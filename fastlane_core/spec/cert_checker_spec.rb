@@ -107,7 +107,7 @@ describe FastlaneCore do
           `ls`
 
           keychain = "keychain with spaces.keychain"
-          cmd = %r{curl -f -o (([A-Z]\:)?\/.+) https://www\.apple\.com/certificateauthority/AppleWWDRCAG6\.cer && security import \1 -k #{Regexp.escape(keychain.shellescape)}}
+          cmd = %r{curl -f -o (([A-Z]\:)?\/.+\.cer) https://www\.apple\.com/certificateauthority/AppleWWDRCAG6\.cer && security import \1 -k #{Regexp.escape(keychain.shellescape)}}
           require "open3"
 
           expect(Open3).to receive(:capture3).with(cmd).and_return(["", "", success_status])
@@ -124,7 +124,7 @@ describe FastlaneCore do
           stub_const('ENV', { "FASTLANE_WWDR_USE_HTTP1_AND_RETRIES" => "true" })
 
           keychain = "keychain with spaces.keychain"
-          cmd = %r{curl --http1.1 --retry 3 --retry-all-errors -f -o (([A-Z]\:)?\/.+) https://www\.apple\.com/certificateauthority/AppleWWDRCAG6\.cer && security import \1 -k #{Regexp.escape(keychain.shellescape)}}
+          cmd = %r{curl --http1.1 --retry 3 --retry-all-errors -f -o (([A-Z]\:)?\/.+\.cer) https://www\.apple\.com/certificateauthority/AppleWWDRCAG6\.cer && security import \1 -k #{Regexp.escape(keychain.shellescape)}}
           require "open3"
 
           expect(Open3).to receive(:capture3).with(cmd).and_return(["", "", success_status])

@@ -146,7 +146,7 @@ module FastlaneCore
 
     def self.install_wwdr_certificate(cert_alias)
       url = WWDRCA_CERTIFICATES.find { |c| c[:alias] == cert_alias }.fetch(:url)
-      file = Tempfile.new(File.basename(url))
+      file = Tempfile.new([File.basename(url, ".cer"), ".cer"])
       filename = file.path
       keychain = wwdr_keychain
       keychain = "-k #{keychain.shellescape}" unless keychain.empty?
