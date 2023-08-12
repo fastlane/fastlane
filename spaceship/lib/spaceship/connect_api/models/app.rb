@@ -300,13 +300,14 @@ module Spaceship
         return get_app_store_versions(client: client, filter: filter, includes: includes).first
       end
 
-      def get_app_store_versions(client: nil, filter: {}, includes: Spaceship::ConnectAPI::AppStoreVersion::ESSENTIAL_INCLUDES, limit: nil, sort: nil)
+      def get_app_store_versions(client: nil, filter: {}, includes: Spaceship::ConnectAPI::AppStoreVersion::ESSENTIAL_INCLUDES, limit: nil)
+        # This API doesn't support "sort" (as of App Store Connect OpenAPI spec v2.4.0)
         client ||= Spaceship::ConnectAPI
         if limit.nil?
-          resps = client.get_app_store_versions(app_id: id, filter: filter, includes: includes, limit: limit, sort: sort).all_pages
+          resps = client.get_app_store_versions(app_id: id, filter: filter, includes: includes, limit: limit).all_pages
           return resps.flat_map(&:to_models)
         else
-          resp = client.get_app_store_versions(app_id: id, filter: filter, includes: includes, limit: limit, sort: sort)
+          resp = client.get_app_store_versions(app_id: id, filter: filter, includes: includes, limit: limit)
           return resp.to_models
         end
       end
