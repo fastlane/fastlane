@@ -278,6 +278,8 @@ workflows:
           ruby_opt: -W:deprecated
           <<: *important-branches
       - tests_macos:
+          name: 'Execute tests on macOS (Xcode 13.4.1, Ruby 3.1)'
+          xcode_version: '13.4.1'
           ruby_version: '3.1'
           ruby_opt: -W:deprecated
       - tests_ubuntu:
