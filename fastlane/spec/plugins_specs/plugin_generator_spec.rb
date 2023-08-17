@@ -104,7 +104,17 @@ describe Fastlane::PluginGenerator do
 
       [
         "source('https://rubygems.org')\n",
-        "gemspec\n"
+        "gemspec\n",
+        "gem 'bundler'\n",
+        "gem 'fastlane', '>= <%= Fastlane::VERSION %>'\n",
+        "gem 'pry'\n",
+        "gem 'rake'\n",
+        "gem 'rspec'\n",
+        "gem 'rspec_junit_formatter'\n",
+        "gem 'rubocop', '<%= Fastlane::RUBOCOP_REQUIREMENT %>'\n",
+        "gem 'rubocop-performance'\n",
+        "gem 'rubocop-require_tools'\n",
+        "gem 'simplecov'\n"
       ].each do |line|
         expect(gemfile_lines).to include(line)
       end
@@ -219,18 +229,6 @@ describe Fastlane::PluginGenerator do
         expect(gemspec.version).to eq(Gem::Version.new('0.1.0'))
         expect(gemspec.email).to eq(email)
         expect(gemspec.summary).to eq(summary)
-        expect(gemspec.development_dependencies).to contain_exactly(
-          Gem::Dependency.new("pry", Gem::Requirement.new([">= 0"]), :development),
-          Gem::Dependency.new("bundler", Gem::Requirement.new([">= 0"]), :development),
-          Gem::Dependency.new("rspec", Gem::Requirement.new([">= 0"]), :development),
-          Gem::Dependency.new("rspec_junit_formatter", Gem::Requirement.new([">= 0"]), :development),
-          Gem::Dependency.new("rake", Gem::Requirement.new([">= 0"]), :development),
-          Gem::Dependency.new("rubocop", Gem::Requirement.new([Fastlane::RUBOCOP_REQUIREMENT]), :development),
-          Gem::Dependency.new("rubocop-require_tools", Gem::Requirement.new([">= 0"]), :development),
-          Gem::Dependency.new("rubocop-performance", Gem::Requirement.new([">= 0"]), :development),
-          Gem::Dependency.new("simplecov", Gem::Requirement.new([">= 0"]), :development),
-          Gem::Dependency.new("fastlane", Gem::Requirement.new([">= #{Fastlane::VERSION}"]), :development)
-        )
       end
     end
 
