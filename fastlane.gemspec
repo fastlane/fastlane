@@ -134,4 +134,5 @@ Gem::Specification.new do |spec|
   spec.add_development_dependency('sinatra', '~> 2.0.8') # Used for mock servers
   spec.add_development_dependency('xcov', '~> 1.4.1') # Used for xcov's parameters generation: https://github.com/fastlane/fastlane/pull/12416
   spec.add_development_dependency('climate_control', '~> 0.2.0')
+  spec.add_development_dependency('http-cookie', '~> 1.0.5') # Must be 1.0.5+ for Ruby 3 compatibility: https://github.com/sparklemotion/http-cookie/commit/d12449a983d3dd660c5fe1f2b135c35e83755cc3
 end

@@ -183,7 +183,7 @@ GEM
     hashdiff (1.0.1)
     highline (2.0.3)
     http-accept (1.7.0)
-    http-cookie (1.0.3)
+    http-cookie (1.0.5)
       domain_name (~> 0.5)
     httpclient (2.8.3)
     interception (0.5)
@@ -329,7 +329,7 @@ GEM
     uber (0.1.0)
     unf (0.1.4)
       unf_ext
-    unf_ext (0.0.7.7)
+    unf_ext (0.0.8.2)
     unicode-display_width (1.7.0)
     webmock (3.12.1)
       addressable (>= 2.3.6)
@@ -371,6 +371,7 @@ DEPENDENCIES
   fastlane-plugin-clubmate
   fastlane-plugin-ruby
   fastlane-plugin-slack_train (>= 0.2.0)
+  http-cookie (~> 1.0.5)
   ox (= 2.13.2)
   pry
   pry-byebug
