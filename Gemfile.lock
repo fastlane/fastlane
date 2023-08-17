@@ -22,6 +22,7 @@ PATH
       google-apis-playcustomapp_v1 (~> 0.1)
       google-cloud-storage (~> 1.31)
       highline (~> 2.0)
+      http-cookie (~> 1.0.5)
       json (< 3.0.0)
       jwt (>= 2.1.0, < 3)
       mini_magick (>= 4.9.4, < 5.0.0)
@@ -371,7 +372,6 @@ DEPENDENCIES
   fastlane-plugin-clubmate
   fastlane-plugin-ruby
   fastlane-plugin-slack_train (>= 0.2.0)
-  http-cookie (~> 1.0.5)
   ox (= 2.13.2)
   pry
   pry-byebug
