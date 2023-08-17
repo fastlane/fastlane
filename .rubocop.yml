@@ -341,3 +341,5 @@ Style/MethodCallWithArgsParentheses:
     - 'context'
     - 'before'
     - 'after'
+Gemspec/DevelopmentDependencies:
+  Enabled: false
