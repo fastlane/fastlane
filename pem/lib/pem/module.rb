@@ -10,8 +10,8 @@ module PEM
   TMP_FOLDER = "#{tmp_dir}/fastlane/PEM/"
   FileUtils.mkdir_p(TMP_FOLDER)
 
-  ENV['FASTLANE_TEAM_ID'] ||= ENV.fetch("PEM_TEAM_ID", nil)
-  ENV['DELIVER_USER'] ||= ENV.fetch("PEM_USERNAME", nil)
+  ENV['FASTLANE_TEAM_ID'] ||= ENV["PEM_TEAM_ID"]
+  ENV['DELIVER_USER'] ||= ENV["PEM_USERNAME"]
 
   Helper = FastlaneCore::Helper # you gotta love Ruby: Helper.* should use the Helper class contained in FastlaneCore
   UI = FastlaneCore::UI

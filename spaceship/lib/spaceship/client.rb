@@ -660,7 +660,7 @@ module Spaceship
     # Fetch the session cookie from the environment
     # (if exists)
     def self.spaceship_session_env
-      ENV["FASTLANE_SESSION"] || ENV.fetch("SPACESHIP_SESSION", nil)
+      ENV["FASTLANE_SESSION"] || ENV["SPACESHIP_SESSION"]
     end
 
     # Get contract messages from App Store Connect's "olympus" endpoint

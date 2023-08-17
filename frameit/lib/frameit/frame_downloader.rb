@@ -40,7 +40,7 @@ module Frameit
 
     def self.templates_path
       # Previously ~/.frameit/device_frames_2/x
-      legacy_path = File.join(ENV.fetch('HOME', nil), ".frameit/devices_frames_2", Frameit.frames_version)
+      legacy_path = File.join(ENV['HOME'], ".frameit/devices_frames_2", Frameit.frames_version)
       return legacy_path if File.directory?(legacy_path)
 
       # New path, being ~/.fastlane/frameit/x

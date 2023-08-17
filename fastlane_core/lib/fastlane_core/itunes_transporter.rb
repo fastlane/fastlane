@@ -196,7 +196,7 @@ module FastlaneCore
       # to determine the best transport mode for packages.
       # It became crucial after WWDC 2020 as it leaded to "Broken pipe (Write failed)" exception
       # More information https://github.com/fastlane/fastlane/issues/16749
-      env_deliver_additional_params = ENV.fetch("DELIVER_ITMSTRANSPORTER_ADDITIONAL_UPLOAD_PARAMETERS", nil)
+      env_deliver_additional_params = ENV["DELIVER_ITMSTRANSPORTER_ADDITIONAL_UPLOAD_PARAMETERS"]
       if env_deliver_additional_params.to_s.strip.empty?
         return nil
       end
@@ -326,7 +326,7 @@ module FastlaneCore
     end
 
     def additional_upload_parameters
-      env_deliver_additional_params = ENV.fetch("DELIVER_ALTOOL_ADDITIONAL_UPLOAD_PARAMETERS", nil)
+      env_deliver_additional_params = ENV["DELIVER_ALTOOL_ADDITIONAL_UPLOAD_PARAMETERS"]
       return nil if env_deliver_additional_params.to_s.strip.empty?
 
       env_deliver_additional_params.to_s.strip
@@ -928,7 +928,7 @@ module FastlaneCore
       #   1) ENV variable for application specific password
       if ENV[TWO_FACTOR_ENV_VARIABLE].to_s.length > 0
         UI.message("Fetching password for transporter from environment variable named `#{TWO_FACTOR_ENV_VARIABLE}`")
-        return ENV.fetch(TWO_FACTOR_ENV_VARIABLE, nil)
+        return ENV[TWO_FACTOR_ENV_VARIABLE]
       end
       #   2) TWO_STEP_HOST_PREFIX from keychain
       account_manager = CredentialsManager::AccountManager.new(user: @user,

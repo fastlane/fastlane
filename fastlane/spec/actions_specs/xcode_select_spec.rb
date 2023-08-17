@@ -34,7 +34,7 @@ describe Fastlane do
           xcode_select \"#{valid_path}\"
         end").runner.execute(:test)
 
-        expect(ENV.fetch("DEVELOPER_DIR", nil)).to eq(valid_path + "/Contents/Developer")
+        expect(ENV["DEVELOPER_DIR"]).to eq(valid_path + "/Contents/Developer")
       end
     end
   end

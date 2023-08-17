@@ -139,7 +139,7 @@ describe Fastlane do
           })
         end").runner.execute(:test)
 
-        expect(result).to include("-m \"#{ENV.fetch('SIGH_PROFILE_PATH', nil)}\"")
+        expect(result).to include("-m \"#{ENV['SIGH_PROFILE_PATH']}\"")
         expect(result.size).to eq(11)
 
         dest_path = File.expand_path('Nowhere')

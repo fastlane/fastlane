@@ -42,7 +42,7 @@ describe Fastlane do
                 xcversion version: '= 7.2'
               end").runner.execute(:test)
 
-              expect(ENV.fetch("DEVELOPER_DIR", nil)).to eq(File.join(v7_2.path, "Contents/Developer"))
+              expect(ENV["DEVELOPER_DIR"]).to eq(File.join(v7_2.path, "Contents/Developer"))
             end
           end
 
@@ -52,7 +52,7 @@ describe Fastlane do
                 xcversion version: '~> 7.2.0'
               end").runner.execute(:test)
 
-              expect(ENV.fetch("DEVELOPER_DIR", nil)).to eq(File.join(v7_2_1.path, "Contents/Developer"))
+              expect(ENV["DEVELOPER_DIR"]).to eq(File.join(v7_2_1.path, "Contents/Developer"))
             end
           end
 
@@ -92,7 +92,7 @@ describe Fastlane do
                 xcversion
               end").runner.execute(:test)
 
-              expect(ENV.fetch("DEVELOPER_DIR", nil)).to eq(File.join(v13_0.path, "Contents/Developer"))
+              expect(ENV["DEVELOPER_DIR"]).to eq(File.join(v13_0.path, "Contents/Developer"))
             end
 
             it "fails if the numbers don't match" do
@@ -128,7 +128,7 @@ describe Fastlane do
                 xcversion(version: '13.0')
               end").runner.execute(:test)
 
-              expect(ENV.fetch("DEVELOPER_DIR", nil)).to eq(File.join(v13_0.path, "Contents/Developer"))
+              expect(ENV["DEVELOPER_DIR"]).to eq(File.join(v13_0.path, "Contents/Developer"))
             end
           end
         end

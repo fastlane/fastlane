@@ -21,7 +21,7 @@ module FastlaneCore
 
       def guess_app_identifier_from_environment
         ["FASTLANE", "DELIVER", "PILOT", "PRODUCE", "PEM", "SIGH", "SNAPSHOT", "MATCH"].each do |current|
-          return ENV.fetch("#{current}_APP_IDENTIFIER", nil) if FastlaneCore::Env.truthy?("#{current}_APP_IDENTIFIER")
+          return ENV["#{current}_APP_IDENTIFIER"] if FastlaneCore::Env.truthy?("#{current}_APP_IDENTIFIER")
         end
         nil
       end

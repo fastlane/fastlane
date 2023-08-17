@@ -54,7 +54,7 @@ RSpec.configure do |config|
     end
 
     # Make sure PATH didn't get emptied during execution of previous (!) test
-    expect(ENV.fetch('PATH', nil)).to be_truthy, "PATH is missing. (Previous test probably emptied it.)"
+    expect(ENV['PATH']).to be_truthy, "PATH is missing. (Previous test probably emptied it.)"
   end
 
   config.after(:each) do |current_test|

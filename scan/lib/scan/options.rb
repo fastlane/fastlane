@@ -106,7 +106,7 @@ module Scan
         FastlaneCore::ConfigItem.new(key: :prelaunch_simulator,
                                      env_name: 'SCAN_PRELAUNCH_SIMULATOR',
                                      description: "Enabling this option will launch the first simulator prior to calling any xcodebuild command",
-                                     default_value: ENV.fetch('FASTLANE_EXPLICIT_OPEN_SIMULATOR', nil),
+                                     default_value: ENV['FASTLANE_EXPLICIT_OPEN_SIMULATOR'],
                                      optional: true,
                                      type: Boolean),
         FastlaneCore::ConfigItem.new(key: :reinstall_app,

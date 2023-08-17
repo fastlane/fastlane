@@ -39,6 +39,6 @@ module Sigh
   UI = FastlaneCore::UI
   ROOT = Pathname.new(File.expand_path('../../..', __FILE__))
 
-  ENV['FASTLANE_TEAM_ID'] ||= ENV.fetch("SIGH_TEAM_ID", nil)
-  ENV['DELIVER_USER'] ||= ENV.fetch("SIGH_USERNAME", nil)
+  ENV['FASTLANE_TEAM_ID'] ||= ENV["SIGH_TEAM_ID"]
+  ENV['DELIVER_USER'] ||= ENV["SIGH_USERNAME"]
 end

@@ -35,7 +35,7 @@ describe Fastlane do
         end").runner.execute(:test)
 
         expect(result).to eq("bundle exec danger")
-        expect(ENV.fetch('DANGER_GITHUB_API_TOKEN', nil)).to eq("1234")
+        expect(ENV['DANGER_GITHUB_API_TOKEN']).to eq("1234")
       end
 
       it "sets github enterprise host" do
@@ -44,7 +44,7 @@ describe Fastlane do
         end").runner.execute(:test)
 
         expect(result).to eq("bundle exec danger")
-        expect(ENV.fetch('DANGER_GITHUB_HOST', nil)).to eq("test.de")
+        expect(ENV['DANGER_GITHUB_HOST']).to eq("test.de")
       end
 
       it "sets github enterprise api base url" do
@@ -53,7 +53,7 @@ describe Fastlane do
         end").runner.execute(:test)
 
         expect(result).to eq("bundle exec danger")
-        expect(ENV.fetch('DANGER_GITHUB_API_BASE_URL', nil)).to eq("https://test.de/api/v3")
+        expect(ENV['DANGER_GITHUB_API_BASE_URL']).to eq("https://test.de/api/v3")
       end
 
       it "appends danger_id" do

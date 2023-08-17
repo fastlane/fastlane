@@ -7,7 +7,7 @@ module Fastlane
     # while optionally adding custom commands for which to enable auto complete
     # @param [Array] options An array of all options (e.g. --custom fl)
     def self.execute(args, options)
-      shell = ENV.fetch('SHELL', nil)
+      shell = ENV['SHELL']
 
       if shell.end_with?("fish")
         fish_completions_dir = "~/.config/fish/completions"

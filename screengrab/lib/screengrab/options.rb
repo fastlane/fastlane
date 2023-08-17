@@ -16,7 +16,7 @@ module Screengrab
                                      short_option: "-n",
                                      optional: true,
                                      code_gen_sensitive: true,
-                                     default_value: ENV['ANDROID_HOME'] || ENV['ANDROID_SDK_ROOT'] || ENV.fetch('ANDROID_SDK', nil),
+                                     default_value: ENV['ANDROID_HOME'] || ENV['ANDROID_SDK_ROOT'] || ENV['ANDROID_SDK'],
                                      default_value_dynamic: true,
                                      description: "Path to the root of your Android SDK installation, e.g. ~/tools/android-sdk-macosx"),
         FastlaneCore::ConfigItem.new(key: :build_tools_version,

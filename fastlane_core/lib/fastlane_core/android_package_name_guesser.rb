@@ -29,8 +29,8 @@ module FastlaneCore
 
       def guess_package_name_from_environment
         package_name = nil
-        package_name ||= ENV.fetch("SUPPLY_PACKAGE_NAME", nil) if FastlaneCore::Env.truthy?("SUPPLY_PACKAGE_NAME")
-        package_name ||= ENV.fetch("SCREENGRAB_APP_PACKAGE_NAME", nil) if FastlaneCore::Env.truthy?("SCREENGRAB_APP_PACKAGE_NAME")
+        package_name ||= ENV["SUPPLY_PACKAGE_NAME"] if FastlaneCore::Env.truthy?("SUPPLY_PACKAGE_NAME")
+        package_name ||= ENV["SCREENGRAB_APP_PACKAGE_NAME"] if FastlaneCore::Env.truthy?("SCREENGRAB_APP_PACKAGE_NAME")
         package_name
       end
 

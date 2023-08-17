@@ -30,8 +30,8 @@ module Fastlane
 
       def self.dsym_path(params)
         file_path = params[:dsym]
-        file_path ||= Actions.lane_context[SharedValues::DSYM_OUTPUT_PATH] || ENV.fetch(SharedValues::DSYM_OUTPUT_PATH.to_s, nil)
-        file_path ||= Actions.lane_context[SharedValues::DSYM_ZIP_PATH] || ENV.fetch(SharedValues::DSYM_ZIP_PATH.to_s, nil)
+        file_path ||= Actions.lane_context[SharedValues::DSYM_OUTPUT_PATH] || ENV[SharedValues::DSYM_OUTPUT_PATH.to_s]
+        file_path ||= Actions.lane_context[SharedValues::DSYM_ZIP_PATH] || ENV[SharedValues::DSYM_ZIP_PATH.to_s]
 
         if file_path
           expanded_file_path = File.expand_path(file_path)

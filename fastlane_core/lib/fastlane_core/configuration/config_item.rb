@@ -258,7 +258,7 @@ module FastlaneCore
       env_names.each do |name|
         next if ENV[name].nil?
         # verify! before using (see https://github.com/fastlane/fastlane/issues/14449)
-        return ENV[name].dup if verify!(auto_convert_value(ENV.fetch(name, nil)))
+        return ENV[name].dup if verify!(auto_convert_value(ENV[name]))
       end
 
       return nil

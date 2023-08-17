@@ -27,12 +27,12 @@ module Fastlane
         Actions.lane_context[SharedValues::SIGH_PROFILE_PATHS] ||= []
         Actions.lane_context[SharedValues::SIGH_PROFILE_PATHS] << path
 
-        uuid = ENV["SIGH_UUID"] || ENV.fetch("SIGH_UDID", nil) # the UUID of the profile
-        name = ENV.fetch("SIGH_NAME", nil) # the name of the profile
+        uuid = ENV["SIGH_UUID"] || ENV["SIGH_UDID"] # the UUID of the profile
+        name = ENV["SIGH_NAME"] # the name of the profile
         Actions.lane_context[SharedValues::SIGH_UUID] = Actions.lane_context[SharedValues::SIGH_UDID] = uuid if uuid
         Actions.lane_context[SharedValues::SIGH_NAME] = Actions.lane_context[SharedValues::SIGH_NAME] = name if name
 
-        set_profile_type(values, ENV.fetch("SIGH_PROFILE_ENTERPRISE", nil))
+        set_profile_type(values, ENV["SIGH_PROFILE_ENTERPRISE"])
 
         return uuid # returs uuid of profile
       end

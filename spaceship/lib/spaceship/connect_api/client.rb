@@ -57,10 +57,10 @@ module Spaceship
 
         unless skip_select_team
           # Check if environment variables are set for Spaceship::Portal or Spaceship::Tunes to select team
-          portal_team_id ||= ENV.fetch('FASTLANE_TEAM_ID', nil)
-          portal_team_name = team_name || ENV.fetch('FASTLANE_TEAM_NAME', nil)
-          tunes_team_id ||= ENV.fetch('FASTLANE_ITC_TEAM_ID', nil)
-          tunes_team_name = team_name || ENV.fetch('FASTLANE_ITC_TEAM_NAME', nil)
+          portal_team_id ||= ENV['FASTLANE_TEAM_ID']
+          portal_team_name = team_name || ENV['FASTLANE_TEAM_NAME']
+          tunes_team_id ||= ENV['FASTLANE_ITC_TEAM_ID']
+          tunes_team_name = team_name || ENV['FASTLANE_ITC_TEAM_NAME']
 
           # The clients will prompt for a team selection if:
           # 1. client exists

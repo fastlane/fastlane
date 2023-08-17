@@ -19,7 +19,7 @@ module Fastlane
       attr_accessor :devices
 
       def initialize(adb_path: nil, adb_host: nil)
-        android_home = ENV['ANDROID_HOME'] || ENV['ANDROID_SDK_ROOT'] || ENV.fetch('ANDROID_SDK', nil)
+        android_home = ENV['ANDROID_HOME'] || ENV['ANDROID_SDK_ROOT'] || ENV['ANDROID_SDK']
         if (adb_path.nil? || adb_path == "adb") && android_home
           adb_path = File.join(android_home, "platform-tools", "adb")
         end

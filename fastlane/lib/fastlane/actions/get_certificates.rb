@@ -20,8 +20,8 @@ module Fastlane
           Cert.config = params # we alread have the finished config
 
           Cert::Runner.new.launch
-          cert_file_path = ENV.fetch("CER_FILE_PATH", nil)
-          certificate_id = ENV.fetch("CER_CERTIFICATE_ID", nil)
+          cert_file_path = ENV["CER_FILE_PATH"]
+          certificate_id = ENV["CER_CERTIFICATE_ID"]
           Actions.lane_context[SharedValues::CERT_FILE_PATH] = cert_file_path
           Actions.lane_context[SharedValues::CERT_CERTIFICATE_ID] = certificate_id
 

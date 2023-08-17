@@ -26,7 +26,7 @@ module Fastlane
 
         zip_path = File.join(Dir.tmpdir, 'plugin.zip')
         sh("curl -Lso #{zip_path} #{params[:url]}")
-        plugins_path = "#{ENV.fetch('HOME', nil)}/Library/Application Support/Developer/Shared/Xcode/Plug-ins"
+        plugins_path = "#{ENV['HOME']}/Library/Application Support/Developer/Shared/Xcode/Plug-ins"
         FileUtils.mkdir_p(plugins_path)
         Action.sh("unzip -qo '#{zip_path}' -d '#{plugins_path}'")
 

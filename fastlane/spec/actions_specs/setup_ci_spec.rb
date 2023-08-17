@@ -130,17 +130,17 @@ describe Fastlane do
 
         it "sets the MATCH_KEYCHAIN_NAME env var" do
           described_class.setup_keychain(timeout: 3600)
-          expect(ENV.fetch("MATCH_KEYCHAIN_NAME", nil)).to eql("fastlane_tmp_keychain")
+          expect(ENV["MATCH_KEYCHAIN_NAME"]).to eql("fastlane_tmp_keychain")
         end
 
         it "sets the MATCH_KEYCHAIN_PASSWORD env var" do
           described_class.setup_keychain(timeout: 3600)
-          expect(ENV.fetch("MATCH_KEYCHAIN_PASSWORD", nil)).to eql("")
+          expect(ENV["MATCH_KEYCHAIN_PASSWORD"]).to eql("")
         end
 
         it "sets the MATCH_READONLY env var" do
           described_class.setup_keychain(timeout: 3600)
-          expect(ENV.fetch("MATCH_READONLY", nil)).to eql("true")
+          expect(ENV["MATCH_READONLY"]).to eql("true")
         end
       end
 
@@ -162,17 +162,17 @@ describe Fastlane do
 
       it "sets the SCAN_OUTPUT_DIRECTORY" do
         described_class.setup_output_paths
-        expect(ENV.fetch("SCAN_OUTPUT_DIRECTORY", nil)).to eql("/dev/null/scan")
+        expect(ENV["SCAN_OUTPUT_DIRECTORY"]).to eql("/dev/null/scan")
       end
 
       it "sets the GYM_OUTPUT_DIRECTORY" do
         described_class.setup_output_paths
-        expect(ENV.fetch("GYM_OUTPUT_DIRECTORY", nil)).to eql("/dev/null/gym")
+        expect(ENV["GYM_OUTPUT_DIRECTORY"]).to eql("/dev/null/gym")
       end
 
       it "sets the FL_BUILDLOG_PATH" do
         described_class.setup_output_paths
-        expect(ENV.fetch("FL_BUILDLOG_PATH", nil)).to eql("/dev/null/buildlogs")
+        expect(ENV["FL_BUILDLOG_PATH"]).to eql("/dev/null/buildlogs")
       end
     end
   end

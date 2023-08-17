@@ -118,7 +118,7 @@ module Fastlane
       end
 
       def self.fill_in_default_values(params)
-        embed = Actions.lane_context[Actions::SharedValues::SIGH_PROFILE_PATH] || ENV.fetch("SIGH_PROFILE_PATH", nil)
+        embed = Actions.lane_context[Actions::SharedValues::SIGH_PROFILE_PATH] || ENV["SIGH_PROFILE_PATH"]
         params[:embed] ||= embed if embed
         params
       end

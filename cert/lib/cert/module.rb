@@ -12,5 +12,5 @@ module Cert
   Boolean = Fastlane::Boolean
   ROOT = Pathname.new(File.expand_path('../../..', __FILE__))
 
-  ENV['FASTLANE_TEAM_ID'] ||= ENV.fetch("CERT_TEAM_ID", nil)
+  ENV['FASTLANE_TEAM_ID'] ||= ENV["CERT_TEAM_ID"]
 end

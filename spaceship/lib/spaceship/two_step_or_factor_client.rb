@@ -132,7 +132,7 @@ module Spaceship
       code_length = security_code["length"]
 
       puts("")
-      env_2fa_sms_default_phone_number = ENV.fetch("SPACESHIP_2FA_SMS_DEFAULT_PHONE_NUMBER", nil)
+      env_2fa_sms_default_phone_number = ENV["SPACESHIP_2FA_SMS_DEFAULT_PHONE_NUMBER"]
 
       if env_2fa_sms_default_phone_number
         raise Tunes::Error.new, "Environment variable SPACESHIP_2FA_SMS_DEFAULT_PHONE_NUMBER is set, but empty." if env_2fa_sms_default_phone_number.empty?

@@ -176,7 +176,7 @@ module Snapshot
           AppleLanguages: [language]
         }
         UI.message("Localizing #{device_type} (AppleLocale=#{locale} AppleLanguages=[#{language}])")
-        plist_path = "#{ENV.fetch('HOME', nil)}/Library/Developer/CoreSimulator/Devices/#{device_udid}/data/Library/Preferences/.GlobalPreferences.plist"
+        plist_path = "#{ENV['HOME']}/Library/Developer/CoreSimulator/Devices/#{device_udid}/data/Library/Preferences/.GlobalPreferences.plist"
         File.write(plist_path, Plist::Emit.dump(plist))
       end
     end
@@ -188,7 +188,7 @@ module Snapshot
           UserInterfaceStyleMode: (dark_mode ? 2 : 1)
         }
         UI.message("Setting interface style #{device_type} (UserInterfaceStyleMode=#{dark_mode})")
-        plist_path = "#{ENV.fetch('HOME', nil)}/Library/Developer/CoreSimulator/Devices/#{device_udid}/data/Library/Preferences/com.apple.uikitservices.userInterfaceStyleMode.plist"
+        plist_path = "#{ENV['HOME']}/Library/Developer/CoreSimulator/Devices/#{device_udid}/data/Library/Preferences/com.apple.uikitservices.userInterfaceStyleMode.plist"
         File.write(plist_path, Plist::Emit.dump(plist))
       end
     end

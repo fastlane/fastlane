@@ -61,7 +61,7 @@ module Fastlane
           auth_parts << "--issuer #{api_key.issuer_id}"
         else
           auth_parts << "--apple-id #{params[:username]}"
-          auth_parts << "--password #{ENV.fetch('FASTLANE_APPLE_APPLICATION_SPECIFIC_PASSWORD', nil)}"
+          auth_parts << "--password #{ENV['FASTLANE_APPLE_APPLICATION_SPECIFIC_PASSWORD']}"
           auth_parts << "--team-id #{params[:asc_provider]}"
         end
 

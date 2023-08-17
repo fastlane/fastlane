@@ -26,9 +26,9 @@ module Match
 
       def self.configure(params)
         api_v4_url     = ENV['CI_API_V4_URL'] || "#{params[:gitlab_host]}/api/v4"
-        project_id     = params[:gitlab_project] || ENV['GITLAB_PROJECT'] || ENV.fetch('CI_PROJECT_ID', nil)
-        job_token      = params[:job_token] || ENV.fetch('CI_JOB_TOKEN', nil)
-        private_token  = params[:private_token] || ENV.fetch('PRIVATE_TOKEN', nil)
+        project_id     = params[:gitlab_project] || ENV['GITLAB_PROJECT'] || ENV['CI_PROJECT_ID']
+        job_token      = params[:job_token] || ENV['CI_JOB_TOKEN']
+        private_token  = params[:private_token] || ENV['PRIVATE_TOKEN']
 
         if params[:git_url].to_s.length > 0
           UI.important("Looks like you still define a `git_url` somewhere, even though")

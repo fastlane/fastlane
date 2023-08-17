@@ -17,7 +17,7 @@ module Fastlane
         end
 
         # finally, get the variable we requested
-        return ENV.fetch(value_to_get, nil) unless value_to_get.nil?
+        return ENV[value_to_get] unless value_to_get.nil?
 
         # if no variable is requested, just return empty string
         return ""

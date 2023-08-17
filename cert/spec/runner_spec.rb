@@ -42,10 +42,10 @@ describe Cert do
           Cert.config = FastlaneCore::Configuration.create(Cert::Options.available_options, options)
 
           Cert::Runner.new.launch
-          expect(ENV.fetch("CER_CERTIFICATE_ID", nil)).to eq("cert_id")
-          expect(ENV.fetch("CER_FILE_PATH", nil)).to eq(certificate_path)
-          expect(ENV.fetch("CER_KEYCHAIN_PATH", nil)).to eq(keychain_path)
-          File.delete(ENV.fetch("CER_FILE_PATH", nil))
+          expect(ENV["CER_CERTIFICATE_ID"]).to eq("cert_id")
+          expect(ENV["CER_FILE_PATH"]).to eq(certificate_path)
+          expect(ENV["CER_KEYCHAIN_PATH"]).to eq(keychain_path)
+          File.delete(ENV["CER_FILE_PATH"])
         end
 
         it "correctly selects expired certificates" do

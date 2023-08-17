@@ -56,7 +56,7 @@ describe Spaceship::ProvisioningProfile do
 
   describe '#all via xcode api' do
     around(:all) do |example|
-      switch = ENV.fetch('SPACESHIP_AVOID_XCODE_API', nil)
+      switch = ENV['SPACESHIP_AVOID_XCODE_API']
       example.run
       ENV['SPACESHIP_AVOID_XCODE_API'] = switch
     end

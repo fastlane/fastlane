@@ -108,7 +108,7 @@ module Fastlane
                                        conflicting_options: [:api_bearer],
                                        sensitive: true,
                                        code_gen_sensitive: true,
-                                       default_value: ENV.fetch("GITHUB_API_TOKEN", nil),
+                                       default_value: ENV["GITHUB_API_TOKEN"],
                                        default_value_dynamic: true,
                                        optional: true),
           FastlaneCore::ConfigItem.new(key: :api_bearer,
