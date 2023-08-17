@@ -114,7 +114,7 @@ describe Scan::SlackPoster do
       it "does Slack posting", requires_xcodebuild: true do
         # ensures that people's local environment variable doesn't interfere with this test
         FastlaneSpec::Env.with_env_values('SLACK_URL' => nil) do
-          expect(ENV['SLACK_URL']).to eq(nil)
+          expect(ENV.fetch('SLACK_URL', nil)).to eq(nil)
 
           Scan.config = FastlaneCore::Configuration.create(Scan::Options.available_options, {
             project: './scan/examples/standard/app.xcodeproj',
@@ -134,7 +134,7 @@ describe Scan::SlackPoster do
     describe "with SLACK_URL ENV var set to a URL value" do
       it "does Slack posting", requires_xcodebuild: true do
         FastlaneSpec::Env.with_env_values('SLACK_URL' => 'https://slack/hook/url') do
-          expect(ENV['SLACK_URL']).to eq('https://slack/hook/url')
+          expect(ENV.fetch('SLACK_URL', nil)).to eq('https://slack/hook/url')
 
           Scan.config = FastlaneCore::Configuration.create(Scan::Options.available_options, {
             project: './scan/examples/standard/app.xcodeproj'

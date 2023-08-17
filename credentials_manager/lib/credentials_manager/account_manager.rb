@@ -29,8 +29,8 @@ module CredentialsManager
 
     def user
       if default_prefix?
-        @user ||= ENV["FASTLANE_USER"]
-        @user ||= ENV["DELIVER_USER"]
+        @user ||= ENV.fetch("FASTLANE_USER", nil)
+        @user ||= ENV.fetch("DELIVER_USER", nil)
         @user ||= AppfileConfig.try_fetch_value(:apple_id)
       end
 
@@ -39,7 +39,7 @@ module CredentialsManager
     end
 
     def fetch_password_from_env
-      password = ENV["FASTLANE_PASSWORD"] || ENV["DELIVER_PASSWORD"]
+      password = ENV["FASTLANE_PASSWORD"] || ENV.fetch("DELIVER_PASSWORD", nil)
       return password if password.to_s.length > 0
       return nil
     end

@@ -57,7 +57,7 @@ module Pilot
                                      description: "Apple ID property in the App Information section in App Store Connect",
                                      optional: true,
                                      code_gen_sensitive: true,
-                                     default_value: ENV["TESTFLIGHT_APPLE_ID"],
+                                     default_value: ENV.fetch("TESTFLIGHT_APPLE_ID", nil),
                                      default_value_dynamic: true,
                                      type: String,
                                      verify_block: proc do |value|

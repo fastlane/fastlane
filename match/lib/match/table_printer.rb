@@ -36,7 +36,7 @@ module Match
         Utils.environment_variable_name_team_id(app_identifier: app_identifier, type: type, platform: platform) => "Development Team ID",
         Utils.environment_variable_name_certificate_name(app_identifier: app_identifier, type: type, platform: platform) => "Certificate Name"
       }.each do |env_key, name|
-        rows << [name, env_key, ENV[env_key]]
+        rows << [name, env_key, ENV.fetch(env_key, nil)]
       end
 
       params = {}

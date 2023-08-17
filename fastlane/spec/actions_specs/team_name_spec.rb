@@ -8,7 +8,7 @@ describe Fastlane do
         end").runner.execute(:test)
 
         [:FASTLANE_TEAM_NAME, :PRODUCE_TEAM_NAME].each do |current|
-          expect(ENV[current.to_s]).to eq(new_val)
+          expect(ENV.fetch(current.to_s, nil)).to eq(new_val)
         end
       end
 

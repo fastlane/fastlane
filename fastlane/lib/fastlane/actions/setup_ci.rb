@@ -59,7 +59,7 @@ module Fastlane
           return
         end
 
-        root = Pathname.new(ENV["FL_OUTPUT_DIR"])
+        root = Pathname.new(ENV.fetch("FL_OUTPUT_DIR", nil))
         ENV["SCAN_OUTPUT_DIRECTORY"] = (root + "scan").to_s
         ENV["GYM_OUTPUT_DIRECTORY"] = (root + "gym").to_s
         ENV["FL_BUILDLOG_PATH"] = (root + "buildlogs").to_s

@@ -13,7 +13,7 @@ module Fastlane
 
         if Helper.ci? || Helper.test?
           # The "BUILD_URL" environment variable is set automatically by Jenkins in every build
-          jenkins_api_url = URI(ENV["BUILD_URL"] + "api/json\?wrapper\=changes\&xpath\=//changeSet//comment")
+          jenkins_api_url = URI(ENV.fetch("BUILD_URL", nil) + "api/json?wrapper=changes&xpath=//changeSet//comment")
           begin
             json = JSON.parse(Net::HTTP.get(jenkins_api_url))
             json['changeSet']['items'].each do |item|

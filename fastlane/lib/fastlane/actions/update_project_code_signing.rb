@@ -38,13 +38,13 @@ module Fastlane
                                        deprecated: "Use `:uuid` instead",
                                        env_name: "FL_PROJECT_SIGNING_UDID",
                                        code_gen_sensitive: true,
-                                       default_value: ENV["SIGH_UUID"],
+                                       default_value: ENV.fetch("SIGH_UUID", nil),
                                        default_value_dynamic: true),
           FastlaneCore::ConfigItem.new(key: :uuid,
                                        env_name: "FL_PROJECT_SIGNING_UUID",
                                        description: "The UUID of the provisioning profile you want to use",
                                        code_gen_sensitive: true,
-                                       default_value: ENV["SIGH_UUID"],
+                                       default_value: ENV.fetch("SIGH_UUID", nil),
                                        default_value_dynamic: true)
         ]
       end

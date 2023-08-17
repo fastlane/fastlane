@@ -158,7 +158,7 @@ module Fastlane
         if ENV[e].nil?
           env_icon = ""
         end
-        env_table << "| #{e} | #{ENV[e]} | #{env_icon} |\n"
+        env_table << "| #{e} | #{ENV.fetch(e, nil)} | #{env_icon} |\n"
       end
       if !found_one
         table = "| Error |\n"
@@ -283,7 +283,7 @@ module Fastlane
       env_output
     end
 
-    def self.anonymized_path(path, home = ENV['HOME'])
+    def self.anonymized_path(path, home = ENV.fetch('HOME', nil))
       return home ? path.gsub(%r{^#{home}(?=/(.*)|$)}, '~\2') : path
     end
 

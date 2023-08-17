@@ -75,7 +75,7 @@ module CredentialsManager
     end
 
     def fallback_to_default_values
-      data[:apple_id] ||= ENV["FASTLANE_USER"] || ENV["DELIVER_USER"] || ENV["DELIVER_USERNAME"]
+      data[:apple_id] ||= ENV["FASTLANE_USER"] || ENV["DELIVER_USER"] || ENV.fetch("DELIVER_USERNAME", nil)
     end
 
     def data

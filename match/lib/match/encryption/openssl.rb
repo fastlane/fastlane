@@ -86,7 +86,7 @@ module Match
 
       # Access the MATCH_PASSWORD, either from ENV variable, Keychain or user input
       def fetch_password!
-        password = ENV["MATCH_PASSWORD"]
+        password = ENV.fetch("MATCH_PASSWORD", nil)
         unless password
           item = Security::InternetPassword.find(server: server_name(self.keychain_name))
           password = item.password if item

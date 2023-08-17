@@ -20,7 +20,7 @@ module Sigh
     def self.install_profile(profile)
       UI.message("Installing provisioning profile...")
       profile_path = File.expand_path("~") + "/Library/MobileDevice/Provisioning Profiles/"
-      uuid = ENV["SIGH_UUID"] || ENV["SIGH_UDID"]
+      uuid = ENV["SIGH_UUID"] || ENV.fetch("SIGH_UDID", nil)
       profile_filename = uuid + ".mobileprovision"
       destination = profile_path + profile_filename
 

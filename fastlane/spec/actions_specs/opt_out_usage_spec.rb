@@ -5,7 +5,7 @@ describe Fastlane do
         Fastlane::FastFile.new.parse("lane :test do
           opt_out_usage
         end").runner.execute(:test)
-        expect(ENV['FASTLANE_OPT_OUT_USAGE']).to eq("YES")
+        expect(ENV.fetch('FASTLANE_OPT_OUT_USAGE', nil)).to eq("YES")
       end
     end
   end

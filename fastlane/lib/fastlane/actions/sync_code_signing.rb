@@ -56,7 +56,7 @@ module Fastlane
             app_identifier = "maccatalyst.#{app_identifier}"
           end
 
-          mapping[app_identifier] = ENV[env_variable_name]
+          mapping[app_identifier] = ENV.fetch(env_variable_name, nil)
         end
 
         Actions.lane_context[SharedValues::MATCH_PROVISIONING_PROFILE_MAPPING] = mapping

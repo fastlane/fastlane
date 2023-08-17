@@ -9,7 +9,7 @@ module Deliver
     def self.available_options
       user = CredentialsManager::AppfileConfig.try_fetch_value(:itunes_connect_id)
       user ||= CredentialsManager::AppfileConfig.try_fetch_value(:apple_id)
-      user ||= ENV["DELIVER_USER"]
+      user ||= ENV.fetch("DELIVER_USER", nil)
 
       [
         FastlaneCore::ConfigItem.new(key: :api_key_path,

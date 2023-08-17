@@ -247,7 +247,7 @@ module Fastlane
             builder.use(FaradayMiddleware::FollowRedirects)
             builder.adapter(Faraday.default_adapter)
           end
-          conn.basic_auth(ENV["GITHUB_USER_NAME"], ENV["GITHUB_API_TOKEN"])
+          conn.basic_auth(ENV.fetch("GITHUB_USER_NAME", nil), ENV.fetch("GITHUB_API_TOKEN", nil))
           response = conn.get('')
           repo_details = JSON.parse(response.body)
 
@@ -260,7 +260,7 @@ module Fastlane
             builder.adapter(Faraday.default_adapter)
           end
 
-          conn.basic_auth(ENV["GITHUB_USER_NAME"], ENV["GITHUB_API_TOKEN"])
+          conn.basic_auth(ENV.fetch("GITHUB_USER_NAME", nil), ENV.fetch("GITHUB_API_TOKEN", nil))
           response = conn.get('')
           contributor_details = JSON.parse(response.body)
 

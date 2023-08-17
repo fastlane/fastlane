@@ -9,6 +9,6 @@ module Produce
   UI = FastlaneCore::UI
   ROOT = Pathname.new(File.expand_path('../../..', __FILE__))
 
-  ENV['FASTLANE_TEAM_ID'] ||= ENV["PRODUCE_TEAM_ID"]
-  ENV['DELIVER_USER'] ||= ENV["PRODUCE_USERNAME"]
+  ENV['FASTLANE_TEAM_ID'] ||= ENV.fetch("PRODUCE_TEAM_ID", nil)
+  ENV['DELIVER_USER'] ||= ENV.fetch("PRODUCE_USERNAME", nil)
 end

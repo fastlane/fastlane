@@ -10,7 +10,7 @@ describe Pilot::Options do
   it "accepts a developer portal team ID" do
     FastlaneCore::Configuration.create(Pilot::Options.available_options, { dev_portal_team_id: 'ABCD1234' })
 
-    expect(ENV['FASTLANE_TEAM_ID']).to eq('ABCD1234')
+    expect(ENV.fetch('FASTLANE_TEAM_ID', nil)).to eq('ABCD1234')
   end
 
   context "beta_app_review_info" do

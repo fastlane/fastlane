@@ -4,15 +4,15 @@ describe Fastlane do
       let(:tmp_keychain_name) { "fastlane_tmp_keychain" }
 
       def check_keychain_nil
-        expect(ENV["MATCH_KEYCHAIN_NAME"]).to be_nil
-        expect(ENV["MATCH_KEYCHAIN_PASSWORD"]).to be_nil
-        expect(ENV["MATCH_READONLY"]).to be_nil
+        expect(ENV.fetch("MATCH_KEYCHAIN_NAME", nil)).to be_nil
+        expect(ENV.fetch("MATCH_KEYCHAIN_PASSWORD", nil)).to be_nil
+        expect(ENV.fetch("MATCH_READONLY", nil)).to be_nil
       end
 
       def check_keychain_created
-        expect(ENV["MATCH_KEYCHAIN_NAME"]).to eq(tmp_keychain_name)
-        expect(ENV["MATCH_KEYCHAIN_PASSWORD"]).to eq("")
-        expect(ENV["MATCH_READONLY"]).to eq("true")
+        expect(ENV.fetch("MATCH_KEYCHAIN_NAME", nil)).to eq(tmp_keychain_name)
+        expect(ENV.fetch("MATCH_KEYCHAIN_PASSWORD", nil)).to eq("")
+        expect(ENV.fetch("MATCH_READONLY", nil)).to eq("true")
       end
 
       it "doesn't work outside CI" do

@@ -50,15 +50,15 @@ module Spaceship
       end
 
       def self.create(key_id: nil, issuer_id: nil, filepath: nil, key: nil, is_key_content_base64: false, duration: nil, in_house: nil, **)
-        key_id ||= ENV['SPACESHIP_CONNECT_API_KEY_ID']
-        issuer_id ||= ENV['SPACESHIP_CONNECT_API_ISSUER_ID']
-        filepath ||= ENV['SPACESHIP_CONNECT_API_KEY_FILEPATH']
-        duration ||= ENV['SPACESHIP_CONNECT_API_TOKEN_DURATION']
+        key_id ||= ENV.fetch('SPACESHIP_CONNECT_API_KEY_ID', nil)
+        issuer_id ||= ENV.fetch('SPACESHIP_CONNECT_API_ISSUER_ID', nil)
+        filepath ||= ENV.fetch('SPACESHIP_CONNECT_API_KEY_FILEPATH', nil)
+        duration ||= ENV.fetch('SPACESHIP_CONNECT_API_TOKEN_DURATION', nil)
 
-        in_house_env = ENV['SPACESHIP_CONNECT_API_IN_HOUSE']
+        in_house_env = ENV.fetch('SPACESHIP_CONNECT_API_IN_HOUSE', nil)
         in_house ||= !["", "no", "false", "off", "0"].include?(in_house_env) if in_house_env
 
-        key ||= ENV['SPACESHIP_CONNECT_API_KEY']
+        key ||= ENV.fetch('SPACESHIP_CONNECT_API_KEY', nil)
         key ||= File.binread(filepath)
 
         if !key.nil? && is_key_content_base64

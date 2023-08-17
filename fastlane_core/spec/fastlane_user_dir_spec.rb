@@ -1,6 +1,6 @@
 describe FastlaneCore do
   it "returns the path to the user's directory" do
-    expected_path = File.join(ENV["HOME"], ".fastlane")
+    expected_path = File.join(ENV.fetch("HOME", nil), ".fastlane")
 
     expect(File).to receive(:directory?).and_return(false)
     expect(FileUtils).to receive(:mkdir_p).with(expected_path)

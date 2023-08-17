@@ -79,11 +79,11 @@ describe Match do
           allow(fake_storage).to receive(:prefixed_working_directory).and_return(repo_dir)
           expect(Match::Generator).to receive(:generate_certificate).with(config, :distribution, fake_storage.working_directory, specific_cert_type: nil).and_return(cert_path)
           expect(Match::Generator).to receive(:generate_provisioning_profile).with(params: config,
-                                                                                prov_type: :appstore,
-                                                                           certificate_id: "something",
-                                                                           app_identifier: values[:app_identifier],
-                                                                                    force: false,
-                                                                       working_directory: fake_storage.working_directory).and_return(profile_path)
+                                                                                   prov_type: :appstore,
+                                                                                   certificate_id: "something",
+                                                                                   app_identifier: values[:app_identifier],
+                                                                                   force: false,
+                                                                                   working_directory: fake_storage.working_directory).and_return(profile_path)
           expect(FastlaneCore::ProvisioningProfile).to receive(:install).with(profile_path, keychain_path).and_return(destination)
           expect(fake_storage).to receive(:save_changes!).with(
             files_to_commit: [
@@ -103,17 +103,17 @@ describe Match do
 
           Match::Runner.new.run(config)
 
-          expect(ENV[Match::Utils.environment_variable_name(app_identifier: "tools.fastlane.app",
-                                                            type: "appstore")]).to eql('98264c6b-5151-4349-8d0f-66691e48ae35')
-          expect(ENV[Match::Utils.environment_variable_name_team_id(app_identifier: "tools.fastlane.app",
-                                                                    type: "appstore")]).to eql('439BBM9367')
-          expect(ENV[Match::Utils.environment_variable_name_profile_name(app_identifier: "tools.fastlane.app",
-                                                                         type: "appstore")]).to eql('tools.fastlane.app AppStore')
+          expect(ENV.fetch(Match::Utils.environment_variable_name(app_identifier: "tools.fastlane.app",
+                                                                  type: "appstore"), nil)).to eql('98264c6b-5151-4349-8d0f-66691e48ae35')
+          expect(ENV.fetch(Match::Utils.environment_variable_name_team_id(app_identifier: "tools.fastlane.app",
+                                                                          type: "appstore"), nil)).to eql('439BBM9367')
+          expect(ENV.fetch(Match::Utils.environment_variable_name_profile_name(app_identifier: "tools.fastlane.app",
+                                                                               type: "appstore"), nil)).to eql('tools.fastlane.app AppStore')
           profile_path = File.expand_path('~/Library/MobileDevice/Provisioning Profiles/98264c6b-5151-4349-8d0f-66691e48ae35.mobileprovision')
-          expect(ENV[Match::Utils.environment_variable_name_profile_path(app_identifier: "tools.fastlane.app",
-                                                                         type: "appstore")]).to eql(profile_path)
-          expect(ENV[Match::Utils.environment_variable_name_certificate_name(app_identifier: "tools.fastlane.app",
-                                                                             type: "appstore")]).to eql("fastlane certificate name")
+          expect(ENV.fetch(Match::Utils.environment_variable_name_profile_path(app_identifier: "tools.fastlane.app",
+                                                                               type: "appstore"), nil)).to eql(profile_path)
+          expect(ENV.fetch(Match::Utils.environment_variable_name_certificate_name(app_identifier: "tools.fastlane.app",
+                                                                                   type: "appstore"), nil)).to eql("fastlane certificate name")
         end
 
         it "uses existing certificates and profiles if they exist", requires_security: true do
@@ -194,17 +194,17 @@ describe Match do
 
           Match::Runner.new.run(config)
 
-          expect(ENV[Match::Utils.environment_variable_name(app_identifier: "tools.fastlane.app",
-                                                            type: "appstore")]).to eql('736590c3-dfe8-4c25-b2eb-2404b8e65fb8')
-          expect(ENV[Match::Utils.environment_variable_name_team_id(app_identifier: "tools.fastlane.app",
-                                                                    type: "appstore")]).to eql('439BBM9367')
-          expect(ENV[Match::Utils.environment_variable_name_profile_name(app_identifier: "tools.fastlane.app",
-                                                                         type: "appstore")]).to eql('match AppStore tools.fastlane.app 1449198835')
+          expect(ENV.fetch(Match::Utils.environment_variable_name(app_identifier: "tools.fastlane.app",
+                                                                  type: "appstore"), nil)).to eql('736590c3-dfe8-4c25-b2eb-2404b8e65fb8')
+          expect(ENV.fetch(Match::Utils.environment_variable_name_team_id(app_identifier: "tools.fastlane.app",
+                                                                          type: "appstore"), nil)).to eql('439BBM9367')
+          expect(ENV.fetch(Match::Utils.environment_variable_name_profile_name(app_identifier: "tools.fastlane.app",
+                                                                               type: "appstore"), nil)).to eql('match AppStore tools.fastlane.app 1449198835')
           profile_path = File.expand_path('~/Library/MobileDevice/Provisioning Profiles/736590c3-dfe8-4c25-b2eb-2404b8e65fb8.mobileprovision')
-          expect(ENV[Match::Utils.environment_variable_name_profile_path(app_identifier: "tools.fastlane.app",
-                                                                         type: "appstore")]).to eql(profile_path)
-          expect(ENV[Match::Utils.environment_variable_name_certificate_name(app_identifier: "tools.fastlane.app",
-                                                                             type: "appstore")]).to eql("fastlane certificate name")
+          expect(ENV.fetch(Match::Utils.environment_variable_name_profile_path(app_identifier: "tools.fastlane.app",
+                                                                               type: "appstore"), nil)).to eql(profile_path)
+          expect(ENV.fetch(Match::Utils.environment_variable_name_certificate_name(app_identifier: "tools.fastlane.app",
+                                                                                   type: "appstore"), nil)).to eql("fastlane certificate name")
         end
 
         it "fails because of an outdated certificate", requires_security: true do

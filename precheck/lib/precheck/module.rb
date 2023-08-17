@@ -17,7 +17,7 @@ module Precheck
   Boolean = Fastlane::Boolean
   ROOT = Pathname.new(File.expand_path('../../..', __FILE__))
 
-  ENV['APP_IDENTIFIER'] ||= ENV["PRECHECK_APP_IDENTIFIER"]
+  ENV['APP_IDENTIFIER'] ||= ENV.fetch("PRECHECK_APP_IDENTIFIER", nil)
 
   DESCRIPTION = 'Check your app using a community driven set of App Store review rules to avoid being rejected'
 end

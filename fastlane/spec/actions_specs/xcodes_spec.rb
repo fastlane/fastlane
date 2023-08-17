@@ -115,7 +115,7 @@ describe Fastlane do
         Fastlane::FastFile.new.parse("lane :test do
           xcodes(version: '14')
         end").runner.execute(:test)
-        expect(ENV["DEVELOPER_DIR"]).to eq(xcode_developer_path)
+        expect(ENV.fetch("DEVELOPER_DIR", nil)).to eq(xcode_developer_path)
       end
 
       it "sets the SharedValues::XCODES_XCODE_PATH lane context" do

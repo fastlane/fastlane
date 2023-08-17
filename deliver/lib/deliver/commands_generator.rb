@@ -36,7 +36,7 @@ module Deliver
 
     def self.force_overwrite_metadata?(options, path)
       res = options[:force]
-      res ||= ENV["DELIVER_FORCE_OVERWRITE"] # for backward compatibility
+      res ||= ENV.fetch("DELIVER_FORCE_OVERWRITE", nil) # for backward compatibility
       res ||= UI.confirm("Do you want to overwrite existing metadata on path '#{File.expand_path(path)}'?") if UI.interactive?
       res
     end

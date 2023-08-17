@@ -66,7 +66,7 @@ module FastlaneCore
 
     # @return true if it is enabled to execute external commands
     def self.sh_enabled?
-      !self.test? || ENV["FORCE_SH_DURING_TESTS"]
+      !self.test? || ENV.fetch("FORCE_SH_DURING_TESTS", nil)
     end
 
     # @return [boolean] true if building in a known CI environment
@@ -159,7 +159,7 @@ module FastlaneCore
       begin
         output = `DEVELOPER_DIR='' "#{xcodebuild_path}" -version`
         @xcode_version = output.split("\n").first.split(' ')[1]
-        @developer_dir = ENV['DEVELOPER_DIR']
+        @developer_dir = ENV.fetch('DEVELOPER_DIR', nil)
       rescue => ex
         UI.error(ex)
         UI.user_error!("Error detecting currently used Xcode installation, please ensure that you have Xcode installed and set it using `sudo xcode-select -s [path]`")
@@ -220,7 +220,7 @@ module FastlaneCore
     end
 
     def self.user_defined_itms_path
-      return ENV["FASTLANE_ITUNES_TRANSPORTER_PATH"] if self.user_defined_itms_path?
+      return ENV.fetch("FASTLANE_ITUNES_TRANSPORTER_PATH", nil) if self.user_defined_itms_path?
     end
 
     # @return the full path to the iTMSTransporter executable

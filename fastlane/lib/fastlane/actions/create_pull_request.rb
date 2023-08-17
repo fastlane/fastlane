@@ -163,7 +163,7 @@ module Fastlane
                                        description: "Personal API Token for GitHub - generate one at https://github.com/settings/tokens",
                                        sensitive: true,
                                        code_gen_sensitive: true,
-                                       default_value: ENV["GITHUB_API_TOKEN"],
+                                       default_value: ENV.fetch("GITHUB_API_TOKEN", nil),
                                        default_value_dynamic: true,
                                        conflicting_options: [:api_bearer],
                                        optional: true),

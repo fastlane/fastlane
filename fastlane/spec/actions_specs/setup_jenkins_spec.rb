@@ -17,22 +17,22 @@ describe Fastlane do
           setup_jenkins
         end").runner.execute(:test)
 
-        expect(ENV["BACKUP_XCARCHIVE_DESTINATION"]).to be_nil
-        expect(ENV["DERIVED_DATA_PATH"]).to be_nil
-        expect(ENV["FL_CARTHAGE_DERIVED_DATA"]).to be_nil
-        expect(ENV["FL_SLATHER_BUILD_DIRECTORY"]).to be_nil
-        expect(ENV["GYM_BUILD_PATH"]).to be_nil
-        expect(ENV["GYM_CODE_SIGNING_IDENTITY"]).to be_nil
-        expect(ENV["GYM_DERIVED_DATA_PATH"]).to be_nil
-        expect(ENV["GYM_OUTPUT_DIRECTORY"]).to be_nil
-        expect(ENV["GYM_RESULT_BUNDLE"]).to be_nil
-        expect(ENV["SCAN_DERIVED_DATA_PATH"]).to be_nil
-        expect(ENV["SCAN_OUTPUT_DIRECTORY"]).to be_nil
-        expect(ENV["SCAN_RESULT_BUNDLE"]).to be_nil
-        expect(ENV["XCODE_DERIVED_DATA_PATH"]).to be_nil
-        expect(ENV["MATCH_KEYCHAIN_NAME"]).to be_nil
-        expect(ENV["MATCH_KEYCHAIN_PASSWORD"]).to be_nil
-        expect(ENV["MATCH_READONLY"]).to be_nil
+        expect(ENV.fetch("BACKUP_XCARCHIVE_DESTINATION", nil)).to be_nil
+        expect(ENV.fetch("DERIVED_DATA_PATH", nil)).to be_nil
+        expect(ENV.fetch("FL_CARTHAGE_DERIVED_DATA", nil)).to be_nil
+        expect(ENV.fetch("FL_SLATHER_BUILD_DIRECTORY", nil)).to be_nil
+        expect(ENV.fetch("GYM_BUILD_PATH", nil)).to be_nil
+        expect(ENV.fetch("GYM_CODE_SIGNING_IDENTITY", nil)).to be_nil
+        expect(ENV.fetch("GYM_DERIVED_DATA_PATH", nil)).to be_nil
+        expect(ENV.fetch("GYM_OUTPUT_DIRECTORY", nil)).to be_nil
+        expect(ENV.fetch("GYM_RESULT_BUNDLE", nil)).to be_nil
+        expect(ENV.fetch("SCAN_DERIVED_DATA_PATH", nil)).to be_nil
+        expect(ENV.fetch("SCAN_OUTPUT_DIRECTORY", nil)).to be_nil
+        expect(ENV.fetch("SCAN_RESULT_BUNDLE", nil)).to be_nil
+        expect(ENV.fetch("XCODE_DERIVED_DATA_PATH", nil)).to be_nil
+        expect(ENV.fetch("MATCH_KEYCHAIN_NAME", nil)).to be_nil
+        expect(ENV.fetch("MATCH_KEYCHAIN_PASSWORD", nil)).to be_nil
+        expect(ENV.fetch("MATCH_READONLY", nil)).to be_nil
       end
 
       it "works when forced" do
@@ -48,19 +48,19 @@ describe Fastlane do
         pwd = Dir.pwd
         output = File.expand_path(File.join(pwd, "./output"))
         derived_data = File.expand_path(File.join(pwd, "./derivedData"))
-        expect(ENV["BACKUP_XCARCHIVE_DESTINATION"]).to eq(output)
-        expect(ENV["DERIVED_DATA_PATH"]).to eq(derived_data)
-        expect(ENV["FL_CARTHAGE_DERIVED_DATA"]).to eq(derived_data)
-        expect(ENV["FL_SLATHER_BUILD_DIRECTORY"]).to eq(derived_data)
-        expect(ENV["GYM_BUILD_PATH"]).to eq(output)
-        expect(ENV["GYM_CODE_SIGNING_IDENTITY"]).to be_nil
-        expect(ENV["GYM_DERIVED_DATA_PATH"]).to eq(derived_data)
-        expect(ENV["GYM_OUTPUT_DIRECTORY"]).to eq(output)
-        expect(ENV["GYM_RESULT_BUNDLE"]).to eq("YES")
-        expect(ENV["SCAN_DERIVED_DATA_PATH"]).to eq(derived_data)
-        expect(ENV["SCAN_OUTPUT_DIRECTORY"]).to eq(output)
-        expect(ENV["SCAN_RESULT_BUNDLE"]).to eq("YES")
-        expect(ENV["XCODE_DERIVED_DATA_PATH"]).to eq(derived_data)
+        expect(ENV.fetch("BACKUP_XCARCHIVE_DESTINATION", nil)).to eq(output)
+        expect(ENV.fetch("DERIVED_DATA_PATH", nil)).to eq(derived_data)
+        expect(ENV.fetch("FL_CARTHAGE_DERIVED_DATA", nil)).to eq(derived_data)
+        expect(ENV.fetch("FL_SLATHER_BUILD_DIRECTORY", nil)).to eq(derived_data)
+        expect(ENV.fetch("GYM_BUILD_PATH", nil)).to eq(output)
+        expect(ENV.fetch("GYM_CODE_SIGNING_IDENTITY", nil)).to be_nil
+        expect(ENV.fetch("GYM_DERIVED_DATA_PATH", nil)).to eq(derived_data)
+        expect(ENV.fetch("GYM_OUTPUT_DIRECTORY", nil)).to eq(output)
+        expect(ENV.fetch("GYM_RESULT_BUNDLE", nil)).to eq("YES")
+        expect(ENV.fetch("SCAN_DERIVED_DATA_PATH", nil)).to eq(derived_data)
+        expect(ENV.fetch("SCAN_OUTPUT_DIRECTORY", nil)).to eq(output)
+        expect(ENV.fetch("SCAN_RESULT_BUNDLE", nil)).to eq("YES")
+        expect(ENV.fetch("XCODE_DERIVED_DATA_PATH", nil)).to eq(derived_data)
       end
 
       it "works inside CI" do
@@ -74,19 +74,19 @@ describe Fastlane do
         pwd = Dir.pwd
         output = File.expand_path(File.join(pwd, "output"))
         derived_data = File.expand_path(File.join(pwd, "derivedData"))
-        expect(ENV["BACKUP_XCARCHIVE_DESTINATION"]).to eq(output)
-        expect(ENV["DERIVED_DATA_PATH"]).to eq(derived_data)
-        expect(ENV["FL_CARTHAGE_DERIVED_DATA"]).to eq(derived_data)
-        expect(ENV["FL_SLATHER_BUILD_DIRECTORY"]).to eq(derived_data)
-        expect(ENV["GYM_BUILD_PATH"]).to eq(output)
-        expect(ENV["GYM_CODE_SIGNING_IDENTITY"]).to be_nil
-        expect(ENV["GYM_DERIVED_DATA_PATH"]).to eq(derived_data)
-        expect(ENV["GYM_OUTPUT_DIRECTORY"]).to eq(output)
-        expect(ENV["GYM_RESULT_BUNDLE"]).to eq("YES")
-        expect(ENV["SCAN_DERIVED_DATA_PATH"]).to eq(derived_data)
-        expect(ENV["SCAN_OUTPUT_DIRECTORY"]).to eq(output)
-        expect(ENV["SCAN_RESULT_BUNDLE"]).to eq("YES")
-        expect(ENV["XCODE_DERIVED_DATA_PATH"]).to eq(derived_data)
+        expect(ENV.fetch("BACKUP_XCARCHIVE_DESTINATION", nil)).to eq(output)
+        expect(ENV.fetch("DERIVED_DATA_PATH", nil)).to eq(derived_data)
+        expect(ENV.fetch("FL_CARTHAGE_DERIVED_DATA", nil)).to eq(derived_data)
+        expect(ENV.fetch("FL_SLATHER_BUILD_DIRECTORY", nil)).to eq(derived_data)
+        expect(ENV.fetch("GYM_BUILD_PATH", nil)).to eq(output)
+        expect(ENV.fetch("GYM_CODE_SIGNING_IDENTITY", nil)).to be_nil
+        expect(ENV.fetch("GYM_DERIVED_DATA_PATH", nil)).to eq(derived_data)
+        expect(ENV.fetch("GYM_OUTPUT_DIRECTORY", nil)).to eq(output)
+        expect(ENV.fetch("GYM_RESULT_BUNDLE", nil)).to eq("YES")
+        expect(ENV.fetch("SCAN_DERIVED_DATA_PATH", nil)).to eq(derived_data)
+        expect(ENV.fetch("SCAN_OUTPUT_DIRECTORY", nil)).to eq(output)
+        expect(ENV.fetch("SCAN_RESULT_BUNDLE", nil)).to eq("YES")
+        expect(ENV.fetch("XCODE_DERIVED_DATA_PATH", nil)).to eq(derived_data)
       end
 
       describe "under CI" do
@@ -108,9 +108,9 @@ describe Fastlane do
             )
           end").runner.execute(:test)
 
-          expect(ENV["MATCH_KEYCHAIN_NAME"]).to be_nil
-          expect(ENV["MATCH_KEYCHAIN_PASSWORD"]).to be_nil
-          expect(ENV["MATCH_READONLY"]).to be_nil
+          expect(ENV.fetch("MATCH_KEYCHAIN_NAME", nil)).to be_nil
+          expect(ENV.fetch("MATCH_KEYCHAIN_PASSWORD", nil)).to be_nil
+          expect(ENV.fetch("MATCH_READONLY", nil)).to be_nil
         end
 
         it "unlock keychain" do
@@ -130,9 +130,9 @@ describe Fastlane do
             )
           end").runner.execute(:test)
 
-          expect(ENV["MATCH_KEYCHAIN_NAME"]).to eq(keychain_path)
-          expect(ENV["MATCH_KEYCHAIN_PASSWORD"]).to eq("password")
-          expect(ENV["MATCH_READONLY"]).to eq("true")
+          expect(ENV.fetch("MATCH_KEYCHAIN_NAME", nil)).to eq(keychain_path)
+          expect(ENV.fetch("MATCH_KEYCHAIN_PASSWORD", nil)).to eq("password")
+          expect(ENV.fetch("MATCH_READONLY", nil)).to eq("true")
         end
 
         it "does not setup match if previously set" do
@@ -144,9 +144,9 @@ describe Fastlane do
             setup_jenkins
           end").runner.execute(:test)
 
-          expect(ENV["MATCH_KEYCHAIN_NAME"]).to eq(keychain_name)
-          expect(ENV["MATCH_KEYCHAIN_PASSWORD"]).to eq(keychain_password)
-          expect(ENV["MATCH_READONLY"]).to eq("false")
+          expect(ENV.fetch("MATCH_KEYCHAIN_NAME", nil)).to eq(keychain_name)
+          expect(ENV.fetch("MATCH_KEYCHAIN_PASSWORD", nil)).to eq(keychain_password)
+          expect(ENV.fetch("MATCH_READONLY", nil)).to eq("false")
         end
 
         it "set code signing identity" do
@@ -156,7 +156,7 @@ describe Fastlane do
             setup_jenkins
           end").runner.execute(:test)
 
-          expect(ENV["GYM_CODE_SIGNING_IDENTITY"]).to eq("Code signing")
+          expect(ENV.fetch("GYM_CODE_SIGNING_IDENTITY", nil)).to eq("Code signing")
         end
 
         it "disable setting code signing identity" do
@@ -168,7 +168,7 @@ describe Fastlane do
             )
           end").runner.execute(:test)
 
-          expect(ENV["GYM_CODE_SIGNING_IDENTITY"]).to be_nil
+          expect(ENV.fetch("GYM_CODE_SIGNING_IDENTITY", nil)).to be_nil
         end
 
         it "set output directory" do
@@ -180,10 +180,10 @@ describe Fastlane do
             )
           end").runner.execute(:test)
 
-          expect(ENV["BACKUP_XCARCHIVE_DESTINATION"]).to eq(directory)
-          expect(ENV["GYM_BUILD_PATH"]).to eq(directory)
-          expect(ENV["GYM_OUTPUT_DIRECTORY"]).to eq(directory)
-          expect(ENV["SCAN_OUTPUT_DIRECTORY"]).to eq(directory)
+          expect(ENV.fetch("BACKUP_XCARCHIVE_DESTINATION", nil)).to eq(directory)
+          expect(ENV.fetch("GYM_BUILD_PATH", nil)).to eq(directory)
+          expect(ENV.fetch("GYM_OUTPUT_DIRECTORY", nil)).to eq(directory)
+          expect(ENV.fetch("SCAN_OUTPUT_DIRECTORY", nil)).to eq(directory)
         end
 
         it "set derived data" do
@@ -195,12 +195,12 @@ describe Fastlane do
             )
           end").runner.execute(:test)
 
-          expect(ENV["DERIVED_DATA_PATH"]).to eq(directory)
-          expect(ENV["FL_CARTHAGE_DERIVED_DATA"]).to eq(directory)
-          expect(ENV["FL_SLATHER_BUILD_DIRECTORY"]).to eq(directory)
-          expect(ENV["GYM_DERIVED_DATA_PATH"]).to eq(directory)
-          expect(ENV["SCAN_DERIVED_DATA_PATH"]).to eq(directory)
-          expect(ENV["XCODE_DERIVED_DATA_PATH"]).to eq(directory)
+          expect(ENV.fetch("DERIVED_DATA_PATH", nil)).to eq(directory)
+          expect(ENV.fetch("FL_CARTHAGE_DERIVED_DATA", nil)).to eq(directory)
+          expect(ENV.fetch("FL_SLATHER_BUILD_DIRECTORY", nil)).to eq(directory)
+          expect(ENV.fetch("GYM_DERIVED_DATA_PATH", nil)).to eq(directory)
+          expect(ENV.fetch("SCAN_DERIVED_DATA_PATH", nil)).to eq(directory)
+          expect(ENV.fetch("XCODE_DERIVED_DATA_PATH", nil)).to eq(directory)
         end
 
         it "disable result bundle path" do
@@ -210,8 +210,8 @@ describe Fastlane do
             )
           end").runner.execute(:test)
 
-          expect(ENV["GYM_RESULT_BUNDLE"]).to be_nil
-          expect(ENV["SCAN_RESULT_BUNDLE"]).to be_nil
+          expect(ENV.fetch("GYM_RESULT_BUNDLE", nil)).to be_nil
+          expect(ENV.fetch("SCAN_RESULT_BUNDLE", nil)).to be_nil
         end
       end
 

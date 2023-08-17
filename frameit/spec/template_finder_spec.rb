@@ -5,7 +5,7 @@ describe Frameit do
       # Prevent the tests from looking in the real home
       # directory.
       before(:all) do
-        @old_env_home = ENV['HOME']
+        @old_env_home = ENV.fetch('HOME', nil)
         ENV['HOME'] = '/tmp/thisdirectorydoesnotexist'
       end
 
