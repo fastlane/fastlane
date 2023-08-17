@@ -315,7 +315,7 @@ Lint/IsStringUsage:
 # ( ) for method calls
 Style/MethodCallWithArgsParentheses:
   Enabled: true
-  IgnoredMethods:
+  AllowedMethods:
     - 'require'
     - 'require_relative'
     - 'fastlane_require'
