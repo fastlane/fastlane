@@ -264,19 +264,19 @@ workflows:
           name: 'Execute tests on macOS (Xcode 12.5.1, Ruby 2.6)'
           xcode_version: '12.5.1'
           ruby_version: '2.6.6'
-          # <<: *important-branches
+          <<: *important-branches
       - tests_macos:
           name: 'Execute tests on macOS (Xcode 12.5.1, Ruby 2.7)'
           xcode_version: '12.5.1'
           ruby_version: '2.7.3'
           ruby_opt: -W:deprecated
-          # <<: *important-branches
+          <<: *important-branches
       - tests_macos:
           name: 'Execute tests on macOS (Xcode 13.4.1, Ruby 3.0)'
           xcode_version: '13.4.1'
           ruby_version: '3.0.4'
           ruby_opt: -W:deprecated
-          # <<: *important-branches
+          <<: *important-branches
       - tests_macos:
           name: 'Execute tests on macOS (Xcode 13.4.1, Ruby 3.1)'
           xcode_version: '13.4.1'
