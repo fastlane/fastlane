@@ -116,7 +116,7 @@ Gem::Specification.new do |spec|
   # Development only
   spec.add_development_dependency('climate_control', '~> 0.2.0')
   spec.add_development_dependency('coveralls', '~> 0.8.13')
-  spec.add_development_dependency('fakefs', '~> 1.2')
+  spec.add_development_dependency('fakefs', '~> 1')
   spec.add_development_dependency('pry-byebug')
   spec.add_development_dependency('pry-rescue')
   spec.add_development_dependency('pry-stack_explorer')

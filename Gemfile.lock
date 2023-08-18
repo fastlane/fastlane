@@ -120,7 +120,7 @@ GEM
     dotenv (2.8.1)
     emoji_regex (3.2.3)
     excon (0.100.0)
-    fakefs (1.2.3)
+    fakefs (1.9.0)
     faraday (1.4.1)
       faraday-excon (~> 1.1)
       faraday-net_http (~> 1.0)
@@ -373,7 +373,7 @@ DEPENDENCIES
   coveralls (~> 0.8.13)
   danger (~> 8)
   danger-junit (~> 1)
-  fakefs (~> 1.2)
+  fakefs (~> 1)
   fastlane!
   fastlane-plugin-clubmate
   fastlane-plugin-ruby
