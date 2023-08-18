@@ -12,7 +12,7 @@ config['require'] = [
   'rubocop/require_tools',
   'rubocop-performance'
 ]
-config.delete("inherit_from")
+config.delete('inherit_from')
 config.delete('CrossPlatform/ForkUsage')
 config.delete('Lint/IsStringUsage')
 # We declare development dependencies in the Gemspec file because we use dynamic values in its template
@@ -74,7 +74,7 @@ Gem::Specification.new do |spec|
   spec.add_dependency('addressable', '>= 2.8', '< 3.0.0') # Support for URI templates
   spec.add_dependency('artifactory', '~> 3.0') # Used to export to an artifactory server
   spec.add_dependency('aws-sdk-s3', '~> 1.0') # Used for S3 storage in fastlane match
-  spec.add_dependency('babosa', '>= 1.0.3', "< 2.0.0") # library for creating human-friendly identifiers, aka "slugs"
+  spec.add_dependency('babosa', '>= 1.0.3', '< 2.0.0') # library for creating human-friendly identifiers, aka "slugs"
   spec.add_dependency('bundler', '>= 1.12.0', '< 3.0.0') # Used for fastlane plugins
   spec.add_dependency('CFPropertyList', '>= 2.3', '< 4.0.0') # Needed to be able to read binary plist format
   spec.add_dependency('colored') # colored terminal output
