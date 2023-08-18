@@ -105,7 +105,7 @@ Gem::Specification.new do |spec|
   spec.add_dependency('security', '= 0.1.3') # macOS Keychain manager, a dead project, no updates expected
   spec.add_dependency('simctl', '~> 1.6.3') # Used for querying and interacting with iOS simulators
   spec.add_dependency('terminal-notifier', '>= 2.0.0', '< 3.0.0') # macOS notifications
-  spec.add_dependency('terminal-table', '>= 1.4.5', '< 2.0.0') # Actions documentation
+  spec.add_dependency('terminal-table', '~> 3') # Actions documentation
   spec.add_dependency('tty-screen', '>= 0.6.3', '< 1.0.0') # detect the terminal width
   spec.add_dependency('tty-spinner', '>= 0.8.0', '< 1.0.0') # loading indicators
   spec.add_dependency('word_wrap', '~> 1.0.0') # to add line breaks for tables with long strings
