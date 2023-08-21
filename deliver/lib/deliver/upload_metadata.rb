@@ -222,7 +222,7 @@ module Deliver
       app_info_worker.start
 
       # Update categories
-      app_info = fetch_edit_app_info(app)
+      app_info = fetch_edit_app_info(app) || fetch_live_app_info(app)
       if app_info
         category_id_map = {}
 
@@ -437,6 +437,12 @@ module Deliver
       end
     end
 
+    def fetch_live_app_info(app, wait_time: 10)
+      retry_if_nil("Cannot find live app info", wait_time: wait_time) do
+        app.fetch_live_app_info
+      end
+    end
+
     def retry_if_nil(message, tries: 5, wait_time: 10)
       loop do
         tries -= 1
@@ -453,7 +459,7 @@ module Deliver
 
     # Finding languages to enable
     def verify_available_info_languages!(options, app, languages)
-      app_info = fetch_edit_app_info(app)
+      app_info = fetch_edit_app_info(app) || fetch_live_app_info(app)
 
       unless app_info
         UI.user_error!("Cannot update languages - could not find an editable info")
