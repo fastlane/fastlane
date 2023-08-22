@@ -371,8 +371,8 @@ PLATFORMS
 DEPENDENCIES
   climate_control (~> 0.2.0)
   coveralls (~> 0.8.13)
-  danger (~> 8)
-  danger-junit (~> 1)
+  danger (~> 8.0)
+  danger-junit (~> 1.0)
   fakefs (~> 1.2)
   fastlane!
   fastlane-plugin-clubmate
