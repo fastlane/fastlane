@@ -196,23 +196,13 @@ describe Spaceship::ConnectAPI::Token do
   end
 
   context 'init' do
-    let(:private_key) do
-      key = OpenSSL::PKey::EC.new('prime256v1')
-      key.generate_key
-      key
-    end
-    let(:public_key) do
-      key = OpenSSL::PKey::EC.new(private_key)
-      key.private_key = nil
-      key
-    end
-
     it 'generates proper token' do
-      token = Spaceship::ConnectAPI::Token.new(key_id: key_id, issuer_id: issuer_id, key: private_key)
+      key = OpenSSL::PKey::EC.generate('prime256v1')
+      token = Spaceship::ConnectAPI::Token.new(key_id: key_id, issuer_id: issuer_id, key: key)
       expect(token.key_id).to eq(key_id)
       expect(token.issuer_id).to eq(issuer_id)
 
-      payload, header = JWT.decode(token.text, public_key, true, { algorithm: 'ES256' })
+      payload, header = JWT.decode(token.text, key, true, { algorithm: 'ES256' })
 
       expect(payload['iss']).to eq(issuer_id)
       expect(payload['iat']).to eq(Time.now.to_i)
