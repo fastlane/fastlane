@@ -204,13 +204,14 @@ module Spaceship
           test_flight_request_client.delete("builds/#{build_id}/relationships/betaGroups", nil, body)
         end
 
-        def create_beta_group(app_id: nil, group_name: nil, is_internal_group: false, public_link_enabled: false, public_link_limit: 10_000, public_link_limit_enabled: false)
+        def create_beta_group(app_id: nil, group_name: nil, is_internal_group: false, public_link_enabled: false, public_link_limit: 10_000, public_link_limit_enabled: false, has_access_to_all_builds: nil)
+          has_access_to_all_builds = is_internal_group ? true : false if has_access_to_all_builds.nil?
           body = {
             data: {
               attributes: {
                 name: group_name,
                 isInternalGroup: is_internal_group,
-                hasAccessToAllBuilds: is_internal_group ? true : false, # Undocumented of 2021-08-02 in ASC API docs and ASC Open API spec. This is the default behavior on App Store Connect and does work with both Apple ID and API Token
+                hasAccessToAllBuilds: has_access_to_all_builds, # Undocumented of 2021-08-02 in ASC API docs and ASC Open API spec. This is the default behavior on App Store Connect and does work with both Apple ID and API Token
                 publicLinkEnabled: public_link_enabled,
                 publicLinkLimit: public_link_limit,
                 publicLinkLimitEnabled: public_link_limit_enabled
