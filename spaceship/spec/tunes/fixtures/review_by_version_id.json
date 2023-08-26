@@ -1,0 +1,60 @@
+{
+    "data": {
+        "reviewCount": 4,
+        "reviews": [{
+            "value": {
+                "id": 1000000000,
+                "rating": 2,
+                "title": "Title 1",
+                "review": "Review 1",
+                "lastModified": 1463887020000,
+                "nickname": "Reviewer1",
+                "storeFront": "NZ",
+                "developerResponse": {
+                    "isHidden": false,
+                    "lastModified": 1490782551000,
+                    "pendingState": "CREATE",
+                    "response": "Thank You",
+                    "responseId": 28516
+                }
+ 
+            }
+        }, {
+            "value": {
+                "id": 1000000001,
+                "rating": 2,
+                "title": "Title 2",
+                "review": "Review 2",
+                "lastModified": 1459152540000,
+                "nickname": "Reviewer2",
+                "storeFront": "NZ"
+           }
+        }, {
+            "value": {
+                "id": 1000000002,
+                "rating": 4,
+                "title": "Title 3",
+                "review": "Review 3",
+                "lastModified": 1455870780000,
+                "nickname": "Reviewer3",
+                "storeFront": "NZ"
+            }
+        }, {
+            "value": {
+                "id": 1000000003,
+                "rating": 5,
+                "title": "Title 4",
+                "review": "Review 4",
+                "lastModified": 1453490460000,
+                "nickname": "Reviewer4",
+                "storeFront": "NZ"
+            }
+        }]
+    },
+    "messages": {
+        "warn": null,
+        "error": null,
+        "info": null
+    },
+    "statusCode": "SUCCESS"
+}

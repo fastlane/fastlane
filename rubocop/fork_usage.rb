@@ -33,7 +33,7 @@ module RuboCop
       def on_send(node)
         return unless bad_fork(node)
         return if self.good_nodes.include?(node)
-        add_offense(node, :expression, MSG)
+        add_offense(node, location: :expression, message: MSG)
       end
     end
   end

@@ -1,5 +1,6 @@
 require 'commander'
 require 'fastlane/version'
+require 'fastlane_core/ui/help_formatter'
 
 require_relative 'download_screenshots'
 require_relative 'options'
@@ -40,6 +41,7 @@ module Deliver
       res
     end
 
+    # rubocop:disable Metrics/PerceivedComplexity
     def run
       program :name, 'deliver'
       program :version, Fastlane::VERSION
@@ -47,9 +49,10 @@ module Deliver
       program :help, 'Author', 'Felix Krause <deliver@krausefx.com>'
       program :help, 'Website', 'https://fastlane.tools'
       program :help, 'Documentation', 'https://docs.fastlane.tools/actions/deliver/'
-      program :help_formatter, :compact
+      program :help_formatter, FastlaneCore::HelpFormatter
 
       global_option('--verbose') { FastlaneCore::Globals.verbose = true }
+      global_option('--env STRING[,STRING2]', String, 'Add environment(s) to use with `dotenv`')
 
       always_trace!
 
@@ -165,15 +168,17 @@ module Deliver
           return 0 unless res
 
           require 'deliver/setup'
-          v = options[:app].latest_version
+          app = Deliver.cache[:app]
+          platform = Spaceship::ConnectAPI::Platform.map(options[:platform])
+          v = app.get_latest_app_store_version(platform: platform)
           if options[:app_version].to_s.length > 0
-            v = options[:app].live_version if v.version != options[:app_version]
-            if v.version != options[:app_version]
+            v = app.get_live_app_store_version(platform: platform) if v.version_string != options[:app_version]
+            if v.nil? || v.version_string != options[:app_version]
               raise "Neither the current nor live version match specified app_version \"#{options[:app_version]}\""
             end
           end
 
-          Deliver::Setup.new.generate_metadata_files(v, path)
+          Deliver::Setup.new.generate_metadata_files(app, v, path, options)
         end
       end
 

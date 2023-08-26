@@ -21,6 +21,11 @@ module Scan
     def scanfile_name
       "Scanfile"
     end
+
+    def building_mac_catalyst_for_mac?
+      return false unless Scan.project
+      Scan.project.supports_mac_catalyst? && Scan.config[:catalyst_platform] == "macos"
+    end
   end
 
   Helper = FastlaneCore::Helper # you gotta love Ruby: Helper.* should use the Helper class contained in FastlaneCore

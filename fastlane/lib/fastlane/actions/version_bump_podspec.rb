@@ -1,7 +1,7 @@
 module Fastlane
   module Actions
     module SharedValues
-      PODSPEC_VERSION_NUMBER = :PODSPEC_VERSION_NUMBER
+      PODSPEC_VERSION_NUMBER ||= :PODSPEC_VERSION_NUMBER
     end
 
     class VersionBumpPodspecAction < Action

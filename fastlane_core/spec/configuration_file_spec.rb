@@ -162,7 +162,7 @@ describe FastlaneCore do
           expect(config[:app_identifier]).to eq("com.global.id")
         end
 
-        it "reads global keys when platform and lane dont match" do
+        it "reads global keys when platform and lane don't match" do
           FastlaneSpec::Env.with_env_values('FASTLANE_PLATFORM_NAME' => 'osx', 'FASTLANE_LANE_NAME' => 'debug') do
             config = FastlaneCore::Configuration.create(options, {})
             config.load_configuration_file('ConfigFileForLane')

@@ -2,7 +2,7 @@ describe Spaceship::Tunes::IAPDetail do
   before { TunesStubbing.itc_stub_iap }
   before { Spaceship::Tunes.login }
   let(:client) { Spaceship::Application.client }
-  let(:app) { Spaceship::Application.all.first }
+  let(:app) { Spaceship::Application.all.find { |a| a.apple_id == "898536088" } }
   let(:detailed) { app.in_app_purchases.find("go.find.me").edit }
 
   describe "Details of an IAP" do
@@ -34,13 +34,13 @@ describe Spaceship::Tunes::IAPDetail do
       context "when iap is not cleared for sale yet" do
         before { allow(detailed).to receive(:cleared_for_sale).and_return(false) }
 
-        it "retuns an empty array" do
+        it "returns an empty array" do
           expect(subject).to eq([])
         end
       end
 
       context "when iap is a non-subscription product" do
-        let(:pricing_tiers) { client.pricing_tiers }
+        let(:pricing_tiers) { client.pricing_tiers('898536088') }
         let(:interval) do
           { tier: 1, begin_date: nil, end_date: nil, grandfathered: nil, country: "WW" }
         end
@@ -177,7 +177,7 @@ describe Spaceship::Tunes::IAPDetail do
             }
           }
       edited.save!
-      expect(edited.versions).to eq({ :"en-US" => { name: "Edit It", description: "Description has at least 10 characters" } })
+      expect(edited.versions).to eq({ "en-US": { name: "Edit It", description: "Description has at least 10 characters", id: nil, status: nil } })
     end
   end
 

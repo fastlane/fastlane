@@ -16,6 +16,17 @@ describe Scan do
         allow(Scan::TestResultParser).to receive(:new).and_return(mock_test_result_parser)
         allow(mock_test_result_parser).to receive(:parse_result).and_return({ tests: 100, failures: 0 })
 
+        allow(Trainer::TestParser).to receive(:auto_convert).and_return({
+          "some/path": {
+            successful: true,
+            number_of_tests: 10,
+            number_of_failures: 0,
+            number_of_tests_excluding_retries: 10,
+            number_of_failures_excluding_retries: 0,
+            number_of_retries: 0
+          }
+        })
+
         @scan = Scan::Runner.new
       end
 
@@ -28,6 +39,9 @@ describe Scan do
             project: './scan/examples/standard/app.xcodeproj',
             include_simulator_logs: false
           })
+
+          # This is a needed side effect from running TestCommandGenerator which is not done in this test
+          Scan.cache[:result_bundle_path] = '/tmp/scan_results/test.xcresults'
 
           expect(FastlaneCore::Simulator).not_to(receive(:copy_logs))
           @scan.handle_results(0)
@@ -44,6 +58,9 @@ describe Scan do
             include_simulator_logs: true
           })
 
+          # This is a needed side effect from running TestCommandGenerator which is not done in this test
+          Scan.cache[:result_bundle_path] = '/tmp/scan_results/test.xcresults'
+
           expect(FastlaneCore::Simulator).to receive(:copy_logs)
           @scan.handle_results(0)
         end
@@ -56,13 +73,138 @@ describe Scan do
               output_directory: '/tmp/scan_results',
               project: './scan/examples/standard/app.xcodeproj'
             })
-            custom_parser = "custom_parser"
-            expect(Scan::TestResultParser).to receive(:new).and_return(custom_parser)
-            expect(custom_parser).to receive(:parse_result).and_return({ tests: 5, failures: 3 })
+
+            # This is a needed side effect from running TestCommandGenerator which is not done in this test
+            Scan.cache[:result_bundle_path] = '/tmp/scan_results/test.xcresults'
+
+            allow(Trainer::TestParser).to receive(:auto_convert).and_return({
+              "some/path": {
+                successful: true,
+                number_of_tests: 10,
+                number_of_failures: 1,
+                number_of_tests_excluding_retries: 10,
+                number_of_failures_excluding_retries: 1,
+                number_of_retries: 0
+              }
+            })
 
             @scan.handle_results(0)
           end.to raise_error(FastlaneCore::Interface::FastlaneTestFailure, "Tests have failed")
         end
+      end
+
+      describe "when handling result" do
+        it "returns output if fail_build is false", requires_xcodebuild: true do
+          Scan.config = FastlaneCore::Configuration.create(Scan::Options.available_options, {
+            output_directory: '/tmp/scan_results',
+            project: './scan/examples/standard/app.xcodeproj',
+            fail_build: false
+          })
+
+          # This is a needed side effect from running TestCommandGenerator which is not done in this test
+          Scan.cache[:result_bundle_path] = '/tmp/scan_results/test.xcresults'
+
+          allow(Trainer::TestParser).to receive(:auto_convert).and_return({
+            "some/path": {
+              successful: true,
+              number_of_tests: 10,
+              number_of_failures: 1,
+              number_of_tests_excluding_retries: 10,
+              number_of_failures_excluding_retries: 1,
+              number_of_retries: 0
+            }
+          })
+
+          expect(@scan.handle_results(0)).to eq({
+            number_of_tests: 10,
+            number_of_failures: 1,
+            number_of_skipped: 0,
+            number_of_tests_excluding_retries: 10,
+            number_of_failures_excluding_retries: 1,
+            number_of_retries: 0
+        })
+        end
+      end
+
+      describe "with scan option :disable_xcpretty set to true" do
+        it "does not generate a temp junit report", requires_xcodebuild: true do
+          Scan.config = FastlaneCore::Configuration.create(Scan::Options.available_options, {
+            output_directory: '/tmp/scan_results',
+            project: './scan/examples/standard/app.xcodeproj',
+            disable_xcpretty: true
+          })
+
+          # This is a needed side effect from running TestCommandGenerator which is not done in this test
+          Scan.cache[:result_bundle_path] = '/tmp/scan_results/test.xcresults'
+
+          Scan.cache[:temp_junit_report] = '/var/folders/non_existent_file.junit'
+          @scan.handle_results(0)
+          expect(Scan.cache[:temp_junit_report]).to(eq('/var/folders/non_existent_file.junit'))
+        end
+
+        it "fails if tests_exit_status is not 0", requires_xcodebuild: true do
+          expect do
+            Scan.config = FastlaneCore::Configuration.create(Scan::Options.available_options, {
+              output_directory: '/tmp/scan_results',
+              project: './scan/examples/standard/app.xcodeproj',
+              disable_xcpretty: true
+            })
+
+            # This is a needed side effect from running TestCommandGenerator which is not done in this test
+            Scan.cache[:result_bundle_path] = '/tmp/scan_results/test.xcresults'
+
+            @scan.handle_results(1)
+          end.to raise_error(FastlaneCore::Interface::FastlaneTestFailure, "Test execution failed. Exit status: 1")
+        end
+      end
+    end
+
+    describe "retry_execute" do
+      before(:each) do
+        @scan = Scan::Runner.new
+      end
+
+      it "retry a failed test", requires_xcodebuild: true do
+        error_output = <<-ERROR_OUTPUT
+Failing tests:
+  FastlaneAppTests:
+          FastlaneAppTests.testCoinToss()
+          -[FastlaneAppTestsOC testCoinTossOC]
+          ERROR_OUTPUT
+
+        expect(Fastlane::UI).to receive(:important).with("Retrying tests: FastlaneAppTests/FastlaneAppTests/testCoinToss, FastlaneAppTests/FastlaneAppTestsOC/testCoinTossOC").once
+        expect(Fastlane::UI).to receive(:important).with("Number of retries remaining: 4").once
+        expect(@scan).to receive(:execute)
+
+        @scan.retry_execute(retries: 5, error_output: error_output)
+      end
+
+      it "retry a failed test when project scheme name has non-whitespace character", requires_xcodebuild: true do
+        error_output = <<-ERROR_OUTPUT
+Failing tests:
+  Fastlane-App-Tests:
+          FastlaneAppTests.testCoinToss()
+          -[FastlaneAppTestsOC testCoinTossOC]
+          ERROR_OUTPUT
+
+        expect(Fastlane::UI).to receive(:important).with("Retrying tests: Fastlane-App-Tests/FastlaneAppTests/testCoinToss, Fastlane-App-Tests/FastlaneAppTestsOC/testCoinTossOC").once
+        expect(Fastlane::UI).to receive(:important).with("Number of retries remaining: 4").once
+        expect(@scan).to receive(:execute)
+
+        @scan.retry_execute(retries: 5, error_output: error_output)
+      end
+
+      it "fail to parse error output", requires_xcodebuild: true do
+        error_output = <<-ERROR_OUTPUT
+Failing tests:
+FastlaneAppTests:
+FastlaneAppTests.testCoinToss()
+-[FastlaneAppTestsOC testCoinTossOC]
+          ERROR_OUTPUT
+
+        expect do
+          @scan.retry_execute(retries: 5, error_output: error_output)
+        end.to raise_error(FastlaneCore::Interface::FastlaneBuildFailure, "Failed to find failed tests to retry (could not parse error output)")
       end
     end
 
@@ -140,6 +282,37 @@ describe Scan do
 
         scan = Scan::Runner.new
         scan.zip_build_products
+      end
+    end
+
+    describe "output_xctestrun" do
+      it "copies .xctestrun file when :output_xctestrun is true", requires_xcodebuild: true do
+        Dir.mktmpdir("scan_results") do |tmp_dir|
+          # Configuration
+          Scan.config = FastlaneCore::Configuration.create(Scan::Options.available_options, {
+            derived_data_path: File.join(tmp_dir, 'derived_data'),
+            output_directory: File.join(tmp_dir, 'output'),
+            project: './scan/examples/standard/app.xcodeproj',
+            output_xctestrun: true
+          })
+
+          # Make output directory
+          FileUtils.mkdir_p(Scan.config[:output_directory])
+
+          # Make derived data directory
+          path = File.join(Scan.config[:derived_data_path], "Build/Products")
+          FileUtils.mkdir_p(path)
+
+          # Create .xctestrun file that will be copied
+          xctestrun_path = File.join(path, 'something-project-something.xctestrun')
+          FileUtils.touch(xctestrun_path)
+
+          scan = Scan::Runner.new
+          scan.copy_xctestrun
+
+          output_path = File.join(Scan.config[:output_directory], 'settings.xctestrun')
+          expect(File.file?(output_path)).to eq(true)
+        end
       end
     end
   end

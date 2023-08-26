@@ -1,8 +1,5 @@
-//
-//  ControlCommand.swift
-//  FastlaneRunner
-//
-//  Created by Joshua Liebowitz on 1/3/18.
+// ControlCommand.swift
+// Copyright (c) 2023 FastlaneTools
 
 //
 //  ** NOTE **
@@ -49,14 +46,15 @@ struct ControlCommand: RubyCommandable {
     }
 
     let message: String?
+    let id: String = UUID().uuidString
     let shutdownCommandType: ShutdownCommandType
     var commandJson: String {
-        var jsonDictionary: [String: Any] = [ControlCommand.commandKey : self.shutdownCommandType.token]
+        var jsonDictionary: [String: Any] = [ControlCommand.commandKey: shutdownCommandType.token]
 
         if let message = message {
             jsonDictionary[ShutdownCommandType.userMessageKey] = message
         }
-        if case .cancel(let reason) = shutdownCommandType {
+        if case let .cancel(reason) = shutdownCommandType {
             jsonDictionary[ShutdownCommandType.CancelReason.reasonKey] = reason.reasonText
         }
 
@@ -66,7 +64,7 @@ struct ControlCommand: RubyCommandable {
     }
 
     init(commandType: ShutdownCommandType, message: String? = nil) {
-        self.shutdownCommandType = commandType
+        shutdownCommandType = commandType
         self.message = message
     }
 }

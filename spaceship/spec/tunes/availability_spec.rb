@@ -3,7 +3,7 @@ describe Spaceship::Tunes::Availability do
   before { TunesStubbing.itc_stub_app_pricing_intervals }
 
   let(:client) { Spaceship::AppVersion.client }
-  let(:app) { Spaceship::Application.all.first }
+  let(:app) { Spaceship::Application.all.find { |a| a.apple_id == "898536088" } }
 
   describe "availability" do
     it "inspect works" do
@@ -52,6 +52,15 @@ describe Spaceship::Tunes::Availability do
       expect(b2b_user_0).not_to(be_nil)
       expect(b2b_user_0.ds_username).to eq('b2b1@abc.com')
     end
+  end
+
+  it "correctly parses b2b organizations" do
+    TunesStubbing.itc_stub_app_pricing_intervals_vpp
+    availability = client.availability(app.apple_id)
+    expect(availability.b2b_organizations.length).to eq(1)
+    b2b_org_0 = availability.b2b_organizations[0]
+    expect(b2b_org_0).not_to(be_nil)
+    expect(b2b_org_0.name).to eq('the best company')
   end
 
   describe "update_availability!" do

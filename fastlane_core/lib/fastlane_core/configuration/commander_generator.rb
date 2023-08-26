@@ -30,6 +30,11 @@ module FastlaneCore
           type = option.is_string ? String : nil
         end
 
+        # OptionParser doesn't like symbol but a symbol and string can be easily cast with `to_sym` and `to_s`
+        if type == Symbol
+          type = String
+        end
+
         # Boolean is a fastlane thing, it's either TrueClass, or FalseClass, but we won't know
         # that until runtime, so nil is the best we get
         if type == Fastlane::Boolean
@@ -67,7 +72,7 @@ module FastlaneCore
         long_switch = "--#{option.key} #{value_appendix}"
 
         description = option.description
-        description += " (#{option.env_name})" unless option.env_name.to_s.empty?
+        description += " (#{option.env_names.join(', ')})" unless option.env_names.empty?
 
         # We compact this array here to remove the short_switch variable if it is nil.
         # Passing a nil value to global_option has been shown to create problems with
@@ -93,9 +98,9 @@ module FastlaneCore
       return if short_switch.nil?
 
       UI.user_error!("Short option #{short_switch} already taken for key #{key}") if used_switches.include?(short_switch)
-      UI.user_error!("-v is already used for the version (key #{key})") if short_switch == "-v"
-      UI.user_error!("-h is already used for the help screen (key #{key})") if short_switch == "-h"
-      UI.user_error!("-t is already used for the trace screen (key #{key})") if short_switch == "-t"
+      UI.user_error!("-v is already used for the fastlane version (key #{key})") if short_switch == "-v"
+      UI.user_error!("-h is already used for the fastlane help screen (key #{key})") if short_switch == "-h"
+      UI.user_error!("-t is already used for the fastlane trace screen (key #{key})") if short_switch == "-t"
 
       used_switches << short_switch
     end

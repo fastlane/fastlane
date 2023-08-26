@@ -12,6 +12,8 @@ module CredentialsManager
       program :version, Fastlane::VERSION
       program :description, 'Manage credentials for fastlane tools.'
 
+      global_option('--env STRING[,STRING2]', String, 'Add environment(s) to use with `dotenv`')
+
       # Command to add entry to Keychain
       command :add do |c|
         c.syntax = 'fastlane fastlane-credentials add'

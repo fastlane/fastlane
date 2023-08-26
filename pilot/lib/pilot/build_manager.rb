@@ -16,7 +16,12 @@ module Pilot
       should_login_in_start = options[:apple_id].nil?
       start(options, should_login: should_login_in_start)
 
-      UI.user_error!("No ipa file given") unless config[:ipa]
+      UI.user_error!("No ipa or pkg file given") if config[:ipa].nil? && config[:pkg].nil?
+
+      if config[:ipa] && config[:pkg]
+        UI.important("WARNING: Both `ipa` and `pkg` options are defined either explicitly or with default_value (build found in directory)")
+        UI.important("Uploading `ipa` is preferred by default. Set `app_platform` to `osx` to force uploading `pkg`")
+      end
 
       check_for_changelog_or_whats_new!(options)
 
@@ -25,31 +30,52 @@ module Pilot
       dir = Dir.mktmpdir
 
       platform = fetch_app_platform
-      package_path = FastlaneCore::IpaUploadPackageBuilder.new.generate(app_id: fetch_app_id,
-                                                                      ipa_path: options[:ipa],
+      ipa_path = options[:ipa]
+      if ipa_path && platform != 'osx'
+        asset_path = ipa_path
+        package_path = FastlaneCore::IpaUploadPackageBuilder.new.generate(app_id: fetch_app_id,
+                                                                      ipa_path: ipa_path,
                                                                   package_path: dir,
                                                                       platform: platform)
+      else
+        pkg_path = options[:pkg]
+        asset_path = pkg_path
+        package_path = FastlaneCore::PkgUploadPackageBuilder.new.generate(app_id: fetch_app_id,
+                                                                        pkg_path: pkg_path,
+                                                                    package_path: dir,
+                                                                        platform: platform)
+      end
 
       transporter = transporter_for_selected_team(options)
-      result = transporter.upload(fetch_app_id, package_path)
+      result = transporter.upload(package_path: package_path, asset_path: asset_path, platform: platform)
 
       unless result
-        UI.user_error!("Error uploading ipa file, for more information see above")
+        transporter_errors = transporter.displayable_errors
+        file_type = platform == "osx" ? "pkg" : "ipa"
+        UI.user_error!("Error uploading #{file_type} file: \n #{transporter_errors}")
       end
 
       UI.success("Successfully uploaded the new binary to App Store Connect")
 
+      # We will fully skip waiting for build processing *only* if no changelog is supplied
+      # Otherwise we may partially wait until the build appears so the changelog can be set, and then bail.
+      return_when_build_appears = false
       if config[:skip_waiting_for_build_processing]
-        UI.important("Skip waiting for build processing")
-        UI.important("This means that no changelog will be set and no build will be distributed to testers")
-        return
+        if config[:changelog].nil?
+          UI.important("`skip_waiting_for_build_processing` used and no `changelog` supplied - skipping waiting for build processing")
+          return
+        else
+          return_when_build_appears = true
+        end
       end
 
       # Calling login again here is needed if login was not called during 'start'
       login unless should_login_in_start
 
       UI.message("If you want to skip waiting for the processing to be finished, use the `skip_waiting_for_build_processing` option")
-      latest_build = wait_for_build_processing_to_be_complete
+      UI.message("Note that if `skip_waiting_for_build_processing` is used but a `changelog` is supplied, this process will wait for the build to appear on AppStoreConnect, update the changelog and then skip the remaining of the processing steps.")
+
+      latest_build = wait_for_build_processing_to_be_complete(return_when_build_appears)
       distribute(options, build: latest_build)
     end
 
@@ -80,11 +106,31 @@ module Pilot
       end
     end
 
-    def wait_for_build_processing_to_be_complete
+    def wait_for_build_processing_to_be_complete(return_when_build_appears = false)
       platform = fetch_app_platform
-      app_version = FastlaneCore::IpaFileAnalyser.fetch_app_version(config[:ipa])
-      app_build = FastlaneCore::IpaFileAnalyser.fetch_app_build(config[:ipa])
-      latest_build = FastlaneCore::BuildWatcher.wait_for_build_processing_to_be_complete(app_id: app.id, platform: platform, app_version: app_version, build_version: app_build, poll_interval: config[:wait_processing_interval], return_spaceship_testflight_build: false)
+      if config[:ipa] && platform != "osx" && !config[:distribute_only]
+        app_version = FastlaneCore::IpaFileAnalyser.fetch_app_version(config[:ipa])
+        app_build = FastlaneCore::IpaFileAnalyser.fetch_app_build(config[:ipa])
+      elsif config[:pkg] && !config[:distribute_only]
+        app_version = FastlaneCore::PkgFileAnalyser.fetch_app_version(config[:pkg])
+        app_build = FastlaneCore::PkgFileAnalyser.fetch_app_build(config[:pkg])
+      else
+        app_version = config[:app_version]
+        app_build = config[:build_number]
+      end
+
+      latest_build = FastlaneCore::BuildWatcher.wait_for_build_processing_to_be_complete(
+        app_id: app.id,
+        platform: platform,
+        app_version: app_version,
+        build_version: app_build,
+        poll_interval: config[:wait_processing_interval],
+        timeout_duration: config[:wait_processing_timeout_duration],
+        return_when_build_appears: return_when_build_appears,
+        return_spaceship_testflight_build: false,
+        select_latest: config[:distribute_only],
+        wait_for_build_beta_detail_processing: true
+      )
 
       unless latest_build.app_version == app_version && latest_build.version == app_build
         UI.important("Uploaded app #{app_version} - #{app_build}, but received build #{latest_build.app_version} - #{latest_build.version}.")
@@ -101,9 +147,17 @@ module Pilot
 
       # Get latest uploaded build if no build specified
       if build.nil?
-        UI.important("No build specified - fetching latest build")
+        app_version = config[:app_version]
+        build_number = config[:build_number]
+        if build_number.nil?
+          if app_version.nil?
+            UI.important("No build specified - fetching latest build")
+          else
+            UI.important("No build specified - fetching latest build for version #{app_version}")
+          end
+        end
         platform = Spaceship::ConnectAPI::Platform.map(fetch_app_platform)
-        build ||= Spaceship::ConnectAPI::Build.all(app_id: app.id, sort: "-uploadedDate", platform: platform, limit: 1).first
+        build ||= Spaceship::ConnectAPI::Build.all(app_id: app.id, version: app_version, build_number: build_number, sort: "-uploadedDate", platform: platform, limit: Spaceship::ConnectAPI::Platform::ALL.size).first
       end
 
       # Verify the build has all the includes that we need
@@ -129,14 +183,20 @@ module Pilot
 
       return if config[:skip_submission]
       if options[:reject_build_waiting_for_review]
-        waiting_for_review_build = build.app.get_builds(filter: { "betaAppReviewSubmission.betaReviewState" => "WAITING_FOR_REVIEW" }, includes: "betaAppReviewSubmission,preReleaseVersion").first
-        unless waiting_for_review_build.nil?
-          UI.important("Another build is already in review. Going to remove that build and submit the new one.")
-          UI.important("Deleting beta app review submission for build: #{waiting_for_review_build.app_version} - #{waiting_for_review_build.version}")
-          waiting_for_review_build.beta_app_review_submission.delete!
-          UI.success("Deleted beta app review submission for previous build: #{waiting_for_review_build.app_version} - #{waiting_for_review_build.version}")
-        end
+        reject_build_waiting_for_review(build)
       end
+
+      if options[:expire_previous_builds]
+        expire_previous_builds(build)
+      end
+
+      if !build.ready_for_internal_testing? && options[:skip_waiting_for_build_processing]
+        # Meta can be uploaded for a build still in processing
+        # Returning before distribute if skip_waiting_for_build_processing
+        # because can't distribute an app that is still processing
+        return
+      end
+
       distribute_build(build, options)
       type = options[:distribute_external] ? 'External' : 'Internal'
       UI.success("Successfully distributed build to #{type} testers 🚀")
@@ -161,7 +221,7 @@ module Pilot
         [
           build.app_version,
           build.version,
-          (build.beta_build_metrics || []).map(&:install_count).reduce(:+)
+          (build.beta_build_metrics || []).map(&:install_count).compact.reduce(:+)
         ]
       end
 
@@ -182,8 +242,11 @@ module Pilot
     end
 
     def update_beta_app_meta(options, build)
-      # Setting account required wth AppStore Connect API
-      update_review_detail(build, { demo_account_required: options[:demo_account_required] })
+      # If demo_account_required is a parameter, it should added into beta_app_review_info
+      unless options[:demo_account_required].nil?
+        options[:beta_app_review_info] = {} if options[:beta_app_review_info].nil?
+        options[:beta_app_review_info][:demo_account_required] = options[:demo_account_required]
+      end
 
       if should_update_beta_app_review_info(options)
         update_review_detail(build, options[:beta_app_review_info])
@@ -214,32 +277,60 @@ module Pilot
         end
       end
 
-      update_build_beta_details(build, {
-        auto_notify_enabled: options[:notify_external_testers]
-      })
+      if options[:notify_external_testers].nil?
+        UI.important("Using App Store Connect's default for notifying external testers (which is true) - set `notify_external_testers` for full control")
+      else
+        update_build_beta_details(build, {
+          auto_notify_enabled: options[:notify_external_testers]
+        })
+      end
     end
 
     def self.truncate_changelog(changelog)
-      max_changelog_length = 4000
-      if changelog && changelog.length > max_changelog_length
-        original_length = changelog.length
-        bottom_message = "..."
-        changelog = "#{changelog[0...max_changelog_length - bottom_message.length]}#{bottom_message}"
-        UI.important("Changelog has been truncated since it exceeds Apple's #{max_changelog_length} character limit. It currently contains #{original_length} characters.")
+      max_changelog_bytes = 4000
+      if changelog
+        changelog_bytes = changelog.unpack('C*').length
+        if changelog_bytes > max_changelog_bytes
+          UI.important("Changelog will be truncated since it exceeds Apple's #{max_changelog_bytes}-byte limit. It currently contains #{changelog_bytes} bytes.")
+          new_changelog = ''
+          new_changelog_bytes = 0
+          max_changelog_bytes -= 3 # Will append '...' later.
+          changelog.chars.each do |char|
+            new_changelog_bytes += char.unpack('C*').length
+            break if new_changelog_bytes >= max_changelog_bytes
+            new_changelog += char
+          end
+          changelog = new_changelog + '...'
+        end
       end
       changelog
     end
 
+    def self.emoji_regex
+      # EmojiRegex::RGIEmoji is now preferred over EmojiRegex::Regex which is deprecated as of 3.2.0
+      # https://github.com/ticky/ruby-emoji-regex/releases/tag/v3.2.0
+      return defined?(EmojiRegex::RGIEmoji) ? EmojiRegex::RGIEmoji : EmojiRegex::Regex
+    end
+
     def self.strip_emoji(changelog)
-      if changelog && changelog =~ EmojiRegex::Regex
-        changelog.gsub!(EmojiRegex::Regex, "")
+      if changelog && changelog =~ emoji_regex
+        changelog.gsub!(emoji_regex, "")
         UI.important("Emoji symbols have been removed from the changelog, since they're not allowed by Apple.")
+      end
+      changelog
+    end
+
+    def self.strip_less_than_sign(changelog)
+      if changelog && changelog.include?("<")
+        changelog.delete!("<")
+        UI.important("Less than signs (<) have been removed from the changelog, since they're not allowed by Apple.")
       end
       changelog
     end
 
     def self.sanitize_changelog(changelog)
       changelog = strip_emoji(changelog)
+      changelog = strip_less_than_sign(changelog)
       truncate_changelog(changelog)
     end
 
@@ -273,22 +364,62 @@ module Pilot
       !options[:localized_build_info].nil?
     end
 
+    def reject_build_waiting_for_review(build)
+      waiting_for_review_build = build.app.get_builds(filter: { "betaAppReviewSubmission.betaReviewState" => "WAITING_FOR_REVIEW" }, includes: "betaAppReviewSubmission,preReleaseVersion").first
+      unless waiting_for_review_build.nil?
+        UI.important("Another build is already in review. Going to remove that build and submit the new one.")
+        UI.important("Deleting beta app review submission for build: #{waiting_for_review_build.app_version} - #{waiting_for_review_build.version}")
+        waiting_for_review_build.beta_app_review_submission.delete!
+        UI.success("Deleted beta app review submission for previous build: #{waiting_for_review_build.app_version} - #{waiting_for_review_build.version}")
+      end
+    end
+
+    def expire_previous_builds(build)
+      builds_to_expire = build.app.get_builds.reject do |asc_build|
+        asc_build.id == build.id
+      end
+
+      builds_to_expire.each(&:expire!)
+    end
+
+    # If App Store Connect API token, use token.
     # If itc_provider was explicitly specified, use it.
     # If there are multiple teams, infer the provider from the selected team name.
     # If there are fewer than two teams, don't infer the provider.
     def transporter_for_selected_team(options)
-      generic_transporter = FastlaneCore::ItunesTransporter.new(options[:username], nil, false, options[:itc_provider])
-      return generic_transporter if options[:itc_provider] || Spaceship::Tunes.client.nil?
-      return generic_transporter unless Spaceship::Tunes.client.teams.count > 1
+      # Use JWT auth
+      api_token = Spaceship::ConnectAPI.token
+      api_key = if options[:api_key].nil? && !api_token.nil?
+                  # Load api key info if user set api_key_path, not api_key
+                  { key_id: api_token.key_id, issuer_id: api_token.issuer_id, key: api_token.key_raw }
+                elsif !options[:api_key].nil?
+                  api_key = options[:api_key].transform_keys(&:to_sym).dup
+                  # key is still base 64 style if api_key is loaded from option
+                  api_key[:key] = Base64.decode64(api_key[:key]) if api_key[:is_key_content_base64]
+                  api_key
+                end
+
+      unless api_token.nil?
+        api_token.refresh! if api_token.expired?
+        return FastlaneCore::ItunesTransporter.new(nil, nil, false, nil, api_token.text, altool_compatible_command: true, api_key: api_key)
+      end
+
+      # Otherwise use username and password
+      tunes_client = Spaceship::ConnectAPI.client ? Spaceship::ConnectAPI.client.tunes_client : nil
+
+      generic_transporter = FastlaneCore::ItunesTransporter.new(options[:username], nil, false, options[:itc_provider], altool_compatible_command: true, api_key: api_key)
+      return generic_transporter if options[:itc_provider] || tunes_client.nil?
+      return generic_transporter unless tunes_client.teams.count > 1
 
       begin
-        team = Spaceship::Tunes.client.teams.find { |t| t['contentProvider']['contentProviderId'].to_s == Spaceship::Tunes.client.team_id }
-        name = team['contentProvider']['name']
+        team = tunes_client.teams.find { |t| t['providerId'].to_s == tunes_client.team_id }
+        name = team['name']
         provider_id = generic_transporter.provider_ids[name]
         UI.verbose("Inferred provider id #{provider_id} for team #{name}.")
-        return FastlaneCore::ItunesTransporter.new(options[:username], nil, false, provider_id)
+        return FastlaneCore::ItunesTransporter.new(options[:username], nil, false, provider_id, altool_compatible_command: true, api_key: api_key)
       rescue => ex
-        UI.verbose("Couldn't infer a provider short name for team with id #{Spaceship::Tunes.client.team_id} automatically: #{ex}. Proceeding without provider short name.")
+        STDERR.puts(ex.to_s)
+        UI.verbose("Couldn't infer a provider short name for team with id #{tunes_client.team_id} automatically: #{ex}. Proceeding without provider short name.")
         return generic_transporter
       end
     end
@@ -299,7 +430,7 @@ module Pilot
       # This is where we could add a check to see if encryption is required and has been updated
       uploaded_build = set_export_compliance_if_needed(uploaded_build, options)
 
-      if options[:groups] || options[:distribute_external]
+      if options[:submit_beta_review] && (options[:groups] || options[:distribute_external])
         if uploaded_build.ready_for_beta_submission?
           uploaded_build.post_beta_app_review_submission
         else
@@ -336,14 +467,21 @@ module Pilot
 
         UI.important("Export compliance has been set to '#{uses_non_exempt_encryption}'. Need to wait for build to finishing processing again...")
         UI.important("Set 'ITSAppUsesNonExemptEncryption' in the 'Info.plist' to skip this step and speed up the submission")
-        return wait_for_build_processing_to_be_complete
+
+        loop do
+          build = Spaceship::ConnectAPI::Build.get(build_id: uploaded_build.id)
+          return build unless build.missing_export_compliance?
+
+          UI.message("Waiting for build #{uploaded_build.id} to process export compliance")
+          sleep(5)
+        end
       else
         return uploaded_build
       end
     end
 
     def update_review_detail(build, info)
-      info = info.collect { |k, v| [k.to_sym, v] }.to_h
+      info = info.transform_keys(&:to_sym)
 
       attributes = {}
       attributes[:contactEmail] = info[:contact_email] if info.key?(:contact_email)
@@ -359,7 +497,7 @@ module Pilot
     end
 
     def update_localized_app_review(build, info_by_lang, default_info: nil)
-      info_by_lang = info_by_lang.collect { |k, v| [k.to_sym, v] }.to_h
+      info_by_lang = info_by_lang.transform_keys(&:to_sym)
 
       if default_info
         info_by_lang.delete(:default)
@@ -405,7 +543,7 @@ module Pilot
     end
 
     def update_localized_build_review(build, info_by_lang, default_info: nil)
-      info_by_lang = info_by_lang.collect { |k, v| [k.to_sym, v] }.to_h
+      info_by_lang = info_by_lang.transform_keys(&:to_sym)
 
       if default_info
         info_by_lang.delete(:default)
@@ -447,12 +585,17 @@ module Pilot
     end
 
     def update_build_beta_details(build, info)
-      build_beta_detail = build.build_beta_detail
-
       attributes = {}
       attributes[:autoNotifyEnabled] = info[:auto_notify_enabled] if info.key?(:auto_notify_enabled)
+      build_beta_detail = build.build_beta_detail
 
-      Spaceship::ConnectAPI.patch_build_beta_details(build_beta_details_id: build_beta_detail.id, attributes: attributes)
+      if build_beta_detail
+        Spaceship::ConnectAPI.patch_build_beta_details(build_beta_details_id: build_beta_detail.id, attributes: attributes)
+      else
+        if attributes[:autoNotifyEnabled]
+          UI.important("Unable to auto notify testers as the build did not include beta detail information - this is likely a temporary issue on TestFlight.")
+        end
+      end
     end
   end
   # rubocop:enable Metrics/ClassLength

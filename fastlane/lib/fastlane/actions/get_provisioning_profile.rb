@@ -6,13 +6,18 @@ module Fastlane
       SIGH_UDID = :SIGH_UDID # deprecated
       SIGH_UUID = :SIGH_UUID
       SIGH_NAME = :SIGH_NAME
-      SIGH_PROFILE_TYPE = :SIGH_PROFILE_TYPE
+      SIGH_PROFILE_TYPE ||= :SIGH_PROFILE_TYPE
     end
 
     class GetProvisioningProfileAction < Action
       def self.run(values)
         require 'sigh'
         require 'credentials_manager/appfile_config'
+
+        # Only set :api_key from SharedValues if :api_key_path isn't set (conflicting options)
+        unless values[:api_key_path]
+          values[:api_key] ||= Actions.lane_context[SharedValues::APP_STORE_CONNECT_API_KEY]
+        end
 
         Sigh.config = values # we already have the finished config
 
@@ -59,12 +64,16 @@ module Fastlane
           ['SIGH_PROFILE_PATHS', 'Paths in which certificates, key and profile are exported'],
           ['SIGH_UUID', 'UUID (Universally Unique IDentifier) of a provisioning profile'],
           ['SIGH_NAME', 'The name of the profile'],
-          ['SIGH_PROFILE_TYPE', 'The profile type, can be appstore, adhoc, development, enterprise']
+          ['SIGH_PROFILE_TYPE', 'The profile type, can be app-store, ad-hoc, development, enterprise, developer-id, can be used in `build_app` as a default value for `export_method`']
         ]
       end
 
       def self.return_value
         "The UUID of the profile sigh just fetched/generated"
+      end
+
+      def self.return_type
+        :string
       end
 
       def self.details

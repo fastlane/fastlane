@@ -66,35 +66,32 @@ module Fastlane
       def self.available_options
         [
           FastlaneCore::ConfigItem.new(key: :api_token,
-                                     env_name: "INSTALLR_API_TOKEN",
-                                     sensitive: true,
-                                     description: "API Token for Installr Access",
-                                     verify_block: proc do |value|
-                                       UI.user_error!("No API token for Installr given, pass using `api_token: 'token'`") unless value && !value.empty?
-                                     end),
+                                       env_name: "INSTALLR_API_TOKEN",
+                                       sensitive: true,
+                                       description: "API Token for Installr Access",
+                                       verify_block: proc do |value|
+                                         UI.user_error!("No API token for Installr given, pass using `api_token: 'token'`") unless value && !value.empty?
+                                       end),
           FastlaneCore::ConfigItem.new(key: :ipa,
-                                     env_name: "INSTALLR_IPA_PATH",
-                                     description: "Path to your IPA file. Optional if you use the _gym_ or _xcodebuild_ action",
-                                     default_value: Actions.lane_context[SharedValues::IPA_OUTPUT_PATH],
-                                     default_value_dynamic: true,
-                                     verify_block: proc do |value|
-                                       UI.user_error!("Couldn't find build file at path '#{value}'") unless File.exist?(value)
-                                     end),
+                                       env_name: "INSTALLR_IPA_PATH",
+                                       description: "Path to your IPA file. Optional if you use the _gym_ or _xcodebuild_ action",
+                                       default_value: Actions.lane_context[SharedValues::IPA_OUTPUT_PATH],
+                                       default_value_dynamic: true,
+                                       verify_block: proc do |value|
+                                         UI.user_error!("Couldn't find build file at path '#{value}'") unless File.exist?(value)
+                                       end),
           FastlaneCore::ConfigItem.new(key: :notes,
-                                     env_name: "INSTALLR_NOTES",
-                                     description: "Release notes",
-                                     is_string: true,
-                                     optional: true),
+                                       env_name: "INSTALLR_NOTES",
+                                       description: "Release notes",
+                                       optional: true),
           FastlaneCore::ConfigItem.new(key: :notify,
-                                     env_name: "INSTALLR_NOTIFY",
-                                     description: "Groups to notify (e.g. 'dev,qa')",
-                                     is_string: true,
-                                     optional: true),
+                                       env_name: "INSTALLR_NOTIFY",
+                                       description: "Groups to notify (e.g. 'dev,qa')",
+                                       optional: true),
           FastlaneCore::ConfigItem.new(key: :add,
-                                     env_name: "INSTALLR_ADD",
-                                     description: "Groups to add (e.g. 'exec,ops')",
-                                     is_string: true,
-                                     optional: true)
+                                       env_name: "INSTALLR_ADD",
+                                       description: "Groups to add (e.g. 'exec,ops')",
+                                       optional: true)
         ]
       end
 

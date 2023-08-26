@@ -4,21 +4,31 @@ module Fastlane
       def self.run(params)
         require 'spaceship'
 
-        UI.message("Login to App Store Connect (#{params[:username]})")
-        Spaceship::Tunes.login(params[:username])
-        Spaceship::Tunes.select_team
-        UI.message("Login successful")
+        # Team selection passed though FASTLANE_ITC_TEAM_ID and FASTLANE_ITC_TEAM_NAME environment variables
+        # Prompts select team if multiple teams and none specified
+        if (api_token = Spaceship::ConnectAPI::Token.from(hash: params[:api_key], filepath: params[:api_key_path]))
+          UI.message("Creating authorization token for App Store Connect API")
+          Spaceship::ConnectAPI.token = api_token
+        elsif !Spaceship::ConnectAPI.token.nil?
+          UI.message("Using existing authorization token for App Store Connect API")
+        else
+          UI.message("Login to App Store Connect (#{params[:username]})")
+          Spaceship::ConnectAPI.login(params[:username], use_portal: false, use_tunes: true, tunes_team_id: params[:team_id], team_name: params[:team_name])
+          UI.message("Login successful")
+        end
 
-        app = Spaceship::Application.find(params[:app_identifier]) || Spaceship::Application.find(params[:app_identifier], mac: true)
+        app = Spaceship::ConnectAPI::App.find(params[:app_identifier])
         UI.user_error!("Couldn't find app with identifier #{params[:app_identifier]}") if app.nil?
 
         version_number = params[:version]
-        platform = params[:platform]
+        platform = Spaceship::ConnectAPI::Platform.map(params[:platform])
+
         unless version_number
           # Automatically fetch the latest version
           UI.message("Fetching the latest version for this app")
-          if app.edit_version(platform: platform) && app.edit_version(platform: platform).version
-            version_number = app.edit_version(platform: platform).version
+          edit_version = app.get_edit_app_store_version(platform: platform)
+          if edit_version
+            version_number = edit_version.version_string
           else
             UI.message("You have to specify a new version number: ")
             version_number = STDIN.gets.strip
@@ -42,31 +52,32 @@ module Fastlane
 
         UI.important("Going to update the changelog to:\n\n#{changelog}\n\n")
 
-        if (v = app.edit_version(platform: platform))
-          if v.version != version_number
+        edit_version = app.get_edit_app_store_version(platform: platform)
+        if edit_version
+          if edit_version.version_string != version_number
             # Version is already there, make sure it matches the one we want to create
-            UI.message("Changing existing version number from '#{v.version}' to '#{version_number}'")
-            v.version = version_number
-            v.save!
+            UI.message("Changing existing version number from '#{edit_version.version_string}' to '#{version_number}'")
+            edit_version = edit_version.update(attributes: {
+              versionString: version_number
+            })
           else
-            UI.message("Updating changelog for existing version #{v.version}")
+            UI.message("Updating changelog for existing version #{edit_version.version_string}")
           end
         else
           UI.message("Creating the new version: #{version_number}")
-          app.create_version!(version_number)
-          app = Spaceship::Application.find(params[:app_identifier]) # Replace with .reload method once available
-          v = app.edit_version(platform: platform)
+          attributes = { versionString: version_number, platform: platform }
+          edit_version = Spaceship::ConnectAPI.post_app_store_version(app_id: app.id, attributes: attributes).first
         end
 
-        v.release_notes.languages.each do |lang|
-          v.release_notes[lang] = changelog
+        localizations = edit_version.get_app_store_version_localizations
+        localizations.each do |localization|
+          UI.message("Updating changelog for the '#{localization.locale}'")
+          localization.update(attributes: {
+            whatsNew: changelog
+          })
         end
 
-        UI.message("Found and updated changelog for the following languages: #{v.release_notes.languages.join(', ')}")
-        UI.message("Uploading changes to App Store Connect...")
-        v.save!
-
-        UI.success("👼  Successfully pushed the new changelog to #{v.url}")
+        UI.success("👼  Successfully pushed the new changelog to for #{edit_version.version_string}")
       end
 
       def self.default_changelog_path
@@ -94,6 +105,23 @@ module Fastlane
         user ||= CredentialsManager::AppfileConfig.try_fetch_value(:apple_id)
 
         [
+          FastlaneCore::ConfigItem.new(key: :api_key_path,
+                                     env_names: ["FL_SET_CHANGELOG_API_KEY_PATH", "APP_STORE_CONNECT_API_KEY_PATH"],
+                                     description: "Path to your App Store Connect API Key JSON file (https://docs.fastlane.tools/app-store-connect-api/#using-fastlane-api-key-json-file)",
+                                     optional: true,
+                                     conflicting_options: [:api_key],
+                                     verify_block: proc do |value|
+                                       UI.user_error!("Couldn't find API key JSON file at path '#{value}'") unless File.exist?(value)
+                                     end),
+          FastlaneCore::ConfigItem.new(key: :api_key,
+                                     env_names: ["FL_SET_CHANGELOG_API_KEY", "APP_STORE_CONNECT_API_KEY"],
+                                     description: "Your App Store Connect API Key information (https://docs.fastlane.tools/app-store-connect-api/#using-fastlane-api-key-hash-option)",
+                                     type: Hash,
+                                     default_value: Fastlane::Actions.lane_context[Fastlane::Actions::SharedValues::APP_STORE_CONNECT_API_KEY],
+                                     default_value_dynamic: true,
+                                     optional: true,
+                                     sensitive: true,
+                                     conflicting_options: [:api_key_path]),
           FastlaneCore::ConfigItem.new(key: :app_identifier,
                                      short_option: "-a",
                                      env_name: "FASTLANE_APP_IDENTIFIER",
@@ -105,6 +133,7 @@ module Fastlane
                                      short_option: "-u",
                                      env_name: "FASTLANE_USERNAME",
                                      description: "Your Apple ID Username",
+                                     optional: true,
                                      default_value: user,
                                      default_value_dynamic: true),
           FastlaneCore::ConfigItem.new(key: :version,
@@ -120,7 +149,7 @@ module Fastlane
                                        env_name: "FL_SET_CHANGELOG_TEAM_ID",
                                        description: "The ID of your App Store Connect team if you're in multiple teams",
                                        optional: true,
-                                       is_string: false, # as we also allow integers, which we convert to strings anyway
+                                       skip_type_validation: true, # as we also allow integers, which we convert to strings anyway
                                        code_gen_sensitive: true,
                                        default_value: CredentialsManager::AppfileConfig.try_fetch_value(:itc_team_id),
                                        default_value_dynamic: true,

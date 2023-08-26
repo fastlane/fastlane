@@ -1,9 +1,5 @@
-//
-//  RubyCommand.swift
-//  FastlaneSwiftRunner
-//
-//  Created by Joshua Liebowitz on 8/4/17.
-//
+// RubyCommand.swift
+// Copyright (c) 2023 FastlaneTools
 
 //
 //  ** NOTE **
@@ -40,40 +36,38 @@ struct RubyCommand: RubyCommandable {
         }
 
         var hasValue: Bool {
-            return nil != self.value
+            return value != nil
         }
 
         var json: String {
-            get {
-                if let someValue = value {
-                    let typeJson: String
-                    if let type = type {
-                        typeJson = ", \"value_type\" : \"\(type.typeString)\""
-                    }else {
-                        typeJson = ""
-                    }
-
-                    if type == .stringClosure  {
-                        return "{\"name\" : \"\(name)\", \"value\" : \"ignored_for_closure\"\(typeJson)}"
-                    } else if let array = someValue as? [String] {
-                        return "{\"name\" : \"\(name)\", \"value\" : \"\(array.joined(separator: ","))\"\(typeJson)}"
-                    } else if let hash = someValue as? [String : Any] {
-                        let jsonData = try! JSONSerialization.data(withJSONObject: hash, options: [])
-                        let jsonString = String(data: jsonData, encoding: .utf8)!
-                        return "{\"name\" : \"\(name)\", \"value\" : \(jsonString)\(typeJson)}"
-                    } else {
-                        let dictionary = [
-                            "name": name,
-                            "value": someValue
-                        ]
-                        let jsonData = try! JSONSerialization.data(withJSONObject: dictionary, options: [])
-                        let jsonString = String(data: jsonData, encoding: .utf8)!
-                        return jsonString
-                    }
+            if let someValue = value {
+                let typeJson: String
+                if let type = type {
+                    typeJson = ", \"value_type\" : \"\(type.typeString)\""
                 } else {
-                    // Just exclude this arg if it doesn't have a value
-                    return ""
+                    typeJson = ""
                 }
+
+                if type == .stringClosure {
+                    return "{\"name\" : \"\(name)\", \"value\" : \"ignored_for_closure\"\(typeJson)}"
+                } else if let array = someValue as? [String] {
+                    return "{\"name\" : \"\(name)\", \"value\" : \(array)\(typeJson)}"
+                } else if let hash = someValue as? [String: Any] {
+                    let jsonData = try! JSONSerialization.data(withJSONObject: hash, options: [])
+                    let jsonString = String(data: jsonData, encoding: .utf8)!
+                    return "{\"name\" : \"\(name)\", \"value\" : \(jsonString)\(typeJson)}"
+                } else {
+                    let dictionary = [
+                        "name": name,
+                        "value": someValue,
+                    ]
+                    let jsonData = try! JSONSerialization.data(withJSONObject: dictionary, options: [])
+                    let jsonString = String(data: jsonData, encoding: .utf8)!
+                    return jsonString
+                }
+            } else {
+                // Just exclude this arg if it doesn't have a value
+                return ""
             }
         }
     }
@@ -82,36 +76,58 @@ struct RubyCommand: RubyCommandable {
     let methodName: String
     let className: String?
     let args: [Argument]
+    let id: String = UUID().uuidString
 
-    func performCallback(callbackArg: String) {
+    var closure: ((String) -> Void)? {
+        let callbacks = args.filter { ($0.type != nil) && $0.type == .stringClosure }
+        guard let callback = callbacks.first else {
+            return nil
+        }
+
+        guard let callbackArgValue = callback.value else {
+            return nil
+        }
+
+        guard let callbackClosure = callbackArgValue as? ((String) -> Void) else {
+            return nil
+        }
+        return callbackClosure
+    }
+
+    func callbackClosure(_ callbackArg: String) -> ((String) -> Void)? {
         // WARNING: This will perform the first callback it receives
-        let callbacks = self.args.filter { ($0.type != nil) && $0.type == .stringClosure }
+        let callbacks = args.filter { ($0.type != nil) && $0.type == .stringClosure }
         guard let callback = callbacks.first else {
             verbose(message: "received call to performCallback with \(callbackArg), but no callback available to perform")
-            return
+            return nil
         }
 
         guard let callbackArgValue = callback.value else {
             verbose(message: "received call to performCallback with \(callbackArg), but callback is nil")
-            return
+            return nil
         }
 
         guard let callbackClosure = callbackArgValue as? ((String) -> Void) else {
             verbose(message: "received call to performCallback with \(callbackArg), but callback type is unknown \(callbackArgValue.self)")
-            return
+            return nil
         }
+        return callbackClosure
+    }
 
-        print("Performing callback with: \(callbackArg)")
-        callbackClosure(callbackArg)
+    func performCallback(callbackArg: String, socket: SocketClient, completion: @escaping () -> Void) {
+        verbose(message: "Performing callback with: \(callbackArg)")
+        socket.leave()
+        callbackClosure(callbackArg)?(callbackArg)
+        completion()
     }
 
     var commandJson: String {
-        let argsArrayJson = self.args
+        let argsArrayJson = args
             .map { $0.json }
             .filter { $0 != "" }
 
         let argsJson: String?
-        if argsArrayJson.count > 0 {
+        if !argsArrayJson.isEmpty {
             argsJson = "\"args\" : [\(argsArrayJson.joined(separator: ","))]"
         } else {
             argsJson = nil

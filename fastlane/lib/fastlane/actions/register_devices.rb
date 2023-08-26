@@ -7,53 +7,87 @@ module Fastlane
         [:ios, :mac].include?(platform)
       end
 
+      def self.file_column_headers
+        ['Device ID', 'Device Name', 'Device Platform']
+      end
+
       def self.run(params)
-        require 'spaceship'
+        platform = Spaceship::ConnectAPI::BundleIdPlatform.map(params[:platform])
 
-        devices = params[:devices]
-        devices_file = params[:devices_file]
-
-        mac = params[:platform] == "mac"
-
-        credentials = CredentialsManager::AccountManager.new(user: params[:username])
-        Spaceship.login(credentials.user, credentials.password)
-        Spaceship.select_team
-
-        UI.message("Fetching list of currently registered devices...")
-        existing_devices = Spaceship::Device.all(mac: mac)
-
-        if devices
-          device_objs = devices.map do |k, v|
-            next if existing_devices.map(&:udid).include?(v)
-            try_create_device(name: k, udid: v, mac: mac)
+        if params[:devices]
+          new_devices = params[:devices].map do |name, udid|
+            [udid, name]
           end
-        elsif devices_file
+        elsif params[:devices_file]
           require 'csv'
 
-          devices_file = CSV.read(File.expand_path(File.join(devices_file)), col_sep: "\t")
-          UI.user_error!("Please provide a file according to the Apple Sample UDID file (https://devimages.apple.com.edgekey.net/downloads/devices/Multiple-Upload-Samples.zip)") unless devices_file.first == ['Device ID', 'Device Name']
+          devices_file = CSV.read(File.expand_path(File.join(params[:devices_file])), col_sep: "\t")
+          unless devices_file.first == file_column_headers.first(2) || devices_file.first == file_column_headers
+            UI.user_error!("Please provide a file according to the Apple Sample UDID file (https://developer.apple.com/account/resources/downloads/Multiple-Upload-Samples.zip)")
+          end
 
-          device_objs = devices_file.drop(1).map do |device|
-            next if existing_devices.map(&:udid).include?(device[0])
-
-            UI.user_error!("Invalid device line, please provide a file according to the Apple Sample UDID file (http://devimages.apple.com/downloads/devices/Multiple-Upload-Samples.zip)") unless device.count == 2
-
-            try_create_device(name: device[1], udid: device[0], mac: mac)
+          new_devices = devices_file.drop(1).map do |row|
+            if row.count == 1
+              UI.user_error!("Invalid device line, ensure you are using tabs (NOT spaces). See Apple's sample/spec here: https://developer.apple.com/account/resources/downloads/Multiple-Upload-Samples.zip")
+            elsif !(2..3).cover?(row.count)
+              UI.user_error!("Invalid device line, please provide a file according to the Apple Sample UDID file (https://developer.apple.com/account/resources/downloads/Multiple-Upload-Samples.zip)")
+            end
+            row
           end
         else
           UI.user_error!("You must pass either a valid `devices` or `devices_file`. Please check the readme.")
+        end
+
+        require 'spaceship'
+        if (api_token = Spaceship::ConnectAPI::Token.from(hash: params[:api_key], filepath: params[:api_key_path]))
+          UI.message("Creating authorization token for App Store Connect API")
+          Spaceship::ConnectAPI.token = api_token
+        elsif !Spaceship::ConnectAPI.token.nil?
+          UI.message("Using existing authorization token for App Store Connect API")
+        else
+          UI.message("Login to App Store Connect (#{params[:username]})")
+          credentials = CredentialsManager::AccountManager.new(user: params[:username])
+          Spaceship::ConnectAPI.login(credentials.user, credentials.password, use_portal: true, use_tunes: false)
+          UI.message("Login successful")
+        end
+
+        UI.message("Fetching list of currently registered devices...")
+        existing_devices = Spaceship::ConnectAPI::Device.all
+
+        device_objs = new_devices.map do |device|
+          if existing_devices.map(&:udid).map(&:downcase).include?(device[0].downcase)
+            UI.verbose("UDID #{device[0]} already exists - Skipping...")
+            next
+          end
+
+          device_platform = platform
+
+          device_platform_supported = !device[2].nil? && self.is_supported?(device[2].to_sym)
+          if device_platform_supported
+            if device[2] == "mac"
+              device_platform = Spaceship::ConnectAPI::BundleIdPlatform::MAC_OS
+            else
+              device_platform = Spaceship::ConnectAPI::BundleIdPlatform::IOS
+            end
+          end
+
+          try_create_device(name: device[1], platform: device_platform, udid: device[0])
         end
 
         UI.success("Successfully registered new devices.")
         return device_objs
       end
 
-      def self.try_create_device(name: nil, udid: nil, mac: false)
-        Spaceship::Device.create!(name: name, udid: udid, mac: mac)
+      def self.try_create_device(name: nil, platform: nil, udid: nil)
+        Spaceship::ConnectAPI::Device.find_or_create(udid, name: name, platform: platform)
       rescue => ex
         UI.error(ex.to_s)
         UI.crash!("Failed to register new device (name: #{name}, UDID: #{udid})")
       end
+
+      #####################################################
+      # @!group Documentation
+      #####################################################
 
       def self.description
         "Registers new devices to the Apple Dev Portal"
@@ -68,7 +102,6 @@ module Fastlane
           FastlaneCore::ConfigItem.new(key: :devices,
                                        env_name: "FL_REGISTER_DEVICES_DEVICES",
                                        description: "A hash of devices, with the name as key and the UDID as value",
-                                       is_string: false,
                                        type: Hash,
                                        optional: true),
           FastlaneCore::ConfigItem.new(key: :devices_file,
@@ -78,6 +111,23 @@ module Fastlane
                                        verify_block: proc do |value|
                                          UI.user_error!("Could not find file '#{value}'") unless File.exist?(value)
                                        end),
+          FastlaneCore::ConfigItem.new(key: :api_key_path,
+                                       env_names: ["FL_REGISTER_DEVICES_API_KEY_PATH", "APP_STORE_CONNECT_API_KEY_PATH"],
+                                       description: "Path to your App Store Connect API Key JSON file (https://docs.fastlane.tools/app-store-connect-api/#using-fastlane-api-key-json-file)",
+                                       optional: true,
+                                       conflicting_options: [:api_key],
+                                       verify_block: proc do |value|
+                                         UI.user_error!("Couldn't find API key JSON file at path '#{value}'") unless File.exist?(value)
+                                       end),
+          FastlaneCore::ConfigItem.new(key: :api_key,
+                                       env_names: ["FL_REGISTER_DEVICES_API_KEY", "APP_STORE_CONNECT_API_KEY"],
+                                       description: "Your App Store Connect API Key information (https://docs.fastlane.tools/app-store-connect-api/#using-fastlane-api-key-hash-option)",
+                                       type: Hash,
+                                       default_value: Fastlane::Actions.lane_context[Fastlane::Actions::SharedValues::APP_STORE_CONNECT_API_KEY],
+                                       default_value_dynamic: true,
+                                       optional: true,
+                                       sensitive: true,
+                                       conflicting_options: [:api_key_path]),
           FastlaneCore::ConfigItem.new(key: :team_id,
                                      env_name: "REGISTER_DEVICES_TEAM_ID",
                                      code_gen_sensitive: true,
@@ -101,6 +151,7 @@ module Fastlane
           FastlaneCore::ConfigItem.new(key: :username,
                                        env_name: "DELIVER_USER",
                                        description: "Optional: Your Apple ID",
+                                       optional: true,
                                        default_value: user,
                                        default_value_dynamic: true),
           FastlaneCore::ConfigItem.new(key: :platform,

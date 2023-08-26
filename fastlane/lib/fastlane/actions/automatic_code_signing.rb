@@ -3,6 +3,8 @@ module Fastlane
   module Actions
     class AutomaticCodeSigningAction < Action
       def self.run(params)
+        UI.deprecated("The `automatic_code_signing` action has been deprecated,")
+        UI.deprecated("Please use `update_code_signing_settings` action instead.")
         FastlaneCore::PrintTable.print_values(config: params, title: "Summary for Automatic Codesigning")
         path = params[:path]
         path = File.join(File.expand_path(path), "project.pbxproj")
@@ -50,7 +52,7 @@ module Fastlane
           if params[:code_sign_identity]
             build_configuration_list.set_setting("CODE_SIGN_IDENTITY", params[:code_sign_identity])
 
-            # We also need to update the value if it was overriden for a specific SDK
+            # We also need to update the value if it was overridden for a specific SDK
             build_configuration_list.build_configurations.each do |build_configuration|
               codesign_build_settings_keys = build_configuration.build_settings.keys.select { |key| key.to_s.match(/CODE_SIGN_IDENTITY.*/) }
               codesign_build_settings_keys.each do |setting|
@@ -124,39 +126,33 @@ module Fastlane
           FastlaneCore::ConfigItem.new(key: :use_automatic_signing,
                                        env_name: "FL_PROJECT_USE_AUTOMATIC_SIGNING",
                                        description: "Defines if project should use automatic signing",
-                                       is_string: false,
+                                       type: Boolean,
                                        default_value: false),
           FastlaneCore::ConfigItem.new(key: :team_id,
                                        env_name: "FASTLANE_TEAM_ID",
                                        optional: true,
-                                       description: "Team ID, is used when upgrading project",
-                                       is_string: true),
+                                       description: "Team ID, is used when upgrading project"),
           FastlaneCore::ConfigItem.new(key: :targets,
                                        env_name: "FL_PROJECT_SIGNING_TARGETS",
                                        optional: true,
                                        type: Array,
-                                       description: "Specify targets you want to toggle the signing mech. (default to all targets)",
-                                       is_string: false),
+                                       description: "Specify targets you want to toggle the signing mech. (default to all targets)"),
           FastlaneCore::ConfigItem.new(key: :code_sign_identity,
                                        env_name: "FL_CODE_SIGN_IDENTITY",
                                        description: "Code signing identity type (iPhone Developer, iPhone Distribution)",
-                                       optional: true,
-                                       is_string: true),
+                                       optional: true),
           FastlaneCore::ConfigItem.new(key: :profile_name,
                                        env_name: "FL_PROVISIONING_PROFILE_SPECIFIER",
                                        description: "Provisioning profile name to use for code signing",
-                                       optional: true,
-                                       is_string: true),
+                                       optional: true),
           FastlaneCore::ConfigItem.new(key: :profile_uuid,
                                        env_name: "FL_PROVISIONING_PROFILE",
                                        description: "Provisioning profile UUID to use for code signing",
-                                       optional: true,
-                                       is_string: true),
+                                       optional: true),
           FastlaneCore::ConfigItem.new(key: :bundle_identifier,
                                        env_name: "FL_APP_IDENTIFIER",
                                        description: "Application Product Bundle Identifier",
-                                       optional: true,
-                                       is_string: true)
+                                       optional: true)
         ]
       end
 
@@ -201,7 +197,11 @@ module Fastlane
       end
 
       def self.category
-        :code_signing
+        :deprecated
+      end
+
+      def self.deprecated_notes
+        "Please use `update_code_signing_settings` action instead."
       end
 
       def self.return_value

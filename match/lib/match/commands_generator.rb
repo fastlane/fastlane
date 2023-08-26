@@ -1,6 +1,7 @@
 require 'commander'
 
 require 'fastlane_core/configuration/configuration'
+require 'fastlane_core/ui/help_formatter'
 
 require_relative 'nuke'
 require_relative 'change_password'
@@ -8,6 +9,7 @@ require_relative 'setup'
 require_relative 'runner'
 require_relative 'options'
 require_relative 'migrate'
+require_relative 'importer'
 
 require_relative 'storage'
 require_relative 'encryption'
@@ -31,9 +33,10 @@ module Match
       program :help, 'Author', 'Felix Krause <match@krausefx.com>'
       program :help, 'Website', 'https://fastlane.tools'
       program :help, 'Documentation', 'https://docs.fastlane.tools/actions/match/'
-      program :help_formatter, :compact
+      program :help_formatter, FastlaneCore::HelpFormatter
 
       global_option('--verbose') { FastlaneCore::Globals.verbose = true }
+      global_option('--env STRING[,STRING2]', String, 'Add environment(s) to use with `dotenv`')
 
       command :run do |c|
         c.syntax = 'fastlane match'
@@ -132,6 +135,19 @@ module Match
         end
       end
 
+      command :import do |c|
+        c.syntax = "fastlane match import"
+        c.description = "Imports certificates and profiles into the encrypted repository"
+
+        FastlaneCore::CommanderGenerator.new.generate(Match::Options.available_options, command: c)
+
+        c.action do |args, options|
+          params = FastlaneCore::Configuration.create(Match::Options.available_options, options.__hash__)
+          params.load_configuration_file("Matchfile") # this has to be done *before* overwriting the value
+          Match::Importer.new.import_cert(params)
+        end
+      end
+
       command :migrate do |c|
         c.syntax = "fastlane match migrate"
         c.description = "Migrate from one storage backend to another one"
@@ -139,7 +155,8 @@ module Match
         FastlaneCore::CommanderGenerator.new.generate(Match::Options.available_options, command: c)
 
         c.action do |args, options|
-          Match::Migrate.new.migrate(args, options)
+          params = FastlaneCore::Configuration.create(Match::Options.available_options, options.__hash__)
+          Match::Migrate.new.migrate(params)
         end
       end
 

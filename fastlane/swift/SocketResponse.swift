@@ -1,9 +1,5 @@
-//
-//  SocketResponse.swift
-//  FastlaneSwiftRunner
-//
-//  Created by Joshua Liebowitz on 7/30/17.
-//
+// SocketResponse.swift
+// Copyright (c) 2023 FastlaneTools
 
 //
 //  ** NOTE **
@@ -17,17 +13,18 @@ import Foundation
 struct SocketResponse {
     enum ResponseType {
         case parseFailure(failureInformation: [String])
-        case failure(failureInformation: [String])
+        case failure(failureInformation: [String], failureClass: String?, failureMessage: String?)
         case readyForNext(returnedObject: String?, closureArgumentValue: String?)
         case clientInitiatedCancel
-        
-        init(statusDictionary: [String : Any]) {
+
+        init(statusDictionary: [String: Any]) {
             guard let status = statusDictionary["status"] as? String else {
                 self = .parseFailure(failureInformation: ["Message failed to parse from Ruby server"])
                 return
             }
-            
+
             if status == "ready_for_next" {
+                verbose(message: "ready for next")
                 let returnedObject = statusDictionary["return_object"] as? String
                 let closureArgumentValue = statusDictionary["closure_argument_value"] as? String
                 self = .readyForNext(returnedObject: returnedObject, closureArgumentValue: closureArgumentValue)
@@ -42,36 +39,38 @@ struct SocketResponse {
                     self = .parseFailure(failureInformation: ["Ruby server indicated failure but Swift couldn't receive it"])
                     return
                 }
-                
-                self = .failure(failureInformation: failureInformation)
+
+                let failureClass = statusDictionary["failure_class"] as? String
+                let failureMessage = statusDictionary["failure_message"] as? String
+                self = .failure(failureInformation: failureInformation, failureClass: failureClass, failureMessage: failureMessage)
                 return
             }
             self = .parseFailure(failureInformation: ["Message status: \(status) not a supported status"])
         }
     }
-    
+
     let responseType: ResponseType
-    
+
     init(payload: String) {
         guard let data = SocketResponse.convertToDictionary(text: payload) else {
-            self.responseType = .parseFailure(failureInformation: ["Unable to parse message from Ruby server"])
+            responseType = .parseFailure(failureInformation: ["Unable to parse message from Ruby server"])
             return
         }
-        
-        guard case let statusDictionary? = data["payload"] as? [String : Any] else {
-            self.responseType = .parseFailure(failureInformation: ["Payload missing from Ruby server response"])
+
+        guard case let statusDictionary? = data["payload"] as? [String: Any] else {
+            responseType = .parseFailure(failureInformation: ["Payload missing from Ruby server response"])
             return
         }
-        
-        self.responseType = ResponseType(statusDictionary: statusDictionary)
+
+        responseType = ResponseType(statusDictionary: statusDictionary)
     }
 }
 
 extension SocketResponse {
-    static func convertToDictionary(text: String) -> [String : Any]? {
+    static func convertToDictionary(text: String) -> [String: Any]? {
         if let data = text.data(using: .utf8) {
             do {
-                return try JSONSerialization.jsonObject(with: data, options: []) as? [String : Any]
+                return try JSONSerialization.jsonObject(with: data, options: []) as? [String: Any]
             } catch {
                 log(message: error.localizedDescription)
             }

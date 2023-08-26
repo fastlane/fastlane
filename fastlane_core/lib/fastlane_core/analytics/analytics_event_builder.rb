@@ -13,7 +13,7 @@ module FastlaneCore
     def new_event(action_stage)
       {
         client_id: @p_hash,
-        category: "fastlane Client Langauge - #{@fastlane_client_language}",
+        category: "fastlane Client Language - #{@fastlane_client_language}",
         action: action_stage,
         label: action_name,
         value: nil

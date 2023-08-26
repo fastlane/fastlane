@@ -1,5 +1,7 @@
 require 'commander'
 
+require 'fastlane_core/ui/help_formatter'
+
 require_relative 'module'
 require_relative 'runner'
 require_relative 'options'
@@ -21,7 +23,7 @@ module Snapshot
       program :help, 'Author', 'Felix Krause <snapshot@krausefx.com>'
       program :help, 'Website', 'https://fastlane.tools'
       program :help, 'Documentation', 'https://docs.fastlane.tools/actions/snapshot/'
-      program :help_formatter, :compact
+      program :help_formatter, FastlaneCore::HelpFormatter
 
       global_option('--verbose', 'Shows a more verbose output') { FastlaneCore::Globals.verbose = true }
 
@@ -56,10 +58,10 @@ module Snapshot
       command :update do |c|
         c.syntax = 'fastlane snapshot update'
         c.description = "Updates your SnapshotHelper.swift to the latest version"
-
+        c.option('--force', 'Disables confirmation prompts')
         c.action do |args, options|
           require 'snapshot/update'
-          Snapshot::Update.new.update
+          Snapshot::Update.new.update(force: options.force)
         end
       end
 

@@ -5,15 +5,34 @@ module Fastlane
         require 'pilot'
         require 'pilot/options'
 
+        distribute_only = values[:distribute_only]
+
         changelog = Actions.lane_context[SharedValues::FL_CHANGELOG]
         values[:changelog] ||= changelog if changelog
 
-        values[:ipa] ||= Actions.lane_context[SharedValues::IPA_OUTPUT_PATH]
-        values[:ipa] = File.expand_path(values[:ipa]) if values[:ipa]
+        unless distribute_only
+          values[:ipa] ||= Actions.lane_context[SharedValues::IPA_OUTPUT_PATH]
+          values[:ipa] = File.expand_path(values[:ipa]) if values[:ipa]
+          values[:pkg] ||= Actions.lane_context[SharedValues::PKG_OUTPUT_PATH]
+          values[:pkg] = File.expand_path(values[:pkg]) if values[:pkg]
+        end
+
+        # Only set :api_key from SharedValues if :api_key_path isn't set (conflicting options)
+        unless values[:api_key_path]
+          values[:api_key] ||= Actions.lane_context[SharedValues::APP_STORE_CONNECT_API_KEY]
+        end
 
         return values if Helper.test?
 
-        Pilot::BuildManager.new.upload(values) # we already have the finished config
+        if distribute_only
+          build_manager = Pilot::BuildManager.new
+          build_manager.start(values, should_login: true)
+
+          build_manager.wait_for_build_processing_to_be_complete(false) unless values[:skip_waiting_for_build_processing]
+          build_manager.distribute(values) # we already have the finished config
+        else
+          Pilot::BuildManager.new.upload(values) # we already have the finished config
+        end
       end
 
       #####################################################
@@ -100,7 +119,7 @@ module Fastlane
       end
 
       def self.is_supported?(platform)
-        [:ios].include?(platform)
+        [:ios, :mac, :tvos].include?(platform)
       end
     end
   end

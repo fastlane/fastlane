@@ -42,7 +42,7 @@ module Fastlane
           FastlaneCore::ConfigItem.new(key: :all,
                                        env_name: "FL_NUMBER_OF_COMMITS_ALL",
                                        optional: true,
-                                       is_string: false,
+                                       type: Boolean,
                                        description: "Returns number of all commits instead of current branch")
         ]
       end
@@ -63,7 +63,7 @@ module Fastlane
         [
           'increment_build_number(build_number: number_of_commits)',
           'build_number = number_of_commits(all: true)
-          increment_build_number(build_number: number_of_commits)'
+          increment_build_number(build_number: build_number)'
         ]
       end
 

@@ -1,6 +1,7 @@
 package tools.fastlane.localetester;
 
-import android.support.test.rule.ActivityTestRule;
+import androidx.test.core.app.ActivityScenario;
+import androidx.test.ext.junit.rules.ActivityScenarioRule;
 
 import org.junit.ClassRule;
 import org.junit.Rule;
@@ -12,12 +13,12 @@ import tools.fastlane.screengrab.FalconScreenshotStrategy;
 import tools.fastlane.screengrab.Screengrab;
 import tools.fastlane.screengrab.locale.LocaleTestRule;
 
-import static android.support.test.espresso.Espresso.onView;
-import static android.support.test.espresso.action.ViewActions.click;
-import static android.support.test.espresso.assertion.ViewAssertions.matches;
-import static android.support.test.espresso.matcher.ViewMatchers.isDisplayed;
-import static android.support.test.espresso.matcher.ViewMatchers.withId;
-import static android.support.test.espresso.matcher.ViewMatchers.withText;
+import static androidx.test.espresso.Espresso.onView;
+import static androidx.test.espresso.action.ViewActions.click;
+import static androidx.test.espresso.assertion.ViewAssertions.matches;
+import static androidx.test.espresso.matcher.ViewMatchers.isDisplayed;
+import static androidx.test.espresso.matcher.ViewMatchers.withId;
+import static androidx.test.espresso.matcher.ViewMatchers.withText;
 
 @RunWith(JUnit4.class)
 public class FalconScreenshots {
@@ -26,13 +27,17 @@ public class FalconScreenshots {
     public static final LocaleTestRule localeTestRule = new LocaleTestRule();
 
     @Rule
-    public ActivityTestRule<MainActivity> activityRule = new ActivityTestRule<>(MainActivity.class, false, false);
+    public ActivityScenarioRule<MainActivity> activityRule = new ActivityScenarioRule<>(MainActivity.class);
 
 
     @Test
     public void testTakeScreenshot() {
-        activityRule.launchActivity(null);
-        Screengrab.setDefaultScreenshotStrategy(new FalconScreenshotStrategy(activityRule.getActivity()));
+        activityRule.getScenario().onActivity(new ActivityScenario.ActivityAction<MainActivity>() {
+            @Override
+            public void perform(MainActivity activity) {
+                Screengrab.setDefaultScreenshotStrategy(new FalconScreenshotStrategy(activity));
+            }
+        });
 
         onView(withId(R.id.greeting)).check(matches(isDisplayed()));
 
@@ -45,8 +50,12 @@ public class FalconScreenshots {
 
     @Test
     public void testTakeMoreScreenshots() {
-        activityRule.launchActivity(null);
-        Screengrab.setDefaultScreenshotStrategy(new FalconScreenshotStrategy(activityRule.getActivity()));
+        activityRule.getScenario().onActivity(new ActivityScenario.ActivityAction<MainActivity>() {
+            @Override
+            public void perform(MainActivity activity) {
+                Screengrab.setDefaultScreenshotStrategy(new FalconScreenshotStrategy(activity));
+            }
+        });
 
         onView(withId(R.id.nav_button)).perform(click());
 

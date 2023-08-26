@@ -24,6 +24,7 @@ module Spaceship
 
       module BetaTesterState
         INSTALLED = "INSTALLED"
+        INVITED = "INVITED"
         NO_BUILDS = "NO_BUILDS"
       end
 

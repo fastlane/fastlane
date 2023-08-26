@@ -1,13 +1,9 @@
 module Fastlane
   module Actions
-    require 'fastlane/actions/build_ios_app'
-    class GymAction < BuildIosAppAction
-      #####################################################
-      # @!group Documentation
-      #####################################################
-
+    require 'fastlane/actions/build_app'
+    class GymAction < BuildAppAction
       def self.description
-        "Alias for the `build_ios_app` action"
+        "Alias for the `build_app` action"
       end
     end
   end

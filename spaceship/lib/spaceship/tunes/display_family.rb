@@ -5,7 +5,7 @@ module Spaceship
     # A definition of different styled displays used by devices
     # that App Store Connect supports storing screenshots.
     # Display styles often only vary based on screen resolution
-    # however other aspects of a displays physical apperance are
+    # however other aspects of a displays physical appearance are
     # also factored (i.e if the home indicator is provided via
     # a hardware button or a software interface).
     class DisplayFamily
@@ -15,12 +15,12 @@ module Spaceship
       # Spaceship::Tunes::AppScreenshot#device_type attribute.
       attr_accessor :name
 
-      # The user friendly name of this defintion.
+      # The user friendly name of this definition.
       #
       # Source: Media Manager in App Store Connect.
       attr_accessor :friendly_name
 
-      # The user friendly category for this defintion (i.e iPhone,
+      # The user friendly category for this definition (i.e iPhone,
       # Apple TV or Desktop).
       attr_accessor :friendly_category_name
 

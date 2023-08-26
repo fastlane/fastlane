@@ -43,6 +43,25 @@ module Spaceship
     end
   end
 
+  # Raised when 429 is received from App Store Connect
+  class TooManyRequestsError < BasicPreferredInfoError
+    attr_reader :retry_after
+    attr_reader :rate_limit_user
+
+    def initialize(resp_hash)
+      headers = resp_hash[:response_headers] || {}
+      @retry_after = (headers['retry-after'] || 60).to_i
+      @rate_limit_user = headers['x-daiquiri-rate-limit-user']
+      message = 'Apple 429 detected'
+      message += " - #{rate_limit_user}" if rate_limit_user
+      super(message)
+    end
+
+    def show_github_issues
+      false
+    end
+  end
+
   class UnexpectedResponse < StandardError
     attr_reader :error_info
 
@@ -76,4 +95,41 @@ module Spaceship
 
   # Raised when 504 is received from App Store Connect
   class GatewayTimeoutError < BasicPreferredInfoError; end
+
+  # Raised when 403 is received from portal request
+  class AccessForbiddenError < BasicPreferredInfoError; end
+
+  # Base class for errors coming from App Store Connect locale changes
+  class AppStoreLocaleError < BasicPreferredInfoError
+    def initialize(msg)
+      @message = (msg ? "An exception occurred for locale: #{msg}." : nil)
+      super
+    end
+
+    # no need to search github issues since the error is specific
+    def show_github_issues
+      false
+    end
+  end
+
+  # Raised for localized text errors from App Store Connect
+  class AppStoreLocalizationError < AppStoreLocaleError
+    def preferred_error_info
+      "#{@message} Check the localization requirements here: https://help.apple.com/app-store-connect/en.lproj/static.html#dev354659071"
+    end
+  end
+
+  # Raised for localized screenshots errors from App Store Connect
+  class AppStoreScreenshotError < AppStoreLocaleError
+    def preferred_error_info
+      "#{@message} Check the screenshot requirements here: https://help.apple.com/app-store-connect/en.lproj/static.html#devd274dd925"
+    end
+  end
+
+  # Raised for localized app preview errors from App Store Connect
+  class AppStoreAppPreviewError < AppStoreLocaleError
+    def preferred_error_info
+      "#{@message} Check the app preview requirements here: https://help.apple.com/app-store-connect/en.lproj/static.html#dev4e413fcb8"
+    end
+  end
 end

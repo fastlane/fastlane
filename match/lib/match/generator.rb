@@ -3,21 +3,37 @@ require_relative 'module'
 module Match
   # Generate missing resources
   class Generator
-    def self.generate_certificate(params, cert_type, working_directory)
+    def self.generate_certificate(params, cert_type, working_directory, specific_cert_type: nil)
       require 'cert/runner'
       require 'cert/options'
 
       output_path = File.join(working_directory, "certs", cert_type.to_s)
 
+      # Mapping match option to cert option for "Developer ID Application"
+      if cert_type.to_sym == :developer_id_application
+        specific_cert_type = cert_type.to_s
+      end
+
+      platform = params[:platform]
+      if platform.to_s == :catalyst.to_s
+        platform = :macos.to_s
+      end
+
       arguments = FastlaneCore::Configuration.create(Cert::Options.available_options, {
+        platform: platform,
         development: params[:type] == "development",
+        type: specific_cert_type,
+        generate_apple_certs: params[:generate_apple_certs],
         output_path: output_path,
         force: true, # we don't need a certificate without its private key, we only care about a new certificate
+        api_key_path: params[:api_key_path],
+        api_key: params[:api_key],
         username: params[:username],
         team_id: params[:team_id],
         team_name: params[:team_name],
         keychain_path: FastlaneCore::Helper.keychain_path(params[:keychain_name]),
-        keychain_password: params[:keychain_password]
+        keychain_password: params[:keychain_password],
+        skip_set_partition_list: params[:skip_set_partition_list]
       })
 
       Cert.config = arguments
@@ -41,7 +57,7 @@ module Match
     end
 
     # @return (String) The UUID of the newly generated profile
-    def self.generate_provisioning_profile(params: nil, prov_type: nil, certificate_id: nil, app_identifier: nil, working_directory: nil)
+    def self.generate_provisioning_profile(params: nil, prov_type: nil, certificate_id: nil, app_identifier: nil, force: true, working_directory: nil)
       require 'sigh/manager'
       require 'sigh/options'
 
@@ -53,24 +69,40 @@ module Match
         names << params[:platform]
       end
 
-      profile_name = names.join(" ")
+      if params[:profile_name].to_s.empty?
+        profile_name = names.join(" ")
+      else
+        profile_name = params[:profile_name]
+      end
 
       values = {
         app_identifier: app_identifier,
         output_path: File.join(working_directory, "profiles", prov_type.to_s),
         username: params[:username],
-        force: true,
+        force: force,
         cert_id: certificate_id,
         provisioning_name: profile_name,
         ignore_profiles_with_different_name: true,
+        api_key_path: params[:api_key_path],
+        api_key: params[:api_key],
         team_id: params[:team_id],
         team_name: params[:team_name],
-        template_name: params[:template_name]
+        template_name: params[:template_name],
+        fail_on_name_taken: params[:fail_on_name_taken],
+        include_all_certificates: params[:include_all_certificates],
+        include_mac_in_profiles: params[:include_mac_in_profiles],
       }
 
       values[:platform] = params[:platform]
-      values[:adhoc] = true if prov_type == :adhoc
-      values[:development] = true if prov_type == :development
+
+      # These options are all conflicting so can only set one
+      if params[:type] == "developer_id"
+        values[:developer_id] = true
+      elsif prov_type == :adhoc
+        values[:adhoc] = true
+      elsif prov_type == :development
+        values[:development] = true
+      end
 
       arguments = FastlaneCore::Configuration.create(Sigh::Options.available_options, values)
 
@@ -81,6 +113,7 @@ module Match
 
     # @return the name of the provisioning profile type
     def self.profile_type_name(type)
+      return "Direct" if type == :developer_id
       return "Development" if type == :development
       return "AdHoc" if type == :adhoc
       return "AppStore" if type == :appstore

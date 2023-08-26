@@ -65,6 +65,7 @@ module Spaceship
                   reference_name: nil,
                   product_id: nil,
                   cleared_for_sale: true,
+                  merch_screenshot: nil,
                   review_notes: nil,
                   review_screenshot: nil,
                   pricing_intervals: nil,
@@ -78,6 +79,7 @@ module Spaceship
                            reference_name: reference_name,
                            product_id: product_id,
                            cleared_for_sale: cleared_for_sale,
+                           merch_screenshot: merch_screenshot,
                            review_notes: review_notes,
                            review_screenshot: review_screenshot,
                            pricing_intervals: pricing_intervals,
@@ -103,17 +105,6 @@ module Spaceship
         end
       end
 
-      # find a specific product
-      # @param product_id (String) Product Id
-      def find(product_id)
-        all.each do |product|
-          if product.product_id == product_id
-            return product
-          end
-        end
-        return nil
-      end
-
       # return all available In-App-Purchase's of current app
       # this is not paged inside iTC-API so if you have a lot if IAP's (2k+)
       # it might take some time to load, same as it takes when you load the list via App Store Connect
@@ -128,6 +119,32 @@ module Spaceship
           return_iaps << loaded_iap
         end
         return_iaps
+      end
+
+      # find a specific product
+      # @param product_id (String) Product Id
+      def find(product_id)
+        all.each do |product|
+          if product.product_id == product_id
+            return product
+          end
+        end
+        return nil
+      end
+
+      # generate app-specific shared secret (or regenerate if exists)
+      def generate_shared_secret
+        client.generate_shared_secret(app_id: self.application.apple_id)
+      end
+
+      # retrieve app-specific shared secret
+      # @param create (Boolean) Create new shared secret if does not exist
+      def get_shared_secret(create: false)
+        secret = client.get_shared_secret(app_id: self.application.apple_id)
+        if create && secret.nil?
+          secret = generate_shared_secret
+        end
+        secret
       end
 
       private

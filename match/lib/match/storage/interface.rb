@@ -9,6 +9,11 @@ module Match
       attr_accessor :working_directory
 
       # To make debugging easier, we have a custom exception here
+      def prefixed_working_directory
+        not_implemented(__method__)
+      end
+
+      # To make debugging easier, we have a custom exception here
       def working_directory
         if @working_directory.nil?
           raise "`working_directory` for the current storage provider is `nil` as the `#download` method was never called"
@@ -18,7 +23,7 @@ module Match
 
       # Call this method after creating a new object to configure
       # the given Storage object. This method will take
-      # different paramters depending on specific class being used
+      # different parameters depending on specific class being used
       def configure
         not_implemented(__method__)
       end
@@ -88,6 +93,10 @@ module Match
       end
 
       def skip_docs
+        not_implemented(__method__)
+      end
+
+      def list_files(file_name: "", file_ext: "")
         not_implemented(__method__)
       end
 

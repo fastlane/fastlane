@@ -14,14 +14,6 @@ module Fastlane
       ENV["FASTLANE_LANE_NAME"] = lane
       Actions.lane_context[Actions::SharedValues::LANE_NAME] = lane
 
-      # xcodeproj has a bug in certain versions that causes it to change directories
-      # and not return to the original working directory
-      # https://github.com/CocoaPods/Xcodeproj/issues/426
-      # Setting this environment variable causes xcodeproj to work around the problem
-      ENV["FORK_XCODE_WRITING"] = "true"
-
-      Fastlane::Helper::DotenvHelper.load_dot_env(env)
-
       started = Time.now
       e = nil
       begin
@@ -41,7 +33,7 @@ module Fastlane
         # wait on socket_thread to be in ready state, then start the runner thread
         self.cruise_swift_lane_in_thread(lane, parameters, swift_server_port)
 
-        socket_thread.join
+        socket_thread.value
       rescue Exception => ex # rubocop:disable Lint/RescueException
         e = ex
       end
@@ -82,7 +74,10 @@ module Fastlane
 
     def self.display_lanes
       self.ensure_runner_built!
-      Actions.sh(%(#{FastlaneCore::FastlaneFolder.swift_runner_path} lanes))
+      return_value = Actions.sh(%(#{FastlaneCore::FastlaneFolder.swift_runner_path} lanes))
+      if FastlaneCore::Globals.verbose?
+        UI.message("runner output: ".yellow + return_value)
+      end
     end
 
     def self.cruise_swift_lane_in_thread(lane, parameters = nil, swift_server_port)
@@ -102,7 +97,12 @@ module Fastlane
       parameter_string += " swiftServerPort #{swift_server_port}"
 
       return Thread.new do
-        Actions.sh(%(#{FastlaneCore::FastlaneFolder.swift_runner_path} lane #{lane}#{parameter_string} > /dev/null))
+        if FastlaneCore::Globals.verbose?
+          return_value = Actions.sh(%(#{FastlaneCore::FastlaneFolder.swift_runner_path} lane #{lane}#{parameter_string}))
+          UI.message("runner output: ".yellow + return_value)
+        else
+          Actions.sh(%(#{FastlaneCore::FastlaneFolder.swift_runner_path} lane #{lane}#{parameter_string} > /dev/null))
+        end
       end
     end
 

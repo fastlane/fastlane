@@ -58,7 +58,7 @@ module Fastlane
 
       def self.example_code
         [
-          'import_certificate(certificate_path: "certs/AppleWWDRCA.cer")',
+          'import_certificate(certificate_path: "certs/AppleWWDRCA6.cer")',
           'import_certificate(
             certificate_path: "certs/dist.p12",
             certificate_password: ENV["CERTIFICATE_PASSWORD"] || "default"

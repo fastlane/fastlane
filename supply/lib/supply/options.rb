@@ -1,3 +1,5 @@
+# rubocop:disable Metrics/ClassLength
+
 require 'fastlane_core/configuration/config_item'
 require 'credentials_manager/appfile_config'
 
@@ -5,7 +7,6 @@ module Supply
   class Options
     # rubocop:disable Metrics/PerceivedComplexity
     def self.available_options
-      default_tracks = %w(production beta alpha internal rollout)
       @options ||= [
         FastlaneCore::ConfigItem.new(key: :package_name,
                                      env_name: "SUPPLY_PACKAGE_NAME",
@@ -14,14 +15,43 @@ module Supply
                                      code_gen_sensitive: true,
                                      default_value: CredentialsManager::AppfileConfig.try_fetch_value(:package_name),
                                      default_value_dynamic: true),
+        FastlaneCore::ConfigItem.new(key: :version_name,
+                                     env_name: "SUPPLY_VERSION_NAME",
+                                     short_option: "-n",
+                                     optional: true,
+                                     description: "Version name (used when uploading new apks/aabs) - defaults to 'versionName' in build.gradle or AndroidManifest.xml",
+                                     default_value: CredentialsManager::AppfileConfig.try_fetch_value(:version_name),
+                                     default_value_dynamic: true),
+        FastlaneCore::ConfigItem.new(key: :version_code,
+                                     env_name: "SUPPLY_VERSION_CODE",
+                                     short_option: "-C",
+                                     optional: true,
+                                     type: Integer,
+                                     description: "Version code (used when updating rollout or promoting specific versions)",
+                                     default_value: CredentialsManager::AppfileConfig.try_fetch_value(:version_code),
+                                     default_value_dynamic: true),
+        FastlaneCore::ConfigItem.new(key: :release_status,
+                                     env_name: "SUPPLY_RELEASE_STATUS",
+                                     short_option: "-e",
+                                     optional: true,
+                                     description: "Release status (used when uploading new apks/aabs) - valid values are #{Supply::ReleaseStatus::ALL.join(', ')}",
+                                     default_value: Supply::ReleaseStatus::COMPLETED,
+                                     default_value_dynamic: true,
+                                     verify_block: proc do |value|
+                                                     UI.user_error!("Value must be one of '#{Supply::RELEASE_STATUS}'") unless Supply::ReleaseStatus::ALL.include?(value)
+                                                   end),
         FastlaneCore::ConfigItem.new(key: :track,
                                      short_option: "-a",
                                      env_name: "SUPPLY_TRACK",
-                                     description: "The track of the application to use. The default available tracks are: #{default_tracks.join(', ')}",
-                                     default_value: 'production'),
+                                     description: "The track of the application to use. The default available tracks are: #{Supply::Tracks::DEFAULTS.join(', ')}",
+                                     default_value: Supply::Tracks::DEFAULT,
+                                     type: String,
+                                     verify_block: proc do |value|
+                                       UI.user_error!("'rollout' is no longer a valid track name - please use 'production' instead") if value.casecmp('rollout').zero?
+                                     end),
         FastlaneCore::ConfigItem.new(key: :rollout,
                                      short_option: "-r",
-                                     description: "The percentage of the user fraction when uploading to the rollout track",
+                                     description: "The percentage of the user fraction when uploading to the rollout track (setting to 1 will complete the rollout)",
                                      optional: true,
                                      verify_block: proc do |value|
                                        min = 0.0
@@ -104,6 +134,7 @@ module Supply
         FastlaneCore::ConfigItem.new(key: :apk_paths,
                                      env_name: "SUPPLY_APK_PATHS",
                                      conflicting_options: [:apk, :aab, :aab_paths],
+                                     code_gen_sensitive: true,
                                      optional: true,
                                      type: Array,
                                      description: "An array of paths to APK files to upload",
@@ -131,6 +162,7 @@ module Supply
         FastlaneCore::ConfigItem.new(key: :aab_paths,
                                      env_name: "SUPPLY_AAB_PATHS",
                                      conflicting_options: [:apk, :apk_paths, :aab],
+                                     code_gen_sensitive: true,
                                      optional: true,
                                      type: Array,
                                      description: "An array of paths to AAB files to upload",
@@ -146,45 +178,62 @@ module Supply
                                      env_name: "SUPPLY_SKIP_UPLOAD_APK",
                                      optional: true,
                                      description: "Whether to skip uploading APK",
-                                     is_string: false,
+                                     type: Boolean,
                                      default_value: false),
         FastlaneCore::ConfigItem.new(key: :skip_upload_aab,
                                      env_name: "SUPPLY_SKIP_UPLOAD_AAB",
                                      optional: true,
                                      description: "Whether to skip uploading AAB",
-                                     is_string: false,
+                                     type: Boolean,
                                      default_value: false),
         FastlaneCore::ConfigItem.new(key: :skip_upload_metadata,
                                      env_name: "SUPPLY_SKIP_UPLOAD_METADATA",
                                      optional: true,
-                                     description: "Whether to skip uploading metadata",
-                                     is_string: false,
+                                     description: "Whether to skip uploading metadata, changelogs not included",
+                                     type: Boolean,
+                                     default_value: false),
+        FastlaneCore::ConfigItem.new(key: :skip_upload_changelogs,
+                                     env_name: "SUPPLY_SKIP_UPLOAD_CHANGELOGS",
+                                     optional: true,
+                                     description: "Whether to skip uploading changelogs",
+                                     type: Boolean,
                                      default_value: false),
         FastlaneCore::ConfigItem.new(key: :skip_upload_images,
                                      env_name: "SUPPLY_SKIP_UPLOAD_IMAGES",
                                      optional: true,
                                      description: "Whether to skip uploading images, screenshots not included",
-                                     is_string: false,
+                                     type: Boolean,
                                      default_value: false),
         FastlaneCore::ConfigItem.new(key: :skip_upload_screenshots,
                                      env_name: "SUPPLY_SKIP_UPLOAD_SCREENSHOTS",
                                      optional: true,
                                      description: "Whether to skip uploading SCREENSHOTS",
-                                     is_string: false,
+                                     type: Boolean,
                                      default_value: false),
         FastlaneCore::ConfigItem.new(key: :track_promote_to,
                                      env_name: "SUPPLY_TRACK_PROMOTE_TO",
                                      optional: true,
-                                     description: "The track to promote to. The default available tracks are: #{default_tracks.join(', ')}"),
+                                     description: "The track to promote to. The default available tracks are: #{Supply::Tracks::DEFAULTS.join(', ')}",
+                                     verify_block: proc do |value|
+                                       UI.user_error!("'rollout' is no longer a valid track name - please use 'production' instead") if value.casecmp('rollout').zero?
+                                     end),
+        FastlaneCore::ConfigItem.new(key: :track_promote_release_status,
+                                     env_name: "SUPPLY_TRACK_PROMOTE_RELEASE_STATUS",
+                                     optional: true,
+                                     description: "Promoted track release status (used when promoting a track) - valid values are #{Supply::ReleaseStatus::ALL.join(', ')}",
+                                     default_value: Supply::ReleaseStatus::COMPLETED,
+                                     verify_block: proc do |value|
+                                                     UI.user_error!("Value must be one of '#{Supply::RELEASE_STATUS}'") unless Supply::ReleaseStatus::ALL.include?(value)
+                                                   end),
         FastlaneCore::ConfigItem.new(key: :validate_only,
                                      env_name: "SUPPLY_VALIDATE_ONLY",
                                      optional: true,
                                      description: "Only validate changes with Google Play rather than actually publish",
-                                     is_string: false,
+                                     type: Boolean,
                                      default_value: false),
         FastlaneCore::ConfigItem.new(key: :mapping,
                                      env_name: "SUPPLY_MAPPING",
-                                     description: "Path to the mapping file to upload",
+                                     description: "Path to the mapping file to upload (mapping.txt or native-debug-symbols.zip alike)",
                                      short_option: "-d",
                                      conflicting_options: [:mapping_paths],
                                      optional: true,
@@ -196,7 +245,7 @@ module Supply
                                      conflicting_options: [:mapping],
                                      optional: true,
                                      type: Array,
-                                     description: "An array of paths to mapping files to upload",
+                                     description: "An array of paths to mapping files to upload (mapping.txt or native-debug-symbols.zip alike)",
                                      short_option: "-s",
                                      verify_block: proc do |value|
                                        UI.user_error!("Could not evaluate array from '#{value}'") unless value.kind_of?(Array)
@@ -215,7 +264,8 @@ module Supply
                                      env_name: "SUPPLY_CHECK_SUPERSEDED_TRACKS",
                                      optional: true,
                                      description: "Check the other tracks for superseded versions and disable them",
-                                     is_string: false,
+                                     deprecated: "Google Play does this automatically now",
+                                     type: Boolean,
                                      default_value: false),
         FastlaneCore::ConfigItem.new(key: :timeout,
                                      env_name: "SUPPLY_TIMEOUT",
@@ -227,17 +277,38 @@ module Supply
                                      env_name: "SUPPLY_DEACTIVATE_ON_PROMOTE",
                                      optional: true,
                                      description: "When promoting to a new track, deactivate the binary in the origin track",
-                                     is_string: false,
+                                     deprecated: "Google Play does this automatically now",
+                                     type: Boolean,
                                      default_value: true),
         FastlaneCore::ConfigItem.new(key: :version_codes_to_retain,
                                      optional: true,
                                      type: Array,
                                      description: "An array of version codes to retain when publishing a new APK",
                                      verify_block: proc do |version_codes|
+                                       version_codes = version_codes.map(&:to_i)
                                        UI.user_error!("Could not evaluate array from '#{version_codes}'") unless version_codes.kind_of?(Array)
                                        version_codes.each do |version_code|
-                                         UI.user_error!("Version code '#{version_code}' is not an integer") unless version_code.kind_of?(Integer)
+                                         UI.user_error!("Version code '#{version_code}' is not an integer") if version_code == 0
                                        end
+                                     end),
+        FastlaneCore::ConfigItem.new(key: :changes_not_sent_for_review,
+                                     env_name: "SUPPLY_CHANGES_NOT_SENT_FOR_REVIEW",
+                                     description: "Indicates that the changes in this edit will not be reviewed until they are explicitly sent for review from the Google Play Console UI",
+                                     type: Boolean,
+                                     default_value: false),
+        FastlaneCore::ConfigItem.new(key: :rescue_changes_not_sent_for_review,
+                                     env_name: "SUPPLY_RESCUE_CHANGES_NOT_SENT_FOR_REVIEW",
+                                     description: "Catches changes_not_sent_for_review errors when an edit is committed and retries with the configuration that the error message recommended",
+                                     type: Boolean,
+                                     default_value: true),
+        FastlaneCore::ConfigItem.new(key: :in_app_update_priority,
+                                     env_name: "SUPPLY_IN_APP_UPDATE_PRIORITY",
+                                     optional: true,
+                                     type: Integer,
+                                     description: "In-app update priority for all the newly added apks in the release. Can take values between [0,5]",
+                                     verify_block: proc do |in_app_update_priority|
+                                       in_app_update_priority = in_app_update_priority.to_i
+                                       UI.user_error!("Invalid in_app_update_priority value '#{in_app_update_priority}'. Values must be between [0,5]") unless (0..5).member?(in_app_update_priority)
                                      end),
         FastlaneCore::ConfigItem.new(key: :obb_main_references_version,
                                      env_name: "SUPPLY_OBB_MAIN_REFERENCES_VERSION",
@@ -258,7 +329,14 @@ module Supply
                                      env_name: "SUPPLY_OBB_PATCH_FILE SIZE",
                                      description: "Size of 'patch' expansion file in bytes",
                                      optional: true,
-                                     type: Numeric)
+                                     type: Numeric),
+        FastlaneCore::ConfigItem.new(key: :ack_bundle_installation_warning,
+                                     env_name: "ACK_BUNDLE_INSTALLATION_WARNING",
+                                     description: "Must be set to true if the bundle installation may trigger a warning on user devices (e.g can only be downloaded over wifi). Typically this is required for bundles over 150MB",
+                                     optional: true,
+                                     type: Boolean,
+                                     default_value: false)
+
       ]
     end
     # rubocop:enable Metrics/PerceivedComplexity

@@ -1,7 +1,34 @@
+inherit_from: .rubocop_todo.yml
+
 require:
   - rubocop/require_tools
+  - rubocop-performance
   - ./rubocop/fork_usage.rb
   - ./rubocop/missing_keys_on_shared_area.rb
+  - ./rubocop/is_string_usage.rb
+
+AllCops:
+  TargetRubyVersion: 2.6
+  NewCops: enable
+  Include:
+    - '**/*.rb'
+    - '**/*file'
+    - '**/*.gemspec'
+    - '*/lib/assets/*Template'
+    - '*/lib/assets/*TemplateAndroid'
+  Exclude:
+    - '**/lib/assets/custom_action_template.rb'
+    - './vendor/**/*'
+    - '**/lib/assets/DefaultFastfileTemplate'
+    - '**/lib/assets/MatchfileTemplate'
+    - '**/spec/fixtures/broken_files/broken_file.rb'
+    - '**/*.provisionprofile'
+
+Lint/ErbNewArguments:
+  Enabled: false
+
+Style/SlicingWithRange:
+  Enabled: false
 
 Style/MultipleComparison:
   Enabled: false
@@ -25,7 +52,7 @@ Performance/RegexpMatch:
   Enabled: false
 
 # This suggests use of `tr` instead of `gsub`. While this might be more performant,
-# these methods are not at all interchangable, and behave very differently. This can
+# these methods are not at all interchangeable, and behave very differently. This can
 # lead to people making the substitution without considering the differences.
 Performance/StringReplacement:
   Enabled: false
@@ -43,16 +70,16 @@ Metrics/ModuleLength:
   Enabled: false
 
 # certificate_1 is an okay variable name
-Style/VariableNumber:
+Naming/VariableNumber:
   Enabled: false
 
 # This is used a lot across the fastlane code base for config files
-Style/MethodMissing:
+Style/MissingRespondToMissing:
   Enabled: false
 
 # This rule isn't useful, lots of discussion happening around it also
 # e.g. https://github.com/bbatsov/rubocop/issues/2338
-MultilineBlockChain:
+Style/MultilineBlockChain:
   Enabled: false
 
 #
@@ -79,10 +106,6 @@ Style/TernaryParentheses:
 Style/EmptyMethod:
   Enabled: false
 
-# It's better to be more explicit about the type
-Style/BracesAroundHashParameters:
-  Enabled: false
-
 # specs sometimes have useless assignments, which is fine
 Lint/UselessAssignment:
   Exclude:
@@ -94,6 +117,7 @@ Require/MissingRequireStatement:
     - '**/spec/**/*.rb'
     - '**/spec_helper.rb'
     - 'spaceship/lib/spaceship/babosa_fix.rb'
+    - 'fastlane_core/lib/fastlane_core/ui/disable_colors.rb'
     - '**/Fastfile'
     - '**/*.gemspec'
     - 'rakelib/**/*'
@@ -103,10 +127,10 @@ Require/MissingRequireStatement:
     - 'supply/**/*' # TODO: remove
 
 # We could potentially enable the 2 below:
-Layout/IndentHash:
+Layout/FirstHashElementIndentation:
   Enabled: false
 
-Layout/AlignHash:
+Layout/HashAlignment:
   Enabled: false
 
 # HoundCI doesn't like this rule
@@ -122,7 +146,7 @@ Style/SymbolArray:
   Enabled: false
 
 # We still support Ruby 2.0.0
-Layout/IndentHeredoc:
+Layout/HeredocIndentation:
   Enabled: false
 
 # This cop would not work fine with rspec
@@ -131,7 +155,7 @@ Style/MixinGrouping:
     - '**/spec/**/*'
 
 # Sometimes we allow a rescue block that doesn't contain code
-Lint/HandleExceptions:
+Lint/SuppressedException:
   Enabled: false
 
 # Cop supports --auto-correct.
@@ -189,15 +213,12 @@ Metrics/ClassLength:
 
 
 # Configuration parameters: AllowURI, URISchemes.
-Metrics/LineLength:
+Layout/LineLength:
   Max: 370
 
 # Configuration parameters: CountKeywordArgs.
 Metrics/ParameterLists:
   Max: 17
-
-Metrics/PerceivedComplexity:
-  Max: 18
 
 # Sometimes it's easier to read without guards
 Style/GuardClause:
@@ -205,6 +226,9 @@ Style/GuardClause:
 
 # We allow both " and '
 Style/StringLiterals:
+  Enabled: false
+
+Style/QuotedSymbols:
   Enabled: false
 
 # something = if something_else
@@ -229,7 +253,7 @@ Lint/ParenthesesAsGroupedExpression:
 
 # This would reject is_ in front of methods
 # We use `is_supported?` everywhere already
-Style/PredicateName:
+Naming/PredicateName:
   Enabled: false
 
 # We allow the $
@@ -241,20 +265,8 @@ Layout/SpaceAroundOperators:
   Exclude:
     - '**/spec/actions_specs/xcodebuild_spec.rb'
 
-AllCops:
-  TargetRubyVersion: 2.0
-  Include:
-    - '*/lib/assets/*Template'
-    - '*/lib/assets/*TemplateAndroid'
-  Exclude:
-    - '**/lib/assets/custom_action_template.rb'
-    - './vendor/**/*'
-    - '**/lib/assets/DefaultFastfileTemplate'
-    - '**/lib/assets/MatchfileTemplate'
-    - '**/spec/fixtures/broken_files/broken_file.rb'
-
 # They have not to be snake_case
-Style/FileName:
+Naming/FileName:
   Exclude:
     - '**/Dangerfile'
     - '**/Brewfile'
@@ -264,6 +276,7 @@ Style/FileName:
     - '**/Fastfile'
     - '**/Deliverfile'
     - '**/Snapfile'
+    - '**/Pluginfile'
     - '**/*.gemspec'
 
 # We're not there yet
@@ -291,10 +304,21 @@ CrossPlatform/ForkUsage:
   Exclude:
     - '**/plugins/template/**/*'
 
+Lint/IsStringUsage:
+  Include:
+    - 'cert/**/*'
+    - 'deliver/**/*'
+    - 'fastlane/**/*'
+    - 'gym/**/*'
+    - 'match/**/*'
+    - 'precheck/**/*'
+    - 'screengrab/**/*'
+    - 'supply/**/*'
+
 # ( ) for method calls
 Style/MethodCallWithArgsParentheses:
   Enabled: true
-  IgnoredMethods:
+  AllowedMethods:
     - 'require'
     - 'require_relative'
     - 'fastlane_require'
@@ -310,6 +334,7 @@ Style/MethodCallWithArgsParentheses:
     - 'platform'
     # rspec tests code below
     - 'to'
+    - 'not_to'
     - 'describe'
     - 'it'
     - 'be'

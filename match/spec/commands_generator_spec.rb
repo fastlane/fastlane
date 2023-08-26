@@ -73,6 +73,9 @@ describe Match::CommandsGenerator do
   describe ":decrypt option handling" do
     def expect_githelper_clone_with(git_url, shallow_clone, git_branch)
       fake_storage = "fake_storage"
+      fake_working_directory = "fake_working_directory"
+      fake_encryption = "fake_encryption"
+
       expect(Match::Storage::GitStorage).to receive(:configure).with({
         git_url: git_url,
         shallow_clone: shallow_clone,
@@ -81,14 +84,20 @@ describe Match::CommandsGenerator do
       }).and_return(fake_storage)
 
       expect(fake_storage).to receive(:download)
-      allow(fake_storage).to receive(:working_directory).and_return("yolo_path")
+      allow(fake_storage).to receive(:working_directory).and_return(fake_working_directory)
       allow(fake_storage).to receive(:keychain_name).and_return("https://github.com/fastlane/certs")
 
-      expect(FastlaneCore::UI).to receive(:success).with(/Successfully decrypted certificates/)
-      expect(FastlaneCore::UI).to receive(:success).with(/Repo is at/)
+      expect(Match::Encryption).to receive(:for_storage_mode).with("git", {
+        git_url: git_url,
+        working_directory: fake_working_directory
+      }).and_return(fake_encryption)
+
+      expect(fake_encryption).to receive(:decrypt_files)
+      expect(FastlaneCore::UI).to receive(:success).with("Repo is at: '#{fake_working_directory}'")
     end
 
     it "can use the git_url short flag from tool options" do
+      stub_const('ENV', { 'MATCH_PASSWORD' => '' })
       stub_commander_runner_args(['decrypt', '-r', 'git@github.com:you/your_repo.git'])
 
       expect_githelper_clone_with('git@github.com:you/your_repo.git', false, { branch: 'master', clone_branch_directly: false })
@@ -97,9 +106,34 @@ describe Match::CommandsGenerator do
     end
 
     it "can use the shallow_clone flag from tool options" do
+      stub_const('ENV', { 'MATCH_PASSWORD' => '' })
       stub_commander_runner_args(['decrypt', '-r', 'git@github.com:you/your_repo.git', '--shallow_clone', 'true'])
 
       expect_githelper_clone_with('git@github.com:you/your_repo.git', true, { branch: 'master', clone_branch_directly: false })
+
+      Match::CommandsGenerator.start
+    end
+  end
+
+  describe ":import option handling" do
+    let(:fake_match_importer) { double("fake match_importer") }
+
+    before(:each) do
+      allow(Match::Importer).to receive(:new).and_return(fake_match_importer)
+    end
+
+    def expect_import_with(expected_options)
+      expect(fake_match_importer).to receive(:import_cert) do |actual_options|
+        expect(actual_options._values).to eq(expected_options._values)
+      end
+    end
+
+    it "can use the git_url short flag from tool options" do
+      stub_commander_runner_args(['import', '-r', 'git@github.com:you/your_repo.git'])
+
+      expected_options = FastlaneCore::Configuration.create(available_options, { git_url: 'git@github.com:you/your_repo.git' })
+
+      expect_import_with(expected_options)
 
       Match::CommandsGenerator.start
     end

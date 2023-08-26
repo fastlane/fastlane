@@ -5,6 +5,38 @@ describe Fastlane do
         allow(FastlaneCore::FastlaneFolder).to receive(:path).and_return(nil)
       end
 
+      describe "#pod_version_at_least" do
+        describe "pod version 1.6" do
+          let(:params) { {} }
+          before :each do
+            allow(Fastlane::Actions::CocoapodsAction).to receive(:pod_version).and_return("1.6.0")
+          end
+
+          it "returns false for at least 1.7" do
+            expect(Fastlane::Actions::CocoapodsAction.pod_version_at_least("1.7", params)).to be(false)
+          end
+
+          it "returns false for at least 1.10" do
+            expect(Fastlane::Actions::CocoapodsAction.pod_version_at_least("1.10", params)).to be(false)
+          end
+        end
+
+        describe "pod version 1.10" do
+          let(:params) { {} }
+          before :each do
+            allow(Fastlane::Actions::CocoapodsAction).to receive(:pod_version).and_return("1.10.0")
+          end
+
+          it "returns false for at least 1.7" do
+            expect(Fastlane::Actions::CocoapodsAction.pod_version_at_least("1.7", params)).to be(true)
+          end
+
+          it "returns false for at least 1.10" do
+            expect(Fastlane::Actions::CocoapodsAction.pod_version_at_least("1.10", params)).to be(true)
+          end
+        end
+      end
+
       it "default use case" do
         result = Fastlane::FastFile.new.parse("lane :test do
           cocoapods
@@ -51,6 +83,56 @@ describe Fastlane do
         expect(result).to eq("bundle exec pod install --repo-update")
       end
 
+      it "add clean_install to command if clean_install is set to true, and  pod version is 1.7 and over" do
+        allow(Fastlane::Actions::CocoapodsAction).to receive(:pod_version).and_return('1.7')
+
+        result = Fastlane::FastFile.new.parse("lane :test do
+          cocoapods(
+            clean_install: true
+          )
+        end").runner.execute(:test)
+
+        expect(result).to eq("bundle exec pod install --clean-install")
+      end
+
+      describe "allow_root" do
+        it "skips allow_root to command if allow_root is set to true, and pod version is 1.1 and over" do
+          allow(Fastlane::Actions::CocoapodsAction).to receive(:pod_version).and_return('1.1')
+
+          result = Fastlane::FastFile.new.parse("lane :test do
+            cocoapods(
+              allow_root: false
+            )
+          end").runner.execute(:test)
+
+          expect(result).to eq("bundle exec pod install")
+        end
+
+        it "add allow_root to command if allow_root is set to true, and pod version is 1.10 and over" do
+          allow(Fastlane::Actions::CocoapodsAction).to receive(:pod_version).and_return('1.10')
+
+          result = Fastlane::FastFile.new.parse("lane :test do
+            cocoapods(
+              allow_root: true
+            )
+          end").runner.execute(:test)
+
+          expect(result).to eq("bundle exec pod install --allow-root")
+        end
+      end
+
+      it "does not add clean_install to command if clean_install is set to true, and pod version is less than 1.7" do
+        allow(Fastlane::Actions::CocoapodsAction).to receive(:pod_version).and_return('1.6')
+
+        result = Fastlane::FastFile.new.parse("lane :test do
+          cocoapods(
+            clean_install: true
+          )
+        end").runner.execute(:test)
+
+        expect(result).to eq("bundle exec pod install")
+      end
+
       it "adds silent to command if silent is set to true" do
         result = Fastlane::FastFile.new.parse("lane :test do
           cocoapods(
@@ -79,6 +161,16 @@ describe Fastlane do
         end").runner.execute(:test)
 
         expect(result).to eq("bundle exec pod install --no-ansi")
+      end
+
+      it "adds deployment to command if deployment is set to true" do
+        result = Fastlane::FastFile.new.parse("lane :test do
+          cocoapods(
+            deployment: true
+          )
+        end").runner.execute(:test)
+
+        expect(result).to eq("bundle exec pod install --deployment")
       end
 
       it "changes directory if podfile is set to the Podfile path" do

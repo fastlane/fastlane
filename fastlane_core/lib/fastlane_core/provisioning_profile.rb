@@ -44,16 +44,31 @@ module FastlaneCore
         parse(path, keychain_path).fetch("Name")
       end
 
+      def bundle_id(path, keychain_path = nil)
+        profile = parse(path, keychain_path)
+        app_id_prefix = profile["ApplicationIdentifierPrefix"].first
+        entitlements = profile["Entitlements"]
+        app_identifier = entitlements["application-identifier"] || entitlements["com.apple.application-identifier"]
+        bundle_id = app_identifier.gsub("#{app_id_prefix}.", "")
+        bundle_id
+      rescue
+        UI.error("Unable to extract the Bundle Id from the provided provisioning profile '#{path}'.")
+      end
+
       def mac?(path, keychain_path = nil)
         parse(path, keychain_path).fetch("Platform", []).include?('OSX')
       end
 
       def profile_filename(path, keychain_path = nil)
         basename = uuid(path, keychain_path)
+        basename + profile_extension(path, keychain_path)
+      end
+
+      def profile_extension(path, keychain_path = nil)
         if mac?(path, keychain_path)
-          basename + ".provisionprofile"
+          ".provisionprofile"
         else
-          basename + ".mobileprovision"
+          ".mobileprovision"
         end
       end
 
@@ -100,7 +115,7 @@ module FastlaneCore
           else
             # `security` only works on Mac, fallback to `openssl`
             # via https://stackoverflow.com/a/14379814/252627
-            decoded = `openssl smime -inform der -verify -noverify -in #{path} 2> #{err}`
+            decoded = `openssl smime -inform der -verify -noverify -in #{path.shellescape} 2> #{err}`
           end
           UI.error("Failure to decode #{path}. Exit: #{$?.exitstatus}: #{File.read(err)}") if $?.exitstatus != 0
           decoded

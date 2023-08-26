@@ -1,5 +1,6 @@
 require 'commander'
 require 'fastlane/new_action'
+require 'fastlane_core/ui/help_formatter'
 
 HighLine.track_eof = false
 
@@ -17,7 +18,7 @@ module Fastlane
       end
       FastlaneCore::Swag.show_loader
 
-      # has to be checked here - in case we wan't to troubleshoot plugin related issues
+      # has to be checked here - in case we want to troubleshoot plugin related issues
       if ARGV.include?("--troubleshoot")
         self.confirm_troubleshoot
       end
@@ -35,7 +36,8 @@ module Fastlane
       # do not use "include" as it may be some where in the commandline where "env" is required, therefore explicit index->0
       unless ARGV[0] == "env" || CLIToolsDistributor.running_version_command? || CLIToolsDistributor.running_help_command?
         # *after* loading the plugins
-        Fastlane.plugin_manager.load_plugins
+        hide_plugins_table = FastlaneCore::Env.truthy?("FASTLANE_HIDE_PLUGINS_TABLE")
+        Fastlane.plugin_manager.load_plugins(print_table: !hide_plugins_table)
         Fastlane::PluginUpdateManager.start_looking_for_updates
       end
       self.new.run
@@ -43,7 +45,7 @@ module Fastlane
       Fastlane::PluginUpdateManager.show_update_status
       if FastlaneCore::Globals.capture_output?
         if $stdout.respond_to?(:string)
-          # Sometimes you can get NoMethodError: undefined method `string' for #<IO:<STDOUT>> when runing with FastlaneRunner (swift)
+          # Sometimes you can get NoMethodError: undefined method `string' for #<IO:<STDOUT>> when running with FastlaneRunner (swift)
           FastlaneCore::Globals.captured_output = Helper.strip_ansi_colors($stdout.string)
         end
         $stdout = STDOUT
@@ -85,7 +87,7 @@ module Fastlane
       program :help, 'Author', 'Felix Krause <fastlane@krausefx.com>'
       program :help, 'Website', 'https://fastlane.tools'
       program :help, 'GitHub', 'https://github.com/fastlane/fastlane'
-      program :help_formatter, :compact
+      program :help_formatter, FastlaneCore::HelpFormatter
 
       global_option('--verbose') { FastlaneCore::Globals.verbose = true }
       global_option('--capture_output', 'Captures the output of the current run, and generates a markdown issue template') do
@@ -93,13 +95,13 @@ module Fastlane
         FastlaneCore::Globals.verbose = true
       end
       global_option('--troubleshoot', 'Enables extended verbose mode. Use with caution, as this even includes ALL sensitive data. Cannot be used on CI.')
+      global_option('--env STRING[,STRING2]', String, 'Add environment(s) to use with `dotenv`')
 
       always_trace!
 
       command :trigger do |c|
         c.syntax = 'fastlane [lane]'
         c.description = 'Run a specific lane. Pass the lane name and optionally the platform first.'
-        c.option('--env STRING[,STRING2]', String, 'Add environment(s) to use with `dotenv`')
         c.option('--disable_runner_upgrades', 'Prevents fastlane from attempting to update FastlaneRunner swift project')
         c.option('--swift_server_port INT', 'Set specific port to communicate between fastlane and FastlaneRunner')
 
@@ -141,10 +143,12 @@ module Fastlane
         c.description = 'Starts local socket server and enables only a single local connection'
         c.option('-s', '--stay_alive', 'Keeps socket server up even after error or disconnects, requires CTRL-C to kill.')
         c.option('-c seconds', '--connection_timeout', 'Sets connection established timeout')
+        c.option('-p port', '--port', "Sets the port on localhost for the socket connection")
         c.action do |args, options|
           default_connection_timeout = 5
           stay_alive = options.stay_alive || false
           connection_timeout = options.connection_timeout || default_connection_timeout
+          port = options.port || 2000
 
           if stay_alive && options.connection_timeout.nil?
             UI.important("stay_alive is set, but the connection timeout is not, this will give you #{default_connection_timeout} seconds to (re)connect")
@@ -157,7 +161,8 @@ module Fastlane
           server = Fastlane::SocketServer.new(
             command_executor: command_executor,
             connection_timeout: connection_timeout,
-            stay_alive: stay_alive
+            stay_alive: stay_alive,
+            port: port
           )
           result = server.start
           UI.success("Result: #{result}") if result
@@ -326,6 +331,22 @@ module Fastlane
         c.action do |args, options|
           search_query = args.last
           PluginSearch.print_plugins(search_query: search_query)
+        end
+      end
+
+      #####################################################
+      # @!group Swift
+      #####################################################
+
+      if FastlaneCore::FastlaneFolder.swift?
+        command :generate_swift do |c|
+          c.syntax = 'fastlane generate_swift'
+          c.description = 'Generates additional Swift APIs for plugins and local actions'
+
+          c.action do |args, options|
+            SwiftActionsAPIGenerator.new(target_output_path: FastlaneCore::FastlaneFolder.swift_folder_path).generate_swift
+            SwiftPluginsAPIGenerator.new(target_output_path: FastlaneCore::FastlaneFolder.swift_folder_path).generate_swift
+          end
         end
       end
 

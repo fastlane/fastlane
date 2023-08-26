@@ -19,7 +19,7 @@ module FastlaneCore
     end
 
     def action_launched(launch_context: nil)
-      unless did_show_message?
+      if should_show_message?
         show_message
       end
 
@@ -52,16 +52,15 @@ module FastlaneCore
       UI.message("You can disable this by adding `opt_out_usage` at the top of your Fastfile")
     end
 
-    def did_show_message?
+    def should_show_message?
+      return false if FastlaneCore::Env.truthy?("FASTLANE_OPT_OUT_USAGE")
+
       file_name = ".did_show_opt_info"
-
       new_path = File.join(FastlaneCore.fastlane_user_dir, file_name)
-      did_show = File.exist?(new_path)
-
-      return did_show if did_show
+      return false if File.exist?(new_path)
 
       File.write(new_path, '1')
-      false
+      true
     end
 
     def finalize_session

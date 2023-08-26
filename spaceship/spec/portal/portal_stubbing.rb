@@ -20,7 +20,7 @@ class PortalStubbing
         to_return(status: 200, body: adp_read_fixture_file(File.join("enterprise", "listCertRequests.action.json")), headers: { 'Content-Type' => 'application/json' })
 
       stub_request(:post, "https://developer.apple.com/services-account/QH65B2/account/ios/profile/createProvisioningProfile.action").
-        with(body: { "appIdId" => "2UMR2S6PAA", "certificateIds" => "Q82WC5JRE9", "distributionType" => "inhouse", "provisioningProfileName" => "Delete Me", "teamId" => "XXXXXXXXXX" }).
+        with(body: { "appIdId" => "2UMR2S6PAA", "certificateIds" => "Q82WC5JRE9", "deviceIds" => "", "distributionType" => "inhouse", "provisioningProfileName" => "Delete Me", "teamId" => "XXXXXXXXXX" }).
         to_return(status: 200, body: adp_read_fixture_file('create_profile_success.json'), headers: { 'Content-Type' => 'application/json' })
     end
 
@@ -40,7 +40,7 @@ class PortalStubbing
       stub_request(:post, "https://developer.apple.com/services-account/QH65B2/account/ios/profile/listProvisioningProfiles.action").
         to_return(status: 200, body: adp_read_fixture_file('listProvisioningProfiles.action.json'), headers: { 'Content-Type' => 'application/json' })
 
-      stub_request(:post, "https://developerservices2.apple.com/services/QH65B2/ios/listProvisioningProfiles.action?includeInactiveProfiles=true&onlyCountLists=true&teamId=XXXXXXXXXX").
+      stub_request(:post, "https://developerservices2.apple.com/services/QH65B2/ios/listProvisioningProfiles.action?includeInactiveProfiles=true&includeExpiredProfiles=true&onlyCountLists=true&teamId=XXXXXXXXXX").
         to_return(status: 200, body: adp_read_fixture_file('listProvisioningProfiles.action.plist'), headers: { 'Content-Type' => 'text/x-xml-plist' })
 
       stub_request(:get, "https://developer.apple.com/services-account/QH65B2/account/ios/profile/downloadProfileContent?provisioningProfileId=PP00000001&teamId=XXXXXXXXXX").
@@ -97,7 +97,7 @@ class PortalStubbing
 
       # Profile with template
       stub_request(:post, "https://developer.apple.com/services-account/QH65B2/account/ios/profile/createProvisioningProfile.action").
-        with(body: { "appIdId" => "R9YNDTPLJX", "certificateIds" => "C8DL7464RQ", "distributionType" => "limited", "provisioningProfileName" => "net.sunapps.106 limited", "teamId" => "XXXXXXXXXX", "template" => "Subscription Service iOS (dist)" }).
+        with(body: { "appIdId" => "R9YNDTPLJX", "certificateIds" => "C8DL7464RQ", "deviceIds" => "", "distributionType" => "limited", "provisioningProfileName" => "net.sunapps.106 limited", "teamId" => "XXXXXXXXXX", "template" => "Subscription Service iOS (dist)" }).
         to_return(status: 200, body: adp_read_fixture_file('create_profile_with_template_success.json'), headers: { 'Content-Type' => 'application/json' })
 
       # Repair Profiles
@@ -182,7 +182,7 @@ class PortalStubbing
 
     def adp_stub_certificates
       stub_request(:post, "https://developer.apple.com/services-account/QH65B2/account/ios/certificate/listCertRequests.action").
-        with(body: { "pageNumber" => "1", "pageSize" => "500", "sort" => "certRequestStatusCode=asc", "teamId" => "XXXXXXXXXX", "types" => "5QPB9NHCEI,R58UK2EWSO,9RQEK7MSXA,LA30L5BJEU,BKLRAVXMGM,UPV3DW712I,Y3B2F3TYSI,3T2ZP62QW8,E5D663CMZW,4APLUP237T,MD8Q2VRT6A,T44PTHVNID,DZQUP8189Y,FGQUP4785Z,S5WE21TULA,3BQKVH9I2X,FUOY7LWJET" }).
+        with(body: { "pageNumber" => "1", "pageSize" => "500", "sort" => "certRequestStatusCode=asc", "teamId" => "XXXXXXXXXX", "types" => "83Q87W3TGH,WXV89964HE,5QPB9NHCEI,R58UK2EWSO,9RQEK7MSXA,LA30L5BJEU,JKG5JZ54H7,UPV3DW712I,Y3B2F3TYSI,3T2ZP62QW8,E5D663CMZW,4APLUP237T,MD8Q2VRT6A,3BQKVH9I2X,BKLRAVXMGM,T44PTHVNID,DZQUP8189Y,FGQUP4785Z,S5WE21TULA,FUOY7LWJET" }).
         to_return(status: 200, body: adp_read_fixture_file('listCertRequests.action.json'), headers: { 'Content-Type' => 'application/json' })
 
       stub_request(:post, "https://developer.apple.com/services-account/QH65B2/account/ios/certificate/listCertRequests.action").

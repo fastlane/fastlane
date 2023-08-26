@@ -22,11 +22,17 @@ class TunesStubbing
       stub_request(:get, "https://appstoreconnect.apple.com/WebObjects/iTunesConnect.woa/wa").
         to_return(status: 200, body: "")
       stub_request(:get, "https://appstoreconnect.apple.com/olympus/v1/session").
-        to_return(status: 200, body: itc_read_fixture_file('olympus_session.json'))
+        to_return(status: 200, body: itc_read_fixture_file('olympus_session.json'), headers: { 'Content-Type' => 'application/json' })
       stub_request(:get, "https://appstoreconnect.apple.com/olympus/v1/app/config?hostname=itunesconnect.apple.com").
         to_return(status: 200, body: { authServiceKey: 'e0abc' }.to_json, headers: { 'Content-Type' => 'application/json' })
+      stub_request(:post, "https://appstoreconnect.apple.com/olympus/v1/session").
+        with(body: "{\"provider\":{\"providerId\":5678}}",
+              headers: { 'Content-Type' => 'application/json', 'X-Requested-With' => 'olympus-ui' }).
+        to_return(status: 200, body: "", headers: {})
 
       # Actual login
+      stub_request(:get, "https://idmsa.apple.com/appleauth/auth/signin?widgetKey=e0abc").
+        to_return(status: 200, body: '', headers: { 'x-apple-hc-bits' => "12", 'x-apple-hc-challenge' => "f8b58554b2f22960fc0dc99aea342276" })
       stub_request(:post, "https://idmsa.apple.com/appleauth/auth/signin").
         with(body: { "accountName" => "spaceship@krausefx.com", "password" => "so_secret", "rememberMe" => true }.to_json).
         to_return(status: 200, body: '{}', headers: { 'Set-Cookie' => "myacinfo=abcdef;" })
@@ -36,19 +42,37 @@ class TunesStubbing
         with(body: { "accountName" => "bad-username", "password" => "bad-password", "rememberMe" => true }.to_json).
         to_return(status: 401, body: '{}', headers: { 'Set-Cookie' => 'session=invalid' })
 
-      stub_request(:post, "https://appstoreconnect.apple.com/WebObjects/iTunesConnect.woa/ra/v1/session/webSession").
-        with(body: "{\"contentProviderId\":\"5678\",\"dsId\":null}",
-              headers: { 'Accept' => '*/*', 'Accept-Encoding' => 'gzip;q=1.0,deflate;q=0.6,identity;q=0.3', 'Content-Type' => 'application/json' }).
-        to_return(status: 200, body: "", headers: {})
-
       # 2FA: Request security code to trusted phone
-      stub_request(:put, "https://idmsa.apple.com/appleauth/auth/verify/phone").
-        with(body: "{\"phoneNumber\":{\"id\":1},\"mode\":\"sms\"}").
-        to_return(status: 200, body: "", headers: {})
+      [1, 2].each do |id|
+        stub_request(:put, "https://idmsa.apple.com/appleauth/auth/verify/phone").
+          with(body: "{\"phoneNumber\":{\"id\":#{id}},\"mode\":\"sms\"}").
+          to_return(status: 200, body: "", headers: {})
+      end
 
       # 2FA: Submit security code from trusted phone for verification
+      [1, 2].each do |id|
+        stub_request(:post, "https://idmsa.apple.com/appleauth/auth/verify/phone/securitycode").
+          with(body: "{\"securityCode\":{\"code\":\"123\"},\"phoneNumber\":{\"id\":#{id}},\"mode\":\"sms\"}").
+          to_return(status: 200, body: "", headers: {})
+      end
+
+      # 2FA: Request and Submit code via voice
+      stub_request(:put, "https://idmsa.apple.com/appleauth/auth/verify/phone").
+        with(body: "{\"phoneNumber\":{\"id\":3},\"mode\":\"voice\"}").
+        to_return(status: 200, body: "", headers: {})
+
       stub_request(:post, "https://idmsa.apple.com/appleauth/auth/verify/phone/securitycode").
-        with(body: "{\"securityCode\":{\"code\":\"123\"},\"phoneNumber\":{\"id\":1},\"mode\":\"sms\"}").
+        with(body: "{\"securityCode\":{\"code\":\"123\"},\"phoneNumber\":{\"id\":3},\"mode\":\"voice\"}").
+        to_return(status: 200, body: "", headers: {})
+
+      # 2FA: Submit security code from trusted phone with voice for verification
+      stub_request(:post, "https://idmsa.apple.com/appleauth/auth/verify/phone/securitycode").
+        with(body: "{\"securityCode\":{\"code\":\"123\"},\"phoneNumber\":{\"id\":1},\"mode\":\"voice\"}").
+        to_return(status: 200, body: "", headers: {})
+
+      # 2FA: Submit security code from trusted device for verification
+      stub_request(:post, "https://idmsa.apple.com/appleauth/auth/verify/trusteddevice/securitycode").
+        with(body: "{\"securityCode\":{\"code\":\"123\"}}").
         to_return(status: 200, body: "", headers: {})
 
       # 2FA: Trust computer
@@ -105,6 +129,9 @@ class TunesStubbing
 
       stub_request(:get, "https://appstoreconnect.apple.com/WebObjects/iTunesConnect.woa/ra/apps/898536088/platforms/ios/reviews?index=0&sort=REVIEW_SORT_ORDER_MOST_RECENT&storefront=US").
         to_return(status: 200, body: itc_read_fixture_file('review_by_storefront.json'), headers: { 'Content-Type' => 'application/json' })
+
+      stub_request(:get, "https://appstoreconnect.apple.com/WebObjects/iTunesConnect.woa/ra/apps/898536088/platforms/ios/reviews?index=0&sort=REVIEW_SORT_ORDER_MOST_RECENT&versionId=1").
+        to_return(status: 200, body: itc_read_fixture_file('review_by_version_id.json'), headers: { 'Content-Type' => 'application/json' })
     end
 
     def itc_stub_build_details
@@ -116,7 +143,7 @@ class TunesStubbing
         to_return(status: 200, body: itc_read_fixture_file('build_details.json'), headers: { 'Content-Type' => 'application/json' })
     end
 
-    def itc_stub_candiate_builds
+    def itc_stub_candidate_builds
       stub_request(:get, "https://appstoreconnect.apple.com/WebObjects/iTunesConnect.woa/ra/apps/898536088/versions/812106519/candidateBuilds").
         to_return(status: 200, body: itc_read_fixture_file('candiate_builds.json'), headers: { 'Content-Type' => 'application/json' })
     end
@@ -301,7 +328,7 @@ class TunesStubbing
     end
 
     def itc_stub_pricing_tiers
-      stub_request(:get, "https://appstoreconnect.apple.com/WebObjects/iTunesConnect.woa/ra/apps/pricing/matrix").
+      stub_request(:get, "https://appstoreconnect.apple.com/WebObjects/iTunesConnect.woa/ra/apps/898536088/iaps/pricing/matrix").
         to_return(status: 200, body: itc_read_fixture_file("pricing_tiers.json"),
                   headers: { "Content-Type" => "application/json" })
     end
@@ -347,6 +374,16 @@ class TunesStubbing
         to_return(status: 200, body: itc_read_fixture_file("iap_price_goal_calc.json"),
                  headers: { "Content-Type" => "application/json" })
 
+      # get shared secret
+      stub_request(:get, "https://appstoreconnect.apple.com/WebObjects/iTunesConnect.woa/ra/apps/898536088/iaps/appSharedSecret").
+        to_return(status: 200, body: itc_read_fixture_file("iap_shared_secret_1.json"),
+                 headers: { "Content-Type" => "application/json" })
+
+      # generate new shared secret
+      stub_request(:post, "https://appstoreconnect.apple.com/WebObjects/iTunesConnect.woa/ra/apps/898536088/iaps/appSharedSecret").
+        to_return(status: 200, body: itc_read_fixture_file("iap_shared_secret_2.json"),
+                 headers: { "Content-Type" => "application/json" })
+
       # delete iap
       stub_request(:delete, "https://appstoreconnect.apple.com/WebObjects/iTunesConnect.woa/ra/apps/898536088/iaps/1194457865").
         to_return(status: 200, body: "", headers: {})
@@ -360,7 +397,7 @@ class TunesStubbing
         with(body: itc_read_fixture_file("iap_create_recurring.json")).
         to_return(status: 200, body: itc_read_fixture_file("iap_detail_recurring.json"),
                   headers: { "Content-Type" => "application/json" })
-      # create recurring iap witout pricing
+      # create recurring iap without pricing
       stub_request(:post, "https://appstoreconnect.apple.com/WebObjects/iTunesConnect.woa/ra/apps/898536088/iaps").
         with(body: itc_read_fixture_file("iap_create_recurring_without_pricing.json")).
         to_return(status: 200, body: itc_read_fixture_file("iap_detail_recurring.json"),
@@ -382,6 +419,11 @@ class TunesStubbing
       # iap edit family
       stub_request(:put, "https://appstoreconnect.apple.com/WebObjects/iTunesConnect.woa/ra/apps/898536088/iaps/family/20373395/").
         with(body: itc_read_fixture_file("iap_family_edit.json")).
+        to_return(status: 200, body: itc_read_fixture_file("iap_family_detail.json"),
+                headers: { "Content-Type" => "application/json" })
+      # iap edit family
+      stub_request(:put, "https://appstoreconnect.apple.com/WebObjects/iTunesConnect.woa/ra/apps/898536088/iaps/family/20373395/").
+        with(body: itc_read_fixture_file("iap_family_edit_with_de.json")).
         to_return(status: 200, body: itc_read_fixture_file("iap_family_detail.json"),
                 headers: { "Content-Type" => "application/json" })
 
@@ -574,52 +616,52 @@ class TunesStubbing
     end
 
     def itc_stub_analytics(start_time, end_time)
-      stub_request(:post, "https://analytics.itunes.apple.com/analytics/api/v1/data/time-series").
+      stub_request(:post, "https://appstoreconnect.apple.com/analytics/api/v1/data/time-series").
         with(body: { "adamId" => ["898536088"], "dimensionFilters" => [], "endTime" => end_time, "frequency" => "DAY", "group" => nil, "measures" => ["units"], "startTime" => start_time }.to_json).
         to_return(status: 200, body: itc_read_fixture_file("app_analytics_units.json"),
                   headers: { "Content-Type" => "application/json" })
 
-      stub_request(:post, "https://analytics.itunes.apple.com/analytics/api/v1/data/time-series").
+      stub_request(:post, "https://appstoreconnect.apple.com/analytics/api/v1/data/time-series").
         with(body: { "adamId" => ["898536088"], "dimensionFilters" => [], "endTime" => end_time, "frequency" => "DAY", "group" => nil, "measures" => ["pageViewCount"], "startTime" => start_time }.to_json).
         to_return(status: 200, body: itc_read_fixture_file("app_analytics_views.json"),
                   headers: { "Content-Type" => "application/json" })
 
-      stub_request(:post, "https://analytics.itunes.apple.com/analytics/api/v1/data/time-series").
+      stub_request(:post, "https://appstoreconnect.apple.com/analytics/api/v1/data/time-series").
         with(body: { "adamId" => ["898536088"], "dimensionFilters" => [], "endTime" => end_time, "frequency" => "DAY", "group" => nil, "measures" => ["iap"], "startTime" => start_time }.to_json).
         to_return(status: 200, body: itc_read_fixture_file("app_analytics_in_app_purchases.json"),
                   headers: { "Content-Type" => "application/json" })
 
-      stub_request(:post, "https://analytics.itunes.apple.com/analytics/api/v1/data/time-series").
+      stub_request(:post, "https://appstoreconnect.apple.com/analytics/api/v1/data/time-series").
         with(body: { "adamId" => ["898536088"], "dimensionFilters" => [], "endTime" => end_time, "frequency" => "DAY", "group" => nil, "measures" => ["sales"], "startTime" => start_time }.to_json).
         to_return(status: 200, body: itc_read_fixture_file("app_analytics_sales.json"),
                   headers: { "Content-Type" => "application/json" })
 
-      stub_request(:post, "https://analytics.itunes.apple.com/analytics/api/v1/data/time-series").
+      stub_request(:post, "https://appstoreconnect.apple.com/analytics/api/v1/data/time-series").
         with(body: { "adamId" => ["898536088"], "dimensionFilters" => [], "endTime" => end_time, "frequency" => "DAY", "group" => nil, "measures" => ["payingUsers"], "startTime" => start_time }.to_json).
         to_return(status: 200, body: itc_read_fixture_file("app_analytics_paying_users.json"),
                   headers: { "Content-Type" => "application/json" })
 
-      stub_request(:post, "https://analytics.itunes.apple.com/analytics/api/v1/data/time-series").
+      stub_request(:post, "https://appstoreconnect.apple.com/analytics/api/v1/data/time-series").
         with(body: { "adamId" => ["898536088"], "dimensionFilters" => [], "endTime" => end_time, "frequency" => "DAY", "group" => nil, "measures" => ["installs"], "startTime" => start_time }.to_json).
         to_return(status: 200, body: itc_read_fixture_file("app_analytics_installs.json"),
                   headers: { "Content-Type" => "application/json" })
 
-      stub_request(:post, "https://analytics.itunes.apple.com/analytics/api/v1/data/time-series").
+      stub_request(:post, "https://appstoreconnect.apple.com/analytics/api/v1/data/time-series").
         with(body: { "adamId" => ["898536088"], "dimensionFilters" => [], "endTime" => end_time, "frequency" => "DAY", "group" => nil, "measures" => ["sessions"], "startTime" => start_time }.to_json).
         to_return(status: 200, body: itc_read_fixture_file("app_analytics_sessions.json"),
                   headers: { "Content-Type" => "application/json" })
 
-      stub_request(:post, "https://analytics.itunes.apple.com/analytics/api/v1/data/time-series").
+      stub_request(:post, "https://appstoreconnect.apple.com/analytics/api/v1/data/time-series").
         with(body: { "adamId" => ["898536088"], "dimensionFilters" => [], "endTime" => end_time, "frequency" => "DAY", "group" => nil, "measures" => ["activeDevices"], "startTime" => start_time }.to_json).
         to_return(status: 200, body: itc_read_fixture_file("app_analytics_active_devices.json"),
                   headers: { "Content-Type" => "application/json" })
 
-      stub_request(:post, "https://analytics.itunes.apple.com/analytics/api/v1/data/time-series").
+      stub_request(:post, "https://appstoreconnect.apple.com/analytics/api/v1/data/time-series").
         with(body: { "adamId" => ["898536088"], "dimensionFilters" => [], "endTime" => end_time, "frequency" => "DAY", "group" => nil, "measures" => ["crashes"], "startTime" => start_time }.to_json).
         to_return(status: 200, body: itc_read_fixture_file("app_analytics_crashes.json"),
                   headers: { "Content-Type" => "application/json" })
 
-      stub_request(:post, "https://analytics.itunes.apple.com/analytics/api/v1/data/time-series").
+      stub_request(:post, "https://appstoreconnect.apple.com/analytics/api/v1/data/time-series").
         with(body: { "adamId" => ["898536088"], "dimensionFilters" => [], "endTime" => end_time, "frequency" => "DAY", "group" => { metric: "installs", dimension: "source", rank: "DESCENDING", limit: 3 }, "measures" => ["installs"], "startTime" => start_time }.to_json).
         to_return(status: 200, body: itc_read_fixture_file("app_analytics_installs_by_source.json"),
                   headers: { "Content-Type" => "application/json" })

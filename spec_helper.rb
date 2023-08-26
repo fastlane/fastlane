@@ -53,7 +53,7 @@ RSpec.configure do |config|
       # no method implemented
     end
 
-    # Make sure PATH didnt get emptied during execution of previous (!) test
+    # Make sure PATH didn't get emptied during execution of previous (!) test
     expect(ENV['PATH']).to be_truthy, "PATH is missing. (Previous test probably emptied it.)"
   end
 
@@ -119,11 +119,14 @@ module FastlaneSpec
     # a wrapper to temporarily modify the values of ARGV to
     # avoid errors like: "warning: already initialized constant ARGV"
     # if no block is given, modifies ARGV for good
-    # rubocop:disable Style/MethodName
+    # rubocop:disable Naming/MethodName
     def self.with_ARGV(argv)
       copy = ARGV.dup
       ARGV.clear
       ARGV.concat(argv)
+      # Commander::Methods imports delegate methods that shares the singleton
+      # so this prevents Commander from choosing wrong command previously cached.
+      Commander::Runner.instance_variable_set(:@instance, nil)
       begin
         # Do not check for "block_given?". This method is useless without a
         # block, and must fail if used like that.
@@ -133,7 +136,7 @@ module FastlaneSpec
         ARGV.concat(copy)
       end
     end
-    # rubocop:enable Style/MethodName
+    # rubocop:enable Naming/MethodName
 
     def self.with_verbose(verbose)
       orig_verbose = FastlaneCore::Globals.verbose?

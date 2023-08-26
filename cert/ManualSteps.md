@@ -16,4 +16,4 @@
 ![assets/manual/Step12.png](assets/manual/Step12.png)
 
 
-#### Yes, you have to follow all those steps to create a provisiong profile with its certificate
+#### Yes, you have to follow all those steps to create a provisioning profile with its certificate

@@ -4,7 +4,7 @@
 
 ###### Easily put your screenshots into the right device frames
 
-_frameit_ allows you to put a gorgeous device frame around your iOS and macOS screenshots just by running one simple command. Use _frameit_ to prepare perfect screenshots for the App Store, your website, QA or emails.
+_frameit_ allows you to put a gorgeous device frame around your iOS, macOS and Android screenshots just by running one simple command. Use _frameit_ to prepare perfect screenshots for the App Store, your website, QA or emails.
 
 -------
 
@@ -23,9 +23,10 @@ _frameit_ allows you to put a gorgeous device frame around your iOS and macOS sc
 
 ## Frame screenshot
 
-Put a gorgeous device frame around your iOS and macOS screenshots just by running one simple command. Support for:
+Put a gorgeous device frame around your iOS, macOS and Android screenshots just by running one simple command. Support for:
 
 - iPhone, iPad and Mac
+- Set of Android devices
 - Portrait and Landscape modes
 - Several device frame colors
 
@@ -59,7 +60,7 @@ Here is a nice gif, that shows _frameit_ in action:
 <h5 align="center">The <em>frameit</em> 2.0 update was kindly sponsored by <a href="https://mindnode.com/">MindNode</a>, seen in the screenshots above.</h5>
 
 
-The first time that _frameit_ is executed the frames will be downloaded automatically. Originally the frames are coming from [Facebook frameset](http://facebook.design/devices) and they are kept on [this repo](https://github.com/fastlane/frameit-frames).
+The first time that _frameit_ is executed the frames will be downloaded automatically. Originally the frames are coming from [Facebook frameset](https://design.facebook.com/toolsandresources/devices/) and they are kept on [this repo](https://github.com/fastlane/frameit-frames).
 
 More information about this process and how to update the frames can be found [here](https://github.com/fastlane/fastlane/tree/master/frameit/frames_generator)
 
@@ -69,10 +70,16 @@ More information about this process and how to update the frames can be found [h
 
 Why should you have to use Photoshop, just to add a frame around your screenshots?
 
-Just navigate to your folder of screenshots and use the following command:
+Just navigate to your folder of screenshots and use the following command (iOS and Mac OS are default platforms for backward compatibility):
 
 ```no-highlight
 fastlane frameit
+```
+
+To frame Android screenshots:
+
+```no-highlight
+fastlane frameit android
 ```
 
 To use the silver version of the frames:
@@ -126,11 +133,13 @@ The general parameters are defined in the `default` key and can be:
 | `stack_title` | Specifies whether _frameit_ should display the keyword above the title when both keyword and title are defined. If it is false, the title and keyword will be displayed side by side when both keyword and title are defined. | `false` |
 | `title_below_image` | Specifies whether _frameit_ should place the title and optional keyword below the device frame. If it is false, it will be placed above the device frame. | `false` |
 | `show_complete_frame` | Specifies whether _frameit_ should shrink the device frame so that it is completely shown in the framed screenshot. If it is false, clipping of the device frame might occur at the bottom (when `title_below_image` is `false`) or top (when `title_below_image` is `true`) of the framed screenshot. | `false` |
-| `padding` | The content of the framed screenshot will be resized to match the specified `padding` around all edges. The vertical padding is also applied between the text and the top or bottom (depending on `title_below_image`) of the device frame. <p> There are 3 different options of specyfying the padding: <p> 1. Default: An integer value that defines both horizontal and vertical padding in pixels. <br> 2. A string that defines (different) padding values in pixels for horizontal and vertical padding. The syntax is `"<horizontal>x<vertical>"`, e.g. `"30x60"`. <br> 3. A string that defines (different) padding values in percentage for horizontal and vertical padding. The syntax is `"<horizontal>%x<vertical>%"`, e.g. `"5%x10%"`. <br> **Note:** The percentage is calculated from the smallest image dimension (height or width). <p> A combination of option 2 and 3 is possible, e.g. `"5%x40"`. | `50` |
+| `padding` | The content of the framed screenshot will be resized to match the specified `padding` around all edges. The vertical padding is also applied between the text and the top or bottom (depending on `title_below_image`) of the device frame. <p> There are 3 different options of specifying the padding: <p> 1. Default: An integer value that defines both horizontal and vertical padding in pixels. <br> 2. A string that defines (different) padding values in pixels for horizontal and vertical padding. The syntax is `"<horizontal>x<vertical>"`, e.g. `"30x60"`. <br> 3. A string that defines (different) padding values in percentage for horizontal and vertical padding. The syntax is `"<horizontal>%x<vertical>%"`, e.g. `"5%x10%"`. <br> **Note:** The percentage is calculated from the smallest image dimension (height or width). <p> A combination of option 2 and 3 is possible, e.g. `"5%x40"`. | `50` |
 | `interline_spacing` | Specifies whether _frameit_ should add or subtract this many pixels between the individual lines of text. This only applies to a multi-line `title` and/or `keyword` to expand or squash together the individual lines of text. | `0` |
-| `font_scale_factor` | Specifies whether _frameit_ should increase or decrease the font size of the text. | `0.1` |
-| `frame` | Overrides the color of the frame to be used. (Valid values are `BLACK, `WHITE`, `GOLD` and `ROSE_GOLD`) | NA |
+| `font_scale_factor` | Specifies whether _frameit_ should increase or decrease the font size of the text. Is ignored for `keyword` or `title`, if `font_size` is specified. | `0.1` |
+| `frame` | Overrides the color of the frame to be used. (Valid values are `BLACK`, `WHITE`, `GOLD` and `ROSE_GOLD`) | NA |
 | `title_min_height` | Specifies a height always reserved for the title. Value can be a percentage of the height or an absolute value. The device will be placed below (or above) this area. Convenient to ensure the device top (or bottom) will be consistently placed at the same height on the different screenshots. | NA |
+| `use_platform` | Overrides the platform used for the screenshot. Valid values are `IOS`, `ANDROID` and `ANY`. | `IOS` |
+| `force_device_type` | Forces a specific device. Valid values are: Huawei P8, Motorola Moto E, Motorola Moto G, Nexus 4, Nexus 5X, Nexus 6P, Nexus 9, Samsung Galaxy Grand Prime, Samsung Galaxy Note 5, Samsung Galaxy S Duos, Samsung Galaxy S3, Samsung Galaxy S5, Samsung Galaxy S7, Samsung Galaxy S8, Samsung Galaxy S9, iPhone 5s, iPhone 5c, iPhone SE, iPhone 6s, iPhone 6s Plus, iPhone 7, iPhone 7 Plus, iPhone 8, iPhone 8 Plus, iPhone X, iPhone XS, iPhone XR, iPhone XS Max, iPad Air 2, iPad Mini 4, iPad Pro, MacBook, Google Pixel 3, Google Pixel 3 XL, HTC One A9, HTC One M8 | NA |
 
 ### Specific parameters
 
@@ -142,7 +151,9 @@ These are defined in the `data` key. This is an array with the following keys fo
 | `filter` | This is mandatory to link the individual configuration to the screenshot, based on part of the file name. <p>Example:<br>If a screenshot is named `iPhone 8-Brainstorming.png` you can use value `Brainstorming` for `filter`.  If there are more than one `filter` matching an entry, they will all be applied in order (which means that the last one has the highest precedence). All other keys from that array element will only be applied on this specific screenshot. |
 | `keyword` | Similar use as in `default`, except that parameter `text` can be used here because it is screenshot specific. |
 | `title` | Similar use as in `default`, except that parameter `text` can be used here because it is screenshot specific. |
-| `frame` | Overrides the color of the frame to be used. (Valid values are `BLACK, `WHITE`, `GOLD` and `ROSE_GOLD`) | NA |
+| `frame` | Overrides the color of the frame to be used. (Valid values are `BLACK`, `WHITE`, `GOLD` and `ROSE_GOLD`) | NA |
+| `use_platform` | Overrides the platform used for the screenshot. Valid values are `IOS`, `ANDROID` and `ANY`. | `IOS` |
+| `force_device_type` | Forces a specific device. Valid values are the same as for the general parameter. | NA |
 
 ### <a name="keyword-and-title-parameters"></a>Framefile `keyword` and `title` parameters
 
@@ -150,8 +161,10 @@ The `keyword` and `title` parameters are both used in `default` and `data`. They
 
 | Key | Description | Default value |
 |-----|-------------|---------------|
-| `color` | The font color for the text. Specify a hex/html color code. | `#000000` (black) |
+| `color` | The font color for the text. Specify a HEX/HTML color code. | `#000000` (black) |
 | `font` | The font family for the text. Specify the (relative) path to the font file (e.g. an OpenType Font). | The default `imagemagick` font, which is system dependent. |
+| `font_size` | The font size for the text specified in points. If not specified or `0`, font will be scaled automatically to fit the available space. _frameit_ still shrinks the text, if it would not fit. | NA |
+| `font_weight` | The [font weight for the text](https://imagemagick.org/script/command-line-options.php#weight). Specify an integer value (e.g. 900). | NA |
 | `text` | The text that should be used for the `keyword` or `title`. <p> Note: If you want to use localised text, use [`.strings` files](#strings-files). | NA |
 
 ### Example
@@ -165,6 +178,7 @@ The `keyword` and `title` parameters are both used in `default` and `data`. They
     },
     "title": {
       "font": "./fonts/MyFont-Th.otf",
+      "font_size": 128,
       "color": "#545454"
     },
     "background": "./background.jpg",
@@ -172,7 +186,8 @@ The `keyword` and `title` parameters are both used in `default` and `data`. They
     "show_complete_frame": false,
     "stack_title" : false,
     "title_below_image": true,
-    "frame": "WHITE"
+    "frame": "WHITE",
+    "use_platform": "IOS"
   },
 
   "data": [
@@ -200,6 +215,10 @@ The `keyword` and `title` parameters are both used in `default` and `data`. They
       "keyword": {
         "color": "#31bb48"
       }
+    },
+    {
+      "filter": "Android",
+      "use_platform": "ANDROID"
     }
   ]
 }
@@ -218,7 +237,7 @@ The `keyword.strings` and `title.strings` are standard `.strings` file you alrea
 **Notes**
 
 - These `.strings` files **MUST** be utf-8 (UTF-8) or utf-16 encoded (UTF-16 BE with BOM). They also must begin with an empty line. If you are having trouble see [issue #1740](https://github.com/fastlane/fastlane/issues/1740)
-- You **MUST** provide a background if you want titles. _frameit_ will not add the tiles if a background is not specified.
+- You **MUST** provide a background if you want titles. _frameit_ will not add the titles if a background is not specified.
 
 ### Screenshot orientation
 
@@ -313,7 +332,24 @@ Use [_deliver_](https://docs.fastlane.tools/actions/deliver/) to upload iOS scre
 
 ## Use a clean status bar
 
-You can use [SimulatorStatusMagic](https://github.com/shinydevelopment/SimulatorStatusMagic) to clean up the status bar.
+You can set `override_status_bar` to `true` in snapshot to set the status bar to Tuesday January 9th at 9:41AM with full battery and reception. If you need more granular customization, to set a Carrier name for example, also set `override_status_bar_arguments` to the specific arguments to be passed to the `xcrun simctl status_bar override` command. Run `xcrun simctl status_bar --help` to see the options available.
+
+### Examples
+
+```ruby
+# Sets the time to 9:41AM with full battery and reception, with the default carrier name: Carrier
+capture_ios_screenshots(
+	override_status_bar: true
+)
+```
+
+```ruby
+# Set the time to 9:41AM, battery at 75% and charging, on the TELUS LTE network
+capture_ios_screenshots(
+	override_status_bar: true,
+	override_status_bar_arguments: "--time 9:41 --dataNetwork lte --cellularMode active --cellularBars 4 --batteryState charging --batteryLevel 75 --operatorName TELUS"
+)
+```
 
 ## Gray artifacts around text
 
@@ -326,5 +362,5 @@ brew install imagemagick
 
 ## Uninstall
 
-- `sudo gem uninstall fastlane`
+- `gem uninstall fastlane`
 - `rm -rf ~/.frameit`

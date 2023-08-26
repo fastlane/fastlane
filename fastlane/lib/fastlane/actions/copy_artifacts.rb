@@ -16,7 +16,7 @@ module Fastlane
         # If any of the paths include "*", we assume that we are referring to the Unix entries
         # e.g /tmp/fastlane/* refers to all the files in /tmp/fastlane
         # We use Dir.glob to expand all those paths, this would create an array of arrays though, so flatten
-        artifacts = artifacts_to_search.map { |f| f.include?("*") ? Dir.glob(f) : f }.flatten
+        artifacts = artifacts_to_search.flat_map { |f| f.include?("*") ? Dir.glob(f) : f }
 
         UI.verbose("Copying artifacts #{artifacts.join(', ')} to #{target_path}")
         UI.verbose(params[:keep_original] ? "Keeping original files" : "Not keeping original files")
@@ -57,22 +57,21 @@ module Fastlane
         [
           FastlaneCore::ConfigItem.new(key: :keep_original,
                                        description: "Set this to false if you want move, rather than copy, the found artifacts",
-                                       is_string: false,
+                                       type: Boolean,
                                        optional: true,
                                        default_value: true),
           FastlaneCore::ConfigItem.new(key: :target_path,
                                        description: "The directory in which you want your artifacts placed",
-                                       is_string: false,
                                        optional: false,
                                        default_value: 'artifacts'),
           FastlaneCore::ConfigItem.new(key: :artifacts,
                                        description: "An array of file patterns of the files/folders you want to preserve",
-                                       is_string: false,
+                                       type: Array,
                                        optional: false,
                                        default_value: []),
           FastlaneCore::ConfigItem.new(key: :fail_on_missing,
                                        description: "Fail when a source file isn't found",
-                                       is_string: false,
+                                       type: Boolean,
                                        optional: true,
                                        default_value: false)
         ]

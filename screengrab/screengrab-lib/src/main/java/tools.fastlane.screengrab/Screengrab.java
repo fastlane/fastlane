@@ -22,15 +22,42 @@
 package tools.fastlane.screengrab;
 
 import android.content.Context;
-import android.support.test.InstrumentationRegistry;
+import androidx.test.platform.app.InstrumentationRegistry;
 
-import java.util.HashMap;
 import java.util.regex.Pattern;
+import java.util.Locale;
 
 public class Screengrab {
     private static final Pattern TAG_PATTERN = Pattern.compile("[a-zA-Z0-9_-]+");
 
-    private static ScreenshotStrategy defaultScreenshotStrategy = new DecorViewScreenshotStrategy();
+    private static ScreenshotStrategy defaultScreenshotStrategy = new UiAutomatorScreenshotStrategy();
+
+    private static String locale;
+
+    /**
+     * @return The current locale
+     */
+    public static String getLocale() {
+        if (locale == null) {
+            Locale implicitLocale = Locale.getDefault();
+            StringBuilder sb = new StringBuilder(implicitLocale.getLanguage());
+            String localeCountry = implicitLocale.getCountry();
+
+            if (localeCountry.length() != 0) {
+                sb.append("-").append(localeCountry);
+            }
+            return sb.toString();
+        } else {
+            return locale;
+        }
+    }
+
+    /**
+     * Set the current locale that will be returned from {@link #getLocale()}
+     */
+    public static void setLocale(String locale) {
+        Screengrab.locale = locale;
+    }
 
     /**
      * @return The default {@link ScreenshotStrategy} used in {@link #screenshot(String)} invocations
@@ -73,7 +100,7 @@ public class Screengrab {
                 .getTargetContext()
                 .getApplicationContext();
 
-        screenshot(screenshotName, strategy, new FileWritingScreenshotCallback(appContext));
+        screenshot(screenshotName, strategy, new FileWritingScreenshotCallback(appContext, getLocale()));
     }
 
     /**

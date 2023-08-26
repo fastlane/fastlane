@@ -89,6 +89,12 @@ module Spaceship
       # Certs are not associated with apps
       #####################################################
 
+      # An Apple development code signing certificate used for development environment
+      class AppleDevelopment < Certificate; end
+
+      # An Apple distribution code signing certificate used for distribution environment
+      class AppleDistribution < Certificate; end
+
       # A development code signing certificate used for development environment
       class Development < Certificate; end
 
@@ -152,12 +158,17 @@ module Spaceship
       # A Mac push notification certificate for production environment
       class MacProductionPush < PushCertificate; end
 
+      APPLE_CERTIFICATE_TYPE_IDS = {
+        "83Q87W3TGH" => AppleDevelopment,
+        "WXV89964HE" => AppleDistribution
+      }
+
       IOS_CERTIFICATE_TYPE_IDS = {
         "5QPB9NHCEI" => Development,
         "R58UK2EWSO" => Production,
         "9RQEK7MSXA" => InHouse,
         "LA30L5BJEU" => Certificate,
-        "BKLRAVXMGM" => DevelopmentPush,
+        "JKG5JZ54H7" => DevelopmentPush,
         "UPV3DW712I" => ProductionPush,
         "Y3B2F3TYSI" => Passbook,
         "3T2ZP62QW8" => WebsitePush,
@@ -167,12 +178,13 @@ module Spaceship
       }
 
       OLDER_IOS_CERTIFICATE_TYPES = [
-        # those are also sent by the browser, but not sure what they represent
+        "3BQKVH9I2X", # old ProductionPush
+        "BKLRAVXMGM", # old DevelopmentPush
+        # those are also sent by the browser, but not sure what they represent:
         "T44PTHVNID",
         "DZQUP8189Y",
         "FGQUP4785Z",
         "S5WE21TULA",
-        "3BQKVH9I2X", # ProductionPush,
         "FUOY7LWJET"
       ]
 
@@ -187,7 +199,9 @@ module Spaceship
         "DIVN2GW3XT" => DeveloperIdApplication
       }
 
-      CERTIFICATE_TYPE_IDS = IOS_CERTIFICATE_TYPE_IDS.merge(MAC_CERTIFICATE_TYPE_IDS)
+      CERTIFICATE_TYPE_IDS = APPLE_CERTIFICATE_TYPE_IDS
+                             .merge(IOS_CERTIFICATE_TYPE_IDS)
+                             .merge(MAC_CERTIFICATE_TYPE_IDS)
 
       # Class methods
       class << self
@@ -259,6 +273,7 @@ module Spaceship
         def all(mac: false)
           if self == Certificate # are we the base-class?
             type_ids = mac ? MAC_CERTIFICATE_TYPE_IDS : IOS_CERTIFICATE_TYPE_IDS
+            type_ids = APPLE_CERTIFICATE_TYPE_IDS.merge(type_ids)
             types = type_ids.keys
             types += OLDER_IOS_CERTIFICATE_TYPES unless mac
           else

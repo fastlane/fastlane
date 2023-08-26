@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuites tests="7" failures="2">
+    <testsuite name="TestUITests" tests="1" failures="0" skipped="0" time="16.05245804786682">
+        <properties>
+          <property name="Configuration" value="Test Scheme Action"/>
+        </properties>
+        <testcase classname="TestUITests" name="testExample()" time="16.05245804786682">
+        </testcase>
+    </testsuite>
+    <testsuite name="TestThisDude" tests="6" failures="2" skipped="0" time="0.5279300212860107">
+        <properties>
+          <property name="Configuration" value="Test Scheme Action"/>
+        </properties>
+        <testcase classname="TestTests" name="testExample()" time="0.0005381107330322266">
+        </testcase>
+        <testcase classname="TestTests" name="testFailureJosh1()" time="0.006072044372558594">
+            <failure message="XCTAssertTrue failed (/Users/josh/Projects/fastlane/test-ios/TestTests/TestTests.swift#CharacterRangeLen=0&amp;EndingLineNumber=36&amp;StartingLineNumber=36)">
+            </failure>
+        </testcase>
+        <testcase classname="TestTests" name="testPerformanceExample()" time="0.2661939859390259">
+        </testcase>
+        <testcase classname="TestThisDude" name="testExample()" time="0.0004099607467651367">
+        </testcase>
+        <testcase classname="TestThisDude" name="testFailureJosh2()" time="0.001544952392578125">
+            <failure message="XCTAssertTrue failed (/Users/josh/Projects/fastlane/test-ios/TestThisDude/TestThisDude.swift#CharacterRangeLen=0&amp;EndingLineNumber=35&amp;StartingLineNumber=35)">
+            </failure>
+        </testcase>
+        <testcase classname="TestThisDude" name="testPerformanceExample()" time="0.2531709671020508">
+        </testcase>
+    </testsuite>
+</testsuites>

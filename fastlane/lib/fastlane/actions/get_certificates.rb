@@ -12,6 +12,11 @@ module Fastlane
         return if Helper.test?
 
         begin
+          # Only set :api_key from SharedValues if :api_key_path isn't set (conflicting options)
+          unless params[:api_key_path]
+            params[:api_key] ||= Actions.lane_context[SharedValues::APP_STORE_CONNECT_API_KEY]
+          end
+
           Cert.config = params # we alread have the finished config
 
           Cert::Runner.new.launch

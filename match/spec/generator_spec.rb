@@ -46,20 +46,22 @@ describe Match::Generator do
         development: true,
         output_path: 'workspace/profiles/development',
         username: 'username',
-        force: true,
+        force: false,
         cert_id: 'fake_cert_id',
         provisioning_name: 'match Development app_identifier',
         ignore_profiles_with_different_name: true,
         team_id: 'team_id',
         platform: :ios,
-        template_name: 'template_name'
+        template_name: 'template_name',
+        fail_on_name_taken: false,
+        include_all_certificates: true,
       })
 
       # This is the important part. We need to see the right configuration come through
       # for sigh
       expect(Sigh).to receive(:config=).with(a_configuration_matching(config))
 
-      # This just mocks out the usual behavior of running cert, since that's not what
+      # This just mocks out the usual behavior of running sigh, since that's not what
       # we're testing
       allow(Sigh::Manager).to receive(:start).and_return("fake_path")
 
@@ -70,9 +72,10 @@ describe Match::Generator do
         username: 'username',
         team_id: 'team_id',
         platform: :ios,
-        template_name: 'template_name'
+        template_name: 'template_name',
+        include_all_certificates: true,
       }
-      Match::Generator.generate_provisioning_profile(params: params, prov_type: :development, certificate_id: 'fake_cert_id', app_identifier: params[:app_identifier], working_directory: "workspace")
+      Match::Generator.generate_provisioning_profile(params: params, prov_type: :development, certificate_id: 'fake_cert_id', app_identifier: params[:app_identifier], force: false, working_directory: "workspace")
     end
   end
 end

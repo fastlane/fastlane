@@ -9,7 +9,7 @@ describe Fastlane do
       let(:correctly_signed_xcarchive_with_spaces) { File.expand_path("./fastlane_core/spec/fixtures/archives/very capable app.xcarchive") }
       let(:correctly_signed_app) { File.expand_path("./fastlane_core/spec/fixtures/archives/very-capable-app.xcarchive/Products/Applications/very-capable-app.app") }
       let(:correctly_signed_app_with_spaces) { File.expand_path("./fastlane_core/spec/fixtures/archives/very capable app.xcarchive/Products/Applications/very capable app.app") }
-      let(:incorrectly_signed_ipa) { File.expand_path("./fastlane_core/spec/fixtures/ipas/ContainsWatchApp.ipa") }
+      let(:incorrectly_signed_ipa) { File.expand_path("./fastlane_core/spec/fixtures/ipas/IncorrectlySigned.ipa") }
       let(:ipa_with_no_app) { File.expand_path("./fastlane_core/spec/fixtures/ipas/no-app-bundle.ipa") }
       let(:simulator_app) { File.expand_path("./fastlane_core/spec/fixtures/bundles/simulator-app.app") }
       let(:not_an_app) { File.expand_path("./fastlane_core/spec/fixtures/bundles/not-an-app.txt") }

@@ -93,16 +93,112 @@ describe Spaceship::Client do
         subject.req_home
       end.to raise_error(Spaceship::ProgramLicenseAgreementUpdated)
     end
+
+    it "raises Spaceship::AccessForbiddenError" do
+      stub_client_request(Spaceship::AccessForbiddenError, 6, 403, "<html>Access Denied - In Read</html>")
+
+      expect do
+        subject.req_home
+      end.to raise_error(Spaceship::AccessForbiddenError)
+    end
+
+    it "raises Spaceship::ProgramLicenseAgreementUpdated" do
+      stub_client_request(Spaceship::ProgramLicenseAgreementUpdated, 6, 200, "Program License Agreement")
+
+      expect do
+        subject.req_home
+      end.to raise_error(Spaceship::ProgramLicenseAgreementUpdated)
+    end
+
+    it "raises Spaceship::TooManyRequestsError" do
+      stub_client_request(Spaceship::TooManyRequestsError.new({}), 6, 429, "Program License Agreement")
+
+      expect do
+        subject.req_home
+      end.to raise_error(Spaceship::Client::TooManyRequestsError)
+    end
   end
 
   describe 'retry' do
     [
-      Faraday::Error::TimeoutError,
-      Faraday::Error::ConnectionFailed,
+      Faraday::TimeoutError,
+      Faraday::ConnectionFailed,
       Faraday::ParsingError,
       Spaceship::BadGatewayError,
       Spaceship::InternalServerError,
-      Spaceship::GatewayTimeoutError
+      Spaceship::GatewayTimeoutError,
+      Spaceship::AccessForbiddenError
+    ].each do |thrown|
+      it "re-raises when retry limit reached throwing #{thrown}" do
+        stub_client_request(thrown, 6, 200, nil)
+
+        expect do
+          subject.req_home
+        end.to raise_error(thrown)
+      end
+
+      it "retries when #{thrown} error raised" do
+        stub_client_request(thrown, 2, 200, default_body)
+
+        expect(subject.req_home.body).to eq(default_body)
+      end
+    end
+
+    it "raises AppleTimeoutError when response contains '302 Found'" do
+      ClientStubbing.stub_connection_timeout_302
+
+      expect do
+        subject.req_home
+      end.to raise_error(Spaceship::Client::AppleTimeoutError)
+    end
+
+    it "raises BadGatewayError when response contains 'Bad Gateway'" do
+      body = <<BODY
+      <!DOCTYPE html>
+<html lang="en">
+<head>
+    <style>
+        body {
+            font-family: "Helvetica Neue", "HelveticaNeue", Helvetica, Arial, sans-serif;
+            font-size: 15px;
+            font-weight: 200;
+            line-height: 20px;
+            color: #4c4c4c;
+            text-align: center;
+        }
+
+        .section {
+            margin-top: 50px;
+        }
+    </style>
+</head>
+<body>
+<div class="section">
+    <h1>&#63743;</h1>
+
+    <h3>Bad Gateway</h3>
+    <p>Correlation Key: XXXXXXXXXXXXXXXXXXXX</p>
+</div>
+</body>
+</html>
+BODY
+      stub_client_retry_auth(502, 1, 200, body)
+
+      expect do
+        subject.req_home
+      end.to raise_error(Spaceship::Client::BadGatewayError)
+    end
+  end
+
+  describe 'retry' do
+    [
+      Faraday::TimeoutError,
+      Faraday::ConnectionFailed,
+      Faraday::ParsingError,
+      Spaceship::BadGatewayError,
+      Spaceship::InternalServerError,
+      Spaceship::GatewayTimeoutError,
+      Spaceship::AccessForbiddenError
     ].each do |thrown|
       it "re-raises when retry limit reached throwing #{thrown}" do
         stub_client_request(thrown, 6, 200, nil)
@@ -171,7 +267,7 @@ BODY
       expect(subject.req_home.body).to eq(default_body)
     end
 
-    it "fails to retry request if loggin fails in retry block when UnauthorizedAccess Error raised" do
+    it "fails to retry request if login fails in retry block when UnauthorizedAccess Error raised" do
       subject.login
       stub_client_retry_auth(401, 1, 200, default_body)
 
