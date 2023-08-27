@@ -58,8 +58,9 @@ module Match
           },
           "gitlab_secure_files" => lambda { |params|
             return Storage::GitLabSecureFiles.configure({
-              api_v4_url: params[:api_v4_url],
-              project_id: params[:gitlab_project],
+              gitlab_host: params[:gitlab_host],
+              gitlab_project: params[:gitlab_project],
+              git_url: params[:git_url], # enables warning about unnecessary git_url
               job_token: params[:job_token],
               private_token: params[:private_token],
               readonly: params[:readonly],
