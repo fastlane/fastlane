@@ -135,8 +135,7 @@ describe Match do
         git_bearer_authorization: nil,
         clone_branch_directly: false,
         type: config[:type],
-        platform: config[:platform],
-        readonly: false
+        platform: config[:platform]
       ).and_return(fake_storage)
 
       expect(fake_storage).to receive(:download).and_return(nil)
