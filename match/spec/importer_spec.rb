@@ -136,7 +136,7 @@ describe Match do
         clone_branch_directly: false,
         type: config[:type],
         platform: config[:platform],
-        readonly: false,
+        readonly: false
       ).and_return(fake_storage)
 
       expect(fake_storage).to receive(:download).and_return(nil)
