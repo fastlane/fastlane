@@ -208,7 +208,7 @@ module Spaceship
           if is_internal_group
             has_access_to_all_builds = true if has_access_to_all_builds.nil?
           else
-            # Access to all builds is only for internal groups
+            UI.important("has_access_to_all_builds is only for internal groups") unless has_access_to_all_builds.nil?
             has_access_to_all_builds = nil
           end
           body = {
