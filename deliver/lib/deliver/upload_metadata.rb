@@ -222,6 +222,11 @@ module Deliver
       app_info_worker.start
 
       # Update categories
+      # When there are iOS and macOS implementations of the same app,
+      # fetch_edit_app_info will fail when trying to fetch data for one platform
+      # if the other is in not editable state.
+      # We still keep fetch_edit_app_info as first option to make sure
+      # latest data is fetched when apps are in an editable state.
       app_info = fetch_edit_app_info(app) || fetch_live_app_info(app)
       if app_info
         category_id_map = {}
@@ -459,6 +464,11 @@ module Deliver
 
     # Finding languages to enable
     def verify_available_info_languages!(options, app, languages)
+      # When there are iOS and macOS implementations of the same app,
+      # fetch_edit_app_info will fail when trying to fetch data for one platform
+      # if the other is in not editable state.
+      # We still keep fetch_edit_app_info as first option to make sure
+      # latest data is fetched when apps are in an editable state.
       app_info = fetch_edit_app_info(app) || fetch_live_app_info(app)
 
       unless app_info
