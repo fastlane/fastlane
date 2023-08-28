@@ -205,7 +205,12 @@ module Spaceship
         end
 
         def create_beta_group(app_id: nil, group_name: nil, is_internal_group: false, public_link_enabled: false, public_link_limit: 10_000, public_link_limit_enabled: false, has_access_to_all_builds: nil)
-          has_access_to_all_builds = is_internal_group ? true : false if has_access_to_all_builds.nil?
+          if is_internal_group
+            has_access_to_all_builds = true if has_access_to_all_builds.nil?
+          else
+            # Access to all builds is only for internal groups
+            has_access_to_all_builds = nil
+          end
           body = {
             data: {
               attributes: {
