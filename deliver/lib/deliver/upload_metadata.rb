@@ -89,7 +89,7 @@ module Deliver
       enabled_languages = detect_languages(options)
 
       app_store_version_localizations = verify_available_version_languages!(options, app, enabled_languages) unless options[:edit_live]
-      app_info_localizations = verify_available_info_languages!(options, app, enabled_languages) unless options[:edit_live]
+      app_info_localizations = verify_available_info_languages!(options, app, enabled_languages) unless options[:edit_live] or !is_updating_app_info(options)
 
       if options[:edit_live]
         # not all values are editable when using live_version
@@ -222,12 +222,7 @@ module Deliver
       app_info_worker.start
 
       # Update categories
-      # When there are iOS and macOS implementations of the same app,
-      # fetch_edit_app_info will fail when trying to fetch data for one platform
-      # if the other is in not editable state.
-      # We still keep fetch_edit_app_info as first option to make sure
-      # latest data is fetched when apps are in an editable state.
-      app_info = fetch_edit_app_info(app) || fetch_live_app_info(app)
+      app_info = fetch_edit_app_info(app)
       if app_info
         category_id_map = {}
 
@@ -442,12 +437,6 @@ module Deliver
       end
     end
 
-    def fetch_live_app_info(app, wait_time: 10)
-      retry_if_nil("Cannot find live app info", wait_time: wait_time) do
-        app.fetch_live_app_info
-      end
-    end
-
     def retry_if_nil(message, tries: 5, wait_time: 10)
       loop do
         tries -= 1
@@ -462,14 +451,18 @@ module Deliver
       end
     end
 
+    # Checking if the metadata to update includes App Info
+    def is_updating_app_info(options)
+      LOCALISED_APP_VALUES.keys.each do |key|
+        return true unless options[key].nil?
+      end
+
+      return false 
+    end
+
     # Finding languages to enable
     def verify_available_info_languages!(options, app, languages)
-      # When there are iOS and macOS implementations of the same app,
-      # fetch_edit_app_info will fail when trying to fetch data for one platform
-      # if the other is in not editable state.
-      # We still keep fetch_edit_app_info as first option to make sure
-      # latest data is fetched when apps are in an editable state.
-      app_info = fetch_edit_app_info(app) || fetch_live_app_info(app)
+      app_info = fetch_edit_app_info(app)
 
       unless app_info
         UI.user_error!("Cannot update languages - could not find an editable info")
