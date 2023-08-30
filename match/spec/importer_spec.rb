@@ -58,6 +58,8 @@ describe Match do
         ]
       )
 
+      expect(fake_storage).to receive(:clear_changes)
+
       Match::Importer.new.import_cert(config, cert_path: cert_path, p12_path: p12_path, profile_path: ios_profile_path)
     end
 
@@ -75,6 +77,8 @@ describe Match do
         ]
       )
 
+      expect(fake_storage).to receive(:clear_changes)
+
       Match::Importer.new.import_cert(config, cert_path: cert_path, p12_path: p12_path, profile_path: osx_profile_path)
     end
 
@@ -91,6 +95,8 @@ describe Match do
           File.join(repo_dir, "certs", "distribution", "#{mock_cert.id}.p12")
         ]
       )
+
+      expect(fake_storage).to receive(:clear_changes)
 
       Match::Importer.new.import_cert(config, cert_path: cert_path, p12_path: p12_path)
     end
@@ -110,6 +116,8 @@ describe Match do
           File.join(repo_dir, "certs", "developer_id_application", "#{mock_cert.id}.p12")
         ]
       )
+
+      expect(fake_storage).to receive(:clear_changes)
 
       Match::Importer.new.import_cert(developer_id_config, cert_path: cert_path, p12_path: p12_path)
     end
@@ -138,6 +146,7 @@ describe Match do
         s3_secret_access_key: nil,
         s3_object_prefix: nil,
         gitlab_project: nil,
+        gitlab_host: 'https://gitlab.com',
         readonly: false,
         username: config[:username],
         team_id: nil,

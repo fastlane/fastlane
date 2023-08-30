@@ -56,6 +56,7 @@ module Match
         s3_bucket: params[:s3_bucket].to_s,
         s3_object_prefix: params[:s3_object_prefix].to_s,
         gitlab_project: params[:gitlab_project],
+        gitlab_host: params[:gitlab_host],
         team_id: params[:team_id] || Spaceship::ConnectAPI.client.portal_team_id
       })
       self.storage.download
@@ -103,6 +104,8 @@ module Match
       else
         UI.success("No relevant certificates or provisioning profiles found, nothing to nuke here :)")
       end
+    ensure
+      self.storage.clear_changes if self.storage
     end
 
     # Be smart about optional values here

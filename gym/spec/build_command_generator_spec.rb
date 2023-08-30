@@ -145,6 +145,20 @@ describe Gym do
       expect(result).to_not(include("-scmProvider system"))
     end
 
+    it "adds -showBuildTimingSummary flag when option is set", requires_xcodebuild: true do
+      options = { project: "./gym/examples/standard/Example.xcodeproj", build_timing_summary: true }
+      Gym.config = FastlaneCore::Configuration.create(Gym::Options.available_options, options)
+      result = Gym::BuildCommandGenerator.generate
+      expect(result).to include("-showBuildTimingSummary")
+    end
+
+    it "the -showBuildTimingSummary is not added by default", requires_xcodebuild: true do
+      options = { project: "./gym/examples/standard/Example.xcodeproj" }
+      Gym.config = FastlaneCore::Configuration.create(Gym::Options.available_options, options)
+      result = Gym::BuildCommandGenerator.generate
+      expect(result).to_not(include("-showBuildTimingSummary"))
+    end
+
     it "uses the correct build command when `skip_archive` is used", requires_xcodebuild: true do
       log_path = File.expand_path("#{FastlaneCore::Helper.buildlog_path}/gym/ExampleProductName-Example.log")
 

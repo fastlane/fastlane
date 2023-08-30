@@ -94,5 +94,8 @@ To run the newly created script, run
 SPACESHIP_DEBUG=1 bundle exec rake debug
 ```
 
+### Additional Information
+See also the [Debugging _spaceship_](spaceship/docs/Debugging.md) documentation.
+
 <!--Links-->
 [first-pr]: YourFirstPR.md

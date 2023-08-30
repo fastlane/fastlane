@@ -64,6 +64,7 @@ describe Match do
             s3_bucket: nil,
             s3_object_prefix: nil,
             gitlab_project: nil,
+            gitlab_host: 'https://gitlab.com',
             readonly: false,
             username: values[:username],
             team_id: nil,
@@ -154,6 +155,7 @@ describe Match do
             s3_bucket: nil,
             s3_object_prefix: nil,
             gitlab_project: nil,
+            gitlab_host: 'https://gitlab.com',
             readonly: false,
             username: values[:username],
             team_id: nil,
@@ -244,6 +246,7 @@ describe Match do
             s3_bucket: nil,
             s3_object_prefix: nil,
             gitlab_project: nil,
+            gitlab_host: 'https://gitlab.com',
             readonly: false,
             username: values[:username],
             team_id: nil,
@@ -316,6 +319,7 @@ describe Match do
             s3_bucket: nil,
             s3_object_prefix: nil,
             gitlab_project: nil,
+            gitlab_host: 'https://gitlab.com',
             readonly: false,
             username: values[:username],
             team_id: nil,
@@ -385,6 +389,19 @@ describe Match do
 
         runner = Match::Runner.new
         expect(runner.device_count_different?(profile: profile_file, platform: :ios)).to be(true)
+      end
+
+      it "device is apple silicon mac" do
+        expect(FastlaneCore::ProvisioningProfile).to receive(:parse).twice.and_return(parsed_profile)
+        expect(Spaceship::ConnectAPI::Profile).to receive(:all).twice.and_return([profile])
+        expect(Spaceship::ConnectAPI::Device).to receive(:all).twice.and_return([profile_device])
+
+        expect(profile_device).to receive(:device_class).twice.and_return(Spaceship::ConnectAPI::Device::DeviceClass::APPLE_SILICON_MAC)
+        expect(profile_device).to receive(:enabled?).and_return(true)
+
+        runner = Match::Runner.new
+        expect(runner.device_count_different?(profile: profile_file, platform: :ios, include_mac_in_profiles: false)).to be(true)
+        expect(runner.device_count_different?(profile: profile_file, platform: :ios, include_mac_in_profiles: true)).to be(false)
       end
     end
   end

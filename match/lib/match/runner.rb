@@ -55,6 +55,7 @@ module Match
         s3_bucket: params[:s3_bucket],
         s3_object_prefix: params[:s3_object_prefix],
         gitlab_project: params[:gitlab_project],
+        gitlab_host: params[:gitlab_host],
         readonly: params[:readonly],
         username: params[:readonly] ? nil : params[:username], # only pass username if not readonly
         team_id: params[:team_id],
@@ -336,7 +337,7 @@ module Match
 
       prov_types_without_devices = [:appstore, :developer_id]
       if !prov_types_without_devices.include?(prov_type) && !params[:force]
-        force = device_count_different?(profile: profile, keychain_path: keychain_path, platform: params[:platform].to_sym)
+        force = device_count_different?(profile: profile, keychain_path: keychain_path, platform: params[:platform].to_sym, include_mac_in_profiles: params[:include_mac_in_profiles])
       else
         # App Store provisioning profiles don't contain device identifiers and
         # thus shouldn't be renewed if the device count has changed.
@@ -347,7 +348,7 @@ module Match
       return force
     end
 
-    def device_count_different?(profile: nil, keychain_path: nil, platform: nil)
+    def device_count_different?(profile: nil, keychain_path: nil, platform: nil, include_mac_in_profiles: false)
       return false unless profile
 
       parsed = FastlaneCore::ProvisioningProfile.parse(profile, keychain_path)
@@ -379,6 +380,9 @@ module Match
           else
             []
           end
+        if platform == :ios && include_mac_in_profiles
+          device_classes += [Spaceship::ConnectAPI::Device::DeviceClass::APPLE_SILICON_MAC]
+        end
 
         devices = Spaceship::ConnectAPI::Device.all
         unless device_classes.empty?
