@@ -89,7 +89,7 @@ module Deliver
       enabled_languages = detect_languages(options)
 
       app_store_version_localizations = verify_available_version_languages!(options, app, enabled_languages) unless options[:edit_live]
-      app_info_localizations = verify_available_info_languages!(options, app, enabled_languages) unless options[:edit_live] or !is_updating_app_info(options)
+      app_info_localizations = verify_available_info_languages!(options, app, enabled_languages) unless options[:edit_live] || !is_updating_app_info(options)
 
       if options[:edit_live]
         # not all values are editable when using live_version
@@ -457,7 +457,7 @@ module Deliver
         return true unless options[key].nil?
       end
 
-      return false 
+      return false
     end
 
     # Finding languages to enable
