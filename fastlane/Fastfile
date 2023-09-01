@@ -584,6 +584,7 @@ end
 
 desc "Ensure the correct formatting for the fastlane tools"
 private_lane :ensure_tool_name_formatting do
+  test_tool_name_formatting_ensurance_lane
   UI.message("🕗  Verifying tool name formatting...")
   require 'fastlane/tools'
   errors = []
@@ -596,6 +597,18 @@ private_lane :ensure_tool_name_formatting do
   errors.each { |a| UI.error(a) }
   UI.user_error!("Invalid formatting of one of the fastlane tools") unless errors.empty?
   UI.success("✅  fastlane tools formatting is correct")
+end
+
+private_lane :test_tool_name_formatting_ensurance_lane do
+  content = File.read("spec/fixtures/fastfiles/tool_name_formatting.txt")
+  errors = find_tool_name_formatting_errors(content: content, path: "CONTRIBUTING.md")
+  errors.select! { |e| !e.end_with?("❌") }
+  errors.each do |e|
+    # Lines that end with "❌" are expected to be errors
+    UI.error(e)
+  end
+  UI.user_error!("Tool name formatting tool failed its unit tests") unless errors.empty?
+  UI.success("✅  Tool name formatting tool passed its unit tests")
 end
 
 def find_tool_name_formatting_errors(content:, path:)
