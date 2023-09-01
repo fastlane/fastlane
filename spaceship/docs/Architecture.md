@@ -1,4 +1,4 @@
-# Spaceship Architecture
+# _spaceship_ Architecture
 
 _spaceship_ uses [Faraday](https://github.com/lostisland/faraday) to interact with multiple Apple API endpoints:
 
