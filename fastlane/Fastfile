@@ -603,8 +603,13 @@ private_lane :ensure_tool_name_formatting do
           errors << "Use _#{tool}_ instead of **#{tool}** to mention a tool in the docs in '#{path}:#{line_number}'" if line.include?("**#{tool}**")
           errors << "Use <em>#{tool}<em> instead of <code>#{tool}</code> to mention a tool in the docs in '#{path}:#{line_number}'" if line.include?("<code>#{tool}</code>")
           errors << "Use <em>#{tool}<em> or _#{tool}_ instead of <ins>#{tool}</ins> to mention a tool in the docs in '#{path}:#{line_number}'" if line.include?("<ins>#{tool}</ins>")
-          if line.include?("_#{tool.to_s.capitalize}_") || line.include?("`#{tool.to_s.capitalize}`") || line.include?(" #{tool.to_s.capitalize} ")
-            errors << "fastlane tools have to be formatted in lowercase: #{tool} in '#{path}:#{line_number}'"
+
+          # Check if the tool is mentioned in the line, but not in lowercase
+          line.scan(/([_ `"])(#{Regexp.escape(tool.to_s)})\1/i) do |match|
+            matched_tool = match[1]
+            tool_is_written_wrong_case = matched_tool != matched_tool.downcase
+            looks_like_an_env_var = line.match?(/[A-Z_]+_#{matched_tool}_[A-Z_]+/)
+            errors << "fastlane tools have to be formatted in lowercase: #{tool} in '#{path}:#{line_number}'" if tool_is_written_wrong_case && !looks_like_an_env_var
           end
         end
       end
