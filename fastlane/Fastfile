@@ -591,12 +591,21 @@ private_lane :ensure_tool_name_formatting do
     Dir["**/*.md"].each do |path|
       content = File.read(path)
       Fastlane::TOOLS.each do |tool|
-        errors << "Use _#{tool}_ instead of `#{tool}` to mention a tool in the docs in '#{path}'" if content.include?("`#{tool}`")
-        errors << "Use _#{tool}_ instead of `_#{tool}_` to mention a tool in the docs in '#{path}'" if content.include?("`_#{tool}_`")
-        errors << "Use [_#{tool}_] instead of [#{tool}] to mention a tool in the docs in '#{path}'" if content.include?("[#{tool}]")
-        errors << "Use <em>#{tool}<em> instead of <code>#{tool}</code> to mention a tool in the docs in '#{path}'" if content.include?("<code>#{tool}</code>")
-        if content.include?("_#{tool.to_s.capitalize}_") || content.include?("`#{tool.to_s.capitalize}`")
-          errors << "fastlane tools have to be formatted in lower case: #{tool} in '#{path}'"
+        lines = content.split("\n")
+        lines.each_with_index do |line, index|
+          line_number = index + 1
+          # Ignore checks if line starts with "^\s*- ❌" (i.e. if it's a line that's already been marked as incorrect)
+          # and if the file is CONTRIBUTING.md (i.e. if it's the branding guidelines section)
+          next if line =~ /^\s*- ❌/ && path == "CONTRIBUTING.md"
+          errors << "Use _#{tool}_ instead of `#{tool}` to mention a tool in the docs in '#{path}:#{line_number}'" if line.include?("`#{tool}`")
+          errors << "Use _#{tool}_ instead of `_#{tool}_` to mention a tool in the docs in '#{path}:#{line_number}'" if line.include?("`_#{tool}_`")
+          errors << "Use [_#{tool}_] instead of [#{tool}] to mention a tool in the docs in '#{path}:#{line_number}'" if line.include?("[#{tool}]")
+          errors << "Use _#{tool}_ instead of **#{tool}** to mention a tool in the docs in '#{path}:#{line_number}'" if line.include?("**#{tool}**")
+          errors << "Use <em>#{tool}<em> instead of <code>#{tool}</code> to mention a tool in the docs in '#{path}:#{line_number}'" if line.include?("<code>#{tool}</code>")
+          errors << "Use <em>#{tool}<em> or _#{tool}_ instead of <ins>#{tool}</ins> to mention a tool in the docs in '#{path}:#{line_number}'" if line.include?("<ins>#{tool}</ins>")
+          if line.include?("_#{tool.to_s.capitalize}_") || line.include?("`#{tool.to_s.capitalize}`") || line.include?(" #{tool.to_s.capitalize} ")
+            errors << "fastlane tools have to be formatted in lowercase: #{tool} in '#{path}:#{line_number}'"
+          end
         end
       end
     end

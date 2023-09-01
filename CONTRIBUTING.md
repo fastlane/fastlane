@@ -72,6 +72,7 @@ Although we don't have a formal style guide, we do have a few guidelines for how
 
 - _fastlane_ and all of the its actions should be written in all lowercase, even at the beginning of a sentence:
     - ❌ "Use Fastlane to automate your screenshots."
+    - ❌ "Use _Fastlane_ to automate your screenshots."
     - ❌ "Fastlane helps you deliver faster."
     - ❌ "Match makes code signing management easy."
     - ✅ "Use _fastlane_ to automate your screenshots."
