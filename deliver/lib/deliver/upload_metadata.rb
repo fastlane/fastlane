@@ -89,7 +89,7 @@ module Deliver
       enabled_languages = detect_languages(options)
 
       app_store_version_localizations = verify_available_version_languages!(options, app, enabled_languages) unless options[:edit_live]
-      app_info_localizations = verify_available_info_languages!(options, app, enabled_languages) unless options[:edit_live] || !is_updating_app_info(options)
+      app_info_localizations = verify_available_info_languages!(options, app, enabled_languages) unless options[:edit_live] || !updating_localised_app_info?(options, app)
 
       if options[:edit_live]
         # not all values are editable when using live_version
@@ -211,15 +211,17 @@ module Deliver
       store_version_worker.start
 
       # Update app info localizations
-      app_info_worker = FastlaneCore::QueueWorker.new do |app_info_localization|
-        attributes = localized_info_attributes_by_locale[app_info_localization.locale]
-        if attributes
-          UI.message("Uploading metadata to App Store Connect for localized info '#{app_info_localization.locale}'")
-          app_info_localization.update(attributes: attributes)
+      unless app_info_localizations.nil?
+        app_info_worker = FastlaneCore::QueueWorker.new do |app_info_localization|
+          attributes = localized_info_attributes_by_locale[app_info_localization.locale]
+          if attributes
+            UI.message("Uploading metadata to App Store Connect for localized info '#{app_info_localization.locale}'")
+            app_info_localization.update(attributes: attributes)
+          end
         end
+        app_info_worker.batch_enqueue(app_info_localizations)
+        app_info_worker.start
       end
-      app_info_worker.batch_enqueue(app_info_localizations)
-      app_info_worker.start
 
       # Update categories
       app_info = fetch_edit_app_info(app)
@@ -437,6 +439,12 @@ module Deliver
       end
     end
 
+    def fetch_live_app_info(app, wait_time: 10)
+      retry_if_nil("Cannot find live app info", wait_time: wait_time) do
+        app.fetch_live_app_info
+      end
+    end
+
     def retry_if_nil(message, tries: 5, wait_time: 10)
       loop do
         tries -= 1
@@ -451,12 +459,39 @@ module Deliver
       end
     end
 
-    # Checking if the metadata to update includes App Info
-    def is_updating_app_info(options)
+    # Checking if the metadata to update includes localised App Info
+    def updating_localised_app_info?(options, app)
+      app_info = fetch_edit_app_info(app) || fetch_live_app_info(app)
+      unless app_info
+        UI.important('Can\'t find edit or live App info. Skipping upload.')
+        return false
+      end
+      localizations = app_info.get_app_info_localizations
+
       LOCALISED_APP_VALUES.keys.each do |key|
-        return true unless options[key].nil?
+        current = options[key]
+        next unless current
+
+        unless current.kind_of?(Hash)
+          UI.error("Error with provided '#{key}'. Must be a hash, the key being the language.")
+          next
+        end
+
+        current.each do |language, value|
+          next unless value.to_s.length > 0
+          strip_value = value.to_s.strip
+          next if strip_value.empty?
+
+          app_info_locale = localizations.find { |l| l.locale == language }
+          next if app_info_locale.nil?
+
+          current_value = app_info_locale.public_send(key.to_sym)
+
+          return true if current_value != strip_value
+        end
       end
 
+      UI.important('No changes to localised App Info detected. Skipping upload.')
       return false
     end
 
