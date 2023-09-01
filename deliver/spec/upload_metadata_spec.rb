@@ -257,10 +257,17 @@ describe Deliver::UploadMetadata do
               description: { "en-US" => "App description" }
           }
 
-          # Get number of verions (used for if whats_new should be sent)
+          # Get number of versions (used for if whats_new should be sent)
           expect(Spaceship::ConnectAPI).to receive(:get_app_store_versions).and_return(app_store_versions)
 
           expect(version).to receive(:update).with(attributes: {})
+
+          # Get app info
+          expect(app).to receive(:fetch_edit_app_info).and_return(app_info)
+          expect(app_info).to receive(:get_app_info_localizations).and_return([app_info_localization_en])
+          
+          # Get app info localization English (Used to compare with data to upload)
+          expect(app_info_localization_en).to receive(:name).and_return("")
 
           # Update version localization
           expect(version_localization_en).to receive(:update).with(attributes: {
