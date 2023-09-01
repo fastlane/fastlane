@@ -68,9 +68,9 @@ Help us keep _fastlane_ open and inclusive. Please read and follow our [Code of 
 
 ## Branding
 
-Although we don't have a formal style guide, we do have a few guidelines for how to refer to _fastlane_ and its tools:
+We have a few guidelines for how to refer to _fastlane_ and its tools:
 
-- _fastlane_ and all of the its actions should be written in all lowercase, even at the beginning of a sentence:
+- _fastlane_ and its actions should be written in all lowercase, even at the beginning of a sentence:
     - ❌ "Use Fastlane to automate your screenshots."
     - ❌ "Use _Fastlane_ to automate your screenshots."
     - ❌ "Fastlane helps you deliver faster."
