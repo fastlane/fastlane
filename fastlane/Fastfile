@@ -584,7 +584,7 @@ end
 
 desc "Ensure the correct formatting for the fastlane tools"
 private_lane :ensure_tool_name_formatting do
-  test_tool_name_formatting_ensurance_lane
+  require_relative "../fastlane/helper/tool_name_formatting_helper.rb"
   UI.message("🕗  Verifying tool name formatting...")
   require 'fastlane/tools'
   errors = []
