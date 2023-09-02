@@ -23,3 +23,5 @@ A sentence that has a tool name in the middle of an env var: `SOMETHING_FASTLANE
 A sentence that contains a _FastLane_ keyword, but also an env var: `FASTLANE_SKIP_CHANGELOG`. ❌
 A sentence that contains `<PATH_TO_YOUR_LOCAL_FASTLANE_CLONE>` placeholder env var. ✅
 A sentence that contains `File.expand_path("<PATH_TO_YOUR_LOCAL_FASTLANE_CLONE>")` placeholder string. ✅
+A sentence that has a weird-looking env var with no prefix other than the delimiter: `_FASTLANE_SOMETHING` ✅
+A sentence that has a weird-looking env var with no suffix other than the delimiter: `SOMETHING_FASTLANE_` ✅
