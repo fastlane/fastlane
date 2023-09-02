@@ -1,4 +1,4 @@
-Some lines in this file should start with a special formatting (the same used in CONTRIBUTING.md), thus they should be ignored by the tool. For every line, however, the emoji that the line ends will tell whether the respective line should pass the check or not.
+Some lines in this file should start with a special formatting (the same used in CONTRIBUTING.md), so they are ignored by the name formatting checks. For every line, however, the emoji that the line ends will tell whether the respective line should pass the check or not (just for a visual reference of the reader).
 
 - ❌ "Use Fastlane to automate your screenshots." ✅
 - ❌ "Use _Fastlane_ to automate your screenshots." ✅
