@@ -478,7 +478,6 @@ module Deliver
         end
 
         current.each do |language, value|
-          next unless value.to_s.length > 0
           strip_value = value.to_s.strip
           next if strip_value.empty?
 
