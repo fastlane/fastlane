@@ -211,7 +211,7 @@ module Deliver
       store_version_worker.start
 
       # Update app info localizations
-      unless app_info_localizations.nil?
+      if app_info_localizations
         app_info_worker = FastlaneCore::QueueWorker.new do |app_info_localization|
           attributes = localized_info_attributes_by_locale[app_info_localization.locale]
           if attributes
