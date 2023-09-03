@@ -87,7 +87,7 @@ Ensure that the following permissions exist in your **src/debug/AndroidManifest.
 
 2. To capture screenshots, add the following to your tests `Screengrab.screenshot("name_of_screenshot_here");` on the appropriate screens
 
-# Generating Screenshots with Screengrab
+# Generating Screenshots with _screengrab_
 - Then, before running `fastlane screengrab` you'll need a debug and test apk
   - You can create your APKs manually with `./gradlew assembleDebug assembleAndroidTest`
   - You can also create a lane and use `build_android_app`:
@@ -228,7 +228,7 @@ When using JUnit 3 you'll need to add a bit more code:
 
 ## Clean Status Bar
 
-Screengrab can clean your status bar to make your screenshots even more beautiful.
+_screengrab_ can clean your status bar to make your screenshots even more beautiful.
 It is simply a wrapper that allows configuring SystemUI DemoMode in your code.
 Note: the clean status bar feature is only supported on devices with *API level >= 23*.
 

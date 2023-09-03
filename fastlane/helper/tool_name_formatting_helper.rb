@@ -29,9 +29,11 @@ module Fastlane
             errors << "Use <em>#{tool}<em> or _#{tool}_ instead of <ins>#{tool}</ins> to mention a tool in the docs in '#{path}:#{line_number}': #{line}" if line.include?("<ins>#{tool}</ins>")
 
             " #{line} ".scan(/([A-Z_]*)([_ `"])(#{Regexp.escape(tool.to_s)})\2([A-Z_]*)/i) do |prefix, delimiter, tool_name, suffix|
-              wrong_case = tool_name != tool.to_s.downcase
+              is_lowercase = tool_name == tool.to_s.downcase
               looks_like_an_env_var = (tool_name == tool_name.upcase) && delimiter == '_' && (!prefix.empty? || !suffix.empty?)
-              errors << "fastlane tools have to be formatted in lowercase: #{tool} in '#{path}:#{line_number}': #{line}" if !looks_like_an_env_var && wrong_case
+              looks_like_ruby_module = line == "module #{tool_name}"
+              is_valid_case = is_lowercase || looks_like_an_env_var || looks_like_ruby_module
+              errors << "fastlane tools have to be formatted in lowercase: #{tool} in '#{path}:#{line_number}': #{line}" unless is_valid_case
             end
           end
         end
