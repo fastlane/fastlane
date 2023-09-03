@@ -244,7 +244,6 @@ describe Deliver::UploadMetadata do
         expect(version).to receive(:get_app_store_version_localizations).and_return([version_localization_en])
 
         # Get app infos
-        expect(app).to receive(:fetch_edit_app_info).and_return(app_info)
         expect(app_info).to receive(:get_app_info_localizations).and_return([app_info_localization_en])
       end
 
@@ -263,7 +262,6 @@ describe Deliver::UploadMetadata do
           expect(version).to receive(:update).with(attributes: {})
 
           # Get app info
-          expect(app).to receive(:fetch_edit_app_info).and_return(app_info)
           expect(app_info).to receive(:get_app_info_localizations).and_return([app_info_localization_en])
 
           # Get app info localization English (Used to compare with data to upload)

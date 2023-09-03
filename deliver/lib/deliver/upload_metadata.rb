@@ -89,7 +89,8 @@ module Deliver
       enabled_languages = detect_languages(options)
 
       app_store_version_localizations = verify_available_version_languages!(options, app, enabled_languages) unless options[:edit_live]
-      app_info_localizations = verify_available_info_languages!(options, app, enabled_languages) unless options[:edit_live] || !updating_localised_app_info?(options, app)
+      app_info = fetch_edit_app_info(app)
+      app_info_localizations = verify_available_info_languages!(options, app, app_info, enabled_languages) unless options[:edit_live] || !updating_localised_app_info?(options, app, app_info)
 
       if options[:edit_live]
         # not all values are editable when using live_version
@@ -224,7 +225,6 @@ module Deliver
       end
 
       # Update categories
-      app_info = fetch_edit_app_info(app)
       if app_info
         category_id_map = {}
 
@@ -460,8 +460,8 @@ module Deliver
     end
 
     # Checking if the metadata to update includes localised App Info
-    def updating_localised_app_info?(options, app)
-      app_info = fetch_edit_app_info(app) || fetch_live_app_info(app)
+    def updating_localised_app_info?(options, app, app_info)
+      app_info = fetch_live_app_info(app) unless app_info
       unless app_info
         UI.important("Can't find edit or live App info. Skipping upload.")
         return false
@@ -495,9 +495,7 @@ module Deliver
     end
 
     # Finding languages to enable
-    def verify_available_info_languages!(options, app, languages)
-      app_info = fetch_edit_app_info(app)
-
+    def verify_available_info_languages!(options, app, app_info, languages)
       unless app_info
         UI.user_error!("Cannot update languages - could not find an editable info")
         return
