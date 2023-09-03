@@ -14,8 +14,8 @@ _match_ makes code signing management easy.
 - ❌ "`match` makes code signing management easy."
 _fastlane_ is an all-in-one tool for app automation.
 _match_ makes code signing management easy.
-FastLane makes code signing management easy. Unfortunately we can't catch this brand misalignment because there's no delimiter around the keyword.
-Fastlane makes code signing management easy. Unfortunately we can't catch this brand misalignment because there's no delimiter around the keyword.
+FastLane makes code signing management easy.
+Fastlane makes code signing management easy.
 _FastLane_ makes code signing management easy.
 A sentence that has a tool name in the beginning of an env var: `MATCH_FILE`
 A sentence that has a tool name in the end of an env var: `UPDATE_FASTLANE`
