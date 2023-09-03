@@ -590,8 +590,7 @@ private_lane :ensure_tool_name_formatting do
   errors = []
   Dir.chdir("..") do
     Dir["**/*.md"].each do |path|
-      content = File.read(path)
-      helper = Helper::ToolNameFormattingHelper.new(content: content, path: path)
+      helper = Helper::ToolNameFormattingHelper.new(path: path, is_documenting_invalid_examples: path == 'CONTRIBUTING.md')
       errors += helper.find_tool_name_formatting_errors
     end
   end

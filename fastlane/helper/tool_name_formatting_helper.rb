@@ -1,22 +1,26 @@
 module Fastlane
   module Helper
     class ToolNameFormattingHelper
-      attr_accessor :content, :path
+      attr_accessor :path, :is_documenting_invalid_examples
 
-      def initialize(content:, path:)
-        @content = content
+      # @param [String] path Path to the file to be checked for tool formatting
+      # @param [Bool] is_documenting_invalid_examples
+      #        Ignore checks if line starts with "^\s*- ❌" (i.e. if it's a line that's already been marked as incorrect)
+      #        Typically used for files like `CONTRIBUTING.md`` (i.e. if it's the branding guidelines section)
+      #
+      def initialize(path:, is_documenting_invalid_examples: false)
         @path = path
+        @is_documenting_invalid_examples = is_documenting_invalid_examples
       end
 
       def find_tool_name_formatting_errors
         errors = []
-        Fastlane::TOOLS.each do |tool|
-          lines = content.split("\n")
-          lines.each_with_index do |line, index|
-            line_number = index + 1
-            # Ignore checks if line starts with "^\s*- ❌" (i.e. if it's a line that's already been marked as incorrect)
-            # and if the file is CONTRIBUTING.md (i.e. if it's the branding guidelines section)
-            next if line =~ /^\s*- ❌/ && path == "CONTRIBUTING.md"
+        File.readlines(path, mode: 'rb:BOM|UTF-8').each_with_index do |line, index|
+          line_number = index + 1
+          line.chomp! # Remove \n at end of line, to avoid including it in the error messages
+          Fastlane::TOOLS.each do |tool|
+            next if is_documenting_invalid_examples && line =~ /^\s*- ❌/
+
             errors << "Use _#{tool}_ instead of `#{tool}` to mention a tool in the docs in '#{path}:#{line_number}': #{line}" if line.include?("`#{tool}`")
             errors << "Use _#{tool}_ instead of `_#{tool}_` to mention a tool in the docs in '#{path}:#{line_number}': #{line}" if line.include?("`_#{tool}_`")
             errors << "Use [_#{tool}_] instead of [#{tool}] to mention a tool in the docs in '#{path}:#{line_number}': #{line}" if line.include?("[#{tool}]")
