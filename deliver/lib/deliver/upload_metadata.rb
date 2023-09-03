@@ -463,7 +463,7 @@ module Deliver
     def updating_localised_app_info?(options, app)
       app_info = fetch_edit_app_info(app) || fetch_live_app_info(app)
       unless app_info
-        UI.important('Can\'t find edit or live App info. Skipping upload.')
+        UI.important("Can't find edit or live App info. Skipping upload.")
         return false
       end
       localizations = app_info.get_app_info_localizations
