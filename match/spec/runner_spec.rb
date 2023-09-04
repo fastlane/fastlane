@@ -52,7 +52,7 @@ describe Match do
             git_bearer_authorization: nil,
             git_private_key: nil,
             type: config[:type],
-            platform: config[:platform],
+            platform: config[:platform]
           ).and_return(fake_storage)
 
           expect(fake_storage).to receive(:download).and_return(nil)
