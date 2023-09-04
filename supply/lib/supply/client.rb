@@ -532,6 +532,11 @@ module Supply
     # @!group Screenshots
     #####################################################
 
+    # @param [String] image_type Typically one of the elements of either Supply::IMAGES_TYPES or Supply::SCREENSHOT_TYPES
+    # @param [String] language Localization code (a BCP-47 language tag; for example, "de-AT" for  Austrian German).
+    #
+    # @return [Array<ImageListing>] A list of PlayStoreImage instances describing each image
+    #
     def fetch_images(image_type: nil, language: nil)
       ensure_active_edit!
 
@@ -544,29 +549,14 @@ module Supply
         )
       end
 
-      urls = (result.images || []).map(&:url)
-      images = urls.map do |url|
-        uri = URI.parse(url)
-        clean_url = [
-          uri.scheme,
-          uri.userinfo,
-          uri.host,
-          uri.port,
-          uri.path
-        ].join
-
-        UI.verbose("Initial URL received: '#{url}'")
-        UI.verbose("Removed params ('#{uri.query}') from the URL")
-        UI.verbose("URL after removing params: '#{clean_url}'")
-
-        full_url = "#{url}=s0" # '=s0' param ensures full image size is returned (https://github.com/fastlane/fastlane/pull/14322#issuecomment-473012462)
-        full_url
+      (result.images || []).map do |row|
+        full_url = "#{row.url}=s0" # '=s0' param ensures full image size is returned (https://github.com/fastlane/fastlane/pull/14322#issuecomment-473012462)
+        ImageListing.new(row.id, row.sha1, row.sha256, full_url)
       end
-
-      return images
     end
 
-    # @param image_type (e.g. phoneScreenshots, sevenInchScreenshots, ...)
+    # @param [String] image_type (e.g. phoneScreenshots, sevenInchScreenshots, ...)
+    # @param [String] language localization code (i.e. BCP-47 language tag as in `pt-BR`)
     def upload_image(image_path: nil, image_type: nil, language: nil)
       ensure_active_edit!
 
@@ -591,6 +581,20 @@ module Supply
           current_edit.id,
           language,
           image_type
+        )
+      end
+    end
+
+    def clear_screenshot(image_type: nil, language: nil, image_id: nil)
+      ensure_active_edit!
+
+      call_google_api do
+        client.delete_edit_image(
+          current_package_name,
+          current_edit.id,
+          language,
+          image_type,
+          image_id
         )
       end
     end
