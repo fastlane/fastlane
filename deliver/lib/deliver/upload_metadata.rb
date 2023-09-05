@@ -461,7 +461,7 @@ module Deliver
 
     # Checking if the metadata to update includes localised App Info
     def updating_localised_app_info?(options, app, app_info)
-      app_info = fetch_live_app_info(app) unless app_info
+      app_info ||= fetch_live_app_info(app)
       unless app_info
         UI.important("Can't find edit or live App info. Skipping upload.")
         return false
