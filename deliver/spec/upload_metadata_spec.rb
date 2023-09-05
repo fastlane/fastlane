@@ -432,7 +432,7 @@ describe Deliver::UploadMetadata do
               metadata_path: metadata_path,
           }
 
-          # Get live ap info
+          # Get live app info
           expect(app).to receive(:fetch_live_app_info).and_return(live_app_info)
 
           # Get number of versions (used for if whats_new should be sent)
@@ -440,7 +440,7 @@ describe Deliver::UploadMetadata do
 
           expect(version).to receive(:update).with(attributes: {})
 
-          # Get app info localization English (Used to compare with data to upload)
+          # Get app info localization in English (used to compare with data to upload)
           uploader.upload(options)
         end
 
@@ -451,7 +451,7 @@ describe Deliver::UploadMetadata do
               name: { "en-US" => "App name" }
           }
 
-          # Get live ap info
+          # Get live app info
           expect(app).to receive(:fetch_live_app_info).and_return(live_app_info)
 
           # Get number of versions (used for if whats_new should be sent)
@@ -459,10 +459,10 @@ describe Deliver::UploadMetadata do
 
           expect(version).to receive(:update).with(attributes: {})
 
-          # Get app info localization English (Used to compare with data to upload)
+          # Get app info localization in English (used to compare with data to upload)
           expect(app_info_localization_en).to receive(:name).and_return("App name")
 
-          # Get app info localization English (Used to compare with data to upload)
+          # Get app info localization in English (used to compare with data to upload)
           uploader.upload(options)
         end
       end
@@ -493,13 +493,13 @@ describe Deliver::UploadMetadata do
         expect(app).to receive(:get_edit_app_store_version).and_return(version)
         expect(version).to receive(:get_app_store_version_localizations).and_return([version_localization_en])
 
-        # Get app info localization English (Used to compare with data to upload)
+        # Get app info localization in English (used to compare with data to upload)
         expect(app_info_localization_en).to receive(:name).and_return("App name")
 
         # Fail because app info can't be updated
         expect(FastlaneCore::UI).to receive(:user_error!).with("Cannot update languages - could not find an editable info").and_call_original
 
-        # Get app info localization English (Used to compare with data to upload)
+        # Get app info localization in English (used to compare with data to upload)
         expect { uploader.upload(options) }.to raise_error(FastlaneCore::Interface::FastlaneError)
       end
     end
