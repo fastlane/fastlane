@@ -384,7 +384,7 @@ describe Supply do
             final_remote_images_ids[screenshot_type] = remote_images.map(&:id)
 
             # We should skip image0, image1, image2 from remote as they are the same as the first local images,
-            # But also skip image3 (which was in-between 2 and 3 in remote listing, but is still present in local images)
+            # But also skip image3 (which was after image4 in remote listing, but is still present in local images)
             # While deleting image4 (because it was in-between image2 and image3 in the `remote_images`, so out of order)
             # And finally deleting image5 and image6, before re-uploading image4, image5 and image6 in the right order
             local_images.sort[0..3].each do |path|
