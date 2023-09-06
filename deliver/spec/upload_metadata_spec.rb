@@ -270,7 +270,7 @@ describe Deliver::UploadMetadata do
           expect(app_info).to receive(:get_app_info_localizations).and_return([app_info_localization_en])
 
           # Get app info localization English (Used to compare with data to upload)
-          expect(app_info_localization_en).to receive(:name).and_return("")
+          expect(app_info_localization_en).to receive(:name).and_return('App Name')
 
           # Update version localization
           expect(version_localization_en).to receive(:update).with(attributes: {
@@ -458,7 +458,7 @@ describe Deliver::UploadMetadata do
           expect(version).to receive(:update).with(attributes: {})
 
           # Get app info localization in English (used to compare with data to upload)
-          expect(app_info_localization_en).to receive(:name).and_return("App name")
+          expect(app_info_localization_en).to receive(:name).and_return('App name')
 
           uploader.upload(options)
         end
@@ -491,10 +491,10 @@ describe Deliver::UploadMetadata do
         expect(version).to receive(:get_app_store_version_localizations).and_return([version_localization_en])
 
         # Get app info localization in English (used to compare with data to upload)
-        expect(app_info_localization_en).to receive(:name).and_return("App name")
+        expect(app_info_localization_en).to receive(:name).and_return('App name')
 
         # Fail because app info can't be updated
-        expect(FastlaneCore::UI).to receive(:user_error!).with("Cannot update languages - could not find an editable info").and_call_original
+        expect(FastlaneCore::UI).to receive(:user_error!).with('Cannot update languages - could not find an editable App info. Verify that your app is in one of the editable states in App Store Connect').and_call_original
 
         # Get app info localization in English (used to compare with data to upload)
         expect { uploader.upload(options) }.to raise_error(FastlaneCore::Interface::FastlaneError)
