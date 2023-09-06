@@ -532,10 +532,11 @@ module Supply
     # @!group Screenshots
     #####################################################
 
+    # Fetch all the images of a given type and for a given language of your store listing
+    #
     # @param [String] image_type Typically one of the elements of either Supply::IMAGES_TYPES or Supply::SCREENSHOT_TYPES
     # @param [String] language Localization code (a BCP-47 language tag; for example, "de-AT" for  Austrian German).
-    #
-    # @return [Array<ImageListing>] A list of PlayStoreImage instances describing each image
+    # @return [Array<ImageListing>] A list of ImageListing instances describing each image with its id, sha256 and url
     #
     def fetch_images(image_type: nil, language: nil)
       ensure_active_edit!
@@ -555,8 +556,11 @@ module Supply
       end
     end
 
+    # Upload an image or screenshot of a specific type for a given language to your store listing
+    #
     # @param [String] image_type (e.g. phoneScreenshots, sevenInchScreenshots, ...)
     # @param [String] language localization code (i.e. BCP-47 language tag as in `pt-BR`)
+    #
     def upload_image(image_path: nil, image_type: nil, language: nil)
       ensure_active_edit!
 
@@ -572,6 +576,11 @@ module Supply
       end
     end
 
+    # Remove all screenshots of a given image_type and language from the store listing
+    #
+    # @param [String] image_type (e.g. phoneScreenshots, sevenInchScreenshots, ...)
+    # @param [String] language localization code (i.e. BCP-47 language tag as in `pt-BR`)
+    #
     def clear_screenshots(image_type: nil, language: nil)
       ensure_active_edit!
 
@@ -585,6 +594,12 @@ module Supply
       end
     end
 
+    # Remove a specific screenshot of a given image_type and language from the store listing
+    #
+    # @param [String] image_type (e.g. phoneScreenshots, sevenInchScreenshots, ...)
+    # @param [String] language localization code (i.e. BCP-47 language tag as in `pt-BR`)
+    # @param [String] image_id The id of the screenshot to remove (as per `ImageListing#id`)
+    #
     def clear_screenshot(image_type: nil, language: nil, image_id: nil)
       ensure_active_edit!
 
