@@ -490,7 +490,7 @@ module Deliver
         end
       end
 
-      UI.message('No changes to localised App Info detected. Skipping upload.')
+      UI.message('No changes to localized App Info detected. Skipping upload.')
       return false
     end
 
