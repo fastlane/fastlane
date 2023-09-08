@@ -121,9 +121,10 @@ module Deliver
     # will cause an error. There may only be a max of one image per language and each image must be
     # exactly 1800x1200.
     #
-    # @param root [String] A directory path @param ignore_validation [String] Set false not to raise
-    # the error when finding invalid folder name @return [Array<Deliver::AppClipHeaderImage>] The
-    # list of AppClipHeaderImage that exist under given `root` directory
+    # @param root [String] A directory path
+    # @param ignore_validation [String] Set false not to raise the error when
+    # finding invalid folder name @return [Array<Deliver::AppClipHeaderImage>]
+    # The list of AppClipHeaderImage that exists under given `root` directory
     def self.load_app_clip_header_images(root, ignore_validation)
       app_clip_header_images = language_folders(root, ignore_validation, true).flat_map do |language_folder|
         paths = language_folder.file_paths

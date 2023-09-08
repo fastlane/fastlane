@@ -252,7 +252,7 @@ app_clip_review_information(
 )
 ```
 
-You can also provide these values by creating files in a `metadata/app_clip_review_information/` directory. The file names must match the pattern `<key>.txt` (e.g. `invocation_urls`). The contents of each file will be used as the value for the matching key. Values provided in the `Deliverfile` or `Fastfile` will be take priority over values from these files.
+You can also provide these values by creating files in a `metadata/app_clip_review_information/` directory. The file names must match the pattern `<key>.txt` (e.g. `invocation_urls`). The contents of each file will be used as the value for the matching key. Values provided in the `Deliverfile` or `Fastfile` will take priority over values from these files.
 
 Example of the `invocation_urls.txt` file:
 
@@ -547,7 +547,7 @@ Key | Editable While Live | Directory | Filename | Deprecated Filename
 
 ## Available App Clip Metadata Folder Options
 
-_deliver_ allows for metadata to be set through `.txt` files in the App Clip metadata folder. This folder can be set using `app_clip_default_experience_metadata_path`. Below are all allowed metadata options.
+_deliver_ allows for metadata to be set through `.txt` files in the App Clip metadata folder. This folder can be set using `app_clip_default_experience_metadata_path`. Below are all the allowed metadata options.
 
 ### Non-Localized Metadata
 
@@ -828,8 +828,8 @@ The default App Store Connect behavior is to not carry-over the previous version
 experience metadata. This is a contradictory behavior because it automatically carries over all
 other version metadata when creating a new version.
 
-_deliver_ fixes this issue by default carrying over the previous version's default App Clip
-experience metadata even if the options above are not specified.
+_deliver_ fixes this issue by carrying over the previous version's default App Clip
+experience metadata by default, even if the options above are not specified.
 
 Example usage in your `Deliverfile`:
 
