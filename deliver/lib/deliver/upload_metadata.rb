@@ -497,7 +497,7 @@ module Deliver
     # Finding languages to enable
     def verify_available_info_languages!(options, app, app_info, languages)
       unless app_info
-        UI.user_error!("Cannot update languages - could not find an editable App info. Verify that your app is in one of the editable states in App Store Connect")
+        UI.user_error!("Cannot update languages - could not find an editable 'App Info'. Verify that your app is in one of the editable states in App Store Connect")
         return
       end
 

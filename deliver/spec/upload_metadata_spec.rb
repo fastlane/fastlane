@@ -494,7 +494,7 @@ describe Deliver::UploadMetadata do
         expect(app_info_localization_en).to receive(:name).and_return('App name')
 
         # Fail because app info can't be updated
-        expect(FastlaneCore::UI).to receive(:user_error!).with('Cannot update languages - could not find an editable App info. Verify that your app is in one of the editable states in App Store Connect').and_call_original
+        expect(FastlaneCore::UI).to receive(:user_error!).with('Cannot update languages - could not find an editable 'App Info'. Verify that your app is in one of the editable states in App Store Connect').and_call_original
 
         # Get app info localization in English (used to compare with data to upload)
         expect { uploader.upload(options) }.to raise_error(FastlaneCore::Interface::FastlaneError)
