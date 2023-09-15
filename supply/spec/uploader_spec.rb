@@ -230,6 +230,7 @@ describe Supply do
       before do
         Supply.config = config
         allow(Supply::Client).to receive(:make_from_config).and_return(client)
+        expect(client).not_to receive(:clear_screenshots)
       end
 
       describe '#upload_images' do
