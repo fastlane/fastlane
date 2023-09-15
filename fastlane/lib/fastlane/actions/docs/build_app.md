@@ -42,8 +42,8 @@ fastlane gym
 
 _gym_ uses the latest APIs to build and sign your application which results in much faster build times.
 
-|          |  Gym Features  |
-|----------|----------------|
+|          |  _gym_ Features  |
+|----------|------------------|
 🚀 | _gym_ builds 30% faster than other build tools like [shenzhen](https://github.com/nomad/shenzhen)
 🏁 | Beautiful inline build output
 📖 | Helps you resolve common build errors like code signing issues

@@ -52,25 +52,7 @@ describe Match do
             git_bearer_authorization: nil,
             git_private_key: nil,
             type: config[:type],
-            generate_apple_certs: generate_apple_certs,
-            platform: config[:platform],
-            google_cloud_bucket_name: "",
-            google_cloud_keys_file: "",
-            google_cloud_project_id: "",
-            skip_google_cloud_account_confirmation: false,
-            s3_region: nil,
-            s3_access_key: nil,
-            s3_secret_access_key: nil,
-            s3_bucket: nil,
-            s3_object_prefix: nil,
-            gitlab_project: nil,
-            gitlab_host: 'https://gitlab.com',
-            readonly: false,
-            username: values[:username],
-            team_id: nil,
-            team_name: nil,
-            api_key_path: nil,
-            api_key: nil
+            platform: config[:platform]
           ).and_return(fake_storage)
 
           expect(fake_storage).to receive(:download).and_return(nil)
@@ -143,25 +125,7 @@ describe Match do
             git_bearer_authorization: nil,
             git_private_key: nil,
             type: config[:type],
-            generate_apple_certs: generate_apple_certs,
-            platform: config[:platform],
-            google_cloud_bucket_name: "",
-            google_cloud_keys_file: "",
-            google_cloud_project_id: "",
-            skip_google_cloud_account_confirmation: false,
-            s3_region: nil,
-            s3_access_key: nil,
-            s3_secret_access_key: nil,
-            s3_bucket: nil,
-            s3_object_prefix: nil,
-            gitlab_project: nil,
-            gitlab_host: 'https://gitlab.com',
-            readonly: false,
-            username: values[:username],
-            team_id: nil,
-            team_name: nil,
-            api_key_path: nil,
-            api_key: nil
+            platform: config[:platform]
           ).and_return(fake_storage)
 
           expect(fake_storage).to receive(:download).and_return(nil)
@@ -234,25 +198,7 @@ describe Match do
             git_bearer_authorization: nil,
             git_private_key: nil,
             type: config[:type],
-            generate_apple_certs: generate_apple_certs,
-            platform: config[:platform],
-            google_cloud_bucket_name: "",
-            google_cloud_keys_file: "",
-            google_cloud_project_id: "",
-            skip_google_cloud_account_confirmation: false,
-            s3_region: nil,
-            s3_access_key: nil,
-            s3_secret_access_key: nil,
-            s3_bucket: nil,
-            s3_object_prefix: nil,
-            gitlab_project: nil,
-            gitlab_host: 'https://gitlab.com',
-            readonly: false,
-            username: values[:username],
-            team_id: nil,
-            team_name: nil,
-            api_key_path: nil,
-            api_key: nil
+            platform: config[:platform]
           ).and_return(fake_storage)
 
           expect(fake_storage).to receive(:download).and_return(nil)
@@ -307,25 +253,7 @@ describe Match do
             git_bearer_authorization: nil,
             git_private_key: nil,
             type: config[:type],
-            generate_apple_certs: generate_apple_certs,
-            platform: config[:platform],
-            google_cloud_bucket_name: "",
-            google_cloud_keys_file: "",
-            google_cloud_project_id: "",
-            skip_google_cloud_account_confirmation: false,
-            s3_region: nil,
-            s3_access_key: nil,
-            s3_secret_access_key: nil,
-            s3_bucket: nil,
-            s3_object_prefix: nil,
-            gitlab_project: nil,
-            gitlab_host: 'https://gitlab.com',
-            readonly: false,
-            username: values[:username],
-            team_id: nil,
-            team_name: nil,
-            api_key_path: nil,
-            api_key: nil
+            platform: config[:platform]
           ).and_return(fake_storage)
 
           expect(fake_storage).to receive(:download).and_return(nil)
