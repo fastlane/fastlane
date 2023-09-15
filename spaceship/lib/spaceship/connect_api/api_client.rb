@@ -202,7 +202,7 @@ module Spaceship
         end
         puts(error) if Spaceship::Globals.verbose?
         Kernel.sleep(backoff)
-        backoff = backoff * 2
+        backoff *= 2
         retry
       end
 

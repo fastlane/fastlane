@@ -138,11 +138,11 @@ describe Spaceship::ConnectAPI::APIClient do
         expect(client).to receive(:request).twice.and_call_original
         expect do
           client.get('')
-        end.to_not raise_error
+        end.to_not(raise_error)
       end
 
       it 'sleeps until limit is reached on 429' do
-        body = JSON.generate({"errors": [{"title": "The request rate limit has been reached.", "details": "We've received too many requests for this API. Please wait and try again or slow down your request rate."}]})
+        body = JSON.generate({ "errors": [{ "title": "The request rate limit has been reached.", "details": "We've received too many requests for this API. Please wait and try again or slow down your request rate." }] })
         stub_client_request(client.hostname, 429, body)
 
         expect(Kernel).to receive(:sleep).exactly(12).times
