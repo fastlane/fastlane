@@ -309,7 +309,7 @@ module Supply
             end
           end
         else
-          client.clear_screenshots(image_type: screenshot_type, language: language) unless Supply.config[:sync_image_upload]
+          client.clear_screenshots(image_type: screenshot_type, language: language)
         end
 
         paths.each do |path|
