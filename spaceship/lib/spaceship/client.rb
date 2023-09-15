@@ -450,6 +450,101 @@ module Spaceship
       return false
     end
 
+    def do_sirp(user, password, modified_cookie)
+      require 'pp'
+
+      prime_length = 2048
+
+      require 'sirp'
+      require 'base64'
+
+      client = SIRP::Client.new(prime_length)
+      a = client.start_authentication
+
+      data = {
+        #a: Base64.encode64(a),
+        a: Base64.strict_encode64(to_byte(a)),
+        accountName: user,
+        protocols: ['s2k', 's2k_fo']
+      }
+
+			pp data
+
+      response = request(:post) do |req|
+        req.url("https://idmsa.apple.com/appleauth/auth/signin/init")
+        req.body = data.to_json
+        req.headers['Content-Type'] = 'application/json'
+        req.headers['X-Requested-With'] = 'XMLHttpRequest'
+        req.headers['X-Apple-Widget-Key'] = self.itc_service_key
+        req.headers['Accept'] = 'application/json, text/javascript'
+        req.headers["Cookie"] = modified_cookie if modified_cookie
+      end
+
+			# pack
+
+      body = response.body
+			pp body
+			iterations = body["iteration"]
+      salt = Base64.strict_decode64(body["salt"])
+      b = Base64.strict_decode64(body["b"])
+      c = body["c"]
+
+			key_length = 32
+      encrypted_password = pbkdf2(password, salt, iterations, key_length)
+
+      m1 = client.process_challenge(
+				user,
+				to_hex(encrypted_password),
+				to_hex(salt),
+				to_hex(b),
+				is_password_encrypted: true
+			)
+      m2 = client.H_AMK
+
+      unless m1
+        raise "no m1"
+      end
+
+      data = {
+        accountName: user,
+        c: c,
+        m1: Base64.encode64(to_byte(m1)).strip,
+        m2: Base64.encode64(to_byte(m2)).strip,
+        rememberMe: false
+      }
+
+      pp data
+      
+      hashcash = self.fetch_hashcash
+
+      response = request(:post) do |req|
+        req.url("https://idmsa.apple.com/appleauth/auth/signin/complete?isRememberMeEnabled=false")
+        req.body = data.to_json
+        req.headers['Content-Type'] = 'application/json'
+        req.headers['X-Requested-With'] = 'XMLHttpRequest'
+        req.headers['X-Apple-Widget-Key'] = self.itc_service_key
+        req.headers['Accept'] = 'application/json, text/javascript'
+        req.headers["Cookie"] = modified_cookie if modified_cookie
+        req.headers["X-Apple-HC"] = hashcash if hashcash
+      end
+
+      return response
+    end
+
+    def pbkdf2(password, salt, iterations, key_length, digest = OpenSSL::Digest::SHA256.new)
+			require 'openssl'
+      password = OpenSSL::Digest::SHA256.digest(password)
+			OpenSSL::PKCS5.pbkdf2_hmac(password, salt, iterations, key_length, digest)
+		end
+
+    def to_hex(str)
+				str.unpack('H*')[0]
+    end
+
+    def to_byte(str)
+        [str].pack('H*')
+    end
+
     # This method is used for both the Apple Dev Portal and App Store Connect
     # This will also handle 2 step verification and 2 factor authentication
     #
@@ -491,21 +586,26 @@ module Spaceship
           modified_cookie.gsub!(unescaped_important_cookie, escaped_important_cookie)
         end
 
-        # Fixes issue https://github.com/fastlane/fastlane/issues/21071
-        # On 2023-02-23, Apple added a custom implementation
-        # of hashcash to their auth flow
-        # hashcash = nil
-        hashcash = self.fetch_hashcash
+        do_new_signin = true
+        response = if do_new_signin
+          do_sirp(user, password, modified_cookie)
+        else
+          # Fixes issue https://github.com/fastlane/fastlane/issues/21071
+          # On 2023-02-23, Apple added a custom implementation
+          # of hashcash to their auth flow
+          # hashcash = nil
+          hashcash = self.fetch_hashcash
 
-        response = request(:post) do |req|
-          req.url("https://idmsa.apple.com/appleauth/auth/signin")
-          req.body = data.to_json
-          req.headers['Content-Type'] = 'application/json'
-          req.headers['X-Requested-With'] = 'XMLHttpRequest'
-          req.headers['X-Apple-Widget-Key'] = self.itc_service_key
-          req.headers['Accept'] = 'application/json, text/javascript'
-          req.headers["Cookie"] = modified_cookie if modified_cookie
-          req.headers["X-Apple-HC"] = hashcash if hashcash
+          request(:post) do |req|
+            req.url("https://idmsa.apple.com/appleauth/auth/signin")
+            req.body = data.to_json
+            req.headers['Content-Type'] = 'application/json'
+            req.headers['X-Requested-With'] = 'XMLHttpRequest'
+            req.headers['X-Apple-Widget-Key'] = self.itc_service_key
+            req.headers['Accept'] = 'application/json, text/javascript'
+            req.headers["Cookie"] = modified_cookie if modified_cookie
+            req.headers["X-Apple-HC"] = hashcash if hashcash
+          end
         end
       rescue UnauthorizedAccessError
         raise InvalidUserCredentialsError.new, "Invalid username and password combination. Used '#{user}' as the username."
@@ -944,6 +1044,7 @@ module Spaceship
     end
 
     def handle_error(response)
+      puts("THE STATUS: #{response.status}")
       case response.status
       when 401
         msg = "Auth lost"

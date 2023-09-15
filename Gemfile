@@ -54,6 +54,8 @@ gem "xcov", "~> 1.4.1"
 # A documentation generation tool for Ruby.
 gem "yard", "~> 0.9.11"
 
+gem "sirp", git: "https://github.com/snatchev/sirp.git"
+
 gemspec(path: ".")
 
 plugins_path = File.join(File.expand_path("..", __FILE__), "fastlane", "Pluginfile")
