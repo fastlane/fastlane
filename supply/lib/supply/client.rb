@@ -78,6 +78,7 @@ module Supply
     private
 
     def call_google_api
+      tries_left ||= (ENV["SUPPLY_UPLOAD_MAX_RETRIES"] || 0).to_i
       yield if block_given?
     rescue Google::Apis::Error => e
       error = begin
@@ -92,7 +93,13 @@ module Supply
         message = e.body
       end
 
-      UI.user_error!("Google Api Error: #{e.message} - #{message}")
+      if tries_left.positive?
+        UI.error("Google Api Error: #{e.message} - #{message} - Retrying...")
+        tries_left -= 1
+        retry
+      else
+        UI.user_error!("Google Api Error: #{e.message} - #{message}")
+      end
     end
   end
 
