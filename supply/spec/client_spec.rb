@@ -13,8 +13,6 @@ describe Supply do
         stub_request(:post, "https://androidpublisher.googleapis.com/upload/androidpublisher/v3/applications/test-app/edits/1/listings/en-US/icon").
           to_return(status: 403, body: '{"error":{"message":"Ensure project settings are enabled."}}', headers: { 'Content-Type' => 'application/json' })
 
-        expect(UI).to receive(:user_error!).with("Google Api Error: Invalid request - Ensure project settings are enabled.").once
-
         current_edit = double
         allow(current_edit).to receive(:id).and_return(1)
 
@@ -23,9 +21,11 @@ describe Supply do
         allow(client).to receive(:current_edit).and_return(current_edit)
 
         client.begin_edit(package_name: 'test-app')
-        client.upload_image(image_path: fixture_file("playstore-icon.png"),
-                            image_type: "icon",
-                              language: "en-US")
+        expect {
+          client.upload_image(image_path: fixture_file("playstore-icon.png"),
+                              image_type: "icon",
+                                language: "en-US")
+        }.to raise_error(FastlaneCore::Interface::FastlaneError, "Google Api Error: Invalid request - Ensure project settings are enabled.")
       end
 
       it "with 5 retries" do
@@ -35,7 +35,6 @@ describe Supply do
           to_return(status: 403, body: '{"error":{"message":"Ensure project settings are enabled."}}', headers: { 'Content-Type' => 'application/json' })
 
         expect(UI).to receive(:error).with("Google Api Error: Invalid request - Ensure project settings are enabled. - Retrying...").exactly(5).times
-        expect(UI).to receive(:user_error!).with("Google Api Error: Invalid request - Ensure project settings are enabled.").once
 
         current_edit = double
         allow(current_edit).to receive(:id).and_return(1)
@@ -45,9 +44,11 @@ describe Supply do
         allow(client).to receive(:current_edit).and_return(current_edit)
 
         client.begin_edit(package_name: 'test-app')
-        client.upload_image(image_path: fixture_file("playstore-icon.png"),
-                            image_type: "icon",
-                              language: "en-US")
+        expect {
+          client.upload_image(image_path: fixture_file("playstore-icon.png"),
+                              image_type: "icon",
+                                language: "en-US")
+        }.to raise_error(FastlaneCore::Interface::FastlaneError, "Google Api Error: Invalid request - Ensure project settings are enabled.")
       end
     end
 
