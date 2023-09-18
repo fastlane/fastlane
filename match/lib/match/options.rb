@@ -4,6 +4,7 @@ require 'credentials_manager/appfile_config'
 require_relative 'module'
 
 module Match
+  # rubocop:disable Metrics/ClassLength
   class Options
     # This is match specific, as users can append storage specific options
     def self.append_option(option)
@@ -222,6 +223,11 @@ module Match
                                      env_name: "MATCH_S3_OBJECT_PREFIX",
                                      description: "Prefix to be used on all objects uploaded to S3",
                                      optional: true),
+        FastlaneCore::ConfigItem.new(key: :s3_skip_encryption,
+                                     env_name: "MATCH_S3_SKIP_ENCRYPTION",
+                                     description: "Skip encryption of all objects uploaded to S3. WARNING: only enable this on S3 buckets with sufficiently restricted permissions and server-side encryption enabled. See https://docs.aws.amazon.com/AmazonS3/latest/userguide/UsingEncryption.html",
+                                     type: Boolean,
+                                     default_value: false),
 
         # Storage: GitLab Secure Files
         FastlaneCore::ConfigItem.new(key: :gitlab_project,
@@ -349,4 +355,5 @@ module Match
       ]
     end
   end
+  # rubocop:enable Metrics/ClassLength
 end

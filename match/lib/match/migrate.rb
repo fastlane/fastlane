@@ -13,13 +13,15 @@ module Match
 
       # We init the Google storage client before the git client
       # to ask for all the missing inputs *before* cloning the git repo
-      google_cloud_storage = Storage.for_mode("google_cloud", {
+      google_cloud_storage = Storage.from_params({
+        storage_mode: "google_cloud",
         google_cloud_bucket_name: params[:google_cloud_bucket_name],
         google_cloud_keys_file: params[:google_cloud_keys_file],
         google_cloud_project_id: params[:google_cloud_project_id]
       })
 
-      git_storage = Storage.for_mode("git", {
+      git_storage = Storage.from_params({
+        storage_mode: "git",
         git_url: params[:git_url],
         shallow_clone: params[:shallow_clone],
         git_branch: params[:git_branch],
@@ -29,6 +31,8 @@ module Match
 
       encryption = Encryption.for_storage_mode(params[:storage_mode], {
         git_url: params[:git_url],
+        s3_bucket: params[:s3_bucket],
+        s3_skip_encryption: params[:s3_skip_encryption],
         working_directory: git_storage.working_directory
       })
       encryption.decrypt_files if encryption
