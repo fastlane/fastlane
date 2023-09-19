@@ -3,7 +3,7 @@ require 'fastlane_core'
 module Supply
   # rubocop:disable Metrics/ClassLength
   class Uploader
-    UploadJob = Struct.new(:language, :version_code)
+    UploadJob = Struct.new(:language, :version_code, :release_notes)
 
     def perform_upload
       FastlaneCore::PrintTable.print_values(config: Supply.config, hide_keys: [:issuer], mask_keys: [:json_key_data], title: "Summary for supply #{Fastlane::VERSION}")
@@ -85,20 +85,6 @@ module Supply
           version_codes.to_s == ""
         end
 
-        release_notes = []
-        upload_worker = FastlaneCore::QueueWorker.new do |job|
-          UI.message("Preparing uploads for language '#{job.language}'...")
-          start_time = Time.now
-          listing = client.listing_for_language(job.language)
-          upload_metadata(job.language, listing) unless Supply.config[:skip_upload_metadata]
-          upload_images(job.language) unless Supply.config[:skip_upload_images]
-          upload_screenshots(job.language) unless Supply.config[:skip_upload_screenshots]
-          release_notes << upload_changelog(job.language, job.version_code) unless Supply.config[:skip_upload_changelogs]
-          UI.message("Uploaded all items for language '#{job.language}'... (#{Time.now - start_time} secs)")
-        rescue => error
-          UI.abort_with_message!("#{job.language} - #{error}")
-        end
-
         version_codes.each do |version_code|
           UI.user_error!("Could not find folder #{metadata_path}") unless File.directory?(metadata_path)
 
@@ -106,12 +92,15 @@ module Supply
           UI.user_error!("Unable to find the requested track - '#{Supply.config[:track]}'") unless track
           UI.user_error!("Could not find release for version code '#{version_code}' to update changelog") unless release
 
+          release_notes = Queue.new
+          upload_worker = create_meta_upload_worker
           upload_worker.batch_enqueue(
             # skip . or .. or hidden folders
-            all_languages.reject { |lang| lang.start_with?('.') }.map { |lang| UploadJob.new(lang, version_code) }
+            all_languages.reject { |lang| lang.start_with?('.') }.map { |lang| UploadJob.new(lang, version_code, release_notes) }
           )
           upload_worker.start
 
+          release_notes = Array.new(release_notes.size) { release_notes.pop } # Queue to Array
           upload_changelogs(release_notes, release, track, track_name) unless release_notes.empty?
         end
       end
@@ -493,6 +482,21 @@ module Supply
         'main'
       elsif filename.include?('patch')
         'patch'
+      end
+    end
+
+    def create_meta_upload_worker
+      FastlaneCore::QueueWorker.new do |job|
+        UI.message("Preparing uploads for language '#{job.language}'...")
+        start_time = Time.now
+        listing = client.listing_for_language(job.language)
+        upload_metadata(job.language, listing) unless Supply.config[:skip_upload_metadata]
+        upload_images(job.language) unless Supply.config[:skip_upload_images]
+        upload_screenshots(job.language) unless Supply.config[:skip_upload_screenshots]
+        job.release_notes << upload_changelog(job.language, job.version_code) unless Supply.config[:skip_upload_changelogs]
+        UI.message("Uploaded all items for language '#{job.language}'... (#{Time.now - start_time} secs)")
+      rescue => error
+        UI.abort_with_message!("#{job.language} - #{error}")
       end
     end
   end
