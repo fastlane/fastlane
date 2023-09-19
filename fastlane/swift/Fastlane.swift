@@ -6737,6 +6737,8 @@ public func makeChangelogFromJenkins(fallbackChangelog: String = "",
    - s3SkipEncryption: Skip encryption of all objects uploaded to S3. WARNING: only enable this on S3 buckets with sufficiently restricted permissions and server-side encryption enabled. See https://docs.aws.amazon.com/AmazonS3/latest/userguide/UsingEncryption.html
    - gitlabProject: GitLab Project Path (i.e. 'gitlab-org/gitlab')
    - gitlabHost: GitLab Host (i.e. 'https://gitlab.com')
+   - jobToken: GitLab CI_JOB_TOKEN
+   - privateToken: GitLab Access Token
    - keychainName: Keychain the items should be imported to
    - keychainPassword: This might be required the first time you access certificates on a new mac. For the login/default keychain this is your macOS account password
    - force: Renew the provisioning profiles every time you run match
@@ -6792,6 +6794,8 @@ public func match(type: String = matchfile.type,
                   s3SkipEncryption: OptionalConfigValue<Bool> = .fastlaneDefault(matchfile.s3SkipEncryption),
                   gitlabProject: OptionalConfigValue<String?> = .fastlaneDefault(matchfile.gitlabProject),
                   gitlabHost: String = matchfile.gitlabHost,
+                  jobToken: OptionalConfigValue<String?> = .fastlaneDefault(matchfile.jobToken),
+                  privateToken: OptionalConfigValue<String?> = .fastlaneDefault(matchfile.privateToken),
                   keychainName: String = matchfile.keychainName,
                   keychainPassword: OptionalConfigValue<String?> = .fastlaneDefault(matchfile.keychainPassword),
                   force: OptionalConfigValue<Bool> = .fastlaneDefault(matchfile.force),
@@ -6845,6 +6849,8 @@ public func match(type: String = matchfile.type,
     let s3SkipEncryptionArg = s3SkipEncryption.asRubyArgument(name: "s3_skip_encryption", type: nil)
     let gitlabProjectArg = gitlabProject.asRubyArgument(name: "gitlab_project", type: nil)
     let gitlabHostArg = RubyCommand.Argument(name: "gitlab_host", value: gitlabHost, type: nil)
+    let jobTokenArg = jobToken.asRubyArgument(name: "job_token", type: nil)
+    let privateTokenArg = privateToken.asRubyArgument(name: "private_token", type: nil)
     let keychainNameArg = RubyCommand.Argument(name: "keychain_name", value: keychainName, type: nil)
     let keychainPasswordArg = keychainPassword.asRubyArgument(name: "keychain_password", type: nil)
     let forceArg = force.asRubyArgument(name: "force", type: nil)
@@ -6897,6 +6903,8 @@ public func match(type: String = matchfile.type,
                                           s3SkipEncryptionArg,
                                           gitlabProjectArg,
                                           gitlabHostArg,
+                                          jobTokenArg,
+                                          privateTokenArg,
                                           keychainNameArg,
                                           keychainPasswordArg,
                                           forceArg,
@@ -6960,6 +6968,8 @@ public func match(type: String = matchfile.type,
    - s3SkipEncryption: Skip encryption of all objects uploaded to S3. WARNING: only enable this on S3 buckets with sufficiently restricted permissions and server-side encryption enabled. See https://docs.aws.amazon.com/AmazonS3/latest/userguide/UsingEncryption.html
    - gitlabProject: GitLab Project Path (i.e. 'gitlab-org/gitlab')
    - gitlabHost: GitLab Host (i.e. 'https://gitlab.com')
+   - jobToken: GitLab CI_JOB_TOKEN
+   - privateToken: GitLab Access Token
    - keychainName: Keychain the items should be imported to
    - keychainPassword: This might be required the first time you access certificates on a new mac. For the login/default keychain this is your macOS account password
    - force: Renew the provisioning profiles every time you run match
@@ -7019,6 +7029,8 @@ public func matchNuke(type: String = "development",
                       s3SkipEncryption: OptionalConfigValue<Bool> = .fastlaneDefault(false),
                       gitlabProject: OptionalConfigValue<String?> = .fastlaneDefault(nil),
                       gitlabHost: String = "https://gitlab.com",
+                      jobToken: OptionalConfigValue<String?> = .fastlaneDefault(nil),
+                      privateToken: OptionalConfigValue<String?> = .fastlaneDefault(nil),
                       keychainName: String = "login.keychain",
                       keychainPassword: OptionalConfigValue<String?> = .fastlaneDefault(nil),
                       force: OptionalConfigValue<Bool> = .fastlaneDefault(false),
@@ -7072,6 +7084,8 @@ public func matchNuke(type: String = "development",
     let s3SkipEncryptionArg = s3SkipEncryption.asRubyArgument(name: "s3_skip_encryption", type: nil)
     let gitlabProjectArg = gitlabProject.asRubyArgument(name: "gitlab_project", type: nil)
     let gitlabHostArg = RubyCommand.Argument(name: "gitlab_host", value: gitlabHost, type: nil)
+    let jobTokenArg = jobToken.asRubyArgument(name: "job_token", type: nil)
+    let privateTokenArg = privateToken.asRubyArgument(name: "private_token", type: nil)
     let keychainNameArg = RubyCommand.Argument(name: "keychain_name", value: keychainName, type: nil)
     let keychainPasswordArg = keychainPassword.asRubyArgument(name: "keychain_password", type: nil)
     let forceArg = force.asRubyArgument(name: "force", type: nil)
@@ -7124,6 +7138,8 @@ public func matchNuke(type: String = "development",
                                           s3SkipEncryptionArg,
                                           gitlabProjectArg,
                                           gitlabHostArg,
+                                          jobTokenArg,
+                                          privateTokenArg,
                                           keychainNameArg,
                                           keychainPasswordArg,
                                           forceArg,
@@ -11206,6 +11222,8 @@ public func swiftlint(mode: String = "lint",
    - s3SkipEncryption: Skip encryption of all objects uploaded to S3. WARNING: only enable this on S3 buckets with sufficiently restricted permissions and server-side encryption enabled. See https://docs.aws.amazon.com/AmazonS3/latest/userguide/UsingEncryption.html
    - gitlabProject: GitLab Project Path (i.e. 'gitlab-org/gitlab')
    - gitlabHost: GitLab Host (i.e. 'https://gitlab.com')
+   - jobToken: GitLab CI_JOB_TOKEN
+   - privateToken: GitLab Access Token
    - keychainName: Keychain the items should be imported to
    - keychainPassword: This might be required the first time you access certificates on a new mac. For the login/default keychain this is your macOS account password
    - force: Renew the provisioning profiles every time you run match
@@ -11261,6 +11279,8 @@ public func syncCodeSigning(type: String = "development",
                             s3SkipEncryption: OptionalConfigValue<Bool> = .fastlaneDefault(false),
                             gitlabProject: OptionalConfigValue<String?> = .fastlaneDefault(nil),
                             gitlabHost: String = "https://gitlab.com",
+                            jobToken: OptionalConfigValue<String?> = .fastlaneDefault(nil),
+                            privateToken: OptionalConfigValue<String?> = .fastlaneDefault(nil),
                             keychainName: String = "login.keychain",
                             keychainPassword: OptionalConfigValue<String?> = .fastlaneDefault(nil),
                             force: OptionalConfigValue<Bool> = .fastlaneDefault(false),
@@ -11314,6 +11334,8 @@ public func syncCodeSigning(type: String = "development",
     let s3SkipEncryptionArg = s3SkipEncryption.asRubyArgument(name: "s3_skip_encryption", type: nil)
     let gitlabProjectArg = gitlabProject.asRubyArgument(name: "gitlab_project", type: nil)
     let gitlabHostArg = RubyCommand.Argument(name: "gitlab_host", value: gitlabHost, type: nil)
+    let jobTokenArg = jobToken.asRubyArgument(name: "job_token", type: nil)
+    let privateTokenArg = privateToken.asRubyArgument(name: "private_token", type: nil)
     let keychainNameArg = RubyCommand.Argument(name: "keychain_name", value: keychainName, type: nil)
     let keychainPasswordArg = keychainPassword.asRubyArgument(name: "keychain_password", type: nil)
     let forceArg = force.asRubyArgument(name: "force", type: nil)
@@ -11366,6 +11388,8 @@ public func syncCodeSigning(type: String = "development",
                                           s3SkipEncryptionArg,
                                           gitlabProjectArg,
                                           gitlabHostArg,
+                                          jobTokenArg,
+                                          privateTokenArg,
                                           keychainNameArg,
                                           keychainPasswordArg,
                                           forceArg,
@@ -13672,4 +13696,4 @@ public let snapshotfile: Snapshotfile = .init()
 
 // Please don't remove the lines below
 // They are used to detect outdated files
-// FastlaneRunnerAPIVersion [0.9.172]
+// FastlaneRunnerAPIVersion [0.9.173]
