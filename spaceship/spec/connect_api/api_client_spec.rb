@@ -126,6 +126,31 @@ describe Spaceship::ConnectAPI::APIClient do
         client.get('')
       end.to raise_error(Spaceship::AccessForbiddenError)
     end
+
+    describe 'with_retry' do
+      it 'sleeps on 429' do
+        stub_request(:get, client.hostname).
+          to_return(status: 429).then.
+          to_return(status: 200, body: "")
+
+        expect(Kernel).to receive(:sleep).once.with(1)
+        expect(client).to receive(:handle_response).once
+        expect(client).to receive(:request).twice.and_call_original
+        expect do
+          client.get('')
+        end.to_not(raise_error)
+      end
+
+      it 'sleeps until limit is reached on 429' do
+        body = JSON.generate({ "errors": [{ "title": "The request rate limit has been reached.", "details": "We've received too many requests for this API. Please wait and try again or slow down your request rate." }] })
+        stub_client_request(client.hostname, 429, body)
+
+        expect(Kernel).to receive(:sleep).exactly(12).times
+        expect do
+          client.get('')
+        end.to raise_error(Spaceship::ConnectAPI::APIClient::TooManyRequestsError, "Too many requests, giving up after backing off for > 3600 seconds.")
+      end
+    end
   end
 
   describe "#handle_error" do

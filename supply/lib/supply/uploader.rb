@@ -281,7 +281,17 @@ module Supply
         path = Dir.glob(search, File::FNM_CASEFOLD).last
         next unless path
 
-        UI.message("Uploading image file #{path}...")
+        if Supply.config[:sync_image_upload]
+          UI.message("🔍 Checking #{image_type} checksum...")
+          existing_images = client.fetch_images(image_type: image_type, language: language)
+          sha256 = Digest::SHA256.file(path).hexdigest
+          if existing_images.map(&:sha256).include?(sha256)
+            UI.message("🟰 Skipping upload of screenshot #{path} as remote sha256 matches.")
+            next
+          end
+        end
+
+        UI.message("⬆️ Uploading image file #{path}...")
         client.upload_image(image_path: File.expand_path(path),
                             image_type: image_type,
                               language: language)
@@ -291,13 +301,30 @@ module Supply
     def upload_screenshots(language)
       Supply::SCREENSHOT_TYPES.each do |screenshot_type|
         search = File.join(metadata_path, language, Supply::IMAGES_FOLDER_NAME, screenshot_type, "*.#{IMAGE_FILE_EXTENSIONS}")
-        paths = Dir.glob(search, File::FNM_CASEFOLD)
+        paths = Dir.glob(search, File::FNM_CASEFOLD).sort
         next unless paths.count > 0
 
-        client.clear_screenshots(image_type: screenshot_type, language: language)
+        if Supply.config[:sync_image_upload]
+          UI.message("🔍 Checking #{screenshot_type} checksums...")
+          existing_images = client.fetch_images(image_type: screenshot_type, language: language)
+          # Don't keep images that either don't exist locally, or that are out of order compared to the `paths` to upload
+          first_path_checksum = Digest::SHA256.file(paths.first).hexdigest
+          existing_images.each do |image|
+            if image.sha256 == first_path_checksum
+              UI.message("🟰 Skipping upload of screenshot #{paths.first} as remote sha256 matches.")
+              paths.shift # Remove first path from the list of paths to be uploaded
+              first_path_checksum = paths.empty? ? nil : Digest::SHA256.file(paths.first).hexdigest
+            else
+              UI.message("🚮 Deleting #{language} screenshot id ##{image.id} as it does not exist locally or is out of order...")
+              client.clear_screenshot(image_type: screenshot_type, language: language, image_id: image.id)
+            end
+          end
+        else
+          client.clear_screenshots(image_type: screenshot_type, language: language)
+        end
 
-        paths.sort.each do |path|
-          UI.message("Uploading screenshot #{path}...")
+        paths.each do |path|
+          UI.message("⬆️  Uploading screenshot #{path}...")
           client.upload_image(image_path: File.expand_path(path),
                               image_type: screenshot_type,
                                 language: language)
