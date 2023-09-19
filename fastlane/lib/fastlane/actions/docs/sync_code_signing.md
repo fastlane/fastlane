@@ -408,7 +408,7 @@ fastlane match adhoc --force_for_new_devices
 
 ##### Templates (aka: custom entitlements)
 
-Match can generate profiles that contain custom entitlements by passing in the entitlement's name with the `template_name` parameter.
+_match_ can generate profiles that contain custom entitlements by passing in the entitlement's name with the `template_name` parameter.
 
 ```
 match(type: "development",

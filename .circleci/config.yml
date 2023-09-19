@@ -261,21 +261,33 @@ workflows:
   build:
     jobs:
       - tests_macos:
+          name: 'Execute tests on macOS (Xcode 12.5.1, Ruby 2.6)'
+          xcode_version: '12.5.1'
+          ruby_version: '2.6.6'
+      - tests_macos:
           name: 'Execute tests on macOS (Xcode 12.5.1, Ruby 2.7)'
           xcode_version: '12.5.1'
-          ruby_version: '2.7'
+          ruby_version: '2.7.3'
           ruby_opt: -W:deprecated
-          <<: *important-branches
       - tests_macos:
           name: 'Execute tests on macOS (Xcode 13.4.1, Ruby 3.0)'
           xcode_version: '13.4.1'
-          ruby_version: '3.0'
+          ruby_version: '3.0.4'
           ruby_opt: -W:deprecated
-          <<: *important-branches
       - tests_macos:
           name: 'Execute tests on macOS (Xcode 13.4.1, Ruby 3.1)'
           xcode_version: '13.4.1'
-          ruby_version: '3.1'
+          ruby_version: '3.1.2'
+          ruby_opt: -W:deprecated
+      - tests_macos:
+          name: 'Execute tests on macOS (Xcode 14.3.1, Ruby 3.1)'
+          xcode_version: '14.3.1'
+          ruby_version: '3.1.4'
+          ruby_opt: -W:deprecated
+      - tests_macos:
+          name: 'Execute tests on macOS (Xcode 15.0.0, Ruby 3.1)'
+          xcode_version: '15.0.0'
+          ruby_version: '3.1.4'
           ruby_opt: -W:deprecated
       - tests_ubuntu:
           name: 'Execute tests on Ubuntu'

@@ -28,12 +28,20 @@ describe FastlaneCore do
     end
 
     describe '#installed_wwdr_certificates' do
+      let(:cert) do
+        cert = OpenSSL::X509::Certificate.new
+        key = OpenSSL::PKey::RSA.new(2048)
+        root_key = OpenSSL::PKey::RSA.new(2048)
+        cert.public_key = key.public_key
+        cert.sign(root_key, OpenSSL::Digest::SHA256.new)
+        cert
+      end
+
       it "should return installed certificate's alias" do
         expect(FastlaneCore::CertChecker).to receive(:wwdr_keychain).and_return('login.keychain')
 
         allow(FastlaneCore::Helper).to receive(:backticks).with(/security find-certificate/).and_return("-----BEGIN CERTIFICATE-----\nG6\n-----END CERTIFICATE-----\n")
 
-        cert = OpenSSL::X509::Certificate.new
         allow(Digest::SHA256).to receive(:hexdigest).with(cert.to_der).and_return('bdd4ed6e74691f0c2bfd01be0296197af1379e0418e2d300efa9c3bef642ca30')
         allow(OpenSSL::X509::Certificate).to receive(:new).and_return(cert)
 
@@ -45,7 +53,6 @@ describe FastlaneCore do
 
         allow(FastlaneCore::Helper).to receive(:backticks).with(/security find-certificate/).and_return("-----BEGIN CERTIFICATE-----\nG6\n-----END CERTIFICATE-----\n")
 
-        cert = OpenSSL::X509::Certificate.new
         allow(OpenSSL::X509::Certificate).to receive(:new).and_return(cert)
 
         expect(FastlaneCore::CertChecker.installed_wwdr_certificates).to eq([])
@@ -107,7 +114,7 @@ describe FastlaneCore do
           `ls`
 
           keychain = "keychain with spaces.keychain"
-          cmd = %r{curl -f -o (([A-Z]\:)?\/.+) https://www\.apple\.com/certificateauthority/AppleWWDRCAG6\.cer && security import \1 -k #{Regexp.escape(keychain.shellescape)}}
+          cmd = %r{curl -f -o (([A-Z]\:)?\/.+\.cer) https://www\.apple\.com/certificateauthority/AppleWWDRCAG6\.cer && security import \1 -k #{Regexp.escape(keychain.shellescape)}}
           require "open3"
 
           expect(Open3).to receive(:capture3).with(cmd).and_return(["", "", success_status])
@@ -124,7 +131,7 @@ describe FastlaneCore do
           stub_const('ENV', { "FASTLANE_WWDR_USE_HTTP1_AND_RETRIES" => "true" })
 
           keychain = "keychain with spaces.keychain"
-          cmd = %r{curl --http1.1 --retry 3 --retry-all-errors -f -o (([A-Z]\:)?\/.+) https://www\.apple\.com/certificateauthority/AppleWWDRCAG6\.cer && security import \1 -k #{Regexp.escape(keychain.shellescape)}}
+          cmd = %r{curl --http1.1 --retry 3 --retry-all-errors -f -o (([A-Z]\:)?\/.+\.cer) https://www\.apple\.com/certificateauthority/AppleWWDRCAG6\.cer && security import \1 -k #{Regexp.escape(keychain.shellescape)}}
           require "open3"
 
           expect(Open3).to receive(:capture3).with(cmd).and_return(["", "", success_status])
