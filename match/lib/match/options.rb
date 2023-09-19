@@ -239,6 +239,14 @@ module Match
                                       default_value: 'https://gitlab.com',
                                       description: "GitLab Host (i.e. 'https://gitlab.com')",
                                       optional: true),
+        FastlaneCore::ConfigItem.new(key: :job_token,
+                                      env_name: "CI_JOB_TOKEN",
+                                      description: "GitLab CI_JOB_TOKEN",
+                                      optional: true),
+        FastlaneCore::ConfigItem.new(key: :private_token,
+                                      env_name: "PRIVATE_TOKEN",
+                                      description: "GitLab Access Token",
+                                      optional: true),
 
         # Keychain
         FastlaneCore::ConfigItem.new(key: :keychain_name,
