@@ -57,7 +57,7 @@ module Match
     end
 
     # @return (String) The UUID of the newly generated profile
-    def self.generate_provisioning_profile(params: nil, prov_type: nil, certificate_id: nil, app_identifier: nil, force: true, working_directory: nil)
+    def self.generate_provisioning_profile(params: nil, prov_type: nil, certificate_id: nil, app_identifier: nil, force: true, working_directory: nil, certificate_serial_number: nil)
       require 'sigh/manager'
       require 'sigh/options'
 
@@ -81,6 +81,7 @@ module Match
         username: params[:username],
         force: force,
         cert_id: certificate_id,
+        cert_serial_number: certificate_serial_number,
         provisioning_name: profile_name,
         ignore_profiles_with_different_name: true,
         api_key_path: params[:api_key_path],

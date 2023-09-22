@@ -142,5 +142,19 @@ describe FastlaneCore do
         end
       end
     end
+
+    describe 'certificate_key_match' do
+      it 'should return true if the certificate and key match' do
+        cert_path = File.join(__dir__, "fixtures/signing/certificates/Certificate.cer")
+        key_path = File.join(__dir__, "fixtures/signing/certificates/PrivateKey.p12")
+        expect(FastlaneCore::CertChecker.certificate_key_match?(cert_path, key_path)).to eq(true)
+      end
+
+      it 'should return false if the certificate and key do not match' do
+        cert_path = File.join(__dir__, "fixtures/signing/certificates/OtherCertificate.cer")
+        key_path = File.join(__dir__, "fixtures/signing/certificates/PrivateKey.p12")
+        expect(FastlaneCore::CertChecker.certificate_key_match?(cert_path, key_path)).to eq(false)
+      end
+    end
   end
 end

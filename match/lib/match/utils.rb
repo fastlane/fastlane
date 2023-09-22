@@ -35,6 +35,10 @@ module Match
       (base_environment_variable_name(app_identifier: app_identifier, type: type, platform: platform) + ["certificate-name"]).join("_")
     end
 
+    def self.environment_variable_name_certificate_serial_number(app_identifier: nil, type: nil, platform: :ios)
+      (base_environment_variable_name(app_identifier: app_identifier, type: type, platform: platform) + ["certificate-serial-number"]).join("_")
+    end
+
     def self.get_cert_info(cer_certificate)
       # can receive a certificate path or the file data
       begin
@@ -46,6 +50,7 @@ module Match
       end
 
       cert = OpenSSL::X509::Certificate.new(cer_certificate)
+      our_cert = FastlaneCore::Certificate.parse(cer_certificate)
 
       # openssl output:
       # subject= /UID={User ID}/CN={Certificate Name}/OU={Certificate User}/O={Organisation}/C={Country}
@@ -58,7 +63,8 @@ module Match
            'O' => 'Organisation',
            'C' => 'Country',
            'notBefore' => 'Start Datetime',
-           'notAfter' => 'End Datetime'
+           'notAfter' => 'End Datetime',
+           'serialNumber' => 'Serial Number'
        }
 
       return out_array.map { |x| x.split(/=+/) if x.include?("=") }
@@ -66,6 +72,7 @@ module Match
                       .map { |k, v| [openssl_keys_to_readable_keys.fetch(k, k), v] }
                       .push([openssl_keys_to_readable_keys.fetch("notBefore"), cert.not_before])
                       .push([openssl_keys_to_readable_keys.fetch("notAfter"), cert.not_after])
+                      .push([openssl_keys_to_readable_keys.fetch("serialNumber"), our_cert["SerialNumber"]])
     rescue => ex
       UI.error("get_cert_info: #{ex}")
       return {}

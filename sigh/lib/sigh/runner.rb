@@ -308,6 +308,10 @@ module Sigh
 
       # Filter them
       certificates = certificates.find_all do |c|
+        if Sigh.config[:cert_serial_number]
+          next unless c.serial_number == Sigh.config[:cert_serial_number].strip
+        end
+
         if Sigh.config[:cert_id]
           next unless c.id == Sigh.config[:cert_id].strip
         end
@@ -346,6 +350,7 @@ module Sigh
         filters = ""
         filters << "Owner Name: '#{Sigh.config[:cert_owner_name]}' " if Sigh.config[:cert_owner_name]
         filters << "Certificate ID: '#{Sigh.config[:cert_id]}' " if Sigh.config[:cert_id]
+        filters << "Certificate Serial Number: '#{Sigh.config[:cert_serial_number]}' " if Sigh.config[:cert_serial_number]
         UI.important("No certificates for filter: #{filters}") if filters.length > 0
         message = "Could not find a matching code signing identity for type '#{profile_type_pretty_type}'. "
         message += "It is recommended to use match to manage code signing for you, more information on https://codesigning.guide. "

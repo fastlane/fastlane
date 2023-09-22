@@ -34,7 +34,8 @@ module Match
         Utils.environment_variable_name_profile_name(app_identifier: app_identifier, type: type, platform: platform) => "Profile Name",
         Utils.environment_variable_name_profile_path(app_identifier: app_identifier, type: type, platform: platform) => "Profile Path",
         Utils.environment_variable_name_team_id(app_identifier: app_identifier, type: type, platform: platform) => "Development Team ID",
-        Utils.environment_variable_name_certificate_name(app_identifier: app_identifier, type: type, platform: platform) => "Certificate Name"
+        Utils.environment_variable_name_certificate_name(app_identifier: app_identifier, type: type, platform: platform) => "Certificate Name",
+        Utils.environment_variable_name_certificate_serial_number(app_identifier: app_identifier, type: type, platform: platform) => "Certificate Serial Number"
       }.each do |env_key, name|
         rows << [name, env_key, ENV[env_key]]
       end
