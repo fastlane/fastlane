@@ -13,6 +13,7 @@ describe Spaceship::ConnectAPI::APIClient do
       let(:one_filter) { { build: "123" } }
       let(:two_filters) { { build: "123", app: "321" } }
       let(:includes) { "model.attribute" }
+      let(:fields) { { a: 'aField', b: 'bField1,bField2' } }
       let(:limit) { "30" }
       let(:sort) { "asc" }
 
@@ -47,6 +48,13 @@ describe Spaceship::ConnectAPI::APIClient do
         })
       end
 
+      it 'builds params with fields' do
+        params = client.build_params(fields: fields)
+        expect(params).to eq({
+          fields: fields
+        })
+      end
+
       it 'builds params with limit' do
         params = client.build_params(limit: limit)
         expect(params).to eq({
@@ -61,11 +69,12 @@ describe Spaceship::ConnectAPI::APIClient do
         })
       end
 
-      it 'builds params with one filter, includes, limit, and sort' do
-        params = client.build_params(filter: one_filter, includes: includes, limit: limit, sort: sort)
+      it 'builds params with one filter, includes, fields, limit, and sort' do
+        params = client.build_params(filter: one_filter, includes: includes, fields: fields, limit: limit, sort: sort)
         expect(params).to eq({
           filter: one_filter,
           include: includes,
+          fields: fields,
           limit: limit,
           sort: sort
         })
