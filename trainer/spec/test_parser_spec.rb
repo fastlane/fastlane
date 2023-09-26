@@ -205,6 +205,7 @@ describe Trainer do
         test_failures = tp.data.last[:tests].select { |t| t[:failures] }
         failure_messages = test_failures.map { |tf| tf[:failures].first[:failure_message] }
         expect(failure_messages).to eq(["XCTAssertTrue failed", "XCTAssertTrue failed"])
+        RSpec::Mocks.space.proxy_for(Trainer::XCResult::TestFailureIssueSummary).reset
       end
     end
   end
