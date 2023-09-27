@@ -26,8 +26,8 @@ module Fastlane
 
       def self.details
         [
-          "Provides a way to have `increment_build_number` be based on the latest build you uploaded to iTC.",
-          "Fetches the most recent build number from TestFlight based on the version number. Provides a way to have `increment_build_number` be based on the latest build you uploaded to iTC."
+          "Fetches the most recent build number from TestFlight based on the version number.",
+          "Provides a way to base `increment_build_number` on the latest build you uploaded to ASC."
         ].join("\n")
       end
 
