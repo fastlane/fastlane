@@ -37,8 +37,7 @@ module FastlaneCore
           end
         end
       end
-      # if somehow $?.exitstatus is nil here, return -1 so it can be treated as an error
-      $?.exitstatus || -1
+      $?.exitstatus
     rescue LoadError
       require 'open3'
       Open3.popen2e(command) do |command_stdin, command_stdout, p| # note the inversion

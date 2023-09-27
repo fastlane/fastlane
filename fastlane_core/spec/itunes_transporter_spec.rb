@@ -1396,4 +1396,18 @@ describe FastlaneCore do
       end
     end
   end
+
+  describe FastlaneCore::AltoolTransporterExecutor do
+    let(:upload_cmd) { "xcrun altool --upload-app --apiKey #{api_key[:key_id]} --apiIssuer #{api_key[:issuer_id]} -t macos -f /tmp/my.app.id.itmsp -k 100000" }
+
+    describe "#execute" do
+      it "reverts to -1 exit code if altool exits early with no exit code" do
+        # remove test behavior, we actually want FastlanePty.spawn to be called here
+        allow(FastlaneCore::Helper).to receive(:test?).and_return(false)
+        # force the nil return of FastlanePty.spawn
+        allow(FastlaneCore::FastlanePty).to receive(:spawn).and_return(nil)
+        expect(described_class.new.execute(upload_cmd, false)).to eq(false)
+      end
+    end
+  end
 end
