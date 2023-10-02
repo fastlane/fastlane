@@ -98,7 +98,8 @@ module Supply
             upload_metadata(language, listing) unless Supply.config[:skip_upload_metadata]
             upload_images(language) unless Supply.config[:skip_upload_images]
             upload_screenshots(language) unless Supply.config[:skip_upload_screenshots]
-            release_notes << upload_changelog(language, version_code) unless Supply.config[:skip_upload_changelogs]
+            changelog = Supply.config[:skip_upload_changelogs] ? nil : upload_changelog(language, version_code)
+            release_notes << changelog unless changelog.nil?
           end
 
           upload_changelogs(release_notes, release, track, track_name) unless release_notes.empty?
@@ -240,10 +241,12 @@ module Supply
         end
       end
 
-      AndroidPublisher::LocalizedText.new(
-        language: language,
-        text: changelog_text
-      )
+      unless changelog_text.empty?
+        AndroidPublisher::LocalizedText.new(
+          language: language,
+          text: changelog_text
+        )
+      end
     end
 
     def upload_changelogs(release_notes, release, track, track_name)
