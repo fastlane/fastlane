@@ -3,6 +3,7 @@
 # A list of devices you want to take the screenshots from
 devices(
   [
+    "iPhone 14 Pro",
     "iPhone 8",
     "iPad Air (4th generation)"
   ]
