@@ -79,8 +79,18 @@ describe Match::CommandsGenerator do
       expect(Match::Storage::GitStorage).to receive(:configure).with({
         git_url: git_url,
         shallow_clone: shallow_clone,
+        skip_docs: false,
         git_branch: git_branch[:branch],
-        clone_branch_directly: git_branch[:clone_branch_directly]
+        clone_branch_directly: git_branch[:clone_branch_directly],
+        git_full_name: nil,
+        git_user_email: nil,
+
+        git_private_key: nil,
+        git_basic_authorization: nil,
+        git_bearer_authorization: nil,
+
+        type: "development",
+        platform: "ios"
       }).and_return(fake_storage)
 
       expect(fake_storage).to receive(:download)
@@ -89,6 +99,8 @@ describe Match::CommandsGenerator do
 
       expect(Match::Encryption).to receive(:for_storage_mode).with("git", {
         git_url: git_url,
+        s3_bucket: nil,
+        s3_skip_encryption: false,
         working_directory: fake_working_directory
       }).and_return(fake_encryption)
 

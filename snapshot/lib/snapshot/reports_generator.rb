@@ -84,6 +84,15 @@ module Snapshot
       {
         # snapshot in Xcode 9 saves screenshots with the SIMULATOR_DEVICE_NAME
         # which includes spaces
+        'iPhone 15 Pro Max' => "iPhone 15 Pro Max",
+        'iPhone 15 Pro' => "iPhone 15 Pro",
+        'iPhone 15 Plus' => "iPhone 15 Plus",
+        'iPhone 15' => "iPhone 15",
+        'iPhone 14 Pro Max' => "iPhone 14 Pro Max",
+        'iPhone 14 Pro' => "iPhone 14 Pro",
+        'iPhone 14 Plus' => "iPhone 14 Plus",
+        'iPhone 14' => "iPhone 14",
+        'iPhone SE (3rd generation)' => "iPhone SE (3rd generation)",
         'iPhone 13 Pro Max' => "iPhone 13 Pro Max",
         'iPhone 13 Pro' => "iPhone 13 Pro",
         'iPhone 13 mini' => "iPhone 13 mini",
@@ -112,9 +121,11 @@ module Snapshot
         'iPhone SE' => "iPhone SE",
         'iPhone 4s' => "iPhone 4s (3.5-Inch)",
         'iPad 2' => 'iPad 2',
+        'iPad Air (5th generation)' => 'iPad Air (5th generation)',
         'iPad Air (3rd generation)' => 'iPad Air (3rd generation)',
         'iPad Air 2' => 'iPad Air 2',
         'iPad Air' => 'iPad Air',
+        'iPad (10th generation)' => 'iPad (10th generation)',
         'iPad (5th generation)' => 'iPad (5th generation)',
         'iPad (7th generation)' => 'iPad (7th generation)',
         'iPad mini 2' => 'iPad mini 2',
@@ -124,8 +135,10 @@ module Snapshot
         'iPad Pro (9.7-inch)' => 'iPad Pro (9.7-inch)',
         'iPad Pro (9.7 inch)' => 'iPad Pro (9.7-inch)', # iOS 10.3.1 simulator
         'iPad Pro (10.5-inch)' => 'iPad Pro (10.5-inch)',
+        'iPad Pro (11-inch) (4th generation)' => 'iPad Pro (11-inch) (4th generation)',
         'iPad Pro (11-inch) (2nd generation)' => 'iPad Pro (11-inch) (2nd generation)',
         'iPad Pro (11-inch)' => 'iPad Pro (11-inch)',
+        'iPad Pro (12.9-inch) (6th generation)' => 'iPad Pro (12.9-inch) (6th generation)',
         'iPad Pro (12.9-inch) (4th generation)' => 'iPad Pro (12.9-inch) (4th generation)',
         'iPad Pro (12.9-inch) (3rd generation)' => 'iPad Pro (12.9-inch) (3rd generation)',
         'iPad Pro (12.9-inch) (2nd generation)' => 'iPad Pro (12.9-inch) (2nd generation)',
@@ -134,12 +147,27 @@ module Snapshot
         'iPad Pro' => 'iPad Pro (12.9-inch)', # iOS 9.3 simulator
         'iPod touch (7th generation)' => 'iPod touch (7th generation)',
         'Apple TV 1080p' => 'Apple TV',
+        'Apple TV 4K (3rd generation)' => 'Apple TV 4K (3rd generation)',
+        'Apple TV 4K (3rd generation) (at 1080p)' => 'Apple TV 4K (3rd generation) (at 1080p)',
         'Apple TV 4K (at 1080p)' => 'Apple TV 4K (at 1080p)',
         'Apple TV 4K' => 'Apple TV 4K',
         'Apple TV' => 'Apple TV',
         'Mac' => 'Mac',
         'Apple Watch Series 5 - 44mm' => 'Apple Watch Series 5 - 44mm',
-        'Apple Watch Series 6 - 44mm' => 'Apple Watch Series 6 - 44mm'
+        'Apple Watch Series 6 - 44mm' => 'Apple Watch Series 6 - 44mm',
+        'Apple Watch Series 5 (40mm)' => 'Apple Watch Series 5 (40mm)',
+        'Apple Watch Series 5 (44mm)' => 'Apple Watch Series 5 (44mm)',
+        'Apple Watch Series 6 (40mm)' => 'Apple Watch Series 6 (40mm)',
+        'Apple Watch Series 6 (44mm)' => 'Apple Watch Series 6 (44mm)',
+        'Apple Watch Series 7 (41mm)' => 'Apple Watch Series 7 (41mm)',
+        'Apple Watch Series 7 (45mm)' => 'Apple Watch Series 7 (45mm)',
+        'Apple Watch Series 8 (41mm)' => 'Apple Watch Series 8 (41mm)',
+        'Apple Watch Series 8 (45mm)' => 'Apple Watch Series 8 (45mm)',
+        'Apple Watch Series 9 (41mm)' => 'Apple Watch Series 9 (41mm)',
+        'Apple Watch Series 9 (45mm)' => 'Apple Watch Series 9 (45mm)',
+        'Apple Watch SE (40mm)' => 'Apple Watch SE (40mm)',
+        'Apple Watch SE (44mm)' => 'Apple Watch SE (44mm)',
+        'Apple Watch Ultra 2 (49mm)' => 'Apple Watch Ultra 2 (49mm)'
       }
     end
 

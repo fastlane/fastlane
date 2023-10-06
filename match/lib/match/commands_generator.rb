@@ -118,16 +118,13 @@ module Match
           params = FastlaneCore::Configuration.create(Match::Options.available_options, options.__hash__)
           params.load_configuration_file("Matchfile")
 
-          storage = Storage.for_mode(params[:storage_mode], {
-            git_url: params[:git_url],
-            shallow_clone: params[:shallow_clone],
-            git_branch: params[:git_branch],
-            clone_branch_directly: params[:clone_branch_directly]
-          })
+          storage = Storage.from_params(params)
           storage.download
 
           encryption = Encryption.for_storage_mode(params[:storage_mode], {
             git_url: params[:git_url],
+            s3_bucket: params[:s3_bucket],
+            s3_skip_encryption: params[:s3_skip_encryption],
             working_directory: storage.working_directory
           })
           encryption.decrypt_files if encryption
