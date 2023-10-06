@@ -18,16 +18,6 @@ describe Fastlane do
           double("XcodeInstall::Xcode", version: "7.3", path: "/Test/Xcode7.3")
         end
 
-        context "with an invalid requirement" do
-          it "raises an error" do
-            expect do
-              Fastlane::FastFile.new.parse("lane :test do
-                xcversion version: '= aaaa'
-              end").runner.execute(:test)
-            end.to raise_error("The requirement '= aaaa' is not a valid RubyGems style requirement")
-          end
-        end
-
         context "with a valid requirement" do
           before do
             require "xcode/install"

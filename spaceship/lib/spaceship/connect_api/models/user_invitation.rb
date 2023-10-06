@@ -1,4 +1,6 @@
 require_relative '../model'
+require_relative 'user'
+
 module Spaceship
   class ConnectAPI
     class UserInvitation
@@ -28,19 +30,7 @@ module Spaceship
         "visibleApps"
       ].join(",")
 
-      module UserRole
-        ADMIN = "ADMIN"
-        FINANCE = "FINANCE"
-        TECHNICAL = "TECHNICAL"
-        SALES = "SALES"
-        MARKETING = "MARKETING"
-        DEVELOPER = "DEVELOPER"
-        ACCOUNT_HOLDER = "ACCOUNT_HOLDER"
-        READ_ONLY = "READ_ONLY"
-        APP_MANAGER = "APP_MANAGER"
-        ACCESS_TO_REPORTS = "ACCESS_TO_REPORTS"
-        CUSTOMER_SUPPORT = "CUSTOMER_SUPPORT"
-      end
+      UserRole = Spaceship::ConnectAPI::User::UserRole
 
       def self.type
         return "userInvitations"
@@ -64,8 +54,8 @@ module Spaceship
       # Create and post user invitation
       # App Store Connect allows for the following combinations of `all_apps_visible` and `visible_app_ids`:
       # - if `all_apps_visible` is `nil`, you don't have to provide values for `visible_app_ids`
-      # - if `all_apps_visible` is true, you must provide values for `visible_app_ids`.
-      # - if `all_apps_visible` is false, you must not provide values for `visible_app_ids`.
+      # - if `all_apps_visible` is false, you must provide values for `visible_app_ids`.
+      # - if `all_apps_visible` is true, you must not provide values for `visible_app_ids`.
       def self.create(client: nil, email: nil, first_name: nil, last_name: nil, roles: [], provisioning_allowed: nil, all_apps_visible: nil, visible_app_ids: [])
         client ||= Spaceship::ConnectAPI
         resp = client.post_user_invitation(

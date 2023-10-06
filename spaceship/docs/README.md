@@ -1,4 +1,4 @@
-# Spaceship Documentation
+# _spaceship_ Documentation
 
 ## API
 

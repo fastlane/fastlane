@@ -31,42 +31,16 @@ module Match
       update_optional_values_depending_on_storage_type(params)
 
       # Choose the right storage and encryption implementations
-      self.storage = Storage.for_mode(params[:storage_mode], {
-        git_url: params[:git_url],
-        shallow_clone: params[:shallow_clone],
-        skip_docs: params[:skip_docs],
-        git_branch: params[:git_branch],
-        git_full_name: params[:git_full_name],
-        git_user_email: params[:git_user_email],
-        clone_branch_directly: params[:clone_branch_directly],
-        git_basic_authorization: params[:git_basic_authorization],
-        git_bearer_authorization: params[:git_bearer_authorization],
-        git_private_key: params[:git_private_key],
-        type: params[:type].to_s,
-        generate_apple_certs: params[:generate_apple_certs],
-        platform: params[:platform].to_s,
-        google_cloud_bucket_name: params[:google_cloud_bucket_name].to_s,
-        google_cloud_keys_file: params[:google_cloud_keys_file].to_s,
-        google_cloud_project_id: params[:google_cloud_project_id].to_s,
-        skip_google_cloud_account_confirmation: params[:skip_google_cloud_account_confirmation],
-        s3_region: params[:s3_region],
-        s3_access_key: params[:s3_access_key],
-        s3_secret_access_key: params[:s3_secret_access_key],
-        s3_bucket: params[:s3_bucket],
-        s3_object_prefix: params[:s3_object_prefix],
-        gitlab_project: params[:gitlab_project],
-        readonly: params[:readonly],
-        username: params[:readonly] ? nil : params[:username], # only pass username if not readonly
-        team_id: params[:team_id],
-        team_name: params[:team_name],
-        api_key_path: params[:api_key_path],
-        api_key: params[:api_key]
-      })
+      storage_params = params
+      storage_params[:username] = params[:readonly] ? nil : params[:username] # only pass username if not readonly
+      self.storage = Storage.from_params(storage_params)
       storage.download
 
       # Init the encryption only after the `storage.download` was called to have the right working directory
       encryption = Encryption.for_storage_mode(params[:storage_mode], {
         git_url: params[:git_url],
+        s3_bucket: params[:s3_bucket],
+        s3_skip_encryption: params[:s3_skip_encryption],
         working_directory: storage.working_directory
       })
       encryption.decrypt_files if encryption
