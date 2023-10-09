@@ -184,16 +184,12 @@ module Trainer
           #     or identifier: "TestThisDude/testFailureJosh2" (when Objective-C)
 
           found_failure = failures.find do |failure|
-            # Clean test_case_name to match identifier format
-            # Sanitize for Swift by replacing "." for "/"
-            # Sanitize for Objective-C by removing "-", "[", "]", and replacing " " for ?/
-            sanitized_test_case_name = failure.test_case_name
-                                              .tr(".", "/")
-                                              .tr("-", "")
-                                              .tr("[", "")
-                                              .tr("]", "")
-                                              .tr(" ", "/")
-            self.identifier == sanitized_test_case_name
+            # Sanitize both test case name and identifier in a consistent fashion, then compare
+            # replace all non-word chars with underscore
+            sanitizer = Proc.new { |name| name.gsub(/\W/, "_") }
+            sanitized_test_case_name = sanitizer.call(failure.test_case_name)
+            sanitized_identifier = sanitizer.call(self.identifier)
+            sanitized_identifier == sanitized_test_case_name
           end
           return found_failure
         else
