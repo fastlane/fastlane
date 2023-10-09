@@ -186,7 +186,7 @@ module Trainer
           found_failure = failures.find do |failure|
             # Sanitize both test case name and identifier in a consistent fashion, then compare
             # replace all non-word chars with underscore
-            sanitizer = Proc.new { |name| name.gsub(/\W/, "_") }
+            sanitizer = proc { |name| name.gsub(/\W/, "_") }
             sanitized_test_case_name = sanitizer.call(failure.test_case_name)
             sanitized_identifier = sanitizer.call(self.identifier)
             sanitized_identifier == sanitized_test_case_name
