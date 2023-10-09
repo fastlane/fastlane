@@ -139,6 +139,7 @@ module Fastlane
           FastlaneCore::ConfigItem.new(key: :password,
                                        env_name: "FL_NEXUS_PASSWORD",
                                        description: "Nexus password",
+                                       sensitive: true,
                                        optional: false),
           FastlaneCore::ConfigItem.new(key: :ssl_verify,
                                        env_name: "FL_NEXUS_SSL_VERIFY",
