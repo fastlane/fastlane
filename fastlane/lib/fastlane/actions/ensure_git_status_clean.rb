@@ -23,7 +23,25 @@ module Fastlane
         # Manual post processing trying to ignore certain file paths
         if (ignore_files = params[:ignore_files])
           repo_status = repo_status.lines.reject do |line|
-            path = line.match(/\s(.*)/)[1]
+            # Extract the file path from the line based on 
+            # https://git-scm.com/docs/git-status#_output
+            
+            # The first two characters indicate the status of the file path (e.g. ' M')
+            # XY PATH
+            path = line&.match(/^.{2}\s(.*)/)&.[](1) || ''
+
+            # If the file path is renamed, the original path is also included in the line (e.g. ' R ORIG_PATH -> PATH')
+            # XY ORIG_PATH -> PATH
+            path = path.split('->').last.strip if path.include?('->')
+
+            # Remove double quotes from the file path
+            path = path.gsub(/"/, '')
+            
+            next if path.empty?  
+            
+            # Remove double quotes from the file path
+            path = path.gsub(/"/, '')
+            
             was_found = ignore_files.include?(path)
 
             UI.message("Ignoring '#{path}'") if was_found
