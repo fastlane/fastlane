@@ -152,7 +152,7 @@ module Gym
                                      optional: true,
                                      verify_block: proc do |value|
                                        av = %w(ios macos)
-                                       UI.user_error!("Unsupported export_method '#{value}', must be: #{av}") unless av.include?(value)
+                                       UI.user_error!("Unsupported catalyst_platform '#{value}', must be: #{av}") unless av.include?(value)
                                      end),
         FastlaneCore::ConfigItem.new(key: :installer_cert_name,
                                      env_name: "GYM_INSTALLER_CERT_NAME",

@@ -209,6 +209,10 @@ describe FastlaneCore do
         expect(@project.ios?).to eq(true)
       end
 
+      it "#multiplatform?", requires_xcode: true do
+        expect(@project.multiplatform?).to eq(false)
+      end
+
       it "#tvos?", requires_xcode: true do
         expect(@project.tvos?).to eq(false)
       end
@@ -250,6 +254,10 @@ describe FastlaneCore do
         expect(@project.tvos?).to eq(false)
       end
 
+      it "#multiplatform?", requires_xcode: true do
+        expect(@project.multiplatform?).to eq(false)
+      end
+
       it "schemes", requires_xcodebuild: true do
         expect(@project.schemes).to eq(["Mac"])
       end
@@ -271,6 +279,10 @@ describe FastlaneCore do
 
       it "#tvos?", requires_xcode: true do
         expect(@project.tvos?).to eq(true)
+      end
+
+      it "#multiplatform?", requires_xcode: true do
+        expect(@project.multiplatform?).to eq(false)
       end
 
       it "schemes", requires_xcodebuild: true do
@@ -298,6 +310,10 @@ describe FastlaneCore do
 
       it "#tvos?", requires_xcode: true do
         expect(@project.tvos?).to eq(true)
+      end
+
+      it "#multiplatform?", requires_xcode: true do
+        expect(@project.multiplatform?).to eq(true)
       end
 
       it "schemes", requires_xcodebuild: true do

@@ -45,7 +45,7 @@ module Fastlane
           @ui.message("\nThe gem name '#{gem_name}' is already taken on RubyGems, please choose a different plugin name.")
         else
           # That's a naming error
-          @ui.message("\nPlugin names can only contain lower case letters, numbers, and underscores")
+          @ui.message("\nPlugin names can only contain lowercase letters, numbers, and underscores")
           @ui.message("and should not contain 'fastlane' or 'plugin'.")
         end
       end
@@ -54,7 +54,7 @@ module Fastlane
     end
 
     def plugin_name_valid?(name)
-      # Only lower case letters, numbers and underscores allowed
+      # Only lowercase letters, numbers and underscores allowed
       /^[a-z0-9_]+$/ =~ name &&
         # Does not contain the words 'fastlane' or 'plugin' since those will become
         # part of the gem name
@@ -79,7 +79,7 @@ module Fastlane
       name = name.to_s.downcase
       fixes = {
         /[\- ]/ => '_', # dashes and spaces become underscores
-        /[^a-z0-9_]/ => '', # anything other than lower case letters, numbers and underscores is removed
+        /[^a-z0-9_]/ => '', # anything other than lowercase letters, numbers and underscores is removed
         /fastlane[_]?/ => '', # 'fastlane' or 'fastlane_' is removed
         /plugin[_]?/ => '' # 'plugin' or 'plugin_' is removed
       }

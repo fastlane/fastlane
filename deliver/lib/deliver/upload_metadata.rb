@@ -89,7 +89,8 @@ module Deliver
       enabled_languages = detect_languages(options)
 
       app_store_version_localizations = verify_available_version_languages!(options, app, enabled_languages) unless options[:edit_live]
-      app_info_localizations = verify_available_info_languages!(options, app, enabled_languages) unless options[:edit_live]
+      app_info = fetch_edit_app_info(app)
+      app_info_localizations = verify_available_info_languages!(options, app, app_info, enabled_languages) unless options[:edit_live] || !updating_localized_app_info?(options, app, app_info)
 
       if options[:edit_live]
         # not all values are editable when using live_version
@@ -211,18 +212,19 @@ module Deliver
       store_version_worker.start
 
       # Update app info localizations
-      app_info_worker = FastlaneCore::QueueWorker.new do |app_info_localization|
-        attributes = localized_info_attributes_by_locale[app_info_localization.locale]
-        if attributes
-          UI.message("Uploading metadata to App Store Connect for localized info '#{app_info_localization.locale}'")
-          app_info_localization.update(attributes: attributes)
+      if app_info_localizations
+        app_info_worker = FastlaneCore::QueueWorker.new do |app_info_localization|
+          attributes = localized_info_attributes_by_locale[app_info_localization.locale]
+          if attributes
+            UI.message("Uploading metadata to App Store Connect for localized info '#{app_info_localization.locale}'")
+            app_info_localization.update(attributes: attributes)
+          end
         end
+        app_info_worker.batch_enqueue(app_info_localizations)
+        app_info_worker.start
       end
-      app_info_worker.batch_enqueue(app_info_localizations)
-      app_info_worker.start
 
       # Update categories
-      app_info = fetch_edit_app_info(app)
       if app_info
         category_id_map = {}
 
@@ -437,6 +439,12 @@ module Deliver
       end
     end
 
+    def fetch_live_app_info(app, wait_time: 10)
+      retry_if_nil("Cannot find live app info", wait_time: wait_time) do
+        app.fetch_live_app_info
+      end
+    end
+
     def retry_if_nil(message, tries: 5, wait_time: 10)
       loop do
         tries -= 1
@@ -451,12 +459,49 @@ module Deliver
       end
     end
 
-    # Finding languages to enable
-    def verify_available_info_languages!(options, app, languages)
-      app_info = fetch_edit_app_info(app)
-
+    # Checking if the metadata to update includes localised App Info
+    def updating_localized_app_info?(options, app, app_info)
+      app_info ||= fetch_live_app_info(app)
       unless app_info
-        UI.user_error!("Cannot update languages - could not find an editable info")
+        UI.important("Can't find edit or live App info. Skipping upload.")
+        return false
+      end
+      localizations = app_info.get_app_info_localizations
+
+      LOCALISED_APP_VALUES.keys.each do |key|
+        current = options[key]
+        next unless current
+
+        unless current.kind_of?(Hash)
+          UI.error("Error with provided '#{key}'. Must be a hash, the key being the language.")
+          next
+        end
+
+        current.each do |language, value|
+          strip_value = value.to_s.strip
+          next if strip_value.empty?
+
+          app_info_locale = localizations.find { |l| l.locale == language }
+          next if app_info_locale.nil?
+
+          begin
+            current_value = app_info_locale.public_send(key.to_sym)
+          rescue NoMethodError
+            next
+          end
+
+          return true if current_value != strip_value
+        end
+      end
+
+      UI.message('No changes to localized App Info detected. Skipping upload.')
+      return false
+    end
+
+    # Finding languages to enable
+    def verify_available_info_languages!(options, app, app_info, languages)
+      unless app_info
+        UI.user_error!("Cannot update languages - could not find an editable 'App Info'. Verify that your app is in one of the editable states in App Store Connect")
         return
       end
 

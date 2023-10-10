@@ -69,9 +69,9 @@ module Spaceship
       # API
       #
 
-      def self.all(client: nil, filter: {}, includes: nil, limit: nil, sort: nil)
+      def self.all(client: nil, filter: {}, includes: nil, fields: nil, limit: nil, sort: nil)
         client ||= Spaceship::ConnectAPI
-        resps = client.get_profiles(filter: filter, includes: includes).all_pages
+        resps = client.get_profiles(filter: filter, includes: includes, fields: fields, limit: limit, sort: sort).all_pages
         return resps.flat_map(&:to_models)
       end
 

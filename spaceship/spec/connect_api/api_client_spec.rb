@@ -13,6 +13,7 @@ describe Spaceship::ConnectAPI::APIClient do
       let(:one_filter) { { build: "123" } }
       let(:two_filters) { { build: "123", app: "321" } }
       let(:includes) { "model.attribute" }
+      let(:fields) { { a: 'aField', b: 'bField1,bField2' } }
       let(:limit) { "30" }
       let(:sort) { "asc" }
 
@@ -47,6 +48,13 @@ describe Spaceship::ConnectAPI::APIClient do
         })
       end
 
+      it 'builds params with fields' do
+        params = client.build_params(fields: fields)
+        expect(params).to eq({
+          fields: fields
+        })
+      end
+
       it 'builds params with limit' do
         params = client.build_params(limit: limit)
         expect(params).to eq({
@@ -61,11 +69,12 @@ describe Spaceship::ConnectAPI::APIClient do
         })
       end
 
-      it 'builds params with one filter, includes, limit, and sort' do
-        params = client.build_params(filter: one_filter, includes: includes, limit: limit, sort: sort)
+      it 'builds params with one filter, includes, fields, limit, and sort' do
+        params = client.build_params(filter: one_filter, includes: includes, fields: fields, limit: limit, sort: sort)
         expect(params).to eq({
           filter: one_filter,
           include: includes,
+          fields: fields,
           limit: limit,
           sort: sort
         })
@@ -125,6 +134,31 @@ describe Spaceship::ConnectAPI::APIClient do
       expect do
         client.get('')
       end.to raise_error(Spaceship::AccessForbiddenError)
+    end
+
+    describe 'with_retry' do
+      it 'sleeps on 429' do
+        stub_request(:get, client.hostname).
+          to_return(status: 429).then.
+          to_return(status: 200, body: "")
+
+        expect(Kernel).to receive(:sleep).once.with(1)
+        expect(client).to receive(:handle_response).once
+        expect(client).to receive(:request).twice.and_call_original
+        expect do
+          client.get('')
+        end.to_not(raise_error)
+      end
+
+      it 'sleeps until limit is reached on 429' do
+        body = JSON.generate({ "errors": [{ "title": "The request rate limit has been reached.", "details": "We've received too many requests for this API. Please wait and try again or slow down your request rate." }] })
+        stub_client_request(client.hostname, 429, body)
+
+        expect(Kernel).to receive(:sleep).exactly(12).times
+        expect do
+          client.get('')
+        end.to raise_error(Spaceship::ConnectAPI::APIClient::TooManyRequestsError, "Too many requests, giving up after backing off for > 3600 seconds.")
+      end
     end
   end
 

@@ -10,7 +10,8 @@
         "publicLinkId" : "abcd1234",
         "publicLinkLimitEnabled" : false,
         "publicLinkLimit" : 10000,
-        "publicLink" : "https://testflight.apple.com/join/abcd1234"
+        "publicLink" : "https://testflight.apple.com/join/abcd1234",
+        "hasAccessToAllBuilds" : null
       }
     }
 }
