@@ -23,7 +23,7 @@ module Fastlane
         # Manual post processing trying to ignore certain file paths
         if (ignore_files = params[:ignore_files])
           repo_status = repo_status.lines.reject do |line|
-            path = line.split(' ').last
+            path = line.match(/\s(.*)/)[1]
             was_found = ignore_files.include?(path)
 
             UI.message("Ignoring '#{path}'") if was_found

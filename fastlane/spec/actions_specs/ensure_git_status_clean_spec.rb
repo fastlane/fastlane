@@ -39,6 +39,17 @@ describe Fastlane do
             end").runner.execute(:test)
           end
 
+          it "outputs success message when a file path contains spaces" do
+            allow(Fastlane::Actions).to receive(:sh).with("git status --porcelain", log: false).and_return("M fastlane/spec/fixtures/git_commit/A FILE WITH SPACE")
+
+            expect(FastlaneCore::UI).to receive(:success).with("Git status is clean, all good! 💪")
+            Fastlane::FastFile.new.parse("lane :test do
+              ensure_git_status_clean(
+                ignore_files: ['fastlane/spec/fixtures/git_commit/A FILE WITH SPACE']
+              )
+            end").runner.execute(:test)
+          end
+
           it "outputs rich error message" do
             expect(FastlaneCore::UI).to receive(:user_error!).with("Git repository is dirty! Please ensure the repo is in a clean state by committing/stashing/discarding all changes first.")
             Fastlane::FastFile.new.parse("lane :test do
