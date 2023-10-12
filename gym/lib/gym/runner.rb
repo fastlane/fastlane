@@ -15,21 +15,16 @@ module Gym
     # @return (String) The path to the resulting ipa
     def run
       unless Gym.config[:skip_build_archive]
-        UI.message("Executing build command.")
         build_app
-        UI.message("Completed build command.")
       end
       verify_archive unless Gym.config[:skip_archive]
-      UI.message("Skip archive is: #{Gym.config[:skip_archive]}.")
 
       return nil if Gym.config[:skip_archive]
 
       FileUtils.mkdir_p(File.expand_path(Gym.config[:output_directory]))
 
-      UI.message("Evaluating build....")
       # Archive
       if Gym.building_for_ios?
-        UI.message("Build for iOS!")
         fix_generic_archive unless Gym.project.watchos? # See https://github.com/fastlane/fastlane/pull/4325
         return BuildCommandGenerator.archive_path if Gym.config[:skip_package_ipa]
 
@@ -61,7 +56,6 @@ module Gym
         end
         copy_files_from_path(File.join(BuildCommandGenerator.archive_path, "Products/usr/local/bin/*")) if Gym.project.command_line_tool?
       end
-      UI.message("Returning path: #{path}")
       return path
     end
     # rubocop:enable Metrics/PerceivedComplexity
