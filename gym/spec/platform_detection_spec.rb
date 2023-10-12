@@ -29,12 +29,17 @@ describe Gym do
     options = { project: "./gym/examples/visionos/VisionExample.xcodeproj", sdk: "xros", skip_package_dependencies_resolution: true }
     Gym.config = FastlaneCore::Configuration.create(Gym::Options.available_options, options)
 
-    expect(Gym.project.multiplatform?).to eq(false)
-    expect(Gym.project.visionos?).to eq(true)
-    expect(Gym.project.ios?).to eq(false)
+    if FastlaneCore::Helper.xcode_at_least?('15.0')
+      expect(Gym.project.multiplatform?).to eq(false)
+      expect(Gym.project.visionos?).to eq(true)
+      expect(Gym.project.ios?).to eq(false)
 
-    expect(Gym.building_for_ios?).to eq(true)
-    expect(Gym.building_for_mac?).to eq(false)
-    expect(Gym.building_multiplatform_for_mac?).to eq(false)
+      expect(Gym.building_for_ios?).to eq(true)
+      expect(Gym.building_for_mac?).to eq(false)
+      expect(Gym.building_multiplatform_for_mac?).to eq(false)
+    else
+      UI.important("Skipping test for older xcode versions.")
+      expect(Gym.project.ios?).to eq(true)
+    end
   end
 end
