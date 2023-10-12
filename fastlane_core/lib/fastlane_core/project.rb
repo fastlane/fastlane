@@ -307,6 +307,10 @@ module FastlaneCore
       supported_platforms.include?(:watchOS)
     end
 
+    def visionos?
+      supported_platforms.include?(:visionOS)
+    end
+
     def multiplatform?
       supported_platforms.count > 1
     end
@@ -323,6 +327,7 @@ module FastlaneCore
         when "iphonesimulator", "iphoneos" then :iOS
         when "watchsimulator", "watchos" then :watchOS
         when "appletvsimulator", "appletvos" then :tvOS
+        when "xros", "xrsimulator" then :visionOS
         end
       end.uniq.compact
     end
