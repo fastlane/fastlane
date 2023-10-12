@@ -39,7 +39,7 @@
 		E12346312AD8389A0010D449 = {
 			isa = PBXGroup;
 			children = (
-				E123463C2AD8389A0010D449 /* Vision Example */,
+				E123463C2AD8389A0010D449 /* VisionExample */,
 				E123463D2AD8389B0010D449 /* Packages */,
 				E123463B2AD8389A0010D449 /* Products */,
 			);
@@ -53,7 +53,7 @@
 			name = Products;
 			sourceTree = "<group>";
 		};
-		E123463C2AD8389A0010D449 /* Vision Example */ = {
+		E123463C2AD8389A0010D449 /* VisionExample */ = {
 			isa = PBXGroup;
 			children = (
 				E12346412AD8389B0010D449 /* Vision_ExampleApp.swift */,
@@ -62,7 +62,7 @@
 				E123464A2AD838A00010D449 /* Info.plist */,
 				E12346472AD838A00010D449 /* Preview Content */,
 			);
-			path = "Vision Example";
+			path = VisionExample;
 			sourceTree = "<group>";
 		};
 		E123463D2AD8389B0010D449 /* Packages */ = {
@@ -119,7 +119,7 @@
 					};
 				};
 			};
-			buildConfigurationList = E12346352AD8389A0010D449 /* Build configuration list for PBXProject "Vision Example" */;
+			buildConfigurationList = E12346352AD8389A0010D449 /* Build configuration list for PBXProject "VisionExample" */;
 			compatibilityVersion = "Xcode 14.0";
 			developmentRegion = en;
 			hasScannedForEncodings = 0;
@@ -299,7 +299,7 @@
 				MARKETING_VERSION = 1.0;
 				PRODUCT_BUNDLE_IDENTIFIER = "com.pppinki.Vision-Example";
 				PRODUCT_NAME = "$(TARGET_NAME)";
-				SUPPORTED_PLATFORMS = "xros xrsimulator";
+				SUPPORTED_PLATFORMS = "xrsimulator xros";
 				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2,7";
@@ -324,7 +324,7 @@
 				MARKETING_VERSION = 1.0;
 				PRODUCT_BUNDLE_IDENTIFIER = "com.pppinki.Vision-Example";
 				PRODUCT_NAME = "$(TARGET_NAME)";
-				SUPPORTED_PLATFORMS = "xros xrsimulator";
+				SUPPORTED_PLATFORMS = "xrsimulator xros";
 				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2,7";
@@ -334,7 +334,7 @@
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
-		E12346352AD8389A0010D449 /* Build configuration list for PBXProject "Vision Example" */ = {
+		E12346352AD8389A0010D449 /* Build configuration list for PBXProject "VisionExample" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				E123464B2AD838A00010D449 /* Debug */,
