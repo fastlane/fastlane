@@ -15,7 +15,7 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
-		E123463A2AD8389A0010D449 /* Vision Example.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "Vision Example.app"; sourceTree = BUILT_PRODUCTS_DIR; };
+		E123463A2AD8389A0010D449 /* VisionExample.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = VisionExample.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		E123463E2AD8389B0010D449 /* RealityKitContent */ = {isa = PBXFileReference; lastKnownFileType = wrapper; path = RealityKitContent; sourceTree = "<group>"; };
 		E12346412AD8389B0010D449 /* Vision_ExampleApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Vision_ExampleApp.swift; sourceTree = "<group>"; };
 		E12346432AD8389B0010D449 /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
@@ -48,7 +48,7 @@
 		E123463B2AD8389A0010D449 /* Products */ = {
 			isa = PBXGroup;
 			children = (
-				E123463A2AD8389A0010D449 /* Vision Example.app */,
+				E123463A2AD8389A0010D449 /* VisionExample.app */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -84,9 +84,9 @@
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
-		E12346392AD8389A0010D449 /* Vision Example */ = {
+		E12346392AD8389A0010D449 /* VisionExample */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = E123464D2AD838A00010D449 /* Build configuration list for PBXNativeTarget "Vision Example" */;
+			buildConfigurationList = E123464D2AD838A00010D449 /* Build configuration list for PBXNativeTarget "VisionExample" */;
 			buildPhases = (
 				E12346362AD8389A0010D449 /* Sources */,
 				E12346372AD8389A0010D449 /* Frameworks */,
@@ -96,12 +96,12 @@
 			);
 			dependencies = (
 			);
-			name = "Vision Example";
+			name = VisionExample;
 			packageProductDependencies = (
 				E123463F2AD8389B0010D449 /* RealityKitContent */,
 			);
 			productName = "Vision Example";
-			productReference = E123463A2AD8389A0010D449 /* Vision Example.app */;
+			productReference = E123463A2AD8389A0010D449 /* VisionExample.app */;
 			productType = "com.apple.product-type.application";
 		};
 /* End PBXNativeTarget section */
@@ -132,7 +132,7 @@
 			projectDirPath = "";
 			projectRoot = "";
 			targets = (
-				E12346392AD8389A0010D449 /* Vision Example */,
+				E12346392AD8389A0010D449 /* VisionExample */,
 			);
 		};
 /* End PBXProject section */
@@ -219,6 +219,7 @@
 				MTL_FAST_MATH = YES;
 				ONLY_ACTIVE_ARCH = YES;
 				SDKROOT = xros;
+				SUPPORTED_PLATFORMS = "xrsimulator xros";
 				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "DEBUG $(inherited)";
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
 				XROS_DEPLOYMENT_TARGET = 1.0;
@@ -275,6 +276,7 @@
 				MTL_ENABLE_DEBUG_INFO = NO;
 				MTL_FAST_MATH = YES;
 				SDKROOT = xros;
+				SUPPORTED_PLATFORMS = "xrsimulator xros";
 				SWIFT_COMPILATION_MODE = wholemodule;
 				VALIDATE_PRODUCT = YES;
 				XROS_DEPLOYMENT_TARGET = 1.0;
@@ -343,7 +345,7 @@
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
-		E123464D2AD838A00010D449 /* Build configuration list for PBXNativeTarget "Vision Example" */ = {
+		E123464D2AD838A00010D449 /* Build configuration list for PBXNativeTarget "VisionExample" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				E123464E2AD838A00010D449 /* Debug */,

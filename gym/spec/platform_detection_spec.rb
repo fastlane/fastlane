@@ -26,12 +26,12 @@ describe Gym do
   end
 
   it "detects the correct platform for a visionOS project", requires_xcodebuild: true do
-    options = { project: "./gym/examples/visionos/VisionExample.xcodeproj", sdk: "xros" }
+    options = { project: "./gym/examples/visionos/VisionExample.xcodeproj", sdk: "xros", skip_package_dependencies_resolution: true }
     Gym.config = FastlaneCore::Configuration.create(Gym::Options.available_options, options)
 
     expect(Gym.project.multiplatform?).to eq(false)
-    expect(Gym.project.ios?).to eq(false)
     expect(Gym.project.visionos?).to eq(true)
+    expect(Gym.project.ios?).to eq(false)
 
     expect(Gym.building_for_ios?).to eq(true)
     expect(Gym.building_for_mac?).to eq(false)
