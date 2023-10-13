@@ -27,8 +27,8 @@ module Gym
 
     def building_for_ios?
       if Gym.project.mac?
-        # Can be building for iOS if mac project and catalyst
-        return building_mac_catalyst_for_ios?
+        # Can be building for iOS if mac project and catalyst or multiplatform and set to iOS
+        return building_mac_catalyst_for_ios? || building_multiplatform_for_ios?
       else
         # Can be iOS project and build for mac if catalyst
         return false if building_mac_catalyst_for_mac?
@@ -43,6 +43,9 @@ module Gym
         # Can be a mac project and not build mac if catalyst
         return building_mac_catalyst_for_mac?
       else
+        # Can be mac project but multiplatform and building for iOS
+        return false if building_multiplatform_for_ios?
+
         return Gym.project.mac?
       end
     end
@@ -53,6 +56,14 @@ module Gym
 
     def building_mac_catalyst_for_mac?
       Gym.project.supports_mac_catalyst? && Gym.config[:catalyst_platform] == "macos"
+    end
+
+    def building_multiplatform_for_ios?
+      Gym.project.multiplatform? && Gym.project.ios? && (Gym.config[:sdk] == "iphoneos" || Gym.config[:sdk] == "iphonesimulator")
+    end
+
+    def building_multiplatform_for_mac?
+      Gym.project.multiplatform? && Gym.project.mac? && Gym.config[:sdk] == "macosx"
     end
 
     def export_destination_upload?

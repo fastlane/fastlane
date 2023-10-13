@@ -484,7 +484,11 @@ module Deliver
           app_info_locale = localizations.find { |l| l.locale == language }
           next if app_info_locale.nil?
 
-          current_value = app_info_locale.public_send(key.to_sym)
+          begin
+            current_value = app_info_locale.public_send(key.to_sym)
+          rescue NoMethodError
+            next
+          end
 
           return true if current_value != strip_value
         end
