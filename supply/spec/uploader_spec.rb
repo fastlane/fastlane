@@ -203,11 +203,10 @@ describe Supply do
       end
     end
 
-    RSpec::Matchers.define(:same_localizedtext_as) do |expected_arr|
-      match do |actual_arr|
-        actual_arr.sort_by(&:language).zip(expected_arr.sort_by(&:language)).map do |actual_localization, expected_localization|
-          actual_localization.language == expected_localization.language && actual_localization.text == expected_localization.text
-        end.reduce(:&)
+    # add basic == functionality to LocalizedText class for testing purpose
+    class AndroidPublisher::LocalizedText
+      def ==(other)
+        self.language == other.language && self.text == other.text
       end
     end
 
@@ -243,7 +242,7 @@ describe Supply do
             )
           end
           # check if at least one of the assignments of release_notes is what we expect
-          expect(release).to receive(:release_notes=).with(same_localizedtext_as(expected_notes))
+          expect(release).to receive(:release_notes=).with(match_array(expected_notes))
           # check if the listings are updated for each language with text data from disk
           languages.each do |lang|
             expect(client).to receive(:update_listing_for_language).with({ language: lang, full_description: "#{lang} full description", short_description: "#{lang} short description", title: "#{lang} title", video: "#{lang} video" })
