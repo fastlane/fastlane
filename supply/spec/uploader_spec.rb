@@ -203,23 +203,59 @@ describe Supply do
       end
     end
 
-    describe '#perform_upload' do
+    # add basic == functionality to LocalizedText class for testing purpose
+    class AndroidPublisher::LocalizedText
+      def ==(other)
+        self.language == other.language && self.text == other.text
+      end
+    end
+
+    shared_examples 'run supply to upload metadata' do |version_codes:, with_explicit_changelogs:|
+      let(:languages) { ['en-US', 'fr-FR', 'ja-JP'] }
+      subject(:release) { double('release', version_codes: version_codes) }
       let(:client) { double('client') }
-      let(:config) { { apk: 'some/path/app.apk' } }
+      let(:config) { { apk_paths: version_codes.map { |v_code| "some/path/app-v#{v_code}.apk" }, metadata_path: 'supply/spec/fixtures/metadata/android', track: 'track-name' } }
 
       before do
         Supply.config = config
         allow(Supply::Client).to receive(:make_from_config).and_return(client)
-        allow(client).to receive(:upload_apk).with(config[:apk]).and_return(1) # newly uploaded version code
+        version_codes.each do |version_code|
+          allow(client).to receive(:upload_apk).with("some/path/app-v#{version_code}.apk").and_return(version_code) # newly uploaded version code
+        end
+        allow(client).to receive(:upload_changelogs).and_return(nil)
+        allow(client).to receive(:tracks).with('track-name').and_return([double('tracks', releases: [ release ])])
+        languages.each do |lang|
+          allow(client).to receive(:listing_for_language).with(lang).and_return(Supply::Listing.new(client, lang))
+        end
         allow(client).to receive(:begin_edit).and_return(nil)
         allow(client).to receive(:commit_current_edit!).and_return(nil)
       end
 
-      it 'should update track with correct version codes' do
+      it 'should update track with correct version codes and optional changelog' do
         uploader = Supply::Uploader.new
-        expect(uploader).to receive(:update_track).with([1]).once
+        expect(uploader).to receive(:update_track).with(version_codes).once
+        version_codes.each do |version_code|
+          expected_notes = languages.map do |lang|
+            AndroidPublisher::LocalizedText.new(
+              language: lang,
+              text: "#{lang} changelog #{with_explicit_changelogs ? version_code : -1}"
+            )
+          end.uniq
+          # check if at least one of the assignments of release_notes is what we expect
+          expect(release).to receive(:release_notes=).with(match_array(expected_notes))
+          # check if the listings are updated for each language with text data from disk
+          languages.each do |lang|
+            expect(client).to receive(:update_listing_for_language).with({ language: lang, full_description: "#{lang} full description", short_description: "#{lang} short description", title: "#{lang} title", video: "#{lang} video" })
+          end
+        end
+
         uploader.perform_upload
       end
+    end
+
+    describe '#peform_upload with metadata' do
+      it_behaves_like 'run supply to upload metadata', version_codes: [1, 2], with_explicit_changelogs: true
+      it_behaves_like 'run supply to upload metadata', version_codes: [3], with_explicit_changelogs: false
     end
 
     context 'when sync_image_upload is set' do
