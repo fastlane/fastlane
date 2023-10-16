@@ -240,7 +240,7 @@ describe Supply do
               language: lang,
               text: "#{lang} changelog #{with_explicit_changelogs ? version_code : -1}"
             )
-          end
+          end.uniq
           # check if at least one of the assignments of release_notes is what we expect
           expect(release).to receive(:release_notes=).with(match_array(expected_notes))
           # check if the listings are updated for each language with text data from disk
