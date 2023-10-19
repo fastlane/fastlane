@@ -84,7 +84,7 @@ describe Fastlane do
           end.to raise_error(ArgumentError, "missing keywords: #{keywords_list(%i[name version])}")
         end
 
-        it 'fails when calling the lane with missing parameters' do
+        it 'fails when calling the lane with some missing parameters' do
           expect do
             @ff.runner.execute(:lane_kw_params, :ios, { name: 'test', interactive: true })
           end.to raise_error(ArgumentError, "missing keyword: #{keywords_list(%i[version])}")
@@ -97,17 +97,17 @@ describe Fastlane do
         end
 
         it 'takes all parameters into account when all are passed explicitly' do
-          result = @ff.runner.execute(:lane_kw_params, :ios, { name: 'test', version: "12.3", interactive: true })
-          expect(result).to eq('name: "test"; version: "12.3"; interactive: true')
+          result = @ff.runner.execute(:lane_kw_params, :ios, { name: 'test', version: "12.3", interactive: false })
+          expect(result).to eq('name: "test"; version: "12.3"; interactive: false')
         end
 
-        it 'use default values of parameters not provided explicitly' do
+        it 'uses default values of parameters not provided explicitly' do
           result = @ff.runner.execute(:lane_kw_params, :ios, { name: 'test', version: "12.3" })
           expect(result).to eq('name: "test"; version: "12.3"; interactive: true')
         end
 
         it 'allows parameters to be provided in arbitrary order' do
-          result = @ff.runner.execute(:lane_kw_params, :ios, { version: "12.3", name: 'test', interactive: true })
+          result = @ff.runner.execute(:lane_kw_params, :ios, { version: "12.3", interactive: true, name: 'test' })
           expect(result).to eq('name: "test"; version: "12.3"; interactive: true')
         end
       end
