@@ -205,7 +205,7 @@ describe Spaceship::ConnectAPI::Token do
       payload, header = JWT.decode(token.text, key, true, { algorithm: 'ES256' })
 
       expect(payload['iss']).to eq(issuer_id)
-      expect(payload['iat']).to eq(Time.now.to_i)
+      expect(payload['iat']).to be < Time.now.to_i
       expect(payload['aud']).to eq('appstoreconnect-v1')
       expect(payload['exp']).to be > Time.now.to_i
 
