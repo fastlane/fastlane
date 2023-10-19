@@ -1,6 +1,5 @@
 require 'credentials_manager'
 
-
 module Fastlane
   module Actions
     class RegisterDevicesAction < Action
