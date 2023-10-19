@@ -68,24 +68,32 @@ describe Fastlane do
         end
       end
 
-
       context 'when a lane expects its parameters as keywords' do
+        def keywords_list(list)
+          # The way keyword lists appear in error messages is different in Windows, so we need this hack to make tests pass in AppVeyor too
+          if FastlaneCore::Helper.windows?
+            list.map(&:to_s).join(', ') # On windows, keyword names don't show the `:` prefix in error messages
+          else
+            list.map(&:inspect).join(', ') # On other platforms, they do have `:` in front or keyword names
+          end
+        end
+
         it 'fails when calling the lane with no parameter at all' do
           expect do
             @ff.runner.execute(:lane_kw_params, :ios)
-          end.to raise_error(ArgumentError, 'missing keywords: :name, :version')
+          end.to raise_error(ArgumentError, "missing keywords: #{keywords_list(%i[name version])}")
         end
 
         it 'fails when calling the lane with missing parameters' do
           expect do
             @ff.runner.execute(:lane_kw_params, :ios, { name: 'test', interactive: true })
-          end.to raise_error(ArgumentError, 'missing keyword: :version')
+          end.to raise_error(ArgumentError, "missing keyword: #{keywords_list(%i[version])}")
         end
 
         it 'fails when calling the lane with extra parameters' do
           expect do
             @ff.runner.execute(:lane_kw_params, :ios, { name: 'test', version: '12.3', interactive: true, unexpected: 42 })
-          end.to raise_error(ArgumentError, 'unknown keyword: :unexpected')
+          end.to raise_error(ArgumentError, "unknown keyword: #{keywords_list(%i[unexpected])}")
         end
 
         it 'takes all parameters into account when all are passed explicitly' do
