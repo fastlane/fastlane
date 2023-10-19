@@ -78,7 +78,7 @@ describe Fastlane do
           end
         end
 
-        it 'fails when calling the lane with no parameter at all' do
+        it 'fails when calling the lane with required parameters not being passed' do
           expect do
             @ff.runner.execute(:lane_kw_params, :ios)
           end.to raise_error(ArgumentError, "missing keywords: #{keywords_list(%i[name version])}")
