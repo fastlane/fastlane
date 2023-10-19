@@ -29,7 +29,7 @@ module Fastlane
       block_expects_keywords = !block.nil? && block.parameters.any? { |type, _| [:key, :keyreq].include?(type) }
       # Conversion of the `Hash` parameters passed by `#call` into keywords has to be explicit in Ruby 3
       # https://www.ruby-lang.org/en/news/2019/12/12/separation-of-positional-and-keyword-arguments-in-ruby-3-0/
-      self.block = block_expects_keywords ? Proc.new { |options| block.call(**options) } : block
+      self.block = block_expects_keywords ? proc { |options| block.call(**options) } : block
       self.is_private = is_private
     end
 

@@ -70,9 +70,9 @@ describe Fastlane do
 
       context 'when a lane expects its parameters as keywords' do
         def keywords_list(list)
-          # The way keyword lists appear in error messages is different in Windows, so we need this hack to make tests pass in AppVeyor too
-          if FastlaneCore::Helper.windows?
-            list.map(&:to_s).join(', ') # On windows, keyword names don't show the `:` prefix in error messages
+          # The way keyword lists appear in error messages is different in Windows & Linux vs macOS
+          if FastlaneCore::Helper.windows? || FastlaneCore::Helper.linux?
+            list.map(&:to_s).join(', ') # On Windows and Linux, keyword names don't show the `:` prefix in error messages
           else
             list.map(&:inspect).join(', ') # On other platforms, they do have `:` in front or keyword names
           end
