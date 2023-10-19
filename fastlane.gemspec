@@ -116,7 +116,7 @@ Gem::Specification.new do |spec|
   # Development only
   spec.add_development_dependency('climate_control', '~> 0.2.0')
   spec.add_development_dependency('coveralls', '~> 0.8.13')
-  spec.add_development_dependency('fakefs', '~> 1.9')
+  spec.add_development_dependency('fakefs', '1.8') # 1.9+ requires Ruby >=2.7, while fastlane uses a `required_ruby_version` of `>= 2.6``
   spec.add_development_dependency('pry-byebug')
   spec.add_development_dependency('pry-rescue')
   spec.add_development_dependency('pry-stack_explorer')
