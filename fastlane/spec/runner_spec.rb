@@ -110,6 +110,16 @@ describe Fastlane do
           result = @ff.runner.execute(:lane_kw_params, :ios, { version: "12.3", interactive: true, name: 'test' })
           expect(result).to eq('name: "test"; version: "12.3"; interactive: true')
         end
+
+        it 'allows a required parameter to receive a nil value' do
+          result = @ff.runner.execute(:lane_kw_params, :ios, { name: nil, version: "12.3", interactive: true })
+          expect(result).to eq('name: nil; version: "12.3"; interactive: true')
+        end
+
+        it 'allows a default value to be overridden with a nil value' do
+          result = @ff.runner.execute(:lane_kw_params, :ios, { name: 'test', version: "12.3", interactive: nil })
+          expect(result).to eq('name: "test"; version: "12.3"; interactive: nil')
+        end
       end
     end
   end
