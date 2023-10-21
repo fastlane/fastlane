@@ -69,31 +69,28 @@ describe Fastlane do
       end
 
       context 'when a lane expects its parameters as keywords' do
-        def keywords_list(list)
-          # The way keyword lists appear in error messages is different in Windows & Linux vs macOS
-          if FastlaneCore::Helper.windows? || FastlaneCore::Helper.linux?
-            list.map(&:to_s).join(', ') # On Windows and Linux, keyword names don't show the `:` prefix in error messages
-          else
-            list.map(&:inspect).join(', ') # On other platforms, they do have `:` in front or keyword names
-          end
+        def keywords_error_message(error, *kwlist)
+          # Depending on Ruby versions, the keyword names appear with or without a `:` in error messages, hence the `:?` Regexp
+          list = kwlist.map { |kw| ":?#{kw}" }.join(', ')
+          /#{Regexp.escape(error)}: #{list}/
         end
 
         it 'fails when calling the lane with required parameters not being passed' do
           expect do
             @ff.runner.execute(:lane_kw_params, :ios)
-          end.to raise_error(ArgumentError, "missing keywords: #{keywords_list(%i[name version])}")
+          end.to raise_error(ArgumentError, keywords_error_message('missing keywords', :name, :version))
         end
 
         it 'fails when calling the lane with some missing parameters' do
           expect do
             @ff.runner.execute(:lane_kw_params, :ios, { name: 'test', interactive: true })
-          end.to raise_error(ArgumentError, "missing keyword: #{keywords_list(%i[version])}")
+          end.to raise_error(ArgumentError, keywords_error_message('missing keyword', :version))
         end
 
         it 'fails when calling the lane with extra parameters' do
           expect do
             @ff.runner.execute(:lane_kw_params, :ios, { name: 'test', version: '12.3', interactive: true, unexpected: 42 })
-          end.to raise_error(ArgumentError, "unknown keyword: #{keywords_list(%i[unexpected])}")
+          end.to raise_error(ArgumentError, keywords_error_message('unknown keyword', :unexpected))
         end
 
         it 'takes all parameters into account when all are passed explicitly' do
