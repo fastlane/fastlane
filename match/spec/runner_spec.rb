@@ -292,7 +292,7 @@ describe Match do
 
       before do
         allow(profile).to receive(:uuid).and_return(uuid)
-        allow(profile).to receive(:fetch_all_devices).and_return([profile_device])
+        allow(profile).to receive(:devices).and_return([profile_device])
       end
 
       it "device is enabled" do
