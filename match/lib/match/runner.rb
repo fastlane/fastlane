@@ -337,7 +337,7 @@ module Match
       portal_profile = all_profiles.detect { |i| i.uuid == uuid }
 
       if portal_profile
-        profile_device_count = portal_profile.fetch_all_devices.count
+        profile_device_count = portal_profile.devices.count
 
         device_classes =
           case platform
@@ -418,7 +418,7 @@ module Match
       #   * For portal certificates, we filter out the expired one but includes a new certificate;
       #   * Profile still contains an expired certificate and is valid.
       # Thus, we need to check the validity of profile certificates too.
-      profile_certs_count = portal_profile.fetch_all_certificates.select(&:valid?).count
+      profile_certs_count = portal_profile.certificates.select(&:valid?).count
 
       certificate_types =
         case platform
