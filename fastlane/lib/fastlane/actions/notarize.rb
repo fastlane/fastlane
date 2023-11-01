@@ -100,7 +100,7 @@ module Fastlane
             UI.success("Successfully notarized and stapled package")
           end
         when 'Invalid'
-          if submission_id && print_log:
+          if submission_id && print_log
             log_request_parts = [
               "xcrun notarytool log #{submission_id}",
             ] + auth_parts
@@ -113,7 +113,7 @@ module Fastlane
               }
             )
             UI.user_error!("Could not notarize package with message '#{log_request_response}'")
-          else:
+          else
             UI.user_error!("Could not notarize package. To see the error, please set 'print_log' to true.")
         else
           UI.crash!("Could not notarize package with status '#{notarization_info['status']}'")
