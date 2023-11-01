@@ -198,6 +198,15 @@ describe Trainer do
                                 }
                               ])
       end
+
+      it "still produces a test failure message when file url is missing", requires_xcode: true do
+        allow_any_instance_of(Trainer::XCResult::TestFailureIssueSummary).to receive(:document_location_in_creating_workspace).and_return(nil)
+        tp = Trainer::TestParser.new("./trainer/spec/fixtures/Test.test_result.xcresult")
+        test_failures = tp.data.last[:tests].select { |t| t[:failures] }
+        failure_messages = test_failures.map { |tf| tf[:failures].first[:failure_message] }
+        expect(failure_messages).to eq(["XCTAssertTrue failed", "XCTAssertTrue failed"])
+        RSpec::Mocks.space.proxy_for(Trainer::XCResult::TestFailureIssueSummary).reset
+      end
     end
   end
 end

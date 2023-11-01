@@ -39,15 +39,15 @@ module Spaceship
       # API
       #
 
-      def self.all(client: nil, filter: {}, includes: nil, limit: nil, sort: nil)
+      def self.all(client: nil, filter: {}, includes: nil, fields: nil, limit: nil, sort: nil)
         client ||= Spaceship::ConnectAPI
-        resps = client.get_bundle_ids(filter: filter, includes: includes).all_pages
+        resps = client.get_bundle_ids(filter: filter, includes: includes, fields: fields, limit: nil, sort: nil).all_pages
         return resps.flat_map(&:to_models)
       end
 
-      def self.find(identifier, includes: nil, client: nil)
+      def self.find(identifier, includes: nil, fields: nil, client: nil)
         client ||= Spaceship::ConnectAPI
-        return all(client: client, filter: { identifier: identifier }, includes: includes).find do |app|
+        return all(client: client, filter: { identifier: identifier }, includes: includes, fields: fields).find do |app|
           app.identifier == identifier
         end
       end
