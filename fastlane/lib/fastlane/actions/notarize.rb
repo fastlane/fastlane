@@ -115,6 +115,7 @@ module Fastlane
             UI.user_error!("Could not notarize package with message '#{log_request_response}'")
           else
             UI.user_error!("Could not notarize package. To see the error, please set 'print_log' to true.")
+          end
         else
           UI.crash!("Could not notarize package with status '#{notarization_info['status']}'")
         end
