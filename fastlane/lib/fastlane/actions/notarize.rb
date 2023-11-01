@@ -102,7 +102,7 @@ module Fastlane
         when 'Invalid'
           if submission_id && print_log
             log_request_parts = [
-              "xcrun notarytool log #{submission_id}",
+              "xcrun notarytool log #{submission_id}"
             ] + auth_parts
             log_request_command = log_request_parts.join(' ')
             log_request_response = Actions.sh(
