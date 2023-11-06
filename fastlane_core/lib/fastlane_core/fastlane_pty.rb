@@ -19,7 +19,19 @@ module FastlaneCore
   end
 
   class FastlanePty
-    def self.spawn(command)
+    def self.spawn(command, &block)
+      self.wrap_errors do
+        begin
+          spawn_with_pty(command, &block)
+        rescue LoadError
+          self.wrap_errors do
+            spawn_with_popen(cmmand, &block)
+          end
+        end
+      end
+    end
+
+    def self.spawn_with_pty(command, &block)
       require 'pty'
       PTY.spawn(command) do |command_stdout, command_stdin, pid|
         begin
@@ -38,20 +50,27 @@ module FastlaneCore
         end
       end
       $?.exitstatus
-    rescue LoadError
+    end
+
+    def self.spawn_with_popen(command, &block)
       require 'open3'
       Open3.popen2e(command) do |command_stdin, command_stdout, p| # note the inversion
         yield(command_stdout, command_stdin, p.value.pid)
-
         command_stdin.close
         command_stdout.close
         p.value.exitstatus
       end
-    rescue StandardError => e
-      # Wrapping any error in FastlanePtyError to allow
-      # callers to see and use $?.exitstatus that
-      # would usually get returned
-      raise FastlanePtyError.new(e, $?.exitstatus)
+    end
+
+    def self.wrap_errors(&block)
+      begin
+        yield
+      rescue StandardError => e
+        # Wrapping any error in FastlanePtyError to allow
+        # callers to see and use $?.exitstatus that
+        # would usually get returned
+        raise FastlanePtyError.new(e, $?.exitstatus)
+      end
     end
   end
 end
