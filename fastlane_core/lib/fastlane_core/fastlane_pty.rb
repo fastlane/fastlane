@@ -20,56 +20,57 @@ module FastlaneCore
 
   class FastlanePty
     def self.spawn(command, &block)
-      self.wrap_errors do
-        begin
-          spawn_with_pty(command, &block)
-        rescue LoadError
-          self.wrap_errors do
-            spawn_with_popen(cmmand, &block)
-          end
-        end
+      begin
+        spawn_with_pty(command, &block)
+      rescue LoadError
+        spawn_with_popen(command, &block)
       end
     end
 
     def self.spawn_with_pty(command, &block)
-      require 'pty'
-      PTY.spawn(command) do |command_stdout, command_stdin, pid|
-        begin
-          yield(command_stdout, command_stdin, pid)
-        rescue Errno::EIO
-          # Exception ignored intentionally.
-          # https://stackoverflow.com/questions/10238298/ruby-on-linux-pty-goes-away-without-eof-raises-errnoeio
-          # This is expected on some linux systems, that indicates that the subcommand finished
-          # and we kept trying to read, ignore it
-        ensure
+      begin
+        require 'pty'
+        PTY.spawn(command) do |command_stdout, command_stdin, pid|
           begin
-            Process.wait(pid)
-          rescue Errno::ECHILD, PTY::ChildExited
-            # The process might have exited.
+            yield(command_stdout, command_stdin, pid)
+          rescue Errno::EIO
+            # Exception ignored intentionally.
+            # https://stackoverflow.com/questions/10238298/ruby-on-linux-pty-goes-away-without-eof-raises-errnoeio
+            # This is expected on some linux systems, that indicates that the subcommand finished
+            # and we kept trying to read, ignore it
+          ensure
+            begin
+              Process.wait(pid)
+            rescue Errno::ECHILD, PTY::ChildExited
+              # The process might have exited.
+            end
           end
         end
-      end
-      $?.exitstatus
-    end
-
-    def self.spawn_with_popen(command, &block)
-      require 'open3'
-      Open3.popen2e(command) do |command_stdin, command_stdout, p| # note the inversion
-        yield(command_stdout, command_stdin, p.value.pid)
-        command_stdin.close
-        command_stdout.close
-        p.value.exitstatus
-      end
-    end
-
-    def self.wrap_errors(&block)
-      begin
-        yield
+        $?.exitstatus
       rescue StandardError => e
         # Wrapping any error in FastlanePtyError to allow
         # callers to see and use $?.exitstatus that
         # would usually get returned
         raise FastlanePtyError.new(e, $?.exitstatus)
+      end
+    end
+
+    def self.spawn_with_popen(command, &block)
+      status = nil
+      begin
+        require 'open3'
+        Open3.popen2e(command) do |command_stdin, command_stdout, p| # note the inversion
+          status = p.value
+          yield(command_stdout, command_stdin, status.pid)
+          command_stdin.close
+          command_stdout.close
+          status.exitstatus
+        end
+      rescue StandardError => e
+        # Wrapping any error in FastlanePtyError to allow
+        # callers to see and use $?.exitstatus that
+        # would usually get returned
+        raise FastlanePtyError.new(e, status.exitstatus)
       end
     end
   end
