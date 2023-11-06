@@ -14,8 +14,6 @@ describe FastlaneCore do
       end
 
       it 'doesn t return -1 if an exception was raised in the block in PTY.spawn' do
-        @all_lines = []
-
         exception = StandardError.new
         expect {
           exit_status = FastlaneCore::FastlanePty.spawn('echo foo') do |command_stdout, command_stdin, pid|
@@ -30,8 +28,6 @@ describe FastlaneCore do
         expect(FastlaneCore::FastlanePty).to receive(:require).with("pty").and_raise(LoadError)
         allow(FastlaneCore::FastlanePty).to receive(:require).with("open3").and_call_original
         allow(FastlaneCore::FastlanePty).to receive(:open3)
-
-        @all_lines = []
 
         exception = StandardError.new
         expect {
