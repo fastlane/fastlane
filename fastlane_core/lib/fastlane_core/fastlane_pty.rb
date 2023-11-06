@@ -10,11 +10,12 @@ end
 
 module FastlaneCore
   class FastlanePtyError < StandardError
-    attr_reader :exit_status
-    def initialize(e, exit_status)
+    attr_reader :exit_status, :process_status
+    def initialize(e, exit_status, process_status)
       super(e)
       set_backtrace(e.backtrace) if e
       @exit_status = exit_status
+      @process_status = process_status
     end
   end
 
@@ -46,12 +47,15 @@ module FastlaneCore
             end
           end
         end
-        $?.exitstatus
+        status = self.process_status
+        raise StandardError, "Process crashed" if status.signaled?
+        status.exitstatus
       rescue StandardError => e
         # Wrapping any error in FastlanePtyError to allow
         # callers to see and use $?.exitstatus that
         # would usually get returned
-        raise FastlanePtyError.new(e, $?.exitstatus)
+        status = self.process_status
+        raise FastlanePtyError.new(e, status.exitstatus || e.exit_status, status)
       end
     end
 
@@ -64,14 +68,20 @@ module FastlaneCore
           yield(command_stdout, command_stdin, status.pid)
           command_stdin.close
           command_stdout.close
+          raise StandardError, "Process crashed" if status.signaled?
           status.exitstatus
         end
       rescue StandardError => e
         # Wrapping any error in FastlanePtyError to allow
         # callers to see and use $?.exitstatus that
         # would usually get returned
-        raise FastlanePtyError.new(e, status.exitstatus)
+        raise FastlanePtyError.new(e, status.exitstatus || e.exit_status, status)
       end
+    end
+
+    # to ease mocking
+    def self.process_status
+      $?
     end
   end
 end

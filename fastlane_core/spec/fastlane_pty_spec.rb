@@ -38,6 +38,52 @@ describe FastlaneCore do
           expect(error.exit_status).to eq(0) # command was success but output handling failed
         }
       end
+
+      # could be used to test
+      # let(:crasher_path) { File.expand_path("./fastlane_core/spec/crasher/crasher") }
+
+      it 'raises an error if the program crashes through PTY.spawn' do
+        status = double("ProcessStatus")
+        allow(status).to receive(:exitstatus) { nil }
+        allow(status).to receive(:signaled?) { true }
+
+        expect(FastlaneCore::FastlanePty).to receive(:require).with("pty").and_return(nil)
+        allow(FastlaneCore::FastlanePty).to receive(:process_status).and_return(status)
+
+        expect {
+          exit_status = FastlaneCore::FastlanePty.spawn("a path of a crasher exec") do |command_stdout, command_stdin, pid|
+          end
+          UI.message(exit_status)
+        }.to raise_error(FastlaneCore::FastlanePtyError) { |error|
+          expect(error.exit_status).to eq(-1) # command was forced to -1
+        }
+      end
+
+      it 'raises an error if the program crashes through PTY.popen' do
+        stdin = double("stdin")
+        allow(stdin).to receive(:close)
+        stdout = double("stdout")
+        allow(stdout).to receive(:close)
+
+        status = double("ProcessStatus")
+        allow(status).to receive(:exitstatus) { nil }
+        allow(status).to receive(:signaled?) { true }
+        allow(status).to receive(:pid) { 12_345 }
+
+        process = double("process")
+        allow(process).to receive(:value) { status }
+
+        expect(FastlaneCore::FastlanePty).to receive(:require).with("pty").and_raise(LoadError)
+        allow(FastlaneCore::FastlanePty).to receive(:require).with("open3").and_return(nil)
+        allow(Open3).to receive(:popen2e).and_yield(stdin, stdout, process)
+
+        expect {
+          exit_status = FastlaneCore::FastlanePty.spawn("a path of a crasher exec") do |command_stdout, command_stdin, pid|
+          end
+        }.to raise_error(FastlaneCore::FastlanePtyError) { |error|
+          expect(error.exit_status).to eq(-1) # command was forced to -1
+        }
+      end
     end
   end
 end
