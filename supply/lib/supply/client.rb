@@ -218,8 +218,8 @@ module Supply
     # @!group Getting data
     #####################################################
 
-    # Get a list of all languages - returns the list
-    # make sure to have an active edit
+    # Fetch a list of all listings for all languages.
+    # - Precondition: an active edit is required.
     def listings
       ensure_active_edit!
 
@@ -230,7 +230,8 @@ module Supply
       end
     end
 
-    # Returns the listing for the given language filled with the current values if it already exists
+    # Fetch the listing for the given language filled with the current values if it already exists
+    # - Precondition: an active edit is required.
     def listing_for_language(language)
       ensure_active_edit!
 
