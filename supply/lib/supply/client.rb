@@ -549,7 +549,7 @@ module Supply
     # @param [String] language Localization code (a BCP-47 language tag; for example, "de-AT" for  Austrian German).
     # @return [Array<ImageListing>] A list of ImageListing instances describing each image with its id, sha256 and url
     #
-    def fetch_images(image_type: nil, language: nil)
+    def fetch_images(image_type: nil, language:)
       ensure_active_edit!
 
       result = call_google_api do
