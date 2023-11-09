@@ -301,13 +301,16 @@ module Supply
     end
 
     def latest_version(track)
-      latest_version = tracks.select { |t| t.track == Supply::Tracks::DEFAULT }.map(&:releases).flatten.reject { |r| r.name.nil? }.max_by(&:name)
+      scope_track = track || Supply::Tracks::DEFAULT
+      latest_version = tracks.select { |t| t.track == scope_track }
+        .map(&:releases)
+        .flatten
+        .reject { |r| r.name.nil? }
+        .max_by(&:name)
 
       # Check if user specified '--track' option if version information from 'production' track is nil
       if latest_version.nil? && track == Supply::Tracks::DEFAULT
         UI.user_error!(%(Unable to find latest version information from "#{Supply::Tracks::DEFAULT}" track. Please specify track information by using the '--track' option.))
-      else
-        latest_version = tracks.select { |t| t.track == track }.map(&:releases).flatten.reject { |r| r.name.nil? }.max_by(&:name)
       end
 
       return latest_version
