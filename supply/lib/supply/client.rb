@@ -133,12 +133,38 @@ module Supply
     #####################################################
 
     # Begin modifying a certain package
-    def begin_edit(package_name: nil)
+    def begin_edit(package_name:)
       UI.user_error!("You currently have an active edit") if @current_edit
 
       self.current_edit = call_google_api { client.insert_edit(package_name) }
-
       self.current_package_name = package_name
+    end
+
+    def get_edit(package_name:, edit_id:)
+      UI.user_error!("You currently have an active edit") if @current_edit
+
+      self.current_edit = call_google_api { client.get_edit(package_name, edit_id) }
+      self.current_package_name = package_name
+      self.current_edit
+    end
+
+    # Returns the current edit, creating one if needed.
+    def get_or_create_edit(package_name:, edit_id: nil)
+      if @current_edit
+        return @current_edit
+      end
+      if edit_id
+        begin
+          get_edit(package_name: package_name, edit_id: edit_id)
+        rescue Google::Apis::ClientError => e
+          # Reasons for failure could be if the edit is no long active (e.g. has been deleted, superseded or expired).
+          # In that case we will create a new edit.
+          begin_edit(package_name: package_name)
+        end
+      else
+        begin_edit(package_name: package_name)
+      end
+      @current_edit
     end
 
     # Aborts the current edit deleting all pending changes
