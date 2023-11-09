@@ -15,6 +15,7 @@ module Spaceship
 
       attr_accessor :bundle_id
       attr_accessor :certificates
+      attr_accessor :devices
 
       attr_mapping({
         "name" => "name",
