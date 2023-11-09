@@ -282,7 +282,8 @@ module Sigh
                            Spaceship::ConnectAPI::Device::DeviceClass::APPLE_WATCH,
                            Spaceship::ConnectAPI::Device::DeviceClass::IPAD,
                            Spaceship::ConnectAPI::Device::DeviceClass::IPHONE,
-                           Spaceship::ConnectAPI::Device::DeviceClass::IPOD
+                           Spaceship::ConnectAPI::Device::DeviceClass::IPOD,
+                           Spaceship::ConnectAPI::Device::DeviceClass::APPLE_VISION_PRO
                          ]
                        when 'tvos'
                          [Spaceship::ConnectAPI::Device::DeviceClass::APPLE_TV]

@@ -32,6 +32,7 @@ module Spaceship
 
         # As of 2022-11-12, this is not officially supported by App Store Connect API
         APPLE_SILICON_MAC = "APPLE_SILICON_MAC"
+        APPLE_VISION_PRO = "APPLE_VISION_PRO"
       end
 
       module Status
