@@ -92,11 +92,20 @@ public protocol MatchfileProtocol: AnyObject {
     /// Prefix to be used on all objects uploaded to S3
     var s3ObjectPrefix: String? { get }
 
+    /// Skip encryption of all objects uploaded to S3. WARNING: only enable this on S3 buckets with sufficiently restricted permissions and server-side encryption enabled. See https://docs.aws.amazon.com/AmazonS3/latest/userguide/UsingEncryption.html
+    var s3SkipEncryption: Bool { get }
+
     /// GitLab Project Path (i.e. 'gitlab-org/gitlab')
     var gitlabProject: String? { get }
 
     /// GitLab Host (i.e. 'https://gitlab.com')
     var gitlabHost: String { get }
+
+    /// GitLab CI_JOB_TOKEN
+    var jobToken: String? { get }
+
+    /// GitLab Access Token
+    var privateToken: String? { get }
 
     /// Keychain the items should be imported to
     var keychainName: String { get }
@@ -187,8 +196,11 @@ public extension MatchfileProtocol {
     var s3SecretAccessKey: String? { return nil }
     var s3Bucket: String? { return nil }
     var s3ObjectPrefix: String? { return nil }
+    var s3SkipEncryption: Bool { return false }
     var gitlabProject: String? { return nil }
     var gitlabHost: String { return "https://gitlab.com" }
+    var jobToken: String? { return nil }
+    var privateToken: String? { return nil }
     var keychainName: String { return "login.keychain" }
     var keychainPassword: String? { return nil }
     var force: Bool { return false }
@@ -212,4 +224,4 @@ public extension MatchfileProtocol {
 
 // Please don't remove the lines below
 // They are used to detect outdated files
-// FastlaneRunnerAPIVersion [0.9.114]
+// FastlaneRunnerAPIVersion [0.9.117]

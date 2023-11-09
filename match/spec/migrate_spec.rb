@@ -19,9 +19,18 @@ describe Match do
 
       fake_google_cloud_storage = "fake_google_cloud_storage"
       expect(Match::Storage::GoogleCloudStorage).to receive(:configure).with(
+        type: nil,
+        platform: nil,
         google_cloud_bucket_name: nil,
         google_cloud_keys_file: nil,
-        google_cloud_project_id: nil
+        google_cloud_project_id: nil,
+        readonly: nil,
+        username: nil,
+        team_id: nil,
+        team_name: nil,
+        api_key_path: nil,
+        api_key: nil,
+        skip_google_cloud_account_confirmation: nil
       ).and_return(fake_google_cloud_storage)
 
       allow(fake_google_cloud_storage).to receive(:download)
@@ -30,10 +39,18 @@ describe Match do
 
       fake_git_storage = "fake_git_storage"
       expect(Match::Storage::GitStorage).to receive(:configure).with(
+        type: nil,
+        platform: nil,
         git_url: git_url,
         shallow_clone: true,
+        skip_docs: nil,
         git_branch: "master",
-        clone_branch_directly: false
+        git_full_name: nil,
+        git_user_email: nil,
+        clone_branch_directly: false,
+        git_basic_authorization: nil,
+        git_bearer_authorization: nil,
+        git_private_key: nil
       ).and_return(fake_git_storage)
 
       allow(fake_git_storage).to receive(:download)

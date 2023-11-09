@@ -59,10 +59,18 @@ module Match
         self.clone_branch_directly = clone_branch_directly
         self.git_basic_authorization = git_basic_authorization
         self.git_bearer_authorization = git_bearer_authorization
-        self.git_private_key = git_private_key
+        self.git_private_key = convert_private_key_path_to_absolute(git_private_key)
 
         self.type = type if type
         self.platform = platform if platform
+      end
+
+      def convert_private_key_path_to_absolute(git_private_key)
+        if !git_private_key.nil? && File.file?(File.expand_path(git_private_key))
+          File.expand_path(git_private_key).shellescape.to_s
+        else
+          git_private_key
+        end
       end
 
       def prefixed_working_directory
