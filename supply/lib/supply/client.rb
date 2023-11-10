@@ -140,16 +140,14 @@ module Supply
     #####################################################
 
     # Begin modifying a certain package
-    def begin_edit(package_name:)
-      UI.user_error!("You currently have an active edit") if @current_edit
+    def begin_edit(package_name:, override_current_edit: false)
+      UI.user_error!("You currently have an active edit") if @current_edit && !override_current_edit
 
       self.current_edit = call_google_api { client.insert_edit(package_name) }
       self.current_package_name = package_name
     end
 
     def get_edit(package_name:, edit_id:)
-      UI.user_error!("You currently have an active edit") if @current_edit
-
       self.current_edit = call_google_api { client.get_edit(package_name, edit_id) }
       self.current_package_name = package_name
       self.current_edit
@@ -160,15 +158,22 @@ module Supply
       # Don't simply return @current_edit if it exists, because it might've been deleted, superseded or expired.
       # Instead, always get the latest edit from the server, using either the user-provided edit_id, or the current edit's id, if any.
       if edit_id
+        UI.verbose("Getting edit with id #{edit_id} with package name #{package_name}…")
         begin
           get_edit(package_name: package_name, edit_id: edit_id || @current_edit&.id)
-        rescue Google::Apis::ClientError => e
+          UI.verbose("Got edit with id #{edit_id} with package name #{package_name}.")
+        rescue => e
+          # Can't really rescue from a specific error here, because we are already unwrapping the Google API client error in `call_google_api`.
           # Reasons for failure could be if the edit is no long active (e.g. has been deleted, superseded or expired).
           # In that case we will create a new edit.
-          begin_edit(package_name: package_name)
+          UI.verbose("Failed to get edit with id #{edit_id} with package name #{package_name}. Reason: #{e.message}\nCreating a new edit…")
+          begin_edit(package_name: package_name, override_current_edit: true)
+          UI.verbose("Created a new edit with id #{@current_edit.id} with package name #{package_name}.")
         end
       else
-        begin_edit(package_name: package_name)
+        UI.verbose("Edit ID was nil. Creating a new edit with package name #{package_name}…")
+        begin_edit(package_name: package_name, override_current_edit: true)
+        UI.verbose("Created a new edit with id #{@current_edit.id} with package name #{package_name}.")
       end
       @current_edit
     end
