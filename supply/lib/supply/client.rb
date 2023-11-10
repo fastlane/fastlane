@@ -155,14 +155,13 @@ module Supply
       self.current_edit
     end
 
-    # Returns the current edit, creating one if needed.
+    # Returns the current edit, creating one if needed (e.g. if there is no active edit, or if the existing one has been deleted, superseded or expired).
     def get_or_create_edit(package_name:, edit_id: nil)
-      if @current_edit
-        return @current_edit
-      end
+      # Don't simply return @current_edit if it exists, because it might've been deleted, superseded or expired.
+      # Instead, always get the latest edit from the server, using either the user-provided edit_id, or the current edit's id, if any.
       if edit_id
         begin
-          get_edit(package_name: package_name, edit_id: edit_id)
+          get_edit(package_name: package_name, edit_id: edit_id || @current_edit&.id)
         rescue Google::Apis::ClientError => e
           # Reasons for failure could be if the edit is no long active (e.g. has been deleted, superseded or expired).
           # In that case we will create a new edit.
