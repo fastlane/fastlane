@@ -9,15 +9,10 @@ module Fastlane
         overload = params[:overload]
         fail_if_missing = params[:fail_if_missing]
 
-        if path
-          env_file = File.join(path, env_file)
-        else
-          base_path = Fastlane::Helper::DotenvHelper.find_dotenv_directory
-          env_file = File.join(base_path, env_file)
-        end
+        env_path = File.join(path, env_file)
 
         if !File.exist?(env_file)
-          error = "Cannot find request dotenv file at '#{env_file}'"
+          error = "Cannot find dotenv file at '#{env_path}'"
 
           if fail_if_missing
             UI.user_error!(error)
@@ -25,11 +20,11 @@ module Fastlane
 
           UI.error(error)
         elsif overload
-          UI.success("Overloading environment variables from '#{env_file}'")
-          Dotenv.overload(env_file)
+          UI.success("Overloading environment variables from '#{env_path}'")
+          Dotenv.overload(env_path)
         else
-          UI.success("Loading environment variables from '#{env_file}'")
-          Dotenv.load(env_file)
+          UI.success("Loading environment variables from '#{env_path}'")
+          Dotenv.load(env_path)
         end
       end
 
@@ -41,11 +36,12 @@ module Fastlane
         [
           FastlaneCore::ConfigItem.new(key: :name,
                                        env_name: 'FL_DOTENV_NAME',
-                                       description: 'Load an dotenv file by name. Ex: ios, android, secret'),
+                                       description: 'Load an dotenv file by name. E.g.: ios, android, secret'),
           FastlaneCore::ConfigItem.new(key: :path,
                                        env_name: 'FL_DOTENV_PATH',
                                        description: 'Directory where the dotenv file is located. Defaults to working directory',
-                                       optional: true),
+                                       default_value: Fastlane::Helper::DotenvHelper.find_dotenv_directory,
+                                       default_value_dynamic: true),
           FastlaneCore::ConfigItem.new(key: :overload,
                                        env_name: 'FL_DOTENV_OVERLOAD',
                                        description: 'Whether environment variables should be overloaded',
@@ -74,7 +70,7 @@ module Fastlane
       def self.example_code
         [
           'dotenv(
-            name: "secret" # looking for .env.secret
+            name: "secret" # Looks for .env.secret
           )',
           'dotenv(
             name: "release",

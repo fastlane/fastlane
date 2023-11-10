@@ -59,7 +59,7 @@ describe Fastlane do
           allow(File).to receive(:exist?).with(anything).and_call_original
           expect(File).to receive(:exist?).with('platforms/ios/.env.release').and_return(false).times.once
 
-          expect(UI).to receive(:error).with("Cannot find request dotenv file at 'platforms/ios/.env.release'")
+          expect(UI).to receive(:error).with("Cannot find dotenv file at 'platforms/ios/.env.release'")
 
           Fastlane::FastFile.new.parse("lane :test do
             dotenv(name: 'release', path: 'platforms/ios')
@@ -74,7 +74,7 @@ describe Fastlane do
             Fastlane::FastFile.new.parse("lane :test do
                 dotenv(name: 'release', path: 'platforms/ios', fail_if_missing: true)
               end").runner.execute(:test)
-          end.to raise_error("Cannot find request dotenv file at 'platforms/ios/.env.release'")
+          end.to raise_error("Cannot find dotenv file at 'platforms/ios/.env.release'")
         end
       end
     end
