@@ -70,6 +70,22 @@ module Fastlane
       def self.is_supported?(platform)
         true
       end
+
+      def self.example_code
+        [
+          'dotenv(
+            name: "secret" # looking for .env.secret
+          )',
+          'dotenv(
+            name: "release",
+            path: "platforms/ios"
+          )',
+          'dotenv(
+            name: "secret",
+            fail_if_missing: true
+          )'
+        ]
+      end
     end
   end
 end
