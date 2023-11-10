@@ -11,7 +11,7 @@ module Fastlane
 
         env_path = File.join(path, env_file)
 
-        if !File.exist?(env_file)
+        if !File.exist?(env_path)
           error = "Cannot find dotenv file at '#{env_path}'"
 
           if fail_if_missing
