@@ -10282,6 +10282,7 @@ public func slackTrainStart(distance: Int = 5,
    - arch: Specify which architecture the binary file is in. Needed for universal binaries
    - sourceFiles: A Dir.glob compatible pattern used to limit the lookup to specific source files. Ignored in gcov mode
    - decimals: The amount of decimals to use for % coverage reporting
+   - ymlfile: Relative path to a file used in place of '.slather.yml'
 
  Slather works with multiple code coverage formats, including Xcode 7 code coverage.
  Slather is available at [https://github.com/SlatherOrg/slather](https://github.com/SlatherOrg/slather).
@@ -10317,7 +10318,8 @@ public func slather(buildDirectory: OptionalConfigValue<String?> = .fastlaneDefa
                     binaryFile: OptionalConfigValue<[String]?> = .fastlaneDefault(nil),
                     arch: OptionalConfigValue<String?> = .fastlaneDefault(nil),
                     sourceFiles: OptionalConfigValue<Bool> = .fastlaneDefault(false),
-                    decimals: OptionalConfigValue<Bool> = .fastlaneDefault(false))
+                    decimals: OptionalConfigValue<Bool> = .fastlaneDefault(false)),
+                    ymlfile: OptionalConfigValue<String?> = .fastlaneDefault(nil)
 {
     let buildDirectoryArg = buildDirectory.asRubyArgument(name: "build_directory", type: nil)
     let projArg = proj.asRubyArgument(name: "proj", type: nil)
@@ -10351,6 +10353,7 @@ public func slather(buildDirectory: OptionalConfigValue<String?> = .fastlaneDefa
     let archArg = arch.asRubyArgument(name: "arch", type: nil)
     let sourceFilesArg = sourceFiles.asRubyArgument(name: "source_files", type: nil)
     let decimalsArg = decimals.asRubyArgument(name: "decimals", type: nil)
+    let ymlfileArg = ymlfile.asRubyArgument(name: "ymlfile", type: nil)
     let array: [RubyCommand.Argument?] = [buildDirectoryArg,
                                           projArg,
                                           workspaceArg,
@@ -10382,7 +10385,8 @@ public func slather(buildDirectory: OptionalConfigValue<String?> = .fastlaneDefa
                                           binaryFileArg,
                                           archArg,
                                           sourceFilesArg,
-                                          decimalsArg]
+                                          decimalsArg,
+                                          ymlfileArg]
     let args: [RubyCommand.Argument] = array
         .filter { $0?.value != nil }
         .compactMap { $0 }
