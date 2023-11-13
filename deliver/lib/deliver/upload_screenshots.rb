@@ -55,7 +55,7 @@ module Deliver
         localizations = version.get_app_store_version_localizations
       end
 
-      upload_screenshots(localizations, screenshots_per_language)
+      upload_screenshots(localizations, screenshots_per_language, options[:screenshot_processing_timeout])
 
       Helper.show_loading_indicator("Sorting screenshots uploaded...")
       sort_screenshots(localizations)
@@ -109,7 +109,7 @@ module Deliver
       end
     end
 
-    def upload_screenshots(localizations, screenshots_per_language, tries: 5)
+    def upload_screenshots(localizations, screenshots_per_language, tries: 5, timeout_seconds: 3600)
       tries -= 1
 
       # Upload screenshots
@@ -166,7 +166,8 @@ module Deliver
     end
 
     # Verify all screenshots have been processed
-    def wait_for_complete(iterator)
+    def wait_for_complete(iterator, timeout_seconds: 3600)
+      start_time = Time.now
       loop do
         states = iterator.each_app_screenshot.map { |_, _, app_screenshot| app_screenshot }.each_with_object({}) do |app_screenshot, hash|
           state = app_screenshot.asset_delivery_state['state']
@@ -177,6 +178,11 @@ module Deliver
         is_processing = states.fetch('UPLOAD_COMPLETE', 0) > 0
         return states unless is_processing
 
+        if Time.now - start_time > timeout_seconds {
+          UI.important("Consider incomplete screenshots failed after #{timeout_seconds} seconds")
+          return states
+        }
+
         UI.verbose("There are still incomplete screenshots - #{states}")
         sleep(5)
       end
@@ -185,8 +191,9 @@ module Deliver
     # Verify all screenshots states on App Store Connect are okay
     def retry_upload_screenshots_if_needed(iterator, states, number_of_screenshots, tries, localizations, screenshots_per_language)
       is_failure = states.fetch("FAILED", 0) > 0
+      is_processing = states.fetch('UPLOAD_COMPLETE', 0) > 0
       is_missing_screenshot = !screenshots_per_language.empty? && !verify_local_screenshots_are_uploaded(iterator, screenshots_per_language)
-      return unless is_failure || is_missing_screenshot
+      return unless is_failure || is_missing_screenshot || is_processing
 
       if tries.zero?
         iterator.each_app_screenshot.select { |_, _, app_screenshot| app_screenshot.error? }.each do |localization, _, app_screenshot|
