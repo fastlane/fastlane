@@ -117,7 +117,7 @@ module FastlaneCore
 
       # Find all installed WWDRCA certificates
       installed_certs = []
-      Helper.backticks("security find-certificate -a -c '#{certificate_name}' -p #{keychain.shellescape}")
+      Helper.backticks("security find-certificate -a -c '#{certificate_name}' -p #{keychain.shellescape}", print: false)
             .lines
             .each do |line|
         if line.start_with?('-----BEGIN CERTIFICATE-----')
