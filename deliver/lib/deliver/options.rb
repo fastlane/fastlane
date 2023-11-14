@@ -164,7 +164,7 @@ module Deliver
                                      default_value: false),
         FastlaneCore::ConfigItem.new(key: :screenshot_processing_timeout,
                                      env_name: "DELIVER_SCREENSHOT_PROCESSING_TIMEOUT",
-                                     description: "Timeout in seconds to wait before considering screenshot processing as failed, used to handle cases where uploads to the App Store are stuck in processing.",
+                                     description: "Timeout in seconds to wait before considering screenshot processing as failed, used to handle cases where uploads to the App Store are stuck in processing",
                                      type: Integer,
                                      default_value: 3600),
         FastlaneCore::ConfigItem.new(key: :sync_screenshots,

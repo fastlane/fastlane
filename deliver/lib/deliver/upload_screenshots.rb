@@ -158,7 +158,7 @@ module Deliver
       UI.verbose('Uploading jobs are completed')
 
       Helper.show_loading_indicator("Waiting for all the screenshots to finish being processed...")
-      states = wait_for_complete(iterator)
+      states = wait_for_complete(iterator, timeout_seconds)
       Helper.hide_loading_indicator
       retry_upload_screenshots_if_needed(iterator, states, total_number_of_screenshots, tries, localizations, screenshots_per_language)
 
@@ -178,10 +178,10 @@ module Deliver
         is_processing = states.fetch('UPLOAD_COMPLETE', 0) > 0
         return states unless is_processing
 
-        if Time.now - start_time > timeout_seconds {
+        if Time.now - start_time > timeout_seconds
           UI.important("Consider incomplete screenshots failed after #{timeout_seconds} seconds")
           return states
-        }
+        end
 
         UI.verbose("There are still incomplete screenshots - #{states}")
         sleep(5)

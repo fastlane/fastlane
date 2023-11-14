@@ -255,6 +255,24 @@ describe Deliver::UploadScreenshots do
         expect(subject.wait_for_complete(iterator)).to eq('COMPLETE' => 1)
       end
     end
+
+    context 'when timeout is exceeded' do
+      it 'should exit the loop and return the current states' do
+        app_screenshot = double('Spaceship::ConnectAPI::AppScreenshot', asset_delivery_state: { 'state' => 'UPLOAD_COMPLETE' })
+        app_screenshot_set = double('Spaceship::ConnectAPI::AppScreenshotSet',
+                                    screenshot_display_type: Spaceship::ConnectAPI::AppScreenshotSet::DisplayType::APP_IPHONE_55,
+                                    app_screenshots: [app_screenshot])
+        localization = double('Spaceship::ConnectAPI::AppStoreVersionLocalization',
+                              locale: 'en-US',
+                              get_app_screenshot_sets: [app_screenshot_set])
+        iterator = Deliver::AppScreenshotIterator.new([localization])
+        states = { 'UPLOAD_COMPLETE' => 1 }
+
+        allow(Time).to receive(:now).and_return(0, 3601)
+
+        expect(subject.wait_for_complete(iterator, timeout_seconds: 3600)).to eq(states)
+      end
+    end
   end
 
   describe '#retry_upload_screenshots_if_needed' do
@@ -350,6 +368,29 @@ describe Deliver::UploadScreenshots do
         expect(subject).to_not(receive(:upload_screenshots).with(any_args))
         expect(UI).to_not(receive(:user_error!))
         subject.retry_upload_screenshots_if_needed(iterator, states, number_of_screenshots, 0, [], screenshots_per_language)
+      end
+    end
+
+    context 'when screenshots are in UPLOAD_COMPLETE state' do
+      it 'should trigger retry logic' do
+        app_screenshot = double('Spaceship::ConnectAPI::AppScreenshot',
+                                'complete?' => false,
+                                'error?' => true,
+                                file_name: '5.5_1.jpg',
+                                error_messages: ['error_message'])
+        app_screenshot_set = double('Spaceship::ConnectAPI::AppScreenshotSet',
+                                    screenshot_display_type: Spaceship::ConnectAPI::AppScreenshotSet::DisplayType::APP_IPHONE_55,
+                                    app_screenshots: [app_screenshot])
+        localization = double('Spaceship::ConnectAPI::AppStoreVersionLocalization',
+                              locale: 'en-US',
+                              get_app_screenshot_sets: [app_screenshot_set])
+        localizations = [localization]
+        iterator = Deliver::AppScreenshotIterator.new(localizations)
+        states = { 'UPLOAD_COMPLETE' => 1 }
+  
+        expect(subject).to receive(:upload_screenshots).with(any_args)
+        expect(app_screenshot).to receive(:delete!)
+        subject.retry_upload_screenshots_if_needed(iterator, states, 1, 1, localizations, {})
       end
     end
   end
