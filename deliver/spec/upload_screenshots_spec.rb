@@ -387,7 +387,7 @@ describe Deliver::UploadScreenshots do
         localizations = [localization]
         iterator = Deliver::AppScreenshotIterator.new(localizations)
         states = { 'UPLOAD_COMPLETE' => 1 }
-  
+
         expect(subject).to receive(:upload_screenshots).with(any_args)
         expect(app_screenshot).to receive(:delete!)
         subject.retry_upload_screenshots_if_needed(iterator, states, 1, 1, localizations, {})
