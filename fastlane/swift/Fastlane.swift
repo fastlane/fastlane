@@ -5252,7 +5252,7 @@ public func gitAdd(path: OptionalConfigValue<[String]?> = .fastlaneDefault(nil),
 /**
  Returns the name of the current git branch, possibly as managed by CI ENV vars
 
- If no branch could be found, this action will return an empty string. This is a wrapper for the internal action Actions.git_branch
+ If no branch could be found, this action will return an empty string. If `FL_GIT_BRANCH_DONT_USE_ENV_VARS` is `true`, it'll ignore CI ENV vars. This is a wrapper for the internal action Actions.git_branch
  */
 @discardableResult public func gitBranch() -> String {
     let args: [RubyCommand.Argument] = []
@@ -6236,7 +6236,7 @@ public func importCertificate(certificatePath: String,
    - skipWifi: Do not search for devices via WiFi
    - ipa: The IPA file to put on the device
 
- Installs the ipa on the device. If no id is given, the first found iOS device will be used. Works via USB or Wi-Fi. This requires `ios-deploy` to be installed. Please have a look at [ios-deploy](https://github.com/ios-control/ios-deploy). To quickly install it, use `npm -g i ios-deploy`
+ Installs the ipa on the device. If no id is given, the first found iOS device will be used. Works via USB or Wi-Fi. This requires `ios-deploy` to be installed. Please have a look at [ios-deploy](https://github.com/ios-control/ios-deploy). To quickly install it, use `brew install ios-deploy`
  */
 public func installOnDevice(extra: OptionalConfigValue<String?> = .fastlaneDefault(nil),
                             deviceId: OptionalConfigValue<String?> = .fastlaneDefault(nil),
@@ -6745,6 +6745,7 @@ public func makeChangelogFromJenkins(fallbackChangelog: String = "",
    - forceForNewDevices: Renew the provisioning profiles if the device count on the developer portal has changed. Ignored for profile types 'appstore' and 'developer_id'
    - includeMacInProfiles: Include Apple Silicon Mac devices in provisioning profiles for iOS/iPadOS apps
    - includeAllCertificates: Include all matching certificates in the provisioning profile. Works only for the 'development' provisioning profile type
+   - certificateId: Select certificate by id. Useful if multiple certificates are stored in one place
    - forceForNewCertificates: Renew the provisioning profiles if the certificate count on the developer portal has changed. Works only for the 'development' provisioning profile type. Requires 'include_all_certificates' option to be 'true'
    - skipConfirmation: Disables confirmation prompts during nuke, answering them with yes
    - safeRemoveCerts: Remove certs from repository during nuke without revoking them on the developer portal
@@ -6802,6 +6803,7 @@ public func match(type: String = matchfile.type,
                   forceForNewDevices: OptionalConfigValue<Bool> = .fastlaneDefault(matchfile.forceForNewDevices),
                   includeMacInProfiles: OptionalConfigValue<Bool> = .fastlaneDefault(matchfile.includeMacInProfiles),
                   includeAllCertificates: OptionalConfigValue<Bool> = .fastlaneDefault(matchfile.includeAllCertificates),
+                  certificateId: OptionalConfigValue<String?> = .fastlaneDefault(matchfile.certificateId),
                   forceForNewCertificates: OptionalConfigValue<Bool> = .fastlaneDefault(matchfile.forceForNewCertificates),
                   skipConfirmation: OptionalConfigValue<Bool> = .fastlaneDefault(matchfile.skipConfirmation),
                   safeRemoveCerts: OptionalConfigValue<Bool> = .fastlaneDefault(matchfile.safeRemoveCerts),
@@ -6857,6 +6859,7 @@ public func match(type: String = matchfile.type,
     let forceForNewDevicesArg = forceForNewDevices.asRubyArgument(name: "force_for_new_devices", type: nil)
     let includeMacInProfilesArg = includeMacInProfiles.asRubyArgument(name: "include_mac_in_profiles", type: nil)
     let includeAllCertificatesArg = includeAllCertificates.asRubyArgument(name: "include_all_certificates", type: nil)
+    let certificateIdArg = certificateId.asRubyArgument(name: "certificate_id", type: nil)
     let forceForNewCertificatesArg = forceForNewCertificates.asRubyArgument(name: "force_for_new_certificates", type: nil)
     let skipConfirmationArg = skipConfirmation.asRubyArgument(name: "skip_confirmation", type: nil)
     let safeRemoveCertsArg = safeRemoveCerts.asRubyArgument(name: "safe_remove_certs", type: nil)
@@ -6911,6 +6914,7 @@ public func match(type: String = matchfile.type,
                                           forceForNewDevicesArg,
                                           includeMacInProfilesArg,
                                           includeAllCertificatesArg,
+                                          certificateIdArg,
                                           forceForNewCertificatesArg,
                                           skipConfirmationArg,
                                           safeRemoveCertsArg,
@@ -6976,6 +6980,7 @@ public func match(type: String = matchfile.type,
    - forceForNewDevices: Renew the provisioning profiles if the device count on the developer portal has changed. Ignored for profile types 'appstore' and 'developer_id'
    - includeMacInProfiles: Include Apple Silicon Mac devices in provisioning profiles for iOS/iPadOS apps
    - includeAllCertificates: Include all matching certificates in the provisioning profile. Works only for the 'development' provisioning profile type
+   - certificateId: Select certificate by id. Useful if multiple certificates are stored in one place
    - forceForNewCertificates: Renew the provisioning profiles if the certificate count on the developer portal has changed. Works only for the 'development' provisioning profile type. Requires 'include_all_certificates' option to be 'true'
    - skipConfirmation: Disables confirmation prompts during nuke, answering them with yes
    - safeRemoveCerts: Remove certs from repository during nuke without revoking them on the developer portal
@@ -7037,6 +7042,7 @@ public func matchNuke(type: String = "development",
                       forceForNewDevices: OptionalConfigValue<Bool> = .fastlaneDefault(false),
                       includeMacInProfiles: OptionalConfigValue<Bool> = .fastlaneDefault(false),
                       includeAllCertificates: OptionalConfigValue<Bool> = .fastlaneDefault(false),
+                      certificateId: OptionalConfigValue<String?> = .fastlaneDefault(nil),
                       forceForNewCertificates: OptionalConfigValue<Bool> = .fastlaneDefault(false),
                       skipConfirmation: OptionalConfigValue<Bool> = .fastlaneDefault(false),
                       safeRemoveCerts: OptionalConfigValue<Bool> = .fastlaneDefault(false),
@@ -7092,6 +7098,7 @@ public func matchNuke(type: String = "development",
     let forceForNewDevicesArg = forceForNewDevices.asRubyArgument(name: "force_for_new_devices", type: nil)
     let includeMacInProfilesArg = includeMacInProfiles.asRubyArgument(name: "include_mac_in_profiles", type: nil)
     let includeAllCertificatesArg = includeAllCertificates.asRubyArgument(name: "include_all_certificates", type: nil)
+    let certificateIdArg = certificateId.asRubyArgument(name: "certificate_id", type: nil)
     let forceForNewCertificatesArg = forceForNewCertificates.asRubyArgument(name: "force_for_new_certificates", type: nil)
     let skipConfirmationArg = skipConfirmation.asRubyArgument(name: "skip_confirmation", type: nil)
     let safeRemoveCertsArg = safeRemoveCerts.asRubyArgument(name: "safe_remove_certs", type: nil)
@@ -7146,6 +7153,7 @@ public func matchNuke(type: String = "development",
                                           forceForNewDevicesArg,
                                           includeMacInProfilesArg,
                                           includeAllCertificatesArg,
+                                          certificateIdArg,
                                           forceForNewCertificatesArg,
                                           skipConfirmationArg,
                                           safeRemoveCertsArg,
@@ -10318,8 +10326,8 @@ public func slather(buildDirectory: OptionalConfigValue<String?> = .fastlaneDefa
                     binaryFile: OptionalConfigValue<[String]?> = .fastlaneDefault(nil),
                     arch: OptionalConfigValue<String?> = .fastlaneDefault(nil),
                     sourceFiles: OptionalConfigValue<Bool> = .fastlaneDefault(false),
-                    decimals: OptionalConfigValue<Bool> = .fastlaneDefault(false)),
-                    ymlfile: OptionalConfigValue<String?> = .fastlaneDefault(nil)
+                    decimals: OptionalConfigValue<Bool> = .fastlaneDefault(false),
+                    ymlfile: OptionalConfigValue<String?> = .fastlaneDefault(nil))
 {
     let buildDirectoryArg = buildDirectory.asRubyArgument(name: "build_directory", type: nil)
     let projArg = proj.asRubyArgument(name: "proj", type: nil)
@@ -11234,6 +11242,7 @@ public func swiftlint(mode: String = "lint",
    - forceForNewDevices: Renew the provisioning profiles if the device count on the developer portal has changed. Ignored for profile types 'appstore' and 'developer_id'
    - includeMacInProfiles: Include Apple Silicon Mac devices in provisioning profiles for iOS/iPadOS apps
    - includeAllCertificates: Include all matching certificates in the provisioning profile. Works only for the 'development' provisioning profile type
+   - certificateId: Select certificate by id. Useful if multiple certificates are stored in one place
    - forceForNewCertificates: Renew the provisioning profiles if the certificate count on the developer portal has changed. Works only for the 'development' provisioning profile type. Requires 'include_all_certificates' option to be 'true'
    - skipConfirmation: Disables confirmation prompts during nuke, answering them with yes
    - safeRemoveCerts: Remove certs from repository during nuke without revoking them on the developer portal
@@ -11291,6 +11300,7 @@ public func syncCodeSigning(type: String = "development",
                             forceForNewDevices: OptionalConfigValue<Bool> = .fastlaneDefault(false),
                             includeMacInProfiles: OptionalConfigValue<Bool> = .fastlaneDefault(false),
                             includeAllCertificates: OptionalConfigValue<Bool> = .fastlaneDefault(false),
+                            certificateId: OptionalConfigValue<String?> = .fastlaneDefault(nil),
                             forceForNewCertificates: OptionalConfigValue<Bool> = .fastlaneDefault(false),
                             skipConfirmation: OptionalConfigValue<Bool> = .fastlaneDefault(false),
                             safeRemoveCerts: OptionalConfigValue<Bool> = .fastlaneDefault(false),
@@ -11346,6 +11356,7 @@ public func syncCodeSigning(type: String = "development",
     let forceForNewDevicesArg = forceForNewDevices.asRubyArgument(name: "force_for_new_devices", type: nil)
     let includeMacInProfilesArg = includeMacInProfiles.asRubyArgument(name: "include_mac_in_profiles", type: nil)
     let includeAllCertificatesArg = includeAllCertificates.asRubyArgument(name: "include_all_certificates", type: nil)
+    let certificateIdArg = certificateId.asRubyArgument(name: "certificate_id", type: nil)
     let forceForNewCertificatesArg = forceForNewCertificates.asRubyArgument(name: "force_for_new_certificates", type: nil)
     let skipConfirmationArg = skipConfirmation.asRubyArgument(name: "skip_confirmation", type: nil)
     let safeRemoveCertsArg = safeRemoveCerts.asRubyArgument(name: "safe_remove_certs", type: nil)
@@ -11400,6 +11411,7 @@ public func syncCodeSigning(type: String = "development",
                                           forceForNewDevicesArg,
                                           includeMacInProfilesArg,
                                           includeAllCertificatesArg,
+                                          certificateIdArg,
                                           forceForNewCertificatesArg,
                                           skipConfirmationArg,
                                           safeRemoveCertsArg,
@@ -13497,7 +13509,7 @@ public func xcov(workspace: OptionalConfigValue<String?> = .fastlaneDefault(nil)
                  coverallsServiceJobId: OptionalConfigValue<String?> = .fastlaneDefault(nil),
                  coverallsRepoToken: OptionalConfigValue<String?> = .fastlaneDefault(nil),
                  xcconfig: OptionalConfigValue<String?> = .fastlaneDefault(nil),
-                 ideFoundationPath: String = "/Applications/Xcode-14.3.0.app/Contents/Developer/../Frameworks/IDEFoundation.framework/Versions/A/IDEFoundation",
+                 ideFoundationPath: String = "/Applications/Xcode-15.0.0.app/Contents/Developer/../Frameworks/IDEFoundation.framework/Versions/A/IDEFoundation",
                  legacySupport: OptionalConfigValue<Bool> = .fastlaneDefault(false))
 {
     let workspaceArg = workspace.asRubyArgument(name: "workspace", type: nil)
@@ -13700,4 +13712,4 @@ public let snapshotfile: Snapshotfile = .init()
 
 // Please don't remove the lines below
 // They are used to detect outdated files
-// FastlaneRunnerAPIVersion [0.9.173]
+// FastlaneRunnerAPIVersion [0.9.174]
