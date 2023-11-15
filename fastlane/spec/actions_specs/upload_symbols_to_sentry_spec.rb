@@ -1,6 +1,11 @@
 describe Fastlane do
   describe Fastlane::FastFile do
     describe "sentry" do
+      before do
+        # Prevent ENV vars that might be defined in the developer's machine to muddy the test environment
+        allow(ENV).to receive(:[]).and_return(nil)
+      end
+
       it "fails with no API key or auth token" do
         dsym_path_1 = './fastlane/spec/fixtures/dSYM/Themoji.dSYM.zip'
 
