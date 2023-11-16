@@ -126,7 +126,12 @@ module Cert
                                        value = value.to_s
                                        pt = %w(macos ios tvos)
                                        UI.user_error!("Unsupported platform, must be: #{pt}") unless pt.include?(value)
-                                     end)
+                                     end),
+        FastlaneCore::ConfigItem.new(key: :allow_key_access_without_warning,
+                                    env_name: "ALLOW_KEY_ACCESS_WITHOUT_WARNING",
+                                    description: "Allow any application to access the key without warning (ios, macos, tvos). Insecure!",
+                                    type: Boolean,
+                                    default_value: false)
       ]
     end
   end
