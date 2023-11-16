@@ -17,8 +17,8 @@ module Spaceship
         # bundleIds
         #
 
-        def get_bundle_ids(filter: {}, includes: nil, limit: nil, sort: nil)
-          params = provisioning_request_client.build_params(filter: filter, includes: includes, limit: limit, sort: sort)
+        def get_bundle_ids(filter: {}, includes: nil, fields: nil, limit: nil, sort: nil)
+          params = provisioning_request_client.build_params(filter: filter, includes: includes, fields: fields, limit: limit, sort: sort)
           provisioning_request_client.get("bundleIds", params)
         end
 
@@ -129,8 +129,8 @@ module Spaceship
         # certificates
         #
 
-        def get_certificates(profile_id: nil, filter: {}, includes: nil, limit: nil, sort: nil)
-          params = provisioning_request_client.build_params(filter: filter, includes: includes, limit: limit, sort: sort)
+        def get_certificates(profile_id: nil, filter: {}, includes: nil, fields: nil, limit: nil, sort: nil)
+          params = provisioning_request_client.build_params(filter: filter, includes: includes, fields: fields, limit: limit, sort: sort)
           if profile_id.nil?
             provisioning_request_client.get("certificates", params)
           else
@@ -164,8 +164,8 @@ module Spaceship
         # devices
         #
 
-        def get_devices(profile_id: nil, filter: {}, includes: nil, limit: nil, sort: nil)
-          params = provisioning_request_client.build_params(filter: filter, includes: includes, limit: limit, sort: sort)
+        def get_devices(profile_id: nil, filter: {}, includes: nil, fields: nil, limit: nil, sort: nil)
+          params = provisioning_request_client.build_params(filter: filter, includes: includes, fields: fields, limit: limit, sort: sort)
           if profile_id.nil?
             provisioning_request_client.get("devices", params)
           else
@@ -213,8 +213,8 @@ module Spaceship
         # profiles
         #
 
-        def get_profiles(filter: {}, includes: nil, limit: nil, sort: nil)
-          params = provisioning_request_client.build_params(filter: filter, includes: includes, limit: limit, sort: sort)
+        def get_profiles(filter: {}, includes: nil, fields: nil, limit: nil, sort: nil)
+          params = provisioning_request_client.build_params(filter: filter, includes: includes, fields: fields, limit: limit, sort: sort)
           provisioning_request_client.get("profiles", params)
         end
 
@@ -251,6 +251,12 @@ module Spaceship
           }
 
           provisioning_request_client.post("profiles", body)
+        end
+
+        def get_profile_bundle_id(profile_id: nil)
+          raise "Profile id is nil" if profile_id.nil?
+
+          provisioning_request_client.get("profiles/#{profile_id}/bundleId")
         end
 
         def delete_profile(profile_id: nil)

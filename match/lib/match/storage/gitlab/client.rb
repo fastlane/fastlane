@@ -40,6 +40,8 @@ module Match
         def files
           @files ||= begin
             url = URI.parse(base_url)
+            # 100 is maximum number of Secure files available on Gitlab https://docs.gitlab.com/ee/api/secure_files.html
+            url.query = [url.query, "per_page=100"].compact.join('&')
 
             request = Net::HTTP::Get.new(url.request_uri)
 
@@ -69,32 +71,56 @@ module Match
               "name" => target_file
             )
 
-            response = execute_request(url, request)
-
-            log_upload_error(response, target_file) if response.code != "201"
+            execute_request(url, request, target_file)
           end
         end
 
-        def log_upload_error(response, target_file)
-          begin
-            response_body = JSON.parse(response.body)
-          rescue JSON::ParserError
-            response_body = response.body
-          end
-
-          if response_body["message"] && (response_body["message"]["name"] == ["has already been taken"])
-            UI.error("#{target_file} already exists in GitLab project #{@project_id}, file not uploaded")
-          else
-            UI.error("Upload error for #{target_file}: #{response_body}")
-          end
-        end
-
-        def execute_request(url, request)
+        def execute_request(url, request, target_file = nil)
           request[authentication_key] = authentication_value
 
           http = Net::HTTP.new(url.host, url.port)
           http.use_ssl = url.instance_of?(URI::HTTPS)
-          http.request(request)
+
+          begin
+            response = http.request(request)
+          rescue Errno::ECONNREFUSED, SocketError => message
+            UI.user_error!("GitLab connection error: #{message}")
+          end
+
+          unless response.kind_of?(Net::HTTPSuccess)
+            handle_response_error(response, target_file)
+          end
+
+          response
+        end
+
+        def handle_response_error(response, target_file = nil)
+          error_prefix      = "GitLab storage error:"
+          file_debug_string = "File: #{target_file}" unless target_file.nil?
+          api_debug_string  = "API: #{@api_v4_url}"
+          debug_info        = "(#{[file_debug_string, api_debug_string].compact.join(', ')})"
+
+          begin
+            parsed = JSON.parse(response.body)
+          rescue JSON::ParserError
+          end
+
+          if parsed && parsed["message"] && (parsed["message"]["name"] == ["has already been taken"])
+            error_handler = :error
+            error = "#{target_file} already exists in GitLab project #{@project_id}, file not uploaded"
+          else
+            error_handler = :user_error!
+            error = "#{response.code}: #{response.body}"
+          end
+          error_message = [error_prefix, error, debug_info].join(' ')
+
+          UI.send(error_handler, error_message)
+        end
+
+        def prompt_for_access_token
+          unless authentication_key
+            @private_token = UI.input("Please supply a GitLab personal or project access token: ")
+          end
         end
       end
     end

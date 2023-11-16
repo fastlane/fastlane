@@ -36,17 +36,9 @@ describe Match do
         git_bearer_authorization: nil,
 
         clone_branch_directly: false,
-        google_cloud_bucket_name: "",
-        google_cloud_keys_file: "",
-        google_cloud_project_id: "",
-        s3_region: "",
-        s3_access_key: "",
-        s3_secret_access_key: "",
-        s3_bucket: "",
-        s3_object_prefix: "",
-        gitlab_project: nil,
-        gitlab_host: 'https://gitlab.com',
-        team_id: nil
+
+        type: config[:type],
+        platform: config[:platform]
       ).and_return(fake_storage)
 
       allow(fake_storage).to receive(:download)

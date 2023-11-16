@@ -47,7 +47,8 @@ module Match
           team_id: params[:team_id],
           team_name: params[:team_name],
           api_key_path: params[:api_key_path],
-          api_key: params[:api_key]
+          api_key: params[:api_key],
+          gitlab_host: params[:gitlab_host]
         )
       end
 
@@ -60,7 +61,8 @@ module Match
                      team_id: nil,
                      team_name: nil,
                      api_key_path: nil,
-                     api_key: nil)
+                     api_key: nil,
+                     gitlab_host: nil)
 
         @readonly = readonly
         @username = username
@@ -68,6 +70,7 @@ module Match
         @team_name = team_name
         @api_key_path = api_key_path
         @api_key = api_key
+        @gitlab_host = gitlab_host
 
         @job_token = job_token
         @private_token = private_token
@@ -95,6 +98,8 @@ module Match
       end
 
       def download
+        gitlab_client.prompt_for_access_token
+
         # Check if we already have a functional working_directory
         return if @working_directory
 

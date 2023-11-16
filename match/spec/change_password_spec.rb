@@ -25,7 +25,12 @@ describe Match do
         git_branch: "master",
         git_full_name: nil,
         git_user_email: nil,
-        clone_branch_directly: false
+        clone_branch_directly: false,
+        git_basic_authorization: nil,
+        git_bearer_authorization: nil,
+        git_private_key: nil,
+        type: config[:type],
+        platform: config[:platform]
       ).and_return(fake_storage)
 
       allow(fake_storage).to receive(:download)

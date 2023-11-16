@@ -4,6 +4,7 @@ require 'credentials_manager/appfile_config'
 require_relative 'module'
 
 module Match
+  # rubocop:disable Metrics/ClassLength
   class Options
     # This is match specific, as users can append storage specific options
     def self.append_option(option)
@@ -222,6 +223,11 @@ module Match
                                      env_name: "MATCH_S3_OBJECT_PREFIX",
                                      description: "Prefix to be used on all objects uploaded to S3",
                                      optional: true),
+        FastlaneCore::ConfigItem.new(key: :s3_skip_encryption,
+                                     env_name: "MATCH_S3_SKIP_ENCRYPTION",
+                                     description: "Skip encryption of all objects uploaded to S3. WARNING: only enable this on S3 buckets with sufficiently restricted permissions and server-side encryption enabled. See https://docs.aws.amazon.com/AmazonS3/latest/userguide/UsingEncryption.html",
+                                     type: Boolean,
+                                     default_value: false),
 
         # Storage: GitLab Secure Files
         FastlaneCore::ConfigItem.new(key: :gitlab_project,
@@ -232,6 +238,14 @@ module Match
                                       env_name: "MATCH_GITLAB_HOST",
                                       default_value: 'https://gitlab.com',
                                       description: "GitLab Host (i.e. 'https://gitlab.com')",
+                                      optional: true),
+        FastlaneCore::ConfigItem.new(key: :job_token,
+                                      env_name: "CI_JOB_TOKEN",
+                                      description: "GitLab CI_JOB_TOKEN",
+                                      optional: true),
+        FastlaneCore::ConfigItem.new(key: :private_token,
+                                      env_name: "PRIVATE_TOKEN",
+                                      description: "GitLab Access Token",
                                       optional: true),
 
         # Keychain
@@ -268,6 +282,11 @@ module Match
                                      description: "Include all matching certificates in the provisioning profile. Works only for the 'development' provisioning profile type",
                                      type: Boolean,
                                      default_value: false),
+        FastlaneCore::ConfigItem.new(key: :certificate_id,
+                                     env_name: "MATCH_CERTIFICATE_ID",
+                                     description: "Select certificate by id. Useful if multiple certificates are stored in one place",
+                                     type: String,
+                                     optional: true),
         FastlaneCore::ConfigItem.new(key: :force_for_new_certificates,
                                      env_name:  "MATCH_FORCE_FOR_NEW_CERTIFICATES",
                                      description: "Renew the provisioning profiles if the certificate count on the developer portal has changed. Works only for the 'development' provisioning profile type. Requires 'include_all_certificates' option to be 'true'",
@@ -349,4 +368,5 @@ module Match
       ]
     end
   end
+  # rubocop:enable Metrics/ClassLength
 end

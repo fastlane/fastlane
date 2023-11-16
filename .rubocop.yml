@@ -228,6 +228,9 @@ Style/GuardClause:
 Style/StringLiterals:
   Enabled: false
 
+Style/QuotedSymbols:
+  Enabled: false
+
 # something = if something_else
 # that's confusing
 Style/ConditionalAssignment:
@@ -315,7 +318,7 @@ Lint/IsStringUsage:
 # ( ) for method calls
 Style/MethodCallWithArgsParentheses:
   Enabled: true
-  IgnoredMethods:
+  AllowedMethods:
     - 'require'
     - 'require_relative'
     - 'fastlane_require'
