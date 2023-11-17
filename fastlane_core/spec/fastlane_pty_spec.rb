@@ -53,7 +53,6 @@ describe FastlaneCore do
         expect {
           exit_status = FastlaneCore::FastlanePty.spawn("a path of a crasher exec") do |command_stdout, command_stdin, pid|
           end
-          UI.message(exit_status)
         }.to raise_error(FastlaneCore::FastlanePtyError) { |error|
           expect(error.exit_status).to eq(-1) # command was forced to -1
         }
