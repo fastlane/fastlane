@@ -35,6 +35,7 @@ module Frameit
 
       default_command(:run)
 
+      # default
       command :run do |c|
         c.syntax = 'fastlane frameit black'
         c.description = "Adds a black frame around all screenshots"
@@ -47,39 +48,29 @@ module Frameit
         end
       end
 
-      command :silver do |c|
-        c.syntax = 'fastlane frameit silver'
-        c.description = "Adds a silver frame around all screenshots"
+      # iphone available colors
+      frame_colors = {
+        silver: { syntax: 'fastlane frameit silver', description: "Adds a silver frame around all screenshots" },
+        gold: { syntax: 'fastlane frameit gold', description: "Adds a gold frame around all screenshots" },
+        rose_gold: { syntax: 'fastlane frameit rose_gold', description: "Adds a rose gold frame around all screenshots" },
+        midnight: { syntax: 'fastlane frameit midnight', description: "Adds a midnight frame around all screenshots" },
+        starlight: { syntax: 'fastlane frameit starlight', description: "Adds a starlight frame around all screenshots" },
+        purple: { syntax: 'fastlane frameit purple', description: "Adds a purple frame around all screenshots" },
+        blue: { syntax: 'fastlane frameit blue', description: "Adds a blue frame around all screenshots" },
+        red: { syntax: 'fastlane frameit red', description: "Adds a red frame around all screenshots" },
+      }
 
-        FastlaneCore::CommanderGenerator.new.generate(Frameit::Options.available_options, command: c)
+      frame_colors.each do |color, details|
+        command color do |c|
+          c.syntax = details[:syntax]
+          c.description = details[:description]
 
-        c.action do |args, options|
-          load_config(options)
-          Frameit::Runner.new.run('.', Frameit::Color::SILVER)
-        end
-      end
+          FastlaneCore::CommanderGenerator.new.generate(Frameit::Options.available_options, command: c)
 
-      command :gold do |c|
-        c.syntax = 'fastlane frameit gold'
-        c.description = "Adds a gold frame around all screenshots"
-
-        FastlaneCore::CommanderGenerator.new.generate(Frameit::Options.available_options, command: c)
-
-        c.action do |args, options|
-          load_config(options)
-          Frameit::Runner.new.run('.', Frameit::Color::GOLD)
-        end
-      end
-
-      command :rose_gold do |c|
-        c.syntax = 'fastlane frameit rose_gold'
-        c.description = "Adds a rose gold frame around all screenshots"
-
-        FastlaneCore::CommanderGenerator.new.generate(Frameit::Options.available_options, command: c)
-
-        c.action do |args, options|
-          load_config(options)
-          Frameit::Runner.new.run('.', Frameit::Color::ROSE_GOLD)
+          c.action do |args, options|
+            load_config(options)
+            Frameit::Runner.new.run('.', Frameit::Color.const_get(color.to_s.upcase))
+          end
         end
       end
 
