@@ -289,6 +289,31 @@ describe Deliver::UploadMetadata do
         end
       end
 
+      context "with privacy_url" do
+        it 'saves privacy_url' do
+          options = {
+            platform: "ios",
+            metadata_path: metadata_path,
+            privacy_url: { "en-US" => "https://fastlane.tools" },
+            apple_tv_privacy_policy: { "en-US" => "https://fastlane.tools/tv" }
+          }
+
+          # Get number of versions (used for if whats_new should be sent)
+          expect(Spaceship::ConnectAPI).to receive(:get_app_store_versions).and_return(app_store_versions)
+
+          expect(version).to receive(:update).with(attributes: {})
+
+          # Validate symbol names used when comparing privacy urls before upload
+          expect(app_info_localization_en).to receive(:privacy_policy_url).and_return(options[:privacy_url]["en-US"])
+          expect(app_info_localization_en).to receive(:privacy_policy_text).and_return(options[:apple_tv_privacy_policy]["en-US"])
+
+          # Update app info
+          expect(app_info).to receive(:update_categories).with(category_id_map: {})
+
+          uploader.upload(options)
+        end
+      end
+
       context "with auto_release_date" do
         it 'with date' do
           options = {
