@@ -85,9 +85,9 @@ module Fastlane
         notarization_info = JSON.parse(submit_response)
 
         # Staple
+        submission_id = notarization_info["id"]
         case notarization_info['status']
         when 'Accepted'
-          submission_id = notarization_info["id"]
           UI.success("Successfully uploaded package to notarization service with request identifier #{submission_id}")
 
           if skip_stapling
@@ -100,7 +100,22 @@ module Fastlane
             UI.success("Successfully notarized and stapled package")
           end
         when 'Invalid'
-          UI.user_error!("Could not notarize package with message '#{notarization_info['statusSummary']}'")
+          if submission_id && print_log
+            log_request_parts = [
+              "xcrun notarytool log #{submission_id}"
+            ] + auth_parts
+            log_request_command = log_request_parts.join(' ')
+            log_request_response = Actions.sh(
+              log_request_command,
+              log: verbose,
+              error_callback: lambda { |msg|
+                UI.error("Error requesting the notarization log: #{msg}")
+              }
+            )
+            UI.user_error!("Could not notarize package with message '#{log_request_response}'")
+          else
+            UI.user_error!("Could not notarize package. To see the error, please set 'print_log' to true.")
+          end
         else
           UI.crash!("Could not notarize package with status '#{notarization_info['status']}'")
         end
