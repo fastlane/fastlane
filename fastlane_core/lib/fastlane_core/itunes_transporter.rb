@@ -215,6 +215,8 @@ module FastlaneCore
 
     private_constant :ERROR_REGEX
 
+    attr_reader :errors
+
     def execute(command, hide_output)
       if Helper.test?
         yield(nil) if block_given?
