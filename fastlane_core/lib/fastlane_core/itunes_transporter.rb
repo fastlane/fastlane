@@ -243,9 +243,6 @@ module FastlaneCore
         @errors << ex.to_s
       end
 
-      # if FastlanePty.spawn returns nil exit code for whatever reason, force it to -1
-      exit_status = -1 unless exit_status
-
       @errors << "The call to the altool completed with a non-zero exit status: #{exit_status}. This indicates a failure." unless exit_status.zero?
       @errors << "-1 indicates altool exited abnormally; try retrying (see https://github.com/fastlane/fastlane/issues/21535)" if exit_status == -1
 
