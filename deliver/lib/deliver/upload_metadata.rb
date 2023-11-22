@@ -468,7 +468,7 @@ module Deliver
       end
       localizations = app_info.get_app_info_localizations
 
-      LOCALISED_APP_VALUES.keys.each do |key|
+      LOCALISED_APP_VALUES.each do |key, localized_key|
         current = options[key]
         next unless current
 
@@ -485,7 +485,7 @@ module Deliver
           next if app_info_locale.nil?
 
           begin
-            current_value = app_info_locale.public_send(key.to_sym)
+            current_value = app_info_locale.public_send(localized_key.to_sym)
           rescue NoMethodError
             next
           end
