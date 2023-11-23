@@ -21,7 +21,7 @@ describe Scan do
           output = File.open('./scan/spec/fixtures/non_parallel_testing_failure.log', &:read)
           expect do
             Scan::ErrorHandler.handle_build_error(output, log_path)
-          end.to_not raise_error
+          end.to_not(raise_error)
         end
       end
 
