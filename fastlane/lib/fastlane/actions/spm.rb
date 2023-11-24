@@ -12,6 +12,7 @@ module Fastlane
         cmd << "--verbose" if params[:verbose]
         cmd << params[:command] if package_commands.include?(params[:command])
         cmd << "--enable-code-coverage" if params[:enable_code_coverage] && (params[:command] == 'generate-xcodeproj' || params[:command] == 'test')
+        cmd << "--parallel" if params[:parallel] && params[:command] == 'test'
         if params[:xcconfig]
           cmd << "--xcconfig-overrides #{params[:xcconfig]}"
         end
@@ -48,6 +49,11 @@ module Fastlane
           FastlaneCore::ConfigItem.new(key: :enable_code_coverage,
                                        env_name: "FL_SPM_ENABLE_CODE_COVERAGE",
                                        description: "Enables code coverage for the generated Xcode project when using the 'generate-xcodeproj' and the 'test' command",
+                                       type: Boolean,
+                                       optional: true),
+          FastlaneCore::ConfigItem.new(key: :parallel,
+                                       env_name: "FL_SPM_PARALLEL",
+                                       description: "Enables running tests in parallel when using the 'test' command",
                                        type: Boolean,
                                        optional: true),
           FastlaneCore::ConfigItem.new(key: :build_path,
