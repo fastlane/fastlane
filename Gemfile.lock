@@ -390,7 +390,7 @@ DEPENDENCIES
   rubocop-performance
   rubocop-require_tools
   sinatra (~> 2.0.8)
-  webmock (~> 3.18.0)
+  webmock (~> 3.18)
   xcode-install (>= 2.6.7)
   xcov (~> 1.4.1)
   yard (~> 0.9.11)
