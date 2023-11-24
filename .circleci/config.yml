@@ -55,8 +55,6 @@ aliases:
       name: Set Ruby version
       command: | # see https://circleci.com/docs/2.0/testing-ios/#using-ruby
         echo "ruby-${_RUBY_VERSION}" > ~/.ruby-version
-        # https://circleci.com/docs/2.0/env-vars/#setting-an-environment-variable-in-a-shell-command
-        echo 'chruby ruby-${_RUBY_VERSION}' >> $BASH_ENV
 
   - &bundle_install
     run:
