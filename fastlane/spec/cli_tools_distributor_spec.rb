@@ -33,6 +33,11 @@ describe Fastlane::CLIToolsDistributor do
   end
 
   describe "update checking" do
+    before(:each) do
+      # prevent the update checker to run and clutter the output
+      ENV["FASTLANE_SKIP_UPDATE_CHECK"] = "a_value"
+    end
+
     it "checks for updates when running a lane" do
       FastlaneSpec::Env.with_ARGV(["sigh"]) do
         require 'fastlane/commands_generator'
