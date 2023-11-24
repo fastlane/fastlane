@@ -2,7 +2,7 @@ describe Spaceship::Tunes::DeviceType do
   describe "type identifiers" do
     before(:each) do
       # Let's catch those calls to avoid polluting the output
-      # Note: warning has a different signature in newer versions of ruby
+      # Note: Warning.warn() has a different signature depending on the Ruby version, hence why we need more than one allow(...)
       allow(Warning).to receive(:warn).with(/Spaceship::Tunes::DeviceType has been deprecated./)
       allow(Warning).to receive(:warn).with(/Spaceship::Tunes::DeviceType has been deprecated./, { category: nil })
     end
