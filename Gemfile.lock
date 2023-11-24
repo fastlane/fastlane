@@ -335,7 +335,7 @@ GEM
       unf_ext
     unf_ext (0.0.8.2)
     unicode-display_width (2.4.2)
-    webmock (3.19.1)
+    webmock (3.18.1)
       addressable (>= 2.8.0)
       crack (>= 0.3.2)
       hashdiff (>= 0.4.0, < 2.0.0)
@@ -390,7 +390,7 @@ DEPENDENCIES
   rubocop-performance
   rubocop-require_tools
   sinatra (~> 2.0.8)
-  webmock (~> 3.8)
+  webmock (~> 3.18.0)
   xcode-install (>= 2.6.7)
   xcov (~> 1.4.1)
   yard (~> 0.9.11)
