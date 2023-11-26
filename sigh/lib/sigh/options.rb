@@ -114,6 +114,17 @@ module Sigh
                                      env_name: "SIGH_PROVISIONING_PROFILE_NAME",
                                      description: "The name of the profile that is used on the Apple Developer Portal",
                                      optional: true),
+        FastlaneCore::ConfigItem.new(key: :keychain_path,
+                                     short_option: "-k",
+                                     env_name: "CERT_KEYCHAIN_PATH",
+                                     description: "Path to a custom keychain",
+                                     code_gen_sensitive: true,
+                                     default_value: Dir["#{Dir.home}/Library/Keychains/login.keychain", "#{Dir.home}/Library/Keychains/login.keychain-db"].last,
+                                     default_value_dynamic: true,
+                                     verify_block: proc do |value|
+                                       value = File.expand_path(value)
+                                       UI.user_error!("Keychain not found at path '#{value}'") unless File.exist?(value)
+                                     end),
         FastlaneCore::ConfigItem.new(key: :ignore_profiles_with_different_name,
                                      env_name: "SIGH_IGNORE_PROFILES_WITH_DIFFERENT_NAME",
                                      description: "Use in combination with :provisioning_name - when true only profiles matching this exact name will be downloaded",
