@@ -116,11 +116,9 @@ module Sigh
                                      optional: true),
         FastlaneCore::ConfigItem.new(key: :keychain_path,
                                      short_option: "-k",
-                                     env_name: "CERT_KEYCHAIN_PATH",
+                                     env_name: "SIGH_KEYCHAIN_PATH",
                                      description: "Path to a custom keychain",
-                                     code_gen_sensitive: true,
-                                     default_value: Dir["#{Dir.home}/Library/Keychains/login.keychain", "#{Dir.home}/Library/Keychains/login.keychain-db"].last,
-                                     default_value_dynamic: true,
+                                     optional: true,
                                      verify_block: proc do |value|
                                        value = File.expand_path(value)
                                        UI.user_error!("Keychain not found at path '#{value}'") unless File.exist?(value)

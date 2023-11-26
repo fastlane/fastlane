@@ -113,7 +113,6 @@ module Sigh
         content = Base64.decode64(profile.profile_content)
         f.write(content)
       end
-
       Manager.install_profile(output_path, Sigh.config[:keychain_path]) unless Sigh.config[:skip_install]
     end
   end
