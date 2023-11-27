@@ -146,6 +146,8 @@ module Scan
 
           selector = ->(sim) { pieces.count > 0 && sim.name == pieces.first }
 
+          display_device = "'#{device_string}'"
+
           set + (
             if pieces.count == 0
               [] # empty array
@@ -157,6 +159,8 @@ module Scan
                 .pop(1)
             else # pieces.count == 2 -- mathematically, because of the 'end of line' part of our regular expression
               version = pieces[1].tr('()', '')
+              display_device = "'#{pieces[0]}' with version #{version}"
+
               potential_emptiness_error = lambda do |sims|
                 if sims.empty?
                   UI.error("No simulators found that are equal to the version " \
@@ -168,8 +172,8 @@ module Scan
             end
           ).tap do |array|
             if array.empty?
-              UI.test_failure!("No device found with name '#{device_string}'") if Scan.config[:ensure_devices_found]
-              UI.error("Ignoring '#{device_string}', couldn’t find matching simulator")
+              UI.test_failure!("No device found with name #{display_device}") if Scan.config[:ensure_devices_found]
+              UI.error("Ignoring '#{device_string}', couldn't find matching simulator")
             end
           end
         end
