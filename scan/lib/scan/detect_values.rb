@@ -1,10 +1,18 @@
 require 'fastlane_core/device_manager'
 require 'fastlane_core/project'
+require 'pathname'
 require_relative 'module'
 
 module Scan
   # This class detects all kinds of default values
   class DetectValues
+    PLATFORM_SIMULATOR_NAME = {
+      'iOS' => 'iPhoneSimulator',
+      'tvOS' => 'AppleTVSimulator',
+      'watchOS' => 'WatchSimulator',
+      'visionOS' => 'XRSimulator'
+    }.freeze
+
     # This is needed as these are more complex default values
     # Returns the finished config object
     def self.set_additional_default_values
@@ -100,6 +108,33 @@ module Scan
       end
     end
 
+    def self.detect_sdk_version(platform)
+      UI.crash!("Unknown platform: #{platform}") unless PLATFORM_SIMULATOR_NAME.key?(platform)
+      simulator_name = PLATFORM_SIMULATOR_NAME[platform]
+      @sdk_versions ||= {}
+      @sdk_versions[platform] ||= begin
+         platform_path = Pathname.new("Platforms/#{simulator_name}.platform/Developer/SDKs/")
+         sdks_path = Pathname.new(FastlaneCore::Helper.xcode_path).join(platform_path)
+         default_sdk_path = sdks_path.join("#{simulator_name}.sdk")
+         sdk_path = sdks_path.children.find { |child| child.symlink? && child.realpath == default_sdk_path }
+         UI.crash!("Unable to find default #{simulator_name} SDK version from SDKs: #{sdks_path.children}") unless sdk_path
+
+         version = /#{Regexp.quote(simulator_name)}(?<val>.*)\.sdk/.match(sdk_path.basename.to_s)
+         UI.crash!("Could not determine SDK version from #{sdk_path}") unless version && version[:val] != ''
+
+         begin
+           Gem::Version.new(version[:val])
+         rescue ArgumentError => e
+           UI.crash!("Could not parse SDK version: #{e.message}")
+         end
+       end
+    end
+
+    def self.compatible_with_sdk(sim)
+      default_sdk_version = detect_sdk_version(sim.os_type)
+      Gem::Version.new(sim.os_version) <= default_sdk_version || sim.os_version.start_with?(default_sdk_version.version)
+    end
+
     def self.regular_expression_for_split_on_whitespace_followed_by_parenthesized_version
       # %r{
       #   \s # a whitespace character
@@ -137,14 +172,11 @@ module Scan
       # We create 2 lambdas, which we iterate over later on
       # If the first lambda `matches` found a simulator to use
       # we'll never call the second one
-
       matches = lambda do
         set_of_simulators = devices.inject(
           Set.new # of simulators
         ) do |set, device_string|
           pieces = device_string.split(regular_expression_for_split_on_whitespace_followed_by_parenthesized_version)
-
-          selector = ->(sim) { pieces.count > 0 && sim.name == pieces.first }
 
           display_device = "'#{device_string}'"
 
@@ -153,10 +185,10 @@ module Scan
               [] # empty array
             elsif pieces.count == 1
               simulators
-                .select(&selector)
+                .select { |sim| sim.name == pieces.first && compatible_with_sdk(sim) }
                 .reverse # more efficient, because `simctl` prints higher versions first
                 .sort_by! { |sim| Gem::Version.new(sim.os_version) }
-                .pop(1)
+                .pop(1) # Select the "highest versioned" simulator if none specified
             else # pieces.count == 2 -- mathematically, because of the 'end of line' part of our regular expression
               version = pieces[1].tr('()', '')
               display_device = "'#{pieces[0]}' with version #{version}"
@@ -168,7 +200,7 @@ module Scan
                   "of deployment target (#{deployment_target_version})")
                 end
               end
-              filter_simulators(simulators, :equal, version).tap(&potential_emptiness_error).select(&selector)
+              filter_simulators(simulators, :equal, version).tap(&potential_emptiness_error).select { |sim| sim.name == pieces.first }
             end
           ).tap do |array|
             if array.empty?
@@ -187,7 +219,7 @@ module Scan
 
           result = Array(
             simulators
-              .select { |sim| sim.name == default_device_name }
+              .select { |sim| sim.name == default_device_name && compatible_with_sdk(sim) }
               .reverse # more efficient, because `simctl` prints higher versions first
               .sort_by! { |sim| Gem::Version.new(sim.os_version) }
               .last || simulators.first
@@ -248,7 +280,6 @@ module Scan
       version = Scan.config[:deployment_target_version]
       version ||= Scan.project.build_settings(key: deployment_target_key) if Scan.project
       version ||= 0
-
       return version
     end
   end
