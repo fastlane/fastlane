@@ -418,6 +418,8 @@ module FastlaneCore
 
         command = build_xcodebuild_showbuildsettings_command
 
+        command = "#{command} 2>&1" # xcodebuild produces errors on stderr #21672
+
         # Xcode might hang here and retrying fixes the problem, see fastlane#4059
         begin
           timeout = FastlaneCore::Project.xcode_build_settings_timeout
