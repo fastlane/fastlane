@@ -67,7 +67,7 @@ module Fastlane
 
       def self.update_with_profile_info(app_path, values)
         provision_profile_path = "#{app_path}/embedded.mobileprovision"
-        UI.user_error!("Unable to extract profile") unless File.exist?(provision_profile_path)
+        UI.user_error!("Unable to find embedded profile in #{provision_profile_path}") unless File.exist?(provision_profile_path)
 
         profile = `cat #{provision_profile_path.shellescape} | security cms -D`
         UI.user_error!("Unable to extract profile") unless $? == 0
