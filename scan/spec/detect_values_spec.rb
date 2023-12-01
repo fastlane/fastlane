@@ -80,6 +80,7 @@ describe Scan do
             Scan::DetectValues.detect_sdk_version(platform)
           end.to raise_error(FastlaneCore::Interface::FastlaneCrash, "Unable to find default #{simulator_name} SDK version from SDKs: #{sdks_path.children}")
         end
+
         it "returns an error on failure to determine #{platform} SDK version from filename" do
           default_path = double("path/to/default.sdk")
           platform_path = double("path/to/sdks")
@@ -101,6 +102,7 @@ describe Scan do
             Scan::DetectValues.detect_sdk_version(platform)
           end.to raise_error(FastlaneCore::Interface::FastlaneCrash, "Could not determine SDK version from #{some_path}")
         end
+
         it "returns an error on failure to parse #{platform} SDK version from filename" do
           default_path = double("path/to/default.sdk")
           platform_path = double("path/to/sdks")
@@ -122,6 +124,7 @@ describe Scan do
             Scan::DetectValues.detect_sdk_version(platform)
           end.to raise_error(FastlaneCore::Interface::FastlaneCrash, "Could not parse SDK version: Malformed version number string asdf17g")
         end
+
         it "detects the expected default for #{platform}" do
           default_path = double("path/to/default.sdk")
           platform_path = double("path/to/sdks")

@@ -135,6 +135,14 @@ module Scan
       Gem::Version.new(sim.os_version) <= default_sdk_version || sim.os_version.start_with?(default_sdk_version.version)
     end
 
+    def self.highest_compatible_simulator(simulators, name)
+      simulators
+        .select { |sim| sim.name == name && compatible_with_sdk(sim) }
+        .reverse
+        .sort_by! { |sim| Gem::Version.new(sim.os_version) }
+        .last
+    end
+
     def self.regular_expression_for_split_on_whitespace_followed_by_parenthesized_version
       # %r{
       #   \s # a whitespace character
@@ -184,11 +192,7 @@ module Scan
             if pieces.count == 0
               [] # empty array
             elsif pieces.count == 1
-              simulators
-                .select { |sim| sim.name == pieces.first && compatible_with_sdk(sim) }
-                .reverse # more efficient, because `simctl` prints higher versions first
-                .sort_by! { |sim| Gem::Version.new(sim.os_version) }
-                .pop(1) # Select the "highest versioned" simulator if none specified
+              [ highest_compatible_simulator(simulators, pieces.first) ]
             else # pieces.count == 2 -- mathematically, because of the 'end of line' part of our regular expression
               version = pieces[1].tr('()', '')
               display_device = "'#{pieces[0]}' with version #{version}"
@@ -217,13 +221,7 @@ module Scan
         default = lambda do
           UI.error("Couldn't find any matching simulators for '#{devices}' - falling back to default simulator") if (devices || []).count > 0
 
-          result = Array(
-            simulators
-              .select { |sim| sim.name == default_device_name && compatible_with_sdk(sim) }
-              .reverse # more efficient, because `simctl` prints higher versions first
-              .sort_by! { |sim| Gem::Version.new(sim.os_version) }
-              .last || simulators.first
-          )
+          result = [ highest_compatible_simulator(simulators, default_device_name) || simulators.first ]
 
           UI.message("Found simulator \"#{result.first.name} (#{result.first.os_version})\"") if result.first
 
