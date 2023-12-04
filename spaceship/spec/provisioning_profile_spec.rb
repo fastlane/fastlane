@@ -139,12 +139,20 @@ describe Spaceship::ProvisioningProfile do
   describe '#valid?' do
     it "Valid profile" do
       p = Spaceship::ProvisioningProfile.all.first
+      p.expires = Time.now.utc + 60
       expect(p.valid?).to eq(true)
     end
 
-    it "Invalid profile" do
+    it "Invalid profile with expired status" do
       profile = Spaceship::ProvisioningProfile.all.first
       profile.status = 'Expired'
+      expect(profile.valid?).to eq(false)
+    end
+
+    it "Invalid profile with active status but expired date" do
+      profile = Spaceship::ProvisioningProfile.all.first
+      profile.status = 'Active'
+      profile.expires = Time.now.utc
       expect(profile.valid?).to eq(false)
     end
   end

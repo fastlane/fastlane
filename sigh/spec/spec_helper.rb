@@ -41,6 +41,7 @@ def sigh_stub_spaceship_connect(inhouse: false, create_profile_app_identifier: n
         profileContent: Base64.encode64("profile content")
       })
       allow(profile).to receive(:bundle_id).and_return(bundle_id)
+      allow(profile).to receive(:expiration_date).and_return(Date.today.next_year.to_time.utc.strftime("%Y-%m-%dT%H:%M:%S%:z"))
 
       profile
     end
@@ -61,6 +62,12 @@ def sigh_stub_spaceship_connect(inhouse: false, create_profile_app_identifier: n
       allow(profile).to receive(:certificates).and_return([certificate])
 
       expect(profile).to receive(:delete!) if expect_delete
+
+      if valid_profiles
+        allow(profile).to receive(:expiration_date).and_return(Date.today.next_year.to_time.utc.strftime("%Y-%m-%dT%H:%M:%S%:z"))
+      else
+        allow(profile).to receive(:expiration_date).and_return(Date.today.prev_year.to_time.utc.strftime("%Y-%m-%dT%H:%M:%S%:z"))
+      end
 
       profile
     end
