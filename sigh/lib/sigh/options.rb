@@ -1,6 +1,10 @@
 require 'fastlane_core/configuration/configuration'
 require 'credentials_manager/appfile_config'
 require_relative 'module'
+require 'spaceship/connect_api/models/device'
+require 'spaceship/connect_api/models/certificate'
+require 'spaceship/connect_api/models/bundle_id'
+require 'spaceship/connect_api/models/profile'
 
 module Sigh
   class Options
@@ -192,7 +196,57 @@ module Sigh
                                      description: "Should the command fail if it was about to create a duplicate of an existing provisioning profile. It can happen due to issues on Apple Developer Portal, when profile to be recreated was not properly deleted first",
                                      optional: true,
                                      is_string: false,
-                                     default_value: false)
+                                     default_value: false),
+
+        # Cache
+        FastlaneCore::ConfigItem.new(key: :cached_certificates,
+                                     description: "A list of cached certificates",
+                                     optional: true,
+                                     is_string: false,
+                                     default_value: nil,
+                                     verify_block: proc do |value|
+                                       if !value.kind_of?(Array) ||
+                                         value.empty? ||
+                                         !value.all?(Spaceship::ConnectAPI::Certificate)
+                                         UI.user_error!("cached_certificates parameter must be a non-empty array of Spaceship::ConnectAPI::Certificate") unless value.kind_of?(Array)
+                                       end
+                                     end),
+        FastlaneCore::ConfigItem.new(key: :cached_devices,
+                                     description: "A list of cached devices",
+                                     optional: true,
+                                     is_string: false,
+                                     default_value: nil,
+                                     verify_block: proc do |value|
+                                       if !value.kind_of?(Array) ||
+                                         value.empty? ||
+                                         !value.all?(Spaceship::ConnectAPI::Device)
+                                         UI.user_error!("cached_devices parameter must be a non-empty array of Spaceship::ConnectAPI::Device")
+                                       end
+                                     end),
+        FastlaneCore::ConfigItem.new(key: :cached_bundle_ids,
+                                     description: "A list of cached bundle ids",
+                                     optional: true,
+                                     is_string: false,
+                                     default_value: nil,
+                                     verify_block: proc do |value|
+                                       if !value.kind_of?(Array) ||
+                                         value.empty? ||
+                                         !value.all?(Spaceship::ConnectAPI::BundleId)
+                                         UI.user_error!("devicached_bundle_idsces parameter must be a non-empty array of Spaceship::ConnectAPI::BundleId")
+                                       end
+                                     end),
+        FastlaneCore::ConfigItem.new(key: :cached_profiles,
+                                      description: "A list of cached bundle ids",
+                                      optional: true,
+                                      is_string: false,
+                                      default_value: nil,
+                                      verify_block: proc do |value|
+                                        if !value.kind_of?(Array) ||
+                                          value.empty? ||
+                                          !value.all?(Spaceship::ConnectAPI::Profile)
+                                          UI.user_error!("cached_profiles parameter must be a non-empty array of Spaceship::ConnectAPI::Profile")
+                                        end
+                                      end)
       ]
     end
   end

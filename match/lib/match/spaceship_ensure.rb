@@ -1,5 +1,6 @@
 require 'spaceship'
 require_relative 'module'
+require_relative 'portal_fetcher'
 
 module Match
   # Ensures the certificate and profiles are also available on App Store Connect
@@ -41,8 +42,9 @@ module Match
       return @team_id
     end
 
-    def bundle_identifier_exists(username: nil, app_identifier: nil, platform: nil)
-      found = Spaceship::ConnectAPI::BundleId.find(app_identifier)
+    def bundle_identifier_exists(username: nil, app_identifier: nil, cached_bundle_ids: nil)
+      search_bundle_ids = cached_bundle_ids || Match::Portal::Fetcher.bundle_ids(bundle_id_identifiers: app_identifier)
+      found = search_bundle_ids.any? { |bundle_id| bundle_id.identifier == app_identifier }
       return if found
 
       require 'sigh/runner'
@@ -52,14 +54,17 @@ module Match
       })
       UI.error("An app with that bundle ID needs to exist in order to create a provisioning profile for it")
       UI.error("================================================================")
-      available_apps = Spaceship::ConnectAPI::BundleId.all.collect { |a| "#{a.identifier} (#{a.name})" }
+      all_bundle_ids = Match::Portal::Fetcher.bundle_ids
+      available_apps = all_bundle_ids.collect { |a| "#{a.identifier} (#{a.name})" }
       UI.message("Available apps:\n- #{available_apps.join("\n- ")}")
       UI.error("Make sure to run `fastlane match` with the same user and team every time.")
       UI.user_error!("Couldn't find bundle identifier '#{app_identifier}' for the user '#{username}'")
     end
 
-    def certificates_exists(username: nil, certificate_ids: [])
-      Spaceship::ConnectAPI::Certificate.all.each do |cert|
+    def certificates_exists(username: nil, certificate_ids: [], platform:, profile_type:, cached_certificates:)
+      certificates = cached_certificates
+      certificates ||= Match::Portal::Fetcher.certificates(platform: platform, profile_type: profile_type)
+      certificates.each do |cert|
         certificate_ids.delete(cert.id)
       end
       return if certificate_ids.empty?
@@ -74,13 +79,26 @@ module Match
       UI.user_error!("To reset the certificates of your Apple account, you can use the `fastlane match nuke` feature, more information on https://docs.fastlane.tools/actions/match/")
     end
 
-    def profile_exists(type: nil, username: nil, uuid: nil, platform: nil)
-      # App Store Connect API does not allow filter of profile by platform or uuid (as of 2020-07-30)
-      # Need to fetch all profiles and search for uuid on client side
-      # But we can filter provisioning profiles based on their type (this, in general way faster than getting all profiles)
-      filter = { profileType: Match.profile_types(type).join(",") } if type
-      found = Spaceship::ConnectAPI::Profile.all(filter: filter).find do |profile|
-        profile.uuid == uuid
+    def profile_exists(profile_type: nil, name: nil, username: nil, uuid: nil, cached_profiles: nil)
+      found = false
+
+      if cached_profiles
+        found = cached_profiles.find do |profile|
+          profile.uuid == uuid
+        end
+      end
+
+      # If no cache, or profile is not found in cache - fetch fresh profiles from the portal,
+      # maybe it has been just created.
+      unless found
+        # App Store Connect API does not allow filter of profile by platform or uuid (as of 2020-07-30)
+        # Need to fetch all profiles and search for uuid on client side
+        # But we can filter provisioning profiles based on their type (this, in general way faster than getting all profiles)
+        profiles = Match::Portal::Fetcher.profiles(profile_type: profile_type, name: name)
+
+        found = profiles.find do |profile|
+          profile.uuid == uuid
+        end
       end
 
       unless found

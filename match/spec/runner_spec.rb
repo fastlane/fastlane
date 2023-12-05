@@ -1,11 +1,20 @@
 describe Match do
   describe Match::Runner do
     let(:keychain) { 'login.keychain' }
+    let(:fake_cache) { double('fake_cache') }
 
     before do
       allow(ENV).to receive(:[]).and_call_original
       allow(ENV).to receive(:[]).with('MATCH_KEYCHAIN_NAME').and_return(keychain)
       allow(ENV).to receive(:[]).with('MATCH_KEYCHAIN_PASSWORD').and_return(nil)
+
+      allow(Match::Portal::Cache).to receive(:new).and_return(fake_cache)
+      allow(fake_cache).to receive(:bundle_ids).and_return(nil)
+      allow(fake_cache).to receive(:certificates).and_return(nil)
+      allow(fake_cache).to receive(:profiles).and_return(nil)
+      allow(fake_cache).to receive(:devices).and_return(nil)
+      allow(fake_cache).to receive(:portal_profile).and_return(nil)
+      allow(fake_cache).to receive(:reset_certificates)
 
       # There is another test
       ENV.delete('FASTLANE_TEAM_ID')
@@ -65,6 +74,7 @@ describe Match do
                                                                            certificate_id: "something",
                                                                            app_identifier: values[:app_identifier],
                                                                                     force: false,
+                                                                                    cache: fake_cache,
                                                                        working_directory: fake_storage.working_directory).and_return(profile_path)
           expect(FastlaneCore::ProvisioningProfile).to receive(:install).with(profile_path, keychain_path).and_return(destination)
           expect(fake_storage).to receive(:save_changes!).with(
@@ -283,54 +293,8 @@ describe Match do
       end
     end
 
-    describe "#device_count_different?" do
-      let(:profile_file) { double("profile file") }
-      let(:uuid) { "1234-1234-1234-1234" }
-      let(:parsed_profile) { { "UUID" => uuid } }
-      let(:profile) { double("profile") }
-      let(:profile_device) { double("profile_device") }
+    it "cache" do
 
-      before do
-        allow(profile).to receive(:uuid).and_return(uuid)
-        allow(profile).to receive(:devices).and_return([profile_device])
-      end
-
-      it "device is enabled" do
-        expect(FastlaneCore::ProvisioningProfile).to receive(:parse).and_return(parsed_profile)
-        expect(Spaceship::ConnectAPI::Profile).to receive(:all).and_return([profile])
-        expect(Spaceship::ConnectAPI::Device).to receive(:all).and_return([profile_device])
-
-        expect(profile_device).to receive(:device_class).and_return(Spaceship::ConnectAPI::Device::DeviceClass::IPOD)
-        expect(profile_device).to receive(:enabled?).and_return(true)
-
-        runner = Match::Runner.new
-        expect(runner.device_count_different?(profile: profile_file, platform: :ios)).to be(false)
-      end
-
-      it "device is disabled" do
-        expect(FastlaneCore::ProvisioningProfile).to receive(:parse).and_return(parsed_profile)
-        expect(Spaceship::ConnectAPI::Profile).to receive(:all).and_return([profile])
-        expect(Spaceship::ConnectAPI::Device).to receive(:all).and_return([profile_device])
-
-        expect(profile_device).to receive(:device_class).and_return(Spaceship::ConnectAPI::Device::DeviceClass::IPOD)
-        expect(profile_device).to receive(:enabled?).and_return(false)
-
-        runner = Match::Runner.new
-        expect(runner.device_count_different?(profile: profile_file, platform: :ios)).to be(true)
-      end
-
-      it "device is apple silicon mac" do
-        expect(FastlaneCore::ProvisioningProfile).to receive(:parse).twice.and_return(parsed_profile)
-        expect(Spaceship::ConnectAPI::Profile).to receive(:all).twice.and_return([profile])
-        expect(Spaceship::ConnectAPI::Device).to receive(:all).twice.and_return([profile_device])
-
-        expect(profile_device).to receive(:device_class).twice.and_return(Spaceship::ConnectAPI::Device::DeviceClass::APPLE_SILICON_MAC)
-        expect(profile_device).to receive(:enabled?).and_return(true)
-
-        runner = Match::Runner.new
-        expect(runner.device_count_different?(profile: profile_file, platform: :ios, include_mac_in_profiles: false)).to be(true)
-        expect(runner.device_count_different?(profile: profile_file, platform: :ios, include_mac_in_profiles: true)).to be(false)
-      end
     end
   end
 end

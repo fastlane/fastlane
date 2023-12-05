@@ -23,7 +23,7 @@ module Match
   end
 
   def self.cert_type_sym(type)
-    type = type.to_s
+    type = type.to_s.downcase
     return :mac_installer_distribution if type == "mac_installer_distribution"
     return :developer_id_installer if type == "developer_id_installer"
     return :developer_id_application if type == "developer_id"
