@@ -251,13 +251,13 @@ module Match
       portal_profile = self.cache.portal_profile(stored_profile_path: stored_profile_path, keychain_path: keychain_path) if stored_profile_path
 
       if params[:force_for_new_devices]
-        force = ProfileIncludes.should_force_include_all_devices?(params: params, portal_profile: portal_profile, cached_devices: self.cache.devices) unless force
+        force ||= ProfileIncludes.should_force_include_all_devices?(params: params, portal_profile: portal_profile, cached_devices: self.cache.devices)
       end
 
       if params[:include_all_certificates]
         # Clearing specified certificate id which will prevent a profile being created with only one certificate
         certificate_id = nil
-        force = ProfileIncludes.should_force_include_all_certificates?(params: params, portal_profile: portal_profile, cached_certificates: self.cache.certificates) unless force
+        force ||= ProfileIncludes.should_force_include_all_certificates?(params: params, portal_profile: portal_profile, cached_certificates: self.cache.certificates)
       end
 
       is_new_profile_created = false
