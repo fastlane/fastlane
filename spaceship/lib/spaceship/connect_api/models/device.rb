@@ -122,13 +122,11 @@ module Spaceship
             # Intel-based provisioning UUID: 01234567-89AB-CDEF-0123-456789ABCDEF.
             # arm64-based provisioning UUID: 01234567-89ABCDEF12345678.
             # Workaround is to include macs having:
-            #   * 25 chars length and only one hypen in provisioning UUID, or
-            #   * 24 chars length w/o hypen.
+            #   * 25 chars length and only one hyphen in provisioning UUID.
             if include_mac_in_profiles &&
                device.device_class == Spaceship::ConnectAPI::Device::DeviceClass::MAC
 
-              next (device.udid.length == 25 && device.udid.count('-') == 1) ||
-                (device.udid.length == 24 && device.udid.count('-') == 0)
+              next device.udid.length == 25 && device.udid.count('-') == 1
             end
 
             device_classes.include?(device.device_class)
