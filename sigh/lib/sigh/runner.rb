@@ -165,8 +165,8 @@ module Sigh
         end
       end
 
-      bundle_id = Sigh.config[:cached_bundle_ids]
-      bundle_id = bundle_id.detect { |e| e.identifier == app_identifier } unless bundle_id.nil?
+      bundle_ids = Sigh.config[:cached_bundle_ids]
+      bundle_id = bundle_ids.detect { |e| e.identifier == app_identifier } if bundle_ids
       bundle_id ||= Spaceship::ConnectAPI::BundleId.find(app_identifier)
       unless bundle_id
         UI.user_error!("Could not find App with App Identifier '#{Sigh.config[:app_identifier]}'")
