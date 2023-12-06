@@ -232,7 +232,7 @@ module Sigh
                                        if !value.kind_of?(Array) ||
                                          value.empty? ||
                                          !value.all?(Spaceship::ConnectAPI::BundleId)
-                                         UI.user_error!("devicached_bundle_idsces parameter must be a non-empty array of Spaceship::ConnectAPI::BundleId")
+                                         UI.user_error!("cached_bundle_ids parameter must be a non-empty array of Spaceship::ConnectAPI::BundleId")
                                        end
                                      end),
         FastlaneCore::ConfigItem.new(key: :cached_profiles,
