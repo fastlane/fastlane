@@ -140,7 +140,7 @@ module Match
           retrieved_secret = aws_sm_client.get_secret_value({
             secret_id: secret.arn
           })
-          decoded_secret = Zlib::Inflate.inflate(Base64.decode64(retrieved_secret.secret_binary))
+          decoded_secret = Zlib::Inflate.inflate(Base64.decode64(retrieved_secret.secret_string))
           stripped_secret_name = strip_secrets_manager_object_prefix(secret.name)
           download_path = File.join(self.working_directory, stripped_secret_name)
           FileUtils.mkdir_p(File.expand_path("..", download_path))
@@ -176,7 +176,7 @@ module Match
               UI.message("The secret #{target_path} was not found, creating...")
               aws_sm_client.create_secret({
                 name: target_path,
-                secret_binary: secret_base64_binary,
+                secret_string: secret_base64_string,
               })
             rescue Aws::SecretsManager::Errors::LimitExceededException
               UI.error("You have reached the request quota, wait a minute or two. Or (unlikely) you have reached the maximum number of secrets (most probably 50,000) allowed for your account. In that case delete some secrets and try again.")
@@ -192,7 +192,7 @@ module Match
 
             response = aws_sm_client.update_secret({
               secret_id: target_path,
-              secret_binary: secret_base64_binary,
+              secret_string: secret_base64_string,
             })
             UI.verbose("Uploaded '#{response[:arn]}' to Secrets manager.")
           end

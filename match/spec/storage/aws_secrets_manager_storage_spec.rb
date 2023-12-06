@@ -34,11 +34,11 @@ describe Match do
 
         expect(aws_sm_client).to receive(:update_secret).with({
           secret_id: 'ABCDEFG/certs/development/ABCDEFG.cer',
-          secret_binary: Base64.encode64(Zlib::Deflate.deflate('body'))
+          secret_string: Base64.encode64(Zlib::Deflate.deflate('body'))
         })
         expect(aws_sm_client).to receive(:update_secret).with({
           secret_id: 'ABCDEFG/certs/development/ABCDEFG.p12',
-          secret_binary: Base64.encode64(Zlib::Deflate.deflate('body'))
+          secret_string: Base64.encode64(Zlib::Deflate.deflate('body'))
         })
 
         subject.upload_files(files_to_upload: files_to_upload)
@@ -59,11 +59,11 @@ describe Match do
 
           expect(aws_sm_client).to receive(:update_secret).with({
               secret_id: 'ABCDEFG/certs/development/ABCDEFG.cer',
-              secret_binary: Base64.encode64(Zlib::Deflate.deflate('body'))
+              secret_string: Base64.encode64(Zlib::Deflate.deflate('body'))
           })
           expect(aws_sm_client).to receive(:update_secret).with({
               secret_id: 'ABCDEFG/certs/development/ABCDEFG.p12',
-              secret_binary: Base64.encode64(Zlib::Deflate.deflate('body'))
+              secret_string: Base64.encode64(Zlib::Deflate.deflate('body'))
           })
 
           subject.upload_files(files_to_upload: files_to_upload)
@@ -76,11 +76,11 @@ describe Match do
 
         expect(aws_sm_client).to receive(:create_secret).with({
             name: 'ABCDEFG/certs/development/ABCDEFG.cer',
-            secret_binary: Base64.encode64(Zlib::Deflate.deflate('body'))
+            secret_string: Base64.encode64(Zlib::Deflate.deflate('body'))
           })
         expect(aws_sm_client).to receive(:create_secret).with({
               name: 'ABCDEFG/certs/development/ABCDEFG.p12',
-              secret_binary: Base64.encode64(Zlib::Deflate.deflate('body'))
+              secret_string: Base64.encode64(Zlib::Deflate.deflate('body'))
           })
 
         subject.upload_files(files_to_upload: files_to_upload)
@@ -94,11 +94,11 @@ describe Match do
 
         expect(aws_sm_client).to receive(:create_secret).with({
           name: '123456/ABCDEFG/certs/development/ABCDEFG.cer',
-          secret_binary: Base64.encode64(Zlib::Deflate.deflate('body'))
+          secret_string: Base64.encode64(Zlib::Deflate.deflate('body'))
         })
         expect(aws_sm_client).to receive(:create_secret).with({
           name: '123456/ABCDEFG/certs/development/ABCDEFG.p12',
-          secret_binary: Base64.encode64(Zlib::Deflate.deflate('body'))
+          secret_string: Base64.encode64(Zlib::Deflate.deflate('body'))
         })
 
         subject.upload_files(files_to_upload: files_to_upload)
@@ -154,7 +154,7 @@ describe Match do
       let(:aws_sm_client) {
         instance_double('Aws::SecretsManager::Client',
                         get_secret_value: double({
-                              secret_binary: Base64.encode64(Zlib::Deflate.deflate('body'))
+                              secret_string: Base64.encode64(Zlib::Deflate.deflate('body'))
                           }),
                           list_secrets: secrets_list_to_download)
       }
