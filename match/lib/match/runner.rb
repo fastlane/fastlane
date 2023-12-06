@@ -247,7 +247,6 @@ module Match
       stored_profile_path = profiles.last
       force = params[:force]
 
-      portal_profile = nil
       portal_profile = self.cache.portal_profile(stored_profile_path: stored_profile_path, keychain_path: keychain_path) if stored_profile_path
 
       if params[:force_for_new_devices]
