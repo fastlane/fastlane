@@ -8,58 +8,75 @@ describe Match do
       before do
         allow(portal_profile).to receive(:devices).and_return([profile_device])
         allow(portal_profile).to receive(:certificates).and_return([profile_certificate])
+        allow(profile_device).to receive(:id).and_return(1)
+        allow(profile_certificate).to receive(:id).and_return(1)
       end
 
-      describe "#device_count_different?" do
-        it "returns false if device count same" do
+      describe "#devices_differ?" do
+        it "returns false if devices are the same" do
           # WHEN
-          device_count_different = Match::ProfileIncludes.device_count_different?(portal_profile: portal_profile, platform: 'ios', include_mac_in_profiles: true, cached_devices: [1])
+          devices_differ = Match::ProfileIncludes.devices_differ?(portal_profile: portal_profile, platform: 'ios', include_mac_in_profiles: true, cached_devices: [profile_device])
 
           # THEN
-          expect(device_count_different).to be(false)
+          expect(devices_differ).to be(false)
         end
 
-        it "returns true if device count differs" do
+        it "returns true if devices differ even when the count is the same" do
+          # GIVEN
+          portal_device = double("profile_device")
+          allow(portal_device).to receive(:id).and_return(2)
+
           # WHEN
-          device_count_different = Match::ProfileIncludes.device_count_different?(portal_profile: portal_profile, platform: 'ios', include_mac_in_profiles: true, cached_devices: [1, 2])
+          devices_differ = Match::ProfileIncludes.devices_differ?(portal_profile: portal_profile, platform: 'ios', include_mac_in_profiles: true, cached_devices: [portal_device])
 
           # THEN
-          expect(device_count_different).to be(true)
+          expect(devices_differ).to be(true)
+        end
+
+        it "returns true if devices differ" do
+          # GIVEN
+          portal_device = double("profile_device")
+          allow(portal_device).to receive(:id).and_return(2)
+
+          # WHEN
+          devices_differ = Match::ProfileIncludes.devices_differ?(portal_profile: portal_profile, platform: 'ios', include_mac_in_profiles: true, cached_devices: [portal_device, profile_device])
+
+          # THEN
+          expect(devices_differ).to be(true)
         end
       end
 
-      describe "#certificate_count_different?" do
-        it "returns false if certificate count same" do
-          # GIVEN
-          allow(profile_certificate).to receive(:valid?).and_return(true)
-
+      describe "#certificates_differ?" do
+        it "returns false if certificates are the same" do
           # WHEN
-          certificate_count_different = Match::ProfileIncludes.certificate_count_different?(portal_profile: portal_profile, platform: 'ios', cached_certificates: [1])
+          certificates_differ = Match::ProfileIncludes.certificates_differ?(portal_profile: portal_profile, platform: 'ios', cached_certificates: [profile_certificate])
 
           # THEN
-          expect(certificate_count_different).to be(false)
+          expect(certificates_differ).to be(false)
         end
 
-        it "returns true if certificate count differs with valid cert" do
+        it "returns true if certs differ even when the count is the same" do
           # GIVEN
-          allow(profile_certificate).to receive(:valid?).and_return(true)
+          portal_cert = double("profile_device")
+          allow(portal_cert).to receive(:id).and_return(2)
 
           # WHEN
-          certificate_count_different = Match::ProfileIncludes.certificate_count_different?(portal_profile: portal_profile, platform: 'ios', cached_certificates: [1, 2])
+          certificates_differ = Match::ProfileIncludes.certificates_differ?(portal_profile: portal_profile, platform: 'ios', cached_certificates: [portal_cert])
 
           # THEN
-          expect(certificate_count_different).to be(true)
+          expect(certificates_differ).to be(true)
         end
 
-        it "returns true if certificate count differs with invalid cert" do
+        it "returns true if certs differ" do
           # GIVEN
-          allow(profile_certificate).to receive(:valid?).and_return(false)
+          portal_cert = double("profile_device")
+          allow(portal_cert).to receive(:id).and_return(2)
 
           # WHEN
-          certificate_count_different = Match::ProfileIncludes.certificate_count_different?(portal_profile: portal_profile, platform: 'ios', cached_certificates: [1])
+          certificates_differ = Match::ProfileIncludes.certificates_differ?(portal_profile: portal_profile, platform: 'ios', cached_certificates: [profile_certificate, portal_cert])
 
           # THEN
-          expect(certificate_count_different).to be(true)
+          expect(certificates_differ).to be(true)
         end
       end
     end

@@ -20,7 +20,7 @@ module Match
     def self.should_force_include_all_devices?(params:, portal_profile:, cached_devices:)
       return false unless self.can_force_include_all_devices?(params: params)
 
-      force = device_count_different?(portal_profile: portal_profile, platform: params[:platform], include_mac_in_profiles: params[:include_mac_in_profiles], cached_devices: cached_devices)
+      force = devices_differ?(portal_profile: portal_profile, platform: params[:platform], include_mac_in_profiles: params[:include_mac_in_profiles], cached_devices: cached_devices)
 
       return force
     end
@@ -43,20 +43,22 @@ module Match
       can_force
     end
 
-    def self.device_count_different?(portal_profile:, platform:, include_mac_in_profiles:, cached_devices:)
+    def self.devices_differ?(portal_profile:, platform:, include_mac_in_profiles:, cached_devices:)
       return false unless portal_profile
 
-      profile_device_count = portal_profile.devices.count
+      profile_devices = portal_profile.devices
 
-      devices = cached_devices
-      devices ||= Match::Portal::Fetcher.devices(platform: platform, include_mac_in_profiles: include_mac_in_profiles)
-      portal_device_count = devices.size
+      portal_devices = cached_devices
+      portal_devices ||= Match::Portal::Fetcher.devices(platform: platform, include_mac_in_profiles: include_mac_in_profiles)
 
-      device_count_different = portal_device_count != profile_device_count
+      profile_device_ids = profile_devices.map(&:id).sort
+      portal_devices_ids = portal_devices.map(&:id).sort
 
-      UI.important("Devices count differs. Portal count: #{portal_device_count}. Profile count: #{profile_device_count}") if device_count_different
+      devices_differs = profile_device_ids != portal_devices_ids
 
-      return device_count_different
+      UI.important("Devices in the profile and available on the portal differ. Recreating a profile") if devices_differs
+
+      return devices_differs
     end
 
     ###############
@@ -68,7 +70,7 @@ module Match
     def self.should_force_include_all_certificates?(params:, portal_profile:, cached_certificates:)
       return false unless self.can_force_include_all_certificates?(params: params)
 
-      force = certificate_count_different?(portal_profile: portal_profile, platform: params[:platform], cached_certificates: cached_certificates)
+      force = certificates_differ?(portal_profile: portal_profile, platform: params[:platform], cached_certificates: cached_certificates)
 
       return force
     end
@@ -97,25 +99,22 @@ module Match
       can_force
     end
 
-    def self.certificate_count_different?(portal_profile:, platform:, cached_certificates:)
+    def self.certificates_differ?(portal_profile:, platform:, cached_certificates:)
       return false unless portal_profile
 
-      # When a certificate expires (not revoked) provisioning profile stays valid.
-      # And if we regenerate certificate count will not differ:
-      #   * For portal certificates, we filter out the expired one but includes a new certificate;
-      #   * Profile still contains an expired certificate and is valid.
-      # Thus, we need to check the validity of profile certificates too.
-      profile_certs_count = portal_profile.certificates.select(&:valid?).count
+      profile_certs = portal_profile.certificates
 
-      certificates = cached_certificates
-      certificates ||= Match::Portal::Fetcher.certificates(platform: platform, profile_type: portal_profile.profile_type)
-      portal_certs_count = certificates.size
+      portal_certs = cached_certificates
+      portal_certs ||= Match::Portal::Fetcher.certificates(platform: platform, profile_type: portal_profile.profile_type)
 
-      certificate_count_different = portal_certs_count != profile_certs_count
+      profile_certs_ids = profile_certs.map(&:id).sort
+      portal_certs_ids = portal_certs.map(&:id).sort
 
-      UI.important("Certificate count differs. Portal count: #{portal_certs_count}. Profile count: #{profile_certs_count}") if certificate_count_different
+      certificates_differ = profile_certs_ids != portal_certs_ids
 
-      return certificate_count_different
+      UI.important("Certificates in the profile and available on the portal differ. Recreating a profile") if certificates_differ
+
+      return certificates_differ
     end
   end
 end
