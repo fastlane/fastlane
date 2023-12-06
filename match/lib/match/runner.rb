@@ -293,16 +293,9 @@ module Match
         is_new_profile_created = true
       end
 
-      if Helper.mac?
-        installed_profile = FastlaneCore::ProvisioningProfile.install(stored_profile_path, keychain_path)
-      end
       parsed = FastlaneCore::ProvisioningProfile.parse(stored_profile_path, keychain_path)
       uuid = parsed["UUID"]
       name = parsed["Name"]
-
-      if params[:output_path]
-        FileUtils.cp(stored_profile_path, params[:output_path])
-      end
 
       check_profile_existance = !is_new_profile_created && spaceship
       if check_profile_existance && !spaceship.profile_exists(profile_type: profile_type,
@@ -315,6 +308,14 @@ module Match
         File.delete(stored_profile_path)
         # This method will be called again, no need to modify `files_to_commit`
         return nil
+      end
+
+      if Helper.mac?
+        installed_profile = FastlaneCore::ProvisioningProfile.install(stored_profile_path, keychain_path)
+      end
+
+      if params[:output_path]
+        FileUtils.cp(stored_profile_path, params[:output_path])
       end
 
       Utils.fill_environment(Utils.environment_variable_name(app_identifier: app_identifier,
