@@ -40,7 +40,7 @@ module Match
 
         certificate_types += additional_cert_types
 
-        filter = { certificateType: certificate_types.sort.join(',') } unless certificate_types.empty?
+        filter = { certificateType: certificate_types.uniq.sort.join(',') } unless certificate_types.empty?
 
         certificates = Spaceship::ConnectAPI::Certificate.all(
           filter: filter
