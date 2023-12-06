@@ -80,25 +80,11 @@ module Match
     end
 
     def profile_exists(profile_type: nil, name: nil, username: nil, uuid: nil, cached_profiles: nil)
-      found = false
+      profiles = cached_profiles
+      profiles ||= Match::Portal::Fetcher.profiles(profile_type: profile_type, name: name)
 
-      if cached_profiles
-        found = cached_profiles.find do |profile|
-          profile.uuid == uuid
-        end
-      end
-
-      # If no cache, or profile is not found in cache - fetch fresh profiles from the portal,
-      # maybe it has been just created.
-      unless found
-        # App Store Connect API does not allow filter of profile by platform or uuid (as of 2020-07-30)
-        # Need to fetch all profiles and search for uuid on client side
-        # But we can filter provisioning profiles based on their type (this, in general way faster than getting all profiles)
-        profiles = Match::Portal::Fetcher.profiles(profile_type: profile_type, name: name)
-
-        found = profiles.find do |profile|
-          profile.uuid == uuid
-        end
+      found = profiles.find do |profile|
+        profile.uuid == uuid
       end
 
       unless found

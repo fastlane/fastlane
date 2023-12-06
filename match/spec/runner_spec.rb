@@ -89,7 +89,7 @@ describe Match do
           allow(spaceship).to receive(:team_id).and_return("")
           expect(Match::SpaceshipEnsure).to receive(:new).and_return(spaceship)
           expect(spaceship).to receive(:certificates_exists).and_return(true)
-          expect(spaceship).to receive(:profile_exists).and_return(true)
+          expect(spaceship).not_to receive(:profile_exists)
           expect(spaceship).to receive(:bundle_identifier_exists).and_return(true)
           expect(Match::Utils).to receive(:get_cert_info).and_return([["Common Name", "fastlane certificate name"]])
 

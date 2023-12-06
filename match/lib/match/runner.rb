@@ -260,6 +260,7 @@ module Match
         force = ProfileIncludes.should_force_include_all_certificates?(params: params, portal_profile: portal_profile, cached_certificates: self.cache.certificates) unless force
       end
 
+      is_new_profile_created = false
       if stored_profile_path.nil? || force
         if params[:readonly]
           UI.error("No matching provisioning profiles found for '#{profile_file}'")
@@ -288,6 +289,8 @@ module Match
         self.cache.forget_portal_profile(portal_profile) if portal_profile
 
         self.files_to_commit << stored_profile_path
+
+        is_new_profile_created = true
       end
 
       if Helper.mac?
@@ -301,11 +304,13 @@ module Match
         FileUtils.cp(stored_profile_path, params[:output_path])
       end
 
-      if spaceship && !spaceship.profile_exists(profile_type: profile_type,
-                                                name: name,
-                                                username: params[:username],
-                                                uuid: uuid,
-                                                cached_profiles: self.cache.profiles)
+      check_profile_existance = !is_new_profile_created && spaceship
+      if check_profile_existance && !spaceship.profile_exists(profile_type: profile_type,
+                                                              name: name,
+                                                              username: params[:username],
+                                                              uuid: uuid,
+                                                              cached_profiles: self.cache.profiles)
+
         # This profile is invalid, let's remove the local file and generate a new one
         File.delete(stored_profile_path)
         # This method will be called again, no need to modify `files_to_commit`
