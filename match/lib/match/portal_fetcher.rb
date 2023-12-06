@@ -59,14 +59,7 @@ module Match
       end
 
       def self.bundle_ids(bundle_id_identifiers: nil)
-        filter = nil
-        if bundle_id_identifiers
-          if bundle_id_identifiers.kind_of?(Array)
-            filter = { identifier: bundle_id_identifiers.join(',') }
-          else
-            filter = { identifier: bundle_id_identifiers }
-          end
-        end
+        filter = { identifier: bundle_id_identifiers.join(',') } if bundle_id_identifiers
 
         bundle_ids = Spaceship::ConnectAPI::BundleId.all(
           filter: filter

@@ -43,7 +43,7 @@ module Match
     end
 
     def bundle_identifier_exists(username: nil, app_identifier: nil, cached_bundle_ids: nil)
-      search_bundle_ids = cached_bundle_ids || Match::Portal::Fetcher.bundle_ids(bundle_id_identifiers: app_identifier)
+      search_bundle_ids = cached_bundle_ids || Match::Portal::Fetcher.bundle_ids(bundle_id_identifiers: [app_identifier])
       found = search_bundle_ids.any? { |bundle_id| bundle_id.identifier == app_identifier }
       return if found
 
