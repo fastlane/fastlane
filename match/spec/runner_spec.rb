@@ -286,100 +286,93 @@ describe Match do
         end
 
         it "renews an outdated certificate", requires_security: true do
-          git_url = "https://github.com/fastlane/fastlane/tree/master/certificates"
-          values = {
-            app_identifier: "tools.fastlane.app",
-            type: "appstore",
-            git_url: git_url,
-            username: "flapple@something.com",
-            renew_expired_certs: true
-          }
+          # GIVEN
 
-          config = FastlaneCore::Configuration.create(Match::Options.available_options, values)
+          # Downloaded and decrypted storage location.
           repo_dir = "./match/spec/fixtures/invalid"
-          invalid_cert_path = "./match/spec/fixtures/invalid/certs/distribution/F7P4EE896K.cer"
-          invalid_key_path = "./match/spec/fixtures/invalid/certs/distribution/F7P4EE896K.p12"
+          #   Invalid cert and key
+          stored_invalid_cert_path = "#{repo_dir}/certs/distribution/F7P4EE896K.cer"
+          stored_invalid_key_path = "#{repo_dir}/certs/distribution/F7P4EE896K.p12"
 
-          valid_cert_path = "./match/spec/fixtures/valid/certs/distribution/E7P4EE896K.cer"
-          valid_key_path = "./match/spec/fixtures/valid/certs/distribution/E7P4EE896K.p12"
+          #   Valid cert and key
+          new_stored_valid_cert_path = "./match/spec/fixtures/valid/certs/distribution/E7P4EE896K.cer"
+          new_stored_valid_key_path = "./match/spec/fixtures/valid/certs/distribution/E7P4EE896K.p12"
 
-          profile_path = "./match/spec/fixtures/test.mobileprovision"
-          keychain_path = FastlaneCore::Helper.keychain_path("login.keychain") # can be .keychain or .keychain-db
-          destination = File.expand_path("~/Library/MobileDevice/Provisioning Profiles/98264c6b-5151-4349-8d0f-66691e48ae35.mobileprovision")
+          # match options
+          match_test_options = {
+            renew_expired_certs: true, # Current test suite.
+            skip_provisioning_profiles: true # We test certificate renewal, not profile.
+          }
+          match_config = create_match_config_with_git_storage(extra_values: match_test_options)
 
-          fake_storage = "fake_storage"
-          expect(Match::Storage::GitStorage).to receive(:configure).with({
-            git_url: git_url,
-            shallow_clone: false,
-            skip_docs: false,
-            git_branch: "master",
-            git_full_name: nil,
-            git_user_email: nil,
-            clone_branch_directly: false,
-            git_basic_authorization: nil,
-            git_bearer_authorization: nil,
-            git_private_key: nil,
-            type: config[:type],
-            platform: config[:platform]
-          }).and_return(fake_storage)
+          fake_cache = create_fake_cache
 
-          expect(fake_storage).to receive(:download).and_return(nil)
-          expect(fake_storage).to receive(:clear_changes).and_return(nil)
-          allow(fake_storage).to receive(:git_url).and_return(git_url)
-          allow(fake_storage).to receive(:working_directory).and_return(repo_dir)
-          allow(fake_storage).to receive(:prefixed_working_directory).and_return(repo_dir)
-          expect(Match::Generator).to receive(:generate_certificate).with(config, :distribution, fake_storage.working_directory, specific_cert_type: nil).and_return(valid_cert_path)
-          expect(Match::Generator).to receive(:generate_provisioning_profile).with(params: config,
-                                                                                prov_type: :appstore,
-                                                                           certificate_id: anything,
-                                                                           app_identifier: values[:app_identifier],
-                                                                                    force: false,
-                                                                       working_directory: fake_storage.working_directory).and_return(profile_path)
+          # EXPECTATIONS
 
-          expect(FastlaneCore::ProvisioningProfile).to receive(:install).with(profile_path, keychain_path).and_return(destination)
+          # Storage
+          fake_storage = create_fake_storage(match_config: match_config, repo_dir: repo_dir)
+          begin # Ensure old certificates are removed from the storage and new are added.
+            expect(fake_storage).to receive(:save_changes!).with(
+              files_to_commit: [
+                new_stored_valid_cert_path,
+                new_stored_valid_key_path # this is important, as a cert consists out of 2 files
+              ],
+              files_to_delete: [
+                stored_invalid_cert_path,
+                stored_invalid_key_path
+              ]
+            )
+          end
 
-          expect(fake_storage).to receive(:save_changes!).with(
-            files_to_commit: [
-              valid_cert_path,
-              valid_key_path, # this is important, as a cert consists out of 2 files
-              "./match/spec/fixtures/test.mobileprovision"
-            ],
-            files_to_delete: [
-              invalid_cert_path,
-              invalid_key_path
-            ]
-          )
-
-          fake_encryption = "fake_encryption"
-          expect(Match::Encryption::OpenSSL).to receive(:new).with(keychain_name: fake_storage.git_url, working_directory: fake_storage.working_directory).and_return(fake_encryption)
-          expect(fake_encryption).to receive(:decrypt_files).and_return(nil)
+          # Encryption
+          fake_encryption = create_fake_encryption(storage: fake_storage)
+          # Ensure new files are encrypted.
           expect(fake_encryption).to receive(:encrypt_files).and_return(nil)
 
-          expect(File).to receive(:delete).with(invalid_cert_path).and_return(nil)
-          expect(File).to receive(:delete).with(invalid_key_path).and_return(nil)
+          # Certificate generator
+          # Ensure a new certificate is generated.
+          expect(Match::Generator).to receive(:generate_certificate).with(match_config, :distribution, fake_storage.working_directory, specific_cert_type: nil).and_return(new_stored_valid_cert_path)
 
-          spaceship = "spaceship"
-          allow(spaceship).to receive(:team_id).and_return("")
-          expect(Match::SpaceshipEnsure).to receive(:new).and_return(spaceship)
-          expect(spaceship).to receive(:bundle_identifier_exists).and_return(true)
-          expect(spaceship).to receive(:profile_exists).with(platform: 'ios', type: :appstore, username: anything, uuid: '98264c6b-5151-4349-8d0f-66691e48ae35').and_return(true)
-          expect(Match::Utils).to receive(:get_cert_info).and_return([["Common Name", "fastlane certificate name"]])
-          expect(Match::Utils).to receive(:is_cert_valid?).with(invalid_cert_path).and_return(false)
-          expect(spaceship).to receive(:certificates_exists).with(username: anything, certificate_ids: ['E7P4EE896K']).and_return(true)
+          # Spaceship ensure helper
+          spaceship_ensure = create_fake_spaceship_ensure
+          begin # Ensure match checks validity of the new certificate.
+            profile_type = Sigh.profile_type_for_distribution_type(
+              platform: match_config[:platform],
+              distribution_type: match_config[:type]
+            )
 
-          Match::Runner.new.run(config)
+            certificates_exists_params = {
+              username: match_config[:username],
+              certificate_ids: ['E7P4EE896K'],
+              cached_certificates: fake_cache.certificates,
+              platform: match_config[:platform],
+              profile_type: profile_type
+            }
+            expect(spaceship_ensure).to receive(:certificates_exists).with(certificates_exists_params).and_return(true)
+          end
 
-          expect(ENV[Match::Utils.environment_variable_name(app_identifier: "tools.fastlane.app",
-                                                            type: "appstore")]).to eql('98264c6b-5151-4349-8d0f-66691e48ae35')
-          expect(ENV[Match::Utils.environment_variable_name_team_id(app_identifier: "tools.fastlane.app",
-                                                                    type: "appstore")]).to eql('439BBM9367')
-          expect(ENV[Match::Utils.environment_variable_name_profile_name(app_identifier: "tools.fastlane.app",
-                                                                         type: "appstore")]).to eql('tools.fastlane.app AppStore')
-          profile_path = File.expand_path('~/Library/MobileDevice/Provisioning Profiles/98264c6b-5151-4349-8d0f-66691e48ae35.mobileprovision')
-          expect(ENV[Match::Utils.environment_variable_name_profile_path(app_identifier: "tools.fastlane.app",
-                                                                         type: "appstore")]).to eql(profile_path)
-          expect(ENV[Match::Utils.environment_variable_name_certificate_name(app_identifier: "tools.fastlane.app",
-                                                                             type: "appstore")]).to eql("fastlane certificate name")
+          # Utils
+          # Ensure match validates stored certificate and make it invalid for the current test suite.
+          expect(Match::Utils).to receive(:is_cert_valid?).with(stored_invalid_cert_path).and_return(false)
+
+          # File system
+          begin # Ensure old certificates are removed from the file system.
+            expect(File).to receive(:delete).with(stored_invalid_cert_path).and_return(nil)
+            expect(File).to receive(:delete).with(stored_invalid_key_path).and_return(nil)
+          end
+
+          # Extra
+          begin # Ensure profiles are not created, not installed, and not validated.
+            expect(Match::Generator).not_to receive(:generate_provisioning_profile)
+            expect(FastlaneCore::ProvisioningProfile).not_to receive(:install)
+            expect(spaceship_ensure).not_to receive(:profile_exists)
+          end
+
+          # WHEN
+          Match::Runner.new.run(match_config)
+
+          # THEN
+          # Rely on expectations defined above.
         end
 
         it "skips provisioning profiles when skip_provisioning_profiles set to true", requires_security: true do
