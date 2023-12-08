@@ -141,7 +141,7 @@ module Match
 
       def delete_files(files_to_delete: [], custom_message: nil)
         if files_to_delete.count > 0
-          commands = files_to_delete.map { |filename|  "git rm #{filename}" }
+          commands = files_to_delete.map { |filename|  "git rm #{filename.shellescape}" }
           git_push(commands: commands, commit_message: custom_message)
         else
           # No specific list given, e.g. this happens on `fastlane match nuke`
