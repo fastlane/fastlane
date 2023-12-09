@@ -99,7 +99,7 @@ Gem::Specification.new do |spec|
   spec.add_dependency('mini_magick', '>= 4.9.4', '< 5.0.0') # To open, edit and export PSD files
   spec.add_dependency('multipart-post', '>= 2.0.0', '< 3.0.0') # Needed for uploading builds to appetize
   spec.add_dependency('naturally', '~> 2.2') # Used to sort strings with numbers in a human-friendly way
-  spec.add_dependency('optparse', '~> 0.1.1') # Used to parse options with Commander
+  spec.add_dependency('optparse', '>= 0.1.1') # Used to parse options with Commander
   spec.add_dependency('plist', '>= 3.1.0', '< 4.0.0') # Needed for set_build_number_repository and get_info_plist_value actions
   spec.add_dependency('rubyzip', '>= 2.0.0', '< 3.0.0') # fix swift/ipa in gym
   spec.add_dependency('security', '= 0.1.3') # macOS Keychain manager, a dead project, no updates expected
