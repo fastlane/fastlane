@@ -10,6 +10,15 @@ module Fastlane
         cmd << "--configuration #{params[:configuration]}" if params[:configuration]
         cmd << "--disable-sandbox" if params[:disable_sandbox]
         cmd << "--verbose" if params[:verbose]
+        if params[:simulator]
+          simulator_flags = [
+            "-Xswiftc", "-sdk",
+            "-Xswiftc", "$(xcrun --sdk #{params[:simulator]} --show-sdk-path)",
+            "-Xswiftc", "-target",
+            "-Xswiftc", "x86_64-apple-ios$(xcrun --sdk #{params[:simulator]} --show-sdk-version)-simulator"
+          ]
+          cmd += simulator_flags
+        end
         cmd << params[:command] if package_commands.include?(params[:command])
         cmd << "--enable-code-coverage" if params[:enable_code_coverage] && (params[:command] == 'generate-xcodeproj' || params[:command] == 'test')
         if params[:xcconfig]
@@ -93,7 +102,12 @@ module Fastlane
                                        env_name: "FL_SPM_VERBOSE",
                                        description: "Increase verbosity of informational output",
                                        type: Boolean,
-                                       default_value: false)
+                                       default_value: false),
+          FastlaneCore::ConfigItem.new(key: :simulator,
+                                       env_name: "FL_SPM_SIMULATOR",
+                                       description: "Specifies the simulator to pass for Swift Compiler",
+                                       type: String,
+                                       optional: true)
         ]
       end
 
