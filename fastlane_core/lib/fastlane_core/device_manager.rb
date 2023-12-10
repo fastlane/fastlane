@@ -7,6 +7,7 @@ require_relative 'helper'
 module FastlaneCore
   class DeviceManager
     class << self
+      attr_reader :runtime_build_os_versions
       def all(requested_os_type = "")
         return connected_devices(requested_os_type) + simulators(requested_os_type)
       end
@@ -25,13 +26,16 @@ module FastlaneCore
         runtime_info = ''
         Open3.popen3('xcrun simctl list runtimes') do |stdin, stdout, stderr, wait_thr|
           # This regex outputs the version info in the format "<platform> <version><exact version>"
-          runtime_info = stdout.read.lines.map { |v| v.sub(/(\w+ \S+)\s*\((\S+)\s[\S\s]*/, "\\1 \\2") }.drop(1)
+          runtime_info = stdout.read
         end
-        exact_versions = Hash.new({})
-        runtime_info.each do |r|
-          platform, general, exact = r.split
-          exact_versions[platform] = {} unless exact_versions.include?(platform)
-          exact_versions[platform][general] = exact
+        unless runtime_info.include?("== Runtimes ==")
+          UI.error("xcrun simctl CLI broken, run `xcrun simctl list devices` and make sure it works")
+          UI.user_error!("xcrun simctl not working.")
+        end
+
+        @runtime_build_os_versions = runtime_info.lines.drop(1).each_with_object({}) do |line, res|
+          matches = line.match(/.*\((?<version>\S+)\s-\s(?<build>\S+)\)[\S\s]*/)
+          res[matches[:build]] = matches[:version]
         end
 
         unless output.include?("== Devices ==")
@@ -57,7 +61,7 @@ module FastlaneCore
 
             if matches.count && (os_type == requested_os_type || requested_os_type == "")
               # This is disabled here because the Device is defined later in the file, and that's a problem for the cop
-              @devices << Device.new(name: name, os_type: os_type, os_version: (exact_versions[os_type][os_version] || os_version), udid: udid, state: state, is_simulator: true)
+              @devices << Device.new(name: name, os_type: os_type, os_version: os_version, udid: udid, state: state, is_simulator: true)
             end
           end
         end
@@ -289,6 +293,7 @@ module FastlaneCore
 
       def clear_cache
         @devices = nil
+        @runtime_build_os_versions = nil
       end
 
       def launch(device)

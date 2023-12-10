@@ -51,113 +51,65 @@ describe Scan do
       end
     end
 
-    describe "#detect_sdk_version" do
+    describe "#default_os_version" do
       it 'informs users of unknown platform name' do
         expect do
-          Scan::DetectValues.detect_sdk_version('test')
+          Scan::DetectValues.default_os_version('test')
         end.to raise_error(FastlaneCore::Interface::FastlaneCrash, "Unknown platform: test")
       end
-      %w[iOS tvOS watchOS].each do |platform|
-        simulator_name = Scan::DetectValues::PLATFORM_SIMULATOR_NAME[platform]
 
-        it "returns an error if there is no default #{platform} SDK symlink" do
-          default_path = double("path/to/default.sdk")
-          platform_path = double("path/to/sdks")
-          sdks_path = double("full/path/to/sdks",
-                             children: [
-                               double("path/to/other.sdk", symlink?: false),
-                               double("path/to/some.sdk",  symlink?: false),
-                               double("path/to/default.sdk", symlink?: false)
-                             ])
+      it 'returns an error if `xcodebuild -showsdks -json` is broken' do
+        sdks_output = 'unexpected output'
+        allow(Open3).to receive(:capture3).with('xcodebuild -showsdks -json').and_return([sdks_output, nil, nil])
 
-          allow(Pathname).to receive(:new).with("Platforms/#{simulator_name}.platform/Developer/SDKs/").and_return(platform_path)
-          allow(FastlaneCore::Helper).to receive(:xcode_path).and_return('mock')
-          allow(Pathname).to receive(:new).with('mock').and_return(sdks_path)
-          allow(sdks_path).to receive(:join).with(platform_path).and_return(sdks_path)
-          allow(sdks_path).to receive(:join).with("#{simulator_name}.sdk").and_return(default_path)
+        expect do
+          Scan::DetectValues.default_os_version('iOS')
+        end.to raise_error(FastlaneCore::Interface::FastlaneError)
+      end
 
-          expect do
-            Scan::DetectValues.detect_sdk_version(platform)
-          end.to raise_error(FastlaneCore::Interface::FastlaneCrash, "Unable to find default #{simulator_name} SDK version from SDKs: #{sdks_path.children}")
-        end
+      it 'returns an error if `xcrun simctl runtime match list -j` is broken' do
+        sdks_output = File.read('./scan/spec/fixtures/XcodebuildSdksOutput15')
+        allow(Open3).to receive(:capture3).with('xcodebuild -showsdks -json').and_return([sdks_output, nil, nil])
 
-        it "returns an error on failure to determine #{platform} SDK version from filename" do
-          default_path = double("path/to/default.sdk")
-          platform_path = double("path/to/sdks")
-          some_path = double("path/to/some.sdk", symlink?: true, realpath: default_path, basename: "#{simulator_name}.sdk")
-          sdks_path = double("full/path/to/sdks",
-                             children: [
-                               double("path/to/other.sdk", symlink?: false),
-                               some_path,
-                               double("path/to/default.sdk", symlink?: false)
-                             ])
+        runtime_output = 'unexpected output'
+        allow(Open3).to receive(:capture3).with('xcrun simctl runtime match list -j').and_return([runtime_output, nil, nil])
 
-          allow(Pathname).to receive(:new).with("Platforms/#{simulator_name}.platform/Developer/SDKs/").and_return(platform_path)
-          allow(FastlaneCore::Helper).to receive(:xcode_path).and_return('mock')
-          allow(Pathname).to receive(:new).with('mock').and_return(sdks_path)
-          allow(sdks_path).to receive(:join).with(platform_path).and_return(sdks_path)
-          allow(sdks_path).to receive(:join).with("#{simulator_name}.sdk").and_return(default_path)
+        expect do
+          Scan::DetectValues.default_os_version('iOS')
+        end.to raise_error(FastlaneCore::Interface::FastlaneError)
+      end
 
-          expect do
-            Scan::DetectValues.detect_sdk_version(platform)
-          end.to raise_error(FastlaneCore::Interface::FastlaneCrash, "Could not determine SDK version from #{some_path}")
-        end
+      build_os_versions = { "21J353" => "17.0", "21R355" => "10.0", "21A342" => "17.0.1" }
+      actual_os_versions = { "tvOS" => "17.0", "watchOS" => "10.0", "iOS" => "17.0.1" }
+      %w[iOS tvOS watchOS].each do |os_type|
+        it "retrieves the correct runtime build for #{os_type}" do
+          sdks_output = File.read('./scan/spec/fixtures/XcodebuildSdksOutput15')
+          allow(Open3).to receive(:capture3).with('xcodebuild -showsdks -json').and_return([sdks_output, nil, nil])
 
-        it "returns an error on failure to parse #{platform} SDK version from filename" do
-          default_path = double("path/to/default.sdk")
-          platform_path = double("path/to/sdks")
-          some_path = double("path/to/some.sdk", symlink?: true, realpath: default_path, basename: "#{simulator_name}asdf17g.sdk")
-          sdks_path = double("full/path/to/sdks",
-                             children: [
-                               double("path/to/other.sdk", symlink?: false),
-                               some_path,
-                               double("path/to/default.sdk", symlink?: false)
-                             ])
+          runtime_output = File.read('./scan/spec/fixtures/XcrunSimctlRuntimeMatchListOutput15')
+          allow(Open3).to receive(:capture3).with('xcrun simctl runtime match list -j').and_return([runtime_output, nil, nil])
 
-          allow(Pathname).to receive(:new).with("Platforms/#{simulator_name}.platform/Developer/SDKs/").and_return(platform_path)
-          allow(FastlaneCore::Helper).to receive(:xcode_path).and_return('mock')
-          allow(Pathname).to receive(:new).with('mock').and_return(sdks_path)
-          allow(sdks_path).to receive(:join).with(platform_path).and_return(sdks_path)
-          allow(sdks_path).to receive(:join).with("#{simulator_name}.sdk").and_return(default_path)
+          allow(FastlaneCore::DeviceManager).to receive(:runtime_build_os_versions).and_return(build_os_versions)
 
-          expect do
-            Scan::DetectValues.detect_sdk_version(platform)
-          end.to raise_error(FastlaneCore::Interface::FastlaneCrash, "Could not parse SDK version: Malformed version number string asdf17g")
-        end
-
-        it "detects the expected default for #{platform}" do
-          default_path = double("path/to/default.sdk")
-          platform_path = double("path/to/sdks")
-          target_version = "17.0"
-          sdks_path = double("full/path/to/sdks",
-                             children: [
-                               double("path/to/other.sdk", symlink?: false),
-                               double("path/to/some.sdk",  symlink?: true, realpath: default_path, basename: "#{simulator_name}#{target_version}.sdk"),
-                               double("path/to/default.sdk", symlink?: false)
-                             ])
-
-          allow(Pathname).to receive(:new).with("Platforms/#{simulator_name}.platform/Developer/SDKs/").and_return(platform_path)
-          allow(FastlaneCore::Helper).to receive(:xcode_path).and_return('mock')
-          allow(Pathname).to receive(:new).with('mock').and_return(sdks_path)
-          allow(sdks_path).to receive(:join).with(platform_path).and_return(sdks_path)
-          allow(sdks_path).to receive(:join).with("#{simulator_name}.sdk").and_return(default_path)
-
-          expect(Scan::DetectValues.detect_sdk_version(platform.to_s)).to equal(Gem::Version.new(target_version))
+          expect(Scan::DetectValues.default_os_version(os_type)).to eq(Gem::Version.new(actual_os_versions[os_type]))
         end
       end
     end
 
     describe "#detect_simulator" do
       it 'returns simulators for requested devices', requires_xcodebuild: true do
-        simctl_device_output = double("simctl device output", read: File.read('./scan/spec/fixtures/DeviceManagerSimctlOutputXcode15'))
-        expect(Open3).to receive(:popen3).with("xcrun simctl list devices").and_yield(nil, simctl_device_output, nil, nil)
+        simctl_list_runtimes_output = double('xcrun simctl list runtimes', read: File.read("./scan/spec/fixtures/XcrunSimctlListRuntimesOutput"))
+        allow(Open3).to receive(:popen3).with("xcrun simctl list runtimes").and_yield(nil, simctl_list_runtimes_output, nil, nil)
 
-        simctl_runtime_output = double("simctl runtime output", read: "line\n")
-        allow(Open3).to receive(:popen3).with("xcrun simctl list runtimes").and_yield(nil, simctl_runtime_output, nil, nil)
+        simctl_list_devices_output = double('xcrun simctl list devices', read: File.read("./scan/spec/fixtures/XcrunSimctlListDevicesOutput15"))
+        allow(Open3).to receive(:popen3).with("xcrun simctl list devices").and_yield(nil, simctl_list_devices_output, nil, nil)
 
-        allow(Scan::DetectValues).to receive(:detect_sdk_version).with('iOS').and_return(Gem::Version.new('17.0'))
-        allow(Scan::DetectValues).to receive(:detect_sdk_version).with('tvOS').and_return(Gem::Version.new('17.0'))
-        allow(Scan::DetectValues).to receive(:detect_sdk_version).with('watchOS').and_return(Gem::Version.new('10.0'))
+        simctl_runtimes_help_output = 'Usage: simctl runtime <operation> <arguments> match list'
+        allow(Open3).to receive(:capture3).with("xcrun simctl runtime -h").and_return([nil, simctl_runtimes_help_output, nil])
+
+        allow(Scan::DetectValues).to receive(:default_os_version).with('iOS').and_return(Gem::Version.new('17.0'))
+        allow(Scan::DetectValues).to receive(:default_os_version).with('tvOS').and_return(Gem::Version.new('17.0'))
+        allow(Scan::DetectValues).to receive(:default_os_version).with('watchOS').and_return(Gem::Version.new('10.0'))
 
         devices = ['iPhone 14 Pro Max', 'Apple TV 4K (3rd generation)', 'Apple Watch Ultra (49mm)']
         simulators = Scan::DetectValues.detect_simulator(devices, '', '', '', nil)
@@ -175,15 +127,18 @@ describe Scan do
       end
 
       it 'filters out simulators newer than what the current Xcode SDK supports', requires_xcodebuild: true do
-        simctl_device_output = double("simctl device output", read: File.read('./scan/spec/fixtures/DeviceManagerSimctlOutputXcode14'))
-        expect(Open3).to receive(:popen3).with("xcrun simctl list devices").and_yield(nil, simctl_device_output, nil, nil)
+        simctl_list_runtimes_output = double('xcrun simctl list runtimes', read: File.read("./scan/spec/fixtures/XcrunSimctlListRuntimesOutput"))
+        allow(Open3).to receive(:popen3).with("xcrun simctl list runtimes").and_yield(nil, simctl_list_runtimes_output, nil, nil)
 
-        simctl_runtime_output = double("simctl runtime output", read: "line\n")
-        allow(Open3).to receive(:popen3).with("xcrun simctl list runtimes").and_yield(nil, simctl_runtime_output, nil, nil)
+        simctl_list_devices_output = double('xcrun simctl list devices', read: File.read("./scan/spec/fixtures/XcrunSimctlListDevicesOutput14"))
+        allow(Open3).to receive(:popen3).with("xcrun simctl list devices").and_yield(nil, simctl_list_devices_output, nil, nil)
 
-        allow(Scan::DetectValues).to receive(:detect_sdk_version).with('iOS').and_return(Gem::Version.new('16.4'))
-        allow(Scan::DetectValues).to receive(:detect_sdk_version).with('tvOS').and_return(Gem::Version.new('16.4'))
-        allow(Scan::DetectValues).to receive(:detect_sdk_version).with('watchOS').and_return(Gem::Version.new('9.4'))
+        simctl_runtimes_help_output = 'Usage: simctl runtime <operation> <arguments> match list'
+        allow(Open3).to receive(:capture3).with("xcrun simctl runtime -h").and_return([nil, simctl_runtimes_help_output, nil])
+
+        allow(Scan::DetectValues).to receive(:default_os_version).with('iOS').and_return(Gem::Version.new('16.4'))
+        allow(Scan::DetectValues).to receive(:default_os_version).with('tvOS').and_return(Gem::Version.new('16.4'))
+        allow(Scan::DetectValues).to receive(:default_os_version).with('watchOS').and_return(Gem::Version.new('9.4'))
 
         devices = ['iPhone 14 Pro Max', 'iPad Pro (12.9-inch) (6th generation) (16.1)', 'Apple TV 4K (3rd generation)', 'Apple Watch Ultra (49mm)']
         simulators = Scan::DetectValues.detect_simulator(devices, '', '', '', nil)

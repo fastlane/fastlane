@@ -71,6 +71,10 @@ describe FastlaneCore do
       expect(response).to receive(:read).and_return(@valid_simulators)
       expect(Open3).to receive(:popen3).with("xcrun simctl list devices").and_yield(nil, response, nil, nil)
 
+      thing = {}
+      expect(thing).to receive(:read).and_return("== Runtimes ==\n")
+      allow(Open3).to receive(:popen3).with("xcrun simctl list runtimes").and_yield(nil, thing, nil, nil)
+
       devices = FastlaneCore::Simulator.all
       expect(devices.count).to eq(4)
 
@@ -101,6 +105,10 @@ describe FastlaneCore do
       expect(response).to receive(:read).and_return(@valid_simulators)
       expect(Open3).to receive(:popen3).with("xcrun simctl list devices").and_yield(nil, response, nil, nil)
 
+      thing = {}
+      expect(thing).to receive(:read).and_return("== Runtimes ==\n")
+      allow(Open3).to receive(:popen3).with("xcrun simctl list runtimes").and_yield(nil, thing, nil, nil)
+
       devices = FastlaneCore::SimulatorTV.all
       expect(devices.count).to eq(1)
 
@@ -115,6 +123,10 @@ describe FastlaneCore do
       response = "response"
       expect(response).to receive(:read).and_return(@valid_simulators)
       expect(Open3).to receive(:popen3).with("xcrun simctl list devices").and_yield(nil, response, nil, nil)
+
+      thing = {}
+      expect(thing).to receive(:read).and_return("== Runtimes ==\n")
+      allow(Open3).to receive(:popen3).with("xcrun simctl list runtimes").and_yield(nil, thing, nil, nil)
 
       devices = FastlaneCore::SimulatorWatch.all
       expect(devices.count).to eq(2)

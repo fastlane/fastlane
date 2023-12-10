@@ -1,0 +1,10 @@
+== Runtimes ==
+iOS 16.1 (16.1 - 20B72) - com.apple.CoreSimulator.SimRuntime.iOS-16-1
+iOS 17.0 (17.0 - 21A328) - com.apple.CoreSimulator.SimRuntime.iOS-17-0
+iOS 17.0 (17.0.1 - 21A342) - com.apple.CoreSimulator.SimRuntime.iOS-17-0
+iOS 17.2 (17.2 - 21C5046b) - com.apple.CoreSimulator.SimRuntime.iOS-17-2
+tvOS 16.4 (16.4 - 20L494) - com.apple.CoreSimulator.SimRuntime.tvOS-16-4
+tvOS 17.0 (17.0 - 21J353) - com.apple.CoreSimulator.SimRuntime.tvOS-17-0
+watchOS 9.4 (9.4 - 20T253) - com.apple.CoreSimulator.SimRuntime.watchOS-9-4
+watchOS 10.0 (10.0 - 21R355) - com.apple.CoreSimulator.SimRuntime.watchOS-10-0
+visionOS 1.0 (1.0 - 21N5300a) - com.apple.CoreSimulator.SimRuntime.xrOS-1-0

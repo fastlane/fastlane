@@ -1,16 +1,17 @@
 require 'fastlane_core/device_manager'
 require 'fastlane_core/project'
 require 'pathname'
+require 'set'
 require_relative 'module'
 
 module Scan
   # This class detects all kinds of default values
   class DetectValues
-    PLATFORM_SIMULATOR_NAME = {
-      'iOS' => 'iPhoneSimulator',
-      'tvOS' => 'AppleTVSimulator',
-      'watchOS' => 'WatchSimulator',
-      'visionOS' => 'XRSimulator'
+    PLATFORMS = {
+      'iOS' => { simulator: 'iphonesimulator', name: 'com.apple.platform.iphoneos' },
+      'tvOS' => { simulator: 'appletvsimulator', name: 'com.apple.platform.appletvos' },
+      'watchOS' => { simulator: 'watchsimulator', name: 'com.apple.platform.watchos' },
+      'visionOS' => { simulator: 'xrsimulator', name: 'com.apple.platform.xros' }
     }.freeze
 
     # This is needed as these are more complex default values
@@ -108,36 +109,58 @@ module Scan
       end
     end
 
-    def self.detect_sdk_version(platform)
-      UI.crash!("Unknown platform: #{platform}") unless PLATFORM_SIMULATOR_NAME.key?(platform)
-      simulator_name = PLATFORM_SIMULATOR_NAME[platform]
-      @sdk_versions ||= {}
-      @sdk_versions[platform] ||= begin
-         platform_path = Pathname.new("Platforms/#{simulator_name}.platform/Developer/SDKs/")
-         sdks_path = Pathname.new(FastlaneCore::Helper.xcode_path).join(platform_path)
-         default_sdk_path = sdks_path.join("#{simulator_name}.sdk")
-         sdk_path = sdks_path.children.find { |child| child.symlink? && child.realpath == default_sdk_path }
-         UI.crash!("Unable to find default #{simulator_name} SDK version from SDKs: #{sdks_path.children}") unless sdk_path
+    def self.default_os_version(os_type)
+      @os_versions ||= {}
+      @os_versions[os_type] ||= begin
+         UI.crash!("Unknown platform: #{os_type}") unless PLATFORMS.key?(os_type)
+         platform = PLATFORMS[os_type]
 
-         version = /#{Regexp.quote(simulator_name)}(?<val>.*)\.sdk/.match(sdk_path.basename.to_s)
-         UI.crash!("Could not determine SDK version from #{sdk_path}") unless version && version[:val] != ''
-
-         begin
-           Gem::Version.new(version[:val])
-         rescue ArgumentError => e
-           UI.crash!("Could not parse SDK version: #{e.message}")
+         # list SDK version for currently running Xcode
+         sdks_output, = Open3.capture3('xcodebuild -showsdks -json')
+         sdk_version = begin
+           JSON.parse(sdks_output).find { |e| e['platform'] == platform[:simulator] }['sdkVersion']
+         rescue StandardError => e
+           UI.error(e)
+           UI.error("xcodebuild CLI broken, please run `xcodebuild` and make sure it works")
+           UI.user_error!("xcodebuild not working")
          end
+
+         # Get runtime build from SDK version
+         runtime_output, = Open3.capture3('xcrun simctl runtime match list -j')
+         runtime_build = begin
+           JSON.parse(runtime_output).values.find { |elem| elem['platform'] == platform[:name] && elem['sdkVersion'] == sdk_version }['chosenRuntimeBuild']
+         rescue StandardError => e
+           UI.error(e)
+           UI.error("xcrun simctl runtime broken, please verify that `xcrun simctl runtime match list` and `xcrun simctl runtime list` work")
+           UI.user_error!("xcrun simctl runtime not working")
+         end
+
+         # Get OS version corresponding to build
+         Gem::Version.new(FastlaneCore::DeviceManager.runtime_build_os_versions[runtime_build])
        end
     end
 
-    def self.compatible_with_sdk(sim)
-      default_sdk_version = detect_sdk_version(sim.os_type)
-      Gem::Version.new(sim.os_version) <= default_sdk_version || sim.os_version.start_with?(default_sdk_version.version)
+    def self.compatibility_constraint
+      @compability_constraint ||= begin
+        _, error, = Open3.capture3('xcrun simctl runtime -h')
+        unless error.include?('Usage: simctl runtime <operation> <arguments>')
+          UI.error("xcrun simctl runtime broken, run 'xcrun simctl runtime' and make sure it works")
+          UI.user_error!("xcrun simctl runtime not working.")
+        end
+
+        # `match list` subcommand added in Xcode 15
+        if error.include?('match list')
+          ->(name, sim) { sim.name == name && Gem::Version.new(sim.os_version) <= default_os_version(sim.os_type) }
+        else
+          ->(name, sim) { sim.name == name }
+        end
+      end
     end
 
-    def self.highest_compatible_simulator(simulators, name)
+    def self.highest_compatible_simulator(simulators, device_name)
+      constraint = compatibility_constraint.curry[device_name]
       simulators
-        .select { |sim| sim.name == name && compatible_with_sdk(sim) }
+        .select(&constraint)
         .reverse
         .sort_by! { |sim| Gem::Version.new(sim.os_version) }
         .last
@@ -157,8 +180,6 @@ module Scan
     end
 
     def self.detect_simulator(devices, requested_os_type, deployment_target_key, default_device_name, simulator_type_descriptor)
-      require 'set'
-
       deployment_target_version = get_deployment_target_version(deployment_target_key)
 
       simulators = filter_simulators(
@@ -176,6 +197,10 @@ module Scan
       end
 
       # At this point we have all simulators for the given deployment target (or higher)
+
+      # Clear out cached values
+      @os_versions = nil
+      @compability_constraint = nil
 
       # We create 2 lambdas, which we iterate over later on
       # If the first lambda `matches` found a simulator to use
