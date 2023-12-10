@@ -11,11 +11,16 @@ module Fastlane
         cmd << "--disable-sandbox" if params[:disable_sandbox]
         cmd << "--verbose" if params[:verbose]
         if params[:simulator]
+          # Check if the simulator syntax is correct using a regular expression
+          unless params[:simulator] =~ /^(iphone|ipad|macos)simulator(\d+\.\d+)?$/
+            UI.error("Invalid simulator syntax. Please use 'iphonesimulator', 'ipadsimulator', or 'macossimulator'.")
+            return
+          end
           simulator_flags = [
             "-Xswiftc", "-sdk",
             "-Xswiftc", "$(xcrun --sdk #{params[:simulator]} --show-sdk-path)",
             "-Xswiftc", "-target",
-            "-Xswiftc", "x86_64-apple-ios$(xcrun --sdk #{params[:simulator]} --show-sdk-version)-simulator"
+            "-Xswiftc", "x86_64-apple-ios$(xcrun --sdk #{params[:simulator]} --show-sdk-version | cut -d '.' -f 1)-simulator"
           ]
           cmd += simulator_flags
         end
