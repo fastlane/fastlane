@@ -460,7 +460,7 @@ describe FastlaneCore do
       )
     end
 
-    it 'correctly extracts exact version information from `xcrun simctl list runtimes`' do
+    it 'properly parses `xcrun simctl list runtimes` to associate runtime builds with their exact OS version' do
       response = double('xcrun simctl list devices', read: '== Devices ==')
       allow(Open3).to receive(:popen3).with('xcrun simctl list devices').and_yield(nil, response, nil, nil)
 
