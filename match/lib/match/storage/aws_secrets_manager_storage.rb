@@ -28,6 +28,7 @@ module Match
       def self.configure(params)
         aws_secrets_manager_region = params[:aws_secrets_manager_region]
         aws_secrets_manager_prefix = params[:aws_secrets_manager_prefix]
+        aws_secrets_manager_path_separator = params[:aws_secrets_manager_path_separator]
         aws_secrets_manager_access_key = params[:aws_secrets_manager_access_key]
         aws_secrets_manager_secret_access_key = params[:aws_secrets_manager_secret_access_key]
         delete_without_recovery = params[:aws_secrets_manager_force_delete_without_recovery]
@@ -46,6 +47,7 @@ module Match
         return self.new(
           aws_secrets_manager_region: aws_secrets_manager_region,
           aws_secrets_manager_prefix: aws_secrets_manager_prefix,
+          aws_secrets_manager_path_separator: params[:aws_secrets_manager_path_separator],
           delete_without_recovery: delete_without_recovery,
           recovery_window_days: recovery_window_days,
           username: params[:username],
@@ -61,6 +63,7 @@ module Match
 
       def initialize(aws_secrets_manager_region: nil,
                      aws_secrets_manager_prefix: nil,
+                     aws_secrets_manager_path_separator: nil,
                      delete_without_recovery: nil,
                      recovery_window_days: nil,
                      username: nil,
@@ -72,6 +75,7 @@ module Match
                      api_key_path: nil,
                      api_key: nil)
         @prefix = aws_secrets_manager_prefix.to_s
+        @path_separator = aws_secrets_manager_path_separator.to_s
         @delete_without_recovery = delete_without_recovery
         @recovery_window_days = recovery_window_days
         @username = username
@@ -142,6 +146,7 @@ module Match
           })
           decoded_secret = Zlib::Inflate.inflate(Base64.decode64(retrieved_secret.secret_string))
           stripped_secret_name = strip_secrets_manager_object_prefix(secret.name)
+          decoded_secret_name = decode_file_name(stripped_secret_name)
           download_path = File.join(self.working_directory, stripped_secret_name)
           FileUtils.mkdir_p(File.expand_path("..", download_path))
           File.write(download_path, decoded_secret)
@@ -158,6 +163,10 @@ module Match
         # `files_to_upload` is an array of files that need to be uploaded to Secrets manager
         # Those doesn't mean they're new, it might just be they're changed
         # Either way, we'll upload them using the same technique
+
+        files_to_upload.each do |file_name|
+          ensure_file_name_encodable(file_name)
+        end
 
         files_to_upload.each do |file_name|
           # Go from
@@ -230,7 +239,8 @@ module Match
         sanitized = sanitize_file_name(file_name)
         return sanitized if sanitized.start_with?(prefix)
 
-        prefix + sanitized
+        encoded = encode_file_name(sanitized)
+        prefix + encoded
       end
 
       def strip_secrets_manager_object_prefix(object_path)
@@ -239,6 +249,30 @@ module Match
 
       def sanitize_file_name(file_name)
         file_name.gsub(self.working_directory + "/", "")
+      end
+
+      def ensure_file_name_encodable(file_name)
+        if @path_separator && file_name.include?(@path_separator)
+          UI.user_error!("The file name '#{file_name}' contains the path separator '#{@path_separator}' which is not allowed")
+        end
+      end
+
+      def encode_file_name(file_name)
+        # if aws_secrets_manager_path_separator is not set, we use the default value
+        if @path_separator.nil?
+          return file_name
+        end
+
+        file_name.gsub(File::SEPARATOR, @path_separator)
+      end
+
+      def decode_file_name(file_name)
+        # if aws_secrets_manager_path_separator is not set, we use the default value
+        if @path_separator.nil?
+          return file_name
+        end
+
+        file_name.gsub(@path_separator, File::SEPARATOR)
       end
 
       def currently_used_team_id

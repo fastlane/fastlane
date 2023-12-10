@@ -49,6 +49,7 @@ describe Match do
         team_id: nil,
         aws_secrets_manager_region: nil,
         aws_secrets_manager_prefix: nil,
+        aws_secrets_manager_path_separator: nil,
         aws_secrets_manager_force_delete_without_recovery: nil,
         aws_secrets_manager_recovery_window_days: nil,
         aws_secrets_manager_access_key: nil,

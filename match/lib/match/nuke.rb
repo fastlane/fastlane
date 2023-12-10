@@ -55,11 +55,12 @@ module Match
         s3_secret_access_key: params[:s3_secret_access_key].to_s,
         s3_bucket: params[:s3_bucket].to_s,
         s3_object_prefix: params[:s3_object_prefix].to_s,
-        gitlab_project: params[:gitlab_project],        
+        gitlab_project: params[:gitlab_project],
         gitlab_host: params[:gitlab_host],
         team_id: params[:team_id] || Spaceship::ConnectAPI.client.portal_team_id,
         aws_secrets_manager_region: params[:aws_secrets_manager_region],
         aws_secrets_manager_prefix: params[:aws_secrets_manager_prefix],
+        aws_secrets_manager_path_separator: params[:aws_secrets_manager_path_separator],
         aws_secrets_manager_force_delete_without_recovery: params[:aws_secrets_manager_force_delete_without_recovery],
         aws_secrets_manager_recovery_window_days: params[:aws_secrets_manager_recovery_window_days],
         aws_secrets_manager_access_key: params[:aws_secrets_manager_access_key],
@@ -77,8 +78,8 @@ module Match
       had_app_identifier = self.params.fetch(:app_identifier, ask: false)
       self.params[:app_identifier] = '' # we don't really need a value here
       FastlaneCore::PrintTable.print_values(config: params,
-                                         hide_keys: [:app_identifier],
-                                             title: "Summary for match nuke #{Fastlane::VERSION}")
+                                            hide_keys: [:app_identifier],
+                                            title: "Summary for match nuke #{Fastlane::VERSION}")
 
       self.safe_remove_certs = params[:safe_remove_certs] || false
 
