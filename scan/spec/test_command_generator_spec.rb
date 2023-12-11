@@ -63,12 +63,12 @@ describe Scan do
     allow(response).to receive(:read).and_return(@valid_simulators)
     allow(Open3).to receive(:popen3).with("xcrun simctl list devices").and_yield(nil, response, nil, nil)
 
-    rt_response = ""
-    allow(rt_response).to receive(:read).and_return("== Runtimes ==\n")
-    allow(Open3).to receive(:popen3).with("xcrun simctl list runtimes").and_yield(nil, rt_response, nil, nil)
+    status = double('status', "success?": true)
+    allow(Open3).to receive(:capture2).with("xcrun simctl list runtimes -j").and_return(['{"runtimes": [] }', status])
 
     allow(Open3).to receive(:capture3).with("xcrun simctl runtime -h").and_return([nil, 'Usage: simctl runtime <operation> <arguments>', nil])
-    allow(Open3).to receive(:popen3).with('xcodebuild -showsdks -json', {}).and_call_original
+
+    allow(Open3).to receive(:popen2).with('xcodebuild -showsdks -json', {}).and_call_original
 
     allow(FastlaneCore::Helper).to receive(:xcode_at_least?).and_return(false)
     allow(FastlaneCore::CommandExecutor).to receive(:execute).with(command: "sw_vers -productVersion", print_all: false, print_command: false).and_return('10.12.1')

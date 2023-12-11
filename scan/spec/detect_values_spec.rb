@@ -52,15 +52,45 @@ describe Scan do
     end
 
     describe "#default_os_version" do
+      before do
+        Scan::DetectValues.clear_cache
+      end
+
       it 'informs users of unknown platform name' do
         expect do
           Scan::DetectValues.default_os_version('test')
         end.to raise_error(FastlaneCore::Interface::FastlaneCrash, "Unknown platform: test")
       end
 
+      it 'returns an error if `xcrun simctl runtime -h` is broken' do
+        help_output = 'garbage'
+        allow(Open3).to receive(:capture3).with('xcrun simctl runtime -h').and_return([nil, help_output, nil])
+
+        expect do
+          Scan::DetectValues.default_os_version('iOS')
+        end.to raise_error(FastlaneCore::Interface::FastlaneError)
+      end
+
       it 'returns an error if `xcodebuild -showsdks -json` is broken' do
+        help_output = 'Usage: simctl runtime <operation> <arguments> match list'
+        allow(Open3).to receive(:capture3).with('xcrun simctl runtime -h').and_return([nil, help_output, nil])
+
         sdks_output = 'unexpected output'
-        allow(Open3).to receive(:capture3).with('xcodebuild -showsdks -json').and_return([sdks_output, nil, nil])
+        status = double('status', "success?": true)
+        allow(Open3).to receive(:capture2).with('xcodebuild -showsdks -json').and_return([sdks_output, status])
+
+        expect do
+          Scan::DetectValues.default_os_version('iOS')
+        end.to raise_error(FastlaneCore::Interface::FastlaneError)
+      end
+
+      it 'returns an error if `xcodebuild -showsdks -json` exits unsuccessfully' do
+        help_output = 'Usage: simctl runtime <operation> <arguments> match list'
+        allow(Open3).to receive(:capture3).with('xcrun simctl runtime -h').and_return([nil, help_output, nil])
+
+        sdks_output = File.read('./scan/spec/fixtures/XcodebuildSdksOutput15')
+        status = double('status', "success?": false)
+        allow(Open3).to receive(:capture2).with('xcodebuild -showsdks -json').and_return([sdks_output, status])
 
         expect do
           Scan::DetectValues.default_os_version('iOS')
@@ -68,11 +98,32 @@ describe Scan do
       end
 
       it 'returns an error if `xcrun simctl runtime match list -j` is broken' do
+        help_output = 'Usage: simctl runtime <operation> <arguments> match list'
+        allow(Open3).to receive(:capture3).with('xcrun simctl runtime -h').and_return([nil, help_output, nil])
+
         sdks_output = File.read('./scan/spec/fixtures/XcodebuildSdksOutput15')
-        allow(Open3).to receive(:capture3).with('xcodebuild -showsdks -json').and_return([sdks_output, nil, nil])
+        status = double('status', "success?": true)
+        allow(Open3).to receive(:capture2).with('xcodebuild -showsdks -json').and_return([sdks_output, status])
 
         runtime_output = 'unexpected output'
-        allow(Open3).to receive(:capture3).with('xcrun simctl runtime match list -j').and_return([runtime_output, nil, nil])
+        allow(Open3).to receive(:capture2).with('xcrun simctl runtime match list -j').and_return([runtime_output, status])
+
+        expect do
+          Scan::DetectValues.default_os_version('iOS')
+        end.to raise_error(FastlaneCore::Interface::FastlaneError)
+      end
+
+      it 'returns an error if `xcrun simctl runtime match list -j` exits unsuccessfully' do
+        help_output = 'Usage: simctl runtime <operation> <arguments> match list'
+        allow(Open3).to receive(:capture3).with('xcrun simctl runtime -h').and_return([nil, help_output, nil])
+
+        sdks_output = File.read('./scan/spec/fixtures/XcodebuildSdksOutput15')
+        success_status = double('status', "success?": true)
+        allow(Open3).to receive(:capture2).with('xcodebuild -showsdks -json').and_return([sdks_output, success_status])
+
+        fail_status = double('fail_status', "success?": false)
+        runtime_output = File.read('./scan/spec/fixtures/XcrunSimctlRuntimeMatchListOutput15')
+        allow(Open3).to receive(:capture2).with('xcrun simctl runtime match list -j').and_return([runtime_output, fail_status])
 
         expect do
           Scan::DetectValues.default_os_version('iOS')
@@ -83,11 +134,15 @@ describe Scan do
       actual_os_versions = { "tvOS" => "17.0", "watchOS" => "10.0", "iOS" => "17.0.1" }
       %w[iOS tvOS watchOS].each do |os_type|
         it "retrieves the correct runtime build for #{os_type}" do
+          help_output = 'Usage: simctl runtime <operation> <arguments> match list'
+          allow(Open3).to receive(:capture3).with('xcrun simctl runtime -h').and_return([nil, help_output, nil])
+
           sdks_output = File.read('./scan/spec/fixtures/XcodebuildSdksOutput15')
-          allow(Open3).to receive(:capture3).with('xcodebuild -showsdks -json').and_return([sdks_output, nil, nil])
+          status = double('status', "success?": true)
+          allow(Open3).to receive(:capture2).with('xcodebuild -showsdks -json').and_return([sdks_output, status])
 
           runtime_output = File.read('./scan/spec/fixtures/XcrunSimctlRuntimeMatchListOutput15')
-          allow(Open3).to receive(:capture3).with('xcrun simctl runtime match list -j').and_return([runtime_output, nil, nil])
+          allow(Open3).to receive(:capture2).with('xcrun simctl runtime match list -j').and_return([runtime_output, status])
 
           allow(FastlaneCore::DeviceManager).to receive(:runtime_build_os_versions).and_return(build_os_versions)
 
@@ -98,8 +153,9 @@ describe Scan do
 
     describe "#detect_simulator" do
       it 'returns simulators for requested devices', requires_xcodebuild: true do
-        simctl_list_runtimes_output = double('xcrun simctl list runtimes', read: File.read("./scan/spec/fixtures/XcrunSimctlListRuntimesOutput"))
-        allow(Open3).to receive(:popen3).with("xcrun simctl list runtimes").and_yield(nil, simctl_list_runtimes_output, nil, nil)
+        simctl_list_runtimes_output = File.read("./scan/spec/fixtures/XcrunSimctlListRuntimesOutput")
+        status = double('status', "success?": true)
+        expect(Open3).to receive(:capture2).with("xcrun simctl list runtimes -j").and_return([simctl_list_runtimes_output, status])
 
         simctl_list_devices_output = double('xcrun simctl list devices', read: File.read("./scan/spec/fixtures/XcrunSimctlListDevicesOutput15"))
         allow(Open3).to receive(:popen3).with("xcrun simctl list devices").and_yield(nil, simctl_list_devices_output, nil, nil)
@@ -127,8 +183,9 @@ describe Scan do
       end
 
       it 'filters out simulators newer than what the current Xcode SDK supports', requires_xcodebuild: true do
-        simctl_list_runtimes_output = double('xcrun simctl list runtimes', read: File.read("./scan/spec/fixtures/XcrunSimctlListRuntimesOutput"))
-        allow(Open3).to receive(:popen3).with("xcrun simctl list runtimes").and_yield(nil, simctl_list_runtimes_output, nil, nil)
+        simctl_list_runtimes_output = File.read("./scan/spec/fixtures/XcrunSimctlListRuntimesOutput")
+        status = double('status', "success?": true)
+        expect(Open3).to receive(:capture2).with("xcrun simctl list runtimes -j").and_return([simctl_list_runtimes_output, status])
 
         simctl_list_devices_output = double('xcrun simctl list devices', read: File.read("./scan/spec/fixtures/XcrunSimctlListDevicesOutput14"))
         allow(Open3).to receive(:popen3).with("xcrun simctl list devices").and_yield(nil, simctl_list_devices_output, nil, nil)

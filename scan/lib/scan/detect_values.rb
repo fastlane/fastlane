@@ -115,52 +115,55 @@ module Scan
          UI.crash!("Unknown platform: #{os_type}") unless PLATFORMS.key?(os_type)
          platform = PLATFORMS[os_type]
 
-         # list SDK version for currently running Xcode
-         sdks_output, = Open3.capture3('xcodebuild -showsdks -json')
-         sdk_version = begin
-           JSON.parse(sdks_output).find { |e| e['platform'] == platform[:simulator] }['sdkVersion']
-         rescue StandardError => e
-           UI.error(e)
-           UI.error("xcodebuild CLI broken, please run `xcodebuild` and make sure it works")
-           UI.user_error!("xcodebuild not working")
+         _, error, = Open3.capture3('xcrun simctl runtime -h')
+         unless error.include?('Usage: simctl runtime <operation> <arguments>')
+           UI.error("xcrun simctl runtime broken, run 'xcrun simctl runtime' and make sure it works")
+           UI.user_error!("xcrun simctl runtime not working.")
          end
 
-         # Get runtime build from SDK version
-         runtime_output, = Open3.capture3('xcrun simctl runtime match list -j')
-         runtime_build = begin
-           JSON.parse(runtime_output).values.find { |elem| elem['platform'] == platform[:name] && elem['sdkVersion'] == sdk_version }['chosenRuntimeBuild']
-         rescue StandardError => e
-           UI.error(e)
-           UI.error("xcrun simctl runtime broken, please verify that `xcrun simctl runtime match list` and `xcrun simctl runtime list` work")
-           UI.user_error!("xcrun simctl runtime not working")
-         end
+         # `match list` subcommand added in Xcode 15
+         if error.include?('match list')
 
-         # Get OS version corresponding to build
-         Gem::Version.new(FastlaneCore::DeviceManager.runtime_build_os_versions[runtime_build])
+           # list SDK version for currently running Xcode
+           sdks_output, status = Open3.capture2('xcodebuild -showsdks -json')
+           sdk_version = begin
+             raise status unless status.success?
+             JSON.parse(sdks_output).find { |e| e['platform'] == platform[:simulator] }['sdkVersion']
+           rescue StandardError => e
+             UI.error(e)
+             UI.error("xcodebuild CLI broken, please run `xcodebuild` and make sure it works")
+             UI.user_error!("xcodebuild not working")
+           end
+
+           # Get runtime build from SDK version
+           runtime_output, status = Open3.capture2('xcrun simctl runtime match list -j')
+           runtime_build = begin
+             raise status unless status.success?
+             JSON.parse(runtime_output).values.find { |elem| elem['platform'] == platform[:name] && elem['sdkVersion'] == sdk_version }['chosenRuntimeBuild']
+           rescue StandardError => e
+             UI.error(e)
+             UI.error("xcrun simctl runtime broken, please verify that `xcrun simctl runtime match list` and `xcrun simctl runtime list` work")
+             UI.user_error!("xcrun simctl runtime not working")
+           end
+
+           # Get OS version corresponding to build
+           Gem::Version.new(FastlaneCore::DeviceManager.runtime_build_os_versions[runtime_build])
+         end
        end
     end
 
-    def self.compatibility_constraint
-      @compability_constraint ||= begin
-        _, error, = Open3.capture3('xcrun simctl runtime -h')
-        unless error.include?('Usage: simctl runtime <operation> <arguments>')
-          UI.error("xcrun simctl runtime broken, run 'xcrun simctl runtime' and make sure it works")
-          UI.user_error!("xcrun simctl runtime not working.")
-        end
+    def self.clear_cache
+      @os_versions = nil
+    end
 
-        # `match list` subcommand added in Xcode 15
-        if error.include?('match list')
-          ->(name, sim) { sim.name == name && Gem::Version.new(sim.os_version) <= default_os_version(sim.os_type) }
-        else
-          ->(name, sim) { sim.name == name }
-        end
-      end
+    def self.compatibility_constraint(sim, device_name)
+      latest_os = default_os_version(sim.os_type)
+      sim.name == device_name && (latest_os.nil? || Gem::Version.new(sim.os_version) <= latest_os)
     end
 
     def self.highest_compatible_simulator(simulators, device_name)
-      constraint = compatibility_constraint.curry[device_name]
       simulators
-        .select(&constraint)
+        .select { |sim| compatibility_constraint(sim, device_name) }
         .reverse
         .sort_by! { |sim| Gem::Version.new(sim.os_version) }
         .last
@@ -180,8 +183,9 @@ module Scan
     end
 
     def self.detect_simulator(devices, requested_os_type, deployment_target_key, default_device_name, simulator_type_descriptor)
-      deployment_target_version = get_deployment_target_version(deployment_target_key)
+      clear_cache
 
+      deployment_target_version = get_deployment_target_version(deployment_target_key)
       simulators = filter_simulators(
         FastlaneCore::DeviceManager.simulators(requested_os_type).tap do |array|
           if array.empty?
@@ -197,10 +201,6 @@ module Scan
       end
 
       # At this point we have all simulators for the given deployment target (or higher)
-
-      # Clear out cached values
-      @os_versions = nil
-      @compability_constraint = nil
 
       # We create 2 lambdas, which we iterate over later on
       # If the first lambda `matches` found a simulator to use
