@@ -12,8 +12,8 @@ module Fastlane
         cmd << "--verbose" if params[:verbose]
         if params[:simulator]
           # Check if the simulator syntax is correct using a regular expression
-          unless params[:simulator] =~ /^(iphone|ipad|macos)simulator(\d+\.\d+)?$/
-            UI.error("Invalid simulator syntax. Please use 'iphonesimulator', 'ipadsimulator', or 'macossimulator'.")
+          unless params[:simulator] =~ /^(iphone|macos)simulator(\d+\.\d+)?$/
+            UI.error("Invalid simulator syntax. Please use 'iphonesimulator', or 'macossimulator'.")
             return
           end
           simulator_flags = [
