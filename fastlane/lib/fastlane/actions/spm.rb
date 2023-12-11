@@ -11,11 +11,6 @@ module Fastlane
         cmd << "--disable-sandbox" if params[:disable_sandbox]
         cmd << "--verbose" if params[:verbose]
         if params[:simulator]
-          # Check if the simulator syntax is correct using a regular expression
-          unless params[:simulator] =~ /^(iphone|macos)simulator(\d+\.\d+)?$/
-            UI.error("Invalid simulator syntax. Please use 'iphonesimulator', or 'macossimulator'.")
-            return
-          end
           simulator_flags = [
             "-Xswiftc", "-sdk",
             "-Xswiftc", "$(xcrun --sdk #{params[:simulator]} --show-sdk-path)",
@@ -112,7 +107,10 @@ module Fastlane
                                        env_name: "FL_SPM_SIMULATOR",
                                        description: "Specifies the simulator to pass for Swift Compiler",
                                        type: String,
-                                       optional: true)
+                                       optional: true,
+                                       verify_block: proc do |value|
+                                         UI.user_error!("Please pass a valid simulator: (iphonesimulator|macossimulator)") unless valid_simulators.include?(value)
+                                       end)
         ]
       end
 
@@ -157,6 +155,10 @@ module Fastlane
 
       def self.xcpretty_output_types
         %w(simple test knock tap)
+      end
+
+      def self.valid_simulators
+        %w(iphonesimulator macossimulator)
       end
     end
   end
