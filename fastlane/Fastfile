@@ -27,7 +27,7 @@ lane :lint_source do
   # Verifying that no debug code is in the code base
   #
   exclude_dirs = ["\.bundle", "*/vendor/bundle"]
-  ensure_no_debug_code(text: "binding.pry", extension: ".rb", exclude: "playground.rb", exclude_dirs: exclude_dirs) # debugging code
+  ensure_no_debug_code(text: "binding\.(irb|pry)", extension: ".rb", exclude: "playground.rb", exclude_dirs: exclude_dirs) # debugging code
   ensure_no_debug_code(text: "# TODO", extension: ".rb", exclude_dirs: exclude_dirs) # TODOs
   ensure_no_debug_code(text: "now: ", extension: ".rb", exclude_dirs: exclude_dirs) # rspec focus
   ensure_no_debug_code(text: "<<<<<<<", extension: ".rb", exclude_dirs: exclude_dirs) # Merge conflict
