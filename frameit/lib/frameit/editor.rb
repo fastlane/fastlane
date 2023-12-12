@@ -325,7 +325,7 @@ module Frameit
     end
 
     def put_title_into_background(background, stack_title)
-      text_images = build_text_images(image.width - 2 * horizontal_frame_padding, image.height - 2 * vertical_frame_padding, stack_title)
+      text_images = build_text_images(image.width - 2 * horizontal_frame_padding, image.height - 2 * vertical_frame_padding)
 
       keyword = text_images[:keyword]
       title = text_images[:title]
@@ -400,7 +400,7 @@ module Frameit
     end
 
     # This will build up to 2 individual images with the title and optional keyword, which will then be added to the real image
-    def build_text_images(max_width, max_height, stack_title)
+    def build_text_images(max_width, max_height)
       words = [:keyword, :title].keep_if { |a| fetch_text(a) } # optional keyword/title
       results = {}
       trim_boxes = {}
