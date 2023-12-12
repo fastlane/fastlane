@@ -112,44 +112,44 @@ module Scan
     def self.default_os_version(os_type)
       @os_versions ||= {}
       @os_versions[os_type] ||= begin
-         UI.crash!("Unknown platform: #{os_type}") unless PLATFORMS.key?(os_type)
-         platform = PLATFORMS[os_type]
+        UI.crash!("Unknown platform: #{os_type}") unless PLATFORMS.key?(os_type)
+        platform = PLATFORMS[os_type]
 
-         _, error, = Open3.capture3('xcrun simctl runtime -h')
-         unless error.include?('Usage: simctl runtime <operation> <arguments>')
-           UI.error("xcrun simctl runtime broken, run 'xcrun simctl runtime' and make sure it works")
-           UI.user_error!("xcrun simctl runtime not working.")
-         end
+        _, error, = Open3.capture3('xcrun simctl runtime -h')
+        unless error.include?('Usage: simctl runtime <operation> <arguments>')
+          UI.error("xcrun simctl runtime broken, run 'xcrun simctl runtime' and make sure it works")
+          UI.user_error!("xcrun simctl runtime not working.")
+        end
 
-         # `match list` subcommand added in Xcode 15
-         if error.include?('match list')
+        # `match list` subcommand added in Xcode 15
+        if error.include?('match list')
 
-           # list SDK version for currently running Xcode
-           sdks_output, status = Open3.capture2('xcodebuild -showsdks -json')
-           sdk_version = begin
-             raise status unless status.success?
-             JSON.parse(sdks_output).find { |e| e['platform'] == platform[:simulator] }['sdkVersion']
-           rescue StandardError => e
-             UI.error(e)
-             UI.error("xcodebuild CLI broken, please run `xcodebuild` and make sure it works")
-             UI.user_error!("xcodebuild not working")
-           end
+          # list SDK version for currently running Xcode
+          sdks_output, status = Open3.capture2('xcodebuild -showsdks -json')
+          sdk_version = begin
+            raise status unless status.success?
+            JSON.parse(sdks_output).find { |e| e['platform'] == platform[:simulator] }['sdkVersion']
+          rescue StandardError => e
+            UI.error(e)
+            UI.error("xcodebuild CLI broken, please run `xcodebuild` and make sure it works")
+            UI.user_error!("xcodebuild not working")
+          end
 
-           # Get runtime build from SDK version
-           runtime_output, status = Open3.capture2('xcrun simctl runtime match list -j')
-           runtime_build = begin
-             raise status unless status.success?
-             JSON.parse(runtime_output).values.find { |elem| elem['platform'] == platform[:name] && elem['sdkVersion'] == sdk_version }['chosenRuntimeBuild']
-           rescue StandardError => e
-             UI.error(e)
-             UI.error("xcrun simctl runtime broken, please verify that `xcrun simctl runtime match list` and `xcrun simctl runtime list` work")
-             UI.user_error!("xcrun simctl runtime not working")
-           end
+          # Get runtime build from SDK version
+          runtime_output, status = Open3.capture2('xcrun simctl runtime match list -j')
+          runtime_build = begin
+            raise status unless status.success?
+            JSON.parse(runtime_output).values.find { |elem| elem['platform'] == platform[:name] && elem['sdkVersion'] == sdk_version }['chosenRuntimeBuild']
+          rescue StandardError => e
+            UI.error(e)
+            UI.error("xcrun simctl runtime broken, please verify that `xcrun simctl runtime match list` and `xcrun simctl runtime list` work")
+            UI.user_error!("xcrun simctl runtime not working")
+          end
 
-           # Get OS version corresponding to build
-           Gem::Version.new(FastlaneCore::DeviceManager.runtime_build_os_versions[runtime_build])
-         end
-       end
+          # Get OS version corresponding to build
+          Gem::Version.new(FastlaneCore::DeviceManager.runtime_build_os_versions[runtime_build])
+        end
+      end
     end
 
     def self.clear_cache

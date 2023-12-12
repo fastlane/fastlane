@@ -13,15 +13,15 @@ module FastlaneCore
 
       def runtime_build_os_versions
         @runtime_build_os_versions ||= begin
-            output, status = Open3.capture2('xcrun simctl list runtimes -j')
-            raise status unless status.success?
-            json = JSON.parse(output)
-            json['runtimes'].map { |h| [h['buildversion'], h['version']] }.to_h
-          rescue StandardError => e
-            UI.error(e)
-            UI.error('xcrun simctl CLI broken; cun `xcrun simctl list runtimes` and make sure it works')
-            UI.user_error!('xcrun simctl not working')
-          end
+          output, status = Open3.capture2('xcrun simctl list runtimes -j')
+          raise status unless status.success?
+          json = JSON.parse(output)
+          json['runtimes'].map { |h| [h['buildversion'], h['version']] }.to_h
+        rescue StandardError => e
+          UI.error(e)
+          UI.error('xcrun simctl CLI broken; cun `xcrun simctl list runtimes` and make sure it works')
+          UI.user_error!('xcrun simctl not working')
+        end
       end
 
       def simulators(requested_os_type = "")
