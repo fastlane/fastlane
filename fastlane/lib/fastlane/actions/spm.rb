@@ -122,6 +122,10 @@ module Fastlane
           'spm(
             command: "generate-xcodeproj",
             xcconfig: "Package.xcconfig"
+          )',
+          'spm(
+            command: "test",
+            parallel: true
           )'
         ]
       end
