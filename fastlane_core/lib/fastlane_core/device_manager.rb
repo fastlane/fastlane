@@ -7,24 +7,25 @@ require_relative 'helper'
 module FastlaneCore
   class DeviceManager
     class << self
-      attr_reader :runtime_build_os_versions
       def all(requested_os_type = "")
         return connected_devices(requested_os_type) + simulators(requested_os_type)
       end
 
+      def runtime_build_os_versions
+        @runtime_build_os_versions ||= begin
+            output, status = Open3.capture2('xcrun simctl list runtimes -j')
+            raise status unless status.success?
+            json = JSON.parse(output)
+            json['runtimes'].map { |h| [h['buildversion'], h['version']] }.to_h
+          rescue StandardError => e
+            UI.error(e)
+            UI.error('xcrun simctl CLI broken; cun `xcrun simctl list runtimes` and make sure it works')
+            UI.user_error!('xcrun simctl not working')
+          end
+      end
+
       def simulators(requested_os_type = "")
         UI.verbose("Fetching available simulator devices")
-
-        output, status = Open3.capture2('xcrun simctl list runtimes -j')
-        begin
-          raise status unless status.success?
-          json = JSON.parse(output)
-          @runtime_build_os_versions = json['runtimes'].map { |h| [h['buildversion'], h['version']] }.to_h
-        rescue StandardError => e
-          UI.error(e)
-          UI.error('xcrun simctl CLI broken; cun `xcrun simctl list runtimes` and make sure it works')
-          UI.user_error!('xcrun simctl not working')
-        end
 
         @devices = []
         os_type = 'unknown'

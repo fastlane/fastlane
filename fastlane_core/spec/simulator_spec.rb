@@ -21,9 +21,6 @@ describe FastlaneCore do
     Apple Watch - 38mm (66D1BF17-3003-465F-A165-E6E3A565E5EB) (Booted)
 "
       FastlaneCore::Simulator.clear_cache
-
-      status = double('status', "success?": true)
-      allow(Open3).to receive(:capture2).with("xcrun simctl list runtimes -j").and_return(['{"runtimes": [] }', status])
     end
 
     it "can launch Simulator.app for a simulator device" do
