@@ -43,6 +43,46 @@ describe Match do
         expect(File.exist?(File.join(storage.working_directory, 'README.md'))).to eq(false) # because the README is being added when committing the changes
       end
 
+      it "directly clones a single branch wtih shallow clone" do
+        # GIVEN
+        path = Dir.mktmpdir # to have access to the actual path
+        allow(Dir).to receive(:mktmpdir).and_return(path)
+
+        git_url = "https://github.com/fastlane/fastlane/tree/master/certificates"
+        git_branch = "master"
+
+        storage = Match::Storage::GitStorage.new(
+          git_url: git_url,
+          branch: git_branch,
+          # Test case:
+          clone_branch_directly: true,
+          shallow_clone: true
+        )
+
+        # EXPECTATIONS
+        expected_commands = [
+          "git clone #{git_url.shellescape} #{path.shellescape} --depth 1 -b #{git_branch} --single-branch",
+          "git --no-pager branch --list origin/#{git_branch} --no-color -r",
+          "git checkout --orphan #{git_branch}",
+          "git reset --hard"
+        ]
+        expected_commands.each do |command|
+          expect(FastlaneCore::CommandExecutor).to receive(:execute).once.with({
+            command: command,
+            print_all: nil,
+            print_command: nil
+          }).and_return("")
+        end
+
+        # WHEN
+        storage.download
+
+        # THEN
+        # expected_commands above are executed
+        expect(File.directory?(storage.working_directory)).to eq(true)
+        expect(File.exist?(File.join(storage.working_directory, 'README.md'))).to eq(false)
+      end
+
       it "clones the repo (not shallow)" do
         path = Dir.mktmpdir # to have access to the actual path
         expect(Dir).to receive(:mktmpdir).and_return(path)
