@@ -109,7 +109,7 @@ module Fastlane
                                        type: String,
                                        optional: true,
                                        verify_block: proc do |value|
-                                         UI.user_error!("Please pass a valid simulator: (#{valid_simulators.join('|')})") unless valid_simulators.include?(value)
+                                         UI.user_error!("Please pass a valid simulator. Use one of the following: #{valid_simulators.join(', ')}") unless valid_simulators.include?(value)
                                        end)
         ]
       end
