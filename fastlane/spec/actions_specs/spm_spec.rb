@@ -360,7 +360,7 @@ describe Fastlane do
                 simulator: 'invalid_simulator'
               )
             end").runner.execute(:test)
-          end.to raise_error("Invalid simulator syntax. Please use 'iphonesimulator', or 'macossimulator'.")
+          end.to raise_error("Please pass a valid simulator. Use one of the following: iphonesimulator, macossimulator"))
         end
       end
     end
