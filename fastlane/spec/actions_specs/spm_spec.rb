@@ -360,20 +360,7 @@ describe Fastlane do
                 simulator: 'invalid_simulator'
               )
             end").runner.execute(:test)
-          end.to raise_error("Invalid simulator syntax. Please use 'iphonesimulator', 'ipadsimulator', or 'macossimulator'.")
-        end
-      end
-
-      context "when simulator is specified for non-package commands" do
-        it "raises an error" do
-          expect do
-            Fastlane::FastFile.new.parse("lane :test do
-              spm(
-                command: 'clean',
-                simulator: 'iphonesimulator'
-              )
-            end").runner.execute(:test)
-          end.to raise_error("Simulator is only applicable to package-related commands.")
+          end.to raise_error("Invalid simulator syntax. Please use 'iphonesimulator', or 'macossimulator'.")
         end
       end
     end
