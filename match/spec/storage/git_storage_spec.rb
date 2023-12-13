@@ -24,7 +24,7 @@ describe Match do
 
     describe "#download" do
       describe "when no branch is specified" do
-        it("checkouts the master branch ") do
+        it "checkouts the master branch" do
           # Override default "test" branch name.
           git_branch = "master"
 
@@ -45,7 +45,7 @@ describe Match do
       end
 
       describe "when using shallow_clone" do
-        it("clones the repo with correct clone command") do
+        it "clones the repo with correct clone command" do
           storage = Match::Storage::GitStorage.new(
             git_url: git_url,
             branch: git_branch,
@@ -66,7 +66,7 @@ describe Match do
       end
 
       describe "when using shallow_clone and clone_branch_directly" do
-        it("clones the repo with correct clone command") do
+        it "clones the repo with correct clone command" do
           storage = Match::Storage::GitStorage.new(
             git_url: git_url,
             branch: git_branch,
@@ -88,7 +88,7 @@ describe Match do
       end
 
       describe "when using clone_branch_directly" do
-        it("clones the repo with correct clone command") do
+        it "clones the repo with correct clone command" do
           storage = Match::Storage::GitStorage.new(
             git_url: git_url,
             branch: git_branch,
@@ -109,7 +109,7 @@ describe Match do
       end
 
       describe "when not using shallow_clone and clone_branch_directly" do
-        it("clones the repo with correct clone command") do
+        it "clones the repo with correct clone command" do
           storage = Match::Storage::GitStorage.new(
             git_url: git_url,
             branch: git_branch,
