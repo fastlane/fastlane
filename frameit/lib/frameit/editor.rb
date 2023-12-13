@@ -439,7 +439,7 @@ module Frameit
 
         results[key] = text_image
 
-        # Natively trimming the image with .trim will result in the loss of the common baseline between the text in all images when side-by-side (e.g. stack_title is false).
+        # Natively trimming the image with .trim will result in the loss of the common baseline between the text in all images when side-by-side.
         # Hence retrieve the calculated trim bounding box without actually trimming:
         calculated_trim_box = text_image.identify do |b|
           b.format("%@") # CALCULATED: trim bounding box (without actually trimming), see: http://www.imagemagick.org/script/escape.php
