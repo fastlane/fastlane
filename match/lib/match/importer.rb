@@ -9,34 +9,7 @@ require 'fileutils'
 module Match
   class Importer
     def import_cert(params, cert_path: nil, p12_path: nil, profile_path: nil)
-      if cert_path.nil?
-        cert_path = params[:import_certificate_file_path]
-      end
-      if p12_path.nil?
-        p12_path = params[:import_certificate_private_key_file_path]
-      end
-      if profile_path.nil?
-        profile_path = params[:import_provisioning_profile_file_path]
-      end
-
-      # Get and verify cert, p12 and profiles path
-      if cert_path.nil?
-        cert_path = ensure_valid_file_path(cert_path, "Certificate", ".cer", optional: true, skip_prompt: params[:import_suppress_ui_file_path_prompts])
-      else
-        cert_path = ensure_valid_file_path(cert_path, "Certificate", ".cer", optional: true, skip_prompt: true)
-      end
-
-      if p12_path.nil?
-        p12_path = ensure_valid_file_path(p12_path, "Private key", ".p12", optional: true, skip_prompt: params[:import_suppress_ui_file_path_prompts])
-      else
-        p12_path = ensure_valid_file_path(p12_path, "Private key", ".p12", optional: true, skip_prompt: true)
-      end
-
-      if profile_path.nil?
-        profile_path = ensure_valid_file_path(profile_path, "Provisioning profile", ".mobileprovision or .provisionprofile", optional: true, skip_prompt: params[:import_suppress_ui_file_path_prompts])
-      else
-        profile_path = ensure_valid_file_path(profile_path, "Provisioning profile", ".mobileprovision or .provisionprofile", optional: true, skip_prompt: true)
-      end
+      cert_path, p12_path, profile_path = resolve_inputs(cert_path, p12_path, profile_path)
 
       if (cert_path.nil? && p12_path.nil? && profile_path.nil?) || (cert_path.nil? && !p12_path.nil?) || (!cert_path.nil? && p12_path.nil?)
         UI.user_error!("When using 'import' you must specify either both a certificate/private key and/or a provisioning profile!")
@@ -160,6 +133,39 @@ module Match
       storage.save_changes!(files_to_commit: files_to_commit)
     ensure
       storage.clear_changes if storage
+    end
+
+    def resolve_inputs(params, cert_path: nil, p12_path: nil, profile_path: nil)
+      if cert_path.nil?
+        cert_path = params[:import_certificate_file_path]
+      end
+      if p12_path.nil?
+        p12_path = params[:import_certificate_private_key_file_path]
+      end
+      if profile_path.nil?
+        profile_path = params[:import_provisioning_profile_file_path]
+      end
+
+      # Get and verify cert, p12 and profiles path
+      if cert_path.nil?
+        cert_path = ensure_valid_file_path(cert_path, "Certificate", ".cer", optional: true, skip_prompt: params[:import_suppress_ui_file_path_prompts])
+      else
+        cert_path = ensure_valid_file_path(cert_path, "Certificate", ".cer", optional: true, skip_prompt: true)
+      end
+
+      if p12_path.nil?
+        p12_path = ensure_valid_file_path(p12_path, "Private key", ".p12", optional: true, skip_prompt: params[:import_suppress_ui_file_path_prompts])
+      else
+        p12_path = ensure_valid_file_path(p12_path, "Private key", ".p12", optional: true, skip_prompt: true)
+      end
+
+      if profile_path.nil?
+        profile_path = ensure_valid_file_path(profile_path, "Provisioning profile", ".mobileprovision or .provisionprofile", optional: true, skip_prompt: params[:import_suppress_ui_file_path_prompts])
+      else
+        profile_path = ensure_valid_file_path(profile_path, "Provisioning profile", ".mobileprovision or .provisionprofile", optional: true, skip_prompt: true)
+      end
+
+      return cert_path, p12_path, profile_path
     end
 
     def ensure_valid_file_path(file_path, file_description, file_extension, optional: false, skip_prompt: false)
