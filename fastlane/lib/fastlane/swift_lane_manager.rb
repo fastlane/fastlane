@@ -105,7 +105,7 @@ module Fastlane
       end
     end
 
-    def self.swap_paths_in_target(target: nil, file_refs_to_swap: nil, expected_path_to_replacement_path_tuples: nil)
+    def self.swap_paths_in_target(file_refs_to_swap: nil, expected_path_to_replacement_path_tuples: nil)
       made_project_updates = false
       file_refs_to_swap.each do |file_ref|
         expected_path_to_replacement_path_tuples.each do |preinstalled_config_relative_path, user_config_relative_path|
@@ -197,14 +197,12 @@ module Fastlane
 
       # Swap in all new user supplied configs into the project
       project_modified = swap_paths_in_target(
-        target: runner_target,
         file_refs_to_swap: target_file_refs,
         expected_path_to_replacement_path_tuples: new_user_tool_file_paths
       )
 
       # Swap out any configs the user has removed, inserting fastlane defaults
       project_modified = swap_paths_in_target(
-        target: runner_target,
         file_refs_to_swap: target_file_refs,
         expected_path_to_replacement_path_tuples: user_tool_files_possibly_removed
       ) || project_modified
