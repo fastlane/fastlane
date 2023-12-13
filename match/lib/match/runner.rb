@@ -155,7 +155,7 @@ module Match
       end
     end
 
-    RENEWABLE_CERT_TYPES = [:mac_installer_distribution, :development, :distribution, :enterprise]
+    RENEWABLE_CERT_TYPES_VIA_API = [:mac_installer_distribution, :development, :distribution, :enterprise]
 
     def fetch_certificate(params: nil, renew_expired_certs: false, specific_cert_type: nil)
       cert_type = Match.cert_type_sym(specific_cert_type || params[:type])
@@ -168,7 +168,7 @@ module Match
       # Determine if cert is renewable.
       # Can't renew developer_id certs with Connect API token. Account holder access is required.
       is_authenticated_with_login = Spaceship::ConnectAPI.token.nil?
-      is_cert_renewable_via_api = RENEWABLE_CERT_TYPES.include?(cert_type)
+      is_cert_renewable_via_api = RENEWABLE_CERT_TYPES_VIA_API.include?(cert_type)
       is_cert_renewable = is_authenticated_with_login || is_cert_renewable_via_api
 
       # Validate existing certificate first.
