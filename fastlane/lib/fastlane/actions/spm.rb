@@ -105,7 +105,7 @@ module Fastlane
                                        default_value: false),
           FastlaneCore::ConfigItem.new(key: :simulator,
                                        env_name: "FL_SPM_SIMULATOR",
-                                       description: "Specifies the simulator to pass for Swift Compiler",
+                                       description: "Specifies the simulator to pass for Swift Compiler (one of: #{valid_simulators.join(', ')})",
                                        type: String,
                                        optional: true,
                                        verify_block: proc do |value|
