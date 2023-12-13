@@ -92,9 +92,14 @@ module Match
         command << " -c http.extraheader='Authorization: Bearer #{self.git_bearer_authorization}'" unless self.git_bearer_authorization.nil?
 
         if self.shallow_clone
-          command << " --depth 1 --no-single-branch"
-        elsif self.clone_branch_directly
+          command << " --depth 1"
+        end
+
+        if self.clone_branch_directly
           command += " -b #{self.branch.shellescape} --single-branch"
+        elsif self.shallow_clone
+          # shallow clone all branches if not cloning branch directly
+          command += " --no-single-branch"
         end
 
         command = command_from_private_key(command) unless self.git_private_key.nil?
