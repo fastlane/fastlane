@@ -292,9 +292,5 @@ describe Match do
         end
       end
     end
-
-    it "cache" do
-
-    end
   end
 end
