@@ -38,11 +38,11 @@ module Match
         profile_path = ensure_valid_file_path(profile_path, "Provisioning profile", ".mobileprovision or .provisionprofile", optional: true, skip_prompt: true)
       end
 
-      if (cert_path.nil? and p12_path.nil? and profile_path.nil?) or (cert_path.nil? and !p12_path.nil?) or (!cert_path.nil? and p12_path.nil?)
+      if (cert_path.nil? && p12_path.nil? && profile_path.nil?) || (cert_path.nil? && !p12_path.nil?) || (!cert_path.nil? && p12_path.nil?)
         UI.user_error!("When using 'import' you must specify either both a certificate/private key and/or a provisioning profile!")
       end
 
-      is_importing_cert_key = (cert_path and p12_path)
+      is_importing_cert_key = (cert_path && p12_path)
 
       # Storage
       storage = Storage.from_params(params)
