@@ -43,7 +43,7 @@ describe Match do
         expect(File.exist?(File.join(storage.working_directory, 'README.md'))).to eq(false) # because the README is being added when committing the changes
       end
 
-      it "directly clones a single branch wtih shallow clone" do
+      it "directly clones a single branch with shallow clone" do
         # GIVEN
         path = Dir.mktmpdir # to have access to the actual path
         allow(Dir).to receive(:mktmpdir).and_return(path)
