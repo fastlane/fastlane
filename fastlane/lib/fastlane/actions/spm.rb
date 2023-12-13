@@ -55,7 +55,7 @@ module Fastlane
                                        env_name: "FL_SPM_PARALLEL",
                                        description: "Enables running tests in parallel when using the 'test' command",
                                        type: Boolean,
-                                       optional: true),
+                                       default_value: false),
           FastlaneCore::ConfigItem.new(key: :build_path,
                                        env_name: "FL_SPM_BUILD_PATH",
                                        description: "Specify build/cache directory [default: ./.build]",
