@@ -6,11 +6,9 @@ require_relative 'generator'
 require 'fastlane_core/provisioning_profile'
 require 'fileutils'
 
-
 module Match
   class Importer
     def import_cert(params, cert_path: nil, p12_path: nil, profile_path: nil)
-
       if cert_path.nil?
         cert_path = params[:import_certificate_file_path]
       end
@@ -40,7 +38,7 @@ module Match
         profile_path = ensure_valid_file_path(profile_path, "Provisioning profile", ".mobileprovision or .provisionprofile", optional: true, skip_prompt: true)
       end
 
-      if (cert_path.nil? and p12_path.nil? and profile_path.nil?) or (cert_path.nil? and p12_path != nil) or (cert_path != nil and p12_path.nil?)
+      if (cert_path.nil? and p12_path.nil? and profile_path.nil?) or (cert_path.nil? and !p12_path.nil?) or (!cert_path.nil? and p12_path.nil?)
         UI.user_error!("When using 'import' you must specify either both a certificate/private key and/or a provisioning profile!")
       end
 
@@ -105,39 +103,39 @@ module Match
         should_skip_certificate_matching = params[:skip_certificate_matching]
         # Skip if we are not importing cert/keys (only profile) OR there is no access to Apple Developer portal but we have the certificates, keys and profiles
         if should_skip_certificate_matching
-            cert_name = File.basename(cert_path, ".*")
-            p12_name = File.basename(p12_path, ".*")
+          cert_name = File.basename(cert_path, ".*")
+          p12_name = File.basename(p12_path, ".*")
 
-            # Make dir if doesn't exist
-            FileUtils.mkdir_p(output_dir_certs)
-            dest_cert_path = File.join(output_dir_certs, "#{cert_name}.cer")
-            dest_p12_path = File.join(output_dir_certs, "#{p12_name}.p12")
+          # Make dir if doesn't exist
+          FileUtils.mkdir_p(output_dir_certs)
+          dest_cert_path = File.join(output_dir_certs, "#{cert_name}.cer")
+          dest_p12_path = File.join(output_dir_certs, "#{p12_name}.p12")
         else
-            if (api_token = Spaceship::ConnectAPI::Token.from(hash: params[:api_key], filepath: params[:api_key_path]))
+          if (api_token = Spaceship::ConnectAPI::Token.from(hash: params[:api_key], filepath: params[:api_key_path]))
             UI.message("Creating authorization token for App Store Connect API")
             Spaceship::ConnectAPI.token = api_token
-            elsif !Spaceship::ConnectAPI.token.nil?
+          elsif !Spaceship::ConnectAPI.token.nil?
             UI.message("Using existing authorization token for App Store Connect API")
-            else
+          else
             UI.message("Login to App Store Connect (#{params[:username]})")
             Spaceship::ConnectAPI.login(params[:username], use_portal: true, use_tunes: false, portal_team_id: params[:team_id], team_name: params[:team_name])
-            end
+          end
 
-            # Need to get the cert id by comparing base64 encoded cert content with certificate content from the API responses
-            certs = Spaceship::ConnectAPI::Certificate.all(filter: { certificateType: certificate_type })
+          # Need to get the cert id by comparing base64 encoded cert content with certificate content from the API responses
+          certs = Spaceship::ConnectAPI::Certificate.all(filter: { certificateType: certificate_type })
 
-            # Base64 encode contents to find match from API to find a cert ID
-            cert_contents_base_64 = Base64.strict_encode64(File.binread(cert_path))
-            matching_cert = certs.find do |cert|
+          # Base64 encode contents to find match from API to find a cert ID
+          cert_contents_base_64 = Base64.strict_encode64(File.binread(cert_path))
+          matching_cert = certs.find do |cert|
             cert.certificate_content == cert_contents_base_64
-            end
+          end
 
-            UI.user_error!("This certificate cannot be imported - the certificate contents did not match with any available on the Developer Portal") if matching_cert.nil?
+          UI.user_error!("This certificate cannot be imported - the certificate contents did not match with any available on the Developer Portal") if matching_cert.nil?
 
-            # Make dir if doesn't exist
-            FileUtils.mkdir_p(output_dir_certs)
-            dest_cert_path = File.join(output_dir_certs, "#{matching_cert.id}.cer")
-            dest_p12_path = File.join(output_dir_certs, "#{matching_cert.id}.p12")
+          # Make dir if doesn't exist
+          FileUtils.mkdir_p(output_dir_certs)
+          dest_cert_path = File.join(output_dir_certs, "#{matching_cert.id}.cer")
+          dest_p12_path = File.join(output_dir_certs, "#{matching_cert.id}.p12")
         end
 
         files_to_commit = [dest_cert_path, dest_p12_path]
@@ -167,7 +165,7 @@ module Match
     def ensure_valid_file_path(file_path, file_description, file_extension, optional: false, skip_prompt: false)
       optional_file_message = optional ? " or leave empty to skip this file" : ""
       raw_file_path = file_path
-      if !skip_prompt
+      unless skip_prompt
         file_path ||= UI.input("#{file_description} (#{file_extension}) path#{optional_file_message}:")
       end
 

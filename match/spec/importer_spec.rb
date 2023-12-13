@@ -102,71 +102,71 @@ describe Match do
     end
 
     it "imports a .mobileprovision (iOS provision) into the match repo without a a .cert and .p12" do
-        repo_dir = Dir.mktmpdir
-        setup_fake_storage(repo_dir, config)
+      repo_dir = Dir.mktmpdir
+      setup_fake_storage(repo_dir, config)
 
-        # UI will prompt 2x for cert/key which we are not providing
-        expect(UI).to receive(:input).and_return("")
-        expect(UI).to receive(:input).and_return("")
+      # UI will prompt 2x for cert/key which we are not providing
+      expect(UI).to receive(:input).and_return("")
+      expect(UI).to receive(:input).and_return("")
 
-        # because no cert/key provided ConnectAPI operations will be skipped
-        expect(Spaceship::ConnectAPI).not_to receive(:login)
-        expect(Spaceship::ConnectAPI::Certificate).not_to receive(:all)
-        expect(fake_storage).to receive(:save_changes!).with(
-          files_to_commit: [
-            File.join(repo_dir, "profiles", "appstore", "AppStore_tools.fastlane.app.mobileprovision")
-          ]
-        )
+      # because no cert/key provided ConnectAPI operations will be skipped
+      expect(Spaceship::ConnectAPI).not_to receive(:login)
+      expect(Spaceship::ConnectAPI::Certificate).not_to receive(:all)
+      expect(fake_storage).to receive(:save_changes!).with(
+        files_to_commit: [
+          File.join(repo_dir, "profiles", "appstore", "AppStore_tools.fastlane.app.mobileprovision")
+        ]
+      )
 
-        expect(fake_storage).to receive(:clear_changes)
+      expect(fake_storage).to receive(:clear_changes)
 
-        Match::Importer.new.import_cert(config, cert_path: nil, p12_path: nil, profile_path: ios_profile_path)
+      Match::Importer.new.import_cert(config, cert_path: nil, p12_path: nil, profile_path: ios_profile_path)
     end
 
     it "imports a .provisionprofile (osx provision) into the match repo without a a .cert and .p12" do
-        repo_dir = Dir.mktmpdir
-        setup_fake_storage(repo_dir, config)
+      repo_dir = Dir.mktmpdir
+      setup_fake_storage(repo_dir, config)
 
-        # UI will prompt 2x for cert/key which we are not providing
-        expect(UI).to receive(:input).and_return("")
-        expect(UI).to receive(:input).and_return("")
+      # UI will prompt 2x for cert/key which we are not providing
+      expect(UI).to receive(:input).and_return("")
+      expect(UI).to receive(:input).and_return("")
 
-        # because no cert/key provided ConnectAPI operations will be skipped
-        expect(Spaceship::ConnectAPI).not_to receive(:login)
-        expect(Spaceship::ConnectAPI::Certificate).not_to receive(:all)
-        expect(fake_storage).to receive(:save_changes!).with(
-          files_to_commit: [
-            File.join(repo_dir, "profiles", "appstore", "AppStore_tools.fastlane.app.provisionprofile")
-          ]
-        )
+      # because no cert/key provided ConnectAPI operations will be skipped
+      expect(Spaceship::ConnectAPI).not_to receive(:login)
+      expect(Spaceship::ConnectAPI::Certificate).not_to receive(:all)
+      expect(fake_storage).to receive(:save_changes!).with(
+        files_to_commit: [
+          File.join(repo_dir, "profiles", "appstore", "AppStore_tools.fastlane.app.provisionprofile")
+        ]
+      )
 
-        expect(fake_storage).to receive(:clear_changes)
+      expect(fake_storage).to receive(:clear_changes)
 
-        Match::Importer.new.import_cert(config, cert_path: nil, p12_path: nil, profile_path: osx_profile_path)
+      Match::Importer.new.import_cert(config, cert_path: nil, p12_path: nil, profile_path: osx_profile_path)
     end
 
     it "imports a .provisionprofile (osx provision) into the match repo without a a .cert and .p12 with UI prompt supression" do
-        repo_dir = Dir.mktmpdir
-        setup_fake_storage(repo_dir, config)
+      repo_dir = Dir.mktmpdir
+      setup_fake_storage(repo_dir, config)
 
-        # supress prompting
-        config[:import_suppress_ui_file_path_prompts] = true
+      # supress prompting
+      config[:import_suppress_ui_file_path_prompts] = true
 
-        # UI should not prompt 2x for cert/key which we are not providing
-        expect(UI).not_to receive(:input)
+      # UI should not prompt 2x for cert/key which we are not providing
+      expect(UI).not_to receive(:input)
 
-        # because no cert/key provided ConnectAPI operations will be skipped
-        expect(Spaceship::ConnectAPI).not_to receive(:login)
-        expect(Spaceship::ConnectAPI::Certificate).not_to receive(:all)
-        expect(fake_storage).to receive(:save_changes!).with(
-          files_to_commit: [
-            File.join(repo_dir, "profiles", "appstore", "AppStore_tools.fastlane.app.provisionprofile")
-          ]
-        )
+      # because no cert/key provided ConnectAPI operations will be skipped
+      expect(Spaceship::ConnectAPI).not_to receive(:login)
+      expect(Spaceship::ConnectAPI::Certificate).not_to receive(:all)
+      expect(fake_storage).to receive(:save_changes!).with(
+        files_to_commit: [
+          File.join(repo_dir, "profiles", "appstore", "AppStore_tools.fastlane.app.provisionprofile")
+        ]
+      )
 
-        expect(fake_storage).to receive(:clear_changes)
+      expect(fake_storage).to receive(:clear_changes)
 
-        Match::Importer.new.import_cert(config, cert_path: nil, p12_path: nil, profile_path: osx_profile_path)
+      Match::Importer.new.import_cert(config, cert_path: nil, p12_path: nil, profile_path: osx_profile_path)
     end
 
     it "imports a .cert and .p12 when the type is set to developer_id" do
