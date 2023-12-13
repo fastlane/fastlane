@@ -139,6 +139,8 @@ describe Match do
 
         # THEN
         expect(sut.certificates).to eq(['portal_certificate_2'])
+        # THEN used cached
+        expect(sut.certificates).to eq(['portal_certificate_2'])
       end
     end
   end
