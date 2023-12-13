@@ -9,7 +9,7 @@ require 'fileutils'
 module Match
   class Importer
     def import_cert(params, cert_path: nil, p12_path: nil, profile_path: nil)
-      cert_path, p12_path, profile_path = resolve_inputs(cert_path, p12_path, profile_path)
+      cert_path, p12_path, profile_path = resolve_inputs(params, cert_path, p12_path, profile_path)
 
       if (cert_path.nil? && p12_path.nil? && profile_path.nil?) || (cert_path.nil? && !p12_path.nil?) || (!cert_path.nil? && p12_path.nil?)
         UI.user_error!("When using 'import' you must specify either both a certificate/private key and/or a provisioning profile!")
@@ -135,7 +135,7 @@ module Match
       storage.clear_changes if storage
     end
 
-    def resolve_inputs(params, cert_path: nil, p12_path: nil, profile_path: nil)
+    def resolve_inputs(params, cert_path, p12_path, profile_path)
       if cert_path.nil?
         cert_path = params[:import_certificate_file_path]
       end
@@ -165,7 +165,7 @@ module Match
         profile_path = ensure_valid_file_path(profile_path, "Provisioning profile", ".mobileprovision or .provisionprofile", optional: true, skip_prompt: true)
       end
 
-      return cert_path, p12_path, profile_path
+      return [cert_path, p12_path, profile_path]
     end
 
     def ensure_valid_file_path(file_path, file_description, file_extension, optional: false, skip_prompt: false)
