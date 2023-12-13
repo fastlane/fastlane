@@ -2,7 +2,7 @@ require 'spaceship/client'
 
 describe Match do
   describe Match::Portal::Cache do
-    let(:default_params) {
+    let(:default_params) do
       {
         platform: 'ios',
         type: 'development',
@@ -15,28 +15,17 @@ describe Match do
         include_all_certificates: true,
         force_for_new_certificates: true
       }
-    }
+    end
 
     let(:bundle_ids) { ['bundle_ID_1', 'bundle_ID_2'] }
 
-    let(:default_sut) {
+    let(:default_sut) do
       Match::Portal::Cache.build(params: default_params, bundle_id_identifiers: bundle_ids)
-    }
+    end
 
     describe "init" do
       it "builds correctly with params" do
-        params = {
-          platform: 'ios',
-          type: 'development',
-          additional_cert_types: nil,
-          readonly: false,
-          force: false,
-          include_mac_in_profiles: true,
-
-          force_for_new_devices: true,
-          include_all_certificates: true,
-          force_for_new_certificates: true
-        }
+        params = default_params
         bundle_ids = ['bundleID']
 
         cache = Match::Portal::Cache.build(params: params, bundle_id_identifiers: bundle_ids)

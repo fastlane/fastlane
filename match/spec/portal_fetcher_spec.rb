@@ -2,9 +2,7 @@ require 'spaceship/client'
 
 describe Match do
   describe Match::Portal::Fetcher do
-    let(:default_sut) {
-      Match::Portal::Fetcher
-    }
+    let(:default_sut) { Match::Portal::Fetcher }
 
     let(:portal_bundle_id) { double("portal_bundle_id") }
     let(:portal_device) { double("portal_device") }
@@ -18,31 +16,31 @@ describe Match do
     let(:certificateType) { Spaceship::ConnectAPI::Certificate::CertificateType }
     let(:profileState) { Spaceship::ConnectAPI::Profile::ProfileState }
 
-    let(:default_device_all_params) {
+    let(:default_device_all_params) do
       {
         filter: { platform: 'IOS,UNIVERSAL', status: 'ENABLED' },
         client: anything
       }
-    }
+    end
 
-    let(:default_certificates_all_params) {
+    let(:default_certificates_all_params) do
       {
         filter: { certificateType: anything }
       }
-    }
+    end
 
-    let(:default_profile_all_params) {
+    let(:default_profile_all_params) do
       {
         filter: { profileType: anything },
         includes: 'bundleId,devices,certificates'
       }
-    }
+    end
 
-    let(:default_bundle_id_all_params) {
+    let(:default_bundle_id_all_params) do
       {
         filter: { identifier: anything }
       }
-    }
+    end
 
     before do
       allow(portal_device).to receive(:device_class).and_return(deviceClass::IPHONE)
