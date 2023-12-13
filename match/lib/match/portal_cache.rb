@@ -66,9 +66,7 @@ module Match
       end
 
       def bundle_ids
-        return @bundle_ids.dup if @bundle_ids
-
-        @bundle_ids = Match::Portal::Fetcher.bundle_ids(
+        @bundle_ids ||= Match::Portal::Fetcher.bundle_ids(
           bundle_id_identifiers: @bundle_id_identifiers
         )
 
@@ -76,9 +74,7 @@ module Match
       end
 
       def certificates
-        return @certificates.dup if @certificates
-
-        @certificates = Match::Portal::Fetcher.certificates(
+        @certificates ||= Match::Portal::Fetcher.certificates(
           platform: @platform,
           profile_type: @profile_type,
           additional_cert_types: @additional_cert_types
@@ -88,9 +84,7 @@ module Match
       end
 
       def profiles
-        return @profiles.dup if @profiles
-
-        @profiles = Match::Portal::Fetcher.profiles(
+        @profiles ||= Match::Portal::Fetcher.profiles(
           profile_type: @profile_type,
           needs_profiles_devices: @needs_profiles_devices,
           needs_profiles_certificate_content: @needs_profiles_certificate_content
@@ -100,9 +94,7 @@ module Match
       end
 
       def devices
-        return @devices.dup if @devices
-
-        @devices = Match::Portal::Fetcher.devices(
+        @devices ||= Match::Portal::Fetcher.devices(
           platform: @platform,
           include_mac_in_profiles: @include_mac_in_profiles
         )
