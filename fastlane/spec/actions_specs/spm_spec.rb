@@ -339,6 +339,43 @@ describe Fastlane do
           expect(result).to eq("set -o pipefail && swift package --verbose generate-xcodeproj --xcconfig-overrides Package.xcconfig 2>&1 | xcpretty --simple")
         end
       end
+
+      context "when simulator is specified" do
+        it "adds simulator flags to the build command" do
+          result = Fastlane::FastFile.new.parse("lane :test do
+              spm(
+                command: 'build',
+                simulator: 'iphonesimulator'
+              )
+            end").runner.execute(:test)
+
+          expect(result).to eq("swift build -Xswiftc -sdk -Xswiftc $(xcrun --sdk iphonesimulator --show-sdk-path) -Xswiftc -target -Xswiftc x86_64-apple-ios$(xcrun --sdk iphonesimulator --show-sdk-version | cut -d '.' -f 1)-simulator")
+        end
+
+        it "raises an error if simulator syntax is invalid" do
+          expect do
+            Fastlane::FastFile.new.parse("lane :test do
+              spm(
+                command: 'build',
+                simulator: 'invalid_simulator'
+              )
+            end").runner.execute(:test)
+          end.to raise_error("Invalid simulator syntax. Please use 'iphonesimulator', 'ipadsimulator', or 'macossimulator'.")
+        end
+      end
+
+      context "when simulator is specified for non-package commands" do
+        it "raises an error" do
+          expect do
+            Fastlane::FastFile.new.parse("lane :test do
+              spm(
+                command: 'clean',
+                simulator: 'iphonesimulator'
+              )
+            end").runner.execute(:test)
+          end.to raise_error("Simulator is only applicable to package-related commands.")
+        end
+      end
     end
   end
 end
