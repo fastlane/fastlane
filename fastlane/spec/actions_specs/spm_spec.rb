@@ -186,6 +186,48 @@ describe Fastlane do
 
           expect(result).to eq("swift test")
         end
+
+        it "sets --parallel to true for test" do
+          result = Fastlane::FastFile.new.parse("lane :test do
+            spm(
+              command: 'test',
+              parallel: true
+            )
+          end").runner.execute(:test)
+
+          expect(result).to eq("swift test --parallel")
+        end
+
+        it "sets --parellel to false for test" do
+          result = Fastlane::FastFile.new.parse("lane :test do
+            spm(
+              command: 'test',
+              parallel: false
+            )
+          end").runner.execute(:test)
+
+          expect(result).to eq("swift test")
+        end
+
+        it "does not add --parellel by default" do
+          result = Fastlane::FastFile.new.parse("lane :test do
+            spm(
+              command: 'test'
+            )
+          end").runner.execute(:test)
+
+          expect(result).to eq("swift test")
+        end
+
+        it "does not add --parellel for irrelevant commands" do
+          result = Fastlane::FastFile.new.parse("lane :test do
+            spm(
+              parallel: true
+            )
+          end").runner.execute(:test)
+
+          expect(result).to eq("swift build")
+        end
       end
 
       context "when command is package related" do

@@ -157,7 +157,7 @@ describe Match do
       it "wraps the git command in ssh-agent shell when using a private key file" do
         path = Dir.mktmpdir # to have access to the actual path
         expect(Dir).to receive(:mktmpdir).and_return(path)
-        expect(File).to receive(:file?).and_return(true)
+        expect(File).to receive(:file?).twice.and_return(true)
         git_url = "https://github.com/fastlane/fastlane/tree/master/certificates"
         shallow_clone = false
         private_key = "#{path}/fastlane.match.id_dsa"
@@ -194,7 +194,7 @@ describe Match do
       it "wraps the git command in ssh-agent shell when using a raw private key" do
         path = Dir.mktmpdir # to have access to the actual path
         expect(Dir).to receive(:mktmpdir).and_return(path)
-        expect(File).to receive(:file?).and_return(false)
+        expect(File).to receive(:file?).twice.and_return(false)
         git_url = "https://github.com/fastlane/fastlane/tree/master/certificates"
         shallow_clone = false
         private_key = "-----BEGIN PRIVATE KEY-----\n-----END PRIVATE KEY-----\n"

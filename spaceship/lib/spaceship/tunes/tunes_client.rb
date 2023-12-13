@@ -272,7 +272,7 @@ module Spaceship
       # if it needs to
       #
       # https://github.com/fastlane/fastlane/pull/20480
-      r = request(:get, "https://appstoreconnect.apple.com/iris/v1/apps?include=appStoreVersions,prices")
+      r = request(:get, "https://appstoreconnect.apple.com/iris/v1/apps?include=appStoreVersions")
       response = Spaceship::ConnectAPI::Response.new(
         body: r.body,
         status: r.status,

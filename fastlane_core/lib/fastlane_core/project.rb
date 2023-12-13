@@ -307,6 +307,10 @@ module FastlaneCore
       supported_platforms.include?(:watchOS)
     end
 
+    def multiplatform?
+      supported_platforms.count > 1
+    end
+
     def supported_platforms
       supported_platforms = build_settings(key: "SUPPORTED_PLATFORMS")
       if supported_platforms.nil?
@@ -360,6 +364,7 @@ module FastlaneCore
       else
         command = "xcodebuild clean -showBuildSettings #{xcodebuild_parameters.join(' ')}"
       end
+      command = "#{command} 2>&1" # xcodebuild produces errors on stderr #21672
       command
     end
 

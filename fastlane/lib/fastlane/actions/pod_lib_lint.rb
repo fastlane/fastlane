@@ -29,7 +29,7 @@ module Fastlane
         command << "--analyze" if params[:analyze]
 
         result = Actions.sh(command.join(' '))
-        UI.success("Pod lib lint Successfully ⬆️ ")
+        UI.success("Pod lib lint successful ⬆️ ")
         return result
       end
 

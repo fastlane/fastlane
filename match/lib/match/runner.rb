@@ -31,42 +31,16 @@ module Match
       update_optional_values_depending_on_storage_type(params)
 
       # Choose the right storage and encryption implementations
-      self.storage = Storage.for_mode(params[:storage_mode], {
-        git_url: params[:git_url],
-        shallow_clone: params[:shallow_clone],
-        skip_docs: params[:skip_docs],
-        git_branch: params[:git_branch],
-        git_full_name: params[:git_full_name],
-        git_user_email: params[:git_user_email],
-        clone_branch_directly: params[:clone_branch_directly],
-        git_basic_authorization: params[:git_basic_authorization],
-        git_bearer_authorization: params[:git_bearer_authorization],
-        git_private_key: params[:git_private_key],
-        type: params[:type].to_s,
-        generate_apple_certs: params[:generate_apple_certs],
-        platform: params[:platform].to_s,
-        google_cloud_bucket_name: params[:google_cloud_bucket_name].to_s,
-        google_cloud_keys_file: params[:google_cloud_keys_file].to_s,
-        google_cloud_project_id: params[:google_cloud_project_id].to_s,
-        skip_google_cloud_account_confirmation: params[:skip_google_cloud_account_confirmation],
-        s3_region: params[:s3_region],
-        s3_access_key: params[:s3_access_key],
-        s3_secret_access_key: params[:s3_secret_access_key],
-        s3_bucket: params[:s3_bucket],
-        s3_object_prefix: params[:s3_object_prefix],
-        gitlab_project: params[:gitlab_project],
-        readonly: params[:readonly],
-        username: params[:readonly] ? nil : params[:username], # only pass username if not readonly
-        team_id: params[:team_id],
-        team_name: params[:team_name],
-        api_key_path: params[:api_key_path],
-        api_key: params[:api_key]
-      })
+      storage_params = params
+      storage_params[:username] = params[:readonly] ? nil : params[:username] # only pass username if not readonly
+      self.storage = Storage.from_params(storage_params)
       storage.download
 
       # Init the encryption only after the `storage.download` was called to have the right working directory
       encryption = Encryption.for_storage_mode(params[:storage_mode], {
         git_url: params[:git_url],
+        s3_bucket: params[:s3_bucket],
+        s3_skip_encryption: params[:s3_skip_encryption],
         working_directory: storage.working_directory
       })
       encryption.decrypt_files if encryption
@@ -174,7 +148,7 @@ module Match
         self.files_to_commit << cert_path
         self.files_to_commit << private_key_path
       else
-        cert_path = certs.last
+        cert_path = select_cert_or_key(paths: certs)
 
         # Check validity of certificate
         if Utils.is_cert_valid?(cert_path)
@@ -198,7 +172,7 @@ module Match
             # Import the private key
             # there seems to be no good way to check if it's already installed - so just install it
             # Key will only be added to the partition list if it isn't already installed
-            Utils.import(keys.last, params[:keychain_name], password: params[:keychain_password])
+            Utils.import(select_cert_or_key(paths: keys), params[:keychain_name], password: params[:keychain_password])
           end
         else
           UI.message("Skipping installation of certificate as it would not work on this operating system.")
@@ -206,7 +180,7 @@ module Match
 
         if params[:output_path]
           FileUtils.cp(cert_path, params[:output_path])
-          FileUtils.cp(keys.last, params[:output_path])
+          FileUtils.cp(select_cert_or_key(paths: keys), params[:output_path])
         end
 
         # Get and print info of certificate
@@ -215,6 +189,12 @@ module Match
       end
 
       return File.basename(cert_path).gsub(".cer", "") # Certificate ID
+    end
+
+    # @return [String] Path to certificate or P12 key
+    def select_cert_or_key(paths:)
+      cert_id_path = ENV['MATCH_CERTIFICATE_ID'] ? paths.find { |path| path.include?(ENV['MATCH_CERTIFICATE_ID']) } : nil
+      cert_id_path || paths.last
     end
 
     # rubocop:disable Metrics/PerceivedComplexity
@@ -336,7 +316,7 @@ module Match
 
       prov_types_without_devices = [:appstore, :developer_id]
       if !prov_types_without_devices.include?(prov_type) && !params[:force]
-        force = device_count_different?(profile: profile, keychain_path: keychain_path, platform: params[:platform].to_sym)
+        force = device_count_different?(profile: profile, keychain_path: keychain_path, platform: params[:platform].to_sym, include_mac_in_profiles: params[:include_mac_in_profiles])
       else
         # App Store provisioning profiles don't contain device identifiers and
         # thus shouldn't be renewed if the device count has changed.
@@ -347,7 +327,7 @@ module Match
       return force
     end
 
-    def device_count_different?(profile: nil, keychain_path: nil, platform: nil)
+    def device_count_different?(profile: nil, keychain_path: nil, platform: nil, include_mac_in_profiles: false)
       return false unless profile
 
       parsed = FastlaneCore::ProvisioningProfile.parse(profile, keychain_path)
@@ -357,7 +337,7 @@ module Match
       portal_profile = all_profiles.detect { |i| i.uuid == uuid }
 
       if portal_profile
-        profile_device_count = portal_profile.fetch_all_devices.count
+        profile_device_count = portal_profile.devices.count
 
         device_classes =
           case platform
@@ -379,6 +359,9 @@ module Match
           else
             []
           end
+        if platform == :ios && include_mac_in_profiles
+          device_classes += [Spaceship::ConnectAPI::Device::DeviceClass::APPLE_SILICON_MAC]
+        end
 
         devices = Spaceship::ConnectAPI::Device.all
         unless device_classes.empty?
@@ -435,7 +418,7 @@ module Match
       #   * For portal certificates, we filter out the expired one but includes a new certificate;
       #   * Profile still contains an expired certificate and is valid.
       # Thus, we need to check the validity of profile certificates too.
-      profile_certs_count = portal_profile.fetch_all_certificates.select(&:valid?).count
+      profile_certs_count = portal_profile.certificates.select(&:valid?).count
 
       certificate_types =
         case platform

@@ -39,6 +39,7 @@ module Gym
         options << "-destination '#{config[:destination]}'" if config[:destination]
         options << "-archivePath #{archive_path.shellescape}" unless config[:skip_archive]
         options << "-resultBundlePath '#{result_bundle_path}'" if config[:result_bundle]
+        options << "-showBuildTimingSummary" if config[:build_timing_summary]
         if config[:use_system_scm] && !options.include?("-scmProvider system")
           options << "-scmProvider system"
         end
@@ -79,7 +80,7 @@ module Gym
         if Gym.config[:disable_xcpretty] || formatter == ''
           UI.verbose("Not using an xcodebuild formatter")
         elsif !options.empty?
-          UI.important("Detected legacy xcpretty being used so formatting wth xcpretty")
+          UI.important("Detected legacy xcpretty being used, so formatting with xcpretty")
           UI.important("Option(s) used: #{options.join(', ')}")
           pipe += pipe_xcpretty
         elsif formatter == 'xcpretty'

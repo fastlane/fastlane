@@ -73,6 +73,29 @@ describe Scan do
           expect(Scan.config[:destination].first).to match(/platform=macOS,variant=Mac Catalyst/)
         end
       end
+
+      context ":run_rosetta_simulator" do
+        it "adds arch=x86_64 if true", requires_xcodebuild: true do
+          options = { project: "./scan/examples/standard/app.xcodeproj", run_rosetta_simulator: true }
+          Scan.config = FastlaneCore::Configuration.create(Scan::Options.available_options, options)
+          expect(Scan.config[:destination].first).to match(/platform=iOS/)
+          expect(Scan.config[:destination].first).to match(/,arch=x86_64/)
+        end
+
+        it "does not add arch=x86_64 if false", requires_xcodebuild: true do
+          options = { project: "./scan/examples/standard/app.xcodeproj", run_rosetta_simulator: false }
+          Scan.config = FastlaneCore::Configuration.create(Scan::Options.available_options, options)
+          expect(Scan.config[:destination].first).to match(/platform=iOS/)
+          expect(Scan.config[:destination].first).to_not(match(/,arch=x86_64/))
+        end
+
+        it "does not add arch=x86_64 by default", requires_xcodebuild: true do
+          options = { project: "./scan/examples/standard/app.xcodeproj" }
+          Scan.config = FastlaneCore::Configuration.create(Scan::Options.available_options, options)
+          expect(Scan.config[:destination].first).to match(/platform=iOS/)
+          expect(Scan.config[:destination].first).to_not(match(/,arch=x86_64/))
+        end
+      end
     end
 
     describe "validation" do

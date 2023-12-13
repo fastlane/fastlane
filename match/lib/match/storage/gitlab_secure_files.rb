@@ -22,9 +22,10 @@ module Match
       attr_reader :team_name
       attr_reader :api_key_path
       attr_reader :api_key
+      attr_reader :api_v4_url
 
       def self.configure(params)
-        api_v4_url     = params[:api_v4_url] || ENV['CI_API_V4_URL'] || 'https://gitlab.com/api/v4'
+        api_v4_url     = ENV['CI_API_V4_URL'] || "#{params[:gitlab_host]}/api/v4"
         project_id     = params[:gitlab_project] || ENV['GITLAB_PROJECT'] || ENV['CI_PROJECT_ID']
         job_token      = params[:job_token] || ENV['CI_JOB_TOKEN']
         private_token  = params[:private_token] || ENV['PRIVATE_TOKEN']
@@ -46,7 +47,8 @@ module Match
           team_id: params[:team_id],
           team_name: params[:team_name],
           api_key_path: params[:api_key_path],
-          api_key: params[:api_key]
+          api_key: params[:api_key],
+          gitlab_host: params[:gitlab_host]
         )
       end
 
@@ -59,7 +61,8 @@ module Match
                      team_id: nil,
                      team_name: nil,
                      api_key_path: nil,
-                     api_key: nil)
+                     api_key: nil,
+                     gitlab_host: nil)
 
         @readonly = readonly
         @username = username
@@ -67,14 +70,15 @@ module Match
         @team_name = team_name
         @api_key_path = api_key_path
         @api_key = api_key
+        @gitlab_host = gitlab_host
 
         @job_token = job_token
         @private_token = private_token
         @api_v4_url = api_v4_url
         @project_id = project_id
-        @gitlab_client = GitLab::Client.new(job_token: job_token, private_token: private_token, project_id: project_id, api_v4_url: api_v4_url)
+        @gitlab_client = GitLab::Client.new(job_token: @job_token, private_token: @private_token, project_id: @project_id, api_v4_url: @api_v4_url)
 
-        UI.message("Initializing match for GitLab project #{@project_id}")
+        UI.message("Initializing match for GitLab project #{@project_id} on #{@gitlab_host}")
       end
 
       # To make debugging easier, we have a custom exception here
@@ -94,6 +98,8 @@ module Match
       end
 
       def download
+        gitlab_client.prompt_for_access_token
+
         # Check if we already have a functional working_directory
         return if @working_directory
 
@@ -174,8 +180,13 @@ module Match
       # that should be generated
       def generate_matchfile_content(template: nil)
         project = UI.input("What is your GitLab Project (i.e. gitlab-org/gitlab): ")
+        host = UI.input("What is your GitLab Host (i.e. https://gitlab.example.com, skip to default to https://gitlab.com): ")
 
-        return "gitlab_project(\"#{project}\")"
+        content = "gitlab_project(\"#{project}\")"
+
+        content += "\ngitlab_host(\"#{host}\")" if host
+
+        return content
       end
     end
   end

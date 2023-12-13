@@ -160,9 +160,6 @@ module Spaceship
             included << {
               type: "appPrices",
               id: "${price1}",
-              attributes: {
-                startDate: nil
-              },
               relationships: {
                 app: {
                   data: {
@@ -1251,6 +1248,29 @@ module Spaceship
         def get_territories(filter: {}, includes: nil, limit: nil, sort: nil)
           params = tunes_request_client.build_params(filter: nil, includes: nil, limit: nil, sort: nil)
           tunes_request_client.get("territories", params)
+        end
+
+        #
+        # resolutionCenter
+        #
+        # As of 2022-11-11:
+        # This is not official available throught the App Store Connect API using an API Key.
+        # This is only works with Apple ID auth.
+        #
+
+        def get_resolution_center_threads(filter: {}, includes: nil)
+          params = tunes_request_client.build_params(filter: filter, includes: includes)
+          tunes_request_client.get('resolutionCenterThreads', params)
+        end
+
+        def get_resolution_center_messages(thread_id:, filter: {}, includes: nil)
+          params = tunes_request_client.build_params(filter: filter, includes: includes)
+          tunes_request_client.get("resolutionCenterThreads/#{thread_id}/resolutionCenterMessages", params)
+        end
+
+        def get_review_rejection(filter: {}, includes: nil)
+          params = tunes_request_client.build_params(filter: filter, includes: includes)
+          tunes_request_client.get("reviewRejections", params)
         end
       end
     end

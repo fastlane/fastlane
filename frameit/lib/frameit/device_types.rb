@@ -120,7 +120,7 @@ module Frameit
     IPHONE_8_PLUS ||= Frameit::Device.new("iphone-8-plus", "Apple iPhone 8 Plus", 6, [[1242, 2208], [2208, 1242]], 401, Color::SPACE_GRAY)
     IPHONE_X ||= Frameit::Device.new("iphone-X", "Apple iPhone X", 7, [[1125, 2436], [2436, 1125]], 458, Color::SPACE_GRAY, Platform::IOS, Deliver::AppScreenshot::ScreenSize::IOS_58, :use_legacy_iphonex)
     IPHONE_XS ||= Frameit::Device.new("iphone-XS", "Apple iPhone XS", 8, [[1125, 2436], [2436, 1125]], 458, Color::SPACE_GRAY, Platform::IOS, Deliver::AppScreenshot::ScreenSize::IOS_58, :use_legacy_iphonexs)
-    IPHONE_XR ||= Frameit::Device.new("iphone-XR", "Apple iPhone XR", 8, [[828, 1792], [1792, 828]], 326, Color::SPACE_GRAY, Platform::IOS, Deliver::AppScreenshot::ScreenSize::IOS_61, :use_legacy_iphonexr)
+    IPHONE_XR ||= Frameit::Device.new("iphone-XR", "Apple iPhone XR", 8, [[828, 1792], [1792, 828]], 326, Color::SPACE_GRAY, Platform::IOS, Deliver::AppScreenshot::ScreenSize::IOS_65, :use_legacy_iphonexsmax)
     IPHONE_XS_MAX ||= Frameit::Device.new("iphone-XS-Max", "Apple iPhone XS Max", 8, [[1242, 2688], [2688, 1242]], 458, Color::SPACE_GRAY, Platform::IOS, Deliver::AppScreenshot::ScreenSize::IOS_65, :use_legacy_iphonexsmax)
     IPHONE_11 ||= Frameit::Device.new("iphone-11", "Apple iPhone 11", 9, [[828, 1792], [1792, 828]], 326, Color::BLACK, Platform::IOS)
     IPHONE_11_PRO ||= Frameit::Device.new("iphone-11-pro", "Apple iPhone 11 Pro", 9, [[1125, 2436], [2436, 1125]], 458, Color::SPACE_GRAY, Platform::IOS)

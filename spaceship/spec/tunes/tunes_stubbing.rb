@@ -31,6 +31,8 @@ class TunesStubbing
         to_return(status: 200, body: "", headers: {})
 
       # Actual login
+      stub_request(:get, "https://idmsa.apple.com/appleauth/auth/signin?widgetKey=e0abc").
+        to_return(status: 200, body: '', headers: { 'x-apple-hc-bits' => "12", 'x-apple-hc-challenge' => "f8b58554b2f22960fc0dc99aea342276" })
       stub_request(:post, "https://idmsa.apple.com/appleauth/auth/signin").
         with(body: { "accountName" => "spaceship@krausefx.com", "password" => "so_secret", "rememberMe" => true }.to_json).
         to_return(status: 200, body: '{}', headers: { 'Set-Cookie' => "myacinfo=abcdef;" })

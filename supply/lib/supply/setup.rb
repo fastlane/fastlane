@@ -66,7 +66,7 @@ module Supply
 
           UI.message("Downloading `#{image_type}` for #{listing.language}...")
 
-          urls = client.fetch_images(image_type: image_type, language: listing.language)
+          urls = client.fetch_images(image_type: image_type, language: listing.language).map(&:url)
           next if urls.nil? || urls.empty?
 
           image_counter = 1 # Used to prefix the downloaded files, so order is preserved.

@@ -108,7 +108,7 @@ describe Fastlane do
                   asc_provider: '#{asc_provider}',
                 )
               end").runner.execute(:test)
-            end.to raise_error(FastlaneCore::Interface::FastlaneError, "Could not notarize package with message 'Archive contains critical validation errors'")
+            end.to raise_error(FastlaneCore::Interface::FastlaneError, "Could not notarize package. To see the error, please set 'print_log' to true.")
           end
         end
       end

@@ -1,4 +1,5 @@
 require_relative '../model'
+require_relative './build_bundle_file_sizes'
 module Spaceship
   class ConnectAPI
     class BuildBundle
@@ -53,6 +54,14 @@ module Spaceship
 
       def self.type
         return "buildBundles"
+      end
+
+      #
+      # API
+      #
+
+      def build_bundle_file_sizes(client: nil)
+        @build_bundle_file_sizes ||= BuildBundleFileSizes.all(client: client, build_bundle_id: id)
       end
     end
   end

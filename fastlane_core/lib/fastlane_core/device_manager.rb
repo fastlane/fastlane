@@ -204,9 +204,9 @@ module FastlaneCore
         return unless os_type == "iOS"
         return if self.state == 'Booted'
 
+        # Boot the simulator and wait for it to finish booting
         UI.message("Booting #{self}")
-
-        `xcrun simctl boot #{self.udid} 2>/dev/null`
+        `xcrun simctl bootstatus #{self.udid} -b &> /dev/null`
         self.state = 'Booted'
       end
 

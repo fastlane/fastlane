@@ -1,10 +1,28 @@
 describe Match do
   describe Match::Storage::GitLabSecureFiles do
-    subject { described_class.new(api_v4_url: 'https://example.com/api', private_token: 'abc123', project_id: 'fake-project') }
+    subject { described_class.new(private_token: 'abc123', project_id: 'fake-project') }
     let(:working_directory) { '/fake/path/to/files' }
 
     before do
       allow(subject).to receive(:working_directory).and_return(working_directory)
+    end
+
+    describe '.configure' do
+      describe 'api_v4_url' do
+        it 'sets the value to CI_API_V4_URL when supplied' do
+          stub_const('ENV', ENV.to_hash.merge('CI_API_V4_URL' => 'https://gitlab.com/api/v4'))
+
+          storage = described_class.configure({})
+
+          expect(storage.api_v4_url).to eq('https://gitlab.com/api/v4')
+        end
+
+        it 'sets the value based on the gitlab_host param' do
+          storage = described_class.configure(gitlab_host: 'http://gitlab.foo.com')
+
+          expect(storage.api_v4_url).to eq('http://gitlab.foo.com/api/v4')
+        end
+      end
     end
 
     describe '#upload_files' do
@@ -96,11 +114,80 @@ describe Match do
     end
 
     describe '#generate_matchfile_content' do
-      it 'returns the correct match file contents for the configured storage mode' do
+      it 'returns the correct match file contents for the configured storage mode and project path' do
         expect(FastlaneCore::UI).to receive(:input).once.and_return("fake-project")
+        expect(FastlaneCore::UI).to receive(:input).once.and_return(nil)
 
         expect(subject.generate_matchfile_content).to eq('gitlab_project("fake-project")')
       end
+
+      it 'returns the correct match file contents for the configured storage mode and project path and gitlab host' do
+        expect(FastlaneCore::UI).to receive(:input).once.and_return("fake-project")
+        expect(FastlaneCore::UI).to receive(:input).once.and_return("https://gitlab.example.com")
+
+        expect(subject.generate_matchfile_content).to eq("gitlab_project(\"fake-project\")\ngitlab_host(\"https://gitlab.example.com\")")
+      end
+    end
+  end
+
+  describe 'Runner Configuration' do
+    let(:available_options) { Match::Options.available_options }
+    let(:base_options) {
+      {
+        storage_mode: 'gitlab_secure_files',
+        gitlab_project: 'test/project',
+        readonly: true,
+        skip_provisioning_profiles: true,
+        app_identifier: 'fake-app-identifier'
+      }
+    }
+    let(:configuration) {
+      FastlaneCore::Configuration.create(available_options, base_options)
+    }
+    let(:runner) {
+      Match::Runner.new.run(configuration)
+    }
+
+    before do
+      allow_any_instance_of(Match::Runner).to receive(:fetch_certificate)
+      expect(Match::Storage::GitLab::Client).to receive_message_chain(:new, :prompt_for_access_token)
+      expect(Match::Storage::GitLab::Client).to receive_message_chain(:new, :files).and_return([])
+    end
+
+    it 'allows the optional job_token param' do
+      base_options[:job_token] = 'foo'
+
+      expect(runner).to be true
+      expect(configuration.fetch(:storage_mode)).to eq('gitlab_secure_files')
+      expect(configuration.fetch(:job_token)).to eq('foo')
+      expect(configuration.fetch(:private_token)).to be nil
+    end
+
+    it 'allows the optional private_token param' do
+      base_options[:private_token] = 'bar'
+
+      expect(runner).to be true
+      expect(configuration.fetch(:storage_mode)).to eq('gitlab_secure_files')
+      expect(configuration.fetch(:job_token)).to be nil
+      expect(configuration.fetch(:private_token)).to eq('bar')
+    end
+
+    it 'uses the PRIVATE_TOKEN ENV variable when supplied' do
+      stub_const('ENV', ENV.to_hash.merge('PRIVATE_TOKEN' => 'env-private'))
+
+      expect(runner).to be true
+      expect(configuration.fetch(:storage_mode)).to eq('gitlab_secure_files')
+      expect(configuration.fetch(:job_token)).to be nil
+      expect(configuration.fetch(:private_token)).to eq('env-private')
+    end
+
+    it 'uses the CI_JOB_TOKEN ENV variable when supplied' do
+      stub_const('ENV', ENV.to_hash.merge('CI_JOB_TOKEN' => 'env-job'))
+
+      expect(runner).to be true
+      expect(configuration.fetch(:storage_mode)).to eq('gitlab_secure_files')
+      expect(configuration.fetch(:job_token)).to eq('env-job')
+      expect(configuration.fetch(:private_token)).to be nil
     end
   end
 end
