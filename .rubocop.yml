@@ -341,3 +341,8 @@ Style/MethodCallWithArgsParentheses:
     - 'context'
     - 'before'
     - 'after'
+
+# Sorts the gems in the Gemfile alphabetically.
+Bundler/OrderedGems:
+  Enabled: true
+  TreatCommentsAsGroupSeparators: false
