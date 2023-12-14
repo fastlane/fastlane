@@ -1,0 +1,27 @@
+source('https://rubygems.org')
+
+# Bundler provides a consistent environment for Ruby projects by tracking and installing exact gem versions
+gem 'bundler'
+# Fastlane is an automation tool for mobile developers to automate tedious tasks
+gem 'fastlane', '>= <%= Fastlane::VERSION %>'
+# Pry is an interactive shell for debugging and exploring Ruby code
+gem 'pry'
+# Rake is a simple task automation tool in Ruby
+gem 'rake'
+# RSpec is a behavior-driven development (BDD) framework for Ruby
+gem 'rspec'
+# Formatter for RSpec to generate JUnit compatible reports
+gem 'rspec_junit_formatter'
+# A Ruby static code analyzer and formatter
+gem 'rubocop', '<%= Fastlane::RUBOCOP_REQUIREMENT %>'
+# A collection of RuboCop cops for performance optimizations
+gem 'rubocop-performance'
+# A RuboCop extension focused on enforcing tools
+gem 'rubocop-require_tools'
+# SimpleCov is a code coverage analysis tool for Ruby
+gem 'simplecov'
+
+gemspec
+
+plugins_path = File.join(File.dirname(__FILE__), 'fastlane', 'Pluginfile')
+eval_gemfile(plugins_path) if File.exist?(plugins_path)
