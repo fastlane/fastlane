@@ -124,9 +124,9 @@ describe Fastlane::PluginGenerator do
         $LOAD_PATH.unshift(lib) unless $LOAD_PATH.include?(lib)
 
         # rubocop:disable Security/Eval
-        # starting with ruby 3.3 we must pass the __FILE__ of the actual file location for the all_class method implementation to work
-        # also we expand the relative_path within the chdir, as Dir.chdir on Mac will make it so tmp paths will always be under /private,
-        # while expand_path called from outside of the chdir will not prefix by /private
+        # Starting with Ruby 3.3, we must pass the __FILE__ of the actual file location for the all_class method implementation to work.
+        # Also, we expand the relative_path within Dir.chdir, as Dir.chdir on macOS will make it so tmp paths will always be under /private,
+        # while expand_path called from outside of Dir.chdir will not be prefixed by /private
         eval(plugin_rb_contents, binding, File.expand_path(relative_path), __LINE__)
         # rubocop:enable Security/Eval
 
