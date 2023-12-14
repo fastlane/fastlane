@@ -1,4 +1,4 @@
-require_relative '../model'
+require_relative '../../connect_api'
 
 require 'openssl'
 
@@ -79,7 +79,7 @@ module Spaceship
       # API
       #
 
-      def self.all(client: nil, filter: {}, includes: nil, fields: nil, limit: nil, sort: nil)
+      def self.all(client: nil, filter: {}, includes: nil, fields: nil, limit: Spaceship::ConnectAPI::MAX_OBJECTS_PER_PAGE_LIMIT, sort: nil)
         client ||= Spaceship::ConnectAPI
         resps = client.get_certificates(filter: filter, includes: includes, fields: fields, limit: limit, sort: sort).all_pages
         return resps.flat_map(&:to_models)
