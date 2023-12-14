@@ -111,7 +111,9 @@ describe Fastlane::PluginGenerator do
     end
 
     it "creates a plugin.rb file for the plugin" do
-      plugin_rb_file = File.join(tmp_dir, gem_name, 'lib', 'fastlane', 'plugin', "#{plugin_name}.rb")
+      relative_path = File.join('lib', 'fastlane', 'plugin', "#{plugin_name}.rb")
+      plugin_rb_file = File.join(tmp_dir, gem_name, relative_path)
+
       expect(File.exist?(plugin_rb_file)).to be(true)
 
       plugin_rb_contents = File.read(plugin_rb_file)
@@ -122,7 +124,10 @@ describe Fastlane::PluginGenerator do
         $LOAD_PATH.unshift(lib) unless $LOAD_PATH.include?(lib)
 
         # rubocop:disable Security/Eval
-        eval(plugin_rb_contents)
+        # Starting with Ruby 3.3, we must pass the __FILE__ of the actual file location for the all_class method implementation to work.
+        # Also, we expand the relative_path within Dir.chdir, as Dir.chdir on macOS will make it so tmp paths will always be under /private,
+        # while expand_path called from outside of Dir.chdir will not be prefixed by /private
+        eval(plugin_rb_contents, binding, File.expand_path(relative_path), __LINE__)
         # rubocop:enable Security/Eval
 
         # If we evaluate the contents of the generated plugin.rb file,
