@@ -51,6 +51,157 @@ describe Scan do
       end
     end
 
+    describe "#default_os_version" do
+      before do
+        Scan::DetectValues.clear_cache
+      end
+
+      it 'informs users of unknown platform name' do
+        expect do
+          Scan::DetectValues.default_os_version('test')
+        end.to raise_error(FastlaneCore::Interface::FastlaneCrash, "Unknown platform: test")
+      end
+
+      it 'returns an error if `xcrun simctl runtime -h` is broken' do
+        help_output = 'garbage'
+        allow(Open3).to receive(:capture3).with('xcrun simctl runtime -h').and_return([nil, help_output, nil])
+
+        expect do
+          Scan::DetectValues.default_os_version('iOS')
+        end.to raise_error(FastlaneCore::Interface::FastlaneError)
+      end
+
+      it 'returns an error if `xcodebuild -showsdks -json` is broken' do
+        help_output = 'Usage: simctl runtime <operation> <arguments> match list'
+        allow(Open3).to receive(:capture3).with('xcrun simctl runtime -h').and_return([nil, help_output, nil])
+
+        sdks_output = 'unexpected output'
+        status = double('status', "success?": true)
+        allow(Open3).to receive(:capture2).with('xcodebuild -showsdks -json').and_return([sdks_output, status])
+
+        expect do
+          Scan::DetectValues.default_os_version('iOS')
+        end.to raise_error(FastlaneCore::Interface::FastlaneError)
+      end
+
+      it 'returns an error if `xcodebuild -showsdks -json` exits unsuccessfully' do
+        help_output = 'Usage: simctl runtime <operation> <arguments> match list'
+        allow(Open3).to receive(:capture3).with('xcrun simctl runtime -h').and_return([nil, help_output, nil])
+
+        sdks_output = File.read('./scan/spec/fixtures/XcodebuildSdksOutput15')
+        status = double('status', "success?": false)
+        allow(Open3).to receive(:capture2).with('xcodebuild -showsdks -json').and_return([sdks_output, status])
+
+        expect do
+          Scan::DetectValues.default_os_version('iOS')
+        end.to raise_error(FastlaneCore::Interface::FastlaneError)
+      end
+
+      it 'returns an error if `xcrun simctl runtime match list -j` is broken' do
+        help_output = 'Usage: simctl runtime <operation> <arguments> match list'
+        allow(Open3).to receive(:capture3).with('xcrun simctl runtime -h').and_return([nil, help_output, nil])
+
+        sdks_output = File.read('./scan/spec/fixtures/XcodebuildSdksOutput15')
+        status = double('status', "success?": true)
+        allow(Open3).to receive(:capture2).with('xcodebuild -showsdks -json').and_return([sdks_output, status])
+
+        runtime_output = 'unexpected output'
+        allow(Open3).to receive(:capture2).with('xcrun simctl runtime match list -j').and_return([runtime_output, status])
+
+        expect do
+          Scan::DetectValues.default_os_version('iOS')
+        end.to raise_error(FastlaneCore::Interface::FastlaneError)
+      end
+
+      it 'returns an error if `xcrun simctl runtime match list -j` exits unsuccessfully' do
+        help_output = 'Usage: simctl runtime <operation> <arguments> match list'
+        allow(Open3).to receive(:capture3).with('xcrun simctl runtime -h').and_return([nil, help_output, nil])
+
+        sdks_output = File.read('./scan/spec/fixtures/XcodebuildSdksOutput15')
+        success_status = double('status', "success?": true)
+        allow(Open3).to receive(:capture2).with('xcodebuild -showsdks -json').and_return([sdks_output, success_status])
+
+        fail_status = double('fail_status', "success?": false)
+        runtime_output = File.read('./scan/spec/fixtures/XcrunSimctlRuntimeMatchListOutput15')
+        allow(Open3).to receive(:capture2).with('xcrun simctl runtime match list -j').and_return([runtime_output, fail_status])
+
+        expect do
+          Scan::DetectValues.default_os_version('iOS')
+        end.to raise_error(FastlaneCore::Interface::FastlaneError)
+      end
+
+      build_os_versions = { "21J353" => "17.0", "21R355" => "10.0", "21A342" => "17.0.1" }
+      actual_os_versions = { "tvOS" => "17.0", "watchOS" => "10.0", "iOS" => "17.0.1" }
+      %w[iOS tvOS watchOS].each do |os_type|
+        it "retrieves the correct runtime build for #{os_type}" do
+          help_output = 'Usage: simctl runtime <operation> <arguments> match list'
+          allow(Open3).to receive(:capture3).with('xcrun simctl runtime -h').and_return([nil, help_output, nil])
+
+          sdks_output = File.read('./scan/spec/fixtures/XcodebuildSdksOutput15')
+          status = double('status', "success?": true)
+          allow(Open3).to receive(:capture2).with('xcodebuild -showsdks -json').and_return([sdks_output, status])
+
+          runtime_output = File.read('./scan/spec/fixtures/XcrunSimctlRuntimeMatchListOutput15')
+          allow(Open3).to receive(:capture2).with('xcrun simctl runtime match list -j').and_return([runtime_output, status])
+
+          allow(FastlaneCore::DeviceManager).to receive(:runtime_build_os_versions).and_return(build_os_versions)
+
+          expect(Scan::DetectValues.default_os_version(os_type)).to eq(Gem::Version.new(actual_os_versions[os_type]))
+        end
+      end
+    end
+
+    describe "#detect_simulator" do
+      it 'returns simulators for requested devices', requires_xcodebuild: true do
+        simctl_list_devices_output = double('xcrun simctl list devices', read: File.read("./scan/spec/fixtures/XcrunSimctlListDevicesOutput15"))
+        allow(Open3).to receive(:popen3).with("xcrun simctl list devices").and_yield(nil, simctl_list_devices_output, nil, nil)
+
+        allow(Scan::DetectValues).to receive(:default_os_version).with('iOS').and_return(Gem::Version.new('17.0'))
+        allow(Scan::DetectValues).to receive(:default_os_version).with('tvOS').and_return(Gem::Version.new('17.0'))
+        allow(Scan::DetectValues).to receive(:default_os_version).with('watchOS').and_return(Gem::Version.new('10.0'))
+
+        devices = ['iPhone 14 Pro Max', 'Apple TV 4K (3rd generation)', 'Apple Watch Ultra (49mm)']
+        simulators = Scan::DetectValues.detect_simulator(devices, '', '', '', nil)
+
+        expect(simulators.count).to eq(3)
+        expect(simulators[0]).to have_attributes(
+          name: "iPhone 14 Pro Max", os_type: "iOS", os_version: "17.0"
+        )
+        expect(simulators[1]).to have_attributes(
+          name: "Apple TV 4K (3rd generation)", os_type: "tvOS", os_version: "17.0"
+        )
+        expect(simulators[2]).to have_attributes(
+          name: "Apple Watch Ultra (49mm)", os_type: "watchOS", os_version: "10.0"
+        )
+      end
+
+      it 'filters out simulators newer than what the current Xcode SDK supports', requires_xcodebuild: true do
+        simctl_list_devices_output = double('xcrun simctl list devices', read: File.read("./scan/spec/fixtures/XcrunSimctlListDevicesOutput14"))
+        allow(Open3).to receive(:popen3).with("xcrun simctl list devices").and_yield(nil, simctl_list_devices_output, nil, nil)
+
+        allow(Scan::DetectValues).to receive(:default_os_version).with('iOS').and_return(Gem::Version.new('16.4'))
+        allow(Scan::DetectValues).to receive(:default_os_version).with('tvOS').and_return(Gem::Version.new('16.4'))
+        allow(Scan::DetectValues).to receive(:default_os_version).with('watchOS').and_return(Gem::Version.new('9.4'))
+
+        devices = ['iPhone 14 Pro Max', 'iPad Pro (12.9-inch) (6th generation) (16.1)', 'Apple TV 4K (3rd generation)', 'Apple Watch Ultra (49mm)']
+        simulators = Scan::DetectValues.detect_simulator(devices, '', '', '', nil)
+
+        expect(simulators.count).to eq(4)
+        expect(simulators[0]).to have_attributes(
+          name: "iPhone 14 Pro Max", os_type: "iOS", os_version: "16.4"
+        )
+        expect(simulators[1]).to have_attributes(
+          name: "iPad Pro (12.9-inch) (6th generation)", os_type: "iOS", os_version: "16.1"
+        )
+        expect(simulators[2]).to have_attributes(
+          name: "Apple TV 4K (3rd generation)", os_type: "tvOS", os_version: "16.4"
+        )
+        expect(simulators[3]).to have_attributes(
+          name: "Apple Watch Ultra (49mm)", os_type: "watchOS", os_version: "9.4"
+        )
+      end
+    end
+
     describe "#detect_destination" do
       it "ios", requires_xcodebuild: true do
         options = { project: "./scan/examples/standard/app.xcodeproj" }
