@@ -346,3 +346,7 @@ Style/MethodCallWithArgsParentheses:
 Bundler/OrderedGems:
   Enabled: true
   TreatCommentsAsGroupSeparators: false
+
+Gemspec/DevelopmentDependencies:
+   Enabled: true
+   EnforcedStyle: Gemfile
