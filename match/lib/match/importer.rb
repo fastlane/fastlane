@@ -11,7 +11,12 @@ module Match
     def import_cert(params, cert_path: nil, p12_path: nil, profile_path: nil)
       cert_path, p12_path, profile_path = resolve_inputs(params, cert_path, p12_path, profile_path)
 
-      if (cert_path.nil? && p12_path.nil? && profile_path.nil?) || (cert_path.nil? && !p12_path.nil?) || (!cert_path.nil? && p12_path.nil?)
+      all_files_are_nil = cert_path.nil? && p12_path.nil? && profile_path.nil?
+
+      # Cert and private key must be provided together or not provided at all.
+      both_cert_and_key_are_provided = cert_path.nil? == p12_path.nil?
+
+      if all_files_are_nil || !both_cert_and_key_are_provided
         UI.user_error!("When using 'import' you must specify either both a certificate/private key and/or a provisioning profile!")
       end
 
@@ -136,15 +141,9 @@ module Match
     end
 
     def resolve_inputs(params, cert_path, p12_path, profile_path)
-      if cert_path.nil?
-        cert_path = params[:import_certificate_file_path]
-      end
-      if p12_path.nil?
-        p12_path = params[:import_certificate_private_key_file_path]
-      end
-      if profile_path.nil?
-        profile_path = params[:import_provisioning_profile_file_path]
-      end
+      cert_path ||= params[:import_certificate_file_path]
+      p12_path ||= params[:import_certificate_private_key_file_path]
+      profile_path ||= params[:import_provisioning_profile_file_path]
 
       # Get and verify cert, p12 and profiles path
       if cert_path.nil?
@@ -170,10 +169,10 @@ module Match
 
     def ensure_valid_file_path(file_path, file_description, file_extension, optional: false, skip_prompt: false)
       optional_file_message = optional ? " or leave empty to skip this file" : ""
-      raw_file_path = file_path
-      unless skip_prompt
+      if file_path.nil? && !skip_prompt
         file_path ||= UI.input("#{file_description} (#{file_extension}) path#{optional_file_message}:")
       end
+      raw_file_path = file_path
 
       if file_path
         file_path = File.absolute_path(file_path) unless file_path == ""
