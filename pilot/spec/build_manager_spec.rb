@@ -305,6 +305,10 @@ describe "Build Manager" do
         expect(FastlaneCore::UI).to_not(receive(:message).with(/Distributing new build to testers/))
         expect(FastlaneCore::UI).to_not(receive(:success).with(/Successfully distributed build to/))
 
+        # Don't expect skip_waiting_for_build_processing messages if it is set
+        expect(FastlaneCore::UI).to_not(receive(:message).with("If you want to skip waiting for the processing to be finished, use the `skip_waiting_for_build_processing` option"))
+        expect(FastlaneCore::UI).to_not(receive(:message).with("Note that if `skip_waiting_for_build_processing` is used but a `changelog` is supplied, this process will wait for the build to appear on AppStoreConnect, update the changelog and then skip the remaining of the processing steps."))
+
         fake_build_manager.distribute(options, build: ready_to_submit_mock_build)
       end
 
