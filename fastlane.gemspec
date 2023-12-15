@@ -125,7 +125,7 @@ Gem::Specification.new do |spec|
   spec.add_development_dependency('rubocop-performance')
   spec.add_development_dependency('rubocop-require_tools')
   spec.add_development_dependency('rubocop', Fastlane::RUBOCOP_REQUIREMENT)
-  spec.add_development_dependency('sinatra', '~> 2.0.8') # Used for mock servers
+  spec.add_development_dependency('sinatra', ['>= 2.2.3', '< 3.0']) # Used for mock servers
   spec.add_development_dependency('webmock', '~> 3.18')
   spec.add_development_dependency('xcov', '~> 1.4.1') # Used for xcov's parameters generation: https://github.com/fastlane/fastlane/pull/12416
   spec.add_development_dependency('yard', '~> 0.9.11')
