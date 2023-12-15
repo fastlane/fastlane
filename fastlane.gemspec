@@ -15,10 +15,6 @@ config['require'] = [
 config.delete('inherit_from')
 config.delete('CrossPlatform/ForkUsage')
 config.delete('Lint/IsStringUsage')
-# We declare development dependencies in the Gemspec file because we use dynamic values in its template
-config['Gemspec/DevelopmentDependencies'] = {
-  'Enabled' => false
-}
 
 File.write("#{lib}/fastlane/plugins/template/.rubocop.yml", YAML.dump(config))
 

@@ -103,10 +103,21 @@ describe Fastlane::PluginGenerator do
       gemfile_lines = File.read(gemfile).lines
 
       [
-        "source('https://rubygems.org')\n",
-        "gemspec\n"
+        "source('https://rubygems.org')",
+        "gem 'bundler'",
+        "gem 'fastlane', '>= #{Fastlane::VERSION}'",
+        "gem 'pry'",
+        "gem 'rake'",
+        "gem 'rspec'",
+        "gem 'rspec_junit_formatter'",
+        "gem 'rubocop', '#{Fastlane::RUBOCOP_REQUIREMENT}'",
+        "gem 'rubocop-performance'",
+        "gem 'rubocop-require_tools'",
+        "gem 'simplecov'",
+        "gemspec"
       ].each do |line|
-        expect(gemfile_lines).to include(line)
+        # Expect them to match approximately, e.g. using regex
+        expect(gemfile_lines).to include("#{line}\n")
       end
     end
 
@@ -224,18 +235,7 @@ describe Fastlane::PluginGenerator do
         expect(gemspec.version).to eq(Gem::Version.new('0.1.0'))
         expect(gemspec.email).to eq(email)
         expect(gemspec.summary).to eq(summary)
-        expect(gemspec.development_dependencies).to contain_exactly(
-          Gem::Dependency.new("pry", Gem::Requirement.new([">= 0"]), :development),
-          Gem::Dependency.new("bundler", Gem::Requirement.new([">= 0"]), :development),
-          Gem::Dependency.new("rspec", Gem::Requirement.new([">= 0"]), :development),
-          Gem::Dependency.new("rspec_junit_formatter", Gem::Requirement.new([">= 0"]), :development),
-          Gem::Dependency.new("rake", Gem::Requirement.new([">= 0"]), :development),
-          Gem::Dependency.new("rubocop", Gem::Requirement.new([Fastlane::RUBOCOP_REQUIREMENT]), :development),
-          Gem::Dependency.new("rubocop-require_tools", Gem::Requirement.new([">= 0"]), :development),
-          Gem::Dependency.new("rubocop-performance", Gem::Requirement.new([">= 0"]), :development),
-          Gem::Dependency.new("simplecov", Gem::Requirement.new([">= 0"]), :development),
-          Gem::Dependency.new("fastlane", Gem::Requirement.new([">= #{Fastlane::VERSION}"]), :development)
-        )
+        expect(gemspec.development_dependencies).to eq([])
       end
     end
 
