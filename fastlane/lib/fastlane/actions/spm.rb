@@ -15,7 +15,7 @@ module Fastlane
             "-Xswiftc", "-sdk",
             "-Xswiftc", "$(xcrun --sdk #{params[:simulator]} --show-sdk-path)",
             "-Xswiftc", "-target",
-            "-Xswiftc", "x86_64-apple-ios$(xcrun --sdk #{params[:simulator]} --show-sdk-version | cut -d '.' -f 1)-simulator"
+            "-Xswiftc", "#{params[:simulator_arch] || "arm64"}-apple-#{params[:simulator] == "iphonesimulator" ? 'ios' : 'macosx'}$(xcrun --sdk #{params[:simulator]} --show-sdk-version | cut -d '.' -f 1)#{"-simulator" if params[:simulator] == "iphonesimulator"}"
           ]
           cmd += simulator_flags
         end
@@ -110,6 +110,14 @@ module Fastlane
                                        optional: true,
                                        verify_block: proc do |value|
                                          UI.user_error!("Please pass a valid simulator. Use one of the following: #{valid_simulators.join(', ')}") unless valid_simulators.include?(value)
+                                       end),
+          FastlaneCore::ConfigItem.new(key: :simulator_arch,
+                                       env_name: "FL_SPM_SIMULATOR_ARCH",
+                                       description: "Specifies the architecture of the simulator to pass for Swift Compiler (one of: #{valid_architectures.join(', ')}), requires simulator to be specified also",
+                                       type: String,
+                                       optional: true,
+                                       verify_block: proc do |value|
+                                         UI.user_error!("Please pass a valid simulator architecrure. Use one of the following: #{valid_architectures.join(', ')}") unless valid_architectures.include?(value)
                                        end)
         ]
       end
@@ -158,7 +166,11 @@ module Fastlane
       end
 
       def self.valid_simulators
-        %w(iphonesimulator macossimulator)
+        %w(iphonesimulator macosx)
+      end
+
+      def self.valid_architectures
+        %w(x86_64 arm64)
       end
     end
   end
