@@ -147,7 +147,14 @@ module Scan
           end
 
           # Get OS version corresponding to build
-          Gem::Version.new(FastlaneCore::DeviceManager.runtime_build_os_versions[runtime_build])
+          os_version = FastlaneCore::DeviceManager.runtime_build_os_versions[runtime_build]
+          if os_version
+            Gem::Version.new(os_version)
+          else
+            Gem::Version.new('0')
+          end
+        else
+          Gem::Version.new('0')
         end
       end
     end
@@ -158,7 +165,7 @@ module Scan
 
     def self.compatibility_constraint(sim, device_name)
       latest_os = default_os_version(sim.os_type)
-      sim.name == device_name && (latest_os.nil? || Gem::Version.new(sim.os_version) <= latest_os)
+      sim.name == device_name && (latest_os.version == '0' || Gem::Version.new(sim.os_version) <= latest_os)
     end
 
     def self.highest_compatible_simulator(simulators, device_name)
@@ -217,7 +224,7 @@ module Scan
             if pieces.count == 0
               [] # empty array
             elsif pieces.count == 1
-              [ highest_compatible_simulator(simulators, pieces.first) ]
+              [ highest_compatible_simulator(simulators, pieces.first) ].compact
             else # pieces.count == 2 -- mathematically, because of the 'end of line' part of our regular expression
               version = pieces[1].tr('()', '')
               display_device = "'#{pieces[0]}' with version #{version}"
@@ -246,7 +253,7 @@ module Scan
         default = lambda do
           UI.error("Couldn't find any matching simulators for '#{devices}' - falling back to default simulator") if (devices || []).count > 0
 
-          result = [ highest_compatible_simulator(simulators, default_device_name) || simulators.first ]
+          result = [ highest_compatible_simulator(simulators, default_device_name) || simulators.first ].compact
 
           UI.message("Found simulator \"#{result.first.name} (#{result.first.os_version})\"") if result.first
 

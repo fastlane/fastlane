@@ -130,6 +130,22 @@ describe Scan do
         end.to raise_error(FastlaneCore::Interface::FastlaneError)
       end
 
+      it 'returns version 0 if no OS version associated with runtime build number' do
+        help_output = 'Usage: simctl runtime <operation> <arguments> match list'
+        allow(Open3).to receive(:capture3).with('xcrun simctl runtime -h').and_return([nil, help_output, nil])
+
+        sdks_output = File.read('./scan/spec/fixtures/XcodebuildSdksOutput15')
+        status = double('status', "success?": true)
+        allow(Open3).to receive(:capture2).with('xcodebuild -showsdks -json').and_return([sdks_output, status])
+
+        runtime_output = File.read('./scan/spec/fixtures/XcrunSimctlRuntimeMatchListOutput15')
+        allow(Open3).to receive(:capture2).with('xcrun simctl runtime match list -j').and_return([runtime_output, status])
+
+        allow(FastlaneCore::DeviceManager).to receive(:runtime_build_os_versions).and_return({})
+
+        expect(Scan::DetectValues.default_os_version('iOS')).to eq(Gem::Version.new('0'))
+      end
+
       build_os_versions = { "21J353" => "17.0", "21R355" => "10.0", "21A342" => "17.0.1" }
       actual_os_versions = { "tvOS" => "17.0", "watchOS" => "10.0", "iOS" => "17.0.1" }
       %w[iOS tvOS watchOS].each do |os_type|
