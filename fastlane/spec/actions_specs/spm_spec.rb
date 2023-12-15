@@ -349,7 +349,7 @@ describe Fastlane do
               )
             end").runner.execute(:test)
 
-          expect(result).to eq("swift build -Xswiftc -sdk -Xswiftc $(xcrun --sdk iphonesimulator --show-sdk-path) -Xswiftc -target -Xswiftc x86_64-apple-ios$(xcrun --sdk iphonesimulator --show-sdk-version | cut -d '.' -f 1)-simulator")
+          expect(result).to eq("swift build -Xswiftc -sdk -Xswiftc $(xcrun --sdk iphonesimulator --show-sdk-path) -Xswiftc -target -Xswiftc arm64-apple-ios$(xcrun --sdk iphonesimulator --show-sdk-version | cut -d '.' -f 1)-simulator")
         end
 
         it "raises an error if simulator syntax is invalid" do
@@ -360,7 +360,49 @@ describe Fastlane do
                 simulator: 'invalid_simulator'
               )
             end").runner.execute(:test)
-          end.to raise_error("Please pass a valid simulator. Use one of the following: iphonesimulator, macossimulator")
+          end.to raise_error("Please pass a valid simulator. Use one of the following: iphonesimulator, macosx")
+        end
+
+        it "sets arm64 as the default architecture when simulator is specified without architecture" do
+          result = Fastlane::FastFile.new.parse("lane :test do
+              spm(
+                command: 'build',
+                simulator: 'iphonesimulator'
+              )
+            end").runner.execute(:test)
+          expect(result).to eq("swift build -Xswiftc -sdk -Xswiftc $(xcrun --sdk iphonesimulator --show-sdk-path) -Xswiftc -target -Xswiftc arm64-apple-ios$(xcrun --sdk iphonesimulator --show-sdk-version | cut -d '.' -f 1)-simulator")
+        end
+
+        it "sets x86-64 as the architecture parameter when simulator is specified" do
+          result = Fastlane::FastFile.new.parse("lane :test do
+              spm(
+                command: 'build',
+                simulator: 'iphonesimulator',
+                simulator_arch: 'x86_64'
+              )
+            end").runner.execute(:test)
+          expect(result).to eq("swift build -Xswiftc -sdk -Xswiftc $(xcrun --sdk iphonesimulator --show-sdk-path) -Xswiftc -target -Xswiftc x86_64-apple-ios$(xcrun --sdk iphonesimulator --show-sdk-version | cut -d '.' -f 1)-simulator")
+        end
+
+        it "sets macosx as the simulator parameter without architecture being specified" do
+          result = Fastlane::FastFile.new.parse("lane :test do
+              spm(
+                command: 'build',
+                simulator: 'macosx'
+              )
+            end").runner.execute(:test)
+          expect(result).to eq("swift build -Xswiftc -sdk -Xswiftc $(xcrun --sdk macosx --show-sdk-path) -Xswiftc -target -Xswiftc arm64-apple-macosx$(xcrun --sdk macosx --show-sdk-version | cut -d '.' -f 1)")
+        end
+
+        it "sets macosx as the simulator parameter with x86_64 passed as architecture" do
+          result = Fastlane::FastFile.new.parse("lane :test do
+              spm(
+                command: 'build',
+                simulator: 'macosx',
+                simulator_arch: 'x86_64'
+              )
+            end").runner.execute(:test)
+          expect(result).to eq("swift build -Xswiftc -sdk -Xswiftc $(xcrun --sdk macosx --show-sdk-path) -Xswiftc -target -Xswiftc x86_64-apple-macosx$(xcrun --sdk macosx --show-sdk-version | cut -d '.' -f 1)")
         end
       end
     end
