@@ -1,9 +1,9 @@
 name: Processing release
-on: 
+on:
   release:
     types: [published]
 
-jobs:   
+jobs:
   communicate-on-pull-request-released:
     name: communicate on pull request released
     runs-on: ubuntu-latest
