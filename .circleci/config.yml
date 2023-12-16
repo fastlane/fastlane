@@ -196,10 +196,10 @@ jobs:
 
   validate_documentation:
     parameters:
-      ruby_version:
+      image:
         type: string
     docker:
-      - image: << parameters.ruby_version >>
+      - image: << parameters.image >>
     steps:
       - *cache_restore_git
       - checkout
@@ -314,7 +314,7 @@ workflows:
           ruby_version: '2.7'
       - validate_documentation:
           name: 'Validate Documentation'
-          ruby_version: 'fastlanetools/ci:0.3.0'
+          image: 'cimg/ruby:3.2.2'
       - lint_source_code:
           name: 'Lint source code'
           ruby_version: 'cimg/ruby:2.6'
