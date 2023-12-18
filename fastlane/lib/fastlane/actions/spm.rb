@@ -12,14 +12,14 @@ module Fastlane
         cmd << "--disable-sandbox" if params[:disable_sandbox]
         cmd << "--verbose" if params[:verbose]
         if params[:simulator]
-          _simulator_platform = simulator_platform(simulator: params[:simulator], simulator_arch: params[:simulator_arch])
-          _simulator_sdk = simulator_sdk(simulator: params[:simulator])
-          _simulator_sdk_suffix = simulator_sdk_suffix(simulator: params[:simulator])
+          simulator_platform = simulator_platform(simulator: params[:simulator], simulator_arch: params[:simulator_arch])
+          simulator_sdk = simulator_sdk(simulator: params[:simulator])
+          simulator_sdk_suffix = simulator_sdk_suffix(simulator: params[:simulator])
           simulator_flags = [
             "-Xswiftc", "-sdk",
             "-Xswiftc", "$(xcrun --sdk #{params[:simulator]} --show-sdk-path)",
             "-Xswiftc", "-target",
-            "-Xswiftc", "#{_simulator_platform}#{_simulator_sdk}#{_simulator_sdk_suffix}"
+            "-Xswiftc", "#{simulator_platform}#{simulator_sdk}#{simulator_sdk_suffix}"
           ]
           cmd += simulator_flags
         end
