@@ -130,7 +130,7 @@ jobs:
 
   tests_ubuntu:
     parameters:
-      ruby_version:
+      image:
         type: string
     environment:
       CIRCLE_TEST_REPORTS: '~/test-reports'
@@ -138,7 +138,7 @@ jobs:
       LANG: 'C.UTF-8'
       FASTLANE_ITUNES_TRANSPORTER_PATH: .bundle
     docker:
-      - image: << parameters.ruby_version >>
+      - image: << parameters.image >>
     steps:
       - *cache_restore_git
       - checkout
@@ -196,10 +196,10 @@ jobs:
 
   validate_documentation:
     parameters:
-      ruby_version:
+      image:
         type: string
     docker:
-      - image: << parameters.ruby_version >>
+      - image: << parameters.image >>
     steps:
       - *cache_restore_git
       - checkout
@@ -217,10 +217,10 @@ jobs:
 
   lint_source_code:
     parameters:
-      ruby_version:
+      image:
         type: string
     docker:
-      - image: << parameters.ruby_version >>
+      - image: << parameters.image >>
     steps:
       - *cache_restore_git
       - checkout
@@ -233,13 +233,13 @@ jobs:
 
   modules_load_up_tests:
     parameters:
-      ruby_version:
+      image:
         type: string
     environment:
       LC_ALL: C.UTF-8
       LANG: C.UTF-8
     docker:
-      - image: << parameters.ruby_version >>
+      - image: << parameters.image >>
     shell: /bin/bash --login -eo pipefail
     steps:
       - *cache_restore_git
@@ -307,17 +307,17 @@ workflows:
           ruby_opt: -W:deprecated
       - tests_ubuntu:
           name: 'Execute tests on Ubuntu'
-          ruby_version: 'fastlanetools/ci:0.3.0'
+          image: 'fastlanetools/ci:0.3.0'
       - validate_fastlane_swift_generation:
           name: 'Validate Fastlane.swift generation'
           xcode_version: '12.5.1'
           ruby_version: '2.7'
       - validate_documentation:
           name: 'Validate Documentation'
-          ruby_version: 'fastlanetools/ci:0.3.0'
+          image: 'cimg/ruby:3.2.2'
       - lint_source_code:
           name: 'Lint source code'
-          ruby_version: 'cimg/ruby:2.6'
+          image: 'cimg/ruby:2.6'
       - modules_load_up_tests:
           name: 'Modules load up tests'
-          ruby_version: 'cimg/ruby:2.6'
+          image: 'cimg/ruby:2.6'
