@@ -15,10 +15,6 @@ config['require'] = [
 config.delete('inherit_from')
 config.delete('CrossPlatform/ForkUsage')
 config.delete('Lint/IsStringUsage')
-# We declare development dependencies in the Gemspec file because we use dynamic values in its template
-config['Gemspec/DevelopmentDependencies'] = {
-  'Enabled' => false
-}
 
 File.write("#{lib}/fastlane/plugins/template/.rubocop.yml", YAML.dump(config))
 
@@ -26,32 +22,32 @@ Gem::Specification.new do |spec|
   spec.name          = "fastlane"
   spec.version       = Fastlane::VERSION
   # list of authors is regenerated and resorted on each release
-  spec.authors       = ["Andrew McBurney",
-                        "Daniel Jankowski",
-                        "Iulian Onofrei",
-                        "Luka Mirosevic",
-                        "Maksym Grebenets",
-                        "Helmut Januschka",
-                        "Jimmy Dee",
-                        "Olivier Halligon",
-                        "Kohki Miki",
-                        "Satoshi Namai",
-                        "Matthew Ellis",
-                        "Roger Oba",
-                        "Joshua Liebowitz",
-                        "Josh Holtz",
+  spec.authors       = ["Fumiya Nakamura",
                         "Felix Krause",
-                        "Jérôme Lacoste",
-                        "Max Ott",
-                        "Aaron Brager",
-                        "Manu Wallner",
-                        "Fumiya Nakamura",
-                        "Manish Rathi",
-                        "Łukasz Grabowski",
-                        "Jorge Revuelta H",
                         "Stefan Natchev",
+                        "Roger Oba",
+                        "Satoshi Namai",
+                        "Josh Holtz",
                         "Danielle Tomlinson",
-                        "Jan Piotrowski"]
+                        "Manu Wallner",
+                        "Andrew McBurney",
+                        "Kohki Miki",
+                        "Olivier Halligon",
+                        "Aaron Brager",
+                        "Jan Piotrowski",
+                        "Maksym Grebenets",
+                        "Daniel Jankowski",
+                        "Luka Mirosevic",
+                        "Jimmy Dee",
+                        "Jorge Revuelta H",
+                        "Manish Rathi",
+                        "Matthew Ellis",
+                        "Helmut Januschka",
+                        "Max Ott",
+                        "Jérôme Lacoste",
+                        "Joshua Liebowitz",
+                        "Łukasz Grabowski",
+                        "Iulian Onofrei"]
 
   spec.email         = ["fastlane@krausefx.com"]
   spec.summary       = Fastlane::DESCRIPTION
@@ -99,7 +95,7 @@ Gem::Specification.new do |spec|
   spec.add_dependency('mini_magick', '>= 4.9.4', '< 5.0.0') # To open, edit and export PSD files
   spec.add_dependency('multipart-post', '>= 2.0.0', '< 3.0.0') # Needed for uploading builds to appetize
   spec.add_dependency('naturally', '~> 2.2') # Used to sort strings with numbers in a human-friendly way
-  spec.add_dependency('optparse', '~> 0.1.1') # Used to parse options with Commander
+  spec.add_dependency('optparse', '>= 0.1.1') # Used to parse options with Commander
   spec.add_dependency('plist', '>= 3.1.0', '< 4.0.0') # Needed for set_build_number_repository and get_info_plist_value actions
   spec.add_dependency('rubyzip', '>= 2.0.0', '< 3.0.0') # fix swift/ipa in gym
   spec.add_dependency('security', '= 0.1.3') # macOS Keychain manager, a dead project, no updates expected
@@ -112,25 +108,4 @@ Gem::Specification.new do |spec|
   spec.add_dependency('xcodeproj', '>= 1.13.0', '< 2.0.0') # Modify Xcode projects
   spec.add_dependency('xcpretty-travis-formatter', '>= 0.0.3')
   spec.add_dependency('xcpretty', '~> 0.3.0') # prettify xcodebuild output
-
-  # Development only
-  spec.add_development_dependency('climate_control', '~> 0.2.0')
-  spec.add_development_dependency('coveralls', '~> 0.8.13')
-  spec.add_development_dependency('fakefs', '~> 1.2')
-  spec.add_development_dependency('pry-byebug')
-  spec.add_development_dependency('pry-rescue')
-  spec.add_development_dependency('pry-stack_explorer')
-  spec.add_development_dependency('pry')
-  spec.add_development_dependency('rake')
-  spec.add_development_dependency('rb-readline') # https://github.com/deivid-rodriguez/byebug/issues/289#issuecomment-251383465
-  spec.add_development_dependency('rest-client', '>= 1.8.0')
-  spec.add_development_dependency('rspec_junit_formatter', '~> 0.4.1')
-  spec.add_development_dependency('rspec', '~> 3.10')
-  spec.add_development_dependency('rubocop-performance')
-  spec.add_development_dependency('rubocop-require_tools')
-  spec.add_development_dependency('rubocop', Fastlane::RUBOCOP_REQUIREMENT)
-  spec.add_development_dependency('sinatra', '~> 2.0.8') # Used for mock servers
-  spec.add_development_dependency('webmock', '~> 3.8')
-  spec.add_development_dependency('xcov', '~> 1.4.1') # Used for xcov's parameters generation: https://github.com/fastlane/fastlane/pull/12416
-  spec.add_development_dependency('yard', '~> 0.9.11')
 end

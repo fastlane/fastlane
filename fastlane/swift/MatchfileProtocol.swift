@@ -125,6 +125,9 @@ public protocol MatchfileProtocol: AnyObject {
     /// Include all matching certificates in the provisioning profile. Works only for the 'development' provisioning profile type
     var includeAllCertificates: Bool { get }
 
+    /// Select certificate by id. Useful if multiple certificates are stored in one place
+    var certificateId: String? { get }
+
     /// Renew the provisioning profiles if the certificate count on the developer portal has changed. Works only for the 'development' provisioning profile type. Requires 'include_all_certificates' option to be 'true'
     var forceForNewCertificates: Bool { get }
 
@@ -207,6 +210,7 @@ public extension MatchfileProtocol {
     var forceForNewDevices: Bool { return false }
     var includeMacInProfiles: Bool { return false }
     var includeAllCertificates: Bool { return false }
+    var certificateId: String? { return nil }
     var forceForNewCertificates: Bool { return false }
     var skipConfirmation: Bool { return false }
     var safeRemoveCerts: Bool { return false }
@@ -224,4 +228,4 @@ public extension MatchfileProtocol {
 
 // Please don't remove the lines below
 // They are used to detect outdated files
-// FastlaneRunnerAPIVersion [0.9.117]
+// FastlaneRunnerAPIVersion [0.9.118]

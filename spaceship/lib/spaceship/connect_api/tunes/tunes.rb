@@ -160,9 +160,6 @@ module Spaceship
             included << {
               type: "appPrices",
               id: "${price1}",
-              attributes: {
-                startDate: nil
-              },
               relationships: {
                 app: {
                   data: {
