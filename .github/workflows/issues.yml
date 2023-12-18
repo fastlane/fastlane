@@ -1,5 +1,5 @@
 ---
-name: Processing issues
+name: Process issues
 on:
   issues:
     types:
@@ -7,7 +7,7 @@ on:
 
 jobs:
   fastlane-env:
-    name: fastlane env reminder
+    name: Remind user about posting their fastlane env
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@master

@@ -1,12 +1,12 @@
 ---
-# Locks closed and inactive issues and pull requests.
-name: Locking issues and pull requests
+name: Lock issues and pull requests
 on:
   schedule:
     - cron: "0 0 * * *" # Every day at midnight
 
 jobs:
   lock:
+    name: Lock closed and inactive issues and pull requests
     runs-on: ubuntu-latest
     steps:
       - uses: fastlane/github-actions/lock@latest
