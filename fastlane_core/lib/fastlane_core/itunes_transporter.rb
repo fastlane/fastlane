@@ -215,6 +215,8 @@ module FastlaneCore
 
     private_constant :ERROR_REGEX
 
+    attr_reader :errors
+
     def execute(command, hide_output)
       if Helper.test?
         yield(nil) if block_given?
@@ -244,6 +246,7 @@ module FastlaneCore
       end
 
       @errors << "The call to the altool completed with a non-zero exit status: #{exit_status}. This indicates a failure." unless exit_status.zero?
+      @errors << "-1 indicates altool exited abnormally; try retrying (see https://github.com/fastlane/fastlane/issues/21535)" if exit_status == -1
 
       unless @errors.empty? || @all_lines.empty?
         # Print the last lines that appear after the last error from the logs

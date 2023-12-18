@@ -364,6 +364,7 @@ module FastlaneCore
       else
         command = "xcodebuild clean -showBuildSettings #{xcodebuild_parameters.join(' ')}"
       end
+      command = "#{command} 2>&1" # xcodebuild produces errors on stderr #21672
       command
     end
 

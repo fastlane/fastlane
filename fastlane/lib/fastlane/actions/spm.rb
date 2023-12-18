@@ -5,6 +5,7 @@ module Fastlane
         cmd = ["swift"]
 
         cmd << (package_commands.include?(params[:command]) ? "package" : params[:command])
+        cmd << "--scratch-path #{params[:scratch_path]}" if params[:scratch_path]
         cmd << "--build-path #{params[:build_path]}" if params[:build_path]
         cmd << "--package-path #{params[:package_path]}" if params[:package_path]
         cmd << "--configuration #{params[:configuration]}" if params[:configuration]
@@ -12,6 +13,7 @@ module Fastlane
         cmd << "--verbose" if params[:verbose]
         cmd << params[:command] if package_commands.include?(params[:command])
         cmd << "--enable-code-coverage" if params[:enable_code_coverage] && (params[:command] == 'generate-xcodeproj' || params[:command] == 'test')
+        cmd << "--parallel" if params[:parallel] && params[:command] == 'test'
         if params[:xcconfig]
           cmd << "--xcconfig-overrides #{params[:xcconfig]}"
         end
@@ -50,9 +52,19 @@ module Fastlane
                                        description: "Enables code coverage for the generated Xcode project when using the 'generate-xcodeproj' and the 'test' command",
                                        type: Boolean,
                                        optional: true),
+          FastlaneCore::ConfigItem.new(key: :scratch_path,
+                                       env_name: "FL_SPM_SCRATCH_PATH",
+                                       description: "Specify build/cache directory [default: ./.build]",
+                                       optional: true),
+          FastlaneCore::ConfigItem.new(key: :parallel,
+                                       env_name: "FL_SPM_PARALLEL",
+                                       description: "Enables running tests in parallel when using the 'test' command",
+                                       type: Boolean,
+                                       default_value: false),
           FastlaneCore::ConfigItem.new(key: :build_path,
                                        env_name: "FL_SPM_BUILD_PATH",
                                        description: "Specify build/cache directory [default: ./.build]",
+                                       deprecated: "`build_path` option is deprecated, use `scratch_path` instead",
                                        optional: true),
           FastlaneCore::ConfigItem.new(key: :package_path,
                                        env_name: "FL_SPM_PACKAGE_PATH",
@@ -110,12 +122,16 @@ module Fastlane
           'spm',
           'spm(
             command: "build",
-            build_path: "./build",
+            scratch_path: "./build",
             configuration: "release"
           )',
           'spm(
             command: "generate-xcodeproj",
             xcconfig: "Package.xcconfig"
+          )',
+          'spm(
+            command: "test",
+            parallel: true
           )'
         ]
       end
