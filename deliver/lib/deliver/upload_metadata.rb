@@ -427,7 +427,7 @@ module Deliver
         .uniq
     end
 
-    def fetch_edit_app_store_version(app, platform, wait_time: 10)
+    def fetch_edit_app_store_version(app, platform, wait_time: 60)
       retry_if_nil("Cannot find edit app store version", wait_time: wait_time) do
         app.get_edit_app_store_version(platform: platform)
       end
