@@ -305,10 +305,6 @@ describe "Build Manager" do
         expect(FastlaneCore::UI).to_not(receive(:message).with(/Distributing new build to testers/))
         expect(FastlaneCore::UI).to_not(receive(:success).with(/Successfully distributed build to/))
 
-        # Don't expect skip_waiting_for_build_processing messages if it is set
-        expect(FastlaneCore::UI).to_not(receive(:message).with("If you want to skip waiting for the processing to be finished, use the `skip_waiting_for_build_processing` option"))
-        expect(FastlaneCore::UI).to_not(receive(:message).with("Note that if `skip_waiting_for_build_processing` is used but a `changelog` is supplied, this process will wait for the build to appear on AppStoreConnect, update the changelog and then skip the remaining of the processing steps."))
-
         fake_build_manager.distribute(options, build: ready_to_submit_mock_build)
       end
 
@@ -603,6 +599,53 @@ describe "Build Manager" do
   end
 
   describe "#upload" do
+    describe "shows the correct notices" do
+      let(:fake_build_manager) { Pilot::BuildManager.new }
+      let(:fake_app_id) { 123 }
+      let(:fake_dir) { "fake dir" }
+      let(:fake_app_platform) { "ios" }
+      let(:upload_options) do
+        {
+          apple_id: fake_app_id,
+          skip_waiting_for_build_processing: true,
+          changelog: "changelog contents",
+          ipa: 'foo'
+        }
+      end
+
+      before(:each) do
+        allow(fake_build_manager).to receive(:login)
+        allow(fake_build_manager).to receive(:fetch_app_platform).and_return(fake_app_platform)
+        allow(Dir).to receive(:mktmpdir).and_return(fake_dir)
+
+        fake_ipauploadpackagebuilder = double
+        allow(fake_ipauploadpackagebuilder).to receive(:generate).with(app_id: fake_app_id, ipa_path: upload_options[:ipa], package_path: fake_dir, platform: fake_app_platform).and_return(true)
+        allow(FastlaneCore::IpaUploadPackageBuilder).to receive(:new).and_return(fake_ipauploadpackagebuilder)
+
+        fake_itunestransporter = double
+        allow(fake_itunestransporter).to receive(:upload).and_return(true)
+        allow(FastlaneCore::ItunesTransporter).to receive(:new).and_return(fake_itunestransporter)
+
+        fake_build = double
+        expect(fake_build_manager).to receive(:wait_for_build_processing_to_be_complete).and_return(fake_build)
+
+        expect(fake_build_manager).to receive(:distribute).with(upload_options, build: fake_build)
+      end
+
+      it "does not advertise `skip_waiting_for_build_processing` if the option is set" do
+        expect(FastlaneCore::UI).to_not(receive(:message).with("If you want to skip waiting for the processing to be finished, use the `skip_waiting_for_build_processing` option"))
+        expect(FastlaneCore::UI).to_not(receive(:message).with("Note that if `skip_waiting_for_build_processing` is used but a `changelog` is supplied, this process will wait for the build to appear on AppStoreConnect, update the changelog and then skip the remaining of the processing steps."))
+
+        fake_build_manager.upload(upload_options)
+      end
+
+      it "shows notice when using `skip_waiting_for_build_processing` and changelog together" do
+        expect(FastlaneCore::UI).to(receive(:important).with("`skip_waiting_for_build_processing` used and `changelog` supplied - will wait until build appears on AppStoreConnect, update the changelog and then skip the rest of the remaining of the processing steps."))
+
+        fake_build_manager.upload(upload_options)
+      end
+    end
+
     describe "uses Manager.login (which does spaceship login) for ipa" do
       let(:fake_build_manager) { Pilot::BuildManager.new }
       let(:fake_app_id) { 123 }
