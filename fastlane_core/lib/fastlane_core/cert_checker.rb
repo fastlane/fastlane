@@ -112,8 +112,9 @@ module FastlaneCore
       `#{commands.join(' ')}`
     end
 
-    def self.installed_wwdr_certificates(keychain)
+    def self.installed_wwdr_certificates(keychain: nil)
       certificate_name = "Apple Worldwide Developer Relations"
+      keychain ||= wwdr_keychain # backwards compatibility
 
       # Find all installed WWDRCA certificates
       installed_certs = []
@@ -139,17 +140,18 @@ module FastlaneCore
     def self.install_missing_wwdr_certificates(in_keychain: nil)
       # Install all Worldwide Developer Relations Intermediate Certificates listed here: https://www.apple.com/certificateauthority/
       keychain = in_keychain || wwdr_keychain
-      missing = WWDRCA_CERTIFICATES.map { |c| c[:alias] } - installed_wwdr_certificates(keychain)
+      missing = WWDRCA_CERTIFICATES.map { |c| c[:alias] } - installed_wwdr_certificates(keychain: keychain)
       missing.each do |cert_alias|
-        install_wwdr_certificate(cert_alias, keychain)
+        install_wwdr_certificate(cert_alias, keychain: keychain)
       end
       missing.count
     end
 
-    def self.install_wwdr_certificate(cert_alias, keychain)
+    def self.install_wwdr_certificate(cert_alias, keychain: nil)
       url = WWDRCA_CERTIFICATES.find { |c| c[:alias] == cert_alias }.fetch(:url)
       file = Tempfile.new([File.basename(url, ".cer"), ".cer"])
       filename = file.path
+      keychain ||= wwdr_keychain # backwards compatibility
       keychain = "-k #{keychain.shellescape}" unless keychain.empty?
 
       # Attempts to fix an issue installing WWDR cert tends to fail on CIs
