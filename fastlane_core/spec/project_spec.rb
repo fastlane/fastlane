@@ -346,8 +346,8 @@ describe FastlaneCore do
         allow(FastlaneCore::Helper).to receive(:xcode_at_least?).with("11.0").and_return(false)
         allow(FastlaneCore::Helper).to receive(:xcode_at_least?).with("13").and_return(false)
         expect(FastlaneCore::Helper).to receive(:xcode_at_least?).with("8.3").and_return(true)
-        command = "xcodebuild -showBuildSettings -project ./fastlane_core/spec/fixtures/projects/Example.xcodeproj"
-        expect(FastlaneCore::Project).to receive(:run_command).with(command.to_s, { timeout: 3, retries: 3, print: true }).and_return(File.read("./fastlane_core/spec/fixtures/projects/build_settings_with_toolchains"))
+        command = "xcodebuild -showBuildSettings -project ./fastlane_core/spec/fixtures/projects/Example.xcodeproj 2>&1"
+        expect(FastlaneCore::Project).to receive(:run_command).with(command, { timeout: 3, retries: 3, print: true }).and_return(File.read("./fastlane_core/spec/fixtures/projects/build_settings_with_toolchains"))
         expect(@project.build_settings(key: "SUPPORTED_PLATFORMS")).to eq("iphonesimulator iphoneos")
       end
 
@@ -357,8 +357,8 @@ describe FastlaneCore do
         allow(FastlaneCore::Helper).to receive(:xcode_at_least?).with("11.0").and_return(false)
         allow(FastlaneCore::Helper).to receive(:xcode_at_least?).with("13").and_return(false)
         expect(FastlaneCore::Helper).to receive(:xcode_at_least?).with("8.3").and_return(false)
-        command = "xcodebuild clean -showBuildSettings -project ./fastlane_core/spec/fixtures/projects/Example.xcodeproj"
-        expect(FastlaneCore::Project).to receive(:run_command).with(command.to_s, { timeout: 3, retries: 3, print: true }).and_return(File.read("./fastlane_core/spec/fixtures/projects/build_settings_with_toolchains"))
+        command = "xcodebuild clean -showBuildSettings -project ./fastlane_core/spec/fixtures/projects/Example.xcodeproj 2>&1"
+        expect(FastlaneCore::Project).to receive(:run_command).with(command, { timeout: 3, retries: 3, print: true }).and_return(File.read("./fastlane_core/spec/fixtures/projects/build_settings_with_toolchains"))
         expect(@project.build_settings(key: "SUPPORTED_PLATFORMS")).to eq("iphonesimulator iphoneos")
       end
     end
@@ -491,7 +491,7 @@ describe FastlaneCore do
           project: "./fastlane_core/spec/fixtures/projects/Example.xcodeproj",
           derived_data_path: "./special/path/DerivedData"
         })
-        command = "xcodebuild -showBuildSettings -project ./fastlane_core/spec/fixtures/projects/Example.xcodeproj -derivedDataPath ./special/path/DerivedData"
+        command = "xcodebuild -showBuildSettings -project ./fastlane_core/spec/fixtures/projects/Example.xcodeproj -derivedDataPath ./special/path/DerivedData 2>&1"
         expect(project.build_xcodebuild_showbuildsettings_command).to eq(command)
       end
     end
@@ -503,7 +503,7 @@ describe FastlaneCore do
           project: "./fastlane_core/spec/fixtures/projects/Example.xcodeproj",
           disable_package_automatic_updates: true
         })
-        command = "xcodebuild -showBuildSettings -project ./fastlane_core/spec/fixtures/projects/Example.xcodeproj -disableAutomaticPackageResolution"
+        command = "xcodebuild -showBuildSettings -project ./fastlane_core/spec/fixtures/projects/Example.xcodeproj -disableAutomaticPackageResolution 2>&1"
         expect(project.build_xcodebuild_showbuildsettings_command).to eq(command)
       end
     end
@@ -511,7 +511,7 @@ describe FastlaneCore do
     describe 'xcodebuild_xcconfig option', requires_xcode: true do
       it 'generates an xcodebuild -showBuildSettings command without xcconfig by default' do
         project = FastlaneCore::Project.new({ project: "./fastlane_core/spec/fixtures/projects/Example.xcodeproj" })
-        command = "xcodebuild -showBuildSettings -project ./fastlane_core/spec/fixtures/projects/Example.xcodeproj"
+        command = "xcodebuild -showBuildSettings -project ./fastlane_core/spec/fixtures/projects/Example.xcodeproj 2>&1"
         expect(project.build_xcodebuild_showbuildsettings_command).to eq(command)
       end
 
@@ -520,7 +520,7 @@ describe FastlaneCore do
           project: "./fastlane_core/spec/fixtures/projects/Example.xcodeproj",
           xcconfig: "/path/to/some.xcconfig"
         })
-        command = "xcodebuild -showBuildSettings -project ./fastlane_core/spec/fixtures/projects/Example.xcodeproj -xcconfig /path/to/some.xcconfig"
+        command = "xcodebuild -showBuildSettings -project ./fastlane_core/spec/fixtures/projects/Example.xcodeproj -xcconfig /path/to/some.xcconfig 2>&1"
         expect(project.build_xcodebuild_showbuildsettings_command).to eq(command)
       end
     end
@@ -531,7 +531,7 @@ describe FastlaneCore do
           project: "./fastlane_core/spec/fixtures/projects/Example.xcodeproj",
           use_system_scm: true
         })
-        command = "xcodebuild -showBuildSettings -project ./fastlane_core/spec/fixtures/projects/Example.xcodeproj -scmProvider system"
+        command = "xcodebuild -showBuildSettings -project ./fastlane_core/spec/fixtures/projects/Example.xcodeproj -scmProvider system 2>&1"
         expect(project.build_xcodebuild_showbuildsettings_command).to eq(command)
       end
 
@@ -539,7 +539,7 @@ describe FastlaneCore do
         project = FastlaneCore::Project.new({
           project: "./fastlane_core/spec/fixtures/projects/Example.xcodeproj"
         })
-        command = "xcodebuild -showBuildSettings -project ./fastlane_core/spec/fixtures/projects/Example.xcodeproj"
+        command = "xcodebuild -showBuildSettings -project ./fastlane_core/spec/fixtures/projects/Example.xcodeproj 2>&1"
         expect(project.build_xcodebuild_showbuildsettings_command).to eq(command)
       end
 
@@ -548,7 +548,7 @@ describe FastlaneCore do
           project: "./fastlane_core/spec/fixtures/projects/Example.xcodeproj",
           use_system_scm: false
         })
-        command = "xcodebuild -showBuildSettings -project ./fastlane_core/spec/fixtures/projects/Example.xcodeproj"
+        command = "xcodebuild -showBuildSettings -project ./fastlane_core/spec/fixtures/projects/Example.xcodeproj 2>&1"
         expect(project.build_xcodebuild_showbuildsettings_command).to eq(command)
       end
     end
@@ -588,7 +588,7 @@ describe FastlaneCore do
           project: "./fastlane_core/spec/fixtures/projects/Example.xcodeproj",
           cloned_source_packages_path: "./path/to/resolve"
         })
-        command = "xcodebuild -showBuildSettings -project ./fastlane_core/spec/fixtures/projects/Example.xcodeproj"
+        command = "xcodebuild -showBuildSettings -project ./fastlane_core/spec/fixtures/projects/Example.xcodeproj 2>&1"
         expect(project.build_xcodebuild_showbuildsettings_command).to eq(command)
       end
 
@@ -621,7 +621,7 @@ describe FastlaneCore do
               project: "./fastlane_core/spec/fixtures/projects/Example.xcodeproj",
               destination: "FakeDestination"
             })
-            command = "xcodebuild -showBuildSettings -project ./fastlane_core/spec/fixtures/projects/Example.xcodeproj -destination FakeDestination"
+            command = "xcodebuild -showBuildSettings -project ./fastlane_core/spec/fixtures/projects/Example.xcodeproj -destination FakeDestination 2>&1"
             expect(project.build_xcodebuild_showbuildsettings_command).to eq(command)
           end
 
@@ -640,7 +640,7 @@ describe FastlaneCore do
             project = FastlaneCore::Project.new({
               project: "./fastlane_core/spec/fixtures/projects/Example.xcodeproj"
             })
-            command = "xcodebuild -showBuildSettings -project ./fastlane_core/spec/fixtures/projects/Example.xcodeproj"
+            command = "xcodebuild -showBuildSettings -project ./fastlane_core/spec/fixtures/projects/Example.xcodeproj 2>&1"
             expect(project.build_xcodebuild_showbuildsettings_command).to eq(command)
           end
 
@@ -667,7 +667,7 @@ describe FastlaneCore do
               project: "./fastlane_core/spec/fixtures/projects/Example.xcodeproj",
               destination: "FakeDestination"
             })
-            command = "xcodebuild -showBuildSettings -project ./fastlane_core/spec/fixtures/projects/Example.xcodeproj"
+            command = "xcodebuild -showBuildSettings -project ./fastlane_core/spec/fixtures/projects/Example.xcodeproj 2>&1"
             expect(project.build_xcodebuild_showbuildsettings_command).to eq(command)
           end
 
@@ -686,7 +686,7 @@ describe FastlaneCore do
             project = FastlaneCore::Project.new({
               project: "./fastlane_core/spec/fixtures/projects/Example.xcodeproj"
             })
-            command = "xcodebuild -showBuildSettings -project ./fastlane_core/spec/fixtures/projects/Example.xcodeproj"
+            command = "xcodebuild -showBuildSettings -project ./fastlane_core/spec/fixtures/projects/Example.xcodeproj 2>&1"
             expect(project.build_xcodebuild_showbuildsettings_command).to eq(command)
           end
 

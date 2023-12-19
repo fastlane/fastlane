@@ -24,7 +24,7 @@ module Fastlane
 
         case File.extname(build_path)
         when ".ipa", ".zip"
-          `unzip #{build_path.shellescape} -d #{dir.shellescape} -x '__MACOSX/*' '*.DS_Store'`
+          `unzip #{build_path.shellescape} -d #{dir.shellescape} -x '__MACOSX/*' '*.DS_Store' 2>&1`
           UI.user_error!("Unable to unzip ipa") unless $? == 0
           # Adding extra ** for edge-case ipas where Payload directory is nested.
           app_path = Dir["#{dir}/**/Payload/*.app"].first
@@ -66,7 +66,10 @@ module Fastlane
       end
 
       def self.update_with_profile_info(app_path, values)
-        profile = `cat #{app_path.shellescape}/embedded.mobileprovision | security cms -D`
+        provision_profile_path = "#{app_path}/embedded.mobileprovision"
+        UI.user_error!("Unable to find embedded profile in #{provision_profile_path}") unless File.exist?(provision_profile_path)
+
+        profile = `cat #{provision_profile_path.shellescape} | security cms -D`
         UI.user_error!("Unable to extract profile") unless $? == 0
 
         plist = Plist.parse_xml(profile)

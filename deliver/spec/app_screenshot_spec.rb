@@ -1,7 +1,10 @@
 require 'deliver/app_screenshot'
 require 'deliver/setup'
+require_relative 'deliver_constants'
 
 describe Deliver::AppScreenshot do
+  include DeliverConstants
+
   def screen_size_from(path)
     path.match(/{([0-9]+)x([0-9]+)}/).captures.map(&:to_i)
   end
@@ -11,8 +14,6 @@ describe Deliver::AppScreenshot do
       screen_size_from(path)
     end
   end
-
-  ScreenSize = Deliver::AppScreenshot::ScreenSize
 
   describe "#initialize" do
     context "when filename doesn't contain 'iPad Pro (3rd generation)' or 'iPad Pro (4th generation)'" do

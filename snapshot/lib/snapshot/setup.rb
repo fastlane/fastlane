@@ -19,7 +19,7 @@ module Snapshot
 
       if File.exist?(snapfile_path)
         if print_instructions_on_failure
-          print_instructions(snapshot_helper_filename: snapshot_helper_filename, snapfile_path: snapfile_path)
+          print_instructions(snapshot_helper_filename: snapshot_helper_filename)
           return
         else
           UI.user_error!("Snapfile already exists at path '#{snapfile_path}'. Run 'fastlane snapshot' to generate screenshots.")
@@ -37,7 +37,7 @@ module Snapshot
       print_instructions(snapshot_helper_filename: snapshot_helper_filename, snapfile_path: snapfile_path)
     end
 
-    def self.print_instructions(snapshot_helper_filename: nil, snapfile_path: nil)
+    def self.print_instructions(snapshot_helper_filename: nil)
       puts("Open your Xcode project and make sure to do the following:".yellow)
       puts("1) Add a new UI Test target to your project".yellow)
       puts("2) Add the ./fastlane/#{snapshot_helper_filename} to your UI Test target".yellow)
