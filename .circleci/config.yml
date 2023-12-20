@@ -262,7 +262,7 @@ jobs:
 
 workflows:
   version: 2
-  run_tests_and_checks:
+  "Run Tests & Checks": # Name of the workflow, which ends up displayed on GitHub's PR Check
     jobs:
       - tests_macos:
           name: 'Execute tests on macOS (Xcode 12.5.1, Ruby 2.6)'
