@@ -182,7 +182,7 @@ describe Deliver::UploadMetadata do
         it "no retry" do
           expect(app).to receive(:get_edit_app_store_version).and_return(version)
 
-          edit_version = uploader.fetch_edit_app_store_version(app, 'IOS', wait_time: 0.1)
+          edit_version = uploader.fetch_edit_app_store_version(app, 'IOS', max_retries: 5, initial_wait_time: 0.1)
           expect(edit_version).to eq(version)
         end
 
@@ -190,14 +190,14 @@ describe Deliver::UploadMetadata do
           expect(app).to receive(:get_edit_app_store_version).and_return(nil)
           expect(app).to receive(:get_edit_app_store_version).and_return(version)
 
-          edit_version = uploader.fetch_edit_app_store_version(app, 'IOS', wait_time: 0.1)
+          edit_version = uploader.fetch_edit_app_store_version(app, 'IOS', max_retries: 5, initial_wait_time: 0.01)
           expect(edit_version).to eq(version)
         end
 
         it "5 retry" do
           expect(app).to receive(:get_edit_app_store_version).and_return(nil).exactly(5).times
 
-          edit_version = uploader.fetch_edit_app_store_version(app, 'IOS', wait_time: 0.1)
+          edit_version = uploader.fetch_edit_app_store_version(app, 'IOS', max_retries: 5, initial_wait_time: 0.01)
           expect(edit_version).to eq(nil)
         end
       end
@@ -206,7 +206,7 @@ describe Deliver::UploadMetadata do
         it "no retry" do
           expect(app).to receive(:fetch_edit_app_info).and_return(app_info)
 
-          edit_app_info = uploader.fetch_edit_app_info(app, wait_time: 0.1)
+          edit_app_info = uploader.fetch_edit_app_info(app, max_retries: 5, initial_wait_time: 0.01)
           expect(edit_app_info).to eq(app_info)
         end
 
@@ -214,14 +214,14 @@ describe Deliver::UploadMetadata do
           expect(app).to receive(:fetch_edit_app_info).and_return(nil)
           expect(app).to receive(:fetch_edit_app_info).and_return(app_info)
 
-          edit_app_info = uploader.fetch_edit_app_info(app, wait_time: 0.1)
+          edit_app_info = uploader.fetch_edit_app_info(app, max_retries: 5, initial_wait_time: 0.01)
           expect(edit_app_info).to eq(app_info)
         end
 
         it "5 retry" do
           expect(app).to receive(:fetch_edit_app_info).and_return(nil).exactly(5).times
 
-          edit_app_info = uploader.fetch_edit_app_info(app, wait_time: 0.1)
+          edit_app_info = uploader.fetch_edit_app_info(app, max_retries: 5, initial_wait_time: 0.01)
           expect(edit_app_info).to eq(nil)
         end
       end
@@ -258,7 +258,8 @@ describe Deliver::UploadMetadata do
               platform: "ios",
               metadata_path: metadata_path,
               name: { "en-US" => "App name" },
-              description: { "en-US" => "App description" }
+              description: { "en-US" => "App description" },
+              version_check_wait_retry_limit: 5,
           }
 
           # Get number of versions (used for if whats_new should be sent)
@@ -295,7 +296,8 @@ describe Deliver::UploadMetadata do
             platform: "ios",
             metadata_path: metadata_path,
             privacy_url: { "en-US" => "https://fastlane.tools" },
-            apple_tv_privacy_policy: { "en-US" => "https://fastlane.tools/tv" }
+            apple_tv_privacy_policy: { "en-US" => "https://fastlane.tools/tv" },
+            version_check_wait_retry_limit: 5,
           }
 
           # Get number of versions (used for if whats_new should be sent)
@@ -319,7 +321,8 @@ describe Deliver::UploadMetadata do
           options = {
               platform: "ios",
               metadata_path: metadata_path,
-              auto_release_date: 1_595_395_800_000
+              auto_release_date: 1_595_395_800_000,
+              version_check_wait_retry_limit: 5,
           }
 
           # Get number of verions (used for if whats_new should be sent)
@@ -343,7 +346,8 @@ describe Deliver::UploadMetadata do
               platform: "ios",
               metadata_path: metadata_path,
               phased_release: true,
-              automatic_release: false
+              automatic_release: false,
+              version_check_wait_retry_limit: 5,
           }
 
           # Get number of verions (used for if whats_new should be sent)
@@ -372,7 +376,8 @@ describe Deliver::UploadMetadata do
           options = {
               platform: "ios",
               metadata_path: metadata_path,
-              phased_release: false
+              phased_release: false,
+              version_check_wait_retry_limit: 5,
           }
 
           # Get number of verions (used for if whats_new should be sent)
@@ -400,7 +405,8 @@ describe Deliver::UploadMetadata do
           options = {
               platform: "ios",
               metadata_path: metadata_path,
-              reset_ratings: true
+              reset_ratings: true,
+              version_check_wait_retry_limit: 5,
           }
 
           # Get number of verions (used for if whats_new should be sent)
@@ -425,7 +431,8 @@ describe Deliver::UploadMetadata do
           options = {
               platform: "ios",
               metadata_path: metadata_path,
-              reset_ratings: false
+              reset_ratings: false,
+              version_check_wait_retry_limit: 5,
           }
 
           # Get number of verions (used for if whats_new should be sent)
@@ -455,6 +462,7 @@ describe Deliver::UploadMetadata do
           options = {
               platform: "ios",
               metadata_path: metadata_path,
+              version_check_wait_retry_limit: 5,
           }
 
           # Get live app info
@@ -471,7 +479,8 @@ describe Deliver::UploadMetadata do
           options = {
               platform: "ios",
               metadata_path: metadata_path,
-              name: { "en-US" => "App name" }
+              name: { "en-US" => "App name" },
+              version_check_wait_retry_limit: 5,
           }
 
           # Get live app info
@@ -497,7 +506,8 @@ describe Deliver::UploadMetadata do
         options = {
             platform: "ios",
             metadata_path: metadata_path,
-            name: { "en-US" => "New app name" }
+            name: { "en-US" => "New app name" },
+            version_check_wait_retry_limit: 5,
         }
 
         allow(Deliver).to receive(:cache).and_return({ app: app })

@@ -89,7 +89,7 @@ module Deliver
       enabled_languages = detect_languages(options)
 
       app_store_version_localizations = verify_available_version_languages!(options, app, enabled_languages) unless options[:edit_live]
-      app_info = fetch_edit_app_info(app)
+      app_info = fetch_edit_app_info(app, max_retries: options[:version_check_wait_retry_limit])
       app_info_localizations = verify_available_info_languages!(options, app, app_info, enabled_languages) unless options[:edit_live] || !updating_localized_app_info?(options, app, app_info)
 
       if options[:edit_live]
@@ -100,7 +100,7 @@ module Deliver
 
         if version.nil?
           UI.message("Couldn't find live version, editing the current version on App Store Connect instead")
-          version = fetch_edit_app_store_version(app, platform)
+          version = fetch_edit_app_store_version(app, platform, max_retries: options[:version_check_wait_retry_limit])
           # we don't want to update the localised_options and non_localised_options
           # as we also check for `options[:edit_live]` at other areas in the code
           # by not touching those 2 variables, deliver is more consistent with what the option says
@@ -109,7 +109,7 @@ module Deliver
           UI.message("Found live version")
         end
       else
-        version = fetch_edit_app_store_version(app, platform)
+        version = fetch_edit_app_store_version(app, platform, max_retries: options[:version_check_wait_retry_limit])
         localised_options = (LOCALISED_VERSION_VALUES.keys + LOCALISED_APP_VALUES.keys)
         non_localised_options = NON_LOCALISED_VERSION_VALUES.keys
       end
@@ -427,25 +427,27 @@ module Deliver
         .uniq
     end
 
-    def fetch_edit_app_store_version(app, platform, wait_time: 10)
-      retry_if_nil("Cannot find edit app store version", wait_time: wait_time) do
+    def fetch_edit_app_store_version(app, platform, max_retries:, initial_wait_time: 10)
+      retry_if_nil("Cannot find edit app store version", tries: max_retries, initial_wait_time: initial_wait_time) do
         app.get_edit_app_store_version(platform: platform)
       end
     end
 
-    def fetch_edit_app_info(app, wait_time: 10)
-      retry_if_nil("Cannot find edit app info", wait_time: wait_time) do
+    def fetch_edit_app_info(app, max_retries:, initial_wait_time: 10)
+      retry_if_nil("Cannot find edit app info", tries: max_retries, initial_wait_time: initial_wait_time) do
         app.fetch_edit_app_info
       end
     end
 
-    def fetch_live_app_info(app, wait_time: 10)
-      retry_if_nil("Cannot find live app info", wait_time: wait_time) do
+    def fetch_live_app_info(app, max_retries:, initial_wait_time: 10)
+      retry_if_nil("Cannot find live app info", tries: max_retries, initial_wait_time: initial_wait_time) do
         app.fetch_live_app_info
       end
     end
 
-    def retry_if_nil(message, tries: 5, wait_time: 10)
+    # Retries a block of code if the return value is nil, with an exponential backoff.
+    def retry_if_nil(message, tries:, initial_wait_time: 10)
+      wait_time = initial_wait_time
       loop do
         tries -= 1
 
@@ -463,7 +465,7 @@ module Deliver
 
     # Checking if the metadata to update includes localised App Info
     def updating_localized_app_info?(options, app, app_info)
-      app_info ||= fetch_live_app_info(app)
+      app_info ||= fetch_live_app_info(app, max_retries: options[:version_check_wait_retry_limit])
       unless app_info
         UI.important("Can't find edit or live App info. Skipping upload.")
         return false
@@ -535,7 +537,7 @@ module Deliver
     # Finding languages to enable
     def verify_available_version_languages!(options, app, languages)
       platform = Spaceship::ConnectAPI::Platform.map(options[:platform])
-      version = fetch_edit_app_store_version(app, platform)
+      version = fetch_edit_app_store_version(app, platform, max_retries: options[:version_check_wait_retry_limit])
 
       unless version
         UI.user_error!("Cannot update languages - could not find an editable version for '#{platform}'")
