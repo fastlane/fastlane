@@ -456,6 +456,8 @@ module Deliver
         sleep(wait_time)
 
         return nil if tries.zero?
+
+        wait_time *= 2 # Double the wait time for the next iteration
       end
     end
 
