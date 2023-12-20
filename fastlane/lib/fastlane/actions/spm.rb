@@ -201,7 +201,7 @@ module Fastlane
       end
 
       def self.simulator_platform(params)
-        platform_suffix = "#{params[:simulator] == "iphonesimulator" ? "ios" : "macosx"}"
+        platform_suffix = params[:simulator] == "iphonesimulator" ? "ios" : "macosx"
         "#{params[:simulator_arch]}-apple-#{platform_suffix}"
       end
 
