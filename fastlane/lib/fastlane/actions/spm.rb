@@ -161,8 +161,8 @@ module Fastlane
           'spm(
             command: "test",
             parallel: true
-          ),
-          spm(
+          )',
+          'spm(
             simulator: "iphonesimulator"
           )',
           'spm(
