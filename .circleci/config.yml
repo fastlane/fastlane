@@ -132,6 +132,8 @@ jobs:
     parameters:
       image:
         type: string
+      ruby_version: # Used when restoring/saving bundler cache
+        type: string
     environment:
       CIRCLE_TEST_REPORTS: '~/test-reports'
       LC_ALL: 'C.UTF-8'
@@ -198,6 +200,8 @@ jobs:
     parameters:
       image:
         type: string
+      ruby_version: # Used when restoring/saving bundler cache
+        type: string
     docker:
       - image: << parameters.image >>
     steps:
@@ -218,6 +222,8 @@ jobs:
   lint_source_code:
     parameters:
       image:
+        type: string
+      ruby_version: # Used when restoring/saving bundler cache
         type: string
     docker:
       - image: << parameters.image >>
@@ -256,7 +262,7 @@ jobs:
 
 workflows:
   version: 2
-  build:
+  "Run Tests & Checks": # Name of the workflow, which ends up displayed on GitHub's PR Check
     jobs:
       - tests_macos:
           name: 'Execute tests on macOS (Xcode 12.5.1, Ruby 2.6)'
@@ -308,6 +314,7 @@ workflows:
       - tests_ubuntu:
           name: 'Execute tests on Ubuntu'
           image: 'fastlanetools/ci:0.3.0'
+          ruby_version: '2.6'
       - validate_fastlane_swift_generation:
           name: 'Validate Fastlane.swift generation'
           xcode_version: '12.5.1'
@@ -315,9 +322,11 @@ workflows:
       - validate_documentation:
           name: 'Validate Documentation'
           image: 'cimg/ruby:3.2.2'
+          ruby_version: '3.2.2'
       - lint_source_code:
           name: 'Lint source code'
           image: 'cimg/ruby:2.6'
+          ruby_version: '2.6'
       - modules_load_up_tests:
           name: 'Modules load up tests'
           image: 'cimg/ruby:2.6'

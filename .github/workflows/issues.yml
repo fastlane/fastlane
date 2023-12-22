@@ -1,14 +1,16 @@
-name: Processing issues
-on: 
+---
+name: Process issues
+on:
   issues:
-    types: [opened]
+    types:
+      - opened
 
-jobs:   
+jobs:
   fastlane-env:
-    name: fastlane env reminder
-    runs-on: ubuntu-latest    
+    name: Remind user about posting their fastlane env
+    runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@master
-    - uses: fastlane/github-actions/fastlane-env-reminder@latest
-      with:
-        repo-token: "${{ secrets.BOT_GITHUB_TOKEN }}"
+      - uses: actions/checkout@master
+      - uses: fastlane/github-actions/fastlane-env-reminder@latest
+        with:
+          repo-token: '${{ secrets.BOT_GITHUB_TOKEN }}'
