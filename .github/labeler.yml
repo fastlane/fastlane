@@ -1,59 +1,70 @@
 # Configuration file for https://github.com/actions/labeler
 
 "tool: cert":
-  - cert/**/*
-
-"tool: credentials_manager":
-  - credentials_manager/**/*
+  - changed-files:
+    - cert/*
 
 "tool: deliver":
-  - deliver/**/*
+  - changed-files:
+    - deliver/*
 
 "tool: fastlane_core":
-  - fastlane_core/**/*
+  - changed-files:
+    - fastlane_core/*
 
 "tool: frameit":
-  - frameit/**/*
+  - changed-files:
+    - frameit/*
 
 "tool: gym":
-  - gym/**/*
+  - changed-files:
+    - gym/*
 
 "tool: match":
-  - match/**/*
+  - changed-files:
+    - match/*
 
 "tool: pem":
-  - pem/**/*
+  - changed-files:
+    - pem/*
 
 "tool: pilot":
-  - pilot/**/*
+  - changed-files:
+    - pilot/*
 
 "tool: precheck":
-  - precheck/**/*
+  - changed-files:
+    - precheck/*
 
 "tool: produce":
-  - produce/**/*
+  - changed-files:
+    - produce/*
 
 "tool: scan":
-  - scan/**/*
+  - changed-files:
+    - scan/*
 
 "tool: screengrab":
-  - screengrab/**/*
+  - changed-files:
+    - screengrab/*
 
 "tool: sigh":
-  - sigh/**/*
+  - changed-files:
+    - sigh/*
 
 "tool: snapshot":
-  - snapshot/**/*
+  - changed-files:
+    - snapshot/*
 
 "tool: spaceship":
-  - spaceship/**/*
+  - changed-files:
+    - spaceship/*
 
 "tool: supply":
-  - supply/**/*
-
-"tool: trainer":
-  - trainer/**/*
+  - changed-files:
+    - supply/*
 
 "type: ci":
-  - .github/**
-  - .circleci/**
+  - changed-files:
+    - .github/*
+    - .circleci/*
