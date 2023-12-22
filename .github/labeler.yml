@@ -2,69 +2,86 @@
 
 "tool: cert":
   - changed-files:
-    - cert/*
+    - any-glob-to-any-file:
+      - cert/*
 
 "tool: deliver":
   - changed-files:
-    - deliver/*
+      - any-glob-to-any-file:
+          - deliver/*
 
 "tool: fastlane_core":
   - changed-files:
-    - fastlane_core/*
+      - any-glob-to-any-file:
+          - fastlane_core/*
 
 "tool: frameit":
   - changed-files:
-    - frameit/*
+      - any-glob-to-any-file:
+          - frameit/*
 
 "tool: gym":
   - changed-files:
-    - gym/*
+      - any-glob-to-any-file:
+          - gym/*
 
 "tool: match":
   - changed-files:
-    - match/*
+      - any-glob-to-any-file:
+          - match/*
 
 "tool: pem":
   - changed-files:
-    - pem/*
+      - any-glob-to-any-file:
+          - pem/*
 
 "tool: pilot":
   - changed-files:
-    - pilot/*
+      - any-glob-to-any-file:
+          - pilot/*
 
 "tool: precheck":
   - changed-files:
-    - precheck/*
+      - any-glob-to-any-file:
+          - precheck/*
 
 "tool: produce":
   - changed-files:
-    - produce/*
+      - any-glob-to-any-file:
+          - produce/*
 
 "tool: scan":
   - changed-files:
-    - scan/*
+      - any-glob-to-any-file:
+          - scan/*
 
 "tool: screengrab":
   - changed-files:
-    - screengrab/*
+      - any-glob-to-any-file:
+          - screengrab/*
 
 "tool: sigh":
   - changed-files:
-    - sigh/*
+      - any-glob-to-any-file:
+          - sigh/*
 
 "tool: snapshot":
   - changed-files:
-    - snapshot/*
+      - any-glob-to-any-file:
+          - snapshot/*
 
 "tool: spaceship":
   - changed-files:
-    - spaceship/*
+      - any-glob-to-any-file:
+          - spaceship/*
 
 "tool: supply":
   - changed-files:
-    - supply/*
+      - any-glob-to-any-file:
+          - supply/*
 
 "type: ci":
   - changed-files:
-    - .github/*
-    - .circleci/*
+    - any-glob-to-any-file:
+      - .github/*
+      - .circleci/*
