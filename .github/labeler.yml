@@ -7,78 +7,78 @@
 
 "tool: deliver":
   - changed-files:
-      - any-glob-to-any-file:
-          - deliver/*
+    - any-glob-to-any-file:
+      - deliver/*
 
 "tool: fastlane_core":
   - changed-files:
-      - any-glob-to-any-file:
-          - fastlane_core/*
+    - any-glob-to-any-file:
+      - fastlane_core/*
 
 "tool: frameit":
   - changed-files:
-      - any-glob-to-any-file:
-          - frameit/*
+    - any-glob-to-any-file:
+      - frameit/*
 
 "tool: gym":
   - changed-files:
-      - any-glob-to-any-file:
-          - gym/*
+    - any-glob-to-any-file:
+      - gym/*
 
 "tool: match":
   - changed-files:
-      - any-glob-to-any-file:
-          - match/*
+    - any-glob-to-any-file:
+      - match/*
 
 "tool: pem":
   - changed-files:
-      - any-glob-to-any-file:
-          - pem/*
+    - any-glob-to-any-file:
+      - pem/*
 
 "tool: pilot":
   - changed-files:
-      - any-glob-to-any-file:
-          - pilot/*
+    - any-glob-to-any-file:
+      - pilot/*
 
 "tool: precheck":
   - changed-files:
-      - any-glob-to-any-file:
-          - precheck/*
+    - any-glob-to-any-file:
+      - precheck/*
 
 "tool: produce":
   - changed-files:
-      - any-glob-to-any-file:
-          - produce/*
+    - any-glob-to-any-file:
+      - produce/*
 
 "tool: scan":
   - changed-files:
-      - any-glob-to-any-file:
-          - scan/*
+    - any-glob-to-any-file:
+      - scan/*
 
 "tool: screengrab":
   - changed-files:
-      - any-glob-to-any-file:
-          - screengrab/*
+    - any-glob-to-any-file:
+      - screengrab/*
 
 "tool: sigh":
   - changed-files:
-      - any-glob-to-any-file:
-          - sigh/*
+    - any-glob-to-any-file:
+      - sigh/*
 
 "tool: snapshot":
   - changed-files:
-      - any-glob-to-any-file:
-          - snapshot/*
+    - any-glob-to-any-file:
+      - snapshot/*
 
 "tool: spaceship":
   - changed-files:
-      - any-glob-to-any-file:
-          - spaceship/*
+    - any-glob-to-any-file:
+      - spaceship/*
 
 "tool: supply":
   - changed-files:
-      - any-glob-to-any-file:
-          - supply/*
+    - any-glob-to-any-file:
+      - supply/*
 
 "type: ci":
   - changed-files:
