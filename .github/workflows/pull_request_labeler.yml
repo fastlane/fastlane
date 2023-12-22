@@ -1,7 +1,11 @@
 name: "Pull Request Labeler"
 on:
-  - pull_request # Temporary, for testing while PR is still open
-  # - pull_request_target
+  pull_request: # Temporary, for testing while PR is still open
+  # pull_request_target
+    types:
+      - opened
+      - synchronize # Add labels when PR receives new commits, which may modify the files in the PR
+      - reopened
 
 jobs:
   labeler:
