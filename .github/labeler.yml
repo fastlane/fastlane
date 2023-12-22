@@ -53,3 +53,7 @@
 
 "tool: trainer":
   - trainer/**/*
+
+"type: ci":
+  - .github/**
+  - .circleci/**
