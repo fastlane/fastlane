@@ -1,0 +1,55 @@
+# Configuration file for https://github.com/actions/labeler
+
+"tool: cert":
+  - cert/**/*
+
+"tool: credentials_manager":
+  - credentials_manager/**/*
+
+"tool: deliver":
+  - deliver/**/*
+
+"tool: fastlane_core":
+  - fastlane_core/**/*
+
+"tool: frameit":
+  - frameit/**/*
+
+"tool: gym":
+  - gym/**/*
+
+"tool: match":
+  - match/**/*
+
+"tool: pem":
+  - pem/**/*
+
+"tool: pilot":
+  - pilot/**/*
+
+"tool: precheck":
+  - precheck/**/*
+
+"tool: produce":
+  - produce/**/*
+
+"tool: scan":
+  - scan/**/*
+
+"tool: screengrab":
+  - screengrab/**/*
+
+"tool: sigh":
+  - sigh/**/*
+
+"tool: snapshot":
+  - snapshot/**/*
+
+"tool: spaceship":
+  - spaceship/**/*
+
+"tool: supply":
+  - supply/**/*
+
+"tool: trainer":
+  - trainer/**/*
