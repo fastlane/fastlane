@@ -15,4 +15,3 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/labeler@v5
-        with:
