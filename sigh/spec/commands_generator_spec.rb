@@ -95,7 +95,7 @@ describe Sigh::CommandsGenerator do
     end
 
     it "custom keychain can be used" do
-      # Assuming on regular machine 
+      # Assuming on regular machine
       test_file = "key.keychain-db"
       File.write(test_file, "")
 
