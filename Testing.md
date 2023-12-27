@@ -10,7 +10,7 @@ The `Fastfile` included at the top of the fastlane project allows you to run sev
 bundle exec fastlane test
 ```
 
-You can also run those steps independently or on a more fine grained way.
+You can also run those steps independently or on a more fine-grained way.
 
 ### Automated tests
 
