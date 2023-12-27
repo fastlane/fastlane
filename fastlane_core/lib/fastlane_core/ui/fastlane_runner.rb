@@ -34,7 +34,7 @@ module Commander
 
     attr_accessor :collector
 
-    # Temporary work around for issues mentioned in https://github.com/fastlane/fastlane/pull/18760
+    # Temporary workaround for issues mentioned in https://github.com/fastlane/fastlane/pull/18760
     # Code taken from https://github.com/commander-rb/commander/blob/40d06bfbc54906d0de7c72ac73f4e9188c9ca294/lib/commander/runner.rb#L372-L385
     #
     # Problem:
