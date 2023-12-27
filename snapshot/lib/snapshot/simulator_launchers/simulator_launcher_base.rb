@@ -124,7 +124,7 @@ module Snapshot
       Helper.backticks("xcrun simctl bootstatus #{device_udid} -b &> /dev/null")
 
       # "Booted" status is not enough for to adjust the status bar
-      # Simulator could stil be booting with Apple logo
+      # Simulator could still be booting with Apple logo
       # Need to wait "some amount of time" until home screen shows
       boot_sleep = ENV["SNAPSHOT_SIMULATOR_WAIT_FOR_BOOT_TIMEOUT"].to_i || 10
       UI.message("Waiting #{boot_sleep} seconds for device to fully boot before overriding status bar... Set 'SNAPSHOT_SIMULATOR_WAIT_FOR_BOOT_TIMEOUT' environment variable to adjust timeout")
