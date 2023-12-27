@@ -103,7 +103,7 @@ module Spaceship
           # will result in a false failure. The response will return a 503 but the database
           # insert will eventually go through.
           #
-          # When this is observed, we will poll until we find the matchin screenshot that
+          # When this is observed, we will poll until we find the matching screenshot that
           # is awaiting for upload and file size
           #
           # https://github.com/fastlane/fastlane/pull/16842
