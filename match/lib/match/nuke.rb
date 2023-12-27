@@ -34,33 +34,14 @@ module Match
 
       spaceship_login
 
-      self.storage = Storage.for_mode(params[:storage_mode], {
-        git_url: params[:git_url],
-        shallow_clone: params[:shallow_clone],
-        skip_docs: params[:skip_docs],
-        git_branch: params[:git_branch],
-        git_full_name: params[:git_full_name],
-        git_user_email: params[:git_user_email],
-
-        git_private_key: params[:git_private_key],
-        git_basic_authorization: params[:git_basic_authorization],
-        git_bearer_authorization: params[:git_bearer_authorization],
-
-        clone_branch_directly: params[:clone_branch_directly],
-        google_cloud_bucket_name: params[:google_cloud_bucket_name].to_s,
-        google_cloud_keys_file: params[:google_cloud_keys_file].to_s,
-        google_cloud_project_id: params[:google_cloud_project_id].to_s,
-        s3_region: params[:s3_region].to_s,
-        s3_access_key: params[:s3_access_key].to_s,
-        s3_secret_access_key: params[:s3_secret_access_key].to_s,
-        s3_bucket: params[:s3_bucket].to_s,
-        team_id: params[:team_id] || Spaceship::ConnectAPI.client.portal_team_id
-      })
+      self.storage = Storage.from_params(params)
       self.storage.download
 
       # After the download was complete
       self.encryption = Encryption.for_storage_mode(params[:storage_mode], {
         git_url: params[:git_url],
+        s3_bucket: params[:s3_bucket],
+        s3_skip_encryption: params[:s3_skip_encryption],
         working_directory: storage.working_directory
       })
       self.encryption.decrypt_files if self.encryption
@@ -101,6 +82,8 @@ module Match
       else
         UI.success("No relevant certificates or provisioning profiles found, nothing to nuke here :)")
       end
+    ensure
+      self.storage.clear_changes if self.storage
     end
 
     # Be smart about optional values here
@@ -148,9 +131,7 @@ module Match
       # Get all iOS and macOS profile
       self.profiles = []
       prov_types.each do |prov_type|
-        types = profile_types(prov_type)
-        # Filtering on 'profileType' seems to be undocumented as of 2020-07-30
-        # but works on both web session and official API
+        types = Match.profile_types(prov_type)
         self.profiles += Spaceship::ConnectAPI::Profile.all(filter: { profileType: types.join(",") }, includes: "certificates")
       end
 
@@ -401,43 +382,6 @@ module Match
         ]
       else
         raise "Unknown type '#{type}'"
-      end
-    end
-
-    # The kind of provisioning profile we're interested in
-    def profile_types(prov_type)
-      case prov_type.to_sym
-      when :appstore
-        return [
-          Spaceship::ConnectAPI::Profile::ProfileType::IOS_APP_STORE,
-          Spaceship::ConnectAPI::Profile::ProfileType::MAC_APP_STORE,
-          Spaceship::ConnectAPI::Profile::ProfileType::TVOS_APP_STORE,
-          Spaceship::ConnectAPI::Profile::ProfileType::MAC_CATALYST_APP_STORE
-        ]
-      when :development
-        return [
-          Spaceship::ConnectAPI::Profile::ProfileType::IOS_APP_DEVELOPMENT,
-          Spaceship::ConnectAPI::Profile::ProfileType::MAC_APP_DEVELOPMENT,
-          Spaceship::ConnectAPI::Profile::ProfileType::TVOS_APP_DEVELOPMENT,
-          Spaceship::ConnectAPI::Profile::ProfileType::MAC_CATALYST_APP_DEVELOPMENT
-        ]
-      when :enterprise
-        return [
-          Spaceship::ConnectAPI::Profile::ProfileType::IOS_APP_INHOUSE,
-          Spaceship::ConnectAPI::Profile::ProfileType::TVOS_APP_INHOUSE
-        ]
-      when :adhoc
-        return [
-          Spaceship::ConnectAPI::Profile::ProfileType::IOS_APP_ADHOC,
-          Spaceship::ConnectAPI::Profile::ProfileType::TVOS_APP_ADHOC
-        ]
-      when :developer_id
-        return [
-          Spaceship::ConnectAPI::Profile::ProfileType::MAC_APP_DIRECT,
-          Spaceship::ConnectAPI::Profile::ProfileType::MAC_CATALYST_APP_DIRECT
-        ]
-      else
-        raise "Unknown provisioning type '#{prov_type}'"
       end
     end
 

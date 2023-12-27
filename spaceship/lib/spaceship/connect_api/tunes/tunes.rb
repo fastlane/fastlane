@@ -134,7 +134,15 @@ module Spaceship
           tunes_request_client.post("apps", body)
         end
 
-        def patch_app(app_id: nil, attributes: {}, app_price_tier_id: nil, territory_ids: nil)
+        # Updates app attributes, price tier, visibility in regions or countries.
+        # Use territory_ids with allow_removing_from_sale to remove app from sale
+        # @param territory_ids updates app visibility in regions or countries.
+        #   Possible values:
+        #   empty array will remove app from sale if allow_removing_from_sale is true,
+        #   array with territory ids will set availability to territories with those ids,
+        #   nil will leave app availability on AppStore as is
+        # @param allow_removing_from_sale allows for removing app from sale when territory_ids is an empty array
+        def patch_app(app_id: nil, attributes: {}, app_price_tier_id: nil, territory_ids: nil, allow_removing_from_sale: false)
           relationships = {}
           included = []
 
@@ -152,9 +160,6 @@ module Spaceship
             included << {
               type: "appPrices",
               id: "${price1}",
-              attributes: {
-                startDate: nil
-              },
               relationships: {
                 app: {
                   data: {
@@ -173,13 +178,15 @@ module Spaceship
           end
 
           # Territories
-          territories_data = (territory_ids || []).map do |id|
-            { type: "territories", id: id }
-          end
-          unless territories_data.empty?
-            relationships[:availableTerritories] = {
-              data: territories_data
-            }
+          unless territory_ids.nil?
+            territories_data = territory_ids.map do |id|
+              { type: "territories", id: id }
+            end
+            if !territories_data.empty? || allow_removing_from_sale
+              relationships[:availableTerritories] = {
+                data: territories_data
+              }
+            end
           end
 
           # Data
@@ -1241,6 +1248,29 @@ module Spaceship
         def get_territories(filter: {}, includes: nil, limit: nil, sort: nil)
           params = tunes_request_client.build_params(filter: nil, includes: nil, limit: nil, sort: nil)
           tunes_request_client.get("territories", params)
+        end
+
+        #
+        # resolutionCenter
+        #
+        # As of 2022-11-11:
+        # This is not official available throught the App Store Connect API using an API Key.
+        # This is only works with Apple ID auth.
+        #
+
+        def get_resolution_center_threads(filter: {}, includes: nil)
+          params = tunes_request_client.build_params(filter: filter, includes: includes)
+          tunes_request_client.get('resolutionCenterThreads', params)
+        end
+
+        def get_resolution_center_messages(thread_id:, filter: {}, includes: nil)
+          params = tunes_request_client.build_params(filter: filter, includes: includes)
+          tunes_request_client.get("resolutionCenterThreads/#{thread_id}/resolutionCenterMessages", params)
+        end
+
+        def get_review_rejection(filter: {}, includes: nil)
+          params = tunes_request_client.build_params(filter: filter, includes: includes)
+          tunes_request_client.get("reviewRejections", params)
         end
       end
     end

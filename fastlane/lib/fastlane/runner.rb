@@ -15,7 +15,7 @@ module Fastlane
 
     # This will take care of executing **one** lane. That's when the user triggers a lane from the CLI for example
     # This method is **not** executed when switching a lane
-    # @param lane_name The name of the lane to execute
+    # @param lane The name of the lane to execute
     # @param platform The name of the platform to execute
     # @param parameters [Hash] The parameters passed from the command line to the lane
     def execute(lane, platform = nil, parameters = nil)

@@ -78,6 +78,7 @@ module Fastlane
         tool_name = ARGV.first ? ARGV.first.downcase : nil
 
         tool_name = process_emojis(tool_name)
+        tool_name = map_aliased_tools(tool_name)
 
         if tool_name && Fastlane::TOOLS.include?(tool_name.to_sym) && !available_lanes.include?(tool_name.to_sym)
           # Triggering a specific tool
@@ -123,6 +124,10 @@ module Fastlane
         end
       ensure
         FastlaneCore::UpdateChecker.show_update_status('fastlane', Fastlane::VERSION)
+      end
+
+      def map_aliased_tools(tool_name)
+        Fastlane::TOOL_ALIASES[tool_name&.to_sym] || tool_name
       end
 
       # Since loading dotenv should respect additional environments passed using

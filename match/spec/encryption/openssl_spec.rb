@@ -25,6 +25,7 @@ describe Match do
     end
 
     it "raises an exception if invalid password is passed" do
+      stub_const('ENV', { "MATCH_PASSWORD" => '2"QAHg@v(Qp{=*n^' })
       @e.encrypt_files
       expect(File.read(@full_path)).to_not(eq(@content))
 

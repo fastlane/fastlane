@@ -1,6 +1,6 @@
 describe Spaceship::Tunes::AppRatings do
   before { Spaceship::Tunes.login }
-  let(:app) { Spaceship::Application.all.first }
+  let(:app) { Spaceship::Application.all.find { |a| a.apple_id == "898536088" } }
   let(:client) { Spaceship::Application.client }
 
   describe "successfully loads rating summary" do

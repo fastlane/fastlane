@@ -99,6 +99,46 @@ describe Fastlane do
           end
         end
       end
+
+      describe "check_verify" do
+        let(:p7) { double('p7') }
+
+        context 'pass' do
+          it 'has data and nil error_string' do
+            allow(p7).to receive(:data).and_return("data")
+            allow(p7).to receive(:error_string).and_return(nil)
+
+            Fastlane::Actions::UpdateProjectProvisioningAction.check_verify!(p7)
+          end
+
+          it 'has data and empty error_string' do
+            allow(p7).to receive(:data).and_return("data")
+            allow(p7).to receive(:error_string).and_return("")
+
+            Fastlane::Actions::UpdateProjectProvisioningAction.check_verify!(p7)
+          end
+        end
+
+        context 'fail' do
+          it 'has no data' do
+            allow(p7).to receive(:data).and_return(nil)
+            allow(p7).to receive(:error_string).and_return("Some error")
+
+            expect do
+              Fastlane::Actions::UpdateProjectProvisioningAction.check_verify!(p7)
+            end.to raise_error(FastlaneCore::Interface::FastlaneCrash)
+          end
+
+          it 'has empty data' do
+            allow(p7).to receive(:data).and_return("")
+            allow(p7).to receive(:error_string).and_return("Some error")
+
+            expect do
+              Fastlane::Actions::UpdateProjectProvisioningAction.check_verify!(p7)
+            end.to raise_error(FastlaneCore::Interface::FastlaneCrash)
+          end
+        end
+      end
     end
   end
 end

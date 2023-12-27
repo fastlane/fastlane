@@ -59,10 +59,18 @@ module Match
         self.clone_branch_directly = clone_branch_directly
         self.git_basic_authorization = git_basic_authorization
         self.git_bearer_authorization = git_bearer_authorization
-        self.git_private_key = git_private_key
+        self.git_private_key = convert_private_key_path_to_absolute(git_private_key)
 
         self.type = type if type
         self.platform = platform if platform
+      end
+
+      def convert_private_key_path_to_absolute(git_private_key)
+        if !git_private_key.nil? && File.file?(File.expand_path(git_private_key))
+          File.expand_path(git_private_key).shellescape.to_s
+        else
+          git_private_key
+        end
       end
 
       def prefixed_working_directory
@@ -84,9 +92,14 @@ module Match
         command << " -c http.extraheader='Authorization: Bearer #{self.git_bearer_authorization}'" unless self.git_bearer_authorization.nil?
 
         if self.shallow_clone
-          command << " --depth 1 --no-single-branch"
-        elsif self.clone_branch_directly
+          command << " --depth 1"
+        end
+
+        if self.clone_branch_directly
           command += " -b #{self.branch.shellescape} --single-branch"
+        elsif self.shallow_clone
+          # shallow clone all branches if not cloning branch directly
+          command += " --no-single-branch"
         end
 
         command = command_from_private_key(command) unless self.git_private_key.nil?

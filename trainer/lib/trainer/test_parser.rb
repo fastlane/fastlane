@@ -136,7 +136,7 @@ module Trainer
 
     # @return [Bool] were all tests successful? Is false if at least one test failed
     def tests_successful?
-      self.data.collect { |a| a[:number_of_failures] }.all?(&:zero?)
+      self.data.collect { |a| a[:number_of_failures_excluding_retries] }.all?(&:zero?)
     end
 
     private

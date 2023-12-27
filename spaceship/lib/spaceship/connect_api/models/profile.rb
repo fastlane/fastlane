@@ -1,4 +1,5 @@
-require_relative '../model'
+require_relative '../../connect_api'
+
 module Spaceship
   class ConnectAPI
     class Profile
@@ -15,6 +16,7 @@ module Spaceship
 
       attr_accessor :bundle_id
       attr_accessor :certificates
+      attr_accessor :devices
 
       attr_mapping({
         "name" => "name",
@@ -51,6 +53,10 @@ module Spaceship
         MAC_CATALYST_APP_DEVELOPMENT = "MAC_CATALYST_APP_DEVELOPMENT"
         MAC_CATALYST_APP_STORE = "MAC_CATALYST_APP_STORE"
         MAC_CATALYST_APP_DIRECT = "MAC_CATALYST_APP_DIRECT"
+
+        # As of 2022-06-25, only available with Apple ID auth
+        MAC_APP_INHOUSE = "MAC_APP_INHOUSE"
+        MAC_CATALYST_APP_INHOUSE = "MAC_CATALYST_APP_INHOUSE"
       end
 
       def self.type
@@ -65,9 +71,9 @@ module Spaceship
       # API
       #
 
-      def self.all(client: nil, filter: {}, includes: nil, limit: nil, sort: nil)
+      def self.all(client: nil, filter: {}, includes: nil, fields: nil, limit: Spaceship::ConnectAPI::MAX_OBJECTS_PER_PAGE_LIMIT, sort: nil)
         client ||= Spaceship::ConnectAPI
-        resps = client.get_profiles(filter: filter, includes: includes).all_pages
+        resps = client.get_profiles(filter: filter, includes: includes, fields: fields, limit: limit, sort: sort).all_pages
         return resps.flat_map(&:to_models)
       end
 

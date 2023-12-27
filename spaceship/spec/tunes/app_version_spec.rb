@@ -2,7 +2,7 @@ describe Spaceship::AppVersion, all: true do
   before { Spaceship::Tunes.login }
 
   let(:client) { Spaceship::AppVersion.client }
-  let(:app) { Spaceship::Application.all.first }
+  let(:app) { Spaceship::Application.all.find { |a| a.apple_id == "898536088" } }
 
   describe "successfully loads and parses the app version" do
     it "inspect works" do
@@ -243,7 +243,7 @@ describe Spaceship::AppVersion, all: true do
   end
 
   describe "Modifying the app version" do
-    let(:version) { Spaceship::Application.all.first.edit_version }
+    let(:version) { app.edit_version }
 
     it "doesn't allow modification of localized properties without the language" do
       begin
@@ -725,7 +725,7 @@ describe Spaceship::AppVersion, all: true do
   end
 
   describe "Modifying the app live version" do
-    let(:version) { Spaceship::Application.all.first.live_version }
+    let(:version) { app.live_version }
 
     describe "Generate promo codes", focus: true do
       it "fetches remaining promocodes" do
@@ -751,7 +751,6 @@ describe Spaceship::AppVersion, all: true do
   describe "Validate attachment file" do
     before { Spaceship::Tunes.login }
     let(:client) { Spaceship::AppVersion.client }
-    let(:app) { Spaceship::Application.all.first }
     describe "successfully loads and parses the app version and attachment" do
       it "contains the right information" do
         TunesStubbing.itc_stub_app_attachment

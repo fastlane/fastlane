@@ -18,6 +18,7 @@ require_relative 'tunes/errors'
 require_relative 'globals'
 require_relative 'provider'
 require_relative 'stats_middleware'
+require_relative 'hashcash'
 
 Faraday::Utils.default_params_encoder = Faraday::FlatParamsEncoder
 
@@ -70,10 +71,10 @@ module Spaceship
 
     # @return (Array) A list of all available teams
     def teams
-      user_details_data['associatedAccounts'].sort_by do |team|
+      user_details_data['availableProviders'].sort_by do |team|
         [
-          team['contentProvider']['name'],
-          team['contentProvider']['contentProviderId']
+          team['name'],
+          team['providerId']
         ]
       end
     end
@@ -124,8 +125,8 @@ module Spaceship
     #  "userName"=>"detlef@krausefx.com"}
     def user_details_data
       return @_cached_user_details if @_cached_user_details
-      r = request(:get, '/WebObjects/iTunesConnect.woa/ra/user/detail')
-      @_cached_user_details = parse_response(r, 'data')
+      r = request(:get, "https://appstoreconnect.apple.com/olympus/v1/session")
+      @_cached_user_details = parse_response(r)
     end
 
     # @return (String) The currently selected Team ID
@@ -135,7 +136,7 @@ module Spaceship
       if teams.count > 1
         puts("The current user is in #{teams.count} teams. Pass a team ID or call `select_team` to choose a team. Using the first one for now.")
       end
-      @current_team_id ||= user_details_data['sessionToken']['contentProviderId']
+      @current_team_id ||= user_details_data['provider']['providerId']
     end
 
     # Set a new team ID which will be used from now on
@@ -144,12 +145,11 @@ module Spaceship
       # following confusing error message
       #
       #     invalid content provider id
-      #
       available_teams = teams.collect do |team|
         {
-          team_id: (team["contentProvider"] || {})["contentProviderId"],
-          public_team_id: (team["contentProvider"] || {})["contentProviderPublicId"],
-          team_name: (team["contentProvider"] || {})["name"]
+          team_id: team["providerId"],
+          public_team_id: team["publicProviderId"],
+          team_name: team["name"]
         }
       end
 
@@ -163,21 +163,10 @@ module Spaceship
       end
 
       response = request(:post) do |req|
-        req.url("https://appstoreconnect.apple.com/olympus/v1/providerSwitchRequests")
-        req.body = {
-          "data": {
-            "type": "providerSwitchRequests",
-            "relationships": {
-              "provider": {
-                "data": {
-                  "type": "providers",
-                  "id": result[:public_team_id]
-                }
-              }
-            }
-          }
-        }.to_json
+        req.url("https://appstoreconnect.apple.com/olympus/v1/session")
+        req.body = { "provider": { "providerId": result[:team_id] } }.to_json
         req.headers['Content-Type'] = 'application/json'
+        req.headers['X-Requested-With'] = 'olympus-ui'
       end
 
       handle_itc_response(response.body)
@@ -502,6 +491,12 @@ module Spaceship
           modified_cookie.gsub!(unescaped_important_cookie, escaped_important_cookie)
         end
 
+        # Fixes issue https://github.com/fastlane/fastlane/issues/21071
+        # On 2023-02-23, Apple added a custom implementation
+        # of hashcash to their auth flow
+        # hashcash = nil
+        hashcash = self.fetch_hashcash
+
         response = request(:post) do |req|
           req.url("https://idmsa.apple.com/appleauth/auth/signin")
           req.body = data.to_json
@@ -510,6 +505,7 @@ module Spaceship
           req.headers['X-Apple-Widget-Key'] = self.itc_service_key
           req.headers['Accept'] = 'application/json, text/javascript'
           req.headers["Cookie"] = modified_cookie if modified_cookie
+          req.headers["X-Apple-HC"] = hashcash if hashcash
         end
       rescue UnauthorizedAccessError
         raise InvalidUserCredentialsError.new, "Invalid username and password combination. Used '#{user}' as the username."
@@ -537,7 +533,6 @@ module Spaceship
 
           if try_upgrade_2fa_later(response)
             store_cookie
-            fetch_olympus_session
             return true
           end
 
@@ -556,6 +551,21 @@ module Spaceship
       end
     end
     # rubocop:enable Metrics/PerceivedComplexity
+
+    def fetch_hashcash
+      response = request(:get, "https://idmsa.apple.com/appleauth/auth/signin?widgetKey=#{self.itc_service_key}")
+      headers = response.headers
+
+      bits = headers["X-Apple-HC-Bits"]
+      challenge = headers["X-Apple-HC-Challenge"]
+
+      if bits.nil? || challenge.nil?
+        puts("Unable to find 'X-Apple-HC-Bits' and 'X-Apple-HC-Challenge' to make hashcash")
+        return nil
+      end
+
+      return Spaceship::Hashcash.make(bits: bits, challenge: challenge)
+    end
 
     # Get the `itctx` from the new (22nd May 2017) API endpoint "olympus"
     # Update (29th March 2019) olympus migrates to new appstoreconnect API

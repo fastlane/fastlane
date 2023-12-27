@@ -47,6 +47,10 @@ module Frameit
     PURPLE ||= "Purple"
     GRAPHITE ||= "Graphite"
     PACIFIC_BLUE ||= "Pacific Blue"
+    MIDNIGHT ||= "Midnight"
+    STARLIGHT ||= "Starlight"
+    SIERRA ||= "Sierra"
+    SORTA_SAGE ||= "Sorta Sage"
 
     def self.all_colors
       Color.constants.map { |c| Color.const_get(c).upcase.gsub(' ', '_') }
@@ -82,6 +86,7 @@ module Frameit
     # Google Pixel 4's priority should be higher than Samsung Galaxy S10+ (priority 8):
     GOOGLE_PIXEL_4 ||= Frameit::Device.new("google-pixel-4", "Google Pixel 4", 9, [[1080, 2280], [2280, 1080]], 444, Color::JUST_BLACK, Platform::ANDROID)
     GOOGLE_PIXEL_4_XL ||= Frameit::Device.new("google-pixel-4-xl", "Google Pixel 4 XL", 9, [[1440, 3040], [3040, 1440]], 537, Color::JUST_BLACK, Platform::ANDROID)
+    GOOGLE_PIXEL_5 ||= Frameit::Device.new("google-pixel-5", "Google Pixel 5", 10, [[1080, 2340], [2340, 1080]], 432, Color::JUST_BLACK, Platform::ANDROID)
     HTC_ONE_A9 ||= Frameit::Device.new("htc-one-a9", "HTC One A9", 6, [[1080, 1920], [1920, 1080]], 441, Color::BLACK, Platform::ANDROID)
     HTC_ONE_M8 ||= Frameit::Device.new("htc-one-m8", "HTC One M8", 3, [[1080, 1920], [1920, 1080]], 441, Color::BLACK, Platform::ANDROID)
     HUAWEI_P8 ||= Frameit::Device.new("huawei-p8", "Huawei P8", 5, [[1080, 1920], [1920, 1080]], 424, Color::BLACK, Platform::ANDROID)
@@ -115,7 +120,7 @@ module Frameit
     IPHONE_8_PLUS ||= Frameit::Device.new("iphone-8-plus", "Apple iPhone 8 Plus", 6, [[1242, 2208], [2208, 1242]], 401, Color::SPACE_GRAY)
     IPHONE_X ||= Frameit::Device.new("iphone-X", "Apple iPhone X", 7, [[1125, 2436], [2436, 1125]], 458, Color::SPACE_GRAY, Platform::IOS, Deliver::AppScreenshot::ScreenSize::IOS_58, :use_legacy_iphonex)
     IPHONE_XS ||= Frameit::Device.new("iphone-XS", "Apple iPhone XS", 8, [[1125, 2436], [2436, 1125]], 458, Color::SPACE_GRAY, Platform::IOS, Deliver::AppScreenshot::ScreenSize::IOS_58, :use_legacy_iphonexs)
-    IPHONE_XR ||= Frameit::Device.new("iphone-XR", "Apple iPhone XR", 8, [[828, 1792], [1792, 828]], 326, Color::SPACE_GRAY, Platform::IOS, Deliver::AppScreenshot::ScreenSize::IOS_61, :use_legacy_iphonexr)
+    IPHONE_XR ||= Frameit::Device.new("iphone-XR", "Apple iPhone XR", 8, [[828, 1792], [1792, 828]], 326, Color::SPACE_GRAY, Platform::IOS, Deliver::AppScreenshot::ScreenSize::IOS_65, :use_legacy_iphonexsmax)
     IPHONE_XS_MAX ||= Frameit::Device.new("iphone-XS-Max", "Apple iPhone XS Max", 8, [[1242, 2688], [2688, 1242]], 458, Color::SPACE_GRAY, Platform::IOS, Deliver::AppScreenshot::ScreenSize::IOS_65, :use_legacy_iphonexsmax)
     IPHONE_11 ||= Frameit::Device.new("iphone-11", "Apple iPhone 11", 9, [[828, 1792], [1792, 828]], 326, Color::BLACK, Platform::IOS)
     IPHONE_11_PRO ||= Frameit::Device.new("iphone-11-pro", "Apple iPhone 11 Pro", 9, [[1125, 2436], [2436, 1125]], 458, Color::SPACE_GRAY, Platform::IOS)
@@ -124,6 +129,10 @@ module Frameit
     IPHONE_12_PRO ||= Frameit::Device.new("iphone-12-pro", "Apple iPhone 12 Pro", 10, [[1170, 2532], [2532, 1170]], 460, Color::SPACE_GRAY, Platform::IOS)
     IPHONE_12_PRO_MAX ||= Frameit::Device.new("iphone12-pro-max", "Apple iPhone 12 Pro Max", 10, [[1284, 2778], [2778, 1284]], 458, Color::GRAPHITE, Platform::IOS)
     IPHONE_12_MINI ||= Frameit::Device.new("iphone-12-mini", "Apple iPhone 12 Mini", 10, [[1125, 2436], [2436, 1125]], 476, Color::BLACK, Platform::IOS)
+    IPHONE_13 ||= Frameit::Device.new("iphone-13", "Apple iPhone 13", 11, [[1170, 2532], [2532, 1170]], 460, Color::MIDNIGHT, Platform::IOS)
+    IPHONE_13_PRO ||= Frameit::Device.new("iphone-13-pro", "Apple iPhone 13 Pro", 11, [[1170, 2532], [2532, 1170]], 460, Color::GRAPHITE, Platform::IOS)
+    IPHONE_13_PRO_MAX ||= Frameit::Device.new("iphone13-pro-max", "Apple iPhone 13 Pro Max", 11, [[1284, 2778], [2778, 1284]], 458, Color::GRAPHITE, Platform::IOS)
+    IPHONE_13_MINI ||= Frameit::Device.new("iphone-13-mini", "Apple iPhone 13 Mini", 11, [[1080, 2340], [2340, 1080]], 476, Color::MIDNIGHT, Platform::IOS)
     IPAD_10_2 ||= Frameit::Device.new("ipad-10-2", "Apple iPad 10.2", 1, [[1620, 2160], [2160, 1620]], 264, Color::SPACE_GRAY, Platform::IOS)
     IPAD_AIR_2 ||= Frameit::Device.new("ipad-air-2", "Apple iPad Air 2", 1, [[1536, 2048], [2048, 1536]], 264, Color::SPACE_GRAY, Platform::IOS, Deliver::AppScreenshot::ScreenSize::IOS_IPAD)
     IPAD_AIR_2019 ||= Frameit::Device.new("ipad-air-2019", "Apple iPad Air (2019)", 2, [[1668, 2224], [2224, 1668]], 265, Color::SPACE_GRAY, Platform::IOS)

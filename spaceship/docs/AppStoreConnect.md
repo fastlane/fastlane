@@ -438,7 +438,7 @@ bundle_id = Spaceship::ConnectAPI::BundleId.find("com.krausefx.app")
 capabilities = bundle_id.get_capabilities
 
 # Create a new capability for bundle identifier
-bundle_id.create_capability(capability_type: Spaceship::ConnectAPI::BundleIdCapability::Type::MAPS)
+bundle_id.create_capability(Spaceship::ConnectAPI::BundleIdCapability::Type::MAPS)
 
 # Create a new capability with known bundle identifier id
 bundle_id_capability = Spaceship::ConnectAPI::BundleIdCapability.create(bundle_id_id: "123456789",

@@ -1,5 +1,5 @@
 // SocketClientDelegateProtocol.swift
-// Copyright (c) 2022 FastlaneTools
+// Copyright (c) 2023 FastlaneTools
 
 //
 //  ** NOTE **

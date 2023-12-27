@@ -560,6 +560,44 @@ describe Fastlane do
       end
     end
 
+    describe 'overriding xcodebuild architecture' do
+      it 'does not override the architecture if the option is not present' do
+        result = Fastlane::FastFile.new.parse("lane :build do
+          xcodebuild(
+            scheme: 'MyApp',
+            workspace: 'MyApp.xcworkspace',
+          )
+        end").runner.execute(:build)
+
+        expect(result).to eq(
+          "set -o pipefail && " \
+          + "xcodebuild " \
+          + "-scheme \"MyApp\" " \
+          + "-workspace \"MyApp.xcworkspace\" " \
+          + "| tee '#{build_log_path}' | xcpretty --color --simple"
+        )
+      end
+
+      it 'overrides the architecture with what is specified if the option is present' do
+        result = Fastlane::FastFile.new.parse("lane :build do
+          xcodebuild(
+            scheme: 'MyApp',
+            workspace: 'MyApp.xcworkspace',
+            xcodebuild_architecture: 'x86_64'
+          )
+        end").runner.execute(:build)
+
+        expect(result).to eq(
+          "set -o pipefail && " \
+          + "arch -x86_64 " \
+          + "xcodebuild " \
+          + "-scheme \"MyApp\" " \
+          + "-workspace \"MyApp.xcworkspace\" " \
+          + "| tee '#{build_log_path}' | xcpretty --color --simple"
+        )
+      end
+    end
+
     describe "test code coverage" do
       it "code coverage is enabled" do
         result = Fastlane::FastFile.new.parse("lane :test do

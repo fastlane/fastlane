@@ -34,11 +34,13 @@ describe Sigh do
         },
         "macos" => {
           Spaceship::ConnectAPI::Profile::ProfileType::MAC_APP_STORE => { in_house: false, options: { platform: "macos" } },
+          Spaceship::ConnectAPI::Profile::ProfileType::MAC_APP_INHOUSE => { in_house: true, options: { platform: "macos" } },
           Spaceship::ConnectAPI::Profile::ProfileType::MAC_APP_DEVELOPMENT => { in_house: false, options: { platform: "macos", development: true } },
           Spaceship::ConnectAPI::Profile::ProfileType::MAC_APP_DIRECT => { in_house: false, options: { platform: "macos", developer_id: true } }
         },
         "catalyst" => {
           Spaceship::ConnectAPI::Profile::ProfileType::MAC_CATALYST_APP_STORE => { in_house: false, options: { platform: "catalyst" } },
+          Spaceship::ConnectAPI::Profile::ProfileType::MAC_CATALYST_APP_INHOUSE => { in_house: true, options: { platform: "catalyst" } },
           Spaceship::ConnectAPI::Profile::ProfileType::MAC_CATALYST_APP_DEVELOPMENT => { in_house: false, options: { platform: "catalyst", development: true } },
           Spaceship::ConnectAPI::Profile::ProfileType::MAC_CATALYST_APP_DIRECT => { in_house: false, options: { platform: "catalyst", developer_id: true } }
         }
@@ -123,7 +125,7 @@ describe Sigh do
         options = {}
         Sigh.config = FastlaneCore::Configuration.create(Sigh::Options.available_options, options)
 
-        expect(Spaceship::ConnectAPI::Device).not_to(receive(:all))
+        expect(Spaceship::ConnectAPI::Device).not_to(receive(:devices_for_platform))
 
         devices = fake_runner.devices_to_use
         expect(devices.size).to eq(0)
@@ -133,7 +135,7 @@ describe Sigh do
         options = { developer_id: true }
         Sigh.config = FastlaneCore::Configuration.create(Sigh::Options.available_options, options)
 
-        expect(Spaceship::ConnectAPI::Device).not_to(receive(:all))
+        expect(Spaceship::ConnectAPI::Device).not_to(receive(:devices_for_platform))
 
         devices = fake_runner.devices_to_use
         expect(devices.size).to eq(0)
@@ -143,17 +145,27 @@ describe Sigh do
         options = { development: true }
         Sigh.config = FastlaneCore::Configuration.create(Sigh::Options.available_options, options)
 
-        expect(Spaceship::ConnectAPI::Device).to receive(:all).and_return(["device"])
+        expect(Spaceship::ConnectAPI::Device).to receive(:devices_for_platform).and_return(["device"])
 
         devices = fake_runner.devices_to_use
         expect(devices.size).to eq(1)
+      end
+
+      it "devices for development with apple silicon" do
+        options = { development: true, include_mac_in_profiles: true }
+        Sigh.config = FastlaneCore::Configuration.create(Sigh::Options.available_options, options)
+
+        expect(Spaceship::ConnectAPI::Device).to receive(:devices_for_platform).and_return(["ios_device", "as_device"])
+
+        devices = fake_runner.devices_to_use
+        expect(devices.size).to eq(2)
       end
 
       it "devices for adhoc" do
         options = { adhoc: true }
         Sigh.config = FastlaneCore::Configuration.create(Sigh::Options.available_options, options)
 
-        expect(Spaceship::ConnectAPI::Device).to receive(:all).and_return(["device"])
+        expect(Spaceship::ConnectAPI::Device).to receive(:devices_for_platform).and_return(["device"])
 
         devices = fake_runner.devices_to_use
         expect(devices.size).to eq(1)
@@ -193,9 +205,11 @@ describe Sigh do
         Spaceship::ConnectAPI::Profile::ProfileType::MAC_APP_STORE => "AppStore",
         Spaceship::ConnectAPI::Profile::ProfileType::MAC_APP_DEVELOPMENT => "Development",
         Spaceship::ConnectAPI::Profile::ProfileType::MAC_APP_DIRECT => "Direct",
+        Spaceship::ConnectAPI::Profile::ProfileType::MAC_APP_INHOUSE => "InHouse",
         Spaceship::ConnectAPI::Profile::ProfileType::MAC_CATALYST_APP_STORE => "AppStore",
         Spaceship::ConnectAPI::Profile::ProfileType::MAC_CATALYST_APP_DEVELOPMENT => "Development",
-        Spaceship::ConnectAPI::Profile::ProfileType::MAC_CATALYST_APP_DIRECT => "Direct"
+        Spaceship::ConnectAPI::Profile::ProfileType::MAC_CATALYST_APP_DIRECT => "Direct",
+        Spaceship::ConnectAPI::Profile::ProfileType::MAC_CATALYST_APP_INHOUSE => "InHouse"
       }
 
       # Creates test for each profile type

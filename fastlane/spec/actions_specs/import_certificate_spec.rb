@@ -11,7 +11,7 @@ describe Fastlane do
         password = 'testpassword'
 
         keychain_path = File.expand_path(File.join('~', 'Library', 'Keychains', keychain))
-        expected_command = "security import #{cert_name} -k '#{keychain_path}' -P #{password} -T /usr/bin/codesign -T /usr/bin/security -T /usr/bin/productbuild 1> /dev/null"
+        expected_command = "security import #{cert_name} -k '#{keychain_path}' -P #{password} -T /usr/bin/codesign -T /usr/bin/security -T /usr/bin/productbuild -T /usr/bin/productsign 1> /dev/null"
 
         # this command is also sent on macOS Sierra and we need to allow it or else the test will fail
         allowed_command = "security set-key-partition-list -S apple-tool:,apple: -s -k #{''.shellescape} #{keychain_path.shellescape} 1> /dev/null"
@@ -38,7 +38,7 @@ describe Fastlane do
         password = '\"test pa$$word\"'
 
         keychain_path = File.expand_path(File.join('~', 'Library', 'Keychains', keychain))
-        expected_security_import_command = "security import #{cert_name.shellescape} -k '#{keychain_path.shellescape}' -P #{password.shellescape} -T /usr/bin/codesign -T /usr/bin/security -T /usr/bin/productbuild 1> /dev/null"
+        expected_security_import_command = "security import #{cert_name.shellescape} -k '#{keychain_path.shellescape}' -P #{password.shellescape} -T /usr/bin/codesign -T /usr/bin/security -T /usr/bin/productbuild -T /usr/bin/productsign 1> /dev/null"
 
         # this command is also sent on macOS Sierra and we need to allow it or else the test will fail
         expected_set_key_partition_list_command = "security set-key-partition-list -S apple-tool:,apple: -s -k #{password.shellescape} #{keychain_path.shellescape} 1> /dev/null"
@@ -66,7 +66,7 @@ describe Fastlane do
         password = 'testpassword'
 
         keychain_path = File.expand_path(File.join('~', 'Library', 'Keychains', keychain))
-        expected_command = "security import #{cert_name} -k '#{keychain_path}' -P #{password} -T /usr/bin/codesign -T /usr/bin/security -T /usr/bin/productbuild"
+        expected_command = "security import #{cert_name} -k '#{keychain_path}' -P #{password} -T /usr/bin/codesign -T /usr/bin/security -T /usr/bin/productbuild -T /usr/bin/productsign"
 
         # this command is also sent on macOS Sierra and we need to allow it or else the test will fail
         allowed_command = "security set-key-partition-list -S apple-tool:,apple: -s -k #{''.shellescape} #{keychain_path.shellescape} 1> /dev/null"

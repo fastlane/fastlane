@@ -315,6 +315,11 @@ module Scan
                                      env_name: "SCAN_OUTPUT_XCTESTRUN",
                                      description: "Should provide additional copy of .xctestrun file (settings.xctestrun) and place in output path?",
                                      default_value: false),
+        FastlaneCore::ConfigItem.new(key: :result_bundle_path,
+                                     env_name: "SCAN_RESULT_BUNDLE_PATH",
+                                     description: "Custom path for the result bundle, overrides result_bundle",
+                                     type: String,
+                                     optional: true),
         FastlaneCore::ConfigItem.new(key: :result_bundle,
                                      short_option: "-z",
                                      env_name: "SCAN_RESULT_BUNDLE",
@@ -475,6 +480,11 @@ module Scan
                                      description: "Use only if you're a pro, use the other options instead",
                                      is_string: false,
                                      optional: true),
+        FastlaneCore::ConfigItem.new(key: :run_rosetta_simulator,
+                                     env_name: "SCAN_RUN_ROSETTA_SIMULATOR",
+                                     description: "Adds arch=x86_64 to the xcodebuild 'destination' argument to run simulator in a Rosetta mode",
+                                     type: Boolean,
+                                     default_value: false),
         FastlaneCore::ConfigItem.new(key: :catalyst_platform,
                                      env_name: "SCAN_CATALYST_PLATFORM",
                                      description: "Platform to build when using a Catalyst enabled app. Valid values are: ios, macos",
@@ -522,7 +532,12 @@ module Scan
                                     env_name: 'SCAN_NUMBER_OF_RETRIES',
                                     description: "The number of times a test can fail",
                                     type: Integer,
-                                    default_value: 0)
+                                    default_value: 0),
+        FastlaneCore::ConfigItem.new(key: :fail_build,
+                                    env_name: "SCAN_FAIL_BUILD",
+                                    description: "Should this step stop the build if the tests fail? Set this to false if you're using trainer",
+                                    type: Boolean,
+                                    default_value: true)
 
       ]
     end
