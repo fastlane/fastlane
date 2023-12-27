@@ -163,7 +163,7 @@ module Fastlane
         group_name = group.name.downcase
         manifest_group_filenames = inverted_hash[group_name]
 
-        # compare the current group files to what the manifest says should minially be there
+        # compare the current group files to what the manifest says should minimally be there
         manifest_group_filenames.each do |filename|
           # current group is missing a file from the manifest, need to add it
           next if existing_group_files_set.include?(filename)
