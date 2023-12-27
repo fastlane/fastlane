@@ -6231,7 +6231,7 @@ public func importCertificate(certificatePath: String,
  Installs an .ipa file on a connected iOS-device via usb or wifi
 
  - parameters:
-   - extra: Extra Command-line arguments passed to ios-deploy
+   - extra: Extra Commandline arguments passed to ios-deploy
    - deviceId: id of the device / if not set defaults to first found device
    - skipWifi: Do not search for devices via WiFi
    - ipa: The IPA file to put on the device
@@ -8649,7 +8649,7 @@ public func resign(ipa: String,
 }
 
 /**
- This action restore your file that was backed up with the `backup_file` action
+ This action restore your file that was backuped with the `backup_file` action
 
  - parameter path: Original file name you want to restore
  */
@@ -13470,7 +13470,7 @@ public func xcodebuild() {
    - ignoreFilePath: Relative or absolute path to the file containing the list of ignored files
    - includeTestTargets: Enables coverage reports for .xctest targets
    - excludeTargets: Comma separated list of targets to exclude from coverage report
-   - includeTargets: Comma separated list of targets to include in coverage report. If specified then exclude_targets will be ignored
+   - includeTargets: Comma separated list of targets to include in coverage report. If specified then exlude_targets will be ignored
    - onlyProjectTargets: Display the coverage only for main project targets (e.g. skip Pods targets)
    - disableCoveralls: Add this flag to disable automatic submission to Coveralls
    - coverallsServiceName: Name of the CI service compatible with Coveralls. i.e. travis-ci. This option must be defined along with coveralls_service_job_id
