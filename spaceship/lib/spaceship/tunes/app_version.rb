@@ -147,7 +147,7 @@ module Spaceship
       # @return (String) App Review Information Email Address
       attr_accessor :review_email
 
-      # @return (Boolean) The checkbox that indiciates if a demo account
+      # @return (Boolean) The checkbox that indicates if a demo account
       #   is needed. Is set automatically depending on if a user and pass
       #   are set
       attr_reader :review_user_needed
