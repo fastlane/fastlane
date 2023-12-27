@@ -546,7 +546,7 @@ module Spaceship
             device_lang_screenshots << new_screenshot
           end
         else # removing
-          raise "cannot remove screenshot with non existing sort_order" unless existing_sort_orders.include?(sort_order)
+          raise "cannot remove screenshot with nonexistent sort_order" unless existing_sort_orders.include?(sort_order)
           device_lang_screenshots.delete_at(existing_sort_orders.index(sort_order))
         end
         setup_screenshots
@@ -624,7 +624,7 @@ module Spaceship
             device_lang_trailers << new_trailer
           end
         else # removing trailer
-          raise "cannot remove trailer with non existing sort_order" unless existing_sort_orders.include?(sort_order)
+          raise "cannot remove trailer with nonexistent sort_order" unless existing_sort_orders.include?(sort_order)
           device_lang_trailers.delete_at(existing_sort_orders.index(sort_order))
         end
         setup_trailers
@@ -754,7 +754,7 @@ module Spaceship
         raise "#{device} isn't a valid device name" unless DisplayFamily.find(device)
 
         languages = raw_data_details.select { |d| d["language"] == language }
-        # IDEA: better error for non existing language
+        # IDEA: better error for nonexistent language
         raise "#{language} isn't an activated language" unless languages.count > 0
         lang_details = languages[0]
         display_families = lang_details["displayFamilies"]["value"]

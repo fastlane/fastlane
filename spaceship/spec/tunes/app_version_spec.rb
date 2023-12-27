@@ -599,7 +599,7 @@ describe Spaceship::AppVersion, all: true do
         it "fails with error if the screenshot to remove doesn't exist" do
           expect do
             version.upload_screenshot!(nil, 5, "English", 'iphone4', false)
-          end.to raise_error("cannot remove screenshot with non existing sort_order")
+          end.to raise_error("cannot remove screenshot with nonexistent sort_order")
         end
       end
     end

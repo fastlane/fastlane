@@ -192,7 +192,7 @@ module FastlaneCore
                               .reject { |p| p.include?("Pods/Pods.xcodeproj") }
                               .map do |p|
                                 # To maintain backwards compatibility, we
-                                # silently ignore non-existent projects from
+                                # silently ignore nonexistent projects from
                                 # workspaces.
                                 begin
                                   Xcodeproj::Project.open(p).build_configurations
