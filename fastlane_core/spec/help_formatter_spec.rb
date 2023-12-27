@@ -51,7 +51,7 @@ describe FastlaneCore::HelpFormatter do
     }
   end
 
-  it 'should indicate default command with with default_command setting' do
+  it 'should indicate default command with default_command setting' do
     commander.default_command = :foo_bar
     help = described_class.new(commander).render
     expect(help).to match(/\(\* default\)/)
