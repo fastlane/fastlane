@@ -741,7 +741,7 @@ function resign {
         done
 
         # List of rules for transferring entitlements from app to profile plist
-        # The format for each enty is "KEY[|ID_TYPE]"
+        # The format for each entry is "KEY[|ID_TYPE]"
         # Where KEY is the plist key, e.g. "keychain-access-groups"
         # and ID_TYPE is optional part separated by '|' that specifies what value to patch:
         # TEAM_ID - patch the TeamIdentifierPrefix
