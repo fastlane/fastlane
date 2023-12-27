@@ -253,7 +253,7 @@ describe Supply do
       end
     end
 
-    describe '#peform_upload with metadata' do
+    describe '#perform_upload with metadata' do
       it_behaves_like 'run supply to upload metadata', version_codes: [1, 2], with_explicit_changelogs: true
       it_behaves_like 'run supply to upload metadata', version_codes: [3], with_explicit_changelogs: false
     end
