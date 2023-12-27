@@ -14,7 +14,7 @@ describe Deliver::UploadScreenshots do
                               get_app_screenshot_sets: [app_screenshot_set])
         screenshots_per_language = { 'en-US' => [] }
 
-        # emurate Deliver::AppScreenshotIterator#each_app_screenshot_set's two behaviors with or without given block
+        # emulate Deliver::AppScreenshotIterator#each_app_screenshot_set's two behaviors with or without given block
         allow_any_instance_of(Deliver::AppScreenshotIterator).to receive(:each_app_screenshot_set) do |&args|
           next([[localization, app_screenshot_set]]) unless args
           args.call(localization, app_screenshot_set)
@@ -35,7 +35,7 @@ describe Deliver::UploadScreenshots do
                               get_app_screenshot_sets: [app_screenshot_set])
         screenshots_per_language = { 'en-US' => [] }
 
-        # emurate Deliver::AppScreenshotIterator#each_app_screenshot_set's two behaviors with or without given block
+        # emulate Deliver::AppScreenshotIterator#each_app_screenshot_set's two behaviors with or without given block
         allow_any_instance_of(Deliver::AppScreenshotIterator).to receive(:each_app_screenshot_set) do |&args|
           next([[localization, app_screenshot_set]]) unless args
           args.call(localization, app_screenshot_set)
