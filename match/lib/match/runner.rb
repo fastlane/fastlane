@@ -296,8 +296,8 @@ module Match
       uuid = parsed["UUID"]
       name = parsed["Name"]
 
-      check_profile_existance = !is_new_profile_created && spaceship
-      if check_profile_existance && !spaceship.profile_exists(profile_type: profile_type,
+      check_profile_existence = !is_new_profile_created && spaceship
+      if check_profile_existence && !spaceship.profile_exists(profile_type: profile_type,
                                                               name: name,
                                                               username: params[:username],
                                                               uuid: uuid,
