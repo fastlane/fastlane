@@ -55,7 +55,7 @@ module Deliver
       verify_version if options[:app_version].to_s.length > 0 && !options[:skip_app_version_update]
 
       # Rejecting before upload meta
-      # Screenshots can not be update/deleted if in waiting for review
+      # Screenshots cannot be update/deleted if in waiting for review
       reject_version_if_possible if options[:reject_if_possible]
 
       upload_metadata
