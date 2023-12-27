@@ -77,7 +77,7 @@ describe FastlaneCore do
         expect(FastlaneCore::Helper.ci?).to be(true)
       end
 
-      it "returns true when building in Github Actions" do
+      it "returns true when building in GitHub Actions" do
         stub_const('ENV', { 'GITHUB_ACTION' => 'FAKE_ACTION' })
         expect(FastlaneCore::Helper.ci?).to be(true)
         stub_const('ENV', { 'GITHUB_ACTIONS' => 'true' })
