@@ -111,7 +111,7 @@ module Gym
         Gym.cache[:binary_path]
       end
 
-      # The path the the dsym file for this app. Might be nil
+      # The path the dsym file for this app. Might be nil
       def dsym_path
         Dir[BuildCommandGenerator.archive_path + "/**/*.app.dSYM"].last
       end

@@ -6412,7 +6412,7 @@ public func ipa(workspace: OptionalConfigValue<String?> = .fastlaneDefault(nil),
 
  - parameters:
    - config: Path to jazzy config file
-   - moduleVersion: Version string to use as part of the the default docs title and inside the docset
+   - moduleVersion: Version string to use as part of the default docs title and inside the docset
  */
 public func jazzy(config: OptionalConfigValue<String?> = .fastlaneDefault(nil),
                   moduleVersion: OptionalConfigValue<String?> = .fastlaneDefault(nil))
