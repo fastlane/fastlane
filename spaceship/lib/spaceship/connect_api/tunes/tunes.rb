@@ -1254,7 +1254,7 @@ module Spaceship
         # resolutionCenter
         #
         # As of 2022-11-11:
-        # This is not official available throught the App Store Connect API using an API Key.
+        # This is not official available through the App Store Connect API using an API Key.
         # This is only works with Apple ID auth.
         #
 
