@@ -1,5 +1,10 @@
 # Configuration file for https://github.com/actions/labeler
 
+"tool: action":
+  - changed-files:
+    - any-glob-to-any-file:
+      - fastlane/lib/fastlane/actions/**/*
+
 "tool: cert":
   - changed-files:
     - any-glob-to-any-file:
@@ -79,6 +84,16 @@
   - changed-files:
     - any-glob-to-any-file:
       - supply/**/*
+
+"topic: swift":
+  - changed-files:
+    - any-glob-to-any-file:
+      - fastlane/swift/**/*
+
+"tool: trainer":
+  - changed-files:
+    - any-glob-to-any-file:
+      - trainer/**/*
 
 "type: ci":
   - changed-files:
