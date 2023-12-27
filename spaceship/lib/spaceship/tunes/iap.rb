@@ -22,7 +22,7 @@ module Spaceship
         Tunes::IAPFamilies.new(attrs)
       end
 
-      # Creates a new In-App-Purchese on App Store Connect
+      # Creates a new In-App-Purchase on App Store Connect
       # if the In-App-Purchase already exists an exception is raised. Spaceship::TunesClient::ITunesConnectError
       # @param type (String): The Type of the in-app-purchase (Spaceship::Tunes::IAPType::CONSUMABLE,Spaceship::Tunes::IAPType::NON_CONSUMABLE,Spaceship::Tunes::IAPType::RECURRING,Spaceship::Tunes::IAPType::NON_RENEW_SUBSCRIPTION)
       # @param versions (Hash): a Hash of the languages
