@@ -24,7 +24,7 @@ module Gym
         parts += options
         parts += pipe
 
-        File.write(config_path, config_content) # overwrite everytime. Could be optimized
+        File.write(config_path, config_content) # overwrite every time. Could be optimized
 
         parts
       end
