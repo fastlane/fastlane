@@ -68,7 +68,7 @@ module Fastlane
       return if $troubleshoot
       UI.error("---")
       UI.error("Are you sure you want to enable '--troubleshoot'?")
-      UI.error("All commmands will run in full unfiltered output mode.")
+      UI.error("All commands will run in full unfiltered output mode.")
       UI.error("Sensitive data, like passwords, could be printed to the log.")
       UI.error("---")
       if UI.confirm("Do you really want to enable --troubleshoot")
@@ -211,7 +211,7 @@ module Fastlane
         c.action do |args, options|
           if ensure_fastfile
             ff = Fastlane::FastFile.new(File.join(FastlaneCore::FastlaneFolder.path || '.', 'Fastfile'))
-            UI.message("You don't need to run `fastlane docs` manually any more, this will be done automatically for you when running a lane.")
+            UI.message("You don't need to run `fastlane docs` manually anymore, this will be done automatically for you when running a lane.")
             Fastlane::DocsGenerator.run(ff)
           end
         end

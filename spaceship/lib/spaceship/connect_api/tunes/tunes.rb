@@ -94,7 +94,7 @@ module Spaceship
             }
           end
 
-          app_store_verions_data = platforms.map do |platform|
+          data_for_app_store_versions = platforms.map do |platform|
             {
               type: "appStoreVersions",
               id: "${store-version-#{platform}}"
@@ -103,7 +103,7 @@ module Spaceship
 
           relationships = {
             appStoreVersions: {
-              data: app_store_verions_data
+              data: data_for_app_store_versions
             },
             appInfos: {
               data: [
@@ -160,9 +160,6 @@ module Spaceship
             included << {
               type: "appPrices",
               id: "${price1}",
-              attributes: {
-                startDate: nil
-              },
               relationships: {
                 app: {
                   data: {
@@ -1257,7 +1254,7 @@ module Spaceship
         # resolutionCenter
         #
         # As of 2022-11-11:
-        # This is not official available throught the App Store Connect API using an API Key.
+        # This is not official available through the App Store Connect API using an API Key.
         # This is only works with Apple ID auth.
         #
 

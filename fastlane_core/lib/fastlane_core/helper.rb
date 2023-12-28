@@ -180,7 +180,7 @@ module FastlaneCore
     # @return Swift version
     def self.swift_version
       if system("which swift > /dev/null 2>&1")
-        output = `swift --version`
+        output = `swift --version 2> /dev/null`
         return output.split("\n").first.match(/version ([0-9.]+)/).captures.first
       end
       return nil

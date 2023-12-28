@@ -387,7 +387,7 @@ module Spaceship
         return resps.flat_map(&:to_models)
       end
 
-      def create_beta_group(client: nil, group_name: nil, is_internal_group: false, public_link_enabled: false, public_link_limit: 10_000, public_link_limit_enabled: false)
+      def create_beta_group(client: nil, group_name: nil, is_internal_group: false, public_link_enabled: false, public_link_limit: 10_000, public_link_limit_enabled: false, has_access_to_all_builds: nil)
         client ||= Spaceship::ConnectAPI
         resps = client.create_beta_group(
           app_id: id,
@@ -395,7 +395,8 @@ module Spaceship
           is_internal_group: is_internal_group,
           public_link_enabled: public_link_enabled,
           public_link_limit: public_link_limit,
-          public_link_limit_enabled: public_link_limit_enabled
+          public_link_limit_enabled: public_link_limit_enabled,
+          has_access_to_all_builds: has_access_to_all_builds
         ).all_pages
         return resps.flat_map(&:to_models).first
       end

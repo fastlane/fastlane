@@ -132,7 +132,7 @@ module Match
         return api_token
       end
 
-      # Returns a short string describing + identifing the current
+      # Returns a short string describing + identifying the current
       # storage backend. This will be printed when nuking a storage
       def human_readable_description
         "GitLab Secure Files Storage [#{self.project_id}]"

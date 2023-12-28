@@ -39,7 +39,7 @@ module FastlaneCore
     def self.installed?(path, in_keychain: nil)
       UI.user_error!("Could not find file '#{path}'") unless File.exist?(path)
 
-      ids = installed_identies(in_keychain: in_keychain)
+      ids = installed_identities(in_keychain: in_keychain)
       ids += installed_installers(in_keychain: in_keychain)
       finger_print = sha1_fingerprint(path)
 
@@ -51,7 +51,7 @@ module FastlaneCore
       installed?(path)
     end
 
-    def self.installed_identies(in_keychain: nil)
+    def self.installed_identities(in_keychain: nil)
       install_missing_wwdr_certificates
 
       available = list_available_identities(in_keychain: in_keychain)
@@ -116,7 +116,7 @@ module FastlaneCore
 
       # Find all installed WWDRCA certificates
       installed_certs = []
-      Helper.backticks("security find-certificate -a -c '#{certificate_name}' -p #{wwdr_keychain.shellescape}")
+      Helper.backticks("security find-certificate -a -c '#{certificate_name}' -p #{wwdr_keychain.shellescape}", print: false)
             .lines
             .each do |line|
         if line.start_with?('-----BEGIN CERTIFICATE-----')
@@ -146,7 +146,7 @@ module FastlaneCore
 
     def self.install_wwdr_certificate(cert_alias)
       url = WWDRCA_CERTIFICATES.find { |c| c[:alias] == cert_alias }.fetch(:url)
-      file = Tempfile.new(File.basename(url))
+      file = Tempfile.new([File.basename(url, ".cer"), ".cer"])
       filename = file.path
       keychain = wwdr_keychain
       keychain = "-k #{keychain.shellescape}" unless keychain.empty?
