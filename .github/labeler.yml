@@ -100,3 +100,4 @@
     - any-glob-to-any-file:
       - .github/**/*
       - .circleci/**/*
+      - appveyor.yml
