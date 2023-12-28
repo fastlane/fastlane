@@ -24,7 +24,7 @@ describe Pilot::TesterImporter do
 
     context "when testers CSV file path is given" do
       let(:fake_tester_manager) { double("tester manager") }
-      let(:fake_testers_file_path) { "fake testers_file_path" }
+      let(:fake_testers_file_path) { Tempfile.new("fake testers_file_path").path }
       let(:fake_input_options) do
         {
           testers_file_path: fake_testers_file_path

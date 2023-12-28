@@ -1,11 +1,20 @@
 describe Match do
   describe Match::Runner do
     let(:keychain) { 'login.keychain' }
+    let(:fake_cache) { double('fake_cache') }
 
     before do
       allow(ENV).to receive(:[]).and_call_original
       allow(ENV).to receive(:[]).with('MATCH_KEYCHAIN_NAME').and_return(keychain)
       allow(ENV).to receive(:[]).with('MATCH_KEYCHAIN_PASSWORD').and_return(nil)
+
+      allow(Match::Portal::Cache).to receive(:new).and_return(fake_cache)
+      allow(fake_cache).to receive(:bundle_ids).and_return(nil)
+      allow(fake_cache).to receive(:certificates).and_return(nil)
+      allow(fake_cache).to receive(:profiles).and_return(nil)
+      allow(fake_cache).to receive(:devices).and_return(nil)
+      allow(fake_cache).to receive(:portal_profile).and_return(nil)
+      allow(fake_cache).to receive(:reset_certificates)
 
       # There is another test
       ENV.delete('FASTLANE_TEAM_ID')
@@ -40,7 +49,7 @@ describe Match do
           destination = File.expand_path("~/Library/MobileDevice/Provisioning Profiles/98264c6b-5151-4349-8d0f-66691e48ae35.mobileprovision")
 
           fake_storage = "fake_storage"
-          expect(Match::Storage::GitStorage).to receive(:configure).with(
+          expect(Match::Storage::GitStorage).to receive(:configure).with({
             git_url: git_url,
             shallow_clone: true,
             skip_docs: false,
@@ -52,26 +61,8 @@ describe Match do
             git_bearer_authorization: nil,
             git_private_key: nil,
             type: config[:type],
-            generate_apple_certs: generate_apple_certs,
-            platform: config[:platform],
-            google_cloud_bucket_name: "",
-            google_cloud_keys_file: "",
-            google_cloud_project_id: "",
-            skip_google_cloud_account_confirmation: false,
-            s3_region: nil,
-            s3_access_key: nil,
-            s3_secret_access_key: nil,
-            s3_bucket: nil,
-            s3_object_prefix: nil,
-            gitlab_project: nil,
-            gitlab_host: 'https://gitlab.com',
-            readonly: false,
-            username: values[:username],
-            team_id: nil,
-            team_name: nil,
-            api_key_path: nil,
-            api_key: nil
-          ).and_return(fake_storage)
+            platform: config[:platform]
+          }).and_return(fake_storage)
 
           expect(fake_storage).to receive(:download).and_return(nil)
           expect(fake_storage).to receive(:clear_changes).and_return(nil)
@@ -83,6 +74,7 @@ describe Match do
                                                                            certificate_id: "something",
                                                                            app_identifier: values[:app_identifier],
                                                                                     force: false,
+                                                                                    cache: fake_cache,
                                                                        working_directory: fake_storage.working_directory).and_return(profile_path)
           expect(FastlaneCore::ProvisioningProfile).to receive(:install).with(profile_path, keychain_path).and_return(destination)
           expect(fake_storage).to receive(:save_changes!).with(
@@ -97,7 +89,7 @@ describe Match do
           allow(spaceship).to receive(:team_id).and_return("")
           expect(Match::SpaceshipEnsure).to receive(:new).and_return(spaceship)
           expect(spaceship).to receive(:certificates_exists).and_return(true)
-          expect(spaceship).to receive(:profile_exists).and_return(true)
+          expect(spaceship).not_to receive(:profile_exists)
           expect(spaceship).to receive(:bundle_identifier_exists).and_return(true)
           expect(Match::Utils).to receive(:get_cert_info).and_return([["Common Name", "fastlane certificate name"]])
 
@@ -131,7 +123,7 @@ describe Match do
           key_path = "./match/spec/fixtures/existing/certs/distribution/E7P4EE896K.p12"
 
           fake_storage = "fake_storage"
-          expect(Match::Storage::GitStorage).to receive(:configure).with(
+          expect(Match::Storage::GitStorage).to receive(:configure).with({
             git_url: git_url,
             shallow_clone: false,
             skip_docs: false,
@@ -143,26 +135,8 @@ describe Match do
             git_bearer_authorization: nil,
             git_private_key: nil,
             type: config[:type],
-            generate_apple_certs: generate_apple_certs,
-            platform: config[:platform],
-            google_cloud_bucket_name: "",
-            google_cloud_keys_file: "",
-            google_cloud_project_id: "",
-            skip_google_cloud_account_confirmation: false,
-            s3_region: nil,
-            s3_access_key: nil,
-            s3_secret_access_key: nil,
-            s3_bucket: nil,
-            s3_object_prefix: nil,
-            gitlab_project: nil,
-            gitlab_host: 'https://gitlab.com',
-            readonly: false,
-            username: values[:username],
-            team_id: nil,
-            team_name: nil,
-            api_key_path: nil,
-            api_key: nil
-          ).and_return(fake_storage)
+            platform: config[:platform]
+          }).and_return(fake_storage)
 
           expect(fake_storage).to receive(:download).and_return(nil)
           expect(fake_storage).to receive(:clear_changes).and_return(nil)
@@ -222,7 +196,7 @@ describe Match do
           key_path = "./match/spec/fixtures/existing/certs/distribution/E7P4EE896K.p12"
 
           fake_storage = "fake_storage"
-          expect(Match::Storage::GitStorage).to receive(:configure).with(
+          expect(Match::Storage::GitStorage).to receive(:configure).with({
             git_url: git_url,
             shallow_clone: false,
             skip_docs: false,
@@ -234,26 +208,8 @@ describe Match do
             git_bearer_authorization: nil,
             git_private_key: nil,
             type: config[:type],
-            generate_apple_certs: generate_apple_certs,
-            platform: config[:platform],
-            google_cloud_bucket_name: "",
-            google_cloud_keys_file: "",
-            google_cloud_project_id: "",
-            skip_google_cloud_account_confirmation: false,
-            s3_region: nil,
-            s3_access_key: nil,
-            s3_secret_access_key: nil,
-            s3_bucket: nil,
-            s3_object_prefix: nil,
-            gitlab_project: nil,
-            gitlab_host: 'https://gitlab.com',
-            readonly: false,
-            username: values[:username],
-            team_id: nil,
-            team_name: nil,
-            api_key_path: nil,
-            api_key: nil
-          ).and_return(fake_storage)
+            platform: config[:platform]
+          }).and_return(fake_storage)
 
           expect(fake_storage).to receive(:download).and_return(nil)
           expect(fake_storage).to receive(:clear_changes).and_return(nil)
@@ -295,7 +251,7 @@ describe Match do
           destination = File.expand_path("~/Library/MobileDevice/Provisioning Profiles/98264c6b-5151-4349-8d0f-66691e48ae35.mobileprovision")
 
           fake_storage = "fake_storage"
-          expect(Match::Storage::GitStorage).to receive(:configure).with(
+          expect(Match::Storage::GitStorage).to receive(:configure).with({
             git_url: git_url,
             shallow_clone: true,
             skip_docs: false,
@@ -307,26 +263,8 @@ describe Match do
             git_bearer_authorization: nil,
             git_private_key: nil,
             type: config[:type],
-            generate_apple_certs: generate_apple_certs,
-            platform: config[:platform],
-            google_cloud_bucket_name: "",
-            google_cloud_keys_file: "",
-            google_cloud_project_id: "",
-            skip_google_cloud_account_confirmation: false,
-            s3_region: nil,
-            s3_access_key: nil,
-            s3_secret_access_key: nil,
-            s3_bucket: nil,
-            s3_object_prefix: nil,
-            gitlab_project: nil,
-            gitlab_host: 'https://gitlab.com',
-            readonly: false,
-            username: values[:username],
-            team_id: nil,
-            team_name: nil,
-            api_key_path: nil,
-            api_key: nil
-          ).and_return(fake_storage)
+            platform: config[:platform]
+          }).and_return(fake_storage)
 
           expect(fake_storage).to receive(:download).and_return(nil)
           expect(fake_storage).to receive(:clear_changes).and_return(nil)
@@ -352,56 +290,6 @@ describe Match do
           Match::Runner.new.run(config)
           # Nothing to check after the run
         end
-      end
-    end
-
-    describe "#device_count_different?" do
-      let(:profile_file) { double("profile file") }
-      let(:uuid) { "1234-1234-1234-1234" }
-      let(:parsed_profile) { { "UUID" => uuid } }
-      let(:profile) { double("profile") }
-      let(:profile_device) { double("profile_device") }
-
-      before do
-        allow(profile).to receive(:uuid).and_return(uuid)
-        allow(profile).to receive(:fetch_all_devices).and_return([profile_device])
-      end
-
-      it "device is enabled" do
-        expect(FastlaneCore::ProvisioningProfile).to receive(:parse).and_return(parsed_profile)
-        expect(Spaceship::ConnectAPI::Profile).to receive(:all).and_return([profile])
-        expect(Spaceship::ConnectAPI::Device).to receive(:all).and_return([profile_device])
-
-        expect(profile_device).to receive(:device_class).and_return(Spaceship::ConnectAPI::Device::DeviceClass::IPOD)
-        expect(profile_device).to receive(:enabled?).and_return(true)
-
-        runner = Match::Runner.new
-        expect(runner.device_count_different?(profile: profile_file, platform: :ios)).to be(false)
-      end
-
-      it "device is disabled" do
-        expect(FastlaneCore::ProvisioningProfile).to receive(:parse).and_return(parsed_profile)
-        expect(Spaceship::ConnectAPI::Profile).to receive(:all).and_return([profile])
-        expect(Spaceship::ConnectAPI::Device).to receive(:all).and_return([profile_device])
-
-        expect(profile_device).to receive(:device_class).and_return(Spaceship::ConnectAPI::Device::DeviceClass::IPOD)
-        expect(profile_device).to receive(:enabled?).and_return(false)
-
-        runner = Match::Runner.new
-        expect(runner.device_count_different?(profile: profile_file, platform: :ios)).to be(true)
-      end
-
-      it "device is apple silicon mac" do
-        expect(FastlaneCore::ProvisioningProfile).to receive(:parse).twice.and_return(parsed_profile)
-        expect(Spaceship::ConnectAPI::Profile).to receive(:all).twice.and_return([profile])
-        expect(Spaceship::ConnectAPI::Device).to receive(:all).twice.and_return([profile_device])
-
-        expect(profile_device).to receive(:device_class).twice.and_return(Spaceship::ConnectAPI::Device::DeviceClass::APPLE_SILICON_MAC)
-        expect(profile_device).to receive(:enabled?).and_return(true)
-
-        runner = Match::Runner.new
-        expect(runner.device_count_different?(profile: profile_file, platform: :ios, include_mac_in_profiles: false)).to be(true)
-        expect(runner.device_count_different?(profile: profile_file, platform: :ios, include_mac_in_profiles: true)).to be(false)
       end
     end
   end

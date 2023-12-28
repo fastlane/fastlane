@@ -18,9 +18,6 @@ module Fastlane
       module Verify
         def self.requirement(req)
           UI.user_error!("Version must be specified") if req.nil? || req.to_s.strip.size == 0
-          Gem::Requirement.new(req.to_s)
-        rescue Gem::Requirement::BadRequirementError
-          UI.user_error!("The requirement '#{req}' is not a valid RubyGems style requirement")
         end
       end
     end

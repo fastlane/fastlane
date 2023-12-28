@@ -34,36 +34,14 @@ module Match
 
       spaceship_login
 
-      self.storage = Storage.for_mode(params[:storage_mode], {
-        git_url: params[:git_url],
-        shallow_clone: params[:shallow_clone],
-        skip_docs: params[:skip_docs],
-        git_branch: params[:git_branch],
-        git_full_name: params[:git_full_name],
-        git_user_email: params[:git_user_email],
-
-        git_private_key: params[:git_private_key],
-        git_basic_authorization: params[:git_basic_authorization],
-        git_bearer_authorization: params[:git_bearer_authorization],
-
-        clone_branch_directly: params[:clone_branch_directly],
-        google_cloud_bucket_name: params[:google_cloud_bucket_name].to_s,
-        google_cloud_keys_file: params[:google_cloud_keys_file].to_s,
-        google_cloud_project_id: params[:google_cloud_project_id].to_s,
-        s3_region: params[:s3_region].to_s,
-        s3_access_key: params[:s3_access_key].to_s,
-        s3_secret_access_key: params[:s3_secret_access_key].to_s,
-        s3_bucket: params[:s3_bucket].to_s,
-        s3_object_prefix: params[:s3_object_prefix].to_s,
-        gitlab_project: params[:gitlab_project],
-        gitlab_host: params[:gitlab_host],
-        team_id: params[:team_id] || Spaceship::ConnectAPI.client.portal_team_id
-      })
+      self.storage = Storage.from_params(params)
       self.storage.download
 
       # After the download was complete
       self.encryption = Encryption.for_storage_mode(params[:storage_mode], {
         git_url: params[:git_url],
+        s3_bucket: params[:s3_bucket],
+        s3_skip_encryption: params[:s3_skip_encryption],
         working_directory: storage.working_directory
       })
       self.encryption.decrypt_files if self.encryption

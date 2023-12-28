@@ -8,23 +8,48 @@ describe Supply do
         to_return(status: 200, body: '{}', headers: { 'Content-Type' => 'application/json' })
     end
 
-    it "displays error messages from the API" do
-      stub_request(:post, "https://androidpublisher.googleapis.com/upload/androidpublisher/v3/applications/test-app/edits/1/listings/en-US/icon").
-        to_return(status: 403, body: '{"error":{"message":"Ensure project settings are enabled."}}', headers: { 'Content-Type' => 'application/json' })
+    describe "displays error messages from the API" do
+      it "with no retries" do
+        stub_request(:post, "https://androidpublisher.googleapis.com/upload/androidpublisher/v3/applications/test-app/edits/1/listings/en-US/icon").
+          to_return(status: 403, body: '{"error":{"message":"Ensure project settings are enabled."}}', headers: { 'Content-Type' => 'application/json' })
 
-      expect(UI).to receive(:user_error!).with("Google Api Error: Invalid request - Ensure project settings are enabled.")
+        current_edit = double
+        allow(current_edit).to receive(:id).and_return(1)
 
-      current_edit = double
-      allow(current_edit).to receive(:id).and_return(1)
+        client = Supply::Client.new(service_account_json: StringIO.new(service_account_file), params: { timeout: 1 })
+        allow(client).to receive(:ensure_active_edit!)
+        allow(client).to receive(:current_edit).and_return(current_edit)
 
-      client = Supply::Client.new(service_account_json: StringIO.new(service_account_file), params: { timeout: 1 })
-      allow(client).to receive(:ensure_active_edit!)
-      allow(client).to receive(:current_edit).and_return(current_edit)
+        client.begin_edit(package_name: 'test-app')
+        expect {
+          client.upload_image(image_path: fixture_file("playstore-icon.png"),
+                              image_type: "icon",
+                                language: "en-US")
+        }.to raise_error(FastlaneCore::Interface::FastlaneError, "Google Api Error: Invalid request - Ensure project settings are enabled.")
+      end
 
-      client.begin_edit(package_name: 'test-app')
-      client.upload_image(image_path: fixture_file("playstore-icon.png"),
-                          image_type: "icon",
-                            language: "en-US")
+      it "with 5 retries" do
+        stub_const("ENV", { 'SUPPLY_UPLOAD_MAX_RETRIES' => 5 })
+
+        stub_request(:post, "https://androidpublisher.googleapis.com/upload/androidpublisher/v3/applications/test-app/edits/1/listings/en-US/icon").
+          to_return(status: 403, body: '{"error":{"message":"Ensure project settings are enabled."}}', headers: { 'Content-Type' => 'application/json' })
+
+        expect(UI).to receive(:error).with("Google Api Error: Invalid request - Ensure project settings are enabled. - Retrying...").exactly(5).times
+
+        current_edit = double
+        allow(current_edit).to receive(:id).and_return(1)
+
+        client = Supply::Client.new(service_account_json: StringIO.new(service_account_file), params: { timeout: 1 })
+        allow(client).to receive(:ensure_active_edit!)
+        allow(client).to receive(:current_edit).and_return(current_edit)
+
+        client.begin_edit(package_name: 'test-app')
+        expect {
+          client.upload_image(image_path: fixture_file("playstore-icon.png"),
+                              image_type: "icon",
+                                language: "en-US")
+        }.to raise_error(FastlaneCore::Interface::FastlaneError, "Google Api Error: Invalid request - Ensure project settings are enabled.")
+      end
     end
 
     describe "AndroidPublisher" do
@@ -54,6 +79,7 @@ describe Supply do
         expect(subject.class.method_defined?(:list_edit_images)).to eq(true)
         expect(subject.class.method_defined?(:upload_edit_image)).to eq(true)
         expect(subject.class.method_defined?(:deleteall_edit_image)).to eq(true)
+        expect(subject.class.method_defined?(:delete_edit_image)).to eq(true)
         expect(subject.class.method_defined?(:upload_edit_expansionfile)).to eq(true)
         expect(subject.class.method_defined?(:uploadapk_internalappsharingartifact)).to eq(true)
         expect(subject.class.method_defined?(:uploadbundle_internalappsharingartifact)).to eq(true)

@@ -15,7 +15,7 @@ def sigh_stub_spaceship_connect(inhouse: false, create_profile_app_identifier: n
 
   device = "device"
   allow(device).to receive(:id).and_return(1)
-  allow(Spaceship::ConnectAPI::Device).to receive(:all).and_return([device])
+  allow(Spaceship::ConnectAPI::Device).to receive(:devices_for_platform).and_return([device])
 
   bundle_ids = all_app_identifiers.map do |id|
     Spaceship::ConnectAPI::BundleId.new("123", {
@@ -65,8 +65,10 @@ def sigh_stub_spaceship_connect(inhouse: false, create_profile_app_identifier: n
       profile
     end
   end
-  allow(Spaceship::ConnectAPI::Profile).to receive(:all).with(anything).and_return(profiles)
   allow(Spaceship::ConnectAPI::Profile).to receive(:all).and_return(profiles)
+  profiles.each do |profile|
+    allow(Spaceship::ConnectAPI::Profile).to receive(:all).with(filter: { name: profile.name }).and_return([profile])
+  end
 
   # Stubs production to only receive certs
   certs = [Spaceship.certificate.production]

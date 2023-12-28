@@ -1,12 +1,14 @@
 require 'deliver/sync_screenshots'
 require 'fakefs/spec_helpers'
+require_relative 'deliver_constants'
 
 describe Deliver::SyncScreenshots do
-  describe '#do_replace_screeshots' do
+  describe '#do_replace_screenshots' do
+    include DeliverConstants
+
     subject { described_class.new(app: nil, platform: nil) }
 
     DisplayType = Spaceship::ConnectAPI::AppScreenshotSet::DisplayType
-    ScreenSize = Deliver::AppScreenshot::ScreenSize
 
     before do
       # To emulate checksum calculation, return the given path as a checksum
