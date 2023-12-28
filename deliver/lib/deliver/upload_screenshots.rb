@@ -55,7 +55,7 @@ module Deliver
         localizations = version.get_app_store_version_localizations
       end
 
-      upload_screenshots(localizations, screenshots_per_language, timeout_seconds: options[:screenshot_processing_timeout])
+      upload_screenshots(localizations, screenshots_per_language, options[:screenshot_processing_timeout])
 
       Helper.show_loading_indicator("Sorting screenshots uploaded...")
       sort_screenshots(localizations)
@@ -109,7 +109,7 @@ module Deliver
       end
     end
 
-    def upload_screenshots(localizations, screenshots_per_language, tries: 5, timeout_seconds: 3600)
+    def upload_screenshots(localizations, screenshots_per_language, timeout_seconds, tries: 5)
       tries -= 1
 
       # Upload screenshots
@@ -207,7 +207,7 @@ module Deliver
         iterator.each_app_screenshot do |_, _, app_screenshot|
           app_screenshot.delete! unless app_screenshot.complete?
         end
-        upload_screenshots(localizations, screenshots_per_language, tries: tries, timeout_seconds: timeout_seconds)
+        upload_screenshots(localizations, screenshots_per_language, timeout_seconds, tries: tries)
       end
     end
 

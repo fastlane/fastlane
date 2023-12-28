@@ -79,7 +79,7 @@ describe Deliver::UploadScreenshots do
           allow(described_class).to receive(:calculate_checksum).and_return('checksum')
 
           expect(app_screenshot_set).to receive(:upload_screenshot).with(path: local_screenshot.path, wait_for_processing: false)
-          subject.upload_screenshots([localization], screenshots_per_language)
+          subject.upload_screenshots([localization], screenshots_per_language, 3600)
         end
       end
 
@@ -100,7 +100,7 @@ describe Deliver::UploadScreenshots do
 
           allow(FastlaneCore::Helper).to receive(:show_loading_indicator).and_return(true)
           expect(app_screenshot_set).to receive(:upload_screenshot).with(path: local_screenshot.path, wait_for_processing: false)
-          subject.upload_screenshots([localization], screenshots_per_language)
+          subject.upload_screenshots([localization], screenshots_per_language, 3600)
         end
       end
     end
@@ -122,7 +122,7 @@ describe Deliver::UploadScreenshots do
 
         allow(FastlaneCore::Helper).to receive(:show_loading_indicator).and_return(true)
         expect(app_screenshot_set).to receive(:upload_screenshot).with(path: local_screenshot.path, wait_for_processing: false)
-        subject.upload_screenshots([localization], screenshots_per_language)
+        subject.upload_screenshots([localization], screenshots_per_language, 3600)
       end
     end
 
@@ -145,7 +145,7 @@ describe Deliver::UploadScreenshots do
 
         allow(FastlaneCore::Helper).to receive(:show_loading_indicator).and_return(true)
         expect(app_screenshot_set).to_not(receive(:upload_screenshot))
-        subject.upload_screenshots([localization], screenshots_per_language)
+        subject.upload_screenshots([localization], screenshots_per_language, 3600)
       end
     end
 
@@ -166,7 +166,7 @@ describe Deliver::UploadScreenshots do
 
         allow(FastlaneCore::Helper).to receive(:show_loading_indicator).and_return(true)
         expect(app_screenshot_set).to receive(:upload_screenshot).exactly(10).times
-        subject.upload_screenshots([localization], screenshots_per_language)
+        subject.upload_screenshots([localization], screenshots_per_language, 3600)
       end
     end
 
@@ -194,7 +194,7 @@ describe Deliver::UploadScreenshots do
 
         allow(FastlaneCore::Helper).to receive(:show_loading_indicator).and_return(true)
         expect(app_screenshot_set).to_not(receive(:upload_screenshot))
-        subject.upload_screenshots([localization], screenshots_per_language)
+        subject.upload_screenshots([localization], screenshots_per_language, 3600)
       end
     end
 
@@ -224,7 +224,7 @@ describe Deliver::UploadScreenshots do
 
         allow(FastlaneCore::Helper).to receive(:show_loading_indicator).and_return(true)
         expect(app_screenshot_set).to_not(receive(:upload_screenshot))
-        subject.upload_screenshots([localization], screenshots_per_language)
+        subject.upload_screenshots([localization], screenshots_per_language, 3600)
       end
     end
   end
