@@ -42,6 +42,8 @@ before_test:
   - gem -v
   - bundle -v
   - which iconv
+  - which git
+  - git --version
 
 build: off
 

@@ -164,13 +164,17 @@ module Deliver
                                      default_value: false),
         FastlaneCore::ConfigItem.new(key: :sync_screenshots,
                                      env_name: "DELIVER_SYNC_SCREENSHOTS",
-                                     description: "Sync screenshots with local ones. This is currently beta option" \
-                                                  "so set true to 'FASTLANE_ENABLE_BETA_DELIVER_SYNC_SCREENSHOTS' environment variable as well",
+                                     description: "Sync screenshots with local ones. This is currently beta option so set true to 'FASTLANE_ENABLE_BETA_DELIVER_SYNC_SCREENSHOTS' environment variable as well",
                                      type: Boolean,
                                      default_value: false),
         FastlaneCore::ConfigItem.new(key: :submit_for_review,
                                      env_name: "DELIVER_SUBMIT_FOR_REVIEW",
                                      description: "Submit the new version for Review after uploading everything",
+                                     type: Boolean,
+                                     default_value: false),
+        FastlaneCore::ConfigItem.new(key: :verify_only,
+                                     env_name: "DELIVER_VERIFY_ONLY",
+                                     description: "Verifies archive with App Store Connect without uploading",
                                      type: Boolean,
                                      default_value: false),
         FastlaneCore::ConfigItem.new(key: :reject_if_possible,
@@ -182,12 +186,12 @@ module Deliver
         # release
         FastlaneCore::ConfigItem.new(key: :automatic_release,
                                      env_name: "DELIVER_AUTOMATIC_RELEASE",
-                                     description: "Should the app be automatically released once it's approved? (Can not be used together with `auto_release_date`)",
+                                     description: "Should the app be automatically released once it's approved? (Cannot be used together with `auto_release_date`)",
                                      type: Boolean,
                                      optional: true),
         FastlaneCore::ConfigItem.new(key: :auto_release_date,
                                      env_name: "DELIVER_AUTO_RELEASE_DATE",
-                                     description: "Date in milliseconds for automatically releasing on pending approval (Can not be used together with `automatic_release`)",
+                                     description: "Date in milliseconds for automatically releasing on pending approval (Cannot be used together with `automatic_release`)",
                                      type: Integer,
                                      optional: true,
                                      conflicting_options: [:automatic_release],
@@ -197,7 +201,7 @@ module Deliver
                                      verify_block: proc do |value|
                                        now_in_ms = Time.now.to_i * 1000
                                        if value < now_in_ms
-                                         UI.user_error!("'#{value}' needs to be in the future and in milliseonds (current time is '#{now_in_ms}')")
+                                         UI.user_error!("'#{value}' needs to be in the future and in milliseconds (current time is '#{now_in_ms}')")
                                        end
                                      end),
         FastlaneCore::ConfigItem.new(key: :phased_release,
@@ -307,7 +311,7 @@ module Deliver
 
         # App Metadata
         FastlaneCore::ConfigItem.new(key: :individual_metadata_items,
-                                     env_name: "DELIVER_INDIVUDAL_METADATA_ITEMS",
+                                     env_names: ["DELIVER_INDIVUDAL_METADATA_ITEMS", "DELIVER_INDIVIDUAL_METADATA_ITEMS"], # The version with typo must be deprecated
                                      description: "An array of localized metadata items to upload individually by language so that errors can be identified. E.g. ['name', 'keywords', 'description']. Note: slow",
                                      deprecated: "Removed after the migration to the new App Store Connect API in June 2020",
                                      type: Array,

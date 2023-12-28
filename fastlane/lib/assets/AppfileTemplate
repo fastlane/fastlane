@@ -1,5 +1,5 @@
 # app_identifier("[[APP_IDENTIFIER]]") # The bundle identifier of your app
-# apple_id("[[APPLE_ID]]") # Your Apple email address
+# apple_id("[[APPLE_ID]]") # Your Apple Developer Portal username
 
 [[TEAMS]]
 # For more information about the Appfile, see:

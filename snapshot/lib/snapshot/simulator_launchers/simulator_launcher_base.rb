@@ -107,7 +107,7 @@ module Snapshot
           output = Helper.backticks("xcrun simctl addmedia #{device_udid} #{path.shellescape} &> /dev/null")
 
           # Run legacy addphoto and addvideo if addmedia isn't found
-          # Output will be empty strin gif it was a success
+          # Output will be empty string if it was a success
           # Output will contain "usage: simctl" if command not found
           if output.include?('usage: simctl')
             Helper.backticks("xcrun simctl add#{media_type} #{device_udid} #{path.shellescape} &> /dev/null")
@@ -124,7 +124,7 @@ module Snapshot
       Helper.backticks("xcrun simctl bootstatus #{device_udid} -b &> /dev/null")
 
       # "Booted" status is not enough for to adjust the status bar
-      # Simulator could stil be booting with Apple logo
+      # Simulator could still be booting with Apple logo
       # Need to wait "some amount of time" until home screen shows
       boot_sleep = ENV["SNAPSHOT_SIMULATOR_WAIT_FOR_BOOT_TIMEOUT"].to_i || 10
       UI.message("Waiting #{boot_sleep} seconds for device to fully boot before overriding status bar... Set 'SNAPSHOT_SIMULATOR_WAIT_FOR_BOOT_TIMEOUT' environment variable to adjust timeout")
@@ -135,7 +135,10 @@ module Snapshot
       if arguments.nil? || arguments.empty?
         # The time needs to be passed as ISO8601 so the simulator formats it correctly
         time = Time.new(2007, 1, 9, 9, 41, 0)
-        arguments = "--time #{time.iso8601} --dataNetwork wifi --wifiMode active --wifiBars 3 --cellularMode active --cellularBars 4 --batteryState charged --batteryLevel 100"
+
+        # If you don't override the operator name, you'll get "Carrier" in the status bar on no-notch devices such as iPhone 8. Pass an empty string to blank it out.
+
+        arguments = "--time #{time.iso8601} --dataNetwork wifi --wifiMode active --wifiBars 3 --cellularMode active --operatorName '' --cellularBars 4 --batteryState charged --batteryLevel 100"
       end
 
       Helper.backticks("xcrun simctl status_bar #{device_udid} override #{arguments} &> /dev/null")

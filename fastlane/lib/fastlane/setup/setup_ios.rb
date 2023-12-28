@@ -387,7 +387,7 @@ module Fastlane
     def verify_app_exists_itc!
       UI.user_error!("No app identifier provided") if self.app_identifier.to_s.length == 0
       UI.message("Checking if the app '#{self.app_identifier}' exists on App Store Connect...")
-      app = Spaceship::Tunes::Application.find(self.app_identifier)
+      app = Spaceship::ConnectAPI::App.find(self.app_identifier)
       if app.nil?
         UI.error("Looks like the app '#{self.app_identifier}' isn't available on #{'App Store Connect'.bold.underline}")
         UI.error("for the team ID '#{self.itc_team_id}' on Apple ID '#{self.user}'")

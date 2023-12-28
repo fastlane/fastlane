@@ -90,14 +90,17 @@ module Spaceship
       end
 
       def refresh!
-        @expiration = Time.now + @duration
+        now = Time.now
+        @expiration = now + @duration
 
         header = {
-          kid: key_id
+          kid: key_id,
+          typ: 'JWT'
         }
 
         payload = {
           iss: issuer_id,
+          iat: now.to_i,
           exp: @expiration.to_i,
           aud: 'appstoreconnect-v1'
         }

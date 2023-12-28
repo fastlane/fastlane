@@ -34,7 +34,7 @@ module Commander
 
     attr_accessor :collector
 
-    # Temporary work around for issues mentioned in https://github.com/fastlane/fastlane/pull/18760
+    # Temporary workaround for issues mentioned in https://github.com/fastlane/fastlane/pull/18760
     # Code taken from https://github.com/commander-rb/commander/blob/40d06bfbc54906d0de7c72ac73f4e9188c9ca294/lib/commander/runner.rb#L372-L385
     #
     # Problem:
@@ -283,7 +283,7 @@ module Commander
     def handle_unknown_error!(e)
       # Some spaceship exception classes implement #preferred_error_info in order to share error info
       # that we'd rather display instead of crashing with a stack trace. However, fastlane_core and
-      # spaceship can not know about each other's classes! To make this information passing work, we
+      # spaceship cannot know about each other's classes! To make this information passing work, we
       # use a bit of Ruby duck-typing to check whether the unknown exception type implements the right
       # method. If so, we'll present any returned error info in the manner of a user_error!
       error_info = e.respond_to?(:preferred_error_info) ? e.preferred_error_info : nil

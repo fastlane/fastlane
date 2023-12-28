@@ -305,11 +305,19 @@ module Scan
       if number_of_failures > 0
         open_report
 
-        UI.test_failure!("Tests have failed")
+        if Scan.config[:fail_build]
+          UI.test_failure!("Tests have failed")
+        else
+          UI.error("Tests have failed")
+        end
       end
 
       unless tests_exit_status == 0
-        UI.test_failure!("Test execution failed. Exit status: #{tests_exit_status}")
+        if Scan.config[:fail_build]
+          UI.test_failure!("Test execution failed. Exit status: #{tests_exit_status}")
+        else
+          UI.error("Test execution failed. Exit status: #{tests_exit_status}")
+        end
       end
 
       open_report
@@ -389,7 +397,7 @@ module Scan
 
       # Return early unless the user wants to prelaunch simulators. Or if the user wants simulator logs
       # then we must prelaunch simulators because Xcode's headless
-      # mode launches and shutsdown the simulators before we can collect the logs.
+      # mode launches and shuts down the simulators before we can collect the logs.
       return unless Scan.config[:prelaunch_simulator] || Scan.config[:include_simulator_logs]
 
       devices_to_shutdown = []

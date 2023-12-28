@@ -70,7 +70,7 @@ module FastlaneCore
 
     # @param options [FastlaneCore::Configuration|Hash] a set of configuration to run xcodebuild to work out build settings
     # @param xcodebuild_list_silent [Boolean] a flag to silent xcodebuild command's output
-    # @param xcodebuild_suppress_stderr [Boolean] a flag to supress output to stderr from xcodebuild
+    # @param xcodebuild_suppress_stderr [Boolean] a flag to suppress output to stderr from xcodebuild
     def initialize(options)
       @options = options
       @path = File.expand_path(self.options[:workspace] || self.options[:project])
@@ -192,7 +192,7 @@ module FastlaneCore
                               .reject { |p| p.include?("Pods/Pods.xcodeproj") }
                               .map do |p|
                                 # To maintain backwards compatibility, we
-                                # silently ignore non-existent projects from
+                                # silently ignore nonexistent projects from
                                 # workspaces.
                                 begin
                                   Xcodeproj::Project.open(p).build_configurations
@@ -307,6 +307,10 @@ module FastlaneCore
       supported_platforms.include?(:watchOS)
     end
 
+    def multiplatform?
+      supported_platforms.count > 1
+    end
+
     def supported_platforms
       supported_platforms = build_settings(key: "SUPPORTED_PLATFORMS")
       if supported_platforms.nil?
@@ -356,17 +360,35 @@ module FastlaneCore
       # This xcodebuild bug is fixed in Xcode 8.3 so 'clean' it's not necessary anymore
       # See: https://github.com/fastlane/fastlane/pull/5626
       if FastlaneCore::Helper.xcode_at_least?('8.3')
-        command = "xcodebuild -showBuildSettings #{xcodebuild_parameters.join(' ')}"
+        command = "xcodebuild -showBuildSettings #{xcodebuild_parameters.join(' ')}#{xcodebuild_destination_parameter}"
       else
         command = "xcodebuild clean -showBuildSettings #{xcodebuild_parameters.join(' ')}"
       end
+      command = "#{command} 2>&1" # xcodebuild produces errors on stderr #21672
       command
     end
 
     def build_xcodebuild_resolvepackagedependencies_command
       return nil if options[:skip_package_dependencies_resolution]
-      command = "xcodebuild -resolvePackageDependencies #{xcodebuild_parameters.join(' ')}"
+      command = "xcodebuild -resolvePackageDependencies #{xcodebuild_parameters.join(' ')}#{xcodebuild_destination_parameter}"
       command
+    end
+
+    def xcodebuild_destination_parameter
+      # Xcode13+ xcodebuild command 'without destination parameter' generates annoying warnings
+      # See: https://github.com/fastlane/fastlane/issues/19579
+      destination_parameter = ""
+      xcode_at_least_13 = FastlaneCore::Helper.xcode_at_least?("13")
+      if xcode_at_least_13 && options[:destination]
+        begin
+          destination_parameter = " " + "-destination #{options[:destination].shellescape}"
+        rescue => ex
+          # xcodebuild command can continue without destination parameter, so
+          # we really don't care about this exception if something goes wrong with shellescape
+          UI.important("Failed to set destination parameter for xcodebuild command: #{ex}")
+        end
+      end
+      destination_parameter
     end
 
     # Get the build settings for our project

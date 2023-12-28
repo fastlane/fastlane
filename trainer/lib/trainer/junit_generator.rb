@@ -15,9 +15,9 @@ module Trainer
 
       lib_path = Trainer::ROOT
       xml_path = File.join(lib_path, "lib/assets/junit.xml.erb")
-      xml = ERB.new(File.read(xml_path), nil, '<>').result(binding) # http://www.rrn.dk/rubys-erb-templating-system
+      xml = ERB.new(File.read(xml_path), trim_mode: '<>').result(binding) # http://www.rrn.dk/rubys-erb-templating-system
 
-      xml = xml.gsub('system_', 'system-').delete("\e") # Jenkins can not parse 'ESC' symbol
+      xml = xml.gsub('system_', 'system-').delete("\e") # Jenkins cannot parse 'ESC' symbol
 
       # We have to manually clear empty lines
       # They may contain white spaces
