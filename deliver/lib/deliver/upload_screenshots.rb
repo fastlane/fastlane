@@ -179,7 +179,7 @@ module Deliver
         return states unless is_processing
 
         if Time.now - start_time > timeout_seconds
-          UI.important("Consider incomplete screenshots failed after #{timeout_seconds} seconds")
+          UI.important("Screenshot upload reached the timeout limit of #{timeout_seconds} seconds. We'll now retry uploading the screenshots that couldn't be uploaded in time.")
           return states
         end
 
