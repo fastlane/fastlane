@@ -71,10 +71,10 @@ public protocol DeliverfileProtocol: AnyObject {
     /// Rejects the previously submitted build if it's in a state where it's possible
     var rejectIfPossible: Bool { get }
 
-    /// Should the app be automatically released once it's approved? (Can not be used together with `auto_release_date`)
+    /// Should the app be automatically released once it's approved? (Cannot be used together with `auto_release_date`)
     var automaticRelease: Bool? { get }
 
-    /// Date in milliseconds for automatically releasing on pending approval (Can not be used together with `automatic_release`)
+    /// Date in milliseconds for automatically releasing on pending approval (Cannot be used together with `automatic_release`)
     var autoReleaseDate: Int? { get }
 
     /// Enable the phased release feature of iTC

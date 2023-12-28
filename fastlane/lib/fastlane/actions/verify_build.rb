@@ -13,7 +13,7 @@ module Fastlane
 
           self.print_values(values)
 
-          self.evaulate(params, values)
+          self.evaluate(params, values)
         end
       end
 
@@ -93,7 +93,7 @@ module Fastlane
                                              title: "Summary for verify_build #{Fastlane::VERSION}")
       end
 
-      def self.evaulate(params, values)
+      def self.evaluate(params, values)
         if params[:provisioning_type]
           UI.user_error!("Mismatched provisioning_type. Required: '#{params[:provisioning_type]}'; Found: '#{values['provisioning_type']}'") unless params[:provisioning_type] == values['provisioning_type']
         end

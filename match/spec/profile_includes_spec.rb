@@ -126,7 +126,7 @@ describe Match do
           expect(can_include_devices).to be(false)
         end
 
-        it "returns false if type is unsutable" do
+        it "returns false if type is unsuitable" do
           # GIVEN
           allow(params).to receive(:[]).with(:type).and_return('appstore')
 
@@ -180,7 +180,7 @@ describe Match do
           expect(can_include_certs).to be(false)
         end
 
-        it "returns false if type is unsutable" do
+        it "returns false if type is unsuitable" do
           # GIVEN
           allow(params).to receive(:[]).with(:type).and_return('appstore')
 

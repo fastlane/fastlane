@@ -160,7 +160,7 @@ module Match
 
       if certs.count == 0 || keys.count == 0
         UI.important("Couldn't find a valid code signing identity for #{cert_type}... creating one for you now")
-        UI.crash!("No code signing identity found and can not create a new one because you enabled `readonly`") if params[:readonly]
+        UI.crash!("No code signing identity found and cannot create a new one because you enabled `readonly`") if params[:readonly]
         cert_path = Generator.generate_certificate(params, cert_type, prefixed_working_directory, specific_cert_type: specific_cert_type)
         private_key_path = cert_path.gsub(".cer", ".p12")
 
@@ -270,7 +270,7 @@ module Match
             all_profiles.each { |p| UI.error("- '#{p}'") }
           end
           UI.error("If you are certain that a profile should exist, double-check the recent changes to your match repository")
-          UI.user_error!("No matching provisioning profiles found and can not create a new one because you enabled `readonly`. Check the output above for more information.")
+          UI.user_error!("No matching provisioning profiles found and cannot create a new one because you enabled `readonly`. Check the output above for more information.")
         end
 
         stored_profile_path = Generator.generate_provisioning_profile(
@@ -296,8 +296,8 @@ module Match
       uuid = parsed["UUID"]
       name = parsed["Name"]
 
-      check_profile_existance = !is_new_profile_created && spaceship
-      if check_profile_existance && !spaceship.profile_exists(profile_type: profile_type,
+      check_profile_existence = !is_new_profile_created && spaceship
+      if check_profile_existence && !spaceship.profile_exists(profile_type: profile_type,
                                                               name: name,
                                                               username: params[:username],
                                                               uuid: uuid,

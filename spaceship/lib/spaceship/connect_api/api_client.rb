@@ -65,7 +65,7 @@ module Spaceship
       end
 
       # Instance level hostname only used when creating
-      # App Store Connect API Farady client.
+      # App Store Connect API Faraday client.
       # Forwarding to class level if using web session.
       def hostname
         if @token

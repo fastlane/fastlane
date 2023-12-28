@@ -3,7 +3,7 @@ require 'fakefs/spec_helpers'
 require_relative 'deliver_constants'
 
 describe Deliver::SyncScreenshots do
-  describe '#do_replace_screeshots' do
+  describe '#do_replace_screenshots' do
     include DeliverConstants
 
     subject { described_class.new(app: nil, platform: nil) }
