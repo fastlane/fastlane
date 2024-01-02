@@ -1,5 +1,5 @@
 // Scanfile.swift
-// Copyright (c) 2023 FastlaneTools
+// Copyright (c) 2024 FastlaneTools
 
 // This class is automatically included in FastlaneRunner during build
 
@@ -17,4 +17,4 @@ public class Scanfile: ScanfileProtocol {
     // during the `init` process, and you won't see this message
 }
 
-// Generated with fastlane 2.217.0
+// Generated with fastlane 2.218.0
