@@ -1,5 +1,5 @@
 // ScreengrabfileProtocol.swift
-// Copyright (c) 2023 FastlaneTools
+// Copyright (c) 2024 FastlaneTools
 
 public protocol ScreengrabfileProtocol: AnyObject {
     /// Path to the root of your Android SDK installation, e.g. ~/tools/android-sdk-macosx
@@ -96,4 +96,4 @@ public extension ScreengrabfileProtocol {
 
 // Please don't remove the lines below
 // They are used to detect outdated files
-// FastlaneRunnerAPIVersion [0.9.119]
+// FastlaneRunnerAPIVersion [0.9.120]

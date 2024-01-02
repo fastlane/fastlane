@@ -1,5 +1,5 @@
 // ScanfileProtocol.swift
-// Copyright (c) 2023 FastlaneTools
+// Copyright (c) 2024 FastlaneTools
 
 public protocol ScanfileProtocol: AnyObject {
     /// Path to the workspace file
@@ -320,4 +320,4 @@ public extension ScanfileProtocol {
 
 // Please don't remove the lines below
 // They are used to detect outdated files
-// FastlaneRunnerAPIVersion [0.9.129]
+// FastlaneRunnerAPIVersion [0.9.130]
