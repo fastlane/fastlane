@@ -80,6 +80,14 @@
         "CLT": "15.0.0.0.1.1694021235",
         "Xcode": "15.1",
         "macOS": "13.6"
+      },
+      "sonoma": {
+        "HOMEBREW_VERSION": "4.2.2-18-gdcd267b",
+        "HOMEBREW_PREFIX": "/opt/homebrew",
+        "Homebrew/homebrew-core": "api",
+        "CLT": "15.0.0.0.1.1694021235",
+        "Xcode": "15.1",
+        "macOS": "14.2.1"
       }
     }
   }
