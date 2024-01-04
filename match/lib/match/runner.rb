@@ -68,14 +68,14 @@ module Match
       # then in the future address the root cause of https://github.com/fastlane/fastlane/issues/11324
       app_identifiers = app_identifiers.flatten.uniq
 
-      # Cache bundle ids, certificates, profiles, and devices.
-      self.cache = Portal::Cache.build(
-        params: params,
-        bundle_id_identifiers: app_identifiers
-      )
-
-      # Verify the App ID (as we don't want 'match' to fail at a later point)
       if spaceship
+        # Cache bundle ids, certificates, profiles, and devices.
+        self.cache = Portal::Cache.build(
+          params: params,
+          bundle_id_identifiers: app_identifiers
+        )
+
+        # Verify the App ID (as we don't want 'match' to fail at a later point)
         app_identifiers.each do |app_identifier|
           spaceship.bundle_identifier_exists(username: params[:username], app_identifier: app_identifier, cached_bundle_ids: self.cache.bundle_ids)
         end
@@ -247,16 +247,19 @@ module Match
       stored_profile_path = profiles.last
       force = params[:force]
 
-      portal_profile = self.cache.portal_profile(stored_profile_path: stored_profile_path, keychain_path: keychain_path) if stored_profile_path
+      if spaceship
+        # check if profile needs to be updated only if not in readonly mode
+        portal_profile = self.cache.portal_profile(stored_profile_path: stored_profile_path, keychain_path: keychain_path) if stored_profile_path
 
-      if params[:force_for_new_devices]
-        force ||= ProfileIncludes.should_force_include_all_devices?(params: params, portal_profile: portal_profile, cached_devices: self.cache.devices)
-      end
+        if params[:force_for_new_devices]
+          force ||= ProfileIncludes.should_force_include_all_devices?(params: params, portal_profile: portal_profile, cached_devices: self.cache.devices)
+        end
 
-      if params[:include_all_certificates]
-        # Clearing specified certificate id which will prevent a profile being created with only one certificate
-        certificate_id = nil
-        force ||= ProfileIncludes.should_force_include_all_certificates?(params: params, portal_profile: portal_profile, cached_certificates: self.cache.certificates)
+        if params[:include_all_certificates]
+          # Clearing specified certificate id which will prevent a profile being created with only one certificate
+          certificate_id = nil
+          force ||= ProfileIncludes.should_force_include_all_certificates?(params: params, portal_profile: portal_profile, cached_certificates: self.cache.certificates)
+        end
       end
 
       is_new_profile_created = false

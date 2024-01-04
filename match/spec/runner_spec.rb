@@ -1,20 +1,13 @@
+require_relative 'spec_helper'
+
 describe Match do
   describe Match::Runner do
     let(:keychain) { 'login.keychain' }
-    let(:fake_cache) { double('fake_cache') }
 
     before do
       allow(ENV).to receive(:[]).and_call_original
       allow(ENV).to receive(:[]).with('MATCH_KEYCHAIN_NAME').and_return(keychain)
       allow(ENV).to receive(:[]).with('MATCH_KEYCHAIN_PASSWORD').and_return(nil)
-
-      allow(Match::Portal::Cache).to receive(:new).and_return(fake_cache)
-      allow(fake_cache).to receive(:bundle_ids).and_return(nil)
-      allow(fake_cache).to receive(:certificates).and_return(nil)
-      allow(fake_cache).to receive(:profiles).and_return(nil)
-      allow(fake_cache).to receive(:devices).and_return(nil)
-      allow(fake_cache).to receive(:portal_profile).and_return(nil)
-      allow(fake_cache).to receive(:reset_certificates)
 
       # There is another test
       ENV.delete('FASTLANE_TEAM_ID')
@@ -47,6 +40,8 @@ describe Match do
           profile_path = "./match/spec/fixtures/test.mobileprovision"
           keychain_path = FastlaneCore::Helper.keychain_path("login.keychain") # can be .keychain or .keychain-db
           destination = File.expand_path("~/Library/MobileDevice/Provisioning Profiles/98264c6b-5151-4349-8d0f-66691e48ae35.mobileprovision")
+
+          fake_cache = create_fake_cache
 
           fake_storage = "fake_storage"
           expect(Match::Storage::GitStorage).to receive(:configure).with({
@@ -116,6 +111,8 @@ describe Match do
             git_url: git_url,
             username: "flapple@something.com"
           }
+
+          create_fake_cache
 
           config = FastlaneCore::Configuration.create(Match::Options.available_options, values)
           repo_dir = "./match/spec/fixtures/existing"
@@ -195,6 +192,8 @@ describe Match do
           cert_path = "./match/spec/fixtures/existing/certs/distribution/E7P4EE896K.cer"
           key_path = "./match/spec/fixtures/existing/certs/distribution/E7P4EE896K.p12"
 
+          create_fake_cache
+
           fake_storage = "fake_storage"
           expect(Match::Storage::GitStorage).to receive(:configure).with({
             git_url: git_url,
@@ -233,6 +232,58 @@ describe Match do
           end.to raise_error("Your certificate 'E7P4EE896K.cer' is not valid, please check end date and renew it if necessary")
         end
 
+        it "installs profiles in read-only mode", requires_security: true do
+          # GIVEN
+
+          # Downloaded and decrypted storage location.
+          repo_dir = "./match/spec/fixtures/existing"
+          #   Valid cert and key
+          stored_valid_cert_path = "#{repo_dir}/certs/distribution/E7P4EE896K.cer"
+          stored_valid_profile_path = "#{repo_dir}/profiles/appstore/AppStore_tools.fastlane.app.mobileprovision"
+
+          # match options
+          match_test_options = {
+            readonly: true # Current test suite.
+          }
+          match_config = create_match_config_with_git_storage(extra_values: match_test_options)
+
+          # EXPECTATIONS
+
+          # Ensure cache is not used.
+          create_fake_cache(allow_usage: false)
+
+          # Storage
+          fake_storage = create_fake_storage(match_config: match_config, repo_dir: repo_dir)
+          # Ensure no changes in storage are made.
+          expect(fake_storage).not_to receive(:save_changes!)
+
+          # Encryption
+          fake_encryption = create_fake_encryption(storage: fake_storage)
+          # Ensure there are no new files to encrypt.
+          expect(fake_encryption).not_to receive(:encrypt_files)
+
+          # Utils
+          # Ensure match validates stored certificate.
+          expect(Match::Utils).to receive(:is_cert_valid?).with(stored_valid_cert_path).and_return(true)
+
+          # Certificates
+          # Ensure a new certificate is not generated.
+          expect(Match::Generator).not_to receive(:generate_certificate).with(match_config, :distribution, fake_storage.working_directory, specific_cert_type: nil)
+
+          # Profiles
+          begin # Ensure profiles are installed, but not validated.
+            keychain_path = FastlaneCore::Helper.keychain_path("login.keychain")
+            expect(FastlaneCore::ProvisioningProfile).to receive(:install).with(stored_valid_profile_path, keychain_path)
+            expect(Match::Generator).not_to receive(:generate_provisioning_profile)
+          end
+
+          # WHEN
+          Match::Runner.new.run(match_config)
+
+          # THEN
+          # Rely on expectations defined above.
+        end
+
         it "skips provisioning profiles when skip_provisioning_profiles set to true", requires_security: true do
           git_url = "https://github.com/fastlane/fastlane/tree/master/certificates"
           values = {
@@ -249,6 +300,8 @@ describe Match do
           cert_path = File.join(repo_dir, "something.cer")
           keychain_path = FastlaneCore::Helper.keychain_path("login.keychain") # can be .keychain or .keychain-db
           destination = File.expand_path("~/Library/MobileDevice/Provisioning Profiles/98264c6b-5151-4349-8d0f-66691e48ae35.mobileprovision")
+
+          create_fake_cache
 
           fake_storage = "fake_storage"
           expect(Match::Storage::GitStorage).to receive(:configure).with({
