@@ -91,7 +91,7 @@ module Sigh
       results = Sigh.config[:cached_profiles]
       results ||= Spaceship::ConnectAPI::Profile.all(filter: filter, includes: includes)
       results.select! do |profile|
-        profile.bundle_id.identifier == Sigh.config[:app_identifier]
+        profile.bundle_id&.identifier == Sigh.config[:app_identifier]
       end
 
       results = results.find_all do |current_profile|
