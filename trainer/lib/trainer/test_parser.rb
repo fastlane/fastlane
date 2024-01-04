@@ -1,10 +1,11 @@
 require 'plist'
-
+require 'parallel'
 require 'fastlane_core/print_table'
 
 require_relative 'junit_generator'
 require_relative 'xcresult'
 require_relative 'module'
+require_relative 'test_result'
 
 module Trainer
   class TestParser
@@ -102,15 +103,9 @@ module Trainer
       UI.user_error!("File not found at path '#{path}'") unless File.exist?(path)
 
       if File.directory?(path) && path.end_with?(".xcresult")
-        parse_xcresult(path, output_remove_retry_attempts: config[:output_remove_retry_attempts])
+        parse_xcresult(path, output_remove_retry_attempts: config[:output_remove_retry_attempts], xcpretty_naming: config[:xcpretty_naming])
       else
-        self.file_content = File.read(path)
-        self.raw_json = Plist.parse_xml(self.file_content)
-
-        return if self.raw_json["FormatVersion"].to_s.length.zero? # maybe that's a useless plist file
-
-        ensure_file_valid!
-        parse_content(config[:xcpretty_naming])
+        parse_test_result(path, config[:xcpretty_naming])
       end
 
       self.number_of_tests = 0
@@ -147,46 +142,15 @@ module Trainer
       UI.user_error!("Format version '#{format_version}' is not supported, must be #{supported_versions.join(', ')}") unless supported_versions.include?(format_version)
     end
 
-    # Converts the raw plist test structure into something that's easier to enumerate
-    def unfold_tests(data)
-      # `data` looks like this
-      # => [{"Subtests"=>
-      #  [{"Subtests"=>
-      #     [{"Subtests"=>
-      #        [{"Duration"=>0.4,
-      #          "TestIdentifier"=>"Unit/testExample()",
-      #          "TestName"=>"testExample()",
-      #          "TestObjectClass"=>"IDESchemeActionTestSummary",
-      #          "TestStatus"=>"Success",
-      #          "TestSummaryGUID"=>"4A24BFED-03E6-4FBE-BC5E-2D80023C06B4"},
-      #         {"FailureSummaries"=>
-      #           [{"FileName"=>"/Users/krausefx/Developer/themoji/Unit/Unit.swift",
-      #             "LineNumber"=>34,
-      #             "Message"=>"XCTAssertTrue failed - ",
-      #             "PerformanceFailure"=>false}],
-      #          "TestIdentifier"=>"Unit/testExample2()",
-
-      tests = []
-      data.each do |current_hash|
-        if current_hash["Subtests"]
-          tests += unfold_tests(current_hash["Subtests"])
-        end
-        if current_hash["TestStatus"]
-          tests << current_hash
-        end
-      end
-      return tests
-    end
-
     # Returns the test group and test name from the passed summary and test
     # Pass xcpretty_naming = true to get the test naming aligned with xcpretty
     def test_group_and_name(testable_summary, test, xcpretty_naming)
       if xcpretty_naming
-        group = testable_summary["TargetName"] + "." + test["TestIdentifier"].split("/")[0..-2].join(".")
-        name = test["TestName"][0..-3]
+        group = testable_summary.target_name + "." + test.identifier.split("/")[0..-2].join(".")
+        name = test.name[0..-3]
       else
-        group = test["TestIdentifier"].split("/")[0..-2].join(".")
-        name = test["TestName"]
+        group = test.identifier.split("/")[0..-2].join(".")
+        name = test.name
       end
       return group, name
     end
@@ -197,41 +161,71 @@ module Trainer
       return output
     end
 
-    def parse_xcresult(path, output_remove_retry_attempts: false)
+    def parse_test_result(path, xcpretty_naming)
+      self.file_content = File.read(path)
+      self.raw_json = Plist.parse_xml(self.file_content)
+
+      return if self.raw_json["FormatVersion"].to_s.length.zero? # maybe that's a useless plist file
+
+      ensure_file_valid!
+      parse_content(xcpretty_naming)
+    end
+
+    def xcresulttool_get_json(path, id = nil)
+      cmd = "xcrun xcresulttool get --format json --path #{path}"
+      cmd << " --id #{id}" unless id.nil?
+      raw = execute_cmd(cmd)
+      JSON.parse(raw)
+    end
+
+    def parse_xcresult(path, output_remove_retry_attempts: false, xcpretty_naming:)
       require 'shellwords'
       path = Shellwords.escape(path)
 
       # Executes xcresulttool to get JSON format of the result bundle object
-      result_bundle_object_raw = execute_cmd("xcrun xcresulttool get --format json --path #{path}")
-      result_bundle_object = JSON.parse(result_bundle_object_raw)
+      result_bundle_object = xcresulttool_get_json(path)
 
       # Parses JSON into ActionsInvocationRecord to find a list of all ids for ActionTestPlanRunSummaries
       actions_invocation_record = Trainer::XCResult::ActionsInvocationRecord.new(result_bundle_object)
       test_refs = actions_invocation_record.actions.map do |action|
         action.action_result.tests_ref
       end.compact
-      ids = test_refs.map(&:id)
+      test_ids = test_refs.map(&:id)
 
       # Maps ids into ActionTestPlanRunSummaries by executing xcresulttool to get JSON
       # containing specific information for each test summary,
-      summaries = ids.map do |id|
-        raw = execute_cmd("xcrun xcresulttool get --format json --path #{path} --id #{id}")
-        json = JSON.parse(raw)
+      summaries = Parallel.map(test_ids) do |id|
+        json = xcresulttool_get_json(path, id)
         Trainer::XCResult::ActionTestPlanRunSummaries.new(json)
       end
 
-      # Converts the ActionTestPlanRunSummaries to data for junit generator
-      failures = actions_invocation_record.issues.test_failure_summaries || []
-      summaries_to_data(summaries, failures, output_remove_retry_attempts: output_remove_retry_attempts)
-    end
-
-    def summaries_to_data(summaries, failures, output_remove_retry_attempts: false)
       # Gets flat list of all ActionTestableSummary
       all_summaries = summaries.map(&:summaries).flatten
       testable_summaries = all_summaries.map(&:testable_summaries).flatten
-
       summaries_to_names = test_summaries_to_configuration_names(all_summaries)
 
+      # Gets flat list of all ActionTestMetadata that failed
+      failed_tests = testable_summaries.map do |testable_summary|
+        testable_summary.all_tests.find_all { |a| a.test_status == 'Failure' }
+      end.flatten
+
+      # Find a list of all ids for ActionTestSummary
+      summary_ids = failed_tests.map do |test|
+        test.summary_ref.id
+      end
+
+      # Maps summary references into array of ActionTestSummary by executing xcresulttool to get JSON
+      # containing more information for each test failure,
+      failures = Parallel.map(summary_ids) do |id|
+        json = xcresulttool_get_json(path, id)
+        Trainer::XCResult::ActionTestSummary.new(json)
+      end
+
+      # Converts the ActionTestPlanRunSummaries to data for junit generator
+      summaries_to_data(testable_summaries, summaries_to_names, failures, output_remove_retry_attempts: output_remove_retry_attempts, xcpretty_naming: xcpretty_naming)
+    end
+
+    def summaries_to_data(testable_summaries, summaries_to_names, failures, output_remove_retry_attempts: false, xcpretty_naming:)
       # Maps ActionTestableSummary to rows for junit generator
       rows = testable_summaries.map do |testable_summary|
         all_tests = testable_summary.all_tests.flatten
@@ -243,12 +237,13 @@ module Trainer
 
         test_rows = all_tests.map do |test|
           identifier = "#{test.parent.name}.#{test.name}"
+          test_group, test_name = test_group_and_name(testable_summary, test, xcpretty_naming)
           test_row = {
             identifier: identifier,
-            name: test.name,
+            name: test_name,
             duration: test.duration,
             status: test.test_status,
-            test_group: test.parent.name,
+            test_group: test_group,
 
             # These don't map to anything but keeping empty strings
             guid: ""
@@ -271,10 +266,10 @@ module Trainer
           failure = test.find_failure(failures)
           if failure
             test_row[:failures] = [{
-              file_name: "",
-              line_number: 0,
-              message: "",
-              performance_failure: {},
+              file_name: failure.file_name,
+              line_number: failure.line_number,
+              message: failure.message,
+              performance_failure: failure.performance_failure,
               failure_message: failure.failure_message
             }]
 
@@ -352,33 +347,35 @@ module Trainer
 
     # Convert the Hashes and Arrays in something more useful
     def parse_content(xcpretty_naming)
-      self.data = self.raw_json["TestableSummaries"].collect do |testable_summary|
+      testable_summaries = self.raw_json['TestableSummaries'].collect do |summary_data|
+        Trainer::TestResult::ActionTestableSummary.new(summary_data)
+      end
+
+      self.data = testable_summaries.map do |testable_summary|
         summary_row = {
-          project_path: testable_summary["ProjectPath"],
-          target_name: testable_summary["TargetName"],
-          test_name: testable_summary["TestName"],
-          duration: testable_summary["Tests"].map { |current_test| current_test["Duration"] }.inject(:+),
-          tests: unfold_tests(testable_summary["Tests"]).collect do |current_test|
+          project_path: testable_summary.project_path,
+          target_name: testable_summary.target_name,
+          test_name: testable_summary.test_name,
+          duration: testable_summary.tests.map(&:duration).inject(:+),
+          tests: testable_summary.all_tests.map do |current_test|
             test_group, test_name = test_group_and_name(testable_summary, current_test, xcpretty_naming)
             current_row = {
-              identifier: current_test["TestIdentifier"],
+              identifier: current_test.identifier,
                  test_group: test_group,
                  name: test_name,
-              object_class: current_test["TestObjectClass"],
-              status: current_test["TestStatus"],
-              guid: current_test["TestSummaryGUID"],
-              duration: current_test["Duration"]
+              object_class: current_test.object_class,
+              status: current_test.status,
+              guid: current_test.summary_guid,
+              duration: current_test.duration
             }
-            if current_test["FailureSummaries"]
-              current_row[:failures] = current_test["FailureSummaries"].collect do |current_failure|
-                {
-                  file_name: current_failure['FileName'],
-                  line_number: current_failure['LineNumber'],
-                  message: current_failure['Message'],
-                  performance_failure: current_failure['PerformanceFailure'],
-                  failure_message: "#{current_failure['Message']} (#{current_failure['FileName']}:#{current_failure['LineNumber']})"
-                }
-              end
+            current_row[:failures] = current_test.failure_summaries.map do |current_failure|
+              {
+                file_name: current_failure.file_name,
+                line_number: current_failure.line_number,
+                message: current_failure.message,
+                performance_failure: current_failure.performance_failure,
+                failure_message: current_failure.failure_message
+              }
             end
             current_row
           end

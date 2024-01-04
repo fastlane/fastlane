@@ -15,7 +15,7 @@
       <% testsuite[:tests].each do |test| %>
         <testcase classname=<%= test[:test_group].encode(:xml => :attr) %> name=<%= test[:name].encode(:xml => :attr) %> time="<%= test[:duration] %>">
           <% (test[:failures] || []).each do |failure| %>
-            <failure message=<%= failure[:failure_message].encode(:xml => :attr) %>>
+            <failure message=<%= failure[:message].encode(:xml => :attr) %>><%= failure[:file_name] %>:<%= failure[:line_number] %>
             </failure>
           <% end %>
           <% if test[:skipped] %>

@@ -76,6 +76,7 @@ module Trainer
       attr_accessor :target_name
       attr_accessor :test_kind
       attr_accessor :tests
+      attr_accessor :failure_summaries
       def initialize(data)
         self.project_relative_path = fetch_value(data, "projectRelativePath")
         self.target_name = fetch_value(data, "targetName")
@@ -83,6 +84,7 @@ module Trainer
         self.tests = fetch_values(data, "tests").map do |tests_data|
           ActionTestSummaryIdentifiableObject.create(tests_data, self)
         end
+        self.failure_summaries = fetch_values(data, 'failureSummaries')
         super
       end
 
@@ -159,12 +161,14 @@ module Trainer
       attr_accessor :performance_metrics_count
       attr_accessor :failure_summaries_count
       attr_accessor :activity_summaries_count
+      attr_accessor :summary_ref
       def initialize(data, parent)
         self.test_status = fetch_value(data, "testStatus")
         self.duration = fetch_value(data, "duration").to_f
         self.performance_metrics_count = fetch_value(data, "performanceMetricsCount")
         self.failure_summaries_count = fetch_value(data, "failureSummariesCount")
         self.activity_summaries_count = fetch_value(data, "activitySummariesCount")
+        self.summary_ref = Reference.new(data['summaryRef']) if data['summaryRef']
         super(data, parent)
       end
 
@@ -172,33 +176,66 @@ module Trainer
         return [self]
       end
 
-      def find_failure(failures)
+      def find_failure(summaries)
         if self.test_status == "Failure"
-          # Tries to match failure on test case name
-          # Example TestFailureIssueSummary:
-          #   producingTarget: "TestThisDude"
-          #   test_case_name: "TestThisDude.testFailureJosh2()" (when Swift)
-          #     or "-[TestThisDudeTests testFailureJosh2]" (when Objective-C)
-          # Example ActionTestMetadata
-          #   identifier: "TestThisDude/testFailureJosh2()" (when Swift)
-          #     or identifier: "TestThisDude/testFailureJosh2" (when Objective-C)
-
-          found_failure = failures.find do |failure|
-            # Clean test_case_name to match identifier format
-            # Sanitize for Swift by replacing "." for "/"
-            # Sanitize for Objective-C by removing "-", "[", "]", and replacing " " for ?/
-            sanitized_test_case_name = failure.test_case_name
-                                              .tr(".", "/")
-                                              .tr("-", "")
-                                              .tr("[", "")
-                                              .tr("]", "")
-                                              .tr(" ", "/")
-            self.identifier == sanitized_test_case_name
+          found_summary = summaries.find do |summary|
+            self.identifier == summary.identifier
           end
-          return found_failure
+
+          if found_summary
+            return found_summary.failure_summaries.first
+          else
+            return nil
+          end
         else
           return nil
         end
+      end
+    end
+
+    # - ActionTestSummary
+    #   * Kind: object
+    #   * Properties:
+    #     + testStatus: String
+    #     + duration: Double
+    #     + failureSummaries: [ActionTestFailureSummary]
+    #     + activitySummaries: [ActionTestActivitySummary]
+    class ActionTestSummary < ActionTestSummaryIdentifiableObject
+      attr_accessor :test_status
+      attr_accessor :duration
+      attr_accessor :failure_summaries
+      def initialize(data)
+        self.test_status = fetch_value(data, 'testStatus')
+        self.duration = fetch_value(data, 'duration').to_f
+        self.failure_summaries = fetch_values(data, 'failureSummaries').map do |summary_data|
+          ActionTestFailureSummary.new(summary_data)
+        end
+        super(data, nil)
+      end
+    end
+
+    # - ActionTestFailureSummary
+    #   * Kind: object
+    #   * Properties:
+    #     + message: String?
+    #     + fileName: String
+    #     + lineNumber: Int
+    #     + isPerformanceFailure: Boolean?
+    class ActionTestFailureSummary < AbstractObject
+      attr_accessor :message
+      attr_accessor :file_name
+      attr_accessor :line_number
+      attr_accessor :performance_failure
+      def initialize(data)
+        self.message = fetch_value(data, 'message')
+        self.file_name = fetch_value(data, 'fileName')
+        self.line_number = fetch_value(data, 'lineNumber').to_i
+        self.performance_failure = fetch_value(data, 'isPerformanceFailure').to_boolean if data['isPerformanceFailure']
+        super
+      end
+
+      def failure_message
+        "#{message} (#{file_name}:#{line_number})"
       end
     end
 
