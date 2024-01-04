@@ -20,6 +20,7 @@ PATH
       gh_inspector (>= 1.1.2, < 2.0.0)
       google-apis-androidpublisher_v3 (~> 0.3)
       google-apis-playcustomapp_v1 (~> 0.1)
+      google-cloud-env (>= 1.6.0, < 2.0.0)
       google-cloud-storage (~> 1.31)
       highline (~> 2.0)
       http-cookie (~> 1.0.5)

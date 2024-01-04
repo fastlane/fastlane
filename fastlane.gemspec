@@ -87,6 +87,7 @@ Gem::Specification.new do |spec|
   spec.add_dependency('gh_inspector', '>= 1.1.2', '< 2.0.0') # search for issues on GitHub when something goes wrong
   spec.add_dependency('google-apis-androidpublisher_v3', '~> 0.3') # Google API Client to access Play Publishing API
   spec.add_dependency('google-apis-playcustomapp_v1', '~> 0.1') # Google API Client to access Custom app Publishing API
+  spec.add_dependency('google-cloud-env', '>= 1.6.0', '< 2.0.0') # Must be < 2.0.0 to support Ruby 2.6
   spec.add_dependency('google-cloud-storage', '~> 1.31') # Access Google Cloud Storage for match
   spec.add_dependency('highline', '~> 2.0') # user inputs (e.g. passwords)
   spec.add_dependency('http-cookie', '~> 1.0.5') # Must be 1.0.5+ for Ruby 3 compatibility: https://github.com/sparklemotion/http-cookie/commit/d12449a983d3dd660c5fe1f2b135c35e83755cc3
