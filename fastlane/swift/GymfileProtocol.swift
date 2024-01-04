@@ -208,4 +208,4 @@ public extension GymfileProtocol {
 
 // Please don't remove the lines below
 // They are used to detect outdated files
-// FastlaneRunnerAPIVersion [0.9.125]
+// FastlaneRunnerAPIVersion [0.9.126]
