@@ -2,7 +2,8 @@
 
 version: 2.1
 orbs:
-    shellcheck: circleci/shellcheck@2.2.2 # brew install shellcheck stopped working so using this
+  shellcheck: circleci/shellcheck@2.2.2 # brew install shellcheck stopped working so using this
+  macos: circleci/macos@2
 
 aliases:
   - &important-branches
@@ -50,12 +51,6 @@ aliases:
       paths:
         - "~/.cache/rubocop_cache"
 
-  - &set_ruby
-    run:
-      name: Set Ruby version
-      command: | # see https://circleci.com/docs/2.0/testing-ios/#using-ruby
-        echo "ruby-${_RUBY_VERSION}" > ~/.ruby-version
-
   - &bundle_install
     run:
       name: bundle install
@@ -81,14 +76,14 @@ jobs:
       CIRCLE_TEST_REPORTS: '~/test-reports'
       LC_ALL: 'en_US.UTF-8'
       LANG: 'en_US.UTF-8'
-      _RUBY_VERSION: << parameters.ruby_version >>
     shell: '/bin/bash --login -eo pipefail'
     steps:
       - *cache_restore_git
       - checkout
       - *cache_save_git
       - *cache_restore_bundler
-      - *set_ruby
+      - macos/switch-ruby:
+          version: << parameters.ruby_version >>
       - run:
           name: debug | ruby version
           command: |
@@ -178,7 +173,8 @@ jobs:
       - checkout
       - *cache_save_git
       - *cache_restore_bundler
-      - *set_ruby
+      - macos/switch-ruby:
+          version: << parameters.ruby_version >>
       - *bundle_install
       - *cache_save_bundler
       - run:
