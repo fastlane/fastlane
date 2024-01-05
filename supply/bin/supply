@@ -1,6 +1,0 @@
-#!/usr/bin/env ruby
-$:.push File.expand_path("../../lib", __FILE__)
-
-require 'supply'
-require 'supply/commands_generator'
-Supply::CommandsGenerator.start

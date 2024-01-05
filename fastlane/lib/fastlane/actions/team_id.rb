@@ -5,7 +5,7 @@ module Fastlane
 
     class TeamIdAction < Action
       def self.run(params)
-        params = nil unless params.kind_of? Array
+        params = nil unless params.kind_of?(Array)
         team = (params || []).first
         UI.user_error!("Please pass your Team ID (e.g. team_id 'Q2CBPK58CA')") unless team.to_s.length > 0
 
@@ -26,6 +26,16 @@ module Fastlane
 
       def self.is_supported?(platform)
         platform == :ios
+      end
+
+      def self.example_code
+        [
+          'team_id("Q2CBPK58CA")'
+        ]
+      end
+
+      def self.category
+        :misc
       end
     end
   end

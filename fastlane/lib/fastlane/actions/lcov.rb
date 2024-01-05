@@ -2,7 +2,7 @@ module Fastlane
   module Actions
     class LcovAction < Action
       def self.is_supported?(platform)
-        [:ios, :mac].include? platform
+        [:ios, :mac].include?(platform)
       end
 
       def self.run(options)
@@ -22,21 +22,17 @@ module Fastlane
           FastlaneCore::ConfigItem.new(key: :project_name,
                                        env_name: "FL_LCOV_PROJECT_NAME",
                                        description: "Name of the project"),
-
           FastlaneCore::ConfigItem.new(key: :scheme,
                                        env_name: "FL_LCOV_SCHEME",
                                        description: "Scheme of the project"),
-
           FastlaneCore::ConfigItem.new(key: :arch,
                                        env_name: "FL_LCOV_ARCH",
                                        description: "The build arch where will search .gcda files",
                                        default_value: "i386"),
-
           FastlaneCore::ConfigItem.new(key: :output_dir,
                                        env_name: "FL_LCOV_OUTPUT_DIR",
                                        description: "The output directory that coverage data will be stored. If not passed will use coverage_reports as default value",
                                        optional: true,
-                                       is_string: true,
                                        default_value: "coverage_reports")
         ]
       end
@@ -82,6 +78,20 @@ module Fastlane
 
       def self.exclude_dirs
         ["/Applications/*", "/Frameworks/*"]
+      end
+
+      def self.example_code
+        [
+          'lcov(
+            project_name: "ProjectName",
+            scheme: "yourScheme",
+            output_dir: "cov_reports" # This value is optional. Default is coverage_reports
+          )'
+        ]
+      end
+
+      def self.category
+        :testing
       end
     end
   end

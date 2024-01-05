@@ -1,0 +1,32 @@
+{
+  "resultCode": 0,
+  "invites": [
+    {
+      "inviteId": "A0B4C6D8EF",
+      "recipientRole": "ADMIN",
+      "inviterName": "Felix Krause",
+      "dateCreated": 1501106986000,
+      "recipientEmail": "abl@g00gle.com",
+      "dateExpires": 1503705599000
+    },
+    {
+      "inviteId": "A1B4C6D8EF",
+      "recipientRole": "MEMBER",
+      "inviterName": "David Ohayon",
+      "dateCreated": 1500664007000,
+      "recipientEmail": "kaipi@g00gle.com",
+      "dateExpires": 1503273599000
+    },
+    {
+      "inviteId": "A2B4C6D8EF",
+      "recipientRole": "MEMBER",
+      "inviterName": "Joshua Liebowitz",
+      "dateCreated": 1500035635000,
+      "recipientEmail": "davg@g00gle.com",
+      "dateExpires": 1502668799000
+    }
+  ],
+  "creationTimestamp": "2017-08-02T18:36:25Z",
+  "userLocale": "en_US",
+  "teams": []
+}

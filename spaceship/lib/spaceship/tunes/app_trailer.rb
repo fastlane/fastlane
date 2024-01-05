@@ -1,6 +1,8 @@
+require_relative 'tunes_base'
+
 module Spaceship
   module Tunes
-    # Represents a preview video hosted on iTunes Connect. Used for icons, screenshots, etc
+    # Represents a preview video hosted on App Store Connect. Used for icons, screenshots, etc
     class AppTrailer < TunesBase
       attr_accessor :video_asset_token
 
@@ -32,12 +34,6 @@ module Spaceship
         'contentType' => :content_type,
         'videoStatus' => :video_status
       )
-
-      class << self
-        def factory(attrs)
-          self.new(attrs)
-        end
-      end
 
       def reset!(attrs = {})
         update_raw_data!({

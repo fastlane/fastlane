@@ -1,5 +1,3 @@
-require 'spec_helper'
-
 describe Spaceship do
   before { Spaceship.login }
 
@@ -20,7 +18,7 @@ describe Spaceship do
   end
 
   it "ProvisioningProfile" do
-    expect(Spaceship.provisioning_profile.all.count).to eq(33)
+    expect(Spaceship.provisioning_profile.all.count).to eq(7)
   end
 
   it "App" do

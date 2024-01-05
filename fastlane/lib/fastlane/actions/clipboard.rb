@@ -2,9 +2,12 @@ module Fastlane
   module Actions
     class ClipboardAction < Action
       def self.run(params)
-        UI.message("Storing '#{params[:value]}' in the clipboard 🎨")
+        value = params[:value]
 
-        `echo "#{params[:value]}" | tr -d '\n' | pbcopy` # we don't use `sh`, as the command looks ugly
+        truncated_value = value[0..800].gsub(/\s\w+\s*$/, '...')
+        UI.message("Storing '#{truncated_value}' in the clipboard 🎨")
+
+        FastlaneCore::Clipboard.copy(content: value)
       end
 
       #####################################################
@@ -12,7 +15,7 @@ module Fastlane
       #####################################################
 
       def self.description
-        "Copies a given string into the clipboard. Works only on Mac OS X computers"
+        "Copies a given string into the clipboard. Works only on macOS"
       end
 
       def self.available_options
@@ -24,11 +27,22 @@ module Fastlane
       end
 
       def self.authors
-        ["KrauseFx"]
+        ["KrauseFx", "joshdholtz", "rogerluan"]
       end
 
       def self.is_supported?(platform)
-        true
+        FastlaneCore::Clipboard.is_supported?
+      end
+
+      def self.example_code
+        [
+          'clipboard(value: "https://docs.fastlane.tools/")',
+          'clipboard(value: lane_context[SharedValues::HOCKEY_DOWNLOAD_LINK] || "")'
+        ]
+      end
+
+      def self.category
+        :misc
       end
     end
   end

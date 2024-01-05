@@ -1,0 +1,143 @@
+{
+  "data": {
+    "sectionErrorKeys": [],
+    "sectionInfoKeys": [],
+    "sectionWarningKeys": [],
+    "internalStatus": "active",
+    "externalStatus": "submitForReview",
+    "expirationDate": null,
+    "internalExpirationDate": null,
+    "externalExpirationDate": null,
+    "primaryLanguage": "English",
+    "primaryLocaleCode": "en-US",
+    "availableLanguages": ["English"],
+    "details": [{
+      "sectionErrorKeys": [],
+      "sectionInfoKeys": [],
+      "sectionWarningKeys": [],
+      "language": "English",
+      "localeCode": "en-US",
+      "whatsNew": {
+        "value": null,
+        "isEditable": true,
+        "isRequired": true,
+        "errorKeys": null,
+        "maxLength": 4000,
+        "minLength": 4
+      },
+      "description": {
+        "value": null,
+        "isEditable": true,
+        "isRequired": true,
+        "errorKeys": null,
+        "maxLength": 4000,
+        "minLength": 10
+      },
+      "feedbackEmail": {
+        "value": null,
+        "isEditable": true,
+        "isRequired": true,
+        "errorKeys": null,
+        "maxLength": 500,
+        "minLength": 1
+      },
+      "marketingUrl": {
+        "value": null,
+        "isEditable": true,
+        "isRequired": true,
+        "errorKeys": null,
+        "maxLength": 255,
+        "minLength": 1
+      },
+      "privacyPolicyUrl": {
+        "value": null,
+        "isEditable": true,
+        "isRequired": false,
+        "errorKeys": null,
+        "maxLength": 255,
+        "minLength": 1
+      },
+      "privacyPolicyText": null
+    }],
+    "reviewFirstName": {
+      "value": null,
+      "isEditable": true,
+      "isRequired": true,
+      "errorKeys": null,
+      "maxLength": 100,
+      "minLength": 1
+    },
+    "reviewLastName": {
+      "value": null,
+      "isEditable": true,
+      "isRequired": true,
+      "errorKeys": null,
+      "maxLength": 100,
+      "minLength": 1
+    },
+    "reviewPhone": {
+      "value": null,
+      "isEditable": true,
+      "isRequired": true,
+      "errorKeys": null,
+      "maxLength": 20,
+      "minLength": 1
+    },
+    "reviewEmail": {
+      "value": null,
+      "isEditable": true,
+      "isRequired": true,
+      "errorKeys": null,
+      "maxLength": 100,
+      "minLength": 1
+    },
+    "reviewNotes": {
+      "value": null,
+      "isEditable": true,
+      "isRequired": false,
+      "errorKeys": null,
+      "maxLength": 4000,
+      "minLength": 1
+    },
+    "reviewUserName": {
+      "value": null,
+      "isEditable": true,
+      "isRequired": false,
+      "errorKeys": null,
+      "maxLength": 400,
+      "minLength": 1
+    },
+    "reviewPassword": {
+      "value": null,
+      "isEditable": true,
+      "isRequired": false,
+      "errorKeys": null,
+      "maxLength": 400,
+      "minLength": 1
+    },
+    "reviewAccountRequired": {
+      "value": false,
+      "isEditable": true,
+      "isRequired": false,
+      "errorKeys": null
+    },
+    "eula": {
+      "value": null,
+      "isEditable": true,
+      "isRequired": false,
+      "errorKeys": null,
+      "maxLength": null,
+      "minLength": 1
+    },
+    "hasExportCompliance": false,
+    "installCount": 0,
+    "externalInstallCount": 0,
+    "internalInstallCount": 0,
+    "sessionCount": 0,
+    "externalSessionCount": 0,
+    "internalSessionCount": 0,
+    "crashCount": 0,
+    "externalCrashCount": 0,
+    "internalCrashCount": 0
+  }
+}

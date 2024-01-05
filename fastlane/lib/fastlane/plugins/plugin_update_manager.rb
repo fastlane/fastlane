@@ -2,7 +2,7 @@ module Fastlane
   # Alert the user when updates for plugins are available
   class PluginUpdateManager
     def self.start_looking_for_updates
-      return if ENV["FASTLANE_SKIP_UPDATE_CHECK"]
+      return if FastlaneCore::Env.truthy?("FASTLANE_SKIP_UPDATE_CHECK")
 
       Thread.new do
         self.plugin_references.each do |plugin_name, current_plugin|
@@ -15,7 +15,7 @@ module Fastlane
     end
 
     def self.show_update_status
-      return if ENV["FASTLANE_SKIP_UPDATE_CHECK"]
+      return if FastlaneCore::Env.truthy?("FASTLANE_SKIP_UPDATE_CHECK")
 
       # We set self.server_results to be nil
       # this way the table is not printed twice
@@ -41,14 +41,15 @@ module Fastlane
         return
       end
 
-      puts Terminal::Table.new({
-        rows: rows,
+      require 'terminal-table'
+      puts(Terminal::Table.new({
+        rows: FastlaneCore::PrintTable.transform_output(rows),
         title: "Plugin updates available".yellow,
         headings: ["Plugin", "Your Version", "Latest Version"]
-      })
-      UI.message "To update all plugins, just run"
-      UI.command "fastlane update_plugins"
-      puts ''
+      }))
+      UI.message("To update all plugins, just run")
+      UI.command "bundle exec fastlane update_plugins"
+      puts('')
       @server_results = nil
     end
 

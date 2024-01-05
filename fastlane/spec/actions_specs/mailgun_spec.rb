@@ -8,7 +8,7 @@ describe Fastlane do
       end
 
       it "raises an error if no mailgun sandbox postmaster is given" do
-        ENV.delete 'MAILGUN_SANDBOX_POSTMASTER'
+        ENV.delete('MAILGUN_SANDBOX_POSTMASTER')
         expect do
           Fastlane::FastFile.new.parse("lane :test do
           mailgun({
@@ -21,7 +21,7 @@ describe Fastlane do
       end
 
       it "raises an error if no mailgun apikey is given" do
-        ENV.delete 'MAILGUN_APIKEY'
+        ENV.delete('MAILGUN_APIKEY')
         expect do
           Fastlane::FastFile.new.parse("lane :test do
           mailgun({
@@ -53,7 +53,7 @@ describe Fastlane do
       end
 
       it "raises an error if no mailgun app_link is given" do
-        ENV.delete 'MAILGUN_APP_LINK'
+        ENV.delete('MAILGUN_APP_LINK')
         expect do
           Fastlane::FastFile.new.parse("lane :test do
           mailgun({

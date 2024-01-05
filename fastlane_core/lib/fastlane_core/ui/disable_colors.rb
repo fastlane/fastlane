@@ -10,8 +10,17 @@ class String
     end
   end
   Colored::EXTRAS.keys.each do |extra|
+    next if extra == 'clear'
     define_method(extra) do
       self # do nothing with the string, but return it
     end
   end
+end
+
+# If a plugin uses the colorize gem, we also want to disable that
+begin
+  require 'colorize'
+  String.disable_colorization = true
+rescue LoadError
+  # Colorize gem is not used by any plugin
 end

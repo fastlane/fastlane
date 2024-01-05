@@ -424,7 +424,7 @@
             "name": "1 Gut Altentann Ad Hoc",
             "status": "Active",
             "type": "iOS Distribution",
-            "distributionMethod": "store",
+            "distributionMethod": "adhoc",
             "proProPlatform": "ios",
             "version": "2",
             "dateExpire": "2015-11-25",

@@ -1,0 +1,35 @@
+  <%= program :name %>
+
+  <%= program :description %>
+
+  <%= "Commands:#{@default_command ? ' (* default)' : '' }" %>
+<% for name, command in @commands.sort -%>
+<% unless alias? name -%>
+    <%= "%-#{max_command_length}s #{@default_command.nil? ? '' : (command.name == @default_command.to_s ? '* ' : '  ') }%s" % [command.name, command.summary || command.description] %>
+<% end -%>
+<% end -%>
+<% unless @aliases.empty? %>
+  Aliases:
+<% for alias_name, args in @aliases.sort -%>
+    <%= "%-#{max_aliases_length}s %s %s" % [alias_name, command(alias_name).name, args.join(' ')] %>
+<% end -%>
+<% end %>
+<% unless @options.empty? -%>
+  Global Options:
+<% for option in @options -%>
+    <%= "%-20s %s" % [option[:switches].join(', '), option[:description]] %>
+<% end -%>
+<% end -%>
+<% default_command_options = @commands.values.find {|c| c.name == @default_command.to_s }&.options || [] %>
+<% unless default_command_options.empty? %>
+  <%= "Options for #{@default_command}:" %>
+<% for option in default_command_options -%>
+    <%= "%-20s %s" % [option[:switches].join(', '), option[:description]] %>
+<% end -%>
+<% end -%>
+<% if program :help -%>
+  <% for title, body in program(:help) %>
+  <%= title %>:
+    <%= body %>
+  <% end %>
+<% end -%>

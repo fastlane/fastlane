@@ -1,23 +1,45 @@
 require 'commander'
 
+require_relative '../module'
+require_relative '../ui/ui'
+
 module FastlaneCore
   class CommanderGenerator
     include Commander::Methods
 
     # Calls the appropriate methods for commander to show the available parameters
-    def generate(options)
+    def generate(options, command: nil)
       # First, enable `always_trace`, to show the stack trace
       always_trace!
 
       used_switches = []
       options.each do |option|
         next if option.description.to_s.empty? # "private" options
+        next unless option.display_in_shell
 
         short_switch = option.short_option
         key = option.key
         validate_short_switch(used_switches, short_switch, key)
 
         type = option.data_type
+
+        # We added type: Hash to code generation, but Ruby's OptionParser doesn't like that
+        # so we need to switch that to something that is supported, luckily, we have an `is_string`
+        # property and if that is false, we'll default to nil
+        if type == Hash
+          type = option.is_string ? String : nil
+        end
+
+        # OptionParser doesn't like symbol but a symbol and string can be easily cast with `to_sym` and `to_s`
+        if type == Symbol
+          type = String
+        end
+
+        # Boolean is a fastlane thing, it's either TrueClass, or FalseClass, but we won't know
+        # that until runtime, so nil is the best we get
+        if type == Fastlane::Boolean
+          type = nil
+        end
 
         # This is an important bit of trickery to solve the boolean option situation.
         #
@@ -50,7 +72,7 @@ module FastlaneCore
         long_switch = "--#{option.key} #{value_appendix}"
 
         description = option.description
-        description += " (#{option.env_name})" unless option.env_name.to_s.empty?
+        description += " (#{option.env_names.join(', ')})" unless option.env_names.empty?
 
         # We compact this array here to remove the short_switch variable if it is nil.
         # Passing a nil value to global_option has been shown to create problems with
@@ -63,8 +85,12 @@ module FastlaneCore
         # automatically coerced or otherwise handled by the ConfigItem for others.
         args = [short_switch, long_switch, (type || String), description].compact
 
-        # This is the call to Commander to set up the option we've been building.
-        global_option(*args)
+        if command
+          command.option(*args)
+        else
+          # This is the call to Commander to set up the option we've been building.
+          global_option(*args)
+        end
       end
     end
 
@@ -72,9 +98,9 @@ module FastlaneCore
       return if short_switch.nil?
 
       UI.user_error!("Short option #{short_switch} already taken for key #{key}") if used_switches.include?(short_switch)
-      UI.user_error!("-v is already used for the version (key #{key})") if short_switch == "-v"
-      UI.user_error!("-h is already used for the help screen (key #{key})") if short_switch == "-h"
-      UI.user_error!("-t is already used for the trace screen (key #{key})") if short_switch == "-t"
+      UI.user_error!("-v is already used for the fastlane version (key #{key})") if short_switch == "-v"
+      UI.user_error!("-h is already used for the fastlane help screen (key #{key})") if short_switch == "-h"
+      UI.user_error!("-t is already used for the fastlane trace screen (key #{key})") if short_switch == "-t"
 
       used_switches << short_switch
     end

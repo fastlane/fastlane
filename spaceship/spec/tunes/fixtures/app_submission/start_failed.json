@@ -410,13 +410,13 @@
                     "isRequired": false,
                     "errorKeys": []
                 },
-                "supportURL": {
+                "supportUrl": {
                     "value": "https://github.com/fastlane",
                     "isEditable": true,
                     "isRequired": false,
                     "errorKeys": []
                 },
-                "marketingURL": {
+                "marketingUrl": {
                     "value": "https://sunapps.net",
                     "isEditable": true,
                     "isRequired": false,
@@ -632,13 +632,13 @@
                     "isRequired": false,
                     "errorKeys": []
                 },
-                "supportURL": {
+                "supportUrl": {
                     "value": "",
                     "isEditable": true,
                     "isRequired": false,
                     "errorKeys": []
                 },
-                "marketingURL": {
+                "marketingUrl": {
                     "value": "",
                     "isEditable": true,
                     "isRequired": false,

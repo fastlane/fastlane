@@ -1,26 +1,15 @@
-require 'json'
-require 'deliver/version'
-require 'deliver/options'
-require 'deliver/commands_generator'
-require 'deliver/detect_values'
-require 'deliver/runner'
-require 'deliver/upload_metadata'
-require 'deliver/upload_screenshots'
-require 'deliver/upload_price_tier'
-require 'deliver/upload_assets'
-require 'deliver/submit_for_review'
-require 'deliver/app_screenshot'
-require 'deliver/html_generator'
-require 'deliver/generate_summary'
-require 'deliver/loader'
+require_relative 'deliver/languages'
+require_relative 'deliver/loader'
+require_relative 'deliver/options'
+require_relative 'deliver/commands_generator'
+require_relative 'deliver/detect_values'
+require_relative 'deliver/runner'
+require_relative 'deliver/upload_metadata'
+require_relative 'deliver/upload_screenshots'
+require_relative 'deliver/upload_price_tier'
+require_relative 'deliver/submit_for_review'
+require_relative 'deliver/app_screenshot'
+require_relative 'deliver/html_generator'
+require_relative 'deliver/generate_summary'
 
-require 'spaceship'
-require 'fastlane_core'
-
-module Deliver
-  class << self
-  end
-
-  Helper = FastlaneCore::Helper # you gotta love Ruby: Helper.* should use the Helper class contained in FastlaneCore
-  UI = FastlaneCore::UI
-end
+require_relative 'deliver/module'

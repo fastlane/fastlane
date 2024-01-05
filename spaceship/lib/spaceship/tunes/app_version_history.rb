@@ -1,6 +1,8 @@
+require_relative 'app_version_states_history'
+
 module Spaceship
   module Tunes
-    # Represents a read only version of an iTunes Connect Versions State History
+    # Represents a read only version of an App Store Connect Versions State History
     class AppVersionHistory < TunesBase
       # @return (Spaceship::Tunes::Application) A reference to the application
       #   this version is for
@@ -20,15 +22,6 @@ module Spaceship
         'versionId' => :version_id,
         'items' => :items
       })
-
-      class << self
-        # Create a new object based on a hash.
-        # This is used to create a new object based on the server response.
-        def factory(attrs)
-          obj = self.new(attrs)
-          return obj
-        end
-      end
 
       # Returns an array of all builds that can be sent to review
       def items

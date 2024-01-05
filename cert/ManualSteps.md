@@ -1,4 +1,4 @@
-# [cert](https://github.com/fastlane/fastlane/tree/master/cert)
+# [_cert_](https://docs.fastlane.tools/actions/cert/)
 
 #### To create a new certificate and a provisioning profile you have to do the following steps on the Apple Developer Portal
 
@@ -16,4 +16,4 @@
 ![assets/manual/Step12.png](assets/manual/Step12.png)
 
 
-#### Yes, you have to follow all those steps to create a provisiong profile with its certificate
+#### Yes, you have to follow all those steps to create a provisioning profile with its certificate

@@ -1,0 +1,30 @@
+{
+  "creationTimestamp": "2017-02-14T21:37:50Z",
+  "resultCode": 0,
+  "userLocale": "en_US",
+  "protocolVersion": "QH65B2",
+  "requestId": "8286b5c1-ed85-4bf5-y65b-0cd7910f1d67",
+  "requestUrl": "https://developer.apple.com:443/services-account/QH65B2/account/ios/device/addDevices.action?content-type=text/x-url-arguments&accept=application/json&requestId=8286b5c1-ed85-4bf5-y65b-0cd7910f1d67&userLocale=en_US&teamId=47C5778P4P",
+  "responseId": "9bc3b97b-7ce1-46d9-9de6-23b4630b9525",
+  "isAdmin": true,
+  "isMember": false,
+  "isAgent": true,
+  "devices": [
+    {
+      "deviceId": "BTSF5CE34F",
+      "name": "Demo Device",
+      "deviceNumber": "7f6c8dc83d77134b5a3a1c53f1202b395b04482b",
+      "devicePlatform": "ios",
+      "status": "c",
+      "deviceClass": "iphone",
+      "model": "iPhone 6"
+    }
+  ],
+  "failedDevices": [
+
+  ],
+  "validationMessages": [
+
+  ],
+  "nextDeviceResetDate": null
+}

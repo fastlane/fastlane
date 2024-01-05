@@ -1,5 +1,3 @@
-require 'spec_helper'
-
 describe Spaceship::Certificate do
   before { Spaceship.login }
   let(:client) { Spaceship::Portal::Certificate.client }
@@ -68,7 +66,7 @@ describe Spaceship::Certificate do
     end
 
     it "handles failed download request" do
-      adp_stub_download_certificate_failure
+      PortalStubbing.adp_stub_download_certificate_failure
 
       error_text = /^Couldn't download certificate, got this instead:/
       expect do
@@ -87,8 +85,8 @@ describe Spaceship::Certificate do
 
   describe '#create' do
     it 'should create and return a new certificate' do
-      expect(client).to receive(:create_certificate!).with('UPV3DW712I', /BEGIN CERTIFICATE REQUEST/, 'B7JBD8LHAA') {
-        JSON.parse(adp_read_fixture_file('certificateCreate.certRequest.json'))
+      expect(client).to receive(:create_certificate!).with('UPV3DW712I', /BEGIN CERTIFICATE REQUEST/, 'B7JBD8LHAA', false) {
+        JSON.parse(PortalStubbing.adp_read_fixture_file('certificateCreate.certRequest.json'))
       }
       csr, pkey = Spaceship::Portal::Certificate.create_certificate_signing_request
       certificate = Spaceship::Portal::Certificate::ProductionPush.create!(csr: csr, bundle_id: 'net.sunapps.151')
@@ -96,8 +94,8 @@ describe Spaceship::Certificate do
     end
 
     it 'should create a new certificate using a CSR from a file' do
-      expect(client).to receive(:create_certificate!).with('UPV3DW712I', /BEGIN CERTIFICATE REQUEST/, 'B7JBD8LHAA') {
-        JSON.parse(adp_read_fixture_file('certificateCreate.certRequest.json'))
+      expect(client).to receive(:create_certificate!).with('UPV3DW712I', /BEGIN CERTIFICATE REQUEST/, 'B7JBD8LHAA', false) {
+        JSON.parse(PortalStubbing.adp_read_fixture_file('certificateCreate.certRequest.json'))
       }
       csr, pkey = Spaceship::Portal::Certificate.create_certificate_signing_request
       Tempfile.open('csr') do |f|
@@ -108,11 +106,20 @@ describe Spaceship::Certificate do
       end
     end
 
+    it 'can create a WebsitePush certificate' do
+      expect(client).to receive(:create_certificate!).with('3T2ZP62QW8', /BEGIN CERTIFICATE REQUEST/, '44V62UZ8L7', false) {
+        JSON.parse(PortalStubbing.adp_read_fixture_file('certificateCreate.certRequest.json'))
+      }
+      csr, pkey = Spaceship::Portal::Certificate.create_certificate_signing_request
+      certificate = Spaceship::Portal::Certificate::WebsitePush.create!(csr: csr, bundle_id: 'web.com.example.one')
+      expect(certificate).to be_instance_of(Spaceship::Portal::Certificate::WebsitePush)
+    end
+
     it 'raises an error if the user wants to create a certificate for a non-existing app' do
       expect do
         csr, pkey = Spaceship::Portal::Certificate.create_certificate_signing_request
         Spaceship::Portal::Certificate::ProductionPush.create!(csr: csr, bundle_id: 'notExisting')
-      end.to raise_error "Could not find app with bundle id 'notExisting'"
+      end.to raise_error("Could not find app with bundle id 'notExisting'")
     end
   end
 end

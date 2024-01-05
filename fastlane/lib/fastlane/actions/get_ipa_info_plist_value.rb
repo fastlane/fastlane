@@ -28,7 +28,7 @@ module Fastlane
       end
 
       def self.details
-        "This is useful for introspecting Info.plist files for .ipa files that have already been built."
+        "This is useful for introspecting Info.plist files for `.ipa` files that have already been built."
       end
 
       def self.available_options
@@ -40,8 +40,8 @@ module Fastlane
           FastlaneCore::ConfigItem.new(key: :ipa,
                                        env_name: "FL_GET_IPA_INFO_PLIST_VALUE_IPA",
                                        description: "Path to IPA",
-                                       is_string: true,
-                                       default_value: Actions.lane_context[SharedValues::IPA_OUTPUT_PATH])
+                                       default_value: Actions.lane_context[SharedValues::IPA_OUTPUT_PATH],
+                                       default_value_dynamic: true)
         ]
       end
 
@@ -61,6 +61,20 @@ module Fastlane
 
       def self.is_supported?(platform)
         [:ios, :mac].include?(platform)
+      end
+
+      def self.example_code
+        [
+          'get_ipa_info_plist_value(ipa: "path.ipa", key: "KEY_YOU_READ")'
+        ]
+      end
+
+      def self.return_type
+        :string
+      end
+
+      def self.category
+        :project
       end
     end
   end

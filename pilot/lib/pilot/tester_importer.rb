@@ -1,4 +1,6 @@
-require "fastlane_core"
+require_relative 'module'
+require_relative 'manager'
+require_relative 'tester_manager'
 
 module Pilot
   class TesterImporter < Manager
@@ -13,8 +15,10 @@ module Pilot
       tester_manager = Pilot::TesterManager.new
       imported_tester_count = 0
 
+      groups = options[:groups]
+
       CSV.foreach(file, "r") do |row|
-        first_name, last_name, email = row
+        first_name, last_name, email, testing_groups = row
 
         unless email
           UI.error("No email found in row: #{row}")
@@ -30,12 +34,16 @@ module Pilot
         config[:first_name] = first_name
         config[:last_name] = last_name
         config[:email] = email
+        config[:groups] = groups
+        if testing_groups
+          config[:groups] = testing_groups.split(";")
+        end
 
         begin
           tester_manager.add_tester(config)
           imported_tester_count += 1
-        rescue
-          # do nothing, move on to the next row
+        rescue => exception
+          UI.error("Error adding tester #{email}: #{exception}")
         end
       end
 

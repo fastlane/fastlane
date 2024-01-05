@@ -33,6 +33,7 @@ module Fastlane
           # This is here just for while due to the transition, should use apikey instead
           FastlaneCore::ConfigItem.new(key: :mailgun_apikey,
                                        env_name: "MAILGUN_APIKEY",
+                                       sensitive: true,
                                        optional: true,
                                        description: "Mailgun apikey for your mail. Please use postmaster instead"),
 
@@ -41,6 +42,7 @@ module Fastlane
                                        description: "Mailgun sandbox domain postmaster for your mail"),
           FastlaneCore::ConfigItem.new(key: :apikey,
                                        env_name: "MAILGUN_APIKEY",
+                                       sensitive: true,
                                        description: "Mailgun apikey for your mail"),
           FastlaneCore::ConfigItem.new(key: :to,
                                        env_name: "MAILGUN_TO",
@@ -57,30 +59,40 @@ module Fastlane
                                        env_name: "MAILGUN_SUBJECT",
                                        description: "Subject of your mail",
                                        optional: true,
-                                       is_string: true,
                                        default_value: "fastlane build"),
           FastlaneCore::ConfigItem.new(key: :success,
-                                      env_name: "MAILGUN_SUCCESS",
-                                      description: "Was this build successful? (true/false)",
-                                      optional: true,
-                                      default_value: true,
-                                      is_string: false),
+                                       env_name: "MAILGUN_SUCCESS",
+                                       description: "Was this build successful? (true/false)",
+                                       optional: true,
+                                       default_value: true,
+                                       type: Boolean),
           FastlaneCore::ConfigItem.new(key: :app_link,
-                                      env_name: "MAILGUN_APP_LINK",
-                                      description: "App Release link",
-                                      optional: false,
-                                      is_string: true),
+                                       env_name: "MAILGUN_APP_LINK",
+                                       description: "App Release link",
+                                       optional: false),
           FastlaneCore::ConfigItem.new(key: :ci_build_link,
-                                      env_name: "MAILGUN_CI_BUILD_LINK",
-                                      description: "CI Build Link",
-                                      optional: true,
-                                      is_string: true),
+                                       env_name: "MAILGUN_CI_BUILD_LINK",
+                                       description: "CI Build Link",
+                                       optional: true),
           FastlaneCore::ConfigItem.new(key: :template_path,
-                                      env_name: "MAILGUN_TEMPLATE_PATH",
-                                      description: "Mail HTML template",
-                                      optional: true,
-                                      is_string: true)
-
+                                       env_name: "MAILGUN_TEMPLATE_PATH",
+                                       description: "Mail HTML template",
+                                       optional: true),
+          FastlaneCore::ConfigItem.new(key: :reply_to,
+                                       env_name: "MAILGUN_REPLY_TO",
+                                       description: "Mail Reply to",
+                                       optional: true),
+          FastlaneCore::ConfigItem.new(key: :attachment,
+                                       env_name: "MAILGUN_ATTACHMENT",
+                                       description: "Mail Attachment filenames, either an array or just one string",
+                                       optional: true,
+                                       type: Array),
+          FastlaneCore::ConfigItem.new(key: :custom_placeholders,
+                                       short_option: "-p",
+                                       env_name: "MAILGUN_CUSTOM_PLACEHOLDERS",
+                                       description: "Placeholders for template given as a hash",
+                                       default_value: {},
+                                       type: Hash)
         ]
       end
 
@@ -90,19 +102,31 @@ module Fastlane
 
       def self.handle_params_transition(options)
         options[:postmaster] = options[:mailgun_sandbox_postmaster] if options[:mailgun_sandbox_postmaster]
-        puts "\nUsing :mailgun_sandbox_postmaster is deprecated, please change to :postmaster".yellow if options[:mailgun_sandbox_postmaster]
+        puts("\nUsing :mailgun_sandbox_postmaster is deprecated, please change to :postmaster".yellow) if options[:mailgun_sandbox_postmaster]
 
         options[:apikey] = options[:mailgun_apikey] if options[:mailgun_apikey]
-        puts "\nUsing :mailgun_apikey is deprecated, please change to :apikey".yellow if options[:mailgun_apikey]
+        puts("\nUsing :mailgun_apikey is deprecated, please change to :apikey".yellow) if options[:mailgun_apikey]
       end
 
       def self.mailgunit(options)
         sandbox_domain = options[:postmaster].split("@").last
-        RestClient.post "https://api:#{options[:apikey]}@api.mailgun.net/v3/#{sandbox_domain}/messages",
-                        from: "#{options[:from]}<#{options[:postmaster]}>",
-                        to: (options[:to]).to_s,
-                        subject: options[:subject],
-                        html: mail_template(options)
+        params = {
+          from: "#{options[:from]} <#{options[:postmaster]}>",
+          to: (options[:to]).to_s,
+          subject: options[:subject],
+          html: mail_template(options)
+        }
+        unless options[:reply_to].nil?
+          params.store(:"h:Reply-To", options[:reply_to])
+        end
+
+        unless options[:attachment].nil?
+          attachment_filenames = [*options[:attachment]]
+          attachments = attachment_filenames.map { |filename| File.new(filename, 'rb') }
+          params.store(:attachment, attachments)
+        end
+
+        RestClient.post("https://api:#{options[:apikey]}@api.mailgun.net/v3/#{sandbox_domain}/messages", params)
         mail_template(options)
       end
 
@@ -116,6 +140,9 @@ module Fastlane
         hash[:success] = options[:success]
         hash[:ci_build_link] = options[:ci_build_link]
 
+        # concatenate with custom placeholders passed by user
+        hash = hash.merge(options[:custom_placeholders])
+
         # grabs module
         eth = Fastlane::ErbTemplateHelper
 
@@ -127,6 +154,37 @@ module Fastlane
           html_template = eth.load("mailgun_html_template")
         end
         eth.render(html_template, hash)
+      end
+
+      def self.example_code
+        [
+          'mailgun(
+            to: "fastlane@krausefx.com",
+            success: true,
+            message: "This is the mail\'s content"
+          )',
+          'mailgun(
+            postmaster: "MY_POSTMASTER",
+            apikey: "MY_API_KEY",
+            to: "DESTINATION_EMAIL",
+            from: "EMAIL_FROM_NAME",
+            reply_to: "EMAIL_REPLY_TO",
+            success: true,
+            message: "Mail Body",
+            app_link: "http://www.myapplink.com",
+            ci_build_link: "http://www.mycibuildlink.com",
+            template_path: "HTML_TEMPLATE_PATH",
+            custom_placeholders: {
+              :var1 => 123,
+              :var2 => "string"
+            },
+            attachment: "dirname/filename.ext"
+          )'
+        ]
+      end
+
+      def self.category
+        :notifications
       end
     end
   end

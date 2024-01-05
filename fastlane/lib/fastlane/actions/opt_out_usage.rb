@@ -12,11 +12,10 @@ module Fastlane
 
       def self.details
         [
-          "By default, fastlane will share the used actions. ",
-          "No personal information is shard. More information available on ",
-          "https://github.com/fastlane/enhancer\n",
-          "Using this action you can opt out"
-        ].join('')
+          "By default, _fastlane_ will track what actions are being used. No personal/sensitive information is recorded.",
+          "Learn more at [https://docs.fastlane.tools/#metrics](https://docs.fastlane.tools/#metrics).",
+          "Add `opt_out_usage` at the top of your Fastfile to disable metrics collection."
+        ].join("\n")
       end
 
       def self.author
@@ -25,6 +24,16 @@ module Fastlane
 
       def self.is_supported?(platform)
         true
+      end
+
+      def self.example_code
+        [
+          'opt_out_usage # add this to the top of your Fastfile'
+        ]
+      end
+
+      def self.category
+        :misc
       end
     end
   end

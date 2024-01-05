@@ -1,0 +1,106 @@
+<!--
+This file is auto-generated and will be re-generated every time the docs are updated.
+To modify it, go to its source at https://github.com/fastlane/fastlane/blob/master/fastlane/lib/fastlane/actions/<%= @action_filename %>
+-->
+
+# <%= @action.action_name %>
+
+<% action = @action %>
+<%= action.description %>
+
+<%= "> #{action.deprecated_notes.gsub("\n", "<br>")}" unless action.deprecated_notes.to_s.empty? %>
+
+<% if @custom_content %>
+<%= @custom_content %>
+<hr />
+<% else %>
+<%= "> #{action.details.gsub(/(?<!\|)\n/, "<br>").gsub(/\|(?=\n|$)/, "")}" unless action.details.to_s.empty? %>
+<% end %>
+
+<%= action.action_name %> ||
+---|---
+Supported platforms | <%= [:ios, :android, :mac].find_all { |a| action.is_supported?(a) }.join(", ") %>
+Author | @<%= Array(action.author || action.authors).join(", @") %>
+<%- unless action.return_value.to_s.empty? -%>
+Returns | <%= action.return_value.gsub("\n", "<br>") %>
+<%- end -%>
+
+<% if (action.example_code || []).count > 0 %>
+
+## <%= action.example_code.count %> Example<%= (action.example_code.count > 1) ? "s" : "" %>
+<% action.example_code.each do |current_sample| %>
+```ruby
+<%= current_sample.gsub("          ", "") %>
+```
+<% end %><%# End of action.example_code... %>
+<% end %><%# End of if %>
+
+<% if action.available_options && action.available_options.first.kind_of?(FastlaneCore::ConfigItem) %>
+
+## Parameters
+
+Key | Description | Default
+----|-------------|--------
+<%- (action.available_options || []).each do |config_item| -%>
+  <%- next unless config_item.kind_of?(FastlaneCore::ConfigItem) -%>
+  <%- next if config_item.description.to_s.length == 0 -%>
+  `<%= config_item.key %>` | <%= config_item.description.gsub(/(?<!\\)\|/, "\\|") %> | <%= config_item.doc_default_value %>
+<%- end %>
+<em id="parameters-legend-dynamic">* = default value is dependent on the user's system</em>
+<% end %><%# End of action.available_options... %>
+
+<hr />
+
+<% if action.output && action.output.kind_of?(Array) && action.output.length > 0 %>
+
+## Lane Variables
+
+Actions can communicate with each other using a shared hash `lane_context`, that can be accessed in other actions, plugins or your lanes: `lane_context[SharedValues:XYZ]`. The `<%= @action.action_name %>` action generates the following Lane Variables:
+
+SharedValue | Description 
+------------|-------------
+<%- (action.output || []).each do |array_item| -%>
+  <%- next unless array_item.kind_of?(Array) -%>
+  <%- next if array_item.length != 2 -%>
+  `SharedValues::<%= array_item[0] %>` | <%= array_item[1] %>
+<%- end %>
+To get more information check the [Lanes documentation](https://docs.fastlane.tools/advanced/lanes/#lane-context).
+<hr />
+<% end %><%# End of action.output... %>
+
+## Documentation
+
+To show the documentation in your terminal, run
+```no-highlight
+fastlane action <%= action.action_name %>
+```
+
+<hr />
+
+## CLI
+
+It is recommended to add the above action into your `Fastfile`, however sometimes you might want to run one-offs. To do so, you can run the following command from your terminal
+
+```no-highlight
+fastlane run <%= @action.action_name %>
+```
+
+To pass parameters, make use of the `:` symbol, for example
+
+```no-highlight
+fastlane run <%= @action.action_name %> parameter1:"value1" parameter2:"value2"
+```
+
+It's important to note that the CLI supports primitive types like integers, floats, booleans, and strings. Arrays can be passed as a comma delimited string (e.g. `param:"1,2,3"`). Hashes are not currently supported.
+
+It is recommended to add all _fastlane_ actions you use to your `Fastfile`.
+
+<hr />
+
+## Source code
+
+This action, just like the rest of _fastlane_, is fully open source, <a href="https://github.com/fastlane/fastlane/blob/master/fastlane/lib/fastlane/actions/<%= @action_filename %>" target="_blank">view the source code on GitHub</a>
+
+<hr />
+
+<a href="/actions/"><b>Back to actions</b></a>

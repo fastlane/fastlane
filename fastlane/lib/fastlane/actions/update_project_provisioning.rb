@@ -1,15 +1,15 @@
 # coding: utf-8
-# rubocop:disable Metrics/AbcSize
+
 module Fastlane
   module Actions
     module SharedValues
     end
 
     class UpdateProjectProvisioningAction < Action
-      ROOT_CERTIFICATE_URL = "http://www.apple.com/appleca/AppleIncRootCertificate.cer"
+      ROOT_CERTIFICATE_URL = "https://www.apple.com/appleca/AppleIncRootCertificate.cer"
       def self.run(params)
         UI.message("You’re updating provisioning profiles directly in your project, but have you considered easier ways to do code signing?")
-        UI.message("https://github.com/fastlane/fastlane/blob/master/fastlane/docs/CodeSigning.md")
+        UI.message("https://docs.fastlane.tools/codesigning/GettingStarted/")
 
         # assign folder from parameter or search for xcodeproj file
         folder = params[:xcodeproj] || Dir["*.xcodeproj"].first
@@ -19,11 +19,10 @@ module Fastlane
         UI.user_error!("Could not find path to project config '#{project_file_path}'. Pass the path to your project (not workspace)!") unless File.exist?(project_file_path)
 
         # download certificate
-        unless File.exist?(params[:certificate])
+        unless File.exist?(params[:certificate]) && File.size(params[:certificate]) > 0
           UI.message("Downloading root certificate from (#{ROOT_CERTIFICATE_URL}) to path '#{params[:certificate]}'")
-          require 'open-uri'
-          File.open(params[:certificate], "w") do |file|
-            file.write(open(ROOT_CERTIFICATE_URL, "rb").read)
+          File.open(params[:certificate], "w:ASCII-8BIT") do |file|
+            file.write(FastlaneCore::Helper.open_uri(ROOT_CERTIFICATE_URL, "rb").read)
           end
         end
 
@@ -35,11 +34,14 @@ module Fastlane
         UI.user_error!("Could not find valid certificate at '#{params[:certificate]}'") unless File.size(params[:certificate]) > 0
         cert = OpenSSL::X509::Certificate.new(File.read(params[:certificate]))
         store.add_cert(cert)
+
         p7.verify([cert], store)
+        check_verify!(p7)
         data = Plist.parse_xml(p7.data)
 
         target_filter = params[:target_filter] || params[:build_configuration_filter]
         configuration = params[:build_configuration]
+        code_signing_identity = params[:code_signing_identity]
 
         # manipulate project file
         UI.success("Going to update project '#{folder}' with UUID")
@@ -47,10 +49,10 @@ module Fastlane
 
         project = Xcodeproj::Project.open(folder)
         project.targets.each do |target|
-          if !target_filter || target.product_name.match(target_filter) || (target.respond_to?(:product_type) && target.product_type.match(target_filter))
-            UI.success("Updating target #{target.product_name}...")
+          if !target_filter || target.name.match(target_filter) || (target.respond_to?(:product_type) && target.product_type.match(target_filter))
+            UI.success("Updating target #{target.name}...")
           else
-            UI.important("Skipping target #{target.product_name} as it doesn't match the filter '#{target_filter}'")
+            UI.important("Skipping target #{target.name} as it doesn't match the filter '#{target_filter}'")
             next
           end
 
@@ -63,28 +65,43 @@ module Fastlane
               next
             end
 
+            if code_signing_identity
+              codesign_build_settings_keys = build_configuration.build_settings.keys.select { |key| key.to_s.match(/CODE_SIGN_IDENTITY.*/) }
+              codesign_build_settings_keys.each do |setting|
+                build_configuration.build_settings[setting] = code_signing_identity
+              end
+            end
+
             build_configuration.build_settings["PROVISIONING_PROFILE"] = data["UUID"]
+            build_configuration.build_settings["PROVISIONING_PROFILE_SPECIFIER"] = data["Name"]
           end
         end
 
         project.save
 
         # complete
-        UI.success("Successfully updated project settings in'#{params[:xcodeproj]}'")
+        UI.success("Successfully updated project settings in '#{folder}'")
+      end
+
+      def self.check_verify!(p7)
+        failed_to_verify = (p7.data.nil? || p7.data == "") && !(p7.error_string || "").empty?
+        if failed_to_verify
+          UI.crash!("Profile could not be verified with error: '#{p7.error_string}'. Try regenerating provisioning profile.")
+        end
       end
 
       def self.description
-        "Update projects code signing settings from your profisioning profile"
+        "Update projects code signing settings from your provisioning profile"
       end
 
       def self.details
         [
-          "This action retrieves a provisioning profile UUID from a provisioning profile (.mobileprovision) to set",
-          "up the xcode projects' code signing settings in *.xcodeproj/project.pbxproj",
-          "The `target_filter` value can be used to only update code signing for specified targets",
-          "The `build_configuration` value can be used to only update code signing for specified build configurations of the targets passing through the `target_filter`",
-          "Example Usage is the WatchKit Extension or WatchKit App, where you need separate provisioning profiles",
-          "Example: `update_project_provisioning(xcodeproj: \"..\", target_filter: \".*WatchKit App.*\")"
+          "You should check out the [code signing guide](https://docs.fastlane.tools/codesigning/getting-started/) before using this action.",
+          "This action retrieves a provisioning profile UUID from a provisioning profile (`.mobileprovision`) to set up the Xcode projects' code signing settings in `*.xcodeproj/project.pbxproj`.",
+          "The `:target_filter` value can be used to only update code signing for the specified targets.",
+          "The `:build_configuration` value can be used to only update code signing for the specified build configurations of the targets passing through the `:target_filter`.",
+          "Example usage is the WatchKit Extension or WatchKit App, where you need separate provisioning profiles.",
+          "Example: `update_project_provisioning(xcodeproj: \"..\", target_filter: \".*WatchKit App.*\")`."
         ].join("\n")
       end
 
@@ -101,13 +118,18 @@ module Fastlane
                                        env_name: "FL_PROJECT_PROVISIONING_PROFILE_FILE",
                                        description: "Path to provisioning profile (.mobileprovision)",
                                        default_value: Actions.lane_context[SharedValues::SIGH_PROFILE_PATH],
+                                       default_value_dynamic: true,
                                        verify_block: proc do |value|
                                          UI.user_error!("Path to provisioning profile is invalid") unless File.exist?(value)
                                        end),
           FastlaneCore::ConfigItem.new(key: :target_filter,
                                        env_name: "FL_PROJECT_PROVISIONING_PROFILE_TARGET_FILTER",
                                        description: "A filter for the target name. Use a standard regex",
-                                       optional: true),
+                                       optional: true,
+                                       skip_type_validation: true, # allow Regexp, String
+                                       verify_block: proc do |value|
+                                         UI.user_error!("target_filter should be Regexp or String") unless [Regexp, String].any? { |type| value.kind_of?(type) }
+                                       end),
           FastlaneCore::ConfigItem.new(key: :build_configuration_filter,
                                        env_name: "FL_PROJECT_PROVISIONING_PROFILE_FILTER",
                                        description: "Legacy option, use 'target_filter' instead",
@@ -115,11 +137,19 @@ module Fastlane
           FastlaneCore::ConfigItem.new(key: :build_configuration,
                                        env_name: "FL_PROJECT_PROVISIONING_PROFILE_BUILD_CONFIGURATION",
                                        description: "A filter for the build configuration name. Use a standard regex. Applied to all configurations if not specified",
-                                       optional: true),
+                                       optional: true,
+                                       skip_type_validation: true, # allow Regexp, String
+                                       verify_block: proc do |value|
+                                         UI.user_error!("build_configuration should be Regexp or String") unless [Regexp, String].any? { |type| value.kind_of?(type) }
+                                       end),
           FastlaneCore::ConfigItem.new(key: :certificate,
                                        env_name: "FL_PROJECT_PROVISIONING_CERTIFICATE_PATH",
                                        description: "Path to apple root certificate",
-                                       default_value: "/tmp/AppleIncRootCertificate.cer")
+                                       default_value: "/tmp/AppleIncRootCertificate.cer"),
+          FastlaneCore::ConfigItem.new(key: :code_signing_identity,
+                                       env_name: "FL_PROJECT_PROVISIONING_CODE_SIGN_IDENTITY",
+                                       description: "Code sign identity for build configuration",
+                                       optional: true)
         ]
       end
 
@@ -128,9 +158,24 @@ module Fastlane
       end
 
       def self.is_supported?(platform)
-        [:ios, :mac].include? platform
+        [:ios, :mac].include?(platform)
+      end
+
+      def self.example_code
+        [
+          'update_project_provisioning(
+            xcodeproj: "Project.xcodeproj",
+            profile: "./watch_app_store.mobileprovision", # optional if you use sigh
+            target_filter: ".*WatchKit Extension.*", # matches name or type of a target
+            build_configuration: "Release",
+            code_signing_identity: "iPhone Development" # optionally specify the codesigning identity
+          )'
+        ]
+      end
+
+      def self.category
+        :code_signing
       end
     end
   end
 end
-# rubocop:enable Metrics/AbcSize

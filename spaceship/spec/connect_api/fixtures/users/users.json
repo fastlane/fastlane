@@ -1,0 +1,78 @@
+{
+    "data" : [ {
+      "type" : "users",
+      "id" : "123456789",
+      "attributes" : {
+        "username" : "pizza@email.com",
+        "firstName" : "Cheese",
+        "lastName" : "Pizza",
+        "email" : "pizza@email.com",
+        "preferredCurrencyTerritory" : "USD_USA",
+        "agreedToTerms" : true,
+        "roles" : [ "ADMIN" ],
+        "allAppsVisible" : true,
+        "provisioningAllowed" : true,
+        "emailVettingRequired" : false,
+        "notifications" : { }
+      },
+      "relationships" : {
+        "visibleApps" : {
+          "links" : {
+            "self" : "https://appstoreconnect.apple.com/iris/v1/users/123456789/relationships/visibleApps",
+            "related" : "https://appstoreconnect.apple.com/iris/v1/users/123456789/visibleApps"
+          }
+        },
+        "provider" : {
+          "links" : {
+            "self" : "https://appstoreconnect.apple.com/iris/v1/users/123456789/relationships/provider",
+            "related" : "https://appstoreconnect.apple.com/iris/v1/users/123456789/provider"
+          }
+        }
+      },
+      "links" : {
+        "self" : "https://appstoreconnect.apple.com/iris/v1/users/123456789"
+      }
+    }, {
+      "type" : "users",
+      "id" : "987654321",
+      "attributes" : {
+        "username" : "burgers@email.com",
+        "firstName" : "Ham",
+        "lastName" : "Burger",
+        "email" : "burgers@email.com",
+        "preferredCurrencyTerritory" : "USD_USA",
+        "agreedToTerms" : false,
+        "roles" : [ "DEVELOPER" ],
+        "allAppsVisible" : true,
+        "provisioningAllowed" : true,
+        "emailVettingRequired" : false,
+        "notifications" : { }
+      },
+      "relationships" : {
+        "visibleApps" : {
+          "links" : {
+            "self" : "https://appstoreconnect.apple.com/iris/v1/users/987654321/relationships/visibleApps",
+            "related" : "https://appstoreconnect.apple.com/iris/v1/users/987654321/visibleApps"
+          }
+        },
+        "provider" : {
+          "links" : {
+            "self" : "https://appstoreconnect.apple.com/iris/v1/users/987654321/relationships/provider",
+            "related" : "https://appstoreconnect.apple.com/iris/v1/users/987654321/provider"
+          }
+        }
+      },
+      "links" : {
+        "self" : "https://appstoreconnect.apple.com/iris/v1/users/987654321"
+      }
+    } ],
+    "links" : {
+      "self" : "https://appstoreconnect.apple.com/iris/v1/users"
+    },
+    "meta" : {
+      "paging" : {
+        "total" : 2,
+        "limit" : 50
+      }
+    }
+  }

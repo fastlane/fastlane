@@ -1,3 +1,5 @@
+require_relative 'portal_base'
+
 module Spaceship
   module Portal
     # Represents an app group of the Apple Dev Portal
@@ -36,12 +38,6 @@ module Spaceship
       )
 
       class << self
-        # Create a new object based on a hash.
-        # This is used to create a new object based on the server response.
-        def factory(attrs)
-          self.new(attrs)
-        end
-
         # @return (Array) Returns all app groups available for this account
         def all
           client.app_groups.map { |group| self.factory(group) }
@@ -67,7 +63,7 @@ module Spaceship
       end
 
       # Delete this app group
-      # @return (AppGroup) The app group you just deletd
+      # @return (AppGroup) The app group you just deleted
       def delete!
         client.delete_app_group!(app_group_id)
         self

@@ -1,89 +1,123 @@
-Developer Portal API
-====================
+# Developer Portal API
 
-# Usage
+- [Usage](#usage)
+  * [Login](#login)
+  * [Apps](#apps)
+    + [App Services](#app-services)
+  * [App Groups](#app-groups)
+  * [iCloud Containers](#icloud-containers)
+  * [Apple Pay Merchants](#apple-pay-merchants)
+  * [Passbook](#passbook)
+  * [Certificates](#certificates)
+    + [Code Signing Certificates](#code-signing-certificates)
+    + [Push Certificates](#push-certificates)
+    + [Create a Certificate](#create-a-certificate)
+  * [Provisioning Profiles](#provisioning-profiles)
+    + [Receiving profiles](#receiving-profiles)
+    + [Create a Provisioning Profile](#create-a-provisioning-profile)
+    + [Repair all broken provisioning profiles](#repair-all-broken-provisioning-profiles)
+  * [Devices](#devices)
+  * [Enterprise](#enterprise)
+  * [Multiple Spaceships](#multiple-spaceships)
+  * [More cool things you can do](#more-cool-things-you-can-do)
+  * [Example Data](#example-data)
+- [License](#license)
 
-To quickly play around with `spaceship` launch `irb` in your terminal and execute `require "spaceship"`.
+## Usage
 
-## Login
+To quickly play around with _spaceship_ launch `irb` in your terminal and execute `require "spaceship"`.
 
-*Note*: If you use both the Developer Portal and iTunes Connect API, you'll have to login on both, as the user might have different user credentials.
+### Login
+
+*Note*: If you use both the Developer Portal and App Store Connect API, you'll have to login on both, as the user might have different user credentials.
 
 ```ruby
-Spaceship.login("felix@krausefx.com", "password")
+Spaceship::Portal.login("felix@krausefx.com", "password")
 
-Spaceship.select_team # call this method to let the user select a team
+Spaceship::Portal.select_team # call this method to let the user select a team
 ```
 
-## Apps
+### Apps
 
 ```ruby
 # Fetch all available apps
-all_apps = Spaceship.app.all
+all_apps = Spaceship::Portal.app.all
 
 # Find a specific app based on the bundle identifier
-app = Spaceship.app.find("com.krausefx.app")
+app = Spaceship::Portal.app.find("com.krausefx.app")
 
 # Show the names of all your apps
-Spaceship.app.all.collect do |app|
+Spaceship::Portal.app.all.collect do |app|
   app.name
 end
 
 # Create a new app
-app = Spaceship.app.create!(bundle_id: "com.krausefx.app_name", name: "fastlane App")
+app = Spaceship::Portal.app.create!(bundle_id: "com.krausefx.app_name", name: "fastlane App")
 ```
 
-### App Services
+#### App Services
 
 App Services are part of the application, however, they are one of the few things that can be changed about the app once it has been created.
 
-Currently available services include (all require the `Spaceship.app_service.` prefix)
+Currently available services include (all require the `Spaceship::Portal.app_service.` prefix)
 
 ```
+access_wifi.(on|off)
 app_group.(on|off)
+apple_pay.(on|off)
 associated_domains.(on|off)
 data_protection.(complete|unless_open|until_first_auth|off)
+game_center.(on|off)
 health_kit.(on|off)
 home_kit.(on|off)
 wireless_accessory.(on|off)
 icloud.(on|off)
 cloud_kit.(xcode5_compatible|cloud_kit)
+in_app_purchase.(on|off)
 inter_app_audio.(on|off)
 passbook.(on|off)
 push_notification.(on|off)
+siri_kit.(on|off)
 vpn_configuration.(on|off)
+network_extension.(on|off)
+hotspot.(on|off)
+multipath.(on|off)
+nfc_tag_reading.(on|off)
 ```
 
 Examples:
 
 ```ruby
 # Find a specific app based on the bundle identifier
-app = Spaceship.app.find("com.krausefx.app")
+app = Spaceship::Portal.app.find("com.krausefx.app")
+
+# Get detail information (e.g. see all enabled app services)
+app.details
 
 # Enable HealthKit, but make sure HomeKit is disabled
-app.update_service(Spaceship.app_service.health_kit.on)
-app.update_service(Spaceship.app_service.home_kit.off)
-app.update_service(Spaceship.app_service.vpn_configuration.on)
-app.update_service(Spaceship.app_service.passbook.off)
-app.update_service(Spaceship.app_service.cloud_kit.cloud_kit)
+app.update_service(Spaceship::Portal.app_service.health_kit.on)
+app.update_service(Spaceship::Portal.app_service.home_kit.off)
+app.update_service(Spaceship::Portal.app_service.vpn_configuration.on)
+app.update_service(Spaceship::Portal.app_service.passbook.off)
+app.update_service(Spaceship::Portal.app_service.cloud_kit.cloud_kit)
 ```
 
-## App Groups
+### App Groups
 
 ```ruby
 # Fetch all existing app groups
-all_groups = Spaceship.app_group.all
+all_groups = Spaceship::Portal.app_group.all
 
 # Find a specific app group, based on the identifier
-group = Spaceship.app_group.find("group.com.example.application")
+group = Spaceship::Portal.app_group.find("group.com.example.application")
 
 # Show the names of all the groups
-Spaceship.app_group.all.collect do |group|
+Spaceship::Portal.app_group.all.collect do |group|
   group.name
 end
 
 # Create a new group
-group = Spaceship.app_group.create!(group_id: "group.com.example.another",
+group = Spaceship::Portal.app_group.create!(group_id: "group.com.example.another",
                                         name: "Another group")
 
 # Associate an app with this group (overwrites any previous associations)
@@ -91,72 +125,149 @@ group = Spaceship.app_group.create!(group_id: "group.com.example.another",
 app = app.associate_groups([group])
 ```
 
-## Certificates
+### iCloud Containers
+
+```ruby
+# Fetch all existing containers
+all_containers = Spaceship::Portal.cloud_container.all
+
+# Find a specific container, based on the identifier
+container = Spaceship::Portal.cloud_container.find("iCloud.com.example.application")
+
+# Show the names of all the containers
+Spaceship::Portal.cloud_container.all.collect do |container|
+  container.name
+end
+
+# Create a new iCloud Container
+container = Spaceship::Portal.cloud_container.create!(identifier: "iCloud.com.example.another",
+                                        name: "Another iCloud Container")
+
+# Associate an app with this container (overwrites any previous associations)
+# Assumes app contains a fetched app, as described above
+app = app.associate_cloud_containers([container])
+```
+
+### Apple Pay Merchants
+
+```ruby
+# Fetch all existing merchants
+all_merchants = Spaceship::Portal.merchant.all
+
+# Find a specific merchant, based on the identifier
+sandbox_merchant = Spaceship::Portal.merchant.find("merchant.com.example.application.sandbox")
+
+# Show the names of all the merchants
+Spaceship::Portal.merchant.all.collect do |merchant|
+  merchant.name
+end
+
+# Create a new merchant
+another_merchant = Spaceship::Portal.merchant.create!(bundle_id: "merchant.com.example.another", name: "Another merchant")
+
+# Delete a merchant
+another_merchant.delete!
+
+# Associate an app with merchant/s (overwrites any previous associations)
+# Assumes app contains a fetched app, as described above
+app = app.associate_merchants([sandbox_merchant, production_merchant])
+```
+
+### Passbook
+
+```ruby
+# Fetch all existing passbooks
+all_passbooks = Spaceship::Portal.passbook.all
+
+# Find a specific passbook, based on the identifier
+passbook = Spaceship::Portal.passbook.find("pass.com.example.passbook")
+
+# Create a new passbook
+passbook = Spaceship::Portal.passbook.create!(bundle_id: 'pass.com.example.passbook', name: 'Fastlane Passbook')
+
+# Delete a passbook using his identifier
+passbook = Spaceship::Portal.passbook.find("pass.com.example.passbook").delete!
+
+```
+
+### Certificates
 
 ```ruby
 # Fetch all available certificates (includes signing and push profiles)
-certificates = Spaceship.certificate.all
+certificates = Spaceship::Portal.certificate.all
 ```
 
-### Code Signing Certificates
+#### Code Signing Certificates
 
 ```ruby
 # Production identities
-prod_certs = Spaceship.certificate.production.all
+prod_certs = Spaceship::Portal.certificate.production.all
 
 # Development identities
-dev_certs = Spaceship.certificate.development.all
+dev_certs = Spaceship::Portal.certificate.development.all
 
 # Download a certificate
 cert_content = prod_certs.first.download
 ```
 
-### Push Certificates
+#### Push Certificates
 ```ruby
 # Production push profiles
-prod_push_certs = Spaceship.certificate.production_push.all
+prod_push_certs = Spaceship::Portal.certificate.production_push.all
 
 # Development push profiles
-dev_push_certs = Spaceship.certificate.development_push.all
+dev_push_certs = Spaceship::Portal.certificate.development_push.all
 
 # Download a push profile
 cert_content = dev_push_certs.first.download
+
+# Creating a push certificate
+
+# Create a new certificate signing request
+csr, pkey = Spaceship::Portal.certificate.create_certificate_signing_request
+
+# Use the signing request to create a new push certificate
+Spaceship::Portal.certificate.production_push.create!(csr: csr, bundle_id: "com.krausefx.app")
 ```
 
-### Create a Certificate
+#### Create a Certificate
 
 ```ruby
 # Create a new certificate signing request
-csr, pkey = Spaceship.certificate.create_certificate_signing_request
+csr, pkey = Spaceship::Portal.certificate.create_certificate_signing_request
 
 # Use the signing request to create a new distribution certificate
-Spaceship.certificate.production.create!(csr: csr)
-
-# Use the signing request to create a new push certificate
-Spaceship.certificate.production_push.create!(csr: csr, bundle_id: "com.krausefx.app")
+Spaceship::Portal.certificate.production.create!(csr: csr)
 ```
 
-## Provisioning Profiles
+### Provisioning Profiles
 
-### Receiving profiles
+#### Receiving profiles
 
 ```ruby
 ##### Finding #####
 
 # Get all available provisioning profiles
-profiles = Spaceship.provisioning_profile.all
+profiles = Spaceship::Portal.provisioning_profile.all
 
-# Get all App Store profiles
-profiles_appstore = Spaceship.provisioning_profile.app_store.all
-
-# Get all AdHoc profiles
-profiles_adhoc = Spaceship.provisioning_profile.ad_hoc.all
+# Get all App Store and Ad Hoc profiles
+# Both app_store.all and ad_hoc.all return the same
+# This is the case since September 2016, since the API has changed
+# and there is no fast way to get the type when fetching the profiles
+profiles_appstore_adhoc = Spaceship::Portal.provisioning_profile.app_store.all
+profiles_appstore_adhoc = Spaceship::Portal.provisioning_profile.ad_hoc.all
 
 # Get all Development profiles
-profiles_dev = Spaceship.provisioning_profile.development.all
+profiles_dev = Spaceship::Portal.provisioning_profile.development.all
 
-# Fetch all profiles for a specific app identifier for the App Store
-filtered_profiles = Spaceship.provisioning_profile.app_store.find_by_bundle_id("com.krausefx.app")
+# Fetch all profiles for a specific app identifier for the App Store (Array of profiles)
+filtered_profiles = Spaceship::Portal.provisioning_profile.app_store.find_by_bundle_id(bundle_id: "com.krausefx.app")
+
+# Check if a provisioning profile is valid
+profile.valid?
+
+# Verify that the certificate of the provisioning profile is valid
+profile.certificate_valid?
 
 ##### Downloading #####
 
@@ -164,23 +275,25 @@ filtered_profiles = Spaceship.provisioning_profile.app_store.find_by_bundle_id("
 profile_content = profiles.first.download
 
 # Download a specific profile as file
-my_profile = Spaceship.provisioning_profile.app_store.find_by_bundle_id("com.krausefx.app")
-File.write("output.mobileprovision", my_profile.download)
+matching_profiles = Spaceship::Portal.provisioning_profile.app_store.find_by_bundle_id(bundle_id: "com.krausefx.app")
+first_profile = matching_profiles.first
+
+File.write("output.mobileprovision", first_profile.download)
 ```
 
-### Create a Provisioning Profile
+#### Create a Provisioning Profile
 
 ```ruby
 # Choose the certificate to use
-cert = Spaceship.certificate.production.all.first
+cert = Spaceship::Portal.certificate.production.all.first
 
 # Create a new provisioning profile with a default name
 # The name of the new profile is "com.krausefx.app AppStore"
-profile = Spaceship.provisioning_profile.app_store.create!(bundle_id: "com.krausefx.app",
+profile = Spaceship::Portal.provisioning_profile.app_store.create!(bundle_id: "com.krausefx.app",
                                                          certificate: cert)
 
 # AdHoc Profiles will add all devices by default
-profile = Spaceship.provisioning_profile.ad_hoc.create!(bundle_id: "com.krausefx.app",
+profile = Spaceship::Portal.provisioning_profile.ad_hoc.create!(bundle_id: "com.krausefx.app",
                                                       certificate: cert,
                                                              name: "Profile Name")
 
@@ -188,12 +301,12 @@ profile = Spaceship.provisioning_profile.ad_hoc.create!(bundle_id: "com.krausefx
 File.write("NewProfile.mobileprovision", profile.download)
 ```
 
-### Repair all broken provisioning profiles
+#### Repair all broken provisioning profiles
 
 ```ruby
 # Select all 'Invalid' or 'Expired' provisioning profiles
-broken_profiles = Spaceship.provisioning_profile.all.find_all do |profile|
-  # the below could be replaced with `!profile.valid?`, which takes longer but also verifies the code signing identity
+broken_profiles = Spaceship::Portal.provisioning_profile.all.find_all do |profile|
+  # the below could be replaced with `!profile.valid? || !profile.certificate_valid?`, which takes longer but also verifies the code signing identity
   (profile.status == "Invalid" or profile.status == "Expired")
 end
 
@@ -203,35 +316,50 @@ broken_profiles.each do |profile|
 end
 
 # or to do the same thing, just more Ruby like
-Spaceship.provisioning_profile.all.find_all { |p| !p.valid? }.map(&:repair!)
+Spaceship::Portal.provisioning_profile.all.find_all { |p| !p.valid? || !p.certificate_valid? }.map(&:repair!)
 ```
 
-## Devices
+### Devices
 
 ```ruby
-all_devices = Spaceship.device.all
+# Get all enabled devices
+all_devices = Spaceship::Portal.device.all
+
+# Disable first device
+all_devices.first.disable!
+
+# Find disabled device and enable it
+Spaceship::Portal.device.find_by_udid("44ee59893cb...", include_disabled: true).enable!
+
+# Get list of all devices, including disabled ones, and filter the result to only include disabled devices use enabled? or disabled? methods
+disabled_devices = Spaceship::Portal.device.all(include_disabled: true).select do |device|
+  !device.enabled?
+end
+
+# or to do the same thing, just more Ruby like with disabled? method
+disabled_devices = Spaceship::Portal.device.all(include_disabled: true).select(&:disabled?)
 
 # Register a new device
-Spaceship.device.create!(name: "Private iPhone 6", udid: "5814abb3...")
+Spaceship::Portal.device.create!(name: "Private iPhone 6", udid: "5814abb3...")
 ```
 
-## Enterprise
+### Enterprise
 
 ```ruby
 # Use the InHouse class to get all enterprise certificates
-cert = Spaceship.certificate.in_house.all.first
+cert = Spaceship::Portal.certificate.in_house.all.first
 
 # Create a new InHouse Enterprise distribution profile
-profile = Spaceship.provisioning_profile.in_house.create!(bundle_id: "com.krausefx.*",
+profile = Spaceship::Portal.provisioning_profile.in_house.create!(bundle_id: "com.krausefx.*",
                                                         certificate: cert)
 
 # List all In-House Provisioning Profiles
-profiles = Spaceship.provisioning_profile.in_house.all
+profiles = Spaceship::Portal.provisioning_profile.in_house.all
 ```
 
-## Multiple Spaceships
+### Multiple Spaceships
 
-Sometimes one `spaceship` just isn't enough. That's why this library has its own Spaceship Launcher to launch and use multiple `spaceships` at the same time :rocket:
+Sometimes one _spaceship_ just isn't enough. That's why this library has its own _spaceship_ launcher to launch and use multiple _spaceships_ at the same time :rocket:
 
 ```ruby
 # Launch 2 spaceships
@@ -248,27 +376,31 @@ devices.each do |device|
 end
 ```
 
-## More cool things you can do
+### More cool things you can do
 ```ruby
 # Find a profile with a specific name
-profile = Spaceship.provisioning_profile.development.all.find { |p| p.name == "Name" }
+profile = Spaceship::Portal.provisioning_profile.development.all.find { |p| p.name == "Name" }
 
 # Add all available devices to the profile
-profile.devices = Spaceship.device.all
+profile.devices = Spaceship::Portal.device.all
 
 # Push the changes back to the Apple Developer Portal
 profile.update!
 
 # Get the currently used team_id
-Spaceship.client.team_id
+Spaceship::Portal.client.team_id
+
+app = Spaceship::Portal.app.find("com.krausefx.app")
+
+# Update app name
+app.update_name!('New App Name')
 
 # We generally don't want to be destructive, but you can also delete things
 # This method might fail for various reasons, e.g. app is already in the store
-app = Spaceship.app.find("com.krausefx.app")
 app.delete!
 ```
 
-## Example Data
+### Example Data
 
 Some unnecessary information was removed, check out [provisioning_profile.rb](https://github.com/fastlane/fastlane/blob/master/spaceship/lib/spaceship/portal/provisioning_profile.rb) for all available attributes.
 
@@ -305,6 +437,6 @@ The example data below is a provisioning profile, containing a device, certifica
 >
 ```
 
-### License
+## License
 
 > This project and all fastlane tools are in no way affiliated with Apple Inc. This project is open source under the MIT license, which means you have full access to the source code and can modify it to fit your own needs. All fastlane tools run on your own computer or server, so your credentials or other sensitive information will never leave your own computer. You are responsible for how you use fastlane tools.

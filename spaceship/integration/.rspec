@@ -1,6 +1,0 @@
-require 'rspec/core/rake_task'
-
---require integration_helper
-
---color
---format d

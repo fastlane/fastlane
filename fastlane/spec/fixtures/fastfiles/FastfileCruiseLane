@@ -1,0 +1,16 @@
+desc "test description for cruise lanes"
+lane :test do
+  puts "test"
+end
+
+platform :ios do
+  lane :apple do
+    puts "apple"
+  end
+end
+
+platform :android do
+  lane :robot do
+    puts "robot"
+  end
+end

@@ -1,0 +1,124 @@
+{
+    "data" : [ {
+      "type" : "certificates",
+      "id" : "123456789",
+      "attributes" : {
+        "certificateTypeId" : "5QPB9NHCEI",
+        "requesterEmail" : "email@email.com",
+        "serialNumber" : "F5A44933E05F97D",
+        "certificateContent" : "content",
+        "displayName" : "Josh Holtz",
+        "requesterLastName" : "Holtz",
+        "ownerId" : "9XJ68BWQJB",
+        "csrContent" : null,
+        "machineName" : null,
+        "platform" : "IOS",
+        "certificateTypeName" : "iOS Development",
+        "requesterFirstName" : "Josh",
+        "machineId" : null,
+        "ownerName" : "Josh Holtz",
+        "name" : "iOS Development: Josh Holtz",
+        "platformName" : "iOS",
+        "responseId" : "7b21415c-74ad-42ea-9d79-f86dac95bb74",
+        "expirationDate" : "2020-02-01T20:50:34.000+0000",
+        "status" : "Issued",
+        "certificateType" : "IOS_DEVELOPMENT"
+      },
+      "links" : {
+        "self" : "https://developer.apple.com:443/services-account/v1/certificates/123456789"
+      }
+    }, {
+      "type" : "certificates",
+      "id" : "987654321",
+      "attributes" : {
+        "certificateTypeId" : "R58UK2EWSO",
+        "requesterEmail" : "email@email.com",
+        "serialNumber" : "5CF4E617EE678ABF",
+        "certificateContent" : "content",
+        "displayName" : "Josh Holtz",
+        "requesterLastName" : "Holtz",
+        "ownerId" : "972KS36P2U",
+        "csrContent" : null,
+        "machineName" : null,
+        "platform" : "IOS",
+        "certificateTypeName" : "iOS Distribution",
+        "requesterFirstName" : "Josh",
+        "machineId" : null,
+        "ownerName" : "Josh Holtz",
+        "name" : "iOS Distribution: Josh Holtz",
+        "platformName" : "iOS",
+        "responseId" : "7b21415c-74ad-42ea-9d79-f86dac95bb74",
+        "expirationDate" : "2020-02-01T20:52:43.000+0000",
+        "status" : "Issued",
+        "certificateType" : "IOS_DISTRIBUTION"
+      },
+      "links" : {
+        "self" : "https://developer.apple.com:443/services-account/v1/certificates/987654321"
+      }
+    }, {
+      "type" : "certificates",
+      "id" : "111222333",
+      "attributes" : {
+        "certificateTypeId" : "5QPB9NHCEI",
+        "requesterEmail" : "email@email.com",
+        "serialNumber" : "6FF0AA8635503A3D",
+        "certificateContent" : "content",
+        "displayName" : "Josh Holtz",
+        "requesterLastName" : "Holtz",
+        "ownerId" : "9XJ68BWQJB",
+        "csrContent" : null,
+        "machineName" : null,
+        "platform" : "IOS",
+        "certificateTypeName" : "iOS Development",
+        "requesterFirstName" : "Josh",
+        "machineId" : null,
+        "ownerName" : "Josh Holtz",
+        "name" : "iOS Development: Josh Holtz",
+        "platformName" : "iOS",
+        "responseId" : "7b21415c-74ad-42ea-9d79-f86dac95bb74",
+        "expirationDate" : "2020-03-03T02:00:00.000+0000",
+        "status" : "Issued",
+        "certificateType" : "IOS_DEVELOPMENT"
+      },
+      "links" : {
+        "self" : "https://developer.apple.com:443/services-account/v1/certificates/111222333"
+      }
+    }, {
+      "type" : "certificates",
+      "id" : "444555666",
+      "attributes" : {
+        "certificateTypeId" : "R58UK2EWSO",
+        "requesterEmail" : "email@email.com",
+        "serialNumber" : "3F0F71BB79758B96",
+        "certificateContent" : "content",
+        "displayName" : "Josh Holtz",
+        "requesterLastName" : "Holtz",
+        "ownerId" : "972KS36P2U",
+        "csrContent" : null,
+        "machineName" : null,
+        "platform" : "IOS",
+        "certificateTypeName" : "iOS Distribution",
+        "requesterFirstName" : "Josh",
+        "machineId" : null,
+        "ownerName" : "Josh Holtz",
+        "name" : "iOS Distribution: Josh Holtz",
+        "platformName" : "iOS",
+        "responseId" : "7b21415c-74ad-42ea-9d79-f86dac95bb74",
+        "expirationDate" : "2020-05-01T15:18:38.000+0000",
+        "status" : "Issued",
+        "certificateType" : "IOS_DISTRIBUTION"
+      },
+      "links" : {
+        "self" : "https://developer.apple.com:443/services-account/v1/certificates/444555666"
+      }
+    } ],
+    "links" : {
+      "self" : "https://developer.apple.com:443/services-account/v1/certificates?sort=displayName&limit=1000"
+    },
+    "meta" : {
+      "paging" : {
+        "total" : 4,
+        "limit" : 1000
+      }
+    }
+  }

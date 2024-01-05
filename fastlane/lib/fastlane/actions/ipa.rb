@@ -1,7 +1,11 @@
 # rubocop:disable Lint/AssignmentInCondition
-# rubocop:disable Style/Next
 module Fastlane
   module Actions
+    module SharedValues
+      IPA_OUTPUT_PATH ||= :IPA_OUTPUT_PATH # originally defined in BuildIosAppAction
+      DSYM_OUTPUT_PATH ||= :DSYM_OUTPUT_PATH # originally defined in BuildIosAppAction
+    end
+
     ARGS_MAP = {
       workspace: '-w',
       project: '-p',
@@ -24,6 +28,8 @@ module Fastlane
       end
 
       def self.run(params)
+        Actions.verify_gem!('krausefx-shenzhen')
+
         # The output directory of the IPA and dSYM
         absolute_dest_directory = nil
 
@@ -57,7 +63,7 @@ module Fastlane
         UI.verbose(command)
 
         begin
-          Actions.sh command
+          Actions.sh(command)
 
           # Finds absolute path of IPA and dSYM
           absolute_ipa_path = find_ipa_file(absolute_dest_directory)
@@ -69,26 +75,23 @@ module Fastlane
           ENV[SharedValues::IPA_OUTPUT_PATH.to_s] = absolute_ipa_path # for deliver
           ENV[SharedValues::DSYM_OUTPUT_PATH.to_s] = absolute_dsym_path
 
-          UI.important("You are using legacy `shenzhen` to build your app")
-          UI.important("It is recommended to upgrade to `gym`")
-          UI.important("To do so, just replace `ipa(...)` with `gym(...)` in your Fastfile")
-          UI.important("https://github.com/fastlane/fastlane/tree/master/gym")
+          deprecation_warning
         rescue => ex
           [
             "-------------------------------------------------------",
             "Original Error:",
             " => " + ex.to_s,
-            "A build error occured. You are using legacy `shenzhen` for building",
-            "it is recommended to upgrade to `gym`: ",
-            "https://github.com/fastlane/fastlane/tree/master/gym",
+            "A build error occurred. You are using legacy `shenzhen` for building",
+            "it is recommended to upgrade to _gym_: ",
+            "https://docs.fastlane.tools/actions/gym/",
             core_command,
             "-------------------------------------------------------"
           ].each do |txt|
             UI.error(txt)
           end
 
-          # Raise a custom exception, as the the normal one is useless for the user
-          UI.user_error!("A build error occured, this is usually related to code signing. Take a look at the error above")
+          # Raise a custom exception, as the normal one is useless for the user
+          UI.user_error!("A build error occurred, this is usually related to code signing. Take a look at the error above")
         end
       end
 
@@ -134,13 +137,6 @@ module Fastlane
         "Easily build and sign your app using shenzhen"
       end
 
-      def self.details
-        [
-          "More information on the shenzhen project page: https://github.com/nomad/shenzhen",
-          "To make code signing work, it is recommended to set a the provisioning profile in the project settings."
-        ].join(' ')
-      end
-
       def self.available_options
         [
           FastlaneCore::ConfigItem.new(key: :workspace,
@@ -163,15 +159,16 @@ module Fastlane
                                        env_name: "IPA_CLEAN",
                                        description: "Clean project before building",
                                        optional: true,
-                                       is_string: false),
+                                       type: Boolean),
           FastlaneCore::ConfigItem.new(key: :archive,
                                        env_name: "IPA_ARCHIVE",
                                        description: "Archive project after building",
                                        optional: true,
-                                       is_string: false),
+                                       type: Boolean),
           FastlaneCore::ConfigItem.new(key: :destination,
                                        env_name: "IPA_DESTINATION",
                                        description: "Build destination. Defaults to current directory",
+                                       default_value_dynamic: true,
                                        optional: true),
           FastlaneCore::ConfigItem.new(key: :embed,
                                        env_name: "IPA_EMBED",
@@ -196,7 +193,8 @@ module Fastlane
           FastlaneCore::ConfigItem.new(key: :xcargs,
                                        env_name: "IPA_XCARGS",
                                        description: "Pass additional arguments to xcodebuild when building the app. Be sure to quote multiple args",
-                                       optional: true)
+                                       optional: true,
+                                       type: :shell_string)
         ]
       end
 
@@ -210,8 +208,39 @@ module Fastlane
       def self.author
         "joshdholtz"
       end
+
+      def self.example_code
+        [
+          'ipa(
+            workspace: "MyApp.xcworkspace",
+            configuration: "Debug",
+            scheme: "MyApp",
+            # (optionals)
+            clean: true,                     # This means "Do Clean". Cleans project before building (the default if not specified).
+            destination: "path/to/dir",      # Destination directory. Defaults to current directory.
+            ipa: "my-app.ipa",               # specify the name of the .ipa file to generate (including file extension)
+            xcargs: "MY_ADHOC=0",            # pass additional arguments to xcodebuild when building the app.
+            embed: "my.mobileprovision",     # Sign .ipa file with .mobileprovision
+            identity: "MyIdentity",          # Identity to be used along with --embed
+            sdk: "10.0",                     # use SDK as the name or path of the base SDK when building the project.
+            archive: true                    # this means "Do Archive". Archive project after building (the default if not specified).
+          )'
+        ]
+      end
+
+      def self.category
+        :deprecated
+      end
+
+      def self.deprecated_notes
+        [
+          "You are using legacy `shenzhen` to build your app, which will be removed soon!",
+          "It is recommended to upgrade to _gym_.",
+          "To do so, just replace `ipa(...)` with `gym(...)` in your Fastfile.",
+          "To make code signing work, follow [https://docs.fastlane.tools/codesigning/xcode-project/](https://docs.fastlane.tools/codesigning/xcode-project/)."
+        ].join("\n")
+      end
     end
   end
 end
 # rubocop:enable Lint/AssignmentInCondition
-# rubocop:enable Style/Next

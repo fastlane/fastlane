@@ -1,3 +1,5 @@
+require_relative 'app_version_promocodes'
+
 module Spaceship
   module Tunes
     # Represents the information about the generation of promocodes
@@ -16,15 +18,6 @@ module Spaceship
         'expirationDate' => :expiration_date,
         'username' => :username
       })
-
-      class << self
-        # Create a new object based on a hash.
-        # This is used to create a new object based on the server response.
-        def factory(attrs)
-          obj = self.new(attrs)
-          return obj
-        end
-      end
 
       def setup
         @version = Tunes::AppVersionPromocodes.factory(raw_data['version'])

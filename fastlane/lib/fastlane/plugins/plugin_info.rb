@@ -5,12 +5,14 @@ module Fastlane
     attr_reader :gem_name
     attr_reader :email
     attr_reader :summary
+    attr_reader :details
 
-    def initialize(plugin_name, author, email, summary)
+    def initialize(plugin_name, author, email, summary, details)
       @plugin_name = plugin_name
       @author = author
       @email = email
       @summary = summary
+      @details = details
     end
 
     def gem_name
@@ -31,11 +33,11 @@ module Fastlane
 
     # Used to expose a local binding for use in ERB templating
     #
-    # rubocop:disable Style/AccessorMethodName
+    # rubocop:disable Naming/AccessorMethodName
     def get_binding
       binding
     end
-    # rubocop:enable Style/AccessorMethodName
+    # rubocop:enable Naming/AccessorMethodName
 
     def ==(other)
       @plugin_name == other.plugin_name &&

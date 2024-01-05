@@ -21,11 +21,11 @@ module Fastlane
       end
 
       def self.description
-        "Set the Urban Airship plist configuration values"
+        "Set [Urban Airship](https://www.urbanairship.com/) plist configuration values"
       end
 
       def self.details
-        "This action updates the AirshipConfig.plist need to configure the Urban Airship SDK at runtime, allowing keys and secrets to easily be set for Enterprise and Production versions of the application."
+        "This action updates the `AirshipConfig.plist` needed to configure the Urban Airship SDK at runtime, allowing keys and secrets to easily be set for the Enterprise and Production versions of the application."
       end
 
       def self.available_options
@@ -34,27 +34,31 @@ module Fastlane
                                        env_name: "URBAN_AIRSHIP_PLIST_PATH",
                                        description: "Path to Urban Airship configuration Plist",
                                        verify_block: proc do |value|
-                                         UI.user_errror!("Could not find Urban Airship plist file") unless File.exist?(value)
+                                         UI.user_error!("Could not find Urban Airship plist file") unless File.exist?(value)
                                        end),
           FastlaneCore::ConfigItem.new(key: :development_app_key,
                                        optional: true,
                                        env_name: "URBAN_AIRSHIP_DEVELOPMENT_APP_KEY",
+                                       sensitive: true,
                                        description: "The development app key"),
           FastlaneCore::ConfigItem.new(key: :development_app_secret,
                                        optional: true,
                                        env_name: "URBAN_AIRSHIP_DEVELOPMENT_APP_SECRET",
+                                       sensitive: true,
                                        description: "The development app secret"),
           FastlaneCore::ConfigItem.new(key: :production_app_key,
                                        optional: true,
                                        env_name: "URBAN_AIRSHIP_PRODUCTION_APP_KEY",
+                                       sensitive: true,
                                        description: "The production app key"),
           FastlaneCore::ConfigItem.new(key: :production_app_secret,
                                        optional: true,
                                        env_name: "URBAN_AIRSHIP_PRODUCTION_APP_SECRET",
+                                       sensitive: true,
                                        description: "The production app secret"),
           FastlaneCore::ConfigItem.new(key: :detect_provisioning_mode,
                                        env_name: "URBAN_AIRSHIP_DETECT_PROVISIONING_MODE",
-                                       is_string: false,
+                                       type: Boolean,
                                        optional: true,
                                        description: "Automatically detect provisioning mode")
         ]
@@ -66,6 +70,20 @@ module Fastlane
 
       def self.is_supported?(platform)
         platform == :ios
+      end
+
+      def self.example_code
+        [
+          'update_urban_airship_configuration(
+            plist_path: "AirshipConfig.plist",
+            production_app_key: "PRODKEY",
+            production_app_secret: "PRODSECRET"
+          )'
+        ]
+      end
+
+      def self.category
+        :push
       end
     end
   end

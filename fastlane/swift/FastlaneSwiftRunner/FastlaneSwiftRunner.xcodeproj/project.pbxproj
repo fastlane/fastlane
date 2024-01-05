@@ -1,0 +1,448 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 46;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		0311E387230AC1B20060BB5C /* Plugins.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0311E386230AC1B20060BB5C /* Plugins.swift */; };
+		0311E38B230AC9490060BB5C /* Actions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0311E38A230AC9490060BB5C /* Actions.swift */; };
+		1257253924B7992C00E04FA3 /* main.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1257253824B7992B00E04FA3 /* main.swift */; };
+		1267C3F42773A43E004DE48A /* Atomic.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1267C3F32773A43E004DE48A /* Atomic.swift */; };
+		12D2EB8D2620D83C00844013 /* OptionalConfigValue.swift in Sources */ = {isa = PBXBuildFile; fileRef = 12D2EB8C2620D83B00844013 /* OptionalConfigValue.swift */; };
+		B302067B1F5E3E9000DE6EBD /* SnapshotfileProtocol.swift in Sources */ = {isa = PBXBuildFile; fileRef = B30206741F5E3E9000DE6EBD /* SnapshotfileProtocol.swift */; };
+		B302067C1F5E3E9000DE6EBD /* GymfileProtocol.swift in Sources */ = {isa = PBXBuildFile; fileRef = B30206751F5E3E9000DE6EBD /* GymfileProtocol.swift */; };
+		B302067D1F5E3E9000DE6EBD /* MatchfileProtocol.swift in Sources */ = {isa = PBXBuildFile; fileRef = B30206761F5E3E9000DE6EBD /* MatchfileProtocol.swift */; };
+		B302067E1F5E3E9000DE6EBD /* PrecheckfileProtocol.swift in Sources */ = {isa = PBXBuildFile; fileRef = B30206771F5E3E9000DE6EBD /* PrecheckfileProtocol.swift */; };
+		B302067F1F5E3E9000DE6EBD /* ScanfileProtocol.swift in Sources */ = {isa = PBXBuildFile; fileRef = B30206781F5E3E9000DE6EBD /* ScanfileProtocol.swift */; };
+		B30206801F5E3E9000DE6EBD /* ScreengrabfileProtocol.swift in Sources */ = {isa = PBXBuildFile; fileRef = B30206791F5E3E9000DE6EBD /* ScreengrabfileProtocol.swift */; };
+		B30206811F5E3E9000DE6EBD /* DeliverfileProtocol.swift in Sources */ = {isa = PBXBuildFile; fileRef = B302067A1F5E3E9000DE6EBD /* DeliverfileProtocol.swift */; };
+		B3BA65A61F5A269100B34850 /* Fastlane.swift in Sources */ = {isa = PBXBuildFile; fileRef = B3BA659D1F5A269100B34850 /* Fastlane.swift */; };
+		B3BA65A71F5A269100B34850 /* LaneFileProtocol.swift in Sources */ = {isa = PBXBuildFile; fileRef = B3BA659E1F5A269100B34850 /* LaneFileProtocol.swift */; };
+		B3BA65A91F5A269100B34850 /* RubyCommand.swift in Sources */ = {isa = PBXBuildFile; fileRef = B3BA65A01F5A269100B34850 /* RubyCommand.swift */; };
+		B3BA65AA1F5A269100B34850 /* Runner.swift in Sources */ = {isa = PBXBuildFile; fileRef = B3BA65A11F5A269100B34850 /* Runner.swift */; };
+		B3BA65AB1F5A269100B34850 /* SocketClient.swift in Sources */ = {isa = PBXBuildFile; fileRef = B3BA65A21F5A269100B34850 /* SocketClient.swift */; };
+		B3BA65AC1F5A269100B34850 /* SocketClientDelegateProtocol.swift in Sources */ = {isa = PBXBuildFile; fileRef = B3BA65A31F5A269100B34850 /* SocketClientDelegateProtocol.swift */; };
+		B3BA65AD1F5A269100B34850 /* SocketResponse.swift in Sources */ = {isa = PBXBuildFile; fileRef = B3BA65A41F5A269100B34850 /* SocketResponse.swift */; };
+		B3BA65AF1F5A2D5C00B34850 /* RunnerArgument.swift in Sources */ = {isa = PBXBuildFile; fileRef = B3BA65AE1F5A2D5C00B34850 /* RunnerArgument.swift */; };
+		C0459CAC27261897002CDFB9 /* FastlaneRunner in CopyFiles */ = {isa = PBXBuildFile; fileRef = D556D6A91F6A08F5003108E3 /* FastlaneRunner */; settings = {ATTRIBUTES = (CodeSignOnCopy, ); }; };
+		D55B28C31F6C588300DC42C5 /* Deliverfile.swift in Sources */ = {isa = PBXBuildFile; fileRef = D55B28BC1F6C588300DC42C5 /* Deliverfile.swift */; };
+		D55B28C41F6C588300DC42C5 /* Gymfile.swift in Sources */ = {isa = PBXBuildFile; fileRef = D55B28BD1F6C588300DC42C5 /* Gymfile.swift */; };
+		D55B28C51F6C588300DC42C5 /* Matchfile.swift in Sources */ = {isa = PBXBuildFile; fileRef = D55B28BE1F6C588300DC42C5 /* Matchfile.swift */; };
+		D55B28C61F6C588300DC42C5 /* Precheckfile.swift in Sources */ = {isa = PBXBuildFile; fileRef = D55B28BF1F6C588300DC42C5 /* Precheckfile.swift */; };
+		D55B28C71F6C588300DC42C5 /* Scanfile.swift in Sources */ = {isa = PBXBuildFile; fileRef = D55B28C01F6C588300DC42C5 /* Scanfile.swift */; };
+		D55B28C81F6C588300DC42C5 /* Screengrabfile.swift in Sources */ = {isa = PBXBuildFile; fileRef = D55B28C11F6C588300DC42C5 /* Screengrabfile.swift */; };
+		D55B28C91F6C588300DC42C5 /* Snapshotfile.swift in Sources */ = {isa = PBXBuildFile; fileRef = D55B28C21F6C588300DC42C5 /* Snapshotfile.swift */; };
+		D5A7C48F1F7C4DAF00A91DE6 /* Appfile.swift in Sources */ = {isa = PBXBuildFile; fileRef = D5A7C48D1F7C4DAF00A91DE6 /* Appfile.swift */; };
+		D5A7C4901F7C4DAF00A91DE6 /* Fastfile.swift in Sources */ = {isa = PBXBuildFile; fileRef = D5A7C48E1F7C4DAF00A91DE6 /* Fastfile.swift */; };
+		D5B8A5B31FFDC49E00536B24 /* ControlCommand.swift in Sources */ = {isa = PBXBuildFile; fileRef = D5B8A5B21FFDC49D00536B24 /* ControlCommand.swift */; };
+		D5BAFD121F7DAAFC0030B324 /* ArgumentProcessor.swift in Sources */ = {isa = PBXBuildFile; fileRef = D5BAFD111F7DAAFC0030B324 /* ArgumentProcessor.swift */; };
+		D5D1DE991FFEE8EA00502A00 /* RubyCommandable.swift in Sources */ = {isa = PBXBuildFile; fileRef = D5D1DE981FFEE8E900502A00 /* RubyCommandable.swift */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXCopyFilesBuildPhase section */
+		C0459CAB27261886002CDFB9 /* CopyFiles */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = $SRCROOT/../..;
+			dstSubfolderSpec = 0;
+			files = (
+				C0459CAC27261897002CDFB9 /* FastlaneRunner in CopyFiles */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXCopyFilesBuildPhase section */
+
+/* Begin PBXFileReference section */
+		0311E386230AC1B20060BB5C /* Plugins.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = Plugins.swift; path = ../Plugins.swift; sourceTree = "<group>"; };
+		0311E38A230AC9490060BB5C /* Actions.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = Actions.swift; path = ../Actions.swift; sourceTree = "<group>"; };
+		1257253824B7992B00E04FA3 /* main.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = main.swift; path = ../main.swift; sourceTree = "<group>"; };
+		1267C3F32773A43E004DE48A /* Atomic.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = Atomic.swift; path = ../Atomic.swift; sourceTree = "<group>"; };
+		12D2EB8C2620D83B00844013 /* OptionalConfigValue.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = OptionalConfigValue.swift; path = ../OptionalConfigValue.swift; sourceTree = "<group>"; };
+		B30206741F5E3E9000DE6EBD /* SnapshotfileProtocol.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = SnapshotfileProtocol.swift; path = ../SnapshotfileProtocol.swift; sourceTree = "<group>"; };
+		B30206751F5E3E9000DE6EBD /* GymfileProtocol.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = GymfileProtocol.swift; path = ../GymfileProtocol.swift; sourceTree = "<group>"; };
+		B30206761F5E3E9000DE6EBD /* MatchfileProtocol.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = MatchfileProtocol.swift; path = ../MatchfileProtocol.swift; sourceTree = "<group>"; };
+		B30206771F5E3E9000DE6EBD /* PrecheckfileProtocol.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = PrecheckfileProtocol.swift; path = ../PrecheckfileProtocol.swift; sourceTree = "<group>"; };
+		B30206781F5E3E9000DE6EBD /* ScanfileProtocol.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = ScanfileProtocol.swift; path = ../ScanfileProtocol.swift; sourceTree = "<group>"; };
+		B30206791F5E3E9000DE6EBD /* ScreengrabfileProtocol.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = ScreengrabfileProtocol.swift; path = ../ScreengrabfileProtocol.swift; sourceTree = "<group>"; };
+		B302067A1F5E3E9000DE6EBD /* DeliverfileProtocol.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = DeliverfileProtocol.swift; path = ../DeliverfileProtocol.swift; sourceTree = "<group>"; };
+		B3144C072005533400470AFE /* README.txt */ = {isa = PBXFileReference; lastKnownFileType = text; path = README.txt; sourceTree = "<group>"; };
+		B3144C08200553C800470AFE /* README.txt */ = {isa = PBXFileReference; lastKnownFileType = text; path = README.txt; sourceTree = "<group>"; };
+		B3144C09200553D400470AFE /* README.txt */ = {isa = PBXFileReference; lastKnownFileType = text; path = README.txt; sourceTree = "<group>"; };
+		B3144C0A200553DC00470AFE /* README.txt */ = {isa = PBXFileReference; lastKnownFileType = text; path = README.txt; sourceTree = "<group>"; };
+		B3BA659D1F5A269100B34850 /* Fastlane.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = Fastlane.swift; path = ../Fastlane.swift; sourceTree = "<group>"; };
+		B3BA659E1F5A269100B34850 /* LaneFileProtocol.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = LaneFileProtocol.swift; path = ../LaneFileProtocol.swift; sourceTree = "<group>"; };
+		B3BA65A01F5A269100B34850 /* RubyCommand.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = RubyCommand.swift; path = ../RubyCommand.swift; sourceTree = "<group>"; };
+		B3BA65A11F5A269100B34850 /* Runner.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = Runner.swift; path = ../Runner.swift; sourceTree = "<group>"; };
+		B3BA65A21F5A269100B34850 /* SocketClient.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = SocketClient.swift; path = ../SocketClient.swift; sourceTree = "<group>"; };
+		B3BA65A31F5A269100B34850 /* SocketClientDelegateProtocol.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = SocketClientDelegateProtocol.swift; path = ../SocketClientDelegateProtocol.swift; sourceTree = "<group>"; };
+		B3BA65A41F5A269100B34850 /* SocketResponse.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = SocketResponse.swift; path = ../SocketResponse.swift; sourceTree = "<group>"; };
+		B3BA65AE1F5A2D5C00B34850 /* RunnerArgument.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = RunnerArgument.swift; path = ../RunnerArgument.swift; sourceTree = "<group>"; };
+		D556D6A91F6A08F5003108E3 /* FastlaneRunner */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = FastlaneRunner; sourceTree = BUILT_PRODUCTS_DIR; };
+		D55B28BC1F6C588300DC42C5 /* Deliverfile.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = Deliverfile.swift; path = ../Deliverfile.swift; sourceTree = "<group>"; };
+		D55B28BD1F6C588300DC42C5 /* Gymfile.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = Gymfile.swift; path = ../Gymfile.swift; sourceTree = "<group>"; };
+		D55B28BE1F6C588300DC42C5 /* Matchfile.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = Matchfile.swift; path = ../Matchfile.swift; sourceTree = "<group>"; };
+		D55B28BF1F6C588300DC42C5 /* Precheckfile.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = Precheckfile.swift; path = ../Precheckfile.swift; sourceTree = "<group>"; };
+		D55B28C01F6C588300DC42C5 /* Scanfile.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = Scanfile.swift; path = ../Scanfile.swift; sourceTree = "<group>"; };
+		D55B28C11F6C588300DC42C5 /* Screengrabfile.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = Screengrabfile.swift; path = ../Screengrabfile.swift; sourceTree = "<group>"; };
+		D55B28C21F6C588300DC42C5 /* Snapshotfile.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = Snapshotfile.swift; path = ../Snapshotfile.swift; sourceTree = "<group>"; };
+		D5A7C48D1F7C4DAF00A91DE6 /* Appfile.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = Appfile.swift; path = ../Appfile.swift; sourceTree = "<group>"; };
+		D5A7C48E1F7C4DAF00A91DE6 /* Fastfile.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = Fastfile.swift; path = ../Fastfile.swift; sourceTree = "<group>"; };
+		D5B8A5B21FFDC49D00536B24 /* ControlCommand.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = ControlCommand.swift; path = ../ControlCommand.swift; sourceTree = "<group>"; };
+		D5BAFD111F7DAAFC0030B324 /* ArgumentProcessor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = ArgumentProcessor.swift; path = ../ArgumentProcessor.swift; sourceTree = "<group>"; };
+		D5D1DE981FFEE8E900502A00 /* RubyCommandable.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = RubyCommandable.swift; path = ../RubyCommandable.swift; sourceTree = "<group>"; };
+/* End PBXFileReference section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		B33BAF541F51F8D90001A751 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		B33BAF4E1F51F8D90001A751 = {
+			isa = PBXGroup;
+			children = (
+				B3BA65B01F5A324A00B34850 /* Fastlane Runner */,
+				D556D6A91F6A08F5003108E3 /* FastlaneRunner */,
+			);
+			sourceTree = "<group>";
+		};
+		B3BA65B01F5A324A00B34850 /* Fastlane Runner */ = {
+			isa = PBXGroup;
+			children = (
+				B3BA65B21F5A327B00B34850 /* Autogenerated API */,
+				B3BA65B31F5A329800B34850 /* Fastfile Components */,
+				B3BA65B11F5A325E00B34850 /* Networking */,
+				D512BA011F7C7F40000D2137 /* Runner Code */,
+				D5A7C48D1F7C4DAF00A91DE6 /* Appfile.swift */,
+				D55B28BC1F6C588300DC42C5 /* Deliverfile.swift */,
+				D5A7C48E1F7C4DAF00A91DE6 /* Fastfile.swift */,
+				D55B28BD1F6C588300DC42C5 /* Gymfile.swift */,
+				D55B28BE1F6C588300DC42C5 /* Matchfile.swift */,
+				D55B28BF1F6C588300DC42C5 /* Precheckfile.swift */,
+				D55B28C01F6C588300DC42C5 /* Scanfile.swift */,
+				D55B28C11F6C588300DC42C5 /* Screengrabfile.swift */,
+				D55B28C21F6C588300DC42C5 /* Snapshotfile.swift */,
+			);
+			name = "Fastlane Runner";
+			sourceTree = "<group>";
+		};
+		B3BA65B11F5A325E00B34850 /* Networking */ = {
+			isa = PBXGroup;
+			children = (
+				1267C3F32773A43E004DE48A /* Atomic.swift */,
+				B3144C072005533400470AFE /* README.txt */,
+				D5B8A5B21FFDC49D00536B24 /* ControlCommand.swift */,
+				B3BA65A01F5A269100B34850 /* RubyCommand.swift */,
+				D5D1DE981FFEE8E900502A00 /* RubyCommandable.swift */,
+				B3BA65A11F5A269100B34850 /* Runner.swift */,
+				B3BA65A21F5A269100B34850 /* SocketClient.swift */,
+				B3BA65A31F5A269100B34850 /* SocketClientDelegateProtocol.swift */,
+				B3BA65A41F5A269100B34850 /* SocketResponse.swift */,
+			);
+			name = Networking;
+			sourceTree = "<group>";
+		};
+		B3BA65B21F5A327B00B34850 /* Autogenerated API */ = {
+			isa = PBXGroup;
+			children = (
+				B3144C09200553D400470AFE /* README.txt */,
+				0311E38A230AC9490060BB5C /* Actions.swift */,
+				B3BA659D1F5A269100B34850 /* Fastlane.swift */,
+				B302067A1F5E3E9000DE6EBD /* DeliverfileProtocol.swift */,
+				B30206751F5E3E9000DE6EBD /* GymfileProtocol.swift */,
+				B30206761F5E3E9000DE6EBD /* MatchfileProtocol.swift */,
+				0311E386230AC1B20060BB5C /* Plugins.swift */,
+				B30206771F5E3E9000DE6EBD /* PrecheckfileProtocol.swift */,
+				B30206781F5E3E9000DE6EBD /* ScanfileProtocol.swift */,
+				B30206791F5E3E9000DE6EBD /* ScreengrabfileProtocol.swift */,
+				B30206741F5E3E9000DE6EBD /* SnapshotfileProtocol.swift */,
+			);
+			name = "Autogenerated API";
+			sourceTree = "<group>";
+		};
+		B3BA65B31F5A329800B34850 /* Fastfile Components */ = {
+			isa = PBXGroup;
+			children = (
+				B3144C08200553C800470AFE /* README.txt */,
+				B3BA659E1F5A269100B34850 /* LaneFileProtocol.swift */,
+				12D2EB8C2620D83B00844013 /* OptionalConfigValue.swift */,
+			);
+			name = "Fastfile Components";
+			sourceTree = "<group>";
+		};
+		D512BA011F7C7F40000D2137 /* Runner Code */ = {
+			isa = PBXGroup;
+			children = (
+				1257253824B7992B00E04FA3 /* main.swift */,
+				B3144C0A200553DC00470AFE /* README.txt */,
+				D5BAFD111F7DAAFC0030B324 /* ArgumentProcessor.swift */,
+				B3BA65AE1F5A2D5C00B34850 /* RunnerArgument.swift */,
+			);
+			name = "Runner Code";
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		B33BAF561F51F8D90001A751 /* FastlaneRunner */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = B33BAF5E1F51F8D90001A751 /* Build configuration list for PBXNativeTarget "FastlaneRunner" */;
+			buildPhases = (
+				B33BAF531F51F8D90001A751 /* Sources */,
+				B33BAF541F51F8D90001A751 /* Frameworks */,
+				C0459CAB27261886002CDFB9 /* CopyFiles */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = FastlaneRunner;
+			productName = FastlaneSwiftRunner;
+			productReference = D556D6A91F6A08F5003108E3 /* FastlaneRunner */;
+			productType = "com.apple.product-type.tool";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		B33BAF4F1F51F8D90001A751 /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				LastSwiftUpdateCheck = 0830;
+				LastUpgradeCheck = 1300;
+				ORGANIZATIONNAME = "Joshua Liebowitz";
+				TargetAttributes = {
+					B33BAF561F51F8D90001A751 = {
+						CreatedOnToolsVersion = 8.3.3;
+						LastSwiftMigration = 0900;
+						ProvisioningStyle = Automatic;
+					};
+				};
+			};
+			buildConfigurationList = B33BAF521F51F8D90001A751 /* Build configuration list for PBXProject "FastlaneSwiftRunner" */;
+			compatibilityVersion = "Xcode 3.2";
+			developmentRegion = en;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				en,
+				Base,
+			);
+			mainGroup = B33BAF4E1F51F8D90001A751;
+			productRefGroup = B33BAF4E1F51F8D90001A751;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				B33BAF561F51F8D90001A751 /* FastlaneRunner */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXSourcesBuildPhase section */
+		B33BAF531F51F8D90001A751 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				B3BA65A91F5A269100B34850 /* RubyCommand.swift in Sources */,
+				D5D1DE991FFEE8EA00502A00 /* RubyCommandable.swift in Sources */,
+				D55B28C41F6C588300DC42C5 /* Gymfile.swift in Sources */,
+				B302067D1F5E3E9000DE6EBD /* MatchfileProtocol.swift in Sources */,
+				1267C3F42773A43E004DE48A /* Atomic.swift in Sources */,
+				B3BA65AC1F5A269100B34850 /* SocketClientDelegateProtocol.swift in Sources */,
+				B3BA65A71F5A269100B34850 /* LaneFileProtocol.swift in Sources */,
+				D55B28C61F6C588300DC42C5 /* Precheckfile.swift in Sources */,
+				B302067F1F5E3E9000DE6EBD /* ScanfileProtocol.swift in Sources */,
+				D55B28C51F6C588300DC42C5 /* Matchfile.swift in Sources */,
+				B30206801F5E3E9000DE6EBD /* ScreengrabfileProtocol.swift in Sources */,
+				D5BAFD121F7DAAFC0030B324 /* ArgumentProcessor.swift in Sources */,
+				B302067C1F5E3E9000DE6EBD /* GymfileProtocol.swift in Sources */,
+				B302067B1F5E3E9000DE6EBD /* SnapshotfileProtocol.swift in Sources */,
+				D55B28C31F6C588300DC42C5 /* Deliverfile.swift in Sources */,
+				D5A7C4901F7C4DAF00A91DE6 /* Fastfile.swift in Sources */,
+				0311E38B230AC9490060BB5C /* Actions.swift in Sources */,
+				D5A7C48F1F7C4DAF00A91DE6 /* Appfile.swift in Sources */,
+				B3BA65AB1F5A269100B34850 /* SocketClient.swift in Sources */,
+				B30206811F5E3E9000DE6EBD /* DeliverfileProtocol.swift in Sources */,
+				B3BA65AA1F5A269100B34850 /* Runner.swift in Sources */,
+				B3BA65AF1F5A2D5C00B34850 /* RunnerArgument.swift in Sources */,
+				D5B8A5B31FFDC49E00536B24 /* ControlCommand.swift in Sources */,
+				1257253924B7992C00E04FA3 /* main.swift in Sources */,
+				B302067E1F5E3E9000DE6EBD /* PrecheckfileProtocol.swift in Sources */,
+				B3BA65AD1F5A269100B34850 /* SocketResponse.swift in Sources */,
+				D55B28C71F6C588300DC42C5 /* Scanfile.swift in Sources */,
+				0311E387230AC1B20060BB5C /* Plugins.swift in Sources */,
+				D55B28C91F6C588300DC42C5 /* Snapshotfile.swift in Sources */,
+				B3BA65A61F5A269100B34850 /* Fastlane.swift in Sources */,
+				D55B28C81F6C588300DC42C5 /* Screengrabfile.swift in Sources */,
+				12D2EB8D2620D83C00844013 /* OptionalConfigValue.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin XCBuildConfiguration section */
+		B33BAF5C1F51F8D90001A751 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++0x";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				CODE_SIGN_IDENTITY = "-";
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_TESTABILITY = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu99;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+				);
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				MACOSX_DEPLOYMENT_TARGET = 10.12;
+				MTL_ENABLE_DEBUG_INFO = YES;
+				ONLY_ACTIVE_ARCH = YES;
+				SDKROOT = macosx;
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+				SWIFT_SWIFT3_OBJC_INFERENCE = Off;
+			};
+			name = Debug;
+		};
+		B33BAF5D1F51F8D90001A751 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++0x";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				CODE_SIGN_IDENTITY = "-";
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				ENABLE_NS_ASSERTIONS = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu99;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				MACOSX_DEPLOYMENT_TARGET = 10.12;
+				MTL_ENABLE_DEBUG_INFO = NO;
+				SDKROOT = macosx;
+				SWIFT_OPTIMIZATION_LEVEL = "-Owholemodule";
+				SWIFT_SWIFT3_OBJC_INFERENCE = Off;
+			};
+			name = Release;
+		};
+		B33BAF5F1F51F8D90001A751 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CLANG_ENABLE_MODULES = YES;
+				CODE_SIGN_IDENTITY = "-";
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks @loader_path/../Frameworks";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+				SWIFT_VERSION = 4.0;
+			};
+			name = Debug;
+		};
+		B33BAF601F51F8D90001A751 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CLANG_ENABLE_MODULES = YES;
+				CODE_SIGN_IDENTITY = "-";
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks @loader_path/../Frameworks";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_VERSION = 4.0;
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		B33BAF521F51F8D90001A751 /* Build configuration list for PBXProject "FastlaneSwiftRunner" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				B33BAF5C1F51F8D90001A751 /* Debug */,
+				B33BAF5D1F51F8D90001A751 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		B33BAF5E1F51F8D90001A751 /* Build configuration list for PBXNativeTarget "FastlaneRunner" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				B33BAF5F1F51F8D90001A751 /* Debug */,
+				B33BAF601F51F8D90001A751 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+/* End XCConfigurationList section */
+	};
+	rootObject = B33BAF4F1F51F8D90001A751 /* Project object */;
+}

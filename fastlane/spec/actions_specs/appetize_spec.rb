@@ -11,6 +11,7 @@ describe Fastlane do
       EOS
     end
 
+    let(:api_host) { 'custom.appetize.io' }
     let(:api_token) { 'mysecrettoken' }
     let(:url) { 'https://example.com/app.zip' }
     let(:http) { double('http') }
@@ -41,7 +42,7 @@ describe Fastlane do
           Fastlane::FastFile.new.parse("lane :test do
             appetize()
           end").runner.execute(:test)
-        end.to raise_error
+        end.to raise_error(FastlaneCore::Interface::FastlaneError)
       end
 
       it "raises an error if no url or path was given" do
@@ -51,7 +52,7 @@ describe Fastlane do
               api_token: '#{api_token}'
             })
           end").runner.execute(:test)
-        end.to raise_error
+        end.to raise_error(FastlaneCore::Interface::FastlaneError, /url parameter is required/)
       end
 
       it "works with valid parameters" do
@@ -62,12 +63,39 @@ describe Fastlane do
               url: '#{url}'
             })
           end").runner.execute(:test)
-        end.not_to raise_error
+        end.not_to(raise_error)
 
-        expect(http).not_to receive(:request).with(JSON.generate(params))
+        expect(http).not_to(receive(:request).with(JSON.generate(params)))
         expect(Fastlane::Actions.lane_context[Fastlane::Actions::SharedValues::APPETIZE_PUBLIC_KEY]).to eql('sKdfjL')
         expect(Fastlane::Actions.lane_context[Fastlane::Actions::SharedValues::APPETIZE_APP_URL]).to eql('https://appetize.io/app/sKdfjL')
         expect(Fastlane::Actions.lane_context[Fastlane::Actions::SharedValues::APPETIZE_MANAGE_URL]).to eql('https://appetize.io/manage/private_Djksfj')
+        expect(Fastlane::Actions.lane_context[Fastlane::Actions::SharedValues::APPETIZE_API_HOST]).to eql('api.appetize.io')
+      end
+
+      it "works with custom API host" do
+        expect do
+          Fastlane::FastFile.new.parse("lane :test do
+            appetize({
+              api_host: '#{api_host}',
+              api_token: '#{api_token}',
+              url: '#{url}'
+            })
+          end").runner.execute(:test)
+        end.not_to(raise_error)
+
+        expect(Fastlane::Actions.lane_context[Fastlane::Actions::SharedValues::APPETIZE_API_HOST]).to eql(api_host)
+      end
+
+      it "raises an error if an invalid timeout was given" do
+        expect do
+          Fastlane::FastFile.new.parse("lane :test do
+            appetize({
+              api_token: '#{api_token}',
+              url: '#{url}',
+              timeout: 9999
+            })
+          end").runner.execute(:test)
+        end.to raise_error(FastlaneCore::Interface::FastlaneError, /value provided doesn't match any of the supported options/)
       end
     end
   end

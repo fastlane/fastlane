@@ -1,0 +1,13 @@
+{
+  "creationTimestamp": "2016-11-17T19:16:09Z",
+  "resultCode": 0,
+  "userLocale": "en_US",
+  "protocolVersion": "QH65B2",
+  "requestId": "4c05049b-699e-4d04-ye50-3a93be2bb7cd",
+  "requestUrl": "https://developer.apple.com:443/services-account/QH65B2/account/ios/device/deleteDevice.action",
+  "responseId": "90bd910a-2f4f-4367-8946-3b9325762519",
+  "isAdmin": true,
+  "isMember": false,
+  "isAgent": false,
+  "nextDeviceResetDate": null
+}

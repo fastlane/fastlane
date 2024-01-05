@@ -1,28 +1,31 @@
-require 'spaceship/version'
-require 'spaceship/base'
-require 'spaceship/client'
-require 'spaceship/launcher'
+require_relative 'spaceship/globals'
+require_relative 'spaceship/base'
+require_relative 'spaceship/client'
+require_relative 'spaceship/provider'
+require_relative 'spaceship/launcher'
+require_relative 'spaceship/hashcash'
+
+# Middleware
+require_relative 'spaceship/stats_middleware'
 
 # Dev Portal
-require 'spaceship/portal/portal'
-require 'spaceship/portal/spaceship'
+require_relative 'spaceship/portal/portal'
+require_relative 'spaceship/portal/spaceship'
 
-# iTunes Connect
-require 'spaceship/tunes/tunes'
-require 'spaceship/tunes/spaceship'
+# App Store Connect
+require_relative 'spaceship/tunes/tunes'
+require_relative 'spaceship/tunes/spaceship'
+require_relative 'spaceship/test_flight'
+require_relative 'spaceship/connect_api'
+require_relative 'spaceship/connect_api/spaceship'
+require_relative 'spaceship/spaceauth_runner'
 
-# To support legacy code
-module Spaceship
-  # Dev Portal
-  Certificate = Spaceship::Portal::Certificate
-  ProvisioningProfile = Spaceship::Portal::ProvisioningProfile
-  Device = Spaceship::Portal::Device
-  App = Spaceship::Portal::App
-  AppGroup = Spaceship::Portal::AppGroup
-  AppService = Spaceship::Portal::AppService
+require_relative 'spaceship/module'
 
-  # iTunes Connect
-  AppVersion = Spaceship::Tunes::AppVersion
-  AppSubmission = Spaceship::Tunes::AppSubmission
-  Application = Spaceship::Tunes::Application
-end
+# Support for legacy wrappers
+require_relative 'spaceship/portal/legacy_wrapper'
+require_relative 'spaceship/tunes/legacy_wrapper'
+
+# For basic user inputs
+require 'highline/import'
+require 'colored'

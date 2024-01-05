@@ -31,9 +31,9 @@ module Fastlane
 
       def self.details
         [
-          "Specify the URL to download and get the content as a return value",
-          "For more advanced networking code, use the Ruby functions instead:",
-          "http://docs.ruby-lang.org/en/2.0.0/Net/HTTP.html"
+          "Specify the URL to download and get the content as a return value.",
+          "Automatically parses JSON into a Ruby data structure.",
+          "For more advanced networking code, use the Ruby functions instead: [http://docs.ruby-lang.org/en/2.0.0/Net/HTTP.html](http://docs.ruby-lang.org/en/2.0.0/Net/HTTP.html)."
         ].join("\n")
       end
 
@@ -52,6 +52,16 @@ module Fastlane
         [
           ['DOWNLOAD_CONTENT', 'The content of the file we just downloaded']
         ]
+      end
+
+      def self.example_code
+        [
+          'data = download(url: "https://host.com/api.json")'
+        ]
+      end
+
+      def self.category
+        :misc
       end
 
       def self.authors

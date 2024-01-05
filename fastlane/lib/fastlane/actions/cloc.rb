@@ -18,7 +18,7 @@ module Fastlane
           source_directory
         ].join(' ').strip
 
-        Actions.sh command
+        Actions.sh(command)
       end
 
       def self.description
@@ -26,7 +26,10 @@ module Fastlane
       end
 
       def self.details
-        "This action will run cloc to generate a SLOC report that the Jenkins SLOCCount plugin can read.  See https://wiki.jenkins-ci.org/display/JENKINS/SLOCCount+Plugin for more information."
+        [
+          "This action will run cloc to generate a SLOC report that the Jenkins SLOCCount plugin can read.",
+          "See [https://wiki.jenkins-ci.org/display/JENKINS/SLOCCount+Plugin](https://wiki.jenkins-ci.org/display/JENKINS/SLOCCount+Plugin) and [https://github.com/AlDanial/cloc](https://github.com/AlDanial/cloc) for more information."
+        ].join("\n")
       end
 
       def self.available_options
@@ -35,28 +38,24 @@ module Fastlane
                                        env_name: "FL_CLOC_BINARY_PATH",
                                        description: "Where the cloc binary lives on your system (full path including 'cloc')",
                                        optional: true,
-                                       is_string: true,
                                        default_value: '/usr/local/bin/cloc'),
           FastlaneCore::ConfigItem.new(key: :exclude_dir,
                                        env_name: "FL_CLOC_EXCLUDE_DIR",
-                                       description: "Comma separated list of directories to exclude", # a short description of this parameter
-                                       optional: true,
-                                       is_string: true),
+                                       description: "Comma separated list of directories to exclude",
+                                       optional: true),
           FastlaneCore::ConfigItem.new(key: :output_directory,
                                        env_name: "FL_CLOC_OUTPUT_DIRECTORY",
                                        description: "Where to put the generated report file",
-                                       is_string: true,
                                        default_value: "build"),
           FastlaneCore::ConfigItem.new(key: :source_directory,
-                                      env_name: "FL_CLOC_SOURCE_DIRECTORY",
-                                      description: "Where to look for the source code (relative to the project root folder)",
-                                      is_string: true,
-                                      default_value: ""),
+                                       env_name: "FL_CLOC_SOURCE_DIRECTORY",
+                                       description: "Where to look for the source code (relative to the project root folder)",
+                                       default_value: ""),
           FastlaneCore::ConfigItem.new(key: :xml,
-                                      env_name: "FL_CLOC_XML",
-                                      description: "Should we generate an XML File (if false, it will generate a plain text file)?",
-                                      is_string: false,
-                                      default_value: true)
+                                       env_name: "FL_CLOC_XML",
+                                       description: "Should we generate an XML File (if false, it will generate a plain text file)?",
+                                       type: Boolean,
+                                       default_value: true)
         ]
       end
 
@@ -66,6 +65,20 @@ module Fastlane
 
       def self.is_supported?(platform)
         [:ios, :mac].include?(platform)
+      end
+
+      def self.example_code
+        [
+          'cloc(
+             exclude_dir: "ThirdParty,Resources",
+             output_directory: "reports",
+             source_directory: "MyCoolApp"
+          )'
+        ]
+      end
+
+      def self.category
+        :misc
       end
     end
   end

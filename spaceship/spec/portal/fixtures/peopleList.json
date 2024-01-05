@@ -1,0 +1,34 @@
+{
+  "creationTimestamp": "2017-01-29T20:03:01Z",
+  "resultCode": 0,
+  "userLocale": "en_US",
+  "teams": null,
+  "team": null,
+  "agent": {
+    "personId": 283226505,
+    "firstName": "Helmut",
+    "lastName": "Januschka",
+    "email": "helmut@januschka.com",
+    "developerStatus": "active",
+    "dateJoined": "2012-11-29T15:25:08Z",
+    "teamMemberId": "5M8TWKRZ3J"
+  },
+  "admins": [{
+    "personId": 1829638349,
+    "firstName": "Some One",
+    "lastName": "Some where",
+    "email": "email@host.com",
+    "developerStatus": "active",
+    "dateJoined": "2016-06-20T06:30:26Z",
+    "teamMemberId": "YGRC2L49ZF"
+  }],
+  "members": [{
+    "personId": 1349195020,
+    "firstName": "Helmut",
+    "lastName": "Januschka",
+    "email": "h.januschka@gmail.com",
+    "developerStatus": "active",
+    "dateJoined": "2010-07-02T10:09:04Z",
+    "teamMemberId": "2XJD8GJ8KR"
+  }]
+}

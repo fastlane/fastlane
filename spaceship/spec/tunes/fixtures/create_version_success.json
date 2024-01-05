@@ -454,13 +454,13 @@
           "isRequired": false,
           "errorKeys": null
         },
-        "supportURL": {
+        "supportUrl": {
           "value": "http://asdfasdf.com",
           "isEditable": true,
           "isRequired": false,
           "errorKeys": null
         },
-        "marketingURL": {
+        "marketingUrl": {
           "value": "https://sunapps.net",
           "isEditable": true,
           "isRequired": false,

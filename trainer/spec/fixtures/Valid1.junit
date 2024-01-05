@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuites tests="3" failures="1">
+    <testsuite name="Unit" tests="3" failures="1" time="0.4">
+        <testcase classname="Unit" name="testExample()" time="0.1">
+        </testcase>
+        <testcase classname="Unit" name="testExample2()" time="0.1">
+            <failure message="XCTAssertTrue failed -  (/Users/liamnichols/Code/Local/Trainer/Unit/Unit.swift:19)">
+            </failure>
+        </testcase>
+        <testcase classname="Unit" name="testPerformanceExample()" time="0.2">
+        </testcase>
+    </testsuite>
+</testsuites>

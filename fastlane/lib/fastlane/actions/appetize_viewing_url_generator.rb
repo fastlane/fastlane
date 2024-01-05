@@ -5,7 +5,7 @@ module Fastlane
 
     class AppetizeViewingUrlGeneratorAction < Action
       def self.run(params)
-        link = "https://appetize.io/embed/#{params[:public_key]}"
+        link = "#{params[:base_url]}/#{params[:public_key]}"
 
         if params[:scale].nil? # sensible default values for scaling
           case params[:device].downcase.to_sym
@@ -26,6 +26,9 @@ module Fastlane
         url_params << "scale=#{params[:scale]}"
         url_params << "launchUrl=#{params[:launch_url]}" if params[:launch_url]
         url_params << "language=#{params[:language]}" if params[:language]
+        url_params << "osVersion=#{params[:os_version]}" if params[:os_version]
+        url_params << "params=#{CGI.escape(params[:params])}" if params[:params]
+        url_params << "proxy=#{CGI.escape(params[:proxy])}" if params[:proxy]
 
         return link + "?" + url_params.join("&")
       end
@@ -39,6 +42,7 @@ module Fastlane
       end
 
       def self.details
+        "Check out the [device_grid guide](https://github.com/fastlane/fastlane/blob/master/fastlane/lib/fastlane/actions/device_grid/README.md) for more information"
       end
 
       def self.available_options
@@ -46,23 +50,27 @@ module Fastlane
           FastlaneCore::ConfigItem.new(key: :public_key,
                                        env_name: "APPETIZE_PUBLICKEY",
                                        description: "Public key of the app you wish to update",
-                                       is_string: true,
+                                       sensitive: true,
                                        default_value: Actions.lane_context[SharedValues::APPETIZE_PUBLIC_KEY],
+                                       default_value_dynamic: true,
                                        optional: false,
                                        verify_block: proc do |value|
                                          if value.start_with?("private_")
                                            UI.user_error!("You provided a private key to appetize, please provide the public key")
                                          end
                                        end),
+          FastlaneCore::ConfigItem.new(key: :base_url,
+                                       env_name: "APPETIZE_VIEWING_URL_GENERATOR_BASE",
+                                       description: "Base URL of Appetize service",
+                                       default_value: "https://appetize.io/embed",
+                                       optional: true),
           FastlaneCore::ConfigItem.new(key: :device,
                                        env_name: "APPETIZE_VIEWING_URL_GENERATOR_DEVICE",
                                        description: "Device type: iphone4s, iphone5s, iphone6, iphone6plus, ipadair, iphone6s, iphone6splus, ipadair2, nexus5, nexus7 or nexus9",
-                                       is_string: true,
                                        default_value: "iphone5s"),
           FastlaneCore::ConfigItem.new(key: :scale,
                                        env_name: "APPETIZE_VIEWING_URL_GENERATOR_SCALE",
                                        description: "Scale of the simulator",
-                                       is_string: true,
                                        optional: true,
                                        verify_block: proc do |value|
                                          available = ["25", "50", "75", "100"]
@@ -71,7 +79,6 @@ module Fastlane
           FastlaneCore::ConfigItem.new(key: :orientation,
                                        env_name: "APPETIZE_VIEWING_URL_GENERATOR_ORIENTATION",
                                        description: "Device orientation",
-                                       is_string: true,
                                        default_value: "portrait",
                                        verify_block: proc do |value|
                                          available = ["portrait", "landscape"]
@@ -80,12 +87,10 @@ module Fastlane
           FastlaneCore::ConfigItem.new(key: :language,
                                        env_name: "APPETIZE_VIEWING_URL_GENERATOR_LANGUAGE",
                                        description: "Device language in ISO 639-1 language code, e.g. 'de'",
-                                       is_string: true,
                                        optional: true),
           FastlaneCore::ConfigItem.new(key: :color,
                                        env_name: "APPETIZE_VIEWING_URL_GENERATOR_COLOR",
                                        description: "Color of the device",
-                                       is_string: true,
                                        default_value: "black",
                                        verify_block: proc do |value|
                                          available = ["black", "white", "silver", "gray"]
@@ -94,12 +99,24 @@ module Fastlane
           FastlaneCore::ConfigItem.new(key: :launch_url,
                                        env_name: "APPETIZE_VIEWING_URL_GENERATOR_LAUNCH_URL",
                                        description: "Specify a deep link to open when your app is launched",
-                                       is_string: true,
+                                       optional: true),
+          FastlaneCore::ConfigItem.new(key: :os_version,
+                                       env_name: "APPETIZE_VIEWING_URL_GENERATOR_OS_VERSION",
+                                       description: "The operating system version on which to run your app, e.g. 10.3, 8.0",
+                                       optional: true),
+          FastlaneCore::ConfigItem.new(key: :params,
+                                       env_name: "APPETIZE_VIEWING_URL_GENERATOR_PARAMS",
+                                       description: "Specify params value to be passed to Appetize",
+                                       optional: true),
+          FastlaneCore::ConfigItem.new(key: :proxy,
+                                       env_name: "APPETIZE_VIEWING_URL_GENERATOR_PROXY",
+                                       description: "Specify a HTTP proxy to be passed to Appetize",
                                        optional: true)
         ]
       end
 
-      def self.output
+      def self.category
+        :misc
       end
 
       def self.return_value

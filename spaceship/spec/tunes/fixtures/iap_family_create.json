@@ -1,0 +1,63 @@
+{
+  "sectionErrorKeys": [],
+  "sectionInfoKeys": [],
+  "sectionWarningKeys": [],
+  "name": {
+    "value": "Family Name"
+  },
+  "id": null,
+  "activeAddOns": [{
+    "adamId": null,
+    "productId": {
+      "value": "new.product"
+    },
+    "familyRank": {
+      "value": null,
+      "isEditable": true,
+      "isRequired": false,
+      "errorKeys": null
+    },
+    "iTunesConnectStatus": null,
+    "referenceName": {
+      "value": "First Product in Family"
+    },
+    "pricingDurationType": {
+      "value": null,
+      "isEditable": true,
+      "isRequired": false,
+      "errorKeys": null
+    }
+  }],
+  "totalActiveAddOns": 0,
+  "replacementFamilyId": null,
+  "details": {
+    "value": [{
+      "value": {
+        "subscriptionName": {
+          "value": "Subname German"
+        },
+        "name": {
+          "value": "App Name German"
+        },
+        "localeCode": {
+          "value": "de-DE"
+        }
+      }
+    }, {
+      "value": {
+        "subscriptionName": {
+          "value": "Subname DA"
+        },
+        "name": {
+          "value": "App Name DA"
+        },
+        "localeCode": {
+          "value": "da"
+        }
+      }
+    }],
+    "isEditable": true,
+    "isRequired": false,
+    "errorKeys": null
+  }
+}

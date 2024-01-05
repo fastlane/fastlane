@@ -1,4 +1,5 @@
 require 'shellwords'
+require_relative '../module'
 
 module Gym
   # Responsible for building the fully working xcodebuild command
@@ -6,10 +7,10 @@ module Gym
     class << self
       def generate
         parts = prefix
-        parts << "xcodebuild"
+        parts << Gym.config[:xcodebuild_command]
         parts += options
-        parts += actions
-        parts += suffix
+        parts += buildactions
+        parts += setting
         parts += pipe
 
         parts
@@ -33,41 +34,121 @@ module Gym
 
         options = []
         options += project_path_array
-        options << "-configuration '#{config[:configuration]}'" if config[:configuration]
         options << "-sdk '#{config[:sdk]}'" if config[:sdk]
+        options << "-toolchain '#{config[:toolchain]}'" if config[:toolchain]
         options << "-destination '#{config[:destination]}'" if config[:destination]
-        options << "-xcconfig '#{config[:xcconfig]}'" if config[:xcconfig]
-        options << "-archivePath '#{archive_path}'"
-        options << "-derivedDataPath '#{config[:derived_data_path]}'" if config[:derived_data_path]
+        options << "-archivePath #{archive_path.shellescape}" unless config[:skip_archive]
         options << "-resultBundlePath '#{result_bundle_path}'" if config[:result_bundle]
+        options << "-showBuildTimingSummary" if config[:build_timing_summary]
+        if config[:use_system_scm] && !options.include?("-scmProvider system")
+          options << "-scmProvider system"
+        end
         options << config[:xcargs] if config[:xcargs]
+        options << "OTHER_SWIFT_FLAGS=\"\\\$(value) -Xfrontend -debug-time-function-bodies\"" if config[:analyze_build_time]
 
         options
       end
 
-      def actions
+      def buildactions
         config = Gym.config
 
-        actions = []
-        actions << :clean if config[:clean]
-        actions << :archive
+        buildactions = []
+        buildactions << :clean if config[:clean]
+        buildactions << :build if config[:skip_archive]
+        buildactions << :archive unless config[:skip_archive]
 
-        actions
+        buildactions
       end
 
-      def suffix
-        suffix = []
-        suffix << "CODE_SIGN_IDENTITY='#{Gym.config[:codesigning_identity]}'" if Gym.config[:codesigning_identity]
-        suffix
+      def setting
+        setting = []
+        if Gym.config[:skip_codesigning]
+          setting << "CODE_SIGN_IDENTITY='' CODE_SIGNING_REQUIRED=NO CODE_SIGN_ENTITLEMENTS='' CODE_SIGNING_ALLOWED=NO"
+        elsif Gym.config[:codesigning_identity]
+          setting << "CODE_SIGN_IDENTITY=#{Gym.config[:codesigning_identity].shellescape}"
+        end
+        setting
       end
 
       def pipe
         pipe = []
-        pipe << "| tee #{xcodebuild_log_path.shellescape} | xcpretty"
-        pipe << "--no-color" if Helper.colors_disabled?
+        pipe << "| tee #{xcodebuild_log_path.shellescape}"
+
+        formatter = Gym.config[:xcodebuild_formatter].chomp
+        options = legacy_xcpretty_options
+
+        if Gym.config[:disable_xcpretty] || formatter == ''
+          UI.verbose("Not using an xcodebuild formatter")
+        elsif !options.empty?
+          UI.important("Detected legacy xcpretty being used, so formatting with xcpretty")
+          UI.important("Option(s) used: #{options.join(', ')}")
+          pipe += pipe_xcpretty
+        elsif formatter == 'xcpretty'
+          pipe += pipe_xcpretty
+        elsif formatter == 'xcbeautify'
+          pipe += pipe_xcbeautify
+        else
+          pipe << "| #{formatter}"
+        end
+
         pipe << "> /dev/null" if Gym.config[:suppress_xcode_output]
+        pipe
+      end
+
+      def pipe_xcbeautify
+        pipe = ['| xcbeautify']
+
+        if FastlaneCore::Helper.colors_disabled?
+          pipe << '--disable-colored-output'
+        end
+
+        return pipe
+      end
+
+      def legacy_xcpretty_options
+        options = []
+
+        options << "xcpretty_test_format" if Gym.config[:xcpretty_test_format]
+        options << "xcpretty_formatter" if Gym.config[:xcpretty_formatter]
+        options << "xcpretty_report_junit" if Gym.config[:xcpretty_report_junit]
+        options << "xcpretty_report_html" if Gym.config[:xcpretty_report_html]
+        options << "xcpretty_report_json" if Gym.config[:xcpretty_report_json]
+        options << "xcpretty_utf" if Gym.config[:xcpretty_utf]
+
+        return options
+      end
+
+      def pipe_xcpretty
+        pipe = []
+
+        formatter = Gym.config[:xcpretty_formatter]
+        pipe << "| xcpretty"
+        pipe << " --test" if Gym.config[:xcpretty_test_format]
+        pipe << " --no-color" if Helper.colors_disabled?
+        pipe << " --formatter " if formatter
+        pipe << formatter if formatter
+        pipe << "--utf" if Gym.config[:xcpretty_utf]
+        report_output_junit = Gym.config[:xcpretty_report_junit]
+        report_output_html = Gym.config[:xcpretty_report_html]
+        report_output_json = Gym.config[:xcpretty_report_json]
+        if report_output_junit
+          pipe << " --report junit --output "
+          pipe << report_output_junit.shellescape
+        elsif report_output_html
+          pipe << " --report html --output "
+          pipe << report_output_html.shellescape
+        elsif report_output_json
+          pipe << " --report json-compilation-database --output "
+          pipe << report_output_json.shellescape
+        end
 
         pipe
+      end
+
+      def post_build
+        commands = []
+        commands << %{grep -E '^[0-9.]+ms' #{xcodebuild_log_path.shellescape} | grep -vE '^0\.[0-9]' | sort -nr > culprits.txt} if Gym.config[:analyze_build_time]
+        commands
       end
 
       def xcodebuild_log_path
@@ -82,11 +163,7 @@ module Gym
       def build_path
         unless Gym.cache[:build_path]
           Gym.cache[:build_path] = Gym.config[:build_path]
-          unless Gym.cache[:build_path]
-            day = Time.now.strftime("%F") # e.g. 2015-08-07
-            Gym.cache[:build_path] = File.expand_path("~/Library/Developer/Xcode/Archives/#{day}/")
-          end
-          FileUtils.mkdir_p Gym.cache[:build_path]
+          FileUtils.mkdir_p(Gym.cache[:build_path])
         end
         Gym.cache[:build_path]
       end
@@ -106,7 +183,12 @@ module Gym
 
       def result_bundle_path
         unless Gym.cache[:result_bundle_path]
-          Gym.cache[:result_bundle_path] = File.join(Gym.config[:output_directory], Gym.config[:output_name]) + ".result"
+          path = Gym.config[:result_bundle_path]
+          path ||= File.join(Gym.config[:output_directory], Gym.config[:output_name] + ".result")
+          if File.directory?(path)
+            FileUtils.remove_dir(path)
+          end
+          Gym.cache[:result_bundle_path] = path
         end
         return Gym.cache[:result_bundle_path]
       end

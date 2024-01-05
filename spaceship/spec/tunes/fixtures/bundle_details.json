@@ -1,0 +1,151 @@
+{
+	"data": {
+		"adamId": 1234567890,
+		"vendorIdentifier": "com.acmecorp.bundle",
+		"copyright": "2019 ACME Corp",
+		"primaryLocaleCode": "en-US",
+		"priceTierStem": "10",
+		"details": [{
+			"name": "Fancy Bundle",
+			"localeCode": "en-US",
+			"approvedDetail": null,
+			"marketingText": {
+				"value": "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.",
+				"isEditable": false,
+				"isRequired": false,
+				"errorKeys": null
+			},
+			"marketingUrl": {
+				"value": "https://acmecorp.com/bundle",
+				"isEditable": false,
+				"isRequired": false,
+				"errorKeys": null
+			},
+			"reviewRequired": false,
+			"empty": false
+		}],
+		"memberApps": [{
+			"adamId": 123456789,
+			"name": "App 1",
+			"iconUrl": "https://is2-ssl.mzstatic.com/image/thumb/Purple71/v5/67/5c/73/674c732d-a701-8e40-f8e9-3ea0c3571f7e/mzl.xhplkhax.png/340x340bb-80.png",
+			"appType": "ios",
+			"priceTier": "Tier 5",
+			"versions": [{
+				"type": "APP",
+				"id": "123456789",
+				"version": "4.0",
+				"state": "readyForSale",
+				"stateKey": "readyForSale",
+				"stateGroup": "readyForSale",
+				"largeAppIcon": {
+					"assetToken": "Purple71/v5/67/4c/73/674c732d-a701-8e40-f8e9-3ea0c3571f7e/mzl.xhplkhax.png",
+					"sortOrder": null,
+					"type": "LargeApplicationIcon",
+					"size": 8387,
+					"width": 1024,
+					"height": 1024,
+					"checksum": "a8aa085de9a1e422a7cefa78c6e98247",
+					"url": "https://is1-ssl.mzstatic.com/image/thumb/Purple71/v5/67/4c/73/674c732d-a701-8e40-f8e9-3ea0c3571f7e/mzl.xhplkhax.png/1024x1024ss-80.png",
+					"thumbNailUrl": "https://is2-ssl.mzstatic.com/image/thumb/Purple71/v5/67/4c/73/674c732d-a701-8e40-f8e9-3ea0c3571f7e/mzl.xhplkhax.png/340x340bb-80.png",
+					"originalFileName": "app1.png"
+				},
+				"supportedHardware": ["iphone", "ipad"],
+				"issuesCount": 0,
+				"hasGrievous": false
+			}]
+		}, {
+			"adamId": 223456789,
+			"name": "App 2",
+			"iconUrl": "https://is1-ssl.mzstatic.com/image/thumb/Purple71/v5/b7/6b/15/b76b15de-70f9-96eb-a278-8784fbc81618/mzl.qpfmmjdy.png/340x340bb-80.png",
+			"appType": "ios",
+			"priceTier": "Tier 5",
+			"versions": [{
+				"type": "APP",
+				"id": "223456789",
+				"version": "4.0",
+				"state": "readyForSale",
+				"stateKey": "readyForSale",
+				"stateGroup": "readyForSale",
+				"largeAppIcon": {
+					"assetToken": "Purple71/v5/b7/6b/15/b76b15de-70f9-96eb-a278-8784fbc81618/mzl.qpfmmjdy.png",
+					"sortOrder": null,
+					"type": "LargeApplicationIcon",
+					"size": 13736,
+					"width": 1024,
+					"height": 1024,
+					"checksum": "ff1ea4b7ebb224b1b4cabc49d4f0ba63",
+					"url": "https://is5-ssl.mzstatic.com/image/thumb/Purple71/v5/b7/6b/15/b76b15de-70f9-96eb-a278-8784fbc81618/mzl.qpfmmjdy.png/1024x1024ss-80.png",
+					"thumbNailUrl": "https://is1-ssl.mzstatic.com/image/thumb/Purple71/v5/b7/6b/15/b76b15de-70f9-96eb-a278-8784fbc81618/mzl.qpfmmjdy.png/340x340bb-80.png",
+					"originalFileName": "app2.png"
+				},
+				"supportedHardware": ["iphone", "ipad"],
+				"issuesCount": 0,
+				"hasGrievous": false
+			}]
+		}, {
+			"adamId": 323456789,
+			"name": "App 3",
+			"iconUrl": "https://is4-ssl.mzstatic.com/image/thumb/Purple62/v5/e7/18/ce/e718ce2c-8617-2369-1d12-c84262857311/mzl.xfldaefl.png/340x340bb-80.png",
+			"appType": "ios",
+			"priceTier": "Tier 5",
+			"versions": [{
+				"type": "APP",
+				"id": "323456789",
+				"version": "4.0",
+				"state": "readyForSale",
+				"stateKey": "readyForSale",
+				"stateGroup": "readyForSale",
+				"largeAppIcon": {
+					"assetToken": "Purple62/v5/e7/18/ce/e718ce2c-8617-2369-1d12-c84262857311/mzl.xfldaefl.png",
+					"sortOrder": null,
+					"type": "LargeApplicationIcon",
+					"size": 15358,
+					"width": 1024,
+					"height": 1024,
+					"checksum": "29ecb4a1676faf2459cf4b52251b12ec",
+					"url": "https://is4-ssl.mzstatic.com/image/thumb/Purple62/v5/e7/18/ce/e718ce2c-8617-2369-1d12-c84262857311/mzl.xfldaefl.png/1024x1024ss-80.png",
+					"thumbNailUrl": "https://is4-ssl.mzstatic.com/image/thumb/Purple62/v5/e7/18/ce/e718ce2c-8617-2369-1d12-c84262857311/mzl.xfldaefl.png/340x340bb-80.png",
+					"originalFileName": "app3.png"
+				},
+				"supportedHardware": ["iphone", "ipad"],
+				"issuesCount": 0,
+				"hasGrievous": false
+			}]
+		}],
+		"canSubmit": false,
+		"canDevReject": false,
+		"clearedForSale": true,
+		"resolutionCenterURL": "/WebObjects/iTunesConnect.woa/ra/ng/bundle/123456789/resolutioncenter",
+		"state": "Ready for Sale",
+		"stateGroup": "readyForSale",
+		"stateKey": "readyForSale",
+		"inFlightState": "Prepare for Submission",
+		"userBundleIcon": {
+			"value": {
+				"assetToken": null,
+				"sortOrder": null,
+				"type": null,
+				"size": null,
+				"width": null,
+				"height": null,
+				"checksum": null,
+				"url": null,
+				"thumbNailUrl": null,
+				"originalFileName": null
+			},
+			"isEditable": true,
+			"isRequired": false,
+			"errorKeys": null,
+			"approvedAssetToken": null,
+			"approvedIconUrl": null
+		},
+		"clearedForSaleEditable": true,
+		"adamId2": 123456789
+	},
+	"messages": {
+		"warn": null,
+		"info": null,
+		"error": null
+	},
+	"statusCode": "SUCCESS"
+}

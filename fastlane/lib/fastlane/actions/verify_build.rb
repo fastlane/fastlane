@@ -1,11 +1,7 @@
 require 'plist'
-require 'terminal-table'
 
 module Fastlane
   module Actions
-    module SharedValues
-      VERIFY_BUILD_CUSTOM_VALUE = :VERIFY_BUILD_CUSTOM_VALUE
-    end
     class VerifyBuildAction < Action
       def self.run(params)
         Dir.mktmpdir do |dir|
@@ -17,39 +13,51 @@ module Fastlane
 
           self.print_values(values)
 
-          self.evaulate(params, values)
+          self.evaluate(params, values)
         end
       end
 
       def self.app_path(params, dir)
-        ipa_path = params[:ipa_path] || Actions.lane_context[SharedValues::IPA_OUTPUT_PATH] || ''
-        UI.user_error!("Unable to find ipa file '#{ipa_path}'.") unless File.exist?(ipa_path)
-        ipa_path = File.expand_path(ipa_path)
+        build_path = params[:ipa_path] || params[:build_path] || Actions.lane_context[SharedValues::IPA_OUTPUT_PATH] || ''
+        UI.user_error!("Unable to find file '#{build_path}'") unless File.exist?(build_path)
+        build_path = File.expand_path(build_path)
 
-        `unzip '#{ipa_path}' -d #{dir}`
-        UI.user_error!("Unable to unzip ipa") unless $? == 0
+        case File.extname(build_path)
+        when ".ipa", ".zip"
+          `unzip #{build_path.shellescape} -d #{dir.shellescape} -x '__MACOSX/*' '*.DS_Store' 2>&1`
+          UI.user_error!("Unable to unzip ipa") unless $? == 0
+          # Adding extra ** for edge-case ipas where Payload directory is nested.
+          app_path = Dir["#{dir}/**/Payload/*.app"].first
+        when ".xcarchive"
+          app_path = Dir["#{build_path}/Products/Applications/*.app"].first
+        else
+          app_path = build_path # Assume that input is an app file.
+        end
 
-        app_path = File.expand_path("#{dir}/Payload/*.app")
-
+        UI.user_error!("Unable to find app file") unless app_path && File.exist?(app_path)
         app_path
       end
 
       def self.gather_cert_info(app_path)
-        cert_info = `codesign -vv -d #{app_path} 2>&1`
+        cert_info = `codesign -vv -d #{app_path.shellescape} 2>&1`
         UI.user_error!("Unable to verify code signing") unless $? == 0
 
         values = {}
 
         parts = cert_info.strip.split(/\r?\n/)
         parts.each do |part|
-          if part =~ /\AAuthority=i(Phone|OS)/
+          if part =~ /\AAuthority=(iPhone|iOS|Apple)\s(Distribution|Development)/
             type = part.split('=')[1].split(':')[0]
             values['provisioning_type'] = type.downcase =~ /distribution/i ? "distribution" : "development"
           end
-          if part.start_with? "TeamIdentifier"
+          if part.start_with?("Authority")
+            values['authority'] ||= []
+            values['authority'] << part.split('=')[1]
+          end
+          if part.start_with?("TeamIdentifier")
             values['team_identifier'] = part.split('=')[1]
           end
-          if part.start_with? "Identifier"
+          if part.start_with?("Identifier")
             values['bundle_identifier'] = part.split('=')[1]
           end
         end
@@ -58,7 +66,10 @@ module Fastlane
       end
 
       def self.update_with_profile_info(app_path, values)
-        profile = `cat #{app_path}/embedded.mobileprovision | security cms -D`
+        provision_profile_path = "#{app_path}/embedded.mobileprovision"
+        UI.user_error!("Unable to find embedded profile in #{provision_profile_path}") unless File.exist?(provision_profile_path)
+
+        profile = `cat #{provision_profile_path.shellescape} | security cms -D`
         UI.user_error!("Unable to extract profile") unless $? == 0
 
         plist = Plist.parse_xml(profile)
@@ -66,6 +77,7 @@ module Fastlane
         values['app_name'] = plist['AppIDName']
         values['provisioning_uuid'] = plist['UUID']
         values['team_name'] = plist['TeamName']
+        values['team_identifier'] = plist['TeamIdentifier'].first
 
         application_identifier_prefix = plist['ApplicationIdentifierPrefix'][0]
         full_bundle_identifier = "#{application_identifier_prefix}.#{values['bundle_identifier']}"
@@ -77,33 +89,13 @@ module Fastlane
       end
 
       def self.print_values(values)
-        table = Terminal::Table.new do |t|
-          t.title = 'Summary for VERIFY_BUILD'.green
-          t.headings = 'Key', 'Value'
-          values.each do |key, value|
-            columns = []
-            columns << key
-            columns << case value
-                       when Hash
-                         value.map { |k, v| "#{k}: #{v}" }.join("\n")
-                       when Array
-                         value.join("\n")
-                       else
-                         value.to_s
-                       end
-
-            t << columns
-          end
-        end
-
-        puts ""
-        puts table
-        puts ""
+        FastlaneCore::PrintTable.print_values(config: values,
+                                             title: "Summary for verify_build #{Fastlane::VERSION}")
       end
 
-      def self.evaulate(params, values)
+      def self.evaluate(params, values)
         if params[:provisioning_type]
-          UI.user_error!("Mismatched provisioning_type. Required: '#{params[:provisioning_type]}''; Found: '#{values['provisioning_type']}'") unless params[:provisioning_type] == values['provisioning_type']
+          UI.user_error!("Mismatched provisioning_type. Required: '#{params[:provisioning_type]}'; Found: '#{values['provisioning_type']}'") unless params[:provisioning_type] == values['provisioning_type']
         end
         if params[:provisioning_uuid]
           UI.user_error!("Mismatched provisioning_uuid. Required: '#{params[:provisioning_uuid]}'; Found: '#{values['provisioning_uuid']}'") unless params[:provisioning_uuid] == values['provisioning_uuid']
@@ -112,7 +104,7 @@ module Fastlane
           UI.user_error!("Mismatched team_identifier. Required: '#{params[:team_identifier]}'; Found: '#{values['team_identifier']}'") unless params[:team_identifier] == values['team_identifier']
         end
         if params[:team_name]
-          UI.user_error!("Mismatched team_name. Required: '#{params[:team_name]}'; Found: 'values['team_name']'") unless params[:team_name] == values['team_name']
+          UI.user_error!("Mismatched team_name. Required: '#{params[:team_name]}'; Found: '#{values['team_name']}'") unless params[:team_name] == values['team_name']
         end
         if params[:app_name]
           UI.user_error!("Mismatched app_name. Required: '#{params[:app_name]}'; Found: '#{values['app_name']}'") unless params[:app_name] == values['app_name']
@@ -121,7 +113,7 @@ module Fastlane
           UI.user_error!("Mismatched bundle_identifier. Required: '#{params[:bundle_identifier]}'; Found: '#{values['bundle_identifier']}'") unless params[:bundle_identifier] == values['bundle_identifier']
         end
 
-        UI.success "Build is verified, have a 🍪."
+        UI.success("Build is verified, have a 🍪.")
       end
 
       #####################################################
@@ -133,6 +125,7 @@ module Fastlane
       end
 
       def self.details
+        "Verifies that the built app was built using the expected build resources. This is relevant for people who build on machines that are used to build apps with different profiles, certificates and/or bundle identifiers to guard against configuration mistakes."
       end
 
       def self.available_options
@@ -168,6 +161,12 @@ module Fastlane
           FastlaneCore::ConfigItem.new(key: :ipa_path,
                                        env_name: "FL_VERIFY_BUILD_IPA_PATH",
                                        description: "Explicitly set the ipa path",
+                                       conflicting_options: [:build_path],
+                                       optional: true),
+          FastlaneCore::ConfigItem.new(key: :build_path,
+                                       env_name: "FL_VERIFY_BUILD_BUILD_PATH",
+                                       description: "Explicitly set the ipa, app or xcarchive path",
+                                       conflicting_options: [:ipa_path],
                                        optional: true)
         ]
       end
@@ -184,6 +183,19 @@ module Fastlane
 
       def self.is_supported?(platform)
         platform == :ios
+      end
+
+      def self.example_code
+        [
+          'verify_build(
+            provisioning_type: "distribution",
+            bundle_identifier: "com.example.myapp"
+          )'
+        ]
+      end
+
+      def self.category
+        :misc
       end
     end
   end

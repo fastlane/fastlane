@@ -20,23 +20,49 @@ describe Snapshot::ResetSimulators do
     ]
   end
 
+  let(:runtimes) do
+    [
+      ["iOS 10.3", "com.apple.CoreSimulator.SimRuntime.iOS-10-3"],
+      ["tvOS 10.2", "com.apple.CoreSimulator.SimRuntime.tvOS-10-2"],
+      ["watchOS 3.2", "com.apple.CoreSimulator.SimRuntime.watchOS-3-2"]
+    ]
+  end
+
   let(:all_devices) do
     usable_devices + unusable_devices
   end
 
-  let(:fixture_data) { File.read('spec/fixtures/xcrun-simctl-list-devices.txt') }
+  let(:fixture_data) { File.read('snapshot/spec/fixtures/xcrun-simctl-list-devices.txt') }
+
+  let(:fixture_runtimes_xcode8) { File.read('snapshot/spec/fixtures/xcrun-simctl-list-runtimes-Xcode8.txt') }
+
+  let(:fixture_runtimes_xcode9) { File.read('snapshot/spec/fixtures/xcrun-simctl-list-runtimes-Xcode9.txt') }
 
   describe '#devices' do
     it 'should read simctl output into arrays of device info' do
-      expect(FastlaneCore::Helper).to receive(:backticks).with(/xcrun simctl list devices/, print: $verbose).and_return(fixture_data)
+      expect(FastlaneCore::Helper).to receive(:backticks).with(/xcrun simctl list devices/, print: FastlaneCore::Globals.verbose?).and_return(fixture_data)
 
       expect(Snapshot::ResetSimulators.devices).to eq(all_devices)
     end
   end
 
+  describe '#clear_everything' do
+    describe 'runtimes' do
+      it "should find runtimes that are available for Xcode 8" do
+        expect(FastlaneCore::Helper).to receive(:backticks).with(/xcrun simctl list runtimes/, print: FastlaneCore::Globals.verbose?).and_return(fixture_runtimes_xcode8)
+        expect(Snapshot::ResetSimulators.runtimes).to eq(runtimes)
+      end
+
+      it "should find runtimes that are available for Xcode 9" do
+        expect(FastlaneCore::Helper).to receive(:backticks).with(/xcrun simctl list runtimes/, print: FastlaneCore::Globals.verbose?).and_return(fixture_runtimes_xcode9)
+        expect(Snapshot::ResetSimulators.runtimes).to eq(runtimes)
+      end
+    end
+  end
+
   describe '#device_line_usable?' do
     describe 'usable devices' do
-      it "should find normal devices to be be usable" do
+      it "should find normal devices to be usable" do
         usable_devices.each do |usable|
           expect(Snapshot::ResetSimulators.device_line_usable?(usable[0])).to be(true)
         end
@@ -44,7 +70,7 @@ describe Snapshot::ResetSimulators do
     end
 
     describe 'unusable devices' do
-      it "should find devices in bad states to be be unusable" do
+      it "should find devices in bad states to be unusable" do
         unusable_devices.each do |unusable|
           expect(Snapshot::ResetSimulators.device_line_usable?(unusable[0])).to be(false)
         end
@@ -62,7 +88,7 @@ describe Snapshot::ResetSimulators do
           ["    Apple Watch - 42mm (C8250DD7-8C4E-4803-838A-731B42785262) (Shutdown)", "Apple Watch - 42mm", "C8250DD7-8C4E-4803-838A-731B42785262"]
         ]
         expect(Snapshot::ResetSimulators).to receive(:devices).and_return(mocked_devices)
-        expect(FastlaneCore::Helper).not_to receive(:backticks)
+        expect(FastlaneCore::Helper).not_to(receive(:backticks))
 
         Snapshot::ResetSimulators.make_phone_watch_pair
       end
@@ -76,7 +102,7 @@ describe Snapshot::ResetSimulators do
           ["    Apple TV 1080p (D7D591A8-17D2-47B4-8D2A-AFAFA28874C9) (Shutdown)", "Apple TV 1080p", "D7D591A8-17D2-47B4-8D2A-AFAFA28874C9"]
         ]
         expect(Snapshot::ResetSimulators).to receive(:devices).and_return(mocked_devices)
-        expect(FastlaneCore::Helper).not_to receive(:backticks)
+        expect(FastlaneCore::Helper).not_to(receive(:backticks))
 
         Snapshot::ResetSimulators.make_phone_watch_pair
       end
@@ -86,10 +112,10 @@ describe Snapshot::ResetSimulators do
       it 'calls out to simctl pair' do
         expected_command = "xcrun simctl pair C8250DD7-8C4E-4803-838A-731B42785262 0311D4EC-14E7-443B-9F27-F32E72342799"
 
-        # By checking against all_devices, we expect those which are in an unusuable state
+        # By checking against all_devices, we expect those which are in an unusable state
         # NOT to be selected!
         expect(Snapshot::ResetSimulators).to receive(:devices).and_return(all_devices)
-        expect(FastlaneCore::Helper).to receive(:backticks).with(expected_command, print: $verbose)
+        expect(FastlaneCore::Helper).to receive(:backticks).with(expected_command, print: FastlaneCore::Globals.verbose?)
 
         Snapshot::ResetSimulators.make_phone_watch_pair
       end

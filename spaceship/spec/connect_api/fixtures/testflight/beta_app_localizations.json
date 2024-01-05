@@ -1,0 +1,34 @@
+{
+    "data" : [ {
+      "type" : "betaAppLocalizations",
+      "id" : "123456789",
+      "attributes" : {
+        "feedbackEmail" : "email@email.com",
+        "marketingUrl" : "https://fastlane.tools/marketing",
+        "privacyPolicyUrl" : "https://fastlane.tools/policy",
+        "tvOsPrivacyPolicy" : null,
+        "description" : "This is a description of my app",
+        "locale" : "en-US"
+      },
+      "relationships" : {
+        "app" : {
+          "links" : {
+            "self" : "https://appstoreconnect.apple.com/iris/v1/betaAppLocalizations/123456789/relationships/app",
+            "related" : "https://appstoreconnect.apple.com/iris/v1/betaAppLocalizations/123456789/app"
+          }
+        }
+      },
+      "links" : {
+        "self" : "https://appstoreconnect.apple.com/iris/v1/betaAppLocalizations/123456789"
+      }
+    } ],
+    "links" : {
+      "self" : "https://appstoreconnect.apple.com/iris/v1/betaAppLocalizations?limit=28&filter%5Blocale%5D=en-US&filter%5Bapp%5D=1358899889"
+    },
+    "meta" : {
+      "paging" : {
+        "total" : 1,
+        "limit" : 28
+      }
+    }
+  }

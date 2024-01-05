@@ -1,7 +1,6 @@
 module Fastlane
   module Actions
     class BundleInstallAction < Action
-      # rubocop:disable Metrics/CyclomaticComplexity
       # rubocop:disable Metrics/PerceivedComplexity
       def self.run(params)
         if gemfile_exists?(params)
@@ -25,13 +24,14 @@ module Fastlane
           cmd << "--trust-policy" if params[:trust_policy]
           cmd << "--without #{params[:without]}" if params[:without]
           cmd << "--with #{params[:with]}" if params[:with]
+          cmd << "--frozen" if params[:frozen]
+          cmd << "--redownload" if params[:redownload]
 
           return sh(cmd.join(' '))
         else
           UI.message("No Gemfile found")
         end
       end
-      # rubocop:enable Metrics/CyclomaticComplexity
       # rubocop:enable Metrics/PerceivedComplexity
 
       def self.gemfile_exists?(params)
@@ -57,6 +57,14 @@ module Fastlane
         ["birmacher", "koglinjg"]
       end
 
+      def self.example_code
+        nil
+      end
+
+      def self.category
+        :misc
+      end
+
       def self.available_options
         [
           FastlaneCore::ConfigItem.new(key: :binstubs,
@@ -66,12 +74,12 @@ module Fastlane
           FastlaneCore::ConfigItem.new(key: :clean,
                                        env_name: "FL_BUNDLE_INSTALL_CLEAN",
                                        description: "Run bundle clean automatically after install",
-                                       is_string: false,
+                                       type: Boolean,
                                        default_value: false),
           FastlaneCore::ConfigItem.new(key: :full_index,
                                        env_name: "FL_BUNDLE_INSTALL_FULL_INDEX",
                                        description: "Use the rubygems modern index instead of the API endpoint",
-                                       is_string: false,
+                                       type: Boolean,
                                        default_value: false),
           FastlaneCore::ConfigItem.new(key: :gemfile,
                                        env_name: "FL_BUNDLE_INSTALL_GEMFILE",
@@ -80,27 +88,27 @@ module Fastlane
           FastlaneCore::ConfigItem.new(key: :jobs,
                                        env_name: "FL_BUNDLE_INSTALL_JOBS",
                                        description: "Install gems using parallel workers",
-                                       is_string: false,
+                                       type: Boolean,
                                        optional: true),
           FastlaneCore::ConfigItem.new(key: :local,
                                        env_name: "FL_BUNDLE_INSTALL_LOCAL",
                                        description: "Do not attempt to fetch gems remotely and use the gem cache instead",
-                                       is_string: false,
+                                       type: Boolean,
                                        default_value: false),
           FastlaneCore::ConfigItem.new(key: :deployment,
                                        env_name: "FL_BUNDLE_INSTALL_DEPLOYMENT",
                                        description: "Install using defaults tuned for deployment and CI environments",
-                                       is_string: false,
+                                       type: Boolean,
                                        default_value: false),
           FastlaneCore::ConfigItem.new(key: :no_cache,
                                        env_name: "FL_BUNDLE_INSTALL_NO_CACHE",
                                        description: "Don't update the existing gem cache",
-                                       is_string: false,
+                                       type: Boolean,
                                        default_value: false),
           FastlaneCore::ConfigItem.new(key: :no_prune,
                                        env_name: "FL_BUNDLE_INSTALL_NO_PRUNE",
                                        description: "Don't remove stale gems from the cache",
-                                       is_string: false,
+                                       type: Boolean,
                                        default_value: false),
           FastlaneCore::ConfigItem.new(key: :path,
                                        env_name: "FL_BUNDLE_INSTALL_PATH",
@@ -109,17 +117,17 @@ module Fastlane
           FastlaneCore::ConfigItem.new(key: :system,
                                        env_name: "FL_BUNDLE_INSTALL_SYSTEM",
                                        description: "Install to the system location ($BUNDLE_PATH or $GEM_HOME) even if the bundle was previously installed somewhere else for this application",
-                                       is_string: false,
+                                       type: Boolean,
                                        default_value: false),
           FastlaneCore::ConfigItem.new(key: :quiet,
                                        env_name: "FL_BUNDLE_INSTALL_QUIET",
                                        description: "Only output warnings and errors",
-                                       is_string: false,
+                                       type: Boolean,
                                        default_value: false),
           FastlaneCore::ConfigItem.new(key: :retry,
                                        env_name: "FL_BUNDLE_INSTALL_RETRY",
                                        description: "Retry network and git requests that have failed",
-                                       is_string: false,
+                                       type: Boolean,
                                        optional: true),
           FastlaneCore::ConfigItem.new(key: :shebang,
                                        env_name: "FL_BUNDLE_INSTALL_SHEBANG",
@@ -140,7 +148,17 @@ module Fastlane
           FastlaneCore::ConfigItem.new(key: :with,
                                        env_name: "FL_BUNDLE_INSTALL_WITH",
                                        description: "Include gems that are part of the specified named group",
-                                       optional: true)
+                                       optional: true),
+          FastlaneCore::ConfigItem.new(key: :frozen,
+                                       env_name: "FL_BUNDLE_INSTALL_FROZEN",
+                                       description: "Don't allow the Gemfile.lock to be updated after install",
+                                       type: Boolean,
+                                       default_value: false),
+          FastlaneCore::ConfigItem.new(key: :redownload,
+                                       env_name: "FL_BUNDLE_INSTALL_REDOWNLOAD",
+                                       description: "Force download every gem, even if the required versions are already available locally",
+                                       type: Boolean,
+                                       default_value: false)
         ]
       end
     end

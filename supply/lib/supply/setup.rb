@@ -1,6 +1,8 @@
 module Supply
   class Setup
     def perform_download
+      UI.message("🕗  Downloading metadata, images, screenshots...")
+
       if File.exist?(metadata_path)
         UI.important("Metadata already exists at path '#{metadata_path}'")
         return
@@ -10,22 +12,30 @@ module Supply
 
       client.listings.each do |listing|
         store_metadata(listing)
-        create_screenshots_folder(listing)
         download_images(listing)
       end
 
-      client.apks_version_codes.each do |apk_version_code|
-        client.apk_listings(apk_version_code).each do |apk_listing|
-          store_apk_listing(apk_listing)
+      if Supply.config[:version_name].to_s == ""
+        latest_version = client.latest_version(Supply.config[:track])
+        if latest_version
+          Supply.config[:version_name] = latest_version.name
+        else
+          UI.user_error!("Could not find the latest version to download metadata, images, and screenshots from")
         end
+      end
+
+      client.release_listings(Supply.config[:version_name]).each do |release_listing|
+        store_release_listing(release_listing)
       end
 
       client.abort_current_edit
 
-      UI.success("Successfully stored metadata in '#{metadata_path}'")
+      UI.success("✅  Successfully stored metadata in '#{metadata_path}'")
     end
 
     def store_metadata(listing)
+      UI.message("📝  Downloading metadata (#{listing.language})")
+
       containing = File.join(metadata_path, listing.language)
       FileUtils.mkdir_p(containing)
 
@@ -37,25 +47,42 @@ module Supply
     end
 
     def download_images(listing)
-      # We cannot download existing screenshots as they are compressed
-      # But we can at least download the images
+      UI.message("🖼️  Downloading images (#{listing.language})")
+
       require 'net/http'
 
-      IMAGES_TYPES.each do |image_type|
-        if ['featureGraphic'].include?(image_type)
-          # we don't get all files in full resolution :(
-          UI.message("Due to the limit of the Google Play API `supply` can't download your existing feature graphics...")
-          next
-        end
+      allowed_imagetypes = [Supply::IMAGES_TYPES, Supply::SCREENSHOT_TYPES].flatten
 
+      allowed_imagetypes.each do |image_type|
         begin
-          UI.message("Downloading #{image_type} for #{listing.language}...")
+          path = File.join(metadata_path, listing.language, IMAGES_FOLDER_NAME, image_type)
 
-          url = client.fetch_images(image_type: image_type, language: listing.language).last
-          next unless url
+          p = Pathname.new(path)
+          if IMAGES_TYPES.include?(image_type) # IMAGE_TYPES are stored in locale/images location
+            FileUtils.mkdir_p(p.dirname.to_s)
+          else # SCREENSHOT_TYPES go under their respective folders.
+            FileUtils.mkdir_p(p.to_s)
+          end
 
-          path = File.join(metadata_path, listing.language, IMAGES_FOLDER_NAME, "#{image_type}.png")
-          File.write(path, Net::HTTP.get(URI.parse(url)))
+          UI.message("Downloading `#{image_type}` for #{listing.language}...")
+
+          urls = client.fetch_images(image_type: image_type, language: listing.language).map(&:url)
+          next if urls.nil? || urls.empty?
+
+          image_counter = 1 # Used to prefix the downloaded files, so order is preserved.
+          urls.each do |url|
+            if IMAGES_TYPES.include?(image_type) # IMAGE_TYPES are stored in locale/images
+              file_path = "#{path}.#{FastImage.type(url)}"
+            else # SCREENSHOT_TYPES are stored in locale/images/<screenshot_types>
+              file_path = File.join(path, "#{image_counter}_#{listing.language}.#{FastImage.type(url)}")
+            end
+
+            File.binwrite(file_path, Net::HTTP.get(URI.parse(url)))
+
+            UI.message("\tDownloaded - #{file_path}")
+
+            image_counter += 1
+          end
         rescue => ex
           UI.error(ex.to_s)
           UI.error("Error downloading '#{image_type}' for #{listing.language}...")
@@ -63,26 +90,19 @@ module Supply
       end
     end
 
-    def create_screenshots_folder(listing)
-      containing = File.join(metadata_path, listing.language)
+    def store_release_listing(release_listing)
+      UI.message("🔨  Downloading changelogs (#{release_listing.language}, #{release_listing.version})")
 
-      FileUtils.mkdir_p(File.join(containing, IMAGES_FOLDER_NAME))
-      Supply::SCREENSHOT_TYPES.each do |screenshot_type|
-        FileUtils.mkdir_p(File.join(containing, IMAGES_FOLDER_NAME, screenshot_type))
-      end
-
-      UI.message("Due to the limit of the Google Play API `supply` can't download your existing screenshots...")
-    end
-
-    def store_apk_listing(apk_listing)
-      containing = File.join(metadata_path, apk_listing.language, CHANGELOGS_FOLDER_NAME)
+      containing = File.join(metadata_path, release_listing.language, CHANGELOGS_FOLDER_NAME)
       unless File.exist?(containing)
         FileUtils.mkdir_p(containing)
       end
 
-      path = File.join(containing, "#{apk_listing.apk_version_code}.txt")
-      UI.message("Writing to #{path}...")
-      File.write(path, apk_listing.recent_changes)
+      release_listing.versioncodes.each do |versioncode|
+        path = File.join(containing, "#{versioncode}.txt")
+        UI.message("Writing to #{path}...")
+        File.write(path, release_listing.release_notes)
+      end
     end
 
     private

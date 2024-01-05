@@ -10,20 +10,20 @@ Along with the [Ruby libraries](https://github.com/fastlane/fastlane/tree/master
 
 **Adding Credentials**
 ```
-fastlane-credentials add --username felix@krausefx.com
+fastlane fastlane-credentials add --username felix@krausefx.com
 Password: *********
 Credential felix@krausefx.com:********* added to keychain.
 ```
 
 **Removing Credentials**
 ```
-fastlane-credentials remove --username felix@krausefx.com
+fastlane fastlane-credentials remove --username felix@krausefx.com
 password has been deleted.
 ```
 
 ## Storing in the keychain
 
-By default, your Apple credentials are stored in the OS X Keychain.
+By default, your Apple credentials are stored in the macOS Keychain.
 
 Your password is only stored locally on your computer.
 
@@ -33,16 +33,18 @@ You can easily delete the stored password by opening the "Keychain Access" app, 
 
 ## Using environment variables
 
+Pass the user credentials via the following environment variables:
+
 ```
 FASTLANE_USER
 FASTLANE_PASSWORD
 ```
 
-If you don't want to have your password stored in the Keychain use `FASTLANE_DONT_STORE_PASSWORD`.
+If you don't want to have your password stored in the Keychain set the `FASTLANE_DONT_STORE_PASSWORD` environment variable to `"1"`.
 
 ## Implementing a custom solution
 
-All ```fastlane``` tools are Ruby-based, and you can take a look at the source code to easily implement your own authentication solution.
+All _fastlane_ tools are Ruby-based, and you can take a look at the source code to easily implement your own authentication solution.
 
 ```ruby
 require 'credentials_manager'
@@ -53,7 +55,7 @@ puts data.password
 ```
 
 # Code of Conduct
-Help us keep `fastlane` open and inclusive. Please read and follow our [Code of Conduct](https://github.com/fastlane/fastlane/blob/master/CODE_OF_CONDUCT.md).
+Help us keep _fastlane_ open and inclusive. Please read and follow our [Code of Conduct](https://github.com/fastlane/fastlane/blob/master/CODE_OF_CONDUCT.md).
 
 # License
 

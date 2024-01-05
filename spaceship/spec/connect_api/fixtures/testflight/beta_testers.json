@@ -1,0 +1,90 @@
+{
+    "data" : [ {
+      "type" : "betaTesters",
+      "id" : "123456789",
+      "attributes" : {
+        "firstName" : "Cats",
+        "lastName" : "AreCute",
+        "email" : "email@email.com",
+        "inviteType" : "EMAIL",
+        "invitation" : null
+      },
+      "relationships" : {
+        "apps" : {
+          "links" : {
+            "self" : "https://appstoreconnect.apple.com/iris/v1/betaTesters/123456789/relationships/apps",
+            "related" : "https://appstoreconnect.apple.com/iris/v1/betaTesters/123456789/apps"
+          }
+        },
+        "betaGroups" : {
+          "links" : {
+            "self" : "https://appstoreconnect.apple.com/iris/v1/betaTesters/123456789/relationships/betaGroups",
+            "related" : "https://appstoreconnect.apple.com/iris/v1/betaTesters/123456789/betaGroups"
+          }
+        },
+        "builds" : {
+          "links" : {
+            "self" : "https://appstoreconnect.apple.com/iris/v1/betaTesters/123456789/relationships/builds",
+            "related" : "https://appstoreconnect.apple.com/iris/v1/betaTesters/123456789/builds"
+          }
+        },
+        "betaTesterMetrics" : {
+          "links" : {
+            "self" : "https://appstoreconnect.apple.com/iris/v1/betaTesters/123456789/relationships/betaTesterMetrics",
+            "related" : "https://appstoreconnect.apple.com/iris/v1/betaTesters/123456789/betaTesterMetrics"
+          }
+        }
+      },
+      "links" : {
+        "self" : "https://appstoreconnect.apple.com/iris/v1/betaTesters/123456789"
+      }
+    }, {
+      "type" : "betaTesters",
+      "id" : "987654321",
+      "attributes" : {
+        "firstName" : null,
+        "lastName" : null,
+        "email" : "email2@email.com",
+        "inviteType" : "EMAIL",
+        "invitation" : null
+      },
+      "relationships" : {
+        "apps" : {
+          "links" : {
+            "self" : "https://appstoreconnect.apple.com/iris/v1/betaTesters/987654321/relationships/apps",
+            "related" : "https://appstoreconnect.apple.com/iris/v1/betaTesters/987654321/apps"
+          }
+        },
+        "betaGroups" : {
+          "links" : {
+            "self" : "https://appstoreconnect.apple.com/iris/v1/betaTesters/987654321/relationships/betaGroups",
+            "related" : "https://appstoreconnect.apple.com/iris/v1/betaTesters/987654321/betaGroups"
+          }
+        },
+        "builds" : {
+          "links" : {
+            "self" : "https://appstoreconnect.apple.com/iris/v1/betaTesters/987654321/relationships/builds",
+            "related" : "https://appstoreconnect.apple.com/iris/v1/betaTesters/987654321/builds"
+          }
+        },
+        "betaTesterMetrics" : {
+          "links" : {
+            "self" : "https://appstoreconnect.apple.com/iris/v1/betaTesters/987654321/relationships/betaTesterMetrics",
+            "related" : "https://appstoreconnect.apple.com/iris/v1/betaTesters/987654321/betaTesterMetrics"
+          }
+        }
+      },
+      "links" : {
+        "self" : "https://appstoreconnect.apple.com/iris/v1/betaTesters/987654321"
+      }
+    } ],
+    "links" : {
+      "self" : "https://appstoreconnect.apple.com/iris/v1/betaTesters"
+    },
+    "meta" : {
+      "paging" : {
+        "total" : 2,
+        "limit" : 50
+      }
+    }
+  }

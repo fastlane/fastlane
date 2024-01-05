@@ -1,11 +1,18 @@
 require 'rexml/document'
 
+require_relative 'helper'
+
 module FastlaneCore
   class PkgFileAnalyser
     def self.fetch_app_identifier(path)
       xml = self.fetch_distribution_xml_file(path)
       return xml.elements['installer-gui-script/product'].attributes['id'] if xml
       return nil
+    end
+
+    # Fetches the app platform from the given pkg file.
+    def self.fetch_app_platform(path)
+      return "osx"
     end
 
     # Fetches the app version from the given pkg file.
@@ -15,12 +22,19 @@ module FastlaneCore
       return nil
     end
 
+    # Fetches the app version from the given pkg file.
+    def self.fetch_app_build(path)
+      xml = self.fetch_distribution_xml_file(path)
+      return xml.elements['installer-gui-script/pkg-ref/bundle-version/bundle'].attributes['CFBundleVersion'] if xml
+      return nil
+    end
+
     def self.fetch_distribution_xml_file(path)
       Dir.mktmpdir do |dir|
         Helper.backticks("xar -C #{dir.shellescape} -xf #{path.shellescape}")
 
         Dir.foreach(dir) do |file|
-          next unless file.include? 'Distribution'
+          next unless file.include?('Distribution')
 
           begin
             content = File.open(File.join(dir, file))

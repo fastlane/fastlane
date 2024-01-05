@@ -1,0 +1,68 @@
+-----
+
+<div class="quality-index" style="color: #<%= @plugin.color_to_use %>"><%= @plugin.data[:overall_score] %></div>
+
+<h3 id="<%= @plugin.name.gsub("fastlane-plugin-", "") %>"><a href="<%= @plugin.homepage %>" target="_blank"><code><%= @plugin.name.gsub("fastlane-plugin-", "") %></code></a></h3>
+
+<p class="via-text">via <%= @plugin.raw_hash["authors"] %></p>
+
+> <%= @plugin.info %>
+
+<% if @plugin.data[:actions].count > 0 %>
+<details>
+<summary class="plugin-actions">Provided actions</summary>
+
+<table>
+  <theader>
+    <tr>
+      <th>Name</th>
+      <th>Category</th>
+      <th>Description</th>
+    </tr>
+  </thead>
+  <tbody>
+<%- @plugin.data[:actions].each do |action| -%>
+    <tr>
+      <td><strong><%= action.name %></strong></td>
+      <td><%= action.category || "-" %></td>
+      <td><%= action.description || action.details || "-" %></td>
+    </tr>
+<%- end -%>
+</tbody>
+</table>
+
+</details>
+<% end %>
+
+<details>
+<summary class="score-details">Score details</summary>
+
+<table>
+  <theader>
+    <tr>
+      <th>Metric</th>
+      <th>Points</th>
+      <th>Description</th>
+    </tr>
+  </thead>
+  <tbody>
+<%- @plugin.ratings.each do |current_rating| -%>
+    <tr>
+      <td><%= current_rating.key %></td>
+      <td><%= current_rating.value %></td>
+      <td><%= current_rating.description %></td>
+    </tr>
+<%- end -%>
+</tbody>
+</table>
+
+</details>
+
+<p>
+<% if @plugin.data[:has_github_page] %>
+  <a href="<%= @plugin.homepage %>" target="_blank">Open on GitHub</a>
+<% else %>
+  <a href="<%= @plugin.homepage %>" target="_blank">Open website</a>
+  <span style="color: #a03030">(no GitHub link provided in gemspec)</span>
+<% end %>
+</p>

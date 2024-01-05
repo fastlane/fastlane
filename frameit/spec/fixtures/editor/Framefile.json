@@ -1,0 +1,24 @@
+{
+  "default": {
+    "background": "../background.jpg",
+    "padding": 50,
+    "title": {
+      "color": "#000000"
+    },
+    "use_platform": "IOS"
+  },
+  "data": [
+    {
+      "filter": "apostrophes",
+      "title": {
+        "text": "Don't forget the apostrophes"
+      }
+    },
+    {
+      "filter": "escaped-apostrophes",
+      "title": {
+        "text": "Don\'t forget the apostrophes"
+      }
+    }
+  ]
+}

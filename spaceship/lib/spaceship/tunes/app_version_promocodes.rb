@@ -1,3 +1,5 @@
+require_relative 'tunes_base'
+
 module Spaceship
   module Tunes
     # Represents the information about remaining number of promo codes for an app version
@@ -20,15 +22,6 @@ module Spaceship
         'maximumNumberOfCodes' => :maximum_number_of_codes,
         'contractFileName' => :contract_file_name
       })
-
-      class << self
-        # Create a new object based on a hash.
-        # This is used to create a new object based on the server response.
-        def factory(attrs)
-          obj = self.new(attrs)
-          return obj
-        end
-      end
     end
   end
 end

@@ -1,5 +1,8 @@
 require 'openssl'
 
+require_relative 'app'
+require_relative 'website_push'
+
 module Spaceship
   module Portal
     # Represents a certificate from the Apple Developer Portal.
@@ -15,7 +18,7 @@ module Spaceship
       # @example Company
       #   "SunApps GmbH"
       # @example Push Profile
-      #   "com.krausefx.app"
+      #   "Apple Push Services"
       attr_accessor :name
 
       # @return (String) Status of the certificate
@@ -46,8 +49,8 @@ module Spaceship
       #
       # @example Code Signing Identity (usually the company name)
       #   "SunApps Gmbh"
-      # @example Push Certificate (the name of your App ID)
-      #   "Awesome App"
+      # @example Push Certificate (the bundle identifier)
+      #   "tools.fastlane.app"
       attr_accessor :owner_name
 
       # @return (String) The ID of the owner, that can be used to
@@ -86,6 +89,12 @@ module Spaceship
       # Certs are not associated with apps
       #####################################################
 
+      # An Apple development code signing certificate used for development environment
+      class AppleDevelopment < Certificate; end
+
+      # An Apple distribution code signing certificate used for distribution environment
+      class AppleDistribution < Certificate; end
+
       # A development code signing certificate used for development environment
       class Development < Certificate; end
 
@@ -105,10 +114,10 @@ module Spaceship
       class MacInstallerDistribution < Certificate; end
 
       # A Mac Developer ID signing certificate for building .app bundles
-      class DeveloperIDApplication < Certificate; end
+      class DeveloperIdApplication < Certificate; end
 
       # A Mac Developer ID signing certificate for building .pkg installers
-      class DeveloperIDInstaller < Certificate; end
+      class DeveloperIdInstaller < Certificate; end
 
       #####################################################
       # Certs that are specific for one app
@@ -125,7 +134,11 @@ module Spaceship
       class ProductionPush < PushCertificate; end
 
       # A push notification certificate for websites
-      class WebsitePush < PushCertificate; end
+      class WebsitePush < PushCertificate
+        def self.portal_type
+          Spaceship::Portal::WebsitePush
+        end
+      end
 
       # A push notification certificate for the VOIP environment
       class VoipPush < PushCertificate; end
@@ -136,32 +149,42 @@ module Spaceship
       # ApplePay certificate
       class ApplePay < Certificate; end
 
+      # ApplePayMerchantIdentity certificate
+      class ApplePayMerchantIdentity < Certificate; end
+
       # A Mac push notification certificate for development environment
       class MacDevelopmentPush < PushCertificate; end
 
       # A Mac push notification certificate for production environment
       class MacProductionPush < PushCertificate; end
 
+      APPLE_CERTIFICATE_TYPE_IDS = {
+        "83Q87W3TGH" => AppleDevelopment,
+        "WXV89964HE" => AppleDistribution
+      }
+
       IOS_CERTIFICATE_TYPE_IDS = {
         "5QPB9NHCEI" => Development,
         "R58UK2EWSO" => Production,
         "9RQEK7MSXA" => InHouse,
         "LA30L5BJEU" => Certificate,
-        "BKLRAVXMGM" => DevelopmentPush,
+        "JKG5JZ54H7" => DevelopmentPush,
         "UPV3DW712I" => ProductionPush,
         "Y3B2F3TYSI" => Passbook,
         "3T2ZP62QW8" => WebsitePush,
-        "E5D663CMZW" => WebsitePush,
-        "4APLUP237T" => ApplePay
+        "E5D663CMZW" => VoipPush,
+        "4APLUP237T" => ApplePay,
+        "MD8Q2VRT6A" => ApplePayMerchantIdentity
       }
 
       OLDER_IOS_CERTIFICATE_TYPES = [
-        # those are also sent by the browser, but not sure what they represent
+        "3BQKVH9I2X", # old ProductionPush
+        "BKLRAVXMGM", # old DevelopmentPush
+        # those are also sent by the browser, but not sure what they represent:
         "T44PTHVNID",
         "DZQUP8189Y",
         "FGQUP4785Z",
         "S5WE21TULA",
-        "3BQKVH9I2X", # ProductionPush,
         "FUOY7LWJET"
       ]
 
@@ -169,14 +192,16 @@ module Spaceship
         "749Y1QAGU7" => MacDevelopment,
         "HXZEUKP0FP" => MacAppDistribution,
         "2PQI8IDXNH" => MacInstallerDistribution,
-        "OYVN2GW35E" => DeveloperIDInstaller,
-        "W0EURJRMC5" => DeveloperIDApplication,
+        "OYVN2GW35E" => DeveloperIdInstaller,
+        "W0EURJRMC5" => DeveloperIdApplication,
         "CDZ7EMXIZ1" => MacProductionPush,
         "HQ4KP3I34R" => MacDevelopmentPush,
-        "DIVN2GW3XT" => DeveloperIDApplication
+        "DIVN2GW3XT" => DeveloperIdApplication
       }
 
-      CERTIFICATE_TYPE_IDS = IOS_CERTIFICATE_TYPE_IDS.merge(MAC_CERTIFICATE_TYPE_IDS)
+      CERTIFICATE_TYPE_IDS = APPLE_CERTIFICATE_TYPE_IDS
+                             .merge(IOS_CERTIFICATE_TYPE_IDS)
+                             .merge(MAC_CERTIFICATE_TYPE_IDS)
 
       # Class methods
       class << self
@@ -189,7 +214,7 @@ module Spaceship
         #  # Use the signing request to create a new distribution certificate
         #  Spaceship.certificate.production.create!(csr: csr)
         def create_certificate_signing_request
-          key = OpenSSL::PKey::RSA.new 2048
+          key = OpenSSL::PKey::RSA.new(2048)
           csr = OpenSSL::X509::Request.new
           csr.version = 0
           csr.subject = OpenSSL::X509::Name.new([
@@ -241,18 +266,19 @@ module Spaceship
           klass.new(attrs)
         end
 
-        # @param mac [Bool] Fetches Mac certificates if true. (Ignored if callsed from a subclass)
+        # @param mac [Bool] Fetches Mac certificates if true. (Ignored if called from a subclass)
         # @return (Array) Returns all certificates of this account.
         #  If this is called from a subclass of Certificate, this will
         #  only include certificates matching the current type.
         def all(mac: false)
           if self == Certificate # are we the base-class?
             type_ids = mac ? MAC_CERTIFICATE_TYPE_IDS : IOS_CERTIFICATE_TYPE_IDS
+            type_ids = APPLE_CERTIFICATE_TYPE_IDS.merge(type_ids)
             types = type_ids.keys
             types += OLDER_IOS_CERTIFICATE_TYPES unless mac
           else
             types = [CERTIFICATE_TYPE_IDS.key(self)]
-            mac = MAC_CERTIFICATE_TYPE_IDS.values.include? self
+            mac = MAC_CERTIFICATE_TYPE_IDS.values.include?(self)
           end
 
           client.certificates(types, mac: mac).map do |cert|
@@ -283,10 +309,11 @@ module Spaceship
         # @return (Certificate): The newly created certificate
         def create!(csr: nil, bundle_id: nil)
           type = CERTIFICATE_TYPE_IDS.key(self)
+          mac = MAC_CERTIFICATE_TYPE_IDS.include?(type)
 
           # look up the app_id by the bundle_id
           if bundle_id
-            app = Spaceship::App.find(bundle_id)
+            app = portal_type.set_client(client).find(bundle_id)
             raise "Could not find app with bundle id '#{bundle_id}'" unless app
             app_id = app.app_id
           end
@@ -295,10 +322,16 @@ module Spaceship
           csr = OpenSSL::X509::Request.new(csr) if csr.kind_of?(String)
 
           # if this succeeds, we need to save the .cer and the private key in keychain access or wherever they go in linux
-          response = client.create_certificate!(type, csr.to_pem, app_id)
+          response = client.create_certificate!(type, csr.to_pem, app_id, mac)
           # munge the response to make it work for the factory
           response['certificateTypeDisplayId'] = response['certificateType']['certificateTypeDisplayId']
           self.new(response)
+        end
+
+        # Default portal class to use when finding by bundle_id
+        # @return (Class): The class this type of certificate belongs to
+        def portal_type
+          Spaceship::Portal::App
         end
       end
 
@@ -321,12 +354,12 @@ module Spaceship
 
       # @return (Bool): Is this certificate a push profile for apps?
       def is_push?
-        self.kind_of? PushCertificate
+        self.kind_of?(PushCertificate)
       end
 
       # @return (Bool) Is this a Mac profile?
       def mac?
-        MAC_CERTIFICATE_TYPE_IDS.include? type_display_id
+        MAC_CERTIFICATE_TYPE_IDS.include?(type_display_id)
       end
     end
   end

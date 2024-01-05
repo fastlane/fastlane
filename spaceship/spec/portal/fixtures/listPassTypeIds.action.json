@@ -1,0 +1,31 @@
+{
+  "creationTimestamp": "2016-11-09T21:35:05Z",
+  "resultCode": 0,
+  "userLocale": "en_US",
+  "protocolVersion": "QH65B2",
+  "requestId": null,
+  "requestUrl": "https://developer.apple.com:443/services-account/QH65B2/account/ios/identifiers/listPassTypeIds.action",
+  "responseId": "232eef46-3ca0-470b-b4e9-ab68f7ba8587",
+  "isAdmin": true,
+  "isMember": false,
+  "isAgent": true,
+  "pageNumber": 0,
+  "pageSize": 0,
+  "totalRecords": 2,
+  "passTypeIdList": [
+    {
+      "name": "First Passbook",
+      "prefix": "9J57U9392R",
+      "identifier": "pass.com.example.one",
+      "status": "current",
+      "passTypeId": "44V62UZ8L7"
+    },
+    {
+      "name": "Second Passbook",
+      "prefix": "3KQEE2SU39",
+      "identifier": "pass.com.example.two",
+      "status": "current",
+      "passTypeId": "R7878HDXC3"
+    }
+  ]
+}

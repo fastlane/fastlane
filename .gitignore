@@ -10,6 +10,10 @@ coverage/
 /tmp/
 rspec_logs.json
 test_output/
+.DS_STORE
+.DS_Store
+.keys
+*.swp
 
 ## Specific to Android
 .gradle/
@@ -18,6 +22,7 @@ local.properties
 
 ## Specific to screengrab
 /screengrab/example/fastlane/metadata/
+/screengrab/target/
 
 ## Specific to RubyMotion:
 .dat*
@@ -36,7 +41,7 @@ build/
 
 # for a library or gem, you might want to ignore these files since the code is
 # intended to run in multiple environments; otherwise, check them in:
-Gemfile.lock
+# Gemfile.lock
 .ruby-version
 .ruby-gemset
 
@@ -46,8 +51,32 @@ Gemfile.lock
 # fastlane specific
 /*.itmsp
 .idea
+.rakeTasks
 spec/fixtures/*.itmsp/*.png
 /integration
 **/report.xml
 **/.bundle
 fastlane/lib/fastlane/plugins/template/.rubocop.yml
+snapshot/example/fastlane/README.md
+snapshot/example/fastlane/screenshots
+fastlane/FastlaneRunner
+fastlane/swift/FastlaneRunner
+vendor
+
+# iOS specific ignores, used in sample projects inside the repo
+DerivedData
+*.pbxuser
+!default.pbxuser
+*.mode1v3
+!default.mode1v3
+*.mode2v3
+!default.mode2v3
+*.perspectivev3
+!default.perspectivev3
+xcuserdata/
+*.moved-aside
+*.xccheckout
+*.xcscmblueprint
+
+# Dotenv
+.env

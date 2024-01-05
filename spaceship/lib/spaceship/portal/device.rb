@@ -1,3 +1,5 @@
+require_relative 'portal_base'
+
 module Spaceship
   module Portal
     # Represents a device from the Apple Developer Portal
@@ -7,7 +9,7 @@ module Spaceship
       #   "XJXGVS46MW"
       attr_accessor :id
 
-      # @return (String) The name of the device
+      # @return (String) The name of the device, must be 50 characters or less.
       # @example
       #   "Felix Krause's iPhone 6"
       attr_accessor :name
@@ -22,7 +24,7 @@ module Spaceship
       #   "ios"
       attr_accessor :platform
 
-      # @return (String) Status of the device. Probably always "c"
+      # @return (String) Status of the device. "c" for enabled devices, "r" for disabled devices.
       # @example
       #   "c"
       attr_accessor :status
@@ -52,16 +54,11 @@ module Spaceship
       })
 
       class << self
-        # Create a new object based on a hash.
-        # This is used to create a new object based on the server response.
-        def factory(attrs)
-          self.new(attrs)
-        end
-
         # @param mac [Bool] Fetches Mac devices if true
+        # @param include_disabled [Bool] Whether to include disable devices. false by default.
         # @return (Array) Returns all devices registered for this account
-        def all(mac: false)
-          client.devices(mac: mac).map { |device| self.factory(device) }
+        def all(mac: false, include_disabled: false)
+          client.devices(mac: mac, include_disabled: include_disabled).map { |device| self.factory(device) }
         end
 
         # @return (Array) Returns all Apple TVs registered for this account
@@ -96,39 +93,44 @@ module Spaceship
 
         # @return (Array) Returns all devices that can be used for iOS profiles (all devices except TVs)
         def all_ios_profile_devices
-          all.select { |device| device.device_type != "tvOS" }
+          all.reject { |device| device.device_type == "tvOS" }
         end
 
-        # @return (Array) Returns all devices that can be used for iOS profiles (all devices except TVs)
+        # @return (Array) Returns all devices matching the provided profile_type
         def all_for_profile_type(profile_type)
-          if profile_type.include? "tvOS"
-            Spaceship::Device.all_apple_tvs
+          if profile_type.include?("tvOS")
+            Spaceship::Portal::Device.all_apple_tvs
+          elsif profile_type.include?("Mac")
+            Spaceship::Portal::Device.all_macs
           else
-            Spaceship::Device.all_ios_profile_devices
+            Spaceship::Portal::Device.all_ios_profile_devices
           end
         end
 
         # @param mac [Bool] Searches for Macs if true
+        # @param include_disabled [Bool] Whether to include disable devices. false by default.
         # @return (Device) Find a device based on the ID of the device. *Attention*:
         #  This is *not* the UDID. nil if no device was found.
-        def find(device_id, mac: false)
-          all(mac: mac).find do |device|
+        def find(device_id, mac: false, include_disabled: false)
+          all(mac: mac, include_disabled: include_disabled).find do |device|
             device.id == device_id
           end
         end
 
         # @param mac [Bool] Searches for Macs if true
+        # @param include_disabled [Bool] Whether to include disable devices. false by default.
         # @return (Device) Find a device based on the UDID of the device. nil if no device was found.
-        def find_by_udid(device_udid, mac: false)
-          all(mac: mac).find do |device|
+        def find_by_udid(device_udid, mac: false, include_disabled: false)
+          all(mac: mac, include_disabled: include_disabled).find do |device|
             device.udid.casecmp(device_udid) == 0
           end
         end
 
         # @param mac [Bool] Searches for Macs if true
+        # @param include_disabled [Bool] Whether to include disable devices. false by default.
         # @return (Device) Find a device based on its name. nil if no device was found.
-        def find_by_name(device_name, mac: false)
-          all(mac: mac).find do |device|
+        def find_by_name(device_name, mac: false, include_disabled: false)
+          all(mac: mac, include_disabled: include_disabled).find do |device|
             device.name == device_name
           end
         end
@@ -146,16 +148,42 @@ module Spaceship
             raise "You cannot create a device without a device_id (UDID) and name"
           end
 
+          raise "Device name must be 50 characters or less. \"#{name}\" has a #{name.length} character length." if name.length > 50
+
           # Find the device by UDID, raise an exception if it already exists
           existing = self.find_by_udid(udid, mac: mac)
           return existing if existing
 
           # It is valid to have the same name for multiple devices
-
           device = client.create_device!(name, udid, mac: mac)
 
           # Update self with the new device
           self.new(device)
+        end
+      end
+
+      def enabled?
+        return self.status == "c"
+      end
+
+      def disabled?
+        return self.status == "r"
+      end
+
+      # Enable current device.
+      def enable!
+        unless enabled?
+          attr = client.enable_device!(self.id, self.udid, mac: self.platform == 'mac')
+          initialize(attr)
+        end
+      end
+
+      # Disable current device. This will invalidate all provisioning profiles that use this device.
+      def disable!
+        if enabled?
+          client.disable_device!(self.id, self.udid, mac: self.platform == 'mac')
+          # disable request doesn't return device json, so we assume that the new status is "r" if response succeeded
+          self.status = "r"
         end
       end
     end

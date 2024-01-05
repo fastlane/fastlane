@@ -10,14 +10,29 @@ module Fastlane
         begin
           path = File.expand_path(params[:path])
           plist = Plist.parse_xml(path)
-          plist[params[:key]] = params[:value]
-          new_plist = plist.to_plist
-          File.write(path, new_plist)
+          if params[:subkey]
+            if plist[params[:key]]
+              plist[params[:key]][params[:subkey]] = params[:value]
+            else
+              UI.message("Key doesn't exist, going to create new one ...")
+              plist[params[:key]] = { params[:subkey] => params[:value] }
+            end
+          else
+            plist[params[:key]] = params[:value]
+          end
+          new_plist = Plist::Emit.dump(plist)
+          if params[:output_file_name]
+            output = params[:output_file_name]
+            FileUtils.mkdir_p(File.expand_path("..", output))
+            File.write(File.expand_path(output), new_plist)
+          else
+            File.write(path, new_plist)
+          end
 
           return params[:value]
         rescue => ex
           UI.error(ex)
-          UI.error("Unable to set value to plist file at '#{path}'")
+          UI.user_error!("Unable to set value to plist file at '#{path}'")
         end
       end
 
@@ -31,10 +46,14 @@ module Fastlane
                                        env_name: "FL_SET_INFO_PLIST_PARAM_NAME",
                                        description: "Name of key in plist",
                                        optional: false),
+          FastlaneCore::ConfigItem.new(key: :subkey,
+                                       env_name: "FL_SET_INFO_PLIST_SUBPARAM_NAME",
+                                       description: "Name of subkey in plist",
+                                       optional: true),
           FastlaneCore::ConfigItem.new(key: :value,
                                        env_name: "FL_SET_INFO_PLIST_PARAM_VALUE",
                                        description: "Value to setup",
-                                       is_string: false,
+                                       skip_type_validation: true, # allow String, Hash
                                        optional: false),
           FastlaneCore::ConfigItem.new(key: :path,
                                        env_name: "FL_SET_INFO_PLIST_PATH",
@@ -42,20 +61,31 @@ module Fastlane
                                        optional: false,
                                        verify_block: proc do |value|
                                          UI.user_error!("Couldn't find plist file at path '#{value}'") unless File.exist?(value)
-                                       end)
+                                       end),
+          FastlaneCore::ConfigItem.new(key: :output_file_name,
+                                       env_name: "FL_SET_INFO_PLIST_OUTPUT_FILE_NAME",
+                                       description: "Path to the output file you want to generate",
+                                       optional: true)
         ]
       end
 
-      def self.output
-        []
-      end
-
       def self.authors
-        ["kohtenko"]
+        ["kohtenko", "uwehollatz"]
       end
 
       def self.is_supported?(platform)
-        [:ios, :mac].include? platform
+        [:ios, :mac].include?(platform)
+      end
+
+      def self.example_code
+        [
+          'set_info_plist_value(path: "./Info.plist", key: "CFBundleIdentifier", value: "com.krausefx.app.beta")',
+          'set_info_plist_value(path: "./MyApp-Info.plist", key: "NSAppTransportSecurity", subkey: "NSAllowsArbitraryLoads", value: true, output_file_name: "./Info.plist")'
+        ]
+      end
+
+      def self.category
+        :project
       end
     end
   end

@@ -5,6 +5,7 @@ module Fastlane
         command = []
         command << "curl"
         command << verbose(params)
+        command << "--fail"
         command += ssl_options(params)
         command += proxy_options(params)
         command += upload_options(params)
@@ -14,7 +15,23 @@ module Fastlane
       end
 
       def self.upload_url(params)
-        "#{params[:endpoint]}#{params[:mount_path]}/service/local/artifact/maven/content".shellescape
+        url = "#{params[:endpoint]}#{params[:mount_path]}"
+
+        if params[:nexus_version] == 2
+          url << "/service/local/artifact/maven/content"
+        else
+          file_extension = File.extname(params[:file]).shellescape
+
+          url << "/repository/#{params[:repo_id]}"
+          url << "/#{params[:repo_group_id].gsub('.', '/')}"
+          url << "/#{params[:repo_project_name]}"
+          url << "/#{params[:repo_project_version]}"
+          url << "/#{params[:repo_project_name]}-#{params[:repo_project_version]}"
+          url << "-#{params[:repo_classifier]}" if params[:repo_classifier]
+          url << file_extension.to_s
+        end
+
+        url.shellescape
       end
 
       def self.verbose(params)
@@ -26,19 +43,24 @@ module Fastlane
         file_extension = file_path.split('.').last.shellescape
 
         options = []
-        options << "-F p=zip"
-        options << "-F hasPom=false"
-        options << "-F r=#{params[:repo_id].shellescape}"
-        options << "-F g=#{params[:repo_group_id].shellescape}"
-        options << "-F a=#{params[:repo_project_name].shellescape}"
-        options << "-F v=#{params[:repo_project_version].shellescape}"
+        if params[:nexus_version] == 2
+          options << "-F p=zip"
+          options << "-F hasPom=false"
+          options << "-F r=#{params[:repo_id].shellescape}"
+          options << "-F g=#{params[:repo_group_id].shellescape}"
+          options << "-F a=#{params[:repo_project_name].shellescape}"
+          options << "-F v=#{params[:repo_project_version].shellescape}"
 
-        if params[:repo_classifier]
-          options << "-F c=#{params[:repo_classifier].shellescape}"
+          if params[:repo_classifier]
+            options << "-F c=#{params[:repo_classifier].shellescape}"
+          end
+
+          options << "-F e=#{file_extension}"
+          options << "-F file=@#{file_path}"
+        else
+          options << "--upload-file #{file_path}"
         end
 
-        options << "-F e=#{file_extension}"
-        options << "-F file=@#{file_path}"
         options << "-u #{params[:username].shellescape}:#{params[:password].shellescape}"
 
         options
@@ -68,7 +90,7 @@ module Fastlane
       #####################################################
 
       def self.description
-        "Upload a file to Sonatype Nexus platform"
+        "Upload a file to [Sonatype Nexus platform](https://www.sonatype.com)"
       end
 
       def self.available_options
@@ -107,7 +129,7 @@ module Fastlane
                                        optional: false),
           FastlaneCore::ConfigItem.new(key: :mount_path,
                                        env_name: "FL_NEXUS_MOUNT_PATH",
-                                       description: "Nexus mount path. Defaults to /nexus",
+                                       description: "Nexus mount path (Nexus 3 instances have this configured as empty by default)",
                                        default_value: "/nexus",
                                        optional: true),
           FastlaneCore::ConfigItem.new(key: :username,
@@ -117,16 +139,30 @@ module Fastlane
           FastlaneCore::ConfigItem.new(key: :password,
                                        env_name: "FL_NEXUS_PASSWORD",
                                        description: "Nexus password",
+                                       sensitive: true,
                                        optional: false),
           FastlaneCore::ConfigItem.new(key: :ssl_verify,
                                        env_name: "FL_NEXUS_SSL_VERIFY",
                                        description: "Verify SSL",
+                                       type: Boolean,
                                        default_value: true,
                                        optional: true),
+          FastlaneCore::ConfigItem.new(key: :nexus_version,
+                                       env_name: "FL_NEXUS_MAJOR_VERSION",
+                                       description: "Nexus major version",
+                                       type: Integer,
+                                       default_value: 2,
+                                       optional: true,
+                                       verify_block: proc do |value|
+                                         min_version = 2
+                                         max_version = 3
+                                         UI.user_error!("Unsupported version (#{value}) min. supported version: #{min_version}") unless value >= min_version
+                                         UI.user_error!("Unsupported version (#{value}) max. supported version: #{max_version}") unless value <= max_version
+                                       end),
           FastlaneCore::ConfigItem.new(key: :verbose,
                                        env_name: "FL_NEXUS_VERBOSE",
                                        description: "Make detailed output",
-                                       is_string: false,
+                                       type: Boolean,
                                        default_value: false,
                                        optional: true),
           FastlaneCore::ConfigItem.new(key: :proxy_username,
@@ -135,6 +171,7 @@ module Fastlane
                                        optional: true),
           FastlaneCore::ConfigItem.new(key: :proxy_password,
                                        env_name: "FL_NEXUS_PROXY_PASSWORD",
+                                       sensitive: true,
                                        description: "Proxy password",
                                        optional: true),
           FastlaneCore::ConfigItem.new(key: :proxy_address,
@@ -149,11 +186,46 @@ module Fastlane
       end
 
       def self.authors
-        ["xfreebird"]
+        ["xfreebird", "mdio"]
       end
 
       def self.is_supported?(platform)
         true
+      end
+
+      def self.example_code
+        [
+          '# for Nexus 2
+          nexus_upload(
+            file: "/path/to/file.ipa",
+            repo_id: "artefacts",
+            repo_group_id: "com.fastlane",
+            repo_project_name: "ipa",
+            repo_project_version: "1.13",
+            repo_classifier: "dSYM", # Optional
+            endpoint: "http://localhost:8081",
+            username: "admin",
+            password: "admin123"
+          )',
+          '# for Nexus 3
+          nexus_upload(
+            nexus_version: 3,
+            mount_path: "",
+            file: "/path/to/file.ipa",
+            repo_id: "artefacts",
+            repo_group_id: "com.fastlane",
+            repo_project_name: "ipa",
+            repo_project_version: "1.13",
+            repo_classifier: "dSYM", # Optional
+            endpoint: "http://localhost:8081",
+            username: "admin",
+            password: "admin123"
+          )'
+        ]
+      end
+
+      def self.category
+        :beta
       end
     end
   end

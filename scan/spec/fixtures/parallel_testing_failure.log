@@ -1,0 +1,43 @@
+Testing started on 'iPad Air 2'
+2018-11-04 09:51:11.194 xcodebuild[20236:2278157]  IDETestOperationsObserverDebug: Writing diagnostic log for test session to:
+/Users/basher/Library/Developer/Xcode/DerivedData/TestingTest-gdgaczvhjqcyjkdnismgbepkohom/Logs/Test/Run-TestingTest-2018.11.04_09-50-56--0800.xcresult/2_Test/Diagnostics/TestingTestTests-4274CC02-E915-4281-B716-7A53DFCB144F/TestingTestTests-AAF3E4FA-0854-4747-B7A5-9A1DC94C2459/Session-TestingTestTests-2018-11-04_095111-wB10Tk.log
+2018-11-04 09:51:11.194 xcodebuild[20236:2276847] [MT] IDETestOperationsObserverDebug: (94DB09C3-9CD2-46C9-AB44-051A05F06292) Beginning test session TestingTestTests-94DB09C3-9CD2-46C9-AB44-051A05F06292 at 2018-11-04 09:51:11.194 with Xcode 10B61 on target <DVTiPhoneSimulator: 0x7f916e93fce0> {
+		SimDevice: Clone 1 of iPad Air 2 (FA4660C5-5923-40BC-A89F-24071E553387, iOS 12.1, Shutdown)
+} (12.1 (16B91))
+Test suite 'TestingTestTests' started on 'Clone 1 of iPad Air 2 - TestingTest.app (20698)'
+Test case 'TestingTestTests.testA()' passed on 'Clone 1 of iPad Air 2 - TestingTest.app (20698)' (0.001 seconds)
+Test case 'TestingTestTests.testB()' passed on 'Clone 1 of iPad Air 2 - TestingTest.app (20698)' (0.001 seconds)
+Test case 'TestingTestTests.testC()' passed on 'Clone 1 of iPad Air 2 - TestingTest.app (20698)' (0.001 seconds)
+Test case 'TestingTestTests.testD()' passed on 'Clone 1 of iPad Air 2 - TestingTest.app (20698)' (0.001 seconds)
+Test case 'TestingTestTests.testE()' passed on 'Clone 1 of iPad Air 2 - TestingTest.app (20698)' (0.001 seconds)
+Test case 'TestingTestTests.testF()' passed on 'Clone 1 of iPad Air 2 - TestingTest.app (20698)' (0.001 seconds)
+Test case 'TestingTestTests.testFailure()' failed on 'Clone 1 of iPad Air 2 - TestingTest.app (20698)' (0.000 seconds)
+2018-11-04 09:51:39.669 xcodebuild[20236:2279785]  IDETestOperationsObserverDebug: Writing diagnostic log for test session to:
+/Users/basher/Library/Developer/Xcode/DerivedData/TestingTest-gdgaczvhjqcyjkdnismgbepkohom/Logs/Test/Run-TestingTest-2018.11.04_09-50-56--0800.xcresult/2_Test/Diagnostics/TestingTestTests-4274CC02-E915-4281-B716-7A53DFCB144F/TestingTestTests-AAF3E4FA-0854-4747-B7A5-9A1DC94C2459/Session-TestingTestTests-2018-11-04_095139-qTnnGX.log
+2018-11-04 09:51:39.669 xcodebuild[20236:2276847] [MT] IDETestOperationsObserverDebug: (09BC7D56-CC8E-4F93-AC28-5B4696DC1E8E) Beginning test session TestingTestTests-09BC7D56-CC8E-4F93-AC28-5B4696DC1E8E at 2018-11-04 09:51:39.669 with Xcode 10B61 on target <DVTiPhoneSimulator: 0x7f916e93fce0> {
+		SimDevice: Clone 1 of iPad Air 2 (FA4660C5-5923-40BC-A89F-24071E553387, iOS 12.1, Booted)
+} (12.1 (16B91))
+Test case 'TestingTestTests.testG()' passed on 'Clone 1 of iPad Air 2 - TestingTest.app (20724)' (0.001 seconds)
+Test case 'TestingTestTests.testH()' passed on 'Clone 1 of iPad Air 2 - TestingTest.app (20724)' (0.001 seconds)
+2018-11-04 09:51:43.017 xcodebuild[20236:2279786]  IDETestOperationsObserverDebug: Writing diagnostic log for test session to:
+/Users/basher/Library/Developer/Xcode/DerivedData/TestingTest-gdgaczvhjqcyjkdnismgbepkohom/Logs/Test/Run-TestingTest-2018.11.04_09-50-56--0800.xcresult/2_Test/Diagnostics/TestingTestTestsClone-F5EF068D-5921-4075-858E-385D4CE9C9BD/TestingTestTestsClone-00616530-14C1-4516-9C4B-526CEF2F4A5E/Session-TestingTestTestsClone-2018-11-04_095143-v3hYjt.log
+2018-11-04 09:51:43.017 xcodebuild[20236:2276847] [MT] IDETestOperationsObserverDebug: (FB26CA52-D3F2-463A-98AE-608B3C80BE65) Beginning test session TestingTestTestsClone-FB26CA52-D3F2-463A-98AE-608B3C80BE65 at 2018-11-04 09:51:43.018 with Xcode 10B61 on target <DVTiPhoneSimulator: 0x7f916e93fce0> {
+		SimDevice: Clone 1 of iPad Air 2 (FA4660C5-5923-40BC-A89F-24071E553387, iOS 12.1, Booted)
+} (12.1 (16B91))
+Test suite 'TestingTestPassing' started on 'Clone 1 of iPad Air 2 - TestingTest.app (20726)'
+Test case 'TestingTestPassing.testA()' passed on 'Clone 1 of iPad Air 2 - TestingTest.app (20726)' (0.001 seconds)
+Test case 'TestingTestPassing.testB()' passed on 'Clone 1 of iPad Air 2 - TestingTest.app (20726)' (0.001 seconds)
+Test case 'TestingTestPassing.testC()' passed on 'Clone 1 of iPad Air 2 - TestingTest.app (20726)' (0.001 seconds)
+Test case 'TestingTestPassing.testD()' passed on 'Clone 1 of iPad Air 2 - TestingTest.app (20726)' (0.001 seconds)
+Test case 'TestingTestPassing.testE()' passed on 'Clone 1 of iPad Air 2 - TestingTest.app (20726)' (0.001 seconds)
+Test case 'TestingTestPassing.testF()' passed on 'Clone 1 of iPad Air 2 - TestingTest.app (20726)' (0.001 seconds)
+Test case 'TestingTestPassing.testG()' passed on 'Clone 1 of iPad Air 2 - TestingTest.app (20726)' (0.001 seconds)
+Test case 'TestingTestPassing.testH()' passed on 'Clone 1 of iPad Air 2 - TestingTest.app (20726)' (0.001 seconds)
+Test case 'TestingTestPassing.testPass()' passed on 'Clone 1 of iPad Air 2 - TestingTest.app (20726)' (0.001 seconds)
+2018-11-04 09:51:49.990 xcodebuild[20236:2276847] [MT] IDETestOperationsObserverDebug: 48.243 elapsed -- Testing started completed.
+2018-11-04 09:51:49.990 xcodebuild[20236:2276847] [MT] IDETestOperationsObserverDebug: 0.000 sec, +0.000 sec -- start
+2018-11-04 09:51:49.990 xcodebuild[20236:2276847] [MT] IDETestOperationsObserverDebug: 48.243 sec, +48.243 sec -- end
+Failing tests:
+	TestingTestTests.testFailure()
+** TEST FAILED **
+

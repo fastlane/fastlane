@@ -1,3 +1,5 @@
+require_relative 'globals'
+
 module Spaceship
   ##
   # Spaceship::Base is the superclass for models in Apple Developer Portal.
@@ -20,8 +22,14 @@ module Spaceship
   # When you want to instantiate a model pass in the parsed response: `Widget.new(widget_json)`
   class Base
     class DataHash
+      include Enumerable
+
       def initialize(hash)
         @hash = hash || {}
+      end
+
+      def key?(key)
+        @hash.key?(key)
       end
 
       def get(*keys)
@@ -37,6 +45,10 @@ module Spaceship
         ref[last] = value
       end
 
+      def delete(key)
+        @hash.delete(key)
+      end
+
       def lookup(keys)
         head, *tail = *keys
         if tail.empty?
@@ -46,10 +58,21 @@ module Spaceship
         end
       end
 
-      def to_json
+      def each(&block)
+        @hash.each(&block)
+      end
+
+      def to_json(*a)
         h = @hash.dup
         h.delete(:application)
-        h.to_json
+        h.to_json(*a)
+      rescue JSON::GeneratorError => e
+        puts("Failed to jsonify #{h} (#{a})") if Spaceship::Globals.verbose?
+        raise e
+      end
+
+      def to_h
+        @hash.dup
       end
     end
 
@@ -66,12 +89,12 @@ module Spaceship
       ##
       # Sets client and returns self for chaining.
       # @return (Spaceship::Base)
-      # rubocop:disable Style/AccessorMethodName
+      # rubocop:disable Naming/AccessorMethodName
       def set_client(client)
         self.client = client
         self
       end
-      # rubocop:enable Style/AccessorMethodName
+      # rubocop:enable Naming/AccessorMethodName
 
       ##
       # Binds attributes getters and setters to underlying data returned from the API.
@@ -116,14 +139,25 @@ module Spaceship
           @attr_mapping.values.each do |method_name|
             getter = method_name.to_sym
             setter = "#{method_name}=".to_sym
-            remove_method(getter) if public_instance_methods.include?(getter)
-            remove_method(setter) if public_instance_methods.include?(setter)
+
+            # Seems like the `public_instance_methods.include?` doesn't always work
+            # More context https://github.com/fastlane/fastlane/issues/11481
+            # That's why we have the `begin` `rescue` code here
+            begin
+              remove_method(getter) if public_instance_methods.include?(getter)
+            rescue NameError
+            end
+            begin
+              remove_method(setter) if public_instance_methods.include?(setter)
+            rescue NameError
+            end
           end
           include(mapping_module(@attr_mapping))
         else
           begin
             @attr_mapping ||= ancestors[1].attr_mapping
-          rescue NameError, NoMethodError
+          rescue NoMethodError
+          rescue NameError
           end
         end
         return @attr_mapping
@@ -157,6 +191,24 @@ module Spaceship
           super
         end
       end
+
+      ##
+      # The factory class-method. This should only be used or overridden in very specific use-cases
+      #
+      # The only time it makes sense to use or override this method is when we want a base class
+      # to return a sub-class based on attributes.
+      #
+      # Here, we define the method to be the same as `Spaceship::Base.new(attrs)`, be it should
+      # be used only by classes that override it.
+      #
+      # Example:
+      #
+      #   Certificate.factory(attrs)
+      #   #=> #<PushCertificate ... >
+      #
+      def factory(attrs, existing_client = nil)
+        self.new(attrs, existing_client)
+      end
     end
 
     ##
@@ -173,19 +225,18 @@ module Spaceship
     # attributes that are defined by `attr_mapping`
     #
     # Do not override `initialize` in your own models.
-    def initialize(attrs = {})
+    def initialize(attrs = {}, existing_client = nil)
       attrs.each do |key, val|
         self.send("#{key}=", val) if respond_to?("#{key}=")
       end
       self.raw_data = DataHash.new(attrs)
-      @client = self.class.client
+      @client = existing_client || self.class.client
       self.setup
     end
 
     # This method can be used by subclasses to do additional initialisation
     # using the `raw_data`
-    def setup
-    end
+    def setup; end
 
     #####################################################
     # @!group Storing the `attr_accessor`
@@ -195,7 +246,7 @@ module Spaceship
     # This will store a list of defined attr_accessors to easily access them when inspecting the values
     def self.attr_accessor(*vars)
       @attributes ||= []
-      @attributes.concat vars
+      @attributes.concat(vars)
       super(*vars)
     end
 
@@ -217,20 +268,43 @@ module Spaceship
     #####################################################
 
     def inspect
-      inspectables = self.attributes
+      # To avoid circular references, we keep track of the references
+      # of all objects already inspected from the first call to inspect
+      # in this call stack
+      # We use a Thread local storage for multi-thread friendliness
+      thread = Thread.current
+      tree_root = thread[:inspected_objects].nil?
+      thread[:inspected_objects] = Set.new if tree_root
 
-      value = inspectables.map do |k|
+      if thread[:inspected_objects].include?(self)
+        # already inspected objects have a default value,
+        # let's follow Ruby's convention for circular references
+        value = "#<Object ...>"
+      else
+        thread[:inspected_objects].add(self)
+        begin
+          value = inspect_value
+        ensure
+          thread[:inspected_objects] = nil if tree_root
+        end
+      end
+
+      "<#{self.class.name} \n#{value}>"
+    end
+
+    def inspect_value
+      self.attributes.map do |k|
         v = self.send(k).inspect
-        v.gsub!("\n", "\n\t") # to align nested elements
+        v = v.gsub("\n", "\n\t") # to align nested elements
 
         "\t#{k}=#{v}"
       end.join(", \n")
-
-      "<#{self.class.name} \n#{value}>"
     end
 
     def to_s
       self.inspect
     end
+
+    private :inspect_value
   end
 end

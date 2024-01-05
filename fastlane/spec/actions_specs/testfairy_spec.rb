@@ -6,27 +6,29 @@ describe Fastlane do
           Fastlane::FastFile.new.parse("lane :test do
             testfairy()
           end").runner.execute(:test)
-        end.to raise_error
+        end.to raise_error(FastlaneCore::Interface::FastlaneError)
       end
 
       it "raises an error if no api key was given" do
+        allow(FastlaneCore::FastlaneFolder).to receive(:path).and_return(nil)
         expect do
           Fastlane::FastFile.new.parse("lane :test do
             testfairy({
               ipa: './fastlane/spec/fixtures/fastfiles/Fastfile1',
             })
           end").runner.execute(:test)
-        end.to raise_error
+        end.to raise_error(FastlaneCore::Interface::FastlaneError, /No API key/)
       end
 
-      it "raises an error if no ipa path was given" do
+      it "raises an error if no ipa or apk path was given" do
+        allow(FastlaneCore::FastlaneFolder).to receive(:path).and_return(nil)
         expect do
           Fastlane::FastFile.new.parse("lane :test do
             testfairy({
               api_key: 'thisistest',
             })
           end").runner.execute(:test)
-        end.to raise_error
+        end.to raise_error(FastlaneCore::Interface::FastlaneError, /No ipa or apk were given/)
       end
 
       it "raises an error if the given ipa path was not found" do
@@ -34,13 +36,49 @@ describe Fastlane do
           Fastlane::FastFile.new.parse("lane :test do
             testfairy({
               api_key: 'thisistest',
+              ipa: './fastlane/nonexistent'
+            })
+          end").runner.execute(:test)
+        end.to raise_error(FastlaneCore::Interface::FastlaneError, "Couldn't find ipa file at path './fastlane/nonexistent'")
+      end
+
+      it "raises an error if the given apk path was not found" do
+        expect do
+          Fastlane::FastFile.new.parse("lane :test do
+            testfairy({
+              api_key: 'thisistest',
+              apk: './fastlane/nonexistent'
+            })
+          end").runner.execute(:test)
+        end.to raise_error(FastlaneCore::Interface::FastlaneError, "Couldn't find apk file at path './fastlane/nonexistent'")
+      end
+
+      it "raises an error if unknown option given" do
+        expect do
+          Fastlane::FastFile.new.parse("lane :test do
+            testfairy({
+              api_key: 'thisistest',
               ipa_path: './fastlane/nonexistent'
             })
           end").runner.execute(:test)
-        end.to raise_error
+        end.to raise_error(FastlaneCore::Interface::FastlaneError, /Could not find option 'ipa_path'/)
       end
 
-      it "works with valid required parameters" do
+      it "raises an error if conflicting ipa and apk parameters" do
+        allow(FastlaneCore::FastlaneFolder).to receive(:path).and_return(nil)
+        expect do
+          Fastlane::FastFile.new.parse("lane :test do
+            testfairy({
+              api_key: 'thisistest',
+              ipa: './fastlane/spec/fixtures/fastfiles/Fastfile1',
+              apk: './fastlane/spec/fixtures/fastfiles/Fastfile1'
+            })
+          end").runner.execute(:test)
+        end.to raise_error(FastlaneCore::Interface::FastlaneError, "Unresolved conflict between options: 'ipa' and 'apk'")
+      end
+
+      it "works with valid required parameters with ipa" do
+        allow(FastlaneCore::FastlaneFolder).to receive(:path).and_return(nil)
         expect do
           Fastlane::FastFile.new.parse("lane :test do
             testfairy({
@@ -48,20 +86,35 @@ describe Fastlane do
               api_key: 'thisistest',
             })
           end").runner.execute(:test)
-        end.not_to raise_error
+        end.not_to(raise_error)
+      end
+
+      it "works with valid required parameters with apk" do
+        allow(FastlaneCore::FastlaneFolder).to receive(:path).and_return(nil)
+        expect do
+          Fastlane::FastFile.new.parse("lane :test do
+            testfairy({
+              apk: './fastlane/spec/fixtures/fastfiles/Fastfile1',
+              api_key: 'thisistest',
+            })
+          end").runner.execute(:test)
+        end.not_to(raise_error)
       end
 
       it "works with valid optional parameters" do
+        allow(FastlaneCore::FastlaneFolder).to receive(:path).and_return(nil)
         expect do
           Fastlane::FastFile.new.parse("lane :test do
             testfairy({
               ipa: './fastlane/spec/fixtures/fastfiles/Fastfile1',
               api_key: 'thisistest',
+              upload_url: 'https://your-subdomain.testfairy.com',
               comment: 'Test Comment!',
-              testers_groups: ['group1', 'group2']
+              testers_groups: ['group1', 'group2'],
+              custom: 'custom argument'
             })
           end").runner.execute(:test)
-        end.not_to raise_error
+        end.not_to(raise_error)
       end
     end
   end

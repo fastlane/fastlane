@@ -16,21 +16,25 @@ module Fastlane
         response = Net::HTTP.start(
           uri.host, uri.port, use_ssl: uri.scheme == 'https'
         ) do |http|
-          request = Net::HTTP::Post.new uri.path
+          request = Net::HTTP::Post.new(uri.path)
           request.content_type = 'application/json'
           request.body = JSON.generate("text" => message)
-          http.request request
+          http.request(request)
         end
-        if response.kind_of? Net::HTTPSuccess
-          UI.success 'Message sent to Flock.'
+        if response.kind_of?(Net::HTTPSuccess)
+          UI.success('Message sent to Flock.')
         else
-          UI.error "HTTP request to '#{uri}' with message '#{message}' failed with a #{response.code} response."
-          UI.user_error! 'Error sending message to Flock. Please verify the Flock webhook token.'
+          UI.error("HTTP request to '#{uri}' with message '#{message}' failed with a #{response.code} response.")
+          UI.user_error!('Error sending message to Flock. Please verify the Flock webhook token.')
         end
       end
 
       def self.description
-        "Send a message to a Flock group"
+        "Send a message to a [Flock](https://flock.com/) group"
+      end
+
+      def self.details
+        "To obtain the token, create a new [incoming message webhook](https://dev.flock.co/wiki/display/FlockAPI/Incoming+Webhooks) in your Flock admin panel."
       end
 
       def self.available_options
@@ -40,6 +44,7 @@ module Fastlane
                                        description: 'Message text'),
           FastlaneCore::ConfigItem.new(key: :token,
                                        env_name: 'FL_FLOCK_TOKEN',
+                                       sensitive: true,
                                        description: 'Token for the Flock incoming webhook'),
           FastlaneCore::ConfigItem.new(key: :base_url,
                                        env_name: 'FL_FLOCK_BASE_URL',
@@ -47,13 +52,26 @@ module Fastlane
                                        optional: true,
                                        default_value: BASE_URL,
                                        verify_block: proc do |value|
-                                         UI.user_error! 'Invalid https URL' unless value.start_with? 'https://'
+                                         UI.user_error!('Invalid https URL') unless value.start_with?('https://')
                                        end)
         ]
       end
 
       def self.author
         "Manav"
+      end
+
+      def self.example_code
+        [
+          'flock(
+            message: "Hello",
+            token: "xxx"
+          )'
+        ]
+      end
+
+      def self.category
+        :notifications
       end
 
       def self.is_supported?(platform)

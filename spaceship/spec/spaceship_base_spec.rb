@@ -1,5 +1,3 @@
-require 'spec_helper'
-
 describe Spaceship::Base do
   let(:client) { double('Client') }
   before { Spaceship::Portal.client = double('Default Client') }
@@ -56,6 +54,15 @@ describe Spaceship::Base do
       it 'can overwrite an attribute and call super' do
         inst = test_class.new({ 'isLiveString' => 'true' })
         expect(inst.is_live).to eq(true)
+      end
+
+      it 'helps troubleshoot json conversion issues' do
+        inst = test_class.new({ 'someAttributeName' => "iPhone\xAE" })
+        expect do
+          FastlaneSpec::Env.with_verbose(true) do
+            inst.raw_data.to_json
+          end
+        end.to raise_error(JSON::GeneratorError)
       end
     end
 

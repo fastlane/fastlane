@@ -12,9 +12,10 @@ module Fastlane
         xcarchive = params[:xcarchive]
         base_destination = params[:destination]
         zipped = params[:zip]
+        zip_filename = params[:zip_filename]
         versioned = params[:versioned]
 
-        # Prepare destionation folder
+        # Prepare destination folder
         full_destination = base_destination
 
         if versioned
@@ -32,10 +33,14 @@ module Fastlane
             UI.message("Compressing #{xcarchive}")
             xcarchive_folder = File.expand_path(File.dirname(xcarchive))
             xcarchive_file = File.basename(xcarchive)
-            zip_file = File.join(dir, "#{xcarchive_file}.zip")
+            zip_file = if zip_filename
+                         File.join(dir, "#{zip_filename}.xcarchive.zip")
+                       else
+                         File.join(dir, "#{xcarchive_file}.zip")
+                       end
 
             # Create zip
-            Actions.sh(%(cd "#{xcarchive_folder}" && zip -r -X "#{zip_file}" "#{xcarchive_file}" > /dev/null))
+            Actions.sh(%(cd "#{xcarchive_folder}" && zip -r -X -y "#{zip_file}" "#{xcarchive_file}" > /dev/null))
 
             # Moved to its final destination
             FileUtils.mv(zip_file, full_destination)
@@ -63,6 +68,7 @@ module Fastlane
           FastlaneCore::ConfigItem.new(key: :xcarchive,
                                        description: 'Path to your xcarchive file. Optional if you use the `xcodebuild` action',
                                        default_value: Actions.lane_context[SharedValues::XCODEBUILD_ARCHIVE],
+                                       default_value_dynamic: true,
                                        optional: false,
                                        env_name: 'BACKUP_XCARCHIVE_ARCHIVE',
                                        verify_block: proc do |value|
@@ -76,14 +82,19 @@ module Fastlane
                                          UI.user_error!("Couldn't find the destination folder at '#{value}'") if !Helper.test? && !File.directory?(value) && !File.exist?(value)
                                        end),
           FastlaneCore::ConfigItem.new(key: :zip,
-                                       description: 'Enable compression of the archive. Default value `true`',
-                                       is_string: false,
+                                       description: 'Enable compression of the archive',
+                                       type: Boolean,
                                        default_value: true,
                                        optional: true,
                                        env_name: 'BACKUP_XCARCHIVE_ZIP'),
+          FastlaneCore::ConfigItem.new(key: :zip_filename,
+                                       description: 'Filename of the compressed archive. Will be appended by `.xcarchive.zip`. Default value is the output xcarchive filename',
+                                       default_value_dynamic: true,
+                                       optional: true,
+                                       env_name: 'BACKUP_XCARCHIVE_ZIP_FILENAME'),
           FastlaneCore::ConfigItem.new(key: :versioned,
-                                       description: 'Create a versioned (date and app version) subfolder where to put the archive. Default value `true`',
-                                       is_string: false,
+                                       description: 'Create a versioned (date and app version) subfolder where to put the archive',
+                                       type: Boolean,
                                        default_value: true,
                                        optional: true,
                                        env_name: 'BACKUP_XCARCHIVE_VERSIONED')
@@ -101,7 +112,23 @@ module Fastlane
       end
 
       def self.is_supported?(platform)
-        [:ios, :mac].include? platform
+        [:ios, :mac].include?(platform)
+      end
+
+      def self.example_code
+        [
+          'backup_xcarchive(
+            xcarchive: "/path/to/file.xcarchive", # Optional if you use the `xcodebuild` action
+            destination: "/somewhere/else/", # Where the backup should be created
+            zip_filename: "file.xcarchive", # The name of the backup file
+            zip: false, # Enable compression of the archive. Defaults to `true`.
+            versioned: true # Create a versioned (date and app version) subfolder where to put the archive
+          )'
+        ]
+      end
+
+      def self.category
+        :misc
       end
     end
   end

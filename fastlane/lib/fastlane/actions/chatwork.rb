@@ -10,7 +10,7 @@ module Fastlane
 
         emoticon = (options[:success] ? '(dance)' : ';(')
 
-        uri = URI.parse("https://api.chatwork.com/v1/rooms/#{options[:roomid]}/messages")
+        uri = URI.parse("https://api.chatwork.com/v2/rooms/#{options[:roomid]}/messages")
         https = Net::HTTP.new(uri.host, uri.port)
         https.use_ssl = true
 
@@ -32,7 +32,7 @@ module Fastlane
       end
 
       def self.description
-        "Send a success/error message to ChatWork"
+        "Send a success/error message to [ChatWork](https://go.chatwork.com/)"
       end
 
       def self.available_options
@@ -40,6 +40,8 @@ module Fastlane
           FastlaneCore::ConfigItem.new(key: :api_token,
                                        env_name: "CHATWORK_API_TOKEN",
                                        description: "ChatWork API Token",
+                                       sensitive: true,
+                                       code_gen_sensitive: true,
                                        verify_block: proc do |value|
                                          unless value.to_s.length > 0
                                            UI.error("Please add 'ENV[\"CHATWORK_API_TOKEN\"] = \"your token\"' to your Fastfile's `before_all` section.")
@@ -52,22 +54,41 @@ module Fastlane
           FastlaneCore::ConfigItem.new(key: :roomid,
                                        env_name: "FL_CHATWORK_ROOMID",
                                        description: "The room ID",
-                                       is_string: false),
+                                       type: Integer),
           FastlaneCore::ConfigItem.new(key: :success,
                                        env_name: "FL_CHATWORK_SUCCESS",
                                        description: "Was this build successful? (true/false)",
                                        optional: true,
                                        default_value: true,
-                                       is_string: false)
+                                       type: Boolean)
         ]
       end
 
       def self.author
-        "ChatWork Inc."
+        "astronaughts"
       end
 
       def self.is_supported?(platform)
         true
+      end
+
+      def self.details
+        "Information on how to obtain an API token: [http://developer.chatwork.com/ja/authenticate.html](http://developer.chatwork.com/ja/authenticate.html)"
+      end
+
+      def self.example_code
+        [
+          'chatwork(
+            message: "App successfully released!",
+            roomid: 12345,
+            success: true,
+            api_token: "Your Token"
+          )'
+        ]
+      end
+
+      def self.category
+        :notifications
       end
     end
   end

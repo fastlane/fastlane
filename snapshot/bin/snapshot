@@ -1,6 +1,0 @@
-#!/usr/bin/env ruby
-$:.push File.expand_path("../../lib", __FILE__)
-
-require 'snapshot'
-require 'snapshot/commands_generator'
-Snapshot::CommandsGenerator.start

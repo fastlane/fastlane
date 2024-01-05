@@ -1,3 +1,5 @@
+require_relative 'tunes_base'
+
 module Spaceship
   module Tunes
     # Represents a geo json
@@ -16,12 +18,6 @@ module Spaceship
         'url' => :url,
         'name' => :name
       )
-
-      class << self
-        def factory(attrs)
-          self.new(attrs)
-        end
-      end
     end
   end
 end

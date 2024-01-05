@@ -1,9 +1,9 @@
 describe Fastlane do
   describe Fastlane::PluginManager do
-    let (:plugin_manager) { Fastlane::PluginManager.new }
+    let(:plugin_manager) { Fastlane::PluginManager.new }
     describe "#gemfile_path" do
       it "returns an absolute path if Gemfile available" do
-        expect(plugin_manager.gemfile_path).to eq(File.expand_path("Gemfile"))
+        expect(plugin_manager.gemfile_path).to eq(File.expand_path("./Gemfile"))
       end
 
       it "returns nil if no Gemfile available" do
@@ -25,7 +25,7 @@ describe Fastlane do
       end
 
       it "returns all fastlane plugins with no fastlane_core" do
-        allow(Bundler::SharedHelpers).to receive(:default_gemfile).and_return("./spec/fixtures/plugins/Pluginfile1")
+        allow(Bundler::SharedHelpers).to receive(:default_gemfile).and_return("./fastlane/spec/fixtures/plugins/Pluginfile1")
         expect(plugin_manager.available_gems).to eq(["fastlane-plugin-xcversion", "fastlane_core", "hemal"])
       end
     end
@@ -37,14 +37,14 @@ describe Fastlane do
       end
 
       it "returns all fastlane plugins with no fastlane_core" do
-        allow(Bundler::SharedHelpers).to receive(:default_gemfile).and_return("./spec/fixtures/plugins/Pluginfile1")
+        allow(Bundler::SharedHelpers).to receive(:default_gemfile).and_return("./fastlane/spec/fixtures/plugins/Pluginfile1")
         expect(plugin_manager.available_plugins).to eq(["fastlane-plugin-xcversion"])
       end
     end
 
     describe "#plugin_is_added_as_dependency?" do
       before do
-        allow(Bundler::SharedHelpers).to receive(:default_gemfile).and_return("./spec/fixtures/plugins/Pluginfile1")
+        allow(Bundler::SharedHelpers).to receive(:default_gemfile).and_return("./fastlane/spec/fixtures/plugins/Pluginfile1")
       end
 
       it "returns true if a plugin is available" do
@@ -64,12 +64,12 @@ describe Fastlane do
 
     describe "#plugins_attached?" do
       it "returns true if plugins are attached" do
-        allow(Bundler::SharedHelpers).to receive(:default_gemfile).and_return("./spec/fixtures/plugins/GemfileWithAttached")
+        allow(Bundler::SharedHelpers).to receive(:default_gemfile).and_return("./fastlane/spec/fixtures/plugins/GemfileWithAttached")
         expect(plugin_manager.plugins_attached?).to eq(true)
       end
 
       it "returns false if plugins are not attached" do
-        allow(Bundler::SharedHelpers).to receive(:default_gemfile).and_return("./spec/fixtures/plugins/GemfileWithoutAttached")
+        allow(Bundler::SharedHelpers).to receive(:default_gemfile).and_return("./fastlane/spec/fixtures/plugins/GemfileWithoutAttached")
         expect(plugin_manager.plugins_attached?).to eq(false)
       end
     end
@@ -79,6 +79,18 @@ describe Fastlane do
         expect(plugin_manager).to receive(:ensure_plugins_attached!)
         expect(plugin_manager).to receive(:exec).with("bundle install --quiet && echo 'Successfully installed plugins'")
         plugin_manager.install_dependencies!
+      end
+    end
+
+    describe "#update_dependencies!" do
+      before do
+        allow(Bundler::SharedHelpers).to receive(:default_gemfile).and_return("./fastlane/spec/fixtures/plugins/Pluginfile1")
+      end
+
+      it "execs out the correct command" do
+        expect(plugin_manager).to receive(:ensure_plugins_attached!)
+        expect(plugin_manager).to receive(:exec).with("bundle update fastlane-plugin-xcversion --quiet && echo 'Successfully updated plugins'")
+        plugin_manager.update_dependencies!
       end
     end
 
@@ -94,20 +106,26 @@ describe Fastlane do
         end
 
         it "supports specifying a custom local path" do
-          expect(FastlaneCore::UI.current).to receive(:select).and_return("Local Path")
-          expect(FastlaneCore::UI.current).to receive(:input).and_return("../yoo")
+          expect(FastlaneCore::UI.ui_object).to receive(:select).and_return("Local Path")
+          expect(FastlaneCore::UI.ui_object).to receive(:input).and_return("../yoo")
           expect(plugin_manager.gem_dependency_suffix("fastlane")).to eq(", path: '../yoo'")
         end
 
         it "supports specifying a custom git URL" do
-          expect(FastlaneCore::UI.current).to receive(:select).and_return("Git URL")
-          expect(FastlaneCore::UI.current).to receive(:input).and_return("https://github.com/fastlane/fastlane")
+          expect(FastlaneCore::UI.ui_object).to receive(:select).and_return("Git URL")
+          expect(FastlaneCore::UI.ui_object).to receive(:input).and_return("https://github.com/fastlane/fastlane")
           expect(plugin_manager.gem_dependency_suffix("fastlane")).to eq(", git: 'https://github.com/fastlane/fastlane'")
         end
 
         it "supports falling back to RubyGems" do
-          expect(FastlaneCore::UI.current).to receive(:select).and_return("RubyGems.org ('fastlane' seems to not be available there)")
+          expect(FastlaneCore::UI.ui_object).to receive(:select).and_return("RubyGems.org ('fastlane' seems to not be available there)")
           expect(plugin_manager.gem_dependency_suffix("fastlane")).to eq("")
+        end
+
+        it "supports specifying a custom source" do
+          expect(FastlaneCore::UI.ui_object).to receive(:select).and_return("Other Gem Server")
+          expect(FastlaneCore::UI.ui_object).to receive(:input).and_return("https://gems.mycompany.com")
+          expect(plugin_manager.gem_dependency_suffix("fastlane")).to eq(", source: 'https://gems.mycompany.com'")
         end
       end
     end
@@ -130,20 +148,6 @@ describe Fastlane do
             #{deprecated_action}
           end").runner.execute(:test)
         end.to raise_exception("The action '#{deprecated_action}' is no longer bundled with fastlane. You can install it using `fastlane add_plugin deprecated`")
-      end
-
-      it "runs the action as expected if the plugin is available" do
-        # We don't need to set this, since this method shouldn't even be called when the plugin is available
-        # expect(Fastlane::Actions).to receive(:formerly_bundled_actions).and_return(["crashlytics"])
-
-        Fastlane::FastFile.new.parse("lane :test do
-          crashlytics({
-            crashlytics_path: './fastlane/spec/fixtures/fastfiles/Fastfile1',
-            api_token: 'wadus',
-            build_secret: 'secret',
-            ipa_path: './fastlane/spec/fixtures/fastfiles/Fastfile1'
-          })
-        end").runner.execute(:test)
       end
     end
 
@@ -168,16 +172,37 @@ describe Fastlane do
 
     describe "Overwriting plugins" do
       it "shows a warning if a plugin overwrites an existing action" do
+        module Fastlane::SpaceshipStats
+        end
+
+        pm = Fastlane::PluginManager.new
+        plugin_name = "spaceship_stats"
+        expect(pm).to receive(:available_plugins).and_return([plugin_name])
+        expect(Fastlane::FastlaneRequire).to receive(:install_gem_if_needed).with(gem_name: plugin_name, require_gem: true)
+        expect(Fastlane::SpaceshipStats).to receive(:all_classes).and_return(["/actions/#{plugin_name}.rb"])
+        expect(UI).to receive(:important).with("Plugin 'SpaceshipStats' overwrites already loaded action '#{plugin_name}'")
+
+        expect do
+          pm.load_plugins
+        end.to_not(output(/No actions were found while loading one or more plugins/).to_stdout)
+      end
+    end
+
+    describe "Plugins not loaded" do
+      it "shows a warning if a plugin isn't loaded" do
         module Fastlane::Crashlytics
         end
 
         pm = Fastlane::PluginManager.new
         plugin_name = "crashlytics"
         expect(pm).to receive(:available_plugins).and_return([plugin_name])
-        expect(pm).to receive(:require).with(plugin_name)
-        expect(Fastlane::Crashlytics).to receive(:all_classes).and_return(["/actions/#{plugin_name}.rb"])
-        expect(UI).to receive(:important).with("Plugin 'Crashlytics' overwrites already loaded action '#{plugin_name}'")
-        pm.load_plugins
+        expect(Fastlane::FastlaneRequire).to receive(:install_gem_if_needed).with(gem_name: plugin_name, require_gem: true)
+
+        expect(pm).to receive(:store_plugin_reference).and_raise(StandardError.new)
+
+        expect do
+          pm.load_plugins
+        end.to output(/No actions were found while loading one or more plugins/).to_stdout
       end
     end
 
@@ -188,7 +213,7 @@ describe Fastlane do
           result = Fastlane::FastFile.new.parse("lane :test do
             my_custom_plugin
           end").runner.execute(:test)
-        end.to raise_exception("Plugin 'my_custom_plugin' was not properly loaded, make sure to follow the plugin docs for troubleshooting: https://github.com/fastlane/fastlane/blob/master/fastlane/docs/PluginsTroubleshooting.md")
+        end.to raise_exception("Plugin 'my_custom_plugin' was not properly loaded, make sure to follow the plugin docs for troubleshooting: https://docs.fastlane.tools/plugins/plugins-troubleshooting/")
       end
 
       it "shows an appropriate error message when an action is not available, which is not a plugin" do
@@ -197,7 +222,19 @@ describe Fastlane do
           result = Fastlane::FastFile.new.parse("lane :test do
             my_custom_plugin
           end").runner.execute(:test)
-        end.to raise_exception("Could not find action or lane 'my_custom_plugin'. Check out the README for more details: https://github.com/fastlane/fastlane/tree/master/fastlane")
+        end.to raise_exception("Could not find action, lane or variable 'my_custom_plugin'. Check out the documentation for more details: https://docs.fastlane.tools/actions")
+      end
+
+      it "shows an appropriate error message when a plugin is really broken" do
+        allow(FastlaneCore::FastlaneFolder).to receive(:path).and_return(nil)
+        ex = ScriptError.new
+        pm = Fastlane::PluginManager.new
+        plugin_name = "broken"
+        expect(pm).to receive(:available_plugins).and_return([plugin_name])
+        expect(Fastlane::FastlaneRequire).to receive(:install_gem_if_needed).with(gem_name: plugin_name, require_gem: true).and_raise(ex)
+        expect(UI).to receive(:error).with("Error loading plugin '#{plugin_name}': #{ex}")
+        pm.load_plugins
+        expect(pm.plugin_references[plugin_name]).not_to(be_nil)
       end
     end
   end

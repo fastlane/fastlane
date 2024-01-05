@@ -1,6 +1,0 @@
-#!/usr/bin/env ruby
-$:.push File.expand_path("../../lib", __FILE__)
-
-require 'cert'
-require 'cert/commands_generator'
-Cert::CommandsGenerator.start

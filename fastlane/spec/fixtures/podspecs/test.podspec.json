@@ -1,0 +1,34 @@
+{
+  "name": "SpecName",
+  "header_dir": "SuchHeader",
+  "version": "1.5.1",
+  "summary": "With just a few lines of code, your app can add fastlane support.",
+  "description": "Much bla",
+  "homepage": "https://github.com/fastlane/fastlane",
+  "license": {
+    "type": "MIT",
+    "file": "LICENSE.txt"
+  },
+  "authors": [
+    "Felix Krause"
+  ],
+  "social_media_url": "https://twitter.com/FastlaneTools",
+  "source": {
+    "git": "https://github.com/fastlane/fastlane.git",
+    "tag": "1.5.1"
+  },
+  "platforms": {
+    "ios": "7.0"
+  },
+  "source_files": "*.{h,m}",
+  "frameworks": "UIKit",
+  "weak_frameworks": "WebKit",
+  "exclude_files": "Demos",
+  "resource_bundles": {
+    "SomeResources": [
+      "yeah.xcassets/*.imageset/*.png",
+      "yeah.xcassets"
+    ]
+  },
+  "requires_arc": true
+}

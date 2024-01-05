@@ -37,27 +37,30 @@ module Fastlane
         "This action changes the app group identifiers in the entitlements file"
       end
 
+      def self.details
+        "Updates the App Group Identifiers in the given Entitlements file, so you can have app groups for the app store build and app groups for an enterprise build."
+      end
+
       def self.available_options
         [
           FastlaneCore::ConfigItem.new(key: :entitlements_file,
                                        env_name: "FL_UPDATE_APP_GROUP_IDENTIFIER_ENTITLEMENTS_FILE_PATH", # The name of the environment variable
                                        description: "The path to the entitlement file which contains the app group identifiers", # a short description of this parameter
                                        verify_block: proc do |value|
-                                         UI.user_error!("Please pass a path to an entitlements file. ") unless value.include? ".entitlements"
-                                         UI.user_error!("Could not find entitlements file") if !File.exist?(value) and !Helper.is_test?
+                                         UI.user_error!("Please pass a path to an entitlements file. ") unless value.include?(".entitlements")
+                                         UI.user_error!("Could not find entitlements file") if !File.exist?(value) && !Helper.test?
                                        end),
           FastlaneCore::ConfigItem.new(key: :app_group_identifiers,
                                        env_name: "FL_UPDATE_APP_GROUP_IDENTIFIER_APP_GROUP_IDENTIFIERS",
                                        description: "An Array of unique identifiers for the app groups. Eg. ['group.com.test.testapp']",
-                                       is_string: false,
-                                       verify_block: proc do |value|
-                                         UI.user_error!("The parameter app_group_identifiers need to be an Array.") unless value.kind_of? Array
-                                       end)
+                                       type: Array)
         ]
       end
 
       def self.output
-        ['APP_GROUP_IDENTIFIERS', 'The new App Group Identifiers']
+        [
+          ['APP_GROUP_IDENTIFIERS', 'The new App Group Identifiers']
+        ]
       end
 
       def self.authors
@@ -66,6 +69,19 @@ module Fastlane
 
       def self.is_supported?(platform)
         platform == :ios
+      end
+
+      def self.example_code
+        [
+          'update_app_group_identifiers(
+            entitlements_file: "/path/to/entitlements_file.entitlements",
+            app_group_identifiers: ["group.your.app.group.identifier"]
+          )'
+        ]
+      end
+
+      def self.category
+        :project
       end
     end
   end

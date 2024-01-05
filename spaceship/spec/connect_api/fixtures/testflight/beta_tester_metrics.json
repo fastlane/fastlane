@@ -1,0 +1,153 @@
+{
+    "data" : [ {
+        "type" : "betaTesterMetrics",
+        "id" : "123456789",
+        "attributes" : {
+          "installCount" : 13,
+          "crashCount" : 0,
+          "sessionCount" : 319,
+          "betaTesterState" : "INSTALLED",
+          "lastModifiedDate" : "2018-11-20T10:06:55-08:00",
+          "installedCfBundleShortVersionString" : "2.6.1",
+          "installedCfBundleVersion" : "1542691006"
+        },
+        "relationships" : {
+          "betaTester" : {
+            "links" : {
+              "self" : "https://appstoreconnect.apple.com/iris/v1/betaTesterMetrics/123456789/relationships/betaTester",
+              "related" : "https://appstoreconnect.apple.com/iris/v1/betaTesterMetrics/123456789/betaTester"
+            }
+          },
+          "betaGroup" : {
+            "links" : {
+              "self" : "https://appstoreconnect.apple.com/iris/v1/betaTesterMetrics/123456789/relationships/betaGroup",
+              "related" : "https://appstoreconnect.apple.com/iris/v1/betaTesterMetrics/123456789/betaGroup"
+            }
+          },
+          "build" : {
+            "links" : {
+              "self" : "https://appstoreconnect.apple.com/iris/v1/betaTesterMetrics/123456789/relationships/build",
+              "related" : "https://appstoreconnect.apple.com/iris/v1/betaTesterMetrics/123456789/build"
+            }
+          },
+          "app" : {
+            "links" : {
+              "self" : "https://appstoreconnect.apple.com/iris/v1/betaTesterMetrics/123456789/relationships/app",
+              "related" : "https://appstoreconnect.apple.com/iris/v1/betaTesterMetrics/123456789/app"
+            }
+          },
+          "latestInstalledBuild" : {
+            "links" : {
+              "self" : "https://appstoreconnect.apple.com/iris/v1/betaTesterMetrics/123456789/relationships/latestInstalledBuild",
+              "related" : "https://appstoreconnect.apple.com/iris/v1/betaTesterMetrics/123456789/latestInstalledBuild"
+            }
+          }
+        },
+        "links" : {
+          "self" : "https://appstoreconnect.apple.com/iris/v1/betaTesterMetrics/123456789"
+        }
+      }, {
+        "type" : "betaTesterMetrics",
+        "id" : "987654321",
+        "attributes" : {
+          "installCount" : 13,
+          "crashCount" : 0,
+          "sessionCount" : 50,
+          "betaTesterState" : "INSTALLED",
+          "lastModifiedDate" : "2019-02-05T10:22:37-08:00",
+          "installedCfBundleShortVersionString" : "2.6.2",
+          "installedCfBundleVersion" : "1544500828"
+        },
+        "relationships" : {
+          "betaTester" : {
+            "links" : {
+              "self" : "https://appstoreconnect.apple.com/iris/v1/betaTesterMetrics/987654321/relationships/betaTester",
+              "related" : "https://appstoreconnect.apple.com/iris/v1/betaTesterMetrics/987654321/betaTester"
+            }
+          },
+          "betaGroup" : {
+            "links" : {
+              "self" : "https://appstoreconnect.apple.com/iris/v1/betaTesterMetrics/987654321/relationships/betaGroup",
+              "related" : "https://appstoreconnect.apple.com/iris/v1/betaTesterMetrics/987654321/betaGroup"
+            }
+          },
+          "build" : {
+            "links" : {
+              "self" : "https://appstoreconnect.apple.com/iris/v1/betaTesterMetrics/987654321/relationships/build",
+              "related" : "https://appstoreconnect.apple.com/iris/v1/betaTesterMetrics/987654321/build"
+            }
+          },
+          "app" : {
+            "links" : {
+              "self" : "https://appstoreconnect.apple.com/iris/v1/betaTesterMetrics/987654321/relationships/app",
+              "related" : "https://appstoreconnect.apple.com/iris/v1/betaTesterMetrics/987654321/app"
+            }
+          },
+          "latestInstalledBuild" : {
+            "links" : {
+              "self" : "https://appstoreconnect.apple.com/iris/v1/betaTesterMetrics/987654321/relationships/latestInstalledBuild",
+              "related" : "https://appstoreconnect.apple.com/iris/v1/betaTesterMetrics/987654321/latestInstalledBuild"
+            }
+          }
+        },
+        "links" : {
+          "self" : "https://appstoreconnect.apple.com/iris/v1/betaTesterMetrics/987654321"
+        }
+      }, {
+        "type" : "betaTesterMetrics",
+        "id" : "111222333",
+        "attributes" : {
+          "installCount" : 0,
+          "crashCount" : 0,
+          "sessionCount" : 3,
+          "betaTesterState" : "INSTALLED",
+          "lastModifiedDate" : "2016-09-07T13:08:09-07:00",
+          "installedCfBundleShortVersionString" : "2.2.3",
+          "installedCfBundleVersion" : "1472758549"
+        },
+        "relationships" : {
+          "betaTester" : {
+            "links" : {
+              "self" : "https://appstoreconnect.apple.com/iris/v1/betaTesterMetrics/111222333/relationships/betaTester",
+              "related" : "https://appstoreconnect.apple.com/iris/v1/betaTesterMetrics/111222333/betaTester"
+            }
+          },
+          "betaGroup" : {
+            "links" : {
+              "self" : "https://appstoreconnect.apple.com/iris/v1/betaTesterMetrics/111222333/relationships/betaGroup",
+              "related" : "https://appstoreconnect.apple.com/iris/v1/betaTesterMetrics/111222333/betaGroup"
+            }
+          },
+          "build" : {
+            "links" : {
+              "self" : "https://appstoreconnect.apple.com/iris/v1/betaTesterMetrics/111222333/relationships/build",
+              "related" : "https://appstoreconnect.apple.com/iris/v1/betaTesterMetrics/111222333/build"
+            }
+          },
+          "app" : {
+            "links" : {
+              "self" : "https://appstoreconnect.apple.com/iris/v1/betaTesterMetrics/111222333/relationships/app",
+              "related" : "https://appstoreconnect.apple.com/iris/v1/betaTesterMetrics/111222333/app"
+            }
+          },
+          "latestInstalledBuild" : {
+            "links" : {
+              "self" : "https://appstoreconnect.apple.com/iris/v1/betaTesterMetrics/111222333/relationships/latestInstalledBuild",
+              "related" : "https://appstoreconnect.apple.com/iris/v1/betaTesterMetrics/111222333/latestInstalledBuild"
+            }
+          }
+        },
+        "links" : {
+          "self" : "https://appstoreconnect.apple.com/iris/v1/betaTesterMetrics/111222333"
+        }
+      } ],
+    "links" : {
+      "self" : "https://appstoreconnect.apple.com/iris/v1/betaTesters"
+    },
+    "meta" : {
+      "paging" : {
+        "total" : 1,
+        "limit" : 50
+      }
+    }
+  }

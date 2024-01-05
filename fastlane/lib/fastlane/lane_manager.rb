@@ -1,15 +1,17 @@
+require_relative 'lane_manager_base.rb'
+
 module Fastlane
-  class LaneManager
+  class LaneManager < LaneManagerBase
     # @param platform The name of the platform to execute
     # @param lane_name The name of the lane to execute
     # @param parameters [Hash] The parameters passed from the command line to the lane
-    # @param env Dot Env Information
-    def self.cruise_lane(platform, lane, parameters = nil, env = nil)
-      UI.user_error!("lane must be a string") unless lane.kind_of?(String) or lane.nil?
-      UI.user_error!("platform must be a string") unless platform.kind_of?(String) or platform.nil?
-      UI.user_error!("parameters must be a hash") unless parameters.kind_of?(Hash) or parameters.nil?
+    # @param A custom Fastfile path, this is used by fastlane.ci
+    def self.cruise_lane(platform, lane, parameters = nil, fastfile_path = nil)
+      UI.user_error!("lane must be a string") unless lane.kind_of?(String) || lane.nil?
+      UI.user_error!("platform must be a string") unless platform.kind_of?(String) || platform.nil?
+      UI.user_error!("parameters must be a hash") unless parameters.kind_of?(Hash) || parameters.nil?
 
-      ff = Fastlane::FastFile.new(Fastlane::FastlaneFolder.fastfile_path)
+      ff = Fastlane::FastFile.new(fastfile_path || FastlaneCore::FastlaneFolder.fastfile_path)
 
       is_platform = false
       begin
@@ -27,7 +29,7 @@ module Fastlane
         end
       end
 
-      if !platform and lane
+      if !platform && lane
         # Either, the user runs a specific lane in root or want to auto complete the available lanes for a platform
         # e.g. `fastlane ios` should list all available iOS actions
         if ff.is_platform_block?(lane)
@@ -38,80 +40,51 @@ module Fastlane
 
       platform, lane = choose_lane(ff, platform) unless lane
 
-      load_dot_env(env)
-
       started = Time.now
       e = nil
       begin
         ff.runner.execute(lane, platform, parameters)
+      rescue NameError => ex
+        print_lane_context
+        print_error_line(ex)
+        e = ex
       rescue Exception => ex # rubocop:disable Lint/RescueException
         # We also catch Exception, since the implemented action might send a SystemExit signal
         # (or similar). We still want to catch that, since we want properly finish running fastlane
         # Tested with `xcake`, which throws a `Xcake::Informative` object
 
-        UI.important 'Variable Dump:'.yellow
-        UI.message Actions.lane_context
-        UI.error ex.to_s if ex.kind_of?(StandardError) # we don't want to print things like 'system exit'
+        print_lane_context
+        print_error_line(ex)
+        UI.error(ex.to_s) if ex.kind_of?(StandardError) # we don't want to print things like 'system exit'
         e = ex
       end
 
       # After running the lanes, since skip_docs might be somewhere in-between
-      Fastlane::DocsGenerator.run(ff) unless ENV["FASTLANE_SKIP_DOCS"]
+      Fastlane::DocsGenerator.run(ff) unless skip_docs?
 
       duration = ((Time.now - started) / 60.0).round
-
       finish_fastlane(ff, duration, e)
 
       return ff
     end
 
-    # All the finishing up that needs to be done
-    def self.finish_fastlane(ff, duration, error)
-      ff.runner.did_finish
-
-      # Finished with all the lanes
-      Fastlane::JUnitGenerator.generate(Fastlane::Actions.executed_actions)
-      print_table(Fastlane::Actions.executed_actions)
-
-      Fastlane::PluginUpdateManager.show_update_status
-
-      if error
-        UI.error 'fastlane finished with errors'
-        raise error
-      elsif duration > 5
-        UI.success "fastlane.tools just saved you #{duration} minutes! 🎉"
-      else
-        UI.success 'fastlane.tools finished successfully 🎉'
-      end
-    end
-
-    # Print a table as summary of the executed actions
-    def self.print_table(actions)
-      return if actions.count == 0
-
-      require 'terminal-table'
-
-      rows = []
-      actions.each_with_index do |current, i|
-        name = current[:name][0..60]
-        rows << [i + 1, name, current[:time].to_i]
-      end
-
-      puts ""
-      puts Terminal::Table.new(
-        title: "fastlane summary".green,
-        headings: ["Step", "Action", "Time (in s)"],
-        rows: rows
-      )
-      puts ""
+    def self.skip_docs?
+      Helper.test? || FastlaneCore::Env.truthy?("FASTLANE_SKIP_DOCS")
     end
 
     # Lane chooser if user didn't provide a lane
     # @param platform: is probably nil, but user might have called `fastlane android`, and only wants to list those actions
     def self.choose_lane(ff, platform)
-      available = ff.runner.lanes[platform].to_a.reject { |lane| lane.last.is_private }
+      available = []
+
+      # nil is the key for lanes that are not under a specific platform
+      lane_platforms = [nil] + Fastlane::SupportedPlatforms.all
+      lane_platforms.each do |p|
+        available += ff.runner.lanes[p].to_a.reject { |lane| lane.last.is_private }
+      end
+
       if available.empty?
-        UI.user_error! "It looks like you don't have any lanes to run just yet. Check out how to get started here: https://github.com/fastlane/fastlane 🚀"
+        UI.user_error!("It looks like you don't have any lanes to run just yet. Check out how to get started here: https://github.com/fastlane/fastlane 🚀")
       end
 
       rows = []
@@ -121,22 +94,25 @@ module Fastlane
 
       rows << [0, "cancel", "No selection, exit fastlane!"]
 
+      require 'terminal-table'
+
       table = Terminal::Table.new(
         title: "Available lanes to run",
         headings: ['Number', 'Lane Name', 'Description'],
-        rows: rows
+        rows: FastlaneCore::PrintTable.transform_output(rows)
       )
 
-      UI.message "Welcome to fastlane! Here's what your app is setup to do:"
+      UI.message("Welcome to fastlane! Here's what your app is set up to do:")
 
-      puts table
+      puts(table)
 
-      i = UI.input "Which number would you like run?"
+      fastlane_command = Helper.bundler? ? "bundle exec fastlane" : "fastlane"
+      i = UI.input("Which number would you like to run?")
 
       i = i.to_i - 1
       if i >= 0 && available[i]
         selection = available[i].last.pretty_name
-        UI.important "Running lane `#{selection}`. Next time you can do this by directly typing `fastlane #{selection}` 🚀."
+        UI.important("Running lane `#{selection}`. Next time you can do this by directly typing `#{fastlane_command} #{selection}` 🚀.")
         platform = selection.split(' ')[0]
         lane_name = selection.split(' ')[1]
 
@@ -147,26 +123,7 @@ module Fastlane
 
         return platform, lane_name # yeah
       else
-        UI.user_error! "Run `fastlane` the next time you need to build, test or release your app 🚀"
-      end
-    end
-
-    def self.load_dot_env(env)
-      return if Dir.glob("**/*.env*", File::FNM_DOTMATCH).count == 0
-      require 'dotenv'
-
-      Actions.lane_context[Actions::SharedValues::ENVIRONMENT] = env if env
-
-      # Making sure the default '.env' and '.env.default' get loaded
-      env_file = File.join(Fastlane::FastlaneFolder.path || "", '.env')
-      env_default_file = File.join(Fastlane::FastlaneFolder.path || "", '.env.default')
-      Dotenv.load(env_file, env_default_file)
-
-      # Loads .env file for the environment passed in through options
-      if env
-        env_file = File.join(Fastlane::FastlaneFolder.path || "", ".env.#{env}")
-        UI.success "Loading from '#{env_file}'"
-        Dotenv.overload(env_file)
+        UI.user_error!("Run `#{fastlane_command}` the next time you need to build, test or release your app 🚀")
       end
     end
   end

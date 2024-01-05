@@ -19,10 +19,11 @@ module Fastlane
       #####################################################
 
       def self.description
-        "Post on twitter"
+        "Post a tweet on [Twitter.com](https://twitter.com)"
       end
 
       def self.details
+        "Post a tweet on Twitter. Requires you to setup an app on [twitter.com](https://twitter.com) and obtain `consumer` and `access_token`."
       end
 
       def self.available_options
@@ -30,27 +31,26 @@ module Fastlane
           FastlaneCore::ConfigItem.new(key: :consumer_key,
                                        env_name: "FL_TW_CONSUMER_KEY",
                                        description: "Consumer Key",
-                                       is_string: true,
+                                       sensitive: true,
                                        optional: false),
           FastlaneCore::ConfigItem.new(key: :consumer_secret,
                                        env_name: "FL_TW_CONSUMER_SECRET",
+                                       sensitive: true,
                                        description: "Consumer Secret",
-                                       is_string: true,
                                        optional: false),
           FastlaneCore::ConfigItem.new(key: :access_token,
                                        env_name: "FL_TW_ACCESS_TOKEN",
+                                       sensitive: true,
                                        description: "Access Token",
-                                       is_string: true,
                                        optional: false),
           FastlaneCore::ConfigItem.new(key: :access_token_secret,
                                        env_name: "FL_TW_ACCESS_TOKEN_SECRET",
+                                       sensitive: true,
                                        description: "Access Token Secret",
-                                       is_string: true,
                                        optional: false),
           FastlaneCore::ConfigItem.new(key: :message,
                                        env_name: "FL_TW_MESSAGE",
                                        description: "The tweet",
-                                       is_string: true,
                                        optional: false)
 
         ]
@@ -62,6 +62,22 @@ module Fastlane
 
       def self.is_supported?(platform)
         true
+      end
+
+      def self.example_code
+        [
+          'twitter(
+            access_token: "XXXX",
+            access_token_secret: "xxx",
+            consumer_key: "xxx",
+            consumer_secret: "xxx",
+            message: "You rock!"
+          )'
+        ]
+      end
+
+      def self.category
+        :notifications
       end
     end
   end

@@ -19,8 +19,8 @@ module Fastlane
 
         response = https.request(req)
 
-        UI.user_error! "Failed to make a request to IFTTT. #{response.message}." unless response.code == "200"
-        UI.success "Successfully made a request to IFTTT."
+        UI.user_error!("Failed to make a request to IFTTT. #{response.message}.") unless response.code == "200"
+        UI.success("Successfully made a request to IFTTT.")
       end
 
       #####################################################
@@ -28,38 +28,40 @@ module Fastlane
       #####################################################
 
       def self.description
-        "Connect to the IFTTT Maker Channel. https://ifttt.com/maker"
+        "Connect to the [IFTTT Maker Channel](https://ifttt.com/maker)"
+      end
+
+      def self.details
+        "Connect to the IFTTT [Maker Channel](https://ifttt.com/maker). An IFTTT Recipe has two components: a Trigger and an Action. In this case, the Trigger will fire every time the Maker Channel receives a web request (made by this _fastlane_ action) to notify it of an event. The Action can be anything that IFTTT supports: email, SMS, etc."
       end
 
       def self.available_options
         [
           FastlaneCore::ConfigItem.new(key: :api_key,
                                       env_name: "IFTTT_API_KEY",
+                                      sensitive: true,
                                       description: "API key",
                                       verify_block: proc do |value|
-                                        raise UI.error "No API key given, pass using `api_key: 'key'`" if value.to_s.empty?
+                                        raise UI.error("No API key given, pass using `api_key: 'key'`") if value.to_s.empty?
                                       end),
           FastlaneCore::ConfigItem.new(key: :event_name,
                                       env_name: "IFTTT_EVENT_NAME",
                                       description: "The name of the event that will be triggered",
                                       verify_block: proc do |value|
-                                        raise UI.error "No event name given, pass using `event_name: 'name'`" if value.to_s.empty?
+                                        raise UI.error("No event name given, pass using `event_name: 'name'`") if value.to_s.empty?
                                       end),
           FastlaneCore::ConfigItem.new(key: :value1,
                                        env_name: "IFTTT_VALUE1",
                                        description: "Extra data sent with the event",
-                                       optional: true,
-                                       is_string: true),
+                                       optional: true),
           FastlaneCore::ConfigItem.new(key: :value2,
                                       env_name: "IFTTT_VALUE2",
                                       description: "Extra data sent with the event",
-                                      optional: true,
-                                      is_string: true),
+                                      optional: true),
           FastlaneCore::ConfigItem.new(key: :value3,
                                        env_name: "IFTTT_VALUE3",
                                        description: "Extra data sent with the event",
-                                       optional: true,
-                                       is_string: true)
+                                       optional: true)
         ]
       end
 
@@ -69,6 +71,22 @@ module Fastlane
 
       def self.authors
         ["vpolouchkine"]
+      end
+
+      def self.example_code
+        [
+          'ifttt(
+            api_key: "...",
+            event_name: "...",
+            value1: "foo",
+            value2: "bar",
+            value3: "baz"
+          )'
+        ]
+      end
+
+      def self.category
+        :notifications
       end
     end
   end

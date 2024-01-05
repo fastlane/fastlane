@@ -1,12 +1,13 @@
 module Fastlane
   class PluginSearch
+    require 'terminal-table'
     require 'word_wrap'
 
     def self.print_plugins(search_query: nil)
       if search_query
-        UI.message "Looking for fastlane plugins containing '#{search_query}'..."
+        UI.message("Looking for fastlane plugins containing '#{search_query}'...")
       else
-        UI.message "Listing all available fastlane plugins"
+        UI.message("Listing all available fastlane plugins")
       end
 
       plugins = Fastlane::PluginFetcher.fetch_gems(search_query: search_query)
@@ -24,15 +25,14 @@ module Fastlane
       end
 
       params = {
-        rows: rows,
+        rows: FastlaneCore::PrintTable.transform_output(rows),
         title: (search_query ? "fastlane plugins '#{search_query}'" : "Available fastlane plugins").green,
         headings: ["Name", "Description", "Downloads"]
       }
-      params[:rows] = rows
 
-      puts ""
-      puts Terminal::Table.new(params)
-      puts ""
+      puts("")
+      puts(Terminal::Table.new(params))
+      puts("")
 
       if plugins.count == 1
         print_plugin_details(plugins.last)

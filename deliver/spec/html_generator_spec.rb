@@ -38,6 +38,22 @@ describe Deliver::HtmlGenerator do
       end
     end
 
+    context 'with an app icon' do
+      let(:options) do
+        {
+          name: { 'en-US' => 'Fastlane Demo' },
+          description: { 'en-US' => 'Demo description' },
+          app_icon: 'fastlane/metadata/app_icon.png'
+        }
+      end
+
+      it 'renders HTML' do
+        capture = render(options, screenshots)
+        expect(capture).to match(/<html>/)
+        expect(capture).to include('app_icon.png')
+      end
+    end
+
     private
 
     def render(options, screenshots)

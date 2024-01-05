@@ -1,0 +1,94 @@
+{
+    "data" : {
+      "type" : "apps",
+      "id" : "123456789",
+      "attributes" : {
+        "name" : "FastlaneTest",
+        "bundleId" : "com.joshholtz.FastlaneTest",
+        "sku" : "SKU_SKU_SKU_SKU",
+        "primaryLocale" : "en-US",
+        "removed" : false,
+        "isAAG" : false
+      },
+      "relationships" : {
+        "betaTesters" : {
+          "links" : {
+            "self" : "https://appstoreconnect.apple.com/iris/v1/apps/123456789/relationships/betaTesters",
+            "related" : "https://appstoreconnect.apple.com/iris/v1/apps/123456789/betaTesters"
+          }
+        },
+        "betaGroups" : {
+          "links" : {
+            "self" : "https://appstoreconnect.apple.com/iris/v1/apps/123456789/relationships/betaGroups",
+            "related" : "https://appstoreconnect.apple.com/iris/v1/apps/123456789/betaGroups"
+          }
+        },
+        "appStoreVersions" : {
+          "links" : {
+            "self" : "https://appstoreconnect.apple.com/iris/v1/apps/123456789/relationships/appStoreVersions",
+            "related" : "https://appstoreconnect.apple.com/iris/v1/apps/123456789/appStoreVersions"
+          }
+        },
+        "preReleaseVersions" : {
+          "links" : {
+            "self" : "https://appstoreconnect.apple.com/iris/v1/apps/123456789/relationships/preReleaseVersions",
+            "related" : "https://appstoreconnect.apple.com/iris/v1/apps/123456789/preReleaseVersions"
+          }
+        },
+        "betaAppLocalizations" : {
+          "links" : {
+            "self" : "https://appstoreconnect.apple.com/iris/v1/apps/123456789/relationships/betaAppLocalizations",
+            "related" : "https://appstoreconnect.apple.com/iris/v1/apps/123456789/betaAppLocalizations"
+          }
+        },
+        "builds" : {
+          "links" : {
+            "self" : "https://appstoreconnect.apple.com/iris/v1/apps/123456789/relationships/builds",
+            "related" : "https://appstoreconnect.apple.com/iris/v1/apps/123456789/builds"
+          }
+        },
+        "betaLicenseAgreement" : {
+          "links" : {
+            "self" : "https://appstoreconnect.apple.com/iris/v1/apps/123456789/relationships/betaLicenseAgreement",
+            "related" : "https://appstoreconnect.apple.com/iris/v1/apps/123456789/betaLicenseAgreement"
+          }
+        },
+        "betaAppReviewDetail" : {
+          "links" : {
+            "self" : "https://appstoreconnect.apple.com/iris/v1/apps/123456789/relationships/betaAppReviewDetail",
+            "related" : "https://appstoreconnect.apple.com/iris/v1/apps/123456789/betaAppReviewDetail"
+          }
+        },
+        "appStoreVersionMetrics" : {
+          "links" : {
+            "self" : "https://appstoreconnect.apple.com/iris/v1/apps/123456789/relationships/appStoreVersionMetrics",
+            "related" : "https://appstoreconnect.apple.com/iris/v1/apps/123456789/appStoreVersionMetrics"
+          }
+        },
+        "betaReviewMetrics" : {
+          "links" : {
+            "self" : "https://appstoreconnect.apple.com/iris/v1/apps/123456789/relationships/betaReviewMetrics",
+            "related" : "https://appstoreconnect.apple.com/iris/v1/apps/123456789/betaReviewMetrics"
+          }
+        },
+        "provider" : {
+          "links" : {
+            "self" : "https://appstoreconnect.apple.com/iris/v1/apps/123456789/relationships/provider",
+            "related" : "https://appstoreconnect.apple.com/iris/v1/apps/123456789/provider"
+          }
+        },
+        "appInfos" : {
+          "links" : {
+            "self" : "https://appstoreconnect.apple.com/iris/v1/apps/123456789/relationships/appInfos",
+            "related" : "https://appstoreconnect.apple.com/iris/v1/apps/123456789/appInfos"
+          }
+        }
+      },
+      "links" : {
+        "self" : "https://appstoreconnect.apple.com/iris/v1/apps/123456789"
+      }
+    },
+    "links" : {
+      "self" : "https://appstoreconnect.apple.com/iris/v1/apps/123456789"
+    }
+  }

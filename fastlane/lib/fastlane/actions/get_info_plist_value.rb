@@ -10,7 +10,8 @@ module Fastlane
 
         begin
           path = File.expand_path(params[:path])
-          plist = Plist.parse_xml(path)
+
+          plist = File.open(path) { |f| Plist.parse_xml(f) }
 
           value = plist[params[:key]]
           Actions.lane_context[SharedValues::GET_INFO_PLIST_VALUE_CUSTOM_VALUE] = value
@@ -18,12 +19,15 @@ module Fastlane
           return value
         rescue => ex
           UI.error(ex)
-          UI.error("Unable to find plist file at '#{path}'")
         end
       end
 
       def self.description
         "Returns value from Info.plist of your project as native Ruby data structures"
+      end
+
+      def self.details
+        "Get a value from a plist file, which can be used to fetch the app identifier and more information about your app"
       end
 
       def self.available_options
@@ -53,7 +57,21 @@ module Fastlane
       end
 
       def self.is_supported?(platform)
-        [:ios, :mac].include? platform
+        [:ios, :mac].include?(platform)
+      end
+
+      def self.example_code
+        [
+          'identifier = get_info_plist_value(path: "./Info.plist", key: "CFBundleIdentifier")'
+        ]
+      end
+
+      def self.return_type
+        :string
+      end
+
+      def self.category
+        :project
       end
     end
   end

@@ -1,5 +1,3 @@
-require 'spec_helper'
-
 describe Commander::Runner do
   describe 'tool collector interactions' do
     class CommandsGenerator
@@ -21,8 +19,8 @@ describe Commander::Runner do
         #
         # This is not ideal, but the downside is potential broken tests in the future,
         # which we can quickly adjust.
-        global_option '--format', String
-        global_option '--out', String
+        global_option('--format', String)
+        global_option('--out', String)
 
         command :run do |c|
           c.action do |args, options|
@@ -30,42 +28,10 @@ describe Commander::Runner do
           end
         end
 
-        default_command :run
+        default_command(:run)
 
         run!
       end
-    end
-
-    let(:mock_tool_collector) { FastlaneCore::ToolCollector.new }
-
-    before(:each) do
-      allow(Commander::Runner).to receive(:instance).and_return(Commander::Runner.new)
-      expect(FastlaneCore::ToolCollector).to receive(:new).and_return(mock_tool_collector)
-    end
-
-    it "calls the tool collector lifecycle methods for a successful run" do
-      expect(mock_tool_collector).to receive(:did_launch_action).with("tool_name").and_call_original
-      expect(mock_tool_collector).to receive(:did_finish).and_call_original
-
-      CommandsGenerator.new.run
-    end
-
-    it "calls the tool collector lifecycle methods for a crash" do
-      expect(mock_tool_collector).to receive(:did_launch_action).with("tool_name").and_call_original
-      expect(mock_tool_collector).to receive(:did_crash).with("tool_name").and_call_original
-
-      expect do
-        CommandsGenerator.new(raise_error: StandardError).run
-      end.to raise_error(StandardError)
-    end
-
-    it "calls the tool collector lifecycle methods for a user error" do
-      expect(mock_tool_collector).to receive(:did_launch_action).with("tool_name").and_call_original
-      expect(mock_tool_collector).to receive(:did_raise_error).with("tool_name").and_call_original
-
-      expect do
-        CommandsGenerator.new(raise_error: FastlaneCore::Interface::FastlaneError).run
-      end.to raise_error(SystemExit)
     end
   end
 
@@ -94,17 +60,17 @@ describe Commander::Runner do
       end.to raise_error(StandardError, '[!] my message'.red)
     end
 
-    it 'should abort and show custom info for errors that have the Apple error info provider method with $verbose=false' do
+    it 'should abort and show custom info for errors that have the Apple error info provider method with FastlaneCore::Globals.verbose?=false' do
       runner = Commander::Runner.new
       expect(runner).to receive(:abort).with("\n[!] Title\n\tLine 1\n\tLine 2".red)
 
-      with_verbose(false) do
+      FastlaneSpec::Env.with_verbose(false) do
         runner.handle_unknown_error!(CustomError.new)
       end
     end
 
-    it 'should reraise and show custom info for errors that have the Apple error info provider method with $verbose=true' do
-      with_verbose(true) do
+    it 'should reraise and show custom info for errors that have the Apple error info provider method with FastlaneCore::Globals.verbose?=true' do
+      FastlaneSpec::Env.with_verbose(true) do
         expect do
           Commander::Runner.new.handle_unknown_error!(CustomError.new)
         end.to raise_error(CustomError, "[!] Title\n\tLine 1\n\tLine 2".red)

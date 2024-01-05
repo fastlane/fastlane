@@ -1,3 +1,5 @@
+require_relative 'portal/portal_client'
+
 module Spaceship
   class Launcher
     attr_accessor :client
@@ -21,7 +23,7 @@ module Spaceship
     def initialize(user = nil, password = nil)
       @client = PortalClient.new
 
-      if user or password
+      if user || password
         @client.login(user, password)
       end
     end
@@ -56,10 +58,13 @@ module Spaceship
     # so that the user can use the environment variable `FASTLANE_TEAM_ID`
     # for future user.
     #
+    # @param team_id (String) (optional): The ID of a Developer Portal team
+    # @param team_name (String) (optional): The name of a Developer Portal team
+    #
     # @return (String) The ID of the select team. You also get the value if
     #   the user is only in one team.
-    def select_team
-      @client.select_team
+    def select_team(team_id: nil, team_name: nil)
+      @client.select_team(team_id: team_id, team_name: team_name)
     end
 
     #####################################################
@@ -68,27 +73,27 @@ module Spaceship
 
     # @return (Class) Access the apps for this spaceship
     def app
-      Spaceship::App.set_client(@client)
+      Spaceship::Portal::App.set_client(@client)
     end
 
     # @return (Class) Access the app groups for this spaceship
     def app_group
-      Spaceship::AppGroup.set_client(@client)
+      Spaceship::Portal::AppGroup.set_client(@client)
     end
 
     # @return (Class) Access the devices for this spaceship
     def device
-      Spaceship::Device.set_client(@client)
+      Spaceship::Portal::Device.set_client(@client)
     end
 
     # @return (Class) Access the certificates for this spaceship
     def certificate
-      Spaceship::Certificate.set_client(@client)
+      Spaceship::Portal::Certificate.set_client(@client)
     end
 
     # @return (Class) Access the provisioning profiles for this spaceship
     def provisioning_profile
-      Spaceship::ProvisioningProfile.set_client(@client)
+      Spaceship::Portal::ProvisioningProfile.set_client(@client)
     end
   end
 end

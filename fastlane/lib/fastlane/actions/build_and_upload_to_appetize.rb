@@ -18,8 +18,11 @@ module Fastlane
         zipped_bundle = Actions::ZipAction.run(path: app_path,
                                         output_path: File.join(tmp_path, "Result.zip"))
 
-        Actions::AppetizeAction.run(path: zipped_bundle,
-                               api_token: params[:api_token])
+        other_action.appetize(path: zipped_bundle,
+                              api_token: params[:api_token],
+                              public_key: params[:public_key],
+                              note: params[:note],
+                              timeout: params[:timeout])
 
         public_key = Actions.lane_context[SharedValues::APPETIZE_PUBLIC_KEY]
         UI.success("Generated Public Key: #{Actions.lane_context[SharedValues::APPETIZE_PUBLIC_KEY]}")
@@ -38,7 +41,10 @@ module Fastlane
       end
 
       def self.details
-        "This should be called from danger"
+        [
+          "This should be called from danger.",
+          "More information in the [device_grid guide](https://github.com/fastlane/fastlane/blob/master/fastlane/lib/fastlane/actions/device_grid/README.md)."
+        ].join("\n")
       end
 
       def self.available_options
@@ -57,7 +63,26 @@ module Fastlane
           FastlaneCore::ConfigItem.new(key: :api_token,
                                        env_name: "APPETIZE_API_TOKEN",
                                        description: "Appetize.io API Token",
-                                       is_string: true)
+                                       sensitive: true,
+                                       code_gen_sensitive: true),
+          FastlaneCore::ConfigItem.new(key: :public_key,
+                                       description: "If not provided, a new app will be created. If provided, the existing build will be overwritten",
+                                       optional: true,
+                                       verify_block: proc do |value|
+                                         if value.start_with?("private_")
+                                           UI.user_error!("You provided a private key to appetize, please provide the public key")
+                                         end
+                                       end),
+          FastlaneCore::ConfigItem.new(key: :note,
+                                       description: "Notes you wish to add to the uploaded app",
+                                       optional: true),
+          FastlaneCore::ConfigItem.new(key: :timeout,
+                                       description: "The number of seconds to wait until automatically ending the session due to user inactivity. Must be 30, 60, 90, 120, 180, 300, 600, 1800, 3600 or 7200. Default is 120",
+                                       type: Integer,
+                                       optional: true,
+                                       verify_block: proc do |value|
+                                         UI.user_error!("The value provided doesn't match any of the supported options.") unless [30, 60, 90, 120, 180, 300, 600, 1800, 3600, 7200].include?(value)
+                                       end)
         ]
       end
 
@@ -74,6 +99,14 @@ module Fastlane
 
       def self.is_supported?(platform)
         platform == :ios
+      end
+
+      def self.example_code
+        nil
+      end
+
+      def self.category
+        :misc
       end
     end
   end

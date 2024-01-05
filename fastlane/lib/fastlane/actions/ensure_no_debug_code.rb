@@ -9,7 +9,7 @@ module Fastlane
 
         if params[:extensions]
           params[:extensions].each do |extension|
-            extension.delete!('.') if extension.include? "."
+            extension.delete!('.') if extension.include?(".")
             extensions << extension
           end
         end
@@ -19,7 +19,16 @@ module Fastlane
         elsif extensions.count > 0
           command << " --include=\\*.#{extensions.join(',')}"
         end
-        return command if Helper.is_test?
+
+        command << " --exclude #{params[:exclude]}" if params[:exclude]
+
+        if params[:exclude_dirs]
+          params[:exclude_dirs].each do |dir|
+            command << " --exclude-dir #{dir.shellescape}"
+          end
+        end
+
+        return command if Helper.test?
 
         UI.important(command)
         results = `#{command}` # we don't use `sh` as the return code of grep is wrong for some reason
@@ -47,9 +56,8 @@ module Fastlane
 
       def self.details
         [
-          "Makes sure the given text is nowhere in the code base. This can be used",
-          "to check if there is any debug code still in your code base or if you have",
-          "things like // TO DO or similar"
+          "You don't want any debug code to slip into production.",
+          "This can be used to check if there is any debug code still in your codebase or if you have things like `// TO DO` or similar."
         ].join("\n")
       end
 
@@ -70,13 +78,22 @@ module Fastlane
                                        description: "The extension that should be searched for",
                                        optional: true,
                                        verify_block: proc do |value|
-                                         value.delete!('.') if value.include? "."
+                                         value.delete!('.') if value.include?(".")
                                        end),
           FastlaneCore::ConfigItem.new(key: :extensions,
                                        env_name: "FL_ENSURE_NO_DEBUG_CODE_EXTENSIONS",
                                        description: "An array of file extensions that should be searched for",
                                        optional: true,
-                                       is_string: false)
+                                       type: Array),
+          FastlaneCore::ConfigItem.new(key: :exclude,
+                                       env_name: "FL_ENSURE_NO_DEBUG_CODE_EXCLUDE",
+                                       description: "Exclude a certain pattern from the search",
+                                       optional: true),
+          FastlaneCore::ConfigItem.new(key: :exclude_dirs,
+                                       env_name: "FL_ENSURE_NO_DEBUG_CODE_EXCLUDE_DIRS",
+                                       description: "An array of dirs that should not be included in the search",
+                                       optional: true,
+                                       type: Array)
         ]
       end
 
@@ -86,6 +103,26 @@ module Fastlane
 
       def self.authors
         ["KrauseFx"]
+      end
+
+      def self.example_code
+        [
+          'ensure_no_debug_code(text: "// TODO")',
+          'ensure_no_debug_code(text: "Log.v",
+                          extension: "java")',
+          'ensure_no_debug_code(text: "NSLog",
+                               path: "./lib",
+                          extension: "m")',
+          'ensure_no_debug_code(text: "(^#define DEBUG|NSLog)",
+                               path: "./lib",
+                          extension: "m")',
+          'ensure_no_debug_code(text: "<<<<<<",
+                         extensions: ["m", "swift", "java"])'
+        ]
+      end
+
+      def self.category
+        :misc
       end
 
       def self.is_supported?(platform)

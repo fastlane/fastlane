@@ -96,6 +96,32 @@
 						<key>vendor_id</key>
 						<string>apple_vendor_id</string>
 					</dict>
+					<dict>
+						<key>_name</key>
+						<string>iPhone</string>
+						<key>bcd_device</key>
+						<string>11.06</string>
+						<key>bus_power</key>
+						<string>500</string>
+						<key>bus_power_used</key>
+						<string>500</string>
+						<key>device_speed</key>
+						<string>high_speed</string>
+						<key>extra_current_used</key>
+						<string>1600</string>
+						<key>location_id</key>
+						<string>0x14800000 / 25</string>
+						<key>manufacturer</key>
+						<string>Apple Inc.</string>
+						<key>product_id</key>
+						<string>0x12a8</string>
+						<key>serial_num</key>
+						<string>000080200006302A0CFFFFFF</string>
+						<key>sleep_current</key>
+						<string>2100</string>
+						<key>vendor_id</key>
+						<string>apple_vendor_id</string>
+					</dict>
 				</array>
 				<key>_name</key>
 				<string>USB30Bus</string>

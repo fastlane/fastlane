@@ -31,11 +31,15 @@ module Fastlane
       #####################################################
 
       def self.is_supported?(platform)
-        [:ios, :mac].include? platform
+        [:ios, :mac].include?(platform)
       end
 
       def self.description
         'Creates a zipped dSYM in the project root from the .xcarchive'
+      end
+
+      def self.details
+        "You can manually specify the path to the xcarchive (not needed if you use `xcodebuild`/`xcarchive` to build your archive)"
       end
 
       def self.available_options
@@ -43,6 +47,7 @@ module Fastlane
           FastlaneCore::ConfigItem.new(key: :archive_path,
                                        description: 'Path to your xcarchive file. Optional if you use the `xcodebuild` action',
                                        default_value: Actions.lane_context[SharedValues::XCODEBUILD_ARCHIVE],
+                                       default_value_dynamic: true,
                                        optional: true,
                                        env_name: 'DSYM_ZIP_XCARCHIVE_PATH',
                                        verify_block: proc do |value|
@@ -56,7 +61,7 @@ module Fastlane
                                        description: 'Whether or not all dSYM files are to be included. Optional, default is false in which only your app dSYM is included',
                                        default_value: false,
                                        optional: true,
-                                       is_string: false,
+                                       type: Boolean,
                                        env_name: 'DSYM_ZIP_ALL')
         ]
       end
@@ -69,6 +74,19 @@ module Fastlane
 
       def self.author
         'lmirosevic'
+      end
+
+      def self.example_code
+        [
+          'dsym_zip',
+          'dsym_zip(
+            archive_path: "MyApp.xcarchive"
+          )'
+        ]
+      end
+
+      def self.category
+        :misc
       end
     end
   end

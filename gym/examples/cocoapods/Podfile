@@ -1,12 +1,12 @@
 # Uncomment this line to define a global platform for your project
 # platform :ios, '6.0'
 
-target 'Example' do
-  pod "HexColors"
+target('Example') do
+  pod("HexColors")
 end
 
-target 'ExampleTests' do
+target('ExampleTests') do
 end
 
-target 'ExampleUITests' do
+target('ExampleUITests') do
 end

@@ -1,5 +1,3 @@
-require 'spec_helper'
-
 describe Spaceship::Device do
   before { Spaceship.login }
   let(:client) { Spaceship::Device.client }
@@ -15,6 +13,19 @@ describe Spaceship::Device do
     expect(device.status).to eq('c')
     expect(device.model).to eq('iPhone 5 (Model A1428)')
     expect(device.device_type).to eq('iphone')
+  end
+
+  subject(:all_devices_disabled) { Spaceship::Device.all(include_disabled: true) }
+  it "successfully loads and parses all devices including disabled ones" do
+    expect(all_devices_disabled.count).to eq(6)
+    device = all_devices_disabled.last
+    expect(device.id).to eq('DISABLED_B')
+    expect(device.name).to eq('Old iPod')
+    expect(device.udid).to eq('44ee59893cb94ead4635743b25012e5b9f8c67c1')
+    expect(device.platform).to eq('ios')
+    expect(device.status).to eq('r')
+    expect(device.model).to eq('iPod touch')
+    expect(device.device_type).to eq('ipod')
   end
 
   subject(:all_phones) { Spaceship::Device.all_iphones }
@@ -99,14 +110,45 @@ describe Spaceship::Device do
       end.to raise_error("You cannot create a device without a device_id (UDID) and name")
     end
 
+    it "should fail to create a device name longer than 50 characters" do
+      expect do
+        Spaceship::Device.create!(name: "Demo Device (Apple Watch Series 3 - 42mm GPS Black)", udid: "7f6c8dc83d77134b5a3a1c53f1202b395b04482b")
+      end.to raise_error("Device name must be 50 characters or less. \"Demo Device (Apple Watch Series 3 - 42mm GPS Black)\" has a 51 character length.")
+    end
+
+    it "should fail to create a device with an invalid UDID" do
+      expect do
+        Spaceship::Device.create!(name: "Demo Device", udid: "1234")
+      end.to raise_error("An invalid value '1234' was provided for the parameter 'deviceNumber'.")
+    end
+
     it "doesn't trigger an ITC call if the device ID is already registered" do
-      expect(client).to_not receive(:create_device!)
+      expect(client).to_not(receive(:create_device!))
       device = Spaceship::Device.create!(name: "Personal iPhone", udid: "e5814abb3b1d92087d48b64f375d8e7694932c39")
     end
 
     it "doesn't raise an exception if the device name is already registered" do
       expect(client).to receive(:create_device!).with("Personal iPhone", "e5814abb3b1d92087d48b64f375d8e7694932c3c", mac: false).and_return({})
       device = Spaceship::Device.create!(name: "Personal iPhone", udid: "e5814abb3b1d92087d48b64f375d8e7694932c3c")
+    end
+  end
+
+  describe "#disable" do
+    it "finds a device by its ID and disables it" do
+      device = Spaceship::Device.find("AAAAAAAAAA")
+      expect(device.status).to eq("c")
+      expect(device.enabled?).to eq(true)
+      device.disable!
+      expect(device.status).to eq("r")
+      expect(device.enabled?).to eq(false)
+    end
+    it "finds a device by its ID and enables it" do
+      device = Spaceship::Device.find("DISABLED_B", include_disabled: true)
+      expect(device.status).to eq("r")
+      expect(device.enabled?).to eq(false)
+      device.enable!
+      expect(device.status).to eq("c")
+      expect(device.enabled?).to eq(true)
     end
   end
 end

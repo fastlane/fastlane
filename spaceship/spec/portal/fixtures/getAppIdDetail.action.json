@@ -43,6 +43,13 @@
         "isProdPushEnabled": true,
         "associatedApplicationGroupsCount": 0,
         "associatedCloudContainersCount": 0,
-        "associatedIdentifiersCount": 0
+        "associatedIdentifiersCount": 0,
+        "associatedApplicationGroups": [
+            {
+                "name": "Production App Group",
+                "identifier": "group.tools.fastlane",
+                "applicationGroup": "NR5BH6N89Z"
+            }
+        ]
     }
 }

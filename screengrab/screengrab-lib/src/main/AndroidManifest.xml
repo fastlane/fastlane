@@ -1,4 +1,9 @@
-<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+<manifest xmlns:tools="http://schemas.android.com/tools"
     package="tools.fastlane.screengrab">
 
+    <!--
+      We will manually check for API level >= 18 before using UiAutomator.
+      We will manually check for API level >= 10 before using Falcon.
+    -->
+    <uses-sdk tools:overrideLibrary="androidx.test.uiautomator.v18,com.jraska.falcon" />
 </manifest>

@@ -1,14 +1,23 @@
 # Fetch and use the latest Fastfile from the fastlane main repository
-import("../../fastlane/fastlane/Fastfile")
+import("../../fastlane/Fastfile")
 
-lane :deploy_aar do
+lane(:deploy_aar_local) do
+  gradle(task: [
+    'screengrab-lib:clean',
+    'screengrab-lib:assembleRelease',
+    'screengrab-lib:publishToMavenLocal',
+    '-PdryRun=false'
+  ].join(' '))
+end
+
+lane(:deploy_aar) do
   ensure_git_branch
   ensure_git_status_clean
 
   gradle(task: [
     'screengrab-lib:clean',
     'screengrab-lib:assembleRelease',
-    'screengrab-lib:bintrayUpload',
+    'screengrab-lib:publish',
     '-PdryRun=false'
   ].join(' '))
 end

@@ -11,10 +11,10 @@ module Fastlane
         command << upload_progress(params)
 
         # Fastlane::Actions.sh has buffering issues, no progress bar is shown in real time
-        # will reanable it when it is fixed
+        # will reenable it when it is fixed
         # result = Fastlane::Actions.sh(command.join(' '), log: false)
         shell_command = command.join(' ')
-        result = Helper.is_test? ? shell_command : `#{shell_command}`
+        result = Helper.test? ? shell_command : `#{shell_command}`
         fail_on_error(result)
 
         result
@@ -79,7 +79,7 @@ module Fastlane
       #####################################################
 
       def self.description
-        "Upload dSYM file to Splunk MINT"
+        "Upload dSYM file to [Splunk MINT](https://mint.splunk.com/)"
       end
 
       def self.available_options
@@ -91,21 +91,23 @@ module Fastlane
           FastlaneCore::ConfigItem.new(key: :api_key,
                                        env_name: "FL_SPLUNKMINT_API_KEY",
                                        description: "Splunk MINT App API key e.g. f57a57ca",
+                                       sensitive: true,
                                        optional: false),
           FastlaneCore::ConfigItem.new(key: :api_token,
                                        env_name: "FL_SPLUNKMINT_API_TOKEN",
                                        description: "Splunk MINT API token e.g. e05ba40754c4869fb7e0b61",
+                                       sensitive: true,
                                        optional: false),
           FastlaneCore::ConfigItem.new(key: :verbose,
                                        env_name: "FL_SPLUNKMINT_VERBOSE",
                                        description: "Make detailed output",
-                                       is_string: false,
+                                       type: Boolean,
                                        default_value: false,
                                        optional: true),
           FastlaneCore::ConfigItem.new(key: :upload_progress,
                                        env_name: "FL_SPLUNKMINT_UPLOAD_PROGRESS",
                                        description: "Show upload progress",
-                                       is_string: false,
+                                       type: Boolean,
                                        default_value: false,
                                        optional: true),
           FastlaneCore::ConfigItem.new(key: :proxy_username,
@@ -114,6 +116,7 @@ module Fastlane
                                        optional: true),
           FastlaneCore::ConfigItem.new(key: :proxy_password,
                                        env_name: "FL_SPLUNKMINT_PROXY_PASSWORD",
+                                       sensitive: true,
                                        description: "Proxy password",
                                        optional: true),
           FastlaneCore::ConfigItem.new(key: :proxy_address,
@@ -133,6 +136,20 @@ module Fastlane
 
       def self.is_supported?(platform)
         platform == :ios
+      end
+
+      def self.example_code
+        [
+          'splunkmint(
+            dsym: "My.app.dSYM.zip",
+            api_key: "43564d3a",
+            api_token: "e05456234c4869fb7e0b61"
+          )'
+        ]
+      end
+
+      def self.category
+        :beta
       end
     end
   end

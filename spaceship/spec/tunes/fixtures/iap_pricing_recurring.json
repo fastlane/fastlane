@@ -1,0 +1,31 @@
+{
+  "data":{
+    "subscriptions":[
+      {
+        "value":{
+          "tierStem":"2",
+          "priceTierEffectiveDate":null,
+          "priceTierEndDate":null,
+          "country":"BB",
+          "grandfathered":{
+            "value":"FUTURE_NONE",
+            "isEditable":false,
+            "isRequired":false,
+            "errorKeys":null
+          }
+        },
+        "isEditable":true,
+        "isRequired":false,
+        "errorKeys":null
+      }
+    ],
+    "introOffers":[],
+    "freeTrials":null
+  },
+  "messages":{
+    "warn":null,
+    "error":null,
+    "info":null
+  },
+  "statusCode":"SUCCESS"
+}

@@ -15,10 +15,9 @@ module Fastlane
 
     # This will take care of executing **one** lane. That's when the user triggers a lane from the CLI for example
     # This method is **not** executed when switching a lane
-    # @param lane_name The name of the lane to execute
+    # @param lane The name of the lane to execute
     # @param platform The name of the platform to execute
     # @param parameters [Hash] The parameters passed from the command line to the lane
-    # rubocop:disable Metrics/AbcSize
     def execute(lane, platform = nil, parameters = nil)
       UI.crash!("No lane given") unless lane
 
@@ -36,11 +35,11 @@ module Fastlane
       Actions.lane_context[Actions::SharedValues::PLATFORM_NAME] = current_platform
       Actions.lane_context[Actions::SharedValues::LANE_NAME] = full_lane_name
 
-      UI.success "Driving the lane '#{full_lane_name}' 🚀"
+      UI.success("Driving the lane '#{full_lane_name}' 🚀")
 
       return_val = nil
 
-      path_to_use = Fastlane::FastlaneFolder.path || Dir.pwd
+      path_to_use = FastlaneCore::FastlaneFolder.path || Dir.pwd
       parameters ||= {}
       begin
         Dir.chdir(path_to_use) do # the file is located in the fastlane folder
@@ -58,17 +57,20 @@ module Fastlane
         return return_val
       rescue => ex
         Dir.chdir(path_to_use) do
-          # Provide error block exception without colour code
-          error_ex = ex.exception(ex.message.gsub(/\033\[\d+m/, ''))
-
-          error_blocks[current_platform].call(current_lane, error_ex, parameters) if error_blocks[current_platform] && current_platform
-          error_blocks[nil].call(current_lane, error_ex, parameters) if error_blocks[nil]
+          # Provide error block exception without color code
+          begin
+            error_blocks[current_platform].call(current_lane, ex, parameters) if current_platform && error_blocks[current_platform]
+            error_blocks[nil].call(current_lane, ex, parameters) if error_blocks[nil]
+          rescue => error_block_exception
+            UI.error("An error occurred while executing the `error` block:")
+            UI.error(error_block_exception.to_s)
+            raise ex # raise the original error message
+          end
         end
 
         raise ex
       end
     end
-    # rubocop:enable Metrics/AbcSize
 
     # @param filter_platform: Filter, to only show the lanes of a given platform
     # @return an array of lanes (platform lane_name) to print them out to the user
@@ -84,50 +86,92 @@ module Fastlane
       all
     end
 
+    # Pass a action symbol (e.g. :deliver or :commit_version_bump)
+    # and this method will return a reference to the action class
+    # if it exists. In case the action with this name can't be found
+    # this method will return nil.
+    # This method is being called by `trigger_action_by_name` to see
+    # if a given action is available (either built-in or loaded from a plugin)
+    # and is also being called from the fastlane docs generator
+    def class_reference_from_action_name(method_sym)
+      method_str = method_sym.to_s.delete("?") # as a `?` could be at the end of the method name
+      class_ref = Actions.action_class_ref(method_str)
+
+      return class_ref if class_ref && class_ref.respond_to?(:run)
+      nil
+    end
+
+    # Pass a action alias symbol (e.g. :enable_automatic_code_signing)
+    # and this method will return a reference to the action class
+    # if it exists. In case the action with this alias can't be found
+    # this method will return nil.
+    def class_reference_from_action_alias(method_sym)
+      alias_found = find_alias(method_sym.to_s)
+      return nil unless alias_found
+
+      class_reference_from_action_name(alias_found.to_sym)
+    end
+
+    # lookup if an alias exists
+    def find_alias(action_name)
+      Actions.alias_actions.each do |key, v|
+        next unless Actions.alias_actions[key]
+        next unless Actions.alias_actions[key].include?(action_name)
+        return key
+      end
+      nil
+    end
+
     # This is being called from `method_missing` from the Fastfile
     # It's also used when an action is called from another action
-    def trigger_action_by_name(method_sym, custom_dir, *arguments)
-      method_str = method_sym.to_s
-      method_str.delete!('?') # as a `?` could be at the end of the method name
-
+    # @param from_action Indicates if this action is being triggered by another action.
+    #                    If so, it won't show up in summary.
+    def trigger_action_by_name(method_sym, custom_dir, from_action, *arguments)
       # First, check if there is a predefined method in the actions folder
-      class_name = method_str.fastlane_class + 'Action'
-      class_ref = nil
-      begin
-        class_ref = Fastlane::Actions.const_get(class_name)
-      rescue NameError
+      class_ref = class_reference_from_action_name(method_sym)
+      unless class_ref
+        class_ref = class_reference_from_action_alias(method_sym)
+        # notify action that it has been used by alias
+        if class_ref.respond_to?(:alias_used)
+          orig_action = method_sym.to_s
+          arguments = [{}] if arguments.empty?
+          class_ref.alias_used(orig_action, arguments.first)
+        end
       end
 
       # It's important to *not* have this code inside the rescue block
       # otherwise all NameErrors will be caught and the error message is
       # confusing
+      begin
+        return self.try_switch_to_lane(method_sym, arguments)
+      rescue LaneNotAvailableError
+        # We don't actually handle this here yet
+        # We just try to use a user configured lane first
+        # and only if there is none, we're gonna check for the
+        # built-in actions
+      end
+
       if class_ref
         if class_ref.respond_to?(:run)
           # Action is available, now execute it
-          return self.execute_action(method_sym, class_ref, arguments, custom_dir: custom_dir)
+          return self.execute_action(method_sym, class_ref, arguments, custom_dir: custom_dir, from_action: from_action)
         else
           UI.user_error!("Action '#{method_sym}' of class '#{class_name}' was found, but has no `run` method.")
         end
+      end
+
+      # No lane, no action, let's at least show the correct error message
+      if Fastlane.plugin_manager.plugin_is_added_as_dependency?(PluginManager.plugin_prefix + method_sym.to_s)
+        # That's a plugin, but for some reason we can't find it
+        UI.user_error!("Plugin '#{method_sym}' was not properly loaded, make sure to follow the plugin docs for troubleshooting: #{PluginManager::TROUBLESHOOTING_URL}")
+      elsif Fastlane::Actions.formerly_bundled_actions.include?(method_sym.to_s)
+        # This was a formerly bundled action which is now a plugin.
+        UI.verbose(caller.join("\n"))
+        UI.user_error!("The action '#{method_sym}' is no longer bundled with fastlane. You can install it using `fastlane add_plugin #{method_sym}`")
       else
-        # Action was not found
-        # Is there a lane under this name?
-        begin
-          return self.try_switch_to_lane(method_sym, arguments)
-        rescue LaneNotAvailableError
-          # No lane, no action, let's at least show the correct error message
-          if Fastlane.plugin_manager.plugin_is_added_as_dependency?(PluginManager.plugin_prefix + method_sym.to_s)
-            # That's a plugin, but for some reason we can't find it
-            UI.user_error!("Plugin '#{method_sym}' was not properly loaded, make sure to follow the plugin docs for troubleshooting: #{PluginManager::TROUBLESHOOTING_URL}")
-          elsif Fastlane::Actions.formerly_bundled_actions.include?(method_str)
-            # This was a formerly bundled action which is now a plugin.
-            UI.verbose(caller.join("\n"))
-            UI.user_error!("The action '#{method_sym}' is no longer bundled with fastlane. You can install it using `fastlane add_plugin #{method_sym}`")
-          else
-            # So there is no plugin under that name, so just show the error message generated by the lane switch
-            UI.verbose(caller.join("\n"))
-            UI.user_error!("Could not find action or lane '#{method_sym}'. Check out the README for more details: https://github.com/fastlane/fastlane/tree/master/fastlane")
-          end
-        end
+        # So there is no plugin under that name, so just show the error message generated by the lane switch
+        UI.verbose(caller.join("\n"))
+        UI.user_error!("Could not find action, lane or variable '#{method_sym}'. Check out the documentation for more details: https://docs.fastlane.tools/actions")
       end
     end
 
@@ -145,18 +189,18 @@ module Fastlane
         original_full = full_lane_name
         original_lane = current_lane
 
-        UI.user_error!("Parameters for a lane must always be a hash") unless (parameters.first || {}).kind_of? Hash
+        UI.user_error!("Parameters for a lane must always be a hash") unless (parameters.first || {}).kind_of?(Hash)
 
         execute_flow_block(before_each_blocks, current_platform, new_lane, parameters)
 
         pretty = [new_lane]
         pretty = [current_platform, new_lane] if current_platform
         Actions.execute_action("Switch to #{pretty.join(' ')} lane") {} # log the action
-        UI.success "Cruising over to lane '#{pretty.join(' ')}' 🚖"
+        UI.message("Cruising over to lane '#{pretty.join(' ')}' 🚖")
 
         # Actually switch lane now
         self.current_lane = new_lane
-        collector.did_launch_action(:lane_switch)
+
         result = block.call(parameters.first || {}) # to always pass a hash
         self.current_lane = original_lane
 
@@ -164,48 +208,82 @@ module Fastlane
         # Call the platform specific after block and then the general one
         execute_flow_block(after_each_blocks, current_platform, new_lane, parameters)
 
-        UI.success "Cruising back to lane '#{original_full}' 🚘".green
+        UI.message("Cruising back to lane '#{original_full}' 🚘")
         return result
       else
         raise LaneNotAvailableError.new, "Lane not found"
       end
     end
 
-    def execute_action(method_sym, class_ref, arguments, custom_dir: nil)
-      custom_dir ||= '..'
-      collector.did_launch_action(method_sym)
+    def execute_action(method_sym, class_ref, arguments, custom_dir: nil, from_action: false)
+      if from_action == true
+        custom_dir = "." # We preserve the directory from where the previous action was called from
+      elsif custom_dir.nil?
+        custom_dir ||= "." if Helper.test?
+        custom_dir ||= ".."
+      end
 
       verify_supported_os(method_sym, class_ref)
 
       begin
         Dir.chdir(custom_dir) do # go up from the fastlane folder, to the project folder
-          Actions.execute_action(class_ref.step_text) do
-            # arguments is an array by default, containing an hash with the actual parameters
-            # Since we usually just need the passed hash, we'll just use the first object if there is only one
-            if arguments.count == 0
-              arguments = ConfigurationHelper.parse(class_ref, {}) # no parameters => empty hash
-            elsif arguments.count == 1 and arguments.first.kind_of? Hash
-              arguments = ConfigurationHelper.parse(class_ref, arguments.first) # Correct configuration passed
-            elsif !class_ref.available_options
-              # This action does not use the new action format
-              # Just passing the arguments to this method
-            else
-              UI.user_error!("You have to call the integration like `#{method_sym}(key: \"value\")`. Run `fastlane action #{method_sym}` for all available keys. Please check out the current documentation on GitHub.")
-            end
+          # Removing step_name before its parsed into configurations
+          args = arguments.kind_of?(Array) && arguments.first.kind_of?(Hash) ? arguments.first : {}
+          step_name = args.delete(:step_name)
 
-            class_ref.runner = self # needed to call another action form an action
-            class_ref.run(arguments)
+          # arguments is an array by default, containing an hash with the actual parameters
+          # Since we usually just need the passed hash, we'll just use the first object if there is only one
+          if arguments.count == 0
+            configurations = ConfigurationHelper.parse(class_ref, {}) # no parameters => empty hash
+          elsif arguments.count == 1 && arguments.first.kind_of?(Hash)
+            configurations = ConfigurationHelper.parse(class_ref, arguments.first) # Correct configuration passed
+          elsif !class_ref.available_options
+            # This action does not use the new action format
+            # Just passing the arguments to this method
+            configurations = arguments
+          else
+            UI.user_error!("You have to call the integration like `#{method_sym}(key: \"value\")`. Run `fastlane action #{method_sym}` for all available keys. Please check out the current documentation on GitHub.")
+          end
+
+          # If another action is calling this action, we shouldn't show it in the summary
+          # A nil value for action_name will hide it from the summary
+          unless from_action
+            action_name = step_name
+            action_name ||= class_ref.method(:step_text).arity == 1 ? class_ref.step_text(configurations) : class_ref.step_text
+          end
+
+          Actions.execute_action(action_name) do
+            if Fastlane::Actions.is_deprecated?(class_ref)
+              puts("==========================================".deprecated)
+              puts("This action (#{method_sym}) is deprecated".deprecated)
+              puts(class_ref.deprecated_notes.to_s.remove_markdown.deprecated) if class_ref.deprecated_notes
+              puts("==========================================\n".deprecated)
+            end
+            class_ref.runner = self # needed to call another action from an action
+            return class_ref.run(configurations)
           end
         end
+      rescue Interrupt => e
+        raise e # reraise the interruption to avoid logging this as a crash
+      rescue FastlaneCore::Interface::FastlaneCommonException => e # these are exceptions that we don't count as crashes
+        raise e
       rescue FastlaneCore::Interface::FastlaneError => e # user_error!
-        collector.did_raise_error(method_sym)
+        action_completed(method_sym.to_s, status: FastlaneCore::ActionCompletionStatus::USER_ERROR, exception: e)
         raise e
       rescue Exception => e # rubocop:disable Lint/RescueException
         # high chance this is actually FastlaneCore::Interface::FastlaneCrash, but can be anything else
         # Catches all exceptions, since some plugins might use system exits to get out
-        collector.did_crash(method_sym)
+        action_completed(method_sym.to_s, status: FastlaneCore::ActionCompletionStatus::FAILED, exception: e)
         raise e
       end
+    end
+
+    def action_completed(action_name, status: nil, exception: nil)
+      #  https://github.com/fastlane/fastlane/issues/11913
+      # if exception.nil? || exception.fastlane_should_report_metrics?
+      #   action_completion_context = FastlaneCore::ActionCompletionContext.context_for_action_name(action_name, args: ARGV, status: status)
+      #   FastlaneCore.session.action_completed(completion_context: action_completion_context)
+      # end
     end
 
     def execute_flow_block(block, current_platform, lane, parameters)
@@ -216,24 +294,14 @@ module Fastlane
 
     def verify_supported_os(name, class_ref)
       if class_ref.respond_to?(:is_supported?)
-        if Actions.lane_context[Actions::SharedValues::PLATFORM_NAME]
-          # This value is filled in based on the executed platform block. Might be nil when lane is in root of Fastfile
-          platform = Actions.lane_context[Actions::SharedValues::PLATFORM_NAME]
-
+        # This value is filled in based on the executed platform block. Might be nil when lane is in root of Fastfile
+        platform = Actions.lane_context[Actions::SharedValues::PLATFORM_NAME]
+        if platform
           unless class_ref.is_supported?(platform)
-            UI.user_error!("Action '#{name}' doesn't support required operating system '#{platform}'.")
+            UI.important("Action '#{name}' isn't known to support operating system '#{platform}'.")
           end
         end
       end
-    end
-
-    def collector
-      @collector ||= ActionCollector.new
-    end
-
-    # Fastfile was finished executing
-    def did_finish
-      collector.did_finish
     end
 
     # Called internally to setup the runner object
@@ -243,7 +311,7 @@ module Fastlane
     def add_lane(lane, override = false)
       lanes[lane.platform] ||= {}
 
-      if !override and lanes[lane.platform][lane.name]
+      if !override && lanes[lane.platform][lane.name]
         UI.user_error!("Lane '#{lane.name}' was defined multiple times!")
       end
 
@@ -259,19 +327,32 @@ module Fastlane
     end
 
     def set_before_all(platform, block)
+      unless before_all_blocks[platform].nil?
+        UI.error("You defined multiple `before_all` blocks in your `Fastfile`. The last one being set will be used.")
+      end
       before_all_blocks[platform] = block
     end
 
     def set_after_all(platform, block)
+      unless after_all_blocks[platform].nil?
+        UI.error("You defined multiple `after_all` blocks in your `Fastfile`. The last one being set will be used.")
+      end
       after_all_blocks[platform] = block
     end
 
     def set_error(platform, block)
+      unless error_blocks[platform].nil?
+        UI.error("You defined multiple `error` blocks in your `Fastfile`. The last one being set will be used.")
+      end
       error_blocks[platform] = block
     end
 
     def lanes
       @lanes ||= {}
+    end
+
+    def did_finish
+      # to maintain compatibility with other sibling classes that have this API
     end
 
     def before_each_blocks

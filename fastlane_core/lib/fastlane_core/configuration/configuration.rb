@@ -1,6 +1,8 @@
-require 'fastlane_core/configuration/config_item'
-require 'fastlane_core/configuration/commander_generator'
-require 'fastlane_core/configuration/configuration_file'
+require_relative '../helper'
+require_relative '../globals'
+require_relative 'config_item'
+require_relative 'commander_generator'
+require_relative 'configuration_file'
 
 module FastlaneCore
   class Configuration
@@ -14,8 +16,15 @@ module FastlaneCore
     # @return [String] The name of the configuration file (not the path). Optional!
     attr_accessor :config_file_name
 
+    # @return [Hash] Options that were set from a config file using load_configuration_file. Optional!
+    attr_accessor :config_file_options
+
     def self.create(available_options, values)
+      UI.user_error!("values parameter must be a hash") unless values.kind_of?(Hash)
       v = values.dup
+      v.each do |key, val|
+        v[key] = val.dup if val.kind_of?(String) # this is necessary when fetching a value from an environment variable
+      end
 
       if v.kind_of?(Hash) && available_options.kind_of?(Array) # we only want to deal with the new configuration system
         # Now see if --verbose would be a valid input
@@ -31,9 +40,27 @@ module FastlaneCore
     # @!group Setting up the configuration
     #####################################################
 
+    # collect sensitive strings
+    def self.sensitive_strings
+      @sensitive_strings ||= []
+    end
+
     def initialize(available_options, values)
       self.available_options = available_options || []
       self.values = values || {}
+      self.config_file_options = {}
+
+      # used for pushing and popping values to provide nesting configuration contexts
+      @values_stack = []
+
+      # if we are in captured output mode - keep a array of sensitive option values
+      # those will be later - replaced by ####
+      if FastlaneCore::Globals.capture_output?
+        available_options.each do |element|
+          next unless element.sensitive
+          self.class.sensitive_strings << values[element.key]
+        end
+      end
 
       verify_input_types
       verify_value_exists
@@ -43,25 +70,21 @@ module FastlaneCore
     end
 
     def verify_input_types
-      UI.user_error!("available_options parameter must be an array of ConfigItems but is #{@available_options.class}") unless @available_options.kind_of? Array
+      UI.user_error!("available_options parameter must be an array of ConfigItems but is #{@available_options.class}") unless @available_options.kind_of?(Array)
       @available_options.each do |item|
-        UI.user_error!("available_options parameter must be an array of ConfigItems. Found #{item.class}.") unless item.kind_of? ConfigItem
+        UI.user_error!("available_options parameter must be an array of ConfigItems. Found #{item.class}.") unless item.kind_of?(ConfigItem)
       end
-      UI.user_error!("values parameter must be a hash") unless @values.kind_of? Hash
+      UI.user_error!("values parameter must be a hash") unless @values.kind_of?(Hash)
     end
 
     def verify_value_exists
       # Make sure the given value keys exist
       @values.each do |key, value|
         next if key == :trace # special treatment
-        option = option_for_key(key)
-        if option
-          @values[key] = option.auto_convert_value(value)
-          UI.deprecated("Using deprecated option: '--#{key}' (#{option.deprecated})") if option.deprecated
-          option.verify!(@values[key]) # Call the verify block for it too
-        else
-          UI.user_error!("Could not find option '#{key}' in the list of available options: #{@available_options.collect(&:key).join(', ')}")
-        end
+        option = self.verify_options_key!(key)
+        @values[key] = option.auto_convert_value(value)
+        UI.deprecated("Using deprecated option: '--#{key}' (#{option.deprecated})") if option.deprecated
+        option.verify!(@values[key]) # Call the verify block for it too
       end
     end
 
@@ -97,7 +120,7 @@ module FastlaneCore
           index = @available_options.find_index { |item| item.key == conflicting_option_key }
           conflicting_option = @available_options[index]
 
-          # ignore conflicts because because value of conflict option is nil
+          # ignore conflicts because value of conflict option is nil
           next if @values[conflicting_option.key].nil?
 
           if current.conflict_block
@@ -135,24 +158,49 @@ module FastlaneCore
     # Take a look at how `gym` uses this method
     #
     # @param config_file_name [String] The name of the configuration file to use (optional)
-    # @param block_for_missing [Block] A ruby block that is called when there is an unkonwn method
+    # @param block_for_missing [Block] A ruby block that is called when there is an unknown method
     #   in the configuration file
-    def load_configuration_file(config_file_name = nil, block_for_missing = nil)
+    def load_configuration_file(config_file_name = nil, block_for_missing = nil, skip_printing_values = false)
       return unless config_file_name
 
       self.config_file_name = config_file_name
 
-      paths = []
-      paths += Dir["./fastlane/#{self.config_file_name}"]
-      paths += Dir["./.fastlane/#{self.config_file_name}"]
-      paths += Dir["./#{self.config_file_name}"]
-      paths += Dir["./spec/fixtures/#{self.config_file_name}"] if Helper.is_test?
-      return if paths.count == 0
+      path = FastlaneCore::Configuration.find_configuration_file_path(config_file_name: config_file_name)
+      return if path.nil?
 
-      path = paths.first
-      configuration_file = ConfigurationFile.new(self, path, block_for_missing)
+      begin
+        configuration_file = ConfigurationFile.new(self, path, block_for_missing, skip_printing_values)
+        options = configuration_file.options
+      rescue FastlaneCore::ConfigurationFile::ExceptionWhileParsingError => e
+        options = e.recovered_options
+        wrapped_exception = e.wrapped_exception
+      end
+
+      # Make sure all the values set in the config file pass verification
+      options.each do |key, val|
+        option = self.verify_options_key!(key)
+        option.verify!(val)
+      end
+
+      # Merge the new options into the old ones, keeping all previously set keys
+      self.config_file_options = options.merge(self.config_file_options)
+
       verify_conflicts # important, since user can set conflicting options in configuration file
+
+      # Now that everything is verified, re-raise an exception that was raised in the config file
+      raise wrapped_exception unless wrapped_exception.nil?
+
       configuration_file
+    end
+
+    def self.find_configuration_file_path(config_file_name: nil)
+      paths = []
+      paths += Dir["./fastlane/#{config_file_name}"]
+      paths += Dir["./.fastlane/#{config_file_name}"]
+      paths += Dir["./#{config_file_name}"]
+      paths += Dir["./fastlane_core/spec/fixtures/#{config_file_name}"] if Helper.test?
+      return nil if paths.count == 0
+      return paths.first
     end
 
     #####################################################
@@ -160,33 +208,31 @@ module FastlaneCore
     #####################################################
 
     # Returns the value for a certain key. fastlane_core tries to fetch the value from different sources
-    # if 'ask' is true and the value is not present, the user will be prompted to provide a value
-    def fetch(key, ask: true)
-      UI.user_error!("Key '#{key}' must be a symbol. Example :app_id.") unless key.kind_of?(Symbol)
+    # if 'ask' is true and the value is not present, the user will be prompted to provide a value if optional
+    # if 'force_ask' is true, the option is not required to be optional to ask
+    # rubocop:disable Metrics/PerceivedComplexity
+    def fetch(key, ask: true, force_ask: false)
+      UI.crash!("Key '#{key}' must be a symbol. Example :#{key}") unless key.kind_of?(Symbol)
 
-      option = option_for_key(key)
-      UI.user_error!("Could not find option for key :#{key}. Available keys: #{@available_options.collect(&:key).join(', ')}") unless option
+      option = verify_options_key!(key)
 
-      value = @values[key]
+      # Same order as https://docs.fastlane.tools/advanced/#priorities-of-parameters-and-options
+      value = if @values.key?(key) && !@values[key].nil?
+                @values[key]
+              elsif (env_value = option.fetch_env_value)
+                env_value
+              elsif self.config_file_options.key?(key)
+                self.config_file_options[key]
+              else
+                option.default_value
+              end
 
       value = option.auto_convert_value(value)
-
-      # `if value == nil` instead of ||= because false is also a valid value
-      if value.nil? and option.env_name and ENV[option.env_name]
-        value = option.auto_convert_value(ENV[option.env_name].dup)
-        option.verify!(value) if value
-      end
-
-      value = option.default_value if value.nil?
-      value = nil if value.nil? and !option.string? # by default boolean flags are false
-
-      return value unless value.nil? # we already have a value
-      return value if option.optional # as this value is not required, just return what we have
-
-      return value unless ask
+      value = nil if value.nil? && !option.string? # by default boolean flags are false
+      return value unless value.nil? && (!option.optional || force_ask) && ask
 
       # fallback to asking
-      if Helper.is_test? or !UI.interactive?
+      if Helper.test? || !UI.interactive?
         # Since we don't want to be asked on tests, we'll just call the verify block with no value
         # to raise the exception that is shown when the user passes an invalid value
         set(key, '')
@@ -195,24 +241,36 @@ module FastlaneCore
       end
 
       while value.nil?
-        UI.important("To not be asked about this value, you can specify it using '#{option.key}'")
-        value = ask("#{option.description}: ")
+        UI.important("To not be asked about this value, you can specify it using '#{option.key}'") if ENV["FASTLANE_ONBOARDING_IN_PROCESS"].to_s.length == 0
+        value = option.sensitive ? UI.password("#{option.description}: ") : UI.input("#{option.description}: ")
+
+        # ConfigItem allows to specify a type for the item but UI.password and
+        # UI.input return String values. Try to convert the String input to
+        # the option's type before passing it along.
+        value = option.auto_convert_value(value)
+
         # Also store this value to use it from now on
         begin
           set(key, value)
         rescue => ex
-          puts ex
+          UI.error(ex)
           value = nil
         end
       end
 
-      value
+      # It's very, very important to use the self[:my_key] notation
+      # as this will make sure to use the `fetch` method
+      # that is responsible for auto converting the values into the right
+      # data type
+      # Found out via https://github.com/fastlane/fastlane/issues/11243
+      return self[key]
     end
+    # rubocop:enable Metrics/PerceivedComplexity
 
     # Overwrites or sets a new value for a given key
     # @param key [Symbol] Must be a symbol
     def set(key, value)
-      UI.user_error!("Key '#{key}' must be a symbol. Example :#{key}.") unless key.kind_of? Symbol
+      UI.crash!("Key '#{key}' must be a symbol. Example :#{key}.") unless key.kind_of?(Symbol)
       option = option_for_key(key)
 
       unless option
@@ -239,6 +297,25 @@ module FastlaneCore
       @values
     end
 
+    # Clears away any current configuration values by pushing them onto a stack.
+    # Values set after calling push_values! will be merged with the previous
+    # values after calling pop_values!
+    #
+    # see: pop_values!
+    def push_values!
+      @values_stack.push(@values)
+      @values = {}
+    end
+
+    # Restores a previous set of configuration values by merging any current
+    # values on top of them
+    #
+    # see: push_values!
+    def pop_values!
+      return if @values_stack.empty?
+      @values = @values_stack.pop.merge(@values)
+    end
+
     def all_keys
       @available_options.collect(&:key)
     end
@@ -251,5 +328,11 @@ module FastlaneCore
     # Aliases `[key]` to `fetch(key)` because Ruby can do it.
     alias [] fetch
     alias []= set
+
+    def verify_options_key!(key)
+      option = option_for_key(key)
+      UI.user_error!("Could not find option '#{key}' in the list of available options: #{@available_options.collect(&:key).join(', ')}") unless option
+      option
+    end
   end
 end

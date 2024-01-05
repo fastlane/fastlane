@@ -1,0 +1,43 @@
+<!--
+This file is auto-generated and will be re-generated every time the docs are updated.
+To modify it, go to its source at https://github.com/fastlane/fastlane/blob/master/fastlane/lib/assets/Actions.md.erb
+-->
+
+{!docs/includes/setup-fastlane-header.md!}
+
+# fastlane actions
+
+This page contains a list of all built-in fastlane actions and their available options.
+
+To get the most up-to-date information from the command line on your current version you can also run
+
+```sh
+fastlane actions # list all available fastlane actions
+fastlane action [action_name] # more information for a specific action
+```
+
+You can import another `Fastfile` by using the `import` action. This is useful if you have shared lanes across multiple apps and you want to store a `Fastfile` in a separate folder. The path must be relative to the `Fastfile` this is called from.
+
+```ruby
+import './path/to/other/Fastfile'
+```
+
+For _fastlane_ plugins, check out the [available plugins](/plugins/available-plugins/) page.
+If you want to create your own action, check out the [local actions](/create-action/#local-actions) page.
+
+<%- @categories.each do |category, actions| -%>
+- [<%= category %>](#<%= category.gsub(" ", "-").downcase %>)
+<%- end -%>
+- [Plugins](/plugins/available-plugins/)
+
+<%- @categories.each do |category, actions| %>
+# <%= category %>
+
+Action | Description | Supported Platforms
+---|---|---
+<%- actions.sort.to_h.each do |_number_of_launches, action| -%>
+<%- link = "/actions/#{action.action_name}/" -%>
+<a href="<%= link %>"><%= action.action_name %></a> | <%= action.description %> | <%= [:ios, :android, :mac].find_all { |a| action.is_supported?(a) }.join(", ") %>
+<%- end %><%# End of actions.sort... %>
+
+<%- end %><%# End of categories.each %>

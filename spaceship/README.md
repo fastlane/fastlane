@@ -1,43 +1,28 @@
 <h3 align="center">
-  <a href="https://github.com/fastlane/fastlane/tree/master/fastlane">
+  <a href="https://docs.fastlane.tools">
     <img src="../fastlane/assets/fastlane.png" width="100" />
     <br />
     fastlane
   </a>
 </h3>
-<p align="center">
-  <a href="https://github.com/fastlane/fastlane/tree/master/deliver">deliver</a> &bull;
-  <a href="https://github.com/fastlane/fastlane/tree/master/snapshot">snapshot</a> &bull;
-  <a href="https://github.com/fastlane/fastlane/tree/master/frameit">frameit</a> &bull;
-  <a href="https://github.com/fastlane/fastlane/tree/master/pem">pem</a> &bull;
-  <a href="https://github.com/fastlane/fastlane/tree/master/sigh">sigh</a> &bull;
-  <a href="https://github.com/fastlane/fastlane/tree/master/produce">produce</a> &bull;
-  <a href="https://github.com/fastlane/fastlane/tree/master/cert">cert</a> &bull;
-  <b>spaceship</b> &bull;
-  <a href="https://github.com/fastlane/fastlane/tree/master/pilot">pilot</a> &bull;
-  <a href="https://github.com/fastlane/boarding">boarding</a> &bull;
-  <a href="https://github.com/fastlane/fastlane/tree/master/gym">gym</a> &bull;
-  <a href="https://github.com/fastlane/fastlane/tree/master/scan">scan</a> &bull;
-  <a href="https://github.com/fastlane/fastlane/tree/master/match">match</a>
-</p>
+
 -------
 
 <p align="center">
   <img src="assets/spaceship.png" width="470">
 </p>
--------
-
-[![Twitter: @FastlaneTools](https://img.shields.io/badge/contact-@KrauseFx-blue.svg?style=flat)](https://twitter.com/KrauseFx)
-[![License](http://img.shields.io/badge/license-MIT-green.svg?style=flat)](https://github.com/fastlane/fastlane/blob/master/spaceship/LICENSE)
-[![Coverage Status](https://coveralls.io/repos/fastlane/spaceship/badge.svg?branch=master&t=ldL8gg)](https://coveralls.io/r/fastlane/spaceship?branch=master)
-[![Gem](https://img.shields.io/gem/v/spaceship.svg?style=flat)](http://rubygems.org/gems/spaceship)
-[![Build Status](https://img.shields.io/circleci/project/fastlane/fastlane/master.svg?style=flat)](https://circleci.com/gh/fastlane/fastlane)
-
-
-Get in contact with the developers on Twitter: [@KrauseFx](https://twitter.com/KrauseFx) and [@snatchev](https://twitter.com/snatchev)
-
 
 -------
+
+[![Twitter: @FastlaneTools](https://img.shields.io/badge/contact-@FastlaneTools-blue.svg?style=flat)](https://twitter.com/FastlaneTools)
+[![License](https://img.shields.io/badge/license-MIT-green.svg?style=flat)](https://github.com/fastlane/fastlane/blob/master/LICENSE)
+
+_spaceship_ exposes both the Apple Developer Center and the App Store Connect API. It’s super fast, well tested and supports all of the operations you can do via the browser. It powers parts of _fastlane_, and can be leveraged for more advanced _fastlane_ features. Scripting your Developer Center workflow has never been easier!
+
+Get in contact with the creators on Twitter: [@FastlaneTools](https://twitter.com/fastlanetools)
+
+-------
+
 <p align="center">
     <a href="#whats-spaceship">Why?</a> &bull;
     <a href="#usage">Usage</a> &bull;
@@ -48,23 +33,25 @@ Get in contact with the developers on Twitter: [@KrauseFx](https://twitter.com/K
 
 -------
 
-<h5 align="center"><code>spaceship</code> is part of <a href="https://fastlane.tools">fastlane</a>: The easiest way to automate building and releasing your iOS and Android apps.</h5>
+<h5 align="center"><em>spaceship</em> is part of <a href="https://fastlane.tools">fastlane</a>: The easiest way to automate beta deployments and releases for your iOS and Android apps.</h5>
 
 # What's spaceship?
 
-spaceship is a Ruby library that exposes both the Apple Developer Center and the iTunes Connect API. It’s super fast, well tested and supports all of the operations you can do via the browser. Scripting your Developer Center workflow has never been easier!
+_spaceship_ uses a combination of [5 different API endpoints](#api-endpoints), used by the Apple Developer Portal and Xcode. As no API offers everything we need, spaceship combines all APIs for you. [More details about the APIs](#technical-details).
 
-Up until now, the [fastlane tools](https://fastlane.tools) used web scraping to interact with Apple's web services. With spaceship it is possible to directly access the underlying APIs using a simple HTTP client only.
-
-Using spaceship, the execution time of [sigh](https://github.com/fastlane/fastlane/tree/master/sigh) was reduced from over 1 minute to less than 5 seconds.
-
-spaceship uses a combination of 3 different API endpoints, used by the Apple Developer Portal and Xcode. As no API offers everything we need, spaceship combines all APIs for you. [More details about the APIs](#technical-details).
+- Blazing fast communication using only a HTTP client
+- Object oriented access to all resources
+- Resistant against front-end design changes of the of the Apple Developer Portal
+- One central tool for the communication
+- Automatic re-trying of requests in case a timeout occurs
+- No web scraping
+- 90%+ test coverage by stubbing server responses
 
 More details about why spaceship is useful on [spaceship.airforce](https://spaceship.airforce).
 
 > No matter how many apps or certificates you have, spaceship **can** handle your scale.
 
-Enough words, here is some code:
+## Example spaceship code
 
 ```ruby
 Spaceship.login
@@ -80,128 +67,105 @@ profile = Spaceship.provisioning_profile.app_store.create!(bundle_id: app.bundle
                                                          certificate: cert)
 
 # Print the name and download the new profile
-puts "Created Profile " + profile.name
+puts("Created Profile " + profile.name)
 profile.download
 ```
 
 ## Speed
 
-How fast are tools using `spaceship` compared to web scraping?
+Before _spaceship_, the [fastlane tools](https://fastlane.tools) used web scraping to interact with Apple's web services. With spaceship it is possible to directly access the underlying APIs using a simple HTTP client only.
+
+Using spaceship, the execution time of [_sigh_](https://docs.fastlane.tools/actions/sigh/) was reduced from over 1 minute to less than 5 seconds.
 
 ![assets/SpaceshipRecording.gif](assets/SpaceshipRecording.gif)
 
 # Installation
 
-    sudo gem install spaceship
+_spaceship_ is part of _fastlane_:
+
+    gem install fastlane
 
 # Usage
 
 ## Playground
 
-To try `spaceship`, just run `spaceship`. It will automatically start the `spaceship playground`. It makes it super easy to try `spaceship` :rocket:
+To try _spaceship_, just run `fastlane spaceship`. It will automatically start the `spaceship playground`. It makes it super easy to try _spaceship_ :rocket:
 
 ![assets/docs/Playground.png](assets/docs/Playground.png)
 
-This requires you to install `pry` using `sudo gem install pry`. `pry` is not installed by default, as most [fastlane](https://fastlane.tools) users won't need the `spaceship playground`. You can add the `pry` dependency to your `Gemfile`.
+This requires you to install `pry` using `gem install pry`. `pry` is not installed by default, as most [_fastlane_](https://fastlane.tools) users won't need the `spaceship playground`. You can add the `pry` dependency to your `Gemfile`.
 
 ## Apple Developer Portal API
 
-##### Open [DeveloperPortal.md](docs/DeveloperPortal.md) for code samples
+Open [DeveloperPortal.md](docs/DeveloperPortal.md) for code samples
 
-## iTunes Connect API
+## App Store Connect API
 
-##### Open [iTunesConnect.md](docs/iTunesConnect.md) for code samples
+Open [AppStoreConnect.md](docs/AppStoreConnect.md) for code samples
 
 ## 2 Step Verification
 
-When your Apple account has 2 step verification enabled, you'll automatically be asked to verify your identity using your phone. The resulting session will be stored in `~/.spaceship/[email]/cookie`. The session should be valid for about one month, however there is no way to test this without actually waiting for over a month.
+When your Apple account has 2 factor verification enabled, you'll automatically be asked to verify your identity. If you have a trusted device configured for your account, then a code will appear on the device. If you don't have any devices configured, but have trusted a phone number, then a code will be sent to your phone. The resulting session will be stored in `~/.fastlane/spaceship/[email]/cookie`. The session should be valid for about one month, however there is no way to test this without actually waiting for over a month.
 
-Since your CI system probably doesn't allow you to input values (like the verification code), you can use `spaceauth`:
+### Support for CI machines
 
-```sh
-spaceauth -u apple@krausefx.com
-```
+#### Web sessions
 
-This will authenticate you and provide a string that can be transfered to your CI system:
+See [Best Practices > Continuous Integration > Authenticating with Apple services > Method 2: Two-step or two-factor authentication > Storing a manually verified session using spaceauth](https://docs.fastlane.tools/best-practices/continuous-integration/#storing-a-manually-verified-session-using-spaceauth)
 
-```
-export FASTLANE_SESSION='---\n- !ruby/object:HTTP::Cookie\n  name: DES5c148586dfd451e55afbaaa5f62418f91\n  value: HSARMTKNSRVTWFla1+yO4gVPowH17VaaaxPFnUdMUegQZxqy1Ie1c2v6bM1vSOzIbuOmrl/FNenlScsd/NbF7/Lw4cpnL15jsyg0TOJwP32tC/NguPiyOaaaU+jrj4tf4uKdIywVaaaFSRVT\n  domain: idmsa.apple.com\n  for_domain: true\n  path: "/"\n  secure: true\n  httponly: true\n  expires: 2016-04-27 23:55:56.000000000 Z\n  max_age: \n  created_at: 2016-03-28 16:55:57.032086000 -07:00\n  accessed_at: 2016-03-28 19:11:17.828141000 -07:00\n'
-```
+#### Transporter
 
-Copy everything from `---\n` to your CI server and provide it as environment variable named `FASTLANE_SESSION`. 
+See [Best Practices > Continuous Integration > Authenticating with Apple services > Method 3: Application-specific passwords](https://docs.fastlane.tools/best-practices/continuous-integration/#method-3-application-specific-passwords)
 
-### Spaceship in use
+## _spaceship_ in use
 
-Most [fastlane tools](https://fastlane.tools) already use `spaceship`, like `sigh`, `cert`, `produce`, `pilot` and `boarding`.
+All [fastlane tools](https://fastlane.tools) that communicate with Apple's web services in some way, use _spaceship_ to do so.
 
 # Technical Details
 
-## HTTP Client
-
-Up until now all [fastlane tools](https://fastlane.tools) used web scraping to interact with Apple's web services. `spaceship` uses a simple HTTP client only, resulting in much less overhead and extremely improved speed.
-
-Advantages of `spaceship` (HTTP client) over web scraping:
-
-- Blazing fast :rocket: 90% faster than previous methods
-- No more overhead by loading images, HTML, JS and CSS files on each page load
-- Great test coverage by stubbing server responses
-- Resistant against design changes of the Apple Developer Portal
-- Automatic re-trying of requests in case a timeout occurs
-
 ## API Endpoints
 
-I won't go into too much technical details about the various API endpoints, but just to give you an idea:
+Overview of the used API endpoints
 
-- `https://idmsa.apple.com`: Used to authenticate to get a valid session
+- `https://idmsa.apple.com`:
+  - Used to authenticate to get a valid session
 - `https://developerservices2.apple.com`:
- - Get a detailed list of all available provisioning profiles
- - This API returns the devices, certificates and app for each of the profiles
- - Register new devices
+  - Get a list of all available provisioning profiles
+  - Register new devices
 - `https://developer.apple.com`:
- - List all devices, certificates, apps and app groups
- - Create new certificates, provisioning profiles and apps
- - Disable/enable services on apps and assign them to app groups
- - Delete certificates and apps
- - Repair provisioning profiles
- - Download provisioning profiles
- - Team selection
-- `https://itunesconnect.apple.com`:
- - Managing apps
- - Managing beta testers
- - Submitting updates to review
- - Managing app metadata
-- `https://du-itc.itunesconnect.apple.com`:
- - Upload icons, screenshots, trailers ...
+  - List all devices, certificates, apps and app groups
+  - Create new certificates, provisioning profiles and apps
+  - Disable/enable services on apps and assign them to app groups
+  - Delete certificates and apps
+  - Repair provisioning profiles
+  - Download provisioning profiles
+  - Team selection
+- `https://appstoreconnect.apple.com`:
+  - Managing apps
+  - Managing beta testers
+  - Submitting updates to review
+  - Managing app metadata
+- `https://du-itc.appstoreconnect.apple.com`:
+  - Upload icons, screenshots, trailers ...
+- `https://is[1-9]-ssl.mzstatic.com`:
+  - Download app screenshots from App Store Connect
 
-`spaceship` uses all those API points to offer this seamless experience.
+_spaceship_ uses all those API points to offer this seamless experience.
 
 ## Magic involved
 
-`spaceship` does a lot of magic to get everything working so neatly:
+_spaceship_ does a lot of magic to get everything working so neatly:
 
 - **Sensible Defaults**: You only have to provide the mandatory information (e.g. new provisioning profiles contain all devices by default)
-- **Local Validation**: When pushing changes back to the Apple Dev Portal `spaceship` will make sure only valid data is sent to Apple (e.g. automatic repairing of provisioning profiles)
-- **Various request/response types**: When working with the different API endpoints, `spaceship` has to deal with `JSON`, `XML`, `txt`, `plist` and sometimes even `HTML` responses and requests.
-- **Automatic Pagination**: Even if you have thousands of apps, profiles or certificates, `spaceship` **can** handle your scale. It was heavily tested by first using `spaceship` to create hundreds of profiles and then accessing them using `spaceship`.
-- **Session, Cookie and CSRF token**: All the security aspects are handled by `spaceship`.
-- **Profile Magic**: Create and upload code signing requests, all managed by `spaceship`
-- **Multiple Spaceship**: You can launch multiple `spaceships` with different Apple accounts to do things like syncing the registered devices.
-
-# Credits
-
-The initial release was sponsored by [ZeroPush](https://zeropush.com).
-
-`spaceship` was developed by
-- [@KrauseFx](https://twitter.com/KrauseFx).
-- [@snatchev](https://twitter.com/snatchev/)
-- [@mathcarignani](https://twitter.com/mathcarignani/)
-
-[Open full list of contributors](https://github.com/fastlane/spaceship/graphs/contributors).
-
-##### [Like this tool? Be the first to know about updates and new fastlane tools](https://tinyletter.com/krausefx)
+- **Local Validation**: When pushing changes back to the Apple Developer Portal _spaceship_ will make sure only valid data is sent to Apple (e.g. automatic repairing of provisioning profiles)
+- **Various request/response types**: When working with the different API endpoints, _spaceship_ has to deal with `JSON`, `XML`, `txt`, `plist` and sometimes even `HTML` responses and requests.
+- **Automatic Pagination**: Even if you have thousands of apps, profiles or certificates, _spaceship_ **can** handle your scale. It was heavily tested by first using _spaceship_ to create hundreds of profiles and then accessing them using _spaceship_.
+- **Session, Cookie and CSRF token**: All the security aspects are handled by _spaceship_.
+- **Profile Magic**: Create and upload code signing requests, all managed by _spaceship_
+- **Multiple Spaceship**: You can launch multiple _spaceships_ with different Apple accounts to do things like syncing the registered devices.
 
 # Code of Conduct
-Help us keep `fastlane` open and inclusive. Please read and follow our [Code of Conduct](https://github.com/fastlane/fastlane/blob/master/CODE_OF_CONDUCT.md).
+Help us keep _fastlane_ open and inclusive. Please read and follow our [Code of Conduct](https://github.com/fastlane/fastlane/blob/master/CODE_OF_CONDUCT.md).
 
 # License
 This project is licensed under the terms of the MIT license. See the LICENSE file.

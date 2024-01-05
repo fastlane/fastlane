@@ -1,34 +1,13 @@
 module Fastlane
   module Actions
-    class AppstoreAction < Action
-      def self.run(params)
-        Actions::DeliverAction.run(params)
-      end
-
+    require 'fastlane/actions/upload_to_app_store'
+    class AppstoreAction < UploadToAppStoreAction
       #####################################################
       # @!group Documentation
       #####################################################
 
       def self.description
-        "Alias for the deliver action"
-      end
-
-      def self.available_options
-        require "deliver"
-        require "deliver/options"
-        FastlaneCore::CommanderGenerator.new.generate(Deliver::Options.available_options)
-      end
-
-      def self.output
-        []
-      end
-
-      def self.author
-        'KrauseFx'
-      end
-
-      def self.is_supported?(platform)
-        Actions::DeliverAction.is_supported?(platform)
+        "Alias for the `upload_to_app_store` action"
       end
     end
   end

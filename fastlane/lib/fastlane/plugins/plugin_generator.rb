@@ -28,11 +28,11 @@ module Fastlane
         handle_template_path(template_path, plugin_info)
       end
 
-      @ui.success "\nYour plugin was successfully generated at #{plugin_info.gem_name}/ 🚀"
-      @ui.success "\nTo get started with using this plugin, run"
-      @ui.message "\n    fastlane add_plugin #{plugin_info.plugin_name}\n"
-      @ui.success "\nfrom a fastlane-enabled app project directory and provide the following as the path:"
-      @ui.message "\n    #{File.expand_path(plugin_info.gem_name)}\n\n"
+      @ui.success("\nYour plugin was successfully generated at #{plugin_info.gem_name}/ 🚀")
+      @ui.success("\nTo get started with using this plugin, run")
+      @ui.message("\n    fastlane add_plugin #{plugin_info.plugin_name}\n")
+      @ui.success("\nfrom a fastlane-enabled app project directory and provide the following as the path:")
+      @ui.message("\n    #{File.expand_path(plugin_info.gem_name)}\n\n")
     end
 
     def handle_template_path(template_path, plugin_info)

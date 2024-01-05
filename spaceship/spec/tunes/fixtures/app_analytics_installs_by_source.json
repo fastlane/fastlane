@@ -1,0 +1,100 @@
+{
+  "size": 5,
+  "results": [
+    {
+      "adamId": "898536088",
+      "meetsThreshold": true,
+      "group": {
+        "key": "AppRef",
+        "title": "App Referrer"
+      },
+      "data": [
+        {
+          "date": "2018-07-29T00:00:00Z",
+          "installs": 0.0
+        }
+      ],
+      "totals": {
+        "value": 0.0,
+        "type": "COUNT",
+        "key": "installs"
+      }
+    },
+    {
+      "adamId": "898536088",
+      "meetsThreshold": true,
+      "group": {
+        "key": "Other",
+        "title": "App Store Browse"
+      },
+      "data": [
+        {
+          "date": "2018-07-29T00:00:00Z",
+          "installs": 0.0
+        }
+      ],
+      "totals": {
+        "value": 0.0,
+        "type": "COUNT",
+        "key": "installs"
+      }
+    },
+    {
+      "adamId": "898536088",
+      "meetsThreshold": true,
+      "group": {
+        "key": "Search",
+        "title": "App Store Search"
+      },
+      "data": [
+        {
+          "date": "2018-07-29T00:00:00Z",
+          "installs": 0.0
+        }
+      ],
+      "totals": {
+        "value": 0.0,
+        "type": "COUNT",
+        "key": "installs"
+      }
+    },
+    {
+      "adamId": "898536088",
+      "meetsThreshold": true,
+      "group": {
+        "key": "Unknown",
+        "title": "Unavailable"
+      },
+      "data": [
+        {
+          "date": "2018-07-29T00:00:00Z",
+          "installs": 0.0
+        }
+      ],
+      "totals": {
+        "value": 0.0,
+        "type": "COUNT",
+        "key": "installs"
+      }
+    },
+    {
+      "adamId": "898536088",
+      "meetsThreshold": true,
+      "group": {
+        "key": "WebRef",
+        "title": "Web Referrer"
+      },
+      "data": [
+        {
+          "date": "2018-07-29T00:00:00Z",
+          "installs": 0.0
+        }
+      ],
+      "totals": {
+        "value": 0.0,
+        "type": "COUNT",
+        "key": "installs"
+      }
+    }
+  ]
+}

@@ -1,5 +1,9 @@
 module Fastlane
   module Actions
+    module SharedValues
+      FL_CHANGELOG ||= :FL_CHANGELOG # originally defined in ChangelogFromGitCommitsAction
+    end
+
     class MakeChangelogFromJenkinsAction < Action
       def self.run(params)
         require 'json'
@@ -7,7 +11,7 @@ module Fastlane
 
         changelog = ""
 
-        if Helper.is_ci? || Helper.is_test?
+        if Helper.ci? || Helper.test?
           # The "BUILD_URL" environment variable is set automatically by Jenkins in every build
           jenkins_api_url = URI(ENV["BUILD_URL"] + "api/json\?wrapper\=changes\&xpath\=//changeSet//comment")
           begin
@@ -41,7 +45,7 @@ module Fastlane
           FastlaneCore::ConfigItem.new(key: :include_commit_body,
                                        description: "Include the commit body along with the summary",
                                        optional: true,
-                                       is_string: false,
+                                       type: Boolean,
                                        default_value: true)
         ]
       end
@@ -58,6 +62,19 @@ module Fastlane
 
       def self.is_supported?(platform)
         true
+      end
+
+      def self.example_code
+        [
+          'make_changelog_from_jenkins(
+            # Optional, lets you set a changelog in the case is not generated on Jenkins or if ran outside of Jenkins
+            fallback_changelog: "Bug fixes and performance enhancements"
+          )'
+        ]
+      end
+
+      def self.category
+        :misc
       end
     end
   end

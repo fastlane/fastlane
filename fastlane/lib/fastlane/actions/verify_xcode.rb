@@ -33,12 +33,26 @@ module Fastlane
             "Authority=Apple Root CA",
             "TeamIdentifier=59GAB85EFG"
           ],
-          [ # Found on Xcode installations downloaded from developer.apple.com
+          [ # Found on App Store installed Xcode installations post-Xcode 11.3
+            "Identifier=com.apple.dt.Xcode",
+            "Authority=Apple Mac OS Application Signing",
+            "Authority=Apple Worldwide Developer Relations Certification Authority",
+            "Authority=Apple Root CA",
+            "TeamIdentifier=APPLECOMPUTER"
+          ],
+          [ # Found on Xcode installations (pre-Xcode 8) downloaded from developer.apple.com
             "Identifier=com.apple.dt.Xcode",
             "Authority=Software Signing",
             "Authority=Apple Code Signing Certification Authority",
             "Authority=Apple Root CA",
             "TeamIdentifier=not set"
+          ],
+          [ # Found on Xcode installations (post-Xcode 8) downloaded from developer.apple.com
+            "Identifier=com.apple.dt.Xcode",
+            "Authority=Software Signing",
+            "Authority=Apple Code Signing Certification Authority",
+            "Authority=Apple Root CA",
+            "TeamIdentifier=59GAB85EFG"
           ]
         ]
 
@@ -63,7 +77,7 @@ module Fastlane
 
         output = verify(command: command, must_includes: must_includes, params: params)
 
-        if output.include?("source=Mac App Store") or output.include?("source=Apple") or output.include?("source=Apple System")
+        if output.include?("source=Mac App Store") || output.include?("source=Apple") || output.include?("source=Apple System")
           UI.success("Successfully verified Xcode installation at path '#{params[:xcode_path]}' 🎧")
         else
           show_and_raise_error("Invalid Download Source of Xcode: #{output}", params[:xcode_path])
@@ -105,11 +119,7 @@ module Fastlane
       end
 
       def self.details
-        [
-          "This action was implemented after the recent Xcode attack to make sure",
-          "you're not using a hacked Xcode installation.",
-          "http://researchcenter.paloaltonetworks.com/2015/09/novel-malware-xcodeghost-modifies-xcode-infects-apple-ios-apps-and-hits-app-store/"
-        ].join("\n")
+        "This action was implemented after the recent Xcode attack to make sure you're not using a [hacked Xcode installation](http://researchcenter.paloaltonetworks.com/2015/09/novel-malware-xcodeghost-modifies-xcode-infects-apple-ios-apps-and-hits-app-store/)."
       end
 
       def self.available_options
@@ -117,7 +127,9 @@ module Fastlane
           FastlaneCore::ConfigItem.new(key: :xcode_path,
                                        env_name: "FL_VERIFY_XCODE_XCODE_PATH",
                                        description: "The path to the Xcode installation to test",
+                                       code_gen_sensitive: true,
                                        default_value: File.expand_path('../../', FastlaneCore::Helper.xcode_path),
+                                       default_value_dynamic: true,
                                        verify_block: proc do |value|
                                          UI.user_error!("Couldn't find Xcode at path '#{value}'") unless File.exist?(value)
                                        end)
@@ -130,6 +142,17 @@ module Fastlane
 
       def self.is_supported?(platform)
         [:ios, :mac].include?(platform)
+      end
+
+      def self.example_code
+        [
+          'verify_xcode',
+          'verify_xcode(xcode_path: "/Applications/Xcode.app")'
+        ]
+      end
+
+      def self.category
+        :building
       end
     end
   end

@@ -1,13 +1,10 @@
 module Fastlane
   module Actions
-    module SharedValues
-    end
-
     class GitBranchAction < Action
       def self.run(params)
-        return ENV['GIT_BRANCH'] if ENV['GIT_BRANCH']
-        return ENV["TRAVIS_BRANCH"] if ENV["TRAVIS_BRANCH"]
-        `git symbolic-ref HEAD --short 2>/dev/null`.strip
+        branch = Actions.git_branch || ""
+        return "" if branch == "HEAD" # Backwards compatibility with the original (and documented) implementation
+        branch
       end
 
       #####################################################
@@ -15,11 +12,11 @@ module Fastlane
       #####################################################
 
       def self.description
-        "Returns the name of the current git branch"
+        "Returns the name of the current git branch, possibly as managed by CI ENV vars"
       end
 
       def self.details
-        "If no branch could be found, this action will return nil"
+        "If no branch could be found, this action will return an empty string. If `FL_GIT_BRANCH_DONT_USE_ENV_VARS` is `true`, it'll ignore CI ENV vars. This is a wrapper for the internal action Actions.git_branch"
       end
 
       def self.available_options
@@ -27,7 +24,9 @@ module Fastlane
       end
 
       def self.output
-        []
+        [
+          ['GIT_BRANCH_ENV_VARS', 'The git branch environment variables']
+        ]
       end
 
       def self.authors
@@ -36,6 +35,20 @@ module Fastlane
 
       def self.is_supported?(platform)
         true
+      end
+
+      def self.example_code
+        [
+          'git_branch'
+        ]
+      end
+
+      def self.return_type
+        :string
+      end
+
+      def self.category
+        :source_control
       end
     end
   end

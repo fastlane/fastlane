@@ -21,7 +21,7 @@ describe Fastlane do
             Fastlane::FastFile.new.parse("lane :test do
               verify_pod_keys
             end").runner.execute(:test)
-          end.to_not raise_error
+          end.to_not(raise_error)
         end
       end
 

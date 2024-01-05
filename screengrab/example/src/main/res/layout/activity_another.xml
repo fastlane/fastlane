@@ -13,4 +13,13 @@
         android:layout_height="wrap_content"
         android:gravity="center"/>
 
+    <Button
+        android:id="@+id/show_dialog_button"
+        android:layout_marginTop="16dp"
+        android:layout_below="@+id/hello"
+        android:layout_centerHorizontal="true"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/show_dialog"/>
+
 </RelativeLayout>

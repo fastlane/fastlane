@@ -10,7 +10,7 @@ module Fastlane
       end
 
       def self.description
-        "Shows a Mac OS X notification"
+        "Shows a macOS notification - use `notification` instead"
       end
 
       def self.author
@@ -22,6 +22,18 @@ module Fastlane
 
       def self.is_supported?(platform)
         Helper.mac?
+      end
+
+      def self.example_code
+        nil
+      end
+
+      def self.category
+        :deprecated
+      end
+
+      def self.deprecated_notes
+        "It's recommended to use the new `notification` action instead of `notify`"
       end
     end
   end

@@ -1,5 +1,9 @@
+require_relative 'device_types'
+
 module Frameit
   class ConfigParser
+    attr_reader :data
+
     def load(path)
       return nil unless File.exist?(path) # we are okay with no config at all
       UI.verbose("Parsing config file '#{path}'")
@@ -12,8 +16,8 @@ module Frameit
       begin
         @data = JSON.parse(data)
       rescue => ex
-        UI.error ex.message
-        UI.user_error! "Invalid JSON file at path '#{@path}'. Make sure it's a valid JSON file"
+        UI.error(ex.message)
+        UI.user_error!("Invalid JSON file at path '#{@path}'. Make sure it's a valid JSON file")
       end
 
       self
@@ -22,11 +26,14 @@ module Frameit
     # Fetches the finished configuration for a given path. This will try to look for a specific value
     # and fallback to a default value if nothing was found
     def fetch_value(path)
-      specific = @data['data'].find { |a| path.include? a['filter'] }
+      specifics = @data['data'].select { |a| path.include?(a['filter']) }
 
       default = @data['default']
 
-      values = default.fastlane_deep_merge(specific || {})
+      values = default.clone
+      specifics.each do |specific|
+        values = values.fastlane_deep_merge(specific)
+      end
 
       change_paths_to_absolutes!(values)
       validate_values(values)
@@ -37,19 +44,19 @@ module Frameit
     # Use absolute paths instead of relative
     def change_paths_to_absolutes!(values)
       values.each do |key, value|
-        if value.kind_of? Hash
+        if value.kind_of?(Hash)
           change_paths_to_absolutes!(value) # recursive call
-        elsif value.kind_of? Array
+        elsif value.kind_of?(Array)
           value.each do |current|
-            change_paths_to_absolutes!(current) if current.kind_of? Hash # recursive call
+            change_paths_to_absolutes!(current) if current.kind_of?(Hash) # recursive call
           end
         else
-          if ['font', 'background'].include? key
+          if ['font', 'background'].include?(key)
             # Change the paths to relative ones
             # `replace`: to change the content of the string, so it's actually stored
             if @path # where is the config file. We don't have a config file in tests
               containing_folder = File.expand_path('..', @path)
-              value.replace File.join(containing_folder, value)
+              value.replace(File.join(containing_folder, value))
             end
           end
         end
@@ -62,35 +69,68 @@ module Frameit
         if value.kind_of?(Hash)
           validate_values(value) # recursive call
         else
-          if key == 'font'
-            UI.user_error!("Could not find font at path '#{File.expand_path(value)}'") unless File.exist?(value)
-          end
-
-          if key == 'fonts'
-            UI.user_error!("`fonts` must be an array") unless value.kind_of?(Array)
-
-            value.each do |current|
-              UI.user_error!("You must specify a font path") if current.fetch('font', '').length == 0
-              UI.user_error!("Could not find font at path '#{File.expand_path(current.fetch('font'))}'") unless File.exist?(current.fetch('font'))
-              UI.user_error!("`supported` must be an array") unless current.fetch('supported', []).kind_of? Array
-            end
-          end
-
-          if key == 'background'
-            UI.user_error!("Could not find background image at path '#{File.expand_path(value)}'") unless File.exist? value
-          end
-
-          if key == 'color'
-            UI.user_error!("Invalid color '#{value}'. Must be valid Hex #123123") unless value.include?("#")
-          end
-
-          if key == 'padding'
-            unless value.kind_of?(Integer) || value.split('x').length == 2
-              UI.user_error!("padding must be type integer or pair of integers of format 'AxB'")
-            end
-          end
+          validate_key(key, value)
         end
       end
+    end
+
+    def validate_key(key, value)
+      case key
+      when 'font'
+        UI.user_error!("Could not find font at path '#{File.expand_path(value)}'") unless File.exist?(value)
+      when 'fonts'
+        check_fonts(value)
+      when 'background'
+        UI.user_error!("Could not find background image at path '#{File.expand_path(value)}'") unless File.exist?(value)
+      when 'color'
+        UI.user_error!("Invalid color '#{value}'. Must be valid Hex #123123") unless value.include?("#")
+      when 'padding'
+        unless integer_or_percentage(value) || value.split('x').length == 2
+          UI.user_error!("padding must be an integer, or pair of integers of format 'AxB', or a percentage of screen size")
+        end
+      when 'title_min_height'
+        unless integer_or_percentage(value)
+          UI.user_error!("padding must be an integer, or a percentage of screen size")
+        end
+      when 'show_complete_frame', 'title_below_image'
+        UI.user_error!("'#{key}' must be a Boolean") unless [true, false].include?(value)
+      when 'font_scale_factor'
+        UI.user_error!("font_scale_factor must be numeric") unless value.kind_of?(Numeric)
+      when 'frame'
+        UI.user_error!("Invalid frame color '#{value}'. Frame color must be one of " + Color.all_colors.join(', ')) unless ConfigParser.supported_color?(value)
+      when 'use_platform'
+        UI.user_error!("Invalid platform type '#{value}'. Available values are " + Platform.all_platforms.join(', ') + ".") unless ConfigParser.supported_platform?(value)
+      when 'force_device_type'
+        UI.user_error!("Invalid device type '#{value}'. Available values: " + Devices.all_device_names_without_apple.join(', ')) unless ConfigParser.supported_device?(value)
+      end
+    end
+
+    def check_fonts(value)
+      UI.user_error!("`fonts` must be an array") unless value.kind_of?(Array)
+
+      value.each do |current|
+        UI.user_error!("You must specify a font path") if current.fetch('font', '').length == 0
+        UI.user_error!("Could not find font at path '#{File.expand_path(current.fetch('font'))}'") unless File.exist?(current.fetch('font'))
+        UI.user_error!("`supported` must be an array") unless current.fetch('supported', []).kind_of?(Array)
+      end
+    end
+
+    def integer_or_percentage(value)
+      value.kind_of?(Integer) || (value.end_with?('%') && value.to_f > 0)
+    end
+
+    def self.supported_color?(value)
+      return false if value.nil?
+      Color.all_colors.any?(value)
+    end
+
+    def self.supported_platform?(value)
+      return false if value.nil?
+      Platform.all_platforms.any?(value)
+    end
+
+    def self.supported_device?(value)
+      return !Device.find_device_by_id_or_name(value).nil?
     end
   end
 end

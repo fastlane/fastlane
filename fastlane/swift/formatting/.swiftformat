@@ -1,0 +1,37 @@
+--exclude Fastlane.swift,Fastfile.swift
+
+# format options
+
+--allman false
+--binarygrouping 4,8
+--commas always
+--comments indent
+--decimalgrouping ignore
+--elseposition same-line
+--empty void
+--exponentcase lowercase
+--exponentgrouping disabled
+--fractiongrouping disabled
+--header ignore
+--hexgrouping 4,8
+--hexliteralcase uppercase
+--ifdef indent
+--indent 4
+--indentcase false
+--importgrouping testable-bottom
+--linebreaks lf
+--octalgrouping 4,8
+--operatorfunc spaced
+--patternlet hoist
+--ranges spaced
+--self remove
+--semicolons inline
+--stripunusedargs always
+--trimwhitespace always
+--wraparguments preserve
+--wrapcollections preserve
+--header "{file}\nCopyright (c) {year} FastlaneTools"
+
+# rules
+
+--enable isEmpty

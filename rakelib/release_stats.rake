@@ -1,7 +1,3 @@
-require 'date'
-require 'terminal-table'
-require 'colored'
-
 RED_COMMIT_COUNT = 5
 RED_DAY_COUNT = 14
 
@@ -23,8 +19,13 @@ def sort_by_commit_count(rows)
   rows.sort_by! { |row| row[1].to_i }.reverse
 end
 
-desc 'Print stats about how much time has passed and work has happened since the last release of each tool'
-task :release_stats do
+desc('Print stats about how much time has passed and work has happened since the last release of each tool')
+task(:release_stats) do
+  require 'date'
+  require 'terminal-table'
+  require 'colored'
+  require 'shellwords'
+
   `git pull --tags`
 
   now = Time.now
@@ -45,7 +46,7 @@ task :release_stats do
   rows = sort_by_commit_count(rows)
   rows = colorize_rows(rows)
 
-  puts Terminal::Table.new(title: 'How Long Since the Last Release?'.green,
+  puts(Terminal::Table.new(title: 'How Long Since the Last Release?'.green,
                            headings: ['Tool', 'Commits', 'Days'],
-                           rows: rows)
+                           rows: rows))
 end

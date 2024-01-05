@@ -1,0 +1,18 @@
+# frozen_string_literal: true
+
+task(default: %w[setup])
+
+task(setup: [:brew, :lint])
+
+task(:brew) do
+  raise '`brew` is required. Please install brew. https://brew.sh/' unless system('which brew')
+
+  puts('➡️  Brew')
+  sh('brew bundle')
+end
+
+task(:lint) do
+  Dir.chdir('..') do
+    sh("swiftformat . --config formatting/.swiftformat --verbose --selfrequired waitWithPolling --exclude Fastfile.swift --swiftversion 4.0")
+  end
+end

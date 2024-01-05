@@ -1,0 +1,121 @@
+---
+- !ruby/object:HTTP::Cookie
+  name: dc
+  value: "-1"
+  domain: itunes.apple.com
+  for_domain: true
+  path: "/"
+  secure: false
+  httponly: false
+  expires:
+  max_age: 3600
+  created_at: &1 2019-04-02 09:10:30.550571000 +11:00
+  accessed_at: *1
+- !ruby/object:HTTP::Cookie
+  name: aa
+  value: aa_value
+  domain: idmsa.apple.com
+  for_domain: true
+  path: "/"
+  secure: true
+  httponly: true
+  expires:
+  max_age:
+  created_at: &2 2019-04-02 09:10:29.241247000 +11:00
+  accessed_at: *2
+- !ruby/object:HTTP::Cookie
+  name: DES123456789012345678901234567890123
+  value: DES_value
+  domain: idmsa.apple.com
+  for_domain: true
+  path: "/"
+  secure: true
+  httponly: true
+  expires:
+  max_age: 2592000
+  created_at: 2019-03-26 12:14:50.450738000 +11:00
+  accessed_at: 2019-04-02 09:10:27.988931000 +11:00
+- !ruby/object:HTTP::Cookie
+  name: dslang
+  value: US-EN
+  domain: apple.com
+  for_domain: true
+  path: "/"
+  secure: true
+  httponly: true
+  expires:
+  max_age:
+  created_at: 2019-04-02 09:10:29.241376000 +11:00
+  accessed_at: &3 2019-04-02 09:10:29.242939000 +11:00
+- !ruby/object:HTTP::Cookie
+  name: site
+  value: USA
+  domain: apple.com
+  for_domain: true
+  path: "/"
+  secure: true
+  httponly: true
+  expires:
+  max_age:
+  created_at: 2019-04-02 09:10:29.241531000 +11:00
+  accessed_at: *3
+- !ruby/object:HTTP::Cookie
+  name: acn01
+  value: acn01_value
+  domain: apple.com
+  for_domain: true
+  path: "/"
+  secure: true
+  httponly: true
+  expires:
+  max_age: 31536000
+  created_at: 2019-04-02 09:10:29.241770000 +11:00
+  accessed_at: *3
+- !ruby/object:HTTP::Cookie
+  name: myacinfo
+  value: myacinfo_value
+  domain: apple.com
+  for_domain: true
+  path: "/"
+  secure: true
+  httponly: true
+  expires:
+  max_age:
+  created_at: 2019-04-02 09:10:29.242011000 +11:00
+  accessed_at: *3
+- !ruby/object:HTTP::Cookie
+  name: itctx
+  value: itctx_value
+  domain: apple.com
+  for_domain: true
+  path: "/"
+  secure: true
+  httponly: true
+  expires:
+  max_age:
+  created_at: &4 2019-04-02 09:10:30.550735000 +11:00
+  accessed_at: *4
+- !ruby/object:HTTP::Cookie
+  name: itcdq
+  value: '0'
+  domain: apple.com
+  for_domain: true
+  path: "/"
+  secure: true
+  httponly: false
+  expires:
+  max_age:
+  created_at: &5 2019-04-02 09:10:30.550837000 +11:00
+  accessed_at: *5
+- !ruby/object:HTTP::Cookie
+  name: dqsid
+  value: dqsid_value
+  domain: olympus.itunes.apple.com
+  for_domain: false
+  path: "/"
+  secure: true
+  httponly: true
+  expires:
+  max_age: 1800
+  created_at: &6 2019-04-02 09:10:30.550448000 +11:00
+  accessed_at: *6

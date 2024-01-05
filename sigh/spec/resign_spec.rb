@@ -16,6 +16,23 @@ describe Sigh do
       @resign = Sigh::Resign.new
     end
 
+    it "Create provisioning options from hash" do
+      tmp_path = Dir.mktmpdir
+      provisioning_profiles = {
+        "at.fastlane" => "#{tmp_path}/folder/mobile.mobileprovision",
+        "at.fastlane.today" => "#{tmp_path}/folder/mobile.today.mobileprovision"
+      }
+      provisioning_options = @resign.create_provisioning_options(provisioning_profiles)
+      expect(provisioning_options).to eq("-p at.fastlane=#{tmp_path}/folder/mobile.mobileprovision -p at.fastlane.today=#{tmp_path}/folder/mobile.today.mobileprovision")
+    end
+
+    it "Create provisioning options from array" do
+      tmp_path = Dir.mktmpdir
+      provisioning_profiles = ["#{tmp_path}/folder/mobile.mobileprovision"]
+      provisioning_options = @resign.create_provisioning_options(provisioning_profiles)
+      expect(provisioning_options).to eq("-p #{tmp_path}/folder/mobile.mobileprovision")
+    end
+
     it "Installed identities parser" do
       stub_request_valid_identities(@resign, VALID_IDENTITIES_OUTPUT)
       actualresult = @resign.installed_identities
@@ -35,7 +52,7 @@ describe Sigh do
     it "SHA1 for identity with name input" do
       stub_request_valid_identities(@resign, VALID_IDENTITIES_OUTPUT)
       actualresult = @resign.sha1_for_signing_identity(IDENTITY_3_NAME)
-      # due to order of of identities in the VALID_IDENTITIES_OUTPUT and since names of identities 2) and 3) are aqual
+      # due to order of of identities in the VALID_IDENTITIES_OUTPUT and since names of identities 2) and 3) are equal
       # sha1_for_signing_identity(name) returns first matching SHA1 for identity name
       expect(actualresult).to eq(IDENTITY_2_SHA1)
     end

@@ -1,0 +1,7 @@
+lane :beta do
+  UI.user_error!("Original error")
+end
+
+error do
+  UI.user_error!("Error in error")
+end

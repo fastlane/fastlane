@@ -18,7 +18,7 @@ module Fastlane
         message = "#{emoticon} #{options[:message]}"
 
         note_path = File.expand_path(options[:note_path]) if options[:note_path]
-        if note_path and File.exist?(note_path)
+        if note_path && File.exist?(note_path)
           contents = File.read(note_path)
           message += "\n\n```\n#{contents}\n```"
         end
@@ -52,7 +52,7 @@ module Fastlane
       end
 
       def self.description
-        "Post a message to Typetalk"
+        "Post a message to [Typetalk](https://www.typetalk.com/)"
       end
 
       def self.available_options
@@ -71,6 +71,22 @@ module Fastlane
 
       def self.is_supported?(platform)
         true
+      end
+
+      def self.example_code
+        [
+          'typetalk(
+            message: "App successfully released!",
+            note_path: "ChangeLog.md",
+            topicId: 1,
+            success: true,
+            typetalk_token: "Your Typetalk Token"
+          )'
+        ]
+      end
+
+      def self.category
+        :notifications
       end
     end
   end

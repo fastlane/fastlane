@@ -1,6 +1,6 @@
 # fastlane danger Device Grid
 
-Ever dream of testing your app straight from a pull request? Well now you can! With [fastlane](https://fastlane.tools), [danger](https://github.com/danger/danger) and [appetize.io](https://appetize.io/), you can stream your latest changes right from the browser.
+Ever dream of testing your app straight from a pull request? Well now you can! With [_fastlane_](https://fastlane.tools), [danger](https://github.com/danger/danger) and [appetize.io](https://appetize.io/), you can stream your latest changes right from the browser.
 
 No more manually installing and testing your app just to review a PR.
 
@@ -10,7 +10,7 @@ No more manually installing and testing your app just to review a PR.
 
 ## Requirements
 
-- [fastlane](https://fastlane.tools)
+- [_fastlane_](https://fastlane.tools)
 - [danger](https://github.com/danger/danger)
 - [appetize.io](https://appetize.io/) account
 - A Continuous Integration system
@@ -24,6 +24,7 @@ Create a `Gemfile` in your project's directory with the following content
 ```ruby
 gem "fastlane"
 gem "danger"
+gem "danger-device_grid"
 ```
 
 and run
@@ -32,9 +33,9 @@ and run
 bundle install
 ```
 
-### Setup `fastlane`
+### Setup _fastlane_
 
-Skip this step if you're already using `fastlane` (which you should)
+Skip this step if you're already using _fastlane_ (which you should)
 
 ```
 fastlane init
@@ -53,7 +54,7 @@ Follow the `danger` guide to authenticate with GitHub
 Edit `Dangerfile` and replace the content with
 
 ```ruby
-puts "Running fastlane to generate and upload an ipa file..."
+puts("Running fastlane to generate and upload an ipa file...")
 
 options = {
   xcodebuild: {
@@ -66,9 +67,7 @@ require 'fastlane'
 result = Fastlane::OneOff.run(action: "build_and_upload_to_appetize",
                           parameters: options)
 
-require 'fastlane/actions/device_grid/device_grid'
-
-device_grid(
+device_grid.run(
   public_key: result,
   languages: ["en", "de"],
   devices: ["iphone5s", "iphone6splus", "ipadair"]
@@ -153,6 +152,6 @@ UI.message("Generated URL: #{url}")
 #### Disclaimer
 
 All product names, logos, and brands are property of their respective owners.  
-The used device frames were provided by Facebook via the [Facebook Design Resources](https://facebook.github.io/design/devices.html). `fastlane` is in no way affiliated with Facebook.
+The used device frames were provided by Facebook via the [Facebook Design Resources](https://facebook.github.io/design/devices.html). _fastlane_ is in no way affiliated with Facebook.
 
 > While Facebook has redrawn and shares these assets for the benefit of the design community, Facebook does not own any of the underlying product or user interface designs. By accessing these assets, you agree to obtain all necessary permissions from the underlying rights holders and/or adhere to any applicable brand use guidelines before using them. Facebook disclaims all express or implied warranties with respect to these assets, including non-infringement of intellectual property rights.

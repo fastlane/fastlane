@@ -25,7 +25,7 @@ describe Fastlane do
           result = Fastlane::FastFile.new.parse("lane :test do
             download(url: '#{url}')
           end").runner.execute(:test)
-        end.to raise_error "Error fetching remote file: execution expired"
+        end.to raise_error("Error fetching remote file: execution expired")
       end
     end
   end

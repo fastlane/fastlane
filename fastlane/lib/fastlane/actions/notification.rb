@@ -6,19 +6,19 @@ module Fastlane
 
         options = params.values
         # :message is non-optional
-        message = options.delete :message
+        message = options.delete(:message)
         # remove nil keys, since `notify` below does not ignore them and instead translates them into empty strings in output, which looks ugly
         options = options.select { |_, v| v }
         option_map = {
           app_icon: :appIcon,
           content_image: :contentImage
         }
-        options = Hash[options.map { |k, v| [option_map.fetch(k, k), v] }]
+        options = options.transform_keys { |k| option_map.fetch(k, k) }
         TerminalNotifier.notify(message, options)
       end
 
       def self.description
-        "Display a Mac OS X notification with custom message and title"
+        "Display a macOS notification with custom message and title"
       end
 
       def self.author
@@ -59,6 +59,16 @@ module Fastlane
 
       def self.is_supported?(platform)
         Helper.mac?
+      end
+
+      def self.example_code
+        [
+          'notification(subtitle: "Finished Building", message: "Ready to upload...")'
+        ]
+      end
+
+      def self.category
+        :notifications
       end
     end
   end

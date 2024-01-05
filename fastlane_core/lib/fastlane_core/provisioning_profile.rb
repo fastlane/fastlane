@@ -1,3 +1,5 @@
+require_relative 'ui/ui'
+
 module FastlaneCore
   class ProvisioningProfile
     class << self
@@ -21,21 +23,53 @@ module FastlaneCore
       #   "TimeToLive"=>185,
       #   "UUID"=>"1752e382-53bd-4910-a393-aaa7de0005ad",
       #   "Version"=>1}
-      def parse(path)
+      def parse(path, keychain_path = nil)
         require 'plist'
 
-        plist = Plist.parse_xml(`security cms -D -i "#{path}"`)
+        plist = Plist.parse_xml(decode(path, keychain_path))
         if (plist || []).count > 5
           plist
         else
-          UI.error("Error parsing provisioning profile at path '#{path}'")
-          nil
+          UI.crash!("Error parsing provisioning profile at path '#{path}'")
         end
       end
 
       # @return [String] The UUID of the given provisioning profile
-      def uuid(path)
-        parse(path).fetch("UUID")
+      def uuid(path, keychain_path = nil)
+        parse(path, keychain_path).fetch("UUID")
+      end
+
+      # @return [String] The Name of the given provisioning profile
+      def name(path, keychain_path = nil)
+        parse(path, keychain_path).fetch("Name")
+      end
+
+      def bundle_id(path, keychain_path = nil)
+        profile = parse(path, keychain_path)
+        app_id_prefix = profile["ApplicationIdentifierPrefix"].first
+        entitlements = profile["Entitlements"]
+        app_identifier = entitlements["application-identifier"] || entitlements["com.apple.application-identifier"]
+        bundle_id = app_identifier.gsub("#{app_id_prefix}.", "")
+        bundle_id
+      rescue
+        UI.error("Unable to extract the Bundle Id from the provided provisioning profile '#{path}'.")
+      end
+
+      def mac?(path, keychain_path = nil)
+        parse(path, keychain_path).fetch("Platform", []).include?('OSX')
+      end
+
+      def profile_filename(path, keychain_path = nil)
+        basename = uuid(path, keychain_path)
+        basename + profile_extension(path, keychain_path)
+      end
+
+      def profile_extension(path, keychain_path = nil)
+        if mac?(path, keychain_path)
+          ".provisionprofile"
+        else
+          ".mobileprovision"
+        end
       end
 
       def profiles_path
@@ -49,10 +83,9 @@ module FastlaneCore
       end
 
       # Installs a provisioning profile for Xcode to use
-      def install(path)
+      def install(path, keychain_path = nil)
         UI.message("Installing provisioning profile...")
-        profile_filename = uuid(path) + ".mobileprovision"
-        destination = File.join(profiles_path, profile_filename)
+        destination = File.join(profiles_path, profile_filename(path, keychain_path))
 
         if path != destination
           # copy to Xcode provisioning profile directory
@@ -62,7 +95,31 @@ module FastlaneCore
           end
         end
 
-        true
+        destination
+      end
+
+      private
+
+      def decode(path, keychain_path = nil)
+        require 'tmpdir'
+        Dir.mktmpdir('fastlane') do |dir|
+          err = "#{dir}/cms.err"
+          # we want to prevent the error output to mix up with the standard output because of
+          # /dev/null: https://github.com/fastlane/fastlane/issues/6387
+          if Helper.mac?
+            if keychain_path.nil?
+              decoded = `security cms -D -i "#{path}" 2> #{err}`
+            else
+              decoded = `security cms -D -i "#{path}" -k "#{keychain_path.shellescape}" 2> #{err}`
+            end
+          else
+            # `security` only works on Mac, fallback to `openssl`
+            # via https://stackoverflow.com/a/14379814/252627
+            decoded = `openssl smime -inform der -verify -noverify -in #{path.shellescape} 2> #{err}`
+          end
+          UI.error("Failure to decode #{path}. Exit: #{$?.exitstatus}: #{File.read(err)}") if $?.exitstatus != 0
+          decoded
+        end
       end
     end
   end
