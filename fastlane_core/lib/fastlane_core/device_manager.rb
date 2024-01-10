@@ -11,6 +11,19 @@ module FastlaneCore
         return connected_devices(requested_os_type) + simulators(requested_os_type)
       end
 
+      def runtime_build_os_versions
+        @runtime_build_os_versions ||= begin
+          output, status = Open3.capture2('xcrun simctl list runtimes -j')
+          raise status unless status.success?
+          json = JSON.parse(output)
+          json['runtimes'].map { |h| [h['buildversion'], h['version']] }.to_h
+        rescue StandardError => e
+          UI.error(e)
+          UI.error('xcrun simctl CLI broken; cun `xcrun simctl list runtimes` and make sure it works')
+          UI.user_error!('xcrun simctl not working')
+        end
+      end
+
       def simulators(requested_os_type = "")
         UI.verbose("Fetching available simulator devices")
 
@@ -20,18 +33,6 @@ module FastlaneCore
         output = ''
         Open3.popen3('xcrun simctl list devices') do |stdin, stdout, stderr, wait_thr|
           output = stdout.read
-        end
-
-        runtime_info = ''
-        Open3.popen3('xcrun simctl list runtimes') do |stdin, stdout, stderr, wait_thr|
-          # This regex outputs the version info in the format "<platform> <version><exact version>"
-          runtime_info = stdout.read.lines.map { |v| v.sub(/(\w+ \S+)\s*\((\S+)\s[\S\s]*/, "\\1 \\2") }.drop(1)
-        end
-        exact_versions = Hash.new({})
-        runtime_info.each do |r|
-          platform, general, exact = r.split
-          exact_versions[platform] = {} unless exact_versions.include?(platform)
-          exact_versions[platform][general] = exact
         end
 
         unless output.include?("== Devices ==")
@@ -57,7 +58,7 @@ module FastlaneCore
 
             if matches.count && (os_type == requested_os_type || requested_os_type == "")
               # This is disabled here because the Device is defined later in the file, and that's a problem for the cop
-              @devices << Device.new(name: name, os_type: os_type, os_version: (exact_versions[os_type][os_version] || os_version), udid: udid, state: state, is_simulator: true)
+              @devices << Device.new(name: name, os_type: os_type, os_version: os_version, udid: udid, state: state, is_simulator: true)
             end
           end
         end
@@ -204,9 +205,9 @@ module FastlaneCore
         return unless os_type == "iOS"
         return if self.state == 'Booted'
 
+        # Boot the simulator and wait for it to finish booting
         UI.message("Booting #{self}")
-
-        `xcrun simctl boot #{self.udid} 2>/dev/null`
+        `xcrun simctl bootstatus #{self.udid} -b &> /dev/null`
         self.state = 'Booted'
       end
 
@@ -289,6 +290,7 @@ module FastlaneCore
 
       def clear_cache
         @devices = nil
+        @runtime_build_os_versions = nil
       end
 
       def launch(device)

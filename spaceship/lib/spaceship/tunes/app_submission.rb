@@ -22,7 +22,7 @@ module Spaceship
 
       # To pass from the user
 
-      # @deprecated Setted automatically by <tt>add_id_info_uses_idfa</tt> usage
+      # @deprecated Set automatically by <tt>add_id_info_uses_idfa</tt> usage
       # @return (Boolean) Ad ID Info - Limits ads tracking
       # <b>DEPRECATED:</b> Use <tt>add_id_info_uses_idfa</tt> instead.
       attr_accessor :add_id_info_limits_tracking

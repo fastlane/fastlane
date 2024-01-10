@@ -103,15 +103,28 @@ describe Fastlane::PluginGenerator do
       gemfile_lines = File.read(gemfile).lines
 
       [
-        "source('https://rubygems.org')\n",
-        "gemspec\n"
+        "source('https://rubygems.org')",
+        "gem 'bundler'",
+        "gem 'fastlane', '>= #{Fastlane::VERSION}'",
+        "gem 'pry'",
+        "gem 'rake'",
+        "gem 'rspec'",
+        "gem 'rspec_junit_formatter'",
+        "gem 'rubocop', '#{Fastlane::RUBOCOP_REQUIREMENT}'",
+        "gem 'rubocop-performance'",
+        "gem 'rubocop-require_tools'",
+        "gem 'simplecov'",
+        "gemspec"
       ].each do |line|
-        expect(gemfile_lines).to include(line)
+        # Expect them to match approximately, e.g. using regex
+        expect(gemfile_lines).to include("#{line}\n")
       end
     end
 
     it "creates a plugin.rb file for the plugin" do
-      plugin_rb_file = File.join(tmp_dir, gem_name, 'lib', 'fastlane', 'plugin', "#{plugin_name}.rb")
+      relative_path = File.join('lib', 'fastlane', 'plugin', "#{plugin_name}.rb")
+      plugin_rb_file = File.join(tmp_dir, gem_name, relative_path)
+
       expect(File.exist?(plugin_rb_file)).to be(true)
 
       plugin_rb_contents = File.read(plugin_rb_file)
@@ -122,7 +135,10 @@ describe Fastlane::PluginGenerator do
         $LOAD_PATH.unshift(lib) unless $LOAD_PATH.include?(lib)
 
         # rubocop:disable Security/Eval
-        eval(plugin_rb_contents)
+        # Starting with Ruby 3.3, we must pass the __FILE__ of the actual file location for the all_class method implementation to work.
+        # Also, we expand the relative_path within Dir.chdir, as Dir.chdir on macOS will make it so tmp paths will always be under /private,
+        # while expand_path called from outside of Dir.chdir will not be prefixed by /private
+        eval(plugin_rb_contents, binding, File.expand_path(relative_path), __LINE__)
         # rubocop:enable Security/Eval
 
         # If we evaluate the contents of the generated plugin.rb file,
@@ -219,18 +235,7 @@ describe Fastlane::PluginGenerator do
         expect(gemspec.version).to eq(Gem::Version.new('0.1.0'))
         expect(gemspec.email).to eq(email)
         expect(gemspec.summary).to eq(summary)
-        expect(gemspec.development_dependencies).to contain_exactly(
-          Gem::Dependency.new("pry", Gem::Requirement.new([">= 0"]), :development),
-          Gem::Dependency.new("bundler", Gem::Requirement.new([">= 0"]), :development),
-          Gem::Dependency.new("rspec", Gem::Requirement.new([">= 0"]), :development),
-          Gem::Dependency.new("rspec_junit_formatter", Gem::Requirement.new([">= 0"]), :development),
-          Gem::Dependency.new("rake", Gem::Requirement.new([">= 0"]), :development),
-          Gem::Dependency.new("rubocop", Gem::Requirement.new([Fastlane::RUBOCOP_REQUIREMENT]), :development),
-          Gem::Dependency.new("rubocop-require_tools", Gem::Requirement.new([">= 0"]), :development),
-          Gem::Dependency.new("rubocop-performance", Gem::Requirement.new([">= 0"]), :development),
-          Gem::Dependency.new("simplecov", Gem::Requirement.new([">= 0"]), :development),
-          Gem::Dependency.new("fastlane", Gem::Requirement.new([">= #{Fastlane::VERSION}"]), :development)
-        )
+        expect(gemspec.development_dependencies).to eq([])
       end
     end
 

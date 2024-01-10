@@ -162,6 +162,7 @@ describe Deliver::UploadMetadata do
              locale: 'en-US')
     end
     let(:app_info) { double('app_info') }
+    let(:live_app_info) { nil }
     let(:app_info_localization_en) do
       double('app_info_localization_en',
              locale: 'en-US')
@@ -237,15 +238,18 @@ describe Deliver::UploadMetadata do
         # Verify available languages
         expect(app).to receive(:id).and_return(id)
         expect(app).to receive(:get_edit_app_store_version).and_return(version)
-        expect(app).to receive(:fetch_edit_app_info).and_return(app_info)
+        expect(uploader).to receive(:fetch_edit_app_info).and_return(app_info)
 
         # Get versions
         expect(app).to receive(:get_edit_app_store_version).and_return(version)
         expect(version).to receive(:get_app_store_version_localizations).and_return([version_localization_en])
 
         # Get app infos
-        expect(app).to receive(:fetch_edit_app_info).and_return(app_info)
-        expect(app_info).to receive(:get_app_info_localizations).and_return([app_info_localization_en])
+        if app_info
+          expect(app_info).to receive(:get_app_info_localizations).and_return([app_info_localization_en])
+        else
+          expect(live_app_info).to receive(:get_app_info_localizations).and_return([app_info_localization_en])
+        end
       end
 
       context "normal metadata" do
@@ -257,10 +261,16 @@ describe Deliver::UploadMetadata do
               description: { "en-US" => "App description" }
           }
 
-          # Get number of verions (used for if whats_new should be sent)
+          # Get number of versions (used for if whats_new should be sent)
           expect(Spaceship::ConnectAPI).to receive(:get_app_store_versions).and_return(app_store_versions)
 
           expect(version).to receive(:update).with(attributes: {})
+
+          # Get app info
+          expect(app_info).to receive(:get_app_info_localizations).and_return([app_info_localization_en])
+
+          # Get app info localization English (Used to compare with data to upload)
+          expect(app_info_localization_en).to receive(:name).and_return('App Name')
 
           # Update version localization
           expect(version_localization_en).to receive(:update).with(attributes: {
@@ -279,6 +289,31 @@ describe Deliver::UploadMetadata do
         end
       end
 
+      context "with privacy_url" do
+        it 'saves privacy_url' do
+          options = {
+            platform: "ios",
+            metadata_path: metadata_path,
+            privacy_url: { "en-US" => "https://fastlane.tools" },
+            apple_tv_privacy_policy: { "en-US" => "https://fastlane.tools/tv" }
+          }
+
+          # Get number of versions (used for if whats_new should be sent)
+          expect(Spaceship::ConnectAPI).to receive(:get_app_store_versions).and_return(app_store_versions)
+
+          expect(version).to receive(:update).with(attributes: {})
+
+          # Validate symbol names used when comparing privacy urls before upload
+          expect(app_info_localization_en).to receive(:privacy_policy_url).and_return(options[:privacy_url]["en-US"])
+          expect(app_info_localization_en).to receive(:privacy_policy_text).and_return(options[:apple_tv_privacy_policy]["en-US"])
+
+          # Update app info
+          expect(app_info).to receive(:update_categories).with(category_id_map: {})
+
+          uploader.upload(options)
+        end
+      end
+
       context "with auto_release_date" do
         it 'with date' do
           options = {
@@ -287,7 +322,7 @@ describe Deliver::UploadMetadata do
               auto_release_date: 1_595_395_800_000
           }
 
-          # Get number of verions (used for if whats_new should be sent)
+          # Get number of version (used for if whats_new should be sent)
           expect(Spaceship::ConnectAPI).to receive(:get_app_store_versions).and_return(app_store_versions)
 
           expect(version).to receive(:update).with(attributes: {
@@ -311,7 +346,7 @@ describe Deliver::UploadMetadata do
               automatic_release: false
           }
 
-          # Get number of verions (used for if whats_new should be sent)
+          # Get number of version (used for if whats_new should be sent)
           expect(Spaceship::ConnectAPI).to receive(:get_app_store_versions).and_return(app_store_versions)
 
           # Defaults to release type manual
@@ -340,7 +375,7 @@ describe Deliver::UploadMetadata do
               phased_release: false
           }
 
-          # Get number of verions (used for if whats_new should be sent)
+          # Get number of version (used for if whats_new should be sent)
           expect(Spaceship::ConnectAPI).to receive(:get_app_store_versions).and_return(app_store_versions)
 
           # Defaults to release type manual
@@ -368,7 +403,7 @@ describe Deliver::UploadMetadata do
               reset_ratings: true
           }
 
-          # Get number of verions (used for if whats_new should be sent)
+          # Get number of version (used for if whats_new should be sent)
           expect(Spaceship::ConnectAPI).to receive(:get_app_store_versions).and_return(app_store_versions)
 
           # Defaults to release type manual
@@ -393,7 +428,7 @@ describe Deliver::UploadMetadata do
               reset_ratings: false
           }
 
-          # Get number of verions (used for if whats_new should be sent)
+          # Get number of version (used for if whats_new should be sent)
           expect(Spaceship::ConnectAPI).to receive(:get_app_store_versions).and_return(app_store_versions)
 
           # Defaults to release type manual
@@ -411,6 +446,83 @@ describe Deliver::UploadMetadata do
 
           uploader.upload(options)
         end
+      end
+
+      context "with no editable app info" do
+        let(:live_app_info) { double('app_info') }
+        let(:app_info) { nil }
+        it 'no new app info provided by user' do
+          options = {
+              platform: "ios",
+              metadata_path: metadata_path,
+          }
+
+          # Get live app info
+          expect(app).to receive(:fetch_live_app_info).and_return(live_app_info)
+
+          # Get number of versions (used for if whats_new should be sent)
+          expect(Spaceship::ConnectAPI).to receive(:get_app_store_versions).and_return(app_store_versions)
+          expect(version).to receive(:update).with(attributes: {})
+
+          uploader.upload(options)
+        end
+
+        it 'same app info as live version' do
+          options = {
+              platform: "ios",
+              metadata_path: metadata_path,
+              name: { "en-US" => "App name" }
+          }
+
+          # Get live app info
+          expect(app).to receive(:fetch_live_app_info).and_return(live_app_info)
+
+          # Get number of versions (used for if whats_new should be sent)
+          expect(Spaceship::ConnectAPI).to receive(:get_app_store_versions).and_return(app_store_versions)
+
+          expect(version).to receive(:update).with(attributes: {})
+
+          # Get app info localization in English (used to compare with data to upload)
+          expect(app_info_localization_en).to receive(:name).and_return('App name')
+
+          uploader.upload(options)
+        end
+      end
+    end
+
+    context "fail when not allowed to update" do
+      let(:live_app_info) { double('app_info') }
+      let(:app_info) { nil }
+      it 'different app info than live version' do
+        options = {
+            platform: "ios",
+            metadata_path: metadata_path,
+            name: { "en-US" => "New app name" }
+        }
+
+        allow(Deliver).to receive(:cache).and_return({ app: app })
+
+        allow(uploader).to receive(:set_review_information)
+        allow(uploader).to receive(:set_review_attachment_file)
+        allow(uploader).to receive(:set_app_rating)
+
+        # Get app info
+        expect(uploader).to receive(:fetch_edit_app_info).and_return(app_info)
+        expect(app).to receive(:fetch_live_app_info).and_return(live_app_info)
+        expect(live_app_info).to receive(:get_app_info_localizations).and_return([app_info_localization_en])
+
+        # Get versions
+        expect(app).to receive(:get_edit_app_store_version).and_return(version)
+        expect(version).to receive(:get_app_store_version_localizations).and_return([version_localization_en])
+
+        # Get app info localization in English (used to compare with data to upload)
+        expect(app_info_localization_en).to receive(:name).and_return('App name')
+
+        # Fail because app info can't be updated
+        expect(FastlaneCore::UI).to receive(:user_error!).with("Cannot update languages - could not find an editable 'App Info'. Verify that your app is in one of the editable states in App Store Connect").and_call_original
+
+        # Get app info localization in English (used to compare with data to upload)
+        expect { uploader.upload(options) }.to raise_error(FastlaneCore::Interface::FastlaneError)
       end
     end
   end

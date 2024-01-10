@@ -76,6 +76,8 @@ require 'spaceship/connect_api/models/actor'
 
 module Spaceship
   class ConnectAPI
+    MAX_OBJECTS_PER_PAGE_LIMIT = 200
+
     # Defined in the App Store Connect API docs:
     # https://developer.apple.com/documentation/appstoreconnectapi/platform
     #

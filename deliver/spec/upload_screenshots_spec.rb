@@ -14,7 +14,7 @@ describe Deliver::UploadScreenshots do
                               get_app_screenshot_sets: [app_screenshot_set])
         screenshots_per_language = { 'en-US' => [] }
 
-        # emurate Deliver::AppScreenshotIterator#each_app_screenshot_set's two behaviors with or without given block
+        # emulate Deliver::AppScreenshotIterator#each_app_screenshot_set's two behaviors with or without given block
         allow_any_instance_of(Deliver::AppScreenshotIterator).to receive(:each_app_screenshot_set) do |&args|
           next([[localization, app_screenshot_set]]) unless args
           args.call(localization, app_screenshot_set)
@@ -35,7 +35,7 @@ describe Deliver::UploadScreenshots do
                               get_app_screenshot_sets: [app_screenshot_set])
         screenshots_per_language = { 'en-US' => [] }
 
-        # emurate Deliver::AppScreenshotIterator#each_app_screenshot_set's two behaviors with or without given block
+        # emulate Deliver::AppScreenshotIterator#each_app_screenshot_set's two behaviors with or without given block
         allow_any_instance_of(Deliver::AppScreenshotIterator).to receive(:each_app_screenshot_set) do |&args|
           next([[localization, app_screenshot_set]]) unless args
           args.call(localization, app_screenshot_set)
@@ -55,7 +55,7 @@ describe Deliver::UploadScreenshots do
     subject { described_class.new }
 
     before do
-      # mock these methods partially to simplfy test cases
+      # mock these methods partially to simplify test cases
       allow(subject).to receive(:wait_for_complete)
       allow(subject).to receive(:retry_upload_screenshots_if_needed)
     end
@@ -74,6 +74,8 @@ describe Deliver::UploadScreenshots do
                                     language: 'en-US',
                                     device_type: Spaceship::ConnectAPI::AppScreenshotSet::DisplayType::APP_IPHONE_55)
           screenshots_per_language = { 'en-US' => [local_screenshot] }
+
+          allow(FastlaneCore::Helper).to receive(:show_loading_indicator).and_return(true)
           allow(described_class).to receive(:calculate_checksum).and_return('checksum')
 
           expect(app_screenshot_set).to receive(:upload_screenshot).with(path: local_screenshot.path, wait_for_processing: false)
@@ -96,6 +98,7 @@ describe Deliver::UploadScreenshots do
           screenshots_per_language = { 'en-US' => [local_screenshot] }
           allow(described_class).to receive(:calculate_checksum).and_return('checksum')
 
+          allow(FastlaneCore::Helper).to receive(:show_loading_indicator).and_return(true)
           expect(app_screenshot_set).to receive(:upload_screenshot).with(path: local_screenshot.path, wait_for_processing: false)
           subject.upload_screenshots([localization], screenshots_per_language)
         end
@@ -117,6 +120,7 @@ describe Deliver::UploadScreenshots do
         screenshots_per_language = { 'en-US' => [local_screenshot] }
         allow(described_class).to receive(:calculate_checksum).and_return('checksum')
 
+        allow(FastlaneCore::Helper).to receive(:show_loading_indicator).and_return(true)
         expect(app_screenshot_set).to receive(:upload_screenshot).with(path: local_screenshot.path, wait_for_processing: false)
         subject.upload_screenshots([localization], screenshots_per_language)
       end
@@ -139,6 +143,7 @@ describe Deliver::UploadScreenshots do
         screenshots_per_language = { 'en-US' => [local_screenshot] }
         allow(described_class).to receive(:calculate_checksum).with(local_screenshot.path).and_return('checksum')
 
+        allow(FastlaneCore::Helper).to receive(:show_loading_indicator).and_return(true)
         expect(app_screenshot_set).to_not(receive(:upload_screenshot))
         subject.upload_screenshots([localization], screenshots_per_language)
       end
@@ -159,6 +164,7 @@ describe Deliver::UploadScreenshots do
         screenshots_per_language = { 'en-US' => Array.new(11, local_screenshot) }
         allow(described_class).to receive(:calculate_checksum).with(local_screenshot.path).and_return('checksum')
 
+        allow(FastlaneCore::Helper).to receive(:show_loading_indicator).and_return(true)
         expect(app_screenshot_set).to receive(:upload_screenshot).exactly(10).times
         subject.upload_screenshots([localization], screenshots_per_language)
       end
@@ -186,6 +192,7 @@ describe Deliver::UploadScreenshots do
         allow(described_class).to receive(:calculate_checksum).with(uploaded_local_screenshot.path).and_return('checksum')
         allow(described_class).to receive(:calculate_checksum).with(new_local_screenshot.path).and_return('another_checksum')
 
+        allow(FastlaneCore::Helper).to receive(:show_loading_indicator).and_return(true)
         expect(app_screenshot_set).to_not(receive(:upload_screenshot))
         subject.upload_screenshots([localization], screenshots_per_language)
       end
@@ -215,6 +222,7 @@ describe Deliver::UploadScreenshots do
         allow(described_class).to receive(:calculate_checksum).with(uploaded_local_screenshot.path).and_return('checksum')
         allow(described_class).to receive(:calculate_checksum).with(new_local_screenshot.path).and_return('another_checksum')
 
+        allow(FastlaneCore::Helper).to receive(:show_loading_indicator).and_return(true)
         expect(app_screenshot_set).to_not(receive(:upload_screenshot))
         subject.upload_screenshots([localization], screenshots_per_language)
       end

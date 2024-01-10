@@ -18,6 +18,7 @@ require_relative 'tunes/errors'
 require_relative 'globals'
 require_relative 'provider'
 require_relative 'stats_middleware'
+require_relative 'hashcash'
 
 Faraday::Utils.default_params_encoder = Faraday::FlatParamsEncoder
 
@@ -428,7 +429,7 @@ module Spaceship
           # which is common, as the session automatically invalidates after x hours (we don't know x)
           # In this case we don't actually care about the exact exception, and why it was failing
           # because either way, we'll have to do a fresh login, where we do the actual error handling
-          puts("Available session is not valid any more. Continuing with normal login.")
+          puts("Available session is not valid anymore. Continuing with normal login.")
         end
       end
       #
@@ -490,6 +491,12 @@ module Spaceship
           modified_cookie.gsub!(unescaped_important_cookie, escaped_important_cookie)
         end
 
+        # Fixes issue https://github.com/fastlane/fastlane/issues/21071
+        # On 2023-02-23, Apple added a custom implementation
+        # of hashcash to their auth flow
+        # hashcash = nil
+        hashcash = self.fetch_hashcash
+
         response = request(:post) do |req|
           req.url("https://idmsa.apple.com/appleauth/auth/signin")
           req.body = data.to_json
@@ -498,6 +505,7 @@ module Spaceship
           req.headers['X-Apple-Widget-Key'] = self.itc_service_key
           req.headers['Accept'] = 'application/json, text/javascript'
           req.headers["Cookie"] = modified_cookie if modified_cookie
+          req.headers["X-Apple-HC"] = hashcash if hashcash
         end
       rescue UnauthorizedAccessError
         raise InvalidUserCredentialsError.new, "Invalid username and password combination. Used '#{user}' as the username."
@@ -525,7 +533,6 @@ module Spaceship
 
           if try_upgrade_2fa_later(response)
             store_cookie
-            fetch_olympus_session
             return true
           end
 
@@ -544,6 +551,21 @@ module Spaceship
       end
     end
     # rubocop:enable Metrics/PerceivedComplexity
+
+    def fetch_hashcash
+      response = request(:get, "https://idmsa.apple.com/appleauth/auth/signin?widgetKey=#{self.itc_service_key}")
+      headers = response.headers
+
+      bits = headers["X-Apple-HC-Bits"]
+      challenge = headers["X-Apple-HC-Challenge"]
+
+      if bits.nil? || challenge.nil?
+        puts("Unable to find 'X-Apple-HC-Bits' and 'X-Apple-HC-Challenge' to make hashcash")
+        return nil
+      end
+
+      return Spaceship::Hashcash.make(bits: bits, challenge: challenge)
+    end
 
     # Get the `itctx` from the new (22nd May 2017) API endpoint "olympus"
     # Update (29th March 2019) olympus migrates to new appstoreconnect API

@@ -23,7 +23,7 @@ describe Match do
       repo_dir = Dir.mktmpdir
 
       fake_storage = "fake_storage"
-      expect(Match::Storage::GitStorage).to receive(:configure).with(
+      expect(Match::Storage::GitStorage).to receive(:configure).with({
         git_url: git_url,
         shallow_clone: true,
         skip_docs: false,
@@ -36,17 +36,10 @@ describe Match do
         git_bearer_authorization: nil,
 
         clone_branch_directly: false,
-        google_cloud_bucket_name: "",
-        google_cloud_keys_file: "",
-        google_cloud_project_id: "",
-        s3_region: "",
-        s3_access_key: "",
-        s3_secret_access_key: "",
-        s3_bucket: "",
-        s3_object_prefix: "",
-        gitlab_project: nil,
-        team_id: nil
-      ).and_return(fake_storage)
+
+        type: config[:type],
+        platform: config[:platform]
+      }).and_return(fake_storage)
 
       allow(fake_storage).to receive(:download)
       allow(fake_storage).to receive(:working_directory).and_return(repo_dir)
