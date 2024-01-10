@@ -121,7 +121,7 @@ module Match
         UI.verbose("Successfully downloaded files from S3 to #{self.working_directory}")
       end
 
-      # Returns a short string describing + identifing the current
+      # Returns a short string describing + identifying the current
       # storage backend. This will be printed when nuking a storage
       def human_readable_description
         return "S3 Bucket [#{s3_bucket}] on region #{s3_region}"

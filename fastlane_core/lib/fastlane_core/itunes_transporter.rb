@@ -804,7 +804,7 @@ module FastlaneCore
       if result
         UI.header("Successfully uploaded package to App Store Connect. It might take a few minutes until it's visible online.")
 
-        FileUtils.rm_rf(actual_dir) unless Helper.test? # we don't need the package any more, since the upload was successful
+        FileUtils.rm_rf(actual_dir) unless Helper.test? # we don't need the package anymore, since the upload was successful
       else
         handle_error(@password)
       end
@@ -862,7 +862,7 @@ module FastlaneCore
       if result
         UI.header("Successfully verified package on App Store Connect")
 
-        FileUtils.rm_rf(actual_dir) unless Helper.test? # we don't need the package any more, since the upload was successful
+        FileUtils.rm_rf(actual_dir) unless Helper.test? # we don't need the package anymore, since the upload was successful
       else
         handle_error(@password)
       end

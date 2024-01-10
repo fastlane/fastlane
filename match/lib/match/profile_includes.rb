@@ -46,7 +46,7 @@ module Match
     def self.devices_differ?(portal_profile:, platform:, include_mac_in_profiles:, cached_devices:)
       return false unless portal_profile
 
-      profile_devices = portal_profile.devices
+      profile_devices = portal_profile.devices || []
 
       portal_devices = cached_devices
       portal_devices ||= Match::Portal::Fetcher.devices(platform: platform, include_mac_in_profiles: include_mac_in_profiles)
@@ -102,7 +102,7 @@ module Match
     def self.certificates_differ?(portal_profile:, platform:, cached_certificates:)
       return false unless portal_profile
 
-      profile_certs = portal_profile.certificates
+      profile_certs = portal_profile.certificates || []
 
       portal_certs = cached_certificates
       portal_certs ||= Match::Portal::Fetcher.certificates(platform: platform, profile_type: portal_profile.profile_type)

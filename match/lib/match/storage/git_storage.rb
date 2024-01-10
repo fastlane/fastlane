@@ -85,7 +85,7 @@ module Match
         self.working_directory = Dir.mktmpdir
 
         command = "git clone #{self.git_url.shellescape} #{self.working_directory.shellescape}"
-        # HTTP headers are supposed to be be case insensitive but
+        # HTTP headers are supposed to be case-insensitive but
         # Bitbucket requires `Authorization: Basic` and `Authorization Bearer` to work
         # https://github.com/fastlane/fastlane/pull/15928
         command << " -c http.extraheader='Authorization: Basic #{self.git_basic_authorization}'" unless self.git_basic_authorization.nil?

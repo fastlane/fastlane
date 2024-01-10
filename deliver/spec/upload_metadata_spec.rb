@@ -325,7 +325,7 @@ describe Deliver::UploadMetadata do
               version_check_wait_retry_limit: 5,
           }
 
-          # Get number of verions (used for if whats_new should be sent)
+          # Get number of version (used for if whats_new should be sent)
           expect(Spaceship::ConnectAPI).to receive(:get_app_store_versions).and_return(app_store_versions)
 
           expect(version).to receive(:update).with(attributes: {
@@ -350,7 +350,7 @@ describe Deliver::UploadMetadata do
               version_check_wait_retry_limit: 5,
           }
 
-          # Get number of verions (used for if whats_new should be sent)
+          # Get number of version (used for if whats_new should be sent)
           expect(Spaceship::ConnectAPI).to receive(:get_app_store_versions).and_return(app_store_versions)
 
           # Defaults to release type manual
@@ -380,7 +380,7 @@ describe Deliver::UploadMetadata do
               version_check_wait_retry_limit: 5,
           }
 
-          # Get number of verions (used for if whats_new should be sent)
+          # Get number of version (used for if whats_new should be sent)
           expect(Spaceship::ConnectAPI).to receive(:get_app_store_versions).and_return(app_store_versions)
 
           # Defaults to release type manual
@@ -409,7 +409,7 @@ describe Deliver::UploadMetadata do
               version_check_wait_retry_limit: 5,
           }
 
-          # Get number of verions (used for if whats_new should be sent)
+          # Get number of version (used for if whats_new should be sent)
           expect(Spaceship::ConnectAPI).to receive(:get_app_store_versions).and_return(app_store_versions)
 
           # Defaults to release type manual
@@ -435,7 +435,7 @@ describe Deliver::UploadMetadata do
               version_check_wait_retry_limit: 5,
           }
 
-          # Get number of verions (used for if whats_new should be sent)
+          # Get number of version (used for if whats_new should be sent)
           expect(Spaceship::ConnectAPI).to receive(:get_app_store_versions).and_return(app_store_versions)
 
           # Defaults to release type manual

@@ -390,7 +390,7 @@ module Frameit
       return font_size if !font_size.nil? && font_size > 0
 
       font_scale_factor = @config['font_scale_factor'] || 0.1
-      UI.user_error!("Parameter 'font_scale_factor' can not be 0. Please provide a value larger than 0.0 (default = 0.1).") if font_scale_factor == 0.0
+      UI.user_error!("Parameter 'font_scale_factor' cannot be 0. Please provide a value larger than 0.0 (default = 0.1).") if font_scale_factor == 0.0
       [@image.width * font_scale_factor].max.round
     end
 
