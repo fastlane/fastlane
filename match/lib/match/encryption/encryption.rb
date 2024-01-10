@@ -43,7 +43,7 @@ module Match
     # key is generated with OpenSSL::KDF::pbkdf2_hmac with properly chosen parameters
     # Short explanation about salt and IV: https://stackoverflow.com/a/1950674/6324550
     class EncryptionV2
-      ALGORITHM = 'AES-256-GCM'
+      ALGORITHM = 'aes-256-gcm'
 
       def encrypt(data, password, salt)
         cipher = ::OpenSSL::Cipher.new(ALGORITHM)
