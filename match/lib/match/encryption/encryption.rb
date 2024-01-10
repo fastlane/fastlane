@@ -28,7 +28,9 @@ module Match
         data = cipher.update(encrypted_data)
         data << cipher.final
       end
+
       private
+
       def keyivgen(cipher, password, salt, hash_algorithm)
         cipher.pkcs5_keyivgen(password, salt, 1, hash_algorithm)
       end
@@ -47,21 +49,21 @@ module Match
         cipher = ::OpenSSL::Cipher::Cipher.new(ALGORITHM)
         cipher.encrypt
 
-        gen = keyivgen(cipher, password, salt)
+        keyivgen(cipher, password, salt)
 
         encrypted_data = cipher.update(data)
         encrypted_data << cipher.final
 
         auth_tag = cipher.auth_tag
 
-        {encrypted_data: encrypted_data, auth_tag: auth_tag}
+        { encrypted_data: encrypted_data, auth_tag: auth_tag }
       end
 
       def decrypt(encrypted_data, password, salt, auth_tag)
         cipher = ::OpenSSL::Cipher::Cipher.new(ALGORITHM)
         cipher.decrypt
 
-        gen = keyivgen(cipher, password, salt)
+        keyivgen(cipher, password, salt)
 
         cipher.auth_tag = auth_tag
 
@@ -70,8 +72,9 @@ module Match
       end
 
       private
+
       def keyivgen(cipher, password, salt)
-        keyIv = ::OpenSSL::KDF.pbkdf2_hmac(password, salt: salt, iterations: 10000, length: 32+12+24, hash: "sha256")
+        keyIv = ::OpenSSL::KDF.pbkdf2_hmac(password, salt: salt, iterations: 10_000, length: 32 + 12 + 24, hash: "sha256")
         key = keyIv[0..31]
         iv = keyIv[32..43]
         auth_data = keyIv[44..-1]
@@ -85,9 +88,9 @@ module Match
       V1_PREFIX = "Salted__"
       V2_PREFIX = "2_Salted__"
 
-      def encrypt(data, password, version=2)
+      def encrypt(data, password, version = 2)
         salt = SecureRandom.random_bytes(8)
-        if version==2
+        if version == 2
           e = EncryptionV2.new
           encryption = e.encrypt(data, password, salt)
           encrypted_data = V2_PREFIX + salt + encryption[:auth_tag] + encryption[:encrypted_data]
@@ -95,7 +98,7 @@ module Match
           e = EncryptionV1.new
           encrypted_data = V1_PREFIX + salt + e.encrypt(data, password, salt)
         end
-        data = Base64.encode64(encrypted_data)
+        Base64.encode64(encrypted_data)
       end
 
       # expected_salt is only used when testing
@@ -113,7 +116,7 @@ module Match
           e = EncryptionV1.new
           begin
             e.decrypt(data_to_decrypt, password, salt)
-          rescue => ex
+          rescue => _ex
             # Note that we are not guaranteed to catch the decryption errors here if the password is wrong
             # as there's no integrity checks.
             # With a wrong password, there's a 0.4% chance it will decrypt garbage and not fail
