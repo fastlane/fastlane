@@ -11,7 +11,7 @@ module Match
       ALGORITHM = 'aes-256-cbc'
 
       def encrypt(data, password, salt, hash_algorithm = "MD5")
-        cipher = ::OpenSSL::Cipher::Cipher.new(ALGORITHM)
+        cipher = ::OpenSSL::Cipher.new(ALGORITHM)
         cipher.encrypt
 
         keyivgen(cipher, password, salt, hash_algorithm)
@@ -20,7 +20,7 @@ module Match
         encrypted_data << cipher.final
       end
       def decrypt(encrypted_data, password, salt, hash_algorithm = "MD5")
-        cipher = ::OpenSSL::Cipher::Cipher.new(ALGORITHM)
+        cipher = ::OpenSSL::Cipher.new(ALGORITHM)
         cipher.decrypt
 
         keyivgen(cipher, password, salt, hash_algorithm)
@@ -46,7 +46,7 @@ module Match
       ALGORITHM = 'AES-256-GCM'
 
       def encrypt(data, password, salt)
-        cipher = ::OpenSSL::Cipher::Cipher.new(ALGORITHM)
+        cipher = ::OpenSSL::Cipher.new(ALGORITHM)
         cipher.encrypt
 
         keyivgen(cipher, password, salt)
@@ -60,7 +60,7 @@ module Match
       end
 
       def decrypt(encrypted_data, password, salt, auth_tag)
-        cipher = ::OpenSSL::Cipher::Cipher.new(ALGORITHM)
+        cipher = ::OpenSSL::Cipher.new(ALGORITHM)
         cipher.decrypt
 
         keyivgen(cipher, password, salt)
