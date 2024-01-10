@@ -110,3 +110,38 @@ describe Match do
     end
   end
 end
+
+describe Match::Storage::S3Storage do
+  let(:s3_endpoint) { 'http://localhost:9000' }
+  let(:s3_force_path_style) { true }
+  let(:s3_client) { instance_double('Aws::S3::Client') }
+
+  subject do
+    described_class.new(
+      s3_region: nil,
+      s3_access_key: nil,
+      s3_secret_access_key: nil,
+      s3_bucket: 'foobar',
+      s3_endpoint: s3_endpoint,
+      s3_force_path_style: s3_force_path_style
+    )
+  end
+
+  before do
+    allow(Aws::S3::Client).to receive(:new).and_return(s3_client)
+  end
+
+  describe '#initialize' do
+    it 'configures the S3 client with the correct endpoint and force_path_style options' do
+      expect(Aws::S3::Client).to receive(:new).with(
+        region: nil,
+        access_key_id: nil,
+        secret_access_key: nil,
+        endpoint: s3_endpoint,
+        force_path_style: s3_force_path_style
+      )
+
+      subject
+    end
+  end
+end
