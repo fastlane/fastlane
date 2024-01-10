@@ -509,7 +509,15 @@ Please be careful when using this option and ensure the certificates and profile
 
 ### Manual Decrypt
 
-If you want to manually decrypt a file you can.
+If you want to manually decrypt or encrypt, you can use the companion script `match_enc`:
+
+```no-highlight
+match_enc encrypt "<fileYouWantToEncryptPath>" "<password>" "<encryptedFilePath>"
+
+match_enc decrypt "<fileYouWantToDecryptPath>" "<password>" "<decryptedFilePath>"
+```
+
+In versions of fastlane priori to 2.219.0, the encryption was compatible with openssl aes-256-cbc cipher.
 
 ```no-highlight
 openssl aes-256-cbc -k "<password>" -in "<fileYouWantToDecryptPath>" -out "<decryptedFilePath>" -a -d -md [md5|sha256]
