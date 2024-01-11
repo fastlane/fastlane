@@ -35,7 +35,7 @@ end
 def ask_password_twice
   password = ask_password("Enter the password:")
   other = ask_password("Enter the password again:")
-  if (other == password)
+  if other == password
     return password
   else
     return nil
