@@ -18,6 +18,7 @@ module Match
 
         encrypted_data = cipher.update(data)
         encrypted_data << cipher.final
+        { encrypted_data: encrypted_data }
       end
       def decrypt(encrypted_data, password, salt, hash_algorithm = "MD5")
         cipher = ::OpenSSL::Cipher.new(ALGORITHM)
@@ -86,7 +87,7 @@ module Match
 
     class MatchDataEncryption
       V1_PREFIX = "Salted__"
-      V2_PREFIX = "2_Salted__"
+      V2_PREFIX = "match_encrypted_v2__"
 
       def encrypt(data, password, version = 2)
         salt = SecureRandom.random_bytes(8)
@@ -96,18 +97,18 @@ module Match
           encrypted_data = V2_PREFIX + salt + encryption[:auth_tag] + encryption[:encrypted_data]
         else
           e = EncryptionV1.new
-          encrypted_data = V1_PREFIX + salt + e.encrypt(data, password, salt)
+          encryption = e.encrypt(data, password, salt)
+          encrypted_data = V1_PREFIX + salt + encryption[:encrypted_data]
         end
         Base64.encode64(encrypted_data)
       end
 
-      # expected_salt is only used when testing
       def decrypt(base64encoded_encrypted, password)
         stored_data = Base64.decode64(base64encoded_encrypted)
         if stored_data.start_with?(V2_PREFIX)
-          salt = stored_data[10..17]
-          auth_tag = stored_data[18..33]
-          data_to_decrypt = stored_data[34..-1]
+          salt = stored_data[20..27]
+          auth_tag = stored_data[28..43]
+          data_to_decrypt = stored_data[44..-1]
           e = EncryptionV2.new
           e.decrypt(data_to_decrypt, password, salt, auth_tag)
         else
@@ -120,6 +121,7 @@ module Match
             # Note that we are not guaranteed to catch the decryption errors here if the password is wrong
             # as there's no integrity checks.
             # With a wrong password, there's a 0.4% chance it will decrypt garbage and not fail
+            # see https://github.com/fastlane/fastlane/issues/21663
             fallback_hash_algorithm = "SHA256"
             e.decrypt(data_to_decrypt, password, salt, fallback_hash_algorithm)
           end
