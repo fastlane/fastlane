@@ -2,7 +2,7 @@ module Fastlane
   module Actions
     class UploadSymbolsToSentryAction < Action
       def self.run(params)
-        # Warning about usinging new plugin
+        # Warning about using new plugin
         UI.important("It's recommended to use the official Sentry Fastlane plugin")
         UI.important("GitHub: https://github.com/getsentry/fastlane-plugin-sentry")
         UI.important("Installation: fastlane add_plugin sentry")

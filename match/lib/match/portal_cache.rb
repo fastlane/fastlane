@@ -18,8 +18,8 @@ module Match
           profile_type: profile_type,
           additional_cert_types: params[:additional_cert_types],
           bundle_id_identifiers: bundle_id_identifiers,
-          needs_profiles_devices: ProfileIncludes.can_force_include?(params: params, notify: true) && !params[:force] && !params[:readonly],
-          needs_profiles_certificate_content: !ProfileIncludes.can_force_include_all_certificates?(params: params),
+          needs_profiles_devices: ProfileIncludes.can_force_include_all_devices?(params: params, notify: true),
+          needs_profiles_certificate_content: !ProfileIncludes.can_force_include_all_certificates?(params: params, notify: true),
           include_mac_in_profiles: params[:include_mac_in_profiles]
         )
 

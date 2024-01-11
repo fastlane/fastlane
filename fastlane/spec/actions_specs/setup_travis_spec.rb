@@ -41,7 +41,7 @@ describe Fastlane do
         check_keychain_nil
       end
 
-      it "works on MacOS Environment when forced" do
+      it "works on macOS Environment when forced" do
         allow(FastlaneCore::Helper).to receive(:mac?).and_return(true)
         stub_const("ENV", {})
 
@@ -54,7 +54,7 @@ describe Fastlane do
         check_keychain_created
       end
 
-      it "works on MacOS Environment inside CI" do
+      it "works on macOS Environment inside CI" do
         allow(FastlaneCore::Helper).to receive(:mac?).and_return(true)
         expect(Fastlane::Actions::CreateKeychainAction).to receive(:run).with(
           {

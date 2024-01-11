@@ -217,7 +217,7 @@ module Scan
             if pieces.count == 0
               [] # empty array
             elsif pieces.count == 1
-              [ highest_compatible_simulator(simulators, pieces.first) ]
+              [ highest_compatible_simulator(simulators, pieces.first) ].compact
             else # pieces.count == 2 -- mathematically, because of the 'end of line' part of our regular expression
               version = pieces[1].tr('()', '')
               display_device = "'#{pieces[0]}' with version #{version}"

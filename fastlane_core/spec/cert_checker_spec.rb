@@ -9,13 +9,13 @@ describe FastlaneCore do
       ProcessStatusMock.new
     }
 
-    describe '#installed_identies' do
+    describe '#installed_identities' do
       it 'should print an error when no local code signing identities are found' do
         allow(FastlaneCore::CertChecker).to receive(:installed_wwdr_certificates).and_return(['G2', 'G3', 'G4', 'G5', 'G6'])
         allow(FastlaneCore::CertChecker).to receive(:list_available_identities).and_return("     0 valid identities found\n")
         expect(FastlaneCore::UI).to receive(:error).with(/There are no local code signing identities found/)
 
-        FastlaneCore::CertChecker.installed_identies
+        FastlaneCore::CertChecker.installed_identities
       end
 
       it 'should not be fooled by 10 local code signing identities available' do
@@ -23,7 +23,7 @@ describe FastlaneCore do
         allow(FastlaneCore::CertChecker).to receive(:list_available_identities).and_return("     10 valid identities found\n")
         expect(FastlaneCore::UI).not_to(receive(:error))
 
-        FastlaneCore::CertChecker.installed_identies
+        FastlaneCore::CertChecker.installed_identities
       end
     end
 

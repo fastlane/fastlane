@@ -14,7 +14,7 @@ describe Deliver::UploadScreenshots do
                               get_app_screenshot_sets: [app_screenshot_set])
         screenshots_per_language = { 'en-US' => [] }
 
-        # emurate Deliver::AppScreenshotIterator#each_app_screenshot_set's two behaviors with or without given block
+        # emulate Deliver::AppScreenshotIterator#each_app_screenshot_set's two behaviors with or without given block
         allow_any_instance_of(Deliver::AppScreenshotIterator).to receive(:each_app_screenshot_set) do |&args|
           next([[localization, app_screenshot_set]]) unless args
           args.call(localization, app_screenshot_set)
@@ -35,7 +35,7 @@ describe Deliver::UploadScreenshots do
                               get_app_screenshot_sets: [app_screenshot_set])
         screenshots_per_language = { 'en-US' => [] }
 
-        # emurate Deliver::AppScreenshotIterator#each_app_screenshot_set's two behaviors with or without given block
+        # emulate Deliver::AppScreenshotIterator#each_app_screenshot_set's two behaviors with or without given block
         allow_any_instance_of(Deliver::AppScreenshotIterator).to receive(:each_app_screenshot_set) do |&args|
           next([[localization, app_screenshot_set]]) unless args
           args.call(localization, app_screenshot_set)
@@ -55,7 +55,7 @@ describe Deliver::UploadScreenshots do
     subject { described_class.new }
 
     before do
-      # mock these methods partially to simplfy test cases
+      # mock these methods partially to simplify test cases
       allow(subject).to receive(:wait_for_complete)
       allow(subject).to receive(:retry_upload_screenshots_if_needed)
     end

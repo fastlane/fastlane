@@ -1,5 +1,5 @@
 // DeliverfileProtocol.swift
-// Copyright (c) 2023 FastlaneTools
+// Copyright (c) 2024 FastlaneTools
 
 public protocol DeliverfileProtocol: AnyObject {
     /// Path to your App Store Connect API Key JSON file (https://docs.fastlane.tools/app-store-connect-api/#using-fastlane-api-key-json-file)
@@ -71,10 +71,10 @@ public protocol DeliverfileProtocol: AnyObject {
     /// Rejects the previously submitted build if it's in a state where it's possible
     var rejectIfPossible: Bool { get }
 
-    /// Should the app be automatically released once it's approved? (Can not be used together with `auto_release_date`)
+    /// Should the app be automatically released once it's approved? (Cannot be used together with `auto_release_date`)
     var automaticRelease: Bool? { get }
 
-    /// Date in milliseconds for automatically releasing on pending approval (Can not be used together with `automatic_release`)
+    /// Date in milliseconds for automatically releasing on pending approval (Cannot be used together with `automatic_release`)
     var autoReleaseDate: Int? { get }
 
     /// Enable the phased release feature of iTC
@@ -264,4 +264,4 @@ public extension DeliverfileProtocol {
 
 // Please don't remove the lines below
 // They are used to detect outdated files
-// FastlaneRunnerAPIVersion [0.9.121]
+// FastlaneRunnerAPIVersion [0.9.123]
