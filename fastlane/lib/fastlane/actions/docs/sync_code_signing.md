@@ -509,7 +509,7 @@ Please be careful when using this option and ensure the certificates and profile
 
 ### Manual Decrypt
 
-If you want to manually decrypt or encrypt, you can use the companion script `match_enc`:
+If you want to manually decrypt or encrypt a file, you can use the companion script `match_file`:
 
 ```no-highlight
 match_file encrypt "<fileYouWantToEncryptPath>" ["<encryptedFilePath>]"
