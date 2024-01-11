@@ -323,7 +323,7 @@ end
 
 lane :release_brew do
   version = local_version
-  sh("cd .. && brew bump-formula-pr fastlane --force --url=https://github.com/fastlane/fastlane/archive/#{version}.tar.gz")
+  sh("cd .. && brew update && brew bump-formula-pr fastlane --force --url=https://github.com/fastlane/fastlane/archive/refs/tags/#{version}.tar.gz")
 end
 
 lane :release_github do

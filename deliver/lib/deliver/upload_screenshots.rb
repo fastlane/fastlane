@@ -85,7 +85,7 @@ module Deliver
         # Only delete screenshots if trying to upload
         next unless screenshots_per_language.keys.include?(localization.locale)
 
-        UI.verbose("Queued delete sceeenshot set job for #{localization.locale} #{app_screenshot_set.screenshot_display_type}")
+        UI.verbose("Queued delete screenshot set job for #{localization.locale} #{app_screenshot_set.screenshot_display_type}")
         worker.enqueue(DeleteScreenshotSetJob.new(app_screenshot_set, localization))
       end
 
@@ -145,7 +145,7 @@ module Deliver
         if duplicate
           UI.message("Previous uploaded. Skipping '#{screenshot.path}'...")
         else
-          UI.verbose("Queued upload sceeenshot job for #{localization.locale} #{app_screenshot_set.screenshot_display_type} #{screenshot.path}")
+          UI.verbose("Queued upload screenshot job for #{localization.locale} #{app_screenshot_set.screenshot_display_type} #{screenshot.path}")
           worker.enqueue(UploadScreenshotJob.new(app_screenshot_set, screenshot.path))
           number_of_screenshots_per_set[app_screenshot_set] += 1
         end
@@ -258,7 +258,7 @@ module Deliver
     # helper method so Spaceship::Tunes.client.available_languages is easier to test
     def self.available_languages
       # 2020-08-24 - Available locales are not available as an endpoint in App Store Connect
-      # Update with Spaceship::Tunes.client.available_languages.sort (as long as endpoint is avilable)
+      # Update with Spaceship::Tunes.client.available_languages.sort (as long as endpoint is available)
       Deliver::Languages::ALL_LANGUAGES
     end
 

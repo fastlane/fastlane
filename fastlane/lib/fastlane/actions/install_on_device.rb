@@ -34,7 +34,7 @@ module Fastlane
           FastlaneCore::ConfigItem.new(key: :extra,
                                        short_option: "-X",
                                        env_name: "FL_IOD_EXTRA",
-                                       description: "Extra Commandline arguments passed to ios-deploy",
+                                       description: "Extra Command-line arguments passed to ios-deploy",
                                        optional: true),
           FastlaneCore::ConfigItem.new(key: :device_id,
                                        short_option: "-d",

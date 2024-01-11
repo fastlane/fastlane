@@ -1,5 +1,5 @@
 // LaneFileProtocol.swift
-// Copyright (c) 2023 FastlaneTools
+// Copyright (c) 2024 FastlaneTools
 
 //
 //  ** NOTE **
@@ -118,11 +118,11 @@ open class LaneFile: NSObject, LaneFileProtocol {
         let lowerCasedLaneRequested = lane.lowercased()
 
         guard let laneMethod = currentLanes[lowerCasedLaneRequested] else {
-            let laneNames = laneFunctionNames.map { laneFuctionName in
-                if laneFuctionName.hasSuffix("lanewithoptions:") {
-                    return trimLaneWithOptionsFromName(laneName: laneFuctionName)
+            let laneNames = laneFunctionNames.map { laneFunctionName in
+                if laneFunctionName.hasSuffix("lanewithoptions:") {
+                    return trimLaneWithOptionsFromName(laneName: laneFunctionName)
                 } else {
-                    return trimLaneFromName(laneName: laneFuctionName)
+                    return trimLaneFromName(laneName: laneFunctionName)
                 }
             }.joined(separator: ", ")
 

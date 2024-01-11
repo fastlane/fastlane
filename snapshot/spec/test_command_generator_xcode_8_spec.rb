@@ -58,7 +58,7 @@ describe Snapshot do
         })
       end
 
-      it 'copies all device log archives to the output directory on macOS 10.12 (Siera)', requires_xcode: true do
+      it 'copies all device log archives to the output directory on macOS 10.12 (Sierra)', requires_xcode: true do
         Snapshot.config = @config
         launcher_config = Snapshot::SimulatorLauncherConfiguration.new(snapshot_config: Snapshot.config)
 

@@ -85,7 +85,7 @@ describe Fastlane do
         example_action_ref = Fastlane::Actions.action_class_ref("example_action")
         expect(Fastlane::Actions.is_deprecated?(example_action_ref)).to eq(false)
 
-        # An action (depreated)
+        # An action (deprecated)
         deprecated_action_ref = Fastlane::Actions.action_class_ref("deprecated_action")
         expect(Fastlane::Actions.is_deprecated?(deprecated_action_ref)).to eq(true)
 

@@ -205,10 +205,10 @@ module Sigh
                                      is_string: false,
                                      default_value: nil,
                                      verify_block: proc do |value|
+                                       next if value.nil?
                                        if !value.kind_of?(Array) ||
-                                         value.empty? ||
                                          !value.all?(Spaceship::ConnectAPI::Certificate)
-                                         UI.user_error!("cached_certificates parameter must be a non-empty array of Spaceship::ConnectAPI::Certificate") unless value.kind_of?(Array)
+                                         UI.user_error!("cached_certificates parameter must be an array of Spaceship::ConnectAPI::Certificate") unless value.kind_of?(Array)
                                        end
                                      end),
         FastlaneCore::ConfigItem.new(key: :cached_devices,
@@ -217,10 +217,10 @@ module Sigh
                                      is_string: false,
                                      default_value: nil,
                                      verify_block: proc do |value|
+                                       next if value.nil?
                                        if !value.kind_of?(Array) ||
-                                         value.empty? ||
                                          !value.all?(Spaceship::ConnectAPI::Device)
-                                         UI.user_error!("cached_devices parameter must be a non-empty array of Spaceship::ConnectAPI::Device")
+                                         UI.user_error!("cached_devices parameter must be an array of Spaceship::ConnectAPI::Device")
                                        end
                                      end),
         FastlaneCore::ConfigItem.new(key: :cached_bundle_ids,
@@ -229,10 +229,10 @@ module Sigh
                                      is_string: false,
                                      default_value: nil,
                                      verify_block: proc do |value|
+                                       next if value.nil?
                                        if !value.kind_of?(Array) ||
-                                         value.empty? ||
                                          !value.all?(Spaceship::ConnectAPI::BundleId)
-                                         UI.user_error!("cached_bundle_ids parameter must be a non-empty array of Spaceship::ConnectAPI::BundleId")
+                                         UI.user_error!("cached_bundle_ids parameter must be an array of Spaceship::ConnectAPI::BundleId")
                                        end
                                      end),
         FastlaneCore::ConfigItem.new(key: :cached_profiles,
@@ -241,10 +241,10 @@ module Sigh
                                       is_string: false,
                                       default_value: nil,
                                       verify_block: proc do |value|
+                                        next if value.nil?
                                         if !value.kind_of?(Array) ||
-                                          value.empty? ||
                                           !value.all?(Spaceship::ConnectAPI::Profile)
-                                          UI.user_error!("cached_profiles parameter must be a non-empty array of Spaceship::ConnectAPI::Profile")
+                                          UI.user_error!("cached_profiles parameter must be an array of Spaceship::ConnectAPI::Profile")
                                         end
                                       end)
       ]

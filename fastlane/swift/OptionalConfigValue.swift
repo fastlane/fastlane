@@ -1,5 +1,5 @@
 // OptionalConfigValue.swift
-// Copyright (c) 2023 FastlaneTools
+// Copyright (c) 2024 FastlaneTools
 
 //
 //  ** NOTE **

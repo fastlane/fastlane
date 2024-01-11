@@ -40,7 +40,7 @@ module FastlaneCore
       UI.user_error!("Could not find file '#{path}'") unless File.exist?(path)
 
       in_keychain &&= FastlaneCore::Helper.keychain_path(in_keychain)
-      ids = installed_identies(in_keychain: in_keychain)
+      ids = installed_identities(in_keychain: in_keychain)
       ids += installed_installers(in_keychain: in_keychain)
       finger_print = sha1_fingerprint(path)
 
@@ -52,7 +52,7 @@ module FastlaneCore
       installed?(path)
     end
 
-    def self.installed_identies(in_keychain: nil)
+    def self.installed_identities(in_keychain: nil)
       install_missing_wwdr_certificates(in_keychain: in_keychain)
 
       available = list_available_identities(in_keychain: in_keychain)

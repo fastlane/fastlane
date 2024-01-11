@@ -1,0 +1,103 @@
+# Configuration file for https://github.com/actions/labeler
+
+"tool: action":
+  - changed-files:
+    - any-glob-to-any-file:
+      - fastlane/lib/fastlane/actions/**/*
+
+"tool: cert":
+  - changed-files:
+    - any-glob-to-any-file:
+      - cert/**/*
+
+"tool: deliver":
+  - changed-files:
+    - any-glob-to-any-file:
+      - deliver/**/*
+
+"tool: fastlane_core":
+  - changed-files:
+    - any-glob-to-any-file:
+      - fastlane_core/**/*
+
+"tool: frameit":
+  - changed-files:
+    - any-glob-to-any-file:
+      - frameit/**/*
+
+"tool: gym":
+  - changed-files:
+    - any-glob-to-any-file:
+      - gym/**/*
+
+"tool: match":
+  - changed-files:
+    - any-glob-to-any-file:
+      - match/**/*
+
+"tool: pem":
+  - changed-files:
+    - any-glob-to-any-file:
+      - pem/**/*
+
+"tool: pilot":
+  - changed-files:
+    - any-glob-to-any-file:
+      - pilot/**/*
+
+"tool: precheck":
+  - changed-files:
+    - any-glob-to-any-file:
+      - precheck/**/*
+
+"tool: produce":
+  - changed-files:
+    - any-glob-to-any-file:
+      - produce/**/*
+
+"tool: scan":
+  - changed-files:
+    - any-glob-to-any-file:
+      - scan/**/*
+
+"tool: screengrab":
+  - changed-files:
+    - any-glob-to-any-file:
+      - screengrab/**/*
+
+"tool: sigh":
+  - changed-files:
+    - any-glob-to-any-file:
+      - sigh/**/*
+
+"tool: snapshot":
+  - changed-files:
+    - any-glob-to-any-file:
+      - snapshot/**/*
+
+"tool: spaceship":
+  - changed-files:
+    - any-glob-to-any-file:
+      - spaceship/**/*
+
+"tool: supply":
+  - changed-files:
+    - any-glob-to-any-file:
+      - supply/**/*
+
+"topic: swift":
+  - changed-files:
+    - any-glob-to-any-file:
+      - fastlane/swift/**/*
+
+"tool: trainer":
+  - changed-files:
+    - any-glob-to-any-file:
+      - trainer/**/*
+
+"type: ci":
+  - changed-files:
+    - any-glob-to-any-file:
+      - .github/**/*
+      - .circleci/**/*
+      - appveyor.yml
