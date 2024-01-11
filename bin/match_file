@@ -4,11 +4,11 @@ require 'match'
 # CLI to encrypt/decrypt files using fastlane match encryption layer
 
 def usage
-  puts("USAGE: [encrypt|decrypt] input_path password [output_path]")
+  puts("USAGE: [encrypt|decrypt] input_path [output_path]")
   exit(-1)
 end
 
-if ARGV.count < 3 || ARGV.count > 4
+if ARGV.count < 2 || ARGV.count > 3
   usage
 end
 
