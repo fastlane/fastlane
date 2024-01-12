@@ -454,8 +454,12 @@ module Deliver
         value = yield
         return value if value
 
-        UI.message("#{message}... Retrying after #{wait_time} seconds (remaining: #{tries})")
-        sleep(wait_time)
+        # Calculate sleep time to be the lesser of the exponential backoff or 5 minutes.
+        # This prevents problems with CI's console output timeouts (of usually 10 minutes), and also
+        # speeds up the retry time for the user, as waiting longer than 5 minutes is a too long wait for a retry.
+        sleep_time = [wait_time * 2, 5 * 60].min
+        UI.message("#{message}... Retrying after #{sleep_time} seconds (remaining: #{tries})")
+        sleep(sleep_time)
 
         return nil if tries.zero?
 
