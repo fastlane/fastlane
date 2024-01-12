@@ -187,7 +187,7 @@ module Deliver
                                      description: "After submitting a new version, App Store Connect takes some time to recognize the new version and we must wait until it's available before attempting to upload metadata for it. There is a mechanism that will check if it's available and retry with an exponential backoff if it's not available yet. " \
                                      "This option specifies how many times we should retry before giving up. Setting this to a value below 5 is not recommended and will likely cause failures. Increase this parameter when Apple servers seem to be degraded or slow",
                                      type: Integer,
-                                     default_value: 5,
+                                     default_value: 7,
                                      verify_block: proc do |value|
                                        UI.user_error!("'#{value}' needs to be greater than 0") if value <= 0
                                      end),
