@@ -9,6 +9,14 @@ module Spaceship
       attr_accessor :email
       attr_accessor :invite_type
       attr_accessor :invitation
+      attr_accessor :beta_tester_state
+      attr_accessor :last_modified_date
+      attr_accessor :installed_cf_bundle_short_version_string
+      attr_accessor :installed_cf_bundle_version
+      attr_accessor :remove_after_date
+      attr_accessor :installed_device
+      attr_accessor :installed_os_version
+      attr_accessor :number_of_installed_devices
 
       attr_accessor :apps
       attr_accessor :beta_groups
@@ -21,6 +29,14 @@ module Spaceship
         "email" => "email",
         "inviteType" => "invite_type",
         "invitation" => "invitation",
+        "betaTesterState" => "beta_tester_state",
+        "lastModifiedDate" => "last_modified_date",
+        "installedCfBundleShortVersionString" => "installed_cf_bundle_short_version_string",
+        "installedCfBundleVersion" => "installed_cf_bundle_version",
+        "removeAfterDate" => "remove_after_date",
+        "installedDevice" => "installed_device",
+        "installedOsVersion" => "installed_os_version",
+        "numberOfInstalledDevices" => "number_of_installed_devices",
 
         "apps" => "apps",
         "betaGroups" => "beta_groups",
