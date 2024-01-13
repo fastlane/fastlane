@@ -28,6 +28,10 @@ DEBUG=1 bundle exec rspec
 You will then jump into an interactive debugger that allows you to print out variables, call methods and [much more](https://github.com/pry/pry/wiki).
 To continue running the original script use `control` + `d`
 
+## Running fastlane within a IRB console
+
+You can open an IRB console by running `bin/console`
+
 ## Debugging and patching [_spaceship_](https://github.com/fastlane/fastlane/tree/master/spaceship) problems
 
 ### Introduction to _spaceship_
@@ -93,6 +97,10 @@ To run the newly created script, run
 ```
 SPACESHIP_DEBUG=1 bundle exec rake debug
 ```
+
+### Running the spaceship playground
+
+You can open an interactive _spaceship_ session console by running `fastlane spaceship`
 
 ### Additional Information
 See also the [Debugging _spaceship_](spaceship/docs/Debugging.md) documentation.
