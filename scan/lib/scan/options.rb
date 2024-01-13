@@ -1,4 +1,4 @@
-srequire 'fastlane_core/configuration/config_item'
+require 'fastlane_core/configuration/config_item'
 require 'fastlane/helper/xcodebuild_formatter_helper'
 require 'credentials_manager/appfile_config'
 require_relative 'module'
