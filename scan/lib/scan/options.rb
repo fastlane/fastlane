@@ -1,4 +1,4 @@
-require 'fastlane_core/configuration/config_item'
+srequire 'fastlane_core/configuration/config_item'
 require 'fastlane/helper/xcodebuild_formatter_helper'
 require 'credentials_manager/appfile_config'
 require_relative 'module'
@@ -31,6 +31,7 @@ module Scan
                                      optional: true,
                                      env_name: "SCAN_PROJECT",
                                      description: "Path to the project file",
+                                     conflicting_options: [:package_path],
                                      verify_block: proc do |value|
                                        v = File.expand_path(value.to_s)
                                        UI.user_error!("Project file not found at path '#{v}'") unless File.exist?(v)
