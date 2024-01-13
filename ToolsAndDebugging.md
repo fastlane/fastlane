@@ -2,6 +2,11 @@
 
 For detailed instructions on how to get started with contributing to _fastlane_, first check out [YourFirstPR.md][first-pr] and [Testing.md](Testing.md). This guide will focus on more advanced instructions on how to debug _fastlane_ and _spaceship_ issues and work on patches.
 
+## Experiment with the Fastlane internals
+
+Open a _fastlane_ console by running `fastlane console` inside or outside your project.
+This will allow you to invoke any of the fastlane modules and classes and test their behavior.
+
 ## Debug using [pry](https://pry.github.io/)
 
 Before you’re able to use [pry](https://pry.github.io/), make sure to have completed the [YourFirstPR.md][first-pr] setup part, as this will install all required development dependencies.
