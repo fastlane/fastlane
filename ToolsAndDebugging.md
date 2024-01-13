@@ -100,7 +100,7 @@ SPACESHIP_DEBUG=1 bundle exec rake debug
 
 ### Running the spaceship playground
 
-You can open an interactive spaceship session console by running `fastlane spaceship`
+You can open an interactive _spaceship_ session console by running `fastlane spaceship`
 
 ### Additional Information
 See also the [Debugging _spaceship_](spaceship/docs/Debugging.md) documentation.
