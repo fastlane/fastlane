@@ -6,7 +6,7 @@ For detailed instructions on how to get started with contributing to _fastlane_,
 
 Open a _fastlane_ console by running `fastlane console` inside or outside your project.
 
-This will allow you to invoke any of the fastlane modules and classes and test their behavior.
+This will allow you to invoke any of the _fastlane_ modules and classes and test their behavior.
 
 ## Debug using [pry](https://pry.github.io/)
 
