@@ -207,27 +207,24 @@ module Trainer
 
       # Parses JSON into ActionsInvocationRecord to find a list of all ids for ActionTestPlanRunSummaries
       actions_invocation_record = Trainer::XCResult::ActionsInvocationRecord.new(result_bundle_object)
-      test_refs = actions_invocation_record.actions.map do |action|
-        action.action_result.tests_ref
-      end.compact
-      ids = test_refs.map(&:id)
+      self.data = actions_invocation_record.actions.map do |action|
+        next if action.action_result.tests_ref.nil?
 
-      # Maps ids into ActionTestPlanRunSummaries by executing xcresulttool to get JSON
-      # containing specific information for each test summary,
-      summaries = ids.map do |id|
-        raw = execute_cmd("xcrun xcresulttool get --format json --path #{path} --id #{id}")
+        # Maps ids into ActionTestPlanRunSummaries by executing xcresulttool to get JSON
+        # containing specific information for each test summary,
+        raw = execute_cmd("xcrun xcresulttool get --format json --path #{path} --id #{action.action_result.tests_ref.id}")
         json = JSON.parse(raw)
-        Trainer::XCResult::ActionTestPlanRunSummaries.new(json)
-      end
+        summaries = Trainer::XCResult::ActionTestPlanRunSummaries.new(json)
 
-      # Converts the ActionTestPlanRunSummaries to data for junit generator
-      failures = actions_invocation_record.issues.test_failure_summaries || []
-      summaries_to_data(summaries, failures, output_remove_retry_attempts: output_remove_retry_attempts)
+        # Converts the ActionTestPlanRunSummaries to data for junit generator
+        failures = actions_invocation_record.issues.test_failure_summaries || []
+        summaries_to_data(summaries, failures, action.run_destination, output_remove_retry_attempts: output_remove_retry_attempts)
+      end.flatten.compact
     end
 
-    def summaries_to_data(summaries, failures, output_remove_retry_attempts: false)
+    def summaries_to_data(summaries, failures, run_destination, output_remove_retry_attempts: false)
       # Gets flat list of all ActionTestableSummary
-      all_summaries = summaries.map(&:summaries).flatten
+      all_summaries = [summaries.summaries].flatten
       testable_summaries = all_summaries.map(&:testable_summaries).flatten
 
       summaries_to_names = test_summaries_to_configuration_names(all_summaries)
@@ -320,6 +317,8 @@ module Trainer
           target_name: testable_summary.target_name,
           test_name: testable_summary.name,
           configuration_name: summaries_to_names[testable_summary],
+          destination_name: run_destination.display_name,
+          destination_os_version: run_destination.target_sdk_record.operating_system_version,
           duration: all_tests.map(&:duration).inject(:+),
           tests: test_rows
         }
@@ -337,7 +336,7 @@ module Trainer
         row
       end
 
-      self.data = rows
+      return rows
     end
 
     def test_summaries_to_configuration_names(test_summaries)
