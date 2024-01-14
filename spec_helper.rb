@@ -18,7 +18,16 @@ unless ENV["DEBUG"]
   $stdout = File.open(fastlane_tests_tmpdir, "w")
 end
 
-# for troubleshooting CI issues on specific tests
+# By default the CI test setup hides the standard output/stderr.
+#
+# Sometimes we wish to enable the original stdout/stderr programmatically in a given test, especially on CI.
+# We can then use the following method to wrap the test code.
+#
+# it 'uses standard test output' do
+#   with_orig_stdout do
+#     ... your test
+#   end
+# end
 def with_orig_stdout(&block)
   $orig_stdout.puts("Temporarily re-enabling standard stdout")
   $stdout, $orig_stdout = $orig_stdout, $stdout
