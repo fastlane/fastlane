@@ -634,13 +634,13 @@ describe "Build Manager" do
 
       it "does not advertise `skip_waiting_for_build_processing` if the option is set" do
         expect(FastlaneCore::UI).to_not(receive(:message).with("If you want to skip waiting for the processing to be finished, use the `skip_waiting_for_build_processing` option"))
-        expect(FastlaneCore::UI).to_not(receive(:message).with("Note that if `skip_waiting_for_build_processing` is used but a `changelog` is supplied, this process will wait for the build to appear on AppStoreConnect, update the changelog and then skip the remaining of the processing steps."))
+        expect(FastlaneCore::UI).to_not(receive(:message).with("Note that if `skip_waiting_for_build_processing` is used but a `changelog` is supplied, this process will wait for the build to appear on App Store Connect, update the changelog and then skip the remaining of the processing steps."))
 
         fake_build_manager.upload(upload_options)
       end
 
       it "shows notice when using `skip_waiting_for_build_processing` and changelog together" do
-        expect(FastlaneCore::UI).to(receive(:important).with("`skip_waiting_for_build_processing` used and `changelog` supplied - will wait until build appears on AppStoreConnect, update the changelog and then skip the rest of the remaining of the processing steps."))
+        expect(FastlaneCore::UI).to(receive(:important).with("`skip_waiting_for_build_processing` used and `changelog` supplied - will wait until build appears on App Store Connect, update the changelog and then skip the rest of the remaining of the processing steps."))
 
         fake_build_manager.upload(upload_options)
       end
