@@ -139,30 +139,64 @@ module FastlaneCore
       # Install all Worldwide Developer Relations Intermediate Certificates listed here: https://www.apple.com/certificateauthority/
       missing = WWDRCA_CERTIFICATES.map { |c| c[:alias] } - installed_wwdr_certificates
       missing.each do |cert_alias|
-        install_wwdr_certificate(cert_alias)
+        Tempfile.create(['fastlane-wwdr-cert-', '.cer']) do |tmpfile|
+          filename = tmpfile.path
+          unless fetch_certificate(cert_alias, filename)
+            UI.verbose("Could not fetch certificate #{cert_alias}")
+            next
+          end
+
+          unless check_expiry(filename)
+            UI.verbose("Skipping installation of certificate: #{filename}, because it is invalid")
+            next
+          end
+
+          UI.message("Installing WWDR certificates '#{cert_alias}'")
+          import_wwdr_certificate(filename)
+        end
       end
       missing.count
     end
 
-    def self.install_wwdr_certificate(cert_alias)
+    def self.fetch_certificate(cert_alias, filename)
       url = WWDRCA_CERTIFICATES.find { |c| c[:alias] == cert_alias }.fetch(:url)
-      file = Tempfile.new([File.basename(url, ".cer"), ".cer"])
-      filename = file.path
-      keychain = wwdr_keychain
-      keychain = "-k #{keychain.shellescape}" unless keychain.empty?
-
       # Attempts to fix an issue installing WWDR cert tends to fail on CIs
       # https://github.com/fastlane/fastlane/issues/20960
-      curl_extras = ""
+      curl_params = []
       if FastlaneCore::Feature.enabled?('FASTLANE_WWDR_USE_HTTP1_AND_RETRIES')
-        curl_extras = "--http1.1 --retry 3 --retry-all-errors "
+        curl_params += ['--http1.1', '--retry', '3', '--retry-all-errors']
       end
 
-      import_command = "curl #{curl_extras}-f -o #{filename} #{url} && security import #{filename} #{keychain}"
-      UI.verbose("Installing WWDR Cert: #{import_command}")
-
+      curl_params += ['-f', '-o', filename, url]
       require 'open3'
-      stdout, stderr, status = Open3.capture3(import_command)
+      stdout, stderr, status = Open3.capture3('curl', *curl_params)
+      if FastlaneCore::Globals.verbose?
+        UI.command_output(stdout)
+        UI.command_output(stderr)
+      end
+      !!status.success?
+    end
+
+    def self.check_expiry(filename)
+      UI.verbose("Checking expiry date of certificate")
+      require 'open3'
+      stdout, stderr, = Open3.capture3('security', 'verify-cert', '-c', filename)
+      if FastlaneCore::Globals.verbose?
+        UI.command_output(stdout)
+        UI.command_output(stderr)
+      end
+      return true if /...certificate verification successful/ =~ stdout
+
+      UI.verbose("Failed to validate certificate expiration")
+      return false
+    end
+
+    def self.import_wwdr_certificate(filename)
+      keychain = wwdr_keychain
+      keychain_args = ['-k', keychain] unless keychain.empty?
+      UI.verbose("Installing WWDR Cert")
+
+      stdout, stderr, status = Open3.capture3('security', 'import', filename, *keychain_args)
       if FastlaneCore::Globals.verbose?
         UI.command_output(stdout)
         UI.command_output(stderr)
