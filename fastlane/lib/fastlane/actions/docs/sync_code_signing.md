@@ -512,9 +512,9 @@ Please be careful when using this option and ensure the certificates and profile
 If you want to manually decrypt or encrypt a file, you can use the companion script `match_file`:
 
 ```no-highlight
-match_file encrypt "<fileYouWantToEncryptPath>" ["<encryptedFilePath>]"
+match_file encrypt "<fileYouWantToEncryptPath>" ["<encryptedFilePath>"]
 
-match_file decrypt "<fileYouWantToDecryptPath>" ["<decryptedFilePath>]"
+match_file decrypt "<fileYouWantToDecryptPath>" ["<decryptedFilePath>"]
 ```
 
 The password will be asked interactively.
