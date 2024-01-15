@@ -1,8 +1,11 @@
 #!/usr/bin/env ruby
+#
+# prints out the latest version number of the gem compatible with the given version of ruby
+#
 require 'net/http'
 require 'json'
 
-GEM_TO_TEST           = "rubygems-update"
+GEM_TO_TEST = "rubygems-update"
 
 if ARGV.count > 0
   RUBY_VERSION_TO_MATCH = ARGV[0]
@@ -22,7 +25,3 @@ matching_gem = gem_versions.find { |gem|
 }
 
 puts matching_gem['number']
-#puts "Latest version of #{GEM_TO_TEST} " +
-#     "compatible with Ruby #{RUBY_VERSION_TO_MATCH} " +
-#     "is #{matching_gem['number']}."
-
