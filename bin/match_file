@@ -64,7 +64,7 @@ loop do
 end
 
 begin
-  Match::Encryption::MatchFileEncryption.new.send(method_name, input_file, password, output_file)
+  Match::Encryption::MatchFileEncryption.new.send(method_name, file_path: input_file, password: password, output_path: output_file)
 rescue => e
   puts("ERROR #{method_name}ing. [#{e}]. Check your password")
   usage

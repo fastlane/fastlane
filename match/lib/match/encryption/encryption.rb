@@ -133,7 +133,7 @@ module Match
 
     # The methods of this class will encrypt or decrypt files in place, by default.
     class MatchFileEncryption
-      def encrypt(file_path, password, output_path = nil)
+      def encrypt(file_path:, password:, output_path: nil)
         output_path = file_path unless output_path
         data_to_encrypt = File.binread(file_path)
         e = MatchDataEncryption.new
@@ -141,7 +141,7 @@ module Match
         File.write(output_path, data)
       end
 
-      def decrypt(file_path, password, output_path = nil)
+      def decrypt(file_path:, password:, output_path: nil)
         output_path = file_path unless output_path
         content = File.read(file_path)
         e = MatchDataEncryption.new

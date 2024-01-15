@@ -112,7 +112,7 @@ module Match
       def encrypt_specific_file(path: nil, password: nil)
         UI.user_error!("No password supplied") if password.to_s.strip.length == 0
         e = MatchFileEncryption.new
-        e.encrypt(path, password)
+        e.encrypt(file_path: path, password: password)
       rescue FastlaneCore::Interface::FastlaneError
         raise
       rescue => error
@@ -122,7 +122,7 @@ module Match
 
       def decrypt_specific_file(path: nil, password: nil)
         e = MatchFileEncryption.new
-        e.decrypt(path, password)
+        e.decrypt(file_path: path, password: password)
       rescue => error
         UI.error(error.to_s)
         UI.crash!("Error decrypting '#{path}'")
