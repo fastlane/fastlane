@@ -161,7 +161,7 @@ module Match
       cert_type = Match.cert_type_sym(specific_cert_type || params[:type])
 
       certs = Dir[File.join(prefixed_working_directory, "certs", cert_type.to_s, "*.cer")]
-      keys = Dir[File.join(prefixed_working_directory, "certs", cert_type.to_s, "*.p12")]
+      keys = certs.map { |cert_path| cert_path.gsub(/\.cer$/, ".p12") }.select { |f| File.exist?(f) }
 
       storage_has_certs = certs.count != 0 && keys.count != 0
 
@@ -173,7 +173,7 @@ module Match
 
       # Validate existing certificate first.
       if renew_expired_certs && is_cert_renewable && storage_has_certs
-        cert_path = select_cert_or_key(paths: certs)
+        cert_path = Runner.select_cert(cert_paths: certs)
 
         unless Utils.is_cert_valid?(cert_path)
           UI.important("Removing invalid certificate '#{File.basename(cert_path)}'")
@@ -200,7 +200,7 @@ module Match
         UI.important("Couldn't find a valid code signing identity for #{cert_type}... creating one for you now")
         UI.crash!("No code signing identity found and cannot create a new one because you enabled `readonly`") if params[:readonly]
         cert_path = Generator.generate_certificate(params, cert_type, prefixed_working_directory, specific_cert_type: specific_cert_type)
-        private_key_path = cert_path.gsub(".cer", ".p12")
+        private_key_path = cert_path.gsub(/\.cer$/, ".p12")
 
         self.files_to_commit << cert_path
         self.files_to_commit << private_key_path
@@ -208,7 +208,8 @@ module Match
         # Reset certificates cache since we have a new cert.
         self.cache.reset_certificates
       else
-        cert_path = select_cert_or_key(paths: certs)
+        cert_path = Runner.select_cert(cert_paths: certs, cert_id: ENV['MATCH_CERTIFICATE_ID'])
+        private_key_path = cert_path.gsub(/\.cer$/, ".p12") if cert_path
 
         # Check validity of certificate
         if Utils.is_cert_valid?(cert_path)
@@ -232,7 +233,7 @@ module Match
             # Import the private key
             # there seems to be no good way to check if it's already installed - so just install it
             # Key will only be added to the partition list if it isn't already installed
-            Utils.import(select_cert_or_key(paths: keys), params[:keychain_name], password: params[:keychain_password])
+            Utils.import(private_key_path, params[:keychain_name], password: params[:keychain_password])
           end
         else
           UI.message("Skipping installation of certificate as it would not work on this operating system.")
@@ -240,7 +241,7 @@ module Match
 
         if params[:output_path]
           FileUtils.cp(cert_path, params[:output_path])
-          FileUtils.cp(select_cert_or_key(paths: keys), params[:output_path])
+          FileUtils.cp(private_key_path, params[:output_path])
         end
 
         # Get and print info of certificate
@@ -252,9 +253,21 @@ module Match
     end
 
     # @return [String] Path to certificate or P12 key
-    def select_cert_or_key(paths:)
-      cert_id_path = ENV['MATCH_CERTIFICATE_ID'] ? paths.find { |path| path.include?(ENV['MATCH_CERTIFICATE_ID']) } : nil
-      cert_id_path || paths.last
+    def self.select_cert(cert_paths:, cert_id: nil)
+      cert_id_path = cert_id ? cert_paths.find { |path| File.basename(path).start_with?(cert_id) } : nil
+      return cert_id_path if cert_id_path
+
+      # Get the certificate with the latest expiration date.
+      selected_cert_path = cert_paths
+        .sort_by do |cert_path|
+          cert = OpenSSL::X509::Certificate.new(File.binread(cert_path))
+
+          # Sort by expiration date, issue date, serial number and id.
+          [cert.not_after, cert.not_before, cert.serial, File.basename(cert_path)]
+        end
+        .last
+
+      return selected_cert_path
     end
 
     # rubocop:disable Metrics/PerceivedComplexity
