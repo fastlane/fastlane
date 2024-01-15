@@ -38,11 +38,12 @@ module Match
       end
     end
 
-    # The newer encryption mechanism
-    # A more secure key and IV generation
-    # IV is randomly generated and provided unencrypted
-    # salt should be randomly generated and provided unencrypted (like in the current implementation)
-    # key is generated with OpenSSL::KDF::pbkdf2_hmac with properly chosen parameters
+    # The newer encryption mechanism, which features a more secure key and IV generation.
+    #
+    # The IV is randomly generated and provided unencrypted.
+    # The salt should be randomly generated and provided unencrypted (like in the current implementation).
+    # The key is generated with OpenSSL::KDF::pbkdf2_hmac with properly chosen parameters.
+    #
     # Short explanation about salt and IV: https://stackoverflow.com/a/1950674/6324550
     class EncryptionV2
       ALGORITHM = 'aes-256-gcm'
