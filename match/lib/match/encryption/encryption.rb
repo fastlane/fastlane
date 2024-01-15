@@ -130,7 +130,7 @@ module Match
       end
     end
 
-    # by default, encrypt or decrypt in place
+    # The methods of this class will encrypt or decrypt files in place, by default.
     class MatchFileEncryption
       def encrypt(file_path, password, output_path = nil)
         output_path = file_path unless output_path
