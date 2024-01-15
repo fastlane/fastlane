@@ -107,6 +107,6 @@ Gem::Specification.new do |spec|
   spec.add_dependency('tty-spinner', '>= 0.8.0', '< 1.0.0') # loading indicators
   spec.add_dependency('word_wrap', '~> 1.0.0') # to add line breaks for tables with long strings
   spec.add_dependency('xcodeproj', '>= 1.13.0', '< 2.0.0') # Modify Xcode projects
-  spec.add_dependency('xcpretty-travis-formatter', '>= 1.0.1', '< 2.0.0')
+  spec.add_dependency('xcpretty-travis-formatter', '>= 0.0.3', '< 2.0.0')
   spec.add_dependency('xcpretty', '~> 0.3.0') # prettify xcodebuild output
 end
