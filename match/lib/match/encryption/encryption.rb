@@ -140,6 +140,7 @@ module Match
         data = e.encrypt(data_to_encrypt, password)
         File.write(output_path, data)
       end
+
       def decrypt(file_path, password, output_path = nil)
         output_path = file_path unless output_path
         content = File.read(file_path)
