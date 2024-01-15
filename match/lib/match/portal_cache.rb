@@ -19,7 +19,7 @@ module Match
           additional_cert_types: params[:additional_cert_types],
           bundle_id_identifiers: bundle_id_identifiers,
           needs_profiles_devices: ProfileIncludes.can_force_include_all_devices?(params: params, notify: true),
-          needs_profiles_certificate_content: !ProfileIncludes.can_force_include_all_certificates?(params: params, notify: true),
+          needs_profiles_certificate_content: !ProfileIncludes.can_force_include_new_certificates?(params: params),
           include_mac_in_profiles: params[:include_mac_in_profiles]
         )
 

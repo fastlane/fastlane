@@ -306,10 +306,13 @@ module Match
           force ||= ProfileIncludes.should_force_include_all_devices?(params: params, portal_profile: portal_profile, cached_devices: self.cache.devices)
         end
 
-        if params[:include_all_certificates]
+        if params[:include_all_certificates] && ProfileIncludes.PROV_TYPES_WITH_MULTIPLE_CERTIFICATES.include?(prov_type)
           # Clearing specified certificate id which will prevent a profile being created with only one certificate
           certificate_id = nil
-          force ||= ProfileIncludes.should_force_include_all_certificates?(params: params, portal_profile: portal_profile, cached_certificates: self.cache.certificates)
+        end
+
+        if params[:force_for_new_certificates]
+          force ||= ProfileIncludes.should_force_include_new_certificates?(params: params, portal_profile: portal_profile, certificate_id: certificate_id, cached_certificates: self.cache.certificates)
         end
       end
 

@@ -8,7 +8,7 @@ module Match
 
     def self.can_force_include?(params:, notify:)
       self.can_force_include_all_devices?(params: params, notify: notify) &&
-        self.can_force_include_all_certificates?(params: params, notify: notify)
+        self.can_force_include_new_certificates?(params: params)
     end
 
     ###############
@@ -67,36 +67,23 @@ module Match
     #
     ###############
 
-    def self.should_force_include_all_certificates?(params:, portal_profile:, cached_certificates:)
-      return false unless self.can_force_include_all_certificates?(params: params)
+    def self.should_force_include_new_certificates?(params:, portal_profile:, certificate_id:, cached_certificates:)
+      return false unless self.can_force_include_new_certificates?(params: params)
 
-      force = certificates_differ?(portal_profile: portal_profile, platform: params[:platform], cached_certificates: cached_certificates)
+      force = false
+
+      if certificate_id
+        cached_certificates.filter! { |c| c.id == certificate_id }
+      end
+
+      certificates_differ?(portal_profile: portal_profile, platform: params[:platform], cached_certificates: cached_certificates)
 
       return force
     end
 
-    def self.can_force_include_all_certificates?(params:, notify: false)
+    def self.can_force_include_new_certificates?(params:)
       return false if params[:readonly] || params[:force]
-      return false unless params[:force_for_new_certificates]
-
-      unless params[:include_all_certificates]
-        UI.important("You specified 'force_for_new_certificates: true', but new certificates will not be added, cause 'include_all_certificates' is 'false'") if notify
-        return false
-      end
-
-      provisioning_type = params[:type].to_sym
-
-      can_force = PROV_TYPES_WITH_MULTIPLE_CERTIFICATES.include?(provisioning_type)
-
-      if !can_force && notify
-        # All other (not development) provisioning profiles don't contain
-        # multiple certificates, thus shouldn't be renewed
-        # if the certificates  count has changed.
-        UI.important("Warning: `force_for_new_certificates` is set but is ignored for non-'development' provisioning profiles.")
-        UI.important("You can safely stop specifying `force_for_new_certificates` when running Match for '#{provisioning_type}' provisioning profiles.")
-      end
-
-      can_force
+      return params[:force_for_new_certificates]
     end
 
     def self.certificates_differ?(portal_profile:, platform:, cached_certificates:)

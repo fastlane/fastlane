@@ -138,10 +138,10 @@ describe Match do
         end
       end
 
-      describe "#can_force_include_all_certificates?" do
+      describe "#can_force_include_new_certificates?" do
         it "returns true if params ok" do
           # WHEN
-          can_include_certs = Match::ProfileIncludes.can_force_include_all_certificates?(params: params)
+          can_include_certs = Match::ProfileIncludes.can_force_include_new_certificates?(params: params)
 
           # THEN
           expect(can_include_certs).to be(true)
@@ -152,43 +152,52 @@ describe Match do
           allow(params).to receive(:[]).with(:readonly).and_return(true)
 
           # WHEN
-          can_include_certs = Match::ProfileIncludes.can_force_include_all_certificates?(params: params)
+          can_include_certs = Match::ProfileIncludes.can_force_include_new_certificates?(params: params)
 
           # THEN
           expect(can_include_certs).to be(false)
         end
 
-        it "returns false if no force_for_new_devices" do
+        it "returns false if no force_for_new_certificates" do
           # GIVEN
           allow(params).to receive(:[]).with(:force_for_new_certificates).and_return(false)
 
           # WHEN
-          can_include_certs = Match::ProfileIncludes.can_force_include_all_certificates?(params: params)
+          can_include_certs = Match::ProfileIncludes.can_force_include_new_certificates?(params: params)
 
           # THEN
           expect(can_include_certs).to be(false)
         end
+      end
+    end
 
-        it "returns false if no include_all_certificates" do
-          # GIVEN
-          allow(params).to receive(:[]).with(:include_all_certificates).and_return(false)
+    describe "should's" do
+      describe "#should_force_include_new_certificates?" do
+        let(:params) { double("params") }
 
-          # WHEN
-          can_include_certs = Match::ProfileIncludes.can_force_include_all_certificates?(params: params)
+        before do
+          allow(params).to receive(:[]).with(:type).and_return('development')
 
-          # THEN
-          expect(can_include_certs).to be(false)
+          allow(params).to receive(:[]).with(:readonly).and_return(false)
+          allow(params).to receive(:[]).with(:force).and_return(false)
+
+          # allow(params).to receive(:[]).with(:force_for_new_devices).and_return(true)
+          allow(params).to receive(:[]).with(:force_for_new_certificates).and_return(true)
+          # allow(params).to receive(:[]).with(:include_all_certificates).and_return(true)
         end
 
-        it "returns false if type is unsuitable" do
+        it "returns true if a single certificate doesn't match" do
           # GIVEN
-          allow(params).to receive(:[]).with(:type).and_return('appstore')
+          allow(params).to receive(:[]).with(:force_for_new_certificates).and_return(false)
+          portal_profile = nil
+          certificate_id = nil
+          cached_certificates = []
 
           # WHEN
-          can_include_certs = Match::ProfileIncludes.can_force_include_all_certificates?(params: params)
+          should_force_certs = Match::ProfileIncludes.should_force_include_new_certificates?(params: params, portal_profile: portal_profile, certificate_id: certificate_id, cached_certificates: cached_certificates)
 
           # THEN
-          expect(can_include_certs).to be(false)
+          expect(should_force_certs).to be(true)
         end
       end
     end
