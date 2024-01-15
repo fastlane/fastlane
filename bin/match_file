@@ -33,8 +33,8 @@ def ask_password(msg)
 end
 
 def ask_password_twice
-  password = ask_password("Enter the password:")
-  other = ask_password("Enter the password again:")
+  password = ask_password("Enter the password: ")
+  other = ask_password("Enter the password again: ")
   if other == password
     return password
   else
