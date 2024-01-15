@@ -296,7 +296,7 @@ module Match
                                      env_name: "MATCH_RENEW_EXPIRED_CERTS",
                                      description: "Automatically renew expired certificates. Note: to renew `developer_id` and `developer_id_installer` certificates you must log in with the Account Holder account by using username and password; App Store Connect API key doesn't work in this case",
                                      type: Boolean,
-                                     default_value: false),
+                                     default_value: true),
         FastlaneCore::ConfigItem.new(key: :skip_confirmation,
                                      env_name: "MATCH_SKIP_CONFIRMATION",
                                      description: "Disables confirmation prompts during nuke, answering them with yes",
