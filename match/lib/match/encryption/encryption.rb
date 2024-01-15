@@ -20,6 +20,7 @@ module Match
         encrypted_data << cipher.final
         { encrypted_data: encrypted_data }
       end
+
       def decrypt(encrypted_data, password, salt, hash_algorithm = "MD5")
         cipher = ::OpenSSL::Cipher.new(ALGORITHM)
         cipher.decrypt
