@@ -161,9 +161,10 @@ module Match
       cert_type = Match.cert_type_sym(specific_cert_type || params[:type])
 
       certs = Dir[File.join(prefixed_working_directory, "certs", cert_type.to_s, "*.cer")]
-      keys = certs.map { |cert_path| cert_path.gsub(/\.cer$/, ".p12") }.select { |f| File.exist?(f) }
+      # Select only certs with the existing .p12 key file.
+      certs.select! { |cert_path| File.exist?(cert_path.gsub(/\.cer$/, ".p12")) }
 
-      storage_has_certs = certs.count != 0 && keys.count != 0
+      storage_has_certs = certs.count != 0
 
       # Determine if cert is renewable.
       # Can't renew developer_id certs with Connect API token. Account holder access is required.
@@ -191,7 +192,6 @@ module Match
           end
 
           certs = []
-          keys = []
           storage_has_certs = false
         end
       end
