@@ -249,7 +249,7 @@ module Match
         TablePrinter.print_certificate_info(cert_info: info)
       end
 
-      return File.basename(cert_path).gsub(".cer", "") # Certificate ID
+      return File.basename(cert_path).gsub(/\.cer$/, "") # Certificate ID
     end
 
     # @return [String] Path to certificate or P12 key
