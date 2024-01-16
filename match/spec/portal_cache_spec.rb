@@ -35,7 +35,7 @@ describe Match do
         expect(cache.profile_type).to eq('IOS_APP_DEVELOPMENT')
         expect(cache.additional_cert_types).to eq(params[:additional_cert_types])
         expect(cache.needs_profiles_devices).to eq(true)
-        expect(cache.needs_profiles_certificate_content).to eq(false)
+        expect(cache.needs_profiles_certificate_content).to eq(true)
         expect(cache.include_mac_in_profiles).to eq(params[:include_mac_in_profiles])
       end
     end
