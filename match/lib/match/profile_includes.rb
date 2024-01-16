@@ -76,7 +76,7 @@ module Match
         cached_certificates.filter! { |c| c.id == certificate_id }
       end
 
-      certificates_differ?(portal_profile: portal_profile, platform: params[:platform], cached_certificates: cached_certificates)
+      force = certificates_differ?(portal_profile: portal_profile, platform: params[:platform], cached_certificates: cached_certificates)
 
       return force
     end
