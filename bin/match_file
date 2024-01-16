@@ -29,6 +29,7 @@ require 'highline'
 # Monkey patch highline to work-around lack of control-c support in highline 2.0
 # Highline 3.0 require ruby 3.0
 # https://github.com/JEG2/highline/pull/259/files
+# rubocop:disable Naming/AccessorMethodName
 HighLine::Terminal::IOConsole.class_eval do
   def get_character
     character = input.getch(intr: true) # from ruby io/console
@@ -38,6 +39,7 @@ HighLine::Terminal::IOConsole.class_eval do
     input.getc
   end
 end
+# rubocop:enable Naming/AccessorMethodName
 
 def ask_password(msg)
   ask(msg) do |q|
