@@ -184,11 +184,11 @@ module Match
           File.delete(cert_path)
 
           # Key filename is the same as cert but with .p12 extension.
-          key_path = cert_path.gsub(/\.cer$/, ".p12")
+          private_key_path = cert_path.gsub(/\.cer$/, ".p12")
           # Remove expired key .p12 file.
-          if File.exist?(key_path)
-            self.files_to_delete << key_path
-            File.delete(key_path)
+          if File.exist?(private_key_path)
+            self.files_to_delete << private_key_path
+            File.delete(private_key_path)
           end
 
           certs = []
