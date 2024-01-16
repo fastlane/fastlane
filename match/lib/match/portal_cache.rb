@@ -19,16 +19,15 @@ module Match
           additional_cert_types: params[:additional_cert_types],
           bundle_id_identifiers: bundle_id_identifiers,
           needs_profiles_devices: ProfileIncludes.can_force_include_all_devices?(params: params, notify: true),
-          needs_profiles_certificate_content: ProfileIncludes.can_force_include_new_certificates?(params: params),
           include_mac_in_profiles: params[:include_mac_in_profiles]
         )
 
         return cache
       end
 
-      attr_reader :platform, :profile_type, :bundle_id_identifiers, :additional_cert_types, :needs_profiles_devices, :needs_profiles_certificate_content, :include_mac_in_profiles
+      attr_reader :platform, :profile_type, :bundle_id_identifiers, :additional_cert_types, :needs_profiles_devices, :include_mac_in_profiles
 
-      def initialize(platform:, profile_type:, additional_cert_types:, bundle_id_identifiers:, needs_profiles_devices:, needs_profiles_certificate_content:, include_mac_in_profiles:)
+      def initialize(platform:, profile_type:, additional_cert_types:, bundle_id_identifiers:, needs_profiles_devices:, include_mac_in_profiles:)
         @platform = platform
         @profile_type = profile_type
 
@@ -40,7 +39,6 @@ module Match
 
         # Profiles
         @needs_profiles_devices = needs_profiles_devices
-        @needs_profiles_certificate_content = needs_profiles_certificate_content
 
         # Devices
         @include_mac_in_profiles = include_mac_in_profiles
@@ -86,8 +84,7 @@ module Match
       def profiles
         @profiles ||= Match::Portal::Fetcher.profiles(
           profile_type: @profile_type,
-          needs_profiles_devices: @needs_profiles_devices,
-          needs_profiles_certificate_content: @needs_profiles_certificate_content
+          needs_profiles_devices: @needs_profiles_devices
         )
 
         return @profiles.dup

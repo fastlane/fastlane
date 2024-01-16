@@ -35,7 +35,6 @@ describe Match do
         expect(cache.profile_type).to eq('IOS_APP_DEVELOPMENT')
         expect(cache.additional_cert_types).to eq(params[:additional_cert_types])
         expect(cache.needs_profiles_devices).to eq(true)
-        expect(cache.needs_profiles_certificate_content).to eq(true)
         expect(cache.include_mac_in_profiles).to eq(params[:include_mac_in_profiles])
       end
     end
@@ -80,7 +79,7 @@ describe Match do
         # GIVEN
         sut = default_sut
 
-        allow(Match::Portal::Fetcher).to receive(:profiles).with(needs_profiles_certificate_content: sut.needs_profiles_certificate_content, needs_profiles_devices: sut.needs_profiles_devices, profile_type: sut.profile_type).and_return(['portal_profile_1']).once
+        allow(Match::Portal::Fetcher).to receive(:profiles).with(needs_profiles_devices: sut.needs_profiles_devices, profile_type: sut.profile_type).and_return(['portal_profile_1']).once
 
         # WHEN
         profiles = sut.profiles
@@ -95,7 +94,7 @@ describe Match do
         # GIVEN
         sut = default_sut
 
-        allow(Match::Portal::Fetcher).to receive(:profiles).with(needs_profiles_certificate_content: sut.needs_profiles_certificate_content, needs_profiles_devices: sut.needs_profiles_devices, profile_type: sut.profile_type).and_return(['portal_profile_1', 'portal_profile_2']).once
+        allow(Match::Portal::Fetcher).to receive(:profiles).with(needs_profiles_devices: sut.needs_profiles_devices, profile_type: sut.profile_type).and_return(['portal_profile_1', 'portal_profile_2']).once
 
         expect(sut.profiles).to eq(['portal_profile_1', 'portal_profile_2'])
 

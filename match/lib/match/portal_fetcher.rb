@@ -5,15 +5,11 @@ require 'spaceship/connect_api/models/profile'
 module Match
   class Portal
     module Fetcher
-      def self.profiles(profile_type:, needs_profiles_devices: false, needs_profiles_certificate_content: false, name: nil)
-        includes = ['bundleId']
+      def self.profiles(profile_type:, needs_profiles_devices: false, name: nil)
+        includes = ['bundleId', 'certificates']
 
         if needs_profiles_devices
           includes += ['devices', 'certificates']
-        end
-
-        if needs_profiles_certificate_content
-          includes += ['certificates']
         end
 
         profiles = Spaceship::ConnectAPI::Profile.all(
