@@ -4,7 +4,7 @@ describe Match do
     describe "select_cert selects best certificate" do
       class CertMock
         attr_accessor :not_before, :not_after, :serial
-        def initialize(starts:, expires:, serial: )
+        def initialize(starts:, expires:, serial:)
           self.not_before = starts
           self.not_after = expires
           self.serial = serial

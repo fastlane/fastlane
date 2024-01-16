@@ -258,16 +258,14 @@ module Match
       return cert_id_path if cert_id_path
 
       # Get the certificate with the latest expiration date.
-      selected_cert_path = cert_paths
-        .sort_by do |cert_path|
-          cert = OpenSSL::X509::Certificate.new(File.binread(cert_path))
+      cert_paths.sort_by! do |cert_path|
+        cert = OpenSSL::X509::Certificate.new(File.binread(cert_path))
 
-          # Sort by expiration date, issue date, serial number and id.
-          [cert.not_after, cert.not_before, cert.serial, File.basename(cert_path)]
-        end
-        .last
+        # Sort by expiration date, issue date, serial number and id.
+        [cert.not_after, cert.not_before, cert.serial, File.basename(cert_path)]
+      end
 
-      return selected_cert_path
+      return cert_paths.last
     end
 
     # rubocop:disable Metrics/PerceivedComplexity
