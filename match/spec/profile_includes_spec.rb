@@ -47,36 +47,64 @@ describe Match do
       end
 
       describe "#certificates_differ?" do
-        it "returns false if certificates are the same" do
-          # WHEN
-          certificates_differ = Match::ProfileIncludes.certificates_differ?(portal_profile: portal_profile, platform: 'ios', cached_certificates: [profile_certificate])
+        describe "certificate_id is not specified (multiple)" do
+          it "returns false if certificates are the same" do
+            # WHEN
+            certificates_differ = Match::ProfileIncludes.certificates_differ?(portal_profile: portal_profile, platform: 'ios', certificate_id: nil, cached_certificates: [profile_certificate])
 
-          # THEN
-          expect(certificates_differ).to be(false)
+            # THEN
+            expect(certificates_differ).to be(false)
+          end
+
+          it "returns true if certs differ even when the count is the same" do
+            # GIVEN
+            portal_cert = double("portal_cert")
+            allow(portal_cert).to receive(:id).and_return(2)
+
+            # WHEN
+            certificates_differ = Match::ProfileIncludes.certificates_differ?(portal_profile: portal_profile, platform: 'ios', certificate_id: nil, cached_certificates: [portal_cert])
+
+            # THEN
+            expect(certificates_differ).to be(true)
+          end
+
+          it "returns true if certs differ" do
+            # GIVEN
+            portal_cert = double("portal_cert")
+            allow(portal_cert).to receive(:id).and_return(2)
+
+            # WHEN
+            certificates_differ = Match::ProfileIncludes.certificates_differ?(portal_profile: portal_profile, platform: 'ios', certificate_id: nil, cached_certificates: [profile_certificate, portal_cert])
+
+            # THEN
+            expect(certificates_differ).to be(true)
+          end
         end
 
-        it "returns true if certs differ even when the count is the same" do
-          # GIVEN
-          portal_cert = double("profile_device")
-          allow(portal_cert).to receive(:id).and_return(2)
+        describe "certificate_id is specified (single)" do
+          it "returns true if certs differ" do
+            # GIVEN
+            portal_cert = double("portal_cert")
+            allow(portal_cert).to receive(:id).and_return(2)
 
-          # WHEN
-          certificates_differ = Match::ProfileIncludes.certificates_differ?(portal_profile: portal_profile, platform: 'ios', cached_certificates: [portal_cert])
+            # WHEN
+            certificates_differ = Match::ProfileIncludes.certificates_differ?(portal_profile: portal_profile, platform: 'ios', certificate_id: portal_cert.id, cached_certificates: [portal_cert, profile_certificate])
 
-          # THEN
-          expect(certificates_differ).to be(true)
-        end
+            # THEN
+            expect(certificates_differ).to be(true)
+          end
 
-        it "returns true if certs differ" do
-          # GIVEN
-          portal_cert = double("profile_device")
-          allow(portal_cert).to receive(:id).and_return(2)
+          it "returns false if certs equal" do
+            # GIVEN
+            portal_cert = double("portal_cert")
+            allow(portal_cert).to receive(:id).and_return(2)
 
-          # WHEN
-          certificates_differ = Match::ProfileIncludes.certificates_differ?(portal_profile: portal_profile, platform: 'ios', cached_certificates: [profile_certificate, portal_cert])
+            # WHEN
+            certificates_differ = Match::ProfileIncludes.certificates_differ?(portal_profile: portal_profile, platform: 'ios', certificate_id: profile_certificate.id, cached_certificates: [profile_certificate, portal_cert])
 
-          # THEN
-          expect(certificates_differ).to be(true)
+            # THEN
+            expect(certificates_differ).to be(false)
+          end
         end
       end
     end
