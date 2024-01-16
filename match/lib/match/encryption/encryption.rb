@@ -10,7 +10,7 @@ module Match
     class EncryptionV1
       ALGORITHM = 'aes-256-cbc'
 
-      def encrypt(data, password, salt, hash_algorithm = "MD5")
+      def encrypt(data:, password:, salt:, hash_algorithm: "MD5")
         cipher = ::OpenSSL::Cipher.new(ALGORITHM)
         cipher.encrypt
 
@@ -21,7 +21,7 @@ module Match
         { encrypted_data: encrypted_data }
       end
 
-      def decrypt(encrypted_data, password, salt, hash_algorithm = "MD5")
+      def decrypt(encrypted_data:, password:, salt:, hash_algorithm: "MD5")
         cipher = ::OpenSSL::Cipher.new(ALGORITHM)
         cipher.decrypt
 
@@ -48,7 +48,7 @@ module Match
     class EncryptionV2
       ALGORITHM = 'aes-256-gcm'
 
-      def encrypt(data, password, salt)
+      def encrypt(data:, password:, salt:)
         cipher = ::OpenSSL::Cipher.new(ALGORITHM)
         cipher.encrypt
 
@@ -62,7 +62,7 @@ module Match
         { encrypted_data: encrypted_data, auth_tag: auth_tag }
       end
 
-      def decrypt(encrypted_data, password, salt, auth_tag)
+      def decrypt(encrypted_data:, password:, salt:, auth_tag:)
         cipher = ::OpenSSL::Cipher.new(ALGORITHM)
         cipher.decrypt
 
@@ -91,41 +91,41 @@ module Match
       V1_PREFIX = "Salted__"
       V2_PREFIX = "match_encrypted_v2__"
 
-      def encrypt(data, password, version = 2)
+      def encrypt(data:, password:, version: 2)
         salt = SecureRandom.random_bytes(8)
         if version == 2
           e = EncryptionV2.new
-          encryption = e.encrypt(data, password, salt)
+          encryption = e.encrypt(data: data, password: password, salt: salt)
           encrypted_data = V2_PREFIX + salt + encryption[:auth_tag] + encryption[:encrypted_data]
         else
           e = EncryptionV1.new
-          encryption = e.encrypt(data, password, salt)
+          encryption = e.encrypt(data: data, password: password, salt: salt)
           encrypted_data = V1_PREFIX + salt + encryption[:encrypted_data]
         end
         Base64.encode64(encrypted_data)
       end
 
-      def decrypt(base64encoded_encrypted, password)
+      def decrypt(base64encoded_encrypted:, password:)
         stored_data = Base64.decode64(base64encoded_encrypted)
         if stored_data.start_with?(V2_PREFIX)
           salt = stored_data[20..27]
           auth_tag = stored_data[28..43]
           data_to_decrypt = stored_data[44..-1]
           e = EncryptionV2.new
-          e.decrypt(data_to_decrypt, password, salt, auth_tag)
+          e.decrypt(encrypted_data: data_to_decrypt, password: password, salt: salt, auth_tag: auth_tag)
         else
           salt = stored_data[8..15]
           data_to_decrypt = stored_data[16..-1]
           e = EncryptionV1.new
           begin
-            e.decrypt(data_to_decrypt, password, salt)
+            e.decrypt(encrypted_data: data_to_decrypt, password: password, salt: salt)
           rescue => _ex
             # Note that we are not guaranteed to catch the decryption errors here if the password is wrong
             # as there's no integrity checks.
             # With a wrong password, there's a 0.4% chance it will decrypt garbage and not fail
             # see https://github.com/fastlane/fastlane/issues/21663
             fallback_hash_algorithm = "SHA256"
-            e.decrypt(data_to_decrypt, password, salt, fallback_hash_algorithm)
+            e.decrypt(encrypted_data: data_to_decrypt, password: password, salt: salt, hash_algorithm: fallback_hash_algorithm)
           end
         end
       end
@@ -137,7 +137,7 @@ module Match
         output_path = file_path unless output_path
         data_to_encrypt = File.binread(file_path)
         e = MatchDataEncryption.new
-        data = e.encrypt(data_to_encrypt, password)
+        data = e.encrypt(data: data_to_encrypt, password: password)
         File.write(output_path, data)
       end
 
@@ -145,7 +145,7 @@ module Match
         output_path = file_path unless output_path
         content = File.read(file_path)
         e = MatchDataEncryption.new
-        decrypted_data = e.decrypt(content, password)
+        decrypted_data = e.decrypt(base64encoded_encrypted: content, password: password)
         File.binwrite(output_path, decrypted_data)
       end
     end
