@@ -70,11 +70,7 @@ module Match
     def self.should_force_include_new_certificates?(params:, portal_profile:, certificate_id:, cached_certificates:)
       return false unless self.can_force_include_new_certificates?(params: params)
 
-      if certificate_id
-        cached_certificates.filter! { |c| c.id == certificate_id }
-      end
-
-      force = certificates_differ?(portal_profile: portal_profile, platform: params[:platform], cached_certificates: cached_certificates)
+      force = certificates_differ?(portal_profile: portal_profile, platform: params[:platform], certificate_id: certificate_id, cached_certificates: cached_certificates)
 
       return force
     end
@@ -84,13 +80,17 @@ module Match
       return params[:force_for_new_certificates]
     end
 
-    def self.certificates_differ?(portal_profile:, platform:, cached_certificates:)
+    def self.certificates_differ?(portal_profile:, platform:, certificate_id:, cached_certificates:)
       return false unless portal_profile
 
       profile_certs = portal_profile.certificates || []
 
       portal_certs = cached_certificates
       portal_certs ||= Match::Portal::Fetcher.certificates(platform: platform, profile_type: portal_profile.profile_type)
+
+      if certificate_id
+        portal_certs.filter! { |c| c.id == certificate_id }
+      end
 
       profile_certs_ids = profile_certs.map(&:id).sort
       portal_certs_ids = portal_certs.map(&:id).sort
