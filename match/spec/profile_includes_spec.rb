@@ -174,6 +174,7 @@ describe Match do
     describe "should's" do
       describe "#should_force_include_new_certificates?" do
         let(:params) { double("params") }
+        let(:portal_profile) { double("portal_profile") }
 
         before do
           allow(params).to receive(:[]).with(:type).and_return('development')
@@ -181,23 +182,45 @@ describe Match do
           allow(params).to receive(:[]).with(:readonly).and_return(false)
           allow(params).to receive(:[]).with(:force).and_return(false)
 
-          # allow(params).to receive(:[]).with(:force_for_new_devices).and_return(true)
           allow(params).to receive(:[]).with(:force_for_new_certificates).and_return(true)
-          # allow(params).to receive(:[]).with(:include_all_certificates).and_return(true)
         end
 
         it "returns true if a single certificate doesn't match" do
           # GIVEN
-          allow(params).to receive(:[]).with(:force_for_new_certificates).and_return(false)
-          portal_profile = nil
-          certificate_id = nil
-          cached_certificates = []
+          allow(params).to receive(:[]).with(:force_for_new_certificates).and_return(true)
+          allow(params).to receive(:[]).with(:platform).and_return('ios')
+
+          profile_certificate = "profile_certificate"
+          allow(portal_profile).to receive(:certificates).and_return([profile_certificate])
+          profile_certificate_id = "profile_certificate_id"
+          allow(profile_certificate).to receive(:id).and_return(profile_certificate_id)
+
+          portal_certificate = "portal_certificate"
+          portal_certificate_id = "portal_certificate_id"
+          allow(portal_certificate).to receive(:id).and_return(portal_certificate_id)
 
           # WHEN
-          should_force_certs = Match::ProfileIncludes.should_force_include_new_certificates?(params: params, portal_profile: portal_profile, certificate_id: certificate_id, cached_certificates: cached_certificates)
+          should_force_new_certs = Match::ProfileIncludes.should_force_include_new_certificates?(params: params, portal_profile: portal_profile, certificate_id: portal_certificate_id, cached_certificates: [portal_certificate])
 
           # THEN
-          expect(should_force_certs).to be(true)
+          expect(should_force_new_certs).to be(true)
+        end
+
+        it "returns false if a single certificate match" do
+          # GIVEN
+          allow(params).to receive(:[]).with(:force_for_new_certificates).and_return(true)
+          allow(params).to receive(:[]).with(:platform).and_return('ios')
+
+          common_certificate = "common_certificate"
+          allow(portal_profile).to receive(:certificates).and_return([common_certificate])
+          common_certificate_id = "certificate_id"
+          allow(common_certificate).to receive(:id).and_return(common_certificate_id)
+
+          # WHEN
+          should_force_new_certs = Match::ProfileIncludes.should_force_include_new_certificates?(params: params, portal_profile: portal_profile, certificate_id: common_certificate_id, cached_certificates: [common_certificate])
+
+          # THEN
+          expect(should_force_new_certs).to be(false)
         end
       end
     end
