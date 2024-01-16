@@ -70,8 +70,6 @@ module Match
     def self.should_force_include_new_certificates?(params:, portal_profile:, certificate_id:, cached_certificates:)
       return false unless self.can_force_include_new_certificates?(params: params)
 
-      force = false
-
       if certificate_id
         cached_certificates.filter! { |c| c.id == certificate_id }
       end
