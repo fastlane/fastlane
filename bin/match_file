@@ -25,22 +25,6 @@ else
   output_file = input_file
 end
 
-require 'highline'
-# Monkey patch highline to work-around lack of control-c support in highline 2.0
-# Highline 3.0 require ruby 3.0
-# https://github.com/JEG2/highline/pull/259/files
-# rubocop:disable Naming/AccessorMethodName
-HighLine::Terminal::IOConsole.class_eval do
-  def get_character
-    character = input.getch(intr: true) # from ruby io/console
-    raise Interrupt if character == "\u0003"
-    character
-  rescue Errno::ENOTTY
-    input.getc
-  end
-end
-# rubocop:enable Naming/AccessorMethodName
-
 def ask_password(msg)
   ask(msg) do |q|
     q.whitespace = :chomp
@@ -50,6 +34,7 @@ end
 
 def ask_password_twice
   password = ask_password("Enter the password: ")
+  return "" if password.empty? || password == "\u0003" # CTRL-C char
   other = ask_password("Enter the password again: ")
   if other == password
     return password
@@ -64,6 +49,8 @@ loop do
   password = ask_password_twice
   break unless password.nil?
 end
+
+exit if password.empty?
 
 begin
   Match::Encryption::MatchFileEncryption.new.send(method_name, file_path: input_file, password: password, output_path: output_file)
