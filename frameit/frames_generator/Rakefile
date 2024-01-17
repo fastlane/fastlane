@@ -185,8 +185,8 @@ def sanitize_filename(filename)
             .gsub('Deep Purple', 'Purple') # "iPhone 14 Pro and Pro Max use "Deep Purple" instead of "Purple" -> unify
             .gsub(' - Portrait', '') # iPads Pro include Portrait and Landscape - we just need Portrait; Landscape filtered via DEVICES_TO_SKIP
             .gsub(' - ', ' ') # Google Pixel device names are separated from their colors by a dash -> remove
-            .gsub(' – ', ' ') # some Apple devices are separated from their colors by this weird dash -> remove
-            .gsub(' — ', ' ') # some Apple devices are separated from their colors by this weird dash -> remove
+            .gsub(' – ', ' ') # some Apple devices are separated from their colors by an en dash -> remove
+            .gsub(' — ', ' ') # some Apple devices are separated from their colors by an em dash -> remove
             .gsub('Note10', 'Note 10') # Samsung Galaxy Note 10 is missing a space in "Note10"
             .gsub('Mi Mix Alpha Front', 'Mi Mix Alpha')
   perform_ipad_renaming(renamed) # Xiaomi Mi Mix Alpha contains the words "Front", "Back" and "Side" => back and side are filtered via DEVICES_TO_SKIP, "Front" removed from the name here
