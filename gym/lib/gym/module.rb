@@ -33,7 +33,7 @@ module Gym
         # Can be iOS project and build for mac if catalyst
         return false if building_mac_catalyst_for_mac?
 
-        # Can be iOS project if iOS, tvOS, watchOS or visionOS
+        # Can be iOS project if iOS, tvOS, watchOS, or visionOS
         return Gym.project.ios? || Gym.project.tvos? || Gym.project.watchos? || Gym.project.visionos?
       end
     end
