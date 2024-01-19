@@ -237,7 +237,7 @@ module Deliver
 
         mapped_values = {}
 
-        # Only update primary and secondar category if explicitly set
+        # Only update primary and secondary category if explicitly set
         unless primary_category.empty?
           mapped = Spaceship::ConnectAPI::AppCategory.map_category_from_itc(
             primary_category
@@ -468,7 +468,7 @@ module Deliver
       end
       localizations = app_info.get_app_info_localizations
 
-      LOCALISED_APP_VALUES.keys.each do |key|
+      LOCALISED_APP_VALUES.each do |key, localized_key|
         current = options[key]
         next unless current
 
@@ -485,7 +485,7 @@ module Deliver
           next if app_info_locale.nil?
 
           begin
-            current_value = app_info_locale.public_send(key.to_sym)
+            current_value = app_info_locale.public_send(localized_key.to_sym)
           rescue NoMethodError
             next
           end
@@ -699,7 +699,7 @@ module Deliver
       end
       UI.message("Setting the app's age rating...")
 
-      # Maping from legacy ITC values to App Store Connect Values
+      # Mapping from legacy ITC values to App Store Connect Values
       mapped_values = {}
       attributes = {}
       json.each do |k, v|

@@ -37,7 +37,7 @@
 # ./floatsign source "iPhone Distribution: Name" -p "path/to/profile" [-d "display name"]  [-e entitlements] [-k keychain] [-b "BundleIdentifier"] outputIpa
 #
 #
-# Modifed 26th January 2012
+# Modified 26th January 2012
 #
 # new features January 2012:
 # 1. change the app display name
@@ -82,12 +82,12 @@
 # 1. fix the way app entitlements are extracted
 #
 # new features October 2021
-# 1. change codesign signatue to use --generate-entitlement-der to include DER encoded entitlements
+# 1. change codesign signature to use --generate-entitlement-der to include DER encoded entitlements
 
 # Logging functions
 
 log() {
-    # Make sure it returns 0 code even when verose mode is off (test 1)
+    # Make sure it returns 0 code even when verbose mode is off (test 1)
     # To use like [[ condition ]] && log "x" && something
     if [[ -n "$VERBOSE" ]]; then echo -e "$@"; else test 1; fi
 }
@@ -149,7 +149,7 @@ usage() {
     echo -e "\t\t\t\t\t\t\tCan't use together with '-n, --version-number' option." >&2
     echo -e "\t-b, --bundle-id bundleId\t\tSpecify new bundle identifier (CFBundleIdentifier)." >&2
     echo -e "\t\t\t\t\t\t\tWarning: will NOT apply for nested apps and extensions." >&2
-    echo -e "\t    --use-app-entitlements\t\tExtract app bundle codesigning entitlements and combine with entitlements from new provisionin profile." >&2
+    echo -e "\t    --use-app-entitlements\t\tExtract app bundle codesigning entitlements and combine with entitlements from new provisioning profile." >&2
     echo -e "\t\t\t\t\t\t\tCan't use together with '-e, --entitlements' option." >&2
     echo -e "\t--keychain-path path\t\t\tSpecify the path to a keychain that /usr/bin/codesign should use." >&2
     echo -e "\t-v, --verbose\t\t\t\tVerbose output." >&2
@@ -561,7 +561,7 @@ function resign {
     FRAMEWORKS_DIR="$APP_PATH/Frameworks"
     if [ -d "$FRAMEWORKS_DIR" ]; then
         if [ "$TEAM_IDENTIFIER" == "" ]; then
-            error "ERROR: embedded frameworks detected, re-signing iOS 8 (or higher) applications wihout a team identifier in the certificate/profile does not work"
+            error "ERROR: embedded frameworks detected, re-signing iOS 8 (or higher) applications without a team identifier in the certificate/profile does not work"
         fi
 
         log "Resigning embedded frameworks using certificate: '$CERTIFICATE'"
@@ -569,7 +569,7 @@ function resign {
         do
             if [[ "$framework" == *.framework || "$framework" == *.dylib ]]; then
                 log "Resigning '$framework'"
-                # Must not qote KEYCHAIN_FLAG because it needs to be unwrapped and passed to codesign with spaces
+                # Must not quote KEYCHAIN_FLAG because it needs to be unwrapped and passed to codesign with spaces
                 # shellcheck disable=SC2086
                 /usr/bin/codesign ${VERBOSE} --generate-entitlement-der ${KEYCHAIN_FLAG} -f -s "$CERTIFICATE" "$framework"
                 checkStatus
@@ -741,7 +741,7 @@ function resign {
         done
 
         # List of rules for transferring entitlements from app to profile plist
-        # The format for each enty is "KEY[|ID_TYPE]"
+        # The format for each entry is "KEY[|ID_TYPE]"
         # Where KEY is the plist key, e.g. "keychain-access-groups"
         # and ID_TYPE is optional part separated by '|' that specifies what value to patch:
         # TEAM_ID - patch the TeamIdentifierPrefix
@@ -838,7 +838,7 @@ function resign {
                 ENTITLEMENTS_VALUE=$(echo "$ENTITLEMENTS_VALUE" | /usr/bin/sed -e "s/$OLD_ICLOUD_ENV/$NEW_ICLOUD_ENV/g")
             fi
 
-            # Remove the entry for current key from profisioning profile entitlements (if exists)
+            # Remove the entry for current key from provisioning profile entitlements (if exists)
             PlistBuddy -c "Delete $KEY" "$PATCHED_ENTITLEMENTS" 2>/dev/null
 
             # Add new entry to patched entitlements
@@ -882,7 +882,7 @@ function resign {
             log "Creating an archived-expanded-entitlements.xcent file for Xcode 9 builds or earlier"
             cp -- "$TEMP_DIR/newEntitlements" "$APP_PATH/archived-expanded-entitlements.xcent"
         fi
-        # Must not qote KEYCHAIN_FLAG because it needs to be unwrapped and passed to codesign with spaces
+        # Must not quote KEYCHAIN_FLAG because it needs to be unwrapped and passed to codesign with spaces
         # shellcheck disable=SC2086
         /usr/bin/codesign ${VERBOSE} --generate-entitlement-der ${KEYCHAIN_FLAG} -f -s "$CERTIFICATE" --entitlements "$TEMP_DIR/newEntitlements" "$APP_PATH"
         checkStatus
@@ -916,7 +916,7 @@ log "Repackaging as $NEW_FILE"
 # Zip up the contents of the "$TEMP_DIR" folder
 # Navigate to the temporary directory (sending the output to null)
 # Zip all the contents, saving the zip file in the above directory
-# Navigate back to the orignating directory (sending the output to null)
+# Navigate back to the originating directory (sending the output to null)
 pushd "$TEMP_DIR" > /dev/null
 # TODO: Fix shellcheck warning and remove directive
 # shellcheck disable=SC2035

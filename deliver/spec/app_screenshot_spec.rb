@@ -1,7 +1,10 @@
 require 'deliver/app_screenshot'
 require 'deliver/setup'
+require_relative 'deliver_constants'
 
 describe Deliver::AppScreenshot do
+  include DeliverConstants
+
   def screen_size_from(path)
     path.match(/{([0-9]+)x([0-9]+)}/).captures.map(&:to_i)
   end
@@ -11,8 +14,6 @@ describe Deliver::AppScreenshot do
       screen_size_from(path)
     end
   end
-
-  ScreenSize = Deliver::AppScreenshot::ScreenSize
 
   describe "#initialize" do
     context "when filename doesn't contain 'iPad Pro (3rd generation)' or 'iPad Pro (4th generation)'" do
@@ -262,8 +263,8 @@ describe Deliver::AppScreenshot do
   describe "#is_messages?" do
     it "should return true when contained in the iMessage directory" do
       files = [
-        "screenshots/iMessage/en-GB/iPhoneXSMax-Potrait{1242x2688}.png",
-        "screenshots/iMessage/en-GB/iPhoneXS-Potrait{1125x2436}.png",
+        "screenshots/iMessage/en-GB/iPhoneXSMax-Portrait{1242x2688}.png",
+        "screenshots/iMessage/en-GB/iPhoneXS-Portrait{1125x2436}.png",
         "screenshots/iMessage/en-GB/iPhone8Plus-Landscape{2208x1242}.png",
         "screenshots/iMessage/en-GB/iPhone8-Landscape{1334x750}.png",
         "screenshots/iMessage/en-GB/iPhoneSE-Portrait-NoStatusBar{640x1096}.png",
@@ -280,8 +281,8 @@ describe Deliver::AppScreenshot do
 
     it "should return false when not contained in the iMessage directory" do
       files = [
-        "screenshots/en-GB/iPhoneXSMax-Potrait{1242x2688}.png",
-        "screenshots/en-GB/iPhoneXS-Potrait{1125x2436}.png",
+        "screenshots/en-GB/iPhoneXSMax-Portrait{1242x2688}.png",
+        "screenshots/en-GB/iPhoneXS-Portrait{1125x2436}.png",
         "screenshots/en-GB/iPhone8Plus-Landscape{2208x1242}.png",
         "screenshots/en-GB/iPhone8-Landscape{1334x750}.png",
         "screenshots/en-GB/iPhoneSE-Portrait-NoStatusBar{640x1096}.png",
