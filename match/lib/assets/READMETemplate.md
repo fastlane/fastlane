@@ -14,7 +14,7 @@ Make sure you have the latest version of the Xcode command line tools installed:
 xcode-select --install
 ```
 
-Install _fastlane_ using bundler by following instructions here : https://docs.fastlane.tools
+Install _fastlane_ using bundler by following instructions here on [fastlane docs](https://docs.fastlane.tools).
 
 or alternatively using 
 
