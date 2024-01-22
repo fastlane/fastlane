@@ -84,12 +84,12 @@ module Match
       end
 
       # Certificate
-      cert_id = fetch_certificate(params: params, renew_expired_certs: true)
+      cert_id = fetch_certificate(params: params, renew_expired_certs: false)
 
       # Mac Installer Distribution Certificate
       additional_cert_types = params[:additional_cert_types] || []
       cert_ids = additional_cert_types.map do |additional_cert_type|
-        fetch_certificate(params: params, renew_expired_certs: true, specific_cert_type: additional_cert_type)
+        fetch_certificate(params: params, renew_expired_certs: false, specific_cert_type: additional_cert_type)
       end
 
       profile_type = Sigh.profile_type_for_distribution_type(
