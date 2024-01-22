@@ -5,8 +5,7 @@ module Spaceship
       include Spaceship::ConnectAPI::Model
 
       # Fields
-      attr_accessor :available_in_all_territories,
-                    :family_sharable,
+      attr_accessor :family_sharable,
                     :name,
                     :product_id,
                     :review_note,
@@ -44,7 +43,6 @@ module Spaceship
       end
 
       attr_mapping({
-        availableInAllTerritories: 'available_in_all_territories',
         familySharable: 'family_sharable',
         name: 'name',
         productId: 'product_id',
@@ -68,7 +66,6 @@ module Spaceship
       def update(
             client: nil,
             name: nil,
-            available_in_all_territories: nil,
             family_sharable: nil,
             review_note: nil,
             subscription_period: nil,
@@ -78,7 +75,6 @@ module Spaceship
         resps = client.update_subscription(
           purchase_id: id,
           name: name,
-          available_in_all_territories: available_in_all_territories,
           family_sharable: family_sharable,
           review_note: review_note,
           subscription_period: subscription_period,

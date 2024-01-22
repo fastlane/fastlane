@@ -5,8 +5,7 @@ module Spaceship
       include Spaceship::ConnectAPI::Model
 
       # Attributes
-      attr_accessor :available_in_all_territories,
-                    :content_hosting,
+      attr_accessor :content_hosting,
                     :family_sharable,
                     :in_app_purchase_type,
                     :name,
@@ -41,7 +40,6 @@ module Spaceship
       end
 
       attr_mapping({
-        availableInAllTerritories: 'available_in_all_territories',
         contentHosting: 'content_hosting',
         familySharable: 'family_sharable',
         inAppPurchaseType: 'in_app_purchase_type',
@@ -61,9 +59,9 @@ module Spaceship
       # Update
       #
 
-      def update(client: nil, name: nil, review_note: nil, family_sharable: nil, available_in_all_territories: nil)
+      def update(client: nil, name: nil, review_note: nil, family_sharable: nil)
         client ||= Spaceship::ConnectAPI
-        resps = client.update_in_app_purchase(purchase_id: id, name: name, review_note: review_note, family_sharable: family_sharable, available_in_all_territories: available_in_all_territories)
+        resps = client.update_in_app_purchase(purchase_id: id, name: name, review_note: review_note, family_sharable: family_sharable)
         models = resps.to_models.first # self
       end
 

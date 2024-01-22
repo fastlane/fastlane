@@ -27,7 +27,7 @@ module Spaceship
           iap_request_client.get("apps/#{app_id}/inAppPurchasesV2", params)
         end
 
-        def create_in_app_purchase(app_id:, name:, product_id:, in_app_purchase_type:, review_note: nil, family_sharable: nil, available_in_all_territories: nil, mighty_logger: nil)
+        def create_in_app_purchase(app_id:, name:, product_id:, in_app_purchase_type:, review_note: nil, family_sharable: nil, mighty_logger: nil)
           attributes = {
             name: name,
             productId: product_id,
@@ -35,7 +35,6 @@ module Spaceship
           }
 
           # Optional Params
-          attributes[:availableInAllTerritories] = available_in_all_territories unless available_in_all_territories.nil?
           attributes[:familySharable] = family_sharable unless family_sharable.nil?
           attributes[:reviewNote] = review_note unless review_note.nil?
 
@@ -60,14 +59,13 @@ module Spaceship
           iap_request_client.post('https://api.appstoreconnect.apple.com/v2/inAppPurchases', params)
         end
 
-        def update_in_app_purchase(purchase_id:, name: nil, review_note: nil, family_sharable: nil, available_in_all_territories: nil)
+        def update_in_app_purchase(purchase_id:, name: nil, review_note: nil, family_sharable: nil)
           attributes = {}
 
           # Optional attributes
           attributes[:name] = name unless name.nil?
           attributes[:reviewNote] = review_note unless review_note.nil?
           attributes[:familySharable] = family_sharable unless family_sharable.nil?
-          attributes[:availableInAllTerritories] = available_in_all_territories unless available_in_all_territories.nil?
 
           params = {
             data: {
@@ -287,14 +285,13 @@ module Spaceship
           iap_request_client.get("subscriptionGroups/#{family_id}/subscriptions", params)
         end
 
-        def create_subscription(name:, product_id:, family_id:, available_in_all_territories: nil, family_sharable: nil, review_note: nil, subscription_period: nil, group_level: nil, mighty_logger: nil)
+        def create_subscription(name:, product_id:, family_id:, family_sharable: nil, review_note: nil, subscription_period: nil, group_level: nil, mighty_logger: nil)
           attributes = {
             name: name,
             productId: product_id
           }
 
           # Optional Params
-          attributes[:availableInAllTerritories] = available_in_all_territories unless available_in_all_territories.nil?
           attributes[:familySharable] = family_sharable unless family_sharable.nil?
           attributes[:reviewNote] = review_note unless review_note.nil?
           attributes[:subscriptionPeriod] = subscription_period unless subscription_period.nil?
@@ -323,7 +320,6 @@ module Spaceship
         def update_subscription(
               purchase_id:,
               name: nil,
-              available_in_all_territories: nil,
               family_sharable: nil,
               review_note: nil,
               subscription_period: nil,
@@ -333,7 +329,6 @@ module Spaceship
 
           # Optional Params
           attributes[:name] = name unless name.nil?
-          attributes[:availableInAllTerritories] = available_in_all_territories unless available_in_all_territories.nil?
           attributes[:familySharable] = family_sharable unless family_sharable.nil?
           attributes[:reviewNote] = review_note unless review_note.nil?
           attributes[:subscriptionPeriod] = subscription_period unless subscription_period.nil?
