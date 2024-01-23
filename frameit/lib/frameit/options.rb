@@ -29,7 +29,7 @@ module Frameit
             env_name: option[:env_name],
             description: option[:description],
             default_value: false,
-            type: Boolean,
+            type: Boolean
           )
         end
 
