@@ -4546,7 +4546,24 @@ public func flock(message: String,
 /**
  Adds device frames around all screenshots (via _frameit_)
 
- - SeeAlso: frameit()
+ - parameters:
+   - white: Use white device frames
+   - silver: Use white device frames. Alias for :white
+   - roseGold: Use rose gold device frames. Alias for :rose_gold
+   - gold: Use gold device frames. Alias for :gold
+   - forceDeviceType: Forces a given device type, useful for Mac screenshots, as their sizes vary
+   - useLegacyIphone5s: Use iPhone 5s instead of iPhone SE frames
+   - useLegacyIphone6s: Use iPhone 6s frames instead of iPhone 7 frames
+   - useLegacyIphone7: Use iPhone 7 frames instead of iPhone 8 frames
+   - useLegacyIphonex: Use iPhone X instead of iPhone XS frames
+   - useLegacyIphonexr: Use iPhone XR instead of iPhone 11 frames
+   - useLegacyIphonexs: Use iPhone XS instead of iPhone 11 Pro frames
+   - useLegacyIphonexsmax: Use iPhone XS Max instead of iPhone 11 Pro Max frames
+   - forceOrientationBlock: [Advanced] A block to customize your screenshots' device orientation
+   - debugMode: Output debug information in framed screenshots
+   - resume: Resume frameit instead of reprocessing all screenshots
+   - usePlatform: Choose a platform, the valid options are IOS, ANDROID and ANY (default is either general platform defined in the fastfile or IOS to ensure backward compatibility)
+   - path: The path to the directory containing the screenshots
 
  Uses [frameit](https://docs.fastlane.tools/actions/frameit/) to prepare perfect screenshots for the App Store, your website, QA or emails.
  You can add background and titles to the framed screenshots as well.
@@ -4555,11 +4572,6 @@ public func frameScreenshots(white: OptionalConfigValue<Bool?> = .fastlaneDefaul
                              silver: OptionalConfigValue<Bool?> = .fastlaneDefault(nil),
                              roseGold: OptionalConfigValue<Bool?> = .fastlaneDefault(nil),
                              gold: OptionalConfigValue<Bool?> = .fastlaneDefault(nil),
-                             midnight: OptionalConfigValue<Bool?> = .fastlaneDefault(nil),
-                             starlight: OptionalConfigValue<Bool?> = .fastlaneDefault(nil),
-                             purple: OptionalConfigValue<Bool?> = .fastlaneDefault(nil),
-                             blue: OptionalConfigValue<Bool?> = .fastlaneDefault(nil),
-                             red: OptionalConfigValue<Bool?> = .fastlaneDefault(nil),
                              forceDeviceType: OptionalConfigValue<String?> = .fastlaneDefault(nil),
                              useLegacyIphone5s: OptionalConfigValue<Bool> = .fastlaneDefault(false),
                              useLegacyIphone6s: OptionalConfigValue<Bool> = .fastlaneDefault(false),
@@ -4572,29 +4584,47 @@ public func frameScreenshots(white: OptionalConfigValue<Bool?> = .fastlaneDefaul
                              debugMode: OptionalConfigValue<Bool> = .fastlaneDefault(false),
                              resume: OptionalConfigValue<Bool> = .fastlaneDefault(false),
                              usePlatform: String = "IOS",
-                             path: String = "./") {
-    frameit(white: white,
-            silver: silver,
-            roseGold: roseGold,
-            gold: gold,
-            midnight: midnight,
-            starlight: starlight,
-            purple: purple,
-            blue: blue,
-            red: red,
-            forceDeviceType: forceDeviceType,
-            useLegacyIphone5s: useLegacyIphone5s,
-            useLegacyIphone6s: useLegacyIphone6s,
-            useLegacyIphone7: useLegacyIphone7,
-            useLegacyIphonex: useLegacyIphonex,
-            useLegacyIphonexr: useLegacyIphonexr,
-            useLegacyIphonexs: useLegacyIphonexs,
-            useLegacyIphonexsmax: useLegacyIphonexsmax,
-            forceOrientationBlock: forceOrientationBlock,
-            debugMode: debugMode,
-            resume: resume,
-            usePlatform: usePlatform,
-            path: path)
+                             path: String = "./")
+{
+    let whiteArg = white.asRubyArgument(name: "white", type: nil)
+    let silverArg = silver.asRubyArgument(name: "silver", type: nil)
+    let roseGoldArg = roseGold.asRubyArgument(name: "rose_gold", type: nil)
+    let goldArg = gold.asRubyArgument(name: "gold", type: nil)
+    let forceDeviceTypeArg = forceDeviceType.asRubyArgument(name: "force_device_type", type: nil)
+    let useLegacyIphone5sArg = useLegacyIphone5s.asRubyArgument(name: "use_legacy_iphone5s", type: nil)
+    let useLegacyIphone6sArg = useLegacyIphone6s.asRubyArgument(name: "use_legacy_iphone6s", type: nil)
+    let useLegacyIphone7Arg = useLegacyIphone7.asRubyArgument(name: "use_legacy_iphone7", type: nil)
+    let useLegacyIphonexArg = useLegacyIphonex.asRubyArgument(name: "use_legacy_iphonex", type: nil)
+    let useLegacyIphonexrArg = useLegacyIphonexr.asRubyArgument(name: "use_legacy_iphonexr", type: nil)
+    let useLegacyIphonexsArg = useLegacyIphonexs.asRubyArgument(name: "use_legacy_iphonexs", type: nil)
+    let useLegacyIphonexsmaxArg = useLegacyIphonexsmax.asRubyArgument(name: "use_legacy_iphonexsmax", type: nil)
+    let forceOrientationBlockArg = RubyCommand.Argument(name: "force_orientation_block", value: forceOrientationBlock, type: .stringClosure)
+    let debugModeArg = debugMode.asRubyArgument(name: "debug_mode", type: nil)
+    let resumeArg = resume.asRubyArgument(name: "resume", type: nil)
+    let usePlatformArg = RubyCommand.Argument(name: "use_platform", value: usePlatform, type: nil)
+    let pathArg = RubyCommand.Argument(name: "path", value: path, type: nil)
+    let array: [RubyCommand.Argument?] = [whiteArg,
+                                          silverArg,
+                                          roseGoldArg,
+                                          goldArg,
+                                          forceDeviceTypeArg,
+                                          useLegacyIphone5sArg,
+                                          useLegacyIphone6sArg,
+                                          useLegacyIphone7Arg,
+                                          useLegacyIphonexArg,
+                                          useLegacyIphonexrArg,
+                                          useLegacyIphonexsArg,
+                                          useLegacyIphonexsmaxArg,
+                                          forceOrientationBlockArg,
+                                          debugModeArg,
+                                          resumeArg,
+                                          usePlatformArg,
+                                          pathArg]
+    let args: [RubyCommand.Argument] = array
+        .filter { $0?.value != nil }
+        .compactMap { $0 }
+    let command = RubyCommand(commandID: "", methodName: "frame_screenshots", className: nil, args: args)
+    _ = runner.executeCommand(command)
 }
 
 /**
@@ -4605,11 +4635,6 @@ public func frameScreenshots(white: OptionalConfigValue<Bool?> = .fastlaneDefaul
    - silver: Use white device frames. Alias for :white
    - roseGold: Use rose gold device frames. Alias for :rose_gold
    - gold: Use gold device frames. Alias for :gold
-   - midnight: Use midnight device frames
-   - starlight: Use starlight device frames
-   - purple: Use purple device frames
-   - blue: Use blue device frames
-   - red: Use red device frames
    - forceDeviceType: Forces a given device type, useful for Mac screenshots, as their sizes vary
    - useLegacyIphone5s: Use iPhone 5s instead of iPhone SE frames
    - useLegacyIphone6s: Use iPhone 6s frames instead of iPhone 7 frames
@@ -4631,11 +4656,6 @@ public func frameit(white: OptionalConfigValue<Bool?> = .fastlaneDefault(nil),
                     silver: OptionalConfigValue<Bool?> = .fastlaneDefault(nil),
                     roseGold: OptionalConfigValue<Bool?> = .fastlaneDefault(nil),
                     gold: OptionalConfigValue<Bool?> = .fastlaneDefault(nil),
-                    midnight: OptionalConfigValue<Bool?> = .fastlaneDefault(nil),
-                    starlight: OptionalConfigValue<Bool?> = .fastlaneDefault(nil),
-                    purple: OptionalConfigValue<Bool?> = .fastlaneDefault(nil),
-                    blue: OptionalConfigValue<Bool?> = .fastlaneDefault(nil),
-                    red: OptionalConfigValue<Bool?> = .fastlaneDefault(nil),
                     forceDeviceType: OptionalConfigValue<String?> = .fastlaneDefault(nil),
                     useLegacyIphone5s: OptionalConfigValue<Bool> = .fastlaneDefault(false),
                     useLegacyIphone6s: OptionalConfigValue<Bool> = .fastlaneDefault(false),
@@ -4654,11 +4674,6 @@ public func frameit(white: OptionalConfigValue<Bool?> = .fastlaneDefault(nil),
     let silverArg = silver.asRubyArgument(name: "silver", type: nil)
     let roseGoldArg = roseGold.asRubyArgument(name: "rose_gold", type: nil)
     let goldArg = gold.asRubyArgument(name: "gold", type: nil)
-    let midnightArg = midnight.asRubyArgument(name: "midnight", type: nil)
-    let starlightArg = starlight.asRubyArgument(name: "starlight", type: nil)
-    let purpleArg = purple.asRubyArgument(name: "purple", type: nil)
-    let blueArg = blue.asRubyArgument(name: "blue", type: nil)
-    let redArg = red.asRubyArgument(name: "red", type: nil)
     let forceDeviceTypeArg = forceDeviceType.asRubyArgument(name: "force_device_type", type: nil)
     let useLegacyIphone5sArg = useLegacyIphone5s.asRubyArgument(name: "use_legacy_iphone5s", type: nil)
     let useLegacyIphone6sArg = useLegacyIphone6s.asRubyArgument(name: "use_legacy_iphone6s", type: nil)
@@ -4676,11 +4691,6 @@ public func frameit(white: OptionalConfigValue<Bool?> = .fastlaneDefault(nil),
                                           silverArg,
                                           roseGoldArg,
                                           goldArg,
-                                          midnightArg,
-                                          starlightArg,
-                                          purpleArg,
-                                          blueArg,
-                                          redArg,
                                           forceDeviceTypeArg,
                                           useLegacyIphone5sArg,
                                           useLegacyIphone6sArg,
