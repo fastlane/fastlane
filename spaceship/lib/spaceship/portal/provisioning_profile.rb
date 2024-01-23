@@ -484,7 +484,14 @@ module Spaceship
       # @return (Bool) Is the current provisioning profile valid?
       #                To also verify the certificate call certificate_valid?
       def valid?
-        return status == 'Active'
+        # Provisioning profiles are not invalidated automatically on the dev portal when the certificate expires.
+        # They become Invalid only when opened directly in the portal 🤷.
+        # We need to do an extra check on the expiration date to ensure the profile is valid.
+        expired = Time.now.utc > self.expires
+
+        is_valid = status == 'Active' && !expired
+
+        return is_valid
       end
 
       # @return (Bool) Is this profile managed by Xcode?

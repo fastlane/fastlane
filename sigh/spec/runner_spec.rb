@@ -125,7 +125,7 @@ describe Sigh do
         options = {}
         Sigh.config = FastlaneCore::Configuration.create(Sigh::Options.available_options, options)
 
-        expect(Spaceship::ConnectAPI::Device).not_to(receive(:all))
+        expect(Spaceship::ConnectAPI::Device).not_to(receive(:devices_for_platform))
 
         devices = fake_runner.devices_to_use
         expect(devices.size).to eq(0)
@@ -135,7 +135,7 @@ describe Sigh do
         options = { developer_id: true }
         Sigh.config = FastlaneCore::Configuration.create(Sigh::Options.available_options, options)
 
-        expect(Spaceship::ConnectAPI::Device).not_to(receive(:all))
+        expect(Spaceship::ConnectAPI::Device).not_to(receive(:devices_for_platform))
 
         devices = fake_runner.devices_to_use
         expect(devices.size).to eq(0)
@@ -145,7 +145,7 @@ describe Sigh do
         options = { development: true }
         Sigh.config = FastlaneCore::Configuration.create(Sigh::Options.available_options, options)
 
-        expect(Spaceship::ConnectAPI::Device).to receive(:all).and_return(["device"])
+        expect(Spaceship::ConnectAPI::Device).to receive(:devices_for_platform).and_return(["device"])
 
         devices = fake_runner.devices_to_use
         expect(devices.size).to eq(1)
@@ -155,7 +155,7 @@ describe Sigh do
         options = { development: true, include_mac_in_profiles: true }
         Sigh.config = FastlaneCore::Configuration.create(Sigh::Options.available_options, options)
 
-        expect(Spaceship::ConnectAPI::Device).to receive(:all).and_return(["ios_device", "as_device"])
+        expect(Spaceship::ConnectAPI::Device).to receive(:devices_for_platform).and_return(["ios_device", "as_device"])
 
         devices = fake_runner.devices_to_use
         expect(devices.size).to eq(2)
@@ -165,7 +165,7 @@ describe Sigh do
         options = { adhoc: true }
         Sigh.config = FastlaneCore::Configuration.create(Sigh::Options.available_options, options)
 
-        expect(Spaceship::ConnectAPI::Device).to receive(:all).and_return(["device"])
+        expect(Spaceship::ConnectAPI::Device).to receive(:devices_for_platform).and_return(["device"])
 
         devices = fake_runner.devices_to_use
         expect(devices.size).to eq(1)

@@ -1,4 +1,5 @@
-require_relative '../model'
+require_relative '../../connect_api'
+
 module Spaceship
   class ConnectAPI
     class Device
@@ -50,11 +51,89 @@ module Spaceship
       #
       # API
       #
-
-      def self.all(client: nil, filter: {}, includes: nil, fields: nil, limit: nil, sort: nil)
+      def self.all(client: nil, filter: {}, includes: nil, fields: nil, limit: Spaceship::ConnectAPI::MAX_OBJECTS_PER_PAGE_LIMIT, sort: nil)
         client ||= Spaceship::ConnectAPI
         resps = client.get_devices(filter: filter, includes: includes, fields: fields, limit: limit, sort: sort).all_pages
         return resps.flat_map(&:to_models)
+      end
+
+      # @param platform [String] The provisioning profile's platform (i.e. ios, tvos, macos, catalyst).
+      # @param include_mac_in_profiles [Bool] Whether to include macs in iOS provisioning profiles. false by default.
+      # @param client [ConnectAPI] ConnectAPI client.
+      # @return (Device) List of enabled devices.
+      def self.devices_for_platform(platform: nil, include_mac_in_profiles: false, client: nil)
+        platform = platform.to_sym
+        include_mac_in_profiles &&= platform == :ios
+
+        device_platform = case platform
+                          when :osx, :macos, :mac
+                            Spaceship::ConnectAPI::Platform::MAC_OS
+                          when :ios
+                            Spaceship::ConnectAPI::Platform::IOS
+                          when :catalyst
+                            Spaceship::ConnectAPI::Platform::MAC_OS
+                          end
+
+        device_platforms = [
+          device_platform,
+          'UNIVERSAL' # Universal Bundle ID platform is undocumented as of Oct 4, 2023.
+        ]
+
+        device_classes =
+          case platform
+          when :ios
+            [
+              Spaceship::ConnectAPI::Device::DeviceClass::IPAD,
+              Spaceship::ConnectAPI::Device::DeviceClass::IPHONE,
+              Spaceship::ConnectAPI::Device::DeviceClass::IPOD,
+              Spaceship::ConnectAPI::Device::DeviceClass::APPLE_WATCH
+            ]
+          when :tvos
+            [
+              Spaceship::ConnectAPI::Device::DeviceClass::APPLE_TV
+            ]
+          when :macos, :catalyst
+            [
+              Spaceship::ConnectAPI::Device::DeviceClass::MAC
+            ]
+          else
+            []
+          end
+
+        if include_mac_in_profiles
+          device_classes << Spaceship::ConnectAPI::Device::DeviceClass::APPLE_SILICON_MAC
+          device_platforms << Spaceship::ConnectAPI::Platform::MAC_OS
+        end
+
+        filter = {
+          status: Spaceship::ConnectAPI::Device::Status::ENABLED,
+          platform: device_platforms.uniq.join(',')
+        }
+
+        devices = Spaceship::ConnectAPI::Device.all(
+          client: client,
+          filter: filter
+        )
+
+        unless device_classes.empty?
+          devices.select! do |device|
+            # App Store Connect API return MAC in device_class instead of APPLE_SILICON_MAC for Silicon Macs.
+            # The difference between old MAC and APPLE_SILICON_MAC is provisioning uuid.
+            # Intel-based provisioning UUID: 01234567-89AB-CDEF-0123-456789ABCDEF.
+            # arm64-based provisioning UUID: 01234567-89ABCDEF12345678.
+            # Workaround is to include macs having:
+            #   * 25 chars length and only one hyphen in provisioning UUID.
+            if include_mac_in_profiles &&
+               device.device_class == Spaceship::ConnectAPI::Device::DeviceClass::MAC
+
+              next device.udid.length == 25 && device.udid.count('-') == 1
+            end
+
+            device_classes.include?(device.device_class)
+          end
+        end
+
+        devices
       end
 
       # @param client [ConnectAPI] ConnectAPI client.

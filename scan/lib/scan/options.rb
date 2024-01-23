@@ -269,7 +269,7 @@ module Scan
                                      default_value: Fastlane::Helper::XcodebuildFormatterHelper.xcbeautify_installed? ? 'xcbeautify' : 'xcpretty',
                                      default_value_dynamic: true),
         FastlaneCore::ConfigItem.new(key: :output_remove_retry_attempts,
-                                     env_name: "SCAN_OUTPUT_REMOVE_RETRY_ATTEMPS",
+                                     env_names: ["SCAN_OUTPUT_REMOVE_RETRY_ATTEMPS", "SCAN_OUTPUT_REMOVE_RETRY_ATTEMPTS"], # The version with typo must be deprecated
                                      description: "Remove retry attempts from test results table and the JUnit report (if not using xcpretty)",
                                      type: Boolean,
                                      default_value: false),

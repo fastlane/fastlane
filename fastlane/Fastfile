@@ -27,7 +27,7 @@ lane :lint_source do
   # Verifying that no debug code is in the code base
   #
   exclude_dirs = ["\.bundle", "*/vendor/bundle"]
-  ensure_no_debug_code(text: "binding.pry", extension: ".rb", exclude: "playground.rb", exclude_dirs: exclude_dirs) # debugging code
+  ensure_no_debug_code(text: "binding\.(irb|pry)", extension: ".rb", exclude: "playground.rb", exclude_dirs: exclude_dirs) # debugging code
   ensure_no_debug_code(text: "# TODO", extension: ".rb", exclude_dirs: exclude_dirs) # TODOs
   ensure_no_debug_code(text: "now: ", extension: ".rb", exclude_dirs: exclude_dirs) # rspec focus
   ensure_no_debug_code(text: "<<<<<<<", extension: ".rb", exclude_dirs: exclude_dirs) # Merge conflict
@@ -323,7 +323,7 @@ end
 
 lane :release_brew do
   version = local_version
-  sh("cd .. && brew bump-formula-pr fastlane --force --url=https://github.com/fastlane/fastlane/archive/#{version}.tar.gz")
+  sh("cd .. && brew update && brew bump-formula-pr fastlane --force --url=https://github.com/fastlane/fastlane/archive/refs/tags/#{version}.tar.gz")
 end
 
 lane :release_github do

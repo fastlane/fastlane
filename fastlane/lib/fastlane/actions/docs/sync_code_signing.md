@@ -509,11 +509,15 @@ Please be careful when using this option and ensure the certificates and profile
 
 ### Manual Decrypt
 
-If you want to manually decrypt a file you can.
+If you want to manually decrypt or encrypt a file, you can use the companion script `match_file`:
 
 ```no-highlight
-openssl aes-256-cbc -k "<password>" -in "<fileYouWantToDecryptPath>" -out "<decryptedFilePath>" -a -d -md [md5|sha256]
+match_file encrypt "<fileYouWantToEncryptPath>" ["<encryptedFilePath>"]
+
+match_file decrypt "<fileYouWantToDecryptPath>" ["<decryptedFilePath>"]
 ```
+
+The password will be asked interactively.
 
 _**Note:** You may need to swap double quotes `"` for single quotes `'` if your match password contains an exclamation mark `!`._
 
