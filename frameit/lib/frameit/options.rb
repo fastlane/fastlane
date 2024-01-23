@@ -14,8 +14,8 @@ module Frameit
           { key: :black, env_name: "FRAMEIT_BLACK_FRAME", description: "Use black device frames" },
           { key: :white, env_name: "FRAMEIT_WHITE_FRAME", description: "Use white device frames" },
           { key: :silver, env_name: "FRAMEIT_SILVER_FRAME", description: "Use white device frames. Alias for :white" },
-          { key: :gold, env_name: "FRAMEIT_GOLD_FRAME", description: "Use gold device frames. Alias for :gold" },
-          { key: :rose_gold, env_name: "FRAMEIT_ROSE_GOLD_FRAME", description: "Use rose gold device frames. Alias for :rose_gold" },
+          { key: :gold, env_name: "FRAMEIT_GOLD_FRAME", description: "Use gold device frame" },
+          { key: :rose_gold, env_name: "FRAMEIT_ROSE_GOLD_FRAME", description: "Use rose gold device frames" },
           { key: :midnight, env_name: "FRAMEIT_MIDNIGHT_FRAME", description: "Use midnight device frames" },
           { key: :starlight, env_name: "FRAMEIT_STARLIGHT_FRAME", description: "Use starlight device frames" },
           { key: :purple, env_name: "FRAMEIT_PURPLE_FRAME", description: "Use purple device frames" },
@@ -28,16 +28,15 @@ module Frameit
             key: option[:key],
             env_name: option[:env_name],
             description: option[:description],
-            type: Boolean,
             default_value: false,
-            optional: true
+            type: Boolean,
           )
         end
 
         options += [
           FastlaneCore::ConfigItem.new(key: :force_device_type,
             env_name: "FRAMEIT_FORCE_DEVICE_TYPE",
-            description: "Forces a given device type, useful for Mac screenshots, as their sizes vary",
+            description: "Forces a given device type, useful for macOS screenshots, as their sizes vary",
             optional: true,
             verify_block: proc do |value|
               UI.user_error!("Invalid device type '#{value}'. Available values: " + Devices.all_device_names_without_apple.join(', ')) unless ConfigParser.supported_device?(value)

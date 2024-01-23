@@ -48,7 +48,7 @@ module Frameit
         end
       end
 
-      # iphone available colors
+      # iPhone available colors
       frame_colors = {
         silver: { syntax: 'fastlane frameit silver', description: "Adds a silver frame around all screenshots" },
         gold: { syntax: 'fastlane frameit gold', description: "Adds a gold frame around all screenshots" },
