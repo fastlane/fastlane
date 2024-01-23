@@ -70,6 +70,8 @@ module Spaceship
                             Spaceship::ConnectAPI::Platform::MAC_OS
                           when :ios
                             Spaceship::ConnectAPI::Platform::IOS
+                          when :tvos
+                            Spaceship::ConnectAPI::Platform::TV_OS
                           when :catalyst
                             Spaceship::ConnectAPI::Platform::MAC_OS
                           end
@@ -106,9 +108,9 @@ module Spaceship
         end
 
         filter = {
-          status: Spaceship::ConnectAPI::Device::Status::ENABLED,
-          platform: device_platforms.uniq.join(',')
+          status: Spaceship::ConnectAPI::Device::Status::ENABLED
         }
+        filter[:platform] = device_platforms.join(',') unless device_platforms.empty?
 
         devices = Spaceship::ConnectAPI::Device.all(
           client: client,
