@@ -8,8 +8,8 @@ module Spaceship
       attr_accessor :last_name
       attr_accessor :email
       attr_accessor :invite_type
-      attr_accessor :invitation
       attr_accessor :beta_tester_state
+      attr_accessor :is_deleted
       attr_accessor :last_modified_date
       attr_accessor :installed_cf_bundle_short_version_string
       attr_accessor :installed_cf_bundle_version
@@ -28,8 +28,8 @@ module Spaceship
         "lastName" => "last_name",
         "email" => "email",
         "inviteType" => "invite_type",
-        "invitation" => "invitation",
         "betaTesterState" => "beta_tester_state",
+        "isDeleted" => "is_deleted",
         "lastModifiedDate" => "last_modified_date",
         "installedCfBundleShortVersionString" => "installed_cf_bundle_short_version_string",
         "installedCfBundleVersion" => "installed_cf_bundle_version",
