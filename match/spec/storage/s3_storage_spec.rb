@@ -109,39 +109,36 @@ describe Match do
       end
     end
   end
-end
 
-describe Match::Storage::S3Storage do
-  let(:s3_endpoint) { 'http://localhost:9000' }
-  let(:s3_force_path_style) { true }
-  let(:s3_client) { instance_double('Aws::S3::Client') }
+  describe Match::Storage::S3Storage do
 
-  subject do
-    described_class.new(
-      s3_region: nil,
-      s3_access_key: nil,
-      s3_secret_access_key: nil,
-      s3_bucket: 'foobar',
-      s3_endpoint: s3_endpoint,
-      s3_force_path_style: s3_force_path_style
-    )
-  end
+    describe '#initialize with custom endpoint and force_path_style' do
+      let(:access_key) { 'access_key' }
+      let(:secret_access_key) { 'secret_access_key' }
+      let(:region) { 'us-east-1' }
+      let(:endpoint) { 'http://localhost:9000' }
+      let(:force_path_style) { true }
+      subject do
+        described_class.new(
+          s3_region: region,
+          s3_access_key: access_key,
+          s3_secret_access_key: secret_access_key,
+          s3_bucket: 'bucket_name',
+          s3_endpoint: endpoint,
+          s3_force_path_style: force_path_style
+        )
+      end
 
-  before do
-    allow(Aws::S3::Client).to receive(:new).and_return(s3_client)
-  end
-
-  describe '#initialize' do
-    it 'configures the S3 client with the correct endpoint and force_path_style options' do
-      expect(Aws::S3::Client).to receive(:new).with(
-        region: nil,
-        access_key_id: nil,
-        secret_access_key: nil,
-        endpoint: s3_endpoint,
-        force_path_style: s3_force_path_style
-      )
-
-      subject
+      it 'passes endpoint and force_path_style to S3ClientHelper' do
+        expect(Fastlane::Helper::S3ClientHelper).to receive(:new).with(
+          access_key: access_key,
+          secret_access_key: secret_access_key,
+          region: region,
+          endpoint: endpoint,
+          force_path_style: force_path_style
+        )
+        subject
+      end
     end
   end
 end
