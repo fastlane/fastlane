@@ -64,7 +64,14 @@ module Spaceship
       end
 
       def valid?
-        return profile_state == ProfileState::ACTIVE
+        # Provisioning profiles are not invalidated automatically on the dev portal when the certificate expires.
+        # They become Invalid only when opened directly in the portal 🤷.
+        # We need to do an extra check on the expiration date to ensure the profile is valid.
+        expired = Time.now.utc > Time.parse(self.expiration_date)
+
+        is_valid = profile_state == ProfileState::ACTIVE && !expired
+
+        return is_valid
       end
 
       #

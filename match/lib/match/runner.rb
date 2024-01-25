@@ -19,6 +19,7 @@ module Match
   # rubocop:disable Metrics/ClassLength
   class Runner
     attr_accessor :files_to_commit
+    attr_accessor :files_to_delete
     attr_accessor :spaceship
 
     attr_accessor :storage
@@ -28,6 +29,7 @@ module Match
     # rubocop:disable Metrics/PerceivedComplexity
     def run(params)
       self.files_to_commit = []
+      self.files_to_delete = []
 
       FileUtils.mkdir_p(params[:output_path]) if params[:output_path]
 
@@ -82,12 +84,12 @@ module Match
       end
 
       # Certificate
-      cert_id = fetch_certificate(params: params, working_directory: storage.working_directory)
+      cert_id = fetch_certificate(params: params, renew_expired_certs: params[:renew_expired_certs])
 
       # Mac Installer Distribution Certificate
       additional_cert_types = params[:additional_cert_types] || []
       cert_ids = additional_cert_types.map do |additional_cert_type|
-        fetch_certificate(params: params, working_directory: storage.working_directory, specific_cert_type: additional_cert_type)
+        fetch_certificate(params: params, renew_expired_certs: params[:renew_expired_certs], specific_cert_type: additional_cert_type)
       end
 
       profile_type = Sigh.profile_type_for_distribution_type(
@@ -112,9 +114,10 @@ module Match
         end
       end
 
-      if self.files_to_commit.count > 0 && !params[:readonly]
+      has_file_changes = self.files_to_commit.count > 0 || self.files_to_delete.count > 0
+      if has_file_changes && !params[:readonly]
         encryption.encrypt_files if encryption
-        storage.save_changes!(files_to_commit: self.files_to_commit)
+        storage.save_changes!(files_to_commit: self.files_to_commit, files_to_delete: self.files_to_delete)
       end
 
       # Print a summary table for each app_identifier
@@ -152,13 +155,48 @@ module Match
       end
     end
 
-    def fetch_certificate(params: nil, working_directory: nil, specific_cert_type: nil)
+    RENEWABLE_CERT_TYPES_VIA_API = [:mac_installer_distribution, :development, :distribution, :enterprise]
+
+    def fetch_certificate(params: nil, renew_expired_certs: false, specific_cert_type: nil)
       cert_type = Match.cert_type_sym(specific_cert_type || params[:type])
 
       certs = Dir[File.join(prefixed_working_directory, "certs", cert_type.to_s, "*.cer")]
       keys = Dir[File.join(prefixed_working_directory, "certs", cert_type.to_s, "*.p12")]
 
-      if certs.count == 0 || keys.count == 0
+      storage_has_certs = certs.count != 0 && keys.count != 0
+
+      # Determine if cert is renewable.
+      # Can't renew developer_id certs with Connect API token. Account holder access is required.
+      is_authenticated_with_login = Spaceship::ConnectAPI.token.nil?
+      is_cert_renewable_via_api = RENEWABLE_CERT_TYPES_VIA_API.include?(cert_type)
+      is_cert_renewable = is_authenticated_with_login || is_cert_renewable_via_api
+
+      # Validate existing certificate first.
+      if renew_expired_certs && is_cert_renewable && storage_has_certs
+        cert_path = select_cert_or_key(paths: certs)
+
+        unless Utils.is_cert_valid?(cert_path)
+          UI.important("Removing invalid certificate '#{File.basename(cert_path)}'")
+
+          # Remove expired cert.
+          self.files_to_delete << cert_path
+          File.delete(cert_path)
+
+          # Key filename is the same as cert but with .p12 extension.
+          key_path = cert_path.gsub(/\.cer$/, ".p12")
+          # Remove expired key .p12 file.
+          if File.exist?(key_path)
+            self.files_to_delete << key_path
+            File.delete(key_path)
+          end
+
+          certs = []
+          keys = []
+          storage_has_certs = false
+        end
+      end
+
+      if !storage_has_certs
         UI.important("Couldn't find a valid code signing identity for #{cert_type}... creating one for you now")
         UI.crash!("No code signing identity found and cannot create a new one because you enabled `readonly`") if params[:readonly]
         cert_path = Generator.generate_certificate(params, cert_type, prefixed_working_directory, specific_cert_type: specific_cert_type)
@@ -318,6 +356,7 @@ module Match
 
       if params[:output_path]
         FileUtils.cp(stored_profile_path, params[:output_path])
+        installed_profile = FastlaneCore::ProvisioningProfile.install(profile, keychain_path)
       end
 
       Utils.fill_environment(Utils.environment_variable_name(app_identifier: app_identifier,

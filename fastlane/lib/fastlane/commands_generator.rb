@@ -249,6 +249,15 @@ module Fastlane
         end
       end
 
+      command :console do |c|
+        c.syntax = 'fastlane console'
+        c.description = 'Opens an interactive developer console'
+        c.action do |args, options|
+          require 'fastlane/console'
+          Fastlane::Console.execute(args, options)
+        end
+      end
+
       command :enable_auto_complete do |c|
         c.syntax = 'fastlane enable_auto_complete'
         c.description = 'Enable tab auto completion'

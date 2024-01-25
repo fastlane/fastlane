@@ -50,7 +50,7 @@ Gem::Specification.new do |spec|
                         "Aaron Brager"]
 
   spec.email         = ["fastlane@krausefx.com"]
-  spec.summary       = Fastlane::DESCRIPTION
+  spec.summary       = Fastlane::SUMMARY
   spec.description   = Fastlane::DESCRIPTION
   spec.homepage      = "https://fastlane.tools"
   spec.license       = "MIT"
@@ -75,7 +75,7 @@ Gem::Specification.new do |spec|
   spec.add_dependency('babosa', '>= 1.0.3', '< 2.0.0') # library for creating human-friendly identifiers, aka "slugs"
   spec.add_dependency('bundler', '>= 1.12.0', '< 3.0.0') # Used for fastlane plugins
   spec.add_dependency('CFPropertyList', '>= 2.3', '< 4.0.0') # Needed to be able to read binary plist format
-  spec.add_dependency('colored') # colored terminal output
+  spec.add_dependency('colored', '~> 1.2') # colored terminal output
   spec.add_dependency('commander', '~> 4.6') # CLI parser
   spec.add_dependency('dotenv', '>= 2.1.1', '< 3.0.0')
   spec.add_dependency('emoji_regex', '>= 0.1', '< 4.0') # Used to scan for Emoji in the changelog
@@ -96,10 +96,10 @@ Gem::Specification.new do |spec|
   spec.add_dependency('mini_magick', '>= 4.9.4', '< 5.0.0') # To open, edit and export PSD files
   spec.add_dependency('multipart-post', '>= 2.0.0', '< 3.0.0') # Needed for uploading builds to appetize
   spec.add_dependency('naturally', '~> 2.2') # Used to sort strings with numbers in a human-friendly way
-  spec.add_dependency('optparse', '>= 0.1.1') # Used to parse options with Commander
+  spec.add_dependency('optparse', '>= 0.1.1', '< 1.0.0') # Used to parse options with Commander
   spec.add_dependency('plist', '>= 3.1.0', '< 4.0.0') # Needed for set_build_number_repository and get_info_plist_value actions
   spec.add_dependency('rubyzip', '>= 2.0.0', '< 3.0.0') # fix swift/ipa in gym
-  spec.add_dependency('security', '= 0.1.3') # macOS Keychain manager, a dead project, no updates expected
+  spec.add_dependency('security', '= 0.1.5') # macOS Keychain manager, a dead project, no updates expected
   spec.add_dependency('simctl', '~> 1.6.3') # Used for querying and interacting with iOS simulators
   spec.add_dependency('terminal-notifier', '>= 2.0.0', '< 3.0.0') # macOS notifications
   spec.add_dependency('terminal-table', '~> 3') # Actions documentation
@@ -107,6 +107,6 @@ Gem::Specification.new do |spec|
   spec.add_dependency('tty-spinner', '>= 0.8.0', '< 1.0.0') # loading indicators
   spec.add_dependency('word_wrap', '~> 1.0.0') # to add line breaks for tables with long strings
   spec.add_dependency('xcodeproj', '>= 1.13.0', '< 2.0.0') # Modify Xcode projects
-  spec.add_dependency('xcpretty-travis-formatter', '>= 0.0.3')
+  spec.add_dependency('xcpretty-travis-formatter', '>= 0.0.3', '< 2.0.0')
   spec.add_dependency('xcpretty', '~> 0.3.0') # prettify xcodebuild output
 end
