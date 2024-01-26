@@ -66,7 +66,7 @@ module Fastlane
             region: region,
             credentials: create_credentials,
             endpoint: endpoint,
-            force_path_style: force_path_style.nil? ? false : force_path_style,
+            force_path_style: force_path_style,
           }.compact
         )
       end
