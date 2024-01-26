@@ -83,14 +83,21 @@ describe Fastlane::Helper::S3ClientHelper do
   end
 
   describe '#client' do
+    let(:s3_client) { instance_double('Aws::S3::Client', list_buckets: []) }
+    let(:s3_credentials) { instance_double('Aws::Credentials') }
+
+    before do
+      allow(Aws::Credentials).to receive(:new).and_return(s3_credentials)
+    end
+
     it 'creates an Aws::S3::Client with correct configuration' do
-      expect(Aws::S3::Client).to receive(:new).with(
+      expect(Aws::S3::Client).to receive(:new).with({
         region: region,
-        credentials: instance_of(Aws::Credentials),
+        credentials: s3_credentials,
         endpoint: endpoint,
         force_path_style: force_path_style
-      )
-      subject.client
+      }).and_return(s3_client)
+      subject.list_buckets
     end
   end
 end
