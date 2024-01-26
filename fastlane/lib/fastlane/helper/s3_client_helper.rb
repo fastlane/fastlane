@@ -8,7 +8,7 @@ module Fastlane
       attr_reader :endpoint
       attr_reader :force_path_style
 
-      def initialize(access_key: nil, secret_access_key: nil, region: nil, s3_client: nil, endpoint: nil, force_path_style: false)
+      def initialize(access_key: nil, secret_access_key: nil, region: nil, s3_client: nil, endpoint: nil, force_path_style: nil)
         @access_key = access_key
         @secret_access_key = secret_access_key
         @region = region
@@ -66,7 +66,7 @@ module Fastlane
             region: region,
             credentials: create_credentials,
             endpoint: endpoint,
-            force_path_style: force_path_style
+            force_path_style: force_path_style.nil? ? false : force_path_style,
           }.compact
         )
       end

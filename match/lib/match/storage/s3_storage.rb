@@ -15,6 +15,8 @@ module Match
       attr_reader :s3_region
       attr_reader :s3_client
       attr_reader :s3_object_prefix
+      attr_reader :s3_endpoint
+      attr_reader :s3_force_path_style
       attr_reader :readonly
       attr_reader :username
       attr_reader :team_id
