@@ -108,9 +108,6 @@ describe Match do
         subject.download
       end
     end
-  end
-
-  describe Match::Storage::S3Storage do
 
     describe '#initialize with custom endpoint and force_path_style' do
       let(:access_key) { 'access_key' }
