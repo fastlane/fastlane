@@ -40,10 +40,6 @@ module Match
           UI.message("The above is just a warning, fastlane will continue as usual now...")
         end
 
-        if (s3_endpoint.to_s.length > 0) && !s3_force_path_style
-          UI.message("When you use a custom S3 endpoint, in most cases you also need to set `force_path_style` to `true`")
-        end
-
         return self.new(
           s3_region: s3_region,
           s3_access_key: s3_access_key,
