@@ -44,7 +44,7 @@ module Fastlane
 
         unless params[:fcm_json].nil?
           data = File.read(params[:fcm_json])
-          fcm_json = Base64.encode64(data)
+          fcm_json = Base64.strict_encode64(data)
           payload["fcm_v1_service_account_json"] = fcm_json
           puts "Encoded FCM JSON DATA: " + fcm_json
         end
