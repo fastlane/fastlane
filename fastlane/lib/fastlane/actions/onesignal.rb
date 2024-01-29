@@ -192,6 +192,7 @@ module Fastlane
             app_name: "New Name for OneSignal App",
             android_token: "Your Android GCM key (optional)",
             android_gcm_sender_id: "Your Android GCM Sender ID (optional)",
+            fcm_json: "Path to FCM Service Account JSON File (optional)",
             apns_p12: "Path to Apple .p12 file (optional)",
             apns_p12_password: "Password for .p12 file (optional)",
             apns_env: "production/sandbox (defaults to production)",
