@@ -46,6 +46,7 @@ module Fastlane
           data = File.read(params[:fcm_json])
           fcm_json = Base64.encode64(data)
           payload["fcm_v1_service_account_json"] = fcm_json
+          puts "Encoded FCM JSON DATA: " + fcm_json
         end
 
         payload["gcm_key"] = android_token unless android_token.nil?
@@ -61,6 +62,7 @@ module Fastlane
         http = Net::HTTP.new(uri.host, uri.port)
         http.use_ssl = true
 
+        puts "Payload: " + payload.to_json
         if is_update
           response = http.put(uri.path, payload.to_json, json_headers)
         else
