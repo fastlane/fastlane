@@ -129,7 +129,7 @@ module Fastlane
                                        optional: true),
           
           FastlaneCore::ConfigItem.new(key: :fcm_json,
-                                       env_name: "fcm_json",
+                                       env_name: "FCM_JSON",
                                        description: "FCM Service Account JSON File (in .json format)",
                                        optional: true),
 
