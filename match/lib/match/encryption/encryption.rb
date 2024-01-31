@@ -119,6 +119,8 @@ module Match
           e = EncryptionV1.new
           begin
             e.decrypt(encrypted_data: data_to_decrypt, password: password, salt: salt)
+            # With the wrong hash_algorithm, there's here 0.4% chance that the decryption failure will not be
+            # detected
           rescue => _ex
             # Note that we are not guaranteed to catch the decryption errors here if the password is wrong
             # as there's no integrity checks.
