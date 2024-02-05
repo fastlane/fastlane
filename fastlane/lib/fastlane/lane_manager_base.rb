@@ -67,7 +67,7 @@ module Fastlane
 
       # Print a nice table unless in FastlaneCore::Globals.verbose? mode
       rows = Actions.lane_context.collect do |key, content|
-        [key, content.to_s]
+        [key, content.to_s.encode("utf-8", invalid: :replace)]
       end
 
       require 'terminal-table'
