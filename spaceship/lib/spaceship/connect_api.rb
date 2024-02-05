@@ -75,6 +75,7 @@ require 'spaceship/connect_api/models/review_rejection'
 require 'spaceship/connect_api/models/actor'
 
 require 'spaceship/connect_api/models/iap/in_app_purchase'
+require 'spaceship/connect_api/models/iap/in_app_purchase_availability'
 require 'spaceship/connect_api/models/iap/in_app_purchase_submission'
 require 'spaceship/connect_api/models/iap/in_app_purchase_localization'
 require 'spaceship/connect_api/models/iap/in_app_purchase_price_point'

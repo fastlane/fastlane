@@ -16,6 +16,7 @@ module Spaceship
       # Relations
       attr_accessor :prices,
                     :localizations,
+                    :in_app_purchase_availabilities,
                     :app_store_review_screenshot
 
       module Type
@@ -148,6 +149,26 @@ module Spaceship
         models = resps.flat_map(&:to_models)
         (self.prices ||= []).concat(models).uniq! { |price| price.id }
         models
+      end
+
+      #
+      # In-App Purchase Availability
+      #
+
+      def get_availabilities(client: nil, includes: Spaceship::ConnectAPI::InAppPurchaseAvailability::ESSENTIAL_INCLUDES, limit: nil)
+        client ||= Spaceship::ConnectAPI
+        resps = client.get_in_app_purchase_availabilities(purchase_id: id, includes: includes, limit: limit).all_pages
+        models = resps.flat_map(&:to_models)
+        (self.in_app_purchase_availabilities ||= []).concat(models).uniq! { |availability| availability.id }
+        models
+      end
+
+      def create_availability(client: nil, available_in_new_territories: nil, available_territory_ids: [])
+        client ||= Spaceship::ConnectAPI
+        resps = client.create_in_app_purchase_availability(purchase_id: id, available_in_new_territories: available_in_new_territories, available_territory_ids: available_territory_ids)
+        model = resps.to_models.first
+        ((self.in_app_purchase_availabilities ||= []) << model).uniq! { |availability| availability.id }
+        model
       end
 
       #

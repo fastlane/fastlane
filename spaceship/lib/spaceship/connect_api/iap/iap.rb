@@ -142,6 +142,41 @@ module Spaceship
         end
 
         #
+        # InAppPurchaseAvailability
+        #
+
+        def get_in_app_purchase_availabilities(purchase_id:, filter: nil, includes: nil, limit: nil)
+          params = iap_request_client.build_params(filter: filter, includes: includes, limit: limit, sort: nil)
+          iap_request_client.get("inAppPurchaseAvailabilities/#{purchase_id}", params)
+        end
+
+        def create_in_app_purchase_availability(purchase_id:, available_in_new_territories:, available_territory_ids:)
+          params = {
+            data: {
+              type: 'inAppPurchaseAvailabilities',
+              attributes: {
+                availableInNewTerritories: available_in_new_territories
+              },
+              relationships: {
+                inAppPurchase: {
+                  data: {
+                    id: purchase_id,
+                    type: 'inAppPurchases'
+                  }
+                },
+                availableTerritories: {
+                  data: available_territory_ids.map do |id|
+                    { id: id, type: 'territories' }
+                  end
+                }
+              }
+            }
+          }
+
+          iap_request_client.post('inAppPurchaseAvailabilities', params)
+        end
+
+        #
         # inAppPurchasePricePoints
         #
 
