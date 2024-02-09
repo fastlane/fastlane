@@ -68,7 +68,7 @@ module Spaceship
         device_platform = case platform
                           when :osx, :macos, :mac
                             Spaceship::ConnectAPI::Platform::MAC_OS
-                          when :ios
+                          when :ios, :tvos
                             Spaceship::ConnectAPI::Platform::IOS
                           when :catalyst
                             Spaceship::ConnectAPI::Platform::MAC_OS
@@ -106,9 +106,9 @@ module Spaceship
         end
 
         filter = {
-          status: Spaceship::ConnectAPI::Device::Status::ENABLED,
-          platform: device_platforms.uniq.join(',')
+          status: Spaceship::ConnectAPI::Device::Status::ENABLED
         }
+        filter[:platform] = device_platforms.uniq.join(',') unless device_platforms.empty?
 
         devices = Spaceship::ConnectAPI::Device.all(
           client: client,
