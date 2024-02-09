@@ -64,7 +64,7 @@ describe Deliver::UploadMetadata do
     end
   end
 
-  describe "#set_review_information" do
+  describe "#review_information" do
     let(:options) { { metadata_path: tmpdir, app_review_information: app_review_information } }
     let(:version) { double("version") }
     let(:app_store_review_detail) { double("app_store_review_detail") }
@@ -85,7 +85,7 @@ describe Deliver::UploadMetadata do
         options[:app_review_information] = {}
 
         expect(FastlaneCore::UI).not_to receive(:message).with("Uploading app review information to App Store Connect")
-        uploader.send("set_review_information", version)
+        uploader.send("review_information", version)
       end
 
       it "successfully set review information" do
@@ -103,7 +103,7 @@ describe Deliver::UploadMetadata do
 
         expect(FastlaneCore::UI).to receive(:message).with("Uploading app review information to App Store Connect")
 
-        uploader.send("set_review_information", version)
+        uploader.send("review_information", version)
       end
     end
 
@@ -119,7 +119,7 @@ describe Deliver::UploadMetadata do
             "demo_account_required" => true
           })
 
-          uploader.send("set_review_information", version)
+          uploader.send("review_information", version)
         end
       end
 
@@ -132,7 +132,7 @@ describe Deliver::UploadMetadata do
             "demo_account_required" => false
           })
 
-          uploader.send("set_review_information", version)
+          uploader.send("review_information", version)
         end
       end
 
@@ -145,7 +145,7 @@ describe Deliver::UploadMetadata do
             "demo_account_required" => false
           })
 
-          uploader.send("set_review_information", version)
+          uploader.send("review_information", version)
         end
       end
     end
@@ -244,9 +244,9 @@ describe Deliver::UploadMetadata do
       before do
         allow(Deliver).to receive(:cache).and_return({ app: app })
 
-        allow(uploader).to receive(:set_review_information)
-        allow(uploader).to receive(:set_review_attachment_file)
-        allow(uploader).to receive(:set_app_rating)
+        allow(uploader).to receive(:review_information)
+        allow(uploader).to receive(:review_attachment_file)
+        allow(uploader).to receive(:app_rating)
 
         # Verify available languages
         expect(app).to receive(:id).and_return(id)
@@ -509,9 +509,9 @@ describe Deliver::UploadMetadata do
       it 'different app info than live version' do
         allow(Deliver).to receive(:cache).and_return({ app: app })
 
-        allow(uploader).to receive(:set_review_information)
-        allow(uploader).to receive(:set_review_attachment_file)
-        allow(uploader).to receive(:set_app_rating)
+        allow(uploader).to receive(:review_information)
+        allow(uploader).to receive(:review_attachment_file)
+        allow(uploader).to receive(:app_rating)
 
         # Get app info
         expect(uploader).to receive(:fetch_edit_app_info).and_return(app_info)

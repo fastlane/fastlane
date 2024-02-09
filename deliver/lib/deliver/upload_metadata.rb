@@ -348,9 +348,9 @@ module Deliver
         end
       end
 
-      set_review_information(version)
-      set_review_attachment_file(version)
-      set_app_rating(app_info)
+      review_information(version)
+      review_attachment_file(version)
+      app_rating(app_info)
     end
 
     # rubocop:enable Metrics/PerceivedComplexity
@@ -651,7 +651,7 @@ module Deliver
       options
     end
 
-    def set_review_information(version)
+    def review_information(version)
       info = options[:app_review_information]
       return if info.nil? || info.empty?
 
@@ -684,7 +684,7 @@ module Deliver
       end
     end
 
-    def set_review_attachment_file(version)
+    def review_attachment_file(version)
       app_store_review_detail = version.fetch_app_store_review_detail
       app_store_review_attachments = app_store_review_detail.app_store_review_attachments || []
 
@@ -702,7 +702,7 @@ module Deliver
       end
     end
 
-    def set_app_rating(app_info)
+    def app_rating(app_info)
       return unless options[:app_rating_config_path]
 
       require 'json'
