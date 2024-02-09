@@ -186,7 +186,6 @@ describe Match do
             type: "appstore",
             git_url: git_url,
             username: "flapple@something.com",
-            renew_expired_certs: false,
             readonly: true
           }
 
@@ -211,7 +210,7 @@ describe Match do
 
           expect do
             Match::Runner.new.run(config)
-          end.to raise_error("Your certificate 'E7P4EE896K.cer' is not valid, please check end date and renew it if necessary")
+          end.to raise_error("No valid code signing identity found and cannot create a new one because you enabled `readonly`")
         end
 
         it "installs profiles in read-only mode", requires_security: true do
@@ -246,7 +245,7 @@ describe Match do
 
           # Utils
           # Ensure match validates stored certificate.
-          expect(Match::Utils).to receive(:is_cert_valid?).with(stored_valid_cert_path).and_return(true).twice
+          expect(Match::Utils).to receive(:is_cert_valid?).with(stored_valid_cert_path).and_return(true)
 
           # Certificates
           # Ensure a new certificate is not generated.
@@ -281,7 +280,6 @@ describe Match do
 
           # match options
           match_test_options = {
-            renew_expired_certs: true, # Current test suite.
             skip_provisioning_profiles: true # We test certificate renewal, not profile.
           }
           match_config = create_match_config_with_git_storage(extra_values: match_test_options)

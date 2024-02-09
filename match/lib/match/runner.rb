@@ -84,12 +84,12 @@ module Match
       end
 
       # Certificate
-      cert_id = fetch_certificate(params: params, renew_expired_certs: params[:renew_expired_certs])
+      cert_id = fetch_certificate(params: params)
 
       # Mac Installer Distribution Certificate
       additional_cert_types = params[:additional_cert_types] || []
       cert_ids = additional_cert_types.map do |additional_cert_type|
-        fetch_certificate(params: params, renew_expired_certs: params[:renew_expired_certs], specific_cert_type: additional_cert_type)
+        fetch_certificate(params: params, specific_cert_type: additional_cert_type)
       end
 
       profile_type = Sigh.profile_type_for_distribution_type(
@@ -155,52 +155,22 @@ module Match
       end
     end
 
-    RENEWABLE_CERT_TYPES_VIA_API = [:mac_installer_distribution, :development, :distribution, :enterprise]
-
-    def fetch_certificate(params: nil, renew_expired_certs: false, specific_cert_type: nil)
+    def fetch_certificate(params: nil, specific_cert_type: nil)
       cert_type = Match.cert_type_sym(specific_cert_type || params[:type])
 
-      certs = Dir[File.join(prefixed_working_directory, "certs", cert_type.to_s, "*.cer")]
-      keys = Dir[File.join(prefixed_working_directory, "certs", cert_type.to_s, "*.p12")]
+      cert_paths = Dir[File.join(prefixed_working_directory, "certs", cert_type.to_s, "*.cer")]
+      # Select only certs with the existing .cer and .p12 pair.
+      cert_paths.select! { |cert_path| File.exist?(cert_path) && File.exist?(cert_path.gsub(/\.cer$/, ".p12")) }
+      # Clear list and storage (if allowed) from expired certificates.
+      self.remove_expired_certs(cert_paths: cert_paths, readonly: params[:readonly])
 
-      storage_has_certs = certs.count != 0 && keys.count != 0
+      storage_has_valid_certs = cert_paths.count != 0
 
-      # Determine if cert is renewable.
-      # Can't renew developer_id certs with Connect API token. Account holder access is required.
-      is_authenticated_with_login = Spaceship::ConnectAPI.token.nil?
-      is_cert_renewable_via_api = RENEWABLE_CERT_TYPES_VIA_API.include?(cert_type)
-      is_cert_renewable = is_authenticated_with_login || is_cert_renewable_via_api
-
-      # Validate existing certificate first.
-      if renew_expired_certs && is_cert_renewable && storage_has_certs
-        cert_path = select_cert_or_key(paths: certs)
-
-        unless Utils.is_cert_valid?(cert_path)
-          UI.important("Removing invalid certificate '#{File.basename(cert_path)}'")
-
-          # Remove expired cert.
-          self.files_to_delete << cert_path
-          File.delete(cert_path)
-
-          # Key filename is the same as cert but with .p12 extension.
-          key_path = cert_path.gsub(/\.cer$/, ".p12")
-          # Remove expired key .p12 file.
-          if File.exist?(key_path)
-            self.files_to_delete << key_path
-            File.delete(key_path)
-          end
-
-          certs = []
-          keys = []
-          storage_has_certs = false
-        end
-      end
-
-      if !storage_has_certs
+      if !storage_has_valid_certs
         UI.important("Couldn't find a valid code signing identity for #{cert_type}... creating one for you now")
-        UI.crash!("No code signing identity found and cannot create a new one because you enabled `readonly`") if params[:readonly]
+        UI.crash!("No valid code signing identity found and cannot create a new one because you enabled `readonly`") if params[:readonly]
         cert_path = Generator.generate_certificate(params, cert_type, prefixed_working_directory, specific_cert_type: specific_cert_type)
-        private_key_path = cert_path.gsub(".cer", ".p12")
+        private_key_path = cert_path.gsub(/\.cer$/, ".p12")
 
         self.files_to_commit << cert_path
         self.files_to_commit << private_key_path
@@ -208,14 +178,8 @@ module Match
         # Reset certificates cache since we have a new cert.
         self.cache.reset_certificates
       else
-        cert_path = select_cert_or_key(paths: certs)
-
-        # Check validity of certificate
-        if Utils.is_cert_valid?(cert_path)
-          UI.verbose("Your certificate '#{File.basename(cert_path)}' is valid")
-        else
-          UI.user_error!("Your certificate '#{File.basename(cert_path)}' is not valid, please check end date and renew it if necessary")
-        end
+        cert_path = self.select_cert(cert_paths: cert_paths, cert_id: ENV['MATCH_CERTIFICATE_ID'])
+        private_key_path = cert_path.gsub(/\.cer$/, ".p12") if cert_path
 
         if Helper.mac?
           UI.message("Installing certificate...")
@@ -232,7 +196,7 @@ module Match
             # Import the private key
             # there seems to be no good way to check if it's already installed - so just install it
             # Key will only be added to the partition list if it isn't already installed
-            Utils.import(select_cert_or_key(paths: keys), params[:keychain_name], password: params[:keychain_password])
+            Utils.import(private_key_path, params[:keychain_name], password: params[:keychain_password])
           end
         else
           UI.message("Skipping installation of certificate as it would not work on this operating system.")
@@ -240,7 +204,7 @@ module Match
 
         if params[:output_path]
           FileUtils.cp(cert_path, params[:output_path])
-          FileUtils.cp(select_cert_or_key(paths: keys), params[:output_path])
+          FileUtils.cp(private_key_path, params[:output_path])
         end
 
         # Get and print info of certificate
@@ -248,13 +212,55 @@ module Match
         TablePrinter.print_certificate_info(cert_info: info)
       end
 
-      return File.basename(cert_path).gsub(".cer", "") # Certificate ID
+      return File.basename(cert_path).gsub(/\.cer$/, "") # Certificate ID
+    end
+
+    # Removes expired certificates form the passed `cert_paths`.
+    # Also deletes expired certificates from the storage if not in a readonly mode.
+    def remove_expired_certs(cert_paths:, readonly:)
+      self.files_to_delete ||= []
+
+      cert_paths.reject! do |cert_path|
+        next false if Utils.is_cert_valid?(cert_path)
+        if readonly
+          UI.message("Ignoring expired certificate '#{File.basename(cert_path)}'. Can't automatically remove it from the storage because `readonly` is true.")
+          next true
+        else
+          UI.message("Certificate '#{File.basename(cert_path)}' is expired. Removing it from the storage.")
+        end
+
+        # Remove expired cert.
+        if File.exist?(cert_path)
+          self.files_to_delete << cert_path
+          File.delete(cert_path)
+        end
+
+        # Key filename is the same as cert but with .p12 extension.
+        private_key_path = cert_path.gsub(/\.cer$/, ".p12")
+        # Remove expired key .p12 file.
+        if File.exist?(private_key_path)
+          self.files_to_delete << private_key_path
+          File.delete(private_key_path)
+        end
+
+        next true
+      end
     end
 
     # @return [String] Path to certificate or P12 key
-    def select_cert_or_key(paths:)
-      cert_id_path = ENV['MATCH_CERTIFICATE_ID'] ? paths.find { |path| path.include?(ENV['MATCH_CERTIFICATE_ID']) } : nil
-      cert_id_path || paths.last
+    def select_cert(cert_paths:, cert_id: nil)
+      cert_id_path = cert_id ? cert_paths.find { |path| File.basename(path).start_with?(cert_id) } : nil
+      return cert_id_path if cert_id_path
+
+      # Get the certificate with the latest expiration date.
+      cert_paths.sort_by! do |cert_path|
+        cert = OpenSSL::X509::Certificate.new(File.binread(cert_path))
+
+        # Sort by expiration date, issue date, serial number and id.
+        [cert.not_after, cert.not_before, cert.serial, File.basename(cert_path)]
+      end
+
+      return cert_paths.last
     end
 
     # rubocop:disable Metrics/PerceivedComplexity
@@ -293,10 +299,13 @@ module Match
           force ||= ProfileIncludes.should_force_include_all_devices?(params: params, portal_profile: portal_profile, cached_devices: self.cache.devices)
         end
 
-        if params[:include_all_certificates]
+        if params[:include_all_certificates] && ProfileIncludes::PROV_TYPES_WITH_MULTIPLE_CERTIFICATES.include?(prov_type)
           # Clearing specified certificate id which will prevent a profile being created with only one certificate
           certificate_id = nil
-          force ||= ProfileIncludes.should_force_include_all_certificates?(params: params, portal_profile: portal_profile, cached_certificates: self.cache.certificates)
+        end
+
+        if params[:force_for_new_certificates]
+          force ||= ProfileIncludes.should_force_include_new_certificates?(params: params, portal_profile: portal_profile, certificate_id: certificate_id, cached_certificates: self.cache.certificates)
         end
       end
 

@@ -32,7 +32,7 @@ describe Match do
     let(:default_profile_all_params) do
       {
         filter: { profileType: anything },
-        includes: 'bundleId,devices,certificates'
+        includes: 'bundleId,certificates,devices'
       }
     end
 
@@ -106,7 +106,7 @@ describe Match do
         sut = default_sut
 
         # WHEN
-        portal_profiles = sut.profiles(profile_type: 'profile_type', needs_profiles_devices: true, needs_profiles_certificate_content: false, name: nil)
+        portal_profiles = sut.profiles(profile_type: 'profile_type', needs_profiles_devices: true, name: nil)
 
         # THEN
         expect(portal_profiles).to eq([portal_profile])
@@ -123,7 +123,7 @@ describe Match do
         allow(Spaceship::ConnectAPI::Profile).to receive(:all).with(profile_params).and_return([portal_profile])
 
         # WHEN
-        portal_profiles = sut.profiles(profile_type: 'profile_type', needs_profiles_devices: true, needs_profiles_certificate_content: false, name: profile_name)
+        portal_profiles = sut.profiles(profile_type: 'profile_type', needs_profiles_devices: true, name: profile_name)
 
         # THEN
         expect(portal_profiles).to eq([portal_profile])
