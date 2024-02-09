@@ -187,6 +187,15 @@ module Deliver
                                      description: "Rejects the previously submitted build if it's in a state where it's possible",
                                      type: Boolean,
                                      default_value: false),
+        FastlaneCore::ConfigItem.new(key: :version_check_wait_retry_limit,
+                                     env_name: "DELIVER_VERSION_CHECK_WAIT_RETRY_LIMIT",
+                                     description: "After submitting a new version, App Store Connect takes some time to recognize the new version and we must wait until it's available before attempting to upload metadata for it. There is a mechanism that will check if it's available and retry with an exponential backoff if it's not available yet. " \
+                                     "This option specifies how many times we should retry before giving up. Setting this to a value below 5 is not recommended and will likely cause failures. Increase this parameter when Apple servers seem to be degraded or slow",
+                                     type: Integer,
+                                     default_value: 7,
+                                     verify_block: proc do |value|
+                                       UI.user_error!("'#{value}' needs to be greater than 0") if value <= 0
+                                     end),
 
         # release
         FastlaneCore::ConfigItem.new(key: :automatic_release,
