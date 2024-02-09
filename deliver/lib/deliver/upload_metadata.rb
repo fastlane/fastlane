@@ -78,19 +78,25 @@ module Deliver
 
     require_relative 'loader'
 
+    attr_accessor :options
+
+    def initialize(options)
+      self.options = options
+    end
+
     # Make sure to call `load_from_filesystem` before calling upload
-    def upload(options)
+    def upload
       return if options[:skip_metadata]
 
       app = Deliver.cache[:app]
 
       platform = Spaceship::ConnectAPI::Platform.map(options[:platform])
 
-      enabled_languages = detect_languages(options)
+      enabled_languages = detect_languages
 
-      app_store_version_localizations = verify_available_version_languages!(options, app, enabled_languages) unless options[:edit_live]
-      app_info = fetch_edit_app_info(app, max_retries: options[:version_check_wait_retry_limit])
-      app_info_localizations = verify_available_info_languages!(options, app, app_info, enabled_languages) unless options[:edit_live] || !updating_localized_app_info?(options, app, app_info)
+      app_store_version_localizations = verify_available_version_languages!(app, enabled_languages) unless options[:edit_live]
+      app_info = fetch_edit_app_info(app)
+      app_info_localizations = verify_available_info_languages!(app, app_info, enabled_languages) unless options[:edit_live] || !updating_localized_app_info?(app, app_info)
 
       if options[:edit_live]
         # not all values are editable when using live_version
@@ -100,7 +106,7 @@ module Deliver
 
         if version.nil?
           UI.message("Couldn't find live version, editing the current version on App Store Connect instead")
-          version = fetch_edit_app_store_version(app, platform, max_retries: options[:version_check_wait_retry_limit])
+          version = fetch_edit_app_store_version(app, platform)
           # we don't want to update the localised_options and non_localised_options
           # as we also check for `options[:edit_live]` at other areas in the code
           # by not touching those 2 variables, deliver is more consistent with what the option says
@@ -109,7 +115,7 @@ module Deliver
           UI.message("Found live version")
         end
       else
-        version = fetch_edit_app_store_version(app, platform, max_retries: options[:version_check_wait_retry_limit])
+        version = fetch_edit_app_store_version(app, platform)
         localised_options = (LOCALISED_VERSION_VALUES.keys + LOCALISED_APP_VALUES.keys)
         non_localised_options = NON_LOCALISED_VERSION_VALUES.keys
       end
@@ -342,9 +348,9 @@ module Deliver
         end
       end
 
-      set_review_information(version, options)
-      set_review_attachment_file(version, options)
-      set_app_rating(app_info, options)
+      review_information(version)
+      review_attachment_file(version)
+      app_rating(app_info)
     end
 
     # rubocop:enable Metrics/PerceivedComplexity
@@ -360,12 +366,12 @@ module Deliver
     end
 
     # If the user is using the 'default' language, then assign values where they are needed
-    def assign_defaults(options)
+    def assign_defaults
       # Normalizes languages keys from symbols to strings
-      normalize_language_keys(options)
+      normalize_language_keys
 
       # Build a complete list of the required languages
-      enabled_languages = detect_languages(options)
+      enabled_languages = detect_languages
 
       # Get all languages used in existing settings
       (LOCALISED_VERSION_VALUES.keys + LOCALISED_APP_VALUES.keys).each do |key|
@@ -402,7 +408,7 @@ module Deliver
       end
     end
 
-    def detect_languages(options)
+    def detect_languages
       # Build a complete list of the required languages
       enabled_languages = options[:languages] || []
 
@@ -427,27 +433,28 @@ module Deliver
         .uniq
     end
 
-    def fetch_edit_app_store_version(app, platform, max_retries:, initial_wait_time: 10)
-      retry_if_nil("Cannot find edit app store version", tries: max_retries, initial_wait_time: initial_wait_time) do
+    def fetch_edit_app_store_version(app, platform)
+      retry_if_nil("Cannot find edit app store version") do
         app.get_edit_app_store_version(platform: platform)
       end
     end
 
-    def fetch_edit_app_info(app, max_retries:, initial_wait_time: 10)
-      retry_if_nil("Cannot find edit app info", tries: max_retries, initial_wait_time: initial_wait_time) do
+    def fetch_edit_app_info(app)
+      retry_if_nil("Cannot find edit app info") do
         app.fetch_edit_app_info
       end
     end
 
-    def fetch_live_app_info(app, max_retries:, initial_wait_time: 10)
-      retry_if_nil("Cannot find live app info", tries: max_retries, initial_wait_time: initial_wait_time) do
+    def fetch_live_app_info(app)
+      retry_if_nil("Cannot find live app info") do
         app.fetch_live_app_info
       end
     end
 
     # Retries a block of code if the return value is nil, with an exponential backoff.
-    def retry_if_nil(message, tries:, initial_wait_time: 10)
-      wait_time = initial_wait_time
+    def retry_if_nil(message)
+      tries = options[:version_check_wait_retry_limit]
+      wait_time = 10
       loop do
         tries -= 1
 
@@ -459,7 +466,7 @@ module Deliver
         # speeds up the retry time for the user, as waiting longer than 5 minutes is a too long wait for a retry.
         sleep_time = [wait_time * 2, 5 * 60].min
         UI.message("#{message}... Retrying after #{sleep_time} seconds (remaining: #{tries})")
-        sleep(sleep_time)
+        Kernel.sleep(sleep_time)
 
         return nil if tries.zero?
 
@@ -468,8 +475,8 @@ module Deliver
     end
 
     # Checking if the metadata to update includes localised App Info
-    def updating_localized_app_info?(options, app, app_info)
-      app_info ||= fetch_live_app_info(app, max_retries: options[:version_check_wait_retry_limit])
+    def updating_localized_app_info?(app, app_info)
+      app_info ||= fetch_live_app_info(app)
       unless app_info
         UI.important("Can't find edit or live App info. Skipping upload.")
         return false
@@ -507,7 +514,7 @@ module Deliver
     end
 
     # Finding languages to enable
-    def verify_available_info_languages!(options, app, app_info, languages)
+    def verify_available_info_languages!(app, app_info, languages)
       unless app_info
         UI.user_error!("Cannot update languages - could not find an editable 'App Info'. Verify that your app is in one of the editable states in App Store Connect")
         return
@@ -539,9 +546,9 @@ module Deliver
     end
 
     # Finding languages to enable
-    def verify_available_version_languages!(options, app, languages)
+    def verify_available_version_languages!(app, languages)
       platform = Spaceship::ConnectAPI::Platform.map(options[:platform])
-      version = fetch_edit_app_store_version(app, platform, max_retries: options[:version_check_wait_retry_limit])
+      version = fetch_edit_app_store_version(app, platform)
 
       unless version
         UI.user_error!("Cannot update languages - could not find an editable version for '#{platform}'")
@@ -574,7 +581,7 @@ module Deliver
     end
 
     # Loads the metadata files and stores them into the options object
-    def load_from_filesystem(options)
+    def load_from_filesystem
       return if options[:skip_metadata]
 
       # Load localised data
@@ -631,7 +638,7 @@ module Deliver
     private
 
     # Normalizes languages keys from symbols to strings
-    def normalize_language_keys(options)
+    def normalize_language_keys
       (LOCALISED_VERSION_VALUES.keys + LOCALISED_APP_VALUES.keys).each do |key|
         current = options[key]
         next unless current && current.kind_of?(Hash)
@@ -644,7 +651,7 @@ module Deliver
       options
     end
 
-    def set_review_information(version, options)
+    def review_information(version)
       info = options[:app_review_information]
       return if info.nil? || info.empty?
 
@@ -677,7 +684,7 @@ module Deliver
       end
     end
 
-    def set_review_attachment_file(version, options)
+    def review_attachment_file(version)
       app_store_review_detail = version.fetch_app_store_review_detail
       app_store_review_attachments = app_store_review_detail.app_store_review_attachments || []
 
@@ -695,7 +702,7 @@ module Deliver
       end
     end
 
-    def set_app_rating(app_info, options)
+    def app_rating(app_info)
       return unless options[:app_rating_config_path]
 
       require 'json'
