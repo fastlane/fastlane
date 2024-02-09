@@ -103,6 +103,7 @@ jobs:
       - run:
           name: bundle exec fastlane execute_tests
           command: |
+            ulimit -n 65536 # allows us to stress test the system if we want
             bundle exec fastlane snapshot reset_simulators --force
             RUBYOPT=<< parameters.ruby_opt >> bundle exec fastlane execute_tests
       - *cache_save_rubocop
