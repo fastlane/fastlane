@@ -1,0 +1,20 @@
+---
+name: Process release
+on:
+  release:
+    types:
+      - published
+
+jobs:
+  announce-release-on-released-pull-requests:
+    name: Announce release on released pull requests
+    runs-on: ubuntu-latest
+    steps:
+      - name: Git checkout
+        uses: actions/checkout@master
+        with:
+          ref: refs/heads/master
+      - name: Announce release on released pull requests
+        uses: fastlane/github-actions/communicate-on-pull-request-released@latest
+        with:
+          repo-token: '${{ secrets.BOT_GITHUB_TOKEN }}'

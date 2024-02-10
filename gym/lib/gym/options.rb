@@ -152,7 +152,7 @@ module Gym
                                      optional: true,
                                      verify_block: proc do |value|
                                        av = %w(ios macos)
-                                       UI.user_error!("Unsupported export_method '#{value}', must be: #{av}") unless av.include?(value)
+                                       UI.user_error!("Unsupported catalyst_platform '#{value}', must be: #{av}") unless av.include?(value)
                                      end),
         FastlaneCore::ConfigItem.new(key: :installer_cert_name,
                                      env_name: "GYM_INSTALLER_CERT_NAME",
@@ -238,6 +238,13 @@ module Gym
                                      type: String,
                                      default_value: Fastlane::Helper::XcodebuildFormatterHelper.xcbeautify_installed? ? 'xcbeautify' : 'xcpretty',
                                      default_value_dynamic: true),
+
+        FastlaneCore::ConfigItem.new(key: :build_timing_summary,
+                                     env_name: "GYM_BUILD_TIMING_SUMMARY",
+                                     description: "Create a build timing summary",
+                                     type: Boolean,
+                                     default_value: false,
+                                     optional: true),
 
         # xcpretty
         FastlaneCore::ConfigItem.new(key: :disable_xcpretty,

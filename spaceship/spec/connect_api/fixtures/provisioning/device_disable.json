@@ -1,0 +1,26 @@
+{
+    "data" : {
+      "id": "123456789",
+      "type": "devices",
+      "attributes": {
+        "addedDate" : "2018-10-10T01:43:27.000+0000",
+        "serialNumber" : null,
+        "description" : null,
+        "platform" : "IOS",
+        "name" : "Josh's iPhone",
+        "deviceClass" : "IPHONE",
+        "model" : "iPhone 8",
+        "udid" : "184098239048390489012849018",
+        "platformName" : "iOS",
+        "responseId" : "03514686-0a76-401e-80d5-7f23845fcd16",
+        "status" : "DISABLED",
+        "devicePlatformLabel" : "iPhone"
+      },
+      "links": {
+        "self": "https://developer.apple.com:443/services-account/v1/devices/123456789"
+      }
+    },
+    "links": {
+      "self": "https://developer.apple.com:443/services-account/v1/devices/123456789"
+    }
+}

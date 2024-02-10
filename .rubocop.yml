@@ -202,7 +202,7 @@ Style/RedundantReturn:
 Style/IfUnlessModifier:
   Enabled: false
 
-# and and or is okay
+# "and" and "or" are okay
 Style/AndOr:
   Enabled: true
   EnforcedStyle: conditionals
@@ -226,6 +226,9 @@ Style/GuardClause:
 
 # We allow both " and '
 Style/StringLiterals:
+  Enabled: false
+
+Style/QuotedSymbols:
   Enabled: false
 
 # something = if something_else
@@ -315,7 +318,7 @@ Lint/IsStringUsage:
 # ( ) for method calls
 Style/MethodCallWithArgsParentheses:
   Enabled: true
-  IgnoredMethods:
+  AllowedMethods:
     - 'require'
     - 'require_relative'
     - 'fastlane_require'
@@ -338,3 +341,12 @@ Style/MethodCallWithArgsParentheses:
     - 'context'
     - 'before'
     - 'after'
+
+# Sorts the gems in the Gemfile alphabetically.
+Bundler/OrderedGems:
+  Enabled: true
+  TreatCommentsAsGroupSeparators: false
+
+Gemspec/DevelopmentDependencies:
+   Enabled: true
+   EnforcedStyle: Gemfile

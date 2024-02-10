@@ -109,25 +109,10 @@ module Match
         return password
       end
 
-      # We encrypt with MD5 because that was the most common default value in older fastlane versions which used the local OpenSSL installation
-      # A more secure key and IV generation is needed in the future
-      # IV should be randomly generated and provided unencrypted
-      # salt should be randomly generated and provided unencrypted (like in the current implementation)
-      # key should be generated with OpenSSL::KDF::pbkdf2_hmac with properly chosen parameters
-      # Short explanation about salt and IV: https://stackoverflow.com/a/1950674/6324550
       def encrypt_specific_file(path: nil, password: nil)
         UI.user_error!("No password supplied") if password.to_s.strip.length == 0
-
-        data_to_encrypt = File.binread(path)
-        salt = SecureRandom.random_bytes(8)
-
-        # The :: is important, as there is a name clash
-        cipher = ::OpenSSL::Cipher.new('AES-256-CBC')
-        cipher.encrypt
-        cipher.pkcs5_keyivgen(password, salt, 1, "MD5")
-        encrypted_data = "Salted__" + salt + cipher.update(data_to_encrypt) + cipher.final
-
-        File.write(path, Base64.encode64(encrypted_data))
+        e = MatchFileEncryption.new
+        e.encrypt(file_path: path, password: password)
       rescue FastlaneCore::Interface::FastlaneError
         raise
       rescue => error
@@ -135,28 +120,12 @@ module Match
         UI.crash!("Error encrypting '#{path}'")
       end
 
-      # The encryption parameters in this implementations reflect the old behavior which depended on the users' local OpenSSL version
-      # 1.0.x OpenSSL and earlier versions use MD5, 1.1.0c and newer uses SHA256, we try both before giving an error
-      def decrypt_specific_file(path: nil, password: nil, hash_algorithm: "MD5")
-        stored_data = Base64.decode64(File.read(path))
-        salt = stored_data[8..15]
-        data_to_decrypt = stored_data[16..-1]
-
-        decipher = ::OpenSSL::Cipher.new('AES-256-CBC')
-        decipher.decrypt
-        decipher.pkcs5_keyivgen(password, salt, 1, hash_algorithm)
-
-        decrypted_data = decipher.update(data_to_decrypt) + decipher.final
-
-        File.binwrite(path, decrypted_data)
+      def decrypt_specific_file(path: nil, password: nil)
+        e = MatchFileEncryption.new
+        e.decrypt(file_path: path, password: password)
       rescue => error
-        fallback_hash_algorithm = "SHA256"
-        if hash_algorithm != fallback_hash_algorithm
-          decrypt_specific_file(path: path, password: password, hash_algorithm: fallback_hash_algorithm)
-        else
-          UI.error(error.to_s)
-          UI.crash!("Error decrypting '#{path}'")
-        end
+        UI.error(error.to_s)
+        UI.crash!("Error decrypting '#{path}'")
       end
     end
   end
