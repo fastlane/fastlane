@@ -143,7 +143,7 @@ describe Scan do
 
         allow(FastlaneCore::DeviceManager).to receive(:runtime_build_os_versions).and_return({})
 
-        expect(Scan::DetectValues.default_os_version('iOS')).to eq(Gem::Version.new('0'))
+        expect(Scan::DetectValues.default_os_version('iOS')).to eq(nil)
       end
 
       build_os_versions = { "21J353" => "17.0", "21R355" => "10.0", "21A342" => "17.0.1" }
