@@ -33,6 +33,7 @@ require 'spaceship/connect_api/models/build'
 require 'spaceship/connect_api/models/build_delivery'
 require 'spaceship/connect_api/models/build_beta_detail'
 require 'spaceship/connect_api/models/build_bundle'
+require 'spaceship/connect_api/models/build_bundle_file_sizes'
 require 'spaceship/connect_api/models/custom_app_organization'
 require 'spaceship/connect_api/models/custom_app_user'
 require 'spaceship/connect_api/models/pre_release_version'
@@ -68,8 +69,15 @@ require 'spaceship/connect_api/models/reset_ratings_request'
 require 'spaceship/connect_api/models/sandbox_tester'
 require 'spaceship/connect_api/models/territory'
 
+require 'spaceship/connect_api/models/resolution_center_message'
+require 'spaceship/connect_api/models/resolution_center_thread'
+require 'spaceship/connect_api/models/review_rejection'
+require 'spaceship/connect_api/models/actor'
+
 module Spaceship
   class ConnectAPI
+    MAX_OBJECTS_PER_PAGE_LIMIT = 200
+
     # Defined in the App Store Connect API docs:
     # https://developer.apple.com/documentation/appstoreconnectapi/platform
     #

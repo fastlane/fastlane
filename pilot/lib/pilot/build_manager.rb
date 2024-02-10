@@ -47,7 +47,7 @@ module Pilot
       end
 
       transporter = transporter_for_selected_team(options)
-      result = transporter.upload(package_path: package_path, asset_path: asset_path)
+      result = transporter.upload(package_path: package_path, asset_path: asset_path, platform: platform)
 
       unless result
         transporter_errors = transporter.displayable_errors
@@ -65,6 +65,7 @@ module Pilot
           UI.important("`skip_waiting_for_build_processing` used and no `changelog` supplied - skipping waiting for build processing")
           return
         else
+          UI.important("`skip_waiting_for_build_processing` used and `changelog` supplied - will wait until build appears on App Store Connect, update the changelog and then skip the rest of the remaining of the processing steps.")
           return_when_build_appears = true
         end
       end
@@ -72,8 +73,10 @@ module Pilot
       # Calling login again here is needed if login was not called during 'start'
       login unless should_login_in_start
 
-      UI.message("If you want to skip waiting for the processing to be finished, use the `skip_waiting_for_build_processing` option")
-      UI.message("Note that if `skip_waiting_for_build_processing` is used but a `changelog` is supplied, this process will wait for the build to appear on AppStoreConnect, update the changelog and then skip the remaining of the processing steps.")
+      if config[:skip_waiting_for_build_processing].nil?
+        UI.message("If you want to skip waiting for the processing to be finished, use the `skip_waiting_for_build_processing` option")
+        UI.message("Note that if `skip_waiting_for_build_processing` is used but a `changelog` is supplied, this process will wait for the build to appear on App Store Connect, update the changelog and then skip the remaining of the processing steps.")
+      end
 
       latest_build = wait_for_build_processing_to_be_complete(return_when_build_appears)
       distribute(options, build: latest_build)
@@ -108,10 +111,10 @@ module Pilot
 
     def wait_for_build_processing_to_be_complete(return_when_build_appears = false)
       platform = fetch_app_platform
-      if config[:ipa] && platform != "osx"
+      if config[:ipa] && platform != "osx" && !config[:distribute_only]
         app_version = FastlaneCore::IpaFileAnalyser.fetch_app_version(config[:ipa])
         app_build = FastlaneCore::IpaFileAnalyser.fetch_app_build(config[:ipa])
-      elsif config[:pkg]
+      elsif config[:pkg] && !config[:distribute_only]
         app_version = FastlaneCore::PkgFileAnalyser.fetch_app_version(config[:pkg])
         app_build = FastlaneCore::PkgFileAnalyser.fetch_app_build(config[:pkg])
       else
@@ -157,7 +160,7 @@ module Pilot
           end
         end
         platform = Spaceship::ConnectAPI::Platform.map(fetch_app_platform)
-        build ||= Spaceship::ConnectAPI::Build.all(app_id: app.id, version: app_version, build_number: build_number, sort: "-uploadedDate", platform: platform, limit: 1).first
+        build ||= Spaceship::ConnectAPI::Build.all(app_id: app.id, version: app_version, build_number: build_number, sort: "-uploadedDate", platform: platform, limit: Spaceship::ConnectAPI::Platform::ALL.size).first
       end
 
       # Verify the build has all the includes that we need
@@ -389,15 +392,25 @@ module Pilot
     def transporter_for_selected_team(options)
       # Use JWT auth
       api_token = Spaceship::ConnectAPI.token
+      api_key = if options[:api_key].nil? && !api_token.nil?
+                  # Load api key info if user set api_key_path, not api_key
+                  { key_id: api_token.key_id, issuer_id: api_token.issuer_id, key: api_token.key_raw }
+                elsif !options[:api_key].nil?
+                  api_key = options[:api_key].transform_keys(&:to_sym).dup
+                  # key is still base 64 style if api_key is loaded from option
+                  api_key[:key] = Base64.decode64(api_key[:key]) if api_key[:is_key_content_base64]
+                  api_key
+                end
+
       unless api_token.nil?
         api_token.refresh! if api_token.expired?
-        return FastlaneCore::ItunesTransporter.new(nil, nil, false, nil, api_token.text)
+        return FastlaneCore::ItunesTransporter.new(nil, nil, false, nil, api_token.text, altool_compatible_command: true, api_key: api_key)
       end
 
       # Otherwise use username and password
       tunes_client = Spaceship::ConnectAPI.client ? Spaceship::ConnectAPI.client.tunes_client : nil
 
-      generic_transporter = FastlaneCore::ItunesTransporter.new(options[:username], nil, false, options[:itc_provider])
+      generic_transporter = FastlaneCore::ItunesTransporter.new(options[:username], nil, false, options[:itc_provider], altool_compatible_command: true, api_key: api_key)
       return generic_transporter if options[:itc_provider] || tunes_client.nil?
       return generic_transporter unless tunes_client.teams.count > 1
 
@@ -406,7 +419,7 @@ module Pilot
         name = team['name']
         provider_id = generic_transporter.provider_ids[name]
         UI.verbose("Inferred provider id #{provider_id} for team #{name}.")
-        return FastlaneCore::ItunesTransporter.new(options[:username], nil, false, provider_id)
+        return FastlaneCore::ItunesTransporter.new(options[:username], nil, false, provider_id, altool_compatible_command: true, api_key: api_key)
       rescue => ex
         STDERR.puts(ex.to_s)
         UI.verbose("Couldn't infer a provider short name for team with id #{tunes_client.team_id} automatically: #{ex}. Proceeding without provider short name.")

@@ -34,7 +34,7 @@ module Snapshot
         if Snapshot.config[:disable_xcpretty] || formatter == ''
           UI.verbose("Not using an xcodebuild formatter")
         elsif !options.empty?
-          UI.important("Detected legacy xcpretty being used so formatting wth xcpretty")
+          UI.important("Detected legacy xcpretty being used, so formatting with xcpretty")
           UI.important("Option(s) used: #{options.join(', ')}")
           pipe += pipe_xcpretty
         elsif formatter == 'xcpretty'

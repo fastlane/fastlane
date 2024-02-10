@@ -55,7 +55,7 @@ module Deliver
       verify_version if options[:app_version].to_s.length > 0 && !options[:skip_app_version_update]
 
       # Rejecting before upload meta
-      # Screenshots can not be update/deleted if in waiting for review
+      # Screenshots cannot be updated or deleted if the app is in the "waiting for review" state
       reject_version_if_possible if options[:reject_if_possible]
 
       upload_metadata
@@ -135,21 +135,21 @@ module Deliver
 
     # Upload all metadata, screenshots, pricing information, etc. to App Store Connect
     def upload_metadata
-      upload_metadata = UploadMetadata.new
+      upload_metadata = UploadMetadata.new(options)
       upload_screenshots = UploadScreenshots.new
 
       # First, collect all the things for the HTML Report
       screenshots = upload_screenshots.collect_screenshots(options)
-      upload_metadata.load_from_filesystem(options)
+      upload_metadata.load_from_filesystem
 
       # Assign "default" values to all languages
-      upload_metadata.assign_defaults(options)
+      upload_metadata.assign_defaults
 
       # Validate
       validate_html(screenshots)
 
       # Commit
-      upload_metadata.upload(options)
+      upload_metadata.upload
 
       if options[:sync_screenshots]
         sync_screenshots = SyncScreenshots.new(app: Deliver.cache[:app], platform: Spaceship::ConnectAPI::Platform.map(options[:platform]))
@@ -179,7 +179,7 @@ module Deliver
           package_path: "/tmp",
           platform: platform
         )
-        result = transporter.verify(package_path: package_path)
+        result = transporter.verify(package_path: package_path, asset_path: ipa_path, platform: platform)
       when "osx"
         package_path = FastlaneCore::PkgUploadPackageBuilder.new.generate(
           app_id: Deliver.cache[:app].id,
@@ -187,7 +187,7 @@ module Deliver
           package_path: "/tmp",
           platform: platform
         )
-        result = transporter.verify(package_path: package_path)
+        result = transporter.verify(package_path: package_path, asset_path: pkg_path, platform: platform)
       else
         UI.user_error!("No suitable file found for verify for platform: #{options[:platform]}")
       end
@@ -216,7 +216,7 @@ module Deliver
           package_path: "/tmp",
           platform: platform
         )
-        result = transporter.upload(package_path: package_path, asset_path: ipa_path)
+        result = transporter.upload(package_path: package_path, asset_path: ipa_path, platform: platform)
       when "osx"
         package_path = FastlaneCore::PkgUploadPackageBuilder.new.generate(
           app_id: Deliver.cache[:app].id,
@@ -224,14 +224,15 @@ module Deliver
           package_path: "/tmp",
           platform: platform
         )
-        result = transporter.upload(package_path: package_path, asset_path: pkg_path)
+        result = transporter.upload(package_path: package_path, asset_path: pkg_path, platform: platform)
       else
         UI.user_error!("No suitable file found for upload for platform: #{options[:platform]}")
       end
 
       unless result
         transporter_errors = transporter.displayable_errors
-        UI.user_error!("Error uploading ipa file: \n #{transporter_errors}")
+        file_type = platform == "osx" ? "pkg" : "ipa"
+        UI.user_error!("Error uploading #{file_type} file: \n #{transporter_errors}")
       end
     end
 
@@ -245,13 +246,9 @@ module Deliver
         UI.message("Review submission cancellation has been requested")
 
         # An app version won't get removed from review instantly
-        # Polling until app version has a state of DEVELOPER_REJECT
+        # Polling until there is no longer an in-progress version
         loop do
-          version = app.get_edit_app_store_version(platform: platform)
-          if version.app_store_state == Spaceship::ConnectAPI::AppStoreVersion::AppStoreState::DEVELOPER_REJECTED
-            break
-          end
-
+          break if app.get_in_progress_review_submission(platform: platform).nil?
           UI.message("Waiting for cancellation to take effect...")
           sleep(15)
         end
@@ -273,14 +270,24 @@ module Deliver
     def transporter_for_selected_team
       # Use JWT auth
       api_token = Spaceship::ConnectAPI.token
+      api_key = if options[:api_key].nil? && !api_token.nil?
+                  # Load api key info if user set api_key_path, not api_key
+                  { key_id: api_token.key_id, issuer_id: api_token.issuer_id, key: api_token.key_raw }
+                elsif !options[:api_key].nil?
+                  api_key = options[:api_key].transform_keys(&:to_sym).dup
+                  # key is still base 64 style if api_key is loaded from option
+                  api_key[:key] = Base64.decode64(api_key[:key]) if api_key[:is_key_content_base64]
+                  api_key
+                end
+
       unless api_token.nil?
         api_token.refresh! if api_token.expired?
-        return FastlaneCore::ItunesTransporter.new(nil, nil, false, nil, api_token.text)
+        return FastlaneCore::ItunesTransporter.new(nil, nil, false, nil, api_token.text, altool_compatible_command: true, api_key: api_key)
       end
 
       tunes_client = Spaceship::ConnectAPI.client.tunes_client
 
-      generic_transporter = FastlaneCore::ItunesTransporter.new(options[:username], nil, false, options[:itc_provider])
+      generic_transporter = FastlaneCore::ItunesTransporter.new(options[:username], nil, false, options[:itc_provider], altool_compatible_command: true, api_key: api_key)
       return generic_transporter unless options[:itc_provider].nil? && tunes_client.teams.count > 1
 
       begin
@@ -288,7 +295,7 @@ module Deliver
         name = team['name']
         provider_id = generic_transporter.provider_ids[name]
         UI.verbose("Inferred provider id #{provider_id} for team #{name}.")
-        return FastlaneCore::ItunesTransporter.new(options[:username], nil, false, provider_id)
+        return FastlaneCore::ItunesTransporter.new(options[:username], nil, false, provider_id, altool_compatible_command: true, api_key: api_key)
       rescue => ex
         UI.verbose("Couldn't infer a provider short name for team with id #{tunes_client.team_id} automatically: #{ex}. Proceeding without provider short name.")
         return generic_transporter

@@ -1,4 +1,3 @@
-require_relative 'options'
 require_relative 'spaceship_ensure'
 require_relative 'encryption'
 require_relative 'storage'
@@ -7,21 +6,22 @@ require 'fileutils'
 
 module Match
   class Migrate
-    def migrate(args, options)
-      params = FastlaneCore::Configuration.create(Match::Options.available_options, options.__hash__)
+    def migrate(params)
       loaded_matchfile = params.load_configuration_file("Matchfile")
 
       ensure_parameters_are_valid(params)
 
       # We init the Google storage client before the git client
       # to ask for all the missing inputs *before* cloning the git repo
-      google_cloud_storage = Storage.for_mode("google_cloud", {
+      google_cloud_storage = Storage.from_params({
+        storage_mode: "google_cloud",
         google_cloud_bucket_name: params[:google_cloud_bucket_name],
         google_cloud_keys_file: params[:google_cloud_keys_file],
         google_cloud_project_id: params[:google_cloud_project_id]
       })
 
-      git_storage = Storage.for_mode("git", {
+      git_storage = Storage.from_params({
+        storage_mode: "git",
         git_url: params[:git_url],
         shallow_clone: params[:shallow_clone],
         git_branch: params[:git_branch],
@@ -31,6 +31,8 @@ module Match
 
       encryption = Encryption.for_storage_mode(params[:storage_mode], {
         git_url: params[:git_url],
+        s3_bucket: params[:s3_bucket],
+        s3_skip_encryption: params[:s3_skip_encryption],
         working_directory: git_storage.working_directory
       })
       encryption.decrypt_files if encryption
@@ -88,6 +90,9 @@ module Match
       UI.success("You can also remove the `git_url`, as well as any other git related configurations from your Fastfile and Matchfile")
       UI.message("")
       UI.input("Please make sure to read the above and confirm with enter")
+    ensure
+      google_cloud_storage.clear_changes if google_cloud_storage
+      git_storage.clear_changes if git_storage
     end
 
     def api_token(params)

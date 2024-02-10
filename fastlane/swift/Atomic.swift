@@ -1,5 +1,5 @@
 // Atomic.swift
-// Copyright (c) 2022 FastlaneTools
+// Copyright (c) 2024 FastlaneTools
 
 import Foundation
 

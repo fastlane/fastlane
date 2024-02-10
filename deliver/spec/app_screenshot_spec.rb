@@ -1,7 +1,10 @@
 require 'deliver/app_screenshot'
 require 'deliver/setup'
+require_relative 'deliver_constants'
 
 describe Deliver::AppScreenshot do
+  include DeliverConstants
+
   def screen_size_from(path)
     path.match(/{([0-9]+)x([0-9]+)}/).captures.map(&:to_i)
   end
@@ -11,8 +14,6 @@ describe Deliver::AppScreenshot do
       screen_size_from(path)
     end
   end
-
-  ScreenSize = Deliver::AppScreenshot::ScreenSize
 
   describe "#initialize" do
     context "when filename doesn't contain 'iPad Pro (3rd generation)' or 'iPad Pro (4th generation)'" do
@@ -66,11 +67,21 @@ describe Deliver::AppScreenshot do
     end
 
     describe "valid screen sizes" do
+      it "should calculate all 6.7 inch iPhone resolutions" do
+        expect_screen_size_from_file("iPhone14ProMax-Portrait{1290x2796}.jpg").to eq(ScreenSize::IOS_67)
+        expect_screen_size_from_file("iPhone14ProMax-Landscape{2796x1290}.jpg").to eq(ScreenSize::IOS_67)
+      end
+
       it "should calculate all 6.5 inch iPhone resolutions" do
         expect_screen_size_from_file("iPhoneXSMax-Portrait{1242x2688}.jpg").to eq(ScreenSize::IOS_65)
         expect_screen_size_from_file("iPhoneXSMax-Landscape{2688x1242}.jpg").to eq(ScreenSize::IOS_65)
         expect_screen_size_from_file("iPhone12ProMax-Portrait{1284x2778}.jpg").to eq(ScreenSize::IOS_65)
         expect_screen_size_from_file("iPhone12ProMax-Landscape{2778x1284}.jpg").to eq(ScreenSize::IOS_65)
+      end
+
+      it "should calculate all 6.1 inch iPhone resolutions" do
+        expect_screen_size_from_file("iPhone14Pro-Portrait{1179x2556}.jpg").to eq(ScreenSize::IOS_61)
+        expect_screen_size_from_file("iPhone14Pro-Landscape{2556x1179}.jpg").to eq(ScreenSize::IOS_61)
       end
 
       it "should calculate all 5.8 inch iPhone resolutions" do
@@ -144,15 +155,26 @@ describe Deliver::AppScreenshot do
         expect_screen_size_from_file("AppleWatch-Series3{312x390}.jpg").to eq(ScreenSize::IOS_APPLE_WATCH)
         expect_screen_size_from_file("AppleWatch-Series4{368x448}.jpg").to eq(ScreenSize::IOS_APPLE_WATCH_SERIES4)
         expect_screen_size_from_file("AppleWatch-Series7{396x484}.jpg").to eq(ScreenSize::IOS_APPLE_WATCH_SERIES7)
+        expect_screen_size_from_file("AppleWatch-Ultra{410x502}.jpg").to eq(ScreenSize::IOS_APPLE_WATCH_ULTRA)
       end
     end
 
     describe "valid iMessage app screen sizes" do
+      it "should calculate all 6.7 inch iPhone resolutions" do
+        expect_screen_size_from_file("iMessage/en-GB/iPhone14ProMax-Portrait{1290x2796}.jpg").to eq(ScreenSize::IOS_67_MESSAGES)
+        expect_screen_size_from_file("iMessage/en-GB/iPhone14ProMax-Landscape{2796x1290}.jpg").to eq(ScreenSize::IOS_67_MESSAGES)
+      end
+
       it "should calculate all 6.5 inch iPhone resolutions" do
         expect_screen_size_from_file("iMessage/en-GB/iPhoneXSMax-Portrait{1242x2688}.jpg").to eq(ScreenSize::IOS_65_MESSAGES)
         expect_screen_size_from_file("iMessage/en-GB/iPhoneXSMax-Landscape{2688x1242}.jpg").to eq(ScreenSize::IOS_65_MESSAGES)
         expect_screen_size_from_file("iMessage/en-GB/iPhone12ProMax-Portrait{1284x2778}.jpg").to eq(ScreenSize::IOS_65_MESSAGES)
         expect_screen_size_from_file("iMessage/en-GB/iPhone12ProMax-Landscape{2778x1284}.jpg").to eq(ScreenSize::IOS_65_MESSAGES)
+      end
+
+      it "should calculate all 6.1 inch iPhone resolutions" do
+        expect_screen_size_from_file("iMessage/en-GB/iPhone14Pro-Portrait{1179x2556}.jpg").to eq(ScreenSize::IOS_61_MESSAGES)
+        expect_screen_size_from_file("iMessage/en-GB/iPhone14Pro-Landscape{2556x1179}.jpg").to eq(ScreenSize::IOS_61_MESSAGES)
       end
 
       it "should calculate all 5.8 inch iPhone resolutions" do
@@ -241,8 +263,8 @@ describe Deliver::AppScreenshot do
   describe "#is_messages?" do
     it "should return true when contained in the iMessage directory" do
       files = [
-        "screenshots/iMessage/en-GB/iPhoneXSMax-Potrait{1242x2688}.png",
-        "screenshots/iMessage/en-GB/iPhoneXS-Potrait{1125x2436}.png",
+        "screenshots/iMessage/en-GB/iPhoneXSMax-Portrait{1242x2688}.png",
+        "screenshots/iMessage/en-GB/iPhoneXS-Portrait{1125x2436}.png",
         "screenshots/iMessage/en-GB/iPhone8Plus-Landscape{2208x1242}.png",
         "screenshots/iMessage/en-GB/iPhone8-Landscape{1334x750}.png",
         "screenshots/iMessage/en-GB/iPhoneSE-Portrait-NoStatusBar{640x1096}.png",
@@ -259,8 +281,8 @@ describe Deliver::AppScreenshot do
 
     it "should return false when not contained in the iMessage directory" do
       files = [
-        "screenshots/en-GB/iPhoneXSMax-Potrait{1242x2688}.png",
-        "screenshots/en-GB/iPhoneXS-Potrait{1125x2436}.png",
+        "screenshots/en-GB/iPhoneXSMax-Portrait{1242x2688}.png",
+        "screenshots/en-GB/iPhoneXS-Portrait{1125x2436}.png",
         "screenshots/en-GB/iPhone8Plus-Landscape{2208x1242}.png",
         "screenshots/en-GB/iPhone8-Landscape{1334x750}.png",
         "screenshots/en-GB/iPhoneSE-Portrait-NoStatusBar{640x1096}.png",
@@ -304,8 +326,14 @@ describe Deliver::AppScreenshot do
       expect(app_screenshot_with(ScreenSize::IOS_55_MESSAGES).device_type).to eq("IMESSAGE_APP_IPHONE_55")
     end
 
-    it "should return nil for 6.1 inch displays (iPhone XR)" do
-      expect(app_screenshot_with(ScreenSize::IOS_61).device_type).to be_nil
+    it "should return iphone14Pro for 6.1 inch displays (iPhone 14)" do
+      expect(app_screenshot_with(ScreenSize::IOS_61).device_type).to eq("APP_IPHONE_61")
+      expect(app_screenshot_with(ScreenSize::IOS_61_MESSAGES).device_type).to eq("IMESSAGE_APP_IPHONE_61")
+    end
+
+    it "should return iphone67 for 6.7 inch displays" do
+      expect(app_screenshot_with(ScreenSize::IOS_67).device_type).to eq("APP_IPHONE_67")
+      expect(app_screenshot_with(ScreenSize::IOS_67_MESSAGES).device_type).to eq("IMESSAGE_APP_IPHONE_67")
     end
 
     it "should return iphone65 for 6.5 inch displays" do
@@ -343,6 +371,10 @@ describe Deliver::AppScreenshot do
 
     it "should return watchSeries7 for Apple Watch Series 7" do
       expect(app_screenshot_with(ScreenSize::IOS_APPLE_WATCH_SERIES7).device_type).to eq("APP_WATCH_SERIES_7")
+    end
+
+    it "should return watchUltra for Apple Watch Ultra" do
+      expect(app_screenshot_with(ScreenSize::IOS_APPLE_WATCH_ULTRA).device_type).to eq("APP_WATCH_ULTRA")
     end
 
     it "should return appleTV for Apple TV" do

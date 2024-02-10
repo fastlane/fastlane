@@ -27,6 +27,7 @@ module Spaceship
 
       module AppStoreState
         READY_FOR_SALE = "READY_FOR_SALE"
+        READY_FOR_REVIEW = "READY_FOR_REVIEW"
         PROCESSING_FOR_APP_STORE = "PROCESSING_FOR_APP_STORE"
         PENDING_DEVELOPER_RELEASE = "PENDING_DEVELOPER_RELEASE"
         PENDING_APPLE_RELEASE = "PENDING_APPLE_RELEASE"
@@ -112,7 +113,7 @@ module Spaceship
 
       # @deprecated
       def fetch_age_rating_declaration(client: nil)
-        raise 'AppStoreVersion no longer as AgeRatingDeclaration as of App Store Connect API 1.3 - Use AppInfo instead'
+        raise 'AppStoreVersion no longer has AgeRatingDeclaration as of App Store Connect API 1.3 - Use AppInfo instead'
       end
 
       #
