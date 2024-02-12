@@ -119,13 +119,11 @@ module Fastlane
                                        description: "Increase verbosity of informational output",
                                        type: Boolean,
                                        default_value: false),
-<<<<<<< HEAD
           FastlaneCore::ConfigItem.new(key: :very_verbose,
                                        env_name: "FL_SPM_VERY_VERBOSE",
                                        description: "Increase verbosity to include debug output",
                                        type: Boolean,
-                                       default_value: false)
-=======
+                                       default_value: false),
           FastlaneCore::ConfigItem.new(key: :simulator,
                                        env_name: "FL_SPM_SIMULATOR",
                                        description: "Specifies the simulator to pass for Swift Compiler (one of: #{valid_simulators.join(', ')})",
@@ -143,7 +141,6 @@ module Fastlane
                                        verify_block: proc do |value|
                                          UI.user_error!("Please pass a valid simulator architecture. Use one of the following: #{valid_architectures.join(', ')}") unless valid_architectures.include?(value)
                                        end)
->>>>>>> upstream/master
         ]
       end
 
