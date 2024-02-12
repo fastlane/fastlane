@@ -30,6 +30,7 @@ module Spaceship
         IPOD = "IPOD"
         APPLE_TV = "APPLE_TV"
         MAC = "MAC"
+        APPLE_VISION_PRO = "APPLE_VISION_PRO"
 
         # As of 2022-11-12, this is not officially supported by App Store Connect API
         APPLE_SILICON_MAC = "APPLE_SILICON_MAC"
@@ -68,7 +69,7 @@ module Spaceship
         device_platform = case platform
                           when :osx, :macos, :mac
                             Spaceship::ConnectAPI::Platform::MAC_OS
-                          when :ios, :tvos
+                          when :ios, :tvos, :xros, :visionos
                             Spaceship::ConnectAPI::Platform::IOS
                           when :catalyst
                             Spaceship::ConnectAPI::Platform::MAC_OS
@@ -86,7 +87,8 @@ module Spaceship
               Spaceship::ConnectAPI::Device::DeviceClass::IPAD,
               Spaceship::ConnectAPI::Device::DeviceClass::IPHONE,
               Spaceship::ConnectAPI::Device::DeviceClass::IPOD,
-              Spaceship::ConnectAPI::Device::DeviceClass::APPLE_WATCH
+              Spaceship::ConnectAPI::Device::DeviceClass::APPLE_WATCH,
+              Spaceship::ConnectAPI::Device::DeviceClass::APPLE_VISION_PRO
             ]
           when :tvos
             [
