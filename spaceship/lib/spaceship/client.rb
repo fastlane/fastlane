@@ -514,11 +514,24 @@ module Spaceship
       # Now we know if the login is successful or if we need to do 2 factor
 
       case response.status
-      when 403
-        raise InvalidUserCredentialsError.new, "Invalid username and password combination. Used '#{user}' as the username."
       when 200
         fetch_olympus_session
         return response
+      when 401
+        # Unauthorized
+        raise InvalidUserCredentialsError.new, "Invalid username and password combination. Used '#{user}' as the username."
+      when 403
+        error_string = "Login worked, but access was forbidden. Try logging in on https://appstoreconnect.apple.com and see if any issues are raised to you there."
+        # Forbidden
+        case response.body["serviceErrors"][0]["code"]
+        when "-20209"
+          error_string = "This Apple ID has been locked for security reasons. Visit iForgot to reset your account (https://iforgot.apple.com)."
+          raise UnauthorizedAccessError.new, error_string
+        when "-20751"
+          error_string = "Login worked, but something went wrong anyway. This has happened when an Apple ID got lost on Apple's end. See https://github.com/fastlane/fastlane/issues/14398; try resetting your account over at https://iforgot.apple.com or contact Apple Developer Support https://developer.apple.com/contact/"
+          raise UnauthorizedAccessError.new, error_string
+        end
+        raise UnauthorizedAccessError.new, error_string
       when 409
         # 2 step/factor is enabled for this account, first handle that
         handle_two_step_or_factor(response)
