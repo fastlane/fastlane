@@ -130,7 +130,7 @@ describe Scan do
         end.to raise_error(FastlaneCore::Interface::FastlaneError)
       end
 
-      it 'returns version 0 if no OS version associated with runtime build number' do
+      it 'returns nil if no OS version associated with runtime build number' do
         help_output = 'Usage: simctl runtime <operation> <arguments> match list'
         allow(Open3).to receive(:capture3).with('xcrun simctl runtime -h').and_return([nil, help_output, nil])
 
