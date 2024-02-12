@@ -1,6 +1,15 @@
 require 'fastlane/cli_tools_distributor'
 
 describe Fastlane::CLIToolsDistributor do
+  around do |example|
+    # FASTLANE_SKIP_UPDATE_CHECK: prevent the update checker to run and clutter the output
+    # (Fastlane::PluginUpdateManager.start_looking_for_updates() will return)
+    # FASTLANE_DISABLE_ANIMATION: prevent the spinner in Fastlane::CLIToolsDistributor.take_off
+    FastlaneSpec::Env.with_env_values('FASTLANE_SKIP_UPDATE_CHECK': 'a_truthy_value', 'FASTLANE_DISABLE_ANIMATION': 'true') do
+      example.run
+    end
+  end
+
   describe "command handling" do
     it "runs the lane instead of the tool when there is a conflict" do
       FastlaneSpec::Env.with_ARGV(["sigh"]) do

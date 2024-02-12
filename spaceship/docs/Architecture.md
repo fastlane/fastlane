@@ -1,10 +1,10 @@
-# Spaceship Architecture
+# _spaceship_ Architecture
 
 _spaceship_ uses [Faraday](https://github.com/lostisland/faraday) to interact with multiple Apple API endpoints:
 
 ## Overview
 
-Spaceship wraps various APIs using the following pattern:
+_spaceship_ wraps various APIs using the following pattern:
 
 A simple `client` and various data models, usually subclassed from a `Base` model (e.g. Spaceship::TestFlight::Base)
 The `client` is responsible for making HTTP requests for a given API or domain. It should be very simple and have no logic.

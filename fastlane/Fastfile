@@ -27,7 +27,7 @@ lane :lint_source do
   # Verifying that no debug code is in the code base
   #
   exclude_dirs = ["\.bundle", "*/vendor/bundle"]
-  ensure_no_debug_code(text: "binding.pry", extension: ".rb", exclude: "playground.rb", exclude_dirs: exclude_dirs) # debugging code
+  ensure_no_debug_code(text: "binding\.(irb|pry)", extension: ".rb", exclude: "playground.rb", exclude_dirs: exclude_dirs) # debugging code
   ensure_no_debug_code(text: "# TODO", extension: ".rb", exclude_dirs: exclude_dirs) # TODOs
   ensure_no_debug_code(text: "now: ", extension: ".rb", exclude_dirs: exclude_dirs) # rspec focus
   ensure_no_debug_code(text: "<<<<<<<", extension: ".rb", exclude_dirs: exclude_dirs) # Merge conflict
@@ -323,7 +323,7 @@ end
 
 lane :release_brew do
   version = local_version
-  sh("cd .. && brew bump-formula-pr fastlane --force --url=https://github.com/fastlane/fastlane/archive/#{version}.tar.gz")
+  sh("cd .. && brew update && brew bump-formula-pr fastlane --force --url=https://github.com/fastlane/fastlane/archive/refs/tags/#{version}.tar.gz")
 end
 
 lane :release_github do
@@ -584,21 +584,14 @@ end
 
 desc "Ensure the correct formatting for the fastlane tools"
 private_lane :ensure_tool_name_formatting do
+  require_relative "../fastlane/helper/tool_name_formatting_helper.rb"
   UI.message("🕗  Verifying tool name formatting...")
   require 'fastlane/tools'
   errors = []
   Dir.chdir("..") do
     Dir["**/*.md"].each do |path|
-      content = File.read(path)
-      Fastlane::TOOLS.each do |tool|
-        errors << "Use _#{tool}_ instead of `#{tool}` to mention a tool in the docs in '#{path}'" if content.include?("`#{tool}`")
-        errors << "Use _#{tool}_ instead of `_#{tool}_` to mention a tool in the docs in '#{path}'" if content.include?("`_#{tool}_`")
-        errors << "Use [_#{tool}_] instead of [#{tool}] to mention a tool in the docs in '#{path}'" if content.include?("[#{tool}]")
-        errors << "Use <em>#{tool}<em> instead of <code>#{tool}</code> to mention a tool in the docs in '#{path}'" if content.include?("<code>#{tool}</code>")
-        if content.include?("_#{tool.to_s.capitalize}_") || content.include?("`#{tool.to_s.capitalize}`")
-          errors << "fastlane tools have to be formatted in lower case: #{tool} in '#{path}'"
-        end
-      end
+      helper = Helper::ToolNameFormattingHelper.new(path: path, is_documenting_invalid_examples: path == 'CONTRIBUTING.md')
+      errors += helper.find_tool_name_formatting_errors
     end
   end
   errors.each { |a| UI.error(a) }

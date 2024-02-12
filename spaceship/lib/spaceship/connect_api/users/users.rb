@@ -28,6 +28,36 @@ module Spaceship
           users_request_client.delete("users/#{user_id}")
         end
 
+        # Update existing user
+        def patch_user(user_id:, all_apps_visible:, provisioning_allowed:, roles:, visible_app_ids:)
+          body = {
+            data: {
+              type: 'users',
+              id: user_id,
+              attributes: {
+                allAppsVisible: all_apps_visible,
+                provisioningAllowed: provisioning_allowed,
+                roles: roles
+              },
+              relationships: {
+                visibleApps: {
+                  data: visible_app_ids.map do |app_id|
+                    {
+                      type: "apps",
+                      id: app_id
+                    }
+                  end
+                }
+              }
+            }
+          }
+
+          # Avoid API error: You cannot set visible apps for this user because the user's roles give them access to all apps.
+          body[:data].delete(:relationships) if all_apps_visible
+
+          users_request_client.patch("users/#{user_id}", body)
+        end
+
         # Add app permissions for user
         # @deprecated Use {#post_user_visible_apps} instead.
         def add_user_visible_apps(user_id: nil, app_ids: nil)
@@ -116,6 +146,10 @@ module Spaceship
               }
             }
           }
+
+          # Avoid API error: You cannot set visible apps for this user because the user's roles give them access to all apps.
+          body[:data].delete(:relationships) if all_apps_visible
+
           users_request_client.post("userInvitations", body)
         end
 

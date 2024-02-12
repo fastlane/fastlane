@@ -1157,14 +1157,14 @@ describe FastlaneCore do
           end
           context "upload command generation" do
             it 'generates a call to altool' do
-              transporter = FastlaneCore::ItunesTransporter.new(email, password, false, 'abcd123', upload: true)
+              transporter = FastlaneCore::ItunesTransporter.new(email, password, false, 'abcd123', altool_compatible_command: true)
               expect(transporter.upload('my.app.id', '/tmp', package_path: '/tmp/my.app.id.itmsp', platform: "osx")).to eq(altool_upload_command(provider_short_name: 'abcd123'))
             end
           end
 
           context "provider IDs command generation" do
             it 'generates a call to altool' do
-              transporter = FastlaneCore::ItunesTransporter.new(email, password, false, 'abcd123', upload: true)
+              transporter = FastlaneCore::ItunesTransporter.new(email, password, false, 'abcd123', altool_compatible_command: true)
               expect(transporter.provider_ids).to eq(altool_provider_id_command)
             end
           end
@@ -1177,7 +1177,7 @@ describe FastlaneCore do
           end
           context "upload command generation" do
             it 'generates a call to xcrun iTMSTransporter instead altool' do
-              transporter = FastlaneCore::ItunesTransporter.new(email, password, false, 'abcd123', upload: true)
+              transporter = FastlaneCore::ItunesTransporter.new(email, password, false, 'abcd123', altool_compatible_command: true)
               expect(transporter.upload('my.app.id', '/tmp', platform: "osx")).to eq(java_upload_command(provider_short_name: 'abcd123', classpath: false))
             end
           end
@@ -1194,7 +1194,7 @@ describe FastlaneCore do
           end
           context "upload command generation" do
             it 'generates a call to altool' do
-              transporter = FastlaneCore::ItunesTransporter.new(email, password, false, 'abcd123', upload: true, api_key: api_key)
+              transporter = FastlaneCore::ItunesTransporter.new(email, password, false, 'abcd123', altool_compatible_command: true, api_key: api_key)
               expected = Regexp.new("API_PRIVATE_KEYS_DIR=#{Regexp.escape(Dir.tmpdir)}.*\s#{Regexp.escape(altool_upload_command(api_key: api_key, provider_short_name: 'abcd123'))}")
               expect(transporter.upload('my.app.id', '/tmp', platform: "osx")).to match(expected)
             end
@@ -1202,7 +1202,7 @@ describe FastlaneCore do
 
           context "provider IDs command generation" do
             it 'generates a call to altool' do
-              transporter = FastlaneCore::ItunesTransporter.new(email, password, false, 'abcd123', upload: true, api_key: api_key)
+              transporter = FastlaneCore::ItunesTransporter.new(email, password, false, 'abcd123', altool_compatible_command: true, api_key: api_key)
               expected = Regexp.new("API_PRIVATE_KEYS_DIR=#{Regexp.escape(Dir.tmpdir)}.*\s#{Regexp.escape(altool_provider_id_command(api_key: api_key))}")
               expect(transporter.provider_ids).to match(expected)
             end
@@ -1393,6 +1393,23 @@ describe FastlaneCore do
           expect(FastlaneCore::FastlanePty).to receive(:spawn).and_raise(StandardError, "It's all broken now.")
           expect(@transporter.upload('my.app.id', '/tmp')).to eq(false)
         end
+      end
+    end
+  end
+
+  describe FastlaneCore::AltoolTransporterExecutor do
+    let(:upload_cmd) { "xcrun altool --upload-app --apiKey #{api_key[:key_id]} --apiIssuer #{api_key[:issuer_id]} -t macos -f /tmp/my.app.id.itmsp -k 100000" }
+    let(:instance) { described_class.new }
+    describe "#execute" do
+      it "logs specific info about altool crash if exit code is -1" do
+        # remove test behavior, we actually want FastlanePty.spawn to be called here
+        allow(FastlaneCore::Helper).to receive(:test?).and_return(false)
+        # force the nil return of FastlanePty.spawn
+        allow(FastlaneCore::FastlanePty).to receive(:spawn).and_return(-1)
+        expect(instance.execute(upload_cmd, false)).to eq(false)
+        expect(instance.errors).to include(
+          "-1 indicates altool exited abnormally; try retrying (see https://github.com/fastlane/fastlane/issues/21535)"
+        )
       end
     end
   end
