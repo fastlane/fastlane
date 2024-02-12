@@ -85,7 +85,7 @@ module Match
         self.working_directory = Dir.mktmpdir
 
         command = "git clone #{self.git_url.shellescape} #{self.working_directory.shellescape}"
-        # HTTP headers are supposed to be be case insensitive but
+        # HTTP headers are supposed to be case-insensitive but
         # Bitbucket requires `Authorization: Basic` and `Authorization Bearer` to work
         # https://github.com/fastlane/fastlane/pull/15928
         command << " -c http.extraheader='Authorization: Basic #{self.git_basic_authorization}'" unless self.git_basic_authorization.nil?
@@ -140,9 +140,10 @@ module Match
       end
 
       def delete_files(files_to_delete: [], custom_message: nil)
-        # No specific list given, e.g. this happens on `fastlane match nuke`
-        # We just want to run `git add -A` to commit everything
-        git_push(commands: ["git add -A"], commit_message: custom_message)
+        if files_to_delete.count > 0
+          commands = files_to_delete.map { |filename|  "git rm #{filename.shellescape}" }
+          git_push(commands: commands, commit_message: custom_message)
+        end
       end
 
       def upload_files(files_to_upload: [], custom_message: nil)

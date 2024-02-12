@@ -48,7 +48,7 @@ module Sigh
           profile = create_profile!
         end
       else
-        UI.user_error!("No matching provisioning profile found and can not create a new one because you enabled `readonly`") if Sigh.config[:readonly]
+        UI.user_error!("No matching provisioning profile found and cannot create a new one because you enabled `readonly`") if Sigh.config[:readonly]
         UI.important("No existing profiles found, that match the certificates you have installed locally! Creating a new provisioning profile for you")
         ensure_app_exists!
         profile = create_profile!
@@ -91,7 +91,7 @@ module Sigh
       results = Sigh.config[:cached_profiles]
       results ||= Spaceship::ConnectAPI::Profile.all(filter: filter, includes: includes)
       results.select! do |profile|
-        profile.bundle_id.identifier == Sigh.config[:app_identifier]
+        profile.bundle_id&.identifier == Sigh.config[:app_identifier]
       end
 
       results = results.find_all do |current_profile|

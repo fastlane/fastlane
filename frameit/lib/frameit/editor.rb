@@ -109,6 +109,26 @@ module Frameit
         end
       end
 
+      # Apply rounded corners for all iPhone 14 devices
+      if screenshot.device.id.to_s.include?("iphone-14") || screenshot.device.id.to_s.include?("iphone14")
+
+        maskData = MiniMagick::Tool::Convert.new do |img|
+          img.size("#{screenshot.size[0]}x#{screenshot.size[1]}")
+          img.canvas('none')
+          img.draw("roundrectangle 0,0,#{screenshot.size[0]},#{screenshot.size[1]},100,100")
+          img << 'png:-'
+        end
+
+        # Create a mask
+        mask = MiniMagick::Image.read(maskData)
+
+        @image = @image.composite(mask, "png") do |c|
+          c.channel("A")
+          c.compose("DstIn")
+          c.alpha("on")
+        end
+      end
+
       @image = frame.composite(image, "png") do |c|
         c.compose("DstOver")
         c.geometry(offset['offset'])
@@ -390,7 +410,7 @@ module Frameit
       return font_size if !font_size.nil? && font_size > 0
 
       font_scale_factor = @config['font_scale_factor'] || 0.1
-      UI.user_error!("Parameter 'font_scale_factor' can not be 0. Please provide a value larger than 0.0 (default = 0.1).") if font_scale_factor == 0.0
+      UI.user_error!("Parameter 'font_scale_factor' cannot be 0. Please provide a value larger than 0.0 (default = 0.1).") if font_scale_factor == 0.0
       [@image.width * font_scale_factor].max.round
     end
 

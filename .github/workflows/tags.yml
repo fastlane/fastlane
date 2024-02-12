@@ -1,6 +1,8 @@
+---
+name: Deploy to Homebrew
 on:
   push:
-    tags: 'v*'
+    tags: 'v*' # Push events to tags matching v*
 
 jobs:
   homebrew:
@@ -8,8 +10,8 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: mislav/bump-homebrew-formula-action@v3.1
-        if: "!contains(github.ref, '-')" # skip prereleases
+        if: "!contains(github.ref, '-')" # Skip prereleases
         with:
           formula-name: fastlane
         env:
-          COMMITTER_TOKEN: ${{ secrets.HOMEBREW_COMMITTER_TOKEN }}
+          COMMITTER_TOKEN: '${{ secrets.HOMEBREW_COMMITTER_TOKEN }}'

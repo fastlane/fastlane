@@ -55,7 +55,7 @@ module Spaceship
         Time.parse(expiration_date) > Time.now
       end
 
-      # Create a new code signing request that can be used to
+      # Create a new cert signing request that can be used to
       # generate a new certificate
       # @example
       #  Create a new certificate signing request
@@ -71,7 +71,7 @@ module Spaceship
                                                 ['CN', 'PEM', OpenSSL::ASN1::UTF8STRING]
                                               ])
         csr.public_key = key.public_key
-        csr.sign(key, OpenSSL::Digest::SHA1.new)
+        csr.sign(key, OpenSSL::Digest::SHA256.new)
         return [csr, key]
       end
 

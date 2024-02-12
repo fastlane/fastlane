@@ -27,7 +27,7 @@ module FastlaneCore
       jobs.each { |job| enqueue(job) }
     end
 
-    # Call this after you enqueuned all the jobs you want to process
+    # Call this after you enqueued all the jobs you want to process
     # This method blocks current thread until all the enqueued jobs are processed
     def start
       @queue.close
