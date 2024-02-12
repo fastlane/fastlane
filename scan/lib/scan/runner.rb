@@ -397,7 +397,7 @@ module Scan
 
       # Return early unless the user wants to prelaunch simulators. Or if the user wants simulator logs
       # then we must prelaunch simulators because Xcode's headless
-      # mode launches and shutsdown the simulators before we can collect the logs.
+      # mode launches and shuts down the simulators before we can collect the logs.
       return unless Scan.config[:prelaunch_simulator] || Scan.config[:include_simulator_logs]
 
       devices_to_shutdown = []

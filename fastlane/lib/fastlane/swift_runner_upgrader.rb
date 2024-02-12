@@ -163,7 +163,7 @@ module Fastlane
         group_name = group.name.downcase
         manifest_group_filenames = inverted_hash[group_name]
 
-        # compare the current group files to what the manifest says should minially be there
+        # compare the current group files to what the manifest says should minimally be there
         manifest_group_filenames.each do |filename|
           # current group is missing a file from the manifest, need to add it
           next if existing_group_files_set.include?(filename)
@@ -232,16 +232,19 @@ module Fastlane
     # adds new copy files build phase to fastlane_runner_target
     def add_missing_copy_phase!(dry_run: false)
       # Check if upgrade is needed
-      # If fastlane copy files build phase exists already, we don't need any more changes to the Xcode project
-      phase_copy_sign = self.fastlane_runner_target.copy_files_build_phases.select { |phase_copy| phase_copy.name == "FastlaneRunnerCopySigned" }.first
 
-      old_phase_copy_sign = self.fastlane_runner_target.shell_script_build_phases.select { |phase_copy| phase_copy.shell_script == "cd \"${SRCROOT}\"\ncd ../..\ncp \"${TARGET_BUILD_DIR}/${EXECUTABLE_PATH}\" .\n" }.first
+      # Check if Copy Files build phase contains FastlaneRunner target.
+      phase_copy_sign = self.fastlane_runner_target.copy_files_build_phases.map(&:files).flatten.select { |file| file.display_name == "FastlaneRunner" }.first
+
+      # If fastlane copy files build phase exists already, we don't need any more changes to the Xcode project
+      phase_copy_sign = self.fastlane_runner_target.copy_files_build_phases.select { |phase_copy| phase_copy.name == "FastlaneRunnerCopySigned" }.first unless phase_copy_sign
 
       return true if dry_run && phase_copy_sign.nil?
 
       return false if dry_run
 
       # Proceed to upgrade
+      old_phase_copy_sign = self.fastlane_runner_target.shell_script_build_phases.select { |phase_copy| phase_copy.shell_script == "cd \"${SRCROOT}\"\ncd ../..\ncp \"${TARGET_BUILD_DIR}/${EXECUTABLE_PATH}\" .\n" }.first
       old_phase_copy_sign.remove_from_project unless old_phase_copy_sign.nil?
 
       unless phase_copy_sign
