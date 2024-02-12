@@ -116,7 +116,6 @@ module Fastlane
           FastlaneCore::ConfigItem.new(key: :skip_update,
                                        env_name: "FL_SPM_SKIP_UPDATE",
                                        description: "Skip updating dependencies from their remote during a resolution",
-                                       optional: true,
                                        type: Boolean,
                                        default_value: false),
           FastlaneCore::ConfigItem.new(key: :verbose,
