@@ -127,9 +127,9 @@ module Spaceship
       # In-App Purchase Price Schedules
       #
 
-      def create_price_schedule(client: nil, in_app_purchase_price_point_id:, start_date: nil)
+      def create_price_schedule(client: nil, in_app_purchase_price_point_id:, start_date: nil, base_territory_id: )
         client ||= Spaceship::ConnectAPI
-        resps = client.create_in_app_purchase_price_schedule(purchase_id: id, in_app_purchase_price_point_id: in_app_purchase_price_point_id, start_date: start_date)
+        resps = client.create_in_app_purchase_price_schedule(purchase_id: id, in_app_purchase_price_point_id: in_app_purchase_price_point_id, start_date: start_date, base_territory_id: base_territory_id)
         resps.to_models.first
       end
 

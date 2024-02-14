@@ -197,7 +197,7 @@ module Spaceship
           iap_request_client.get("inAppPurchasePriceSchedules/#{purchase_id}/manualPrices", params)
         end
 
-        def create_in_app_purchase_price_schedule(purchase_id:, in_app_purchase_price_point_id:, start_date: nil)
+        def create_in_app_purchase_price_schedule(purchase_id:, in_app_purchase_price_point_id:, start_date: nil, base_territory_id:)
           params = {
             data: {
               type: 'inAppPurchasePriceSchedules',
@@ -211,6 +211,12 @@ module Spaceship
 
                 manualPrices: {
                   data: [] # Filled with loop below
+                },
+                baseTerritory: {
+                  data: {
+                    id: base_territory_id,
+                    type: 'territories'
+                  }
                 }
               }
             },
