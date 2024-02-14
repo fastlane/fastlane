@@ -89,7 +89,6 @@ module Spaceship
       VISION_OS = "VISION_OS"
       WATCH_OS = "WATCH_OS"
 
-
       ALL = [IOS, MAC_OS, TV_OS, VISION_OS, WATCH_OS]
 
       def self.map(platform)
