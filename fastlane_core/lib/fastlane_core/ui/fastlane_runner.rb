@@ -243,10 +243,6 @@ module Commander
       ui.error(e.to_s)
       ui.error("")
       ui.error("SSL errors can be caused by various components on your local machine.")
-      if Gem::Version.new(RUBY_VERSION) < Gem::Version.new('2.1')
-        ui.error("Apple has recently changed their servers to require TLS 1.2, which may")
-        ui.error("not be available to your system installed Ruby (#{RUBY_VERSION})")
-      end
       ui.error("")
       ui.error("The best solution is to use the self-contained fastlane version.")
       ui.error("Which ships with a bundled OpenSSL,ruby and all gems - so you don't depend on system libraries")
