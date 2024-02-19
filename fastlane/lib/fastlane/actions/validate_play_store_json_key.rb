@@ -15,7 +15,7 @@ module Fastlane
           FastlaneCore::UI.success("Successfully established connection to Google Play Store.")
           FastlaneCore::UI.verbose("client: " + client.inspect)
         rescue => e
-          UI.error("Could not establish a connection to Google Play Store with this json key file.")
+          UI.error("Could not establish a connection to Google Play Store with this access token/json key file.")
           UI.error("#{e.message}\n#{e.backtrace.join("\n")}") if FastlaneCore::Globals.verbose?
         end
       end
@@ -45,7 +45,7 @@ module Fastlane
           FastlaneCore::ConfigItem.new(key: :json_key,
                                        env_name: "SUPPLY_JSON_KEY",
                                        short_option: "-j",
-                                       conflicting_options: [:json_key_data],
+                                       conflicting_options: [:json_key_data, :access_token],
                                        optional: true,
                                        description: "The path to a file containing service account JSON, used to authenticate with Google",
                                        code_gen_sensitive: true,
@@ -58,7 +58,7 @@ module Fastlane
           FastlaneCore::ConfigItem.new(key: :json_key_data,
                                        env_name: "SUPPLY_JSON_KEY_DATA",
                                        short_option: "-c",
-                                       conflicting_options: [:json_key],
+                                       conflicting_options: [:json_key, :access_token],
                                        optional: true,
                                        description: "The raw service account JSON data used to authenticate with Google",
                                        code_gen_sensitive: true,
@@ -71,6 +71,12 @@ module Fastlane
                                            UI.user_error!("Could not parse service account json: JSON::ParseError")
                                          end
                                        end),
+          FastlaneCore::ConfigItem.new(key: :access_token,
+                                       env_name: "SUPPLY_ACCESS_TOKEN",
+                                       conflicting_options: [:json_key_data, :json_key],
+                                       optional: true, # alternative for :json_key
+                                       description: "The access token, used to authenticate with Google",
+                                       code_gen_sensitive: true),
           # stuff
           FastlaneCore::ConfigItem.new(key: :root_url,
                                        env_name: "SUPPLY_ROOT_URL",

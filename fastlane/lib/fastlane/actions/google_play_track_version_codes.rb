@@ -9,6 +9,7 @@ module Fastlane
         :issuer,
         :json_key,
         :json_key_data,
+        :access_token,
         :root_url,
         :timeout
       ]

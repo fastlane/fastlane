@@ -55,7 +55,7 @@ module Fastlane
           FastlaneCore::ConfigItem.new(key: :json_key,
                                        env_name: "SUPPLY_JSON_KEY",
                                        short_option: "-j",
-                                       conflicting_options: [:json_key_data],
+                                       conflicting_options: [:json_key_data, :access_token],
                                        optional: true, # optional until it is possible specify either json_key OR json_key_data are required
                                        description: "The path to a file containing service account JSON, used to authenticate with Google",
                                        code_gen_sensitive: true,
@@ -68,7 +68,7 @@ module Fastlane
           FastlaneCore::ConfigItem.new(key: :json_key_data,
                                        env_name: "SUPPLY_JSON_KEY_DATA",
                                        short_option: "-c",
-                                       conflicting_options: [:json_key],
+                                       conflicting_options: [:json_key, :access_token],
                                        optional: true,
                                        description: "The raw service account JSON data used to authenticate with Google",
                                        code_gen_sensitive: true,
@@ -81,6 +81,12 @@ module Fastlane
                                            UI.user_error!("Could not parse service account json: JSON::ParseError")
                                          end
                                        end),
+          FastlaneCore::ConfigItem.new(key: :access_token,
+                                       env_name: "SUPPLY_ACCESS_TOKEN",
+                                       conflicting_options: [:json_key_data, :json_key],
+                                       optional: true, # alternative for :json_key
+                                       description: "The access token, used to authenticate with Google",
+                                       code_gen_sensitive: true),
           FastlaneCore::ConfigItem.new(key: :developer_account_id,
                                        short_option: "-k",
                                        env_name: "SUPPLY_DEVELOPER_ACCOUNT_ID",

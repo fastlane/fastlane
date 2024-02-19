@@ -2,7 +2,7 @@ module Fastlane
   module Actions
     class GetManagedPlayStorePublishingRightsAction < Action
       def self.run(params)
-        unless params[:json_key] || params[:json_key_data]
+        unless params[:json_key] || params[:json_key_data] || params[:access_token]
           UI.important("To not be asked about this value, you can specify it using 'json_key'")
           json_key_path = UI.input("The service account json file used to authenticate with Google: ")
           json_key_path = File.expand_path(json_key_path)
@@ -76,7 +76,7 @@ module Fastlane
           FastlaneCore::ConfigItem.new(key: :json_key,
                                        env_name: "SUPPLY_JSON_KEY",
                                        short_option: "-j",
-                                       conflicting_options: [:json_key_data],
+                                       conflicting_options: [:json_key_data, :access_token],
                                        optional: true, # optional until it is possible specify either json_key OR json_key_data are required
                                        description: "The path to a file containing service account JSON, used to authenticate with Google",
                                        code_gen_sensitive: true,
@@ -86,10 +86,16 @@ module Fastlane
                                          UI.user_error!("Could not find service account json file at path '#{File.expand_path(value)}'") unless File.exist?(File.expand_path(value))
                                          UI.user_error!("'#{value}' doesn't seem to be a JSON file") unless FastlaneCore::Helper.json_file?(File.expand_path(value))
                                        end),
+          FastlaneCore::ConfigItem.new(key: :access_token,
+                                       env_name: "SUPPLY_ACCESS_TOKEN",
+                                       conflicting_options: [:json_key_data, :json_key],
+                                       optional: true, # alternative for :json_key
+                                       description: "The access token, used to authenticate with Google",
+                                       code_gen_sensitive: true),
           FastlaneCore::ConfigItem.new(key: :json_key_data,
                                        env_name: "SUPPLY_JSON_KEY_DATA",
                                        short_option: "-c",
-                                       conflicting_options: [:json_key],
+                                       conflicting_options: [:json_key, :access_token],
                                        optional: true,
                                        description: "The raw service account JSON data used to authenticate with Google",
                                        code_gen_sensitive: true,
