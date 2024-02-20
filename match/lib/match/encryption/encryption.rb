@@ -118,12 +118,13 @@ module Match
           data_to_decrypt = stored_data[16..-1]
           e = EncryptionV1.new
           begin
-            e.decrypt(encrypted_data: data_to_decrypt, password: password, salt: salt)
-          rescue => _ex
-            # Note that we are not guaranteed to catch the decryption errors here if the password is wrong
+            # Note that we are not guaranteed to catch the decryption errors here if the password or the hash is wrong
             # as there's no integrity checks.
-            # With a wrong password, there's a 0.4% chance it will decrypt garbage and not fail
             # see https://github.com/fastlane/fastlane/issues/21663
+            e.decrypt(encrypted_data: data_to_decrypt, password: password, salt: salt)
+            # With the wrong hash_algorithm, there's here 0.4% chance that the decryption failure will go undetected
+          rescue => _ex
+            # With a wrong password, there's a 0.4% chance it will decrypt garbage and not fail
             fallback_hash_algorithm = "SHA256"
             e.decrypt(encrypted_data: data_to_decrypt, password: password, salt: salt, hash_algorithm: fallback_hash_algorithm)
           end

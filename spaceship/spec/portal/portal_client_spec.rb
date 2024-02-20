@@ -259,7 +259,7 @@ describe Spaceship::Client do
                                                 "deviceIds",
                                                 "appId",
                                                 "certificateIds")
-        expect(a_request(:post, /developerservices2.apple.com/)).to have_been_made
+        expect(a_request(:post, /developerservices2\.apple\.com/)).to have_been_made
       end
     end
 

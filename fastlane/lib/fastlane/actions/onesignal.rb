@@ -42,14 +42,19 @@ module Fastlane
           payload["apns_p12_password"] = apns_p12_password || ""
         end
 
+        unless params[:fcm_json].nil?
+          data = File.read(params[:fcm_json])
+          fcm_json = Base64.strict_encode64(data)
+          payload["fcm_v1_service_account_json"] = fcm_json
+        end
+
         payload["gcm_key"] = android_token unless android_token.nil?
         payload["android_gcm_sender_id"] = android_gcm_sender_id unless android_gcm_sender_id.nil?
         payload["organization_id"] = organization_id unless organization_id.nil?
 
         # here's the actual lifting - POST or PUT to OneSignal
-
         json_headers = { 'Content-Type' => 'application/json', 'Authorization' => "Basic #{auth_token}" }
-        url = +'https://onesignal.com/api/v1/apps'
+        url = +'https://api.onesignal.com/apps'
         url << '/' + app_id if is_update
         uri = URI.parse(url)
         http = Net::HTTP.new(uri.host, uri.port)
@@ -122,6 +127,11 @@ module Fastlane
                                        sensitive: true,
                                        optional: true),
 
+          FastlaneCore::ConfigItem.new(key: :fcm_json,
+                                       env_name: "FCM_JSON",
+                                       description: "FCM Service Account JSON File (in .json format)",
+                                       optional: true),
+
           FastlaneCore::ConfigItem.new(key: :apns_p12,
                                        env_name: "APNS_P12",
                                        description: "APNS P12 File (in .p12 format)",
@@ -169,6 +179,7 @@ module Fastlane
             app_name: "Name for OneSignal App",
             android_token: "Your Android GCM key (optional)",
             android_gcm_sender_id: "Your Android GCM Sender ID (optional)",
+            fcm_json: "Path to FCM Service Account JSON File (optional)",
             apns_p12: "Path to Apple .p12 file (optional)",
             apns_p12_password: "Password for .p12 file (optional)",
             apns_env: "production/sandbox (defaults to production)",
@@ -180,6 +191,7 @@ module Fastlane
             app_name: "New Name for OneSignal App",
             android_token: "Your Android GCM key (optional)",
             android_gcm_sender_id: "Your Android GCM Sender ID (optional)",
+            fcm_json: "Path to FCM Service Account JSON File (optional)",
             apns_p12: "Path to Apple .p12 file (optional)",
             apns_p12_password: "Password for .p12 file (optional)",
             apns_env: "production/sandbox (defaults to production)",
