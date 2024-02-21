@@ -95,8 +95,8 @@ module Spaceship
                 permissions: {
                   edit: true,
                   delete: true
-                }
-                seedId: seed_id
+                },
+                seedId: seed_id,
                 teamId: provisioning_request_client.team_id
               },
               relationships: {
