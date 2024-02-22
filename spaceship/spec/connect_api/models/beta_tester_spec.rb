@@ -26,6 +26,12 @@ describe Spaceship::ConnectAPI::BetaTester do
       expect(model.installed_device).to eq("iPhone14_7")
       expect(model.installed_os_version).to eq("17.2.1")
       expect(model.number_of_installed_devices).to eq(1.0)
+      expect(model.latest_expiring_cf_bundle_short_version_string).to eq("1.3.300")
+      expect(model.latest_expiring_cf_bundle_version_string).to eq("1113")
+      expect(model.installed_device_platform).to eq("IOS")
+      expect(model.latest_installed_device).to eq("iPhone14_7")
+      expect(model.latest_installed_os_version).to eq("17.2.1")
+      expect(model.latest_installed_device_platform).to eq("IOS")
     end
   end
 end
