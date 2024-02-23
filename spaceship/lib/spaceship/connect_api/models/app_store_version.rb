@@ -20,6 +20,7 @@ module Spaceship
       attr_accessor :is_watch_only
       attr_accessor :downloadable
       attr_accessor :created_date
+      attr_accessor :review_type
 
       attr_accessor :app_store_version_submission
       attr_accessor :app_store_version_phased_release
@@ -68,6 +69,11 @@ module Spaceship
         SCHEDULED = "SCHEDULED"
       end
 
+      module ReviewType
+        APP_STORE = "APP_STORE"
+        NOTARIZATION = "NOTARIZATION"
+      end
+
       attr_mapping({
         "platform" =>  "platform",
         "versionString" =>  "version_string",
@@ -82,6 +88,7 @@ module Spaceship
         "isWatchOnly" =>  "is_watch_only",
         "downloadable" =>  "downloadable",
         "createdDate" =>  "created_date",
+        "reviewType" => "review_type",
 
         "appStoreVersionSubmission" => "app_store_version_submission",
         "build" => "build",
