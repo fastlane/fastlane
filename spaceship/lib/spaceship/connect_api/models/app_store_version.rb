@@ -10,6 +10,7 @@ module Spaceship
       attr_accessor :platform
       attr_accessor :version_string
       attr_accessor :app_store_state
+      attr_accessor :app_version_state
       attr_accessor :store_icon
       attr_accessor :watch_store_icon
       attr_accessor :copyright
@@ -25,6 +26,8 @@ module Spaceship
       attr_accessor :app_store_review_detail
       attr_accessor :app_store_version_localizations
 
+      # Deprecated in App Store Connect API specification 3.3
+      # Contains incomplete list of statuses from specification (AppStoreVersionState)
       module AppStoreState
         READY_FOR_SALE = "READY_FOR_SALE"
         READY_FOR_REVIEW = "READY_FOR_REVIEW"
@@ -41,6 +44,24 @@ module Spaceship
         INVALID_BINARY = "INVALID_BINARY"
       end
 
+      module AppVersionState
+        ACCEPTED = "ACCEPTED"
+        DEVELOPER_REJECTED = "DEVELOPER_REJECTED"
+        IN_REVIEW = "IN_REVIEW"
+        INVALID_BINARY = "INVALID_BINARY"
+        METADATA_REJECTED = "METADATA_REJECTED"
+        PENDING_APPLE_RELEASE = "PENDING_APPLE_RELEASE"
+        PENDING_DEVELOPER_RELEASE = "PENDING_DEVELOPER_RELEASE"
+        PREPARE_FOR_SUBMISSION = "PREPARE_FOR_SUBMISSION"
+        PROCESSING_FOR_DISTRIBUTION = "PROCESSING_FOR_DISTRIBUTION"
+        READY_FOR_DISTRIBUTION = "READY_FOR_DISTRIBUTION"
+        READY_FOR_REVIEW = "READY_FOR_REVIEW"
+        REJECTED = "REJECTED"
+        REPLACED_WITH_NEW_VERSION = "REPLACED_WITH_NEW_VERSION"
+        WAITING_FOR_EXPORT_COMPLIANCE = "WAITING_FOR_EXPORT_COMPLIANCE"
+        WAITING_FOR_REVIEW = "WAITING_FOR_REVIEW"
+      end
+
       module ReleaseType
         AFTER_APPROVAL = "AFTER_APPROVAL"
         MANUAL = "MANUAL"
@@ -51,6 +72,7 @@ module Spaceship
         "platform" =>  "platform",
         "versionString" =>  "version_string",
         "appStoreState" =>  "app_store_state",
+        "appVersionState" => "app_version_state",
         "storeIcon" =>  "store_icon",
         "watchStoreIcon" =>  "watch_store_icon",
         "copyright" =>  "copyright",
