@@ -20,9 +20,9 @@ gem "fakefs", "1.8"
 gem "mime-types", ['>= 1.16', '< 4.0']
 # Fast XML parser and object marshaller.
 if RUBY_VERSION < '2.7.0'
-	gem "ox", "2.13.2"
+  gem "ox", "2.13.2"
 else
-	gem "ox", "~> 2.13"
+  gem "ox", "~> 2.13"
 end
 # Provides an interactive debugging environment for Ruby.
 gem "pry"
