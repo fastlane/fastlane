@@ -236,8 +236,7 @@ module Spaceship
         platform ||= Spaceship::ConnectAPI::Platform::IOS
         filter = {
           appVersionState: [
-            Spaceship::ConnectAPI::AppStoreVersion::AppVersionState::READY_FOR_DISTRIBUTION,
-            Spaceship::ConnectAPI::AppStoreVersion::AppVersionState::DEVELOPER_REMOVED_FROM_SALE
+            Spaceship::ConnectAPI::AppStoreVersion::AppVersionState::READY_FOR_DISTRIBUTION
           ].join(","),
           platform: platform
         }
