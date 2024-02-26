@@ -123,7 +123,7 @@ module Spaceship
 
         resp = client.get_app_infos(app_id: id, includes: includes)
         return resp.to_models.select do |model|
-          states.include?(model.app_store_state)
+          states.include?(model.state)
         end.first
       end
 
@@ -138,7 +138,7 @@ module Spaceship
 
         resp = client.get_app_infos(app_id: id, includes: includes)
         return resp.to_models.select do |model|
-          states.include?(model.app_store_state)
+          states.include?(model.state)
         end.first
       end
 
