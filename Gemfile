@@ -22,7 +22,7 @@ gem "mime-types", ['>= 1.16', '< 4.0']
 if RUBY_VERSION < '2.7.0'
   gem "ox", "2.13.2"
 else
-  gem "ox", "~> 2.13"
+  gem "ox", "2.14.16"
 end
 # Provides an interactive debugging environment for Ruby.
 gem "pry"
