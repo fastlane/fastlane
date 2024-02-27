@@ -309,6 +309,7 @@ workflows:
       - tests_ubuntu:
           name: 'Execute tests on Ubuntu'
           image: 'cimg/ruby:2.7'
+          ruby_version: '2.7'
       - validate_fastlane_swift_generation:
           name: 'Validate Fastlane.swift generation'
           xcode_version: '12.5.1'
