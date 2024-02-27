@@ -321,6 +321,7 @@ workflows:
       - lint_source_code:
           name: 'Lint source code'
           image: 'cimg/ruby:2.7'
+          ruby_version: '2.7'
       - modules_load_up_tests:
           name: 'Modules load up tests'
           image: 'cimg/ruby:2.7'
