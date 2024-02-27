@@ -216,7 +216,7 @@ GEM
     open4 (1.3.4)
     optparse (0.4.0)
     os (1.1.4)
-    ox (2.13.2)
+    ox (2.14.16)
     parallel (1.23.0)
     parser (3.2.2.3)
       ast (~> 2.4.1)
@@ -371,7 +371,7 @@ DEPENDENCIES
   fastlane-plugin-ruby
   fastlane-plugin-slack_train (>= 0.2.0)
   mime-types (>= 1.16, < 4.0)
-  ox (= 2.13.2)
+  ox (= 2.14.16)
   pry
   pry-byebug
   pry-rescue
@@ -390,4 +390,4 @@ DEPENDENCIES
   yard (~> 0.9.11)
 
 BUNDLED WITH
-   2.3.21
+   2.3.13

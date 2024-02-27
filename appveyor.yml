@@ -42,8 +42,7 @@ environment:
   LANG: en_US.UTF-8
   FASTLANE_ITUNES_TRANSPORTER_PATH: C:/tmp
   matrix:
-    - ruby_version: 26-x64
-    # - ruby_version: 27-x64
+    - ruby_version: 27-x64
     # - ruby_version: 30-x64 # disabled for now as we only have 1 concurent job
     # - ruby_version: 31-x64
     - ruby_version: 32-x64

@@ -19,11 +19,7 @@ gem "fakefs", "1.8"
 # for file uploads with Faraday
 gem "mime-types", ['>= 1.16', '< 4.0']
 # Fast XML parser and object marshaller.
-if RUBY_VERSION < '2.7.0'
-  gem "ox", "2.13.2"
-else
-  gem "ox", "2.14.16"
-end
+gem "ox", "2.14.16"
 # Provides an interactive debugging environment for Ruby.
 gem "pry"
 # A plugin for pry that adds step-by-step debugging and stack navigation.
