@@ -71,7 +71,7 @@ module Spaceship
         return false if ready_for_distribution.nil?
         territoryAvailabilities = get_app_availabilities.territory_availabilities
         availabilities = territoryAvailabilities.map(&:available)
-        return availabilities.all? { |a| a == false }
+        return availabilities.all?(false)
       end
 
       #
