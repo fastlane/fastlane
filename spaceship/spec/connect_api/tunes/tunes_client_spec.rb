@@ -51,7 +51,7 @@ describe Spaceship::ConnectAPI::Tunes::Client do
         let(:app_id) { "123" }
 
         it 'succeeds' do
-          url = "#{path}/#{app_id}" 
+          url = "#{path}/#{app_id}"
           params = {
             include: "territoryAvailabilities",
             limit: { "territoryAvailabilities": 200 }
