@@ -160,7 +160,7 @@ module Spaceship
       def get_app_availabilities(client: nil, filter: {}, includes: "territoryAvailabilities", limit: { "territoryAvailabilities": 200 })
         client ||= Spaceship::ConnectAPI
         resp = client.get_app_availabilities(app_id: id, filter: filter, includes: includes, limit: limit, sort: nil)
-        return resp.to_models
+        return resp.to_models.first
       end
 
       #
