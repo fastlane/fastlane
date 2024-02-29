@@ -23,7 +23,7 @@ describe FastlaneCore do
 
     it 'raises an error if broken xcrun simctl list runtimes' do
       status = double('status', "success?": true)
-      expect(Open3).to receive(:capture2).with("xcrun simctl list runtimes -j").and_return(['garbage', status])
+      expect(Open3).to receive(:capture2).with("xcrun simctl list -j runtimes").and_return(['garbage', status])
 
       expect do
         FastlaneCore::DeviceManager.runtime_build_os_versions
@@ -439,7 +439,7 @@ describe FastlaneCore do
     it 'properly parses `xcrun simctl list runtimes` to associate runtime builds with their exact OS version' do
       status = double('status', "success?": true)
       runtime_output = File.read('./fastlane_core/spec/fixtures/XcrunSimctlListRuntimesOutput')
-      expect(Open3).to receive(:capture2).with("xcrun simctl list runtimes -j").and_return([runtime_output, status])
+      expect(Open3).to receive(:capture2).with("xcrun simctl list -j runtimes").and_return([runtime_output, status])
 
       expect(FastlaneCore::DeviceManager.runtime_build_os_versions['21A328']).to eq('17.0')
       expect(FastlaneCore::DeviceManager.runtime_build_os_versions['21A342']).to eq('17.0.1')
