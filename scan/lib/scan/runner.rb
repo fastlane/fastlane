@@ -124,10 +124,16 @@ module Scan
 
       retryable_tests = []
 
-      failing_tests = input.split("Failing tests:\n").fetch(1, [])
-                           .split("\n\n").first
-
       require 'pp'
+      puts "SCAN OUTPUT (input)"
+      pp input
+
+      failing_tests = if Scan.config[:testplan]
+        input.split("Failing tests:\n").last.split("\n\n").first
+      else
+        input.split("Failing tests:\n").fetch(1, []).split("\n\n").first
+      end
+
       puts "SCAN OUTPUT (failing_tests)"
       pp failing_tests
 
