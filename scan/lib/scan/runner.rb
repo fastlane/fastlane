@@ -127,15 +127,28 @@ module Scan
       failing_tests = input.split("Failing tests:\n").fetch(1, [])
                            .split("\n\n").first
 
+      require 'pp'
+      puts "SCAN OUTPUT (failing_tests)"
+      pp failing_tests
+
       suites = failing_tests.split(/(?=\n\s+[\w\s]+:\n)/)
 
-      suites.each do |suite|
-        suite_name = suite.match(/\s*([\w\s\S]+):/).captures.first
+      puts "SCAN OUTPUT (suites)"
+      pp suites
 
-        test_cases = suite.split(":\n").fetch(1, []).split("\n").each
+      suites.each do |suite|
+        suite_name = suite.match(/\s*([\w\s\S]+):/)&.captures&.first
+
+        puts "SCAN OUTPUT (suite_name)"
+        puts suite_name
+
+        test_cases = suite&.split(":\n").fetch(1, []).split("\n").each
                           .select { |line| line.match?(/^\s+/) }
                           .map { |line| line.strip.gsub(/[\s\.]/, "/").gsub(/[\-\[\]\(\)]/, "") }
                           .map { |line| suite_name + "/" + line }
+
+        puts "SCAN OUTPUT (test_cases)"
+        puts test_cases
 
         retryable_tests += test_cases
       end
