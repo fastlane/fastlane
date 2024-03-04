@@ -82,7 +82,7 @@ module Scan
       # Number of retries does not equal xcodebuild's -test-iterations number
       # It needs include 1 iteration by default
       number_of_retries = config[:number_of_retries] + 1
-      if number_of_retries > 1 && FastlaneCore::Helper.xcode_at_least?(13)
+      if number_of_retries > 1 && FastlaneCore::Helper.xcode_at_least?(13) && Scan.config[:retry_method] == "xcode"
         options << "-retry-tests-on-failure"
         options << "-test-iterations #{number_of_retries}"
       end
