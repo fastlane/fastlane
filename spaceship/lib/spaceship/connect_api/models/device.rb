@@ -33,6 +33,7 @@ module Spaceship
 
         # As of 2022-11-12, this is not officially supported by App Store Connect API
         APPLE_SILICON_MAC = "APPLE_SILICON_MAC"
+        INTEL_MAC = "INTEL_MAC"
       end
 
       module Status
@@ -94,7 +95,9 @@ module Spaceship
             ]
           when :macos, :catalyst
             [
-              Spaceship::ConnectAPI::Device::DeviceClass::MAC
+              Spaceship::ConnectAPI::Device::DeviceClass::MAC,
+              Spaceship::ConnectAPI::Device::DeviceClass::APPLE_SILICON_MAC,
+              Spaceship::ConnectAPI::Device::DeviceClass::INTEL_MAC
             ]
           else
             []
