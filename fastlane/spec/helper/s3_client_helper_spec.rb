@@ -58,4 +58,46 @@ describe Fastlane::Helper::S3ClientHelper do
       described_class.new(access_key: '', secret_access_key: '').list_buckets
     end
   end
+
+  let(:access_key) { 'access_key' }
+  let(:secret_access_key) { 'secret_access_key' }
+  let(:region) { 'us-east-1' }
+  let(:endpoint) { 'http://localhost:9000' }
+  let(:force_path_style) { true }
+
+  subject do
+    described_class.new(
+      access_key: access_key,
+      secret_access_key: secret_access_key,
+      region: region,
+      endpoint: endpoint,
+      force_path_style: force_path_style
+    )
+  end
+
+  describe '#initialize' do
+    it 'correctly assigns endpoint and force_path_style' do
+      expect(subject.endpoint).to eq(endpoint)
+      expect(subject.force_path_style).to eq(force_path_style)
+    end
+  end
+
+  describe '#client' do
+    let(:s3_client) { instance_double('Aws::S3::Client', list_buckets: []) }
+    let(:s3_credentials) { instance_double('Aws::Credentials') }
+
+    before do
+      allow(Aws::Credentials).to receive(:new).and_return(s3_credentials)
+    end
+
+    it 'creates an Aws::S3::Client with correct configuration' do
+      expect(Aws::S3::Client).to receive(:new).with({
+        region: region,
+        credentials: s3_credentials,
+        endpoint: endpoint,
+        force_path_style: force_path_style
+      }).and_return(s3_client)
+      subject.list_buckets
+    end
+  end
 end
