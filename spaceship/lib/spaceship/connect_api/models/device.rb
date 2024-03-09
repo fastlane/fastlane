@@ -31,7 +31,7 @@ module Spaceship
         APPLE_TV = "APPLE_TV"
         MAC = "MAC"
 
-        # As of 2024-03-1082, this is not _officially_ supported by App Store Connect API (according to API docs)—yet still used in the API responses
+        # As of 2024-03-08, this is not _officially_ supported by App Store Connect API (according to API docs)—yet still used in the API responses
         APPLE_SILICON_MAC = "APPLE_SILICON_MAC"
         INTEL_MAC = "INTEL_MAC"
       end
