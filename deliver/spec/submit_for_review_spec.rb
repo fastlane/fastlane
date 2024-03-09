@@ -14,13 +14,13 @@ describe Deliver::SubmitForReview do
     let(:ready_for_review_version) do
       double('ready_for_review_version',
              id: '1',
-             app_store_state: "READY_FOR_REVIEW",
+             app_version_state: "READY_FOR_REVIEW",
              version_string: "1.0.0")
     end
     let(:prepare_for_submission_version) do
       double('prepare_for_submission_version',
              id: '1',
-             app_store_state: "PREPARE_FOR_SUBMISSION",
+             app_version_state: "PREPARE_FOR_SUBMISSION",
              version_string: "1.0.0")
     end
     let(:selected_build) { double('selected_build') }
