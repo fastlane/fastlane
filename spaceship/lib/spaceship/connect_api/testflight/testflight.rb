@@ -4,6 +4,10 @@ module Spaceship
   class ConnectAPI
     module TestFlight
       module API
+        module Version
+          V1 = "v1"
+        end
+
         def test_flight_request_client=(test_flight_request_client)
           @test_flight_request_client = test_flight_request_client
         end
@@ -19,12 +23,12 @@ module Spaceship
 
         def get_apps(filter: {}, includes: nil, limit: nil, sort: nil)
           params = test_flight_request_client.build_params(filter: filter, includes: includes, limit: limit, sort: sort)
-          test_flight_request_client.get("apps", params)
+          test_flight_request_client.get("#{Version::V1}/apps", params)
         end
 
         def get_app(app_id: nil, includes: nil)
           params = test_flight_request_client.build_params(filter: nil, includes: includes, limit: nil, sort: nil)
-          test_flight_request_client.get("apps/#{app_id}", params)
+          test_flight_request_client.get("#{Version::V1}/apps/#{app_id}", params)
         end
 
         #
@@ -33,7 +37,7 @@ module Spaceship
 
         def get_beta_app_localizations(filter: {}, includes: nil, limit: nil, sort: nil)
           params = test_flight_request_client.build_params(filter: filter, includes: includes, limit: limit, sort: sort)
-          test_flight_request_client.get("betaAppLocalizations", params)
+          test_flight_request_client.get("#{Version::V1}/betaAppLocalizations", params)
         end
 
         def post_beta_app_localizations(app_id: nil, attributes: {})
@@ -52,7 +56,7 @@ module Spaceship
             }
           }
 
-          test_flight_request_client.post("betaAppLocalizations", body)
+          test_flight_request_client.post("#{Version::V1}/betaAppLocalizations", body)
         end
 
         def patch_beta_app_localizations(localization_id: nil, attributes: {})
@@ -64,7 +68,7 @@ module Spaceship
             }
           }
 
-          test_flight_request_client.patch("betaAppLocalizations/#{localization_id}", body)
+          test_flight_request_client.patch("#{Version::V1}/betaAppLocalizations/#{localization_id}", body)
         end
 
         #
@@ -73,7 +77,7 @@ module Spaceship
 
         def get_beta_app_review_detail(filter: {}, includes: nil, limit: nil, sort: nil)
           params = test_flight_request_client.build_params(filter: filter, includes: includes, limit: limit, sort: sort)
-          test_flight_request_client.get("betaAppReviewDetails", params)
+          test_flight_request_client.get("#{Version::V1}/betaAppReviewDetails", params)
         end
 
         def patch_beta_app_review_detail(app_id: nil, attributes: {})
@@ -85,7 +89,7 @@ module Spaceship
             }
           }
 
-          test_flight_request_client.patch("betaAppReviewDetails/#{app_id}", body)
+          test_flight_request_client.patch("#{Version::V1}/betaAppReviewDetails/#{app_id}", body)
         end
 
         #
@@ -94,7 +98,7 @@ module Spaceship
 
         def get_beta_app_review_submissions(filter: {}, includes: nil, limit: nil, sort: nil, cursor: nil)
           params = test_flight_request_client.build_params(filter: filter, includes: includes, limit: limit, sort: sort, cursor: cursor)
-          test_flight_request_client.get("betaAppReviewSubmissions", params)
+          test_flight_request_client.get("#{Version::V1}/betaAppReviewSubmissions", params)
         end
 
         def post_beta_app_review_submissions(build_id: nil)
@@ -112,12 +116,12 @@ module Spaceship
             }
           }
 
-          test_flight_request_client.post("betaAppReviewSubmissions", body)
+          test_flight_request_client.post("#{Version::V1}/betaAppReviewSubmissions", body)
         end
 
         def delete_beta_app_review_submission(beta_app_review_submission_id: nil)
           params = test_flight_request_client.build_params(filter: nil, includes: nil, limit: nil, sort: nil, cursor: nil)
-          test_flight_request_client.delete("betaAppReviewSubmissions/#{beta_app_review_submission_id}", params)
+          test_flight_request_client.delete("#{Version::V1}/betaAppReviewSubmissions/#{beta_app_review_submission_id}", params)
         end
 
         #
@@ -126,7 +130,7 @@ module Spaceship
 
         def get_beta_build_localizations(filter: {}, includes: nil, limit: nil, sort: nil)
           params = test_flight_request_client.build_params(filter: filter, includes: includes, limit: limit, sort: sort)
-          test_flight_request_client.get("betaBuildLocalizations", params)
+          test_flight_request_client.get("#{Version::V1}/betaBuildLocalizations", params)
         end
 
         def post_beta_build_localizations(build_id: nil, attributes: {})
@@ -145,7 +149,7 @@ module Spaceship
             }
           }
 
-          test_flight_request_client.post("betaBuildLocalizations", body)
+          test_flight_request_client.post("#{Version::V1}/betaBuildLocalizations", body)
         end
 
         def patch_beta_build_localizations(localization_id: nil, feedbackEmail: nil, attributes: {})
@@ -157,7 +161,7 @@ module Spaceship
             }
           }
 
-          test_flight_request_client.patch("betaBuildLocalizations/#{localization_id}", body)
+          test_flight_request_client.patch("#{Version::V1}/betaBuildLocalizations/#{localization_id}", body)
         end
 
         #
@@ -166,7 +170,7 @@ module Spaceship
 
         def get_beta_build_metrics(filter: {}, includes: nil, limit: nil, sort: nil)
           params = test_flight_request_client.build_params(filter: filter, includes: includes, limit: limit, sort: sort)
-          test_flight_request_client.get("betaBuildMetrics", params)
+          test_flight_request_client.get("#{Version::V1}/betaBuildMetrics", params)
         end
 
         #
@@ -175,7 +179,7 @@ module Spaceship
 
         def get_beta_groups(filter: {}, includes: nil, limit: nil, sort: nil)
           params = test_flight_request_client.build_params(filter: filter, includes: includes, limit: limit, sort: sort)
-          test_flight_request_client.get("betaGroups", params)
+          test_flight_request_client.get("#{Version::V1}/betaGroups", params)
         end
 
         def add_beta_groups_to_build(build_id: nil, beta_group_ids: [])
@@ -188,7 +192,7 @@ module Spaceship
             end
           }
 
-          test_flight_request_client.post("builds/#{build_id}/relationships/betaGroups", body)
+          test_flight_request_client.post("#{Version::V1}/builds/#{build_id}/relationships/betaGroups", body)
         end
 
         def delete_beta_groups_from_build(build_id: nil, beta_group_ids: [])
@@ -201,7 +205,7 @@ module Spaceship
             end
           }
 
-          test_flight_request_client.delete("builds/#{build_id}/relationships/betaGroups", nil, body)
+          test_flight_request_client.delete("#{Version::V1}/builds/#{build_id}/relationships/betaGroups", nil, body)
         end
 
         def create_beta_group(app_id: nil, group_name: nil, is_internal_group: false, public_link_enabled: false, public_link_limit: 10_000, public_link_limit_enabled: false, has_access_to_all_builds: nil)
@@ -232,7 +236,7 @@ module Spaceship
               type: "betaGroups",
             },
           }
-          test_flight_request_client.post("betaGroups", body)
+          test_flight_request_client.post("#{Version::V1}/betaGroups", body)
         end
 
         def patch_group(group_id: nil, attributes: {})
@@ -244,19 +248,19 @@ module Spaceship
             }
           }
 
-          test_flight_request_client.patch("betaGroups/#{group_id}", body)
+          test_flight_request_client.patch("#{Version::V1}/betaGroups/#{group_id}", body)
         end
 
         def delete_beta_group(group_id: nil)
           raise "group_id is nil" if group_id.nil?
 
-          test_flight_request_client.delete("betaGroups/#{group_id}")
+          test_flight_request_client.delete("#{Version::V1}/betaGroups/#{group_id}")
         end
 
         def get_builds_for_beta_group(group_id: nil)
           raise "group_id is nil" if group_id.nil?
 
-          test_flight_request_client.get("betaGroups/#{group_id}/builds")
+          test_flight_request_client.get("#{Version::V1}/betaGroups/#{group_id}/builds")
         end
 
         #
@@ -265,7 +269,7 @@ module Spaceship
 
         def get_beta_testers(filter: {}, includes: nil, limit: nil, sort: nil)
           params = test_flight_request_client.build_params(filter: filter, includes: includes, limit: limit, sort: sort)
-          test_flight_request_client.get("betaTesters", params)
+          test_flight_request_client.get("#{Version::V1}/betaTesters", params)
         end
 
         # beta_testers - [{email: "", firstName: "", lastName: ""}]
@@ -293,7 +297,7 @@ module Spaceship
             }
           }
 
-          test_flight_request_client.post("bulkBetaTesterAssignments", body)
+          test_flight_request_client.post("#{Version::V1}/bulkBetaTesterAssignments", body)
         end
 
         # attributes - {email: "", firstName: "", lastName: ""}
@@ -315,7 +319,7 @@ module Spaceship
             }
           }
 
-          test_flight_request_client.post("betaTesters", body)
+          test_flight_request_client.post("#{Version::V1}/betaTesters", body)
         end
 
         def add_beta_tester_to_group(beta_group_id: nil, beta_tester_ids: nil)
@@ -328,7 +332,7 @@ module Spaceship
               }
             end
           }
-          test_flight_request_client.post("betaGroups/#{beta_group_id}/relationships/betaTesters", body)
+          test_flight_request_client.post("#{Version::V1}/betaGroups/#{beta_group_id}/relationships/betaTesters", body)
         end
 
         def delete_beta_tester_from_apps(beta_tester_id: nil, app_ids: [])
@@ -341,7 +345,7 @@ module Spaceship
             end
           }
 
-          test_flight_request_client.delete("betaTesters/#{beta_tester_id}/relationships/apps", nil, body)
+          test_flight_request_client.delete("#{Version::V1}/betaTesters/#{beta_tester_id}/relationships/apps", nil, body)
         end
 
         def delete_beta_tester_from_beta_groups(beta_tester_id: nil, beta_group_ids: [])
@@ -354,7 +358,7 @@ module Spaceship
             end
           }
 
-          test_flight_request_client.delete("betaTesters/#{beta_tester_id}/relationships/betaGroups", nil, body)
+          test_flight_request_client.delete("#{Version::V1}/betaTesters/#{beta_tester_id}/relationships/betaGroups", nil, body)
         end
 
         def delete_beta_testers_from_app(beta_tester_ids: [], app_id: nil)
@@ -367,7 +371,7 @@ module Spaceship
             end
           }
 
-          test_flight_request_client.delete("apps/#{app_id}/relationships/betaTesters", nil, body)
+          test_flight_request_client.delete("#{Version::V1}/apps/#{app_id}/relationships/betaTesters", nil, body)
         end
 
         def add_beta_tester_to_builds(beta_tester_id: nil, build_ids: [])
@@ -380,7 +384,7 @@ module Spaceship
             end
           }
 
-          test_flight_request_client.post("betaTesters/#{beta_tester_id}/relationships/builds", body)
+          test_flight_request_client.post("#{Version::V1}/betaTesters/#{beta_tester_id}/relationships/builds", body)
         end
 
         def add_beta_testers_to_build(build_id: nil, beta_tester_ids: [])
@@ -393,7 +397,7 @@ module Spaceship
             end
           }
 
-          test_flight_request_client.post("builds/#{build_id}/relationships/individualTesters", body)
+          test_flight_request_client.post("#{Version::V1}/builds/#{build_id}/relationships/individualTesters", body)
         end
 
         def delete_beta_testers_from_build(build_id: nil, beta_tester_ids: [])
@@ -406,7 +410,7 @@ module Spaceship
             end
           }
 
-          test_flight_request_client.delete("builds/#{build_id}/relationships/individualTesters", nil, body)
+          test_flight_request_client.delete("#{Version::V1}/builds/#{build_id}/relationships/individualTesters", nil, body)
         end
 
         #
@@ -415,7 +419,7 @@ module Spaceship
 
         def get_beta_tester_metrics(filter: {}, includes: nil, limit: nil, sort: nil)
           params = test_flight_request_client.build_params(filter: filter, includes: includes, limit: limit, sort: sort)
-          test_flight_request_client.get("betaTesterMetrics", params)
+          test_flight_request_client.get("#{Version::V1}/betaTesterMetrics", params)
         end
 
         #
@@ -424,7 +428,7 @@ module Spaceship
 
         def get_build_bundles_build_bundle_file_sizes(build_bundle_id:, limit: nil)
           params = test_flight_request_client.build_params(filter: nil, includes: nil, limit: limit, sort: nil, cursor: nil)
-          test_flight_request_client.get("buildBundles/#{build_bundle_id}/buildBundleFileSizes", params)
+          test_flight_request_client.get("#{Version::V1}/buildBundles/#{build_bundle_id}/buildBundleFileSizes", params)
         end
 
         #
@@ -433,16 +437,16 @@ module Spaceship
 
         def get_builds(filter: {}, includes: "buildBetaDetail,betaBuildMetrics", limit: 10, sort: "uploadedDate", cursor: nil)
           params = test_flight_request_client.build_params(filter: filter, includes: includes, limit: limit, sort: sort, cursor: cursor)
-          test_flight_request_client.get("builds", params)
+          test_flight_request_client.get("#{Version::V1}/builds", params)
         end
 
         def get_build(build_id: nil, app_store_version_id: nil, includes: nil)
           if build_id
             params = test_flight_request_client.build_params(filter: nil, includes: includes, limit: nil, sort: nil, cursor: nil)
-            return test_flight_request_client.get("builds/#{build_id}", params)
+            return test_flight_request_client.get("#{Version::V1}/builds/#{build_id}", params)
           elsif app_store_version_id
             params = test_flight_request_client.build_params(filter: nil, includes: includes, limit: nil, sort: nil, cursor: nil)
-            return test_flight_request_client.get("appStoreVersions/#{app_store_version_id}/build", params)
+            return test_flight_request_client.get("#{Version::V1}/appStoreVersions/#{app_store_version_id}/build", params)
           else
             return nil
           end
@@ -457,7 +461,7 @@ module Spaceship
             }
           }
 
-          test_flight_request_client.patch("builds/#{build_id}", body)
+          test_flight_request_client.patch("#{Version::V1}/builds/#{build_id}", body)
         end
 
         #
@@ -466,7 +470,7 @@ module Spaceship
 
         def get_build_beta_details(filter: {}, includes: nil, limit: nil, sort: nil)
           params = test_flight_request_client.build_params(filter: filter, includes: includes, limit: limit, sort: sort)
-          test_flight_request_client.get("buildBetaDetails", params)
+          test_flight_request_client.get("#{Version::V1}/buildBetaDetails", params)
         end
 
         def patch_build_beta_details(build_beta_details_id: nil, attributes: {})
@@ -478,7 +482,7 @@ module Spaceship
             }
           }
 
-          test_flight_request_client.patch("buildBetaDetails/#{build_beta_details_id}", body)
+          test_flight_request_client.patch("#{Version::V1}/buildBetaDetails/#{build_beta_details_id}", body)
         end
 
         #
@@ -487,7 +491,7 @@ module Spaceship
 
         def get_build_deliveries(app_id:, filter: {}, includes: nil, limit: nil, sort: nil)
           params = test_flight_request_client.build_params(filter: filter, includes: includes, limit: limit, sort: sort)
-          test_flight_request_client.get("apps/#{app_id}/buildDeliveries", params)
+          test_flight_request_client.get("#{Version::V1}/apps/#{app_id}/buildDeliveries", params)
         end
 
         #
@@ -496,7 +500,7 @@ module Spaceship
 
         def get_pre_release_versions(filter: {}, includes: nil, limit: nil, sort: nil)
           params = test_flight_request_client.build_params(filter: filter, includes: includes, limit: limit, sort: sort)
-          test_flight_request_client.get("preReleaseVersions", params)
+          test_flight_request_client.get("#{Version::V1}/preReleaseVersions", params)
         end
 
         #
@@ -505,13 +509,13 @@ module Spaceship
 
         def get_beta_feedback(filter: {}, includes: nil, limit: nil, sort: nil)
           params = test_flight_request_client.build_params(filter: filter, includes: includes, limit: limit, sort: sort)
-          test_flight_request_client.get("betaFeedbacks", params)
+          test_flight_request_client.get("#{Version::V1}/betaFeedbacks", params)
         end
 
         def delete_beta_feedback(feedback_id: nil)
           raise "Feedback id is nil" if feedback_id.nil?
 
-          test_flight_request_client.delete("betaFeedbacks/#{feedback_id}")
+          test_flight_request_client.delete("#{Version::V1}/betaFeedbacks/#{feedback_id}")
         end
       end
     end
