@@ -47,7 +47,7 @@ describe Spaceship::ConnectAPI::Tunes::Client do
 
     describe "appStoreVersionReleaseRequests" do
       context 'post_app_store_version_release_request' do
-        let(:path) { "appStoreVersionReleaseRequests" }
+        let(:path) { "v1/appStoreVersionReleaseRequests" }
         let(:app_store_version_id) { "123" }
         let(:body) do
           {
@@ -78,7 +78,7 @@ describe Spaceship::ConnectAPI::Tunes::Client do
     describe "reviewSubmissions" do
       context 'get_review_submissions' do
         let(:app_id) { "123456789-app" }
-        let(:path) { "apps/#{app_id}/reviewSubmissions" }
+        let(:path) { "v1/apps/#{app_id}/reviewSubmissions" }
 
         it 'succeeds' do
           params = {}
@@ -90,7 +90,7 @@ describe Spaceship::ConnectAPI::Tunes::Client do
 
       context 'get_review_submission' do
         let(:review_submission_id) { "123456789" }
-        let(:path) { "reviewSubmissions/#{review_submission_id}" }
+        let(:path) { "v1/reviewSubmissions/#{review_submission_id}" }
 
         it 'succeeds' do
           params = {}
@@ -103,7 +103,7 @@ describe Spaceship::ConnectAPI::Tunes::Client do
       context 'post_review_submission' do
         let(:app_id) { "123456789-app" }
         let(:platform) { Spaceship::ConnectAPI::Platform::IOS }
-        let(:path) { "reviewSubmissions" }
+        let(:path) { "v1/reviewSubmissions" }
         let(:body) do
           {
             data: {
@@ -135,7 +135,7 @@ describe Spaceship::ConnectAPI::Tunes::Client do
       context 'patch_review_submission' do
         let(:review_submission_id) { "123456789" }
         let(:attributes) { { submitted: true } }
-        let(:path) { "reviewSubmissions/#{review_submission_id}" }
+        let(:path) { "v1/reviewSubmissions/#{review_submission_id}" }
         let(:body) do
           {
             data: {
@@ -159,7 +159,7 @@ describe Spaceship::ConnectAPI::Tunes::Client do
     describe "reviewSubmissionItems" do
       context 'get_review_submission_items' do
         let(:review_submission_id) { "123456789" }
-        let(:path) { "reviewSubmissions/#{review_submission_id}/items" }
+        let(:path) { "v1/reviewSubmissions/#{review_submission_id}/items" }
 
         it 'succeeds' do
           params = {}
@@ -172,7 +172,7 @@ describe Spaceship::ConnectAPI::Tunes::Client do
       context 'post_review_submission_item' do
         let(:review_submission_id) { "123456789" }
         let(:app_store_version_id) { "123456789-app-store-version" }
-        let(:path) { "reviewSubmissionItems" }
+        let(:path) { "v1/reviewSubmissionItems" }
         let(:body) do
           {
             data: {
