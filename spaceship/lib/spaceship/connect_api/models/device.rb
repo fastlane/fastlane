@@ -31,8 +31,9 @@ module Spaceship
         APPLE_TV = "APPLE_TV"
         MAC = "MAC"
 
-        # As of 2022-11-12, this is not officially supported by App Store Connect API
+        # As of 2024-03-08, this is not _officially_ supported by App Store Connect API (according to API docs)—yet still used in the API responses
         APPLE_SILICON_MAC = "APPLE_SILICON_MAC"
+        INTEL_MAC = "INTEL_MAC"
       end
 
       module Status
@@ -94,7 +95,9 @@ module Spaceship
             ]
           when :macos, :catalyst
             [
-              Spaceship::ConnectAPI::Device::DeviceClass::MAC
+              Spaceship::ConnectAPI::Device::DeviceClass::MAC,
+              Spaceship::ConnectAPI::Device::DeviceClass::APPLE_SILICON_MAC,
+              Spaceship::ConnectAPI::Device::DeviceClass::INTEL_MAC
             ]
           else
             []
