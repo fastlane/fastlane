@@ -179,10 +179,10 @@ module Fastlane
                                        end),
           FastlaneCore::ConfigItem.new(key: :platform,
                                        env_name: "FL_UPLOAD_SYMBOLS_TO_CRASHLYTICS_PLATFORM",
-                                       description: "The platform of the app (ios, appletvos, mac)",
+                                       description: "The platform of the app (ios, appletvos, mac, xros)",
                                        default_value: "ios",
                                        verify_block: proc do |value|
-                                         available = ['ios', 'appletvos', 'mac']
+                                         available = ['ios', 'appletvos', 'mac', 'xros']
                                          UI.user_error!("Invalid platform '#{value}', must be #{available.join(', ')}") unless available.include?(value)
                                        end),
           FastlaneCore::ConfigItem.new(key: :dsym_worker_threads,
@@ -216,7 +216,7 @@ module Fastlane
       end
 
       def self.is_supported?(platform)
-        [:ios, :appletvos].include?(platform)
+        [:ios, :appletvos, :xros].include?(platform)
       end
 
       def self.example_code
