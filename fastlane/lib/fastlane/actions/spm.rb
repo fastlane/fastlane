@@ -10,6 +10,7 @@ module Fastlane
         cmd << "--package-path #{params[:package_path]}" if params[:package_path]
         cmd << "--configuration #{params[:configuration]}" if params[:configuration]
         cmd << "--disable-sandbox" if params[:disable_sandbox]
+        cmd << "--skip-update" if params[:skip_update]
         cmd << "--verbose" if params[:verbose]
         if params[:simulator]
           simulator_platform = simulator_platform(simulator: params[:simulator], simulator_arch: params[:simulator_arch])
@@ -112,6 +113,11 @@ module Fastlane
                                        description: "Pass in xcpretty additional command line arguments (e.g. '--test --no-color' or '--tap --no-utf'), requires xcpretty_output to be specified also",
                                        type: String,
                                        optional: true),
+          FastlaneCore::ConfigItem.new(key: :skip_update,
+                                       env_name: "FL_SPM_SKIP_UPDATE",
+                                       description: "Skip updating dependencies from their remote during a resolution",
+                                       type: Boolean,
+                                       default_value: false),
           FastlaneCore::ConfigItem.new(key: :verbose,
                                        short_option: "-v",
                                        env_name: "FL_SPM_VERBOSE",
