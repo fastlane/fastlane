@@ -167,6 +167,17 @@ describe Spaceship::ConnectAPI::App do
   end
 
   describe("Checks if app removed_from_sale?") do
+    it('gets true when app has not been released (no READY_FOR_DISTRIBUTION app store versions)') do
+      ConnectAPIStubbing::Tunes.stub_get_app_availabilities_removed_from_sale
+      ConnectAPIStubbing::Tunes.stub_get_app_store_version_not_ready_for_distribution
+
+      app = Spaceship::ConnectAPI::App.new("123456789", [])
+      app_store_version = app.get_ready_for_distribution_app_store_version(includes: nil)
+
+      expect(app_store_version).to be(nil)
+      expect(app.removed_from_sale?).to be(true)
+    end
+
     it('gets true when app is removed from sale') do
       ConnectAPIStubbing::Tunes.stub_get_app_availabilities_removed_from_sale
       ConnectAPIStubbing::Tunes.stub_get_app_store_version_ready_for_distribution

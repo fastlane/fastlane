@@ -68,7 +68,7 @@ module Spaceship
 
       def removed_from_sale?
         ready_for_distribution = get_ready_for_distribution_app_store_version(includes: nil)
-        return false if ready_for_distribution.nil?
+        return true if ready_for_distribution.nil?
         territoryAvailabilities = get_app_availabilities.territory_availabilities
         availabilities = territoryAvailabilities.map(&:available)
         return availabilities.all?(false)
