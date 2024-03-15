@@ -169,10 +169,10 @@ module Fastlane
                                        end),
           FastlaneCore::ConfigItem.new(key: :platform,
                                        env_name: "FL_SET_CHANGELOG_PLATFORM",
-                                       description: "The platform of the app (ios, appletvos, mac)",
+                                       description: "The platform of the app (ios, appletvos, xros, mac)",
                                        default_value: "ios",
                                        verify_block: proc do |value|
-                                         available = ['ios', 'appletvos', 'mac']
+                                         available = ['ios', 'appletvos', 'xros', 'mac']
                                          UI.user_error!("Invalid platform '#{value}', must be #{available.join(', ')}") unless available.include?(value)
                                        end)
         ]
@@ -183,7 +183,7 @@ module Fastlane
       end
 
       def self.is_supported?(platform)
-        [:ios, :appletvos, :mac].include?(platform)
+        [:ios, :appletvos, :xros, :mac].include?(platform)
       end
 
       def self.example_code
