@@ -172,7 +172,7 @@ module Deliver
       transporter = transporter_for_selected_team
 
       case platform
-      when "ios", "appletvos"
+      when "ios", "appletvos", "xros"
         package_path = FastlaneCore::IpaUploadPackageBuilder.new.generate(
           app_id: Deliver.cache[:app].id,
           ipa_path: ipa_path,
@@ -209,7 +209,7 @@ module Deliver
       transporter = transporter_for_selected_team
 
       case platform
-      when "ios", "appletvos"
+      when "ios", "appletvos", "xros"
         package_path = FastlaneCore::IpaUploadPackageBuilder.new.generate(
           app_id: Deliver.cache[:app].id,
           ipa_path: ipa_path,

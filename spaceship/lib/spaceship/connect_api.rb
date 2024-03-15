@@ -87,8 +87,9 @@ module Spaceship
       MAC_OS = "MAC_OS"
       TV_OS = "TV_OS"
       WATCH_OS = "WATCH_OS"
+      VISION_OS = "VISION_OS"
 
-      ALL = [IOS, MAC_OS, TV_OS, WATCH_OS]
+      ALL = [IOS, MAC_OS, TV_OS, WATCH_OS, VISION_OS]
 
       def self.map(platform)
         return platform if ALL.include?(platform)
@@ -101,6 +102,8 @@ module Spaceship
           return Spaceship::ConnectAPI::Platform::MAC_OS
         when :ios
           return Spaceship::ConnectAPI::Platform::IOS
+        when :visionos, :xros
+          return Spaceship::ConnectAPI::Platform::VISION_OS
         else
           raise "Cannot find a matching platform for '#{platform}' - valid values are #{ALL.join(', ')}"
         end
