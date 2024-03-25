@@ -1,0 +1,21 @@
+{
+  "data" : {
+    "type" : "betaAppTesterDetails",
+    "id" : "123456789",
+    "attributes" : {
+      "maxInternalTesters" : 100,
+      "maxExternalTesters" : 10000,
+      "maxInternalGroups" : 100,
+      "maxExternalGroups" : 200,
+      "currentInternalTesters" : 1,
+      "currentExternalTesters" : 9725,
+      "currentDeletedTesters" : 1680
+    },
+    "links" : {
+      "self" : "https://appstoreconnect.apple.com/iris/v1/betaAppTesterDetails/123456789"
+    }
+  },
+  "links" : {
+    "self" : "https://appstoreconnect.apple.com/iris/v1/apps/987654321/betaAppTesterDetail"
+  }
+}
