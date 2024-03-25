@@ -43,6 +43,11 @@ class ConnectAPIStubbing
           to_return(status: 200, body: read_fixture_file('beta_app_review_submissions.json'), headers: { 'Content-Type' => 'application/json' })
       end
 
+      def stub_beta_app_tester_detail
+        stub_request(:get, "https://appstoreconnect.apple.com/iris/v1/apps/123456789/betaAppTesterDetail").
+          to_return(status: 200, body: read_fixture_file('beta_app_tester_detail.json'), headers: { 'Content-Type' => 'application/json' })
+      end
+
       def stub_beta_build_localizations
         stub_request(:get, "https://appstoreconnect.apple.com/iris/v1/betaBuildLocalizations").
           to_return(status: 200, body: read_fixture_file('beta_build_localizations.json'), headers: { 'Content-Type' => 'application/json' })

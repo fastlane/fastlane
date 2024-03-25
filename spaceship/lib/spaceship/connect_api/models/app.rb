@@ -392,6 +392,11 @@ module Spaceship
         return resps.flat_map(&:to_models)
       end
 
+      def get_beta_app_tester_detail()
+        client ||= Spaceship::ConnectAPI
+        client.get_beta_app_tester_detail(app_id: id).to_models
+      end
+
       def create_beta_group(client: nil, group_name: nil, is_internal_group: false, public_link_enabled: false, public_link_limit: 10_000, public_link_limit_enabled: false, has_access_to_all_builds: nil)
         client ||= Spaceship::ConnectAPI
         resps = client.create_beta_group(
