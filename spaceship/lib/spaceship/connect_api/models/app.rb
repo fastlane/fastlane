@@ -392,7 +392,7 @@ module Spaceship
         return resps.flat_map(&:to_models)
       end
 
-      def get_beta_app_tester_detail()
+      def get_beta_app_tester_detail
         client ||= Spaceship::ConnectAPI
         client.get_beta_app_tester_detail(app_id: id).to_models
       end

@@ -14,7 +14,7 @@ describe Spaceship::ConnectAPI::BetaAppTesterDetail do
       model = response.first
       expect(model.id).to eq("123456789")
       expect(model.maxInternalTesters).to eq(100)
-      expect(model.maxExternalTesters).to eq(10000)
+      expect(model.maxExternalTesters).to eq(10_000)
       expect(model.maxInternalGroups).to eq(100)
       expect(model.maxExternalGroups).to eq(200)
       expect(model.currentInternalTesters).to eq(1)
