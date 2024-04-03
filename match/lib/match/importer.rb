@@ -167,15 +167,15 @@ module Match
       return [cert_path, p12_path, profile_path]
     end
 
-    def ensure_valid_file_path(file_path, file_description, file_extension, optional: false, skip_prompt: false)
+    private def ensure_valid_file_path(file_path, file_description, file_extension, optional: false, skip_prompt: false)
       optional_file_message = optional ? " or leave empty to skip this file" : ""
-      if file_path.nil? && !skip_prompt
+      unless skip_prompt
         file_path ||= UI.input("#{file_description} (#{file_extension}) path#{optional_file_message}:")
       end
       raw_file_path = file_path
 
       if file_path
-        file_path = File.absolute_path(file_path) unless file_path == ""
+        file_path = File.expand_path(file_path) unless file_path == ""
         file_path = File.exist?(file_path) ? file_path : nil
       end
 
