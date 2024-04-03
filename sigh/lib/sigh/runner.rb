@@ -108,7 +108,7 @@ module Sigh
           if force_profile_device_udids.length > 0
             filtered_devices = current_profile.devices.select { |device| force_profile_device_udids.include?(device.udid) }
             if force_profile_device_udids.length != filtered_devices.length
-              UI.message("Provisioning Profile '#{current_profile.name}' is valid but does not match force_profile_device_udids skipping this one...")
+              UI.message("Provisioning Profile '#{current_profile.name}' is valid but does not match force_profile_device_udids, skipping this one...")
               profile_qualifies = false
             end
           end
