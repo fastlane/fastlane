@@ -2,10 +2,10 @@
 // Copyright (c) 2024 FastlaneTools
 
 public protocol SnapshotfileProtocol: AnyObject {
-    /// Path the workspace file
+    /// Path to the workspace file
     var workspace: String? { get }
 
-    /// Path the project file
+    /// Path to the project file
     var project: String? { get }
 
     /// Pass additional arguments to xcodebuild for the test phase. Be sure to quote the setting names and values e.g. OTHER_LDFLAGS="-ObjC -lstdc++"
@@ -204,4 +204,4 @@ public extension SnapshotfileProtocol {
 
 // Please don't remove the lines below
 // They are used to detect outdated files
-// FastlaneRunnerAPIVersion [0.9.115]
+// FastlaneRunnerAPIVersion [0.9.116]
