@@ -1,3 +1,4 @@
+require 'ostruct'
 module Fastlane
   class ErbTemplateHelper
     require "erb"
