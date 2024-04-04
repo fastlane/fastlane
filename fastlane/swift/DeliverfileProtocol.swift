@@ -59,6 +59,9 @@ public protocol DeliverfileProtocol: AnyObject {
     /// Clear all previously uploaded screenshots before uploading the new ones
     var overwriteScreenshots: Bool { get }
 
+    /// Timeout in seconds to wait before considering screenshot processing as failed, used to handle cases where uploads to the App Store are stuck in processing
+    var screenshotProcessingTimeout: Int { get }
+
     /// Sync screenshots with local ones. This is currently beta option so set true to 'FASTLANE_ENABLE_BETA_DELIVER_SYNC_SCREENSHOTS' environment variable as well
     var syncScreenshots: Bool { get }
 
@@ -70,6 +73,9 @@ public protocol DeliverfileProtocol: AnyObject {
 
     /// Rejects the previously submitted build if it's in a state where it's possible
     var rejectIfPossible: Bool { get }
+
+    /// After submitting a new version, App Store Connect takes some time to recognize the new version and we must wait until it's available before attempting to upload metadata for it. There is a mechanism that will check if it's available and retry with an exponential backoff if it's not available yet. This option specifies how many times we should retry before giving up. Setting this to a value below 5 is not recommended and will likely cause failures. Increase this parameter when Apple servers seem to be degraded or slow
+    var versionCheckWaitRetryLimit: Int { get }
 
     /// Should the app be automatically released once it's approved? (Cannot be used together with `auto_release_date`)
     var automaticRelease: Bool? { get }
@@ -215,10 +221,12 @@ public extension DeliverfileProtocol {
     var skipAppVersionUpdate: Bool { return false }
     var force: Bool { return false }
     var overwriteScreenshots: Bool { return false }
+    var screenshotProcessingTimeout: Int { return 3600 }
     var syncScreenshots: Bool { return false }
     var submitForReview: Bool { return false }
     var verifyOnly: Bool { return false }
     var rejectIfPossible: Bool { return false }
+    var versionCheckWaitRetryLimit: Int { return 7 }
     var automaticRelease: Bool? { return nil }
     var autoReleaseDate: Int? { return nil }
     var phasedRelease: Bool { return false }
@@ -264,4 +272,4 @@ public extension DeliverfileProtocol {
 
 // Please don't remove the lines below
 // They are used to detect outdated files
-// FastlaneRunnerAPIVersion [0.9.123]
+// FastlaneRunnerAPIVersion [0.9.124]

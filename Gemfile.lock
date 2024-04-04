@@ -1,7 +1,7 @@
 PATH
   remote: .
   specs:
-    fastlane (2.219.0)
+    fastlane (2.220.0)
       CFPropertyList (>= 2.3, < 4.0.0)
       addressable (>= 2.8, < 3.0.0)
       artifactory (~> 3.0)
@@ -54,7 +54,7 @@ GEM
     ast (2.4.2)
     atomos (0.1.3)
     aws-eventstream (1.3.0)
-    aws-partitions (1.876.0)
+    aws-partitions (1.877.0)
     aws-sdk-core (3.190.1)
       aws-eventstream (~> 1, >= 1.3.0)
       aws-partitions (~> 1, >= 1.651.0)
@@ -116,11 +116,10 @@ GEM
     digest-crc (0.6.5)
       rake (>= 12.0.0, < 14.0.0)
     docile (1.3.5)
-    domain_name (0.5.20190701)
-      unf (>= 0.0.5, < 1.0.0)
+    domain_name (0.6.20240107)
     dotenv (2.8.1)
     emoji_regex (3.2.3)
-    excon (0.108.0)
+    excon (0.109.0)
     fakefs (1.8.0)
     faraday (1.4.1)
       faraday-excon (~> 1.1)
@@ -325,9 +324,6 @@ GEM
     tty-spinner (0.9.3)
       tty-cursor (~> 0.7)
     uber (0.1.0)
-    unf (0.1.4)
-      unf_ext
-    unf_ext (0.0.8.2)
     unicode-display_width (2.4.2)
     webmock (3.18.1)
       addressable (>= 2.8.0)
