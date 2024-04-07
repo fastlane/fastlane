@@ -224,6 +224,7 @@ describe Match do
 
           # match options
           match_test_options = {
+            output_path: "tmp/match_certs", # to test the expectation that we do a file copy when this option is provided
             readonly: true # Current test suite.
           }
           match_config = create_match_config_with_git_storage(extra_values: match_test_options)
@@ -257,6 +258,12 @@ describe Match do
             expect(FastlaneCore::ProvisioningProfile).to receive(:install).with(stored_valid_profile_path, keychain_path)
             expect(Match::Generator).not_to receive(:generate_provisioning_profile)
           end
+
+          # output_path
+          expect(FileUtils).to receive(:mkdir_p).with(match_test_options[:output_path])
+          expect(FileUtils).to receive(:cp).with(stored_valid_cert_path, match_test_options[:output_path])
+          expect(FileUtils).to receive(:cp).with("#{repo_dir}/certs/distribution/E7P4EE896K.p12", match_test_options[:output_path])
+          expect(FileUtils).to receive(:cp).with(stored_valid_profile_path, match_test_options[:output_path])
 
           # WHEN
           Match::Runner.new.run(match_config)

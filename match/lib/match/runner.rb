@@ -356,7 +356,6 @@ module Match
 
       if params[:output_path]
         FileUtils.cp(stored_profile_path, params[:output_path])
-        installed_profile = FastlaneCore::ProvisioningProfile.install(profile, keychain_path)
       end
 
       Utils.fill_environment(Utils.environment_variable_name(app_identifier: app_identifier,
