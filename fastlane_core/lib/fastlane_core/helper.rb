@@ -180,7 +180,7 @@ module FastlaneCore
     # @return Swift version
     def self.swift_version
       if system("which swift > /dev/null 2>&1")
-        output = `swift --version`
+        output = `swift --version 2> /dev/null`
         return output.split("\n").first.match(/version ([0-9.]+)/).captures.first
       end
       return nil
@@ -480,21 +480,6 @@ module FastlaneCore
           return password
         end
         UI.error("Your entries do not match. Please try again")
-      end
-    end
-
-    # URI.open added by `require 'open-uri'` is not available in Ruby 2.4. This helper lets you open a URI
-    # by choosing appropriate interface to do so depending on Ruby version. This helper is subject to be removed
-    # when fastlane drops Ruby 2.4 support.
-    def self.open_uri(*rest, &block)
-      require 'open-uri'
-
-      if Gem::Version.new(RUBY_VERSION) < Gem::Version.new('2.5')
-        dup = rest.dup
-        uri = dup.shift
-        URI.parse(uri).open(*dup, &block)
-      else
-        URI.open(*rest, &block)
       end
     end
   end

@@ -55,7 +55,7 @@ module Deliver
       verify_version if options[:app_version].to_s.length > 0 && !options[:skip_app_version_update]
 
       # Rejecting before upload meta
-      # Screenshots can not be update/deleted if in waiting for review
+      # Screenshots cannot be updated or deleted if the app is in the "waiting for review" state
       reject_version_if_possible if options[:reject_if_possible]
 
       upload_metadata
@@ -135,21 +135,21 @@ module Deliver
 
     # Upload all metadata, screenshots, pricing information, etc. to App Store Connect
     def upload_metadata
-      upload_metadata = UploadMetadata.new
+      upload_metadata = UploadMetadata.new(options)
       upload_screenshots = UploadScreenshots.new
 
       # First, collect all the things for the HTML Report
       screenshots = upload_screenshots.collect_screenshots(options)
-      upload_metadata.load_from_filesystem(options)
+      upload_metadata.load_from_filesystem
 
       # Assign "default" values to all languages
-      upload_metadata.assign_defaults(options)
+      upload_metadata.assign_defaults
 
       # Validate
       validate_html(screenshots)
 
       # Commit
-      upload_metadata.upload(options)
+      upload_metadata.upload
 
       if options[:sync_screenshots]
         sync_screenshots = SyncScreenshots.new(app: Deliver.cache[:app], platform: Spaceship::ConnectAPI::Platform.map(options[:platform]))
@@ -231,7 +231,8 @@ module Deliver
 
       unless result
         transporter_errors = transporter.displayable_errors
-        UI.user_error!("Error uploading ipa file: \n #{transporter_errors}")
+        file_type = platform == "osx" ? "pkg" : "ipa"
+        UI.user_error!("Error uploading #{file_type} file: \n #{transporter_errors}")
       end
     end
 

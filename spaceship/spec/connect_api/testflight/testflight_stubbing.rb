@@ -67,8 +67,16 @@ class ConnectAPIStubbing
         stub_request(:get, "https://appstoreconnect.apple.com/iris/v1/betaGroups").
           to_return(status: 200, body: read_fixture_file('beta_groups.json'), headers: { 'Content-Type' => 'application/json' })
 
+        created_beta_group = JSON.parse(read_fixture_file('beta_create_group.json'))
         stub_request(:post, "https://appstoreconnect.apple.com/iris/v1/betaGroups").
-          to_return(status: 200, body: read_fixture_file('beta_create_group.json'), headers: { 'Content-Type' => 'application/json' })
+          to_return { |request|
+            request_body = JSON.parse(request.body)
+            response_body = created_beta_group.dup
+            %w{isInternalGroup hasAccessToAllBuilds}.each do |attribute|
+              response_body["data"]["attributes"][attribute] = request_body["data"]["attributes"][attribute]
+            end
+            { status: 200, body: JSON.dump(response_body), headers: { 'Content-Type' => 'application/json' } }
+          }
 
         stub_request(:delete, "https://appstoreconnect.apple.com/iris/v1/betaGroups/123456789").
           to_return(status: 200, body: "", headers: {})

@@ -63,7 +63,7 @@ module Spaceship
       end
 
       # Delete this app group
-      # @return (AppGroup) The app group you just deletd
+      # @return (AppGroup) The app group you just deleted
       def delete!
         client.delete_app_group!(app_group_id)
         self

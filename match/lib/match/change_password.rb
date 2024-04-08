@@ -19,19 +19,13 @@ module Match
       new_password = FastlaneCore::Helper.ask_password(message: "New passphrase for Git Repo: ", confirm: true)
 
       # Choose the right storage and encryption implementations
-      storage = Storage.for_mode(params[:storage_mode], {
-        git_url: params[:git_url],
-        shallow_clone: params[:shallow_clone],
-        skip_docs: params[:skip_docs],
-        git_branch: params[:git_branch],
-        git_full_name: params[:git_full_name],
-        git_user_email: params[:git_user_email],
-        clone_branch_directly: params[:clone_branch_directly]
-      })
+      storage = Storage.from_params(params)
       storage.download
 
       encryption = Encryption.for_storage_mode(params[:storage_mode], {
         git_url: params[:git_url],
+        s3_bucket: params[:s3_bucket],
+        s3_skip_encryption: params[:s3_skip_encryption],
         working_directory: storage.working_directory
       })
       encryption.decrypt_files

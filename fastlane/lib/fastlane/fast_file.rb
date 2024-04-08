@@ -187,7 +187,7 @@ module Fastlane
     end
 
     # Execute shell command
-    # Accepts arguments with with and without the command named keyword so that sh
+    # Accepts arguments with and without the command named keyword so that sh
     # behaves like other actions with named keywords
     # https://github.com/fastlane/fastlane/issues/14930
     #
