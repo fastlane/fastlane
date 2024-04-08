@@ -23,7 +23,7 @@ module Snapshot
                                      short_option: "-w",
                                      env_name: "SNAPSHOT_WORKSPACE",
                                      optional: true,
-                                     description: "Path the workspace file",
+                                     description: "Path to the workspace file",
                                      verify_block: proc do |value|
                                        v = File.expand_path(value.to_s)
                                        UI.user_error!("Workspace file not found at path '#{v}'") unless File.exist?(v)
@@ -34,7 +34,7 @@ module Snapshot
                                      short_option: "-p",
                                      optional: true,
                                      env_name: "SNAPSHOT_PROJECT",
-                                     description: "Path the project file",
+                                     description: "Path to the project file",
                                      verify_block: proc do |value|
                                        v = File.expand_path(value.to_s)
                                        UI.user_error!("Project file not found at path '#{v}'") unless File.exist?(v)

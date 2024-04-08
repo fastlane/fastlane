@@ -20,19 +20,6 @@ Some people might also use the [_fastlane_ tag on StackOverflow](https://stackov
 - You will need a Google account to sign the CLA when you make your first PR
 - For some more advanced tooling and debugging tips, check out [ToolsAndDebugging.md](ToolsAndDebugging.md)
 
-### Google Contributor License Agreement (CLA)
-Upon your first pull request to _fastlane_, the [googlebot](https://github.com/googlebot) will ask you to sign the Google Contributor License Agreement. Once the CLA has been accepted, the PR will be available to merge and you will not be asked to sign it again unless your GitHub username or email address changes.
-
-Contributions to this project must be accompanied by a Contributor License
-Agreement. You (or your employer) retain the copyright to your contribution;
-this simply gives us permission to use and redistribute your contributions as
-part of the project. Head over to <https://cla.developers.google.com/> to see
-your current agreements on file or to sign a new one.
-
-You generally only need to submit a CLA once, so if you've already submitted one
-(even if it was for a different project), you probably don't need to do it
-again.
-
 ### New Actions
 
 Please be aware that we don’t accept submissions for new actions at the moment. You can find more information about that [here][submit action].
@@ -65,6 +52,29 @@ One of the best ways we can keep _fastlane_ an approachable, stable, and dependa
 ## Code of Conduct
 
 Help us keep _fastlane_ open and inclusive. Please read and follow our [Code of Conduct][code of conduct].
+
+## Branding
+
+We have a few guidelines for how to refer to _fastlane_ and its tools:
+
+- _fastlane_ and its actions should be written in all lowercase, even at the beginning of a sentence:
+    - ❌ "Use Fastlane to automate your screenshots."
+    - ❌ "Use _Fastlane_ to automate your screenshots."
+    - ❌ "Fastlane helps you deliver faster."
+    - ❌ "Match makes code signing management easy."
+    - ✅ "Use _fastlane_ to automate your screenshots."
+    - ✅ "_fastlane_ helps you deliver faster."
+    - ✅ "_match_ makes code signing management easy."
+- _fastlane_ and all of its actions should be italicized when written in prose:
+    - ❌ "`fastlane` is an all-in-one tool for app automation."
+    - ❌ "**fastlane** is an all-in-one tool for app automation."
+    - ❌ "fastlane is an all-in-one tool for app automation."
+    - ❌ "<ins>fastlane</ins> is an all-in-one tool for app automation."
+    - ❌ "`match` makes code signing management easy."
+    - ✅ "_fastlane_ is an all-in-one tool for app automation."
+    - ✅ "_match_ makes code signing management easy."
+
+Please use these guidelines when writing about _fastlane_ and its tools, be it when contributing to the project or writing about it elsewhere.
 
 ## Above All, Thanks for Your Contributions
 

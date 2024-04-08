@@ -65,7 +65,7 @@ module Spaceship
       end
 
       # Instance level hostname only used when creating
-      # App Store Connect API Farady client.
+      # App Store Connect API Faraday client.
       # Forwarding to class level if using web session.
       def hostname
         if @token
@@ -87,13 +87,14 @@ module Spaceship
         return @token.nil?
       end
 
-      def build_params(filter: nil, includes: nil, limit: nil, sort: nil, cursor: nil)
+      def build_params(filter: nil, includes: nil, fields: nil, limit: nil, sort: nil, cursor: nil)
         params = {}
 
         filter = filter.delete_if { |k, v| v.nil? } if filter
 
         params[:filter] = filter if filter && !filter.empty?
         params[:include] = includes if includes
+        params[:fields] = fields if fields
         params[:limit] = limit if limit
         params[:sort] = sort if sort
         params[:cursor] = cursor if cursor
@@ -156,7 +157,13 @@ module Spaceship
         end
       end
 
-      def with_asc_retry(tries = 5, &_block)
+      class TooManyRequestsError < StandardError
+        def initialize(msg)
+          super
+        end
+      end
+
+      def with_asc_retry(tries = 5, backoff = 1, &_block)
         response = yield
 
         status = response.status if response
@@ -166,6 +173,10 @@ module Spaceship
           raise TimeoutRetryError, msg
         end
 
+        if status == 429
+          raise TooManyRequestsError, "Too many requests, backing off #{backoff} seconds"
+        end
+
         return response
       rescue UnauthorizedAccessError => error
         tries -= 1
@@ -173,7 +184,7 @@ module Spaceship
         if tries.zero?
           raise error
         else
-          msg = "Token has expired or has been revoked! Trying to refresh..."
+          msg = "Token has expired, issued-at-time is in the future, or has been revoked! Trying to refresh..."
           puts(msg) if Spaceship::Globals.verbose?
           @token.refresh!
           retry
@@ -186,6 +197,14 @@ module Spaceship
         else
           retry
         end
+      rescue TooManyRequestsError => error
+        if backoff > 3600
+          raise TooManyRequestsError, "Too many requests, giving up after backing off for > 3600 seconds."
+        end
+        puts(error) if Spaceship::Globals.verbose?
+        Kernel.sleep(backoff)
+        backoff *= 2
+        retry
       end
 
       def handle_response(response)

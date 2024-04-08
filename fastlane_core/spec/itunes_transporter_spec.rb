@@ -1396,4 +1396,21 @@ describe FastlaneCore do
       end
     end
   end
+
+  describe FastlaneCore::AltoolTransporterExecutor do
+    let(:upload_cmd) { "xcrun altool --upload-app --apiKey #{api_key[:key_id]} --apiIssuer #{api_key[:issuer_id]} -t macos -f /tmp/my.app.id.itmsp -k 100000" }
+    let(:instance) { described_class.new }
+    describe "#execute" do
+      it "logs specific info about altool crash if exit code is -1" do
+        # remove test behavior, we actually want FastlanePty.spawn to be called here
+        allow(FastlaneCore::Helper).to receive(:test?).and_return(false)
+        # force the nil return of FastlanePty.spawn
+        allow(FastlaneCore::FastlanePty).to receive(:spawn).and_return(-1)
+        expect(instance.execute(upload_cmd, false)).to eq(false)
+        expect(instance.errors).to include(
+          "-1 indicates altool exited abnormally; try retrying (see https://github.com/fastlane/fastlane/issues/21535)"
+        )
+      end
+    end
+  end
 end
