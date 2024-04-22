@@ -68,7 +68,7 @@ describe Spaceship::ConnectAPI::Token do
       file.close
       expect do
         Spaceship::ConnectAPI::Token.from_json_file(file.path)
-      end.to raise_error("App Store Connect API key JSON is missing field(s): key_id, issuer_id, key")
+      end.to raise_error("App Store Connect API key JSON is missing field(s): key_id, key")
     end
 
     it 'raises error with missing key' do
@@ -147,6 +147,21 @@ describe Spaceship::ConnectAPI::Token do
 
         expect(token.key_id).to eq('key_id')
         expect(token.issuer_id).to eq('issuer_id')
+        expect(token.text).not_to(be_nil)
+        expect(token.duration).to eq(200)
+        expect(token.in_house).to eq(true)
+      end
+
+      it "without issuer_id" do
+        expect(File).to receive(:binread).with('/path/to/file').and_return(private_key)
+        token = Spaceship::ConnectAPI::Token.create(
+          key_id: "key_id",
+          filepath: "/path/to/file",
+          duration: 200,
+          in_house: true
+        )
+
+        expect(token.key_id).to eq('key_id')
         expect(token.text).not_to(be_nil)
         expect(token.duration).to eq(200)
         expect(token.in_house).to eq(true)
