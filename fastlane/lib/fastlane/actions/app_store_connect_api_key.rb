@@ -56,7 +56,7 @@ module Fastlane
                                        description: "The key ID"),
           FastlaneCore::ConfigItem.new(key: :issuer_id,
                                        env_name: "APP_STORE_CONNECT_API_KEY_ISSUER_ID",
-                                       description: "The issuer ID",
+                                       description: "The issuer ID. It can be nil if the key is individual API key",
                                        optional: true),
           FastlaneCore::ConfigItem.new(key: :key_filepath,
                                        env_name: "APP_STORE_CONNECT_API_KEY_KEY_FILEPATH",
