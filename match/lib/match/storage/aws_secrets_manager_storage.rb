@@ -165,7 +165,7 @@ module Match
         # Either way, we'll upload them using the same technique
 
         files_to_upload.each do |file_name|
-          ensure_file_name_encodable(file_name)
+          ensure_file_name_encodable(sanitize_file_name(file_name))
         end
 
         files_to_upload.each do |file_name|
@@ -176,7 +176,7 @@ module Match
           #
           target_path = secrets_manager_object_path(file_name)
           UI.verbose("Uploading '#{target_path}' to Secrets manager...")
-          secret_base64_binary = Base64.encode64(Zlib::Deflate.deflate(File.read(file_name)))
+          secret_base64_string = Base64.encode64(Zlib::Deflate.deflate(File.read(file_name)))
           begin
             response = aws_sm_client.describe_secret({
               secret_id: target_path,
