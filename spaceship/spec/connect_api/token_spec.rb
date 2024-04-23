@@ -212,7 +212,7 @@ describe Spaceship::ConnectAPI::Token do
   end
 
   context 'init' do
-    it 'generates proper token' do
+    it 'generates proper team token' do
       key = OpenSSL::PKey::EC.generate('prime256v1')
       token = Spaceship::ConnectAPI::Token.new(key_id: key_id, issuer_id: issuer_id, key: key)
       expect(token.key_id).to eq(key_id)
@@ -221,6 +221,27 @@ describe Spaceship::ConnectAPI::Token do
       payload, header = JWT.decode(token.text, key, true, { algorithm: 'ES256' })
 
       expect(payload['iss']).to eq(issuer_id)
+      expect(payload['sub']).to be_nil
+
+      expect(payload['iat']).to be < Time.now.to_i
+      expect(payload['aud']).to eq('appstoreconnect-v1')
+      expect(payload['exp']).to be > Time.now.to_i
+
+      expect(header['kid']).to eq(key_id)
+      expect(header['typ']).to eq('JWT')
+    end
+
+    it 'generates proper individual token' do
+      key = OpenSSL::PKey::EC.generate('prime256v1')
+      token = Spaceship::ConnectAPI::Token.new(key_id: key_id, key: key)
+      expect(token.key_id).to eq(key_id)
+      expect(token.issuer_id).to be_nil
+
+      payload, header = JWT.decode(token.text, key, true, { algorithm: 'ES256' })
+
+      expect(payload['sub']).to eq('user')
+      expect(payload['iss']).to be_nil
+
       expect(payload['iat']).to be < Time.now.to_i
       expect(payload['aud']).to eq('appstoreconnect-v1')
       expect(payload['exp']).to be > Time.now.to_i
