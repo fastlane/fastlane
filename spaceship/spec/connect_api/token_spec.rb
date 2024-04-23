@@ -162,6 +162,7 @@ describe Spaceship::ConnectAPI::Token do
         )
 
         expect(token.key_id).to eq('key_id')
+        expect(token.issuer_id).to be_nil
         expect(token.text).not_to(be_nil)
         expect(token.duration).to eq(200)
         expect(token.in_house).to eq(true)
