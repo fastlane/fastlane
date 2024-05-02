@@ -95,7 +95,7 @@ public protocol DeliverfileProtocol: AnyObject {
     /// Path to the app rating's config
     var appRatingConfigPath: String? { get }
 
-    /// Extra information for the submission (e.g. compliance specifications, IDFA settings)
+    /// Extra information for the submission (e.g. compliance specifications)
     var submissionInformation: [String: Any]? { get }
 
     /// The ID of your App Store Connect team if you're in multiple teams

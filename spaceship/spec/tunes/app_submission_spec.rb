@@ -21,21 +21,9 @@ describe Spaceship::AppSubmission do
       submission = app.create_submission
       submission.content_rights_contains_third_party_content = true
       submission.content_rights_has_rights = true
-      submission.add_id_info_uses_idfa = false
       submission.complete!
 
       expect(submission.submitted_for_review).to eq(true)
-    end
-
-    it "sets automatically the limitsTracking value for the usesIdfa" do
-      TunesStubbing.itc_stub_app_submissions
-      submission = app.create_submission
-      submission.content_rights_contains_third_party_content = true
-      submission.content_rights_has_rights = true
-      submission.add_id_info_uses_idfa = true
-      submission.complete!
-
-      expect(submission.raw_data["adIdInfo"]["limitsTracking"]["value"]).to eq(true)
     end
 
     it "raises an error when submitting an app that has validation errors" do
@@ -51,7 +39,6 @@ describe Spaceship::AppSubmission do
       submission = app.create_submission
       submission.content_rights_contains_third_party_content = true
       submission.content_rights_has_rights = true
-      submission.add_id_info_uses_idfa = false
 
       expect do
         submission.complete!

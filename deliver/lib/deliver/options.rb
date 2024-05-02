@@ -249,7 +249,7 @@ module Deliver
                                      end),
         FastlaneCore::ConfigItem.new(key: :submission_information,
                                      short_option: "-b",
-                                     description: "Extra information for the submission (e.g. compliance specifications, IDFA settings)",
+                                     description: "Extra information for the submission (e.g. compliance specifications)",
                                      type: Hash,
                                      optional: true),
 
