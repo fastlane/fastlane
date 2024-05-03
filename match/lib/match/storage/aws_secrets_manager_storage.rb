@@ -263,8 +263,6 @@ module Match
           return file_name
         end
 
-        UI.user_error!("The file name '#{file_name}' contains the path separator '#{@path_separator}' which is not allowed") if file_name.include?(@path_separator)
-
         file_name.gsub(File::SEPARATOR, @path_separator)
       end
 
