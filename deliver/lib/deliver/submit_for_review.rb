@@ -51,11 +51,11 @@ module Deliver
       10.times do
         version_with_latest_info = Spaceship::ConnectAPI::AppStoreVersion.get(app_store_version_id: version.id)
 
-        if version_with_latest_info.app_store_state == Spaceship::ConnectAPI::AppStoreVersion::AppStoreState::READY_FOR_REVIEW
+        if version_with_latest_info.app_version_state == Spaceship::ConnectAPI::AppStoreVersion::AppVersionState::READY_FOR_REVIEW
           break
         end
 
-        UI.message("Waiting for the state of the version to become #{Spaceship::ConnectAPI::AppStoreVersion::AppStoreState::READY_FOR_REVIEW}...")
+        UI.message("Waiting for the state of the version to become #{Spaceship::ConnectAPI::AppStoreVersion::AppVersionState::READY_FOR_REVIEW}...")
 
         sleep(15)
       end

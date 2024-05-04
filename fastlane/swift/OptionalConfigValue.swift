@@ -93,8 +93,8 @@ extension OptionalConfigValue: ExpressibleByDictionaryLiteral where T == [String
 
     public init(dictionaryLiteral elements: (Key, Value)...) {
         var dict: [Key: Value] = [:]
-        elements.forEach {
-            dict[$0.0] = $0.1
+        for element in elements {
+            dict[element.0] = element.1
         }
         self = .userDefined(dict)
     }

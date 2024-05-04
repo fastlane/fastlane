@@ -68,7 +68,7 @@ open class LaneFile: NSObject, LaneFileProtocol {
 
     public static var lanes: [String: String] {
         var laneToMethodName: [String: String] = [:]
-        laneFunctionNames.forEach { name in
+        for name in laneFunctionNames {
             let lowercasedName = name.lowercased()
             if lowercasedName.hasSuffix("lane") {
                 laneToMethodName[lowercasedName] = name

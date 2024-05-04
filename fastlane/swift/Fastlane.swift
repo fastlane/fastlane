@@ -2,6 +2,7 @@
 // Copyright (c) 2024 FastlaneTools
 
 import Foundation
+
 /**
  Run ADB Actions
 
@@ -661,10 +662,12 @@ public func appledoc(input: [String],
    - skipAppVersionUpdate: Don’t create or update the app version that is being prepared for submission
    - force: Skip verification of HTML preview file
    - overwriteScreenshots: Clear all previously uploaded screenshots before uploading the new ones
+   - screenshotProcessingTimeout: Timeout in seconds to wait before considering screenshot processing as failed, used to handle cases where uploads to the App Store are stuck in processing
    - syncScreenshots: Sync screenshots with local ones. This is currently beta option so set true to 'FASTLANE_ENABLE_BETA_DELIVER_SYNC_SCREENSHOTS' environment variable as well
    - submitForReview: Submit the new version for Review after uploading everything
    - verifyOnly: Verifies archive with App Store Connect without uploading
    - rejectIfPossible: Rejects the previously submitted build if it's in a state where it's possible
+   - versionCheckWaitRetryLimit: After submitting a new version, App Store Connect takes some time to recognize the new version and we must wait until it's available before attempting to upload metadata for it. There is a mechanism that will check if it's available and retry with an exponential backoff if it's not available yet. This option specifies how many times we should retry before giving up. Setting this to a value below 5 is not recommended and will likely cause failures. Increase this parameter when Apple servers seem to be degraded or slow
    - automaticRelease: Should the app be automatically released once it's approved? (Cannot be used together with `auto_release_date`)
    - autoReleaseDate: Date in milliseconds for automatically releasing on pending approval (Cannot be used together with `automatic_release`)
    - phasedRelease: Enable the phased release feature of iTC
@@ -733,10 +736,12 @@ public func appstore(apiKeyPath: OptionalConfigValue<String?> = .fastlaneDefault
                      skipAppVersionUpdate: OptionalConfigValue<Bool> = .fastlaneDefault(false),
                      force: OptionalConfigValue<Bool> = .fastlaneDefault(false),
                      overwriteScreenshots: OptionalConfigValue<Bool> = .fastlaneDefault(false),
+                     screenshotProcessingTimeout: Int = 3600,
                      syncScreenshots: OptionalConfigValue<Bool> = .fastlaneDefault(false),
                      submitForReview: OptionalConfigValue<Bool> = .fastlaneDefault(false),
                      verifyOnly: OptionalConfigValue<Bool> = .fastlaneDefault(false),
                      rejectIfPossible: OptionalConfigValue<Bool> = .fastlaneDefault(false),
+                     versionCheckWaitRetryLimit: Int = 7,
                      automaticRelease: OptionalConfigValue<Bool?> = .fastlaneDefault(nil),
                      autoReleaseDate: OptionalConfigValue<Int?> = .fastlaneDefault(nil),
                      phasedRelease: OptionalConfigValue<Bool> = .fastlaneDefault(false),
@@ -798,10 +803,12 @@ public func appstore(apiKeyPath: OptionalConfigValue<String?> = .fastlaneDefault
     let skipAppVersionUpdateArg = skipAppVersionUpdate.asRubyArgument(name: "skip_app_version_update", type: nil)
     let forceArg = force.asRubyArgument(name: "force", type: nil)
     let overwriteScreenshotsArg = overwriteScreenshots.asRubyArgument(name: "overwrite_screenshots", type: nil)
+    let screenshotProcessingTimeoutArg = RubyCommand.Argument(name: "screenshot_processing_timeout", value: screenshotProcessingTimeout, type: nil)
     let syncScreenshotsArg = syncScreenshots.asRubyArgument(name: "sync_screenshots", type: nil)
     let submitForReviewArg = submitForReview.asRubyArgument(name: "submit_for_review", type: nil)
     let verifyOnlyArg = verifyOnly.asRubyArgument(name: "verify_only", type: nil)
     let rejectIfPossibleArg = rejectIfPossible.asRubyArgument(name: "reject_if_possible", type: nil)
+    let versionCheckWaitRetryLimitArg = RubyCommand.Argument(name: "version_check_wait_retry_limit", value: versionCheckWaitRetryLimit, type: nil)
     let automaticReleaseArg = automaticRelease.asRubyArgument(name: "automatic_release", type: nil)
     let autoReleaseDateArg = autoReleaseDate.asRubyArgument(name: "auto_release_date", type: nil)
     let phasedReleaseArg = phasedRelease.asRubyArgument(name: "phased_release", type: nil)
@@ -862,10 +869,12 @@ public func appstore(apiKeyPath: OptionalConfigValue<String?> = .fastlaneDefault
                                           skipAppVersionUpdateArg,
                                           forceArg,
                                           overwriteScreenshotsArg,
+                                          screenshotProcessingTimeoutArg,
                                           syncScreenshotsArg,
                                           submitForReviewArg,
                                           verifyOnlyArg,
                                           rejectIfPossibleArg,
+                                          versionCheckWaitRetryLimitArg,
                                           automaticReleaseArg,
                                           autoReleaseDateArg,
                                           phasedReleaseArg,
@@ -2108,8 +2117,8 @@ public func captureAndroidScreenshots(androidHome: OptionalConfigValue<String?> 
  Generate new localized screenshots on multiple devices (via _snapshot_)
 
  - parameters:
-   - workspace: Path the workspace file
-   - project: Path the project file
+   - workspace: Path to the workspace file
+   - project: Path to the project file
    - xcargs: Pass additional arguments to xcodebuild for the test phase. Be sure to quote the setting names and values e.g. OTHER_LDFLAGS="-ObjC -lstdc++"
    - xcconfig: Use an extra XCCONFIG file to build your app
    - devices: A list of devices you want to take the screenshots from
@@ -2317,8 +2326,8 @@ public func captureIosScreenshots(workspace: OptionalConfigValue<String?> = .fas
  Alias for the `capture_ios_screenshots` action
 
  - parameters:
-   - workspace: Path the workspace file
-   - project: Path the project file
+   - workspace: Path to the workspace file
+   - project: Path to the project file
    - xcargs: Pass additional arguments to xcodebuild for the test phase. Be sure to quote the setting names and values e.g. OTHER_LDFLAGS="-ObjC -lstdc++"
    - xcconfig: Use an extra XCCONFIG file to build your app
    - devices: A list of devices you want to take the screenshots from
@@ -3693,10 +3702,12 @@ public func deleteKeychain(name: OptionalConfigValue<String?> = .fastlaneDefault
    - skipAppVersionUpdate: Don’t create or update the app version that is being prepared for submission
    - force: Skip verification of HTML preview file
    - overwriteScreenshots: Clear all previously uploaded screenshots before uploading the new ones
+   - screenshotProcessingTimeout: Timeout in seconds to wait before considering screenshot processing as failed, used to handle cases where uploads to the App Store are stuck in processing
    - syncScreenshots: Sync screenshots with local ones. This is currently beta option so set true to 'FASTLANE_ENABLE_BETA_DELIVER_SYNC_SCREENSHOTS' environment variable as well
    - submitForReview: Submit the new version for Review after uploading everything
    - verifyOnly: Verifies archive with App Store Connect without uploading
    - rejectIfPossible: Rejects the previously submitted build if it's in a state where it's possible
+   - versionCheckWaitRetryLimit: After submitting a new version, App Store Connect takes some time to recognize the new version and we must wait until it's available before attempting to upload metadata for it. There is a mechanism that will check if it's available and retry with an exponential backoff if it's not available yet. This option specifies how many times we should retry before giving up. Setting this to a value below 5 is not recommended and will likely cause failures. Increase this parameter when Apple servers seem to be degraded or slow
    - automaticRelease: Should the app be automatically released once it's approved? (Cannot be used together with `auto_release_date`)
    - autoReleaseDate: Date in milliseconds for automatically releasing on pending approval (Cannot be used together with `automatic_release`)
    - phasedRelease: Enable the phased release feature of iTC
@@ -3765,10 +3776,12 @@ public func deliver(apiKeyPath: OptionalConfigValue<String?> = .fastlaneDefault(
                     skipAppVersionUpdate: OptionalConfigValue<Bool> = .fastlaneDefault(deliverfile.skipAppVersionUpdate),
                     force: OptionalConfigValue<Bool> = .fastlaneDefault(deliverfile.force),
                     overwriteScreenshots: OptionalConfigValue<Bool> = .fastlaneDefault(deliverfile.overwriteScreenshots),
+                    screenshotProcessingTimeout: Int = deliverfile.screenshotProcessingTimeout,
                     syncScreenshots: OptionalConfigValue<Bool> = .fastlaneDefault(deliverfile.syncScreenshots),
                     submitForReview: OptionalConfigValue<Bool> = .fastlaneDefault(deliverfile.submitForReview),
                     verifyOnly: OptionalConfigValue<Bool> = .fastlaneDefault(deliverfile.verifyOnly),
                     rejectIfPossible: OptionalConfigValue<Bool> = .fastlaneDefault(deliverfile.rejectIfPossible),
+                    versionCheckWaitRetryLimit: Int = deliverfile.versionCheckWaitRetryLimit,
                     automaticRelease: OptionalConfigValue<Bool?> = .fastlaneDefault(deliverfile.automaticRelease),
                     autoReleaseDate: OptionalConfigValue<Int?> = .fastlaneDefault(deliverfile.autoReleaseDate),
                     phasedRelease: OptionalConfigValue<Bool> = .fastlaneDefault(deliverfile.phasedRelease),
@@ -3830,10 +3843,12 @@ public func deliver(apiKeyPath: OptionalConfigValue<String?> = .fastlaneDefault(
     let skipAppVersionUpdateArg = skipAppVersionUpdate.asRubyArgument(name: "skip_app_version_update", type: nil)
     let forceArg = force.asRubyArgument(name: "force", type: nil)
     let overwriteScreenshotsArg = overwriteScreenshots.asRubyArgument(name: "overwrite_screenshots", type: nil)
+    let screenshotProcessingTimeoutArg = RubyCommand.Argument(name: "screenshot_processing_timeout", value: screenshotProcessingTimeout, type: nil)
     let syncScreenshotsArg = syncScreenshots.asRubyArgument(name: "sync_screenshots", type: nil)
     let submitForReviewArg = submitForReview.asRubyArgument(name: "submit_for_review", type: nil)
     let verifyOnlyArg = verifyOnly.asRubyArgument(name: "verify_only", type: nil)
     let rejectIfPossibleArg = rejectIfPossible.asRubyArgument(name: "reject_if_possible", type: nil)
+    let versionCheckWaitRetryLimitArg = RubyCommand.Argument(name: "version_check_wait_retry_limit", value: versionCheckWaitRetryLimit, type: nil)
     let automaticReleaseArg = automaticRelease.asRubyArgument(name: "automatic_release", type: nil)
     let autoReleaseDateArg = autoReleaseDate.asRubyArgument(name: "auto_release_date", type: nil)
     let phasedReleaseArg = phasedRelease.asRubyArgument(name: "phased_release", type: nil)
@@ -3894,10 +3909,12 @@ public func deliver(apiKeyPath: OptionalConfigValue<String?> = .fastlaneDefault(
                                           skipAppVersionUpdateArg,
                                           forceArg,
                                           overwriteScreenshotsArg,
+                                          screenshotProcessingTimeoutArg,
                                           syncScreenshotsArg,
                                           submitForReviewArg,
                                           verifyOnlyArg,
                                           rejectIfPossibleArg,
+                                          versionCheckWaitRetryLimitArg,
                                           automaticReleaseArg,
                                           autoReleaseDateArg,
                                           phasedReleaseArg,
@@ -5246,17 +5263,21 @@ public func getPushCertificate(platform: String = "ios",
  - parameters:
    - path: The file(s) and path(s) you want to add
    - shellEscape: Shell escapes paths (set to false if using wildcards or manually escaping spaces in :path)
+   - force: Allow adding otherwise ignored files
    - pathspec: **DEPRECATED!** Use `--path` instead - The pathspec you want to add files from
  */
 public func gitAdd(path: OptionalConfigValue<[String]?> = .fastlaneDefault(nil),
                    shellEscape: OptionalConfigValue<Bool> = .fastlaneDefault(true),
+                   force: OptionalConfigValue<Bool> = .fastlaneDefault(false),
                    pathspec: OptionalConfigValue<String?> = .fastlaneDefault(nil))
 {
     let pathArg = path.asRubyArgument(name: "path", type: nil)
     let shellEscapeArg = shellEscape.asRubyArgument(name: "shell_escape", type: nil)
+    let forceArg = force.asRubyArgument(name: "force", type: nil)
     let pathspecArg = pathspec.asRubyArgument(name: "pathspec", type: nil)
     let array: [RubyCommand.Argument?] = [pathArg,
                                           shellEscapeArg,
+                                          forceArg,
                                           pathspecArg]
     let args: [RubyCommand.Argument] = array
         .filter { $0?.value != nil }
@@ -7552,6 +7573,7 @@ public func oclint(oclintPath: String = "oclint",
    - appName: OneSignal App Name. This is required when creating an app (in other words, when `:app_id` is not set, and optional when updating an app
    - androidToken: ANDROID GCM KEY
    - androidGcmSenderId: GCM SENDER ID
+   - fcmJson: FCM Service Account JSON File (in .json format)
    - apnsP12: APNS P12 File (in .p12 format)
    - apnsP12Password: APNS P12 password
    - apnsEnv: APNS environment
@@ -7564,6 +7586,7 @@ public func onesignal(appId: OptionalConfigValue<String?> = .fastlaneDefault(nil
                       appName: OptionalConfigValue<String?> = .fastlaneDefault(nil),
                       androidToken: OptionalConfigValue<String?> = .fastlaneDefault(nil),
                       androidGcmSenderId: OptionalConfigValue<String?> = .fastlaneDefault(nil),
+                      fcmJson: OptionalConfigValue<String?> = .fastlaneDefault(nil),
                       apnsP12: OptionalConfigValue<String?> = .fastlaneDefault(nil),
                       apnsP12Password: OptionalConfigValue<String?> = .fastlaneDefault(nil),
                       apnsEnv: String = "production",
@@ -7574,6 +7597,7 @@ public func onesignal(appId: OptionalConfigValue<String?> = .fastlaneDefault(nil
     let appNameArg = appName.asRubyArgument(name: "app_name", type: nil)
     let androidTokenArg = androidToken.asRubyArgument(name: "android_token", type: nil)
     let androidGcmSenderIdArg = androidGcmSenderId.asRubyArgument(name: "android_gcm_sender_id", type: nil)
+    let fcmJsonArg = fcmJson.asRubyArgument(name: "fcm_json", type: nil)
     let apnsP12Arg = apnsP12.asRubyArgument(name: "apns_p12", type: nil)
     let apnsP12PasswordArg = apnsP12Password.asRubyArgument(name: "apns_p12_password", type: nil)
     let apnsEnvArg = RubyCommand.Argument(name: "apns_env", value: apnsEnv, type: nil)
@@ -7583,6 +7607,7 @@ public func onesignal(appId: OptionalConfigValue<String?> = .fastlaneDefault(nil
                                           appNameArg,
                                           androidTokenArg,
                                           androidGcmSenderIdArg,
+                                          fcmJsonArg,
                                           apnsP12Arg,
                                           apnsP12PasswordArg,
                                           apnsEnvArg,
@@ -10438,8 +10463,8 @@ public func slather(buildDirectory: OptionalConfigValue<String?> = .fastlaneDefa
  Alias for the `capture_ios_screenshots` action
 
  - parameters:
-   - workspace: Path the workspace file
-   - project: Path the project file
+   - workspace: Path to the workspace file
+   - project: Path to the project file
    - xcargs: Pass additional arguments to xcodebuild for the test phase. Be sure to quote the setting names and values e.g. OTHER_LDFLAGS="-ObjC -lstdc++"
    - xcconfig: Use an extra XCCONFIG file to build your app
    - devices: A list of devices you want to take the screenshots from
@@ -12499,10 +12524,12 @@ public func uploadSymbolsToSentry(apiHost: String = "https://app.getsentry.com/a
    - skipAppVersionUpdate: Don’t create or update the app version that is being prepared for submission
    - force: Skip verification of HTML preview file
    - overwriteScreenshots: Clear all previously uploaded screenshots before uploading the new ones
+   - screenshotProcessingTimeout: Timeout in seconds to wait before considering screenshot processing as failed, used to handle cases where uploads to the App Store are stuck in processing
    - syncScreenshots: Sync screenshots with local ones. This is currently beta option so set true to 'FASTLANE_ENABLE_BETA_DELIVER_SYNC_SCREENSHOTS' environment variable as well
    - submitForReview: Submit the new version for Review after uploading everything
    - verifyOnly: Verifies archive with App Store Connect without uploading
    - rejectIfPossible: Rejects the previously submitted build if it's in a state where it's possible
+   - versionCheckWaitRetryLimit: After submitting a new version, App Store Connect takes some time to recognize the new version and we must wait until it's available before attempting to upload metadata for it. There is a mechanism that will check if it's available and retry with an exponential backoff if it's not available yet. This option specifies how many times we should retry before giving up. Setting this to a value below 5 is not recommended and will likely cause failures. Increase this parameter when Apple servers seem to be degraded or slow
    - automaticRelease: Should the app be automatically released once it's approved? (Cannot be used together with `auto_release_date`)
    - autoReleaseDate: Date in milliseconds for automatically releasing on pending approval (Cannot be used together with `automatic_release`)
    - phasedRelease: Enable the phased release feature of iTC
@@ -12571,10 +12598,12 @@ public func uploadToAppStore(apiKeyPath: OptionalConfigValue<String?> = .fastlan
                              skipAppVersionUpdate: OptionalConfigValue<Bool> = .fastlaneDefault(false),
                              force: OptionalConfigValue<Bool> = .fastlaneDefault(false),
                              overwriteScreenshots: OptionalConfigValue<Bool> = .fastlaneDefault(false),
+                             screenshotProcessingTimeout: Int = 3600,
                              syncScreenshots: OptionalConfigValue<Bool> = .fastlaneDefault(false),
                              submitForReview: OptionalConfigValue<Bool> = .fastlaneDefault(false),
                              verifyOnly: OptionalConfigValue<Bool> = .fastlaneDefault(false),
                              rejectIfPossible: OptionalConfigValue<Bool> = .fastlaneDefault(false),
+                             versionCheckWaitRetryLimit: Int = 7,
                              automaticRelease: OptionalConfigValue<Bool?> = .fastlaneDefault(nil),
                              autoReleaseDate: OptionalConfigValue<Int?> = .fastlaneDefault(nil),
                              phasedRelease: OptionalConfigValue<Bool> = .fastlaneDefault(false),
@@ -12636,10 +12665,12 @@ public func uploadToAppStore(apiKeyPath: OptionalConfigValue<String?> = .fastlan
     let skipAppVersionUpdateArg = skipAppVersionUpdate.asRubyArgument(name: "skip_app_version_update", type: nil)
     let forceArg = force.asRubyArgument(name: "force", type: nil)
     let overwriteScreenshotsArg = overwriteScreenshots.asRubyArgument(name: "overwrite_screenshots", type: nil)
+    let screenshotProcessingTimeoutArg = RubyCommand.Argument(name: "screenshot_processing_timeout", value: screenshotProcessingTimeout, type: nil)
     let syncScreenshotsArg = syncScreenshots.asRubyArgument(name: "sync_screenshots", type: nil)
     let submitForReviewArg = submitForReview.asRubyArgument(name: "submit_for_review", type: nil)
     let verifyOnlyArg = verifyOnly.asRubyArgument(name: "verify_only", type: nil)
     let rejectIfPossibleArg = rejectIfPossible.asRubyArgument(name: "reject_if_possible", type: nil)
+    let versionCheckWaitRetryLimitArg = RubyCommand.Argument(name: "version_check_wait_retry_limit", value: versionCheckWaitRetryLimit, type: nil)
     let automaticReleaseArg = automaticRelease.asRubyArgument(name: "automatic_release", type: nil)
     let autoReleaseDateArg = autoReleaseDate.asRubyArgument(name: "auto_release_date", type: nil)
     let phasedReleaseArg = phasedRelease.asRubyArgument(name: "phased_release", type: nil)
@@ -12700,10 +12731,12 @@ public func uploadToAppStore(apiKeyPath: OptionalConfigValue<String?> = .fastlan
                                           skipAppVersionUpdateArg,
                                           forceArg,
                                           overwriteScreenshotsArg,
+                                          screenshotProcessingTimeoutArg,
                                           syncScreenshotsArg,
                                           submitForReviewArg,
                                           verifyOnlyArg,
                                           rejectIfPossibleArg,
+                                          versionCheckWaitRetryLimitArg,
                                           automaticReleaseArg,
                                           autoReleaseDateArg,
                                           phasedReleaseArg,
@@ -13561,7 +13594,7 @@ public func xcov(workspace: OptionalConfigValue<String?> = .fastlaneDefault(nil)
                  coverallsServiceJobId: OptionalConfigValue<String?> = .fastlaneDefault(nil),
                  coverallsRepoToken: OptionalConfigValue<String?> = .fastlaneDefault(nil),
                  xcconfig: OptionalConfigValue<String?> = .fastlaneDefault(nil),
-                 ideFoundationPath: String = "/Applications/Xcode-15.1.0.app/Contents/Developer/../Frameworks/IDEFoundation.framework/Versions/A/IDEFoundation",
+                 ideFoundationPath: String = "/Applications/Xcode-15.3.0.app/Contents/Developer/../Frameworks/IDEFoundation.framework/Versions/A/IDEFoundation",
                  legacySupport: OptionalConfigValue<Bool> = .fastlaneDefault(false))
 {
     let workspaceArg = workspace.asRubyArgument(name: "workspace", type: nil)
@@ -13764,4 +13797,4 @@ public let snapshotfile: Snapshotfile = .init()
 
 // Please don't remove the lines below
 // They are used to detect outdated files
-// FastlaneRunnerAPIVersion [0.9.176]
+// FastlaneRunnerAPIVersion [0.9.177]
