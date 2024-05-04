@@ -1,0 +1,5 @@
+{
+    "typescript.disableAutomaticTypeAcquisition": false,
+    "redhat.telemetry.enabled": true,
+    "workbench.experimental.cloudChanges.autoStore": "onShutdown"
+}
