@@ -86,6 +86,28 @@ describe Spaceship::ConnectAPI::App do
       expect(model.bundle_id).to eq("com.joshholtz.FastlaneTest")
     end
 
+    it('fetches live app info') do
+      ConnectAPIStubbing::Tunes.stub_get_app_infos
+      app = Spaceship::ConnectAPI::App.new("123456789", [])
+
+      info = app.fetch_live_app_info(includes: nil)
+      expect(info.id).to eq("1111-11111")
+      expect(info.app_store_age_rating).to eq("FOUR_PLUS")
+      expect(info.app_store_state).to eq("READY_FOR_SALE")
+      expect(info.state).to eq("READY_FOR_DISTRIBUTION")
+    end
+
+    it('fetches edit app info') do
+      ConnectAPIStubbing::Tunes.stub_get_app_infos
+      app = Spaceship::ConnectAPI::App.new("123456789", [])
+
+      info = app.fetch_edit_app_info(includes: nil)
+      expect(info.id).to eq("1111-2222")
+      expect(info.app_store_age_rating).to eq("FOUR_PLUS")
+      expect(info.app_store_state).to eq("PREPARE_FOR_SUBMISSION")
+      expect(info.state).to eq("PREPARE_FOR_SUBMISSION")
+    end
+
     it 'creates beta group' do
       app = Spaceship::ConnectAPI::App.find("com.joshholtz.FastlaneTest")
 

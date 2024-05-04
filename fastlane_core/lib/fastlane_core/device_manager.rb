@@ -13,7 +13,7 @@ module FastlaneCore
 
       def runtime_build_os_versions
         @runtime_build_os_versions ||= begin
-          output, status = Open3.capture2('xcrun simctl list runtimes -j')
+          output, status = Open3.capture2('xcrun simctl list -j runtimes')
           raise status unless status.success?
           json = JSON.parse(output)
           json['runtimes'].map { |h| [h['buildversion'], h['version']] }.to_h
