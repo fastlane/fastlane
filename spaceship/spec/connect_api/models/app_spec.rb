@@ -176,7 +176,7 @@ describe Spaceship::ConnectAPI::App do
     it('gets app availabilities when app is removed from sale') do
       ConnectAPIStubbing::Tunes.stub_get_app_availabilities_removed_from_sale
       app = Spaceship::ConnectAPI::App.new("123456789", [])
-      
+
       availabilities = app.get_app_availabilities
 
       expect(availabilities.availableInNewTerritories).to be(false)
