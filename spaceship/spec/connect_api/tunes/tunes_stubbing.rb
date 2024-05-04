@@ -37,6 +37,7 @@ class ConnectAPIStubbing
       def stub_get_app_store_version_not_ready_for_distribution
         stub_request(:get, "https://appstoreconnect.apple.com/iris/v1/apps/123456789/appStoreVersions?filter%5BappVersionState%5D=READY_FOR_DISTRIBUTION&filter%5Bplatform%5D=IOS").
           to_return(status: 200, body: read_fixture_file('app_store_versions_not_ready.json'), headers: { 'Content-Type' => 'application/json' })
+      end
 
       def stub_get_app_infos
         stub_request(:get, "https://appstoreconnect.apple.com/iris/v1/apps/123456789/appInfos").
