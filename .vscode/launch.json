@@ -1,0 +1,122 @@
+{
+    // Use IntelliSense to learn about possible attributes.
+    // Hover to view descriptions of existing attributes.
+    // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "type": "pli",
+            "request": "launch",
+            "name": "PL/I: Wait for attachment",
+            "waitForAttachment": {
+                "id": "<unique-id>"
+            }
+        },
+        {
+            "type": "pli",
+            "request": "launch",
+            "name": "PL/I",
+            "program": "${workspaceFolder}/<insert-program-name-here>",
+            "cwd": "${workspaceFolder}",
+            "stopOnEntry": true
+        },
+        {
+            "type": "cobol",
+            "request": "launch",
+            "name": "COBOL (native): Wait for attachment",
+            "waitForAttachment": {
+                "any": {}
+            }
+        },
+        {
+            "type": "cobol",
+            "request": "launch",
+            "name": "COBOL (native): Remote-SSH",
+            "program": "<insert-program-name-here>",
+            "env": {
+                "TERM": "xterm",
+                "DISPLAY": "<hostname-or-ip:D.S>"
+            },
+            "stopOnEntry": true
+        },
+        {
+            "type": "cobol",
+            "request": "launch",
+            "name": "COBOL (native): 64-bit",
+            "program": "${workspaceFolder}/<insert-program-name-here>",
+            "cwd": "${workspaceFolder}",
+            "is64Bit": true,
+            "stopOnEntry": true
+        },
+        {
+            "name": "BrightScript Debug: Launch",
+            "type": "brightscript",
+            "request": "launch",
+            "host": "${promptForHost}",
+            "password": "${promptForPassword}",
+            "rootDir": "${workspaceFolder}"
+        },
+        {
+            "name": "BrightScript Debug: Launch",
+            "type": "brightscript",
+            "request": "launch",
+            "host": "${promptForHost}",
+            "password": "${promptForPassword}",
+            "rootDir": "${workspaceFolder}"
+        },
+        {
+            "type": "aws-sam",
+            "request": "direct-invoke",
+            "name": "Invoke Lambda",
+            "invokeTarget": {
+                "target": "code",
+                "lambdaHandler": "Function Handler",
+                "projectRoot": "${workspaceFolder}"
+            },
+            "lambda": {
+                "runtime": "Lambda Runtime",
+                "payload": {
+                    "json": {}
+                }
+            }
+        },
+        {
+            "name": "Embedded Debug",
+            "type": "embedded-debug",
+            "request": "launch",
+            "serialNumber": "<serial number of your device>",
+            "program": "${command:embedded-debug.getApplicationFile}",
+            "cmsisPack": "<path or URL of CMSIS Pack for your device>"
+        },
+        {
+            "type": "aws-sam",
+            "request": "direct-invoke",
+            "name": "Invoke Lambda with API Gateway",
+            "invokeTarget": {
+                "target": "api",
+                "templatePath": "Template Location",
+                "logicalId": "Function Logical ID"
+            },
+            "api": {
+                "path": "Path",
+                "httpMethod": "Method",
+                "payload": {
+                    "json": {}
+                }
+            }
+        },
+        {
+            "type": "pli",
+            "request": "attach",
+            "name": "PL/I: Attach to process",
+            "processId": "${command:pickProcess}"
+        },
+        {
+            "type": "mock",
+            "request": "launch",
+            "name": "Ask for file name",
+            "program": "${workspaceFolder}/${command:AskForProgramName}",
+            "stopOnEntry": true
+        }
+    ]
+}
