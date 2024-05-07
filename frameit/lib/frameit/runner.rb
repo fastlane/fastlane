@@ -16,9 +16,15 @@ module Frameit
 
     def run(path, color = nil, platform = nil)
       unless color
+        color = Frameit::Color::BLACK if Frameit.config[:black]
         color = Frameit::Color::SILVER if Frameit.config[:white] || Frameit.config[:silver]
         color = Frameit::Color::GOLD if Frameit.config[:gold]
         color = Frameit::Color::ROSE_GOLD if Frameit.config[:rose_gold]
+        color = Frameit::Color::MIDNIGHT if Frameit.config[:midnight]
+        color = Frameit::Color::STARLIGHT if Frameit.config[:starlight]
+        color = Frameit::Color::PURPLE if Frameit.config[:purple]
+        color = Frameit::Color::BLUE if Frameit.config[:blue]
+        color = Frameit::Color::RED if Frameit.config[:red]
       end
 
       screenshots = Dir.glob("#{path}/**/*.{png,PNG}").uniq # uniq because thanks to {png,PNG} there are duplicates
