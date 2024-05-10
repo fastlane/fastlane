@@ -386,13 +386,18 @@ module FastlaneCore
   # Generates commands and executes the iTMSTransporter through the shell script it provides by the same name
   class ShellScriptTransporterExecutor < TransporterExecutor
     def build_upload_command(username, password, source = "/tmp", provider_short_name = "", jwt = nil, platform = nil, api_key = nil)
-      use_jwt = !jwt.to_s.empty?
       [
         '"' + Helper.transporter_path + '"',
         "-m upload",
-        ("-u #{username.shellescape}" unless use_jwt),
-        ("-p #{shell_escaped_password(password)}" unless use_jwt),
-        ("-jwt #{jwt}" if use_jwt),
+        (if username && password
+           "-u #{username.shellescape} -p #{shell_escaped_password(password)}"
+         else
+           if api_key
+             "-apiIssuer #{api_key[:issuer_id]} -apiKey #{api_key[:key_id]}"
+           else
+             "-jwt #{jwt}"
+           end
+         end),
         file_upload_option(source),
         additional_upload_parameters, # that's here, because the user might overwrite the -t option
         "-k 100000",
