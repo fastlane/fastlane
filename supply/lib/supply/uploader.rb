@@ -187,7 +187,7 @@ module Supply
         end
 
         releases.first.name = Supply.config[:version_name]
-        releases.first.version_codes = ["#{Supply.config[:version_code]}"]
+        releases.first.version_codes = [Supply.config[:version_code].to_s]
       end
 
       if Supply.config[:version_code].to_s != ""
