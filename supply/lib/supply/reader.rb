@@ -37,8 +37,13 @@ module Supply
 
       client.begin_edit(package_name: Supply.config[:package_name])
       releases = client.track_releases(track)
-      rollout_percentages = releases.map { |release| [release.name, release.user_fraction] }.to_h
-
+      rollout_percentages = releases.map do |release|
+        {
+          name: release.name,
+          version_codes: release.version_codes.join(', '),
+          user_fraction: release.user_fraction
+        }
+      end
       client.abort_current_edit
 
       if rollout_percentages.empty?

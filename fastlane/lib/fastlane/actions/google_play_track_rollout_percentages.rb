@@ -20,7 +20,7 @@ module Fastlane
 
         Supply.config = params
 
-        rollout_percentages = Supply::Reader.new.track_rollout_percentages || {}
+        rollout_percentages = Supply::Reader.new.track_rollout_percentages || []
         rollout_percentages
       end
 
