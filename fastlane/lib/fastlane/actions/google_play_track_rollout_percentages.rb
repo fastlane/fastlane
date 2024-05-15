@@ -18,14 +18,9 @@ module Fastlane
         require 'supply/options'
         require 'supply/reader'
 
-        # Configure Supply with parameters
         Supply.config = params
 
-        # Retrieve rollout percentages using the new method in the Reader class
-        rollout_percentages = Supply::Reader.new.track_rollout_percentages
-        unless rollout_percentages.empty?
-          UI.success("Successfully retrieved rollout percentages for track: #{params[:track]}")
-        end
+        rollout_percentages = Supply::Reader.new.track_rollout_percentages || {}
         rollout_percentages
       end
 
@@ -38,21 +33,19 @@ module Fastlane
       end
 
       def self.details
-        "Use this action to fetch the rollout percentages of all active releases in a specified Google Play track."
+        "More information: [https://docs.fastlane.tools/actions/supply/](https://docs.fastlane.tools/actions/supply/)"
       end
 
       def self.available_options
         require 'supply'
         require 'supply/options'
 
-        # Select only the options needed for this action from Supply options
         Supply::Options.available_options.select do |option|
           OPTIONS.include?(option.key)
         end
       end
 
       def self.output
-        # Define the kind of data that this action returns
         [
           ['GOOGLE_PLAY_TRACK_ROLLOUT_PERCENTAGES', 'A hash containing the rollout percentages of releases']
         ]
@@ -63,11 +56,11 @@ module Fastlane
       end
 
       def self.authors
-        ["your_username"] # Replace with your Fastlane portal username or handle
+        ["brainbicycle"]
       end
 
       def self.is_supported?(platform)
-        platform == :android # Ensure this runs only for Android platform
+        platform == :android
       end
 
       def self.example_code
