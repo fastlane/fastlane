@@ -354,10 +354,10 @@ module Deliver
         end
       end
 
-      set_review_information(version, options)
-      set_app_clip_review_information(version, options)
-      set_review_attachment_file(version, options)
-      set_app_rating(app_info, options)
+      review_information(version)
+      app_clip_review_information(version)
+      review_attachment_file(version)
+      app_rating(app_info)
     end
 
     # rubocop:enable Metrics/PerceivedComplexity
@@ -459,9 +459,8 @@ module Deliver
     end
 
     # Retries a block of code if the return value is nil, with an exponential backoff.
-    def retry_if_nil(message)
+    def retry_if_nil(message, wait_time: 10)
       tries = options[:version_check_wait_retry_limit]
-      wait_time = 10
       loop do
         tries -= 1
 
@@ -707,7 +706,7 @@ module Deliver
       end
     end
 
-    def set_app_clip_review_information(version, options)
+    def app_clip_review_information(version)
       info = options[:app_clip_review_information]
       return if info.nil? || info.empty?
 
@@ -749,7 +748,7 @@ module Deliver
       end
     end
 
-    def set_review_attachment_file(version, options)
+    def review_attachment_file(version)
       app_store_review_detail = version.fetch_app_store_review_detail
       app_store_review_attachments = app_store_review_detail.app_store_review_attachments || []
 
