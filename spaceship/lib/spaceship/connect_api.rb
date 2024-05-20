@@ -83,6 +83,8 @@ require 'spaceship/connect_api/models/actor'
 
 module Spaceship
   class ConnectAPI
+    MAX_OBJECTS_PER_PAGE_LIMIT = 200
+
     # Defined in the App Store Connect API docs:
     # https://developer.apple.com/documentation/appstoreconnectapi/platform
     #
@@ -91,9 +93,10 @@ module Spaceship
       IOS = "IOS"
       MAC_OS = "MAC_OS"
       TV_OS = "TV_OS"
+      VISION_OS = "VISION_OS"
       WATCH_OS = "WATCH_OS"
 
-      ALL = [IOS, MAC_OS, TV_OS, WATCH_OS]
+      ALL = [IOS, MAC_OS, TV_OS, VISION_OS, WATCH_OS]
 
       def self.map(platform)
         return platform if ALL.include?(platform)
@@ -106,6 +109,8 @@ module Spaceship
           return Spaceship::ConnectAPI::Platform::MAC_OS
         when :ios
           return Spaceship::ConnectAPI::Platform::IOS
+        when :xros, :visionos
+          return Spaceship::ConnectAPI::Platform::VISION_OS
         else
           raise "Cannot find a matching platform for '#{platform}' - valid values are #{ALL.join(', ')}"
         end
@@ -128,7 +133,7 @@ module Spaceship
         case platform.to_sym
         when :osx, :macos, :mac
           return Spaceship::ConnectAPI::Platform::MAC_OS
-        when :ios
+        when :ios, :xros, :visionos
           return Spaceship::ConnectAPI::Platform::IOS
         else
           raise "Cannot find a matching platform for '#{platform}' - valid values are #{ALL.join(', ')}"

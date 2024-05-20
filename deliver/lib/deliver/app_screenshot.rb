@@ -69,6 +69,8 @@ module Deliver
       IOS_APPLE_WATCH_SERIES4 = "iOS-Apple-Watch-Series4"
       # Apple Watch Series 7
       IOS_APPLE_WATCH_SERIES7 = "iOS-Apple-Watch-Series7"
+      # Apple Watch Ultra
+      IOS_APPLE_WATCH_ULTRA = "iOS-Apple-Watch-Ultra"
 
       # Apple TV
       APPLE_TV = "Apple-TV"
@@ -128,6 +130,7 @@ module Deliver
         ScreenSize::IOS_APPLE_WATCH => Spaceship::ConnectAPI::AppScreenshotSet::DisplayType::APP_WATCH_SERIES_3,
         ScreenSize::IOS_APPLE_WATCH_SERIES4 => Spaceship::ConnectAPI::AppScreenshotSet::DisplayType::APP_WATCH_SERIES_4,
         ScreenSize::IOS_APPLE_WATCH_SERIES7 => Spaceship::ConnectAPI::AppScreenshotSet::DisplayType::APP_WATCH_SERIES_7,
+        ScreenSize::IOS_APPLE_WATCH_ULTRA => Spaceship::ConnectAPI::AppScreenshotSet::DisplayType::APP_WATCH_ULTRA,
         ScreenSize::APPLE_TV => Spaceship::ConnectAPI::AppScreenshotSet::DisplayType::APP_APPLE_TV
       }
       return matching[self.screen_size]
@@ -165,6 +168,7 @@ module Deliver
         ScreenSize::IOS_APPLE_WATCH => "Watch",
         ScreenSize::IOS_APPLE_WATCH_SERIES4 => "Watch Series4",
         ScreenSize::IOS_APPLE_WATCH_SERIES7 => "Watch Series7",
+        ScreenSize::IOS_APPLE_WATCH_ULTRA => "Watch Ultra",
         ScreenSize::APPLE_TV => "Apple TV"
       }
       return matching[self.screen_size]
@@ -197,7 +201,7 @@ module Deliver
 
     def self.device_messages
       # This list does not include iPad Pro 12.9-inch (3rd generation)
-      # because it has same resoluation as IOS_IPAD_PRO and will clobber
+      # because it has same resolution as IOS_IPAD_PRO and will clobber
       return {
         ScreenSize::IOS_67_MESSAGES => [
           [1290, 2796],
@@ -261,7 +265,7 @@ module Deliver
     # reference: https://help.apple.com/app-store-connect/#/devd274dd925
     def self.devices
       # This list does not include iPad Pro 12.9-inch (3rd generation)
-      # because it has same resoluation as IOS_IPAD_PRO and will clobber
+      # because it has same resolution as IOS_IPAD_PRO and will clobber
       return {
         ScreenSize::IOS_67 => [
           [1290, 2796],
@@ -339,6 +343,9 @@ module Deliver
         ],
         ScreenSize::IOS_APPLE_WATCH_SERIES7 => [
           [396, 484]
+        ],
+        ScreenSize::IOS_APPLE_WATCH_ULTRA => [
+          [410, 502]
         ],
         ScreenSize::APPLE_TV => [
           [1920, 1080],

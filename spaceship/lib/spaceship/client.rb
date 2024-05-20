@@ -429,7 +429,7 @@ module Spaceship
           # which is common, as the session automatically invalidates after x hours (we don't know x)
           # In this case we don't actually care about the exact exception, and why it was failing
           # because either way, we'll have to do a fresh login, where we do the actual error handling
-          puts("Available session is not valid any more. Continuing with normal login.")
+          puts("Available session is not valid anymore. Continuing with normal login.")
         end
       end
       #

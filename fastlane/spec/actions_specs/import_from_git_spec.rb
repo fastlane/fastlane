@@ -199,7 +199,7 @@ describe Fastlane do
 
         # Actually, `git checkout` makes sure of this, but I think it's ok to
         # keep this test, in case we change the implementation.
-        it "works with inexistent paths" do
+        it "works with nonexistent paths" do
           expect(UI).to receive(:important).with('Works since v1')
 
           expect do

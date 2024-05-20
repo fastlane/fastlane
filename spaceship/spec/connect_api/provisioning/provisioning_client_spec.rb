@@ -47,7 +47,7 @@ describe Spaceship::ConnectAPI::Provisioning::Client do
 
     describe "bundleIds" do
       context 'get_bundle_ids' do
-        let(:path) { "bundleIds" }
+        let(:path) { "v1/bundleIds" }
 
         it 'succeeds' do
           params = {}
@@ -103,7 +103,7 @@ settings: settings = [{ key: Spaceship::ConnectAPI::BundleIdCapability::Settings
 
     describe "certificates" do
       context 'get_certificates' do
-        let(:path) { "certificates" }
+        let(:path) { "v1/certificates" }
 
         it 'succeeds' do
           params = {}
@@ -114,7 +114,7 @@ settings: settings = [{ key: Spaceship::ConnectAPI::BundleIdCapability::Settings
       end
 
       context 'get_certificates_for_profile' do
-        let(:path) { "profiles/123456789/certificates" }
+        let(:path) { "v1/profiles/123456789/certificates" }
 
         it 'succeeds' do
           params = {}
@@ -127,7 +127,7 @@ settings: settings = [{ key: Spaceship::ConnectAPI::BundleIdCapability::Settings
 
     describe "devices" do
       context 'get_devices' do
-        let(:path) { "devices" }
+        let(:path) { "v1/devices" }
 
         it 'succeeds' do
           params = {}
@@ -140,7 +140,7 @@ settings: settings = [{ key: Spaceship::ConnectAPI::BundleIdCapability::Settings
 
     describe "profiles" do
       context 'get_profiles' do
-        let(:path) { "profiles" }
+        let(:path) { "v1/profiles" }
 
         it 'succeeds' do
           params = {}
