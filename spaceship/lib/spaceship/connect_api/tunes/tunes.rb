@@ -793,7 +793,7 @@ module Spaceship
             }
           }
 
-          tunes_request_client.post("appClipAppStoreReviewDetails", body)
+          tunes_request_client.post("#{Version::V1}/appClipAppStoreReviewDetails", body)
         end
 
         def patch_app_clip_app_store_review_detail(app_clip_app_store_review_detail_id: nil, attributes: {})
@@ -805,7 +805,7 @@ module Spaceship
             }
           }
 
-          tunes_request_client.patch("appClipAppStoreReviewDetails/#{app_clip_app_store_review_detail_id}", body)
+          tunes_request_client.patch("#{Version::V1}/appClipAppStoreReviewDetails/#{app_clip_app_store_review_detail_id}", body)
         end
 
         #
@@ -1318,7 +1318,7 @@ module Spaceship
 
         def get_app_clips(app_id:, filter: {}, includes: nil, limit: nil, sort: nil)
           params = tunes_request_client.build_params(filter: filter, includes: includes, limit: limit, sort: sort)
-          tunes_request_client.get("apps/#{app_id}/appClips", params)
+          tunes_request_client.get("#{Version::V1}/apps/#{app_id}/appClips", params)
         end
 
         #
@@ -1327,12 +1327,12 @@ module Spaceship
 
         def get_app_clip_default_experience(app_clip_default_experience_id:, filter: {}, includes: nil, limit: nil, sort: nil)
           params = tunes_request_client.build_params(filter: filter, includes: includes, limit: limit, sort: sort)
-          tunes_request_client.get("appClipDefaultExperiences/#{app_clip_default_experience_id}", params)
+          tunes_request_client.get("#{Version::V1}/appClipDefaultExperiences/#{app_clip_default_experience_id}", params)
         end
 
         def get_app_clip_default_experience_localizations(app_clip_default_experience_id:, filter: {}, includes: nil, limit: nil, sort: nil)
           params = tunes_request_client.build_params(filter: filter, includes: includes, limit: limit, sort: sort)
-          tunes_request_client.get("appClipDefaultExperiences/#{app_clip_default_experience_id}/appClipDefaultExperienceLocalizations", params)
+          tunes_request_client.get("#{Version::V1}/appClipDefaultExperiences/#{app_clip_default_experience_id}/appClipDefaultExperienceLocalizations", params)
         end
 
         # https://developer.apple.com/documentation/appstoreconnectapi/create_a_default_app_clip_experience
@@ -1368,7 +1368,7 @@ module Spaceship
             }
           end
 
-          tunes_request_client.post("appClipDefaultExperiences", body)
+          tunes_request_client.post("#{Version::V1}/appClipDefaultExperiences", body)
         end
 
         # https://developer.apple.com/documentation/appstoreconnectapi/modify_a_default_app_clip_experience
@@ -1381,7 +1381,7 @@ module Spaceship
             }
           }
 
-          tunes_request_client.patch("appClipDefaultExperiences/#{default_experience_id}", body)
+          tunes_request_client.patch("#{Version::V1}/appClipDefaultExperiences/#{default_experience_id}", body)
         end
 
         #
@@ -1390,7 +1390,7 @@ module Spaceship
 
         def get_app_clip_default_experience_header_image(app_clip_default_experience_localization_id:, filter: {}, includes: nil, limit: nil, sort: nil)
           params = tunes_request_client.build_params(filter: filter, includes: includes, limit: limit, sort: sort)
-          tunes_request_client.get("appClipDefaultExperienceLocalizations/#{app_clip_default_experience_localization_id}/relationships/appClipHeaderImage", params)
+          tunes_request_client.get("#{Version::V1}/appClipDefaultExperienceLocalizations/#{app_clip_default_experience_localization_id}/relationships/appClipHeaderImage", params)
         end
 
         # https://developer.apple.com/documentation/appstoreconnectapi/create_the_localized_metadata_for_a_default_app_clip_experience
@@ -1423,7 +1423,7 @@ module Spaceship
             }
           }
 
-          tunes_request_client.patch("appClipDefaultExperienceLocalizations/#{app_clip_default_experience_localization_id}", body)
+          tunes_request_client.patch("#{Version::V1}/appClipDefaultExperienceLocalizations/#{app_clip_default_experience_localization_id}", body)
         end
 
         #
@@ -1433,7 +1433,7 @@ module Spaceship
         # https://developer.apple.com/documentation/appstoreconnectapi/read_the_app_clip_card_image
         def get_app_clip_header_image(app_clip_header_image_id:, filter: {}, includes: nil, limit: nil, sort: nil)
           params = tunes_request_client.build_params(filter: filter, includes: includes, limit: limit, sort: sort)
-          tunes_request_client.get("appClipHeaderImages/#{app_clip_header_image_id}", params)
+          tunes_request_client.get("#{Version::V1}/appClipHeaderImages/#{app_clip_header_image_id}", params)
         end
 
         # https://developer.apple.com/documentation/appstoreconnectapi/create_an_app_clip_card_image_for_a_default_app_clip_experience
@@ -1453,7 +1453,7 @@ module Spaceship
             }
           }
 
-          tunes_request_client.post("appClipHeaderImages", body)
+          tunes_request_client.post("#{Version::V1}/appClipHeaderImages", body)
         end
 
         # https://developer.apple.com/documentation/appstoreconnectapi/modify_an_app_clip_card_image
@@ -1466,12 +1466,12 @@ module Spaceship
             }
           }
 
-          tunes_request_client.patch("appClipHeaderImages/#{app_clip_header_image_id}", body)
+          tunes_request_client.patch("#{Version::V1}/appClipHeaderImages/#{app_clip_header_image_id}", body)
         end
 
         # https://developer.apple.com/documentation/appstoreconnectapi/delete_a_default_app_clip_experience_image
         def delete_app_clip_header_image(app_clip_header_image_id: nil)
-          tunes_request_client.delete("appClipHeaderImages/#{app_clip_header_image_id}")
+          tunes_request_client.delete("#{Version::V1}/appClipHeaderImages/#{app_clip_header_image_id}")
         end
 
         #
@@ -1480,7 +1480,7 @@ module Spaceship
 
         def get_build_bundles_beta_app_clip_invocations(build_bundle_id:, filter: {}, includes: nil, limit: nil, sort: nil)
           params = tunes_request_client.build_params(filter: filter, includes: includes, limit: limit, sort: sort)
-          tunes_request_client.get("buildBundles/#{build_bundle_id}/betaAppClipInvocations", params)
+          tunes_request_client.get("#{Version::V1}/buildBundles/#{build_bundle_id}/betaAppClipInvocations", params)
         end
 
         # https://developer.apple.com/documentation/appstoreconnectapi/create_an_app_clip_invocation_for_testers_in_testflight
@@ -1523,11 +1523,11 @@ module Spaceship
             included: included
           }
 
-          tunes_request_client.post("betaAppClipInvocations", body)
+          tunes_request_client.post("#{Version::V1}/betaAppClipInvocations", body)
         end
 
         def delete_beta_app_clip_invocation(beta_app_clip_invocation_id:)
-          tunes_request_client.delete("betaAppClipInvocations/#{beta_app_clip_invocation_id}")
+          tunes_request_client.delete("#{Version::V1}/betaAppClipInvocations/#{beta_app_clip_invocation_id}")
         end
 
         #
@@ -1552,7 +1552,7 @@ module Spaceship
             }
           }
 
-          tunes_request_client.post("betaAppClipInvocationLocalizations", body)
+          tunes_request_client.post("#{Version::V1}/betaAppClipInvocationLocalizations", body)
         end
 
         # https://developer.apple.com/documentation/appstoreconnectapi/modify_localized_metadata_of_an_app_clip_invocation_for_testers
@@ -1565,7 +1565,7 @@ module Spaceship
             }
           }
 
-          tunes_request_client.patch("betaAppClipInvocationLocalizations/#{beta_app_clip_invocation_localization_id}", body)
+          tunes_request_client.patch("#{Version::V1}/betaAppClipInvocationLocalizations/#{beta_app_clip_invocation_localization_id}", body)
         end
       end
     end
