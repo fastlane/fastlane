@@ -600,6 +600,18 @@ module Spaceship
       parse_response(r, 'certRequest')
     end
 
+    def create_apple_pay_certificate!(csr, merchant_id = nil, mac = false)
+      ensure_csrf(Spaceship::Portal::Certificate)
+
+      r = request(:post, "account/#{platform_slug(mac)}/certificate/submitCertificateRequest.action", {
+        teamId: team_id,
+        type: Spaceship::Portal::Certificate::CERTIFICATE_TYPE_IDS.key(Spaceship::Portal::Certificate::ApplePay),
+        csrContent: csr,
+        specialIdentifierDisplayId: merchant_id
+      })
+      parse_response(r, 'certRequest')
+    end
+
     def download_certificate(certificate_id, type, mac: false)
       { type: type, certificate_id: certificate_id }.each { |k, v| raise "#{k} must not be nil" if v.nil? }
 
