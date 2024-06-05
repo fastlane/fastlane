@@ -9,6 +9,21 @@ open class Fastfile: LaneFile {
     override public init() {
         super.init()
     }
+
+    @LaneBuilder
+    func releaseLaneBuild() -> [LaneAction] {
+        "0.0.1"
+        BuildApp()
+        UploadToTestFlight()
+    }
+    
+    func releaseLane() {
+        let actions = releaseLaneBuild()
+        let runner = LaneRunner(actions: actions)
+        runner.run()
+    }
+    
+    /* More lanes here */
 }
 
 // Please don't remove the lines below
