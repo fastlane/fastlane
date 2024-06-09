@@ -1,0 +1,32 @@
+name: Bump
+
+on:
+  workflow_dispatch:
+
+jobs:
+  bump_version:
+    runs-on: macos-latest
+
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v3
+
+    - name: Set up Ruby
+      uses: ruby/setup-ruby@v1
+      with:
+        ruby-version: 3.2
+
+    - name: Install Fastlane
+      run: gem install fastlane
+
+    - name: Run Fastlane Bump
+      run: fastlane bump
+
+    # - name: Create Pull Request
+    #   uses: peter-evans/create-pull-request@v5
+    #   with:
+    #     commit-message: Bump version
+    #     branch: bump-version
+    #     title: Bump version
+    #     body: This PR bumps the version using Fastlane.
+    #     labels: version-bump
