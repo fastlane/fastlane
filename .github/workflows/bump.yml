@@ -2,6 +2,15 @@ name: Bump
 
 on:
   workflow_dispatch:
+    inputs:
+      logLevel:
+        description: 'Bump type'
+        required: true
+        type: choice
+        options:
+          - major
+          - minor
+          - patch
 
 jobs:
   bump_version:
