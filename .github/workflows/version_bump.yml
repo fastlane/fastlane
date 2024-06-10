@@ -30,4 +30,4 @@ jobs:
       run: bundle install
 
     - name: Run fastlane Bump
-      run: fastlane bump --bump_type=${{ github.event.inputs.bump_type }}
+      run: bundle exec fastlane bump --bump_type=${{ github.event.inputs.bump_type }}
