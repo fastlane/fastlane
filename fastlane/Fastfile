@@ -111,6 +111,7 @@ lane :bump do |options|
   paths_for_commit = []
 
   version_file_path = "./fastlane/lib/fastlane/version.rb"
+  last_version_file_path = File.absolute_path("../CHANGELOG.latest")
 
   # Verify everything is in a consistent state
   latest_version = current_version
@@ -119,7 +120,7 @@ lane :bump do |options|
 
   changelog_text = show_changelog
 
-  File.write("CHANGELOG.latest", changelog_text)
+  File.write(last_version_file_path, changelog_text)
 
   sh("pwd")
   sh("ls -al")
@@ -145,7 +146,7 @@ lane :bump do |options|
   paths_for_commit << "Gemfile.lock"
 
   # Add CHANGELOG.latest
-  paths_for_commit << "CHANGELOG.latest"
+  paths_for_commit << last_version_file_path
 
   # Add version file path to change set
   paths_for_commit << version_file_path
