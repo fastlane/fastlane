@@ -563,7 +563,7 @@ end
 
 desc "Ensure all the requirement environment variables are provided"
 desc "this way the deployment script will fail early (and often)"
-private_lane :verify_env_variables do
+private_lane :verify_env_variables do |options|
   ensure_env_vars(env_vars: ['GITHUB_USER_NAME', 'GITHUB_API_TOKEN'])
 
   unless options[:skip_ruby_gems]
