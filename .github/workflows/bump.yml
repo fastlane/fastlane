@@ -1,9 +1,10 @@
+---
 name: Bump
 
 on:
   workflow_dispatch:
     inputs:
-      logLevel:
+      bump_type:
         description: 'Bump type'
         required: true
         type: choice
