@@ -110,9 +110,6 @@ lane :bump do |options|
   UI.user_error!("Please provide a GitHub API token using `FL_GITHUB_RELEASE_API_TOKEN`") if github_api_token.to_s.length == 0
   paths_for_commit = []
 
-  version_file_path = "./fastlane/lib/fastlane/version.rb"
-  latest_changelog_file_path = "./CHANGELOG.latest"
-
   # Verify everything is in a consistent state
   latest_version = current_version
   local_version = version_get_podspec(path: version_file_path, require_variable_prefix: false)
@@ -120,7 +117,7 @@ lane :bump do |options|
 
   changelog_text = show_changelog
 
-  File.write(latest_changelog_file_path, changelog_text)
+  File.write("../CHANGELOG.latest", changelog_text)
 
   bump_type = options[:bump_type]
   is_automated_bump = !bump_type.nil?
@@ -145,7 +142,7 @@ lane :bump do |options|
   paths_for_commit << latest_changelog_file_path
 
   # Add version file path to change set
-  paths_for_commit << version_file_path
+  paths_for_commit << "CHANGELOG.latest"
 
   sh("bundle exec rake generate_team_table")
   paths_for_commit << "README.md"
