@@ -119,7 +119,11 @@ lane :bump do |options|
 
   changelog_text = show_changelog
 
-  File.write("../CHANGELOG.latest", changelog_text)
+  File.write("CHANGELOG.latest", changelog_text)
+
+  sh("pwd")
+  sh("ls -al")
+  sh("cd .. && ls -al")
 
   bump_type = options[:bump_type]
   is_automated_bump = !bump_type.nil?
