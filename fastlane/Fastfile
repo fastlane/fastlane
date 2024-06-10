@@ -141,10 +141,10 @@ lane :bump do |options|
   paths_for_commit << "Gemfile.lock"
 
   # Add CHANGELOG.latest
-  paths_for_commit << latest_changelog_file_path
+  paths_for_commit << "CHANGELOG.latest"
 
   # Add version file path to change set
-  paths_for_commit << "CHANGELOG.latest"
+  paths_for_commit << version_file_path
 
   sh("bundle exec rake generate_team_table")
   paths_for_commit << "README.md"
