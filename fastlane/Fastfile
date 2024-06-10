@@ -171,8 +171,7 @@ lane :bump do |options|
     api_token: github_api_token,
     repo: slug,
     title: commit_message,
-    body: pr_body.join("\n\n"),
-    error_handlers: 
+    body: pr_body.join("\n\n")
   )
 
   if ENV['SLACK_URL']
