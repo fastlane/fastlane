@@ -13,6 +13,10 @@ on:
           - minor
           - patch
 
+permissions:
+  contents: write
+  pull-requests: write
+
 jobs:
   bump_version:
     runs-on: macos-latest
