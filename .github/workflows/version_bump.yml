@@ -31,9 +31,8 @@ jobs:
 
     - name: Run fastlane Bump
       run: |
-        git config --global user.email "${GITHUB_ACTOR_ID}+${GITHUB_ACTOR}@users.noreply.github.com"
-        git config --global user.name "$(gh api /users/${GITHUB_ACTOR} | jq .name -r)"
-        git config -l
+        git config --global user.email "41898282+github-actions[bot]@users.noreply.github.com"
+        git config --global user.name "github-actions[bot]"
         bundle exec fastlane bump bump_type:${{ github.event.inputs.bump_type }}
       env:
         GITHUB_USER_NAME: fastlane
