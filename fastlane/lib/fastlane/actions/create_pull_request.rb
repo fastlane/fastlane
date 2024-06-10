@@ -17,6 +17,8 @@ module Fastlane
         payload['body'] = params[:body] if params[:body]
         payload['draft'] = params[:draft] if params[:draft]
 
+        UI.message("Params: #{params}")
+
         GithubApiAction.run(
           server_url: params[:api_url],
           api_token: params[:api_token],
@@ -26,7 +28,7 @@ module Fastlane
           body: payload,
           error_handlers: {
             '*' => proc do |result|
-              UI.error("GitHub responded with #{result[:status]}: #{result[:body]}")
+              UI.error("GitHub responded with #{result[:status]}: #{result[:body]} with '#{result[:json]}'")
               return nil
             end
           }

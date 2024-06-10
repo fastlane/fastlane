@@ -33,7 +33,7 @@ jobs:
       run: |
         git config --global user.email "41898282+github-actions[bot]@users.noreply.github.com"
         git config --global user.name "github-actions[bot]"
-        bundle exec fastlane bump bump_type:${{ github.event.inputs.bump_type }} --verbose
+        bundle exec fastlane bump bump_type:${{ github.event.inputs.bump_type }}
       env:
         GITHUB_USER_NAME: fastlane
         GITHUB_API_TOKEN: ${{ secrets.GITHUB_TOKEN }}
