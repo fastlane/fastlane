@@ -111,7 +111,7 @@ lane :bump do |options|
   paths_for_commit = []
 
   version_file_path = "./fastlane/lib/fastlane/version.rb"
-  latest_changelog_file_path = "../CHANGELOG.latest"
+  latest_changelog_file_path = "./CHANGELOG.latest"
 
   # Verify everything is in a consistent state
   latest_version = current_version
