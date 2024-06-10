@@ -1,0 +1,33 @@
+---
+name: Version Bump
+
+on:
+  workflow_dispatch:
+    inputs:
+      bump_type:
+        description: 'Bump type'
+        required: true
+        type: choice
+        options:
+          - major
+          - minor
+          - patch
+
+jobs:
+  bump_version:
+    runs-on: macos-latest
+
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v3
+
+    - name: Set up Ruby
+      uses: ruby/setup-ruby@v1
+      with:
+        ruby-version: 3.2
+
+    - name: Install fastlane
+      run: bundle install
+
+    - name: Run fastlane Bump
+      run: fastlane bump --bump_type=${{ github.event.inputs.bump_type }}
