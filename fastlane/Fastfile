@@ -456,7 +456,7 @@ lane :update_docs do |options|
   debug = options[:debug]
   version = options[:version]
 
-  unless debug
+  unle,ss debug
     verify_env_variables
     ensure_actions_config_items_formatting
   end

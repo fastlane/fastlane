@@ -31,3 +31,7 @@ jobs:
 
     - name: Run fastlane Bump
       run: bundle exec fastlane bump bump_type:${{ github.event.inputs.bump_type }}
+      env:
+        GITHUB_USER_NAME: fastlane
+        GITHUB_API_TOKEN: ${{ secret.GITHUB_TOKEN }}
+        FL_GITHUB_RELEASE_API_TOKEN: ${{ secret.GITHUB_TOKEN }}
