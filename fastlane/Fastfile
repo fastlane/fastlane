@@ -140,6 +140,9 @@ lane :bump do |options|
   paths_for_commit += sh("cd .. && git status --porcelain fastlane/swift | sed s/^...//").each_line.to_a.map(&:strip)
   paths_for_commit << "Gemfile.lock"
 
+  # Add CHANGELOG.latest
+  paths_for_commit << "CHANGELOG.latest"
+
   # Add version file path to change set
   paths_for_commit << version_file_path
 
