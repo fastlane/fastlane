@@ -120,7 +120,7 @@ lane :bump do |options|
 
   changelog_text = show_changelog
 
-  File.write(changelog_text, latest_changelog_file_path)
+  File.write(latest_changelog_file_path, changelog_text)
 
   bump_type = options[:bump_type]
   is_automated_bump = !bump_type.nil?
