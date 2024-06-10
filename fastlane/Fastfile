@@ -119,8 +119,13 @@ lane :bump do |options|
 
   changelog_text = show_changelog
 
+  bump_type = options[:bump_type]
   bump_type ||= 'minor' if prompt(text: "New feature, method or API?", boolean: true)
   bump_type ||= 'patch'
+
+  # Save changelog to CHANGELOG.latest
+  changelog_path = File.expand_path('CHANGELOG.latest')
+  File.write(changelog_path, changelog)
 
   slug = "fastlane/fastlane"
   new_version = version_bump_podspec(path: version_file_path, bump_type: bump_type, require_variable_prefix: false)
