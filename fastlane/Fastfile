@@ -240,20 +240,24 @@ end
 desc "Does everything that's needed for a release"
 desc "This includes running tests and verifying the GitHub release"
 lane :release do
-  verify_env_variables
-  slack_train_start(distance: 2,
-                       train: "🚀",
-           reverse_direction: true,
-                        rail: "✨")
+  is_gh_action = true
 
-  update_fastlane
-  slack_train
+  verify_env_variables
+  unless is_gh_action
+    slack_train_start(distance: 2,
+                         train: "🚀",
+             reverse_direction: true,
+                          rail: "✨")
+  end
+
+  update_fastlane unless is_gh_action
+  slack_train unless is_gh_action
 
   # Git verification
   #
   ensure_git_status_clean
   ensure_git_branch(branch: 'master')
-  git_pull
+  git_pull unless is_gh_action
 
   validate_repo
 
@@ -268,74 +272,80 @@ lane :release do
 
   # Then push to git remote
   #
-  push_to_git_remote
+  # push_to_git_remote
+  # TODO: What does this do?
+
+  github_username = "joshdholtz"
+  repo_name = "#{github_username}/fastlane"
+  gem_version_path = File.absolute_path("../pkg/fastlane-#{version}.gem")
 
   # Preparing GitHub Release
   #
-  github_release = get_github_release(url: "fastlane/fastlane", version: version)
+  github_release = get_github_release(url: repo_name, version: version)
   if (github_release || {}).fetch('body', '').length == 0
-    show_changelog(old_version: old_version)
-
-    title = prompt(text: 'Title: ')
-    description = prompt(text: "Please enter a changelog (make sure to rephrase changes to make it easy to understand, and remove non-important changes that don't affect the end-user): ",
-                         multi_line_end_keyword: "END")
+    title = "Improvements"
+    description = File.read("../CHANGELOG.latest.md")
 
     github_release = set_github_release(
-      repository_name: "fastlane/fastlane",
+      repository_name: repo_name,
       name: [version, title].join(" "),
       tag_name: version,
       description: description,
-      is_draft: false
+      is_draft: false,
+      upload_assets: [gem_version_path]
     )
+    print github_release
+
+    sh("gem push --host https://rubygems.pkg.github.com/#{github_username} #{gem_version_path}")
 
     # Actual release of the gem
     # Using IO.popen because `gem push` will prompt for 2FA if enabled
     #
-    command = "gem push ../pkg/fastlane-#{version}.gem"
-    IO.popen(command) do |io|
-      io.each do |line|
-        puts(line)
-      end
-    end
+    # command = "gem push ../pkg/fastlane-#{version}.gem"
+    # IO.popen(command) do |io|
+    #   io.each do |line|
+    #     puts(line)
+    #   end
+    # end
 
-    release_url = github_release['html_url']
+    # release_url = github_release['html_url']
 
-    message = [title, description, release_url].join("\n\n")
-    add_fastlane_git_tag(tag: "fastlane/#{version}", message: message)
+    # message = [title, description, release_url].join("\n\n")
+    # add_fastlane_git_tag(tag: "fastlane/#{version}", message: message)
   end
 
   # After publishing
   #
-  if ENV['SLACK_URL']
-    release_notes = github_release['body']
-    # markup - turn github references into links
-    release_notes.gsub!(/\(#([0-9]+)\)/, '(<https://github.com/fastlane/fastlane/issues/\1|#\1>)')
-    slack_message = "Successfully released [fastlane #{version}](#{release_url}) :rocket:"
-    slack(
-      channel: "releases",
-      default_payloads: [],
-      message: slack_message,
-      payload: {
-        "New" => release_notes
-      }
-    )
-    slack(channel: "action", default_payloads: [], message: slack_message)
-  end
+  # if ENV['SLACK_URL']
+  #   release_notes = github_release['body']
+  #   # markup - turn github references into links
+  #   release_notes.gsub!(/\(#([0-9]+)\)/, '(<https://github.com/fastlane/fastlane/issues/\1|#\1>)')
+  #   slack_message = "Successfully released [fastlane #{version}](#{release_url}) :rocket:"
+  #   slack(
+  #     channel: "releases",
+  #     default_payloads: [],
+  #     message: slack_message,
+  #     payload: {
+  #       "New" => release_notes
+  #     }
+  #   )
+  #   slack(channel: "action", default_payloads: [], message: slack_message)
+  # end
 
-  clubmate
+  # clubmate
 
-  puts("You can now tweet:".green)
-  releases_url = "https://github.com/fastlane/fastlane/releases/tag/#{version}"
-  puts("[fastlane] #{github_release['name']} #{releases_url}")
+  # puts("You can now tweet:".green)
+  # releases_url = "https://github.com/fastlane/fastlane/releases/tag/#{version}"
+  # puts("[fastlane] #{github_release['name']} #{releases_url}")
 
-  send_mac_app_ci_reminder
+  # send_mac_app_ci_reminder
 
-  update_docs(version: version)
+  # update_docs(version: version)
 
-  release_brew
-  release_github
+  # release_brew
+  # release_github
 
-  slack_train
+  # slack_train
 end
 
 desc "Does everything that's needed for a release"
