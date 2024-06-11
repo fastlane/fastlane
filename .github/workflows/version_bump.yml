@@ -9,9 +9,9 @@ on:
         required: true
         type: choice
         options:
-          - major
-          - minor
           - patch
+          - minor
+          - major
 
 permissions:
   contents: write
@@ -33,7 +33,7 @@ jobs:
     - name: Install fastlane
       run: bundle install
 
-    - name: Run fastlane Bump
+    - name: Run fastlane bump
       run: |
         git config --global user.email "41898282+github-actions[bot]@users.noreply.github.com"
         git config --global user.name "github-actions[bot]"
