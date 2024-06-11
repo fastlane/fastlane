@@ -371,7 +371,9 @@ lane :release_tag do |options|
   # update_fastlane
   # slack_train
 
-  validate_repo
+  # Builds gem
+  # validate_repo
+  gem_version_path = File.absolute_path("../pkg/fastlane-#{version}.gem")
 
   # Verifying RubyGems version
   #
@@ -381,8 +383,6 @@ lane :release_tag do |options|
   if Gem::Version.new(version) <= Gem::Version.new(old_version)
     UI.user_error!("Version number #{version} was already deployed")
   end
-
-  sh ""
 
   # Preparing GitHub Release
   #
@@ -395,13 +395,16 @@ lane :release_tag do |options|
     UI.message("Description:")
     puts description
 
-    # github_release = set_github_release(
-    #   repository_name: "fastlane/fastlane",
-    #   name: [version, title].join(" "),
-    #   tag_name: version,
-    #   description: description,
-    #   is_draft: false
-    # )
+    github_release = set_github_release(
+      repository_name: "fastlane/fastlane",
+      name: [version, title].join(" "),
+      tag_name: version,
+      description: description,
+      is_draft: false,
+      upload_assets: [gem_version_path]
+    )
+
+    sh("gem push --key github --host https://rubygems.pkg.github.com/YOUR_GITHUB_USERNAME your_gem-0.1.0.gem")
 
     # Actual release of the gem
     # Using IO.popen because `gem push` will prompt for 2FA if enabled
