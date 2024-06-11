@@ -7,7 +7,6 @@ on:
 
 jobs:
   tag-version:
-    if: startsWith(github.event.head_commit.message, 'Merge pull request #') && contains(github.event.head_commit.message, 'version-bump-')
     runs-on: ubuntu-latest
 
     steps:
@@ -19,14 +18,27 @@ jobs:
         with:
           ruby-version: '2.7' # Specify your ruby version
 
+      - name: Check if version-bump merge
+        id: check_bump
+        run: |
+          if [[ "${{ github.event.head_commit.message }}" == *"Merge pull request"* ]] && [[ "${{ github.event.head_commit.message }}" == *"version-bump-"* ]]; then
+            echo "Version bump merge detected."
+            echo "::set-output name=should_tag::true"
+          else
+            echo "Not a version bump merge."
+            echo "::set-output name=should_tag::false"
+          fi
+
       - name: Read gem version
         id: read_version
+        if: steps.check_bump.outputs.should_tag == 'true'
         run: |
           gemspec_file=$(ls *.gemspec)
           version=$(grep -E "spec.version\s*=\s*['\"][0-9]+\.[0-9]+\.[0-9]+['\"]" $gemspec_file | grep -o -E "[0-9]+\.[0-9]+\.[0-9]+")
           echo "::set-output name=version::$version"
 
       - name: Create Tag
+        if: steps.check_bump.outputs.should_tag == 'true'
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
