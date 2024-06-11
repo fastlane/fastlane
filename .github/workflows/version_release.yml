@@ -19,8 +19,6 @@ jobs:
     steps:
     - name: Checkout repository
       uses: actions/checkout@v3
-      with:
-        ref: ${{ steps.get_tag.outputs.tag }}
 
     - name: Determine Tag
       id: get_tag
