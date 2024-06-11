@@ -370,7 +370,14 @@ private_lane :github_changelog do |options|
   body = JSON.parse(resp[:body])
   commits = body["commits"].reverse
 
+  sleep_time = ENV['FL_CHANGELOG_SLEEP'].to_i
+
   formatted = commits.map do |commit|
+    if sleep_time > 0
+      UI.message("Sleeping for #{sleep_time} second(s) to get changelog")
+      sleep(sleep_time)
+    end
+
     # Default to commit message info
     message = commit["commit"]["message"].lines.first.strip
     name = commit["commit"]["author"]["name"]
