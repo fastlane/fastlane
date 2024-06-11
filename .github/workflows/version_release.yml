@@ -37,7 +37,7 @@ jobs:
         ruby-version: '3.2'
 
     - name: Install fastlane
-    run: bundle install
+      run: bundle install
 
     - name: Run fastlane
       env:
