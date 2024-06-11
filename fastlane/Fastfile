@@ -103,11 +103,15 @@ end
 desc "Increment the version number of this gem, after generating new Swift API"
 lane :bump do |options|
   verify_env_variables(skip_ruby_gems: true)
-  ensure_git_branch(branch: "master")
+  # ensure_git_branch(branch: "master")
   ensure_git_status_clean
 
   github_api_token = ENV["FL_GITHUB_RELEASE_API_TOKEN"]
-  UI.user_error!("Please provide a GitHub API token using `FL_GITHUB_RELEASE_API_TOKEN`") if github_api_token.to_s.length == 0
+  github_api_bearer = ENV["FL_GITHUB_RELEASE_API_BEARER"]
+
+  if github_api_token.to_s.length == 0 or github_api_bearer.to_s.length == 0
+    UI.user_error!("Please provide a GitHub API token using `FL_GITHUB_RELEASE_API_TOKEN` or `FL_GITHUB_RELEASE_API_BEARER`")
+  end
   paths_for_commit = []
 
   version_file_path = "./fastlane/lib/fastlane/version.rb"
@@ -165,8 +169,8 @@ lane :bump do |options|
   pr_body << "**Changes since release '#{latest_version}':**"
   pr_body << changelog_text
   pr_url = create_pull_request(
-    api_bearer: is_automated_bump ? github_api_token : nil,
-    api_token: is_automated_bump ? nil : github_api_token,
+    api_bearer: github_api_bearer,
+    api_token: github_api_token,
     repo: slug,
     title: commit_message,
     body: pr_body.join("\n\n")

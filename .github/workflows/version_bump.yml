@@ -41,7 +41,7 @@ jobs:
       env:
         GITHUB_USER_NAME: fastlane
         GITHUB_API_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        FL_GITHUB_RELEASE_API_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        FL_GITHUB_RELEASE_API_BEARER: ${{ secrets.GITHUB_TOKEN }}
         FASTLANE_XCODEBUILD_SETTINGS_TIMEOUT: 180
         FASTLANE_XCODEBUILD_SETTINGS_RETRIES: 5
         
