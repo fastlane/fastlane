@@ -109,7 +109,7 @@ lane :bump do |options|
   github_api_token = ENV["FL_GITHUB_RELEASE_API_TOKEN"]
   github_api_bearer = ENV["FL_GITHUB_RELEASE_API_BEARER"]
 
-  if github_api_token.to_s.length == 0 and github_api_bearer.to_s.length == 0
+  if github_api_token.to_s.length == 0 && github_api_bearer.to_s.length == 0
     UI.user_error!("Please provide a GitHub API token using `FL_GITHUB_RELEASE_API_TOKEN` or `FL_GITHUB_RELEASE_API_BEARER`")
   end
   paths_for_commit = []
