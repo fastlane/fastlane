@@ -343,7 +343,7 @@ desc "This includes running tests and verifying the GitHub release"
 lane :release_tag do |options|
   # Git verification
   #
-  # ensure_git_status_clean
+  ensure_git_status_clean
   #ensure_git_branch(branch: 'master')
 
   # Git tag stuff
@@ -351,18 +351,18 @@ lane :release_tag do |options|
   UI.user_error!("Option tag is required") unless tag_name
 
   # TODO: Undo this before committing
-  # sh "git fetch --tags"
-  # sh "git checkout tags/#{tag_name}"
+  sh "git fetch --tags"
+  sh "git checkout tags/#{tag_name}"
 
-  # # Verify that the tag was successfully checked out
-  # current_tag = sh("git describe --tags --exact-match").strip
-  # if current_tag == tag_name
-  #   UI.message("Successfully checked out tag #{tag_name}")
-  # else
-  #   UI.user_error!("Failed to check out tag #{tag_name}")
-  # end
+  # Verify that the tag was successfully checked out
+  current_tag = sh("git describe --tags --exact-match").strip
+  if current_tag == tag_name
+    UI.message("Successfully checked out tag #{tag_name}")
+  else
+    UI.user_error!("Failed to check out tag #{tag_name}")
+  end
 
-  # verify_env_variables
+  verify_env_variables
   # slack_train_start(distance: 2,
   #                      train: "🚀",
   #          reverse_direction: true,
@@ -372,11 +372,9 @@ lane :release_tag do |options|
   # slack_train
 
   # Builds gem
-  # validate_repo
-  gem_version_path = File.absolute_path("../pkg/fastlane-#{version}.gem")
+  validate_repo
 
   # Verifying RubyGems version
-  #
   version = local_version
   old_version = current_version
   puts("Deploying #{version}")
@@ -384,19 +382,22 @@ lane :release_tag do |options|
     UI.user_error!("Version number #{version} was already deployed")
   end
 
+  github_username = "joshdholtz"
+  repo_name = "#{github_username}/fastlane"
+  gem_version_path = File.absolute_path("../pkg/fastlane-#{version}.gem")
+
   # Preparing GitHub Release
   #
-  github_release = get_github_release(url: "fastlane/fastlane", version: version)
+  github_release = get_github_release(url: repo_name, version: version)
   if (github_release || {}).fetch('body', '').length == 0
-    title = version
+    title = "Improvements"
     description = File.read("../CHANGELOG.latest.md")
 
-    UI.message("Title: #{title}")
     UI.message("Description:")
     puts description
 
     github_release = set_github_release(
-      repository_name: "fastlane/fastlane",
+      repository_name: repo_name,
       name: [version, title].join(" "),
       tag_name: version,
       description: description,
@@ -404,7 +405,9 @@ lane :release_tag do |options|
       upload_assets: [gem_version_path]
     )
 
-    sh("gem push --key github --host https://rubygems.pkg.github.com/YOUR_GITHUB_USERNAME your_gem-0.1.0.gem")
+    sh("gem push --host https://rubygems.pkg.github.com/#{github_username} #{gem_version_path}")
+
+    puts github_release
 
     # Actual release of the gem
     # Using IO.popen because `gem push` will prompt for 2FA if enabled

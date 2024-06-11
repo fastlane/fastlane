@@ -44,5 +44,8 @@ jobs:
       - name: Run fastlane
         env:
           GITHUB_TAG: ${{ steps.get_tag.outputs.tag }}
+          GITHUB_API_BEARER: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_USER_NAME: fastlane # Todo: This is needed for docs - remove somehow
+          GITHUB_API_TOKEN: ${{ secrets.GITHUB_TOKEN }} # Todo: This is needed for docs - remove somehow
         run: |
           bundle exec fastlane release_tag:${{ env.GITHUB_TAG }}
