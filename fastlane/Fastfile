@@ -242,7 +242,7 @@ desc "This includes running tests and verifying the GitHub release"
 lane :release do
   is_gh_action = true
 
-  verify_env_variables
+  verify_env_variables(skip_ruby_gems: true)
   unless is_gh_action
     slack_train_start(distance: 2,
                          train: "🚀",
