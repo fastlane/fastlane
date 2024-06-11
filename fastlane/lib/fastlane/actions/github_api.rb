@@ -18,12 +18,6 @@ module Fastlane
           error_handlers = params[:error_handlers] || {}
           secure = params[:secure]
 
-          puts http_method
-          puts url
-          puts headers
-          puts payload
-          puts secure
-
           response = call_endpoint(
             url,
             http_method,
