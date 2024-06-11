@@ -17,35 +17,35 @@ jobs:
     runs-on: macos-latest
 
     steps:
-      - name: Checkout repository
-        uses: actions/checkout@v3
-        with:
-          ref: ${{ steps.get_tag.outputs.tag }}
+    - name: Checkout repository
+      uses: actions/checkout@v3
+      with:
+        ref: ${{ steps.get_tag.outputs.tag }}
 
-      - name: Determine Tag
-        id: get_tag
-        run: |
-          if [ "${{ github.event_name }}" == "workflow_dispatch" ]; then
-            echo "##[set-output name=tag;]${{ github.event.inputs.tag }}"
-          else
-            TAG_NAME=${{ github.ref }}
-            TAG_NAME=${TAG_NAME/refs\/tags\//}
-            echo "##[set-output name=tag;]$TAG_NAME"
-          fi
+    - name: Determine Tag
+      id: get_tag
+      run: |
+        if [ "${{ github.event_name }}" == "workflow_dispatch" ]; then
+          echo "##[set-output name=tag;]${{ github.event.inputs.tag }}"
+        else
+          TAG_NAME=${{ github.ref }}
+          TAG_NAME=${TAG_NAME/refs\/tags\//}
+          echo "##[set-output name=tag;]$TAG_NAME"
+        fi
 
-      - name: Set up Ruby
-        uses: ruby/setup-ruby@v1
-        with:
-          ruby-version: '3.2'
+    - name: Set up Ruby
+      uses: ruby/setup-ruby@v1
+      with:
+        ruby-version: '3.2'
 
-      - name: Install fastlane
-      run: bundle install
+    - name: Install fastlane
+    run: bundle install
 
-      - name: Run fastlane
-        env:
-          GITHUB_TAG: ${{ steps.get_tag.outputs.tag }}
-          GITHUB_API_BEARER: ${{ secrets.GITHUB_TOKEN }}
-          GITHUB_USER_NAME: fastlane # Todo: This is needed for docs - remove somehow
-          GITHUB_API_TOKEN: ${{ secrets.GITHUB_TOKEN }} # Todo: This is needed for docs - remove somehow
-        run: |
-          bundle exec fastlane release_tag:${{ env.GITHUB_TAG }}
+    - name: Run fastlane
+      env:
+        GITHUB_TAG: ${{ steps.get_tag.outputs.tag }}
+        GITHUB_API_BEARER: ${{ secrets.GITHUB_TOKEN }}
+        GITHUB_USER_NAME: fastlane # Todo: This is needed for docs - remove somehow
+        GITHUB_API_TOKEN: ${{ secrets.GITHUB_TOKEN }} # Todo: This is needed for docs - remove somehow
+      run: |
+        bundle exec fastlane release_tag:${{ env.GITHUB_TAG }}
