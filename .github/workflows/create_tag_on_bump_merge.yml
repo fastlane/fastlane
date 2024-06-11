@@ -1,33 +1,17 @@
 name: Create Tag Version on Bump Merge
 
 on:
-  push:
-    branches:
-      - master
+  pull_request:
+    types: [closed]
 
 jobs:
-  tag-version:
+  version_bump:
+    if: github.event.pull_request.merged == true && startsWith(github.event.pull_request.head.ref, 'version-bump-2.221.0-')
     runs-on: ubuntu-latest
 
     steps:
       - name: Checkout code
         uses: actions/checkout@v2
-
-      - name: Set up Ruby
-        uses: actions/setup-ruby@v1
-        with:
-          ruby-version: '2.7' # Specify your ruby version
-
-      - name: Check if version-bump merge
-        id: check_bump
-        run: |
-          if [[ "${{ github.event.head_commit.message }}" == *"Merge pull request"* ]] && [[ "${{ github.event.head_commit.message }}" == *"version-bump-"* ]]; then
-            echo "Version bump merge detected."
-            echo "::set-output name=should_tag::true"
-          else
-            echo "Not a version bump merge."
-            echo "::set-output name=should_tag::false"
-          fi
 
       - name: Read gem version
         id: read_version
