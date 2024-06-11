@@ -15,16 +15,14 @@ jobs:
 
       - name: Read gem version
         id: read_version
-        if: steps.check_bump.outputs.should_tag == 'true'
         run: |
           gemspec_file=$(ls *.gemspec)
           version=$(grep -E "spec.version\s*=\s*['\"][0-9]+\.[0-9]+\.[0-9]+['\"]" $gemspec_file | grep -o -E "[0-9]+\.[0-9]+\.[0-9]+")
-          echo "::set-output name=version::$version"
+          echo "version=$version" >> $GITHUB_ENV
 
       - name: Create Tag
-        if: steps.check_bump.outputs.should_tag == 'true'
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          git tag -a v${{ steps.read_version.outputs.version }} -m "Version ${{ steps.read_version.outputs.version }}"
+          git tag -a v${{ env.version }} -m "Version ${{ env.version }}"
           git push origin --tags
