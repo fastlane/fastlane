@@ -1,32 +1,28 @@
 name: Create Tag Version on Bump Merge
 
 on:
-  push:
-    branches:
-      - master
+  pull_request:
+    types: [closed]
 
 jobs:
-  tag-version:
-    if: startsWith(github.event.head_commit.message, 'Merge pull request #') && contains(github.event.head_commit.message, 'version-bump-')
+  version_bump:
+    if: github.event.pull_request.merged == true && startsWith(github.event.pull_request.head.ref, 'version-bump-2.221.0-')
     runs-on: ubuntu-latest
 
     steps:
       - name: Checkout code
         uses: actions/checkout@v2
 
-      - name: Set up Ruby
-        uses: actions/setup-ruby@v1
-        with:
-          ruby-version: '2.7' # Specify your ruby version
-
       - name: Read gem version
         id: read_version
+        if: steps.check_bump.outputs.should_tag == 'true'
         run: |
           gemspec_file=$(ls *.gemspec)
           version=$(grep -E "spec.version\s*=\s*['\"][0-9]+\.[0-9]+\.[0-9]+['\"]" $gemspec_file | grep -o -E "[0-9]+\.[0-9]+\.[0-9]+")
           echo "::set-output name=version::$version"
 
       - name: Create Tag
+        if: steps.check_bump.outputs.should_tag == 'true'
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
