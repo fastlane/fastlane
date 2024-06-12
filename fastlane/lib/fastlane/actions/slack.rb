@@ -31,6 +31,7 @@ module Fastlane
           post_message(
             channel: channel,
             username: username,
+            thread_timestamp: options[:thread_timestamp],
             attachments: [slack_attachment],
             link_names: link_names,
             icon_url: icon_url,
@@ -38,10 +39,11 @@ module Fastlane
           )
         end
 
-        def post_message(channel:, username:, attachments:, link_names:, icon_url:, fail_on_error:)
+        def post_message(channel:, username:, thread_timestamp:, attachments:, link_names:, icon_url:, fail_on_error:)
           @notifier.post_to_legacy_incoming_webhook(
             channel: channel,
             username: username,
+            thread_timestamp: thread_timestamp,
             link_names: link_names,
             icon_url: icon_url,
             attachments: attachments
@@ -246,6 +248,11 @@ module Fastlane
                                        description: "Find and link channel names and usernames (true/false)",
                                        optional: true,
                                        default_value: false,
+                                       type: Boolean),
+          FastlaneCore::ConfigItem.new(key: :thread_timestamp,
+                                       env_name: "FL_SLACK_THREAD_TIMESTAMP",
+                                       description: "Timestamp of the message to reply",
+                                       optional: true,
                                        type: Boolean)
         ]
       end
