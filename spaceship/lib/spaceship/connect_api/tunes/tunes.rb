@@ -1278,6 +1278,14 @@ module Spaceship
           params = tunes_request_client.build_params(filter: filter, includes: includes)
           tunes_request_client.get("#{Version::V1}/reviewRejections", params)
         end
+
+        #
+        # appClips
+        #
+        def get_app_clips(app_id:, filter: {}, includes: nil, limit: nil, sort: nil)
+          params = tunes_request_client.build_params(filter: filter, includes: includes, limit: limit, sort: sort)
+          tunes_request_client.get("apps/#{app_id}/appClips", params)
+        end
       end
     end
   end
