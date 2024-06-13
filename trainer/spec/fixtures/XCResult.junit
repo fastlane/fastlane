@@ -2,14 +2,18 @@
 <testsuites tests="7" failures="2">
     <testsuite name="TestUITests" tests="1" failures="0" skipped="0" time="16.05245804786682">
         <properties>
-          <property name="Configuration" value="Test Scheme Action"/>
+            <property name="Configuration" value="Test Scheme Action"/>
+            <property name="Destination name" value="iPhone 6 - 10.3"/>
+            <property name="Destination OS version" value="13.0"/>
         </properties>
         <testcase classname="TestUITests" name="testExample()" time="16.05245804786682">
         </testcase>
     </testsuite>
     <testsuite name="TestThisDude" tests="6" failures="2" skipped="0" time="0.5279300212860107">
         <properties>
-          <property name="Configuration" value="Test Scheme Action"/>
+            <property name="Configuration" value="Test Scheme Action"/>
+            <property name="Destination name" value="iPhone 6 - 10.3"/>
+            <property name="Destination OS version" value="13.0"/>
         </properties>
         <testcase classname="TestTests" name="testExample()" time="0.0005381107330322266">
         </testcase>
