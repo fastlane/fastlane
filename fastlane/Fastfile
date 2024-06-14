@@ -353,7 +353,7 @@ desc "This includes running tests and verifying the GitHub release"
 lane :release_tag do |options|
   # Git verification
   #
-  # ensure_git_status_clean
+  ensure_git_status_clean
   #ensure_git_branch(branch: 'master')
 
   # Git tag stuff
@@ -372,7 +372,7 @@ lane :release_tag do |options|
     UI.user_error!("Failed to check out tag #{tag_name}")
   end
 
-  verify_env_variables
+  # verify_env_variables
   # slack_train_start(distance: 2,
   #                      train: "🚀",
   #          reverse_direction: true,
