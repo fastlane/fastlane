@@ -1,6 +1,6 @@
 describe Match::Generator do
   describe 'calling through to other tools' do
-    it 'configures cert correctly for nested execution', requires_keychain: true do
+    it 'configures cert correctly for nested execution' do
       require 'cert'
 
       config = FastlaneCore::Configuration.create(Cert::Options.available_options, {
@@ -9,8 +9,8 @@ describe Match::Generator do
         force: true,
         username: 'username',
         team_id: 'team_id',
-        keychain_path: FastlaneCore::Helper.keychain_path("login.keychain"),
-        keychain_password: 'password',
+        keychain_path: FastlaneCore::Helper.mac? ? FastlaneCore::Helper.keychain_path("login.keychain") : "",
+        keychain_password: FastlaneCore::Helper.mac? ? 'password' : "",
         platform: "ios",
         filename: nil,
         team_name: nil
