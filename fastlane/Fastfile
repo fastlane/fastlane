@@ -94,7 +94,7 @@ lane :execute_tests do
     UI.user_error!("fastlane gem is above 1.5 MB, make sure no additional resources are included by mistake") if size_in_mb > 1
 
     # Run the tests
-    sh("DEBUG=true bundle exec rake test_all")
+    sh("bundle exec rake test_all")
   end
 end
 
