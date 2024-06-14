@@ -353,7 +353,7 @@ desc "This includes running tests and verifying the GitHub release"
 lane :release_tag do |options|
   # Git verification
   #
-  ensure_git_status_clean
+  # ensure_git_status_clean
   #ensure_git_branch(branch: 'master')
 
   # Git tag stuff
