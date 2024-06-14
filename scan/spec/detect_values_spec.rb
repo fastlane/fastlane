@@ -212,7 +212,7 @@ describe Scan do
       context "catalyst" do
         it "ios", requires_xcodebuild: true do
           options = { project: "./scan/examples/standard/app.xcodeproj" }
-          expect_any_instance_of(FastlaneCore::Project).to receive(:supports_mac_catalyst?).and_return(true)
+          expect_any_instance_of(FastlaneCore::Project).not_to receive(:supports_mac_catalyst?)
           Scan.config = FastlaneCore::Configuration.create(Scan::Options.available_options, options)
           expect(Scan.config[:destination].first).to match(/platform=iOS/)
         end
