@@ -102,15 +102,20 @@ end
 
 desc "Increment the version number of this gem, after generating new Swift API"
 lane :bump do |options|
-  verify_env_variables
+  verify_env_variables(skip_ruby_gems: true)
   ensure_git_branch(branch: "master")
   ensure_git_status_clean
 
   github_api_token = ENV["FL_GITHUB_RELEASE_API_TOKEN"]
-  UI.user_error!("Please provide a GitHub API token using `FL_GITHUB_RELEASE_API_TOKEN`") if github_api_token.to_s.length == 0
+  github_api_bearer = ENV["FL_GITHUB_RELEASE_API_BEARER"]
+
+  if github_api_token.to_s.length == 0 && github_api_bearer.to_s.length == 0
+    UI.user_error!("Please provide a GitHub API token using `FL_GITHUB_RELEASE_API_TOKEN` or `FL_GITHUB_RELEASE_API_BEARER`")
+  end
   paths_for_commit = []
 
   version_file_path = "./fastlane/lib/fastlane/version.rb"
+  last_version_file_path = File.absolute_path("../CHANGELOG.latest.md")
 
   # Verify everything is in a consistent state
   latest_version = current_version
@@ -118,6 +123,12 @@ lane :bump do |options|
   UI.user_error!("Version on RubyGems doesn't match local repo: #{latest_version} != #{local_version}") if latest_version != local_version
 
   changelog_text = show_changelog
+
+  # Update CHANGELOG.lasest.md (which will be used to create the Release)
+  File.write(last_version_file_path, changelog_text)
+
+  bump_type = options[:bump_type]
+  is_automated_bump = !bump_type.nil?
 
   bump_type ||= 'minor' if prompt(text: "New feature, method or API?", boolean: true)
   bump_type ||= 'patch'
@@ -134,6 +145,9 @@ lane :bump do |options|
   # Add all changed files to the version bump commit
   paths_for_commit += sh("cd .. && git status --porcelain fastlane/swift | sed s/^...//").each_line.to_a.map(&:strip)
   paths_for_commit << "Gemfile.lock"
+
+  # Add CHANGELOG.latest
+  paths_for_commit << last_version_file_path
 
   # Add version file path to change set
   paths_for_commit << version_file_path
@@ -155,6 +169,7 @@ lane :bump do |options|
   pr_body << "**Changes since release '#{latest_version}':**"
   pr_body << changelog_text
   pr_url = create_pull_request(
+    api_bearer: github_api_bearer,
     api_token: github_api_token,
     repo: slug,
     title: commit_message,
@@ -171,7 +186,9 @@ lane :bump do |options|
   end
 
   # Revert to master branch
-  sh("git checkout master")
+  unless is_automated_bump
+    sh("git checkout master")
+  end
 end
 
 desc "Generate the Swift api and test it"
@@ -353,7 +370,14 @@ private_lane :github_changelog do |options|
   body = JSON.parse(resp[:body])
   commits = body["commits"].reverse
 
+  sleep_time = ENV['FL_CHANGELOG_SLEEP'].to_i
+
   formatted = commits.map do |commit|
+    if sleep_time > 0
+      UI.message("Sleeping for #{sleep_time} second(s) to get changelog")
+      sleep(sleep_time)
+    end
+
     # Default to commit message info
     message = commit["commit"]["message"].lines.first.strip
     name = commit["commit"]["author"]["name"]
@@ -563,10 +587,12 @@ end
 
 desc "Ensure all the requirement environment variables are provided"
 desc "this way the deployment script will fail early (and often)"
-private_lane :verify_env_variables do
+private_lane :verify_env_variables do |options|
   ensure_env_vars(env_vars: ['GITHUB_USER_NAME', 'GITHUB_API_TOKEN'])
 
-  UI.user_error!("You're not logged in RubyGems. Log in using `gem push` if using RubyGems < 2.7.0 or `gem signin` if using RubyGems >=2.7.0") unless File.file?(File.expand_path("~/.gem/credentials"))
+  unless options[:skip_ruby_gems]
+    UI.user_error!("You're not logged in RubyGems. Log in using `gem push` if using RubyGems < 2.7.0 or `gem signin` if using RubyGems >=2.7.0") unless File.file?(File.expand_path("~/.gem/credentials"))
+  end
 end
 
 desc "Get the local version number per version.rb"
@@ -590,6 +616,7 @@ private_lane :ensure_tool_name_formatting do
   errors = []
   Dir.chdir("..") do
     Dir["**/*.md"].each do |path|
+      next if path == "CHANGELOG.latest.md"
       helper = Helper::ToolNameFormattingHelper.new(path: path, is_documenting_invalid_examples: path == 'CONTRIBUTING.md')
       errors += helper.find_tool_name_formatting_errors
     end

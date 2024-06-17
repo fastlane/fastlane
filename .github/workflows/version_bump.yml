@@ -1,0 +1,48 @@
+---
+name: Version Bump
+
+on:
+  workflow_dispatch:
+    inputs:
+      bump_type:
+        description: 'Bump type'
+        required: true
+        type: choice
+        options:
+          - patch
+          - minor
+          - major
+
+permissions:
+  contents: write
+  pull-requests: write
+
+jobs:
+  bump_version:
+    runs-on: macos-latest
+
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v3
+
+    - name: Set up Ruby
+      uses: ruby/setup-ruby@v1
+      with:
+        ruby-version: 3.2
+
+    - name: Install fastlane
+      run: bundle install
+
+    - name: Run fastlane bump
+      run: |
+        git config --global user.email "41898282+github-actions[bot]@users.noreply.github.com"
+        git config --global user.name "github-actions[bot]"
+        bundle exec fastlane bump bump_type:${{ github.event.inputs.bump_type }}
+      env:
+        GITHUB_USER_NAME: fastlane
+        GITHUB_API_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        FL_GITHUB_RELEASE_API_BEARER: ${{ secrets.GITHUB_TOKEN }}
+        FL_CHANGELOG_SLEEP: 5
+        FASTLANE_XCODEBUILD_SETTINGS_TIMEOUT: 180
+        FASTLANE_XCODEBUILD_SETTINGS_RETRIES: 5
+        
