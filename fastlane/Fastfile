@@ -353,7 +353,7 @@ lane :release do
   # slack_train
 end
 
-lane :create_github_release do |options| do
+lane :create_github_release do |options|
   # Git verification
   #
   ensure_git_status_clean
@@ -397,6 +397,14 @@ lane :create_github_release do |options| do
 
     UI.success("New GitHub release has been created: #{release_url}")
   end
+end
+
+lane :publish_rubygems_from_github_release do |options|
+
+end
+
+lane :publish_github_packages_from_github_release do |options|
+
 end
 
 desc "Does everything that's needed for a release"
