@@ -292,7 +292,8 @@ lane :release do
       tag_name: version,
       description: description,
       is_draft: false,
-      upload_assets: [gem_version_path]
+      upload_assets: [gem_version_path],
+      api_bearer: ENV['FASTLANE_RELEASE_API_BEARER']
     )
     print github_release
 
