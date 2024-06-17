@@ -412,7 +412,8 @@ lane :release_tag do |options|
       tag_name: version,
       description: description,
       is_draft: false,
-      upload_assets: [gem_version_path]
+      upload_assets: [gem_version_path],
+      api_bearer: ENV['FL_GITHUB_RELEASE_API_BEARER']
     )
 
     sh("gem push --host https://rubygems.pkg.github.com/#{github_username} #{gem_version_path}")
