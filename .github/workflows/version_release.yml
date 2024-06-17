@@ -27,6 +27,7 @@ jobs:
       env:
         FASTLANE_RELEASE_API_BEARER: ${{ secrets.GITHUB_TOKEN }}
       run: |
+        mkdir -p ~/.gem
         echo ":github: Bearer $FASTLANE_RELEASE_API_BEARER" > ~/.gem/credentials
         chmod 0600 ~/.gem/credentials
         bundle exec fastlane release
