@@ -30,4 +30,4 @@ jobs:
         mkdir -p ~/.gem
         echo ":github: Bearer $FASTLANE_RELEASE_API_BEARER" > ~/.gem/credentials
         chmod 0600 ~/.gem/credentials
-        bundle exec fastlane release
+        bundle exec fastlane create_github_release
