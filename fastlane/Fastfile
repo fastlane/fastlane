@@ -296,7 +296,7 @@ lane :release do
       api_bearer: ENV['FASTLANE_RELEASE_API_BEARER']
     )
     print github_release
-    
+
     UI.message("We are about to push a gem to github: ")
     command = "gem push --host https://rubygems.pkg.github.com/#{github_username} #{gem_version_path}"
     puts command
@@ -368,7 +368,7 @@ lane :create_github_release do |options|
   puts("Deploying #{version}")
   if Gem::Version.new(version) <= Gem::Version.new(old_version)
     UI.user_error!("Version number #{version} was already deployed")
-  end  
+  end
 
   github_username = "joshdholtz"
   repo_name = "#{github_username}/fastlane"
