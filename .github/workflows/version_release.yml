@@ -25,6 +25,6 @@ jobs:
 
     - name: Run fastlane
       env:
-        FL_GITHUB_RELEASE_API_BEARER: ${{ secrets.GITHUB_TOKEN }}
+        FASTLANE_RELEASE_API_BEARER: ${{ secrets.GITHUB_TOKEN }}
       run: |
-        bundle exec fastlane release
+        bundle exec fastlane release_gh

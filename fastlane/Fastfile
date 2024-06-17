@@ -348,6 +348,10 @@ lane :release do
   # slack_train
 end
 
+lane :release_gh do |options|
+  validate_repo
+end
+
 desc "Does everything that's needed for a release"
 desc "This includes running tests and verifying the GitHub release"
 lane :release_tag do |options|
