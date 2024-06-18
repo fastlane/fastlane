@@ -102,7 +102,10 @@ end
 
 desc "Increment the version number of this gem, after generating new Swift API"
 lane :bump do |options|
-  verify_env_variables(skip_ruby_gems: true)
+  bump_type = options[:bump_type]
+  is_automated_bump = !bump_type.nil?
+
+  verify_env_variables(skip_ruby_gems: is_automated_bump)
   ensure_git_branch(branch: "master")
   ensure_git_status_clean
 
@@ -126,9 +129,6 @@ lane :bump do |options|
 
   # Update CHANGELOG.lasest.md (which will be used to create the Release)
   File.write(last_version_file_path, changelog_text)
-
-  bump_type = options[:bump_type]
-  is_automated_bump = !bump_type.nil?
 
   bump_type ||= 'minor' if prompt(text: "New feature, method or API?", boolean: true)
   bump_type ||= 'patch'
@@ -239,8 +239,6 @@ end
 
 desc "Does everything that's needed for a release"
 desc "This includes running tests and verifying the GitHub release"
-desc "Does everything that's needed for a release"
-desc "This includes running tests and verifying the GitHub release"
 lane :release do
   verify_env_variables
   slack_train_start(distance: 2,
@@ -340,6 +338,7 @@ lane :release do
   slack_train
 end
 
+desc "Creates a GitHub release with the gem as an asset"
 lane :create_github_release do |options|
   # Git verification
   #
@@ -352,7 +351,6 @@ lane :create_github_release do |options|
   #
   version = local_version
   old_version = current_version
-  puts("Deploying #{version}")
   if Gem::Version.new(version) <= Gem::Version.new(old_version)
     UI.user_error!("Version number #{version} was already deployed")
   end
