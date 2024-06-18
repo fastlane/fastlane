@@ -1,0 +1,34 @@
+---
+name: Release Step 2 - Create GitHub Release
+
+on:
+  push:
+    tags:
+      - '*'
+  workflow_dispatch:
+
+jobs:
+  create_github_release:
+    runs-on: macos-latest
+
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v3
+
+    - name: Set up Ruby
+      uses: ruby/setup-ruby@v1
+      with:
+        ruby-version: '3.2'
+
+    - name: Install fastlane
+      run: bundle install
+
+    - name: Run fastlane
+      env:
+        FASTLANE_RELEASE_API_BEARER: ${{ secrets.GITHUB_TOKEN }}
+        FL_GITHUB_RELEASE_API_BEARER: ${{ secrets.GITHUB_TOKEN }}
+      run: |
+        mkdir -p ~/.gem
+        echo ":github: Bearer $FASTLANE_RELEASE_API_BEARER" > ~/.gem/credentials
+        chmod 0600 ~/.gem/credentials
+        bundle exec fastlane create_github_release
