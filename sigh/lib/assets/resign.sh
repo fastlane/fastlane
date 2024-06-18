@@ -858,7 +858,7 @@ function resign {
         OLD_BUNDLE_ID=$(echo ${OLD_BUNDLE_ID} | sed "s!\\.!\\\\.!g")
         NEW_BUNDLE_ID=$(echo ${NEW_BUNDLE_ID} | sed "s!\\.!\\\\.!g")
         log "Replacing old bundle ID '$OLD_BUNDLE_ID' with new bundle ID '$NEW_BUNDLE_ID' in patched entitlements"
-        /usr/bin/sed -i .bak "s!\(<string>[A-Z0-9]\{10\}\)\.${OLD_BUNDLE_ID}</string>!\1.${NEW_BUNDLE_ID}</string>!g"
+        /usr/bin/sed -i .bak "s!\(<string>[A-Z0-9]\{10\}\)\.${OLD_BUNDLE_ID}</string>!\1.${NEW_BUNDLE_ID}</string>!g" "$PATCHED_ENTITLEMENTS"
 
         log "Resigning application using certificate: '$CERTIFICATE'"
         log "and patched entitlements:"
