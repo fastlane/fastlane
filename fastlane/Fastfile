@@ -355,7 +355,7 @@ lane :create_github_release do |options|
     UI.user_error!("Version number #{version} was already deployed")
   end
 
-  github_username = "joshdholtz"
+  github_username = ENV["RELEASE_GITHUB_USERNAME"] || "fastlane"
   repo_name = "#{github_username}/fastlane"
   gem_version_path = File.absolute_path("../pkg/fastlane-#{version}.gem")
 
@@ -390,6 +390,35 @@ end
 
 lane :publish_github_packages_from_github_release do |options|
 
+end
+
+lane :download_github_release_gem do |options|
+  require 'open-uri'
+
+  version = options[:version]
+
+  github_username = ENV["RELEASE_GITHUB_USERNAME"] || "fastlane"
+
+  github_release = get_github_release(url: "#{github_username}/fastlane", version: version)
+  assets = (github_release || {}).fetch('assets', [])
+
+  gem_asset = assets.find { |a| a["name"].end_with?(".gem") }
+  gem_asset_url = gem_asset["browser_download_url"]
+
+  # Extract the file name from the URL
+  file_name = File.basename(URI.parse(gem_asset_url).path)
+
+  FileUtils.mkdir_p('../pkg')
+  file_path = File.join('../pkg', file_name)
+
+  # Download the file
+  URI.open(gem_asset_url) do |remote_file|
+    File.open(file_path, 'wb') do |local_file|
+      local_file.write(remote_file.read)
+    end
+  end
+
+  file_path
 end
 
 lane :release_brew do
