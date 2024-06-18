@@ -381,6 +381,8 @@ lane :create_github_release do |options|
     add_fastlane_git_tag(tag: "fastlane/#{version}", message: message)
 
     UI.success("New GitHub release has been created: #{release_url}")
+  else
+    UI.message("GitHub release has already been created")
   end
 end
 
