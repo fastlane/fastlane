@@ -1,5 +1,5 @@
 ---
-name: Version Bump
+name: Create Version Bump
 
 on:
   workflow_dispatch:
@@ -18,7 +18,7 @@ permissions:
   pull-requests: write
 
 jobs:
-  bump_version:
+  create_version_bump:
     runs-on: macos-latest
 
     steps:

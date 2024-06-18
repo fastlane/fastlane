@@ -1,5 +1,5 @@
 ---
-name: Version Release
+name: Create GitHub Release
 
 on:
   push:
@@ -8,7 +8,7 @@ on:
   workflow_dispatch:
 
 jobs:
-  release_version:
+  create_github_release:
     runs-on: macos-latest
 
     steps:
