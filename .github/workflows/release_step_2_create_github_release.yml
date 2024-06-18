@@ -23,12 +23,19 @@ jobs:
     - name: Install fastlane
       run: bundle install
 
+    - uses: rubygems/configure-rubygems-credentials@v1.0.0
+
+    - name: Configure GitHub Packages config
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      run: |
+        mkdir -p ~/.gem
+        echo ":github: Bearer $GITHUB_TOKEN" > ~/.gem/credentials
+        chmod 0600 ~/.gem/credentials
+
     - name: Run fastlane
       env:
         FASTLANE_RELEASE_API_BEARER: ${{ secrets.GITHUB_TOKEN }}
         FL_GITHUB_RELEASE_API_BEARER: ${{ secrets.GITHUB_TOKEN }}
       run: |
-        mkdir -p ~/.gem
-        echo ":github: Bearer $FASTLANE_RELEASE_API_BEARER" > ~/.gem/credentials
-        chmod 0600 ~/.gem/credentials
         bundle exec fastlane create_github_release

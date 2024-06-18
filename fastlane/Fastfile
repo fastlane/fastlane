@@ -391,6 +391,8 @@ lane :create_github_release do |options|
              end
 
   sh "gem push --key github --host https://rubygems.pkg.github.com/#{github_username} #{gem_path}"
+
+  sh "gem push #{gem_path}"
 end
 
 lane :publish_rubygems_from_github_release do |options|
