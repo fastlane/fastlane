@@ -387,7 +387,7 @@ lane :create_github_release do |options|
              else
                UI.message("GitHub release has already been created")
 
-               download_github_release_gem
+               download_github_release_gem(version: version)
              end
 
   sh "gem push --key github --host https://rubygems.pkg.github.com/#{github_username} #{gem_path}"
