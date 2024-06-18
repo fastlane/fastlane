@@ -1,5 +1,5 @@
 ---
-name: Create GitHub Release
+name: Release Step 2 - Create GitHub Release
 
 on:
   push:

@@ -1,5 +1,5 @@
 ---
-name: Create Version Bump
+name: Release Step 1 - Create Version Bump
 
 on:
   workflow_dispatch:
