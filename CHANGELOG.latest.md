@@ -1,8 +1,1 @@
 * [fastlane] Delete IDFA declarations for Apple App Store submission (#22003) via Vyacheslav Frolov (@fr0l)
-* [ci] add manual to process release workflow (#22095) via Josh Holtz (@joshdholtz)
-* [ci] add manual dispatch th to deploy rubygems workflow (#22094) via Josh Holtz (@joshdholtz)
-* [ci] pass version to `download_github_release_gem` to get gem (#22093) via Josh Holtz (@joshdholtz)
-* [ci] add  to create github release workflow (#22092) via Josh Holtz (@joshdholtz)
-* [ci] publish github packages (#22091) via Josh Holtz (@joshdholtz)
-* [ci] automate GitHub Release creation with attached Gem (#22090) via Josh Holtz (@joshdholtz)
-* [ci] fix tag and bump merge again (#22083) via Josh Holtz (@joshdholtz)
