@@ -1,4 +1,6 @@
 require_relative '../model'
+require_relative '../../connect_api'
+
 module Spaceship
   class ConnectAPI
     class User
