@@ -66,9 +66,9 @@ module Spaceship
         return resps.flat_map(&:to_models)
       end
 
-      def self.find(client: nil, email: nil, includes: ESSENTIAL_INCLUDES)
+      def self.find(client: nil, username: nil, includes: ESSENTIAL_INCLUDES)
         client ||= Spaceship::ConnectAPI
-        return all(client: client, filter: { email: email }, includes: includes)
+        return all(client: client, filter: { username: username }, includes: includes)
       end
 
       # @param client [ConnectAPI] ConnectAPI client.
