@@ -42,7 +42,7 @@ describe Match::Encryption do
     it "should return OpenSSL object for storage mode git" do
       storage_mode = "git"
       git_url = "git@github.com:you/your_repo.git"
-      working_directory = "my-workding-directory"
+      working_directory = "my-working-directory"
 
       encryption = Match::Encryption.for_storage_mode(storage_mode, {
         git_url: git_url,
@@ -60,7 +60,7 @@ describe Match::Encryption do
     it "should return OpenSSL object for storage mode s3 and skip encryption is false" do
       storage_mode = "s3"
       s3_bucket = "my-bucket"
-      working_directory = "my-workding-directory"
+      working_directory = "my-working-directory"
 
       encryption = Match::Encryption.for_storage_mode(storage_mode, {
         git_url: "",

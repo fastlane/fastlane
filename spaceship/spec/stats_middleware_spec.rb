@@ -64,8 +64,8 @@ describe Spaceship::StatsMiddleware do
       expect(Spaceship::StatsMiddleware.service_stats.size).to eq(8)
 
       expect(find_count("api.appstoreconnect.apple.com")).to eq(2)
-      expect(find_count("appstoreconnect.apple.com/iris/v1/")).to eq(1)
-      expect(find_count("developer.apple.com/services-account/v1/")).to eq(1)
+      expect(find_count("appstoreconnect.apple.com/iris/")).to eq(1)
+      expect(find_count("developer.apple.com/services-account/")).to eq(1)
       expect(find_count("idmsa.apple.com")).to eq(1)
       expect(find_count("appstoreconnect.apple.com/olympus/v1/")).to eq(1)
       expect(find_count("appstoreconnect.apple.com/WebObjects/iTunesConnect.woa/")).to eq(1)

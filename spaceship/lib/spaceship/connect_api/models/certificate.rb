@@ -1,4 +1,4 @@
-require_relative '../model'
+require_relative '../../connect_api'
 
 require 'openssl'
 
@@ -55,7 +55,7 @@ module Spaceship
         Time.parse(expiration_date) > Time.now
       end
 
-      # Create a new code signing request that can be used to
+      # Create a new cert signing request that can be used to
       # generate a new certificate
       # @example
       #  Create a new certificate signing request
@@ -71,7 +71,7 @@ module Spaceship
                                                 ['CN', 'PEM', OpenSSL::ASN1::UTF8STRING]
                                               ])
         csr.public_key = key.public_key
-        csr.sign(key, OpenSSL::Digest::SHA1.new)
+        csr.sign(key, OpenSSL::Digest::SHA256.new)
         return [csr, key]
       end
 
@@ -79,7 +79,7 @@ module Spaceship
       # API
       #
 
-      def self.all(client: nil, filter: {}, includes: nil, fields: nil, limit: nil, sort: nil)
+      def self.all(client: nil, filter: {}, includes: nil, fields: nil, limit: Spaceship::ConnectAPI::MAX_OBJECTS_PER_PAGE_LIMIT, sort: nil)
         client ||= Spaceship::ConnectAPI
         resps = client.get_certificates(filter: filter, includes: includes, fields: fields, limit: limit, sort: sort).all_pages
         return resps.flat_map(&:to_models)

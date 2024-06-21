@@ -1,0 +1,55 @@
+---
+name: Release Step 2 - Create GitHub Release
+
+on:
+  push:
+    tags:
+      - '*'
+  workflow_dispatch:
+    inputs:
+      skip_github_packages:
+        description: 'Skip pushing to GitHub Packages'
+        required: true
+        default: false
+        type: boolean
+      skip_rubygems:
+        description: 'Skip pushing to RubyGems'
+        required: true
+        default: false
+        type: boolean
+
+jobs:
+  create_github_release:
+    runs-on: macos-latest
+
+    permissions:
+      contents: write
+      id-token: write
+
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v3
+
+    - name: Set up Ruby
+      uses: ruby/setup-ruby@v1
+      with:
+        ruby-version: '3.2'
+
+    - name: Install fastlane
+      run: bundle install
+
+    - uses: rubygems/configure-rubygems-credentials@v1.0.0
+
+    - name: Configure GitHub Packages config
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      run: |
+        mkdir -p ~/.gem
+        echo ":github: Bearer $GITHUB_TOKEN" > ~/.gem/credentials
+        chmod 0600 ~/.gem/credentials
+
+    - name: Run fastlane
+      env:
+        FASTLANE_RELEASE_API_BEARER: ${{ secrets.GITHUB_TOKEN }}
+      run: |
+        bundle exec fastlane create_github_release skip_github_packages:${{ github.event.inputs.skip_github_packages }} skip_rubygems:${{ github.event.inputs.skip_rubygems }}

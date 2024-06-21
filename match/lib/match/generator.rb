@@ -1,4 +1,5 @@
 require_relative 'module'
+require_relative 'profile_includes'
 
 module Match
   # Generate missing resources
@@ -57,7 +58,7 @@ module Match
     end
 
     # @return (String) The UUID of the newly generated profile
-    def self.generate_provisioning_profile(params: nil, prov_type: nil, certificate_id: nil, app_identifier: nil, force: true, working_directory: nil)
+    def self.generate_provisioning_profile(params: nil, prov_type: nil, certificate_id: nil, app_identifier: nil, force: true, cache: nil, working_directory: nil)
       require 'sigh/manager'
       require 'sigh/options'
 
@@ -102,6 +103,13 @@ module Match
         values[:adhoc] = true
       elsif prov_type == :development
         values[:development] = true
+      end
+
+      if cache
+        values[:cached_certificates] = cache.certificates
+        values[:cached_devices] = cache.devices
+        values[:cached_bundle_ids] = cache.bundle_ids
+        values[:cached_profiles] = cache.profiles
       end
 
       arguments = FastlaneCore::Configuration.create(Sigh::Options.available_options, values)

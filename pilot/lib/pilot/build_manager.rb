@@ -65,6 +65,7 @@ module Pilot
           UI.important("`skip_waiting_for_build_processing` used and no `changelog` supplied - skipping waiting for build processing")
           return
         else
+          UI.important("`skip_waiting_for_build_processing` used and `changelog` supplied - will wait until build appears on App Store Connect, update the changelog and then skip the rest of the remaining of the processing steps.")
           return_when_build_appears = true
         end
       end
@@ -72,8 +73,10 @@ module Pilot
       # Calling login again here is needed if login was not called during 'start'
       login unless should_login_in_start
 
-      UI.message("If you want to skip waiting for the processing to be finished, use the `skip_waiting_for_build_processing` option")
-      UI.message("Note that if `skip_waiting_for_build_processing` is used but a `changelog` is supplied, this process will wait for the build to appear on AppStoreConnect, update the changelog and then skip the remaining of the processing steps.")
+      if config[:skip_waiting_for_build_processing].nil?
+        UI.message("If you want to skip waiting for the processing to be finished, use the `skip_waiting_for_build_processing` option")
+        UI.message("Note that if `skip_waiting_for_build_processing` is used but a `changelog` is supplied, this process will wait for the build to appear on App Store Connect, update the changelog and then skip the remaining of the processing steps.")
+      end
 
       latest_build = wait_for_build_processing_to_be_complete(return_when_build_appears)
       distribute(options, build: latest_build)
@@ -365,12 +368,17 @@ module Pilot
     end
 
     def reject_build_waiting_for_review(build)
-      waiting_for_review_build = build.app.get_builds(filter: { "betaAppReviewSubmission.betaReviewState" => "WAITING_FOR_REVIEW" }, includes: "betaAppReviewSubmission,preReleaseVersion").first
+      waiting_for_review_build = build.app.get_builds(
+        filter: { "betaAppReviewSubmission.betaReviewState" => "WAITING_FOR_REVIEW,IN_REVIEW",
+                  "expired" => false,
+                  "preReleaseVersion.version" => build.pre_release_version.version },
+        includes: "betaAppReviewSubmission,preReleaseVersion"
+      ).first
       unless waiting_for_review_build.nil?
         UI.important("Another build is already in review. Going to remove that build and submit the new one.")
-        UI.important("Deleting beta app review submission for build: #{waiting_for_review_build.app_version} - #{waiting_for_review_build.version}")
-        waiting_for_review_build.beta_app_review_submission.delete!
-        UI.success("Deleted beta app review submission for previous build: #{waiting_for_review_build.app_version} - #{waiting_for_review_build.version}")
+        UI.important("Canceling beta app review submission for build: #{waiting_for_review_build.app_version} - #{waiting_for_review_build.version}")
+        waiting_for_review_build.expire!
+        UI.success("Canceled beta app review submission for previous build: #{waiting_for_review_build.app_version} - #{waiting_for_review_build.version}")
       end
     end
 

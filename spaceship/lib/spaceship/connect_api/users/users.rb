@@ -4,6 +4,10 @@ module Spaceship
   class ConnectAPI
     module Users
       module API
+        module Version
+          V1 = "v1"
+        end
+
         def users_request_client=(users_request_client)
           @users_request_client = users_request_client
         end
@@ -20,12 +24,12 @@ module Spaceship
         # Get list of users
         def get_users(filter: {}, includes: nil, limit: nil, sort: nil)
           params = users_request_client.build_params(filter: filter, includes: includes, limit: limit, sort: sort)
-          users_request_client.get("users", params)
+          users_request_client.get("#{Version::V1}/users", params)
         end
 
         # Delete existing user
         def delete_user(user_id: nil)
-          users_request_client.delete("users/#{user_id}")
+          users_request_client.delete("#{Version::V1}/users/#{user_id}")
         end
 
         # Update existing user
@@ -55,7 +59,7 @@ module Spaceship
           # Avoid API error: You cannot set visible apps for this user because the user's roles give them access to all apps.
           body[:data].delete(:relationships) if all_apps_visible
 
-          users_request_client.patch("users/#{user_id}", body)
+          users_request_client.patch("#{Version::V1}/users/#{user_id}", body)
         end
 
         # Add app permissions for user
@@ -74,7 +78,7 @@ module Spaceship
             end
           }
 
-          users_request_client.post("users/#{user_id}/relationships/visibleApps", body)
+          users_request_client.post("#{Version::V1}/users/#{user_id}/relationships/visibleApps", body)
         end
 
         # Replace app permissions for user
@@ -88,7 +92,7 @@ module Spaceship
             end
           }
 
-          users_request_client.patch("users/#{user_id}/relationships/visibleApps", body)
+          users_request_client.patch("#{Version::V1}/users/#{user_id}/relationships/visibleApps", body)
         end
 
         # Remove app permissions for user
@@ -102,13 +106,13 @@ module Spaceship
             end
           }
           params = nil
-          users_request_client.delete("users/#{user_id}/relationships/visibleApps", params, body)
+          users_request_client.delete("#{Version::V1}/users/#{user_id}/relationships/visibleApps", params, body)
         end
 
         # Get app permissions for user
         def get_user_visible_apps(user_id: id, limit: nil)
           params = users_request_client.build_params(filter: {}, includes: nil, limit: limit, sort: nil)
-          users_request_client.get("users/#{user_id}/visibleApps", params)
+          users_request_client.get("#{Version::V1}/users/#{user_id}/visibleApps", params)
         end
 
         #
@@ -118,7 +122,7 @@ module Spaceship
         # Get all invited users
         def get_user_invitations(filter: {}, includes: nil, limit: nil, sort: nil)
           params = users_request_client.build_params(filter: filter, includes: includes, limit: limit, sort: sort)
-          users_request_client.get("userInvitations", params)
+          users_request_client.get("#{Version::V1}/userInvitations", params)
         end
 
         # Invite new users to App Store Connect
@@ -150,18 +154,18 @@ module Spaceship
           # Avoid API error: You cannot set visible apps for this user because the user's roles give them access to all apps.
           body[:data].delete(:relationships) if all_apps_visible
 
-          users_request_client.post("userInvitations", body)
+          users_request_client.post("#{Version::V1}/userInvitations", body)
         end
 
         # Remove invited user from team (not yet accepted)
         def delete_user_invitation(user_invitation_id: nil)
-          users_request_client.delete("userInvitations/#{user_invitation_id}")
+          users_request_client.delete("#{Version::V1}/userInvitations/#{user_invitation_id}")
         end
 
         # Get all app permissions for invited user
         def get_user_invitation_visible_apps(user_invitation_id: id, limit: nil)
           params = users_request_client.build_params(filter: {}, includes: nil, limit: limit, sort: nil)
-          users_request_client.get("userInvitations/#{user_invitation_id}/visibleApps", params)
+          users_request_client.get("#{Version::V1}/userInvitations/#{user_invitation_id}/visibleApps", params)
         end
       end
     end

@@ -86,7 +86,7 @@ describe Match do
         let(:file_contents) { 'hello' }
         let(:file) { { checksum: 'foo' } }
 
-        it 'reuturns false' do
+        it 'returns false' do
           tempfile = Tempfile.new
           tempfile.write(file_contents)
           tempfile.close

@@ -1,4 +1,5 @@
-require_relative '../model'
+require_relative '../../connect_api'
+
 module Spaceship
   class ConnectAPI
     class Profile
@@ -15,6 +16,7 @@ module Spaceship
 
       attr_accessor :bundle_id
       attr_accessor :certificates
+      attr_accessor :devices
 
       attr_mapping({
         "name" => "name",
@@ -62,14 +64,21 @@ module Spaceship
       end
 
       def valid?
-        return profile_state == ProfileState::ACTIVE
+        # Provisioning profiles are not invalidated automatically on the dev portal when the certificate expires.
+        # They become Invalid only when opened directly in the portal 🤷.
+        # We need to do an extra check on the expiration date to ensure the profile is valid.
+        expired = Time.now.utc > Time.parse(self.expiration_date)
+
+        is_valid = profile_state == ProfileState::ACTIVE && !expired
+
+        return is_valid
       end
 
       #
       # API
       #
 
-      def self.all(client: nil, filter: {}, includes: nil, fields: nil, limit: nil, sort: nil)
+      def self.all(client: nil, filter: {}, includes: nil, fields: nil, limit: Spaceship::ConnectAPI::MAX_OBJECTS_PER_PAGE_LIMIT, sort: nil)
         client ||= Spaceship::ConnectAPI
         resps = client.get_profiles(filter: filter, includes: includes, fields: fields, limit: limit, sort: sort).all_pages
         return resps.flat_map(&:to_models)

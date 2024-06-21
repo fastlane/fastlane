@@ -50,6 +50,10 @@ module Fastlane
 
         response = http.request(req)
 
+        unless response.code.to_i.between?(200, 299)
+          UI.user_error!("Error uploading to Appetize.io: received HTTP #{response.code} with body #{response.body}")
+        end
+
         parse_response(response) # this will raise an exception if something goes wrong
 
         UI.message("App URL: #{Actions.lane_context[SharedValues::APPETIZE_APP_URL]}")

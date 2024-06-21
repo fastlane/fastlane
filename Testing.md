@@ -10,7 +10,7 @@ The `Fastfile` included at the top of the fastlane project allows you to run sev
 bundle exec fastlane test
 ```
 
-You can also run those steps independently or on a more fine grained way.
+You can also run those steps independently or on a more fine-grained way.
 
 ### Automated tests
 
@@ -106,4 +106,4 @@ From now on, every time you introduce a change to your local _fastlane_ code bas
 
 If you want to run a command with your normal _fastlane_ installation, simply do not run the command with the `bundle exec` prefix.
 
-To fully remove your local _fastlane_ from your local project again, delete the `Gemfile` you created above or remove the adaptions you did to match the `Gemfile` template.
+To completely remove _fastlane_ from your local project, delete the `Gemfile` you created earlier, or undo the changes you made to match the `Gemfile` template.

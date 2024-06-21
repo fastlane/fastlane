@@ -10,35 +10,62 @@ module Spaceship
       attr_accessor :platform
       attr_accessor :version_string
       attr_accessor :app_store_state
+      attr_accessor :app_version_state
       attr_accessor :store_icon
       attr_accessor :watch_store_icon
       attr_accessor :copyright
       attr_accessor :release_type
       attr_accessor :earliest_release_date # 2020-06-17T12:00:00-07:00
-      attr_accessor :uses_idfa
       attr_accessor :is_watch_only
       attr_accessor :downloadable
       attr_accessor :created_date
+      attr_accessor :review_type
 
       attr_accessor :app_store_version_submission
       attr_accessor :app_store_version_phased_release
       attr_accessor :app_store_review_detail
       attr_accessor :app_store_version_localizations
 
+      # Deprecated in App Store Connect API specification 3.3
       module AppStoreState
-        READY_FOR_SALE = "READY_FOR_SALE"
-        READY_FOR_REVIEW = "READY_FOR_REVIEW"
-        PROCESSING_FOR_APP_STORE = "PROCESSING_FOR_APP_STORE"
-        PENDING_DEVELOPER_RELEASE = "PENDING_DEVELOPER_RELEASE"
-        PENDING_APPLE_RELEASE = "PENDING_APPLE_RELEASE"
-        IN_REVIEW = "IN_REVIEW"
-        WAITING_FOR_REVIEW = "WAITING_FOR_REVIEW"
+        ACCEPTED = "ACCEPTED"
         DEVELOPER_REJECTED = "DEVELOPER_REJECTED"
         DEVELOPER_REMOVED_FROM_SALE = "DEVELOPER_REMOVED_FROM_SALE"
-        REJECTED = "REJECTED"
-        PREPARE_FOR_SUBMISSION = "PREPARE_FOR_SUBMISSION"
-        METADATA_REJECTED = "METADATA_REJECTED"
+        IN_REVIEW = "IN_REVIEW"
         INVALID_BINARY = "INVALID_BINARY"
+        METADATA_REJECTED = "METADATA_REJECTED"
+        PENDING_APPLE_RELEASE = "PENDING_APPLE_RELEASE"
+        PENDING_CONTRACT = "PENDING_CONTRACT"
+        PENDING_DEVELOPER_RELEASE = "PENDING_DEVELOPER_RELEASE"
+        PREORDER_READY_FOR_SALE = "PREORDER_READY_FOR_SALE"
+        PREPARE_FOR_SUBMISSION = "PREPARE_FOR_SUBMISSION"
+        PROCESSING_FOR_APP_STORE = "PROCESSING_FOR_APP_STORE"
+        READY_FOR_REVIEW = "READY_FOR_REVIEW"
+        READY_FOR_SALE = "READY_FOR_SALE"
+        REJECTED = "REJECTED"
+        REMOVED_FROM_SALE = "REMOVED_FROM_SALE"
+        REPLACED_WITH_NEW_VERSION = "REPLACED_WITH_NEW_VERSION"
+        WAITING_FOR_EXPORT_COMPLIANCE = "WAITING_FOR_EXPORT_COMPLIANCE"
+        WAITING_FOR_REVIEW = "WAITING_FOR_REVIEW"
+        NOT_APPLICABLE = "NOT_APPLICABLE"
+      end
+
+      module AppVersionState
+        ACCEPTED = "ACCEPTED"
+        DEVELOPER_REJECTED = "DEVELOPER_REJECTED"
+        IN_REVIEW = "IN_REVIEW"
+        INVALID_BINARY = "INVALID_BINARY"
+        METADATA_REJECTED = "METADATA_REJECTED"
+        PENDING_APPLE_RELEASE = "PENDING_APPLE_RELEASE"
+        PENDING_DEVELOPER_RELEASE = "PENDING_DEVELOPER_RELEASE"
+        PREPARE_FOR_SUBMISSION = "PREPARE_FOR_SUBMISSION"
+        PROCESSING_FOR_DISTRIBUTION = "PROCESSING_FOR_DISTRIBUTION"
+        READY_FOR_DISTRIBUTION = "READY_FOR_DISTRIBUTION"
+        READY_FOR_REVIEW = "READY_FOR_REVIEW"
+        REJECTED = "REJECTED"
+        REPLACED_WITH_NEW_VERSION = "REPLACED_WITH_NEW_VERSION"
+        WAITING_FOR_EXPORT_COMPLIANCE = "WAITING_FOR_EXPORT_COMPLIANCE"
+        WAITING_FOR_REVIEW = "WAITING_FOR_REVIEW"
       end
 
       module ReleaseType
@@ -47,19 +74,25 @@ module Spaceship
         SCHEDULED = "SCHEDULED"
       end
 
+      module ReviewType
+        APP_STORE = "APP_STORE"
+        NOTARIZATION = "NOTARIZATION"
+      end
+
       attr_mapping({
         "platform" =>  "platform",
         "versionString" =>  "version_string",
         "appStoreState" =>  "app_store_state",
+        "appVersionState" => "app_version_state",
         "storeIcon" =>  "store_icon",
         "watchStoreIcon" =>  "watch_store_icon",
         "copyright" =>  "copyright",
         "releaseType" =>  "release_type",
         "earliestReleaseDate" =>  "earliest_release_date",
-        "usesIdfa" =>  "uses_idfa",
         "isWatchOnly" =>  "is_watch_only",
         "downloadable" =>  "downloadable",
         "createdDate" =>  "created_date",
+        "reviewType" => "review_type",
 
         "appStoreVersionSubmission" => "app_store_version_submission",
         "build" => "build",
@@ -92,7 +125,7 @@ module Spaceship
       # API
       #
 
-      # app,routingAppCoverage,resetRatingsRequest,appStoreVersionSubmission,appStoreVersionPhasedRelease,ageRatingDeclaration,appStoreReviewDetail,idfaDeclaration,gameCenterConfiguration
+      # app,routingAppCoverage,resetRatingsRequest,appStoreVersionSubmission,appStoreVersionPhasedRelease,ageRatingDeclaration,appStoreReviewDetail,gameCenterConfiguration
       def self.get(client: nil, app_store_version_id: nil, includes: nil, limit: nil, sort: nil)
         client ||= Spaceship::ConnectAPI
         return client.get_app_store_version(
@@ -203,22 +236,6 @@ module Spaceship
       def select_build(client: nil, build_id: nil)
         client ||= Spaceship::ConnectAPI
         resp = client.patch_app_store_version_with_build(app_store_version_id: id, build_id: build_id)
-        return resp.to_models.first
-      end
-
-      #
-      # IDFA Declarations
-      #
-
-      def fetch_idfa_declaration(client: nil)
-        client ||= Spaceship::ConnectAPI
-        resp = client.get_idfa_declaration(app_store_version_id: id)
-        return resp.to_models.first
-      end
-
-      def create_idfa_declaration(client: nil, attributes: nil)
-        client ||= Spaceship::ConnectAPI
-        resp = client.post_idfa_declaration(app_store_version_id: id, attributes: attributes)
         return resp.to_models.first
       end
 

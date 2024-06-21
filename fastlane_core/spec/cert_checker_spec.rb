@@ -9,21 +9,23 @@ describe FastlaneCore do
       ProcessStatusMock.new
     }
 
-    describe '#installed_identies' do
+    describe '#installed_identities' do
       it 'should print an error when no local code signing identities are found' do
+        allow(FastlaneCore::CertChecker).to receive(:wwdr_keychain).and_return('login.keychain')
         allow(FastlaneCore::CertChecker).to receive(:installed_wwdr_certificates).and_return(['G2', 'G3', 'G4', 'G5', 'G6'])
         allow(FastlaneCore::CertChecker).to receive(:list_available_identities).and_return("     0 valid identities found\n")
         expect(FastlaneCore::UI).to receive(:error).with(/There are no local code signing identities found/)
 
-        FastlaneCore::CertChecker.installed_identies
+        FastlaneCore::CertChecker.installed_identities
       end
 
       it 'should not be fooled by 10 local code signing identities available' do
+        allow(FastlaneCore::CertChecker).to receive(:wwdr_keychain).and_return('login.keychain')
         allow(FastlaneCore::CertChecker).to receive(:installed_wwdr_certificates).and_return(['G2', 'G3', 'G4', 'G5', 'G6'])
         allow(FastlaneCore::CertChecker).to receive(:list_available_identities).and_return("     10 valid identities found\n")
         expect(FastlaneCore::UI).not_to(receive(:error))
 
-        FastlaneCore::CertChecker.installed_identies
+        FastlaneCore::CertChecker.installed_identities
       end
     end
 
@@ -40,7 +42,7 @@ describe FastlaneCore do
       it "should return installed certificate's alias" do
         expect(FastlaneCore::CertChecker).to receive(:wwdr_keychain).and_return('login.keychain')
 
-        allow(FastlaneCore::Helper).to receive(:backticks).with(/security find-certificate/).and_return("-----BEGIN CERTIFICATE-----\nG6\n-----END CERTIFICATE-----\n")
+        allow(FastlaneCore::Helper).to receive(:backticks).with(/security find-certificate/, { print: false }).and_return("-----BEGIN CERTIFICATE-----\nG6\n-----END CERTIFICATE-----\n")
 
         allow(Digest::SHA256).to receive(:hexdigest).with(cert.to_der).and_return('bdd4ed6e74691f0c2bfd01be0296197af1379e0418e2d300efa9c3bef642ca30')
         allow(OpenSSL::X509::Certificate).to receive(:new).and_return(cert)
@@ -51,7 +53,7 @@ describe FastlaneCore do
       it "should return an empty array if unknown WWDR certificates are found" do
         expect(FastlaneCore::CertChecker).to receive(:wwdr_keychain).and_return('login.keychain')
 
-        allow(FastlaneCore::Helper).to receive(:backticks).with(/security find-certificate/).and_return("-----BEGIN CERTIFICATE-----\nG6\n-----END CERTIFICATE-----\n")
+        allow(FastlaneCore::Helper).to receive(:backticks).with(/security find-certificate/, { print: false }).and_return("-----BEGIN CERTIFICATE-----\nG6\n-----END CERTIFICATE-----\n")
 
         allow(OpenSSL::X509::Certificate).to receive(:new).and_return(cert)
 
@@ -61,18 +63,20 @@ describe FastlaneCore do
 
     describe '#install_missing_wwdr_certificates' do
       it 'should install all official WWDR certificates' do
+        allow(FastlaneCore::CertChecker).to receive(:wwdr_keychain).and_return('login.keychain')
         allow(FastlaneCore::CertChecker).to receive(:installed_wwdr_certificates).and_return([])
-        expect(FastlaneCore::CertChecker).to receive(:install_wwdr_certificate).with('G2')
-        expect(FastlaneCore::CertChecker).to receive(:install_wwdr_certificate).with('G3')
-        expect(FastlaneCore::CertChecker).to receive(:install_wwdr_certificate).with('G4')
-        expect(FastlaneCore::CertChecker).to receive(:install_wwdr_certificate).with('G5')
-        expect(FastlaneCore::CertChecker).to receive(:install_wwdr_certificate).with('G6')
+        expect(FastlaneCore::CertChecker).to receive(:install_wwdr_certificate).with('G2', { keychain: "login.keychain" })
+        expect(FastlaneCore::CertChecker).to receive(:install_wwdr_certificate).with('G3', { keychain: "login.keychain" })
+        expect(FastlaneCore::CertChecker).to receive(:install_wwdr_certificate).with('G4', { keychain: "login.keychain" })
+        expect(FastlaneCore::CertChecker).to receive(:install_wwdr_certificate).with('G5', { keychain: "login.keychain" })
+        expect(FastlaneCore::CertChecker).to receive(:install_wwdr_certificate).with('G6', { keychain: "login.keychain" })
         FastlaneCore::CertChecker.install_missing_wwdr_certificates
       end
 
       it 'should install the missing official WWDR certificate' do
+        allow(FastlaneCore::CertChecker).to receive(:wwdr_keychain).and_return('login.keychain')
         allow(FastlaneCore::CertChecker).to receive(:installed_wwdr_certificates).and_return(['G2', 'G3', 'G4', 'G5'])
-        expect(FastlaneCore::CertChecker).to receive(:install_wwdr_certificate).with('G6')
+        expect(FastlaneCore::CertChecker).to receive(:install_wwdr_certificate).with('G6', { keychain: "login.keychain" })
         FastlaneCore::CertChecker.install_missing_wwdr_certificates
       end
 
@@ -103,7 +107,7 @@ describe FastlaneCore do
 
       it 'should shell escape keychain names when checking for installation' do
         expect(FastlaneCore::CertChecker).to receive(:wwdr_keychain).and_return(keychain_name)
-        expect(FastlaneCore::Helper).to receive(:backticks).with(name_regex).and_return("")
+        expect(FastlaneCore::Helper).to receive(:backticks).with(name_regex, { print: false }).and_return("")
 
         FastlaneCore::CertChecker.installed_wwdr_certificates
       end
