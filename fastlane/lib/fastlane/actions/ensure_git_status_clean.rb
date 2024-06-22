@@ -23,9 +23,6 @@ module Fastlane
         # Manual post processing trying to ignore certain file paths
         if (ignore_files = params[:ignore_files])
           repo_status = repo_status.lines.reject do |line|
-            # Extract the file path from the line based on
-            # https://git-scm.com/docs/git-status#_output
-
             path = path_from_git_status_line(line)
             next if path.empty?
 
