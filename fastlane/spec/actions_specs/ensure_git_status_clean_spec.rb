@@ -40,7 +40,7 @@ describe Fastlane do
           end
 
           it "outputs success message when a file path contains spaces" do
-            allow(Fastlane::Actions).to receive(:sh).with("git status --porcelain", log: false).and_return(" M fastlane/spec/fixtures/git_commit/A FILE WITH SPACE")
+            allow(Fastlane::Actions).to receive(:sh).with("git status --porcelain", log: false).and_return(" M \"fastlane/spec/fixtures/git_commit/A FILE WITH SPACE\"")
 
             expect(FastlaneCore::UI).to receive(:success).with("Git status is clean, all good! 💪")
             Fastlane::FastFile.new.parse("lane :test do
@@ -51,7 +51,7 @@ describe Fastlane do
           end
 
           it "outputs success message when a file path is renamed" do
-            allow(Fastlane::Actions).to receive(:sh).with("git status --porcelain", log: false).and_return("R  fastlane/spec/fixtures/git_commit/A FILE WITH SPACE -> fastlane/spec/fixtures/git_commit/A_FILE_WITHOUT_SPACE")
+            allow(Fastlane::Actions).to receive(:sh).with("git status --porcelain", log: false).and_return("R  \"fastlane/spec/fixtures/git_commit/A FILE WITH SPACE\" -> \"fastlane/spec/fixtures/git_commit/A_FILE_WITHOUT_SPACE\"")
 
             expect(FastlaneCore::UI).to receive(:success).with("Git status is clean, all good! 💪")
             Fastlane::FastFile.new.parse("lane :test do

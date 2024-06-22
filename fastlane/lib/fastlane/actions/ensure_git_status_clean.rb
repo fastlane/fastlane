@@ -26,21 +26,8 @@ module Fastlane
             # Extract the file path from the line based on
             # https://git-scm.com/docs/git-status#_output
 
-            # The first two characters indicate the status of the file path (e.g. ' M')
-            # XY PATH
-            path = line&.match(/^.{2}\s(.*)/)&.[](1) || ''
-
-            # If the file path is renamed, the original path is also included in the line (e.g. ' R ORIG_PATH -> PATH')
-            # XY ORIG_PATH -> PATH
-            path = path.split('->').last.strip if path.include?('->')
-
-            # Remove double quotes from the file path
-            path = path.gsub(/"/, '')
-
+            path = path_from_git_status_line(line)
             next if path.empty?
-
-            # Remove double quotes from the file path
-            path = path.gsub(/"/, '')
 
             was_found = ignore_files.include?(path)
 
@@ -70,6 +57,19 @@ module Fastlane
           end
           UI.user_error!(error_message)
         end
+      end
+
+      def self.path_from_git_status_line(line)
+        # Extract the file path from the line based on https://git-scm.com/docs/git-status#_output.
+        # The first two characters indicate the status of the file path (e.g. ' M')
+        #  M App/script.sh
+        #
+        # If the file path is renamed, the original path is also included in the line (e.g. 'R  ORIG_PATH -> PATH')
+        # R  App/script.sh -> App/script_renamed.sh
+        #
+        path = line.match(/^.. (.* -> )?(.*)$/)[2]
+        path = path.delete_prefix('"').delete_suffix('"')
+        return path
       end
 
       def self.description
