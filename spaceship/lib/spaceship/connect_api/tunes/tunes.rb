@@ -417,6 +417,15 @@ module Spaceship
         end
 
         #
+        # appAvailabilities
+        #
+
+        def get_app_availabilities(app_id: nil, filter: nil, includes: nil, limit: nil, sort: nil)
+          params = tunes_request_client.build_params(filter: nil, includes: includes, limit: limit, sort: nil)
+          tunes_request_client.get("#{Version::V2}/appAvailabilities/#{app_id}", params)
+        end
+
+        #
         # availableTerritories
         #
 

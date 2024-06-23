@@ -45,6 +45,24 @@ describe Spaceship::ConnectAPI::Tunes::Client do
       return req_mock
     end
 
+    describe "appAvailabilities" do
+      context 'get_app_availabilities' do
+        let(:path) { "v2/appAvailabilities" }
+        let(:app_id) { "123" }
+
+        it 'succeeds' do
+          url = "#{path}/#{app_id}"
+          params = {
+            include: "territoryAvailabilities",
+            limit: { "territoryAvailabilities": 200 }
+          }
+          req_mock = test_request_params(url, params)
+          expect(client).to receive(:request).with(:get).and_yield(req_mock).and_return(req_mock)
+          client.get_app_availabilities(app_id: app_id, includes: "territoryAvailabilities", limit: { "territoryAvailabilities": 200 })
+        end
+      end
+    end
+
     describe "appStoreVersionReleaseRequests" do
       context 'post_app_store_version_release_request' do
         let(:path) { "v1/appStoreVersionReleaseRequests" }
