@@ -187,7 +187,6 @@ describe Spaceship::ConnectAPI::App do
       expect(availabilities.territory_availabilities[1].contentStatuses).to eq(["CANNOT_SELL"])
     end
   end
-<<<<<<< lucgrabowski-check-if-app-removed-from-sale
 
   describe("Checks if app removed_from_sale?") do
     it('gets true when app has not been released (no READY_FOR_DISTRIBUTION app store versions)') do
@@ -252,6 +251,4 @@ describe Spaceship::ConnectAPI::App do
       expect(app.removed_from_sale?).to be(false)
     end
   end
-=======
->>>>>>> master
 end
