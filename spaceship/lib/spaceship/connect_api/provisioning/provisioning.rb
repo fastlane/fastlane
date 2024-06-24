@@ -96,7 +96,12 @@ module Spaceship
               type: "bundleIds",
               id: bundle_id_id,
               attributes: {
-                teamId: seed_id
+                permissions: {
+                  edit: true,
+                  delete: true
+                },
+                seedId: seed_id,
+                teamId: provisioning_request_client.team_id
               },
               relationships: {
                 bundleIdCapabilities: {

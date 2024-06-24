@@ -82,6 +82,20 @@ describe Deliver::Runner do
       end
     end
 
+    describe 'with an IPA file for visionOS' do
+      before do
+        options[:platform] = 'xros'
+      end
+
+      it 'uploads the IPA for the visionOS platform' do
+        expect_any_instance_of(FastlaneCore::IpaUploadPackageBuilder).to receive(:generate)
+          .with(app_id: 'YI8C2AS', ipa_path: 'ACME.ipa', package_path: '/tmp', platform: 'xros')
+          .and_return('path')
+        expect(transporter).to receive(:upload).with(package_path: 'path', asset_path: 'ACME.ipa', platform: 'xros').and_return(true)
+        runner.upload_binary
+      end
+    end
+
     describe 'with a PKG file for macOS' do
       before do
         options[:platform] = 'osx'
@@ -125,6 +139,20 @@ describe Deliver::Runner do
           .with(app_id: 'YI8C2AS', ipa_path: 'ACME.ipa', package_path: '/tmp', platform: 'appletvos')
           .and_return('path')
         expect(transporter).to receive(:verify).with(asset_path: "ACME.ipa", package_path: 'path', platform: "appletvos").and_return(true)
+        runner.verify_binary
+      end
+    end
+
+    describe 'with an IPA file for visionOS' do
+      before do
+        options[:platform] = 'xros'
+      end
+
+      it 'verifies the IPA for the visionOS platform' do
+        expect_any_instance_of(FastlaneCore::IpaUploadPackageBuilder).to receive(:generate)
+          .with(app_id: 'YI8C2AS', ipa_path: 'ACME.ipa', package_path: '/tmp', platform: 'xros')
+          .and_return('path')
+        expect(transporter).to receive(:verify).with(asset_path: "ACME.ipa", package_path: 'path', platform: "xros").and_return(true)
         runner.verify_binary
       end
     end

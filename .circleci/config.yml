@@ -180,19 +180,6 @@ jobs:
           version: << parameters.ruby_version >>
       - *bundle_install
       - *cache_save_bundler
-      - run:
-          name: debug | brew version
-          command: |
-            brew -v
-      - run:
-          name: brew update if needed # temporary solution for this https://discuss.circleci.com/t/macos-image-users-homebrew-brownout-2021-04-26/39872/2
-          command: |
-            # if the version is not 3.x.x, try brew update
-            ruby -e 'exit(1) if `brew -v` =~ /2\.\d+\.\d+/' ||\
-            brew update || \
-            # if brew update fails due to shallow clone, try unshallowing and then brew update again
-            git -C /usr/local/Homebrew/Library/Taps/homebrew/homebrew-core fetch --unshallow && \
-            brew update
       - run: bundle exec fastlane generate_swift_api
 
   validate_documentation:
@@ -320,8 +307,8 @@ workflows:
           ruby_version: '2.6'
       - validate_fastlane_swift_generation:
           name: 'Validate Fastlane.swift generation'
-          xcode_version: '12.5.1'
-          ruby_version: '2.7'
+          xcode_version: '15.0.1'
+          ruby_version: '3.2'
       - validate_documentation:
           name: 'Validate Documentation'
           image: 'cimg/ruby:3.2.2'

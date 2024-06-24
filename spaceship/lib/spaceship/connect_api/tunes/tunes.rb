@@ -1104,51 +1104,6 @@ module Spaceship
         end
 
         #
-        # idfaDeclarations
-        #
-
-        def get_idfa_declaration(app_store_version_id: nil)
-          params = tunes_request_client.build_params(filter: nil, includes: nil, limit: nil, sort: nil)
-          tunes_request_client.get("#{Version::V1}/appStoreVersions/#{app_store_version_id}/idfaDeclaration", params)
-        end
-
-        def post_idfa_declaration(app_store_version_id: nil, attributes: nil)
-          body = {
-            data: {
-              type: "idfaDeclarations",
-              attributes: attributes,
-              relationships: {
-                appStoreVersion: {
-                  data: {
-                    type: "appStoreVersions",
-                    id: app_store_version_id
-                  }
-                }
-              }
-            }
-          }
-
-          tunes_request_client.post("#{Version::V1}/idfaDeclarations", body)
-        end
-
-        def patch_idfa_declaration(idfa_declaration_id: nil, attributes: nil)
-          body = {
-            data: {
-              type: "idfaDeclarations",
-              id: idfa_declaration_id,
-              attributes: attributes
-            }
-          }
-
-          tunes_request_client.patch("#{Version::V1}/idfaDeclarations/#{idfa_declaration_id}", body)
-        end
-
-        def delete_idfa_declaration(idfa_declaration_id: nil)
-          params = tunes_request_client.build_params(filter: nil, includes: nil, limit: nil, sort: nil)
-          tunes_request_client.delete("#{Version::V1}/idfaDeclarations/#{idfa_declaration_id}", params)
-        end
-
-        #
         # reviewSubmissions
         #
 
