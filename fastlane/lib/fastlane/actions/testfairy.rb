@@ -97,7 +97,7 @@ module Fastlane
           when :custom
             [key, value]
           when :tags
-            [key, value]
+            [key, value.join(',')]
           else
             UI.user_error!("Unknown parameter: #{key}")
           end
