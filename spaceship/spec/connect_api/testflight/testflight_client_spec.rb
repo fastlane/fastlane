@@ -256,6 +256,20 @@ describe Spaceship::ConnectAPI::TestFlight::Client do
       end
     end
 
+    describe 'betaAppTesterDetail' do
+      context 'get_beta_app_tester_detail' do
+        let(:app_id) { "123456789" }
+        let(:path) { "apps/#{app_id}/betaAppTesterDetail" }
+
+        it 'succeeds' do
+          params = {}
+          req_mock = test_request_params(path, params)
+          expect(client).to receive(:request).with(:get).and_yield(req_mock).and_return(req_mock)
+          client.get_beta_app_tester_detail(app_id: app_id)
+        end
+      end
+    end
+
     describe "betaBuildLocalizations" do
       context 'get_beta_build_localizations' do
         let(:path) { "v1/betaBuildLocalizations" }

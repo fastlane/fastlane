@@ -182,6 +182,10 @@ module Spaceship
           test_flight_request_client.get("#{Version::V1}/betaGroups", params)
         end
 
+        def get_beta_app_tester_detail(app_id:)
+          test_flight_request_client.get("apps/#{app_id}/betaAppTesterDetail", {})
+        end
+
         def add_beta_groups_to_build(build_id: nil, beta_group_ids: [])
           body = {
             data: beta_group_ids.map do |id|
