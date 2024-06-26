@@ -19,11 +19,11 @@ module Deliver
       IOS_55 = "iOS-5.5-in"
       # iPhone XS
       IOS_58 = "iOS-5.8-in"
-      # iPhone 14 Pro
+      # iPhone 15 Pro, iPhone 15, iPhone 14 Pro
       IOS_61 = "iOS-6.1-in"
       # iPhone 14 Plus, iPhone 13 Pro Max, iPhone 12 Pro Max, iPhone 11 Pro Max, iPhone 11, iPhone XS Max, iPhone XR
       IOS_65 = "iOS-6.5-in"
-      # iPhone 14 Pro Max
+      # iPhone 15 Plus, iPhone 15 Pro Max, iPhone 14 Pro Max
       IOS_67 = "iOS-6.7-in"
 
       # iPad
@@ -45,11 +45,11 @@ module Deliver
       IOS_55_MESSAGES = "iOS-5.5-in-messages"
       # iPhone XS iMessage
       IOS_58_MESSAGES = "iOS-5.8-in-messages"
-      # iPhone 14 Pro iMessage
+      # iPhone 15 Pro, iPhone 15, iPhone 14 Pro iMessage
       IOS_61_MESSAGES = "iOS-6.1-in-messages"
       # iPhone 14 Plus, iPhone 13 Pro Max, iPhone 12 Pro Max, iPhone 11 Pro Max, iPhone 11, iPhone XS Max, iPhone XR iMessage
       IOS_65_MESSAGES = "iOS-6.5-in-messages"
-      # iPhone 14 Pro Max iMessage
+      # iPhone 15 Plus, iPhone 15 Pro Max, iPhone 14 Pro Max iMessage
       IOS_67_MESSAGES = "iOS-6.7-in-messages"
 
       # iPad iMessage
