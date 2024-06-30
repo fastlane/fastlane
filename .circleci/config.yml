@@ -307,8 +307,8 @@ workflows:
           ruby_version: '2.6'
       - validate_fastlane_swift_generation:
           name: 'Validate Fastlane.swift generation'
-          xcode_version: '12.5.1'
-          ruby_version: '2.7'
+          xcode_version: '15.0.1'
+          ruby_version: '3.2'
       - validate_documentation:
           name: 'Validate Documentation'
           image: 'cimg/ruby:3.2.2'

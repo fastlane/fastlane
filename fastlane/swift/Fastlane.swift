@@ -674,7 +674,7 @@ public func appledoc(input: [String],
    - resetRatings: Reset the summary rating when you release a new version of the application
    - priceTier: The price tier of this application
    - appRatingConfigPath: Path to the app rating's config
-   - submissionInformation: Extra information for the submission (e.g. compliance specifications, IDFA settings)
+   - submissionInformation: Extra information for the submission (e.g. compliance specifications)
    - teamId: The ID of your App Store Connect team if you're in multiple teams
    - teamName: The name of your App Store Connect team if you're in multiple teams
    - devPortalTeamId: The short ID of your Developer Portal team, if you're in multiple teams. Different from your iTC team ID!
@@ -3714,7 +3714,7 @@ public func deleteKeychain(name: OptionalConfigValue<String?> = .fastlaneDefault
    - resetRatings: Reset the summary rating when you release a new version of the application
    - priceTier: The price tier of this application
    - appRatingConfigPath: Path to the app rating's config
-   - submissionInformation: Extra information for the submission (e.g. compliance specifications, IDFA settings)
+   - submissionInformation: Extra information for the submission (e.g. compliance specifications)
    - teamId: The ID of your App Store Connect team if you're in multiple teams
    - teamName: The name of your App Store Connect team if you're in multiple teams
    - devPortalTeamId: The short ID of your Developer Portal team, if you're in multiple teams. Different from your iTC team ID!
@@ -12540,7 +12540,7 @@ public func uploadSymbolsToSentry(apiHost: String = "https://app.getsentry.com/a
    - resetRatings: Reset the summary rating when you release a new version of the application
    - priceTier: The price tier of this application
    - appRatingConfigPath: Path to the app rating's config
-   - submissionInformation: Extra information for the submission (e.g. compliance specifications, IDFA settings)
+   - submissionInformation: Extra information for the submission (e.g. compliance specifications)
    - teamId: The ID of your App Store Connect team if you're in multiple teams
    - teamName: The name of your App Store Connect team if you're in multiple teams
    - devPortalTeamId: The short ID of your Developer Portal team, if you're in multiple teams. Different from your iTC team ID!
@@ -13801,4 +13801,4 @@ public let snapshotfile: Snapshotfile = .init()
 
 // Please don't remove the lines below
 // They are used to detect outdated files
-// FastlaneRunnerAPIVersion [0.9.178]
+// FastlaneRunnerAPIVersion [0.9.179]
