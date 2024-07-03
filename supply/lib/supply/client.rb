@@ -47,7 +47,7 @@ module Supply
     # @param service_account_json: The raw service account Json data
     def initialize(service_account_json: nil, params: nil)
       # check if it's an external account or service account
-      json_file = JSON.parse(File.read(service_account_json.string))
+      json_file = JSON.parse(File.read(service_account_json.read))
       auth = json_file["type"] == "external_account" ? Google::Auth::ExternalAccount::Credentials : Google::Auth::ServiceAccountCredentials
       auth_client = auth.make_creds(json_key_io: service_account_json, scope: self.class::SCOPE)
 
