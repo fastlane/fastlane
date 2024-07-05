@@ -46,6 +46,8 @@ describe Deliver::Runner do
     }
   end
 
+  let(:fake_team_api_key_json_path) { File.absolute_path("./spaceship/spec/connect_api/fixtures/asc_key.json") }
+
   before do
     allow(Deliver).to receive(:cache).and_return({
       app: double('app', { id: 'YI8C2AS' })
@@ -111,6 +113,36 @@ describe Deliver::Runner do
         runner.upload_binary
       end
     end
+
+    describe 'with Team API Key' do
+      before do
+        options[:api_key] = JSON.load_file(fake_team_api_key_json_path, symbolize_names: true)
+      end
+
+      it 'initializes transporter with API key' do
+        token = instance_double(Spaceship::ConnectAPI::Token, {
+          text: 'API_TOKEN',
+          expired?: false
+        })
+        allow(Spaceship::ConnectAPI).to receive(:token).and_return token
+        expect_any_instance_of(FastlaneCore::IpaUploadPackageBuilder).to receive(:generate).and_return('path')
+        expect(FastlaneCore::ItunesTransporter).to receive(:new)
+          .with(
+            nil,
+            nil,
+            false,
+            nil,
+            'API_TOKEN',
+            {
+              altool_compatible_command: true,
+              api_key: options[:api_key],
+            }
+          )
+          .and_return(transporter)
+        expect(transporter).to receive(:upload).with(package_path: 'path', asset_path: 'ACME.ipa', platform: 'ios').and_return(true)
+        runner.upload_binary
+      end
+    end
   end
 
   describe :verify_binary do
@@ -169,6 +201,36 @@ describe Deliver::Runner do
           .with(app_id: 'YI8C2AS', pkg_path: 'ACME.pkg', package_path: '/tmp', platform: 'osx')
           .and_return('path')
         expect(transporter).to receive(:verify).with(asset_path: "ACME.pkg", package_path: 'path', platform: "osx").and_return(true)
+        runner.verify_binary
+      end
+    end
+
+    describe 'with Team API Key' do
+      before do
+        options[:api_key] = JSON.load_file(fake_team_api_key_json_path, symbolize_names: true)
+      end
+
+      it 'initializes transporter with API Key' do
+        token = instance_double(Spaceship::ConnectAPI::Token, {
+          text: 'API_TOKEN',
+          expired?: false
+        })
+        allow(Spaceship::ConnectAPI).to receive(:token).and_return token
+        allow_any_instance_of(FastlaneCore::IpaUploadPackageBuilder).to receive(:generate).and_return('path')
+        expect(FastlaneCore::ItunesTransporter).to receive(:new)
+          .with(
+            nil,
+            nil,
+            false,
+            nil,
+            'API_TOKEN',
+            {
+              altool_compatible_command: true,
+              api_key: options[:api_key],
+            }
+          )
+          .and_return(transporter)
+        expect(transporter).to receive(:verify).and_return(true)
         runner.verify_binary
       end
     end
