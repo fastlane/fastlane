@@ -346,7 +346,7 @@ module Fastlane
                 Actions.sh("cd #{clone_folder.shellescape} && git fetch --all --quiet && git checkout #{checkout_param.shellescape} #{checkout_path} && git reset --hard")
                 # Check if checked out "branch" is actually a branch or a tag
                 current_branch = Actions.sh("cd #{clone_folder.shellescape} && git rev-parse --abbrev-ref HEAD")
-                unless current_branch.strip.eql? "HEAD"
+                unless current_branch.strip.eql?("HEAD")
                   Actions.sh("cd #{clone_folder.shellescape} && git rebase")
                 end
               end
