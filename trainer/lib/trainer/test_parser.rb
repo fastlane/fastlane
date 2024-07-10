@@ -204,8 +204,7 @@ module Trainer
       # Executes xcresulttool to get JSON format of the result bundle object
       # Hotfix: From Xcode 16 beta 3 'xcresulttool get --format json' has been deprecated; '--legacy' flag required to keep on using the command
       xcresulttool_cmd = "xcrun xcresulttool get --format json --path #{path}"
-      xcode_version_object = JSON.parse(`plutil -convert json -o - #{FastlaneCore::Helper.xcode_path}../version.plist`)
-      xcresulttool_cmd << ' --legacy' if xcode_version_object['CFBundleVersion'].to_i >= 23044 # CFBundleVersion of Xcode 16 beta 3
+      xcresulttool_cmd << ' --legacy' if `xcrun --version`.gsub('xcrun version ', '').to_f >= 70.0 # Version of xcrun bundled in Xcode 16 beta 3
 
       result_bundle_object_raw = execute_cmd(xcresulttool_cmd)
       result_bundle_object = JSON.parse(result_bundle_object_raw)
