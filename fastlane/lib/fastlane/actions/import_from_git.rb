@@ -71,7 +71,7 @@ module Fastlane
             branch: "HEAD", # The branch to checkout on the repository.
             path: "fastlane/Fastfile", # The path of the Fastfile in the repository.
             version: [">= 1.1.0", "< 2.0.0"], # The version to checkout on the repository. Multiple conditions can be used to select the latest version within constraints.
-            cache_path: "~/.cache/fastlane/imported" # A directory in which the repository will be added, which means that it will not be cloned again on subsequent calls.
+            cache_path: "~/.cache/fastlane/imported", # A directory in which the repository will be added, which means that it will not be cloned again on subsequent calls.
             git_basic_authorization: "<YOUR BASE64 KEY>"
           )'
         ]
