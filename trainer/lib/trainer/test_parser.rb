@@ -202,7 +202,12 @@ module Trainer
       path = Shellwords.escape(path)
 
       # Executes xcresulttool to get JSON format of the result bundle object
-      result_bundle_object_raw = execute_cmd("xcrun xcresulttool get --format json --path #{path}")
+      # Hotfix: From Xcode 16 beta 3 'xcresulttool get --format json' has been deprecated; '--legacy' flag required to keep on using the command
+      xcresulttool_cmd = "xcrun xcresulttool get --format json --path #{path}"
+      xcode_version_object = JSON.parse(`plutil -convert json -o - #{FastlaneCore::Helper.xcode_path}../version.plist`)
+      xcresulttool_cmd << ' --legacy' if xcode_version_object['CFBundleVersion'].to_i >= 23044 # CFBundleVersion of Xcode 16 beta 3
+
+      result_bundle_object_raw = execute_cmd(xcresulttool_cmd)
       result_bundle_object = JSON.parse(result_bundle_object_raw)
 
       # Parses JSON into ActionsInvocationRecord to find a list of all ids for ActionTestPlanRunSummaries
@@ -215,7 +220,7 @@ module Trainer
       # Maps ids into ActionTestPlanRunSummaries by executing xcresulttool to get JSON
       # containing specific information for each test summary,
       summaries = ids.map do |id|
-        raw = execute_cmd("xcrun xcresulttool get --format json --path #{path} --id #{id}")
+        raw = execute_cmd("#{xcresulttool_cmd} --id #{id}")
         json = JSON.parse(raw)
         Trainer::XCResult::ActionTestPlanRunSummaries.new(json)
       end
