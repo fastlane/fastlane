@@ -52,7 +52,7 @@ module Gym
         return building_mac_catalyst_for_mac?
       else
         # Can be mac project but multiplatform and building for non-macOS
-        return false if !building_multiplatform_for_mac?
+        return false unless building_multiplatform_for_mac?
 
         return Gym.project.mac?
       end
