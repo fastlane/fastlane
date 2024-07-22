@@ -279,7 +279,7 @@ describe Gym do
                                "-project ./gym/examples/standard/Example.xcodeproj",
                                "-destination 'generic/platform=iOS'",
                                "-archivePath #{Gym::BuildCommandGenerator.archive_path.shellescape}",
-                               "-resultBundlePath './ExampleProductName.result'",
+                               "-resultBundlePath './ExampleProductName.xcresult'",
                                :archive,
                                "| tee #{log_path.shellescape}",
                                "| xcpretty"
