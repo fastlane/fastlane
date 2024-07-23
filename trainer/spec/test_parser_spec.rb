@@ -27,7 +27,7 @@ describe Trainer do
     end
 
     describe "#generate_cmd_parse_xcresult" do
-      it "appends '--legacy' to command for parse_xcresult on >= Xcode 16 beta 3" do
+      it "appends '--legacy' to command for parse_xcresult on >= Xcode 16 beta 3", requires_xcode: true do
         xcresult_sample_path = "./trainer/spec/fixtures/Test.test_result.xcresult"
         @model = Trainer::TestParser.new(xcresult_sample_path)
         allow_any_instance_of(Trainer::TestParser).to receive(:`).and_return("xcresulttool version 23021, format version 3.53 (current)")
@@ -35,7 +35,7 @@ describe Trainer do
         expect(actual).to eq("xcrun xcresulttool get --format json --path #{xcresult_sample_path} --legacy")
       end
 
-      it "use traditional command for parse_xcresult on < Xcode 16 beta 3" do
+      it "use traditional command for parse_xcresult on < Xcode 16 beta 3", requires_xcode: true do
         xcresult_sample_path = "./trainer/spec/fixtures/Test.test_result.xcresult"
         @model = Trainer::TestParser.new(xcresult_sample_path)
         allow_any_instance_of(Trainer::TestParser).to receive(:`).and_return("xcresulttool version 22608, format version 3.49 (current)")

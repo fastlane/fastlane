@@ -211,7 +211,9 @@ module Trainer
       )
 
       # Version of xcresulttool bundled in Xcode 16 beta 3 was 23021
-      xcresulttool_cmd << '--legacy' if `xcrun xcresulttool version`.split(',')[0].gsub('xcresulttool version ', '').to_f >= 23_021.0
+      xcresulttool_version_string = `xcrun xcresulttool version`.split(',')[0]
+      xcresulttool_version = xcresulttool_version_string.gsub('xcresulttool version ', '').to_f
+      xcresulttool_cmd << '--legacy' if xcresulttool_version >= 23_021.0
 
       xcresulttool_cmd.join(' ')
     end
