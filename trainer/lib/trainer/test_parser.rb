@@ -197,14 +197,32 @@ module Trainer
       return output
     end
 
+    # Hotfix: From Xcode 16 beta 3 'xcresulttool get --format json' has been deprecated;
+    #         '--legacy' flag required to keep on using the command
+    def generate_cmd_parse_xcresult(path)
+      xcresulttool_cmd = %W(
+        xcrun
+        xcresulttool
+        get
+        --format
+        json
+        --path
+        #{path}
+      )
+
+      # Version of xcresulttool bundled in Xcode 16 beta 3 was 23021
+      xcresulttool_cmd << '--legacy' if `xcrun xcresulttool version`.split(',')[0].gsub('xcresulttool version ', '').to_f >= 23_021.0
+
+      xcresulttool_cmd.join(' ')
+    end
+
     def parse_xcresult(path, output_remove_retry_attempts: false)
       require 'shellwords'
       path = Shellwords.escape(path)
 
       # Executes xcresulttool to get JSON format of the result bundle object
       # Hotfix: From Xcode 16 beta 3 'xcresulttool get --format json' has been deprecated; '--legacy' flag required to keep on using the command
-      xcresulttool_cmd = "xcrun xcresulttool get --format json --path #{path}"
-      xcresulttool_cmd << ' --legacy' if `xcrun --version`.gsub('xcrun version ', '').to_f >= 70.0 # Version of xcrun bundled in Xcode 16 beta 3
+      xcresulttool_cmd = generate_cmd_parse_xcresult(path)
 
       result_bundle_object_raw = execute_cmd(xcresulttool_cmd)
       result_bundle_object = JSON.parse(result_bundle_object_raw)

@@ -26,6 +26,24 @@ describe Trainer do
       end
     end
 
+    describe "#generate_cmd_parse_xcresult" do
+      it "appends '--legacy' to command for parse_xcresult on >= Xcode 16 beta 3" do
+        xcresult_sample_path = "./trainer/spec/fixtures/Test.test_result.xcresult"
+        @model = Trainer::TestParser.new(xcresult_sample_path)
+        allow_any_instance_of(Trainer::TestParser).to receive(:`).and_return("xcresulttool version 23021, format version 3.53 (current)")
+        actual = @model.send(:generate_cmd_parse_xcresult, xcresult_sample_path)
+        expect(actual).to eq("xcrun xcresulttool get --format json --path #{xcresult_sample_path} --legacy")
+      end
+
+      it "use traditional command for parse_xcresult on < Xcode 16 beta 3" do
+        xcresult_sample_path = "./trainer/spec/fixtures/Test.test_result.xcresult"
+        @model = Trainer::TestParser.new(xcresult_sample_path)
+        allow_any_instance_of(Trainer::TestParser).to receive(:`).and_return("xcresulttool version 22608, format version 3.49 (current)")
+        actual = @model.send(:generate_cmd_parse_xcresult, xcresult_sample_path)
+        expect(actual).to eq("xcrun xcresulttool get --format json --path #{xcresult_sample_path}")
+      end
+    end
+
     describe "Stores the data in a useful format" do
       describe "#tests_successful?" do
         it "returns false if tests failed" do
