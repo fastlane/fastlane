@@ -27,20 +27,31 @@ describe Trainer do
     end
 
     describe "#generate_cmd_parse_xcresult" do
-      it "appends '--legacy' to command for parse_xcresult on >= Xcode 16 beta 3", requires_xcode: true do
-        xcresult_sample_path = "./trainer/spec/fixtures/Test.test_result.xcresult"
-        @model = Trainer::TestParser.new(xcresult_sample_path)
-        allow_any_instance_of(Trainer::TestParser).to receive(:`).and_return("xcresulttool version 23021, format version 3.53 (current)")
-        actual = @model.send(:generate_cmd_parse_xcresult, xcresult_sample_path)
-        expect(actual).to eq("xcrun xcresulttool get --format json --path #{xcresult_sample_path} --legacy")
+      let(:xcresult_sample_path) { "./trainer/spec/fixtures/Test.test_result.xcresult" }
+      let!(:subject) { Trainer::TestParser.new(xcresult_sample_path) }
+      let(:command) { subject.send(:generate_cmd_parse_xcresult, xcresult_sample_path) }
+
+      before do
+        allow(File).to receive(:expand_path).with(xcresult_sample_path).and_return(xcresult_sample_path)
+        allow_any_instance_of(Trainer::TestParser).to receive(:`).with('xcrun xcresulttool version').and_return(version)
       end
 
-      it "use traditional command for parse_xcresult on < Xcode 16 beta 3", requires_xcode: true do
-        xcresult_sample_path = "./trainer/spec/fixtures/Test.test_result.xcresult"
-        @model = Trainer::TestParser.new(xcresult_sample_path)
-        allow_any_instance_of(Trainer::TestParser).to receive(:`).and_return("xcresulttool version 22608, format version 3.49 (current)")
-        actual = @model.send(:generate_cmd_parse_xcresult, xcresult_sample_path)
-        expect(actual).to eq("xcrun xcresulttool get --format json --path #{xcresult_sample_path}")
+      context 'with >= Xcode 16 beta 3' do
+        let(:version) { 'xcresulttool version 23021, format version 3.53 (current)' }
+        let(:expected) { "xcrun xcresulttool get --format json --path #{xcresult_sample_path} --legacy" }
+
+        it 'should pass `--legacy`' do
+          expect(command).to eq(expected)
+        end
+      end
+
+      context 'with < Xcode 16 beta 3' do
+        let(:version) { 'xcresulttool version 22608, format version 3.49 (current)' }
+        let(:expected) { "xcrun xcresulttool get --format json --path #{xcresult_sample_path}" }
+
+        it 'should not pass `--legacy`' do
+          expect(command).to eq(expected)
+        end
       end
     end
 

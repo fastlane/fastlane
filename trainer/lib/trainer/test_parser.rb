@@ -210,10 +210,11 @@ module Trainer
         #{path}
       )
 
-      # Version of xcresulttool bundled in Xcode 16 beta 3 was 23021
-      xcresulttool_version_string = `xcrun xcresulttool version`.split(',')[0]
-      xcresulttool_version = xcresulttool_version_string.gsub('xcresulttool version ', '').to_f
-      xcresulttool_cmd << '--legacy' if xcresulttool_version >= 23_021.0
+      # e.g. DEVELOPER_DIR=/Applications/Xcode_16_beta_3.app
+      # xcresulttool version 23021, format version 3.53 (current)
+      match = `xcrun xcresulttool version`.match(/xcresulttool version (?<version>\d+),/)
+      version = match[:version]&.to_f
+      xcresulttool_cmd << '--legacy' if version >= 23_021.0
 
       xcresulttool_cmd.join(' ')
     end
