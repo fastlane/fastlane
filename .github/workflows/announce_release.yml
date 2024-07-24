@@ -4,7 +4,6 @@ on:
   release:
     types:
       - published
-  workflow_dispatch:
 
 jobs:
   announce-release-on-released-pull-requests:

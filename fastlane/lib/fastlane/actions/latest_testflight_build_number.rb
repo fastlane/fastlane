@@ -83,7 +83,7 @@ module Fastlane
                                        optional: true,
                                        default_value: "ios",
                                        verify_block: proc do |value|
-                                         UI.user_error!("The platform can only be ios, osx, or appletvos") unless %('osx', ios', 'appletvos').include?(value)
+                                         UI.user_error!("The platform can only be ios, osx, xros or appletvos") unless %('osx', ios', 'appletvos', 'xros').include?(value)
                                        end),
           FastlaneCore::ConfigItem.new(key: :initial_build_number,
                                        env_name: "INITIAL_BUILD_NUMBER",

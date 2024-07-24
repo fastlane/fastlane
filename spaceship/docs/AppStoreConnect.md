@@ -168,7 +168,6 @@ attr_accessor :watch_store_icon
 attr_accessor :copyright
 attr_accessor :release_type
 attr_accessor :earliest_release_date
-attr_accessor :uses_idfa
 attr_accessor :is_watch_only
 attr_accessor :downloadable
 attr_accessor :created_date
@@ -221,7 +220,7 @@ version.select_build(build_id: build.id)
 ### Submit app for App Store Review
 
 ```ruby
-# Check out submit_for_review.rb to get an overview how to modify idfa, submission information
+# Check out submit_for_review.rb to get an overview how to modify submission information
 version.create_app_store_version_submission
 ```
 
