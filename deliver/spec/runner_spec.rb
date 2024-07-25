@@ -128,6 +128,7 @@ describe Deliver::Runner do
           expired?: false
         })
         allow(Spaceship::ConnectAPI).to receive(:token).and_return(token)
+        allow(Spaceship::ConnectAPI).to receive(:token=)
         expect_any_instance_of(FastlaneCore::IpaUploadPackageBuilder).to receive(:generate).and_return('path')
         expect(FastlaneCore::ItunesTransporter).to receive(:new)
           .with(
@@ -158,6 +159,7 @@ describe Deliver::Runner do
           expired?: false
         })
         allow(Spaceship::ConnectAPI).to receive(:token).and_return(token)
+        allow(Spaceship::ConnectAPI).to receive(:token=)
         expect_any_instance_of(FastlaneCore::IpaUploadPackageBuilder).to receive(:generate).and_return('path')
         expect(FastlaneCore::ItunesTransporter).to receive(:new)
           .with(
@@ -248,6 +250,7 @@ describe Deliver::Runner do
           expired?: false
         })
         allow(Spaceship::ConnectAPI).to receive(:token).and_return(token)
+        allow(Spaceship::ConnectAPI).to receive(:token=)
         allow_any_instance_of(FastlaneCore::IpaUploadPackageBuilder).to receive(:generate).and_return('path')
         expect(FastlaneCore::ItunesTransporter).to receive(:new)
           .with(
@@ -278,6 +281,7 @@ describe Deliver::Runner do
           expired?: false
         })
         allow(Spaceship::ConnectAPI).to receive(:token).and_return(token)
+        allow(Spaceship::ConnectAPI).to receive(:token=)
         allow_any_instance_of(FastlaneCore::IpaUploadPackageBuilder).to receive(:generate).and_return('path')
         expect(FastlaneCore::ItunesTransporter).to receive(:new)
           .with(
