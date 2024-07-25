@@ -127,7 +127,7 @@ describe Deliver::Runner do
           text: 'API_TOKEN',
           expired?: false
         })
-        allow(Spaceship::ConnectAPI).to receive(:token).and_return token
+        allow(Spaceship::ConnectAPI).to receive(:token).and_return(token)
         expect_any_instance_of(FastlaneCore::IpaUploadPackageBuilder).to receive(:generate).and_return('path')
         expect(FastlaneCore::ItunesTransporter).to receive(:new)
           .with(
@@ -157,7 +157,7 @@ describe Deliver::Runner do
           text: 'API_TOKEN',
           expired?: false
         })
-        allow(Spaceship::ConnectAPI).to receive(:token).and_return token
+        allow(Spaceship::ConnectAPI).to receive(:token).and_return(token)
         expect_any_instance_of(FastlaneCore::IpaUploadPackageBuilder).to receive(:generate).and_return('path')
         expect(FastlaneCore::ItunesTransporter).to receive(:new)
           .with(
@@ -247,7 +247,7 @@ describe Deliver::Runner do
           text: 'API_TOKEN',
           expired?: false
         })
-        allow(Spaceship::ConnectAPI).to receive(:token).and_return token
+        allow(Spaceship::ConnectAPI).to receive(:token).and_return(token)
         allow_any_instance_of(FastlaneCore::IpaUploadPackageBuilder).to receive(:generate).and_return('path')
         expect(FastlaneCore::ItunesTransporter).to receive(:new)
           .with(
@@ -277,7 +277,7 @@ describe Deliver::Runner do
           text: 'API_TOKEN',
           expired?: false
         })
-        allow(Spaceship::ConnectAPI).to receive(:token).and_return token
+        allow(Spaceship::ConnectAPI).to receive(:token).and_return(token)
         allow_any_instance_of(FastlaneCore::IpaUploadPackageBuilder).to receive(:generate).and_return('path')
         expect(FastlaneCore::ItunesTransporter).to receive(:new)
           .with(
