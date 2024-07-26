@@ -212,9 +212,9 @@ module Trainer
 
       # e.g. DEVELOPER_DIR=/Applications/Xcode_16_beta_3.app
       # xcresulttool version 23021, format version 3.53 (current)
-      match = `xcrun xcresulttool version`.match(/xcresulttool version (?<version>\d+),/)
-      version = match[:version]&.to_f
-      xcresulttool_cmd << '--legacy' if version >= 23_021.0
+      match = `xcrun xcresulttool version`.match(/xcresulttool version (?<version>[\d.]+)/)
+      version = match[:version]
+      xcresulttool_cmd << '--legacy' if Gem::Version.new(version) >= Gem::Version.new(23_021)
 
       xcresulttool_cmd.join(' ')
     end

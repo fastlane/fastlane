@@ -46,7 +46,7 @@ describe Trainer do
       end
 
       context 'with < Xcode 16 beta 3' do
-        let(:version) { 'xcresulttool version 22608, format version 3.49 (current)' }
+        let(:version) { 'xcresulttool version 22608.2, format version 3.49 (current)' }
         let(:expected) { "xcrun xcresulttool get --format json --path #{xcresult_sample_path}" }
 
         it 'should not pass `--legacy`', requires_xcode: true do
