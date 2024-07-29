@@ -97,7 +97,7 @@ module Fastlane
           when :custom
             [key, value]
           when :tags
-            [key, value]
+            [key, value.join(',')]
           when :folder_name
             [key, value]
           when :landing_page_mode
