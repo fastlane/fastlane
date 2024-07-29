@@ -278,7 +278,8 @@ module Fastlane
     # @param version [String, Array] Version requirement for repo tags
     # @param dependencies [Array] An optional array of additional Fastfiles in the repository
     # @param cache_path [String] An optional path to a directory where the repository should be cloned into
-    def import_from_git(url: nil, branch: 'HEAD', path: 'fastlane/Fastfile', version: nil, dependencies: [], cache_path: nil) # rubocop:disable Metrics/PerceivedComplexity
+    # @param git_basic_authorization [String] An optional git basic authorization header to access the git repo (e.g.: access via HTTPS, GitHub Actions, etc), usually a string in Base64
+    def import_from_git(url: nil, branch: 'HEAD', path: 'fastlane/Fastfile', version: nil, dependencies: [], cache_path: nil, git_basic_authorization: nil) # rubocop:disable Metrics/PerceivedComplexity
       UI.user_error!("Please pass a path to the `import_from_git` action") if url.to_s.length == 0
 
       Actions.execute_action('import_from_git') do
@@ -313,8 +314,9 @@ module Fastlane
               # so we can switch between tags or branches instantly, or else,
               # it would defeat the caching's purpose.
               depth = is_eligible_for_caching ? "" : "--depth 1"
-
-              Actions.sh("git clone #{url.shellescape} #{clone_folder.shellescape} #{depth} --no-checkout #{branch_option}")
+              command = "git clone #{url.shellescape} #{clone_folder.shellescape} #{depth} --no-checkout #{branch_option}"
+              command << " -c http.extraheader='Authorization: Basic #{git_basic_authorization}'" unless git_basic_authorization.nil?
+              Actions.sh(command)
             end
           end
 
