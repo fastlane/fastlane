@@ -227,9 +227,10 @@ module Gym
       end
 
       def print_environment_information
-        if Gym.config[:export_method].to_s == "development"
+        export_method = Gym.config[:export_method].to_s
+        if [ExportMethod::DEBUGGING, ExportMethod::DEBUGGING_DEPRECATED].include?(export_method)
           UI.message("")
-          UI.error("Your `export_method` in gym is defined as `development`")
+          UI.error("Your `export_method` in gym is defined as `#{export_method}`")
           UI.error("which might cause problems when signing your application")
           UI.error("Are you sure want to build and export for development?")
           UI.error("Please make sure to define the correct export methods when calling")
