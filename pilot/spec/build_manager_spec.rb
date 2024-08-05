@@ -871,8 +871,11 @@ describe "Build Manager" do
 
   describe "#transporter_for_selected_team" do
     let(:fake_manager) { Pilot::BuildManager.new }
-    let(:fake_api_key_json_path) do
+    let(:fake_team_api_key_json_path) do
       "./spaceship/spec/connect_api/fixtures/asc_key.json"
+    end
+    let(:fake_individual_api_key_json_path) do
+      "./spaceship/spec/connect_api/fixtures/asc_individual_key.json"
     end
 
     let(:selected_team_id) { "123" }
@@ -890,15 +893,26 @@ describe "Build Manager" do
       }
     end
 
-    it "with API token" do
+    it "with Team API Key and API token" do
       options = {}
-      allow(Spaceship::ConnectAPI).to receive(:token).and_return(Spaceship::ConnectAPI::Token.from(filepath: fake_api_key_json_path))
+      allow(Spaceship::ConnectAPI).to receive(:token).and_return(Spaceship::ConnectAPI::Token.from(filepath: fake_team_api_key_json_path))
 
       transporter = fake_manager.send(:transporter_for_selected_team, options)
       expect(transporter.instance_variable_get(:@jwt)).not_to(be_nil)
       expect(transporter.instance_variable_get(:@user)).to be_nil
       expect(transporter.instance_variable_get(:@password)).to be_nil
       expect(transporter.instance_variable_get(:@provider_short_name)).to be_nil
+    end
+
+    it "with Individual API Key" do
+      options = { username: "josh" }
+      allow(Spaceship::ConnectAPI).to receive(:token).and_return(Spaceship::ConnectAPI::Token.from(filepath: fake_individual_api_key_json_path))
+
+      transporter = fake_manager.send(:transporter_for_selected_team, options)
+      expect(transporter.instance_variable_get(:@jwt)).to(be_nil)
+      expect(transporter.instance_variable_get(:@user)).to eq("josh")
+      expect(transporter.instance_variable_get(:@password)).to eq("DELIVERPASS")
+      expect(transporter.instance_variable_get(:@provider_short_name)).to(be_nil)
     end
 
     describe "with itc_provider" do
