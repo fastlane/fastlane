@@ -1,7 +1,7 @@
 require 'fastlane_core/command_executor'
 require 'fastlane_core/configuration/configuration'
 require 'fastlane/helper/s3_client_helper'
-
+require 'pry'
 require_relative '../options'
 require_relative '../module'
 require_relative '../spaceship_ensure'
@@ -108,7 +108,11 @@ module Match
           # the string represent a remote location, not a local file in disk.
           next if object.key.end_with?("/")
 
-          file_path = strip_s3_object_prefix(object.key) # :s3_object_prefix:team_id/path/to/file
+          file_path = strip_s3_object_prefix(object.key) # :s3_object_prefix/:team_id/path/to/file
+          if !team_id.nil? && !team_id.empty?
+            # Skip the current object as it is not associated with the supplied team
+            next unless file_path.start_with?(team_id.to_s)
+          end
 
           # strip s3_prefix from file_path
           download_path = File.join(self.working_directory, file_path)

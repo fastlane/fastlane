@@ -68,10 +68,13 @@ describe Match do
     end
 
     describe '#download' do
+      let(:team_id) { 'GFEDCBA' }
       let(:files_to_download) do
         [
           instance_double('Aws::S3::Object', key: 'ABCDEFG/certs/development/ABCDEFG.cer', download_file: true),
-          instance_double('Aws::S3::Object', key: 'ABCDEFG/certs/development/ABCDEFG.p12', download_file: true)
+          instance_double('Aws::S3::Object', key: 'ABCDEFG/certs/development/ABCDEFG.p12', download_file: true),
+          instance_double('Aws::S3::Object', key: "#{team_id}/certs/development/ABCDEFG1.cer", download_file: true),
+          instance_double('Aws::S3::Object', key: "#{team_id}/certs/development/ABCDEFG1.p12", download_file: true)
         ]
       end
       let(:s3_client) { instance_double('Fastlane::Helper::S3ClientHelper', find_bucket!: double(objects: files_to_download)) }
@@ -106,6 +109,26 @@ describe Match do
         expect(invalid_object).not_to receive(:download_file).with("#{working_directory}/#{invalid_object.key}")
 
         subject.download
+      end
+
+      context 'team_id is set' do
+        subject { described_class.new(s3_region: nil, s3_access_key: nil, s3_secret_access_key: nil, s3_bucket: 'foobar', team_id: team_id) }
+
+        before do
+          allow(subject).to receive(:working_directory).and_return(working_directory)
+          allow(subject).to receive(:s3_client).and_return(s3_client)
+        end
+
+        it 'downloards only files that have the correct team id' do
+          files_to_download.each do |file_object|
+            if file_object.key.start_with?(team_id)
+              expect(file_object).to receive(:download_file).with("#{working_directory}/#{file_object.key}")
+            else
+              expect(file_object).to_not(receive(:download_file).with("#{working_directory}/#{file_object.key}"))
+            end
+          end
+          subject.download
+        end
       end
     end
   end
