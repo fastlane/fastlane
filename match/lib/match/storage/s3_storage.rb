@@ -1,7 +1,7 @@
 require 'fastlane_core/command_executor'
 require 'fastlane_core/configuration/configuration'
 require 'fastlane/helper/s3_client_helper'
-require 'pry'
+
 require_relative '../options'
 require_relative '../module'
 require_relative '../spaceship_ensure'
