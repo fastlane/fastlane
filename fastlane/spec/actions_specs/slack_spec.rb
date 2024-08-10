@@ -32,6 +32,7 @@ describe Fastlane::Actions do
         expected_args = {
           channel: channel,
           username: 'fastlane',
+          thread_timestamp: nil,
           attachments: [
             hash_including(
               color: 'danger',
