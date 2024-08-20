@@ -39,7 +39,6 @@ module Spaceship
 
         missing_keys = []
         missing_keys << 'key_id' unless json.key?(:key_id)
-        missing_keys << 'issuer_id' unless json.key?(:issuer_id)
         missing_keys << 'key' unless json.key?(:key)
 
         unless missing_keys.empty?
@@ -99,11 +98,18 @@ module Spaceship
         }
 
         payload = {
-          iss: issuer_id,
-          iat: now.to_i,
+          # Reduce the issued-at-time in case our time is slighly ahead of Apple's servers, which causes the token to be rejected.
+          iat: now.to_i - 60,
           exp: @expiration.to_i,
           aud: 'appstoreconnect-v1'
         }
+        if issuer_id
+          payload[:iss] = issuer_id
+        else
+          # Consider the key as individual key.
+          # https://developer.apple.com/documentation/appstoreconnectapi/generating_tokens_for_api_requests#4313913
+          payload[:sub] = 'user'
+        end
 
         @text = JWT.encode(payload, @key, 'ES256', header)
       end
