@@ -28,10 +28,6 @@ describe Fastlane do
       it "when update with RubyGems" do
         expect(Gem::CommandManager).to receive(:instance).and_return(mock_instance).twice
 
-        # Manifest
-        expect(FastlaneCore::FastlaneFolder).to receive(:swift?).and_return(true)
-        expect(UI).to receive(:success).with(%r{fastlane\/swift\/upgrade_manifest.json})
-
         # Start
         expect(UI).to receive(:success).with("Driving the lane 'test' 🚀")
         expect(UI).to receive(:message).with("Looking for updates for fastlane...")
@@ -68,10 +64,6 @@ describe Fastlane do
       it "when update with Homebrew" do
         expect(Fastlane::Helper).to receive(:homebrew?).and_return(true).twice
         expect(Gem::CommandManager).to receive(:instance).and_return(mock_instance).twice
-
-        # Manifest
-        expect(FastlaneCore::FastlaneFolder).to receive(:swift?).and_return(true)
-        expect(UI).to receive(:success).with(%r{fastlane\/swift\/upgrade_manifest.json})
 
         # Start
         expect(UI).to receive(:success).with("Driving the lane 'test' 🚀")
