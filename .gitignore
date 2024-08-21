@@ -60,7 +60,8 @@ fastlane/lib/fastlane/plugins/template/.rubocop.yml
 snapshot/example/fastlane/README.md
 snapshot/example/fastlane/screenshots
 fastlane/FastlaneRunner
-fastlane/swift/FastlaneRunner
+fastlane/swift/.build
+.swiftpm
 vendor
 
 # iOS specific ignores, used in sample projects inside the repo

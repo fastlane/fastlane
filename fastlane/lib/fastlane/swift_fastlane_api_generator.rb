@@ -17,7 +17,7 @@ module Fastlane
   end
 
   class SwiftFastlaneAPIGenerator < SwiftAPIGenerator
-    def initialize(target_output_path: "swift")
+    def initialize(target_output_path: "../Sources/Fastlane")
       @target_filename = "Fastlane.swift"
       @target_output_path = File.expand_path(target_output_path)
       @generated_paths = []
@@ -68,7 +68,7 @@ module Fastlane
   end
 
   class SwiftActionsAPIGenerator < SwiftAPIGenerator
-    def initialize(target_output_path: "swift")
+    def initialize(target_output_path: "../Sources/Fastlane")
       @target_filename = "Actions.swift"
       @target_output_path = File.expand_path(target_output_path)
       @generated_paths = []
@@ -89,7 +89,7 @@ module Fastlane
   end
 
   class SwiftPluginsAPIGenerator < SwiftAPIGenerator
-    def initialize(target_output_path: "swift")
+    def initialize(target_output_path: "../Sources/Fastlane")
       @target_filename = "Plugins.swift"
       @target_output_path = File.expand_path(target_output_path)
       @generated_paths = []

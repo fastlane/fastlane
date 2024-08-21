@@ -140,7 +140,7 @@ module Fastlane
 
       # Show message if Fastfile.swift exists but missing Swift classes and Xcode project
       if FastlaneCore::FastlaneFolder.swift?
-        UI.important("Restoring Swift classes and FastlaneSwiftRunner.xcodeproj...")
+        UI.important("Restoring Swift classes...")
       end
 
       FileUtils.cp_r(runner_source_resources, destination_path)
@@ -186,18 +186,16 @@ module Fastlane
     def write_fastfile!
       # Write the Fastfile
       fastfile_file_name = "Fastfile"
-      fastfile_file_name += ".swift" if self.is_swift_fastfile
 
       fastfile_path = File.join(FastlaneCore::FastlaneFolder.path, fastfile_file_name)
       self.fastfile_content.gsub!("[[LANES]]", "") # since we always keep it until writing out
-      File.write(fastfile_path, self.fastfile_content) # remove trailing spaces before platform ends
+      File.write(fastfile_path, self.fastfile_content) unless self.is_swift_fastfile # remove trailing spaces before platform ends
 
       appfile_file_name = "Appfile"
-      appfile_file_name += ".swift" if self.is_swift_fastfile
       appfile_path = File.join(FastlaneCore::FastlaneFolder.path, appfile_file_name)
       self.appfile_content.gsub!("[[TEAMS]]", "")
 
-      File.write(appfile_path, self.appfile_content)
+      File.write(appfile_path, self.appfile_content) unless self.is_swift_fastfile
 
       add_or_update_gemfile(update_gemfile_if_needed: true)
 

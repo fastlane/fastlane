@@ -1,0 +1,32 @@
+{
+  "pins" : [
+    {
+      "identity" : "fastlane",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/fastlane/fastlane",
+      "state" : {
+        "revision" : "e1ab951b63aeb7a669b415708ffbe0e1346c0f59",
+        "version" : "2.222.0"
+      }
+    },
+    {
+      "identity" : "swift-argument-parser",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/apple/swift-argument-parser",
+      "state" : {
+        "revision" : "41982a3656a71c768319979febd796c6fd111d5c",
+        "version" : "1.5.0"
+      }
+    },
+    {
+      "identity" : "swiftshell",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/kareman/SwiftShell",
+      "state" : {
+        "revision" : "99680b2efc7c7dbcace1da0b3979d266f02e213c",
+        "version" : "5.1.0"
+      }
+    }
+  ],
+  "version" : 2
+}

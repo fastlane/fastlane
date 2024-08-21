@@ -30,7 +30,7 @@ module FastlaneCore
     end
 
     def self.swift_runner_project_path
-      return File.join(self.swift_folder_path, 'FastlaneSwiftRunner', 'FastlaneSwiftRunner.xcodeproj')
+      return File.join(self.swift_folder_path, 'Package.swift')
     end
 
     def self.swift_runner_built?

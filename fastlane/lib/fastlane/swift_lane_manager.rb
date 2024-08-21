@@ -168,9 +168,7 @@ module Fastlane
     def self.first_time_setup
       setup_message = ["fastlane is now configured to use a swift-based Fastfile (Fastfile.swift) 🦅"]
       setup_message << "To edit your new Fastfile.swift, type: `open #{FastlaneCore::FastlaneFolder.swift_runner_project_path}`"
-
-      # Go through and link up whatever we generated during `fastlane init swift` so the user can edit them easily
-      self.link_user_configs_to_project(updated_message: setup_message.join("\n"))
+      UI.success(setup_message)
     end
 
     def self.link_user_configs_to_project(updated_message: nil)

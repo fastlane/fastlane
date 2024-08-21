@@ -12,7 +12,7 @@ task(:brew) do
 end
 
 task(:lint) do
-  Dir.chdir('..') do
-    sh("swiftformat . --config formatting/.swiftformat --verbose --selfrequired waitWithPolling --exclude Fastfile.swift --swiftversion 4.0")
+  Dir.chdir('../../../Sources/Fastlane') do
+    sh("swiftformat . --verbose --selfrequired waitWithPolling --exclude Fastfile.swift")
   end
 end

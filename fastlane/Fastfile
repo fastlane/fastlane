@@ -139,9 +139,6 @@ lane :bump do |options|
   # Everything looks good, let's generate the Swift API
   generate_swift_api(fastlane_version: new_version)
 
-  # Alright, now let's update our FastlaneSwiftRunner manifest
-  generate_fastlane_swift_runner_manifest
-
   # Add all changed files to the version bump commit
   paths_for_commit += sh("cd .. && git status --porcelain fastlane/swift | sed s/^...//").each_line.to_a.map(&:strip)
   paths_for_commit << "Gemfile.lock"
@@ -203,38 +200,11 @@ lane :generate_swift_api do |options|
     UI.success("Done formatting fastlane.swift API")
   end
   UI.success("Done generating fastlane.swift API, ensuring it builds")
-  gym(
-    project: File.expand_path("swift/FastlaneSwiftRunner/FastlaneSwiftRunner.xcodeproj"),
-    skip_package_ipa: true
-  )
-  sh("swift build")
-  sh("rm -r ../.build")
-  sh("rm ../FastlaneRunner")
+  Dir.chdir("..") do
+    sh("swift build")
+    sh("rm -r .build")
+  end
   generated_files
-end
-
-desc "Generate the FastlaneSwiftRunner project manifest"
-lane :generate_fastlane_swift_runner_manifest do |options|
-  # Don't attempt to upgrade config files, like Fastfile.swift, Deliverfile.swift, etc...
-  non_upgrade_set = TOOL_CONFIG_FILES.map { |tool_name| "#{tool_name}.swift" }.to_set
-
-  swift_folder = File.expand_path("swift")
-  runner_project_path = File.expand_path(File.join(swift_folder, "/FastlaneSwiftRunner/FastlaneSwiftRunner.xcodeproj"))
-  project = Xcodeproj::Project.open(runner_project_path)
-
-  swift_files = project.files
-                       .reject { |file| file.name.nil? }
-                       .reject { |file| non_upgrade_set.include?(file.name) }
-                       .select { |file| file.name.end_with?(".swift") }
-
-  # It is assumed that all Swift files we're including are contained in the root group, or 1 group deep
-  swift_filenames_to_group_name = swift_files.each_with_object({}) { |file, object| object[file.name] = file.parent.name }
-
-  manifest_path = File.expand_path(File.join(swift_folder, "/upgrade_manifest.json"))
-  File.write(manifest_path, swift_filenames_to_group_name.to_json)
-
-  UI.success("Done generating FastlaneSwiftRunner project manifest")
-  manifest_path
 end
 
 desc "Does everything that's needed for a release"
