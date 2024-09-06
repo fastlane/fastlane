@@ -260,4 +260,24 @@ describe Spaceship::ConnectAPI::APIClient do
       end
     end
   end
+
+  describe "#hostname" do
+    let(:mock_token) { double('token') }
+    let(:client) { Spaceship::ConnectAPI::APIClient.new(token: mock_token) }
+
+    it 'points to App Store Connect API when in_house is not set' do
+      allow(mock_token).to receive(:in_house).and_return(nil)
+      expect(client.hostname).to eq('https://api.appstoreconnect.apple.com/')
+    end
+
+    it 'points to App Store Connect API when in_house is false' do
+      allow(mock_token).to receive(:in_house).and_return(false)
+      expect(client.hostname).to eq('https://api.appstoreconnect.apple.com/')
+    end
+
+    it 'points to Enterprise Program API when in_house is true' do
+      allow(mock_token).to receive(:in_house).and_return(true)
+      expect(client.hostname).to eq('https://api.enterprise.developer.apple.com')
+    end
+  end
 end
