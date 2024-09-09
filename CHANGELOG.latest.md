@@ -1,1 +1,7 @@
-* [deliver][spaceship] remove IDFA declarations for Apple App Store submission process (#22003) via Vyacheslav Frolov (@fr0l)
+* [action][sh] fastlane sh with log set to false should respect a step name (#22151) via Daniel Jankowski (@mollyIV)
+* [scan][trainer] hotfix for float-type version acquisition of `xcresulttool version` fails (#22157) via David Dongkyu Kim (@dokimyj)
+* [gym] fix default result bundle path name (#22154) via Ignacio Calderon (@kronenthaler)
+* [scan][trainer] hotfix for xcresulttool spec changes >= XC16b3 (#22147) via David Dongkyu Kim (@dokimyj)
+* [action][ensure_git_status_clean] support empty spaces in `ignore_files` file paths (#21566) via Daniel Jankowski (@mollyIV)
+* [spaceship] add visionOS support for Connect API (#22032) via Frederik Seiffert (@triplef)
+* [spaceship] Add get app availabilities v2 request (#21901) via Lukasz Grabowski (@lucgrabowski)
