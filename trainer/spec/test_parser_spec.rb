@@ -26,6 +26,35 @@ describe Trainer do
       end
     end
 
+    describe "#generate_cmd_parse_xcresult" do
+      let(:xcresult_sample_path) { "./trainer/spec/fixtures/Test.test_result.xcresult" }
+      let!(:subject) { Trainer::TestParser.new(xcresult_sample_path) }
+      let(:command) { subject.send(:generate_cmd_parse_xcresult, xcresult_sample_path) }
+
+      before do
+        allow(File).to receive(:expand_path).with(xcresult_sample_path).and_return(xcresult_sample_path)
+        allow_any_instance_of(Trainer::TestParser).to receive(:`).with('xcrun xcresulttool version').and_return(version)
+      end
+
+      context 'with >= Xcode 16 beta 3' do
+        let(:version) { 'xcresulttool version 23021, format version 3.53 (current)' }
+        let(:expected) { "xcrun xcresulttool get --format json --path #{xcresult_sample_path} --legacy" }
+
+        it 'should pass `--legacy`', requires_xcode: true do
+          expect(command).to eq(expected)
+        end
+      end
+
+      context 'with < Xcode 16 beta 3' do
+        let(:version) { 'xcresulttool version 22608.2, format version 3.49 (current)' }
+        let(:expected) { "xcrun xcresulttool get --format json --path #{xcresult_sample_path}" }
+
+        it 'should not pass `--legacy`', requires_xcode: true do
+          expect(command).to eq(expected)
+        end
+      end
+    end
+
     describe "Stores the data in a useful format" do
       describe "#tests_successful?" do
         it "returns false if tests failed" do
