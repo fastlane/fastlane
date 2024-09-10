@@ -277,7 +277,7 @@ describe Spaceship::ConnectAPI::APIClient do
 
     it 'points to Enterprise Program API when in_house is true' do
       allow(mock_token).to receive(:in_house).and_return(true)
-      expect(client.hostname).to eq('https://api.enterprise.developer.apple.com')
+      expect(client.hostname).to eq('https://api.enterprise.developer.apple.com/')
     end
   end
 end
