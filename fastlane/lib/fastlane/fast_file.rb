@@ -315,7 +315,7 @@ module Fastlane
               # When using cached clones, we need the entire repository history
               # so we can switch between tags or branches instantly, or else,
               # it would defeat the caching's purpose.
-              depth_option = is_eligible_for_caching ? "" : "--depth #{depth}"
+              depth_option = depth ? "--depth #{depth}" : ""
               no_tags_option = no_tags ? "--no-tags" : ""
               filter_option = filter ? "--filter=#{filter}" : ""
 
