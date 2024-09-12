@@ -224,7 +224,6 @@ module Deliver
             app_identifier: app_identifier,
             app_version_build: app_version_build
           )
-          result = transporter.upload(package_path: package_path, asset_path: ipa_path, platform: platform)
         else
           package_path = FastlaneCore::IpaUploadPackageBuilder.new.generate(
             app_id: Deliver.cache[:app].id,
@@ -232,8 +231,8 @@ module Deliver
             package_path: "/tmp",
             platform: platform
           )
-          result = transporter.upload(package_path: package_path, asset_path: ipa_path, platform: platform)
         end
+        result = transporter.upload(package_path: package_path, asset_path: ipa_path, platform: platform)
       when "osx"
         package_path = FastlaneCore::PkgUploadPackageBuilder.new.generate(
           app_id: Deliver.cache[:app].id,
