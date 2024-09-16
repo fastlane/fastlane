@@ -143,7 +143,7 @@ module Deliver
       UploadAppClipDefaultExperienceMetadata.new.upload_metadata(options)
       UploadAppClipDefaultExperienceHeaderImages.new.find_and_upload(options)
 
-      upload_metadata = UploadMetadata.new
+      upload_metadata = UploadMetadata.new(options)
       upload_screenshots = UploadScreenshots.new
 
       # First, collect all the things for the HTML Report
