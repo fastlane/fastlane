@@ -44,7 +44,7 @@ module Deliver
 
           # if there's an existing header image, it must be deleted before uploading the new one
           unless localization.app_clip_header_image.nil?
-            localization.app_clip_header_image.delete
+            localization.app_clip_header_image.delete!
             UI.verbose("[#{localization.locale}] Removed existing header image")
           end
 
@@ -59,7 +59,7 @@ module Deliver
 
       app_clip_header_images.each do |header_image|
         localization = app_clip_default_experience_localizations.find { |l| l.locale.eql?(header_image.language) }
-        UI.error("Could not find existing localization for #{header_image.langauge}") unless localization
+        UI.error("Could not find existing localization for #{header_image.language}") unless localization
 
         # check to see if it's already uploaded
         checksum = UploadAppClipDefaultExperienceHeaderImages.calculate_checksum(header_image.path)
