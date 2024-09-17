@@ -1342,7 +1342,7 @@ public func buildAndroidApp(task: OptionalConfigValue<String?> = .fastlaneDefaul
    - skipPackageDependenciesResolution: Skips resolution of Swift Package Manager dependencies
    - disablePackageAutomaticUpdates: Prevents packages from automatically being resolved to versions other than those recorded in the `Package.resolved` file
    - useSystemScm: Lets xcodebuild use system's scm configuration
-   - packageAuthorizationProvider: Lets xcodebuild use a specificed package authorization provider (keychain|netrc)
+   - packageAuthorizationProvider: Lets xcodebuild use a specified package authorization provider (keychain|netrc)
 
  - returns: The absolute path to the generated ipa file
 
@@ -1559,7 +1559,7 @@ public func buildAndroidApp(task: OptionalConfigValue<String?> = .fastlaneDefaul
    - skipPackageDependenciesResolution: Skips resolution of Swift Package Manager dependencies
    - disablePackageAutomaticUpdates: Prevents packages from automatically being resolved to versions other than those recorded in the `Package.resolved` file
    - useSystemScm: Lets xcodebuild use system's scm configuration
-   - packageAuthorizationProvider: Lets xcodebuild use a specificed package authorization provider (keychain|netrc)
+   - packageAuthorizationProvider: Lets xcodebuild use a specified package authorization provider (keychain|netrc)
 
  - returns: The absolute path to the generated ipa file
 
@@ -1768,7 +1768,7 @@ public func buildAndroidApp(task: OptionalConfigValue<String?> = .fastlaneDefaul
    - skipPackageDependenciesResolution: Skips resolution of Swift Package Manager dependencies
    - disablePackageAutomaticUpdates: Prevents packages from automatically being resolved to versions other than those recorded in the `Package.resolved` file
    - useSystemScm: Lets xcodebuild use system's scm configuration
-   - packageAuthorizationProvider: Lets xcodebuild use a specificed package authorization provider (keychain|netrc)
+   - packageAuthorizationProvider: Lets xcodebuild use a specified package authorization provider (keychain|netrc)
 
  - returns: The absolute path to the generated ipa file
 
@@ -2175,7 +2175,7 @@ public func captureAndroidScreenshots(androidHome: OptionalConfigValue<String?> 
    - disableXcpretty: Disable xcpretty formatting of build
    - suppressXcodeOutput: Suppress the output of xcodebuild to stdout. Output is still saved in buildlog_path
    - useSystemScm: Lets xcodebuild use system's scm configuration
-   - packageAuthorizationProvider: Lets xcodebuild use a specificed package authorization provider (keychain|netrc)
+   - packageAuthorizationProvider: Lets xcodebuild use a specified package authorization provider (keychain|netrc)
  */
 public func captureIosScreenshots(workspace: OptionalConfigValue<String?> = .fastlaneDefault(nil),
                                   project: OptionalConfigValue<String?> = .fastlaneDefault(nil),
@@ -2387,7 +2387,7 @@ public func captureIosScreenshots(workspace: OptionalConfigValue<String?> = .fas
    - disableXcpretty: Disable xcpretty formatting of build
    - suppressXcodeOutput: Suppress the output of xcodebuild to stdout. Output is still saved in buildlog_path
    - useSystemScm: Lets xcodebuild use system's scm configuration
-   - packageAuthorizationProvider: Lets xcodebuild use a specificed package authorization provider (keychain|netrc)
+   - packageAuthorizationProvider: Lets xcodebuild use a specified package authorization provider (keychain|netrc)
  */
 public func captureScreenshots(workspace: OptionalConfigValue<String?> = .fastlaneDefault(nil),
                                project: OptionalConfigValue<String?> = .fastlaneDefault(nil),
@@ -5707,7 +5707,7 @@ public func gradle(task: OptionalConfigValue<String?> = .fastlaneDefault(nil),
    - skipPackageDependenciesResolution: Skips resolution of Swift Package Manager dependencies
    - disablePackageAutomaticUpdates: Prevents packages from automatically being resolved to versions other than those recorded in the `Package.resolved` file
    - useSystemScm: Lets xcodebuild use system's scm configuration
-   - packageAuthorizationProvider: Lets xcodebuild use a specificed package authorization provider (keychain|netrc)
+   - packageAuthorizationProvider: Lets xcodebuild use a specified package authorization provider (keychain|netrc)
 
  - returns: The absolute path to the generated ipa file
 
@@ -8872,7 +8872,7 @@ public func rubyVersion() {
    - useSystemScm: Lets xcodebuild use system's scm configuration
    - numberOfRetries: The number of times a test can fail
    - failBuild: Should this step stop the build if the tests fail? Set this to false if you're using trainer
-   - packageAuthorizationProvider: Lets xcodebuild use a specificed package authorization provider (keychain|netrc)
+   - packageAuthorizationProvider: Lets xcodebuild use a specified package authorization provider (keychain|netrc)
 
  - returns: Outputs hash of results with the following keys: :number_of_tests, :number_of_failures, :number_of_retries, :number_of_tests_excluding_retries, :number_of_failures_excluding_retries
 
@@ -9306,7 +9306,7 @@ public func say(text: [String],
    - useSystemScm: Lets xcodebuild use system's scm configuration
    - numberOfRetries: The number of times a test can fail
    - failBuild: Should this step stop the build if the tests fail? Set this to false if you're using trainer
-   - packageAuthorizationProvider: Lets xcodebuild use a specificed package authorization provider (keychain|netrc)
+   - packageAuthorizationProvider: Lets xcodebuild use a specified package authorization provider (keychain|netrc)
 
  - returns: Outputs hash of results with the following keys: :number_of_tests, :number_of_failures, :number_of_retries, :number_of_tests_excluding_retries, :number_of_failures_excluding_retries
 
@@ -10536,7 +10536,7 @@ public func slather(buildDirectory: OptionalConfigValue<String?> = .fastlaneDefa
    - disableXcpretty: Disable xcpretty formatting of build
    - suppressXcodeOutput: Suppress the output of xcodebuild to stdout. Output is still saved in buildlog_path
    - useSystemScm: Lets xcodebuild use system's scm configuration
-   - packageAuthorizationProvider: Lets xcodebuild use a specificed package authorization provider (keychain|netrc)
+   - packageAuthorizationProvider: Lets xcodebuild use a specified package authorization provider (keychain|netrc)
  */
 public func snapshot(workspace: OptionalConfigValue<String?> = .fastlaneDefault(snapshotfile.workspace),
                      project: OptionalConfigValue<String?> = .fastlaneDefault(snapshotfile.project),
