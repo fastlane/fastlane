@@ -71,7 +71,10 @@ describe Match do
       end
 
       it "defaults to false and uses v2 encryption" do
-        expect(@match_encryption_double).to(receive(:encrypt)).with(file_path: anything(), password: anything(), version: 2)
+        expect(@match_encryption_double)
+          .to(receive(:encrypt))
+          .with(file_path: anything, password: anything, version: 2)
+
         @e.encrypt_files
       end
 
@@ -82,7 +85,10 @@ describe Match do
           force_legacy_encryption: true
         )
 
-        expect(@match_encryption_double).to(receive(:encrypt)).with(file_path: anything(), password: anything(), version: 1)
+        expect(@match_encryption_double)
+          .to(receive(:encrypt))
+          .with(file_path: anything, password: anything, version: 1)
+
         enc.encrypt_files
       end
 
@@ -93,7 +99,10 @@ describe Match do
           force_legacy_encryption: false
         )
 
-        expect(@match_encryption_double).to(receive(:encrypt)).with(file_path: anything(), password: anything(), version: 2)
+        expect(@match_encryption_double)
+          .to(receive(:encrypt))
+          .with(file_path: anything, password: anything, version: 2)
+
         enc.encrypt_files
       end
     end
