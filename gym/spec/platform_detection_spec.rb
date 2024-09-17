@@ -30,8 +30,8 @@ describe Gym do
     Gym.config = FastlaneCore::Configuration.create(Gym::Options.available_options, options)
 
     expect(Gym.project.multiplatform?).to eq(false)
-    expect(Gym.project.visionos?).to eq(false)
-    expect(Gym.project.ios?).to eq(true)
+    expect(Gym.project.visionos?).to eq(true)
+    expect(Gym.project.ios?).to eq(false)
 
     expect(Gym.building_for_ios?).to eq(true)
     expect(Gym.building_for_mac?).to eq(false)
