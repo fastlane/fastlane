@@ -74,7 +74,7 @@ end
 
 def create_fake_encryption(storage:)
   fake_encryption = "fake_encryption"
-  expect(Match::Encryption::OpenSSL).to receive(:new).with(keychain_name: storage.git_url, working_directory: storage.working_directory).and_return(fake_encryption)
+  expect(Match::Encryption::OpenSSL).to receive(:new).with(keychain_name: storage.git_url, working_directory: storage.working_directory, force_legacy_encryption: false).and_return(fake_encryption)
 
   # Ensure files from storage are decrypted.
   expect(fake_encryption).to receive(:decrypt_files).and_return(nil)
