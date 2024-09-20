@@ -89,8 +89,8 @@ module Supply
           UI.user_error!("Could not find folder #{metadata_path}") unless File.directory?(metadata_path)
 
           track, release = fetch_track_and_release!(track_name, version_code)
-          UI.user_error!("Unable to find the requested track - '#{track_name}'") unless track
-          UI.user_error!("Could not find release for version code '#{version_code}' to update changelog") unless release
+          UI.user_error!("Unable to find the requested track '#{track_name}' for version code '#{version_code}'") unless track
+          UI.user_error!("Could not find release for version code '#{version_code}' in track '#{track_name}' to update changelog") unless release
 
           release_notes_queue = Queue.new
           upload_worker = create_meta_upload_worker
