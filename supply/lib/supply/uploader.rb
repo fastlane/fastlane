@@ -127,11 +127,11 @@ module Supply
       track_name = Supply.config[:track]
       track, release = fetch_track_and_release!(track_name, Supply.config[:version_code], Supply::ReleaseStatus::IN_PROGRESS)
       UI.user_error!("Unable to find the requested track - '#{track_name}'") unless track
-      UI.user_error!("Unable to find the requested release on track - '#{track_name}'") unless release
+      UI.user_error!("Unable to find the requested release in track - '#{track_name}'") unless release
 
       version_code = release.version_codes.max
 
-      UI.message("Updating #{version_code}'s rollout to '#{Supply.config[:rollout]}' on track '#{track_name}'...")
+      UI.message("Updating #{version_code}'s rollout to '#{Supply.config[:rollout]}' in track '#{track_name}'...")
 
       if track && release
         completed = Supply.config[:rollout].to_f == 1
