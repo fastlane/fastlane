@@ -214,7 +214,7 @@ module Fastlane
                                        optional: true),
           FastlaneCore::ConfigItem.new(key: :icon_url,
                                        env_name: "FL_SLACK_ICON_URL",
-                                       description: "Overrides the webhook's image property if use_webhook_configured_username_and_icon is false",
+                                       description: "Specifies a URL of an image to use as the photo of the message. Overrides the webhook's image property if use_webhook_configured_username_and_icon is false",
                                        default_value: "https://fastlane.tools/assets/img/fastlane_icon.png",
                                        optional: true),
           FastlaneCore::ConfigItem.new(key: :icon_emoji,
