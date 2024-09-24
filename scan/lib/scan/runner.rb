@@ -87,11 +87,8 @@ module Scan
       ]
       exit_status = 0
 
-      FastlaneCore::CommandExecutor.execute(command: command,
-                                          print_all: true,
-                                      print_command: true,
-                                             prefix: prefix_hash,
-                                            loading: "Loading...",
+      FastlaneCore::CommandExecutor.execute(command: command, print_all: true, print_command: true,
+                                             prefix: prefix_hash, loading: "Loading...",
                                     suppress_output: Scan.config[:suppress_xcode_output],
                                               error: proc do |error_output|
                                                 begin
@@ -134,8 +131,7 @@ module Scan
 
       retryable_tests = []
 
-      failing_tests = input.split("Failing tests:\n").fetch(1, [])
-                           .split("\n\n").first
+      failing_tests = input.split("Failing tests:\n").fetch(1, []).split("\n\n").first
 
       suites = failing_tests.split(/(?=\n\s+[\w\s]+:\n)/)
 
