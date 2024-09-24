@@ -377,7 +377,7 @@ module FastlaneCore
       end
     end
   end
-  
+
   class SimulatorVision < Simulator
     class << self
       def all
