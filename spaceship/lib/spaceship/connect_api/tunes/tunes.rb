@@ -1242,6 +1242,21 @@ module Spaceship
           params = tunes_request_client.build_params(filter: filter, includes: includes)
           tunes_request_client.get("#{Version::V1}/reviewRejections", params)
         end
+
+        def patch_icp_number_details(app_id:, icpNumber:, developerNameMismatchConsent: false)
+          body = {
+            data: {
+              type: "appIcpNumberDetails",
+              id: app_id,
+              attributes:{
+                icpNumber: icpNumber,
+                developerNameMismatchConsent: developerNameMismatchConsent
+              }
+            }
+          }
+
+          tunes_request_client.patch("#{Version::V1}/appIcpNumberDetails/#{app_id}", body)
+        end
       end
     end
   end

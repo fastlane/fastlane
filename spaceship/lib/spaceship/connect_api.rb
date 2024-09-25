@@ -70,6 +70,7 @@ require 'spaceship/connect_api/models/review_submission_item'
 require 'spaceship/connect_api/models/reset_ratings_request'
 require 'spaceship/connect_api/models/sandbox_tester'
 require 'spaceship/connect_api/models/territory'
+require 'spaceship/connect_api/models/app_icp_number_details'
 
 require 'spaceship/connect_api/models/resolution_center_message'
 require 'spaceship/connect_api/models/resolution_center_thread'

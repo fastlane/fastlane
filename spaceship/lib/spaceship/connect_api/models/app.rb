@@ -18,6 +18,7 @@ module Spaceship
       attr_accessor :content_rights_declaration
       attr_accessor :app_store_versions
       attr_accessor :prices
+      attr_accessor :app_icp_number_detail
 
       # Only available with Apple ID auth
       attr_accessor :distribution_type
@@ -54,6 +55,7 @@ module Spaceship
         "contentRightsDeclaration" => "content_rights_declaration",
 
         "appStoreVersions" => "app_store_versions",
+        "icpNumberDetail" => "app_icp_number_detail",
         # This attribute is already deprecated. It will be removed in a future release.
         "prices" => "prices"
       })
@@ -99,6 +101,11 @@ module Spaceship
       def self.get(client: nil, app_id: nil, includes: "appStoreVersions")
         client ||= Spaceship::ConnectAPI
         return client.get_app(app_id: app_id, includes: includes).first
+      end
+
+      def self.get_icp_number_details(client: nil, app_id: nil)
+        client ||= Spaceship::ConnectAPI
+        return client.get_app(app_id: app_id, includes: "icpNumberDetail").first.app_icp_number_detail
       end
 
       # Updates app attributes, price tier and availability of an app in territories
@@ -486,6 +493,11 @@ module Spaceship
         user_ids.each do |user_id|
           client.delete_user_visible_apps(user_id: user_id, app_ids: [id])
         end
+      end
+
+      def patch_icp_number_details(icpNumber:, developerNameMismatchConsent: false)
+        client ||= Spaceship::ConnectAPI
+        client.patch_icp_number_details(app_id: id, icpNumber: icpNumber, developerNameMismatchConsent: developerNameMismatchConsent)
       end
     end
   end
