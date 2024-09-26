@@ -80,7 +80,8 @@ module FastlaneCore
       def matching_build(watched_app_version: nil, watched_build_version: nil, app_id: nil, platform: nil, select_latest: false)
         # Normalize the watched app version and build version to ensure consistency
         watched_app_version = normalize_version(version: watched_app_version)
-        watched_build_version = normalize_version(version: watched_build_version)
+        # I do not think we want to do anything to the build number
+        # watched_build_version = normalize_version(version: watched_build_version)
 
         # Only query for the specific version, without generating alternates like X.Y vs X.Y.0
         versions = [watched_app_version].compact
@@ -110,6 +111,7 @@ module FastlaneCore
 
         # Raise an error if more than one build is returned
         matched_builds = version_matches.map(&:builds).flatten
+
         if matched_builds.size > 1 && !select_latest
           error_builds = matched_builds.map do |build|
             "#{build.app_version}(#{build.version}) for #{build.platform} - #{build.processing_state}"
@@ -120,19 +122,6 @@ module FastlaneCore
         matched_builds.last
       end
 
-
-      def alternate_version(version)
-        return nil if version.nil?
-
-        version_info = Gem::Version.new(version)
-        if version_info.segments.size == 3 && version_info.segments[2] == 0
-          return version_info.segments[0..1].join(".")
-        elsif version_info.segments.size == 2
-          return "#{version}.0"
-        end
-
-        return nil
-      end
 
       def processed?(build: nil, wait_for_build_beta_detail_processing: false)
         return false unless build
