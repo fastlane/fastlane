@@ -34,7 +34,7 @@ module FastlaneCore
 
         showed_info = false
         loop do
-          matched_build, app_version_queried = matching_build(watched_app_version: app_version, watched_build_version: build_version, app_id: app_id, platform: platform, select_latest: select_latest)
+          matched_build = matching_build(watched_app_version: app_version, watched_build_version: build_version, app_id: app_id, platform: platform, select_latest: select_latest)
           if matched_build.nil? && !showed_info
             UI.important("Read more information on why this build isn't showing up yet - https://github.com/fastlane/fastlane/issues/14997")
             showed_info = true
@@ -47,13 +47,6 @@ module FastlaneCore
           # having a build resource appear in AppStoreConnect (matched_build) may be enough (i.e. setting a changelog)
           # so here we may choose to skip the full processing of the build if return_when_build_appears is true
           if matched_build && (return_when_build_appears || processed?(build: matched_build, wait_for_build_beta_detail_processing: wait_for_build_beta_detail_processing))
-
-            if !app_version.nil? && !app_version_queried.nil? && app_version != app_version_queried
-              UI.important("App version is #{app_version} but build was found while querying #{app_version_queried}")
-              UI.important("This shouldn't be an issue as Apple sees #{app_version} and #{app_version_queried} as equal")
-              UI.important("See docs for more info - https://developer.apple.com/library/archive/documentation/General/Reference/InfoPlistKeyReference/Articles/CoreFoundationKeys.html#//apple_ref/doc/uid/20001431-102364")
-            end
-
             if return_spaceship_testflight_build
               return matched_build.to_testflight_build
             else
@@ -124,7 +117,7 @@ module FastlaneCore
           raise BuildWatcherError.new, "Found more than 1 matching build: \n#{error_builds}"
         end
 
-        matched_builds
+        matched_builds.last
       end
 
 
