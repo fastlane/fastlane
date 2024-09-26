@@ -35,7 +35,6 @@ module FastlaneCore
         showed_info = false
         loop do
           matched_build, app_version_queried = matching_build(watched_app_version: app_version, watched_build_version: build_version, app_id: app_id, platform: platform, select_latest: select_latest)
-
           if matched_build.nil? && !showed_info
             UI.important("Read more information on why this build isn't showing up yet - https://github.com/fastlane/fastlane/issues/14997")
             showed_info = true
@@ -49,7 +48,7 @@ module FastlaneCore
           # so here we may choose to skip the full processing of the build if return_when_build_appears is true
           if matched_build && (return_when_build_appears || processed?(build: matched_build, wait_for_build_beta_detail_processing: wait_for_build_beta_detail_processing))
 
-            if !app_version.nil? && app_version != app_version_queried
+            if !app_version.nil? && !app_version_queried.nil? && app_version != app_version_queried
               UI.important("App version is #{app_version} but build was found while querying #{app_version_queried}")
               UI.important("This shouldn't be an issue as Apple sees #{app_version} and #{app_version_queried} as equal")
               UI.important("See docs for more info - https://developer.apple.com/library/archive/documentation/General/Reference/InfoPlistKeyReference/Articles/CoreFoundationKeys.html#//apple_ref/doc/uid/20001431-102364")
@@ -73,26 +72,26 @@ module FastlaneCore
 
       def normalize_version(version: nil)
         return version unless version.instance_of?(String)
-        
+
         # Ensure the version has 3 parts and add .0 to [Major].[Minor] if needed
         version_parts = version.split('.').map { |s| s.to_i.to_s }
-      
+
         # Add missing parts to conform to the [Major].[Minor].[Patch] format
         while version_parts.size < 3
           version_parts << "0"
         end
-      
+
         version_parts.join('.')
       end
-      
+
       def matching_build(watched_app_version: nil, watched_build_version: nil, app_id: nil, platform: nil, select_latest: false)
         # Normalize the watched app version and build version to ensure consistency
         watched_app_version = normalize_version(version: watched_app_version)
         watched_build_version = normalize_version(version: watched_build_version)
-      
+
         # Only query for the specific version, without generating alternates like X.Y vs X.Y.0
         versions = [watched_app_version].compact
-      
+
         if versions.empty?
           if select_latest
             message = watched_build_version.nil? ? "Searching for the latest build" : "Searching for the latest build with build number: #{watched_build_version}"
@@ -102,7 +101,7 @@ module FastlaneCore
             raise BuildWatcherError.new, "There is no app version to watch"
           end
         end
-      
+
         # Perform the query for builds with the exact version
         version_matches = versions.map do |version|
           match = VersionMatches.new
@@ -115,7 +114,7 @@ module FastlaneCore
           )
           match
         end.flatten
-      
+
         # Raise an error if more than one build is returned
         matched_builds = version_matches.map(&:builds).flatten
         if matched_builds.size > 1 && !select_latest
@@ -124,10 +123,10 @@ module FastlaneCore
           end.join("\n")
           raise BuildWatcherError.new, "Found more than 1 matching build: \n#{error_builds}"
         end
-      
+
         matched_builds
       end
-      
+
 
       def alternate_version(version)
         return nil if version.nil?
