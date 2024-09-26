@@ -387,6 +387,7 @@ lane :create_github_release do |options|
              else
                UI.message("GitHub release has already been created")
 
+               sleep(50) # GitHub rate limits are annowing
                download_github_release_gem(version: version)
              end
 
@@ -410,7 +411,7 @@ lane :download_github_release_gem do |options|
 
   github_username = ENV["RELEASE_GITHUB_USERNAME"] || "fastlane"
 
-  github_release = get_github_release(url: "#{github_username}/fastlane", version: version)
+  github_release = get_github_release(url: "#{github_username}/fastlane", version: version, api_bearer: ENV['FASTLANE_RELEASE_API_BEARER'])
   assets = (github_release || {}).fetch('assets', [])
 
   gem_asset = assets.find { |a| a["name"].end_with?(".gem") }
