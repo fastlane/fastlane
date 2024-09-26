@@ -475,7 +475,7 @@ private_lane :github_changelog do |options|
     # Default to commit message info
     message = commit["commit"]["message"].lines.first.strip
     name = commit["commit"]["author"]["name"]
-    username = commit["author"]["login"]
+    username = commit["author"]&.[]("login")
 
     # Get pull request associate with commit message
     sha = commit["sha"]
