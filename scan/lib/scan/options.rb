@@ -542,7 +542,11 @@ module Scan
                                     env_name: "SCAN_PACKAGE_AUTHORIZATION_PROVIDER",
                                     description: "Lets xcodebuild use a specified package authorization provider (keychain|netrc)",
                                     optional: true,
-                                    type: String)
+                                    type: String,
+                                    verify_block: proc do |value|
+                                      av = %w(netrc keychain)
+                                      UI.user_error!("Unsupported authorization provider '#{value}', must be: #{av}") unless av.include?(value)
+                                    end)
 
       ]
     end
