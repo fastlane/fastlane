@@ -1342,6 +1342,7 @@ public func buildAndroidApp(task: OptionalConfigValue<String?> = .fastlaneDefaul
    - skipPackageDependenciesResolution: Skips resolution of Swift Package Manager dependencies
    - disablePackageAutomaticUpdates: Prevents packages from automatically being resolved to versions other than those recorded in the `Package.resolved` file
    - useSystemScm: Lets xcodebuild use system's scm configuration
+   - packageAuthorizationProvider: Lets xcodebuild use a specified package authorization provider (keychain|netrc)
 
  - returns: The absolute path to the generated ipa file
 
@@ -1448,6 +1449,7 @@ public func buildAndroidApp(task: OptionalConfigValue<String?> = .fastlaneDefaul
     let skipPackageDependenciesResolutionArg = skipPackageDependenciesResolution.asRubyArgument(name: "skip_package_dependencies_resolution", type: nil)
     let disablePackageAutomaticUpdatesArg = disablePackageAutomaticUpdates.asRubyArgument(name: "disable_package_automatic_updates", type: nil)
     let useSystemScmArg = useSystemScm.asRubyArgument(name: "use_system_scm", type: nil)
+    let packageAuthorizationProviderArg = packageAuthorizationProvider.asRubyArgument(name: "package_authorization_provider", type: nil)
     let array: [RubyCommand.Argument?] = [workspaceArg,
                                           projectArg,
                                           schemeArg,
@@ -1497,7 +1499,8 @@ public func buildAndroidApp(task: OptionalConfigValue<String?> = .fastlaneDefaul
                                           clonedSourcePackagesPathArg,
                                           skipPackageDependenciesResolutionArg,
                                           disablePackageAutomaticUpdatesArg,
-                                          useSystemScmArg]
+                                          useSystemScmArg,
+                                          packageAuthorizationProviderArg]
     let args: [RubyCommand.Argument] = array
         .filter { $0?.value != nil }
         .compactMap { $0 }
@@ -1556,6 +1559,7 @@ public func buildAndroidApp(task: OptionalConfigValue<String?> = .fastlaneDefaul
    - skipPackageDependenciesResolution: Skips resolution of Swift Package Manager dependencies
    - disablePackageAutomaticUpdates: Prevents packages from automatically being resolved to versions other than those recorded in the `Package.resolved` file
    - useSystemScm: Lets xcodebuild use system's scm configuration
+   - packageAuthorizationProvider: Lets xcodebuild use a specified package authorization provider (keychain|netrc)
 
  - returns: The absolute path to the generated ipa file
 
@@ -1656,6 +1660,7 @@ public func buildAndroidApp(task: OptionalConfigValue<String?> = .fastlaneDefaul
     let skipPackageDependenciesResolutionArg = skipPackageDependenciesResolution.asRubyArgument(name: "skip_package_dependencies_resolution", type: nil)
     let disablePackageAutomaticUpdatesArg = disablePackageAutomaticUpdates.asRubyArgument(name: "disable_package_automatic_updates", type: nil)
     let useSystemScmArg = useSystemScm.asRubyArgument(name: "use_system_scm", type: nil)
+    let packageAuthorizationProviderArg = packageAuthorizationProvider.asRubyArgument(name: "package_authorization_provider", type: nil)
     let array: [RubyCommand.Argument?] = [workspaceArg,
                                           projectArg,
                                           schemeArg,
@@ -1702,7 +1707,8 @@ public func buildAndroidApp(task: OptionalConfigValue<String?> = .fastlaneDefaul
                                           clonedSourcePackagesPathArg,
                                           skipPackageDependenciesResolutionArg,
                                           disablePackageAutomaticUpdatesArg,
-                                          useSystemScmArg]
+                                          useSystemScmArg,
+                                          packageAuthorizationProviderArg]
     let args: [RubyCommand.Argument] = array
         .filter { $0?.value != nil }
         .compactMap { $0 }
@@ -1762,6 +1768,7 @@ public func buildAndroidApp(task: OptionalConfigValue<String?> = .fastlaneDefaul
    - skipPackageDependenciesResolution: Skips resolution of Swift Package Manager dependencies
    - disablePackageAutomaticUpdates: Prevents packages from automatically being resolved to versions other than those recorded in the `Package.resolved` file
    - useSystemScm: Lets xcodebuild use system's scm configuration
+   - packageAuthorizationProvider: Lets xcodebuild use a specified package authorization provider (keychain|netrc)
 
  - returns: The absolute path to the generated ipa file
 
@@ -1864,6 +1871,7 @@ public func buildAndroidApp(task: OptionalConfigValue<String?> = .fastlaneDefaul
     let skipPackageDependenciesResolutionArg = skipPackageDependenciesResolution.asRubyArgument(name: "skip_package_dependencies_resolution", type: nil)
     let disablePackageAutomaticUpdatesArg = disablePackageAutomaticUpdates.asRubyArgument(name: "disable_package_automatic_updates", type: nil)
     let useSystemScmArg = useSystemScm.asRubyArgument(name: "use_system_scm", type: nil)
+    let packageAuthorizationProviderArg = packageAuthorizationProvider.asRubyArgument(name: "package_authorization_provider", type: nil)
     let array: [RubyCommand.Argument?] = [workspaceArg,
                                           projectArg,
                                           schemeArg,
@@ -1911,7 +1919,8 @@ public func buildAndroidApp(task: OptionalConfigValue<String?> = .fastlaneDefaul
                                           clonedSourcePackagesPathArg,
                                           skipPackageDependenciesResolutionArg,
                                           disablePackageAutomaticUpdatesArg,
-                                          useSystemScmArg]
+                                          useSystemScmArg,
+                                          packageAuthorizationProviderArg]
     let args: [RubyCommand.Argument] = array
         .filter { $0?.value != nil }
         .compactMap { $0 }
@@ -2166,6 +2175,7 @@ public func captureAndroidScreenshots(androidHome: OptionalConfigValue<String?> 
    - disableXcpretty: Disable xcpretty formatting of build
    - suppressXcodeOutput: Suppress the output of xcodebuild to stdout. Output is still saved in buildlog_path
    - useSystemScm: Lets xcodebuild use system's scm configuration
+   - packageAuthorizationProvider: Lets xcodebuild use a specified package authorization provider (keychain|netrc)
  */
 public func captureIosScreenshots(workspace: OptionalConfigValue<String?> = .fastlaneDefault(nil),
                                   project: OptionalConfigValue<String?> = .fastlaneDefault(nil),
@@ -2266,6 +2276,7 @@ public func captureIosScreenshots(workspace: OptionalConfigValue<String?> = .fas
     let disableXcprettyArg = disableXcpretty.asRubyArgument(name: "disable_xcpretty", type: nil)
     let suppressXcodeOutputArg = suppressXcodeOutput.asRubyArgument(name: "suppress_xcode_output", type: nil)
     let useSystemScmArg = useSystemScm.asRubyArgument(name: "use_system_scm", type: nil)
+    let packageAuthorizationProviderArg = packageAuthorizationProvider.asRubyArgument(name: "package_authorization_provider", type: nil)
     let array: [RubyCommand.Argument?] = [workspaceArg,
                                           projectArg,
                                           xcargsArg,
@@ -2314,7 +2325,8 @@ public func captureIosScreenshots(workspace: OptionalConfigValue<String?> = .fas
                                           xcprettyArgsArg,
                                           disableXcprettyArg,
                                           suppressXcodeOutputArg,
-                                          useSystemScmArg]
+                                          useSystemScmArg,
+                                          packageAuthorizationProviderArg]
     let args: [RubyCommand.Argument] = array
         .filter { $0?.value != nil }
         .compactMap { $0 }
@@ -2375,6 +2387,7 @@ public func captureIosScreenshots(workspace: OptionalConfigValue<String?> = .fas
    - disableXcpretty: Disable xcpretty formatting of build
    - suppressXcodeOutput: Suppress the output of xcodebuild to stdout. Output is still saved in buildlog_path
    - useSystemScm: Lets xcodebuild use system's scm configuration
+   - packageAuthorizationProvider: Lets xcodebuild use a specified package authorization provider (keychain|netrc)
  */
 public func captureScreenshots(workspace: OptionalConfigValue<String?> = .fastlaneDefault(nil),
                                project: OptionalConfigValue<String?> = .fastlaneDefault(nil),
@@ -2475,6 +2488,7 @@ public func captureScreenshots(workspace: OptionalConfigValue<String?> = .fastla
     let disableXcprettyArg = disableXcpretty.asRubyArgument(name: "disable_xcpretty", type: nil)
     let suppressXcodeOutputArg = suppressXcodeOutput.asRubyArgument(name: "suppress_xcode_output", type: nil)
     let useSystemScmArg = useSystemScm.asRubyArgument(name: "use_system_scm", type: nil)
+    let packageAuthorizationProviderArg = packageAuthorizationProvider.asRubyArgument(name: "package_authorization_provider", type: nil)
     let array: [RubyCommand.Argument?] = [workspaceArg,
                                           projectArg,
                                           xcargsArg,
@@ -2523,7 +2537,8 @@ public func captureScreenshots(workspace: OptionalConfigValue<String?> = .fastla
                                           xcprettyArgsArg,
                                           disableXcprettyArg,
                                           suppressXcodeOutputArg,
-                                          useSystemScmArg]
+                                          useSystemScmArg,
+                                          packageAuthorizationProviderArg]
     let args: [RubyCommand.Argument] = array
         .filter { $0?.value != nil }
         .compactMap { $0 }
@@ -5692,6 +5707,7 @@ public func gradle(task: OptionalConfigValue<String?> = .fastlaneDefault(nil),
    - skipPackageDependenciesResolution: Skips resolution of Swift Package Manager dependencies
    - disablePackageAutomaticUpdates: Prevents packages from automatically being resolved to versions other than those recorded in the `Package.resolved` file
    - useSystemScm: Lets xcodebuild use system's scm configuration
+   - packageAuthorizationProvider: Lets xcodebuild use a specified package authorization provider (keychain|netrc)
 
  - returns: The absolute path to the generated ipa file
 
@@ -5798,6 +5814,7 @@ public func gradle(task: OptionalConfigValue<String?> = .fastlaneDefault(nil),
     let skipPackageDependenciesResolutionArg = skipPackageDependenciesResolution.asRubyArgument(name: "skip_package_dependencies_resolution", type: nil)
     let disablePackageAutomaticUpdatesArg = disablePackageAutomaticUpdates.asRubyArgument(name: "disable_package_automatic_updates", type: nil)
     let useSystemScmArg = useSystemScm.asRubyArgument(name: "use_system_scm", type: nil)
+    let packageAuthorizationProviderArg = packageAuthorizationProvider.asRubyArgument(name: "package_authorization_provider", type: nil)
     let array: [RubyCommand.Argument?] = [workspaceArg,
                                           projectArg,
                                           schemeArg,
@@ -5847,7 +5864,8 @@ public func gradle(task: OptionalConfigValue<String?> = .fastlaneDefault(nil),
                                           clonedSourcePackagesPathArg,
                                           skipPackageDependenciesResolutionArg,
                                           disablePackageAutomaticUpdatesArg,
-                                          useSystemScmArg]
+                                          useSystemScmArg,
+                                          packageAuthorizationProviderArg]
     let args: [RubyCommand.Argument] = array
         .filter { $0?.value != nil }
         .compactMap { $0 }
@@ -8854,6 +8872,7 @@ public func rubyVersion() {
    - useSystemScm: Lets xcodebuild use system's scm configuration
    - numberOfRetries: The number of times a test can fail
    - failBuild: Should this step stop the build if the tests fail? Set this to false if you're using trainer
+   - packageAuthorizationProvider: Lets xcodebuild use a specified package authorization provider (keychain|netrc)
 
  - returns: Outputs hash of results with the following keys: :number_of_tests, :number_of_failures, :number_of_retries, :number_of_tests_excluding_retries, :number_of_failures_excluding_retries
 
@@ -9016,6 +9035,7 @@ public func rubyVersion() {
     let useSystemScmArg = useSystemScm.asRubyArgument(name: "use_system_scm", type: nil)
     let numberOfRetriesArg = RubyCommand.Argument(name: "number_of_retries", value: numberOfRetries, type: nil)
     let failBuildArg = failBuild.asRubyArgument(name: "fail_build", type: nil)
+    let packageAuthorizationProviderArg = packageAuthorizationProvider.asRubyArgument(name: "package_authorization_provider", type: nil)
     let array: [RubyCommand.Argument?] = [workspaceArg,
                                           projectArg,
                                           packagePathArg,
@@ -9093,7 +9113,8 @@ public func rubyVersion() {
                                           disablePackageAutomaticUpdatesArg,
                                           useSystemScmArg,
                                           numberOfRetriesArg,
-                                          failBuildArg]
+                                          failBuildArg,
+                                          packageAuthorizationProviderArg]
     let args: [RubyCommand.Argument] = array
         .filter { $0?.value != nil }
         .compactMap { $0 }
@@ -9285,6 +9306,7 @@ public func say(text: [String],
    - useSystemScm: Lets xcodebuild use system's scm configuration
    - numberOfRetries: The number of times a test can fail
    - failBuild: Should this step stop the build if the tests fail? Set this to false if you're using trainer
+   - packageAuthorizationProvider: Lets xcodebuild use a specified package authorization provider (keychain|netrc)
 
  - returns: Outputs hash of results with the following keys: :number_of_tests, :number_of_failures, :number_of_retries, :number_of_tests_excluding_retries, :number_of_failures_excluding_retries
 
@@ -9447,6 +9469,7 @@ public func say(text: [String],
     let useSystemScmArg = useSystemScm.asRubyArgument(name: "use_system_scm", type: nil)
     let numberOfRetriesArg = RubyCommand.Argument(name: "number_of_retries", value: numberOfRetries, type: nil)
     let failBuildArg = failBuild.asRubyArgument(name: "fail_build", type: nil)
+    let packageAuthorizationProviderArg = packageAuthorizationProvider.asRubyArgument(name: "package_authorization_provider", type: nil)
     let array: [RubyCommand.Argument?] = [workspaceArg,
                                           projectArg,
                                           packagePathArg,
@@ -9524,7 +9547,8 @@ public func say(text: [String],
                                           disablePackageAutomaticUpdatesArg,
                                           useSystemScmArg,
                                           numberOfRetriesArg,
-                                          failBuildArg]
+                                          failBuildArg,
+                                          packageAuthorizationProviderArg]
     let args: [RubyCommand.Argument] = array
         .filter { $0?.value != nil }
         .compactMap { $0 }
@@ -10512,6 +10536,7 @@ public func slather(buildDirectory: OptionalConfigValue<String?> = .fastlaneDefa
    - disableXcpretty: Disable xcpretty formatting of build
    - suppressXcodeOutput: Suppress the output of xcodebuild to stdout. Output is still saved in buildlog_path
    - useSystemScm: Lets xcodebuild use system's scm configuration
+   - packageAuthorizationProvider: Lets xcodebuild use a specified package authorization provider (keychain|netrc)
  */
 public func snapshot(workspace: OptionalConfigValue<String?> = .fastlaneDefault(snapshotfile.workspace),
                      project: OptionalConfigValue<String?> = .fastlaneDefault(snapshotfile.project),
@@ -10612,6 +10637,7 @@ public func snapshot(workspace: OptionalConfigValue<String?> = .fastlaneDefault(
     let disableXcprettyArg = disableXcpretty.asRubyArgument(name: "disable_xcpretty", type: nil)
     let suppressXcodeOutputArg = suppressXcodeOutput.asRubyArgument(name: "suppress_xcode_output", type: nil)
     let useSystemScmArg = useSystemScm.asRubyArgument(name: "use_system_scm", type: nil)
+    let packageAuthorizationProviderArg = packageAuthorizationProvider.asRubyArgument(name: "package_authorization_provider", type: nil)
     let array: [RubyCommand.Argument?] = [workspaceArg,
                                           projectArg,
                                           xcargsArg,
@@ -10660,7 +10686,8 @@ public func snapshot(workspace: OptionalConfigValue<String?> = .fastlaneDefault(
                                           xcprettyArgsArg,
                                           disableXcprettyArg,
                                           suppressXcodeOutputArg,
-                                          useSystemScmArg]
+                                          useSystemScmArg,
+                                          packageAuthorizationProviderArg]
     let args: [RubyCommand.Argument] = array
         .filter { $0?.value != nil }
         .compactMap { $0 }
