@@ -358,7 +358,7 @@ lane :create_github_release do |options|
 
   # Preparing GitHub Release
   #
-  github_release = get_github_release(url: repo_name, version: version)
+  github_release = get_github_release(url: repo_name, version: version, api_bearer: ENV['FASTLANE_RELEASE_API_BEARER'])
   gem_path = if (github_release || {}).fetch('body', '').length == 0
                # Validate repo and create gem
                validate_repo
