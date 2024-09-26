@@ -268,7 +268,7 @@ module Snapshot
                                      type: Boolean,
                                      default_value: false),
         FastlaneCore::ConfigItem.new(key: :package_authorization_provider,
-                                     env_name: "PACKAGE_AUTHORIZATION_PROVIDER",
+                                     env_name: "SNAPSHOT_PACKAGE_AUTHORIZATION_PROVIDER",
                                      description: "Lets xcodebuild use a specified package authorization provider (keychain|netrc)",
                                      optional: true,
                                      type: String),
