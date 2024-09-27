@@ -93,7 +93,6 @@ describe Spaceship::ConnectAPI::Tunes::Client do
       end
     end
 
-
     describe "territories" do
       context 'get_territories' do
         let(:path) { "v1/territories" }
