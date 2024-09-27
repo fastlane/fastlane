@@ -70,9 +70,7 @@ module FastlaneCore
         version_parts = version.split('.').map { |s| s.to_i.to_s }
 
         # Add missing parts to conform to the [Major].[Minor].[Patch] format
-        while version_parts.size < 3
-          version_parts << "0"
-        end
+        version_parts << "0" while version_parts.size < 3
 
         version_parts.join('.')
       end
@@ -80,8 +78,7 @@ module FastlaneCore
       def matching_build(watched_app_version: nil, watched_build_version: nil, app_id: nil, platform: nil, select_latest: false)
         # Normalize the watched app version and build version to ensure consistency
         watched_app_version = normalize_version(version: watched_app_version)
-        # I do not think we want to do anything to the build number
-        # watched_build_version = normalize_version(version: watched_build_version)
+        watched_build_version = normalize_version(version: watched_build_version)
 
         # Only query for the specific version, without generating alternates like X.Y vs X.Y.0
         versions = [watched_app_version].compact
@@ -125,7 +122,6 @@ module FastlaneCore
 
       def processed?(build: nil, wait_for_build_beta_detail_processing: false)
         return false unless build
-
         is_processed = build.processed?
 
         # App Store Connect API has multiple build processing states
