@@ -119,7 +119,7 @@ module FastlaneCore
 
         # Need to filter out duplicate builds (which could be a result from the double X.Y.0 and X.Y queries)
         # See: https://github.com/fastlane/fastlane/issues/22248
-        matched_builds = matched_builds.uniq { |build| build.id }
+        matched_builds = matched_builds.uniq(&:id)
 
         if matched_builds.size > 1 && !select_latest
           error_builds = matched_builds.map do |build|
