@@ -1,4 +1,11 @@
 describe Gym::CodeSigningMapping do
+  before(:all) do
+    options = { project: "./gym/examples/standard/Example.xcodeproj" }
+    @config = FastlaneCore::Configuration.create(Gym::Options.available_options, options)
+  end
+
+  before(:each) { Gym.config = @config }
+
   describe "#app_identifier_contains?" do
     it "returns false if it doesn't contain it" do
       csm = Gym::CodeSigningMapping.new(project: nil)
