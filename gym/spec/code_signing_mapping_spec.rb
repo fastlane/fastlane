@@ -1,4 +1,4 @@
-describe Gym::CodeSigningMapping do
+describe Gym::CodeSigningMapping, requires_xcodebuild: true do
   before(:all) do
     options = { project: "./gym/examples/standard/Example.xcodeproj" }
     @config = FastlaneCore::Configuration.create(Gym::Options.available_options, options)
