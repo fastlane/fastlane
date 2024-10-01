@@ -24,13 +24,7 @@ module Fastlane
     end
 
     def render(template)
-      # From Ruby 2.6, ERB.new takes keyword arguments and positional ones are deprecated
-      # https://bugs.ruby-lang.org/issues/14256
-      if Gem::Version.new(RUBY_VERSION) >= Gem::Version.new("2.6.0")
-        ERB.new(template, trim_mode: @trim_mode).result(binding)
-      else
-        ERB.new(template, nil, @trim_mode).result(binding)
-      end
+      ERB.new(template, trim_mode: @trim_mode).result(binding)
     end
   end
 end
