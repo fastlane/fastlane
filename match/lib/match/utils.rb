@@ -61,8 +61,7 @@ module Match
            'notAfter' => 'End Datetime'
        }
 
-      return out_array.map { |x| x.split(/=+/) if x.include?("=") }
-                      .compact
+      return out_array.filter_map { |x| x.split(/=+/) if x.include?("=") }
                       .map { |k, v| [openssl_keys_to_readable_keys.fetch(k, k), v] }
                       .push([openssl_keys_to_readable_keys.fetch("notBefore"), cert.not_before])
                       .push([openssl_keys_to_readable_keys.fetch("notAfter"), cert.not_after])

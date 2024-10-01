@@ -16,14 +16,14 @@ module Fastlane
           enabled_services_object = self.service_object
           enabled_services.each do |k, v|
             enabled_services_object.__hash__[k] = true
-            enabled_services_object.send("#{k}=", v)
+            enabled_services_object.send(:"#{k}=", v)
           end
           Produce::Service.enable(enabled_services_object, nil) unless enabled_services.empty?
 
           disabled_services_object = self.service_object
           disabled_services.each do |k, v|
             disabled_services_object.__hash__[k] = true
-            disabled_services_object.send("#{k}=", v)
+            disabled_services_object.send(:"#{k}=", v)
           end
           Produce::Service.disable(disabled_services_object, nil) unless disabled_services.empty?
         end

@@ -125,7 +125,7 @@ module Fastlane
 
         loop do
           build_bundles = build.build_bundles.select { |b| b.includes_symbols == true }
-          dsym_urls = build_bundles.map(&:dsym_url).compact
+          dsym_urls = build_bundles.filter_map(&:dsym_url)
 
           break if build_bundles.count == dsym_urls.count
 

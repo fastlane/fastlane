@@ -56,7 +56,7 @@ module Spaceship
 
       def update_raw_data!(hash)
         hash.each do |k, v|
-          self.send("#{k}=", v)
+          self.send(:"#{k}=", v)
         end
       end
     end

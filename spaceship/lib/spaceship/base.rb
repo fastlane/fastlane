@@ -227,7 +227,7 @@ module Spaceship
     # Do not override `initialize` in your own models.
     def initialize(attrs = {}, existing_client = nil)
       attrs.each do |key, val|
-        self.send("#{key}=", val) if respond_to?("#{key}=")
+        self.send(:"#{key}=", val) if respond_to?(:"#{key}=")
       end
       self.raw_data = DataHash.new(attrs)
       @client = existing_client || self.class.client

@@ -467,7 +467,7 @@ private_lane :github_changelog do |options|
 
   sleep_time = ENV['FL_CHANGELOG_SLEEP'].to_i
 
-  formatted = commits.map do |commit|
+  formatted = commits.filter_map do |commit|
     if sleep_time > 0
       UI.message("Sleeping for #{sleep_time} second(s) to get changelog")
       sleep(sleep_time)
@@ -513,7 +513,7 @@ private_lane :github_changelog do |options|
     end
 
     "* #{message} via #{name} (@#{username})"
-  end.compact.join("\n")
+  end.join("\n")
 
   formatted
 end

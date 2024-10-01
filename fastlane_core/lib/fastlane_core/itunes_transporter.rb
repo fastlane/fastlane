@@ -120,7 +120,7 @@ module FastlaneCore
     end
 
     def parse_provider_info(lines)
-      lines.map { |line| itms_provider_pair(line) }.compact.to_h
+      lines.filter_map { |line| itms_provider_pair(line) }.to_h
     end
 
     private

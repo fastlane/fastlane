@@ -548,7 +548,7 @@ module Spaceship
       devices = parse_response(req, 'devices')
       return devices.first unless devices.empty?
 
-      validation_messages = parse_response(req, 'validationMessages').map { |message| message["validationUserMessage"] }.compact.uniq
+      validation_messages = parse_response(req, 'validationMessages').filter_map { |message| message["validationUserMessage"] }.uniq
 
       raise UnexpectedResponse.new, validation_messages.join('\n') unless validation_messages.empty?
       raise UnexpectedResponse.new, "Couldn't register new device, got this: #{parse_response(req)}"
