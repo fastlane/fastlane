@@ -1,6 +1,5 @@
 require 'faraday' # HTTP Client
 require 'faraday-cookie_jar'
-require 'faraday_middleware'
 
 require 'spaceship/globals'
 

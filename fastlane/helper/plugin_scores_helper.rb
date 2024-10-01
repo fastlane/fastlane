@@ -2,7 +2,7 @@ module Fastlane
   module Helper
     module PluginScoresHelper
       require 'faraday'
-      require 'faraday_middleware'
+      require 'faraday/follow_redirects'
       require 'yaml'
 
       class FastlanePluginRating
@@ -244,7 +244,7 @@ module Fastlane
           conn = Faraday.new(url: url) do |builder|
             # The order below IS important
             # See bug here https://github.com/lostisland/faraday_middleware/issues/105
-            builder.use(FaradayMiddleware::FollowRedirects)
+            builder.use(Faraday::FollowRedirects::Middleware)
             builder.adapter(Faraday.default_adapter)
           end
           conn.basic_auth(ENV["GITHUB_USER_NAME"], ENV["GITHUB_API_TOKEN"])
@@ -256,7 +256,7 @@ module Fastlane
           conn = Faraday.new(url: url) do |builder|
             # The order below IS important
             # See bug here https://github.com/lostisland/faraday_middleware/issues/105
-            builder.use(FaradayMiddleware::FollowRedirects)
+            builder.use(Faraday::FollowRedirects::Middleware)
             builder.adapter(Faraday.default_adapter)
           end
 

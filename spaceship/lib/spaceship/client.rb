@@ -1,7 +1,6 @@
 require 'babosa'
 require 'faraday' # HTTP Client
 require 'faraday-cookie_jar'
-require 'faraday_middleware'
 require 'logger'
 require 'tmpdir'
 require 'cgi'
