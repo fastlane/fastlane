@@ -58,7 +58,7 @@ describe Gym::CodeSigningMapping, requires_xcodebuild: true do
   describe "#detect_project_profile_mapping_for_tv_os" do
     it "returns the mapping of the selected provisioning profiles for tv_os", requires_xcode: true do
       workspace_path = "gym/spec/fixtures/projects/cocoapods/Example.xcworkspace"
-      options = { workspace: workspace_path, scheme: "Example", destination: "generic/platform=tvOS" }
+      options = { workspace: workspace_path, scheme: "ExampletvOS", destination: "generic/platform=tvOS" }
       project = FastlaneCore::Project.new(options)
       Gym.config = FastlaneCore::Configuration.create(Gym::Options.available_options, options)
       csm = Gym::CodeSigningMapping.new(project: project)
