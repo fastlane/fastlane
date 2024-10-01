@@ -16,7 +16,7 @@ end
 task(:test_all) do
   formatter = "--format progress"
   formatter += " -r rspec_junit_formatter --format RspecJunitFormatter -o #{ENV['CIRCLE_TEST_REPORTS']}/rspec/fastlane-junit-results.xml" if ENV["CIRCLE_TEST_REPORTS"]
-  command = "rspec --pattern ./**/*_spec.rb #{formatter}"
+  command = "rspec --pattern ./**/*_spec.rb #{formatter} #{ENV['RSPEC_ARGS']}"
 
   run_rspec(command)
 end
@@ -40,7 +40,7 @@ task(:test_all_individually) do
 
   failed = files.select do |file|
     formatter = "--format progress"
-    command = "rspec #{formatter} #{file}"
+    command = "rspec #{formatter} #{ENV['RSPEC_ARGS']} #{file}"
     run_rspec(command)
     false
   rescue => _
