@@ -72,7 +72,7 @@ bundle exec rake test_all_individually
 
 #### Troubleshoot flickering tests
 
-If your tests fail randomly, pass extra arguments to `test_all` and `test_all_indidivually` using the environment variable `RSPEC_ARGS` to isolate the test failures and reproduce them.
+If your tests fail randomly, pass extra arguments to `test_all` and `test_all_individually` using the environment variable `RSPEC_ARGS` to isolate the test failures and reproduce them.
 
 Here are some examples.
 
