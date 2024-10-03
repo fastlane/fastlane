@@ -50,7 +50,6 @@ describe Gym::CodeSigningMapping, requires_xcodebuild: true do
       project = FastlaneCore::Project.new(options)
       Gym.config = FastlaneCore::Configuration.create(Gym::Options.available_options, options)
       csm = Gym::CodeSigningMapping.new(project: project)
-      #Gym.config[:scheme] = "Target A"
       expect(csm.detect_project_profile_mapping).to eq({ "com.targeta.release" => "release-targeta", "com.targetb.release" => "release-targetb" })
     end
   end
