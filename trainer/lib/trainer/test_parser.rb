@@ -232,9 +232,9 @@ module Trainer
 
       # Parses JSON into ActionsInvocationRecord to find a list of all ids for ActionTestPlanRunSummaries
       actions_invocation_record = Trainer::XCResult::ActionsInvocationRecord.new(result_bundle_object)
-      test_refs = actions_invocation_record.actions.map do |action|
+      test_refs = actions_invocation_record.actions.filter_map do |action|
         action.action_result.tests_ref
-      end.compact
+      end
       ids = test_refs.map(&:id)
 
       # Maps ids into ActionTestPlanRunSummaries by executing xcresulttool to get JSON

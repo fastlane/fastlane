@@ -286,8 +286,8 @@ workflows:
           ruby_opt: -W:deprecated
       - tests_ubuntu:
           name: 'Execute tests on Ubuntu'
-          image: 'fastlanetools/ci:0.3.0'
-          ruby_version: '2.6'
+          image: 'cimg/ruby:2.7-node'
+          ruby_version: '2.7'
       - validate_fastlane_swift_generation:
           name: 'Validate Fastlane.swift generation'
           xcode_version: '15.0.1'
@@ -298,8 +298,8 @@ workflows:
           ruby_version: '3.2'
       - lint_source_code:
           name: 'Lint source code'
-          image: 'cimg/ruby:2.6'
-          ruby_version: '2.6'
+          image: 'cimg/ruby:2.7'
+          ruby_version: '2.7'
       - modules_load_up_tests:
           name: 'Modules load up tests'
-          image: 'cimg/ruby:2.6'
+          image: 'cimg/ruby:2.7'

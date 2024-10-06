@@ -219,7 +219,7 @@ module Fastlane
 
       em = e.message
 
-      while e.respond_to?("cause") && (e = e.cause)
+      while e.respond_to?(:cause) && (e = e.cause)
         exception_array << "cause: #{e.class}"
         exception_array << e.backtrace
       end

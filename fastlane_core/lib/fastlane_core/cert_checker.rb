@@ -130,11 +130,10 @@ module FastlaneCore
 
       # Get the alias (see `WWDRCA_CERTIFICATES`) of the installed WWDRCA certificates
       installed_certs
-        .map do |pem|
+        .filter_map do |pem|
           sha256 = Digest::SHA256.hexdigest(OpenSSL::X509::Certificate.new(pem).to_der)
           WWDRCA_CERTIFICATES.find { |c| c[:sha256].casecmp?(sha256) }&.fetch(:alias)
         end
-        .compact
     end
 
     def self.install_missing_wwdr_certificates(in_keychain: nil)

@@ -62,7 +62,7 @@ Gem::Specification.new do |spec|
     "source_code_uri" => "https://github.com/fastlane/fastlane"
   }
 
-  spec.required_ruby_version = '>= 2.6'
+  spec.required_ruby_version = '>= 2.7'
 
   spec.files = Dir.glob("*/lib/**/*", File::FNM_DOTMATCH) + Dir["fastlane/swift/**/*"] + Dir["bin/*"] + Dir["*/README.md"] + %w(README.md LICENSE .yardopts) - Dir["fastlane/lib/fastlane/actions/device_grid/assets/*"] - Dir["fastlane/lib/fastlane/actions/docs/assets/*"]
   spec.bindir = "bin"
@@ -80,14 +80,16 @@ Gem::Specification.new do |spec|
   spec.add_dependency('dotenv', '>= 2.1.1', '< 3.0.0')
   spec.add_dependency('emoji_regex', '>= 0.1', '< 4.0') # Used to scan for Emoji in the changelog
   spec.add_dependency('excon', '>= 0.71.0', '< 1.0.0') # Great HTTP Client
-  spec.add_dependency('faraday_middleware', '~> 1.0') # Same as faraday
-  spec.add_dependency('faraday-cookie_jar', '~> 0.0.6')
-  spec.add_dependency('faraday', '~> 1.0') # The faraday gem is used for deploygate, hockey and testfairy actions.
+  spec.add_dependency('faraday', '>= 1', '< 3') # The faraday gem is used for deploygate, hockey and testfairy actions.
+  spec.add_dependency('faraday-follow_redirects', '~> 0.3.0') # Middleware for Faraday to Follow 30X Redirects
+  spec.add_dependency('faraday-retry', '~> 2') # Retry middleware for Faraday. Used by testfairy action
+  spec.add_dependency('faraday-multipart', '~> 1') # Converts Request.body into a multipart.
+  spec.add_dependency('faraday-cookie_jar', '~> 0.0.6') # Spaceship uses this to store cookies for the session, when authorizing with login/password.
   spec.add_dependency('fastimage', '>= 2.1.0', '< 3.0.0') # fetch the image sizes from the screenshots
   spec.add_dependency('gh_inspector', '>= 1.1.2', '< 2.0.0') # search for issues on GitHub when something goes wrong
   spec.add_dependency('google-apis-androidpublisher_v3', '~> 0.3') # Google API Client to access Play Publishing API
   spec.add_dependency('google-apis-playcustomapp_v1', '~> 0.1') # Google API Client to access Custom app Publishing API
-  spec.add_dependency('google-cloud-env', '>= 1.6.0', '< 2.0.0') # Must be < 2.0.0 to support Ruby 2.6
+  spec.add_dependency('google-cloud-env', '>= 1.6.0', '< 2.2.0') # Must be < 2.2.0 to support Ruby 2.7
   spec.add_dependency('google-cloud-storage', '~> 1.31') # Access Google Cloud Storage for match
   spec.add_dependency('highline', '~> 2.0') # user inputs (e.g. passwords)
   spec.add_dependency('http-cookie', '~> 1.0.5') # Must be 1.0.5+ for Ruby 3 compatibility: https://github.com/sparklemotion/http-cookie/commit/d12449a983d3dd660c5fe1f2b135c35e83755cc3

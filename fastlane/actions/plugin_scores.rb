@@ -28,11 +28,11 @@ module Fastlane
           results = JSON.parse(URI.open(url).read)
           break if results.count == 0
 
-          plugins += results.collect do |current|
+          plugins += results.filter_map do |current|
             next if self.hidden_plugins.include?(current['name'])
 
             Fastlane::Helper::PluginScoresHelper::FastlanePluginScore.new(current, cache_path)
-          end.compact
+          end
 
           page += 1
         end

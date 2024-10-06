@@ -1,7 +1,7 @@
 # https://www.appveyor.com/docs/appveyor-yml/
 
 version: "{build}"
-
+image: Visual Studio 2022
 # branches to build
 branches:
   # allowlist
@@ -23,9 +23,12 @@ init:
 # cloning the repository happens here
 
 install:
-  - set PATH=C:\Ruby26-x64\bin;%PATH%
-  - FOR /F "usebackq delims==" %%A IN (`ruby .ci/compatible_gem_version`) DO gem update --system %%A
-  - FOR /F "usebackq delims==" %%A IN (`ruby .ci/bundler_version.rb`) DO gem install bundler -v %%A
+  - set PATH=C:\Ruby27-x64\bin;%PATH%
+  - ruby --version
+  - ruby .ci/compatible_gem_version
+  - FOR /F "usebackq delims==" %%A IN (`ruby .ci/compatible_gem_version`) DO gem update --no-document --system %%A
+  - ruby .ci/bundler_version.rb
+  - FOR /F "usebackq delims==" %%A IN (`ruby .ci/bundler_version.rb`) DO gem install bundler --no-document -v %%A
   - bundle install
   # iconv
   - appveyor DownloadFile

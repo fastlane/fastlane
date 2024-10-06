@@ -145,12 +145,12 @@ module Snapshot
         require("simctl")
 
         # Gets actual simctl device type from device name
-        return device_names.map do |device_name|
+        return device_names.filter_map do |device_name|
           device = SimCtl.device(name: device_name)
           if device
             device.devicetype.name
           end
-        end.compact
+        end
       end
     end
   end

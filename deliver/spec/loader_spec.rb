@@ -92,7 +92,7 @@ describe Deliver::Loader do
 
       expect(@folders.size).not_to(eq(0))
       expected_languages = @languages[1..-1].map(&:downcase).sort
-      actual_languages = @folders.map(&:basename).map(&:downcase).sort
+      actual_languages = @folders.map { |x| x.basename.downcase }.sort
       expect(actual_languages).to eq(expected_languages)
     end
 

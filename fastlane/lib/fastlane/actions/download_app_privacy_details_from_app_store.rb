@@ -31,8 +31,8 @@ module Fastlane
             usage.category.id
           end
           grouped_usages.sort_by(&:first).each do |key, usage_group|
-            purposes = usage_group.map(&:purpose).compact || []
-            data_protections = usage_group.map(&:data_protection).compact || []
+            purposes = usage_group.filter_map(&:purpose) || []
+            data_protections = usage_group.filter_map(&:data_protection) || []
             usages_config << {
               "category" => key,
               "purposes" => purposes.map(&:id).sort.uniq,

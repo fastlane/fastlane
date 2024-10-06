@@ -1,6 +1,5 @@
 require 'faraday' # HTTP Client
 require 'faraday-cookie_jar'
-require 'faraday_middleware'
 
 require 'spaceship/globals'
 
@@ -46,7 +45,7 @@ module Spaceship
       end
 
       def self.with_retry(tries = 5, &_block)
-        tries = 1 if Object.const_defined?("SpecHelper")
+        tries = 1 if Object.const_defined?(:SpecHelper)
         response = yield
 
         tries -= 1

@@ -1,5 +1,5 @@
 require 'addressable'
-require 'faraday_middleware'
+require 'faraday/follow_redirects'
 
 require_relative '../rule'
 
@@ -30,7 +30,7 @@ module Precheck
           uri = Addressable::URI.parse(url)
           uri.fragment = nil
           request = Faraday.new(uri.normalize.to_s) do |connection|
-            connection.use(FaradayMiddleware::FollowRedirects)
+            connection.use(Faraday::FollowRedirects::Middleware)
             connection.adapter(:net_http)
           end
           return RuleReturn.new(validation_state: Precheck::VALIDATION_STATES[:failed], failure_data: "HTTP #{request.head.status}: #{url}") unless request.head.status == 200

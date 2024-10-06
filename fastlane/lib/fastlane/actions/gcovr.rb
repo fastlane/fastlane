@@ -97,14 +97,14 @@ module Fastlane
         params = params.delete_if { |_, v| v.nil? }
 
         # Maps nice developer param names to CLI arguments
-        params.map do |k, v|
+        params.filter_map do |k, v|
           v ||= ""
           args = ARGS_MAP[k]
           if args
             value = (v != true && v.to_s.length > 0 ? "\"#{v}\"" : "")
             "#{args} #{value}".strip
           end
-        end.compact
+        end
       end
 
       def self.description

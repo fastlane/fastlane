@@ -51,8 +51,7 @@ module Fastlane
       # Gets all source files for action
       methods = klass.methods(false).map { |m| klass.method(m) }
       source_files = methods
-                     .map(&:source_location)
-                     .compact
+                     .filter_map(&:source_location)
                      .map { |(file, line)| file }
                      .uniq
 
