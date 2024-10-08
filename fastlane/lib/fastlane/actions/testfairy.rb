@@ -257,7 +257,7 @@ module Fastlane
                                        env_name: "FL_TESTFAIRY_TAGS",
                                        description: "Custom tags that can be used to organize your builds",
                                        type: Array,
-                                       default_value: [])
+                                       default_value: []),
           FastlaneCore::ConfigItem.new(key: :folder_name,
                                        optional: true,
                                        env_name: "FL_TESTFAIRY_FOLDER_NAME",
@@ -277,7 +277,7 @@ module Fastlane
                                        optional: true,
                                        env_name: "FL_TESTFAIRY_PLATFORM",
                                        description: "Use if upload build is not iOS or Android. Contact support@testfairy.com for more information",
-                                       default_value: ''),
+                                       default_value: '')
         ]
       end
 
