@@ -164,6 +164,9 @@ public protocol MatchfileProtocol: AnyObject {
     /// Skips setting the partition list (which can sometimes take a long time). Setting the partition list is usually needed to prevent Xcode from prompting to allow a cert to be used for signing
     var skipSetPartitionList: Bool { get }
 
+    /// Force encryption to use legacy cbc algorithm for backwards compatibility with older match versions
+    var forceLegacyEncryption: Bool { get }
+
     /// Print out extra information and all commands
     var verbose: Bool { get }
 }
@@ -223,9 +226,10 @@ public extension MatchfileProtocol {
     var skipCertificateMatching: Bool { return false }
     var outputPath: String? { return nil }
     var skipSetPartitionList: Bool { return false }
+    var forceLegacyEncryption: Bool { return false }
     var verbose: Bool { return false }
 }
 
 // Please don't remove the lines below
 // They are used to detect outdated files
-// FastlaneRunnerAPIVersion [0.9.124]
+// FastlaneRunnerAPIVersion [0.9.127]

@@ -235,6 +235,9 @@ public protocol ScanfileProtocol: AnyObject {
 
     /// Should this step stop the build if the tests fail? Set this to false if you're using trainer
     var failBuild: Bool { get }
+
+    /// Lets xcodebuild use a specified package authorization provider (keychain|netrc)
+    var packageAuthorizationProvider: String? { get }
 }
 
 public extension ScanfileProtocol {
@@ -316,8 +319,9 @@ public extension ScanfileProtocol {
     var useSystemScm: Bool { return false }
     var numberOfRetries: Int { return 0 }
     var failBuild: Bool { return true }
+    var packageAuthorizationProvider: String? { return nil }
 }
 
 // Please don't remove the lines below
 // They are used to detect outdated files
-// FastlaneRunnerAPIVersion [0.9.135]
+// FastlaneRunnerAPIVersion [0.9.138]

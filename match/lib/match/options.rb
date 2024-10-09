@@ -355,6 +355,11 @@ module Match
                                      description: "Skips setting the partition list (which can sometimes take a long time). Setting the partition list is usually needed to prevent Xcode from prompting to allow a cert to be used for signing",
                                      type: Boolean,
                                      default_value: false),
+        FastlaneCore::ConfigItem.new(key: :force_legacy_encryption,
+                                     env_name: "MATCH_FORCE_LEGACY_ENCRYPTION",
+                                     description: "Force encryption to use legacy cbc algorithm for backwards compatibility with older match versions",
+                                     type: Boolean,
+                                     default_value: false),
 
         # other
         FastlaneCore::ConfigItem.new(key: :verbose,

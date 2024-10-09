@@ -14,15 +14,23 @@ You can also run those steps independently or on a more fine-grained way.
 
 ### Automated tests
 
-Make sure to run the automated tests using `bundle exec` to ensure you’re running the correct version of `rspec` and `rubocop`
+Make sure to run the automated tests using `bundle exec` to ensure you’re running the correct version of `rspec` and `rubocop`.
 
 #### All unit tests
 
 First, navigate into the root of the _fastlane_ project and run all unit tests using
 
 ```
+bundle exec rake test_all
+```
+
+You can also invoke rspec directly
+
+```
 bundle exec rspec
 ```
+
+The test execution sends all standard output to a random temporary file. Prefix the command line with `DEBUG= ` to print out the output instead. E.g. `DEBUG= bundle exec rspec`
 
 #### Unit tests for one specific tool
 
@@ -53,6 +61,43 @@ bundle exec rspec ./fastlane/spec/fastlane_require_spec.rb:17
 The number is the line number of the unit test (`it ... do`) or unit test group (`describe ... do`) you want to run.
 
 Instead of using the line number you can also use a filter with the `it "something", now: true` notation and then use `bundle exec rspec -t now` to run this tagged test. (Note that `now` can be any random string of your choice.)
+
+#### Ensuring all tests run independently
+
+If you want to check if all the tests in the test suite can be run independently, use
+
+```
+bundle exec rake test_all_individually
+```
+
+#### Troubleshoot flickering tests
+
+If your tests fail randomly, pass extra arguments to `test_all` and `test_all_individually` using the environment variable `RSPEC_ARGS` to isolate the test failures and reproduce them.
+
+Here are some examples.
+
+Randomize the order of tests for the full suite:
+```
+RSPEC_ARGS="--order rand" bundle exec rake test_all
+```
+
+Pass a given seed to the full test suite:
+```
+RSPEC_ARGS="--seed 1234" bundle exec rake test_all
+```
+
+Run each test file independently and randomize within each run:
+```
+RSPEC_ARGS="--bisect random" bundle exec rake test_all_individually
+```
+
+Run the specific tests in bisect mode with a given seed:
+```
+bundle exec rspec --seed 1234 bisect your/list/of/tests.rb
+```
+
+For more information, see [rspec command line documentation](https://rspec.info/features/3-13/rspec-core/command-line/)
+
 
 ### Code style
 

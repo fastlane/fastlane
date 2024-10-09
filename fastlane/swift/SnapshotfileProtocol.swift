@@ -125,6 +125,9 @@ public protocol SnapshotfileProtocol: AnyObject {
     /// Prevents packages from automatically being resolved to versions other than those recorded in the `Package.resolved` file
     var disablePackageAutomaticUpdates: Bool { get }
 
+    /// Lets xcodebuild use a specified package authorization provider (keychain|netrc)
+    var packageAuthorizationProvider: String? { get }
+
     /// The testplan associated with the scheme that should be used for testing
     var testplan: String? { get }
 
@@ -192,6 +195,7 @@ public extension SnapshotfileProtocol {
     var clonedSourcePackagesPath: String? { return nil }
     var skipPackageDependenciesResolution: Bool { return false }
     var disablePackageAutomaticUpdates: Bool { return false }
+    var packageAuthorizationProvider: String? { return nil }
     var testplan: String? { return nil }
     var onlyTesting: String? { return nil }
     var skipTesting: String? { return nil }
@@ -204,4 +208,4 @@ public extension SnapshotfileProtocol {
 
 // Please don't remove the lines below
 // They are used to detect outdated files
-// FastlaneRunnerAPIVersion [0.9.119]
+// FastlaneRunnerAPIVersion [0.9.122]
