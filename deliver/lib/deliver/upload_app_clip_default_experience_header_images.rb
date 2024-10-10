@@ -69,7 +69,6 @@ module Deliver
         end
 
         # upload
-        UI.verbose("Queued upload app clip header image job for #{localization.locale} '#{header_image.path}'")
         worker.enqueue(UploadAppClipHeaderImageJob.new(header_image.path, localization))
       end
 

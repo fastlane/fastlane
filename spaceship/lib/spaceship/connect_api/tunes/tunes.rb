@@ -1410,7 +1410,7 @@ module Spaceship
             }
           }
 
-          tunes_request_client.post("appClipDefaultExperienceLocalizations", body)
+          tunes_request_client.post("#{Version::V1}/appClipDefaultExperienceLocalizations", body)
         end
 
         # https://developer.apple.com/documentation/appstoreconnectapi/modify_the_localization_for_a_default_app_clip_experience
