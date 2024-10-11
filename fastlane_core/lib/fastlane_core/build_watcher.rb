@@ -116,6 +116,11 @@ module FastlaneCore
         # Raise error if more than 1 build is returned
         # This should never happen but need to inform the user if it does
         matched_builds = version_matches.map(&:builds).flatten
+
+        # Need to filter out duplicate builds (which could be a result from the double X.Y.0 and X.Y queries)
+        # See: https://github.com/fastlane/fastlane/issues/22248
+        matched_builds = matched_builds.uniq(&:id)
+
         if matched_builds.size > 1 && !select_latest
           error_builds = matched_builds.map do |build|
             "#{build.app_version}(#{build.version}) for #{build.platform} - #{build.processing_state}"

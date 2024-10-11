@@ -267,6 +267,15 @@ module Snapshot
                                      description: "Prevents packages from automatically being resolved to versions other than those recorded in the `Package.resolved` file",
                                      type: Boolean,
                                      default_value: false),
+        FastlaneCore::ConfigItem.new(key: :package_authorization_provider,
+                                     env_name: "SNAPSHOT_PACKAGE_AUTHORIZATION_PROVIDER",
+                                     description: "Lets xcodebuild use a specified package authorization provider (keychain|netrc)",
+                                     optional: true,
+                                     type: String,
+                                     verify_block: proc do |value|
+                                       av = %w(netrc keychain)
+                                       UI.user_error!("Unsupported authorization provider '#{value}', must be: #{av}") unless av.include?(value)
+                                     end),
         FastlaneCore::ConfigItem.new(key: :testplan,
                                      env_name: "SNAPSHOT_TESTPLAN",
                                      description: "The testplan associated with the scheme that should be used for testing",

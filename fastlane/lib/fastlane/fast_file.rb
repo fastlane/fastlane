@@ -218,7 +218,9 @@ module Fastlane
     end
 
     def self.sh(*command, step_name: nil, log: true, error_callback: nil, &b)
-      command_header = log ? step_name || Actions.shell_command_from_args(*command) : "shell command"
+      command_header = step_name
+      command_header ||= log ? Actions.shell_command_from_args(*command) : "shell command"
+
       Actions.execute_action(command_header) do
         Actions.sh_no_action(*command, log: log, error_callback: error_callback, &b)
       end
@@ -343,7 +345,11 @@ module Fastlane
               # Update the repo if it's eligible for caching but the version isn't specified
               UI.message("Fetching remote git branches and updating git repo...")
               Helper.with_env_values('GIT_TERMINAL_PROMPT' => '0') do
-                Actions.sh("cd #{clone_folder.shellescape} && git fetch --all --quiet && git checkout #{checkout_param.shellescape} #{checkout_path} && git reset --hard && git rebase")
+                command = "cd #{clone_folder.shellescape} && git fetch --all --quiet && git checkout #{checkout_param.shellescape} #{checkout_path} && git reset --hard"
+                # Check if checked out "branch" is actually a branch or a tag
+                current_branch = Actions.sh("cd #{clone_folder.shellescape} && git rev-parse --abbrev-ref HEAD")
+                command << " && git rebase" unless current_branch.strip.eql?("HEAD")
+                Actions.sh(command)
               end
             else
               begin

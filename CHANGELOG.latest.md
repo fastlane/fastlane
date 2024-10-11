@@ -1,0 +1,5 @@
+* [spaceship] Add support for Enterprise Program API (#22215) via GevaZeichner (@GevaZeichner)
+* Make test pass standalone (#22268) via Jerome Lacoste (@lacostej)
+* Add missing require 'ostruct' in erb_template_helper.rb to solve uninitialized constant Fastlane::OpenStruct (NameError)  (#21950) via Nicolas G (@nicgodoy)
+* [Fastlane.Swift] Allow overriding LaneFileProtocol lifecycles when subclassing LaneFile (#20563) via Sven Tiigi (@SvenTiigi)
+* [Match][S3] Only download (and decrypt) files in the subfolder of the provided TeamID (#22199) via Olivier Halligon (@AliSoftware)
