@@ -586,8 +586,9 @@ module Spaceship
           modified_cookie.gsub!(unescaped_important_cookie, escaped_important_cookie)
         end
 
-        do_new_signin = true
-        response = if do_new_signin
+        do_legacy_signin = FastlaneCore::Feature.enabled?('FASTLANE_USE_LEGACY_PRE_SIRP_AUTH')
+        response = unless do_legacy_signin
+                     # Fixes issue https://github.com/fastlane/fastlane/issues/26368#issuecomment-2424190032
                      do_sirp(user, password, modified_cookie)
                    else
                      # Fixes issue https://github.com/fastlane/fastlane/issues/21071

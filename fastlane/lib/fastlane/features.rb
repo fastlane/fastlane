@@ -8,3 +8,6 @@ FastlaneCore::Feature.register(env_var: 'FASTLANE_ENABLE_BETA_DELIVER_SYNC_SCREE
 
 FastlaneCore::Feature.register(env_var: 'FASTLANE_WWDR_USE_HTTP1_AND_RETRIES',
                                description: 'Adds --http1.1 and --retry 3 --retry-all-errors to the curl command to download WWDR certificates')
+
+FastlaneCore::Feature.register(env_var: 'FASTLANE_USE_LEGACY_PRE_SIRP_AUTH',
+                               description: 'Use legacy pre-SIRP auth')
