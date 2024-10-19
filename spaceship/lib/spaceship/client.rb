@@ -468,7 +468,7 @@ module Spaceship
         protocols: ['s2k', 's2k_fo']
       }
 
-			# pp data
+      # pp data
 
       response = request(:post) do |req|
         req.url("https://idmsa.apple.com/appleauth/auth/signin/init")
@@ -480,25 +480,25 @@ module Spaceship
         req.headers["Cookie"] = modified_cookie if modified_cookie
       end
 
-			# pack
+      # pack
 
       body = response.body
-			# pp body
-			iterations = body["iteration"]
+      # pp body
+      iterations = body["iteration"]
       salt = Base64.strict_decode64(body["salt"])
       b = Base64.strict_decode64(body["b"])
       c = body["c"]
 
-			key_length = 32
+      key_length = 32
       encrypted_password = pbkdf2(password, salt, iterations, key_length)
 
       m1 = client.process_challenge(
-				user,
-				to_hex(encrypted_password),
-				to_hex(salt),
-				to_hex(b),
-				is_password_encrypted: true
-			)
+        user,
+        to_hex(encrypted_password),
+        to_hex(salt),
+        to_hex(b),
+        is_password_encrypted: true
+      )
       m2 = client.H_AMK
 
       unless m1
@@ -514,7 +514,7 @@ module Spaceship
       }
 
       # pp data
-      
+
       hashcash = self.fetch_hashcash
 
       response = request(:post) do |req|
@@ -532,17 +532,17 @@ module Spaceship
     end
 
     def pbkdf2(password, salt, iterations, key_length, digest = OpenSSL::Digest::SHA256.new)
-			require 'openssl'
+      require 'openssl'
       password = OpenSSL::Digest::SHA256.digest(password)
-			OpenSSL::PKCS5.pbkdf2_hmac(password, salt, iterations, key_length, digest)
-		end
+      OpenSSL::PKCS5.pbkdf2_hmac(password, salt, iterations, key_length, digest)
+    end
 
     def to_hex(str)
-				str.unpack('H*')[0]
+      str.unpack1('H*')
     end
 
     def to_byte(str)
-        [str].pack('H*')
+      [str].pack('H*')
     end
 
     # This method is used for both the Apple Dev Portal and App Store Connect
@@ -588,25 +588,25 @@ module Spaceship
 
         do_new_signin = true
         response = if do_new_signin
-          do_sirp(user, password, modified_cookie)
-        else
-          # Fixes issue https://github.com/fastlane/fastlane/issues/21071
-          # On 2023-02-23, Apple added a custom implementation
-          # of hashcash to their auth flow
-          # hashcash = nil
-          hashcash = self.fetch_hashcash
+                     do_sirp(user, password, modified_cookie)
+                   else
+                     # Fixes issue https://github.com/fastlane/fastlane/issues/21071
+                     # On 2023-02-23, Apple added a custom implementation
+                     # of hashcash to their auth flow
+                     # hashcash = nil
+                     hashcash = self.fetch_hashcash
 
-          request(:post) do |req|
-            req.url("https://idmsa.apple.com/appleauth/auth/signin")
-            req.body = data.to_json
-            req.headers['Content-Type'] = 'application/json'
-            req.headers['X-Requested-With'] = 'XMLHttpRequest'
-            req.headers['X-Apple-Widget-Key'] = self.itc_service_key
-            req.headers['Accept'] = 'application/json, text/javascript'
-            req.headers["Cookie"] = modified_cookie if modified_cookie
-            req.headers["X-Apple-HC"] = hashcash if hashcash
-          end
-        end
+                     request(:post) do |req|
+                       req.url("https://idmsa.apple.com/appleauth/auth/signin")
+                       req.body = data.to_json
+                       req.headers['Content-Type'] = 'application/json'
+                       req.headers['X-Requested-With'] = 'XMLHttpRequest'
+                       req.headers['X-Apple-Widget-Key'] = self.itc_service_key
+                       req.headers['Accept'] = 'application/json, text/javascript'
+                       req.headers["Cookie"] = modified_cookie if modified_cookie
+                       req.headers["X-Apple-HC"] = hashcash if hashcash
+                     end
+                   end
       rescue UnauthorizedAccessError
         raise InvalidUserCredentialsError.new, "Invalid username and password combination. Used '#{user}' as the username."
       end
