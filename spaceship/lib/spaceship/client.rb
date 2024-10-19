@@ -468,7 +468,7 @@ module Spaceship
         protocols: ['s2k', 's2k_fo']
       }
 
-			pp data
+			# pp data
 
       response = request(:post) do |req|
         req.url("https://idmsa.apple.com/appleauth/auth/signin/init")
@@ -483,7 +483,7 @@ module Spaceship
 			# pack
 
       body = response.body
-			pp body
+			# pp body
 			iterations = body["iteration"]
       salt = Base64.strict_decode64(body["salt"])
       b = Base64.strict_decode64(body["b"])
@@ -513,7 +513,7 @@ module Spaceship
         rememberMe: false
       }
 
-      pp data
+      # pp data
       
       hashcash = self.fetch_hashcash
 
@@ -1044,7 +1044,6 @@ module Spaceship
     end
 
     def handle_error(response)
-      puts("THE STATUS: #{response.status}")
       case response.status
       when 401
         msg = "Auth lost"
