@@ -455,7 +455,7 @@ module Spaceship
 
       prime_length = 2048
 
-      require 'sirp'
+      require 'fastlane-sirp'
       require 'base64'
 
       client = SIRP::Client.new(prime_length)
