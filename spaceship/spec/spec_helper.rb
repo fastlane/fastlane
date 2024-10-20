@@ -113,7 +113,7 @@ RSpec.configure do |config|
   end
 end
 
-RSpec.shared_examples("common spaceship login") do |skip_login|
+RSpec.shared_examples("common spaceship login") do |skip_tunes_login|
   require 'fastlane-sirp'
   let(:authentication_data) {
     '8f30ce83b660f03abb0f8570c235e0e1e1d3860a222304acf18e989bdc065dc922a141e6da4563f0' \
@@ -131,6 +131,6 @@ RSpec.shared_examples("common spaceship login") do |skip_login|
     allow_any_instance_of(SIRP::Client).to receive(:start_authentication).and_return(authentication_data)
     allow_any_instance_of(SIRP::Client).to receive(:process_challenge).and_return("1234")
 
-    Spaceship::Tunes.login unless skip_login
+    Spaceship::Tunes.login unless skip_tunes_login
   }
 end
