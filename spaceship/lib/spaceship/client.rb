@@ -494,7 +494,7 @@ module Spaceship
       m2 = client.H_AMK
 
       unless m1
-        raise "no m1"
+        raise SIRPAuthenticationError
       end
 
       data = {
