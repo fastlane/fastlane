@@ -451,24 +451,19 @@ module Spaceship
     end
 
     def do_sirp(user, password, modified_cookie)
-      require 'pp'
-
-      prime_length = 2048
-
       require 'fastlane-sirp'
       require 'base64'
+
+      prime_length = 2048
 
       client = SIRP::Client.new(prime_length)
       a = client.start_authentication
 
       data = {
-        #a: Base64.encode64(a),
         a: Base64.strict_encode64(to_byte(a)),
         accountName: user,
         protocols: ['s2k', 's2k_fo']
       }
-
-      # pp data
 
       response = request(:post) do |req|
         req.url("https://idmsa.apple.com/appleauth/auth/signin/init")
@@ -480,10 +475,7 @@ module Spaceship
         req.headers["Cookie"] = modified_cookie if modified_cookie
       end
 
-      # pack
-
       body = response.body
-      # pp body
       iterations = body["iteration"]
       salt = Base64.strict_decode64(body["salt"])
       b = Base64.strict_decode64(body["b"])
@@ -512,8 +504,6 @@ module Spaceship
         m2: Base64.encode64(to_byte(m2)).strip,
         rememberMe: false
       }
-
-      # pp data
 
       hashcash = self.fetch_hashcash
 
@@ -586,11 +576,8 @@ module Spaceship
           modified_cookie.gsub!(unescaped_important_cookie, escaped_important_cookie)
         end
 
-        do_legacy_signin = FastlaneCore::Feature.enabled?('FASTLANE_USE_LEGACY_PRE_SIRP_AUTH')
-        response = unless do_legacy_signin
-                     # Fixes issue https://github.com/fastlane/fastlane/issues/26368#issuecomment-2424190032
-                     do_sirp(user, password, modified_cookie)
-                   else
+        do_legacy_signin = ENV['FASTLANE_USE_LEGACY_PRE_SIRP_AUTH']
+        response = if do_legacy_signin
                      # Fixes issue https://github.com/fastlane/fastlane/issues/21071
                      # On 2023-02-23, Apple added a custom implementation
                      # of hashcash to their auth flow
@@ -607,6 +594,9 @@ module Spaceship
                        req.headers["Cookie"] = modified_cookie if modified_cookie
                        req.headers["X-Apple-HC"] = hashcash if hashcash
                      end
+                   else
+                     # Fixes issue https://github.com/fastlane/fastlane/issues/26368#issuecomment-2424190032
+                     do_sirp(user, password, modified_cookie)
                    end
       rescue UnauthorizedAccessError
         raise InvalidUserCredentialsError.new, "Invalid username and password combination. Used '#{user}' as the username."

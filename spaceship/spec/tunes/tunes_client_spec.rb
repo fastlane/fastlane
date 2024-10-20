@@ -1,4 +1,23 @@
+require 'fastlane-sirp'
+
 describe Spaceship::TunesClient do
+  let(:authentication_data) {
+    '8f30ce83b660f03abb0f8570c235e0e1e1d3860a222304acf18e989bdc065dc922a141e6da4563f0' \
+      '5586605b0e10535d875ca7e0fae7fe100cfe533374f29aaa803cdfb2c6194f458485e87f76988f6' \
+      'cddaa1829309438e1aa9ab652b17cfc081fff40356cb3af35c621e9f37ba6e2a03e6abac5a6bfe' \
+      '18ddb489412b7c56355292e6c355f8859270d04063b843d23c1ef7503c3c5dd2c56740101a3ef5' \
+      'bfec6bff1e6dc55e3f70840a83a95d7b3d20ab350d0472809ce87a4e3c29ed9685eb7721dc87ba' \
+      'bfadbd9e65e75d5df55547bcff98711ddeae7b8e1e6dbf529e96f7caa4b830b43575cddc52cebc' \
+      '39f9522f85cbf33ac35ee59f66f48109c12fbb78d'
+  }
+  let(:username) { 'spaceship@krausefx.com' }
+  let(:password) { 'so_secret' }
+
+  before {
+    allow_any_instance_of(SIRP::Client).to receive(:start_authentication).and_return(authentication_data)
+    allow_any_instance_of(SIRP::Client).to receive(:process_challenge).and_return("1234")
+  }
+
   describe '#login' do
     it 'raises an exception if authentication failed' do
       expect do
@@ -28,10 +47,12 @@ describe Spaceship::TunesClient do
     end
 
     it 'has authType is sa' do
-      response = double
-      allow(response).to receive(:status).and_return(412)
-      allow(response).to receive(:body).and_return({ "authType" => "sa" })
-      allow_any_instance_of(Spaceship::Client).to receive(:request).and_return(response)
+      expect_any_instance_of(Spaceship::Client).to receive(:request).twice.and_call_original
+
+      response_second = double
+      allow(response_second).to receive(:status).and_return(412)
+      allow(response_second).to receive(:body).and_return({ "authType" => "sa" })
+      expect_any_instance_of(Spaceship::Client).to receive(:request).once.and_return(response_second)
 
       expect do
         Spaceship::Tunes.login(username, password)
@@ -40,10 +61,12 @@ describe Spaceship::TunesClient do
     end
 
     it 'has authType of hsa' do
-      response = double
-      allow(response).to receive(:status).and_return(412)
-      allow(response).to receive(:body).and_return({ "authType" => "hsa" })
-      allow_any_instance_of(Spaceship::Client).to receive(:request).and_return(response)
+      expect_any_instance_of(Spaceship::Client).to receive(:request).twice.and_call_original
+
+      response_second = double
+      allow(response_second).to receive(:status).and_return(412)
+      allow(response_second).to receive(:body).and_return({ "authType" => "hsa" })
+      expect_any_instance_of(Spaceship::Client).to receive(:request).once.and_return(response_second)
 
       expect do
         Spaceship::Tunes.login(username, password)
@@ -52,10 +75,12 @@ describe Spaceship::TunesClient do
     end
 
     it 'has authType of non-sa' do
-      response = double
-      allow(response).to receive(:status).and_return(412)
-      allow(response).to receive(:body).and_return({ "authType" => "non-sa" })
-      allow_any_instance_of(Spaceship::Client).to receive(:request).and_return(response)
+      expect_any_instance_of(Spaceship::Client).to receive(:request).twice.and_call_original
+
+      response_second = double
+      allow(response_second).to receive(:status).and_return(412)
+      allow(response_second).to receive(:body).and_return({ "authType" => "hsa" })
+      expect_any_instance_of(Spaceship::Client).to receive(:request).once.and_return(response_second)
 
       expect do
         Spaceship::Tunes.login(username, password)
@@ -64,10 +89,12 @@ describe Spaceship::TunesClient do
     end
 
     it 'has authType of hsa2' do
-      response = double
-      allow(response).to receive(:status).and_return(412)
-      allow(response).to receive(:body).and_return({ "authType" => "hsa2" })
-      allow_any_instance_of(Spaceship::Client).to receive(:request).and_return(response)
+      expect_any_instance_of(Spaceship::Client).to receive(:request).twice.and_call_original
+
+      response_second = double
+      allow(response_second).to receive(:status).and_return(412)
+      allow(response_second).to receive(:body).and_return({ "authType" => "hsa2" })
+      expect_any_instance_of(Spaceship::Client).to receive(:request).once.and_return(response_second)
 
       expect do
         Spaceship::Tunes.login(username, password)
