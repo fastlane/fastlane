@@ -2,7 +2,6 @@ require 'spec_helper'
 
 describe Spaceship::Tunes::AppAnalytics do
   include_examples "common spaceship login"
-  # before { Spaceship::Tunes.login }
 
   let(:app) { Spaceship::Application.all.find { |a| a.apple_id == "898536088" } }
 
