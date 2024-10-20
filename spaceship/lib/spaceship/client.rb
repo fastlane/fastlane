@@ -475,6 +475,8 @@ module Spaceship
         req.headers["Cookie"] = modified_cookie if modified_cookie
       end
 
+      puts("Received SIRP signin init response") if Spaceship::Globals.verbose?
+
       body = response.body
       iterations = body["iteration"]
       salt = Base64.strict_decode64(body["salt"])
@@ -494,6 +496,7 @@ module Spaceship
       m2 = client.H_AMK
 
       unless m1
+        puts("Error processing SIRP challenge") if Spaceship::Globals.verbose?
         raise SIRPAuthenticationError
       end
 
@@ -517,6 +520,8 @@ module Spaceship
         req.headers["Cookie"] = modified_cookie if modified_cookie
         req.headers["X-Apple-HC"] = hashcash if hashcash
       end
+
+      puts("Completed SIRP authentication with status of #{response.status}") if Spaceship::Globals.verbose?
 
       return response
     end
@@ -578,6 +583,8 @@ module Spaceship
 
         do_legacy_signin = ENV['FASTLANE_USE_LEGACY_PRE_SIRP_AUTH']
         response = if do_legacy_signin
+                     puts("Starting legacy Apple ID login") if Spaceship::Globals.verbose?
+
                      # Fixes issue https://github.com/fastlane/fastlane/issues/21071
                      # On 2023-02-23, Apple added a custom implementation
                      # of hashcash to their auth flow
@@ -596,6 +603,7 @@ module Spaceship
                      end
                    else
                      # Fixes issue https://github.com/fastlane/fastlane/issues/26368#issuecomment-2424190032
+                     puts("Starting SIRP Apple ID login") if Spaceship::Globals.verbose?
                      do_sirp(user, password, modified_cookie)
                    end
       rescue UnauthorizedAccessError
