@@ -239,6 +239,18 @@ describe Fastlane do
           end").runner.execute(:test)
         end
 
+        it "works with initial checkout where the requested version is the last commit" do
+          allow(UI).to receive(:message)
+          expect(UI).to receive(:message).with(caching_message)
+          expect(UI).to receive(:important).with('Works since v2.1')
+
+          Fastlane::FastFile.new.parse("lane :test_wtf do
+            import_from_git(url: '#{source_directory_path}', version: '2.1', cache_path: '#{cache_directory_path}')
+
+            works
+          end").runner.execute(:test_wtf)
+        end
+
         # Meaning, `git fetch` and `git rebase` are performed when caching is eligible
         # and the version isn't specified.
         it "works with updated branch" do
