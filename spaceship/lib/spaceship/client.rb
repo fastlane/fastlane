@@ -454,9 +454,7 @@ module Spaceship
       require 'fastlane-sirp'
       require 'base64'
 
-      prime_length = 2048
-
-      client = SIRP::Client.new(prime_length)
+      client = SIRP::Client.new(2048)
       a = client.start_authentication
 
       data = {
@@ -475,7 +473,7 @@ module Spaceship
         req.headers["Cookie"] = modified_cookie if modified_cookie
       end
 
-      puts("Received SIRP signin init response") if Spaceship::Globals.verbose?
+      puts("Received SIRP signin init response: #{response.body}") if Spaceship::Globals.verbose?
 
       body = response.body
       iterations = body["iteration"]
@@ -495,7 +493,7 @@ module Spaceship
       )
       m2 = client.H_AMK
 
-      unless m1
+      if m1 == false
         puts("Error processing SIRP challenge") if Spaceship::Globals.verbose?
         raise SIRPAuthenticationError
       end
@@ -555,12 +553,6 @@ module Spaceship
       # If the session is valid no need to attempt to generate a new one.
       return true if has_valid_session
 
-      data = {
-        accountName: user,
-        password: password,
-        rememberMe: true
-      }
-
       begin
         # The below workaround is only needed for 2 step verified machines
         # Due to escaping of cookie values we have a little workaround here
@@ -581,31 +573,7 @@ module Spaceship
           modified_cookie.gsub!(unescaped_important_cookie, escaped_important_cookie)
         end
 
-        do_legacy_signin = ENV['FASTLANE_USE_LEGACY_PRE_SIRP_AUTH']
-        response = if do_legacy_signin
-                     puts("Starting legacy Apple ID login") if Spaceship::Globals.verbose?
-
-                     # Fixes issue https://github.com/fastlane/fastlane/issues/21071
-                     # On 2023-02-23, Apple added a custom implementation
-                     # of hashcash to their auth flow
-                     # hashcash = nil
-                     hashcash = self.fetch_hashcash
-
-                     request(:post) do |req|
-                       req.url("https://idmsa.apple.com/appleauth/auth/signin")
-                       req.body = data.to_json
-                       req.headers['Content-Type'] = 'application/json'
-                       req.headers['X-Requested-With'] = 'XMLHttpRequest'
-                       req.headers['X-Apple-Widget-Key'] = self.itc_service_key
-                       req.headers['Accept'] = 'application/json, text/javascript'
-                       req.headers["Cookie"] = modified_cookie if modified_cookie
-                       req.headers["X-Apple-HC"] = hashcash if hashcash
-                     end
-                   else
-                     # Fixes issue https://github.com/fastlane/fastlane/issues/26368#issuecomment-2424190032
-                     puts("Starting SIRP Apple ID login") if Spaceship::Globals.verbose?
-                     do_sirp(user, password, modified_cookie)
-                   end
+        response = perform_login_method(user, password, modified_cookie)
       rescue UnauthorizedAccessError
         raise InvalidUserCredentialsError.new, "Invalid username and password combination. Used '#{user}' as the username."
       end
@@ -650,6 +618,40 @@ module Spaceship
       end
     end
     # rubocop:enable Metrics/PerceivedComplexity
+
+    def perform_login_method(user, password, modified_cookie)
+      do_legacy_signin = ENV['FASTLANE_USE_LEGACY_PRE_SIRP_AUTH']
+      if do_legacy_signin
+        puts("Starting legacy Apple ID login") if Spaceship::Globals.verbose?
+
+        # Fixes issue https://github.com/fastlane/fastlane/issues/21071
+        # On 2023-02-23, Apple added a custom implementation
+        # of hashcash to their auth flow
+        # hashcash = nil
+        hashcash = self.fetch_hashcash
+
+        data = {
+          accountName: user,
+          password: password,
+          rememberMe: true
+        }
+
+        return request(:post) do |req|
+          req.url("https://idmsa.apple.com/appleauth/auth/signin")
+          req.body = data.to_json
+          req.headers['Content-Type'] = 'application/json'
+          req.headers['X-Requested-With'] = 'XMLHttpRequest'
+          req.headers['X-Apple-Widget-Key'] = self.itc_service_key
+          req.headers['Accept'] = 'application/json, text/javascript'
+          req.headers["Cookie"] = modified_cookie if modified_cookie
+          req.headers["X-Apple-HC"] = hashcash if hashcash
+        end
+      else
+        # Fixes issue https://github.com/fastlane/fastlane/issues/26368#issuecomment-2424190032
+        puts("Starting SIRP Apple ID login") if Spaceship::Globals.verbose?
+        return do_sirp(user, password, modified_cookie)
+      end
+    end
 
     def fetch_hashcash
       response = request(:get, "https://idmsa.apple.com/appleauth/auth/signin?widgetKey=#{self.itc_service_key}")
