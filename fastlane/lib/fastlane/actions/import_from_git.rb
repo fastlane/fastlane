@@ -43,6 +43,9 @@ module Fastlane
                                        optional: true),
           FastlaneCore::ConfigItem.new(key: :cache_path,
                                        description: "The path to a directory where the repository should be cloned into. Defaults to `nil`, which causes the repository to be cloned on every call, to a temporary directory",
+                                       optional: true),
+          FastlaneCore::ConfigItem.new(key: :git_basic_authorization,
+                                       description: "Use a basic authorization header to access the git repo (e.g.: access via HTTPS, GitHub Actions, etc), usually a string in Base64",
                                        optional: true)
         ]
       end
@@ -68,7 +71,8 @@ module Fastlane
             branch: "HEAD", # The branch to checkout on the repository.
             path: "fastlane/Fastfile", # The path of the Fastfile in the repository.
             version: [">= 1.1.0", "< 2.0.0"], # The version to checkout on the repository. Multiple conditions can be used to select the latest version within constraints.
-            cache_path: "~/.cache/fastlane/imported" # A directory in which the repository will be added, which means that it will not be cloned again on subsequent calls.
+            cache_path: "~/.cache/fastlane/imported", # A directory in which the repository will be added, which means that it will not be cloned again on subsequent calls.
+            git_basic_authorization: "<YOUR BASE64 KEY>"
           )'
         ]
       end
