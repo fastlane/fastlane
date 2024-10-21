@@ -1,5 +1,3 @@
-* [spaceship] Add support for Enterprise Program API (#22215) via GevaZeichner (@GevaZeichner)
-* Make test pass standalone (#22268) via Jerome Lacoste (@lacostej)
-* Add missing require 'ostruct' in erb_template_helper.rb to solve uninitialized constant Fastlane::OpenStruct (NameError)  (#21950) via Nicolas G (@nicgodoy)
-* [Fastlane.Swift] Allow overriding LaneFileProtocol lifecycles when subclassing LaneFile (#20563) via Sven Tiigi (@SvenTiigi)
-* [Match][S3] Only download (and decrypt) files in the subfolder of the provided TeamID (#22199) via Olivier Halligon (@AliSoftware)
+This version has a required fix for authenticating with Apple via Apple ID. Apple started using their own variant of SRP (Secure Remote Password) using SHA-256 and 2048 bit hashing in the sign in flow. Any previous _fastlane_ versions will likely response a "503 Service Temporarily Unavailable" when authenicating with an Apple ID.
+
+* [spaceship] New AppleID Auth with SRP (#26415) via Josh Holtz (@snatchev and @joshdholtz)
