@@ -509,7 +509,7 @@ module Spaceship
       hashcash = self.fetch_hashcash
 
       response = request(:post) do |req|
-        req.url("https://idmsa.apple.com/appleauth/auth/signin/complete?isRememberMeEnabled=false")
+        req.url("https://idmsa.apple.com/appleauth/auth/signin/complete")
         req.body = data.to_json
         req.headers['Content-Type'] = 'application/json'
         req.headers['X-Requested-With'] = 'XMLHttpRequest'
@@ -1047,10 +1047,12 @@ module Spaceship
     def handle_error(response)
       case response.status
       when 401
+        puts("Received 401 with #{response.body}") if Spaceship::Globals.verbose?
         msg = "Auth lost"
         logger.warn(msg)
         raise UnauthorizedAccessError.new, "Unauthorized Access"
       when 403
+        puts("Received 403 with #{response.body}") if Spaceship::Globals.verbose?
         msg = "Access forbidden"
         logger.warn(msg)
         raise AccessForbiddenError.new, msg
