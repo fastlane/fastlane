@@ -89,8 +89,8 @@ module Supply
           UI.user_error!("Could not find folder #{metadata_path}") unless File.directory?(metadata_path)
 
           track, release = fetch_track_and_release!(track_name, version_code)
-          UI.user_error!("Unable to find the requested track - '#{Supply.config[:track]}'") unless track
-          UI.user_error!("Could not find release for version code '#{version_code}' to update changelog") unless release
+          UI.user_error!("Unable to find the requested track '#{track_name}' for version code '#{version_code}'") unless track
+          UI.user_error!("Could not find release for version code '#{version_code}' in track '#{track_name}' to update changelog") unless release
 
           release_notes_queue = Queue.new
           upload_worker = create_meta_upload_worker
@@ -124,24 +124,22 @@ module Supply
     end
 
     def update_rollout
-      track, release = fetch_track_and_release!(Supply.config[:track], Supply.config[:version_code], Supply::ReleaseStatus::IN_PROGRESS)
-      UI.user_error!("Unable to find the requested track - '#{Supply.config[:track]}'") unless track
-      UI.user_error!("Unable to find the requested release on track - '#{Supply.config[:track]}'") unless release
+      track_name = Supply.config[:track]
+      in_progress_status = Supply::ReleaseStatus::IN_PROGRESS
+      track, release = fetch_track_and_release!(track_name, Supply.config[:version_code], in_progress_status)
+      UI.user_error!("Unable to find the requested track '#{track_name}' with status in progress (#{in_progress_status})") unless track
+      UI.user_error!("Unable to find the requested release in track '#{track_name}' with status in progress (#{in_progress_status})") unless release
 
       version_code = release.version_codes.max
 
-      UI.message("Updating #{version_code}'s rollout to '#{Supply.config[:rollout]}' on track '#{Supply.config[:track]}'...")
+      UI.message("Updating #{version_code}'s rollout to '#{Supply.config[:rollout]}' in track '#{track_name}'...")
 
-      if track && release
-        completed = Supply.config[:rollout].to_f == 1
-        release.user_fraction = completed ? nil : Supply.config[:rollout]
-        release.status = Supply::ReleaseStatus::COMPLETED if completed
+      completed = Supply.config[:rollout].to_f == 1
+      release.user_fraction = completed ? nil : Supply.config[:rollout]
+      release.status = Supply::ReleaseStatus::COMPLETED if completed
 
-        # Deleted other version codes if completed because only allowed on completed version in a release
-        track.releases.delete_if { |r| !(r.version_codes || []).map(&:to_s).include?(version_code) } if completed
-      else
-        UI.user_error!("Unable to find version to rollout in track '#{Supply.config[:track]}'")
-      end
+      # Deleted other version codes if completed because only allowed on completed version in a release
+      track.releases.delete_if { |r| !(r.version_codes || []).map(&:to_s).include?(version_code) } if completed
 
       client.update_track(Supply.config[:track], track)
     end
