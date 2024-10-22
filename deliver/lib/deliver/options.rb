@@ -99,7 +99,7 @@ module Deliver
                                      optional: true,
                                      default_value: "ios",
                                      verify_block: proc do |value|
-                                       UI.user_error!("The platform can only be ios, appletvos, or osx") unless %('ios', 'appletvos', 'osx').include?(value)
+                                       UI.user_error!("The platform can only be ios, appletvos, xros or osx") unless %('ios', 'appletvos', 'xros', 'osx').include?(value)
                                      end),
 
         # live version
@@ -249,7 +249,7 @@ module Deliver
                                      end),
         FastlaneCore::ConfigItem.new(key: :submission_information,
                                      short_option: "-b",
-                                     description: "Extra information for the submission (e.g. compliance specifications, IDFA settings)",
+                                     description: "Extra information for the submission (e.g. compliance specifications)",
                                      type: Hash,
                                      optional: true),
 

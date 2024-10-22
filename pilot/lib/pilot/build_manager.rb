@@ -368,12 +368,17 @@ module Pilot
     end
 
     def reject_build_waiting_for_review(build)
-      waiting_for_review_build = build.app.get_builds(filter: { "betaAppReviewSubmission.betaReviewState" => "WAITING_FOR_REVIEW" }, includes: "betaAppReviewSubmission,preReleaseVersion").first
+      waiting_for_review_build = build.app.get_builds(
+        filter: { "betaAppReviewSubmission.betaReviewState" => "WAITING_FOR_REVIEW,IN_REVIEW",
+                  "expired" => false,
+                  "preReleaseVersion.version" => build.pre_release_version.version },
+        includes: "betaAppReviewSubmission,preReleaseVersion"
+      ).first
       unless waiting_for_review_build.nil?
         UI.important("Another build is already in review. Going to remove that build and submit the new one.")
-        UI.important("Deleting beta app review submission for build: #{waiting_for_review_build.app_version} - #{waiting_for_review_build.version}")
-        waiting_for_review_build.beta_app_review_submission.delete!
-        UI.success("Deleted beta app review submission for previous build: #{waiting_for_review_build.app_version} - #{waiting_for_review_build.version}")
+        UI.important("Canceling beta app review submission for build: #{waiting_for_review_build.app_version} - #{waiting_for_review_build.version}")
+        waiting_for_review_build.expire!
+        UI.success("Canceled beta app review submission for previous build: #{waiting_for_review_build.app_version} - #{waiting_for_review_build.version}")
       end
     end
 
@@ -386,6 +391,7 @@ module Pilot
     end
 
     # If App Store Connect API token, use token.
+    # If api_key is specified and it is an Individual API Key, don't use token but use username.
     # If itc_provider was explicitly specified, use it.
     # If there are multiple teams, infer the provider from the selected team name.
     # If there are fewer than two teams, don't infer the provider.
@@ -401,6 +407,14 @@ module Pilot
                   api_key[:key] = Base64.decode64(api_key[:key]) if api_key[:is_key_content_base64]
                   api_key
                 end
+
+      # Currently no kind of transporters accept an Individual API Key. Use username and app-specific password instead.
+      # See https://github.com/fastlane/fastlane/issues/22115
+      is_individual_key = !api_key.nil? && api_key[:issuer_id].nil?
+      if is_individual_key
+        api_key = nil
+        api_token = nil
+      end
 
       unless api_token.nil?
         api_token.refresh! if api_token.expired?
