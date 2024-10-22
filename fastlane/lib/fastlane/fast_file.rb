@@ -278,7 +278,10 @@ module Fastlane
     # @param version [String, Array] Version requirement for repo tags
     # @param dependencies [Array] An optional array of additional Fastfiles in the repository
     # @param cache_path [String] An optional path to a directory where the repository should be cloned into
-    def import_from_git(url: nil, branch: 'HEAD', path: 'fastlane/Fastfile', version: nil, dependencies: [], cache_path: nil) # rubocop:disable Metrics/PerceivedComplexity
+    # @param depth [Integer] Perform a shallow clone with a history truncated to the specified number of commits
+    # @param no_tags [Boolean] Clone without tags
+    # @param filter [String] Filter the clone to include only specific types of objects
+    def import_from_git(url: nil, branch: 'HEAD', path: 'fastlane/Fastfile', version: nil, dependencies: [], cache_path: nil, depth: nil, no_tags: false, filter: nil) # rubocop:disable Metrics/PerceivedComplexity
       UI.user_error!("Please pass a path to the `import_from_git` action") if url.to_s.length == 0
 
       Actions.execute_action('import_from_git') do
@@ -312,9 +315,11 @@ module Fastlane
               # When using cached clones, we need the entire repository history
               # so we can switch between tags or branches instantly, or else,
               # it would defeat the caching's purpose.
-              depth = is_eligible_for_caching ? "" : "--depth 1"
+              depth_option = depth ? "--depth #{depth}" : ""
+              no_tags_option = no_tags ? "--no-tags" : ""
+              filter_option = filter ? "--filter=#{filter}" : ""
 
-              Actions.sh("git clone #{url.shellescape} #{clone_folder.shellescape} #{depth} --no-checkout #{branch_option}")
+              Actions.sh("git clone #{url.shellescape} #{clone_folder.shellescape} #{depth_option} #{no_tags_option} #{filter_option} --no-checkout #{branch_option}")
             end
           end
 

@@ -43,7 +43,19 @@ module Fastlane
                                        optional: true),
           FastlaneCore::ConfigItem.new(key: :cache_path,
                                        description: "The path to a directory where the repository should be cloned into. Defaults to `nil`, which causes the repository to be cloned on every call, to a temporary directory",
-                                       optional: true)
+                                       optional: true),
+          FastlaneCore::ConfigItem.new(key: :depth,
+                                       description: "Perform a shallow clone with a history truncated to the specified number of commits",
+                                       optional: true,
+                                       type: Integer),
+          FastlaneCore::ConfigItem.new(key: :no_tags,
+                                       description: "Clone without tags",
+                                       optional: true,
+                                       type: Boolean),
+          FastlaneCore::ConfigItem.new(key: :filter,
+                                       description: "Filter the clone to include only specific types of objects",
+                                       optional: true,
+                                       type: String)
         ]
       end
 
