@@ -312,8 +312,8 @@ module Fastlane
               # so we can switch between tags or branches instantly, or else,
               # it would defeat the caching's purpose.
               depth = is_eligible_for_caching ? "" : "--depth 1"
-              branch_option = "--branch #{branch}" if branch != 'HEAD'
-              command = "git clone #{url.shellescape} #{clone_folder.shellescape} #{depth} --no-checkout #{branch_option}"
+              command = "git clone #{url.shellescape} #{clone_folder.shellescape} #{depth} --no-checkout"
+              command << " --branch #{branch}" if branch != 'HEAD'
               git_extra_headers.each do |header|
                 command << " --config http.extraHeader='#{header}'"
               end
