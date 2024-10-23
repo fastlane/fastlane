@@ -278,8 +278,8 @@ module Fastlane
     # @param version [String, Array] Version requirement for repo tags
     # @param dependencies [Array] An optional array of additional Fastfiles in the repository
     # @param cache_path [String] An optional path to a directory where the repository should be cloned into
-    # @param git_extra_header [String] An optional custom HTTP header to access the git repo (`Authorization: Basic <YOUR BASE64 KEY>`, `Cache-Control: no-cache`, etc.)
-    def import_from_git(url: nil, branch: 'HEAD', path: 'fastlane/Fastfile', version: nil, dependencies: [], cache_path: nil, git_extra_header: nil) # rubocop:disable Metrics/PerceivedComplexity
+    # @param git_extra_headers [Array] An optional array of custom HTTP headers to access the git repo (`Authorization: Basic <YOUR BASE64 KEY>`, `Cache-Control: no-cache`, etc.)
+    def import_from_git(url: nil, branch: 'HEAD', path: 'fastlane/Fastfile', version: nil, dependencies: [], cache_path: nil, git_extra_headers: []) # rubocop:disable Metrics/PerceivedComplexity
       UI.user_error!("Please pass a path to the `import_from_git` action") if url.to_s.length == 0
 
       Actions.execute_action('import_from_git') do
@@ -315,7 +315,9 @@ module Fastlane
               # it would defeat the caching's purpose.
               depth = is_eligible_for_caching ? "" : "--depth 1"
               command = "git clone #{url.shellescape} #{clone_folder.shellescape} #{depth} --no-checkout #{branch_option}"
-              command << " --config http.extraHeader='#{git_extra_header}'" unless git_extra_header.nil?
+              git_extra_headers.each do |header|
+                command << " --config http.extraHeader='#{header}'"
+              end
               Actions.sh(command)
             end
           end
