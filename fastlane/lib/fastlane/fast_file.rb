@@ -298,8 +298,6 @@ module Fastlane
         import_block = proc do |target_path|
           clone_folder = File.join(target_path, repo_name)
 
-          branch_option = "--branch #{branch}" if branch != 'HEAD'
-
           checkout_dependencies = dependencies.map(&:shellescape).join(" ")
 
           # If the current call is eligible for caching, we check out all the
@@ -314,6 +312,7 @@ module Fastlane
               # so we can switch between tags or branches instantly, or else,
               # it would defeat the caching's purpose.
               depth = is_eligible_for_caching ? "" : "--depth 1"
+              branch_option = "--branch #{branch}" if branch != 'HEAD'
               command = "git clone #{url.shellescape} #{clone_folder.shellescape} #{depth} --no-checkout #{branch_option}"
               git_extra_headers.each do |header|
                 command << " --config http.extraHeader='#{header}'"
