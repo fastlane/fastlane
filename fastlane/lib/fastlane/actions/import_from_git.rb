@@ -45,7 +45,7 @@ module Fastlane
                                        description: "The path to a directory where the repository should be cloned into. Defaults to `nil`, which causes the repository to be cloned on every call, to a temporary directory",
                                        optional: true),
           FastlaneCore::ConfigItem.new(key: :git_extra_header,
-                                       description: "Add custom header for e.g. authorization or caching",
+                                       description: "An optional custom HTTP header to access the git repo (`Authorization: Basic <YOUR BASE64 KEY>`, `Cache-Control: no-cache`, etc.)",
                                        optional: true)
         ]
       end
