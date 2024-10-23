@@ -315,7 +315,7 @@ module Fastlane
               # it would defeat the caching's purpose.
               depth = is_eligible_for_caching ? "" : "--depth 1"
               command = "git clone #{url.shellescape} #{clone_folder.shellescape} #{depth} --no-checkout #{branch_option}"
-              command << " -c http.extraheader='Authorization: Basic #{git_basic_authorization}'" unless git_basic_authorization.nil?
+              command << " --config http.extraHeader='#{git_extra_header}'" unless git_extra_header.nil?
               Actions.sh(command)
             end
           end
