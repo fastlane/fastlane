@@ -309,7 +309,7 @@ describe Fastlane do
         header = 'Authorization: Basic my_base_64_key'
 
         allow(Fastlane::Actions).to receive(:sh).and_call_original
-        expect(Fastlane::Actions).to receive(:sh).with(a_string_including("--config \"http.extraHeader=#{header}\""))
+        expect(Fastlane::Actions).to receive(:sh).with(any_args, '--config', "http.extraHeader=#{header}")
 
         Fastlane::FastFile.new.parse("lane :test do
           import_from_git(url: '#{source_directory_path}', git_extra_headers: ['#{header}'])
@@ -321,7 +321,7 @@ describe Fastlane do
         second_header = 'Cache-Control: no-cache'
 
         allow(Fastlane::Actions).to receive(:sh).and_call_original
-        expect(Fastlane::Actions).to receive(:sh).with(a_string_including("--config \"http.extraHeader=#{first_header}\" --config \"http.extraHeader=#{second_header}\""))
+        expect(Fastlane::Actions).to receive(:sh).with(any_args, '--config', "http.extraHeader=#{first_header}", '--config', "http.extraHeader=#{second_header}")
 
         Fastlane::FastFile.new.parse("lane :test do
           import_from_git(url: '#{source_directory_path}', git_extra_headers: ['#{first_header}', '#{second_header}'])

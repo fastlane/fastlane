@@ -308,16 +308,16 @@ module Fastlane
           if Dir[clone_folder].empty?
             UI.message("Cloning remote git repo...")
             Helper.with_env_values('GIT_TERMINAL_PROMPT' => '0') do
-              command = "git clone #{url.shellescape} #{clone_folder.shellescape} --no-checkout"
+              command = ['git', 'clone', url, clone_folder, '--no-checkout']
               # When using cached clones, we need the entire repository history
               # so we can switch between tags or branches instantly, or else,
               # it would defeat the caching's purpose.
-              command << " --depth 1" unless is_eligible_for_caching
-              command << " --branch #{branch}" unless branch == 'HEAD'
+              command += ['--depth', '1'] unless is_eligible_for_caching
+              command += ['--branch', branch] unless branch == 'HEAD'
               git_extra_headers.each do |header|
-                command << " --config \"http.extraHeader=#{header}\""
+                command += ['--config', "http.extraHeader=#{header}"]
               end
-              Actions.sh(command)
+              Actions.sh(*command)
             end
           end
 
