@@ -315,7 +315,7 @@ module Fastlane
               command << " --depth 1" unless is_eligible_for_caching
               command << " --branch #{branch}" if branch != 'HEAD'
               git_extra_headers.each do |header|
-                command << " --config http.extraHeader='#{header}'"
+                command << " --config \"http.extraHeader=#{header}\""
               end
               Actions.sh(command)
             end
