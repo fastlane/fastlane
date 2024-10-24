@@ -313,7 +313,7 @@ module Fastlane
               # so we can switch between tags or branches instantly, or else,
               # it would defeat the caching's purpose.
               command << " --depth 1" unless is_eligible_for_caching
-              command << " --branch #{branch}" if branch != 'HEAD'
+              command << " --branch #{branch}" unless branch == 'HEAD'
               git_extra_headers.each do |header|
                 command << " --config \"http.extraHeader=#{header}\""
               end
