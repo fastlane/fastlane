@@ -81,7 +81,7 @@ Gem::Specification.new do |spec|
   spec.add_dependency('multipart-post', '~> 2.0.0') # Needed for uploading builds to appetize
   spec.add_dependency('word_wrap', '~> 1.0.0') # to add line breaks for tables with long strings
 
-  spec.add_dependency('optparse', '~> 0.1.1') # Used to parse options with Commander
+  spec.add_dependency('optparse', '>= 0.1.1', '< 1.0.0') # Used to parse options with Commander # Addison: Updated this to a version that is compatible with our other gems, it matches fastlane master, we don't use this in the product code.
 
   # TTY dependencies
   spec.add_dependency('tty-screen', '>= 0.6.3', '< 1.0.0') # detect the terminal width
@@ -96,6 +96,7 @@ Gem::Specification.new do |spec|
   spec.add_dependency('faraday', '~> 1.0') # The faraday gem is used for deploygate, hockey and testfairy actions.
   spec.add_dependency('faraday_middleware', '~> 1.0') # Same as faraday
   spec.add_dependency('fastimage', '>= 2.1.0', '< 3.0.0') # fetch the image sizes from the screenshots
+  spec.add_dependency('fastlane-sirp', '>= 1.0.0') # Addison: Added this to work around a login error, it matches fastlane master
   spec.add_dependency('gh_inspector', '>= 1.1.2', '< 2.0.0') # search for issues on GitHub when something goes wrong
   spec.add_dependency('highline', '~> 2.0') # user inputs (e.g. passwords)
   spec.add_dependency('json', '< 3.0.0') # Because sometimes it's just not installed
