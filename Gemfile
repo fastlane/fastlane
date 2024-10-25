@@ -10,3 +10,6 @@ gemspec(path: ".")
 
 plugins_path = File.join(File.expand_path("..", __FILE__), 'fastlane', 'Pluginfile')
 eval_gemfile(plugins_path)
+
+# This is included in the fastlane.gemspec in newer versions of fastlane, but those also have a completely different formatted gemspecfile, so including it here instead 
+gem 'fastlane-sirp', '>= 1.0.0'
