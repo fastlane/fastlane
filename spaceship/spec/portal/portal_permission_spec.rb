@@ -1,5 +1,7 @@
 describe Spaceship::Portal do
   describe "InsufficientPermissions" do
+    # Skip tunes login and login with portal
+    include_examples "common spaceship login", true
     before { Spaceship::Portal.login }
     let(:certificate) { Spaceship::Certificate.all.first }
 

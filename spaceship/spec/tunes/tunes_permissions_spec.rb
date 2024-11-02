@@ -1,6 +1,6 @@
 describe Spaceship::Tunes do
   describe "InsufficientPermissions" do
-    before { Spaceship::Tunes.login }
+    include_examples "common spaceship login"
     let(:app) { Spaceship::Application.all.find { |a| a.apple_id == "898536088" } }
 
     it "raises an appropriate App Store Connect error when user doesn't have enough permission to do something" do

@@ -43,6 +43,21 @@ module Spaceship
     end
   end
 
+  # User doesn't have enough permission for given action
+  class SIRPAuthenticationError < BasicPreferredInfoError
+    TITLE = 'Authentication issue validating secrets:'.freeze
+
+    def preferred_error_info
+      message ? [TITLE, message] : nil
+    end
+
+    # We don't want to show similar GitHub issues, as the error message
+    # should be pretty clear
+    def show_github_issues
+      false
+    end
+  end
+
   # Raised when 429 is received from App Store Connect
   class TooManyRequestsError < BasicPreferredInfoError
     attr_reader :retry_after
