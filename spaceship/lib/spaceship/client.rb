@@ -525,7 +525,7 @@ module Spaceship
       return response
     end
 
-    def pbkdf2(password, salt, iterations, key_length, digest = OpenSSL::Digest::SHA256.new, protocol)
+    def pbkdf2(password, salt, iterations, key_length, protocol, digest = OpenSSL::Digest::SHA256.new)
       require 'openssl'
       password = OpenSSL::Digest::SHA256.digest(password)
 
@@ -533,7 +533,7 @@ module Spaceship
         puts("Using legacy s2k_fo protocol for password digest") if Spaceship::Globals.verbose?
         password = to_byte(to_hex(password))
       end
-      
+
       OpenSSL::PKCS5.pbkdf2_hmac(password, salt, iterations, key_length, digest)
     end
 
