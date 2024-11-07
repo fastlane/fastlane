@@ -245,7 +245,7 @@ module Fastlane
           FastlaneCore::ConfigItem.new(key: :custom,
                                        optional: true,
                                        env_name: "FL_TESTFAIRY_CUSTOM",
-                                       description: "Array of custom options. Contact support@testfairy.com for more information",
+                                       description: "Array of custom options. Contact support for more information",
                                        default_value: ''),
           FastlaneCore::ConfigItem.new(key: :timeout,
                                        env_name: "FL_TESTFAIRY_TIMEOUT",
@@ -276,7 +276,7 @@ module Fastlane
           FastlaneCore::ConfigItem.new(key: :platform,
                                        optional: true,
                                        env_name: "FL_TESTFAIRY_PLATFORM",
-                                       description: "Use if upload build is not iOS or Android. Contact support@testfairy.com for more information",
+                                       description: "Use if upload build is not iOS or Android. Contact support for more information",
                                        default_value: '')
         ]
       end
