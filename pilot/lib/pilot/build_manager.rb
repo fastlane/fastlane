@@ -391,6 +391,7 @@ module Pilot
     end
 
     # If App Store Connect API token, use token.
+    # If api_key is specified and it is an Individual API Key, don't use token but use username.
     # If itc_provider was explicitly specified, use it.
     # If there are multiple teams, infer the provider from the selected team name.
     # If there are fewer than two teams, don't infer the provider.
@@ -406,6 +407,14 @@ module Pilot
                   api_key[:key] = Base64.decode64(api_key[:key]) if api_key[:is_key_content_base64]
                   api_key
                 end
+
+      # Currently no kind of transporters accept an Individual API Key. Use username and app-specific password instead.
+      # See https://github.com/fastlane/fastlane/issues/22115
+      is_individual_key = !api_key.nil? && api_key[:issuer_id].nil?
+      if is_individual_key
+        api_key = nil
+        api_token = nil
+      end
 
       unless api_token.nil?
         api_token.refresh! if api_token.expired?

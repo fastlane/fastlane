@@ -40,7 +40,11 @@ open class LaneFile: NSObject, LaneFileProtocol {
         return String(laneName.prefix(laneName.count - 12))
     }
 
-    public func onError(currentLane: String, errorInfo _: String, errorClass _: String?, errorMessage _: String?) {
+    open func beforeAll(with _: String) {}
+
+    open func afterAll(with _: String) {}
+
+    open func onError(currentLane: String, errorInfo _: String, errorClass _: String?, errorMessage _: String?) {
         LaneFile.onErrorCalled.insert(currentLane)
     }
 
