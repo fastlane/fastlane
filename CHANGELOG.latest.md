@@ -1,7 +1,3 @@
-* [action][sh] fastlane sh with log set to false should respect a step name (#22151) via Daniel Jankowski (@mollyIV)
-* [scan][trainer] hotfix for float-type version acquisition of `xcresulttool version` fails (#22157) via David Dongkyu Kim (@dokimyj)
-* [gym] fix default result bundle path name (#22154) via Ignacio Calderon (@kronenthaler)
-* [scan][trainer] hotfix for xcresulttool spec changes >= XC16b3 (#22147) via David Dongkyu Kim (@dokimyj)
-* [action][ensure_git_status_clean] support empty spaces in `ignore_files` file paths (#21566) via Daniel Jankowski (@mollyIV)
-* [spaceship] add visionOS support for Connect API (#22032) via Frederik Seiffert (@triplef)
-* [spaceship] Add get app availabilities v2 request (#21901) via Lukasz Grabowski (@lucgrabowski)
+This version has a required fix for authenticating with Apple via Apple ID. Apple started using their own variant of SRP (Secure Remote Password) using SHA-256 and 2048 bit hashing in the sign in flow. Any previous _fastlane_ versions will likely response a "503 Service Temporarily Unavailable" when authenicating with an Apple ID.
+
+* [spaceship] New AppleID Auth with SRP (#26415) via Josh Holtz (@snatchev and @joshdholtz)
