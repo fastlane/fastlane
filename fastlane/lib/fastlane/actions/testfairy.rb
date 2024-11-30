@@ -267,7 +267,10 @@ module Fastlane
                                        optional: true,
                                        env_name: "FL_TESTFAIRY_LANDING_PAGE_MODE",
                                        description: "Visibility of build landing after upload. Can be 'open' or 'closed'",
-                                       default_value: 'open'),
+                                       default_value: 'open',
+                                       verify_block: proc do |value|
+                                         UI.user_error!("The landing page mode can only be open or closed") unless %('open', 'closed').include?(value)
+                                       end),
           FastlaneCore::ConfigItem.new(key: :upload_to_saucelabs,
                                        optional: true,
                                        env_name: "FL_TESTFAIRY_UPLOAD_TO_SAUCELABS",
