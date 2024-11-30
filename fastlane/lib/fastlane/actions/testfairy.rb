@@ -275,7 +275,10 @@ module Fastlane
                                        optional: true,
                                        env_name: "FL_TESTFAIRY_UPLOAD_TO_SAUCELABS",
                                        description: "Upload file directly to Sauce Labs. It can be 'on' or 'off'",
-                                       default_value: 'off'),
+                                       default_value: 'off',
+                                       verify_block: proc do |value|
+                                         UI.user_error!("The upload to Sauce Labs can only be on or off") unless %('on', 'off').include?(value)
+                                       end),
           FastlaneCore::ConfigItem.new(key: :platform,
                                        optional: true,
                                        env_name: "FL_TESTFAIRY_PLATFORM",
