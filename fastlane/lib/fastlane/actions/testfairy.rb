@@ -269,7 +269,7 @@ module Fastlane
                                        description: "Visibility of build landing after upload. Can be 'open' or 'closed'",
                                        default_value: 'open',
                                        verify_block: proc do |value|
-                                         UI.user_error!("The landing page mode can only be open or closed") unless %('open', 'closed').include?(value)
+                                         UI.user_error!("The landing page mode can only be open or closed") unless %w(open closed).include?(value)
                                        end),
           FastlaneCore::ConfigItem.new(key: :upload_to_saucelabs,
                                        optional: true,
@@ -277,7 +277,7 @@ module Fastlane
                                        description: "Upload file directly to Sauce Labs. It can be 'on' or 'off'",
                                        default_value: 'off',
                                        verify_block: proc do |value|
-                                         UI.user_error!("The upload to Sauce Labs can only be on or off") unless %('on', 'off').include?(value)
+                                         UI.user_error!("The upload to Sauce Labs can only be on or off") unless %w(on off).include?(value)
                                        end),
           FastlaneCore::ConfigItem.new(key: :platform,
                                        optional: true,
