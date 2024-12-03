@@ -9,7 +9,7 @@ module Spaceship
       # @return (String) the family name
       attr_accessor :name
 
-      # @return (Intger) the Family Id
+      # @return (Integer) the Family Id
       attr_accessor :family_id
 
       attr_mapping({

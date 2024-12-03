@@ -1,5 +1,5 @@
 // ScanfileProtocol.swift
-// Copyright (c) 2023 FastlaneTools
+// Copyright (c) 2024 FastlaneTools
 
 public protocol ScanfileProtocol: AnyObject {
     /// Path to the workspace file
@@ -206,6 +206,9 @@ public protocol ScanfileProtocol: AnyObject {
     /// Use only if you're a pro, use the other options instead
     var destination: String? { get }
 
+    /// Adds arch=x86_64 to the xcodebuild 'destination' argument to run simulator in a Rosetta mode
+    var runRosettaSimulator: Bool { get }
+
     /// Platform to build when using a Catalyst enabled app. Valid values are: ios, macos
     var catalystPlatform: String? { get }
 
@@ -232,6 +235,9 @@ public protocol ScanfileProtocol: AnyObject {
 
     /// Should this step stop the build if the tests fail? Set this to false if you're using trainer
     var failBuild: Bool { get }
+
+    /// Lets xcodebuild use a specified package authorization provider (keychain|netrc)
+    var packageAuthorizationProvider: String? { get }
 }
 
 public extension ScanfileProtocol {
@@ -303,6 +309,7 @@ public extension ScanfileProtocol {
     var slackOnlyOnFailure: Bool { return false }
     var slackDefaultPayloads: [String]? { return nil }
     var destination: String? { return nil }
+    var runRosettaSimulator: Bool { return false }
     var catalystPlatform: String? { return nil }
     var customReportFileName: String? { return nil }
     var xcodebuildCommand: String { return "env NSUnbufferedIO=YES xcodebuild" }
@@ -312,8 +319,9 @@ public extension ScanfileProtocol {
     var useSystemScm: Bool { return false }
     var numberOfRetries: Int { return 0 }
     var failBuild: Bool { return true }
+    var packageAuthorizationProvider: String? { return nil }
 }
 
 // Please don't remove the lines below
 // They are used to detect outdated files
-// FastlaneRunnerAPIVersion [0.9.122]
+// FastlaneRunnerAPIVersion [0.9.139]

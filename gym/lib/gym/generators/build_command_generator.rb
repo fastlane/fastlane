@@ -80,7 +80,7 @@ module Gym
         if Gym.config[:disable_xcpretty] || formatter == ''
           UI.verbose("Not using an xcodebuild formatter")
         elsif !options.empty?
-          UI.important("Detected legacy xcpretty being used so formatting wth xcpretty")
+          UI.important("Detected legacy xcpretty being used, so formatting with xcpretty")
           UI.important("Option(s) used: #{options.join(', ')}")
           pipe += pipe_xcpretty
         elsif formatter == 'xcpretty'
@@ -184,7 +184,7 @@ module Gym
       def result_bundle_path
         unless Gym.cache[:result_bundle_path]
           path = Gym.config[:result_bundle_path]
-          path ||= File.join(Gym.config[:output_directory], Gym.config[:output_name] + ".result")
+          path ||= File.join(Gym.config[:output_directory], Gym.config[:output_name] + ".xcresult")
           if File.directory?(path)
             FileUtils.remove_dir(path)
           end

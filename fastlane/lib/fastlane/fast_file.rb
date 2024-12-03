@@ -187,7 +187,7 @@ module Fastlane
     end
 
     # Execute shell command
-    # Accepts arguments with with and without the command named keyword so that sh
+    # Accepts arguments with and without the command named keyword so that sh
     # behaves like other actions with named keywords
     # https://github.com/fastlane/fastlane/issues/14930
     #
@@ -218,7 +218,9 @@ module Fastlane
     end
 
     def self.sh(*command, step_name: nil, log: true, error_callback: nil, &b)
-      command_header = log ? step_name || Actions.shell_command_from_args(*command) : "shell command"
+      command_header = step_name
+      command_header ||= log ? Actions.shell_command_from_args(*command) : "shell command"
+
       Actions.execute_action(command_header) do
         Actions.sh_no_action(*command, log: log, error_callback: error_callback, &b)
       end
@@ -276,7 +278,8 @@ module Fastlane
     # @param version [String, Array] Version requirement for repo tags
     # @param dependencies [Array] An optional array of additional Fastfiles in the repository
     # @param cache_path [String] An optional path to a directory where the repository should be cloned into
-    def import_from_git(url: nil, branch: 'HEAD', path: 'fastlane/Fastfile', version: nil, dependencies: [], cache_path: nil) # rubocop:disable Metrics/PerceivedComplexity
+    # @param git_extra_headers [Array] An optional array of custom HTTP headers to access the git repo (`Authorization: Basic <YOUR BASE64 KEY>`, `Cache-Control: no-cache`, etc.)
+    def import_from_git(url: nil, branch: 'HEAD', path: 'fastlane/Fastfile', version: nil, dependencies: [], cache_path: nil, git_extra_headers: []) # rubocop:disable Metrics/PerceivedComplexity
       UI.user_error!("Please pass a path to the `import_from_git` action") if url.to_s.length == 0
 
       Actions.execute_action('import_from_git') do
@@ -295,8 +298,6 @@ module Fastlane
         import_block = proc do |target_path|
           clone_folder = File.join(target_path, repo_name)
 
-          branch_option = "--branch #{branch}" if branch != 'HEAD'
-
           checkout_dependencies = dependencies.map(&:shellescape).join(" ")
 
           # If the current call is eligible for caching, we check out all the
@@ -307,12 +308,16 @@ module Fastlane
           if Dir[clone_folder].empty?
             UI.message("Cloning remote git repo...")
             Helper.with_env_values('GIT_TERMINAL_PROMPT' => '0') do
+              command = ['git', 'clone', url, clone_folder, '--no-checkout']
               # When using cached clones, we need the entire repository history
               # so we can switch between tags or branches instantly, or else,
               # it would defeat the caching's purpose.
-              depth = is_eligible_for_caching ? "" : "--depth 1"
-
-              Actions.sh("git clone #{url.shellescape} #{clone_folder.shellescape} #{depth} --no-checkout #{branch_option}")
+              command += ['--depth', '1'] unless is_eligible_for_caching
+              command += ['--branch', branch] unless branch == 'HEAD'
+              git_extra_headers.each do |header|
+                command += ['--config', "http.extraHeader=#{header}"]
+              end
+              Actions.sh(*command)
             end
           end
 
@@ -343,7 +348,11 @@ module Fastlane
               # Update the repo if it's eligible for caching but the version isn't specified
               UI.message("Fetching remote git branches and updating git repo...")
               Helper.with_env_values('GIT_TERMINAL_PROMPT' => '0') do
-                Actions.sh("cd #{clone_folder.shellescape} && git fetch --all --quiet && git checkout #{checkout_param.shellescape} #{checkout_path} && git reset --hard && git rebase")
+                command = "cd #{clone_folder.shellescape} && git fetch --all --quiet && git checkout #{checkout_param.shellescape} #{checkout_path} && git reset --hard"
+                # Check if checked out "branch" is actually a branch or a tag
+                current_branch = Actions.sh("cd #{clone_folder.shellescape} && git rev-parse --abbrev-ref HEAD")
+                command << " && git rebase" unless current_branch.strip.eql?("HEAD")
+                Actions.sh(command)
               end
             else
               begin

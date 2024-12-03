@@ -15,7 +15,7 @@ class TunesStubbing
       itc_service_key_path = File.expand_path("~/Library/Caches/spaceship_itc_service_key.txt")
       File.delete(itc_service_key_path) if File.exist?(itc_service_key_path)
 
-      stub_request(:get, 'https://appstoreconnect.apple.com/itc/static-resources/controllers/login_cntrl.js').
+      stub_request(:get, 'https://appstoreconnect.apple.com/itc/static-resources/controllers/_cntrl.js').
         to_return(status: 200, body: itc_read_fixture_file('login_cntrl.js'))
       stub_request(:get, "https://appstoreconnect.apple.com/WebObjects/iTunesConnect.woa").
         to_return(status: 200, body: "")
@@ -36,6 +36,35 @@ class TunesStubbing
       stub_request(:post, "https://idmsa.apple.com/appleauth/auth/signin").
         with(body: { "accountName" => "spaceship@krausefx.com", "password" => "so_secret", "rememberMe" => true }.to_json).
         to_return(status: 200, body: '{}', headers: { 'Set-Cookie' => "myacinfo=abcdef;" })
+
+      # SIRP login
+      stub_request(:post, "https://idmsa.apple.com/appleauth/auth/signin/init").
+        with(
+          body: "{\"a\":\"jzDOg7Zg8Dq7D4VwwjXg4eHThgoiIwSs8Y6Ym9wGXckioUHm2kVj8FWGYFsOEFNdh1yn4Prn/hA" \
+            "M/lMzdPKaqoA837LGGU9FhIXof3aYj2zdqhgpMJQ44aqatlKxfPwIH/9ANWyzrzXGIenze6bioD5qu" \
+            "sWmv+GN20iUErfFY1UpLmw1X4hZJw0EBjuEPSPB73UDw8XdLFZ0AQGj71v+xr/x5txV4/cIQKg6lde" \
+            "z0gqzUNBHKAnOh6Tjwp7ZaF63ch3Ie6v629nmXnXV31VUe8/5hxHd6ue44ebb9Snpb3yqS4MLQ1dc3" \
+            "cUs68OflSL4XL8zrDXuWfZvSBCcEvu3jQ==\",\"accountName\":\"spaceship@krausefx.com\",\"protocols\":[\"s2k\",\"s2k_fo\"]}"
+        ).
+        to_return(status: 200, body: itc_read_fixture_file('signin_init.json'), headers: { 'Content-Type' => 'application/json' })
+
+      stub_request(:post, "https://idmsa.apple.com/appleauth/auth/signin/complete?isRememberMeEnabled=false").
+        with(
+          body: "{\"accountName\":\"spaceship@krausefx.com\",\"c\":\"d-227-a6ae7b06-8e82-11ef-8ba6-e5527b74d559:PRN\",\"m1\":\"EjQ=\",\"m2\":\"\",\"rememberMe\":false}"
+).
+        to_return(status: 200, body: "", headers: { 'Set-Cookie' => "myacinfo=abcdef;" })
+
+      # SIRP login failed
+
+      stub_request(:post, "https://idmsa.apple.com/appleauth/auth/signin/init").
+        with(
+          body: "{\"a\":\"jzDOg7Zg8Dq7D4VwwjXg4eHThgoiIwSs8Y6Ym9wGXckioUHm2kVj8FWGYFsOEFNdh1yn4Prn/hAM/" \
+          "lMzdPKaqoA837LGGU9FhIXof3aYj2zdqhgpMJQ44aqatlKxfPwIH/9ANWyzrzXGIenze6bioD5qusWmv+" \
+          "GN20iUErfFY1UpLmw1X4hZJw0EBjuEPSPB73UDw8XdLFZ0AQGj71v+xr/x5txV4/cIQKg6ldez0gqzUN" \
+          "BHKAnOh6Tjwp7ZaF63ch3Ie6v629nmXnXV31VUe8/5hxHd6ue44ebb9Snpb3yqS4MLQ1dc3cUs68OflS" \
+          "L4XL8zrDXuWfZvSBCcEvu3jQ==\",\"accountName\":\"bad-username\",\"protocols\":[\"s2k\",\"s2k_fo\"]}"
+        ).
+        to_return(status: 401, body: '{}', headers: { 'Set-Cookie' => 'session=invalid' })
 
       # Failed login attempts
       stub_request(:post, "https://idmsa.apple.com/appleauth/auth/signin").
@@ -145,7 +174,7 @@ class TunesStubbing
 
     def itc_stub_candidate_builds
       stub_request(:get, "https://appstoreconnect.apple.com/WebObjects/iTunesConnect.woa/ra/apps/898536088/versions/812106519/candidateBuilds").
-        to_return(status: 200, body: itc_read_fixture_file('candiate_builds.json'), headers: { 'Content-Type' => 'application/json' })
+        to_return(status: 200, body: itc_read_fixture_file('candidate_builds.json'), headers: { 'Content-Type' => 'application/json' })
     end
 
     def itc_stub_applications_first_create

@@ -173,6 +173,8 @@ module Trainer
       end
 
       def find_failure(failures)
+        sanitizer = proc { |name| name.gsub(/\W/, "_") }
+        sanitized_identifier = sanitizer.call(self.identifier)
         if self.test_status == "Failure"
           # Tries to match failure on test case name
           # Example TestFailureIssueSummary:
@@ -184,16 +186,10 @@ module Trainer
           #     or identifier: "TestThisDude/testFailureJosh2" (when Objective-C)
 
           found_failure = failures.find do |failure|
-            # Clean test_case_name to match identifier format
-            # Sanitize for Swift by replacing "." for "/"
-            # Sanitize for Objective-C by removing "-", "[", "]", and replacing " " for ?/
-            sanitized_test_case_name = failure.test_case_name
-                                              .tr(".", "/")
-                                              .tr("-", "")
-                                              .tr("[", "")
-                                              .tr("]", "")
-                                              .tr(" ", "/")
-            self.identifier == sanitized_test_case_name
+            # Sanitize both test case name and identifier in a consistent fashion, then replace all non-word
+            # chars with underscore, and compare them
+            sanitized_test_case_name = sanitizer.call(failure.test_case_name)
+            sanitized_identifier == sanitized_test_case_name
           end
           return found_failure
         else
@@ -391,7 +387,7 @@ module Trainer
 
       def failure_message
         new_message = self.message
-        if self.document_location_in_creating_workspace
+        if self.document_location_in_creating_workspace&.url
           file_path = self.document_location_in_creating_workspace.url.gsub("file://", "")
           new_message += " (#{file_path})"
         end

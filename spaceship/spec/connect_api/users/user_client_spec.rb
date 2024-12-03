@@ -55,7 +55,7 @@ describe Spaceship::ConnectAPI::Users::Client do
 
     describe "users" do
       context 'get_users' do
-        let(:path) { "users" }
+        let(:path) { "v1/users" }
 
         it 'succeeds' do
           params = {}
@@ -65,9 +65,61 @@ describe Spaceship::ConnectAPI::Users::Client do
         end
       end
 
+      context 'patch_user' do
+        let(:user_id) { "123" }
+        let(:all_apps_visible) { false }
+        let(:provisioning_allowed) { true }
+        let(:roles) { ["ADMIN"] }
+        let(:path) { "v1/users/#{user_id}" }
+        let(:app_ids) { ["456", "789"] }
+        let(:body) do
+          {
+            data: {
+              type: 'users',
+              id: user_id,
+              attributes: {
+                allAppsVisible: all_apps_visible,
+                provisioningAllowed: provisioning_allowed,
+                roles: roles
+              },
+              relationships: {
+                visibleApps: {
+                  data: app_ids.map do |app_id|
+                    {
+                      type: "apps",
+                      id: app_id
+                    }
+                  end
+                }
+              }
+            }
+          }
+        end
+
+        it 'succeeds with list of apps' do
+          url = path
+          req_mock = test_request_body(url, body)
+
+          expect(client).to receive(:request).with(:patch).and_yield(req_mock).and_return(req_mock)
+          client.patch_user(user_id: user_id, all_apps_visible: all_apps_visible, provisioning_allowed: provisioning_allowed, roles: roles, visible_app_ids: app_ids)
+        end
+
+        it 'succeeds with all apps' do
+          body_all_apps = body.clone
+          body_all_apps[:data][:attributes][:allAppsVisible] = true
+          body_all_apps[:data].delete(:relationships)
+
+          url = path
+          req_mock = test_request_body(url, body_all_apps)
+
+          expect(client).to receive(:request).with(:patch).and_yield(req_mock).and_return(req_mock)
+          client.patch_user(user_id: user_id, all_apps_visible: true, provisioning_allowed: provisioning_allowed, roles: roles, visible_app_ids: app_ids)
+        end
+      end
+
       context 'delete_user' do
         let(:user_id) { "123" }
-        let(:path) { "users/#{user_id}" }
+        let(:path) { "v1/users/#{user_id}" }
 
         it 'succeeds' do
           req_mock = test_request(path)
@@ -78,7 +130,7 @@ describe Spaceship::ConnectAPI::Users::Client do
 
       context 'post_user_visible_apps' do
         let(:user_id) { "123" }
-        let(:path) { "users/#{user_id}/relationships/visibleApps" }
+        let(:path) { "v1/users/#{user_id}/relationships/visibleApps" }
         let(:app_ids) { ["456", "789"] }
         let(:body) do
           {
@@ -102,7 +154,7 @@ describe Spaceship::ConnectAPI::Users::Client do
 
       context 'patch_user_visible_apps' do
         let(:user_id) { "123" }
-        let(:path) { "users/#{user_id}/relationships/visibleApps" }
+        let(:path) { "v1/users/#{user_id}/relationships/visibleApps" }
         let(:app_ids) { ["456", "789"] }
         let(:body) do
           {
@@ -126,7 +178,7 @@ describe Spaceship::ConnectAPI::Users::Client do
 
       context 'delete_user_visible_apps' do
         let(:user_id) { "123" }
-        let(:path) { "users/#{user_id}/relationships/visibleApps" }
+        let(:path) { "v1/users/#{user_id}/relationships/visibleApps" }
         let(:app_ids) { ["456", "789"] }
         let(:body) do
           {
@@ -150,7 +202,7 @@ describe Spaceship::ConnectAPI::Users::Client do
 
       context 'get_user_visible_apps' do
         let(:user_id) { "42" }
-        let(:path) { "users/#{user_id}/visibleApps" }
+        let(:path) { "v1/users/#{user_id}/visibleApps" }
 
         it 'succeeds' do
           params = {}
@@ -163,7 +215,7 @@ describe Spaceship::ConnectAPI::Users::Client do
 
     describe "user_invitations" do
       context 'get_user_invitations' do
-        let(:path) { "userInvitations" }
+        let(:path) { "v1/userInvitations" }
 
         it 'succeeds' do
           params = {}
@@ -174,7 +226,7 @@ describe Spaceship::ConnectAPI::Users::Client do
       end
 
       context 'post_user_invitation' do
-        let(:path) { "userInvitations" }
+        let(:path) { "v1/userInvitations" }
         let(:attributes) {
           {
             email: "test@example.com",
@@ -224,7 +276,7 @@ describe Spaceship::ConnectAPI::Users::Client do
 
       context 'delete_user_invitation' do
         let(:invitation_id) { "123" }
-        let(:path) { "userInvitations/#{invitation_id}" }
+        let(:path) { "v1/userInvitations/#{invitation_id}" }
 
         it 'succeeds' do
           req_mock = test_request(path)
@@ -235,7 +287,7 @@ describe Spaceship::ConnectAPI::Users::Client do
 
       context 'get_user_invitation_visible_apps' do
         let(:invitation_id) { "42" }
-        let(:path) { "userInvitations/#{invitation_id}/visibleApps" }
+        let(:path) { "v1/userInvitations/#{invitation_id}/visibleApps" }
 
         it 'succeeds' do
           params = {}

@@ -212,7 +212,7 @@ fastlane match development
 
 <img src="/img/actions/match_appstore_small.gif" width="550" />
 
-This will create a new certificate and provisioning profile (if required) and store them in your selected storage.  
+This will create a new certificate and provisioning profile (if required) and store them in your selected storage.
 If you previously ran _match_ with the configured storage it will automatically install the existing profiles from your storage.
 
 The provisioning profiles are installed in `~/Library/MobileDevice/Provisioning Profiles` while the certificates and private keys are installed in your Keychain.
@@ -400,7 +400,7 @@ By using the `force_for_new_devices` parameter, _match_ will check if the (enabl
 
 _**Important:** The `force_for_new_devices` parameter is ignored for App Store provisioning profiles since they don't contain any device information._
 
-If you're not using _fastlane_, you can also use the `force_for_new_devices` option from the command line:
+If you're not using `Fastfile`, you can also use the `force_for_new_devices` option from the command line:
 
 ```no-highlight
 fastlane match adhoc --force_for_new_devices
@@ -408,7 +408,7 @@ fastlane match adhoc --force_for_new_devices
 
 ##### Templates (aka: custom entitlements)
 
-Match can generate profiles that contain custom entitlements by passing in the entitlement's name with the `template_name` parameter.
+_match_ can generate profiles that contain custom entitlements by passing in the entitlement's name with the `template_name` parameter.
 
 ```
 match(type: "development",
@@ -509,11 +509,17 @@ Please be careful when using this option and ensure the certificates and profile
 
 ### Manual Decrypt
 
-If you want to manually decrypt a file you can.
+If you want to manually decrypt or encrypt a file, you can use the companion script `match_file`:
 
 ```no-highlight
-openssl aes-256-cbc -k "<password>" -in "<fileYouWantToDecryptPath>" -out "<decryptedFilePath>" -a -d
+match_file encrypt "<fileYouWantToEncryptPath>" ["<encryptedFilePath>"]
+
+match_file decrypt "<fileYouWantToDecryptPath>" ["<decryptedFilePath>"]
 ```
+
+The password will be asked interactively.
+
+_**Note:** You may need to swap double quotes `"` for single quotes `'` if your match password contains an exclamation mark `!`._
 
 #### Export Distribution Certificate and Private Key as Single .p12 File
 

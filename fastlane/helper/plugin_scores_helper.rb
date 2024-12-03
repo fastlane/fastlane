@@ -52,7 +52,7 @@ module Fastlane
           self.homepage = hash["homepage_uri"] || hash["documentation_uri"]
           self.raw_hash = hash
 
-          has_github_page = self.homepage.to_s.include?("https://github.com") # Here we can add non GitHub support one day
+          has_github_page = self.homepage.to_s.start_with?("https://github.com") # Here we can add non GitHub support one day
 
           self.data = {
             has_homepage: self.homepage.to_s.length > 5,

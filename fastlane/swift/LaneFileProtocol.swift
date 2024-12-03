@@ -1,5 +1,5 @@
 // LaneFileProtocol.swift
-// Copyright (c) 2023 FastlaneTools
+// Copyright (c) 2024 FastlaneTools
 
 //
 //  ** NOTE **
@@ -40,7 +40,11 @@ open class LaneFile: NSObject, LaneFileProtocol {
         return String(laneName.prefix(laneName.count - 12))
     }
 
-    public func onError(currentLane: String, errorInfo _: String, errorClass _: String?, errorMessage _: String?) {
+    open func beforeAll(with _: String) {}
+
+    open func afterAll(with _: String) {}
+
+    open func onError(currentLane: String, errorInfo _: String, errorClass _: String?, errorMessage _: String?) {
         LaneFile.onErrorCalled.insert(currentLane)
     }
 
@@ -68,7 +72,7 @@ open class LaneFile: NSObject, LaneFileProtocol {
 
     public static var lanes: [String: String] {
         var laneToMethodName: [String: String] = [:]
-        laneFunctionNames.forEach { name in
+        for name in laneFunctionNames {
             let lowercasedName = name.lowercased()
             if lowercasedName.hasSuffix("lane") {
                 laneToMethodName[lowercasedName] = name
@@ -118,11 +122,11 @@ open class LaneFile: NSObject, LaneFileProtocol {
         let lowerCasedLaneRequested = lane.lowercased()
 
         guard let laneMethod = currentLanes[lowerCasedLaneRequested] else {
-            let laneNames = laneFunctionNames.map { laneFuctionName in
-                if laneFuctionName.hasSuffix("lanewithoptions:") {
-                    return trimLaneWithOptionsFromName(laneName: laneFuctionName)
+            let laneNames = laneFunctionNames.map { laneFunctionName in
+                if laneFunctionName.hasSuffix("lanewithoptions:") {
+                    return trimLaneWithOptionsFromName(laneName: laneFunctionName)
                 } else {
-                    return trimLaneFromName(laneName: laneFuctionName)
+                    return trimLaneFromName(laneName: laneFunctionName)
                 }
             }.joined(separator: ", ")
 

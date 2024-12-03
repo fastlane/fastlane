@@ -99,7 +99,7 @@ module Deliver
                                      optional: true,
                                      default_value: "ios",
                                      verify_block: proc do |value|
-                                       UI.user_error!("The platform can only be ios, appletvos, or osx") unless %('ios', 'appletvos', 'osx').include?(value)
+                                       UI.user_error!("The platform can only be ios, appletvos, xros or osx") unless %('ios', 'appletvos', 'xros', 'osx').include?(value)
                                      end),
 
         # live version
@@ -162,6 +162,11 @@ module Deliver
                                      description: "Clear all previously uploaded screenshots before uploading the new ones",
                                      type: Boolean,
                                      default_value: false),
+        FastlaneCore::ConfigItem.new(key: :screenshot_processing_timeout,
+                                     env_name: "DELIVER_SCREENSHOT_PROCESSING_TIMEOUT",
+                                     description: "Timeout in seconds to wait before considering screenshot processing as failed, used to handle cases where uploads to the App Store are stuck in processing",
+                                     type: Integer,
+                                     default_value: 3600),
         FastlaneCore::ConfigItem.new(key: :sync_screenshots,
                                      env_name: "DELIVER_SYNC_SCREENSHOTS",
                                      description: "Sync screenshots with local ones. This is currently beta option so set true to 'FASTLANE_ENABLE_BETA_DELIVER_SYNC_SCREENSHOTS' environment variable as well",
@@ -182,16 +187,25 @@ module Deliver
                                      description: "Rejects the previously submitted build if it's in a state where it's possible",
                                      type: Boolean,
                                      default_value: false),
+        FastlaneCore::ConfigItem.new(key: :version_check_wait_retry_limit,
+                                     env_name: "DELIVER_VERSION_CHECK_WAIT_RETRY_LIMIT",
+                                     description: "After submitting a new version, App Store Connect takes some time to recognize the new version and we must wait until it's available before attempting to upload metadata for it. There is a mechanism that will check if it's available and retry with an exponential backoff if it's not available yet. " \
+                                     "This option specifies how many times we should retry before giving up. Setting this to a value below 5 is not recommended and will likely cause failures. Increase this parameter when Apple servers seem to be degraded or slow",
+                                     type: Integer,
+                                     default_value: 7,
+                                     verify_block: proc do |value|
+                                       UI.user_error!("'#{value}' needs to be greater than 0") if value <= 0
+                                     end),
 
         # release
         FastlaneCore::ConfigItem.new(key: :automatic_release,
                                      env_name: "DELIVER_AUTOMATIC_RELEASE",
-                                     description: "Should the app be automatically released once it's approved? (Can not be used together with `auto_release_date`)",
+                                     description: "Should the app be automatically released once it's approved? (Cannot be used together with `auto_release_date`)",
                                      type: Boolean,
                                      optional: true),
         FastlaneCore::ConfigItem.new(key: :auto_release_date,
                                      env_name: "DELIVER_AUTO_RELEASE_DATE",
-                                     description: "Date in milliseconds for automatically releasing on pending approval (Can not be used together with `automatic_release`)",
+                                     description: "Date in milliseconds for automatically releasing on pending approval (Cannot be used together with `automatic_release`)",
                                      type: Integer,
                                      optional: true,
                                      conflicting_options: [:automatic_release],
@@ -201,7 +215,7 @@ module Deliver
                                      verify_block: proc do |value|
                                        now_in_ms = Time.now.to_i * 1000
                                        if value < now_in_ms
-                                         UI.user_error!("'#{value}' needs to be in the future and in milliseonds (current time is '#{now_in_ms}')")
+                                         UI.user_error!("'#{value}' needs to be in the future and in milliseconds (current time is '#{now_in_ms}')")
                                        end
                                      end),
         FastlaneCore::ConfigItem.new(key: :phased_release,
@@ -235,7 +249,7 @@ module Deliver
                                      end),
         FastlaneCore::ConfigItem.new(key: :submission_information,
                                      short_option: "-b",
-                                     description: "Extra information for the submission (e.g. compliance specifications, IDFA settings)",
+                                     description: "Extra information for the submission (e.g. compliance specifications)",
                                      type: Hash,
                                      optional: true),
 
@@ -311,7 +325,7 @@ module Deliver
 
         # App Metadata
         FastlaneCore::ConfigItem.new(key: :individual_metadata_items,
-                                     env_name: "DELIVER_INDIVUDAL_METADATA_ITEMS",
+                                     env_names: ["DELIVER_INDIVUDAL_METADATA_ITEMS", "DELIVER_INDIVIDUAL_METADATA_ITEMS"], # The version with typo must be deprecated
                                      description: "An array of localized metadata items to upload individually by language so that errors can be identified. E.g. ['name', 'keywords', 'description']. Note: slow",
                                      deprecated: "Removed after the migration to the new App Store Connect API in June 2020",
                                      type: Array,

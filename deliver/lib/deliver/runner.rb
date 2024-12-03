@@ -55,7 +55,7 @@ module Deliver
       verify_version if options[:app_version].to_s.length > 0 && !options[:skip_app_version_update]
 
       # Rejecting before upload meta
-      # Screenshots can not be update/deleted if in waiting for review
+      # Screenshots cannot be updated or deleted if the app is in the "waiting for review" state
       reject_version_if_possible if options[:reject_if_possible]
 
       upload_metadata
@@ -135,21 +135,21 @@ module Deliver
 
     # Upload all metadata, screenshots, pricing information, etc. to App Store Connect
     def upload_metadata
-      upload_metadata = UploadMetadata.new
+      upload_metadata = UploadMetadata.new(options)
       upload_screenshots = UploadScreenshots.new
 
       # First, collect all the things for the HTML Report
       screenshots = upload_screenshots.collect_screenshots(options)
-      upload_metadata.load_from_filesystem(options)
+      upload_metadata.load_from_filesystem
 
       # Assign "default" values to all languages
-      upload_metadata.assign_defaults(options)
+      upload_metadata.assign_defaults
 
       # Validate
       validate_html(screenshots)
 
       # Commit
-      upload_metadata.upload(options)
+      upload_metadata.upload
 
       if options[:sync_screenshots]
         sync_screenshots = SyncScreenshots.new(app: Deliver.cache[:app], platform: Spaceship::ConnectAPI::Platform.map(options[:platform]))
@@ -172,7 +172,7 @@ module Deliver
       transporter = transporter_for_selected_team
 
       case platform
-      when "ios", "appletvos"
+      when "ios", "appletvos", "xros"
         package_path = FastlaneCore::IpaUploadPackageBuilder.new.generate(
           app_id: Deliver.cache[:app].id,
           ipa_path: ipa_path,
@@ -209,7 +209,7 @@ module Deliver
       transporter = transporter_for_selected_team
 
       case platform
-      when "ios", "appletvos"
+      when "ios", "appletvos", "xros"
         package_path = FastlaneCore::IpaUploadPackageBuilder.new.generate(
           app_id: Deliver.cache[:app].id,
           ipa_path: ipa_path,
@@ -231,7 +231,8 @@ module Deliver
 
       unless result
         transporter_errors = transporter.displayable_errors
-        UI.user_error!("Error uploading ipa file: \n #{transporter_errors}")
+        file_type = platform == "osx" ? "pkg" : "ipa"
+        UI.user_error!("Error uploading #{file_type} file: \n #{transporter_errors}")
       end
     end
 
@@ -263,6 +264,7 @@ module Deliver
     private
 
     # If App Store Connect API token, use token.
+    # If api_key is specified and it is an Individual API Key, don't use token but use username.
     # If itc_provider was explicitly specified, use it.
     # If there are multiple teams, infer the provider from the selected team name.
     # If there are fewer than two teams, don't infer the provider.
@@ -278,6 +280,14 @@ module Deliver
                   api_key[:key] = Base64.decode64(api_key[:key]) if api_key[:is_key_content_base64]
                   api_key
                 end
+
+      # Currently no kind of transporters accept an Individual API Key. Use username and app-specific password instead.
+      # See https://github.com/fastlane/fastlane/issues/22115
+      is_individual_key = !api_key.nil? && api_key[:issuer_id].nil?
+      if is_individual_key
+        api_key = nil
+        api_token = nil
+      end
 
       unless api_token.nil?
         api_token.refresh! if api_token.expired?

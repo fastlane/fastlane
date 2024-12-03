@@ -197,12 +197,37 @@ module Trainer
       return output
     end
 
+    # Hotfix: From Xcode 16 beta 3 'xcresulttool get --format json' has been deprecated;
+    #         '--legacy' flag required to keep on using the command
+    def generate_cmd_parse_xcresult(path)
+      xcresulttool_cmd = %W(
+        xcrun
+        xcresulttool
+        get
+        --format
+        json
+        --path
+        #{path}
+      )
+
+      # e.g. DEVELOPER_DIR=/Applications/Xcode_16_beta_3.app
+      # xcresulttool version 23021, format version 3.53 (current)
+      match = `xcrun xcresulttool version`.match(/xcresulttool version (?<version>[\d.]+)/)
+      version = match[:version]
+      xcresulttool_cmd << '--legacy' if Gem::Version.new(version) >= Gem::Version.new(23_021)
+
+      xcresulttool_cmd.join(' ')
+    end
+
     def parse_xcresult(path, output_remove_retry_attempts: false)
       require 'shellwords'
       path = Shellwords.escape(path)
 
       # Executes xcresulttool to get JSON format of the result bundle object
-      result_bundle_object_raw = execute_cmd("xcrun xcresulttool get --format json --path #{path}")
+      # Hotfix: From Xcode 16 beta 3 'xcresulttool get --format json' has been deprecated; '--legacy' flag required to keep on using the command
+      xcresulttool_cmd = generate_cmd_parse_xcresult(path)
+
+      result_bundle_object_raw = execute_cmd(xcresulttool_cmd)
       result_bundle_object = JSON.parse(result_bundle_object_raw)
 
       # Parses JSON into ActionsInvocationRecord to find a list of all ids for ActionTestPlanRunSummaries
@@ -215,7 +240,7 @@ module Trainer
       # Maps ids into ActionTestPlanRunSummaries by executing xcresulttool to get JSON
       # containing specific information for each test summary,
       summaries = ids.map do |id|
-        raw = execute_cmd("xcrun xcresulttool get --format json --path #{path} --id #{id}")
+        raw = execute_cmd("#{xcresulttool_cmd} --id #{id}")
         json = JSON.parse(raw)
         Trainer::XCResult::ActionTestPlanRunSummaries.new(json)
       end
@@ -238,7 +263,7 @@ module Trainer
 
         # Used by store number of passes and failures by identifier
         # This is used when Xcode 13 (and up) retries tests
-        # The identifier is duplicated until test succeeds or max count is reachd
+        # The identifier is duplicated until test succeeds or max count is reached
         tests_by_identifier = {}
 
         test_rows = all_tests.map do |test|

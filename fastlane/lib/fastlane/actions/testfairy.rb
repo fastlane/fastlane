@@ -96,6 +96,8 @@ module Fastlane
             [key, options_to_client.call(value).join(',')]
           when :custom
             [key, value]
+          when :tags
+            [key, value.join(',')]
           else
             UI.user_error!("Unknown parameter: #{key}")
           end
@@ -241,7 +243,13 @@ module Fastlane
                                        env_name: "FL_TESTFAIRY_TIMEOUT",
                                        description: "Request timeout in seconds",
                                        type: Integer,
-                                       optional: true)
+                                       optional: true),
+          FastlaneCore::ConfigItem.new(key: :tags,
+                                       optional: true,
+                                       env_name: "FL_TESTFAIRY_TAGS",
+                                       description: "Custom tags that can be used to organize your builds",
+                                       type: Array,
+                                       default_value: [])
         ]
       end
 

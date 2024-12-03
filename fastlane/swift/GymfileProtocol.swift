@@ -1,5 +1,5 @@
 // GymfileProtocol.swift
-// Copyright (c) 2023 FastlaneTools
+// Copyright (c) 2024 FastlaneTools
 
 public protocol GymfileProtocol: AnyObject {
     /// Path to the workspace file
@@ -151,6 +151,9 @@ public protocol GymfileProtocol: AnyObject {
 
     /// Lets xcodebuild use system's scm configuration
     var useSystemScm: Bool { get }
+
+    /// Lets xcodebuild use a specified package authorization provider (keychain|netrc)
+    var packageAuthorizationProvider: String? { get }
 }
 
 public extension GymfileProtocol {
@@ -204,8 +207,9 @@ public extension GymfileProtocol {
     var skipPackageDependenciesResolution: Bool { return false }
     var disablePackageAutomaticUpdates: Bool { return false }
     var useSystemScm: Bool { return false }
+    var packageAuthorizationProvider: String? { return nil }
 }
 
 // Please don't remove the lines below
 // They are used to detect outdated files
-// FastlaneRunnerAPIVersion [0.9.117]
+// FastlaneRunnerAPIVersion [0.9.134]
