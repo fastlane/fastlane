@@ -15,8 +15,12 @@ module Fastlane
         platform = Spaceship::ConnectAPI::BundleIdPlatform.map(params[:platform])
 
         if params[:devices]
-          new_devices = params[:devices].map do |name, udid|
-            [udid, name]
+          if params[:is_devices_inv]
+            new_devices = params[:devices].to_a
+          else
+            new_devices = params[:devices].map do |name, udid|
+              [udid, name]
+            end
           end
         elsif params[:devices_file]
           require 'csv'
@@ -104,6 +108,11 @@ module Fastlane
                                        description: "A hash of devices, with the name as key and the UDID as value",
                                        type: Hash,
                                        optional: true),
+          FastlaneCore::ConfigItem.new(key: :is_devices_inv,
+                                       env_name: "FL_REGISTER_DEVICES_IS_DEVICES_INV",
+                                       description: "If devices hash parameter provided with UDID as key and the name as value",
+                                       type: Boolean,
+                                       optional: true),
           FastlaneCore::ConfigItem.new(key: :devices_file,
                                        env_name: "FL_REGISTER_DEVICES_FILE",
                                        description: "Provide a path to a file with the devices to register. For the format of the file see the examples",
@@ -184,7 +193,14 @@ module Fastlane
               "Luka iPhone 6" => "1234567890123456789012345678901234567890",
               "Felix iPad Air 2" => "abcdefghijklmnopqrstvuwxyzabcdefghijklmn"
             }
-          ) # Simply provide a list of devices as a Hash',
+          ) # Simply provide a list of devices as a Hash, with the name as key',
+          'register_devices(
+            devices: {
+              "1234567890123456789012345678901234567890" => "Luka iPhone 6",
+              "abcdefghijklmnopqrstvuwxyzabcdefghijklmn" => "Felix iPad Air 2"
+            },
+            is_devices_inv: true
+          ) # Provide a list of devices as a Hash, with the UDID as key',
           'register_devices(
             devices_file: "./devices.txt"
           ) # Alternatively provide a standard UDID export .txt file, see the Apple Sample (http://devimages.apple.com/downloads/devices/Multiple-Upload-Samples.zip)',
