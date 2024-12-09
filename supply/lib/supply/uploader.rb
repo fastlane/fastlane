@@ -135,7 +135,11 @@ module Supply
       if track && release
         completed = Supply.config[:rollout].to_f == 1
         release.user_fraction = completed ? nil : Supply.config[:rollout]
-        release.status = Supply::ReleaseStatus::COMPLETED if completed
+        if Supply.config[:release_status]
+          release.status = Supply.config[:release_status]
+        else
+          release.status = completed ? Supply::ReleaseStatus::COMPLETED : Supply::ReleaseStatus::IN_PROGRESS
+        end
 
         # Deleted other version codes if completed because only allowed on completed version in a release
         track.releases.delete_if { |r| !(r.version_codes || []).map(&:to_s).include?(version_code) } if completed
