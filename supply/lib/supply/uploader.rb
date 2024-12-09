@@ -113,7 +113,7 @@ module Supply
       track = tracks.first
       releases = track.releases
 
-      releases = releases.select { |r| only_statuses.include?(r.status) } unless only_statuses.empty? || only_statuses.nil?
+      releases = releases.select { |r| only_statuses.include?(r.status) } unless only_statuses.nil? || only_statuses.empty?
       releases = releases.select { |r| (r.version_codes || []).map(&:to_s).include?(version_code.to_s) } if version_code
 
       if releases.size > 1
