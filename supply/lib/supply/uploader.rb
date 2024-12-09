@@ -106,14 +106,14 @@ module Supply
       end
     end
 
-    def fetch_track_and_release!(track, version_code, status = nil)
+    def fetch_track_and_release!(track, version_code, only_statuses = nil)
       tracks = client.tracks(track)
       return nil, nil if tracks.empty?
 
       track = tracks.first
       releases = track.releases
 
-      releases = releases.select { |r| r.status == status } if status
+      releases = releases.select { |r| only_statuses.include?(r.status) } unless only_statuses.empty? || only_statuses.nil?
       releases = releases.select { |r| (r.version_codes || []).map(&:to_s).include?(version_code.to_s) } if version_code
 
       if releases.size > 1
@@ -124,7 +124,7 @@ module Supply
     end
 
     def update_rollout
-      track, release = fetch_track_and_release!(Supply.config[:track], Supply.config[:version_code], Supply::ReleaseStatus::IN_PROGRESS)
+      track, release = fetch_track_and_release!(Supply.config[:track], Supply.config[:version_code], [Supply::ReleaseStatus::IN_PROGRESS, Supply::ReleaseStatus::DRAFT])
       UI.user_error!("Unable to find the requested track - '#{Supply.config[:track]}'") unless track
       UI.user_error!("Unable to find the requested release on track - '#{Supply.config[:track]}'") unless release
 
