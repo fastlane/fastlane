@@ -106,14 +106,14 @@ module Supply
       end
     end
 
-    def fetch_track_and_release!(track, version_code, only_statuses = nil)
+    def fetch_track_and_release!(track, version_code, statuses = nil)
       tracks = client.tracks(track)
       return nil, nil if tracks.empty?
 
       track = tracks.first
       releases = track.releases
 
-      releases = releases.select { |r| only_statuses.include?(r.status) } unless only_statuses.nil? || only_statuses.empty?
+      releases = releases.select { |r| statuses.include?(r.status) } unless statuses.nil? || statuses.empty?
       releases = releases.select { |r| (r.version_codes || []).map(&:to_s).include?(version_code.to_s) } if version_code
 
       if releases.size > 1
