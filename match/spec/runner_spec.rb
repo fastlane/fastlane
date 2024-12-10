@@ -332,6 +332,39 @@ describe Match do
           Match::Runner.new.run(config)
           # Nothing to check after the run
         end
+
+        it "fails because enterprise type requested without in_house credentials", requires_security: true do
+          git_url = "https://github.com/fastlane/fastlane/tree/master/certificates"
+          values = {
+            app_identifier: "tools.fastlane.app",
+            type: "enterprise",
+            git_url: git_url,
+            username: "flapple@something.com",
+            readonly: false
+          }
+
+          config = FastlaneCore::Configuration.create(Match::Options.available_options, values)
+          repo_dir = "./match/spec/fixtures/existing"
+          cert_path = "./match/spec/fixtures/existing/certs/distribution/E7P4EE896K.cer"
+          key_path = "./match/spec/fixtures/existing/certs/distribution/E7P4EE896K.p12"
+
+          create_fake_cache
+
+          fake_storage = create_fake_storage(match_config: config, repo_dir: repo_dir)
+
+          fake_encryption = "fake_encryption"
+          expect(Match::Encryption::OpenSSL).to receive(:new).with(keychain_name: fake_storage.git_url, working_directory: fake_storage.working_directory, force_legacy_encryption: false).and_return(fake_encryption)
+          expect(fake_encryption).to receive(:decrypt_files).and_return(nil)
+
+          client = "client"
+          expect(Match::SpaceshipEnsure).to receive(:new)
+          expect(Spaceship::ConnectAPI).to receive(:client).and_return(client)
+          allow(client).to receive(:in_house?).and_return(false)
+
+          expect do
+            Match::Runner.new.run(config)
+          end.to raise_error("You defined the profile type 'enterprise', but your Apple account doesn't support In-House profiles")
+        end
       end
     end
   end
