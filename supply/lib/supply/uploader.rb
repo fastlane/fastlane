@@ -141,8 +141,8 @@ module Supply
           release.status = completed ? Supply::ReleaseStatus::COMPLETED : Supply::ReleaseStatus::IN_PROGRESS
         end
 
-        # Its okay to set releases to an array containing the newest release
-        # Google Play will keep previous releases there this release is a partial rollout
+        # It's okay to set releases to an array containing the newest release
+        # Google Play will keep previous releases there untouched
         track.releases = [release]
       else
         UI.user_error!("Unable to find version to rollout in track '#{Supply.config[:track]}'")
@@ -214,7 +214,7 @@ module Supply
       end
 
       if track_to
-        # Its okay to set releases to an array containing the newest release
+        # It's okay to set releases to an array containing the newest release
         # Google Play will keep previous releases there this release is a partial rollout
         track_to.releases = [release]
       else
@@ -439,7 +439,7 @@ module Supply
       tracks = client.tracks(Supply.config[:track])
       track = tracks.first
       if track
-        # Its okay to set releases to an array containing the newest release
+        # It's okay to set releases to an array containing the newest release
         # Google Play will keep previous releases there this release is a partial rollout
         track.releases = [track_release]
       else
