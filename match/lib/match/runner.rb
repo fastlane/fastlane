@@ -56,7 +56,7 @@ module Match
 
       unless params[:readonly]
         self.spaceship = SpaceshipEnsure.new(params[:username], params[:team_id], params[:team_name], api_token(params))
-        if params[:type] == "enterprise" && !Spaceship.client.in_house?
+        if params[:type] == "enterprise" && !Spaceship::ConnectAPI.client.in_house?
           UI.user_error!("You defined the profile type 'enterprise', but your Apple account doesn't support In-House profiles")
         end
       end
