@@ -17,4 +17,4 @@ public class Scanfile: ScanfileProtocol {
     // during the `init` process, and you won't see this message
 }
 
-// Generated with fastlane 2.225.0
+// Generated with fastlane 2.226.0

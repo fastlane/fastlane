@@ -11602,9 +11602,13 @@ public func teamName() {
    - autoUpdate: Allows an easy upgrade of all users to the current version. To enable set to 'on'
    - notify: Send email to testers
    - options: Array of options (shake,video_only_wifi,anonymous)
-   - custom: Array of custom options. Contact support@testfairy.com for more information
+   - custom: Array of custom options. Contact support for more information
    - timeout: Request timeout in seconds
    - tags: Custom tags that can be used to organize your builds
+   - folderName: Name of the dashboard folder that contains this app
+   - landingPageMode: Visibility of build landing after upload. Can be 'open' or 'closed'
+   - uploadToSaucelabs: Upload file directly to Sauce Labs. It can be 'on' or 'off'
+   - platform: Use if upload build is not iOS or Android. Contact support for more information
 
  You can retrieve your API key on [your settings page](https://free.testfairy.com/settings/)
  */
@@ -11621,7 +11625,11 @@ public func testfairy(apiKey: String,
                       options: [String] = [],
                       custom: String = "",
                       timeout: OptionalConfigValue<Int?> = .fastlaneDefault(nil),
-                      tags: [String] = [])
+                      tags: [String] = [],
+                      folderName: String = "",
+                      landingPageMode: String = "open",
+                      uploadToSaucelabs: String = "off",
+                      platform: String = "")
 {
     let apiKeyArg = RubyCommand.Argument(name: "api_key", value: apiKey, type: nil)
     let ipaArg = ipa.asRubyArgument(name: "ipa", type: nil)
@@ -11637,6 +11645,10 @@ public func testfairy(apiKey: String,
     let customArg = RubyCommand.Argument(name: "custom", value: custom, type: nil)
     let timeoutArg = timeout.asRubyArgument(name: "timeout", type: nil)
     let tagsArg = RubyCommand.Argument(name: "tags", value: tags, type: nil)
+    let folderNameArg = RubyCommand.Argument(name: "folder_name", value: folderName, type: nil)
+    let landingPageModeArg = RubyCommand.Argument(name: "landing_page_mode", value: landingPageMode, type: nil)
+    let uploadToSaucelabsArg = RubyCommand.Argument(name: "upload_to_saucelabs", value: uploadToSaucelabs, type: nil)
+    let platformArg = RubyCommand.Argument(name: "platform", value: platform, type: nil)
     let array: [RubyCommand.Argument?] = [apiKeyArg,
                                           ipaArg,
                                           apkArg,
@@ -11650,7 +11662,11 @@ public func testfairy(apiKey: String,
                                           optionsArg,
                                           customArg,
                                           timeoutArg,
-                                          tagsArg]
+                                          tagsArg,
+                                          folderNameArg,
+                                          landingPageModeArg,
+                                          uploadToSaucelabsArg,
+                                          platformArg]
     let args: [RubyCommand.Argument] = array
         .filter { $0?.value != nil }
         .compactMap { $0 }
@@ -13861,4 +13877,4 @@ public let snapshotfile: Snapshotfile = .init()
 
 // Please don't remove the lines below
 // They are used to detect outdated files
-// FastlaneRunnerAPIVersion [0.9.184]
+// FastlaneRunnerAPIVersion [0.9.185]

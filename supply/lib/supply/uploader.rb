@@ -106,14 +106,14 @@ module Supply
       end
     end
 
-    def fetch_track_and_release!(track, version_code, status = nil)
+    def fetch_track_and_release!(track, version_code, statuses = nil)
       tracks = client.tracks(track)
       return nil, nil if tracks.empty?
 
       track = tracks.first
       releases = track.releases
 
-      releases = releases.select { |r| r.status == status } if status
+      releases = releases.select { |r| statuses.include?(r.status) } unless statuses.nil? || statuses.empty?
       releases = releases.select { |r| (r.version_codes || []).map(&:to_s).include?(version_code.to_s) } if version_code
 
       if releases.size > 1
@@ -124,7 +124,7 @@ module Supply
     end
 
     def update_rollout
-      track, release = fetch_track_and_release!(Supply.config[:track], Supply.config[:version_code], Supply::ReleaseStatus::IN_PROGRESS)
+      track, release = fetch_track_and_release!(Supply.config[:track], Supply.config[:version_code], [Supply::ReleaseStatus::IN_PROGRESS, Supply::ReleaseStatus::DRAFT])
       UI.user_error!("Unable to find the requested track - '#{Supply.config[:track]}'") unless track
       UI.user_error!("Unable to find the requested release on track - '#{Supply.config[:track]}'") unless release
 
@@ -135,10 +135,15 @@ module Supply
       if track && release
         completed = Supply.config[:rollout].to_f == 1
         release.user_fraction = completed ? nil : Supply.config[:rollout]
-        release.status = Supply::ReleaseStatus::COMPLETED if completed
+        if Supply.config[:release_status]
+          release.status = Supply.config[:release_status]
+        else
+          release.status = completed ? Supply::ReleaseStatus::COMPLETED : Supply::ReleaseStatus::IN_PROGRESS
+        end
 
-        # Deleted other version codes if completed because only allowed on completed version in a release
-        track.releases.delete_if { |r| !(r.version_codes || []).map(&:to_s).include?(version_code) } if completed
+        # It's okay to set releases to an array containing the newest release
+        # Google Play will keep previous releases there untouched
+        track.releases = [release]
       else
         UI.user_error!("Unable to find version to rollout in track '#{Supply.config[:track]}'")
       end
@@ -209,7 +214,7 @@ module Supply
       end
 
       if track_to
-        # Its okay to set releases to an array containing the newest release
+        # It's okay to set releases to an array containing the newest release
         # Google Play will keep previous releases there this release is a partial rollout
         track_to.releases = [release]
       else
@@ -434,7 +439,7 @@ module Supply
       tracks = client.tracks(Supply.config[:track])
       track = tracks.first
       if track
-        # Its okay to set releases to an array containing the newest release
+        # It's okay to set releases to an array containing the newest release
         # Google Play will keep previous releases there this release is a partial rollout
         track.releases = [track_release]
       else
