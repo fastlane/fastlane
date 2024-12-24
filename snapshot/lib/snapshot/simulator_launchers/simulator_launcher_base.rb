@@ -138,7 +138,7 @@ module Snapshot
 
         # If you don't override the operator name, you'll get "Carrier" in the status bar on no-notch devices such as iPhone 8. Pass an empty string to blank it out.
 
-        arguments = "--time #{time.iso8601} --dataNetwork wifi --wifiMode active --wifiBars 3 --cellularMode active --operatorName '' --cellularBars 4 --batteryState charged --batteryLevel 100"
+        arguments = "--time #{time.iso8601(3)} --dataNetwork wifi --wifiMode active --wifiBars 3 --cellularMode active --operatorName '' --cellularBars 4 --batteryState charged --batteryLevel 100"
       end
 
       Helper.backticks("xcrun simctl status_bar #{device_udid} override #{arguments} &> /dev/null")
