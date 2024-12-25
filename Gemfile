@@ -55,8 +55,8 @@ gem "xcov", "~> 1.4.1"
 gem "yard", "~> 0.9.11"
 
 if Gem::Version.new(RUBY_VERSION) >= Gem::Version.new('3.4.0')
-  # A module used to abbreviate strings.
   gem "abbrev"
+  gem "mutex_m"
 end
 
 gemspec(path: ".")

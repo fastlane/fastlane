@@ -211,6 +211,7 @@ GEM
     multipart-post (2.0.0)
     mustermann (2.0.2)
       ruby2_keywords (~> 0.0.1)
+    mutex_m (0.3.0)
     nanaimo (0.3.0)
     nap (1.1.0)
     naturally (2.2.1)
@@ -377,6 +378,7 @@ DEPENDENCIES
   fastlane-plugin-ruby
   fastlane-plugin-slack_train (>= 0.2.0)
   mime-types (>= 1.16, < 4.0)
+  mutex_m
   ox (= 2.13.2)
   pry
   pry-byebug
