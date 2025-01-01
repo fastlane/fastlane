@@ -77,7 +77,7 @@ Gem::Specification.new do |spec|
   spec.add_dependency('CFPropertyList', '>= 2.3', '< 4.0.0') # Needed to be able to read binary plist format
   spec.add_dependency('colored', '~> 1.2') # colored terminal output
   spec.add_dependency('commander', '~> 4.6') # CLI parser
-  spec.add_dependency('dotenv', '>= 2.1.1', '< 3.0.0')
+  spec.add_dependency('dotenv', '>= 3.0.0', '< 4.0.0')
   spec.add_dependency('emoji_regex', '>= 0.1', '< 4.0') # Used to scan for Emoji in the changelog
   spec.add_dependency('excon', '>= 0.71.0', '< 1.0.0') # Great HTTP Client
   spec.add_dependency('faraday_middleware', '~> 1.0') # Same as faraday
