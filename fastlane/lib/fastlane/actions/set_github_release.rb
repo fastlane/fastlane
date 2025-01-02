@@ -223,7 +223,7 @@ module Fastlane
                                        default_value: false,
                                        type: Boolean),
           FastlaneCore::ConfigItem.new(key: :make_latest,
-                                       env_name: "FL_SET_GITHUB_RELEASE_MKE_LATEST",
+                                       env_name: "FL_SET_GITHUB_RELEASE_MAKE_LATEST",
                                        description: "Whether the release should be set as the latest release for the repository",
                                        optional: true,
                                        default_value: true,
