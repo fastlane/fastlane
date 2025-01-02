@@ -362,7 +362,16 @@ module Trainer
         row
       end
 
-      self.data = rows
+      self.data = remove_repetition_retries(rows, output_remove_retry_attempts)
+    end
+
+    def remove_repetition_retries(rows, output_remove_retry_attempts)
+      if output_remove_retry_attempts
+        rows.group_by { |row| row[:test_name] }
+            .map { |_, group| group.min_by { |row| row[:number_of_failures_excluding_retries] } }
+      else
+        rows
+      end
     end
 
     def test_summaries_to_configuration_names(test_summaries)
