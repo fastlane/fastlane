@@ -103,7 +103,7 @@ module Fastlane
       end
 
       def self.find_binary_path(params)
-        params[:binary_path] ||= (Dir["/Applications/Fabric.app/**/upload-symbols"] + Dir["./Pods/Fabric/upload-symbols"] + Dir["./scripts/upload-symbols"] + Dir["./Pods/FirebaseCrashlytics/upload-symbols"]).last
+        params[:binary_path] ||= (Dir["/Applications/Fabric.app/**/upload-symbols"] + Dir["./Pods/Fabric/upload-symbols"] + Dir["./scripts/upload-symbols"] + Dir["./Pods/FirebaseCrashlytics/upload-symbols"] + Dir["~/Library/Developer/Xcode/DerivedData/*/SourcePackages/checkouts/firebase-ios-sdk/Crashlytics/upload-symbols"] + Dir["DerivedData/*/SourcePackages/checkouts/firebase-ios-sdk/Crashlytics/upload-symbols"]).last
         UI.user_error!("Failed to find Fabric's upload_symbols binary at /Applications/Fabric.app/**/upload-symbols or ./Pods/**/upload-symbols. Please specify the location of the binary explicitly by using the binary_path option") unless params[:binary_path]
 
         params[:binary_path] = File.expand_path(params[:binary_path])
