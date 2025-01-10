@@ -77,7 +77,7 @@ module FastlaneCore
 
         # Provisioning profile location changed for XCode 16
         if xcode_version >= "16"
-          provisioning_path = "/Library/Developer/Xcode/UserData/Provisioning Profiles"
+          provisioning_path = "/Library/Developer/Xcode/UserData/Provisioning Profiles/"
         else
           provisioning_path = "/Library/MobileDevice/Provisioning Profiles/"
         end
