@@ -84,6 +84,10 @@ module FastlaneCore
       return ENV.key?('CIRCLECI')
     end
 
+    def self.is_codebuild?
+      return ENV.key?('CODEBUILD_BUILD_ARN')
+    end
+
     def self.operating_system
       return "macOS" if RUBY_PLATFORM.downcase.include?("darwin")
       return "Windows" if RUBY_PLATFORM.downcase.include?("mswin")
