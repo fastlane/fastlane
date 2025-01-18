@@ -84,6 +84,7 @@ module FastlaneCore
       return ENV.key?('CIRCLECI')
     end
 
+    # @return [boolean] true if environment variable CODEBUILD_BUILD_ARN is set
     def self.is_codebuild?
       return ENV.key?('CODEBUILD_BUILD_ARN')
     end
