@@ -8,7 +8,7 @@ module Fastlane
         end
 
         case detect_provider(params)
-        when 'circleci'
+        when 'circleci', 'codebuild'
           setup_output_paths
         end
 
@@ -20,7 +20,7 @@ module Fastlane
       end
 
       def self.detect_provider(params)
-        params[:provider] || (Helper.is_circle_ci? ? 'circleci' : nil)
+        params[:provider] || (Helper.is_circle_ci? ? 'circleci' : nil) || (Helper.is_codebuild? ? 'codebuild' : nil)
       end
 
       def self.setup_keychain(params)
