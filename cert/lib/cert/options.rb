@@ -100,8 +100,9 @@ module Cert
                                      env_name: "CERT_KEYCHAIN_PATH",
                                      description: "Path to a custom keychain",
                                      code_gen_sensitive: true,
-                                     default_value: Dir["#{Dir.home}/Library/Keychains/login.keychain", "#{Dir.home}/Library/Keychains/login.keychain-db"].last,
+                                     default_value: Helper.mac? ? Dir["#{Dir.home}/Library/Keychains/login.keychain", "#{Dir.home}/Library/Keychains/login.keychain-db"].last : nil,
                                      default_value_dynamic: true,
+                                     optional: true,
                                      verify_block: proc do |value|
                                        UI.user_error!("Keychain is not supported on platforms other than macOS") unless Helper.mac?
                                        value = File.expand_path(value)
