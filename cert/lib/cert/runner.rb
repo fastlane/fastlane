@@ -241,7 +241,11 @@ module Cert
       ENV["CER_CERTIFICATE_ID"] = certificate.id
       ENV["CER_FILE_PATH"] = cert_path
 
-      UI.success("Successfully generated #{certificate.id}" + (Helper.mac? ? " which was imported to the local machine." : ""))
+      if Helper.mac?
+        UI.success("Successfully generated #{certificate.id} which was imported to the local machine.")
+      else
+        UI.success("Successfully generated #{certificate.id}")
+      end
 
       return cert_path
     end
