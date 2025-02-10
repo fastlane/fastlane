@@ -1,4 +1,4 @@
-describe Match::Generator do  
+describe Match::Generator do
   describe 'calling through' do
     describe 'cert' do
       require 'cert'
@@ -36,7 +36,7 @@ describe Match::Generator do
 
       context 'in macOS' do
         let(:is_mac) { true }
-    
+
         it 'configures correctly' do
           expect(FastlaneCore::Helper).to receive(:keychain_path).with("login.keychain").exactly(2).times.and_return("fake_keychain_name")
           expect(File).to receive(:expand_path).with("fake_keychain_name").exactly(2).times.and_return("fake_keychain_path")
@@ -60,10 +60,10 @@ describe Match::Generator do
           Match::Generator.generate_certificate(params, 'development', "workspace")
         end
       end
-    
+
       context 'in non-macOS' do
         let(:is_mac) { false }
-    
+
         it 'configures correctly' do
           keychain_config_hash = {
             keychain_path: nil,
