@@ -4,6 +4,10 @@ describe Match::Generator do
       require 'cert'
 
       allow(FastlaneCore::Helper).to receive(:mac?).and_return(true)
+      allow(File).to receive(:exist?).and_call_original
+      expect(FastlaneCore::Helper).to receive(:keychain_path).with("login.keychain").exactly(2).times.and_return("fake_keychain_name")
+      expect(File).to receive(:expand_path).with("fake_keychain_name").exactly(2).times.and_return("fake_keychain_path")
+      expect(File).to receive(:exist?).with("fake_keychain_path").exactly(2).times.and_return(true)
 
       config = FastlaneCore::Configuration.create(Cert::Options.available_options, {
         development: true,
@@ -85,8 +89,11 @@ describe Match::Generator do
       allow(fake_runner).to receive(:launch).and_return("fake_path")
 
       allow(FastlaneCore::Helper).to receive(:mac?).and_return(true)
+      allow(File).to receive(:exist?).and_call_original
       expect(FastlaneCore::Helper).to receive(:keychain_path).with("login.keychain").and_return("fake_keychain_name")
       expect(File).to receive(:expand_path).with("fake_keychain_name").and_return("fake_keychain_path")
+      expect(File).to receive(:exist?).with("fake_keychain_path").and_return(true)
+
       params = {
         type: 'development',
         workspace: 'workspace',
@@ -96,9 +103,7 @@ describe Match::Generator do
         keychain_password: 'password'
       }
 
-      expect do
-        Match::Generator.generate_certificate(params, 'development', "workspace")
-      end.to raise_error(FastlaneCore::Interface::FastlaneError, "Keychain not found at path 'fake_keychain_path'")
+      Match::Generator.generate_certificate(params, 'development', "workspace")
     end
 
     it 'configures sigh correctly for nested execution' do
