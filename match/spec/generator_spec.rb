@@ -4,6 +4,7 @@ describe Match::Generator do
       require 'cert'
 
       allow(FastlaneCore::Helper).to receive(:mac?).and_return(true)
+      allow(FastlaneCore::Helper).to receive(:xcode_at_least?).and_return(false)
       allow(File).to receive(:exist?).and_call_original
       expect(FastlaneCore::Helper).to receive(:keychain_path).with("login.keychain").exactly(2).times.and_return("fake_keychain_name")
       expect(File).to receive(:expand_path).with("fake_keychain_name").exactly(2).times.and_return("fake_keychain_path")
@@ -89,6 +90,7 @@ describe Match::Generator do
       allow(fake_runner).to receive(:launch).and_return("fake_path")
 
       allow(FastlaneCore::Helper).to receive(:mac?).and_return(true)
+      allow(FastlaneCore::Helper).to receive(:xcode_at_least?).and_return(false)
       allow(File).to receive(:exist?).and_call_original
       expect(FastlaneCore::Helper).to receive(:keychain_path).with("login.keychain").and_return("fake_keychain_name")
       expect(File).to receive(:expand_path).with("fake_keychain_name").and_return("fake_keychain_path")
