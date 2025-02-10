@@ -9,8 +9,8 @@ describe Match::Generator do
         force: true,
         username: 'username',
         team_id: 'team_id',
-        keychain_path: FastlaneCore::Helper.mac? ? FastlaneCore::Helper.keychain_path("login.keychain") : "",
-        keychain_password: FastlaneCore::Helper.mac? ? 'password' : "",
+        keychain_path: FastlaneCore::Helper.keychain_path("login.keychain"),
+        keychain_password: 'password',
         platform: "ios",
         filename: nil,
         team_name: nil
@@ -25,6 +25,7 @@ describe Match::Generator do
       fake_runner = "fake_runner"
       allow(Cert::Runner).to receive(:new).and_return(fake_runner)
       allow(fake_runner).to receive(:launch).and_return("fake_path")
+      allow(FastlaneCore::Helper).to receive(:mac?).and_return(true)
 
       params = {
         type: 'development',
@@ -36,6 +37,29 @@ describe Match::Generator do
       }
 
       Match::Generator.generate_certificate(params, 'development', "workspace")
+    end
+
+    it 'prohibits keychain values in non-macos' do
+      require 'cert'
+      # This just mocks out the usual behavior of running cert, since that's not what
+      # we're testing
+      fake_runner = "fake_runner"
+      allow(Cert::Runner).to receive(:new).and_return(fake_runner)
+      allow(fake_runner).to receive(:launch).and_return("fake_path")
+      allow(FastlaneCore::Helper).to receive(:mac?).and_return(false)
+
+      params = {
+        type: 'development',
+        workspace: 'workspace',
+        username: 'username',
+        team_id: 'team_id',
+        keychain_name: 'login.keychain',
+        keychain_password: 'password'
+      }
+
+      expect do
+        Match::Generator.generate_certificate(params, 'development', "workspace")
+      end.to raise_error("Invalid default value for keychain_path, doesn't match verify_block")
     end
 
     it 'configures sigh correctly for nested execution' do
