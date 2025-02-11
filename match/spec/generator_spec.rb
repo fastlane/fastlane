@@ -25,6 +25,12 @@ describe Match::Generator do
           keychain_password: 'password'
         }
       }
+      let(:config) {
+        FastlaneCore::Configuration.create(
+          Cert::Options.available_options,
+          common_config_hash.merge(keychain_config_hash)
+        )
+      }
 
       before do
         allow(FastlaneCore::Helper).to receive(:mac?).and_return(is_mac)
@@ -34,21 +40,19 @@ describe Match::Generator do
         allow(File).to receive(:exist?).and_call_original
       end
 
-      context 'in macOS' do
+      context 'on macOS' do
         let(:is_mac) { true }
+        let(:keychain_config_hash) {
+          {
+            keychain_path: FastlaneCore::Helper.keychain_path("login.keychain"),
+            keychain_password: 'password'
+          }
+        }
 
         it 'configures correctly' do
           expect(FastlaneCore::Helper).to receive(:keychain_path).with("login.keychain").exactly(2).times.and_return("fake_keychain_name")
           expect(File).to receive(:expand_path).with("fake_keychain_name").exactly(2).times.and_return("fake_keychain_path")
           expect(File).to receive(:exist?).with("fake_keychain_path").exactly(2).times.and_return(true)
-          keychain_config_hash = {
-            keychain_path: FastlaneCore::Helper.keychain_path("login.keychain"),
-            keychain_password: 'password'
-          }
-          config = FastlaneCore::Configuration.create(
-            Cert::Options.available_options,
-            common_config_hash.merge(keychain_config_hash)
-          )
           expect(Cert).to receive(:config=).with(a_configuration_matching(config))
           Match::Generator.generate_certificate(params, 'development', "workspace")
         end
@@ -61,36 +65,46 @@ describe Match::Generator do
         end
       end
 
-      context 'in non-macOS' do
+      context 'on non-macOS' do
         let(:is_mac) { false }
-
-        it 'configures correctly' do
-          keychain_config_hash = {
+        let(:keychain_config_hash) {
+          {
             keychain_path: nil,
             keychain_password: nil
           }
-          config = FastlaneCore::Configuration.create(
-            Cert::Options.available_options,
-            common_config_hash.merge(keychain_config_hash)
-          )
-          expect(FastlaneCore::Helper).not_to receive(:keychain_path)
-          expect(File).not_to receive(:expand_path)
-          expect(Cert).to receive(:config=).with(a_configuration_matching(config))
-          Match::Generator.generate_certificate(params, 'development', "workspace")
+        }
+
+        context 'with keychain_path' do
+          let(:keychain_config_hash) {
+            { keychain_path: "fake_keychain_path", keychain_password: "password" }
+          }
+          it 'raises an error' do
+            expect {
+              config
+            }.to raise_error(FastlaneCore::Interface::FastlaneError, "Keychain is not supported on platforms other than macOS")
+          end
         end
 
-        it 'does not receive keychain_path' do
-          expect(FastlaneCore::Helper).not_to receive(:keychain_path)
-          expect(File).not_to receive(:expand_path)
-          Match::Generator.generate_certificate(params, 'development', "workspace")
+        context 'without keychain_path' do
+          it 'configures correctly' do
+            expect(FastlaneCore::Helper).not_to receive(:keychain_path)
+            expect(File).not_to receive(:expand_path)
+            expect(Cert).to receive(:config=).with(a_configuration_matching(config))
+            Match::Generator.generate_certificate(params, 'development', "workspace")
+          end
+
+          it 'does not receive keychain_path' do
+            expect(FastlaneCore::Helper).not_to receive(:keychain_path)
+            expect(File).not_to receive(:expand_path)
+            Match::Generator.generate_certificate(params, 'development', "workspace")
+          end
         end
       end
     end
 
     describe 'sigh' do
-      require 'sigh'
-      it 'configures correctly for nested execution' do
-        config = FastlaneCore::Configuration.create(Sigh::Options.available_options, {
+      let(:config) {
+        FastlaneCore::Configuration.create(Sigh::Options.available_options, {
           app_identifier: 'app_identifier',
           development: true,
           output_path: 'workspace/profiles/development',
@@ -105,7 +119,10 @@ describe Match::Generator do
           fail_on_name_taken: false,
           include_all_certificates: true,
         })
+      }
 
+      require 'sigh'
+      it 'configures correctly for nested execution' do
         # This is the important part. We need to see the right configuration come through
         # for sigh
         expect(Sigh).to receive(:config=).with(a_configuration_matching(config))
