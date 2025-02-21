@@ -777,13 +777,14 @@ module Spaceship
       parse_response(response)
     end
 
-    def create_key!(name: nil, service_configs: nil)
+    def create_key!(name: nil, service_configs: nil, scope: nil)
       fetch_csrf_token_for_keys
 
       params = {
         name: name,
         serviceConfigurations: service_configs,
-        teamId: team_id
+        teamId: team_id,
+        scope: scope
       }
 
       response = request(:post, 'account/auth/key/create') do |req|

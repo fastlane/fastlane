@@ -384,6 +384,11 @@ the developer website<a/>.<br />"
         subject.create_key!(name: 'some name', service_configs: [])
         expect(WebMock).to have_requested(:post, api_root + '/create')
       end
+
+      it "allows custom scope to be set" do
+        response = subject.create_key!(name: "Test Key", scope: "team")
+        expect(response["scope"]).to eq("team")
+      end
     end
 
     describe 'revoke_key!' do
