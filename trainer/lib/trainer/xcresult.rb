@@ -264,25 +264,6 @@ module Trainer
           testsuite.add_element(sub_suite.to_xml)
         end
 
-        # Add properties for configuration and device
-        properties = REXML::Element.new('properties')
-        
-        if @configuration
-          config_prop = REXML::Element.new('property')
-          config_prop.attributes['name'] = 'configuration'
-          config_prop.attributes['value'] = @configuration['configurationName']
-          properties.add_element(config_prop)
-        end
-
-        if @device
-          device_prop = REXML::Element.new('property')
-          device_prop.attributes['name'] = 'device'
-          device_prop.attributes['value'] = @device['name'] || 'Unknown Device'
-          properties.add_element(device_prop)
-        end
-
-        testsuite.add_element(properties) if properties.elements.any?
-
         # Add summary attributes
         testsuite.attributes['tests'] = test_cases_count.to_s
         testsuite.attributes['failures'] = failures_count.to_s
@@ -317,17 +298,17 @@ module Trainer
     end
 
     class TestPlan
-      attr_reader :test_suites, :name
+      attr_reader :test_suites, :name, :configurations, :devices
 
-      def initialize(test_suites:, name: 'XCResult Test Run')
+      def initialize(test_suites:, configurations: [], devices: [])
         @test_suites = test_suites
-        @name = name
+        @configurations = configurations
+        @devices = devices
       end
 
       def to_xml
         # Create the root testsuites element
         testsuites = REXML::Element.new('testsuites')
-        testsuites.attributes['name'] = name
         
         # Add each test suite to the root
         test_suites.each do |suite|
@@ -343,12 +324,33 @@ module Trainer
         # Convert to XML string with prologue
         doc = REXML::Document.new
         doc << REXML::XMLDecl.new('1.0', 'UTF-8')
-        doc.add(testsuites)
+
+        unless @configurations.empty? && @devices.empty?
+          # Add properties for configuration and device
+          properties = REXML::Element.new('properties')
         
+          @configurations.each do |config|
+            config_prop = REXML::Element.new('property')
+            config_prop.attributes['name'] = 'testPlanConfiguration'
+            config_prop.attributes['value'] = config['configurationName']
+            properties.add_element(config_prop)
+          end
+  
+          @devices.each do |device|
+            device_prop = REXML::Element.new('property')
+            device_prop.attributes['name'] = 'device'
+            device_prop.attributes['value'] = "#{device.fetch('modelName', 'Unknown Device')} (#{device.fetch('osVersion', 'Unknown OS Version')})"
+            properties.add_element(device_prop)
+          end
+        
+          testsuites.add_element(properties) if properties.elements.any?
+        end
+        
+        doc.add(testsuites)
+
         formatter = REXML::Formatters::Pretty.new
         output = String.new
         formatter.write(doc, output)
-        puts "---output: #{output}"
         output
       end
     end
@@ -380,10 +382,10 @@ module Trainer
 
           # Convert test plan node's children (test bundles) to TestSuite objects
           test_suites = test_plan_node['children']&.map do |test_bundle|
-            TestSuite.new(node: test_bundle, configurations: configurations, devices: devices)
+            TestSuite.new(node: test_bundle)
           end || []
 
-          TestPlan.new(test_suites: test_suites)
+          TestPlan.new(test_suites: test_suites, configurations: configurations, devices: devices)
         end
 
         private

@@ -1,5 +1,5 @@
 <?xml version='1.0' encoding='UTF-8'?>
-<testsuites name='XCResult Test Run' tests='91' failures='26' skipped='13' time='103.230099'>
+<testsuites tests='91' failures='26' skipped='13' time='103.230099'>
   <testsuite name='FastlaneTrainerExampleUITests' time='94.0' tests='14' failures='8' skipped='0'>
     <testsuite name='FastlaneTrainerExampleUITests' time='74.0' tests='10' failures='8' skipped='0'>
       <testcase name='testAccessibilityAndScreenshots()' classname='FastlaneTrainerExampleUITests' time='6.0'>
@@ -75,9 +75,6 @@
         </properties>
       </testcase>
     </testsuite>
-    <properties>
-      <property name='device' value='Unknown Device'/>
-    </properties>
   </testsuite>
   <testsuite name='FastlaneTrainerExampleTests' time='8.446939' tests='65' failures='16' skipped='12'>
     <testsuite name='FastlaneTrainer Tests' time='8.446939' tests='65' failures='16' skipped='12'>
@@ -495,9 +492,6 @@
         </testcase>
       </testsuite>
     </testsuite>
-    <properties>
-      <property name='device' value='Unknown Device'/>
-    </properties>
   </testsuite>
   <testsuite name='FastlaneTrainerExampleXCTests' time='0.78316' tests='12' failures='2' skipped='1'>
     <testsuite name='FastlaneTrainerExampleXCTests' time='0.78316' tests='12' failures='2' skipped='1'>
@@ -529,8 +523,9 @@
       <testcase name='testPlatformSpecific()' classname='FastlaneTrainerExampleXCTests' time='0.00059'/>
       <testcase name='testThrowingOperation()' classname='FastlaneTrainerExampleXCTests' time='0.00057'/>
     </testsuite>
-    <properties>
-      <property name='device' value='Unknown Device'/>
-    </properties>
   </testsuite>
+  <properties>
+    <property name='testPlanConfiguration' value='MyTestPlanConfig'/>
+    <property name='device' value='iPhone 16 Pro (18.2)'/>
+  </properties>
 </testsuites>
