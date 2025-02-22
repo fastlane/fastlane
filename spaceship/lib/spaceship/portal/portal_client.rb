@@ -777,17 +777,27 @@ module Spaceship
       parse_response(response)
     end
 
-    def create_key!(name: nil, service_configs: nil, scope: nil)
+    def create_key!(name: nil, service_configs: nil, scope: 'team')
       fetch_csrf_token_for_keys
+
+      # Format service configurations for APNS
+      service_configs_requests = (service_configs || []).map do |config|
+        {
+          isNew: true,
+          serviceId: "U27F4V844T",
+          identifiers: {},
+          environment: "all",
+          scope: scope
+        }.merge(config) # Merge any passed config properties
+      end
 
       params = {
         name: name,
-        serviceConfigurations: service_configs,
-        teamId: team_id,
-        scope: scope
+        serviceConfigurationsRequests: service_configs_requests,
+        teamId: team_id
       }
 
-      response = request(:post, 'account/auth/key/create') do |req|
+      response = request(:post, 'account/auth/key/v2/create') do |req|
         req.headers['Content-Type'] = 'application/json'
         req.body = params.to_json
       end
