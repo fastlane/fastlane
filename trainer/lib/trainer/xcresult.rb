@@ -274,16 +274,6 @@ module Trainer
 
       private
 
-      def parse_duration(duration_str)
-        return 0.0 if duration_str.nil?
-        
-        # Handle comma-separated duration (Xcode 16 format)
-        duration_str = duration_str.gsub(',', '.')
-        
-        # Remove 's' suffix and convert to float
-        duration_str.chomp('s').to_f
-      end
-
       def process_children(children)
         children.each do |child|
           case child['nodeType']
