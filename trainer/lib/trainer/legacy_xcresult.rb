@@ -1,5 +1,5 @@
 module Trainer
-  module XCResult
+  module LegacyXCResult
     # Model attributes and relationships taken from running the following command:
     # xcrun xcresulttool formatDescription
 
@@ -393,6 +393,195 @@ module Trainer
         end
 
         return new_message
+      end
+    end
+
+    module Parser
+      class << self
+        def parse_xcresult(path, output_remove_retry_attempts: false)
+          require 'shellwords'
+          require 'json'
+          path = Shellwords.escape(path)
+
+          # Executes xcresulttool to get JSON format of the result bundle object
+          # Hotfix: From Xcode 16 beta 3 'xcresulttool get --format json' has been deprecated; '--legacy' flag required to keep on using the command
+          xcresulttool_cmd = generate_cmd_parse_xcresult(path)
+
+          result_bundle_object_raw = execute_cmd(xcresulttool_cmd)
+          result_bundle_object = JSON.parse(result_bundle_object_raw)
+
+          # Parses JSON into ActionsInvocationRecord to find a list of all ids for ActionTestPlanRunSummaries
+          actions_invocation_record = Trainer::LegacyXCResult::ActionsInvocationRecord.new(result_bundle_object)
+          test_refs = actions_invocation_record.actions.map do |action|
+            action.action_result.tests_ref
+          end.compact
+          ids = test_refs.map(&:id)
+
+          # Maps ids into ActionTestPlanRunSummaries by executing xcresulttool to get JSON
+          # containing specific information for each test summary,
+          summaries = ids.map do |id|
+            raw = execute_cmd("#{xcresulttool_cmd} --id #{id}")
+            json = JSON.parse(raw)
+            Trainer::LegacyXCResult::ActionTestPlanRunSummaries.new(json)
+          end
+
+          # Converts the ActionTestPlanRunSummaries to data for junit generator
+          failures = actions_invocation_record.issues.test_failure_summaries || []
+          summaries_to_data(summaries, failures, output_remove_retry_attempts: output_remove_retry_attempts)
+        end
+
+        private
+
+        def summaries_to_data(summaries, failures, output_remove_retry_attempts: false)
+          # Gets flat list of all ActionTestableSummary
+          all_summaries = summaries.map(&:summaries).flatten
+          testable_summaries = all_summaries.map(&:testable_summaries).flatten
+
+          summaries_to_names = test_summaries_to_configuration_names(all_summaries)
+
+          # Maps ActionTestableSummary to rows for junit generator
+          rows = testable_summaries.map do |testable_summary|
+            all_tests = testable_summary.all_tests.flatten
+
+            # Used by store number of passes and failures by identifier
+            # This is used when Xcode 13 (and up) retries tests
+            # The identifier is duplicated until test succeeds or max count is reached
+            tests_by_identifier = {}
+
+            test_rows = all_tests.map do |test|
+              identifier = "#{test.parent.name}.#{test.name}"
+              test_row = {
+                identifier: identifier,
+                name: test.name,
+                duration: test.duration,
+                status: test.test_status,
+                test_group: test.parent.name,
+
+                # These don't map to anything but keeping empty strings
+                guid: ""
+              }
+
+              info = tests_by_identifier[identifier] || {}
+              info[:failure_count] ||= 0
+              info[:skip_count] ||= 0
+              info[:success_count] ||= 0
+
+              retry_count = info[:retry_count]
+              if retry_count.nil?
+                retry_count = 0
+              else
+                retry_count += 1
+              end
+              info[:retry_count] = retry_count
+
+              # Set failure message if failure found
+              failure = test.find_failure(failures)
+              if failure
+                test_row[:failures] = [{
+                  file_name: "",
+                  line_number: 0,
+                  message: "",
+                  performance_failure: {},
+                  failure_message: failure.failure_message
+                }]
+
+                info[:failure_count] += 1
+              elsif test.test_status == "Skipped"
+                test_row[:skipped] = true
+                info[:skip_count] += 1
+              else
+                info[:success_count] = 1
+              end
+
+              tests_by_identifier[identifier] = info
+
+              test_row
+            end
+
+            # Remove retry attempts from the count and test rows
+            if output_remove_retry_attempts
+              test_rows = test_rows.reject do |test_row|
+                remove = false
+
+                identifier = test_row[:identifier]
+                info = tests_by_identifier[identifier]
+
+                # Remove if this row is a retry and is a failure
+                if info[:retry_count] > 0
+                  remove = !(test_row[:failures] || []).empty?
+                end
+
+                # Remove all failure and retry count if test did eventually pass
+                if remove
+                  info[:failure_count] -= 1
+                  info[:retry_count] -= 1
+                  tests_by_identifier[identifier] = info
+                end
+
+                remove
+              end
+            end
+
+            row = {
+              project_path: testable_summary.project_relative_path,
+              target_name: testable_summary.target_name,
+              test_name: testable_summary.name,
+              configuration_name: summaries_to_names[testable_summary],
+              duration: all_tests.map(&:duration).inject(:+),
+              tests: test_rows
+            }
+
+            row[:number_of_tests] = row[:tests].count
+            row[:number_of_failures] = row[:tests].find_all { |a| (a[:failures] || []).count > 0 }.count
+
+            # Used for seeing if any tests continued to fail after all of the Xcode 13 (and up) retries have finished
+            unique_tests = tests_by_identifier.values || []
+            row[:number_of_tests_excluding_retries] = unique_tests.count
+            row[:number_of_skipped] = unique_tests.map { |a| a[:skip_count] }.inject(:+)
+            row[:number_of_failures_excluding_retries] = unique_tests.find_all { |a| (a[:success_count] + a[:skip_count]) == 0 }.count
+            row[:number_of_retries] = unique_tests.map { |a| a[:retry_count] }.inject(:+)
+
+            row
+          end
+
+          rows
+        end
+
+        def test_summaries_to_configuration_names(test_summaries)
+          summary_to_name = {}
+          test_summaries.each do |summary|
+            summary.testable_summaries.each do |testable_summary|
+              summary_to_name[testable_summary] = summary.name
+            end
+          end
+          summary_to_name
+        end
+
+        def generate_cmd_parse_xcresult(path)
+          xcresulttool_cmd = %W(
+            xcrun
+            xcresulttool
+            get
+            --format
+            json
+            --path
+            #{path}
+          )
+
+          # e.g. DEVELOPER_DIR=/Applications/Xcode_16_beta_3.app
+          # xcresulttool version 23021, format version 3.53 (current)
+          match = `xcrun xcresulttool version`.match(/xcresulttool version (?<version>[\d.]+)/)
+          version = match[:version]
+          xcresulttool_cmd << '--legacy' if Gem::Version.new(version) >= Gem::Version.new(23_021)
+
+          xcresulttool_cmd.join(' ')
+        end
+
+        def execute_cmd(cmd)
+          output = `#{cmd}`
+          raise "Failed to execute - #{cmd}" unless $?.success?
+          return output
+        end
       end
     end
   end
