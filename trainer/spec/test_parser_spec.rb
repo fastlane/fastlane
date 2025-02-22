@@ -291,53 +291,6 @@ describe Trainer do
       allow(Trainer::XCResult::Parser).to receive(:xcresult_to_json).with(xcresult_path).and_return(json_fixture)
     end
 
-    describe ".parse_xcresult" do
-      context "with Xcode 16 xcresult bundle" do
-        xit "generates the correct XML representation of test results" do
-          # Parse the xcresult
-          test_plan = Trainer::XCResult::Parser.parse_xcresult(path: xcresult_path)
-          
-          # Generate XML
-          generated_xml = test_plan.to_xml
-
-          # Read expected XML
-          expected_xml = File.read(expected_xml_path)
-
-          # Compare XML content
-          # Note: We use a normalized comparison to handle whitespace and formatting differences
-          normalized_generated = normalize_xml(generated_xml)
-          normalized_expected = normalize_xml(expected_xml)
-
-          expect(normalized_generated).to eq(normalized_expected)
-        end
-      end
-    end
-
-    # Helper method to normalize XML for comparison
-    def normalize_xml(xml_string)
-      # Remove whitespace, newlines, and sort attributes
-      doc = REXML::Document.new(xml_string)
-      
-      # Recursive method to sort attributes
-      def sort_attributes(element)
-        # Sort attributes alphabetically
-        element.attributes.keys.sort.each do |key|
-          element.attributes[key] = element.attributes.delete(key)
-        end
-
-        # Recursively sort child elements
-        element.elements.each { |child| sort_attributes(child) }
-      end
-
-      sort_attributes(doc.root)
-
-      # Convert to string with minimal formatting
-      output = String.new
-      formatter = REXML::Formatters::Default.new
-      formatter.write(doc, output)
-      output
-    end
-
     describe 'Xcode 16 xcresult bundle' do
       def normalize_xml(xml_string)
         doc = REXML::Document.new(xml_string)
