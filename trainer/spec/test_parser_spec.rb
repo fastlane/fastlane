@@ -32,7 +32,7 @@ describe Trainer do
 
       before do
         allow(File).to receive(:expand_path).with(xcresult_sample_path).and_return(xcresult_sample_path)
-        allow(Trainer::LegacyXCResult::Parser).to receive(:`).with('xcrun xcresulttool version').and_return(version)
+        allow(Trainer::XCResult::Parser).to receive(:`).with('xcrun xcresulttool version').and_return(version)
       end
 
       context 'with >= Xcode 16 beta 3' do
@@ -45,7 +45,7 @@ describe Trainer do
       end
 
       context 'with < Xcode 16 beta 3' do
-        let(:version) { 'xcresulttool version 22608.2, format version 3.49 (current)' }
+        let(:version) { 'xcresulttool version 22608, format version 3.49 (current)' }
         let(:expected) { "xcrun xcresulttool get --format json --path #{xcresult_sample_path}" }
 
         it 'should not pass `--legacy`', requires_xcode: true do
@@ -55,9 +55,14 @@ describe Trainer do
     end
 
     describe "Stores the data in a useful format" do
+      before do
+        allow(Trainer::XCResult::Parser).to receive(:supports_xcode16_xcresulttool?).and_return(true)
+      end
+      let(:config) { { force_legacy_xcresulttool: true } }
+
       describe "#tests_successful?" do
         it "returns false if tests failed" do
-          tp = Trainer::TestParser.new("./trainer/spec/fixtures/Valid1.plist")
+          tp = Trainer::TestParser.new("./trainer/spec/fixtures/Valid1.plist", config)
           expect(tp.tests_successful?).to eq(false)
         end
       end
@@ -118,7 +123,7 @@ describe Trainer do
       end
 
       it "works as expected with xcresult", requires_xcode: true do
-        tp = Trainer::TestParser.new("./trainer/spec/fixtures/Test.test_result.xcresult")
+        tp = Trainer::TestParser.new("./trainer/spec/fixtures/Test.test_result.xcresult", config)
         expect(tp.data).to eq([
                                 {
                                   project_path: "Test.xcodeproj",
@@ -229,7 +234,7 @@ describe Trainer do
 
       it "still produces a test failure message when file url is missing", requires_xcode: true do
         allow_any_instance_of(Trainer::LegacyXCResult::TestFailureIssueSummary).to receive(:document_location_in_creating_workspace).and_return(nil)
-        tp = Trainer::TestParser.new("./trainer/spec/fixtures/Test.test_result.xcresult")
+        tp = Trainer::TestParser.new("./trainer/spec/fixtures/Test.test_result.xcresult", config)
         test_failures = tp.data.last[:tests].select { |t| t[:failures] }
         failure_messages = test_failures.map { |tf| tf[:failures].first[:failure_message] }
         expect(failure_messages).to eq(["XCTAssertTrue failed", "XCTAssertTrue failed"])
@@ -237,7 +242,7 @@ describe Trainer do
       end
 
       it "works as expected with xcresult with spaces", requires_xcode: true do
-        tp = Trainer::TestParser.new("./trainer/spec/fixtures/Test.with_spaces.xcresult")
+        tp = Trainer::TestParser.new("./trainer/spec/fixtures/Test.with_spaces.xcresult", config)
         expect(tp.data).to eq([
                                 {
                                   project_path: "SpaceTests.xcodeproj",
@@ -272,6 +277,61 @@ describe Trainer do
                                   number_of_retries: 0
                                 }
                               ])
+      end
+    end
+  end
+
+  describe Trainer::XCResult::Parser do
+    it 'generates same data for legacy and new commands' do
+      xcresult_path = File.expand_path('../fixtures/Test.test_result.xcresult', __FILE__)
+      
+      keys_to_compare = [
+        :number_of_tests,
+        :number_of_failures,
+        :number_of_tests_excluding_retries,
+        :number_of_failures_excluding_retries,
+        :number_of_retries,
+        :number_of_skipped
+      ]
+  
+      test_plan = Trainer::XCResult::Parser.parse_xcresult(path: xcresult_path)
+      new_parser_data = test_plan.map do |suite|
+        suite.to_hash.slice(*keys_to_compare)
+      end
+  
+      legacy_parser_data = Trainer::LegacyXCResult::Parser.parse_xcresult(path: xcresult_path).map do |hash|
+        hash.slice(*keys_to_compare)
+      end
+      
+      expect(legacy_parser_data).to eq(new_parser_data)
+    end
+
+    describe 'Xcode 16 xcresult bundle' do
+      let(:xcresult_path) { File.expand_path('../fixtures/Xcode16-Mixed-XCTest-SwiftTesting.xcresult', __FILE__) }
+      let(:json_fixture_path) { File.expand_path("../fixtures/Xcode16-Mixed-XCTest-SwiftTesting.json", __FILE__) }
+      let(:json_fixture) { JSON.parse(File.read(json_fixture_path)) }
+
+      it 'generates correct JUnit XML including retries' do
+        # Uncomment this if you want to bypass the xcresult_to_json call during testing
+        # allow(Trainer::XCResult::Parser).to receive(:xcresult_to_json).with(xcresult_path).and_return(json_fixture)
+
+        test_plan = Trainer::XCResult::Parser.parse_xcresult(path: xcresult_path)
+        junit_xml = test_plan.to_xml
+
+        expected_xml_path = File.expand_path('../fixtures/Xcode16-Mixed-XCTest-SwiftTesting-WithRetries.junit', __FILE__)
+        expected_xml = File.read(expected_xml_path)
+        expect(junit_xml.chomp).to eq(expected_xml.chomp)
+      end
+
+      it 'generates correct JUnit XML excluding retries' do
+        # Uncomment this if you want to bypass the xcresult_to_json call during testing
+        # allow(Trainer::XCResult::Parser).to receive(:xcresult_to_json).with(xcresult_path).and_return(json_fixture)
+
+        test_plan = Trainer::XCResult::Parser.parse_xcresult(path: xcresult_path, output_remove_retry_attempts: true)
+        junit_xml = test_plan.to_xml
+        expected_xml_path = File.expand_path('../fixtures/Xcode16-Mixed-XCTest-SwiftTesting-WithoutRetries.junit', __FILE__)
+        expected_xml = File.read(expected_xml_path)
+        expect(junit_xml.chomp).to eq(expected_xml.chomp)
       end
     end
   end

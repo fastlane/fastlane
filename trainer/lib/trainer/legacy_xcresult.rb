@@ -398,7 +398,7 @@ module Trainer
 
     module Parser
       class << self
-        def parse_xcresult(path, output_remove_retry_attempts: false)
+        def parse_xcresult(path:, output_remove_retry_attempts: false)
           require 'shellwords'
           require 'json'
           path = Shellwords.escape(path)
@@ -568,11 +568,7 @@ module Trainer
             #{path}
           )
 
-          # e.g. DEVELOPER_DIR=/Applications/Xcode_16_beta_3.app
-          # xcresulttool version 23021, format version 3.53 (current)
-          match = `xcrun xcresulttool version`.match(/xcresulttool version (?<version>[\d.]+)/)
-          version = match[:version]
-          xcresulttool_cmd << '--legacy' if Gem::Version.new(version) >= Gem::Version.new(23_021)
+          xcresulttool_cmd << '--legacy' if Trainer::XCResult::Parser.supports_xcode16_xcresulttool?
 
           xcresulttool_cmd.join(' ')
         end
