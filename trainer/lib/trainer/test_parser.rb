@@ -100,7 +100,7 @@ module Trainer
       UI.user_error!("File not found at path '#{path}'") unless File.exist?(path)
 
       if File.directory?(path) && path.end_with?(".xcresult")
-        klass = XCResult::Parser.supports_xcode16_xcresulttool? && !config[:use_legacy_xcresulttool] ? XCResult::Parser : LegacyXCResult::Parser
+        klass = XCResult::Parser.supports_xcode16_xcresulttool? && !config[:force_legacy_xcresulttool] ? XCResult::Parser : LegacyXCResult::Parser
         self.data = klass.parse_xcresult(path: path, output_remove_retry_attempts: config[:output_remove_retry_attempts])
       else
         file_content = File.read(path)

@@ -58,7 +58,7 @@ describe Trainer do
       before do
         allow(Trainer::XCResult::Parser).to receive(:supports_xcode16_xcresulttool?).and_return(true)
       end
-      let(:config) { { use_legacy_xcresulttool: true } }
+      let(:config) { { force_legacy_xcresulttool: true } }
 
       describe "#tests_successful?" do
         it "returns false if tests failed" do
