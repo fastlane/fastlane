@@ -1,6 +1,7 @@
 require 'shellwords'
 require 'json'
 require 'open3'
+require 'rexml/document'
 
 module Trainer
   module XCResult
@@ -20,7 +21,7 @@ module Trainer
       attr_reader :attachments
       attr_reader :tags
 
-      def initialize(node)
+      def initialize(node:)
         @name = node['name']
         @identifier = node['nodeIdentifier']
         @duration = parse_duration(node['duration'])
@@ -44,6 +45,71 @@ module Trainer
 
       def skipped?
         @result == 'Skipped'
+      end
+
+      def to_xml
+        testcase = REXML::Element.new('testcase')
+        testcase.attributes['name'] = @name
+        testcase.attributes['classname'] = @test_group
+        testcase.attributes['time'] = @duration.to_s
+
+        # Handle test result
+        if failed?
+          failure = REXML::Element.new('failure')
+          failure.attributes['message'] = @failure_messages.first if @failure_messages.any?
+          testcase.add_element(failure)
+        elsif skipped?
+          testcase.add_element(REXML::Element.new('skipped'))
+        end
+
+        # Add properties if available
+        if @arguments.any? || @repetitions.any? || @source_references.any? || @attachments.any? || @tags.any?
+          properties = REXML::Element.new('properties')
+          
+          # Add arguments as properties
+          @arguments.each_with_index do |arg, index|
+            prop = REXML::Element.new('property')
+            prop.attributes['name'] = "argument#{index + 1}"
+            prop.attributes['value'] = arg
+            properties.add_element(prop)
+          end
+
+          # Add repetitions as properties
+          @repetitions.each_with_index do |rep, index|
+            prop = REXML::Element.new('property')
+            prop.attributes['name'] = "repetition#{index + 1}"
+            prop.attributes['value'] = "#{rep[:name]} (#{rep[:result]})"
+            properties.add_element(prop)
+          end
+
+          # Add source references as properties
+          @source_references.each_with_index do |ref, index|
+            prop = REXML::Element.new('property')
+            prop.attributes['name'] = "source_reference#{index + 1}"
+            prop.attributes['value'] = ref
+            properties.add_element(prop)
+          end
+
+          # Add attachments as properties
+          @attachments.each_with_index do |attachment, index|
+            prop = REXML::Element.new('property')
+            prop.attributes['name'] = "attachment#{index + 1}"
+            prop.attributes['value'] = attachment
+            properties.add_element(prop)
+          end
+
+          # Add tags as properties
+          @tags.each_with_index do |tag, index|
+            prop = REXML::Element.new('property')
+            prop.attributes['name'] = "tag#{index + 1}"
+            prop.attributes['value'] = tag
+            properties.add_element(prop)
+          end
+
+          testcase.add_element(properties)
+        end
+
+        testcase
       end
 
       private
@@ -116,7 +182,7 @@ module Trainer
       attr_reader :configuration
       attr_reader :device
 
-      def initialize(node, configurations = [], devices = [])
+      def initialize(node:, configurations: [], devices: [])
         @name = node['name']
         @identifier = node['nodeIdentifier']
         @type = node['nodeType']
@@ -146,6 +212,48 @@ module Trainer
         @result == 'Skipped'
       end
 
+      def to_xml
+        testsuite = REXML::Element.new('testsuite')
+        testsuite.attributes['name'] = @name
+        testsuite.attributes['time'] = @duration.to_s
+
+        # Add test cases
+        @test_cases.each do |test_case|
+          testsuite.add_element(test_case.to_xml)
+        end
+
+        # Add sub-suites
+        @sub_suites.each do |sub_suite|
+          testsuite.add_element(sub_suite.to_xml)
+        end
+
+        # Add properties for configuration and device
+        properties = REXML::Element.new('properties')
+        
+        if @configuration
+          config_prop = REXML::Element.new('property')
+          config_prop.attributes['name'] = 'configuration'
+          config_prop.attributes['value'] = @configuration['configurationName']
+          properties.add_element(config_prop)
+        end
+
+        if @device
+          device_prop = REXML::Element.new('property')
+          device_prop.attributes['name'] = 'device'
+          device_prop.attributes['value'] = @device['name'] || 'Unknown Device'
+          properties.add_element(device_prop)
+        end
+
+        testsuite.add_element(properties) if properties.elements.any?
+
+        # Add summary attributes
+        testsuite.attributes['tests'] = @test_cases.count.to_s
+        testsuite.attributes['failures'] = @test_cases.count { |tc| tc.failed? }.to_s
+        testsuite.attributes['skipped'] = @test_cases.count { |tc| tc.skipped? }.to_s
+
+        testsuite
+      end
+
       private
 
       def parse_duration(duration_str)
@@ -162,9 +270,9 @@ module Trainer
         children.each do |child|
           case child['nodeType']
           when 'Test Case'
-            @test_cases << TestCase.new(child)
+            @test_cases << TestCase.new(node: child)
           when 'Test Suite', 'Unit test bundle', 'UI test bundle'
-            @sub_suites << TestSuite.new(child)
+            @sub_suites << TestSuite.new(node: child)
           end
         end
       end
@@ -183,7 +291,42 @@ module Trainer
           Gem::Version.new(version) >= Gem::Version.new(23_021)
         end
 
-        def parse_xcresult(path)
+        class TestPlan
+          attr_reader :test_suites, :name
+
+          def initialize(test_suites:, name: 'XCResult Test Run')
+            @test_suites = test_suites
+            @name = name
+          end
+
+          def to_xml
+            # Create the root testsuites element
+            testsuites = REXML::Element.new('testsuites')
+            testsuites.attributes['name'] = name
+            
+            # Add each test suite to the root
+            test_suites.each do |suite|
+              testsuites.add_element(suite.to_xml)
+            end
+
+            # Calculate total summary
+            testsuites.attributes['tests'] = test_suites.sum { |suite| suite.test_cases.count }.to_s
+            testsuites.attributes['failures'] = test_suites.sum { |suite| suite.test_cases.count { |tc| tc.failed? } }.to_s
+            testsuites.attributes['skipped'] = test_suites.sum { |suite| suite.test_cases.count { |tc| tc.skipped? } }.to_s
+            testsuites.attributes['time'] = test_suites.sum { |suite| suite.duration }.to_s
+
+            # Convert to XML string
+            doc = REXML::Document.new
+            doc.add(testsuites)
+            
+            formatter = REXML::Formatters::Pretty.new
+            output = String.new
+            formatter.write(doc, output)
+            output
+          end
+        end
+
+        def parse_xcresult(path:)
           json = xcresult_to_json(path)
           
           # Extract configurations and devices
@@ -193,12 +336,14 @@ module Trainer
           # Find the test plan node (root of test results)
           test_plan_node = json['testNodes']&.find { |node| node['nodeType'] == 'Test Plan' }
           
-          return [] if test_plan_node.nil?
+          return TestPlan.new(test_suites: []) if test_plan_node.nil?
 
           # Convert test plan node's children (test bundles) to TestSuite objects
-          test_plan_node['children']&.map do |test_bundle|
-            TestSuite.new(test_bundle, configurations, devices)
+          test_suites = test_plan_node['children']&.map do |test_bundle|
+            TestSuite.new(node: test_bundle, configurations: configurations, devices: devices)
           end || []
+
+          TestPlan.new(test_suites: test_suites)
         end
 
         private

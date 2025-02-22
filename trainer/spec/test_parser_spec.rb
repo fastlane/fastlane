@@ -275,4 +275,98 @@ describe Trainer do
       end
     end
   end
+
+  describe Trainer::XCResult::Parser do
+    describe ".parse_xcresult" do
+      context "with Xcode 16 mixed test results" do
+        let(:json_fixture_path) { File.expand_path("../fixtures/Xcode16Mixed.json", __FILE__) }
+        let(:json_fixture) { JSON.parse(File.read(json_fixture_path)) }
+        let(:expected_xml_path) { File.expand_path('../fixtures/Xcode16Mixed.junit', __FILE__) }
+
+        before do
+          allow(Trainer::XCResult::Parser).to receive(:xcresult_to_json).and_return(json_fixture)
+        end
+
+        it "generates the correct XML representation of test results" do
+          # Parse the xcresult
+          test_plan = Trainer::XCResult::Parser.parse_xcresult(path: json_fixture_path)
+          
+          # Generate XML
+          generated_xml = test_plan.to_xml
+
+          # Read expected XML
+          expected_xml = File.read(expected_xml_path)
+
+          # Compare XML content
+          # Note: We use a normalized comparison to handle whitespace and formatting differences
+          normalized_generated = normalize_xml(generated_xml)
+          normalized_expected = normalize_xml(expected_xml)
+
+          expect(normalized_generated).to eq(normalized_expected)
+        end
+      end
+    end
+
+    # Helper method to normalize XML for comparison
+    def normalize_xml(xml_string)
+      # Remove whitespace, newlines, and sort attributes
+      doc = REXML::Document.new(xml_string)
+      
+      # Recursive method to sort attributes
+      def sort_attributes(element)
+        # Sort attributes alphabetically
+        element.attributes.keys.sort.each do |key|
+          element.attributes[key] = element.attributes.delete(key)
+        end
+
+        # Recursively sort child elements
+        element.elements.each { |child| sort_attributes(child) }
+      end
+
+      sort_attributes(doc.root)
+
+      # Convert to string with minimal formatting
+      output = String.new
+      formatter = REXML::Formatters::Default.new
+      formatter.write(doc, output)
+      output
+    end
+
+    describe 'Xcode 16 Mixed Test Results' do
+      let(:fixture_path) { File.expand_path('../fixtures/Xcode16Mixed.json', __FILE__) }
+      let(:expected_xml_path) { File.expand_path('../fixtures/Xcode16Mixed.junit', __FILE__) }
+
+      before do
+        allow(Trainer::XCResult::Parser).to receive(:xcresult_to_json).and_return(JSON.parse(File.read(fixture_path)))
+      end
+
+      def normalize_xml(xml_string)
+        doc = REXML::Document.new(xml_string)
+        
+        # Sort attributes for consistent comparison
+        doc.root.attributes.keys.sort.each do |key|
+          doc.root.attributes[key] = doc.root.attributes[key]
+        end
+
+        # Normalize whitespace and sort
+        formatted_xml = ""
+        formatter = REXML::Formatters::Pretty.new
+        formatter.compact = true
+        formatter.write(doc, formatted_xml)
+        formatted_xml.gsub(/\s+/, ' ').strip
+      end
+
+      it 'generates correct JUnit XML for Xcode 16 mixed test results' do
+        test_plan = Trainer::XCResult::Parser.parse_xcresult(path: fixture_path)
+        junit_xml = test_plan.to_xml
+
+        expected_xml = File.read(expected_xml_path)
+        
+        normalized_actual = normalize_xml(junit_xml)
+        normalized_expected = normalize_xml(expected_xml)
+
+        expect(normalized_actual).to eq(normalized_expected)
+      end
+    end
+  end
 end
