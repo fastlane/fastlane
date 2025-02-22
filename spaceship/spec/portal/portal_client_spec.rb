@@ -384,6 +384,35 @@ the developer website<a/>.<br />"
         subject.create_key!(name: 'some name', service_configs: [])
         expect(WebMock).to have_requested(:post, api_root + '/create')
       end
+
+      it 'creates a key with proper APNS configuration' do
+        expected_params = {
+          name: "Test Key",
+          serviceConfigurationsRequests: [{
+            isNew: true,
+            serviceId: "U27F4V844T",
+            identifiers: {},
+            environment: "all",
+            scope: "team"
+          }],
+          teamId: "XXXXXXXXXX"
+        }
+
+        response = subject.create_key!(name: "Test Key", service_configs: [{}])
+        
+        expect(WebMock).to have_requested(:post, "#{api_root}/v2/create").
+          with(body: expected_params.to_json)
+      end
+
+      it 'uses team scope by default' do
+        response = subject.create_key!(name: "Test Key", service_configs: [{}])
+        expect(response["serviceConfigurations"].first["scope"]).to eq("team")
+      end
+
+      it 'allows custom scope to be set' do
+        response = subject.create_key!(name: "Test Key", service_configs: [{}], scope: "global")
+        expect(response["serviceConfigurations"].first["scope"]).to eq("global")
+      end
     end
 
     describe 'revoke_key!' do

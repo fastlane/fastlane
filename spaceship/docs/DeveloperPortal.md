@@ -1,27 +1,29 @@
 # Developer Portal API
 
-- [Usage](#usage)
-  * [Login](#login)
-  * [Apps](#apps)
-    + [App Services](#app-services)
-  * [App Groups](#app-groups)
-  * [iCloud Containers](#icloud-containers)
-  * [Apple Pay Merchants](#apple-pay-merchants)
-  * [Passbook](#passbook)
-  * [Certificates](#certificates)
-    + [Code Signing Certificates](#code-signing-certificates)
-    + [Push Certificates](#push-certificates)
-    + [Create a Certificate](#create-a-certificate)
-  * [Provisioning Profiles](#provisioning-profiles)
-    + [Receiving profiles](#receiving-profiles)
-    + [Create a Provisioning Profile](#create-a-provisioning-profile)
-    + [Repair all broken provisioning profiles](#repair-all-broken-provisioning-profiles)
-  * [Devices](#devices)
-  * [Enterprise](#enterprise)
-  * [Multiple Spaceships](#multiple-spaceships)
-  * [More cool things you can do](#more-cool-things-you-can-do)
-  * [Example Data](#example-data)
-- [License](#license)
+- [Developer Portal API](#developer-portal-api)
+  - [Usage](#usage)
+    - [Login](#login)
+    - [Apps](#apps)
+      - [App Services](#app-services)
+    - [App Groups](#app-groups)
+    - [iCloud Containers](#icloud-containers)
+    - [Apple Pay Merchants](#apple-pay-merchants)
+    - [Passbook](#passbook)
+    - [Certificates](#certificates)
+      - [Code Signing Certificates](#code-signing-certificates)
+      - [Push Certificates](#push-certificates)
+      - [Create a Certificate](#create-a-certificate)
+    - [Authentication Keys](#authentication-keys)
+    - [Provisioning Profiles](#provisioning-profiles)
+      - [Receiving profiles](#receiving-profiles)
+      - [Create a Provisioning Profile](#create-a-provisioning-profile)
+      - [Repair all broken provisioning profiles](#repair-all-broken-provisioning-profiles)
+    - [Devices](#devices)
+    - [Enterprise](#enterprise)
+    - [Multiple Spaceships](#multiple-spaceships)
+    - [More cool things you can do](#more-cool-things-you-can-do)
+    - [Example Data](#example-data)
+  - [License](#license)
 
 ## Usage
 
@@ -29,7 +31,7 @@ To quickly play around with _spaceship_ launch `irb` in your terminal and execut
 
 ### Login
 
-*Note*: If you use both the Developer Portal and App Store Connect API, you'll have to login on both, as the user might have different user credentials.
+_Note_: If you use both the Developer Portal and App Store Connect API, you'll have to login on both, as the user might have different user credentials.
 
 ```ruby
 Spaceship::Portal.login("felix@krausefx.com", "password")
@@ -211,6 +213,7 @@ cert_content = prod_certs.first.download
 ```
 
 #### Push Certificates
+
 ```ruby
 # Production push profiles
 prod_push_certs = Spaceship::Portal.certificate.production_push.all
@@ -239,6 +242,17 @@ csr, pkey = Spaceship::Portal.certificate.create_certificate_signing_request
 # Use the signing request to create a new distribution certificate
 Spaceship::Portal.certificate.production.create!(csr: csr)
 ```
+
+### Authentication Keys
+
+The authentication keys can be used for various Apple services. When creating an APNS key:
+
+- `name`: A descriptive name for your key
+- `service_configs`: Configuration for the key services. For APNS, an empty config will use defaults
+- `scope`: Access scope for the key (defaults to 'team')
+  - 'team': Key is scoped to the entire Apple Developer team
+  - 'app': Key is scoped to a specific app
+  - 'global': Key has broader access (if supported)
 
 ### Provisioning Profiles
 
@@ -377,6 +391,7 @@ end
 ```
 
 ### More cool things you can do
+
 ```ruby
 # Find a profile with a specific name
 profile = Spaceship::Portal.provisioning_profile.development.all.find { |p| p.name == "Name" }
