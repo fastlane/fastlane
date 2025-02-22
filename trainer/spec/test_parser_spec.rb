@@ -28,12 +28,11 @@ describe Trainer do
 
     describe "#generate_cmd_parse_xcresult" do
       let(:xcresult_sample_path) { "./trainer/spec/fixtures/Test.test_result.xcresult" }
-      let!(:subject) { Trainer::TestParser.new(xcresult_sample_path) }
-      let(:command) { subject.send(:generate_cmd_parse_xcresult, xcresult_sample_path) }
+      let(:command) { Trainer::LegacyXCResult::Parser.send(:generate_cmd_parse_xcresult, xcresult_sample_path) }
 
       before do
         allow(File).to receive(:expand_path).with(xcresult_sample_path).and_return(xcresult_sample_path)
-        allow_any_instance_of(Trainer::TestParser).to receive(:`).with('xcrun xcresulttool version').and_return(version)
+        allow(Trainer::LegacyXCResult::Parser).to receive(:`).with('xcrun xcresulttool version').and_return(version)
       end
 
       context 'with >= Xcode 16 beta 3' do
@@ -229,12 +228,12 @@ describe Trainer do
       end
 
       it "still produces a test failure message when file url is missing", requires_xcode: true do
-        allow_any_instance_of(Trainer::XCResult::TestFailureIssueSummary).to receive(:document_location_in_creating_workspace).and_return(nil)
+        allow_any_instance_of(Trainer::LegacyXCResult::TestFailureIssueSummary).to receive(:document_location_in_creating_workspace).and_return(nil)
         tp = Trainer::TestParser.new("./trainer/spec/fixtures/Test.test_result.xcresult")
         test_failures = tp.data.last[:tests].select { |t| t[:failures] }
         failure_messages = test_failures.map { |tf| tf[:failures].first[:failure_message] }
         expect(failure_messages).to eq(["XCTAssertTrue failed", "XCTAssertTrue failed"])
-        RSpec::Mocks.space.proxy_for(Trainer::XCResult::TestFailureIssueSummary).reset
+        RSpec::Mocks.space.proxy_for(Trainer::LegacyXCResult::TestFailureIssueSummary).reset
       end
 
       it "works as expected with xcresult with spaces", requires_xcode: true do
