@@ -130,7 +130,7 @@ module Trainer
 
     # Returns the JUnit report as String
     def to_junit
-      JunitGenerator.new(self.data).generate
+      self.data.is_a?(Trainer::XCResult::TestPlan) ? self.data.to_xml : JunitGenerator.new(self.data).generate
     end
 
     # @return [Bool] were all tests successful? Is false if at least one test failed

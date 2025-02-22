@@ -21,7 +21,7 @@ module Trainer
       attr_reader :attachments
       attr_reader :tags
 
-      def self.from_node(node:)
+      def self.from_node(node:, xcpretty_naming:)
         # If there are arguments or repetitions, generate multiple test cases
         test_cases = []
 
@@ -55,19 +55,19 @@ module Trainer
               modified_node['duration'] = rep_node['duration'] if rep_node['duration']
             end
 
-            test_cases << new(node: modified_node)
+            test_cases << new(node: modified_node, xcpretty_naming: xcpretty_naming)
           end
         end
 
         test_cases
       end
 
-      def initialize(node:)
+      def initialize(node:, xcpretty_naming:)
         @name = node['name']
         @identifier = node['nodeIdentifier']
         @duration = parse_duration(node['duration'] || node.dig('repetition', 'duration'))
         @result = node['result']
-        @classname = extract_classname(node)
+        @classname = extract_classname(node, xcpretty_naming: xcpretty_naming)
         @argument = node['argument']
         @repetition = node['repetition']
         @failure_messages = extract_failure_messages(node)
@@ -165,13 +165,13 @@ module Trainer
         duration_str.chomp('s').to_f
       end
 
-      def extract_classname(node)
+      def extract_classname(node, xcpretty_naming:)
         # Extract test group from identifier if possible
         return '' if @identifier.nil?
         
         # Split identifier and take all parts except the last (test name)
         parts = @identifier.split('/')
-        parts[0...-1].join('.')
+        parts[0...-1].join(xcpretty_naming ? '.' : '/')
       end
 
       def extract_failure_messages(node)
@@ -201,10 +201,8 @@ module Trainer
       attr_reader :test_cases
       attr_reader :sub_suites
       attr_reader :tags
-      attr_reader :configuration
-      attr_reader :device
 
-      def initialize(node:, configurations: [], devices: [])
+      def initialize(node:, xcpretty_naming: false)
         @name = node['name']
         @identifier = node['nodeIdentifier']
         @type = node['nodeType']
@@ -214,11 +212,7 @@ module Trainer
         # Extract test cases and sub-suites
         @test_cases = []
         @sub_suites = []
-        process_children(node['children'] || [])
-
-        # Find associated configuration and device
-        @configuration = configurations.find { |config| config['configurationName'] == @name }
-        @device = devices.first  # For now, return the first device
+        process_children(node['children'] || [], xcpretty_naming: xcpretty_naming)
       end
 
       def passed?
@@ -249,6 +243,17 @@ module Trainer
         @skipped_count ||= @test_cases.count { |tc| tc.skipped? } + @sub_suites.sum { |sub_suite| sub_suite.skipped_count }
       end
 
+      def to_hash
+        {
+          number_of_tests: test_cases_count,
+          number_of_failures: failures_count,
+          number_of_tests_excluding_retries: test_cases_count, # TODO: Implement this
+          number_of_failures_excluding_retries: failures_count, # TODO: Implement this
+          number_of_retries: 0, # TODO: Implement this
+          number_of_skipped: skipped_count
+        }
+      end
+
       def to_xml
         testsuite = REXML::Element.new('testsuite')
         testsuite.attributes['name'] = @name
@@ -274,14 +279,14 @@ module Trainer
 
       private
 
-      def process_children(children)
+      def process_children(children, xcpretty_naming:)
         children.each do |child|
           case child['nodeType']
           when 'Test Case'
             # Use from_node to generate multiple test cases if needed
-            @test_cases.concat(TestCase.from_node(node: child))
+            @test_cases.concat(TestCase.from_node(node: child, xcpretty_naming: xcpretty_naming))
           when 'Test Suite', 'Unit test bundle', 'UI test bundle'
-            @sub_suites << TestSuite.new(node: child)
+            @sub_suites << TestSuite.new(node: child, xcpretty_naming: xcpretty_naming)
           end
         end
       end
@@ -294,6 +299,11 @@ module Trainer
         @test_suites = test_suites
         @configurations = configurations
         @devices = devices
+      end
+
+      include Enumerable
+      def each(&block)
+        test_suites.map(&:to_hash).each(&block)
       end
 
       def to_xml
@@ -358,7 +368,7 @@ module Trainer
           Gem::Version.new(version) >= Gem::Version.new(23_021)
         end
 
-        def parse_xcresult(path:, output_remove_retry_attempts: false)
+        def parse_xcresult(path:, output_remove_retry_attempts: false, xcpretty_naming: false)
           # TODO: Remove retry attempts if output_remove_retry_attempts is true
           json = xcresult_to_json(path)
           
@@ -372,7 +382,7 @@ module Trainer
 
           # Convert test plan node's children (test bundles) to TestSuite objects
           test_suites = test_plan_node['children']&.map do |test_bundle|
-            TestSuite.new(node: test_bundle)
+            TestSuite.new(node: test_bundle, xcpretty_naming: xcpretty_naming)
           end || []
 
           TestPlan.new(test_suites: test_suites, configurations: configurations, devices: devices)
