@@ -4,6 +4,7 @@ require 'fastlane_core/print_table'
 
 require_relative 'junit_generator'
 require_relative 'legacy_xcresult'
+require_relative 'xcresult'
 require_relative 'module'
 require_relative 'plist_test_summary_parser'
 
@@ -99,7 +100,8 @@ module Trainer
       UI.user_error!("File not found at path '#{path}'") unless File.exist?(path)
 
       if File.directory?(path) && path.end_with?(".xcresult")
-        self.data = LegacyXCResult::Parser.parse_xcresult(path, output_remove_retry_attempts: config[:output_remove_retry_attempts])
+        klass = XCResult::Parser.supports_xcode16_xcresulttool? && !config[:use_legacy_xcresulttool] ? XCResult::Parser : LegacyXCResult::Parser
+        self.data = klass.parse_xcresult(path: path, output_remove_retry_attempts: config[:output_remove_retry_attempts])
       else
         file_content = File.read(path)
         raw_json = Plist.parse_xml(file_content)

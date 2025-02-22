@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuites tests="31" failures="8" skipped="5">
+  <testsuite name="FastlaneTrainerExampleTests" tests="22" failures="7" skipped="4" time="0.1">
+    <testsuite name="Math Operations" tests="1" failures="0" time="0.014">
+      <testcase classname="FastlaneTrainerTests/MathTests" name="testArithmetic" time="0.014"/>
+    </testsuite>
+    <testsuite name="Resource-Dependent Tests" tests="2" failures="2" time="0.02">
+      <testcase classname="FastlaneTrainerTests/SkipTests/ResourceTests" name="testWithNetworkRequirement" time="0.01">
+        <failure message="Test requires network access"/>
+      </testcase>
+      <testcase classname="FastlaneTrainerTests/SkipTests/ResourceTests" name="testWithDatabaseCleanup" time="0.01">
+        <failure message="Database not available"/>
+      </testcase>
+    </testsuite>
+    <testsuite name="Feature Flag Tests" tests="2" failures="2" skipped="1" time="0.05">
+      <testcase classname="FastlaneTrainerTests/SkipTests/FeatureFlagTests" name="testPremiumFeature" time="0.004">
+        <skipped/>
+      </testcase>
+      <testcase classname="FastlaneTrainerTests/SkipTests/FeatureFlagTests" name="testFeatureFlag" time="0.005">
+        <failure message="Feature 'experimental_feature' is not enabled"/>
+        <failure message="Feature 'premium_feature' is not enabled"/>
+      </testcase>
+    </testsuite>
+    <testsuite name="Environment-Dependent Tests" tests="2" skipped="2" time="0.01">
+      <testcase classname="FastlaneTrainerTests/SkipTests/EnvironmentTests" name="testProductionConfig" time="0.003">
+        <skipped/>
+      </testcase>
+      <testcase classname="FastlaneTrainerTests/SkipTests/EnvironmentTests" name="testCIOnly" time="0.005">
+        <skipped/>
+      </testcase>
+    </testsuite>
+    <testsuite name="Content Management" tests="2" failures="1" time="0.01">
+      <testsuite name="Posts" tests="2" failures="1" time="0.01">
+        <testsuite name="Creation" tests="1" failures="1" time="0.007">
+          <testcase classname="FastlaneTrainerTests/ContentTests/PostTests/CreationTests" name="testPostLength" time="0.007">
+            <failure message="Post length validation failed"/>
+          </testcase>
+        </testsuite>
+        <testsuite name="Moderation" tests="1" failures="0" time="0.003">
+          <testcase classname="FastlaneTrainerTests/ContentTests/PostTests/ModerationTests" name="testContentFiltering" time="0.003"/>
+        </testsuite>
+      </testsuite>
+    </testsuite>
+    <testsuite name="User Management" tests="13" failures="2" time="0.1">
+      <testsuite name="Registration" tests="3" failures="1" time="0.02">
+        <testsuite name="Password Validation" tests="2" failures="1" time="0.01">
+          <testcase classname="FastlaneTrainerTests/UserTests/RegistrationTests/PasswordTests" name="testPasswordLength" time="0.007">
+            <failure message="Password length validation failed"/>
+          </testcase>
+          <testcase classname="FastlaneTrainerTests/UserTests/RegistrationTests/PasswordTests" name="testPasswordComplexity" time="0.006"/>
+        </testsuite>
+        <testsuite name="Email Validation" tests="1" failures="0" time="0.006">
+          <testcase classname="FastlaneTrainerTests/UserTests/RegistrationTests/EmailTests" name="testValidEmails" time="0.006"/>
+        </testsuite>
+        <testcase classname="FastlaneTrainerTests/UserTests/RegistrationTests" name="testBasicRegistration" time="0.008"/>
+      </testsuite>
+      <testsuite name="Profile Management" tests="10" failures="0" time="0.08">
+        <testsuite name="Avatar" tests="2" failures="0" time="0.007">
+          <testcase classname="FastlaneTrainerTests/UserTests/ProfileTests/AvatarTests" name="testAvatarDimensions" time="0.006"/>
+          <testcase classname="FastlaneTrainerTests/UserTests/ProfileTests/AvatarTests" name="testAvatarFileTypes" time="0.004"/>
+        </testsuite>
+        <testsuite name="Settings" tests="1" failures="0" time="0.004">
+          <testcase classname="FastlaneTrainerTests/UserTests/ProfileTests/SettingsTests" name="testPrivacySettings" time="0.004"/>
+        </testsuite>
+      </testsuite>
+    </testsuite>
+  </testsuite>
+  <testsuite name="FastlaneTrainerExampleXCTests" tests="9" failures="1" time="0.5">
+    <testcase classname="FastlaneTrainerExampleXCTests" name="testBasicAssertions" time="0.02">
+      <failure message="XCTAssertFalse failed"/>
+    </testcase>
+  </testsuite>
+</testsuites> 

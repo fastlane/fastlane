@@ -398,7 +398,7 @@ module Trainer
 
     module Parser
       class << self
-        def parse_xcresult(path, output_remove_retry_attempts: false)
+        def parse_xcresult(path:, output_remove_retry_attempts: false)
           require 'shellwords'
           require 'json'
           path = Shellwords.escape(path)

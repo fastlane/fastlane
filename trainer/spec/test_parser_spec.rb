@@ -32,7 +32,7 @@ describe Trainer do
 
       before do
         allow(File).to receive(:expand_path).with(xcresult_sample_path).and_return(xcresult_sample_path)
-        allow(Trainer::LegacyXCResult::Parser).to receive(:`).with('xcrun xcresulttool version').and_return(version)
+        allow(Trainer::XCResult::Parser).to receive(:`).with('xcrun xcresulttool version').and_return(version)
       end
 
       context 'with >= Xcode 16 beta 3' do
@@ -45,7 +45,7 @@ describe Trainer do
       end
 
       context 'with < Xcode 16 beta 3' do
-        let(:version) { 'xcresulttool version 22608.2, format version 3.49 (current)' }
+        let(:version) { 'xcresulttool version 22608, format version 3.49 (current)' }
         let(:expected) { "xcrun xcresulttool get --format json --path #{xcresult_sample_path}" }
 
         it 'should not pass `--legacy`', requires_xcode: true do
@@ -55,9 +55,14 @@ describe Trainer do
     end
 
     describe "Stores the data in a useful format" do
+      before do
+        allow(Trainer::XCResult::Parser).to receive(:supports_xcode16_xcresulttool?).and_return(true)
+      end
+      let(:config) { { use_legacy_xcresulttool: true } }
+
       describe "#tests_successful?" do
         it "returns false if tests failed" do
-          tp = Trainer::TestParser.new("./trainer/spec/fixtures/Valid1.plist")
+          tp = Trainer::TestParser.new("./trainer/spec/fixtures/Valid1.plist", config)
           expect(tp.tests_successful?).to eq(false)
         end
       end
@@ -118,7 +123,7 @@ describe Trainer do
       end
 
       it "works as expected with xcresult", requires_xcode: true do
-        tp = Trainer::TestParser.new("./trainer/spec/fixtures/Test.test_result.xcresult")
+        tp = Trainer::TestParser.new("./trainer/spec/fixtures/Test.test_result.xcresult", config)
         expect(tp.data).to eq([
                                 {
                                   project_path: "Test.xcodeproj",
@@ -229,7 +234,7 @@ describe Trainer do
 
       it "still produces a test failure message when file url is missing", requires_xcode: true do
         allow_any_instance_of(Trainer::LegacyXCResult::TestFailureIssueSummary).to receive(:document_location_in_creating_workspace).and_return(nil)
-        tp = Trainer::TestParser.new("./trainer/spec/fixtures/Test.test_result.xcresult")
+        tp = Trainer::TestParser.new("./trainer/spec/fixtures/Test.test_result.xcresult", config)
         test_failures = tp.data.last[:tests].select { |t| t[:failures] }
         failure_messages = test_failures.map { |tf| tf[:failures].first[:failure_message] }
         expect(failure_messages).to eq(["XCTAssertTrue failed", "XCTAssertTrue failed"])
@@ -237,7 +242,7 @@ describe Trainer do
       end
 
       it "works as expected with xcresult with spaces", requires_xcode: true do
-        tp = Trainer::TestParser.new("./trainer/spec/fixtures/Test.with_spaces.xcresult")
+        tp = Trainer::TestParser.new("./trainer/spec/fixtures/Test.with_spaces.xcresult", config)
         expect(tp.data).to eq([
                                 {
                                   project_path: "SpaceTests.xcodeproj",
@@ -277,19 +282,20 @@ describe Trainer do
   end
 
   describe Trainer::XCResult::Parser do
+    let(:xcresult_path) { 'Xcode16Mixed.xcresult' }
+    let(:json_fixture_path) { File.expand_path("../fixtures/Xcode16Mixed.json", __FILE__) }
+    let(:json_fixture) { JSON.parse(File.read(json_fixture_path)) }
+    let(:expected_xml_path) { File.expand_path('../fixtures/Xcode16Mixed.junit', __FILE__) }
+
+    before do
+      allow(Trainer::XCResult::Parser).to receive(:xcresult_to_json).with(xcresult_path).and_return(json_fixture)
+    end
+
     describe ".parse_xcresult" do
-      context "with Xcode 16 mixed test results" do
-        let(:json_fixture_path) { File.expand_path("../fixtures/Xcode16Mixed.json", __FILE__) }
-        let(:json_fixture) { JSON.parse(File.read(json_fixture_path)) }
-        let(:expected_xml_path) { File.expand_path('../fixtures/Xcode16Mixed.junit', __FILE__) }
-
-        before do
-          allow(Trainer::XCResult::Parser).to receive(:xcresult_to_json).and_return(json_fixture)
-        end
-
-        it "generates the correct XML representation of test results" do
+      context "with Xcode 16 xcresult bundle" do
+        xit "generates the correct XML representation of test results" do
           # Parse the xcresult
-          test_plan = Trainer::XCResult::Parser.parse_xcresult(path: json_fixture_path)
+          test_plan = Trainer::XCResult::Parser.parse_xcresult(path: xcresult_path)
           
           # Generate XML
           generated_xml = test_plan.to_xml
@@ -332,14 +338,7 @@ describe Trainer do
       output
     end
 
-    describe 'Xcode 16 Mixed Test Results' do
-      let(:fixture_path) { File.expand_path('../fixtures/Xcode16Mixed.json', __FILE__) }
-      let(:expected_xml_path) { File.expand_path('../fixtures/Xcode16Mixed.junit', __FILE__) }
-
-      before do
-        allow(Trainer::XCResult::Parser).to receive(:xcresult_to_json).and_return(JSON.parse(File.read(fixture_path)))
-      end
-
+    describe 'Xcode 16 xcresult bundle' do
       def normalize_xml(xml_string)
         doc = REXML::Document.new(xml_string)
         
@@ -356,8 +355,8 @@ describe Trainer do
         formatted_xml.gsub(/\s+/, ' ').strip
       end
 
-      it 'generates correct JUnit XML for Xcode 16 mixed test results' do
-        test_plan = Trainer::XCResult::Parser.parse_xcresult(path: fixture_path)
+      it 'generates correct JUnit XML for Xcode 16 xcresult bundle' do
+        test_plan = Trainer::XCResult::Parser.parse_xcresult(path: xcresult_path)
         junit_xml = test_plan.to_xml
 
         expected_xml = File.read(expected_xml_path)

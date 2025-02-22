@@ -13,22 +13,63 @@ module Trainer
       attr_reader :identifier
       attr_reader :duration
       attr_reader :result
-      attr_reader :test_group
-      attr_reader :arguments
-      attr_reader :repetitions
+      attr_reader :classname
+      attr_reader :argument
+      attr_reader :repetition
       attr_reader :failure_messages
       attr_reader :source_references
       attr_reader :attachments
       attr_reader :tags
 
+      def self.from_node(node:)
+        # If there are arguments or repetitions, generate multiple test cases
+        test_cases = []
+
+        # Handle arguments
+        argument_nodes = node['children']&.select { |child| child['nodeType'] == 'Arguments' } || []
+        argument_nodes = [nil] if argument_nodes.empty?
+
+        # Handle repetitions
+        repetition_nodes = node['children']&.select { |child| ['Repetition', 'Test Case Run'].include?(child['nodeType']) } || []
+        repetition_nodes = [nil] if repetition_nodes.empty?
+
+        # Generate test cases for each combination of argument and repetition
+        argument_nodes.each do |arg_node|
+          repetition_nodes.each do |rep_node|
+            modified_node = node.dup
+            
+            # Add argument information if present
+            if arg_node
+              modified_node['argument'] = arg_node['name']
+            end
+
+            # Add repetition information if present
+            if rep_node
+              # Only store the name of the repetition
+              modified_node['repetition'] = rep_node['name']
+              
+              # Override result if repetition has a different result
+              modified_node['result'] = rep_node['result'] if rep_node['result'] != node['result']
+              
+              # Override duration with repetition's duration if present
+              modified_node['duration'] = rep_node['duration'] if rep_node['duration']
+            end
+
+            test_cases << new(node: modified_node)
+          end
+        end
+
+        test_cases
+      end
+
       def initialize(node:)
         @name = node['name']
         @identifier = node['nodeIdentifier']
-        @duration = parse_duration(node['duration'])
+        @duration = parse_duration(node['duration'] || node.dig('repetition', 'duration'))
         @result = node['result']
-        @test_group = extract_test_group(node)
-        @arguments = extract_arguments(node)
-        @repetitions = extract_repetitions(node)
+        @classname = extract_classname(node)
+        @argument = node['argument']
+        @repetition = node['repetition']
         @failure_messages = extract_failure_messages(node)
         @source_references = extract_source_references(node)
         @attachments = extract_attachments(node)
@@ -50,7 +91,7 @@ module Trainer
       def to_xml
         testcase = REXML::Element.new('testcase')
         testcase.attributes['name'] = @name
-        testcase.attributes['classname'] = @test_group
+        testcase.attributes['classname'] = @classname
         testcase.attributes['time'] = @duration.to_s
 
         # Handle test result
@@ -63,22 +104,22 @@ module Trainer
         end
 
         # Add properties if available
-        if @arguments.any? || @repetitions.any? || @source_references.any? || @attachments.any? || @tags.any?
+        if @argument || @repetition || @source_references.any? || @attachments.any? || @tags.any?
           properties = REXML::Element.new('properties')
           
-          # Add arguments as properties
-          @arguments.each_with_index do |arg, index|
+          # Add argument as property
+          if @argument
             prop = REXML::Element.new('property')
-            prop.attributes['name'] = "argument#{index + 1}"
-            prop.attributes['value'] = arg
+            prop.attributes['name'] = "argument"
+            prop.attributes['value'] = @argument
             properties.add_element(prop)
           end
 
-          # Add repetitions as properties
-          @repetitions.each_with_index do |rep, index|
+          # Add repetition as property
+          if @repetition
             prop = REXML::Element.new('property')
-            prop.attributes['name'] = "repetition#{index + 1}"
-            prop.attributes['value'] = "#{rep[:name]} (#{rep[:result]})"
+            prop.attributes['name'] = "repetition"
+            prop.attributes['value'] = @repetition
             properties.add_element(prop)
           end
 
@@ -124,31 +165,13 @@ module Trainer
         duration_str.chomp('s').to_f
       end
 
-      def extract_test_group(node)
+      def extract_classname(node)
         # Extract test group from identifier if possible
         return '' if @identifier.nil?
         
         # Split identifier and take all parts except the last (test name)
         parts = @identifier.split('/')
-        parts[0...-1].join('/')
-      end
-
-      def extract_arguments(node)
-        node['children']
-          &.select { |child| child['nodeType'] == 'Arguments' }
-          &.map { |arg| arg['name'] } || []
-      end
-
-      def extract_repetitions(node)
-        node['children']
-          &.select { |child| ['Repetition', 'Test Case Run'].include?(child['nodeType']) }
-          &.map do |rep|
-            {
-              name: rep['name'],
-              duration: parse_duration(rep['duration']),
-              result: rep['result']
-            }
-          end || []
+        parts[0...-1].join('.')
       end
 
       def extract_failure_messages(node)
@@ -174,7 +197,6 @@ module Trainer
       attr_reader :name
       attr_reader :identifier
       attr_reader :type
-      attr_reader :duration
       attr_reader :result
       attr_reader :test_cases
       attr_reader :sub_suites
@@ -186,7 +208,6 @@ module Trainer
         @name = node['name']
         @identifier = node['nodeIdentifier']
         @type = node['nodeType']
-        @duration = parse_duration(node['duration'])
         @result = node['result']
         @tags = node['tags'] || []
 
@@ -212,10 +233,26 @@ module Trainer
         @result == 'Skipped'
       end
 
+      def duration
+        @duration ||= @test_cases.sum { |tc| tc.duration } + @sub_suites.sum { |sub_suite| sub_suite.duration }
+      end
+
+      def test_cases_count
+        @test_cases_count ||= @test_cases.count + @sub_suites.sum { |sub_suite| sub_suite.test_cases_count }
+      end
+
+      def failures_count
+        @failures_count ||= @test_cases.count { |tc| tc.failed? } + @sub_suites.sum { |sub_suite| sub_suite.failures_count }
+      end
+
+      def skipped_count
+        @skipped_count ||= @test_cases.count { |tc| tc.skipped? } + @sub_suites.sum { |sub_suite| sub_suite.skipped_count }
+      end
+
       def to_xml
         testsuite = REXML::Element.new('testsuite')
         testsuite.attributes['name'] = @name
-        testsuite.attributes['time'] = @duration.to_s
+        testsuite.attributes['time'] = duration.to_s
 
         # Add test cases
         @test_cases.each do |test_case|
@@ -247,9 +284,9 @@ module Trainer
         testsuite.add_element(properties) if properties.elements.any?
 
         # Add summary attributes
-        testsuite.attributes['tests'] = @test_cases.count.to_s
-        testsuite.attributes['failures'] = @test_cases.count { |tc| tc.failed? }.to_s
-        testsuite.attributes['skipped'] = @test_cases.count { |tc| tc.skipped? }.to_s
+        testsuite.attributes['tests'] = test_cases_count.to_s
+        testsuite.attributes['failures'] = failures_count.to_s
+        testsuite.attributes['skipped'] = skipped_count.to_s  
 
         testsuite
       end
@@ -270,11 +307,49 @@ module Trainer
         children.each do |child|
           case child['nodeType']
           when 'Test Case'
-            @test_cases << TestCase.new(node: child)
+            # Use from_node to generate multiple test cases if needed
+            @test_cases.concat(TestCase.from_node(node: child))
           when 'Test Suite', 'Unit test bundle', 'UI test bundle'
             @sub_suites << TestSuite.new(node: child)
           end
         end
+      end
+    end
+
+    class TestPlan
+      attr_reader :test_suites, :name
+
+      def initialize(test_suites:, name: 'XCResult Test Run')
+        @test_suites = test_suites
+        @name = name
+      end
+
+      def to_xml
+        # Create the root testsuites element
+        testsuites = REXML::Element.new('testsuites')
+        testsuites.attributes['name'] = name
+        
+        # Add each test suite to the root
+        test_suites.each do |suite|
+          testsuites.add_element(suite.to_xml)
+        end
+
+        # Calculate total summary
+        testsuites.attributes['tests'] = test_suites.sum { |suite| suite.test_cases_count }.to_s
+        testsuites.attributes['failures'] = test_suites.sum { |suite| suite.failures_count }.to_s
+        testsuites.attributes['skipped'] = test_suites.sum { |suite| suite.skipped_count }.to_s
+        testsuites.attributes['time'] = test_suites.sum { |suite| suite.duration }.to_s
+
+        # Convert to XML string with prologue
+        doc = REXML::Document.new
+        doc << REXML::XMLDecl.new('1.0', 'UTF-8')
+        doc.add(testsuites)
+        
+        formatter = REXML::Formatters::Pretty.new
+        output = String.new
+        formatter.write(doc, output)
+        puts "---output: #{output}"
+        output
       end
     end
 
@@ -291,42 +366,8 @@ module Trainer
           Gem::Version.new(version) >= Gem::Version.new(23_021)
         end
 
-        class TestPlan
-          attr_reader :test_suites, :name
-
-          def initialize(test_suites:, name: 'XCResult Test Run')
-            @test_suites = test_suites
-            @name = name
-          end
-
-          def to_xml
-            # Create the root testsuites element
-            testsuites = REXML::Element.new('testsuites')
-            testsuites.attributes['name'] = name
-            
-            # Add each test suite to the root
-            test_suites.each do |suite|
-              testsuites.add_element(suite.to_xml)
-            end
-
-            # Calculate total summary
-            testsuites.attributes['tests'] = test_suites.sum { |suite| suite.test_cases.count }.to_s
-            testsuites.attributes['failures'] = test_suites.sum { |suite| suite.test_cases.count { |tc| tc.failed? } }.to_s
-            testsuites.attributes['skipped'] = test_suites.sum { |suite| suite.test_cases.count { |tc| tc.skipped? } }.to_s
-            testsuites.attributes['time'] = test_suites.sum { |suite| suite.duration }.to_s
-
-            # Convert to XML string
-            doc = REXML::Document.new
-            doc.add(testsuites)
-            
-            formatter = REXML::Formatters::Pretty.new
-            output = String.new
-            formatter.write(doc, output)
-            output
-          end
-        end
-
-        def parse_xcresult(path:)
+        def parse_xcresult(path:, output_remove_retry_attempts: false)
+          # TODO: Remove retry attempts if output_remove_retry_attempts is true
           json = xcresult_to_json(path)
           
           # Extract configurations and devices
@@ -335,7 +376,6 @@ module Trainer
 
           # Find the test plan node (root of test results)
           test_plan_node = json['testNodes']&.find { |node| node['nodeType'] == 'Test Plan' }
-          
           return TestPlan.new(test_suites: []) if test_plan_node.nil?
 
           # Convert test plan node's children (test bundles) to TestSuite objects
