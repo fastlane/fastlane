@@ -576,8 +576,8 @@ module Trainer
         end
 
         def execute_cmd(cmd)
-          output = `#{cmd}`
-          raise "Failed to execute - #{cmd}" unless $?.success?
+          output, status = Open3.capture2e(cmd)
+          raise "Failed to execute '#{cmd}': #{output}" unless status.success?
           return output
         end
       end
