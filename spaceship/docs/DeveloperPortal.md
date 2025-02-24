@@ -14,6 +14,10 @@
       - [Push Certificates](#push-certificates)
       - [Create a Certificate](#create-a-certificate)
     - [Authentication Keys](#authentication-keys)
+      - [APNS (Apple Push Notification Service)](#apns-apple-push-notification-service)
+      - [MusicKit](#musickit)
+      - [DeviceCheck](#devicecheck)
+      - [Service Configuration Details](#service-configuration-details)
     - [Provisioning Profiles](#provisioning-profiles)
       - [Receiving profiles](#receiving-profiles)
       - [Create a Provisioning Profile](#create-a-provisioning-profile)
@@ -245,14 +249,54 @@ Spaceship::Portal.certificate.production.create!(csr: csr)
 
 ### Authentication Keys
 
-The authentication keys can be used for various Apple services. When creating an APNS key:
+The authentication keys can be used for various Apple services. When creating a key, you can configure the following:
 
 - `name`: A descriptive name for your key
-- `service_configs`: Configuration for the key services. For APNS, an empty config will use defaults
-- `scope`: Access scope for the key (defaults to 'team')
-  - 'team': Key is scoped to the entire Apple Developer team
-  - 'app': Key is scoped to a specific app
-  - 'global': Key has broader access (if supported)
+- `service_configs`: Configuration for the key services. A hash where each key is a service ID and the value is its configuration:
+
+#### APNS (Apple Push Notification Service)
+
+```ruby
+{
+  "U27F4V844T" => {  # APNS_ID
+    identifiers: {},  # Optional: Specific app identifiers
+    environment: "all",  # Optional: Defaults to "all"
+    scope: "team"  # Optional: Defaults to "team"
+  }
+}
+```
+
+#### MusicKit
+
+```ruby
+{
+  "6A7HVUVQ3M" => {  # MUSIC_KIT_ID
+    identifiers: "4H4P58CJTN"  # The MusicKit identifier
+  }
+}
+```
+
+#### DeviceCheck
+
+```ruby
+{
+  "DQ8HTZ7739" => {  # DEVICE_CHECK_ID
+    identifiers: {}  # Optional: Specific identifiers if needed
+  }
+}
+```
+
+#### Service Configuration Details
+
+- `identifiers`: Service-specific identifiers
+  - For MusicKit: A string or array containing the MusicKit identifier(s)
+  - For other services: A hash of identifiers (can be empty)
+- `environment`: (APNS only) The environment setting
+  - Defaults to "all"
+  - Options: "all", "production", "development"
+- `scope`: (APNS only) Access scope for the key
+  - Defaults to "team"
+  - Options: "team", "app", "global"
 
 ### Provisioning Profiles
 
@@ -342,7 +386,7 @@ all_devices = Spaceship::Portal.device.all
 # Disable first device
 all_devices.first.disable!
 
-# Find disabled device and enable it
+# Find disabled device and enable it
 Spaceship::Portal.device.find_by_udid("44ee59893cb...", include_disabled: true).enable!
 
 # Get list of all devices, including disabled ones, and filter the result to only include disabled devices use enabled? or disabled? methods
