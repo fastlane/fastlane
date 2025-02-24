@@ -1,7 +1,5 @@
-require 'shellwords'
 require 'json'
 require 'open3'
-require 'rexml/document'
 
 require_relative 'xcresult/helper'
 require_relative 'xcresult/test_case_attributes'

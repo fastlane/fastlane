@@ -294,9 +294,8 @@ describe Trainer do
         :number_of_skipped
       ]
 
-      test_plan = Trainer::XCResult::Parser.parse_xcresult(path: xcresult_path)
-      new_parser_data = test_plan.map do |suite|
-        suite.to_hash.slice(*keys_to_compare)
+      new_parser_data = Trainer::XCResult::Parser.parse_xcresult(path: xcresult_path).map do |hash|
+        hash.slice(*keys_to_compare)
       end
 
       legacy_parser_data = Trainer::LegacyXCResult::Parser.parse_xcresult(path: xcresult_path).map do |hash|

@@ -1,5 +1,4 @@
 require 'rexml/document'
-require 'shellwords'
 require 'rubygems'
 
 module Trainer
