@@ -782,11 +782,11 @@ module Spaceship
 
       service_configs_requests = (service_configs || {}).map do |service_id, configs|
         if service_id == Spaceship::Portal::Key::MUSIC_KIT_ID
-        {
-          serviceId: service_id,
-          isNew: true,
-          identifiers: configs[:identifiers] || {},
-          }
+          {
+            serviceId: service_id,
+            isNew: true,
+            identifiers: configs[:identifiers] || {},
+            }
         elsif service_id == Spaceship::Portal::Key::DEVICE_CHECK_ID
           {
             serviceId: service_id,
@@ -805,7 +805,6 @@ module Spaceship
           raise "Unknown service id: #{service_id}"
         end
       end
-      
 
       params = {
         name: name,
