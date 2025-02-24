@@ -37,7 +37,7 @@ describe Trainer do
 
       context 'with >= Xcode 16 beta 3' do
         let(:version) { 'xcresulttool version 23021, format version 3.53 (current)' }
-        let(:expected) { "xcrun xcresulttool get --format json --path #{xcresult_sample_path} --legacy" }
+        let(:expected) { ['xcrun', 'xcresulttool', 'get', '--format', 'json', '--path', xcresult_sample_path, '--legacy'] }
 
         it 'should pass `--legacy`', requires_xcode: true do
           expect(command).to eq(expected)
@@ -46,7 +46,7 @@ describe Trainer do
 
       context 'with < Xcode 16 beta 3' do
         let(:version) { 'xcresulttool version 22608, format version 3.49 (current)' }
-        let(:expected) { "xcrun xcresulttool get --format json --path #{xcresult_sample_path}" }
+        let(:expected) { ['xcrun', 'xcresulttool', 'get', '--format', 'json', '--path', xcresult_sample_path] }
 
         it 'should not pass `--legacy`', requires_xcode: true do
           expect(command).to eq(expected)
