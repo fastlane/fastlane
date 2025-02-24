@@ -17,17 +17,6 @@ module Trainer
 
     module Parser
       class << self
-        # Since Xcode 16b3, xcresulttool has marked `get <object> --format json` as deprecated/legacy,
-        # and replaced it with `xcrun xcresulttool get test-results tests` instead.
-        def supports_xcode16_xcresulttool?
-          # e.g. DEVELOPER_DIR=/Applications/Xcode_16_beta_3.app
-          # xcresulttool version 23021, format version 3.53 (current)
-          match = `xcrun xcresulttool version`.match(/xcresulttool version (?<version>[\d.]+)/)
-          version = match[:version]
-
-          Gem::Version.new(version) >= Gem::Version.new(23_021)
-        end
-
         # Parses an xcresult file and returns a TestPlan object
         #
         # @param path [String] The path to the xcresult file

@@ -1,3 +1,5 @@
+require_relative 'xcresult/helper'
+
 module Trainer
   module LegacyXCResult
     # Model attributes and relationships taken from running the following command:
@@ -568,7 +570,7 @@ module Trainer
             #{path}
           )
 
-          xcresulttool_cmd << '--legacy' if Trainer::XCResult::Parser.supports_xcode16_xcresulttool?
+          xcresulttool_cmd << '--legacy' if Trainer::XCResult::Helper.supports_xcode16_xcresulttool?
 
           xcresulttool_cmd.join(' ')
         end

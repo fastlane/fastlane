@@ -32,7 +32,7 @@ describe Trainer do
 
       before do
         allow(File).to receive(:expand_path).with(xcresult_sample_path).and_return(xcresult_sample_path)
-        allow(Trainer::XCResult::Parser).to receive(:`).with('xcrun xcresulttool version').and_return(version)
+        allow(Trainer::XCResult::Helper).to receive(:`).with('xcrun xcresulttool version').and_return(version)
       end
 
       context 'with >= Xcode 16 beta 3' do
@@ -56,7 +56,7 @@ describe Trainer do
 
     describe "Stores the data in a useful format" do
       before do
-        allow(Trainer::XCResult::Parser).to receive(:supports_xcode16_xcresulttool?).and_return(true)
+        allow(Trainer::XCResult::Helper).to receive(:supports_xcode16_xcresulttool?).and_return(true)
       end
       let(:config) { { force_legacy_xcresulttool: true } }
 
