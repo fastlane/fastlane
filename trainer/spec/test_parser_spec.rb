@@ -55,9 +55,6 @@ describe Trainer do
     end
 
     describe "Stores the data in a useful format" do
-      before do
-        allow(Trainer::XCResult::Helper).to receive(:supports_xcode16_xcresulttool?).and_return(true)
-      end
       let(:config) { { force_legacy_xcresulttool: true } }
 
       describe "#tests_successful?" do
