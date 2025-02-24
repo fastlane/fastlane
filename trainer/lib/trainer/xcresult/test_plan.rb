@@ -31,8 +31,8 @@ module Trainer
         end || []
 
         new(
-          test_suites: test_suites, 
-          configurations: configurations, 
+          test_suites: test_suites,
+          configurations: configurations,
           devices: devices
         )
       end
@@ -51,9 +51,8 @@ module Trainer
           tests: test_suites.sum(&:test_cases_count).to_s,
           failures: test_suites.sum(&:failures_count).to_s,
           skipped: test_suites.sum(&:skipped_count).to_s,
-          time: test_suites.sum(&:duration).to_s
-        )
-        
+          time: test_suites.sum(&:duration).to_s)
+
         # Add each test suite to the root
         test_suites.each do |suite|
           testsuites.add_element(suite.to_xml(output_remove_retry_attempts: output_remove_retry_attempts))
@@ -65,7 +64,7 @@ module Trainer
 
         # Add properties for configuration and device
         properties = Helper.create_xml_element('properties')
-      
+
         @configurations.each do |config|
           config_prop = Helper.create_xml_element('property', name: 'Configuration', value: config['configurationName'])
           properties.add_element(config_prop)
@@ -75,9 +74,9 @@ module Trainer
           device_prop = Helper.create_xml_element('property', name: 'device', value: "#{device.fetch('modelName', 'Unknown Device')} (#{device.fetch('osVersion', 'Unknown OS Version')})")
           properties.add_element(device_prop)
         end
-      
+
         testsuites.add_element(properties) if properties.elements.any?
-        
+
         doc.add(testsuites)
 
         formatter = REXML::Formatters::Pretty.new

@@ -50,17 +50,23 @@ module Trainer
           retries = Helper.find_json_children(node_for_attributes, 'Repetition', 'Test Case Run')
                          &.map { |rep_node| Repetition.from_json(node: rep_node) } || []
 
-          failure_messages = retries.empty? ? 
-            extract_failure_messages(node_for_attributes) : 
-            retries.flat_map(&:failure_messages)
-          
-          source_references = retries.empty? ? 
-            extract_source_references(node_for_attributes) : 
-            retries.flat_map(&:source_references)
+          failure_messages = if retries.empty?
+                               extract_failure_messages(node_for_attributes)
+                             else
+                               retries.flat_map(&:failure_messages)
+                             end
 
-          attachments = retries.empty? ? 
-            extract_attachments(node_for_attributes) : 
-            retries.flat_map(&:attachments)
+          source_references = if retries.empty?
+                                extract_source_references(node_for_attributes)
+                              else
+                                retries.flat_map(&:source_references)
+                              end
+
+          attachments = if retries.empty?
+                          extract_attachments(node_for_attributes)
+                        else
+                          retries.flat_map(&:attachments)
+                        end
 
           new(
             name: node['name'],
@@ -86,13 +92,16 @@ module Trainer
       # - If retries, the array contains one <testcase> element per retry
       def to_xml_nodes
         runs = @retries.nil? || @retries.empty? ? [nil] : @retries
-        
+
         runs.map do |run|
           Helper.create_xml_element('testcase',
-            name: @argument.nil? ? @name : @name.match?(/(\(.*\))/) ? @name.gsub(/(\(.*\))/, "(#{@argument})") : "#{@name} (#{@argument})",
+            name: if @argument.nil?
+                    @name
+                  else
+                    @name.match?(/(\(.*\))/) ? @name.gsub(/(\(.*\))/, "(#{@argument})") : "#{@name} (#{@argument})"
+                  end,
             classname: @classname,
-            time: (run || self).duration.to_s
-          ).tap do |testcase|
+            time: (run || self).duration.to_s).tap do |testcase|
             add_xml_result_elements(testcase, run || self)
             add_properties_to_xml(testcase, repetition_name: run&.name)
           end
@@ -109,7 +118,7 @@ module Trainer
 
       def total_failures_count
         if retries_count > 0
-          @retries.count { |retry_run| retry_run.failed? }
+          @retries.count(&:failed?)
         elsif failed?
           1
         else
@@ -117,14 +126,15 @@ module Trainer
         end
       end
 
-      private
-
       def self.extract_classname(node)
         return nil if node['nodeIdentifier'].nil?
-        
+
         parts = node['nodeIdentifier'].split('/')
         parts[0...-1].join('.')
       end
+      private_class_method :extract_classname
+
+      private
 
       # Adds <properties> element to the XML <testcase> element
       #
@@ -143,7 +153,7 @@ module Trainer
       # <properties> element is only added to the XML if at least one property exists
       def add_properties_to_xml(testcase, repetition_name: nil)
         properties = Helper.create_xml_element('properties')
-        
+
         # Add argument as property
         if @argument
           name_prop = Helper.create_xml_element('property', name: "testname", value: @name)

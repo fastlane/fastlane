@@ -284,7 +284,7 @@ describe Trainer do
   describe Trainer::XCResult::Parser do
     it 'generates same data for legacy and new commands' do
       xcresult_path = File.expand_path('../fixtures/Test.test_result.xcresult', __FILE__)
-      
+
       keys_to_compare = [
         :number_of_tests,
         :number_of_failures,
@@ -293,16 +293,16 @@ describe Trainer do
         :number_of_retries,
         :number_of_skipped
       ]
-  
+
       test_plan = Trainer::XCResult::Parser.parse_xcresult(path: xcresult_path)
       new_parser_data = test_plan.map do |suite|
         suite.to_hash.slice(*keys_to_compare)
       end
-  
+
       legacy_parser_data = Trainer::LegacyXCResult::Parser.parse_xcresult(path: xcresult_path).map do |hash|
         hash.slice(*keys_to_compare)
       end
-      
+
       expect(legacy_parser_data).to eq(new_parser_data)
     end
 

@@ -24,7 +24,7 @@ module Trainer
       # @return [Array<Hash>] Array of child nodes matching the specified types
       def self.find_json_children(node, *node_types)
         return [] if node.nil? || node['children'].nil?
-        
+
         node['children'].select { |child| node_types.include?(child['nodeType']) }
       end
 

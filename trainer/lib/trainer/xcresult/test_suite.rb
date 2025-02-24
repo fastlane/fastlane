@@ -50,34 +50,34 @@ module Trainer
       end
 
       def duration
-        @duration ||= @test_cases.sum { |tc| tc.duration } + @sub_suites.sum { |sub_suite| sub_suite.duration }
+        @duration ||= @test_cases.sum(&:duration) + @sub_suites.sum(&:duration)
       end
 
       def test_cases_count
-        @test_cases_count ||= @test_cases.count + @sub_suites.sum { |sub_suite| sub_suite.test_cases_count }
+        @test_cases_count ||= @test_cases.count + @sub_suites.sum(&:test_cases_count)
       end
 
       def failures_count
-        @failures_count ||= @test_cases.count { |tc| tc.failed? } + @sub_suites.sum { |sub_suite| sub_suite.failures_count }
+        @failures_count ||= @test_cases.count(&:failed?) + @sub_suites.sum(&:failures_count)
       end
 
       def skipped_count
-        @skipped_count ||= @test_cases.count { |tc| tc.skipped? } + @sub_suites.sum { |sub_suite| sub_suite.skipped_count }
+        @skipped_count ||= @test_cases.count(&:skipped?) + @sub_suites.sum(&:skipped_count)
       end
 
       def total_tests_count
-        @test_cases.sum(&:total_tests_count) + 
-        @sub_suites.sum(&:total_tests_count)
+        @test_cases.sum(&:total_tests_count) +
+          @sub_suites.sum(&:total_tests_count)
       end
 
       def total_failures_count
-        @test_cases.sum(&:total_failures_count) + 
-        @sub_suites.sum(&:total_failures_count)
+        @test_cases.sum(&:total_failures_count) +
+          @sub_suites.sum(&:total_failures_count)
       end
 
       def total_retries_count
-        @test_cases.sum(&:retries_count) + 
-        @sub_suites.sum(&:total_retries_count)
+        @test_cases.sum(&:retries_count) +
+          @sub_suites.sum(&:total_retries_count)
       end
 
       # Hash representation used by TestParser to collect test results
@@ -95,13 +95,12 @@ module Trainer
       # Generates a JUnit-compatible XML representation of the test suite
       # See https://github.com/testmoapp/junitxml/
       def to_xml(output_remove_retry_attempts: false)
-        testsuite = Helper.create_xml_element('testsuite', 
-          name: @name, 
-          time: duration.to_s, 
-          tests: test_cases_count.to_s, 
-          failures: failures_count.to_s, 
-          skipped: skipped_count.to_s
-        )
+        testsuite = Helper.create_xml_element('testsuite',
+          name: @name,
+          time: duration.to_s,
+          tests: test_cases_count.to_s,
+          failures: failures_count.to_s,
+          skipped: skipped_count.to_s)
 
         # Add test cases
         @test_cases.each do |test_case|

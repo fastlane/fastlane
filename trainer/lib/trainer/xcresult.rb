@@ -14,7 +14,6 @@ module Trainer
   # Model xcresulttool JSON output for Xcode16+ version of xcresulttool
   # See JSON schema from `xcrun xcresulttool get test-results tests --help`
   module XCResult
-
     module Parser
       class << self
         # Parses an xcresult file and returns a TestPlan object
@@ -24,7 +23,7 @@ module Trainer
         # @return [TestPlan] A TestPlan object containing the test results
         def parse_xcresult(path:, output_remove_retry_attempts: false)
           json = xcresult_to_json(path)
-          
+
           TestPlan.from_json(
             json: json
           ).tap do |test_plan|

@@ -81,4 +81,4 @@ module Trainer
       end
     end
   end
-end 
+end
