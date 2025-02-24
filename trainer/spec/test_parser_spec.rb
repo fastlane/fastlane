@@ -282,7 +282,7 @@ describe Trainer do
   end
 
   describe Trainer::XCResult::Parser do
-    it 'generates same data for legacy and new commands' do
+    it 'generates same data for legacy and new commands', requires_xcodebuild: true do
       xcresult_path = File.expand_path('../fixtures/Test.test_result.xcresult', __FILE__)
 
       keys_to_compare = [
@@ -311,7 +311,7 @@ describe Trainer do
       let(:json_fixture_path) { File.expand_path("../fixtures/Xcode16-Mixed-XCTest-SwiftTesting.json", __FILE__) }
       let(:json_fixture) { JSON.parse(File.read(json_fixture_path)) }
 
-      it 'generates correct JUnit XML including retries' do
+      it 'generates correct JUnit XML including retries', requires_xcodebuild: true do
         # Uncomment this if you want to bypass the xcresult_to_json call during testing
         # allow(Trainer::XCResult::Parser).to receive(:xcresult_to_json).with(xcresult_path).and_return(json_fixture)
 
@@ -323,7 +323,7 @@ describe Trainer do
         expect(junit_xml.chomp).to eq(expected_xml.chomp)
       end
 
-      it 'generates correct JUnit XML excluding retries' do
+      it 'generates correct JUnit XML excluding retries', requires_xcodebuild: true do
         # Uncomment this if you want to bypass the xcresult_to_json call during testing
         # allow(Trainer::XCResult::Parser).to receive(:xcresult_to_json).with(xcresult_path).and_return(json_fixture)
 
