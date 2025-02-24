@@ -777,19 +777,35 @@ module Spaceship
       parse_response(response)
     end
 
-    def create_key!(name: nil, service_configs: nil, scope: 'team')
+    def create_key!(name: nil, service_configs: nil)
       fetch_csrf_token_for_keys
 
-      # Format service configurations for APNS
-      service_configs_requests = (service_configs || []).map do |config|
+      service_configs_requests = (service_configs || {}).map do |service_id, configs|
+        if service_id == Spaceship::Portal::Key::MUSIC_KIT_ID
         {
+          serviceId: service_id,
           isNew: true,
-          serviceId: "U27F4V844T",
-          identifiers: {},
-          environment: "all",
-          scope: scope
-        }.merge(config) # Merge any passed config properties
+          identifiers: configs[:identifiers] || {},
+          }
+        elsif service_id == Spaceship::Portal::Key::DEVICE_CHECK_ID
+          {
+            serviceId: service_id,
+            isNew: true,
+            identifiers: configs[:identifiers] || {},
+          }
+        elsif service_id == Spaceship::Portal::Key::APNS_ID
+          {
+            serviceId: service_id,
+            isNew: true,
+            identifiers: configs[:identifiers] || {},
+            environment: configs[:environment] || "all",
+            scope: configs[:scope] || "team"
+          }
+        else
+          raise "Unknown service id: #{service_id}"
+        end
       end
+      
 
       params = {
         name: name,
