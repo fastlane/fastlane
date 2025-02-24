@@ -194,7 +194,7 @@ module Trainer
         
         runs.map do |run|
           Helper.create_xml_element('testcase',
-            name: @name,
+            name: @argument.nil? ? @name : @name.match?(/(\(.*\))/) ? @name.gsub(/(\(.*\))/, "(#{@argument})") : "#{@name} (#{@argument})",
             classname: @classname,
             time: (run || self).duration.to_s
           ).tap do |testcase|
@@ -237,11 +237,13 @@ module Trainer
       # @param repetition_name [String, nil] Name of the retry attempt, if this is a retry
       #
       # Properties added:
-      # - argument: Test argument value if present
-      # - repetition: Name of the retry attempt if present
-      # - source_referenceN: Source code references (file/line) for failures
-      # - attachmentN: Test attachments like screenshots
-      # - tagN: Test tags/categories
+      # - if argument is present:
+      #   - `testname`: Raw test name (as in such case, <testcase name="…"> would contain a mix of the test name and the argument)
+      #   - `argument`: Test argument value
+      # - `repetitionN`: Name of the retry attempt if present
+      # - `source_referenceN`: Source code references (file/line) for failures
+      # - `attachmentN`: Test attachments like screenshots
+      # - `tagN`: Test tags/categories
       #
       # <properties> element is only added to the XML if at least one property exists
       def add_properties_to_xml(testcase, repetition_name: nil)
@@ -249,6 +251,8 @@ module Trainer
         
         # Add argument as property
         if @argument
+          name_prop = Helper.create_xml_element('property', name: "testname", value: @name)
+          properties.add_element(name_prop)
           prop = Helper.create_xml_element('property', name: "argument", value: @argument)
           properties.add_element(prop)
         end
