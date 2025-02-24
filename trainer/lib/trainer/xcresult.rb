@@ -148,28 +148,32 @@ module Trainer
 
         # Generate test cases for each argument
         argument_nodes.map do |arg_node|
-          retries = Helper.find_json_children(node, 'Repetition', 'Test Case Run')
+          # For repetition nodes, failure messages, source refs, attachments and result attributes,
+          # Search them as children of the argument child node if present, of the test case node otherwise.
+          node_for_attributes = arg_node || node
+
+          retries = Helper.find_json_children(node_for_attributes, 'Repetition', 'Test Case Run')
                          &.map { |rep_node| Repetition.from_json(node: rep_node) } || []
 
           failure_messages = retries.empty? ? 
-            extract_failure_messages(node) : 
+            extract_failure_messages(node_for_attributes) : 
             retries.flat_map(&:failure_messages)
           
           source_references = retries.empty? ? 
-            extract_source_references(node) : 
+            extract_source_references(node_for_attributes) : 
             retries.flat_map(&:source_references)
 
           attachments = retries.empty? ? 
-            extract_attachments(node) : 
+            extract_attachments(node_for_attributes) : 
             retries.flat_map(&:attachments)
 
           new(
             name: node['name'],
             identifier: node['nodeIdentifier'],
             duration: parse_duration(node['duration']),
-            result: node['result'],
+            result: node_for_attributes['result'],
             classname: extract_classname(node),
-            argument: arg_node&.[]('name'),
+            argument: arg_node&.[]('name'), # Only set if there is an argument
             tags: node['tags'] || [],
             retries: retries,
             failure_messages: failure_messages,
