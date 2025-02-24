@@ -51,8 +51,10 @@ module Gym
         # Can be a mac project and not build mac if catalyst
         return building_mac_catalyst_for_mac?
       else
-        # Can be mac project or multiplatform and building for macOS
-        return Gym.project.mac? || building_multiplatform_for_mac?
+        # Can be mac project but multiplatform and building for iOS
+        return false if building_multiplatform_for_ios?
+
+        return Gym.project.mac?
       end
     end
 
