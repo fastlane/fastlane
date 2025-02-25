@@ -65,7 +65,7 @@ describe Spaceship::Portal::Key do
           }
         }
       }
-      
+
       mock_client_response(:create_key!, with: { name: 'New Key', service_configs: expected_service_configs }) do
         {
           keyId: 'a-new-key-id'
