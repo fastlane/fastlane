@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuites tests="2" failures="1">
+    <testsuite name="FastlaneTrainerSwiftTestingTests" tests="2" failures="1" skipped="0" time="0.0024025440216064453">
+        <properties>
+          <property name="Configuration" value="Configuration 1"/>
+        </properties>
+        <testcase classname="NestedTests" name="nestedExampleShouldFail()" time="0.001239776611328125">
+            <failure message="Expectation failed: true == false (/Users/jhagglund/dev2/FastlaneTrainerSwiftTesting/FastlaneTrainerSwiftTestingTests/FastlaneTrainerSwiftTestingTests.swift#EndingLineNumber=18&amp;StartingLineNumber=18)">
+            </failure>
+        </testcase>
+        <testcase classname="NestedTests" name="nestedExampleShouldFail()" time="0.0004439353942871094">
+            <failure message="Expectation failed: true == false (/Users/jhagglund/dev2/FastlaneTrainerSwiftTesting/FastlaneTrainerSwiftTestingTests/FastlaneTrainerSwiftTestingTests.swift#EndingLineNumber=18&amp;StartingLineNumber=18)">
+            </failure>
+        </testcase>
+        <testcase classname="NestedTests" name="nestedExampleShouldFail()" time="9.012222290039062e-05">
+            <failure message="Expectation failed: true == false (/Users/jhagglund/dev2/FastlaneTrainerSwiftTesting/FastlaneTrainerSwiftTestingTests/FastlaneTrainerSwiftTestingTests.swift#EndingLineNumber=18&amp;StartingLineNumber=18)">
+            </failure>
+        </testcase>
+        <testcase classname="FastlaneTrainerSwiftTestingTests" name="topLevelShouldPass()" time="0.00015282630920410156">
+        </testcase>
+        <testcase classname="FastlaneTrainerSwiftTestingTests" name="topLevelShouldPass()" time="0.0004169940948486328">
+        </testcase>
+        <testcase classname="FastlaneTrainerSwiftTestingTests" name="topLevelShouldPass()" time="5.888938903808594e-05">
+        </testcase>
+    </testsuite>
+</testsuites>

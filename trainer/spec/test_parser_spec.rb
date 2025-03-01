@@ -118,6 +118,102 @@ describe Trainer do
                               ])
       end
 
+      it "works as expected with an xcresult from Swift Testing without parameterized tests", requires_xcode: true do
+        tp = Trainer::TestParser.new("./trainer/spec/fixtures/SwiftTesting.xcresult")
+        expect(tp.data).to eq([
+                                {
+                                  "project_path": "FastlaneTrainerSwiftTesting.xcodeproj",
+                                  "target_name": "FastlaneTrainerSwiftTestingTests",
+                                  "test_name": "FastlaneTrainerSwiftTestingTests",
+                                  "configuration_name": "Configuration 1",
+                                  "duration": 0.0024025440216064453,
+                                  "tests": [
+                                    {
+                                      "identifier": "NestedTests.nestedExampleShouldFail()",
+                                      "name": "nestedExampleShouldFail()",
+                                      "duration": 0.001239776611328125,
+                                      "status": "Failure",
+                                      "test_group": "NestedTests",
+                                      "guid": "",
+                                      "failures": [
+                                        {
+                                          "file_name": "",
+                                          "line_number": 0,
+                                          "message": "",
+                                          "performance_failure": {},
+                                          "failure_message": "Expectation failed: true == false (/Users/jhagglund/dev2/FastlaneTrainerSwiftTesting/FastlaneTrainerSwiftTestingTests/FastlaneTrainerSwiftTestingTests.swift#EndingLineNumber=18&StartingLineNumber=18)"
+                                        }
+                                      ]
+                                    },
+                                    {
+                                      "identifier": "NestedTests.nestedExampleShouldFail()",
+                                      "name": "nestedExampleShouldFail()",
+                                      "duration": 0.0004439353942871094,
+                                      "status": "Failure",
+                                      "test_group": "NestedTests",
+                                      "guid": "",
+                                      "failures": [
+                                        {
+                                          "file_name": "",
+                                          "line_number": 0,
+                                          "message": "",
+                                          "performance_failure": {},
+                                          "failure_message": "Expectation failed: true == false (/Users/jhagglund/dev2/FastlaneTrainerSwiftTesting/FastlaneTrainerSwiftTestingTests/FastlaneTrainerSwiftTestingTests.swift#EndingLineNumber=18&StartingLineNumber=18)"
+                                        }
+                                      ]
+                                    },
+                                    {
+                                      "identifier": "NestedTests.nestedExampleShouldFail()",
+                                      "name": "nestedExampleShouldFail()",
+                                      "duration": 9.012222290039062e-05,
+                                      "status": "Failure",
+                                      "test_group": "NestedTests",
+                                      "guid": "",
+                                      "failures": [
+                                        {
+                                          "file_name": "",
+                                          "line_number": 0,
+                                          "message": "",
+                                          "performance_failure": {},
+                                          "failure_message": "Expectation failed: true == false (/Users/jhagglund/dev2/FastlaneTrainerSwiftTesting/FastlaneTrainerSwiftTestingTests/FastlaneTrainerSwiftTestingTests.swift#EndingLineNumber=18&StartingLineNumber=18)"
+                                        }
+                                      ]
+                                    },
+                                    {
+                                      "identifier": "FastlaneTrainerSwiftTestingTests.topLevelShouldPass()",
+                                      "name": "topLevelShouldPass()",
+                                      "duration": 0.00015282630920410156,
+                                      "status": "Success",
+                                      "test_group": "FastlaneTrainerSwiftTestingTests",
+                                      "guid": ""
+                                    },
+                                    {
+                                      "identifier": "FastlaneTrainerSwiftTestingTests.topLevelShouldPass()",
+                                      "name": "topLevelShouldPass()",
+                                      "duration": 0.0004169940948486328,
+                                      "status": "Success",
+                                      "test_group": "FastlaneTrainerSwiftTestingTests",
+                                      "guid": ""
+                                    },
+                                    {
+                                      "identifier": "FastlaneTrainerSwiftTestingTests.topLevelShouldPass()",
+                                      "name": "topLevelShouldPass()",
+                                      "duration": 5.888938903808594e-05,
+                                      "status": "Success",
+                                      "test_group": "FastlaneTrainerSwiftTestingTests",
+                                      "guid": ""
+                                    }
+                                  ],
+                                  "number_of_tests": 6,
+                                  "number_of_failures": 3,
+                                  "number_of_tests_excluding_retries": 2,
+                                  "number_of_skipped": 0,
+                                  "number_of_failures_excluding_retries": 1,
+                                  "number_of_retries": 4
+                                }
+                              ])
+      end
+
       it "works as expected with xcresult", requires_xcode: true do
         tp = Trainer::TestParser.new("./trainer/spec/fixtures/Test.test_result.xcresult")
         expect(tp.data).to eq([

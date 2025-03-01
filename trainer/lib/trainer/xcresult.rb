@@ -186,10 +186,11 @@ module Trainer
           #     or identifier: "TestThisDude/testFailureJosh2" (when Objective-C)
 
           found_failure = failures.find do |failure|
-            # Sanitize both test case name and identifier in a consistent fashion, then replace all non-word
-            # chars with underscore, and compare them
             sanitized_test_case_name = sanitizer.call(failure.test_case_name)
-            sanitized_identifier == sanitized_test_case_name
+
+            # Swfit Testing can break the expectation of strict equality when the test case is nested under an inner class.
+            # In this case, we can assert that the identifier ends with the test case name.
+            sanitized_identifier == sanitized_test_case_name || sanitized_identifier.end_with?(sanitized_test_case_name)
           end
           return found_failure
         else

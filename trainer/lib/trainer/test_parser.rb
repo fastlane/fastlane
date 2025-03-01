@@ -394,6 +394,7 @@ module Trainer
               guid: current_test["TestSummaryGUID"],
               duration: current_test["Duration"]
             }
+
             if current_test["FailureSummaries"]
               current_row[:failures] = current_test["FailureSummaries"].collect do |current_failure|
                 {
