@@ -29,6 +29,31 @@ describe Fastlane do
           end
         end
 
+        describe "calls setup_keychain after setup_output_paths if CODEBUILD_BUILD_ARN env variable is set on Mac Agents" do
+          before do
+            stub_const("ENV", { "CODEBUILD_BUILD_ARN" => "anything" })
+          end
+          it "runs on Mac" do
+            allow(FastlaneCore::Helper).to receive(:mac?).and_return(true)
+
+            # Message is asserted in reverse order, hence output of setup_output_paths is expected last
+            expect(Fastlane::UI).to receive(:message).with("Enabling match readonly mode.")
+            expect(Fastlane::UI).to receive(:message).with("Creating temporary keychain: \"fastlane_tmp_keychain\".")
+            expect(Fastlane::UI).to receive(:message).with("Skipping Log Path setup as FL_OUTPUT_DIR is unset")
+
+            described_class.run(force: true)
+          end
+
+          it "skips on linux" do
+            allow(FastlaneCore::Helper).to receive(:mac?).and_return(false)
+
+            expect(Fastlane::UI).to receive(:message).with("Skipping Log Path setup as FL_OUTPUT_DIR is unset")
+            expect(Fastlane::UI).to receive(:message).with("Skipping Keychain setup on non-macOS CI Agent")
+
+            described_class.run(provider: "circleci")
+          end
+        end
+
         describe "calls setup_keychain if no provider is be detected on Mac Agents" do
           it "runs on Mac" do
             allow(FastlaneCore::Helper).to receive(:mac?).and_return(true)
@@ -95,7 +120,17 @@ describe Fastlane do
         end
       end
 
-      context "when not running on CircleCI" do
+      context "When running on CodeBuild" do
+        before do
+          stub_const("ENV", { "CODEBUILD_BUILD_ARN" => "anything" })
+        end
+
+        it "returns codebuild when :provider is not set" do
+          expect(described_class.detect_provider({})).to eql("codebuild")
+        end
+      end
+
+      context "when not running on CircleCI and CodeBuild" do
         before do
           # Unset environment to ensure CIRCLECI is not set even if the test suite is run on CircleCI
           stub_const("ENV", {})
