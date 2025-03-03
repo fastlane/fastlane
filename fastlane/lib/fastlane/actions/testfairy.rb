@@ -151,11 +151,11 @@ module Fastlane
       private_class_method :parse_response
 
       def self.description
-        'Upload a new build to [TestFairy](https://www.testfairy.com/)'
+        'Upload a new build to [TestFairy](https://saucelabs.com/products/mobile-testing/app-betas)'
       end
 
       def self.details
-        "You can retrieve your API key on [your settings page](https://free.testfairy.com/settings/)"
+        "You can retrieve your API key on [your settings page](https://app.testfairy.com/settings/access-key)"
       end
 
       def self.available_options
