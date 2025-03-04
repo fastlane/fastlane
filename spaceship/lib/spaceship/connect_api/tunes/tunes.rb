@@ -417,6 +417,15 @@ module Spaceship
         end
 
         #
+        # appAvailabilities
+        #
+
+        def get_app_availabilities(app_id: nil, filter: nil, includes: nil, limit: nil, sort: nil)
+          params = tunes_request_client.build_params(filter: nil, includes: includes, limit: limit, sort: nil)
+          tunes_request_client.get("#{Version::V2}/appAvailabilities/#{app_id}", params)
+        end
+
+        #
         # availableTerritories
         #
 
@@ -1092,51 +1101,6 @@ module Spaceship
         def delete_custom_app_organization(custom_app_organization_id: nil)
           params = tunes_request_client.build_params(filter: nil, includes: nil, limit: nil, sort: nil)
           tunes_request_client.delete("#{Version::V1}/customAppOrganizations/#{custom_app_organization_id}", params)
-        end
-
-        #
-        # idfaDeclarations
-        #
-
-        def get_idfa_declaration(app_store_version_id: nil)
-          params = tunes_request_client.build_params(filter: nil, includes: nil, limit: nil, sort: nil)
-          tunes_request_client.get("#{Version::V1}/appStoreVersions/#{app_store_version_id}/idfaDeclaration", params)
-        end
-
-        def post_idfa_declaration(app_store_version_id: nil, attributes: nil)
-          body = {
-            data: {
-              type: "idfaDeclarations",
-              attributes: attributes,
-              relationships: {
-                appStoreVersion: {
-                  data: {
-                    type: "appStoreVersions",
-                    id: app_store_version_id
-                  }
-                }
-              }
-            }
-          }
-
-          tunes_request_client.post("#{Version::V1}/idfaDeclarations", body)
-        end
-
-        def patch_idfa_declaration(idfa_declaration_id: nil, attributes: nil)
-          body = {
-            data: {
-              type: "idfaDeclarations",
-              id: idfa_declaration_id,
-              attributes: attributes
-            }
-          }
-
-          tunes_request_client.patch("#{Version::V1}/idfaDeclarations/#{idfa_declaration_id}", body)
-        end
-
-        def delete_idfa_declaration(idfa_declaration_id: nil)
-          params = tunes_request_client.build_params(filter: nil, includes: nil, limit: nil, sort: nil)
-          tunes_request_client.delete("#{Version::V1}/idfaDeclarations/#{idfa_declaration_id}", params)
         end
 
         #

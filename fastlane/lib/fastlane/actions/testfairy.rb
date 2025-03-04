@@ -96,6 +96,16 @@ module Fastlane
             [key, options_to_client.call(value).join(',')]
           when :custom
             [key, value]
+          when :tags
+            [key, value.join(',')]
+          when :folder_name
+            [key, value]
+          when :landing_page_mode
+            [key, value]
+          when :upload_to_saucelabs
+            [key, value]
+          when :platform
+            [key, value]
           else
             UI.user_error!("Unknown parameter: #{key}")
           end
@@ -235,13 +245,45 @@ module Fastlane
           FastlaneCore::ConfigItem.new(key: :custom,
                                        optional: true,
                                        env_name: "FL_TESTFAIRY_CUSTOM",
-                                       description: "Array of custom options. Contact support@testfairy.com for more information",
+                                       description: "Array of custom options. Contact support for more information",
                                        default_value: ''),
           FastlaneCore::ConfigItem.new(key: :timeout,
                                        env_name: "FL_TESTFAIRY_TIMEOUT",
                                        description: "Request timeout in seconds",
                                        type: Integer,
-                                       optional: true)
+                                       optional: true),
+          FastlaneCore::ConfigItem.new(key: :tags,
+                                       optional: true,
+                                       env_name: "FL_TESTFAIRY_TAGS",
+                                       description: "Custom tags that can be used to organize your builds",
+                                       type: Array,
+                                       default_value: []),
+          FastlaneCore::ConfigItem.new(key: :folder_name,
+                                       optional: true,
+                                       env_name: "FL_TESTFAIRY_FOLDER_NAME",
+                                       description: "Name of the dashboard folder that contains this app",
+                                       default_value: ''),
+          FastlaneCore::ConfigItem.new(key: :landing_page_mode,
+                                       optional: true,
+                                       env_name: "FL_TESTFAIRY_LANDING_PAGE_MODE",
+                                       description: "Visibility of build landing after upload. Can be 'open' or 'closed'",
+                                       default_value: 'open',
+                                       verify_block: proc do |value|
+                                         UI.user_error!("The landing page mode can only be open or closed") unless %w(open closed).include?(value)
+                                       end),
+          FastlaneCore::ConfigItem.new(key: :upload_to_saucelabs,
+                                       optional: true,
+                                       env_name: "FL_TESTFAIRY_UPLOAD_TO_SAUCELABS",
+                                       description: "Upload file directly to Sauce Labs. It can be 'on' or 'off'",
+                                       default_value: 'off',
+                                       verify_block: proc do |value|
+                                         UI.user_error!("The upload to Sauce Labs can only be on or off") unless %w(on off).include?(value)
+                                       end),
+          FastlaneCore::ConfigItem.new(key: :platform,
+                                       optional: true,
+                                       env_name: "FL_TESTFAIRY_PLATFORM",
+                                       description: "Use if upload build is not iOS or Android. Contact support for more information",
+                                       default_value: '')
         ]
       end
 

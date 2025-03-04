@@ -1,5 +1,5 @@
 describe Spaceship::ConnectAPI::Certificate do
-  before { Spaceship::Portal.login }
+  include_examples "common spaceship login"
 
   describe '#client' do
     it '#get_certificates' do

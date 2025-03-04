@@ -186,7 +186,7 @@ module Fastlane
                                        optional: true,
                                        default_value: "ios",
                                        verify_block: proc do |value|
-                                         UI.user_error!("The platform can only be ios, appletvos, or osx") unless %('ios', 'appletvos', 'osx').include?(value)
+                                         UI.user_error!("The platform can only be ios, appletvos/tvos, xros or osx") unless %w(ios appletvos tvos xros osx).include?(value)
                                        end),
           FastlaneCore::ConfigItem.new(key: :team_name,
                                        short_option: "-e",

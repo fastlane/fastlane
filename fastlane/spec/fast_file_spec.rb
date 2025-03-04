@@ -49,7 +49,7 @@ describe Fastlane do
         end
 
         it "passes command as string, step_name, and log false with default error_callback" do
-          expect(Fastlane::Actions).to receive(:execute_action).with("shell command").and_call_original
+          expect(Fastlane::Actions).to receive(:execute_action).with("some_name").and_call_original
 
           expect(Fastlane::Actions).to receive(:sh_no_action)
             .with("git commit", log: false, error_callback: nil)

@@ -16,7 +16,6 @@ module Spaceship
       attr_accessor :copyright
       attr_accessor :release_type
       attr_accessor :earliest_release_date # 2020-06-17T12:00:00-07:00
-      attr_accessor :uses_idfa
       attr_accessor :is_watch_only
       attr_accessor :downloadable
       attr_accessor :created_date
@@ -90,7 +89,6 @@ module Spaceship
         "copyright" =>  "copyright",
         "releaseType" =>  "release_type",
         "earliestReleaseDate" =>  "earliest_release_date",
-        "usesIdfa" =>  "uses_idfa",
         "isWatchOnly" =>  "is_watch_only",
         "downloadable" =>  "downloadable",
         "createdDate" =>  "created_date",
@@ -127,7 +125,7 @@ module Spaceship
       # API
       #
 
-      # app,routingAppCoverage,resetRatingsRequest,appStoreVersionSubmission,appStoreVersionPhasedRelease,ageRatingDeclaration,appStoreReviewDetail,idfaDeclaration,gameCenterConfiguration
+      # app,routingAppCoverage,resetRatingsRequest,appStoreVersionSubmission,appStoreVersionPhasedRelease,ageRatingDeclaration,appStoreReviewDetail,gameCenterConfiguration
       def self.get(client: nil, app_store_version_id: nil, includes: nil, limit: nil, sort: nil)
         client ||= Spaceship::ConnectAPI
         return client.get_app_store_version(
@@ -238,22 +236,6 @@ module Spaceship
       def select_build(client: nil, build_id: nil)
         client ||= Spaceship::ConnectAPI
         resp = client.patch_app_store_version_with_build(app_store_version_id: id, build_id: build_id)
-        return resp.to_models.first
-      end
-
-      #
-      # IDFA Declarations
-      #
-
-      def fetch_idfa_declaration(client: nil)
-        client ||= Spaceship::ConnectAPI
-        resp = client.get_idfa_declaration(app_store_version_id: id)
-        return resp.to_models.first
-      end
-
-      def create_idfa_declaration(client: nil, attributes: nil)
-        client ||= Spaceship::ConnectAPI
-        resp = client.post_idfa_declaration(app_store_version_id: id, attributes: attributes)
         return resp.to_models.first
       end
 
