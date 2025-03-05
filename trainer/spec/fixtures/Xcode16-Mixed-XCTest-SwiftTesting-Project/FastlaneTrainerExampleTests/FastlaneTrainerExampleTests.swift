@@ -64,7 +64,7 @@ struct FastlaneTrainerTests {
   @Test(.serialized, arguments: (0..<128).map(UnicodeScalar.init).map(Character.init))
   func testName🏷️And📋ParamsUsingSome😱Unusual🤪Characters(asciiCharacter: Character) throws {
     #expect(asciiCharacter.asciiValue != nil)
-    #expect(asciiCharacter.isWhitespace == false)
+    #expect(asciiCharacter.asciiValue ?? 0 > 6, "Character \(asciiCharacter) has ASCII value <= 6")
   }
 
   // MARK: - Nested Test Groups
