@@ -61,6 +61,12 @@ struct FastlaneTrainerTests {
     #expect(randomNumber <= range.max)
   }
 
+  @Test(.serialized, arguments: (0..<128).map(UnicodeScalar.init).map(Character.init))
+  func testName🏷️And📋ParamsUsingSome😱Unusual🤪Characters(asciiCharacter: Character) throws {
+    #expect(asciiCharacter.asciiValue != nil)
+    #expect(asciiCharacter.isWhitespace == false)
+  }
+
   // MARK: - Nested Test Groups
 
   @Suite("String Operations")
