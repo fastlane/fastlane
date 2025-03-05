@@ -11,10 +11,10 @@ module Trainer
       # @param attributes [Hash] A hash of attributes to add to the element
       # @return [REXML::Element] The created XML element
       def self.create_xml_element(name, **attributes)
+        # Sanitize invalid XML characters (control chars except tab/CR/LF) to avoid errors when generating XML
         sanitizer = proc { |text| text.to_s.gsub(/[\x00-\x08\x0B\x0C\x0E-\x1F\x7F]/) { |c| format("\\u%04x", c.ord) } }
         element = REXML::Element.new(sanitizer.call(name))
         attributes.compact.each do |key, value|
-          # Filter out invalid XML characters (control chars except tab/CR/LF)
           safe_value = sanitizer.call(value.to_s)
           element.attributes[key.to_s] = safe_value
         end
