@@ -1,0 +1,3 @@
+# SQLite database files in the .xcresult bundle are not needed for the trainer specs suite
+# So let's save some disk space and not commit them to the repo
+database.sqlite3
