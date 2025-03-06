@@ -124,7 +124,6 @@ module Scan
         # `match list` subcommand added in Xcode 15
         if error.include?('match list')
 
-
           # list SDK version for currently running Xcode
           sdks_output, status = Open3.capture2('xcodebuild -showsdks -json')
           sdk_version = begin
