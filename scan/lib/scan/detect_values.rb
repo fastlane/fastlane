@@ -178,12 +178,12 @@ module Scan
     def self.highest_compatible_simulator(simulators, device_name)
       UI.verbose("highest_compatible_simulator: for '#{device_name}' from: #{simulators} ")
       result = simulators
-        .select { |sim| compatibility_constraint(sim, device_name) }
+               .select { |sim| compatibility_constraint(sim, device_name) }
       UI.verbose("compatible simulators: '#{result}'")
       result = result
-        .reverse
-        .sort_by! { |sim| Gem::Version.new(sim.os_version) }
-        .last
+               .reverse
+               .sort_by! { |sim| Gem::Version.new(sim.os_version) }
+               .last
       UI.verbose("result: '#{result}' is nil?: #{result.nil?}")
       result
     end
