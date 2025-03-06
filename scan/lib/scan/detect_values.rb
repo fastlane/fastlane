@@ -154,11 +154,13 @@ module Scan
           end
 
           os_version = FastlaneCore::DeviceManager.runtime_build_os_versions[runtime_build]
-          UI.verbose("os_version: '#{os_version}' os_version.nil?: #{os_version.nil?}")
-          return nil if os_version.nil?
-          result = Gem::Version.new(os_version)
-          UI.verbose("default_os_version result: '#{result}' result.nil?: #{result.nil?}")
-          result
+          if os_version.nil?
+            UI.error("No OS version found for runtime build: '#{runtime_build}'")
+          else
+            result = Gem::Version.new(os_version)
+            UI.verbose("default_os_version result: '#{result}'")
+            result
+          end
         end
       end
     end
