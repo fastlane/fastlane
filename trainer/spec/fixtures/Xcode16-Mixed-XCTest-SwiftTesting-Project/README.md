@@ -11,16 +11,17 @@ The only reason it is committed to the repo is to:
 
 To add more tests to be then reported in the `.xcresult` fixture so that the `trainer` specs suite can test more cases:
 
- - Add your tests to the Xcode project like you'd do normally.
- - Run the tests in Xcode.
- - When the tests are done running, locate the `.xcresult` file that Xcode created. It'll typically be in the `~/Library/Developer/Xcode/DerivedData/{project-name}-{project-uuid}/Logs/Test/` directory.
- - Copy the new `.xcresult` file and paste it in the `spec/fixtures` directory, giving it the name `Xcode16-Mixed-XCTest-SwiftTesting-Project.xcresult`.
- - Delete the `database.sqlite3` file in the `.xcresult` bundle you just copied, as it is not used by the `trainer` specs suite and would be a waste of disk space.
-
-    ```
-    $ rm -r trainer/spec/fixtures/Xcode16-Mixed-XCTest-SwiftTesting.xcresult
-    $ cp -R ~/Library/Developer/Xcode/DerivedData/FastlaneTrainerExample-{uuid}/Logs/Test/Test-FastlaneTrainerExample-{timestamp}.xcresult trainer/spec/fixtures/Xcode16-Mixed-XCTest-SwiftTesting.xcresult
-    $ rm -r trainer/spec/fixtures/Xcode16-Mixed-XCTest-SwiftTesting.xcresult/Data/database.sqlite3
+ - Add your tests to the Xcode project like you'd do normally, then run the tests in Xcode (⌘U).
+ - Locate the `~/Library/Developer/Xcode/DerivedData/{project-name}-{project-uuid}/Logs/Test/*.xcresult` file that Xcode created.
+   - Let's call that path `$XCRESULT_PATH`.
+ - Run `xcrun xcresulttool get test-results tests --path "$XCRESULT_PATH"`
+   - In addition to printing the JSON of the test results, this call will also have the side effect of generating the `$XCRESULT_PATH/database.sqlite3` database file in the `.xcresult` bundle.
+ - Copy the `$XCRESULT_PATH/{Info.plist,database.sqlite3}` files in the `spec/fixtures/Xcode16-Mixed-XCTest-SwiftTesting-Project.xcresult` directory.
+   - Since the `database.sqlite3` file represents the same data as what's serialized in `$XCRESULT_PATH/Data/*`, but takes way less disk space (since the database can optimize storage), the idea is to only commit that database file instead of the `Data/` directory to save disk space and make the git logs/diffs easier to work with.
+ 
+    ```bash
+    $ XCRESULT_PATH="$HOME/Library/Developer/Xcode/DerivedData/FastlaneTrainerExample-{uuid}/Logs/Test/Test-FastlaneTrainerExample-{timestamp}.xcresult"
+    # cp "$XCRESULT_PATH"/{Info.plist,database.sqlite3} trainer/spec/fixtures/Xcode16-Mixed-XCTest-SwiftTesting.xcresult
     ```
 
 You can then run the `trainer` specs suite, which will use the new `.xcresult` fixture, and adjust the rspec tests accordingly to cover the added cases.
