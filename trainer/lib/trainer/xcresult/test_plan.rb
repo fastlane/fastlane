@@ -53,29 +53,31 @@ module Trainer
           skipped: test_suites.sum(&:skipped_count).to_s,
           time: test_suites.sum(&:duration).to_s)
 
+        # Create <properties> node for configuration and device, to be applied to each suite node
+        properties = Helper.create_xml_element('properties').tap do |properties|
+          @configurations.each do |config|
+            config_prop = Helper.create_xml_element('property', name: 'Configuration', value: config['configurationName'])
+            properties.add_element(config_prop)
+          end
+  
+          @devices.each do |device|
+            device_prop = Helper.create_xml_element('property', name: 'device', value: "#{device.fetch('modelName', 'Unknown Device')} (#{device.fetch('osVersion', 'Unknown OS Version')})")
+            properties.add_element(device_prop)
+          end  
+        end
+
         # Add each test suite to the root
         test_suites.each do |suite|
-          testsuites.add_element(suite.to_xml(output_remove_retry_attempts: output_remove_retry_attempts))
+          suite_node = suite.to_xml(output_remove_retry_attempts: output_remove_retry_attempts)
+          # In JUnit conventions, the <testsuites> root element can't have properties
+          # So we add the <properties> node to each child <testsuite> node instead
+          suite_node.add_element(properties.dup) if properties.elements.any?
+          testsuites.add_element(suite_node)
         end
 
         # Convert to XML string with prologue
         doc = REXML::Document.new
         doc << REXML::XMLDecl.new('1.0', 'UTF-8')
-
-        # Add properties for configuration and device
-        properties = Helper.create_xml_element('properties')
-
-        @configurations.each do |config|
-          config_prop = Helper.create_xml_element('property', name: 'Configuration', value: config['configurationName'])
-          properties.add_element(config_prop)
-        end
-
-        @devices.each do |device|
-          device_prop = Helper.create_xml_element('property', name: 'device', value: "#{device.fetch('modelName', 'Unknown Device')} (#{device.fetch('osVersion', 'Unknown OS Version')})")
-          properties.add_element(device_prop)
-        end
-
-        testsuites.add_element(properties) if properties.elements.any?
 
         doc.add(testsuites)
 

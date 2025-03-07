@@ -1237,6 +1237,10 @@ Password &apos;thisislongenough&apos; is too short'/>
         </testsuite>
       </testsuite>
     </testsuite>
+    <properties>
+      <property name='Configuration' value='MyTestPlanConfig'/>
+      <property name='device' value='iPhone 16 Pro (18.2)'/>
+    </properties>
   </testsuite>
   <testsuite name='FastlaneTrainerExampleXCTests' time='0.74439' tests='11' failures='1' skipped='1'>
     <testsuite name='FastlaneTrainerExampleXCTests' time='0.74439' tests='11' failures='1' skipped='1'>
@@ -1262,6 +1266,10 @@ Password &apos;thisislongenough&apos; is too short'/>
       <testcase name='testPlatformSpecific()' classname='FastlaneTrainerExampleXCTests' time='0.00067'/>
       <testcase name='testThrowingOperation()' classname='FastlaneTrainerExampleXCTests' time='0.0006'/>
     </testsuite>
+    <properties>
+      <property name='Configuration' value='MyTestPlanConfig'/>
+      <property name='device' value='iPhone 16 Pro (18.2)'/>
+    </properties>
   </testsuite>
   <testsuite name='FastlaneTrainerExampleUITests' time='64.0' tests='10' failures='4' skipped='0'>
     <testsuite name='FastlaneTrainerExampleUITests' time='48.0' tests='6' failures='4' skipped='0'>
@@ -1318,9 +1326,9 @@ Password &apos;thisislongenough&apos; is too short'/>
         </properties>
       </testcase>
     </testsuite>
+    <properties>
+      <property name='Configuration' value='MyTestPlanConfig'/>
+      <property name='device' value='iPhone 16 Pro (18.2)'/>
+    </properties>
   </testsuite>
-  <properties>
-    <property name='Configuration' value='MyTestPlanConfig'/>
-    <property name='device' value='iPhone 16 Pro (18.2)'/>
-  </properties>
 </testsuites>
