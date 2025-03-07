@@ -1,15 +1,15 @@
-This Xcode project is not directly used by the `trainer` specs suite as a fixture (i.e. the specs suite don't reference that fixture directly), but it is the Xcode project that was used to generate the `Xcode16-Mixed-XCTest-SwiftTesting-Project.xcresult` file.
+This Xcode project is not directly used by the _trainer_ specs suite as a fixture (i.e. the specs suite don't reference that fixture directly), but it is the Xcode project that was used to generate the `Xcode16-Mixed-XCTest-SwiftTesting-Project.xcresult` file.
 
 ## Why is this Xcode project committed to the repo?
 
 The only reason it is committed to the repo is to:
 
  - Provide a reference to what tests were used to generate the `Xcode16-Mixed-XCTest-SwiftTesting-Project.xcresult` file.
- - Make it easy to add more tests if we want to expand `trainer`'s test suite to cover more cases.
+ - Make it easy to add more tests if we want to expand _trainer_'s test suite to cover more cases.
 
 ## How to add more tests to the `.xcresult` fixture?
 
-To add more tests to be then reported in the `.xcresult` fixture so that the `trainer` specs suite can test more cases:
+To add more tests to be then reported in the `.xcresult` fixture so that the _trainer_ specs suite can test more cases:
 
  - Add your tests to the Xcode project like you'd do normally, then run the tests in Xcode (⌘U).
  - Locate the `~/Library/Developer/Xcode/DerivedData/{project-name}-{project-uuid}/Logs/Test/*.xcresult` file that Xcode created.
@@ -24,4 +24,4 @@ To add more tests to be then reported in the `.xcresult` fixture so that the `tr
     # cp "$XCRESULT_PATH"/{Info.plist,database.sqlite3} trainer/spec/fixtures/Xcode16-Mixed-XCTest-SwiftTesting.xcresult
     ```
 
-You can then run the `trainer` specs suite, which will use the new `.xcresult` fixture, and adjust the rspec tests accordingly to cover the added cases.
+You can then run the _trainer_ specs suite, which will use the new `.xcresult` fixture, and adjust the rspec tests accordingly to cover the added cases.
