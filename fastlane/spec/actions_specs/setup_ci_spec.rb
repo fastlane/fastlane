@@ -76,13 +76,13 @@ describe Fastlane do
         describe "keychain_name option" do
           it "accepts a custom keychain_name" do
             allow(FastlaneCore::Helper).to receive(:mac?).and_return(true)
-  
+
             expect(Fastlane::UI).to receive(:message).with("Enabling match readonly mode.")
             expect(Fastlane::UI).to receive(:message).with("Creating temporary keychain: \"example_keychain_name\".")
-  
+
             described_class.run(force: true, keychain_name: "example_keychain_name")
           end
-        end  
+        end
       end
     end
 
