@@ -54,16 +54,16 @@ module Trainer
           time: test_suites.sum(&:duration).to_s)
 
         # Create <properties> node for configuration and device, to be applied to each suite node
-        properties = Helper.create_xml_element('properties').tap do |properties|
+        properties = Helper.create_xml_element('properties').tap do |node|
           @configurations.each do |config|
             config_prop = Helper.create_xml_element('property', name: 'Configuration', value: config['configurationName'])
-            properties.add_element(config_prop)
+            node.add_element(config_prop)
           end
-  
+
           @devices.each do |device|
             device_prop = Helper.create_xml_element('property', name: 'device', value: "#{device.fetch('modelName', 'Unknown Device')} (#{device.fetch('osVersion', 'Unknown OS Version')})")
-            properties.add_element(device_prop)
-          end  
+            node.add_element(device_prop)
+          end
         end
 
         # Add each test suite to the root
