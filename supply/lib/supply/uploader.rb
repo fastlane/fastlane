@@ -133,12 +133,19 @@ module Supply
       UI.message("Updating #{version_code}'s rollout to '#{Supply.config[:rollout]}' on track '#{Supply.config[:track]}'...")
 
       if track && release
-        completed = Supply.config[:rollout].to_f == 1
-        release.user_fraction = completed ? nil : Supply.config[:rollout]
-        if Supply.config[:release_status]
-          release.status = Supply.config[:release_status]
+        rollout = Supply.config[:rollout]
+        status = Supply.config[:release_status]
+
+        if rollout.to_f == 1 && status != Supply::ReleaseStatus::DRAFT
+          release.user_fraction = nil
+          release.status = Supply::ReleaseStatus::COMPLETED
         else
-          release.status = completed ? Supply::ReleaseStatus::COMPLETED : Supply::ReleaseStatus::IN_PROGRESS
+          release.user_fraction = rollout # may be nil if not provided explicitly
+          # If release_status not provided explicitly (and thus defaults to 'completed'), but rollout is privided with a value < 1.0, then set to 'inProgress' instead
+          status = Supply::ReleaseStatus::IN_PROGRESS if status == Supply::ReleaseStatus::COMPLETED && !rollout.nil? && rollout.to_f < 1
+          # If release_status is set to 'inProgress' but no rollout value is provided, error out
+          UI.user_error!("You need to provide a rollout value when release_status is set to 'inProgress'") if status == Supply::ReleaseStatus::IN_PROGRESS && rollout.nil?
+          release.status = status
         end
 
         # It's okay to set releases to an array containing the newest release
