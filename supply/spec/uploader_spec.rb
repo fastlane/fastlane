@@ -532,7 +532,7 @@ describe Supply do
             rollout: 0.5,
             release_status: Supply::ReleaseStatus::DRAFT,
             expected_status: Supply::ReleaseStatus::DRAFT,
-            expected_user_fraction: 0.5
+            expected_user_fraction: nil # user_fraction is only valid for IN_PROGRESS or HALTED status
         end
 
         context 'when release_status is IN_PROGRESS' do
@@ -559,7 +559,7 @@ describe Supply do
             rollout: 1.0,
             release_status: Supply::ReleaseStatus::DRAFT,
             expected_status: Supply::ReleaseStatus::DRAFT,
-            expected_user_fraction: 1.0
+            expected_user_fraction: nil # user_fraction is only valid for IN_PROGRESS or HALTED status
         end
 
         context 'when release_status is IN_PROGRESS' do
