@@ -481,8 +481,8 @@ describe Supply do
         it "sets status to #{expected_status} and user_fraction to #{expected_user_fraction.inspect}" do
           expect(client).to receive(:update_track).with('alpha', track) do |_, track_param|
             expect(track_param.releases).to eq([release])
-            expect(track_param.releases.first.user_fraction).to eq(expected_user_fraction)
             expect(track_param.releases.first.status).to eq(expected_status)
+            expect(track_param.releases.first.user_fraction).to eq(expected_user_fraction)
           end
           subject.update_rollout
         end

@@ -136,7 +136,7 @@ module Supply
         rollout = Supply.config[:rollout]
         status = Supply.config[:release_status]
 
-        # If release_status not provided explicitly (and thus defaults to 'completed'), but rollout is privided with a value < 1.0, then set to 'inProgress' instead
+        # If release_status not provided explicitly (and thus defaults to 'completed'), but rollout is provided with a value < 1.0, then set to 'inProgress' instead
         status = Supply::ReleaseStatus::IN_PROGRESS if status == Supply::ReleaseStatus::COMPLETED && !rollout.nil? && rollout.to_f < 1
         # If release_status is set to 'inProgress' but rollout is provided with a value = 1.0, then set to 'completed' instead
         status = Supply::ReleaseStatus::COMPLETED if status == Supply::ReleaseStatus::IN_PROGRESS && rollout.to_f == 1
