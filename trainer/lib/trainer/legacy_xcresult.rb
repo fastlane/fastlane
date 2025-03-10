@@ -5,7 +5,7 @@ require_relative 'xcresult/helper'
 module Trainer
   module LegacyXCResult
     # Model attributes and relationships taken from running the following command:
-    # xcrun xcresulttool formatDescription
+    # xcrun xcresulttool formatDescription --legacy
 
     class AbstractObject
       attr_accessor :type
