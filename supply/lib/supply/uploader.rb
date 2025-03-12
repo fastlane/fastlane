@@ -133,13 +133,19 @@ module Supply
       UI.message("Updating #{version_code}'s rollout to '#{Supply.config[:rollout]}' on track '#{Supply.config[:track]}'...")
 
       if track && release
-        completed = Supply.config[:rollout].to_f == 1
-        release.user_fraction = completed ? nil : Supply.config[:rollout]
-        if Supply.config[:release_status]
-          release.status = Supply.config[:release_status]
-        else
-          release.status = completed ? Supply::ReleaseStatus::COMPLETED : Supply::ReleaseStatus::IN_PROGRESS
-        end
+        rollout = Supply.config[:rollout]
+        status = Supply.config[:release_status]
+
+        # If release_status not provided explicitly (and thus defaults to 'completed'), but rollout is provided with a value < 1.0, then set to 'inProgress' instead
+        status = Supply::ReleaseStatus::IN_PROGRESS if status == Supply::ReleaseStatus::COMPLETED && !rollout.nil? && rollout.to_f < 1
+        # If release_status is set to 'inProgress' but rollout is provided with a value = 1.0, then set to 'completed' instead
+        status = Supply::ReleaseStatus::COMPLETED if status == Supply::ReleaseStatus::IN_PROGRESS && rollout.to_f == 1
+        # If release_status is set to 'inProgress' but no rollout value is provided, error out
+        UI.user_error!("You need to provide a rollout value when release_status is set to 'inProgress'") if status == Supply::ReleaseStatus::IN_PROGRESS && rollout.nil?
+        release.status = status
+        # user_fraction is only valid for IN_PROGRESS or HALTED status
+        # https://googleapis.dev/ruby/google-api-client/latest/Google/Apis/AndroidpublisherV3/TrackRelease.html#user_fraction-instance_method
+        release.user_fraction = [Supply::ReleaseStatus::IN_PROGRESS, Supply::ReleaseStatus::HALTED].include?(release.status) ? rollout : nil
 
         # It's okay to set releases to an array containing the newest release
         # Google Play will keep previous releases there untouched
