@@ -1,6 +1,6 @@
 module Trainer
   module XCResult
-    # Mixin for shared test case and repetition attributes
+    # Mixin for shared attributes between TestCase and Repetition
     module TestCaseAttributes
       def self.included(base)
         base.extend(ClassMethods)

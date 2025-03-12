@@ -2,6 +2,9 @@ require_relative 'test_case_attributes'
 
 module Trainer
   module XCResult
+    # Represents retries of a test case, including the original run
+    # e.g. a test case that ran 3 times in total will be represented by 3 Repetition instances in the `xcresulttool` JSON output,
+    # one for the original run and one for the 2 retries.
     class Repetition
       include TestCaseAttributes
 

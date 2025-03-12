@@ -4,6 +4,7 @@ require_relative 'repetition'
 
 module Trainer
   module XCResult
+    # Represents a test case, including its retries (aka repetitions)
     class TestCase
       include TestCaseAttributes
 
@@ -13,6 +14,8 @@ module Trainer
       attr_reader :result
       attr_reader :classname
       attr_reader :argument
+      # @return [Array<Repetition>] Array of retry attempts for this test case, **including the initial attempt**
+      # This will be `nil` if the test case was not run multiple times, but will contain all repetitions if it was run more than once.
       attr_reader :retries
       attr_reader :failure_messages
       attr_reader :source_references

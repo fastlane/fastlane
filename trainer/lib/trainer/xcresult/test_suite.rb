@@ -2,6 +2,7 @@ require_relative 'test_case'
 
 module Trainer
   module XCResult
+    # Represents a test suite, including its test cases and sub-suites
     class TestSuite
       attr_reader :name
       attr_reader :identifier
