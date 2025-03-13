@@ -1,27 +1,33 @@
 # Developer Portal API
 
-- [Usage](#usage)
-  * [Login](#login)
-  * [Apps](#apps)
-    + [App Services](#app-services)
-  * [App Groups](#app-groups)
-  * [iCloud Containers](#icloud-containers)
-  * [Apple Pay Merchants](#apple-pay-merchants)
-  * [Passbook](#passbook)
-  * [Certificates](#certificates)
-    + [Code Signing Certificates](#code-signing-certificates)
-    + [Push Certificates](#push-certificates)
-    + [Create a Certificate](#create-a-certificate)
-  * [Provisioning Profiles](#provisioning-profiles)
-    + [Receiving profiles](#receiving-profiles)
-    + [Create a Provisioning Profile](#create-a-provisioning-profile)
-    + [Repair all broken provisioning profiles](#repair-all-broken-provisioning-profiles)
-  * [Devices](#devices)
-  * [Enterprise](#enterprise)
-  * [Multiple Spaceships](#multiple-spaceships)
-  * [More cool things you can do](#more-cool-things-you-can-do)
-  * [Example Data](#example-data)
-- [License](#license)
+- [Developer Portal API](#developer-portal-api)
+  - [Usage](#usage)
+    - [Login](#login)
+    - [Apps](#apps)
+      - [App Services](#app-services)
+    - [App Groups](#app-groups)
+    - [iCloud Containers](#icloud-containers)
+    - [Apple Pay Merchants](#apple-pay-merchants)
+    - [Passbook](#passbook)
+    - [Certificates](#certificates)
+      - [Code Signing Certificates](#code-signing-certificates)
+      - [Push Certificates](#push-certificates)
+      - [Create a Certificate](#create-a-certificate)
+    - [Authentication Keys](#authentication-keys)
+      - [APNS (Apple Push Notification Service)](#apns-apple-push-notification-service)
+      - [MusicKit](#musickit)
+      - [DeviceCheck](#devicecheck)
+      - [Service Configuration Details](#service-configuration-details)
+    - [Provisioning Profiles](#provisioning-profiles)
+      - [Receiving profiles](#receiving-profiles)
+      - [Create a Provisioning Profile](#create-a-provisioning-profile)
+      - [Repair all broken provisioning profiles](#repair-all-broken-provisioning-profiles)
+    - [Devices](#devices)
+    - [Enterprise](#enterprise)
+    - [Multiple Spaceships](#multiple-spaceships)
+    - [More cool things you can do](#more-cool-things-you-can-do)
+    - [Example Data](#example-data)
+  - [License](#license)
 
 ## Usage
 
@@ -29,7 +35,7 @@ To quickly play around with _spaceship_ launch `irb` in your terminal and execut
 
 ### Login
 
-*Note*: If you use both the Developer Portal and App Store Connect API, you'll have to login on both, as the user might have different user credentials.
+_Note_: If you use both the Developer Portal and App Store Connect API, you'll have to login on both, as the user might have different user credentials.
 
 ```ruby
 Spaceship::Portal.login("felix@krausefx.com", "password")
@@ -211,6 +217,7 @@ cert_content = prod_certs.first.download
 ```
 
 #### Push Certificates
+
 ```ruby
 # Production push profiles
 prod_push_certs = Spaceship::Portal.certificate.production_push.all
@@ -239,6 +246,57 @@ csr, pkey = Spaceship::Portal.certificate.create_certificate_signing_request
 # Use the signing request to create a new distribution certificate
 Spaceship::Portal.certificate.production.create!(csr: csr)
 ```
+
+### Authentication Keys
+
+The authentication keys can be used for various Apple services. When creating a key, you can configure the following:
+
+- `name`: A descriptive name for your key
+- `service_configs`: Configuration for the key services. A hash where each key is a service ID and the value is its configuration:
+
+#### APNS (Apple Push Notification Service)
+
+```ruby
+{
+  "U27F4V844T" => {  # APNS_ID
+    identifiers: {},  # Optional: Specific app identifiers
+    environment: "all",  # Optional: Defaults to "all"
+    scope: "team"  # Optional: Defaults to "team"
+  }
+}
+```
+
+#### MusicKit
+
+```ruby
+{
+  "6A7HVUVQ3M" => {  # MUSIC_KIT_ID
+    identifiers: "4H4P58CJTN"  # The MusicKit identifier
+  }
+}
+```
+
+#### DeviceCheck
+
+```ruby
+{
+  "DQ8HTZ7739" => {  # DEVICE_CHECK_ID
+    identifiers: {}  # Optional: Specific identifiers if needed
+  }
+}
+```
+
+#### Service Configuration Details
+
+- `identifiers`: Service-specific identifiers
+  - For MusicKit: A string or array containing the MusicKit identifier(s)
+  - For other services: A hash of identifiers (can be empty)
+- `environment`: (APNS only) The environment setting
+  - Defaults to "all"
+  - Options: "all", "production", "development"
+- `scope`: (APNS only) Access scope for the key
+  - Defaults to "team"
+  - Options: "team", "app", "global"
 
 ### Provisioning Profiles
 
@@ -328,7 +386,7 @@ all_devices = Spaceship::Portal.device.all
 # Disable first device
 all_devices.first.disable!
 
-# Find disabled device and enable it
+# Find disabled device and enable it
 Spaceship::Portal.device.find_by_udid("44ee59893cb...", include_disabled: true).enable!
 
 # Get list of all devices, including disabled ones, and filter the result to only include disabled devices use enabled? or disabled? methods
@@ -377,6 +435,7 @@ end
 ```
 
 ### More cool things you can do
+
 ```ruby
 # Find a profile with a specific name
 profile = Spaceship::Portal.provisioning_profile.development.all.find { |p| p.name == "Name" }
