@@ -92,7 +92,7 @@ module Spaceship
         self.extend(Spaceship::ConnectAPI::Provisioning::API)
         self.extend(Spaceship::ConnectAPI::Users::API)
 
-        set_indvidual_clients(
+        set_individual_clients(
           cookie: cookie,
           current_team_id: current_team_id,
           token: token,
@@ -157,7 +157,7 @@ module Spaceship
 
         # Updating the tunes and portal clients requires resetting
         # of the clients in the API modules
-        set_indvidual_clients(
+        set_individual_clients(
           cookie: nil,
           current_team_id: nil,
           token: nil,

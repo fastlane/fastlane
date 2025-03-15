@@ -66,14 +66,14 @@ module Supply
 
           UI.message("Downloading `#{image_type}` for #{listing.language}...")
 
-          urls = client.fetch_images(image_type: image_type, language: listing.language)
+          urls = client.fetch_images(image_type: image_type, language: listing.language).map(&:url)
           next if urls.nil? || urls.empty?
 
           image_counter = 1 # Used to prefix the downloaded files, so order is preserved.
           urls.each do |url|
             if IMAGES_TYPES.include?(image_type) # IMAGE_TYPES are stored in locale/images
               file_path = "#{path}.#{FastImage.type(url)}"
-            else # SCREENSHOT_TYPES are stored in locale/images/<screensho_types>
+            else # SCREENSHOT_TYPES are stored in locale/images/<screenshot_types>
               file_path = File.join(path, "#{image_counter}_#{listing.language}.#{FastImage.type(url)}")
             end
 

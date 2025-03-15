@@ -21,6 +21,7 @@ describe Match do
         # this command is also sent on macOS Sierra and we need to allow it or else the test will fail
         expected_partition_command = "security set-key-partition-list -S apple-tool:,apple:,codesign: -s -k #{''.shellescape} #{Dir.home}/Library/Keychains/login.keychain 1> /dev/null"
 
+        allow(FastlaneCore::Helper).to receive(:show_loading_indicator).and_return(true)
         allow(File).to receive(:file?).and_return(false)
         expect(File).to receive(:file?).with("#{Dir.home}/Library/Keychains/login.keychain").and_return(true)
         allow(File).to receive(:exist?).and_return(false)
@@ -40,6 +41,7 @@ describe Match do
         # this command is also sent on macOS Sierra and we need to allow it or else the test will fail
         expected_partition_command = "security set-key-partition-list -S apple-tool:,apple:,codesign: -s -k #{''.shellescape} #{keychain} 1> /dev/null"
 
+        allow(FastlaneCore::Helper).to receive(:show_loading_indicator).and_return(true)
         allow(File).to receive(:file?).and_return(false)
         expect(File).to receive(:file?).with(keychain).and_return(true)
         allow(File).to receive(:exist?).and_return(false)
@@ -65,6 +67,7 @@ describe Match do
         # this command is also sent on macOS Sierra and we need to allow it or else the test will fail
         expected_partition_command = "security set-key-partition-list -S apple-tool:,apple:,codesign: -s -k #{''.shellescape} #{Dir.home}/Library/Keychains/login.keychain-db 1> /dev/null"
 
+        allow(FastlaneCore::Helper).to receive(:show_loading_indicator).and_return(true)
         allow(File).to receive(:file?).and_return(false)
         expect(File).to receive(:file?).with("#{Dir.home}/Library/Keychains/login.keychain-db").and_return(true)
         allow(File).to receive(:exist?).and_return(false)
@@ -89,6 +92,7 @@ describe Match do
           expect(FastlaneCore::Helper).to receive(:ask_password).and_return('user_entered')
           expect(Security::InternetPassword).to receive(:add).with('fastlane_keychain_login', anything, 'user_entered')
 
+          allow(FastlaneCore::Helper).to receive(:show_loading_indicator).and_return(true)
           allow(File).to receive(:file?).and_return(false)
           expect(File).to receive(:file?).with("#{Dir.home}/Library/Keychains/login.keychain").and_return(true)
           allow(File).to receive(:exist?).and_return(false)
@@ -110,6 +114,7 @@ describe Match do
           allow(item).to receive(:password).and_return('from_keychain')
           allow(Security::InternetPassword).to receive(:find).and_return(item)
 
+          allow(FastlaneCore::Helper).to receive(:show_loading_indicator).and_return(true)
           allow(File).to receive(:file?).and_return(false)
           expect(File).to receive(:file?).with("#{Dir.home}/Library/Keychains/login.keychain").and_return(true)
           allow(File).to receive(:exist?).and_return(false)

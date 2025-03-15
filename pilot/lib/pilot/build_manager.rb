@@ -65,6 +65,7 @@ module Pilot
           UI.important("`skip_waiting_for_build_processing` used and no `changelog` supplied - skipping waiting for build processing")
           return
         else
+          UI.important("`skip_waiting_for_build_processing` used and `changelog` supplied - will wait until build appears on App Store Connect, update the changelog and then skip the rest of the remaining of the processing steps.")
           return_when_build_appears = true
         end
       end
@@ -72,8 +73,10 @@ module Pilot
       # Calling login again here is needed if login was not called during 'start'
       login unless should_login_in_start
 
-      UI.message("If you want to skip waiting for the processing to be finished, use the `skip_waiting_for_build_processing` option")
-      UI.message("Note that if `skip_waiting_for_build_processing` is used but a `changelog` is supplied, this process will wait for the build to appear on AppStoreConnect, update the changelog and then skip the remaining of the processing steps.")
+      if config[:skip_waiting_for_build_processing].nil?
+        UI.message("If you want to skip waiting for the processing to be finished, use the `skip_waiting_for_build_processing` option")
+        UI.message("Note that if `skip_waiting_for_build_processing` is used but a `changelog` is supplied, this process will wait for the build to appear on App Store Connect, update the changelog and then skip the remaining of the processing steps.")
+      end
 
       latest_build = wait_for_build_processing_to_be_complete(return_when_build_appears)
       distribute(options, build: latest_build)
@@ -157,7 +160,7 @@ module Pilot
           end
         end
         platform = Spaceship::ConnectAPI::Platform.map(fetch_app_platform)
-        build ||= Spaceship::ConnectAPI::Build.all(app_id: app.id, version: app_version, build_number: build_number, sort: "-uploadedDate", platform: platform, limit: 1).first
+        build ||= Spaceship::ConnectAPI::Build.all(app_id: app.id, version: app_version, build_number: build_number, sort: "-uploadedDate", platform: platform, limit: Spaceship::ConnectAPI::Platform::ALL.size).first
       end
 
       # Verify the build has all the includes that we need
@@ -365,12 +368,17 @@ module Pilot
     end
 
     def reject_build_waiting_for_review(build)
-      waiting_for_review_build = build.app.get_builds(filter: { "betaAppReviewSubmission.betaReviewState" => "WAITING_FOR_REVIEW" }, includes: "betaAppReviewSubmission,preReleaseVersion").first
+      waiting_for_review_build = build.app.get_builds(
+        filter: { "betaAppReviewSubmission.betaReviewState" => "WAITING_FOR_REVIEW,IN_REVIEW",
+                  "expired" => false,
+                  "preReleaseVersion.version" => build.pre_release_version.version },
+        includes: "betaAppReviewSubmission,preReleaseVersion"
+      ).first
       unless waiting_for_review_build.nil?
         UI.important("Another build is already in review. Going to remove that build and submit the new one.")
-        UI.important("Deleting beta app review submission for build: #{waiting_for_review_build.app_version} - #{waiting_for_review_build.version}")
-        waiting_for_review_build.beta_app_review_submission.delete!
-        UI.success("Deleted beta app review submission for previous build: #{waiting_for_review_build.app_version} - #{waiting_for_review_build.version}")
+        UI.important("Canceling beta app review submission for build: #{waiting_for_review_build.app_version} - #{waiting_for_review_build.version}")
+        waiting_for_review_build.expire!
+        UI.success("Canceled beta app review submission for previous build: #{waiting_for_review_build.app_version} - #{waiting_for_review_build.version}")
       end
     end
 
@@ -383,6 +391,7 @@ module Pilot
     end
 
     # If App Store Connect API token, use token.
+    # If api_key is specified and it is an Individual API Key, don't use token but use username.
     # If itc_provider was explicitly specified, use it.
     # If there are multiple teams, infer the provider from the selected team name.
     # If there are fewer than two teams, don't infer the provider.
@@ -399,15 +408,23 @@ module Pilot
                   api_key
                 end
 
+      # Currently no kind of transporters accept an Individual API Key. Use username and app-specific password instead.
+      # See https://github.com/fastlane/fastlane/issues/22115
+      is_individual_key = !api_key.nil? && api_key[:issuer_id].nil?
+      if is_individual_key
+        api_key = nil
+        api_token = nil
+      end
+
       unless api_token.nil?
         api_token.refresh! if api_token.expired?
-        return FastlaneCore::ItunesTransporter.new(nil, nil, false, nil, api_token.text, upload: true, api_key: api_key)
+        return FastlaneCore::ItunesTransporter.new(nil, nil, false, nil, api_token.text, altool_compatible_command: true, api_key: api_key)
       end
 
       # Otherwise use username and password
       tunes_client = Spaceship::ConnectAPI.client ? Spaceship::ConnectAPI.client.tunes_client : nil
 
-      generic_transporter = FastlaneCore::ItunesTransporter.new(options[:username], nil, false, options[:itc_provider], upload: true, api_key: api_key)
+      generic_transporter = FastlaneCore::ItunesTransporter.new(options[:username], nil, false, options[:itc_provider], altool_compatible_command: true, api_key: api_key)
       return generic_transporter if options[:itc_provider] || tunes_client.nil?
       return generic_transporter unless tunes_client.teams.count > 1
 
@@ -416,7 +433,7 @@ module Pilot
         name = team['name']
         provider_id = generic_transporter.provider_ids[name]
         UI.verbose("Inferred provider id #{provider_id} for team #{name}.")
-        return FastlaneCore::ItunesTransporter.new(options[:username], nil, false, provider_id, upload: true, api_key: api_key)
+        return FastlaneCore::ItunesTransporter.new(options[:username], nil, false, provider_id, altool_compatible_command: true, api_key: api_key)
       rescue => ex
         STDERR.puts(ex.to_s)
         UI.verbose("Couldn't infer a provider short name for team with id #{tunes_client.team_id} automatically: #{ex}. Proceeding without provider short name.")

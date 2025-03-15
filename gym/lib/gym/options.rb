@@ -152,7 +152,7 @@ module Gym
                                      optional: true,
                                      verify_block: proc do |value|
                                        av = %w(ios macos)
-                                       UI.user_error!("Unsupported export_method '#{value}', must be: #{av}") unless av.include?(value)
+                                       UI.user_error!("Unsupported catalyst_platform '#{value}', must be: #{av}") unless av.include?(value)
                                      end),
         FastlaneCore::ConfigItem.new(key: :installer_cert_name,
                                      env_name: "GYM_INSTALLER_CERT_NAME",
@@ -239,6 +239,13 @@ module Gym
                                      default_value: Fastlane::Helper::XcodebuildFormatterHelper.xcbeautify_installed? ? 'xcbeautify' : 'xcpretty',
                                      default_value_dynamic: true),
 
+        FastlaneCore::ConfigItem.new(key: :build_timing_summary,
+                                     env_name: "GYM_BUILD_TIMING_SUMMARY",
+                                     description: "Create a build timing summary",
+                                     type: Boolean,
+                                     default_value: false,
+                                     optional: true),
+
         # xcpretty
         FastlaneCore::ConfigItem.new(key: :disable_xcpretty,
                                      env_name: "DISABLE_XCPRETTY",
@@ -313,7 +320,16 @@ module Gym
                                      description: "Lets xcodebuild use system's scm configuration",
                                      optional: true,
                                      type: Boolean,
-                                     default_value: false)
+                                     default_value: false),
+        FastlaneCore::ConfigItem.new(key: :package_authorization_provider,
+                                     env_name: "GYM_PACKAGE_AUTHORIZATION_PROVIDER",
+                                     description: "Lets xcodebuild use a specified package authorization provider (keychain|netrc)",
+                                     optional: true,
+                                     type: String,
+                                     verify_block: proc do |value|
+                                       av = %w(netrc keychain)
+                                       UI.user_error!("Unsupported authorization provider '#{value}', must be: #{av}") unless av.include?(value)
+                                     end)
       ]
     end
   end

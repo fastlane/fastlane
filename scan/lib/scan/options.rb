@@ -269,7 +269,7 @@ module Scan
                                      default_value: Fastlane::Helper::XcodebuildFormatterHelper.xcbeautify_installed? ? 'xcbeautify' : 'xcpretty',
                                      default_value_dynamic: true),
         FastlaneCore::ConfigItem.new(key: :output_remove_retry_attempts,
-                                     env_name: "SCAN_OUTPUT_REMOVE_RETRY_ATTEMPS",
+                                     env_names: ["SCAN_OUTPUT_REMOVE_RETRY_ATTEMPS", "SCAN_OUTPUT_REMOVE_RETRY_ATTEMPTS"], # The version with typo must be deprecated
                                      description: "Remove retry attempts from test results table and the JUnit report (if not using xcpretty)",
                                      type: Boolean,
                                      default_value: false),
@@ -480,6 +480,11 @@ module Scan
                                      description: "Use only if you're a pro, use the other options instead",
                                      is_string: false,
                                      optional: true),
+        FastlaneCore::ConfigItem.new(key: :run_rosetta_simulator,
+                                     env_name: "SCAN_RUN_ROSETTA_SIMULATOR",
+                                     description: "Adds arch=x86_64 to the xcodebuild 'destination' argument to run simulator in a Rosetta mode",
+                                     type: Boolean,
+                                     default_value: false),
         FastlaneCore::ConfigItem.new(key: :catalyst_platform,
                                      env_name: "SCAN_CATALYST_PLATFORM",
                                      description: "Platform to build when using a Catalyst enabled app. Valid values are: ios, macos",
@@ -532,7 +537,16 @@ module Scan
                                     env_name: "SCAN_FAIL_BUILD",
                                     description: "Should this step stop the build if the tests fail? Set this to false if you're using trainer",
                                     type: Boolean,
-                                    default_value: true)
+                                    default_value: true),
+        FastlaneCore::ConfigItem.new(key: :package_authorization_provider,
+                                    env_name: "SCAN_PACKAGE_AUTHORIZATION_PROVIDER",
+                                    description: "Lets xcodebuild use a specified package authorization provider (keychain|netrc)",
+                                    optional: true,
+                                    type: String,
+                                    verify_block: proc do |value|
+                                      av = %w(netrc keychain)
+                                      UI.user_error!("Unsupported authorization provider '#{value}', must be: #{av}") unless av.include?(value)
+                                    end)
 
       ]
     end

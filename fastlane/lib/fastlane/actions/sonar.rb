@@ -20,6 +20,7 @@ module Fastlane
         sonar_scanner_args << "-Dsonar.language=\"#{params[:project_language]}\"" if params[:project_language]
         sonar_scanner_args << "-Dsonar.sourceEncoding=\"#{params[:source_encoding]}\"" if params[:source_encoding]
         sonar_scanner_args << "-Dsonar.login=\"#{params[:sonar_login]}\"" if params[:sonar_login]
+        sonar_scanner_args << "-Dsonar.token=\"#{params[:sonar_token]}\"" if params[:sonar_token]
         sonar_scanner_args << "-Dsonar.host.url=\"#{params[:sonar_url]}\"" if params[:sonar_url]
         sonar_scanner_args << "-Dsonar.organization=\"#{params[:sonar_organization]}\"" if params[:sonar_organization]
         sonar_scanner_args << "-Dsonar.branch.name=\"#{params[:branch_name]}\"" if params[:branch_name]
@@ -100,9 +101,17 @@ module Fastlane
                                        optional: true),
           FastlaneCore::ConfigItem.new(key: :sonar_login,
                                        env_name: "FL_SONAR_LOGIN",
-                                       description: "Pass the Sonar Login token (e.g: xxxxxxprivate_token_XXXXbXX7e)",
+                                       description: "Pass the Sonar Login Token (e.g: xxxxxxprivate_token_XXXXbXX7e)",
+                                       deprecated: "Login and password were deprecated in favor of login token. See https://community.sonarsource.com/t/deprecating-sonar-login-and-sonar-password-in-favor-of-sonar-token/95829 for more details",
                                        optional: true,
-                                       sensitive: true),
+                                       sensitive: true,
+                                       conflicting_options: [:sonar_token]),
+          FastlaneCore::ConfigItem.new(key: :sonar_token,
+                                       env_name: "FL_SONAR_TOKEN",
+                                       description: "Pass the Sonar Token (e.g: xxxxxxprivate_token_XXXXbXX7e)",
+                                       optional: true,
+                                       sensitive: true,
+                                       conflicting_options: [:sonar_login]),
           FastlaneCore::ConfigItem.new(key: :sonar_url,
                                        env_name: "FL_SONAR_URL",
                                        description: "Pass the url of the Sonar server",
@@ -156,7 +165,7 @@ module Fastlane
             project_name: "iOS - AwesomeApp",
             sources_path: File.expand_path("../AwesomeApp"),
             sonar_organization: "myOrg",
-            sonar_login: "123456abcdef",
+            sonar_token: "123456abcdef",
             sonar_url: "https://sonarcloud.io"
           )'
         ]

@@ -61,9 +61,17 @@ module Spaceship
 
       # Send token to server to get a valid session
       r = request(:post) do |req|
-        req.url("https://idmsa.apple.com/appleauth/auth/verify/device/#{device_id}/securitycode")
+        req.url("https://idmsa.apple.com/appleauth/auth/verify/phone/securitycode")
         req.headers['Content-Type'] = 'application/json'
-        req.body = { "code" => code.to_s }.to_json
+        req.body = {
+          "phoneNumber": {
+            "id": device_id
+          },
+          "securityCode": {
+            "code" => code.to_s
+          },
+          "mode": "sms"
+        }.to_json
         update_request_headers(req)
       end
 

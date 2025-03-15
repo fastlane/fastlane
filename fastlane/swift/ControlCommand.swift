@@ -1,5 +1,5 @@
 // ControlCommand.swift
-// Copyright (c) 2022 FastlaneTools
+// Copyright (c) 2025 FastlaneTools
 
 //
 //  ** NOTE **
