@@ -27,7 +27,7 @@ module Spaceship
           iap_request_client.get("apps/#{app_id}/inAppPurchasesV2", params)
         end
 
-        def create_in_app_purchase(app_id:, name:, product_id:, in_app_purchase_type:, review_note: nil, family_sharable: nil, available_in_all_territories: nil)
+        def create_in_app_purchase(app_id:, name:, product_id:, in_app_purchase_type:, review_note: nil, family_sharable: nil, mighty_logger: nil)
           attributes = {
             name: name,
             productId: product_id,
@@ -35,7 +35,6 @@ module Spaceship
           }
 
           # Optional Params
-          attributes[:availableInAllTerritories] = available_in_all_territories unless available_in_all_territories.nil?
           attributes[:familySharable] = family_sharable unless family_sharable.nil?
           attributes[:reviewNote] = review_note unless review_note.nil?
 
@@ -54,18 +53,19 @@ module Spaceship
             }
           }
 
+          mighty_logger.info 'create in-app purchase fastlane', label: 'iap_api', context: { product_id: product_id, params: params } if mighty_logger
+
           # This endpoint is on `v2`
           iap_request_client.post('https://api.appstoreconnect.apple.com/v2/inAppPurchases', params)
         end
 
-        def update_in_app_purchase(purchase_id:, name: nil, review_note: nil, family_sharable: nil, available_in_all_territories: nil)
+        def update_in_app_purchase(purchase_id:, name: nil, review_note: nil, family_sharable: nil)
           attributes = {}
 
           # Optional attributes
           attributes[:name] = name unless name.nil?
           attributes[:reviewNote] = review_note unless review_note.nil?
           attributes[:familySharable] = family_sharable unless family_sharable.nil?
-          attributes[:availableInAllTerritories] = available_in_all_territories unless available_in_all_territories.nil?
 
           params = {
             data: {
@@ -142,6 +142,41 @@ module Spaceship
         end
 
         #
+        # InAppPurchaseAvailability
+        #
+
+        def get_in_app_purchase_availabilities(purchase_id:, filter: nil, includes: nil, limit: nil)
+          params = iap_request_client.build_params(filter: filter, includes: includes, limit: limit, sort: nil)
+          iap_request_client.get("inAppPurchaseAvailabilities/#{purchase_id}", params)
+        end
+
+        def create_in_app_purchase_availability(purchase_id:, available_in_new_territories:, available_territory_ids:)
+          params = {
+            data: {
+              type: 'inAppPurchaseAvailabilities',
+              attributes: {
+                availableInNewTerritories: available_in_new_territories
+              },
+              relationships: {
+                inAppPurchase: {
+                  data: {
+                    id: purchase_id,
+                    type: 'inAppPurchases'
+                  }
+                },
+                availableTerritories: {
+                  data: available_territory_ids.map do |id|
+                    { id: id, type: 'territories' }
+                  end
+                }
+              }
+            }
+          }
+
+          iap_request_client.post('inAppPurchaseAvailabilities', params)
+        end
+
+        #
         # inAppPurchasePricePoints
         #
 
@@ -162,7 +197,7 @@ module Spaceship
           iap_request_client.get("inAppPurchasePriceSchedules/#{purchase_id}/manualPrices", params)
         end
 
-        def create_in_app_purchase_price_schedule(purchase_id:, in_app_purchase_price_point_id:, start_date: nil)
+        def create_in_app_purchase_price_schedule(purchase_id:, in_app_purchase_price_point_id:, start_date: nil, base_territory_id:)
           params = {
             data: {
               type: 'inAppPurchasePriceSchedules',
@@ -176,6 +211,12 @@ module Spaceship
 
                 manualPrices: {
                   data: [] # Filled with loop below
+                },
+                baseTerritory: {
+                  data: {
+                    id: base_territory_id,
+                    type: 'territories'
+                  }
                 }
               }
             },
@@ -285,14 +326,13 @@ module Spaceship
           iap_request_client.get("subscriptionGroups/#{family_id}/subscriptions", params)
         end
 
-        def create_subscription(name:, product_id:, family_id:, available_in_all_territories: nil, family_sharable: nil, review_note: nil, subscription_period: nil, group_level: nil)
+        def create_subscription(name:, product_id:, family_id:, family_sharable: nil, review_note: nil, subscription_period: nil, group_level: nil, mighty_logger: nil)
           attributes = {
             name: name,
             productId: product_id
           }
 
           # Optional Params
-          attributes[:availableInAllTerritories] = available_in_all_territories unless available_in_all_territories.nil?
           attributes[:familySharable] = family_sharable unless family_sharable.nil?
           attributes[:reviewNote] = review_note unless review_note.nil?
           attributes[:subscriptionPeriod] = subscription_period unless subscription_period.nil?
@@ -313,13 +353,14 @@ module Spaceship
             }
           }
 
+          mighty_logger.info 'create in-app purchase fastlane', label: 'iap_api', context: { product_id: product_id, params: params } if mighty_logger
+
           iap_request_client.post('subscriptions', params)
         end
 
         def update_subscription(
               purchase_id:,
               name: nil,
-              available_in_all_territories: nil,
               family_sharable: nil,
               review_note: nil,
               subscription_period: nil,
@@ -329,7 +370,6 @@ module Spaceship
 
           # Optional Params
           attributes[:name] = name unless name.nil?
-          attributes[:availableInAllTerritories] = available_in_all_territories unless available_in_all_territories.nil?
           attributes[:familySharable] = family_sharable unless family_sharable.nil?
           attributes[:reviewNote] = review_note unless review_note.nil?
           attributes[:subscriptionPeriod] = subscription_period unless subscription_period.nil?

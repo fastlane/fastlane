@@ -5,8 +5,7 @@ module Spaceship
       include Spaceship::ConnectAPI::Model
 
       # Attributes
-      attr_accessor :available_in_all_territories,
-                    :content_hosting,
+      attr_accessor :content_hosting,
                     :family_sharable,
                     :in_app_purchase_type,
                     :name,
@@ -17,6 +16,7 @@ module Spaceship
       # Relations
       attr_accessor :prices,
                     :localizations,
+                    :in_app_purchase_availabilities,
                     :app_store_review_screenshot
 
       module Type
@@ -41,7 +41,6 @@ module Spaceship
       end
 
       attr_mapping({
-        availableInAllTerritories: 'available_in_all_territories',
         contentHosting: 'content_hosting',
         familySharable: 'family_sharable',
         inAppPurchaseType: 'in_app_purchase_type',
@@ -61,9 +60,9 @@ module Spaceship
       # Update
       #
 
-      def update(client: nil, name: nil, review_note: nil, family_sharable: nil, available_in_all_territories: nil)
+      def update(client: nil, name: nil, review_note: nil, family_sharable: nil)
         client ||= Spaceship::ConnectAPI
-        resps = client.update_in_app_purchase(purchase_id: id, name: name, review_note: review_note, family_sharable: family_sharable, available_in_all_territories: available_in_all_territories)
+        resps = client.update_in_app_purchase(purchase_id: id, name: name, review_note: review_note, family_sharable: family_sharable)
         models = resps.to_models.first # self
       end
 
@@ -128,9 +127,9 @@ module Spaceship
       # In-App Purchase Price Schedules
       #
 
-      def create_price_schedule(client: nil, in_app_purchase_price_point_id:, start_date: nil)
+      def create_price_schedule(client: nil, in_app_purchase_price_point_id:, start_date: nil, base_territory_id: )
         client ||= Spaceship::ConnectAPI
-        resps = client.create_in_app_purchase_price_schedule(purchase_id: id, in_app_purchase_price_point_id: in_app_purchase_price_point_id, start_date: start_date)
+        resps = client.create_in_app_purchase_price_schedule(purchase_id: id, in_app_purchase_price_point_id: in_app_purchase_price_point_id, start_date: start_date, base_territory_id: base_territory_id)
         resps.to_models.first
       end
 
@@ -150,6 +149,26 @@ module Spaceship
         models = resps.flat_map(&:to_models)
         (self.prices ||= []).concat(models).uniq! { |price| price.id }
         models
+      end
+
+      #
+      # In-App Purchase Availability
+      #
+
+      def get_availabilities(client: nil, includes: Spaceship::ConnectAPI::InAppPurchaseAvailability::ESSENTIAL_INCLUDES, limit: nil)
+        client ||= Spaceship::ConnectAPI
+        resps = client.get_in_app_purchase_availabilities(purchase_id: id, includes: includes, limit: limit).all_pages
+        models = resps.flat_map(&:to_models)
+        (self.in_app_purchase_availabilities ||= []).concat(models).uniq! { |availability| availability.id }
+        models
+      end
+
+      def create_availability(client: nil, available_in_new_territories: nil, available_territory_ids: [])
+        client ||= Spaceship::ConnectAPI
+        resps = client.create_in_app_purchase_availability(purchase_id: id, available_in_new_territories: available_in_new_territories, available_territory_ids: available_territory_ids)
+        model = resps.to_models.first
+        ((self.in_app_purchase_availabilities ||= []) << model).uniq! { |availability| availability.id }
+        model
       end
 
       #

@@ -70,9 +70,9 @@ module Spaceship
         return resps.flat_map(&:to_models)
       end
 
-      def create_subscription(client: nil, name:, product_id:, available_in_all_territories: nil, family_sharable: nil, review_note: nil, subscription_period: nil, group_level: nil)
+      def create_subscription(client: nil, name:, product_id:, family_sharable: nil, review_note: nil, subscription_period: nil, group_level: nil)
         client ||= Spaceship::ConnectAPI
-        resps = client.create_subscription(family_id: id, name: name, product_id: product_id, available_in_all_territories: available_in_all_territories, family_sharable: family_sharable, review_note: review_note, subscription_period: subscription_period, group_level: group_level)
+        resps = client.create_subscription(family_id: id, name: name, product_id: product_id, family_sharable: family_sharable, review_note: review_note, subscription_period: subscription_period, group_level: group_level)
         return resps.to_models.first
       end
 

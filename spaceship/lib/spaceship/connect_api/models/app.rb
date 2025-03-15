@@ -14,10 +14,8 @@ module Spaceship
       attr_accessor :is_opted_in_to_distribute_ios_app_on_mac_app_store
       attr_accessor :removed
       attr_accessor :is_aag
-      attr_accessor :available_in_new_territories
       attr_accessor :content_rights_declaration
       attr_accessor :app_store_versions
-      attr_accessor :prices
 
       # Only available with Apple ID auth
       attr_accessor :distribution_type
@@ -47,19 +45,16 @@ module Spaceship
         "isOptedInToDistributeIosAppOnMacAppStore" => "is_opted_in_to_distribute_ios_app_on_mac_app_store",
         "removed" => "removed",
         "isAAG" => "is_aag",
-        "availableInNewTerritories" => "available_in_new_territories",
         "distributionType" => "distribution_type",
         "educationDiscountType" => "education_discount_type",
 
         "contentRightsDeclaration" => "content_rights_declaration",
 
         "appStoreVersions" => "app_store_versions",
-        # This attribute is already deprecated. It will be removed in a future release.
-        "prices" => "prices"
       })
 
       ESSENTIAL_INCLUDES = [
-        "appStoreVersions"
+        "appStoreVersions",
       ].join(",")
 
       def self.type
@@ -509,9 +504,9 @@ module Spaceship
         return resps.flat_map(&:to_models)
       end
 
-      def create_in_app_purchase(client: nil, name:, product_id:, in_app_purchase_type:, review_note: nil, family_sharable: nil, available_in_all_territories: nil)
+      def create_in_app_purchase(client: nil, name:, product_id:, in_app_purchase_type:, review_note: nil, family_sharable: nil, mighty_logger: nil)
         client ||= Spaceship::ConnectAPI
-        resps = client.create_in_app_purchase(app_id: id, name: name, product_id: product_id, in_app_purchase_type: in_app_purchase_type, review_note: review_note, family_sharable: family_sharable, available_in_all_territories: available_in_all_territories)
+        resps = client.create_in_app_purchase(app_id: id, name: name, product_id: product_id, in_app_purchase_type: in_app_purchase_type, review_note: review_note, family_sharable: family_sharable, mighty_logger: mighty_logger)
         return resps.to_models.first
       end
 
@@ -547,9 +542,9 @@ module Spaceship
         return resps.to_models.first
       end
 
-      def create_subscription(client: nil, family_id:, name:, product_id:, available_in_all_territories: nil, family_sharable: nil, review_note: nil, subscription_period: nil, group_level: nil)
+      def create_subscription(client: nil, family_id:, name:, product_id:, family_sharable: nil, review_note: nil, subscription_period: nil, group_level: nil, mighty_logger: nil)
         client ||= Spaceship::ConnectAPI
-        resps = client.create_subscription(family_id: family_id, name: name, product_id: product_id, available_in_all_territories: available_in_all_territories, family_sharable: family_sharable, review_note: review_note, subscription_period: subscription_period, group_level: group_level)
+        resps = client.create_subscription(family_id: family_id, name: name, product_id: product_id, family_sharable: family_sharable, review_note: review_note, subscription_period: subscription_period, group_level: group_level, mighty_logger: mighty_logger)
         return resps.to_models.first
       end
 
