@@ -78,7 +78,6 @@ module Spaceship
 
         device_platforms = [
           device_platform,
-          'UNIVERSAL' # Universal Bundle ID platform is undocumented as of Oct 4, 2023.
         ]
 
         device_classes =
