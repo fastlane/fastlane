@@ -26,7 +26,7 @@ module Fastlane
         payload['name'] = params[:name] if params[:name]
         payload['body'] = params[:description] if params[:description]
         payload['target_commitish'] = params[:commitish] if params[:commitish]
-        payload['make_latest'] = params[:make_latest] if params[:make_latest]
+        payload['make_latest'] = params[:make_latest] if params[:make_latest] && !params[:is_draft] && !params[:is_prerelease]
 
         GithubApiAction.run(
           server_url: server_url,
