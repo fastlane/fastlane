@@ -77,7 +77,7 @@ module Spaceship
                           end
 
         device_platforms = [
-          device_platform,
+          device_platform
         ]
 
         device_classes =
