@@ -94,7 +94,7 @@ def create_fake_spaceship_ensure
 end
 
 def provisioning_path_for_xcode_version(xcode_version)
-  if xcode_version.split('.')[0].to_i < 16
+  if xcode_version.xcode_at_least?(16)
     return File.join(File.expand_path("~"), "Library/MobileDevice/Provisioning Profiles")
   else
     return File.join(File.expand_path("~"), "Library/Developer/Xcode/UserData/Provisioning Profiles")
