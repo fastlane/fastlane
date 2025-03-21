@@ -215,7 +215,7 @@ fastlane match development
 This will create a new certificate and provisioning profile (if required) and store them in your selected storage.
 If you previously ran _match_ with the configured storage it will automatically install the existing profiles from your storage.
 
-The provisioning profiles are installed in `~/Library/MobileDevice/Provisioning Profiles` while the certificates and private keys are installed in your Keychain.
+The provisioning profiles are installed in `~/Library/Developer/Xcode/UserData/Provisioning Profiles` (`~/Library/MobileDevice/Provisioning Profiles` for Xcode versions prior to 16.0) while the certificates and private keys are installed in your Keychain.
 
 To get a more detailed output of what _match_ is doing use
 
