@@ -93,7 +93,7 @@ module Spaceship
           attributes: {
             name: name,
             profileType: profile_type
-             # Unsupported
+            # Unsupported
             # https://developer.apple.com/documentation/appstoreconnectapi/profilecreaterequest/data-data.dictionary/attributes-data.dictionary
             # templateName: template_name
           }
