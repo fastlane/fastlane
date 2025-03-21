@@ -92,8 +92,10 @@ module Spaceship
           devices: device_ids,
           attributes: {
             name: name,
-            profileType: profile_type,
-            templateName: template_name
+            profileType: profile_type
+             # Unsupported
+            # https://developer.apple.com/documentation/appstoreconnectapi/profilecreaterequest/data-data.dictionary/attributes-data.dictionary
+            # templateName: template_name
           }
         )
         return resp.to_models.first
