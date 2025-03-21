@@ -18,7 +18,7 @@ describe Match do
 
     let(:default_device_all_params) do
       {
-        filter: { platform: 'IOS,UNIVERSAL', status: 'ENABLED' },
+        filter: { platform: 'IOS', status: 'ENABLED' },
         client: anything
       }
     end
