@@ -68,6 +68,70 @@ Shopping list:
   - Muffins
         LIST
       end
+
+      it "does not print output to stdout when status != 0 and output was already printed" do
+        unless FastlaneCore::Helper.windows?
+          expect(Process).to receive(:wait)
+        end
+
+        # prints to UI.command_output instead
+        expect do
+          FastlaneCore::CommandExecutor.execute(
+            command: 'echo log; exit 42',
+            print_all: true,
+            error: proc do |_error_output| end
+          )
+        end.not_to output("log\n").to_stdout
+      end
+
+      it "prints output to stdout ony ones when status != 0 and output was not already printed" do
+        unless FastlaneCore::Helper.windows?
+          expect(Process).to receive(:wait).twice
+        end
+
+        expect do
+          FastlaneCore::CommandExecutor.execute(
+            command: 'echo log; exit 42',
+            print_all: false,
+            error: proc do |_error_output| end
+          )
+        end.to output("log\n").to_stdout
+
+        expect do
+          FastlaneCore::CommandExecutor.execute(
+            command: 'echo log; exit 42',
+            print_all: true,
+            suppress_output: true,
+            error: proc do |_error_output| end
+          )
+        end.to output("log\n").to_stdout
+      end
+
+      it "calls error block with output argument" do
+        unless FastlaneCore::Helper.windows?
+          expect(Process).to receive(:wait).twice
+        end
+
+        error_block_input = nil
+        result = FastlaneCore::CommandExecutor.execute(
+          command: 'echo log; exit 42',
+          print_all: true,
+          error: proc do |error_output|
+            error_block_input = error_output
+          end
+        )
+        expect(error_block_input).to eq('log')
+
+        error_block_input = nil
+        result = FastlaneCore::CommandExecutor.execute(
+          command: 'echo log; exit 42',
+          print_all: false,
+          error: proc do |error_output|
+            error_block_input = error_output
+          end
+        )
+        expect(error_block_input).to eq('log')
+      end
     end
 
     describe "which" do
