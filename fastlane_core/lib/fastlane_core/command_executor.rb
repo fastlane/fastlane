@@ -77,8 +77,13 @@ module FastlaneCore
 
         # Exit status for build command, should be 0 if build succeeded
         if status != 0
-          o = output.join("\n")
-          puts(o) unless suppress_output # the user has the right to see the raw output
+          o = String.new
+          is_output_already_printed = print_all && !suppress_output
+          if !is_output_already_printed || !error.nil?
+            o = output.join("\n")
+          end
+          puts(o) unless is_output_already_printed
+
           UI.error("Exit status: #{status}")
           if error
             error.call(o, status)
