@@ -65,11 +65,11 @@ module Spaceship
       end
 
       # Instance level hostname only used when creating
-      # App Store Connect API Farady client.
+      # App Store Connect API Faraday client.
       # Forwarding to class level if using web session.
       def hostname
         if @token
-          return "https://api.appstoreconnect.apple.com/v1/"
+          return @token.in_house ? "https://api.enterprise.developer.apple.com/" : "https://api.appstoreconnect.apple.com/"
         end
         return self.class.hostname
       end
@@ -87,13 +87,14 @@ module Spaceship
         return @token.nil?
       end
 
-      def build_params(filter: nil, includes: nil, limit: nil, sort: nil, cursor: nil)
+      def build_params(filter: nil, includes: nil, fields: nil, limit: nil, sort: nil, cursor: nil)
         params = {}
 
         filter = filter.delete_if { |k, v| v.nil? } if filter
 
         params[:filter] = filter if filter && !filter.empty?
         params[:include] = includes if includes
+        params[:fields] = fields if fields
         params[:limit] = limit if limit
         params[:sort] = sort if sort
         params[:cursor] = cursor if cursor
@@ -183,7 +184,7 @@ module Spaceship
         if tries.zero?
           raise error
         else
-          msg = "Token has expired or has been revoked! Trying to refresh..."
+          msg = "Token has expired, issued-at-time is in the future, or has been revoked! Trying to refresh..."
           puts(msg) if Spaceship::Globals.verbose?
           @token.refresh!
           retry

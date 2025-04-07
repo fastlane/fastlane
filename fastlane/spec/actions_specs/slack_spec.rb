@@ -22,6 +22,7 @@ describe Fastlane::Actions do
           message: message,
           success: false,
           channel: channel,
+          icon_emoji: ':white_check_mark:',
           payload: {
             'Build Date' => Time.new.to_s,
             'Built by' => 'Jenkins'
@@ -46,6 +47,7 @@ describe Fastlane::Actions do
           ],
           link_names: false,
           icon_url: 'https://fastlane.tools/assets/img/fastlane_icon.png',
+          icon_emoji: ':white_check_mark:',
           fail_on_error: true
         }
         expect(subject).to receive(:post_message).with(expected_args)

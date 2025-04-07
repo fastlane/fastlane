@@ -1,5 +1,5 @@
 module Deliver
-  # This is a convinient class that enumerates app store connect's screenshots in various degrees.
+  # This is a convenient class that enumerates app store connect's screenshots in various degrees.
   class AppScreenshotIterator
     NUMBER_OF_THREADS = Helper.test? ? 1 : [ENV.fetch("DELIVER_NUMBER_OF_THREADS", 10).to_i, 10].min
 
@@ -59,7 +59,7 @@ module Deliver
     # @yieldparam [optional, Spaceship::ConnectAPI::AppStoreVersionLocalization] localization
     # @yieldparam [optional, Spaceship::ConnectAPI::AppStoreScreenshotSet] app_screenshot_set
     # @yieldparam [optional, Deliver::AppScreenshot] screenshot
-    # @yieldparam [optional, Integer] index a number reperesents which position the screenshot will be
+    # @yieldparam [optional, Integer] index a number represents which position the screenshot will be
     def each_local_screenshot(screenshots_per_language, &block)
       return enum_for(__method__, screenshots_per_language) unless block_given?
 

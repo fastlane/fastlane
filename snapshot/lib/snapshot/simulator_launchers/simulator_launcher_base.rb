@@ -107,7 +107,7 @@ module Snapshot
           output = Helper.backticks("xcrun simctl addmedia #{device_udid} #{path.shellescape} &> /dev/null")
 
           # Run legacy addphoto and addvideo if addmedia isn't found
-          # Output will be empty strin gif it was a success
+          # Output will be empty string if it was a success
           # Output will contain "usage: simctl" if command not found
           if output.include?('usage: simctl')
             Helper.backticks("xcrun simctl add#{media_type} #{device_udid} #{path.shellescape} &> /dev/null")
@@ -124,7 +124,7 @@ module Snapshot
       Helper.backticks("xcrun simctl bootstatus #{device_udid} -b &> /dev/null")
 
       # "Booted" status is not enough for to adjust the status bar
-      # Simulator could stil be booting with Apple logo
+      # Simulator could still be booting with Apple logo
       # Need to wait "some amount of time" until home screen shows
       boot_sleep = ENV["SNAPSHOT_SIMULATOR_WAIT_FOR_BOOT_TIMEOUT"].to_i || 10
       UI.message("Waiting #{boot_sleep} seconds for device to fully boot before overriding status bar... Set 'SNAPSHOT_SIMULATOR_WAIT_FOR_BOOT_TIMEOUT' environment variable to adjust timeout")

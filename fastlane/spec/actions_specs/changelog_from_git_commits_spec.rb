@@ -190,8 +190,27 @@ describe Fastlane do
         expect(result).to eq(changelog)
       end
 
+      it "Returns a scoped log from the app's path if so requested" do
+        result = Fastlane::FastFile.new.parse("lane :test do
+          changelog_from_git_commits(app_path: './apps/ios')
+        end").runner.execute(:test)
+
+        tag_name = %w(git rev-list --tags --max-count=1).shelljoin
+        describe = %W(git describe --tags #{tag_name}).shelljoin
+        changelog = %W(git log --pretty=%B #{describe}...HEAD ./apps/ios).shelljoin
+        expect(result).to eq(changelog)
+      end
+
       it "Runs between option from command line" do
-        expect(system("fastlane run changelog_from_git_commits between:123456,HEAD")).to be
+
+        options = FastlaneCore::Configuration.create(Fastlane::Actions::ChangelogFromGitCommitsAction.available_options, {
+          between: '123456,HEAD'
+        })
+
+        result = Fastlane::Actions::ChangelogFromGitCommitsAction.run(options)
+
+        changelog = %w(git log --pretty=%B 123456...HEAD).shelljoin
+        expect(result).to eq(changelog)
       end
 
       it "Accepts string value for :between" do

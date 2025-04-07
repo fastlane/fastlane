@@ -2,7 +2,8 @@
 
 version: 2.1
 orbs:
-    shellcheck: circleci/shellcheck@2.2.2 # brew install shellcheck stopped working so using this
+  shellcheck: circleci/shellcheck@2.2.2 # brew install shellcheck stopped working so using this
+  macos: circleci/macos@2
 
 aliases:
   - &important-branches
@@ -50,21 +51,15 @@ aliases:
       paths:
         - "~/.cache/rubocop_cache"
 
-  - &set_ruby
-    run:
-      name: Set Ruby version
-      command: | # see https://circleci.com/docs/2.0/testing-ios/#using-ruby
-        echo "ruby-${_RUBY_VERSION}" > ~/.ruby-version
-        # https://circleci.com/docs/2.0/env-vars/#setting-an-environment-variable-in-a-shell-command
-        echo 'chruby ruby-${_RUBY_VERSION}' >> $BASH_ENV
-
   - &bundle_install
     run:
       name: bundle install
       command: |
+        gem update --system `.ci/compatible_gem_version`
         gem install bundler -v $(cat Gemfile.lock | tail -1 | tr -d " ")
         bundle config set --local path .bundle
         bundle check || bundle install --jobs=4 --retry=3
+        bundle env
 
 jobs:
   tests_macos: &tests_macos_base
@@ -83,14 +78,14 @@ jobs:
       CIRCLE_TEST_REPORTS: '~/test-reports'
       LC_ALL: 'en_US.UTF-8'
       LANG: 'en_US.UTF-8'
-      _RUBY_VERSION: << parameters.ruby_version >>
     shell: '/bin/bash --login -eo pipefail'
     steps:
       - *cache_restore_git
       - checkout
       - *cache_save_git
       - *cache_restore_bundler
-      - *set_ruby
+      - macos/switch-ruby:
+          version: << parameters.ruby_version >>
       - run:
           name: debug | ruby version
           command: |
@@ -108,6 +103,7 @@ jobs:
       - run:
           name: bundle exec fastlane execute_tests
           command: |
+            ulimit -n 65536 # allows us to stress test the system if we want
             bundle exec fastlane snapshot reset_simulators --force
             RUBYOPT=<< parameters.ruby_opt >> bundle exec fastlane execute_tests
       - *cache_save_rubocop
@@ -132,7 +128,9 @@ jobs:
 
   tests_ubuntu:
     parameters:
-      ruby_version:
+      image:
+        type: string
+      ruby_version: # Used when restoring/saving bundler cache
         type: string
     environment:
       CIRCLE_TEST_REPORTS: '~/test-reports'
@@ -140,7 +138,7 @@ jobs:
       LANG: 'C.UTF-8'
       FASTLANE_ITUNES_TRANSPORTER_PATH: .bundle
     docker:
-      - image: << parameters.ruby_version >>
+      - image: << parameters.image >>
     steps:
       - *cache_restore_git
       - checkout
@@ -178,30 +176,20 @@ jobs:
       - checkout
       - *cache_save_git
       - *cache_restore_bundler
-      - *set_ruby
+      - macos/switch-ruby:
+          version: << parameters.ruby_version >>
       - *bundle_install
       - *cache_save_bundler
-      - run:
-          name: debug | brew version
-          command: |
-            brew -v
-      - run:
-          name: brew update if needed # temporary solution for this https://discuss.circleci.com/t/macos-image-users-homebrew-brownout-2021-04-26/39872/2
-          command: |
-            # if the version is not 3.x.x, try brew update
-            ruby -e 'exit(1) if `brew -v` =~ /2\.\d+\.\d+/' ||\
-            brew update || \
-            # if brew update fails due to shallow clone, try unshallowing and then brew update again
-            git -C /usr/local/Homebrew/Library/Taps/homebrew/homebrew-core fetch --unshallow && \
-            brew update
       - run: bundle exec fastlane generate_swift_api
 
   validate_documentation:
     parameters:
-      ruby_version:
+      image:
+        type: string
+      ruby_version: # Used when restoring/saving bundler cache
         type: string
     docker:
-      - image: << parameters.ruby_version >>
+      - image: << parameters.image >>
     steps:
       - *cache_restore_git
       - checkout
@@ -211,7 +199,7 @@ jobs:
       - run:
           name: Setup Build
           command: |
-            gem update --system
+            gem update --system `.ci/compatible_gem_version`
       - *bundle_install
       - *cache_save_bundler
 
@@ -219,10 +207,12 @@ jobs:
 
   lint_source_code:
     parameters:
-      ruby_version:
+      image:
+        type: string
+      ruby_version: # Used when restoring/saving bundler cache
         type: string
     docker:
-      - image: << parameters.ruby_version >>
+      - image: << parameters.image >>
     steps:
       - *cache_restore_git
       - checkout
@@ -235,13 +225,13 @@ jobs:
 
   modules_load_up_tests:
     parameters:
-      ruby_version:
+      image:
         type: string
     environment:
       LC_ALL: C.UTF-8
       LANG: C.UTF-8
     docker:
-      - image: << parameters.ruby_version >>
+      - image: << parameters.image >>
     shell: /bin/bash --login -eo pipefail
     steps:
       - *cache_restore_git
@@ -258,53 +248,58 @@ jobs:
 
 workflows:
   version: 2
-  build:
+  "Run Tests & Checks": # Name of the workflow, which ends up displayed on GitHub's PR Check
     jobs:
-      - tests_macos:
-          name: 'Execute tests on macOS (Xcode 12.5.1, Ruby 2.6)'
-          xcode_version: '12.5.1'
-          ruby_version: '2.6.6'
-          <<: *important-branches
-      - tests_macos:
-          name: 'Execute tests on macOS (Xcode 12.5.1, Ruby 2.7)'
-          xcode_version: '12.5.1'
-          ruby_version: '2.7.3'
-          ruby_opt: -W:deprecated
-          <<: *important-branches
-      - tests_macos:
-          name: 'Execute tests on macOS (Xcode 13.4.1, Ruby 3.0)'
-          xcode_version: '13.4.1'
-          ruby_version: '3.0.4'
-          ruby_opt: -W:deprecated
-          <<: *important-branches
       - tests_macos:
           name: 'Execute tests on macOS (Xcode 13.4.1, Ruby 3.1)'
           xcode_version: '13.4.1'
-          ruby_version: '3.1.2'
+          ruby_version: '3.1'
           ruby_opt: -W:deprecated
       - tests_macos:
           name: 'Execute tests on macOS (Xcode 14.3.1, Ruby 3.1)'
           xcode_version: '14.3.1'
-          ruby_version: '3.1.4'
+          ruby_version: '3.1'
           ruby_opt: -W:deprecated
       - tests_macos:
-          name: 'Execute tests on macOS (Xcode 15.0.0, Ruby 3.1)'
-          xcode_version: '15.0.0'
-          ruby_version: '3.1.4'
+          name: 'Execute tests on macOS (Xcode 15.0.1, Ruby 3.1)'
+          xcode_version: '15.0.1'
+          ruby_version: '3.1'
+          ruby_opt: -W:deprecated
+      - tests_macos:
+          name: 'Execute tests on macOS (Xcode 14.3.1, Ruby 3.2)'
+          xcode_version: '14.3.1'
+          ruby_version: '3.2'
+          ruby_opt: -W:deprecated
+      - tests_macos:
+          name: 'Execute tests on macOS (Xcode 15.0.1, Ruby 3.2)'
+          xcode_version: '15.0.1'
+          ruby_version: '3.2'
+          ruby_opt: -W:deprecated
+      - tests_macos:
+          name: 'Execute tests on macOS (Xcode 15.2.0, Ruby 3.2)'
+          xcode_version: '15.2.0'
+          ruby_version: '3.2'
+      - tests_macos:
+          name: 'Execute tests on macOS (Xcode 15.3, Ruby 3.3)'
+          xcode_version: '15.3'
+          ruby_version: '3.3'
           ruby_opt: -W:deprecated
       - tests_ubuntu:
           name: 'Execute tests on Ubuntu'
-          ruby_version: 'fastlanetools/ci:0.3.0'
+          image: 'fastlanetools/ci:0.3.0'
+          ruby_version: '2.6'
       - validate_fastlane_swift_generation:
           name: 'Validate Fastlane.swift generation'
-          xcode_version: '12.5.1'
-          ruby_version: '2.7'
+          xcode_version: '15.0.1'
+          ruby_version: '3.2'
       - validate_documentation:
           name: 'Validate Documentation'
-          ruby_version: 'fastlanetools/ci:0.3.0'
+          image: 'cimg/ruby:3.2.2'
+          ruby_version: '3.2'
       - lint_source_code:
           name: 'Lint source code'
-          ruby_version: 'cimg/ruby:2.6'
+          image: 'cimg/ruby:2.6'
+          ruby_version: '2.6'
       - modules_load_up_tests:
           name: 'Modules load up tests'
-          ruby_version: 'cimg/ruby:2.6'
+          image: 'cimg/ruby:2.6'

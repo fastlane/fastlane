@@ -201,7 +201,7 @@ describe Fastlane do
       end
 
       context "when specify collapsible option" do
-        it "adds collapsile option" do
+        it "adds collapsible option" do
           result = Fastlane::FastFile.new.parse("lane :test do
             sourcedocs(
               output_folder: 'docs',
@@ -212,7 +212,7 @@ describe Fastlane do
           expect(result).to eq("sourcedocs generate --output-folder docs --collapsible")
         end
 
-        it "doesn't add collapsile option" do
+        it "doesn't add collapsible option" do
           result = Fastlane::FastFile.new.parse("lane :test do
             sourcedocs(
               output_folder: 'docs',

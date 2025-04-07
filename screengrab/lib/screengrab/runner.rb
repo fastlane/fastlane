@@ -37,7 +37,7 @@ module Screengrab
       test_packages_to_use = @config[:use_tests_in_packages]
 
       if test_classes_to_use && test_classes_to_use.any? && test_packages_to_use && test_packages_to_use.any?
-        UI.error("'use_tests_in_classes' and 'use_tests_in_packages' can not be combined. Please use one or the other.")
+        UI.error("'use_tests_in_classes' and 'use_tests_in_packages' cannot be combined. Please use one or the other.")
         return
       end
 
