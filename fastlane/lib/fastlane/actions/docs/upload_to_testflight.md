@@ -87,6 +87,8 @@ To upload binaries from Linux:
     - `FASTLANE_ITUNES_TRANSPORTER_USE_SHELL_SCRIPT=true`
     - `FASTLANE_ITUNES_TRANSPORTER_PATH=/usr/local/itms` (_or the path where Transporter is installed_)
 
+_Note: fastlane will temporarily save the upload credentials in `$HOME/.appstoreconnect/private_keys/`. Any other files in that directory will be deleted upon upload completion._
+
 ## List builds
 
 To list all builds for specific application use
