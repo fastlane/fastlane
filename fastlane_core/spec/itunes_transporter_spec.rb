@@ -158,8 +158,7 @@ describe FastlaneCore do
         ('com.apple.transporter.Application' if classpath),
         ("-jar #{FastlaneCore::Helper.transporter_java_jar_path.shellescape}" unless classpath),
         "-m upload",
-        ("-u #{email.shellescape}" if jwt.nil?),
-        ("-p #{password.shellescape}" if jwt.nil?),
+        ("-u #{email.shellescape} -p #{password.shellescape}" if jwt.nil?),
         ("-jwt #{jwt}" unless jwt.nil?),
         upload_part,
         (transporter.to_s if transporter),
@@ -183,8 +182,7 @@ describe FastlaneCore do
         ('com.apple.transporter.Application' if classpath),
         ("-jar #{FastlaneCore::Helper.transporter_java_jar_path.shellescape}" unless classpath),
         "-m verify",
-        ("-u #{email.shellescape}" if jwt.nil?),
-        ("-p #{password.shellescape}" if jwt.nil?),
+        ("-u #{email.shellescape} -p #{password.shellescape}" if jwt.nil?),
         ("-jwt #{jwt}" unless jwt.nil?),
         "-f /tmp/my.app.id.itmsp",
         (transporter.to_s if transporter),
@@ -207,8 +205,7 @@ describe FastlaneCore do
         ('com.apple.transporter.Application' if classpath),
         ("-jar #{FastlaneCore::Helper.transporter_java_jar_path.shellescape}" unless classpath),
         '-m lookupMetadata',
-        ("-u #{email.shellescape}" if jwt.nil?),
-        ("-p #{password.shellescape}" if jwt.nil?),
+        ("-u #{email.shellescape} -p #{password.shellescape}" if jwt.nil?),
         ("-jwt #{jwt}" unless jwt.nil?),
         '-apple_id my.app.id',
         '-destination /tmp',
@@ -230,8 +227,7 @@ describe FastlaneCore do
         "-classpath #{FastlaneCore::Helper.transporter_java_jar_path.shellescape}",
         'com.apple.transporter.Application',
         '-m provider',
-        ('-u fabric.devtools@gmail.com' if jwt.nil?),
-        ("-p #{password.shellescape}" if jwt.nil?),
+        ("-u fabric.devtools@gmail.com -p #{password.shellescape}" if jwt.nil?),
         ("-jwt #{jwt}" if jwt),
         '2>&1'
       ].compact.join(' ')
@@ -251,8 +247,7 @@ describe FastlaneCore do
         '-Dsun.net.http.retryPost=false',
         "-jar #{FastlaneCore::Helper.transporter_java_jar_path.shellescape}",
         "-m upload",
-        ("-u #{email.shellescape}" if jwt.nil?),
-        ("-p #{password.shellescape}" if jwt.nil?),
+        ("-u #{email.shellescape} -p #{password.shellescape}" if jwt.nil?),
         ("-jwt #{jwt}" unless jwt.nil?),
         upload_part,
         (transporter.to_s if transporter),
@@ -274,8 +269,7 @@ describe FastlaneCore do
         '-Dsun.net.http.retryPost=false',
         "-jar #{FastlaneCore::Helper.transporter_java_jar_path.shellescape}",
         "-m verify",
-        ("-u #{email.shellescape}" if jwt.nil?),
-        ("-p #{password.shellescape}" if jwt.nil?),
+        ("-u #{email.shellescape} -p #{password.shellescape}" if jwt.nil?),
         ("-jwt #{jwt}" unless jwt.nil?),
         "-f /tmp/my.app.id.itmsp",
         (transporter.to_s if transporter),
@@ -296,8 +290,7 @@ describe FastlaneCore do
         '-Dsun.net.http.retryPost=false',
         "-jar #{FastlaneCore::Helper.transporter_java_jar_path.shellescape}",
         '-m lookupMetadata',
-        ("-u #{email.shellescape}" if jwt.nil?),
-        ("-p #{password.shellescape}" if jwt.nil?),
+        ("-u #{email.shellescape} -p #{password.shellescape}" if jwt.nil?),
         ("-jwt #{jwt}" unless jwt.nil?),
         '-apple_id my.app.id',
         '-destination /tmp',
@@ -1442,18 +1435,11 @@ describe FastlaneCore do
     let(:pass_arg) { nil }
     let(:jwt_arg) { nil }
     let(:api_key_arg) { nil }
-    let(:expected_error) { nil }
 
     shared_examples "build_credential_params" do
       it do
-        if expected_error.nil?
-          command_line_param = transporter.build_credential_params(usr_arg, pass_arg, jwt_arg, api_key_arg)
-          expect(command_line_param).to eq(expected)
-        else
-          expect {
-            transporter.build_credential_params(usr_arg, pass_arg, jwt_arg, api_key_arg)
-          }.to raise_error(expected_error)
-        end
+        command_line_param = transporter.build_credential_params(usr_arg, pass_arg, jwt_arg, api_key_arg)
+        expect(command_line_param).to eq(expected)
       end
     end
 
@@ -1463,21 +1449,21 @@ describe FastlaneCore do
       context "with use username and password" do
         let(:usr_arg) { email }
         let(:pass_arg) { password }
-        let(:expected) { ["-u #{email.shellescape}", "-p #{password.shellescape}"] }
+        let(:expected) { "-u #{email.shellescape} -p #{password.shellescape}" }
 
         include_examples 'build_credential_params'
       end
 
       context "with jwt" do
         let(:jwt_arg) { jwt }
-        let(:expected_error) { NoMethodError }
+        let(:expected) { nil }
 
         include_examples 'build_credential_params'
       end
 
       context "with api key" do
         let(:api_key_arg) { api_key }
-        let(:expected) { ["--apiKey #{api_key[:key_id]}", "--apiIssuer #{api_key[:issuer_id]}"] }
+        let(:expected) { "--apiKey #{api_key[:key_id]} --apiIssuer #{api_key[:issuer_id]}" }
 
         include_examples 'build_credential_params'
       end
@@ -1486,7 +1472,7 @@ describe FastlaneCore do
         let(:usr_arg) { email }
         let(:pass_arg) { password }
         let(:api_key_arg) { api_key }
-        let(:expected) { ["--apiKey #{api_key[:key_id]}", "--apiIssuer #{api_key[:issuer_id]}"] } # api_key takes precedence
+        let(:expected) { "--apiKey #{api_key[:key_id]} --apiIssuer #{api_key[:issuer_id]}" } # api_key takes precedence
 
         include_examples 'build_credential_params'
       end
@@ -1497,7 +1483,7 @@ describe FastlaneCore do
       let(:transporter) { FastlaneCore::ShellScriptTransporterExecutor.new }
 
       context "with no args" do
-        let(:expected) { [] }
+        let(:expected) { nil }
 
         include_examples 'build_credential_params'
       end
@@ -1505,21 +1491,21 @@ describe FastlaneCore do
       context "with use username and password" do
         let(:usr_arg) { email }
         let(:pass_arg) { password }
-        let(:expected) { ["-u #{email.shellescape} -p #{transporter.send(:shell_escaped_password, password)}"] }
+        let(:expected) { "-u #{email.shellescape} -p #{transporter.send(:shell_escaped_password, password)}" }
 
         include_examples 'build_credential_params'
       end
 
       context "with jwt" do
         let(:jwt_arg) { jwt }
-        let(:expected) { ["-jwt #{jwt}"] }
+        let(:expected) { "-jwt #{jwt}" }
 
         include_examples 'build_credential_params'
       end
 
       context "with api key" do
         let(:api_key_arg) { api_key }
-        let(:expected) { ["-apiIssuer #{api_key[:issuer_id]} -apiKey #{api_key[:key_id]}"] }
+        let(:expected) { "-apiIssuer #{api_key[:issuer_id]} -apiKey #{api_key[:key_id]}" }
 
         include_examples 'build_credential_params'
       end
@@ -1528,7 +1514,7 @@ describe FastlaneCore do
         let(:usr_arg) { email }
         let(:pass_arg) { password }
         let(:jwt_arg) { jwt }
-        let(:expected) { ["-jwt #{jwt}"] }
+        let(:expected) { "-jwt #{jwt}" } # jwt takes precedence
 
         include_examples 'build_credential_params'
       end
@@ -1537,7 +1523,7 @@ describe FastlaneCore do
         let(:usr_arg) { email }
         let(:pass_arg) { password }
         let(:api_key_arg) { api_key }
-        let(:expected) { ["-apiIssuer #{api_key[:issuer_id]} -apiKey #{api_key[:key_id]}"] }
+        let(:expected) { "-apiIssuer #{api_key[:issuer_id]} -apiKey #{api_key[:key_id]}" } # api_key takes precedence
 
         include_examples 'build_credential_params'
       end
@@ -1545,7 +1531,7 @@ describe FastlaneCore do
       context "with jwt and api key" do
         let(:jwt_arg) { jwt }
         let(:api_key_arg) { api_key }
-        let(:expected) { ["-apiIssuer #{api_key[:issuer_id]} -apiKey #{api_key[:key_id]}"] }
+        let(:expected) { "-apiIssuer #{api_key[:issuer_id]} -apiKey #{api_key[:key_id]}" } # api_key takes precedence
 
         include_examples 'build_credential_params'
       end
@@ -1555,7 +1541,7 @@ describe FastlaneCore do
       let(:transporter) { FastlaneCore::JavaTransporterExecutor.new }
 
       context "with no args" do
-        let(:expected_error) { NoMethodError }
+        let(:expected) { nil }
 
         include_examples 'build_credential_params'
       end
@@ -1563,14 +1549,23 @@ describe FastlaneCore do
       context "with username and password" do
         let(:usr_arg) { email }
         let(:pass_arg) { password }
-        let(:expected) { ["-u #{email.shellescape}", "-p #{password.shellescape}"] }
+        let(:expected) { "-u #{email.shellescape} -p #{password.shellescape}" }
 
         include_examples 'build_credential_params'
       end
 
       context "with jwt" do
         let(:jwt_arg) { jwt }
-        let(:expected) { ["-jwt #{jwt}"] }
+        let(:expected) { "-jwt #{jwt}" }
+
+        include_examples 'build_credential_params'
+      end
+
+      context "with user, pass and jwt" do
+        let(:usr_arg) { email }
+        let(:pass_arg) { password }
+        let(:jwt_arg) { jwt }
+        let(:expected) { "-jwt #{jwt}" } # jwt takes precedence
 
         include_examples 'build_credential_params'
       end

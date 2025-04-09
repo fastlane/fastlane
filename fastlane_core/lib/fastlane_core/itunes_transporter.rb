@@ -58,7 +58,7 @@ module FastlaneCore
     # @param jwt [String, nil] A JSON Web Token for token-based authentication (optional).
     # @param api_key [Hash, nil] An API key for authentication (optional).
     #
-    # @return [Array<String>] An array containing the appropriate credentials for authentication.
+    # @return [String] A string containing the appropriate credentials for authentication.
     def build_credential_params(username = nil, password = nil, jwt = nil, api_key = nil)
       not_implemented(__method__)
     end
@@ -314,12 +314,11 @@ module FastlaneCore
     end
 
     def build_credential_params(username = nil, password = nil, jwt = nil, api_key = nil)
-      [
-        ("-u #{username.shellescape}" if api_key.nil?),
-        ("-p #{password.shellescape}" if api_key.nil?),
-        ("--apiKey #{api_key[:key_id]}" unless api_key.nil?),
-        ("--apiIssuer #{api_key[:issuer_id]}" unless api_key.nil?)
-      ].compact
+      if !username.nil? && !password.nil? && api_key.nil?
+        "-u #{username.shellescape} -p #{password.shellescape}"
+      elsif !api_key.nil?
+        "--apiKey #{api_key[:key_id]} --apiIssuer #{api_key[:issuer_id]}"
+      end
     end
 
     def build_upload_command(username, password, source = "/tmp", provider_short_name = "", jwt = nil, platform = nil, api_key = nil)
@@ -328,7 +327,7 @@ module FastlaneCore
         ("API_PRIVATE_KEYS_DIR=#{api_key[:key_dir]}" if use_api_key),
         "xcrun altool",
         "--upload-app",
-        *build_credential_params(username, password, jwt, api_key),
+        build_credential_params(username, password, jwt, api_key),
         ("--asc-provider #{provider_short_name}" unless use_api_key || provider_short_name.to_s.empty?),
         platform_option(platform),
         file_upload_option(source),
@@ -343,7 +342,7 @@ module FastlaneCore
         ("API_PRIVATE_KEYS_DIR=#{api_key[:key_dir]}" if use_api_key),
         "xcrun altool",
         "--list-providers",
-        *build_credential_params(username, password, jwt, api_key),
+        build_credential_params(username, password, jwt, api_key),
         "--output-format json"
       ].compact.join(' ')
     end
@@ -360,7 +359,7 @@ module FastlaneCore
         ("API_PRIVATE_KEYS_DIR=#{api_key[:key_dir]}" if use_api_key),
         "xcrun altool",
         "--validate-app",
-        *build_credential_params(username, password, nil, api_key),
+        build_credential_params(username, password, nil, api_key),
         ("--asc-provider #{provider_short_name}" unless use_api_key || provider_short_name.to_s.empty?),
         platform_option(platform),
         file_upload_option(source)
@@ -425,18 +424,20 @@ module FastlaneCore
   # Generates commands and executes the iTMSTransporter through the shell script it provides by the same name
   class ShellScriptTransporterExecutor < TransporterExecutor
     def build_credential_params(username = nil, password = nil, jwt = nil, api_key = nil)
-      [
-        ("-u #{username.shellescape} -p #{shell_escaped_password(password)}" if !(username.nil? || password.nil?) && (jwt.nil? && api_key.nil?)),
-        ("-jwt #{jwt}" if !jwt.nil? && api_key.nil?),
-        ("-apiIssuer #{api_key[:issuer_id]} -apiKey #{api_key[:key_id]}" unless api_key.nil?)
-      ].compact
+      if !(username.nil? || password.nil?) && (jwt.nil? && api_key.nil?)
+        "-u #{username.shellescape} -p #{shell_escaped_password(password)}"
+      elsif !jwt.nil? && api_key.nil?
+        "-jwt #{jwt}"
+      elsif !api_key.nil?
+        "-apiIssuer #{api_key[:issuer_id]} -apiKey #{api_key[:key_id]}"
+      end
     end
 
     def build_upload_command(username, password, source = "/tmp", provider_short_name = "", jwt = nil, platform = nil, api_key = nil)
       [
         '"' + Helper.transporter_path + '"',
         "-m upload",
-        *build_credential_params(username, password, jwt, api_key),
+        build_credential_params(username, password, jwt, api_key),
         file_upload_option(source),
         additional_upload_parameters, # that's here, because the user might overwrite the -t option
         "-k 100000",
@@ -449,7 +450,7 @@ module FastlaneCore
       [
         '"' + Helper.transporter_path + '"',
         "-m lookupMetadata",
-        *build_credential_params(username, password, jwt),
+        build_credential_params(username, password, jwt),
         "-apple_id #{apple_id}",
         "-destination '#{destination}'",
         ("-itc_provider #{provider_short_name}" if jwt.nil? && !provider_short_name.to_s.empty?)
@@ -460,7 +461,7 @@ module FastlaneCore
       [
         '"' + Helper.transporter_path + '"',
         '-m provider',
-        *build_credential_params(username, password, jwt, api_key)
+        build_credential_params(username, password, jwt, api_key)
       ].compact.join(' ')
     end
 
@@ -469,7 +470,7 @@ module FastlaneCore
       [
         '"' + Helper.transporter_path + '"',
         '-m verify',
-        *build_credential_params(username, password, jwt),
+        build_credential_params(username, password, jwt),
         "-f #{source.shellescape}",
         ("-WONoPause true" if Helper.windows?), # Windows only: process instantly returns instead of waiting for key press
         ("-itc_provider #{provider_short_name}" if jwt.nil? && !provider_short_name.to_s.empty?)
@@ -518,11 +519,15 @@ module FastlaneCore
   # escaping problems in its accompanying shell script.
   class JavaTransporterExecutor < TransporterExecutor
     def build_credential_params(username = nil, password = nil, jwt = nil, api_key = nil, is_password_from_env = false)
-      [
-        ("-u #{username.shellescape}" if jwt.to_s.empty?),
-        ((is_password_from_env ? "-p @env:ITMS_TRANSPORTER_PASSWORD" : "-p #{password.shellescape}") if jwt.to_s.empty?),
-        ("-jwt #{jwt}" unless jwt.to_s.empty?)
-      ].compact
+      if !username.nil? && jwt.to_s.empty?
+        if is_password_from_env
+          "-u #{username.shellescape} -p @env:ITMS_TRANSPORTER_PASSWORD"
+        elsif !password.nil?
+          "-u #{username.shellescape} -p #{password.shellescape}"
+        end
+      elsif !jwt.to_s.empty?
+        "-jwt #{jwt}"
+      end
     end
 
     def build_upload_command(username, password, source = "/tmp", provider_short_name = "", jwt = nil, platform = nil, api_key = nil)
@@ -532,7 +537,7 @@ module FastlaneCore
           ("ITMS_TRANSPORTER_PASSWORD=#{password.shellescape}" if jwt.to_s.empty?),
           'xcrun iTMSTransporter',
           '-m upload',
-          *credential_params,
+          credential_params,
           file_upload_option(source),
           additional_upload_parameters, # that's here, because the user might overwrite the -t option
           '-k 100000',
@@ -551,7 +556,7 @@ module FastlaneCore
           '-Dsun.net.http.retryPost=false',
           java_code_option,
           '-m upload',
-          *credential_params,
+          credential_params,
           file_upload_option(source),
           additional_upload_parameters, # that's here, because the user might overwrite the -t option
           '-k 100000',
@@ -569,7 +574,7 @@ module FastlaneCore
           ("ITMS_TRANSPORTER_PASSWORD=#{password.shellescape}" if jwt.to_s.empty?),
           'xcrun iTMSTransporter',
           '-m verify',
-          *credential_params,
+          credential_params,
           "-f #{source.shellescape}",
           ("-itc_provider #{provider_short_name}" if jwt.nil? && !provider_short_name.to_s.empty?),
           '2>&1' # cause stderr to be written to stdout
@@ -586,7 +591,7 @@ module FastlaneCore
           '-Dsun.net.http.retryPost=false',
           java_code_option,
           '-m verify',
-          *credential_params,
+          credential_params,
           "-f #{source.shellescape}",
           ("-itc_provider #{provider_short_name}" if jwt.nil? && !provider_short_name.to_s.empty?),
           '2>&1' # cause stderr to be written to stdout
@@ -601,7 +606,7 @@ module FastlaneCore
           ("ITMS_TRANSPORTER_PASSWORD=#{password.shellescape}" if jwt.to_s.empty?),
           'xcrun iTMSTransporter',
           '-m lookupMetadata',
-          *credential_params,
+          credential_params,
           "-apple_id #{apple_id.shellescape}",
           "-destination #{destination.shellescape}",
           ("-itc_provider #{provider_short_name}" if jwt.nil? && !provider_short_name.to_s.empty?),
@@ -619,7 +624,7 @@ module FastlaneCore
           '-Dsun.net.http.retryPost=false',
           java_code_option,
           '-m lookupMetadata',
-          *credential_params,
+          credential_params,
           "-apple_id #{apple_id.shellescape}",
           "-destination #{destination.shellescape}",
           ("-itc_provider #{provider_short_name}" if jwt.nil? && !provider_short_name.to_s.empty?),
@@ -635,7 +640,7 @@ module FastlaneCore
           ("ITMS_TRANSPORTER_PASSWORD=#{password.shellescape}" if jwt.to_s.empty?),
           'xcrun iTMSTransporter',
           '-m provider',
-          *credential_params,
+          credential_params,
           '2>&1' # cause stderr to be written to stdout
         ].compact.join(' ')
       else
@@ -650,7 +655,7 @@ module FastlaneCore
           '-Dsun.net.http.retryPost=false',
           java_code_option,
           '-m provider',
-          *credential_params,
+          credential_params,
           '2>&1' # cause stderr to be written to stdout
         ].compact.join(' ')
       end
