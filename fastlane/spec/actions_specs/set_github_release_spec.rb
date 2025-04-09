@@ -4,7 +4,7 @@ describe Fastlane do
       describe "with api_token" do
         it "sends and receives the right content from GitHub" do
           stub_request(:post, "https://api.github.com/repos/czechboy0/czechboy0.github.io/releases").
-            with(body: "{\"tag_name\":\"tag33\",\"draft\":false,\"prerelease\":false,\"generate_release_notes\":false,\"name\":\"Awesome Release\",\"body\":\"Bunch of new things :+1:\",\"target_commitish\":\"test\"}",
+            with(body: "{\"tag_name\":\"tag33\",\"draft\":false,\"prerelease\":false,\"generate_release_notes\":false,\"name\":\"Awesome Release\",\"body\":\"Bunch of new things :+1:\",\"target_commitish\":\"test\",\"make_latest\":\"true\"}",
             headers: { 'Authorization' => 'Basic MTIzNDVhYmNkZQ==', 'Host' => 'api.github.com:443', 'User-Agent' => 'fastlane-github_api' }).
             to_return(status: 201, body: File.read("./fastlane/spec/fixtures/requests/github_create_release_response.json"), headers: {})
 
@@ -18,7 +18,60 @@ describe Fastlane do
               description: 'Bunch of new things :+1:',
               is_draft: 'false',
               is_prerelease: 'false',
-              is_generate_release_notes: 'false'
+              is_generate_release_notes: 'false',
+              make_latest: 'true'
+              )
+            end").runner.execute(:test)
+
+          expect(result['html_url']).to eq("https://github.com/czechboy0/czechboy0.github.io/releases/tag/tag33")
+          expect(result['id']).to eq(1_585_808)
+          expect(result).to eq(JSON.parse(File.read("./fastlane/spec/fixtures/requests/github_create_release_response.json")))
+        end
+
+        it "does not send make_latest parameter if draft is true" do
+          stub_request(:post, "https://api.github.com/repos/czechboy0/czechboy0.github.io/releases").
+            with(body: "{\"tag_name\":\"tag33\",\"draft\":true,\"prerelease\":false,\"generate_release_notes\":false,\"name\":\"Awesome Release\",\"body\":\"Bunch of new things :+1:\",\"target_commitish\":\"test\"}",
+            headers: { 'Authorization' => 'Basic MTIzNDVhYmNkZQ==', 'Host' => 'api.github.com:443', 'User-Agent' => 'fastlane-github_api' }).
+            to_return(status: 201, body: File.read("./fastlane/spec/fixtures/requests/github_create_release_response.json"), headers: {})
+
+          result = Fastlane::FastFile.new.parse("lane :test do
+            set_github_release(
+              repository_name: 'czechboy0/czechboy0.github.io',
+              api_token: '12345abcde',
+              tag_name: 'tag33',
+              name: 'Awesome Release',
+              commitish: 'test',
+              description: 'Bunch of new things :+1:',
+              is_draft: 'true',
+              is_prerelease: 'false',
+              is_generate_release_notes: 'false',
+              make_latest: 'true'
+              )
+            end").runner.execute(:test)
+
+          expect(result['html_url']).to eq("https://github.com/czechboy0/czechboy0.github.io/releases/tag/tag33")
+          expect(result['id']).to eq(1_585_808)
+          expect(result).to eq(JSON.parse(File.read("./fastlane/spec/fixtures/requests/github_create_release_response.json")))
+        end
+
+        it "does not send make_latest parameter if prerelease is true" do
+          stub_request(:post, "https://api.github.com/repos/czechboy0/czechboy0.github.io/releases").
+            with(body: "{\"tag_name\":\"tag33\",\"draft\":false,\"prerelease\":true,\"generate_release_notes\":false,\"name\":\"Awesome Release\",\"body\":\"Bunch of new things :+1:\",\"target_commitish\":\"test\"}",
+            headers: { 'Authorization' => 'Basic MTIzNDVhYmNkZQ==', 'Host' => 'api.github.com:443', 'User-Agent' => 'fastlane-github_api' }).
+            to_return(status: 201, body: File.read("./fastlane/spec/fixtures/requests/github_create_release_response.json"), headers: {})
+
+          result = Fastlane::FastFile.new.parse("lane :test do
+            set_github_release(
+              repository_name: 'czechboy0/czechboy0.github.io',
+              api_token: '12345abcde',
+              tag_name: 'tag33',
+              name: 'Awesome Release',
+              commitish: 'test',
+              description: 'Bunch of new things :+1:',
+              is_draft: 'false',
+              is_prerelease: 'true',
+              is_generate_release_notes: 'false',
+              make_latest: 'true'
               )
             end").runner.execute(:test)
 
@@ -29,7 +82,7 @@ describe Fastlane do
 
         it "returns nil if status code != 201" do
           stub_request(:post, "https://api.github.com/repos/czechboy0/czechboy0.github.io/releases").
-            with(body: "{\"tag_name\":\"tag33\",\"draft\":false,\"prerelease\":false,\"generate_release_notes\":false,\"name\":\"Awesome Release\",\"body\":\"Bunch of new things :+1:\",\"target_commitish\":\"test\"}",
+            with(body: "{\"tag_name\":\"tag33\",\"draft\":false,\"prerelease\":false,\"generate_release_notes\":false,\"name\":\"Awesome Release\",\"body\":\"Bunch of new things :+1:\",\"target_commitish\":\"test\",\"make_latest\":\"true\"}",
             headers: { 'Authorization' => 'Basic MTIzNDVhYmNkZQ==', 'Host' => 'api.github.com:443', 'User-Agent' => 'fastlane-github_api' }).
             to_return(status: 422, headers: {})
 
@@ -43,7 +96,8 @@ describe Fastlane do
               description: 'Bunch of new things :+1:',
               is_draft: false,
               is_prerelease: false,
-              is_generate_release_notes: false
+              is_generate_release_notes: false,
+              make_latest: 'true'
               )
             end").runner.execute(:test)
 
@@ -52,7 +106,7 @@ describe Fastlane do
 
         it "raises error if status code is not a supported error code" do
           stub_request(:post, "https://api.github.com/repos/czechboy0/czechboy0.github.io/releases").
-            with(body: "{\"tag_name\":\"tag33\",\"draft\":false,\"prerelease\":false,\"generate_release_notes\":false,\"name\":\"Awesome Release\",\"body\":\"Bunch of new things :+1:\",\"target_commitish\":\"test\"}",
+            with(body: "{\"tag_name\":\"tag33\",\"draft\":false,\"prerelease\":false,\"generate_release_notes\":false,\"name\":\"Awesome Release\",\"body\":\"Bunch of new things :+1:\",\"target_commitish\":\"test\",\"make_latest\":\"true\"}",
             headers: { 'Authorization' => 'Basic MTIzNDVhYmNkZQ==', 'Host' => 'api.github.com:443', 'User-Agent' => 'fastlane-github_api' }).
             to_return(status: 502, headers: {})
 
@@ -67,7 +121,8 @@ describe Fastlane do
                 description: 'Bunch of new things :+1:',
                 is_draft: false,
                 is_prerelease: false,
-                is_generate_release_notes: false
+                is_generate_release_notes: false,
+                make_latest: 'true'
                 )
               end").runner.execute(:test)
           end.to raise_error(/GitHub responded with 502/)
@@ -75,7 +130,7 @@ describe Fastlane do
 
         it "can use a generated changelog as the description" do
           stub_request(:post, "https://api.github.com/repos/czechboy0/czechboy0.github.io/releases").
-            with(body: "{\"tag_name\":\"tag33\",\"draft\":false,\"prerelease\":false,\"generate_release_notes\":false,\"name\":\"Awesome Release\",\"body\":\"autogenerated changelog\",\"target_commitish\":\"test\"}",
+            with(body: "{\"tag_name\":\"tag33\",\"draft\":false,\"prerelease\":false,\"generate_release_notes\":false,\"name\":\"Awesome Release\",\"body\":\"autogenerated changelog\",\"target_commitish\":\"test\",\"make_latest\":\"true\"}",
             headers: { 'Authorization' => 'Basic MTIzNDVhYmNkZQ==', 'Host' => 'api.github.com:443', 'User-Agent' => 'fastlane-github_api' }).
             to_return(status: 201, body: File.read("./fastlane/spec/fixtures/requests/github_create_release_response.json"), headers: {})
 
@@ -89,7 +144,8 @@ describe Fastlane do
               commitish: 'test',
               is_draft: false,
               is_prerelease: false,
-              is_generate_release_notes: false
+              is_generate_release_notes: false,
+              make_latest: 'true'
               )
             end").runner.execute(:test)
 
@@ -98,7 +154,7 @@ describe Fastlane do
 
         it "prefers an explicit description over a generated changelog" do
           stub_request(:post, "https://api.github.com/repos/czechboy0/czechboy0.github.io/releases").
-            with(body: "{\"tag_name\":\"tag33\",\"draft\":false,\"prerelease\":false,\"generate_release_notes\":false,\"name\":\"Awesome Release\",\"body\":\"explicitly provided\",\"target_commitish\":\"test\"}",
+            with(body: "{\"tag_name\":\"tag33\",\"draft\":false,\"prerelease\":false,\"generate_release_notes\":false,\"name\":\"Awesome Release\",\"body\":\"explicitly provided\",\"target_commitish\":\"test\",\"make_latest\":\"true\"}",
             headers: { 'Authorization' => 'Basic MTIzNDVhYmNkZQ==', 'Host' => 'api.github.com:443', 'User-Agent' => 'fastlane-github_api' }).
             to_return(status: 201, body: File.read("./fastlane/spec/fixtures/requests/github_create_release_response.json"), headers: {})
 
@@ -113,7 +169,8 @@ describe Fastlane do
               description: 'explicitly provided',
               is_draft: false,
               is_prerelease: false,
-              is_generate_release_notes: false
+              is_generate_release_notes: false,
+              make_latest: 'true'
               )
             end").runner.execute(:test)
 
@@ -124,7 +181,7 @@ describe Fastlane do
       describe "with api_bearer" do
         it "sends and receives the right content from GitHub" do
           stub_request(:post, "https://api.github.com/repos/czechboy0/czechboy0.github.io/releases").
-            with(body: "{\"tag_name\":\"tag33\",\"draft\":false,\"prerelease\":false,\"generate_release_notes\":false,\"name\":\"Awesome Release\",\"body\":\"Bunch of new things :+1:\",\"target_commitish\":\"test\"}",
+            with(body: "{\"tag_name\":\"tag33\",\"draft\":false,\"prerelease\":false,\"generate_release_notes\":false,\"name\":\"Awesome Release\",\"body\":\"Bunch of new things :+1:\",\"target_commitish\":\"test\",\"make_latest\":\"true\"}",
             headers: { 'Authorization' => 'Bearer 12345abcde', 'Host' => 'api.github.com:443', 'User-Agent' => 'fastlane-github_api' }).
             to_return(status: 201, body: File.read("./fastlane/spec/fixtures/requests/github_create_release_response.json"), headers: {})
 
@@ -138,7 +195,8 @@ describe Fastlane do
               description: 'Bunch of new things :+1:',
               is_draft: 'false',
               is_prerelease: 'false',
-              is_generate_release_notes: 'false'
+              is_generate_release_notes: 'false',
+              make_latest: 'true'
               )
             end").runner.execute(:test)
 
