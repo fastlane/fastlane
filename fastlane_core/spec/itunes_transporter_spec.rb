@@ -1505,7 +1505,7 @@ describe FastlaneCore do
       context "with use username and password" do
         let(:usr_arg) { email }
         let(:pass_arg) { password }
-        let(:expected) { ["-u #{email.shellescape} -p '#{password.shellescape.gsub("\\'", %q('"\\\'"'))}'"] }
+        let(:expected) { ["-u #{email.shellescape} -p #{transporter.send(:shell_escaped_password, password)}"] }
 
         include_examples 'build_credential_params'
       end
