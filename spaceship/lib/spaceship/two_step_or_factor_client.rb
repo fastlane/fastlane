@@ -233,7 +233,12 @@ module Spaceship
 
     # extracted into its own method for testing
     def ask_for_2fa_code(text)
-      ask(text)
+      if !ENV["FASTLANE_2FA_SCRIPT"].nil? && ENV["FASTLANE_2FA_SCRIPT"].length > 0
+        puts("A Two Factor Script was defined using FASTLANE_2FA_SCRIPT. Running this script now to get the 2-factor-code...".yellow)
+        system(ENV["FASTLANE_2FA_SCRIPT"])
+      else
+        ask(text)
+      end
     end
 
     # extracted into its own method for testing

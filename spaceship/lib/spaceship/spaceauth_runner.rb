@@ -15,6 +15,18 @@ module Spaceship
     end
 
     def run
+
+      non_interactive = false
+      # FASTLANE_2FA_SCRIPT is used in CI systems that cannot run interactive scripts together with FASTLANE_SESSION_ENV_FILE
+      if !ENV["FASTLANE_2FA_SCRIPT"].nil? && ENV["FASTLANE_2FA_SCRIPT"].length > 0
+        if ENV["FASTLANE_SESSION_ENV_FILE"].nil? || ENV["FASTLANE_SESSION_ENV_FILE"].length == 0
+          puts("When using the variable FASTLANE_2FA_SCRIPT make sure to also set the variable FASTLANE_SESSION_ENV_FILE.".red)
+          puts("See https://docs.fastlane.tools/best-practices/continuous-integration for more information.".red)
+          raise "FASTLANE_SESSION_ENV_FILE not set"
+        end
+        non_interactive = true
+      end
+
       begin
         puts("Logging into to App Store Connect (#{@username})...") unless Spaceship::Globals.check_session
         Spaceship::Tunes.login(@username)
@@ -47,6 +59,15 @@ module Spaceship
       end
 
       @yaml = cookies.to_yaml.gsub("\n", "\\n")
+
+      if non_interactive
+        # Write the session to the environment variable
+        File.open(ENV["FASTLANE_SESSION_ENV_FILE"], "w") do |file|
+          file.puts("FASTLANE_SESSION='#{@yaml}'")
+        end
+        puts("The variable FASTLANE_SESSION has been written to #{ENV['FASTLANE_2FA_SCRIPT']}")
+        return self
+      end
 
       puts("---")
       puts("")
