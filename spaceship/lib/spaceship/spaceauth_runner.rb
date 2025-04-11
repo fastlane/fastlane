@@ -65,7 +65,7 @@ module Spaceship
         File.open(ENV["FASTLANE_SESSION_ENV_FILE"], "w") do |file|
           file.puts("FASTLANE_SESSION='#{@yaml}'")
         end
-        puts("The variable FASTLANE_SESSION has been written to #{ENV['FASTLANE_2FA_SCRIPT']}")
+        puts("The variable FASTLANE_SESSION has been written to #{ENV['FASTLANE_SESSION_ENV_FILE']}")
         return self
       end
 
