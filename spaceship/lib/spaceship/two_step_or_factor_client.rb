@@ -1,5 +1,6 @@
 require_relative 'globals'
 require_relative 'tunes/tunes_client'
+require 'open3'
 
 module Spaceship
   class Client
@@ -235,7 +236,19 @@ module Spaceship
     def ask_for_2fa_code(text)
       if !ENV["FASTLANE_2FA_SCRIPT"].nil? && ENV["FASTLANE_2FA_SCRIPT"].length > 0
         puts("A Two Factor Script was defined using FASTLANE_2FA_SCRIPT. Running this script now to get the 2-factor-code...".yellow)
-        system(ENV["FASTLANE_2FA_SCRIPT"])
+        stdout_str, stderr_str, exit_code = Open3.capture3(ENV["FASTLANE_2FA_SCRIPT"])
+        if exit_code != 0
+          puts("Error while running the script #{ENV['FASTLANE_2FA_SCRIPT']}.".red)
+          puts("STDERR:".red)
+          puts("")
+          puts(stderr_str)
+          puts("")
+          puts("STDOUT:".red)
+          puts("")
+          puts(stdout_str)
+          raise "Error while running the script #{ENV['FASTLANE_2FA_SCRIPT']}"
+        end
+        stdout_str.strip
       else
         ask(text)
       end
