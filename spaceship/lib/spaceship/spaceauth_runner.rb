@@ -15,7 +15,6 @@ module Spaceship
     end
 
     def run
-
       non_interactive = false
       # FASTLANE_2FA_SCRIPT is used in CI systems that cannot run interactive scripts together with FASTLANE_SESSION_ENV_FILE
       if !ENV["FASTLANE_2FA_SCRIPT"].nil? && ENV["FASTLANE_2FA_SCRIPT"].length > 0
