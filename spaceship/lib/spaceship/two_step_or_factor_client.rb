@@ -240,14 +240,12 @@ module Spaceship
         if exit_code != 0
           puts("Error while running the script #{ENV['FASTLANE_2FA_SCRIPT']}.".red)
           puts("STDERR:".red)
-          puts("")
           puts(stderr_str)
-          puts("")
           puts("STDOUT:".red)
-          puts("")
           puts(stdout_str)
           raise "Error while running the script #{ENV['FASTLANE_2FA_SCRIPT']}"
         end
+        puts("Using the code from the script #{ENV['FASTLANE_2FA_SCRIPT']}: #{stdout_str.strip}".yellow)
         stdout_str.strip
       else
         ask(text)
