@@ -201,13 +201,13 @@ module Sigh
     def filter_profiles_by_cert_id(profiles)
       results = profiles.find_all do |current_profile|
         validCertId = false
-          current_profile.certificates.map do |cert|
-            if cert.id == Sigh.config[:cert_id].to_s
-              validCertId = true
-            else
-              UI.message("Provisioning Profile CERTID : '#{cert.id}' not match given CERTID : '#{Sigh.config[:cert_id]}', skipping this one...")
-            end
+        current_profile.certificates.each do |cert|
+          if cert.id == Sigh.config[:cert_id].to_s
+            validCertId = true
+          else
+            UI.message("Provisioning Profile cert_id : '#{cert.id}' not match given cert_id : '#{Sigh.config[:cert_id]}', skipping this one...")
           end
+        end
         validCertId
       end
       results
