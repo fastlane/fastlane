@@ -203,9 +203,9 @@ module Sigh
         validCertId = false
           current_profile.certificates.map do |cert|
             if cert.id == Sigh.config[:cert_id].to_s
-               validCertId = true
+              validCertId = true
             else
-               UI.message("Provisioning Profile CERTID : '#{cert.id}' not match given CERTID : '#{Sigh.config[:cert_id]}', skipping this one...")
+              UI.message("Provisioning Profile CERTID : '#{cert.id}' not match given CERTID : '#{Sigh.config[:cert_id]}', skipping this one...")
             end
           end
         validCertId
