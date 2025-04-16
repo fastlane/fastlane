@@ -106,7 +106,6 @@ module Sigh
       # Take the provisioning profile name into account
       results = filter_profiles_by_name(results) if Sigh.config[:provisioning_name].to_s.length > 0
       # Take the cert_id into account
-      UI.message("Verifying profile certificate ID...")
       results = filter_profiles_by_cert_id(results) if Sigh.config[:cert_id].to_s.length > 0
       return results if Sigh.config[:skip_certificate_verification] || Sigh.config[:include_all_certificates]
 
@@ -206,7 +205,7 @@ module Sigh
             if cert.id == Sigh.config[:cert_id].to_s
                validCertId = true
             else
-               UI.message("Provisioning Profile CERTID : '#{cert.id}' doesn't match given CERTID : '#{Sigh.config[:cert_id]}', skipping this one...")
+               UI.message("Provisioning Profile CERTID : '#{cert.id}' not match given CERTID : '#{Sigh.config[:cert_id]}', skipping this one...")
             end
           end
         validCertId
