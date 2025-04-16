@@ -84,7 +84,7 @@ module Sigh
 
       includes = 'bundleId'
 
-      unless Sigh.config[:skip_certificate_verification] || Sigh.config[:include_all_certificates]
+      unless (Sigh.config[:skip_certificate_verification] || Sigh.config[:include_all_certificates]) && Sigh.config[:cert_id].to_s.length == 0
         includes += ',certificates'
       end
 
@@ -105,6 +105,9 @@ module Sigh
 
       # Take the provisioning profile name into account
       results = filter_profiles_by_name(results) if Sigh.config[:provisioning_name].to_s.length > 0
+      # Take the cert_id into account
+      UI.message("Verifying profile certificate ID...")
+      results = filter_profiles_by_cert_id(results) if Sigh.config[:cert_id].to_s.length > 0
       return results if Sigh.config[:skip_certificate_verification] || Sigh.config[:include_all_certificates]
 
       UI.message("Verifying certificates...")
@@ -194,6 +197,21 @@ module Sigh
         profiles = filtered
       end
       profiles
+    end
+
+    def filter_profiles_by_cert_id(profiles)
+      results = profiles.find_all do |current_profile|
+        validCertId = false
+          current_profile.certificates.map do |cert|
+            if cert.id == Sigh.config[:cert_id].to_s
+               validCertId = true
+            else
+               UI.message("Provisioning Profile CERTID : '#{cert.id}' doesn't match given CERTID : '#{Sigh.config[:cert_id]}', skipping this one...")
+            end
+          end
+        validCertId
+      end
+      results
     end
 
     def fetch_certificates(certificate_types)
