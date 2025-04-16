@@ -1,5 +1,5 @@
 // Fastlane.swift
-// Copyright (c) 2024 FastlaneTools
+// Copyright (c) 2025 FastlaneTools
 
 import Foundation
 
@@ -2690,7 +2690,7 @@ public func cert(development: OptionalConfigValue<Bool> = .fastlaneDefault(false
                  teamName: OptionalConfigValue<String?> = .fastlaneDefault(nil),
                  filename: OptionalConfigValue<String?> = .fastlaneDefault(nil),
                  outputPath: String = ".",
-                 keychainPath: String,
+                 keychainPath: OptionalConfigValue<String?> = .fastlaneDefault(nil),
                  keychainPassword: OptionalConfigValue<String?> = .fastlaneDefault(nil),
                  skipSetPartitionList: OptionalConfigValue<Bool> = .fastlaneDefault(false),
                  platform: String = "ios")
@@ -2706,7 +2706,7 @@ public func cert(development: OptionalConfigValue<Bool> = .fastlaneDefault(false
     let teamNameArg = teamName.asRubyArgument(name: "team_name", type: nil)
     let filenameArg = filename.asRubyArgument(name: "filename", type: nil)
     let outputPathArg = RubyCommand.Argument(name: "output_path", value: outputPath, type: nil)
-    let keychainPathArg = RubyCommand.Argument(name: "keychain_path", value: keychainPath, type: nil)
+    let keychainPathArg = keychainPath.asRubyArgument(name: "keychain_path", type: nil)
     let keychainPasswordArg = keychainPassword.asRubyArgument(name: "keychain_password", type: nil)
     let skipSetPartitionListArg = skipSetPartitionList.asRubyArgument(name: "skip_set_partition_list", type: nil)
     let platformArg = RubyCommand.Argument(name: "platform", value: platform, type: nil)
@@ -4842,7 +4842,7 @@ public func getCertificates(development: OptionalConfigValue<Bool> = .fastlaneDe
                             teamName: OptionalConfigValue<String?> = .fastlaneDefault(nil),
                             filename: OptionalConfigValue<String?> = .fastlaneDefault(nil),
                             outputPath: String = ".",
-                            keychainPath: String,
+                            keychainPath: OptionalConfigValue<String?> = .fastlaneDefault(nil),
                             keychainPassword: OptionalConfigValue<String?> = .fastlaneDefault(nil),
                             skipSetPartitionList: OptionalConfigValue<Bool> = .fastlaneDefault(false),
                             platform: String = "ios")
@@ -4858,7 +4858,7 @@ public func getCertificates(development: OptionalConfigValue<Bool> = .fastlaneDe
     let teamNameArg = teamName.asRubyArgument(name: "team_name", type: nil)
     let filenameArg = filename.asRubyArgument(name: "filename", type: nil)
     let outputPathArg = RubyCommand.Argument(name: "output_path", value: outputPath, type: nil)
-    let keychainPathArg = RubyCommand.Argument(name: "keychain_path", value: keychainPath, type: nil)
+    let keychainPathArg = keychainPath.asRubyArgument(name: "keychain_path", type: nil)
     let keychainPasswordArg = keychainPassword.asRubyArgument(name: "keychain_password", type: nil)
     let skipSetPartitionListArg = skipSetPartitionList.asRubyArgument(name: "skip_set_partition_list", type: nil)
     let platformArg = RubyCommand.Argument(name: "platform", value: platform, type: nil)
@@ -9931,6 +9931,7 @@ public func setPodKey(useBundleExec: OptionalConfigValue<Bool> = .fastlaneDefaul
    - force: Force setup, even if not executed by CI
    - provider: CI provider. If none is set, the provider is detected automatically
    - timeout: Set a custom timeout in seconds for keychain.  Set `0` if you want to specify 'no time-out'
+   - keychainName: Set a custom keychain name
 
  - Creates a new temporary keychain for use with match|
  - Switches match to `readonly` mode to not create new profiles/cert on CI|
@@ -9940,14 +9941,17 @@ public func setPodKey(useBundleExec: OptionalConfigValue<Bool> = .fastlaneDefaul
  */
 public func setupCi(force: OptionalConfigValue<Bool> = .fastlaneDefault(false),
                     provider: OptionalConfigValue<String?> = .fastlaneDefault(nil),
-                    timeout: Int = 3600)
+                    timeout: Int = 3600,
+                    keychainName: String = "fastlane_tmp_keychain")
 {
     let forceArg = force.asRubyArgument(name: "force", type: nil)
     let providerArg = provider.asRubyArgument(name: "provider", type: nil)
     let timeoutArg = RubyCommand.Argument(name: "timeout", value: timeout, type: nil)
+    let keychainNameArg = RubyCommand.Argument(name: "keychain_name", value: keychainName, type: nil)
     let array: [RubyCommand.Argument?] = [forceArg,
                                           providerArg,
-                                          timeoutArg]
+                                          timeoutArg,
+                                          keychainNameArg]
     let args: [RubyCommand.Argument] = array
         .filter { $0?.value != nil }
         .compactMap { $0 }
@@ -11588,7 +11592,7 @@ public func teamName() {
 }
 
 /**
- Upload a new build to [TestFairy](https://www.testfairy.com/)
+ Upload a new build to SauceLabs' TestFairy
 
  - parameters:
    - apiKey: API Key for TestFairy
@@ -11610,7 +11614,9 @@ public func teamName() {
    - uploadToSaucelabs: Upload file directly to Sauce Labs. It can be 'on' or 'off'
    - platform: Use if upload build is not iOS or Android. Contact support for more information
 
- You can retrieve your API key on [your settings page](https://free.testfairy.com/settings/)
+ Upload a new build to [TestFairy](https://saucelabs.com/products/mobile-testing/app-betas).
+ You can retrieve your API key on [your settings page](https://app.testfairy.com/settings/access-key)
+
  */
 public func testfairy(apiKey: String,
                       ipa: OptionalConfigValue<String?> = .fastlaneDefault(nil),
@@ -11856,6 +11862,7 @@ public func testflight(apiKeyPath: OptionalConfigValue<String?> = .fastlaneDefau
    - outputFilename: Filename the xml file should be written to. Defaults to name of input file. (Only works if one input file is used)
    - failBuild: Should this step stop the build if the tests fail? Set this to false if you're handling this with a test reporter
    - xcprettyNaming: Produces class name and test name identical to xcpretty naming in junit file
+   - forceLegacyXcresulttool: Force the use of the '--legacy' flag for xcresulttool instead of using the new commands
    - silent: Silences all output
    - outputRemoveRetryAttempts: Doesn't include retry attempts in the output
 
@@ -11867,6 +11874,7 @@ public func trainer(path: String = ".",
                     outputFilename: OptionalConfigValue<String?> = .fastlaneDefault(nil),
                     failBuild: OptionalConfigValue<Bool> = .fastlaneDefault(true),
                     xcprettyNaming: OptionalConfigValue<Bool> = .fastlaneDefault(false),
+                    forceLegacyXcresulttool: OptionalConfigValue<Bool> = .fastlaneDefault(false),
                     silent: OptionalConfigValue<Bool> = .fastlaneDefault(false),
                     outputRemoveRetryAttempts: OptionalConfigValue<Bool> = .fastlaneDefault(false))
 {
@@ -11876,6 +11884,7 @@ public func trainer(path: String = ".",
     let outputFilenameArg = outputFilename.asRubyArgument(name: "output_filename", type: nil)
     let failBuildArg = failBuild.asRubyArgument(name: "fail_build", type: nil)
     let xcprettyNamingArg = xcprettyNaming.asRubyArgument(name: "xcpretty_naming", type: nil)
+    let forceLegacyXcresulttoolArg = forceLegacyXcresulttool.asRubyArgument(name: "force_legacy_xcresulttool", type: nil)
     let silentArg = silent.asRubyArgument(name: "silent", type: nil)
     let outputRemoveRetryAttemptsArg = outputRemoveRetryAttempts.asRubyArgument(name: "output_remove_retry_attempts", type: nil)
     let array: [RubyCommand.Argument?] = [pathArg,
@@ -11884,6 +11893,7 @@ public func trainer(path: String = ".",
                                           outputFilenameArg,
                                           failBuildArg,
                                           xcprettyNamingArg,
+                                          forceLegacyXcresulttoolArg,
                                           silentArg,
                                           outputRemoveRetryAttemptsArg]
     let args: [RubyCommand.Argument] = array
@@ -13877,4 +13887,4 @@ public let snapshotfile: Snapshotfile = .init()
 
 // Please don't remove the lines below
 // They are used to detect outdated files
-// FastlaneRunnerAPIVersion [0.9.185]
+// FastlaneRunnerAPIVersion [0.9.187]

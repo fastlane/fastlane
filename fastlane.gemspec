@@ -22,32 +22,32 @@ Gem::Specification.new do |spec|
   spec.name          = "fastlane"
   spec.version       = Fastlane::VERSION
   # list of authors is regenerated and resorted on each release
-  spec.authors       = ["Roger Oba",
-                        "Luka Mirosevic",
-                        "Daniel Jankowski",
-                        "Max Ott",
-                        "Joshua Liebowitz",
-                        "Jorge Revuelta H",
+  spec.authors       = ["Danielle Tomlinson",
                         "Łukasz Grabowski",
-                        "Danielle Tomlinson",
-                        "Aaron Brager",
-                        "Jan Piotrowski",
-                        "Iulian Onofrei",
-                        "Kohki Miki",
                         "Maksym Grebenets",
-                        "Stefan Natchev",
-                        "Andrew McBurney",
-                        "Jimmy Dee",
-                        "Matthew Ellis",
-                        "Satoshi Namai",
-                        "Felix Krause",
-                        "Helmut Januschka",
+                        "Jorge Revuelta H",
                         "Manish Rathi",
+                        "Roger Oba",
                         "Fumiya Nakamura",
+                        "Kohki Miki",
+                        "Luka Mirosevic",
+                        "Satoshi Namai",
+                        "Max Ott",
+                        "Daniel Jankowski",
                         "Josh Holtz",
+                        "Olivier Halligon",
                         "Jérôme Lacoste",
+                        "Joshua Liebowitz",
+                        "Stefan Natchev",
+                        "Aaron Brager",
+                        "Helmut Januschka",
+                        "Felix Krause",
+                        "Iulian Onofrei",
+                        "Matthew Ellis",
+                        "Jimmy Dee",
                         "Manu Wallner",
-                        "Olivier Halligon"]
+                        "Jan Piotrowski",
+                        "Andrew McBurney"]
 
   spec.email         = ["fastlane@krausefx.com"]
   spec.summary       = Fastlane::SUMMARY
@@ -109,5 +109,5 @@ Gem::Specification.new do |spec|
   spec.add_dependency('word_wrap', '~> 1.0.0') # to add line breaks for tables with long strings
   spec.add_dependency('xcodeproj', '>= 1.13.0', '< 2.0.0') # Modify Xcode projects
   spec.add_dependency('xcpretty-travis-formatter', '>= 0.0.3', '< 2.0.0')
-  spec.add_dependency('xcpretty', '~> 0.4.0') # prettify xcodebuild output
+  spec.add_dependency('xcpretty', '~> 0.4.1') # prettify xcodebuild output
 end

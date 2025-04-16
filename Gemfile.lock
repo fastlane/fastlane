@@ -1,7 +1,7 @@
 PATH
   remote: .
   specs:
-    fastlane (2.226.0)
+    fastlane (2.227.1)
       CFPropertyList (>= 2.3, < 4.0.0)
       addressable (>= 2.8, < 3.0.0)
       artifactory (~> 3.0)
@@ -41,7 +41,7 @@ PATH
       tty-spinner (>= 0.8.0, < 1.0.0)
       word_wrap (~> 1.0.0)
       xcodeproj (>= 1.13.0, < 2.0.0)
-      xcpretty (~> 0.4.0)
+      xcpretty (~> 0.4.1)
       xcpretty-travis-formatter (>= 0.0.3, < 2.0.0)
 
 GEM
@@ -355,7 +355,7 @@ GEM
       slack-notifier
       terminal-table
       xcodeproj
-    xcpretty (0.4.0)
+    xcpretty (0.4.1)
       rouge (~> 3.28.0)
     xcpretty-travis-formatter (1.0.1)
       xcpretty (~> 0.2, >= 0.0.7)
