@@ -199,7 +199,7 @@ module Sigh
     end
 
     def filter_profiles_by_cert_id(profiles)
-      results = profiles.find_all do |current_profile|
+      filtered = profiles.find_all do |current_profile|
         validCertId = false
         current_profile.certificates.each do |cert|
           if cert.id == Sigh.config[:cert_id].to_s
@@ -210,7 +210,7 @@ module Sigh
         end
         validCertId
       end
-      results
+      filtered
     end
 
     def fetch_certificates(certificate_types)
