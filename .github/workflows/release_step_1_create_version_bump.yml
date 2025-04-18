@@ -1,5 +1,5 @@
 ---
-name: Version Bump
+name: Release Step 1 - Create Version Bump
 
 on:
   workflow_dispatch:
@@ -18,7 +18,7 @@ permissions:
   pull-requests: write
 
 jobs:
-  bump_version:
+  create_version_bump:
     runs-on: macos-latest
 
     steps:
@@ -39,10 +39,11 @@ jobs:
         git config --global user.name "github-actions[bot]"
         bundle exec fastlane bump bump_type:${{ github.event.inputs.bump_type }}
       env:
-        GITHUB_USER_NAME: fastlane
-        GITHUB_API_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        GITHUB_USER_NAME: fastlane # Todo: This is needed for docs - remove somehow
+        GITHUB_API_TOKEN: ${{ secrets.GITHUB_TOKEN }} # Todo: This is needed for docs - remove somehow
+        GITHUB_API_BEARER: ${{ secrets.GITHUB_TOKEN }}
         FL_GITHUB_RELEASE_API_BEARER: ${{ secrets.GITHUB_TOKEN }}
-        FL_CHANGELOG_SLEEP: 5
+        FL_CHANGELOG_SLEEP: 10
         FASTLANE_XCODEBUILD_SETTINGS_TIMEOUT: 180
         FASTLANE_XCODEBUILD_SETTINGS_RETRIES: 5
         

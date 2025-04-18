@@ -55,7 +55,7 @@ aliases:
     run:
       name: bundle install
       command: |
-        sudo gem update --system `.ci/compatible_gem_version`
+        gem update --system `.ci/compatible_gem_version`
         gem install bundler -v $(cat Gemfile.lock | tail -1 | tr -d " ")
         bundle config set --local path .bundle
         bundle check || bundle install --jobs=4 --retry=3
@@ -251,26 +251,9 @@ workflows:
   "Run Tests & Checks": # Name of the workflow, which ends up displayed on GitHub's PR Check
     jobs:
       - tests_macos:
-          name: 'Execute tests on macOS (Xcode 12.5.1, Ruby 2.6)'
-          xcode_version: '12.5.1'
-          ruby_version: '2.6.6'
-          <<: *important-branches
-      - tests_macos:
-          name: 'Execute tests on macOS (Xcode 12.5.1, Ruby 2.7)'
-          xcode_version: '12.5.1'
-          ruby_version: '2.7.3'
-          ruby_opt: -W:deprecated
-          <<: *important-branches
-      - tests_macos:
-          name: 'Execute tests on macOS (Xcode 13.4.1, Ruby 3.0)'
-          xcode_version: '13.4.1'
-          ruby_version: '3.0.4'
-          ruby_opt: -W:deprecated
-          <<: *important-branches
-      - tests_macos:
           name: 'Execute tests on macOS (Xcode 13.4.1, Ruby 3.1)'
           xcode_version: '13.4.1'
-          ruby_version: '3.1.2'
+          ruby_version: '3.1'
           ruby_opt: -W:deprecated
       - tests_macos:
           name: 'Execute tests on macOS (Xcode 14.3.1, Ruby 3.1)'
@@ -307,8 +290,8 @@ workflows:
           ruby_version: '2.6'
       - validate_fastlane_swift_generation:
           name: 'Validate Fastlane.swift generation'
-          xcode_version: '12.5.1'
-          ruby_version: '2.7'
+          xcode_version: '15.0.1'
+          ruby_version: '3.2'
       - validate_documentation:
           name: 'Validate Documentation'
           image: 'cimg/ruby:3.2.2'

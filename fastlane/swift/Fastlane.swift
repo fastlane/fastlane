@@ -1,5 +1,5 @@
 // Fastlane.swift
-// Copyright (c) 2024 FastlaneTools
+// Copyright (c) 2025 FastlaneTools
 
 import Foundation
 
@@ -674,7 +674,7 @@ public func appledoc(input: [String],
    - resetRatings: Reset the summary rating when you release a new version of the application
    - priceTier: The price tier of this application
    - appRatingConfigPath: Path to the app rating's config
-   - submissionInformation: Extra information for the submission (e.g. compliance specifications, IDFA settings)
+   - submissionInformation: Extra information for the submission (e.g. compliance specifications)
    - teamId: The ID of your App Store Connect team if you're in multiple teams
    - teamName: The name of your App Store Connect team if you're in multiple teams
    - devPortalTeamId: The short ID of your Developer Portal team, if you're in multiple teams. Different from your iTC team ID!
@@ -1342,6 +1342,7 @@ public func buildAndroidApp(task: OptionalConfigValue<String?> = .fastlaneDefaul
    - skipPackageDependenciesResolution: Skips resolution of Swift Package Manager dependencies
    - disablePackageAutomaticUpdates: Prevents packages from automatically being resolved to versions other than those recorded in the `Package.resolved` file
    - useSystemScm: Lets xcodebuild use system's scm configuration
+   - packageAuthorizationProvider: Lets xcodebuild use a specified package authorization provider (keychain|netrc)
 
  - returns: The absolute path to the generated ipa file
 
@@ -1396,7 +1397,8 @@ public func buildAndroidApp(task: OptionalConfigValue<String?> = .fastlaneDefaul
                                         clonedSourcePackagesPath: OptionalConfigValue<String?> = .fastlaneDefault(nil),
                                         skipPackageDependenciesResolution: OptionalConfigValue<Bool> = .fastlaneDefault(false),
                                         disablePackageAutomaticUpdates: OptionalConfigValue<Bool> = .fastlaneDefault(false),
-                                        useSystemScm: OptionalConfigValue<Bool> = .fastlaneDefault(false)) -> String
+                                        useSystemScm: OptionalConfigValue<Bool> = .fastlaneDefault(false),
+                                        packageAuthorizationProvider: OptionalConfigValue<String?> = .fastlaneDefault(nil)) -> String
 {
     let workspaceArg = workspace.asRubyArgument(name: "workspace", type: nil)
     let projectArg = project.asRubyArgument(name: "project", type: nil)
@@ -1448,6 +1450,7 @@ public func buildAndroidApp(task: OptionalConfigValue<String?> = .fastlaneDefaul
     let skipPackageDependenciesResolutionArg = skipPackageDependenciesResolution.asRubyArgument(name: "skip_package_dependencies_resolution", type: nil)
     let disablePackageAutomaticUpdatesArg = disablePackageAutomaticUpdates.asRubyArgument(name: "disable_package_automatic_updates", type: nil)
     let useSystemScmArg = useSystemScm.asRubyArgument(name: "use_system_scm", type: nil)
+    let packageAuthorizationProviderArg = packageAuthorizationProvider.asRubyArgument(name: "package_authorization_provider", type: nil)
     let array: [RubyCommand.Argument?] = [workspaceArg,
                                           projectArg,
                                           schemeArg,
@@ -1497,7 +1500,8 @@ public func buildAndroidApp(task: OptionalConfigValue<String?> = .fastlaneDefaul
                                           clonedSourcePackagesPathArg,
                                           skipPackageDependenciesResolutionArg,
                                           disablePackageAutomaticUpdatesArg,
-                                          useSystemScmArg]
+                                          useSystemScmArg,
+                                          packageAuthorizationProviderArg]
     let args: [RubyCommand.Argument] = array
         .filter { $0?.value != nil }
         .compactMap { $0 }
@@ -1556,6 +1560,7 @@ public func buildAndroidApp(task: OptionalConfigValue<String?> = .fastlaneDefaul
    - skipPackageDependenciesResolution: Skips resolution of Swift Package Manager dependencies
    - disablePackageAutomaticUpdates: Prevents packages from automatically being resolved to versions other than those recorded in the `Package.resolved` file
    - useSystemScm: Lets xcodebuild use system's scm configuration
+   - packageAuthorizationProvider: Lets xcodebuild use a specified package authorization provider (keychain|netrc)
 
  - returns: The absolute path to the generated ipa file
 
@@ -1607,7 +1612,8 @@ public func buildAndroidApp(task: OptionalConfigValue<String?> = .fastlaneDefaul
                                            clonedSourcePackagesPath: OptionalConfigValue<String?> = .fastlaneDefault(nil),
                                            skipPackageDependenciesResolution: OptionalConfigValue<Bool> = .fastlaneDefault(false),
                                            disablePackageAutomaticUpdates: OptionalConfigValue<Bool> = .fastlaneDefault(false),
-                                           useSystemScm: OptionalConfigValue<Bool> = .fastlaneDefault(false)) -> String
+                                           useSystemScm: OptionalConfigValue<Bool> = .fastlaneDefault(false),
+                                           packageAuthorizationProvider: OptionalConfigValue<String?> = .fastlaneDefault(nil)) -> String
 {
     let workspaceArg = workspace.asRubyArgument(name: "workspace", type: nil)
     let projectArg = project.asRubyArgument(name: "project", type: nil)
@@ -1656,6 +1662,7 @@ public func buildAndroidApp(task: OptionalConfigValue<String?> = .fastlaneDefaul
     let skipPackageDependenciesResolutionArg = skipPackageDependenciesResolution.asRubyArgument(name: "skip_package_dependencies_resolution", type: nil)
     let disablePackageAutomaticUpdatesArg = disablePackageAutomaticUpdates.asRubyArgument(name: "disable_package_automatic_updates", type: nil)
     let useSystemScmArg = useSystemScm.asRubyArgument(name: "use_system_scm", type: nil)
+    let packageAuthorizationProviderArg = packageAuthorizationProvider.asRubyArgument(name: "package_authorization_provider", type: nil)
     let array: [RubyCommand.Argument?] = [workspaceArg,
                                           projectArg,
                                           schemeArg,
@@ -1702,7 +1709,8 @@ public func buildAndroidApp(task: OptionalConfigValue<String?> = .fastlaneDefaul
                                           clonedSourcePackagesPathArg,
                                           skipPackageDependenciesResolutionArg,
                                           disablePackageAutomaticUpdatesArg,
-                                          useSystemScmArg]
+                                          useSystemScmArg,
+                                          packageAuthorizationProviderArg]
     let args: [RubyCommand.Argument] = array
         .filter { $0?.value != nil }
         .compactMap { $0 }
@@ -1762,6 +1770,7 @@ public func buildAndroidApp(task: OptionalConfigValue<String?> = .fastlaneDefaul
    - skipPackageDependenciesResolution: Skips resolution of Swift Package Manager dependencies
    - disablePackageAutomaticUpdates: Prevents packages from automatically being resolved to versions other than those recorded in the `Package.resolved` file
    - useSystemScm: Lets xcodebuild use system's scm configuration
+   - packageAuthorizationProvider: Lets xcodebuild use a specified package authorization provider (keychain|netrc)
 
  - returns: The absolute path to the generated ipa file
 
@@ -1814,7 +1823,8 @@ public func buildAndroidApp(task: OptionalConfigValue<String?> = .fastlaneDefaul
                                            clonedSourcePackagesPath: OptionalConfigValue<String?> = .fastlaneDefault(nil),
                                            skipPackageDependenciesResolution: OptionalConfigValue<Bool> = .fastlaneDefault(false),
                                            disablePackageAutomaticUpdates: OptionalConfigValue<Bool> = .fastlaneDefault(false),
-                                           useSystemScm: OptionalConfigValue<Bool> = .fastlaneDefault(false)) -> String
+                                           useSystemScm: OptionalConfigValue<Bool> = .fastlaneDefault(false),
+                                           packageAuthorizationProvider: OptionalConfigValue<String?> = .fastlaneDefault(nil)) -> String
 {
     let workspaceArg = workspace.asRubyArgument(name: "workspace", type: nil)
     let projectArg = project.asRubyArgument(name: "project", type: nil)
@@ -1864,6 +1874,7 @@ public func buildAndroidApp(task: OptionalConfigValue<String?> = .fastlaneDefaul
     let skipPackageDependenciesResolutionArg = skipPackageDependenciesResolution.asRubyArgument(name: "skip_package_dependencies_resolution", type: nil)
     let disablePackageAutomaticUpdatesArg = disablePackageAutomaticUpdates.asRubyArgument(name: "disable_package_automatic_updates", type: nil)
     let useSystemScmArg = useSystemScm.asRubyArgument(name: "use_system_scm", type: nil)
+    let packageAuthorizationProviderArg = packageAuthorizationProvider.asRubyArgument(name: "package_authorization_provider", type: nil)
     let array: [RubyCommand.Argument?] = [workspaceArg,
                                           projectArg,
                                           schemeArg,
@@ -1911,7 +1922,8 @@ public func buildAndroidApp(task: OptionalConfigValue<String?> = .fastlaneDefaul
                                           clonedSourcePackagesPathArg,
                                           skipPackageDependenciesResolutionArg,
                                           disablePackageAutomaticUpdatesArg,
-                                          useSystemScmArg]
+                                          useSystemScmArg,
+                                          packageAuthorizationProviderArg]
     let args: [RubyCommand.Argument] = array
         .filter { $0?.value != nil }
         .compactMap { $0 }
@@ -2158,6 +2170,7 @@ public func captureAndroidScreenshots(androidHome: OptionalConfigValue<String?> 
    - clonedSourcePackagesPath: Sets a custom path for Swift Package Manager dependencies
    - skipPackageDependenciesResolution: Skips resolution of Swift Package Manager dependencies
    - disablePackageAutomaticUpdates: Prevents packages from automatically being resolved to versions other than those recorded in the `Package.resolved` file
+   - packageAuthorizationProvider: Lets xcodebuild use a specified package authorization provider (keychain|netrc)
    - testplan: The testplan associated with the scheme that should be used for testing
    - onlyTesting: Array of strings matching Test Bundle/Test Suite/Test Cases to run
    - skipTesting: Array of strings matching Test Bundle/Test Suite/Test Cases to skip
@@ -2208,6 +2221,7 @@ public func captureIosScreenshots(workspace: OptionalConfigValue<String?> = .fas
                                   clonedSourcePackagesPath: OptionalConfigValue<String?> = .fastlaneDefault(nil),
                                   skipPackageDependenciesResolution: OptionalConfigValue<Bool> = .fastlaneDefault(false),
                                   disablePackageAutomaticUpdates: OptionalConfigValue<Bool> = .fastlaneDefault(false),
+                                  packageAuthorizationProvider: OptionalConfigValue<String?> = .fastlaneDefault(nil),
                                   testplan: OptionalConfigValue<String?> = .fastlaneDefault(nil),
                                   onlyTesting: Any? = nil,
                                   skipTesting: Any? = nil,
@@ -2258,6 +2272,7 @@ public func captureIosScreenshots(workspace: OptionalConfigValue<String?> = .fas
     let clonedSourcePackagesPathArg = clonedSourcePackagesPath.asRubyArgument(name: "cloned_source_packages_path", type: nil)
     let skipPackageDependenciesResolutionArg = skipPackageDependenciesResolution.asRubyArgument(name: "skip_package_dependencies_resolution", type: nil)
     let disablePackageAutomaticUpdatesArg = disablePackageAutomaticUpdates.asRubyArgument(name: "disable_package_automatic_updates", type: nil)
+    let packageAuthorizationProviderArg = packageAuthorizationProvider.asRubyArgument(name: "package_authorization_provider", type: nil)
     let testplanArg = testplan.asRubyArgument(name: "testplan", type: nil)
     let onlyTestingArg = RubyCommand.Argument(name: "only_testing", value: onlyTesting, type: nil)
     let skipTestingArg = RubyCommand.Argument(name: "skip_testing", value: skipTesting, type: nil)
@@ -2307,6 +2322,7 @@ public func captureIosScreenshots(workspace: OptionalConfigValue<String?> = .fas
                                           clonedSourcePackagesPathArg,
                                           skipPackageDependenciesResolutionArg,
                                           disablePackageAutomaticUpdatesArg,
+                                          packageAuthorizationProviderArg,
                                           testplanArg,
                                           onlyTestingArg,
                                           skipTestingArg,
@@ -2367,6 +2383,7 @@ public func captureIosScreenshots(workspace: OptionalConfigValue<String?> = .fas
    - clonedSourcePackagesPath: Sets a custom path for Swift Package Manager dependencies
    - skipPackageDependenciesResolution: Skips resolution of Swift Package Manager dependencies
    - disablePackageAutomaticUpdates: Prevents packages from automatically being resolved to versions other than those recorded in the `Package.resolved` file
+   - packageAuthorizationProvider: Lets xcodebuild use a specified package authorization provider (keychain|netrc)
    - testplan: The testplan associated with the scheme that should be used for testing
    - onlyTesting: Array of strings matching Test Bundle/Test Suite/Test Cases to run
    - skipTesting: Array of strings matching Test Bundle/Test Suite/Test Cases to skip
@@ -2417,6 +2434,7 @@ public func captureScreenshots(workspace: OptionalConfigValue<String?> = .fastla
                                clonedSourcePackagesPath: OptionalConfigValue<String?> = .fastlaneDefault(nil),
                                skipPackageDependenciesResolution: OptionalConfigValue<Bool> = .fastlaneDefault(false),
                                disablePackageAutomaticUpdates: OptionalConfigValue<Bool> = .fastlaneDefault(false),
+                               packageAuthorizationProvider: OptionalConfigValue<String?> = .fastlaneDefault(nil),
                                testplan: OptionalConfigValue<String?> = .fastlaneDefault(nil),
                                onlyTesting: Any? = nil,
                                skipTesting: Any? = nil,
@@ -2467,6 +2485,7 @@ public func captureScreenshots(workspace: OptionalConfigValue<String?> = .fastla
     let clonedSourcePackagesPathArg = clonedSourcePackagesPath.asRubyArgument(name: "cloned_source_packages_path", type: nil)
     let skipPackageDependenciesResolutionArg = skipPackageDependenciesResolution.asRubyArgument(name: "skip_package_dependencies_resolution", type: nil)
     let disablePackageAutomaticUpdatesArg = disablePackageAutomaticUpdates.asRubyArgument(name: "disable_package_automatic_updates", type: nil)
+    let packageAuthorizationProviderArg = packageAuthorizationProvider.asRubyArgument(name: "package_authorization_provider", type: nil)
     let testplanArg = testplan.asRubyArgument(name: "testplan", type: nil)
     let onlyTestingArg = RubyCommand.Argument(name: "only_testing", value: onlyTesting, type: nil)
     let skipTestingArg = RubyCommand.Argument(name: "skip_testing", value: skipTesting, type: nil)
@@ -2516,6 +2535,7 @@ public func captureScreenshots(workspace: OptionalConfigValue<String?> = .fastla
                                           clonedSourcePackagesPathArg,
                                           skipPackageDependenciesResolutionArg,
                                           disablePackageAutomaticUpdatesArg,
+                                          packageAuthorizationProviderArg,
                                           testplanArg,
                                           onlyTestingArg,
                                           skipTestingArg,
@@ -2670,7 +2690,7 @@ public func cert(development: OptionalConfigValue<Bool> = .fastlaneDefault(false
                  teamName: OptionalConfigValue<String?> = .fastlaneDefault(nil),
                  filename: OptionalConfigValue<String?> = .fastlaneDefault(nil),
                  outputPath: String = ".",
-                 keychainPath: String,
+                 keychainPath: OptionalConfigValue<String?> = .fastlaneDefault(nil),
                  keychainPassword: OptionalConfigValue<String?> = .fastlaneDefault(nil),
                  skipSetPartitionList: OptionalConfigValue<Bool> = .fastlaneDefault(false),
                  platform: String = "ios")
@@ -2686,7 +2706,7 @@ public func cert(development: OptionalConfigValue<Bool> = .fastlaneDefault(false
     let teamNameArg = teamName.asRubyArgument(name: "team_name", type: nil)
     let filenameArg = filename.asRubyArgument(name: "filename", type: nil)
     let outputPathArg = RubyCommand.Argument(name: "output_path", value: outputPath, type: nil)
-    let keychainPathArg = RubyCommand.Argument(name: "keychain_path", value: keychainPath, type: nil)
+    let keychainPathArg = keychainPath.asRubyArgument(name: "keychain_path", type: nil)
     let keychainPasswordArg = keychainPassword.asRubyArgument(name: "keychain_password", type: nil)
     let skipSetPartitionListArg = skipSetPartitionList.asRubyArgument(name: "skip_set_partition_list", type: nil)
     let platformArg = RubyCommand.Argument(name: "platform", value: platform, type: nil)
@@ -2727,6 +2747,7 @@ public func cert(development: OptionalConfigValue<Bool> = .fastlaneDefault(false
    - quiet: Whether or not to disable changelog output
    - includeMerges: **DEPRECATED!** Use `:merge_commit_filtering` instead - Whether or not to include any commits that are merges
    - mergeCommitFiltering: Controls inclusion of merge commits when collecting the changelog. Valid values: 'include_merges', 'exclude_merges', 'only_include_merges'
+   - appPath: Scopes the changelog to a specific subdirectory of the repository
 
  - returns: Returns a String containing your formatted git commits
 
@@ -2742,7 +2763,8 @@ public func cert(development: OptionalConfigValue<Bool> = .fastlaneDefault(false
                                                        matchLightweightTag: OptionalConfigValue<Bool> = .fastlaneDefault(true),
                                                        quiet: OptionalConfigValue<Bool> = .fastlaneDefault(false),
                                                        includeMerges: OptionalConfigValue<Bool?> = .fastlaneDefault(nil),
-                                                       mergeCommitFiltering: String = "include_merges") -> String
+                                                       mergeCommitFiltering: String = "include_merges",
+                                                       appPath: OptionalConfigValue<String?> = .fastlaneDefault(nil)) -> String
 {
     let betweenArg = between.asRubyArgument(name: "between", type: nil)
     let commitsCountArg = commitsCount.asRubyArgument(name: "commits_count", type: nil)
@@ -2755,6 +2777,7 @@ public func cert(development: OptionalConfigValue<Bool> = .fastlaneDefault(false
     let quietArg = quiet.asRubyArgument(name: "quiet", type: nil)
     let includeMergesArg = includeMerges.asRubyArgument(name: "include_merges", type: nil)
     let mergeCommitFilteringArg = RubyCommand.Argument(name: "merge_commit_filtering", value: mergeCommitFiltering, type: nil)
+    let appPathArg = appPath.asRubyArgument(name: "app_path", type: nil)
     let array: [RubyCommand.Argument?] = [betweenArg,
                                           commitsCountArg,
                                           pathArg,
@@ -2765,7 +2788,8 @@ public func cert(development: OptionalConfigValue<Bool> = .fastlaneDefault(false
                                           matchLightweightTagArg,
                                           quietArg,
                                           includeMergesArg,
-                                          mergeCommitFilteringArg]
+                                          mergeCommitFilteringArg,
+                                          appPathArg]
     let args: [RubyCommand.Argument] = array
         .filter { $0?.value != nil }
         .compactMap { $0 }
@@ -3714,7 +3738,7 @@ public func deleteKeychain(name: OptionalConfigValue<String?> = .fastlaneDefault
    - resetRatings: Reset the summary rating when you release a new version of the application
    - priceTier: The price tier of this application
    - appRatingConfigPath: Path to the app rating's config
-   - submissionInformation: Extra information for the submission (e.g. compliance specifications, IDFA settings)
+   - submissionInformation: Extra information for the submission (e.g. compliance specifications)
    - teamId: The ID of your App Store Connect team if you're in multiple teams
    - teamName: The name of your App Store Connect team if you're in multiple teams
    - devPortalTeamId: The short ID of your Developer Portal team, if you're in multiple teams. Different from your iTC team ID!
@@ -4096,7 +4120,7 @@ public func downloadAppPrivacyDetailsFromAppStore(username: String,
    - appIdentifier: The bundle identifier of your app
    - teamId: The ID of your App Store Connect team if you're in multiple teams
    - teamName: The name of your App Store Connect team if you're in multiple teams
-   - platform: The app platform for dSYMs you wish to download (ios, appletvos)
+   - platform: The app platform for dSYMs you wish to download (ios, xros, appletvos)
    - version: The app version for dSYMs you wish to download, pass in 'latest' to download only the latest build's dSYMs or 'live' to download only the live version dSYMs
    - buildNumber: The app build_number for dSYMs you wish to download
    - minVersion: The minimum app version for dSYMs you wish to download
@@ -4818,7 +4842,7 @@ public func getCertificates(development: OptionalConfigValue<Bool> = .fastlaneDe
                             teamName: OptionalConfigValue<String?> = .fastlaneDefault(nil),
                             filename: OptionalConfigValue<String?> = .fastlaneDefault(nil),
                             outputPath: String = ".",
-                            keychainPath: String,
+                            keychainPath: OptionalConfigValue<String?> = .fastlaneDefault(nil),
                             keychainPassword: OptionalConfigValue<String?> = .fastlaneDefault(nil),
                             skipSetPartitionList: OptionalConfigValue<Bool> = .fastlaneDefault(false),
                             platform: String = "ios")
@@ -4834,7 +4858,7 @@ public func getCertificates(development: OptionalConfigValue<Bool> = .fastlaneDe
     let teamNameArg = teamName.asRubyArgument(name: "team_name", type: nil)
     let filenameArg = filename.asRubyArgument(name: "filename", type: nil)
     let outputPathArg = RubyCommand.Argument(name: "output_path", value: outputPath, type: nil)
-    let keychainPathArg = RubyCommand.Argument(name: "keychain_path", value: keychainPath, type: nil)
+    let keychainPathArg = keychainPath.asRubyArgument(name: "keychain_path", type: nil)
     let keychainPasswordArg = keychainPassword.asRubyArgument(name: "keychain_password", type: nil)
     let skipSetPartitionListArg = skipSetPartitionList.asRubyArgument(name: "skip_set_partition_list", type: nil)
     let platformArg = RubyCommand.Argument(name: "platform", value: platform, type: nil)
@@ -5692,6 +5716,7 @@ public func gradle(task: OptionalConfigValue<String?> = .fastlaneDefault(nil),
    - skipPackageDependenciesResolution: Skips resolution of Swift Package Manager dependencies
    - disablePackageAutomaticUpdates: Prevents packages from automatically being resolved to versions other than those recorded in the `Package.resolved` file
    - useSystemScm: Lets xcodebuild use system's scm configuration
+   - packageAuthorizationProvider: Lets xcodebuild use a specified package authorization provider (keychain|netrc)
 
  - returns: The absolute path to the generated ipa file
 
@@ -5746,7 +5771,8 @@ public func gradle(task: OptionalConfigValue<String?> = .fastlaneDefault(nil),
                                    clonedSourcePackagesPath: OptionalConfigValue<String?> = .fastlaneDefault(gymfile.clonedSourcePackagesPath),
                                    skipPackageDependenciesResolution: OptionalConfigValue<Bool> = .fastlaneDefault(gymfile.skipPackageDependenciesResolution),
                                    disablePackageAutomaticUpdates: OptionalConfigValue<Bool> = .fastlaneDefault(gymfile.disablePackageAutomaticUpdates),
-                                   useSystemScm: OptionalConfigValue<Bool> = .fastlaneDefault(gymfile.useSystemScm)) -> String
+                                   useSystemScm: OptionalConfigValue<Bool> = .fastlaneDefault(gymfile.useSystemScm),
+                                   packageAuthorizationProvider: OptionalConfigValue<String?> = .fastlaneDefault(gymfile.packageAuthorizationProvider)) -> String
 {
     let workspaceArg = workspace.asRubyArgument(name: "workspace", type: nil)
     let projectArg = project.asRubyArgument(name: "project", type: nil)
@@ -5798,6 +5824,7 @@ public func gradle(task: OptionalConfigValue<String?> = .fastlaneDefault(nil),
     let skipPackageDependenciesResolutionArg = skipPackageDependenciesResolution.asRubyArgument(name: "skip_package_dependencies_resolution", type: nil)
     let disablePackageAutomaticUpdatesArg = disablePackageAutomaticUpdates.asRubyArgument(name: "disable_package_automatic_updates", type: nil)
     let useSystemScmArg = useSystemScm.asRubyArgument(name: "use_system_scm", type: nil)
+    let packageAuthorizationProviderArg = packageAuthorizationProvider.asRubyArgument(name: "package_authorization_provider", type: nil)
     let array: [RubyCommand.Argument?] = [workspaceArg,
                                           projectArg,
                                           schemeArg,
@@ -5847,7 +5874,8 @@ public func gradle(task: OptionalConfigValue<String?> = .fastlaneDefault(nil),
                                           clonedSourcePackagesPathArg,
                                           skipPackageDependenciesResolutionArg,
                                           disablePackageAutomaticUpdatesArg,
-                                          useSystemScmArg]
+                                          useSystemScmArg,
+                                          packageAuthorizationProviderArg]
     let args: [RubyCommand.Argument] = array
         .filter { $0?.value != nil }
         .compactMap { $0 }
@@ -6795,6 +6823,7 @@ public func makeChangelogFromJenkins(fallbackChangelog: String = "",
    - skipCertificateMatching: Set to true if there is no access to Apple developer portal but there are certificates, keys and profiles provided. Only works with match import action
    - outputPath: Path in which to export certificates, key and profile
    - skipSetPartitionList: Skips setting the partition list (which can sometimes take a long time). Setting the partition list is usually needed to prevent Xcode from prompting to allow a cert to be used for signing
+   - forceLegacyEncryption: Force encryption to use legacy cbc algorithm for backwards compatibility with older match versions
    - verbose: Print out extra information and all commands
 
  More information: https://docs.fastlane.tools/actions/match/
@@ -6853,6 +6882,7 @@ public func match(type: String = matchfile.type,
                   skipCertificateMatching: OptionalConfigValue<Bool> = .fastlaneDefault(matchfile.skipCertificateMatching),
                   outputPath: OptionalConfigValue<String?> = .fastlaneDefault(matchfile.outputPath),
                   skipSetPartitionList: OptionalConfigValue<Bool> = .fastlaneDefault(matchfile.skipSetPartitionList),
+                  forceLegacyEncryption: OptionalConfigValue<Bool> = .fastlaneDefault(matchfile.forceLegacyEncryption),
                   verbose: OptionalConfigValue<Bool> = .fastlaneDefault(matchfile.verbose))
 {
     let typeArg = RubyCommand.Argument(name: "type", value: type, type: nil)
@@ -6909,6 +6939,7 @@ public func match(type: String = matchfile.type,
     let skipCertificateMatchingArg = skipCertificateMatching.asRubyArgument(name: "skip_certificate_matching", type: nil)
     let outputPathArg = outputPath.asRubyArgument(name: "output_path", type: nil)
     let skipSetPartitionListArg = skipSetPartitionList.asRubyArgument(name: "skip_set_partition_list", type: nil)
+    let forceLegacyEncryptionArg = forceLegacyEncryption.asRubyArgument(name: "force_legacy_encryption", type: nil)
     let verboseArg = verbose.asRubyArgument(name: "verbose", type: nil)
     let array: [RubyCommand.Argument?] = [typeArg,
                                           additionalCertTypesArg,
@@ -6964,6 +6995,7 @@ public func match(type: String = matchfile.type,
                                           skipCertificateMatchingArg,
                                           outputPathArg,
                                           skipSetPartitionListArg,
+                                          forceLegacyEncryptionArg,
                                           verboseArg]
     let args: [RubyCommand.Argument] = array
         .filter { $0?.value != nil }
@@ -7030,6 +7062,7 @@ public func match(type: String = matchfile.type,
    - skipCertificateMatching: Set to true if there is no access to Apple developer portal but there are certificates, keys and profiles provided. Only works with match import action
    - outputPath: Path in which to export certificates, key and profile
    - skipSetPartitionList: Skips setting the partition list (which can sometimes take a long time). Setting the partition list is usually needed to prevent Xcode from prompting to allow a cert to be used for signing
+   - forceLegacyEncryption: Force encryption to use legacy cbc algorithm for backwards compatibility with older match versions
    - verbose: Print out extra information and all commands
 
  Use the match_nuke action to revoke your certificates and provisioning profiles.
@@ -7092,6 +7125,7 @@ public func matchNuke(type: String = "development",
                       skipCertificateMatching: OptionalConfigValue<Bool> = .fastlaneDefault(false),
                       outputPath: OptionalConfigValue<String?> = .fastlaneDefault(nil),
                       skipSetPartitionList: OptionalConfigValue<Bool> = .fastlaneDefault(false),
+                      forceLegacyEncryption: OptionalConfigValue<Bool> = .fastlaneDefault(false),
                       verbose: OptionalConfigValue<Bool> = .fastlaneDefault(false))
 {
     let typeArg = RubyCommand.Argument(name: "type", value: type, type: nil)
@@ -7148,6 +7182,7 @@ public func matchNuke(type: String = "development",
     let skipCertificateMatchingArg = skipCertificateMatching.asRubyArgument(name: "skip_certificate_matching", type: nil)
     let outputPathArg = outputPath.asRubyArgument(name: "output_path", type: nil)
     let skipSetPartitionListArg = skipSetPartitionList.asRubyArgument(name: "skip_set_partition_list", type: nil)
+    let forceLegacyEncryptionArg = forceLegacyEncryption.asRubyArgument(name: "force_legacy_encryption", type: nil)
     let verboseArg = verbose.asRubyArgument(name: "verbose", type: nil)
     let array: [RubyCommand.Argument?] = [typeArg,
                                           additionalCertTypesArg,
@@ -7203,6 +7238,7 @@ public func matchNuke(type: String = "development",
                                           skipCertificateMatchingArg,
                                           outputPathArg,
                                           skipSetPartitionListArg,
+                                          forceLegacyEncryptionArg,
                                           verboseArg]
     let args: [RubyCommand.Argument] = array
         .filter { $0?.value != nil }
@@ -8854,6 +8890,7 @@ public func rubyVersion() {
    - useSystemScm: Lets xcodebuild use system's scm configuration
    - numberOfRetries: The number of times a test can fail
    - failBuild: Should this step stop the build if the tests fail? Set this to false if you're using trainer
+   - packageAuthorizationProvider: Lets xcodebuild use a specified package authorization provider (keychain|netrc)
 
  - returns: Outputs hash of results with the following keys: :number_of_tests, :number_of_failures, :number_of_retries, :number_of_tests_excluding_retries, :number_of_failures_excluding_retries
 
@@ -8936,7 +8973,8 @@ public func rubyVersion() {
                                         disablePackageAutomaticUpdates: OptionalConfigValue<Bool> = .fastlaneDefault(false),
                                         useSystemScm: OptionalConfigValue<Bool> = .fastlaneDefault(false),
                                         numberOfRetries: Int = 0,
-                                        failBuild: OptionalConfigValue<Bool> = .fastlaneDefault(true)) -> [String: Any]
+                                        failBuild: OptionalConfigValue<Bool> = .fastlaneDefault(true),
+                                        packageAuthorizationProvider: OptionalConfigValue<String?> = .fastlaneDefault(nil)) -> [String: Any]
 {
     let workspaceArg = workspace.asRubyArgument(name: "workspace", type: nil)
     let projectArg = project.asRubyArgument(name: "project", type: nil)
@@ -9016,6 +9054,7 @@ public func rubyVersion() {
     let useSystemScmArg = useSystemScm.asRubyArgument(name: "use_system_scm", type: nil)
     let numberOfRetriesArg = RubyCommand.Argument(name: "number_of_retries", value: numberOfRetries, type: nil)
     let failBuildArg = failBuild.asRubyArgument(name: "fail_build", type: nil)
+    let packageAuthorizationProviderArg = packageAuthorizationProvider.asRubyArgument(name: "package_authorization_provider", type: nil)
     let array: [RubyCommand.Argument?] = [workspaceArg,
                                           projectArg,
                                           packagePathArg,
@@ -9093,7 +9132,8 @@ public func rubyVersion() {
                                           disablePackageAutomaticUpdatesArg,
                                           useSystemScmArg,
                                           numberOfRetriesArg,
-                                          failBuildArg]
+                                          failBuildArg,
+                                          packageAuthorizationProviderArg]
     let args: [RubyCommand.Argument] = array
         .filter { $0?.value != nil }
         .compactMap { $0 }
@@ -9285,6 +9325,7 @@ public func say(text: [String],
    - useSystemScm: Lets xcodebuild use system's scm configuration
    - numberOfRetries: The number of times a test can fail
    - failBuild: Should this step stop the build if the tests fail? Set this to false if you're using trainer
+   - packageAuthorizationProvider: Lets xcodebuild use a specified package authorization provider (keychain|netrc)
 
  - returns: Outputs hash of results with the following keys: :number_of_tests, :number_of_failures, :number_of_retries, :number_of_tests_excluding_retries, :number_of_failures_excluding_retries
 
@@ -9367,7 +9408,8 @@ public func say(text: [String],
                                     disablePackageAutomaticUpdates: OptionalConfigValue<Bool> = .fastlaneDefault(scanfile.disablePackageAutomaticUpdates),
                                     useSystemScm: OptionalConfigValue<Bool> = .fastlaneDefault(scanfile.useSystemScm),
                                     numberOfRetries: Int = scanfile.numberOfRetries,
-                                    failBuild: OptionalConfigValue<Bool> = .fastlaneDefault(scanfile.failBuild)) -> [String: Any]
+                                    failBuild: OptionalConfigValue<Bool> = .fastlaneDefault(scanfile.failBuild),
+                                    packageAuthorizationProvider: OptionalConfigValue<String?> = .fastlaneDefault(scanfile.packageAuthorizationProvider)) -> [String: Any]
 {
     let workspaceArg = workspace.asRubyArgument(name: "workspace", type: nil)
     let projectArg = project.asRubyArgument(name: "project", type: nil)
@@ -9447,6 +9489,7 @@ public func say(text: [String],
     let useSystemScmArg = useSystemScm.asRubyArgument(name: "use_system_scm", type: nil)
     let numberOfRetriesArg = RubyCommand.Argument(name: "number_of_retries", value: numberOfRetries, type: nil)
     let failBuildArg = failBuild.asRubyArgument(name: "fail_build", type: nil)
+    let packageAuthorizationProviderArg = packageAuthorizationProvider.asRubyArgument(name: "package_authorization_provider", type: nil)
     let array: [RubyCommand.Argument?] = [workspaceArg,
                                           projectArg,
                                           packagePathArg,
@@ -9524,7 +9567,8 @@ public func say(text: [String],
                                           disablePackageAutomaticUpdatesArg,
                                           useSystemScmArg,
                                           numberOfRetriesArg,
-                                          failBuildArg]
+                                          failBuildArg,
+                                          packageAuthorizationProviderArg]
     let args: [RubyCommand.Argument] = array
         .filter { $0?.value != nil }
         .compactMap { $0 }
@@ -9707,7 +9751,7 @@ public func setBuildNumberRepository(useHgRevisionNumber: OptionalConfigValue<Bo
    - changelog: Changelog text that should be uploaded to App Store Connect
    - teamId: The ID of your App Store Connect team if you're in multiple teams
    - teamName: The name of your App Store Connect team if you're in multiple teams
-   - platform: The platform of the app (ios, appletvos, mac)
+   - platform: The platform of the app (ios, appletvos, xros, mac)
 
  This is useful if you have only one changelog for all languages.
  You can store the changelog in `./changelog.txt` and it will automatically get loaded from there. This integration is useful if you support e.g. 10 languages and want to use the same "What's new"-text for all languages.
@@ -9887,6 +9931,7 @@ public func setPodKey(useBundleExec: OptionalConfigValue<Bool> = .fastlaneDefaul
    - force: Force setup, even if not executed by CI
    - provider: CI provider. If none is set, the provider is detected automatically
    - timeout: Set a custom timeout in seconds for keychain.  Set `0` if you want to specify 'no time-out'
+   - keychainName: Set a custom keychain name
 
  - Creates a new temporary keychain for use with match|
  - Switches match to `readonly` mode to not create new profiles/cert on CI|
@@ -9896,14 +9941,17 @@ public func setPodKey(useBundleExec: OptionalConfigValue<Bool> = .fastlaneDefaul
  */
 public func setupCi(force: OptionalConfigValue<Bool> = .fastlaneDefault(false),
                     provider: OptionalConfigValue<String?> = .fastlaneDefault(nil),
-                    timeout: Int = 3600)
+                    timeout: Int = 3600,
+                    keychainName: String = "fastlane_tmp_keychain")
 {
     let forceArg = force.asRubyArgument(name: "force", type: nil)
     let providerArg = provider.asRubyArgument(name: "provider", type: nil)
     let timeoutArg = RubyCommand.Argument(name: "timeout", value: timeout, type: nil)
+    let keychainNameArg = RubyCommand.Argument(name: "keychain_name", value: keychainName, type: nil)
     let array: [RubyCommand.Argument?] = [forceArg,
                                           providerArg,
-                                          timeoutArg]
+                                          timeoutArg,
+                                          keychainNameArg]
     let args: [RubyCommand.Argument] = array
         .filter { $0?.value != nil }
         .compactMap { $0 }
@@ -10205,7 +10253,8 @@ public func skipDocs() {
    - useWebhookConfiguredUsernameAndIcon: Use webhook's default username and icon settings? (true/false)
    - slackUrl: Create an Incoming WebHook for your Slack group
    - username: Overrides the webhook's username property if use_webhook_configured_username_and_icon is false
-   - iconUrl: Overrides the webhook's image property if use_webhook_configured_username_and_icon is false
+   - iconUrl: Specifies a URL of an image to use as the photo of the message. Overrides the webhook's image property if use_webhook_configured_username_and_icon is false
+   - iconEmoji: Specifies an emoji (using colon shortcodes, eg. :white_check_mark:) to use as the photo of the message. Overrides the webhook's image property if use_webhook_configured_username_and_icon is false. This parameter takes precedence over icon_url
    - payload: Add additional information to this post. payload must be a hash containing any key with any value
    - defaultPayloads: Specifies default payloads to include. Pass an empty array to suppress all the default payloads
    - attachmentProperties: Merge additional properties in the slack attachment, see https://api.slack.com/docs/attachments
@@ -10222,6 +10271,7 @@ public func slack(message: OptionalConfigValue<String?> = .fastlaneDefault(nil),
                   slackUrl: String,
                   username: String = "fastlane",
                   iconUrl: String = "https://fastlane.tools/assets/img/fastlane_icon.png",
+                  iconEmoji: OptionalConfigValue<String?> = .fastlaneDefault(nil),
                   payload: [String: Any] = [:],
                   defaultPayloads: [String] = ["lane", "test_result", "git_branch", "git_author", "last_git_commit", "last_git_commit_hash"],
                   attachmentProperties: [String: Any] = [:],
@@ -10236,6 +10286,7 @@ public func slack(message: OptionalConfigValue<String?> = .fastlaneDefault(nil),
     let slackUrlArg = RubyCommand.Argument(name: "slack_url", value: slackUrl, type: nil)
     let usernameArg = RubyCommand.Argument(name: "username", value: username, type: nil)
     let iconUrlArg = RubyCommand.Argument(name: "icon_url", value: iconUrl, type: nil)
+    let iconEmojiArg = iconEmoji.asRubyArgument(name: "icon_emoji", type: nil)
     let payloadArg = RubyCommand.Argument(name: "payload", value: payload, type: nil)
     let defaultPayloadsArg = RubyCommand.Argument(name: "default_payloads", value: defaultPayloads, type: nil)
     let attachmentPropertiesArg = RubyCommand.Argument(name: "attachment_properties", value: attachmentProperties, type: nil)
@@ -10249,6 +10300,7 @@ public func slack(message: OptionalConfigValue<String?> = .fastlaneDefault(nil),
                                           slackUrlArg,
                                           usernameArg,
                                           iconUrlArg,
+                                          iconEmojiArg,
                                           payloadArg,
                                           defaultPayloadsArg,
                                           attachmentPropertiesArg,
@@ -10504,6 +10556,7 @@ public func slather(buildDirectory: OptionalConfigValue<String?> = .fastlaneDefa
    - clonedSourcePackagesPath: Sets a custom path for Swift Package Manager dependencies
    - skipPackageDependenciesResolution: Skips resolution of Swift Package Manager dependencies
    - disablePackageAutomaticUpdates: Prevents packages from automatically being resolved to versions other than those recorded in the `Package.resolved` file
+   - packageAuthorizationProvider: Lets xcodebuild use a specified package authorization provider (keychain|netrc)
    - testplan: The testplan associated with the scheme that should be used for testing
    - onlyTesting: Array of strings matching Test Bundle/Test Suite/Test Cases to run
    - skipTesting: Array of strings matching Test Bundle/Test Suite/Test Cases to skip
@@ -10554,6 +10607,7 @@ public func snapshot(workspace: OptionalConfigValue<String?> = .fastlaneDefault(
                      clonedSourcePackagesPath: OptionalConfigValue<String?> = .fastlaneDefault(snapshotfile.clonedSourcePackagesPath),
                      skipPackageDependenciesResolution: OptionalConfigValue<Bool> = .fastlaneDefault(snapshotfile.skipPackageDependenciesResolution),
                      disablePackageAutomaticUpdates: OptionalConfigValue<Bool> = .fastlaneDefault(snapshotfile.disablePackageAutomaticUpdates),
+                     packageAuthorizationProvider: OptionalConfigValue<String?> = .fastlaneDefault(snapshotfile.packageAuthorizationProvider),
                      testplan: OptionalConfigValue<String?> = .fastlaneDefault(snapshotfile.testplan),
                      onlyTesting: Any? = snapshotfile.onlyTesting,
                      skipTesting: Any? = snapshotfile.skipTesting,
@@ -10604,6 +10658,7 @@ public func snapshot(workspace: OptionalConfigValue<String?> = .fastlaneDefault(
     let clonedSourcePackagesPathArg = clonedSourcePackagesPath.asRubyArgument(name: "cloned_source_packages_path", type: nil)
     let skipPackageDependenciesResolutionArg = skipPackageDependenciesResolution.asRubyArgument(name: "skip_package_dependencies_resolution", type: nil)
     let disablePackageAutomaticUpdatesArg = disablePackageAutomaticUpdates.asRubyArgument(name: "disable_package_automatic_updates", type: nil)
+    let packageAuthorizationProviderArg = packageAuthorizationProvider.asRubyArgument(name: "package_authorization_provider", type: nil)
     let testplanArg = testplan.asRubyArgument(name: "testplan", type: nil)
     let onlyTestingArg = RubyCommand.Argument(name: "only_testing", value: onlyTesting, type: nil)
     let skipTestingArg = RubyCommand.Argument(name: "skip_testing", value: skipTesting, type: nil)
@@ -10653,6 +10708,7 @@ public func snapshot(workspace: OptionalConfigValue<String?> = .fastlaneDefault(
                                           clonedSourcePackagesPathArg,
                                           skipPackageDependenciesResolutionArg,
                                           disablePackageAutomaticUpdatesArg,
+                                          packageAuthorizationProviderArg,
                                           testplanArg,
                                           onlyTestingArg,
                                           skipTestingArg,
@@ -11336,6 +11392,7 @@ public func swiftlint(mode: String = "lint",
    - skipCertificateMatching: Set to true if there is no access to Apple developer portal but there are certificates, keys and profiles provided. Only works with match import action
    - outputPath: Path in which to export certificates, key and profile
    - skipSetPartitionList: Skips setting the partition list (which can sometimes take a long time). Setting the partition list is usually needed to prevent Xcode from prompting to allow a cert to be used for signing
+   - forceLegacyEncryption: Force encryption to use legacy cbc algorithm for backwards compatibility with older match versions
    - verbose: Print out extra information and all commands
 
  More information: https://docs.fastlane.tools/actions/match/
@@ -11394,6 +11451,7 @@ public func syncCodeSigning(type: String = "development",
                             skipCertificateMatching: OptionalConfigValue<Bool> = .fastlaneDefault(false),
                             outputPath: OptionalConfigValue<String?> = .fastlaneDefault(nil),
                             skipSetPartitionList: OptionalConfigValue<Bool> = .fastlaneDefault(false),
+                            forceLegacyEncryption: OptionalConfigValue<Bool> = .fastlaneDefault(false),
                             verbose: OptionalConfigValue<Bool> = .fastlaneDefault(false))
 {
     let typeArg = RubyCommand.Argument(name: "type", value: type, type: nil)
@@ -11450,6 +11508,7 @@ public func syncCodeSigning(type: String = "development",
     let skipCertificateMatchingArg = skipCertificateMatching.asRubyArgument(name: "skip_certificate_matching", type: nil)
     let outputPathArg = outputPath.asRubyArgument(name: "output_path", type: nil)
     let skipSetPartitionListArg = skipSetPartitionList.asRubyArgument(name: "skip_set_partition_list", type: nil)
+    let forceLegacyEncryptionArg = forceLegacyEncryption.asRubyArgument(name: "force_legacy_encryption", type: nil)
     let verboseArg = verbose.asRubyArgument(name: "verbose", type: nil)
     let array: [RubyCommand.Argument?] = [typeArg,
                                           additionalCertTypesArg,
@@ -11505,6 +11564,7 @@ public func syncCodeSigning(type: String = "development",
                                           skipCertificateMatchingArg,
                                           outputPathArg,
                                           skipSetPartitionListArg,
+                                          forceLegacyEncryptionArg,
                                           verboseArg]
     let args: [RubyCommand.Argument] = array
         .filter { $0?.value != nil }
@@ -11532,7 +11592,7 @@ public func teamName() {
 }
 
 /**
- Upload a new build to [TestFairy](https://www.testfairy.com/)
+ Upload a new build to SauceLabs' TestFairy
 
  - parameters:
    - apiKey: API Key for TestFairy
@@ -11546,10 +11606,17 @@ public func teamName() {
    - autoUpdate: Allows an easy upgrade of all users to the current version. To enable set to 'on'
    - notify: Send email to testers
    - options: Array of options (shake,video_only_wifi,anonymous)
-   - custom: Array of custom options. Contact support@testfairy.com for more information
+   - custom: Array of custom options. Contact support for more information
    - timeout: Request timeout in seconds
+   - tags: Custom tags that can be used to organize your builds
+   - folderName: Name of the dashboard folder that contains this app
+   - landingPageMode: Visibility of build landing after upload. Can be 'open' or 'closed'
+   - uploadToSaucelabs: Upload file directly to Sauce Labs. It can be 'on' or 'off'
+   - platform: Use if upload build is not iOS or Android. Contact support for more information
 
- You can retrieve your API key on [your settings page](https://free.testfairy.com/settings/)
+ Upload a new build to [TestFairy](https://saucelabs.com/products/mobile-testing/app-betas).
+ You can retrieve your API key on [your settings page](https://app.testfairy.com/settings/access-key)
+
  */
 public func testfairy(apiKey: String,
                       ipa: OptionalConfigValue<String?> = .fastlaneDefault(nil),
@@ -11563,7 +11630,12 @@ public func testfairy(apiKey: String,
                       notify: String = "off",
                       options: [String] = [],
                       custom: String = "",
-                      timeout: OptionalConfigValue<Int?> = .fastlaneDefault(nil))
+                      timeout: OptionalConfigValue<Int?> = .fastlaneDefault(nil),
+                      tags: [String] = [],
+                      folderName: String = "",
+                      landingPageMode: String = "open",
+                      uploadToSaucelabs: String = "off",
+                      platform: String = "")
 {
     let apiKeyArg = RubyCommand.Argument(name: "api_key", value: apiKey, type: nil)
     let ipaArg = ipa.asRubyArgument(name: "ipa", type: nil)
@@ -11578,6 +11650,11 @@ public func testfairy(apiKey: String,
     let optionsArg = RubyCommand.Argument(name: "options", value: options, type: nil)
     let customArg = RubyCommand.Argument(name: "custom", value: custom, type: nil)
     let timeoutArg = timeout.asRubyArgument(name: "timeout", type: nil)
+    let tagsArg = RubyCommand.Argument(name: "tags", value: tags, type: nil)
+    let folderNameArg = RubyCommand.Argument(name: "folder_name", value: folderName, type: nil)
+    let landingPageModeArg = RubyCommand.Argument(name: "landing_page_mode", value: landingPageMode, type: nil)
+    let uploadToSaucelabsArg = RubyCommand.Argument(name: "upload_to_saucelabs", value: uploadToSaucelabs, type: nil)
+    let platformArg = RubyCommand.Argument(name: "platform", value: platform, type: nil)
     let array: [RubyCommand.Argument?] = [apiKeyArg,
                                           ipaArg,
                                           apkArg,
@@ -11590,7 +11667,12 @@ public func testfairy(apiKey: String,
                                           notifyArg,
                                           optionsArg,
                                           customArg,
-                                          timeoutArg]
+                                          timeoutArg,
+                                          tagsArg,
+                                          folderNameArg,
+                                          landingPageModeArg,
+                                          uploadToSaucelabsArg,
+                                          platformArg]
     let args: [RubyCommand.Argument] = array
         .filter { $0?.value != nil }
         .compactMap { $0 }
@@ -11780,6 +11862,7 @@ public func testflight(apiKeyPath: OptionalConfigValue<String?> = .fastlaneDefau
    - outputFilename: Filename the xml file should be written to. Defaults to name of input file. (Only works if one input file is used)
    - failBuild: Should this step stop the build if the tests fail? Set this to false if you're handling this with a test reporter
    - xcprettyNaming: Produces class name and test name identical to xcpretty naming in junit file
+   - forceLegacyXcresulttool: Force the use of the '--legacy' flag for xcresulttool instead of using the new commands
    - silent: Silences all output
    - outputRemoveRetryAttempts: Doesn't include retry attempts in the output
 
@@ -11791,6 +11874,7 @@ public func trainer(path: String = ".",
                     outputFilename: OptionalConfigValue<String?> = .fastlaneDefault(nil),
                     failBuild: OptionalConfigValue<Bool> = .fastlaneDefault(true),
                     xcprettyNaming: OptionalConfigValue<Bool> = .fastlaneDefault(false),
+                    forceLegacyXcresulttool: OptionalConfigValue<Bool> = .fastlaneDefault(false),
                     silent: OptionalConfigValue<Bool> = .fastlaneDefault(false),
                     outputRemoveRetryAttempts: OptionalConfigValue<Bool> = .fastlaneDefault(false))
 {
@@ -11800,6 +11884,7 @@ public func trainer(path: String = ".",
     let outputFilenameArg = outputFilename.asRubyArgument(name: "output_filename", type: nil)
     let failBuildArg = failBuild.asRubyArgument(name: "fail_build", type: nil)
     let xcprettyNamingArg = xcprettyNaming.asRubyArgument(name: "xcpretty_naming", type: nil)
+    let forceLegacyXcresulttoolArg = forceLegacyXcresulttool.asRubyArgument(name: "force_legacy_xcresulttool", type: nil)
     let silentArg = silent.asRubyArgument(name: "silent", type: nil)
     let outputRemoveRetryAttemptsArg = outputRemoveRetryAttempts.asRubyArgument(name: "output_remove_retry_attempts", type: nil)
     let array: [RubyCommand.Argument?] = [pathArg,
@@ -11808,6 +11893,7 @@ public func trainer(path: String = ".",
                                           outputFilenameArg,
                                           failBuildArg,
                                           xcprettyNamingArg,
+                                          forceLegacyXcresulttoolArg,
                                           silentArg,
                                           outputRemoveRetryAttemptsArg]
     let args: [RubyCommand.Argument] = array
@@ -12540,7 +12626,7 @@ public func uploadSymbolsToSentry(apiHost: String = "https://app.getsentry.com/a
    - resetRatings: Reset the summary rating when you release a new version of the application
    - priceTier: The price tier of this application
    - appRatingConfigPath: Path to the app rating's config
-   - submissionInformation: Extra information for the submission (e.g. compliance specifications, IDFA settings)
+   - submissionInformation: Extra information for the submission (e.g. compliance specifications)
    - teamId: The ID of your App Store Connect team if you're in multiple teams
    - teamName: The name of your App Store Connect team if you're in multiple teams
    - devPortalTeamId: The short ID of your Developer Portal team, if you're in multiple teams. Different from your iTC team ID!
@@ -13598,7 +13684,7 @@ public func xcov(workspace: OptionalConfigValue<String?> = .fastlaneDefault(nil)
                  coverallsServiceJobId: OptionalConfigValue<String?> = .fastlaneDefault(nil),
                  coverallsRepoToken: OptionalConfigValue<String?> = .fastlaneDefault(nil),
                  xcconfig: OptionalConfigValue<String?> = .fastlaneDefault(nil),
-                 ideFoundationPath: String = "/Applications/Xcode_15.0.1.app/Contents/Developer/../Frameworks/IDEFoundation.framework/Versions/A/IDEFoundation",
+                 ideFoundationPath: String = "/Applications/Xcode_15.4.app/Contents/Developer/../Frameworks/IDEFoundation.framework/Versions/A/IDEFoundation",
                  legacySupport: OptionalConfigValue<Bool> = .fastlaneDefault(false))
 {
     let workspaceArg = workspace.asRubyArgument(name: "workspace", type: nil)
@@ -13801,4 +13887,4 @@ public let snapshotfile: Snapshotfile = .init()
 
 // Please don't remove the lines below
 // They are used to detect outdated files
-// FastlaneRunnerAPIVersion [0.9.178]
+// FastlaneRunnerAPIVersion [0.9.187]

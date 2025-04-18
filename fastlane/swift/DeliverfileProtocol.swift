@@ -1,5 +1,5 @@
 // DeliverfileProtocol.swift
-// Copyright (c) 2024 FastlaneTools
+// Copyright (c) 2025 FastlaneTools
 
 public protocol DeliverfileProtocol: AnyObject {
     /// Path to your App Store Connect API Key JSON file (https://docs.fastlane.tools/app-store-connect-api/#using-fastlane-api-key-json-file)
@@ -95,7 +95,7 @@ public protocol DeliverfileProtocol: AnyObject {
     /// Path to the app rating's config
     var appRatingConfigPath: String? { get }
 
-    /// Extra information for the submission (e.g. compliance specifications, IDFA settings)
+    /// Extra information for the submission (e.g. compliance specifications)
     var submissionInformation: [String: Any]? { get }
 
     /// The ID of your App Store Connect team if you're in multiple teams
@@ -272,4 +272,4 @@ public extension DeliverfileProtocol {
 
 // Please don't remove the lines below
 // They are used to detect outdated files
-// FastlaneRunnerAPIVersion [0.9.125]
+// FastlaneRunnerAPIVersion [0.9.134]

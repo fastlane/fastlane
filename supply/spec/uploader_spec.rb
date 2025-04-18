@@ -453,5 +453,152 @@ describe Supply do
         end
       end
     end
+
+    describe '#update_rollout' do
+      let(:subject) { Supply::Uploader.new }
+      let(:client) { double('client') }
+      let(:version_code) { 123 }
+      let(:config) { { track: 'alpha' } }
+      let(:release) { AndroidPublisher::TrackRelease.new }
+      let(:track) { AndroidPublisher::Track.new }
+
+      before do
+        Supply.config = config
+        allow(Supply::Client).to receive(:make_from_config).and_return(client)
+        allow(client).to receive(:tracks).with('alpha').and_return([track])
+        allow(release).to receive(:version_codes).and_return([version_code])
+        allow(client).to receive(:update_track)
+      end
+
+      shared_examples 'updates track with correct status and rollout' do |rollout:, release_status:, expected_status:, expected_user_fraction:|
+        before do
+          release.status = Supply::ReleaseStatus::IN_PROGRESS
+          track.releases = [release]
+          config[:rollout] = rollout
+          config[:release_status] = release_status
+        end
+
+        it "sets status to #{expected_status} and user_fraction to #{expected_user_fraction.inspect}" do
+          expect(client).to receive(:update_track).with('alpha', track) do |_, track_param|
+            expect(track_param.releases).to eq([release])
+            expect(track_param.releases.first.status).to eq(expected_status)
+            expect(track_param.releases.first.user_fraction).to eq(expected_user_fraction)
+          end
+          subject.update_rollout
+        end
+      end
+
+      shared_examples 'raises error for invalid rollout' do |rollout:, release_status:, expected_error:|
+        before do
+          release.status = Supply::ReleaseStatus::IN_PROGRESS
+          track.releases = [release]
+          config[:rollout] = rollout
+          config[:release_status] = release_status
+        end
+
+        it 'raises an error' do
+          expect { subject.update_rollout }.to raise_error(expected_error)
+        end
+      end
+
+      context 'when rollout is nil' do
+        context 'when release_status is DRAFT' do
+          include_examples 'updates track with correct status and rollout',
+            rollout: nil,
+            release_status: Supply::ReleaseStatus::DRAFT,
+            expected_status: Supply::ReleaseStatus::DRAFT,
+            expected_user_fraction: nil
+        end
+
+        context 'when release_status is IN_PROGRESS' do
+          include_examples 'raises error for invalid rollout',
+            rollout: nil,
+            release_status: Supply::ReleaseStatus::IN_PROGRESS,
+            expected_error: /You need to provide a rollout value when release_status is set to 'inProgress'/
+        end
+
+        context 'when release_status is COMPLETED' do
+          include_examples 'updates track with correct status and rollout',
+            rollout: nil,
+            release_status: Supply::ReleaseStatus::COMPLETED,
+            expected_status: Supply::ReleaseStatus::COMPLETED,
+            expected_user_fraction: nil
+        end
+      end
+
+      context 'when rollout is 0.5' do
+        context 'when release_status is DRAFT' do
+          include_examples 'updates track with correct status and rollout',
+            rollout: 0.5,
+            release_status: Supply::ReleaseStatus::DRAFT,
+            expected_status: Supply::ReleaseStatus::DRAFT,
+            expected_user_fraction: nil # user_fraction is only valid for IN_PROGRESS or HALTED status
+        end
+
+        context 'when release_status is IN_PROGRESS' do
+          include_examples 'updates track with correct status and rollout',
+            rollout: 0.5,
+            release_status: Supply::ReleaseStatus::IN_PROGRESS,
+            expected_status: Supply::ReleaseStatus::IN_PROGRESS,
+            expected_user_fraction: 0.5
+        end
+
+        context 'when release_status is COMPLETED' do
+          include_examples 'updates track with correct status and rollout',
+            rollout: 0.5,
+            release_status: Supply::ReleaseStatus::COMPLETED,
+            # We want to ensure the implementation forces status of IN_PROGRESS when explicit rollout < 1.0 is provided
+            expected_status: Supply::ReleaseStatus::IN_PROGRESS,
+            expected_user_fraction: 0.5
+        end
+      end
+
+      context 'when rollout is 1.0' do
+        context 'when release_status is DRAFT' do
+          include_examples 'updates track with correct status and rollout',
+            rollout: 1.0,
+            release_status: Supply::ReleaseStatus::DRAFT,
+            expected_status: Supply::ReleaseStatus::DRAFT,
+            expected_user_fraction: nil # user_fraction is only valid for IN_PROGRESS or HALTED status
+        end
+
+        context 'when release_status is IN_PROGRESS' do
+          include_examples 'updates track with correct status and rollout',
+            rollout: 1.0,
+            release_status: Supply::ReleaseStatus::IN_PROGRESS,
+            # We want to ensure the implementation forces status of COMPLETED when explicit rollout = 1.0 is provided
+            expected_status: Supply::ReleaseStatus::COMPLETED,
+            expected_user_fraction: nil
+        end
+
+        context 'when release_status is COMPLETED' do
+          include_examples 'updates track with correct status and rollout',
+            rollout: 1.0,
+            release_status: Supply::ReleaseStatus::COMPLETED,
+            expected_status: Supply::ReleaseStatus::COMPLETED,
+            expected_user_fraction: nil
+        end
+      end
+
+      context 'when track is not found' do
+        before do
+          allow(client).to receive(:tracks).with('alpha').and_return([])
+        end
+
+        it 'raises an error' do
+          expect { subject.update_rollout }.to raise_error(/Unable to find the requested track/)
+        end
+      end
+
+      context 'when release is not found' do
+        before do
+          allow(track).to receive(:releases).and_return([])
+        end
+
+        it 'raises an error' do
+          expect { subject.update_rollout }.to raise_error(/Unable to find the requested release on track/)
+        end
+      end
+    end
   end
 end

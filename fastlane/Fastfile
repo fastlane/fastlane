@@ -102,7 +102,10 @@ end
 
 desc "Increment the version number of this gem, after generating new Swift API"
 lane :bump do |options|
-  verify_env_variables(skip_ruby_gems: true)
+  bump_type = options[:bump_type]
+  is_automated_bump = !bump_type.nil?
+
+  verify_env_variables(skip_ruby_gems: is_automated_bump)
   ensure_git_branch(branch: "master")
   ensure_git_status_clean
 
@@ -126,9 +129,6 @@ lane :bump do |options|
 
   # Update CHANGELOG.lasest.md (which will be used to create the Release)
   File.write(last_version_file_path, changelog_text)
-
-  bump_type = options[:bump_type]
-  is_automated_bump = !bump_type.nil?
 
   bump_type ||= 'minor' if prompt(text: "New feature, method or API?", boolean: true)
   bump_type ||= 'patch'
@@ -338,6 +338,101 @@ lane :release do
   slack_train
 end
 
+desc "Creates a GitHub release with the gem as an asset"
+lane :create_github_release do |options|
+  # Git verification
+  #
+  ensure_git_status_clean
+  ensure_git_branch(branch: 'master')
+
+  # Verifying RubyGems version
+  #
+  version = local_version
+  old_version = current_version
+  if Gem::Version.new(version) <= Gem::Version.new(old_version)
+    UI.user_error!("Version number #{version} was already deployed")
+  end
+
+  github_username = ENV["RELEASE_GITHUB_USERNAME"] || "fastlane"
+  repo_name = "#{github_username}/fastlane"
+
+  # Preparing GitHub Release
+  #
+  github_release = get_github_release(url: repo_name, version: version, api_bearer: ENV['FASTLANE_RELEASE_API_BEARER'])
+  gem_path = if (github_release || {}).fetch('body', '').length == 0
+               # Validate repo and create gem
+               validate_repo
+               gem_version_path = File.absolute_path("../pkg/fastlane-#{version}.gem")
+
+               title = "Improvements"
+               description = File.read("../CHANGELOG.latest.md")
+
+               github_release = set_github_release(
+                 repository_name: repo_name,
+                 name: [version, title].join(" "),
+                 tag_name: version,
+                 description: description,
+                 is_draft: false,
+                 upload_assets: [gem_version_path],
+                 api_bearer: ENV['FASTLANE_RELEASE_API_BEARER']
+               )
+
+               release_url = github_release['html_url']
+               message = [title, description, release_url].join("\n\n")
+               add_fastlane_git_tag(tag: "fastlane/#{version}", message: message)
+
+               UI.success("New GitHub release has been created: #{release_url}")
+
+               gem_version_path
+             else
+               UI.message("GitHub release has already been created")
+
+               sleep(50) # GitHub rate limits are annowing
+               download_github_release_gem(version: version)
+             end
+
+  sh "gem push --key github --host https://rubygems.pkg.github.com/#{github_username} #{gem_path}" unless options[:skip_github_packages]
+
+  sh "gem push #{gem_path}" unless options[:skip_rubygems]
+end
+
+lane :publish_rubygems_from_github_release do |options|
+
+end
+
+lane :publish_github_packages_from_github_release do |options|
+
+end
+
+lane :download_github_release_gem do |options|
+  require 'open-uri'
+
+  version = options[:version]
+
+  github_username = ENV["RELEASE_GITHUB_USERNAME"] || "fastlane"
+
+  github_release = get_github_release(url: "#{github_username}/fastlane", version: version, api_bearer: ENV['FASTLANE_RELEASE_API_BEARER'])
+  assets = (github_release || {}).fetch('assets', [])
+
+  gem_asset = assets.find { |a| a["name"].end_with?(".gem") }
+  gem_asset_url = gem_asset["browser_download_url"]
+
+  # Extract the file name from the URL
+  file_name = File.basename(URI.parse(gem_asset_url).path)
+
+  FileUtils.mkdir_p('../pkg')
+  file_path = File.join('../pkg', file_name)
+
+  # Download the file
+  URI.open(gem_asset_url) do |remote_file|
+    File.open(file_path, 'wb') do |local_file|
+      local_file.write(remote_file.read)
+    end
+  end
+
+  file_path
+end
+
 lane :release_brew do
   version = local_version
   sh("cd .. && brew update && brew bump-formula-pr fastlane --force --url=https://github.com/fastlane/fastlane/archive/refs/tags/#{version}.tar.gz")
@@ -381,7 +476,7 @@ private_lane :github_changelog do |options|
     # Default to commit message info
     message = commit["commit"]["message"].lines.first.strip
     name = commit["commit"]["author"]["name"]
-    username = commit["author"]["login"]
+    username = commit["author"]&.[]("login")
 
     # Get pull request associate with commit message
     sha = commit["sha"]

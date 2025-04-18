@@ -37,9 +37,9 @@ module Fastlane
 
         Dir.chdir(params[:path]) do
           if params[:commits_count]
-            changelog = Actions.git_log_last_commits(params[:pretty], params[:commits_count], merge_commit_filtering, params[:date_format], params[:ancestry_path])
+            changelog = Actions.git_log_last_commits(params[:pretty], params[:commits_count], merge_commit_filtering, params[:date_format], params[:ancestry_path], params[:app_path])
           else
-            changelog = Actions.git_log_between(params[:pretty], from, to, merge_commit_filtering, params[:date_format], params[:ancestry_path])
+            changelog = Actions.git_log_between(params[:pretty], from, to, merge_commit_filtering, params[:date_format], params[:ancestry_path], params[:app_path])
           end
 
           changelog = changelog.gsub("\n\n", "\n") if changelog # as there are duplicate newlines
@@ -147,7 +147,11 @@ module Fastlane
                                        verify_block: proc do |value|
                                          matches_option = GIT_MERGE_COMMIT_FILTERING_OPTIONS.any? { |opt| opt.to_s == value }
                                          UI.user_error!("Valid values for :merge_commit_filtering are #{GIT_MERGE_COMMIT_FILTERING_OPTIONS.map { |o| "'#{o}'" }.join(', ')}") unless matches_option
-                                       end)
+                                       end),
+          FastlaneCore::ConfigItem.new(key: :app_path,
+                                       env_name: 'FL_CHANGELOG_FROM_GIT_COMMITS_APP_PATH',
+                                       description: "Scopes the changelog to a specific subdirectory of the repository",
+                                       optional: true)
         ]
       end
 
