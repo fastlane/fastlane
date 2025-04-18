@@ -1,11 +1,25 @@
 describe Supply do
   describe Supply::Client do
     let(:service_account_file) { File.read(fixture_file("sample-service-account.json")) }
+    let(:external_account_file) { File.read(fixture_file("sample-external-account.json")) }
     before do
       stub_request(:post, "https://www.googleapis.com/oauth2/v4/token").
         to_return(status: 200, body: '{}', headers: { 'Content-Type' => 'application/json' })
       stub_request(:post, "https://androidpublisher.googleapis.com/androidpublisher/v3/applications/test-app/edits").
         to_return(status: 200, body: '{}', headers: { 'Content-Type' => 'application/json' })
+    end
+
+    describe "initialize client" do
+      it "with external account credentials" do
+        stub_request(:get, "https://credential-source.example.com/token").
+          to_return(status: 200, body: '{"value": "access-token"}', headers: { 'Content-Type' => 'application/json' })
+        stub_request(:post, "https://sts.googleapis.com/v1/token").
+          to_return(status: 200, body: '{}', headers: { 'Content-Type' => 'application/json' })
+        stub_request(:post, "https://iamcredentials.googleapis.com/v1/projects/-/serviceAccounts/fastlane@fastlane-tools.iam.gserviceaccount.com:generateAccessToken").
+          to_return(status: 200, body: '{}', headers: { 'Content-Type' => 'application/json' })
+
+        Supply::Client.new(service_account_json: StringIO.new(external_account_file), params: { timeout: 1 })
+      end
     end
 
     describe "displays error messages from the API" do
