@@ -147,7 +147,20 @@ module Scan
           end
 
           # Get OS version corresponding to build
-          Gem::Version.new(FastlaneCore::DeviceManager.runtime_build_os_versions[runtime_build])
+          UI.verbose("runtime_build: '#{runtime_build}'")
+          build_os_version = FastlaneCore::DeviceManager.runtime_build_os_versions
+          build_os_version.each do |key, value|
+            UI.verbose("key: '#{key}' value: '#{value}'")
+          end
+
+          os_version = FastlaneCore::DeviceManager.runtime_build_os_versions[runtime_build]
+          if os_version.nil?
+            UI.error("No OS version found for runtime build: '#{runtime_build}'")
+          else
+            result = Gem::Version.new(os_version)
+            UI.verbose("default_os_version result: '#{result}'")
+            result
+          end
         end
       end
     end
@@ -158,15 +171,23 @@ module Scan
 
     def self.compatibility_constraint(sim, device_name)
       latest_os = default_os_version(sim.os_type)
-      sim.name == device_name && (latest_os.nil? || Gem::Version.new(sim.os_version) <= latest_os)
+      UI.verbose("Simulator name: '#{sim.name}' os_version: '#{sim.os_version}' is compatible with device_name: '#{device_name}' and latest_os: '#{latest_os}'")
+      result = sim.name == device_name && (latest_os.nil? || Gem::Version.new(sim.os_version) <= latest_os)
+      UI.verbose("compatible? '#{result}'")
+      result
     end
 
     def self.highest_compatible_simulator(simulators, device_name)
-      simulators
-        .select { |sim| compatibility_constraint(sim, device_name) }
-        .reverse
-        .sort_by! { |sim| Gem::Version.new(sim.os_version) }
-        .last
+      UI.verbose("highest_compatible_simulator: for '#{device_name}' from: #{simulators} ")
+      result = simulators
+               .select { |sim| compatibility_constraint(sim, device_name) }
+      UI.verbose("compatible simulators: '#{result}'")
+      result = result
+               .reverse
+               .sort_by! { |sim| Gem::Version.new(sim.os_version) }
+               .last
+      UI.verbose("result: '#{result}' is nil?: #{result.nil?}")
+      result
     end
 
     def self.regular_expression_for_split_on_whitespace_followed_by_parenthesized_version
@@ -185,6 +206,7 @@ module Scan
     def self.detect_simulator(devices, requested_os_type, deployment_target_key, default_device_name, simulator_type_descriptor)
       clear_cache
 
+      UI.verbose("detect_simulator: #{devices} #{requested_os_type} #{deployment_target_key} #{default_device_name} #{simulator_type_descriptor}")
       deployment_target_version = get_deployment_target_version(deployment_target_key)
       simulators = filter_simulators(
         FastlaneCore::DeviceManager.simulators(requested_os_type).tap do |array|
@@ -212,6 +234,7 @@ module Scan
           pieces = device_string.split(regular_expression_for_split_on_whitespace_followed_by_parenthesized_version)
 
           display_device = "'#{device_string}'"
+          UI.verbose("display_device: #{display_device} pieces: #{pieces.first} #{pieces.last}")
 
           set + (
             if pieces.count == 0
