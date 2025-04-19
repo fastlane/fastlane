@@ -17,4 +17,4 @@ public class Snapshotfile: SnapshotfileProtocol {
     // during the `init` process, and you won't see this message
 }
 
-// Generated with fastlane 2.227.1
+// Generated with fastlane 2.227.2

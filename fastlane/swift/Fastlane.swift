@@ -8826,8 +8826,8 @@ public func rubyVersion() {
    - prelaunchSimulator: Enabling this option will launch the first simulator prior to calling any xcodebuild command
    - reinstallApp: Enabling this option will automatically uninstall the application before running it
    - appIdentifier: The bundle identifier of the app to uninstall (only needed when enabling reinstall_app)
-   - onlyTesting: Array of strings matching Test Bundle/Test Suite/Test Cases to run
-   - skipTesting: Array of strings matching Test Bundle/Test Suite/Test Cases to skip
+   - onlyTesting: Array of test identifiers to run. Expected format: TestTarget[/TestSuite[/TestCase]]
+   - skipTesting: Array of test identifiers to skip. Expected format: TestTarget[/TestSuite[/TestCase]]
    - testplan: The testplan associated with the scheme that should be used for testing
    - onlyTestConfigurations: Array of strings matching test plan configurations to run
    - skipTestConfigurations: Array of strings matching test plan configurations to skip
@@ -9261,8 +9261,8 @@ public func say(text: [String],
    - prelaunchSimulator: Enabling this option will launch the first simulator prior to calling any xcodebuild command
    - reinstallApp: Enabling this option will automatically uninstall the application before running it
    - appIdentifier: The bundle identifier of the app to uninstall (only needed when enabling reinstall_app)
-   - onlyTesting: Array of strings matching Test Bundle/Test Suite/Test Cases to run
-   - skipTesting: Array of strings matching Test Bundle/Test Suite/Test Cases to skip
+   - onlyTesting: Array of test identifiers to run. Expected format: TestTarget[/TestSuite[/TestCase]]
+   - skipTesting: Array of test identifiers to skip. Expected format: TestTarget[/TestSuite[/TestCase]]
    - testplan: The testplan associated with the scheme that should be used for testing
    - onlyTestConfigurations: Array of strings matching test plan configurations to run
    - skipTestConfigurations: Array of strings matching test plan configurations to skip
@@ -13887,4 +13887,4 @@ public let snapshotfile: Snapshotfile = .init()
 
 // Please don't remove the lines below
 // They are used to detect outdated files
-// FastlaneRunnerAPIVersion [0.9.187]
+// FastlaneRunnerAPIVersion [0.9.188]
