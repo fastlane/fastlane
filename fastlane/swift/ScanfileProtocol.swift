@@ -44,10 +44,10 @@ public protocol ScanfileProtocol: AnyObject {
     /// The bundle identifier of the app to uninstall (only needed when enabling reinstall_app)
     var appIdentifier: String? { get }
 
-    /// Array of strings matching Test Bundle/Test Suite/Test Cases to run
+    /// Array of test identifiers to run. Expected format: TestTarget[/TestSuite[/TestCase]]
     var onlyTesting: String? { get }
 
-    /// Array of strings matching Test Bundle/Test Suite/Test Cases to skip
+    /// Array of test identifiers to skip. Expected format: TestTarget[/TestSuite[/TestCase]]
     var skipTesting: String? { get }
 
     /// The testplan associated with the scheme that should be used for testing
@@ -324,4 +324,4 @@ public extension ScanfileProtocol {
 
 // Please don't remove the lines below
 // They are used to detect outdated files
-// FastlaneRunnerAPIVersion [0.9.142]
+// FastlaneRunnerAPIVersion [0.9.143]
