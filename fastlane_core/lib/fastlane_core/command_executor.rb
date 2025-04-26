@@ -34,7 +34,7 @@ module FastlaneCore
         print_all = true if FastlaneCore::Globals.verbose?
         prefix ||= {}
 
-        output = []
+        output = ''
         command = command.join(" ") if command.kind_of?(Array)
         UI.command(command) if print_command
 
@@ -47,7 +47,7 @@ module FastlaneCore
             command_stdout.each do |l|
               line = l.chomp
               line = line[1..-1] if line[0] == "\r"
-              output << line
+              output.concat(line, "\n")
 
               next unless print_all
 
@@ -62,38 +62,35 @@ module FastlaneCore
         rescue => ex
           # FastlanePty adds exit_status on to StandardError so every error will have a status code
           status = ex.exit_status
+          output.delete_suffix!("\n") unless output.empty?
 
           # This could happen when the environment is wrong:
           # > invalid byte sequence in US-ASCII (ArgumentError)
-          output << ex.to_s
-          o = output.join("\n")
-          puts(o)
+          output.concat(ex.to_s)
+          puts(output)
           if error
-            error.call(o, nil)
+            error.call(output, nil)
           else
             raise ex
           end
         end
+        output.delete_suffix!("\n") unless output.empty?
 
         # Exit status for build command, should be 0 if build succeeded
         if status != 0
           is_output_already_printed = print_all && !suppress_output
-          if is_output_already_printed && error.nil?
-            o = ""
-          else
-            o = output.join("\n")
-          end
-          puts(o) unless is_output_already_printed
+
+          puts(output) unless is_output_already_printed
 
           UI.error("Exit status: #{status}")
           if error
-            error.call(o, status)
+            error.call(output, status)
           else
             UI.user_error!("Exit status: #{status}")
           end
         end
 
-        return output.join("\n")
+        return output
       end
     end
   end
