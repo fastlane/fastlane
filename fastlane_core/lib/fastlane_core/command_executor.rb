@@ -77,9 +77,10 @@ module FastlaneCore
 
         # Exit status for build command, should be 0 if build succeeded
         if status != 0
-          o = String.new
           is_output_already_printed = print_all && !suppress_output
-          if !is_output_already_printed || !error.nil?
+          if is_output_already_printed && error.nil?
+            o = ""
+          else
             o = output.join("\n")
           end
           puts(o) unless is_output_already_printed
