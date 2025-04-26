@@ -87,7 +87,7 @@ Shopping list:
         end.not_to output(failing_command_output).to_stdout
       end
 
-      it "prints output to stdout ony ones when status != 0 and output was not already printed" do
+      it "prints output to stdout only once when status != 0 and output was not already printed" do
         unless FastlaneCore::Helper.windows?
           expect(Process).to receive(:wait).exactly(3)
         end
