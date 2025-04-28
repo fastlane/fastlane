@@ -77,6 +77,7 @@ Shopping list:
         unless FastlaneCore::Helper.windows?
           expect(Process).to receive(:wait)
         end
+        expect(FastlaneCore::UI).to receive(:command_output).with(failing_command_error_input)
 
         expect do
           FastlaneCore::CommandExecutor.execute(
@@ -91,6 +92,7 @@ Shopping list:
         unless FastlaneCore::Helper.windows?
           expect(Process).to receive(:wait).exactly(3)
         end
+        expect(FastlaneCore::UI).not_to receive(:command_output)
 
         expect do
           FastlaneCore::CommandExecutor.execute(
@@ -98,7 +100,11 @@ Shopping list:
             print_all: false,
             error: nil
           )
-        end.to output(failing_command_output).to_stdout.and(raise_error)
+        end.to output(failing_command_output).to_stdout.and(
+          raise_error(FastlaneCore::Interface::FastlaneError) do |error|
+            expect(error.message).to match('Exit status: 42')
+          end
+        )
 
         expect do
           FastlaneCore::CommandExecutor.execute(
@@ -142,6 +148,47 @@ Shopping list:
           end
         )
         expect(error_block_input).to eq(failing_command_error_input)
+      end
+
+      it "calls prefix blocks if print_all set on" do
+        expect(FastlaneCore::UI).to receive(:command_output).with("Prefix: foo")
+
+        prefix_block_input = nil
+        FastlaneCore::CommandExecutor.execute(
+          command: 'echo foo',
+          print_all: true,
+          prefix: [
+            {
+              prefix: "Prefix: ",
+              block: proc do |value|
+                prefix_block_input = value
+                true
+              end
+            }
+          ]
+        )
+        expect(prefix_block_input).to eq('foo')
+      end
+
+      it "does not calls prefix blocks if suppress_output set on" do
+        expect(FastlaneCore::UI).not_to receive(:command_output)
+
+        prefix_block_input = nil
+        FastlaneCore::CommandExecutor.execute(
+          command: 'echo foo',
+          print_all: true,
+          suppress_output: true,
+          prefix: [
+            {
+              prefix: "Prefix: ",
+              block: proc do |value|
+                prefix_block_input = value
+                true
+              end
+            }
+          ]
+        )
+        expect(prefix_block_input).to be_nil
       end
     end
 
