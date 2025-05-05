@@ -1,3 +1,4 @@
-* [match] fix error with universal provisioning filter ("'UNIVERSAL' is not a valid filter value") (#29500) via Michael Neeley (@redreceipt)
-* Bump xcpretty to version 0.4.1 (#29516) via Iulian Onofrei (@revolter)
-* [scan] Remove unnecessary shellescape when generating -resultBundlePath option (#22285) via Junfeng (@hujunfeng)
+* [deliver] Fix altool not logging errors (#29545) via TCROC (@TCROC)
+* [precheck] fix typo in precheck error (#22086) via Hans Knöchel (@hansemannn)
+* [pilot] ability to upload ipas to Testflight from Linux (#22014) via Cristian Caruceru (@ccaruceru)
+* [docs] Clarify only-testing/skip-testing format (#27585) via Ben LaVerriere (@benlaverriere)
