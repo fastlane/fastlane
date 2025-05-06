@@ -263,6 +263,7 @@ module Spaceship
           puts("Error while running the script #{ENV['FASTLANE_2FA_SCRIPT']}: Output without spaces is not 6 digits.".red)
           puts("Original Output: #{stdout_str}")
           puts("Output without spaces: #{two_factor_code}")
+          puts("Output length: #{two_factor_code.length}")
           raise "Error while running the script #{ENV['FASTLANE_2FA_SCRIPT']}"
         end
 
