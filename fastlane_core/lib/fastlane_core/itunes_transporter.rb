@@ -51,6 +51,45 @@ module FastlaneCore
       not_implemented(__method__)
     end
 
+    # Builds a string array of credentials parameters based on the provided authentication details.
+    #
+    # @param username [String, nil] The username for authentication (optional).
+    # @param password [String, nil] The password for authentication (optional).
+    # @param jwt [String, nil] A JSON Web Token for token-based authentication (optional).
+    # @param api_key [Hash, nil] An API key for authentication (optional).
+    #
+    # @return [String] A string containing the appropriate credentials for authentication.
+    def build_credential_params(username = nil, password = nil, jwt = nil, api_key = nil)
+      not_implemented(__method__)
+    end
+
+    # Runs preparations before executing any command from the executor.
+    #
+    # @param original_api_key [Hash] api key containing the issuer id and private key
+    # @return [Hash] copy of `api_key` which includes an extra `key_dir` with the location of the .p8 file on disk
+    def prepare(original_api_key:)
+      return if original_api_key.nil?
+      # Create .p8 file from api_key and provide api key info which contains .p8 file path
+      api_key = original_api_key.dup
+      if self.kind_of?(ShellScriptTransporterExecutor)
+        # as of Transporter v3.3.0, the app is unable to detect the private keys under the 'private_keys' folder in current directory
+        # so we must rely on the other search paths in the Home dir:
+        # https://help.apple.com/itc/transporteruserguide/en.lproj/static.html#itc803b7be80
+        private_keys_dir = File.join(Dir.home, ".appstoreconnect/private_keys")
+        unless Dir.exist?(private_keys_dir)
+          FileUtils.mkdir_p(private_keys_dir)
+        end
+        api_key[:key_dir] = private_keys_dir
+      else
+        api_key[:key_dir] = Dir.mktmpdir("deliver-")
+      end
+      # Specified p8 needs to be generated to call altool or iTMSTransporter
+      File.open(File.join(api_key[:key_dir], "AuthKey_#{api_key[:key_id]}.p8"), "wb") do |p8|
+        p8.write(api_key[:key])
+      end
+      api_key
+    end
+
     def execute(command, hide_output)
       if Helper.test?
         yield(nil) if block_given?
@@ -249,21 +288,7 @@ module FastlaneCore
       @errors << "-1 indicates altool exited abnormally; try retrying (see https://github.com/fastlane/fastlane/issues/21535)" if exit_status == -1
 
       unless @errors.empty? || @all_lines.empty?
-        # Print the last lines that appear after the last error from the logs
-        # If error text is not detected, it will be 20 lines
-        # This is key for non-verbose mode
-
-        # The format of altool's result with error is like below
-        # > *** Error: Error uploading '...'.
-        # > *** Error: ...
-        # > {
-        # >     NSLocalizedDescription = "...",
-        # >     ...
-        # > }
-        # So this line tries to find the line which has "*** Error:" prefix from bottom of log
-        error_line_index = @all_lines.rindex { |line| ERROR_REGEX.match?(line) }
-
-        @all_lines[(error_line_index || -20)..-1].each do |line|
+        @all_lines.each do |line|
           UI.important("[altool] #{line}")
         end
         UI.message("Application Loader output above ^")
@@ -274,16 +299,21 @@ module FastlaneCore
       exit_status.zero?
     end
 
+    def build_credential_params(username = nil, password = nil, jwt = nil, api_key = nil)
+      if !username.nil? && !password.nil? && api_key.nil?
+        "-u #{username.shellescape} -p #{password.shellescape}"
+      elsif !api_key.nil?
+        "--apiKey #{api_key[:key_id]} --apiIssuer #{api_key[:issuer_id]}"
+      end
+    end
+
     def build_upload_command(username, password, source = "/tmp", provider_short_name = "", jwt = nil, platform = nil, api_key = nil)
       use_api_key = !api_key.nil?
       [
         ("API_PRIVATE_KEYS_DIR=#{api_key[:key_dir]}" if use_api_key),
         "xcrun altool",
         "--upload-app",
-        ("-u #{username.shellescape}" unless use_api_key),
-        ("-p #{password.shellescape}" unless use_api_key),
-        ("--apiKey #{api_key[:key_id]}" if use_api_key),
-        ("--apiIssuer #{api_key[:issuer_id]}" if use_api_key),
+        build_credential_params(username, password, jwt, api_key),
         ("--asc-provider #{provider_short_name}" unless use_api_key || provider_short_name.to_s.empty?),
         platform_option(platform),
         file_upload_option(source),
@@ -298,10 +328,7 @@ module FastlaneCore
         ("API_PRIVATE_KEYS_DIR=#{api_key[:key_dir]}" if use_api_key),
         "xcrun altool",
         "--list-providers",
-        ("-u #{username.shellescape}" unless use_api_key),
-        ("-p #{password.shellescape}" unless use_api_key),
-        ("--apiKey #{api_key[:key_id]}" if use_api_key),
-        ("--apiIssuer #{api_key[:issuer_id]}" if use_api_key),
+        build_credential_params(username, password, jwt, api_key),
         "--output-format json"
       ].compact.join(' ')
     end
@@ -318,10 +345,7 @@ module FastlaneCore
         ("API_PRIVATE_KEYS_DIR=#{api_key[:key_dir]}" if use_api_key),
         "xcrun altool",
         "--validate-app",
-        ("-u #{username.shellescape}" unless use_api_key),
-        ("-p #{password.shellescape}" unless use_api_key),
-        ("--apiKey #{api_key[:key_id]}" if use_api_key),
-        ("--apiIssuer #{api_key[:issuer_id]}" if use_api_key),
+        build_credential_params(username, password, nil, api_key),
         ("--asc-provider #{provider_short_name}" unless use_api_key || provider_short_name.to_s.empty?),
         platform_option(platform),
         file_upload_option(source)
@@ -385,14 +409,21 @@ module FastlaneCore
 
   # Generates commands and executes the iTMSTransporter through the shell script it provides by the same name
   class ShellScriptTransporterExecutor < TransporterExecutor
+    def build_credential_params(username = nil, password = nil, jwt = nil, api_key = nil)
+      if !(username.nil? || password.nil?) && (jwt.nil? && api_key.nil?)
+        "-u #{username.shellescape} -p #{shell_escaped_password(password)}"
+      elsif !jwt.nil? && api_key.nil?
+        "-jwt #{jwt}"
+      elsif !api_key.nil?
+        "-apiIssuer #{api_key[:issuer_id]} -apiKey #{api_key[:key_id]}"
+      end
+    end
+
     def build_upload_command(username, password, source = "/tmp", provider_short_name = "", jwt = nil, platform = nil, api_key = nil)
-      use_jwt = !jwt.to_s.empty?
       [
         '"' + Helper.transporter_path + '"',
         "-m upload",
-        ("-u #{username.shellescape}" unless use_jwt),
-        ("-p #{shell_escaped_password(password)}" unless use_jwt),
-        ("-jwt #{jwt}" if use_jwt),
+        build_credential_params(username, password, jwt, api_key),
         file_upload_option(source),
         additional_upload_parameters, # that's here, because the user might overwrite the -t option
         "-k 100000",
@@ -402,13 +433,10 @@ module FastlaneCore
     end
 
     def build_download_command(username, password, apple_id, destination = "/tmp", provider_short_name = "", jwt = nil)
-      use_jwt = !jwt.to_s.empty?
       [
         '"' + Helper.transporter_path + '"',
         "-m lookupMetadata",
-        ("-u #{username.shellescape}" unless use_jwt),
-        ("-p #{shell_escaped_password(password)}" unless use_jwt),
-        ("-jwt #{jwt}" if use_jwt),
+        build_credential_params(username, password, jwt),
         "-apple_id #{apple_id}",
         "-destination '#{destination}'",
         ("-itc_provider #{provider_short_name}" if jwt.nil? && !provider_short_name.to_s.empty?)
@@ -416,25 +444,19 @@ module FastlaneCore
     end
 
     def build_provider_ids_command(username, password, jwt = nil, api_key = nil)
-      use_jwt = !jwt.to_s.empty?
       [
         '"' + Helper.transporter_path + '"',
         '-m provider',
-        ("-u \"#{username.shellescape}\"" unless use_jwt),
-        ("-p #{shell_escaped_password(password)}" unless use_jwt),
-        ("-jwt #{jwt}" if use_jwt)
+        build_credential_params(username, password, jwt, api_key)
       ].compact.join(' ')
     end
 
     def build_verify_command(username, password, source = "/tmp", provider_short_name = "", **kwargs)
       jwt = kwargs[:jwt]
-      use_jwt = !jwt.to_s.empty?
       [
         '"' + Helper.transporter_path + '"',
         '-m verify',
-        ("-u #{username.shellescape}" unless use_jwt),
-        ("-p #{shell_escaped_password(password)}" unless use_jwt),
-        ("-jwt #{jwt}" if use_jwt),
+        build_credential_params(username, password, jwt),
         "-f #{source.shellescape}",
         ("-WONoPause true" if Helper.windows?), # Windows only: process instantly returns instead of waiting for key press
         ("-itc_provider #{provider_short_name}" if jwt.nil? && !provider_short_name.to_s.empty?)
@@ -482,16 +504,26 @@ module FastlaneCore
   # Generates commands and executes the iTMSTransporter by invoking its Java app directly, to avoid the crazy parameter
   # escaping problems in its accompanying shell script.
   class JavaTransporterExecutor < TransporterExecutor
+    def build_credential_params(username = nil, password = nil, jwt = nil, api_key = nil, is_password_from_env = false)
+      if !username.nil? && jwt.to_s.empty?
+        if is_password_from_env
+          "-u #{username.shellescape} -p @env:ITMS_TRANSPORTER_PASSWORD"
+        elsif !password.nil?
+          "-u #{username.shellescape} -p #{password.shellescape}"
+        end
+      elsif !jwt.to_s.empty?
+        "-jwt #{jwt}"
+      end
+    end
+
     def build_upload_command(username, password, source = "/tmp", provider_short_name = "", jwt = nil, platform = nil, api_key = nil)
-      use_jwt = !jwt.to_s.empty?
-      if !Helper.user_defined_itms_path? && Helper.mac? && Helper.xcode_at_least?(11)
+      credential_params = build_credential_params(username, password, jwt, api_key, is_default_itms_on_xcode_11?)
+      if is_default_itms_on_xcode_11?
         [
-          ("ITMS_TRANSPORTER_PASSWORD=#{password.shellescape}" unless use_jwt),
+          ("ITMS_TRANSPORTER_PASSWORD=#{password.shellescape}" if jwt.to_s.empty?),
           'xcrun iTMSTransporter',
           '-m upload',
-          ("-u #{username.shellescape}" unless use_jwt),
-          ("-p @env:ITMS_TRANSPORTER_PASSWORD" unless use_jwt),
-          ("-jwt #{jwt}" if use_jwt),
+          credential_params,
           file_upload_option(source),
           additional_upload_parameters, # that's here, because the user might overwrite the -t option
           '-k 100000',
@@ -510,9 +542,7 @@ module FastlaneCore
           '-Dsun.net.http.retryPost=false',
           java_code_option,
           '-m upload',
-          ("-u #{username.shellescape}" unless use_jwt),
-          ("-p #{password.shellescape}" unless use_jwt),
-          ("-jwt #{jwt}" if use_jwt),
+          credential_params,
           file_upload_option(source),
           additional_upload_parameters, # that's here, because the user might overwrite the -t option
           '-k 100000',
@@ -524,15 +554,13 @@ module FastlaneCore
 
     def build_verify_command(username, password, source = "/tmp", provider_short_name = "", **kwargs)
       jwt = kwargs[:jwt]
-      use_jwt = !jwt.to_s.empty?
-      if !Helper.user_defined_itms_path? && Helper.mac? && Helper.xcode_at_least?(11)
+      credential_params = build_credential_params(username, password, jwt, nil, is_default_itms_on_xcode_11?)
+      if is_default_itms_on_xcode_11?
         [
-          ("ITMS_TRANSPORTER_PASSWORD=#{password.shellescape}" unless use_jwt),
+          ("ITMS_TRANSPORTER_PASSWORD=#{password.shellescape}" if jwt.to_s.empty?),
           'xcrun iTMSTransporter',
           '-m verify',
-          ("-u #{username.shellescape}" unless use_jwt),
-          ("-p @env:ITMS_TRANSPORTER_PASSWORD" unless use_jwt),
-          ("-jwt #{jwt}" if use_jwt),
+          credential_params,
           "-f #{source.shellescape}",
           ("-itc_provider #{provider_short_name}" if jwt.nil? && !provider_short_name.to_s.empty?),
           '2>&1' # cause stderr to be written to stdout
@@ -549,9 +577,7 @@ module FastlaneCore
           '-Dsun.net.http.retryPost=false',
           java_code_option,
           '-m verify',
-          ("-u #{username.shellescape}" unless use_jwt),
-          ("-p #{password.shellescape}" unless use_jwt),
-          ("-jwt #{jwt}" if use_jwt),
+          credential_params,
           "-f #{source.shellescape}",
           ("-itc_provider #{provider_short_name}" if jwt.nil? && !provider_short_name.to_s.empty?),
           '2>&1' # cause stderr to be written to stdout
@@ -560,15 +586,13 @@ module FastlaneCore
     end
 
     def build_download_command(username, password, apple_id, destination = "/tmp", provider_short_name = "", jwt = nil)
-      use_jwt = !jwt.to_s.empty?
-      if !Helper.user_defined_itms_path? && Helper.mac? && Helper.xcode_at_least?(11)
+      credential_params = build_credential_params(username, password, jwt, nil, is_default_itms_on_xcode_11?)
+      if is_default_itms_on_xcode_11?
         [
-          ("ITMS_TRANSPORTER_PASSWORD=#{password.shellescape}" unless use_jwt),
+          ("ITMS_TRANSPORTER_PASSWORD=#{password.shellescape}" if jwt.to_s.empty?),
           'xcrun iTMSTransporter',
           '-m lookupMetadata',
-          ("-u #{username.shellescape}" unless use_jwt),
-          ("-p @env:ITMS_TRANSPORTER_PASSWORD" unless use_jwt),
-          ("-jwt #{jwt}" if use_jwt),
+          credential_params,
           "-apple_id #{apple_id.shellescape}",
           "-destination #{destination.shellescape}",
           ("-itc_provider #{provider_short_name}" if jwt.nil? && !provider_short_name.to_s.empty?),
@@ -586,9 +610,7 @@ module FastlaneCore
           '-Dsun.net.http.retryPost=false',
           java_code_option,
           '-m lookupMetadata',
-          ("-u #{username.shellescape}" unless use_jwt),
-          ("-p #{password.shellescape}" unless use_jwt),
-          ("-jwt #{jwt}" if use_jwt),
+          credential_params,
           "-apple_id #{apple_id.shellescape}",
           "-destination #{destination.shellescape}",
           ("-itc_provider #{provider_short_name}" if jwt.nil? && !provider_short_name.to_s.empty?),
@@ -598,15 +620,13 @@ module FastlaneCore
     end
 
     def build_provider_ids_command(username, password, jwt = nil, api_key = nil)
-      use_jwt = !jwt.to_s.empty?
-      if !Helper.user_defined_itms_path? && Helper.mac? && Helper.xcode_at_least?(11)
+      credential_params = build_credential_params(username, password, jwt, api_key, is_default_itms_on_xcode_11?)
+      if is_default_itms_on_xcode_11?
         [
-          ("ITMS_TRANSPORTER_PASSWORD=#{password.shellescape}" unless use_jwt),
+          ("ITMS_TRANSPORTER_PASSWORD=#{password.shellescape}" if jwt.to_s.empty?),
           'xcrun iTMSTransporter',
           '-m provider',
-          ("-u #{username.shellescape}" unless use_jwt),
-          ("-p @env:ITMS_TRANSPORTER_PASSWORD" unless use_jwt),
-          ("-jwt #{jwt}" if use_jwt),
+          credential_params,
           '2>&1' # cause stderr to be written to stdout
         ].compact.join(' ')
       else
@@ -621,12 +641,14 @@ module FastlaneCore
           '-Dsun.net.http.retryPost=false',
           java_code_option,
           '-m provider',
-          ("-u #{username.shellescape}" unless use_jwt),
-          ("-p #{password.shellescape}" unless use_jwt),
-          ("-jwt #{jwt}" if use_jwt),
+          credential_params,
           '2>&1' # cause stderr to be written to stdout
         ].compact.join(' ')
       end
+    end
+
+    def is_default_itms_on_xcode_11?
+      !Helper.user_defined_itms_path? && Helper.mac? && Helper.xcode_at_least?(11)
     end
 
     def java_code_option
@@ -686,7 +708,7 @@ module FastlaneCore
       use_shell_script ||= Helper.windows?
       use_shell_script ||= Feature.enabled?('FASTLANE_ITUNES_TRANSPORTER_USE_SHELL_SCRIPT')
 
-      if jwt.to_s.empty?
+      if jwt.to_s.empty? && api_key.nil?
         @user = user
         @password = password || load_password_for_transporter
       end
@@ -783,9 +805,7 @@ module FastlaneCore
       # Handle AppStore Connect API
       use_api_key = !@api_key.nil?
       api_key_placeholder = use_api_key ? { key_id: "YourKeyID", issuer_id: "YourIssuerID", key_dir: "YourTmpP8KeyDir" } : nil
-
-      api_key = nil
-      api_key = api_key_with_p8_file_path(@api_key) if use_api_key
+      api_key = @transporter_executor.prepare(original_api_key: @api_key)
 
       command = @transporter_executor.build_upload_command(@user, @password, actual_dir, @provider_short_name, @jwt, platform, api_key)
       UI.verbose(@transporter_executor.build_upload_command(@user, password_placeholder, actual_dir, @provider_short_name, jwt_placeholder, platform, api_key_placeholder))
@@ -846,8 +866,7 @@ module FastlaneCore
 
       # Masking credentials for verbose outputs
       api_key_placeholder = use_api_key ? { key_id: "YourKeyID", issuer_id: "YourIssuerID", key_dir: "YourTmpP8KeyDir" } : nil
-
-      api_key = api_key_with_p8_file_path(@api_key) if use_api_key
+      api_key = @transporter_executor.prepare(original_api_key: @api_key)
 
       command = @transporter_executor.build_verify_command(@user, @password, actual_dir, @provider_short_name, jwt: @jwt, platform: platform, api_key: api_key)
       UI.verbose(@transporter_executor.build_verify_command(@user, password_placeholder, actual_dir, @provider_short_name, jwt: jwt_placeholder, platform: platform, api_key: api_key_placeholder))
@@ -882,8 +901,7 @@ module FastlaneCore
       use_api_key = !@api_key.nil?
       api_key_placeholder = use_api_key ? { key_id: "YourKeyID", issuer_id: "YourIssuerID", key_dir: "YourTmpP8KeyDir" } : nil
 
-      api_key = nil
-      api_key = api_key_with_p8_file_path(@api_key) if use_api_key
+      api_key = @transporter_executor.prepare(original_api_key: @api_key)
 
       command = @transporter_executor.build_provider_ids_command(@user, @password, @jwt, api_key)
       UI.verbose(@transporter_executor.build_provider_ids_command(@user, password_placeholder, jwt_placeholder, api_key_placeholder))
@@ -907,17 +925,6 @@ module FastlaneCore
     private
 
     TWO_FACTOR_ENV_VARIABLE = "FASTLANE_APPLE_APPLICATION_SPECIFIC_PASSWORD"
-
-    # Create .p8 file from api_key and provide api key info which contains .p8 file path
-    def api_key_with_p8_file_path(original_api_key)
-      api_key = original_api_key.dup
-      api_key[:key_dir] = Dir.mktmpdir("deliver-")
-      # Specified p8 needs to be generated to call altool
-      File.open(File.join(api_key[:key_dir], "AuthKey_#{api_key[:key_id]}.p8"), "wb") do |p8|
-        p8.write(api_key[:key])
-      end
-      api_key
-    end
 
     # Returns whether altool should be used or ItunesTransporter should be used
     def should_use_altool?(altool_compatible_command, use_shell_script)
