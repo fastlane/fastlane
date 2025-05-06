@@ -76,6 +76,7 @@ Gem::Specification.new do |spec|
   spec.add_dependency('babosa', '>= 1.0.3', '< 2.0.0') # library for creating human-friendly identifiers, aka "slugs"
   spec.add_dependency('base64', '>= 0.2.0', '< 1.0.0') # Base64 encoding/decoding, JWT dependency
   spec.add_dependency('bundler', '>= 1.12.0', '< 3.0.0') # Used for fastlane plugins
+  spec.add_dependency('csv', '>= 3.3.4', '< 4.0.0') # CSV parsing
   spec.add_dependency('CFPropertyList', '>= 2.3', '< 4.0.0') # Needed to be able to read binary plist format
   spec.add_dependency('colored', '~> 1.2') # colored terminal output
   spec.add_dependency('commander', '~> 4.6') # CLI parser
@@ -96,12 +97,14 @@ Gem::Specification.new do |spec|
   spec.add_dependency('http-cookie', '~> 1.0.5') # Must be 1.0.5+ for Ruby 3 compatibility: https://github.com/sparklemotion/http-cookie/commit/d12449a983d3dd660c5fe1f2b135c35e83755cc3
   spec.add_dependency('json', '< 3.0.0') # Because sometimes it's just not installed
   spec.add_dependency('jwt', '>= 2.1.0', '< 3') # Used for generating authentication tokens for App Store Connect API
+  spec.add_dependency('logger', '>= 1.7.0', '< 2.0.0') # Used for loggings
   spec.add_dependency('mini_magick', '>= 4.9.4', '< 5.0.0') # To open, edit and export PSD files
   spec.add_dependency('multipart-post', '>= 2.0.0', '< 3.0.0') # Needed for uploading builds to appetize
   spec.add_dependency('mutex_m', '>= 0.3.0', '< 1.0.0') # Mutex implementation for Ruby, Faraday dependency
   spec.add_dependency('nkf', '>= 0.1.3', '< 1.0.0') # Ruby's native encoding library, CFPropertyList dependency
   spec.add_dependency('naturally', '~> 2.2') # Used to sort strings with numbers in a human-friendly way
   spec.add_dependency('optparse', '>= 0.1.1', '< 1.0.0') # Used to parse options with Commander
+  spec.add_dependency('ostruct', '>= 0.6.1', '< 1.0.0') # Used for creating OpenStruct objects
   spec.add_dependency('plist', '>= 3.1.0', '< 4.0.0') # Needed for set_build_number_repository and get_info_plist_value actions
   spec.add_dependency('rubyzip', '>= 2.0.0', '< 3.0.0') # fix swift/ipa in gym
   spec.add_dependency('security', '= 0.1.5') # macOS Keychain manager, a dead project, no updates expected
