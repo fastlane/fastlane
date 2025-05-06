@@ -237,6 +237,7 @@ module Spaceship
       if !ENV["FASTLANE_2FA_SCRIPT"].nil? && ENV["FASTLANE_2FA_SCRIPT"].length > 0
         puts("A Two Factor Script was defined using FASTLANE_2FA_SCRIPT. Running this script now to get the 2-factor-code...".yellow)
         stdout_str, stderr_str, exit_code = Open3.capture3(ENV["FASTLANE_2FA_SCRIPT"])
+
         if exit_code != 0
           puts("Error while running the script #{ENV['FASTLANE_2FA_SCRIPT']}.".red)
           puts("STDERR:".red)
@@ -245,8 +246,26 @@ module Spaceship
           puts(stdout_str)
           raise "Error while running the script #{ENV['FASTLANE_2FA_SCRIPT']}"
         end
-        puts("Using the code from the script #{ENV['FASTLANE_2FA_SCRIPT']}: #{stdout_str.strip}".yellow)
-        stdout_str.strip
+
+        if stdout_str.nil? || stdout_str.length == 0
+          puts("Error while running the script #{ENV['FASTLANE_2FA_SCRIPT']}: No output.".red)
+          raise "Error while running the script #{ENV['FASTLANE_2FA_SCRIPT']}"
+        end
+
+        if stdout_str.length < 6
+          puts("Error while running the script #{ENV['FASTLANE_2FA_SCRIPT']}: Output is too short.".red)
+          raise "Error while running the script #{ENV['FASTLANE_2FA_SCRIPT']}"
+        end
+
+        two_factor_code = stdout_str.delete(' ')
+
+        if two_factor_code.length != 6
+          puts("Error while running the script #{ENV['FASTLANE_2FA_SCRIPT']}: Output without spaces is not 6 digits.".red)
+          raise "Error while running the script #{ENV['FASTLANE_2FA_SCRIPT']}"
+        end
+
+        puts("Using the code from the script #{ENV['FASTLANE_2FA_SCRIPT']}: #{two_factor_code}".yellow)
+        two_factor_code
       else
         ask(text)
       end
