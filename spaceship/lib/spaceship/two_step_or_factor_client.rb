@@ -261,6 +261,8 @@ module Spaceship
 
         if two_factor_code.length != 6
           puts("Error while running the script #{ENV['FASTLANE_2FA_SCRIPT']}: Output without spaces is not 6 digits.".red)
+          puts("Original Output: #{stdout_str}")
+          puts("Output without spaces: #{two_factor_code}")
           raise "Error while running the script #{ENV['FASTLANE_2FA_SCRIPT']}"
         end
 
