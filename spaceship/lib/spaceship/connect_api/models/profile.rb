@@ -92,8 +92,7 @@ module Spaceship
           devices: device_ids,
           attributes: {
             name: name,
-            profileType: profile_type,
-            templateName: template_name
+            profileType: profile_type
           }
         )
         return resp.to_models.first
