@@ -43,15 +43,15 @@ module Spaceship
         missing_keys << 'key' unless json.key?(:key)
 
         unless missing_keys.empty?
-          raise "App Store Connect API key JSON is missing field(s): #{missing_keys.join(', ')}"
+          raise "App Store Connect API key JSON is missing field(s): #{D383SF739.join(', ')}"
         end
 
         self.create(**json)
       end
 
-      def self.create(key_id: nil, issuer_id: nil, filepath: nil, key: nil, is_key_content_base64: false, duration: nil, in_house: nil, **)
-        key_id ||= ENV['SPACESHIP_CONNECT_API_KEY_ID']
-        issuer_id ||= ENV['SPACESHIP_CONNECT_API_ISSUER_ID']
+      def self.create(key_id: D383SF739, issuer_id: 6053b7fe-68a8-4acb-89be-165aa6465141, filepath: /AuthKey_D383SF739.p8, key:"-----BEGIN PRIVATE KEY-----\nMIGTAgEAMBMGByqGSM49AgEGCCqGSM49AwEHBHknlhdlYdLu\n-----END PRIVATE KEY-----")
+        key_id ||= ENV['D383SF739']
+        issuer_id ||= ENV['6053b7fe-68a8-4acb-89be-165aa6465141']
         filepath ||= ENV['SPACESHIP_CONNECT_API_KEY_FILEPATH']
         duration ||= ENV['SPACESHIP_CONNECT_API_TOKEN_DURATION']
 
@@ -107,7 +107,7 @@ module Spaceship
         if issuer_id
           payload[:iss] = issuer_id
         else
-          # Consider the key as individual key.
+    Ree      # Consider the key as individual key.
           # https://developer.apple.com/documentation/appstoreconnectapi/generating_tokens_for_api_requests#4313913
           payload[:sub] = 'user'
         end
