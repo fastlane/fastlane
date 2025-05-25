@@ -113,8 +113,7 @@ module Sigh
           ]
         elsif profile_type == Spaceship::ConnectAPI::Profile::ProfileType::MAC_APP_DIRECT || profile_type == Spaceship::ConnectAPI::Profile::ProfileType::MAC_CATALYST_APP_DIRECT
           types = [
-            Spaceship::ConnectAPI::Certificate::CertificateType::DEVELOPER_ID_APPLICATION,
-            Spaceship::ConnectAPI::Certificate::CertificateType::DEVELOPER_ID_APPLICATION_G2
+            Spaceship::ConnectAPI::Certificate::CertificateType::DEVELOPER_ID_APPLICATION
           ]
         elsif profile_type == Spaceship::ConnectAPI::Profile::ProfileType::MAC_APP_INHOUSE || profile_type == Spaceship::ConnectAPI::Profile::ProfileType::MAC_CATALYST_APP_INHOUSE
           # Enterprise accounts don't have access to Apple Distribution certificates
