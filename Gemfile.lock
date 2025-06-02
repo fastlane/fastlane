@@ -119,7 +119,8 @@ GEM
     digest-crc (0.6.5)
       rake (>= 12.0.0, < 14.0.0)
     docile (1.3.5)
-    domain_name (0.6.20240107)
+    domain_name (0.5.20190701)
+      unf (>= 0.0.5, < 1.0.0)
     dotenv (2.8.1)
     emoji_regex (3.2.3)
     excon (0.109.0)
@@ -238,7 +239,7 @@ GEM
     pry-stack_explorer (0.4.12)
       binding_of_caller (~> 0.7)
       pry (~> 0.13)
-    public_suffix (6.0.1)
+    public_suffix (5.1.1)
     racc (1.7.1)
     rack (2.2.8)
     rack-protection (2.2.4)
@@ -332,6 +333,7 @@ GEM
     tty-spinner (0.9.3)
       tty-cursor (~> 0.7)
     uber (0.1.0)
+    unf (0.2.0)
     unicode-display_width (2.4.2)
     webmock (3.24.0)
       addressable (>= 2.8.0)
@@ -362,7 +364,7 @@ GEM
     yard (0.9.26)
 
 PLATFORMS
-  ruby
+  universal-darwin-24
 
 DEPENDENCIES
   climate_control (~> 0.2.0)
