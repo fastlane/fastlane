@@ -86,15 +86,16 @@ module Spaceship
 
       def self.create(client: nil, name: nil, profile_type: nil, bundle_id_id: nil, certificate_ids: nil, device_ids: nil, template_name: nil)
         client ||= Spaceship::ConnectAPI
+        attributes = {
+          name: name,
+          profileType: profile_type
+        }
+        attributes[:templateName] = template_name if template_name
         resp = client.post_profiles(
           bundle_id_id: bundle_id_id,
           certificates: certificate_ids,
           devices: device_ids,
-          attributes: {
-            name: name,
-            profileType: profile_type,
-            templateName: template_name
-          }
+          attributes: attributes
         )
         return resp.to_models.first
       end
