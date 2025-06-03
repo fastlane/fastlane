@@ -1,3 +1,4 @@
-This version has a required fix for authenticating with Apple via Apple ID. Apple started using their own variant of SRP (Secure Remote Password) using SHA-256 and 2048 bit hashing in the sign in flow. Any previous _fastlane_ versions will likely response a "503 Service Temporarily Unavailable" when authenicating with an Apple ID.
-
-* [spaceship] New AppleID Auth with SRP (#26415) via Josh Holtz (@snatchev and @joshdholtz)
+* [deliver] Fix altool not logging errors (#29545) via TCROC (@TCROC)
+* [precheck] fix typo in precheck error (#22086) via Hans Knöchel (@hansemannn)
+* [pilot] ability to upload ipas to Testflight from Linux (#22014) via Cristian Caruceru (@ccaruceru)
+* [docs] Clarify only-testing/skip-testing format (#27585) via Ben LaVerriere (@benlaverriere)
