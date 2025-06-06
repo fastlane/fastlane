@@ -222,5 +222,71 @@ describe Spaceship::ConnectAPI::Tunes::Client do
         end
       end
     end
+
+    describe "sandboxTesters" do
+      context 'post_sandbox_tester' do
+        let(:path) { "v1/sandboxTesters" }
+        let(:mock_email) { "test+#{SecureRandom.uuid}@example.com" }
+        let(:attributes) do
+          {
+            firstName: "Test",
+            lastName: "User",
+            email: mock_email,
+            territory: "USA"
+          }
+        end
+        let(:expected_body_attributes) do
+          attributes.merge(birthDate: an_instance_of(String))
+        end
+        let(:body) do
+          {
+            data: {
+              type: "sandboxTesters",
+              attributes: expected_body_attributes
+            }
+          }
+        end
+
+        it 'succeeds and includes a birthDate' do
+          url = path
+          # We need to ensure the attributes passed to test_request_body includes a birthDate
+          # The actual client.post_sandbox_tester call will modify the attributes hash internally.
+          # So we check that the *expected* body matches this.
+
+          # Stub the rand method to control birthDate for the purpose of this test
+          # This ensures that we can predict the birthDate if we wanted to, though here we only check for its presence and format.
+          allow_any_instance_of(Object).to receive(:rand).with(1970..2000).and_return(1985)
+          allow_any_instance_of(Object).to receive(:rand).with(1..12).and_return(6)
+          allow_any_instance_of(Object).to receive(:rand).with(1..28).and_return(15)
+          # Expected birthDate based on above stubs: "1985-06-15"
+
+          expected_attributes_with_birthdate = attributes.merge(birthDate: "1985-06-15")
+
+          req_mock = test_request_body(url, {
+            data: {
+              type: "sandboxTesters",
+              attributes: expected_attributes_with_birthdate
+            }
+          })
+
+          expect(client).to receive(:request).with(:post).and_yield(req_mock).and_return(req_mock)
+          client.post_sandbox_tester(attributes: attributes.dup) # Pass a dup as the method modifies the hash
+        end
+      end
+
+      context 'delete_sandbox_tester' do
+        let(:sandbox_tester_id) { "123456789" }
+        let(:path) { "v1/sandboxTesters/#{sandbox_tester_id}" }
+
+        it 'succeeds' do
+          url = path
+          params = {} # No query params expected
+          req_mock = test_request_params(url, params) # Used for GET and DELETE with params
+
+          expect(client).to receive(:request).with(:delete).and_yield(req_mock).and_return(req_mock)
+          client.delete_sandbox_tester(sandbox_tester_id: sandbox_tester_id)
+        end
+      end
+    end
   end
 end

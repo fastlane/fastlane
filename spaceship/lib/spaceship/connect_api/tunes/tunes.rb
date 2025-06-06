@@ -1196,6 +1196,13 @@ module Spaceship
         end
 
         def post_sandbox_tester(attributes: {})
+          if attributes[:birthDate].nil?
+            year = rand(1970..2000)
+            month = rand(1..12)
+            day = rand(1..28)
+            attributes[:birthDate] = format('%04d-%02d-%02d', year, month, day)
+          end
+
           body = {
             data: {
               type: "sandboxTesters",
