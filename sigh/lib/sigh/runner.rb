@@ -174,6 +174,10 @@ module Sigh
 
       UI.important("Creating new provisioning profile for '#{Sigh.config[:app_identifier]}' with name '#{name}' for '#{Sigh.config[:platform]}' platform")
 
+      unless Sigh.config[:template_name].nil?
+        UI.important("Template name is set to '#{Sigh.config[:template_name]}', however, this is not supported by the App Store Connect API anymore, since May 2025. The template name will be ignored. For more information: https://docs.fastlane.tools/actions/match/#managed-capabilities")
+      end
+
       profile = Spaceship::ConnectAPI::Profile.create(
         name: name,
         profile_type: profile_type,
