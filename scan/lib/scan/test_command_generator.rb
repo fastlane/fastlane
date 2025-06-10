@@ -54,7 +54,7 @@ module Scan
         options << "-scmProvider system"
       end
       if config[:package_authorization_provider] && !options.include?("-packageAuthorizationProvider #{config[:package_authorization_provider].shellescape}")
-        options << "-packageAuthorizationProvider #{options[:package_authorization_provider].shellescape}"
+        options << "-packageAuthorizationProvider #{config[:package_authorization_provider].shellescape}"
       end
       if config[:result_bundle_path]
         options << "-resultBundlePath #{config[:result_bundle_path].shellescape}"
