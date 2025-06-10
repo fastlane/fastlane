@@ -80,6 +80,9 @@ module Spaceship
       # API
       #
 
+      # Certificate types not supported by the App Store Connect API.
+      # https://api.appstoreconnect.apple.com/v1/certificates?filter[certificateType]=DEVELOPER_ID_APPLICATION_G2
+      # Radar: FB21181137.
       UNSUPPORTED_CERTIFICATE_TYPE_FILTERS = [
         CertificateType::DEVELOPER_ID_APPLICATION_G2
       ]
@@ -91,7 +94,9 @@ module Spaceship
 
         has_unsupported_cert_types_filter = filter[:certificateType] && UNSUPPORTED_CERTIFICATE_TYPE_FILTERS.any? { |type| filter[:certificateType].include?(type) }
 
-        # If the filter contains unsupported certificate types, remove the certificateType filter
+        # If the filter contains unsupported certificate types:
+        # - remove the certificateType filter completely and fetch all certificates
+        # - filter fetched certificates later by the given certificate types
         if has_unsupported_cert_types_filter
           new_filter[:certificateType] = nil
         end
@@ -102,6 +107,7 @@ module Spaceship
         certs = resps.flat_map(&:to_models)
 
         if has_unsupported_cert_types_filter
+          # Filter fetched certificates by the given certificate types if we encountered unsupported certificate types in the filter previously.
           certs.select! do |cert|
             filter[:certificateType].include?(cert.certificate_type)
           end
