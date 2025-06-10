@@ -125,7 +125,7 @@ module Scan
         # tests to run
         FastlaneCore::ConfigItem.new(key: :only_testing,
                                      env_name: "SCAN_ONLY_TESTING",
-                                     description: "Array of strings matching Test Bundle/Test Suite/Test Cases to run",
+                                     description: "Array of test identifiers to run. Expected format: TestTarget[/TestSuite[/TestCase]]",
                                      optional: true,
                                      is_string: false,
                                      verify_block: proc do |value|
@@ -133,7 +133,7 @@ module Scan
                                      end),
         FastlaneCore::ConfigItem.new(key: :skip_testing,
                                      env_name: "SCAN_SKIP_TESTING",
-                                     description: "Array of strings matching Test Bundle/Test Suite/Test Cases to skip",
+                                     description: "Array of test identifiers to skip. Expected format: TestTarget[/TestSuite[/TestCase]]",
                                      optional: true,
                                      is_string: false,
                                      verify_block: proc do |value|
