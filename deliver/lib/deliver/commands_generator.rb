@@ -154,7 +154,7 @@ module Deliver
 
       command :download_metadata do |c|
         c.syntax = 'fastlane deliver download_metadata'
-        c.description = "Downloads existing metadata and stores it locally. This overwrites the local files."
+        c.description = "Downloads existing metadata and stores it locally. Use --force option to overwrite local files without prompt."
 
         FastlaneCore::CommanderGenerator.new.generate(deliverfile_options, command: c)
 
@@ -165,6 +165,7 @@ module Deliver
           containing = FastlaneCore::Helper.fastlane_enabled_folder_path
           path = options[:metadata_path] || File.join(containing, 'metadata')
           res = Deliver::CommandsGenerator.force_overwrite_metadata?(options, path)
+          UI.message("Will not overwrite existing metadata (answered no, or tty not detected). To override: use --force option") unless res
           return 0 unless res
 
           require 'deliver/setup'

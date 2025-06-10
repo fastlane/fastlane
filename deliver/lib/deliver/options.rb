@@ -154,7 +154,7 @@ module Deliver
         FastlaneCore::ConfigItem.new(key: :force,
                                      short_option: "-f",
                                      env_name: "DELIVER_FORCE",
-                                     description: "Skip verification of HTML preview file",
+                                     description: "Skip verification of HTML preview file or overwrite existing metadata without prompt (download_metadata)",
                                      type: Boolean,
                                      default_value: false),
         FastlaneCore::ConfigItem.new(key: :overwrite_screenshots,
