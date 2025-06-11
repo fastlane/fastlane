@@ -1,3 +1,2 @@
-* [match] fix error with universal provisioning filter ("'UNIVERSAL' is not a valid filter value") (#29500) via Michael Neeley (@redreceipt)
-* Bump xcpretty to version 0.4.1 (#29516) via Iulian Onofrei (@revolter)
-* [scan] Remove unnecessary shellescape when generating -resultBundlePath option (#22285) via Junfeng (@hujunfeng)
+* [sigh][match] fix issue where unknown attribute `template_name` is being sent when creating provisioning profiles (#29591) via Florentin Luca Rieger (@visuallization)
+* [action][hipchat] remove hipchat action (#29558) via Eitan Adler (@grimreaper)
