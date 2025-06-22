@@ -70,17 +70,41 @@ describe Match do
     describe '#download' do
       let(:files_to_download) do
         [
-          instance_double('Aws::S3::Object', key: 'ABCDEFG/certs/development/ABCDEFG.cer', download_file: true),
-          instance_double('Aws::S3::Object', key: 'ABCDEFG/certs/development/ABCDEFG.p12', download_file: true)
+          instance_double('Aws::S3::Object', key: 'TEAMID1/certs/development/CERTID1.cer', download_file: true),
+          instance_double('Aws::S3::Object', key: 'TEAMID1/certs/development/CERTID1.p12', download_file: true),
+          instance_double('Aws::S3::Object', key: 'TEAMID2/certs/development/CERTID2.cer', download_file: true),
+          instance_double('Aws::S3::Object', key: 'TEAMID2/certs/development/CERTID2.p12', download_file: true)
         ]
       end
-      let(:s3_client) { instance_double('Fastlane::Helper::S3ClientHelper', find_bucket!: double(objects: files_to_download)) }
+      let(:bucket) { instance_double('Aws::S3::Bucket') }
+      let(:s3_client) { instance_double('Fastlane::Helper::S3ClientHelper', find_bucket!: bucket) }
+
+      def stub_bucket_content(objects: files_to_download)
+        allow(bucket).to receive(:objects) do |options|
+          objects.select { |file_object| file_object.key.start_with?(options[:prefix] || '') }
+        end
+      end
 
       before { class_double('FileUtils', mkdir_p: true).as_stubbed_const }
 
       it 'downloads to correct working directory' do
+        stub_bucket_content
         files_to_download.each do |file_object|
           expect(file_object).to receive(:download_file).with("#{working_directory}/#{file_object.key}")
+        end
+
+        subject.download
+      end
+
+      it 'only downloads files specific to the provided team' do
+        stub_bucket_content
+        allow(subject).to receive(:team_id).and_return('TEAMID2')
+        files_to_download.each do |file_object|
+          if file_object.key.start_with?('TEAMID2')
+            expect(file_object).to receive(:download_file).with("#{working_directory}/#{file_object.key}")
+          else
+            expect(file_object).not_to receive(:download_file)
+          end
         end
 
         subject.download
@@ -89,8 +113,13 @@ describe Match do
       it 'downloads files and strips the s3_object_prefix for working_directory path' do
         allow(subject).to receive(:s3_object_prefix).and_return('123456/')
 
-        files_to_download.each do |file_object|
-          expect(file_object).to receive(:download_file).with("#{working_directory}/#{file_object.key}")
+        prefixed_objects = files_to_download.map do |obj|
+          instance_double('Aws::S3::Object', key: "123456/#{obj.key}", download_file: true)
+        end
+        stub_bucket_content(objects: prefixed_objects)
+
+        prefixed_objects.each do |file_object|
+          expect(file_object).to receive(:download_file).with("#{working_directory}/#{file_object.key.delete_prefix('123456/')}")
         end
 
         subject.download

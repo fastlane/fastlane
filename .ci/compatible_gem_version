@@ -1,0 +1,27 @@
+#!/usr/bin/env ruby
+#
+# prints out the latest version number of the gem compatible with the given version of ruby
+#
+require 'net/http'
+require 'json'
+
+GEM_TO_TEST = "rubygems-update"
+
+if ARGV.count > 0
+  RUBY_VERSION_TO_MATCH = ARGV[0]
+else
+  RUBY_VERSION_TO_MATCH = RUBY_VERSION
+end
+
+API_URL = "https://rubygems.org/api/v1/versions/#{GEM_TO_TEST}.json"
+
+# Load list of all available versions of GEM_TO_TEST
+gem_versions = JSON.parse(Net::HTTP.get(URI(API_URL)))
+
+# Process list to find matching Ruby version
+matching_gem = gem_versions.find { |gem|
+  Gem::Dependency.new('', gem['ruby_version']).
+    match?('', RUBY_VERSION_TO_MATCH)
+}
+
+puts matching_gem['number']

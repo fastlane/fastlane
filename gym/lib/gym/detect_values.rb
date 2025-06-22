@@ -147,6 +147,8 @@ module Gym
 
       platform = if Gym.project.tvos?
                    "tvOS"
+                 elsif Gym.project.visionos?
+                   "visionOS"
                  elsif Gym.building_for_ios?
                    "iOS"
                  elsif Gym.building_for_mac?

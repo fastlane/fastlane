@@ -1,10 +1,19 @@
 require 'fastlane_core/device_manager'
 require 'fastlane_core/project'
+require 'pathname'
+require 'set'
 require_relative 'module'
 
 module Scan
   # This class detects all kinds of default values
   class DetectValues
+    PLATFORMS = {
+      'iOS' => { simulator: 'iphonesimulator', name: 'com.apple.platform.iphoneos' },
+      'tvOS' => { simulator: 'appletvsimulator', name: 'com.apple.platform.appletvos' },
+      'watchOS' => { simulator: 'watchsimulator', name: 'com.apple.platform.watchos' },
+      'visionOS' => { simulator: 'xrsimulator', name: 'com.apple.platform.xros' }
+    }.freeze
+
     # This is needed as these are more complex default values
     # Returns the finished config object
     def self.set_additional_default_values
@@ -100,6 +109,66 @@ module Scan
       end
     end
 
+    def self.default_os_version(os_type)
+      @os_versions ||= {}
+      @os_versions[os_type] ||= begin
+        UI.crash!("Unknown platform: #{os_type}") unless PLATFORMS.key?(os_type)
+        platform = PLATFORMS[os_type]
+
+        _, error, = Open3.capture3('xcrun simctl runtime -h')
+        unless error.include?('Usage: simctl runtime <operation> <arguments>')
+          UI.error("xcrun simctl runtime broken, run 'xcrun simctl runtime' and make sure it works")
+          UI.user_error!("xcrun simctl runtime not working.")
+        end
+
+        # `match list` subcommand added in Xcode 15
+        if error.include?('match list')
+
+          # list SDK version for currently running Xcode
+          sdks_output, status = Open3.capture2('xcodebuild -showsdks -json')
+          sdk_version = begin
+            raise status unless status.success?
+            JSON.parse(sdks_output).find { |e| e['platform'] == platform[:simulator] }['sdkVersion']
+          rescue StandardError => e
+            UI.error(e)
+            UI.error("xcodebuild CLI broken, please run `xcodebuild` and make sure it works")
+            UI.user_error!("xcodebuild not working")
+          end
+
+          # Get runtime build from SDK version
+          runtime_output, status = Open3.capture2('xcrun simctl runtime match list -j')
+          runtime_build = begin
+            raise status unless status.success?
+            JSON.parse(runtime_output).values.find { |elem| elem['platform'] == platform[:name] && elem['sdkVersion'] == sdk_version }['chosenRuntimeBuild']
+          rescue StandardError => e
+            UI.error(e)
+            UI.error("xcrun simctl runtime broken, please verify that `xcrun simctl runtime match list` and `xcrun simctl runtime list` work")
+            UI.user_error!("xcrun simctl runtime not working")
+          end
+
+          # Get OS version corresponding to build
+          Gem::Version.new(FastlaneCore::DeviceManager.runtime_build_os_versions[runtime_build])
+        end
+      end
+    end
+
+    def self.clear_cache
+      @os_versions = nil
+    end
+
+    def self.compatibility_constraint(sim, device_name)
+      latest_os = default_os_version(sim.os_type)
+      sim.name == device_name && (latest_os.nil? || Gem::Version.new(sim.os_version) <= latest_os)
+    end
+
+    def self.highest_compatible_simulator(simulators, device_name)
+      simulators
+        .select { |sim| compatibility_constraint(sim, device_name) }
+        .reverse
+        .sort_by! { |sim| Gem::Version.new(sim.os_version) }
+        .last
+    end
+
     def self.regular_expression_for_split_on_whitespace_followed_by_parenthesized_version
       # %r{
       #   \s # a whitespace character
@@ -114,10 +183,9 @@ module Scan
     end
 
     def self.detect_simulator(devices, requested_os_type, deployment_target_key, default_device_name, simulator_type_descriptor)
-      require 'set'
+      clear_cache
 
       deployment_target_version = get_deployment_target_version(deployment_target_key)
-
       simulators = filter_simulators(
         FastlaneCore::DeviceManager.simulators(requested_os_type).tap do |array|
           if array.empty?
@@ -137,26 +205,23 @@ module Scan
       # We create 2 lambdas, which we iterate over later on
       # If the first lambda `matches` found a simulator to use
       # we'll never call the second one
-
       matches = lambda do
         set_of_simulators = devices.inject(
           Set.new # of simulators
         ) do |set, device_string|
           pieces = device_string.split(regular_expression_for_split_on_whitespace_followed_by_parenthesized_version)
 
-          selector = ->(sim) { pieces.count > 0 && sim.name == pieces.first }
+          display_device = "'#{device_string}'"
 
           set + (
             if pieces.count == 0
               [] # empty array
             elsif pieces.count == 1
-              simulators
-                .select(&selector)
-                .reverse # more efficient, because `simctl` prints higher versions first
-                .sort_by! { |sim| Gem::Version.new(sim.os_version) }
-                .pop(1)
+              [ highest_compatible_simulator(simulators, pieces.first) ].compact
             else # pieces.count == 2 -- mathematically, because of the 'end of line' part of our regular expression
               version = pieces[1].tr('()', '')
+              display_device = "'#{pieces[0]}' with version #{version}"
+
               potential_emptiness_error = lambda do |sims|
                 if sims.empty?
                   UI.error("No simulators found that are equal to the version " \
@@ -164,12 +229,12 @@ module Scan
                   "of deployment target (#{deployment_target_version})")
                 end
               end
-              filter_simulators(simulators, :equal, version).tap(&potential_emptiness_error).select(&selector)
+              filter_simulators(simulators, :equal, version).tap(&potential_emptiness_error).select { |sim| sim.name == pieces.first }
             end
           ).tap do |array|
             if array.empty?
-              UI.test_failure!("No device found with name '#{device_string}'") if Scan.config[:ensure_devices_found]
-              UI.error("Ignoring '#{device_string}', couldn’t find matching simulator")
+              UI.test_failure!("No device found with name #{display_device}") if Scan.config[:ensure_devices_found]
+              UI.error("Ignoring '#{device_string}', couldn't find matching simulator")
             end
           end
         end
@@ -181,13 +246,7 @@ module Scan
         default = lambda do
           UI.error("Couldn't find any matching simulators for '#{devices}' - falling back to default simulator") if (devices || []).count > 0
 
-          result = Array(
-            simulators
-              .select { |sim| sim.name == default_device_name }
-              .reverse # more efficient, because `simctl` prints higher versions first
-              .sort_by! { |sim| Gem::Version.new(sim.os_version) }
-              .last || simulators.first
-          )
+          result = [ highest_compatible_simulator(simulators, default_device_name) || simulators.first ]
 
           UI.message("Found simulator \"#{result.first.name} (#{result.first.os_version})\"") if result.first
 
@@ -244,7 +303,6 @@ module Scan
       version = Scan.config[:deployment_target_version]
       version ||= Scan.project.build_settings(key: deployment_target_key) if Scan.project
       version ||= 0
-
       return version
     end
   end

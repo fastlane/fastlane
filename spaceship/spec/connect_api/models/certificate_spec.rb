@@ -1,5 +1,5 @@
 describe Spaceship::ConnectAPI::Certificate do
-  before { Spaceship::Portal.login }
+  include_examples "common spaceship login"
 
   describe '#client' do
     it '#get_certificates' do
@@ -44,6 +44,22 @@ describe Spaceship::ConnectAPI::Certificate do
 
       it 'should be valid' do
         expect(certificate.valid?).to eq(true)
+      end
+    end
+
+    context 'when expiration_date is nil' do
+      before { certificate.expiration_date = nil }
+
+      it 'should be invalid' do
+        expect(certificate.valid?).to eq(false)
+      end
+    end
+
+    context 'when expiration_date is an empty string' do
+      before { certificate.expiration_date = "" }
+
+      it 'should be invalid' do
+        expect(certificate.valid?).to eq(false)
       end
     end
   end

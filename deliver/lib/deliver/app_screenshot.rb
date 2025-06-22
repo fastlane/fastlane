@@ -201,7 +201,7 @@ module Deliver
 
     def self.device_messages
       # This list does not include iPad Pro 12.9-inch (3rd generation)
-      # because it has same resoluation as IOS_IPAD_PRO and will clobber
+      # because it has same resolution as IOS_IPAD_PRO and will clobber
       return {
         ScreenSize::IOS_67_MESSAGES => [
           [1290, 2796],
@@ -265,7 +265,7 @@ module Deliver
     # reference: https://help.apple.com/app-store-connect/#/devd274dd925
     def self.devices
       # This list does not include iPad Pro 12.9-inch (3rd generation)
-      # because it has same resoluation as IOS_IPAD_PRO and will clobber
+      # because it has same resolution as IOS_IPAD_PRO and will clobber
       return {
         ScreenSize::IOS_67 => [
           [1290, 2796],

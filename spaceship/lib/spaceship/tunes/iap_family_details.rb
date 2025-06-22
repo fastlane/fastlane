@@ -9,13 +9,13 @@ module Spaceship
       # @return (String) the family name
       attr_accessor :name
 
-      # @return (Intger) the family id
+      # @return (Integer) the family id
       attr_accessor :family_id
 
       # @return (Array) all linked in-app purchases of this family
       attr_accessor :linked_iaps
 
-      # @return (Intger) amount of linked in-app purchases of this family (read-only)
+      # @return (Integer) amount of linked in-app purchases of this family (read-only)
       attr_accessor :iap_count
 
       # @return (Array) of all in-app purchase family details

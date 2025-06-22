@@ -1,10 +1,13 @@
 require_relative '../mock_servers'
+require 'fastlane-sirp'
 
 describe Spaceship::Client do
-  before { Spaceship.login }
+  # Skip tunes login and login with portal
+  include_examples "common spaceship login", true
+  before {
+    Spaceship.login
+  }
   subject { Spaceship.client }
-  let(:username) { 'spaceship@krausefx.com' }
-  let(:password) { 'so_secret' }
 
   describe '#login' do
     it 'sets the session cookies' do
@@ -259,7 +262,7 @@ describe Spaceship::Client do
                                                 "deviceIds",
                                                 "appId",
                                                 "certificateIds")
-        expect(a_request(:post, /developerservices2.apple.com/)).to have_been_made
+        expect(a_request(:post, /developerservices2\.apple\.com/)).to have_been_made
       end
     end
 

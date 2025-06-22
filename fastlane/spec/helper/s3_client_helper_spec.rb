@@ -44,12 +44,12 @@ describe Fastlane::Helper::S3ClientHelper do
     end
 
     it 'passes region if given' do
-      expect(Aws::S3::Client).to receive(:new).with(region: 'aws-region').and_return(s3_client)
+      expect(Aws::S3::Client).to receive(:new).with({ region: 'aws-region' }).and_return(s3_client)
       described_class.new(region: 'aws-region').list_buckets
     end
 
     it 'creates credentials if access_key and secret are given' do
-      expect(Aws::S3::Client).to receive(:new).with(credentials: s3_credentials).and_return(s3_client)
+      expect(Aws::S3::Client).to receive(:new).with({ credentials: s3_credentials }).and_return(s3_client)
       described_class.new(access_key: 'access_key', secret_access_key: 'secret_access_key').list_buckets
     end
 

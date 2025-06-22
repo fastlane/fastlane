@@ -223,7 +223,7 @@ describe Fastlane do
         end.to raise_error("Please pass the path to the project or its containing directory, not the workspace path")
       end
 
-      it "raises an exception when user passes non-existent directory" do
+      it "raises an exception when user passes nonexistent directory" do
         expect do
           Fastlane::FastFile.new.parse("lane :test do
             get_version_number(xcodeproj: '/path/to/random/directory')

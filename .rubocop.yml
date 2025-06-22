@@ -202,7 +202,7 @@ Style/RedundantReturn:
 Style/IfUnlessModifier:
   Enabled: false
 
-# and and or is okay
+# "and" and "or" are okay
 Style/AndOr:
   Enabled: true
   EnforcedStyle: conditionals
@@ -341,3 +341,12 @@ Style/MethodCallWithArgsParentheses:
     - 'context'
     - 'before'
     - 'after'
+
+# Sorts the gems in the Gemfile alphabetically.
+Bundler/OrderedGems:
+  Enabled: true
+  TreatCommentsAsGroupSeparators: false
+
+Gemspec/DevelopmentDependencies:
+   Enabled: true
+   EnforcedStyle: Gemfile

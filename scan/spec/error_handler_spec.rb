@@ -7,19 +7,21 @@ describe Scan do
     describe "handle_build_error" do
       describe "when parsing parallel test failure output" do
         it "does not report a build failure" do
+          expect(Scan).to receive(:config).and_return({})
           output = File.open('./scan/spec/fixtures/parallel_testing_failure.log', &:read)
           expect do
             Scan::ErrorHandler.handle_build_error(output, log_path)
-          end.to_not(raise_error(FastlaneCore::Interface::FastlaneBuildFailure))
+          end.not_to raise_error
         end
       end
 
       describe "when parsing non-parallel test failure output" do
         it "does not report a build failure" do
+          expect(Scan).to receive(:config).and_return({})
           output = File.open('./scan/spec/fixtures/non_parallel_testing_failure.log', &:read)
           expect do
             Scan::ErrorHandler.handle_build_error(output, log_path)
-          end.to_not(raise_error(FastlaneCore::Interface::FastlaneBuildFailure))
+          end.to_not(raise_error)
         end
       end
 
@@ -40,23 +42,19 @@ describe Scan do
         end
 
         it "mentions log above when not suppressing output", requires_xcodebuild: true do
-          expect(FastlaneCore::UI).to receive(:build_failure!).with("Error building the application. See the log above.")
-
           output = File.open(output_path, &:read)
           expect do
             Scan::ErrorHandler.handle_build_error(output, log_path)
-          end.to(raise_error)
+          end.to(raise_error(FastlaneCore::Interface::FastlaneBuildFailure, "Error building the application. See the log above."))
         end
 
         it "mentions log file when suppressing output", requires_xcodebuild: true do
           Scan.config[:suppress_xcode_output] = true
 
-          expect(FastlaneCore::UI).to receive(:build_failure!).with("Error building the application. See the log here: '#{log_path}'.")
-
           output = File.open(output_path, &:read)
           expect do
             Scan::ErrorHandler.handle_build_error(output, log_path)
-          end.to(raise_error)
+          end.to(raise_error(FastlaneCore::Interface::FastlaneBuildFailure, "Error building the application. See the log here: '#{log_path}'."))
         end
       end
     end

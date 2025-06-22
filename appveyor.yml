@@ -24,6 +24,8 @@ init:
 
 install:
   - set PATH=C:\Ruby26-x64\bin;%PATH%
+  - FOR /F "usebackq delims==" %%A IN (`ruby .ci/compatible_gem_version`) DO gem update --system %%A
+  - FOR /F "usebackq delims==" %%A IN (`ruby .ci/bundler_version.rb`) DO gem install bundler -v %%A
   - bundle install
   # iconv
   - appveyor DownloadFile

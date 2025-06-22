@@ -101,8 +101,11 @@ module Match
         # No existing working directory, creating a new one now
         self.working_directory = Dir.mktmpdir
 
-        s3_client.find_bucket!(s3_bucket).objects(prefix: s3_object_prefix).each do |object|
+        # If team_id is defined, use `:team/` as a prefix (appending it at the end of the `s3_object_prefix` if one provided by the user),
+        # so that we limit the download to only files that are specific to this team, and avoid downloads + decryption of unnecessary files.
+        key_prefix = team_id.nil? ? s3_object_prefix : File.join(s3_object_prefix, team_id, '').delete_prefix('/')
 
+        s3_client.find_bucket!(s3_bucket).objects(prefix: key_prefix).each do |object|
           # Prevent download if the file path is a directory.
           # We need to check if string ends with "/" instead of using `File.directory?` because
           # the string represent a remote location, not a local file in disk.
@@ -121,7 +124,7 @@ module Match
         UI.verbose("Successfully downloaded files from S3 to #{self.working_directory}")
       end
 
-      # Returns a short string describing + identifing the current
+      # Returns a short string describing + identifying the current
       # storage backend. This will be printed when nuking a storage
       def human_readable_description
         return "S3 Bucket [#{s3_bucket}] on region #{s3_region}"
@@ -181,7 +184,7 @@ module Match
       end
 
       def strip_s3_object_prefix(object_path)
-        object_path.gsub(/^#{s3_object_prefix}/, "")
+        object_path.delete_prefix(s3_object_prefix.to_s).delete_prefix('/')
       end
 
       def sanitize_file_name(file_name)

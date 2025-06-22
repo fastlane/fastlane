@@ -162,7 +162,7 @@ module Fastlane
       end
 
       def print_bundle_exec_warning(is_slow: false)
-        return if FastlaneCore::Helper.bundler? # user is alread using bundler
+        return if FastlaneCore::Helper.bundler? # user is already using bundler
         return if FastlaneCore::Env.truthy?('SKIP_SLOW_FASTLANE_WARNING') # user disabled the warnings
         return if FastlaneCore::Helper.contained_fastlane? # user uses the bundled fastlane
 

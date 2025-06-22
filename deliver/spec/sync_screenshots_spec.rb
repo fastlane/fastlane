@@ -2,11 +2,11 @@ require 'deliver/sync_screenshots'
 require 'fakefs/spec_helpers'
 
 describe Deliver::SyncScreenshots do
-  describe '#do_replace_screeshots' do
+  describe '#do_replace_screenshots' do
+
     subject { described_class.new(app: nil, platform: nil) }
 
     DisplayType = Spaceship::ConnectAPI::AppScreenshotSet::DisplayType
-    ScreenSize = Deliver::AppScreenshot::ScreenSize
 
     before do
       # To emulate checksum calculation, return the given path as a checksum
@@ -20,10 +20,10 @@ describe Deliver::SyncScreenshots do
     context 'ASC has nothing and going to add screenshots' do
       let(:screenshots) do
         [
-          mock_screenshot(path: '5.5_1.jpg', screen_size: ScreenSize::IOS_55),
-          mock_screenshot(path: '5.5_2.jpg', screen_size: ScreenSize::IOS_55),
-          mock_screenshot(path: '6.5_1.jpg', screen_size: ScreenSize::IOS_65),
-          mock_screenshot(path: '6.5_2.jpg', screen_size: ScreenSize::IOS_65)
+          mock_screenshot(path: '5.5_1.jpg', screen_size: Deliver::AppScreenshot::ScreenSize::IOS_55),
+          mock_screenshot(path: '5.5_2.jpg', screen_size: Deliver::AppScreenshot::ScreenSize::IOS_55),
+          mock_screenshot(path: '6.5_1.jpg', screen_size: Deliver::AppScreenshot::ScreenSize::IOS_65),
+          mock_screenshot(path: '6.5_2.jpg', screen_size: Deliver::AppScreenshot::ScreenSize::IOS_65)
         ]
       end
 
@@ -53,10 +53,10 @@ describe Deliver::SyncScreenshots do
     context 'ASC has a screenshot on each screenshot set and going to add another screenshot' do
       let(:screenshots) do
         [
-          mock_screenshot(path: '5.5_1.jpg', screen_size: ScreenSize::IOS_55),
-          mock_screenshot(path: '5.5_2.jpg', screen_size: ScreenSize::IOS_55),
-          mock_screenshot(path: '6.5_1.jpg', screen_size: ScreenSize::IOS_65),
-          mock_screenshot(path: '6.5_2.jpg', screen_size: ScreenSize::IOS_65)
+          mock_screenshot(path: '5.5_1.jpg', screen_size: Deliver::AppScreenshot::ScreenSize::IOS_55),
+          mock_screenshot(path: '5.5_2.jpg', screen_size: Deliver::AppScreenshot::ScreenSize::IOS_55),
+          mock_screenshot(path: '6.5_1.jpg', screen_size: Deliver::AppScreenshot::ScreenSize::IOS_65),
+          mock_screenshot(path: '6.5_2.jpg', screen_size: Deliver::AppScreenshot::ScreenSize::IOS_65)
         ]
       end
 
@@ -126,10 +126,10 @@ describe Deliver::SyncScreenshots do
 
       let(:screenshots) do
         [
-          mock_screenshot(path: '5.5_1.jpg', screen_size: ScreenSize::IOS_55),
-          mock_screenshot(path: '5.5_2_improved.jpg', screen_size: ScreenSize::IOS_55),
-          mock_screenshot(path: '6.5_1.jpg', screen_size: ScreenSize::IOS_65),
-          mock_screenshot(path: '6.5_2_improved.jpg', screen_size: ScreenSize::IOS_65)
+          mock_screenshot(path: '5.5_1.jpg', screen_size: Deliver::AppScreenshot::ScreenSize::IOS_55),
+          mock_screenshot(path: '5.5_2_improved.jpg', screen_size: Deliver::AppScreenshot::ScreenSize::IOS_55),
+          mock_screenshot(path: '6.5_1.jpg', screen_size: Deliver::AppScreenshot::ScreenSize::IOS_65),
+          mock_screenshot(path: '6.5_2_improved.jpg', screen_size: Deliver::AppScreenshot::ScreenSize::IOS_65)
         ]
       end
 

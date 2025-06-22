@@ -78,15 +78,23 @@ module Fastlane
     end
 
     def self.print_error_line(ex)
-      error_line = ex.backtrace.first
-      return if error_line.nil?
+      lines = ex.backtrace_locations&.select { |loc| loc.path == 'Fastfile' }&.map(&:lineno)
+      return if lines.nil? || lines.empty?
 
-      error_line = error_line.match("Fastfile:(\\d+):")
-      return unless error_line
+      fastfile_content = File.read(FastlaneCore::FastlaneFolder.fastfile_path, encoding: "utf-8")
+      if ex.backtrace_locations.first&.path == 'Fastfile'
+        # If exception happened directly in the Fastfile itself (e.g. ArgumentError)
+        UI.error("Error in your Fastfile at line #{lines.first}")
+        UI.content_error(fastfile_content, lines.first)
+        lines.shift
+      end
 
-      line = error_line[1]
-      UI.error("Error in your Fastfile at line #{line}")
-      UI.content_error(File.read(FastlaneCore::FastlaneFolder.fastfile_path, encoding: "utf-8"), line)
+      unless lines.empty?
+        # If exception happened directly in the Fastfile, also print the caller (still from the Fastfile).
+        # If exception happened in _fastlane_ internal code, print the line from the Fastfile that called it
+        UI.error("Called from Fastfile at line #{lines.first}")
+        UI.content_error(fastfile_content, lines.first)
+      end
     end
   end
 end
