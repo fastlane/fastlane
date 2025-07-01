@@ -301,7 +301,7 @@ module Scan
     # get deployment target version
     def self.get_deployment_target_version(deployment_target_key)
       version = Scan.config[:deployment_target_version]
-      version ||= Scan.project.build_settings(key: deployment_target_key) if Scan.project
+      version ||= Scan.project.build_settings(key: deployment_target_key) if Scan.project && !deployment_target_key.empty?
       version ||= 0
       return version
     end
