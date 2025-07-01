@@ -406,14 +406,16 @@ If you're not using `Fastfile`, you can also use the `force_for_new_devices` opt
 fastlane match adhoc --force_for_new_devices
 ```
 
-##### Templates (aka: custom entitlements)
+##### Managed capabilities
 
-_match_ can generate profiles that contain custom entitlements by passing in the entitlement's name with the `template_name` parameter.
+> [!IMPORTANT]
+> This feature has been deprecated since May 2025, until Apple provides a new solution. We will update this documentation once we have more information on how to handle managed capabilities in the future.
 
-```
-match(type: "development",
-      template_name: "Apple Pay Pass Suppression Development")
-```
+Managed capabilities — formerly known as "additional entitlements" or "custom entitlements", enabled via "templates" — are additional capabilities that require Apple's review and approval before they can be distributed.
+
+These capabilities used to be enabled by passing a `template_name` parameter to the _match_ action, which would then generate a provisioning profile with the entitlements specified by the given template. However, this feature was never officially supported by Apple's API (undocumented), and they eventually removed it in May 2025 ([see issue #29498](https://github.com/fastlane/fastlane/issues/29498)). Apple still hasn't provided a replacement for this functionality.
+
+As a result, the `template_name` parameter was deprecated in the _match_ action, and it will not generate provisioning profiles with custom entitlements.
 
 ### Setup Xcode project
 
