@@ -23,31 +23,31 @@ Gem::Specification.new do |spec|
   spec.version       = Fastlane::VERSION
   # list of authors is regenerated and resorted on each release
   spec.authors       = ["Maksym Grebenets",
-                        "Felix Krause",
-                        "Matthew Ellis",
-                        "Stefan Natchev",
-                        "Iulian Onofrei",
-                        "Aaron Brager",
-                        "Helmut Januschka",
-                        "Jimmy Dee",
-                        "Jorge Revuelta H",
-                        "Danielle Tomlinson",
-                        "Olivier Halligon",
-                        "Luka Mirosevic",
-                        "Manu Wallner",
-                        "Jan Piotrowski",
-                        "Joshua Liebowitz",
-                        "Fumiya Nakamura",
-                        "Kohki Miki",
-                        "Łukasz Grabowski",
-                        "Andrew McBurney",
-                        "Josh Holtz",
-                        "Roger Oba",
-                        "Max Ott",
-                        "Daniel Jankowski",
-                        "Manish Rathi",
                         "Jérôme Lacoste",
-                        "Satoshi Namai"]
+                        "Jorge Revuelta H",
+                        "Andrew McBurney",
+                        "Fumiya Nakamura",
+                        "Satoshi Namai",
+                        "Jan Piotrowski",
+                        "Kohki Miki",
+                        "Luka Mirosevic",
+                        "Joshua Liebowitz",
+                        "Josh Holtz",
+                        "Daniel Jankowski",
+                        "Felix Krause",
+                        "Danielle Tomlinson",
+                        "Aaron Brager",
+                        "Jimmy Dee",
+                        "Helmut Januschka",
+                        "Manish Rathi",
+                        "Manu Wallner",
+                        "Łukasz Grabowski",
+                        "Olivier Halligon",
+                        "Stefan Natchev",
+                        "Max Ott",
+                        "Iulian Onofrei",
+                        "Matthew Ellis",
+                        "Roger Oba"]
 
   spec.email         = ["fastlane@krausefx.com"]
   spec.summary       = Fastlane::SUMMARY
@@ -66,7 +66,7 @@ Gem::Specification.new do |spec|
 
   spec.files = Dir.glob("*/lib/**/*", File::FNM_DOTMATCH) + Dir["fastlane/swift/**/*"] + Dir["bin/*"] + Dir["*/README.md"] + %w(README.md LICENSE .yardopts) - Dir["fastlane/lib/fastlane/actions/device_grid/assets/*"] - Dir["fastlane/lib/fastlane/actions/docs/assets/*"]
   spec.bindir = "bin"
-  spec.executables = spec.files.grep(%r{^bin/}) { |f| File.basename(f) }
+  spec.executables = spec.files.grep(%r{^bin/}) { |f| File.basename(f) } - ["bin/console"]
   spec.require_paths = Dir["*/lib"]
 
   spec.add_dependency('addressable', '>= 2.8', '< 3.0.0') # Support for URI templates
