@@ -69,6 +69,8 @@ module Deliver
       IOS_APPLE_WATCH_SERIES4 = "iOS-Apple-Watch-Series4"
       # Apple Watch Series 7
       IOS_APPLE_WATCH_SERIES7 = "iOS-Apple-Watch-Series7"
+      # Apple Watch Series 10
+      IOS_APPLE_WATCH_SERIES10 = "iOS-Apple-Watch-Series10"
       # Apple Watch Ultra
       IOS_APPLE_WATCH_ULTRA = "iOS-Apple-Watch-Ultra"
 
@@ -130,6 +132,7 @@ module Deliver
         ScreenSize::IOS_APPLE_WATCH => Spaceship::ConnectAPI::AppScreenshotSet::DisplayType::APP_WATCH_SERIES_3,
         ScreenSize::IOS_APPLE_WATCH_SERIES4 => Spaceship::ConnectAPI::AppScreenshotSet::DisplayType::APP_WATCH_SERIES_4,
         ScreenSize::IOS_APPLE_WATCH_SERIES7 => Spaceship::ConnectAPI::AppScreenshotSet::DisplayType::APP_WATCH_SERIES_7,
+        ScreenSize::IOS_APPLE_WATCH_SERIES10 => Spaceship::ConnectAPI::AppScreenshotSet::DisplayType::APP_WATCH_SERIES_10,
         ScreenSize::IOS_APPLE_WATCH_ULTRA => Spaceship::ConnectAPI::AppScreenshotSet::DisplayType::APP_WATCH_ULTRA,
         ScreenSize::APPLE_TV => Spaceship::ConnectAPI::AppScreenshotSet::DisplayType::APP_APPLE_TV
       }
@@ -168,6 +171,7 @@ module Deliver
         ScreenSize::IOS_APPLE_WATCH => "Watch",
         ScreenSize::IOS_APPLE_WATCH_SERIES4 => "Watch Series4",
         ScreenSize::IOS_APPLE_WATCH_SERIES7 => "Watch Series7",
+        ScreenSize::IOS_APPLE_WATCH_SERIES10 => "Watch Series10",
         ScreenSize::IOS_APPLE_WATCH_ULTRA => "Watch Ultra",
         ScreenSize::APPLE_TV => "Apple TV"
       }
@@ -343,6 +347,9 @@ module Deliver
         ],
         ScreenSize::IOS_APPLE_WATCH_SERIES7 => [
           [396, 484]
+        ],
+        ScreenSize::IOS_APPLE_WATCH_SERIES10 => [
+          [416, 496]
         ],
         ScreenSize::IOS_APPLE_WATCH_ULTRA => [
           [410, 502]
