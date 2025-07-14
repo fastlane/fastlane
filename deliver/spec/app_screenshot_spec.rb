@@ -80,9 +80,9 @@ describe Deliver::AppScreenshot do
       end
 
       it "should calculate all 6.1 inch iPhone resolutions" do
-         expect_screen_size_from_file("iPhone14Pro-Portrait{1206x2622}.jpg").to eq(Deliver::AppScreenshot::ScreenSize::IOS_63)
+        expect_screen_size_from_file("iPhone14Pro-Portrait{1206x2622}.jpg").to eq(Deliver::AppScreenshot::ScreenSize::IOS_63)
         expect_screen_size_from_file("iPhone14Pro-Landscape{2622x1206}.jpg").to eq(Deliver::AppScreenshot::ScreenSize::IOS_63)
-       expect_screen_size_from_file("iPhone14Pro-Portrait{1179x2556}.jpg").to eq(Deliver::AppScreenshot::ScreenSize::IOS_63)
+        expect_screen_size_from_file("iPhone14Pro-Portrait{1179x2556}.jpg").to eq(Deliver::AppScreenshot::ScreenSize::IOS_63)
         expect_screen_size_from_file("iPhone14Pro-Landscape{2556x1179}.jpg").to eq(Deliver::AppScreenshot::ScreenSize::IOS_63)
       end
 
