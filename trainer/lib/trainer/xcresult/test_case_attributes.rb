@@ -19,13 +19,6 @@ module Trainer
       end
 
       module ClassMethods
-        def parse_duration(duration_str)
-          return 0.0 if duration_str.nil?
-
-          # Handle comma-separated duration, and remove 's' suffix
-          duration_str.gsub(',', '.').chomp('s').to_f
-        end
-
         def extract_failure_messages(node)
           node['children']
             &.select { |child| child['nodeType'] == 'Failure Message' }

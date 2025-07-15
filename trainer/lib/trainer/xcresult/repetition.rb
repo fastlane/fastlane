@@ -27,7 +27,7 @@ module Trainer
       def self.from_json(node:)
         new(
           name: node['name'],
-          duration: parse_duration(node['duration']),
+          duration: node['durationInSeconds'],
           result: node['result'],
           failure_messages: extract_failure_messages(node),
           source_references: extract_source_references(node),
