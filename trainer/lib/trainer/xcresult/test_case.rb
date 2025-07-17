@@ -74,7 +74,7 @@ module Trainer
           new(
             name: node['name'],
             identifier: node['nodeIdentifier'],
-            duration: node['durationInSeconds'],
+            duration: extract_duration(node),
             result: node_for_attributes['result'],
             classname: extract_classname(node),
             argument: arg_node&.[]('name'), # Only set if there is an argument
