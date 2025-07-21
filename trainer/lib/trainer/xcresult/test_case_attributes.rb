@@ -23,7 +23,7 @@ module Trainer
       module ClassMethods
         def extract_duration(node)
           if FastlaneCore::Helper.xcode_at_least?('16.3')
-            node['durationInSeconds']
+            node['durationInSeconds'] || 0.0
           else
             duration_str = node['duration']
 
