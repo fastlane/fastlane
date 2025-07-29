@@ -1,5 +1,6 @@
 module Fastlane
   module Actions
+    # rubocop:disable Metrics/ClassLength
     class NotarizeAction < Action
       # rubocop:disable Metrics/PerceivedComplexity
       def self.run(params)
@@ -78,13 +79,16 @@ module Fastlane
         end
 
         submit_command = submit_parts.join(' ')
-        submit_response = Actions.sh(
-          submit_command,
-          log: verbose,
-          error_callback: lambda { |msg|
-            UI.error("Error polling for notarization info: #{msg}")
-          }
-        )
+
+        error_callback = lambda do |msg|
+          UI.error("Error polling for notarization info: #{msg}")
+        end
+
+        submit_response = if verbose
+                            self.sh_with_separate_streams(submit_command, error_callback: error_callback)
+                          else
+                            Actions.sh(submit_command, log: false, error_callback: error_callback)
+                          end
 
         notarization_info = JSON.parse(submit_response)
 
@@ -116,6 +120,7 @@ module Fastlane
                 UI.error("Error requesting the notarization log: #{msg}")
               }
             )
+
             UI.user_error!("Could not notarize package with message '#{log_request_response}'")
           else
             UI.user_error!("Could not notarize package. To see the error, please set 'print_log' to true.")
@@ -258,6 +263,57 @@ module Fastlane
 
           yield(proc { |command| "#{command} -u #{apple_id_account.user} -p @env:FL_NOTARIZE_PASSWORD" })
         end
+      end
+
+      # This runs a command and returns stdout only, while printing stderr to the console.
+      # By default Action.sh merges stdout and stderr, but for notarize, when used with --verbose flag, we need to print stderr to the console, and still return valid result from stdout.
+      def self.sh_with_separate_streams(*command, error_callback: nil)
+        shell_command = Actions.shell_command_from_args(*command)
+        UI.command(shell_command)
+
+        # This is only for testing
+        return shell_command unless FastlaneCore::Helper.sh_enabled?
+
+        stdout_data = ""
+        stderr_data = ""
+
+        Open3.popen3(*command) do |stdin, stdout, stderr, wait_thr|
+          stdin.close
+
+          stdout.sync = true
+          stderr.sync = true
+
+          loop do
+            ready = IO.select([stdout, stderr], nil, nil, 0.1)
+            break unless ready
+
+            ready.first.each do |io|
+              line = io.gets
+              next unless line
+
+              (io == stdout ? stdout_data : stderr_data) << line
+              UI.command_output(line.strip) unless line.strip.empty?
+            end
+
+            # Check if process has finished
+            break if stdout.eof? && stderr.eof?
+          end
+
+          exit_status = wait_thr.value
+          if exit_status.exitstatus != 0
+            message = "Exit status of command '#{shell_command}' was #{exit_status.exitstatus} instead of 0."
+            message += "\nStderr: #{stderr_data}" unless stderr_data.empty?
+
+            if error_callback
+              UI.error(message)
+              error_callback.call(stderr_data)
+            else
+              UI.shell_error!(message)
+            end
+          end
+        end
+
+        stdout_data
       end
 
       def self.description
