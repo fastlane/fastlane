@@ -74,10 +74,13 @@ describe Fastlane do
             end").runner.execute(:test)
           end
 
-          it "successful with verbose option" do
+          it "successful with verbose option and mixed stdout/stderr output" do
             stub_const('ENV', { "FASTLANE_APPLE_APPLICATION_SPECIFIC_PASSWORD" => app_specific_password })
 
-            expect(Fastlane::Actions).to receive(:sh).with("xcrun notarytool submit #{package.path} --output-format json --wait --apple-id #{username} --password #{app_specific_password} --team-id #{asc_provider} --verbose", { error_callback: anything, log: true }).and_return(success_submit_response)
+            # Simulate the real scenario where notarytool outputs JSON to stdout and verbose info to stderr
+            json_stdout = success_submit_response
+
+            expect(Fastlane::Actions::NotarizeAction).to receive(:sh_with_separate_streams).with("xcrun notarytool submit #{package.path} --output-format json --wait --apple-id #{username} --password #{app_specific_password} --team-id #{asc_provider} --verbose", { error_callback: anything }).and_return(json_stdout)
 
             expect(Fastlane::Actions).to receive(:sh).with("xcrun stapler staple #{package.path}", { log: true })
 
@@ -128,6 +131,26 @@ describe Fastlane do
                 )
               end").runner.execute(:test)
             end.to raise_error(FastlaneCore::Interface::FastlaneError, "Could not notarize package. To see the error, please set 'print_log' to true.")
+          end
+
+          it "verbose mode correctly handles separate stdout/stderr streams" do
+            allow(FastlaneCore::Helper).to receive(:sh_enabled?).and_return(true)
+
+            test_command = "echo 'stdout message' && echo 'stderr message' >&2"
+
+            captured_output = []
+            allow(Fastlane::UI).to receive(:command_output) do |message|
+              captured_output << message
+            end
+
+            result = Fastlane::Actions::NotarizeAction.sh_with_separate_streams(test_command)
+
+            expect(result).to include("stdout message")
+            expect(result).not_to include("stderr message")
+
+            # Verify that both stdout and stderr were printed to console
+            expect(captured_output).to include("stdout message")
+            expect(captured_output).to include("stderr message")
           end
         end
       end
