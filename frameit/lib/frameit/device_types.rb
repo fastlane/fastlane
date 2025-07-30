@@ -118,8 +118,8 @@ module Frameit
     IPHONE_7_PLUS ||= Frameit::Device.new("iphone-7-plus", "Apple iPhone 7 Plus", 5, [[1242, 2208], [2208, 1242]], 401, Color::MATTE_BLACK, Platform::IOS, Deliver::AppScreenshot::ScreenSize::IOS_55, :use_legacy_iphone7)
     IPHONE_8 ||= Frameit::Device.new("iphone-8", "Apple iPhone 8", 6, [[750, 1334], [1334, 750]], 326, Color::SPACE_GRAY)
     IPHONE_8_PLUS ||= Frameit::Device.new("iphone-8-plus", "Apple iPhone 8 Plus", 6, [[1242, 2208], [2208, 1242]], 401, Color::SPACE_GRAY)
-    IPHONE_X ||= Frameit::Device.new("iphone-X", "Apple iPhone X", 7, [[1125, 2436], [2436, 1125]], 458, Color::SPACE_GRAY, Platform::IOS, Deliver::AppScreenshot::ScreenSize::IOS_58, :use_legacy_iphonex)
-    IPHONE_XS ||= Frameit::Device.new("iphone-XS", "Apple iPhone XS", 8, [[1125, 2436], [2436, 1125]], 458, Color::SPACE_GRAY, Platform::IOS, Deliver::AppScreenshot::ScreenSize::IOS_58, :use_legacy_iphonexs)
+    IPHONE_X ||= Frameit::Device.new("iphone-X", "Apple iPhone X", 7, [[1125, 2436], [2436, 1125]], 458, Color::SPACE_GRAY, Platform::IOS, Deliver::AppScreenshot::ScreenSize::IOS_61, :use_legacy_iphonex)
+    IPHONE_XS ||= Frameit::Device.new("iphone-XS", "Apple iPhone XS", 8, [[1125, 2436], [2436, 1125]], 458, Color::SPACE_GRAY, Platform::IOS, Deliver::AppScreenshot::ScreenSize::IOS_61, :use_legacy_iphonexs)
     IPHONE_XR ||= Frameit::Device.new("iphone-XR", "Apple iPhone XR", 8, [[828, 1792], [1792, 828]], 326, Color::SPACE_GRAY, Platform::IOS, Deliver::AppScreenshot::ScreenSize::IOS_65, :use_legacy_iphonexsmax)
     IPHONE_XS_MAX ||= Frameit::Device.new("iphone-XS-Max", "Apple iPhone XS Max", 8, [[1242, 2688], [2688, 1242]], 458, Color::SPACE_GRAY, Platform::IOS, Deliver::AppScreenshot::ScreenSize::IOS_65, :use_legacy_iphonexsmax)
     IPHONE_11 ||= Frameit::Device.new("iphone-11", "Apple iPhone 11", 9, [[828, 1792], [1792, 828]], 326, Color::BLACK, Platform::IOS)
@@ -145,9 +145,9 @@ module Frameit
     # this is 1st or 2nd gen of iPad Pro 12.9:
     IPAD_PRO ||= Frameit::Device.new("ipad-pro", "Apple iPad Pro", 3, [[2048, 2732], [2732, 2048]], 264, Color::SPACE_GRAY, Platform::IOS, Deliver::AppScreenshot::ScreenSize::IOS_IPAD_PRO)
     # 3rd generation:
-    IPAD_PRO_12_9 ||= Frameit::Device.new("ipadPro129", "Apple iPad Pro (12.9-inch) (3rd generation)", 4, [[2048, 2732], [2732, 2048]], 264, Color::SPACE_GRAY, Platform::IOS, Deliver::AppScreenshot::ScreenSize::IOS_IPAD_PRO_12_9)
+    IPAD_PRO_12_9 ||= Frameit::Device.new("ipadPro129", "Apple iPad Pro (12.9-inch) (3rd generation)", 4, [[2048, 2732], [2732, 2048]], 264, Color::SPACE_GRAY, Platform::IOS, Deliver::AppScreenshot::ScreenSize::IOS_IPAD_PRO_13)
     # 4th generation:
-    IPAD_PRO_12_9_4 ||= Frameit::Device.new("ipadPro129", "Apple iPad Pro (12.9-inch) (4th generation)", 5, [[2048, 2732], [2732, 2048]], 264, Color::SPACE_GRAY, Platform::IOS, Deliver::AppScreenshot::ScreenSize::IOS_IPAD_PRO_12_9)
+    IPAD_PRO_12_9_4 ||= Frameit::Device.new("ipadPro129", "Apple iPad Pro (12.9-inch) (4th generation)", 5, [[2048, 2732], [2732, 2048]], 264, Color::SPACE_GRAY, Platform::IOS, Deliver::AppScreenshot::ScreenSize::IOS_IPAD_PRO_13)
     # iPad Pro (10.5-inch) is not in frameit-frames repo, but must be included so that we are backward compatible with PR #15373
     # priority must be lower so that users who didn't copy the frame to their frameit frames folder will not get an error
     # ID and formatted name must be exactly as specified so that device.detect_device() will select this device if the filename includes them
