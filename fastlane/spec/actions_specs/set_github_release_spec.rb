@@ -72,8 +72,8 @@ describe Fastlane do
               is_prerelease: 'true',
               is_generate_release_notes: 'false',
               make_latest: 'true'
-              )
-            end").runner.execute(:test)
+            )
+          end").runner.execute(:test)
 
           expect(result['html_url']).to eq("https://github.com/czechboy0/czechboy0.github.io/releases/tag/tag33")
           expect(result['id']).to eq(1_585_808)
