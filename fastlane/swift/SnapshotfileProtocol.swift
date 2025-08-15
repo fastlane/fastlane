@@ -1,5 +1,5 @@
 // SnapshotfileProtocol.swift
-// Copyright (c) 2024 FastlaneTools
+// Copyright (c) 2025 FastlaneTools
 
 public protocol SnapshotfileProtocol: AnyObject {
     /// Path to the workspace file
@@ -208,4 +208,4 @@ public extension SnapshotfileProtocol {
 
 // Please don't remove the lines below
 // They are used to detect outdated files
-// FastlaneRunnerAPIVersion [0.9.124]
+// FastlaneRunnerAPIVersion [0.9.128]
