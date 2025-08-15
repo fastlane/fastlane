@@ -26,7 +26,7 @@ module Fastlane
         payload['name'] = params[:name] if params[:name]
         payload['body'] = params[:description] if params[:description]
         payload['target_commitish'] = params[:commitish] if params[:commitish]
-        payload['make_latest'] = params[:make_latest] if params[:make_latest] && !params[:is_draft] && !params[:is_prerelease]
+        payload['make_latest'] = params[:make_latest] if params[:make_latest]
 
         GithubApiAction.run(
           server_url: server_url,
@@ -240,6 +240,10 @@ module Fastlane
                                        env_name: "FL_SET_GITHUB_RELEASE_MAKE_LATEST",
                                        description: "Set the release as the latest release",
                                        optional: true,
+                                       conflicting_options: [:is_draft, :is_prerelease],
+                                       conflict_block: proc do |value|
+                                         UI.user_error!("You can't use 'make_latest' and '#{value.key}' together.")
+                                       end,
                                        verify_block: proc do |value|
                                          value = value.to_s
                                          pt = %w(true false legacy)

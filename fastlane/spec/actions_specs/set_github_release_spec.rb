@@ -16,8 +16,6 @@ describe Fastlane do
               name: 'Awesome Release',
               commitish: 'test',
               description: 'Bunch of new things :+1:',
-              is_draft: 'false',
-              is_prerelease: 'false',
               is_generate_release_notes: 'false',
               make_latest: 'true'
               )
@@ -28,56 +26,38 @@ describe Fastlane do
           expect(result).to eq(JSON.parse(File.read("./fastlane/spec/fixtures/requests/github_create_release_response.json")))
         end
 
-        it "does not send make_latest parameter if draft is true" do
-          stub_request(:post, "https://api.github.com/repos/czechboy0/czechboy0.github.io/releases").
-            with(body: "{\"tag_name\":\"tag33\",\"draft\":true,\"prerelease\":false,\"generate_release_notes\":false,\"name\":\"Awesome Release\",\"body\":\"Bunch of new things :+1:\",\"target_commitish\":\"test\"}",
-            headers: { 'Authorization' => 'Basic MTIzNDVhYmNkZQ==', 'Host' => 'api.github.com:443', 'User-Agent' => 'fastlane-github_api' }).
-            to_return(status: 201, body: File.read("./fastlane/spec/fixtures/requests/github_create_release_response.json"), headers: {})
-
-          result = Fastlane::FastFile.new.parse("lane :test do
-            set_github_release(
-              repository_name: 'czechboy0/czechboy0.github.io',
-              api_token: '12345abcde',
-              tag_name: 'tag33',
-              name: 'Awesome Release',
-              commitish: 'test',
-              description: 'Bunch of new things :+1:',
-              is_draft: 'true',
-              is_prerelease: 'false',
-              is_generate_release_notes: 'false',
-              make_latest: 'true'
-            )
-          end").runner.execute(:test)
-
-          expect(result['html_url']).to eq("https://github.com/czechboy0/czechboy0.github.io/releases/tag/tag33")
-          expect(result['id']).to eq(1_585_808)
-          expect(result).to eq(JSON.parse(File.read("./fastlane/spec/fixtures/requests/github_create_release_response.json")))
+        it "errors when both draft and make_latest are set" do
+          expect do
+            Fastlane::FastFile.new.parse("lane :test do
+              set_github_release(
+                repository_name: 'czechboy0/czechboy0.github.io',
+                api_token: '12345abcde',
+                tag_name: 'tag33',
+                name: 'Awesome Release',
+                commitish: 'test',
+                description: 'Bunch of new things :+1:',
+                is_draft: 'true',
+                make_latest: 'true'
+              )
+            end").runner.execute(:test)
+          end.to raise_error(/make_latest.+is_draft/)
         end
 
-        it "does not send make_latest parameter if prerelease is true" do
-          stub_request(:post, "https://api.github.com/repos/czechboy0/czechboy0.github.io/releases").
-            with(body: "{\"tag_name\":\"tag33\",\"draft\":false,\"prerelease\":true,\"generate_release_notes\":false,\"name\":\"Awesome Release\",\"body\":\"Bunch of new things :+1:\",\"target_commitish\":\"test\"}",
-            headers: { 'Authorization' => 'Basic MTIzNDVhYmNkZQ==', 'Host' => 'api.github.com:443', 'User-Agent' => 'fastlane-github_api' }).
-            to_return(status: 201, body: File.read("./fastlane/spec/fixtures/requests/github_create_release_response.json"), headers: {})
-
-          result = Fastlane::FastFile.new.parse("lane :test do
-            set_github_release(
-              repository_name: 'czechboy0/czechboy0.github.io',
-              api_token: '12345abcde',
-              tag_name: 'tag33',
-              name: 'Awesome Release',
-              commitish: 'test',
-              description: 'Bunch of new things :+1:',
-              is_draft: 'false',
-              is_prerelease: 'true',
-              is_generate_release_notes: 'false',
-              make_latest: 'true'
-            )
-          end").runner.execute(:test)
-
-          expect(result['html_url']).to eq("https://github.com/czechboy0/czechboy0.github.io/releases/tag/tag33")
-          expect(result['id']).to eq(1_585_808)
-          expect(result).to eq(JSON.parse(File.read("./fastlane/spec/fixtures/requests/github_create_release_response.json")))
+        it "errors when both prerelease and make_latest are set" do
+          expect do
+            Fastlane::FastFile.new.parse("lane :test do
+              set_github_release(
+                repository_name: 'czechboy0/czechboy0.github.io',
+                api_token: '12345abcde',
+                tag_name: 'tag33',
+                name: 'Awesome Release',
+                commitish: 'test',
+                description: 'Bunch of new things :+1:',
+                is_prerelease: 'true',
+                make_latest: 'true'
+              )
+            end").runner.execute(:test)
+          end.to raise_error(/make_latest.+is_prerelease/)
         end
 
         it "returns nil if status code != 201" do
@@ -94,8 +74,6 @@ describe Fastlane do
               name: 'Awesome Release',
               commitish: 'test',
               description: 'Bunch of new things :+1:',
-              is_draft: false,
-              is_prerelease: false,
               is_generate_release_notes: false,
               make_latest: 'true'
               )
@@ -119,8 +97,6 @@ describe Fastlane do
                 name: 'Awesome Release',
                 commitish: 'test',
                 description: 'Bunch of new things :+1:',
-                is_draft: false,
-                is_prerelease: false,
                 is_generate_release_notes: false,
                 make_latest: 'true'
                 )
@@ -142,8 +118,6 @@ describe Fastlane do
               tag_name: 'tag33',
               name: 'Awesome Release',
               commitish: 'test',
-              is_draft: false,
-              is_prerelease: false,
               is_generate_release_notes: false,
               make_latest: 'true'
               )
@@ -167,8 +141,6 @@ describe Fastlane do
               name: 'Awesome Release',
               commitish: 'test',
               description: 'explicitly provided',
-              is_draft: false,
-              is_prerelease: false,
               is_generate_release_notes: false,
               make_latest: 'true'
               )
@@ -193,8 +165,6 @@ describe Fastlane do
               name: 'Awesome Release',
               commitish: 'test',
               description: 'Bunch of new things :+1:',
-              is_draft: 'false',
-              is_prerelease: 'false',
               is_generate_release_notes: 'false',
               make_latest: 'true'
               )
