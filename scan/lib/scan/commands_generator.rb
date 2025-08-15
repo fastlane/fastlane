@@ -8,7 +8,7 @@ require_relative 'options'
 
 HighLine.track_eof = false
 
-module Scan
+module Scan #test
   class CommandsGenerator
     include Commander::Methods
 
