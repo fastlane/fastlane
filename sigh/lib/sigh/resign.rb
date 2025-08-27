@@ -166,7 +166,7 @@ module Sigh
     end
 
     def validate_ipa_file(ipa)
-      UI.user_error!("ipa file could not be found or is not an ipa file (#{ipa})") unless File.exist?(ipa) && ipa.end_with?('.ipa')
+      UI.user_error!("ipa file could not be found or is not an ipa file (#{ipa})") unless File.exist?(ipa) && (ipa.end_with?('.ipa') || ipa.end_with?('.app'))
     end
 
     def validate_provisioning_file(provisioning_profile)
