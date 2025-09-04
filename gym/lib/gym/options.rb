@@ -4,6 +4,7 @@ require 'credentials_manager/appfile_config'
 require_relative 'module'
 
 module Gym
+  # rubocop:disable Metrics/ClassLength
   class Options
     def self.available_options
       return @options if @options
@@ -305,6 +306,11 @@ module Gym
                                      description: "Sets a custom path for Swift Package Manager dependencies",
                                      type: String,
                                      optional: true),
+        FastlaneCore::ConfigItem.new(key: :package_cache_path,
+                                     env_name: "GYM_PACKAGE_CACHE_PATH",
+                                     description: "Sets a custom package cache path for Swift Package Manager dependencies",
+                                     type: String,
+                                     optional: true),
         FastlaneCore::ConfigItem.new(key: :skip_package_dependencies_resolution,
                                      env_name: "GYM_SKIP_PACKAGE_DEPENDENCIES_RESOLUTION",
                                      description: "Skips resolution of Swift Package Manager dependencies",
@@ -333,4 +339,5 @@ module Gym
       ]
     end
   end
+  # rubocop:enable Metrics/ClassLength
 end

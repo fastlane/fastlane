@@ -572,13 +572,14 @@ describe FastlaneCore do
         expect(project.build_xcodebuild_resolvepackagedependencies_command).to eq(command)
       end
 
-      it 'generates an xcodebuild -resolvePackageDependencies command with a custom resolving path with Xcode >= 11' do
+      it 'generates an xcodebuild -resolvePackageDependencies command with custom resolving paths with Xcode >= 11' do
         allow(FastlaneCore::Helper).to receive(:xcode_at_least?).and_return(true)
         project = FastlaneCore::Project.new({
           project: "./fastlane_core/spec/fixtures/projects/Example.xcodeproj",
-          cloned_source_packages_path: "./path/to/resolve"
+          cloned_source_packages_path: "./path/to/cloned_source_packages",
+          package_cache_path: "./path/to/package_cache"
         })
-        command = "xcodebuild -resolvePackageDependencies -project ./fastlane_core/spec/fixtures/projects/Example.xcodeproj -clonedSourcePackagesDirPath ./path/to/resolve"
+        command = "xcodebuild -resolvePackageDependencies -project ./fastlane_core/spec/fixtures/projects/Example.xcodeproj -clonedSourcePackagesDirPath ./path/to/cloned_source_packages -packageCachePath ./path/to/package_cache"
         expect(project.build_xcodebuild_resolvepackagedependencies_command).to eq(command)
       end
 
