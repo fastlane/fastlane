@@ -4,6 +4,7 @@ require 'credentials_manager/appfile_config'
 require_relative 'module'
 
 module Gym
+  # rubocop:disable Metrics/ClassLength
   class Options
     def self.available_options
       return @options if @options
@@ -338,4 +339,5 @@ module Gym
       ]
     end
   end
+  # rubocop:enable Metrics/ClassLength
 end
