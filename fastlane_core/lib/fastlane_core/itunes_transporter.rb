@@ -311,6 +311,7 @@ module FastlaneCore
       use_api_key = !api_key.nil?
       [
         ("API_PRIVATE_KEYS_DIR=#{api_key[:key_dir]}" if use_api_key),
+        ("DEVELOPER_DIR=#{ENV['DEVELOPER_DIR']}" if ENV['DEVELOPER_DIR']),
         "xcrun altool",
         "--upload-app",
         build_credential_params(username, password, jwt, api_key),
@@ -326,6 +327,7 @@ module FastlaneCore
       use_api_key = !api_key.nil?
       [
         ("API_PRIVATE_KEYS_DIR=#{api_key[:key_dir]}" if use_api_key),
+        ("DEVELOPER_DIR=#{ENV['DEVELOPER_DIR']}" if ENV['DEVELOPER_DIR']),
         "xcrun altool",
         "--list-providers",
         build_credential_params(username, password, jwt, api_key),
@@ -343,6 +345,7 @@ module FastlaneCore
       use_api_key = !api_key.nil?
       [
         ("API_PRIVATE_KEYS_DIR=#{api_key[:key_dir]}" if use_api_key),
+        ("DEVELOPER_DIR=#{ENV['DEVELOPER_DIR']}" if ENV['DEVELOPER_DIR']),
         "xcrun altool",
         "--validate-app",
         build_credential_params(username, password, nil, api_key),

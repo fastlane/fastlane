@@ -140,7 +140,7 @@ module FastlaneCore
         return xcode_server_xcode_path
       end
 
-      return `xcode-select -p`.delete("\n") + "/"
+      return `DEVELOPER_DIR='#{ENV['DEVELOPER_DIR']}' xcode-select -p`.delete("\n") + "/"
     end
 
     def self.xcode_server?
@@ -162,7 +162,7 @@ module FastlaneCore
       end
 
       begin
-        output = `DEVELOPER_DIR='' "#{xcodebuild_path}" -version`
+        output = `DEVELOPER_DIR='#{ENV['DEVELOPER_DIR']}' "#{xcodebuild_path}" -version`
         @xcode_version = output.split("\n").first.split(' ')[1]
         @developer_dir = ENV['DEVELOPER_DIR']
       rescue => ex
