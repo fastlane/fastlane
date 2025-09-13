@@ -10,7 +10,7 @@ module Fastlane
       #####################################################
 
       def self.description
-        "Setup the keychain and match to work with Travis CI"
+        "Set up the keychain and match to work with Travis CI"
       end
 
       def self.details

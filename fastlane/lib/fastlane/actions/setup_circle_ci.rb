@@ -10,7 +10,7 @@ module Fastlane
       #####################################################
 
       def self.description
-        "Setup the keychain and match to work with CircleCI"
+        "Set up the keychain and match to work with CircleCI"
       end
 
       def self.details

@@ -38,7 +38,7 @@ module Fastlane
         "📸  Automate screenshots" => :ios_screenshots,
         "👩‍✈️  Automate beta distribution to TestFlight" => :ios_testflight,
         "🚀  Automate App Store distribution" => :ios_app_store,
-        "🛠  Manual setup - manually setup your project to automate your tasks" => :ios_manual
+        "🛠  Manual setup - manually set up your project to automate your tasks" => :ios_manual
       }
 
       selected = UI.select("What would you like to use fastlane for?", options.keys)

@@ -3,7 +3,7 @@ require 'fastlane/boolean'
 require_relative 'detect_values'
 
 module Screengrab
-  # Use this to just setup the configuration attribute and set it later somewhere else
+  # Use this to just set up the configuration attribute and set it later somewhere else
   class << self
     attr_accessor :config
     attr_accessor :android_environment

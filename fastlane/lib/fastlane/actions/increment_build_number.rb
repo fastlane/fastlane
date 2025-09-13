@@ -53,7 +53,7 @@ module Fastlane
 
         return Actions.lane_context[SharedValues::BUILD_NUMBER] = build_number
       rescue
-        UI.user_error!("Apple Generic Versioning is not enabled in this project.\nBefore being able to increment and read the version number from your Xcode project, you first need to setup your project properly. Please follow the guide at https://developer.apple.com/library/content/qa/qa1827/_index.html")
+        UI.user_error!("Apple Generic Versioning is not enabled in this project.\nBefore being able to increment and read the version number from your Xcode project, you first need to set up your project properly. Please follow the guide at https://developer.apple.com/library/content/qa/qa1827/_index.html")
       end
 
       def self.description
