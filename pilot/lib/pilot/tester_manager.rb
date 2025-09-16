@@ -19,7 +19,7 @@ module Pilot
           firstName: config[:first_name],
           lastName: config[:last_name]
         }
-        group.post_beta_tester_assignment(beta_group_ids: [group.id], attributes: user)
+        group.post_bulk_beta_tester_assignments(beta_testers: [user])
       end
 
       group_names = groups_param.join(';')
