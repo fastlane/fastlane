@@ -39,7 +39,6 @@ module Spaceship
       # beta_testers - [{email: "", firstName: "", lastName: ""}]
       def post_bulk_beta_tester_assignments(client: nil, beta_testers: nil)
         client ||= Spaceship::ConnectAPI
-        # Use the working post_beta_tester_assignment method for each tester
         return beta_testers.map do |tester|
           client.post_beta_tester_assignment(beta_group_ids: [id], attributes: tester)
         end
