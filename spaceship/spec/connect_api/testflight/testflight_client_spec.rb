@@ -465,43 +465,6 @@ describe Spaceship::ConnectAPI::TestFlight::Client do
         end
       end
 
-      context 'post_bulk_beta_tester_assignments' do
-        let(:path) { "v1/bulkBetaTesterAssignments" }
-        let(:beta_group_id) { "123" }
-        let(:beta_testers) do
-          [
-            { email: "email1", firstName: "first1", lastName: "last1", errors: [] },
-            { email: "email2", firstName: "first2", lastName: "last2", errors: [] }
-          ]
-        end
-        let(:body) do
-          {
-            data: {
-              attributes: {
-                betaTesters: beta_testers
-              },
-              relationships: {
-                betaGroup: {
-                  data: {
-                    type: "betaGroups",
-                    id: beta_group_id
-                  }
-                }
-              },
-              type: "bulkBetaTesterAssignments"
-            }
-          }
-        end
-
-        it 'succeeds' do
-          url = path
-          req_mock = test_request_body(url, body)
-
-          expect(client).to receive(:request).with(:post).and_yield(req_mock).and_return(req_mock)
-          client.post_bulk_beta_tester_assignments(beta_group_id: beta_group_id, beta_testers: beta_testers)
-        end
-      end
-
       context 'post_beta_tester_assignment' do
         let(:path) { "v1/betaTesters" }
         let(:beta_group_ids) { ["123", "456"] }

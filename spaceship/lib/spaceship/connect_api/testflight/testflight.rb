@@ -272,34 +272,6 @@ module Spaceship
           test_flight_request_client.get("#{Version::V1}/betaTesters", params)
         end
 
-        # beta_testers - [{email: "", firstName: "", lastName: ""}]
-        def post_bulk_beta_tester_assignments(beta_group_id: nil, beta_testers: nil)
-          beta_testers || []
-
-          beta_testers.map do |tester|
-            tester[:errors] = []
-          end
-
-          body = {
-            data: {
-              attributes: {
-                betaTesters: beta_testers
-              },
-              relationships: {
-                betaGroup: {
-                  data: {
-                    type: "betaGroups",
-                    id: beta_group_id
-                  }
-                }
-              },
-              type: "bulkBetaTesterAssignments"
-            }
-          }
-
-          test_flight_request_client.post("#{Version::V1}/bulkBetaTesterAssignments", body)
-        end
-
         # attributes - {email: "", firstName: "", lastName: ""}
         def post_beta_tester_assignment(beta_group_ids: [], attributes: {})
           body = {
