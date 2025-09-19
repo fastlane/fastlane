@@ -66,8 +66,9 @@ module Fastlane
     # Checks if the gem name is still free on RubyGems
     def gem_name_taken?(name)
       require 'json'
+      require 'open-uri'
       url = "https://rubygems.org/api/v1/gems/#{name}.json"
-      response = JSON.parse(FastlaneCore::Helper.open_uri(url).read)
+      response = JSON.parse(URI.open(url).read)
       return !!response['version']
     rescue
       false
