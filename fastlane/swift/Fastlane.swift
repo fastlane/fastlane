@@ -5063,7 +5063,7 @@ public func getManagedPlayStorePublishingRights(jsonKey: OptionalConfigValue<Str
    - skipCertificateVerification: Skips the verification of the certificates for every existing profiles. This will make sure the provisioning profile can be used on the local machine
    - platform: Set the provisioning profile's platform (i.e. ios, tvos, macos, catalyst)
    - readonly: Only fetch existing profile, don't generate new ones
-   - templateName: The name of provisioning profile template. If the developer account has provisioning profile templates (aka: custom entitlements), the template name can be found by inspecting the Entitlements drop-down while creating/editing a provisioning profile (e.g. "Apple Pay Pass Suppression Development")
+   - templateName: **DEPRECATED!** Removed since May 2025 on App Store Connect API OpenAPI v3.8.0 - Learn more: https://docs.fastlane.tools/actions/match/#managed-capabilities - The name of provisioning profile template. If the developer account has provisioning profile templates (aka: custom entitlements), the template name can be found by inspecting the Entitlements drop-down while creating/editing a provisioning profile (e.g. "Apple Pay Pass Suppression Development")
    - failOnNameTaken: Should the command fail if it was about to create a duplicate of an existing provisioning profile. It can happen due to issues on Apple Developer Portal, when profile to be recreated was not properly deleted first
    - cachedCertificates: A list of cached certificates
    - cachedDevices: A list of cached devices
@@ -5976,65 +5976,6 @@ public func hgPush(force: OptionalConfigValue<Bool> = .fastlaneDefault(false),
 }
 
 /**
- Send a error/success message to [HipChat](https://www.hipchat.com/)
-
- - parameters:
-   - message: The message to post on HipChat
-   - channel: The room or @username
-   - apiToken: Hipchat API Token
-   - customColor: Specify a custom color, this overrides the success boolean. Can be one of 'yellow', 'red', 'green', 'purple', 'gray', or 'random'
-   - success: Was this build successful? (true/false)
-   - version: Version of the Hipchat API. Must be 1 or 2
-   - notifyRoom: Should the people in the room be notified? (true/false)
-   - apiHost: The host of the HipChat-Server API
-   - messageFormat: Format of the message to post. Must be either 'html' or 'text'
-   - includeHtmlHeader: Should html formatted messages include a preformatted header? (true/false)
-   - from: Name the message will appear to be sent from
-
- Send a message to **room** (by default) or a direct message to **@username** with success (green) or failure (red) status.
- */
-public func hipchat(message: String = "",
-                    channel: String,
-                    apiToken: String,
-                    customColor: OptionalConfigValue<String?> = .fastlaneDefault(nil),
-                    success: OptionalConfigValue<Bool> = .fastlaneDefault(true),
-                    version: String,
-                    notifyRoom: OptionalConfigValue<Bool> = .fastlaneDefault(false),
-                    apiHost: String = "api.hipchat.com",
-                    messageFormat: String = "html",
-                    includeHtmlHeader: OptionalConfigValue<Bool> = .fastlaneDefault(true),
-                    from: String = "fastlane")
-{
-    let messageArg = RubyCommand.Argument(name: "message", value: message, type: nil)
-    let channelArg = RubyCommand.Argument(name: "channel", value: channel, type: nil)
-    let apiTokenArg = RubyCommand.Argument(name: "api_token", value: apiToken, type: nil)
-    let customColorArg = customColor.asRubyArgument(name: "custom_color", type: nil)
-    let successArg = success.asRubyArgument(name: "success", type: nil)
-    let versionArg = RubyCommand.Argument(name: "version", value: version, type: nil)
-    let notifyRoomArg = notifyRoom.asRubyArgument(name: "notify_room", type: nil)
-    let apiHostArg = RubyCommand.Argument(name: "api_host", value: apiHost, type: nil)
-    let messageFormatArg = RubyCommand.Argument(name: "message_format", value: messageFormat, type: nil)
-    let includeHtmlHeaderArg = includeHtmlHeader.asRubyArgument(name: "include_html_header", type: nil)
-    let fromArg = RubyCommand.Argument(name: "from", value: from, type: nil)
-    let array: [RubyCommand.Argument?] = [messageArg,
-                                          channelArg,
-                                          apiTokenArg,
-                                          customColorArg,
-                                          successArg,
-                                          versionArg,
-                                          notifyRoomArg,
-                                          apiHostArg,
-                                          messageFormatArg,
-                                          includeHtmlHeaderArg,
-                                          fromArg]
-    let args: [RubyCommand.Argument] = array
-        .filter { $0?.value != nil }
-        .compactMap { $0 }
-    let command = RubyCommand(commandID: "", methodName: "hipchat", className: nil, args: args)
-    _ = runner.executeCommand(command)
-}
-
-/**
  Refer to [App Center](https://github.com/Microsoft/fastlane-plugin-appcenter/)
 
  - parameters:
@@ -6817,7 +6758,7 @@ public func makeChangelogFromJenkins(fallbackChangelog: String = "",
    - skipDocs: Skip generation of a README.md for the created git repository
    - platform: Set the provisioning profile's platform to work with (i.e. ios, tvos, macos, catalyst)
    - deriveCatalystAppIdentifier: Enable this if you have the Mac Catalyst capability enabled and your project was created with Xcode 11.3 or earlier. Prepends 'maccatalyst.' to the app identifier for the provisioning profile mapping
-   - templateName: The name of provisioning profile template. If the developer account has provisioning profile templates (aka: custom entitlements), the template name can be found by inspecting the Entitlements drop-down while creating/editing a provisioning profile (e.g. "Apple Pay Pass Suppression Development")
+   - templateName: **DEPRECATED!** Removed since May 2025 on App Store Connect API OpenAPI v3.8.0 - Learn more: https://docs.fastlane.tools/actions/match/#managed-capabilities - The name of provisioning profile template. If the developer account has provisioning profile templates (aka: custom entitlements), the template name can be found by inspecting the Entitlements drop-down while creating/editing a provisioning profile (e.g. "Apple Pay Pass Suppression Development")
    - profileName: A custom name for the provisioning profile. This will replace the default provisioning profile name if specified
    - failOnNameTaken: Should the command fail if it was about to create a duplicate of an existing provisioning profile. It can happen due to issues on Apple Developer Portal, when profile to be recreated was not properly deleted first
    - skipCertificateMatching: Set to true if there is no access to Apple developer portal but there are certificates, keys and profiles provided. Only works with match import action
@@ -7056,7 +6997,7 @@ public func match(type: String = matchfile.type,
    - skipDocs: Skip generation of a README.md for the created git repository
    - platform: Set the provisioning profile's platform to work with (i.e. ios, tvos, macos, catalyst)
    - deriveCatalystAppIdentifier: Enable this if you have the Mac Catalyst capability enabled and your project was created with Xcode 11.3 or earlier. Prepends 'maccatalyst.' to the app identifier for the provisioning profile mapping
-   - templateName: The name of provisioning profile template. If the developer account has provisioning profile templates (aka: custom entitlements), the template name can be found by inspecting the Entitlements drop-down while creating/editing a provisioning profile (e.g. "Apple Pay Pass Suppression Development")
+   - templateName: **DEPRECATED!** Removed since May 2025 on App Store Connect API OpenAPI v3.8.0 - Learn more: https://docs.fastlane.tools/actions/match/#managed-capabilities - The name of provisioning profile template. If the developer account has provisioning profile templates (aka: custom entitlements), the template name can be found by inspecting the Entitlements drop-down while creating/editing a provisioning profile (e.g. "Apple Pay Pass Suppression Development")
    - profileName: A custom name for the provisioning profile. This will replace the default provisioning profile name if specified
    - failOnNameTaken: Should the command fail if it was about to create a duplicate of an existing provisioning profile. It can happen due to issues on Apple Developer Portal, when profile to be recreated was not properly deleted first
    - skipCertificateMatching: Set to true if there is no access to Apple developer portal but there are certificates, keys and profiles provided. Only works with match import action
@@ -10126,7 +10067,7 @@ public func setupTravis(force: OptionalConfigValue<Bool> = .fastlaneDefault(fals
    - skipCertificateVerification: Skips the verification of the certificates for every existing profiles. This will make sure the provisioning profile can be used on the local machine
    - platform: Set the provisioning profile's platform (i.e. ios, tvos, macos, catalyst)
    - readonly: Only fetch existing profile, don't generate new ones
-   - templateName: The name of provisioning profile template. If the developer account has provisioning profile templates (aka: custom entitlements), the template name can be found by inspecting the Entitlements drop-down while creating/editing a provisioning profile (e.g. "Apple Pay Pass Suppression Development")
+   - templateName: **DEPRECATED!** Removed since May 2025 on App Store Connect API OpenAPI v3.8.0 - Learn more: https://docs.fastlane.tools/actions/match/#managed-capabilities - The name of provisioning profile template. If the developer account has provisioning profile templates (aka: custom entitlements), the template name can be found by inspecting the Entitlements drop-down while creating/editing a provisioning profile (e.g. "Apple Pay Pass Suppression Development")
    - failOnNameTaken: Should the command fail if it was about to create a duplicate of an existing provisioning profile. It can happen due to issues on Apple Developer Portal, when profile to be recreated was not properly deleted first
    - cachedCertificates: A list of cached certificates
    - cachedDevices: A list of cached devices
@@ -11386,7 +11327,7 @@ public func swiftlint(mode: String = "lint",
    - skipDocs: Skip generation of a README.md for the created git repository
    - platform: Set the provisioning profile's platform to work with (i.e. ios, tvos, macos, catalyst)
    - deriveCatalystAppIdentifier: Enable this if you have the Mac Catalyst capability enabled and your project was created with Xcode 11.3 or earlier. Prepends 'maccatalyst.' to the app identifier for the provisioning profile mapping
-   - templateName: The name of provisioning profile template. If the developer account has provisioning profile templates (aka: custom entitlements), the template name can be found by inspecting the Entitlements drop-down while creating/editing a provisioning profile (e.g. "Apple Pay Pass Suppression Development")
+   - templateName: **DEPRECATED!** Removed since May 2025 on App Store Connect API OpenAPI v3.8.0 - Learn more: https://docs.fastlane.tools/actions/match/#managed-capabilities - The name of provisioning profile template. If the developer account has provisioning profile templates (aka: custom entitlements), the template name can be found by inspecting the Entitlements drop-down while creating/editing a provisioning profile (e.g. "Apple Pay Pass Suppression Development")
    - profileName: A custom name for the provisioning profile. This will replace the default provisioning profile name if specified
    - failOnNameTaken: Should the command fail if it was about to create a duplicate of an existing provisioning profile. It can happen due to issues on Apple Developer Portal, when profile to be recreated was not properly deleted first
    - skipCertificateMatching: Set to true if there is no access to Apple developer portal but there are certificates, keys and profiles provided. Only works with match import action
@@ -13887,4 +13828,4 @@ public let snapshotfile: Snapshotfile = .init()
 
 // Please don't remove the lines below
 // They are used to detect outdated files
-// FastlaneRunnerAPIVersion [0.9.188]
+// FastlaneRunnerAPIVersion [0.9.189]
