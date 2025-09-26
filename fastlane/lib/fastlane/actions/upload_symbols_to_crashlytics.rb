@@ -204,7 +204,7 @@ module Fastlane
                                        env_name: "FL_UPLOAD_SYMBOLS_TO_CRASHLYTICS_FAIL_ON_ERROR",
                                        description: "Should the action fail when an upload fails?",
                                        type: Boolean,
-                                       default_value: false)
+                                       default_value: false),
           FastlaneCore::ConfigItem.new(key: :debug,
                                        env_name: "FL_UPLOAD_SYMBOLS_TO_CRASHLYTICS_DEBUG",
                                        description: "Enable debug mode for upload-symbols",
