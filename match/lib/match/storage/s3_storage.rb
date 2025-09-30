@@ -119,7 +119,7 @@ module Match
           FileUtils.mkdir_p(File.expand_path("..", download_path))
           UI.verbose("Downloading file from S3 '#{file_path}' on bucket #{self.s3_bucket}")
 
-          object.download_file(download_path)
+          s3_client.download_file(s3_bucket, object.key, download_path)
         end
         UI.verbose("Successfully downloaded files from S3 to #{self.working_directory}")
       end
