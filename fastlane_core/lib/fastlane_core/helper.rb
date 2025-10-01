@@ -450,6 +450,10 @@ module FastlaneCore
       self.windows?
     end
 
+    def self.is_linux?
+      self.linux?
+    end
+
     # <b>DEPRECATED:</b> Use the `ROOT` constant from the appropriate tool module instead
     # e.g. File.join(Sigh::ROOT, 'lib', 'assets', 'resign.sh')
     #

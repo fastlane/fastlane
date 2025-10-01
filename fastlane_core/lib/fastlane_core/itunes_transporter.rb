@@ -43,7 +43,9 @@ module FastlaneCore
       not_implemented(__method__)
     end
 
-    def build_upload_command(username, password, source = "/tmp", provider_short_name = "", jwt = nil, platform = nil, api_key = nil)
+    # rubocop:disable Metrics/ParameterLists
+    def build_upload_command(username, password, source = "/tmp", provider_short_name = "", jwt = nil, platform = nil, api_key = nil, asset_description = nil)
+      # rubocop:enable Metrics/ParameterLists
       not_implemented(__method__)
     end
 
@@ -218,15 +220,30 @@ module FastlaneCore
       end
     end
 
-    def file_upload_option(source)
+    def is_asset_file_type(source)
       ext = File.extname(source).downcase
-      is_asset_file_type = !File.directory?(source) && [".ipa", ".pkg", ".dmg", ".zip"].include?(ext)
+      !File.directory?(source) && [".ipa", ".pkg", ".dmg", ".zip"].include?(ext)
+    end
 
-      if is_asset_file_type
+    def file_upload_option(source)
+      if is_asset_file_type(source)
         return "-assetFile #{source.shellescape}"
       else
         return "-f #{source.shellescape}"
       end
+    end
+
+    def asset_description_option(source, asset_description)
+      is_linux_or_windows = Helper.is_linux? || Helper.is_windows?
+      suggest_to_use_asset_description = is_linux_or_windows && asset_description.nil?
+      if suggest_to_use_asset_description
+        UI.important("Starting in 2026, Apple will require that you use the -assetDescription option with your .ipa or .pkg files.")
+        UI.message("👆 That was Apple's official announcement.")
+        UI.message("However, we started seeing their backend reject calls from Linux machines intermittently at the end of September 2025 with the error:")
+        UI.message("`Unable to perform software analysis on Linux. Export an AppStoreInfo.plist from Xcode, and use the -assetDescription option.`")
+      end
+
+      "-assetDescription #{asset_description}" if is_asset_file_type(source) && asset_description
     end
 
     def additional_upload_parameters
@@ -307,7 +324,9 @@ module FastlaneCore
       end
     end
 
-    def build_upload_command(username, password, source = "/tmp", provider_short_name = "", jwt = nil, platform = nil, api_key = nil)
+    # rubocop:disable Metrics/ParameterLists
+    def build_upload_command(username, password, source = "/tmp", provider_short_name = "", jwt = nil, platform = nil, api_key = nil, asset_description = nil)
+      # rubocop:enable Metrics/ParameterLists
       use_api_key = !api_key.nil?
       [
         ("API_PRIVATE_KEYS_DIR=#{api_key[:key_dir]}" if use_api_key),
@@ -419,12 +438,15 @@ module FastlaneCore
       end
     end
 
-    def build_upload_command(username, password, source = "/tmp", provider_short_name = "", jwt = nil, platform = nil, api_key = nil)
+    # rubocop:disable Metrics/ParameterLists
+    def build_upload_command(username, password, source = "/tmp", provider_short_name = "", jwt = nil, platform = nil, api_key = nil, asset_description = nil)
+      # rubocop:enable Metrics/ParameterLists
       [
         '"' + Helper.transporter_path + '"',
         "-m upload",
         build_credential_params(username, password, jwt, api_key),
         file_upload_option(source),
+        asset_description_option(source, asset_description),
         additional_upload_parameters, # that's here, because the user might overwrite the -t option
         "-k 100000",
         ("-WONoPause true" if Helper.windows?), # Windows only: process instantly returns instead of waiting for key press
@@ -516,7 +538,9 @@ module FastlaneCore
       end
     end
 
-    def build_upload_command(username, password, source = "/tmp", provider_short_name = "", jwt = nil, platform = nil, api_key = nil)
+    # rubocop:disable Metrics/ParameterLists
+    def build_upload_command(username, password, source = "/tmp", provider_short_name = "", jwt = nil, platform = nil, api_key = nil, asset_description = nil)
+      # rubocop:enable Metrics/ParameterLists
       credential_params = build_credential_params(username, password, jwt, api_key, is_default_itms_on_xcode_11?)
       if is_default_itms_on_xcode_11?
         [
@@ -525,6 +549,7 @@ module FastlaneCore
           '-m upload',
           credential_params,
           file_upload_option(source),
+          asset_description_option(source, asset_description),
           additional_upload_parameters, # that's here, because the user might overwrite the -t option
           '-k 100000',
           ("-itc_provider #{provider_short_name}" if jwt.nil? && !provider_short_name.to_s.empty?),
@@ -544,6 +569,7 @@ module FastlaneCore
           '-m upload',
           credential_params,
           file_upload_option(source),
+          asset_description_option(source, asset_description),
           additional_upload_parameters, # that's here, because the user might overwrite the -t option
           '-k 100000',
           ("-itc_provider #{provider_short_name}" if jwt.nil? && !provider_short_name.to_s.empty?),
@@ -772,17 +798,20 @@ module FastlaneCore
     # @return (Bool) True if everything worked fine
     # @raise [Deliver::TransporterTransferError] when something went wrong
     #   when transferring
-    def upload(app_id = nil, dir = nil, package_path: nil, asset_path: nil, platform: nil)
+    def upload(app_id = nil, dir = nil, package_path: nil, asset_path: nil, asset_description: nil, platform: nil)
       raise "app_id and dir are required or package_path or asset_path is required" if (app_id.nil? || dir.nil?) && package_path.nil? && asset_path.nil?
 
       # Transport can upload .ipa, .dmg, and .pkg files directly with -assetFile
       # However, -assetFile requires -assetDescription if Linux or Windows
       # This will give the asset directly if macOS and asset_path exists
+      # or if Linux or Windows and asset_path exists and asset_description exists
       # otherwise it will use the .itmsp package
 
       force_itmsp = FastlaneCore::Env.truthy?("ITMSTRANSPORTER_FORCE_ITMS_PACKAGE_UPLOAD")
-      can_use_asset_path = Helper.is_mac? && asset_path
 
+      can_use_asset_path_macos = Helper.is_mac? && asset_path
+      can_use_asset_path_linux_windows = (Helper.is_linux? || Helper.is_windows?) && asset_path && asset_description
+      can_use_asset_path = can_use_asset_path_macos || can_use_asset_path_linux_windows
       actual_dir = if can_use_asset_path && !force_itmsp
                      # The asset gets deleted upon completion so copying to a temp directory
                      # (with randomized filename, for multibyte-mixed filename upload fails)
@@ -807,8 +836,8 @@ module FastlaneCore
       api_key_placeholder = use_api_key ? { key_id: "YourKeyID", issuer_id: "YourIssuerID", key_dir: "YourTmpP8KeyDir" } : nil
       api_key = @transporter_executor.prepare(original_api_key: @api_key)
 
-      command = @transporter_executor.build_upload_command(@user, @password, actual_dir, @provider_short_name, @jwt, platform, api_key)
-      UI.verbose(@transporter_executor.build_upload_command(@user, password_placeholder, actual_dir, @provider_short_name, jwt_placeholder, platform, api_key_placeholder))
+      command = @transporter_executor.build_upload_command(@user, @password, actual_dir, @provider_short_name, @jwt, platform, api_key, asset_description)
+      UI.important(@transporter_executor.build_upload_command(@user, password_placeholder, actual_dir, @provider_short_name, jwt_placeholder, platform, api_key_placeholder, asset_description))
 
       begin
         result = @transporter_executor.execute(command, ItunesTransporter.hide_transporter_output?)
