@@ -92,135 +92,284 @@ describe Gym do
                            ])
     end
 
-    it "generates a valid plist file we need" do
-      options = { project: "./gym/examples/standard/Example.xcodeproj" }
-      Gym.config = FastlaneCore::Configuration.create(Gym::Options.available_options, options)
+    describe "with Xcode 15.3 installed" do
+      before(:each) do
+        allow(FastlaneCore::Helper).to receive(:xcode_version).and_return('15.3')
+        allow(FastlaneCore::Helper).to receive(:mac?).and_return(true)
+        allow(FastlaneCore::Helper).to receive(:windows?).and_return(false)
+        allow(FastlaneCore::Helper).to receive(:linux?).and_return(false)
+      end
 
-      result = Gym::PackageCommandGeneratorXcode7.generate
-      config_path = Gym::PackageCommandGeneratorXcode7.config_path
+      it "generates a valid plist file we need" do
+        options = { project: "./gym/examples/standard/Example.xcodeproj" }
+        Gym.config = FastlaneCore::Configuration.create(Gym::Options.available_options, options)
 
-      expect(Plist.parse_xml(config_path)).to eq({
-        'method' => "app-store"
-      })
-    end
+        result = Gym::PackageCommandGeneratorXcode7.generate
+        config_path = Gym::PackageCommandGeneratorXcode7.config_path
 
-    it "reads user export plist" do
-      options = { project: "./gym/examples/standard/Example.xcodeproj", export_options: "./gym/examples/standard/ExampleExport.plist" }
-      Gym.config = FastlaneCore::Configuration.create(Gym::Options.available_options, options)
+        expect(Plist.parse_xml(config_path)).to eq({
+          'method' => "app-store"
+        })
+      end
 
-      result = Gym::PackageCommandGeneratorXcode7.generate
-      config_path = Gym::PackageCommandGeneratorXcode7.config_path
+      it "reads user export plist" do
+        options = { project: "./gym/examples/standard/Example.xcodeproj", export_options: "./gym/examples/standard/ExampleExport.plist" }
+        Gym.config = FastlaneCore::Configuration.create(Gym::Options.available_options, options)
 
-      expect(Plist.parse_xml(config_path)).to eq({
-        'embedOnDemandResourcesAssetPacksInBundle' => true,
-        'manifest' => {
-          'appURL' => 'https://www.example.com/Example.ipa',
-          'displayImageURL' => 'https://www.example.com/display.png',
-          'fullSizeImageURL' => 'https://www.example.com/fullSize.png'
-        },
-        'method' => 'ad-hoc'
-      })
-      expect(Gym.config[:export_method]).to eq("ad-hoc")
-      expect(Gym.config[:include_symbols]).to be_nil
-      expect(Gym.config[:include_bitcode]).to be_nil
-      expect(Gym.config[:export_team_id]).to be_nil
-    end
+        result = Gym::PackageCommandGeneratorXcode7.generate
+        config_path = Gym::PackageCommandGeneratorXcode7.config_path
 
-    it "defaults to the correct export type if :export_options parameter is provided" do
-      options = {
-        project: "./gym/examples/standard/Example.xcodeproj",
-        export_options: {
-          include_symbols: true
-        }
-      }
-
-      Gym.config = FastlaneCore::Configuration.create(Gym::Options.available_options, options)
-
-      result = Gym::PackageCommandGeneratorXcode7.generate
-      config_path = Gym::PackageCommandGeneratorXcode7.config_path
-
-      content = Plist.parse_xml(config_path)
-      expect(content["include_symbols"]).to eq(true)
-      expect(content["method"]).to eq('app-store')
-    end
-
-    it "reads user export plist and override some parameters" do
-      options = {
-        project: "./gym/examples/standard/Example.xcodeproj",
-        export_options: "./gym/examples/standard/ExampleExport.plist",
-        export_method: "app-store",
-        include_symbols: false,
-        include_bitcode: true,
-        export_team_id: "1234567890"
-      }
-      Gym.config = FastlaneCore::Configuration.create(Gym::Options.available_options, options)
-
-      result = Gym::PackageCommandGeneratorXcode7.generate
-      config_path = Gym::PackageCommandGeneratorXcode7.config_path
-
-      expect(Plist.parse_xml(config_path)).to eq({
-        'embedOnDemandResourcesAssetPacksInBundle' => true,
-        'manifest' => {
-          'appURL' => 'https://www.example.com/Example.ipa',
-          'displayImageURL' => 'https://www.example.com/display.png',
-          'fullSizeImageURL' => 'https://www.example.com/fullSize.png'
-        },
-        'method' => 'app-store',
-        'uploadSymbols' => false,
-        'uploadBitcode' => true,
-        'teamID' => '1234567890'
-      })
-    end
-
-    it "reads export options from hash" do
-      options = {
-        project: "./gym/examples/standard/Example.xcodeproj",
-        export_options: {
-          embedOnDemandResourcesAssetPacksInBundle: false,
-          manifest: {
-            appURL: "https://example.com/My App.ipa",
-            displayImageURL: "https://www.example.com/display image.png",
-            fullSizeImageURL: "https://www.example.com/fullSize image.png"
+        expect(Plist.parse_xml(config_path)).to eq({
+          'embedOnDemandResourcesAssetPacksInBundle' => true,
+          'manifest' => {
+            'appURL' => 'https://www.example.com/Example.ipa',
+            'displayImageURL' => 'https://www.example.com/display.png',
+            'fullSizeImageURL' => 'https://www.example.com/fullSize.png'
           },
-          method: "enterprise",
-          uploadSymbols: false,
-          uploadBitcode: true,
-          teamID: "1234567890"
-        },
-        export_method: "app-store",
-        include_symbols: true,
-        include_bitcode: false,
-        export_team_id: "ASDFGHJK"
-      }
-      Gym.config = FastlaneCore::Configuration.create(Gym::Options.available_options, options)
+          'method' => 'ad-hoc'
+        })
+        expect(Gym.config[:export_method]).to eq("ad-hoc")
+        expect(Gym.config[:include_symbols]).to be_nil
+        expect(Gym.config[:include_bitcode]).to be_nil
+        expect(Gym.config[:export_team_id]).to be_nil
+      end
 
-      result = Gym::PackageCommandGeneratorXcode7.generate
-      config_path = Gym::PackageCommandGeneratorXcode7.config_path
+      it "defaults to the correct export type if :export_options parameter is provided" do
+        options = {
+          project: "./gym/examples/standard/Example.xcodeproj",
+          export_options: {
+            include_symbols: true
+          }
+        }
 
-      expect(Plist.parse_xml(config_path)).to eq({
-        'embedOnDemandResourcesAssetPacksInBundle' => false,
-        'manifest' => {
-          'appURL' => 'https://example.com/My%20App.ipa',
-          'displayImageURL' => 'https://www.example.com/display%20image.png',
-          'fullSizeImageURL' => 'https://www.example.com/fullSize%20image.png'
-        },
-        'method' => 'app-store',
-        'uploadSymbols' => true,
-        'uploadBitcode' => false,
-        'teamID' => 'ASDFGHJK'
-      })
+        Gym.config = FastlaneCore::Configuration.create(Gym::Options.available_options, options)
+
+        result = Gym::PackageCommandGeneratorXcode7.generate
+        config_path = Gym::PackageCommandGeneratorXcode7.config_path
+
+        content = Plist.parse_xml(config_path)
+        expect(content["include_symbols"]).to eq(true)
+        expect(content["method"]).to eq('app-store')
+      end
+
+      it "reads user export plist and override some parameters" do
+        options = {
+          project: "./gym/examples/standard/Example.xcodeproj",
+          export_options: "./gym/examples/standard/ExampleExport.plist",
+          export_method: "app-store",
+          include_symbols: false,
+          include_bitcode: true,
+          export_team_id: "1234567890"
+        }
+        Gym.config = FastlaneCore::Configuration.create(Gym::Options.available_options, options)
+
+        result = Gym::PackageCommandGeneratorXcode7.generate
+        config_path = Gym::PackageCommandGeneratorXcode7.config_path
+
+        expect(Plist.parse_xml(config_path)).to eq({
+          'embedOnDemandResourcesAssetPacksInBundle' => true,
+          'manifest' => {
+            'appURL' => 'https://www.example.com/Example.ipa',
+            'displayImageURL' => 'https://www.example.com/display.png',
+            'fullSizeImageURL' => 'https://www.example.com/fullSize.png'
+          },
+          'method' => 'app-store',
+          'uploadSymbols' => false,
+          'uploadBitcode' => true,
+          'teamID' => '1234567890'
+        })
+      end
+
+      it "reads export options from hash" do
+        options = {
+          project: "./gym/examples/standard/Example.xcodeproj",
+          export_options: {
+            embedOnDemandResourcesAssetPacksInBundle: false,
+            manifest: {
+              appURL: "https://example.com/My App.ipa",
+              displayImageURL: "https://www.example.com/display image.png",
+              fullSizeImageURL: "https://www.example.com/fullSize image.png"
+            },
+            method: "enterprise",
+            uploadSymbols: false,
+            uploadBitcode: true,
+            teamID: "1234567890"
+          },
+          export_method: "app-store",
+          include_symbols: true,
+          include_bitcode: false,
+          export_team_id: "ASDFGHJK"
+        }
+        Gym.config = FastlaneCore::Configuration.create(Gym::Options.available_options, options)
+
+        result = Gym::PackageCommandGeneratorXcode7.generate
+        config_path = Gym::PackageCommandGeneratorXcode7.config_path
+
+        expect(Plist.parse_xml(config_path)).to eq({
+          'embedOnDemandResourcesAssetPacksInBundle' => false,
+          'manifest' => {
+            'appURL' => 'https://example.com/My%20App.ipa',
+            'displayImageURL' => 'https://www.example.com/display%20image.png',
+            'fullSizeImageURL' => 'https://www.example.com/fullSize%20image.png'
+          },
+          'method' => 'app-store',
+          'uploadSymbols' => true,
+          'uploadBitcode' => false,
+          'teamID' => 'ASDFGHJK'
+        })
+      end
+
+      it "doesn't store bitcode/symbols information for non app-store builds" do
+        options = { project: "./gym/examples/standard/Example.xcodeproj", export_method: 'ad-hoc' }
+        Gym.config = FastlaneCore::Configuration.create(Gym::Options.available_options, options)
+
+        result = Gym::PackageCommandGeneratorXcode7.generate
+        config_path = Gym::PackageCommandGeneratorXcode7.config_path
+
+        expect(Plist.parse_xml(config_path)).to eq({
+          'method' => "ad-hoc"
+        })
+      end
     end
 
-    it "doesn't store bitcode/symbols information for non app-store builds" do
-      options = { project: "./gym/examples/standard/Example.xcodeproj", export_method: 'ad-hoc' }
-      Gym.config = FastlaneCore::Configuration.create(Gym::Options.available_options, options)
+    describe "with Xcode 15.4 installed" do
+      before(:each) do
+        allow(FastlaneCore::Helper).to receive(:xcode_version).and_return('15.4')
+        allow(FastlaneCore::Helper).to receive(:mac?).and_return(true)
+        allow(FastlaneCore::Helper).to receive(:windows?).and_return(false)
+        allow(FastlaneCore::Helper).to receive(:linux?).and_return(false)
+      end
 
-      result = Gym::PackageCommandGeneratorXcode7.generate
-      config_path = Gym::PackageCommandGeneratorXcode7.config_path
+      it "generates a valid plist file we need" do
+        options = { project: "./gym/examples/standard/Example.xcodeproj" }
+        Gym.config = FastlaneCore::Configuration.create(Gym::Options.available_options, options)
 
-      expect(Plist.parse_xml(config_path)).to eq({
-        'method' => "ad-hoc"
-      })
+        result = Gym::PackageCommandGeneratorXcode7.generate
+        config_path = Gym::PackageCommandGeneratorXcode7.config_path
+
+        expect(Plist.parse_xml(config_path)).to eq({
+          'method' => "app-store-connect"
+        })
+      end
+
+      it "reads user export plist" do
+        options = { project: "./gym/examples/standard/Example.xcodeproj", export_options: "./gym/examples/standard/ExampleExport.plist" }
+        Gym.config = FastlaneCore::Configuration.create(Gym::Options.available_options, options)
+
+        result = Gym::PackageCommandGeneratorXcode7.generate
+        config_path = Gym::PackageCommandGeneratorXcode7.config_path
+
+        expect(Plist.parse_xml(config_path)).to eq({
+          'embedOnDemandResourcesAssetPacksInBundle' => true,
+          'manifest' => {
+            'appURL' => 'https://www.example.com/Example.ipa',
+            'displayImageURL' => 'https://www.example.com/display.png',
+            'fullSizeImageURL' => 'https://www.example.com/fullSize.png'
+          },
+          'method' => 'release-testing'
+        })
+        expect(Gym.config[:export_method]).to eq("ad-hoc")
+        expect(Gym.config[:include_symbols]).to be_nil
+        expect(Gym.config[:include_bitcode]).to be_nil
+        expect(Gym.config[:export_team_id]).to be_nil
+      end
+
+      it "defaults to the correct export type if :export_options parameter is provided" do
+        options = {
+          project: "./gym/examples/standard/Example.xcodeproj",
+          export_options: {
+            include_symbols: true
+          }
+        }
+
+        Gym.config = FastlaneCore::Configuration.create(Gym::Options.available_options, options)
+
+        result = Gym::PackageCommandGeneratorXcode7.generate
+        config_path = Gym::PackageCommandGeneratorXcode7.config_path
+
+        content = Plist.parse_xml(config_path)
+        expect(content["include_symbols"]).to eq(true)
+        expect(content["method"]).to eq('app-store-connect')
+      end
+
+      it "reads user export plist and override some parameters" do
+        options = {
+          project: "./gym/examples/standard/Example.xcodeproj",
+          export_options: "./gym/examples/standard/ExampleExport.plist",
+          export_method: "app-store",
+          include_symbols: false,
+          include_bitcode: true,
+          export_team_id: "1234567890"
+        }
+        Gym.config = FastlaneCore::Configuration.create(Gym::Options.available_options, options)
+
+        result = Gym::PackageCommandGeneratorXcode7.generate
+        config_path = Gym::PackageCommandGeneratorXcode7.config_path
+
+        expect(Plist.parse_xml(config_path)).to eq({
+          'embedOnDemandResourcesAssetPacksInBundle' => true,
+          'manifest' => {
+            'appURL' => 'https://www.example.com/Example.ipa',
+            'displayImageURL' => 'https://www.example.com/display.png',
+            'fullSizeImageURL' => 'https://www.example.com/fullSize.png'
+          },
+          'method' => 'app-store-connect',
+          'uploadSymbols' => false,
+          'uploadBitcode' => true,
+          'teamID' => '1234567890'
+        })
+      end
+
+      it "reads export options from hash" do
+        options = {
+          project: "./gym/examples/standard/Example.xcodeproj",
+          export_options: {
+            embedOnDemandResourcesAssetPacksInBundle: false,
+            manifest: {
+              appURL: "https://example.com/My App.ipa",
+              displayImageURL: "https://www.example.com/display image.png",
+              fullSizeImageURL: "https://www.example.com/fullSize image.png"
+            },
+            method: "enterprise",
+            uploadSymbols: false,
+            uploadBitcode: true,
+            teamID: "1234567890"
+          },
+          export_method: "app-store",
+          include_symbols: true,
+          include_bitcode: false,
+          export_team_id: "ASDFGHJK"
+        }
+        Gym.config = FastlaneCore::Configuration.create(Gym::Options.available_options, options)
+
+        result = Gym::PackageCommandGeneratorXcode7.generate
+        config_path = Gym::PackageCommandGeneratorXcode7.config_path
+
+        expect(Plist.parse_xml(config_path)).to eq({
+          'embedOnDemandResourcesAssetPacksInBundle' => false,
+          'manifest' => {
+            'appURL' => 'https://example.com/My%20App.ipa',
+            'displayImageURL' => 'https://www.example.com/display%20image.png',
+            'fullSizeImageURL' => 'https://www.example.com/fullSize%20image.png'
+          },
+          'method' => 'app-store-connect',
+          'uploadSymbols' => true,
+          'uploadBitcode' => false,
+          'teamID' => 'ASDFGHJK'
+        })
+      end
+
+      it "doesn't store bitcode/symbols information for non app-store builds" do
+        options = { project: "./gym/examples/standard/Example.xcodeproj", export_method: 'ad-hoc' }
+        Gym.config = FastlaneCore::Configuration.create(Gym::Options.available_options, options)
+
+        result = Gym::PackageCommandGeneratorXcode7.generate
+        config_path = Gym::PackageCommandGeneratorXcode7.config_path
+
+        expect(Plist.parse_xml(config_path)).to eq({
+          'method' => "release-testing"
+        })
+      end
     end
 
     it "uses a temporary folder to store the resulting ipa file" do

@@ -185,11 +185,39 @@ module Gym
         hash
       end
 
+      def use_old_export_method_values?
+        # this isn't called out in https://developer.apple.com/documentation/xcode-release-notes
+        # but online folks started complaining about it after Xcode 15.4-ish
+        # according to https://github.com/fastlane/fastlane/issues/22028 
+        # and issues raised in other repos
+        !Helper.xcode_at_least?("15.4")
+      end
+
+      def export_method(method)
+        if use_old_export_method_values?
+          method
+        else
+          # TODO test all of these...
+          map_fastlane_export_method_to_gte_xcode_15_4_export_method = {
+            "app-store" => "app-store-connect",
+            "validation" => "validation",
+            "ad-hoc" => "release-testing",
+            "package" => "package",
+            "enterprise" => "enterprise",
+            "development" => "development",
+            "developer-id" => "developer-id",
+            "mac-application" => "mac-application"
+          }
+          map_fastlane_export_method_to_gte_xcode_15_4_export_method[method]
+        end
+      end
+
       def config_content
         hash = read_export_options
 
         # Overrides export options if needed
-        hash[:method] = Gym.config[:export_method]
+        hash[:method] = export_method(Gym.config[:export_method])
+
         if Gym.config[:export_method] == 'app-store'
           hash[:uploadSymbols] = (Gym.config[:include_symbols] ? true : false) unless Gym.config[:include_symbols].nil?
           hash[:uploadBitcode] = (Gym.config[:include_bitcode] ? true : false) unless Gym.config[:include_bitcode].nil?
