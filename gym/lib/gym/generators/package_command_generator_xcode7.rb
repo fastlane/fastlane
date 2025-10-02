@@ -188,7 +188,7 @@ module Gym
       def use_old_export_method_values?
         # this isn't called out in https://developer.apple.com/documentation/xcode-release-notes
         # but online folks started complaining about it after Xcode 15.4-ish
-        # according to https://github.com/fastlane/fastlane/issues/22028 
+        # according to https://github.com/fastlane/fastlane/issues/22028
         # and issues raised in other repos
         !Helper.xcode_at_least?("15.4")
       end
