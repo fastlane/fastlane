@@ -235,6 +235,9 @@ module Gym
 
         hash[:teamID] = Gym.config[:export_team_id] if Gym.config[:export_team_id]
 
+        # TODO: 3 prs...
+        hash[:generateAppStoreInformation] = true
+
         UI.important("Generated plist file with the following values:")
         UI.command_output("-----------------------------------------")
         UI.command_output(JSON.pretty_generate(hash))
