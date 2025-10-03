@@ -13,9 +13,8 @@ describe FastlaneCore do
       allow(SecureRandom).to receive(:uuid).and_return(random_uuid)
     end
 
-    def shell_upload_command(provider_short_name: nil, transporter: nil, jwt: nil, use_asset_path: false, use_asset_description: false, username: email, input_pass: password, api_key: nil)
+    def shell_upload_command(provider_short_name: nil, transporter: nil, jwt: nil, use_asset_path: false, username: email, input_pass: password, api_key: nil)
       upload_part = use_asset_path ? "-assetFile /tmp/#{random_uuid}.ipa" : "-f /tmp/my.app.id.itmsp"
-      asset_description_part = use_asset_description ? "-assetDescription /tmp/AppStoreInfo.plist" : nil
 
       username = username if username != email
       escaped_password = input_pass
@@ -45,7 +44,6 @@ describe FastlaneCore do
            "-jwt #{jwt}"
          end),
         upload_part,
-        asset_description_part,
         (transporter.to_s if transporter),
         "-k 100000",
         ("-WONoPause true" if FastlaneCore::Helper.windows?),
@@ -144,9 +142,8 @@ describe FastlaneCore do
       ].compact.join(' ')
     end
 
-    def java_upload_command(provider_short_name: nil, transporter: nil, jwt: nil, classpath: true, use_asset_path: false, use_asset_description: false)
+    def java_upload_command(provider_short_name: nil, transporter: nil, jwt: nil, classpath: true, use_asset_path: false)
       upload_part = use_asset_path ? "-assetFile /tmp/#{random_uuid}.ipa" : "-f /tmp/my.app.id.itmsp"
-      asset_description_part = use_asset_description ? "-assetDescription /tmp/AppStoreInfo.plist" : nil
 
       [
         FastlaneCore::Helper.transporter_java_executable_path.shellescape,
@@ -164,7 +161,6 @@ describe FastlaneCore do
         ("-u #{email.shellescape} -p #{password.shellescape}" if jwt.nil?),
         ("-jwt #{jwt}" unless jwt.nil?),
         upload_part,
-        asset_description_part,
         (transporter.to_s if transporter),
         "-k 100000",
         ("-itc_provider #{provider_short_name}" if provider_short_name),
@@ -237,9 +233,8 @@ describe FastlaneCore do
       ].compact.join(' ')
     end
 
-    def java_upload_command_9(provider_short_name: nil, transporter: nil, jwt: nil, use_asset_path: false, use_asset_description: false)
+    def java_upload_command_9(provider_short_name: nil, transporter: nil, jwt: nil, use_asset_path: false)
       upload_part = use_asset_path ? "-assetFile /tmp/#{random_uuid}.ipa" : "-f /tmp/my.app.id.itmsp"
-      asset_description_part = use_asset_description ? "-assetDescription /tmp/AppStoreInfo.plist" : nil
 
       [
         FastlaneCore::Helper.transporter_java_executable_path.shellescape,
@@ -255,7 +250,6 @@ describe FastlaneCore do
         ("-u #{email.shellescape} -p #{password.shellescape}" if jwt.nil?),
         ("-jwt #{jwt}" unless jwt.nil?),
         upload_part,
-        asset_description_part,
         (transporter.to_s if transporter),
         "-k 100000",
         ("-itc_provider #{provider_short_name}" if provider_short_name),
@@ -305,9 +299,8 @@ describe FastlaneCore do
       ].compact.join(' ')
     end
 
-    def xcrun_upload_command(provider_short_name: nil, transporter: nil, jwt: nil, use_asset_path: false, use_asset_description: false)
+    def xcrun_upload_command(provider_short_name: nil, transporter: nil, jwt: nil, use_asset_path: false)
       upload_part = use_asset_path ? "-assetFile /tmp/#{random_uuid}.ipa" : "-f /tmp/my.app.id.itmsp"
-      asset_description_part = use_asset_description ? "-assetDescription /tmp/AppStoreInfo.plist" : nil
 
       [
         ("ITMS_TRANSPORTER_PASSWORD=#{password.shellescape}" if jwt.nil?),
@@ -317,7 +310,6 @@ describe FastlaneCore do
         ("-p @env:ITMS_TRANSPORTER_PASSWORD" if jwt.nil?),
         ("-jwt #{jwt}" unless jwt.nil?),
         upload_part,
-        asset_description_part,
         (transporter.to_s if transporter),
         "-k 100000",
         ("-itc_provider #{provider_short_name}" if provider_short_name),
