@@ -329,7 +329,13 @@ module Gym
                                      verify_block: proc do |value|
                                        av = %w(netrc keychain)
                                        UI.user_error!("Unsupported authorization provider '#{value}', must be: #{av}") unless av.include?(value)
-                                     end)
+                                     end),
+        FastlaneCore::ConfigItem.new(key: :generate_app_store_information,
+                                     env_name: "GYM_GENERATE_APP_STORE_INFORMATION",
+                                     description: "Generate App Store information",
+                                     type: Boolean,
+                                     default_value: false,
+                                     optional: true)
       ]
     end
   end
