@@ -75,10 +75,10 @@ module Fastlane
           UI.verbose("upload_dsym using command: #{command_to_execute}")
           Actions.sh(command_to_execute, log: params[:debug])
         rescue => ex
+          UI.error(ex.to_s) # it fails, however we don't want to fail everything just for this
+
           if params[:fail_on_error] == true
             raise
-          else
-            UI.error(ex.to_s) # it fails, however we don't want to fail everything just for this
           end
         end
       end
