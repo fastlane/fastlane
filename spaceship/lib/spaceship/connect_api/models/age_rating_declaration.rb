@@ -8,6 +8,7 @@ module Spaceship
       attr_accessor :alcohol_tobacco_or_drug_use_or_references
       attr_accessor :contests
       attr_accessor :gambling_simulated
+      attr_accessor :korea_age_rating_override
       attr_accessor :medical_or_treatment_information
       attr_accessor :profanity_or_crude_humor
       attr_accessor :sexual_content_graphic_and_nudity
@@ -20,7 +21,7 @@ module Spaceship
 
       # Boolean
       attr_accessor :gambling
-      attr_accessor :seventeen_plus
+      attr_accessor :loot_box
       attr_accessor :unrestricted_web_access
 
       # KidsAge
@@ -46,9 +47,10 @@ module Spaceship
         "contests" => "contests",
         "gambling" => "gambling",
         "gamblingSimulated" => "gambling_simulated",
+        "koreaAgeRatingOverride" => "korea_age_rating_override",
+        "lootBox" => "loot_box",
         "medicalOrTreatmentInformation" => "medical_or_treatment_information",
         "profanityOrCrudeHumor" => "profanity_or_crude_humor",
-        "seventeenPlus" => "seventeen_plus",
         "sexualContentGraphicAndNudity" => "sexual_content_graphic_and_nudity",
         "sexualContentOrNudity" => "sexual_content_or_nudity",
         "horrorOrFearThemes" => "horror_or_fear_themes",
