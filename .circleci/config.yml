@@ -56,10 +56,10 @@ aliases:
       name: bundle install
       command: |
         gem update --system `.ci/compatible_gem_version`
-        gem install bundler -v $(cat Gemfile.lock | tail -1 | tr -d " ")
+        gem install bundler -v `.ci/bundler_version.rb`
         bundle config set --local path .bundle
         bundle check || bundle install --jobs=4 --retry=3
-        bundle env
+        rbenv rehash
 
 jobs:
   tests_macos: &tests_macos_base
@@ -88,13 +88,14 @@ jobs:
           version: << parameters.ruby_version >>
       - run:
           name: debug | ruby version
-          command: |
-            ruby -v
+          command: ruby -v
       - run:
           name: Setup Build
-          command: |
-            mkdir -p ~/test-reports
+          command: mkdir -p ~/test-reports
       - *bundle_install
+      - run:
+          name: debug | bundler version
+          command: bundle env
       - *cache_save_bundler
       - run:
           name: Check PR Metadata
@@ -179,6 +180,9 @@ jobs:
       - macos/switch-ruby:
           version: << parameters.ruby_version >>
       - *bundle_install
+      - run:
+          name: debug | bundler version
+          command: bundle env
       - *cache_save_bundler
       - run: bundle exec fastlane generate_swift_api
 
