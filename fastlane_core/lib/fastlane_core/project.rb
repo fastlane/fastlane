@@ -341,6 +341,7 @@ module FastlaneCore
       proj << "-derivedDataPath #{options[:derived_data_path].shellescape}" if options[:derived_data_path]
       proj << "-xcconfig #{options[:xcconfig].shellescape}" if options[:xcconfig]
       proj << "-scmProvider system" if options[:use_system_scm]
+      proj << "-packageAuthorizationProvider #{options[:package_authorization_provider].shellescape}" if options[:package_authorization_provider]
 
       xcode_at_least_11 = FastlaneCore::Helper.xcode_at_least?('11.0')
       if xcode_at_least_11 && options[:cloned_source_packages_path]

@@ -69,7 +69,7 @@ module Spaceship
       # Forwarding to class level if using web session.
       def hostname
         if @token
-          return "https://api.appstoreconnect.apple.com/"
+          return @token.in_house ? "https://api.enterprise.developer.apple.com/" : "https://api.appstoreconnect.apple.com/"
         end
         return self.class.hostname
       end

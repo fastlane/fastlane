@@ -1,5 +1,5 @@
 describe Spaceship::ConnectAPI::AppStoreVersionReleaseRequest do
-  before { Spaceship::Tunes.login }
+  include_examples "common spaceship login"
 
   describe '#Spaceship::ConnectAPI' do
     it '#post_app_store_version_release_request' do

@@ -99,7 +99,7 @@ module Deliver
                                      optional: true,
                                      default_value: "ios",
                                      verify_block: proc do |value|
-                                       UI.user_error!("The platform can only be ios, appletvos, xros or osx") unless %('ios', 'appletvos', 'xros', 'osx').include?(value)
+                                       UI.user_error!("The platform can only be ios, appletvos/tvos, xros or osx") unless %w(ios appletvos tvos xros osx).include?(value)
                                      end),
 
         # live version

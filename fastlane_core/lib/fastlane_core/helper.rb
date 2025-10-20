@@ -74,7 +74,7 @@ module FastlaneCore
       return true if self.is_circle_ci?
 
       # Check for Jenkins, Travis CI, ... environment variables
-      ['JENKINS_HOME', 'JENKINS_URL', 'TRAVIS', 'CI', 'APPCENTER_BUILD_ID', 'TEAMCITY_VERSION', 'GO_PIPELINE_NAME', 'bamboo_buildKey', 'GITLAB_CI', 'XCS', 'TF_BUILD', 'GITHUB_ACTION', 'GITHUB_ACTIONS', 'BITRISE_IO', 'BUDDY'].each do |current|
+      ['JENKINS_HOME', 'JENKINS_URL', 'TRAVIS', 'CI', 'APPCENTER_BUILD_ID', 'TEAMCITY_VERSION', 'GO_PIPELINE_NAME', 'bamboo_buildKey', 'GITLAB_CI', 'XCS', 'TF_BUILD', 'GITHUB_ACTION', 'GITHUB_ACTIONS', 'BITRISE_IO', 'BUDDY', 'CODEBUILD_BUILD_ARN'].each do |current|
         return true if FastlaneCore::Env.truthy?(current)
       end
       return false
@@ -82,6 +82,11 @@ module FastlaneCore
 
     def self.is_circle_ci?
       return ENV.key?('CIRCLECI')
+    end
+
+    # @return [boolean] true if environment variable CODEBUILD_BUILD_ARN is set
+    def self.is_codebuild?
+      return ENV.key?('CODEBUILD_BUILD_ARN')
     end
 
     def self.operating_system

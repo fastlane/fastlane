@@ -1,6 +1,10 @@
 describe FastlaneCore do
   describe FastlaneCore::CommandExecutor do
     describe "execute" do
+      let(:failing_command) { FastlaneCore::Helper.windows? ? 'echo log && exit 42' : 'echo log; exit 42' }
+      let(:failing_command_output) { FastlaneCore::Helper.windows? ? "log \n" : "log\n" }
+      let(:failing_command_error_input) { FastlaneCore::Helper.windows? ? "log " : "log" }
+
       it 'executes a simple command successfully' do
         unless FastlaneCore::Helper.windows?
           expect(Process).to receive(:wait)
@@ -67,6 +71,77 @@ Shopping list:
   - Bread
   - Muffins
         LIST
+      end
+
+      it "does not print output to stdout when status != 0 and output was already printed" do
+        unless FastlaneCore::Helper.windows?
+          expect(Process).to receive(:wait)
+        end
+
+        expect do
+          FastlaneCore::CommandExecutor.execute(
+            command: failing_command,
+            print_all: true,
+            error: proc do |_error_output| end
+          )
+        end.not_to output(failing_command_output).to_stdout
+      end
+
+      it "prints output to stdout only once when status != 0 and output was not already printed" do
+        unless FastlaneCore::Helper.windows?
+          expect(Process).to receive(:wait).exactly(3)
+        end
+
+        expect do
+          FastlaneCore::CommandExecutor.execute(
+            command: failing_command,
+            print_all: false,
+            error: nil
+          )
+        end.to output(failing_command_output).to_stdout.and(raise_error)
+
+        expect do
+          FastlaneCore::CommandExecutor.execute(
+            command: failing_command,
+            print_all: false,
+            error: proc do |_error_output| end
+          )
+        end.to output(failing_command_output).to_stdout
+
+        expect do
+          FastlaneCore::CommandExecutor.execute(
+            command: failing_command,
+            print_all: true,
+            suppress_output: true,
+            error: proc do |_error_output| end
+          )
+        end.to output(failing_command_output).to_stdout
+      end
+
+      it "calls error block with output argument" do
+        unless FastlaneCore::Helper.windows?
+          expect(Process).to receive(:wait).twice
+        end
+
+        error_block_input = nil
+        result = FastlaneCore::CommandExecutor.execute(
+          command: failing_command,
+          print_all: true,
+          error: proc do |error_output|
+            error_block_input = error_output
+          end
+        )
+        expect(error_block_input).to eq(failing_command_error_input)
+
+        error_block_input = nil
+        result = FastlaneCore::CommandExecutor.execute(
+          command: failing_command,
+          print_all: false,
+          error: proc do |error_output|
+            error_block_input = error_output
+          end
+        )
+        expect(error_block_input).to eq(failing_command_error_input)
       end
     end
 
