@@ -168,7 +168,7 @@ jobs:
       - *cache_restore_git
       - checkout
       - *cache_save_git
-      - *bundle_install
+      - ruby/install-deps:
 
       - run: bundle exec fastlane validate_docs
 
