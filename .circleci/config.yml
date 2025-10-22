@@ -67,7 +67,7 @@ jobs:
           name: Setup Build
           command: |
             mkdir -p ~/test-reports
-      - ruby/install-deps:
+      - ruby/install-deps
       - run:
           name: Check PR Metadata
           command: bundle exec danger || echo "danger failed"
@@ -119,7 +119,7 @@ jobs:
           name: Setup Build
           command: |
             mkdir -p ~/test-reports
-      - ruby/install-deps:
+      - ruby/install-deps
       - run:
           name: Check PR Metadata
           command: bundle exec danger || echo "danger failed"
@@ -147,7 +147,7 @@ jobs:
       - *cache_save_git
       - macos/switch-ruby:
           version: << parameters.ruby_version >>
-      - ruby/install-deps:
+      - ruby/install-deps
       - run: bundle exec fastlane generate_swift_api
 
   validate_documentation:
@@ -162,7 +162,7 @@ jobs:
       - *cache_restore_git
       - checkout
       - *cache_save_git
-      - ruby/install-deps:
+      - ruby/install-deps
 
       - run: bundle exec fastlane validate_docs
 
@@ -178,7 +178,7 @@ jobs:
       - *cache_restore_git
       - checkout
       - *cache_save_git
-      - ruby/install-deps:
+      - ruby/install-deps
 
       - run: bundle exec fastlane lint_source
 
