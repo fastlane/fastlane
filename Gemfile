@@ -28,6 +28,9 @@ gem "pry-byebug"
 gem "pry-rescue"
 # A plugin for pry that enables exploring the call stack.
 gem "pry-stack_explorer"
+# Used for fastlane-sirp.
+# Version 5.1.0+ requires Ruby >=3.0, while fastlane uses a `required_ruby_version` of `>= 2.6`.
+gem "public_suffix", "~> 5.0.5"
 # A simple task automation tool.
 gem "rake"
 # A readline implementation in Ruby
