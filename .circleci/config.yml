@@ -57,7 +57,6 @@ aliases:
       command: |
         gem update --system `.ci/compatible_gem_version`
         gem install bundler -v $(cat Gemfile.lock | tail -1 | tr -d " ")
-        bundle config set --local path .bundle
         bundle check || bundle install --jobs=4 --retry=3
         bundle env
 
