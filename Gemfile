@@ -13,6 +13,9 @@ gem "coveralls", "~> 0.8.13"
 gem "danger", "~> 8.0"
 # Plugin for Danger that reports JUnit test results.
 gem "danger-junit", "~> 1.0"
+# domain_name is used for http-cookie
+# Version 0.6.20231109+ requires Ruby >= 2.7, while fastlane uses a `required_ruby_version` of `>= 2.6`.
+gem "domain_name", "~> 0.5.20190701"
 # A fake filesystem.
 # Version 1.9+ requires Ruby >=2.7, while fastlane uses a `required_ruby_version` of `>= 2.6`.
 gem "fakefs", "1.8"
