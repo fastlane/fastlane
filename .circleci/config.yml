@@ -4,15 +4,9 @@ version: 2.1
 orbs:
   shellcheck: circleci/shellcheck@2.2.2 # brew install shellcheck stopped working so using this
   macos: circleci/macos@2
-  ruby: circle/ruby@2.5.4
+  ruby: circleci/ruby@2.5.4
 
 aliases:
-  - &important-branches
-    filters:
-      branches:
-        only:
-          - master
-          - /^version\-bump\-.*/
   # common - cache
   - &cache_restore_git
     restore_cache:
