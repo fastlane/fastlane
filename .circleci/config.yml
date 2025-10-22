@@ -4,6 +4,7 @@ version: 2.1
 orbs:
   shellcheck: circleci/shellcheck@2.2.2 # brew install shellcheck stopped working so using this
   macos: circleci/macos@2
+  ruby: circle/ruby@2.5.4
 
 aliases:
   - &important-branches
@@ -27,17 +28,6 @@ aliases:
       paths:
         - ".git"
 
-  - &cache_restore_bundler
-    restore_cache:
-      name: cache | restore bundle
-      key: v3-gems-{{ arch }}-<< parameters.ruby_version >>-{{ checksum "Gemfile.lock" }}
-  - &cache_save_bundler
-    save_cache:
-      name: cache | store bundle
-      key: v3-gems-{{ arch }}-<< parameters.ruby_version >>-{{ checksum "Gemfile.lock" }}
-      paths:
-        - ".bundle"
-
   - &cache_restore_rubocop
     restore_cache:
       name: cache | restore rubocop
@@ -53,12 +43,8 @@ aliases:
 
   - &bundle_install
     run:
-      name: bundle install
-      command: |
-        gem update --system `.ci/compatible_gem_version`
-        gem install bundler -v $(cat Gemfile.lock | tail -1 | tr -d " ")
-        bundle check || bundle install --jobs=4 --retry=3
-        bundle env
+      - ruby/install-deps
+
 
 jobs:
   tests_macos: &tests_macos_base
@@ -82,7 +68,6 @@ jobs:
       - *cache_restore_git
       - checkout
       - *cache_save_git
-      - *cache_restore_bundler
       - macos/switch-ruby:
           version: << parameters.ruby_version >>
       - run:
@@ -94,7 +79,6 @@ jobs:
           command: |
             mkdir -p ~/test-reports
       - *bundle_install
-      - *cache_save_bundler
       - run:
           name: Check PR Metadata
           command: bundle exec danger || echo "danger failed"
@@ -142,13 +126,11 @@ jobs:
       - *cache_restore_git
       - checkout
       - *cache_save_git
-      - *cache_restore_bundler
       - run:
           name: Setup Build
           command: |
             mkdir -p ~/test-reports
       - *bundle_install
-      - *cache_save_bundler
       - run:
           name: Check PR Metadata
           command: bundle exec danger || echo "danger failed"
@@ -174,11 +156,9 @@ jobs:
       - *cache_restore_git
       - checkout
       - *cache_save_git
-      - *cache_restore_bundler
       - macos/switch-ruby:
           version: << parameters.ruby_version >>
       - *bundle_install
-      - *cache_save_bundler
       - run: bundle exec fastlane generate_swift_api
 
   validate_documentation:
@@ -193,14 +173,7 @@ jobs:
       - *cache_restore_git
       - checkout
       - *cache_save_git
-      - *cache_restore_bundler
-
-      - run:
-          name: Setup Build
-          command: |
-            gem update --system `.ci/compatible_gem_version`
       - *bundle_install
-      - *cache_save_bundler
 
       - run: bundle exec fastlane validate_docs
 
@@ -216,9 +189,7 @@ jobs:
       - *cache_restore_git
       - checkout
       - *cache_save_git
-      - *cache_restore_bundler
       - *bundle_install
-      - *cache_save_bundler
 
       - run: bundle exec fastlane lint_source
 
