@@ -43,7 +43,7 @@ aliases:
 
   - &bundle_install
     run:
-      - ruby/install-deps
+      - ruby/install-deps:
 
 
 jobs:
