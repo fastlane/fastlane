@@ -9,6 +9,7 @@ require:
 
 AllCops:
   TargetRubyVersion: 3.0
+  SuggestExtensions: false
   NewCops: enable
   Include:
     - '**/*.rb'
