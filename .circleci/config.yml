@@ -154,8 +154,6 @@ jobs:
     parameters:
       image:
         type: string
-      ruby_version: # Used when restoring/saving bundler cache
-        type: string
     docker:
       - image: << parameters.image >>
     steps:
@@ -168,8 +166,6 @@ jobs:
   lint_source_code:
     parameters:
       image:
-        type: string
-      ruby_version: # Used when restoring/saving bundler cache
         type: string
     docker:
       - image: << parameters.image >>
@@ -245,7 +241,6 @@ workflows:
       - tests_ubuntu:
           name: 'Execute tests on Ubuntu'
           image: 'cimg/ruby:3.2-node'
-          ruby_version: '3.2'
       - validate_fastlane_swift_generation:
           name: 'Validate Fastlane.swift generation'
           xcode_version: '15.0.1'
@@ -253,11 +248,9 @@ workflows:
       - validate_documentation:
           name: 'Validate Documentation'
           image: 'cimg/ruby:3.2'
-          ruby_version: '3.2'
       - lint_source_code:
           name: 'Lint source code'
           image: 'cimg/ruby:3.2'
-          ruby_version: '3.2'
       - modules_load_up_tests:
           name: 'Modules load up tests'
           image: 'cimg/ruby:3.2'
