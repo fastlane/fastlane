@@ -102,8 +102,6 @@ jobs:
     parameters:
       image:
         type: string
-      ruby_version: # Used when restoring/saving bundler cache
-        type: string
     environment:
       CIRCLE_TEST_REPORTS: '~/test-reports'
       LC_ALL: 'C.UTF-8'
