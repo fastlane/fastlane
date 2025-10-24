@@ -28,7 +28,6 @@ cache:
 install:
   - set PATH=C:\Ruby32-x64\bin;%PATH%
   - bundle config --local path vendor/bundle
-  - ridk install 3 # for ruby >= 3.1, we need the full compiler toolchain for gems with native extensions
   - bundle install
   # iconv
   - appveyor DownloadFile
