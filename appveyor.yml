@@ -27,7 +27,6 @@ cache:
 
 install:
   - set PATH=C:\Ruby32-x64\bin;%PATH%
-  - bundle config --local path vendor/bundle
   - bundle install
   # iconv
   - appveyor DownloadFile
