@@ -27,10 +27,7 @@ cache:
 
 install:
   - set PATH=C:\Ruby32-x64\bin;%PATH%
-  - ruby -v
-  - which ruby
-  - gem -v
-  - bundle -v
+  - gem install bundler -v $(cat Gemfile.lock | tail -1 | tr -d " ") --force
   - bundle install
   # iconv
   - appveyor DownloadFile
