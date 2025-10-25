@@ -29,7 +29,7 @@ install:
   - ps: |
       $env:PATH="C:\Ruby32-x64\bin;$env:PATH"
       $version = (Get-Content Gemfile.lock | Select-Object -Last 1).Trim()
-      gem install bundler --force -v
+      gem install bundler --force -v $version
   - set PATH=C:\Ruby32-x64\bin;%PATH%
   - bundle install
   # iconv
