@@ -27,7 +27,9 @@ cache:
 
 install:
   - set PATH=C:\Ruby32-x64\bin;%PATH%
-  - FOR /F "usebackq delims==" %%A IN (`ruby .ci/bundler_version.rb`) DO gem install bundler -v %%A
+  - ps: |
+      $version = (Get-Content Gemfile.lock | Select-Object -Last 1).Trim()
+      gem install bundler --force -v $version
   - bundle install
   # iconv
   - appveyor DownloadFile
