@@ -27,9 +27,6 @@ cache:
 
 install:
   - set PATH=C:\Ruby32-x64\bin;%PATH%
-  - ruby -e "p File.expand_path('..', __FILE__)" %CD%\Gemfile
-  - ruby -e "p File.join(File.expand_path('..', __FILE__), 'fastlane', 'Pluginfile')" %CD%\Gemfile
-  - if exist fastlane\Pluginfile (echo Pluginfile found) else (echo Pluginfile MISSING)
   - bundle install
   # iconv
   - appveyor DownloadFile
