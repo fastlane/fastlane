@@ -26,17 +26,14 @@ cache:
 # cloning the repository happens here
 
 install:
-  - ps: |
-      $env:PATH = "C:\Ruby32-x64\bin;$env:PATH"
-      $version = (Get-Content Gemfile.lock | Select-Object -Last 1).Trim()
-      gem install bundler --force -v $version
-      bundle install
-
-      # Download and silently install libiconv
-      $iconvUrl = "https://downloads.sourceforge.net/project/gnuwin32/libiconv/1.9.2-1/libiconv-1.9.2-1.exe?download"
-      $iconvPath = Join-Path $env:TEMP "libiconv.exe"
-      Invoke-WebRequest -Uri $iconvUrl -OutFile $iconvPath
-      Start-Process -FilePath $iconvPath -ArgumentList "/SILENT", "/SUPPRESSMSGBOXES" -Wait
+  - set PATH=C:\Ruby32-x64\bin;%PATH%
+  - gem install bundler --force
+  - bundle install
+  # iconv
+  - appveyor DownloadFile
+    https://downloads.sourceforge.net/project/gnuwin32/libiconv/1.9.2-1/libiconv-1.9.2-1.exe?download
+    -FileName %TEMP%\libiconv.exe
+  - "%TEMP%\\libiconv.exe /SILENT /SUPPRESSMSGBOXES"
 
 environment:
   LC_ALL: en_US.UTF-8
