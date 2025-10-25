@@ -2,6 +2,9 @@
 
 version: "{build}"
 
+# https://www.appveyor.com/docs/windows-images-software/
+image: 'Visual Studio 2019'
+
 # branches to build
 branches:
   # allowlist
@@ -26,14 +29,7 @@ cache:
 # cloning the repository happens here
 
 install:
-  - set PATH=C:\Ruby32-x64\bin;%PATH%
-  - gem install bundler --force
   - bundle install
-  # iconv
-  - appveyor DownloadFile
-    https://downloads.sourceforge.net/project/gnuwin32/libiconv/1.9.2-1/libiconv-1.9.2-1.exe?download
-    -FileName %TEMP%\libiconv.exe
-  - "%TEMP%\\libiconv.exe /SILENT /SUPPRESSMSGBOXES"
 
 environment:
   LC_ALL: en_US.UTF-8
