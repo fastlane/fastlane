@@ -2,6 +2,9 @@
 
 version: "{build}"
 
+# https://www.appveyor.com/docs/windows-images-software/
+image: 'Visual Studio 2019'
+
 # branches to build
 branches:
   # allowlist
@@ -14,24 +17,15 @@ skip_tags: true
 # Do not build additional commits to feature branch with open Pull Requests
 skip_branch_with_pr: true
 
-# Rolling builds
-# can only be configured via UI: https://www.appveyor.com/docs/build-configuration/#rolling-builds
-
 init:
   - git config --global core.autocrlf true
 
-# cloning the repository happens here
+cache:
+  - vendor/bundle
 
+# cloning the repository happens here
 install:
-  - set PATH=C:\Ruby26-x64\bin;%PATH%
-  - FOR /F "usebackq delims==" %%A IN (`ruby .ci/compatible_gem_version`) DO gem update --system %%A
-  - FOR /F "usebackq delims==" %%A IN (`ruby .ci/bundler_version.rb`) DO gem install bundler -v %%A
   - bundle install
-  # iconv
-  - appveyor DownloadFile
-    https://downloads.sourceforge.net/project/gnuwin32/libiconv/1.9.2-1/libiconv-1.9.2-1.exe?download
-    -FileName %TEMP%\libiconv.exe
-  - "%TEMP%\\libiconv.exe /SILENT /SUPPRESSMSGBOXES"
 
 environment:
   LC_ALL: en_US.UTF-8
