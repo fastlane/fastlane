@@ -27,17 +27,18 @@ cache:
 
 install:
   - ps: |
+      $env:PATH = "C:\Ruby32-x64\bin;$env:PATH"
       $version = (Get-Content Gemfile.lock | Select-Object -Last 1).Trim()
       gem install bundler --force -v $version
-  - bundle install
-  # iconv
-  - appveyor DownloadFile
-    https://downloads.sourceforge.net/project/gnuwin32/libiconv/1.9.2-1/libiconv-1.9.2-1.exe?download
-    -FileName %TEMP%\libiconv.exe
-  - "%TEMP%\\libiconv.exe /SILENT /SUPPRESSMSGBOXES"
+      bundle install
+
+      # Download and silently install libiconv
+      $iconvUrl = "https://downloads.sourceforge.net/project/gnuwin32/libiconv/1.9.2-1/libiconv-1.9.2-1.exe?download"
+      $iconvPath = Join-Path $env:TEMP "libiconv.exe"
+      Invoke-WebRequest -Uri $iconvUrl -OutFile $iconvPath
+      Start-Process -FilePath $iconvPath -ArgumentList "/SILENT", "/SUPPRESSMSGBOXES" -Wait
 
 environment:
-  PATH: C:\Ruby32-x64\bin;%PATH%
   LC_ALL: en_US.UTF-8
   LANG: en_US.UTF-8
   FASTLANE_ITUNES_TRANSPORTER_PATH: C:/tmp
