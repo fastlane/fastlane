@@ -26,11 +26,11 @@ cache:
 # cloning the repository happens here
 
 install:
-  - set PATH=C:\Ruby32-x64\bin;%PATH%
   - ps: |
       $env:PATH="C:\Ruby32-x64\bin;$env:PATH"
       $version = (Get-Content Gemfile.lock | Select-Object -Last 1).Trim()
-      gem install bundler --force -v $version
+      gem install bundler --force -v
+  - set PATH=C:\Ruby32-x64\bin;%PATH%
   - bundle install
   # iconv
   - appveyor DownloadFile
