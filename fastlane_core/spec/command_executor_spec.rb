@@ -6,6 +6,10 @@ describe FastlaneCore do
       let(:failing_command_error_input) { FastlaneCore::Helper.windows? ? "log " : "log" }
 
       it 'executes a simple command successfully' do
+        unless FastlaneCore::Helper.windows?
+          expect(Process).to receive(:wait)
+        end
+
         result = FastlaneCore::CommandExecutor.execute(command: 'echo foo')
 
         expect(result).to eq('foo')

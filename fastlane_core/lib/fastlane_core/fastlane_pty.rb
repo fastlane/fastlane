@@ -57,18 +57,18 @@ module FastlaneCore
     def self.spawn_with_popen(command, &block)
       status = nil
       require 'open3'
-      Open3.popen2e(command) do |stdin_io, stdout_io, wait_thread|
-        yield(stdout_io, stdin_io, wait_thread.pid)
-        stdin_io.close
-        stdout_io.close
-        status = wait_thread.value
+      Open3.popen2e(command) do |command_stdin, command_stdout, p| # note the inversion
+        status = p.value
+        yield(command_stdout, command_stdin, status.pid)
+        command_stdin.close
+        command_stdout.close
         raise StandardError, "Process crashed" if status.signaled?
         status.exitstatus
       end
     rescue StandardError => e
       # Wrapping any error in FastlanePtyError to allow callers to see and use
       # $?.exitstatus that would usually get returned
-      raise FastlanePtyError.new(e, status&.exitstatus || e.exit_status, status)
+      raise FastlanePtyError.new(e, status.exitstatus || e.exit_status, status)
     end
 
     # to ease mocking
