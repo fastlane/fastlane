@@ -126,7 +126,10 @@ module Deliver
     # finding invalid folder name @return [Array<Deliver::AppClipHeaderImage>]
     # The list of AppClipHeaderImage that exists under given `root` directory
     def self.load_app_clip_header_images(root, ignore_validation)
-      app_clip_header_images = language_folders(root, ignore_validation, true).flat_map do |language_folder|
+      language_folders_list = language_folders(root, ignore_validation, true)
+
+      # Load images from all language folders (including default)
+      app_clip_header_images = language_folders_list.flat_map do |language_folder|
         paths = language_folder.file_paths
         paths.map { |path| AppClipHeaderImage.new(path, language_folder.language) }
       end
@@ -144,7 +147,8 @@ module Deliver
       end
 
       # validate there is only one header image per language
-      app_clip_header_images.map(&:language).each do |language|
+      # Filter out nil languages (e.g., from default folder) before validation
+      app_clip_header_images.map(&:language).compact.each do |language|
         if app_clip_header_images.find_all { |header_image| header_image.language.eql?(language) }.length > 1
           UI.user_error!("There can only be one app clip header image per language. The language #{language} has more than one image.")
         end

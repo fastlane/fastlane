@@ -23,6 +23,9 @@ module Deliver
       # load the metadata from the filesystem before uploading
       load_from_filesystem(options)
 
+      # Assign default values to all languages
+      assign_defaults(options)
+
       app = Deliver.cache[:app]
       platform = Spaceship::ConnectAPI::Platform.map(options[:platform])
       version = fetch_edit_app_store_version(app, platform)
@@ -92,6 +95,40 @@ module Deliver
         UI.message("Loading '#{path}'...")
         options[key] ||= File.read(path).strip
       end
+    end
+
+    # If the user is using the 'default' language, then assign values where they are needed
+    def assign_defaults(options)
+      # Build a complete list of the required languages
+      enabled_languages = detect_languages(options)
+
+      return unless enabled_languages.include?("default")
+      UI.message("Detected languages for app clip default experience: " + enabled_languages.to_s)
+
+      LOCALISED_APP_CLIP_DEFAULT_EXPERIENCE_VALUES.keys.each do |key|
+        current = options[key]
+        next unless current && current.kind_of?(Hash)
+
+        default = current["default"]
+        next if default.nil?
+
+        enabled_languages.each do |language|
+          value = current[language]
+          next unless value.nil?
+
+          current[language] = default
+        end
+        current.delete("default")
+      end
+    end
+
+    def detect_languages(options)
+      Languages.detect_languages(
+        options: options,
+        localized_values_keys: LOCALISED_APP_CLIP_DEFAULT_EXPERIENCE_VALUES.keys,
+        metadata_path: options[:app_clip_default_experience_metadata_path],
+        ignore_validation: options[:ignore_language_directory_validation]
+      )
     end
 
     # from upload_metadata.rb
