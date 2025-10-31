@@ -24,12 +24,26 @@ module FastlaneCore
         end
       end
 
+      def runtime_name_to_version
+        @runtime_name_to_version ||= begin
+          output, status = Open3.capture2('xcrun simctl list -j runtimes')
+          raise status unless status.success?
+          json = JSON.parse(output)
+          json['runtimes'].map { |h| [h['name'], h['version']] }.to_h
+        rescue StandardError => e
+          UI.error(e)
+          UI.error('xcrun simctl CLI broken; run `xcrun simctl list runtimes` and make sure it works')
+          UI.user_error!('xcrun simctl not working')
+        end
+      end
+
       def simulators(requested_os_type = "")
         UI.verbose("Fetching available simulator devices")
 
         @devices = []
         os_type = 'unknown'
         os_version = 'unknown'
+        actual_os_version = 'unknown'
         output = ''
         Open3.popen3('xcrun simctl list devices') do |stdin, stdout, stderr, wait_thr|
           output = stdout.read
@@ -40,11 +54,19 @@ module FastlaneCore
           UI.user_error!("xcrun simctl not working.")
         end
 
+        # Get runtime mapping from JSON data
+        # For example, maps "iOS 26.0" -> "26.0.1"
+        runtime_mapping = runtime_name_to_version
+
         output.split(/\n/).each do |line|
           next if line =~ /unavailable/
           next if line =~ /^== /
           if line =~ /^-- /
-            (os_type, os_version) = line.gsub(/-- (.*) --/, '\1').split
+            section_header = line.gsub(/-- (.*) --/, '\1')
+            (os_type, os_version) = section_header.split
+
+            # Use the actual runtime version if available, otherwise fall back to section version
+            actual_os_version = runtime_mapping[section_header] || os_version
           else
             next if os_type =~ /^Unavailable/
 
@@ -58,7 +80,7 @@ module FastlaneCore
 
             if matches.count && (os_type == requested_os_type || requested_os_type == "")
               # This is disabled here because the Device is defined later in the file, and that's a problem for the cop
-              @devices << Device.new(name: name, os_type: os_type, os_version: os_version, udid: udid, state: state, is_simulator: true)
+              @devices << Device.new(name: name, os_type: os_type, os_version: actual_os_version, udid: udid, state: state, is_simulator: true)
             end
           end
         end
