@@ -449,7 +449,7 @@ describe FastlaneCore do
     it 'properly maps runtime names to actual versions for version mismatch fix' do
       # Clear cache to ensure our mock is called
       FastlaneCore::DeviceManager.instance_variable_set(:@runtime_name_to_version, nil)
-      
+
       status = double('status', "success?": true)
       runtime_output = File.read('./fastlane_core/spec/fixtures/XcrunSimctlListRuntimesOutputWithVersionMismatch')
       expect(Open3).to receive(:capture2).with("xcrun simctl list -j runtimes").and_return([runtime_output, status])
@@ -461,13 +461,13 @@ describe FastlaneCore do
     it 'fixes iOS version mismatch by using actual runtime versions instead of section header versions' do
       # Clear cache to ensure our mock is called
       FastlaneCore::DeviceManager.instance_variable_set(:@runtime_name_to_version, nil)
-      
+
       # Mock the runtime JSON response
       status = double('status', "success?": true)
       runtime_output = File.read('./fastlane_core/spec/fixtures/XcrunSimctlListRuntimesOutputWithVersionMismatch')
       expect(Open3).to receive(:capture2).with("xcrun simctl list -j runtimes").and_return([runtime_output, status])
 
-      # Mock the simctl devices output  
+      # Mock the simctl devices output
       response = "response"
       simctl_output = File.read('./fastlane_core/spec/fixtures/DeviceManagerSimctlOutputWithVersionMismatch')
       expect(response).to receive(:read).and_return(simctl_output)
@@ -489,12 +489,12 @@ describe FastlaneCore do
       expect(devices[1]).to have_attributes(
         name: "iPhone 15 Pro Max", os_type: "iOS", os_version: "26.0.1",
         udid: "6D8B8DC9-F2BD-41C6-BC9A-C8BCEB521675",
-        state: "Shutdown", 
+        state: "Shutdown",
         is_simulator: true
       )
       expect(devices[2]).to have_attributes(
         name: "iPad Pro (12.9-inch) (6th generation)", os_type: "iOS", os_version: "26.0.1",
-        udid: "F5106A29-D2BF-49DA-81C7-BEB94D9BDCED", 
+        udid: "F5106A29-D2BF-49DA-81C7-BEB94D9BDCED",
         state: "Shutdown",
         is_simulator: true
       )
