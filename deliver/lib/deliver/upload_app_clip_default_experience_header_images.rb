@@ -43,14 +43,14 @@ module Deliver
         next if header_image.language.nil? || header_image.language.empty?
 
         existing_localization = app_clip_default_experience_localizations.find { |l| l.locale.eql?(header_image.language) }
-        unless existing_localization
-          UI.message("Creating app clip default experience localization for '#{header_image.language}'")
-          new_localization = Spaceship::ConnectAPI::AppClipDefaultExperienceLocalizations.create(
-            default_experience_id: app_clip_default_experience.id,
-            attributes: { locale: header_image.language }
-          )
-          app_clip_default_experience_localizations << new_localization
-        end
+        next if existing_localization
+
+        UI.message("Creating app clip default experience localization for '#{header_image.language}'")
+        new_localization = Spaceship::ConnectAPI::AppClipDefaultExperienceLocalizations.create(
+          default_experience_id: app_clip_default_experience.id,
+          attributes: { locale: header_image.language }
+        )
+        app_clip_default_experience_localizations << new_localization
       end
 
       # Upload app clip header images
