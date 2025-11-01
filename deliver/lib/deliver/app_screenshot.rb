@@ -253,11 +253,15 @@ module Deliver
         ],
         ScreenSize::IOS_IPAD_11_MESSAGES => [
           [1668, 2388],
-          [2388, 1668]
+          [2388, 1668],
+          [1668, 2420],
+          [2420, 1668]
         ],
         ScreenSize::IOS_IPAD_PRO_MESSAGES => [
           [2732, 2048],
-          [2048, 2732]
+          [2048, 2732],
+          [2064, 2752],
+          [2752, 2064]
         ]
       }
     end
@@ -323,11 +327,15 @@ module Deliver
         ],
         ScreenSize::IOS_IPAD_11 => [
           [1668, 2388],
-          [2388, 1668]
+          [2388, 1668],
+          [1668, 2420],
+          [2420, 1668]
         ],
         ScreenSize::IOS_IPAD_PRO => [
           [2732, 2048],
-          [2048, 2732]
+          [2048, 2732],
+          [2064, 2752],
+          [2752, 2064]
         ],
         ScreenSize::MAC => [
           [1280, 800],
@@ -361,7 +369,8 @@ module Deliver
         "iPad Pro (12.9-inch) (5th generation)", # Default simulator has this name
         "iPad Pro (12.9-inch) (6th generation)", # Default simulator has this name
         "IPAD_PRO_3GEN_129", # Screenshots downloaded from App Store Connect has this name
-        "ipadPro129" # Legacy: screenshots downloaded from iTunes Connect used to have this name
+        "ipadPro129", # Legacy: screenshots downloaded from iTunes Connect used to have this name
+        "iPad Pro 13-inch (M4)" # Default simulator has this name
       ].any? { |key| filename.include?(key) }
       if is_3rd_gen
         if screen_size == ScreenSize::IOS_IPAD_PRO
