@@ -250,7 +250,8 @@ module FastlaneCore
 
   # Generates commands and executes the altool.
   class AltoolTransporterExecutor < TransporterExecutor
-    ERROR_REGEX = /\*\*\* Error:\s+(.+)/
+    # Xcode 26 uses ERROR, while previous versions used *** Error
+    ERROR_REGEX = /(?:\*\*\*\s*)?ERROR:\s+(.+)/i
 
     private_constant :ERROR_REGEX
 
@@ -296,6 +297,13 @@ module FastlaneCore
       end
 
       yield(@all_lines) if block_given?
+
+      # If Xcode >= 26, count success based on errors instead of exit status
+      # As seen in #29730 & #29739 - altool may return zero exit code with a failure.
+      if Helper.xcode_at_least?(26)
+        return @errors.empty?
+      end
+
       exit_status.zero?
     end
 
