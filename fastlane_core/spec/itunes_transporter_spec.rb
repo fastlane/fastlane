@@ -1417,7 +1417,7 @@ describe FastlaneCore do
     let(:upload_cmd) { "xcrun altool --upload-app --apiKey #{api_key[:key_id]} --apiIssuer #{api_key[:issuer_id]} -t macos -f /tmp/my.app.id.itmsp -k 100000" }
     let(:instance) { described_class.new }
     describe "#execute" do
-      it "logs specific info about altool crash if exit code is -1" do
+      it "logs specific info about altool crash if exit code is -1", :requires_xcode do
         # remove test behavior, we actually want FastlanePty.spawn to be called here
         allow(FastlaneCore::Helper).to receive(:test?).and_return(false)
         # force the nil return of FastlanePty.spawn
@@ -1428,7 +1428,7 @@ describe FastlaneCore do
         )
       end
 
-      it "treats '*** Error:' output as failure (Xcode < 16), non-zero exit code" do
+      it "treats '*** Error:' output as failure (Xcode < 16), non-zero exit code", :requires_xcode do
         require 'stringio'
         allow(FastlaneCore::Helper).to receive(:test?).and_return(false)
         allow(FastlaneCore::Helper).to receive(:xcode_version).and_return('16.0')
@@ -1444,7 +1444,7 @@ describe FastlaneCore do
         expect(instance.errors.join("\n")).to include("App Store operation failed. Unable to process app at this time due to a general error")
       end
 
-      it "treats 'ERROR:' output as failure (Xcode 26), zero exit code" do
+      it "treats 'ERROR:' output as failure (Xcode 26), zero exit code", :requires_xcode do
         require 'stringio'
         allow(FastlaneCore::Helper).to receive(:test?).and_return(false)
         allow(FastlaneCore::Helper).to receive(:xcode_version).and_return('26.0')
