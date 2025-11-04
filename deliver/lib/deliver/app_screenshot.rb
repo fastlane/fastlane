@@ -370,6 +370,8 @@ module Deliver
         "iPad Pro (12.9-inch) (6th generation)", # Default simulator has this name
         "IPAD_PRO_3GEN_129", # Screenshots downloaded from App Store Connect has this name
         "ipadPro129", # Legacy: screenshots downloaded from iTunes Connect used to have this name
+        "iPad Air 13-inch (M2)", # Default simulator has this name
+        "iPad Air 13-inch (M3)", # Default simulator has this name
         "iPad Pro 13-inch (M4)" # Default simulator has this name
       ].any? { |key| filename.include?(key) }
       if is_3rd_gen
