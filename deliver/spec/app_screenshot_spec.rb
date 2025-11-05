@@ -116,7 +116,7 @@ describe Deliver::AppScreenshot do
         expect_screen_size_from_file("iPad-Landscape-12_9Inch{2732x2048}.jpg").to eq(Deliver::AppScreenshot::ScreenSize::IOS_IPAD_PRO)
         expect_screen_size_from_file("iPad-Portrait-12_9Inch{2064x2752}.jpg").to eq(Deliver::AppScreenshot::ScreenSize::IOS_IPAD_PRO)
         expect_screen_size_from_file("iPad-Landscape-12_9Inch{2752x2064}.jpg").to eq(Deliver::AppScreenshot::ScreenSize::IOS_IPAD_PRO)
-      end   
+      end
 
       it "should calculate all 11 inch iPad resolutions" do
         expect_screen_size_from_file("iPad-Portrait-11Inch{1668x2388}.jpg").to eq(Deliver::AppScreenshot::ScreenSize::IOS_IPAD_11)
