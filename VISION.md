@@ -43,4 +43,4 @@ The Mobile Native Foundation (MNF) provides a neutral home for open source proje
 
 MNF recognizes _fastlane_ as an essential tool for automating beta deployments and app store releases for iOS and Android. By hosting _fastlane_, the foundation ensures that it remains a community-driven, transparent, and vendor-neutral project which is free from commercial interests or proprietary lock-in.
 
-Under the stewardship of MNF, fastlane will continue to thrive as open source software, maintained and improved through collaboration among developers, contributors, and organizations that depend on it.
+Under the stewardship of MNF, _fastlane_ will continue to thrive as open source software, maintained and improved through collaboration among developers, contributors, and organizations that depend on it.
