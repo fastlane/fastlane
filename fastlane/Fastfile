@@ -610,7 +610,7 @@ lane :update_docs do |options|
     else
       # Create a new branch
       sh("git checkout -b 'update-actions-md-#{Time.now.to_i}'") unless debug
-      plugins_path = "docs/plugins/available-plugins.md"
+      plugins_path = "docs/generated/available-plugins.md"
       unless options[:skip_plugin_scores]
         plugin_scores(template_path: template_path,
                         output_path: plugins_path,
