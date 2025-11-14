@@ -153,7 +153,9 @@ describe Deliver::AppScreenshot do
         expect_screen_size_from_file("AppleWatch-Series3{312x390}.jpg").to eq(Deliver::AppScreenshot::ScreenSize::IOS_APPLE_WATCH)
         expect_screen_size_from_file("AppleWatch-Series4{368x448}.jpg").to eq(Deliver::AppScreenshot::ScreenSize::IOS_APPLE_WATCH_SERIES4)
         expect_screen_size_from_file("AppleWatch-Series7{396x484}.jpg").to eq(Deliver::AppScreenshot::ScreenSize::IOS_APPLE_WATCH_SERIES7)
+        expect_screen_size_from_file("AppleWatch-Series7{416x496}.jpg").to eq(Deliver::AppScreenshot::ScreenSize::IOS_APPLE_WATCH_SERIES10)
         expect_screen_size_from_file("AppleWatch-Ultra{410x502}.jpg").to eq(Deliver::AppScreenshot::ScreenSize::IOS_APPLE_WATCH_ULTRA)
+        expect_screen_size_from_file("AppleWatch-Ultra3{422x514}.jpg").to eq(Deliver::AppScreenshot::ScreenSize::IOS_APPLE_WATCH_ULTRA3)
       end
     end
 
@@ -371,8 +373,16 @@ describe Deliver::AppScreenshot do
       expect(app_screenshot_with(Deliver::AppScreenshot::ScreenSize::IOS_APPLE_WATCH_SERIES7).device_type).to eq("APP_WATCH_SERIES_7")
     end
 
+    it "should return watchSeries10 for Apple Watch Series 10" do
+      expect(app_screenshot_with(Deliver::AppScreenshot::ScreenSize::IOS_APPLE_WATCH_SERIES10).device_type).to eq("APP_WATCH_SERIES_10")
+    end
+
     it "should return watchUltra for Apple Watch Ultra" do
       expect(app_screenshot_with(Deliver::AppScreenshot::ScreenSize::IOS_APPLE_WATCH_ULTRA).device_type).to eq("APP_WATCH_ULTRA")
+    end
+
+    it "should return watchUltra3 for Apple Watch Ultra 3" do
+      expect(app_screenshot_with(Deliver::AppScreenshot::ScreenSize::IOS_APPLE_WATCH_ULTRA3).device_type).to eq("APP_WATCH_ULTRA_3")
     end
 
     it "should return appleTV for Apple TV" do
