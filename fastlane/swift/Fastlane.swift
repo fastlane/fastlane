@@ -9866,7 +9866,7 @@ public func setPodKey(useBundleExec: OptionalConfigValue<Bool> = .fastlaneDefaul
 }
 
 /**
- Setup the keychain and match to work with CI
+ Set up the keychain and match to work with CI
 
  - parameters:
    - force: Force setup, even if not executed by CI
@@ -9901,7 +9901,7 @@ public func setupCi(force: OptionalConfigValue<Bool> = .fastlaneDefault(false),
 }
 
 /**
- Setup the keychain and match to work with CircleCI
+ Set up the keychain and match to work with CircleCI
 
  - parameter force: Force setup, even if not executed by CircleCI
 
@@ -9991,7 +9991,7 @@ public func setupJenkins(force: OptionalConfigValue<Bool> = .fastlaneDefault(fal
 }
 
 /**
- Setup the keychain and match to work with Travis CI
+ Set up the keychain and match to work with Travis CI
 
  - parameter force: Force setup, even if not executed by travis
 
