@@ -25,8 +25,7 @@ end
 desc "Verifies source code is in a good state"
 lane :lint_source do
   # Verifying that no debug code is in the code base
-  #
-  exclude_dirs = ["\.bundle", "*/vendor/bundle"]
+  exclude_dirs = %w[.bundle vendor]
   ensure_no_debug_code(text: "binding\.(irb|pry)", extension: ".rb", exclude: "playground.rb", exclude_dirs: exclude_dirs) # debugging code
   ensure_no_debug_code(text: "# TODO", extension: ".rb", exclude_dirs: exclude_dirs) # TODOs
   ensure_no_debug_code(text: "now: ", extension: ".rb", exclude_dirs: exclude_dirs) # rspec focus
@@ -41,9 +40,9 @@ lane :lint_source do
   Dir.chdir("..") do
     # Verify shell code style
     if FastlaneCore::Helper.mac?
-      sh('find -E . -regex ".*\.(sh|bash)" -not -name "Pods-*" -name ".bundle" -exec shellcheck {} +')
+      sh('find -E . -regex ".*\.(sh|bash)" -not -name "Pods-*" -name ".bundle" -name "vendor" -exec shellcheck {} +')
     elsif !FastlaneCore::Helper.windows?
-      sh('find . -regextype posix-egrep -regex ".*\.(sh|bash)" -not -name "Pods-*" -name ".bundle" -exec shellcheck {} +')
+      sh('find . -regextype posix-egrep -regex ".*\.(sh|bash)" -not -name "Pods-*" -name ".bundle" -name "vendor" -exec shellcheck {} +')
     end
   end
 end
@@ -561,7 +560,7 @@ end
 desc "Makes sure the tests on https://docs.fastlane.tools still work with the latest version"
 lane :verify_docs do
   clone_docs do
-    Bundler.with_clean_env do
+    Bundler.with_unbundled_env do
       puts(`sed -i -e "s/activate_bin_path/bin_path/g" $(which bundle)`) # workaround for bundler https://github.com/bundler/bundler/issues/4602#issuecomment-233619696
       sh("bundle install")
       sh("bundle exec fastlane test skip_building:true") # skip_building since we don't have a proper python environment set up
@@ -712,6 +711,7 @@ private_lane :ensure_tool_name_formatting do
   Dir.chdir("..") do
     Dir["**/*.md"].each do |path|
       next if path == "CHANGELOG.latest.md"
+      next if path.start_with?('vendor/bundle', '.bundle')
       helper = Helper::ToolNameFormattingHelper.new(path: path, is_documenting_invalid_examples: path == 'CONTRIBUTING.md')
       errors += helper.find_tool_name_formatting_errors
     end
