@@ -1417,7 +1417,7 @@ describe FastlaneCore do
     let(:upload_cmd) { "xcrun altool --upload-app --apiKey #{api_key[:key_id]} --apiIssuer #{api_key[:issuer_id]} -t macos -f /tmp/my.app.id.itmsp -k 100000" }
     let(:instance) { described_class.new }
     describe "#execute" do
-      it "logs specific info about altool crash if exit code is -1" do
+      it "logs specific info about altool crash if exit code is -1", :requires_xcode do
         # remove test behavior, we actually want FastlanePty.spawn to be called here
         allow(FastlaneCore::Helper).to receive(:test?).and_return(false)
         # force the nil return of FastlanePty.spawn
@@ -1426,6 +1426,37 @@ describe FastlaneCore do
         expect(instance.errors).to include(
           "-1 indicates altool exited abnormally; try retrying (see https://github.com/fastlane/fastlane/issues/21535)"
         )
+      end
+
+      it "treats '*** Error:' output as failure (Xcode < 16), non-zero exit code", :requires_xcode do
+        require 'stringio'
+        allow(FastlaneCore::Helper).to receive(:test?).and_return(false)
+        allow(FastlaneCore::Helper).to receive(:xcode_version).and_return('16.0')
+        altool_output = <<~OUT
+          *** Error: Unable to validate archive './artifacts/our_app.ipa'.
+          *** Error: code 1095 (App Store operation failed. Unable to process app at this time due to a general error)
+        OUT
+        fake_io = StringIO.new(altool_output)
+        allow(FastlaneCore::FastlanePty).to receive(:spawn).and_yield(fake_io, nil, 123).and_return(1)
+
+        expect(instance.execute(upload_cmd, false)).to eq(false)
+        expect(instance.errors.join("\n")).to include("Unable to validate archive './artifacts/our_app.ipa'")
+        expect(instance.errors.join("\n")).to include("App Store operation failed. Unable to process app at this time due to a general error")
+      end
+
+      it "treats 'ERROR:' output as failure (Xcode 26), zero exit code", :requires_xcode do
+        require 'stringio'
+        allow(FastlaneCore::Helper).to receive(:test?).and_return(false)
+        allow(FastlaneCore::Helper).to receive(:xcode_version).and_return('26.0')
+        altool_output = <<~OUT
+          2025-10-31 11:34:44.726 ERROR: [ContentDelivery.Uploader.102BA2C00] The provided entity includes an attribute with a value that has already been used (-19232) The bundle version must be higher than the previously uploaded version: ‘20251031.110341’. (ID: e1ab497b-753b-411c-82f1-22b9bffecf00)
+          2025-10-31 11:34:44.727 ERROR: [altool.102BA2C00] Failed to upload package.
+        OUT
+        fake_io = StringIO.new(altool_output)
+        allow(FastlaneCore::FastlanePty).to receive(:spawn).and_yield(fake_io, nil, 123).and_return(0)
+
+        expect(instance.execute(upload_cmd, false)).to eq(false)
+        expect(instance.errors.join("\n")).to include("[ContentDelivery.Uploader.102BA2C00] The provided entity includes an attribute with a value that has already been used")
       end
     end
   end
