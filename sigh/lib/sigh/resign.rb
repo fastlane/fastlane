@@ -110,11 +110,11 @@ module Sigh
     end
 
     def find_ipa
-      Dir[File.join(Dir.pwd, '*.ipa')].sort { |a, b| File.mtime(a) <=> File.mtime(b) }.first
+      Dir[File.join(Dir.pwd, '*.ipa')] { |a, b| File.mtime(a) <=> File.mtime(b) }.first
     end
 
     def find_provisioning_profile
-      Dir[File.join(Dir.pwd, '*.mobileprovision')].sort { |a, b| File.mtime(a) <=> File.mtime(b) }.first
+      Dir[File.join(Dir.pwd, '*.mobileprovision')] { |a, b| File.mtime(a) <=> File.mtime(b) }.first
     end
 
     def find_signing_identity(signing_identity)

@@ -199,7 +199,7 @@ module Deliver
         iterator.each_app_screenshot.select { |_, _, app_screenshot| app_screenshot.error? }.each do |localization, _, app_screenshot|
           UI.error("#{app_screenshot.file_name} for #{localization.locale} has error(s) - #{app_screenshot.error_messages.join(', ')}")
         end
-        incomplete_screenshot_count = states.reject { |k, v| k == 'COMPLETE' }.reduce(0) { |sum, (k, v)| sum + v }
+        incomplete_screenshot_count = states.except('COMPLETE').reduce(0) { |sum, (k, v)| sum + v }
         UI.user_error!("Failed verification of all screenshots uploaded... #{incomplete_screenshot_count} incomplete screenshot(s) still exist")
       else
         UI.error("Failed to upload all screenshots... Tries remaining: #{tries}")
