@@ -40,9 +40,13 @@ jobs:
     description: 'Execute tests on macOS with given Xcode and Ruby version'
     macos:
       xcode: << parameters.xcode_version >>
+    resource_class: << parameters.resource_class >>
     parameters:
       xcode_version:
         type: string
+      resource_class:
+        type: string
+        default: 'macos.m1.medium.gen1'
       ruby_version:
         type: string
       ruby_opt:
@@ -239,6 +243,7 @@ workflows:
       - tests_macos:
           name: 'Execute tests on macOS (Xcode 26, Ruby 3.4)'
           xcode_version: '26.0.1'
+          resource_class: 'm4pro.medium'
           ruby_version: '3.4'
           ruby_opt: -W:deprecated
       - tests_ubuntu:
