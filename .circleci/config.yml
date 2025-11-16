@@ -241,9 +241,8 @@ workflows:
           ruby_version: '3.3'
           ruby_opt: -W:deprecated
       - tests_macos:
-          name: 'Execute tests on macOS (Xcode 26, Ruby 3.4)'
-          xcode_version: '26.0.1'
-          resource_class: 'm4pro.medium'
+          name: 'Execute tests on macOS (Xcode 16.4.0, Ruby 3.4)'
+          xcode_version: '16.4.0'
           ruby_version: '3.4'
           ruby_opt: -W:deprecated
       - tests_ubuntu:
