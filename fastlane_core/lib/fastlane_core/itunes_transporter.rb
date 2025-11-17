@@ -297,14 +297,7 @@ module FastlaneCore
       end
 
       yield(@all_lines) if block_given?
-
-      # If Xcode >= 26, count success based on errors instead of exit status
-      # As seen in #29730 & #29739 - altool may return zero exit code with a failure.
-      if Helper.xcode_at_least?(26)
-        return @errors.empty?
-      end
-
-      exit_status.zero?
+      @errors.empty?
     end
 
     def build_credential_params(username = nil, password = nil, jwt = nil, api_key = nil)
