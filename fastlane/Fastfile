@@ -39,11 +39,15 @@ lane :lint_source do
   rubocop(step_name: 'policekeeping_the_code_with_rubocop')
 
   Dir.chdir("..") do
-    # Verify shell code style
-    if FastlaneCore::Helper.mac?
-      sh('find -E . -regex ".*\.(sh|bash)" -not -name "Pods-*" -name ".bundle" -exec shellcheck {} +')
-    elsif !FastlaneCore::Helper.windows?
-      sh('find . -regextype posix-egrep -regex ".*\.(sh|bash)" -not -name "Pods-*" -name ".bundle" -exec shellcheck {} +')
+    # If no shellcheck - warn and skip, otherwise shellcheck all .sh and .bash files
+    if system('which shellcheck > /dev/null 2>&1')
+      if FastlaneCore::Helper.mac?
+        sh('find -E . -regex ".*\.(sh|bash)" -not -name "Pods-*" -not -path "./.bundle/*" -not -path "./vendor/*" -exec shellcheck {} +')
+      elsif !FastlaneCore::Helper.windows?
+        sh('find . -regextype posix-egrep -regex ".*\.(sh|bash)" -not -name "Pods-*" -not -path "./.bundle/*" -not -path "./vendor/*" -exec shellcheck {} +')
+      end
+    else
+      UI.important("shellcheck not installed, skipping shell code style verification")
     end
   end
 end
