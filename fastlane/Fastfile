@@ -712,7 +712,7 @@ private_lane :ensure_tool_name_formatting do
   Dir.chdir("..") do
     Dir["**/*.md"].each do |path|
       next if path == "CHANGELOG.latest.md"
-      next if path.start_with?('vendor/bundle', '.bundle')
+      next if path.start_with?('vendor/', '.bundle/')
       helper = Helper::ToolNameFormattingHelper.new(path: path, is_documenting_invalid_examples: path == 'CONTRIBUTING.md')
       errors += helper.find_tool_name_formatting_errors
     end
