@@ -77,7 +77,7 @@ module Deliver
       # iterate over screenshots per localization
       screenshots_per_language.each do |language, screenshots_for_language|
         localization = supported_localizations.find { |l| l.locale == language }
-        screenshots_per_display_type = screenshots_for_language.reject { |screenshot| screenshot.device_type.nil? }.group_by(&:device_type)
+        screenshots_per_display_type = screenshots_for_language.reject { |screenshot| screenshot.display_type.nil? }.group_by(&:display_type)
 
         screenshots_per_display_type.each do |display_type, screenshots|
           # create AppScreenshotSet for given display_type if it doesn't exist
