@@ -26,7 +26,7 @@ desc "Verifies source code is in a good state"
 lane :lint_source do
   # Verifying that no debug code is in the code base
   #
-  exclude_dirs = ["\.bundle", "*/vendor/bundle"]
+  exclude_dirs = ["\.bundle", "vendor"]
   ensure_no_debug_code(text: "binding\.(irb|pry)", extension: ".rb", exclude: "playground.rb", exclude_dirs: exclude_dirs) # debugging code
   ensure_no_debug_code(text: "# TODO", extension: ".rb", exclude_dirs: exclude_dirs) # TODOs
   ensure_no_debug_code(text: "now: ", extension: ".rb", exclude_dirs: exclude_dirs) # rspec focus
@@ -712,6 +712,7 @@ private_lane :ensure_tool_name_formatting do
   Dir.chdir("..") do
     Dir["**/*.md"].each do |path|
       next if path == "CHANGELOG.latest.md"
+      next if path.start_with?('vendor/', '.bundle/')
       helper = Helper::ToolNameFormattingHelper.new(path: path, is_documenting_invalid_examples: path == 'CONTRIBUTING.md')
       errors += helper.find_tool_name_formatting_errors
     end

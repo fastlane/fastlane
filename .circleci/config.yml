@@ -4,14 +4,9 @@ version: 2.1
 orbs:
   shellcheck: circleci/shellcheck@2.2.2 # brew install shellcheck stopped working so using this
   macos: circleci/macos@2
+  ruby: circleci/ruby@2.5.4
 
 aliases:
-  - &important-branches
-    filters:
-      branches:
-        only:
-          - master
-          - /^version\-bump\-.*/
   # common - cache
   - &cache_restore_git
     restore_cache:
@@ -27,17 +22,6 @@ aliases:
       paths:
         - ".git"
 
-  - &cache_restore_bundler
-    restore_cache:
-      name: cache | restore bundle
-      key: v3-gems-{{ arch }}-<< parameters.ruby_version >>-{{ checksum "Gemfile.lock" }}
-  - &cache_save_bundler
-    save_cache:
-      name: cache | store bundle
-      key: v3-gems-{{ arch }}-<< parameters.ruby_version >>-{{ checksum "Gemfile.lock" }}
-      paths:
-        - ".bundle"
-
   - &cache_restore_rubocop
     restore_cache:
       name: cache | restore rubocop
@@ -50,16 +34,6 @@ aliases:
       key: v1-rubocop-{{ arch }}-{{ epoch }}
       paths:
         - "~/.cache/rubocop_cache"
-
-  - &bundle_install
-    run:
-      name: bundle install
-      command: |
-        gem update --system `.ci/compatible_gem_version`
-        gem install bundler -v $(cat Gemfile.lock | tail -1 | tr -d " ")
-        bundle config set --local path .bundle
-        bundle check || bundle install --jobs=4 --retry=3
-        bundle env
 
 jobs:
   tests_macos: &tests_macos_base
@@ -83,7 +57,6 @@ jobs:
       - *cache_restore_git
       - checkout
       - *cache_save_git
-      - *cache_restore_bundler
       - macos/switch-ruby:
           version: << parameters.ruby_version >>
       - run:
@@ -94,8 +67,7 @@ jobs:
           name: Setup Build
           command: |
             mkdir -p ~/test-reports
-      - *bundle_install
-      - *cache_save_bundler
+      - ruby/install-deps
       - run:
           name: Check PR Metadata
           command: bundle exec danger || echo "danger failed"
@@ -130,8 +102,6 @@ jobs:
     parameters:
       image:
         type: string
-      ruby_version: # Used when restoring/saving bundler cache
-        type: string
     environment:
       CIRCLE_TEST_REPORTS: '~/test-reports'
       LC_ALL: 'C.UTF-8'
@@ -143,13 +113,11 @@ jobs:
       - *cache_restore_git
       - checkout
       - *cache_save_git
-      - *cache_restore_bundler
       - run:
           name: Setup Build
           command: |
             mkdir -p ~/test-reports
-      - *bundle_install
-      - *cache_save_bundler
+      - ruby/install-deps
       - run:
           name: Check PR Metadata
           command: bundle exec danger || echo "danger failed"
@@ -175,51 +143,35 @@ jobs:
       - *cache_restore_git
       - checkout
       - *cache_save_git
-      - *cache_restore_bundler
       - macos/switch-ruby:
           version: << parameters.ruby_version >>
-      - *bundle_install
-      - *cache_save_bundler
+      - ruby/install-deps
       - run: bundle exec fastlane generate_swift_api
 
   validate_documentation:
     parameters:
       image:
         type: string
-      ruby_version: # Used when restoring/saving bundler cache
-        type: string
     docker:
       - image: << parameters.image >>
     steps:
       - *cache_restore_git
       - checkout
       - *cache_save_git
-      - *cache_restore_bundler
-
-      - run:
-          name: Setup Build
-          command: |
-            gem update --system `.ci/compatible_gem_version`
-      - *bundle_install
-      - *cache_save_bundler
-
+      - ruby/install-deps
       - run: bundle exec fastlane validate_docs
 
   lint_source_code:
     parameters:
       image:
         type: string
-      ruby_version: # Used when restoring/saving bundler cache
-        type: string
     docker:
       - image: << parameters.image >>
     steps:
       - *cache_restore_git
       - checkout
       - *cache_save_git
-      - *cache_restore_bundler
-      - *bundle_install
-      - *cache_save_bundler
+      - ruby/install-deps
 
       - run: bundle exec fastlane lint_source
 
@@ -284,22 +236,24 @@ workflows:
           xcode_version: '15.3'
           ruby_version: '3.3'
           ruby_opt: -W:deprecated
+      - tests_macos:
+          name: 'Execute tests on macOS (Xcode 16.4.0, Ruby 3.4)'
+          xcode_version: '16.4.0'
+          ruby_version: '3.4'
+          ruby_opt: -W:deprecated
       - tests_ubuntu:
           name: 'Execute tests on Ubuntu'
-          image: 'fastlanetools/ci:0.3.0'
-          ruby_version: '2.6'
+          image: 'cimg/ruby:3.2-node'
       - validate_fastlane_swift_generation:
           name: 'Validate Fastlane.swift generation'
           xcode_version: '15.0.1'
           ruby_version: '3.2'
       - validate_documentation:
           name: 'Validate Documentation'
-          image: 'cimg/ruby:3.2.2'
-          ruby_version: '3.2'
+          image: 'cimg/ruby:3.2'
       - lint_source_code:
           name: 'Lint source code'
-          image: 'cimg/ruby:2.6'
-          ruby_version: '2.6'
+          image: 'cimg/ruby:3.2'
       - modules_load_up_tests:
           name: 'Modules load up tests'
-          image: 'cimg/ruby:2.6'
+          image: 'cimg/ruby:3.2'
