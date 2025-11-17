@@ -40,16 +40,18 @@ module Deliver
       DisplayType::APP_WATCH_SERIES_3 => "iOS-Apple-Watch",
       DisplayType::APP_WATCH_SERIES_4 => "iOS-Apple-Watch-Series4",
       DisplayType::APP_WATCH_SERIES_7 => "iOS-Apple-Watch-Series7",
+      DisplayType::APP_WATCH_SERIES_10 => "iOS-Apple-Watch-Series10",
       DisplayType::APP_WATCH_ULTRA => "iOS-Apple-Watch-Ultra",
       DisplayType::APP_APPLE_TV => "Apple-TV",
-      DisplayType::APP_DESKTOP => "Mac"
+      DisplayType::APP_DESKTOP => "Mac",
+      DisplayType::APP_APPLE_VISION_PRO => "visionOS-Vision-Pro"
     }.freeze
 
     FORMATTED_NAMES = {
       DisplayType::APP_IPHONE_35 => "iPhone 4",
       DisplayType::APP_IPHONE_40 => "iPhone 5",
-      DisplayType::APP_IPHONE_47 => "iPhone 6", # also 7 & 8
-      DisplayType::APP_IPHONE_55 => "iPhone 6 Plus", # also 7 Plus & 8 Plus
+      DisplayType::APP_IPHONE_47 => "iPhone 6",
+      DisplayType::APP_IPHONE_55 => "iPhone 6 Plus",
       DisplayType::APP_IPHONE_58 => "iPhone XS",
       DisplayType::APP_IPHONE_61 => "iPhone 14 Pro",
       DisplayType::APP_IPHONE_65 => "iPhone XS Max",
@@ -60,8 +62,8 @@ module Deliver
       DisplayType::APP_IPAD_PRO_129 => "iPad Pro",
       DisplayType::APP_IPAD_PRO_3GEN_129 => "iPad Pro (12.9-inch) (3rd generation)",
       DisplayType::IMESSAGE_APP_IPHONE_40 => "iPhone 5 (iMessage)",
-      DisplayType::IMESSAGE_APP_IPHONE_47 => "iPhone 6 (iMessage)", # also 7 & 8
-      DisplayType::IMESSAGE_APP_IPHONE_55 => "iPhone 6 Plus (iMessage)", # also 7 Plus & 8 Plus
+      DisplayType::IMESSAGE_APP_IPHONE_47 => "iPhone 6 (iMessage)",
+      DisplayType::IMESSAGE_APP_IPHONE_55 => "iPhone 6 Plus (iMessage)",
       DisplayType::IMESSAGE_APP_IPHONE_58 => "iPhone XS (iMessage)",
       DisplayType::IMESSAGE_APP_IPHONE_61 => "iPhone 14 Pro (iMessage)",
       DisplayType::IMESSAGE_APP_IPHONE_65 => "iPhone XS Max (iMessage)",
@@ -75,18 +77,23 @@ module Deliver
       DisplayType::APP_WATCH_SERIES_3 => "Watch",
       DisplayType::APP_WATCH_SERIES_4 => "Watch Series4",
       DisplayType::APP_WATCH_SERIES_7 => "Watch Series7",
+      DisplayType::APP_WATCH_SERIES_10 => "Watch Series10",
       DisplayType::APP_WATCH_ULTRA => "Watch Ultra",
-      DisplayType::APP_APPLE_TV => "Apple TV"
+      DisplayType::APP_APPLE_TV => "Apple TV",
+      DisplayType::APP_APPLE_VISION_PRO => "Vision Pro"
     }.freeze
 
     # reference: https://help.apple.com/app-store-connect/#/devd274dd925
-    # This list does not include iPad Pro 12.9-inch (3rd generation)
-    # because it has same resolution as APP_IPAD_PRO_129 and will clobber.
     # Returns a hash mapping DisplayType constants to their supported resolutions.
     DEVICE_RESOLUTIONS = {
+      # These are actually 6.9" devices
       DisplayType::APP_IPHONE_67 => [
+        [1260, 2736],
+        [2736, 1260],
         [1290, 2796],
-        [2796, 1290]
+        [2796, 1290],
+        [1320, 2868],
+        [2868, 1320]
       ],
       DisplayType::APP_IPHONE_65 => [
         [1242, 2688],
@@ -94,15 +101,21 @@ module Deliver
         [1284, 2778],
         [2778, 1284]
       ],
+      # These are actually 6.3" devices
       DisplayType::APP_IPHONE_61 => [
         [1179, 2556],
-        [2556, 1179]
+        [2556, 1179],
+        [1206, 2622],
+        [2622, 1206]
       ],
+      # These are actually 6.1" devices
       DisplayType::APP_IPHONE_58 => [
+        [1170, 2532],
+        [2532, 1170],
         [1125, 2436],
         [2436, 1125],
-        [1170, 2532],
-        [2532, 1170]
+        [1080, 2340],
+        [2340, 1080]
       ],
       DisplayType::APP_IPHONE_55 => [
         [1242, 2208],
@@ -124,14 +137,14 @@ module Deliver
         [960, 600],
         [960, 640]
       ],
-      DisplayType::APP_IPAD_97 => [ # 9.7 inch
+      DisplayType::APP_IPAD_97 => [
         [1024, 748],
         [1024, 768],
         [2048, 1496],
         [2048, 1536],
-        [768, 1004], # portrait without status bar
+        [768, 1004],
         [768, 1024],
-        [1536, 2008], # portrait without status bar
+        [1536, 2008],
         [1536, 2048]
       ],
       DisplayType::APP_IPAD_105 => [
@@ -139,12 +152,24 @@ module Deliver
         [2224, 1668]
       ],
       DisplayType::APP_IPAD_PRO_3GEN_11 => [
+        [1488, 2266],
+        [2266, 1488],
+        [1668, 2420],
+        [2420, 1668],
         [1668, 2388],
-        [2388, 1668]
+        [2388, 1668],
+        [1640, 2360],
+        [2360, 1640]
       ],
       DisplayType::APP_IPAD_PRO_129 => [
+        [2048, 2732],
+        [2732, 2048]
+      ],
+      DisplayType::APP_IPAD_PRO_3GEN_129 => [
+        [2048, 2732],
         [2732, 2048],
-        [2048, 2732]
+        [2064, 2752],
+        [2752, 2064]
       ],
       DisplayType::APP_DESKTOP => [
         [1280, 800],
@@ -161,11 +186,18 @@ module Deliver
       DisplayType::APP_WATCH_SERIES_7 => [
         [396, 484]
       ],
+      DisplayType::APP_WATCH_SERIES_10 => [
+        [416, 496]
+      ],
       DisplayType::APP_WATCH_ULTRA => [
-        [410, 502]
+        [410, 502],
+        [422, 514]
       ],
       DisplayType::APP_APPLE_TV => [
         [1920, 1080],
+        [3840, 2160]
+      ],
+      DisplayType::APP_APPLE_VISION_PRO => [
         [3840, 2160]
       ]
     }.freeze

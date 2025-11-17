@@ -66,8 +66,12 @@ describe Deliver::AppScreenshot do
 
     describe "valid screen sizes" do
       it "should calculate all 6.7 inch iPhone resolutions" do
+        expect_display_type_from_file("iPhone14ProMax-Portrait{1260x2736}.jpg").to eq(Deliver::AppScreenshot::DisplayType::APP_IPHONE_67)
+        expect_display_type_from_file("iPhone14ProMax-Landscape{2736x1260}.jpg").to eq(Deliver::AppScreenshot::DisplayType::APP_IPHONE_67)
         expect_display_type_from_file("iPhone14ProMax-Portrait{1290x2796}.jpg").to eq(Deliver::AppScreenshot::DisplayType::APP_IPHONE_67)
         expect_display_type_from_file("iPhone14ProMax-Landscape{2796x1290}.jpg").to eq(Deliver::AppScreenshot::DisplayType::APP_IPHONE_67)
+        expect_display_type_from_file("iPhone16ProMax-Portrait{1320x2868}.jpg").to eq(Deliver::AppScreenshot::DisplayType::APP_IPHONE_67)
+        expect_display_type_from_file("iPhone16ProMax-Landscape{2868x1320}.jpg").to eq(Deliver::AppScreenshot::DisplayType::APP_IPHONE_67)
       end
 
       it "should calculate all 6.5 inch iPhone resolutions" do
@@ -80,11 +84,17 @@ describe Deliver::AppScreenshot do
       it "should calculate all 6.1 inch iPhone resolutions" do
         expect_display_type_from_file("iPhone14Pro-Portrait{1179x2556}.jpg").to eq(Deliver::AppScreenshot::DisplayType::APP_IPHONE_61)
         expect_display_type_from_file("iPhone14Pro-Landscape{2556x1179}.jpg").to eq(Deliver::AppScreenshot::DisplayType::APP_IPHONE_61)
+        expect_display_type_from_file("iPhone15Pro-Portrait{1206x2622}.jpg").to eq(Deliver::AppScreenshot::DisplayType::APP_IPHONE_61)
+        expect_display_type_from_file("iPhone15Pro-Landscape{2622x1206}.jpg").to eq(Deliver::AppScreenshot::DisplayType::APP_IPHONE_61)
       end
 
       it "should calculate all 5.8 inch iPhone resolutions" do
+        expect_display_type_from_file("iPhone12-Portrait{1170x2532}.jpg").to eq(Deliver::AppScreenshot::DisplayType::APP_IPHONE_58)
+        expect_display_type_from_file("iPhone12-Landscape{2532x1170}.jpg").to eq(Deliver::AppScreenshot::DisplayType::APP_IPHONE_58)
         expect_display_type_from_file("iPhoneXS-Portrait{1125x2436}.jpg").to eq(Deliver::AppScreenshot::DisplayType::APP_IPHONE_58)
         expect_display_type_from_file("iPhoneXS-Landscape{2436x1125}.jpg").to eq(Deliver::AppScreenshot::DisplayType::APP_IPHONE_58)
+        expect_display_type_from_file("iPhoneX-Portrait{1080x2340}.jpg").to eq(Deliver::AppScreenshot::DisplayType::APP_IPHONE_58)
+        expect_display_type_from_file("iPhoneX-Landscape{2340x1080}.jpg").to eq(Deliver::AppScreenshot::DisplayType::APP_IPHONE_58)
       end
 
       it "should calculate all 5.5 inch iPhone resolutions" do
@@ -117,8 +127,14 @@ describe Deliver::AppScreenshot do
       end
 
       it "should calculate all 11 inch iPad resolutions" do
+        expect_display_type_from_file("iPad-Portrait-11Inch{1488x2266}.jpg").to eq(Deliver::AppScreenshot::DisplayType::APP_IPAD_PRO_3GEN_11)
+        expect_display_type_from_file("iPad-Landscape-11Inch{2266x1488}.jpg").to eq(Deliver::AppScreenshot::DisplayType::APP_IPAD_PRO_3GEN_11)
+        expect_display_type_from_file("iPad-Portrait-11Inch{1668x2420}.jpg").to eq(Deliver::AppScreenshot::DisplayType::APP_IPAD_PRO_3GEN_11)
+        expect_display_type_from_file("iPad-Landscape-11Inch{2420x1668}.jpg").to eq(Deliver::AppScreenshot::DisplayType::APP_IPAD_PRO_3GEN_11)
         expect_display_type_from_file("iPad-Portrait-11Inch{1668x2388}.jpg").to eq(Deliver::AppScreenshot::DisplayType::APP_IPAD_PRO_3GEN_11)
         expect_display_type_from_file("iPad-Landscape-11Inch{2388x1668}.jpg").to eq(Deliver::AppScreenshot::DisplayType::APP_IPAD_PRO_3GEN_11)
+        expect_display_type_from_file("iPad-Portrait-11Inch{1640x2360}.jpg").to eq(Deliver::AppScreenshot::DisplayType::APP_IPAD_PRO_3GEN_11)
+        expect_display_type_from_file("iPad-Landscape-11Inch{2360x1640}.jpg").to eq(Deliver::AppScreenshot::DisplayType::APP_IPAD_PRO_3GEN_11)
       end
 
       it "should calculate all 10.5 inch iPad resolutions" do
