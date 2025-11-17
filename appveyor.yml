@@ -20,6 +20,9 @@ skip_branch_with_pr: true
 init:
   - git config --global core.autocrlf true
 
+cache:
+  - vendor/bundle
+
 # cloning the repository happens here
 install:
   - bundle install
