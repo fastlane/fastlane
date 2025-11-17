@@ -240,6 +240,7 @@ workflows:
           name: 'Execute tests on macOS (Xcode 16.4.0, Ruby 3.4)'
           xcode_version: '16.4.0'
           ruby_version: '3.4'
+          ruby_opt: -W:deprecated
       - tests_ubuntu:
           name: 'Execute tests on Ubuntu'
           image: 'cimg/ruby:3.2-node'
