@@ -19,7 +19,7 @@ gem "fakefs", "1.8"
 # for file uploads with Faraday
 gem "mime-types", ['>= 1.16', '< 4.0']
 # Fast XML parser and object marshaller.
-# Version 2.14.14+ requires Ruby >=2.7, while fastlane uses a `required_ruby_version` of `>= 2.6`.
+# Version 2.14.15+ requires Ruby >=2.7, while fastlane uses a `required_ruby_version` of `>= 2.6`.
 gem "ox", "2.14.14"
 # Provides an interactive debugging environment for Ruby.
 gem "pry"
