@@ -86,7 +86,7 @@ module Deliver
     # reference: https://help.apple.com/app-store-connect/#/devd274dd925
     # Returns a hash mapping DisplayType constants to their supported resolutions.
     DEVICE_RESOLUTIONS = {
-      # These are actually 6.9" devices
+      # These are actually 6.9" iPhones
       DisplayType::APP_IPHONE_67 => [
         [1260, 2736],
         [2736, 1260],
@@ -101,14 +101,14 @@ module Deliver
         [1284, 2778],
         [2778, 1284]
       ],
-      # These are actually 6.3" devices
+      # These are actually 6.3" iPhones
       DisplayType::APP_IPHONE_61 => [
         [1179, 2556],
         [2556, 1179],
         [1206, 2622],
         [2622, 1206]
       ],
-      # These are actually 6.1" devices
+      # These are actually 6.1" iPhones
       DisplayType::APP_IPHONE_58 => [
         [1170, 2532],
         [2532, 1170],
@@ -161,10 +161,12 @@ module Deliver
         [1640, 2360],
         [2360, 1640]
       ],
+      # These are 12.9" iPads
       DisplayType::APP_IPAD_PRO_129 => [
         [2048, 2732],
         [2732, 2048]
       ],
+      # These are actually 13" iPads
       DisplayType::APP_IPAD_PRO_3GEN_129 => [
         [2048, 2732],
         [2732, 2048],
@@ -217,6 +219,15 @@ module Deliver
       DisplayType::IMESSAGE_APP_IPAD_PRO_3GEN_129 => DEVICE_RESOLUTIONS[DisplayType::APP_IPAD_PRO_129]
     }.freeze
 
+    # Resolutions that are shared by multiple device types
+    CONFLICTING_RESOLUTIONS = [
+      # iPad Pro 12.9" (2nd gen) and iPad Pro 13" (3rd+ gen)
+      [2048, 2732],
+      [2732, 2048],
+      # Apple TV and Apple Vision Pro
+      [3840, 2160]
+    ].freeze
+
     # @return [Spaceship::ConnectAPI::AppScreenshotSet::DisplayType] the display type
     attr_accessor :display_type
 
@@ -249,42 +260,39 @@ module Deliver
       return DisplayType::ALL_IMESSAGE.include?(self.display_type)
     end
 
-    def self.resolve_ipadpro_conflict_if_needed(display_type, filename)
-      is_3rd_gen = [
-        "iPad Pro (12.9-inch) (3rd generation)", # Default simulator has this name
-        "iPad Pro (12.9-inch) (4th generation)", # Default simulator has this name
-        "iPad Pro (12.9-inch) (5th generation)", # Default simulator has this name
-        "iPad Pro (12.9-inch) (6th generation)", # Default simulator has this name
-        "IPAD_PRO_3GEN_129", # Screenshots downloaded from App Store Connect has this name
-        "ipadPro129" # Legacy: screenshots downloaded from iTunes Connect used to have this name
-      ].any? { |key| filename.include?(key) }
-      if is_3rd_gen
-        if display_type == DisplayType::APP_IPAD_PRO_129
-          return DisplayType::APP_IPAD_PRO_3GEN_129
-        elsif display_type == DisplayType::IMESSAGE_APP_IPAD_PRO_129
-          return DisplayType::IMESSAGE_APP_IPAD_PRO_3GEN_129
-        end
-      end
-      display_type
-    end
-
     def self.calculate_display_type(path)
       size = FastImage.size(path)
-
       UI.user_error!("Could not find or parse file at path '#{path}'") if size.nil? || size.count == 0
 
-      # iMessage screenshots have same resolution as app screenshots so we need to distinguish them
       path_component = Pathname.new(path).each_filename.to_a[-3]
-      devices = path_component.eql?("iMessage") ? DEVICE_RESOLUTIONS_MESSAGES : DEVICE_RESOLUTIONS
+      is_imessage = path_component.eql?("iMessage")
+      devices = is_imessage ? DEVICE_RESOLUTIONS_MESSAGES : DEVICE_RESOLUTIONS
 
-      devices.each do |display_type, resolutions|
-        if resolutions.include?(size)
-          filename = Pathname.new(path).basename.to_s
-          return resolve_ipadpro_conflict_if_needed(display_type, filename)
+      matching_display_type = devices.find { |_display_type, resolutions| resolutions.include?(size) }&.first
+
+      return nil unless matching_display_type
+
+      return matching_display_type unless CONFLICTING_RESOLUTIONS.include?(size)
+
+      path_lower = path.downcase
+
+      case size
+      # iPad Pro conflict
+      when [2048, 2732], [2732, 2048]
+        is_2gen = path_lower.include?("app_ipad_pro_129") ||
+                  (path_lower.include?("12.9") && path_lower.include?("2nd generation")) # e.g. iPad Pro (12.9-inch) (2nd generation)
+
+        if is_2gen
+          return is_imessage ? DisplayType::IMESSAGE_APP_IPAD_PRO_129 : DisplayType::APP_IPAD_PRO_129
+        else
+          return is_imessage ? DisplayType::IMESSAGE_APP_IPAD_PRO_3GEN_129 : DisplayType::APP_IPAD_PRO_3GEN_129
         end
+      # Apple TV vs Vision Pro conflict
+      when [3840, 2160]
+        return path_lower.include?("vision") ? DisplayType::APP_APPLE_VISION_PRO : DisplayType::APP_APPLE_TV
+      else
+        matching_display_type
       end
-
-      nil
     end
   end
 end

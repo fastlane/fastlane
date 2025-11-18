@@ -87,7 +87,7 @@ describe Frameit::Device do
         expect_forced_screen_size("iPhone X").to eq(Devices::IPHONE_X)
       end
 
-      it "should force iPhone XS despite arbitrary file name and resolution via Deliver::AppScreenshot::ScreenSize" do
+      it "should force iPhone XS despite arbitrary file name and resolution via display type string" do
         expect_forced_screen_size("iOS-5.8-in").to eq(Devices::IPHONE_XS)
       end
     end

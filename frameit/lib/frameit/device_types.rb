@@ -142,11 +142,11 @@ module Frameit
     IPAD_AIR_2019 ||= Frameit::Device.new("ipad-air-2019", "Apple iPad Air (2019)", 2, [[1668, 2224], [2224, 1668]], 265, Color::SPACE_GRAY, Platform::IOS)
     IPAD_MINI_4 ||= Frameit::Device.new("ipad-mini-4", "Apple iPad Mini 4", 2, [[1536, 2048], [2048, 1536]], 324, Color::SPACE_GRAY)
     IPAD_MINI_2019 ||= Frameit::Device.new("ipad-mini-2019", "Apple iPad Mini (2019)", 3, [[1536, 2048], [2048, 1536]], 324, Color::SPACE_GRAY)
-    # this is 1st or 2nd gen of iPad Pro 12.9:
+    # iPad Pro 12.9" (2nd gen):
     IPAD_PRO ||= Frameit::Device.new("ipad-pro", "Apple iPad Pro", 3, [[2048, 2732], [2732, 2048]], 264, Color::SPACE_GRAY, Platform::IOS, "iOS-iPad-Pro")
-    # 3rd generation:
+    # iPad Pro 13" (3rd gen - rebranded from 12.9"):
     IPAD_PRO_12_9 ||= Frameit::Device.new("ipadPro129", "Apple iPad Pro (12.9-inch) (3rd generation)", 4, [[2048, 2732], [2732, 2048]], 264, Color::SPACE_GRAY, Platform::IOS, "iOS-iPad-Pro-12.9")
-    # 4th generation:
+    # iPad Pro 13" (4th gen):
     IPAD_PRO_12_9_4 ||= Frameit::Device.new("ipadPro129", "Apple iPad Pro (12.9-inch) (4th generation)", 5, [[2048, 2732], [2732, 2048]], 264, Color::SPACE_GRAY, Platform::IOS, "iOS-iPad-Pro-12.9")
     # iPad Pro (10.5-inch) is not in frameit-frames repo, but must be included so that we are backward compatible with PR #15373
     # priority must be lower so that users who didn't copy the frame to their frameit frames folder will not get an error
