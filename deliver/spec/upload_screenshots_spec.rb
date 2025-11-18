@@ -305,7 +305,7 @@ describe Deliver::UploadScreenshots do
       end
     end
 
-    context 'when one of the screenshots is FAILD state and tries remains non zero' do
+    context 'when one of the screenshots is FAILED state and tries remains non zero' do
       it 'should retry upload_screenshots' do
         app_screenshot = double('Spaceship::ConnectAPI::AppScreenshot', 'complete?' => false, 'error?' => true)
         app_screenshot_set = double('Spaceship::ConnectAPI::AppScreenshotSet',
