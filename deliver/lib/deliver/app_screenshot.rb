@@ -179,7 +179,7 @@ module Deliver
       DisplayType::IMESSAGE_APP_IPAD_105 => DEVICE_RESOLUTIONS[DisplayType::APP_IPAD_105],
       DisplayType::IMESSAGE_APP_IPAD_PRO_3GEN_11 => DEVICE_RESOLUTIONS[DisplayType::APP_IPAD_PRO_3GEN_11],
       DisplayType::IMESSAGE_APP_IPAD_PRO_129 => DEVICE_RESOLUTIONS[DisplayType::APP_IPAD_PRO_129],
-      DisplayType::IMESSAGE_APP_IPAD_PRO_3GEN_129 => DEVICE_RESOLUTIONS[DisplayType::APP_IPAD_PRO_129]
+      DisplayType::IMESSAGE_APP_IPAD_PRO_3GEN_129 => DEVICE_RESOLUTIONS[DisplayType::APP_IPAD_PRO_3GEN_129]
     }.freeze
 
     # Resolutions that are shared by multiple device types
