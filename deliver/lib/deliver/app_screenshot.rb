@@ -10,43 +10,6 @@ module Deliver
     # Shorthand for DisplayType constants
     DisplayType = Spaceship::ConnectAPI::AppScreenshotSet::DisplayType
 
-    # Mapping from DisplayType constants to screen size strings (preserved for backward compatibility)
-    DISPLAY_TYPE_TO_SCREEN_SIZE = {
-      DisplayType::APP_IPHONE_35 => "iOS-3.5-in",
-      DisplayType::APP_IPHONE_40 => "iOS-4-in",
-      DisplayType::APP_IPHONE_47 => "iOS-4.7-in",
-      DisplayType::APP_IPHONE_55 => "iOS-5.5-in",
-      DisplayType::APP_IPHONE_58 => "iOS-5.8-in",
-      DisplayType::APP_IPHONE_61 => "iOS-6.1-in",
-      DisplayType::APP_IPHONE_65 => "iOS-6.5-in",
-      DisplayType::APP_IPHONE_67 => "iOS-6.7-in",
-      DisplayType::APP_IPAD_97 => "iOS-iPad",
-      DisplayType::APP_IPAD_105 => "iOS-iPad-10.5",
-      DisplayType::APP_IPAD_PRO_3GEN_11 => "iOS-iPad-11",
-      DisplayType::APP_IPAD_PRO_129 => "iOS-iPad-Pro",
-      DisplayType::APP_IPAD_PRO_3GEN_129 => "iOS-iPad-Pro-12.9",
-      DisplayType::IMESSAGE_APP_IPHONE_40 => "iOS-4-in-messages",
-      DisplayType::IMESSAGE_APP_IPHONE_47 => "iOS-4.7-in-messages",
-      DisplayType::IMESSAGE_APP_IPHONE_55 => "iOS-5.5-in-messages",
-      DisplayType::IMESSAGE_APP_IPHONE_58 => "iOS-5.8-in-messages",
-      DisplayType::IMESSAGE_APP_IPHONE_61 => "iOS-6.1-in-messages",
-      DisplayType::IMESSAGE_APP_IPHONE_65 => "iOS-6.5-in-messages",
-      DisplayType::IMESSAGE_APP_IPHONE_67 => "iOS-6.7-in-messages",
-      DisplayType::IMESSAGE_APP_IPAD_97 => "iOS-iPad-messages",
-      DisplayType::IMESSAGE_APP_IPAD_105 => "iOS-iPad-10.5-messages",
-      DisplayType::IMESSAGE_APP_IPAD_PRO_3GEN_11 => "iOS-iPad-11-messages",
-      DisplayType::IMESSAGE_APP_IPAD_PRO_129 => "iOS-iPad-Pro-messages",
-      DisplayType::IMESSAGE_APP_IPAD_PRO_3GEN_129 => "iOS-iPad-Pro-12.9-messages",
-      DisplayType::APP_WATCH_SERIES_3 => "iOS-Apple-Watch",
-      DisplayType::APP_WATCH_SERIES_4 => "iOS-Apple-Watch-Series4",
-      DisplayType::APP_WATCH_SERIES_7 => "iOS-Apple-Watch-Series7",
-      DisplayType::APP_WATCH_SERIES_10 => "iOS-Apple-Watch-Series10",
-      DisplayType::APP_WATCH_ULTRA => "iOS-Apple-Watch-Ultra",
-      DisplayType::APP_APPLE_TV => "Apple-TV",
-      DisplayType::APP_DESKTOP => "Mac",
-      DisplayType::APP_APPLE_VISION_PRO => "visionOS-Vision-Pro"
-    }.freeze
-
     FORMATTED_NAMES = {
       DisplayType::APP_IPHONE_35 => "iPhone 4",
       DisplayType::APP_IPHONE_40 => "iPhone 5",
