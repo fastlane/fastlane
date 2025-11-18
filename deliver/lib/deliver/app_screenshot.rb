@@ -220,7 +220,9 @@ module Deliver
     end
 
     def is_messages?
+      # rubocop:disable Require/MissingRequireStatement
       return DisplayType::ALL_IMESSAGE.include?(self.display_type)
+      # rubocop:enable Require/MissingRequireStatement
     end
 
     def self.calculate_display_type(path)
@@ -245,6 +247,7 @@ module Deliver
         is_2gen = path_lower.include?("app_ipad_pro_129") ||
                   (path_lower.include?("12.9") && path_lower.include?("2nd generation")) # e.g. iPad Pro (12.9-inch) (2nd generation)
 
+        # rubocop:disable Require/MissingRequireStatement
         if is_2gen
           return is_imessage ? DisplayType::IMESSAGE_APP_IPAD_PRO_129 : DisplayType::APP_IPAD_PRO_129
         else
@@ -253,6 +256,7 @@ module Deliver
       # Apple TV vs Vision Pro conflict
       when [3840, 2160]
         return path_lower.include?("vision") ? DisplayType::APP_APPLE_VISION_PRO : DisplayType::APP_APPLE_TV
+        # rubocop:enable Require/MissingRequireStatement
       else
         matching_display_type
       end
