@@ -548,7 +548,7 @@ function resign {
         for assetpack in "$ODR_DIR"/*
         do
             if [[ "$assetpack" == *.assetpack ]]; then
-                rm -rf "$assetpack/_CodeSignature"
+                rm -rf "$assetpack"/_CodeSignature
                 /usr/bin/codesign "${VERBOSE}" --generate-entitlement-der "${KEYCHAIN_FLAG}" -f -s "$CERTIFICATE" "$assetpack"
                 checkStatus
             else
