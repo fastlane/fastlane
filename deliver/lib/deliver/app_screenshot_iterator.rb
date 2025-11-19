@@ -1,3 +1,5 @@
+require_relative 'module'
+
 module Deliver
   # This is a convenient class that enumerates app store connect's screenshots in various degrees.
   class AppScreenshotIterator
@@ -81,6 +83,7 @@ module Deliver
 
         screenshots_per_display_type.each do |display_type, screenshots|
           # create AppScreenshotSet for given display_type if it doesn't exist
+          UI.verbose("Setting up screenshot set for #{language}, #{display_type}")
           app_screenshot_set = (app_screenshot_set_per_locale_and_display_type[language] || {})[display_type]
           app_screenshot_set ||= localization.create_app_screenshot_set(attributes: { screenshotDisplayType: display_type })
 

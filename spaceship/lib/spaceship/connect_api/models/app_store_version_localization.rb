@@ -2,7 +2,6 @@ require_relative '../model'
 require_relative './app_preview_set'
 require_relative './app_screenshot_set'
 require_relative '../../errors'
-require_relative '../../module'
 
 module Spaceship
   class ConnectAPI
@@ -105,7 +104,6 @@ module Spaceship
       end
 
       def create_app_screenshot_set(client: nil, attributes: nil)
-        UI.verbose("Creating screenshot set for localization attributes: #{attributes}")
         client ||= Spaceship::ConnectAPI
         resp = client.post_app_screenshot_set(app_store_version_localization_id: id, attributes: attributes)
         return resp.to_models.first
