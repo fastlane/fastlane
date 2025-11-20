@@ -460,8 +460,9 @@ describe FastlaneCore do
       runtime_output = File.read('./fastlane_core/spec/fixtures/XcrunSimctlListRuntimesOutputWithVersionMismatch')
       expect(Open3).to receive(:capture2).with("xcrun simctl list -j runtimes").and_return([runtime_output, status])
 
-      expect(FastlaneCore::DeviceManager.runtime_name_to_version['iOS 17.0']).to eq('17.0')
-      expect(FastlaneCore::DeviceManager.runtime_name_to_version['iOS 26.0']).to eq('26.0.1')
+      expect(FastlaneCore::DeviceManager.runtime_name_to_version['iOS 17.0']).to eq(['17.0'])
+      expect(FastlaneCore::DeviceManager.runtime_name_to_version['iOS 18.0']).to eq(['18.0', '18.0.1'])
+      expect(FastlaneCore::DeviceManager.runtime_name_to_version['iOS 26.0']).to eq(['26.0.1'])
     end
 
     it 'fixes iOS version mismatch by using actual runtime versions instead of section header versions' do

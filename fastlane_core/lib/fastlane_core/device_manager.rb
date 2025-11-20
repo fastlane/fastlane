@@ -29,7 +29,11 @@ module FastlaneCore
           output, status = Open3.capture2('xcrun simctl list -j runtimes')
           raise status unless status.success?
           json = JSON.parse(output)
-          json['runtimes'].map { |h| [h['name'], h['version']] }.to_h
+          # Group by name and collect all versions for each name
+          # For example: "iOS 17.0" => ["17.0", "17.0.1"]
+          json['runtimes']
+            .group_by { |h| h['name'] }
+            .transform_values { |runtimes| runtimes.map { |h| h['version'] } }
         rescue StandardError => e
           UI.error(e)
           UI.error('xcrun simctl CLI broken; run `xcrun simctl list runtimes` and make sure it works')
@@ -43,7 +47,7 @@ module FastlaneCore
         @devices = []
         os_type = 'unknown'
         os_version = 'unknown'
-        actual_os_version = 'unknown'
+        actual_os_versions = []
         output = ''
         Open3.popen3('xcrun simctl list devices') do |stdin, stdout, stderr, wait_thr|
           output = stdout.read
@@ -55,7 +59,7 @@ module FastlaneCore
         end
 
         # Get runtime mapping from JSON data
-        # For example, maps "iOS 26.0" -> "26.0.1"
+        # For example, maps "iOS 17.0" -> ["17.0", "17.0.1"] or "iOS 26.0" -> ["26.0.1"]
         runtime_mapping = runtime_name_to_version
 
         output.split(/\n/).each do |line|
@@ -65,8 +69,8 @@ module FastlaneCore
             section_header = line.gsub(/-- (.*) --/, '\1')
             (os_type, os_version) = section_header.split
 
-            # Use the actual runtime version if available, otherwise fall back to section version
-            actual_os_version = runtime_mapping[section_header] || os_version
+            # Get array of actual runtime versions if available, otherwise use section version in array
+            actual_os_versions = runtime_mapping[section_header] || [os_version]
           else
             next if os_type =~ /^Unavailable/
 
@@ -79,8 +83,12 @@ module FastlaneCore
             name = matches.join(' ')
 
             if matches.count && (os_type == requested_os_type || requested_os_type == "")
-              # This is disabled here because the Device is defined later in the file, and that's a problem for the cop
-              @devices << Device.new(name: name, os_type: os_type, os_version: actual_os_version, udid: udid, state: state, is_simulator: true)
+              # Create a device entry for each available runtime version
+              # This handles cases where multiple runtimes share the same name (e.g., "iOS 17.0")
+              actual_os_versions.each do |actual_os_version|
+                # This is disabled here because the Device is defined later in the file, and that's a problem for the cop
+                @devices << Device.new(name: name, os_type: os_type, os_version: actual_os_version, udid: udid, state: state, is_simulator: true)
+              end
             end
           end
         end
