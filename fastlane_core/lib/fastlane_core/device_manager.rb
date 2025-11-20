@@ -157,6 +157,12 @@ module FastlaneCore
                   .os_version
       end
 
+      def clear_cache
+        @devices = nil
+        @runtime_build_os_versions = nil
+        @runtime_name_to_version = nil
+      end
+
       # The code below works from Xcode 7 on
       # def all
       #   UI.verbose("Fetching available devices")
@@ -311,8 +317,7 @@ module FastlaneCore
       end
 
       def clear_cache
-        @devices = nil
-        @runtime_build_os_versions = nil
+        DeviceManager.clear_cache
       end
 
       def launch(device)

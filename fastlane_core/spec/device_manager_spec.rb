@@ -4,11 +4,14 @@ describe FastlaneCore do
   describe FastlaneCore::DeviceManager do
     before(:all) do
       @simctl_output = File.read('./fastlane_core/spec/fixtures/DeviceManagerSimctlOutputXcode7')
+      @simctl_runtime_output = File.read('./fastlane_core/spec/fixtures/XcrunSimctlListRuntimesOutput')
       @system_profiler_output = File.read('./fastlane_core/spec/fixtures/DeviceManagerSystem_profilerOutput')
       @instruments_output = File.read('./fastlane_core/spec/fixtures/DeviceManagerInstrumentsOutput')
       @system_profiler_output_items_without_items = File.read('./fastlane_core/spec/fixtures/DeviceManagerSystem_profilerOutputItemsWithoutItems')
       @system_profiler_output_usb_hub = File.read('./fastlane_core/spec/fixtures/DeviceManagerSystem_profilerOutputUsbHub')
+    end
 
+    before(:each) do
       FastlaneCore::Simulator.clear_cache
     end
 
@@ -166,6 +169,9 @@ describe FastlaneCore do
     end
 
     it "properly parses the simctl output and generates Device objects for tvOS simulator" do
+      status = double('status', "success?": true)
+      expect(Open3).to receive(:capture2).with("xcrun simctl list -j runtimes").and_return([@simctl_runtime_output, status])
+
       response = "response"
       expect(response).to receive(:read).and_return(@simctl_output)
       expect(Open3).to receive(:popen3).with("xcrun simctl list devices").and_yield(nil, response, nil, nil)
@@ -182,6 +188,9 @@ describe FastlaneCore do
     end
 
     it "properly parses the simctl output and generates Device objects for watchOS simulator" do
+      status = double('status', "success?": true)
+      expect(Open3).to receive(:capture2).with("xcrun simctl list -j runtimes").and_return([@simctl_runtime_output, status])
+
       response = "response"
       expect(response).to receive(:read).and_return(@simctl_output)
       expect(Open3).to receive(:popen3).with("xcrun simctl list devices").and_yield(nil, response, nil, nil)
@@ -204,6 +213,9 @@ describe FastlaneCore do
     end
 
     it "properly parses the simctl output and generates Device objects for all simulators" do
+      status = double('status', "success?": true)
+      expect(Open3).to receive(:capture2).with("xcrun simctl list -j runtimes").and_return([@simctl_runtime_output, status])
+
       response = "response"
       expect(response).to receive(:read).and_return(@simctl_output)
       expect(Open3).to receive(:popen3).with("xcrun simctl list devices").and_yield(nil, response, nil, nil)
@@ -256,6 +268,9 @@ describe FastlaneCore do
     end
 
     it "properly parses the simctl output with unavailable devices and generates Device objects for all simulators" do
+      status = double('status', "success?": true)
+      expect(Open3).to receive(:capture2).with("xcrun simctl list -j runtimes").and_return([@simctl_runtime_output, status])
+
       response = "response"
       simctl_output = File.read('./fastlane_core/spec/fixtures/DeviceManagerSimctlOutputXcode10BootedUnavailable')
       expect(response).to receive(:read).and_return(simctl_output)
@@ -357,6 +372,9 @@ describe FastlaneCore do
     end
 
     it "properly parses output for all iOS devices" do
+      status = double('status', "success?": true)
+      expect(Open3).to receive(:capture2).with("xcrun simctl list -j runtimes").and_return([@simctl_runtime_output, status])
+
       response = "response"
       expect(response).to receive(:read).and_return(@system_profiler_output)
       expect(Open3).to receive(:popen3).with("system_profiler SPUSBDataType -xml").and_yield(nil, response, nil, nil)
@@ -409,6 +427,9 @@ describe FastlaneCore do
     end
 
     it "properly parses output for all tvOS devices" do
+      status = double('status', "success?": true)
+      expect(Open3).to receive(:capture2).with("xcrun simctl list -j runtimes").and_return([@simctl_runtime_output, status])
+
       response = "response"
       expect(response).to receive(:read).and_return(@system_profiler_output)
       expect(Open3).to receive(:popen3).with("system_profiler SPUSBDataType -xml").and_yield(nil, response, nil, nil)
