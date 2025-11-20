@@ -243,7 +243,7 @@ workflows:
           ruby_opt: -W:deprecated
       - tests_ubuntu:
           name: 'Execute tests on Ubuntu'
-          image: 'cimg/ruby:3.2-node'
+          image: 'cimg/ruby:3.2.2-node'
       - validate_fastlane_swift_generation:
           name: 'Validate Fastlane.swift generation'
           xcode_version: '15.0.1'
