@@ -156,6 +156,10 @@ describe Scan do
         simctl_list_devices_output = double('xcrun simctl list devices', read: File.read("./scan/spec/fixtures/XcrunSimctlListDevicesOutput15"))
         allow(Open3).to receive(:popen3).with("xcrun simctl list devices").and_yield(nil, simctl_list_devices_output, nil, nil)
 
+        simctl_runtime_output = File.read('./scan/spec/fixtures/XcrunSimctlListRuntimesOutput')
+        runtime_status = double('status', "success?": true)
+        allow(Open3).to receive(:capture2).with("xcrun simctl list -j runtimes").and_return([simctl_runtime_output, runtime_status])
+
         allow(Scan::DetectValues).to receive(:default_os_version).with('iOS').and_return(Gem::Version.new('17.0'))
         allow(Scan::DetectValues).to receive(:default_os_version).with('tvOS').and_return(Gem::Version.new('17.0'))
         allow(Scan::DetectValues).to receive(:default_os_version).with('watchOS').and_return(Gem::Version.new('10.0'))
@@ -178,6 +182,10 @@ describe Scan do
       it 'filters out simulators newer than what the current Xcode SDK supports', requires_xcodebuild: true do
         simctl_list_devices_output = double('xcrun simctl list devices', read: File.read("./scan/spec/fixtures/XcrunSimctlListDevicesOutput14"))
         allow(Open3).to receive(:popen3).with("xcrun simctl list devices").and_yield(nil, simctl_list_devices_output, nil, nil)
+
+        simctl_runtime_output = File.read('./scan/spec/fixtures/XcrunSimctlListRuntimesOutput')
+        runtime_status = double('status', "success?": true)
+        allow(Open3).to receive(:capture2).with("xcrun simctl list -j runtimes").and_return([simctl_runtime_output, runtime_status])
 
         allow(Scan::DetectValues).to receive(:default_os_version).with('iOS').and_return(Gem::Version.new('16.4'))
         allow(Scan::DetectValues).to receive(:default_os_version).with('tvOS').and_return(Gem::Version.new('16.4'))
