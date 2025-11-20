@@ -153,6 +153,12 @@ describe Scan do
 
     describe "#detect_simulator" do
       it 'returns simulators for requested devices', requires_xcodebuild: true do
+        # Stub Scan.config and Scan.project to avoid full initialization
+        config_stub = double('config')
+        allow(config_stub).to receive(:[]).and_return(nil)
+        allow(Scan).to receive(:config).and_return(config_stub)
+        allow(Scan).to receive(:project).and_return(nil)
+
         simctl_list_devices_output = double('xcrun simctl list devices', read: File.read("./scan/spec/fixtures/XcrunSimctlListDevicesOutput15"))
         allow(Open3).to receive(:popen3).with("xcrun simctl list devices").and_yield(nil, simctl_list_devices_output, nil, nil)
 
@@ -180,6 +186,12 @@ describe Scan do
       end
 
       it 'filters out simulators newer than what the current Xcode SDK supports', requires_xcodebuild: true do
+        # Stub Scan.config and Scan.project to avoid full initialization
+        config_stub = double('config')
+        allow(config_stub).to receive(:[]).and_return(nil)
+        allow(Scan).to receive(:config).and_return(config_stub)
+        allow(Scan).to receive(:project).and_return(nil)
+
         simctl_list_devices_output = double('xcrun simctl list devices', read: File.read("./scan/spec/fixtures/XcrunSimctlListDevicesOutput14"))
         allow(Open3).to receive(:popen3).with("xcrun simctl list devices").and_yield(nil, simctl_list_devices_output, nil, nil)
 
