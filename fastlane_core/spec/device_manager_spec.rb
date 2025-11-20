@@ -9,11 +9,11 @@ describe FastlaneCore do
       @instruments_output = File.read('./fastlane_core/spec/fixtures/DeviceManagerInstrumentsOutput')
       @system_profiler_output_items_without_items = File.read('./fastlane_core/spec/fixtures/DeviceManagerSystem_profilerOutputItemsWithoutItems')
       @system_profiler_output_usb_hub = File.read('./fastlane_core/spec/fixtures/DeviceManagerSystem_profilerOutputUsbHub')
+
+      FastlaneCore::Simulator.clear_cache
     end
 
     before(:each) do
-      FastlaneCore::Simulator.clear_cache
-
       status = double('status', "success?": true)
       allow(Open3).to receive(:capture2).with("xcrun simctl list -j runtimes").and_return([@simctl_runtime_output, status])
     end
