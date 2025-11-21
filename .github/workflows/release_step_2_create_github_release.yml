@@ -23,6 +23,7 @@ jobs:
     runs-on: macos-latest
 
     permissions:
+      packages: write
       contents: write
       id-token: write
 
