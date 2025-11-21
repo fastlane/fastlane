@@ -18,6 +18,9 @@ gem "danger-junit", "~> 1.0"
 gem "fakefs", "1.8"
 # for file uploads with Faraday
 gem "mime-types", ['>= 1.16', '< 4.0']
+# standard library for OpenSSL is 3.3.0, but we need a fix for openssl
+# https://github.com/ruby/openssl/issues/949#issuecomment-3370358680
+gem "openssl", "~> 3.3.1"
 # Fast XML parser and object marshaller.
 # Version 2.14.15+ requires Ruby >=2.7, while fastlane uses a `required_ruby_version` of `>= 2.6`.
 gem "ox", "2.14.14"
