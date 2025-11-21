@@ -73,6 +73,9 @@ desc "Runs the tests"
 lane :execute_tests do
   version = local_version # has to be outside of the `Dir.chdir`
 
+  # Verify SSL connection is alright.
+  download(url: "https://rubygems.org/api/v1/gems/fastlane.json")
+
   # Verifying the --help command
   Dir.chdir("..") do
     cmd = Helper.windows? ? "cd bin && fastlane --help" : "PAGER=cat bin/fastlane --help"
