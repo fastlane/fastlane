@@ -152,3 +152,4 @@ From now on, every time you introduce a change to your local _fastlane_ code bas
 If you want to run a command with your normal _fastlane_ installation, simply do not run the command with the `bundle exec` prefix.
 
 To completely remove _fastlane_ from your local project, delete the `Gemfile` you created earlier, or undo the changes you made to match the `Gemfile` template.
+
