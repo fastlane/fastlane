@@ -73,7 +73,7 @@ desc "Runs the tests"
 lane :execute_tests do
   version = local_version # has to be outside of the `Dir.chdir`
 
-  # Verify SSL connection is alright.
+  # Verify SSL connection is alright - https://github.com/fastlane/fastlane/issues/29710
   download(url: "https://rubygems.org/api/v1/gems/fastlane.json")
 
   # Verifying the --help command

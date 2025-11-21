@@ -18,8 +18,8 @@ gem "danger-junit", "~> 1.0"
 gem "fakefs", "1.8"
 # for file uploads with Faraday
 gem "mime-types", ['>= 1.16', '< 4.0']
-# standard library for OpenSSL has affected versions.
-# https://github.com/ruby/openssl/issues/949#issuecomment-3370358680
+# standard library for OpenSSL has affected versions (unable to get certificate CRL) - ruby/openssl/issues/949
+# We block affected versions here so a patched gem version will be used regardless of Ruby version.
 gem "openssl",
     ">= 3.1.2",
     "!= 3.2.0",
