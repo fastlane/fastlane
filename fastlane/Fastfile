@@ -576,7 +576,9 @@ desc "Update the actions.md on https://docs.fastlane.tools"
 desc "This will also automatically submit a pull request to fastlane/docs"
 lane :update_docs do |options|
   debug = options[:debug]
-  version = options[:version]
+  version = options[:version] || current_version
+
+  puts("Starting docs update for version #{version} 🚀")
 
   unless debug
     verify_env_variables(skip_ruby_gems: true)
