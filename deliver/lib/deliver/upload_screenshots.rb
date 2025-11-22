@@ -134,7 +134,7 @@ module Deliver
         number_of_screenshots_per_set[app_screenshot_set] ||= (app_screenshot_set.app_screenshots || []).count
 
         if number_of_screenshots_per_set[app_screenshot_set] >= 10
-          UI.error("Too many screenshots found for device '#{screenshot.device_type}' in '#{screenshot.language}', skipping this one (#{screenshot.path})")
+          UI.error("Too many screenshots found for device '#{screenshot.display_type}' in '#{screenshot.language}', skipping this one (#{screenshot.path})")
           next
         end
 
