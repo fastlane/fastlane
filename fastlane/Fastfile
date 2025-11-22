@@ -579,7 +579,7 @@ lane :update_docs do |options|
   version = options[:version]
 
   unless debug
-    verify_env_variables
+    verify_env_variables(skip_ruby_gems: true)
     ensure_actions_config_items_formatting
   end
 
