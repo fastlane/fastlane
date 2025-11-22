@@ -67,7 +67,11 @@ module Fastlane
           }
 
           if File.exist?(cache_path)
-            self.cache = YAML.load_file(cache_path)
+            self.cache = YAML.safe_load(
+              File.read(cache_path),
+              permitted_classes: [Date, Time, Symbol, FastlanePluginAction],
+              aliases: true
+            )
           else
             self.cache = {}
           end
@@ -190,7 +194,7 @@ module Fastlane
         def append_git_data
           Dir.mktmpdir("fastlane-plugin") do |tmp|
             clone_folder = File.join(tmp, self.name)
-            `GIT_TERMINAL_PROMPT=0 git clone #{self.homepage.shellescape} #{clone_folder.shellescape}`
+            `GIT_TERMINAL_PROMPT=0 git clone --filter=blob:none #{self.homepage.shellescape} #{clone_folder.shellescape}`
 
             break unless File.directory?(clone_folder)
 
