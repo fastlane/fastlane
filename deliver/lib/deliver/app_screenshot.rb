@@ -205,7 +205,11 @@ module Deliver
       return {
         ScreenSize::IOS_67_MESSAGES => [
           [1290, 2796],
-          [2796, 1290]
+          [2796, 1290],
+          [1260, 2736],
+          [2736, 1260],
+          [1320, 2868],
+          [2868, 1320]
         ],
         ScreenSize::IOS_65_MESSAGES => [
           [1242, 2688],
@@ -215,7 +219,9 @@ module Deliver
         ],
         ScreenSize::IOS_61_MESSAGES => [
           [1179, 2556],
-          [2556, 1179]
+          [2556, 1179],
+          [1206, 2622],
+          [2622, 1206]
         ],
         ScreenSize::IOS_58_MESSAGES => [
           [1125, 2436],
@@ -253,11 +259,15 @@ module Deliver
         ],
         ScreenSize::IOS_IPAD_11_MESSAGES => [
           [1668, 2388],
-          [2388, 1668]
+          [2388, 1668],
+          [1668, 2420],
+          [2420, 1668]
         ],
         ScreenSize::IOS_IPAD_PRO_MESSAGES => [
           [2732, 2048],
-          [2048, 2732]
+          [2048, 2732],
+          [2064, 2752],
+          [2752, 2064]
         ]
       }
     end
@@ -269,7 +279,11 @@ module Deliver
       return {
         ScreenSize::IOS_67 => [
           [1290, 2796],
-          [2796, 1290]
+          [2796, 1290],
+          [1260, 2736],
+          [2736, 1260],
+          [1320, 2868],
+          [2868, 1320]
         ],
         ScreenSize::IOS_65 => [
           [1242, 2688],
@@ -279,7 +293,9 @@ module Deliver
         ],
         ScreenSize::IOS_61 => [
           [1179, 2556],
-          [2556, 1179]
+          [2556, 1179],
+          [1206, 2622],
+          [2622, 1206]
         ],
         ScreenSize::IOS_58 => [
           [1125, 2436],
@@ -323,11 +339,15 @@ module Deliver
         ],
         ScreenSize::IOS_IPAD_11 => [
           [1668, 2388],
-          [2388, 1668]
+          [2388, 1668],
+          [1668, 2420],
+          [2420, 1668]
         ],
         ScreenSize::IOS_IPAD_PRO => [
           [2732, 2048],
-          [2048, 2732]
+          [2048, 2732],
+          [2064, 2752],
+          [2752, 2064]
         ],
         ScreenSize::MAC => [
           [1280, 800],
@@ -361,7 +381,10 @@ module Deliver
         "iPad Pro (12.9-inch) (5th generation)", # Default simulator has this name
         "iPad Pro (12.9-inch) (6th generation)", # Default simulator has this name
         "IPAD_PRO_3GEN_129", # Screenshots downloaded from App Store Connect has this name
-        "ipadPro129" # Legacy: screenshots downloaded from iTunes Connect used to have this name
+        "ipadPro129", # Legacy: screenshots downloaded from iTunes Connect used to have this name
+        "iPad Air 13-inch (M2)", # Default simulator has this name
+        "iPad Air 13-inch (M3)", # Default simulator has this name
+        "iPad Pro 13-inch (M4)" # Default simulator has this name
       ].any? { |key| filename.include?(key) }
       if is_3rd_gen
         if screen_size == ScreenSize::IOS_IPAD_PRO
