@@ -48,6 +48,9 @@ jobs:
       ruby_opt:
         type: string
         default: ''
+      bundler_version:
+        type: string
+        default: ''
     environment:
       CIRCLE_TEST_REPORTS: '~/test-reports'
       LC_ALL: 'en_US.UTF-8'
@@ -71,12 +74,13 @@ jobs:
           name: Ensure required Bundler version
           command: |
             set -eo pipefail
-            if [ -z "${BUNDLER_VERSION:-}" ]; then
+            bundler_version="<< parameters.bundler_version >>"
+            if [ -z "$bundler_version" ]; then
               echo "BUNDLER_VERSION not set, skipping install."
               exit 0
             fi
-            if ! gem list -i bundler -v "${BUNDLER_VERSION}" > /dev/null 2>&1; then
-              gem install --user-install bundler -v "${BUNDLER_VERSION}"
+            if ! gem list -i bundler -v "$bundler_version" > /dev/null 2>&1; then
+              gem install --user-install bundler -v "$bundler_version"
             fi
             ruby_version=$(ruby -e 'require "rbconfig"; print RbConfig::CONFIG["ruby_version"]')
             {
@@ -225,8 +229,7 @@ workflows:
           xcode_version: '13.4.1'
           ruby_version: 'system'
           ruby_opt: -W:deprecated
-          environment:
-            BUNDLER_VERSION: '2.4.22'
+          bundler_version: '2.4.22'
       - tests_macos:
           name: 'Execute tests on macOS (Xcode 13.4.1, Ruby 3.1)'
           xcode_version: '13.4.1'
