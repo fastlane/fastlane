@@ -246,7 +246,7 @@ workflows:
           xcode_version: '16.4.0'
           ruby_version: '3.4'
           ruby_opt: -W:deprecated
-        - tests_ubuntu:
+      - tests_ubuntu:
           name: 'Execute tests on Ubuntu (Ruby 2.6)'
           image: 'cimg/ruby:2.6'
       - tests_ubuntu:
