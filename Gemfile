@@ -66,9 +66,9 @@ gem "yard", "~> 0.9.11"
 # `required_ruby_version` of `>= 2.6`.
 gem "public_suffix", "< 6.0"
 
-# domain_name >= 0.6.20240107 requires Ruby >= 2.7.0, while fastlane uses a
+# domain_name 0.6.x requires Ruby >= 2.7.0, while fastlane uses a
 # `required_ruby_version` of `>= 2.6`.
-gem "domain_name", "< 0.6.20240107"
+gem "domain_name", "< 0.6"
 
 gemspec(path: ".")
 
