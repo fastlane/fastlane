@@ -31,6 +31,9 @@ jobs:
     - name: Checkout repository
       uses: actions/checkout@v5
 
+    - name: Ignore changes to .bundle/config
+      run: git update-index --skip-worktree .bundle/config
+
     - name: Set up Ruby
       uses: ruby/setup-ruby@v1
       with:
