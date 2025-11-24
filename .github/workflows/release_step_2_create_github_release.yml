@@ -35,7 +35,9 @@ jobs:
       uses: ruby/setup-ruby@v1
       with:
         ruby-version: '3.2'
-        bundler-cache: true
+
+    - name: Install fastlane
+      run: bundle install
 
     - uses: rubygems/configure-rubygems-credentials@v1.0.0
 
