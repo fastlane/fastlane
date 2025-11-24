@@ -48,9 +48,6 @@ jobs:
       ruby_opt:
         type: string
         default: ''
-      bundler_version:
-        type: string
-        default: ''
     environment:
       CIRCLE_TEST_REPORTS: '~/test-reports'
       LC_ALL: 'en_US.UTF-8'
@@ -70,25 +67,6 @@ jobs:
           name: Setup Build
           command: |
             mkdir -p ~/test-reports
-      - run:
-          name: Ensure required Bundler version
-          command: |
-            set -eo pipefail
-            bundler_version="<< parameters.bundler_version >>"
-            if [ -z "$bundler_version" ]; then
-              echo "BUNDLER_VERSION not set, skipping install."
-              exit 0
-            fi
-            if ! gem list -i bundler -v "$bundler_version" > /dev/null 2>&1; then
-              gem install --user-install bundler -v "$bundler_version"
-            fi
-            ruby_version=$(ruby -e 'require "rbconfig"; print RbConfig::CONFIG["ruby_version"]')
-            {
-              echo "export PATH=\"$HOME/.gem/ruby/${ruby_version}/bin:$PATH\""
-              echo "export GEM_HOME=\"$HOME/.gem\""
-              echo "export GEM_PATH=\"$HOME/.gem\""
-            } >> "$BASH_ENV"
-            source "$BASH_ENV"
       - ruby/install-deps
       - run:
           name: Check PR Metadata
@@ -225,11 +203,10 @@ workflows:
   "Run Tests & Checks": # Name of the workflow, which ends up displayed on GitHub's PR Check
     jobs:
       - tests_macos:
-          name: 'Execute tests on macOS (Xcode 13.4.1, System Ruby (2.6))'
+          name: 'Execute tests on macOS (Xcode 13.4.1, Ruby 2.7)'
           xcode_version: '13.4.1'
-          ruby_version: 'system'
+          ruby_version: '2.7'
           ruby_opt: -W:deprecated
-          bundler_version: '2.4.22'
       - tests_macos:
           name: 'Execute tests on macOS (Xcode 13.4.1, Ruby 3.1)'
           xcode_version: '13.4.1'
