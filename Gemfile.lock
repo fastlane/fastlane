@@ -251,7 +251,7 @@ GEM
     pry-stack_explorer (0.4.12)
       binding_of_caller (~> 0.7)
       pry (~> 0.13)
-    public_suffix (6.0.1)
+    public_suffix (5.1.1)
     racc (1.7.1)
     rack (2.2.8)
     rack-protection (2.2.4)
@@ -394,6 +394,7 @@ DEPENDENCIES
   pry-byebug
   pry-rescue
   pry-stack_explorer
+  public_suffix (< 6.0)
   rake
   rb-readline
   rspec (~> 3.10)
@@ -408,4 +409,4 @@ DEPENDENCIES
   yard (~> 0.9.11)
 
 BUNDLED WITH
-   2.4.22
+   2.6.2
