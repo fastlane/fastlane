@@ -31,6 +31,7 @@ jobs:
 
       - name: Build gem
         id: build
+        shell: bash
         run: |
           GEM_FILE=$(gem build fastlane.gemspec | grep "File:" | awk '{print $2}')
           echo "gem_file=$GEM_FILE" >> $GITHUB_OUTPUT
