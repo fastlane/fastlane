@@ -62,6 +62,10 @@ gem "xcov", "~> 1.4.1"
 # A documentation generation tool for Ruby.
 gem "yard", "~> 0.9.11"
 
+# public_suffix >= 6.0 requires Ruby >= 3.0, while fastlane uses a
+# `required_ruby_version` of `>= 2.6`.
+gem "public_suffix", "< 6.0"
+
 gemspec(path: ".")
 
 plugins_path = File.join(File.expand_path("..", __FILE__), "fastlane", "Pluginfile")
