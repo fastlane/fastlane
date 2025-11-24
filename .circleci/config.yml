@@ -67,6 +67,24 @@ jobs:
           name: Setup Build
           command: |
             mkdir -p ~/test-reports
+      - run:
+          name: Ensure required Bundler version
+          command: |
+            set -eo pipefail
+            if [ -z "${BUNDLER_VERSION:-}" ]; then
+              echo "BUNDLER_VERSION not set, skipping install."
+              exit 0
+            fi
+            if ! gem list -i bundler -v "${BUNDLER_VERSION}" > /dev/null 2>&1; then
+              gem install --user-install bundler -v "${BUNDLER_VERSION}"
+            fi
+            ruby_version=$(ruby -e 'require "rbconfig"; print RbConfig::CONFIG["ruby_version"]')
+            {
+              echo "export PATH=\"$HOME/.gem/ruby/${ruby_version}/bin:$PATH\""
+              echo "export GEM_HOME=\"$HOME/.gem\""
+              echo "export GEM_PATH=\"$HOME/.gem\""
+            } >> "$BASH_ENV"
+            source "$BASH_ENV"
       - ruby/install-deps
       - run:
           name: Check PR Metadata
@@ -207,6 +225,8 @@ workflows:
           xcode_version: '13.4.1'
           ruby_version: 'system'
           ruby_opt: -W:deprecated
+          environment:
+            BUNDLER_VERSION: '2.4.22'
       - tests_macos:
           name: 'Execute tests on macOS (Xcode 13.4.1, Ruby 3.1)'
           xcode_version: '13.4.1'
