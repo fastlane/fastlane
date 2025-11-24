@@ -608,7 +608,7 @@ lane :update_docs do |options|
     # This ensures documentation tests leverage the latest action parameters and code samples.
     unless options[:skip_bundle_update]
       Bundler.with_unbundled_env do
-        sh("bundle update fastlane")
+        sh('bundle', 'update', 'fastlane')
       end
     end
 
