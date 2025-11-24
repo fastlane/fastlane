@@ -31,14 +31,13 @@ jobs:
     - name: Checkout repository
       uses: actions/checkout@v5
 
-    - name: Ignore changes to .bundle/config
-      run: git update-index --skip-worktree .bundle/config
-
     - name: Set up Ruby
       uses: ruby/setup-ruby@v1
       with:
         ruby-version: '3.2'
-        bundler-cache: true
+
+    - name: Install fastlane
+      run: bundle install
 
     - uses: rubygems/configure-rubygems-credentials@v1.0.0
 
