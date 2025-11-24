@@ -129,7 +129,7 @@ GEM
     digest-crc (0.6.5)
       rake (>= 12.0.0, < 14.0.0)
     docile (1.3.5)
-    domain_name (0.6.20240107)
+    domain_name (0.6.20231109)
     dotenv (2.8.1)
     emoji_regex (3.2.3)
     excon (0.109.0)
@@ -382,6 +382,7 @@ DEPENDENCIES
   coveralls (~> 0.8.13)
   danger (~> 8.0)
   danger-junit (~> 1.0)
+  domain_name (< 0.6.20240107)
   fakefs (= 1.8)
   fastlane!
   fastlane-plugin-clubmate
