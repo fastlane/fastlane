@@ -147,7 +147,17 @@ module Scan
           end
 
           # Get OS version corresponding to build
-          Gem::Version.new(FastlaneCore::DeviceManager.runtime_build_os_versions[runtime_build])
+          
+          # In August 2025, Apple released an update to the simulator, without updating xcode
+          # this leads to a nil os_version here.
+          os_version = FastlaneCore::DeviceManager.runtime_build_os_versions[runtime_build]
+          
+          if os_version.nil? and runtime_build == "22F76"
+           # retry with the hardcoded runtime build version
+           os_version = FastlaneCore::DeviceManager.runtime_build_os_versions["22G86"]
+          end
+          
+          Gem::Version.new(os_version)
         end
       end
     end
