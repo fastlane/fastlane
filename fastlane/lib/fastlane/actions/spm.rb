@@ -11,6 +11,7 @@ module Fastlane
         cmd << "--configuration #{params[:configuration]}" if params[:configuration]
         cmd << "--disable-sandbox" if params[:disable_sandbox]
         cmd << "--verbose" if params[:verbose]
+        cmd << "--very-verbose" if params[:very_verbose]
         if params[:simulator]
           simulator_platform = simulator_platform(simulator: params[:simulator], simulator_arch: params[:simulator_arch])
           simulator_sdk = simulator_sdk(simulator: params[:simulator])
@@ -116,6 +117,12 @@ module Fastlane
                                        short_option: "-v",
                                        env_name: "FL_SPM_VERBOSE",
                                        description: "Increase verbosity of informational output",
+                                       type: Boolean,
+                                       default_value: false),
+          FastlaneCore::ConfigItem.new(key: :very_verbose,
+                                       short_option: "-V",
+                                       env_name: "FL_SPM_VERY_VERBOSE",
+                                       description: "Increase verbosity to include debug output",
                                        type: Boolean,
                                        default_value: false),
           FastlaneCore::ConfigItem.new(key: :simulator,

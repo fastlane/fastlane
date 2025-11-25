@@ -49,13 +49,14 @@ module Match
         git_url: params[:git_url],
         s3_bucket: params[:s3_bucket],
         s3_skip_encryption: params[:s3_skip_encryption],
-        working_directory: storage.working_directory
+        working_directory: storage.working_directory,
+        force_legacy_encryption: params[:force_legacy_encryption]
       })
       encryption.decrypt_files if encryption
 
       unless params[:readonly]
         self.spaceship = SpaceshipEnsure.new(params[:username], params[:team_id], params[:team_name], api_token(params))
-        if params[:type] == "enterprise" && !Spaceship.client.in_house?
+        if params[:type] == "enterprise" && !Spaceship::ConnectAPI.client.in_house?
           UI.user_error!("You defined the profile type 'enterprise', but your Apple account doesn't support In-House profiles")
         end
       end
@@ -356,7 +357,6 @@ module Match
 
       if params[:output_path]
         FileUtils.cp(stored_profile_path, params[:output_path])
-        installed_profile = FastlaneCore::ProvisioningProfile.install(profile, keychain_path)
       end
 
       Utils.fill_environment(Utils.environment_variable_name(app_identifier: app_identifier,

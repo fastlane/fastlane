@@ -1,7 +1,9 @@
 # https://www.appveyor.com/docs/appveyor-yml/
-image: Visual Studio 2019
 
 version: "{build}"
+
+# https://www.appveyor.com/docs/windows-images-software/
+image: 'Visual Studio 2019'
 
 # branches to build
 branches:
@@ -15,37 +17,20 @@ skip_tags: true
 # Do not build additional commits to feature branch with open Pull Requests
 skip_branch_with_pr: true
 
-# Rolling builds
-# can only be configured via UI: https://www.appveyor.com/docs/build-configuration/#rolling-builds
-
 init:
   - git config --global core.autocrlf true
 
 cache:
-  - .vendor/bundle
+  - vendor/bundle
 
 # cloning the repository happens here
-
 install:
-  - SET PATH=C:\Ruby%ruby_version%\bin;%PATH%
-  - bundle config --local path .vendor/bundle
-  - ridk install 3 # for ruby >= 3.1, we need the full compiler toolchain for gems with native extensions
   - bundle install
-  # iconv
-  - appveyor DownloadFile
-    https://downloads.sourceforge.net/project/gnuwin32/libiconv/1.9.2-1/libiconv-1.9.2-1.exe?download
-    -FileName %TEMP%\libiconv.exe
-  - "%TEMP%\\libiconv.exe /SILENT /SUPPRESSMSGBOXES"
 
 environment:
   LC_ALL: en_US.UTF-8
   LANG: en_US.UTF-8
   FASTLANE_ITUNES_TRANSPORTER_PATH: C:/tmp
-  matrix:
-    - ruby_version: 27-x64
-    # - ruby_version: 30-x64 # disabled for now as we only have 1 concurent job
-    # - ruby_version: 31-x64
-    - ruby_version: 32-x64
 
 before_test:
   - ruby -v

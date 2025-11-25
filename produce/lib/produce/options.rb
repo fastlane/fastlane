@@ -54,7 +54,7 @@ module Produce
                                      optional: true,
                                      default_value: "ios",
                                      verify_block: proc do |value|
-                                                     UI.user_error!("The platform can only be ios or osx") unless %('ios', 'osx', 'tvos').include?(value)
+                                                     UI.user_error!("The platform can only be ios, osx or tvos") unless %w(ios osx tvos).include?(value)
                                                    end),
         FastlaneCore::ConfigItem.new(key: :platforms,
                                      short_option: "-J",
