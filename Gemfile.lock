@@ -30,6 +30,7 @@ PATH
       http-cookie (~> 1.0.5)
       json (< 3.0.0)
       jwt (>= 2.1.0, < 3)
+      logger (>= 1.6, < 2.0)
       mini_magick (>= 4.9.4, < 5.0.0)
       multipart-post (>= 2.0.0, < 3.0.0)
       mutex_m (~> 0.3.0)
@@ -211,6 +212,7 @@ GEM
       rexml
     kramdown-parser-gfm (1.1.0)
       kramdown (~> 2.0)
+    logger (1.7.0)
     method_source (1.0.0)
     mime-types (3.5.2)
       mime-types-data (~> 3.2015)
