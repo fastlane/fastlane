@@ -3,7 +3,7 @@ source("https://rubygems.org")
 # Needed for the Fastlane::RUBOCOP_REQUIREMENT below
 require_relative "fastlane/lib/fastlane/version.rb"
 
-# Please don't add line breaks between the gems and their comments, as RuboCop won't be able to sort these alphabetically.
+# Please keep all gems and their comments together without empty lines, so RuboCop can sort them alphabetically.
 
 # Allows fine-grained control of environment variables.
 gem "climate_control", "~> 0.2.0"
@@ -13,6 +13,9 @@ gem "coveralls", "~> 0.8.13"
 gem "danger", "~> 8.0"
 # Plugin for Danger that reports JUnit test results.
 gem "danger-junit", "~> 1.0"
+# domain_name 0.6.x requires Ruby >= 2.7.0, while fastlane uses a
+# `required_ruby_version` of `>= 2.6`.
+gem "domain_name", "< 0.6"
 # A fake filesystem.
 # Version 1.9+ requires Ruby >=2.7, while fastlane uses a `required_ruby_version` of `>= 2.6`.
 gem "fakefs", "1.8"
@@ -35,6 +38,9 @@ gem "pry-byebug"
 gem "pry-rescue"
 # A plugin for pry that enables exploring the call stack.
 gem "pry-stack_explorer"
+# public_suffix >= 6.0 requires Ruby >= 3.0, while fastlane uses a
+# `required_ruby_version` of `>= 2.6`.
+gem "public_suffix", "< 6.0"
 # A simple task automation tool.
 gem "rake"
 # A readline implementation in Ruby
