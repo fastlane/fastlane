@@ -247,9 +247,6 @@ workflows:
           ruby_version: '3.4'
           ruby_opt: -W:deprecated
       - tests_ubuntu:
-          name: 'Execute tests on Ubuntu (Ruby 2.6)'
-          image: 'cimg/ruby:2.6-node'
-      - tests_ubuntu:
           name: 'Execute tests on Ubuntu'
           image: 'cimg/ruby:3.2.2-node'
       - validate_fastlane_swift_generation:
