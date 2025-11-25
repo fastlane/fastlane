@@ -47,8 +47,7 @@ module Match
         ].join(',')
       when :developer_id_application
         certificate_type = [
-          Spaceship::ConnectAPI::Certificate::CertificateType::DEVELOPER_ID_APPLICATION,
-          Spaceship::ConnectAPI::Certificate::CertificateType::DEVELOPER_ID_APPLICATION_G2
+          Spaceship::ConnectAPI::Certificate::CertificateType::DEVELOPER_ID_APPLICATION
         ].join(',')
       when :mac_installer_distribution
         certificate_type = [

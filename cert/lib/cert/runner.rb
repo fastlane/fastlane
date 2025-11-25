@@ -160,7 +160,6 @@ module Cert
           return [Spaceship::ConnectAPI::Certificate::CertificateType::MAC_INSTALLER_DISTRIBUTION]
         when :developer_id_application
           return [
-            Spaceship::ConnectAPI::Certificate::CertificateType::DEVELOPER_ID_APPLICATION_G2,
             Spaceship::ConnectAPI::Certificate::CertificateType::DEVELOPER_ID_APPLICATION
           ]
         when :developer_id_kext
