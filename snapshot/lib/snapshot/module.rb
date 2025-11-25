@@ -4,7 +4,7 @@ require_relative 'detect_values'
 require_relative 'dependency_checker'
 
 module Snapshot
-  # Use this to just setup the configuration attribute and set it later somewhere else
+  # Use this to just set up the configuration attribute and set it later somewhere else
   class << self
     attr_accessor :config
 

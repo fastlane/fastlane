@@ -304,7 +304,7 @@ module Fastlane
       end
     end
 
-    # Called internally to setup the runner object
+    # Called internally to set up the runner object
     #
 
     # @param lane [Lane] A lane object
