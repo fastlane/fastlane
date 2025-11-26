@@ -127,7 +127,7 @@ describe Sigh do
           profiles = fake_runner.fetch_profiles
           expect(profiles.size).to eq(0)
         end
-	
+
         it "with cert_id filter" do
           sigh_stub_spaceship_connect(inhouse: false, all_app_identifiers: ["com.krausefx.app"], app_identifier_and_profile_names: { "com.krausefx.app" => ["No dupe here"] })
 
