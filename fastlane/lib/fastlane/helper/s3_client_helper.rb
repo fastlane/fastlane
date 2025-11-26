@@ -39,6 +39,10 @@ module Fastlane
         obj.public_url.to_s
       end
 
+      def download_file(bucket_name, key, destination_path)
+        Aws::S3::TransferManager.new(client: client).download_file(destination_path, bucket: bucket_name, key: key)
+      end
+
       def delete_file(bucket_name, file_name)
         bucket = find_bucket!(bucket_name)
         file = bucket.object(file_name)
