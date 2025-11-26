@@ -329,7 +329,7 @@ GEM
       rack (~> 2.2)
       rack-protection (= 2.2.4)
       tilt (~> 2.0)
-    slack-notifier (2.3.2)
+    slack-notifier (2.4.0)
     strscan (3.1.2)
     sync (0.5.0)
     sysrandom (1.0.5)
@@ -366,16 +366,20 @@ GEM
       colored2 (~> 3.1)
       nanaimo (~> 0.3.0)
       rexml (~> 3.2.4)
-    xcov (1.4.3)
-      fastlane (>= 2.82.0, < 3.0.0)
+    xcov (1.9.0)
+      abbrev
+      fastlane (>= 2.141.0, < 3.0.0)
       multipart-post
+      nkf
       slack-notifier
       terminal-table
       xcodeproj
+      xcresult (~> 0.2.0)
     xcpretty (0.4.1)
       rouge (~> 3.28.0)
     xcpretty-travis-formatter (1.0.1)
       xcpretty (~> 0.2, >= 0.0.7)
+    xcresult (0.2.4)
     yard (0.9.26)
 
 PLATFORMS
@@ -410,7 +414,7 @@ DEPENDENCIES
   sinatra (>= 2.2.3, < 3.0)
   webmock (~> 3.18)
   xcode-install (>= 2.6.7)
-  xcov (~> 1.4.1)
+  xcov (~> 1.9.0)
   yard (~> 0.9.11)
 
 BUNDLED WITH
