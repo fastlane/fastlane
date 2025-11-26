@@ -27,7 +27,7 @@ for TEST_MODULE in "${TEST_MODULES[@]}"; do
   if ruby -e "require '$TEST_MODULE'"; then
     echo "Succeeded."
   else
-    exit 1
+    exit 2
   fi
 done
 
