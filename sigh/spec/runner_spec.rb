@@ -105,7 +105,7 @@ describe Sigh do
         it "with cert_id filter" do
           sigh_stub_spaceship_connect(inhouse: false, all_app_identifiers: ["com.krausefx.app"], app_identifier_and_profile_names: { "com.krausefx.app" => ["No dupe here"] })
 
-          options = { app_identifier: "com.krausefx.app", cert_id: "123456789" }
+          options = { app_identifier: "com.krausefx.app", skip_certificate_verification: true, cert_id: "123456789" }
           Sigh.config = FastlaneCore::Configuration.create(Sigh::Options.available_options, options)
 
           profiles = fake_runner.fetch_profiles
@@ -131,7 +131,7 @@ describe Sigh do
         it "with cert_id filter" do
           sigh_stub_spaceship_connect(inhouse: false, all_app_identifiers: ["com.krausefx.app"], app_identifier_and_profile_names: { "com.krausefx.app" => ["No dupe here"] })
 
-          options = { app_identifier: "com.krausefx.app", cert_id: "987654321" }
+          options = { app_identifier: "com.krausefx.app", skip_certificate_verification: true, cert_id: "987654321" }
           Sigh.config = FastlaneCore::Configuration.create(Sigh::Options.available_options, options)
 
           profiles = fake_runner.fetch_profiles
