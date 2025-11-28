@@ -20,6 +20,7 @@ TEST_MODULES=(
   "snapshot"
   "spaceship"
   "supply"
+  "trainer"
 )
 
 for TEST_MODULE in "${TEST_MODULES[@]}"; do
