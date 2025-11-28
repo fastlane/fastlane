@@ -32,11 +32,14 @@ module Match
         additional_cert_types.map! do |cert_type|
           case Match.cert_type_sym(cert_type)
           when :mac_installer_distribution
-            Spaceship::ConnectAPI::Certificate::CertificateType::MAC_INSTALLER_DISTRIBUTION
+            [Spaceship::ConnectAPI::Certificate::CertificateType::MAC_INSTALLER_DISTRIBUTION]
           when :developer_id_installer
-            Spaceship::ConnectAPI::Certificate::CertificateType::DEVELOPER_ID_INSTALLER
+            [
+              Spaceship::ConnectAPI::Certificate::CertificateType::DEVELOPER_ID_INSTALLER_G2,
+              Spaceship::ConnectAPI::Certificate::CertificateType::DEVELOPER_ID_INSTALLER
+            ]
           end
-        end
+        end.flatten!
 
         certificate_types += additional_cert_types
 
