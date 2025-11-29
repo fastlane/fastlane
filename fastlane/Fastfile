@@ -362,37 +362,36 @@ lane :create_github_release do |options|
   # Preparing GitHub Release
   #
   github_release = get_github_release(url: repo_name, version: version, api_bearer: ENV['FASTLANE_RELEASE_API_BEARER'])
-  gem_path = if (github_release || {}).fetch('body', '').length == 0
-               # Validate repo and create gem
-               validate_repo
-               gem_version_path = File.absolute_path("../pkg/fastlane-#{version}.gem")
+  gem_path = File.absolute_path("../pkg/fastlane-#{version}.gem")
 
-               title = "Improvements"
-               description = File.read("../CHANGELOG.latest.md")
+  if (github_release || {}).fetch('body', '').length == 0
+    # Validate repo and create gem
+    validate_repo
 
-               github_release = set_github_release(
-                 repository_name: repo_name,
-                 name: [version, title].join(" "),
-                 tag_name: version,
-                 description: description,
-                 is_draft: false,
-                 upload_assets: [gem_version_path],
-                 api_bearer: ENV['FASTLANE_RELEASE_API_BEARER']
-               )
+    title = "Improvements"
+    description = File.read("../CHANGELOG.latest.md")
 
-               release_url = github_release['html_url']
-               message = [title, description, release_url].join("\n\n")
-               add_fastlane_git_tag(tag: "fastlane/#{version}", message: message)
+    github_release = set_github_release(
+      repository_name: repo_name,
+      name: [version, title].join(" "),
+      tag_name: version,
+      description: description,
+      is_draft: false,
+      upload_assets: [gem_path],
+      api_bearer: ENV['FASTLANE_RELEASE_API_BEARER']
+    )
 
-               UI.success("New GitHub release has been created: #{release_url}")
+    release_url = github_release['html_url']
+    message = [title, description, release_url].join("\n\n")
+    add_fastlane_git_tag(tag: "fastlane/#{version}", message: message)
 
-               gem_version_path
-             else
-               UI.message("GitHub release has already been created")
+    UI.success("New GitHub release has been created: #{release_url}")
+  else
+    UI.message("GitHub release has already been created")
 
-               sleep(50) # GitHub rate limits are annowing
-               download_github_release_gem(version: version)
-             end
+    sleep(50) # GitHub rate limits are annoying
+    download_github_release_gem(version: version)
+  end
 
   sh "gem push --key github --host https://rubygems.pkg.github.com/#{github_username} #{gem_path}" unless options[:skip_github_packages]
 
