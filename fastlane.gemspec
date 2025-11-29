@@ -4,20 +4,6 @@ lib = File.expand_path('../fastlane/lib', __FILE__)
 $LOAD_PATH.unshift(lib) unless $LOAD_PATH.include?(lib)
 require 'fastlane/version'
 
-# Copy over the latest .rubocop.yml style guide
-require 'yaml'
-rubocop_config = File.expand_path('../.rubocop.yml', __FILE__)
-config = YAML.safe_load(open(rubocop_config))
-config['require'] = [
-  'rubocop/require_tools',
-  'rubocop-performance'
-]
-config.delete('inherit_from')
-config.delete('CrossPlatform/ForkUsage')
-config.delete('Lint/IsStringUsage')
-
-File.write("#{lib}/fastlane/plugins/template/.rubocop.yml", YAML.dump(config))
-
 Gem::Specification.new do |spec|
   spec.name          = "fastlane"
   spec.version       = Fastlane::VERSION
@@ -118,5 +104,4 @@ Gem::Specification.new do |spec|
   spec.add_dependency('mutex_m', '~> 0.3.0') # 3.4 - workaround for httpclient as can't upgrade to 2.9 yet
   spec.add_dependency('nkf', '~> 0.2.0') # 3.4 - workaround for CFPropertyList as can't upgrade to 4.x yet
   spec.add_dependency('logger', '>= 1.6', '< 2.0') # stdlib gem removed from default set in Ruby 3.5+
-
 end
