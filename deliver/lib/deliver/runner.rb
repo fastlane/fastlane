@@ -204,6 +204,7 @@ module Deliver
 
       ipa_path = options[:ipa]
       pkg_path = options[:pkg]
+      asset_description_path = options[:asset_description_path]
 
       platform = options[:platform]
       transporter = transporter_for_selected_team
@@ -216,7 +217,7 @@ module Deliver
           package_path: "/tmp",
           platform: platform
         )
-        result = transporter.upload(package_path: package_path, asset_path: ipa_path, platform: platform)
+        result = transporter.upload(package_path: package_path, asset_path: ipa_path, platform: platform, asset_description: asset_description_path)
       when "osx"
         package_path = FastlaneCore::PkgUploadPackageBuilder.new.generate(
           app_id: Deliver.cache[:app].id,
@@ -224,7 +225,7 @@ module Deliver
           package_path: "/tmp",
           platform: platform
         )
-        result = transporter.upload(package_path: package_path, asset_path: pkg_path, platform: platform)
+        result = transporter.upload(package_path: package_path, asset_path: pkg_path, platform: platform, asset_description: asset_description_path)
       else
         UI.user_error!("No suitable file found for upload for platform: #{options[:platform]}")
       end

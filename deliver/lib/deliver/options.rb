@@ -83,6 +83,10 @@ module Deliver
                                      conflict_block: proc do |value|
                                        UI.user_error!("You can't use 'pkg' and '#{value.key}' options in one run.")
                                      end),
+        FastlaneCore::ConfigItem.new(key: :asset_description_path,
+                                     env_name: "DELIVER_ASSET_DESCRIPTION_PATH",
+                                     description: "Path to the asset description file (Apple requires a AppStoreInfo.plist for Linux and Windows)",
+                                     optional: true),
         FastlaneCore::ConfigItem.new(key: :build_number,
                                      short_option: "-n",
                                      env_name: "DELIVER_BUILD_NUMBER",

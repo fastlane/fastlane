@@ -102,6 +102,10 @@ module Pilot
                                      conflict_block: proc do |value|
                                        UI.user_error!("You can't use 'pkg' and '#{value.key}' options in one run.")
                                      end),
+        FastlaneCore::ConfigItem.new(key: :asset_description_path,
+                                     env_name: "PILOT_ASSET_DESCRIPTION_PATH",
+                                     description: "Path to the asset description file (Apple requires a AppStoreInfo.plist for Linux and Windows)",
+                                     optional: true),
 
         # app review info
         FastlaneCore::ConfigItem.new(key: :demo_account_required,
