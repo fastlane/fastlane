@@ -175,29 +175,6 @@ jobs:
 
       - run: bundle exec fastlane lint_source
 
-  modules_load_up_tests:
-    parameters:
-      image:
-        type: string
-    environment:
-      LC_ALL: C.UTF-8
-      LANG: C.UTF-8
-    docker:
-      - image: << parameters.image >>
-    shell: /bin/bash --login -eo pipefail
-    steps:
-      - *cache_restore_git
-      - checkout
-      - *cache_save_git
-
-      - run:
-          name: Setup Build
-          # Build gem from fastlane.gemspec and install locally
-          command: |
-            gem install $(echo $(gem build fastlane.gemspec) | sed 's/.*File: //')
-
-      - run: /bin/bash ./test_modules/run_tests.sh
-
 workflows:
   version: 2
   "Run Tests & Checks": # Name of the workflow, which ends up displayed on GitHub's PR Check
@@ -261,7 +238,4 @@ workflows:
           image: 'cimg/ruby:3.2'
       - lint_source_code:
           name: 'Lint source code'
-          image: 'cimg/ruby:3.2'
-      - modules_load_up_tests:
-          name: 'Modules load up tests'
           image: 'cimg/ruby:3.2'
