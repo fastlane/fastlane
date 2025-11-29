@@ -4,6 +4,8 @@ on:
   issues:
     types:
       - opened
+permissions:
+  issues: write
 
 jobs:
   fastlane-env:
@@ -13,4 +15,4 @@ jobs:
       - uses: actions/checkout@v5
       - uses: fastlane/github-actions/fastlane-env-reminder@latest
         with:
-          repo-token: '${{ secrets.BOT_GITHUB_TOKEN }}'
+          repo-token: ${{ secrets.GITHUB_TOKEN }}
