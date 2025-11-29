@@ -4,6 +4,9 @@ on:
   release:
     types:
       - published
+permissions:
+  issues: write
+  pull-requests: write
 
 jobs:
   announce-release-on-released-pull-requests:
@@ -17,4 +20,4 @@ jobs:
       - name: Announce release on released pull requests
         uses: fastlane/github-actions/communicate-on-pull-request-released@latest
         with:
-          repo-token: '${{ secrets.BOT_GITHUB_TOKEN }}'
+          repo-token: ${{ secrets.GITHUB_TOKEN }}
