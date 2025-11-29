@@ -576,10 +576,12 @@ desc "Update the actions.md on https://docs.fastlane.tools"
 desc "This will also automatically submit a pull request to fastlane/docs"
 lane :update_docs do |options|
   debug = options[:debug]
-  version = options[:version]
+  version = options[:version] || current_version
+
+  puts("Starting docs update for version #{version} 🚀")
 
   unless debug
-    verify_env_variables
+    verify_env_variables(skip_ruby_gems: true)
     ensure_actions_config_items_formatting
   end
 
@@ -602,9 +604,11 @@ lane :update_docs do |options|
       File.expand_path(current_output_path) # to make sure we commit the change
     end
 
+    # We want to align fastlane/docs "fastlane" version with the latest released version.
+    # This ensures documentation tests leverage the latest action parameters and code samples.
     unless options[:skip_bundle_update]
-      Bundler.with_clean_env do
-        sh("bundle update")
+      Bundler.with_unbundled_env do
+        sh('bundle', 'update', 'fastlane')
       end
     end
 
