@@ -1,5 +1,6 @@
 require_relative 'globals'
 require_relative 'tunes/tunes_client'
+require 'open3'
 
 module Spaceship
   class Client
@@ -233,7 +234,36 @@ module Spaceship
 
     # extracted into its own method for testing
     def ask_for_2fa_code(text)
-      ask(text)
+      if !ENV["FASTLANE_2FA_SCRIPT"].nil? && ENV["FASTLANE_2FA_SCRIPT"].length > 0
+        puts("A Two Factor Script was defined using FASTLANE_2FA_SCRIPT. Running this script now to get the 2-factor-code...".yellow)
+        stdout_str, stderr_str, exit_code = Open3.capture3(ENV["FASTLANE_2FA_SCRIPT"])
+
+        if exit_code != 0
+          puts("Error while running the script #{ENV['FASTLANE_2FA_SCRIPT']}.".red)
+          puts("STDERR:".red)
+          puts(stderr_str)
+          puts("STDOUT:".red)
+          puts(stdout_str)
+          raise "Error while running the script #{ENV['FASTLANE_2FA_SCRIPT']}"
+        end
+
+        if stdout_str.nil? || stdout_str.length == 0
+          puts("Error while running the script #{ENV['FASTLANE_2FA_SCRIPT']}: No output.".red)
+          raise "Error while running the script #{ENV['FASTLANE_2FA_SCRIPT']}"
+        end
+
+        if stdout_str.length < 6
+          puts("Error while running the script #{ENV['FASTLANE_2FA_SCRIPT']}: Output is too short.".red)
+          raise "Error while running the script #{ENV['FASTLANE_2FA_SCRIPT']}"
+        end
+
+        two_factor_code = stdout_str.delete(' ')
+
+        puts("Using the code from the script #{ENV['FASTLANE_2FA_SCRIPT']}: #{two_factor_code}".yellow)
+        two_factor_code
+      else
+        ask(text)
+      end
     end
 
     # extracted into its own method for testing
