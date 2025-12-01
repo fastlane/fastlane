@@ -10,7 +10,7 @@ jobs:
       matrix:
         ruby-version: ['3.0', '3.1', '3.2', '3.3', '3.4']
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
 
       - name: Set up Ruby
         uses: ruby/setup-ruby@v1
@@ -22,7 +22,7 @@ jobs:
         run: bundle exec rake
 
       - name: Upload artifact
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v5
         if: failure()
         with:
           name: test-results-ruby-${{ matrix.ruby-version }}
