@@ -203,15 +203,15 @@ module Sigh
 
     def filter_profiles_by_cert_id(profiles)
       filtered = profiles.find_all do |current_profile|
-        validCertId = false
+        valid_cert_id = false
         current_profile.certificates.each do |cert|
           if cert.id == Sigh.config[:cert_id].to_s
-            validCertId = true
+            valid_cert_id = true
           else
-            UI.message("Provisioning Profile cert_id : '#{cert.id}' not match given cert_id : '#{Sigh.config[:cert_id]}', skipping this one...")
+            UI.message("Provisioning Profile cert_id : '#{cert.id}' does not match given cert_id : '#{Sigh.config[:cert_id]}', skipping this one...")
           end
         end
-        validCertId
+        valid_cert_id
       end
       filtered
     end
