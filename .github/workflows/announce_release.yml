@@ -1,20 +1,27 @@
 ---
 name: Process release
 on:
-  release:
+  workflow_run:
+    workflows: ["Release Step 2 - Create GitHub Release"]
+    branches:
+      - master
     types:
-      - published
+      - completed
+permissions:
+  issues: write
+  pull-requests: write
 
 jobs:
   announce-release-on-released-pull-requests:
     name: Announce release on released pull requests
     runs-on: ubuntu-latest
+    if: ${{ github.event.workflow_run.conclusion == 'success' }}
     steps:
-      - name: Git checkout
-        uses: actions/checkout@master
+      - name: Checkout repository
+        uses: actions/checkout@v6
         with:
-          ref: refs/heads/master
+          ref: master
       - name: Announce release on released pull requests
         uses: fastlane/github-actions/communicate-on-pull-request-released@latest
         with:
-          repo-token: '${{ secrets.BOT_GITHUB_TOKEN }}'
+          repo-token: ${{ secrets.GITHUB_TOKEN }}

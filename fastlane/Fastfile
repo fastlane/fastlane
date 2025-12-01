@@ -26,7 +26,7 @@ desc "Verifies source code is in a good state"
 lane :lint_source do
   # Verifying that no debug code is in the code base
   #
-  exclude_dirs = ["\.bundle", "*/vendor/bundle"]
+  exclude_dirs = ["\.bundle", "vendor"]
   ensure_no_debug_code(text: "binding\.(irb|pry)", extension: ".rb", exclude: "playground.rb", exclude_dirs: exclude_dirs) # debugging code
   ensure_no_debug_code(text: "# TODO", extension: ".rb", exclude_dirs: exclude_dirs) # TODOs
   ensure_no_debug_code(text: "now: ", extension: ".rb", exclude_dirs: exclude_dirs) # rspec focus
@@ -72,6 +72,9 @@ end
 desc "Runs the tests"
 lane :execute_tests do
   version = local_version # has to be outside of the `Dir.chdir`
+
+  # Verify SSL connection is alright - https://github.com/fastlane/fastlane/issues/29710
+  download(url: "https://rubygems.org/api/v1/gems/fastlane.json")
 
   # Verifying the --help command
   Dir.chdir("..") do
@@ -573,10 +576,12 @@ desc "Update the actions.md on https://docs.fastlane.tools"
 desc "This will also automatically submit a pull request to fastlane/docs"
 lane :update_docs do |options|
   debug = options[:debug]
-  version = options[:version]
+  version = options[:version] || current_version
+
+  puts("Starting docs update for version #{version} 🚀")
 
   unless debug
-    verify_env_variables
+    verify_env_variables(skip_ruby_gems: true)
     ensure_actions_config_items_formatting
   end
 
@@ -599,9 +604,11 @@ lane :update_docs do |options|
       File.expand_path(current_output_path) # to make sure we commit the change
     end
 
+    # We want to align fastlane/docs "fastlane" version with the latest released version.
+    # This ensures documentation tests leverage the latest action parameters and code samples.
     unless options[:skip_bundle_update]
-      Bundler.with_clean_env do
-        sh("bundle update")
+      Bundler.with_unbundled_env do
+        sh('bundle', 'update', 'fastlane')
       end
     end
 
@@ -610,7 +617,7 @@ lane :update_docs do |options|
     else
       # Create a new branch
       sh("git checkout -b 'update-actions-md-#{Time.now.to_i}'") unless debug
-      plugins_path = "docs/plugins/available-plugins.md"
+      plugins_path = "docs/generated/available-plugins.md"
       unless options[:skip_plugin_scores]
         plugin_scores(template_path: template_path,
                         output_path: plugins_path,
@@ -712,6 +719,7 @@ private_lane :ensure_tool_name_formatting do
   Dir.chdir("..") do
     Dir["**/*.md"].each do |path|
       next if path == "CHANGELOG.latest.md"
+      next if path.start_with?('vendor/', '.bundle/')
       helper = Helper::ToolNameFormattingHelper.new(path: path, is_documenting_invalid_examples: path == 'CONTRIBUTING.md')
       errors += helper.find_tool_name_formatting_errors
     end
