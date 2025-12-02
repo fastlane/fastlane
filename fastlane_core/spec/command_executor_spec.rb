@@ -5,15 +5,17 @@ describe FastlaneCore do
       let(:failing_command_output) { FastlaneCore::Helper.windows? ? "log \n" : "log\n" }
       let(:failing_command_error_input) { FastlaneCore::Helper.windows? ? "log " : "log" }
 
-      it 'executes a simple command successfully' do
-        unless FastlaneCore::Helper.windows?
-          expect(Process).to receive(:wait)
+      8_000.times {
+        it 'executes a simple command successfully' do
+          unless FastlaneCore::Helper.windows?
+            expect(Process).to receive(:wait)
+          end
+
+          result = FastlaneCore::CommandExecutor.execute(command: 'echo foo')
+
+          expect(result).to eq('foo')
         end
-
-        result = FastlaneCore::CommandExecutor.execute(command: 'echo foo')
-
-        expect(result).to eq('foo')
-      end
+      }
 
       it 'handles reading which throws a EIO exception', requires_pty: true do
         fake_std_in = [
@@ -21,9 +23,11 @@ describe FastlaneCore do
         ]
         expect(fake_std_in).to receive(:each).and_yield(*fake_std_in).and_raise(Errno::EIO)
 
+        fake_std_out = 'not_really_std_out'
+
         # Make a fake child process so we have a valid PID and $? is set correctly
         expect(PTY).to receive(:spawn) do |command, &block|
-          expect(command).to eq('ls')
+          expect(command).to eq('ls;')
 
           # PTY uses "$?" to get exitcode, which is filled in by Process.wait(),
           # so we have to spawn a real process unless we want to mock methods
@@ -31,7 +35,7 @@ describe FastlaneCore do
           child_process_id = Process.spawn('echo foo', out: File::NULL)
           expect(Process).to receive(:wait).with(child_process_id)
 
-          block.yield(fake_std_in, 'not_really_std_out', child_process_id)
+          block.yield(fake_std_in, fake_std_out, child_process_id)
         end
 
         result = FastlaneCore::CommandExecutor.execute(command: 'ls')
@@ -49,8 +53,10 @@ describe FastlaneCore do
           "  - Muffins\n"
         ]
 
+        fake_std_out = 'not_really_std_out'
+
         expect(PTY).to receive(:spawn) do |command, &block|
-          expect(command).to eq('echo foo')
+          expect(command).to eq('echo foo;')
 
           # PTY uses "$?" to get exitcode, which is filled in by Process.wait(),
           # so we have to spawn a real process unless we want to mock methods
@@ -58,7 +64,7 @@ describe FastlaneCore do
           child_process_id = Process.spawn('echo foo', out: File::NULL)
           expect(Process).to receive(:wait).with(child_process_id)
 
-          block.yield(fake_std_in, 'not_really_std_out', child_process_id)
+          block.yield(fake_std_in, fake_std_out, child_process_id)
         end
 
         result = FastlaneCore::CommandExecutor.execute(command: 'echo foo')

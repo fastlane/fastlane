@@ -26,8 +26,10 @@ module FastlaneCore
       spawn_with_popen(command, &block)
     end
 
-    def self.spawn_with_pty(command, &block)
+    def self.spawn_with_pty(original_command, &block)
       require 'pty'
+      # this forces the PTY flush
+      command = "#{original_command};"
       PTY.spawn(command) do |command_stdout, command_stdin, pid|
         begin
           yield(command_stdout, command_stdin, pid)

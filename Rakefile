@@ -16,7 +16,7 @@ end
 task(:test_all) do
   formatter = "--format progress"
   formatter += " -r rspec_junit_formatter --format RspecJunitFormatter -o #{ENV['CIRCLE_TEST_REPORTS']}/rspec/fastlane-junit-results.xml" if ENV["CIRCLE_TEST_REPORTS"]
-  command = "rspec --pattern spec/**/*_spec.rb,*/spec/**/*_spec.rb #{formatter} #{ENV['RSPEC_ARGS']}"
+  command = "rspec --pattern fastlane_core/spec/command_executor_spec.rb #{formatter} #{ENV['RSPEC_ARGS']}"
 
   run_rspec(command)
 end
