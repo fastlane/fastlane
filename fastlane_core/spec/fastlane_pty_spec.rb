@@ -14,13 +14,19 @@ describe FastlaneCore do
       end
 
       it 'doesn t return -1 if an exception was raised in the block in PTY.spawn' do
+        status = double("ProcessStatus")
+        allow(status).to receive(:exitstatus) { 0 }
+
+        expect(FastlaneCore::FastlanePty).to receive(:require).with("pty").and_return(nil)
+        allow(FastlaneCore::FastlanePty).to receive(:process_status).and_return(status)
+
         exception = StandardError.new
         expect {
-          exit_status = FastlaneCore::FastlanePty.spawn('echo foo') do |command_stdout, command_stdin, pid|
+          exit_status = FastlaneCore::FastlanePty.spawn('a path of a working exec') do |command_stdout, command_stdin, pid|
             raise exception
           end
         }.to raise_error(FastlaneCore::FastlanePtyError) { |error|
-          expect(error.exit_status).to eq(-1) # command was success but output handling failed
+          expect(error.exit_status).to eq(0) # command was success but output handling failed
         }
       end
 
