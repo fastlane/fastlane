@@ -1,0 +1,108 @@
+name: Danger Lint Checks
+
+on:
+  pull_request:
+    types: [opened, edited, synchronize, reopened, ready_for_review]
+
+permissions:
+  contents: read
+  pull-requests: write
+  issues: write
+
+jobs:
+  dangerfile-port:
+    name: Run PR lint checks
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/github-script@v8
+        with:
+          script: |
+            const owner = context.repo.owner;
+            const repo = context.repo.repo;
+            const pr   = context.payload.pull_request;
+            const prNumber = pr.number;
+
+            const warnings = [];
+
+            // 1) Big PR: additions + deletions > 500
+            const { data: fullPR } = await github.rest.pulls.get({ owner, repo, pull_number: prNumber });
+            const loc = (fullPR.additions ?? 0) + (fullPR.deletions ?? 0);
+            if (loc > 500) {
+              warnings.push("Big PR");
+            }
+
+            // 2) WIP in title or body
+            const title = (pr.title || "").toUpperCase();
+            const body  = (pr.body  || "").toUpperCase();
+            if ((title + body).includes("WIP")) {
+              warnings.push("Pull Request is Work in Progress");
+            }
+
+            // 3) Changelog/summary required in PR description (very short body -> warn)
+            const rawBody = pr.body || "";
+            if (rawBody.trim().length < 5) {
+              warnings.push(`Please provide a changelog summary in the Pull Request description @${pr.user.login}`);
+            }
+
+            // 4) File modification checks
+            const files = await github.paginate(github.rest.pulls.listFiles, {
+              owner,
+              repo,
+              pull_number: prNumber,
+              per_page: 100,
+            });
+            const filenames = new Set(files.map(f => f.filename));
+
+            if (filenames.has("snapshot/lib/assets/SnapshotHelper.swift")) {
+              warnings.push("You modified `SnapshotHelper.swift`, make sure to update the version number at the bottom of the file to notify users about the new helper file.");
+            }
+
+            if (filenames.has("snapshot/lib/assets/SnapshotHelperXcode8.swift")) {
+              warnings.push("You modified `SnapshotHelperXcode8.swift`, make sure to update the version number at the bottom of the file to notify users about the new helper file.");
+            }
+
+            // 5) Maintainer access check
+            const headOwner = pr.head.repo.owner.login;
+            const baseOwner = pr.base.repo.owner.login;
+            if (pr.maintainer_can_modify === false && headOwner !== baseOwner) {
+              warnings.push(
+                "If you would allow the maintainers access to make changes to your branch that would be 💯 " +
+                "This allows maintainers to help move pull requests through quicker if there are any changes that they can help with 😊 " +
+                "See more info at https://help.github.com/en/articles/allowing-changes-to-a-pull-request-branch-created-from-a-fork"
+              );
+            }
+
+            // Prepare sticky header used to identify our comment(s)
+            const HEADER = `### ⚠️ PR Lint Warnings`;
+
+            // Find and delete any previous comments created by this workflow to avoid duplicates
+            const existingComments = await github.paginate(github.rest.issues.listComments, {
+              owner,
+              repo,
+              issue_number: prNumber,
+              per_page: 100,
+            });
+
+            for (const c of existingComments) {
+              // Delete only comments that look like ours (start with header) and were authored by the GitHub Actions bot
+              if (typeof c.body === 'string' && c.body.startsWith(HEADER) && c.user && c.user.login === 'github-actions[bot]') {
+                await github.rest.issues.deleteComment({ owner, repo, comment_id: c.id });
+              }
+            }
+
+            // Post a single aggregated comment if there are warnings; otherwise do nothing (we already cleaned up any prior warnings comment)
+            if (warnings.length > 0) {
+              const body = [
+                HEADER,
+                "",
+                ...warnings.map(w => `- ${w}`),
+              ].join("\n");
+
+              await github.rest.issues.createComment({
+                owner,
+                repo,
+                issue_number: prNumber,
+                body,
+              });
+            }
