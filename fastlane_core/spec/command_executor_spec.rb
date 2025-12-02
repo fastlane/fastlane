@@ -5,17 +5,15 @@ describe FastlaneCore do
       let(:failing_command_output) { FastlaneCore::Helper.windows? ? "log \n" : "log\n" }
       let(:failing_command_error_input) { FastlaneCore::Helper.windows? ? "log " : "log" }
 
-      8_000.times {
-        it 'executes a simple command successfully' do
-          unless FastlaneCore::Helper.windows?
-            expect(Process).to receive(:wait)
-          end
-
-          result = FastlaneCore::CommandExecutor.execute(command: 'echo foo')
-
-          expect(result).to eq('foo')
+      it 'executes a simple command successfully' do
+        unless FastlaneCore::Helper.windows?
+          expect(Process).to receive(:wait)
         end
-      }
+
+        result = FastlaneCore::CommandExecutor.execute(command: 'echo foo')
+
+        expect(result).to eq('foo')
+      end
 
       it 'handles reading which throws a EIO exception', requires_pty: true do
         fake_std_in = [
