@@ -22,8 +22,6 @@ describe FastlaneCore do
         fake_std_in = double("stdin")
         expect(fake_std_in).to receive(:each).and_yield(*fake_std_in_lines).and_raise(Errno::EIO)
 
-        #expect(fake_std_in).to receive(:each).and_yield(*fake_std_in).and_raise(Errno::EIO)
-
         fake_std_out = double("stdout")
 
         expect(fake_std_in).to receive(:close)
