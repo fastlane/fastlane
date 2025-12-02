@@ -111,10 +111,9 @@ Shopping list:
             print_all: false,
             error: nil
           )
-        end.to output(failing_command_output).to_stdout.and(raise_error(FastlaneCore::Interface::FastlaneError) {
-          |error|
+        end.to output(failing_command_output).to_stdout.and(raise_error(FastlaneCore::Interface::FastlaneError) do |error|
           expect(error.to_s).to eq("Exit status: 42")
-        })
+        end)
 
         expect do
           FastlaneCore::CommandExecutor.execute(
