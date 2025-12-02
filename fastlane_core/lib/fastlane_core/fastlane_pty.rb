@@ -28,7 +28,7 @@ module FastlaneCore
 
     def self.spawn_with_pty(original_command, &block)
       require 'pty'
-      # this forces the PTY flush
+      # this forces the PTY flush - fixes #21792
       command = "#{original_command};"
       PTY.spawn(command) do |command_stdout, command_stdin, pid|
         begin
