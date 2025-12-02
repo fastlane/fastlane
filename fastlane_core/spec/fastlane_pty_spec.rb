@@ -20,7 +20,7 @@ describe FastlaneCore do
             raise exception
           end
         }.to raise_error(FastlaneCore::FastlanePtyError) { |error|
-          expect(error.exit_status).to eq(0) # command was success but output handling failed
+          expect(error.exit_status).to eq(-1) # command was success but output handling failed
         }
       end
 

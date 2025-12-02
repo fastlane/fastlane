@@ -39,6 +39,8 @@ module FastlaneCore
           # This is expected on some linux systems, that indicates that the subcommand finished
           # and we kept trying to read, ignore it
         ensure
+          command_stdin.close
+          command_stdout.close
           begin
             Process.wait(pid)
           rescue Errno::ECHILD, PTY::ChildExited

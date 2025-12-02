@@ -16,12 +16,18 @@ describe FastlaneCore do
       end
 
       it 'handles reading which throws a EIO exception', requires_pty: true do
-        fake_std_in = [
+        fake_std_in_lines = [
           "a_filename\n"
         ]
-        expect(fake_std_in).to receive(:each).and_yield(*fake_std_in).and_raise(Errno::EIO)
+        fake_std_in = double("stdin")
+        expect(fake_std_in).to receive(:each).and_yield(*fake_std_in_lines).and_raise(Errno::EIO)
 
-        fake_std_out = 'not_really_std_out'
+        #expect(fake_std_in).to receive(:each).and_yield(*fake_std_in).and_raise(Errno::EIO)
+
+        fake_std_out = double("stdout")
+
+        expect(fake_std_in).to receive(:close)
+        expect(fake_std_out).to receive(:close)
 
         # Make a fake child process so we have a valid PID and $? is set correctly
         expect(PTY).to receive(:spawn) do |command, &block|
@@ -52,6 +58,9 @@ describe FastlaneCore do
         ]
 
         fake_std_out = 'not_really_std_out'
+
+        expect(fake_std_in).to receive(:close)
+        expect(fake_std_out).to receive(:close)
 
         expect(PTY).to receive(:spawn) do |command, &block|
           expect(command).to eq('echo foo;')
@@ -102,7 +111,10 @@ Shopping list:
             print_all: false,
             error: nil
           )
-        end.to output(failing_command_output).to_stdout.and(raise_error)
+        end.to output(failing_command_output).to_stdout.and(raise_error(FastlaneCore::Interface::FastlaneError) {
+          |error|
+          expect(error.to_s).to eq("Exit status: 42")
+        })
 
         expect do
           FastlaneCore::CommandExecutor.execute(
