@@ -9,10 +9,6 @@ require_relative "fastlane/lib/fastlane/version.rb"
 gem "climate_control", "~> 0.2.0"
 # A tool for integrating Coveralls.io with Ruby apps.
 gem "coveralls", "~> 0.8.13"
-# Automates code review chores.
-gem "danger", "~> 8.0"
-# Plugin for Danger that reports JUnit test results.
-gem "danger-junit", "~> 1.0"
 # domain_name 0.6.x requires Ruby >= 2.7.0, while fastlane uses a
 # `required_ruby_version` of `>= 2.6`.
 gem "domain_name", "< 0.6"
