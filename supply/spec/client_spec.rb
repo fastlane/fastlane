@@ -42,6 +42,12 @@ describe Supply do
         }.to raise_error(FastlaneCore::Interface::FastlaneError, "Google Api Error: Invalid request - Ensure project settings are enabled.")
       end
 
+      it "displays error messages for invalid credentials" do
+        expect {
+          Supply::Client.new(service_account_json: StringIO.new("{}"), params: { timeout: 1 })
+        }.to raise_error(FastlaneCore::Interface::FastlaneError, "Invalid Google Credentials file provided.")
+      end
+
       it "with 5 retries" do
         stub_const("ENV", { 'SUPPLY_UPLOAD_MAX_RETRIES' => 5 })
 
