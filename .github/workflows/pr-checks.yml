@@ -1,7 +1,7 @@
-name: Danger Lint Checks
+name: PR Checks
 
 on:
-  pull_request:
+  pull_request_target:
     types: [opened, edited, synchronize, reopened, ready_for_review]
 
 permissions:
@@ -10,8 +10,8 @@ permissions:
   issues: write
 
 jobs:
-  dangerfile-port:
-    name: Run PR lint checks
+  pr-checks:
+    name: Run PR checks
     runs-on: ubuntu-latest
 
     steps:
