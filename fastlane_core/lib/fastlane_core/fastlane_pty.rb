@@ -29,7 +29,7 @@ module FastlaneCore
     def self.spawn_with_pty(original_command, &block)
       require 'pty'
       # this forces the PTY flush - fixes #21792
-      command = "#{original_command};"
+      command = ENV['FASTLANE_EXEC_FLUSH_PTY_WORKAROUND'] ? "#{original_command};" : original_command
       PTY.spawn(command) do |command_stdout, command_stdin, pid|
         begin
           yield(command_stdout, command_stdin, pid)

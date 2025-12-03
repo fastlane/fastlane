@@ -10,7 +10,9 @@ describe FastlaneCore do
           expect(Process).to receive(:wait)
         end
 
-        result = FastlaneCore::CommandExecutor.execute(command: 'echo foo')
+        result = FastlaneSpec::Env.with_env_values('FASTLANE_EXEC_FLUSH_PTY_WORKAROUND' => '1') do
+          FastlaneCore::CommandExecutor.execute(command: 'echo foo')
+        end
 
         expect(result).to eq('foo')
       end
@@ -29,7 +31,7 @@ describe FastlaneCore do
 
         # Make a fake child process so we have a valid PID and $? is set correctly
         expect(PTY).to receive(:spawn) do |command, &block|
-          expect(command).to eq('ls;')
+          expect(command).to eq('ls')
 
           # PTY uses "$?" to get exitcode, which is filled in by Process.wait(),
           # so we have to spawn a real process unless we want to mock methods
@@ -61,7 +63,7 @@ describe FastlaneCore do
         expect(fake_std_out).to receive(:close)
 
         expect(PTY).to receive(:spawn) do |command, &block|
-          expect(command).to eq('echo foo;')
+          expect(command).to eq('echo foo')
 
           # PTY uses "$?" to get exitcode, which is filled in by Process.wait(),
           # so we have to spawn a real process unless we want to mock methods
