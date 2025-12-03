@@ -1,6 +1,6 @@
 //
 //  SnapshotHelper.swift
-//  Example2
+//  Example
 //
 //  Created by Felix Krause on 10/8/15.
 //
