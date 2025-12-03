@@ -16,7 +16,7 @@ end
 task(:test_all) do
   formatter = "--format progress"
   formatter += " -r rspec_junit_formatter --format RspecJunitFormatter -o #{ENV['CIRCLE_TEST_REPORTS']}/rspec/fastlane-junit-results.xml" if ENV["CIRCLE_TEST_REPORTS"]
-  command = "rspec --pattern ./**/*_spec.rb #{formatter} #{ENV['RSPEC_ARGS']}"
+  command = "rspec --pattern spec/**/*_spec.rb,*/spec/**/*_spec.rb #{formatter} #{ENV['RSPEC_ARGS']}"
 
   run_rspec(command)
 end
@@ -115,3 +115,29 @@ task(:update_gem_spec_authors) do
 end
 
 task(default: :test_all)
+
+# Prepare the plugin template RuboCop config before building/installing the gem
+desc "Prepare .rubocop.yml for plugin template"
+task(:prepare_rubocop_config) do
+  require 'yaml'
+  require 'fileutils'
+
+  lib = File.expand_path('fastlane/lib', __dir__)
+  rubocop_config = File.expand_path('.rubocop.yml', __dir__)
+
+  next unless File.exist?(rubocop_config)
+
+  config = YAML.safe_load(File.read(rubocop_config))
+  config['require'] = %w[rubocop/require_tools rubocop-performance]
+  config.delete('inherit_from')
+  config.delete('CrossPlatform/ForkUsage')
+  config.delete('Lint/IsStringUsage')
+
+  target = File.join(lib, 'fastlane/plugins/template/.rubocop.yml')
+  FileUtils.mkdir_p(File.dirname(target))
+  File.write(target, YAML.dump(config))
+end
+
+%w(build install release).each do |t|
+  Rake::Task[t].enhance([:prepare_rubocop_config]) if Rake::Task.task_defined?(t)
+end

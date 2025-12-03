@@ -73,7 +73,7 @@ module Fastlane
         ] + auth_parts
 
         if verbose
-          submit_command << "--verbose"
+          submit_parts << "--verbose"
         end
 
         submit_command = submit_parts.join(' ')

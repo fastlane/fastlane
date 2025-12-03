@@ -1,2 +1,4 @@
-* [sigh][match] fix issue where unknown attribute `template_name` is being sent when creating provisioning profiles (#29591) via Florentin Luca Rieger (@visuallization)
-* [action][hipchat] remove hipchat action (#29558) via Eitan Adler (@grimreaper)
+* [ci] Restore a regular 'bunde install' during releases (#29775) via Connor Tumbleson (@iBotPeaches)
+* build: releases should ignore changes to .bundle/config (#29774) via Connor Tumbleson (@iBotPeaches)
+* [core] add support for more gems removed from stdlib (ruby 3.4) (#29767) via Connor Tumbleson (@iBotPeaches)
+* [ci] speed up release actions + fix gha publishing (#29765) via Connor Tumbleson (@iBotPeaches)
