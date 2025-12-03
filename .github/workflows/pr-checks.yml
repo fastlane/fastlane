@@ -20,7 +20,7 @@ jobs:
           script: |
             const owner = context.repo.owner;
             const repo = context.repo.repo;
-            const pr   = context.payload.pull_request;
+            const pr = context.payload.pull_request;
             const prNumber = pr.number;
 
             const warnings = [];
@@ -73,10 +73,8 @@ jobs:
               );
             }
 
-            // Prepare sticky header used to identify our comment(s)
+            // Add our comment (delete any prior robotic comment first)
             const HEADER = `### ⚠️ PR Lint Warnings`;
-
-            // Find and delete any previous comments created by this workflow to avoid duplicates
             const existingComments = await github.paginate(github.rest.issues.listComments, {
               owner,
               repo,
