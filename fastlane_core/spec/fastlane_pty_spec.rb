@@ -90,5 +90,25 @@ describe FastlaneCore do
         }
       end
     end
+
+    describe "spawn_with_pty" do
+      it 'passes the command to Pty when FASTLANE_EXEC_FLUSH_PTY_WORKAROUND is not set' do
+        allow(PTY).to receive(:spawn).with("echo foo")
+
+        FastlaneSpec::Env.with_env_values('FASTLANE_EXEC_FLUSH_PTY_WORKAROUND' => nil) do
+          FastlaneCore::FastlanePty.spawn_with_pty('echo foo') do |command_stdout, command_stdin, pid|
+          end
+        end
+      end
+
+      it 'wraps the command with a workaround when FASTLANE_EXEC_FLUSH_PTY_WORKAROUND is set' do
+        allow(PTY).to receive(:spawn).with("echo foo;")
+
+        FastlaneSpec::Env.with_env_values('FASTLANE_EXEC_FLUSH_PTY_WORKAROUND' => '1') do
+          FastlaneCore::FastlanePty.spawn_with_pty('echo foo') do |command_stdout, command_stdin, pid|
+          end
+        end
+      end
+    end
   end
 end
