@@ -1,18 +1,5 @@
 require "bundler/gem_tasks"
 
-GEMS = %w(fastlane danger-device_grid)
-
-SECONDS_PER_DAY = 60 * 60 * 24
-
-task(:rubygems_admins) do
-  names = ["KrauseFx", "joshdholtz", "snatchev", "powerivq"]
-  (GEMS + ["krausefx-shenzhen", "commander-fastlane", "fastlane-plugin-firebase_test_lab"]).each do |gem_name|
-    names.each do |name|
-      puts(`gem owner #{gem_name} -a #{name}`)
-    end
-  end
-end
-
 task(:test_all) do
   formatter = "--format progress"
   formatter += " -r rspec_junit_formatter --format RspecJunitFormatter -o #{ENV['CIRCLE_TEST_REPORTS']}/rspec/fastlane-junit-results.xml" if ENV["CIRCLE_TEST_REPORTS"]
@@ -85,7 +72,6 @@ task(:generate_team_table) do
     else
       content << "<h4 align='center'>#{github_user_name}</h4>"
     end
-    # content << "<p align='center'>#{user_content['slogan']}</p>" if user_content['slogan'].to_s.length > 0
 
     content << "</td>"
     content << "</tr>" if counter % number_of_rows == number_of_rows - 1
