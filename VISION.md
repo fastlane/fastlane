@@ -37,10 +37,10 @@ Each _fastlane_ tool has a specific purpose and should be kept focused on the fu
 * [_scan_](https://github.com/fastlane/fastlane/tree/master/scan): The easiest way to run tests for your iOS and Mac apps
 * [_precheck_](https://github.com/fastlane/fastlane/tree/master/precheck): Check your app using a community driven set of App Store review rules to avoid being rejected
 
-## _fastlane_’s Relationship with [Google](https://google.com)
+## _fastlane_’s Relationship with [Mobile Native Foundation](https://mobilenativefoundation.org)
 
-Google supports app development teams with the best tools for building, understanding, and growing their mobile app businesses through [Firebase](https://firebase.google.com) and [Fabric](https://get.fabric.io/).
+The Mobile Native Foundation (MNF) provides a neutral home for open source projects that support the mobile development community. It serves as a safe haven for tools and frameworks that developers rely on to build, test, and release high-quality mobile apps.
 
-Google has recognized _fastlane_ as the best tool for tackling tough beta and release deployment challenges. The team’s mission is to make _fastlane_ the de facto tool to automate beta deployments and app store releases for iOS and Android apps.
+MNF recognizes _fastlane_ as an essential tool for automating beta deployments and app store releases for iOS and Android. By hosting _fastlane_, the foundation ensures that it remains a community-driven, transparent, and vendor-neutral project which is free from commercial interests or proprietary lock-in.
 
-Google intends to keep _fastlane_ open source and available as a standalone tool for users who are not using Firebase or Fabric. Google is also committed to increasing use of _fastlane_ by promoting it through other products and websites, and developing integrations with Firebase and Fabric tools to help them work better together.
+Under the stewardship of MNF, _fastlane_ will continue to thrive as open source software, maintained and improved through collaboration among developers, contributors, and organizations that depend on it.

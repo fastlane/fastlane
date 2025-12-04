@@ -8,9 +8,7 @@ module Spaceship
       attr_accessor :alcohol_tobacco_or_drug_use_or_references
       attr_accessor :contests
       attr_accessor :gambling_simulated
-      attr_accessor :guns_or_other_weapons
-      attr_accessor :horror_or_fear_themes
-      attr_accessor :mature_or_suggestive_themes
+      attr_accessor :korea_age_rating_override
       attr_accessor :medical_or_treatment_information
       attr_accessor :profanity_or_crude_humor
       attr_accessor :sexual_content_graphic_and_nudity
@@ -23,11 +21,7 @@ module Spaceship
       attr_accessor :advertising
       attr_accessor :age_assurance
       attr_accessor :gambling
-      attr_accessor :health_or_wellness_topics
       attr_accessor :loot_box
-      attr_accessor :messaging_and_chat
-      attr_accessor :parental_controls
-      attr_accessor :seventeen_plus
       attr_accessor :unrestricted_web_access
       attr_accessor :user_generated_content
 
@@ -84,18 +78,12 @@ module Spaceship
         "developerAgeRatingInfoUrl" => "developer_age_rating_info_url",
         "gambling" => "gambling",
         "gamblingSimulated" => "gambling_simulated",
-        "gunsOrOtherWeapons" => "guns_or_other_weapons",
-        "healthOrWellnessTopics" => "health_or_wellness_topics",
-        "horrorOrFearThemes" => "horror_or_fear_themes",
-        "kidsAgeBand" => "kids_age_band",
         "koreaAgeRatingOverride" => "korea_age_rating_override",
         "lootBox" => "loot_box",
-        "matureOrSuggestiveThemes" => "mature_or_suggestive_themes",
         "medicalOrTreatmentInformation" => "medical_or_treatment_information",
         "messagingAndChat" => "messaging_and_chat",
         "parentalControls" => "parental_controls",
         "profanityOrCrudeHumor" => "profanity_or_crude_humor",
-        "seventeenPlus" => "seventeen_plus",
         "sexualContentGraphicAndNudity" => "sexual_content_graphic_and_nudity",
         "sexualContentOrNudity" => "sexual_content_or_nudity",
         "unrestrictedWebAccess" => "unrestricted_web_access",
