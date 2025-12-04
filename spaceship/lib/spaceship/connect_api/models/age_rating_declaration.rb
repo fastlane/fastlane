@@ -179,7 +179,7 @@ module Spaceship
           "unrestrictedWebAccess",
           "userGeneratedContent"
         ]
-        
+
         if boolean_keys.include?(key)
           new_value = LEGACY_BOOLEAN_VALUE_ITC_MAP[value]
           return value if new_value.nil?
