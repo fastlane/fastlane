@@ -69,9 +69,6 @@ jobs:
           command: |
             mkdir -p ~/test-reports
       - ruby/install-deps
-      - run:
-          name: Check PR Metadata
-          command: bundle exec danger || echo "danger failed"
       - *cache_restore_rubocop
       - run:
           name: bundle exec fastlane execute_tests
@@ -94,10 +91,6 @@ jobs:
       - store_artifacts:
           path: ~/test-reports/ruby_warnings.txt
           destination: ruby_warnings.txt
-      - run:
-          name: Post Test Results to GitHub
-          command: bundle exec danger || echo "danger failed"
-          when: always  # Run this even when tests fail
 
   tests_ubuntu:
     parameters:
@@ -119,9 +112,6 @@ jobs:
           command: |
             mkdir -p ~/test-reports
       - ruby/install-deps
-      - run:
-          name: Check PR Metadata
-          command: bundle exec danger || echo "danger failed"
       - *cache_restore_rubocop
       - run: bundle exec fastlane execute_tests
       - *cache_save_rubocop
@@ -133,10 +123,6 @@ jobs:
       - store_artifacts:
           path: ~/test-reports/ruby_warnings.txt
           destination: ruby_warnings.txt
-      - run:
-          name: Post Test Results to GitHub
-          command: bundle exec danger || echo "danger failed"
-          when: always  # Run this even when tests fail
 
   validate_fastlane_swift_generation:
     resource_class: macos-m1-medium-gen1
