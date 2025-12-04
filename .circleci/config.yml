@@ -234,7 +234,7 @@ workflows:
           image: 'cimg/ruby:3.2.2-node'
       - validate_fastlane_swift_generation:
           name: 'Validate Fastlane.swift generation'
-          xcode_version: '15.0.1'
+          xcode_version: '16.4.0'
           ruby_version: '3.2'
       - validate_documentation:
           name: 'Validate Documentation'
