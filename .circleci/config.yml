@@ -38,6 +38,7 @@ aliases:
 jobs:
   tests_macos: &tests_macos_base
     description: 'Execute tests on macOS with given Xcode and Ruby version'
+    resource_class: macos-m1-medium-gen1
     macos:
       xcode: << parameters.xcode_version >>
     parameters:
@@ -138,6 +139,7 @@ jobs:
           when: always  # Run this even when tests fail
 
   validate_fastlane_swift_generation:
+    resource_class: macos-m1-medium-gen1
     <<: *tests_macos_base
     steps:
       - *cache_restore_git
