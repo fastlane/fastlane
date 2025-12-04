@@ -95,7 +95,6 @@ module Spaceship
         "messagingAndChat" => "messaging_and_chat",
         "parentalControls" => "parental_controls",
         "profanityOrCrudeHumor" => "profanity_or_crude_humor",
-        "seventeenPlus" => "seventeen_plus",
         "sexualContentGraphicAndNudity" => "sexual_content_graphic_and_nudity",
         "sexualContentOrNudity" => "sexual_content_or_nudity",
         "unrestrictedWebAccess" => "unrestricted_web_access",
@@ -106,6 +105,7 @@ module Spaceship
 
         # Deprecated as of App Store Connect API 1.3
         "gamblingAndContests" => "gambling_and_contests",
+        "seventeenPlus" => "seventeen_plus",
       })
 
       def self.type
