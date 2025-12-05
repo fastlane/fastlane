@@ -27,7 +27,6 @@ module Spaceship
       attr_accessor :loot_box
       attr_accessor :messaging_and_chat
       attr_accessor :parental_controls
-      attr_accessor :seventeen_plus
       attr_accessor :unrestricted_web_access
       attr_accessor :user_generated_content
 
@@ -103,9 +102,8 @@ module Spaceship
         "violenceRealisticProlongedGraphicOrSadistic" => "violence_realistic_prolonged_graphic_or_sadistic",
         "violenceRealistic" => "violence_realistic",
 
-        # Deprecated as of App Store Connect API 1.3
+        # Deprecated as of App Store Connect API 1.3 - No longer accepted by API
         "gamblingAndContests" => "gambling_and_contests",
-        "seventeenPlus" => "seventeen_plus",
       })
 
       def self.type
