@@ -93,7 +93,9 @@ module Deliver
 
       # Verify all screenshots have been deleted
       # Sometimes API requests will fail but screenshots will still be deleted
-      count = iterator.each_app_screenshot_set.map { |_, app_screenshot_set| app_screenshot_set }
+      count = iterator.each_app_screenshot_set
+                      .select { |localization, _| screenshots_per_language.keys.include?(localization.locale) }
+                      .map { |_, app_screenshot_set| app_screenshot_set }
                       .reduce(0) { |sum, app_screenshot_set| sum + app_screenshot_set.app_screenshots.size }
 
       UI.important("Number of screenshots not deleted: #{count}")
