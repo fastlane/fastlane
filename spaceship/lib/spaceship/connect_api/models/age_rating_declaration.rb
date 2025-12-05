@@ -175,7 +175,8 @@ module Spaceship
           "messagingAndChat",
           "parentalControls",
           "unrestrictedWebAccess",
-          "userGeneratedContent"
+          "userGeneratedContent",
+          "seventeenPlus"
         ]
 
         if boolean_keys.include?(key)
