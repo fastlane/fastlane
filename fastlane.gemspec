@@ -4,20 +4,6 @@ lib = File.expand_path('../fastlane/lib', __FILE__)
 $LOAD_PATH.unshift(lib) unless $LOAD_PATH.include?(lib)
 require 'fastlane/version'
 
-# Copy over the latest .rubocop.yml style guide
-require 'yaml'
-rubocop_config = File.expand_path('../.rubocop.yml', __FILE__)
-config = YAML.safe_load(open(rubocop_config), aliases: true)
-config['require'] = [
-  'rubocop/require_tools',
-  'rubocop-performance'
-]
-config.delete('inherit_from')
-config.delete('CrossPlatform/ForkUsage')
-config.delete('Lint/IsStringUsage')
-
-File.write("#{lib}/fastlane/plugins/template/.rubocop.yml", YAML.dump(config))
-
 Gem::Specification.new do |spec|
   spec.name          = "fastlane"
   spec.version       = Fastlane::VERSION
