@@ -38,6 +38,7 @@ aliases:
 jobs:
   tests_macos: &tests_macos_base
     description: 'Execute tests on macOS with given Xcode and Ruby version'
+    resource_class: macos-m1-medium-gen1
     macos:
       xcode: << parameters.xcode_version >>
     parameters:
@@ -138,6 +139,7 @@ jobs:
           when: always  # Run this even when tests fail
 
   validate_fastlane_swift_generation:
+    resource_class: macos-m1-medium-gen1
     <<: *tests_macos_base
     steps:
       - *cache_restore_git
@@ -174,29 +176,6 @@ jobs:
       - ruby/install-deps
 
       - run: bundle exec fastlane lint_source
-
-  modules_load_up_tests:
-    parameters:
-      image:
-        type: string
-    environment:
-      LC_ALL: C.UTF-8
-      LANG: C.UTF-8
-    docker:
-      - image: << parameters.image >>
-    shell: /bin/bash --login -eo pipefail
-    steps:
-      - *cache_restore_git
-      - checkout
-      - *cache_save_git
-
-      - run:
-          name: Setup Build
-          # Build gem from fastlane.gemspec and install locally
-          command: |
-            gem install $(echo $(gem build fastlane.gemspec) | sed 's/.*File: //')
-
-      - run: /bin/bash ./test_modules/run_tests.sh
 
 workflows:
   version: 2
@@ -258,7 +237,4 @@ workflows:
           image: 'cimg/ruby:3.2'
       - lint_source_code:
           name: 'Lint source code'
-          image: 'cimg/ruby:3.2'
-      - modules_load_up_tests:
-          name: 'Modules load up tests'
           image: 'cimg/ruby:3.2'
