@@ -76,7 +76,7 @@ describe Deliver::UploadScreenshots do
 
         # en-US set should be deleted, fr-FR should NOT be deleted
         expect(en_screenshot_set).to receive(:delete!)
-        expect(fr_screenshot_set).not_to(receive(:delete!))
+        expect(fr_screenshot_set).to_not(receive(:delete!))
         # Should succeed since en-US count is 0 (fr-FR's screenshot is not counted)
         expect(UI).to_not(receive(:user_error!))
         described_class.new.delete_screenshots([en_localization, fr_localization], screenshots_per_language)
