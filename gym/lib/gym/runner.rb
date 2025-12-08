@@ -383,7 +383,7 @@ module Gym
         # Build the swinfo command
         command = [
           "xcrun",
-          swinfo_path,
+          swinfo_path.shellescape,
           "-f", ipa_path.shellescape,
           "-o", swinfo_plist_path.shellescape,
           "-prettyprint", "true",

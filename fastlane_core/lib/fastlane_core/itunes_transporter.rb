@@ -486,6 +486,10 @@ module FastlaneCore
       # uploading packages on non-macOS platforms requires AppStoreInfo.plist starting with Transporter >= 4.1
       if !Helper.is_mac? && File.directory?(source)
         asset_file = Dir.glob(File.join(source, "*.{#{allowed_package_extensions.join(',')}}")).first
+        unless asset_file
+          UI.user_error!("No package file (#{allowed_package_extensions.join(',')}) found in #{source}")
+        end
+
         appstore_info_path = File.join(source, "AppStoreInfo.plist")
         unless File.file?(appstore_info_path)
           UI.error("AppStoreInfo.plist is required for uploading #{File.extname(asset_file)} files on non-macOS platforms.")
