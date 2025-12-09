@@ -425,7 +425,7 @@ As a result, the `template_name` parameter was deprecated in the _match_ action,
 
 _match_ automatically pre-fills environment variables with the UUIDs of the correct provisioning profiles, ready to be used in your Xcode project.
 
-More information about how to setup your Xcode project can be found [here](/codesigning/xcode-project/)
+More information about how to set up your Xcode project can be found [here](/codesigning/xcode-project/)
 
 #### To build from Xcode manually
 
