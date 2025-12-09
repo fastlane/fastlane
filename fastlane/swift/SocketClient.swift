@@ -51,7 +51,7 @@ class SocketClient: NSObject {
 
     private(set) weak var socketDelegate: SocketClientDelegateProtocol?
 
-    public private(set) var socketStatus: SocketStatus
+    private(set) var socketStatus: SocketStatus
 
     // localhost only, this prevents other computers from connecting
     init(host: String = "localhost", port: UInt32 = 2000, commandTimeoutSeconds: Int = defaultCommandTimeoutSeconds, socketDelegate: SocketClientDelegateProtocol) {
@@ -110,13 +110,13 @@ class SocketClient: NSObject {
         socketDelegate?.connectionsOpened()
     }
 
-    public func send(rubyCommand: RubyCommandable) {
+    func send(rubyCommand: RubyCommandable) {
         verbose(message: "sending: \(rubyCommand.json)")
         send(string: rubyCommand.json)
         writeSemaphore.signal()
     }
 
-    public func sendComplete() {
+    func sendComplete() {
         closeSession(sendAbort: true)
     }
 
@@ -193,11 +193,11 @@ class SocketClient: NSObject {
         socketDelegate?.connectionsClosed()
     }
 
-    public func enter() {
+    func enter() {
         dispatchGroup.enter()
     }
 
-    public func leave() {
+    func leave() {
         readSemaphore.signal()
         writeSemaphore.signal()
     }
