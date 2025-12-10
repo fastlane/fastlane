@@ -31,6 +31,7 @@ module Pilot
 
       platform = fetch_app_platform
       ipa_path = options[:ipa]
+      asset_description_path = options[:asset_description_path]
       if ipa_path && platform != 'osx'
         asset_path = ipa_path
         app_identifier = config[:app_identifier] || fetch_app_identifier
@@ -45,6 +46,7 @@ module Pilot
                                                                 bundle_version: bundle_version)
       else
         pkg_path = options[:pkg]
+        asset_description_path = options[:asset_description_path]
         asset_path = pkg_path
         package_path = FastlaneCore::PkgUploadPackageBuilder.new.generate(app_id: fetch_app_id,
                                                                         pkg_path: pkg_path,
@@ -53,7 +55,7 @@ module Pilot
       end
 
       transporter = transporter_for_selected_team(options)
-      result = transporter.upload(package_path: package_path, asset_path: asset_path, platform: platform)
+      result = transporter.upload(package_path: package_path, asset_path: asset_path, platform: platform, asset_description: asset_description_path)
 
       unless result
         transporter_errors = transporter.displayable_errors
