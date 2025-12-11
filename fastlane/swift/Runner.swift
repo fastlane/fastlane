@@ -1,5 +1,5 @@
 // Runner.swift
-// Copyright (c) 2024 FastlaneTools
+// Copyright (c) 2025 FastlaneTools
 
 //
 //  ** NOTE **
@@ -230,7 +230,7 @@ class Logger {
         case verbose
     }
 
-    public static var logMode: LogMode = .normal
+    static var logMode: LogMode = .normal
 
     func log(message: String) {
         let timestamp = NSDate().timeIntervalSince1970

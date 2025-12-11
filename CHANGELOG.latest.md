@@ -1,3 +1,4 @@
-This version has a required fix for authenticating with Apple via Apple ID. Apple started using their own variant of SRP (Secure Remote Password) using SHA-256 and 2048 bit hashing in the sign in flow. Any previous _fastlane_ versions will likely response a "503 Service Temporarily Unavailable" when authenicating with an Apple ID.
-
-* [spaceship] New AppleID Auth with SRP (#26415) via Josh Holtz (@snatchev and @joshdholtz)
+* [ci] Restore a regular 'bunde install' during releases (#29775) via Connor Tumbleson (@iBotPeaches)
+* build: releases should ignore changes to .bundle/config (#29774) via Connor Tumbleson (@iBotPeaches)
+* [core] add support for more gems removed from stdlib (ruby 3.4) (#29767) via Connor Tumbleson (@iBotPeaches)
+* [ci] speed up release actions + fix gha publishing (#29765) via Connor Tumbleson (@iBotPeaches)
