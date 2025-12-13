@@ -250,7 +250,8 @@ module FastlaneCore
 
   # Generates commands and executes the altool.
   class AltoolTransporterExecutor < TransporterExecutor
-    ERROR_REGEX = /\*\*\* Error:\s+(.+)/
+    # Xcode 26 uses ERROR, while previous versions used *** Error
+    ERROR_REGEX = /(?:\*\*\*\s*)?ERROR:\s+(.+)/i
 
     private_constant :ERROR_REGEX
 
@@ -296,7 +297,7 @@ module FastlaneCore
       end
 
       yield(@all_lines) if block_given?
-      exit_status.zero?
+      @errors.empty?
     end
 
     def build_credential_params(username = nil, password = nil, jwt = nil, api_key = nil)
