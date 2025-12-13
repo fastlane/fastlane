@@ -67,7 +67,11 @@ module Fastlane
           }
 
           if File.exist?(cache_path)
-            self.cache = YAML.load_file(cache_path)
+            self.cache = YAML.safe_load(
+              File.read(cache_path),
+              permitted_classes: [Date, Time, Symbol, FastlanePluginAction],
+              aliases: true
+            )
           else
             self.cache = {}
           end

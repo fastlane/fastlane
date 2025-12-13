@@ -302,7 +302,7 @@ lane :release do
     app_version: '1.0',
     sku: '123',
     team_name: 'SunApps GmbH', # only necessary when in multiple teams
-    
+
     # Optional
     # App services can be enabled during app creation
     enable_services: {
@@ -317,6 +317,7 @@ lane :release do
       car_play_navigation_app: "on",            # Valid values: "on", "off"
       car_play_voip_calling_app: "on",          # Valid values: "on", "off"
       class_kit: "on",                          # Valid values: "on", "off"
+      declared_age_range: "on",                 # Valid values: "on", "off"
       icloud: "xcode5_compatible",              # Valid values: "xcode5_compatible", "xcode6_compatible", "off"
       critical_alerts: "on",                    # Valid values: "on", "off"
       custom_network_protocol: "on",            # Valid values: "on", "off"
