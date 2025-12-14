@@ -173,7 +173,7 @@ module Frameit
     IPHONE_13_MINI ||= Device.new("iphone-13-mini", "Apple iPhone 13 Mini", 11, [[1080, 2340], [2340, 1080]], 476, Color::MIDNIGHT, Platform::IOS)
     IPHONE_14 ||= Device.new("iphone-14", "Apple iPhone 14", 12, [[1170, 2532], [2532, 1170]], 460, Color::MIDNIGHT, Platform::IOS)
     IPHONE_14_PLUS ||= Device.new("iphone-14-plus", "Apple iPhone 14 Plus", 12, [[1284, 2778], [2778, 1284]], 458, Color::MIDNIGHT, Platform::IOS)
-    [2IPHONE_14_PRO ||= Device.new("iphone-14-pro", "Apple iPhone 14 Pro", 12, [[1179, 2556], 556, 1179]], 460, Color::PURPLE, Platform::IOS)
+    IPHONE_14_PRO ||= Device.new("iphone-14-pro", "Apple iPhone 14 Pro", 12, [[1179, 2556], [2556, 1179]], 460, Color::PURPLE, Platform::IOS)
     IPHONE_14_PRO_MAX ||= Device.new("iphone14-pro-max", "Apple iPhone 14 Pro Max", 12, [[1290, 2796], [2796, 1290]], 458, Color::PURPLE, Platform::IOS)
     IPAD_10_2 ||= Device.new("ipad-10-2", "Apple iPad 10.2", 1, [[1620, 2160], [2160, 1620]], 264, Color::SPACE_GRAY, Platform::IOS)
     IPAD_AIR_2 ||= Device.new("ipad-air-2", "Apple iPad Air 2", 1, [[1536, 2048], [2048, 1536]], 264, Color::SPACE_GRAY, Platform::IOS, DEVICE_SCREEN_IDS[DisplayType::APP_IPAD_97])
