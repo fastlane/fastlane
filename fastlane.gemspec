@@ -4,50 +4,36 @@ lib = File.expand_path('../fastlane/lib', __FILE__)
 $LOAD_PATH.unshift(lib) unless $LOAD_PATH.include?(lib)
 require 'fastlane/version'
 
-# Copy over the latest .rubocop.yml style guide
-require 'yaml'
-rubocop_config = File.expand_path('../.rubocop.yml', __FILE__)
-config = YAML.safe_load(open(rubocop_config))
-config['require'] = [
-  'rubocop/require_tools',
-  'rubocop-performance'
-]
-config.delete('inherit_from')
-config.delete('CrossPlatform/ForkUsage')
-config.delete('Lint/IsStringUsage')
-
-File.write("#{lib}/fastlane/plugins/template/.rubocop.yml", YAML.dump(config))
-
 Gem::Specification.new do |spec|
   spec.name          = "fastlane"
   spec.version       = Fastlane::VERSION
   # list of authors is regenerated and resorted on each release
-  spec.authors       = ["Danielle Tomlinson",
-                        "Łukasz Grabowski",
-                        "Maksym Grebenets",
-                        "Jorge Revuelta H",
+  spec.authors       = ["Jérôme Lacoste",
                         "Manish Rathi",
-                        "Roger Oba",
-                        "Fumiya Nakamura",
-                        "Kohki Miki",
-                        "Luka Mirosevic",
-                        "Satoshi Namai",
-                        "Max Ott",
-                        "Daniel Jankowski",
-                        "Josh Holtz",
-                        "Olivier Halligon",
-                        "Jérôme Lacoste",
-                        "Joshua Liebowitz",
                         "Stefan Natchev",
+                        "Kohki Miki",
+                        "Olivier Halligon",
+                        "Luka Mirosevic",
                         "Aaron Brager",
-                        "Helmut Januschka",
-                        "Felix Krause",
-                        "Iulian Onofrei",
-                        "Matthew Ellis",
                         "Jimmy Dee",
+                        "Helmut Januschka",
                         "Manu Wallner",
+                        "Josh Holtz",
+                        "Iulian Onofrei",
+                        "Max Ott",
+                        "Łukasz Grabowski",
+                        "Daniel Jankowski",
+                        "Maksym Grebenets",
+                        "Roger Oba",
+                        "Andrew McBurney",
+                        "Jorge Revuelta H",
+                        "Satoshi Namai",
+                        "Felix Krause",
                         "Jan Piotrowski",
-                        "Andrew McBurney"]
+                        "Fumiya Nakamura",
+                        "Danielle Tomlinson",
+                        "Matthew Ellis",
+                        "Joshua Liebowitz"]
 
   spec.email         = ["fastlane@krausefx.com"]
   spec.summary       = Fastlane::SUMMARY
@@ -66,7 +52,7 @@ Gem::Specification.new do |spec|
 
   spec.files = Dir.glob("*/lib/**/*", File::FNM_DOTMATCH) + Dir["fastlane/swift/**/*"] + Dir["bin/*"] + Dir["*/README.md"] + %w(README.md LICENSE .yardopts) - Dir["fastlane/lib/fastlane/actions/device_grid/assets/*"] - Dir["fastlane/lib/fastlane/actions/docs/assets/*"]
   spec.bindir = "bin"
-  spec.executables = spec.files.grep(%r{^bin/}) { |f| File.basename(f) }
+  spec.executables = spec.files.grep(%r{^bin/}) { |f| File.basename(f) } - ["bin/console"]
   spec.require_paths = Dir["*/lib"]
 
   spec.add_dependency('addressable', '>= 2.8', '< 3.0.0') # Support for URI templates
@@ -110,4 +96,12 @@ Gem::Specification.new do |spec|
   spec.add_dependency('xcodeproj', '>= 1.13.0', '< 2.0.0') # Modify Xcode projects
   spec.add_dependency('xcpretty-travis-formatter', '>= 0.0.3', '< 2.0.0')
   spec.add_dependency('xcpretty', '~> 0.4.1') # prettify xcodebuild output
+
+  # As Ruby evolves, some stdlib modules are no longer bundled with Ruby and instead standard gems.
+  spec.add_dependency('abbrev', '~> 0.1.2') # 3.4 - workaround for highline as can't upgrade to 3.x yet
+  spec.add_dependency('base64', '~> 0.2.0') # 3.4 - workaround for CFPropertyList as can't upgrade to 4.x yet
+  spec.add_dependency('csv', '~> 3.3') # 3.4 - workaround for sinatra as can't upgrade to 4.x yet
+  spec.add_dependency('mutex_m', '~> 0.3.0') # 3.4 - workaround for httpclient as can't upgrade to 2.9 yet
+  spec.add_dependency('nkf', '~> 0.2.0') # 3.4 - workaround for CFPropertyList as can't upgrade to 4.x yet
+  spec.add_dependency('logger', '>= 1.6', '< 2.0') # stdlib gem removed from default set in Ruby 3.5+
 end

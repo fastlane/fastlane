@@ -125,7 +125,7 @@ module Scan
         # tests to run
         FastlaneCore::ConfigItem.new(key: :only_testing,
                                      env_name: "SCAN_ONLY_TESTING",
-                                     description: "Array of strings matching Test Bundle/Test Suite/Test Cases to run",
+                                     description: "Array of test identifiers to run. Expected format: TestTarget[/TestSuite[/TestCase]]",
                                      optional: true,
                                      is_string: false,
                                      verify_block: proc do |value|
@@ -133,7 +133,7 @@ module Scan
                                      end),
         FastlaneCore::ConfigItem.new(key: :skip_testing,
                                      env_name: "SCAN_SKIP_TESTING",
-                                     description: "Array of strings matching Test Bundle/Test Suite/Test Cases to skip",
+                                     description: "Array of test identifiers to skip. Expected format: TestTarget[/TestSuite[/TestCase]]",
                                      optional: true,
                                      is_string: false,
                                      verify_block: proc do |value|
@@ -512,6 +512,11 @@ module Scan
                                     description: "Sets a custom path for Swift Package Manager dependencies",
                                     type: String,
                                     optional: true),
+        FastlaneCore::ConfigItem.new(key: :package_cache_path,
+                                     env_name: "SCAN_PACKAGE_CACHE_PATH",
+                                     description: "Sets a custom package cache path for Swift Package Manager dependencies",
+                                     type: String,
+                                     optional: true),
         FastlaneCore::ConfigItem.new(key: :skip_package_dependencies_resolution,
                                      env_name: "SCAN_SKIP_PACKAGE_DEPENDENCIES_RESOLUTION",
                                      description: "Skips resolution of Swift Package Manager dependencies",

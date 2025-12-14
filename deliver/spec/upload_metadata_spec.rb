@@ -64,6 +64,20 @@ describe Deliver::UploadMetadata do
     end
   end
 
+  describe "#app_rating" do
+    let(:options) { { app_rating_config_path: "/tmp/fake-age-rating.json" } }
+    let(:uploader) { Deliver::UploadMetadata.new(options) }
+
+    it "skips age rating upload when app info cannot be fetched (nil)" do
+      expect(File).not_to receive(:read)
+      expect(FastlaneCore::UI).not_to receive(:message).with("Setting the app's age rating...")
+
+      expect(FastlaneCore::UI).to receive(:important).with("Skipping age rating update because app info could not be fetched.")
+
+      uploader.send("app_rating", nil)
+    end
+  end
+
   describe "#review_information" do
     let(:options) { { metadata_path: tmpdir, app_review_information: app_review_information } }
     let(:version) { double("version") }

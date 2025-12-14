@@ -230,7 +230,7 @@ class Logger {
         case verbose
     }
 
-    public static var logMode: LogMode = .normal
+    static var logMode: LogMode = .normal
 
     func log(message: String) {
         let timestamp = NSDate().timeIntervalSince1970
