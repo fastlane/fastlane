@@ -57,7 +57,7 @@ module Produce
 
     def valid_services_for(options)
       allowed_keys = [:access_wifi, :app_attest, :app_group, :apple_pay, :associated_domains, :auto_fill_credential, :car_play_audio_app, :car_play_messaging_app,
-                      :car_play_navigation_app, :car_play_voip_calling_app, :class_kit, :icloud, :critical_alerts, :custom_network_protocol, :data_protection,
+                      :car_play_navigation_app, :car_play_voip_calling_app, :class_kit, :declared_age_range, :icloud, :critical_alerts, :custom_network_protocol, :data_protection,
                       :extended_virtual_address_space, :file_provider_testing_mode, :family_controls, :fonts, :game_center, :health_kit, :hls_interstitial_preview, :home_kit, :hotspot,
                       :hotspot_helper, :in_app_purchase, :inter_app_audio, :low_latency_hls, :managed_associated_domains, :maps, :multipath, :network_extension,
                       :nfc_tag_reading, :passbook, :personal_vpn, :push_notification, :sign_in_with_apple, :siri_kit, :system_extension, :user_management, :vpn_configuration, :wallet,
@@ -172,6 +172,11 @@ module Produce
           UI.user_error!("Unknown service '#{options.data_protection}'. Valid values: 'complete', 'unlessopen', 'untilfirstauth'") unless options.data_protection == true || options.data_protection == false
         end
         bundle_id.update_capability(DATA_PROTECTION, enabled: on, settings: settings)
+      end
+
+      if options.declared_age_range
+        UI.message("\tDeclared Age Range")
+        bundle_id.update_capability(DECLARED_AGE_RANGE, enabled: on)
       end
 
       if options.extended_virtual_address_space
