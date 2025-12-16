@@ -286,8 +286,6 @@ describe Match do
           config = FastlaneCore::Configuration.create(Match::Options.available_options, values)
           repo_dir = Dir.mktmpdir
           cert_path = File.join(repo_dir, "something.cer")
-          keychain_path = FastlaneCore::Helper.keychain_path("login.keychain") # can be .keychain or .keychain-db
-          destination = File.join(provisioning_path_for_xcode_version(xcode_version), "98264c6b-5151-4349-8d0f-66691e48ae35.mobileprovision")
 
           create_fake_cache
 
