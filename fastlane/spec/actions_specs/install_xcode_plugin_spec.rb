@@ -9,7 +9,7 @@ describe Fastlane do
         url = "https://example.com/plugin.zip; touch /tmp/fastlane_pwned"
 
         expect(FileUtils).to receive(:mkdir_p).with(plugins_path)
-        expect(Fastlane::Actions).to receive(:sh).with("curl", "-L", "-s", "-o", kind_of(String), url)
+        expect(Fastlane::Action).to receive(:sh).with("curl", "-L", "-s", "-o", kind_of(String), url)
         expect(Fastlane::Action).to receive(:sh).with("unzip", "-qo", kind_of(String), "-d", plugins_path)
 
         Fastlane::FastFile.new.parse("lane :test do
