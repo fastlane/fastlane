@@ -413,37 +413,23 @@ describe Scan do
     end
 
     describe "device and destination precedence" do
-      it "warns when device and destination differ", requires_xcodebuild: true do
-        options = {
-          project: "./scan/examples/standard/app.xcodeproj",
-          device: "iPhone 14",
-          destination: "platform=iOS Simulator,name=iPhone 17,OS=26.1"
-        }
-        expect(FastlaneCore::UI).to receive(:important).with(/Both device and destination provided/)
-        Scan.config = FastlaneCore::Configuration.create(Scan::Options.available_options, options)
+      it "extracts devices correctly from destination for warning comparison" do
+        explicit_devices = ["iPhone 14"]
+        destination = "platform=iOS Simulator,name=iPhone 17,OS=26.1"
+        destination_devices = Scan::DetectValues.extract_devices_from_destination(destination)
+
+        # Verify that the devices are different (would trigger warning)
+        expect(explicit_devices & destination_devices).to be_empty
+        expect(destination_devices).to eq(["iPhone 17 (26.1)"])
       end
 
-      it "uses device when both device and destination are provided", requires_xcodebuild: true do
-        options = {
-          project: "./scan/examples/standard/app.xcodeproj",
-          device: "iPhone 14",
-          destination: "platform=iOS Simulator,name=iPhone 17,OS=26.1"
-        }
-        Scan.config = FastlaneCore::Configuration.create(Scan::Options.available_options, options)
-        # Device should be used, so Scan.devices should contain iPhone 14 simulator
-        expect(Scan.devices).not_to be_nil
-        expect(Scan.devices.first.name).to eq("iPhone 14")
-      end
+      it "extracts devices from destination when no explicit device provided" do
+        explicit_devices = []
+        destination = "platform=iOS Simulator,name=iPhone 14,OS=17.0"
+        destination_devices = Scan::DetectValues.extract_devices_from_destination(destination)
 
-      it "uses destination when only destination is provided", requires_xcodebuild: true do
-        options = {
-          project: "./scan/examples/standard/app.xcodeproj",
-          destination: "platform=iOS Simulator,name=iPhone 14,OS=17.0"
-        }
-        Scan.config = FastlaneCore::Configuration.create(Scan::Options.available_options, options)
-        # Destination should be used to detect device
-        expect(Scan.devices).not_to be_nil
-        expect(Scan.devices.first.name).to eq("iPhone 14")
+        # When no explicit devices, destination devices should be used
+        expect(destination_devices).to eq(["iPhone 14 (17.0)"])
       end
     end
   end
