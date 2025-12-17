@@ -38,7 +38,22 @@ module Scan
         Scan.project.select_scheme
       end
 
-      devices = Scan.config[:devices] || Array(Scan.config[:device]) # important to use Array(nil) for when the value is nil
+      # important to use Array(nil) for when the value is nil
+      explicit_devices = Scan.config[:devices] || Array(Scan.config[:device])
+      destination_devices = extract_devices_from_destination(Scan.config[:destination])
+
+      if explicit_devices.any? && destination_devices.any? && (explicit_devices & destination_devices).empty?
+        UI.important("Both device and destination provided; using device '#{explicit_devices.join(', ')}' which differs from destination '#{destination_devices.join(', ')}'")
+      end
+
+      devices = if explicit_devices.any?
+                  explicit_devices
+                elsif destination_devices.any?
+                  destination_devices
+                else
+                  []
+                end
+
       if devices.count > 0
         detect_simulator(devices, '', '', '', nil)
       elsif Scan.project
@@ -180,6 +195,43 @@ module Scan
       #   ) # end of lookahead
       # }
       /\s(?=\([\d\.]+\)$)/
+    end
+
+    def self.extract_devices_from_destination(destination_value)
+      Array(destination_value).compact.flat_map do |destination|
+        next [] unless destination.include?("platform=")
+
+        platform = destination[/platform=([^,]+)/, 1]
+        next [] unless platform && platform.downcase.include?("simulator")
+
+        # Extract OS type from platform (e.g., "iOS Simulator" -> "iOS")
+        os_type = platform.gsub(/\s+Simulator$/i, '')
+
+        name = destination[/name=([^,]+)/, 1]
+        id = destination[/id=([^,]+)/, 1]
+
+        # According to xcodebuild docs, name and id are mutually exclusive
+        # If both are present, prefer name (more user-friendly)
+        device_name = nil
+        if name
+          device_name = name
+        elsif id
+          # Look up simulator by UDID
+          simulators = FastlaneCore::DeviceManager.simulators(os_type)
+          matching_sim = simulators.find { |sim| sim.udid == id }
+          if matching_sim
+            device_name = matching_sim.name
+          else
+            UI.error("Could not find simulator with id '#{id}' for platform '#{platform}'")
+            next []
+          end
+        else
+          next []
+        end
+
+        os = destination[/OS=([^,]+)/, 1]
+        os && !os.empty? ? "#{device_name} (#{os})" : device_name
+      end
     end
 
     def self.detect_simulator(devices, requested_os_type, deployment_target_key, default_device_name, simulator_type_descriptor)
