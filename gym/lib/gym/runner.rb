@@ -24,7 +24,7 @@ module Gym
       FileUtils.mkdir_p(File.expand_path(Gym.config[:output_directory]))
 
       # Archive
-      if Gym.building_for_ios?
+      if Gym.building_for_ipa?
         fix_generic_archive unless Gym.project.watchos? # See https://github.com/fastlane/fastlane/pull/4325
         return BuildCommandGenerator.archive_path if Gym.config[:skip_package_ipa]
 
@@ -41,7 +41,7 @@ module Gym
           appstore_info_path = move_appstore_info
           generate_appstore_info(path) unless appstore_info_path
         end
-      elsif Gym.building_for_mac?
+      elsif Gym.building_for_pkg?
         path = File.expand_path(Gym.config[:output_directory])
         compress_and_move_dsym
         if Gym.project.mac_app? || Gym.building_mac_catalyst_for_mac?
