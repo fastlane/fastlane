@@ -143,6 +143,9 @@ public protocol GymfileProtocol: AnyObject {
     /// Sets a custom path for Swift Package Manager dependencies
     var clonedSourcePackagesPath: String? { get }
 
+    /// Sets a custom package cache path for Swift Package Manager dependencies
+    var packageCachePath: String? { get }
+
     /// Skips resolution of Swift Package Manager dependencies
     var skipPackageDependenciesResolution: Bool { get }
 
@@ -154,6 +157,9 @@ public protocol GymfileProtocol: AnyObject {
 
     /// Lets xcodebuild use a specified package authorization provider (keychain|netrc)
     var packageAuthorizationProvider: String? { get }
+
+    /// Generate AppStoreInfo.plist using swinfo for app-store exports
+    var generateAppstoreInfo: Bool { get }
 }
 
 public extension GymfileProtocol {
@@ -204,12 +210,14 @@ public extension GymfileProtocol {
     var skipProfileDetection: Bool { return false }
     var xcodebuildCommand: String { return "xcodebuild" }
     var clonedSourcePackagesPath: String? { return nil }
+    var packageCachePath: String? { return nil }
     var skipPackageDependenciesResolution: Bool { return false }
     var disablePackageAutomaticUpdates: Bool { return false }
     var useSystemScm: Bool { return false }
     var packageAuthorizationProvider: String? { return nil }
+    var generateAppstoreInfo: Bool { return false }
 }
 
 // Please don't remove the lines below
 // They are used to detect outdated files
-// FastlaneRunnerAPIVersion [0.9.141]
+// FastlaneRunnerAPIVersion [0.9.142]
