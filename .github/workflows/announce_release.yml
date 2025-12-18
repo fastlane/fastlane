@@ -41,7 +41,7 @@ jobs:
         id: release_version
         run: |
           if [ -f "release_tag.txt" ]; then
-            echo "version=$(cat release_tag/release_tag.txt)" >> "$GITHUB_OUTPUT"
+            echo "version=$(cat release_tag.txt)" >> "$GITHUB_OUTPUT"
           else
             echo "release_tag.txt not found in expected locations"
             exit 1
