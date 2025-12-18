@@ -17,4 +17,4 @@ public class Screengrabfile: ScreengrabfileProtocol {
     // during the `init` process, and you won't see this message
 }
 
-// Generated with fastlane 2.229.1
+// Generated with fastlane 2.230.0
