@@ -8,6 +8,8 @@ on:
     types:
       - completed
 permissions:
+  actions: read
+  contents: read
   issues: write
   pull-requests: write
 
@@ -21,7 +23,28 @@ jobs:
         uses: actions/checkout@v6
         with:
           ref: master
+
+      - name: Download release tag artifact
+        uses: actions/download-artifact@v7
+        with:
+          run-id: ${{ github.event.workflow_run.id }}
+          name: release_tag
+
+      - name: Extract version from artifact
+        id: release_version
+        run: |
+          if [ -f "release_tag/release_tag.txt" ]; then
+            echo "version=$(cat release_tag/release_tag.txt)" >> "$GITHUB_OUTPUT"
+          elif [ -f "release_tag.txt" ]; then
+            # Fallback in case the artifact was extracted directly in the workspace
+            echo "version=$(cat release_tag.txt)" >> "$GITHUB_OUTPUT"
+          else
+            echo "release_tag.txt not found in expected locations" >&2
+            exit 1
+          fi
+
       - name: Announce release on released pull requests
         uses: fastlane/github-actions/communicate-on-pull-request-released@latest
         with:
+          version: ${{ steps.release_version.outputs.version }}
           repo-token: ${{ secrets.GITHUB_TOKEN }}
