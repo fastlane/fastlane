@@ -38,10 +38,9 @@ jobs:
 
       - name: Extract version from artifact
         if: ${{ github.event_name == 'workflow_run' }}
-        id: release_version
         run: |
           if [ -f "release_tag.txt" ]; then
-            echo "version=$(cat release_tag.txt)" >> "$GITHUB_OUTPUT"
+            echo "FL_VERSION=$(cat release_tag.txt)" >> "$GITHUB_ENV"
           else
             echo "release_tag.txt not found in expected locations"
             exit 1
@@ -49,11 +48,10 @@ jobs:
 
       - name: Set version from workflow_dispatch input
         if: ${{ github.event_name == 'workflow_dispatch' }}
-        id: release_version
-        run: echo "version=${{ github.event.inputs.version }}" >> "$GITHUB_OUTPUT"
+        run: echo "FL_VERSION=${{ github.event.inputs.version }}" >> "$GITHUB_ENV"
 
       - name: Announce release on released pull requests
         uses: fastlane/github-actions/communicate-on-pull-request-released@latest
         with:
-          version: ${{ steps.release_version.outputs.version }}
+          version: ${{ env.FL_VERSION }}
           repo-token: ${{ secrets.GITHUB_TOKEN }}
