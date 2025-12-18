@@ -7,6 +7,11 @@ on:
       - master
     types:
       - completed
+  workflow_dispatch:
+    inputs:
+      version:
+        description: 'Version to announce'
+        required: true
 permissions:
   actions: read
   contents: read
@@ -25,23 +30,27 @@ jobs:
           ref: master
 
       - name: Download release tag artifact
+        if: ${{ github.event_name == 'workflow_run' }}
         uses: actions/download-artifact@v7
         with:
           run-id: ${{ github.event.workflow_run.id }}
           name: release_tag
 
       - name: Extract version from artifact
+        if: ${{ github.event_name == 'workflow_run' }}
         id: release_version
         run: |
-          if [ -f "release_tag/release_tag.txt" ]; then
+          if [ -f "release_tag.txt" ]; then
             echo "version=$(cat release_tag/release_tag.txt)" >> "$GITHUB_OUTPUT"
-          elif [ -f "release_tag.txt" ]; then
-            # Fallback in case the artifact was extracted directly in the workspace
-            echo "version=$(cat release_tag.txt)" >> "$GITHUB_OUTPUT"
           else
-            echo "release_tag.txt not found in expected locations" >&2
+            echo "release_tag.txt not found in expected locations"
             exit 1
           fi
+
+      - name: Set version from workflow_dispatch input
+        if: ${{ github.event_name == 'workflow_dispatch' }}
+        id: release_version
+        run: echo "version=${{ github.event.inputs.version }}" >> "$GITHUB_OUTPUT"
 
       - name: Announce release on released pull requests
         uses: fastlane/github-actions/communicate-on-pull-request-released@latest
