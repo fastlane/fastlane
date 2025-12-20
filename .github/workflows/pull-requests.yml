@@ -7,6 +7,9 @@ jobs:
   communicate-on-pull-request-merged:
     name: communicate on pull request merged
     runs-on: ubuntu-latest
+    permissions:
+      issues: write
+      pull-requests: write
     steps:
       - name: Communicate on PR merged
         if: github.event.pull_request.merged
