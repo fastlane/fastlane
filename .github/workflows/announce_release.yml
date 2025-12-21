@@ -22,27 +22,23 @@ jobs:
   announce-release-on-released-pull-requests:
     name: Announce release on released pull requests
     runs-on: ubuntu-latest
-    if: ${{ github.event.workflow_run.conclusion == 'success' }}
+    if: ${{ github.event.workflow_run.conclusion == 'success' || github.event_name == 'workflow_dispatch' }}
     steps:
-      - name: Checkout repository
-        uses: actions/checkout@v6
-        with:
-          ref: master
-
       - name: Download release tag artifact
         if: ${{ github.event_name == 'workflow_run' }}
         uses: actions/download-artifact@v7
         with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
           run-id: ${{ github.event.workflow_run.id }}
           name: release_tag
 
       - name: Extract version from artifact
         if: ${{ github.event_name == 'workflow_run' }}
         run: |
-          if [ -f "release_tag.txt" ]; then
-            echo "FL_VERSION=$(cat release_tag.txt)" >> "$GITHUB_ENV"
+          if [ -f "latest.txt" ]; then
+            echo "FL_VERSION=$(cat latest.txt)" >> "$GITHUB_ENV"
           else
-            echo "release_tag.txt not found in expected locations"
+            echo "latest.txt not found in expected locations"
             exit 1
           fi
 
