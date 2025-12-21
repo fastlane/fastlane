@@ -690,7 +690,7 @@ end
 
 desc "Confirm RubyGem credentials are set up correctly"
 private_lane :verify_ruby_gem_credentials do
-  UI.user_error!("You're not logged in RubyGems. Log in using `gem push` if using RubyGems < 2.7.0 or `gem signin` if using RubyGems >=2.7.0") unless File.file?(File.expand_path("~/.gem/credentials"))
+  UI.user_error!("You're not logged into RubyGems. Log in using `gem push` if using RubyGems < 2.7.0 or `gem signin` if using RubyGems >=2.7.0") unless File.file?(File.expand_path("~/.gem/credentials"))
 end
 
 desc "Build fastlane gem"
