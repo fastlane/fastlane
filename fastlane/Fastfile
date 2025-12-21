@@ -705,7 +705,7 @@ private_lane :build_fastlane_gem do |options|
       sh("bundle install")
     end
 
-    sh("rake install")
+    sh("rake", "install")
 
     # Ensure the file size of the fastlane gem is below 1.5 MB
     size_in_mb = File.size("pkg/fastlane-#{version}.gem").to_f / (1024 * 1024 * 1.5)
