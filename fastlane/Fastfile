@@ -351,10 +351,6 @@ lane :create_github_release do |options|
   # Verifying RubyGems version
   #
   version = local_version
-  old_version = current_version
-  if Gem::Version.new(version) <= Gem::Version.new(old_version)
-    UI.user_error!("Version number #{version} was already deployed")
-  end
 
   # Set the version into an ENV variable for GitHub Actions to read
   ENV['FASTLANE_RELEASE_VERSION'] = version
@@ -395,10 +391,6 @@ lane :create_github_release do |options|
     sleep(50) # GitHub rate limits are annoying
     download_github_release_gem(version: version)
   end
-
-  sh "gem push --key github --host https://rubygems.pkg.github.com/#{github_username} #{gem_path}" unless options[:skip_github_packages]
-
-  sh "gem push #{gem_path}" unless options[:skip_rubygems]
 end
 
 lane :publish_rubygems_from_github_release do |options|
