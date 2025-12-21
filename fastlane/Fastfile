@@ -90,8 +90,8 @@ lane :execute_tests do
   benchmark_help_command
 
   # Run the tests
+  build_fastlane_gem(version: version) unless File.file?("pkg/fastlane-#{version}.gem")
   Dir.chdir("..") do
-    build_fastlane_gem(version: version) unless File.file?("pkg/fastlane-#{version}.gem")
     sh("bundle", "exec", "rake", "test_all")
   end
 end
@@ -697,12 +697,20 @@ desc "Build fastlane gem"
 private_lane :build_fastlane_gem do |options|
   version = options[:version]
 
-  sh("bundle check || bundle install")
-  sh("rake install")
+  Dir.chdir("..") do
+    begin
+      sh("bundle check")
+    rescue => e
+      UI.message("bundle check failed (#{e.message.strip}), running bundle install")
+      sh("bundle install")
+    end
 
-  # Ensure the file size of the fastlane gem is below 1.5 MB
-  size_in_mb = File.size("pkg/fastlane-#{version}.gem").to_f / (1024 * 1024 * 1.5)
-  UI.user_error!("fastlane gem is above 1.5 MB, make sure no additional resources are included by mistake") if size_in_mb > 1
+    sh("rake install")
+
+    # Ensure the file size of the fastlane gem is below 1.5 MB
+    size_in_mb = File.size("pkg/fastlane-#{version}.gem").to_f / (1024 * 1024 * 1.5)
+    UI.user_error!("fastlane gem is above 1.5 MB, make sure no additional resources are included by mistake") if size_in_mb > 1
+  end
 end
 
 desc "Get the local version number per version.rb"
