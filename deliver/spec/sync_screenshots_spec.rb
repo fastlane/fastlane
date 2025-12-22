@@ -6,8 +6,6 @@ describe Deliver::SyncScreenshots do
 
     subject { described_class.new(app: nil, platform: nil) }
 
-    DisplayType = Spaceship::ConnectAPI::AppScreenshotSet::DisplayType
-
     before do
       # To emulate checksum calculation, return the given path as a checksum
       allow(Deliver::ScreenshotComparable).to receive(:calculate_checksum) { |path| path }
@@ -20,10 +18,10 @@ describe Deliver::SyncScreenshots do
     context 'ASC has nothing and going to add screenshots' do
       let(:screenshots) do
         [
-          mock_screenshot(path: '5.5_1.jpg', screen_size: Deliver::AppScreenshot::ScreenSize::IOS_55),
-          mock_screenshot(path: '5.5_2.jpg', screen_size: Deliver::AppScreenshot::ScreenSize::IOS_55),
-          mock_screenshot(path: '6.5_1.jpg', screen_size: Deliver::AppScreenshot::ScreenSize::IOS_65),
-          mock_screenshot(path: '6.5_2.jpg', screen_size: Deliver::AppScreenshot::ScreenSize::IOS_65)
+          mock_screenshot(path: '5.5_1.jpg', display_type: Deliver::AppScreenshot::DisplayType::APP_IPHONE_55),
+          mock_screenshot(path: '5.5_2.jpg', display_type: Deliver::AppScreenshot::DisplayType::APP_IPHONE_55),
+          mock_screenshot(path: '6.5_1.jpg', display_type: Deliver::AppScreenshot::DisplayType::APP_IPHONE_65),
+          mock_screenshot(path: '6.5_2.jpg', display_type: Deliver::AppScreenshot::DisplayType::APP_IPHONE_65)
         ]
       end
 
@@ -53,10 +51,10 @@ describe Deliver::SyncScreenshots do
     context 'ASC has a screenshot on each screenshot set and going to add another screenshot' do
       let(:screenshots) do
         [
-          mock_screenshot(path: '5.5_1.jpg', screen_size: Deliver::AppScreenshot::ScreenSize::IOS_55),
-          mock_screenshot(path: '5.5_2.jpg', screen_size: Deliver::AppScreenshot::ScreenSize::IOS_55),
-          mock_screenshot(path: '6.5_1.jpg', screen_size: Deliver::AppScreenshot::ScreenSize::IOS_65),
-          mock_screenshot(path: '6.5_2.jpg', screen_size: Deliver::AppScreenshot::ScreenSize::IOS_65)
+          mock_screenshot(path: '5.5_1.jpg', display_type: Deliver::AppScreenshot::DisplayType::APP_IPHONE_55),
+          mock_screenshot(path: '5.5_2.jpg', display_type: Deliver::AppScreenshot::DisplayType::APP_IPHONE_55),
+          mock_screenshot(path: '6.5_1.jpg', display_type: Deliver::AppScreenshot::DisplayType::APP_IPHONE_65),
+          mock_screenshot(path: '6.5_2.jpg', display_type: Deliver::AppScreenshot::DisplayType::APP_IPHONE_65)
         ]
       end
 
@@ -126,10 +124,10 @@ describe Deliver::SyncScreenshots do
 
       let(:screenshots) do
         [
-          mock_screenshot(path: '5.5_1.jpg', screen_size: Deliver::AppScreenshot::ScreenSize::IOS_55),
-          mock_screenshot(path: '5.5_2_improved.jpg', screen_size: Deliver::AppScreenshot::ScreenSize::IOS_55),
-          mock_screenshot(path: '6.5_1.jpg', screen_size: Deliver::AppScreenshot::ScreenSize::IOS_65),
-          mock_screenshot(path: '6.5_2_improved.jpg', screen_size: Deliver::AppScreenshot::ScreenSize::IOS_65)
+          mock_screenshot(path: '5.5_1.jpg', display_type: Deliver::AppScreenshot::DisplayType::APP_IPHONE_55),
+          mock_screenshot(path: '5.5_2_improved.jpg', display_type: Deliver::AppScreenshot::DisplayType::APP_IPHONE_55),
+          mock_screenshot(path: '6.5_1.jpg', display_type: Deliver::AppScreenshot::DisplayType::APP_IPHONE_65),
+          mock_screenshot(path: '6.5_2_improved.jpg', display_type: Deliver::AppScreenshot::DisplayType::APP_IPHONE_65)
         ]
       end
 
@@ -194,12 +192,12 @@ describe Deliver::SyncScreenshots do
       screenshot
     end
 
-    def mock_screenshot(path: '/path/to/screenshot', language: 'en-US', screen_size: Deliver::AppScreenshot::ScreenSize::IOS_55)
+    def mock_screenshot(path: '/path/to/screenshot', language: 'en-US', display_type: Deliver::AppScreenshot::DisplayType::APP_IPHONE_55)
       screenshot = double(
         'Deliver::AppScreenshot',
         path: path,
         language: language,
-        device_type: screen_size
+        display_type: display_type
       )
       allow(screenshot).to receive(:kind_of?).with(Deliver::AppScreenshot).and_return(true)
       screenshot
