@@ -414,7 +414,7 @@ the developer website<a/>.<br />"
           teamId: "XXXXXXXXXX"
         }
 
-        response = subject.create_key!(name: "Test Key", service_configs: apns_service_configs)
+        subject.create_key!(name: "Test Key", service_configs: apns_service_configs)
         expect(WebMock).to have_requested(:post, api_root + '/v2/create').
           with(body: expected_params.to_json, headers: { 'Content-Type' => 'application/json' })
       end
@@ -438,7 +438,7 @@ the developer website<a/>.<br />"
           teamId: "XXXXXXXXXX"
         }
 
-        response = subject.create_key!(name: "Test Key", service_configs: device_check_service_configs)
+        subject.create_key!(name: "Test Key", service_configs: device_check_service_configs)
         expect(WebMock).to have_requested(:post, api_root + '/v2/create').
           with(body: expected_params.to_json, headers: { 'Content-Type' => 'application/json' })
       end
@@ -466,7 +466,7 @@ the developer website<a/>.<br />"
           teamId: "XXXXXXXXXX"
         }
 
-        response = subject.create_key!(name: "Test Key", service_configs: music_kit_service_configs)
+        subject.create_key!(name: "Test Key", service_configs: music_kit_service_configs)
         expect(WebMock).to have_requested(:post, api_root + '/v2/create').
           with(body: expected_params.to_json, headers: { 'Content-Type' => 'application/json' })
       end
