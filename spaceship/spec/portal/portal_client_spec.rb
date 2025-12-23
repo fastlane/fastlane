@@ -448,7 +448,7 @@ the developer website<a/>.<br />"
           Spaceship::Portal::Key::MUSIC_KIT_ID => {
             identifiers: {
               music: ["4H4P58CJTN"]
-            },
+            }
           }
         }
 
@@ -460,7 +460,7 @@ the developer website<a/>.<br />"
               isNew: true,
               identifiers: {
                 music: ["4H4P58CJTN"]
-              },
+              }
             }
           ],
           teamId: "XXXXXXXXXX"
