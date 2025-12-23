@@ -1,5 +1,5 @@
 // ScanfileProtocol.swift
-// Copyright (c) 2024 FastlaneTools
+// Copyright (c) 2025 FastlaneTools
 
 public protocol ScanfileProtocol: AnyObject {
     /// Path to the workspace file
@@ -44,10 +44,10 @@ public protocol ScanfileProtocol: AnyObject {
     /// The bundle identifier of the app to uninstall (only needed when enabling reinstall_app)
     var appIdentifier: String? { get }
 
-    /// Array of strings matching Test Bundle/Test Suite/Test Cases to run
+    /// Array of test identifiers to run. Expected format: TestTarget[/TestSuite[/TestCase]]
     var onlyTesting: String? { get }
 
-    /// Array of strings matching Test Bundle/Test Suite/Test Cases to skip
+    /// Array of test identifiers to skip. Expected format: TestTarget[/TestSuite[/TestCase]]
     var skipTesting: String? { get }
 
     /// The testplan associated with the scheme that should be used for testing
@@ -221,6 +221,9 @@ public protocol ScanfileProtocol: AnyObject {
     /// Sets a custom path for Swift Package Manager dependencies
     var clonedSourcePackagesPath: String? { get }
 
+    /// Sets a custom package cache path for Swift Package Manager dependencies
+    var packageCachePath: String? { get }
+
     /// Skips resolution of Swift Package Manager dependencies
     var skipPackageDependenciesResolution: Bool { get }
 
@@ -314,6 +317,7 @@ public extension ScanfileProtocol {
     var customReportFileName: String? { return nil }
     var xcodebuildCommand: String { return "env NSUnbufferedIO=YES xcodebuild" }
     var clonedSourcePackagesPath: String? { return nil }
+    var packageCachePath: String? { return nil }
     var skipPackageDependenciesResolution: Bool { return false }
     var disablePackageAutomaticUpdates: Bool { return false }
     var useSystemScm: Bool { return false }
@@ -324,4 +328,4 @@ public extension ScanfileProtocol {
 
 // Please don't remove the lines below
 // They are used to detect outdated files
-// FastlaneRunnerAPIVersion [0.9.140]
+// FastlaneRunnerAPIVersion [0.9.147]
