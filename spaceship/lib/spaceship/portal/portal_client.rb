@@ -787,7 +787,7 @@ module Spaceship
             serviceId: service_id,
             isNew: true,
             identifiers: configs[:identifiers] || {},
-            }
+          }
         elsif service_id == Spaceship::Portal::Key::DEVICE_CHECK_ID
           {
             serviceId: service_id,
