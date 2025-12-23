@@ -1,33 +1,32 @@
 # Developer Portal API
 
-- [Developer Portal API](#developer-portal-api)
-  - [Usage](#usage)
-    - [Login](#login)
-    - [Apps](#apps)
-      - [App Services](#app-services)
-    - [App Groups](#app-groups)
-    - [iCloud Containers](#icloud-containers)
-    - [Apple Pay Merchants](#apple-pay-merchants)
-    - [Passbook](#passbook)
-    - [Certificates](#certificates)
-      - [Code Signing Certificates](#code-signing-certificates)
-      - [Push Certificates](#push-certificates)
-      - [Create a Certificate](#create-a-certificate)
-    - [Authentication Keys](#authentication-keys)
-      - [APNS (Apple Push Notification Service)](#apns-apple-push-notification-service)
-      - [MusicKit](#musickit)
-      - [DeviceCheck](#devicecheck)
-      - [Service Configuration Details](#service-configuration-details)
-    - [Provisioning Profiles](#provisioning-profiles)
-      - [Receiving profiles](#receiving-profiles)
-      - [Create a Provisioning Profile](#create-a-provisioning-profile)
-      - [Repair all broken provisioning profiles](#repair-all-broken-provisioning-profiles)
-    - [Devices](#devices)
-    - [Enterprise](#enterprise)
-    - [Multiple Spaceships](#multiple-spaceships)
-    - [More cool things you can do](#more-cool-things-you-can-do)
-    - [Example Data](#example-data)
-  - [License](#license)
+- [Usage](#usage)
+  - [Login](#login)
+  - [Apps](#apps)
+    - [App Services](#app-services)
+  - [App Groups](#app-groups)
+  - [iCloud Containers](#icloud-containers)
+  - [Apple Pay Merchants](#apple-pay-merchants)
+  - [Passbook](#passbook)
+  - [Certificates](#certificates)
+    - [Code Signing Certificates](#code-signing-certificates)
+    - [Push Certificates](#push-certificates)
+    - [Create a Certificate](#create-a-certificate)
+  - [Authentication Keys](#authentication-keys)
+    - [APNS (Apple Push Notification Service)](#apns-apple-push-notification-service)
+    - [MusicKit](#musickit)
+    - [DeviceCheck](#devicecheck)
+    - [Service Configuration Details](#service-configuration-details)
+  - [Provisioning Profiles](#provisioning-profiles)
+    - [Receiving profiles](#receiving-profiles)
+    - [Create a Provisioning Profile](#create-a-provisioning-profile)
+    - [Repair all broken provisioning profiles](#repair-all-broken-provisioning-profiles)
+  - [Devices](#devices)
+  - [Enterprise](#enterprise)
+  - [Multiple Spaceships](#multiple-spaceships)
+  - [More cool things you can do](#more-cool-things-you-can-do)
+  - [Example Data](#example-data)
+- [License](#license)
 
 ## Usage
 
@@ -35,7 +34,7 @@ To quickly play around with _spaceship_ launch `irb` in your terminal and execut
 
 ### Login
 
-_Note_: If you use both the Developer Portal and App Store Connect API, you'll have to login on both, as the user might have different user credentials.
+*Note*: If you use both the Developer Portal and App Store Connect API, you'll have to login on both, as the user might have different user credentials.
 
 ```ruby
 Spaceship::Portal.login("felix@krausefx.com", "password")
