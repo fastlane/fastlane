@@ -422,7 +422,7 @@ the developer website<a/>.<br />"
       it 'creates a key with DEVICE_CHECK service' do
         device_check_service_configs = {
           Spaceship::Portal::Key::DEVICE_CHECK_ID => {
-            identifiers: {},
+            identifiers: {}
           }
         }
 
@@ -432,7 +432,7 @@ the developer website<a/>.<br />"
             {
               serviceId: Spaceship::Portal::Key::DEVICE_CHECK_ID,
               isNew: true,
-              identifiers: {},
+              identifiers: {}
             }
           ],
           teamId: "XXXXXXXXXX"
