@@ -22,6 +22,10 @@ describe Deliver::DetectValues do
         it 'sets up metadata folder in fastlane folder' do
           expect(options[:metadata_path]).to eq('./fastlane/metadata')
         end
+
+        it 'sets up app previews folder in fastlane folder' do
+          expect(options[:app_previews_path]).to eq('./fastlane/app-previews')
+        end
       end
 
       describe 'running without fastlane' do
@@ -38,11 +42,15 @@ describe Deliver::DetectValues do
         it 'sets up metadata folder in current folder' do
           expect(options[:metadata_path]).to eq('./metadata')
         end
+
+        it 'sets up app previews folder in current folder' do
+          expect(options[:app_previews_path]).to eq('./app-previews')
+        end
       end
     end
 
     describe 'when folders are specified in options' do
-      let(:options) { { screenshots_path: './screenshots', metadata_path: './metadata' } }
+      let(:options) { { screenshots_path: './screenshots', metadata_path: './metadata', app_previews_path: './app-previews' } }
 
       it 'keeps the specified screenshots folder' do
         expect(options[:screenshots_path]).to eq('./screenshots')
@@ -50,6 +58,10 @@ describe Deliver::DetectValues do
 
       it 'keeps the specified metadata folder' do
         expect(options[:metadata_path]).to eq('./metadata')
+      end
+
+      it 'keeps the specified app previews folder' do
+        expect(options[:app_previews_path]).to eq('./app-previews')
       end
     end
   end

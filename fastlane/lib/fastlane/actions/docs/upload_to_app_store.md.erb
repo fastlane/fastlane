@@ -2,7 +2,7 @@
   <img src="/img/actions/deliver.png" width="250">
 </p>
 
-_deliver_ uploads screenshots, metadata and binaries to App Store Connect. Use _deliver_ to submit your app for App Store review.
+_deliver_ uploads screenshots, App Preview videos, metadata and binaries to App Store Connect. Use _deliver_ to submit your app for App Store review.
 
 -------
 
@@ -18,7 +18,7 @@ _deliver_ uploads screenshots, metadata and binaries to App Store Connect. Use _
 <h5 align="center"><code>deliver</code> is part of <a href="https://fastlane.tools">fastlane</a>: The easiest way to automate beta deployments and releases for your iOS and Android apps.</h5>
 
 # Features
-- Upload hundreds of localized screenshots completely automatically
+- Upload hundreds of localized screenshots and App Preview videos completely automatically
 - Upload a new ipa/pkg file to App Store Connect without Xcode from any Mac
 - Maintain your app metadata locally and push changes back to App Store Connect
 - Easily implement a real Continuous Deployment process using [_fastlane_](https://fastlane.tools)
@@ -42,13 +42,13 @@ From now on, you can run `fastlane deliver` to deploy a new update, or just uplo
 
 # Usage
 
-Check out your local `./fastlane/metadata` and `./fastlane/screenshots` folders (if you don't use [_fastlane_](https://fastlane.tools) it's `./metadata` instead)
+Check out your local `./fastlane/metadata`, `./fastlane/screenshots`, and `./fastlane/app-previews` folders (if you don't use [_fastlane_](https://fastlane.tools) it's `./metadata` instead)
 
 ![/img/actions/deliver_metadata.png](/img/actions/deliver_metadata.png)
 
 You'll see your metadata from App Store Connect. Feel free to store the metadata in git (not the screenshots). You can now modify it locally and push the changes back to App Store Connect.
 
-Run `fastlane deliver` to upload the app metadata from your local machine
+Run `fastlane deliver` to upload the app metadata, screenshots, and App Preview videos from your local machine
 
 ```no-highlight
 fastlane deliver
@@ -174,6 +174,19 @@ submit_for_review(true)
 A path to a folder containing subfolders for each language. This will automatically detect the device type based on the image resolution. Also includes  Watch Support.
 
 ![/img/actions/deliver_screenshots.png](/img/actions/deliver_screenshots.png)
+
+##### app_previews_path
+Path to the App Preview videos you want to upload. The folder must be structured with language-specific subfolders, similar to screenshots:
+
+![/img/actions/deliver_app-previews.png](/img/actions/deliver_app-previews.png)
+
+Up to 3 videos per locale and per device type are uploaded, then ordered by filename. Device type is inferred from the filename (case insensitive):
+
+```no-highlight
+<%= Spaceship::ConnectAPI::AppPreviewSet::PreviewType::ALL.join(', ') %>
+```
+
+A preview poster frame is set using `preview_frame_time_code`.
 
 ##### metadata_path
 Path to the metadata you want to use. The folder has to be structured like this
