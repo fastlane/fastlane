@@ -335,6 +335,27 @@ BODY
         subject.do_sirp("user", "password", nil)
       end.to raise_error(Spaceship::Client::UnexpectedResponse, /Expected JSON response, but got String/)
     end
+
+    it "raises Spaceship::UnexpectedResponse when body contains serviceErrors" do
+      response_body = {
+        "iteration" => 0,
+        "serviceErrors" => [
+          {
+            "code" => "-900007",
+            "suppressDismissal" => false
+          }
+        ]
+      }
+
+      stub_request(:post, "https://idmsa.apple.com/appleauth/auth/signin/init").
+        to_return(status: 200, body: response_body.to_json, headers: { 'Content-Type' => 'application/json' })
+
+      allow(subject).to receive(:itc_service_key).and_return("fake_service_key")
+
+      expect do
+        subject.do_sirp("user", "password", nil)
+      end.to raise_error(Spaceship::Client::UnexpectedResponse)
+    end
   end
 
   describe "#log_response" do

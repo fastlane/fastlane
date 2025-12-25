@@ -480,6 +480,10 @@ module Spaceship
         raise UnexpectedResponse, "Expected JSON response, but got #{body.class}: #{body.to_s[0..1000]}"
       end
 
+      if body["serviceErrors"]
+        raise UnexpectedResponse, body
+      end
+
       iterations = body["iteration"]
       salt = Base64.strict_decode64(body["salt"])
       b = Base64.strict_decode64(body["b"])
