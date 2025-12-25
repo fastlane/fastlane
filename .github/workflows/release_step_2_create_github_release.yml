@@ -58,5 +58,5 @@ jobs:
     - uses: actions/upload-artifact@v6
       with:
         name: release_tag
-        path: latest.txt
+        path: latest_fl_version.txt
         retention-days: 1
