@@ -9,6 +9,7 @@ PATH
       aws-sdk-s3 (~> 1.0)
       babosa (>= 1.0.3, < 2.0.0)
       base64 (~> 0.2.0)
+      benchmark (>= 0.1.0)
       bundler (>= 1.12.0, < 3.0.0)
       colored (~> 1.2)
       commander (~> 4.6)
@@ -37,6 +38,7 @@ PATH
       naturally (~> 2.2)
       nkf (~> 0.2.0)
       optparse (>= 0.1.1, < 1.0.0)
+      ostruct (>= 0.1.0)
       plist (>= 3.1.0, < 4.0.0)
       rubyzip (>= 2.0.0, < 3.0.0)
       security (= 0.1.5)
@@ -81,6 +83,7 @@ GEM
       aws-eventstream (~> 1, >= 1.0.2)
     babosa (1.0.4)
     base64 (0.2.0)
+    benchmark (0.5.0)
     bigdecimal (3.1.8)
     binding_of_caller (0.8.0)
       debug_inspector (>= 0.0.1)
@@ -235,6 +238,7 @@ GEM
     openssl (3.1.3)
     optparse (0.4.0)
     os (1.1.4)
+    ostruct (0.6.3)
     ox (2.14.14)
     parallel (1.23.0)
     parser (3.2.2.3)
@@ -385,6 +389,7 @@ PLATFORMS
   ruby
 
 DEPENDENCIES
+  benchmark
   climate_control (~> 0.2.0)
   coveralls (~> 0.8.13)
   danger (~> 8.0)
@@ -396,6 +401,7 @@ DEPENDENCIES
   fastlane-plugin-slack_train (>= 0.2.0)
   mime-types (>= 1.16, < 4.0)
   openssl (>= 3.1.2, != 3.3.0, != 3.2.1, != 3.2.0)
+  ostruct
   ox (= 2.14.14)
   pry
   pry-byebug
