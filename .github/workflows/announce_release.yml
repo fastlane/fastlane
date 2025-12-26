@@ -7,7 +7,14 @@ on:
       - master
     types:
       - completed
+  workflow_dispatch:
+    inputs:
+      version:
+        description: 'Version to announce'
+        required: true
 permissions:
+  actions: read
+  contents: read
   issues: write
   pull-requests: write
 
@@ -15,13 +22,31 @@ jobs:
   announce-release-on-released-pull-requests:
     name: Announce release on released pull requests
     runs-on: ubuntu-latest
-    if: ${{ github.event.workflow_run.conclusion == 'success' }}
+    if: ${{ github.event.workflow_run.conclusion == 'success' || github.event_name == 'workflow_dispatch' }}
     steps:
-      - name: Checkout repository
-        uses: actions/checkout@v6
+      - name: Download release tag artifact
+        if: ${{ github.event_name == 'workflow_run' }}
+        uses: actions/download-artifact@v7
         with:
-          ref: master
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          run-id: ${{ github.event.workflow_run.id }}
+          name: release_tag
+
+      - name: Extract version from artifact
+        if: ${{ github.event_name == 'workflow_run' }}
+        run: |
+          if [ ! -f "latest_fl_version.txt" ]; then
+            echo "latest_fl_version.txt not found in expected locations"
+            exit 1
+          fi
+          echo "FL_VERSION=$(cat latest_fl_version.txt)" >> "$GITHUB_ENV"
+
+      - name: Set version from workflow_dispatch input
+        if: ${{ github.event_name == 'workflow_dispatch' }}
+        run: echo "FL_VERSION=${{ github.event.inputs.version }}" >> "$GITHUB_ENV"
+
       - name: Announce release on released pull requests
         uses: fastlane/github-actions/communicate-on-pull-request-released@latest
         with:
+          version: ${{ env.FL_VERSION }}
           repo-token: ${{ secrets.GITHUB_TOKEN }}
