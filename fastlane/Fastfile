@@ -12,7 +12,9 @@ end
 
 desc "Verifies all tests pass and the current state of the repo is valid"
 lane :validate_repo do
+  version = local_version
   lint_source
+  build_fastlane_gem(version: version)
   execute_tests
   validate_docs
   ensure_tool_name_formatting
@@ -87,17 +89,10 @@ lane :execute_tests do
 
   benchmark_help_command
 
+  # Run the tests
+  build_fastlane_gem(version: version) unless File.file?("pkg/fastlane-#{version}.gem")
   Dir.chdir("..") do
-    # Install the bundle and the actual gem
-    sh("bundle check || bundle install")
-    sh("rake install")
-
-    # Ensure the file size of the fastlane gem is below 1.5 MB
-    size_in_mb = File.size("pkg/fastlane-#{version}.gem").to_f / (1024 * 1024 * 1.5)
-    UI.user_error!("fastlane gem is above 1.5 MB, make sure no additional resources are included by mistake") if size_in_mb > 1
-
-    # Run the tests
-    sh("bundle exec rake test_all")
+    sh("bundle", "exec", "rake", "test_all")
   end
 end
 
@@ -108,7 +103,8 @@ lane :bump do |options|
   bump_type = options[:bump_type]
   is_automated_bump = !bump_type.nil?
 
-  verify_env_variables(skip_ruby_gems: is_automated_bump)
+  verify_env_variables
+  verify_ruby_gem_credentials unless is_automated_bump
   ensure_git_branch(branch: "master")
   ensure_git_status_clean
 
@@ -240,107 +236,6 @@ lane :generate_fastlane_swift_runner_manifest do |options|
   manifest_path
 end
 
-desc "Does everything that's needed for a release"
-desc "This includes running tests and verifying the GitHub release"
-lane :release do
-  verify_env_variables
-  slack_train_start(distance: 2,
-                       train: "🚀",
-           reverse_direction: true,
-                        rail: "✨")
-
-  update_fastlane
-  slack_train
-
-  # Git verification
-  #
-  ensure_git_status_clean
-  ensure_git_branch(branch: 'master')
-  git_pull
-
-  validate_repo
-
-  # Verifying RubyGems version
-  #
-  version = local_version
-  old_version = current_version
-  puts("Deploying #{version}")
-  if Gem::Version.new(version) <= Gem::Version.new(old_version)
-    UI.user_error!("Version number #{version} was already deployed")
-  end
-
-  # Then push to git remote
-  #
-  push_to_git_remote
-
-  # Preparing GitHub Release
-  #
-  github_release = get_github_release(url: "fastlane/fastlane", version: version)
-  if (github_release || {}).fetch('body', '').length == 0
-    show_changelog(old_version: old_version)
-
-    title = prompt(text: 'Title: ')
-    description = prompt(text: "Please enter a changelog (make sure to rephrase changes to make it easy to understand, and remove non-important changes that don't affect the end-user): ",
-                         multi_line_end_keyword: "END")
-
-    github_release = set_github_release(
-      repository_name: "fastlane/fastlane",
-      name: [version, title].join(" "),
-      tag_name: version,
-      description: description,
-      is_draft: false
-    )
-
-    # Actual release of the gem
-    # Using IO.popen because `gem push` will prompt for 2FA if enabled
-    #
-    command = "gem push ../pkg/fastlane-#{version}.gem"
-    IO.popen(command) do |io|
-      io.each do |line|
-        puts(line)
-      end
-    end
-
-    release_url = github_release['html_url']
-
-    message = [title, description, release_url].join("\n\n")
-    add_fastlane_git_tag(tag: "fastlane/#{version}", message: message)
-  end
-
-  # After publishing
-  #
-  if ENV['SLACK_URL']
-    release_notes = github_release['body']
-    # markup - turn github references into links
-    release_notes.gsub!(/\(#([0-9]+)\)/, '(<https://github.com/fastlane/fastlane/issues/\1|#\1>)')
-    slack_message = "Successfully released [fastlane #{version}](#{release_url}) :rocket:"
-    slack(
-      channel: "releases",
-      default_payloads: [],
-      message: slack_message,
-      payload: {
-        "New" => release_notes
-      }
-    )
-    slack(channel: "action", default_payloads: [], message: slack_message)
-  end
-
-  clubmate
-
-  puts("You can now tweet:".green)
-  releases_url = "https://github.com/fastlane/fastlane/releases/tag/#{version}"
-  puts("[fastlane] #{github_release['name']} #{releases_url}")
-
-  send_mac_app_ci_reminder
-
-  update_docs(version: version)
-
-  release_brew
-  release_github
-
-  slack_train
-end
-
 desc "Creates a GitHub release with the gem as an asset"
 lane :create_github_release do |options|
   # Git verification
@@ -398,14 +293,6 @@ lane :create_github_release do |options|
   sh "gem push #{gem_path}" unless options[:skip_rubygems]
 end
 
-lane :publish_rubygems_from_github_release do |options|
-
-end
-
-lane :publish_github_packages_from_github_release do |options|
-
-end
-
 lane :download_github_release_gem do |options|
   require 'open-uri'
 
@@ -433,28 +320,6 @@ lane :download_github_release_gem do |options|
   end
 
   file_path
-end
-
-lane :release_brew do
-  version = local_version
-  sh("cd .. && brew update && brew bump-formula-pr fastlane --force --url=https://github.com/fastlane/fastlane/archive/refs/tags/#{version}.tar.gz")
-end
-
-lane :release_github do
-  version = local_version
-  sh("cd .. &&gem push --key github --host https://rubygems.pkg.github.com/fastlane pkg/fastlane-#{version}.gem")
-end
-
-desc "Notifies Fabric Slack to run CI Job for Mac App"
-private_lane :send_mac_app_ci_reminder do
-  if ENV['FABRIC_SLACK_URL']
-    slack(
-      slack_url: ENV['FABRIC_SLACK_URL'],
-      channel: 'deployment-tools',
-      default_payloads: [],
-      message: "Please run the Fastlane Mac App Package CI job in TeamCity\n#{ENV['FABRIC_MAC_APP_CI_JOB_URL']}"
-    )
-  end
 end
 
 desc "Generate changelog from GitHub compare and PR data for mentioning GitHub usernames in release notes"
@@ -580,7 +445,7 @@ lane :update_docs do |options|
   puts("Starting docs update for version #{version} 🚀")
 
   unless debug
-    verify_env_variables(skip_ruby_gems: true)
+    verify_env_variables
     ensure_actions_config_items_formatting
   end
 
@@ -688,11 +553,32 @@ end
 
 desc "Ensure all the requirement environment variables are provided"
 desc "this way the deployment script will fail early (and often)"
-private_lane :verify_env_variables do |options|
+private_lane :verify_env_variables do
   ensure_env_vars(env_vars: ['GITHUB_USER_NAME', 'GITHUB_API_TOKEN'])
+end
 
-  unless options[:skip_ruby_gems]
-    UI.user_error!("You're not logged in RubyGems. Log in using `gem push` if using RubyGems < 2.7.0 or `gem signin` if using RubyGems >=2.7.0") unless File.file?(File.expand_path("~/.gem/credentials"))
+desc "Confirm RubyGem credentials are set up correctly"
+private_lane :verify_ruby_gem_credentials do
+  UI.user_error!("You're not logged in to RubyGems. Log in using `gem push` if using RubyGems < 2.7.0 or `gem signin` if using RubyGems >=2.7.0") unless File.file?(File.expand_path("~/.gem/credentials"))
+end
+
+desc "Builds the fastlane gem"
+private_lane :build_fastlane_gem do |options|
+  version = options[:version]
+
+  Dir.chdir("..") do
+    begin
+      sh("bundle check")
+    rescue => e
+      UI.message("bundle check failed (#{e.message.strip}), running bundle install")
+      sh("bundle install")
+    end
+
+    sh("rake", "install")
+
+    # Ensure the file size of the fastlane gem is below 1.5 MB
+    size_in_mb = File.size("pkg/fastlane-#{version}.gem").to_f / (1024 * 1024 * 1.5)
+    UI.user_error!("fastlane gem is above 1.5 MB, make sure no additional resources are included by mistake") if size_in_mb > 1
   end
 end
 
