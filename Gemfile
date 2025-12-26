@@ -5,6 +5,8 @@ require_relative "fastlane/lib/fastlane/version.rb"
 
 # Please keep all gems and their comments together without empty lines, so RuboCop can sort them alphabetically.
 
+# Benchmark was removed from Ruby's standard library in Ruby 4.0+.
+gem "benchmark"
 # Allows fine-grained control of environment variables.
 gem "climate_control", "~> 0.2.0"
 # A tool for integrating Coveralls.io with Ruby apps.
@@ -28,6 +30,8 @@ gem "openssl",
     "!= 3.2.0",
     "!= 3.2.1",
     "!= 3.3.0"
+# OpenStruct was removed from Ruby's standard library in Ruby 4.0+.
+gem "ostruct"
 # Fast XML parser and object marshaller.
 # Version 2.14.15+ requires Ruby >=2.7, while fastlane uses a `required_ruby_version` of `>= 2.6`.
 gem "ox", "2.14.14"
