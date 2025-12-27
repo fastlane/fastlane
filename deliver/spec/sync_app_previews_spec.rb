@@ -356,9 +356,7 @@ describe Deliver::SyncAppPreviews do
     error_message = "mocked error message"
     write_preview_file(locale: locale, name: "#{device}_1.mp4", bytes: "some-video")
 
-    # re-mock the Spaceship API to forcibly raise err on upload
-    uploaded_files_by_locale_and_type = Hash.new { |h, k| h[k] = Hash.new { |hh, kk| hh[kk] = [] } }
-    existing_sets = {}
+    # redo the mocks on Spaceship API to forcibly raise err on upload
     version = double("AppStoreVersion")
     allow(app).to receive(:get_edit_app_store_version).with(platform: platform).and_return(version)
     loc = double("Localization-#{locale}", locale: locale)

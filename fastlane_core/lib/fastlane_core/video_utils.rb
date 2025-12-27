@@ -145,11 +145,12 @@ module FastlaneCore
       return nil unless video_flags && video_flags.length == 4
       version = video_flags.getbyte(0)
       if version == 1
-        skip(io, 8 * 3) # creation, modification, track id (u32 each) but 64-bit times
+        skip(io, 8 * 2) # creation, modification (u64)
+        skip(io, 4)     # track id (u32)
         skip(io, 4)     # reserved
         skip(io, 8)     # duration (u64)
       else
-        skip(io, 4 * 3) # creation, modification, track id
+        skip(io, 4 * 3) # creation, modification, track id (u32)
         skip(io, 4)     # reserved
         skip(io, 4)     # duration (u32)
       end
