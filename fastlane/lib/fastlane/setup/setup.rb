@@ -116,7 +116,7 @@ module Fastlane
       else
         UI.error("No iOS or Android projects were found in directory '#{Dir.pwd}'")
         UI.error("Make sure to `cd` into the directory containing your iOS or Android app")
-        if UI.confirm("Alternatively, would you like to manually setup a fastlane config in the current directory instead?")
+        if UI.confirm("Alternatively, would you like to manually set up a fastlane config in the current directory instead?")
           SetupIos.new(
             is_swift_fastfile: is_swift_fastfile,
             user: user,
