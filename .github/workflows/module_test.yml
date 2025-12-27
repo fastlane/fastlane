@@ -19,7 +19,7 @@ jobs:
     strategy:
       matrix:
         os: [ubuntu-latest, macos-latest, windows-latest]
-        ruby: ['3.3', '3.4']
+        ruby: ['3.3', '3.4', '4.0']
     runs-on: ${{ matrix.os }}
     steps:
       - uses: actions/checkout@v6
