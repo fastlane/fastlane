@@ -23,15 +23,15 @@ module Deliver
       localizations = editable_version.get_app_store_version_localizations
       locale_by_code = localizations.each_with_object({}) { |l, h| h[l.locale] = l }
 
-      video_paths_per_locale = discover_videos(@app_previews_path)
-      if video_paths_per_locale.empty?
+      video_previews_per_locale = discover_videos(@app_previews_path)
+      if video_previews_per_locale.empty?
         UI.message("No preview videos found under '#{@app_previews_path}'.")
         return
       end
 
       jobs = []
-      video_paths_per_locale.each do |locale, paths|
-        process_locale_videos(locale: locale, paths: paths, locale_by_code: locale_by_code, jobs: jobs)
+      video_previews_per_locale.each do |locale, previews|
+        process_locale_videos(locale: locale, previews: previews, locale_by_code: locale_by_code, jobs: jobs)
       end
 
       if jobs.empty?
@@ -39,7 +39,7 @@ module Deliver
         return
       end
 
-      UI.message("Queueing #{jobs.size} preview video upload job(s) across #{video_paths_per_locale.keys.size} locale(s)...")
+      UI.message("Queueing #{jobs.size} preview video upload job(s) across #{video_previews_per_locale.keys.size} locale(s)...")
 
       upload_errors = []
       worker = FastlaneCore::QueueWorker.new do |job|
@@ -75,8 +75,8 @@ module Deliver
 
     private
 
-    # process videos for a single locale: infer the types, enforce limits, create/reuse sets, enqueue upload jobs
-    def process_locale_videos(locale:, paths:, locale_by_code:, jobs:)
+    # process videos for a single locale: enforce limits, create/reuse sets, enqueue upload jobs
+    def process_locale_videos(locale:, previews:, locale_by_code:, jobs:)
       localization = locale_by_code[locale]
       unless localization
         UI.important("Locale '#{locale}' does not exist on App Store Connect for this version. Skipping its videos.")
@@ -95,16 +95,9 @@ module Deliver
                                .each_with_object({}) { |set, h| h[set.preview_type] = set }
       end
 
-      # group videos by preview type inferred from filename to enforce a max of 3 per locale AND type
+      # group videos by preview type to enforce a max of 3 per locale AND type
       videos_by_preview_type = Hash.new { |h, k| h[k] = [] }
-      paths.each do |video_path|
-        preview_type = Spaceship::ConnectAPI::AppPreviewSet.preview_type_from_filename(File.basename(video_path))
-        unless preview_type
-          UI.important("[#{locale}] Could not infer preview type for '#{File.basename(video_path)}'. Skipping.")
-          next
-        end
-        videos_by_preview_type[preview_type] << video_path
-      end
+      previews.each { |item| videos_by_preview_type[item[:preview_type]] << item[:path] }
 
       videos_by_preview_type.each do |preview_type, video_paths|
         video_paths.sort!
@@ -120,7 +113,7 @@ module Deliver
         end
 
         video_paths.each do |video_path|
-          already_exist = (preview_set.app_previews || []).any? { |preview| preview.source_file_checksum == Digest::MD5.hexdigest(File.binread(video_path)) }
+          already_exist = (preview_set.app_previews || []).any? { |preview| preview.source_file_checksum == Digest::MD5.file(video_path).hexdigest }
           if already_exist
             UI.message("[#{locale}] Preview '#{File.basename(video_path)}' already uploaded (matching checksum). Skipping upload.")
             next
@@ -143,18 +136,18 @@ module Deliver
     def discover_videos(root)
       extensions = %w[mp4 mov m4v]
       locales = Dir.children(root).select { |subdir| File.directory?(File.join(root, subdir)) }
-      result = {}
+      all_videos = {}
       locales.each do |locale|
         dir = File.join(root, locale)
         video_paths = Dir.children(dir)
                          .select { |filename| extensions.include?(File.extname(filename).delete(".").downcase) }
                          .map { |filename| File.join(dir, filename) }
                          .sort
-        valid_video_paths = []
+        valid_previews = []
         video_paths.each do |path|
           # require filename to contain a known preview type token
-          inferred_from_name = Spaceship::ConnectAPI::AppPreviewSet.preview_type_from_filename(File.basename(path))
-          unless inferred_from_name
+          preview_type = Spaceship::ConnectAPI::AppPreviewSet.preview_type_from_filename(File.basename(path))
+          unless preview_type
             UI.important("[#{locale}] '#{File.basename(path)}' does not contain any known preview device type. Skipping.")
             next
           end
@@ -180,18 +173,18 @@ module Deliver
           # validate resolution against accepted canonical sizes; warn if resolution can't be determined
           res = FastlaneCore::VideoUtils.read_video_resolution(path)
           if res
-            unless Spaceship::ConnectAPI::AppPreviewSet.validate_video_resolution(res[0], res[1])
+            unless Spaceship::ConnectAPI::AppPreviewSet.validate_video_resolution(res[0], res[1], preview_type)
               UI.important("[#{locale}] '#{File.basename(path)}' has invalid resolution #{res.join('x')}. Skipping.")
               next
             end
           else
             UI.important("[#{locale}] Could not determine resolution for '#{File.basename(path)}'. Proceeding anyway.")
           end
-          valid_video_paths << path
+          valid_previews << { path: path, preview_type: preview_type }
         end
-        result[locale] = valid_video_paths unless valid_video_paths.empty?
+        all_videos[locale] = valid_previews unless valid_previews.empty?
       end
-      result
+      all_videos
     end
 
     def delete_existing_previews(localization, sets)

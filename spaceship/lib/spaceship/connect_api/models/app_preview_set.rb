@@ -109,9 +109,9 @@ module Spaceship
         return client.get_app_preview_set(app_preview_set_id: id, includes: "appPreviews").first
       end
 
-      # Validate video resolution (portrait canonical sizes). Returns true if the resolution
-      # matches any accepted pair, false otherwise.
-      def self.validate_video_resolution(width, height)
+      # Validate video resolution (portrait canonical sizes) for provided preview_type.
+      # Returns true if the resolution matches any accepted pair.
+      def self.validate_video_resolution(width, height, preview_type)
         return false unless width && height
         if width > height
           width, height = height, width
@@ -135,9 +135,9 @@ module Spaceship
           PreviewType::IPAD_105          => [[1200, 1600]],
           PreviewType::IPAD_97           => [[900, 1200]],
         }
-        canonical.values.any? do |pairs|
-          pairs.any? { |(canon_width, canon_height)| width == canon_width && height == canon_height }
-        end
+
+        pairs = canonical[preview_type] || []
+        pairs.any? { |(canon_width, canon_height)| width == canon_width && height == canon_height }
       end
 
       def self.preview_type_from_filename(name, preview_types = PreviewType::ALL)
