@@ -43,7 +43,10 @@ describe Snapshot do
         allow(File).to receive(:expand_path).and_call_original
         allow(File).to receive(:expand_path).with("some fake snapfile").and_return("/fake/path/Snapfile")
         allow(File).to receive(:expand_path).with("..", "./snapshot/example/Example.xcodeproj").and_return("./snapshot/example")
-        allow(File).to receive(:exist?).and_return(false)
+        allow(File).to receive(:exist?).and_call_original
+        allow(File).to receive(:exist?).with("./snapshot/example/Example.xcodeproj").and_return(true)
+        allow(File).to receive(:exist?).with("/fake/path/Snapfile").and_return(false)
+        allow(File).to receive(:exist?).with("./snapshot/example/some fake snapfile").and_return(false)
         allow(Dir).to receive(:chdir).and_yield
       end
 
@@ -62,10 +65,14 @@ describe Snapshot do
       end
 
       it "does not overwrite devices when devices is already set and project is Mac", requires_xcodebuild: true do
+        # Get a real device name from available simulators to avoid validation errors
+        available_devices = FastlaneCore::Simulator.all.map(&:name)
+        test_device = available_devices.first || "iPhone 16 Pro Max"
+
         options = {
             project: "./snapshot/example/Example.xcodeproj",
             scheme: "ExampleMacOSUITests",
-            devices: ["iPhone 15 Pro"]
+            devices: [test_device]
         }
         mock_project = instance_double(FastlaneCore::Project, mac?: true, path: "./snapshot/example/Example.xcodeproj", select_scheme: nil)
         allow(FastlaneCore::Project).to receive(:new).and_return(mock_project)
@@ -73,7 +80,7 @@ describe Snapshot do
 
         Snapshot.config = FastlaneCore::Configuration.create(Snapshot::Options.available_options, options)
 
-        expect(Snapshot.config[:devices]).to eq(["iPhone 15 Pro"])
+        expect(Snapshot.config[:devices]).to eq([test_device])
       end
     end
   end
