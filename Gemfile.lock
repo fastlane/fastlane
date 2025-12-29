@@ -9,7 +9,7 @@ PATH
       aws-sdk-s3 (~> 1.0)
       babosa (>= 1.0.3, < 2.0.0)
       base64 (~> 0.2.0)
-      bundler (>= 1.12.0, < 5.0.0)
+      bundler (>= 1.17.3, < 5.0.0)
       colored (~> 1.2)
       commander (~> 4.6)
       csv (~> 3.3)
