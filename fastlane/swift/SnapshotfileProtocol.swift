@@ -119,6 +119,9 @@ public protocol SnapshotfileProtocol: AnyObject {
     /// Sets a custom path for Swift Package Manager dependencies
     var clonedSourcePackagesPath: String? { get }
 
+    /// Sets a custom package cache path for Swift Package Manager dependencies
+    var packageCachePath: String? { get }
+
     /// Skips resolution of Swift Package Manager dependencies
     var skipPackageDependenciesResolution: Bool { get }
 
@@ -193,6 +196,7 @@ public extension SnapshotfileProtocol {
     var concurrentSimulators: Bool { return true }
     var disableSlideToType: Bool { return false }
     var clonedSourcePackagesPath: String? { return nil }
+    var packageCachePath: String? { return nil }
     var skipPackageDependenciesResolution: Bool { return false }
     var disablePackageAutomaticUpdates: Bool { return false }
     var packageAuthorizationProvider: String? { return nil }
@@ -208,4 +212,4 @@ public extension SnapshotfileProtocol {
 
 // Please don't remove the lines below
 // They are used to detect outdated files
-// FastlaneRunnerAPIVersion [0.9.130]
+// FastlaneRunnerAPIVersion [0.9.131]
