@@ -31,7 +31,6 @@ describe Spaceship::ConnectAPI::Certificate do
           includes: nil,
           limit: Spaceship::ConnectAPI::MAX_OBJECTS_PER_PAGE_LIMIT,
           sort: nil
-
       }
     end
 
