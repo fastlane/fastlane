@@ -26,7 +26,7 @@ gem "openssl",
     "!= 3.2.1",
     "!= 3.3.0"
 # Fast XML parser and object marshaller.
-gem "ox"
+gem "ox", "~> 2.14"
 # Provides an interactive debugging environment for Ruby.
 gem "pry"
 # A plugin for pry that adds step-by-step debugging and stack navigation.
@@ -35,8 +35,7 @@ gem "pry-byebug"
 gem "pry-rescue"
 # A plugin for pry that enables exploring the call stack.
 gem "pry-stack_explorer"
-# public_suffix >= 6.0 requires Ruby >= 3.0, while fastlane uses a
-# `required_ruby_version` of `>= 2.7`.
+# public_suffix >= 6.0 requires Ruby >= 3.0, while fastlane uses a `required_ruby_version` of `>= 2.7`.
 gem "public_suffix", "< 6.0"
 # A simple task automation tool.
 gem "rake"
