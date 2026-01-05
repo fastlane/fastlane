@@ -154,6 +154,11 @@ module Pilot
                                          values.keys.each { |value| UI.user_error!("Invalid key '#{value}'") unless valid_keys.include?(value.to_s) }
                                        end
                                      end),
+        FastlaneCore::ConfigItem.new(key: :languages,
+                                     type: Array,
+                                     env_name: "LANGUAGES",
+                                     description: "List of locales permitted for localized build/app info (e.g. en-US,de-DE). If set, Pilot will ignore other locales when updating localized beta metadata",
+                                     optional: true),
         FastlaneCore::ConfigItem.new(key: :changelog,
                                      short_option: "-w",
                                      optional: true,
