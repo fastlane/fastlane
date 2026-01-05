@@ -520,6 +520,9 @@ module Pilot
         default_info = info_by_lang.delete(:default)
       end
 
+      allowed = allowed_locales
+      info_by_lang.select! { |locale, _| allowed.include?(locale.to_s) } if allowed
+
       # Initialize hash of lang codes with info_by_lang keys
       localizations_by_lang = {}
       info_by_lang.each_key do |key|
@@ -534,6 +537,7 @@ module Pilot
 
       # Create or update localized app review info
       localizations_by_lang.each do |lang_code, localization|
+        next if allowed && !allowed.include?(lang_code.to_s)
         info = info_by_lang[lang_code]
 
         info = default_info unless info
@@ -566,6 +570,9 @@ module Pilot
         default_info = info_by_lang.delete(:default)
       end
 
+      allowed = allowed_locales
+      info_by_lang.select! { |locale, _| allowed.include?(locale.to_s) } if allowed
+
       # Initialize hash of lang codes with info_by_lang keys
       localizations_by_lang = {}
       info_by_lang.each_key do |key|
@@ -580,11 +587,21 @@ module Pilot
 
       # Create or update localized app review info
       localizations_by_lang.each do |lang_code, localization|
+        next if allowed && !allowed.include?(lang_code.to_s)
         info = info_by_lang[lang_code]
 
         info = default_info unless info
         update_localized_build_review_for_lang(build, localization, lang_code, info) if info
       end
+    end
+
+    def allowed_locales
+      langs = config[:languages]
+      langs ||= ENV["LANGUAGES"]
+      return nil unless langs
+
+      langs = langs.split(",") unless langs.kind_of?(Array)
+      langs.map { |l| l.to_s.strip }.reject(&:empty?)
     end
 
     def update_localized_build_review_for_lang(build, localization, locale, info)
