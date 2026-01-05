@@ -94,9 +94,9 @@ module Deliver
 
       enabled_languages = detect_languages
 
-      app_store_version_localizations = verify_available_version_languages!(app, enabled_languages) unless options[:edit_live]
       app_info = fetch_edit_app_info(app)
-      app_info_localizations = verify_available_info_languages!(app, app_info, enabled_languages) unless options[:edit_live] || !updating_localized_app_info?(app, app_info)
+      app_store_version_localizations = nil
+      app_info_localizations = nil
 
       if options[:edit_live]
         # not all values are editable when using live_version
@@ -118,6 +118,23 @@ module Deliver
         version = fetch_edit_app_store_version(app, platform)
         localised_options = (LOCALISED_VERSION_VALUES.keys + LOCALISED_APP_VALUES.keys)
         non_localised_options = NON_LOCALISED_VERSION_VALUES.keys
+      end
+
+      unless options[:edit_live]
+        if options[:skip_language_detection]
+          # Do not create/enable additional locales; use what already exists on ASC
+          app_store_version_localizations = version.get_app_store_version_localizations
+        else
+          app_store_version_localizations = verify_available_version_languages!(app, enabled_languages)
+        end
+
+        if updating_localized_app_info?(app, app_info)
+          if options[:skip_language_detection]
+            app_info_localizations = app_info&.get_app_info_localizations
+          else
+            app_info_localizations = verify_available_info_languages!(app, app_info, enabled_languages)
+          end
+        end
       end
 
       # Needed for to filter out release notes from being sent up
