@@ -9,15 +9,15 @@ describe Snapshot do
 
         if FastlaneCore::Helper.xcode_at_least?("13")
           expect(Fastlane::Helper).to receive(:backticks)
-            .with("open -a Simulator.app --args -CurrentDeviceUDID #{device_udid} &> /dev/null")
+            .with("open -a Simulator.app --args -CurrentDeviceUDID #{device_udid} 2>&1 > /dev/null")
             .and_return("").exactly(1).times
         else
           expect(Fastlane::Helper).to receive(:backticks)
-            .with("xcrun instruments -w #{device_udid} &> /dev/null")
+            .with("xcrun instruments -w #{device_udid} 2>&1 > /dev/null")
             .and_return("").exactly(1).times
         end
         expect(Fastlane::Helper).to receive(:backticks)
-          .with("xcrun simctl addmedia #{device_udid} #{paths.join(' ')} &> /dev/null")
+          .with("xcrun simctl addmedia #{device_udid} #{paths.join(' ')} 2>&1 > /dev/null")
           .and_return("").exactly(1).times
 
         # Verify that backticks isn't called for the fallback to addphoto/addvideo
@@ -32,16 +32,16 @@ describe Snapshot do
 
         if FastlaneCore::Helper.xcode_at_least?("13")
           expect(Fastlane::Helper).to receive(:backticks)
-            .with("open -a Simulator.app --args -CurrentDeviceUDID #{device_udid} &> /dev/null")
+            .with("open -a Simulator.app --args -CurrentDeviceUDID #{device_udid} 2>&1 > /dev/null")
             .and_return("").exactly(1).times
         else
           expect(Fastlane::Helper).to receive(:backticks)
-            .with("xcrun instruments -w #{device_udid} &> /dev/null")
+            .with("xcrun instruments -w #{device_udid} 2>&1 > /dev/null")
             .and_return("").exactly(1).times
         end
 
         expect(Fastlane::Helper).to receive(:backticks)
-          .with("xcrun simctl addmedia #{device_udid} #{paths.join(' ')} &> /dev/null")
+          .with("xcrun simctl addmedia #{device_udid} #{paths.join(' ')} 2>&1 > /dev/null")
           .and_return("usage: simctl [--noxpc] [--set <path>] [--profiles <path>] <subcommand> ...\n").exactly(1).times
 
         expect(Fastlane::Helper).to receive(:backticks).with(anything).and_return(anything).exactly(1).times
