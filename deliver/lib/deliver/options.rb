@@ -483,6 +483,12 @@ module Deliver
                                      type: Boolean,
                                      optional: true,
                                      default_value: true),
+        FastlaneCore::ConfigItem.new(key: :skip_language_detection,
+                                     env_name: "SKIP_LANGUAGE_DETECTION",
+                                     description: "Skip language detection in App Store Connect and use the languages specified in the languages param",
+                                     type: Boolean,
+                                     optional: true,
+                                     default_value: false),
 
         # internal
         FastlaneCore::ConfigItem.new(key: :app,
