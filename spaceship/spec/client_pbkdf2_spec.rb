@@ -39,6 +39,12 @@ describe Spaceship::Client do
       res_s2k_fo = subject.pbkdf2(password, salt, iterations, key_length, 's2k_fo')
       expect(res_s2k).not_to eq(res_s2k_fo)
     end
+
+    it 'raises ArgumentError for unsupported protocol' do
+      expect do
+        subject.pbkdf2(password, salt, iterations, key_length, 'unsupported')
+      end.to raise_error(ArgumentError, "Unsupported protocol 'unsupported' for pbkdf2")
+    end
   end
 
   describe '#to_hex and #to_byte' do

@@ -527,6 +527,11 @@ module Spaceship
 
     def pbkdf2(password, salt, iterations, key_length, protocol, digest = OpenSSL::Digest::SHA256.new)
       require 'openssl'
+
+      unless %w[s2k s2k_fo].include?(protocol)
+        raise ArgumentError, "Unsupported protocol '#{protocol}' for pbkdf2"
+      end
+
       password = OpenSSL::Digest::SHA256.digest(password)
 
       if protocol == 's2k_fo'
