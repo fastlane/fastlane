@@ -21,7 +21,7 @@ describe Snapshot do
           .and_return("").exactly(1).times
 
         # Verify that backticks isn't called for the fallback to addphoto/addvideo
-        expect(Fastlane::Helper).to receive(:backticks).with(anything).and_return(anything).exactly(0).times
+        expect(Fastlane::Helper).to receive(:backticks).with(any_args).and_return(anything).exactly(0).times
 
         launcher = Snapshot::SimulatorLauncherBase.new
         launcher.add_media(['phone'], 'photo', paths)
@@ -44,7 +44,7 @@ describe Snapshot do
           .with("xcrun simctl addmedia #{device_udid} #{paths.join(' ')}", print: FastlaneCore::Globals.verbose?)
           .and_return("usage: simctl [--noxpc] [--set <path>] [--profiles <path>] <subcommand> ...\n").exactly(1).times
 
-        expect(Fastlane::Helper).to receive(:backticks).with(anything).and_return(anything).exactly(1).times
+        expect(Fastlane::Helper).to receive(:backticks).with(any_args).and_return(anything).exactly(1).times
 
         launcher = Snapshot::SimulatorLauncherBase.new
         launcher.add_media(['phone'], 'photo', paths)
