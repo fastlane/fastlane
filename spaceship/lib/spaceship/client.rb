@@ -531,7 +531,7 @@ module Spaceship
 
       if protocol == 's2k_fo'
         puts("Using legacy s2k_fo protocol for password digest") if Spaceship::Globals.verbose?
-        password = to_byte(to_hex(password))
+        password = to_hex(password)
       end
 
       OpenSSL::PKCS5.pbkdf2_hmac(password, salt, iterations, key_length, digest)

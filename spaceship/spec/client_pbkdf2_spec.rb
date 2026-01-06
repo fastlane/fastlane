@@ -25,25 +25,19 @@ describe Spaceship::Client do
     end
 
     it 'calculates pbkdf2 for s2k_fo protocol' do
-      expect(Spaceship::Globals).to(receive(:verbose?).and_return(true))
-      expect(subject).to(receive(:puts).with("Using legacy s2k_fo protocol for password digest"))
-
       result = subject.pbkdf2(password, salt, iterations, key_length, 's2k_fo')
-      expect(result).to_not(be_nil)
-      expect(result.length).to(eq(key_length))
 
-      # Manual calculation for verification
       hashed_password = OpenSSL::Digest::SHA256.digest(password)
-      # s2k_fo does: password = to_byte(to_hex(password))
-      fo_password = [hashed_password.unpack1('H*')].pack('H*')
+      fo_password = hashed_password.unpack1('H*') # <-- hex STRING, not packed back
       expected = OpenSSL::PKCS5.pbkdf2_hmac(fo_password, salt, iterations, key_length, OpenSSL::Digest::SHA256.new)
-      expect(result).to(eq(expected))
+
+      expect(result).to eq(expected)
     end
 
-    it 'calculates the same result for s2k and s2k_fo in the current environment' do
+    it 'produces different results for s2k vs s2k_fo' do
       res_s2k = subject.pbkdf2(password, salt, iterations, key_length, 's2k')
       res_s2k_fo = subject.pbkdf2(password, salt, iterations, key_length, 's2k_fo')
-      expect(res_s2k).to(eq(res_s2k_fo))
+      expect(res_s2k).not_to eq(res_s2k_fo)
     end
   end
 
