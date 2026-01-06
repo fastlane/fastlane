@@ -47,19 +47,26 @@ describe Spaceship::Client do
     end
   end
 
-  describe '#to_hex and #to_byte' do
-    it 'converts string to hex and back' do
+  describe '#to_hex' do
+    it 'converts string to hex' do
       str = "hello world"
       hex = subject.to_hex(str)
       expect(hex).to(eq("68656c6c6f20776f726c64"))
-      expect(subject.to_byte(hex)).to(eq(str))
     end
-
-    it 'handles binary data' do
+    it 'converts binary data to hex' do
       binary = "\x00\xFF\x00\xFF".b
       hex = subject.to_hex(binary)
       expect(hex).to(eq("00ff00ff"))
-      expect(subject.to_byte(hex)).to(eq(binary))
+    end
+  end
+  describe '#to_byte' do
+    it 'converts hex back to string' do
+      hex = "68656c6c6f20776f726c64"
+      expect(subject.to_byte(hex)).to(eq("hello world"))
+    end
+    it 'converts hex back to binary data' do
+      hex = "00ff00ff"
+      expect(subject.to_byte(hex)).to(eq("\x00\xFF\x00\xFF".b))
     end
   end
 end
