@@ -529,7 +529,7 @@ module Spaceship
       require 'openssl'
 
       unless %w[s2k s2k_fo].include?(protocol)
-        raise ArgumentError, "Unsupported protocol '#{protocol}' for pbkdf2"
+        raise SIRPAuthenticationError, "Unsupported protocol '#{protocol}' for pbkdf2"
       end
 
       password = OpenSSL::Digest::SHA256.digest(password)
