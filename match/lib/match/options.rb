@@ -327,6 +327,7 @@ module Match
                                      env_name: "MATCH_PROVISIONING_PROFILE_TEMPLATE_NAME",
                                      description: "The name of provisioning profile template. If the developer account has provisioning profile templates (aka: custom entitlements), the template name can be found by inspecting the Entitlements drop-down while creating/editing a provisioning profile (e.g. \"Apple Pay Pass Suppression Development\")",
                                      optional: true,
+                                     deprecated: "Removed since May 2025 on App Store Connect API OpenAPI v3.8.0 - Learn more: https://docs.fastlane.tools/actions/match/#managed-capabilities",
                                      default_value: nil),
         FastlaneCore::ConfigItem.new(key: :profile_name,
                                     env_name: "MATCH_PROVISIONING_PROFILE_NAME",

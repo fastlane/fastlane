@@ -588,7 +588,7 @@ Key | Editable While Live | Directory | Filename | Deprecated Filename
 
 ### Available age rating groups
 
-#### Non Boolean
+#### Infrequent/Mild or Frequent/Intense
 
 **Values**
 
@@ -597,34 +597,73 @@ Key | Editable While Live | Directory | Filename | Deprecated Filename
 - 2: Frequent/Intense (Legacy value, use `FREQUENT_OR_INTENSE`instead)
 
 - `NONE`
+- `INFREQUENT`
 - `INFREQUENT_OR_MILD`
+- `FREQUENT`
 - `FREQUENT_OR_INTENSE`
 
 **Keys**
 
-- 'alcoholTobaccoOrDrugUseOrReferences'
-- 'contests'
-- 'gamblingSimulated'
-- 'medicalOrTreatmentInformation'
-- 'profanityOrCrudeHumor'
+- `alcoholTobaccoOrDrugUseOrReferences`
+- `contests`
+- `gamblingSimulated`
+- `gunsOrOtherWeapons`
+- `horrorOrFearThemes`
+- `matureOrSuggestiveThemes`
+- `medicalOrTreatmentInformation`
+- `profanityOrCrudeHumor`
+- `sexualContentGraphicAndNudity`
+- `sexualContentOrNudity`
+- `violenceCartoonOrFantasy`
+- `violenceRealistic`
+- `violenceRealisticProlongedGraphicOrSadistic`
 
-- 'sexualContentGraphicAndNudity'
-- 'sexualContentOrNudity'
-- 'horrorOrFearThemes'
-- 'matureOrSuggestiveThemes'
-- 'unrestrictedWebAccess'
-- 'violenceCartoonOrFantasy'
-- 'violenceRealisticProlongedGraphicOrSadistic'
-- 'violenceRealistic'
-- 'kidsAgeBand'
+#### Age Rating
+
+**Values**
+
+- `NONE`
+- `NINE_PLUS`
+- `THIRTEEN_PLUS`
+- `SIXTEEN_PLUS`
+- `EIGHTEEN_PLUS`
+- `UNRATED`
+
+**Keys**
+
+- `ageRatingOverrideV2`
+
+#### Korea Age Rating
+
+**Values**
+
+- `NONE`
+- `FIFTEEN_PLUS`
+- `NINETEEN_PLUS`
+
+**Keys**
+
+- `koreaAgeRatingOverride`
+
+#### URL
+
+**Keys**
+
+- `developerAgeRatingInfoUrl`
 
 #### Boolean
 
 **Keys**
 
+- `advertising`
+- `ageAssurance`
 - `gambling`
-- 'seventeenPlus'
+- `healthOrWellnessTopics`
+- `lootBox`
+- `messagingAndChat`
+- `parentalControls`
 - `unrestrictedWebAccess`
+- `userGeneratedContent`
 
 #### Kids Age
 
