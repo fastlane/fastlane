@@ -40,10 +40,10 @@ describe Spaceship::Client do
       expect(res_s2k).not_to eq(res_s2k_fo)
     end
 
-    it 'raises ArgumentError for unsupported protocol' do
+    it 'raises SIRPAuthenticationError for unsupported protocol' do
       expect do
         subject.pbkdf2(password, salt, iterations, key_length, 'unsupported')
-      end.to raise_error(ArgumentError, "Unsupported protocol 'unsupported' for pbkdf2")
+      end.to raise_error(Spaceship::SIRPAuthenticationError, "Unsupported protocol 'unsupported' for pbkdf2")
     end
   end
 
