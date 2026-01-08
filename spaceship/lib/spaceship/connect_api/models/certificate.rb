@@ -100,7 +100,7 @@ module Spaceship
         if has_unsupported_cert_types_filter
           new_filter[:certificateType] = nil
         end
-        new_filter = new_filter.compact
+        new_filter.compact!
 
         resps = client.get_certificates(filter: new_filter, includes: includes, fields: fields, limit: limit, sort: sort).all_pages
 

@@ -52,5 +52,12 @@ jobs:
     - name: Run fastlane
       env:
         FASTLANE_RELEASE_API_BEARER: ${{ secrets.GITHUB_TOKEN }}
+        SLACK_URL: ${{ secrets.SLACK_URL }}
       run: |
         bundle exec fastlane create_github_release skip_github_packages:${{ github.event.inputs.skip_github_packages }} skip_rubygems:${{ github.event.inputs.skip_rubygems }}
+
+    - uses: actions/upload-artifact@v6
+      with:
+        name: release_tag
+        path: latest_fl_version.txt
+        retention-days: 1

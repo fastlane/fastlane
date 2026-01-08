@@ -93,6 +93,7 @@ def before_each_spaceship
   ConnectAPIStubbing::TestFlight.stub_pre_release_versions
 
   ConnectAPIStubbing::Tunes.stub_app_store_version_release_request
+  ConnectAPIStubbing::Tunes.stub_webhooks
 
   ConnectAPIStubbing::Users.stub_users
 end

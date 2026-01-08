@@ -705,6 +705,11 @@ module Deliver
     def app_rating(app_info)
       return unless options[:app_rating_config_path]
 
+      unless app_info
+        UI.important("Skipping age rating update because app info could not be fetched.")
+        return
+      end
+
       require 'json'
       begin
         json = JSON.parse(File.read(options[:app_rating_config_path]))
