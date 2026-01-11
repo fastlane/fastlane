@@ -26,7 +26,7 @@ describe FastlaneCore::AnalyticsIngesterClient do
       }
 
       # Stub the GA4 endpoint
-      stub = stub_request(:post, "https://www.google-analytics.com/mp/collect?measurement_id=G-94HQ3VVP0X&api_secret=placeholder_secret")
+      stub = stub_request(:post, "https://www.google-analytics.com/mp/collect?measurement_id=G-94HQ3VVP0X")
         .with do |request|
           body = JSON.parse(request.body)
           
@@ -69,7 +69,7 @@ describe FastlaneCore::AnalyticsIngesterClient do
       }
 
       # Stub the GA4 endpoint
-      stub = stub_request(:post, "https://www.google-analytics.com/mp/collect?measurement_id=G-94HQ3VVP0X&api_secret=placeholder_secret")
+      stub = stub_request(:post, "https://www.google-analytics.com/mp/collect?measurement_id=G-94HQ3VVP0X")
         .with do |request|
           body = JSON.parse(request.body)
           
