@@ -19,7 +19,7 @@ describe FastlaneCore::AnalyticsEventBuilder do
 
     it "includes Xcode version for iOS platform" do
       allow(FastlaneCore::Helper).to receive(:xcode_version).and_return("14.3")
-      
+
       builder = FastlaneCore::AnalyticsEventBuilder.new(
         p_hash: "test_hash",
         session_id: "test_session",

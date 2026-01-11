@@ -13,22 +13,22 @@ module FastlaneCore
 
     def new_event(action_stage)
       custom_params = {}
-      
+
       # Add Ruby version
       custom_params[:ruby_version] = RUBY_VERSION
-      
+
       # Add Xcode version (only for iOS/macOS platforms)
       if @platform == :ios || @platform == :mac
         xcode_ver = Helper.xcode_version
         custom_params[:xcode_version] = xcode_ver if xcode_ver
       end
-      
+
       # Add platform
       custom_params[:platform] = @platform.to_s if @platform
-      
+
       # Add fastlane client language
       custom_params[:client_language] = @fastlane_client_language.to_s
-      
+
       {
         client_id: @p_hash,
         category: "fastlane Client Language - #{@fastlane_client_language}",

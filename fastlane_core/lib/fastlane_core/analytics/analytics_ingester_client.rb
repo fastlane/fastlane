@@ -38,7 +38,7 @@ module FastlaneCore
       end
       connection.headers[:user_agent] = 'fastlane/' + Fastlane::VERSION
       connection.headers['Content-Type'] = 'application/json'
-      
+
       # GA4 Measurement Protocol format
       payload = {
         client_id: event[:client_id],
@@ -54,7 +54,7 @@ module FastlaneCore
           }
         ]
       }
-      
+
       connection.post("/mp/collect?measurement_id=#{@ga_tracking}") do |req|
         req.body = payload.to_json
       end
