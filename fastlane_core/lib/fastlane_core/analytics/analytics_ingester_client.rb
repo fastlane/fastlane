@@ -7,8 +7,12 @@ require_relative '../helper'
 module FastlaneCore
   class AnalyticsIngesterClient
     GA_URL = "https://www.google-analytics.com"
+    GA4_MEASUREMENT_ID = "G-94HQ3VVP0X"
+    GA4_API_SECRET = "placeholder_secret" # Not needed for client-side tracking
 
     private_constant :GA_URL
+    private_constant :GA4_MEASUREMENT_ID
+    private_constant :GA4_API_SECRET
 
     def initialize(ga_tracking)
       @ga_tracking = ga_tracking
@@ -34,21 +38,30 @@ module FastlaneCore
 
     def post_request(event)
       connection = Faraday.new(GA_URL) do |conn|
-        conn.request(:url_encoded)
         conn.adapter(Faraday.default_adapter)
       end
       connection.headers[:user_agent] = 'fastlane/' + Fastlane::VERSION
-      connection.post("/collect", {
-        v: "1",                                            # API Version
-        tid: @ga_tracking,                                 # Tracking ID / Property ID
-        cid: event[:client_id],                            # Client ID
-        t: "event",                                        # Event hit type
-        ec: event[:category],                              # Event category
-        ea: event[:action],                                # Event action
-        el: event[:label] || "na",                         # Event label
-        ev: event[:value] || "0",                          # Event value
-        aip: "1"                                           # IP anonymization
-      })
+      connection.headers['Content-Type'] = 'application/json'
+      
+      # GA4 Measurement Protocol format
+      payload = {
+        client_id: event[:client_id],
+        events: [
+          {
+            name: event[:action].to_s,
+            params: {
+              event_category: event[:category],
+              event_label: event[:label] || "na",
+              value: event[:value] || 0,
+              engagement_time_msec: 100
+            }.merge(event[:custom_params] || {})
+          }
+        ]
+      }
+      
+      connection.post("/mp/collect?measurement_id=#{GA4_MEASUREMENT_ID}&api_secret=#{GA4_API_SECRET}") do |req|
+        req.body = payload.to_json
+      end
     end
   end
 end

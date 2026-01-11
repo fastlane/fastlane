@@ -4,7 +4,7 @@ require_relative 'analytics_event_builder'
 
 module FastlaneCore
   class AnalyticsSession
-    GA_TRACKING = "UA-121171860-1"
+    GA_TRACKING = "G-94HQ3VVP0X"
 
     private_constant :GA_TRACKING
     attr_accessor :session_id
@@ -32,7 +32,8 @@ module FastlaneCore
         p_hash: launch_context.p_hash,
         session_id: session_id,
         action_name: nil,
-        fastlane_client_language: launch_context.fastlane_client_language
+        fastlane_client_language: launch_context.fastlane_client_language,
+        platform: launch_context.platform
       )
 
       launch_event = builder.new_event(:launch)
