@@ -17,8 +17,8 @@ module FastlaneCore
       # Add Ruby version
       custom_params[:ruby_version] = RUBY_VERSION
       
-      # Add Xcode version (only for macOS/iOS)
-      if @platform != :android
+      # Add Xcode version (only for iOS/macOS platforms)
+      if @platform == :ios || @platform == :mac
         xcode_ver = Helper.xcode_version
         custom_params[:xcode_version] = xcode_ver if xcode_ver
       end

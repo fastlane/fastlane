@@ -7,11 +7,11 @@ require_relative '../helper'
 module FastlaneCore
   class AnalyticsIngesterClient
     GA_URL = "https://www.google-analytics.com"
-    GA4_MEASUREMENT_ID = "G-94HQ3VVP0X"
-    GA4_API_SECRET = "placeholder_secret" # Not needed for client-side tracking
+    # Note: GA4 Measurement Protocol API secret is optional for client-side implementations
+    # when using the /mp/collect endpoint without validation requirements
+    GA4_API_SECRET = "placeholder_secret"
 
     private_constant :GA_URL
-    private_constant :GA4_MEASUREMENT_ID
     private_constant :GA4_API_SECRET
 
     def initialize(ga_tracking)
@@ -59,7 +59,7 @@ module FastlaneCore
         ]
       }
       
-      connection.post("/mp/collect?measurement_id=#{GA4_MEASUREMENT_ID}&api_secret=#{GA4_API_SECRET}") do |req|
+      connection.post("/mp/collect?measurement_id=#{@ga_tracking}&api_secret=#{GA4_API_SECRET}") do |req|
         req.body = payload.to_json
       end
     end

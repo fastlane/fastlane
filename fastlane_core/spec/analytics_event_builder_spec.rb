@@ -87,6 +87,7 @@ describe FastlaneCore::AnalyticsEventBuilder do
       event = builder.new_event(:launch)
 
       expect(event[:custom_params][:platform]).to be_nil
+      expect(event[:custom_params][:xcode_version]).to be_nil
       expect(event[:custom_params][:ruby_version]).to eq(RUBY_VERSION)
     end
   end
