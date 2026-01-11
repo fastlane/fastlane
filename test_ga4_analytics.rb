@@ -5,7 +5,7 @@
 # Usage from repo root: ruby test_ga4_analytics.rb
 #
 # This script sends a real test event to the GA4 endpoint.
-# You can monitor events in Google Analytics 4 Real-Time reports.
+# You can monitor events in Google Analytics 4 Real-Time reports or DebugView.
 
 require_relative 'fastlane_core/lib/fastlane_core/analytics/analytics_ingester_client'
 require_relative 'fastlane_core/lib/fastlane_core/analytics/analytics_event_builder'
@@ -20,10 +20,10 @@ ENV.delete('FASTLANE_OPT_OUT_USAGE')
 puts "\n" + "=" * 80
 puts "GA4 Analytics Test Script"
 puts "=" * 80
-puts "\nThis script sends a real test event to GA4."
+puts "\nThis script sends a real test event to GA4 using the client-side endpoint."
 puts "\nConfiguration:"
 puts "  - Tracking ID: G-94HQ3VVP0X"
-puts "  - Endpoint: https://www.google-analytics.com/mp/collect"
+puts "  - Endpoint: https://www.google-analytics.com/g/collect (client-side, no API secret needed)"
 puts "  - Platform: #{RUBY_PLATFORM}"
 puts "  - Ruby Version: #{RUBY_VERSION}"
 
@@ -84,14 +84,19 @@ puts "✅ Event sent successfully!"
 puts "\nTo verify in Google Analytics 4:"
 puts "1. Go to https://analytics.google.com/"
 puts "2. Select the property with ID: G-94HQ3VVP0X"
-puts "3. Navigate to: Reports > Realtime"
+puts "3. Navigate to: Reports > Realtime (or Admin > DebugView)"
 puts "4. Look for events in the last 30 minutes:"
 puts "   - Event name: launch"
-puts "   - Event category: fastlane Client Language - ruby"
-puts "   - Custom parameters:"
+puts "   - Event parameters:"
+puts "     • event_category: fastlane Client Language - ruby"
 puts "     • ruby_version: #{RUBY_VERSION}"
 puts "     • platform: #{platform}"
 puts "     • client_language: ruby"
 puts "     • xcode_version: #{xcode_ver}" if xcode_ver
+
+puts "\nNote: The endpoint now uses /g/collect (client-side) which:"
+puts "  - Does NOT require an API secret (safe for public code)"
+puts "  - Uses URL-encoded parameters (like gtag.js)"
+puts "  - Sends with _dbg=1 for easier debugging in GA4 DebugView"
 
 puts "\n" + "=" * 80 + "\n"

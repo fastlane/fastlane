@@ -16,7 +16,7 @@ describe FastlaneCore::AnalyticsIngesterClient do
         category: "fastlane Client Language - ruby",
         action: :launch,
         label: "test_action",
-        value: nil,
+        value: 42,
         custom_params: {
           ruby_version: "2.7.0",
           xcode_version: "14.0",
@@ -25,28 +25,29 @@ describe FastlaneCore::AnalyticsIngesterClient do
         }
       }
 
-      # Stub the GA4 endpoint
-      stub = stub_request(:post, "https://www.google-analytics.com/mp/collect?measurement_id=G-94HQ3VVP0X")
+      # Stub the GA4 client-side endpoint
+      stub = stub_request(:post, "https://www.google-analytics.com/g/collect")
              .with do |request|
-        body = JSON.parse(request.body)
+        # Parse URL-encoded body
+        params = URI.decode_www_form(request.body).to_h
 
-        # Verify GA4 payload structure
-        expect(body["client_id"]).to eq("test_client_id_123")
-        expect(body["events"]).to be_an(Array)
-        expect(body["events"].length).to eq(1)
+        # Verify GA4 client-side payload structure
+        expect(params["v"]).to eq("2")
+        expect(params["tid"]).to eq("G-94HQ3VVP0X")
+        expect(params["cid"]).to eq("test_client_id_123")
+        expect(params["en"]).to eq("launch")
+        expect(params["_dbg"]).to eq("1")
 
-        event_data = body["events"][0]
-        expect(event_data["name"]).to eq("launch")
-        expect(event_data["params"]["event_category"]).to eq("fastlane Client Language - ruby")
-        expect(event_data["params"]["event_label"]).to eq("test_action")
-        expect(event_data["params"]["value"]).to eq(0)
-        expect(event_data["params"]["engagement_time_msec"]).to eq(100)
+        # Verify standard event parameters
+        expect(params["ep.event_category"]).to eq("fastlane Client Language - ruby")
+        expect(params["ep.event_label"]).to eq("test_action")
+        expect(params["ep.value"]).to eq("42")
 
-        # Verify custom params are included
-        expect(event_data["params"]["ruby_version"]).to eq("2.7.0")
-        expect(event_data["params"]["xcode_version"]).to eq("14.0")
-        expect(event_data["params"]["platform"]).to eq("ios")
-        expect(event_data["params"]["client_language"]).to eq("ruby")
+        # Verify custom params are included with ep. prefix
+        expect(params["ep.ruby_version"]).to eq("2.7.0")
+        expect(params["ep.xcode_version"]).to eq("14.0")
+        expect(params["ep.platform"]).to eq("ios")
+        expect(params["ep.client_language"]).to eq("ruby")
 
         true
       end
@@ -68,17 +69,18 @@ describe FastlaneCore::AnalyticsIngesterClient do
         value: nil
       }
 
-      # Stub the GA4 endpoint
-      stub = stub_request(:post, "https://www.google-analytics.com/mp/collect?measurement_id=G-94HQ3VVP0X")
+      # Stub the GA4 client-side endpoint
+      stub = stub_request(:post, "https://www.google-analytics.com/g/collect")
              .with do |request|
-        body = JSON.parse(request.body)
+        params = URI.decode_www_form(request.body).to_h
 
-        expect(body["client_id"]).to eq("test_client_id_456")
-        event_data = body["events"][0]
-        expect(event_data["name"]).to eq("complete")
-        expect(event_data["params"]["event_category"]).to eq("fastlane Client Language - swift")
-        expect(event_data["params"]["event_label"]).to eq("na")
-        expect(event_data["params"]["value"]).to eq(0)
+        expect(params["v"]).to eq("2")
+        expect(params["tid"]).to eq("G-94HQ3VVP0X")
+        expect(params["cid"]).to eq("test_client_id_456")
+        expect(params["en"]).to eq("complete")
+        expect(params["ep.event_category"]).to eq("fastlane Client Language - swift")
+        expect(params["ep.event_label"]).to eq("na")
+        expect(params["ep.value"]).to eq("0")
 
         true
       end
