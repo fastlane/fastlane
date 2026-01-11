@@ -1,3 +1,5 @@
+require_relative '../helper'
+
 module FastlaneCore
   class AnalyticsEventBuilder
     attr_accessor :action_name
