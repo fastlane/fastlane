@@ -14,6 +14,7 @@ test_output/
 .DS_Store
 .keys
 *.swp
+latest_fl_version.txt
 
 ## Specific to Android
 .gradle/

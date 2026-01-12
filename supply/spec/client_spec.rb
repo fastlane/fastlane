@@ -1,11 +1,37 @@
 describe Supply do
   describe Supply::Client do
     let(:service_account_file) { File.read(fixture_file("sample-service-account.json")) }
+    let(:external_account_file) { File.read(fixture_file("sample-external-account.json")) }
     before do
       stub_request(:post, "https://www.googleapis.com/oauth2/v4/token").
         to_return(status: 200, body: '{}', headers: { 'Content-Type' => 'application/json' })
       stub_request(:post, "https://androidpublisher.googleapis.com/androidpublisher/v3/applications/test-app/edits").
         to_return(status: 200, body: '{}', headers: { 'Content-Type' => 'application/json' })
+    end
+
+    describe "initialize client" do
+      it "with external account credentials" do
+        stub_request(:get, "https://credential-source.example.com/token").
+          to_return(status: 200, body: '{"value": "access-token"}', headers: { 'Content-Type' => 'application/json' })
+        stub_request(:post, "https://sts.googleapis.com/v1/token").
+          to_return(status: 200, body: '{}', headers: { 'Content-Type' => 'application/json' })
+        stub_request(:post, "https://iamcredentials.googleapis.com/v1/projects/-/serviceAccounts/fastlane@fastlane-tools.iam.gserviceaccount.com:generateAccessToken").
+          to_return(status: 200, body: '{}', headers: { 'Content-Type' => 'application/json' })
+
+        Supply::Client.new(service_account_json: StringIO.new(external_account_file), params: { timeout: 1 })
+      end
+
+      it "with external account credentials from file" do
+        stub_request(:get, "https://credential-source.example.com/token").
+          to_return(status: 200, body: '{"value": "access-token"}', headers: { 'Content-Type' => 'application/json' })
+        stub_request(:post, "https://sts.googleapis.com/v1/token").
+          to_return(status: 200, body: '{}', headers: { 'Content-Type' => 'application/json' })
+        stub_request(:post, "https://iamcredentials.googleapis.com/v1/projects/-/serviceAccounts/fastlane@fastlane-tools.iam.gserviceaccount.com:generateAccessToken").
+          to_return(status: 200, body: '{}', headers: { 'Content-Type' => 'application/json' })
+
+        file_path = fixture_file("sample-external-account.json")
+        Supply::Client.make_from_config(params: { json_key: file_path, timeout: 1 })
+      end
     end
 
     describe "displays error messages from the API" do
@@ -26,6 +52,18 @@ describe Supply do
                               image_type: "icon",
                                 language: "en-US")
         }.to raise_error(FastlaneCore::Interface::FastlaneError, "Google Api Error: Invalid request - Ensure project settings are enabled.")
+      end
+
+      it "displays error messages for invalid json" do
+        expect {
+          Supply::Client.new(service_account_json: StringIO.new("{/asdf"), params: { timeout: 1 })
+        }.to raise_error(FastlaneCore::Interface::FastlaneError, "Invalid Google Credentials file provided - unable to parse json.")
+      end
+
+      it "displays error messages for missing credential type" do
+        expect {
+          Supply::Client.new(service_account_json: StringIO.new("{}"), params: { timeout: 1 })
+        }.to raise_error(FastlaneCore::Interface::FastlaneError, "Invalid Google Credentials file provided - no credential type found.")
       end
 
       it "with 5 retries" do
