@@ -4,7 +4,7 @@
 # Tip: to generate the `database.sqlite3` file from the `Data/` directory if it doesn't exist, run the following command:
 #
 # ```bash
-# xcrun xcresulttool get test-results tests --path Xcode16Plus-Mixed-XCTest-SwiftTesting-Project.xcresult
+# xcrun xcresulttool get test-results tests --path Xcode16-Mixed-XCTest-SwiftTesting-Project.xcresult
 # ```
 *.xcresult/Data
 !*.xcresult/database.sqlite3
