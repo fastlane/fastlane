@@ -78,6 +78,7 @@ xcuserdata/
 *.moved-aside
 *.xccheckout
 *.xcscmblueprint
+.build/
 
 # Dotenv
 .env
