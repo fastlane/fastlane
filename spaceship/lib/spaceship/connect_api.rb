@@ -74,6 +74,7 @@ require 'spaceship/connect_api/models/resolution_center_message'
 require 'spaceship/connect_api/models/resolution_center_thread'
 require 'spaceship/connect_api/models/review_rejection'
 require 'spaceship/connect_api/models/actor'
+require 'spaceship/connect_api/models/webhook'
 
 module Spaceship
   class ConnectAPI

@@ -65,6 +65,15 @@ module Fastlane
           end
         end
 
+        # Ruby version warning
+        if Gem::Version.new(RUBY_VERSION) < Gem::Version.new(Fastlane::SUGGESTED_RUBY_MIN_VERSION) && !FastlaneCore::Env.truthy?("FASTLANE_SKIP_RUBY_VERSION_WARNING")
+          warn = "WARNING: Support for your Ruby version is going away. fastlane will soon require Ruby #{Fastlane::SUGGESTED_RUBY_MIN_VERSION} or newer."
+          UI.important(warn)
+          at_exit do
+            UI.important(warn)
+          end
+        end
+
         # Needs to go after load_dot_env for variable FASTLANE_SKIP_UPDATE_CHECK
         FastlaneCore::UpdateChecker.start_looking_for_update('fastlane')
 
