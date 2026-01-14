@@ -356,6 +356,10 @@ module FastlaneCore
         proj << "-disableAutomaticPackageResolution"
       end
 
+      if xcode_at_least_11 && options[:skip_package_repository_fetches]
+        proj << "-skipPackageUpdates"
+      end
+
       return proj
     end
 
