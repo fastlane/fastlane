@@ -241,39 +241,39 @@ describe FastlaneCore do
 
     describe "#backticks" do
       it "executes the command and returns the output" do
-        expect(FastlaneCore::Helper.backticks("echo 'hello'")).to eq("hello\n")
+        expect(FastlaneCore::Helper.backticks("echo hello")).to eq("hello\n")
       end
 
       it "prints the command and output if print is true" do
-        expect(FastlaneCore::UI).to receive(:command).with("echo 'hello'")
+        expect(FastlaneCore::UI).to receive(:command).with("echo hello")
         expect(FastlaneCore::UI).to receive(:command_output).with("hello\n")
-        FastlaneCore::Helper.backticks("echo 'hello'", print: true)
+        FastlaneCore::Helper.backticks("echo hello", print: true)
       end
 
       it "does not print the command and output if print is false" do
         expect(FastlaneCore::UI).not_to receive(:command)
         expect(FastlaneCore::UI).not_to receive(:command_output)
-        FastlaneCore::Helper.backticks("echo 'hello'", print: false)
+        FastlaneCore::Helper.backticks("echo hello", print: false)
       end
     end
 
     describe "#backticks_if_verbose" do
       it "executes the command and returns the output" do
-        expect(FastlaneCore::Helper.backticks_if_verbose("echo 'hello'")).to eq("hello\n")
+        expect(FastlaneCore::Helper.backticks_if_verbose("echo hello")).to eq("hello\n")
       end
 
       it "prints the command and output if verbose is true" do
         allow(FastlaneCore::Globals).to receive(:verbose?).and_return(true)
-        expect(FastlaneCore::UI).to receive(:command).with("echo 'hello'")
+        expect(FastlaneCore::UI).to receive(:command).with("echo hello")
         expect(FastlaneCore::UI).to receive(:command_output).with("hello\n")
-        FastlaneCore::Helper.backticks_if_verbose("echo 'hello'")
+        FastlaneCore::Helper.backticks_if_verbose("echo hello")
       end
 
       it "does not print the command and output if verbose is false" do
         allow(FastlaneCore::Globals).to receive(:verbose?).and_return(false)
         expect(FastlaneCore::UI).not_to receive(:command)
         expect(FastlaneCore::UI).not_to receive(:command_output)
-        FastlaneCore::Helper.backticks_if_verbose("echo 'hello'")
+        FastlaneCore::Helper.backticks_if_verbose("echo hello")
       end
     end
 
