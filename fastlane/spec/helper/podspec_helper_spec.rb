@@ -83,5 +83,38 @@ describe Fastlane::Actions do
         expect(@version_podspec_file.version_match[:prerelease]).to eq('SNAPSHOT')
       end
     end
+    context "with custom version_var_name" do
+      it "returns the current version once parsed with custom version_var_name" do
+        test_content = 'spec.my_version = "1.3.2"'
+        version_podspec_file = Fastlane::Helper::PodspecHelper.new(nil, true, 'my_version')
+        result = version_podspec_file.parse(test_content)
+        expect(result).to eq('1.3.2')
+        expect(version_podspec_file.version_value).to eq('1.3.2')
+      end
+
+      it "returns the current version once parsed with custom version_var_name and no prefix" do
+        test_content = 'MY_VERSION = "1.3.2"'
+        version_podspec_file = Fastlane::Helper::PodspecHelper.new(nil, false, 'MY_VERSION')
+        result = version_podspec_file.parse(test_content)
+        expect(result).to eq('1.3.2')
+        expect(version_podspec_file.version_value).to eq('1.3.2')
+      end
+
+      it "matches the correct version when multiple version-like strings exist" do
+        test_content = <<RUBY
+          module Fastlane
+            VERSION = '2.230.0'.freeze
+            SUGGESTED_RUBY_MIN_VERSION = '3.2.0'.freeze
+          end
+RUBY
+        # Default behavior matches first one if case-insensitive and no prefix
+        version_podspec_file = Fastlane::Helper::PodspecHelper.new(nil, false, 'version')
+        expect(version_podspec_file.parse(test_content)).to eq('2.230.0')
+
+        # Explicitly matching SUGGESTED_RUBY_MIN_VERSION
+        version_podspec_file = Fastlane::Helper::PodspecHelper.new(nil, false, 'SUGGESTED_RUBY_MIN_VERSION')
+        expect(version_podspec_file.parse(test_content)).to eq('3.2.0')
+      end
+    end
   end
 end

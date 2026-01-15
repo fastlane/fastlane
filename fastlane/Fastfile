@@ -121,7 +121,7 @@ lane :bump do |options|
 
   # Verify everything is in a consistent state
   latest_version = current_version
-  local_version = version_get_podspec(path: version_file_path, require_variable_prefix: false)
+  local_version = version_get_podspec(path: version_file_path, require_variable_prefix: false, version_var_name: "VERSION")
   UI.user_error!("Version on RubyGems doesn't match local repo: #{latest_version} != #{local_version}") if latest_version != local_version
 
   changelog_text = show_changelog

@@ -7,10 +7,10 @@ module Fastlane
       attr_accessor :version_match
       attr_accessor :version_value
 
-      def initialize(path = nil, require_variable_prefix = true)
-        version_var_name = 'version'
+      def initialize(path = nil, require_variable_prefix = true, version_var_name = 'version')
         variable_prefix = require_variable_prefix ? /\w\./ : //
         @version_regex = /^(?<begin>[^#]*#{variable_prefix}#{version_var_name}\s*=\s*['"])(?<value>(?<major>[0-9]+)(\.(?<minor>[0-9]+))?(\.(?<patch>[0-9]+))?(?<appendix>(\.[0-9]+)*)?(-(?<prerelease>(.+)))?)(?<end>['"])/i
+        @version_regex = /^[ \t]*(?<begin>#{variable_prefix}#{version_var_name}\s*=\s*['"])(?<value>(?<major>[0-9]+)(\.(?<minor>[0-9]+))?(\.(?<patch>[0-9]+))?(?<appendix>(\.[0-9]+)*)?(-(?<prerelease>(.+)))?)(?<end>['"])/i unless require_variable_prefix
 
         return unless (path || '').length > 0
         UI.user_error!("Could not find podspec file at path '#{path}'") unless File.exist?(path)
@@ -23,7 +23,7 @@ module Fastlane
 
       def parse(podspec_content)
         @podspec_content = podspec_content
-        @version_match = @version_regex.match(@podspec_content)
+        @version_match = @podspec_content.match(@version_regex)
         UI.user_error!("Could not find version in podspec content '#{@podspec_content}'") if @version_match.nil?
         @version_value = @version_match[:value]
       end

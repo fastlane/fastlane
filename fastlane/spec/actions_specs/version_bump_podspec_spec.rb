@@ -210,6 +210,22 @@ describe Fastlane do
 
         expect(result).to eq('1.5.1.3')
       end
+
+      it "gets the version with a custom version_var_name" do
+        require 'tempfile'
+        temp_file = Tempfile.new('version.rb')
+        temp_file.write("module Fastlane\n  VERSION = '2.230.0'.freeze\n  SUGGESTED_RUBY_MIN_VERSION = '3.2.0'.freeze\nend")
+        temp_file.close
+
+        allow(FastlaneCore::FastlaneFolder).to receive(:path).and_return(nil)
+        result = Fastlane::FastFile.new.parse("lane :test do
+          version_get_podspec(path: '#{temp_file.path}', require_variable_prefix: false, version_var_name: 'SUGGESTED_RUBY_MIN_VERSION')
+        end").runner.execute(:test)
+
+        expect(result).to eq('3.2.0')
+      ensure
+        temp_file.unlink if temp_file
+      end
     end
 
     describe "version_bump_podspec" do
@@ -312,6 +328,27 @@ describe Fastlane do
           end").runner.execute(:test)
 
           expect(result).to eq('1.5.1.5.1')
+        end
+
+        it "bumps the version with a custom version_var_name" do
+          require 'tempfile'
+          temp_file = Tempfile.new(%w[version .rb])
+          temp_file.write("module Fastlane\n  VERSION = '2.230.0'.freeze\n  SUGGESTED_RUBY_MIN_VERSION = '3.2.0'.freeze\nend")
+          temp_file.close
+
+          allow(FastlaneCore::FastlaneFolder).to receive(:path).and_return(nil)
+          allow(Fastlane::Helper).to receive(:test?).and_return(false)
+
+          result = Fastlane::FastFile.new.parse("lane :test do
+            version_bump_podspec(path: '#{temp_file.path}', require_variable_prefix: false, version_var_name: 'SUGGESTED_RUBY_MIN_VERSION', bump_type: 'minor')
+          end").runner.execute(:test)
+
+          expect(result).to eq('3.3.0')
+          content = File.read(temp_file.path)
+          expect(content).to include("SUGGESTED_RUBY_MIN_VERSION = '3.3.0'")
+          expect(content).to include("VERSION = '2.230.0'")
+        ensure
+          temp_file.unlink if temp_file
         end
       end
     end
