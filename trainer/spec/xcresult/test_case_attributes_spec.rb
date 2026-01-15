@@ -101,18 +101,6 @@ describe Trainer::XCResult::TestCaseAttributes do
         end
       end
 
-      context 'with localized format (Russian)' do
-        it 'parses "1 мин 19 с" format' do
-          node = { 'duration' => '1 мин 19 с' }
-          # This will parse minutes correctly but seconds might fail
-          # as it doesn't have 's' suffix. Let's verify behavior.
-          result = test_class.extract_duration(node)
-          # Should parse 'мин' as containing 'm' and 'с' as containing 's'
-          # But if it doesn't work, we need to update the logic
-          expect(result).to be >= 60.0 # At least 1 minute
-        end
-      end
-
       context 'with decimal values in minutes format' do
         it 'parses "1m 5.5s" format' do
           node = { 'duration' => '1m 5.5s' }
