@@ -128,6 +128,22 @@ module Deliver
                                      description: "Path to the folder containing the screenshots",
                                      optional: true),
 
+        # app previews (videos)
+        FastlaneCore::ConfigItem.new(key: :app_previews_path,
+                                     env_name: "DELIVER_APP_PREVIEWS_PATH",
+                                     description: "Path to the folder containing localized App Preview videos",
+                                     optional: true),
+        FastlaneCore::ConfigItem.new(key: :preview_frame_time_code,
+                                     env_name: "DELIVER_PREVIEW_FRAME_TIME_CODE",
+                                     description: "Time code for the App Preview still frame written as hour:minute:second:centisecond (e.g. 00:00:00:01)",
+                                     optional: true,
+                                     default_value: "00:00:05:00"),
+        FastlaneCore::ConfigItem.new(key: :overwrite_preview_videos,
+                                     env_name: "DELIVER_OVERWRITE_PREVIEW_VIDEOS",
+                                     description: "Clear all previously uploaded App Preview videos before uploading the new ones",
+                                     type: Boolean,
+                                     default_value: false),
+
         # skip
         FastlaneCore::ConfigItem.new(key: :skip_binary_upload,
                                      env_name: "DELIVER_SKIP_BINARY_UPLOAD",
