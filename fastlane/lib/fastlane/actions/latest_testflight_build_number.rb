@@ -106,7 +106,13 @@ module Fastlane
                                        optional: true,
                                        code_gen_sensitive: true,
                                        default_value: CredentialsManager::AppfileConfig.try_fetch_value(:itc_team_name),
-                                       default_value_dynamic: true)
+                                       default_value_dynamic: true),
+          FastlaneCore::ConfigItem.new(key: :filter,
+                                       short_option: "-f",
+                                       description: "A map containing additional filters for querying builds. E.g. to filter expired builds, use `{expired: false}`",
+                                       optional: true,
+                                       type: Hash,
+                                       default_value: {})
         ]
       end
 

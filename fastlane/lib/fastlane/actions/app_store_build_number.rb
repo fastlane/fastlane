@@ -67,7 +67,7 @@ module Fastlane
           platform = params[:platform]
 
           # Create filter for get_builds with optional version number
-          filter = { app: app.id }
+          filter = (params[:filter] || {}).merge(app: app.id)
           if version_number
             filter["preReleaseVersion.version"] = version_number
             version_number_message = "version #{version_number}"
