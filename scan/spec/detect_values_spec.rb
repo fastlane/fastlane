@@ -153,8 +153,18 @@ describe Scan do
 
     describe "#detect_simulator" do
       it 'returns simulators for requested devices', requires_xcodebuild: true do
+        # Stub Scan.config and Scan.project to avoid full initialization
+        config_stub = double('config')
+        allow(config_stub).to receive(:[]).and_return(nil)
+        allow(Scan).to receive(:config).and_return(config_stub)
+        allow(Scan).to receive(:project).and_return(nil)
+
         simctl_list_devices_output = double('xcrun simctl list devices', read: File.read("./scan/spec/fixtures/XcrunSimctlListDevicesOutput15"))
         allow(Open3).to receive(:popen3).with("xcrun simctl list devices").and_yield(nil, simctl_list_devices_output, nil, nil)
+
+        simctl_runtime_output = File.read('./scan/spec/fixtures/XcrunSimctlListRuntimesOutput')
+        runtime_status = double('status', "success?": true)
+        allow(Open3).to receive(:capture2).with("xcrun simctl list -j runtimes").and_return([simctl_runtime_output, runtime_status])
 
         allow(Scan::DetectValues).to receive(:default_os_version).with('iOS').and_return(Gem::Version.new('17.0'))
         allow(Scan::DetectValues).to receive(:default_os_version).with('tvOS').and_return(Gem::Version.new('17.0'))
@@ -176,8 +186,18 @@ describe Scan do
       end
 
       it 'filters out simulators newer than what the current Xcode SDK supports', requires_xcodebuild: true do
+        # Stub Scan.config and Scan.project to avoid full initialization
+        config_stub = double('config')
+        allow(config_stub).to receive(:[]).and_return(nil)
+        allow(Scan).to receive(:config).and_return(config_stub)
+        allow(Scan).to receive(:project).and_return(nil)
+
         simctl_list_devices_output = double('xcrun simctl list devices', read: File.read("./scan/spec/fixtures/XcrunSimctlListDevicesOutput14"))
         allow(Open3).to receive(:popen3).with("xcrun simctl list devices").and_yield(nil, simctl_list_devices_output, nil, nil)
+
+        simctl_runtime_output = File.read('./scan/spec/fixtures/XcrunSimctlListRuntimesOutput')
+        runtime_status = double('status', "success?": true)
+        allow(Open3).to receive(:capture2).with("xcrun simctl list -j runtimes").and_return([simctl_runtime_output, runtime_status])
 
         allow(Scan::DetectValues).to receive(:default_os_version).with('iOS').and_return(Gem::Version.new('16.4'))
         allow(Scan::DetectValues).to receive(:default_os_version).with('tvOS').and_return(Gem::Version.new('16.4'))
