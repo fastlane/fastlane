@@ -104,5 +104,7 @@ Gem::Specification.new do |spec|
   spec.add_dependency('csv', '~> 3.3') # 3.4 - workaround for sinatra as can't upgrade to 4.x yet
   spec.add_dependency('mutex_m', '~> 0.3.0') # 3.4 - workaround for httpclient as can't upgrade to 2.9 yet
   spec.add_dependency('nkf', '~> 0.2.0') # 3.4 - workaround for CFPropertyList as can't upgrade to 4.x yet
-  spec.add_dependency('logger', '>= 1.6', '< 2.0') # stdlib gem removed from default set in Ruby 3.5+
+  spec.add_dependency('logger', '>= 1.6', '< 2.0') # 4.0 - stdlib gem removed from default set
+  spec.add_dependency('benchmark', '>= 0.1.0') # 4.1 - stdlib gem removed from default set
+  spec.add_dependency('ostruct', '>= 0.1.0') # 4.1 - stdlib gem removed from default set
 end
