@@ -3,49 +3,48 @@ module Fastlane
     module SharedValues
     end
 
-    # Wrapper class that converts symbol keys to strings when accessing hash
-    # This allows users to use symbols like plist[:KEY] while maintaining
-    # compatibility with the string keys returned by Xcodeproj::Plist
-    class PlistHashWrapper
-      def initialize(hash)
-        @hash = hash
-      end
-
-      def []=(key, value)
-        @hash[key.to_s] = value
-      end
-
-      def [](key)
-        @hash[key.to_s]
-      end
-
-      def fetch(key, *args, &block)
-        @hash.fetch(key.to_s, *args, &block)
-      end
-
-      def key?(key)
-        @hash.key?(key.to_s)
-      end
-
-      def has_key?(key)
-        @hash.has_key?(key.to_s)
-      end
-
-      def delete(key)
-        @hash.delete(key.to_s)
-      end
-
-      # Delegate all other methods to the underlying hash
-      def method_missing(method, *args, &block)
-        @hash.send(method, *args, &block)
-      end
-
-      def respond_to_missing?(method, include_private = false)
-        @hash.respond_to?(method, include_private) || super
-      end
-    end
-
     class UpdatePlistAction < Action
+      # Wrapper class that converts symbol keys to strings when accessing hash
+      # This allows users to use symbols like plist[:KEY] while maintaining
+      # compatibility with the string keys returned by Xcodeproj::Plist
+      class PlistHashWrapper
+        def initialize(hash)
+          @hash = hash
+        end
+
+        def []=(key, value)
+          @hash[key.to_s] = value
+        end
+
+        def [](key)
+          @hash[key.to_s]
+        end
+
+        def fetch(key, *args, &block)
+          @hash.fetch(key.to_s, *args, &block)
+        end
+
+        def key?(key)
+          @hash.key?(key.to_s)
+        end
+
+        def has_key?(key)
+          @hash.has_key?(key.to_s)
+        end
+
+        def delete(key)
+          @hash.delete(key.to_s)
+        end
+
+        # Delegate all other methods to the underlying hash
+        def method_missing(method, *args, &block)
+          @hash.send(method, *args, &block)
+        end
+
+        def respond_to_missing?(method, include_private = false)
+          @hash.respond_to?(method, include_private) || super
+        end
+      end
       def self.run(params)
         require 'xcodeproj'
 
