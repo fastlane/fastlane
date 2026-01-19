@@ -28,9 +28,7 @@ module Fastlane
           @hash.key?(key.to_s)
         end
 
-        def has_key?(key)
-          @hash.has_key?(key.to_s)
-        end
+        alias has_key? key?
 
         def delete(key)
           @hash.delete(key.to_s)
