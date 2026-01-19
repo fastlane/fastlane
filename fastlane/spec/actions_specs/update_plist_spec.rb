@@ -33,6 +33,57 @@ describe Fastlane do
         expect(result).to include("<string>#{app_identifier}</string>")
       end
 
+      it "updates the plist using symbol keys" do
+        result = Fastlane::FastFile.new.parse("lane :test do
+          update_plist ({
+            plist_path: '#{test_path}/#{plist_path}',
+            block: proc do |plist|
+              plist[:CFBundleIdentifier] = '#{app_identifier}'
+              plist[:CFBundleDisplayName] = '#{display_name}'
+            end
+          })
+        end").runner.execute(:test)
+        expect(result).to include("<string>#{display_name}</string>")
+        expect(result).to include("<string>#{app_identifier}</string>")
+      end
+
+      it "updates the plist with mixed symbol and string keys" do
+        result = Fastlane::FastFile.new.parse("lane :test do
+          update_plist ({
+            plist_path: '#{test_path}/#{plist_path}',
+            block: proc do |plist|
+              plist[:CFBundleIdentifier] = '#{app_identifier}'
+              plist['CFBundleDisplayName'] = '#{display_name}'
+            end
+          })
+        end").runner.execute(:test)
+        expect(result).to include("<string>#{display_name}</string>")
+        expect(result).to include("<string>#{app_identifier}</string>")
+      end
+
+      it "updates the plist with symbol keys for large plist files" do
+        # Create a large plist with many keys to reproduce the issue
+        large_plist_content = '<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd"><plist version="1.0"><dict>'
+        (1..40).each do |i|
+          large_plist_content += "<key>Key#{i}</key><string>Value#{i}</string>"
+        end
+        large_plist_content += '<key>CFBundleIdentifier</key><string>empty</string></dict></plist>'
+        
+        File.write(File.join(test_path, 'LargeInfo.plist'), large_plist_content)
+        
+        result = Fastlane::FastFile.new.parse("lane :test do
+          update_plist ({
+            plist_path: '#{test_path}/LargeInfo.plist',
+            block: proc do |plist|
+              plist[:CFBundleIdentifier] = '#{app_identifier}'
+            end
+          })
+        end").runner.execute(:test)
+        expect(result).to include("<string>#{app_identifier}</string>")
+        
+        File.delete(File.join(test_path, 'LargeInfo.plist'))
+      end
+
       it "throws an error when the plist file does not exist" do
         # This is path update_plist creates to locate the plist file.
         full_path = [test_path, proj_file, '..', "NOEXIST-#{plist_path}"].join(File::SEPARATOR)

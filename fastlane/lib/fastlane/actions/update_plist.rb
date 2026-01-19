@@ -3,6 +3,48 @@ module Fastlane
     module SharedValues
     end
 
+    # Wrapper class that converts symbol keys to strings when accessing hash
+    # This allows users to use symbols like plist[:KEY] while maintaining
+    # compatibility with the string keys returned by Xcodeproj::Plist
+    class PlistHashWrapper
+      def initialize(hash)
+        @hash = hash
+      end
+
+      def []=(key, value)
+        @hash[key.to_s] = value
+      end
+
+      def [](key)
+        @hash[key.to_s]
+      end
+
+      def fetch(key, *args, &block)
+        @hash.fetch(key.to_s, *args, &block)
+      end
+
+      def key?(key)
+        @hash.key?(key.to_s)
+      end
+
+      def has_key?(key)
+        @hash.has_key?(key.to_s)
+      end
+
+      def delete(key)
+        @hash.delete(key.to_s)
+      end
+
+      # Delegate all other methods to the underlying hash
+      def method_missing(method, *args, &block)
+        @hash.send(method, *args, &block)
+      end
+
+      def respond_to_missing?(method, include_private = false)
+        @hash.respond_to?(method, include_private) || super
+      end
+    end
+
     class UpdatePlistAction < Action
       def self.run(params)
         require 'xcodeproj'
@@ -17,7 +59,9 @@ module Fastlane
         UI.user_error!("Couldn't find plist file at path '#{plist_path}'") unless File.exist?(plist_path)
         plist = Xcodeproj::Plist.read_from_path(plist_path)
 
-        params[:block].call(plist) if params[:block]
+        # Wrap the plist hash to automatically convert symbol keys to strings
+        wrapped_plist = PlistHashWrapper.new(plist)
+        params[:block].call(wrapped_plist) if params[:block]
 
         # Write changes to file
         Xcodeproj::Plist.write_to_path(plist, plist_path)
