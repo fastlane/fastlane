@@ -65,10 +65,10 @@ describe Fastlane do
         # Create a large plist with many keys to reproduce the issue
         large_plist_keys = (1..40).map { |i| "<key>Key#{i}</key><string>Value#{i}</string>" }.join
         large_plist_content = '<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd"><plist version="1.0"><dict>' + large_plist_keys + '<key>CFBundleIdentifier</key><string>empty</string></dict></plist>'
-        
+
         large_plist_path = File.join(test_path, 'LargeInfo.plist')
         File.write(large_plist_path, large_plist_content)
-        
+
         begin
           result = Fastlane::FastFile.new.parse("lane :test do
             update_plist ({
