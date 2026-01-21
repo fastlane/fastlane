@@ -8,20 +8,20 @@ describe Snapshot do
         allow(Snapshot::TestCommandGenerator).to receive(:device_udid).and_return(device_udid)
 
         if FastlaneCore::Helper.xcode_at_least?("13")
-          expect(Fastlane::Helper).to receive(:backticks_if_verbose)
+          expect(Fastlane::Helper).to receive(:backticks_verbose)
             .with("open -a Simulator.app --args -CurrentDeviceUDID #{device_udid}")
             .and_return("").exactly(1).times
         else
-          expect(Fastlane::Helper).to receive(:backticks_if_verbose)
+          expect(Fastlane::Helper).to receive(:backticks_verbose)
             .with("xcrun instruments -w #{device_udid}")
             .and_return("").exactly(1).times
         end
-        expect(Fastlane::Helper).to receive(:backticks_if_verbose)
+        expect(Fastlane::Helper).to receive(:backticks_verbose)
           .with("xcrun simctl addmedia #{device_udid} #{paths.join(' ')}")
           .and_return("").exactly(1).times
 
-        # Verify that backticks_if_verbose isn't called for the fallback to addphoto/addvideo
-        expect(Fastlane::Helper).to receive(:backticks_if_verbose).with(any_args).and_return(anything).exactly(0).times
+        # Verify that backticks_verbose isn't called for the fallback to addphoto/addvideo
+        expect(Fastlane::Helper).to receive(:backticks_verbose).with(any_args).and_return(anything).exactly(0).times
 
         launcher = Snapshot::SimulatorLauncherBase.new
         launcher.add_media(['phone'], 'photo', paths)
@@ -31,20 +31,20 @@ describe Snapshot do
         allow(Snapshot::TestCommandGenerator).to receive(:device_udid).and_return(device_udid)
 
         if FastlaneCore::Helper.xcode_at_least?("13")
-          expect(Fastlane::Helper).to receive(:backticks_if_verbose)
+          expect(Fastlane::Helper).to receive(:backticks_verbose)
             .with("open -a Simulator.app --args -CurrentDeviceUDID #{device_udid}")
             .and_return("").exactly(1).times
         else
-          expect(Fastlane::Helper).to receive(:backticks_if_verbose)
+          expect(Fastlane::Helper).to receive(:backticks_verbose)
             .with("xcrun instruments -w #{device_udid}")
             .and_return("").exactly(1).times
         end
 
-        expect(Fastlane::Helper).to receive(:backticks_if_verbose)
+        expect(Fastlane::Helper).to receive(:backticks_verbose)
           .with("xcrun simctl addmedia #{device_udid} #{paths.join(' ')}")
           .and_return("usage: simctl [--noxpc] [--set <path>] [--profiles <path>] <subcommand> ...\n").exactly(1).times
 
-        expect(Fastlane::Helper).to receive(:backticks_if_verbose).with(any_args).and_return(anything).exactly(1).times
+        expect(Fastlane::Helper).to receive(:backticks_verbose).with(any_args).and_return(anything).exactly(1).times
 
         launcher = Snapshot::SimulatorLauncherBase.new
         launcher.add_media(['phone'], 'photo', paths)
@@ -61,12 +61,12 @@ describe Snapshot do
         allow(Snapshot::TestCommandGenerator).to receive(:device_udid).and_return(device_udid)
         allow(ENV).to receive(:[]).with("SNAPSHOT_SIMULATOR_WAIT_FOR_BOOT_TIMEOUT").and_return(nil)
 
-        expect(Fastlane::Helper).to receive(:backticks_if_verbose)
+        expect(Fastlane::Helper).to receive(:backticks_verbose)
           .with("xcrun simctl bootstatus #{device_udid} -b")
           .and_return("").exactly(1).times
 
         # Verify the time format is HH:MM (e.g., "09:41") not ISO8601
-        expect(Fastlane::Helper).to receive(:backticks_if_verbose)
+        expect(Fastlane::Helper).to receive(:backticks_verbose)
           .with(match(/xcrun simctl status_bar #{device_udid} override --time 09:41/))
           .and_return("").exactly(1).times
 
@@ -78,12 +78,12 @@ describe Snapshot do
         allow(Snapshot::TestCommandGenerator).to receive(:device_udid).and_return(device_udid)
         allow(ENV).to receive(:[]).with("SNAPSHOT_SIMULATOR_WAIT_FOR_BOOT_TIMEOUT").and_return(nil)
 
-        expect(Fastlane::Helper).to receive(:backticks_if_verbose)
+        expect(Fastlane::Helper).to receive(:backticks_verbose)
           .with("xcrun simctl bootstatus #{device_udid} -b")
           .and_return("").exactly(1).times
 
         custom_args = "--time 10:30 --dataNetwork lte"
-        expect(Fastlane::Helper).to receive(:backticks_if_verbose)
+        expect(Fastlane::Helper).to receive(:backticks_verbose)
           .with("xcrun simctl status_bar #{device_udid} override #{custom_args}")
           .and_return("").exactly(1).times
 
