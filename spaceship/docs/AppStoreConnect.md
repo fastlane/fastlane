@@ -15,6 +15,7 @@
   * [App Analytics](#app-analytics)
   * [Bundle Id](#bundle-id-auth-key)
   * [Bundle Id Capability](#bundle-id-capability-auth-key)
+  * [Webhooks](#webhooks-auth-key)
 - [License](#license)
 
 ## Usage
@@ -450,6 +451,30 @@ capabilities.each do |capability|
     capability.delete!
   end
 end
+```
+
+### Webhooks (Auth Key)
+
+```ruby
+app = Spaceship::ConnectAPI::App.find("com.krausefx.app")
+
+# Fetch all webhooks
+webhooks = Spaceship::ConnectAPI::Webhook.all(app_id: app.id)
+
+# Create a new webhook
+new_webhook = Spaceship::ConnectAPI::Webhook.create(
+  app_id:      app.id,
+  event_types: [
+    Spaceship::ConnectAPI::Webhook::EventType::APP_STORE_VERSION_APP_VERSION_STATE_UPDATED,
+  ],
+  name:         'Webhook Name',
+  secret:       'secret1234',
+  url:          'https://webhook.example.com'
+)
+
+# Delete a webhook
+webhooks.first.delete!
+new_webhook.delete!
 ```
 
 ## License

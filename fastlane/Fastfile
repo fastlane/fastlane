@@ -550,7 +550,6 @@ error do |lane, exception|
   if ENV['SLACK_URL']
     slack(channel: "testing", message: exception.to_s, success: false)
   end
-  slack_train_crash
 end
 
 # Helper
