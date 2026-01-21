@@ -310,7 +310,7 @@ module FastlaneCore
       return result
     end
 
-    def self.backticks_if_verbose(command)
+    def self.backticks_verbose(command)
       UI.command(command) if FastlaneCore::Globals.verbose?
       result = `#{command}`
       UI.command_output(result) if FastlaneCore::Globals.verbose?

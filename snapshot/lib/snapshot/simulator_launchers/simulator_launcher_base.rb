@@ -52,7 +52,7 @@ module Snapshot
       # Kill and shutdown all currently running simulators so that the following settings
       # changes will be picked up when they are started again.
       Snapshot.kill_simulator # because of https://github.com/fastlane/fastlane/issues/2533
-      Helper.backticks_if_verbose("xcrun simctl shutdown booted")
+      Helper.backticks_verbose("xcrun simctl shutdown booted")
 
       Fixes::SimulatorZoomFix.patch
       Fixes::HardwareKeyboardFix.patch
@@ -81,7 +81,7 @@ module Snapshot
 
       unless launcher_config.headless
         simulator_path = File.join(Helper.xcode_path, 'Applications', 'Simulator.app')
-        Helper.backticks_if_verbose("open -a #{simulator_path} -g")
+        Helper.backticks_verbose("open -a #{simulator_path} -g")
       end
     end
 
@@ -95,22 +95,22 @@ module Snapshot
 
         UI.message("Launch Simulator #{device_type}")
         if FastlaneCore::Helper.xcode_at_least?("13")
-          Helper.backticks_if_verbose("open -a Simulator.app --args -CurrentDeviceUDID #{device_udid}")
+          Helper.backticks_verbose("open -a Simulator.app --args -CurrentDeviceUDID #{device_udid}")
         else
-          Helper.backticks_if_verbose("xcrun instruments -w #{device_udid}")
+          Helper.backticks_verbose("xcrun instruments -w #{device_udid}")
         end
 
         paths.each do |path|
           UI.message("Adding '#{path}'")
 
           # Attempting addmedia since addphoto and addvideo are deprecated
-          output = Helper.backticks_if_verbose("xcrun simctl addmedia #{device_udid} #{path.shellescape}")
+          output = Helper.backticks_verbose("xcrun simctl addmedia #{device_udid} #{path.shellescape}")
 
           # Run legacy addphoto and addvideo if addmedia isn't found
           # Output will be empty string if it was a success
           # Output will contain "usage: simctl" if command not found
           if output.include?('usage: simctl')
-            Helper.backticks_if_verbose("xcrun simctl add#{media_type} #{device_udid} #{path.shellescape}")
+            Helper.backticks_verbose("xcrun simctl add#{media_type} #{device_udid} #{path.shellescape}")
           end
         end
       end
@@ -121,7 +121,7 @@ module Snapshot
 
       UI.message("Launch Simulator #{device_type}")
       # Boot the simulator and wait for it to finish booting
-      Helper.backticks_if_verbose("xcrun simctl bootstatus #{device_udid} -b")
+      Helper.backticks_verbose("xcrun simctl bootstatus #{device_udid} -b")
 
       # "Booted" status is not enough for to adjust the status bar
       # Simulator could still be booting with Apple logo
@@ -143,14 +143,14 @@ module Snapshot
         arguments = "--time #{time_str} --dataNetwork wifi --wifiMode active --wifiBars 3 --cellularMode active --operatorName '' --cellularBars 4 --batteryState charged --batteryLevel 100"
       end
 
-      Helper.backticks_if_verbose("xcrun simctl status_bar #{device_udid} override #{arguments}")
+      Helper.backticks_verbose("xcrun simctl status_bar #{device_udid} override #{arguments}")
     end
 
     def clear_status_bar(device_type)
       device_udid = TestCommandGenerator.device_udid(device_type)
 
       UI.message("Clearing Status Bar Override")
-      Helper.backticks_if_verbose("xcrun simctl status_bar #{device_udid} clear")
+      Helper.backticks_verbose("xcrun simctl status_bar #{device_udid} clear")
     end
 
     def uninstall_app(device_type)
@@ -166,7 +166,7 @@ module Snapshot
 
       UI.important("Erasing #{device_type}...")
 
-      Helper.backticks_if_verbose("xcrun simctl erase #{device_udid}")
+      Helper.backticks_verbose("xcrun simctl erase #{device_udid}")
     end
 
     def localize_simulator(device_type, language, locale)
