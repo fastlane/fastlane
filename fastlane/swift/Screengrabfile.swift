@@ -1,5 +1,5 @@
 // Screengrabfile.swift
-// Copyright (c) 2025 FastlaneTools
+// Copyright (c) 2026 FastlaneTools
 
 // This class is automatically included in FastlaneRunner during build
 
@@ -17,4 +17,4 @@ public class Screengrabfile: ScreengrabfileProtocol {
     // during the `init` process, and you won't see this message
 }
 
-// Generated with fastlane 2.230.0
+// Generated with fastlane 2.231.0

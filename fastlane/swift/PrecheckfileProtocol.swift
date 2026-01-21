@@ -1,5 +1,5 @@
 // PrecheckfileProtocol.swift
-// Copyright (c) 2025 FastlaneTools
+// Copyright (c) 2026 FastlaneTools
 
 public protocol PrecheckfileProtocol: AnyObject {
     /// Path to your App Store Connect API Key JSON file (https://docs.fastlane.tools/app-store-connect-api/#using-fastlane-api-key-json-file)
@@ -52,4 +52,4 @@ public extension PrecheckfileProtocol {
 
 // Please don't remove the lines below
 // They are used to detect outdated files
-// FastlaneRunnerAPIVersion [0.9.135]
+// FastlaneRunnerAPIVersion [0.9.136]
