@@ -14,7 +14,7 @@ module Fastlane
       def post_to_legacy_incoming_webhook(channel:, username:, attachments:, link_names:, icon_url:, icon_emoji:, thread_ts:)
         @client.post(@webhook_url) do |request|
           request.headers['Content-Type'] = 'application/json'
-          request.body = {
+          body = {
             channel: channel,
             username: username,
             icon_url: icon_url,
@@ -22,8 +22,8 @@ module Fastlane
             attachments: attachments,
             link_names: link_names,
           }
-          request.body[:thread_ts] = thread_ts unless thread_ts.nil? || thread_ts.empty?
-          request.body.to_json
+          body[:thread_ts] = thread_ts unless thread_ts.nil? || thread_ts.empty?
+          request.body = body.to_json
         end
       end
 
