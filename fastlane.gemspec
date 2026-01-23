@@ -8,33 +8,33 @@ Gem::Specification.new do |spec|
   spec.name          = "fastlane"
   spec.version       = Fastlane::VERSION
   # list of authors is regenerated and resorted on each release
-  spec.authors       = ["Aaron Brager",
-                        "Felix Krause",
-                        "Satoshi Namai",
-                        "Stefan Natchev",
+  spec.authors       = ["Jan Piotrowski",
+                        "Josh Holtz",
                         "Łukasz Grabowski",
-                        "Luka Mirosevic",
-                        "Connor Tumbleson",
-                        "Danielle Tomlinson",
-                        "Max Ott",
-                        "Fumiya Nakamura",
+                        "Iulian Onofrei",
                         "Olivier Halligon",
-                        "Matthew Ellis",
-                        "Jorge Revuelta H",
-                        "Jérôme Lacoste",
                         "Jimmy Dee",
+                        "Satoshi Namai",
+                        "Danielle Tomlinson",
                         "Daniel Jankowski",
+                        "Felix Krause",
+                        "Maksym Grebenets",
+                        "Kohki Miki",
+                        "Luka Mirosevic",
                         "Joshua Liebowitz",
                         "Manu Wallner",
-                        "Jan Piotrowski",
                         "Roger Oba",
+                        "Max Ott",
+                        "Fumiya Nakamura",
+                        "Jérôme Lacoste",
                         "Helmut Januschka",
-                        "Andrew McBurney",
-                        "Iulian Onofrei",
-                        "Josh Holtz",
+                        "Jorge Revuelta H",
                         "Manish Rathi",
-                        "Kohki Miki",
-                        "Maksym Grebenets"]
+                        "Stefan Natchev",
+                        "Connor Tumbleson",
+                        "Andrew McBurney",
+                        "Matthew Ellis",
+                        "Aaron Brager"]
 
   spec.email         = ["fastlane@krausefx.com"]
   spec.summary       = Fastlane::SUMMARY
@@ -104,5 +104,7 @@ Gem::Specification.new do |spec|
   spec.add_dependency('csv', '~> 3.3') # 3.4 - workaround for sinatra as can't upgrade to 4.x yet
   spec.add_dependency('mutex_m', '~> 0.3.0') # 3.4 - workaround for httpclient as can't upgrade to 2.9 yet
   spec.add_dependency('nkf', '~> 0.2.0') # 3.4 - workaround for CFPropertyList as can't upgrade to 4.x yet
-  spec.add_dependency('logger', '>= 1.6', '< 2.0') # stdlib gem removed from default set in Ruby 3.5+
+  spec.add_dependency('logger', '>= 1.6', '< 2.0') # 4.0 - stdlib gem removed from default set
+  spec.add_dependency('benchmark', '>= 0.1.0') # 4.1 - stdlib gem removed from default set
+  spec.add_dependency('ostruct', '>= 0.1.0') # 4.1 - stdlib gem removed from default set
 end

@@ -32,6 +32,35 @@ describe Fastlane do
         end").runner.execute(:test)
       end
 
+      it "works with certificate, password and format" do
+        cert_name = "test.cer"
+        keychain = 'test.keychain'
+        password = 'testpassword'
+        format = 'pkcs12'
+
+        keychain_path = File.expand_path(File.join('~', 'Library', 'Keychains', keychain))
+        expected_command = "security import #{cert_name} -k '#{keychain_path}' -P #{password} -f #{format} -T /usr/bin/codesign -T /usr/bin/security -T /usr/bin/productbuild -T /usr/bin/productsign 1> /dev/null"
+
+        # this command is also sent on macOS Sierra and we need to allow it or else the test will fail
+        allowed_command = "security set-key-partition-list -S apple-tool:,apple: -s -k #{''.shellescape} #{keychain_path.shellescape} 1> /dev/null"
+
+        allow(File).to receive(:file?).and_return(false)
+        allow(File).to receive(:file?).with(keychain_path).and_return(true)
+        allow(File).to receive(:exist?).and_return(false)
+        expect(File).to receive(:exist?).with(cert_name).and_return(true)
+        allow(Open3).to receive(:popen3).with(expected_command)
+        allow(Open3).to receive(:popen3).with(allowed_command)
+
+        Fastlane::FastFile.new.parse("lane :test do
+          import_certificate ({
+            keychain_name: '#{keychain}',
+            certificate_path: '#{cert_name}',
+            certificate_password: '#{password}',
+            certificate_format: '#{format}'
+          })
+        end").runner.execute(:test)
+      end
+
       it "works with certificate and password that contain spaces, special chars, or '\'" do
         cert_name = '\" test \".cer'
         keychain = '\" test \".keychain'

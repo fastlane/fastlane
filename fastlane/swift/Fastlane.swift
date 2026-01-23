@@ -1,5 +1,5 @@
 // Fastlane.swift
-// Copyright (c) 2025 FastlaneTools
+// Copyright (c) 2026 FastlaneTools
 
 import Foundation
 
@@ -3074,15 +3074,6 @@ public func cloc(binaryPath: String = "/usr/local/bin/cloc",
         .filter { $0?.value != nil }
         .compactMap { $0 }
     let command = RubyCommand(commandID: "", methodName: "cloc", className: nil, args: args)
-    _ = runner.executeCommand(command)
-}
-
-/**
- Print a Club Mate in your build output
- */
-public func clubmate() {
-    let args: [RubyCommand.Argument] = []
-    let command = RubyCommand(commandID: "", methodName: "clubmate", className: nil, args: args)
     _ = runner.executeCommand(command)
 }
 
@@ -7830,7 +7821,8 @@ public func pilot(apiKeyPath: OptionalConfigValue<String?> = .fastlaneDefault(ni
                   waitProcessingTimeoutDuration: OptionalConfigValue<Int?> = .fastlaneDefault(nil),
                   waitForUploadedBuild: OptionalConfigValue<Bool> = .fastlaneDefault(false),
                   rejectBuildWaitingForReview: OptionalConfigValue<Bool> = .fastlaneDefault(false),
-                  submitBetaReview: OptionalConfigValue<Bool> = .fastlaneDefault(true))
+                  submitBetaReview: OptionalConfigValue<Bool> = .fastlaneDefault(true),
+                  appStoreEligible: OptionalConfigValue<Bool> = .fastlaneDefault(true))
 {
     let apiKeyPathArg = apiKeyPath.asRubyArgument(name: "api_key_path", type: nil)
     let apiKeyArg = apiKey.asRubyArgument(name: "api_key", type: nil)
@@ -7871,6 +7863,7 @@ public func pilot(apiKeyPath: OptionalConfigValue<String?> = .fastlaneDefault(ni
     let waitForUploadedBuildArg = waitForUploadedBuild.asRubyArgument(name: "wait_for_uploaded_build", type: nil)
     let rejectBuildWaitingForReviewArg = rejectBuildWaitingForReview.asRubyArgument(name: "reject_build_waiting_for_review", type: nil)
     let submitBetaReviewArg = submitBetaReview.asRubyArgument(name: "submit_beta_review", type: nil)
+    let appStoreEligibleArg = appStoreEligible.asRubyArgument(name: "app_store_eligible", type: nil)
     let array: [RubyCommand.Argument?] = [apiKeyPathArg,
                                           apiKeyArg,
                                           usernameArg,
@@ -7909,7 +7902,8 @@ public func pilot(apiKeyPath: OptionalConfigValue<String?> = .fastlaneDefault(ni
                                           waitProcessingTimeoutDurationArg,
                                           waitForUploadedBuildArg,
                                           rejectBuildWaitingForReviewArg,
-                                          submitBetaReviewArg]
+                                          submitBetaReviewArg,
+                                          appStoreEligibleArg]
     let args: [RubyCommand.Argument] = array
         .filter { $0?.value != nil }
         .compactMap { $0 }
@@ -10304,55 +10298,6 @@ public func slack(message: OptionalConfigValue<String?> = .fastlaneDefault(nil),
 }
 
 /**
- Show a train of the fastlane progress
-
- - returns: A string that is being sent to slack
- */
-public func slackTrain() {
-    let args: [RubyCommand.Argument] = []
-    let command = RubyCommand(commandID: "", methodName: "slack_train", className: nil, args: args)
-    _ = runner.executeCommand(command)
-}
-
-/**
-
- */
-public func slackTrainCrash() {
-    let args: [RubyCommand.Argument] = []
-    let command = RubyCommand(commandID: "", methodName: "slack_train_crash", className: nil, args: args)
-    _ = runner.executeCommand(command)
-}
-
-/**
- Show a train of the fastlane progress
-
- - parameters:
-   - distance: How many rails do we need?
-   - train: Train emoji
-   - rail: Character or emoji for the rail
-   - reverseDirection: Pass true if you want the train to go from left to right
- */
-public func slackTrainStart(distance: Int = 5,
-                            train: String = "🚝",
-                            rail: String = "=",
-                            reverseDirection: OptionalConfigValue<Bool> = .fastlaneDefault(false))
-{
-    let distanceArg = RubyCommand.Argument(name: "distance", value: distance, type: nil)
-    let trainArg = RubyCommand.Argument(name: "train", value: train, type: nil)
-    let railArg = RubyCommand.Argument(name: "rail", value: rail, type: nil)
-    let reverseDirectionArg = reverseDirection.asRubyArgument(name: "reverse_direction", type: nil)
-    let array: [RubyCommand.Argument?] = [distanceArg,
-                                          trainArg,
-                                          railArg,
-                                          reverseDirectionArg]
-    let args: [RubyCommand.Argument] = array
-        .filter { $0?.value != nil }
-        .compactMap { $0 }
-    let command = RubyCommand(commandID: "", methodName: "slack_train_start", className: nil, args: args)
-    _ = runner.executeCommand(command)
-}
-
-/**
  Use slather to generate a code coverage report
 
  - parameters:
@@ -11758,7 +11703,8 @@ public func testflight(apiKeyPath: OptionalConfigValue<String?> = .fastlaneDefau
                        waitProcessingTimeoutDuration: OptionalConfigValue<Int?> = .fastlaneDefault(nil),
                        waitForUploadedBuild: OptionalConfigValue<Bool> = .fastlaneDefault(false),
                        rejectBuildWaitingForReview: OptionalConfigValue<Bool> = .fastlaneDefault(false),
-                       submitBetaReview: OptionalConfigValue<Bool> = .fastlaneDefault(true))
+                       submitBetaReview: OptionalConfigValue<Bool> = .fastlaneDefault(true),
+                       appStoreEligible: OptionalConfigValue<Bool> = .fastlaneDefault(true))
 {
     let apiKeyPathArg = apiKeyPath.asRubyArgument(name: "api_key_path", type: nil)
     let apiKeyArg = apiKey.asRubyArgument(name: "api_key", type: nil)
@@ -11799,6 +11745,7 @@ public func testflight(apiKeyPath: OptionalConfigValue<String?> = .fastlaneDefau
     let waitForUploadedBuildArg = waitForUploadedBuild.asRubyArgument(name: "wait_for_uploaded_build", type: nil)
     let rejectBuildWaitingForReviewArg = rejectBuildWaitingForReview.asRubyArgument(name: "reject_build_waiting_for_review", type: nil)
     let submitBetaReviewArg = submitBetaReview.asRubyArgument(name: "submit_beta_review", type: nil)
+    let appStoreEligibleArg = appStoreEligible.asRubyArgument(name: "app_store_eligible", type: nil)
     let array: [RubyCommand.Argument?] = [apiKeyPathArg,
                                           apiKeyArg,
                                           usernameArg,
@@ -11837,7 +11784,8 @@ public func testflight(apiKeyPath: OptionalConfigValue<String?> = .fastlaneDefau
                                           waitProcessingTimeoutDurationArg,
                                           waitForUploadedBuildArg,
                                           rejectBuildWaitingForReviewArg,
-                                          submitBetaReviewArg]
+                                          submitBetaReviewArg,
+                                          appStoreEligibleArg]
     let args: [RubyCommand.Argument] = array
         .filter { $0?.value != nil }
         .compactMap { $0 }
@@ -13181,7 +13129,8 @@ public func uploadToTestflight(apiKeyPath: OptionalConfigValue<String?> = .fastl
                                waitProcessingTimeoutDuration: OptionalConfigValue<Int?> = .fastlaneDefault(nil),
                                waitForUploadedBuild: OptionalConfigValue<Bool> = .fastlaneDefault(false),
                                rejectBuildWaitingForReview: OptionalConfigValue<Bool> = .fastlaneDefault(false),
-                               submitBetaReview: OptionalConfigValue<Bool> = .fastlaneDefault(true))
+                               submitBetaReview: OptionalConfigValue<Bool> = .fastlaneDefault(true),
+                               appStoreEligible: OptionalConfigValue<Bool> = .fastlaneDefault(true))
 {
     let apiKeyPathArg = apiKeyPath.asRubyArgument(name: "api_key_path", type: nil)
     let apiKeyArg = apiKey.asRubyArgument(name: "api_key", type: nil)
@@ -13222,6 +13171,7 @@ public func uploadToTestflight(apiKeyPath: OptionalConfigValue<String?> = .fastl
     let waitForUploadedBuildArg = waitForUploadedBuild.asRubyArgument(name: "wait_for_uploaded_build", type: nil)
     let rejectBuildWaitingForReviewArg = rejectBuildWaitingForReview.asRubyArgument(name: "reject_build_waiting_for_review", type: nil)
     let submitBetaReviewArg = submitBetaReview.asRubyArgument(name: "submit_beta_review", type: nil)
+    let appStoreEligibleArg = appStoreEligible.asRubyArgument(name: "app_store_eligible", type: nil)
     let array: [RubyCommand.Argument?] = [apiKeyPathArg,
                                           apiKeyArg,
                                           usernameArg,
@@ -13260,7 +13210,8 @@ public func uploadToTestflight(apiKeyPath: OptionalConfigValue<String?> = .fastl
                                           waitProcessingTimeoutDurationArg,
                                           waitForUploadedBuildArg,
                                           rejectBuildWaitingForReviewArg,
-                                          submitBetaReviewArg]
+                                          submitBetaReviewArg,
+                                          appStoreEligibleArg]
     let args: [RubyCommand.Argument] = array
         .filter { $0?.value != nil }
         .compactMap { $0 }
@@ -13900,4 +13851,4 @@ public let snapshotfile: Snapshotfile = .init()
 
 // Please don't remove the lines below
 // They are used to detect outdated files
-// FastlaneRunnerAPIVersion [0.9.192]
+// FastlaneRunnerAPIVersion [0.9.194]
