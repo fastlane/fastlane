@@ -5,6 +5,7 @@ require 'credentials_manager/appfile_config'
 require_relative 'module'
 
 module Snapshot
+  # rubocop:disable Metrics/ClassLength
   class Options
     def self.verify_type(item_name, acceptable_types, value)
       type_ok = [Array, String].any? { |type| value.kind_of?(type) }
@@ -342,4 +343,5 @@ module Snapshot
       ]
     end
   end
+  # rubocop:enable Metrics/ClassLength
 end
