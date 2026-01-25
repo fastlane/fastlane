@@ -182,11 +182,6 @@ workflows:
   "Run Tests & Checks": # Name of the workflow, which ends up displayed on GitHub's PR Check
     jobs:
       - tests_macos:
-          name: 'Execute tests on macOS (Xcode 16.2.0, Ruby 3.1)'
-          xcode_version: '16.2.0'
-          ruby_version: '3.1'
-          ruby_opt: -W:deprecated
-      - tests_macos:
           name: 'Execute tests on macOS (Xcode 16.3.0, Ruby 3.1)'
           xcode_version: '16.3.0'
           ruby_version: '3.1'
