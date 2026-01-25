@@ -82,6 +82,8 @@ _pilot_ uses [_spaceship_](https://spaceship.airforce) to submit the build metad
 ### Upload from Linux
 
 To upload binaries from Linux:
+
+- have the package file and the `AppStoreInfo.plist` file in the same location on disk (_check [fastlane gym](https://docs.fastlane.tools/actions/gym/) on how to make them_)
 - make sure you have [Transporter on Linux](https://help.apple.com/itc/transporteruserguide/en.lproj/static.html) installed
 - set the following environment variables:
     - `FASTLANE_ITUNES_TRANSPORTER_USE_SHELL_SCRIPT=true`

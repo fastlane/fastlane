@@ -49,7 +49,7 @@ module Fastlane
       end
 
       def self.is_supported?(platform)
-        [:ios, :mac].include?(platform)
+        [:ios, :mac, :xros].include?(platform)
       end
 
       def self.example_code
