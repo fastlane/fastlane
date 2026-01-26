@@ -7821,8 +7821,7 @@ public func pilot(apiKeyPath: OptionalConfigValue<String?> = .fastlaneDefault(ni
                   waitProcessingTimeoutDuration: OptionalConfigValue<Int?> = .fastlaneDefault(nil),
                   waitForUploadedBuild: OptionalConfigValue<Bool> = .fastlaneDefault(false),
                   rejectBuildWaitingForReview: OptionalConfigValue<Bool> = .fastlaneDefault(false),
-                  submitBetaReview: OptionalConfigValue<Bool> = .fastlaneDefault(true),
-                  appStoreEligible: OptionalConfigValue<Bool> = .fastlaneDefault(true))
+                  submitBetaReview: OptionalConfigValue<Bool> = .fastlaneDefault(true))
 {
     let apiKeyPathArg = apiKeyPath.asRubyArgument(name: "api_key_path", type: nil)
     let apiKeyArg = apiKey.asRubyArgument(name: "api_key", type: nil)
@@ -7863,7 +7862,6 @@ public func pilot(apiKeyPath: OptionalConfigValue<String?> = .fastlaneDefault(ni
     let waitForUploadedBuildArg = waitForUploadedBuild.asRubyArgument(name: "wait_for_uploaded_build", type: nil)
     let rejectBuildWaitingForReviewArg = rejectBuildWaitingForReview.asRubyArgument(name: "reject_build_waiting_for_review", type: nil)
     let submitBetaReviewArg = submitBetaReview.asRubyArgument(name: "submit_beta_review", type: nil)
-    let appStoreEligibleArg = appStoreEligible.asRubyArgument(name: "app_store_eligible", type: nil)
     let array: [RubyCommand.Argument?] = [apiKeyPathArg,
                                           apiKeyArg,
                                           usernameArg,
@@ -7902,8 +7900,7 @@ public func pilot(apiKeyPath: OptionalConfigValue<String?> = .fastlaneDefault(ni
                                           waitProcessingTimeoutDurationArg,
                                           waitForUploadedBuildArg,
                                           rejectBuildWaitingForReviewArg,
-                                          submitBetaReviewArg,
-                                          appStoreEligibleArg]
+                                          submitBetaReviewArg]
     let args: [RubyCommand.Argument] = array
         .filter { $0?.value != nil }
         .compactMap { $0 }
@@ -11703,8 +11700,7 @@ public func testflight(apiKeyPath: OptionalConfigValue<String?> = .fastlaneDefau
                        waitProcessingTimeoutDuration: OptionalConfigValue<Int?> = .fastlaneDefault(nil),
                        waitForUploadedBuild: OptionalConfigValue<Bool> = .fastlaneDefault(false),
                        rejectBuildWaitingForReview: OptionalConfigValue<Bool> = .fastlaneDefault(false),
-                       submitBetaReview: OptionalConfigValue<Bool> = .fastlaneDefault(true),
-                       appStoreEligible: OptionalConfigValue<Bool> = .fastlaneDefault(true))
+                       submitBetaReview: OptionalConfigValue<Bool> = .fastlaneDefault(true))
 {
     let apiKeyPathArg = apiKeyPath.asRubyArgument(name: "api_key_path", type: nil)
     let apiKeyArg = apiKey.asRubyArgument(name: "api_key", type: nil)
@@ -11745,7 +11741,6 @@ public func testflight(apiKeyPath: OptionalConfigValue<String?> = .fastlaneDefau
     let waitForUploadedBuildArg = waitForUploadedBuild.asRubyArgument(name: "wait_for_uploaded_build", type: nil)
     let rejectBuildWaitingForReviewArg = rejectBuildWaitingForReview.asRubyArgument(name: "reject_build_waiting_for_review", type: nil)
     let submitBetaReviewArg = submitBetaReview.asRubyArgument(name: "submit_beta_review", type: nil)
-    let appStoreEligibleArg = appStoreEligible.asRubyArgument(name: "app_store_eligible", type: nil)
     let array: [RubyCommand.Argument?] = [apiKeyPathArg,
                                           apiKeyArg,
                                           usernameArg,
@@ -11784,8 +11779,7 @@ public func testflight(apiKeyPath: OptionalConfigValue<String?> = .fastlaneDefau
                                           waitProcessingTimeoutDurationArg,
                                           waitForUploadedBuildArg,
                                           rejectBuildWaitingForReviewArg,
-                                          submitBetaReviewArg,
-                                          appStoreEligibleArg]
+                                          submitBetaReviewArg]
     let args: [RubyCommand.Argument] = array
         .filter { $0?.value != nil }
         .compactMap { $0 }
@@ -13129,8 +13123,7 @@ public func uploadToTestflight(apiKeyPath: OptionalConfigValue<String?> = .fastl
                                waitProcessingTimeoutDuration: OptionalConfigValue<Int?> = .fastlaneDefault(nil),
                                waitForUploadedBuild: OptionalConfigValue<Bool> = .fastlaneDefault(false),
                                rejectBuildWaitingForReview: OptionalConfigValue<Bool> = .fastlaneDefault(false),
-                               submitBetaReview: OptionalConfigValue<Bool> = .fastlaneDefault(true),
-                               appStoreEligible: OptionalConfigValue<Bool> = .fastlaneDefault(true))
+                               submitBetaReview: OptionalConfigValue<Bool> = .fastlaneDefault(true))
 {
     let apiKeyPathArg = apiKeyPath.asRubyArgument(name: "api_key_path", type: nil)
     let apiKeyArg = apiKey.asRubyArgument(name: "api_key", type: nil)
@@ -13171,7 +13164,6 @@ public func uploadToTestflight(apiKeyPath: OptionalConfigValue<String?> = .fastl
     let waitForUploadedBuildArg = waitForUploadedBuild.asRubyArgument(name: "wait_for_uploaded_build", type: nil)
     let rejectBuildWaitingForReviewArg = rejectBuildWaitingForReview.asRubyArgument(name: "reject_build_waiting_for_review", type: nil)
     let submitBetaReviewArg = submitBetaReview.asRubyArgument(name: "submit_beta_review", type: nil)
-    let appStoreEligibleArg = appStoreEligible.asRubyArgument(name: "app_store_eligible", type: nil)
     let array: [RubyCommand.Argument?] = [apiKeyPathArg,
                                           apiKeyArg,
                                           usernameArg,
@@ -13210,8 +13202,7 @@ public func uploadToTestflight(apiKeyPath: OptionalConfigValue<String?> = .fastl
                                           waitProcessingTimeoutDurationArg,
                                           waitForUploadedBuildArg,
                                           rejectBuildWaitingForReviewArg,
-                                          submitBetaReviewArg,
-                                          appStoreEligibleArg]
+                                          submitBetaReviewArg]
     let args: [RubyCommand.Argument] = array
         .filter { $0?.value != nil }
         .compactMap { $0 }
