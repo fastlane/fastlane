@@ -8,33 +8,33 @@ Gem::Specification.new do |spec|
   spec.name          = "fastlane"
   spec.version       = Fastlane::VERSION
   # list of authors is regenerated and resorted on each release
-  spec.authors       = ["Aaron Brager",
+  spec.authors       = ["Jan Piotrowski",
+                        "Josh Holtz",
+                        "Łukasz Grabowski",
+                        "Iulian Onofrei",
+                        "Olivier Halligon",
+                        "Jimmy Dee",
                         "Satoshi Namai",
                         "Danielle Tomlinson",
-                        "Kohki Miki",
-                        "Connor Tumbleson",
-                        "Jorge Revuelta H",
-                        "Joshua Liebowitz",
-                        "Luka Mirosevic",
-                        "Stefan Natchev",
-                        "Manish Rathi",
                         "Daniel Jankowski",
-                        "Łukasz Grabowski",
-                        "Helmut Januschka",
-                        "Roger Oba",
-                        "Jan Piotrowski",
-                        "Andrew McBurney",
-                        "Jimmy Dee",
-                        "Olivier Halligon",
-                        "Matthew Ellis",
-                        "Manu Wallner",
-                        "Max Ott",
-                        "Iulian Onofrei",
-                        "Josh Holtz",
-                        "Jérôme Lacoste",
                         "Felix Krause",
+                        "Maksym Grebenets",
+                        "Kohki Miki",
+                        "Luka Mirosevic",
+                        "Joshua Liebowitz",
+                        "Manu Wallner",
+                        "Roger Oba",
+                        "Max Ott",
                         "Fumiya Nakamura",
-                        "Maksym Grebenets"]
+                        "Jérôme Lacoste",
+                        "Helmut Januschka",
+                        "Jorge Revuelta H",
+                        "Manish Rathi",
+                        "Stefan Natchev",
+                        "Connor Tumbleson",
+                        "Andrew McBurney",
+                        "Matthew Ellis",
+                        "Aaron Brager"]
 
   spec.email         = ["fastlane@krausefx.com"]
   spec.summary       = Fastlane::SUMMARY
@@ -49,7 +49,7 @@ Gem::Specification.new do |spec|
     "source_code_uri" => "https://github.com/fastlane/fastlane"
   }
 
-  spec.required_ruby_version = '>= 2.6'
+  spec.required_ruby_version = '>= 2.7'
 
   spec.files = Dir.glob("*/lib/**/*", File::FNM_DOTMATCH) + Dir["fastlane/swift/**/*"] + Dir["bin/*"] + Dir["*/README.md"] + %w(README.md LICENSE .yardopts) - Dir["fastlane/lib/fastlane/actions/device_grid/assets/*"] - Dir["fastlane/lib/fastlane/actions/docs/assets/*"]
   spec.bindir = "bin"
@@ -75,7 +75,7 @@ Gem::Specification.new do |spec|
   spec.add_dependency('gh_inspector', '>= 1.1.2', '< 2.0.0') # search for issues on GitHub when something goes wrong
   spec.add_dependency('google-apis-androidpublisher_v3', '~> 0.3') # Google API Client to access Play Publishing API
   spec.add_dependency('google-apis-playcustomapp_v1', '~> 0.1') # Google API Client to access Custom app Publishing API
-  spec.add_dependency('google-cloud-env', '>= 1.6.0', '< 2.0.0') # Must be < 2.0.0 to support Ruby 2.6
+  spec.add_dependency('google-cloud-env', '>= 1.6.0', '<= 2.1.1') # Must be <= 2.1.1 to support Ruby 2.7
   spec.add_dependency('google-cloud-storage', '~> 1.31') # Access Google Cloud Storage for match
   spec.add_dependency('highline', '~> 2.0') # user inputs (e.g. passwords)
   spec.add_dependency('http-cookie', '~> 1.0.5') # Must be 1.0.5+ for Ruby 3 compatibility: https://github.com/sparklemotion/http-cookie/commit/d12449a983d3dd660c5fe1f2b135c35e83755cc3
@@ -104,5 +104,7 @@ Gem::Specification.new do |spec|
   spec.add_dependency('csv', '~> 3.3') # 3.4 - workaround for sinatra as can't upgrade to 4.x yet
   spec.add_dependency('mutex_m', '~> 0.3.0') # 3.4 - workaround for httpclient as can't upgrade to 2.9 yet
   spec.add_dependency('nkf', '~> 0.2.0') # 3.4 - workaround for CFPropertyList as can't upgrade to 4.x yet
-  spec.add_dependency('logger', '>= 1.6', '< 2.0') # stdlib gem removed from default set in Ruby 3.5+
+  spec.add_dependency('logger', '>= 1.6', '< 2.0') # 4.0 - stdlib gem removed from default set
+  spec.add_dependency('benchmark', '>= 0.1.0') # 4.1 - stdlib gem removed from default set
+  spec.add_dependency('ostruct', '>= 0.1.0') # 4.1 - stdlib gem removed from default set
 end

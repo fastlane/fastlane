@@ -135,4 +135,21 @@ describe Pilot::Options do
       end.to raise_error(FastlaneCore::Interface::FastlaneError, "Invalid key 'buffalo_chicken'")
     end
   end
+
+  context "app_store_eligible" do
+    it "accepts boolean values" do
+      expect do
+        FastlaneCore::Configuration.create(Pilot::Options.available_options, { app_store_eligible: true })
+      end.not_to(raise_error)
+
+      expect do
+        FastlaneCore::Configuration.create(Pilot::Options.available_options, { app_store_eligible: false })
+      end.not_to(raise_error)
+    end
+
+    it "defaults to true" do
+      config = FastlaneCore::Configuration.create(Pilot::Options.available_options, {})
+      expect(config[:app_store_eligible]).to eq(true)
+    end
+  end
 end
