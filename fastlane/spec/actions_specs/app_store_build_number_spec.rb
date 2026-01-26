@@ -78,6 +78,10 @@ describe Fastlane do
         { version: build_number }
       end
 
+      let(:build_upload) do
+        { cf_build_version: build_number, cf_build_short_version_string: app_version }
+      end
+
       let(:live_version) do
         { build: build, version_string: app_version }
       end
@@ -194,6 +198,14 @@ describe Fastlane do
             .to receive(:app_version)
             .and_return(app_version)
 
+          allow(build_upload)
+            .to receive(:cf_build_version)
+            .and_return(build_number)
+
+          allow(build_upload)
+            .to receive(:cf_build_short_version_string)
+            .and_return(app_version)
+
           options[:live] = false
           expect(UI).to receive(:message).with("Using existing authorization token for App Store Connect API")
         end
@@ -205,10 +217,10 @@ describe Fastlane do
           end
 
           it "sets the correct filters and fetches the latest testflight build number with any platform" do
-            expected_filter = { app: app_id }
+            expected_filter = {}
             expect(Spaceship::ConnectAPI::Platform).to receive(:map).with(nil).and_return(nil)
             expect(UI).to receive(:message).with("Fetching the latest build number for any version")
-            expect(Spaceship::ConnectAPI).to receive(:get_builds).with(filter: expected_filter, sort: "-uploadedDate", includes: "preReleaseVersion", limit: 1).and_return([build])
+            expect(Spaceship::ConnectAPI).to receive(:get_build_uploads).with(app_id: app_id, filter: expected_filter, sort: "-cfBundleVersion", limit: 1).and_return([build_upload])
             expect(UI).to receive(:message).with("Latest upload for version #{app_version} on any platform is build: #{build_number}")
 
             result = Fastlane::Actions::AppStoreBuildNumberAction.get_build_info(options)
@@ -224,9 +236,9 @@ describe Fastlane do
           end
 
           it "sets the correct filters and fetches the latest testflight build number with correct platform" do
-            expected_filter = { :app => app_id, "preReleaseVersion.platform" => platform }
+            expected_filter = { "platform" => platform }
             expect(UI).to receive(:message).with("Fetching the latest build number for any version")
-            expect(Spaceship::ConnectAPI).to receive(:get_builds).with(filter: expected_filter, sort: "-uploadedDate", includes: "preReleaseVersion", limit: 1).and_return([build])
+            expect(Spaceship::ConnectAPI).to receive(:get_build_uploads).with(app_id: app_id, filter: expected_filter, sort: "-cfBundleVersion", limit: 1).and_return([build_upload])
             expect(UI).to receive(:message).with("Latest upload for version #{app_version} on #{platform} platform is build: #{build_number}")
 
             result = Fastlane::Actions::AppStoreBuildNumberAction.get_build_info(options)
@@ -242,10 +254,10 @@ describe Fastlane do
           end
 
           it "sets the correct filters and fetches the latest testflight build number with any platform of given version" do
-            expected_filter = { :app => app_id, "preReleaseVersion.version" => app_version }
+            expected_filter = { "cfBundleShortVersionString" => app_version }
             expect(Spaceship::ConnectAPI::Platform).to receive(:map).with(nil).and_return(nil)
             expect(UI).to receive(:message).with("Fetching the latest build number for version #{app_version}")
-            expect(Spaceship::ConnectAPI).to receive(:get_builds).with(filter: expected_filter, sort: "-uploadedDate", includes: "preReleaseVersion", limit: 1).and_return([build])
+            expect(Spaceship::ConnectAPI).to receive(:get_build_uploads).with(app_id: app_id, filter: expected_filter, sort: "-cfBundleVersion", limit: 1).and_return([build_upload])
             expect(UI).to receive(:message).with("Latest upload for version #{app_version} on any platform is build: #{build_number}")
 
             result = Fastlane::Actions::AppStoreBuildNumberAction.get_build_info(options)
@@ -261,9 +273,9 @@ describe Fastlane do
           end
 
           it "sets the correct filters and fetches the latest testflight build number with correct platform of given version" do
-            expected_filter = { :app => app_id, "preReleaseVersion.platform" => platform, "preReleaseVersion.version" => app_version }
+            expected_filter = { "platform" => platform, "cfBundleShortVersionString" => app_version }
             expect(UI).to receive(:message).with("Fetching the latest build number for version #{app_version}")
-            expect(Spaceship::ConnectAPI).to receive(:get_builds).with(filter: expected_filter, sort: "-uploadedDate", includes: "preReleaseVersion", limit: 1).and_return([build])
+            expect(Spaceship::ConnectAPI).to receive(:get_build_uploads).with(app_id: app_id, filter: expected_filter, sort: "-cfBundleVersion", limit: 1).and_return([build_upload])
             expect(UI).to receive(:message).with("Latest upload for version #{app_version} on #{platform} platform is build: #{build_number}")
 
             result = Fastlane::Actions::AppStoreBuildNumberAction.get_build_info(options)
@@ -274,10 +286,10 @@ describe Fastlane do
 
         context "when could not find the build and 'initial_build_number' is NOT given in input options" do
           before(:each) do
-            expected_filter = { :app => app_id, "preReleaseVersion.platform" => platform, "preReleaseVersion.version" => app_version }
+            expected_filter = { "platform" => platform, "cfBundleShortVersionString" => app_version }
             allow(Spaceship::ConnectAPI)
-              .to receive(:get_builds)
-              .with(filter: expected_filter, sort: "-uploadedDate", includes: "preReleaseVersion", limit: 1)
+              .to receive(:get_build_uploads)
+              .with(app_id: app_id, filter: expected_filter, sort: "-cfBundleVersion", limit: 1)
               .and_return([nil])
 
             options[:version] = app_version
@@ -287,8 +299,8 @@ describe Fastlane do
 
           it "raises an exception" do
             expect(UI).to receive(:message).with("Fetching the latest build number for version #{app_version}")
-            expect(UI).to receive(:important).with("Could not find a build for version #{app_version} on #{platform} platform on App Store Connect")
-            expect(UI).to receive(:user_error!).with("Could not find a build on App Store Connect - and 'initial_build_number' option is not set")
+            expect(UI).to receive(:important).with("Could not find a build upload for version #{app_version} on #{platform} platform on App Store Connect")
+            expect(UI).to receive(:user_error!).with("Could not find a build upload on App Store Connect - and 'initial_build_number' option is not set")
 
             Fastlane::Actions::AppStoreBuildNumberAction.get_build_info(options)
           end
@@ -296,10 +308,10 @@ describe Fastlane do
 
         context "when could not find the build but 'initial_build_number' is given in input options" do
           before(:each) do
-            expected_filter = { :app => app_id, "preReleaseVersion.platform" => platform, "preReleaseVersion.version" => app_version }
+            expected_filter = { "platform" => platform, "cfBundleShortVersionString" => app_version }
             allow(Spaceship::ConnectAPI)
-              .to receive(:get_builds)
-              .with(filter: expected_filter, sort: "-uploadedDate", includes: "preReleaseVersion", limit: 1)
+              .to receive(:get_build_uploads)
+              .with(app_id: app_id, filter: expected_filter, sort: "-cfBundleVersion", limit: 1)
               .and_return([nil])
 
             options[:version] = app_version
@@ -309,7 +321,7 @@ describe Fastlane do
 
           it "fallbacks to 'initial_build_number' input param" do
             expect(UI).to receive(:message).with("Fetching the latest build number for version #{app_version}")
-            expect(UI).to receive(:important).with("Could not find a build for version #{app_version} on #{platform} platform on App Store Connect")
+            expect(UI).to receive(:important).with("Could not find a build upload for version #{app_version} on #{platform} platform on App Store Connect")
             expect(UI).to receive(:message).with("Using initial build number of 5678")
 
             result = Fastlane::Actions::AppStoreBuildNumberAction.get_build_info(options)
