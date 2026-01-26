@@ -329,12 +329,6 @@ module Pilot
                                      env_name: "PILOT_DISTRIBUTE_EXTERNAL",
                                      description: "Send the build for a beta review",
                                      type: Boolean,
-                                     default_value: true),
-        FastlaneCore::ConfigItem.new(key: :app_store_eligible,
-                                     env_name: "PILOT_APP_STORE_ELIGIBLE",
-                                     description: "Should the build be considered App Store eligible? If set to false, the build of your app is only available to members of your development team. Maps to the BuildAudienceType field of AppStoreConnect API",
-                                     type: Boolean,
-                                     optional: true,
                                      default_value: true)
       ]
     end
