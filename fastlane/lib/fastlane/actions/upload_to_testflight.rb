@@ -75,6 +75,9 @@ module Fastlane
             changelog: "This is my changelog of things that have changed in a log"
           )',
           'upload_to_testflight(
+            app_store_eligible: false # Set build to internal only (default is true for App Store eligible)
+          )',
+          'upload_to_testflight(
             beta_app_review_info: {
               contact_email: "email@email.com",
               contact_first_name: "Connect",

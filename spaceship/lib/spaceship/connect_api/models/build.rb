@@ -13,6 +13,7 @@ module Spaceship
       attr_accessor :icon_asset_token
       attr_accessor :processing_state
       attr_accessor :uses_non_exempt_encryption
+      attr_accessor :build_audience_type
 
       attr_accessor :app
       attr_accessor :beta_app_review_submission
@@ -32,6 +33,7 @@ module Spaceship
         "iconAssetToken" => "icon_asset_token",
         "processingState" => "processing_state",
         "usesNonExemptEncryption" => "uses_non_exempt_encryption",
+        "buildAudienceType" => "build_audience_type",
 
         "app" => "app",
         "betaAppReviewSubmission" => "beta_app_review_submission",

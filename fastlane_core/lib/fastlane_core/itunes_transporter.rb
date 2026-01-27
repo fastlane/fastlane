@@ -219,8 +219,8 @@ module FastlaneCore
     end
 
     def file_upload_option(source)
-      ext = File.extname(source).downcase
-      is_asset_file_type = !File.directory?(source) && [".ipa", ".pkg", ".dmg", ".zip"].include?(ext)
+      file_ext = File.extname(source).downcase
+      is_asset_file_type = !File.directory?(source) && allowed_package_extensions.map { |ext| ".#{ext}" }.include?(file_ext)
 
       if is_asset_file_type
         return "-assetFile #{source.shellescape}"
@@ -246,11 +246,16 @@ module FastlaneCore
       end
       return deliver_additional_params
     end
+
+    def allowed_package_extensions
+      ["ipa", "pkg", "dmg", "zip"]
+    end
   end
 
   # Generates commands and executes the altool.
   class AltoolTransporterExecutor < TransporterExecutor
-    ERROR_REGEX = /\*\*\* Error:\s+(.+)/
+    # Xcode 26 uses ERROR, while previous versions used *** Error
+    ERROR_REGEX = /(?:\*\*\*\s*)?ERROR:\s+(.+)/i
 
     private_constant :ERROR_REGEX
 
@@ -296,7 +301,7 @@ module FastlaneCore
       end
 
       yield(@all_lines) if block_given?
-      exit_status.zero?
+      @errors.empty?
     end
 
     def build_credential_params(username = nil, password = nil, jwt = nil, api_key = nil)
@@ -476,6 +481,31 @@ module FastlaneCore
       # rubocop:enable Style/YodaCondition
 
       UI.error("Could not download/upload from App Store Connect! It's probably related to your password or your internet connection.")
+    end
+
+    def file_upload_option(source)
+      # uploading packages on non-macOS platforms requires AppStoreInfo.plist starting with Transporter >= 4.1
+      if !Helper.is_mac? && File.directory?(source)
+        asset_file = Dir.glob(File.join(source, "*.{#{allowed_package_extensions.join(',')}}")).first
+        unless asset_file
+          UI.user_error!("No package file (#{allowed_package_extensions.join(',')}) found in #{source}")
+        end
+
+        appstore_info_path = File.join(source, "AppStoreInfo.plist")
+        unless File.file?(appstore_info_path)
+          UI.error("AppStoreInfo.plist is required for uploading #{File.extname(asset_file)} files on non-macOS platforms.")
+          UI.error("Expected AppStoreInfo.plist in the same directory as the #{File.extname(asset_file)} file.")
+          UI.error("Generate it by running either 'fastlane gym [...] --generate_appstore_info'")
+          UI.error("Or add '<key>generateAppStoreInformation</key><true/>' in an options.plist then run 'fastlane gym [...] --export_options options.plist'.")
+          UI.user_error!("Missing required AppStoreInfo.plist file for iTMSTransporter upload")
+        end
+
+        UI.verbose("Using AppStoreInfo.plist for iTMSTransporter upload: #{appstore_info_path}")
+        return "-assetFile #{asset_file.shellescape} -assetDescription #{appstore_info_path.shellescape}"
+      end
+
+      # use standard behavior for other file types or macOS platform
+      super(source)
     end
 
     private
@@ -776,16 +806,16 @@ module FastlaneCore
       raise "app_id and dir are required or package_path or asset_path is required" if (app_id.nil? || dir.nil?) && package_path.nil? && asset_path.nil?
 
       # Transport can upload .ipa, .dmg, and .pkg files directly with -assetFile
-      # However, -assetFile requires -assetDescription if Linux or Windows
-      # This will give the asset directly if macOS and asset_path exists
-      # otherwise it will use the .itmsp package
+      # However, -assetFile requires -assetDescription arguments if Linux or Windows.
+      # This will return the asset directly if asset_path exists,
+      # otherwise it will use the .itmsp package for the -f argument
 
       force_itmsp = FastlaneCore::Env.truthy?("ITMSTRANSPORTER_FORCE_ITMS_PACKAGE_UPLOAD")
       can_use_asset_path = Helper.is_mac? && asset_path
 
       actual_dir = if can_use_asset_path && !force_itmsp
                      # The asset gets deleted upon completion so copying to a temp directory
-                     # (with randomized filename, for multibyte-mixed filename upload fails)
+                     # (with randomized filename. for multibyte-mixed filename it fails to upload)
                      new_file_name = "#{SecureRandom.uuid}#{File.extname(asset_path)}"
                      tmp_asset_path = File.join(Dir.tmpdir, new_file_name)
                      FileUtils.cp(asset_path, tmp_asset_path)

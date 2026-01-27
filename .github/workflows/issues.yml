@@ -4,13 +4,15 @@ on:
   issues:
     types:
       - opened
+permissions:
+  issues: write
 
 jobs:
   fastlane-env:
     name: Remind user about posting their fastlane env
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@master
+      - uses: actions/checkout@v6
       - uses: fastlane/github-actions/fastlane-env-reminder@latest
         with:
-          repo-token: '${{ secrets.BOT_GITHUB_TOKEN }}'
+          repo-token: ${{ secrets.GITHUB_TOKEN }}
