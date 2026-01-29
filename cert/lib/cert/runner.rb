@@ -159,10 +159,13 @@ module Cert
         when :mac_installer_distribution
           return [Spaceship::ConnectAPI::Certificate::CertificateType::MAC_INSTALLER_DISTRIBUTION]
         when :developer_id_application
-          return [
-            Spaceship::ConnectAPI::Certificate::CertificateType::DEVELOPER_ID_APPLICATION_G2,
-            Spaceship::ConnectAPI::Certificate::CertificateType::DEVELOPER_ID_APPLICATION
-          ]
+          # DEVELOPER_ID_APPLICATION_G2 no longer supported by the App Store Connect API.
+          # https://api.appstoreconnect.apple.com/v1/certificates?filter[certificateType]=DEVELOPER_ID_APPLICATION_G2
+          # Radar: FB21181137.
+          # Related:
+          # - https://github.com/fastlane/fastlane/issues/29587
+          # - https://github.com/fastlane/fastlane/pull/29784
+          return [Spaceship::ConnectAPI::Certificate::CertificateType::DEVELOPER_ID_APPLICATION]
         when :developer_id_kext
           return [Spaceship::ConnectAPI::Certificate::CertificateType::DEVELOPER_ID_KEXT]
         when :developer_id_installer
