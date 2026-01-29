@@ -1,0 +1,89 @@
+name: CI
+
+on:
+  push:
+    branches: [ master ]
+  pull_request:
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+env:
+  TEST_REPORTS: ${{ github.workspace }}/test-reports
+  CIRCLE_TEST_REPORTS: ${{ github.workspace }}/test-reports
+
+jobs:
+  macos-tests:
+    name: ${{ matrix.os }}, Xcode ${{ matrix.xcode }}, Ruby ${{ matrix.ruby }} Tests
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: true
+      matrix:
+        include:
+          - { xcode: '', ruby: '3.2', rubyopt: '', os: 'windows-2022' }
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Select Xcode ${{ matrix.xcode }}
+        if: runner.os == 'macOS'
+        uses: maxim-lobanov/setup-xcode@v1
+        with:
+          xcode-version: ${{ matrix.xcode }}
+
+      - name: Debug | Xcode version
+        if: runner.os == 'macOS'
+        run: |
+          xcodebuild -version
+          xcode-select -p
+
+      - name: Set up Ruby ${{ matrix.ruby }}
+        uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: ${{ matrix.ruby }}
+          bundler-cache: true
+
+      - name: Debug | Ruby version
+        shell: bash
+        run: ruby -v
+
+      - name: Setup Build directories
+        if: runner.os != 'Windows'
+        run: mkdir -p "$TEST_REPORTS"
+
+      - name: Increase Open File Limit
+        if: runner.os != 'Windows'
+        shell: bash
+        run: ulimit -n 65536
+
+      - name: Run tests
+        env:
+          RUBYOPT: ${{ matrix.rubyopt }}
+        shell: bash
+        run: |
+          git config --global user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git config --global user.name "github-actions[bot]"
+          bundle exec fastlane execute_tests
+
+      - name: Check compatibility with Ruby 3.0
+        shell: bash
+        run: |
+          touch "$TEST_REPORTS/ruby_warnings.txt"
+          ! grep -E "warning:\s.*(deprecated).*$" "$TEST_REPORTS/ruby_warnings.txt" && echo "No deprecation message found."
+          ! grep -E "warning:\s.*(obsolete).*$" "$TEST_REPORTS/ruby_warnings.txt" && echo "No obsolete message found."
+
+      - name: Upload rspec reports
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: rspec-${{ matrix.xcode }}-ruby-${{ matrix.ruby }}
+          path: ${{ env.TEST_REPORTS }}/rspec
+          if-no-files-found: ignore
+
+      - name: Upload ruby warnings
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: ruby_warnings-${{ matrix.xcode }}-ruby-${{ matrix.ruby }}.txt
+          path: ${{ env.TEST_REPORTS }}/ruby_warnings.txt
+          if-no-files-found: ignore
