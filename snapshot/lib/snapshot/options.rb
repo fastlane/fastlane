@@ -5,6 +5,7 @@ require 'credentials_manager/appfile_config'
 require_relative 'module'
 
 module Snapshot
+  # rubocop:disable Metrics/ClassLength
   class Options
     def self.verify_type(item_name, acceptable_types, value)
       type_ok = [Array, String].any? { |type| value.kind_of?(type) }
@@ -269,7 +270,12 @@ module Snapshot
                                      default_value: false),
         FastlaneCore::ConfigItem.new(key: :disable_package_automatic_updates,
                                      env_name: "SNAPSHOT_DISABLE_PACKAGE_AUTOMATIC_UPDATES",
-                                     description: "Prevents packages from automatically being resolved to versions other than those recorded in the `Package.resolved` file",
+                                     description: "Prevents packages from automatically being resolved to versions other than those recorded in the `Package.resolved` file. This translates in the option `-disableAutomaticPackageResolution` being passed to xcodebuild",
+                                     type: Boolean,
+                                     default_value: false),
+        FastlaneCore::ConfigItem.new(key: :skip_package_repository_fetches,
+                                     env_name: "SNAPSHOT_SKIP_PACKAGE_REPOSITORY_FETCHES",
+                                     description: "Skips updating package dependencies from their remote. This translates in the option `-skipPackageUpdates` being passed to xcodebuild",
                                      type: Boolean,
                                      default_value: false),
         FastlaneCore::ConfigItem.new(key: :package_authorization_provider,
@@ -337,4 +343,5 @@ module Snapshot
       ]
     end
   end
+  # rubocop:enable Metrics/ClassLength
 end
