@@ -1,5 +1,5 @@
 // LaneFileProtocol.swift
-// Copyright (c) 2025 FastlaneTools
+// Copyright (c) 2026 FastlaneTools
 
 //
 //  ** NOTE **
