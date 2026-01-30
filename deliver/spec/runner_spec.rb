@@ -300,4 +300,61 @@ describe Deliver::Runner do
       end
     end
   end
+
+  describe :upload_metadata do
+    let(:fake_upload_metadata) { instance_double(Deliver::UploadMetadata, load_from_filesystem: nil, assign_defaults: nil, upload: nil) }
+    let(:fake_upload_screenshots) { instance_double(Deliver::UploadScreenshots, collect_screenshots: [], upload: nil) }
+    let(:fake_html_generator) { instance_double(Deliver::HtmlGenerator, run: nil) }
+
+    before do
+      allow(Deliver::UploadMetadata).to receive(:new).and_return(fake_upload_metadata)
+      allow(Deliver::UploadScreenshots).to receive(:new).and_return(fake_upload_screenshots)
+      allow(Deliver::HtmlGenerator).to receive(:new).and_return(fake_html_generator)
+    end
+
+    it 'invokes SyncAppPreviews when app_previews_path is provided' do
+      options[:app_previews_path] = './fastlane/app-previews'
+      options[:preview_frame_time_code] = '00:00:01:00'
+      options[:overwrite_preview_videos] = true
+
+      previews_double = instance_double(Deliver::SyncAppPreviews)
+      expect(Deliver::SyncAppPreviews).to receive(:new).with(
+        app: Deliver.cache[:app],
+        platform: Spaceship::ConnectAPI::Platform.map(options[:platform]),
+        app_previews_path: options[:app_previews_path],
+        preview_frame_time_code: options[:preview_frame_time_code],
+        overwrite_preview_videos: options[:overwrite_preview_videos]
+      ).and_return(previews_double)
+      expect(previews_double).to receive(:sync_from_path)
+
+      runner.upload_metadata
+    end
+
+    it 'does not invoke SyncAppPreviews when app_previews_path is not provided' do
+      options.delete(:app_previews_path)
+      expect(Deliver::SyncAppPreviews).not_to receive(:new)
+      runner.upload_metadata
+    end
+
+    it 'uses SyncScreenshots when sync_screenshots is true' do
+      options[:sync_screenshots] = true
+      screenshots_double = instance_double(Deliver::SyncScreenshots)
+      expect(Deliver::SyncScreenshots).to receive(:new).with(
+        app: Deliver.cache[:app],
+        platform: Spaceship::ConnectAPI::Platform.map(options[:platform])
+      ).and_return(screenshots_double)
+      expect(screenshots_double).to receive(:sync).with([])
+      expect(fake_upload_screenshots).not_to receive(:upload)
+
+      runner.upload_metadata
+    end
+
+    it 'uses UploadScreenshots when sync_screenshots is false or nil' do
+      options[:sync_screenshots] = nil
+      expect(Deliver::SyncScreenshots).not_to receive(:new)
+      expect(fake_upload_screenshots).to receive(:upload).with(options, [])
+
+      runner.upload_metadata
+    end
+  end
 end
