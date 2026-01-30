@@ -87,7 +87,7 @@ module Fastlane
                                        end),
           FastlaneCore::ConfigItem.new(key: :initial_build_number,
                                        env_name: "INITIAL_BUILD_NUMBER",
-                                       description: "sets the build number to given value if no build is in current train",
+                                       description: "sets the build number to given value if no build (upload) is in current train",
                                        default_value: 1,
                                        skip_type_validation: true), # allow Integer, String
           FastlaneCore::ConfigItem.new(key: :team_id,
