@@ -106,10 +106,7 @@ module Trainer
         # Add test cases
         @test_cases.each do |test_case|
           runs = test_case.to_xml_nodes
-          # Remove retry attempts: keep only the final run (whether it passes, fails, or is skipped)
-          if output_remove_retry_attempts
-            runs = runs.last(1)
-          end
+          runs = runs.last(1) if output_remove_retry_attempts
           runs.each { |node| testsuite.add_element(node) }
         end
 
