@@ -89,6 +89,7 @@ def before_each_spaceship
   ConnectAPIStubbing::TestFlight.stub_build_beta_details
   ConnectAPIStubbing::TestFlight.stub_build_bundles
   ConnectAPIStubbing::TestFlight.stub_build_deliveries
+  ConnectAPIStubbing::TestFlight.stub_build_uploads
   ConnectAPIStubbing::TestFlight.stub_builds
   ConnectAPIStubbing::TestFlight.stub_pre_release_versions
 
