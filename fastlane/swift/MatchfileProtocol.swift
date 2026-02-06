@@ -172,64 +172,231 @@ public protocol MatchfileProtocol: AnyObject {
 }
 
 public extension MatchfileProtocol {
-    var type: String { return "development" }
-    var additionalCertTypes: [String]? { return nil }
-    var readonly: Bool { return false }
-    var generateAppleCerts: Bool { return true }
-    var skipProvisioningProfiles: Bool { return false }
-    var appIdentifier: [String] { return [] }
-    var apiKeyPath: String? { return nil }
-    var apiKey: [String: Any]? { return nil }
-    var username: String? { return nil }
-    var teamId: String? { return nil }
-    var teamName: String? { return nil }
-    var storageMode: String { return "git" }
-    var gitUrl: String { return "" }
-    var gitBranch: String { return "master" }
-    var gitFullName: String? { return nil }
-    var gitUserEmail: String? { return nil }
-    var shallowClone: Bool { return false }
-    var cloneBranchDirectly: Bool { return false }
-    var gitBasicAuthorization: String? { return nil }
-    var gitBearerAuthorization: String? { return nil }
-    var gitPrivateKey: String? { return nil }
-    var googleCloudBucketName: String? { return nil }
-    var googleCloudKeysFile: String? { return nil }
-    var googleCloudProjectId: String? { return nil }
-    var skipGoogleCloudAccountConfirmation: Bool { return false }
-    var s3Region: String? { return nil }
-    var s3AccessKey: String? { return nil }
-    var s3SecretAccessKey: String? { return nil }
-    var s3Bucket: String? { return nil }
-    var s3ObjectPrefix: String? { return nil }
-    var s3SkipEncryption: Bool { return false }
-    var gitlabProject: String? { return nil }
-    var gitlabHost: String { return "https://gitlab.com" }
-    var jobToken: String? { return nil }
-    var privateToken: String? { return nil }
-    var keychainName: String { return "login.keychain" }
-    var keychainPassword: String? { return nil }
-    var force: Bool { return false }
-    var forceForNewDevices: Bool { return false }
-    var includeMacInProfiles: Bool { return false }
-    var includeAllCertificates: Bool { return false }
-    var certificateId: String? { return nil }
-    var forceForNewCertificates: Bool { return false }
-    var skipConfirmation: Bool { return false }
-    var safeRemoveCerts: Bool { return false }
-    var skipDocs: Bool { return false }
-    var platform: String { return "ios" }
-    var deriveCatalystAppIdentifier: Bool { return false }
-    var templateName: String? { return nil }
-    var profileName: String? { return nil }
-    var failOnNameTaken: Bool { return false }
-    var skipCertificateMatching: Bool { return false }
-    var outputPath: String? { return nil }
-    var skipSetPartitionList: Bool { return false }
-    var forceLegacyEncryption: Bool { return false }
-    var verbose: Bool { return false }
+    var type: String {
+        return "development"
+    }
+
+    var additionalCertTypes: [String]? {
+        return nil
+    }
+
+    var readonly: Bool {
+        return false
+    }
+
+    var generateAppleCerts: Bool {
+        return true
+    }
+
+    var skipProvisioningProfiles: Bool {
+        return false
+    }
+
+    var appIdentifier: [String] {
+        return []
+    }
+
+    var apiKeyPath: String? {
+        return nil
+    }
+
+    var apiKey: [String: Any]? {
+        return nil
+    }
+
+    var username: String? {
+        return nil
+    }
+
+    var teamId: String? {
+        return nil
+    }
+
+    var teamName: String? {
+        return nil
+    }
+
+    var storageMode: String {
+        return "git"
+    }
+
+    var gitUrl: String {
+        return ""
+    }
+
+    var gitBranch: String {
+        return "master"
+    }
+
+    var gitFullName: String? {
+        return nil
+    }
+
+    var gitUserEmail: String? {
+        return nil
+    }
+
+    var shallowClone: Bool {
+        return false
+    }
+
+    var cloneBranchDirectly: Bool {
+        return false
+    }
+
+    var gitBasicAuthorization: String? {
+        return nil
+    }
+
+    var gitBearerAuthorization: String? {
+        return nil
+    }
+
+    var gitPrivateKey: String? {
+        return nil
+    }
+
+    var googleCloudBucketName: String? {
+        return nil
+    }
+
+    var googleCloudKeysFile: String? {
+        return nil
+    }
+
+    var googleCloudProjectId: String? {
+        return nil
+    }
+
+    var skipGoogleCloudAccountConfirmation: Bool {
+        return false
+    }
+
+    var s3Region: String? {
+        return nil
+    }
+
+    var s3AccessKey: String? {
+        return nil
+    }
+
+    var s3SecretAccessKey: String? {
+        return nil
+    }
+
+    var s3Bucket: String? {
+        return nil
+    }
+
+    var s3ObjectPrefix: String? {
+        return nil
+    }
+
+    var s3SkipEncryption: Bool {
+        return false
+    }
+
+    var gitlabProject: String? {
+        return nil
+    }
+
+    var gitlabHost: String {
+        return "https://gitlab.com"
+    }
+
+    var jobToken: String? {
+        return nil
+    }
+
+    var privateToken: String? {
+        return nil
+    }
+
+    var keychainName: String {
+        return "login.keychain"
+    }
+
+    var keychainPassword: String? {
+        return nil
+    }
+
+    var force: Bool {
+        return false
+    }
+
+    var forceForNewDevices: Bool {
+        return false
+    }
+
+    var includeMacInProfiles: Bool {
+        return false
+    }
+
+    var includeAllCertificates: Bool {
+        return false
+    }
+
+    var certificateId: String? {
+        return nil
+    }
+
+    var forceForNewCertificates: Bool {
+        return false
+    }
+
+    var skipConfirmation: Bool {
+        return false
+    }
+
+    var safeRemoveCerts: Bool {
+        return false
+    }
+
+    var skipDocs: Bool {
+        return false
+    }
+
+    var platform: String {
+        return "ios"
+    }
+
+    var deriveCatalystAppIdentifier: Bool {
+        return false
+    }
+
+    var templateName: String? {
+        return nil
+    }
+
+    var profileName: String? {
+        return nil
+    }
+
+    var failOnNameTaken: Bool {
+        return false
+    }
+
+    var skipCertificateMatching: Bool {
+        return false
+    }
+
+    var outputPath: String? {
+        return nil
+    }
+
+    var skipSetPartitionList: Bool {
+        return false
+    }
+
+    var forceLegacyEncryption: Bool {
+        return false
+    }
+
+    var verbose: Bool {
+        return false
+    }
 }
 
 // Please don't remove the lines below
 // They are used to detect outdated files
-// FastlaneRunnerAPIVersion [0.9.138]
+// FastlaneRunnerAPIVersion [0.9.139]

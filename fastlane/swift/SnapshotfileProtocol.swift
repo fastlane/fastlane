@@ -125,8 +125,11 @@ public protocol SnapshotfileProtocol: AnyObject {
     /// Skips resolution of Swift Package Manager dependencies
     var skipPackageDependenciesResolution: Bool { get }
 
-    /// Prevents packages from automatically being resolved to versions other than those recorded in the `Package.resolved` file
+    /// Prevents packages from automatically being resolved to versions other than those recorded in the `Package.resolved` file. This translates in the option `-disableAutomaticPackageResolution` being passed to xcodebuild
     var disablePackageAutomaticUpdates: Bool { get }
+
+    /// Skips updating package dependencies from their remote. This translates in the option `-skipPackageUpdates` being passed to xcodebuild
+    var skipPackageRepositoryFetches: Bool { get }
 
     /// Lets xcodebuild use a specified package authorization provider (keychain|netrc)
     var packageAuthorizationProvider: String? { get }
@@ -157,59 +160,215 @@ public protocol SnapshotfileProtocol: AnyObject {
 }
 
 public extension SnapshotfileProtocol {
-    var workspace: String? { return nil }
-    var project: String? { return nil }
-    var xcargs: String? { return nil }
-    var xcconfig: String? { return nil }
-    var devices: [String]? { return nil }
-    var languages: [String] { return ["en-US"] }
-    var launchArguments: [String] { return [""] }
-    var outputDirectory: String { return "screenshots" }
-    var outputSimulatorLogs: Bool { return false }
-    var iosVersion: String? { return nil }
-    var skipOpenSummary: Bool { return false }
-    var skipHelperVersionCheck: Bool { return false }
-    var clearPreviousScreenshots: Bool { return false }
-    var reinstallApp: Bool { return false }
-    var eraseSimulator: Bool { return false }
-    var headless: Bool { return true }
-    var overrideStatusBar: Bool { return false }
-    var overrideStatusBarArguments: String? { return nil }
-    var localizeSimulator: Bool { return false }
-    var darkMode: Bool? { return nil }
-    var appIdentifier: String? { return nil }
-    var addPhotos: [String]? { return nil }
-    var addVideos: [String]? { return nil }
-    var htmlTemplate: String? { return nil }
-    var buildlogPath: String { return "~/Library/Logs/snapshot" }
-    var clean: Bool { return false }
-    var testWithoutBuilding: Bool? { return nil }
-    var configuration: String? { return nil }
-    var sdk: String? { return nil }
-    var scheme: String? { return nil }
-    var numberOfRetries: Int { return 1 }
-    var stopAfterFirstError: Bool { return false }
-    var derivedDataPath: String? { return nil }
-    var resultBundle: Bool { return false }
-    var testTargetName: String? { return nil }
-    var namespaceLogFiles: String? { return nil }
-    var concurrentSimulators: Bool { return true }
-    var disableSlideToType: Bool { return false }
-    var clonedSourcePackagesPath: String? { return nil }
-    var packageCachePath: String? { return nil }
-    var skipPackageDependenciesResolution: Bool { return false }
-    var disablePackageAutomaticUpdates: Bool { return false }
-    var packageAuthorizationProvider: String? { return nil }
-    var testplan: String? { return nil }
-    var onlyTesting: String? { return nil }
-    var skipTesting: String? { return nil }
-    var xcodebuildFormatter: String { return "xcbeautify" }
-    var xcprettyArgs: String? { return nil }
-    var disableXcpretty: Bool? { return nil }
-    var suppressXcodeOutput: Bool? { return nil }
-    var useSystemScm: Bool { return false }
+    var workspace: String? {
+        return nil
+    }
+
+    var project: String? {
+        return nil
+    }
+
+    var xcargs: String? {
+        return nil
+    }
+
+    var xcconfig: String? {
+        return nil
+    }
+
+    var devices: [String]? {
+        return nil
+    }
+
+    var languages: [String] {
+        return ["en-US"]
+    }
+
+    var launchArguments: [String] {
+        return [""]
+    }
+
+    var outputDirectory: String {
+        return "screenshots"
+    }
+
+    var outputSimulatorLogs: Bool {
+        return false
+    }
+
+    var iosVersion: String? {
+        return nil
+    }
+
+    var skipOpenSummary: Bool {
+        return false
+    }
+
+    var skipHelperVersionCheck: Bool {
+        return false
+    }
+
+    var clearPreviousScreenshots: Bool {
+        return false
+    }
+
+    var reinstallApp: Bool {
+        return false
+    }
+
+    var eraseSimulator: Bool {
+        return false
+    }
+
+    var headless: Bool {
+        return true
+    }
+
+    var overrideStatusBar: Bool {
+        return false
+    }
+
+    var overrideStatusBarArguments: String? {
+        return nil
+    }
+
+    var localizeSimulator: Bool {
+        return false
+    }
+
+    var darkMode: Bool? {
+        return nil
+    }
+
+    var appIdentifier: String? {
+        return nil
+    }
+
+    var addPhotos: [String]? {
+        return nil
+    }
+
+    var addVideos: [String]? {
+        return nil
+    }
+
+    var htmlTemplate: String? {
+        return nil
+    }
+
+    var buildlogPath: String {
+        return "~/Library/Logs/snapshot"
+    }
+
+    var clean: Bool {
+        return false
+    }
+
+    var testWithoutBuilding: Bool? {
+        return nil
+    }
+
+    var configuration: String? {
+        return nil
+    }
+
+    var sdk: String? {
+        return nil
+    }
+
+    var scheme: String? {
+        return nil
+    }
+
+    var numberOfRetries: Int {
+        return 1
+    }
+
+    var stopAfterFirstError: Bool {
+        return false
+    }
+
+    var derivedDataPath: String? {
+        return nil
+    }
+
+    var resultBundle: Bool {
+        return false
+    }
+
+    var testTargetName: String? {
+        return nil
+    }
+
+    var namespaceLogFiles: String? {
+        return nil
+    }
+
+    var concurrentSimulators: Bool {
+        return true
+    }
+
+    var disableSlideToType: Bool {
+        return false
+    }
+
+    var clonedSourcePackagesPath: String? {
+        return nil
+    }
+
+    var packageCachePath: String? {
+        return nil
+    }
+
+    var skipPackageDependenciesResolution: Bool {
+        return false
+    }
+
+    var disablePackageAutomaticUpdates: Bool {
+        return false
+    }
+
+    var skipPackageRepositoryFetches: Bool {
+        return false
+    }
+
+    var packageAuthorizationProvider: String? {
+        return nil
+    }
+
+    var testplan: String? {
+        return nil
+    }
+
+    var onlyTesting: String? {
+        return nil
+    }
+
+    var skipTesting: String? {
+        return nil
+    }
+
+    var xcodebuildFormatter: String {
+        return "xcbeautify"
+    }
+
+    var xcprettyArgs: String? {
+        return nil
+    }
+
+    var disableXcpretty: Bool? {
+        return nil
+    }
+
+    var suppressXcodeOutput: Bool? {
+        return nil
+    }
+
+    var useSystemScm: Bool {
+        return false
+    }
 }
 
 // Please don't remove the lines below
 // They are used to detect outdated files
-// FastlaneRunnerAPIVersion [0.9.133]
+// FastlaneRunnerAPIVersion [0.9.134]
