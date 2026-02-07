@@ -149,6 +149,72 @@ describe Scan do
           expect(Scan::DetectValues.default_os_version(os_type)).to eq(Gem::Version.new(actual_os_versions[os_type]))
         end
       end
+
+      it 'falls back to SDK version when runtime build is not found in installed runtimes' do
+        help_output = 'Usage: simctl runtime <operation> <arguments> match list'
+        allow(Open3).to receive(:capture3).with('xcrun simctl runtime -h').and_return([nil, help_output, nil])
+
+        sdks_output = File.read('./scan/spec/fixtures/XcodebuildSdksOutput15')
+        status = double('status', "success?": true)
+        allow(Open3).to receive(:capture2).with('xcodebuild -showsdks -json').and_return([sdks_output, status])
+
+        runtime_output = File.read('./scan/spec/fixtures/XcrunSimctlRuntimeMatchListOutput15')
+        allow(Open3).to receive(:capture2).with('xcrun simctl runtime match list -j').and_return([runtime_output, status])
+
+        # Return a hash that does NOT contain the chosenRuntimeBuild "21A342" for iOS
+        missing_build_versions = { "XXXXXX" => "16.0" }
+        allow(FastlaneCore::DeviceManager).to receive(:runtime_build_os_versions).and_return(missing_build_versions)
+
+        expect(FastlaneCore::UI).to receive(:important).with(/Runtime build '21A342' not found.*falling back to SDK version '17.0'/)
+
+        # Should fall back to SDK version 17.0 instead of crashing
+        expect(Scan::DetectValues.default_os_version('iOS')).to eq(Gem::Version.new('17.0'))
+      end
+
+      it 'caches the fallback value on subsequent calls' do
+        help_output = 'Usage: simctl runtime <operation> <arguments> match list'
+        allow(Open3).to receive(:capture3).with('xcrun simctl runtime -h').and_return([nil, help_output, nil])
+
+        sdks_output = File.read('./scan/spec/fixtures/XcodebuildSdksOutput15')
+        status = double('status', "success?": true)
+        allow(Open3).to receive(:capture2).with('xcodebuild -showsdks -json').and_return([sdks_output, status])
+
+        runtime_output = File.read('./scan/spec/fixtures/XcrunSimctlRuntimeMatchListOutput15')
+        allow(Open3).to receive(:capture2).with('xcrun simctl runtime match list -j').and_return([runtime_output, status])
+
+        missing_build_versions = {}
+        allow(FastlaneCore::DeviceManager).to receive(:runtime_build_os_versions).and_return(missing_build_versions)
+        allow(FastlaneCore::UI).to receive(:important)
+
+        first_result = Scan::DetectValues.default_os_version('iOS')
+        second_result = Scan::DetectValues.default_os_version('iOS')
+
+        expect(first_result).to eq(second_result)
+        # capture3 should only be called once due to memoization
+        expect(Open3).to have_received(:capture3).with('xcrun simctl runtime -h').once
+      end
+
+      it 'caches successful lookups on subsequent calls' do
+        help_output = 'Usage: simctl runtime <operation> <arguments> match list'
+        allow(Open3).to receive(:capture3).with('xcrun simctl runtime -h').and_return([nil, help_output, nil])
+
+        sdks_output = File.read('./scan/spec/fixtures/XcodebuildSdksOutput15')
+        status = double('status', "success?": true)
+        allow(Open3).to receive(:capture2).with('xcodebuild -showsdks -json').and_return([sdks_output, status])
+
+        runtime_output = File.read('./scan/spec/fixtures/XcrunSimctlRuntimeMatchListOutput15')
+        allow(Open3).to receive(:capture2).with('xcrun simctl runtime match list -j').and_return([runtime_output, status])
+
+        allow(FastlaneCore::DeviceManager).to receive(:runtime_build_os_versions).and_return(build_os_versions)
+
+        first_result = Scan::DetectValues.default_os_version('iOS')
+        second_result = Scan::DetectValues.default_os_version('iOS')
+
+        expect(first_result).to eq(Gem::Version.new('17.0.1'))
+        expect(first_result).to eq(second_result)
+        # capture3 should only be called once due to memoization
+        expect(Open3).to have_received(:capture3).with('xcrun simctl runtime -h').once
+      end
     end
 
     describe "#detect_simulator" do
