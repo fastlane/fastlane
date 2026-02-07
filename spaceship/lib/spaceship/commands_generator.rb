@@ -49,8 +49,6 @@ module Spaceship
                                 true
                               elsif %w(no NO false FALSE off OFF).include?(options.copy_to_clipboard.to_s)
                                 false
-                              else
-                                nil
                               end
           Spaceship::SpaceauthRunner.new(username: options.user, copy_to_clipboard: copy_to_clipboard).run
         end
