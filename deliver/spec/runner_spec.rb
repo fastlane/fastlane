@@ -140,6 +140,7 @@ describe Deliver::Runner do
             {
               altool_compatible_command: true,
               api_key: options[:api_key],
+              provider_public_id: nil
             }
           )
           .and_return(transporter)
@@ -170,6 +171,7 @@ describe Deliver::Runner do
             {
               altool_compatible_command: true,
               api_key: nil,
+              provider_public_id: nil
             }
           )
           .and_return(transporter)
