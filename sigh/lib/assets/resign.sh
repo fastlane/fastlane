@@ -548,8 +548,8 @@ function resign {
         for assetpack in "$ODR_DIR"/*
         do
             if [[ "$assetpack" == *.assetpack ]]; then
-                rm -rf $assetpack/_CodeSignature
-                /usr/bin/codesign ${VERBOSE} --generate-entitlement-der ${KEYCHAIN_FLAG} -f -s "$CERTIFICATE" "$assetpack"
+                rm -rf "$assetpack"/_CodeSignature
+                /usr/bin/codesign "${VERBOSE}" --generate-entitlement-der "${KEYCHAIN_FLAG}" -f -s "$CERTIFICATE" "$assetpack"
                 checkStatus
             else
                 log "Ignoring non-assetpack: $assetpack"
@@ -625,7 +625,7 @@ function resign {
             log "Creating an archived-expanded-entitlements.xcent file for Xcode 9 builds or earlier"
             cp -f "$ENTITLEMENTS" "$APP_PATH/archived-expanded-entitlements.xcent"
         fi
-        /usr/bin/codesign ${VERBOSE} --generate-entitlement-der -f -s "$CERTIFICATE" --entitlements "$ENTITLEMENTS" "$APP_PATH"
+        /usr/bin/codesign "${VERBOSE}" --generate-entitlement-der -f -s "$CERTIFICATE" --entitlements "$ENTITLEMENTS" "$APP_PATH"
         checkStatus
     elif  [[ -n "${USE_APP_ENTITLEMENTS}" ]]; then
         # Extract entitlements from provisioning profile and from the app binary
@@ -823,7 +823,7 @@ function resign {
                     log "Certificate $CERTIFICATE matches a SHA1 pattern"
                     local certificate_matches="$( security find-identity -v -p codesigning | grep -m 1 "$CERTIFICATE" )"
                     if [ -n "$certificate_matches" ]; then
-                        certificate_name="$(/usr/bin/sed -E s/[^\"]+\"\([^\"]+\)\".*/\\1/ <<< $certificate_matches )"
+                        certificate_name="$(/usr/bin/sed -E s/[^\"]+\"\([^\"]+\)\".*/\\1/ <<< "$certificate_matches" )"
                         log "Certificate name: $certificate_name"
                     fi
                 fi
@@ -870,7 +870,7 @@ function resign {
             log "Creating an archived-expanded-entitlements.xcent file for Xcode 9 builds or earlier"
             cp -f "$PATCHED_ENTITLEMENTS" "$APP_PATH/archived-expanded-entitlements.xcent"
         fi
-        /usr/bin/codesign ${VERBOSE} --generate-entitlement-der -f -s "$CERTIFICATE" --entitlements "$PATCHED_ENTITLEMENTS" "$APP_PATH"
+        /usr/bin/codesign "${VERBOSE}" --generate-entitlement-der -f -s "$CERTIFICATE" --entitlements "$PATCHED_ENTITLEMENTS" "$APP_PATH"
         checkStatus
     else
         log "Extracting entitlements from provisioning profile"
@@ -917,10 +917,12 @@ log "Repackaging as $NEW_FILE"
 # Navigate to the temporary directory (sending the output to null)
 # Zip all the contents, saving the zip file in the above directory
 # Navigate back to the originating directory (sending the output to null)
+# shellcheck disable=SC2164
 pushd "$TEMP_DIR" > /dev/null
 # TODO: Fix shellcheck warning and remove directive
 # shellcheck disable=SC2035
 zip -qry "../$TEMP_DIR.ipa" *
+# shellcheck disable=SC2164
 popd > /dev/null
 
 # Move the resulting ipa to the target destination

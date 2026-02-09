@@ -13,8 +13,15 @@ describe FastlaneCore do
       allow(SecureRandom).to receive(:uuid).and_return(random_uuid)
     end
 
-    def shell_upload_command(provider_short_name: nil, transporter: nil, jwt: nil, use_asset_path: false, username: email, input_pass: password, api_key: nil)
-      upload_part = use_asset_path ? "-assetFile /tmp/#{random_uuid}.ipa" : "-f /tmp/my.app.id.itmsp"
+    def shell_upload_command(provider_short_name: nil, transporter: nil, jwt: nil, use_asset_path: false, username: email, input_pass: password, api_key: nil, is_mac: true, has_appstore_info: true)
+      upload_part = if use_asset_path
+                      "-assetFile /tmp/#{random_uuid}.ipa"
+                    elsif !is_mac && has_appstore_info
+                      # On non-macOS platforms, use -assetFile with -assetDescription for .itmsp directories
+                      "-assetFile /tmp/my.app.id.itmsp/my.app.id.ipa -assetDescription /tmp/my.app.id.itmsp/AppStoreInfo.plist"
+                    else
+                      "-f /tmp/my.app.id.itmsp"
+                    end
 
       username = username if username != email
       escaped_password = input_pass
@@ -1219,6 +1226,15 @@ describe FastlaneCore do
     end
 
     describe "with `FASTLANE_ITUNES_TRANSPORTER_USE_SHELL_SCRIPT` set" do
+      shared_examples "non_macOS_setup" do
+        before do
+          allow(FastlaneCore::Helper).to receive(:is_mac?).and_return(false)
+          allow(File).to receive(:directory?).with('/tmp/my.app.id.itmsp').and_return(true)
+          allow(Dir).to receive(:glob).with('/tmp/my.app.id.itmsp/*.{ipa,pkg,dmg,zip}').and_return(['/tmp/my.app.id.itmsp/my.app.id.ipa'])
+          allow(FastlaneCore::UI).to receive(:verbose)
+        end
+      end
+
       before(:each) do
         ENV["FASTLANE_ITUNES_TRANSPORTER_USE_SHELL_SCRIPT"] = "1"
         allow(FastlaneCore::Helper).to receive(:itms_path).and_return('/tmp')
@@ -1228,15 +1244,51 @@ describe FastlaneCore do
       describe "upload command generation" do
         let(:keys_parent_dir) { File.join(Dir.home, ".appstoreconnect") }
 
-        it 'generates a call to the shell script with user and password' do
-          transporter = FastlaneCore::ItunesTransporter.new(email, password, false)
-          expect(transporter.upload('my.app.id', '/tmp')).to eq(shell_upload_command)
+        context "on non-macOS platforms" do
+          include_examples "non_macOS_setup"
+
+          context "with AppStoreInfo.plist present" do
+            before do
+              allow(File).to receive(:file?).with('/tmp/my.app.id.itmsp/AppStoreInfo.plist').and_return(true)
+            end
+
+            it 'uses -assetFile and -assetDescription when uploading with package_path and JWT' do
+              transporter = FastlaneCore::ItunesTransporter.new(nil, nil, true, 'abcd1234', jwt)
+              expect(transporter.upload(package_path: '/tmp/my.app.id.itmsp')).to eq(shell_upload_command(jwt: jwt, is_mac: false, has_appstore_info: true))
+            end
+
+            it 'uses -assetFile and -assetDescription when uploading with app_id and dir' do
+              transporter = FastlaneCore::ItunesTransporter.new(email, password, true)
+              expect(transporter.upload('my.app.id', '/tmp')).to eq(shell_upload_command(is_mac: false, has_appstore_info: true))
+            end
+          end
+
+          context "without AppStoreInfo.plist" do
+            before do
+              allow(File).to receive(:file?).with('/tmp/my.app.id.itmsp/AppStoreInfo.plist').and_return(false)
+              allow(FastlaneCore::UI).to receive(:error)
+              allow(FastlaneCore::UI).to receive(:user_error!).and_raise(FastlaneCore::Interface::FastlaneError)
+            end
+
+            it 'raises an error about missing AppStoreInfo.plist' do
+              transporter = FastlaneCore::ItunesTransporter.new(email, password, true)
+              expect { transporter.upload('my.app.id', '/tmp') }.to raise_error(FastlaneCore::Interface::FastlaneError)
+              expect(FastlaneCore::UI).to have_received(:error).with("AppStoreInfo.plist is required for uploading .ipa files on non-macOS platforms.")
+            end
+          end
         end
 
-        it 'generates a call to the shell script with api key' do
-          transporter = FastlaneCore::ItunesTransporter.new(api_key: api_key)
-          expect(transporter.upload('my.app.id', '/tmp')).to eq(shell_upload_command(username: nil, input_pass: nil, api_key: api_key))
-          expect(Dir.empty?(keys_parent_dir)).to be_truthy if Dir.exist?(keys_parent_dir)
+        context "on macOS platforms" do
+          it 'generates a call to the shell script with user and password' do
+            transporter = FastlaneCore::ItunesTransporter.new(email, password, false)
+            expect(transporter.upload('my.app.id', '/tmp')).to eq(shell_upload_command)
+          end
+
+          it 'generates a call to the shell script with api key' do
+            transporter = FastlaneCore::ItunesTransporter.new(api_key: api_key)
+            expect(transporter.upload('my.app.id', '/tmp')).to eq(shell_upload_command(username: nil, input_pass: nil, api_key: api_key))
+            expect(Dir.empty?(keys_parent_dir)).to be_truthy if Dir.exist?(keys_parent_dir)
+          end
         end
       end
 
@@ -1426,6 +1478,37 @@ describe FastlaneCore do
         expect(instance.errors).to include(
           "-1 indicates altool exited abnormally; try retrying (see https://github.com/fastlane/fastlane/issues/21535)"
         )
+      end
+
+      it "treats '*** Error:' output as failure (Xcode < 16), non-zero exit code" do
+        require 'stringio'
+        allow(FastlaneCore::Helper).to receive(:test?).and_return(false)
+        allow(FastlaneCore::Helper).to receive(:xcode_version).and_return('16.0')
+        altool_output = <<~OUT
+          *** Error: Unable to validate archive './artifacts/our_app.ipa'.
+          *** Error: code 1095 (App Store operation failed. Unable to process app at this time due to a general error)
+        OUT
+        fake_io = StringIO.new(altool_output)
+        allow(FastlaneCore::FastlanePty).to receive(:spawn).and_yield(fake_io, nil, 123).and_return(1)
+
+        expect(instance.execute(upload_cmd, false)).to eq(false)
+        expect(instance.errors.join("\n")).to include("Unable to validate archive './artifacts/our_app.ipa'")
+        expect(instance.errors.join("\n")).to include("App Store operation failed. Unable to process app at this time due to a general error")
+      end
+
+      it "treats 'ERROR:' output as failure (Xcode 26), zero exit code" do
+        require 'stringio'
+        allow(FastlaneCore::Helper).to receive(:test?).and_return(false)
+        allow(FastlaneCore::Helper).to receive(:xcode_version).and_return('26.0')
+        altool_output = <<~OUT
+          2025-10-31 11:34:44.726 ERROR: [ContentDelivery.Uploader.102BA2C00] The provided entity includes an attribute with a value that has already been used (-19232) The bundle version must be higher than the previously uploaded version: ‘20251031.110341’. (ID: e1ab497b-753b-411c-82f1-22b9bffecf00)
+          2025-10-31 11:34:44.727 ERROR: [altool.102BA2C00] Failed to upload package.
+        OUT
+        fake_io = StringIO.new(altool_output)
+        allow(FastlaneCore::FastlanePty).to receive(:spawn).and_yield(fake_io, nil, 123).and_return(0)
+
+        expect(instance.execute(upload_cmd, false)).to eq(false)
+        expect(instance.errors.join("\n")).to include("[ContentDelivery.Uploader.102BA2C00] The provided entity includes an attribute with a value that has already been used")
       end
     end
   end
