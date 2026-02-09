@@ -1,5 +1,5 @@
 // PrecheckfileProtocol.swift
-// Copyright (c) 2025 FastlaneTools
+// Copyright (c) 2026 FastlaneTools
 
 public protocol PrecheckfileProtocol: AnyObject {
     /// Path to your App Store Connect API Key JSON file (https://docs.fastlane.tools/app-store-connect-api/#using-fastlane-api-key-json-file)
@@ -37,19 +37,51 @@ public protocol PrecheckfileProtocol: AnyObject {
 }
 
 public extension PrecheckfileProtocol {
-    var apiKeyPath: String? { return nil }
-    var apiKey: [String: Any]? { return nil }
-    var appIdentifier: String { return "" }
-    var username: String? { return nil }
-    var teamId: String? { return nil }
-    var teamName: String? { return nil }
-    var platform: String { return "ios" }
-    var defaultRuleLevel: String { return "error" }
-    var includeInAppPurchases: Bool { return true }
-    var useLive: Bool { return false }
-    var freeStuffInIap: String? { return nil }
+    var apiKeyPath: String? {
+        return nil
+    }
+
+    var apiKey: [String: Any]? {
+        return nil
+    }
+
+    var appIdentifier: String {
+        return ""
+    }
+
+    var username: String? {
+        return nil
+    }
+
+    var teamId: String? {
+        return nil
+    }
+
+    var teamName: String? {
+        return nil
+    }
+
+    var platform: String {
+        return "ios"
+    }
+
+    var defaultRuleLevel: String {
+        return "error"
+    }
+
+    var includeInAppPurchases: Bool {
+        return true
+    }
+
+    var useLive: Bool {
+        return false
+    }
+
+    var freeStuffInIap: String? {
+        return nil
+    }
 }
 
 // Please don't remove the lines below
 // They are used to detect outdated files
-// FastlaneRunnerAPIVersion [0.9.132]
+// FastlaneRunnerAPIVersion [0.9.138]

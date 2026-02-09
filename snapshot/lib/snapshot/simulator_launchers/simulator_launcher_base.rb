@@ -133,12 +133,14 @@ module Snapshot
       UI.message("Overriding Status Bar")
 
       if arguments.nil? || arguments.empty?
-        # The time needs to be passed as ISO8601 so the simulator formats it correctly
+        # The time must be passed as HH:MM format (e.g., "09:41")
+        # Note: Despite the simctl manual stating ISO date strings are supported, only HH:MM format actually works
         time = Time.new(2007, 1, 9, 9, 41, 0)
+        time_str = time.strftime("%H:%M")
 
         # If you don't override the operator name, you'll get "Carrier" in the status bar on no-notch devices such as iPhone 8. Pass an empty string to blank it out.
 
-        arguments = "--time #{time.iso8601} --dataNetwork wifi --wifiMode active --wifiBars 3 --cellularMode active --operatorName '' --cellularBars 4 --batteryState charged --batteryLevel 100"
+        arguments = "--time #{time_str} --dataNetwork wifi --wifiMode active --wifiBars 3 --cellularMode active --operatorName '' --cellularBars 4 --batteryState charged --batteryLevel 100"
       end
 
       Helper.backticks("xcrun simctl status_bar #{device_udid} override #{arguments} &> /dev/null")

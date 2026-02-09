@@ -66,17 +66,17 @@ module Fastlane
           version_number = params[:version]
           platform = params[:platform]
 
-          # Create filter for get_builds with optional version number
-          filter = { app: app.id }
+          # Create filter for get_build_uploads with optional version number
+          filter = {}
           if version_number
-            filter["preReleaseVersion.version"] = version_number
+            filter["cfBundleShortVersionString"] = version_number
             version_number_message = "version #{version_number}"
           else
             version_number_message = "any version"
           end
 
           if platform
-            filter["preReleaseVersion.platform"] = Spaceship::ConnectAPI::Platform.map(platform)
+            filter["platform"] = Spaceship::ConnectAPI::Platform.map(platform)
             platform_message = "#{platform} platform"
           else
             platform_message = "any platform"
@@ -84,19 +84,20 @@ module Fastlane
 
           UI.message("Fetching the latest build number for #{version_number_message}")
 
-          # Get latest build for optional version number and return build number if found
-          build = Spaceship::ConnectAPI.get_builds(filter: filter, sort: "-uploadedDate", includes: "preReleaseVersion", limit: 1).first
-          if build
-            build_nr = build.version
-            UI.message("Latest upload for version #{build.app_version} on #{platform_message} is build: #{build_nr}")
-            return OpenStruct.new({ build_nr: build_nr, build_v: build.app_version })
+          # Get latest build upload for optional version number and return build number if found
+          build_upload = Spaceship::ConnectAPI.get_build_uploads(app_id: app.id, filter: filter, sort: "-cfBundleVersion", limit: 1).first
+          if build_upload
+            build_nr = build_upload.cf_build_version
+            build_v = build_upload.cf_build_short_version_string
+            UI.message("Latest upload for version #{build_v} on #{platform_message} is build: #{build_nr}")
+            return OpenStruct.new({ build_nr: build_nr, build_v: build_v })
           end
 
-          # Let user know that build couldn't be found
-          UI.important("Could not find a build for #{version_number_message} on #{platform_message} on App Store Connect")
+          # Let user know that build upload couldn't be found
+          UI.important("Could not find a build upload for #{version_number_message} on #{platform_message} on App Store Connect")
 
           if params[:initial_build_number].nil?
-            UI.user_error!("Could not find a build on App Store Connect - and 'initial_build_number' option is not set")
+            UI.user_error!("Could not find a build upload on App Store Connect - and 'initial_build_number' option is not set")
           else
             build_nr = params[:initial_build_number]
             UI.message("Using initial build number of #{build_nr}")
@@ -140,7 +141,7 @@ module Fastlane
                                        conflicting_options: [:api_key_path]),
           FastlaneCore::ConfigItem.new(key: :initial_build_number,
                                        env_name: "INITIAL_BUILD_NUMBER",
-                                       description: "sets the build number to given value if no build is in current train",
+                                       description: "sets the build number to given value if no build (upload) is in current train",
                                        skip_type_validation: true), # as we also allow integers, which we convert to strings anyway
           FastlaneCore::ConfigItem.new(key: :app_identifier,
                                        short_option: "-a",
