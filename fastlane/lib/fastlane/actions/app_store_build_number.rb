@@ -66,8 +66,11 @@ module Fastlane
           version_number = params[:version]
           platform = params[:platform]
 
-          # Create filter for get_build_uploads with optional version number
-          filter = {}
+          # Create filter for get_build_uploads to exclude builds in AWAITING_UPLOAD state
+          # AWAITING_UPLOAD builds have no uploadedDate, which would break the sort order
+          filter = { state: "PROCESSING,FAILED,COMPLETE" }
+
+          # Append optional version number filter
           if version_number
             filter["cfBundleShortVersionString"] = version_number
             version_number_message = "version #{version_number}"
@@ -75,6 +78,7 @@ module Fastlane
             version_number_message = "any version"
           end
 
+          # Append optional platform filter
           if platform
             filter["platform"] = Spaceship::ConnectAPI::Platform.map(platform)
             platform_message = "#{platform} platform"
@@ -85,7 +89,7 @@ module Fastlane
           UI.message("Fetching the latest build number for #{version_number_message}")
 
           # Get latest build upload for optional version number and return build number if found
-          build_upload = Spaceship::ConnectAPI.get_build_uploads(app_id: app.id, filter: filter, sort: "-cfBundleVersion", limit: 1).first
+          build_upload = Spaceship::ConnectAPI.get_build_uploads(app_id: app.id, filter: filter, sort: "-uploadedDate", limit: 1).first
           if build_upload
             build_nr = build_upload.cf_build_version
             build_v = build_upload.cf_build_short_version_string
