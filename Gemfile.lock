@@ -271,7 +271,7 @@ GEM
       pry (~> 0.13)
     public_suffix (5.1.1)
     racc (1.7.1)
-    rack (2.2.8)
+    rack (2.2.22)
     rack-protection (2.2.4)
       rack
     rainbow (3.1.1)
