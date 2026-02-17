@@ -11,7 +11,7 @@ module Fastlane
       # Overriding channel, icon_url, icon_emoji and username is only supported in legacy incoming webhook.
       # Also note that the use of attachments has been discouraged by Slack, in favor of Block Kit.
       # https://api.slack.com/legacy/custom-integrations/messaging/webhooks
-      def post_to_legacy_incoming_webhook(channel:, username:, attachments:, link_names:, icon_url:, icon_emoji:, thread_ts:)
+      def post_to_legacy_incoming_webhook(channel:, username:, attachments:, link_names:, icon_url:, icon_emoji:, thread_ts: nil)
         @client.post(@webhook_url) do |request|
           request.headers['Content-Type'] = 'application/json'
           body = {
