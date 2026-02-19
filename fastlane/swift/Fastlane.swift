@@ -11093,6 +11093,7 @@ public func ssh(username: String,
    - syncImageUpload: Whether to use sha256 comparison to skip upload of images and screenshots that are already in Play Store
    - trackPromoteTo: The track to promote to. The default available tracks are: production, beta, alpha, internal
    - trackPromoteReleaseStatus: Promoted track release status (used when promoting a track) - valid values are completed, draft, halted, inProgress
+   - trackPromoteForce: Force promote a specific version code (version_name is required)
    - validateOnly: Only validate changes with Google Play rather than actually publish
    - mapping: Path to the mapping file to upload (mapping.txt or native-debug-symbols.zip alike)
    - mappingPaths: An array of paths to mapping files to upload (mapping.txt or native-debug-symbols.zip alike)
@@ -11136,6 +11137,7 @@ public func supply(packageName: String,
                    syncImageUpload: OptionalConfigValue<Bool> = .fastlaneDefault(false),
                    trackPromoteTo: OptionalConfigValue<String?> = .fastlaneDefault(nil),
                    trackPromoteReleaseStatus: String = "completed",
+                   trackPromoteForce: OptionalConfigValue<Bool> = .fastlaneDefault(false),
                    validateOnly: OptionalConfigValue<Bool> = .fastlaneDefault(false),
                    mapping: OptionalConfigValue<String?> = .fastlaneDefault(nil),
                    mappingPaths: OptionalConfigValue<[String]?> = .fastlaneDefault(nil),
@@ -11177,6 +11179,7 @@ public func supply(packageName: String,
     let syncImageUploadArg = syncImageUpload.asRubyArgument(name: "sync_image_upload", type: nil)
     let trackPromoteToArg = trackPromoteTo.asRubyArgument(name: "track_promote_to", type: nil)
     let trackPromoteReleaseStatusArg = RubyCommand.Argument(name: "track_promote_release_status", value: trackPromoteReleaseStatus, type: nil)
+    let trackPromoteForceArg = RubyCommand.Argument(name: "track_promote_force", value: trackPromoteForce, type: nil)
     let validateOnlyArg = validateOnly.asRubyArgument(name: "validate_only", type: nil)
     let mappingArg = mapping.asRubyArgument(name: "mapping", type: nil)
     let mappingPathsArg = mappingPaths.asRubyArgument(name: "mapping_paths", type: nil)
@@ -11217,6 +11220,7 @@ public func supply(packageName: String,
                                           syncImageUploadArg,
                                           trackPromoteToArg,
                                           trackPromoteReleaseStatusArg,
+                                          trackPromoteForceArg,
                                           validateOnlyArg,
                                           mappingArg,
                                           mappingPathsArg,
@@ -12921,6 +12925,7 @@ public func uploadToPlayStore(packageName: String,
                               syncImageUpload: OptionalConfigValue<Bool> = .fastlaneDefault(false),
                               trackPromoteTo: OptionalConfigValue<String?> = .fastlaneDefault(nil),
                               trackPromoteReleaseStatus: String = "completed",
+                              trackPromoteForce: OptionalConfigValue<Bool> = .fastlaneDefault(false),
                               validateOnly: OptionalConfigValue<Bool> = .fastlaneDefault(false),
                               mapping: OptionalConfigValue<String?> = .fastlaneDefault(nil),
                               mappingPaths: OptionalConfigValue<[String]?> = .fastlaneDefault(nil),
@@ -12962,6 +12967,7 @@ public func uploadToPlayStore(packageName: String,
     let syncImageUploadArg = syncImageUpload.asRubyArgument(name: "sync_image_upload", type: nil)
     let trackPromoteToArg = trackPromoteTo.asRubyArgument(name: "track_promote_to", type: nil)
     let trackPromoteReleaseStatusArg = RubyCommand.Argument(name: "track_promote_release_status", value: trackPromoteReleaseStatus, type: nil)
+    let trackPromoteForceArg = RubyCommand.Argument(name: "track_promote_force", value: trackPromoteForce, type: nil)
     let validateOnlyArg = validateOnly.asRubyArgument(name: "validate_only", type: nil)
     let mappingArg = mapping.asRubyArgument(name: "mapping", type: nil)
     let mappingPathsArg = mappingPaths.asRubyArgument(name: "mapping_paths", type: nil)
@@ -13002,6 +13008,7 @@ public func uploadToPlayStore(packageName: String,
                                           syncImageUploadArg,
                                           trackPromoteToArg,
                                           trackPromoteReleaseStatusArg,
+                                          trackPromoteForceArg,
                                           validateOnlyArg,
                                           mappingArg,
                                           mappingPathsArg,
