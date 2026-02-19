@@ -7380,8 +7380,6 @@ public func nexusUpload(file: String,
 
  - parameters:
    - package: Path to package to notarize, e.g. .app bundle or disk image
-   - useNotarytool: Whether to `xcrun notarytool` or `xcrun altool`
-   - tryEarlyStapling: Whether to try early stapling while the notarization request is in progress
    - skipStapling: Do not staple the notarization ticket to the artifact; useful for single file executables and ZIP archives
    - bundleId: Bundle identifier to uniquely identify the package
    - username: Apple ID username
@@ -7392,8 +7390,6 @@ public func nexusUpload(file: String,
    - apiKey: Your App Store Connect API Key information (https://docs.fastlane.tools/app-store-connect-api/#using-fastlane-api-key-hash-option)
  */
 public func notarize(package: String,
-                     useNotarytool: OptionalConfigValue<Bool> = .fastlaneDefault(true),
-                     tryEarlyStapling: OptionalConfigValue<Bool> = .fastlaneDefault(false),
                      skipStapling: OptionalConfigValue<Bool> = .fastlaneDefault(false),
                      bundleId: OptionalConfigValue<String?> = .fastlaneDefault(nil),
                      username: OptionalConfigValue<String?> = .fastlaneDefault(nil),
@@ -7404,8 +7400,6 @@ public func notarize(package: String,
                      apiKey: OptionalConfigValue<[String: Any]?> = .fastlaneDefault(nil))
 {
     let packageArg = RubyCommand.Argument(name: "package", value: package, type: nil)
-    let useNotarytoolArg = useNotarytool.asRubyArgument(name: "use_notarytool", type: nil)
-    let tryEarlyStaplingArg = tryEarlyStapling.asRubyArgument(name: "try_early_stapling", type: nil)
     let skipStaplingArg = skipStapling.asRubyArgument(name: "skip_stapling", type: nil)
     let bundleIdArg = bundleId.asRubyArgument(name: "bundle_id", type: nil)
     let usernameArg = username.asRubyArgument(name: "username", type: nil)
@@ -7415,8 +7409,6 @@ public func notarize(package: String,
     let apiKeyPathArg = apiKeyPath.asRubyArgument(name: "api_key_path", type: nil)
     let apiKeyArg = apiKey.asRubyArgument(name: "api_key", type: nil)
     let array: [RubyCommand.Argument?] = [packageArg,
-                                          useNotarytoolArg,
-                                          tryEarlyStaplingArg,
                                           skipStaplingArg,
                                           bundleIdArg,
                                           usernameArg,
