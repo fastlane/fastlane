@@ -97,7 +97,7 @@ module Pilot
     end
 
     def find_app_tester(email: nil, app: nil)
-      tester = app.get_beta_testers(filter: { email: email }, includes: "apps,betaTesterMetrics,betaGroups").first
+      tester = app.get_beta_testers(filter: { email: email }, includes: "apps,betaGroups").first
 
       if tester
         UI.success("Found existing tester #{email}")
