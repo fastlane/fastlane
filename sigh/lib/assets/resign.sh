@@ -176,6 +176,7 @@ PROVISIONS_BY_ID=()
 DEFAULT_PROVISION=""
 TEMP_DIR="_floatsignTemp"
 USE_APP_ENTITLEMENTS=""
+VERBOSE=""
 XCODE_VERSION="$(xcodebuild -version | grep "Xcode" | /usr/bin/cut -f 2 -d ' ')"
 
 # List of plist keys used for reference to and from nested apps and extensions
@@ -549,8 +550,6 @@ function resign {
         do
             if [[ "$assetpack" == *.assetpack ]]; then
                 rm -rf "$assetpack"/_CodeSignature
-                # Must not quote VERBOSE because empty string is treated as the filename
-                # shellcheck disable=SC2086
                 /usr/bin/codesign ${VERBOSE} --generate-entitlement-der "${KEYCHAIN_FLAG}" -f -s "$CERTIFICATE" "$assetpack"
                 checkStatus
             else
@@ -627,8 +626,6 @@ function resign {
             log "Creating an archived-expanded-entitlements.xcent file for Xcode 9 builds or earlier"
             cp -f "$ENTITLEMENTS" "$APP_PATH/archived-expanded-entitlements.xcent"
         fi
-        # Must not quote VERBOSE because empty string is treated as the filename
-        # shellcheck disable=SC2086
         /usr/bin/codesign ${VERBOSE} --generate-entitlement-der -f -s "$CERTIFICATE" --entitlements "$ENTITLEMENTS" "$APP_PATH"
         checkStatus
     elif  [[ -n "${USE_APP_ENTITLEMENTS}" ]]; then
@@ -874,8 +871,6 @@ function resign {
             log "Creating an archived-expanded-entitlements.xcent file for Xcode 9 builds or earlier"
             cp -f "$PATCHED_ENTITLEMENTS" "$APP_PATH/archived-expanded-entitlements.xcent"
         fi
-        # Must not quote VERBOSE because empty string is treated as the filename
-        # shellcheck disable=SC2086
         /usr/bin/codesign ${VERBOSE} --generate-entitlement-der -f -s "$CERTIFICATE" --entitlements "$PATCHED_ENTITLEMENTS" "$APP_PATH"
         checkStatus
     else
