@@ -176,6 +176,7 @@ PROVISIONS_BY_ID=()
 DEFAULT_PROVISION=""
 TEMP_DIR="_floatsignTemp"
 USE_APP_ENTITLEMENTS=""
+VERBOSE=""
 XCODE_VERSION="$(xcodebuild -version | grep "Xcode" | /usr/bin/cut -f 2 -d ' ')"
 
 # List of plist keys used for reference to and from nested apps and extensions
@@ -549,7 +550,7 @@ function resign {
         do
             if [[ "$assetpack" == *.assetpack ]]; then
                 rm -rf "$assetpack"/_CodeSignature
-                /usr/bin/codesign "${VERBOSE}" --generate-entitlement-der "${KEYCHAIN_FLAG}" -f -s "$CERTIFICATE" "$assetpack"
+                /usr/bin/codesign ${VERBOSE} --generate-entitlement-der "${KEYCHAIN_FLAG}" -f -s "$CERTIFICATE" "$assetpack"
                 checkStatus
             else
                 log "Ignoring non-assetpack: $assetpack"
@@ -625,7 +626,7 @@ function resign {
             log "Creating an archived-expanded-entitlements.xcent file for Xcode 9 builds or earlier"
             cp -f "$ENTITLEMENTS" "$APP_PATH/archived-expanded-entitlements.xcent"
         fi
-        /usr/bin/codesign "${VERBOSE}" --generate-entitlement-der -f -s "$CERTIFICATE" --entitlements "$ENTITLEMENTS" "$APP_PATH"
+        /usr/bin/codesign ${VERBOSE} --generate-entitlement-der -f -s "$CERTIFICATE" --entitlements "$ENTITLEMENTS" "$APP_PATH"
         checkStatus
     elif  [[ -n "${USE_APP_ENTITLEMENTS}" ]]; then
         # Extract entitlements from provisioning profile and from the app binary
@@ -870,7 +871,7 @@ function resign {
             log "Creating an archived-expanded-entitlements.xcent file for Xcode 9 builds or earlier"
             cp -f "$PATCHED_ENTITLEMENTS" "$APP_PATH/archived-expanded-entitlements.xcent"
         fi
-        /usr/bin/codesign "${VERBOSE}" --generate-entitlement-der -f -s "$CERTIFICATE" --entitlements "$PATCHED_ENTITLEMENTS" "$APP_PATH"
+        /usr/bin/codesign ${VERBOSE} --generate-entitlement-der -f -s "$CERTIFICATE" --entitlements "$PATCHED_ENTITLEMENTS" "$APP_PATH"
         checkStatus
     else
         log "Extracting entitlements from provisioning profile"
