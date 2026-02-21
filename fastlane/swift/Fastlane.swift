@@ -6605,7 +6605,7 @@ public func jazzy(config: OptionalConfigValue<String?> = .fastlaneDefault(nil),
                                                            username: OptionalConfigValue<String?> = .fastlaneDefault(nil),
                                                            version: OptionalConfigValue<String?> = .fastlaneDefault(nil),
                                                            platform: String = "ios",
-                                                           initialBuildNumber: Int = 1,
+                                                           initialBuildNumber: Int = 0,
                                                            teamId: OptionalConfigValue<String?> = .fastlaneDefault(nil),
                                                            teamName: OptionalConfigValue<String?> = .fastlaneDefault(nil)) -> Int
 {
