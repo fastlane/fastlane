@@ -53,6 +53,9 @@ module Scan
       if config[:use_system_scm] && !options.include?("-scmProvider system")
         options << "-scmProvider system"
       end
+      if config[:package_authorization_provider] && !options.include?("-packageAuthorizationProvider #{config[:package_authorization_provider].shellescape}")
+        options << "-packageAuthorizationProvider #{config[:package_authorization_provider].shellescape}"
+      end
       if config[:result_bundle_path]
         options << "-resultBundlePath #{config[:result_bundle_path].shellescape}"
         Scan.cache[:result_bundle_path] = config[:result_bundle_path]

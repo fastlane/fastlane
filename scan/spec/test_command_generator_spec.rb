@@ -297,6 +297,13 @@ describe Scan do
               result = @test_command_generator.project_path_array
               expect(result).to eq(["-scheme package"])
             end
+
+            it "includes packageAuthorizationProvider argument in build command when set", requires_xcodebuild: true do
+              options = { package_path: "./scan/examples/package/", scheme: "package", package_authorization_provider: "netrc" }
+              Scan.config = FastlaneCore::Configuration.create(Scan::Options.available_options, options)
+              result = @test_command_generator.generate
+              expect(result).to include("-packageAuthorizationProvider netrc")
+            end
           end
 
           describe "With workspace" do
