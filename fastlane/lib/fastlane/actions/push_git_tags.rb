@@ -17,9 +17,12 @@ module Fastlane
         # optionally add the force component
         command << '--force' if params[:force]
 
-        result = Actions.sh(command.join(' '))
-        UI.success('Tags pushed to remote')
-        result
+        params[:path] = './' unless params[:path]
+        Dir.chdir(params[:path]) do
+          result = Actions.sh(command.join(' '))
+          UI.success('Tags pushed to remote')
+          result
+        end
       end
 
       #####################################################
@@ -46,7 +49,12 @@ module Fastlane
           FastlaneCore::ConfigItem.new(key: :tag,
                                        env_name: "FL_GIT_PUSH_TAG",
                                        description: "The tag to push to remote",
-                                       optional: true)
+                                       optional: true),
+          FastlaneCore::ConfigItem.new(key: :path,
+                                       env_name: 'FL_GIT_PUSH_PATH',
+                                       description: 'Path of the git repository',
+                                       optional: true,
+                                       default_value: './')
         ]
       end
 
