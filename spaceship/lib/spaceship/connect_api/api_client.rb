@@ -11,6 +11,8 @@ module Spaceship
   class ConnectAPI
     class APIClient < Spaceship::Client
       attr_accessor :token
+      attr_accessor :disable_retries
+      attr_accessor :mighty_logger
 
       #####################################################
       # @!group Client Init
@@ -115,7 +117,9 @@ module Spaceship
       end
 
       def post(url_or_path, body, tries: 5)
+        tries = 1 if disable_retries
         response = with_asc_retry(tries) do
+          mighty_logger.info 'Fastlane post request', label: 'iap_api', context: { url: url_or_path, body: body } if mighty_logger
           request(:post) do |req|
             req.url(url_or_path)
             req.body = body.to_json
@@ -168,6 +172,8 @@ module Spaceship
 
         status = response.status if response
 
+        mighty_logger.info 'create in-app purchase fastlane status', label: 'iap_api', context: { status: status, response: response.body } if mighty_logger && (400...600).cover?(response.status)
+
         if [500, 504].include?(status)
           msg = "Timeout received! Retrying after 3 seconds (remaining: #{tries})..."
           raise TimeoutRetryError, msg
@@ -180,6 +186,7 @@ module Spaceship
         return response
       rescue UnauthorizedAccessError => error
         tries -= 1
+        mighty_logger.info 'create in-app purchase fastlane error', label: 'iap_api', context: { error: error } if mighty_logger
         puts(error) if Spaceship::Globals.verbose?
         if tries.zero?
           raise error
@@ -191,6 +198,7 @@ module Spaceship
         end
       rescue TimeoutRetryError => error
         tries -= 1
+        mighty_logger.info 'create in-app purchase fastlane error', label: 'iap_api', context: { error: error } if mighty_logger
         puts(error) if Spaceship::Globals.verbose?
         if tries.zero?
           return response
