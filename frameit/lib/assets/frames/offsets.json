@@ -1,0 +1,32 @@
+{
+  "portrait": {
+    "iPhone 16": {
+      "offset": "+90+90",
+      "width": 1179
+    },
+    "iPhone 16 Plus": {
+      "offset": "+90+87",
+      "width": 1290
+    },
+    "iPhone 16 Pro": {
+      "offset": "+72+69",
+      "width": 1206
+    },
+    "iPhone 16 Pro Max": {
+      "offset": "+75+66",
+      "width": 1320
+    },
+    "iPhone 17": {
+      "offset": "+72+69",
+      "width": 1206
+    },
+    "iPhone 17 Pro": {
+      "offset": "+72+69",
+      "width": 1206
+    },
+    "iPhone 17 Pro Max": {
+      "offset": "+75+66",
+      "width": 1320
+    }
+  }
+}

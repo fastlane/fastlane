@@ -14,7 +14,18 @@ module Frameit
       end
 
       offset_value = @offsets_cache["portrait"][sanitize_device_name(screenshot.device_name)]
-      UI.error("Tried looking for offset information for 'portrait', #{screenshot.device_name} in '#{offsets_json_path}'") unless offset_value
+
+      unless offset_value
+        unless @embedded_offsets_cache
+          embedded_offsets_path = File.join(Frameit::ROOT, "lib", "assets", "frames", "offsets.json")
+          if File.exist?(embedded_offsets_path)
+            @embedded_offsets_cache = JSON.parse(File.read(embedded_offsets_path))
+          end
+        end
+        offset_value = @embedded_offsets_cache["portrait"][sanitize_device_name(screenshot.device_name)] if @embedded_offsets_cache
+      end
+
+      UI.error("Tried looking for offset information for 'portrait', #{screenshot.device_name}") unless offset_value
       return offset_value
     end
 

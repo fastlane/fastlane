@@ -12,6 +12,7 @@ module Frameit
 
       filename = create_file_name(screenshot.device_name, screenshot.color.nil? ? screenshot.default_color : screenshot.color)
       templates = Dir["#{FrameDownloader.templates_path}/#{filename}.{png,jpg}"] # ~/.frameit folder
+      templates = Dir["#{embedded_frames_path}/#{filename}.{png,jpg}"] if templates.count == 0
 
       UI.verbose("Looking for #{filename} and found #{templates.count} template(s)")
 
@@ -20,6 +21,7 @@ module Frameit
         filename = create_file_name(screenshot.device_name, screenshot.default_color)
         UI.important("Unfortunately device type '#{screenshot.device_name}' is not available in #{screenshot.color}, falling back to " + (screenshot.default_color.nil? ? "default" : screenshot.default_color) + "...")
         templates = Dir["#{FrameDownloader.templates_path}/#{filename}.{png,jpg}"] # ~/.frameit folder
+        templates = Dir["#{embedded_frames_path}/#{filename}.{png,jpg}"] if templates.count == 0
         UI.verbose("Looking for #{filename} and found #{templates.count} template(s)")
       end
 
@@ -35,6 +37,10 @@ module Frameit
       else
         return templates.first.tr(" ", "\ ")
       end
+    end
+
+    def self.embedded_frames_path
+      File.join(Frameit::ROOT, "lib", "assets", "frames")
     end
 
     def self.create_file_name(device_name, color)
