@@ -137,9 +137,11 @@ module Fastlane
         # see https://github.com/fastlane/fastlane/issues/29916
         begin
           FastlaneCore::UpdateChecker.show_update_status('fastlane', Fastlane::VERSION)
+        # rubocop:disable Lint/RescueException
         rescue Exception => e
           UI.error(e.to_s)
         end
+        # rubocop:enable Lint/RescueException
       end
 
       def map_aliased_tools(tool_name)
