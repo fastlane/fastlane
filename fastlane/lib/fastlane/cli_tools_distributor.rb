@@ -132,7 +132,14 @@ module Fastlane
           Fastlane::CommandsGenerator.start
         end
       ensure
-        FastlaneCore::UpdateChecker.show_update_status('fastlane', Fastlane::VERSION)
+        # If the ruby setup if broken, and UpdateChecker fails catastrophically,
+        # we don't want to hide the original exception. We just print it
+        # see https://github.com/fastlane/fastlane/issues/29916
+        begin
+          FastlaneCore::UpdateChecker.show_update_status('fastlane', Fastlane::VERSION)
+        rescue Exception => e
+          UI.error(e.to_s)
+        end
       end
 
       def map_aliased_tools(tool_name)
