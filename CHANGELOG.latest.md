@@ -1,1 +1,6 @@
-* [action] Revert to "-uploadedDate" sort order for app_store_build_num… (#29899) via Kai Leonhardt (@Mik4sa)
+* [sigh] fix: prevent empty string as input to codesign on VERBOSE (#29910) via Connor Tumbleson (@iBotPeaches)
+* Fix console command compatibility with Ruby 3.3+ (#29925) via Jerome Lacoste (@lacostej)
+* cli: do not hide the original exception when failing in our ensure block (#29923) via Jerome Lacoste (@lacostej)
+* [core] Fix gemspec bin/console exclusion to subtract "console" not "bin/console" (#29914) via Tachibana waita (@whywaita)
+* [core] Upgrade rack transitive dep to please dependabot (#29911) via Jerome Lacoste (@lacostej)
+* build: move to faraday 1.10.5 (#29906) via Connor Tumbleson (@iBotPeaches)
