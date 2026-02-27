@@ -310,6 +310,13 @@ module FastlaneCore
       return result
     end
 
+    def self.backticks_verbose(command)
+      UI.command(command) if FastlaneCore::Globals.verbose?
+      result = `#{command}`
+      UI.command_output(result) if FastlaneCore::Globals.verbose?
+      return result
+    end
+
     # removes ANSI colors from string
     def self.strip_ansi_colors(str)
       str.gsub(/\e\[([;\d]+)?m/, '')
