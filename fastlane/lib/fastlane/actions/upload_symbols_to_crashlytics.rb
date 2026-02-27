@@ -69,12 +69,17 @@ module Fastlane
         end
         command << "-p #{params[:platform] == 'appletvos' ? 'tvos' : params[:platform]}"
         command << File.expand_path(path).shellescape
+
         begin
           command_to_execute = command.join(" ")
           UI.verbose("upload_dsym using command: #{command_to_execute}")
           Actions.sh(command_to_execute, log: params[:debug])
         rescue => ex
           UI.error(ex.to_s) # it fails, however we don't want to fail everything just for this
+
+          if params[:fail_on_error] == true
+            raise
+          end
         end
       end
 
@@ -195,6 +200,11 @@ module Fastlane
                                          min_threads = 1
                                          UI.user_error!("Too few threads (#{value}) minimum number of threads: #{min_threads}") unless value >= min_threads
                                        end),
+          FastlaneCore::ConfigItem.new(key: :fail_on_error,
+                                       env_name: "FL_UPLOAD_SYMBOLS_TO_CRASHLYTICS_FAIL_ON_ERROR",
+                                       description: "Should the action fail when an upload fails?",
+                                       type: Boolean,
+                                       default_value: false),
           FastlaneCore::ConfigItem.new(key: :debug,
                                        env_name: "FL_UPLOAD_SYMBOLS_TO_CRASHLYTICS_DEBUG",
                                        description: "Enable debug mode for upload-symbols",
