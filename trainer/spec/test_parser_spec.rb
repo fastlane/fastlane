@@ -290,8 +290,7 @@ describe Trainer do
               name: "testFlaky()",
               duration: 0.5,
               test_status: "Failure",
-              parent: test_group
-            )
+              parent: test_group)
             allow(t).to receive(:find_failure).and_return(failure)
             t
           end
@@ -301,8 +300,7 @@ describe Trainer do
               name: "testFlaky()",
               duration: 0.1,
               test_status: "Skipped",
-              parent: test_group
-            )
+              parent: test_group)
             allow(t).to receive(:find_failure).and_return(nil)
             t
           end
@@ -312,15 +310,13 @@ describe Trainer do
               all_tests: [failing_test, skipped_test],
               project_relative_path: "MyApp.xcodeproj",
               target_name: "MyTests",
-              name: "MyTests"
-            )
+              name: "MyTests")
           end
 
           let(:plan_run_summary) do
             double("plan_run_summary",
               name: "Test Scheme Action",
-              testable_summaries: [testable_summary]
-            )
+              testable_summaries: [testable_summary])
           end
 
           let(:summaries_wrapper) do
