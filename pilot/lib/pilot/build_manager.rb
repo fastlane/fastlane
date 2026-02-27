@@ -453,9 +453,6 @@ module Pilot
       # This is where we could add a check to see if encryption is required and has been updated
       uploaded_build = set_export_compliance_if_needed(uploaded_build, options)
 
-      # Set build audience type if specified
-      uploaded_build = set_build_audience_type_if_needed(uploaded_build, options)
-
       if options[:submit_beta_review] && (options[:groups] || options[:distribute_external])
         if uploaded_build.ready_for_beta_submission?
           uploaded_build.post_beta_app_review_submission
@@ -504,22 +501,6 @@ module Pilot
       else
         return uploaded_build
       end
-    end
-
-    def set_build_audience_type_if_needed(uploaded_build, options)
-      unless options[:app_store_eligible].nil?
-        build_audience_type = options[:app_store_eligible] ? "APP_STORE_ELIGIBLE" : "INTERNAL_ONLY"
-        attributes = { buildAudienceType: build_audience_type }
-
-        Spaceship::ConnectAPI.patch_builds(build_id: uploaded_build.id, attributes: attributes)
-
-        UI.success("Build audience type has been set to '#{build_audience_type}'")
-
-        # Reload the build to get the updated attributes
-        uploaded_build = Spaceship::ConnectAPI::Build.get(build_id: uploaded_build.id)
-      end
-
-      return uploaded_build
     end
 
     def update_review_detail(build, info)

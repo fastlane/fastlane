@@ -135,7 +135,7 @@ public func addGitTag(tag: OptionalConfigValue<String?> = .fastlaneDefault(nil),
  - parameters:
    - apiKeyPath: Path to your App Store Connect API Key JSON file (https://docs.fastlane.tools/app-store-connect-api/#using-fastlane-api-key-json-file)
    - apiKey: Your App Store Connect API Key information (https://docs.fastlane.tools/app-store-connect-api/#using-fastlane-api-key-hash-option)
-   - initialBuildNumber: sets the build number to given value if no build is in current train
+   - initialBuildNumber: sets the build number to given value if no build (upload) is in current train
    - appIdentifier: The bundle identifier of your app
    - username: Your Apple ID Username
    - teamId: The ID of your App Store Connect team if you're in multiple teams
@@ -1341,7 +1341,8 @@ public func buildAndroidApp(task: OptionalConfigValue<String?> = .fastlaneDefaul
    - clonedSourcePackagesPath: Sets a custom path for Swift Package Manager dependencies
    - packageCachePath: Sets a custom package cache path for Swift Package Manager dependencies
    - skipPackageDependenciesResolution: Skips resolution of Swift Package Manager dependencies
-   - disablePackageAutomaticUpdates: Prevents packages from automatically being resolved to versions other than those recorded in the `Package.resolved` file
+   - disablePackageAutomaticUpdates: Prevents packages from automatically being resolved to versions other than those recorded in the `Package.resolved` file. This translates in the option `-disableAutomaticPackageResolution` being passed to xcodebuild
+   - skipPackageRepositoryFetches: Skips updating package dependencies from their remote. This translates in the option `-skipPackageUpdates` being passed to xcodebuild
    - useSystemScm: Lets xcodebuild use system's scm configuration
    - packageAuthorizationProvider: Lets xcodebuild use a specified package authorization provider (keychain|netrc)
    - generateAppstoreInfo: Generate AppStoreInfo.plist using swinfo for app-store exports
@@ -1400,6 +1401,7 @@ public func buildAndroidApp(task: OptionalConfigValue<String?> = .fastlaneDefaul
                                         packageCachePath: OptionalConfigValue<String?> = .fastlaneDefault(nil),
                                         skipPackageDependenciesResolution: OptionalConfigValue<Bool> = .fastlaneDefault(false),
                                         disablePackageAutomaticUpdates: OptionalConfigValue<Bool> = .fastlaneDefault(false),
+                                        skipPackageRepositoryFetches: OptionalConfigValue<Bool> = .fastlaneDefault(false),
                                         useSystemScm: OptionalConfigValue<Bool> = .fastlaneDefault(false),
                                         packageAuthorizationProvider: OptionalConfigValue<String?> = .fastlaneDefault(nil),
                                         generateAppstoreInfo: OptionalConfigValue<Bool> = .fastlaneDefault(false)) -> String
@@ -1454,6 +1456,7 @@ public func buildAndroidApp(task: OptionalConfigValue<String?> = .fastlaneDefaul
     let packageCachePathArg = packageCachePath.asRubyArgument(name: "package_cache_path", type: nil)
     let skipPackageDependenciesResolutionArg = skipPackageDependenciesResolution.asRubyArgument(name: "skip_package_dependencies_resolution", type: nil)
     let disablePackageAutomaticUpdatesArg = disablePackageAutomaticUpdates.asRubyArgument(name: "disable_package_automatic_updates", type: nil)
+    let skipPackageRepositoryFetchesArg = skipPackageRepositoryFetches.asRubyArgument(name: "skip_package_repository_fetches", type: nil)
     let useSystemScmArg = useSystemScm.asRubyArgument(name: "use_system_scm", type: nil)
     let packageAuthorizationProviderArg = packageAuthorizationProvider.asRubyArgument(name: "package_authorization_provider", type: nil)
     let generateAppstoreInfoArg = generateAppstoreInfo.asRubyArgument(name: "generate_appstore_info", type: nil)
@@ -1507,6 +1510,7 @@ public func buildAndroidApp(task: OptionalConfigValue<String?> = .fastlaneDefaul
                                           packageCachePathArg,
                                           skipPackageDependenciesResolutionArg,
                                           disablePackageAutomaticUpdatesArg,
+                                          skipPackageRepositoryFetchesArg,
                                           useSystemScmArg,
                                           packageAuthorizationProviderArg,
                                           generateAppstoreInfoArg]
@@ -1567,7 +1571,8 @@ public func buildAndroidApp(task: OptionalConfigValue<String?> = .fastlaneDefaul
    - clonedSourcePackagesPath: Sets a custom path for Swift Package Manager dependencies
    - packageCachePath: Sets a custom package cache path for Swift Package Manager dependencies
    - skipPackageDependenciesResolution: Skips resolution of Swift Package Manager dependencies
-   - disablePackageAutomaticUpdates: Prevents packages from automatically being resolved to versions other than those recorded in the `Package.resolved` file
+   - disablePackageAutomaticUpdates: Prevents packages from automatically being resolved to versions other than those recorded in the `Package.resolved` file. This translates in the option `-disableAutomaticPackageResolution` being passed to xcodebuild
+   - skipPackageRepositoryFetches: Skips updating package dependencies from their remote. This translates in the option `-skipPackageUpdates` being passed to xcodebuild
    - useSystemScm: Lets xcodebuild use system's scm configuration
    - packageAuthorizationProvider: Lets xcodebuild use a specified package authorization provider (keychain|netrc)
    - generateAppstoreInfo: Generate AppStoreInfo.plist using swinfo for app-store exports
@@ -1623,6 +1628,7 @@ public func buildAndroidApp(task: OptionalConfigValue<String?> = .fastlaneDefaul
                                            packageCachePath: OptionalConfigValue<String?> = .fastlaneDefault(nil),
                                            skipPackageDependenciesResolution: OptionalConfigValue<Bool> = .fastlaneDefault(false),
                                            disablePackageAutomaticUpdates: OptionalConfigValue<Bool> = .fastlaneDefault(false),
+                                           skipPackageRepositoryFetches: OptionalConfigValue<Bool> = .fastlaneDefault(false),
                                            useSystemScm: OptionalConfigValue<Bool> = .fastlaneDefault(false),
                                            packageAuthorizationProvider: OptionalConfigValue<String?> = .fastlaneDefault(nil),
                                            generateAppstoreInfo: OptionalConfigValue<Bool> = .fastlaneDefault(false)) -> String
@@ -1674,6 +1680,7 @@ public func buildAndroidApp(task: OptionalConfigValue<String?> = .fastlaneDefaul
     let packageCachePathArg = packageCachePath.asRubyArgument(name: "package_cache_path", type: nil)
     let skipPackageDependenciesResolutionArg = skipPackageDependenciesResolution.asRubyArgument(name: "skip_package_dependencies_resolution", type: nil)
     let disablePackageAutomaticUpdatesArg = disablePackageAutomaticUpdates.asRubyArgument(name: "disable_package_automatic_updates", type: nil)
+    let skipPackageRepositoryFetchesArg = skipPackageRepositoryFetches.asRubyArgument(name: "skip_package_repository_fetches", type: nil)
     let useSystemScmArg = useSystemScm.asRubyArgument(name: "use_system_scm", type: nil)
     let packageAuthorizationProviderArg = packageAuthorizationProvider.asRubyArgument(name: "package_authorization_provider", type: nil)
     let generateAppstoreInfoArg = generateAppstoreInfo.asRubyArgument(name: "generate_appstore_info", type: nil)
@@ -1724,6 +1731,7 @@ public func buildAndroidApp(task: OptionalConfigValue<String?> = .fastlaneDefaul
                                           packageCachePathArg,
                                           skipPackageDependenciesResolutionArg,
                                           disablePackageAutomaticUpdatesArg,
+                                          skipPackageRepositoryFetchesArg,
                                           useSystemScmArg,
                                           packageAuthorizationProviderArg,
                                           generateAppstoreInfoArg]
@@ -1785,7 +1793,8 @@ public func buildAndroidApp(task: OptionalConfigValue<String?> = .fastlaneDefaul
    - clonedSourcePackagesPath: Sets a custom path for Swift Package Manager dependencies
    - packageCachePath: Sets a custom package cache path for Swift Package Manager dependencies
    - skipPackageDependenciesResolution: Skips resolution of Swift Package Manager dependencies
-   - disablePackageAutomaticUpdates: Prevents packages from automatically being resolved to versions other than those recorded in the `Package.resolved` file
+   - disablePackageAutomaticUpdates: Prevents packages from automatically being resolved to versions other than those recorded in the `Package.resolved` file. This translates in the option `-disableAutomaticPackageResolution` being passed to xcodebuild
+   - skipPackageRepositoryFetches: Skips updating package dependencies from their remote. This translates in the option `-skipPackageUpdates` being passed to xcodebuild
    - useSystemScm: Lets xcodebuild use system's scm configuration
    - packageAuthorizationProvider: Lets xcodebuild use a specified package authorization provider (keychain|netrc)
    - generateAppstoreInfo: Generate AppStoreInfo.plist using swinfo for app-store exports
@@ -1842,6 +1851,7 @@ public func buildAndroidApp(task: OptionalConfigValue<String?> = .fastlaneDefaul
                                            packageCachePath: OptionalConfigValue<String?> = .fastlaneDefault(nil),
                                            skipPackageDependenciesResolution: OptionalConfigValue<Bool> = .fastlaneDefault(false),
                                            disablePackageAutomaticUpdates: OptionalConfigValue<Bool> = .fastlaneDefault(false),
+                                           skipPackageRepositoryFetches: OptionalConfigValue<Bool> = .fastlaneDefault(false),
                                            useSystemScm: OptionalConfigValue<Bool> = .fastlaneDefault(false),
                                            packageAuthorizationProvider: OptionalConfigValue<String?> = .fastlaneDefault(nil),
                                            generateAppstoreInfo: OptionalConfigValue<Bool> = .fastlaneDefault(false)) -> String
@@ -1894,6 +1904,7 @@ public func buildAndroidApp(task: OptionalConfigValue<String?> = .fastlaneDefaul
     let packageCachePathArg = packageCachePath.asRubyArgument(name: "package_cache_path", type: nil)
     let skipPackageDependenciesResolutionArg = skipPackageDependenciesResolution.asRubyArgument(name: "skip_package_dependencies_resolution", type: nil)
     let disablePackageAutomaticUpdatesArg = disablePackageAutomaticUpdates.asRubyArgument(name: "disable_package_automatic_updates", type: nil)
+    let skipPackageRepositoryFetchesArg = skipPackageRepositoryFetches.asRubyArgument(name: "skip_package_repository_fetches", type: nil)
     let useSystemScmArg = useSystemScm.asRubyArgument(name: "use_system_scm", type: nil)
     let packageAuthorizationProviderArg = packageAuthorizationProvider.asRubyArgument(name: "package_authorization_provider", type: nil)
     let generateAppstoreInfoArg = generateAppstoreInfo.asRubyArgument(name: "generate_appstore_info", type: nil)
@@ -1945,6 +1956,7 @@ public func buildAndroidApp(task: OptionalConfigValue<String?> = .fastlaneDefaul
                                           packageCachePathArg,
                                           skipPackageDependenciesResolutionArg,
                                           disablePackageAutomaticUpdatesArg,
+                                          skipPackageRepositoryFetchesArg,
                                           useSystemScmArg,
                                           packageAuthorizationProviderArg,
                                           generateAppstoreInfoArg]
@@ -2194,7 +2206,8 @@ public func captureAndroidScreenshots(androidHome: OptionalConfigValue<String?> 
    - clonedSourcePackagesPath: Sets a custom path for Swift Package Manager dependencies
    - packageCachePath: Sets a custom package cache path for Swift Package Manager dependencies
    - skipPackageDependenciesResolution: Skips resolution of Swift Package Manager dependencies
-   - disablePackageAutomaticUpdates: Prevents packages from automatically being resolved to versions other than those recorded in the `Package.resolved` file
+   - disablePackageAutomaticUpdates: Prevents packages from automatically being resolved to versions other than those recorded in the `Package.resolved` file. This translates in the option `-disableAutomaticPackageResolution` being passed to xcodebuild
+   - skipPackageRepositoryFetches: Skips updating package dependencies from their remote. This translates in the option `-skipPackageUpdates` being passed to xcodebuild
    - packageAuthorizationProvider: Lets xcodebuild use a specified package authorization provider (keychain|netrc)
    - testplan: The testplan associated with the scheme that should be used for testing
    - onlyTesting: Array of strings matching Test Bundle/Test Suite/Test Cases to run
@@ -2247,6 +2260,7 @@ public func captureIosScreenshots(workspace: OptionalConfigValue<String?> = .fas
                                   packageCachePath: OptionalConfigValue<String?> = .fastlaneDefault(nil),
                                   skipPackageDependenciesResolution: OptionalConfigValue<Bool> = .fastlaneDefault(false),
                                   disablePackageAutomaticUpdates: OptionalConfigValue<Bool> = .fastlaneDefault(false),
+                                  skipPackageRepositoryFetches: OptionalConfigValue<Bool> = .fastlaneDefault(false),
                                   packageAuthorizationProvider: OptionalConfigValue<String?> = .fastlaneDefault(nil),
                                   testplan: OptionalConfigValue<String?> = .fastlaneDefault(nil),
                                   onlyTesting: Any? = nil,
@@ -2299,6 +2313,7 @@ public func captureIosScreenshots(workspace: OptionalConfigValue<String?> = .fas
     let packageCachePathArg = packageCachePath.asRubyArgument(name: "package_cache_path", type: nil)
     let skipPackageDependenciesResolutionArg = skipPackageDependenciesResolution.asRubyArgument(name: "skip_package_dependencies_resolution", type: nil)
     let disablePackageAutomaticUpdatesArg = disablePackageAutomaticUpdates.asRubyArgument(name: "disable_package_automatic_updates", type: nil)
+    let skipPackageRepositoryFetchesArg = skipPackageRepositoryFetches.asRubyArgument(name: "skip_package_repository_fetches", type: nil)
     let packageAuthorizationProviderArg = packageAuthorizationProvider.asRubyArgument(name: "package_authorization_provider", type: nil)
     let testplanArg = testplan.asRubyArgument(name: "testplan", type: nil)
     let onlyTestingArg = RubyCommand.Argument(name: "only_testing", value: onlyTesting, type: nil)
@@ -2350,6 +2365,7 @@ public func captureIosScreenshots(workspace: OptionalConfigValue<String?> = .fas
                                           packageCachePathArg,
                                           skipPackageDependenciesResolutionArg,
                                           disablePackageAutomaticUpdatesArg,
+                                          skipPackageRepositoryFetchesArg,
                                           packageAuthorizationProviderArg,
                                           testplanArg,
                                           onlyTestingArg,
@@ -2411,7 +2427,8 @@ public func captureIosScreenshots(workspace: OptionalConfigValue<String?> = .fas
    - clonedSourcePackagesPath: Sets a custom path for Swift Package Manager dependencies
    - packageCachePath: Sets a custom package cache path for Swift Package Manager dependencies
    - skipPackageDependenciesResolution: Skips resolution of Swift Package Manager dependencies
-   - disablePackageAutomaticUpdates: Prevents packages from automatically being resolved to versions other than those recorded in the `Package.resolved` file
+   - disablePackageAutomaticUpdates: Prevents packages from automatically being resolved to versions other than those recorded in the `Package.resolved` file. This translates in the option `-disableAutomaticPackageResolution` being passed to xcodebuild
+   - skipPackageRepositoryFetches: Skips updating package dependencies from their remote. This translates in the option `-skipPackageUpdates` being passed to xcodebuild
    - packageAuthorizationProvider: Lets xcodebuild use a specified package authorization provider (keychain|netrc)
    - testplan: The testplan associated with the scheme that should be used for testing
    - onlyTesting: Array of strings matching Test Bundle/Test Suite/Test Cases to run
@@ -2464,6 +2481,7 @@ public func captureScreenshots(workspace: OptionalConfigValue<String?> = .fastla
                                packageCachePath: OptionalConfigValue<String?> = .fastlaneDefault(nil),
                                skipPackageDependenciesResolution: OptionalConfigValue<Bool> = .fastlaneDefault(false),
                                disablePackageAutomaticUpdates: OptionalConfigValue<Bool> = .fastlaneDefault(false),
+                               skipPackageRepositoryFetches: OptionalConfigValue<Bool> = .fastlaneDefault(false),
                                packageAuthorizationProvider: OptionalConfigValue<String?> = .fastlaneDefault(nil),
                                testplan: OptionalConfigValue<String?> = .fastlaneDefault(nil),
                                onlyTesting: Any? = nil,
@@ -2516,6 +2534,7 @@ public func captureScreenshots(workspace: OptionalConfigValue<String?> = .fastla
     let packageCachePathArg = packageCachePath.asRubyArgument(name: "package_cache_path", type: nil)
     let skipPackageDependenciesResolutionArg = skipPackageDependenciesResolution.asRubyArgument(name: "skip_package_dependencies_resolution", type: nil)
     let disablePackageAutomaticUpdatesArg = disablePackageAutomaticUpdates.asRubyArgument(name: "disable_package_automatic_updates", type: nil)
+    let skipPackageRepositoryFetchesArg = skipPackageRepositoryFetches.asRubyArgument(name: "skip_package_repository_fetches", type: nil)
     let packageAuthorizationProviderArg = packageAuthorizationProvider.asRubyArgument(name: "package_authorization_provider", type: nil)
     let testplanArg = testplan.asRubyArgument(name: "testplan", type: nil)
     let onlyTestingArg = RubyCommand.Argument(name: "only_testing", value: onlyTesting, type: nil)
@@ -2567,6 +2586,7 @@ public func captureScreenshots(workspace: OptionalConfigValue<String?> = .fastla
                                           packageCachePathArg,
                                           skipPackageDependenciesResolutionArg,
                                           disablePackageAutomaticUpdatesArg,
+                                          skipPackageRepositoryFetchesArg,
                                           packageAuthorizationProviderArg,
                                           testplanArg,
                                           onlyTestingArg,
@@ -5738,7 +5758,8 @@ public func gradle(task: OptionalConfigValue<String?> = .fastlaneDefault(nil),
    - clonedSourcePackagesPath: Sets a custom path for Swift Package Manager dependencies
    - packageCachePath: Sets a custom package cache path for Swift Package Manager dependencies
    - skipPackageDependenciesResolution: Skips resolution of Swift Package Manager dependencies
-   - disablePackageAutomaticUpdates: Prevents packages from automatically being resolved to versions other than those recorded in the `Package.resolved` file
+   - disablePackageAutomaticUpdates: Prevents packages from automatically being resolved to versions other than those recorded in the `Package.resolved` file. This translates in the option `-disableAutomaticPackageResolution` being passed to xcodebuild
+   - skipPackageRepositoryFetches: Skips updating package dependencies from their remote. This translates in the option `-skipPackageUpdates` being passed to xcodebuild
    - useSystemScm: Lets xcodebuild use system's scm configuration
    - packageAuthorizationProvider: Lets xcodebuild use a specified package authorization provider (keychain|netrc)
    - generateAppstoreInfo: Generate AppStoreInfo.plist using swinfo for app-store exports
@@ -5797,6 +5818,7 @@ public func gradle(task: OptionalConfigValue<String?> = .fastlaneDefault(nil),
                                    packageCachePath: OptionalConfigValue<String?> = .fastlaneDefault(gymfile.packageCachePath),
                                    skipPackageDependenciesResolution: OptionalConfigValue<Bool> = .fastlaneDefault(gymfile.skipPackageDependenciesResolution),
                                    disablePackageAutomaticUpdates: OptionalConfigValue<Bool> = .fastlaneDefault(gymfile.disablePackageAutomaticUpdates),
+                                   skipPackageRepositoryFetches: OptionalConfigValue<Bool> = .fastlaneDefault(gymfile.skipPackageRepositoryFetches),
                                    useSystemScm: OptionalConfigValue<Bool> = .fastlaneDefault(gymfile.useSystemScm),
                                    packageAuthorizationProvider: OptionalConfigValue<String?> = .fastlaneDefault(gymfile.packageAuthorizationProvider),
                                    generateAppstoreInfo: OptionalConfigValue<Bool> = .fastlaneDefault(gymfile.generateAppstoreInfo)) -> String
@@ -5851,6 +5873,7 @@ public func gradle(task: OptionalConfigValue<String?> = .fastlaneDefault(nil),
     let packageCachePathArg = packageCachePath.asRubyArgument(name: "package_cache_path", type: nil)
     let skipPackageDependenciesResolutionArg = skipPackageDependenciesResolution.asRubyArgument(name: "skip_package_dependencies_resolution", type: nil)
     let disablePackageAutomaticUpdatesArg = disablePackageAutomaticUpdates.asRubyArgument(name: "disable_package_automatic_updates", type: nil)
+    let skipPackageRepositoryFetchesArg = skipPackageRepositoryFetches.asRubyArgument(name: "skip_package_repository_fetches", type: nil)
     let useSystemScmArg = useSystemScm.asRubyArgument(name: "use_system_scm", type: nil)
     let packageAuthorizationProviderArg = packageAuthorizationProvider.asRubyArgument(name: "package_authorization_provider", type: nil)
     let generateAppstoreInfoArg = generateAppstoreInfo.asRubyArgument(name: "generate_appstore_info", type: nil)
@@ -5904,6 +5927,7 @@ public func gradle(task: OptionalConfigValue<String?> = .fastlaneDefault(nil),
                                           packageCachePathArg,
                                           skipPackageDependenciesResolutionArg,
                                           disablePackageAutomaticUpdatesArg,
+                                          skipPackageRepositoryFetchesArg,
                                           useSystemScmArg,
                                           packageAuthorizationProviderArg,
                                           generateAppstoreInfoArg]
@@ -6174,6 +6198,7 @@ public func ifttt(apiKey: String,
  - parameters:
    - certificatePath: Path to certificate
    - certificatePassword: Certificate password
+   - certificateFormat: Format of the certificate. Check the '-f' switch from 'security import --help' command
    - keychainName: Keychain the items should be imported to
    - keychainPath: Path to the Keychain file to which the items should be imported
    - keychainPassword: The password for the keychain. Note that for the login keychain this is your user's password
@@ -6183,6 +6208,7 @@ public func ifttt(apiKey: String,
  */
 public func importCertificate(certificatePath: String,
                               certificatePassword: OptionalConfigValue<String?> = .fastlaneDefault(nil),
+                              certificateFormat: OptionalConfigValue<String?> = .fastlaneDefault(nil),
                               keychainName: String,
                               keychainPath: OptionalConfigValue<String?> = .fastlaneDefault(nil),
                               keychainPassword: OptionalConfigValue<String?> = .fastlaneDefault(nil),
@@ -6190,12 +6216,14 @@ public func importCertificate(certificatePath: String,
 {
     let certificatePathArg = RubyCommand.Argument(name: "certificate_path", value: certificatePath, type: nil)
     let certificatePasswordArg = certificatePassword.asRubyArgument(name: "certificate_password", type: nil)
+    let certificateFormatArg = certificateFormat.asRubyArgument(name: "certificate_format", type: nil)
     let keychainNameArg = RubyCommand.Argument(name: "keychain_name", value: keychainName, type: nil)
     let keychainPathArg = keychainPath.asRubyArgument(name: "keychain_path", type: nil)
     let keychainPasswordArg = keychainPassword.asRubyArgument(name: "keychain_password", type: nil)
     let logOutputArg = logOutput.asRubyArgument(name: "log_output", type: nil)
     let array: [RubyCommand.Argument?] = [certificatePathArg,
                                           certificatePasswordArg,
+                                          certificateFormatArg,
                                           keychainNameArg,
                                           keychainPathArg,
                                           keychainPasswordArg,
@@ -6561,7 +6589,7 @@ public func jazzy(config: OptionalConfigValue<String?> = .fastlaneDefault(nil),
    - username: Your Apple ID Username
    - version: The version number whose latest build number we want
    - platform: The platform to use (optional)
-   - initialBuildNumber: sets the build number to given value if no build is in current train
+   - initialBuildNumber: sets the build number to given value if no build (upload) is in current train
    - teamId: The ID of your App Store Connect team if you're in multiple teams
    - teamName: The name of your App Store Connect team if you're in multiple teams
 
@@ -7821,8 +7849,7 @@ public func pilot(apiKeyPath: OptionalConfigValue<String?> = .fastlaneDefault(ni
                   waitProcessingTimeoutDuration: OptionalConfigValue<Int?> = .fastlaneDefault(nil),
                   waitForUploadedBuild: OptionalConfigValue<Bool> = .fastlaneDefault(false),
                   rejectBuildWaitingForReview: OptionalConfigValue<Bool> = .fastlaneDefault(false),
-                  submitBetaReview: OptionalConfigValue<Bool> = .fastlaneDefault(true),
-                  appStoreEligible: OptionalConfigValue<Bool> = .fastlaneDefault(true))
+                  submitBetaReview: OptionalConfigValue<Bool> = .fastlaneDefault(true))
 {
     let apiKeyPathArg = apiKeyPath.asRubyArgument(name: "api_key_path", type: nil)
     let apiKeyArg = apiKey.asRubyArgument(name: "api_key", type: nil)
@@ -7863,7 +7890,6 @@ public func pilot(apiKeyPath: OptionalConfigValue<String?> = .fastlaneDefault(ni
     let waitForUploadedBuildArg = waitForUploadedBuild.asRubyArgument(name: "wait_for_uploaded_build", type: nil)
     let rejectBuildWaitingForReviewArg = rejectBuildWaitingForReview.asRubyArgument(name: "reject_build_waiting_for_review", type: nil)
     let submitBetaReviewArg = submitBetaReview.asRubyArgument(name: "submit_beta_review", type: nil)
-    let appStoreEligibleArg = appStoreEligible.asRubyArgument(name: "app_store_eligible", type: nil)
     let array: [RubyCommand.Argument?] = [apiKeyPathArg,
                                           apiKeyArg,
                                           usernameArg,
@@ -7902,8 +7928,7 @@ public func pilot(apiKeyPath: OptionalConfigValue<String?> = .fastlaneDefault(ni
                                           waitProcessingTimeoutDurationArg,
                                           waitForUploadedBuildArg,
                                           rejectBuildWaitingForReviewArg,
-                                          submitBetaReviewArg,
-                                          appStoreEligibleArg]
+                                          submitBetaReviewArg]
     let args: [RubyCommand.Argument] = array
         .filter { $0?.value != nil }
         .compactMap { $0 }
@@ -8862,7 +8887,8 @@ public func rubyVersion() {
    - clonedSourcePackagesPath: Sets a custom path for Swift Package Manager dependencies
    - packageCachePath: Sets a custom package cache path for Swift Package Manager dependencies
    - skipPackageDependenciesResolution: Skips resolution of Swift Package Manager dependencies
-   - disablePackageAutomaticUpdates: Prevents packages from automatically being resolved to versions other than those recorded in the `Package.resolved` file
+   - disablePackageAutomaticUpdates: Prevents packages from automatically being resolved to versions other than those recorded in the `Package.resolved` file. This translates in the option `-disableAutomaticPackageResolution` being passed to xcodebuild
+   - skipPackageRepositoryFetches: Skips updating package dependencies from their remote. This translates in the option `-skipPackageUpdates` being passed to xcodebuild
    - useSystemScm: Lets xcodebuild use system's scm configuration
    - numberOfRetries: The number of times a test can fail
    - failBuild: Should this step stop the build if the tests fail? Set this to false if you're using trainer
@@ -8948,6 +8974,7 @@ public func rubyVersion() {
                                         packageCachePath: OptionalConfigValue<String?> = .fastlaneDefault(nil),
                                         skipPackageDependenciesResolution: OptionalConfigValue<Bool> = .fastlaneDefault(false),
                                         disablePackageAutomaticUpdates: OptionalConfigValue<Bool> = .fastlaneDefault(false),
+                                        skipPackageRepositoryFetches: OptionalConfigValue<Bool> = .fastlaneDefault(false),
                                         useSystemScm: OptionalConfigValue<Bool> = .fastlaneDefault(false),
                                         numberOfRetries: Int = 0,
                                         failBuild: OptionalConfigValue<Bool> = .fastlaneDefault(true),
@@ -9029,6 +9056,7 @@ public func rubyVersion() {
     let packageCachePathArg = packageCachePath.asRubyArgument(name: "package_cache_path", type: nil)
     let skipPackageDependenciesResolutionArg = skipPackageDependenciesResolution.asRubyArgument(name: "skip_package_dependencies_resolution", type: nil)
     let disablePackageAutomaticUpdatesArg = disablePackageAutomaticUpdates.asRubyArgument(name: "disable_package_automatic_updates", type: nil)
+    let skipPackageRepositoryFetchesArg = skipPackageRepositoryFetches.asRubyArgument(name: "skip_package_repository_fetches", type: nil)
     let useSystemScmArg = useSystemScm.asRubyArgument(name: "use_system_scm", type: nil)
     let numberOfRetriesArg = RubyCommand.Argument(name: "number_of_retries", value: numberOfRetries, type: nil)
     let failBuildArg = failBuild.asRubyArgument(name: "fail_build", type: nil)
@@ -9109,6 +9137,7 @@ public func rubyVersion() {
                                           packageCachePathArg,
                                           skipPackageDependenciesResolutionArg,
                                           disablePackageAutomaticUpdatesArg,
+                                          skipPackageRepositoryFetchesArg,
                                           useSystemScmArg,
                                           numberOfRetriesArg,
                                           failBuildArg,
@@ -9301,7 +9330,8 @@ public func say(text: [String],
    - clonedSourcePackagesPath: Sets a custom path for Swift Package Manager dependencies
    - packageCachePath: Sets a custom package cache path for Swift Package Manager dependencies
    - skipPackageDependenciesResolution: Skips resolution of Swift Package Manager dependencies
-   - disablePackageAutomaticUpdates: Prevents packages from automatically being resolved to versions other than those recorded in the `Package.resolved` file
+   - disablePackageAutomaticUpdates: Prevents packages from automatically being resolved to versions other than those recorded in the `Package.resolved` file. This translates in the option `-disableAutomaticPackageResolution` being passed to xcodebuild
+   - skipPackageRepositoryFetches: Skips updating package dependencies from their remote. This translates in the option `-skipPackageUpdates` being passed to xcodebuild
    - useSystemScm: Lets xcodebuild use system's scm configuration
    - numberOfRetries: The number of times a test can fail
    - failBuild: Should this step stop the build if the tests fail? Set this to false if you're using trainer
@@ -9387,6 +9417,7 @@ public func say(text: [String],
                                     packageCachePath: OptionalConfigValue<String?> = .fastlaneDefault(scanfile.packageCachePath),
                                     skipPackageDependenciesResolution: OptionalConfigValue<Bool> = .fastlaneDefault(scanfile.skipPackageDependenciesResolution),
                                     disablePackageAutomaticUpdates: OptionalConfigValue<Bool> = .fastlaneDefault(scanfile.disablePackageAutomaticUpdates),
+                                    skipPackageRepositoryFetches: OptionalConfigValue<Bool> = .fastlaneDefault(scanfile.skipPackageRepositoryFetches),
                                     useSystemScm: OptionalConfigValue<Bool> = .fastlaneDefault(scanfile.useSystemScm),
                                     numberOfRetries: Int = scanfile.numberOfRetries,
                                     failBuild: OptionalConfigValue<Bool> = .fastlaneDefault(scanfile.failBuild),
@@ -9468,6 +9499,7 @@ public func say(text: [String],
     let packageCachePathArg = packageCachePath.asRubyArgument(name: "package_cache_path", type: nil)
     let skipPackageDependenciesResolutionArg = skipPackageDependenciesResolution.asRubyArgument(name: "skip_package_dependencies_resolution", type: nil)
     let disablePackageAutomaticUpdatesArg = disablePackageAutomaticUpdates.asRubyArgument(name: "disable_package_automatic_updates", type: nil)
+    let skipPackageRepositoryFetchesArg = skipPackageRepositoryFetches.asRubyArgument(name: "skip_package_repository_fetches", type: nil)
     let useSystemScmArg = useSystemScm.asRubyArgument(name: "use_system_scm", type: nil)
     let numberOfRetriesArg = RubyCommand.Argument(name: "number_of_retries", value: numberOfRetries, type: nil)
     let failBuildArg = failBuild.asRubyArgument(name: "fail_build", type: nil)
@@ -9548,6 +9580,7 @@ public func say(text: [String],
                                           packageCachePathArg,
                                           skipPackageDependenciesResolutionArg,
                                           disablePackageAutomaticUpdatesArg,
+                                          skipPackageRepositoryFetchesArg,
                                           useSystemScmArg,
                                           numberOfRetriesArg,
                                           failBuildArg,
@@ -10490,7 +10523,8 @@ public func slather(buildDirectory: OptionalConfigValue<String?> = .fastlaneDefa
    - clonedSourcePackagesPath: Sets a custom path for Swift Package Manager dependencies
    - packageCachePath: Sets a custom package cache path for Swift Package Manager dependencies
    - skipPackageDependenciesResolution: Skips resolution of Swift Package Manager dependencies
-   - disablePackageAutomaticUpdates: Prevents packages from automatically being resolved to versions other than those recorded in the `Package.resolved` file
+   - disablePackageAutomaticUpdates: Prevents packages from automatically being resolved to versions other than those recorded in the `Package.resolved` file. This translates in the option `-disableAutomaticPackageResolution` being passed to xcodebuild
+   - skipPackageRepositoryFetches: Skips updating package dependencies from their remote. This translates in the option `-skipPackageUpdates` being passed to xcodebuild
    - packageAuthorizationProvider: Lets xcodebuild use a specified package authorization provider (keychain|netrc)
    - testplan: The testplan associated with the scheme that should be used for testing
    - onlyTesting: Array of strings matching Test Bundle/Test Suite/Test Cases to run
@@ -10543,6 +10577,7 @@ public func snapshot(workspace: OptionalConfigValue<String?> = .fastlaneDefault(
                      packageCachePath: OptionalConfigValue<String?> = .fastlaneDefault(snapshotfile.packageCachePath),
                      skipPackageDependenciesResolution: OptionalConfigValue<Bool> = .fastlaneDefault(snapshotfile.skipPackageDependenciesResolution),
                      disablePackageAutomaticUpdates: OptionalConfigValue<Bool> = .fastlaneDefault(snapshotfile.disablePackageAutomaticUpdates),
+                     skipPackageRepositoryFetches: OptionalConfigValue<Bool> = .fastlaneDefault(snapshotfile.skipPackageRepositoryFetches),
                      packageAuthorizationProvider: OptionalConfigValue<String?> = .fastlaneDefault(snapshotfile.packageAuthorizationProvider),
                      testplan: OptionalConfigValue<String?> = .fastlaneDefault(snapshotfile.testplan),
                      onlyTesting: Any? = snapshotfile.onlyTesting,
@@ -10595,6 +10630,7 @@ public func snapshot(workspace: OptionalConfigValue<String?> = .fastlaneDefault(
     let packageCachePathArg = packageCachePath.asRubyArgument(name: "package_cache_path", type: nil)
     let skipPackageDependenciesResolutionArg = skipPackageDependenciesResolution.asRubyArgument(name: "skip_package_dependencies_resolution", type: nil)
     let disablePackageAutomaticUpdatesArg = disablePackageAutomaticUpdates.asRubyArgument(name: "disable_package_automatic_updates", type: nil)
+    let skipPackageRepositoryFetchesArg = skipPackageRepositoryFetches.asRubyArgument(name: "skip_package_repository_fetches", type: nil)
     let packageAuthorizationProviderArg = packageAuthorizationProvider.asRubyArgument(name: "package_authorization_provider", type: nil)
     let testplanArg = testplan.asRubyArgument(name: "testplan", type: nil)
     let onlyTestingArg = RubyCommand.Argument(name: "only_testing", value: onlyTesting, type: nil)
@@ -10646,6 +10682,7 @@ public func snapshot(workspace: OptionalConfigValue<String?> = .fastlaneDefault(
                                           packageCachePathArg,
                                           skipPackageDependenciesResolutionArg,
                                           disablePackageAutomaticUpdatesArg,
+                                          skipPackageRepositoryFetchesArg,
                                           packageAuthorizationProviderArg,
                                           testplanArg,
                                           onlyTestingArg,
@@ -11703,8 +11740,7 @@ public func testflight(apiKeyPath: OptionalConfigValue<String?> = .fastlaneDefau
                        waitProcessingTimeoutDuration: OptionalConfigValue<Int?> = .fastlaneDefault(nil),
                        waitForUploadedBuild: OptionalConfigValue<Bool> = .fastlaneDefault(false),
                        rejectBuildWaitingForReview: OptionalConfigValue<Bool> = .fastlaneDefault(false),
-                       submitBetaReview: OptionalConfigValue<Bool> = .fastlaneDefault(true),
-                       appStoreEligible: OptionalConfigValue<Bool> = .fastlaneDefault(true))
+                       submitBetaReview: OptionalConfigValue<Bool> = .fastlaneDefault(true))
 {
     let apiKeyPathArg = apiKeyPath.asRubyArgument(name: "api_key_path", type: nil)
     let apiKeyArg = apiKey.asRubyArgument(name: "api_key", type: nil)
@@ -11745,7 +11781,6 @@ public func testflight(apiKeyPath: OptionalConfigValue<String?> = .fastlaneDefau
     let waitForUploadedBuildArg = waitForUploadedBuild.asRubyArgument(name: "wait_for_uploaded_build", type: nil)
     let rejectBuildWaitingForReviewArg = rejectBuildWaitingForReview.asRubyArgument(name: "reject_build_waiting_for_review", type: nil)
     let submitBetaReviewArg = submitBetaReview.asRubyArgument(name: "submit_beta_review", type: nil)
-    let appStoreEligibleArg = appStoreEligible.asRubyArgument(name: "app_store_eligible", type: nil)
     let array: [RubyCommand.Argument?] = [apiKeyPathArg,
                                           apiKeyArg,
                                           usernameArg,
@@ -11784,8 +11819,7 @@ public func testflight(apiKeyPath: OptionalConfigValue<String?> = .fastlaneDefau
                                           waitProcessingTimeoutDurationArg,
                                           waitForUploadedBuildArg,
                                           rejectBuildWaitingForReviewArg,
-                                          submitBetaReviewArg,
-                                          appStoreEligibleArg]
+                                          submitBetaReviewArg]
     let args: [RubyCommand.Argument] = array
         .filter { $0?.value != nil }
         .compactMap { $0 }
@@ -13129,8 +13163,7 @@ public func uploadToTestflight(apiKeyPath: OptionalConfigValue<String?> = .fastl
                                waitProcessingTimeoutDuration: OptionalConfigValue<Int?> = .fastlaneDefault(nil),
                                waitForUploadedBuild: OptionalConfigValue<Bool> = .fastlaneDefault(false),
                                rejectBuildWaitingForReview: OptionalConfigValue<Bool> = .fastlaneDefault(false),
-                               submitBetaReview: OptionalConfigValue<Bool> = .fastlaneDefault(true),
-                               appStoreEligible: OptionalConfigValue<Bool> = .fastlaneDefault(true))
+                               submitBetaReview: OptionalConfigValue<Bool> = .fastlaneDefault(true))
 {
     let apiKeyPathArg = apiKeyPath.asRubyArgument(name: "api_key_path", type: nil)
     let apiKeyArg = apiKey.asRubyArgument(name: "api_key", type: nil)
@@ -13171,7 +13204,6 @@ public func uploadToTestflight(apiKeyPath: OptionalConfigValue<String?> = .fastl
     let waitForUploadedBuildArg = waitForUploadedBuild.asRubyArgument(name: "wait_for_uploaded_build", type: nil)
     let rejectBuildWaitingForReviewArg = rejectBuildWaitingForReview.asRubyArgument(name: "reject_build_waiting_for_review", type: nil)
     let submitBetaReviewArg = submitBetaReview.asRubyArgument(name: "submit_beta_review", type: nil)
-    let appStoreEligibleArg = appStoreEligible.asRubyArgument(name: "app_store_eligible", type: nil)
     let array: [RubyCommand.Argument?] = [apiKeyPathArg,
                                           apiKeyArg,
                                           usernameArg,
@@ -13210,8 +13242,7 @@ public func uploadToTestflight(apiKeyPath: OptionalConfigValue<String?> = .fastl
                                           waitProcessingTimeoutDurationArg,
                                           waitForUploadedBuildArg,
                                           rejectBuildWaitingForReviewArg,
-                                          submitBetaReviewArg,
-                                          appStoreEligibleArg]
+                                          submitBetaReviewArg]
     let args: [RubyCommand.Argument] = array
         .filter { $0?.value != nil }
         .compactMap { $0 }
@@ -13797,7 +13828,7 @@ public func xcversion(version: String) {
     return runner.executeCommand(command)
 }
 
-// These are all the parsing functions needed to transform our data into the expected types
+/// These are all the parsing functions needed to transform our data into the expected types
 func parseArray(fromString: String, function: String = #function) -> [String] {
     verbose(message: "parsing an Array from data: \(fromString), from function: \(function)")
     let potentialArray: String
@@ -13806,8 +13837,7 @@ func parseArray(fromString: String, function: String = #function) -> [String] {
     } else {
         potentialArray = fromString
     }
-    let array: [String] = try! JSONSerialization.jsonObject(with: potentialArray.data(using: .utf8)!, options: []) as! [String]
-    return array
+    return try! JSONSerialization.jsonObject(with: potentialArray.data(using: .utf8)!, options: []) as! [String]
 }
 
 func parseDictionary(fromString: String, function: String = #function) -> [String: String] {
@@ -13827,8 +13857,7 @@ func parseDictionaryHelper(fromString: String, function: String = #function) -> 
     } else {
         potentialDictionary = fromString
     }
-    let dictionary: [String: Any] = try! JSONSerialization.jsonObject(with: potentialDictionary.data(using: .utf8)!, options: []) as! [String: Any]
-    return dictionary
+    return try! JSONSerialization.jsonObject(with: potentialDictionary.data(using: .utf8)!, options: []) as! [String: Any]
 }
 
 func parseBool(fromString: String, function: String = #function) -> Bool {
@@ -13851,4 +13880,4 @@ public let snapshotfile: Snapshotfile = .init()
 
 // Please don't remove the lines below
 // They are used to detect outdated files
-// FastlaneRunnerAPIVersion [0.9.194]
+// FastlaneRunnerAPIVersion [0.9.197]
