@@ -1,5 +1,7 @@
 # Testing _fastlane_
 
+IGNORE TESTING
+
 ## Testing your local changes
 
 ### Checking it all
