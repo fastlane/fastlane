@@ -431,7 +431,7 @@ module Spaceship
 
         def get_available_territories(app_id: nil, filter: {}, includes: nil, limit: nil, sort: nil)
           params = tunes_request_client.build_params(filter: filter, includes: includes, limit: limit, sort: sort)
-          tunes_request_client.get("#{Version::V1}/apps/#{app_id}/availableTerritories", params)
+          tunes_request_client.get("#{Version::V2}/appAvailabilities/#{app_id}/territoryAvailabilities", params)
         end
 
         #
