@@ -307,6 +307,13 @@ module Deliver
                                      code_gen_sensitive: true,
                                      default_value: CredentialsManager::AppfileConfig.try_fetch_value(:itc_provider),
                                      default_value_dynamic: true),
+        FastlaneCore::ConfigItem.new(key: :provider_public_id,
+                                     env_name: "DELIVER_PROVIDER_PUBLIC_ID",
+                                     description: "The provider public ID to be used with altool (--provider-public-id). This value will override the automatically detected provider value for altool uploads. Required after Xcode 26 when your account is associated with multiple providers and using username/app-password authentication",
+                                     optional: true,
+                                     code_gen_sensitive: true,
+                                     default_value: CredentialsManager::AppfileConfig.try_fetch_value(:provider_public_id),
+                                     default_value_dynamic: true),
         # rubocop:enable Layout/LineLength
 
         # precheck
