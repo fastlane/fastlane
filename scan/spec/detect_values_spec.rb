@@ -330,5 +330,107 @@ describe Scan do
         expect(Scan.config[:skip_test_configurations]).to eq(["ConfigurationA", "ConfigurationB"])
       end
     end
+
+    describe "#extract_devices_from_destination" do
+      before do
+        # Mock simulators for testing
+        @mock_simulator = double(
+          name: "iPhone 17",
+          udid: "5BBA1401-0C74-47A7-8709-9F6C1D9C9CBB",
+          os_type: "iOS",
+          os_version: "17.0"
+        )
+      end
+
+      it "extracts device name from destination with name parameter" do
+        destination = "platform=iOS Simulator,name=iPhone 17,OS=26.1"
+        result = Scan::DetectValues.extract_devices_from_destination(destination)
+        expect(result).to eq(["iPhone 17 (26.1)"])
+      end
+
+      it "extracts device name from destination without OS version" do
+        destination = "platform=iOS Simulator,name=iPhone 17"
+        result = Scan::DetectValues.extract_devices_from_destination(destination)
+        expect(result).to eq(["iPhone 17"])
+      end
+
+      it "extracts device name from destination with id parameter" do
+        allow(FastlaneCore::DeviceManager).to receive(:simulators).with("iOS").and_return([@mock_simulator])
+        destination = "platform=iOS Simulator,id=5BBA1401-0C74-47A7-8709-9F6C1D9C9CBB,OS=26.1"
+        result = Scan::DetectValues.extract_devices_from_destination(destination)
+        expect(result).to eq(["iPhone 17 (26.1)"])
+      end
+
+      it "extracts device name from destination with id parameter without OS version" do
+        allow(FastlaneCore::DeviceManager).to receive(:simulators).with("iOS").and_return([@mock_simulator])
+        destination = "platform=iOS Simulator,id=5BBA1401-0C74-47A7-8709-9F6C1D9C9CBB"
+        result = Scan::DetectValues.extract_devices_from_destination(destination)
+        expect(result).to eq(["iPhone 17"])
+      end
+
+      it "prefers name over id when both are present" do
+        allow(FastlaneCore::DeviceManager).to receive(:simulators).with("iOS").and_return([@mock_simulator])
+        destination = "platform=iOS Simulator,name=iPhone 18,id=5BBA1401-0C74-47A7-8709-9F6C1D9C9CBB,OS=26.1"
+        result = Scan::DetectValues.extract_devices_from_destination(destination)
+        expect(result).to eq(["iPhone 18 (26.1)"])
+      end
+
+      it "returns empty array when id is not found" do
+        allow(FastlaneCore::DeviceManager).to receive(:simulators).with("iOS").and_return([])
+        expect(FastlaneCore::UI).to receive(:error).with("Could not find simulator with id 'INVALID-ID' for platform 'iOS Simulator'")
+        destination = "platform=iOS Simulator,id=INVALID-ID"
+        result = Scan::DetectValues.extract_devices_from_destination(destination)
+        expect(result).to eq([])
+      end
+
+      it "returns empty array for non-simulator platforms" do
+        destination = "platform=iOS,name=iPhone 17"
+        result = Scan::DetectValues.extract_devices_from_destination(destination)
+        expect(result).to eq([])
+      end
+
+      it "handles multiple destinations" do
+        destinations = [
+          "platform=iOS Simulator,name=iPhone 17,OS=26.1",
+          "platform=iOS Simulator,name=iPhone 18"
+        ]
+        result = Scan::DetectValues.extract_devices_from_destination(destinations)
+        expect(result).to eq(["iPhone 17 (26.1)", "iPhone 18"])
+      end
+
+      it "handles tvOS Simulator platform" do
+        tvos_simulator = double(
+          name: "Apple TV 4K",
+          udid: "TV-UDID-123",
+          os_type: "tvOS",
+          os_version: "17.0"
+        )
+        allow(FastlaneCore::DeviceManager).to receive(:simulators).with("tvOS").and_return([tvos_simulator])
+        destination = "platform=tvOS Simulator,id=TV-UDID-123"
+        result = Scan::DetectValues.extract_devices_from_destination(destination)
+        expect(result).to eq(["Apple TV 4K"])
+      end
+    end
+
+    describe "device and destination precedence" do
+      it "extracts devices correctly from destination for warning comparison" do
+        explicit_devices = ["iPhone 14"]
+        destination = "platform=iOS Simulator,name=iPhone 17,OS=26.1"
+        destination_devices = Scan::DetectValues.extract_devices_from_destination(destination)
+
+        # Verify that the devices are different (would trigger warning)
+        expect(explicit_devices & destination_devices).to be_empty
+        expect(destination_devices).to eq(["iPhone 17 (26.1)"])
+      end
+
+      it "extracts devices from destination when no explicit device provided" do
+        explicit_devices = []
+        destination = "platform=iOS Simulator,name=iPhone 14,OS=17.0"
+        destination_devices = Scan::DetectValues.extract_devices_from_destination(destination)
+
+        # When no explicit devices, destination devices should be used
+        expect(destination_devices).to eq(["iPhone 14 (17.0)"])
+      end
+    end
   end
 end
