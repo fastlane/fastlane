@@ -89,6 +89,17 @@ module Frameit
     STARLIGHT ||= "Starlight"
     SIERRA ||= "Sierra"
     SORTA_SAGE ||= "Sorta Sage"
+    TEAL ||= "Teal"
+    ULTRAMARINE ||= "Ultramarine"
+    BLACK_TITANIUM ||= "Black Titanium"
+    DESERT_TITANIUM ||= "Desert Titanium"
+    NATURAL_TITANIUM ||= "Natural Titanium"
+    WHITE_TITANIUM ||= "White Titanium"
+    COSMIC_ORANGE ||= "Cosmic Orange"
+    DEEP_BLUE ||= "Deep Blue"
+    MIST_BLUE ||= "Mist Blue"
+    SAGE ||= "Sage"
+    LAVENDER ||= "Lavender"
 
     def self.all_colors
       Color.constants.map { |c| Color.const_get(c).upcase.gsub(' ', '_') }
@@ -175,6 +186,13 @@ module Frameit
     IPHONE_14_PLUS ||= Device.new("iphone-14-plus", "Apple iPhone 14 Plus", 12, [[1284, 2778], [2778, 1284]], 458, Color::MIDNIGHT, Platform::IOS)
     IPHONE_14_PRO ||= Device.new("iphone-14-pro", "Apple iPhone 14 Pro", 12, [[1179, 2556], [2556, 1179]], 460, Color::PURPLE, Platform::IOS)
     IPHONE_14_PRO_MAX ||= Device.new("iphone14-pro-max", "Apple iPhone 14 Pro Max", 12, [[1290, 2796], [2796, 1290]], 458, Color::PURPLE, Platform::IOS)
+    IPHONE_16 ||= Device.new("iphone-16", "Apple iPhone 16", 13, [[1179, 2556], [2556, 1179]], 460, Color::BLACK, Platform::IOS)
+    IPHONE_16_PLUS ||= Device.new("iphone-16-plus", "Apple iPhone 16 Plus", 13, [[1290, 2796], [2796, 1290]], 460, Color::BLACK, Platform::IOS)
+    IPHONE_16_PRO ||= Device.new("iphone-16-pro", "Apple iPhone 16 Pro", 13, [[1206, 2622], [2622, 1206]], 460, Color::NATURAL_TITANIUM, Platform::IOS, DEVICE_SCREEN_IDS[DisplayType::APP_IPHONE_61])
+    IPHONE_16_PRO_MAX ||= Device.new("iphone16-pro-max", "Apple iPhone 16 Pro Max", 13, [[1320, 2868], [2868, 1320]], 460, Color::NATURAL_TITANIUM, Platform::IOS, DEVICE_SCREEN_IDS[DisplayType::APP_IPHONE_67])
+    IPHONE_17 ||= Device.new("iphone-17", "Apple iPhone 17", 14, [[1206, 2622], [2622, 1206]], 460, Color::BLACK, Platform::IOS, DEVICE_SCREEN_IDS[DisplayType::APP_IPHONE_61])
+    IPHONE_17_PRO ||= Device.new("iphone-17-pro", "Apple iPhone 17 Pro", 14, [[1206, 2622], [2622, 1206]], 460, Color::SILVER, Platform::IOS, DEVICE_SCREEN_IDS[DisplayType::APP_IPHONE_61])
+    IPHONE_17_PRO_MAX ||= Device.new("iphone17-pro-max", "Apple iPhone 17 Pro Max", 14, [[1320, 2868], [2868, 1320]], 460, Color::SILVER, Platform::IOS, DEVICE_SCREEN_IDS[DisplayType::APP_IPHONE_67])
     IPAD_10_2 ||= Device.new("ipad-10-2", "Apple iPad 10.2", 1, [[1620, 2160], [2160, 1620]], 264, Color::SPACE_GRAY, Platform::IOS)
     IPAD_AIR_2 ||= Device.new("ipad-air-2", "Apple iPad Air 2", 1, [[1536, 2048], [2048, 1536]], 264, Color::SPACE_GRAY, Platform::IOS, DEVICE_SCREEN_IDS[DisplayType::APP_IPAD_97])
     IPAD_AIR_2019 ||= Device.new("ipad-air-2019", "Apple iPad Air (2019)", 2, [[1668, 2224], [2224, 1668]], 265, Color::SPACE_GRAY, Platform::IOS)
