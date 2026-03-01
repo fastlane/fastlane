@@ -1,5 +1,5 @@
 // Fastlane.swift
-// Copyright (c) 2025 FastlaneTools
+// Copyright (c) 2026 FastlaneTools
 
 import Foundation
 
@@ -135,7 +135,7 @@ public func addGitTag(tag: OptionalConfigValue<String?> = .fastlaneDefault(nil),
  - parameters:
    - apiKeyPath: Path to your App Store Connect API Key JSON file (https://docs.fastlane.tools/app-store-connect-api/#using-fastlane-api-key-json-file)
    - apiKey: Your App Store Connect API Key information (https://docs.fastlane.tools/app-store-connect-api/#using-fastlane-api-key-hash-option)
-   - initialBuildNumber: sets the build number to given value if no build is in current train
+   - initialBuildNumber: sets the build number to given value if no build (upload) is in current train
    - appIdentifier: The bundle identifier of your app
    - username: Your Apple ID Username
    - teamId: The ID of your App Store Connect team if you're in multiple teams
@@ -1339,10 +1339,13 @@ public func buildAndroidApp(task: OptionalConfigValue<String?> = .fastlaneDefaul
    - skipProfileDetection: Do not try to build a profile mapping from the xcodeproj. Match or a manually provided mapping should be used
    - xcodebuildCommand: Allows for override of the default `xcodebuild` command
    - clonedSourcePackagesPath: Sets a custom path for Swift Package Manager dependencies
+   - packageCachePath: Sets a custom package cache path for Swift Package Manager dependencies
    - skipPackageDependenciesResolution: Skips resolution of Swift Package Manager dependencies
-   - disablePackageAutomaticUpdates: Prevents packages from automatically being resolved to versions other than those recorded in the `Package.resolved` file
+   - disablePackageAutomaticUpdates: Prevents packages from automatically being resolved to versions other than those recorded in the `Package.resolved` file. This translates in the option `-disableAutomaticPackageResolution` being passed to xcodebuild
+   - skipPackageRepositoryFetches: Skips updating package dependencies from their remote. This translates in the option `-skipPackageUpdates` being passed to xcodebuild
    - useSystemScm: Lets xcodebuild use system's scm configuration
    - packageAuthorizationProvider: Lets xcodebuild use a specified package authorization provider (keychain|netrc)
+   - generateAppstoreInfo: Generate AppStoreInfo.plist using swinfo for app-store exports
 
  - returns: The absolute path to the generated ipa file
 
@@ -1395,10 +1398,13 @@ public func buildAndroidApp(task: OptionalConfigValue<String?> = .fastlaneDefaul
                                         skipProfileDetection: OptionalConfigValue<Bool> = .fastlaneDefault(false),
                                         xcodebuildCommand: String = "xcodebuild",
                                         clonedSourcePackagesPath: OptionalConfigValue<String?> = .fastlaneDefault(nil),
+                                        packageCachePath: OptionalConfigValue<String?> = .fastlaneDefault(nil),
                                         skipPackageDependenciesResolution: OptionalConfigValue<Bool> = .fastlaneDefault(false),
                                         disablePackageAutomaticUpdates: OptionalConfigValue<Bool> = .fastlaneDefault(false),
+                                        skipPackageRepositoryFetches: OptionalConfigValue<Bool> = .fastlaneDefault(false),
                                         useSystemScm: OptionalConfigValue<Bool> = .fastlaneDefault(false),
-                                        packageAuthorizationProvider: OptionalConfigValue<String?> = .fastlaneDefault(nil)) -> String
+                                        packageAuthorizationProvider: OptionalConfigValue<String?> = .fastlaneDefault(nil),
+                                        generateAppstoreInfo: OptionalConfigValue<Bool> = .fastlaneDefault(false)) -> String
 {
     let workspaceArg = workspace.asRubyArgument(name: "workspace", type: nil)
     let projectArg = project.asRubyArgument(name: "project", type: nil)
@@ -1447,10 +1453,13 @@ public func buildAndroidApp(task: OptionalConfigValue<String?> = .fastlaneDefaul
     let skipProfileDetectionArg = skipProfileDetection.asRubyArgument(name: "skip_profile_detection", type: nil)
     let xcodebuildCommandArg = RubyCommand.Argument(name: "xcodebuild_command", value: xcodebuildCommand, type: nil)
     let clonedSourcePackagesPathArg = clonedSourcePackagesPath.asRubyArgument(name: "cloned_source_packages_path", type: nil)
+    let packageCachePathArg = packageCachePath.asRubyArgument(name: "package_cache_path", type: nil)
     let skipPackageDependenciesResolutionArg = skipPackageDependenciesResolution.asRubyArgument(name: "skip_package_dependencies_resolution", type: nil)
     let disablePackageAutomaticUpdatesArg = disablePackageAutomaticUpdates.asRubyArgument(name: "disable_package_automatic_updates", type: nil)
+    let skipPackageRepositoryFetchesArg = skipPackageRepositoryFetches.asRubyArgument(name: "skip_package_repository_fetches", type: nil)
     let useSystemScmArg = useSystemScm.asRubyArgument(name: "use_system_scm", type: nil)
     let packageAuthorizationProviderArg = packageAuthorizationProvider.asRubyArgument(name: "package_authorization_provider", type: nil)
+    let generateAppstoreInfoArg = generateAppstoreInfo.asRubyArgument(name: "generate_appstore_info", type: nil)
     let array: [RubyCommand.Argument?] = [workspaceArg,
                                           projectArg,
                                           schemeArg,
@@ -1498,10 +1507,13 @@ public func buildAndroidApp(task: OptionalConfigValue<String?> = .fastlaneDefaul
                                           skipProfileDetectionArg,
                                           xcodebuildCommandArg,
                                           clonedSourcePackagesPathArg,
+                                          packageCachePathArg,
                                           skipPackageDependenciesResolutionArg,
                                           disablePackageAutomaticUpdatesArg,
+                                          skipPackageRepositoryFetchesArg,
                                           useSystemScmArg,
-                                          packageAuthorizationProviderArg]
+                                          packageAuthorizationProviderArg,
+                                          generateAppstoreInfoArg]
     let args: [RubyCommand.Argument] = array
         .filter { $0?.value != nil }
         .compactMap { $0 }
@@ -1557,10 +1569,13 @@ public func buildAndroidApp(task: OptionalConfigValue<String?> = .fastlaneDefaul
    - skipProfileDetection: Do not try to build a profile mapping from the xcodeproj. Match or a manually provided mapping should be used
    - xcodebuildCommand: Allows for override of the default `xcodebuild` command
    - clonedSourcePackagesPath: Sets a custom path for Swift Package Manager dependencies
+   - packageCachePath: Sets a custom package cache path for Swift Package Manager dependencies
    - skipPackageDependenciesResolution: Skips resolution of Swift Package Manager dependencies
-   - disablePackageAutomaticUpdates: Prevents packages from automatically being resolved to versions other than those recorded in the `Package.resolved` file
+   - disablePackageAutomaticUpdates: Prevents packages from automatically being resolved to versions other than those recorded in the `Package.resolved` file. This translates in the option `-disableAutomaticPackageResolution` being passed to xcodebuild
+   - skipPackageRepositoryFetches: Skips updating package dependencies from their remote. This translates in the option `-skipPackageUpdates` being passed to xcodebuild
    - useSystemScm: Lets xcodebuild use system's scm configuration
    - packageAuthorizationProvider: Lets xcodebuild use a specified package authorization provider (keychain|netrc)
+   - generateAppstoreInfo: Generate AppStoreInfo.plist using swinfo for app-store exports
 
  - returns: The absolute path to the generated ipa file
 
@@ -1610,10 +1625,13 @@ public func buildAndroidApp(task: OptionalConfigValue<String?> = .fastlaneDefaul
                                            skipProfileDetection: OptionalConfigValue<Bool> = .fastlaneDefault(false),
                                            xcodebuildCommand: String = "xcodebuild",
                                            clonedSourcePackagesPath: OptionalConfigValue<String?> = .fastlaneDefault(nil),
+                                           packageCachePath: OptionalConfigValue<String?> = .fastlaneDefault(nil),
                                            skipPackageDependenciesResolution: OptionalConfigValue<Bool> = .fastlaneDefault(false),
                                            disablePackageAutomaticUpdates: OptionalConfigValue<Bool> = .fastlaneDefault(false),
+                                           skipPackageRepositoryFetches: OptionalConfigValue<Bool> = .fastlaneDefault(false),
                                            useSystemScm: OptionalConfigValue<Bool> = .fastlaneDefault(false),
-                                           packageAuthorizationProvider: OptionalConfigValue<String?> = .fastlaneDefault(nil)) -> String
+                                           packageAuthorizationProvider: OptionalConfigValue<String?> = .fastlaneDefault(nil),
+                                           generateAppstoreInfo: OptionalConfigValue<Bool> = .fastlaneDefault(false)) -> String
 {
     let workspaceArg = workspace.asRubyArgument(name: "workspace", type: nil)
     let projectArg = project.asRubyArgument(name: "project", type: nil)
@@ -1659,10 +1677,13 @@ public func buildAndroidApp(task: OptionalConfigValue<String?> = .fastlaneDefaul
     let skipProfileDetectionArg = skipProfileDetection.asRubyArgument(name: "skip_profile_detection", type: nil)
     let xcodebuildCommandArg = RubyCommand.Argument(name: "xcodebuild_command", value: xcodebuildCommand, type: nil)
     let clonedSourcePackagesPathArg = clonedSourcePackagesPath.asRubyArgument(name: "cloned_source_packages_path", type: nil)
+    let packageCachePathArg = packageCachePath.asRubyArgument(name: "package_cache_path", type: nil)
     let skipPackageDependenciesResolutionArg = skipPackageDependenciesResolution.asRubyArgument(name: "skip_package_dependencies_resolution", type: nil)
     let disablePackageAutomaticUpdatesArg = disablePackageAutomaticUpdates.asRubyArgument(name: "disable_package_automatic_updates", type: nil)
+    let skipPackageRepositoryFetchesArg = skipPackageRepositoryFetches.asRubyArgument(name: "skip_package_repository_fetches", type: nil)
     let useSystemScmArg = useSystemScm.asRubyArgument(name: "use_system_scm", type: nil)
     let packageAuthorizationProviderArg = packageAuthorizationProvider.asRubyArgument(name: "package_authorization_provider", type: nil)
+    let generateAppstoreInfoArg = generateAppstoreInfo.asRubyArgument(name: "generate_appstore_info", type: nil)
     let array: [RubyCommand.Argument?] = [workspaceArg,
                                           projectArg,
                                           schemeArg,
@@ -1707,10 +1728,13 @@ public func buildAndroidApp(task: OptionalConfigValue<String?> = .fastlaneDefaul
                                           skipProfileDetectionArg,
                                           xcodebuildCommandArg,
                                           clonedSourcePackagesPathArg,
+                                          packageCachePathArg,
                                           skipPackageDependenciesResolutionArg,
                                           disablePackageAutomaticUpdatesArg,
+                                          skipPackageRepositoryFetchesArg,
                                           useSystemScmArg,
-                                          packageAuthorizationProviderArg]
+                                          packageAuthorizationProviderArg,
+                                          generateAppstoreInfoArg]
     let args: [RubyCommand.Argument] = array
         .filter { $0?.value != nil }
         .compactMap { $0 }
@@ -1767,10 +1791,13 @@ public func buildAndroidApp(task: OptionalConfigValue<String?> = .fastlaneDefaul
    - skipProfileDetection: Do not try to build a profile mapping from the xcodeproj. Match or a manually provided mapping should be used
    - xcodebuildCommand: Allows for override of the default `xcodebuild` command
    - clonedSourcePackagesPath: Sets a custom path for Swift Package Manager dependencies
+   - packageCachePath: Sets a custom package cache path for Swift Package Manager dependencies
    - skipPackageDependenciesResolution: Skips resolution of Swift Package Manager dependencies
-   - disablePackageAutomaticUpdates: Prevents packages from automatically being resolved to versions other than those recorded in the `Package.resolved` file
+   - disablePackageAutomaticUpdates: Prevents packages from automatically being resolved to versions other than those recorded in the `Package.resolved` file. This translates in the option `-disableAutomaticPackageResolution` being passed to xcodebuild
+   - skipPackageRepositoryFetches: Skips updating package dependencies from their remote. This translates in the option `-skipPackageUpdates` being passed to xcodebuild
    - useSystemScm: Lets xcodebuild use system's scm configuration
    - packageAuthorizationProvider: Lets xcodebuild use a specified package authorization provider (keychain|netrc)
+   - generateAppstoreInfo: Generate AppStoreInfo.plist using swinfo for app-store exports
 
  - returns: The absolute path to the generated ipa file
 
@@ -1821,10 +1848,13 @@ public func buildAndroidApp(task: OptionalConfigValue<String?> = .fastlaneDefaul
                                            skipProfileDetection: OptionalConfigValue<Bool> = .fastlaneDefault(false),
                                            xcodebuildCommand: String = "xcodebuild",
                                            clonedSourcePackagesPath: OptionalConfigValue<String?> = .fastlaneDefault(nil),
+                                           packageCachePath: OptionalConfigValue<String?> = .fastlaneDefault(nil),
                                            skipPackageDependenciesResolution: OptionalConfigValue<Bool> = .fastlaneDefault(false),
                                            disablePackageAutomaticUpdates: OptionalConfigValue<Bool> = .fastlaneDefault(false),
+                                           skipPackageRepositoryFetches: OptionalConfigValue<Bool> = .fastlaneDefault(false),
                                            useSystemScm: OptionalConfigValue<Bool> = .fastlaneDefault(false),
-                                           packageAuthorizationProvider: OptionalConfigValue<String?> = .fastlaneDefault(nil)) -> String
+                                           packageAuthorizationProvider: OptionalConfigValue<String?> = .fastlaneDefault(nil),
+                                           generateAppstoreInfo: OptionalConfigValue<Bool> = .fastlaneDefault(false)) -> String
 {
     let workspaceArg = workspace.asRubyArgument(name: "workspace", type: nil)
     let projectArg = project.asRubyArgument(name: "project", type: nil)
@@ -1871,10 +1901,13 @@ public func buildAndroidApp(task: OptionalConfigValue<String?> = .fastlaneDefaul
     let skipProfileDetectionArg = skipProfileDetection.asRubyArgument(name: "skip_profile_detection", type: nil)
     let xcodebuildCommandArg = RubyCommand.Argument(name: "xcodebuild_command", value: xcodebuildCommand, type: nil)
     let clonedSourcePackagesPathArg = clonedSourcePackagesPath.asRubyArgument(name: "cloned_source_packages_path", type: nil)
+    let packageCachePathArg = packageCachePath.asRubyArgument(name: "package_cache_path", type: nil)
     let skipPackageDependenciesResolutionArg = skipPackageDependenciesResolution.asRubyArgument(name: "skip_package_dependencies_resolution", type: nil)
     let disablePackageAutomaticUpdatesArg = disablePackageAutomaticUpdates.asRubyArgument(name: "disable_package_automatic_updates", type: nil)
+    let skipPackageRepositoryFetchesArg = skipPackageRepositoryFetches.asRubyArgument(name: "skip_package_repository_fetches", type: nil)
     let useSystemScmArg = useSystemScm.asRubyArgument(name: "use_system_scm", type: nil)
     let packageAuthorizationProviderArg = packageAuthorizationProvider.asRubyArgument(name: "package_authorization_provider", type: nil)
+    let generateAppstoreInfoArg = generateAppstoreInfo.asRubyArgument(name: "generate_appstore_info", type: nil)
     let array: [RubyCommand.Argument?] = [workspaceArg,
                                           projectArg,
                                           schemeArg,
@@ -1920,10 +1953,13 @@ public func buildAndroidApp(task: OptionalConfigValue<String?> = .fastlaneDefaul
                                           skipProfileDetectionArg,
                                           xcodebuildCommandArg,
                                           clonedSourcePackagesPathArg,
+                                          packageCachePathArg,
                                           skipPackageDependenciesResolutionArg,
                                           disablePackageAutomaticUpdatesArg,
+                                          skipPackageRepositoryFetchesArg,
                                           useSystemScmArg,
-                                          packageAuthorizationProviderArg]
+                                          packageAuthorizationProviderArg,
+                                          generateAppstoreInfoArg]
     let args: [RubyCommand.Argument] = array
         .filter { $0?.value != nil }
         .compactMap { $0 }
@@ -2168,8 +2204,10 @@ public func captureAndroidScreenshots(androidHome: OptionalConfigValue<String?> 
    - concurrentSimulators: Take snapshots on multiple simulators concurrently. Note: This option is only applicable when running against Xcode 9
    - disableSlideToType: Disable the simulator from showing the 'Slide to type' prompt
    - clonedSourcePackagesPath: Sets a custom path for Swift Package Manager dependencies
+   - packageCachePath: Sets a custom package cache path for Swift Package Manager dependencies
    - skipPackageDependenciesResolution: Skips resolution of Swift Package Manager dependencies
-   - disablePackageAutomaticUpdates: Prevents packages from automatically being resolved to versions other than those recorded in the `Package.resolved` file
+   - disablePackageAutomaticUpdates: Prevents packages from automatically being resolved to versions other than those recorded in the `Package.resolved` file. This translates in the option `-disableAutomaticPackageResolution` being passed to xcodebuild
+   - skipPackageRepositoryFetches: Skips updating package dependencies from their remote. This translates in the option `-skipPackageUpdates` being passed to xcodebuild
    - packageAuthorizationProvider: Lets xcodebuild use a specified package authorization provider (keychain|netrc)
    - testplan: The testplan associated with the scheme that should be used for testing
    - onlyTesting: Array of strings matching Test Bundle/Test Suite/Test Cases to run
@@ -2219,8 +2257,10 @@ public func captureIosScreenshots(workspace: OptionalConfigValue<String?> = .fas
                                   concurrentSimulators: OptionalConfigValue<Bool> = .fastlaneDefault(true),
                                   disableSlideToType: OptionalConfigValue<Bool> = .fastlaneDefault(false),
                                   clonedSourcePackagesPath: OptionalConfigValue<String?> = .fastlaneDefault(nil),
+                                  packageCachePath: OptionalConfigValue<String?> = .fastlaneDefault(nil),
                                   skipPackageDependenciesResolution: OptionalConfigValue<Bool> = .fastlaneDefault(false),
                                   disablePackageAutomaticUpdates: OptionalConfigValue<Bool> = .fastlaneDefault(false),
+                                  skipPackageRepositoryFetches: OptionalConfigValue<Bool> = .fastlaneDefault(false),
                                   packageAuthorizationProvider: OptionalConfigValue<String?> = .fastlaneDefault(nil),
                                   testplan: OptionalConfigValue<String?> = .fastlaneDefault(nil),
                                   onlyTesting: Any? = nil,
@@ -2270,8 +2310,10 @@ public func captureIosScreenshots(workspace: OptionalConfigValue<String?> = .fas
     let concurrentSimulatorsArg = concurrentSimulators.asRubyArgument(name: "concurrent_simulators", type: nil)
     let disableSlideToTypeArg = disableSlideToType.asRubyArgument(name: "disable_slide_to_type", type: nil)
     let clonedSourcePackagesPathArg = clonedSourcePackagesPath.asRubyArgument(name: "cloned_source_packages_path", type: nil)
+    let packageCachePathArg = packageCachePath.asRubyArgument(name: "package_cache_path", type: nil)
     let skipPackageDependenciesResolutionArg = skipPackageDependenciesResolution.asRubyArgument(name: "skip_package_dependencies_resolution", type: nil)
     let disablePackageAutomaticUpdatesArg = disablePackageAutomaticUpdates.asRubyArgument(name: "disable_package_automatic_updates", type: nil)
+    let skipPackageRepositoryFetchesArg = skipPackageRepositoryFetches.asRubyArgument(name: "skip_package_repository_fetches", type: nil)
     let packageAuthorizationProviderArg = packageAuthorizationProvider.asRubyArgument(name: "package_authorization_provider", type: nil)
     let testplanArg = testplan.asRubyArgument(name: "testplan", type: nil)
     let onlyTestingArg = RubyCommand.Argument(name: "only_testing", value: onlyTesting, type: nil)
@@ -2320,8 +2362,10 @@ public func captureIosScreenshots(workspace: OptionalConfigValue<String?> = .fas
                                           concurrentSimulatorsArg,
                                           disableSlideToTypeArg,
                                           clonedSourcePackagesPathArg,
+                                          packageCachePathArg,
                                           skipPackageDependenciesResolutionArg,
                                           disablePackageAutomaticUpdatesArg,
+                                          skipPackageRepositoryFetchesArg,
                                           packageAuthorizationProviderArg,
                                           testplanArg,
                                           onlyTestingArg,
@@ -2381,8 +2425,10 @@ public func captureIosScreenshots(workspace: OptionalConfigValue<String?> = .fas
    - concurrentSimulators: Take snapshots on multiple simulators concurrently. Note: This option is only applicable when running against Xcode 9
    - disableSlideToType: Disable the simulator from showing the 'Slide to type' prompt
    - clonedSourcePackagesPath: Sets a custom path for Swift Package Manager dependencies
+   - packageCachePath: Sets a custom package cache path for Swift Package Manager dependencies
    - skipPackageDependenciesResolution: Skips resolution of Swift Package Manager dependencies
-   - disablePackageAutomaticUpdates: Prevents packages from automatically being resolved to versions other than those recorded in the `Package.resolved` file
+   - disablePackageAutomaticUpdates: Prevents packages from automatically being resolved to versions other than those recorded in the `Package.resolved` file. This translates in the option `-disableAutomaticPackageResolution` being passed to xcodebuild
+   - skipPackageRepositoryFetches: Skips updating package dependencies from their remote. This translates in the option `-skipPackageUpdates` being passed to xcodebuild
    - packageAuthorizationProvider: Lets xcodebuild use a specified package authorization provider (keychain|netrc)
    - testplan: The testplan associated with the scheme that should be used for testing
    - onlyTesting: Array of strings matching Test Bundle/Test Suite/Test Cases to run
@@ -2432,8 +2478,10 @@ public func captureScreenshots(workspace: OptionalConfigValue<String?> = .fastla
                                concurrentSimulators: OptionalConfigValue<Bool> = .fastlaneDefault(true),
                                disableSlideToType: OptionalConfigValue<Bool> = .fastlaneDefault(false),
                                clonedSourcePackagesPath: OptionalConfigValue<String?> = .fastlaneDefault(nil),
+                               packageCachePath: OptionalConfigValue<String?> = .fastlaneDefault(nil),
                                skipPackageDependenciesResolution: OptionalConfigValue<Bool> = .fastlaneDefault(false),
                                disablePackageAutomaticUpdates: OptionalConfigValue<Bool> = .fastlaneDefault(false),
+                               skipPackageRepositoryFetches: OptionalConfigValue<Bool> = .fastlaneDefault(false),
                                packageAuthorizationProvider: OptionalConfigValue<String?> = .fastlaneDefault(nil),
                                testplan: OptionalConfigValue<String?> = .fastlaneDefault(nil),
                                onlyTesting: Any? = nil,
@@ -2483,8 +2531,10 @@ public func captureScreenshots(workspace: OptionalConfigValue<String?> = .fastla
     let concurrentSimulatorsArg = concurrentSimulators.asRubyArgument(name: "concurrent_simulators", type: nil)
     let disableSlideToTypeArg = disableSlideToType.asRubyArgument(name: "disable_slide_to_type", type: nil)
     let clonedSourcePackagesPathArg = clonedSourcePackagesPath.asRubyArgument(name: "cloned_source_packages_path", type: nil)
+    let packageCachePathArg = packageCachePath.asRubyArgument(name: "package_cache_path", type: nil)
     let skipPackageDependenciesResolutionArg = skipPackageDependenciesResolution.asRubyArgument(name: "skip_package_dependencies_resolution", type: nil)
     let disablePackageAutomaticUpdatesArg = disablePackageAutomaticUpdates.asRubyArgument(name: "disable_package_automatic_updates", type: nil)
+    let skipPackageRepositoryFetchesArg = skipPackageRepositoryFetches.asRubyArgument(name: "skip_package_repository_fetches", type: nil)
     let packageAuthorizationProviderArg = packageAuthorizationProvider.asRubyArgument(name: "package_authorization_provider", type: nil)
     let testplanArg = testplan.asRubyArgument(name: "testplan", type: nil)
     let onlyTestingArg = RubyCommand.Argument(name: "only_testing", value: onlyTesting, type: nil)
@@ -2533,8 +2583,10 @@ public func captureScreenshots(workspace: OptionalConfigValue<String?> = .fastla
                                           concurrentSimulatorsArg,
                                           disableSlideToTypeArg,
                                           clonedSourcePackagesPathArg,
+                                          packageCachePathArg,
                                           skipPackageDependenciesResolutionArg,
                                           disablePackageAutomaticUpdatesArg,
+                                          skipPackageRepositoryFetchesArg,
                                           packageAuthorizationProviderArg,
                                           testplanArg,
                                           onlyTestingArg,
@@ -3046,15 +3098,6 @@ public func cloc(binaryPath: String = "/usr/local/bin/cloc",
 }
 
 /**
- Print a Club Mate in your build output
- */
-public func clubmate() {
-    let args: [RubyCommand.Argument] = []
-    let command = RubyCommand(commandID: "", methodName: "clubmate", className: nil, args: args)
-    _ = runner.executeCommand(command)
-}
-
-/**
  Runs `pod install` for the project
 
  - parameters:
@@ -3320,7 +3363,7 @@ public func createAppOnManagedPlayStore(jsonKey: OptionalConfigValue<String?> = 
    - skipItc: Skip the creation of the app on App Store Connect
    - itcUsers: Array of App Store Connect users. If provided, you can limit access to this newly created app for users with the App Manager, Developer, Marketer or Sales roles
    - enabledFeatures: **DEPRECATED!** Please use `enable_services` instead - Array with Spaceship App Services
-   - enableServices: Array with Spaceship App Services (e.g. access_wifi: (on|off), app_attest: (on|off), app_group: (on|off), apple_pay: (on|off), associated_domains: (on|off), auto_fill_credential: (on|off), class_kit: (on|off), icloud: (legacy|cloudkit), custom_network_protocol: (on|off), data_protection: (complete|unlessopen|untilfirstauth), extended_virtual_address_space: (on|off), family_controls: (on|off), file_provider_testing_mode: (on|off), fonts: (on|off), game_center: (ios|mac), health_kit: (on|off), hls_interstitial_preview: (on|off), home_kit: (on|off), hotspot: (on|off), in_app_purchase: (on|off), inter_app_audio: (on|off), low_latency_hls: (on|off), managed_associated_domains: (on|off), maps: (on|off), multipath: (on|off), network_extension: (on|off), nfc_tag_reading: (on|off), personal_vpn: (on|off), passbook: (on|off), push_notification: (on|off), sign_in_with_apple: (on), siri_kit: (on|off), system_extension: (on|off), user_management: (on|off), vpn_configuration: (on|off), wallet: (on|off), wireless_accessory: (on|off), car_play_audio_app: (on|off), car_play_messaging_app: (on|off), car_play_navigation_app: (on|off), car_play_voip_calling_app: (on|off), critical_alerts: (on|off), hotspot_helper: (on|off), driver_kit: (on|off), driver_kit_endpoint_security: (on|off), driver_kit_family_hid_device: (on|off), driver_kit_family_networking: (on|off), driver_kit_family_serial: (on|off), driver_kit_hid_event_service: (on|off), driver_kit_transport_hid: (on|off), multitasking_camera_access: (on|off), sf_universal_link_api: (on|off), vp9_decoder: (on|off), music_kit: (on|off), shazam_kit: (on|off), communication_notifications: (on|off), group_activities: (on|off), health_kit_estimate_recalibration: (on|off), time_sensitive_notifications: (on|off))
+   - enableServices: Array with Spaceship App Services (e.g. access_wifi: (on|off), app_attest: (on|off), app_group: (on|off), apple_pay: (on|off), associated_domains: (on|off), auto_fill_credential: (on|off), class_kit: (on|off), declared_age_range: (on|off), icloud: (legacy|cloudkit), custom_network_protocol: (on|off), data_protection: (complete|unlessopen|untilfirstauth), extended_virtual_address_space: (on|off), family_controls: (on|off), file_provider_testing_mode: (on|off), fonts: (on|off), game_center: (ios|mac), health_kit: (on|off), hls_interstitial_preview: (on|off), home_kit: (on|off), hotspot: (on|off), in_app_purchase: (on|off), inter_app_audio: (on|off), low_latency_hls: (on|off), managed_associated_domains: (on|off), maps: (on|off), multipath: (on|off), network_extension: (on|off), nfc_tag_reading: (on|off), personal_vpn: (on|off), passbook: (on|off), push_notification: (on|off), sign_in_with_apple: (on), siri_kit: (on|off), system_extension: (on|off), user_management: (on|off), vpn_configuration: (on|off), wallet: (on|off), wireless_accessory: (on|off), car_play_audio_app: (on|off), car_play_messaging_app: (on|off), car_play_navigation_app: (on|off), car_play_voip_calling_app: (on|off), critical_alerts: (on|off), hotspot_helper: (on|off), driver_kit: (on|off), driver_kit_endpoint_security: (on|off), driver_kit_family_hid_device: (on|off), driver_kit_family_networking: (on|off), driver_kit_family_serial: (on|off), driver_kit_hid_event_service: (on|off), driver_kit_transport_hid: (on|off), multitasking_camera_access: (on|off), sf_universal_link_api: (on|off), vp9_decoder: (on|off), music_kit: (on|off), shazam_kit: (on|off), communication_notifications: (on|off), group_activities: (on|off), health_kit_estimate_recalibration: (on|off), time_sensitive_notifications: (on|off))
    - skipDevcenter: Skip the creation of the app on the Apple Developer Portal
    - teamId: The ID of your Developer Portal team if you're in multiple teams
    - teamName: The name of your Developer Portal team if you're in multiple teams
@@ -5713,10 +5756,13 @@ public func gradle(task: OptionalConfigValue<String?> = .fastlaneDefault(nil),
    - skipProfileDetection: Do not try to build a profile mapping from the xcodeproj. Match or a manually provided mapping should be used
    - xcodebuildCommand: Allows for override of the default `xcodebuild` command
    - clonedSourcePackagesPath: Sets a custom path for Swift Package Manager dependencies
+   - packageCachePath: Sets a custom package cache path for Swift Package Manager dependencies
    - skipPackageDependenciesResolution: Skips resolution of Swift Package Manager dependencies
-   - disablePackageAutomaticUpdates: Prevents packages from automatically being resolved to versions other than those recorded in the `Package.resolved` file
+   - disablePackageAutomaticUpdates: Prevents packages from automatically being resolved to versions other than those recorded in the `Package.resolved` file. This translates in the option `-disableAutomaticPackageResolution` being passed to xcodebuild
+   - skipPackageRepositoryFetches: Skips updating package dependencies from their remote. This translates in the option `-skipPackageUpdates` being passed to xcodebuild
    - useSystemScm: Lets xcodebuild use system's scm configuration
    - packageAuthorizationProvider: Lets xcodebuild use a specified package authorization provider (keychain|netrc)
+   - generateAppstoreInfo: Generate AppStoreInfo.plist using swinfo for app-store exports
 
  - returns: The absolute path to the generated ipa file
 
@@ -5769,10 +5815,13 @@ public func gradle(task: OptionalConfigValue<String?> = .fastlaneDefault(nil),
                                    skipProfileDetection: OptionalConfigValue<Bool> = .fastlaneDefault(gymfile.skipProfileDetection),
                                    xcodebuildCommand: String = gymfile.xcodebuildCommand,
                                    clonedSourcePackagesPath: OptionalConfigValue<String?> = .fastlaneDefault(gymfile.clonedSourcePackagesPath),
+                                   packageCachePath: OptionalConfigValue<String?> = .fastlaneDefault(gymfile.packageCachePath),
                                    skipPackageDependenciesResolution: OptionalConfigValue<Bool> = .fastlaneDefault(gymfile.skipPackageDependenciesResolution),
                                    disablePackageAutomaticUpdates: OptionalConfigValue<Bool> = .fastlaneDefault(gymfile.disablePackageAutomaticUpdates),
+                                   skipPackageRepositoryFetches: OptionalConfigValue<Bool> = .fastlaneDefault(gymfile.skipPackageRepositoryFetches),
                                    useSystemScm: OptionalConfigValue<Bool> = .fastlaneDefault(gymfile.useSystemScm),
-                                   packageAuthorizationProvider: OptionalConfigValue<String?> = .fastlaneDefault(gymfile.packageAuthorizationProvider)) -> String
+                                   packageAuthorizationProvider: OptionalConfigValue<String?> = .fastlaneDefault(gymfile.packageAuthorizationProvider),
+                                   generateAppstoreInfo: OptionalConfigValue<Bool> = .fastlaneDefault(gymfile.generateAppstoreInfo)) -> String
 {
     let workspaceArg = workspace.asRubyArgument(name: "workspace", type: nil)
     let projectArg = project.asRubyArgument(name: "project", type: nil)
@@ -5821,10 +5870,13 @@ public func gradle(task: OptionalConfigValue<String?> = .fastlaneDefault(nil),
     let skipProfileDetectionArg = skipProfileDetection.asRubyArgument(name: "skip_profile_detection", type: nil)
     let xcodebuildCommandArg = RubyCommand.Argument(name: "xcodebuild_command", value: xcodebuildCommand, type: nil)
     let clonedSourcePackagesPathArg = clonedSourcePackagesPath.asRubyArgument(name: "cloned_source_packages_path", type: nil)
+    let packageCachePathArg = packageCachePath.asRubyArgument(name: "package_cache_path", type: nil)
     let skipPackageDependenciesResolutionArg = skipPackageDependenciesResolution.asRubyArgument(name: "skip_package_dependencies_resolution", type: nil)
     let disablePackageAutomaticUpdatesArg = disablePackageAutomaticUpdates.asRubyArgument(name: "disable_package_automatic_updates", type: nil)
+    let skipPackageRepositoryFetchesArg = skipPackageRepositoryFetches.asRubyArgument(name: "skip_package_repository_fetches", type: nil)
     let useSystemScmArg = useSystemScm.asRubyArgument(name: "use_system_scm", type: nil)
     let packageAuthorizationProviderArg = packageAuthorizationProvider.asRubyArgument(name: "package_authorization_provider", type: nil)
+    let generateAppstoreInfoArg = generateAppstoreInfo.asRubyArgument(name: "generate_appstore_info", type: nil)
     let array: [RubyCommand.Argument?] = [workspaceArg,
                                           projectArg,
                                           schemeArg,
@@ -5872,10 +5924,13 @@ public func gradle(task: OptionalConfigValue<String?> = .fastlaneDefault(nil),
                                           skipProfileDetectionArg,
                                           xcodebuildCommandArg,
                                           clonedSourcePackagesPathArg,
+                                          packageCachePathArg,
                                           skipPackageDependenciesResolutionArg,
                                           disablePackageAutomaticUpdatesArg,
+                                          skipPackageRepositoryFetchesArg,
                                           useSystemScmArg,
-                                          packageAuthorizationProviderArg]
+                                          packageAuthorizationProviderArg,
+                                          generateAppstoreInfoArg]
     let args: [RubyCommand.Argument] = array
         .filter { $0?.value != nil }
         .compactMap { $0 }
@@ -6143,6 +6198,7 @@ public func ifttt(apiKey: String,
  - parameters:
    - certificatePath: Path to certificate
    - certificatePassword: Certificate password
+   - certificateFormat: Format of the certificate. Check the '-f' switch from 'security import --help' command
    - keychainName: Keychain the items should be imported to
    - keychainPath: Path to the Keychain file to which the items should be imported
    - keychainPassword: The password for the keychain. Note that for the login keychain this is your user's password
@@ -6152,6 +6208,7 @@ public func ifttt(apiKey: String,
  */
 public func importCertificate(certificatePath: String,
                               certificatePassword: OptionalConfigValue<String?> = .fastlaneDefault(nil),
+                              certificateFormat: OptionalConfigValue<String?> = .fastlaneDefault(nil),
                               keychainName: String,
                               keychainPath: OptionalConfigValue<String?> = .fastlaneDefault(nil),
                               keychainPassword: OptionalConfigValue<String?> = .fastlaneDefault(nil),
@@ -6159,12 +6216,14 @@ public func importCertificate(certificatePath: String,
 {
     let certificatePathArg = RubyCommand.Argument(name: "certificate_path", value: certificatePath, type: nil)
     let certificatePasswordArg = certificatePassword.asRubyArgument(name: "certificate_password", type: nil)
+    let certificateFormatArg = certificateFormat.asRubyArgument(name: "certificate_format", type: nil)
     let keychainNameArg = RubyCommand.Argument(name: "keychain_name", value: keychainName, type: nil)
     let keychainPathArg = keychainPath.asRubyArgument(name: "keychain_path", type: nil)
     let keychainPasswordArg = keychainPassword.asRubyArgument(name: "keychain_password", type: nil)
     let logOutputArg = logOutput.asRubyArgument(name: "log_output", type: nil)
     let array: [RubyCommand.Argument?] = [certificatePathArg,
                                           certificatePasswordArg,
+                                          certificateFormatArg,
                                           keychainNameArg,
                                           keychainPathArg,
                                           keychainPasswordArg,
@@ -6530,7 +6589,7 @@ public func jazzy(config: OptionalConfigValue<String?> = .fastlaneDefault(nil),
    - username: Your Apple ID Username
    - version: The version number whose latest build number we want
    - platform: The platform to use (optional)
-   - initialBuildNumber: sets the build number to given value if no build is in current train
+   - initialBuildNumber: sets the build number to given value if no build (upload) is in current train
    - teamId: The ID of your App Store Connect team if you're in multiple teams
    - teamName: The name of your App Store Connect team if you're in multiple teams
 
@@ -7206,7 +7265,7 @@ public func minFastlaneVersion() {
  - parameters:
    - username: Your Apple ID Username
    - appIdentifier: App Identifier (Bundle ID, e.g. com.krausefx.app)
-   - services: Array with Spaceship App Services (e.g. access_wifi: (on|off)(:on|:off)(true|false), app_attest: (on|off)(:on|:off)(true|false), app_group: (on|off)(:on|:off)(true|false), apple_pay: (on|off)(:on|:off)(true|false), associated_domains: (on|off)(:on|:off)(true|false), auto_fill_credential: (on|off)(:on|:off)(true|false), class_kit: (on|off)(:on|:off)(true|false), icloud: (legacy|cloudkit)(:on|:off)(true|false), custom_network_protocol: (on|off)(:on|:off)(true|false), data_protection: (complete|unlessopen|untilfirstauth)(:on|:off)(true|false), extended_virtual_address_space: (on|off)(:on|:off)(true|false), family_controls: (on|off)(:on|:off)(true|false), file_provider_testing_mode: (on|off)(:on|:off)(true|false), fonts: (on|off)(:on|:off)(true|false), game_center: (ios|mac)(:on|:off)(true|false), health_kit: (on|off)(:on|:off)(true|false), hls_interstitial_preview: (on|off)(:on|:off)(true|false), home_kit: (on|off)(:on|:off)(true|false), hotspot: (on|off)(:on|:off)(true|false), in_app_purchase: (on|off)(:on|:off)(true|false), inter_app_audio: (on|off)(:on|:off)(true|false), low_latency_hls: (on|off)(:on|:off)(true|false), managed_associated_domains: (on|off)(:on|:off)(true|false), maps: (on|off)(:on|:off)(true|false), multipath: (on|off)(:on|:off)(true|false), network_extension: (on|off)(:on|:off)(true|false), nfc_tag_reading: (on|off)(:on|:off)(true|false), personal_vpn: (on|off)(:on|:off)(true|false), passbook: (on|off)(:on|:off)(true|false), push_notification: (on|off)(:on|:off)(true|false), sign_in_with_apple: (on)(:on|:off)(true|false), siri_kit: (on|off)(:on|:off)(true|false), system_extension: (on|off)(:on|:off)(true|false), user_management: (on|off)(:on|:off)(true|false), vpn_configuration: (on|off)(:on|:off)(true|false), wallet: (on|off)(:on|:off)(true|false), wireless_accessory: (on|off)(:on|:off)(true|false), car_play_audio_app: (on|off)(:on|:off)(true|false), car_play_messaging_app: (on|off)(:on|:off)(true|false), car_play_navigation_app: (on|off)(:on|:off)(true|false), car_play_voip_calling_app: (on|off)(:on|:off)(true|false), critical_alerts: (on|off)(:on|:off)(true|false), hotspot_helper: (on|off)(:on|:off)(true|false), driver_kit: (on|off)(:on|:off)(true|false), driver_kit_endpoint_security: (on|off)(:on|:off)(true|false), driver_kit_family_hid_device: (on|off)(:on|:off)(true|false), driver_kit_family_networking: (on|off)(:on|:off)(true|false), driver_kit_family_serial: (on|off)(:on|:off)(true|false), driver_kit_hid_event_service: (on|off)(:on|:off)(true|false), driver_kit_transport_hid: (on|off)(:on|:off)(true|false), multitasking_camera_access: (on|off)(:on|:off)(true|false), sf_universal_link_api: (on|off)(:on|:off)(true|false), vp9_decoder: (on|off)(:on|:off)(true|false), music_kit: (on|off)(:on|:off)(true|false), shazam_kit: (on|off)(:on|:off)(true|false), communication_notifications: (on|off)(:on|:off)(true|false), group_activities: (on|off)(:on|:off)(true|false), health_kit_estimate_recalibration: (on|off)(:on|:off)(true|false), time_sensitive_notifications: (on|off)(:on|:off)(true|false))
+   - services: Array with Spaceship App Services (e.g. access_wifi: (on|off)(:on|:off)(true|false), app_attest: (on|off)(:on|:off)(true|false), app_group: (on|off)(:on|:off)(true|false), apple_pay: (on|off)(:on|:off)(true|false), associated_domains: (on|off)(:on|:off)(true|false), auto_fill_credential: (on|off)(:on|:off)(true|false), class_kit: (on|off)(:on|:off)(true|false), declared_age_range: (on|off)(:on|:off)(true|false), icloud: (legacy|cloudkit)(:on|:off)(true|false), custom_network_protocol: (on|off)(:on|:off)(true|false), data_protection: (complete|unlessopen|untilfirstauth)(:on|:off)(true|false), extended_virtual_address_space: (on|off)(:on|:off)(true|false), family_controls: (on|off)(:on|:off)(true|false), file_provider_testing_mode: (on|off)(:on|:off)(true|false), fonts: (on|off)(:on|:off)(true|false), game_center: (ios|mac)(:on|:off)(true|false), health_kit: (on|off)(:on|:off)(true|false), hls_interstitial_preview: (on|off)(:on|:off)(true|false), home_kit: (on|off)(:on|:off)(true|false), hotspot: (on|off)(:on|:off)(true|false), in_app_purchase: (on|off)(:on|:off)(true|false), inter_app_audio: (on|off)(:on|:off)(true|false), low_latency_hls: (on|off)(:on|:off)(true|false), managed_associated_domains: (on|off)(:on|:off)(true|false), maps: (on|off)(:on|:off)(true|false), multipath: (on|off)(:on|:off)(true|false), network_extension: (on|off)(:on|:off)(true|false), nfc_tag_reading: (on|off)(:on|:off)(true|false), personal_vpn: (on|off)(:on|:off)(true|false), passbook: (on|off)(:on|:off)(true|false), push_notification: (on|off)(:on|:off)(true|false), sign_in_with_apple: (on)(:on|:off)(true|false), siri_kit: (on|off)(:on|:off)(true|false), system_extension: (on|off)(:on|:off)(true|false), user_management: (on|off)(:on|:off)(true|false), vpn_configuration: (on|off)(:on|:off)(true|false), wallet: (on|off)(:on|:off)(true|false), wireless_accessory: (on|off)(:on|:off)(true|false), car_play_audio_app: (on|off)(:on|:off)(true|false), car_play_messaging_app: (on|off)(:on|:off)(true|false), car_play_navigation_app: (on|off)(:on|:off)(true|false), car_play_voip_calling_app: (on|off)(:on|:off)(true|false), critical_alerts: (on|off)(:on|:off)(true|false), hotspot_helper: (on|off)(:on|:off)(true|false), driver_kit: (on|off)(:on|:off)(true|false), driver_kit_endpoint_security: (on|off)(:on|:off)(true|false), driver_kit_family_hid_device: (on|off)(:on|:off)(true|false), driver_kit_family_networking: (on|off)(:on|:off)(true|false), driver_kit_family_serial: (on|off)(:on|:off)(true|false), driver_kit_hid_event_service: (on|off)(:on|:off)(true|false), driver_kit_transport_hid: (on|off)(:on|:off)(true|false), multitasking_camera_access: (on|off)(:on|:off)(true|false), sf_universal_link_api: (on|off)(:on|:off)(true|false), vp9_decoder: (on|off)(:on|:off)(true|false), music_kit: (on|off)(:on|:off)(true|false), shazam_kit: (on|off)(:on|:off)(true|false), communication_notifications: (on|off)(:on|:off)(true|false), group_activities: (on|off)(:on|:off)(true|false), health_kit_estimate_recalibration: (on|off)(:on|:off)(true|false), time_sensitive_notifications: (on|off)(:on|:off)(true|false))
    - teamId: The ID of your Developer Portal team if you're in multiple teams
    - teamName: The name of your Developer Portal team if you're in multiple teams
 
@@ -8208,7 +8267,7 @@ public func println(message: OptionalConfigValue<String?> = .fastlaneDefault(nil
    - skipItc: Skip the creation of the app on App Store Connect
    - itcUsers: Array of App Store Connect users. If provided, you can limit access to this newly created app for users with the App Manager, Developer, Marketer or Sales roles
    - enabledFeatures: **DEPRECATED!** Please use `enable_services` instead - Array with Spaceship App Services
-   - enableServices: Array with Spaceship App Services (e.g. access_wifi: (on|off), app_attest: (on|off), app_group: (on|off), apple_pay: (on|off), associated_domains: (on|off), auto_fill_credential: (on|off), class_kit: (on|off), icloud: (legacy|cloudkit), custom_network_protocol: (on|off), data_protection: (complete|unlessopen|untilfirstauth), extended_virtual_address_space: (on|off), family_controls: (on|off), file_provider_testing_mode: (on|off), fonts: (on|off), game_center: (ios|mac), health_kit: (on|off), hls_interstitial_preview: (on|off), home_kit: (on|off), hotspot: (on|off), in_app_purchase: (on|off), inter_app_audio: (on|off), low_latency_hls: (on|off), managed_associated_domains: (on|off), maps: (on|off), multipath: (on|off), network_extension: (on|off), nfc_tag_reading: (on|off), personal_vpn: (on|off), passbook: (on|off), push_notification: (on|off), sign_in_with_apple: (on), siri_kit: (on|off), system_extension: (on|off), user_management: (on|off), vpn_configuration: (on|off), wallet: (on|off), wireless_accessory: (on|off), car_play_audio_app: (on|off), car_play_messaging_app: (on|off), car_play_navigation_app: (on|off), car_play_voip_calling_app: (on|off), critical_alerts: (on|off), hotspot_helper: (on|off), driver_kit: (on|off), driver_kit_endpoint_security: (on|off), driver_kit_family_hid_device: (on|off), driver_kit_family_networking: (on|off), driver_kit_family_serial: (on|off), driver_kit_hid_event_service: (on|off), driver_kit_transport_hid: (on|off), multitasking_camera_access: (on|off), sf_universal_link_api: (on|off), vp9_decoder: (on|off), music_kit: (on|off), shazam_kit: (on|off), communication_notifications: (on|off), group_activities: (on|off), health_kit_estimate_recalibration: (on|off), time_sensitive_notifications: (on|off))
+   - enableServices: Array with Spaceship App Services (e.g. access_wifi: (on|off), app_attest: (on|off), app_group: (on|off), apple_pay: (on|off), associated_domains: (on|off), auto_fill_credential: (on|off), class_kit: (on|off), declared_age_range: (on|off), icloud: (legacy|cloudkit), custom_network_protocol: (on|off), data_protection: (complete|unlessopen|untilfirstauth), extended_virtual_address_space: (on|off), family_controls: (on|off), file_provider_testing_mode: (on|off), fonts: (on|off), game_center: (ios|mac), health_kit: (on|off), hls_interstitial_preview: (on|off), home_kit: (on|off), hotspot: (on|off), in_app_purchase: (on|off), inter_app_audio: (on|off), low_latency_hls: (on|off), managed_associated_domains: (on|off), maps: (on|off), multipath: (on|off), network_extension: (on|off), nfc_tag_reading: (on|off), personal_vpn: (on|off), passbook: (on|off), push_notification: (on|off), sign_in_with_apple: (on), siri_kit: (on|off), system_extension: (on|off), user_management: (on|off), vpn_configuration: (on|off), wallet: (on|off), wireless_accessory: (on|off), car_play_audio_app: (on|off), car_play_messaging_app: (on|off), car_play_navigation_app: (on|off), car_play_voip_calling_app: (on|off), critical_alerts: (on|off), hotspot_helper: (on|off), driver_kit: (on|off), driver_kit_endpoint_security: (on|off), driver_kit_family_hid_device: (on|off), driver_kit_family_networking: (on|off), driver_kit_family_serial: (on|off), driver_kit_hid_event_service: (on|off), driver_kit_transport_hid: (on|off), multitasking_camera_access: (on|off), sf_universal_link_api: (on|off), vp9_decoder: (on|off), music_kit: (on|off), shazam_kit: (on|off), communication_notifications: (on|off), group_activities: (on|off), health_kit_estimate_recalibration: (on|off), time_sensitive_notifications: (on|off))
    - skipDevcenter: Skip the creation of the app on the Apple Developer Portal
    - teamId: The ID of your Developer Portal team if you're in multiple teams
    - teamName: The name of your Developer Portal team if you're in multiple teams
@@ -8826,8 +8885,10 @@ public func rubyVersion() {
    - customReportFileName: **DEPRECATED!** Use `--output_files` instead - Sets custom full report file name when generating a single report
    - xcodebuildCommand: Allows for override of the default `xcodebuild` command
    - clonedSourcePackagesPath: Sets a custom path for Swift Package Manager dependencies
+   - packageCachePath: Sets a custom package cache path for Swift Package Manager dependencies
    - skipPackageDependenciesResolution: Skips resolution of Swift Package Manager dependencies
-   - disablePackageAutomaticUpdates: Prevents packages from automatically being resolved to versions other than those recorded in the `Package.resolved` file
+   - disablePackageAutomaticUpdates: Prevents packages from automatically being resolved to versions other than those recorded in the `Package.resolved` file. This translates in the option `-disableAutomaticPackageResolution` being passed to xcodebuild
+   - skipPackageRepositoryFetches: Skips updating package dependencies from their remote. This translates in the option `-skipPackageUpdates` being passed to xcodebuild
    - useSystemScm: Lets xcodebuild use system's scm configuration
    - numberOfRetries: The number of times a test can fail
    - failBuild: Should this step stop the build if the tests fail? Set this to false if you're using trainer
@@ -8910,8 +8971,10 @@ public func rubyVersion() {
                                         customReportFileName: OptionalConfigValue<String?> = .fastlaneDefault(nil),
                                         xcodebuildCommand: String = "env NSUnbufferedIO=YES xcodebuild",
                                         clonedSourcePackagesPath: OptionalConfigValue<String?> = .fastlaneDefault(nil),
+                                        packageCachePath: OptionalConfigValue<String?> = .fastlaneDefault(nil),
                                         skipPackageDependenciesResolution: OptionalConfigValue<Bool> = .fastlaneDefault(false),
                                         disablePackageAutomaticUpdates: OptionalConfigValue<Bool> = .fastlaneDefault(false),
+                                        skipPackageRepositoryFetches: OptionalConfigValue<Bool> = .fastlaneDefault(false),
                                         useSystemScm: OptionalConfigValue<Bool> = .fastlaneDefault(false),
                                         numberOfRetries: Int = 0,
                                         failBuild: OptionalConfigValue<Bool> = .fastlaneDefault(true),
@@ -8990,8 +9053,10 @@ public func rubyVersion() {
     let customReportFileNameArg = customReportFileName.asRubyArgument(name: "custom_report_file_name", type: nil)
     let xcodebuildCommandArg = RubyCommand.Argument(name: "xcodebuild_command", value: xcodebuildCommand, type: nil)
     let clonedSourcePackagesPathArg = clonedSourcePackagesPath.asRubyArgument(name: "cloned_source_packages_path", type: nil)
+    let packageCachePathArg = packageCachePath.asRubyArgument(name: "package_cache_path", type: nil)
     let skipPackageDependenciesResolutionArg = skipPackageDependenciesResolution.asRubyArgument(name: "skip_package_dependencies_resolution", type: nil)
     let disablePackageAutomaticUpdatesArg = disablePackageAutomaticUpdates.asRubyArgument(name: "disable_package_automatic_updates", type: nil)
+    let skipPackageRepositoryFetchesArg = skipPackageRepositoryFetches.asRubyArgument(name: "skip_package_repository_fetches", type: nil)
     let useSystemScmArg = useSystemScm.asRubyArgument(name: "use_system_scm", type: nil)
     let numberOfRetriesArg = RubyCommand.Argument(name: "number_of_retries", value: numberOfRetries, type: nil)
     let failBuildArg = failBuild.asRubyArgument(name: "fail_build", type: nil)
@@ -9069,8 +9134,10 @@ public func rubyVersion() {
                                           customReportFileNameArg,
                                           xcodebuildCommandArg,
                                           clonedSourcePackagesPathArg,
+                                          packageCachePathArg,
                                           skipPackageDependenciesResolutionArg,
                                           disablePackageAutomaticUpdatesArg,
+                                          skipPackageRepositoryFetchesArg,
                                           useSystemScmArg,
                                           numberOfRetriesArg,
                                           failBuildArg,
@@ -9261,8 +9328,10 @@ public func say(text: [String],
    - customReportFileName: **DEPRECATED!** Use `--output_files` instead - Sets custom full report file name when generating a single report
    - xcodebuildCommand: Allows for override of the default `xcodebuild` command
    - clonedSourcePackagesPath: Sets a custom path for Swift Package Manager dependencies
+   - packageCachePath: Sets a custom package cache path for Swift Package Manager dependencies
    - skipPackageDependenciesResolution: Skips resolution of Swift Package Manager dependencies
-   - disablePackageAutomaticUpdates: Prevents packages from automatically being resolved to versions other than those recorded in the `Package.resolved` file
+   - disablePackageAutomaticUpdates: Prevents packages from automatically being resolved to versions other than those recorded in the `Package.resolved` file. This translates in the option `-disableAutomaticPackageResolution` being passed to xcodebuild
+   - skipPackageRepositoryFetches: Skips updating package dependencies from their remote. This translates in the option `-skipPackageUpdates` being passed to xcodebuild
    - useSystemScm: Lets xcodebuild use system's scm configuration
    - numberOfRetries: The number of times a test can fail
    - failBuild: Should this step stop the build if the tests fail? Set this to false if you're using trainer
@@ -9345,8 +9414,10 @@ public func say(text: [String],
                                     customReportFileName: OptionalConfigValue<String?> = .fastlaneDefault(scanfile.customReportFileName),
                                     xcodebuildCommand: String = scanfile.xcodebuildCommand,
                                     clonedSourcePackagesPath: OptionalConfigValue<String?> = .fastlaneDefault(scanfile.clonedSourcePackagesPath),
+                                    packageCachePath: OptionalConfigValue<String?> = .fastlaneDefault(scanfile.packageCachePath),
                                     skipPackageDependenciesResolution: OptionalConfigValue<Bool> = .fastlaneDefault(scanfile.skipPackageDependenciesResolution),
                                     disablePackageAutomaticUpdates: OptionalConfigValue<Bool> = .fastlaneDefault(scanfile.disablePackageAutomaticUpdates),
+                                    skipPackageRepositoryFetches: OptionalConfigValue<Bool> = .fastlaneDefault(scanfile.skipPackageRepositoryFetches),
                                     useSystemScm: OptionalConfigValue<Bool> = .fastlaneDefault(scanfile.useSystemScm),
                                     numberOfRetries: Int = scanfile.numberOfRetries,
                                     failBuild: OptionalConfigValue<Bool> = .fastlaneDefault(scanfile.failBuild),
@@ -9425,8 +9496,10 @@ public func say(text: [String],
     let customReportFileNameArg = customReportFileName.asRubyArgument(name: "custom_report_file_name", type: nil)
     let xcodebuildCommandArg = RubyCommand.Argument(name: "xcodebuild_command", value: xcodebuildCommand, type: nil)
     let clonedSourcePackagesPathArg = clonedSourcePackagesPath.asRubyArgument(name: "cloned_source_packages_path", type: nil)
+    let packageCachePathArg = packageCachePath.asRubyArgument(name: "package_cache_path", type: nil)
     let skipPackageDependenciesResolutionArg = skipPackageDependenciesResolution.asRubyArgument(name: "skip_package_dependencies_resolution", type: nil)
     let disablePackageAutomaticUpdatesArg = disablePackageAutomaticUpdates.asRubyArgument(name: "disable_package_automatic_updates", type: nil)
+    let skipPackageRepositoryFetchesArg = skipPackageRepositoryFetches.asRubyArgument(name: "skip_package_repository_fetches", type: nil)
     let useSystemScmArg = useSystemScm.asRubyArgument(name: "use_system_scm", type: nil)
     let numberOfRetriesArg = RubyCommand.Argument(name: "number_of_retries", value: numberOfRetries, type: nil)
     let failBuildArg = failBuild.asRubyArgument(name: "fail_build", type: nil)
@@ -9504,8 +9577,10 @@ public func say(text: [String],
                                           customReportFileNameArg,
                                           xcodebuildCommandArg,
                                           clonedSourcePackagesPathArg,
+                                          packageCachePathArg,
                                           skipPackageDependenciesResolutionArg,
                                           disablePackageAutomaticUpdatesArg,
+                                          skipPackageRepositoryFetchesArg,
                                           useSystemScmArg,
                                           numberOfRetriesArg,
                                           failBuildArg,
@@ -10256,55 +10331,6 @@ public func slack(message: OptionalConfigValue<String?> = .fastlaneDefault(nil),
 }
 
 /**
- Show a train of the fastlane progress
-
- - returns: A string that is being sent to slack
- */
-public func slackTrain() {
-    let args: [RubyCommand.Argument] = []
-    let command = RubyCommand(commandID: "", methodName: "slack_train", className: nil, args: args)
-    _ = runner.executeCommand(command)
-}
-
-/**
-
- */
-public func slackTrainCrash() {
-    let args: [RubyCommand.Argument] = []
-    let command = RubyCommand(commandID: "", methodName: "slack_train_crash", className: nil, args: args)
-    _ = runner.executeCommand(command)
-}
-
-/**
- Show a train of the fastlane progress
-
- - parameters:
-   - distance: How many rails do we need?
-   - train: Train emoji
-   - rail: Character or emoji for the rail
-   - reverseDirection: Pass true if you want the train to go from left to right
- */
-public func slackTrainStart(distance: Int = 5,
-                            train: String = "🚝",
-                            rail: String = "=",
-                            reverseDirection: OptionalConfigValue<Bool> = .fastlaneDefault(false))
-{
-    let distanceArg = RubyCommand.Argument(name: "distance", value: distance, type: nil)
-    let trainArg = RubyCommand.Argument(name: "train", value: train, type: nil)
-    let railArg = RubyCommand.Argument(name: "rail", value: rail, type: nil)
-    let reverseDirectionArg = reverseDirection.asRubyArgument(name: "reverse_direction", type: nil)
-    let array: [RubyCommand.Argument?] = [distanceArg,
-                                          trainArg,
-                                          railArg,
-                                          reverseDirectionArg]
-    let args: [RubyCommand.Argument] = array
-        .filter { $0?.value != nil }
-        .compactMap { $0 }
-    let command = RubyCommand(commandID: "", methodName: "slack_train_start", className: nil, args: args)
-    _ = runner.executeCommand(command)
-}
-
-/**
  Use slather to generate a code coverage report
 
  - parameters:
@@ -10495,8 +10521,10 @@ public func slather(buildDirectory: OptionalConfigValue<String?> = .fastlaneDefa
    - concurrentSimulators: Take snapshots on multiple simulators concurrently. Note: This option is only applicable when running against Xcode 9
    - disableSlideToType: Disable the simulator from showing the 'Slide to type' prompt
    - clonedSourcePackagesPath: Sets a custom path for Swift Package Manager dependencies
+   - packageCachePath: Sets a custom package cache path for Swift Package Manager dependencies
    - skipPackageDependenciesResolution: Skips resolution of Swift Package Manager dependencies
-   - disablePackageAutomaticUpdates: Prevents packages from automatically being resolved to versions other than those recorded in the `Package.resolved` file
+   - disablePackageAutomaticUpdates: Prevents packages from automatically being resolved to versions other than those recorded in the `Package.resolved` file. This translates in the option `-disableAutomaticPackageResolution` being passed to xcodebuild
+   - skipPackageRepositoryFetches: Skips updating package dependencies from their remote. This translates in the option `-skipPackageUpdates` being passed to xcodebuild
    - packageAuthorizationProvider: Lets xcodebuild use a specified package authorization provider (keychain|netrc)
    - testplan: The testplan associated with the scheme that should be used for testing
    - onlyTesting: Array of strings matching Test Bundle/Test Suite/Test Cases to run
@@ -10546,8 +10574,10 @@ public func snapshot(workspace: OptionalConfigValue<String?> = .fastlaneDefault(
                      concurrentSimulators: OptionalConfigValue<Bool> = .fastlaneDefault(snapshotfile.concurrentSimulators),
                      disableSlideToType: OptionalConfigValue<Bool> = .fastlaneDefault(snapshotfile.disableSlideToType),
                      clonedSourcePackagesPath: OptionalConfigValue<String?> = .fastlaneDefault(snapshotfile.clonedSourcePackagesPath),
+                     packageCachePath: OptionalConfigValue<String?> = .fastlaneDefault(snapshotfile.packageCachePath),
                      skipPackageDependenciesResolution: OptionalConfigValue<Bool> = .fastlaneDefault(snapshotfile.skipPackageDependenciesResolution),
                      disablePackageAutomaticUpdates: OptionalConfigValue<Bool> = .fastlaneDefault(snapshotfile.disablePackageAutomaticUpdates),
+                     skipPackageRepositoryFetches: OptionalConfigValue<Bool> = .fastlaneDefault(snapshotfile.skipPackageRepositoryFetches),
                      packageAuthorizationProvider: OptionalConfigValue<String?> = .fastlaneDefault(snapshotfile.packageAuthorizationProvider),
                      testplan: OptionalConfigValue<String?> = .fastlaneDefault(snapshotfile.testplan),
                      onlyTesting: Any? = snapshotfile.onlyTesting,
@@ -10597,8 +10627,10 @@ public func snapshot(workspace: OptionalConfigValue<String?> = .fastlaneDefault(
     let concurrentSimulatorsArg = concurrentSimulators.asRubyArgument(name: "concurrent_simulators", type: nil)
     let disableSlideToTypeArg = disableSlideToType.asRubyArgument(name: "disable_slide_to_type", type: nil)
     let clonedSourcePackagesPathArg = clonedSourcePackagesPath.asRubyArgument(name: "cloned_source_packages_path", type: nil)
+    let packageCachePathArg = packageCachePath.asRubyArgument(name: "package_cache_path", type: nil)
     let skipPackageDependenciesResolutionArg = skipPackageDependenciesResolution.asRubyArgument(name: "skip_package_dependencies_resolution", type: nil)
     let disablePackageAutomaticUpdatesArg = disablePackageAutomaticUpdates.asRubyArgument(name: "disable_package_automatic_updates", type: nil)
+    let skipPackageRepositoryFetchesArg = skipPackageRepositoryFetches.asRubyArgument(name: "skip_package_repository_fetches", type: nil)
     let packageAuthorizationProviderArg = packageAuthorizationProvider.asRubyArgument(name: "package_authorization_provider", type: nil)
     let testplanArg = testplan.asRubyArgument(name: "testplan", type: nil)
     let onlyTestingArg = RubyCommand.Argument(name: "only_testing", value: onlyTesting, type: nil)
@@ -10647,8 +10679,10 @@ public func snapshot(workspace: OptionalConfigValue<String?> = .fastlaneDefault(
                                           concurrentSimulatorsArg,
                                           disableSlideToTypeArg,
                                           clonedSourcePackagesPathArg,
+                                          packageCachePathArg,
                                           skipPackageDependenciesResolutionArg,
                                           disablePackageAutomaticUpdatesArg,
+                                          skipPackageRepositoryFetchesArg,
                                           packageAuthorizationProviderArg,
                                           testplanArg,
                                           onlyTestingArg,
@@ -13573,7 +13607,11 @@ public func xcodebuild() {
    - configuration: The configuration used when building the app. Defaults to 'Release'
    - sourceDirectory: The path to project's root directory
    - derivedDataPath: The directory where build products and other derived data will go
+   - xccovFileDirectPath: The path or array of paths to the xccoverage/xccovreport/xcresult files to parse to generate code coverage
    - outputDirectory: The directory in which all reports will be stored
+   - clonedSourcePackagesPath: Sets a custom path for Swift Package Manager dependencies
+   - useSystemScm: Lets xcodebuild use system's scm configuration
+   - isSwiftPackage: Enables generating coverage reports for Package.swift derived projects
    - htmlReport: Produce an HTML report
    - markdownReport: Produce a Markdown report
    - jsonReport: Produce a JSON report
@@ -13585,6 +13623,7 @@ public func xcodebuild() {
    - slackMessage: The message which is published together with a successful report
    - ignoreFilePath: Relative or absolute path to the file containing the list of ignored files
    - includeTestTargets: Enables coverage reports for .xctest targets
+   - includeZeroTargets: Final report will include target even if the coverage is 0%
    - excludeTargets: Comma separated list of targets to exclude from coverage report
    - includeTargets: Comma separated list of targets to include in coverage report. If specified then exlude_targets will be ignored
    - onlyProjectTargets: Display the coverage only for main project targets (e.g. skip Pods targets)
@@ -13597,7 +13636,7 @@ public func xcodebuild() {
    - legacySupport: Whether xcov should parse a xccoverage file instead on xccovreport
 
  Create nice code coverage reports and post coverage summaries on Slack *(xcov gem is required)*.
- More information: [https://github.com/nakiostudio/xcov](https://github.com/nakiostudio/xcov).
+ More information: [https://github.com/fastlane-community/xcov](https://github.com/fastlane-community/xcov).
  */
 public func xcov(workspace: OptionalConfigValue<String?> = .fastlaneDefault(nil),
                  project: OptionalConfigValue<String?> = .fastlaneDefault(nil),
@@ -13605,7 +13644,11 @@ public func xcov(workspace: OptionalConfigValue<String?> = .fastlaneDefault(nil)
                  configuration: OptionalConfigValue<String?> = .fastlaneDefault(nil),
                  sourceDirectory: OptionalConfigValue<String?> = .fastlaneDefault(nil),
                  derivedDataPath: OptionalConfigValue<String?> = .fastlaneDefault(nil),
+                 xccovFileDirectPath: OptionalConfigValue<[String]?> = .fastlaneDefault(nil),
                  outputDirectory: String = "./xcov_report",
+                 clonedSourcePackagesPath: OptionalConfigValue<String?> = .fastlaneDefault(nil),
+                 useSystemScm: OptionalConfigValue<Bool> = .fastlaneDefault(false),
+                 isSwiftPackage: OptionalConfigValue<Bool> = .fastlaneDefault(false),
                  htmlReport: OptionalConfigValue<Bool> = .fastlaneDefault(true),
                  markdownReport: OptionalConfigValue<Bool> = .fastlaneDefault(false),
                  jsonReport: OptionalConfigValue<Bool> = .fastlaneDefault(false),
@@ -13617,6 +13660,7 @@ public func xcov(workspace: OptionalConfigValue<String?> = .fastlaneDefault(nil)
                  slackMessage: String = "Your *xcov* coverage report",
                  ignoreFilePath: String = "./.xcovignore",
                  includeTestTargets: OptionalConfigValue<Bool> = .fastlaneDefault(false),
+                 includeZeroTargets: OptionalConfigValue<Bool> = .fastlaneDefault(true),
                  excludeTargets: OptionalConfigValue<String?> = .fastlaneDefault(nil),
                  includeTargets: OptionalConfigValue<String?> = .fastlaneDefault(nil),
                  onlyProjectTargets: OptionalConfigValue<Bool> = .fastlaneDefault(false),
@@ -13625,7 +13669,7 @@ public func xcov(workspace: OptionalConfigValue<String?> = .fastlaneDefault(nil)
                  coverallsServiceJobId: OptionalConfigValue<String?> = .fastlaneDefault(nil),
                  coverallsRepoToken: OptionalConfigValue<String?> = .fastlaneDefault(nil),
                  xcconfig: OptionalConfigValue<String?> = .fastlaneDefault(nil),
-                 ideFoundationPath: String = "/Applications/Xcode_15.4.app/Contents/Developer/../Frameworks/IDEFoundation.framework/Versions/A/IDEFoundation",
+                 ideFoundationPath: String = "/Applications/Xcode_16.4.app/Contents/Developer/../Frameworks/IDEFoundation.framework/Versions/A/IDEFoundation",
                  legacySupport: OptionalConfigValue<Bool> = .fastlaneDefault(false))
 {
     let workspaceArg = workspace.asRubyArgument(name: "workspace", type: nil)
@@ -13634,7 +13678,11 @@ public func xcov(workspace: OptionalConfigValue<String?> = .fastlaneDefault(nil)
     let configurationArg = configuration.asRubyArgument(name: "configuration", type: nil)
     let sourceDirectoryArg = sourceDirectory.asRubyArgument(name: "source_directory", type: nil)
     let derivedDataPathArg = derivedDataPath.asRubyArgument(name: "derived_data_path", type: nil)
+    let xccovFileDirectPathArg = xccovFileDirectPath.asRubyArgument(name: "xccov_file_direct_path", type: nil)
     let outputDirectoryArg = RubyCommand.Argument(name: "output_directory", value: outputDirectory, type: nil)
+    let clonedSourcePackagesPathArg = clonedSourcePackagesPath.asRubyArgument(name: "cloned_source_packages_path", type: nil)
+    let useSystemScmArg = useSystemScm.asRubyArgument(name: "use_system_scm", type: nil)
+    let isSwiftPackageArg = isSwiftPackage.asRubyArgument(name: "is_swift_package", type: nil)
     let htmlReportArg = htmlReport.asRubyArgument(name: "html_report", type: nil)
     let markdownReportArg = markdownReport.asRubyArgument(name: "markdown_report", type: nil)
     let jsonReportArg = jsonReport.asRubyArgument(name: "json_report", type: nil)
@@ -13646,6 +13694,7 @@ public func xcov(workspace: OptionalConfigValue<String?> = .fastlaneDefault(nil)
     let slackMessageArg = RubyCommand.Argument(name: "slack_message", value: slackMessage, type: nil)
     let ignoreFilePathArg = RubyCommand.Argument(name: "ignore_file_path", value: ignoreFilePath, type: nil)
     let includeTestTargetsArg = includeTestTargets.asRubyArgument(name: "include_test_targets", type: nil)
+    let includeZeroTargetsArg = includeZeroTargets.asRubyArgument(name: "include_zero_targets", type: nil)
     let excludeTargetsArg = excludeTargets.asRubyArgument(name: "exclude_targets", type: nil)
     let includeTargetsArg = includeTargets.asRubyArgument(name: "include_targets", type: nil)
     let onlyProjectTargetsArg = onlyProjectTargets.asRubyArgument(name: "only_project_targets", type: nil)
@@ -13662,7 +13711,11 @@ public func xcov(workspace: OptionalConfigValue<String?> = .fastlaneDefault(nil)
                                           configurationArg,
                                           sourceDirectoryArg,
                                           derivedDataPathArg,
+                                          xccovFileDirectPathArg,
                                           outputDirectoryArg,
+                                          clonedSourcePackagesPathArg,
+                                          useSystemScmArg,
+                                          isSwiftPackageArg,
                                           htmlReportArg,
                                           markdownReportArg,
                                           jsonReportArg,
@@ -13674,6 +13727,7 @@ public func xcov(workspace: OptionalConfigValue<String?> = .fastlaneDefault(nil)
                                           slackMessageArg,
                                           ignoreFilePathArg,
                                           includeTestTargetsArg,
+                                          includeZeroTargetsArg,
                                           excludeTargetsArg,
                                           includeTargetsArg,
                                           onlyProjectTargetsArg,
@@ -13774,7 +13828,7 @@ public func xcversion(version: String) {
     return runner.executeCommand(command)
 }
 
-// These are all the parsing functions needed to transform our data into the expected types
+/// These are all the parsing functions needed to transform our data into the expected types
 func parseArray(fromString: String, function: String = #function) -> [String] {
     verbose(message: "parsing an Array from data: \(fromString), from function: \(function)")
     let potentialArray: String
@@ -13783,8 +13837,7 @@ func parseArray(fromString: String, function: String = #function) -> [String] {
     } else {
         potentialArray = fromString
     }
-    let array: [String] = try! JSONSerialization.jsonObject(with: potentialArray.data(using: .utf8)!, options: []) as! [String]
-    return array
+    return try! JSONSerialization.jsonObject(with: potentialArray.data(using: .utf8)!, options: []) as! [String]
 }
 
 func parseDictionary(fromString: String, function: String = #function) -> [String: String] {
@@ -13804,8 +13857,7 @@ func parseDictionaryHelper(fromString: String, function: String = #function) -> 
     } else {
         potentialDictionary = fromString
     }
-    let dictionary: [String: Any] = try! JSONSerialization.jsonObject(with: potentialDictionary.data(using: .utf8)!, options: []) as! [String: Any]
-    return dictionary
+    return try! JSONSerialization.jsonObject(with: potentialDictionary.data(using: .utf8)!, options: []) as! [String: Any]
 }
 
 func parseBool(fromString: String, function: String = #function) -> Bool {
@@ -13828,4 +13880,4 @@ public let snapshotfile: Snapshotfile = .init()
 
 // Please don't remove the lines below
 // They are used to detect outdated files
-// FastlaneRunnerAPIVersion [0.9.189]
+// FastlaneRunnerAPIVersion [0.9.197]

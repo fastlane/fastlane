@@ -176,6 +176,7 @@ PROVISIONS_BY_ID=()
 DEFAULT_PROVISION=""
 TEMP_DIR="_floatsignTemp"
 USE_APP_ENTITLEMENTS=""
+VERBOSE=""
 XCODE_VERSION="$(xcodebuild -version | grep "Xcode" | /usr/bin/cut -f 2 -d ' ')"
 
 # List of plist keys used for reference to and from nested apps and extensions
@@ -548,8 +549,8 @@ function resign {
         for assetpack in "$ODR_DIR"/*
         do
             if [[ "$assetpack" == *.assetpack ]]; then
-                rm -rf $assetpack/_CodeSignature
-                /usr/bin/codesign ${VERBOSE} --generate-entitlement-der ${KEYCHAIN_FLAG} -f -s "$CERTIFICATE" "$assetpack"
+                rm -rf "$assetpack"/_CodeSignature
+                /usr/bin/codesign ${VERBOSE} --generate-entitlement-der "${KEYCHAIN_FLAG}" -f -s "$CERTIFICATE" "$assetpack"
                 checkStatus
             else
                 log "Ignoring non-assetpack: $assetpack"
@@ -823,7 +824,7 @@ function resign {
                     log "Certificate $CERTIFICATE matches a SHA1 pattern"
                     local certificate_matches="$( security find-identity -v -p codesigning | grep -m 1 "$CERTIFICATE" )"
                     if [ -n "$certificate_matches" ]; then
-                        certificate_name="$(/usr/bin/sed -E s/[^\"]+\"\([^\"]+\)\".*/\\1/ <<< $certificate_matches )"
+                        certificate_name="$(/usr/bin/sed -E s/[^\"]+\"\([^\"]+\)\".*/\\1/ <<< "$certificate_matches" )"
                         log "Certificate name: $certificate_name"
                     fi
                 fi
@@ -914,10 +915,12 @@ log "Repackaging as $NEW_FILE"
 # Navigate to the temporary directory (sending the output to null)
 # Zip all the contents, saving the zip file in the above directory
 # Navigate back to the originating directory (sending the output to null)
+# shellcheck disable=SC2164
 pushd "$TEMP_DIR" > /dev/null
 # TODO: Fix shellcheck warning and remove directive
 # shellcheck disable=SC2035
 zip -qry "../$TEMP_DIR.ipa" *
+# shellcheck disable=SC2164
 popd > /dev/null
 
 # Move the resulting ipa to the target destination

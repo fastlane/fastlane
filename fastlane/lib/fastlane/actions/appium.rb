@@ -90,7 +90,7 @@ module Fastlane
               port: params[:port],
               appium_lib: appium_lib
             ).start_driver
-            Appium.promote_appium_methods(RSpec::Core::ExampleGroup)
+            Appium.promote_appium_methods(RSpec::Core::ExampleGroup, @driver)
           end
 
           c.after(:each) do

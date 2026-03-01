@@ -1,5 +1,5 @@
 // LaneFileProtocol.swift
-// Copyright (c) 2025 FastlaneTools
+// Copyright (c) 2026 FastlaneTools
 
 //
 //  ** NOTE **
@@ -21,7 +21,9 @@ public protocol LaneFileProtocol: AnyObject {
 }
 
 public extension LaneFileProtocol {
-    var fastlaneVersion: String { return "" } // Defaults to "" because that means any is fine
+    var fastlaneVersion: String {
+        return ""
+    } // Defaults to "" because that means any is fine
     func beforeAll(with _: String) {} // No-op by default
     func afterAll(with _: String) {} // No-op by default
     func recordLaneDescriptions() {} // No-op by default

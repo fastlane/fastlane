@@ -570,7 +570,7 @@ module Trainer
             path
           ]
 
-          xcresulttool_cmd << '--legacy' if Trainer::XCResult::Helper.supports_xcode16_xcresulttool?
+          xcresulttool_cmd << '--legacy' if Trainer::XCResult::Helper.supports_xcresulttool_version_23?
 
           xcresulttool_cmd
         end

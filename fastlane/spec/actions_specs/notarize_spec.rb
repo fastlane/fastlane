@@ -74,6 +74,25 @@ describe Fastlane do
             end").runner.execute(:test)
           end
 
+          it "successful with verbose option" do
+            stub_const('ENV', { "FASTLANE_APPLE_APPLICATION_SPECIFIC_PASSWORD" => app_specific_password })
+
+            expect(Fastlane::Actions).to receive(:sh).with("xcrun notarytool submit #{package.path} --output-format json --wait --apple-id #{username} --password #{app_specific_password} --team-id #{asc_provider} --verbose", { error_callback: anything, log: true }).and_return(success_submit_response)
+
+            expect(Fastlane::Actions).to receive(:sh).with("xcrun stapler staple #{package.path}", { log: true })
+
+            result = Fastlane::FastFile.new.parse("lane :test do
+              notarize(
+                use_notarytool: true,
+                package: '#{package.path}',
+                bundle_id: '#{bundle_id}',
+                username: '#{username}',
+                asc_provider: '#{asc_provider}',
+                verbose: true
+              )
+            end").runner.execute(:test)
+          end
+
           it "successful with skip_stapling" do
             stub_const('ENV', { "FASTLANE_APPLE_APPLICATION_SPECIFIC_PASSWORD" => app_specific_password })
 
