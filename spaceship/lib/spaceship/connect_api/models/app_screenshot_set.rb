@@ -19,12 +19,15 @@ module Spaceship
         APP_IPHONE_61 = "APP_IPHONE_61"
         APP_IPHONE_65 = "APP_IPHONE_65"
         APP_IPHONE_67 = "APP_IPHONE_67"
+        APP_IPHONE_63 = "APP_IPHONE_63"
+        APP_IPHONE_69 = "APP_IPHONE_69"
 
         APP_IPAD_97 = "APP_IPAD_97"
         APP_IPAD_105 = "APP_IPAD_105"
         APP_IPAD_PRO_3GEN_11 = "APP_IPAD_PRO_3GEN_11"
         APP_IPAD_PRO_129 = "APP_IPAD_PRO_129"
         APP_IPAD_PRO_3GEN_129 = "APP_IPAD_PRO_3GEN_129"
+        APP_IPAD_PRO_13 = "APP_IPAD_PRO_13"
 
         IMESSAGE_APP_IPHONE_40 = "IMESSAGE_APP_IPHONE_40"
         IMESSAGE_APP_IPHONE_47 = "IMESSAGE_APP_IPHONE_47"
@@ -60,6 +63,8 @@ module Spaceship
           IMESSAGE_APP_IPHONE_61,
           IMESSAGE_APP_IPHONE_65,
           IMESSAGE_APP_IPHONE_67,
+          APP_IPHONE_63,
+          APP_IPHONE_69,
 
           IMESSAGE_APP_IPAD_97,
           IMESSAGE_APP_IPAD_105,
@@ -77,12 +82,15 @@ module Spaceship
           APP_IPHONE_61,
           APP_IPHONE_65,
           APP_IPHONE_67,
+          APP_IPHONE_63,
+          APP_IPHONE_69,
 
           APP_IPAD_97,
           APP_IPAD_105,
           APP_IPAD_PRO_3GEN_11,
           APP_IPAD_PRO_129,
           APP_IPAD_PRO_3GEN_129,
+          APP_IPAD_PRO_13,
 
           IMESSAGE_APP_IPHONE_40,
           IMESSAGE_APP_IPHONE_47,
@@ -91,12 +99,15 @@ module Spaceship
           IMESSAGE_APP_IPHONE_61,
           IMESSAGE_APP_IPHONE_65,
           IMESSAGE_APP_IPHONE_67,
+          APP_IPHONE_63,
+          APP_IPHONE_69,
 
           IMESSAGE_APP_IPAD_97,
           IMESSAGE_APP_IPAD_105,
           IMESSAGE_APP_IPAD_PRO_129,
           IMESSAGE_APP_IPAD_PRO_3GEN_11,
           IMESSAGE_APP_IPAD_PRO_3GEN_129,
+          APP_IPAD_PRO_13,
 
           APP_WATCH_SERIES_3,
           APP_WATCH_SERIES_4,
