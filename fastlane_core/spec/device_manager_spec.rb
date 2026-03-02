@@ -4,12 +4,18 @@ describe FastlaneCore do
   describe FastlaneCore::DeviceManager do
     before(:all) do
       @simctl_output = File.read('./fastlane_core/spec/fixtures/DeviceManagerSimctlOutputXcode7')
+      @simctl_runtime_output = File.read('./fastlane_core/spec/fixtures/XcrunSimctlListRuntimesOutput')
       @system_profiler_output = File.read('./fastlane_core/spec/fixtures/DeviceManagerSystem_profilerOutput')
       @instruments_output = File.read('./fastlane_core/spec/fixtures/DeviceManagerInstrumentsOutput')
       @system_profiler_output_items_without_items = File.read('./fastlane_core/spec/fixtures/DeviceManagerSystem_profilerOutputItemsWithoutItems')
       @system_profiler_output_usb_hub = File.read('./fastlane_core/spec/fixtures/DeviceManagerSystem_profilerOutputUsbHub')
 
       FastlaneCore::Simulator.clear_cache
+    end
+
+    before(:each) do
+      status = double('status', "success?": true)
+      allow(Open3).to receive(:capture2).with("xcrun simctl list -j runtimes").and_return([@simctl_runtime_output, status])
     end
 
     it 'raises an error if broken xcrun simctl list devices' do
@@ -444,6 +450,61 @@ describe FastlaneCore do
       expect(FastlaneCore::DeviceManager.runtime_build_os_versions['21A328']).to eq('17.0')
       expect(FastlaneCore::DeviceManager.runtime_build_os_versions['21A342']).to eq('17.0.1')
       expect(FastlaneCore::DeviceManager.runtime_build_os_versions['21R355']).to eq('10.0')
+    end
+
+    it 'properly maps runtime names to actual versions for version mismatch fix' do
+      # Clear cache to ensure our mock is called
+      FastlaneCore::DeviceManager.instance_variable_set(:@runtime_name_to_version, nil)
+
+      status = double('status', "success?": true)
+      runtime_output = File.read('./fastlane_core/spec/fixtures/XcrunSimctlListRuntimesOutputWithVersionMismatch')
+      expect(Open3).to receive(:capture2).with("xcrun simctl list -j runtimes").and_return([runtime_output, status])
+
+      expect(FastlaneCore::DeviceManager.runtime_name_to_version['iOS 17.0']).to eq(['17.0'])
+      expect(FastlaneCore::DeviceManager.runtime_name_to_version['iOS 18.0']).to eq(['18.0', '18.0.1'])
+      expect(FastlaneCore::DeviceManager.runtime_name_to_version['iOS 26.0']).to eq(['26.0.1'])
+    end
+
+    it 'fixes iOS version mismatch by using actual runtime versions instead of section header versions' do
+      # Clear cache to ensure our mock is called
+      FastlaneCore::DeviceManager.instance_variable_set(:@runtime_name_to_version, nil)
+
+      # Mock the runtime JSON response
+      status = double('status', "success?": true)
+      runtime_output = File.read('./fastlane_core/spec/fixtures/XcrunSimctlListRuntimesOutputWithVersionMismatch')
+      expect(Open3).to receive(:capture2).with("xcrun simctl list -j runtimes").and_return([runtime_output, status])
+
+      # Mock the simctl devices output
+      response = "response"
+      simctl_output = File.read('./fastlane_core/spec/fixtures/DeviceManagerSimctlOutputWithVersionMismatch')
+      expect(response).to receive(:read).and_return(simctl_output)
+      expect(Open3).to receive(:popen3).with("xcrun simctl list devices").and_yield(nil, response, nil, nil)
+
+      devices = FastlaneCore::DeviceManager.simulators('iOS')
+      expect(devices.count).to eq(3)
+
+      # Verify that iOS 17.0 devices use exact version (no mismatch here)
+      expect(devices[0]).to have_attributes(
+        name: "iPhone 15 Pro Max", os_type: "iOS", os_version: "17.0",
+        udid: "752335B5-96D2-460D-89A9-3D5D768BDEAC",
+        state: "Shutdown",
+        is_simulator: true
+      )
+
+      # Verify that iOS 26.0 devices use the ACTUAL runtime version (26.0.1) not section header (26.0)
+      # This is the key test for our fix - section header shows "iOS 26.0" but actual runtime is "26.0.1"
+      expect(devices[1]).to have_attributes(
+        name: "iPhone 15 Pro Max", os_type: "iOS", os_version: "26.0.1",
+        udid: "6D8B8DC9-F2BD-41C6-BC9A-C8BCEB521675",
+        state: "Shutdown",
+        is_simulator: true
+      )
+      expect(devices[2]).to have_attributes(
+        name: "iPad Pro (12.9-inch) (6th generation)", os_type: "iOS", os_version: "26.0.1",
+        udid: "F5106A29-D2BF-49DA-81C7-BEB94D9BDCED",
+        state: "Shutdown",
+        is_simulator: true
+      )
     end
 
     describe FastlaneCore::DeviceManager::Device do
