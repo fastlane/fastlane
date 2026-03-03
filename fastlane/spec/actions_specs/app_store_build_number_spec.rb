@@ -217,10 +217,10 @@ describe Fastlane do
           end
 
           it "sets the correct filters and fetches the latest testflight build number with any platform" do
-            expected_filter = {}
+            expected_filter = { state: "PROCESSING,FAILED,COMPLETE" }
             expect(Spaceship::ConnectAPI::Platform).to receive(:map).with(nil).and_return(nil)
             expect(UI).to receive(:message).with("Fetching the latest build number for any version")
-            expect(Spaceship::ConnectAPI).to receive(:get_build_uploads).with(app_id: app_id, filter: expected_filter, sort: "-cfBundleVersion", limit: 1).and_return([build_upload])
+            expect(Spaceship::ConnectAPI).to receive(:get_build_uploads).with(app_id: app_id, filter: expected_filter, sort: "-uploadedDate", limit: 1).and_return([build_upload])
             expect(UI).to receive(:message).with("Latest upload for version #{app_version} on any platform is build: #{build_number}")
 
             result = Fastlane::Actions::AppStoreBuildNumberAction.get_build_info(options)
@@ -236,9 +236,9 @@ describe Fastlane do
           end
 
           it "sets the correct filters and fetches the latest testflight build number with correct platform" do
-            expected_filter = { "platform" => platform }
+            expected_filter = { :state => "PROCESSING,FAILED,COMPLETE", "platform" => platform }
             expect(UI).to receive(:message).with("Fetching the latest build number for any version")
-            expect(Spaceship::ConnectAPI).to receive(:get_build_uploads).with(app_id: app_id, filter: expected_filter, sort: "-cfBundleVersion", limit: 1).and_return([build_upload])
+            expect(Spaceship::ConnectAPI).to receive(:get_build_uploads).with(app_id: app_id, filter: expected_filter, sort: "-uploadedDate", limit: 1).and_return([build_upload])
             expect(UI).to receive(:message).with("Latest upload for version #{app_version} on #{platform} platform is build: #{build_number}")
 
             result = Fastlane::Actions::AppStoreBuildNumberAction.get_build_info(options)
@@ -254,10 +254,10 @@ describe Fastlane do
           end
 
           it "sets the correct filters and fetches the latest testflight build number with any platform of given version" do
-            expected_filter = { "cfBundleShortVersionString" => app_version }
+            expected_filter = { :state => "PROCESSING,FAILED,COMPLETE", "cfBundleShortVersionString" => app_version }
             expect(Spaceship::ConnectAPI::Platform).to receive(:map).with(nil).and_return(nil)
             expect(UI).to receive(:message).with("Fetching the latest build number for version #{app_version}")
-            expect(Spaceship::ConnectAPI).to receive(:get_build_uploads).with(app_id: app_id, filter: expected_filter, sort: "-cfBundleVersion", limit: 1).and_return([build_upload])
+            expect(Spaceship::ConnectAPI).to receive(:get_build_uploads).with(app_id: app_id, filter: expected_filter, sort: "-uploadedDate", limit: 1).and_return([build_upload])
             expect(UI).to receive(:message).with("Latest upload for version #{app_version} on any platform is build: #{build_number}")
 
             result = Fastlane::Actions::AppStoreBuildNumberAction.get_build_info(options)
@@ -273,9 +273,9 @@ describe Fastlane do
           end
 
           it "sets the correct filters and fetches the latest testflight build number with correct platform of given version" do
-            expected_filter = { "platform" => platform, "cfBundleShortVersionString" => app_version }
+            expected_filter = { :state => "PROCESSING,FAILED,COMPLETE", "platform" => platform, "cfBundleShortVersionString" => app_version }
             expect(UI).to receive(:message).with("Fetching the latest build number for version #{app_version}")
-            expect(Spaceship::ConnectAPI).to receive(:get_build_uploads).with(app_id: app_id, filter: expected_filter, sort: "-cfBundleVersion", limit: 1).and_return([build_upload])
+            expect(Spaceship::ConnectAPI).to receive(:get_build_uploads).with(app_id: app_id, filter: expected_filter, sort: "-uploadedDate", limit: 1).and_return([build_upload])
             expect(UI).to receive(:message).with("Latest upload for version #{app_version} on #{platform} platform is build: #{build_number}")
 
             result = Fastlane::Actions::AppStoreBuildNumberAction.get_build_info(options)
@@ -286,10 +286,10 @@ describe Fastlane do
 
         context "when could not find the build and 'initial_build_number' is NOT given in input options" do
           before(:each) do
-            expected_filter = { "platform" => platform, "cfBundleShortVersionString" => app_version }
+            expected_filter = { :state => "PROCESSING,FAILED,COMPLETE", "platform" => platform, "cfBundleShortVersionString" => app_version }
             allow(Spaceship::ConnectAPI)
               .to receive(:get_build_uploads)
-              .with(app_id: app_id, filter: expected_filter, sort: "-cfBundleVersion", limit: 1)
+              .with(app_id: app_id, filter: expected_filter, sort: "-uploadedDate", limit: 1)
               .and_return([nil])
 
             options[:version] = app_version
@@ -308,10 +308,10 @@ describe Fastlane do
 
         context "when could not find the build but 'initial_build_number' is given in input options" do
           before(:each) do
-            expected_filter = { "platform" => platform, "cfBundleShortVersionString" => app_version }
+            expected_filter = { :state => "PROCESSING,FAILED,COMPLETE", "platform" => platform, "cfBundleShortVersionString" => app_version }
             allow(Spaceship::ConnectAPI)
               .to receive(:get_build_uploads)
-              .with(app_id: app_id, filter: expected_filter, sort: "-cfBundleVersion", limit: 1)
+              .with(app_id: app_id, filter: expected_filter, sort: "-uploadedDate", limit: 1)
               .and_return([nil])
 
             options[:version] = app_version
