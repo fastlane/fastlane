@@ -45,6 +45,7 @@ module Spaceship
 
         # As of 2021-11-09, this is only available with Apple ID auth
         DEVELOPER_ID_INSTALLER = "DEVELOPER_ID_INSTALLER"
+        DEVELOPER_ID_INSTALLER_G2 = "DEVELOPER_ID_INSTALLER_G2"
       end
 
       def self.type
