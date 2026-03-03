@@ -51,7 +51,7 @@ describe "resign.sh" do
         does_bundle_id_match "#{pattern}" "#{bundle_id}" #{mode ? "\"#{mode}\"" : '""'}
         echo $?
       BASH
-      stdout, _, _ = run_bash(script)
+      stdout, = run_bash(script)
       stdout.strip.split("\n").last.to_i
     end
 
@@ -124,7 +124,7 @@ describe "resign.sh" do
         PROVISIONS_BY_ID=(#{provisions_bash})
         provision_for_bundle_id "#{bundle_id}" #{mode ? "\"#{mode}\"" : '""'}
       BASH
-      stdout, _, _ = run_bash(script)
+      stdout, = run_bash(script)
       stdout.strip
     end
 
