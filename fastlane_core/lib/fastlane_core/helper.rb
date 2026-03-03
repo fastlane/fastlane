@@ -3,6 +3,7 @@ require 'colored'
 require 'tty-spinner'
 require 'pathname'
 
+require_relative 'command_executor'
 require_relative 'fastlane_folder'
 require_relative 'ui/ui'
 require_relative 'env'
