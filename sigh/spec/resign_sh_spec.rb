@@ -158,9 +158,10 @@ describe "resign.sh" do
   end
 
   # ─── Group C: Bundle ID replacement sed ───────────────────────────────
+  # resign.sh uses BSD sed's `-i .bak` syntax which only works on macOS
   describe "bundle ID replacement sed" do
     before(:each) do
-      skip("/usr/bin/sed not available") unless File.executable?("/usr/bin/sed")
+      skip("BSD sed required (macOS only)") unless RUBY_PLATFORM.include?("darwin")
     end
 
     def run_sed_replacement(input_xml, old_id, new_id)
@@ -235,9 +236,10 @@ describe "resign.sh" do
   end
 
   # ─── Group D: Entitlements sed patterns ───────────────────────────────
+  # These tests use BSD sed syntax from resign.sh which only runs on macOS
   describe "entitlements sed patterns" do
     before(:each) do
-      skip("/usr/bin/sed not available") unless File.executable?("/usr/bin/sed")
+      skip("BSD sed required (macOS only)") unless RUBY_PLATFORM.include?("darwin")
     end
 
     describe "plist wrapper stripping" do
