@@ -14,7 +14,7 @@ module FastlaneCore
     end
 
     def self.is_supported?
-      return `which pbcopy`.length > 0 && `which pbpaste`.length > 0
+      return !FastlaneCore::Helper.which('pbcopy').nil? && !FastlaneCore::Helper.which('pbpaste').nil?
     end
   end
 end
