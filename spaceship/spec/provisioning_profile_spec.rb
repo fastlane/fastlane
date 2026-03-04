@@ -1,4 +1,6 @@
 describe Spaceship::ProvisioningProfile do
+  # Skip tunes login and login with portal
+  include_examples "common spaceship login", true
   before { Spaceship.login }
   let(:client) { Spaceship::ProvisioningProfile.client }
   let(:cert_id) { "C8DL7464RQ" }
@@ -288,10 +290,23 @@ describe Spaceship::ProvisioningProfile do
       profile.repair!
     end
 
+    it "handles nil certificates in the certificate list" do
+      profile.certificates = [nil]
+      expect(client).to receive(:repair_provisioning_profile!).with('PP00000006', 'delete.me.please AppStore', 'store', '2UMR2S6P4L', [cert_id], [], mac: false, sub_platform: nil, template_name: nil).and_return({})
+      profile.repair!
+    end
+
     it "update the certificate if the current one is invalid" do
       expect(profile.certificates.first.id).to eq("3BH4JJSWM4")
       expect(client).to receive(:repair_provisioning_profile!).with('PP00000006', 'delete.me.please AppStore', 'store', '2UMR2S6P4L', [cert_id], [], mac: false, sub_platform: nil, template_name: nil).and_return({})
       profile.repair! # repair will replace the old certificate with the new one
+    end
+
+    it "ignores nil entries when collecting certificate ids" do
+      valid_cert = Spaceship::Certificate.all.first
+      profile.certificates = [valid_cert, nil]
+      expect(client).to receive(:repair_provisioning_profile!).with('PP00000006', 'delete.me.please AppStore', 'store', '2UMR2S6P4L', [valid_cert.id], [], mac: false, sub_platform: nil, template_name: nil).and_return({})
+      profile.repair!
     end
 
     it "repairs an existing profile with no devices" do

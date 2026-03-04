@@ -428,21 +428,42 @@ module Spaceship
         #
         # This is the minimum protection needed for people using spaceship directly
         unless certificate_valid?
+          available_certificates = nil
           if mac?
             if self.kind_of?(Development)
-              self.certificates = [Spaceship::Portal::Certificate::MacDevelopment.all.first]
+              cert = Spaceship::Portal::Certificate::MacDevelopment.all.first
+              if cert.nil?
+                available_certificates ||= Spaceship::Portal::Certificate.all(mac: true)
+                cert = available_certificates.find { |c| c.kind_of?(Spaceship::Portal::Certificate::AppleDevelopment) }
+              end
+              self.certificates = [cert].compact
             elsif self.kind_of?(Direct)
-              self.certificates = [Spaceship::Portal::Certificate::DeveloperIdApplication.all.first]
+              self.certificates = [Spaceship::Portal::Certificate::DeveloperIdApplication.all.first].compact
             else
-              self.certificates = [Spaceship::Portal::Certificate::MacAppDistribution.all.first]
+              cert = Spaceship::Portal::Certificate::MacAppDistribution.all.first
+              if cert.nil?
+                available_certificates ||= Spaceship::Portal::Certificate.all(mac: true)
+                cert = available_certificates.find { |c| c.kind_of?(Spaceship::Portal::Certificate::AppleDistribution) }
+              end
+              self.certificates = [cert].compact
             end
           else
             if self.kind_of?(Development)
-              self.certificates = [Spaceship::Portal::Certificate::Development.all.first]
+              cert = Spaceship::Portal::Certificate::Development.all.first
+              if cert.nil?
+                available_certificates ||= Spaceship::Portal::Certificate.all(mac: false)
+                cert = available_certificates.find { |c| c.kind_of?(Spaceship::Portal::Certificate::AppleDevelopment) }
+              end
+              self.certificates = [cert].compact
             elsif self.kind_of?(InHouse)
-              self.certificates = [Spaceship::Portal::Certificate::InHouse.all.first]
+              self.certificates = [Spaceship::Portal::Certificate::InHouse.all.first].compact
             else
-              self.certificates = [Spaceship::Portal::Certificate::Production.all.first]
+              cert = Spaceship::Portal::Certificate::Production.all.first
+              if cert.nil?
+                available_certificates ||= Spaceship::Portal::Certificate.all(mac: false)
+                cert = available_certificates.find { |c| c.kind_of?(Spaceship::Portal::Certificate::AppleDistribution) }
+              end
+              self.certificates = [cert].compact
             end
           end
         end
@@ -453,8 +474,8 @@ module Spaceship
             name,
             distribution_method,
             app.app_id,
-            certificates.map(&:id),
-            devices.map(&:id),
+            certificates.map(&:id).compact,
+            devices.map(&:id).compact,
             mac: mac?,
             sub_platform: tvos? ? 'tvOS' : nil,
             template_name: is_template_profile ? template.purpose_name : nil
@@ -473,11 +494,14 @@ module Spaceship
       # @return (Bool) is the certificate valid?
       def certificate_valid?
         return false if (certificates || []).count == 0
+
+        all_certificate_ids = Spaceship::Portal::Certificate.all(mac: mac?).collect(&:id)
         certificates.each do |c|
-          if Spaceship::Portal::Certificate.all(mac: mac?).collect(&:id).include?(c.id)
-            return true
-          end
+          next unless c&.id.to_s.length > 0
+
+          return true if all_certificate_ids.include?(c.id)
         end
+
         return false
       end
 
@@ -520,12 +544,24 @@ module Spaceship
       end
 
       def certificates
+        if @certificates
+          @certificates = @certificates.compact
+
+          # `@certificates` can be pre-populated from different sources (e.g. Xcode API/raw data).
+          # Ensure we only ever expose real Certificate model objects here.
+          if @certificates.any? { |c| !c.kind_of?(Spaceship::Portal::Certificate) }
+            @certificates = []
+          end
+        end
+
         if (@certificates || []).empty?
-          @certificates = (profile_details["certificates"] || []).collect do |cert|
+          @certificates = (profile_details["certificates"] || []).filter_map do |cert|
+            next unless cert
             Certificate.set_client(client).factory(cert)
           end
         end
 
+        @certificates.select! { |c| c&.id.to_s.length > 0 }
         @certificates
       end
 
