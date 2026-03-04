@@ -36,18 +36,20 @@ module Fastlane
             link_names: link_names,
             icon_url: icon_url,
             icon_emoji: icon_emoji,
-            fail_on_error: options[:fail_on_error]
+            fail_on_error: options[:fail_on_error],
+            thread_ts: options[:thread_ts]
           )
         end
 
-        def post_message(channel:, username:, attachments:, link_names:, icon_url:, icon_emoji:, fail_on_error:)
+        def post_message(channel:, username:, attachments:, link_names:, icon_url:, icon_emoji:, fail_on_error:, thread_ts:)
           @notifier.post_to_legacy_incoming_webhook(
             channel: channel,
             username: username,
             link_names: link_names,
             icon_url: icon_url,
             icon_emoji: icon_emoji,
-            attachments: attachments
+            attachments: attachments,
+            thread_ts: thread_ts
           )
           UI.success('Successfully sent Slack notification')
         rescue => error
@@ -220,6 +222,10 @@ module Fastlane
           FastlaneCore::ConfigItem.new(key: :icon_emoji,
                                        env_name: "FL_SLACK_ICON_EMOJI",
                                        description: "Specifies an emoji (using colon shortcodes, eg. :white_check_mark:) to use as the photo of the message. Overrides the webhook's image property if use_webhook_configured_username_and_icon is false. This parameter takes precedence over icon_url",
+                                       optional: true),
+          FastlaneCore::ConfigItem.new(key: :thread_ts,
+                                       env_name: "FL_SLACK_THREAD_TS",
+                                       description: "Specifies a thread timestamp to reply to a message in a thread",
                                        optional: true),
           FastlaneCore::ConfigItem.new(key: :payload,
                                        env_name: "FL_SLACK_PAYLOAD",
