@@ -239,6 +239,44 @@ describe FastlaneCore do
       end
     end
 
+    describe "#backticks" do
+      it "executes the command and returns the output" do
+        expect(FastlaneCore::Helper.backticks("echo hello")).to eq("hello\n")
+      end
+
+      it "prints the command and output if print is true" do
+        expect(FastlaneCore::UI).to receive(:command).with("echo hello")
+        expect(FastlaneCore::UI).to receive(:command_output).with("hello\n")
+        FastlaneCore::Helper.backticks("echo hello", print: true)
+      end
+
+      it "does not print the command and output if print is false" do
+        expect(FastlaneCore::UI).not_to receive(:command)
+        expect(FastlaneCore::UI).not_to receive(:command_output)
+        FastlaneCore::Helper.backticks("echo hello", print: false)
+      end
+    end
+
+    describe "#backticks_verbose" do
+      it "executes the command and returns the output" do
+        expect(FastlaneCore::Helper.backticks_verbose("echo hello")).to eq("hello\n")
+      end
+
+      it "prints the command and output if verbose is true" do
+        allow(FastlaneCore::Globals).to receive(:verbose?).and_return(true)
+        expect(FastlaneCore::UI).to receive(:command).with("echo hello")
+        expect(FastlaneCore::UI).to receive(:command_output).with("hello\n")
+        FastlaneCore::Helper.backticks_verbose("echo hello")
+      end
+
+      it "does not print the command and output if verbose is false" do
+        allow(FastlaneCore::Globals).to receive(:verbose?).and_return(false)
+        expect(FastlaneCore::UI).not_to receive(:command)
+        expect(FastlaneCore::UI).not_to receive(:command_output)
+        FastlaneCore::Helper.backticks_verbose("echo hello")
+      end
+    end
+
     describe "#fastlane_enabled?" do
       it "returns false when FastlaneCore::FastlaneFolder.path is nil" do
         expect(FastlaneCore::FastlaneFolder).to receive(:path).and_return(nil)
