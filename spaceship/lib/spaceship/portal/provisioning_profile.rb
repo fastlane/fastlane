@@ -427,46 +427,7 @@ module Spaceship
         # sigh handles more specific filtering and validation steps that make this logic OK
         #
         # This is the minimum protection needed for people using spaceship directly
-        unless certificate_valid?
-          available_certificates = nil
-          if mac?
-            if self.kind_of?(Development)
-              cert = Spaceship::Portal::Certificate::MacDevelopment.all.first
-              if cert.nil?
-                available_certificates ||= Spaceship::Portal::Certificate.all(mac: true)
-                cert = available_certificates.find { |c| c.kind_of?(Spaceship::Portal::Certificate::AppleDevelopment) }
-              end
-              self.certificates = [cert].compact
-            elsif self.kind_of?(Direct)
-              self.certificates = [Spaceship::Portal::Certificate::DeveloperIdApplication.all.first].compact
-            else
-              cert = Spaceship::Portal::Certificate::MacAppDistribution.all.first
-              if cert.nil?
-                available_certificates ||= Spaceship::Portal::Certificate.all(mac: true)
-                cert = available_certificates.find { |c| c.kind_of?(Spaceship::Portal::Certificate::AppleDistribution) }
-              end
-              self.certificates = [cert].compact
-            end
-          else
-            if self.kind_of?(Development)
-              cert = Spaceship::Portal::Certificate::Development.all.first
-              if cert.nil?
-                available_certificates ||= Spaceship::Portal::Certificate.all(mac: false)
-                cert = available_certificates.find { |c| c.kind_of?(Spaceship::Portal::Certificate::AppleDevelopment) }
-              end
-              self.certificates = [cert].compact
-            elsif self.kind_of?(InHouse)
-              self.certificates = [Spaceship::Portal::Certificate::InHouse.all.first].compact
-            else
-              cert = Spaceship::Portal::Certificate::Production.all.first
-              if cert.nil?
-                available_certificates ||= Spaceship::Portal::Certificate.all(mac: false)
-                cert = available_certificates.find { |c| c.kind_of?(Spaceship::Portal::Certificate::AppleDistribution) }
-              end
-              self.certificates = [cert].compact
-            end
-          end
-        end
+        ensure_valid_certificate_selection! unless certificate_valid?
 
         client.with_retry do
           client.repair_provisioning_profile!(
@@ -489,6 +450,45 @@ module Spaceship
 
         return profile
       end
+
+      def ensure_valid_certificate_selection!
+        self.certificates = suggested_certificates
+      end
+
+      def suggested_certificates
+        if mac?
+          return [Spaceship::Portal::Certificate::DeveloperIdApplication.all.first].compact if kind_of?(Direct)
+          if kind_of?(Development)
+            return [find_best_certificate(primary: Spaceship::Portal::Certificate::MacDevelopment,
+                                          fallback_kind: Spaceship::Portal::Certificate::AppleDevelopment,
+                                          mac: true)].compact
+          end
+
+          return [find_best_certificate(primary: Spaceship::Portal::Certificate::MacAppDistribution,
+                                        fallback_kind: Spaceship::Portal::Certificate::AppleDistribution,
+                                        mac: true)].compact
+        end
+
+        return [Spaceship::Portal::Certificate::InHouse.all.first].compact if kind_of?(InHouse)
+        if kind_of?(Development)
+          return [find_best_certificate(primary: Spaceship::Portal::Certificate::Development,
+                                        fallback_kind: Spaceship::Portal::Certificate::AppleDevelopment,
+                                        mac: false)].compact
+        end
+
+        [find_best_certificate(primary: Spaceship::Portal::Certificate::Production,
+                               fallback_kind: Spaceship::Portal::Certificate::AppleDistribution,
+                               mac: false)].compact
+      end
+
+      def find_best_certificate(primary:, fallback_kind:, mac:)
+        cert = primary.all.first
+        return cert if cert
+
+        Spaceship::Portal::Certificate.all(mac: mac).find { |c| c.kind_of?(fallback_kind) }
+      end
+
+      private :ensure_valid_certificate_selection!, :suggested_certificates, :find_best_certificate
 
       # Is the certificate of this profile available?
       # @return (Bool) is the certificate valid?
