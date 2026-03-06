@@ -291,7 +291,12 @@ describe Spaceship::ProvisioningProfile do
     end
 
     it "handles nil certificates in the certificate list" do
-      profile.certificates = [nil]
+      original_details = profile.profile_details
+      certificates_with_nil = original_details["certificates"].dup
+      certificates_with_nil << nil
+
+      allow(profile).to receive(:profile_details).and_return(original_details.merge("certificates" => certificates_with_nil))
+
       expect(client).to receive(:repair_provisioning_profile!).with('PP00000006', 'delete.me.please AppStore', 'store', '2UMR2S6P4L', [cert_id], [], mac: false, sub_platform: nil, template_name: nil).and_return({})
       profile.repair!
     end
