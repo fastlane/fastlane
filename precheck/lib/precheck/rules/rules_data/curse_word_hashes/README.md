@@ -2,7 +2,7 @@
 
 ## What does `precheck/rules/curse_words_rule` do?
 
-It uses the metadata fetched from the App Store by `precheck` and reviews it word by word, failing if it matches one of the committed terms. 
+It uses the metadata fetched from the App Store by _precheck_ and reviews it word by word, failing if it matches one of the committed terms. 
 
 ## What Terms to Hash
 
