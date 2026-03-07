@@ -34,3 +34,21 @@ irb(main):004:0>
 ```
 
 Append this to the end of the file (with a newline afterward).
+
+## How to Test Your Newly Added Term
+
+### Hack at the unit tests to include your phrase
+
+Update the tests in https://github.com/fastlane/fastlane/blob/master/precheck/spec/rules/curse_words_rule_spec.rb to include your new phrase.
+
+```diff
+      let(:happy_item) { TextItemToCheck.new("tacos are really delicious, seriously, I can't even", :description, "description") }
+-     let(:curse_item) { TextItemToCheck.new("please excuse the use of 'shit' in this description", :description, "description") }
++     let(:curse_item) { TextItemToCheck.new("please excuse the use of 'oneword' in this description", :description, "description") }
+
+      it "passes for non-curse item" do
+```
+
+### Update your App's listing and run pre-check
+
+Add your term to your App's description or keywords and run `bundle exec fastlane precheck` to ensure that it fails the check.
