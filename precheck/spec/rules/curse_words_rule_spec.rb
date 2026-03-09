@@ -7,6 +7,7 @@ module Precheck
       let(:happy_item) { TextItemToCheck.new("tacos are really delicious, seriously, I can't even", :description, "description") }
       let(:curse_item) { TextItemToCheck.new("please excuse the use of 'shit' in this description", :description, "description") }
       let(:all_caps_item) { TextItemToCheck.new("NSFW description", :description, "description") }
+      let(:punctuation_item) { TextItemToCheck.new("Report content to https://example.com/report/nsfw-content", :description, "description") }
 
       it "passes for non-curse item" do
         result = rule.check_item(happy_item)
@@ -20,6 +21,11 @@ module Precheck
 
       it "fails for a curse word in all caps" do
         result = rule.check_item(all_caps_item)
+        expect(result.status).to eq(VALIDATION_STATES[:failed])
+      end
+
+      it "fails for a curse word surrounded by punctuation" do
+        result = rule.check_item(punctuation_item)
         expect(result.status).to eq(VALIDATION_STATES[:failed])
       end
     end
