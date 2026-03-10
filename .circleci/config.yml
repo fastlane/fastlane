@@ -38,7 +38,7 @@ aliases:
 jobs:
   tests_macos: &tests_macos_base
     description: 'Execute tests on macOS with given Xcode and Ruby version'
-    resource_class: macos-m1-medium-gen1
+    resource_class: m4pro.medium
     macos:
       xcode: << parameters.xcode_version >>
     parameters:
@@ -139,7 +139,7 @@ jobs:
           when: always  # Run this even when tests fail
 
   validate_fastlane_swift_generation:
-    resource_class: macos-m1-medium-gen1
+    resource_class: m4pro.medium
     <<: *tests_macos_base
     steps:
       - *cache_restore_git
@@ -182,42 +182,23 @@ workflows:
   "Run Tests & Checks": # Name of the workflow, which ends up displayed on GitHub's PR Check
     jobs:
       - tests_macos:
-          name: 'Execute tests on macOS (Xcode 13.4.1, Ruby 2.7)'
-          xcode_version: '13.4.1'
-          ruby_version: '2.7'
-          ruby_opt: -W:deprecated
-      - tests_macos:
-          name: 'Execute tests on macOS (Xcode 13.4.1, Ruby 3.1)'
-          xcode_version: '13.4.1'
+          name: 'Execute tests on macOS (Xcode 16.3.0, Ruby 3.1)'
+          xcode_version: '16.3.0'
           ruby_version: '3.1'
           ruby_opt: -W:deprecated
       - tests_macos:
-          name: 'Execute tests on macOS (Xcode 14.3.1, Ruby 3.1)'
-          xcode_version: '14.3.1'
+          name: 'Execute tests on macOS (Xcode 16.4.0, Ruby 3.1)'
+          xcode_version: '16.4.0'
           ruby_version: '3.1'
           ruby_opt: -W:deprecated
       - tests_macos:
-          name: 'Execute tests on macOS (Xcode 15.0.1, Ruby 3.1)'
-          xcode_version: '15.0.1'
-          ruby_version: '3.1'
-          ruby_opt: -W:deprecated
-      - tests_macos:
-          name: 'Execute tests on macOS (Xcode 14.3.1, Ruby 3.2)'
-          xcode_version: '14.3.1'
+          name: 'Execute tests on macOS (Xcode 16.4.0, Ruby 3.2)'
+          xcode_version: '16.4.0'
           ruby_version: '3.2'
           ruby_opt: -W:deprecated
       - tests_macos:
-          name: 'Execute tests on macOS (Xcode 15.0.1, Ruby 3.2)'
-          xcode_version: '15.0.1'
-          ruby_version: '3.2'
-          ruby_opt: -W:deprecated
-      - tests_macos:
-          name: 'Execute tests on macOS (Xcode 15.2.0, Ruby 3.2)'
-          xcode_version: '15.2.0'
-          ruby_version: '3.2'
-      - tests_macos:
-          name: 'Execute tests on macOS (Xcode 15.3, Ruby 3.3)'
-          xcode_version: '15.3'
+          name: 'Execute tests on macOS (Xcode 16.4.0, Ruby 3.3)'
+          xcode_version: '16.4.0'
           ruby_version: '3.3'
           ruby_opt: -W:deprecated
       - tests_macos:
@@ -225,15 +206,28 @@ workflows:
           xcode_version: '16.4.0'
           ruby_version: '3.4'
           ruby_opt: -W:deprecated
+      - tests_macos:
+          name: 'Execute tests on macOS (Xcode 26.1.1, Ruby 3.4)'
+          xcode_version: '26.1.1'
+          ruby_version: '3.4'
+          ruby_opt: -W:deprecated
+      - tests_macos:
+          name: 'Execute tests on macOS (Xcode 26.2.0, Ruby 3.4)'
+          xcode_version: '26.2.0'
+          ruby_version: '3.4'
+          ruby_opt: -W:deprecated
       - tests_ubuntu:
-          name: 'Execute tests on Ubuntu (Ruby 2.6)'
-          image: 'cimg/ruby:2.6-node'
+          name: 'Execute tests on Ubuntu (Ruby 2.7)'
+          image: 'cimg/ruby:2.7-node'
       - tests_ubuntu:
-          name: 'Execute tests on Ubuntu'
+          name: 'Execute tests on Ubuntu (Ruby 3.0)'
+          image: 'cimg/ruby:3.0-node'
+      - tests_ubuntu:
+          name: 'Execute tests on Ubuntu (Ruby 3.2)'
           image: 'cimg/ruby:3.2.2-node'
       - validate_fastlane_swift_generation:
           name: 'Validate Fastlane.swift generation'
-          xcode_version: '15.0.1'
+          xcode_version: '16.4.0'
           ruby_version: '3.2'
       - validate_documentation:
           name: 'Validate Documentation'
