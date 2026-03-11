@@ -70,14 +70,14 @@ describe Match do
     describe '#download' do
       let(:files_to_download) do
         [
-          instance_double('Aws::S3::Object', key: 'TEAMID1/certs/development/CERTID1.cer', download_file: true),
-          instance_double('Aws::S3::Object', key: 'TEAMID1/certs/development/CERTID1.p12', download_file: true),
-          instance_double('Aws::S3::Object', key: 'TEAMID2/certs/development/CERTID2.cer', download_file: true),
-          instance_double('Aws::S3::Object', key: 'TEAMID2/certs/development/CERTID2.p12', download_file: true)
+          instance_double('Aws::S3::Object', key: 'TEAMID1/certs/development/CERTID1.cer'),
+          instance_double('Aws::S3::Object', key: 'TEAMID1/certs/development/CERTID1.p12'),
+          instance_double('Aws::S3::Object', key: 'TEAMID2/certs/development/CERTID2.cer'),
+          instance_double('Aws::S3::Object', key: 'TEAMID2/certs/development/CERTID2.p12')
         ]
       end
       let(:bucket) { instance_double('Aws::S3::Bucket') }
-      let(:s3_client) { instance_double('Fastlane::Helper::S3ClientHelper', find_bucket!: bucket) }
+      let(:s3_client) { instance_double('Fastlane::Helper::S3ClientHelper', find_bucket!: bucket, download_file: true) }
 
       def stub_bucket_content(objects: files_to_download)
         allow(bucket).to receive(:objects) do |options|
@@ -90,7 +90,7 @@ describe Match do
       it 'downloads to correct working directory' do
         stub_bucket_content
         files_to_download.each do |file_object|
-          expect(file_object).to receive(:download_file).with("#{working_directory}/#{file_object.key}")
+          expect(s3_client).to receive(:download_file).with('foobar', file_object.key, "#{working_directory}/#{file_object.key}")
         end
 
         subject.download
@@ -101,9 +101,9 @@ describe Match do
         allow(subject).to receive(:team_id).and_return('TEAMID2')
         files_to_download.each do |file_object|
           if file_object.key.start_with?('TEAMID2')
-            expect(file_object).to receive(:download_file).with("#{working_directory}/#{file_object.key}")
+            expect(s3_client).to receive(:download_file).with('foobar', file_object.key, "#{working_directory}/#{file_object.key}")
           else
-            expect(file_object).not_to receive(:download_file)
+            expect(s3_client).not_to receive(:download_file).with('foobar', file_object.key, anything)
           end
         end
 
@@ -119,7 +119,7 @@ describe Match do
         stub_bucket_content(objects: prefixed_objects)
 
         prefixed_objects.each do |file_object|
-          expect(file_object).to receive(:download_file).with("#{working_directory}/#{file_object.key.delete_prefix('123456/')}")
+          expect(s3_client).to receive(:download_file).with('foobar', file_object.key, "#{working_directory}/#{file_object.key.delete_prefix('123456/')}")
         end
 
         subject.download
@@ -131,8 +131,8 @@ describe Match do
 
         allow(s3_client).to receive_message_chain(:find_bucket!, :objects).and_return([valid_object, invalid_object])
 
-        expect(valid_object).to receive(:download_file).with("#{working_directory}/#{valid_object.key}")
-        expect(invalid_object).not_to receive(:download_file).with("#{working_directory}/#{invalid_object.key}")
+        expect(s3_client).to receive(:download_file).with('foobar', valid_object.key, "#{working_directory}/#{valid_object.key}")
+        expect(s3_client).not_to receive(:download_file).with('foobar', invalid_object.key, anything)
 
         subject.download
       end

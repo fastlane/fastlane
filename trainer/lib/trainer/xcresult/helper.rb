@@ -38,13 +38,23 @@ module Trainer
       # and replaced it with `xcrun xcresulttool get test-results tests` instead.
       #
       # @return [Boolean] Whether the xcresulttool supports Xcode 16+ commands
-      def self.supports_xcode16_xcresulttool?
+      def self.supports_xcresulttool_version_23?
         # e.g. DEVELOPER_DIR=/Applications/Xcode_16_beta_3.app
         # xcresulttool version 23021, format version 3.53 (current)
         match = `xcrun xcresulttool version`.match(/xcresulttool version (?<version>[\d.]+)/)
         version = match[:version]
 
         Gem::Version.new(version) >= Gem::Version.new(23_021)
+      rescue
+        false
+      end
+
+      def self.supports_xcresulttool_version_24?
+        # xcresulttool version 24408, schema version: 0.1.0 (legacy commands format version: 3.56)
+        match = `xcrun xcresulttool version`.match(/xcresulttool version (?<version>[\d.]+)/)
+        version = match[:version]
+
+        Gem::Version.new(version) >= Gem::Version.new(24_408)
       rescue
         false
       end

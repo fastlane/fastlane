@@ -12,7 +12,7 @@ module Fastlane
         result += "# Available Plugins\n\n\n"
         result += plugins.collect do |current_plugin|
           @plugin = current_plugin
-          result = ERB.new(File.read(params[:template_path]), 0, '-').result(binding) # https://web.archive.org/web/20160430190141/www.rrn.dk/rubys-erb-templating-system
+          result = ERB.new(File.read(params[:template_path]), trim_mode: '-').result(binding) # https://web.archive.org/web/20160430190141/www.rrn.dk/rubys-erb-templating-system
         end.join("\n")
 
         File.write(File.join("docs", params[:output_path]), result)

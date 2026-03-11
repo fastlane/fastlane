@@ -46,7 +46,24 @@ module Supply
     # Initializes the service and its auth_client using the specified information
     # @param service_account_json: The raw service account Json data
     def initialize(service_account_json: nil, params: nil)
-      auth_client = Google::Auth::ServiceAccountCredentials.make_creds(json_key_io: service_account_json, scope: self.class::SCOPE)
+      # decode the json and check its type
+      begin
+        json_content = service_account_json.read
+        google_credentials = JSON.parse(json_content)
+        service_account_json.rewind
+      rescue JSON::ParserError
+        UI.user_error!("Invalid Google Credentials file provided - unable to parse json.")
+      end
+
+      # use correct credential class based on type
+      case google_credentials['type']
+      when "external_account"
+        auth_client = Google::Auth::ExternalAccount::Credentials.make_creds(json_key_io: service_account_json, scope: self.class::SCOPE)
+      when "service_account"
+        auth_client = Google::Auth::ServiceAccountCredentials.make_creds(json_key_io: service_account_json, scope: self.class::SCOPE)
+      else
+        UI.user_error!("Invalid Google Credentials file provided - no credential type found.")
+      end
 
       UI.verbose("Fetching a new access token from Google...")
 

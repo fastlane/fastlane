@@ -17,6 +17,26 @@ describe FastlaneCore do
       end
     end
 
+    describe "#xcode_at_least?" do
+      ["15.2", "15.2.3", 15, 15.3].each do |check_version|
+        ["15.3", "16"].each do |xcode_version|
+          it "Xcode #{xcode_version} is at least #{check_version}" do
+            allow(FastlaneCore::Helper).to receive(:xcode_version).and_return(xcode_version)
+
+            expect(FastlaneCore::Helper.xcode_at_least?(check_version)).to be(true)
+          end
+        end
+
+        ["14", "14.99.99"].each do |xcode_version|
+          it "Xcode #{xcode_version} is less than #{check_version}" do
+            allow(FastlaneCore::Helper).to receive(:xcode_version).and_return(xcode_version)
+
+            expect(FastlaneCore::Helper.xcode_at_least?(check_version)).to be(false)
+          end
+        end
+      end
+    end
+
     describe '#colors_disabled?' do
       it "should return false if no environment variables set" do
         stub_const('ENV', {})

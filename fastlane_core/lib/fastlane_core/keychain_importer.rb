@@ -4,13 +4,15 @@ require 'security'
 
 module FastlaneCore
   class KeychainImporter
-    def self.import_file(path, keychain_path, keychain_password: nil, certificate_password: "", skip_set_partition_list: false, output: FastlaneCore::Globals.verbose?)
+    def self.import_file(path, keychain_path, keychain_password: nil, certificate_password: "", certificate_format: nil, skip_set_partition_list: false, output: FastlaneCore::Globals.verbose?)
       UI.user_error!("Could not find file '#{path}'") unless File.exist?(path)
 
       password_part = " -P #{certificate_password.shellescape}"
+      certificate_format_part = certificate_format.to_s.strip.empty? ? "" : " -f #{certificate_format.shellescape}"
 
       command = "security import #{path.shellescape} -k '#{keychain_path.shellescape}'"
       command << password_part
+      command << certificate_format_part
       command << " -T /usr/bin/codesign" # to not be asked for permission when running a tool like `gym` (before Sierra)
       command << " -T /usr/bin/security"
       command << " -T /usr/bin/productbuild" # to not be asked for permission when using an installer cert for macOS
