@@ -12,9 +12,9 @@ module Pilot
 
       app = find_app(apple_id: options[:apple_id], app_identifier: options[:app_identifier])
       if app
-        testers = app.get_beta_testers(includes: "apps,betaTesterMetrics,betaGroups")
+        testers = app.get_beta_testers(includes: "apps,betaGroups")
       else
-        testers = Spaceship::ConnectAPI::BetaTester.all(includes: "apps,betaTesterMetrics,betaGroups")
+        testers = Spaceship::ConnectAPI::BetaTester.all(includes: "apps,betaGroups")
       end
 
       file = config[:testers_file_path]
@@ -26,7 +26,7 @@ module Pilot
           group_names = tester.beta_groups.map(&:name).join(";") || ""
 
           metric = (tester.beta_tester_metrics || []).first
-          if metric.installed?
+          if metric&.installed?
             install_version = "#{metric.installed_cf_bundle_short_version_string} (#{metric.installed_cf_bundle_version})"
             pretty_date = metric.installed_cf_bundle_version
           end
