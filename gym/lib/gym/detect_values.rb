@@ -109,7 +109,7 @@ module Gym
       return if team_id.nil?
 
       case Gym.config[:export_method]
-      when "app-store"
+      when "app-store", "app-store-connect"
         prefix = "3rd Party Mac Developer Installer: "
       when "developer-id"
         prefix = "Developer ID Installer: "

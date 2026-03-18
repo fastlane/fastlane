@@ -226,7 +226,7 @@ module Gym
       end
 
       def print_environment_information
-        if Gym.config[:export_method].to_s == "development"
+        if ["development", "debugging"].include?(Gym.config[:export_method].to_s)
           UI.message("")
           UI.error("Your `export_method` in gym is defined as `development`")
           UI.error("which might cause problems when signing your application")
@@ -250,6 +250,7 @@ module Gym
           # There is no 100% good way to detect the profile type based on the name
           available_export_types = {
             "app-store" => "app-store",
+            "app-store-connect" => "app-store-connect",
             "app store" => "app-store",
             "appstore" => "app-store",
             "enterprise" => "enterprise",
@@ -257,9 +258,11 @@ module Gym
             "in house" => "enterprise",
             "inhouse" => "enterprise",
             "ad-hoc" => "ad-hoc",
+            "release-testing" => "release-testing",
             "adhoc" => "ad-hoc",
             "ad hoc" => "ad-hoc",
-            "development" => "development"
+            "development" => "development",
+            "debugging" => "debugging"
           }
 
           selected_provisioning_profiles.each do |current_bundle_identifier, current_profile_name|

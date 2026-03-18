@@ -372,7 +372,7 @@ module Gym
 
     # Create AppStoreInfo.plist using swinfo for iOS app-store exports
     def generate_appstore_info(ipa_path)
-      return unless Gym.config[:generate_appstore_info] && Gym.building_for_ios? && Gym.config[:export_method] == 'app-store'
+      return unless Gym.config[:generate_appstore_info] && Gym.building_for_ios? && ['app-store', 'app-store-connect'].include?(Gym.config[:export_method])
 
       swinfo_plist_path = File.join(File.expand_path(Gym.config[:output_directory]), "AppStoreInfo.plist")
       swinfo_path = File.join(FastlaneCore::Helper.xcode_path, "usr/bin/swinfo")
