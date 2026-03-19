@@ -1,0 +1,67 @@
+{
+  "runtimes" : [
+    {
+      "identifier" : "com.apple.CoreSimulator.SimRuntime.iOS-16-1",
+      "version" : "16.1",
+      "name" : "iOS 16.1",
+      "isAvailable" : true,
+      "buildversion" : "20B72"
+    },
+    {
+      "identifier" : "com.apple.CoreSimulator.SimRuntime.iOS-17-0",
+      "version" : "17.0",
+      "name" : "iOS 17.0",
+      "isAvailable" : true,
+      "buildversion" : "21A328"
+    },
+    {
+      "identifier" : "com.apple.CoreSimulator.SimRuntime.iOS-17-2",
+      "version" : "17.2",
+      "name" : "iOS 17.2",
+      "isAvailable" : true,
+      "buildversion" : "21C62"
+    },
+    {
+      "identifier" : "com.apple.CoreSimulator.SimRuntime.tvOS-16-4",
+      "version" : "16.4",
+      "name" : "tvOS 16.4",
+      "isAvailable" : true,
+      "buildversion" : "20L497"
+    },
+    {
+      "identifier" : "com.apple.CoreSimulator.SimRuntime.tvOS-17-0",
+      "version" : "17.0",
+      "name" : "tvOS 17.0",
+      "isAvailable" : true,
+      "buildversion" : "21J353"
+    },
+    {
+      "identifier" : "com.apple.CoreSimulator.SimRuntime.watchOS-9-4",
+      "version" : "9.4",
+      "name" : "watchOS 9.4",
+      "isAvailable" : true,
+      "buildversion" : "20T253"
+    },
+    {
+      "identifier" : "com.apple.CoreSimulator.SimRuntime.watchOS-10-0",
+      "version" : "10.0",
+      "name" : "watchOS 10.0",
+      "isAvailable" : true,
+      "buildversion" : "21R355"
+    },
+    {
+      "identifier" : "com.apple.CoreSimulator.SimRuntime.visionOS-1-0",
+      "version" : "1.0",
+      "name" : "visionOS 1.0",
+      "isAvailable" : false,
+      "buildversion" : "21N301"
+    },
+    {
+      "identifier" : "com.apple.CoreSimulator.SimRuntime.iOS-16-4",
+      "version" : "16.4",
+      "name" : "iOS 16.4",
+      "isAvailable" : false,
+      "buildversion" : "20E247"
+    }
+  ]
+}
