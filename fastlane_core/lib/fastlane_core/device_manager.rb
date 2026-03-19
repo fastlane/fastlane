@@ -196,7 +196,6 @@ module FastlaneCore
                   .last
                   .os_version
       end
-
     end
 
     # Use the UDID for the given device when setting the destination

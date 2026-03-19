@@ -541,7 +541,7 @@ describe FastlaneCore do
 
       versions = FastlaneCore::DeviceManager.runtime_id_os_versions
       expect(versions['com.apple.CoreSimulator.SimRuntime.iOS-16-1']).to eq('16.1')
-      expect(versions['com.apple.CoreSimulator.SimRuntime.iOS-17-0']).to eq('17.0')
+      expect(versions['com.apple.CoreSimulator.SimRuntime.iOS-17-0']).to eq('17.0.1')
     end
 
     describe FastlaneCore::DeviceManager::Device do
