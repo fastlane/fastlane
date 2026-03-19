@@ -217,9 +217,6 @@ workflows:
           ruby_version: '3.4'
           ruby_opt: -W:deprecated
       - tests_ubuntu:
-          name: 'Execute tests on Ubuntu (Ruby 2.7)'
-          image: 'cimg/ruby:2.7-node'
-      - tests_ubuntu:
           name: 'Execute tests on Ubuntu (Ruby 3.0)'
           image: 'cimg/ruby:3.0-node'
       - tests_ubuntu:

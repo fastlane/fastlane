@@ -25,7 +25,7 @@ PATH
       gh_inspector (>= 1.1.2, < 2.0.0)
       google-apis-androidpublisher_v3 (~> 0.3)
       google-apis-playcustomapp_v1 (~> 0.1)
-      google-cloud-env (>= 1.6.0, <= 2.1.1)
+      google-cloud-env (>= 1.6.0, < 2.3.0)
       google-cloud-storage (~> 1.31)
       highline (~> 2.0)
       http-cookie (~> 1.0.5)
@@ -402,7 +402,7 @@ DEPENDENCIES
   coveralls (~> 0.8.13)
   danger (~> 8.0)
   danger-junit (~> 1.0)
-  fakefs (>= 1.8, < 3.0)
+  fakefs (>= 1.8, < 3.0.3)
   fastlane!
   fastlane-plugin-ruby
   mime-types (>= 1.16, < 4.0)
@@ -412,7 +412,7 @@ DEPENDENCIES
   pry-byebug
   pry-rescue
   pry-stack_explorer
-  public_suffix (< 6.0)
+  public_suffix (< 7.0)
   rake
   rb-readline
   rspec (~> 3.10)
@@ -427,4 +427,4 @@ DEPENDENCIES
   yard (~> 0.9.11)
 
 BUNDLED WITH
-   2.4.22
+   2.5.23
