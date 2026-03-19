@@ -313,6 +313,49 @@ describe FastlaneCore do
       )
     end
 
+    it "handles legacy 'availability' string field from older Xcode versions" do
+      mock_simctl_json('DeviceManagerSimctlJsonDevicesLegacyAvailability', 'DeviceManagerSimctlJsonRuntimesLegacyAvailability')
+
+      devices = FastlaneCore::Simulator.all
+      # Only the 2 available iOS 10.0 devices should be returned; the 2 unavailable iOS 9.3 devices are filtered out
+      expect(devices.count).to eq(2)
+
+      expect(devices[0]).to have_attributes(
+        name: "iPhone 6s", os_type: "iOS", os_version: "10.0",
+        udid: "521336F6-CB62-409B-8387-D064F658276B",
+        state: "Shutdown",
+        is_simulator: true
+      )
+      expect(devices[1]).to have_attributes(
+        name: "iPhone SE", os_type: "iOS", os_version: "10.0",
+        udid: "B68B2B7F-4FA2-4E70-9BF2-C32308F75B31",
+        state: "Shutdown",
+        is_simulator: true
+      )
+    end
+
+    describe "device_available?" do
+      it "returns true for isAvailable boolean true" do
+        expect(FastlaneCore::DeviceManager.device_available?({ 'isAvailable' => true })).to be(true)
+      end
+
+      it "returns false for isAvailable boolean false" do
+        expect(FastlaneCore::DeviceManager.device_available?({ 'isAvailable' => false })).to be(false)
+      end
+
+      it "returns true for legacy availability string '(available)'" do
+        expect(FastlaneCore::DeviceManager.device_available?({ 'availability' => '(available)' })).to be(true)
+      end
+
+      it "returns false for legacy availability string with 'unavailable'" do
+        expect(FastlaneCore::DeviceManager.device_available?({ 'availability' => '(unavailable, runtime profile not found)' })).to be(false)
+      end
+
+      it "returns true when neither field is present" do
+        expect(FastlaneCore::DeviceManager.device_available?({})).to be(true)
+      end
+    end
+
     describe "os_type_from_runtime_identifier" do
       it "extracts iOS from runtime identifier" do
         expect(FastlaneCore::DeviceManager.os_type_from_runtime_identifier("com.apple.CoreSimulator.SimRuntime.iOS-26-3")).to eq("iOS")

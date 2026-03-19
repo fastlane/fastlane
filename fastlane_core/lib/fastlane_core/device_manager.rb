@@ -14,28 +14,27 @@ module FastlaneCore
       # Maps runtime identifiers to their precise version strings.
       # e.g. {"com.apple.CoreSimulator.SimRuntime.iOS-26-3" => "26.3.1", ...}
       def runtime_id_os_versions
-        @runtime_id_os_versions ||= begin
-          output, status = Open3.capture2('xcrun simctl list -j runtimes')
-          raise status unless status.success?
-          json = JSON.parse(output)
-          json['runtimes'].map { |h| [h['identifier'], h['version']] }.to_h
-        rescue StandardError => e
-          UI.error(e)
-          UI.error('xcrun simctl CLI broken; run `xcrun simctl list runtimes` and make sure it works')
-          UI.user_error!('xcrun simctl not working')
-        end
+        @runtime_id_os_versions ||= parsed_runtimes.map { |h| [h['identifier'], h['version']] }.to_h
       end
 
       def runtime_build_os_versions
-        @runtime_build_os_versions ||= begin
-          output, status = Open3.capture2('xcrun simctl list -j runtimes')
-          raise status unless status.success?
-          json = JSON.parse(output)
-          json['runtimes'].map { |h| [h['buildversion'], h['version']] }.to_h
-        rescue StandardError => e
-          UI.error(e)
-          UI.error('xcrun simctl CLI broken; cun `xcrun simctl list runtimes` and make sure it works')
-          UI.user_error!('xcrun simctl not working')
+        @runtime_build_os_versions ||= parsed_runtimes.map { |h| [h['buildversion'], h['version']] }.to_h
+      end
+
+      # Checks whether a device JSON entry represents an available device.
+      # Handles both the modern `isAvailable` boolean (Xcode 10.1+) and the
+      # legacy `availability` string field (Xcode < 10.1, e.g. "(available)" or
+      # "(unavailable, runtime profile not found)").
+      def device_available?(device)
+        if device.key?('isAvailable')
+          # Xcode 10.1+: boolean true/false
+          device['isAvailable'] == true
+        elsif device.key?('availability')
+          # Xcode < 10.1: string "(available)" or "(unavailable, ...)"
+          !device['availability'].to_s.include?('unavailable')
+        else
+          # If neither field is present, include the device (best-effort)
+          true
         end
       end
 
@@ -91,8 +90,8 @@ module FastlaneCore
           next unless requested_os_type == "" || os_type == requested_os_type
 
           device_list.each do |device|
-            # Skip unavailable devices
-            next unless device['isAvailable']
+            # Skip unavailable devices (handles both boolean isAvailable and string availability)
+            next unless device_available?(device)
 
             name = device['name']
             udid = device['udid']
@@ -169,9 +168,27 @@ module FastlaneCore
 
       def clear_cache
         @devices = nil
+        @parsed_runtimes = nil
         @runtime_build_os_versions = nil
         @runtime_id_os_versions = nil
       end
+
+      private
+
+      def parsed_runtimes
+        @parsed_runtimes ||= begin
+          output, status = Open3.capture2('xcrun simctl list -j runtimes')
+          raise status unless status.success?
+          json = JSON.parse(output)
+          json['runtimes']
+        rescue StandardError => e
+          UI.error(e)
+          UI.error('xcrun simctl CLI broken; run `xcrun simctl list runtimes` and make sure it works')
+          UI.user_error!('xcrun simctl not working')
+        end
+      end
+
+      public
 
       def latest_simulator_version_for_device(device)
         simulators.select { |s| s.name == device }
@@ -180,36 +197,6 @@ module FastlaneCore
                   .os_version
       end
 
-      # The code below works from Xcode 7 on
-      # def all
-      #   UI.verbose("Fetching available devices")
-
-      #   @devices = []
-      #   output = ''
-      #   Open3.popen3('xcrun simctl list devices --json') do |stdin, stdout, stderr, wait_thr|
-      #     output = stdout.read
-      #   end
-
-      #   begin
-      #     data = JSON.parse(output)
-      #   rescue => ex
-      #     UI.error(ex)
-      #     UI.error("xcrun simctl CLI broken, run `xcrun simctl list devices` and make sure it works")
-      #     UI.user_error!("xcrun simctl not working.")
-      #   end
-
-      #   data["devices"].each do |os_version, l|
-      #     l.each do |device|
-      #       next if device['availability'].include?("unavailable")
-      #       next unless os_version.include?(requested_os_type)
-
-      #       os = os_version.gsub(requested_os_type + " ", "").strip
-      #       @devices << Device.new(name: device['name'], os_type: requested_os_type, os_version: os, udid: device['udid'])
-      #     end
-      #   end
-
-      #   return @devices
-      # end
     end
 
     # Use the UDID for the given device when setting the destination
