@@ -1,0 +1,41 @@
+{
+  "data": [
+    {
+      "type": "territoryAvailabilities",
+      "id": "abcdefg",
+      "attributes": {
+        "available": true,
+        "releaseDate": "2025-05-13", 
+        "preOrderEnabled": false, 
+        "preOrderPublishDate": null, 
+        "contentStatuses": ["AVAILABLE"]
+      },
+      "links": {
+        "self": "https://appstoreconnect.apple.com/iris/v1/territoryAvailabilities/abcdefg"
+      }
+    },
+    {
+      "type": "territoryAvailabilities",
+      "id": "hijklmn",
+      "attributes": {
+        "available": false,
+        "releaseDate": "2025-05-13", 
+        "preOrderEnabled": false, 
+        "preOrderPublishDate": null, 
+        "contentStatuses": ["CANNOT_SELL"]
+      },
+      "links": {
+        "self": "https://appstoreconnect.apple.com/iris/v1/territoryAvailabilities/hijklmn"
+      }
+    }
+  ],
+  "links": {
+    "self": "https://appstoreconnect.apple.com/iris/v2/appAvailabilities/123456789/territoryAvailabilities"
+  },
+  "meta": {
+    "paging": {
+      "total": 2, 
+      "limit": 50
+    }
+  }
+}
