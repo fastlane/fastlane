@@ -381,6 +381,10 @@ module Match
         return [
           Spaceship::ConnectAPI::Certificate::CertificateType::IOS_DISTRIBUTION
         ]
+      when :developer_id_application
+        return [
+          Spaceship::ConnectAPI::Certificate::CertificateType::DEVELOPER_ID_APPLICATION
+        ]
       else
         raise "Unknown type '#{type}'"
       end
