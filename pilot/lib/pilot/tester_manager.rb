@@ -97,7 +97,7 @@ module Pilot
     end
 
     def find_app_tester(email: nil, app: nil)
-      tester = app.get_beta_testers(filter: { email: email }, includes: "apps,betaTesterMetrics,betaGroups").first
+      tester = app.get_beta_testers(filter: { email: email }, includes: "apps,betaGroups").first
 
       if tester
         UI.success("Found existing tester #{email}")
@@ -107,7 +107,7 @@ module Pilot
     end
 
     def list_testers_by_app(app)
-      testers = app.get_beta_testers(includes: "apps,betaTesterMetrics,betaGroups")
+      testers = app.get_beta_testers(includes: "apps,betaGroups")
 
       list_by_app(testers, "All Testers")
     end
@@ -152,7 +152,7 @@ module Pilot
       end
 
       metric = (tester.beta_tester_metrics || []).first
-      if metric.installed?
+      if metric&.installed?
         rows << ["Latest Version", "#{metric.installed_cf_bundle_short_version_string} (#{metric.installed_cf_bundle_version})"]
         rows << ["Latest Install Date", metric.installed_cf_bundle_version]
         rows << ["Installed", metric.installed?]
