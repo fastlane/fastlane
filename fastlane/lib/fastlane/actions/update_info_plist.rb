@@ -8,7 +8,7 @@ module Fastlane
         # Check if parameters are set
         if params[:app_identifier] || params[:display_name] || params[:block]
           if (params[:app_identifier] || params[:display_name]) && params[:block]
-            UI.important("block parameter can not be specified with app_identifier or display_name")
+            UI.important("block parameter cannot be specified with app_identifier or display_name")
             return false
           end
 

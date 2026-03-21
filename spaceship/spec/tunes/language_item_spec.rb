@@ -1,7 +1,5 @@
 describe Spaceship::Tunes::LanguageItem do
-  before do
-    Spaceship::Tunes.login
-  end
+  include_examples "common spaceship login"
 
   let(:app) { Spaceship::Application.all.find { |a| a.apple_id == "898536088" } }
 

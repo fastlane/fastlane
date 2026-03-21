@@ -2,7 +2,7 @@ module Fastlane
   module Actions
     class OptOutCrashReportingAction < Action
       def self.run(params)
-        UI.message("fastlane doesn't have crash reporting any more, feel free to remove `opt_out_crash_reporting` from your Fastfile")
+        UI.message("fastlane doesn't have crash reporting anymore, feel free to remove `opt_out_crash_reporting` from your Fastfile")
       end
 
       def self.description
@@ -10,7 +10,7 @@ module Fastlane
       end
 
       def self.details
-        "_fastlane_ doesn't have crash reporting any more. Feel free to remove `opt_out_crash_reporting` from your Fastfile."
+        "_fastlane_ doesn't have crash reporting anymore. Feel free to remove `opt_out_crash_reporting` from your Fastfile."
       end
 
       def self.authors

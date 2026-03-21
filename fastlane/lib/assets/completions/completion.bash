@@ -21,6 +21,6 @@ _fastlane_complete() {
   completions="$(sed -En 's/^[ 	]*lane +:([^ 	]+).*$/\1/p' "$file")"
   completions="$completions update_fastlane"
 
-  COMPREPLY=( $(compgen -W "$completions" -- "$word") )
+  mapfile -t COMPREPLY < <(compgen -W "$completions" -- "$word")
 }
 

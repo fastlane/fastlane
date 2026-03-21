@@ -101,6 +101,16 @@ describe Sigh do
           profiles = fake_runner.fetch_profiles
           expect(profiles.size).to eq(1)
         end
+
+        it "with cert_id filter" do
+          sigh_stub_spaceship_connect(inhouse: false, all_app_identifiers: ["com.krausefx.app"], app_identifier_and_profile_names: { "com.krausefx.app" => ["No dupe here"] })
+
+          options = { app_identifier: "com.krausefx.app", skip_certificate_verification: true, cert_id: "123456789" }
+          Sigh.config = FastlaneCore::Configuration.create(Sigh::Options.available_options, options)
+
+          profiles = fake_runner.fetch_profiles
+          expect(profiles.size).to eq(1)
+        end
       end
 
       context "unsuccessfully" do
@@ -117,6 +127,16 @@ describe Sigh do
           profiles = fake_runner.fetch_profiles
           expect(profiles.size).to eq(0)
         end
+
+        it "with cert_id filter" do
+          sigh_stub_spaceship_connect(inhouse: false, all_app_identifiers: ["com.krausefx.app"], app_identifier_and_profile_names: { "com.krausefx.app" => ["No dupe here"] })
+
+          options = { app_identifier: "com.krausefx.app", skip_certificate_verification: true, cert_id: "987654321" }
+          Sigh.config = FastlaneCore::Configuration.create(Sigh::Options.available_options, options)
+
+          profiles = fake_runner.fetch_profiles
+          expect(profiles.size).to eq(0)
+        end
       end
     end
 
@@ -125,7 +145,7 @@ describe Sigh do
         options = {}
         Sigh.config = FastlaneCore::Configuration.create(Sigh::Options.available_options, options)
 
-        expect(Spaceship::ConnectAPI::Device).not_to(receive(:all))
+        expect(Spaceship::ConnectAPI::Device).not_to(receive(:devices_for_platform))
 
         devices = fake_runner.devices_to_use
         expect(devices.size).to eq(0)
@@ -135,7 +155,7 @@ describe Sigh do
         options = { developer_id: true }
         Sigh.config = FastlaneCore::Configuration.create(Sigh::Options.available_options, options)
 
-        expect(Spaceship::ConnectAPI::Device).not_to(receive(:all))
+        expect(Spaceship::ConnectAPI::Device).not_to(receive(:devices_for_platform))
 
         devices = fake_runner.devices_to_use
         expect(devices.size).to eq(0)
@@ -145,7 +165,7 @@ describe Sigh do
         options = { development: true }
         Sigh.config = FastlaneCore::Configuration.create(Sigh::Options.available_options, options)
 
-        expect(Spaceship::ConnectAPI::Device).to receive(:all).and_return(["device"])
+        expect(Spaceship::ConnectAPI::Device).to receive(:devices_for_platform).and_return(["device"])
 
         devices = fake_runner.devices_to_use
         expect(devices.size).to eq(1)
@@ -155,7 +175,7 @@ describe Sigh do
         options = { development: true, include_mac_in_profiles: true }
         Sigh.config = FastlaneCore::Configuration.create(Sigh::Options.available_options, options)
 
-        expect(Spaceship::ConnectAPI::Device).to receive(:all).and_return(["ios_device", "as_device"])
+        expect(Spaceship::ConnectAPI::Device).to receive(:devices_for_platform).and_return(["ios_device", "as_device"])
 
         devices = fake_runner.devices_to_use
         expect(devices.size).to eq(2)
@@ -165,7 +185,7 @@ describe Sigh do
         options = { adhoc: true }
         Sigh.config = FastlaneCore::Configuration.create(Sigh::Options.available_options, options)
 
-        expect(Spaceship::ConnectAPI::Device).to receive(:all).and_return(["device"])
+        expect(Spaceship::ConnectAPI::Device).to receive(:devices_for_platform).and_return(["device"])
 
         devices = fake_runner.devices_to_use
         expect(devices.size).to eq(1)

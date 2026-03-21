@@ -2,12 +2,12 @@ require 'deliver/upload_metadata'
 require 'tempfile'
 
 describe Deliver::UploadMetadata do
-  let(:uploader) { Deliver::UploadMetadata.new }
   let(:tmpdir) { Dir.mktmpdir }
 
   describe '#load_from_filesystem' do
     context 'with review information' do
       let(:options) { { metadata_path: tmpdir, app_review_information: app_review_information } }
+      let(:uploader) { Deliver::UploadMetadata.new(options) }
 
       def create_metadata(path, text)
         File.open(File.join(path), 'w') do |f|
@@ -33,7 +33,7 @@ describe Deliver::UploadMetadata do
       context 'without app_review_information' do
         let(:app_review_information) { nil }
         it 'can load review information from file' do
-          uploader.load_from_filesystem(options)
+          uploader.load_from_filesystem
           expect(options[:app_review_information][:first_name]).to eql('Alice')
           expect(options[:app_review_information][:last_name]).to eql('Smith')
           expect(options[:app_review_information][:phone_number]).to eql('+819012345678')
@@ -47,7 +47,7 @@ describe Deliver::UploadMetadata do
       context 'with app_review_information' do
         let(:app_review_information) { { notes: 'This is a note from option' } }
         it 'values will be masked by the in options' do
-          uploader.load_from_filesystem(options)
+          uploader.load_from_filesystem
           expect(options[:app_review_information][:first_name]).to eql('Alice')
           expect(options[:app_review_information][:last_name]).to eql('Smith')
           expect(options[:app_review_information][:phone_number]).to eql('+819012345678')
@@ -64,10 +64,25 @@ describe Deliver::UploadMetadata do
     end
   end
 
-  describe "#set_review_information" do
+  describe "#app_rating" do
+    let(:options) { { app_rating_config_path: "/tmp/fake-age-rating.json" } }
+    let(:uploader) { Deliver::UploadMetadata.new(options) }
+
+    it "skips age rating upload when app info cannot be fetched (nil)" do
+      expect(File).not_to receive(:read)
+      expect(FastlaneCore::UI).not_to receive(:message).with("Setting the app's age rating...")
+
+      expect(FastlaneCore::UI).to receive(:important).with("Skipping age rating update because app info could not be fetched.")
+
+      uploader.send("app_rating", nil)
+    end
+  end
+
+  describe "#review_information" do
     let(:options) { { metadata_path: tmpdir, app_review_information: app_review_information } }
     let(:version) { double("version") }
     let(:app_store_review_detail) { double("app_store_review_detail") }
+    let(:uploader) { Deliver::UploadMetadata.new(options) }
 
     context "with review_information" do
       let(:app_review_information) do
@@ -81,8 +96,10 @@ describe Deliver::UploadMetadata do
       end
 
       it "skips review information with empty app_review_information" do
+        options[:app_review_information] = {}
+
         expect(FastlaneCore::UI).not_to receive(:message).with("Uploading app review information to App Store Connect")
-        uploader.send("set_review_information", version, { app_review_information: {} })
+        uploader.send("review_information", version)
       end
 
       it "successfully set review information" do
@@ -100,7 +117,7 @@ describe Deliver::UploadMetadata do
 
         expect(FastlaneCore::UI).to receive(:message).with("Uploading app review information to App Store Connect")
 
-        uploader.send("set_review_information", version, options)
+        uploader.send("review_information", version)
       end
     end
 
@@ -116,7 +133,7 @@ describe Deliver::UploadMetadata do
             "demo_account_required" => true
           })
 
-          uploader.send("set_review_information", version, options)
+          uploader.send("review_information", version)
         end
       end
 
@@ -129,7 +146,7 @@ describe Deliver::UploadMetadata do
             "demo_account_required" => false
           })
 
-          uploader.send("set_review_information", version, options)
+          uploader.send("review_information", version)
         end
       end
 
@@ -142,7 +159,7 @@ describe Deliver::UploadMetadata do
             "demo_account_required" => false
           })
 
-          uploader.send("set_review_information", version, options)
+          uploader.send("review_information", version)
         end
       end
     end
@@ -175,6 +192,10 @@ describe Deliver::UploadMetadata do
              count: 0)
     end
 
+    let(:options) { { version_check_wait_retry_limit: 5 } }
+
+    let(:uploader) { Deliver::UploadMetadata.new(options) }
+
     let(:metadata_path) { Dir.mktmpdir }
 
     context "fetch app edit" do
@@ -182,22 +203,24 @@ describe Deliver::UploadMetadata do
         it "no retry" do
           expect(app).to receive(:get_edit_app_store_version).and_return(version)
 
-          edit_version = uploader.fetch_edit_app_store_version(app, 'IOS', wait_time: 0.1)
+          edit_version = uploader.fetch_edit_app_store_version(app, 'IOS')
           expect(edit_version).to eq(version)
         end
 
         it "1 retry" do
+          expect(Kernel).to receive(:sleep).once.with(20)
           expect(app).to receive(:get_edit_app_store_version).and_return(nil)
           expect(app).to receive(:get_edit_app_store_version).and_return(version)
 
-          edit_version = uploader.fetch_edit_app_store_version(app, 'IOS', wait_time: 0.1)
+          edit_version = uploader.fetch_edit_app_store_version(app, 'IOS')
           expect(edit_version).to eq(version)
         end
 
         it "5 retry" do
+          expect(Kernel).to receive(:sleep).exactly(5).times
           expect(app).to receive(:get_edit_app_store_version).and_return(nil).exactly(5).times
 
-          edit_version = uploader.fetch_edit_app_store_version(app, 'IOS', wait_time: 0.1)
+          edit_version = uploader.fetch_edit_app_store_version(app, 'IOS')
           expect(edit_version).to eq(nil)
         end
       end
@@ -206,34 +229,38 @@ describe Deliver::UploadMetadata do
         it "no retry" do
           expect(app).to receive(:fetch_edit_app_info).and_return(app_info)
 
-          edit_app_info = uploader.fetch_edit_app_info(app, wait_time: 0.1)
+          edit_app_info = uploader.fetch_edit_app_info(app)
           expect(edit_app_info).to eq(app_info)
         end
 
         it "1 retry" do
+          expect(Kernel).to receive(:sleep).once.with(20)
           expect(app).to receive(:fetch_edit_app_info).and_return(nil)
           expect(app).to receive(:fetch_edit_app_info).and_return(app_info)
 
-          edit_app_info = uploader.fetch_edit_app_info(app, wait_time: 0.1)
+          edit_app_info = uploader.fetch_edit_app_info(app)
           expect(edit_app_info).to eq(app_info)
         end
 
         it "5 retry" do
+          expect(Kernel).to receive(:sleep).exactly(5).times
           expect(app).to receive(:fetch_edit_app_info).and_return(nil).exactly(5).times
 
-          edit_app_info = uploader.fetch_edit_app_info(app, wait_time: 0.1)
+          edit_app_info = uploader.fetch_edit_app_info(app)
           expect(edit_app_info).to eq(nil)
         end
       end
     end
 
     context "#upload" do
+      let(:options) { {} }
+
       before do
         allow(Deliver).to receive(:cache).and_return({ app: app })
 
-        allow(uploader).to receive(:set_review_information)
-        allow(uploader).to receive(:set_review_attachment_file)
-        allow(uploader).to receive(:set_app_rating)
+        allow(uploader).to receive(:review_information)
+        allow(uploader).to receive(:review_attachment_file)
+        allow(uploader).to receive(:app_rating)
 
         # Verify available languages
         expect(app).to receive(:id).and_return(id)
@@ -254,12 +281,11 @@ describe Deliver::UploadMetadata do
 
       context "normal metadata" do
         it "saves metadata" do
-          options = {
-              platform: "ios",
-              metadata_path: metadata_path,
-              name: { "en-US" => "App name" },
-              description: { "en-US" => "App description" }
-          }
+          options[:platform] = "ios"
+          options[:metadata_path] = metadata_path
+          options[:name] = { "en-US" => "App name" }
+          options[:description] = { "en-US" => "App description" }
+          options[:version_check_wait_retry_limit] = 5
 
           # Get number of versions (used for if whats_new should be sent)
           expect(Spaceship::ConnectAPI).to receive(:get_app_store_versions).and_return(app_store_versions)
@@ -285,19 +311,42 @@ describe Deliver::UploadMetadata do
           # Update app info
           expect(app_info).to receive(:update_categories).with(category_id_map: {})
 
-          uploader.upload(options)
+          uploader.upload
+        end
+      end
+
+      context "with privacy_url" do
+        it 'saves privacy_url' do
+          options[:platform] = "ios"
+          options[:metadata_path] = metadata_path
+          options[:privacy_url] = { "en-US" => "https://fastlane.tools" }
+          options[:apple_tv_privacy_policy] = { "en-US" => "https://fastlane.tools/tv" }
+          options[:version_check_wait_retry_limit] = 5
+
+          # Get number of versions (used for if whats_new should be sent)
+          expect(Spaceship::ConnectAPI).to receive(:get_app_store_versions).and_return(app_store_versions)
+
+          expect(version).to receive(:update).with(attributes: {})
+
+          # Validate symbol names used when comparing privacy urls before upload
+          expect(app_info_localization_en).to receive(:privacy_policy_url).and_return(options[:privacy_url]["en-US"])
+          expect(app_info_localization_en).to receive(:privacy_policy_text).and_return(options[:apple_tv_privacy_policy]["en-US"])
+
+          # Update app info
+          expect(app_info).to receive(:update_categories).with(category_id_map: {})
+
+          uploader.upload
         end
       end
 
       context "with auto_release_date" do
         it 'with date' do
-          options = {
-              platform: "ios",
-              metadata_path: metadata_path,
-              auto_release_date: 1_595_395_800_000
-          }
+          options[:platform] = "ios"
+          options[:metadata_path] = metadata_path
+          options[:auto_release_date] = 1_595_395_800_000
+          options[:version_check_wait_retry_limit] = 5
 
-          # Get number of verions (used for if whats_new should be sent)
+          # Get number of version (used for if whats_new should be sent)
           expect(Spaceship::ConnectAPI).to receive(:get_app_store_versions).and_return(app_store_versions)
 
           expect(version).to receive(:update).with(attributes: {
@@ -308,20 +357,19 @@ describe Deliver::UploadMetadata do
           # Update app info
           expect(app_info).to receive(:update_categories).with(category_id_map: {})
 
-          uploader.upload(options)
+          uploader.upload
         end
       end
 
       context "with phased_release" do
         it 'with true' do
-          options = {
-              platform: "ios",
-              metadata_path: metadata_path,
-              phased_release: true,
-              automatic_release: false
-          }
+          options[:platform] = "ios"
+          options[:metadata_path] = metadata_path
+          options[:phased_release] = true
+          options[:automatic_release] = false
+          options[:version_check_wait_retry_limit] = 5
 
-          # Get number of verions (used for if whats_new should be sent)
+          # Get number of version (used for if whats_new should be sent)
           expect(Spaceship::ConnectAPI).to receive(:get_app_store_versions).and_return(app_store_versions)
 
           # Defaults to release type manual
@@ -340,17 +388,16 @@ describe Deliver::UploadMetadata do
           # Update app info
           expect(app_info).to receive(:update_categories).with(category_id_map: {})
 
-          uploader.upload(options)
+          uploader.upload
         end
 
         it 'with false' do
-          options = {
-              platform: "ios",
-              metadata_path: metadata_path,
-              phased_release: false
-          }
+          options[:platform] = "ios"
+          options[:metadata_path] = metadata_path
+          options[:phased_release] = false
+          options[:version_check_wait_retry_limit] = 5
 
-          # Get number of verions (used for if whats_new should be sent)
+          # Get number of version (used for if whats_new should be sent)
           expect(Spaceship::ConnectAPI).to receive(:get_app_store_versions).and_return(app_store_versions)
 
           # Defaults to release type manual
@@ -366,19 +413,18 @@ describe Deliver::UploadMetadata do
           # Update app info
           expect(app_info).to receive(:update_categories).with(category_id_map: {})
 
-          uploader.upload(options)
+          uploader.upload
         end
       end
 
       context "with reset_ratings" do
-        it 'with true' do
-          options = {
-              platform: "ios",
-              metadata_path: metadata_path,
-              reset_ratings: true
-          }
+        it 'with select reset_ratings' do
+          options[:platform] = "ios"
+          options[:metadata_path] = metadata_path
+          options[:reset_ratings] = true
+          options[:version_check_wait_retry_limit] = 5
 
-          # Get number of verions (used for if whats_new should be sent)
+          # Get number of version (used for if whats_new should be sent)
           expect(Spaceship::ConnectAPI).to receive(:get_app_store_versions).and_return(app_store_versions)
 
           # Defaults to release type manual
@@ -393,17 +439,16 @@ describe Deliver::UploadMetadata do
           # Update app info
           expect(app_info).to receive(:update_categories).with(category_id_map: {})
 
-          uploader.upload(options)
+          uploader.upload
         end
 
-        it 'with false' do
-          options = {
-              platform: "ios",
-              metadata_path: metadata_path,
-              reset_ratings: false
-          }
+        it 'does not select reset_ratings' do
+          options[:platform] = "ios"
+          options[:metadata_path] = metadata_path
+          options[:reset_ratings] = false
+          options[:version_check_wait_retry_limit] = 5
 
-          # Get number of verions (used for if whats_new should be sent)
+          # Get number of version (used for if whats_new should be sent)
           expect(Spaceship::ConnectAPI).to receive(:get_app_store_versions).and_return(app_store_versions)
 
           # Defaults to release type manual
@@ -419,18 +464,18 @@ describe Deliver::UploadMetadata do
           # Update app info
           expect(app_info).to receive(:update_categories).with(category_id_map: {})
 
-          uploader.upload(options)
+          uploader.upload
         end
       end
 
       context "with no editable app info" do
         let(:live_app_info) { double('app_info') }
         let(:app_info) { nil }
+
         it 'no new app info provided by user' do
-          options = {
-              platform: "ios",
-              metadata_path: metadata_path,
-          }
+          options[:platform] = "ios"
+          options[:metadata_path] = metadata_path
+          options[:version_check_wait_retry_limit] = 5
 
           # Get live app info
           expect(app).to receive(:fetch_live_app_info).and_return(live_app_info)
@@ -439,15 +484,14 @@ describe Deliver::UploadMetadata do
           expect(Spaceship::ConnectAPI).to receive(:get_app_store_versions).and_return(app_store_versions)
           expect(version).to receive(:update).with(attributes: {})
 
-          uploader.upload(options)
+          uploader.upload
         end
 
         it 'same app info as live version' do
-          options = {
-              platform: "ios",
-              metadata_path: metadata_path,
-              name: { "en-US" => "App name" }
-          }
+          options[:platform] = "ios"
+          options[:metadata_path] = metadata_path
+          options[:name] = { "en-US" => "App name" }
+          options[:version_check_wait_retry_limit] = 5
 
           # Get live app info
           expect(app).to receive(:fetch_live_app_info).and_return(live_app_info)
@@ -460,7 +504,7 @@ describe Deliver::UploadMetadata do
           # Get app info localization in English (used to compare with data to upload)
           expect(app_info_localization_en).to receive(:name).and_return('App name')
 
-          uploader.upload(options)
+          uploader.upload
         end
       end
     end
@@ -468,18 +512,20 @@ describe Deliver::UploadMetadata do
     context "fail when not allowed to update" do
       let(:live_app_info) { double('app_info') }
       let(:app_info) { nil }
-      it 'different app info than live version' do
-        options = {
-            platform: "ios",
-            metadata_path: metadata_path,
-            name: { "en-US" => "New app name" }
+      let(:options) {
+        {
+          platform: "ios",
+          metadata_path: metadata_path,
+          name: { "en-US" => "New app name" },
+          version_check_wait_retry_limit: 5,
         }
-
+      }
+      it 'different app info than live version' do
         allow(Deliver).to receive(:cache).and_return({ app: app })
 
-        allow(uploader).to receive(:set_review_information)
-        allow(uploader).to receive(:set_review_attachment_file)
-        allow(uploader).to receive(:set_app_rating)
+        allow(uploader).to receive(:review_information)
+        allow(uploader).to receive(:review_attachment_file)
+        allow(uploader).to receive(:app_rating)
 
         # Get app info
         expect(uploader).to receive(:fetch_edit_app_info).and_return(app_info)
@@ -497,13 +543,14 @@ describe Deliver::UploadMetadata do
         expect(FastlaneCore::UI).to receive(:user_error!).with("Cannot update languages - could not find an editable 'App Info'. Verify that your app is in one of the editable states in App Store Connect").and_call_original
 
         # Get app info localization in English (used to compare with data to upload)
-        expect { uploader.upload(options) }.to raise_error(FastlaneCore::Interface::FastlaneError)
+        expect { uploader.upload }.to raise_error(FastlaneCore::Interface::FastlaneError)
       end
     end
   end
 
   describe "#languages" do
     let(:options) { { metadata_path: tmpdir } }
+    let(:uploader) { Deliver::UploadMetadata.new(options) }
 
     def create_metadata(path, text)
       File.open(File.join(path), 'w') do |f|
@@ -524,8 +571,8 @@ describe Deliver::UploadMetadata do
         create_filesystem_language('de-DE')
         create_filesystem_language('el')
 
-        uploader.load_from_filesystem(options)
-        languages = uploader.detect_languages(options)
+        uploader.load_from_filesystem
+        languages = uploader.detect_languages
 
         expect(languages.sort).to eql(['de-DE', 'el', 'en-US'])
       end
@@ -536,8 +583,8 @@ describe Deliver::UploadMetadata do
         create_filesystem_language('default')
         create_filesystem_language('en-US')
 
-        uploader.load_from_filesystem(options)
-        languages = uploader.detect_languages(options)
+        uploader.load_from_filesystem
+        languages = uploader.detect_languages
 
         expect(languages.sort).to eql(['default', 'en-US'])
       end
@@ -547,8 +594,8 @@ describe Deliver::UploadMetadata do
       it "languages are 'en-AU', 'en-CA', 'en-GB'" do
         options[:languages] = ['en-AU', 'en-CA', 'en-GB']
 
-        uploader.load_from_filesystem(options)
-        languages = uploader.detect_languages(options)
+        uploader.load_from_filesystem
+        languages = uploader.detect_languages
 
         expect(languages.sort).to eql(['en-AU', 'en-CA', 'en-GB'])
       end
@@ -563,8 +610,8 @@ describe Deliver::UploadMetadata do
           'es-MX' => 'something else'
         }
 
-        uploader.load_from_filesystem(options)
-        languages = uploader.detect_languages(options)
+        uploader.load_from_filesystem
+        languages = uploader.detect_languages
 
         expect(languages.sort).to eql(['default', 'es-MX'])
       end
@@ -581,8 +628,8 @@ describe Deliver::UploadMetadata do
           'something'
         )
 
-        uploader.load_from_filesystem(options)
-        languages = uploader.detect_languages(options)
+        uploader.load_from_filesystem
+        languages = uploader.detect_languages
 
         expect(languages.sort).to eql(['default', 'en-US'])
       end
@@ -601,8 +648,8 @@ describe Deliver::UploadMetadata do
         create_filesystem_language('de-DE')
         create_filesystem_language('el')
 
-        uploader.load_from_filesystem(options)
-        languages = uploader.detect_languages(options)
+        uploader.load_from_filesystem
+        languages = uploader.detect_languages
 
         expect(languages.sort).to eql(['de-DE', 'default', 'el', 'en-AU', 'en-CA', 'en-GB', 'en-US', 'es-MX'])
       end
@@ -621,8 +668,8 @@ describe Deliver::UploadMetadata do
         create_filesystem_language('de-DE')
         create_filesystem_language('el')
 
-        uploader.load_from_filesystem(options)
-        uploader.assign_defaults(options)
+        uploader.load_from_filesystem
+        uploader.assign_defaults
 
         expect(options[:release_notes]["en-US"]).to eql('something else')
         expect(options[:release_notes]["es-MX"]).to eql('something else else')

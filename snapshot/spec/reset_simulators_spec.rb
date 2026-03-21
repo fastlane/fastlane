@@ -62,7 +62,7 @@ describe Snapshot::ResetSimulators do
 
   describe '#device_line_usable?' do
     describe 'usable devices' do
-      it "should find normal devices to be be usable" do
+      it "should find normal devices to be usable" do
         usable_devices.each do |usable|
           expect(Snapshot::ResetSimulators.device_line_usable?(usable[0])).to be(true)
         end
@@ -70,7 +70,7 @@ describe Snapshot::ResetSimulators do
     end
 
     describe 'unusable devices' do
-      it "should find devices in bad states to be be unusable" do
+      it "should find devices in bad states to be unusable" do
         unusable_devices.each do |unusable|
           expect(Snapshot::ResetSimulators.device_line_usable?(unusable[0])).to be(false)
         end

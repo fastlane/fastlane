@@ -58,11 +58,13 @@ module Deliver
     def find_folders(options)
       containing = Helper.fastlane_enabled? ? FastlaneCore::FastlaneFolder.path : '.'
       options[:screenshots_path] ||= File.join(containing, 'screenshots')
+      options[:app_previews_path] ||= File.join(containing, 'app-previews')
       options[:metadata_path] ||= File.join(containing, 'metadata')
     end
 
     def ensure_folders_created(options)
       FileUtils.mkdir_p(options[:screenshots_path])
+      FileUtils.mkdir_p(options[:app_previews_path])
       FileUtils.mkdir_p(options[:metadata_path])
     end
 
@@ -92,7 +94,7 @@ module Deliver
       return unless languages
 
       # 2020-08-24 - Available locales are not available as an endpoint in App Store Connect
-      # Update with Spaceship::Tunes.client.available_languages.sort (as long as endpoint is avilable)
+      # Update with Spaceship::Tunes.client.available_languages.sort (as long as endpoint is available)
       all_languages = Deliver::Languages::ALL_LANGUAGES
       diff = languages - all_languages
 

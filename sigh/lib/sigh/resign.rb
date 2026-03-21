@@ -58,7 +58,7 @@ module Sigh
         resign_path.shellescape,
         ipa.shellescape,
         signing_identity.shellescape,
-        provisioning_options, # we are aleady shellescaping this above, when we create the provisioning_options from the provisioning_profiles
+        provisioning_options, # we are already shellescaping this above, when we create the provisioning_options from the provisioning_profiles
         entitlements,
         version,
         display_name,

@@ -49,8 +49,11 @@ describe Fastlane do
 
       it "throws errors when syntax is incorrect" do
         content = File.read('./fastlane/spec/fixtures/broken_files/broken_file.rb', encoding: 'utf-8')
-        expect(UI).to receive(:content_error).with(content, '7')
-        expect(UI).to receive(:content_error).with(content, '8')
+        expect(UI).to receive(:content_error).with(content, '7') # syntax error, unexpected ':', expecting '}'
+        # in ruby < 3.2, the SyntaxError string representation contains a second error
+        if Gem::Version.new(RUBY_VERSION) < Gem::Version.new('3.2')
+          expect(UI).to receive(:content_error).with(content, '8') # syntax error, unexpected ':', expecting `end'
+        end
         expect(UI).to receive(:user_error!).with("Syntax error in broken_file.rb")
         Fastlane::Actions.load_external_actions("./fastlane/spec/fixtures/broken_files")
       end
@@ -82,7 +85,7 @@ describe Fastlane do
         example_action_ref = Fastlane::Actions.action_class_ref("example_action")
         expect(Fastlane::Actions.is_deprecated?(example_action_ref)).to eq(false)
 
-        # An action (depreated)
+        # An action (deprecated)
         deprecated_action_ref = Fastlane::Actions.action_class_ref("deprecated_action")
         expect(Fastlane::Actions.is_deprecated?(deprecated_action_ref)).to eq(true)
 

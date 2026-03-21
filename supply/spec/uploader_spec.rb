@@ -203,23 +203,59 @@ describe Supply do
       end
     end
 
-    describe '#perform_upload' do
+    # add basic == functionality to LocalizedText class for testing purpose
+    class AndroidPublisher::LocalizedText
+      def ==(other)
+        self.language == other.language && self.text == other.text
+      end
+    end
+
+    shared_examples 'run supply to upload metadata' do |version_codes:, with_explicit_changelogs:|
+      let(:languages) { ['en-US', 'fr-FR', 'ja-JP'] }
+      subject(:release) { double('release', version_codes: version_codes) }
       let(:client) { double('client') }
-      let(:config) { { apk: 'some/path/app.apk' } }
+      let(:config) { { apk_paths: version_codes.map { |v_code| "some/path/app-v#{v_code}.apk" }, metadata_path: 'supply/spec/fixtures/metadata/android', track: 'track-name' } }
 
       before do
         Supply.config = config
         allow(Supply::Client).to receive(:make_from_config).and_return(client)
-        allow(client).to receive(:upload_apk).with(config[:apk]).and_return(1) # newly uploaded version code
+        version_codes.each do |version_code|
+          allow(client).to receive(:upload_apk).with("some/path/app-v#{version_code}.apk").and_return(version_code) # newly uploaded version code
+        end
+        allow(client).to receive(:upload_changelogs).and_return(nil)
+        allow(client).to receive(:tracks).with('track-name').and_return([double('tracks', releases: [ release ])])
+        languages.each do |lang|
+          allow(client).to receive(:listing_for_language).with(lang).and_return(Supply::Listing.new(client, lang))
+        end
         allow(client).to receive(:begin_edit).and_return(nil)
         allow(client).to receive(:commit_current_edit!).and_return(nil)
       end
 
-      it 'should update track with correct version codes' do
+      it 'should update track with correct version codes and optional changelog' do
         uploader = Supply::Uploader.new
-        expect(uploader).to receive(:update_track).with([1]).once
+        expect(uploader).to receive(:update_track).with(version_codes).once
+        version_codes.each do |version_code|
+          expected_notes = languages.map do |lang|
+            AndroidPublisher::LocalizedText.new(
+              language: lang,
+              text: "#{lang} changelog #{with_explicit_changelogs ? version_code : -1}"
+            )
+          end.uniq
+          # check if at least one of the assignments of release_notes is what we expect
+          expect(release).to receive(:release_notes=).with(match_array(expected_notes))
+          # check if the listings are updated for each language with text data from disk
+          languages.each do |lang|
+            expect(client).to receive(:update_listing_for_language).with({ language: lang, full_description: "#{lang} full description", short_description: "#{lang} short description", title: "#{lang} title", video: "#{lang} video" })
+          end
+        end
+
         uploader.perform_upload
       end
+    end
+
+    describe '#perform_upload with metadata' do
+      it_behaves_like 'run supply to upload metadata', version_codes: [1, 2], with_explicit_changelogs: true
+      it_behaves_like 'run supply to upload metadata', version_codes: [3], with_explicit_changelogs: false
     end
 
     context 'when sync_image_upload is set' do
@@ -414,6 +450,153 @@ describe Supply do
             ]
             expect(final_remote_images_ids[screenshot_type]).to eq(expected_final_images_ids)
           end
+        end
+      end
+    end
+
+    describe '#update_rollout' do
+      let(:subject) { Supply::Uploader.new }
+      let(:client) { double('client') }
+      let(:version_code) { 123 }
+      let(:config) { { track: 'alpha' } }
+      let(:release) { AndroidPublisher::TrackRelease.new }
+      let(:track) { AndroidPublisher::Track.new }
+
+      before do
+        Supply.config = config
+        allow(Supply::Client).to receive(:make_from_config).and_return(client)
+        allow(client).to receive(:tracks).with('alpha').and_return([track])
+        allow(release).to receive(:version_codes).and_return([version_code])
+        allow(client).to receive(:update_track)
+      end
+
+      shared_examples 'updates track with correct status and rollout' do |rollout:, release_status:, expected_status:, expected_user_fraction:|
+        before do
+          release.status = Supply::ReleaseStatus::IN_PROGRESS
+          track.releases = [release]
+          config[:rollout] = rollout
+          config[:release_status] = release_status
+        end
+
+        it "sets status to #{expected_status} and user_fraction to #{expected_user_fraction.inspect}" do
+          expect(client).to receive(:update_track).with('alpha', track) do |_, track_param|
+            expect(track_param.releases).to eq([release])
+            expect(track_param.releases.first.status).to eq(expected_status)
+            expect(track_param.releases.first.user_fraction).to eq(expected_user_fraction)
+          end
+          subject.update_rollout
+        end
+      end
+
+      shared_examples 'raises error for invalid rollout' do |rollout:, release_status:, expected_error:|
+        before do
+          release.status = Supply::ReleaseStatus::IN_PROGRESS
+          track.releases = [release]
+          config[:rollout] = rollout
+          config[:release_status] = release_status
+        end
+
+        it 'raises an error' do
+          expect { subject.update_rollout }.to raise_error(expected_error)
+        end
+      end
+
+      context 'when rollout is nil' do
+        context 'when release_status is DRAFT' do
+          include_examples 'updates track with correct status and rollout',
+            rollout: nil,
+            release_status: Supply::ReleaseStatus::DRAFT,
+            expected_status: Supply::ReleaseStatus::DRAFT,
+            expected_user_fraction: nil
+        end
+
+        context 'when release_status is IN_PROGRESS' do
+          include_examples 'raises error for invalid rollout',
+            rollout: nil,
+            release_status: Supply::ReleaseStatus::IN_PROGRESS,
+            expected_error: /You need to provide a rollout value when release_status is set to 'inProgress'/
+        end
+
+        context 'when release_status is COMPLETED' do
+          include_examples 'updates track with correct status and rollout',
+            rollout: nil,
+            release_status: Supply::ReleaseStatus::COMPLETED,
+            expected_status: Supply::ReleaseStatus::COMPLETED,
+            expected_user_fraction: nil
+        end
+      end
+
+      context 'when rollout is 0.5' do
+        context 'when release_status is DRAFT' do
+          include_examples 'updates track with correct status and rollout',
+            rollout: 0.5,
+            release_status: Supply::ReleaseStatus::DRAFT,
+            expected_status: Supply::ReleaseStatus::DRAFT,
+            expected_user_fraction: nil # user_fraction is only valid for IN_PROGRESS or HALTED status
+        end
+
+        context 'when release_status is IN_PROGRESS' do
+          include_examples 'updates track with correct status and rollout',
+            rollout: 0.5,
+            release_status: Supply::ReleaseStatus::IN_PROGRESS,
+            expected_status: Supply::ReleaseStatus::IN_PROGRESS,
+            expected_user_fraction: 0.5
+        end
+
+        context 'when release_status is COMPLETED' do
+          include_examples 'updates track with correct status and rollout',
+            rollout: 0.5,
+            release_status: Supply::ReleaseStatus::COMPLETED,
+            # We want to ensure the implementation forces status of IN_PROGRESS when explicit rollout < 1.0 is provided
+            expected_status: Supply::ReleaseStatus::IN_PROGRESS,
+            expected_user_fraction: 0.5
+        end
+      end
+
+      context 'when rollout is 1.0' do
+        context 'when release_status is DRAFT' do
+          include_examples 'updates track with correct status and rollout',
+            rollout: 1.0,
+            release_status: Supply::ReleaseStatus::DRAFT,
+            expected_status: Supply::ReleaseStatus::DRAFT,
+            expected_user_fraction: nil # user_fraction is only valid for IN_PROGRESS or HALTED status
+        end
+
+        context 'when release_status is IN_PROGRESS' do
+          include_examples 'updates track with correct status and rollout',
+            rollout: 1.0,
+            release_status: Supply::ReleaseStatus::IN_PROGRESS,
+            # We want to ensure the implementation forces status of COMPLETED when explicit rollout = 1.0 is provided
+            expected_status: Supply::ReleaseStatus::COMPLETED,
+            expected_user_fraction: nil
+        end
+
+        context 'when release_status is COMPLETED' do
+          include_examples 'updates track with correct status and rollout',
+            rollout: 1.0,
+            release_status: Supply::ReleaseStatus::COMPLETED,
+            expected_status: Supply::ReleaseStatus::COMPLETED,
+            expected_user_fraction: nil
+        end
+      end
+
+      context 'when track is not found' do
+        before do
+          allow(client).to receive(:tracks).with('alpha').and_return([])
+        end
+
+        it 'raises an error' do
+          expect { subject.update_rollout }.to raise_error(/Unable to find the requested track/)
+        end
+      end
+
+      context 'when release is not found' do
+        before do
+          allow(track).to receive(:releases).and_return([])
+        end
+
+        it 'raises an error' do
+          expect { subject.update_rollout }.to raise_error(/Unable to find the requested release on track/)
         end
       end
     end

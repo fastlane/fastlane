@@ -18,7 +18,7 @@ describe Match do
       repo_dir = Dir.mktmpdir
 
       fake_google_cloud_storage = "fake_google_cloud_storage"
-      expect(Match::Storage::GoogleCloudStorage).to receive(:configure).with(
+      expect(Match::Storage::GoogleCloudStorage).to receive(:configure).with({
         type: nil,
         platform: nil,
         google_cloud_bucket_name: nil,
@@ -31,14 +31,14 @@ describe Match do
         api_key_path: nil,
         api_key: nil,
         skip_google_cloud_account_confirmation: nil
-      ).and_return(fake_google_cloud_storage)
+      }).and_return(fake_google_cloud_storage)
 
       allow(fake_google_cloud_storage).to receive(:download)
       allow(fake_google_cloud_storage).to receive(:save_changes!)
       allow(fake_google_cloud_storage).to receive(:bucket_name).and_return("")
 
       fake_git_storage = "fake_git_storage"
-      expect(Match::Storage::GitStorage).to receive(:configure).with(
+      expect(Match::Storage::GitStorage).to receive(:configure).with({
         type: nil,
         platform: nil,
         git_url: git_url,
@@ -51,7 +51,7 @@ describe Match do
         git_basic_authorization: nil,
         git_bearer_authorization: nil,
         git_private_key: nil
-      ).and_return(fake_git_storage)
+      }).and_return(fake_git_storage)
 
       allow(fake_git_storage).to receive(:download)
       allow(fake_git_storage).to receive(:working_directory).and_return(repo_dir)

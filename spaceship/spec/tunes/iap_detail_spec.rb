@@ -1,6 +1,6 @@
 describe Spaceship::Tunes::IAPDetail do
   before { TunesStubbing.itc_stub_iap }
-  before { Spaceship::Tunes.login }
+  include_examples "common spaceship login"
   let(:client) { Spaceship::Application.client }
   let(:app) { Spaceship::Application.all.find { |a| a.apple_id == "898536088" } }
   let(:detailed) { app.in_app_purchases.find("go.find.me").edit }

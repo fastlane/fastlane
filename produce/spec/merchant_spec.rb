@@ -78,8 +78,8 @@ describe Produce::Merchant do
       allow(Produce::Merchant).to receive(:mac?).and_return(true)
       allow(merchant_repo).to receive(:find).and_return(merchant_0)
 
-      result_0 = Produce::Merchant.find_merchant("some-identfier", merchant: merchant_repo)
-      result_1 = Produce::Merchant.find_merchant("some-identfier", merchant: merchant_repo)
+      result_0 = Produce::Merchant.find_merchant("some-identifier", merchant: merchant_repo)
+      result_1 = Produce::Merchant.find_merchant("some-identifier", merchant: merchant_repo)
 
       expect(result_0).to equal(result_1)
     end
@@ -89,11 +89,11 @@ describe Produce::Merchant do
       merchant_1 = Object.new
       allow(Produce::Merchant).to receive(:mac?).and_return(true)
       merchant_repo = Object.new
-      allow(merchant_repo).to receive(:find).with("some-identfier-0", any_args).and_return(merchant_0)
-      allow(merchant_repo).to receive(:find).with("some-identfier-1", any_args).and_return(merchant_1)
+      allow(merchant_repo).to receive(:find).with("some-identifier-0", any_args).and_return(merchant_0)
+      allow(merchant_repo).to receive(:find).with("some-identifier-1", any_args).and_return(merchant_1)
 
-      result_0 = Produce::Merchant.find_merchant("some-identfier-0", merchant: merchant_repo)
-      result_1 = Produce::Merchant.find_merchant("some-identfier-1", merchant: merchant_repo)
+      result_0 = Produce::Merchant.find_merchant("some-identifier-0", merchant: merchant_repo)
+      result_1 = Produce::Merchant.find_merchant("some-identifier-1", merchant: merchant_repo)
 
       expect(result_0).to equal(merchant_0)
       expect(result_1).to equal(merchant_1)

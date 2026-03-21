@@ -90,7 +90,7 @@ module Fastlane
             UI.error(txt)
           end
 
-          # Raise a custom exception, as the the normal one is useless for the user
+          # Raise a custom exception, as the normal one is useless for the user
           UI.user_error!("A build error occurred, this is usually related to code signing. Take a look at the error above")
         end
       end

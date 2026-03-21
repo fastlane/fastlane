@@ -9,7 +9,7 @@ describe FastlaneCore::QueueWorker do
   describe '#enqueue' do
     subject { described_class.new(1) { |_| } }
 
-    it 'should accepet any object' do
+    it 'should accept any object' do
       expect { subject.enqueue(1) }.not_to(raise_error)
       expect { subject.enqueue('aaa') }.not_to(raise_error)
       expect { subject.enqueue([1, 2, 3]) }.not_to(raise_error)

@@ -38,6 +38,11 @@ module Scan
           return
         when /Testing failed/
           UI.build_failure!("Error building the application. #{details}")
+        when /Testing started.*\*\* TEST FAILED \*\*/m, /Testing started.*\*\* TEST EXECUTE FAILED \*\*/m
+          # Xcode 26+: If we see both "Testing started" and "** TEST FAILED **"
+          # or "** TEST EXECUTE FAILED **" (test-without-building), then tests
+          # were executed but failed.
+          return
         when /Executed/, /Failing tests:/
           # this is *really* important:
           # we don't want to raise an exception here

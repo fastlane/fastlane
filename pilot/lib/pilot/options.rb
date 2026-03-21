@@ -49,7 +49,7 @@ module Pilot
                                      description: "The platform to use (optional)",
                                      optional: true,
                                      verify_block: proc do |value|
-                                       UI.user_error!("The platform can only be ios, appletvos, or osx") unless ['ios', 'appletvos', 'osx'].include?(value)
+                                       UI.user_error!("The platform can only be ios, appletvos, osx, or xros") unless ['ios', 'appletvos', 'osx', 'xros'].include?(value)
                                      end),
         FastlaneCore::ConfigItem.new(key: :apple_id,
                                      short_option: "-p",

@@ -109,33 +109,34 @@ module Snapshot
           end
         }
       ]
+      error_proc = proc do |output, return_code|
+        self.collected_errors.concat(failed_devices.map do |device, messages|
+          "#{device}: #{messages.join(', ')}"
+        end)
+
+        cleanup_after_failure(devices, language, locale, launch_args, return_code)
+
+        # no exception raised... that means we need to retry
+        UI.error("Caught error... #{return_code}")
+
+        self.current_number_of_retries_due_to_failing_simulator += 1
+        if self.current_number_of_retries_due_to_failing_simulator < 20 && return_code != 65
+          # If the return code is not 65, we should assume its a simulator failure and retry
+          launch_simultaneously(devices, language, locale, launch_args)
+        elsif retries < launcher_config.number_of_retries
+          # If there are retries remaining, run the tests again
+          retry_tests(retries, command, language, locale, launch_args, devices)
+        else
+          # It's important to raise an error, as we don't want to collect the screenshots
+          UI.crash!("Too many errors... no more retries...") if launcher_config.stop_after_first_error
+        end
+      end
       FastlaneCore::CommandExecutor.execute(command: command,
                                           print_all: true,
                                       print_command: true,
                                              prefix: prefix_hash,
                                             loading: "Loading...",
-                                              error: proc do |output, return_code|
-                                                self.collected_errors.concat(failed_devices.map do |device, messages|
-                                                  "#{device}: #{messages.join(', ')}"
-                                                end)
-
-                                                cleanup_after_failure(devices, language, locale, launch_args, return_code)
-
-                                                # no exception raised... that means we need to retry
-                                                UI.error("Caught error... #{return_code}")
-
-                                                self.current_number_of_retries_due_to_failing_simulator += 1
-                                                if self.current_number_of_retries_due_to_failing_simulator < 20 && return_code != 65
-                                                  # If the return code is not 65, we should assume its a simulator failure and retry
-                                                  launch_simultaneously(devices, language, locale, launch_args)
-                                                elsif retries < launcher_config.number_of_retries
-                                                  # If there are retries remaining, run the tests again
-                                                  retry_tests(retries, command, language, locale, launch_args, devices)
-                                                else
-                                                  # It's important to raise an error, as we don't want to collect the screenshots
-                                                  UI.crash!("Too many errors... no more retries...") if launcher_config.stop_after_first_error
-                                                end
-                                              end)
+                                              error: error_proc)
     end
 
     def cleanup_after_failure(devices, language, locale, launch_args, return_code)

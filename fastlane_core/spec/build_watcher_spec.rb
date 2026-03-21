@@ -13,7 +13,18 @@ describe FastlaneCore::BuildWatcher do
     end
     let(:ready_build) do
       double(
+        id: '123',
         app_version: "1.0",
+        version: "1",
+        processed?: true,
+        platform: 'IOS',
+        processing_state: 'VALID'
+      )
+    end
+    let(:ready_build_dup) do
+      double(
+        id: '321',
+        app_version: "1.0.0",
         version: "1",
         processed?: true,
         platform: 'IOS',
@@ -133,7 +144,7 @@ describe FastlaneCore::BuildWatcher do
     describe 'multiple builds found' do
       describe 'select_latest is false' do
         it 'raises error select_latest is false' do
-          builds = [ready_build, ready_build]
+          builds = [ready_build, ready_build_dup]
 
           expect(Spaceship::ConnectAPI::Build).to receive(:all).with(options_1_0).and_return([])
           expect(Spaceship::ConnectAPI::Build).to receive(:all).with(options_1_0_0).and_return([])
@@ -155,6 +166,7 @@ describe FastlaneCore::BuildWatcher do
       describe 'select_latest is true' do
         let(:newest_ready_build) do
           double(
+            id: "853",
             app_version: "1.0",
             version: "2",
             processed?: true,
@@ -479,6 +491,7 @@ describe FastlaneCore::BuildWatcher do
 
         let(:newest_ready_build) do
           double(
+            id: '482',
             app_version: "1.0",
             version: "2",
             processed?: true,

@@ -42,22 +42,22 @@ module Precheck
 
         result = rule.check_item(item)
         expect(result.status).to eq(VALIDATION_STATES[:failed])
-        expect(result.rule_return.failure_data).to eq("http://fastlane.tools")
+        expect(result.rule_return.failure_data).to eq("HTTP 500: http://fastlane.tools")
 
         setup_url_rule_mock(return_status: 404)
         result = rule.check_item(item)
         expect(result.status).to eq(VALIDATION_STATES[:failed])
-        expect(result.rule_return.failure_data).to eq("http://fastlane.tools")
+        expect(result.rule_return.failure_data).to eq("HTTP 404: http://fastlane.tools")
 
         setup_url_rule_mock(return_status: 409)
         result = rule.check_item(item)
         expect(result.status).to eq(VALIDATION_STATES[:failed])
-        expect(result.rule_return.failure_data).to eq("http://fastlane.tools")
+        expect(result.rule_return.failure_data).to eq("HTTP 409: http://fastlane.tools")
 
         setup_url_rule_mock(return_status: 403)
         result = rule.check_item(item)
         expect(result.status).to eq(VALIDATION_STATES[:failed])
-        expect(result.rule_return.failure_data).to eq("http://fastlane.tools")
+        expect(result.rule_return.failure_data).to eq("HTTP 403: http://fastlane.tools")
       end
 
       it "fails if not optional and URL is nil" do

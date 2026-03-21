@@ -52,7 +52,7 @@ module Fastlane
           self.homepage = hash["homepage_uri"] || hash["documentation_uri"]
           self.raw_hash = hash
 
-          has_github_page = self.homepage.to_s.include?("https://github.com") # Here we can add non GitHub support one day
+          has_github_page = self.homepage.to_s.start_with?("https://github.com") # Here we can add non GitHub support one day
 
           self.data = {
             has_homepage: self.homepage.to_s.length > 5,
@@ -67,7 +67,11 @@ module Fastlane
           }
 
           if File.exist?(cache_path)
-            self.cache = YAML.load_file(cache_path)
+            self.cache = YAML.safe_load(
+              File.read(cache_path),
+              permitted_classes: [Date, Time, Symbol, FastlanePluginAction],
+              aliases: true
+            )
           else
             self.cache = {}
           end
