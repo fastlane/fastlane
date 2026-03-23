@@ -290,6 +290,14 @@ describe Spaceship::ProvisioningProfile do
       profile.repair!
     end
 
+    it "raises when no valid signing certificates are available" do
+      allow(profile).to receive(:certificate_valid?).and_return(false)
+      allow(profile).to receive(:suggested_certificates).and_return([])
+      expect do
+        profile.repair!
+      end.to raise_error(/No valid signing certificates were found/)
+    end
+
     it "handles nil certificates in the certificate list" do
       original_details = profile.profile_details
       certificates_with_nil = original_details["certificates"].dup

@@ -452,7 +452,13 @@ module Spaceship
       end
 
       def ensure_valid_certificate_selection!
-        self.certificates = suggested_certificates
+        certs = suggested_certificates
+        if certs.nil? || certs.empty?
+          raise "No valid signing certificates were found to repair or regenerate this provisioning profile. " \
+                "Please create or import an appropriate signing certificate in your Apple Developer account " \
+                "and try again."
+        end
+        self.certificates = certs
       end
 
       def suggested_certificates
@@ -545,13 +551,9 @@ module Spaceship
 
       def certificates
         if @certificates
-          @certificates = @certificates.compact
-
           # `@certificates` can be pre-populated from different sources (e.g. Xcode API/raw data).
-          # Ensure we only ever expose real Certificate model objects here.
-          if @certificates.any? { |c| !c.kind_of?(Spaceship::Portal::Certificate) }
-            @certificates = []
-          end
+          # Filter to only real Certificate objects rather than clearing all on a single stray value.
+          @certificates = @certificates.compact.select { |c| c.kind_of?(Spaceship::Portal::Certificate) }
         end
 
         if (@certificates || []).empty?
