@@ -6,7 +6,7 @@ module Fastlane
         require 'sigh'
 
         # try to resign the ipa
-        if Sigh::Resign.resign(params[:ipa], params[:signing_identity], params[:provisioning_profile], params[:entitlements], params[:version], params[:display_name], params[:short_version], params[:bundle_version], params[:bundle_id], params[:use_app_entitlements], params[:keychain_path])
+        if Sigh::Resign.resign(params[:ipa], params[:signing_identity], params[:provisioning_profile], params[:entitlements], params[:version], params[:display_name], params[:short_version], params[:bundle_version], params[:bundle_id], params[:use_app_entitlements], params[:keychain_path], params[:pagesize])
           UI.success('Successfully re-signed .ipa 🔏.')
         else
           UI.user_error!("Failed to re-sign .ipa")
@@ -109,6 +109,11 @@ module Fastlane
           FastlaneCore::ConfigItem.new(key: :keychain_path,
                                        env_name: "FL_RESIGN_KEYCHAIN_PATH",
                                        description: "Provide a path to a keychain file that should be used by `/usr/bin/codesign`",
+                                       optional: true),
+          FastlaneCore::ConfigItem.new(key: :pagesize,
+                                       env_name: "FL_RESIGN_PAGESIZE",
+                                       description: "Page size in bytes passed to `/usr/bin/codesign --pagesize` (must be a power of two)",
+                                       type: Integer,
                                        optional: true)
         ]
       end
