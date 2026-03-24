@@ -562,6 +562,8 @@ function resign {
         do
             if [[ "$assetpack" == *.assetpack ]]; then
                 rm -rf "$assetpack"/_CodeSignature
+                # Must not quote PAGESIZE_FLAG because it needs to be unwrapped and passed to codesign with spaces
+                # shellcheck disable=SC2086
                 /usr/bin/codesign ${VERBOSE} ${PAGESIZE_FLAG} --generate-entitlement-der "${KEYCHAIN_FLAG}" -f -s "$CERTIFICATE" "$assetpack"
                 checkStatus
             else
@@ -582,7 +584,7 @@ function resign {
         do
             if [[ "$framework" == *.framework || "$framework" == *.dylib ]]; then
                 log "Resigning '$framework'"
-                # Must not quote KEYCHAIN_FLAG because it needs to be unwrapped and passed to codesign with spaces
+                # Must not quote KEYCHAIN_FLAG, PAGESIZE_FLAG because they need to be unwrapped and passed to codesign with spaces
                 # shellcheck disable=SC2086
                 /usr/bin/codesign ${VERBOSE} ${PAGESIZE_FLAG} --generate-entitlement-der ${KEYCHAIN_FLAG} -f -s "$CERTIFICATE" "$framework"
                 checkStatus
@@ -638,6 +640,8 @@ function resign {
             log "Creating an archived-expanded-entitlements.xcent file for Xcode 9 builds or earlier"
             cp -f "$ENTITLEMENTS" "$APP_PATH/archived-expanded-entitlements.xcent"
         fi
+        # Must not quote PAGESIZE_FLAG because it needs to be unwrapped and passed to codesign with spaces
+        # shellcheck disable=SC2086
         /usr/bin/codesign ${VERBOSE} ${PAGESIZE_FLAG} --generate-entitlement-der -f -s "$CERTIFICATE" --entitlements "$ENTITLEMENTS" "$APP_PATH"
         checkStatus
     elif  [[ -n "${USE_APP_ENTITLEMENTS}" ]]; then
@@ -883,6 +887,8 @@ function resign {
             log "Creating an archived-expanded-entitlements.xcent file for Xcode 9 builds or earlier"
             cp -f "$PATCHED_ENTITLEMENTS" "$APP_PATH/archived-expanded-entitlements.xcent"
         fi
+        # Must not quote PAGESIZE_FLAG because it needs to be unwrapped and passed to codesign with spaces
+        # shellcheck disable=SC2086
         /usr/bin/codesign ${VERBOSE} ${PAGESIZE_FLAG} --generate-entitlement-der -f -s "$CERTIFICATE" --entitlements "$PATCHED_ENTITLEMENTS" "$APP_PATH"
         checkStatus
     else
@@ -895,7 +901,7 @@ function resign {
             log "Creating an archived-expanded-entitlements.xcent file for Xcode 9 builds or earlier"
             cp -- "$TEMP_DIR/newEntitlements" "$APP_PATH/archived-expanded-entitlements.xcent"
         fi
-        # Must not quote KEYCHAIN_FLAG because it needs to be unwrapped and passed to codesign with spaces
+        # Must not quote KEYCHAIN_FLAG, PAGESIZE_FLAG because they need to be unwrapped and passed to codesign with spaces
         # shellcheck disable=SC2086
         /usr/bin/codesign ${VERBOSE} ${PAGESIZE_FLAG} --generate-entitlement-der ${KEYCHAIN_FLAG} -f -s "$CERTIFICATE" --entitlements "$TEMP_DIR/newEntitlements" "$APP_PATH"
         checkStatus
