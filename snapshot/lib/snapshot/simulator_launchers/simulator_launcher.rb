@@ -4,7 +4,7 @@ require_relative 'simulator_launcher_base'
 module Snapshot
   class CPUInspector
     def self.hwprefs_available?
-      !FastlaneCore::Helper.which('hwprefs').nil?
+      !!FastlaneCore::Helper.which('hwprefs')
     end
 
     def self.cpu_count

@@ -14,7 +14,7 @@ module FastlaneCore
     end
 
     def self.is_supported?
-      return !FastlaneCore::Helper.which('pbcopy').nil? && !FastlaneCore::Helper.which('pbpaste').nil?
+      return FastlaneCore::Helper.which('pbcopy') && FastlaneCore::Helper.which('pbpaste')
     end
   end
 end

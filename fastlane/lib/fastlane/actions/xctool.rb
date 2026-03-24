@@ -4,7 +4,7 @@ module Fastlane
       def self.run(params)
         UI.important("Have you seen the new 'scan' tool to run tests? https://docs.fastlane.tools/actions/scan/")
         unless Helper.test?
-          UI.user_error!("xctool not installed, please install using `brew install xctool`") if Helper.which('xctool').nil?
+          UI.user_error!("xctool not installed, please install using `brew install xctool`") unless Helper.which('xctool')
         end
 
         params = [] if params.kind_of?(FastlaneCore::Configuration)

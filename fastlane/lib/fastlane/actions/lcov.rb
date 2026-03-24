@@ -7,7 +7,7 @@ module Fastlane
 
       def self.run(options)
         unless Helper.test?
-          UI.user_error!("lcov not installed, please install using `brew install lcov`") if Helper.which('lcov').nil?
+          UI.user_error!("lcov not installed, please install using `brew install lcov`") unless Helper.which('lcov')
         end
         gen_cov(options)
       end

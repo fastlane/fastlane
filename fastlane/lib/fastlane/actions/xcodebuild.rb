@@ -74,7 +74,7 @@ module Fastlane
 
       def self.run(params)
         unless Helper.test?
-          UI.user_error!("xcodebuild not installed") if Helper.which('xcodebuild').nil?
+          UI.user_error!("xcodebuild not installed") unless Helper.which('xcodebuild')
         end
 
         # The args we will build with

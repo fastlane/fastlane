@@ -5,7 +5,7 @@ module Fastlane
     class InstallOnDeviceAction < Action
       def self.run(params)
         unless Helper.test?
-          UI.user_error!("ios-deploy not installed, see https://github.com/ios-control/ios-deploy for instructions") if Helper.which('ios-deploy').nil?
+          UI.user_error!("ios-deploy not installed, see https://github.com/ios-control/ios-deploy for instructions") unless Helper.which('ios-deploy')
         end
         taxi_cmd = [
           "ios-deploy",

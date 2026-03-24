@@ -40,7 +40,7 @@ module Fastlane
       end
 
       def self.verify_sonar_scanner_binary
-        UI.user_error!("You have to install sonar-scanner using `brew install sonar-scanner`") if Helper.which('sonar-scanner').nil?
+        UI.user_error!("You have to install sonar-scanner using `brew install sonar-scanner`") unless Helper.which('sonar-scanner')
       end
 
       #####################################################

@@ -2,7 +2,7 @@ module Fastlane
   module Actions
     class SourcedocsAction < Action
       def self.run(params)
-        UI.user_error!("You have to install sourcedocs using `brew install sourcedocs`") if Helper.which('sourcedocs').nil? && !Helper.test?
+        UI.user_error!("You have to install sourcedocs using `brew install sourcedocs`") unless Helper.which('sourcedocs') || Helper.test?
 
         command =  "sourcedocs generate"
         command << " --all-modules" if params[:all_modules]
