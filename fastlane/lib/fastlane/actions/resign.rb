@@ -116,11 +116,11 @@ module Fastlane
                                        type: Integer,
                                        optional: true,
                                        verify_block: proc do |value|
-                                        next if value.nil?
-                                        unless value.is_a?(Integer) && value.positive? && (value & (value - 1)).zero?
-                                          UI.user_error!("'pagesize' must be a positive power of two. Provided value: #{value}")
-                                        end
-                                      end)
+                                         next if value.nil?
+                                         unless value.kind_of?(Integer) && value.positive? && (value & (value - 1)).zero?
+                                           UI.user_error!("'pagesize' must be a positive power of two. Provided value: #{value}")
+                                         end
+                                       end)
         ]
       end
 
