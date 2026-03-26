@@ -14,11 +14,14 @@ module Frameit
     DisplayType::APP_IPHONE_61 => "iOS-6.1-in",
     DisplayType::APP_IPHONE_65 => "iOS-6.5-in",
     DisplayType::APP_IPHONE_67 => "iOS-6.7-in",
+    DisplayType::APP_IPHONE_63 => "iOS-6.3-in",
+    DisplayType::APP_IPHONE_69 => "iOS-6.9-in",
     DisplayType::APP_IPAD_97 => "iOS-iPad",
     DisplayType::APP_IPAD_105 => "iOS-iPad-10.5",
     DisplayType::APP_IPAD_PRO_3GEN_11 => "iOS-iPad-11",
     DisplayType::APP_IPAD_PRO_129 => "iOS-iPad-Pro",
     DisplayType::APP_IPAD_PRO_3GEN_129 => "iOS-iPad-Pro-12.9",
+    DisplayType::APP_IPAD_PRO_13 => "iOS-iPad-Pro-13",
     DisplayType::IMESSAGE_APP_IPHONE_40 => "iOS-4-in-messages",
     DisplayType::IMESSAGE_APP_IPHONE_47 => "iOS-4.7-in-messages",
     DisplayType::IMESSAGE_APP_IPHONE_55 => "iOS-5.5-in-messages",
@@ -89,6 +92,7 @@ module Frameit
     STARLIGHT ||= "Starlight"
     SIERRA ||= "Sierra"
     SORTA_SAGE ||= "Sorta Sage"
+    COSMIC_ORANGE ||= "Cosmic Orange"
 
     def self.all_colors
       Color.constants.map { |c| Color.const_get(c).upcase.gsub(' ', '_') }
@@ -194,6 +198,13 @@ module Frameit
 
     MAC ||= Device.new("mac", "Apple MacBook", 0, [[1280, 800], [1440, 900], [2560, 1600], [2880, 1800]], nil, Color::SPACE_GRAY, Platform::IOS, DEVICE_SCREEN_IDS[DisplayType::APP_DESKTOP])
 
+
+    # iPhone 17 series
+    IPHONE_17_PRO ||= Device.new("iphone-17-pro", "Apple iPhone 17 Pro", 13, [[1206, 2622], [2622, 1206]], 460, Color::COSMIC_ORANGE, Platform::IOS, DEVICE_SCREEN_IDS[DisplayType::APP_IPHONE_63])
+    IPHONE_17_PRO_MAX ||= Device.new("iphone17-pro-max", "Apple iPhone 17 Pro Max", 13, [[1320, 2868], [2868, 1320]], 460, Color::COSMIC_ORANGE, Platform::IOS, DEVICE_SCREEN_IDS[DisplayType::APP_IPHONE_69])
+
+    # iPad Pro 13-inch (M5)
+    IPAD_PRO_13 ||= Device.new("ipadPro13", "Apple iPad Pro 13-inch (M5)", 4, [[2064, 2752], [2752, 2064]], 264, Color::SPACE_GRAY, Platform::IOS, DEVICE_SCREEN_IDS[DisplayType::APP_IPAD_PRO_13])
     def self.all_device_names_without_apple
       Devices.constants.map { |c| Devices.const_get(c).formatted_name_without_apple }
     end
