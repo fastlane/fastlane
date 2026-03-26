@@ -114,7 +114,13 @@ module Fastlane
                                        env_name: "FL_RESIGN_PAGESIZE",
                                        description: "Page size in bytes passed to `/usr/bin/codesign --pagesize` (must be a power of two)",
                                        type: Integer,
-                                       optional: true)
+                                       optional: true,
+                                       verify_block: proc do |value|
+                                        next if value.nil?
+                                        unless value.is_a?(Integer) && value.positive? && (value & (value - 1)).zero?
+                                          UI.user_error!("'pagesize' must be a positive power of two. Provided value: #{value}")
+                                        end
+                                      end)
         ]
       end
 
