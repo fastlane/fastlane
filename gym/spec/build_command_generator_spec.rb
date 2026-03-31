@@ -237,7 +237,7 @@ describe Gym do
         expect(result.to_s).to include(File.expand_path("#{FastlaneCore::Helper.buildlog_path}/gym"))
       end
 
-      it "#xcodebuild_log_path uses app_name when provided" do
+      it "#xcodebuild_log_path uses app_name when provided", requires_xcodebuild: true do
         options = { project: "./gym/examples/standard/Example.xcodeproj", buildlog_path: "/tmp/my/path", scheme: 'Example', app_name: 'CustomApp' }
         Gym.config = FastlaneCore::Configuration.create(Gym::Options.available_options, options)
         expect(Gym.project).not_to receive(:app_name)
@@ -249,11 +249,12 @@ describe Gym do
     describe "Derived Data Example" do
       before(:each) do
         options = { project: "./gym/examples/standard/Example.xcodeproj", derived_data_path: "/tmp/my/derived_data", scheme: 'Example' }
-        Gym.config = FastlaneCore::Configuration.create(Gym::Options.available_options, options)
-        @project = FastlaneCore::Project.new(Gym.config)
+        config = FastlaneCore::Configuration.create(Gym::Options.available_options, options)
+        @project = FastlaneCore::Project.new(config)
         allow(Gym).to receive(:project).and_return(@project)
       end
       it "uses the correct build command with the example project", requires_xcodebuild: true do
+        Gym.config = FastlaneCore::Configuration.create(Gym::Options.available_options, { project: "./gym/examples/standard/Example.xcodeproj", derived_data_path: "/tmp/my/derived_data", scheme: 'Example' })
         log_path = File.expand_path("#{FastlaneCore::Helper.buildlog_path}/gym/ExampleProductName-Example.log")
 
         result = Gym::BuildCommandGenerator.generate
