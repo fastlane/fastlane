@@ -34,7 +34,7 @@ module Fastlane
           "If you don't want to verify an HTML preview for App Store builds, use the `:force` option.",
           "This is useful when running _fastlane_ on your Continuous Integration server:",
           "`_upload_to_app_store_(force: true)`",
-          "If your account is on multiple teams and you need to tell the `iTMSTransporter` which 'provider' to use, you can set the `:itc_provider` option to pass this info."
+          "If your account is on multiple teams and you need to tell the transporter which provider to use, you can set `:itc_provider` or `:provider_public_id`."
         ].join("\n")
       end
 
