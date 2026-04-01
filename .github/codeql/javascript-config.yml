@@ -1,0 +1,5 @@
+queries:
+  - uses: security-and-quality
+
+paths-ignore:
+  - 'spaceship/spec/tunes/fixtures/login_cntrl.js'
