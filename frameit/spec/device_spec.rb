@@ -38,6 +38,36 @@ describe Frameit::Device do
         expect_screen_size_from_file("screenshot-Landscape{2532x1170}.jpg", Platform::IOS).to eq(Devices::IPHONE_14)
       end
 
+      it "should detect iPhone 16 in portrait and landscape based on priority" do
+        expect_screen_size_from_file("screenshot-Portrait{1179x2556}.jpg", Platform::IOS).to eq(Devices::IPHONE_16)
+        expect_screen_size_from_file("screenshot-Landscape{2556x1179}.jpg", Platform::IOS).to eq(Devices::IPHONE_16)
+      end
+
+      it "should detect iPhone 16 Plus in portrait and landscape based on priority" do
+        expect_screen_size_from_file("screenshot-Portrait{1290x2796}.jpg", Platform::IOS).to eq(Devices::IPHONE_16_PLUS)
+        expect_screen_size_from_file("screenshot-Landscape{2796x1290}.jpg", Platform::IOS).to eq(Devices::IPHONE_16_PLUS)
+      end
+
+      it "should detect iPhone 16 Pro instead of iPhone 16 because of the file name containing device name" do
+        expect_screen_size_from_file("Apple iPhone 16 Pro-Portrait{1206x2622}.jpg", Platform::IOS).to eq(Devices::IPHONE_16_PRO)
+        expect_screen_size_from_file("Apple iPhone 16 Pro-Landscape{2622x1206}.jpg", Platform::IOS).to eq(Devices::IPHONE_16_PRO)
+      end
+
+      it "should detect iPhone 17 Pro in portrait and landscape based on priority" do
+        expect_screen_size_from_file("screenshot-Portrait{1206x2622}.jpg", Platform::IOS).to eq(Devices::IPHONE_17_PRO)
+        expect_screen_size_from_file("screenshot-Landscape{2622x1206}.jpg", Platform::IOS).to eq(Devices::IPHONE_17_PRO)
+      end
+
+      it "should detect iPhone 17 Pro Max in portrait and landscape based on priority" do
+        expect_screen_size_from_file("screenshot-Portrait{1320x2868}.jpg", Platform::IOS).to eq(Devices::IPHONE_17_PRO_MAX)
+        expect_screen_size_from_file("screenshot-Landscape{2868x1320}.jpg", Platform::IOS).to eq(Devices::IPHONE_17_PRO_MAX)
+      end
+
+      it "should detect iPhone 17 instead of iPhone 17 Pro because of the file name containing device name" do
+        expect_screen_size_from_file("Apple iPhone 17-Portrait{1206x2622}.jpg", Platform::IOS).to eq(Devices::IPHONE_17)
+        expect_screen_size_from_file("Apple iPhone 17-Landscape{2622x1206}.jpg", Platform::IOS).to eq(Devices::IPHONE_17)
+      end
+
       it "should detect iPhone X instead of iPhone XS because of the file name containing device name" do
         expect_screen_size_from_file("Apple iPhone X-Portrait{1125x2436}.jpg", Platform::IOS).to eq(Devices::IPHONE_X)
         expect_screen_size_from_file("Apple iPhone X-Landscape{2436x1125}.jpg", Platform::IOS).to eq(Devices::IPHONE_X)
@@ -89,6 +119,30 @@ describe Frameit::Device do
 
       it "should force iPhone XS despite arbitrary file name and resolution via display type string" do
         expect_forced_screen_size("iOS-5.8-in").to eq(Devices::IPHONE_XS)
+      end
+
+      it "should force iPhone 16 via device ID" do
+        expect_forced_screen_size("iphone-16").to eq(Devices::IPHONE_16)
+      end
+
+      it "should force iPhone 16 Pro Max via device ID" do
+        expect_forced_screen_size("iphone16-pro-max").to eq(Devices::IPHONE_16_PRO_MAX)
+      end
+
+      it "should force iPhone 17 via device ID" do
+        expect_forced_screen_size("iphone-17").to eq(Devices::IPHONE_17)
+      end
+
+      it "should force iPhone 17 via device name" do
+        expect_forced_screen_size("iPhone 17").to eq(Devices::IPHONE_17)
+      end
+
+      it "should force iPhone 17 via display type string" do
+        expect_forced_screen_size("iOS-6.1-in").to eq(Devices::IPHONE_17)
+      end
+
+      it "should force iPhone 17 Pro Max via display type string" do
+        expect_forced_screen_size("iOS-6.7-in").to eq(Devices::IPHONE_17_PRO_MAX)
       end
     end
 
