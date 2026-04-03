@@ -97,12 +97,16 @@ module Scan
 
     def self.filter_simulators(simulators, operator = :greater_than_or_equal, deployment_target)
       deployment_target_version = Gem::Version.new(deployment_target)
+      target_segment_count = deployment_target.to_s.split('.').length
       simulators.select do |s|
         sim_version = Gem::Version.new(s.os_version)
         if operator == :greater_than_or_equal
           sim_version >= deployment_target_version
         elsif operator == :equal
-          sim_version == deployment_target_version
+          # Truncate the simulator version to the same number of segments as the
+          # specifier so that e.g. "26.3" matches a simulator running "26.3.1".
+          truncated = s.os_version.to_s.split('.').first(target_segment_count).join('.')
+          Gem::Version.new(truncated) == deployment_target_version
         else
           false # this will show an error message in the detect_simulator method
         end
