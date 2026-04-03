@@ -1,0 +1,26 @@
+{
+  "data": {
+    "type": "webhooks",
+    "id": "webhook-789",
+    "attributes": {
+      "enabled": true,
+      "eventTypes": ["BUILD_UPLOAD_STATE_UPDATED"],
+      "name": "New Webhook",
+      "url": "https://new.example.com/webhook"
+    },
+    "relationships": {
+      "deliveries": {
+        "links": {
+          "self": "https://api.appstoreconnect.apple.com/v1/webhooks/webhook-789/relationships/deliveries",
+          "related": "https://api.appstoreconnect.apple.com/v1/webhooks/webhook-789/deliveries"
+        }
+      }
+    },
+    "links": {
+      "self": "https://api.appstoreconnect.apple.com/v1/webhooks/webhook-789"
+    }
+  },
+  "links": {
+    "self": "https://api.appstoreconnect.apple.com/v1/webhooks/webhook-789"
+  }
+}

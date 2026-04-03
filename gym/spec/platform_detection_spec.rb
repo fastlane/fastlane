@@ -9,6 +9,8 @@ describe Gym do
 
     expect(Gym.building_for_mac?).to eq(false)
     expect(Gym.building_for_ios?).to eq(true)
+    expect(Gym.building_for_ipa?).to eq(true)
+    expect(Gym.building_for_pkg?).to eq(false)
     expect(Gym.building_multiplatform_for_ios?).to eq(true)
   end
 
@@ -22,6 +24,8 @@ describe Gym do
 
     expect(Gym.building_for_ios?).to eq(false)
     expect(Gym.building_for_mac?).to eq(true)
+    expect(Gym.building_for_ipa?).to eq(false)
+    expect(Gym.building_for_pkg?).to eq(true)
     expect(Gym.building_multiplatform_for_mac?).to eq(true)
   end
 
@@ -35,6 +39,8 @@ describe Gym do
 
     expect(Gym.building_for_ios?).to eq(true)
     expect(Gym.building_for_mac?).to eq(false)
+    expect(Gym.building_for_ipa?).to eq(true)
+    expect(Gym.building_for_pkg?).to eq(false)
     expect(Gym.building_multiplatform_for_mac?).to eq(false)
   end
 end

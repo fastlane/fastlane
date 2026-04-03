@@ -33,10 +33,16 @@ module Pilot
       ipa_path = options[:ipa]
       if ipa_path && platform != 'osx'
         asset_path = ipa_path
+        app_identifier = config[:app_identifier] || fetch_app_identifier
+        short_version = config[:app_version] || FastlaneCore::IpaFileAnalyser.fetch_app_version(ipa_path)
+        bundle_version = config[:build_number] || FastlaneCore::IpaFileAnalyser.fetch_app_build(ipa_path)
         package_path = FastlaneCore::IpaUploadPackageBuilder.new.generate(app_id: fetch_app_id,
                                                                       ipa_path: ipa_path,
                                                                   package_path: dir,
-                                                                      platform: platform)
+                                                                      platform: platform,
+                                                                app_identifier: app_identifier,
+                                                                 short_version: short_version,
+                                                                bundle_version: bundle_version)
       else
         pkg_path = options[:pkg]
         asset_path = pkg_path
@@ -368,12 +374,17 @@ module Pilot
     end
 
     def reject_build_waiting_for_review(build)
-      waiting_for_review_build = build.app.get_builds(filter: { "betaAppReviewSubmission.betaReviewState" => "WAITING_FOR_REVIEW" }, includes: "betaAppReviewSubmission,preReleaseVersion").first
+      waiting_for_review_build = build.app.get_builds(
+        filter: { "betaAppReviewSubmission.betaReviewState" => "WAITING_FOR_REVIEW,IN_REVIEW",
+                  "expired" => false,
+                  "preReleaseVersion.version" => build.pre_release_version.version },
+        includes: "betaAppReviewSubmission,preReleaseVersion"
+      ).first
       unless waiting_for_review_build.nil?
         UI.important("Another build is already in review. Going to remove that build and submit the new one.")
-        UI.important("Deleting beta app review submission for build: #{waiting_for_review_build.app_version} - #{waiting_for_review_build.version}")
-        waiting_for_review_build.beta_app_review_submission.delete!
-        UI.success("Deleted beta app review submission for previous build: #{waiting_for_review_build.app_version} - #{waiting_for_review_build.version}")
+        UI.important("Canceling beta app review submission for build: #{waiting_for_review_build.app_version} - #{waiting_for_review_build.version}")
+        waiting_for_review_build.expire!
+        UI.success("Canceled beta app review submission for previous build: #{waiting_for_review_build.app_version} - #{waiting_for_review_build.version}")
       end
     end
 
@@ -386,7 +397,8 @@ module Pilot
     end
 
     # If App Store Connect API token, use token.
-    # If itc_provider was explicitly specified, use it.
+    # If api_key is specified and it is an Individual API Key, don't use token but use username.
+    # If itc_provider or provider_public_id was explicitly specified, use it.
     # If there are multiple teams, infer the provider from the selected team name.
     # If there are fewer than two teams, don't infer the provider.
     def transporter_for_selected_team(options)
@@ -402,16 +414,24 @@ module Pilot
                   api_key
                 end
 
+      # Currently no kind of transporters accept an Individual API Key. Use username and app-specific password instead.
+      # See https://github.com/fastlane/fastlane/issues/22115
+      is_individual_key = !api_key.nil? && api_key[:issuer_id].nil?
+      if is_individual_key
+        api_key = nil
+        api_token = nil
+      end
+
       unless api_token.nil?
         api_token.refresh! if api_token.expired?
-        return FastlaneCore::ItunesTransporter.new(nil, nil, false, nil, api_token.text, altool_compatible_command: true, api_key: api_key)
+        return FastlaneCore::ItunesTransporter.new(nil, nil, false, nil, api_token.text, altool_compatible_command: true, api_key: api_key, provider_public_id: nil)
       end
 
       # Otherwise use username and password
       tunes_client = Spaceship::ConnectAPI.client ? Spaceship::ConnectAPI.client.tunes_client : nil
 
-      generic_transporter = FastlaneCore::ItunesTransporter.new(options[:username], nil, false, options[:itc_provider], altool_compatible_command: true, api_key: api_key)
-      return generic_transporter if options[:itc_provider] || tunes_client.nil?
+      generic_transporter = FastlaneCore::ItunesTransporter.new(options[:username], nil, false, options[:itc_provider], altool_compatible_command: true, api_key: api_key, provider_public_id: options[:provider_public_id])
+      return generic_transporter if options[:itc_provider] || options[:provider_public_id] || tunes_client.nil?
       return generic_transporter unless tunes_client.teams.count > 1
 
       begin

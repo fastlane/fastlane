@@ -3,6 +3,9 @@ name: Lock issues and pull requests
 on:
   schedule:
     - cron: "0 0 * * *" # Every day at midnight
+permissions:
+  issues: write
+  pull-requests: write
 
 jobs:
   lock:
@@ -11,5 +14,5 @@ jobs:
     steps:
       - uses: fastlane/github-actions/lock@latest
         with:
-          repo-token: '${{ secrets.BOT_GITHUB_TOKEN }}'
+          repo-token: ${{ secrets.GITHUB_TOKEN }}
           days-before-lock: 60

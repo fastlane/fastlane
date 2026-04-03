@@ -1,23 +1,14 @@
 require "bundler/gem_tasks"
 
-GEMS = %w(fastlane danger-device_grid)
-
-SECONDS_PER_DAY = 60 * 60 * 24
-
-task(:rubygems_admins) do
-  names = ["KrauseFx", "joshdholtz", "snatchev", "powerivq"]
-  (GEMS + ["krausefx-shenzhen", "commander-fastlane", "fastlane-plugin-firebase_test_lab"]).each do |gem_name|
-    names.each do |name|
-      puts(`gem owner #{gem_name} -a #{name}`)
-    end
-  end
-end
-
 task(:test_all) do
   formatter = "--format progress"
   formatter += " -r rspec_junit_formatter --format RspecJunitFormatter -o #{ENV['CIRCLE_TEST_REPORTS']}/rspec/fastlane-junit-results.xml" if ENV["CIRCLE_TEST_REPORTS"]
-  command = "rspec --pattern ./**/*_spec.rb #{formatter}"
+  command = "rspec --pattern spec/**/*_spec.rb,*/spec/**/*_spec.rb #{formatter} #{ENV['RSPEC_ARGS']}"
 
+  run_rspec(command)
+end
+
+def run_rspec(command)
   # To move Ruby 3.0 or next major version migration going forward, we want to keep monitoring deprecation warnings
   if Gem.win_platform?
     # Windows would not work with /bin/bash so skip collecting warnings
@@ -30,10 +21,25 @@ task(:test_all) do
   end
 end
 
-# Overwrite the default rake task
-# since we use fastlane to deploy fastlane
-task(:push) do
-  sh("bundle exec fastlane release")
+# run, displays and saves the list of tests that do not work standalone
+task(:test_all_individually) do
+  files = Dir.glob("./**/*_spec.rb")
+
+  failed = files.select do |file|
+    formatter = "--format progress"
+    command = "rspec #{formatter} #{ENV['RSPEC_ARGS']} #{file}"
+    run_rspec(command)
+    false
+  rescue => _
+    true
+  end
+
+  unless failed.empty?
+    puts("Individual tests failing: #{failed.join(' ')}")
+    file = "failed_tests"
+    File.write(file, failed.join("\n"))
+    raise "Some tests are failing when ran on their own. See #{file}"
+  end
 end
 
 task(:generate_team_table) do
@@ -60,7 +66,6 @@ task(:generate_team_table) do
     else
       content << "<h4 align='center'>#{github_user_name}</h4>"
     end
-    # content << "<p align='center'>#{user_content['slogan']}</p>" if user_content['slogan'].to_s.length > 0
 
     content << "</td>"
     content << "</tr>" if counter % number_of_rows == number_of_rows - 1
@@ -90,3 +95,29 @@ task(:update_gem_spec_authors) do
 end
 
 task(default: :test_all)
+
+# Prepare the plugin template RuboCop config before building/installing the gem
+desc "Prepare .rubocop.yml for plugin template"
+task(:prepare_rubocop_config) do
+  require 'yaml'
+  require 'fileutils'
+
+  lib = File.expand_path('fastlane/lib', __dir__)
+  rubocop_config = File.expand_path('.rubocop.yml', __dir__)
+
+  next unless File.exist?(rubocop_config)
+
+  config = YAML.safe_load(File.read(rubocop_config), aliases: true)
+  config['require'] = %w[rubocop/require_tools rubocop-performance]
+  config.delete('inherit_from')
+  config.delete('CrossPlatform/ForkUsage')
+  config.delete('Lint/IsStringUsage')
+
+  target = File.join(lib, 'fastlane/plugins/template/.rubocop.yml')
+  FileUtils.mkdir_p(File.dirname(target))
+  File.write(target, YAML.dump(config))
+end
+
+%w(build install release).each do |t|
+  Rake::Task[t].enhance([:prepare_rubocop_config]) if Rake::Task.task_defined?(t)
+end
