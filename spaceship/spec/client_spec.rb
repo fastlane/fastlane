@@ -78,12 +78,37 @@ describe Spaceship::Client do
       end.to raise_error(Spaceship::GatewayTimeoutError)
     end
 
-    it "raises Spaceship::GatewayTimeoutError" do
+    it "raises Spaceship::GatewayTimeoutError for 504" do
       stub_client_request(Spaceship::GatewayTimeoutError, 6, 504, "<html>Gateway Timeout - In Read</html>")
 
       expect do
         subject.req_home
       end.to raise_error(Spaceship::GatewayTimeoutError)
+    end
+
+    it "raises Spaceship::BadGatewayError for 502" do
+      stub_client_request(Spaceship::BadGatewayError, 6, 502, "<html>Bad Gateway</html>")
+
+      expect do
+        subject.req_home
+      end.to raise_error(Spaceship::BadGatewayError)
+    end
+
+    it "raises Spaceship::AppleTimeoutError for 503" do
+      stub_client_request(Spaceship::AppleTimeoutError, 6, 503, "<html>Service Unavailable</html>")
+
+      expect do
+        subject.req_home
+      end.to raise_error(Spaceship::AppleTimeoutError)
+    end
+
+    it "raises Spaceship::AppleTimeoutError for 503 HTML content" do
+      body = "<html><head><title>503 Service Temporarily Unavailable</title></head><body><center><h1>503 Service Temporarily Unavailable</h1></center></body>"
+      stub_client_request(Spaceship::AppleTimeoutError, 6, 200, body)
+
+      expect do
+        subject.req_home
+      end.to raise_error(Spaceship::AppleTimeoutError)
     end
 
     it "raises Spaceship::ProgramLicenseAgreementUpdated" do
@@ -298,6 +323,38 @@ BODY
 
         expect(subject.req_home.body).to eq(default_body)
       end
+    end
+  end
+
+  describe "#do_sirp" do
+    it "raises Spaceship::UnexpectedResponse when body is not valid JSON, but HTTP 200" do
+      stub_request(:post, "https://idmsa.apple.com/appleauth/auth/signin/init").
+        to_return(status: 200, body: "<html>Something went wrong</html>", headers: { 'Content-Type' => 'text/html' })
+
+      expect do
+        subject.do_sirp("user", "password", nil)
+      end.to raise_error(Spaceship::Client::UnexpectedResponse, /Expected JSON response, but got String/)
+    end
+
+    it "raises Spaceship::UnexpectedResponse when body contains serviceErrors" do
+      response_body = {
+        "iteration" => 0,
+        "serviceErrors" => [
+          {
+            "code" => "-900007",
+            "suppressDismissal" => false
+          }
+        ]
+      }
+
+      stub_request(:post, "https://idmsa.apple.com/appleauth/auth/signin/init").
+        to_return(status: 200, body: response_body.to_json, headers: { 'Content-Type' => 'application/json' })
+
+      allow(subject).to receive(:itc_service_key).and_return("fake_service_key")
+
+      expect do
+        subject.do_sirp("user", "password", nil)
+      end.to raise_error(Spaceship::Client::UnexpectedResponse)
     end
   end
 

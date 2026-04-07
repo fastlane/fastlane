@@ -476,13 +476,22 @@ module Spaceship
       puts("Received SIRP signin init response: #{response.body}") if Spaceship::Globals.verbose?
 
       body = response.body
+      unless body.kind_of?(Hash)
+        raise UnexpectedResponse, "Expected JSON response, but got #{body.class}: #{body.to_s[0..1000]}"
+      end
+
+      if body["serviceErrors"]
+        raise UnexpectedResponse, body
+      end
+
       iterations = body["iteration"]
       salt = Base64.strict_decode64(body["salt"])
       b = Base64.strict_decode64(body["b"])
       c = body["c"]
+      protocol = body["protocol"]
 
       key_length = 32
-      encrypted_password = pbkdf2(password, salt, iterations, key_length)
+      encrypted_password = pbkdf2(password, salt, iterations, key_length, protocol)
 
       m1 = client.process_challenge(
         user,
@@ -524,9 +533,20 @@ module Spaceship
       return response
     end
 
-    def pbkdf2(password, salt, iterations, key_length, digest = OpenSSL::Digest::SHA256.new)
+    def pbkdf2(password, salt, iterations, key_length, protocol, digest = OpenSSL::Digest::SHA256.new)
       require 'openssl'
+
+      unless %w[s2k s2k_fo].include?(protocol)
+        raise SIRPAuthenticationError, "Unsupported protocol '#{protocol}' for pbkdf2"
+      end
+
       password = OpenSSL::Digest::SHA256.digest(password)
+
+      if protocol == 's2k_fo'
+        puts("Using legacy s2k_fo protocol for password digest") if Spaceship::Globals.verbose?
+        password = to_hex(password)
+      end
+
       OpenSSL::PKCS5.pbkdf2_hmac(password, salt, iterations, key_length, digest)
     end
 
@@ -1040,6 +1060,10 @@ module Spaceship
           raise BadGatewayError.new, "Apple 502 detected - this might be temporary server error, try again later"
         end
 
+        if response.body.to_s.include?("<title>503 Service Temporarily Unavailable</title>") || response.body.to_s.include?("<h1>503 Service Temporarily Unavailable</h1>")
+          raise AppleTimeoutError.new, "Apple 503 detected - this might be temporary server error, check https://developer.apple.com/system-status/ to see if there is a known downtime"
+        end
+
         return response
       end
     end
@@ -1056,6 +1080,12 @@ module Spaceship
         raise AccessForbiddenError.new, msg
       when 429
         raise TooManyRequestsError, response.to_hash
+      when 502
+        raise BadGatewayError.new, "Apple 502 detected - this might be temporary server error, try again later"
+      when 503
+        raise AppleTimeoutError.new, "Apple 503 detected - this might be temporary server error, check https://developer.apple.com/system-status/ to see if there is a known downtime"
+      when 504
+        raise GatewayTimeoutError.new, "Apple 504 detected - this might be temporary server error, try again later"
       end
     end
 
