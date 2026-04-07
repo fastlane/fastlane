@@ -308,12 +308,13 @@ module FastlaneCore
       if !username.nil? && !password.nil? && api_key.nil?
         "-u #{username.shellescape} -p #{password.shellescape}"
       elsif !api_key.nil?
-        # Individual API keys have no issuer_id; altool supports them via
-        # an empty --apiIssuer and the --api-key-subject user flag.
-        issuer = api_key[:issuer_id] || ""
-        params = "--apiKey #{api_key[:key_id]} --apiIssuer #{issuer}"
-        params += " --api-key-subject user" if api_key[:issuer_id].nil?
-        params
+        # Individual API keys have no issuer_id; altool supports them
+        # by omitting --apiIssuer and passing --api-key-subject user.
+        if api_key[:issuer_id]
+          "--apiKey #{api_key[:key_id]} --apiIssuer #{api_key[:issuer_id]}"
+        else
+          "--apiKey #{api_key[:key_id]} --api-key-subject user"
+        end
       end
     end
 
