@@ -104,6 +104,12 @@ module Spaceship
         return resps.flat_map(&:to_models)
       end
 
+      def fetch_bundle_id(client: nil)
+        client ||= Spaceship::ConnectAPI
+        resps = client.get_profile_bundle_id(profile_id: id)
+        return resps.to_models.first
+      end
+
       def fetch_all_certificates(client: nil, filter: {}, includes: nil, sort: nil)
         client ||= Spaceship::ConnectAPI
         resps = client.get_certificates(profile_id: id, filter: filter, includes: includes).all_pages
