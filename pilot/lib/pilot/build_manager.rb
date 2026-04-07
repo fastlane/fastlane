@@ -398,7 +398,7 @@ module Pilot
 
     # If App Store Connect API token, use token.
     # If api_key is specified and it is an Individual API Key, don't use token but use username.
-    # If itc_provider was explicitly specified, use it.
+    # If itc_provider or provider_public_id was explicitly specified, use it.
     # If there are multiple teams, infer the provider from the selected team name.
     # If there are fewer than two teams, don't infer the provider.
     def transporter_for_selected_team(options)
@@ -416,14 +416,14 @@ module Pilot
 
       unless api_token.nil?
         api_token.refresh! if api_token.expired?
-        return FastlaneCore::ItunesTransporter.new(nil, nil, false, nil, api_token.text, altool_compatible_command: true, api_key: api_key)
+        return FastlaneCore::ItunesTransporter.new(nil, nil, false, nil, api_token.text, altool_compatible_command: true, api_key: api_key, provider_public_id: nil)
       end
 
       # Otherwise use username and password
       tunes_client = Spaceship::ConnectAPI.client ? Spaceship::ConnectAPI.client.tunes_client : nil
 
-      generic_transporter = FastlaneCore::ItunesTransporter.new(options[:username], nil, false, options[:itc_provider], altool_compatible_command: true, api_key: api_key)
-      return generic_transporter if options[:itc_provider] || tunes_client.nil?
+      generic_transporter = FastlaneCore::ItunesTransporter.new(options[:username], nil, false, options[:itc_provider], altool_compatible_command: true, api_key: api_key, provider_public_id: options[:provider_public_id])
+      return generic_transporter if options[:itc_provider] || options[:provider_public_id] || tunes_client.nil?
       return generic_transporter unless tunes_client.teams.count > 1
 
       begin
@@ -444,9 +444,6 @@ module Pilot
 
       # This is where we could add a check to see if encryption is required and has been updated
       uploaded_build = set_export_compliance_if_needed(uploaded_build, options)
-
-      # Set build audience type if specified
-      uploaded_build = set_build_audience_type_if_needed(uploaded_build, options)
 
       if options[:submit_beta_review] && (options[:groups] || options[:distribute_external])
         if uploaded_build.ready_for_beta_submission?
@@ -496,22 +493,6 @@ module Pilot
       else
         return uploaded_build
       end
-    end
-
-    def set_build_audience_type_if_needed(uploaded_build, options)
-      unless options[:app_store_eligible].nil?
-        build_audience_type = options[:app_store_eligible] ? "APP_STORE_ELIGIBLE" : "INTERNAL_ONLY"
-        attributes = { buildAudienceType: build_audience_type }
-
-        Spaceship::ConnectAPI.patch_builds(build_id: uploaded_build.id, attributes: attributes)
-
-        UI.success("Build audience type has been set to '#{build_audience_type}'")
-
-        # Reload the build to get the updated attributes
-        uploaded_build = Spaceship::ConnectAPI::Build.get(build_id: uploaded_build.id)
-      end
-
-      return uploaded_build
     end
 
     def update_review_detail(build, info)

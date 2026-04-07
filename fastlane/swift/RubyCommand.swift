@@ -11,7 +11,9 @@
 import Foundation
 
 struct RubyCommand: RubyCommandable {
-    var type: CommandType { return .action }
+    var type: CommandType {
+        return .action
+    }
 
     struct Argument {
         enum ArgType {
@@ -62,8 +64,7 @@ struct RubyCommand: RubyCommandable {
                         "value": someValue,
                     ]
                     let jsonData = try! JSONSerialization.data(withJSONObject: dictionary, options: [])
-                    let jsonString = String(data: jsonData, encoding: .utf8)!
-                    return jsonString
+                    return String(data: jsonData, encoding: .utf8)!
                 }
             } else {
                 // Just exclude this arg if it doesn't have a value
@@ -146,9 +147,7 @@ struct RubyCommand: RubyCommandable {
             jsonParts.append(classNameJson)
         }
 
-        let commandJsonString = "{\(jsonParts.joined(separator: ","))}"
-
-        return commandJsonString
+        return "{\(jsonParts.joined(separator: ","))}"
     }
 }
 

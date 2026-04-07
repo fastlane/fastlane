@@ -8,33 +8,33 @@ Gem::Specification.new do |spec|
   spec.name          = "fastlane"
   spec.version       = Fastlane::VERSION
   # list of authors is regenerated and resorted on each release
-  spec.authors       = ["Jan Piotrowski",
-                        "Josh Holtz",
-                        "Łukasz Grabowski",
-                        "Iulian Onofrei",
-                        "Olivier Halligon",
-                        "Jimmy Dee",
-                        "Satoshi Namai",
+  spec.authors       = ["Jorge Revuelta H",
                         "Danielle Tomlinson",
-                        "Daniel Jankowski",
-                        "Felix Krause",
-                        "Maksym Grebenets",
-                        "Kohki Miki",
-                        "Luka Mirosevic",
-                        "Joshua Liebowitz",
-                        "Manu Wallner",
-                        "Roger Oba",
-                        "Max Ott",
                         "Fumiya Nakamura",
                         "Jérôme Lacoste",
+                        "Roger Oba",
+                        "Aaron Brager",
+                        "Maksym Grebenets",
                         "Helmut Januschka",
-                        "Jorge Revuelta H",
-                        "Manish Rathi",
-                        "Stefan Natchev",
+                        "Manu Wallner",
+                        "Olivier Halligon",
+                        "Daniel Jankowski",
+                        "Satoshi Namai",
                         "Connor Tumbleson",
+                        "Felix Krause",
+                        "Iulian Onofrei",
+                        "Josh Holtz",
+                        "Jan Piotrowski",
+                        "Joshua Liebowitz",
+                        "Kohki Miki",
+                        "Łukasz Grabowski",
                         "Andrew McBurney",
+                        "Stefan Natchev",
+                        "Manish Rathi",
+                        "Jimmy Dee",
+                        "Max Ott",
                         "Matthew Ellis",
-                        "Aaron Brager"]
+                        "Luka Mirosevic"]
 
   spec.email         = ["fastlane@krausefx.com"]
   spec.summary       = Fastlane::SUMMARY
@@ -53,12 +53,12 @@ Gem::Specification.new do |spec|
 
   spec.files = Dir.glob("*/lib/**/*", File::FNM_DOTMATCH) + Dir["fastlane/swift/**/*"] + Dir["bin/*"] + Dir["*/README.md"] + %w(README.md LICENSE .yardopts) - Dir["fastlane/lib/fastlane/actions/device_grid/assets/*"] - Dir["fastlane/lib/fastlane/actions/docs/assets/*"]
   spec.bindir = "bin"
-  spec.executables = spec.files.grep(%r{^bin/}) { |f| File.basename(f) } - ["bin/console"]
+  spec.executables = spec.files.grep(%r{^bin/}) { |f| File.basename(f) } - ["console"]
   spec.require_paths = Dir["*/lib"]
 
   spec.add_dependency('addressable', '>= 2.8', '< 3.0.0') # Support for URI templates
   spec.add_dependency('artifactory', '~> 3.0') # Used to export to an artifactory server
-  spec.add_dependency('aws-sdk-s3', '~> 1.0') # Used for S3 storage in fastlane match
+  spec.add_dependency('aws-sdk-s3', '~> 1.197') # Used for S3 storage in fastlane match
   spec.add_dependency('babosa', '>= 1.0.3', '< 2.0.0') # library for creating human-friendly identifiers, aka "slugs"
   spec.add_dependency('bundler', '>= 1.17.3', '< 5.0.0') # Used for fastlane plugins
   spec.add_dependency('CFPropertyList', '>= 2.3', '< 4.0.0') # Needed to be able to read binary plist format
