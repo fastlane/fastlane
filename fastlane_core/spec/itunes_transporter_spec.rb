@@ -1560,6 +1560,13 @@ describe FastlaneCore do
         include_examples 'build_credential_params'
       end
 
+      context "with individual api key (no issuer_id)" do
+        let(:api_key_arg) { { key_id: "TESTAPIK2HW", issuer_id: nil } }
+        let(:expected) { "--apiKey TESTAPIK2HW --apiIssuer  --api-key-subject user" }
+
+        include_examples 'build_credential_params'
+      end
+
     end
 
     describe FastlaneCore::ShellScriptTransporterExecutor do
