@@ -308,7 +308,14 @@ module FastlaneCore
       if !username.nil? && !password.nil? && api_key.nil?
         "-u #{username.shellescape} -p #{password.shellescape}"
       elsif !api_key.nil?
-        "--apiKey #{api_key[:key_id]} --apiIssuer #{api_key[:issuer_id]}"
+        # Individual API keys have no issuer_id; altool requires --apiIssuer
+        # to be present, so we pass the key_id as a placeholder and add
+        # --api-key-subject user to signal individual key JWT generation.
+        if api_key[:issuer_id]
+          "--apiKey #{api_key[:key_id]} --apiIssuer #{api_key[:issuer_id]}"
+        else
+          "--apiKey #{api_key[:key_id]} --apiIssuer #{api_key[:key_id]} --api-key-subject user"
+        end
       end
     end
 
