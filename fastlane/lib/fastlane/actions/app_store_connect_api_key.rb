@@ -139,7 +139,7 @@ module Fastlane
             key_content: "-----BEGIN EC PRIVATE KEY-----\nfewfawefawfe\n-----END EC PRIVATE KEY-----"
           )',
           'app_store_connect_api_key(
-            key_id: "D83848D23", # no issuer_id if the key is individual          
+            key_id: "D83848D23", # no issuer_id if the key is individual
             key_content: "-----BEGIN EC PRIVATE KEY-----\nfewfawefawfe\n-----END EC PRIVATE KEY-----"
           )'
         ]
