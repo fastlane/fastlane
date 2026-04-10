@@ -365,5 +365,151 @@ describe Match do
         end
       end
     end
+
+    describe '#select_cert_or_key' do
+      let(:runner) { Match::Runner.new }
+      let(:cert_paths) do
+        [
+          "/fake/certs/distribution/AAAA111111.cer",
+          "/fake/certs/distribution/BBBB222222.cer",
+          "/fake/certs/distribution/CCCC333333.cer"
+        ]
+      end
+      let(:key_paths) do
+        [
+          "/fake/certs/distribution/AAAA111111.p12",
+          "/fake/certs/distribution/BBBB222222.p12"
+        ]
+      end
+
+      it "returns the last path when no certificate_id is provided" do
+        result = runner.send(:select_cert_or_key, paths: cert_paths)
+        expect(result).to eq("/fake/certs/distribution/CCCC333333.cer")
+      end
+
+      it "returns the last path when certificate_id is nil" do
+        result = runner.send(:select_cert_or_key, paths: cert_paths, certificate_id: nil)
+        expect(result).to eq("/fake/certs/distribution/CCCC333333.cer")
+      end
+
+      it "selects the matching path when certificate_id matches exactly" do
+        result = runner.send(:select_cert_or_key, paths: cert_paths, certificate_id: "BBBB222222")
+        expect(result).to eq("/fake/certs/distribution/BBBB222222.cer")
+      end
+
+      it "does not substring-match certificate_id" do
+        result = runner.send(:select_cert_or_key, paths: cert_paths, certificate_id: "BBBB")
+        expect(result).to eq("/fake/certs/distribution/CCCC333333.cer")
+      end
+
+      it "falls back to last path when certificate_id does not match any path" do
+        result = runner.send(:select_cert_or_key, paths: cert_paths, certificate_id: "NONEXISTENT")
+        expect(result).to eq("/fake/certs/distribution/CCCC333333.cer")
+      end
+
+      it "works with .p12 key paths" do
+        result = runner.send(:select_cert_or_key, paths: key_paths, certificate_id: "AAAA111111")
+        expect(result).to eq("/fake/certs/distribution/AAAA111111.p12")
+      end
+    end
+
+    describe '#fetch_certificate certificate_id param resolution' do
+      let(:runner) { Match::Runner.new }
+
+      before do
+        allow(Spaceship::ConnectAPI).to receive(:token).and_return("fake_token")
+      end
+
+      it "uses certificate_id param to select the correct certificate" do
+        Dir.mktmpdir do |dir|
+          # Create two certs and keys
+          cert_dir = File.join(dir, "certs", "distribution")
+          FileUtils.mkdir_p(cert_dir)
+          File.write(File.join(cert_dir, "FIRST11111.cer"), "cert1")
+          File.write(File.join(cert_dir, "FIRST11111.p12"), "key1")
+          File.write(File.join(cert_dir, "SECOND2222.cer"), "cert2")
+          File.write(File.join(cert_dir, "SECOND2222.p12"), "key2")
+
+          allow(runner).to receive(:prefixed_working_directory).and_return(dir)
+          allow(Match::Utils).to receive(:is_cert_valid?).and_return(true)
+          allow(Match::Utils).to receive(:get_cert_info).and_return([["Common Name", "test"]])
+          allow(FastlaneCore::Helper).to receive(:mac?).and_return(false)
+
+          values = {
+            app_identifier: "com.test.app",
+            type: "appstore",
+            git_url: "https://example.com",
+            certificate_id: "FIRST11111"
+          }
+          config = FastlaneCore::Configuration.create(Match::Options.available_options, values)
+
+          cert_id = runner.send(:fetch_certificate, params: config)
+          expect(cert_id).to eq("FIRST11111")
+        end
+      end
+
+      it "uses MATCH_CERTIFICATE_ID env var for backward compatibility" do
+        Dir.mktmpdir do |dir|
+          cert_dir = File.join(dir, "certs", "distribution")
+          FileUtils.mkdir_p(cert_dir)
+          File.write(File.join(cert_dir, "FIRST11111.cer"), "cert1")
+          File.write(File.join(cert_dir, "FIRST11111.p12"), "key1")
+          File.write(File.join(cert_dir, "SECOND2222.cer"), "cert2")
+          File.write(File.join(cert_dir, "SECOND2222.p12"), "key2")
+
+          allow(runner).to receive(:prefixed_working_directory).and_return(dir)
+          allow(Match::Utils).to receive(:is_cert_valid?).and_return(true)
+          allow(Match::Utils).to receive(:get_cert_info).and_return([["Common Name", "test"]])
+          allow(FastlaneCore::Helper).to receive(:mac?).and_return(false)
+
+          ENV['MATCH_CERTIFICATE_ID'] = 'FIRST11111'
+          begin
+            values = {
+              app_identifier: "com.test.app",
+              type: "appstore",
+              git_url: "https://example.com"
+            }
+            config = FastlaneCore::Configuration.create(Match::Options.available_options, values)
+
+            cert_id = runner.send(:fetch_certificate, params: config)
+            expect(cert_id).to eq("FIRST11111")
+          ensure
+            ENV.delete('MATCH_CERTIFICATE_ID')
+          end
+        end
+      end
+
+      it "prefers explicit param over env var" do
+        Dir.mktmpdir do |dir|
+          cert_dir = File.join(dir, "certs", "distribution")
+          FileUtils.mkdir_p(cert_dir)
+          File.write(File.join(cert_dir, "FIRST11111.cer"), "cert1")
+          File.write(File.join(cert_dir, "FIRST11111.p12"), "key1")
+          File.write(File.join(cert_dir, "SECOND2222.cer"), "cert2")
+          File.write(File.join(cert_dir, "SECOND2222.p12"), "key2")
+
+          allow(runner).to receive(:prefixed_working_directory).and_return(dir)
+          allow(Match::Utils).to receive(:is_cert_valid?).and_return(true)
+          allow(Match::Utils).to receive(:get_cert_info).and_return([["Common Name", "test"]])
+          allow(FastlaneCore::Helper).to receive(:mac?).and_return(false)
+
+          ENV['MATCH_CERTIFICATE_ID'] = 'SECOND2222'
+          begin
+            values = {
+              app_identifier: "com.test.app",
+              type: "appstore",
+              git_url: "https://example.com",
+              certificate_id: "FIRST11111"
+            }
+            config = FastlaneCore::Configuration.create(Match::Options.available_options, values)
+
+            cert_id = runner.send(:fetch_certificate, params: config)
+            expect(cert_id).to eq("FIRST11111")
+          ensure
+            ENV.delete('MATCH_CERTIFICATE_ID')
+          end
+        end
+      end
+    end
   end
 end
