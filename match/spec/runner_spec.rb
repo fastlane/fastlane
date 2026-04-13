@@ -526,6 +526,7 @@ describe Match do
           allow(Match::Utils).to receive(:is_cert_valid?).and_return(true)
           allow(Match::Utils).to receive(:get_cert_info).and_return([["Common Name", "test"]])
           allow(FastlaneCore::Helper).to receive(:mac?).and_return(true)
+          allow(FastlaneCore::Helper).to receive(:xcode_at_least?).and_return(false)
           allow(FastlaneCore::CertChecker).to receive(:installed?).and_return(false)
 
           expected_cert_path = File.join(cert_dir, "FIRST11111.cer")
