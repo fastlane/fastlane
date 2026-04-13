@@ -255,7 +255,7 @@ module Match
 
     # @return [String] Path to certificate or P12 key
     def select_cert_or_key(paths:, certificate_id: nil)
-      return paths.last unless certificate_id
+      return paths.last if certificate_id.to_s.strip.empty?
 
       cert_id_path = paths.find { |path| File.basename(path, File.extname(path)) == certificate_id }
       return cert_id_path if cert_id_path

@@ -392,6 +392,16 @@ describe Match do
         expect(result).to eq("/fake/certs/distribution/CCCC333333.cer")
       end
 
+      it "returns the last path when certificate_id is an empty string" do
+        result = runner.send(:select_cert_or_key, paths: cert_paths, certificate_id: "")
+        expect(result).to eq("/fake/certs/distribution/CCCC333333.cer")
+      end
+
+      it "returns the last path when certificate_id is whitespace-only" do
+        result = runner.send(:select_cert_or_key, paths: cert_paths, certificate_id: "  ")
+        expect(result).to eq("/fake/certs/distribution/CCCC333333.cer")
+      end
+
       it "selects the matching path when certificate_id matches exactly" do
         result = runner.send(:select_cert_or_key, paths: cert_paths, certificate_id: "BBBB222222")
         expect(result).to eq("/fake/certs/distribution/BBBB222222.cer")
