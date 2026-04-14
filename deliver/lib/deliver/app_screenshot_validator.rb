@@ -3,25 +3,22 @@ require 'fastimage'
 module Deliver
   class AppScreenshotValidator
     # A simple structure that holds error information as well as formatted error messages consistently
-    # Set `to_skip` to `true` when just needing to skip uploading rather than causing a crash.
     class ValidationError
       # Constants that can be given to `type` param
       INVALID_SCREEN_SIZE = 'Invalid screen size'.freeze
-      UNACCEPTABLE_DEVICE = 'Not an accepted App Store Connect device'.freeze
       INVALID_FILE_EXTENSION = 'Invalid file extension'.freeze
       FILE_EXTENSION_MISMATCH = 'File extension mismatches its image format'.freeze
 
-      attr_reader :type, :path, :debug_info, :to_skip
+      attr_reader :type, :path, :debug_info
 
-      def initialize(type: nil, path: nil, debug_info: nil, to_skip: false)
+      def initialize(type: nil, path: nil, debug_info: nil)
         @type = type
         @path = path
         @debug_info = debug_info
-        @to_skip = to_skip
       end
 
       def to_s
-        "#{to_skip ? '🏃 Skipping' : '🚫 Error'}: #{path} - #{type} (#{debug_info})"
+        "🚫 Error: #{path} - #{type} (#{debug_info})"
       end
 
       def inspect
@@ -46,7 +43,6 @@ module Deliver
       errors_found = []
 
       validate_screen_size(screenshot, errors_found)
-      validate_device_type(screenshot, errors_found)
       validate_file_extension_and_format(screenshot, errors_found)
 
       # Merge errors found into given errors array
@@ -55,22 +51,10 @@ module Deliver
     end
 
     def self.validate_screen_size(screenshot, errors_found)
-      if screenshot.screen_size.nil?
+      if screenshot.display_type.nil?
         errors_found << ValidationError.new(type: ValidationError::INVALID_SCREEN_SIZE,
                                             path: screenshot.path,
-                                            debug_info: "Actual size is #{get_formatted_size(screenshot)}. See the specifications to fix #{APP_SCREENSHOT_SPEC_URL}")
-      end
-    end
-
-    # Checking if the device type exists in spaceship
-    # Ex: iPhone 6.1 inch isn't supported in App Store Connect but need
-    # to have it in there for frameit support
-    def self.validate_device_type(screenshot, errors_found)
-      if !screenshot.screen_size.nil? && screenshot.device_type.nil?
-        errors_found << ValidationError.new(type: ValidationError::UNACCEPTABLE_DEVICE,
-                                            path: screenshot.path,
-                                            debug_info: "Screen size #{screenshot.screen_size} is not accepted. See the specifications to fix #{APP_SCREENSHOT_SPEC_URL}",
-                                            to_skip: true)
+                                            debug_info: "Screenshot size is not supported. Actual size is #{get_formatted_size(screenshot)}. See the specifications to fix #{APP_SCREENSHOT_SPEC_URL}")
       end
     end
 

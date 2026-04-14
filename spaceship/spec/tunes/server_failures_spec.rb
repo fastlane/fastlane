@@ -1,9 +1,6 @@
 describe Spaceship::TunesClient do
   describe "Random Server Failures" do
-    # let(:mock_client) { double('MockClient') }
-    before do
-      Spaceship::Tunes.login
-    end
+    include_examples "common spaceship login"
     let(:client) { Spaceship::Application.client }
     let(:app) { Spaceship::Application.all.first }
 

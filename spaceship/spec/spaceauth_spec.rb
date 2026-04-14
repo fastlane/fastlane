@@ -28,7 +28,7 @@ describe Spaceship::SpaceauthRunner do
 
     it 'when true, it should copy the session to clipboard' do
       Spaceship::SpaceauthRunner.new(copy_to_clipboard: true).run
-      expect(FastlaneCore::Clipboard.paste).to match(%r{.*domain: idmsa.apple.com.*path: \"\/appleauth\/auth\/\".*})
+      expect(FastlaneCore::Clipboard.paste).to match(%r{.*domain: idmsa.apple.com.*path: \"\/appleauth\/auth\/signin\/\".*})
     end
 
     it 'when false, it should not copy the session to clipboard' do
@@ -79,7 +79,7 @@ describe Spaceship::SpaceauthRunner do
 
   describe '#session_string' do
     it 'should return the session when called after run' do
-      expect(Spaceship::SpaceauthRunner.new.run.session_string).to match(%r{.*domain: idmsa.apple.com.*path: \"\/appleauth\/auth\/\".*})
+      expect(Spaceship::SpaceauthRunner.new.run.session_string).to match(%r{.*domain: idmsa.apple.com.*path: \"\/appleauth\/auth\/signin\/\".*})
     end
 
     it 'should throw when called before run' do

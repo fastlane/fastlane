@@ -49,6 +49,7 @@ module Fastlane
           associated_domains: 'associated_domains',
           auto_fill_credential: 'auto_fill_credential',
           class_kit: 'class_kit',
+          declared_age_range: 'declared_age_range',
           icloud: 'icloud',
           custom_network_protocol: 'custom_network_protocol',
           data_protection: 'data_protection',
