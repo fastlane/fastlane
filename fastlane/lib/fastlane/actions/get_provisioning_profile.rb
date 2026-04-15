@@ -34,7 +34,7 @@ module Fastlane
 
         set_profile_type(values, ENV["SIGH_PROFILE_ENTERPRISE"])
 
-        return uuid # returs uuid of profile
+        return uuid # returns uuid of profile
       end
 
       def self.set_profile_type(values, enterprise)

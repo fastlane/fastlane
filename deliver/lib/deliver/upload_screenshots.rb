@@ -55,7 +55,7 @@ module Deliver
         localizations = version.get_app_store_version_localizations
       end
 
-      upload_screenshots(localizations, screenshots_per_language)
+      upload_screenshots(localizations, screenshots_per_language, options[:screenshot_processing_timeout])
 
       Helper.show_loading_indicator("Sorting screenshots uploaded...")
       sort_screenshots(localizations)
@@ -85,7 +85,7 @@ module Deliver
         # Only delete screenshots if trying to upload
         next unless screenshots_per_language.keys.include?(localization.locale)
 
-        UI.verbose("Queued delete sceeenshot set job for #{localization.locale} #{app_screenshot_set.screenshot_display_type}")
+        UI.verbose("Queued delete screenshot set job for #{localization.locale} #{app_screenshot_set.screenshot_display_type}")
         worker.enqueue(DeleteScreenshotSetJob.new(app_screenshot_set, localization))
       end
 
@@ -93,7 +93,9 @@ module Deliver
 
       # Verify all screenshots have been deleted
       # Sometimes API requests will fail but screenshots will still be deleted
-      count = iterator.each_app_screenshot_set.map { |_, app_screenshot_set| app_screenshot_set }
+      count = iterator.each_app_screenshot_set
+                      .select { |localization, _| screenshots_per_language.keys.include?(localization.locale) }
+                      .map { |_, app_screenshot_set| app_screenshot_set }
                       .reduce(0) { |sum, app_screenshot_set| sum + app_screenshot_set.app_screenshots.size }
 
       UI.important("Number of screenshots not deleted: #{count}")
@@ -109,7 +111,7 @@ module Deliver
       end
     end
 
-    def upload_screenshots(localizations, screenshots_per_language, tries: 5)
+    def upload_screenshots(localizations, screenshots_per_language, timeout_seconds, tries: 5)
       tries -= 1
 
       # Upload screenshots
@@ -134,7 +136,7 @@ module Deliver
         number_of_screenshots_per_set[app_screenshot_set] ||= (app_screenshot_set.app_screenshots || []).count
 
         if number_of_screenshots_per_set[app_screenshot_set] >= 10
-          UI.error("Too many screenshots found for device '#{screenshot.device_type}' in '#{screenshot.language}', skipping this one (#{screenshot.path})")
+          UI.error("Too many screenshots found for device '#{screenshot.display_type}' in '#{screenshot.language}', skipping this one (#{screenshot.path})")
           next
         end
 
@@ -145,7 +147,7 @@ module Deliver
         if duplicate
           UI.message("Previous uploaded. Skipping '#{screenshot.path}'...")
         else
-          UI.verbose("Queued upload sceeenshot job for #{localization.locale} #{app_screenshot_set.screenshot_display_type} #{screenshot.path}")
+          UI.verbose("Queued upload screenshot job for #{localization.locale} #{app_screenshot_set.screenshot_display_type} #{screenshot.path}")
           worker.enqueue(UploadScreenshotJob.new(app_screenshot_set, screenshot.path))
           number_of_screenshots_per_set[app_screenshot_set] += 1
         end
@@ -158,15 +160,16 @@ module Deliver
       UI.verbose('Uploading jobs are completed')
 
       Helper.show_loading_indicator("Waiting for all the screenshots to finish being processed...")
-      states = wait_for_complete(iterator)
+      states = wait_for_complete(iterator, timeout_seconds)
       Helper.hide_loading_indicator
-      retry_upload_screenshots_if_needed(iterator, states, total_number_of_screenshots, tries, localizations, screenshots_per_language)
+      retry_upload_screenshots_if_needed(iterator, states, total_number_of_screenshots, tries, timeout_seconds, localizations, screenshots_per_language)
 
       UI.message("Successfully uploaded all screenshots")
     end
 
     # Verify all screenshots have been processed
-    def wait_for_complete(iterator)
+    def wait_for_complete(iterator, timeout_seconds)
+      start_time = Time.now
       loop do
         states = iterator.each_app_screenshot.map { |_, _, app_screenshot| app_screenshot }.each_with_object({}) do |app_screenshot, hash|
           state = app_screenshot.asset_delivery_state['state']
@@ -177,16 +180,22 @@ module Deliver
         is_processing = states.fetch('UPLOAD_COMPLETE', 0) > 0
         return states unless is_processing
 
+        if Time.now - start_time > timeout_seconds
+          UI.important("Screenshot upload reached the timeout limit of #{timeout_seconds} seconds. We'll now retry uploading the screenshots that couldn't be uploaded in time.")
+          return states
+        end
+
         UI.verbose("There are still incomplete screenshots - #{states}")
         sleep(5)
       end
     end
 
     # Verify all screenshots states on App Store Connect are okay
-    def retry_upload_screenshots_if_needed(iterator, states, number_of_screenshots, tries, localizations, screenshots_per_language)
+    def retry_upload_screenshots_if_needed(iterator, states, number_of_screenshots, tries, timeout_seconds, localizations, screenshots_per_language)
       is_failure = states.fetch("FAILED", 0) > 0
+      is_processing = states.fetch('UPLOAD_COMPLETE', 0) > 0
       is_missing_screenshot = !screenshots_per_language.empty? && !verify_local_screenshots_are_uploaded(iterator, screenshots_per_language)
-      return unless is_failure || is_missing_screenshot
+      return unless is_failure || is_missing_screenshot || is_processing
 
       if tries.zero?
         iterator.each_app_screenshot.select { |_, _, app_screenshot| app_screenshot.error? }.each do |localization, _, app_screenshot|
@@ -200,7 +209,7 @@ module Deliver
         iterator.each_app_screenshot do |_, _, app_screenshot|
           app_screenshot.delete! unless app_screenshot.complete?
         end
-        upload_screenshots(localizations, screenshots_per_language, tries: tries)
+        upload_screenshots(localizations, screenshots_per_language, timeout_seconds, tries: tries)
       end
     end
 
@@ -258,7 +267,7 @@ module Deliver
     # helper method so Spaceship::Tunes.client.available_languages is easier to test
     def self.available_languages
       # 2020-08-24 - Available locales are not available as an endpoint in App Store Connect
-      # Update with Spaceship::Tunes.client.available_languages.sort (as long as endpoint is avilable)
+      # Update with Spaceship::Tunes.client.available_languages.sort (as long as endpoint is available)
       Deliver::Languages::ALL_LANGUAGES
     end
 

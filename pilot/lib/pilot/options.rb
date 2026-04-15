@@ -49,7 +49,7 @@ module Pilot
                                      description: "The platform to use (optional)",
                                      optional: true,
                                      verify_block: proc do |value|
-                                       UI.user_error!("The platform can only be ios, appletvos, or osx") unless ['ios', 'appletvos', 'osx'].include?(value)
+                                       UI.user_error!("The platform can only be ios, appletvos, osx, or xros") unless ['ios', 'appletvos', 'osx', 'xros'].include?(value)
                                      end),
         FastlaneCore::ConfigItem.new(key: :apple_id,
                                      short_option: "-p",
@@ -292,6 +292,10 @@ module Pilot
         FastlaneCore::ConfigItem.new(key: :itc_provider,
                                      env_name: "PILOT_ITC_PROVIDER",
                                      description: "The provider short name to be used with the iTMSTransporter to identify your team. This value will override the automatically detected provider short name. To get provider short name run `pathToXcode.app/Contents/Applications/Application\\ Loader.app/Contents/itms/bin/iTMSTransporter -m provider -u 'USERNAME' -p 'PASSWORD' -account_type itunes_connect -v off`. The short names of providers should be listed in the second column",
+                                     optional: true),
+        FastlaneCore::ConfigItem.new(key: :provider_public_id,
+                                     env_name: "PILOT_PROVIDER_PUBLIC_ID",
+                                     description: "The provider public ID to be used with altool (--provider-public-id). This value will override the automatically detected provider value for altool uploads. Required after Xcode 26 when your account is associated with multiple providers and using username/app-password authentication",
                                      optional: true),
         # rubocop:enable Layout/LineLength
 

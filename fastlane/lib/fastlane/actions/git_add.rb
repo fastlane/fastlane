@@ -17,7 +17,16 @@ module Fastlane
           success_message = "Successfully added all files 💾."
         end
 
-        result = Actions.sh("git add #{paths}", log: FastlaneCore::Globals.verbose?).chomp
+        force = params[:force] ? "--force" : nil
+
+        command = [
+          "git",
+          "add",
+          force,
+          paths
+        ].compact
+
+        result = Actions.sh(command.join(" "), log: FastlaneCore::Globals.verbose?).chomp
         UI.success(success_message)
         return result
       end
@@ -46,6 +55,11 @@ module Fastlane
                                        description: "Shell escapes paths (set to false if using wildcards or manually escaping spaces in :path)",
                                        type: Boolean,
                                        default_value: true,
+                                       optional: true),
+          FastlaneCore::ConfigItem.new(key: :force,
+                                       description: "Allow adding otherwise ignored files",
+                                       type: Boolean,
+                                       default_value: false,
                                        optional: true),
           # Deprecated
           FastlaneCore::ConfigItem.new(key: :pathspec,
@@ -76,7 +90,8 @@ module Fastlane
           'git_add(path: "./Frameworks/*", shell_escape: false)',
           'git_add(path: ["*.h", "*.m"], shell_escape: false)',
           'git_add(path: "./Frameworks/*", shell_escape: false)',
-          'git_add(path: "*.txt", shell_escape: false)'
+          'git_add(path: "*.txt", shell_escape: false)',
+          'git_add(path: "./tmp/.keep", force: true)'
         ]
       end
 

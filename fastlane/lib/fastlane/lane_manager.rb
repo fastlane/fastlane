@@ -5,9 +5,8 @@ module Fastlane
     # @param platform The name of the platform to execute
     # @param lane_name The name of the lane to execute
     # @param parameters [Hash] The parameters passed from the command line to the lane
-    # @param env Dot Env Information
     # @param A custom Fastfile path, this is used by fastlane.ci
-    def self.cruise_lane(platform, lane, parameters = nil, env = nil, fastfile_path = nil)
+    def self.cruise_lane(platform, lane, parameters = nil, fastfile_path = nil)
       UI.user_error!("lane must be a string") unless lane.kind_of?(String) || lane.nil?
       UI.user_error!("platform must be a string") unless platform.kind_of?(String) || platform.nil?
       UI.user_error!("parameters must be a hash") unless parameters.kind_of?(Hash) || parameters.nil?

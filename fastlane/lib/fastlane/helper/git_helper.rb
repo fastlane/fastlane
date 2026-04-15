@@ -9,13 +9,14 @@ module Fastlane
       end.freeze
     end
 
-    def self.git_log_between(pretty_format, from, to, merge_commit_filtering, date_format = nil, ancestry_path)
+    def self.git_log_between(pretty_format, from, to, merge_commit_filtering, date_format = nil, ancestry_path, app_path)
       command = %w(git log)
       command << "--pretty=#{pretty_format}"
       command << "--date=#{date_format}" if date_format
       command << '--ancestry-path' if ancestry_path
       command << "#{from}...#{to}"
       command << git_log_merge_commit_filtering_option(merge_commit_filtering)
+      command << app_path if app_path
       # "*command" syntax expands "command" array into variable arguments, which
       # will then be individually shell-escaped by Actions.sh.
       Actions.sh(*command.compact, log: false).chomp
@@ -23,13 +24,14 @@ module Fastlane
       nil
     end
 
-    def self.git_log_last_commits(pretty_format, commit_count, merge_commit_filtering, date_format = nil, ancestry_path)
+    def self.git_log_last_commits(pretty_format, commit_count, merge_commit_filtering, date_format = nil, ancestry_path, app_path)
       command = %w(git log)
       command << "--pretty=#{pretty_format}"
       command << "--date=#{date_format}" if date_format
       command << '--ancestry-path' if ancestry_path
       command << '-n' << commit_count.to_s
       command << git_log_merge_commit_filtering_option(merge_commit_filtering)
+      command << app_path if app_path
       Actions.sh(*command.compact, log: false).chomp
     rescue
       nil
@@ -121,7 +123,10 @@ module Fastlane
 
     # Returns the current git branch, or "HEAD" if it's not checked out to any branch
     # Can be replaced using the environment variable `GIT_BRANCH`
+    # unless `FL_GIT_BRANCH_DONT_USE_ENV_VARS` is `true`
     def self.git_branch
+      return self.git_branch_name_using_HEAD if FastlaneCore::Env.truthy?('FL_GIT_BRANCH_DONT_USE_ENV_VARS')
+
       env_name = SharedValues::GIT_BRANCH_ENV_VARS.find { |env_var| FastlaneCore::Env.truthy?(env_var) }
       ENV.fetch(env_name.to_s) do
         self.git_branch_name_using_HEAD

@@ -5,6 +5,7 @@ require 'credentials_manager/appfile_config'
 require_relative 'module'
 
 module Snapshot
+  # rubocop:disable Metrics/ClassLength
   class Options
     def self.verify_type(item_name, acceptable_types, value)
       type_ok = [Array, String].any? { |type| value.kind_of?(type) }
@@ -23,7 +24,7 @@ module Snapshot
                                      short_option: "-w",
                                      env_name: "SNAPSHOT_WORKSPACE",
                                      optional: true,
-                                     description: "Path the workspace file",
+                                     description: "Path to the workspace file",
                                      verify_block: proc do |value|
                                        v = File.expand_path(value.to_s)
                                        UI.user_error!("Workspace file not found at path '#{v}'") unless File.exist?(v)
@@ -34,7 +35,7 @@ module Snapshot
                                      short_option: "-p",
                                      optional: true,
                                      env_name: "SNAPSHOT_PROJECT",
-                                     description: "Path the project file",
+                                     description: "Path to the project file",
                                      verify_block: proc do |value|
                                        v = File.expand_path(value.to_s)
                                        UI.user_error!("Project file not found at path '#{v}'") unless File.exist?(v)
@@ -257,6 +258,11 @@ module Snapshot
                                      description: "Sets a custom path for Swift Package Manager dependencies",
                                      type: String,
                                      optional: true),
+        FastlaneCore::ConfigItem.new(key: :package_cache_path,
+                                     env_name: "SNAPSHOT_PACKAGE_CACHE_PATH",
+                                     description: "Sets a custom package cache path for Swift Package Manager dependencies",
+                                     type: String,
+                                     optional: true),
         FastlaneCore::ConfigItem.new(key: :skip_package_dependencies_resolution,
                                      env_name: "SNAPSHOT_SKIP_PACKAGE_DEPENDENCIES_RESOLUTION",
                                      description: "Skips resolution of Swift Package Manager dependencies",
@@ -264,9 +270,23 @@ module Snapshot
                                      default_value: false),
         FastlaneCore::ConfigItem.new(key: :disable_package_automatic_updates,
                                      env_name: "SNAPSHOT_DISABLE_PACKAGE_AUTOMATIC_UPDATES",
-                                     description: "Prevents packages from automatically being resolved to versions other than those recorded in the `Package.resolved` file",
+                                     description: "Prevents packages from automatically being resolved to versions other than those recorded in the `Package.resolved` file. This translates in the option `-disableAutomaticPackageResolution` being passed to xcodebuild",
                                      type: Boolean,
                                      default_value: false),
+        FastlaneCore::ConfigItem.new(key: :skip_package_repository_fetches,
+                                     env_name: "SNAPSHOT_SKIP_PACKAGE_REPOSITORY_FETCHES",
+                                     description: "Skips updating package dependencies from their remote. This translates in the option `-skipPackageUpdates` being passed to xcodebuild",
+                                     type: Boolean,
+                                     default_value: false),
+        FastlaneCore::ConfigItem.new(key: :package_authorization_provider,
+                                     env_name: "SNAPSHOT_PACKAGE_AUTHORIZATION_PROVIDER",
+                                     description: "Lets xcodebuild use a specified package authorization provider (keychain|netrc)",
+                                     optional: true,
+                                     type: String,
+                                     verify_block: proc do |value|
+                                       av = %w(netrc keychain)
+                                       UI.user_error!("Unsupported authorization provider '#{value}', must be: #{av}") unless av.include?(value)
+                                     end),
         FastlaneCore::ConfigItem.new(key: :testplan,
                                      env_name: "SNAPSHOT_TESTPLAN",
                                      description: "The testplan associated with the scheme that should be used for testing",
@@ -323,4 +343,5 @@ module Snapshot
       ]
     end
   end
+  # rubocop:enable Metrics/ClassLength
 end

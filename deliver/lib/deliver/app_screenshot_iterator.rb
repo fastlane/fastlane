@@ -1,5 +1,7 @@
+require_relative 'module'
+
 module Deliver
-  # This is a convinient class that enumerates app store connect's screenshots in various degrees.
+  # This is a convenient class that enumerates app store connect's screenshots in various degrees.
   class AppScreenshotIterator
     NUMBER_OF_THREADS = Helper.test? ? 1 : [ENV.fetch("DELIVER_NUMBER_OF_THREADS", 10).to_i, 10].min
 
@@ -59,7 +61,7 @@ module Deliver
     # @yieldparam [optional, Spaceship::ConnectAPI::AppStoreVersionLocalization] localization
     # @yieldparam [optional, Spaceship::ConnectAPI::AppStoreScreenshotSet] app_screenshot_set
     # @yieldparam [optional, Deliver::AppScreenshot] screenshot
-    # @yieldparam [optional, Integer] index a number reperesents which position the screenshot will be
+    # @yieldparam [optional, Integer] index a number represents which position the screenshot will be
     def each_local_screenshot(screenshots_per_language, &block)
       return enum_for(__method__, screenshots_per_language) unless block_given?
 
@@ -77,10 +79,11 @@ module Deliver
       # iterate over screenshots per localization
       screenshots_per_language.each do |language, screenshots_for_language|
         localization = supported_localizations.find { |l| l.locale == language }
-        screenshots_per_display_type = screenshots_for_language.reject { |screenshot| screenshot.device_type.nil? }.group_by(&:device_type)
+        screenshots_per_display_type = screenshots_for_language.reject { |screenshot| screenshot.display_type.nil? }.group_by(&:display_type)
 
         screenshots_per_display_type.each do |display_type, screenshots|
           # create AppScreenshotSet for given display_type if it doesn't exist
+          UI.verbose("Setting up screenshot set for #{language}, #{display_type}")
           app_screenshot_set = (app_screenshot_set_per_locale_and_display_type[language] || {})[display_type]
           app_screenshot_set ||= localization.create_app_screenshot_set(attributes: { screenshotDisplayType: display_type })
 

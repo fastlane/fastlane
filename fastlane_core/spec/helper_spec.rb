@@ -17,6 +17,26 @@ describe FastlaneCore do
       end
     end
 
+    describe "#xcode_at_least?" do
+      ["15.2", "15.2.3", 15, 15.3].each do |check_version|
+        ["15.3", "16"].each do |xcode_version|
+          it "Xcode #{xcode_version} is at least #{check_version}" do
+            allow(FastlaneCore::Helper).to receive(:xcode_version).and_return(xcode_version)
+
+            expect(FastlaneCore::Helper.xcode_at_least?(check_version)).to be(true)
+          end
+        end
+
+        ["14", "14.99.99"].each do |xcode_version|
+          it "Xcode #{xcode_version} is less than #{check_version}" do
+            allow(FastlaneCore::Helper).to receive(:xcode_version).and_return(xcode_version)
+
+            expect(FastlaneCore::Helper.xcode_at_least?(check_version)).to be(false)
+          end
+        end
+      end
+    end
+
     describe '#colors_disabled?' do
       it "should return false if no environment variables set" do
         stub_const('ENV', {})
@@ -77,7 +97,7 @@ describe FastlaneCore do
         expect(FastlaneCore::Helper.ci?).to be(true)
       end
 
-      it "returns true when building in Github Actions" do
+      it "returns true when building in GitHub Actions" do
         stub_const('ENV', { 'GITHUB_ACTION' => 'FAKE_ACTION' })
         expect(FastlaneCore::Helper.ci?).to be(true)
         stub_const('ENV', { 'GITHUB_ACTIONS' => 'true' })
@@ -228,38 +248,6 @@ describe FastlaneCore do
       it "returns true when FastlaneCore::FastlaneFolder.path is not nil" do
         expect(FastlaneCore::FastlaneFolder).to receive(:path).and_return('./fastlane')
         expect(FastlaneCore::Helper.fastlane_enabled?).to be(true)
-      end
-    end
-
-    describe '#open_uri' do
-      before do
-        stub_request(:get, 'https://fastlane.tools').to_return(body: 'SOME_TEXT', status: 200)
-      end
-
-      it 'performs URI.open and return IO like object that can be read' do
-        expect(FastlaneCore::Helper.open_uri('https://fastlane.tools')).to respond_to(:read)
-      end
-
-      it 'performs URI.open with block' do
-        is_block_called = false
-        FastlaneCore::Helper.open_uri('https://fastlane.tools') do |content|
-          expect(content).to respond_to(:read)
-          is_block_called = true
-        end
-        expect(is_block_called).to be(true)
-      end
-
-      it 'performs URI.open with options' do
-        expect(FastlaneCore::Helper.open_uri('https://fastlane.tools', 'rb')).to respond_to(:read)
-      end
-
-      it 'performs URI.open with options and block' do
-        is_block_called = false
-        FastlaneCore::Helper.open_uri('https://fastlane.tools', 'rb') do |content|
-          expect(content).to respond_to(:read)
-          is_block_called = true
-        end
-        expect(is_block_called).to be(true)
       end
     end
   end

@@ -59,7 +59,7 @@ module Spaceship
 
       # @return (String) Platform of the app
       # @example 'ios'
-      attr_accessor :app_plattform
+      attr_accessor :app_platform
 
       # @return (String) Device Requirements / Device Protocols
       attr_accessor :device_protocols

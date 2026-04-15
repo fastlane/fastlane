@@ -88,7 +88,7 @@ task(:generate_device_frames) do
 
   puts("Download and extract the latest devices from Facebook")
   puts("")
-  puts("  https://facebook.design/devices")
+  puts("  https://design.facebook.com/toolsandresources/devices/")
   puts("")
   confirm
   puts("Currently the script renames iPad files according to the following scheme:")
@@ -176,12 +176,20 @@ end
 
 # Facebook's device naming is inconsistent. This method fixes the file names.
 def sanitize_filename(filename)
-  perform_ipad_renaming(filename
-      .gsub('Grey', 'Gray') # some Apple devices have "Grey" instead of "Gray" color -> unify
-      .gsub(' - Portrait', '') # iPads Pro include Portrait and Landscape - we just need Portrait; Landscape filtered via DEVICES_TO_SKIP
-      .gsub(' - ', ' ') # Google Pixel device names are separated from their colors by a dash -> remove
-      .gsub('Note10', 'Note 10') # Samsung Galaxy Note 10 is missing a space in "Note10"
-      .gsub('Mi Mix Alpha Front', 'Mi Mix Alpha')) # Xiaomi Mi Mix Alpha contains the words "Front", "Back" and "Side" => back and side are filtered via DEVICES_TO_SKIP, "Front" removed from the name here
+  renamed = filename
+            .gsub('Grey', 'Gray') # some Apple devices have "Grey" instead of "Gray" color -> unify
+            .gsub('Golden', 'Gold') # some Apple devices have "Golden" instead of "Gold" color -> unify
+            .gsub('(PRODUCT)Red', 'Red') # some Apple devices have "(Product)Red" instead of "Red" -> unify
+            .gsub('(PRODUCT)RED', 'Red') # some Apple devices have "(Product)Red" instead of "Red" -> unify
+            .gsub('Space Black', 'Black') # "iPhone 14 Pro and Pro Max use "Space Black" instead of "Black" -> unify
+            .gsub('Deep Purple', 'Purple') # "iPhone 14 Pro and Pro Max use "Deep Purple" instead of "Purple" -> unify
+            .gsub(' - Portrait', '') # iPads Pro include Portrait and Landscape - we just need Portrait; Landscape filtered via DEVICES_TO_SKIP
+            .gsub(' - ', ' ') # Google Pixel device names are separated from their colors by a dash -> remove
+            .gsub(' – ', ' ') # some Apple devices are separated from their colors by an en dash -> remove
+            .gsub(' — ', ' ') # some Apple devices are separated from their colors by an em dash -> remove
+            .gsub('Note10', 'Note 10') # Samsung Galaxy Note 10 is missing a space in "Note10"
+            .gsub('Mi Mix Alpha Front', 'Mi Mix Alpha')
+  perform_ipad_renaming(renamed) # Xiaomi Mi Mix Alpha contains the words "Front", "Back" and "Side" => back and side are filtered via DEVICES_TO_SKIP, "Front" removed from the name here
 end
 
 # Facebook doesn't include versions in iPad files - this function makes sure the correct versions are added
@@ -262,9 +270,13 @@ def measure_slot(path)
 end
 
 def sanitize_device_name(filename)
-  basename = File.basename(filename, File.extname(filename))
-  basename = basename.gsub("Apple", "")
-  basename = basename.gsub("-", " ")
+  basename = File
+             .basename(filename, File.extname(filename))
+             .gsub("Apple", "")
+             .gsub("-", " ")
+             .gsub(' - ', ' ') # Google Pixel device names are separated from their colors by a dash -> remove
+             .gsub(' – ', ' ') # some Apple devices are separated from their colors by this weird dash -> remove
+             .gsub(' — ', ' ') # some Apple devices are separated from their colors by this weird dash -> remove
 
   # Directory is named "Nexus 5X" but file named "Nexus 5x"
   # Need to rename to "Nexus 5X"
