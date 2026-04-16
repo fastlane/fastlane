@@ -10,6 +10,7 @@
 [![Homebrew](https://img.shields.io/badge/dynamic/json.svg?url=https://formulae.brew.sh/api/formula/fastlane.json&query=$.versions.stable&label=homebrew)](https://formulae.brew.sh/formula/fastlane)
 [![Build Status](https://img.shields.io/circleci/project/github/fastlane/fastlane/master.svg)](https://circleci.com/gh/fastlane/fastlane)
 [![PRs welcome!](https://img.shields.io/badge/PRs-welcome-brightgreen.svg)](https://github.com/fastlane/fastlane/blob/master/CONTRIBUTING.md)
+[![OpenCollective!](https://opencollective.com/fastlane/tiers/badge.svg)](https://opencollective.com/fastlane)
 
 _fastlane_ is a tool for iOS and Android developers to automate tedious tasks like generating screenshots, dealing with provisioning profiles, and releasing your application.
 
