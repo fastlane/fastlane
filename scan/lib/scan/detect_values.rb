@@ -130,7 +130,8 @@ module Scan
           sdks_output, status = Open3.capture2('xcodebuild -showsdks -json')
           sdk_version = begin
             raise status unless status.success?
-            JSON.parse(sdks_output).find { |e| e['platform'] == platform[:simulator] }['sdkVersion']
+            entry = JSON.parse(sdks_output).find { |e| e['platform'] == platform[:simulator] }
+            entry['productVersion'] || entry['sdkVersion']
           rescue StandardError => e
             UI.error(e)
             UI.error("xcodebuild CLI broken, please run `xcodebuild` and make sure it works")
