@@ -557,6 +557,45 @@ describe Match do
           expect(cert_id).to eq("FIRST11111")
         end
       end
+
+      it "ignores certificate_id when fetching additional cert types" do
+        Dir.mktmpdir do |dir|
+          # Primary cert type directory with the target certificate
+          primary_dir = File.join(dir, "certs", "distribution")
+          FileUtils.mkdir_p(primary_dir)
+          File.write(File.join(primary_dir, "FIRST11111.cer"), "cert1")
+          File.write(File.join(primary_dir, "FIRST11111.p12"), "key1")
+
+          # Additional cert type directory with different certificates
+          additional_dir = File.join(dir, "certs", "mac_installer_distribution")
+          FileUtils.mkdir_p(additional_dir)
+          File.write(File.join(additional_dir, "INSTALLER1.cer"), "cert2")
+          File.write(File.join(additional_dir, "INSTALLER1.p12"), "key2")
+          File.write(File.join(additional_dir, "INSTALLER2.cer"), "cert3")
+          File.write(File.join(additional_dir, "INSTALLER2.p12"), "key3")
+
+          allow(runner).to receive(:prefixed_working_directory).and_return(dir)
+          allow(Match::Utils).to receive(:is_cert_valid?).and_return(true)
+          allow(Match::Utils).to receive(:get_cert_info).and_return([["Common Name", "test"]])
+          allow(FastlaneCore::Helper).to receive(:mac?).and_return(false)
+
+          values = {
+            app_identifier: "com.test.app",
+            type: "appstore",
+            git_url: "https://example.com",
+            certificate_id: "FIRST11111"
+          }
+          config = FastlaneCore::Configuration.create(Match::Options.available_options, values)
+
+          # Primary cert should use certificate_id
+          cert_id = runner.send(:fetch_certificate, params: config)
+          expect(cert_id).to eq("FIRST11111")
+
+          # Additional cert type should ignore certificate_id and pick the last cert
+          additional_cert_id = runner.send(:fetch_certificate, params: config, specific_cert_type: "mac_installer_distribution")
+          expect(additional_cert_id).to eq("INSTALLER2")
+        end
+      end
     end
   end
 end
