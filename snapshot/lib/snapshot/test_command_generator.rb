@@ -148,7 +148,7 @@ module Snapshot
         return device_names.map do |device_name|
           device = SimCtl.device(name: device_name)
           if device
-            device.devicetype.name
+            device.respond_to?(:devicetype) && device.devicetype ? device.devicetype.name : device_name
           end
         end.compact
       end
