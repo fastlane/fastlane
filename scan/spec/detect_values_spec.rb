@@ -215,6 +215,25 @@ describe Scan do
         # capture3 should only be called once due to memoization
         expect(Open3).to have_received(:capture3).with('xcrun simctl runtime -h').once
       end
+
+      it 'uses productVersion over sdkVersion when they differ (Xcode 26 mismatch)' do
+        help_output = 'Usage: simctl runtime <operation> <arguments> match list'
+        allow(Open3).to receive(:capture3).with('xcrun simctl runtime -h').and_return([nil, help_output, nil])
+
+        # Xcode 26: sdkVersion is "26.4" but productVersion is "26.4.1"
+        sdks_output = File.read('./scan/spec/fixtures/XcodebuildSdksOutput26')
+        status = double('status', "success?": true)
+        allow(Open3).to receive(:capture2).with('xcodebuild -showsdks -json').and_return([sdks_output, status])
+
+        # simctl uses "26.4.1" (matching productVersion, not sdkVersion)
+        runtime_output = File.read('./scan/spec/fixtures/XcrunSimctlRuntimeMatchListOutput26')
+        allow(Open3).to receive(:capture2).with('xcrun simctl runtime match list -j').and_return([runtime_output, status])
+
+        xcode26_build_os_versions = { "26A5000a" => "26.4.1" }
+        allow(FastlaneCore::DeviceManager).to receive(:runtime_build_os_versions).and_return(xcode26_build_os_versions)
+
+        expect(Scan::DetectValues.default_os_version('iOS')).to eq(Gem::Version.new('26.4.1'))
+      end
     end
 
     describe "#detect_simulator" do
