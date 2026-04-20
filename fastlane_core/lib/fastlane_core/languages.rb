@@ -11,6 +11,6 @@ module FastlaneCore
     # - produce/lib/produce/available_default_languages.rb
     # - spaceship/lib/assets/languageMapping.json
     # See pull request for example: https://github.com/fastlane/fastlane/pull/14110
-    ALL_LANGUAGES = %w[ar-SA ca cs da de-DE el en-AU en-CA en-GB en-US es-ES es-MX fi fr-CA fr-FR he hi hr hu id it ja ko ms nl-NL no pl pt-BR pt-PT ro ru sk sv th tr uk vi zh-Hans zh-Hant]
+    ALL_LANGUAGES = %w[ar-SA bn ca cs da de-DE el en-AU en-CA en-GB en-US es-ES es-MX fi fr-CA fr-FR gu he hi hr hu id it ja kn ko ml mr ms nl-NL no or pa pl pt-BR pt-PT ro ru sk sl sv ta te th tr uk ur vi zh-Hans zh-Hant]
   end
 end

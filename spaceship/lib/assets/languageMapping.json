@@ -302,5 +302,71 @@
             "vi"
         ],
         "itc_locale": "vi"
+    },
+    {
+        "locale": "bn",
+        "name": "Bangla",
+        "game-center": false,
+        "itc_locale": "bn"
+    },
+    {
+        "locale": "gu-IN",
+        "name": "Gujarati",
+        "game-center": false,
+        "itc_locale": "gu"
+    },
+    {
+        "locale": "kn-IN",
+        "name": "Kannada",
+        "game-center": false,
+        "itc_locale": "kn"
+    },
+    {
+        "locale": "ml-IN",
+        "name": "Malayalam",
+        "game-center": false,
+        "itc_locale": "ml"
+    },
+    {
+        "locale": "mr-IN",
+        "name": "Marathi",
+        "game-center": false,
+        "itc_locale": "mr"
+    },
+    {
+        "locale": "or-IN",
+        "name": "Odia",
+        "game-center": false,
+        "itc_locale": "or"
+    },
+    {
+        "locale": "pa-IN",
+        "name": "Punjabi",
+        "game-center": false,
+        "itc_locale": "pa"
+    },
+    {
+        "locale": "sl-SI",
+        "name": "Slovenian",
+        "game-center": false,
+        "itc_locale": "sl"
+    },
+    {
+        "locale": "ta-IN",
+        "name": "Tamil",
+        "game-center": false,
+        "itc_locale": "ta"
+    },
+    {
+        "locale": "te-IN",
+        "name": "Telugu",
+        "game-center": false,
+        "itc_locale": "te"
+    },
+    {
+        "locale": "ur",
+        "name": "Urdu",
+        "game-center": false,
+        "itc_locale": "ur"
     }
 ]
