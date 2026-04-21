@@ -48,6 +48,23 @@ describe Supply do
         file_path = fixture_file("sample-authorized-user.json")
         Supply::Client.make_from_config(params: { json_key: file_path, timeout: 1 })
       end
+
+      it "with Application Default Credentials when no json_key is provided" do
+        mock_auth_client = double("auth_client")
+        allow(Google::Auth).to receive(:get_application_default).with(Supply::Client::SCOPE).and_return(mock_auth_client)
+        allow(mock_auth_client).to receive(:fetch_access_token!)
+
+        Supply::Client.make_from_config(params: { timeout: 1 })
+      end
+
+      it "raises an informative error when no credentials are found" do
+        allow(Google::Auth).to receive(:get_application_default).and_raise(RuntimeError, "Your credentials were not found.")
+        allow(UI).to receive(:interactive?).and_return(false)
+
+        expect {
+          Supply::Client.make_from_config(params: { timeout: 1 })
+        }.to raise_error(FastlaneCore::Interface::FastlaneError, /json_key.*GOOGLE_APPLICATION_CREDENTIALS.*gcloud/m)
+      end
     end
 
     describe "displays error messages from the API" do

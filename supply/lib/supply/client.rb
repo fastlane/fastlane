@@ -16,55 +16,68 @@ module Supply
     def self.make_from_config(params: nil)
       params ||= Supply.config
       service_account_data = self.service_account_authentication(params: params)
-      return self.new(service_account_json: service_account_data, params: params)
+
+      if service_account_data
+        return self.new(service_account_json: service_account_data, params: params)
+      end
+
+      # No explicit credentials — try Application Default Credentials discovery
+      # (GOOGLE_APPLICATION_CREDENTIALS env var, ~/.config/gcloud/application_default_credentials.json, or GCE metadata)
+      UI.verbose("No json_key provided, attempting Application Default Credentials...")
+      begin
+        auth_client = Google::Auth.get_application_default(self::SCOPE)
+        return self.new(auth_client: auth_client, params: params)
+      rescue RuntimeError => e
+        UI.verbose("Application Default Credentials not available: #{e.message}")
+      end
+
+      if UI.interactive?
+        UI.important("To not be asked about this value, you can specify it using 'json_key'")
+        json_key_path = UI.input("The service account json file used to authenticate with Google: ")
+        json_key_path = File.expand_path(json_key_path)
+        UI.user_error!("Could not find service account json file at path '#{json_key_path}'") unless File.exist?(json_key_path)
+        params[:json_key] = json_key_path
+        return self.new(service_account_json: File.open(json_key_path), params: params)
+      else
+        UI.user_error!("Could not load Google credentials. Provide 'json_key'/'json_key_data', set GOOGLE_APPLICATION_CREDENTIALS, or run: gcloud auth application-default login --scopes=openid,email,https://www.googleapis.com/auth/androidpublisher")
+      end
     end
 
     # Supply authentication file
+    # Returns an IO object for the credentials file, or nil if no explicit credentials were provided.
     def self.service_account_authentication(params: nil)
-      unless params[:json_key] || params[:json_key_data]
-        if UI.interactive?
-          UI.important("To not be asked about this value, you can specify it using 'json_key'")
-          json_key_path = UI.input("The service account json file used to authenticate with Google: ")
-          json_key_path = File.expand_path(json_key_path)
-
-          UI.user_error!("Could not find service account json file at path '#{json_key_path}'") unless File.exist?(json_key_path)
-          params[:json_key] = json_key_path
-        else
-          UI.user_error!("Could not load Google authentication. Make sure it has been added as an environment variable in 'json_key' or 'json_key_data'")
-        end
-      end
-
       if params[:json_key]
-        service_account_json = File.open(File.expand_path(params[:json_key]))
+        File.open(File.expand_path(params[:json_key]))
       elsif params[:json_key_data]
-        service_account_json = StringIO.new(params[:json_key_data])
+        StringIO.new(params[:json_key_data])
       end
-
-      service_account_json
     end
 
     # Initializes the service and its auth_client using the specified information
     # @param service_account_json: The raw service account Json data
-    def initialize(service_account_json: nil, params: nil)
-      # decode the json and check its type
-      begin
-        json_content = service_account_json.read
-        google_credentials = JSON.parse(json_content)
-        service_account_json.rewind
-      rescue JSON::ParserError
-        UI.user_error!("Invalid Google Credentials file provided - unable to parse json.")
-      end
+    # @param auth_client: A pre-built auth client (e.g. from Application Default Credentials discovery)
+    def initialize(service_account_json: nil, auth_client: nil, params: nil)
+      if auth_client.nil?
+        # decode the json and check its type
+        begin
+          json_content = service_account_json.read
+          google_credentials = JSON.parse(json_content)
+          service_account_json.rewind
+        rescue JSON::ParserError
+          UI.user_error!("Invalid Google Credentials file provided - unable to parse json.")
+        end
 
-      # use correct credential class based on type
-      case google_credentials['type']
-      when "authorized_user"
-        auth_client = Google::Auth::UserRefreshCredentials.make_creds(json_key_io: service_account_json, scope: self.class::SCOPE)
-      when "external_account"
-        auth_client = Google::Auth::ExternalAccount::Credentials.make_creds(json_key_io: service_account_json, scope: self.class::SCOPE)
-      when "service_account"
-        auth_client = Google::Auth::ServiceAccountCredentials.make_creds(json_key_io: service_account_json, scope: self.class::SCOPE)
-      else
-        UI.user_error!("Invalid Google Credentials file provided - no credential type found.")
+        # use correct credential class based on type
+        case google_credentials['type']
+        when "authorized_user"
+          auth_client = Google::Auth::UserRefreshCredentials.make_creds(json_key_io: service_account_json, scope: self.class::SCOPE)
+        when "external_account"
+          auth_client = Google::Auth::ExternalAccount::Credentials.make_creds(json_key_io: service_account_json, scope: self.class::SCOPE)
+        when "service_account"
+          auth_client = Google::Auth::ServiceAccountCredentials.make_creds(json_key_io: service_account_json, scope: self.class::SCOPE)
+        else
+          UI.user_error!("Invalid Google Credentials file provided - no credential type found.")
+        end
       end
 
       UI.verbose("Fetching a new access token from Google...")
@@ -150,7 +163,7 @@ module Supply
         service_account_json = StringIO.new(JSON.dump(cred_json))
         service_account_json
       else
-        UI.user_error!("No authentication parameters were specified. These must be provided in order to authenticate with Google")
+        nil
       end
     end
 
