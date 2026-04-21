@@ -162,8 +162,6 @@ module Supply
         }
         service_account_json = StringIO.new(JSON.dump(cred_json))
         service_account_json
-      else
-        nil
       end
     end
 
