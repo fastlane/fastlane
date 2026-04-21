@@ -53,7 +53,7 @@ module Fastlane
 
         UI.message("Fetching list of currently registered devices...")
         existing_devices = Spaceship::ConnectAPI::Device.all
-        
+
         existing_udids = existing_devices.map(&:udid).map do |udid|
           udid.tr("-", "").downcase
         end
