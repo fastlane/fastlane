@@ -55,7 +55,7 @@ module Fastlane
         existing_devices = Spaceship::ConnectAPI::Device.all
         
         existing_udids = existing_devices.map(&:udid).map do |udid|
-         udid.tr("-", "").downcase
+          udid.tr("-", "").downcase
         end
 
         device_objs = new_devices.map do |device|
