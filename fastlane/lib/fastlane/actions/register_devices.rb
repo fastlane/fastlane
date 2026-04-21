@@ -57,7 +57,7 @@ module Fastlane
         existing_udids = existing_devices.map(&:udid).map do |udid|
          udid.tr("-", "").downcase
         end
-        
+
         device_objs = new_devices.map do |device|
           if existing_udids.include?(device[0].tr("-", "").downcase)
             UI.verbose("UDID #{device[0]} already exists - Skipping...")
@@ -77,6 +77,7 @@ module Fastlane
 
           try_create_device(name: device[1], platform: device_platform, udid: device[0])
         end
+
         UI.success("Successfully registered new devices.")
         return device_objs.compact
       end
