@@ -2,6 +2,7 @@ describe Supply do
   describe Supply::Client do
     let(:service_account_file) { File.read(fixture_file("sample-service-account.json")) }
     let(:external_account_file) { File.read(fixture_file("sample-external-account.json")) }
+    let(:authorized_user_file) { File.read(fixture_file("sample-authorized-user.json")) }
     before do
       stub_request(:post, "https://www.googleapis.com/oauth2/v4/token").
         to_return(status: 200, body: '{}', headers: { 'Content-Type' => 'application/json' })
@@ -30,6 +31,21 @@ describe Supply do
           to_return(status: 200, body: '{}', headers: { 'Content-Type' => 'application/json' })
 
         file_path = fixture_file("sample-external-account.json")
+        Supply::Client.make_from_config(params: { json_key: file_path, timeout: 1 })
+      end
+
+      it "with authorized_user credentials" do
+        stub_request(:post, "https://oauth2.googleapis.com/token").
+          to_return(status: 200, body: '{"access_token": "fake-access-token", "token_type": "Bearer", "expires_in": 3600}', headers: { 'Content-Type' => 'application/json' })
+
+        Supply::Client.new(service_account_json: StringIO.new(authorized_user_file), params: { timeout: 1 })
+      end
+
+      it "with authorized_user credentials from file" do
+        stub_request(:post, "https://oauth2.googleapis.com/token").
+          to_return(status: 200, body: '{"access_token": "fake-access-token", "token_type": "Bearer", "expires_in": 3600}', headers: { 'Content-Type' => 'application/json' })
+
+        file_path = fixture_file("sample-authorized-user.json")
         Supply::Client.make_from_config(params: { json_key: file_path, timeout: 1 })
       end
     end

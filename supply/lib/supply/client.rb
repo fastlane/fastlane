@@ -57,6 +57,8 @@ module Supply
 
       # use correct credential class based on type
       case google_credentials['type']
+      when "authorized_user"
+        auth_client = Google::Auth::UserRefreshCredentials.make_creds(json_key_io: service_account_json, scope: self.class::SCOPE)
       when "external_account"
         auth_client = Google::Auth::ExternalAccount::Credentials.make_creds(json_key_io: service_account_json, scope: self.class::SCOPE)
       when "service_account"
