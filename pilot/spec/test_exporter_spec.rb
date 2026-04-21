@@ -25,7 +25,7 @@ describe Pilot::TesterExporter do
       let(:fake_app) { "fake app" }
 
       before(:each) do
-        allow(fake_app).to receive(:get_beta_testers).with(includes: "apps,betaTesterMetrics,betaGroups").and_return([])
+        allow(fake_app).to receive(:get_beta_testers).with(includes: "apps,betaGroups").and_return([])
         allow(fake_tester_exporter).to receive(:find_app).with(apple_id: fake_apple_id, app_identifier: fake_app_identifier).and_return(fake_app)
       end
 
@@ -47,7 +47,7 @@ describe Pilot::TesterExporter do
 
       before(:each) do
         allow(fake_tester_exporter).to receive(:find_app).with(apple_id: fake_apple_id, app_identifier: fake_app_identifier).and_return(nil)
-        allow(Spaceship::ConnectAPI::BetaTester).to receive(:all).with(includes: "apps,betaTesterMetrics,betaGroups").and_return([])
+        allow(Spaceship::ConnectAPI::BetaTester).to receive(:all).with(includes: "apps,betaGroups").and_return([])
       end
 
       it "exports beta testers inside the correct file path" do
