@@ -21,7 +21,7 @@ module Fastlane
       end
 
       def self.description
-        "Validate a Google credentials JSON file used to authenticate with the Google Play Store"
+        "Validate Google credentials JSON for the Google Play Store"
       end
 
       def self.authors
