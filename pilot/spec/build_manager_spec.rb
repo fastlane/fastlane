@@ -921,13 +921,13 @@ describe "Build Manager" do
     end
 
     it "with Individual API Key" do
-      options = { username: "josh" }
+      options = {}
       allow(Spaceship::ConnectAPI).to receive(:token).and_return(Spaceship::ConnectAPI::Token.from(filepath: fake_individual_api_key_json_path))
 
       transporter = fake_manager.send(:transporter_for_selected_team, options)
-      expect(transporter.instance_variable_get(:@jwt)).to(be_nil)
-      expect(transporter.instance_variable_get(:@user)).to eq("josh")
-      expect(transporter.instance_variable_get(:@password)).to eq("DELIVERPASS")
+      expect(transporter.instance_variable_get(:@jwt)).not_to(be_nil)
+      expect(transporter.instance_variable_get(:@user)).to be_nil
+      expect(transporter.instance_variable_get(:@password)).to be_nil
       expect(transporter.instance_variable_get(:@provider_short_name)).to(be_nil)
     end
 

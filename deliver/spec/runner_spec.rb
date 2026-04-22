@@ -154,7 +154,7 @@ describe Deliver::Runner do
         options[:api_key] = JSON.load_file(fake_individual_api_key_json_path, symbolize_names: true)
       end
 
-      it 'initializes transporter with username' do
+      it 'initializes transporter with API key' do
         token = instance_double(Spaceship::ConnectAPI::Token, {
           text: 'API_TOKEN',
           expired?: false
@@ -164,13 +164,14 @@ describe Deliver::Runner do
         expect_any_instance_of(FastlaneCore::IpaUploadPackageBuilder).to receive(:generate).and_return('path')
         expect(FastlaneCore::ItunesTransporter).to receive(:new)
           .with(
-            'bill@acme.com',
+            nil,
             nil,
             false,
             nil,
+            'API_TOKEN',
             {
               altool_compatible_command: true,
-              api_key: nil,
+              api_key: options[:api_key],
               provider_public_id: nil
             }
           )
@@ -278,7 +279,7 @@ describe Deliver::Runner do
         options[:api_key] = JSON.load_file(fake_individual_api_key_json_path, symbolize_names: true)
       end
 
-      it 'initializes transporter with username' do
+      it 'initializes transporter with API key' do
         token = instance_double(Spaceship::ConnectAPI::Token, {
           text: 'API_TOKEN',
           expired?: false
@@ -288,13 +289,14 @@ describe Deliver::Runner do
         allow_any_instance_of(FastlaneCore::IpaUploadPackageBuilder).to receive(:generate).and_return('path')
         expect(FastlaneCore::ItunesTransporter).to receive(:new)
           .with(
-            'bill@acme.com',
+            nil,
             nil,
             false,
             nil,
+            'API_TOKEN',
             {
               altool_compatible_command: true,
-              api_key: nil,
+              api_key: options[:api_key],
               provider_public_id: nil
             }
           )

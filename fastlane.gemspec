@@ -8,33 +8,33 @@ Gem::Specification.new do |spec|
   spec.name          = "fastlane"
   spec.version       = Fastlane::VERSION
   # list of authors is regenerated and resorted on each release
-  spec.authors       = ["Jorge Revuelta H",
-                        "Danielle Tomlinson",
-                        "Fumiya Nakamura",
-                        "Jérôme Lacoste",
+  spec.authors       = ["Stefan Natchev",
+                        "Felix Krause",
+                        "Manu Wallner",
+                        "Maksym Grebenets",
+                        "Manish Rathi",
+                        "Helmut Januschka",
+                        "Josh Holtz",
+                        "Iulian Onofrei",
+                        "Andrew McBurney",
+                        "Jorge Revuelta H",
+                        "Jan Piotrowski",
+                        "Olivier Halligon",
+                        "Kohki Miki",
                         "Roger Oba",
                         "Aaron Brager",
-                        "Maksym Grebenets",
-                        "Helmut Januschka",
-                        "Manu Wallner",
-                        "Olivier Halligon",
+                        "Luka Mirosevic",
                         "Daniel Jankowski",
                         "Satoshi Namai",
                         "Connor Tumbleson",
-                        "Felix Krause",
-                        "Iulian Onofrei",
-                        "Josh Holtz",
-                        "Jan Piotrowski",
-                        "Joshua Liebowitz",
-                        "Kohki Miki",
-                        "Łukasz Grabowski",
-                        "Andrew McBurney",
-                        "Stefan Natchev",
-                        "Manish Rathi",
+                        "Danielle Tomlinson",
                         "Jimmy Dee",
+                        "Joshua Liebowitz",
                         "Max Ott",
+                        "Fumiya Nakamura",
                         "Matthew Ellis",
-                        "Luka Mirosevic"]
+                        "Jérôme Lacoste",
+                        "Łukasz Grabowski"]
 
   spec.email         = ["fastlane@krausefx.com"]
   spec.summary       = Fastlane::SUMMARY
@@ -71,7 +71,7 @@ Gem::Specification.new do |spec|
   spec.add_dependency('faraday-cookie_jar', '~> 0.0.6')
   spec.add_dependency('faraday', '~> 1.0') # The faraday gem is used for deploygate, hockey and testfairy actions.
   spec.add_dependency('fastimage', '>= 2.1.0', '< 3.0.0') # fetch the image sizes from the screenshots
-  spec.add_dependency('fastlane-sirp', '>= 1.0.0')
+  spec.add_dependency('fastlane-sirp', '>= 1.1.0') # used for sirp login
   spec.add_dependency('gh_inspector', '>= 1.1.2', '< 2.0.0') # search for issues on GitHub when something goes wrong
   spec.add_dependency('google-apis-androidpublisher_v3', '~> 0.3') # Google API Client to access Play Publishing API
   spec.add_dependency('google-apis-playcustomapp_v1', '~> 0.1') # Google API Client to access Custom app Publishing API

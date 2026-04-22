@@ -414,14 +414,6 @@ module Pilot
                   api_key
                 end
 
-      # Currently no kind of transporters accept an Individual API Key. Use username and app-specific password instead.
-      # See https://github.com/fastlane/fastlane/issues/22115
-      is_individual_key = !api_key.nil? && api_key[:issuer_id].nil?
-      if is_individual_key
-        api_key = nil
-        api_token = nil
-      end
-
       unless api_token.nil?
         api_token.refresh! if api_token.expired?
         return FastlaneCore::ItunesTransporter.new(nil, nil, false, nil, api_token.text, altool_compatible_command: true, api_key: api_key, provider_public_id: nil)
