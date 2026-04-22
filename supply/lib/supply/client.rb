@@ -121,6 +121,11 @@ module Supply
 
       if error
         message = error["error"] && error["error"]["message"]
+        details = error["error"] && error["error"]["details"]
+        if details&.any? { |d| d["reason"] == "ACCESS_TOKEN_SCOPE_INSUFFICIENT" }
+          UI.important("Your credentials are missing the required scope. If using Application Default Credentials, re-run:")
+          UI.important("  gcloud auth application-default login --scopes=openid,email,https://www.googleapis.com/auth/androidpublisher")
+        end
       else
         message = e.body
       end
