@@ -353,6 +353,12 @@ the developer website<a/>.<br />"
           keys: []
         }
       end
+
+      MockAPI::DeveloperPortalServer.post('/services-account/QH65B2/account/auth/key/v2/create') do
+        {
+          keys: []
+        }
+      end
     end
 
     describe '#list_keys' do
@@ -382,7 +388,87 @@ the developer website<a/>.<br />"
     describe '#create_key!' do
       it 'creates a key' do
         subject.create_key!(name: 'some name', service_configs: [])
-        expect(WebMock).to have_requested(:post, api_root + '/create')
+        expect(WebMock).to have_requested(:post, api_root + '/v2/create')
+      end
+
+      it 'creates a key with APNS service' do
+        apns_service_configs = {
+          Spaceship::Portal::Key::APNS_ID => {
+            identifiers: {},
+            environment: "all",
+            scope: "team"
+          }
+        }
+
+        expected_params = {
+          name: "Test Key",
+          serviceConfigurationsRequests: [
+            {
+              serviceId: Spaceship::Portal::Key::APNS_ID,
+              isNew: true,
+              identifiers: {},
+              environment: "all",
+              scope: "team"
+            }
+          ],
+          teamId: "XXXXXXXXXX"
+        }
+
+        subject.create_key!(name: "Test Key", service_configs: apns_service_configs)
+        expect(WebMock).to have_requested(:post, api_root + '/v2/create').
+          with(body: expected_params.to_json, headers: { 'Content-Type' => 'application/json' })
+      end
+
+      it 'creates a key with DEVICE_CHECK service' do
+        device_check_service_configs = {
+          Spaceship::Portal::Key::DEVICE_CHECK_ID => {
+            identifiers: {}
+          }
+        }
+
+        expected_params = {
+          name: "Test Key",
+          serviceConfigurationsRequests: [
+            {
+              serviceId: Spaceship::Portal::Key::DEVICE_CHECK_ID,
+              isNew: true,
+              identifiers: {}
+            }
+          ],
+          teamId: "XXXXXXXXXX"
+        }
+
+        subject.create_key!(name: "Test Key", service_configs: device_check_service_configs)
+        expect(WebMock).to have_requested(:post, api_root + '/v2/create').
+          with(body: expected_params.to_json, headers: { 'Content-Type' => 'application/json' })
+      end
+
+      it 'creates a key with MUSIC_KIT service' do
+        music_kit_service_configs = {
+          Spaceship::Portal::Key::MUSIC_KIT_ID => {
+            identifiers: {
+              music: ["4H4P58CJTN"]
+            }
+          }
+        }
+
+        expected_params = {
+          name: "Test Key",
+          serviceConfigurationsRequests: [
+            {
+              serviceId: Spaceship::Portal::Key::MUSIC_KIT_ID,
+              isNew: true,
+              identifiers: {
+                music: ["4H4P58CJTN"]
+              }
+            }
+          ],
+          teamId: "XXXXXXXXXX"
+        }
+
+        subject.create_key!(name: "Test Key", service_configs: music_kit_service_configs)
+        expect(WebMock).to have_requested(:post, api_root + '/v2/create').
+          with(body: expected_params.to_json, headers: { 'Content-Type' => 'application/json' })
       end
     end
 

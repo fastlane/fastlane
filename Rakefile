@@ -42,12 +42,6 @@ task(:test_all_individually) do
   end
 end
 
-# Overwrite the default rake task
-# since we use fastlane to deploy fastlane
-task(:push) do
-  sh("bundle exec fastlane release")
-end
-
 task(:generate_team_table) do
   require 'json'
   content = ["<table id='team'>"]
@@ -113,7 +107,7 @@ task(:prepare_rubocop_config) do
 
   next unless File.exist?(rubocop_config)
 
-  config = YAML.safe_load(File.read(rubocop_config))
+  config = YAML.safe_load(File.read(rubocop_config), aliases: true)
   config['require'] = %w[rubocop/require_tools rubocop-performance]
   config.delete('inherit_from')
   config.delete('CrossPlatform/ForkUsage')

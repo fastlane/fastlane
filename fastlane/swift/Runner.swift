@@ -1,5 +1,5 @@
 // Runner.swift
-// Copyright (c) 2025 FastlaneTools
+// Copyright (c) 2026 FastlaneTools
 
 //
 //  ** NOTE **
@@ -97,7 +97,7 @@ class Runner {
     }
 }
 
-// Handle threading stuff
+/// Handle threading stuff
 extension Runner {
     func startSocketThread(port: UInt32) {
         let secondsToWait = DispatchTimeInterval.seconds(SocketClient.connectTimeoutSeconds)

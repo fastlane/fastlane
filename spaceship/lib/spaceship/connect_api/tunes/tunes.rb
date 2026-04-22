@@ -367,9 +367,9 @@ module Spaceship
         # appPreviewSets
         #
 
-        def get_app_preview_sets(filter: {}, includes: nil, limit: nil, sort: nil)
+        def get_app_preview_sets(app_store_version_localization_id: nil, filter: {}, includes: nil, limit: nil, sort: nil)
           params = tunes_request_client.build_params(filter: filter, includes: includes, limit: limit, sort: sort)
-          tunes_request_client.get("#{Version::V1}/appPreviewSets", params)
+          tunes_request_client.get("#{Version::V1}/appStoreVersionLocalizations/#{app_store_version_localization_id}/appPreviewSets", params)
         end
 
         def get_app_preview_set(app_preview_set_id: nil, filter: {}, includes: nil, limit: nil, sort: nil)
@@ -1241,6 +1241,44 @@ module Spaceship
         def get_review_rejection(filter: {}, includes: nil)
           params = tunes_request_client.build_params(filter: filter, includes: includes)
           tunes_request_client.get("#{Version::V1}/reviewRejections", params)
+        end
+
+        #
+        # webhooks
+        #
+
+        def get_webhooks(app_id:, filter: {}, includes: nil, limit: nil, sort: nil)
+          params = tunes_request_client.build_params(filter: filter, includes: includes, limit: limit, sort: sort)
+          tunes_request_client.get("#{Version::V1}/apps/#{app_id}/webhooks", params)
+        end
+
+        def post_webhook(app_id:, enabled:, event_types:, name:, secret:, url:)
+          body = {
+            data: {
+              type: "webhooks",
+              attributes: {
+                enabled: enabled,
+                eventTypes: event_types,
+                name: name,
+                secret: secret,
+                url: url
+              },
+              relationships: {
+                app: {
+                  data: {
+                    id: app_id,
+                    type: "apps"
+                  }
+                }
+              }
+            }
+          }
+
+          tunes_request_client.post("#{Version::V1}/webhooks", body)
+        end
+
+        def delete_webhook(webhook_id:)
+          tunes_request_client.delete("#{Version::V1}/webhooks/#{webhook_id}")
         end
       end
     end
