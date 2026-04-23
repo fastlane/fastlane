@@ -1,0 +1,32 @@
+{
+  "devices" : {
+    "com.apple.CoreSimulator.SimRuntime.iOS-10-0" : [
+      {
+        "name" : "iPhone 6s",
+        "udid" : "521336F6-CB62-409B-8387-D064F658276B",
+        "state" : "Shutdown",
+        "availability" : "(available)"
+      },
+      {
+        "name" : "iPhone SE",
+        "udid" : "B68B2B7F-4FA2-4E70-9BF2-C32308F75B31",
+        "state" : "Shutdown",
+        "availability" : "(available)"
+      }
+    ],
+    "com.apple.CoreSimulator.SimRuntime.iOS-9-3" : [
+      {
+        "name" : "iPhone 4s",
+        "udid" : "BFFA7DB1-4FB6-45E0-8CBA-EEB9386B66D7",
+        "state" : "Shutdown",
+        "availability" : "(unavailable, runtime profile not found)"
+      },
+      {
+        "name" : "iPhone 5",
+        "udid" : "051EBB13-7A3F-4A8F-8440-96BB8DE7CD3C",
+        "state" : "Shutdown",
+        "availability" : "(unavailable, runtime profile not found)"
+      }
+    ]
+  }
+}
