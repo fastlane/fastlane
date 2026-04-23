@@ -427,25 +427,7 @@ module Spaceship
         # sigh handles more specific filtering and validation steps that make this logic OK
         #
         # This is the minimum protection needed for people using spaceship directly
-        unless certificate_valid?
-          if mac?
-            if self.kind_of?(Development)
-              self.certificates = [Spaceship::Portal::Certificate::MacDevelopment.all.first]
-            elsif self.kind_of?(Direct)
-              self.certificates = [Spaceship::Portal::Certificate::DeveloperIdApplication.all.first]
-            else
-              self.certificates = [Spaceship::Portal::Certificate::MacAppDistribution.all.first]
-            end
-          else
-            if self.kind_of?(Development)
-              self.certificates = [Spaceship::Portal::Certificate::Development.all.first]
-            elsif self.kind_of?(InHouse)
-              self.certificates = [Spaceship::Portal::Certificate::InHouse.all.first]
-            else
-              self.certificates = [Spaceship::Portal::Certificate::Production.all.first]
-            end
-          end
-        end
+        ensure_valid_certificate_selection! unless certificate_valid?
 
         client.with_retry do
           client.repair_provisioning_profile!(
@@ -453,8 +435,8 @@ module Spaceship
             name,
             distribution_method,
             app.app_id,
-            certificates.map(&:id),
-            devices.map(&:id),
+            certificates.map(&:id).compact,
+            devices.map(&:id).compact,
             mac: mac?,
             sub_platform: tvos? ? 'tvOS' : nil,
             template_name: is_template_profile ? template.purpose_name : nil
@@ -469,15 +451,63 @@ module Spaceship
         return profile
       end
 
+      def ensure_valid_certificate_selection!
+        certs = suggested_certificates
+        if certs.nil? || certs.empty?
+          raise "No valid signing certificates were found to repair or regenerate this provisioning profile. " \
+                "Please create or import an appropriate signing certificate in your Apple Developer account " \
+                "and try again."
+        end
+        self.certificates = certs
+      end
+
+      def suggested_certificates
+        if mac?
+          return [Spaceship::Portal::Certificate::DeveloperIdApplication.all.first].compact if kind_of?(Direct)
+          if kind_of?(Development)
+            return [find_best_certificate(primary: Spaceship::Portal::Certificate::MacDevelopment,
+                                          fallback_kind: Spaceship::Portal::Certificate::AppleDevelopment,
+                                          mac: true)].compact
+          end
+
+          return [find_best_certificate(primary: Spaceship::Portal::Certificate::MacAppDistribution,
+                                        fallback_kind: Spaceship::Portal::Certificate::AppleDistribution,
+                                        mac: true)].compact
+        end
+
+        return [Spaceship::Portal::Certificate::InHouse.all.first].compact if kind_of?(InHouse)
+        if kind_of?(Development)
+          return [find_best_certificate(primary: Spaceship::Portal::Certificate::Development,
+                                        fallback_kind: Spaceship::Portal::Certificate::AppleDevelopment,
+                                        mac: false)].compact
+        end
+
+        [find_best_certificate(primary: Spaceship::Portal::Certificate::Production,
+                               fallback_kind: Spaceship::Portal::Certificate::AppleDistribution,
+                               mac: false)].compact
+      end
+
+      def find_best_certificate(primary:, fallback_kind:, mac:)
+        cert = primary.all.first
+        return cert if cert
+
+        Spaceship::Portal::Certificate.all(mac: mac).find { |c| c.kind_of?(fallback_kind) }
+      end
+
+      private :ensure_valid_certificate_selection!, :suggested_certificates, :find_best_certificate
+
       # Is the certificate of this profile available?
       # @return (Bool) is the certificate valid?
       def certificate_valid?
         return false if (certificates || []).count == 0
+
+        all_certificate_ids = Spaceship::Portal::Certificate.all(mac: mac?).collect(&:id)
         certificates.each do |c|
-          if Spaceship::Portal::Certificate.all(mac: mac?).collect(&:id).include?(c.id)
-            return true
-          end
+          next unless c&.id.to_s.length > 0
+
+          return true if all_certificate_ids.include?(c.id)
         end
+
         return false
       end
 
@@ -520,12 +550,20 @@ module Spaceship
       end
 
       def certificates
+        if @certificates
+          # `@certificates` can be pre-populated from different sources (e.g. Xcode API/raw data).
+          # Filter to only real Certificate objects rather than clearing all on a single stray value.
+          @certificates = @certificates.compact.select { |c| c.kind_of?(Spaceship::Portal::Certificate) }
+        end
+
         if (@certificates || []).empty?
-          @certificates = (profile_details["certificates"] || []).collect do |cert|
+          @certificates = (profile_details["certificates"] || []).filter_map do |cert|
+            next unless cert
             Certificate.set_client(client).factory(cert)
           end
         end
 
+        @certificates.select! { |c| c&.id.to_s.length > 0 }
         @certificates
       end
 
