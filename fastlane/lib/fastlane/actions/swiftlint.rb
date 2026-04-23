@@ -2,7 +2,7 @@ module Fastlane
   module Actions
     class SwiftlintAction < Action
       def self.run(params)
-        if `which swiftlint`.to_s.length == 0 && params[:executable].nil? && !Helper.test?
+        unless Helper.which('swiftlint') || params[:executable] || Helper.test?
           UI.user_error!("You have to install swiftlint using `brew install swiftlint` or specify the executable path with the `:executable` option.")
         end
 
