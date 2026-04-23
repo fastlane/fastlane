@@ -14,13 +14,20 @@ module Deliver
       @app_previews_path = app_previews_path
       @frame_time_code = preview_frame_time_code
       @overwrite = overwrite_preview_videos
+
+      validate_path!
     end
 
     def sync_from_path
       UI.important("Uploading App Preview videos...")
-      validate_path!
 
-      localizations = editable_version.get_app_store_version_localizations
+      version = editable_version
+      if version.nil?
+        UI.important("Could not find an editable App Store version for platform #{@platform}. Skipping App Preview upload.")
+        return
+      end
+
+      localizations = version.get_app_store_version_localizations
       locale_by_code = localizations.each_with_object({}) { |l, h| h[l.locale] = l }
 
       video_previews_per_locale = discover_videos(@app_previews_path)

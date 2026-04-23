@@ -11,40 +11,46 @@ describe Deliver::DetectValues do
         before do
           allow(FastlaneCore::Helper).to receive(:fastlane_enabled?).and_return(true)
           allow(FastlaneCore::FastlaneFolder).to receive(:path).and_return('./fastlane')
-
-          value_detector.find_folders(options)
         end
 
         it 'sets up screenshots folder in fastlane folder' do
+          value_detector.find_folders(options)
           expect(options[:screenshots_path]).to eq('./fastlane/screenshots')
         end
 
         it 'sets up metadata folder in fastlane folder' do
+          value_detector.find_folders(options)
           expect(options[:metadata_path]).to eq('./fastlane/metadata')
         end
 
-        it 'sets up app previews folder in fastlane folder' do
-          expect(options[:app_previews_path]).to eq('./fastlane/app-previews')
+        it 'does not automatically set up app previews folder in fastlane folder even if it exists' do
+          FileUtils.mkdir_p('./fastlane/app-previews')
+          value_detector.find_folders(options)
+          expect(options[:app_previews_path]).to be_nil
+          FileUtils.rm_rf('./fastlane/app-previews')
         end
       end
 
       describe 'running without fastlane' do
         before do
           allow(FastlaneCore::Helper).to receive(:fastlane_enabled?).and_return(false)
-
-          value_detector.find_folders(options)
         end
 
         it 'sets up screenshots folder in current folder' do
+          value_detector.find_folders(options)
           expect(options[:screenshots_path]).to eq('./screenshots')
         end
 
         it 'sets up metadata folder in current folder' do
+          value_detector.find_folders(options)
           expect(options[:metadata_path]).to eq('./metadata')
         end
 
-        it 'sets up app previews folder in current folder' do
-          expect(options[:app_previews_path]).to eq('./app-previews')
+        it 'does not automatically set up app previews folder in current folder even if it exists' do
+          FileUtils.mkdir_p('./app-previews')
+          value_detector.find_folders(options)
+          expect(options[:app_previews_path]).to be_nil
+          FileUtils.rm_rf('./app-previews')
         end
       end
     end
