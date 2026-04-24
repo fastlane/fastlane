@@ -89,6 +89,10 @@ module Deliver
         app_identifier: options[:app_identifier]
       }
 
+      if options[:precheck_skip_unreachable_urls]
+        precheck_options[:unreachable_urls] = { level: :skip }
+      end
+
       if options[:api_key] || options[:api_key_path]
         if options[:precheck_include_in_app_purchases]
           UI.user_error!("Precheck cannot check In-app purchases with the App Store Connect API Key (yet). Exclude In-app purchases from precheck, disable the precheck step in your build step, or use Apple ID login")
