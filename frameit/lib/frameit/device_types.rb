@@ -190,7 +190,7 @@ module Frameit
     IPHONE_16_PLUS ||= Device.new("iphone-16-plus", "Apple iPhone 16 Plus", 13, [[1290, 2796], [2796, 1290]], 460, Color::BLACK, Platform::IOS)
     IPHONE_16_PRO ||= Device.new("iphone-16-pro", "Apple iPhone 16 Pro", 13, [[1206, 2622], [2622, 1206]], 460, Color::NATURAL_TITANIUM, Platform::IOS, DEVICE_SCREEN_IDS[DisplayType::APP_IPHONE_61])
     IPHONE_16_PRO_MAX ||= Device.new("iphone16-pro-max", "Apple iPhone 16 Pro Max", 13, [[1320, 2868], [2868, 1320]], 460, Color::NATURAL_TITANIUM, Platform::IOS, DEVICE_SCREEN_IDS[DisplayType::APP_IPHONE_67])
-    IPHONE_17 ||= Device.new("iphone-17", "Apple iPhone 17", 14, [[1206, 2622], [2622, 1206]], 460, Color::BLACK, Platform::IOS, DEVICE_SCREEN_IDS[DisplayType::APP_IPHONE_61])
+    IPHONE_17 ||= Device.new("iphone-17", "Apple iPhone 17", 14, [[1206, 2622], [2622, 1206]], 460, Color::BLACK, Platform::IOS)
     IPHONE_17_PRO ||= Device.new("iphone-17-pro", "Apple iPhone 17 Pro", 14, [[1206, 2622], [2622, 1206]], 460, Color::SILVER, Platform::IOS, DEVICE_SCREEN_IDS[DisplayType::APP_IPHONE_61])
     IPHONE_17_PRO_MAX ||= Device.new("iphone17-pro-max", "Apple iPhone 17 Pro Max", 14, [[1320, 2868], [2868, 1320]], 460, Color::SILVER, Platform::IOS, DEVICE_SCREEN_IDS[DisplayType::APP_IPHONE_67])
     IPAD_10_2 ||= Device.new("ipad-10-2", "Apple iPad 10.2", 1, [[1620, 2160], [2160, 1620]], 264, Color::SPACE_GRAY, Platform::IOS)
