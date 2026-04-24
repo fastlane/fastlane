@@ -41,6 +41,15 @@ public protocol DeliverfileProtocol: AnyObject {
     /// Path to the folder containing the screenshots
     var screenshotsPath: String? { get }
 
+    /// Path to the folder containing localized App Preview videos
+    var appPreviewsPath: String? { get }
+
+    /// Time code for the App Preview still frame written as hour:minute:second:centisecond (e.g. 00:00:00:01)
+    var previewFrameTimeCode: String { get }
+
+    /// Clear all previously uploaded App Preview videos before uploading the new ones
+    var overwritePreviewVideos: Bool { get }
+
     /// Skip uploading an ipa or pkg to App Store Connect
     var skipBinaryUpload: Bool { get }
 
@@ -112,6 +121,9 @@ public protocol DeliverfileProtocol: AnyObject {
 
     /// The provider short name to be used with the iTMSTransporter to identify your team. This value will override the automatically detected provider short name. To get provider short name run `pathToXcode.app/Contents/Applications/Application\ Loader.app/Contents/itms/bin/iTMSTransporter -m provider -u 'USERNAME' -p 'PASSWORD' -account_type itunes_connect -v off`. The short names of providers should be listed in the second column
     var itcProvider: String? { get }
+
+    /// The provider public ID to be used with altool (--provider-public-id). This value will override the automatically detected provider value for altool uploads. Required after Xcode 26 when your account is associated with multiple providers and using username/app-password authentication
+    var providerPublicId: String? { get }
 
     /// Run precheck before submitting to app review
     var runPrecheckBeforeSubmit: Bool { get }
@@ -254,6 +266,18 @@ public extension DeliverfileProtocol {
         return nil
     }
 
+    var appPreviewsPath: String? {
+        return nil
+    }
+
+    var previewFrameTimeCode: String {
+        return "00:00:05:00"
+    }
+
+    var overwritePreviewVideos: Bool {
+        return false
+    }
+
     var skipBinaryUpload: Bool {
         return false
     }
@@ -347,6 +371,10 @@ public extension DeliverfileProtocol {
     }
 
     var itcProvider: String? {
+        return nil
+    }
+
+    var providerPublicId: String? {
         return nil
     }
 
@@ -469,4 +497,4 @@ public extension DeliverfileProtocol {
 
 // Please don't remove the lines below
 // They are used to detect outdated files
-// FastlaneRunnerAPIVersion [0.9.143]
+// FastlaneRunnerAPIVersion [0.9.145]

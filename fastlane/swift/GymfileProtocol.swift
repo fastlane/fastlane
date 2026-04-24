@@ -20,6 +20,9 @@ public protocol GymfileProtocol: AnyObject {
     /// The name of the resulting ipa file
     var outputName: String? { get }
 
+    /// App name to use in logfile name
+    var appName: String? { get }
+
     /// The configuration to use when building the app. Defaults to 'Release'
     var configuration: String? { get }
 
@@ -187,6 +190,10 @@ public extension GymfileProtocol {
     }
 
     var outputName: String? {
+        return nil
+    }
+
+    var appName: String? {
         return nil
     }
 
@@ -385,4 +392,4 @@ public extension GymfileProtocol {
 
 // Please don't remove the lines below
 // They are used to detect outdated files
-// FastlaneRunnerAPIVersion [0.9.146]
+// FastlaneRunnerAPIVersion [0.9.148]

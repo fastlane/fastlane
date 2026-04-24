@@ -115,7 +115,7 @@ describe FastlaneCore do
       ].compact.join(' ')
     end
 
-    def altool_upload_command(api_key: nil, platform: "macos", provider_short_name: "")
+    def altool_upload_command(api_key: nil, platform: "macos", provider_short_name: "", provider_public_id: "")
       use_api_key = !api_key.nil?
       upload_part = "-f /tmp/my.app.id.itmsp"
       escaped_password = password.shellescape
@@ -128,6 +128,7 @@ describe FastlaneCore do
         ("--apiKey #{api_key[:key_id]}" if use_api_key),
         ("--apiIssuer #{api_key[:issuer_id]}" if use_api_key),
         ("--asc-provider #{provider_short_name}" unless use_api_key || provider_short_name.to_s.empty?),
+        ("--provider-public-id #{provider_public_id}" unless use_api_key || provider_public_id.to_s.empty?),
         ("-t #{platform}"),
         upload_part,
         "-k 100000"
@@ -1174,6 +1175,12 @@ describe FastlaneCore do
               transporter = FastlaneCore::ItunesTransporter.new(email, password, false, 'abcd123', altool_compatible_command: true)
               expect(transporter.upload('my.app.id', '/tmp', package_path: '/tmp/my.app.id.itmsp', platform: "osx")).to eq(altool_upload_command(provider_short_name: 'abcd123'))
             end
+
+            it 'generates a call to altool with provider_public_id' do
+              provider_public_id = '00000000-0000-0000-0000-000000000000'
+              transporter = FastlaneCore::ItunesTransporter.new(email, password, false, nil, altool_compatible_command: true, provider_public_id: provider_public_id)
+              expect(transporter.upload('my.app.id', '/tmp', package_path: '/tmp/my.app.id.itmsp', platform: "osx")).to eq(altool_upload_command(provider_short_name: nil, provider_public_id: provider_public_id))
+            end
           end
 
           context "provider IDs command generation" do
@@ -1556,6 +1563,13 @@ describe FastlaneCore do
         let(:pass_arg) { password }
         let(:api_key_arg) { api_key }
         let(:expected) { "--apiKey #{api_key[:key_id]} --apiIssuer #{api_key[:issuer_id]}" } # api_key takes precedence
+
+        include_examples 'build_credential_params'
+      end
+
+      context "with individual api key (no issuer_id)" do
+        let(:api_key_arg) { { key_id: "TESTAPIK2HW", issuer_id: nil } }
+        let(:expected) { "--apiKey TESTAPIK2HW --apiIssuer TESTAPIK2HW --api-key-subject user" }
 
         include_examples 'build_credential_params'
       end

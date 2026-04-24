@@ -86,6 +86,9 @@ public protocol MatchfileProtocol: AnyObject {
     /// S3 secret access key
     var s3SecretAccessKey: String? { get }
 
+    /// S3 session token
+    var s3SessionToken: String? { get }
+
     /// Name of the S3 bucket
     var s3Bucket: String? { get }
 
@@ -284,6 +287,10 @@ public extension MatchfileProtocol {
         return nil
     }
 
+    var s3SessionToken: String? {
+        return nil
+    }
+
     var s3Bucket: String? {
         return nil
     }
@@ -399,4 +406,4 @@ public extension MatchfileProtocol {
 
 // Please don't remove the lines below
 // They are used to detect outdated files
-// FastlaneRunnerAPIVersion [0.9.140]
+// FastlaneRunnerAPIVersion [0.9.142]

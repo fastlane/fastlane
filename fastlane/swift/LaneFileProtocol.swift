@@ -56,9 +56,9 @@ open class LaneFile: NSObject, LaneFileProtocol {
         #if !SWIFT_PACKAGE
             let methodList = class_copyMethodList(self, &methodCount)
         #else
-            /// In SPM we're calling this functions out of the scope of the normal binary that it's
-            /// being built, so *self* in this scope would be the SPM executable instead of the Fastfile
-            /// that we'd normally expect.
+            // In SPM we're calling this functions out of the scope of the normal binary that it's
+            // being built, so *self* in this scope would be the SPM executable instead of the Fastfile
+            // that we'd normally expect.
             let methodList = class_copyMethodList(type(of: fastfileInstance!), &methodCount)
         #endif
         for i in 0 ..< Int(methodCount) {
