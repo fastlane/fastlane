@@ -4,13 +4,15 @@ require_relative 'analytics_event_builder'
 
 module FastlaneCore
   class AnalyticsSession
-    GA_TRACKING = "UA-121171860-1"
+    GA_TRACKING = "G-94HQ3VVP0X"
+    GA_API_SECRET = "jzMsKsnKRTyFqM_teqVaHg"
 
     private_constant :GA_TRACKING
+    private_constant :GA_API_SECRET
     attr_accessor :session_id
     attr_accessor :client
 
-    def initialize(analytics_ingester_client: AnalyticsIngesterClient.new(GA_TRACKING))
+    def initialize(analytics_ingester_client: AnalyticsIngesterClient.new(GA_TRACKING, GA_API_SECRET))
       require 'securerandom'
       @session_id = SecureRandom.uuid
       @client = analytics_ingester_client
@@ -32,7 +34,8 @@ module FastlaneCore
         p_hash: launch_context.p_hash,
         session_id: session_id,
         action_name: nil,
-        fastlane_client_language: launch_context.fastlane_client_language
+        fastlane_client_language: launch_context.fastlane_client_language,
+        build_tool_version: launch_context.build_tool_version
       )
 
       launch_event = builder.new_event(:launch)

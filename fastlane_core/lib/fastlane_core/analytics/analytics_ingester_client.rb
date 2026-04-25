@@ -10,8 +10,9 @@ module FastlaneCore
 
     private_constant :GA_URL
 
-    def initialize(ga_tracking)
-      @ga_tracking = ga_tracking
+    def initialize(measurement_id, api_secret)
+      @measurement_id = measurement_id
+      @api_secret = api_secret
     end
 
     def post_event(event)
@@ -34,21 +35,14 @@ module FastlaneCore
 
     def post_request(event)
       connection = Faraday.new(GA_URL) do |conn|
-        conn.request(:url_encoded)
         conn.adapter(Faraday.default_adapter)
       end
       connection.headers[:user_agent] = 'fastlane/' + Fastlane::VERSION
-      connection.post("/collect", {
-        v: "1",                                            # API Version
-        tid: @ga_tracking,                                 # Tracking ID / Property ID
-        cid: event[:client_id],                            # Client ID
-        t: "event",                                        # Event hit type
-        ec: event[:category],                              # Event category
-        ea: event[:action],                                # Event action
-        el: event[:label] || "na",                         # Event label
-        ev: event[:value] || "0",                          # Event value
-        aip: "1"                                           # IP anonymization
-      })
+      connection.headers['Content-Type'] = 'application/json'
+      connection.post(
+        "/mp/collect?measurement_id=#{@measurement_id}&api_secret=#{@api_secret}",
+        event.to_json
+      )
     end
   end
 end
