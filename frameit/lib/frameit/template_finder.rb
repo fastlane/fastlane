@@ -24,7 +24,7 @@ module Frameit
       end
 
       if templates.count == 0
-        if screenshot.deliver_screen_id == Deliver::AppScreenshot::ScreenSize::IOS_35
+        if screenshot.deliver_screen_id == DEVICE_SCREEN_IDS[DisplayType::APP_IPHONE_35]
           UI.important("Unfortunately 3.5\" device frames were discontinued. Skipping screen '#{screenshot.path}'")
           UI.error("Looked for: '#{filename}.png'")
         else

@@ -1,6 +1,10 @@
 require 'ostruct'
+
 describe Frameit do
   describe Frameit::TemplateFinder do
+    DEVICE_SCREEN_IDS = Frameit::DEVICE_SCREEN_IDS
+    DisplayType = Frameit::DisplayType
+
     describe 'it can find some screenshots' do
       # Prevent the tests from looking in the real home
       # directory.
@@ -36,7 +40,7 @@ describe Frameit do
                                          device_name: 'Apple iPhone-SE',
                                          color: 'SpaceGray',
                                          orientation_name: 'Vert',
-                                         deliver_screen_id: 'iOS-4-in'
+                                         deliver_screen_id: DEVICE_SCREEN_IDS[DisplayType::APP_IPHONE_40]
         })
         expected_result = 'Apple iPhone-SE SpaceGray'
 
@@ -48,7 +52,7 @@ describe Frameit do
                                          device_name: 'Apple iPhone-SE',
                                          color: 'Silver',
                                          orientation_name: 'Horz',
-                                         deliver_screen_id: 'iOS-4-in'
+                                         deliver_screen_id: DEVICE_SCREEN_IDS[DisplayType::APP_IPHONE_40]
         })
         expected_result = 'Apple iPhone-SE Silver'
 
@@ -60,7 +64,7 @@ describe Frameit do
                                          device_name: 'Apple iPhone_5s',
                                          color: 'SpaceGray',
                                          orientation_name: 'Horz',
-                                         deliver_screen_id: 'iOS-4-in'
+                                         deliver_screen_id: DEVICE_SCREEN_IDS[DisplayType::APP_IPHONE_40]
         })
         expected_result = 'Apple iPhone_5s SpaceGray'
 
@@ -70,7 +74,7 @@ describe Frameit do
       it 'finds an iPhone 6s' do
         screenshot = make_screenshot({
                                          device_name: 'Apple iPhone-6s',
-                                         deliver_screen_id: 'iOS-4.7-in'
+                                         deliver_screen_id: DEVICE_SCREEN_IDS[DisplayType::APP_IPHONE_47]
         })
         expected_result = 'Apple iPhone-6s silver'
 
@@ -81,7 +85,7 @@ describe Frameit do
         screenshot = make_screenshot({
                                          device_name: 'Apple iPhone-6s-Plus',
                                          orientation_name: 'Horz',
-                                         deliver_screen_id: 'iOS-4.7-in'
+                                         deliver_screen_id: DEVICE_SCREEN_IDS[DisplayType::APP_IPHONE_47]
         })
         expected_result = 'Apple iPhone-6s-Plus silver'
 
@@ -91,7 +95,7 @@ describe Frameit do
       it 'finds an ipad mini' do
         screenshot = make_screenshot({
                                          device_name: 'Apple iPad-mini',
-                                         deliver_screen_id: 'iOS-iPad'
+                                         deliver_screen_id: DEVICE_SCREEN_IDS[DisplayType::APP_IPAD_97]
         })
         expected_result = 'Apple iPad-mini silver'
 
@@ -103,7 +107,7 @@ describe Frameit do
                                          device_name: 'Apple iPad-Pro',
                                          color: 'SpaceGray',
                                          orientation_name: 'Vert',
-                                         deliver_screen_id: 'iOS-iPad-Pro'
+                                         deliver_screen_id: DEVICE_SCREEN_IDS[DisplayType::APP_IPAD_PRO_129]
         })
         expected_result = 'Apple iPad-Pro SpaceGray'
 
