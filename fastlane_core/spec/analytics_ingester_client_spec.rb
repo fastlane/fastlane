@@ -76,6 +76,10 @@ describe FastlaneCore::AnalyticsIngesterClient do
       ENV.delete("FASTLANE_OPT_OUT_USAGE")
     end
 
+    after do
+      ENV.delete("FASTLANE_OPT_OUT_USAGE")
+    end
+
     it 'returns nil when in test mode' do
       allow(FastlaneCore::Helper).to receive(:test?).and_return(true)
       result = subject.post_event(event)
@@ -87,7 +91,6 @@ describe FastlaneCore::AnalyticsIngesterClient do
       ENV["FASTLANE_OPT_OUT_USAGE"] = "true"
       result = subject.post_event(event)
       expect(result).to be_nil
-      ENV.delete("FASTLANE_OPT_OUT_USAGE")
     end
   end
 

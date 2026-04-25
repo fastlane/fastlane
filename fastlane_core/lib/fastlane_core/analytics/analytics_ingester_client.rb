@@ -1,6 +1,7 @@
 require 'faraday'
 require 'openssl'
 require 'json'
+require 'uri'
 
 require_relative '../helper'
 
@@ -39,10 +40,8 @@ module FastlaneCore
       end
       connection.headers[:user_agent] = 'fastlane/' + Fastlane::VERSION
       connection.headers['Content-Type'] = 'application/json'
-      connection.post(
-        "/mp/collect?measurement_id=#{@measurement_id}&api_secret=#{@api_secret}",
-        event.to_json
-      )
+      params = URI.encode_www_form(measurement_id: @measurement_id, api_secret: @api_secret)
+      connection.post("/mp/collect?#{params}", event.to_json)
     end
   end
 end
