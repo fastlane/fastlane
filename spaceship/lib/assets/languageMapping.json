@@ -304,7 +304,7 @@
         "itc_locale": "vi"
     },
     {
-        "locale": "bn",
+        "locale": "bn-BD",
         "name": "Bangla",
         "game-center": false,
         "itc_locale": "bn"
@@ -364,7 +364,7 @@
         "itc_locale": "te"
     },
     {
-        "locale": "ur",
+        "locale": "ur-PK",
         "name": "Urdu",
         "game-center": false,
         "itc_locale": "ur"
