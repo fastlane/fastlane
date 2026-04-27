@@ -206,6 +206,25 @@ describe Fastlane do
       end
     end
 
+    describe "FASTLANE_SKIP_USED_PLUGINS" do
+      it "suppresses plugin table output when set" do
+        module Fastlane::Crashlytics
+        end
+
+        pm = Fastlane::PluginManager.new
+        plugin_name = "crashlytics"
+        expect(pm).to receive(:available_plugins).and_return([plugin_name])
+        expect(Fastlane::FastlaneRequire).to receive(:install_gem_if_needed).with(gem_name: plugin_name, require_gem: true)
+
+        expect(pm).to receive(:store_plugin_reference).and_raise(StandardError.new)
+
+        FastlaneSpec::Env.with_env_values('FASTLANE_SKIP_USED_PLUGINS' => 'true') do
+          expect(pm).not_to(receive(:print_plugin_information))
+          pm.load_plugins
+        end
+      end
+    end
+
     describe "Error handling of invalid plugins" do
       it "shows an appropriate error message when an action is not available, even though a plugin was added" do
         expect do
