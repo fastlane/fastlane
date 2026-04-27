@@ -123,5 +123,71 @@ describe Supply do
         expect(subject.class.method_defined?(:uploadbundle_internalappsharingartifact)).to eq(true)
       end
     end
+
+    describe "#get_track_meta" do
+      let(:service_account_file) { File.read(fixture_file("sample-service-account.json")) }
+
+      before do
+        stub_request(:post, "https://www.googleapis.com/oauth2/v4/token").
+          to_return(status: 200, body: '{}', headers: { 'Content-Type' => 'application/json' })
+        stub_request(:post, "https://androidpublisher.googleapis.com/androidpublisher/v3/applications/pkg-meta/edits").
+          to_return(status: 200, body: '{"id":"edit-meta-1"}', headers: { 'Content-Type' => 'application/json' })
+      end
+
+      it "returns a Track from the Android Publisher API" do
+        stub_request(:get, "https://androidpublisher.googleapis.com/androidpublisher/v3/applications/pkg-meta/edits/edit-meta-1/tracks/production").
+          to_return(
+            status: 200,
+            body: '{"track":"production","releases":[{"name":"1.0.0","versionCodes":["42"],"status":"completed"}]}',
+            headers: { 'Content-Type' => 'application/json' }
+          )
+
+        client = Supply::Client.new(service_account_json: StringIO.new(service_account_file), params: { timeout: 1 })
+        client.begin_edit(package_name: "pkg-meta")
+        result = client.get_track_meta("production")
+
+        expect(result).to be_a(AndroidPublisher::Track)
+        expect(result.track).to eq("production")
+        expect(result.releases.length).to eq(1)
+        expect(result.releases.first.version_codes).to eq(["42"])
+      end
+
+      it "returns nil when the track is empty (trackEmpty)" do
+        stub_request(:get, "https://androidpublisher.googleapis.com/androidpublisher/v3/applications/pkg-meta/edits/edit-meta-1/tracks/internal").
+          to_return(
+            status: 404,
+            body: {
+              error: {
+                code: 404,
+                message: "track empty",
+                details: [{ "@type" => "type.googleapis.com/google.rpc.ErrorInfo", "reason" => "trackEmpty" }]
+              }
+            }.to_json,
+            headers: { 'Content-Type' => 'application/json' }
+          )
+
+        client = Supply::Client.new(service_account_json: StringIO.new(service_account_file), params: { timeout: 1 })
+        client.begin_edit(package_name: "pkg-meta")
+        expect(client.get_track_meta("internal")).to be_nil
+      end
+
+      it "returns nil when the track is not found" do
+        stub_request(:get, "https://androidpublisher.googleapis.com/androidpublisher/v3/applications/pkg-meta/edits/edit-meta-1/tracks/unknown-track").
+          to_return(status: 404, body: '{"error":{"message":"Track not found"}}', headers: { 'Content-Type' => 'application/json' })
+
+        client = Supply::Client.new(service_account_json: StringIO.new(service_account_file), params: { timeout: 1 })
+        client.begin_edit(package_name: "pkg-meta")
+        expect(client.get_track_meta("unknown-track")).to be_nil
+      end
+
+      it "re-raises on other client errors" do
+        stub_request(:get, "https://androidpublisher.googleapis.com/androidpublisher/v3/applications/pkg-meta/edits/edit-meta-1/tracks/production").
+          to_return(status: 403, body: '{"error":{"message":"forbidden"}}', headers: { 'Content-Type' => 'application/json' })
+
+        client = Supply::Client.new(service_account_json: StringIO.new(service_account_file), params: { timeout: 1 })
+        client.begin_edit(package_name: "pkg-meta")
+        expect { client.get_track_meta("production") }.to raise_error(Google::Apis::ClientError)
+      end
+    end
   end
 end

@@ -488,6 +488,22 @@ module Supply
       end
     end
 
+    def get_track_meta(track)
+      ensure_active_edit!
+
+      begin
+        result = client.get_edit_track(
+          current_package_name,
+          current_edit.id,
+          track
+        )
+        return result
+      rescue Google::Apis::ClientError => e
+        return nil if e.status_code == 404 && track_empty_or_missing_message?(e)
+        raise
+      end
+    end
+
     # Get list of version codes for track
     def track_version_codes(track)
       ensure_active_edit!
@@ -654,6 +670,11 @@ module Supply
     end
 
     private
+
+    def track_empty_or_missing_message?(error)
+      combined = "#{error}#{error.body}"
+      combined.include?("trackEmpty") || combined.include?("Track not found")
+    end
 
     def ensure_active_edit!
       UI.user_error!("You need to have an active edit, make sure to call `begin_edit`") unless @current_edit
