@@ -11,6 +11,7 @@ require_relative 'upload_price_tier'
 require_relative 'upload_metadata'
 require_relative 'upload_screenshots'
 require_relative 'sync_screenshots'
+require_relative 'sync_app_previews'
 require_relative 'detect_values'
 
 module Deliver
@@ -158,6 +159,17 @@ module Deliver
         upload_screenshots.upload(options, screenshots)
       end
 
+      if options[:app_previews_path]
+        previews = Deliver::SyncAppPreviews.new(
+          app: Deliver.cache[:app],
+          platform: Spaceship::ConnectAPI::Platform.map(options[:platform]),
+          app_previews_path: options[:app_previews_path],
+          preview_frame_time_code: options[:preview_frame_time_code],
+          overwrite_preview_videos: options[:overwrite_preview_videos]
+        )
+        previews.sync_from_path
+      end
+
       UploadPriceTier.new.upload(options)
     end
 
@@ -265,7 +277,7 @@ module Deliver
 
     # If App Store Connect API token, use token.
     # If api_key is specified and it is an Individual API Key, don't use token but use username.
-    # If itc_provider was explicitly specified, use it.
+    # If itc_provider or provider_public_id was explicitly specified, use it.
     # If there are multiple teams, infer the provider from the selected team name.
     # If there are fewer than two teams, don't infer the provider.
     def transporter_for_selected_team
@@ -281,23 +293,16 @@ module Deliver
                   api_key
                 end
 
-      # Currently no kind of transporters accept an Individual API Key. Use username and app-specific password instead.
-      # See https://github.com/fastlane/fastlane/issues/22115
-      is_individual_key = !api_key.nil? && api_key[:issuer_id].nil?
-      if is_individual_key
-        api_key = nil
-        api_token = nil
-      end
-
       unless api_token.nil?
         api_token.refresh! if api_token.expired?
-        return FastlaneCore::ItunesTransporter.new(nil, nil, false, nil, api_token.text, altool_compatible_command: true, api_key: api_key)
+        return FastlaneCore::ItunesTransporter.new(nil, nil, false, nil, api_token.text, altool_compatible_command: true, api_key: api_key, provider_public_id: nil)
       end
 
       tunes_client = Spaceship::ConnectAPI.client.tunes_client
 
-      generic_transporter = FastlaneCore::ItunesTransporter.new(options[:username], nil, false, options[:itc_provider], altool_compatible_command: true, api_key: api_key)
-      return generic_transporter unless options[:itc_provider].nil? && tunes_client.teams.count > 1
+      generic_transporter = FastlaneCore::ItunesTransporter.new(options[:username], nil, false, options[:itc_provider], altool_compatible_command: true, api_key: api_key, provider_public_id: options[:provider_public_id])
+      return generic_transporter if options[:itc_provider] || options[:provider_public_id] || tunes_client.nil?
+      return generic_transporter unless tunes_client.teams.count > 1
 
       begin
         team = tunes_client.teams.find { |t| t['providerId'].to_s == tunes_client.team_id }

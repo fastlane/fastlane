@@ -56,7 +56,7 @@ jobs:
       run: |
         bundle exec fastlane create_github_release skip_github_packages:${{ github.event.inputs.skip_github_packages }} skip_rubygems:${{ github.event.inputs.skip_rubygems }}
 
-    - uses: actions/upload-artifact@v6
+    - uses: actions/upload-artifact@v7
       with:
         name: release_tag
         path: latest_fl_version.txt

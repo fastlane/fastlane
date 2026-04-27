@@ -50,6 +50,9 @@ jobs:
           set -euo pipefail
           export PATH="$GEM_HOME/bin:$PATH"
 
+          # Verify executables
+          ruby -e "require 'rubygems/package'; spec = Gem::Package.new('${{ steps.build.outputs.gem_file }}').spec; expected = %w(bin-proxy fastlane match_file); puts \"Gem executables: #{spec.executables}\"; exit(1) unless spec.executables.sort == expected.sort"
+
           # Determine installed fastlane version from the gem
           FASTLANE_VERSION=$(ruby -e "require 'fastlane'; puts Fastlane::VERSION")
           echo "Detected fastlane version: ${FASTLANE_VERSION}"

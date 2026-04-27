@@ -8,33 +8,33 @@ Gem::Specification.new do |spec|
   spec.name          = "fastlane"
   spec.version       = Fastlane::VERSION
   # list of authors is regenerated and resorted on each release
-  spec.authors       = ["Jan Piotrowski",
-                        "Josh Holtz",
-                        "Łukasz Grabowski",
-                        "Iulian Onofrei",
-                        "Olivier Halligon",
-                        "Jimmy Dee",
-                        "Satoshi Namai",
-                        "Danielle Tomlinson",
-                        "Daniel Jankowski",
+  spec.authors       = ["Stefan Natchev",
                         "Felix Krause",
-                        "Maksym Grebenets",
-                        "Kohki Miki",
-                        "Luka Mirosevic",
-                        "Joshua Liebowitz",
                         "Manu Wallner",
+                        "Maksym Grebenets",
+                        "Manish Rathi",
+                        "Helmut Januschka",
+                        "Josh Holtz",
+                        "Iulian Onofrei",
+                        "Andrew McBurney",
+                        "Jorge Revuelta H",
+                        "Jan Piotrowski",
+                        "Olivier Halligon",
+                        "Kohki Miki",
                         "Roger Oba",
+                        "Aaron Brager",
+                        "Luka Mirosevic",
+                        "Daniel Jankowski",
+                        "Satoshi Namai",
+                        "Connor Tumbleson",
+                        "Danielle Tomlinson",
+                        "Jimmy Dee",
+                        "Joshua Liebowitz",
                         "Max Ott",
                         "Fumiya Nakamura",
-                        "Jérôme Lacoste",
-                        "Helmut Januschka",
-                        "Jorge Revuelta H",
-                        "Manish Rathi",
-                        "Stefan Natchev",
-                        "Connor Tumbleson",
-                        "Andrew McBurney",
                         "Matthew Ellis",
-                        "Aaron Brager"]
+                        "Jérôme Lacoste",
+                        "Łukasz Grabowski"]
 
   spec.email         = ["fastlane@krausefx.com"]
   spec.summary       = Fastlane::SUMMARY
@@ -49,16 +49,16 @@ Gem::Specification.new do |spec|
     "source_code_uri" => "https://github.com/fastlane/fastlane"
   }
 
-  spec.required_ruby_version = '>= 2.6'
+  spec.required_ruby_version = '>= 2.7'
 
   spec.files = Dir.glob("*/lib/**/*", File::FNM_DOTMATCH) + Dir["fastlane/swift/**/*"] + Dir["bin/*"] + Dir["*/README.md"] + %w(README.md LICENSE .yardopts) - Dir["fastlane/lib/fastlane/actions/device_grid/assets/*"] - Dir["fastlane/lib/fastlane/actions/docs/assets/*"]
   spec.bindir = "bin"
-  spec.executables = spec.files.grep(%r{^bin/}) { |f| File.basename(f) } - ["bin/console"]
+  spec.executables = spec.files.grep(%r{^bin/}) { |f| File.basename(f) } - ["console"]
   spec.require_paths = Dir["*/lib"]
 
   spec.add_dependency('addressable', '>= 2.8', '< 3.0.0') # Support for URI templates
   spec.add_dependency('artifactory', '~> 3.0') # Used to export to an artifactory server
-  spec.add_dependency('aws-sdk-s3', '~> 1.0') # Used for S3 storage in fastlane match
+  spec.add_dependency('aws-sdk-s3', '~> 1.197') # Used for S3 storage in fastlane match
   spec.add_dependency('babosa', '>= 1.0.3', '< 2.0.0') # library for creating human-friendly identifiers, aka "slugs"
   spec.add_dependency('bundler', '>= 1.17.3', '< 5.0.0') # Used for fastlane plugins
   spec.add_dependency('CFPropertyList', '>= 2.3', '< 4.0.0') # Needed to be able to read binary plist format
@@ -71,11 +71,11 @@ Gem::Specification.new do |spec|
   spec.add_dependency('faraday-cookie_jar', '~> 0.0.6')
   spec.add_dependency('faraday', '~> 1.0') # The faraday gem is used for deploygate, hockey and testfairy actions.
   spec.add_dependency('fastimage', '>= 2.1.0', '< 3.0.0') # fetch the image sizes from the screenshots
-  spec.add_dependency('fastlane-sirp', '>= 1.0.0')
+  spec.add_dependency('fastlane-sirp', '>= 1.1.0') # used for sirp login
   spec.add_dependency('gh_inspector', '>= 1.1.2', '< 2.0.0') # search for issues on GitHub when something goes wrong
   spec.add_dependency('google-apis-androidpublisher_v3', '~> 0.3') # Google API Client to access Play Publishing API
   spec.add_dependency('google-apis-playcustomapp_v1', '~> 0.1') # Google API Client to access Custom app Publishing API
-  spec.add_dependency('google-cloud-env', '>= 1.6.0', '< 2.0.0') # Must be < 2.0.0 to support Ruby 2.6
+  spec.add_dependency('google-cloud-env', '>= 1.6.0', '<= 2.1.1') # Must be <= 2.1.1 to support Ruby 2.7
   spec.add_dependency('google-cloud-storage', '~> 1.31') # Access Google Cloud Storage for match
   spec.add_dependency('highline', '~> 2.0') # user inputs (e.g. passwords)
   spec.add_dependency('http-cookie', '~> 1.0.5') # Must be 1.0.5+ for Ruby 3 compatibility: https://github.com/sparklemotion/http-cookie/commit/d12449a983d3dd660c5fe1f2b135c35e83755cc3

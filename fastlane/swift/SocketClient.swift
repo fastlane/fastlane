@@ -53,7 +53,7 @@ class SocketClient: NSObject {
 
     private(set) var socketStatus: SocketStatus
 
-    // localhost only, this prevents other computers from connecting
+    /// localhost only, this prevents other computers from connecting
     init(host: String = "localhost", port: UInt32 = 2000, commandTimeoutSeconds: Int = defaultCommandTimeoutSeconds, socketDelegate: SocketClientDelegateProtocol) {
         self.host = host
         self.port = port
