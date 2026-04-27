@@ -121,6 +121,62 @@ describe Supply do
         expect(subject.class.method_defined?(:upload_edit_expansionfile)).to eq(true)
         expect(subject.class.method_defined?(:uploadapk_internalappsharingartifact)).to eq(true)
         expect(subject.class.method_defined?(:uploadbundle_internalappsharingartifact)).to eq(true)
+        expect(subject.class.method_defined?(:list_application_track_releases)).to eq(true)
+      end
+    end
+
+    describe "#list_track_release_summaries" do
+      let(:service_account_file) { File.read(fixture_file("sample-service-account.json")) }
+
+      before do
+        stub_request(:post, "https://www.googleapis.com/oauth2/v4/token").
+          to_return(status: 200, body: '{}', headers: { 'Content-Type' => 'application/json' })
+      end
+
+      it "returns release summaries without opening an edit" do
+        stub_request(:get, "https://androidpublisher.googleapis.com/androidpublisher/v3/applications/com.example.app/tracks/production/releases").
+          to_return(
+            status: 200,
+            body: '{"releases":[{"releaseName":"1.0.0","releaseLifecycleState":"inProgress","track":"production"}]}',
+            headers: { 'Content-Type' => 'application/json' }
+          )
+
+        client = Supply::Client.new(service_account_json: StringIO.new(service_account_file), params: { timeout: 1 })
+        result = client.list_track_release_summaries("com.example.app", "production")
+
+        expect(result.length).to be(1)
+        expect(result.first).to be_a(AndroidPublisher::ReleaseSummary)
+        expect(result.first.release_name).to eq("1.0.0")
+        expect(result.first.release_lifecycle_state).to eq("inProgress")
+        expect(result.first.track).to eq("production")
+      end
+
+      it "returns an empty array when no releases exist" do
+        stub_request(:get, "https://androidpublisher.googleapis.com/androidpublisher/v3/applications/com.example.app/tracks/internal/releases").
+          to_return(
+            status: 200,
+            body: '{"releases":[]}',
+            headers: { 'Content-Type' => 'application/json' }
+          )
+
+        client = Supply::Client.new(service_account_json: StringIO.new(service_account_file), params: { timeout: 1 })
+        result = client.list_track_release_summaries("com.example.app", "internal")
+
+        expect(result).to eq([])
+      end
+
+      it "returns an empty array when releases key is nil" do
+        stub_request(:get, "https://androidpublisher.googleapis.com/androidpublisher/v3/applications/com.example.app/tracks/internal/releases").
+          to_return(
+            status: 200,
+            body: '{}',
+            headers: { 'Content-Type' => 'application/json' }
+          )
+
+        client = Supply::Client.new(service_account_json: StringIO.new(service_account_file), params: { timeout: 1 })
+        result = client.list_track_release_summaries("com.example.app", "internal")
+
+        expect(result).to eq([])
       end
     end
   end
