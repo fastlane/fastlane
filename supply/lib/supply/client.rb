@@ -488,38 +488,34 @@ module Supply
       end
     end
 
-    # Get list of version codes for track
-    def track_version_codes(track)
+    def get_edit_track(track)
       ensure_active_edit!
 
       begin
-        result = client.get_edit_track(
+        client.get_edit_track(
           current_package_name,
           current_edit.id,
           track
         )
-        return result.releases.flat_map(&:version_codes) || []
       rescue Google::Apis::ClientError => e
-        return [] if e.status_code == 404 && (e.to_s.include?("trackEmpty") || e.to_s.include?("Track not found"))
-        raise
+        text = [e.message, e.body.to_s].compact.join("\n").downcase
+        is_empty = text.include?("track empty") || text.include?("trackempty") || text.include?("track not found")
+        not_found = (Integer(e.status_code) == 404 rescue false)
+        raise unless not_found && is_empty
+        nil
       end
+    end
+
+    # Get list of version codes for track
+    def track_version_codes(track)
+      result = get_edit_track(track)
+      result&.releases&.flat_map(&:version_codes) || []
     end
 
     # Get list of release names for track
     def track_releases(track)
-      ensure_active_edit!
-
-      begin
-        result = client.get_edit_track(
-          current_package_name,
-          current_edit.id,
-          track
-        )
-        return result.releases || []
-      rescue Google::Apis::ClientError => e
-        return [] if e.status_code == 404 && e.to_s.include?("trackEmpty")
-        raise
-      end
+      result = get_edit_track(track)
+      result&.releases || []
     end
 
     def upload_changelogs(track, track_name)
