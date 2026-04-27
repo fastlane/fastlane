@@ -498,7 +498,10 @@ module Supply
           track
         )
       rescue Google::Apis::ClientError => e
-        raise unless e.status_code == 404 && (e.to_s.include?("trackEmpty") || e.to_s.include?("Track not found"))
+        text = [e.message, e.body.to_s].compact.join("\n").downcase
+        is_empty = text.include?("track empty") || text.include?("trackempty") || text.include?("track not found")
+        not_found = (Integer(e.status_code) == 404 rescue false)
+        raise unless not_found && is_empty
         nil
       end
     end
