@@ -208,15 +208,15 @@ describe Fastlane do
 
     describe "FASTLANE_SKIP_USED_PLUGINS" do
       it "suppresses plugin table output when set" do
-        module Fastlane::Crashlytics
+        module Fastlane::SpaceshipStats
         end
 
         pm = Fastlane::PluginManager.new
-        plugin_name = "crashlytics"
+        plugin_name = "spaceship_stats"
         expect(pm).to receive(:available_plugins).and_return([plugin_name])
         expect(Fastlane::FastlaneRequire).to receive(:install_gem_if_needed).with(gem_name: plugin_name, require_gem: true)
-
-        expect(pm).to receive(:store_plugin_reference).and_raise(StandardError.new)
+        expect(Fastlane::SpaceshipStats).to receive(:all_classes).and_return(["/actions/#{plugin_name}.rb"])
+        allow(UI).to receive(:important)
 
         FastlaneSpec::Env.with_env_values('FASTLANE_SKIP_USED_PLUGINS' => 'true') do
           expect(pm).not_to(receive(:print_plugin_information))
