@@ -522,6 +522,12 @@ module Supply
       end
     end
 
+    def list_track_release_summaries(package_name, track)
+      call_google_api do
+        client.list_application_track_releases("applications/#{package_name}/tracks/#{track}")
+      end.releases || []
+    end
+
     def upload_changelogs(track, track_name)
       ensure_active_edit!
 
