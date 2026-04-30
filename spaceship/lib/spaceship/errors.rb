@@ -116,9 +116,11 @@ module Spaceship
 
   # Base class for errors coming from App Store Connect locale changes
   class AppStoreLocaleError < BasicPreferredInfoError
-    def initialize(msg)
-      @message = (msg ? "An exception occurred for locale: #{msg}." : nil)
-      super
+    def initialize(locale, error)
+      error_message = error.respond_to?(:message) ? error.message : error.to_s
+      locale_str = locale || "unknown"
+      @message = "An exception has occurred for locale: #{locale_str}.\nError: #{error_message}"
+      super(@message)
     end
 
     # no need to search github issues since the error is specific
@@ -130,21 +132,21 @@ module Spaceship
   # Raised for localized text errors from App Store Connect
   class AppStoreLocalizationError < AppStoreLocaleError
     def preferred_error_info
-      "#{@message} Check the localization requirements here: https://help.apple.com/app-store-connect/en.lproj/static.html#dev354659071"
+      "#{@message}\nCheck the localization requirements here: https://developer.apple.com/help/app-store-connect/manage-app-information/localize-app-information"
     end
   end
 
   # Raised for localized screenshots errors from App Store Connect
   class AppStoreScreenshotError < AppStoreLocaleError
     def preferred_error_info
-      "#{@message} Check the screenshot requirements here: https://help.apple.com/app-store-connect/en.lproj/static.html#devd274dd925"
+      "#{@message}\nCheck the screenshot requirements here: https://developer.apple.com/help/app-store-connect/reference/screenshot-specifications"
     end
   end
 
   # Raised for localized app preview errors from App Store Connect
   class AppStoreAppPreviewError < AppStoreLocaleError
     def preferred_error_info
-      "#{@message} Check the app preview requirements here: https://help.apple.com/app-store-connect/en.lproj/static.html#dev4e413fcb8"
+      "#{@message}\nCheck the app preview requirements here: https://developer.apple.com/help/app-store-connect/reference/app-preview-specifications"
     end
   end
 end

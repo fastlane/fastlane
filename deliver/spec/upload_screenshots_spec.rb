@@ -49,6 +49,39 @@ describe Deliver::UploadScreenshots do
         described_class.new.delete_screenshots([localization], screenshots_per_language)
       end
     end
+
+    context 'when screenshots_per_language do not cover all localizations' do
+      it 'should only attempt to delete screenshots for selected localizations' do
+        app_screenshot = double('Spaceship::ConnectAPI::AppScreenshot', id: 'some-id')
+        en_screenshot_set = double('Spaceship::ConnectAPI::AppScreenshotSet',
+                                   screenshot_display_type: Spaceship::ConnectAPI::AppScreenshotSet::DisplayType::APP_IPHONE_55,
+                                   app_screenshots: [])
+        fr_screenshot_set = double('Spaceship::ConnectAPI::AppScreenshotSet',
+                                   screenshot_display_type: Spaceship::ConnectAPI::AppScreenshotSet::DisplayType::APP_IPHONE_55,
+                                   app_screenshots: [app_screenshot])
+        en_localization = double('Spaceship::ConnectAPI::AppStoreVersionLocalization',
+                                 locale: 'en-US',
+                                 get_app_screenshot_sets: [en_screenshot_set])
+        fr_localization = double('Spaceship::ConnectAPI::AppStoreVersionLocalization',
+                                 locale: 'fr-FR',
+                                 get_app_screenshot_sets: [fr_screenshot_set])
+        # Only en-US in screenshots_per_language, fr-FR should be ignored
+        screenshots_per_language = { 'en-US' => [] }
+
+        allow_any_instance_of(Deliver::AppScreenshotIterator).to receive(:each_app_screenshot_set) do |&args|
+          result = [[en_localization, en_screenshot_set], [fr_localization, fr_screenshot_set]]
+          next(result) unless args
+          result.each { |loc, set| args.call(loc, set) }
+        end
+
+        # en-US set should be deleted, fr-FR should NOT be deleted
+        expect(en_screenshot_set).to receive(:delete!)
+        expect(fr_screenshot_set).to_not(receive(:delete!))
+        # Should succeed since en-US count is 0 (fr-FR's screenshot is not counted)
+        expect(UI).to_not(receive(:user_error!))
+        described_class.new.delete_screenshots([en_localization, fr_localization], screenshots_per_language)
+      end
+    end
   end
 
   describe '#upload_screenshots' do
@@ -72,7 +105,7 @@ describe Deliver::UploadScreenshots do
           local_screenshot = double('Deliver::AppScreenshot',
                                     path: '/path/to/screenshot',
                                     language: 'en-US',
-                                    device_type: Spaceship::ConnectAPI::AppScreenshotSet::DisplayType::APP_IPHONE_55)
+                                    display_type: Spaceship::ConnectAPI::AppScreenshotSet::DisplayType::APP_IPHONE_55)
           screenshots_per_language = { 'en-US' => [local_screenshot] }
 
           allow(FastlaneCore::Helper).to receive(:show_loading_indicator).and_return(true)
@@ -94,7 +127,7 @@ describe Deliver::UploadScreenshots do
           local_screenshot = double('Deliver::AppScreenshot',
                                     path: '/path/to/screenshot',
                                     language: 'en-US',
-                                    device_type: Spaceship::ConnectAPI::AppScreenshotSet::DisplayType::APP_IPHONE_55)
+                                    display_type: Spaceship::ConnectAPI::AppScreenshotSet::DisplayType::APP_IPHONE_55)
           screenshots_per_language = { 'en-US' => [local_screenshot] }
           allow(described_class).to receive(:calculate_checksum).and_return('checksum')
 
@@ -116,7 +149,7 @@ describe Deliver::UploadScreenshots do
         local_screenshot = double('Deliver::AppScreenshot',
                                   path: '/path/to/screenshot',
                                   language: 'en-US',
-                                  device_type: Spaceship::ConnectAPI::AppScreenshotSet::DisplayType::APP_IPHONE_55)
+                                  display_type: Spaceship::ConnectAPI::AppScreenshotSet::DisplayType::APP_IPHONE_55)
         screenshots_per_language = { 'en-US' => [local_screenshot] }
         allow(described_class).to receive(:calculate_checksum).and_return('checksum')
 
@@ -139,7 +172,7 @@ describe Deliver::UploadScreenshots do
         local_screenshot = double('Deliver::AppScreenshot',
                                   path: '/path/to/screenshot',
                                   language: 'en-US',
-                                  device_type: Spaceship::ConnectAPI::AppScreenshotSet::DisplayType::APP_IPHONE_55)
+                                  display_type: Spaceship::ConnectAPI::AppScreenshotSet::DisplayType::APP_IPHONE_55)
         screenshots_per_language = { 'en-US' => [local_screenshot] }
         allow(described_class).to receive(:calculate_checksum).with(local_screenshot.path).and_return('checksum')
 
@@ -160,7 +193,7 @@ describe Deliver::UploadScreenshots do
         local_screenshot = double('Deliver::AppScreenshot',
                                   path: '/path/to/screenshot',
                                   language: 'en-US',
-                                  device_type: Spaceship::ConnectAPI::AppScreenshotSet::DisplayType::APP_IPHONE_55)
+                                  display_type: Spaceship::ConnectAPI::AppScreenshotSet::DisplayType::APP_IPHONE_55)
         screenshots_per_language = { 'en-US' => Array.new(11, local_screenshot) }
         allow(described_class).to receive(:calculate_checksum).with(local_screenshot.path).and_return('checksum')
 
@@ -183,11 +216,11 @@ describe Deliver::UploadScreenshots do
         uploaded_local_screenshot = double('Deliver::AppScreenshot',
                                            path: '/path/to/screenshot',
                                            language: 'en-US',
-                                           device_type: Spaceship::ConnectAPI::AppScreenshotSet::DisplayType::APP_IPHONE_55)
+                                           display_type: Spaceship::ConnectAPI::AppScreenshotSet::DisplayType::APP_IPHONE_55)
         new_local_screenshot = double('Deliver::AppScreenshot',
                                       path: '/path/to/new_screenshot',
                                       language: 'en-US',
-                                      device_type: Spaceship::ConnectAPI::AppScreenshotSet::DisplayType::APP_IPHONE_55)
+                                      display_type: Spaceship::ConnectAPI::AppScreenshotSet::DisplayType::APP_IPHONE_55)
         screenshots_per_language = { 'en-US' => [*Array.new(10, uploaded_local_screenshot), new_local_screenshot] }
         allow(described_class).to receive(:calculate_checksum).with(uploaded_local_screenshot.path).and_return('checksum')
         allow(described_class).to receive(:calculate_checksum).with(new_local_screenshot.path).and_return('another_checksum')
@@ -211,11 +244,11 @@ describe Deliver::UploadScreenshots do
         uploaded_local_screenshot = double('Deliver::AppScreenshot',
                                            path: 'screenshot.jpg',
                                            language: 'en-US',
-                                           device_type: Spaceship::ConnectAPI::AppScreenshotSet::DisplayType::APP_IPHONE_55)
+                                           display_type: Spaceship::ConnectAPI::AppScreenshotSet::DisplayType::APP_IPHONE_55)
         new_local_screenshot = double('Deliver::AppScreenshot',
                                       path: '0_screenshot.jpg',
                                       language: 'en-US',
-                                      device_type: Spaceship::ConnectAPI::AppScreenshotSet::DisplayType::APP_IPHONE_55)
+                                      display_type: Spaceship::ConnectAPI::AppScreenshotSet::DisplayType::APP_IPHONE_55)
 
         # The new screenshot appears prior to others in the iterator
         screenshots_per_language = { 'en-US' => [new_local_screenshot, *Array.new(10, uploaded_local_screenshot)] }
@@ -421,7 +454,7 @@ describe Deliver::UploadScreenshots do
         local_screenshot = double('Deliver::AppScreenshot',
                                   path: '/path/to/new_screenshot',
                                   language: 'en-US',
-                                  device_type: Spaceship::ConnectAPI::AppScreenshotSet::DisplayType::APP_IPHONE_55)
+                                  display_type: Spaceship::ConnectAPI::AppScreenshotSet::DisplayType::APP_IPHONE_55)
         screenshots_per_language = { 'en-US' => [local_screenshot] }
 
         expect(described_class).to receive(:calculate_checksum).with(local_screenshot.path).and_return('checksum')
@@ -442,7 +475,7 @@ describe Deliver::UploadScreenshots do
         local_screenshot = double('Deliver::AppScreenshot',
                                   path: '/path/to/new_screenshot',
                                   language: 'en-US',
-                                  device_type: Spaceship::ConnectAPI::AppScreenshotSet::DisplayType::APP_IPHONE_55)
+                                  display_type: Spaceship::ConnectAPI::AppScreenshotSet::DisplayType::APP_IPHONE_55)
         screenshots_per_language = { 'en-US' => [local_screenshot] }
 
         expect(described_class).to receive(:calculate_checksum).with(local_screenshot.path).and_return('checksum')

@@ -10,6 +10,7 @@ require_relative 'provisioning_profile'
 require_relative 'certificate'
 require_relative 'website_push'
 require_relative 'persons'
+require_relative 'key'
 
 module Spaceship
   # rubocop:disable Metrics/ClassLength
@@ -780,13 +781,39 @@ module Spaceship
     def create_key!(name: nil, service_configs: nil)
       fetch_csrf_token_for_keys
 
+      service_configs_requests = (service_configs || {}).map do |service_id, configs|
+        if service_id == Spaceship::Portal::Key::MUSIC_KIT_ID
+          {
+            serviceId: service_id,
+            isNew: true,
+            identifiers: configs[:identifiers] || {}
+          }
+        elsif service_id == Spaceship::Portal::Key::DEVICE_CHECK_ID
+          {
+            serviceId: service_id,
+            isNew: true,
+            identifiers: configs[:identifiers] || {}
+          }
+        elsif service_id == Spaceship::Portal::Key::APNS_ID
+          {
+            serviceId: service_id,
+            isNew: true,
+            identifiers: configs[:identifiers] || {},
+            environment: configs[:environment] || "all",
+            scope: configs[:scope] || "team"
+          }
+        else
+          raise "Unknown service id: #{service_id}"
+        end
+      end
+
       params = {
         name: name,
-        serviceConfigurations: service_configs,
+        serviceConfigurationsRequests: service_configs_requests,
         teamId: team_id
       }
 
-      response = request(:post, 'account/auth/key/create') do |req|
+      response = request(:post, 'account/auth/key/v2/create') do |req|
         req.headers['Content-Type'] = 'application/json'
         req.body = params.to_json
       end

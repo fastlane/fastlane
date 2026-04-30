@@ -101,6 +101,16 @@ describe Sigh do
           profiles = fake_runner.fetch_profiles
           expect(profiles.size).to eq(1)
         end
+
+        it "with cert_id filter" do
+          sigh_stub_spaceship_connect(inhouse: false, all_app_identifiers: ["com.krausefx.app"], app_identifier_and_profile_names: { "com.krausefx.app" => ["No dupe here"] })
+
+          options = { app_identifier: "com.krausefx.app", skip_certificate_verification: true, cert_id: "123456789" }
+          Sigh.config = FastlaneCore::Configuration.create(Sigh::Options.available_options, options)
+
+          profiles = fake_runner.fetch_profiles
+          expect(profiles.size).to eq(1)
+        end
       end
 
       context "unsuccessfully" do
@@ -113,6 +123,16 @@ describe Sigh do
           Sigh.config = FastlaneCore::Configuration.create(Sigh::Options.available_options, options)
 
           expect(FastlaneCore::CertChecker).to receive(:installed?).with(anything).and_return(false)
+
+          profiles = fake_runner.fetch_profiles
+          expect(profiles.size).to eq(0)
+        end
+
+        it "with cert_id filter" do
+          sigh_stub_spaceship_connect(inhouse: false, all_app_identifiers: ["com.krausefx.app"], app_identifier_and_profile_names: { "com.krausefx.app" => ["No dupe here"] })
+
+          options = { app_identifier: "com.krausefx.app", skip_certificate_verification: true, cert_id: "987654321" }
+          Sigh.config = FastlaneCore::Configuration.create(Sigh::Options.available_options, options)
 
           profiles = fake_runner.fetch_profiles
           expect(profiles.size).to eq(0)

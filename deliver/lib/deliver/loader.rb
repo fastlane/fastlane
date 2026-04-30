@@ -100,16 +100,9 @@ module Deliver
       errors = []
       valid_screenshots = screenshots.select { |screenshot| Deliver::AppScreenshotValidator.validate(screenshot, errors) }
 
-      errors_to_skip, errors_to_crash = errors.partition(&:to_skip)
-
-      unless errors_to_skip.empty?
-        UI.important("🏃 Screenshots to be skipped are detected!")
-        errors_to_skip.each { |error| UI.message(error) }
-      end
-
-      unless errors_to_crash.empty?
+      unless errors.empty?
         UI.important("🚫 Invalid screenshots were detected! Here are the reasons:")
-        errors_to_crash.each { |error| UI.error(error) }
+        errors.each { |error| UI.error(error) }
         UI.user_error!("Canceled uploading screenshots. Please check the error messages above and fix the screenshots.")
       end
 

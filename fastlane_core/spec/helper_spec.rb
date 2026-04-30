@@ -17,6 +17,26 @@ describe FastlaneCore do
       end
     end
 
+    describe "#xcode_at_least?" do
+      ["15.2", "15.2.3", 15, 15.3].each do |check_version|
+        ["15.3", "16"].each do |xcode_version|
+          it "Xcode #{xcode_version} is at least #{check_version}" do
+            allow(FastlaneCore::Helper).to receive(:xcode_version).and_return(xcode_version)
+
+            expect(FastlaneCore::Helper.xcode_at_least?(check_version)).to be(true)
+          end
+        end
+
+        ["14", "14.99.99"].each do |xcode_version|
+          it "Xcode #{xcode_version} is less than #{check_version}" do
+            allow(FastlaneCore::Helper).to receive(:xcode_version).and_return(xcode_version)
+
+            expect(FastlaneCore::Helper.xcode_at_least?(check_version)).to be(false)
+          end
+        end
+      end
+    end
+
     describe '#colors_disabled?' do
       it "should return false if no environment variables set" do
         stub_const('ENV', {})
@@ -216,6 +236,18 @@ describe FastlaneCore do
         expect(FastlaneCore::UI).to receive(:command).exactly(1).times
 
         FastlaneCore::Helper.zip_directory(directory_to_zip, the_zip, contents_only: true, print: false)
+      end
+    end
+
+    describe "#which" do
+      it "delegates to FastlaneCore::CommandExecutor.which" do
+        expect(FastlaneCore::CommandExecutor).to receive(:which).with('ruby').and_return('/usr/bin/ruby')
+        expect(FastlaneCore::Helper.which('ruby')).to eq('/usr/bin/ruby')
+      end
+
+      it "returns nil when command is not found" do
+        expect(FastlaneCore::CommandExecutor).to receive(:which).with('not_a_real_command').and_return(nil)
+        expect(FastlaneCore::Helper.which('not_a_real_command')).to be_nil
       end
     end
 

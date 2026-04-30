@@ -93,6 +93,14 @@ def create_fake_spaceship_ensure
   return spaceship_ensure
 end
 
+def provisioning_path_for_xcode_version(xcode_version)
+  if xcode_version.split('.')[0].to_i < 16
+    return File.join(File.expand_path("~"), "Library/MobileDevice/Provisioning Profiles")
+  else
+    return File.join(File.expand_path("~"), "Library/Developer/Xcode/UserData/Provisioning Profiles")
+  end
+end
+
 def create_fake_cache(allow_usage: true)
   fake_cache = 'fake_cache'
 

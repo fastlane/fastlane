@@ -57,7 +57,7 @@ module Fastlane
                                        short_option: "-j",
                                        conflicting_options: [:json_key_data],
                                        optional: true, # optional until it is possible specify either json_key OR json_key_data are required
-                                       description: "The path to a file containing service account JSON, used to authenticate with Google",
+                                       description: "The path to a Google credentials JSON file (Application Default, Workload Identity, or Service Account), used to authenticate with Google",
                                        code_gen_sensitive: true,
                                        default_value: CredentialsManager::AppfileConfig.try_fetch_value(:json_key_file),
                                        default_value_dynamic: true,
@@ -70,7 +70,7 @@ module Fastlane
                                        short_option: "-c",
                                        conflicting_options: [:json_key],
                                        optional: true,
-                                       description: "The raw service account JSON data used to authenticate with Google",
+                                       description: "The raw content of a Google credentials JSON file (Application Default, Workload Identity, or Service Account) used to authenticate with Google",
                                        code_gen_sensitive: true,
                                        default_value: CredentialsManager::AppfileConfig.try_fetch_value(:json_key_data_raw),
                                        default_value_dynamic: true,

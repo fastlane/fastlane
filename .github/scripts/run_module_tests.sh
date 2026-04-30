@@ -16,18 +16,20 @@ TEST_MODULES=(
   "produce"
   "scan"
   "screengrab"
+  "sigh"
   "snapshot"
   "spaceship"
   "supply"
+  "trainer"
 )
-for TEST_MODULE in ${TEST_MODULES[*]}
-do
+
+for TEST_MODULE in "${TEST_MODULES[@]}"; do
   echo "Executing $TEST_MODULE module load up test"
-  if ruby -e "require '$TEST_MODULE'"
-  then
-    echo "Succeed."
-    exit 0
+  if ruby -e "require '$TEST_MODULE'"; then
+    echo "Succeeded."
   else
     exit 2
   fi
 done
+
+exit 0
