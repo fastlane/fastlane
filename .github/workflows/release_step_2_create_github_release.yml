@@ -39,7 +39,7 @@ jobs:
     - name: Install fastlane
       run: bundle install
 
-    - uses: rubygems/configure-rubygems-credentials@v1.0.0
+    - uses: rubygems/configure-rubygems-credentials@v2.0.0
 
     - name: Configure GitHub Packages config
       env:
