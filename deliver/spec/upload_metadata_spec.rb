@@ -111,15 +111,23 @@ describe Deliver::UploadMetadata do
     end
 
     context "when skip_metadata is false" do
-      let(:options) { { skip_metadata: false, platform: "ios" } }
+      let(:options) { { skip_metadata: false, platform: "ios", version_check_wait_retry_limit: 1 } }
       let(:platform) { double("platform") }
 
       before do
         allow(Spaceship::ConnectAPI::Platform).to receive(:map).with("ios").and_return(platform)
+        allow(Deliver).to receive(:cache).and_return({ app: app })
+        allow(app).to receive(:id).and_return("app-id")
+        allow(uploader).to receive(:detect_languages).and_return([])
+        allow(uploader).to receive(:verify_available_version_languages!).and_return([])
+        allow(uploader).to receive(:fetch_edit_app_info).with(app).and_return(app_info)
+        allow(app_info).to receive(:get_app_info_localizations).and_return([])
+        allow(uploader).to receive(:verify_available_info_languages!).with(app, app_info, [], anything).and_return([])
+        allow(uploader).to receive(:fetch_edit_app_store_version)
+        allow(uploader).to receive(:app_rating)
       end
 
       it "runs the full metadata upload flow" do
-        expect(Deliver).to receive(:cache).and_return({ app: app })
         expect(uploader).to receive(:detect_languages)
         expect(uploader).to receive(:verify_available_version_languages!)
         expect(uploader).to receive(:fetch_edit_app_info)
