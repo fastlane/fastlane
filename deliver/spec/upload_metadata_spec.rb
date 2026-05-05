@@ -80,7 +80,7 @@ describe Deliver::UploadMetadata do
 
   describe "#upload" do
     let(:app) { double("app") }
-    let(:app_info) { double("app_info") }
+    let(:app_info) { double("app_info", get_app_info_localizations: [], update_categories: nil) }
     let(:options) { { skip_metadata: true, app_rating_config_path: "/tmp/fake-age-rating.json" } }
     let(:uploader) { Deliver::UploadMetadata.new(options) }
 
@@ -113,6 +113,7 @@ describe Deliver::UploadMetadata do
     context "when skip_metadata is false" do
       let(:options) { { skip_metadata: false, platform: "ios", version_check_wait_retry_limit: 1 } }
       let(:platform) { double("platform") }
+      let(:version) { double("version", version_string: "1.0.0", update: nil, fetch_app_store_review_detail: double("review_detail", app_store_review_attachments: [])) }
 
       before do
         allow(Spaceship::ConnectAPI::Platform).to receive(:map).with("ios").and_return(platform)
@@ -123,8 +124,10 @@ describe Deliver::UploadMetadata do
         allow(uploader).to receive(:fetch_edit_app_info).with(app).and_return(app_info)
         allow(app_info).to receive(:get_app_info_localizations).and_return([])
         allow(uploader).to receive(:verify_available_info_languages!).with(app, app_info, [], anything).and_return([])
-        allow(uploader).to receive(:fetch_edit_app_store_version)
+        allow(uploader).to receive(:fetch_edit_app_store_version).and_return(version)
         allow(uploader).to receive(:app_rating)
+        allow(Spaceship::ConnectAPI).to receive(:get_app_store_versions).and_return([])
+        allow(uploader).to receive(:updating_localized_app_info?).and_return(true)
       end
 
       it "runs the full metadata upload flow" do
