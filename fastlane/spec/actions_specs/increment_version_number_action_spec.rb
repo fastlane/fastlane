@@ -108,6 +108,44 @@ describe Fastlane do
         expect(Fastlane::Actions.lane_context[Fastlane::Actions::SharedValues::VERSION_NUMBER]).to end_with("&& agvtool new-marketing-version 1.77.3")
       end
 
+      it "resolves $(MARKETING_VERSION) using get_version_number action" do
+        from_version = "$(MARKETING_VERSION)"
+        resolved_version = "1.2.3"
+        expect(Fastlane::Actions).to receive(:sh)
+          .with(/agvtool what-marketing-version/, any_args)
+          .once
+          .and_return(from_version)
+
+        expect(Fastlane::Actions::GetVersionNumberAction).to receive(:run)
+          .with(xcodeproj: nil)
+          .and_return(resolved_version)
+
+        Fastlane::FastFile.new.parse("lane :test do
+          increment_version_number
+        end").runner.execute(:test)
+
+        expect(Fastlane::Actions.lane_context[Fastlane::Actions::SharedValues::VERSION_NUMBER]).to match(/cd .* && agvtool new-marketing-version 1.2.4/)
+      end
+
+      it "resolves ${MARKETING_VERSION} using get_version_number action" do
+        from_version = "${MARKETING_VERSION}"
+        resolved_version = "1.2.3"
+        expect(Fastlane::Actions).to receive(:sh)
+          .with(/agvtool what-marketing-version/, any_args)
+          .once
+          .and_return(from_version)
+
+        expect(Fastlane::Actions::GetVersionNumberAction).to receive(:run)
+          .with(xcodeproj: nil)
+          .and_return(resolved_version)
+
+        Fastlane::FastFile.new.parse("lane :test do
+          increment_version_number
+        end").runner.execute(:test)
+
+        expect(Fastlane::Actions.lane_context[Fastlane::Actions::SharedValues::VERSION_NUMBER]).to match(/cd .* && agvtool new-marketing-version 1.2.4/)
+      end
+
       it "returns the new version as return value" do
         expect(Fastlane::Actions).to receive(:sh)
           .with(/agvtool what-marketing-version/, any_args)

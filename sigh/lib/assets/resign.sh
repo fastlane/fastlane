@@ -152,6 +152,7 @@ usage() {
     echo -e "\t    --use-app-entitlements\t\tExtract app bundle codesigning entitlements and combine with entitlements from new provisioning profile." >&2
     echo -e "\t\t\t\t\t\t\tCan't use together with '-e, --entitlements' option." >&2
     echo -e "\t--keychain-path path\t\t\tSpecify the path to a keychain that /usr/bin/codesign should use." >&2
+    echo -e "\t--pagesize size\t\t\t\tSpecify the page size (in bytes) for codesign. Must be a power of two." >&2
     echo -e "\t-v, --verbose\t\t\t\tVerbose output." >&2
     echo -e "\t-h, --help\t\t\t\tDisplay help message." >&2
     exit 2
@@ -171,6 +172,7 @@ VERSION_NUMBER=""
 SHORT_VERSION=
 BUNDLE_VERSION=
 KEYCHAIN_PATH=
+PAGESIZE=
 RAW_PROVISIONS=()
 PROVISIONS_BY_ID=()
 DEFAULT_PROVISION=""
@@ -227,6 +229,10 @@ while [ "$1" != "" ]; do
             shift
             KEYCHAIN_PATH="$1"
             ;;
+        --pagesize )
+            shift
+            PAGESIZE="$1"
+            ;;
         -v | --verbose )
             VERBOSE="--verbose"
             ;;
@@ -248,6 +254,11 @@ if [ -n "$KEYCHAIN_PATH" ]; then
     KEYCHAIN_FLAG="--keychain $KEYCHAIN_PATH"
 fi
 
+PAGESIZE_ARGS=()
+if [ -n "$PAGESIZE" ]; then
+    PAGESIZE_ARGS=(--pagesize "$PAGESIZE")
+fi
+
 # Log the options
 for provision in "${RAW_PROVISIONS[@]}"; do
     if [[ "$provision" =~ .+=.+ ]]; then
@@ -267,6 +278,7 @@ log "Certificate: '$CERTIFICATE'"
 [[ -n "${SHORT_VERSION}" ]] && log "Specified short version to use: '$SHORT_VERSION'"
 [[ -n "${BUNDLE_VERSION}" ]] && log "Specified bundle version to use: '$BUNDLE_VERSION'"
 [[ -n "${KEYCHAIN_FLAG}" ]] && log "Specified keychain to use: '$KEYCHAIN_PATH'"
+[[ -n "${PAGESIZE}" ]] && log "Specified page size: '$PAGESIZE'"
 [[ -n "${NEW_FILE}" ]] && log "Output file name: '$NEW_FILE'"
 [[ -n "${USE_APP_ENTITLEMENTS}" ]] && log "Extract app entitlements: YES"
 
@@ -550,7 +562,7 @@ function resign {
         do
             if [[ "$assetpack" == *.assetpack ]]; then
                 rm -rf "$assetpack"/_CodeSignature
-                /usr/bin/codesign ${VERBOSE} --generate-entitlement-der "${KEYCHAIN_FLAG}" -f -s "$CERTIFICATE" "$assetpack"
+                /usr/bin/codesign ${VERBOSE} "${PAGESIZE_ARGS[@]}" --generate-entitlement-der "${KEYCHAIN_FLAG}" -f -s "$CERTIFICATE" "$assetpack"
                 checkStatus
             else
                 log "Ignoring non-assetpack: $assetpack"
@@ -572,7 +584,7 @@ function resign {
                 log "Resigning '$framework'"
                 # Must not quote KEYCHAIN_FLAG because it needs to be unwrapped and passed to codesign with spaces
                 # shellcheck disable=SC2086
-                /usr/bin/codesign ${VERBOSE} --generate-entitlement-der ${KEYCHAIN_FLAG} -f -s "$CERTIFICATE" "$framework"
+                /usr/bin/codesign ${VERBOSE} "${PAGESIZE_ARGS[@]}" --generate-entitlement-der ${KEYCHAIN_FLAG} -f -s "$CERTIFICATE" "$framework"
                 checkStatus
             else
                 log "Ignoring non-framework: $framework"
@@ -626,7 +638,7 @@ function resign {
             log "Creating an archived-expanded-entitlements.xcent file for Xcode 9 builds or earlier"
             cp -f "$ENTITLEMENTS" "$APP_PATH/archived-expanded-entitlements.xcent"
         fi
-        /usr/bin/codesign ${VERBOSE} --generate-entitlement-der -f -s "$CERTIFICATE" --entitlements "$ENTITLEMENTS" "$APP_PATH"
+        /usr/bin/codesign ${VERBOSE} "${PAGESIZE_ARGS[@]}" --generate-entitlement-der -f -s "$CERTIFICATE" --entitlements "$ENTITLEMENTS" "$APP_PATH"
         checkStatus
     elif  [[ -n "${USE_APP_ENTITLEMENTS}" ]]; then
         # Extract entitlements from provisioning profile and from the app binary
@@ -871,7 +883,7 @@ function resign {
             log "Creating an archived-expanded-entitlements.xcent file for Xcode 9 builds or earlier"
             cp -f "$PATCHED_ENTITLEMENTS" "$APP_PATH/archived-expanded-entitlements.xcent"
         fi
-        /usr/bin/codesign ${VERBOSE} --generate-entitlement-der -f -s "$CERTIFICATE" --entitlements "$PATCHED_ENTITLEMENTS" "$APP_PATH"
+        /usr/bin/codesign ${VERBOSE} "${PAGESIZE_ARGS[@]}" --generate-entitlement-der -f -s "$CERTIFICATE" --entitlements "$PATCHED_ENTITLEMENTS" "$APP_PATH"
         checkStatus
     else
         log "Extracting entitlements from provisioning profile"
@@ -885,7 +897,7 @@ function resign {
         fi
         # Must not quote KEYCHAIN_FLAG because it needs to be unwrapped and passed to codesign with spaces
         # shellcheck disable=SC2086
-        /usr/bin/codesign ${VERBOSE} --generate-entitlement-der ${KEYCHAIN_FLAG} -f -s "$CERTIFICATE" --entitlements "$TEMP_DIR/newEntitlements" "$APP_PATH"
+        /usr/bin/codesign ${VERBOSE} "${PAGESIZE_ARGS[@]}" --generate-entitlement-der ${KEYCHAIN_FLAG} -f -s "$CERTIFICATE" --entitlements "$TEMP_DIR/newEntitlements" "$APP_PATH"
         checkStatus
     fi
 

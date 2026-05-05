@@ -293,6 +293,10 @@ module Pilot
                                      env_name: "PILOT_ITC_PROVIDER",
                                      description: "The provider short name to be used with the iTMSTransporter to identify your team. This value will override the automatically detected provider short name. To get provider short name run `pathToXcode.app/Contents/Applications/Application\\ Loader.app/Contents/itms/bin/iTMSTransporter -m provider -u 'USERNAME' -p 'PASSWORD' -account_type itunes_connect -v off`. The short names of providers should be listed in the second column",
                                      optional: true),
+        FastlaneCore::ConfigItem.new(key: :provider_public_id,
+                                     env_name: "PILOT_PROVIDER_PUBLIC_ID",
+                                     description: "The provider public ID to be used with altool (--provider-public-id). This value will override the automatically detected provider value for altool uploads. Required after Xcode 26 when your account is associated with multiple providers and using username/app-password authentication",
+                                     optional: true),
         # rubocop:enable Layout/LineLength
 
         # waiting and uploaded build

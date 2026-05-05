@@ -152,7 +152,8 @@ module Gym
       end
 
       def xcodebuild_log_path
-        file_name = "#{Gym.project.app_name}-#{Gym.config[:scheme]}.log"
+        app_name = Gym.config[:app_name] || Gym.project.app_name
+        file_name = "#{app_name}-#{Gym.config[:scheme]}.log"
         containing = File.expand_path(Gym.config[:buildlog_path])
         FileUtils.mkdir_p(containing)
 

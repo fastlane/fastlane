@@ -502,26 +502,7 @@ module Trainer
 
             # Remove retry attempts from the count and test rows
             if output_remove_retry_attempts
-              test_rows = test_rows.reject do |test_row|
-                remove = false
-
-                identifier = test_row[:identifier]
-                info = tests_by_identifier[identifier]
-
-                # Remove if this row is a retry and is a failure
-                if info[:retry_count] > 0
-                  remove = !(test_row[:failures] || []).empty?
-                end
-
-                # Remove all failure and retry count if test did eventually pass
-                if remove
-                  info[:failure_count] -= 1
-                  info[:retry_count] -= 1
-                  tests_by_identifier[identifier] = info
-                end
-
-                remove
-              end
+              test_rows, tests_by_identifier = remove_retry_attempts(test_rows, tests_by_identifier)
             end
 
             row = {
@@ -547,6 +528,32 @@ module Trainer
           end
 
           rows
+        end
+
+        def remove_retry_attempts(test_rows, tests_by_identifier)
+          # Group test rows by identifier and keep only the last one for each identifier
+          test_rows_by_identifier = test_rows.group_by { |row| row[:identifier] }
+
+          # Update counts for removed retry attempts
+          test_rows_by_identifier.each do |identifier, rows|
+            rows_to_remove = rows[0...-1]
+
+            info = tests_by_identifier[identifier]
+            rows_to_remove.each do |row|
+              if !(row[:failures] || []).empty?
+                info[:failure_count] -= 1
+              elsif row[:skipped] == true
+                info[:skip_count] -= 1
+              end
+              info[:retry_count] -= 1
+            end
+            tests_by_identifier[identifier] = info
+          end
+
+          # Keep only the last row for each identifier
+          filtered_test_rows = test_rows_by_identifier.values.map(&:last)
+
+          [filtered_test_rows, tests_by_identifier]
         end
 
         def test_summaries_to_configuration_names(test_summaries)
