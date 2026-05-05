@@ -400,7 +400,7 @@ DEPENDENCIES
   coveralls (~> 0.8.13)
   danger (~> 8.0)
   danger-junit (~> 1.0)
-  fakefs (>= 1.8, < 3.0.3)
+  fakefs (>= 1.8, < 3.0.2)
   fastlane!
   fastlane-plugin-ruby
   mime-types (>= 1.16, < 4.0)
