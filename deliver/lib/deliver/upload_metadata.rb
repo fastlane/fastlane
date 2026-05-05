@@ -92,10 +92,9 @@ module Deliver
           app = Deliver.cache[:app]
           app_info = fetch_edit_app_info(app)
           app_rating(app_info)
-          return
-        else
-          return
         end
+
+        return
       end
 
       app = Deliver.cache[:app]
