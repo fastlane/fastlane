@@ -111,7 +111,12 @@ describe Deliver::UploadMetadata do
     end
 
     context "when skip_metadata is false" do
-      let(:options) { { skip_metadata: false } }
+      let(:options) { { skip_metadata: false, platform: "ios" } }
+      let(:platform) { double("platform") }
+
+      before do
+        allow(Spaceship::ConnectAPI::Platform).to receive(:map).with("ios").and_return(platform)
+      end
 
       it "runs the full metadata upload flow" do
         expect(Deliver).to receive(:cache).and_return({ app: app })
