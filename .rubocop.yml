@@ -1,7 +1,6 @@
 inherit_from: .rubocop_todo.yml
 
 require:
-  - rubocop/require_tools
   - rubocop-performance
   - ./rubocop/fork_usage.rb
   - ./rubocop/missing_keys_on_shared_area.rb

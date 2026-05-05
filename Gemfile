@@ -50,8 +50,6 @@ gem "rspec_junit_formatter", "~> 0.4.1"
 gem "rubocop", Fastlane::RUBOCOP_REQUIREMENT
 # A collection of RuboCop cops for performance optimizations.
 gem "rubocop-performance"
-# A RuboCop extension focused on enforcing tools.
-gem "rubocop-require_tools"
 # Used to mock servers.
 gem "sinatra", [">= 2.2.3", "< 3.0"]
 # A library for stubbing and setting expectations on HTTP requests.
