@@ -29,6 +29,11 @@ module Fastlane
                             .split("\n")
                             .last
                             .strip
+
+          if current_version =~ /\$\(([\w\-]+)\)/ || current_version =~ /\$\{([\w\-]+)\}/
+            UI.verbose("agvtool returned $(MARKETING_VERSION), resolving it...")
+            current_version = GetVersionNumberAction.run(xcodeproj: params[:xcodeproj])
+          end
         rescue
           current_version = ''
         end

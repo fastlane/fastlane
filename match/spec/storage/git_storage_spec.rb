@@ -172,6 +172,29 @@ describe Match do
       end
     end
 
+    describe "#delete_files" do
+      it "uses literal pathspecs when removing files from git" do
+        storage = Match::Storage::GitStorage.new(
+          type: "development",
+          platform: "ios",
+          branch: git_branch
+        )
+
+        profile_with_wildcard = File.join(@path, "profiles", "development", "Development_com.example.WebDriverAgent.*.mobileprovision")
+        matched_profile = File.join(@path, "profiles", "development", "Development_com.example.WebDriverAgent.xctrunner.mobileprovision")
+
+        expected_commit_commands = [
+          "git --literal-pathspecs rm -- #{profile_with_wildcard.shellescape}",
+          "git --literal-pathspecs rm -- #{matched_profile.shellescape}",
+          "git commit -m " + '[fastlane] Updated development and platform ios'.shellescape,
+          "git push origin #{git_branch}"
+        ]
+        expect_command_execution(expected_commit_commands)
+
+        storage.delete_files(files_to_delete: [profile_with_wildcard, matched_profile])
+      end
+    end
+
     describe "#authentication" do
       describe "when using a private key file" do
         it "wraps the git command in ssh-agent shell" do

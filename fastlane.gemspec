@@ -8,33 +8,33 @@ Gem::Specification.new do |spec|
   spec.name          = "fastlane"
   spec.version       = Fastlane::VERSION
   # list of authors is regenerated and resorted on each release
-  spec.authors       = ["Stefan Natchev",
-                        "Felix Krause",
+  spec.authors       = ["Satoshi Namai",
+                        "Łukasz Grabowski",
                         "Manu Wallner",
-                        "Maksym Grebenets",
-                        "Manish Rathi",
+                        "Connor Tumbleson",
                         "Helmut Januschka",
-                        "Josh Holtz",
-                        "Iulian Onofrei",
+                        "Stefan Natchev",
+                        "Maksym Grebenets",
+                        "Felix Krause",
                         "Andrew McBurney",
+                        "Luka Mirosevic",
+                        "Josh Holtz",
                         "Jorge Revuelta H",
                         "Jan Piotrowski",
-                        "Olivier Halligon",
-                        "Kohki Miki",
-                        "Roger Oba",
-                        "Aaron Brager",
-                        "Luka Mirosevic",
-                        "Daniel Jankowski",
-                        "Satoshi Namai",
-                        "Connor Tumbleson",
-                        "Danielle Tomlinson",
-                        "Jimmy Dee",
-                        "Joshua Liebowitz",
-                        "Max Ott",
+                        "Iulian Onofrei",
                         "Fumiya Nakamura",
+                        "Joshua Liebowitz",
+                        "Daniel Jankowski",
+                        "Danielle Tomlinson",
+                        "Kohki Miki",
+                        "Jimmy Dee",
+                        "Max Ott",
+                        "Manish Rathi",
+                        "Aaron Brager",
+                        "Olivier Halligon",
+                        "Roger Oba",
                         "Matthew Ellis",
-                        "Jérôme Lacoste",
-                        "Łukasz Grabowski"]
+                        "Jérôme Lacoste"]
 
   spec.email         = ["fastlane@krausefx.com"]
   spec.summary       = Fastlane::SUMMARY
@@ -61,7 +61,7 @@ Gem::Specification.new do |spec|
   spec.add_dependency('aws-sdk-s3', '~> 1.197') # Used for S3 storage in fastlane match
   spec.add_dependency('babosa', '>= 1.0.3', '< 2.0.0') # library for creating human-friendly identifiers, aka "slugs"
   spec.add_dependency('bundler', '>= 1.17.3', '< 5.0.0') # Used for fastlane plugins
-  spec.add_dependency('CFPropertyList', '>= 2.3', '< 4.0.0') # Needed to be able to read binary plist format
+  spec.add_dependency('CFPropertyList', '>= 2.3', '< 5.0.0') # Needed to be able to read binary plist format
   spec.add_dependency('colored', '~> 1.2') # colored terminal output
   spec.add_dependency('commander', '~> 4.6') # CLI parser
   spec.add_dependency('dotenv', '>= 2.1.1', '< 3.0.0')
@@ -99,11 +99,11 @@ Gem::Specification.new do |spec|
   spec.add_dependency('xcpretty', '~> 0.4.1') # prettify xcodebuild output
 
   # As Ruby evolves, some stdlib modules are no longer bundled with Ruby and instead standard gems.
-  spec.add_dependency('abbrev', '~> 0.1.2') # 3.4 - workaround for highline as can't upgrade to 3.x yet
-  spec.add_dependency('base64', '~> 0.2.0') # 3.4 - workaround for CFPropertyList as can't upgrade to 4.x yet
+  spec.add_dependency('abbrev', '~> 0.1') # 3.4 - workaround for highline as can't upgrade to 3.x yet
+  spec.add_dependency('base64', '~> 0.2') # 3.4 - workaround for CFPropertyList as can't upgrade to 4.x yet
   spec.add_dependency('csv', '~> 3.3') # 3.4 - workaround for sinatra as can't upgrade to 4.x yet
-  spec.add_dependency('mutex_m', '~> 0.3.0') # 3.4 - workaround for httpclient as can't upgrade to 2.9 yet
-  spec.add_dependency('nkf', '~> 0.2.0') # 3.4 - workaround for CFPropertyList as can't upgrade to 4.x yet
+  spec.add_dependency('mutex_m', '~> 0.3') # 3.4 - workaround for httpclient as can't upgrade to 2.9 yet
+  spec.add_dependency('nkf', '~> 0.2') # 3.4 - workaround for CFPropertyList as can't upgrade to 4.x yet
   spec.add_dependency('logger', '>= 1.6', '< 2.0') # 4.0 - stdlib gem removed from default set
   spec.add_dependency('benchmark', '>= 0.1.0') # 4.1 - stdlib gem removed from default set
   spec.add_dependency('ostruct', '>= 0.1.0') # 4.1 - stdlib gem removed from default set
