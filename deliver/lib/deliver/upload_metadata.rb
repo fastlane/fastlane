@@ -86,7 +86,17 @@ module Deliver
 
     # Make sure to call `load_from_filesystem` before calling upload
     def upload
-      return if options[:skip_metadata]
+      # Standalone age rating update when skip_metadata is true and app_rating_config_path is provided
+      if options[:skip_metadata]
+        if options[:app_rating_config_path]
+          app = Deliver.cache[:app]
+          app_info = fetch_edit_app_info(app)
+          app_rating(app_info)
+          return
+        else
+          return
+        end
+      end
 
       app = Deliver.cache[:app]
 

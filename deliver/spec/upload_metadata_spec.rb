@@ -78,6 +78,55 @@ describe Deliver::UploadMetadata do
     end
   end
 
+  describe "#upload" do
+    let(:app) { double("app") }
+    let(:app_info) { double("app_info") }
+    let(:options) { { skip_metadata: true, app_rating_config_path: "/tmp/fake-age-rating.json" } }
+    let(:uploader) { Deliver::UploadMetadata.new(options) }
+
+    context "when skip_metadata is true and app_rating_config_path is provided" do
+      before do
+        allow(Deliver).to receive(:cache).and_return({ app: app })
+        allow(uploader).to receive(:fetch_edit_app_info).with(app).and_return(app_info)
+        allow(uploader).to receive(:app_rating).with(app_info)
+      end
+
+      it "runs only age rating update and returns early" do
+        expect(uploader).to receive(:fetch_edit_app_info).with(app).and_return(app_info)
+        expect(uploader).to receive(:app_rating).with(app_info)
+
+        uploader.upload
+      end
+    end
+
+    context "when skip_metadata is true and app_rating_config_path is not provided" do
+      let(:options) { { skip_metadata: true } }
+
+      it "returns early without running any metadata operations" do
+        expect(uploader).not_to receive(:fetch_edit_app_info)
+        expect(uploader).not_to receive(:app_rating)
+
+        uploader.upload
+      end
+    end
+
+    context "when skip_metadata is false" do
+      let(:options) { { skip_metadata: false } }
+
+      it "runs the full metadata upload flow" do
+        expect(Deliver).to receive(:cache).and_return({ app: app })
+        expect(uploader).to receive(:detect_languages)
+        expect(uploader).to receive(:verify_available_version_languages!)
+        expect(uploader).to receive(:fetch_edit_app_info)
+        expect(uploader).to receive(:verify_available_info_languages!)
+        expect(uploader).to receive(:fetch_edit_app_store_version)
+        expect(uploader).to receive(:app_rating)
+
+        uploader.upload
+      end
+    end
+  end
+
   describe "#review_information" do
     let(:options) { { metadata_path: tmpdir, app_review_information: app_review_information } }
     let(:version) { double("version") }
