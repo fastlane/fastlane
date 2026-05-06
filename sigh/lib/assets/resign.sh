@@ -562,7 +562,7 @@ function resign {
         do
             if [[ "$assetpack" == *.assetpack ]]; then
                 rm -rf "$assetpack"/_CodeSignature
-                /usr/bin/codesign ${VERBOSE} "${PAGESIZE_ARGS[@]}" --generate-entitlement-der "${KEYCHAIN_FLAG}" -f -s "$CERTIFICATE" "$assetpack"
+                /usr/bin/codesign ${VERBOSE} "${PAGESIZE_ARGS[@]}" --generate-entitlement-der ${KEYCHAIN_FLAG} -f -s "$CERTIFICATE" "$assetpack"
                 checkStatus
             else
                 log "Ignoring non-assetpack: $assetpack"
