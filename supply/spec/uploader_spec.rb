@@ -467,9 +467,9 @@ describe Supply do
       it 'forces draft status when deploying to draft track' do
         Supply.config = {
           track: 'draft',
-          release_status: Supply::ReleaseStatus::COMPLETED,
-          rollout: 0.5
+          release_status: Supply::ReleaseStatus::COMPLETED
         }
+        allow(client).to receive(:get_edit_track).with('draft').and_return(nil)
         allow(client).to receive(:tracks).with('draft').and_return([])
 
         expect(client).to receive(:update_track).with('draft', kind_of(AndroidPublisher::Track)) do |_, track|
@@ -632,7 +632,7 @@ describe Supply do
 
       context 'when track is not found' do
         before do
-          allow(client).to receive(:get_edit_track).with('alpha').and_return(nil)
+          allow(client).to receive(:tracks).with('alpha').and_return([])
         end
 
         it 'raises an error' do
