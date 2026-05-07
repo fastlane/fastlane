@@ -168,6 +168,12 @@ module Match
     end
 
     def filter_by_cert
+      certificate_id = self.params[:certificate_id].to_s.strip
+      unless certificate_id.empty?
+        filter_by_certificate_ids([certificate_id], missing_error_message: "No certificate found for certificate_id '#{certificate_id}'")
+        return
+      end
+
       # Force will continue to revoke and delete all certificates and profiles
       return if self.params[:force] || !UI.interactive?
       return if self.certs.count < 2
@@ -198,44 +204,7 @@ module Match
           UI.user_error!("No certificates were selected based on option number(s) entered")
         end
 
-        # Do profile selection logic
-        cert_ids = self.certs.map(&:id)
-        self.profiles = self.profiles.select do |profile|
-          profile_cert_ids = profile.certificates.map(&:id)
-          (cert_ids & profile_cert_ids).any?
-        end
-
-        # Do file selection logic
-        self.files = self.files.select do |f|
-          found = false
-
-          ext = File.extname(f)
-          filename = File.basename(f, ".*")
-
-          # Attempt to find cert based on filename
-          if ext == ".cer" || ext == ".p12"
-            found ||= self.certs.any? do |cert|
-              filename == cert.id.to_s
-            end
-          end
-
-          # Attempt to find profile matched on UUIDs in profile
-          if ext == ".mobileprovision" || ext == ".provisionprofile"
-            storage_uuid = FastlaneCore::ProvisioningProfile.uuid(f)
-
-            found ||= self.profiles.any? do |profile|
-              tmp_file = Tempfile.new
-              tmp_file.write(Base64.decode64(profile.profile_content))
-              tmp_file.close
-
-              # Compare profile uuid in storage to profile uuid on developer portal
-              portal_uuid = FastlaneCore::ProvisioningProfile.uuid(tmp_file.path)
-              storage_uuid == portal_uuid
-            end
-          end
-
-          found
-        end
+        filter_profiles_and_files_by_selected_certificates
       end
     end
 
@@ -355,6 +324,57 @@ module Match
         UI.success("Successfully deleted file")
 
         file
+      end
+    end
+
+    def filter_by_certificate_ids(certificate_ids, missing_error_message: nil)
+      certificate_ids = certificate_ids.map { |id| id.to_s.strip }.reject(&:empty?)
+      self.certs = self.certs.select do |cert|
+        certificate_ids.include?(cert.id.to_s)
+      end
+
+      UI.user_error!(missing_error_message || "No certificates were selected") if self.certs.empty?
+
+      filter_profiles_and_files_by_selected_certificates
+    end
+
+    def filter_profiles_and_files_by_selected_certificates
+      # Do profile selection logic
+      cert_ids = self.certs.map { |cert| cert.id.to_s }
+      self.profiles = self.profiles.reject do |profile|
+        profile_cert_ids = profile.certificates.map { |cert| cert.id.to_s }
+        (cert_ids & profile_cert_ids).empty?
+      end
+
+      profile_uuids = self.profiles.map do |profile|
+        Tempfile.create("profile") do |tmp_file|
+          tmp_file.binmode
+          tmp_file.write(Base64.decode64(profile.profile_content))
+          tmp_file.flush
+
+          FastlaneCore::ProvisioningProfile.uuid(tmp_file.path)
+        end
+      end
+
+      # Do file selection logic
+      self.files = self.files.select do |f|
+        found = false
+
+        ext = File.extname(f)
+        filename = File.basename(f, ".*")
+
+        # Attempt to find cert based on filename
+        if ext == ".cer" || ext == ".p12"
+          found ||= cert_ids.include?(filename)
+        end
+
+        # Attempt to find profile matched on UUIDs in profile
+        if ext == ".mobileprovision" || ext == ".provisionprofile"
+          storage_uuid = FastlaneCore::ProvisioningProfile.uuid(f)
+          found ||= profile_uuids.include?(storage_uuid)
+        end
+
+        found
       end
     end
 
