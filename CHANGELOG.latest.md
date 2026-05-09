@@ -1,1 +1,2 @@
 * [deliver] fix app previews always running during usage. (#29989) via Connor Tumbleson (@iBotPeaches)
+* [deliver] Add `update_app_age_rating` action for standalone App Store age rating updates - [@PratikPatil131](https://github.com/PratikPatil131)
