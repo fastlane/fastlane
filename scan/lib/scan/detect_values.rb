@@ -90,6 +90,11 @@ module Scan
       default_path = Scan.project.build_settings(key: "BUILT_PRODUCTS_DIR")
       # => /Users/.../Library/Developer/Xcode/DerivedData/app-bqrfaojicpsqnoglloisfftjhksc/Build/Products/Release-iphoneos
       # We got 3 folders up to point to ".../DerivedData/app-[random_chars]/"
+      if default_path.nil?
+        UI.error("Can't retrieve BUILT_PRODUCTS_DIR from the project to detect derived data path.")
+        UI.error("Either set `derived_data_path` explicitly in `scan`, or enable build for running in the scheme.")
+        return
+      end
       default_path = File.expand_path("../../..", default_path)
       UI.verbose("Detected derived data path '#{default_path}'")
       Scan.config[:derived_data_path] = default_path
@@ -130,7 +135,8 @@ module Scan
           sdks_output, status = Open3.capture2('xcodebuild -showsdks -json')
           sdk_version = begin
             raise status unless status.success?
-            JSON.parse(sdks_output).find { |e| e['platform'] == platform[:simulator] }['sdkVersion']
+            entry = JSON.parse(sdks_output).find { |e| e['platform'] == platform[:simulator] }
+            entry['productVersion'] || entry['sdkVersion']
           rescue StandardError => e
             UI.error(e)
             UI.error("xcodebuild CLI broken, please run `xcodebuild` and make sure it works")

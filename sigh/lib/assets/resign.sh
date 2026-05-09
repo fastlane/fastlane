@@ -249,9 +249,9 @@ while [ "$1" != "" ]; do
     shift
 done
 
-KEYCHAIN_FLAG=
+KEYCHAIN_ARGS=()
 if [ -n "$KEYCHAIN_PATH" ]; then
-    KEYCHAIN_FLAG="--keychain $KEYCHAIN_PATH"
+    KEYCHAIN_ARGS=(--keychain "$KEYCHAIN_PATH")
 fi
 
 PAGESIZE_ARGS=()
@@ -277,7 +277,7 @@ log "Certificate: '$CERTIFICATE'"
 [[ -n "${VERSION_NUMBER}" ]] && log "Specified version number to use: '$VERSION_NUMBER'"
 [[ -n "${SHORT_VERSION}" ]] && log "Specified short version to use: '$SHORT_VERSION'"
 [[ -n "${BUNDLE_VERSION}" ]] && log "Specified bundle version to use: '$BUNDLE_VERSION'"
-[[ -n "${KEYCHAIN_FLAG}" ]] && log "Specified keychain to use: '$KEYCHAIN_PATH'"
+[[ ${#KEYCHAIN_ARGS[@]} -gt 0 ]] && log "Specified keychain to use: '$KEYCHAIN_PATH'"
 [[ -n "${PAGESIZE}" ]] && log "Specified page size: '$PAGESIZE'"
 [[ -n "${NEW_FILE}" ]] && log "Output file name: '$NEW_FILE'"
 [[ -n "${USE_APP_ENTITLEMENTS}" ]] && log "Extract app entitlements: YES"
@@ -562,7 +562,7 @@ function resign {
         do
             if [[ "$assetpack" == *.assetpack ]]; then
                 rm -rf "$assetpack"/_CodeSignature
-                /usr/bin/codesign ${VERBOSE} "${PAGESIZE_ARGS[@]}" --generate-entitlement-der "${KEYCHAIN_FLAG}" -f -s "$CERTIFICATE" "$assetpack"
+                /usr/bin/codesign ${VERBOSE} "${PAGESIZE_ARGS[@]}" --generate-entitlement-der "${KEYCHAIN_ARGS[@]}" -f -s "$CERTIFICATE" "$assetpack"
                 checkStatus
             else
                 log "Ignoring non-assetpack: $assetpack"
@@ -582,9 +582,7 @@ function resign {
         do
             if [[ "$framework" == *.framework || "$framework" == *.dylib ]]; then
                 log "Resigning '$framework'"
-                # Must not quote KEYCHAIN_FLAG because it needs to be unwrapped and passed to codesign with spaces
-                # shellcheck disable=SC2086
-                /usr/bin/codesign ${VERBOSE} "${PAGESIZE_ARGS[@]}" --generate-entitlement-der ${KEYCHAIN_FLAG} -f -s "$CERTIFICATE" "$framework"
+                /usr/bin/codesign ${VERBOSE} "${PAGESIZE_ARGS[@]}" --generate-entitlement-der "${KEYCHAIN_ARGS[@]}" -f -s "$CERTIFICATE" "$framework"
                 checkStatus
             else
                 log "Ignoring non-framework: $framework"
@@ -895,9 +893,7 @@ function resign {
             log "Creating an archived-expanded-entitlements.xcent file for Xcode 9 builds or earlier"
             cp -- "$TEMP_DIR/newEntitlements" "$APP_PATH/archived-expanded-entitlements.xcent"
         fi
-        # Must not quote KEYCHAIN_FLAG because it needs to be unwrapped and passed to codesign with spaces
-        # shellcheck disable=SC2086
-        /usr/bin/codesign ${VERBOSE} "${PAGESIZE_ARGS[@]}" --generate-entitlement-der ${KEYCHAIN_FLAG} -f -s "$CERTIFICATE" --entitlements "$TEMP_DIR/newEntitlements" "$APP_PATH"
+        /usr/bin/codesign ${VERBOSE} "${PAGESIZE_ARGS[@]}" --generate-entitlement-der "${KEYCHAIN_ARGS[@]}" -f -s "$CERTIFICATE" --entitlements "$TEMP_DIR/newEntitlements" "$APP_PATH"
         checkStatus
     fi
 

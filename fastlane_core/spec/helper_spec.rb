@@ -239,6 +239,18 @@ describe FastlaneCore do
       end
     end
 
+    describe "#which" do
+      it "delegates to FastlaneCore::CommandExecutor.which" do
+        expect(FastlaneCore::CommandExecutor).to receive(:which).with('ruby').and_return('/usr/bin/ruby')
+        expect(FastlaneCore::Helper.which('ruby')).to eq('/usr/bin/ruby')
+      end
+
+      it "returns nil when command is not found" do
+        expect(FastlaneCore::CommandExecutor).to receive(:which).with('not_a_real_command').and_return(nil)
+        expect(FastlaneCore::Helper.which('not_a_real_command')).to be_nil
+      end
+    end
+
     describe "#fastlane_enabled?" do
       it "returns false when FastlaneCore::FastlaneFolder.path is nil" do
         expect(FastlaneCore::FastlaneFolder).to receive(:path).and_return(nil)
