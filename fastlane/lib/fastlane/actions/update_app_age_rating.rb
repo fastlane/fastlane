@@ -16,15 +16,17 @@ module Fastlane
         [
           FastlaneCore::ConfigItem.new(
             key: :api_key_path,
-            env_name: "APP_STORE_CONNECT_API_KEY_PATH",
+            env_names: ["DELIVER_API_KEY_PATH", "APP_STORE_CONNECT_API_KEY_PATH"],
             description: "Path to your App Store Connect API Key JSON file (https://docs.fastlane.tools/app-store-connect-api/)",
             optional: true,
             conflicting_options: %i[api_key],
-            type: String
+            verify_block: proc do |value|
+              UI.user_error!("Couldn't find API key JSON file at path '#{value}'") unless File.exist?(value)
+            end
           ),
           FastlaneCore::ConfigItem.new(
             key: :api_key,
-            env_name: "APP_STORE_CONNECT_API_KEY",
+            env_names: ["DELIVER_API_KEY", "APP_STORE_CONNECT_API_KEY"],
             description: "Your App Store Connect API Key information (https://docs.fastlane.tools/app-store-connect-api/)",
             optional: true,
             conflicting_options: %i[api_key_path],
