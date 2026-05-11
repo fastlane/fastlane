@@ -462,7 +462,7 @@ module Supply
     # ensures that release status is set to draft if the track is draft
     def resolved_track_release_status(track_name)
       track_meta = client.get_edit_track(track_name)
-      is_draft = track_meta&.releases.nil? || track_meta&.releases.first&.status == Supply::ReleaseStatus::DRAFT
+      is_draft = track_meta&.releases.nil? || track_meta&.releases&.first&.status == Supply::ReleaseStatus::DRAFT
       return Supply::ReleaseStatus::DRAFT if is_draft
 
       Supply.config[:release_status]
