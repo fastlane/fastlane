@@ -41,7 +41,7 @@ module Fastlane
           )
         end
 
-        def post_message(channel:, username:, attachments:, link_names:, icon_url:, icon_emoji:, fail_on_error:, thread_ts:)
+        def post_message(channel:, username:, attachments:, link_names:, icon_url:, icon_emoji:, fail_on_error:, thread_ts: nil)
           @notifier.post_to_legacy_incoming_webhook(
             channel: channel,
             username: username,

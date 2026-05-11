@@ -22,7 +22,10 @@ module Fastlane
             attachments: attachments,
             link_names: link_names,
           }
-          body[:thread_ts] = thread_ts unless thread_ts.nil? || thread_ts.empty?
+          unless thread_ts.nil?
+            ts = thread_ts.to_s
+            body[:thread_ts] = ts unless ts.empty?
+          end
           request.body = body.to_json
         end
       end
