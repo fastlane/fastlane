@@ -27,7 +27,7 @@ module Deliver
       default_experience = version.app_clip_default_experience
       UI.user_error!("Cannot download app clip header images if no default experience exists for version '#{version.version_string}'") unless default_experience
 
-      localizations = Spaceship::ConnectAPI::AppClipDefaultExperienceLocalizations.find_all(app_clip_default_experience_id: default_experience.id, includes: 'appClipHeaderImage')
+      localizations = Spaceship::ConnectAPI::AppClipDefaultExperienceLocalization.find_all(app_clip_default_experience_id: default_experience.id, includes: 'appClipHeaderImage')
 
       threads = []
       localizations.each do |localization|

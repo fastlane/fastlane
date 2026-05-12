@@ -39,7 +39,7 @@ module Deliver
       # Validate options
       subtitle_localized = options[:app_clip_default_experience_subtitle]
       action = options[:app_clip_default_experience_action]
-      has_options_specified = !subtitle_localized.nil? or !action.nil?
+      has_options_specified = !subtitle_localized.nil? || !action.nil?
 
       if app_clip.nil?
         UI.user_error!("A build with an app clip must be uploaded to App Store Connect before uploading the default experience metadata") if has_options_specified
@@ -168,7 +168,7 @@ module Deliver
       end
 
       # update the subtitle
-      existing_localizations = Spaceship::ConnectAPI::AppClipDefaultExperienceLocalizations.find_all(app_clip_default_experience_id: app_clip_default_experience.id)
+      existing_localizations = Spaceship::ConnectAPI::AppClipDefaultExperienceLocalization.find_all(app_clip_default_experience_id: app_clip_default_experience.id)
 
       # from upload_metadata.rb
       app_info_worker = FastlaneCore::QueueWorker.new do |locale|
@@ -185,7 +185,7 @@ module Deliver
         else
           # create new
           attributes = localized_subtitle_attributes_by_locale[locale][:create_attributes]
-          Spaceship::ConnectAPI::AppClipDefaultExperienceLocalizations.create(default_experience_id: app_clip_default_experience.id, attributes: attributes)
+          Spaceship::ConnectAPI::AppClipDefaultExperienceLocalization.create(default_experience_id: app_clip_default_experience.id, attributes: attributes)
           UI.verbose("[#{locale}] Created new with #{attributes}")
         end
       end

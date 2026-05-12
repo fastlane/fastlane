@@ -645,7 +645,7 @@ module Deliver
       resolve_app_clip_review_info_path = lambda do |option_name|
         path = File.join(options[:metadata_path], APP_CLIP_REVIEW_INFORMATION_DIR, "#{option_name}.txt")
         return nil unless File.exist?(path)
-        return nil if options[:app_review_information][option_name].to_s.length > 0
+        return nil if options[:app_clip_review_information][option_name].to_s.length > 0
         return path
       end
 
@@ -710,8 +710,8 @@ module Deliver
       info = options[:app_clip_review_information]
       return if info.nil? || info.empty?
 
-      info = info.transform_keys(&:to_sym)
       UI.user_error!("`app_clip_review_information` must be a hash", show_github_issues: true) unless info.kind_of?(Hash)
+      info = info.transform_keys(&:to_sym)
       attributes = {}
       APP_CLIP_REVIEW_INFORMATION_VALUES.each do |key, attribute_name|
         if info[key].kind_of?(Array)

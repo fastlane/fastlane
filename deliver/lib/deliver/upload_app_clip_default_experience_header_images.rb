@@ -26,16 +26,14 @@ module Deliver
       UI.important("Will begin uploading app clip default experience header images for '#{version.version_string}' on App Store Connect")
       UI.message("Starting with the upload of app clip header images...")
 
-      localizations = version.get_app_store_version_localizations
-
-      upload(app_clip_default_experience, localizations, app_clip_header_images)
+      upload(app_clip_default_experience, app_clip_header_images)
 
       UI.success("Successfully uploaded app clip default experience header images to App Store Connect")
     end
 
-    def upload(app_clip_default_experience, localizations, app_clip_header_images)
+    def upload(app_clip_default_experience, app_clip_header_images)
       # get the existing localizations and their header images
-      app_clip_default_experience_localizations = Spaceship::ConnectAPI::AppClipDefaultExperienceLocalizations.find_all(app_clip_default_experience_id: app_clip_default_experience.id, includes: 'appClipHeaderImage')
+      app_clip_default_experience_localizations = Spaceship::ConnectAPI::AppClipDefaultExperienceLocalization.find_all(app_clip_default_experience_id: app_clip_default_experience.id, includes: 'appClipHeaderImage')
 
       # Create missing localizations for languages that have header images but no localization
       app_clip_header_images.each do |header_image|
@@ -46,7 +44,7 @@ module Deliver
         next if existing_localization
 
         UI.message("Creating app clip default experience localization for '#{header_image.language}'")
-        new_localization = Spaceship::ConnectAPI::AppClipDefaultExperienceLocalizations.create(
+        new_localization = Spaceship::ConnectAPI::AppClipDefaultExperienceLocalization.create(
           default_experience_id: app_clip_default_experience.id,
           attributes: { locale: header_image.language }
         )
@@ -107,7 +105,7 @@ module Deliver
     def wait_for_complete(app_clip_default_experience_id)
       loop do
         # fetch
-        app_clip_default_experience_localizations = Spaceship::ConnectAPI::AppClipDefaultExperienceLocalizations.find_all(app_clip_default_experience_id: app_clip_default_experience_id, includes: 'appClipHeaderImage')
+        app_clip_default_experience_localizations = Spaceship::ConnectAPI::AppClipDefaultExperienceLocalization.find_all(app_clip_default_experience_id: app_clip_default_experience_id, includes: 'appClipHeaderImage')
         header_images = app_clip_default_experience_localizations.map(&:app_clip_header_image)
 
         # group states

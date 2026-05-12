@@ -621,7 +621,10 @@ module Pilot
       return unless app_clip_invocations
 
       app_clip_build_bundle = build.build_bundles.find { |bundle| bundle.bundle_type.eql?("APP_CLIP") }
-      UI.important("Skipping adding the app clip invocations. Cannot find the app clip build bundle for this build.") unless app_clip_build_bundle
+      unless app_clip_build_bundle
+        UI.important("Skipping adding the app clip invocations. Cannot find the app clip build bundle for this build.")
+        return
+      end
 
       # Beta app clip invocations from previous builds may be copied by ASC over to the uploaded
       # build, so we have to check against what the user specified.

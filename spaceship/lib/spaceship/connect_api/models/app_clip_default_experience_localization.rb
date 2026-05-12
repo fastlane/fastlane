@@ -1,7 +1,7 @@
 require_relative '../model'
 module Spaceship
   class ConnectAPI
-    class AppClipDefaultExperienceLocalizations
+    class AppClipDefaultExperienceLocalization
       include Spaceship::ConnectAPI::Model
 
       attr_accessor :locale

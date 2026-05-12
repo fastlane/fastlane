@@ -28,7 +28,7 @@ module Spaceship
         return resps.to_models.first
       end
 
-      def self.get(client: nil, app_clip_default_experience_id:, filter: {}, includes: {}, limit: nil, sort: nil)
+      def self.get(client: nil, app_clip_default_experience_id:, filter: {}, includes: nil, limit: nil, sort: nil)
         client ||= Spaceship::ConnectAPI
         resps = client.get_app_clip_default_experience(app_clip_default_experience_id: app_clip_default_experience_id, filter: filter, includes: includes, limit: limit, sort: sort).all_pages
         return resps.flat_map(&:to_models).first
