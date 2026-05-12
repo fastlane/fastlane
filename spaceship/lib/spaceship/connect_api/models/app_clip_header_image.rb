@@ -99,7 +99,7 @@ module Spaceship
             attributes: post_attributes
           ).first
         rescue => error
-          UI.user_error!("Unable to create app clip header image reservation: #{error}")
+          raise "Unable to create app clip header image reservation: #{error}"
         end
 
         # Upload the file
