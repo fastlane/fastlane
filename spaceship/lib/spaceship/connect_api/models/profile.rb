@@ -95,10 +95,7 @@ module Spaceship
           bundle_id_id: bundle_id_id,
           certificates: certificate_ids,
           devices: device_ids,
-          attributes: {
-            name: name,
-            profileType: profile_type
-          }
+          attributes: attributes
         )
         return resp.to_models.first
       end
