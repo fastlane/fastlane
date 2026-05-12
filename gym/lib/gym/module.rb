@@ -56,11 +56,29 @@ module Gym
     end
 
     def building_mac_catalyst_for_ios?
-      Gym.project.supports_mac_catalyst? && Gym.config[:catalyst_platform] == "ios"
+      return false unless Gym.project.supports_mac_catalyst?
+
+      # If catalyst_platform is explicitly set, use it
+      if Gym.config[:catalyst_platform]
+        return Gym.config[:catalyst_platform] == "ios"
+      end
+
+      # If catalyst_platform is not set, use SDK to determine
+      # Mac Catalyst apps with iOS SDK build for iOS (IPA), not macOS
+      return Gym.config[:sdk] == "iphoneos" || Gym.config[:sdk] == "iphonesimulator"
     end
 
     def building_mac_catalyst_for_mac?
-      Gym.project.supports_mac_catalyst? && Gym.config[:catalyst_platform] == "macos"
+      return false unless Gym.project.supports_mac_catalyst?
+
+      # If catalyst_platform is explicitly set, use it
+      if Gym.config[:catalyst_platform]
+        return Gym.config[:catalyst_platform] == "macos"
+      end
+
+      # If catalyst_platform is not set, use SDK to determine
+      # Mac Catalyst apps with SDK macosx build for Mac (PKG), otherwise for iOS (IPA)
+      return Gym.config[:sdk] == "macosx"
     end
 
     def building_multiplatform_for_ios?
