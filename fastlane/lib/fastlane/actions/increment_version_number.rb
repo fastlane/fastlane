@@ -23,6 +23,8 @@ module Fastlane
           '&&'
         ].join(' ')
 
+        version_number_build_setting = nil
+
         begin
           current_version = Actions
                             .sh("#{command_prefix} agvtool what-marketing-version -terse1", log: FastlaneCore::Globals.verbose?)
@@ -31,7 +33,8 @@ module Fastlane
                             .strip
 
           if current_version =~ /\$\(([\w\-]+)\)/ || current_version =~ /\$\{([\w\-]+)\}/
-            UI.verbose("agvtool returned $(MARKETING_VERSION), resolving it...")
+            version_number_build_setting = $1
+            UI.verbose("agvtool returned $(#{version_number_build_setting}), resolving it...")
             current_version = GetVersionNumberAction.run(xcodeproj: params[:xcodeproj])
           end
         rescue
@@ -80,6 +83,12 @@ module Fastlane
           Actions.lane_context[SharedValues::VERSION_NUMBER] = command
         else
           Actions.sh(command)
+          version_number_build_setting ||= "MARKETING_VERSION"
+          update_project_version_build_setting(
+            params[:xcodeproj],
+            version_number_build_setting,
+            next_version_number.to_s.strip
+          )
           Actions.lane_context[SharedValues::VERSION_NUMBER] = next_version_number
         end
 
@@ -99,6 +108,22 @@ module Fastlane
 
       def self.version_token_error
         "Can't increment version"
+      end
+
+      def self.update_project_version_build_setting(xcodeproj_path_or_dir, build_setting, version_number)
+        project = GetVersionNumberAction.get_project!(xcodeproj_path_or_dir || '.')
+        changed = false
+
+        ([project] + project.targets).each do |item|
+          item.build_configurations.each do |config|
+            next unless config.build_settings.key?(build_setting)
+
+            config.build_settings[build_setting] = version_number
+            changed = true
+          end
+        end
+
+        project.save if changed
       end
 
       def self.description
