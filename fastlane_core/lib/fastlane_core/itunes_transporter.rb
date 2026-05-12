@@ -43,7 +43,7 @@ module FastlaneCore
       not_implemented(__method__)
     end
 
-    def build_upload_command(username, password, source = "/tmp", provider_short_name = "", jwt = nil, platform = nil, api_key = nil)
+    def build_upload_command(username, password, source = "/tmp", options = {})
       not_implemented(__method__)
     end
 
@@ -219,8 +219,8 @@ module FastlaneCore
     end
 
     def file_upload_option(source)
-      ext = File.extname(source).downcase
-      is_asset_file_type = !File.directory?(source) && [".ipa", ".pkg", ".dmg", ".zip"].include?(ext)
+      file_ext = File.extname(source).downcase
+      is_asset_file_type = !File.directory?(source) && allowed_package_extensions.map { |ext| ".#{ext}" }.include?(file_ext)
 
       if is_asset_file_type
         return "-assetFile #{source.shellescape}"
@@ -246,11 +246,16 @@ module FastlaneCore
       end
       return deliver_additional_params
     end
+
+    def allowed_package_extensions
+      ["ipa", "pkg", "dmg", "zip"]
+    end
   end
 
   # Generates commands and executes the altool.
   class AltoolTransporterExecutor < TransporterExecutor
-    ERROR_REGEX = /\*\*\* Error:\s+(.+)/
+    # Xcode 26 uses ERROR, while previous versions used *** Error
+    ERROR_REGEX = /(?:\*\*\*\s*)?ERROR:\s+(.+)/i
 
     private_constant :ERROR_REGEX
 
@@ -296,18 +301,30 @@ module FastlaneCore
       end
 
       yield(@all_lines) if block_given?
-      exit_status.zero?
+      @errors.empty?
     end
 
     def build_credential_params(username = nil, password = nil, jwt = nil, api_key = nil)
       if !username.nil? && !password.nil? && api_key.nil?
         "-u #{username.shellescape} -p #{password.shellescape}"
       elsif !api_key.nil?
-        "--apiKey #{api_key[:key_id]} --apiIssuer #{api_key[:issuer_id]}"
+        # Individual API keys have no issuer_id; altool requires --apiIssuer
+        # to be present, so we pass the key_id as a placeholder and add
+        # --api-key-subject user to signal individual key JWT generation.
+        if api_key[:issuer_id]
+          "--apiKey #{api_key[:key_id]} --apiIssuer #{api_key[:issuer_id]}"
+        else
+          "--apiKey #{api_key[:key_id]} --apiIssuer #{api_key[:key_id]} --api-key-subject user"
+        end
       end
     end
 
-    def build_upload_command(username, password, source = "/tmp", provider_short_name = "", jwt = nil, platform = nil, api_key = nil)
+    def build_upload_command(username, password, source = "/tmp", options = {})
+      provider_short_name = options.fetch(:provider_short_name, "")
+      provider_public_id = options.fetch(:provider_public_id, "")
+      jwt = options[:jwt]
+      platform = options[:platform]
+      api_key = options[:api_key]
       use_api_key = !api_key.nil?
       [
         ("API_PRIVATE_KEYS_DIR=#{api_key[:key_dir]}" if use_api_key),
@@ -315,6 +332,7 @@ module FastlaneCore
         "--upload-app",
         build_credential_params(username, password, jwt, api_key),
         ("--asc-provider #{provider_short_name}" unless use_api_key || provider_short_name.to_s.empty?),
+        ("--provider-public-id #{provider_public_id}" unless use_api_key || provider_public_id.to_s.empty?),
         platform_option(platform),
         file_upload_option(source),
         additional_upload_parameters,
@@ -337,9 +355,11 @@ module FastlaneCore
       raise "This feature has not been implemented yet with altool for Xcode 14"
     end
 
-    def build_verify_command(username, password, source = "/tmp", provider_short_name = "", **kwargs)
-      api_key = kwargs[:api_key]
-      platform = kwargs[:platform]
+    def build_verify_command(username, password, source = "/tmp", options = {})
+      provider_short_name = options.fetch(:provider_short_name, "")
+      provider_public_id = options.fetch(:provider_public_id, "")
+      api_key = options[:api_key]
+      platform = options[:platform]
       use_api_key = !api_key.nil?
       [
         ("API_PRIVATE_KEYS_DIR=#{api_key[:key_dir]}" if use_api_key),
@@ -347,6 +367,7 @@ module FastlaneCore
         "--validate-app",
         build_credential_params(username, password, nil, api_key),
         ("--asc-provider #{provider_short_name}" unless use_api_key || provider_short_name.to_s.empty?),
+        ("--provider-public-id #{provider_public_id}" unless use_api_key || provider_public_id.to_s.empty?),
         platform_option(platform),
         file_upload_option(source)
       ].compact.join(' ')
@@ -419,7 +440,10 @@ module FastlaneCore
       end
     end
 
-    def build_upload_command(username, password, source = "/tmp", provider_short_name = "", jwt = nil, platform = nil, api_key = nil)
+    def build_upload_command(username, password, source = "/tmp", options = {})
+      provider_short_name = options.fetch(:provider_short_name, "")
+      jwt = options[:jwt]
+      api_key = options[:api_key]
       [
         '"' + Helper.transporter_path + '"',
         "-m upload",
@@ -451,8 +475,9 @@ module FastlaneCore
       ].compact.join(' ')
     end
 
-    def build_verify_command(username, password, source = "/tmp", provider_short_name = "", **kwargs)
-      jwt = kwargs[:jwt]
+    def build_verify_command(username, password, source = "/tmp", options = {})
+      provider_short_name = options.fetch(:provider_short_name, "")
+      jwt = options[:jwt]
       [
         '"' + Helper.transporter_path + '"',
         '-m verify',
@@ -476,6 +501,31 @@ module FastlaneCore
       # rubocop:enable Style/YodaCondition
 
       UI.error("Could not download/upload from App Store Connect! It's probably related to your password or your internet connection.")
+    end
+
+    def file_upload_option(source)
+      # uploading packages on non-macOS platforms requires AppStoreInfo.plist starting with Transporter >= 4.1
+      if !Helper.is_mac? && File.directory?(source)
+        asset_file = Dir.glob(File.join(source, "*.{#{allowed_package_extensions.join(',')}}")).first
+        unless asset_file
+          UI.user_error!("No package file (#{allowed_package_extensions.join(',')}) found in #{source}")
+        end
+
+        appstore_info_path = File.join(source, "AppStoreInfo.plist")
+        unless File.file?(appstore_info_path)
+          UI.error("AppStoreInfo.plist is required for uploading #{File.extname(asset_file)} files on non-macOS platforms.")
+          UI.error("Expected AppStoreInfo.plist in the same directory as the #{File.extname(asset_file)} file.")
+          UI.error("Generate it by running either 'fastlane gym [...] --generate_appstore_info'")
+          UI.error("Or add '<key>generateAppStoreInformation</key><true/>' in an options.plist then run 'fastlane gym [...] --export_options options.plist'.")
+          UI.user_error!("Missing required AppStoreInfo.plist file for iTMSTransporter upload")
+        end
+
+        UI.verbose("Using AppStoreInfo.plist for iTMSTransporter upload: #{appstore_info_path}")
+        return "-assetFile #{asset_file.shellescape} -assetDescription #{appstore_info_path.shellescape}"
+      end
+
+      # use standard behavior for other file types or macOS platform
+      super(source)
     end
 
     private
@@ -516,7 +566,10 @@ module FastlaneCore
       end
     end
 
-    def build_upload_command(username, password, source = "/tmp", provider_short_name = "", jwt = nil, platform = nil, api_key = nil)
+    def build_upload_command(username, password, source = "/tmp", options = {})
+      provider_short_name = options.fetch(:provider_short_name, "")
+      jwt = options[:jwt]
+      api_key = options[:api_key]
       credential_params = build_credential_params(username, password, jwt, api_key, is_default_itms_on_xcode_11?)
       if is_default_itms_on_xcode_11?
         [
@@ -552,8 +605,9 @@ module FastlaneCore
       end
     end
 
-    def build_verify_command(username, password, source = "/tmp", provider_short_name = "", **kwargs)
-      jwt = kwargs[:jwt]
+    def build_verify_command(username, password, source = "/tmp", options = {})
+      provider_short_name = options.fetch(:provider_short_name, "")
+      jwt = options[:jwt]
       credential_params = build_credential_params(username, password, jwt, nil, is_default_itms_on_xcode_11?)
       if is_default_itms_on_xcode_11?
         [
@@ -701,7 +755,8 @@ module FastlaneCore
     #                            see: https://github.com/fastlane/fastlane/issues/1524#issuecomment-196370628
     #                            for more information about how to use the iTMSTransporter to list your provider
     #                            short names
-    def initialize(user = nil, password = nil, use_shell_script = false, provider_short_name = nil, jwt = nil, altool_compatible_command: false, api_key: nil)
+    # @param provider_public_id The provider public ID to be given to altool via --provider-public-id.
+    def initialize(user = nil, password = nil, use_shell_script = false, provider_short_name = nil, jwt = nil, altool_compatible_command: false, api_key: nil, provider_public_id: nil)
       # Xcode 6.x doesn't have the same iTMSTransporter Java setup as later Xcode versions, so
       # we can't default to using the newer direct Java invocation strategy for those versions.
       use_shell_script ||= Helper.is_mac? && Helper.xcode_version.start_with?('6.')
@@ -719,9 +774,11 @@ module FastlaneCore
       if should_use_altool?(altool_compatible_command, use_shell_script)
         UI.verbose("Using altool as transporter.")
         @transporter_executor = AltoolTransporterExecutor.new
+        @provider_public_id = provider_public_id
       else
         UI.verbose("Using iTMSTransporter as transporter.")
         @transporter_executor = use_shell_script ? ShellScriptTransporterExecutor.new : JavaTransporterExecutor.new
+        @provider_public_id = nil
       end
 
       @provider_short_name = provider_short_name
@@ -776,16 +833,16 @@ module FastlaneCore
       raise "app_id and dir are required or package_path or asset_path is required" if (app_id.nil? || dir.nil?) && package_path.nil? && asset_path.nil?
 
       # Transport can upload .ipa, .dmg, and .pkg files directly with -assetFile
-      # However, -assetFile requires -assetDescription if Linux or Windows
-      # This will give the asset directly if macOS and asset_path exists
-      # otherwise it will use the .itmsp package
+      # However, -assetFile requires -assetDescription arguments if Linux or Windows.
+      # This will return the asset directly if asset_path exists,
+      # otherwise it will use the .itmsp package for the -f argument
 
       force_itmsp = FastlaneCore::Env.truthy?("ITMSTRANSPORTER_FORCE_ITMS_PACKAGE_UPLOAD")
       can_use_asset_path = Helper.is_mac? && asset_path
 
       actual_dir = if can_use_asset_path && !force_itmsp
                      # The asset gets deleted upon completion so copying to a temp directory
-                     # (with randomized filename, for multibyte-mixed filename upload fails)
+                     # (with randomized filename. for multibyte-mixed filename it fails to upload)
                      new_file_name = "#{SecureRandom.uuid}#{File.extname(asset_path)}"
                      tmp_asset_path = File.join(Dir.tmpdir, new_file_name)
                      FileUtils.cp(asset_path, tmp_asset_path)
@@ -807,8 +864,10 @@ module FastlaneCore
       api_key_placeholder = use_api_key ? { key_id: "YourKeyID", issuer_id: "YourIssuerID", key_dir: "YourTmpP8KeyDir" } : nil
       api_key = @transporter_executor.prepare(original_api_key: @api_key)
 
-      command = @transporter_executor.build_upload_command(@user, @password, actual_dir, @provider_short_name, @jwt, platform, api_key)
-      UI.verbose(@transporter_executor.build_upload_command(@user, password_placeholder, actual_dir, @provider_short_name, jwt_placeholder, platform, api_key_placeholder))
+      upload_options = { provider_short_name: @provider_short_name, provider_public_id: @provider_public_id, jwt: @jwt, platform: platform, api_key: api_key }
+      upload_options_placeholder = { provider_short_name: @provider_short_name, provider_public_id: @provider_public_id, jwt: jwt_placeholder, platform: platform, api_key: api_key_placeholder }
+      command = @transporter_executor.build_upload_command(@user, @password, actual_dir, upload_options)
+      UI.verbose(@transporter_executor.build_upload_command(@user, password_placeholder, actual_dir, upload_options_placeholder))
 
       begin
         result = @transporter_executor.execute(command, ItunesTransporter.hide_transporter_output?)
@@ -868,8 +927,10 @@ module FastlaneCore
       api_key_placeholder = use_api_key ? { key_id: "YourKeyID", issuer_id: "YourIssuerID", key_dir: "YourTmpP8KeyDir" } : nil
       api_key = @transporter_executor.prepare(original_api_key: @api_key)
 
-      command = @transporter_executor.build_verify_command(@user, @password, actual_dir, @provider_short_name, jwt: @jwt, platform: platform, api_key: api_key)
-      UI.verbose(@transporter_executor.build_verify_command(@user, password_placeholder, actual_dir, @provider_short_name, jwt: jwt_placeholder, platform: platform, api_key: api_key_placeholder))
+      verify_options = { provider_short_name: @provider_short_name, provider_public_id: @provider_public_id, jwt: @jwt, platform: platform, api_key: api_key }
+      verify_options_placeholder = { provider_short_name: @provider_short_name, provider_public_id: @provider_public_id, jwt: jwt_placeholder, platform: platform, api_key: api_key_placeholder }
+      command = @transporter_executor.build_verify_command(@user, @password, actual_dir, verify_options)
+      UI.verbose(@transporter_executor.build_verify_command(@user, password_placeholder, actual_dir, verify_options_placeholder))
 
       begin
         result = @transporter_executor.execute(command, ItunesTransporter.hide_transporter_output?)

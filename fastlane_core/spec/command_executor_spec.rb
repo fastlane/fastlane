@@ -10,16 +10,24 @@ describe FastlaneCore do
           expect(Process).to receive(:wait)
         end
 
-        result = FastlaneCore::CommandExecutor.execute(command: 'echo foo')
+        result = FastlaneSpec::Env.with_env_values('FASTLANE_EXEC_FLUSH_PTY_WORKAROUND' => '1') do
+          FastlaneCore::CommandExecutor.execute(command: 'echo foo')
+        end
 
         expect(result).to eq('foo')
       end
 
       it 'handles reading which throws a EIO exception', requires_pty: true do
-        fake_std_in = [
+        fake_std_in_lines = [
           "a_filename\n"
         ]
-        expect(fake_std_in).to receive(:each).and_yield(*fake_std_in).and_raise(Errno::EIO)
+        fake_std_in = double("stdin")
+        expect(fake_std_in).to receive(:each).and_yield(*fake_std_in_lines).and_raise(Errno::EIO)
+
+        fake_std_out = double("stdout")
+
+        expect(fake_std_in).to receive(:close)
+        expect(fake_std_out).to receive(:close)
 
         # Make a fake child process so we have a valid PID and $? is set correctly
         expect(PTY).to receive(:spawn) do |command, &block|
@@ -31,7 +39,7 @@ describe FastlaneCore do
           child_process_id = Process.spawn('echo foo', out: File::NULL)
           expect(Process).to receive(:wait).with(child_process_id)
 
-          block.yield(fake_std_in, 'not_really_std_out', child_process_id)
+          block.yield(fake_std_in, fake_std_out, child_process_id)
         end
 
         result = FastlaneCore::CommandExecutor.execute(command: 'ls')
@@ -49,6 +57,11 @@ describe FastlaneCore do
           "  - Muffins\n"
         ]
 
+        fake_std_out = 'not_really_std_out'
+
+        expect(fake_std_in).to receive(:close)
+        expect(fake_std_out).to receive(:close)
+
         expect(PTY).to receive(:spawn) do |command, &block|
           expect(command).to eq('echo foo')
 
@@ -58,7 +71,7 @@ describe FastlaneCore do
           child_process_id = Process.spawn('echo foo', out: File::NULL)
           expect(Process).to receive(:wait).with(child_process_id)
 
-          block.yield(fake_std_in, 'not_really_std_out', child_process_id)
+          block.yield(fake_std_in, fake_std_out, child_process_id)
         end
 
         result = FastlaneCore::CommandExecutor.execute(command: 'echo foo')
@@ -98,7 +111,9 @@ Shopping list:
             print_all: false,
             error: nil
           )
-        end.to output(failing_command_output).to_stdout.and(raise_error)
+        end.to output(failing_command_output).to_stdout.and(raise_error(FastlaneCore::Interface::FastlaneError) do |error|
+          expect(error.to_s).to eq("Exit status: 42")
+        end)
 
         expect do
           FastlaneCore::CommandExecutor.execute(

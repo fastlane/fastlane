@@ -97,7 +97,7 @@ module Fastlane
       if File.exist?(custom_file_location)
         UI.verbose("Using custom md.erb file for action #{action.action_name}")
 
-        result = ERB.new(File.read(custom_file_location), 0, '-').result(binding) # https://web.archive.org/web/20160430190141/www.rrn.dk/rubys-erb-templating-system
+        result = ERB.new(File.read(custom_file_location), trim_mode: '-').result(binding) # https://web.archive.org/web/20160430190141/www.rrn.dk/rubys-erb-templating-system
 
         return result
       end
@@ -122,7 +122,7 @@ module Fastlane
         end
 
         template = File.join(Fastlane::ROOT, "lib/assets/ActionDetails.md.erb")
-        result = ERB.new(File.read(template), 0, '-').result(binding)
+        result = ERB.new(File.read(template), trim_mode: '-').result(binding)
 
         action_mds[action.action_name] = result
       end
@@ -139,7 +139,7 @@ module Fastlane
 
       # Generate actions.md
       template = File.join(Fastlane::ROOT, "lib/assets/Actions.md.erb")
-      result = ERB.new(File.read(template), 0, '-').result(binding) # https://web.archive.org/web/20160430190141/www.rrn.dk/rubys-erb-templating-system
+      result = ERB.new(File.read(template), trim_mode: '-').result(binding) # https://web.archive.org/web/20160430190141/www.rrn.dk/rubys-erb-templating-system
       File.write(File.join(docs_dir, "generated", "actions.md"), result)
 
       # Generate actions sub pages (e.g. generated/actions/slather.md, generated/actions/scan.md)
@@ -165,7 +165,7 @@ module Fastlane
         end
 
         template = File.join(Fastlane::ROOT, "lib/assets/ActionDetails.md.erb")
-        result = ERB.new(File.read(template), 0, '-').result(binding) # https://web.archive.org/web/20160430190141/www.rrn.dk/rubys-erb-templating-system
+        result = ERB.new(File.read(template), trim_mode: '-').result(binding) # https://web.archive.org/web/20160430190141/www.rrn.dk/rubys-erb-templating-system
 
         # Actions get placed in "generated/actions" directory
         file_name = File.join(generated_actions_dir, "#{action.action_name}.md")

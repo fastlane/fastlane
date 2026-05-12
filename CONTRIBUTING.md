@@ -17,7 +17,6 @@ Some people might also use the [_fastlane_ tag on StackOverflow](https://stackov
 ## I want to contribute to _fastlane_
 
 - To start working on _fastlane_, check out [YourFirstPR.md][firstpr]
-- You will need a Google account to sign the CLA when you make your first PR
 - For some more advanced tooling and debugging tips, check out [ToolsAndDebugging.md](ToolsAndDebugging.md)
 
 ### New Actions

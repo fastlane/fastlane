@@ -14,7 +14,7 @@ describe Match do
       ENV.delete('FASTLANE_TEAM_NAME')
     end
 
-    ["10", "11"].each do |xcode_version|
+    ["10", "11", "16"].each do |xcode_version|
       context "Xcode #{xcode_version}" do
         let(:generate_apple_certs) { xcode_version == "11" }
         before do
@@ -39,7 +39,7 @@ describe Match do
           cert_path = File.join(repo_dir, "something.cer")
           profile_path = "./match/spec/fixtures/test.mobileprovision"
           keychain_path = FastlaneCore::Helper.keychain_path("login.keychain") # can be .keychain or .keychain-db
-          destination = File.expand_path("~/Library/MobileDevice/Provisioning Profiles/98264c6b-5151-4349-8d0f-66691e48ae35.mobileprovision")
+          destination = File.join(provisioning_path_for_xcode_version(xcode_version), "98264c6b-5151-4349-8d0f-66691e48ae35.mobileprovision")
 
           fake_cache = create_fake_cache
 
@@ -97,7 +97,7 @@ describe Match do
                                                                     type: "appstore")]).to eql('439BBM9367')
           expect(ENV[Match::Utils.environment_variable_name_profile_name(app_identifier: "tools.fastlane.app",
                                                                          type: "appstore")]).to eql('tools.fastlane.app AppStore')
-          profile_path = File.expand_path('~/Library/MobileDevice/Provisioning Profiles/98264c6b-5151-4349-8d0f-66691e48ae35.mobileprovision')
+          profile_path = File.join(provisioning_path_for_xcode_version(xcode_version), '98264c6b-5151-4349-8d0f-66691e48ae35.mobileprovision')
           expect(ENV[Match::Utils.environment_variable_name_profile_path(app_identifier: "tools.fastlane.app",
                                                                          type: "appstore")]).to eql(profile_path)
           expect(ENV[Match::Utils.environment_variable_name_certificate_name(app_identifier: "tools.fastlane.app",
@@ -172,7 +172,7 @@ describe Match do
                                                                     type: "appstore")]).to eql('439BBM9367')
           expect(ENV[Match::Utils.environment_variable_name_profile_name(app_identifier: "tools.fastlane.app",
                                                                          type: "appstore")]).to eql('match AppStore tools.fastlane.app 1449198835')
-          profile_path = File.expand_path('~/Library/MobileDevice/Provisioning Profiles/736590c3-dfe8-4c25-b2eb-2404b8e65fb8.mobileprovision')
+          profile_path = File.join(provisioning_path_for_xcode_version(xcode_version), '736590c3-dfe8-4c25-b2eb-2404b8e65fb8.mobileprovision')
           expect(ENV[Match::Utils.environment_variable_name_profile_path(app_identifier: "tools.fastlane.app",
                                                                          type: "appstore")]).to eql(profile_path)
           expect(ENV[Match::Utils.environment_variable_name_certificate_name(app_identifier: "tools.fastlane.app",
@@ -286,8 +286,6 @@ describe Match do
           config = FastlaneCore::Configuration.create(Match::Options.available_options, values)
           repo_dir = Dir.mktmpdir
           cert_path = File.join(repo_dir, "something.cer")
-          keychain_path = FastlaneCore::Helper.keychain_path("login.keychain") # can be .keychain or .keychain-db
-          destination = File.expand_path("~/Library/MobileDevice/Provisioning Profiles/98264c6b-5151-4349-8d0f-66691e48ae35.mobileprovision")
 
           create_fake_cache
 
@@ -364,6 +362,238 @@ describe Match do
           expect do
             Match::Runner.new.run(config)
           end.to raise_error("You defined the profile type 'enterprise', but your Apple account doesn't support In-House profiles")
+        end
+      end
+    end
+
+    describe '#select_cert_or_key' do
+      let(:runner) { Match::Runner.new }
+      let(:cert_paths) do
+        [
+          "/fake/certs/distribution/AAAA111111.cer",
+          "/fake/certs/distribution/BBBB222222.cer",
+          "/fake/certs/distribution/CCCC333333.cer"
+        ]
+      end
+      let(:key_paths) do
+        [
+          "/fake/certs/distribution/AAAA111111.p12",
+          "/fake/certs/distribution/BBBB222222.p12"
+        ]
+      end
+
+      it "returns the last path when no certificate_id is provided" do
+        result = runner.send(:select_cert_or_key, paths: cert_paths)
+        expect(result).to eq("/fake/certs/distribution/CCCC333333.cer")
+      end
+
+      it "returns the last path when certificate_id is nil" do
+        result = runner.send(:select_cert_or_key, paths: cert_paths, certificate_id: nil)
+        expect(result).to eq("/fake/certs/distribution/CCCC333333.cer")
+      end
+
+      it "returns the last path when certificate_id is an empty string" do
+        result = runner.send(:select_cert_or_key, paths: cert_paths, certificate_id: "")
+        expect(result).to eq("/fake/certs/distribution/CCCC333333.cer")
+      end
+
+      it "returns the last path when certificate_id is whitespace-only" do
+        result = runner.send(:select_cert_or_key, paths: cert_paths, certificate_id: "  ")
+        expect(result).to eq("/fake/certs/distribution/CCCC333333.cer")
+      end
+
+      it "selects the matching path when certificate_id matches exactly" do
+        result = runner.send(:select_cert_or_key, paths: cert_paths, certificate_id: "BBBB222222")
+        expect(result).to eq("/fake/certs/distribution/BBBB222222.cer")
+      end
+
+      it "does not substring-match certificate_id" do
+        expect do
+          runner.send(:select_cert_or_key, paths: cert_paths, certificate_id: "BBBB")
+        end.to raise_error(FastlaneCore::Interface::FastlaneError, "No certificate or key found for certificate_id 'BBBB'")
+      end
+
+      it "raises an error when certificate_id does not match any path" do
+        expect do
+          runner.send(:select_cert_or_key, paths: cert_paths, certificate_id: "NONEXISTENT")
+        end.to raise_error(FastlaneCore::Interface::FastlaneError, "No certificate or key found for certificate_id 'NONEXISTENT'")
+      end
+
+      it "works with .p12 key paths" do
+        result = runner.send(:select_cert_or_key, paths: key_paths, certificate_id: "AAAA111111")
+        expect(result).to eq("/fake/certs/distribution/AAAA111111.p12")
+      end
+    end
+
+    describe '#fetch_certificate certificate_id param resolution' do
+      let(:runner) { Match::Runner.new }
+
+      before do
+        allow(Spaceship::ConnectAPI).to receive(:token).and_return("fake_token")
+      end
+
+      it "uses certificate_id param to select the correct certificate" do
+        Dir.mktmpdir do |dir|
+          # Create two certs and keys
+          cert_dir = File.join(dir, "certs", "distribution")
+          FileUtils.mkdir_p(cert_dir)
+          File.write(File.join(cert_dir, "FIRST11111.cer"), "cert1")
+          File.write(File.join(cert_dir, "FIRST11111.p12"), "key1")
+          File.write(File.join(cert_dir, "SECOND2222.cer"), "cert2")
+          File.write(File.join(cert_dir, "SECOND2222.p12"), "key2")
+
+          allow(runner).to receive(:prefixed_working_directory).and_return(dir)
+          allow(Match::Utils).to receive(:is_cert_valid?).and_return(true)
+          allow(Match::Utils).to receive(:get_cert_info).and_return([["Common Name", "test"]])
+          allow(FastlaneCore::Helper).to receive(:mac?).and_return(false)
+
+          values = {
+            app_identifier: "com.test.app",
+            type: "appstore",
+            git_url: "https://example.com",
+            certificate_id: "FIRST11111"
+          }
+          config = FastlaneCore::Configuration.create(Match::Options.available_options, values)
+
+          cert_id = runner.send(:fetch_certificate, params: config)
+          expect(cert_id).to eq("FIRST11111")
+        end
+      end
+
+      it "uses MATCH_CERTIFICATE_ID env var for backward compatibility" do
+        Dir.mktmpdir do |dir|
+          cert_dir = File.join(dir, "certs", "distribution")
+          FileUtils.mkdir_p(cert_dir)
+          File.write(File.join(cert_dir, "FIRST11111.cer"), "cert1")
+          File.write(File.join(cert_dir, "FIRST11111.p12"), "key1")
+          File.write(File.join(cert_dir, "SECOND2222.cer"), "cert2")
+          File.write(File.join(cert_dir, "SECOND2222.p12"), "key2")
+
+          allow(runner).to receive(:prefixed_working_directory).and_return(dir)
+          allow(Match::Utils).to receive(:is_cert_valid?).and_return(true)
+          allow(Match::Utils).to receive(:get_cert_info).and_return([["Common Name", "test"]])
+          allow(FastlaneCore::Helper).to receive(:mac?).and_return(false)
+
+          ENV['MATCH_CERTIFICATE_ID'] = 'FIRST11111'
+          begin
+            values = {
+              app_identifier: "com.test.app",
+              type: "appstore",
+              git_url: "https://example.com"
+            }
+            config = FastlaneCore::Configuration.create(Match::Options.available_options, values)
+
+            cert_id = runner.send(:fetch_certificate, params: config)
+            expect(cert_id).to eq("FIRST11111")
+          ensure
+            ENV.delete('MATCH_CERTIFICATE_ID')
+          end
+        end
+      end
+
+      it "prefers explicit param over env var" do
+        Dir.mktmpdir do |dir|
+          cert_dir = File.join(dir, "certs", "distribution")
+          FileUtils.mkdir_p(cert_dir)
+          File.write(File.join(cert_dir, "FIRST11111.cer"), "cert1")
+          File.write(File.join(cert_dir, "FIRST11111.p12"), "key1")
+          File.write(File.join(cert_dir, "SECOND2222.cer"), "cert2")
+          File.write(File.join(cert_dir, "SECOND2222.p12"), "key2")
+
+          allow(runner).to receive(:prefixed_working_directory).and_return(dir)
+          allow(Match::Utils).to receive(:is_cert_valid?).and_return(true)
+          allow(Match::Utils).to receive(:get_cert_info).and_return([["Common Name", "test"]])
+          allow(FastlaneCore::Helper).to receive(:mac?).and_return(false)
+
+          ENV['MATCH_CERTIFICATE_ID'] = 'SECOND2222'
+          begin
+            values = {
+              app_identifier: "com.test.app",
+              type: "appstore",
+              git_url: "https://example.com",
+              certificate_id: "FIRST11111"
+            }
+            config = FastlaneCore::Configuration.create(Match::Options.available_options, values)
+
+            cert_id = runner.send(:fetch_certificate, params: config)
+            expect(cert_id).to eq("FIRST11111")
+          ensure
+            ENV.delete('MATCH_CERTIFICATE_ID')
+          end
+        end
+      end
+
+      it "imports the matching .p12 key when certificate_id is set and on macOS" do
+        Dir.mktmpdir do |dir|
+          cert_dir = File.join(dir, "certs", "distribution")
+          FileUtils.mkdir_p(cert_dir)
+          File.write(File.join(cert_dir, "FIRST11111.cer"), "cert1")
+          File.write(File.join(cert_dir, "FIRST11111.p12"), "key1")
+          File.write(File.join(cert_dir, "SECOND2222.cer"), "cert2")
+          File.write(File.join(cert_dir, "SECOND2222.p12"), "key2")
+
+          allow(runner).to receive(:prefixed_working_directory).and_return(dir)
+          allow(Match::Utils).to receive(:is_cert_valid?).and_return(true)
+          allow(Match::Utils).to receive(:get_cert_info).and_return([["Common Name", "test"]])
+          allow(FastlaneCore::Helper).to receive(:mac?).and_return(true)
+          allow(FastlaneCore::Helper).to receive(:xcode_at_least?).and_return(false)
+          allow(FastlaneCore::CertChecker).to receive(:installed?).and_return(false)
+
+          expected_cert_path = File.join(cert_dir, "FIRST11111.cer")
+          expected_key_path = File.join(cert_dir, "FIRST11111.p12")
+
+          expect(Match::Utils).to receive(:import).with(expected_cert_path, "login.keychain", password: nil).ordered
+          expect(Match::Utils).to receive(:import).with(expected_key_path, "login.keychain", password: nil).ordered
+
+          values = {
+            app_identifier: "com.test.app",
+            type: "appstore",
+            git_url: "https://example.com",
+            certificate_id: "FIRST11111"
+          }
+          config = FastlaneCore::Configuration.create(Match::Options.available_options, values)
+
+          cert_id = runner.send(:fetch_certificate, params: config)
+          expect(cert_id).to eq("FIRST11111")
+        end
+      end
+
+      it "ignores certificate_id when fetching additional cert types" do
+        Dir.mktmpdir do |dir|
+          # Primary cert type directory with the target certificate
+          primary_dir = File.join(dir, "certs", "distribution")
+          FileUtils.mkdir_p(primary_dir)
+          File.write(File.join(primary_dir, "FIRST11111.cer"), "cert1")
+          File.write(File.join(primary_dir, "FIRST11111.p12"), "key1")
+
+          # Additional cert type directory with different certificates
+          additional_dir = File.join(dir, "certs", "mac_installer_distribution")
+          FileUtils.mkdir_p(additional_dir)
+          File.write(File.join(additional_dir, "INSTALLER1.cer"), "cert2")
+          File.write(File.join(additional_dir, "INSTALLER1.p12"), "key2")
+          File.write(File.join(additional_dir, "INSTALLER2.cer"), "cert3")
+          File.write(File.join(additional_dir, "INSTALLER2.p12"), "key3")
+
+          allow(runner).to receive(:prefixed_working_directory).and_return(dir)
+          allow(Match::Utils).to receive(:is_cert_valid?).and_return(true)
+          allow(Match::Utils).to receive(:get_cert_info).and_return([["Common Name", "test"]])
+          allow(FastlaneCore::Helper).to receive(:mac?).and_return(false)
+
+          values = {
+            app_identifier: "com.test.app",
+            type: "appstore",
+            git_url: "https://example.com",
+            certificate_id: "FIRST11111"
+          }
+          config = FastlaneCore::Configuration.create(Match::Options.available_options, values)
+
+          # Primary cert should use certificate_id
+          cert_id = runner.send(:fetch_certificate, params: config)
+          expect(cert_id).to eq("FIRST11111")
+
+          # Additional cert type should ignore certificate_id and pick the last cert
+          additional_cert_id = runner.send(:fetch_certificate, params: config, specific_cert_type: "mac_installer_distribution")
+          expect(additional_cert_id).to eq("INSTALLER2")
         end
       end
     end

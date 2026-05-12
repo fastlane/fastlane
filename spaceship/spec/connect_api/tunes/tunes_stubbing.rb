@@ -70,6 +70,17 @@ class ConnectAPIStubbing
         stub_request(:get, "https://appstoreconnect.apple.com/iris/v1/reviewSubmissions/123456789/items").
           to_return(status: 200, body: read_fixture_file('review_submission_items.json'), headers: { 'Content-Type' => 'application/json' })
       end
+
+      def stub_webhooks
+        stub_request(:get, "https://api.appstoreconnect.apple.com/v1/apps/123456789/webhooks").
+          to_return(status: 200, body: read_fixture_file('webhooks.json'), headers: { 'Content-Type' => 'application/json' })
+
+        stub_request(:post, "https://api.appstoreconnect.apple.com/v1/webhooks").
+          to_return(status: 200, body: read_fixture_file('webhook.json'), headers: { 'Content-Type' => 'application/json' })
+
+        stub_request(:delete, "https://api.appstoreconnect.apple.com/v1/webhooks/webhook-123").
+          to_return(status: 200, body: "", headers: {})
+      end
     end
   end
 end
