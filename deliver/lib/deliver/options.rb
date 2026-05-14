@@ -128,11 +128,11 @@ module Deliver
                                      description: "Path to the folder containing the screenshots",
                                      optional: true),
         FastlaneCore::ConfigItem.new(key: :app_clip_header_images_path,
-                                     env_name: "APP_CLIP_HEADER_IMAGES_PATH",
+                                     env_name: "DELIVER_APP_CLIP_HEADER_IMAGES_PATH",
                                      description: "Path to the folder containing the app clip header images",
                                      optional: true),
         FastlaneCore::ConfigItem.new(key: :app_clip_default_experience_metadata_path,
-                                     env_name: "APP_CLIP_DEFAULT_EXPERIENCE_METADATA_PATH",
+                                     env_name: "DELIVER_APP_CLIP_DEFAULT_EXPERIENCE_METADATA_PATH",
                                      description: "Path to the folder containing the app clip default experience metadata",
                                      optional: true),
 
@@ -498,12 +498,12 @@ module Deliver
 
         # app clip default experience
         FastlaneCore::ConfigItem.new(key: :app_clip_default_experience_subtitle,
-                                     env_name: "APP_CLIP_DEFAULT_EXPERIENCE_SUBTITLE",
+                                     env_name: "DELIVER_APP_CLIP_DEFAULT_EXPERIENCE_SUBTITLE",
                                      description: "The localized subtitle for the default app clip experience",
                                      optional: true,
                                      type: Hash),
         FastlaneCore::ConfigItem.new(key: :app_clip_default_experience_action,
-                                     env_name: "APP_CLIP_DEFAULT_EXPERIENCE_ACTION",
+                                     env_name: "DELIVER_APP_CLIP_DEFAULT_EXPERIENCE_ACTION",
                                      description: "Action for the default app clip experience (OPEN, VIEW, PLAY)",
                                      optional: true),
 
