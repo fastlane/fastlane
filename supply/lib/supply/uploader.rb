@@ -134,9 +134,9 @@ module Supply
 
       if track && release
         rollout = Supply.config[:rollout]
-        status = Supply.config[:release_status]
+        status = resolved_automatic_status
 
-        # If release_status not provided explicitly (and thus defaults to 'completed'), but rollout is provided with a value < 1.0, then set to 'inProgress' instead
+        # If release_status resolves to 'completed', but rollout is provided with a value < 1.0, then set to 'inProgress' instead
         status = Supply::ReleaseStatus::IN_PROGRESS if status == Supply::ReleaseStatus::COMPLETED && !rollout.nil? && rollout.to_f < 1
         # If release_status is set to 'inProgress' but rollout is provided with a value = 1.0, then set to 'completed' instead
         status = Supply::ReleaseStatus::COMPLETED if status == Supply::ReleaseStatus::IN_PROGRESS && rollout.to_f == 1
@@ -197,7 +197,7 @@ module Supply
         end
       else
         releases = releases.select do |release|
-          release.status == Supply.config[:release_status]
+          release.status == resolved_automatic_status
         end
       end
 
@@ -459,13 +459,21 @@ module Supply
       client.update_track(Supply.config[:track], track)
     end
 
+    def resolved_automatic_status
+      if Supply.config[:release_status] == Supply::ReleaseStatus::FASTLANE_AUTOMATIC
+        return Supply::ReleaseStatus::COMPLETED
+      end
+      Supply.config[:release_status]
+    end
+
     # ensures that release status is set to draft if the track is draft
     def resolved_track_release_status(track_name)
       track_meta = client.get_edit_track(track_name)
-      is_draft = track_meta&.releases.nil? || track_meta&.releases&.first&.status == Supply::ReleaseStatus::DRAFT
-      return Supply::ReleaseStatus::DRAFT if is_draft
+      releases = track_meta&.releases
+      is_draft = releases.nil? || releases.empty? || releases.first&.status == Supply::ReleaseStatus::DRAFT
+      return Supply::ReleaseStatus::DRAFT if is_draft && Supply.config[:release_status] == Supply::ReleaseStatus::FASTLANE_AUTOMATIC
 
-      Supply.config[:release_status]
+      resolved_automatic_status
     end
 
     # returns only language directories from metadata_path

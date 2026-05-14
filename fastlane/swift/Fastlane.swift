@@ -11136,7 +11136,7 @@ public func ssh(username: String,
    - packageName: The package name of the application to use
    - versionName: Version name (used when uploading new apks/aabs) - defaults to 'versionName' in build.gradle or AndroidManifest.xml
    - versionCode: The versionCode for which to download the generated APK
-   - releaseStatus: Release status (used when uploading new apks/aabs) - valid values are completed, draft, halted, inProgress
+   - releaseStatus: Release status (used when uploading new apks/aabs) - valid values are completed, draft, halted, inProgress, fastlane_automatic
    - track: The track of the application to use. The default available tracks are: production, beta, alpha, internal
    - rollout: The percentage of the user fraction when uploading to the rollout track (setting to 1 will complete the rollout)
    - metadataPath: Path to the directory containing the metadata files
@@ -11179,7 +11179,7 @@ public func ssh(username: String,
 public func supply(packageName: String,
                    versionName: OptionalConfigValue<String?> = .fastlaneDefault(nil),
                    versionCode: OptionalConfigValue<Int?> = .fastlaneDefault(nil),
-                   releaseStatus: String = "completed",
+                   releaseStatus: String = "fastlane_automatic",
                    track: String = "production",
                    rollout: OptionalConfigValue<String?> = .fastlaneDefault(nil),
                    metadataPath: OptionalConfigValue<String?> = .fastlaneDefault(nil),
@@ -12949,7 +12949,7 @@ public func uploadToAppStore(apiKeyPath: OptionalConfigValue<String?> = .fastlan
    - packageName: The package name of the application to use
    - versionName: Version name (used when uploading new apks/aabs) - defaults to 'versionName' in build.gradle or AndroidManifest.xml
    - versionCode: The versionCode for which to download the generated APK
-   - releaseStatus: Release status (used when uploading new apks/aabs) - valid values are completed, draft, halted, inProgress
+   - releaseStatus: Release status (used when uploading new apks/aabs) - valid values are completed, draft, halted, inProgress, fastlane_automatic
    - track: The track of the application to use. The default available tracks are: production, beta, alpha, internal
    - rollout: The percentage of the user fraction when uploading to the rollout track (setting to 1 will complete the rollout)
    - metadataPath: Path to the directory containing the metadata files
@@ -12992,7 +12992,7 @@ public func uploadToAppStore(apiKeyPath: OptionalConfigValue<String?> = .fastlan
 public func uploadToPlayStore(packageName: String,
                               versionName: OptionalConfigValue<String?> = .fastlaneDefault(nil),
                               versionCode: OptionalConfigValue<Int?> = .fastlaneDefault(nil),
-                              releaseStatus: String = "completed",
+                              releaseStatus: String = "fastlane_automatic",
                               track: String = "production",
                               rollout: OptionalConfigValue<String?> = .fastlaneDefault(nil),
                               metadataPath: OptionalConfigValue<String?> = .fastlaneDefault(nil),
