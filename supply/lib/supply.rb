@@ -44,7 +44,7 @@ module Supply
     HALTED = "halted"
     IN_PROGRESS = "inProgress"
 
-    # When used, this value will be dynamically resolved to a GPS status
+    # When used, this value will be dynamically resolved to a valid release status
     FASTLANE_AUTOMATIC = 'fastlane_automatic'
 
     ALL = [COMPLETED, DRAFT, HALTED, IN_PROGRESS]
