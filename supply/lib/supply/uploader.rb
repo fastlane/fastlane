@@ -424,9 +424,10 @@ module Supply
 
       UI.message("Updating track '#{Supply.config[:track]}'...")
 
+      status = resolved_track_release_status(Supply.config[:track])
       track_release = AndroidPublisher::TrackRelease.new(
         name: Supply.config[:version_name],
-        status: Supply.config[:release_status],
+        status: status,
         version_codes: apk_version_codes
       )
 
@@ -456,6 +457,15 @@ module Supply
       end
 
       client.update_track(Supply.config[:track], track)
+    end
+
+    # ensures that release status is set to draft if the track is draft
+    def resolved_track_release_status(track_name)
+      track_meta = client.get_edit_track(track_name)
+      is_draft = track_meta&.releases.nil? || track_meta&.releases&.first&.status == Supply::ReleaseStatus::DRAFT
+      return Supply::ReleaseStatus::DRAFT if is_draft
+
+      Supply.config[:release_status]
     end
 
     # returns only language directories from metadata_path
