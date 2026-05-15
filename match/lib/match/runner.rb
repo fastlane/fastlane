@@ -89,7 +89,7 @@ module Match
         distribution_type: params[:type]
       )
 
-      if !params[:skip_certificates]
+      unless params[:skip_certificates]
         # Certificate
         cert_id = fetch_certificate(params: params, renew_expired_certs: false)
 
@@ -106,6 +106,9 @@ module Match
 
       else
         cert_id = Match.cache[:cert_id]
+        if cert_id.nil?
+          UI.user_error!("'skip_certificates' was enabled, but no previously cached certificate ID was found. Run 'match' once without 'skip_certificates' to create and cache a certificate before using this option.")
+        end
       end
 
       # Provisioning Profiles
