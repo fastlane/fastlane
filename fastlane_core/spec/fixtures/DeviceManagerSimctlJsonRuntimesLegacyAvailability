@@ -1,0 +1,18 @@
+{
+  "runtimes" : [
+    {
+      "identifier" : "com.apple.CoreSimulator.SimRuntime.iOS-10-0",
+      "version" : "10.0",
+      "name" : "iOS 10.0",
+      "buildversion" : "14A345",
+      "isAvailable" : true
+    },
+    {
+      "identifier" : "com.apple.CoreSimulator.SimRuntime.iOS-9-3",
+      "version" : "9.3",
+      "name" : "iOS 9.3",
+      "buildversion" : "13E233",
+      "isAvailable" : false
+    }
+  ]
+}
