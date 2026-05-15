@@ -130,6 +130,19 @@ describe Spaceship::Client do
       end
     end
 
+    describe '#valid_name_for' do
+      it 'does not modify input when it already contains only valid characters' do
+        input = 'Development App 123'
+        expect(subject.send(:valid_name_for, input)).to eq(input)
+      end
+
+      it 'sanitizes invalid characters and appends md5 hash when input changed' do
+        input = 'Development App λ@&*"'
+        expected = 'Development App  ' + Digest::MD5.hexdigest(input)
+        expect(subject.send(:valid_name_for, input)).to eq(expected)
+      end
+    end
+
     describe '#create_app' do
       it 'should make a request create an explicit app id' do
         response = subject.create_app!(:explicit, 'Production App', 'tools.fastlane.spaceship.some-explicit-app')
@@ -145,7 +158,7 @@ describe Spaceship::Client do
         expect(response['identifier']).to eq('tools.fastlane.spaceship.*')
       end
 
-      it 'should strip non ASCII characters' do
+      it 'does not modify input when it already contains only valid characters' do
         response = subject.create_app!(:explicit, 'pp Test 1ed9e25c93ac7142ff9df53e7f80e84c', 'tools.fastlane.spaceship.some-explicit-app')
         expect(response['isWildCard']).to eq(false)
         expect(response['name']).to eq('pp Test 1ed9e25c93ac7142ff9df53e7f80e84c')
