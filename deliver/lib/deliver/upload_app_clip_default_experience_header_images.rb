@@ -17,7 +17,7 @@ module Deliver
       app = Deliver.cache[:app]
 
       platform = Spaceship::ConnectAPI::Platform.map(options[:platform])
-      version = app.get_edit_app_store_version(platform: platform, includes: 'appClipDefaultExperience')
+      version = app.get_edit_app_store_version(platform: platform, includes: Spaceship::ConnectAPI::AppStoreVersion::ESSENTIAL_INCLUDES + ",appClipDefaultExperience")
       UI.user_error!("Could not find a version to edit for app '#{app.name}' for '#{platform}'") unless version
 
       app_clip_default_experience = version.app_clip_default_experience

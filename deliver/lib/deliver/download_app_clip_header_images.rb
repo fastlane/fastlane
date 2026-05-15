@@ -17,10 +17,10 @@ module Deliver
 
       platform = Spaceship::ConnectAPI::Platform.map(options[:platform])
       if options[:use_live_version]
-        version = app.get_live_app_store_version(platform: platform, includes: 'appClipDefaultExperience')
+        version = app.get_live_app_store_version(platform: platform, includes: Spaceship::ConnectAPI::AppStoreVersion::ESSENTIAL_INCLUDES + ",appClipDefaultExperience")
         UI.user_error!("Could not find a live version on App Store Connect. Try using '--use_live_version false'") if version.nil?
       else
-        version = app.get_edit_app_store_version(platform: platform, includes: 'appClipDefaultExperience')
+        version = app.get_edit_app_store_version(platform: platform, includes: Spaceship::ConnectAPI::AppStoreVersion::ESSENTIAL_INCLUDES + ",appClipDefaultExperience")
         UI.user_error!("Could not find an edit version on App Store Connect. Try using '--use_live_version true'") if version.nil?
       end
 

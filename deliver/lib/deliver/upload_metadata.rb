@@ -106,7 +106,7 @@ module Deliver
 
       if options[:edit_live]
         # not all values are editable when using live_version
-        version = app.get_live_app_store_version(platform: platform, includes: 'appClipDefaultExperience')
+        version = app.get_live_app_store_version(platform: platform, includes: Spaceship::ConnectAPI::AppStoreVersion::ESSENTIAL_INCLUDES + ",appClipDefaultExperience")
         localised_options = LOCALISED_LIVE_VALUES
         non_localised_options = NON_LOCALISED_LIVE_VALUES
 
@@ -442,7 +442,7 @@ module Deliver
 
     def fetch_edit_app_store_version(app, platform, wait_time: 10)
       retry_if_nil("Cannot find edit app store version", wait_time: wait_time) do
-        app.get_edit_app_store_version(platform: platform, includes: 'appClipDefaultExperience')
+        app.get_edit_app_store_version(platform: platform, includes: Spaceship::ConnectAPI::AppStoreVersion::ESSENTIAL_INCLUDES + ",appClipDefaultExperience")
       end
     end
 

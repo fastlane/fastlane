@@ -134,13 +134,13 @@ module Deliver
     # from upload_metadata.rb
     def fetch_edit_app_store_version(app, platform, wait_time: 10)
       retry_if_nil("Cannot find edit app store version", wait_time: wait_time) do
-        app.get_edit_app_store_version(platform: platform, includes: 'appClipDefaultExperience')
+        app.get_edit_app_store_version(platform: platform, includes: Spaceship::ConnectAPI::AppStoreVersion::ESSENTIAL_INCLUDES + ",appClipDefaultExperience")
       end
     end
 
     def fetch_live_app_store_version(app, platform, wait_time: 10)
       retry_if_nil("Cannot find live app store version", wait_time: wait_time) do
-        app.get_live_app_store_version(platform: platform, includes: 'appClipDefaultExperience')
+        app.get_live_app_store_version(platform: platform, includes: Spaceship::ConnectAPI::AppStoreVersion::ESSENTIAL_INCLUDES + ",appClipDefaultExperience")
       end
     end
 
