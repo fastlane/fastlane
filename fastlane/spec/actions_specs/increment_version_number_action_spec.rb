@@ -204,7 +204,7 @@ describe Fastlane do
         target = double("target", build_configurations: [target_config, other_config])
         project = double("project", build_configurations: [project_config], targets: [target])
 
-        expect(Fastlane::Actions::GetVersionNumberAction).to receive(:get_project!)
+        expect(Fastlane::Helper::XcodeprojHelper).to receive(:get_project!)
           .with("App.xcodeproj")
           .and_return(project)
         expect(project).to receive(:save)
@@ -223,7 +223,7 @@ describe Fastlane do
         target = double("target", build_configurations: [target_config])
         project = double("project", build_configurations: [project_config], targets: [target])
 
-        expect(Fastlane::Actions::GetVersionNumberAction).to receive(:get_project!)
+        expect(Fastlane::Helper::XcodeprojHelper).to receive(:get_project!)
           .with("App.xcodeproj")
           .and_return(project)
         expect(project).not_to receive(:save)

@@ -5,6 +5,7 @@ module Fastlane
     end
 
     class IncrementVersionNumberAction < Action
+      require 'fastlane/helper/xcodeproj_helper'
       require 'shellwords'
 
       def self.is_supported?(platform)
@@ -111,18 +112,8 @@ module Fastlane
       end
 
       def self.update_project_version_build_setting(xcodeproj_path_or_dir, build_setting, version_number)
-        project = GetVersionNumberAction.get_project!(xcodeproj_path_or_dir || '.')
-        changed = false
-
-        ([project] + project.targets).each do |item|
-          item.build_configurations.each do |config|
-            next unless config.build_settings.key?(build_setting)
-
-            config.build_settings[build_setting] = version_number
-            changed = true
-          end
-        end
-
+        project = Fastlane::Helper::XcodeprojHelper.get_project!(xcodeproj_path_or_dir || '.')
+        changed = Fastlane::Helper::XcodeprojHelper.update_project_build_setting(project, build_setting, version_number)
         project.save if changed
       end
 
