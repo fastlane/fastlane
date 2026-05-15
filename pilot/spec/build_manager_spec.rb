@@ -599,6 +599,13 @@ describe "Build Manager" do
   end
 
   describe "#upload" do
+    before(:each) do
+      # Prevent class-level Spaceship::ConnectAPI.client state from leaking
+      # in from other spec files (e.g. spaceship_spec.rb sets a real client
+      # that holds references to doubles which expire between examples).
+      allow(Spaceship::ConnectAPI).to receive(:client).and_return(nil)
+    end
+
     describe "shows the correct notices" do
       let(:fake_build_manager) { Pilot::BuildManager.new }
       let(:fake_app_id) { 123 }
