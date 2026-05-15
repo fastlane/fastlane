@@ -239,6 +239,24 @@ describe FastlaneCore do
       end
     end
 
+    describe "#backticks" do
+      it "executes the command and returns the output" do
+        expect(FastlaneCore::Helper.backticks("echo hello")).to eq("hello\n")
+      end
+
+      it "prints the command and output if print is true" do
+        expect(FastlaneCore::UI).to receive(:command).with("echo hello")
+        expect(FastlaneCore::UI).to receive(:command_output).with("hello\n")
+        FastlaneCore::Helper.backticks("echo hello", print: true)
+      end
+
+      it "does not print the command and output if print is false" do
+        expect(FastlaneCore::UI).not_to receive(:command)
+        expect(FastlaneCore::UI).not_to receive(:command_output)
+        FastlaneCore::Helper.backticks("echo hello", print: false)
+      end
+    end
+
     describe "#which" do
       it "delegates to FastlaneCore::CommandExecutor.which" do
         expect(FastlaneCore::CommandExecutor).to receive(:which).with('ruby').and_return('/usr/bin/ruby')
