@@ -183,7 +183,7 @@ module Pilot
                                      is_string: false,
                                      default_value: false),
         FastlaneCore::ConfigItem.new(key: :app_clip_invocations,
-                                     env_name: "APP_CLIP_INVOCATIONS",
+                                     env_name: "PILOT_APP_CLIP_INVOCATIONS",
                                      description: "Add beta app clip invocations to your builds in TestFlight",
                                      optional: true,
                                      type: Array,
@@ -196,7 +196,7 @@ module Pilot
                                        end
                                      end),
         FastlaneCore::ConfigItem.new(key: :overwrite_app_clip_invocations,
-                                     env_name: "OVERWRITE_APP_CLIP_INVOCATIONS",
+                                     env_name: "PILOT_APP_CLIPS_OVERWRITE_INVOCATIONS",
                                      description: "Clear all previous beta app clip invocations before adding new ones",
                                      optional: true,
                                      type: Boolean,
