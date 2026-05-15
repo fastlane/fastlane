@@ -113,7 +113,7 @@ module Spaceship
         }
 
         # Patch app clip header image that file upload is complete
-        # Catch error if patch retries due to 504. Origal patch
+        # Catch error if patch retries due to 504. Original patch
         # may go through by return response as 504.
         begin
           app_clip_header_image = Spaceship::ConnectAPI.patch_app_clip_header_image(

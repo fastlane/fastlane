@@ -1315,6 +1315,8 @@ module Spaceship
         def delete_webhook(webhook_id:)
           tunes_request_client.delete("#{Version::V1}/webhooks/#{webhook_id}")
         end
+
+        #
         # appClips
         #
 

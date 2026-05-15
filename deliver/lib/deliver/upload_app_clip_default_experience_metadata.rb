@@ -52,7 +52,7 @@ module Deliver
         return copy_live_version_app_clip_default_experience_metadata(app: app, platform: platform, edit_version: version, app_clip: app_clip)
       end
 
-      UI.user_error!("You must provide at least the subtitle and action for a app clip default experience") if subtitle_localized.nil? || action.nil?
+      UI.user_error!("You must provide at least the subtitle and action for an app clip default experience") if subtitle_localized.nil? || action.nil?
 
       # see if there's an existing experience for this version
       default_experience = version.app_clip_default_experience

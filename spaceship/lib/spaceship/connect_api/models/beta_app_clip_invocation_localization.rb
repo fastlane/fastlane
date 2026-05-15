@@ -27,8 +27,8 @@ module Spaceship
 
       def update(client: nil, attributes:)
         client ||= Spaceship::ConnectAPI
-        resps = client.patch_beta_app_clip_invocation_localization(beta_app_clip_invocation_localization_id: id, attributes: attributes).all_pages
-        return resps.flat_map(&:to_models)
+        resp = client.patch_beta_app_clip_invocation_localization(beta_app_clip_invocation_localization_id: id, attributes: attributes)
+        return resp.to_models.first
       end
     end
   end
