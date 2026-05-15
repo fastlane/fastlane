@@ -599,6 +599,16 @@ describe Supply do
           expect { subject.update_rollout }.to raise_error(/Unable to find the requested release on track/)
         end
       end
+
+      context 'when track releases is nil' do
+        before do
+          allow(track).to receive(:releases).and_return(nil)
+        end
+
+        it 'does not crash and raises an error about missing release' do
+          expect { subject.update_rollout }.to raise_error(/Unable to find the requested release on track/)
+        end
+      end
     end
   end
 end
