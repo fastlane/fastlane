@@ -1,7 +1,6 @@
 inherit_from: .rubocop_todo.yml
 
 require:
-  - rubocop/require_tools
   - rubocop-performance
   - ./rubocop/fork_usage.rb
   - ./rubocop/missing_keys_on_shared_area.rb
@@ -111,21 +110,6 @@ Style/EmptyMethod:
 Lint/UselessAssignment:
   Exclude:
     - '**/spec/**/*'
-
-# In specs requires are done automatically
-Require/MissingRequireStatement:
-  Exclude:
-    - '**/spec/**/*.rb'
-    - '**/spec_helper.rb'
-    - 'spaceship/lib/spaceship/babosa_fix.rb'
-    - 'fastlane_core/lib/fastlane_core/ui/disable_colors.rb'
-    - '**/Fastfile'
-    - '**/*.gemspec'
-    - 'rakelib/**/*'
-    - '**/*.rake'
-    - '**/Rakefile'
-    - 'fastlane/**/*' # TODO: remove
-    - 'supply/**/*' # TODO: remove
 
 # We could potentially enable the 2 below:
 Layout/FirstHashElementIndentation:
