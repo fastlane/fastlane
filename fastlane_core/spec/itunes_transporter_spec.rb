@@ -100,12 +100,7 @@ describe FastlaneCore do
     end
 
     def shell_provider_id_command(jwt: nil)
-      # Ruby doesn't escape "+" with Shellwords.escape from 2.7 https://bugs.ruby-lang.org/issues/14429
-      escaped_password = if RUBY_VERSION >= "2.7.0"
-                           "'\\!\\>\\ p@\\$s_-+\\=w'\"\\'\"'o\\%rd\\\"\\&\\#\\*\\<'"
-                         else
-                           "'\\!\\>\\ p@\\$s_-\\+\\=w'\"\\'\"'o\\%rd\\\"\\&\\#\\*\\<'"
-                         end
+      escaped_password = "'\\!\\>\\ p@\\$s_-+\\=w'\"\\'\"'o\\%rd\\\"\\&\\#\\*\\<'"
       [
         '"' + FastlaneCore::Helper.transporter_path + '"',
         "-m provider",

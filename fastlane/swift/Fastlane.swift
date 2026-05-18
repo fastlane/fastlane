@@ -3331,8 +3331,8 @@ public func copyArtifacts(keepOriginal: OptionalConfigValue<Bool> = .fastlaneDef
  Create Managed Google Play Apps
 
  - parameters:
-   - jsonKey: The path to a file containing service account JSON, used to authenticate with Google
-   - jsonKeyData: The raw service account JSON data used to authenticate with Google
+   - jsonKey: The path to a Google credentials JSON file (Application Default, Workload Identity, or Service Account), used to authenticate with Google
+   - jsonKeyData: The raw content of a Google credentials JSON file (Application Default, Workload Identity, or Service Account) used to authenticate with Google
    - developerAccountId: The ID of your Google Play Console account. Can be obtained from the URL when you log in (`https://play.google.com/apps/publish/?account=...` or when you 'Obtain private app publishing rights' (https://developers.google.com/android/work/play/custom-app-api/get-started#retrieve_the_developer_account_id)
    - apk: Path to the APK file to upload
    - appTitle: App Title
@@ -4287,8 +4287,8 @@ public func downloadDsyms(apiKeyPath: OptionalConfigValue<String?> = .fastlaneDe
    - metadataPath: Path to the directory containing the metadata files
    - key: **DEPRECATED!** Use `--json_key` instead - The p12 File used to authenticate with Google
    - issuer: **DEPRECATED!** Use `--json_key` instead - The issuer of the p12 file (email address of the service account)
-   - jsonKey: The path to a file containing service account JSON, used to authenticate with Google
-   - jsonKeyData: The raw service account JSON data used to authenticate with Google
+   - jsonKey: The path to a Google credentials JSON file (Application Default, Workload Identity, or Service Account), used to authenticate with Google
+   - jsonKeyData: The raw content of a Google credentials JSON file (Application Default, Workload Identity, or Service Account), used to authenticate with Google
    - rootUrl: Root URL for the Google Play API. The provided URL will be used for API calls in place of https://www.googleapis.com/
    - timeout: Timeout for read, open, and send (in seconds)
 
@@ -4338,8 +4338,8 @@ public func downloadFromPlayStore(packageName: String,
  - parameters:
    - packageName: The package name of the application to use
    - versionCode: The versionCode for which to download the generated APK
-   - jsonKey: The path to a file containing service account JSON, used to authenticate with Google
-   - jsonKeyData: The raw service account JSON data used to authenticate with Google
+   - jsonKey: The path to a Google credentials JSON file (Application Default, Workload Identity, or Service Account), used to authenticate with Google
+   - jsonKeyData: The raw content of a Google credentials JSON file (Application Default, Workload Identity, or Service Account), used to authenticate with Google
    - rootUrl: Root URL for the Google Play API. The provided URL will be used for API calls in place of https://www.googleapis.com/
    - timeout: Timeout for read, open, and send (in seconds)
    - destination: The path on disk where to download the Generated Universal APK
@@ -5594,8 +5594,8 @@ public func githubApi(serverUrl: String = "https://api.github.com",
    - track: The track of the application to use. The default available tracks are: production, beta, alpha, internal
    - key: **DEPRECATED!** Use `--json_key` instead - The p12 File used to authenticate with Google
    - issuer: **DEPRECATED!** Use `--json_key` instead - The issuer of the p12 file (email address of the service account)
-   - jsonKey: The path to a file containing service account JSON, used to authenticate with Google
-   - jsonKeyData: The raw service account JSON data used to authenticate with Google
+   - jsonKey: The path to a Google credentials JSON file (Application Default, Workload Identity, or Service Account), used to authenticate with Google
+   - jsonKeyData: The raw content of a Google credentials JSON file (Application Default, Workload Identity, or Service Account), used to authenticate with Google
    - rootUrl: Root URL for the Google Play API. The provided URL will be used for API calls in place of https://www.googleapis.com/
    - timeout: Timeout for read, open, and send (in seconds)
 
@@ -5643,8 +5643,8 @@ public func googlePlayTrackReleaseNames(packageName: String,
    - track: The track of the application to use. The default available tracks are: production, beta, alpha, internal
    - key: **DEPRECATED!** Use `--json_key` instead - The p12 File used to authenticate with Google
    - issuer: **DEPRECATED!** Use `--json_key` instead - The issuer of the p12 file (email address of the service account)
-   - jsonKey: The path to a file containing service account JSON, used to authenticate with Google
-   - jsonKeyData: The raw service account JSON data used to authenticate with Google
+   - jsonKey: The path to a Google credentials JSON file (Application Default, Workload Identity, or Service Account), used to authenticate with Google
+   - jsonKeyData: The raw content of a Google credentials JSON file (Application Default, Workload Identity, or Service Account), used to authenticate with Google
    - rootUrl: Root URL for the Google Play API. The provided URL will be used for API calls in place of https://www.googleapis.com/
    - timeout: Timeout for read, open, and send (in seconds)
 
@@ -11142,8 +11142,8 @@ public func ssh(username: String,
    - metadataPath: Path to the directory containing the metadata files
    - key: **DEPRECATED!** Use `--json_key` instead - The p12 File used to authenticate with Google
    - issuer: **DEPRECATED!** Use `--json_key` instead - The issuer of the p12 file (email address of the service account)
-   - jsonKey: The path to a file containing service account JSON, used to authenticate with Google
-   - jsonKeyData: The raw service account JSON data used to authenticate with Google
+   - jsonKey: The path to a Google credentials JSON file (Application Default, Workload Identity, or Service Account), used to authenticate with Google
+   - jsonKeyData: The raw content of a Google credentials JSON file (Application Default, Workload Identity, or Service Account), used to authenticate with Google
    - apk: Path to the APK file to upload
    - apkPaths: An array of paths to APK files to upload
    - aab: Path to the AAB file to upload
@@ -12955,8 +12955,8 @@ public func uploadToAppStore(apiKeyPath: OptionalConfigValue<String?> = .fastlan
    - metadataPath: Path to the directory containing the metadata files
    - key: **DEPRECATED!** Use `--json_key` instead - The p12 File used to authenticate with Google
    - issuer: **DEPRECATED!** Use `--json_key` instead - The issuer of the p12 file (email address of the service account)
-   - jsonKey: The path to a file containing service account JSON, used to authenticate with Google
-   - jsonKeyData: The raw service account JSON data used to authenticate with Google
+   - jsonKey: The path to a Google credentials JSON file (Application Default, Workload Identity, or Service Account), used to authenticate with Google
+   - jsonKeyData: The raw content of a Google credentials JSON file (Application Default, Workload Identity, or Service Account), used to authenticate with Google
    - apk: Path to the APK file to upload
    - apkPaths: An array of paths to APK files to upload
    - aab: Path to the AAB file to upload
@@ -13122,8 +13122,8 @@ public func uploadToPlayStore(packageName: String,
 
  - parameters:
    - packageName: The package name of the application to use
-   - jsonKey: The path to a file containing service account JSON, used to authenticate with Google
-   - jsonKeyData: The raw service account JSON data used to authenticate with Google
+   - jsonKey: The path to a Google credentials JSON file (Application Default, Workload Identity, or Service Account), used to authenticate with Google
+   - jsonKeyData: The raw content of a Google credentials JSON file (Application Default, Workload Identity, or Service Account), used to authenticate with Google
    - apk: Path to the APK file to upload
    - apkPaths: An array of paths to APK files to upload
    - aab: Path to the AAB file to upload
@@ -13347,15 +13347,15 @@ public func uploadToTestflight(apiKeyPath: OptionalConfigValue<String?> = .fastl
 }
 
 /**
- Validate that the Google Play Store `json_key` works
+ Validate Google credentials JSON for the Google Play Store
 
  - parameters:
-   - jsonKey: The path to a file containing service account JSON, used to authenticate with Google
-   - jsonKeyData: The raw service account JSON data used to authenticate with Google
+   - jsonKey: The path to a Google credentials JSON file (Application Default, Workload Identity, or Service Account), used to authenticate with Google
+   - jsonKeyData: The raw content of a Google credentials JSON file (Application Default, Workload Identity, or Service Account), used to authenticate with Google
    - rootUrl: Root URL for the Google Play API. The provided URL will be used for API calls in place of https://www.googleapis.com/
    - timeout: Timeout for read, open, and send (in seconds)
 
- Use this action to test and validate your private key json key file used to connect and authenticate with the Google Play API
+ Use this action to test and validate your Google credentials JSON file (of type authorized_user, external_account, service_account) used to connect and authenticate with the Google Play API
  */
 public func validatePlayStoreJsonKey(jsonKey: OptionalConfigValue<String?> = .fastlaneDefault(nil),
                                      jsonKeyData: OptionalConfigValue<String?> = .fastlaneDefault(nil),
@@ -13976,4 +13976,4 @@ public let snapshotfile: Snapshotfile = .init()
 
 // Please don't remove the lines below
 // They are used to detect outdated files
-// FastlaneRunnerAPIVersion [0.9.198]
+// FastlaneRunnerAPIVersion [0.9.200]
