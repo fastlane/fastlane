@@ -223,7 +223,9 @@ describe Supply do
           allow(client).to receive(:upload_apk).with("some/path/app-v#{version_code}.apk").and_return(version_code) # newly uploaded version code
         end
         allow(client).to receive(:upload_changelogs).and_return(nil)
-        allow(client).to receive(:tracks).with('track-name').and_return([double('tracks', releases: [ release ])])
+        track = double('track', releases: [release])
+        allow(client).to receive(:tracks).with('track-name').and_return([track])
+        allow(client).to receive(:get_edit_track).with('track-name').and_return(track)
         languages.each do |lang|
           allow(client).to receive(:listing_for_language).with(lang).and_return(Supply::Listing.new(client, lang))
         end
@@ -454,6 +456,105 @@ describe Supply do
       end
     end
 
+    describe '#update_track' do
+      let(:subject) { Supply::Uploader.new }
+      let(:client) { double('client') }
+
+      before do
+        allow(Supply::Client).to receive(:make_from_config).and_return(client)
+      end
+
+      it 'uses draft when release_status is automatic and track metadata is missing' do
+        Supply.config = {
+          track: 'draft',
+          release_status: Supply::ReleaseStatus::FASTLANE_AUTOMATIC
+        }
+        allow(client).to receive(:get_edit_track).with('draft').and_return(nil)
+        allow(client).to receive(:tracks).with('draft').and_return([])
+
+        expect(client).to receive(:update_track).with('draft', kind_of(AndroidPublisher::Track)) do |_, track|
+          release = track.releases.first
+          expect(release.status).to eq(Supply::ReleaseStatus::DRAFT)
+          expect(release.user_fraction).to be_nil
+        end
+
+        subject.send(:update_track, [123])
+      end
+
+      it 'uses draft when release_status is automatic and the current release is draft' do
+        Supply.config = {
+          track: 'alpha',
+          release_status: Supply::ReleaseStatus::FASTLANE_AUTOMATIC
+        }
+        allow(client).to receive(:tracks).with('alpha').and_return([])
+        allow(client).to receive(:get_edit_track).with('alpha').and_return(
+          AndroidPublisher::Track.new(
+            track: 'alpha',
+            releases: [AndroidPublisher::TrackRelease.new(status: Supply::ReleaseStatus::DRAFT, version_codes: [99])]
+          )
+        )
+
+        expect(client).to receive(:update_track).with('alpha', kind_of(AndroidPublisher::Track)) do |_, track|
+          release = track.releases.first
+          expect(release.status).to eq(Supply::ReleaseStatus::DRAFT)
+        end
+
+        subject.send(:update_track, [123])
+      end
+
+      it 'uses draft when release_status is automatic and releases list is empty' do
+        Supply.config = {
+          track: 'internal',
+          release_status: Supply::ReleaseStatus::FASTLANE_AUTOMATIC
+        }
+        allow(client).to receive(:tracks).with('internal').and_return([])
+        allow(client).to receive(:get_edit_track).with('internal').and_return(
+          AndroidPublisher::Track.new(track: 'internal', releases: [])
+        )
+
+        expect(client).to receive(:update_track).with('internal', kind_of(AndroidPublisher::Track)) do |_, track|
+          expect(track.releases.first.status).to eq(Supply::ReleaseStatus::DRAFT)
+        end
+
+        subject.send(:update_track, [123])
+      end
+
+      it 'uses completed when release_status is automatic and the current release is completed' do
+        Supply.config = {
+          track: 'alpha',
+          release_status: Supply::ReleaseStatus::FASTLANE_AUTOMATIC
+        }
+        allow(client).to receive(:tracks).with('alpha').and_return([])
+        allow(client).to receive(:get_edit_track).with('alpha').and_return(
+          AndroidPublisher::Track.new(
+            track: 'alpha',
+            releases: [AndroidPublisher::TrackRelease.new(status: Supply::ReleaseStatus::COMPLETED, version_codes: [1])]
+          )
+        )
+
+        expect(client).to receive(:update_track).with('alpha', kind_of(AndroidPublisher::Track)) do |_, track|
+          expect(track.releases.first.status).to eq(Supply::ReleaseStatus::COMPLETED)
+        end
+
+        subject.send(:update_track, [123])
+      end
+
+      it 'does not override an explicit completed release_status for a draft-shaped track' do
+        Supply.config = {
+          track: 'draft',
+          release_status: Supply::ReleaseStatus::COMPLETED
+        }
+        allow(client).to receive(:get_edit_track).with('draft').and_return(nil)
+        allow(client).to receive(:tracks).with('draft').and_return([])
+
+        expect(client).to receive(:update_track).with('draft', kind_of(AndroidPublisher::Track)) do |_, track|
+          expect(track.releases.first.status).to eq(Supply::ReleaseStatus::COMPLETED)
+        end
+
+        subject.send(:update_track, [123])
+      end
+    end
+
     describe '#update_rollout' do
       let(:subject) { Supply::Uploader.new }
       let(:client) { double('client') }
@@ -466,6 +567,7 @@ describe Supply do
         Supply.config = config
         allow(Supply::Client).to receive(:make_from_config).and_return(client)
         allow(client).to receive(:tracks).with('alpha').and_return([track])
+        allow(client).to receive(:get_edit_track).with('alpha').and_return(track)
         allow(release).to receive(:version_codes).and_return([version_code])
         allow(client).to receive(:update_track)
       end
