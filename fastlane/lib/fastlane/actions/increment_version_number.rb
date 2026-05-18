@@ -35,7 +35,7 @@ module Fastlane
 
           if current_version =~ /\$\(([\w\-]+)\)/ || current_version =~ /\$\{([\w\-]+)\}/
             version_number_build_setting = $1
-            UI.verbose("agvtool returned $(#{version_number_build_setting}), resolving it...")
+            UI.verbose("agvtool returned #{current_version}, resolving it...")
             current_version = GetVersionNumberAction.run(xcodeproj: params[:xcodeproj])
           end
         rescue
@@ -112,9 +112,21 @@ module Fastlane
       end
 
       def self.update_project_version_build_setting(xcodeproj_path_or_dir, build_setting, version_number)
-        project = Fastlane::Helper::XcodeprojHelper.get_project!(xcodeproj_path_or_dir || '.')
+        project_path_or_dir = xcodeproj_path_or_dir
+        if project_path_or_dir.nil?
+          xcodeproj_paths = Dir.glob("./*.xcodeproj")
+          return if xcodeproj_paths.empty?
+
+          if xcodeproj_paths.size > 1
+            return
+          end
+
+          project_path_or_dir = xcodeproj_paths.first
+        end
+
+        project = Fastlane::Helper::XcodeprojHelper.get_project!(project_path_or_dir)
         changed = Fastlane::Helper::XcodeprojHelper.update_project_build_setting(project, build_setting, version_number)
-        project.save if changed
+        project.save if changed[:project]
       end
 
       def self.description
