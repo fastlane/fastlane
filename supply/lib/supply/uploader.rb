@@ -468,10 +468,12 @@ module Supply
 
     # ensures that release status is set to draft if the track is draft
     def resolved_track_release_status(track_name)
+      return Supply.config[:release_status] if Supply.config[:release_status] != Supply::ReleaseStatus::FASTLANE_AUTOMATIC
+
       track_meta = client.get_edit_track(track_name)
       releases = track_meta&.releases
       is_draft = releases.nil? || releases.empty? || releases.first&.status == Supply::ReleaseStatus::DRAFT
-      return Supply::ReleaseStatus::DRAFT if is_draft && Supply.config[:release_status] == Supply::ReleaseStatus::FASTLANE_AUTOMATIC
+      return Supply::ReleaseStatus::DRAFT if is_draft
 
       resolved_automatic_status
     end
