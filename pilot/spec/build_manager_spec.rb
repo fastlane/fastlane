@@ -41,6 +41,16 @@ describe "Build Manager" do
       changelog = Pilot::BuildManager.sanitize_changelog(changelog)
       expect(changelog).to eq(File.read("./pilot/spec/fixtures/build_manager/changelog_long_truncated"))
     end
+    it "accepts a frozen changelog containing emoji" do
+      changelog = "I'm 🦇B🏧an🪴!".freeze
+      changelog = Pilot::BuildManager.sanitize_changelog(changelog)
+      expect(changelog).to eq("I'm Ban!")
+    end
+    it "accepts a frozen changelog containing less than signs" do
+      changelog = "I'm <script>man<<!".freeze
+      changelog = Pilot::BuildManager.sanitize_changelog(changelog)
+      expect(changelog).to eq("I'm script>man!")
+    end
   end
 
   describe ".has_changelog_or_whats_new?" do
