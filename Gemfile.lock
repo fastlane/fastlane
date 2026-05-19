@@ -206,7 +206,7 @@ GEM
       google-cloud-core (~> 1.6)
       googleauth (>= 0.16.2, < 2.a)
       mini_mime (~> 1.0)
-    google-logging-utils (0.2.0)
+    google-logging-utils (0.1.0)
     googleauth (1.16.2)
       faraday (>= 1.0, < 3.a)
       google-cloud-env (~> 2.2)
