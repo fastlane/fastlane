@@ -36,16 +36,15 @@ module Fastlane
           end
         end
 
-        UI.user_error!('Could not read bundle identifier, provide as a parameter') unless bundle_id
-
         if use_notarytool
-          notarytool(params, package_path, bundle_id, skip_stapling, print_log, verbose, api_key, compressed_package_path)
+          notarytool(params, package_path, skip_stapling, print_log, verbose, api_key, compressed_package_path)
         else
+          UI.user_error!('Could not read bundle identifier, provide as a parameter') unless bundle_id
           altool(params, package_path, bundle_id, try_early_stapling, skip_stapling, print_log, verbose, api_key, compressed_package_path)
         end
       end
 
-      def self.notarytool(params, package_path, bundle_id, skip_stapling, print_log, verbose, api_key, compressed_package_path)
+      def self.notarytool(params, package_path, skip_stapling, print_log, verbose, api_key, compressed_package_path)
         temp_file = nil
 
         # Create authorization part of command with either API Key or Apple ID
@@ -303,7 +302,7 @@ module Fastlane
                                        type: Boolean),
           FastlaneCore::ConfigItem.new(key: :bundle_id,
                                        env_name: 'FL_NOTARIZE_BUNDLE_ID',
-                                       description: 'Bundle identifier to uniquely identify the package',
+                                       description: 'Bundle identifier to uniquely identify the package (required for altool)',
                                        optional: true),
           FastlaneCore::ConfigItem.new(key: :username,
                                        env_name: 'FL_NOTARIZE_USERNAME',
