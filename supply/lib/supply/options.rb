@@ -34,12 +34,12 @@ module Supply
                                      env_name: "SUPPLY_RELEASE_STATUS",
                                      short_option: "-e",
                                      optional: true,
-                                     description: "Release status (used when uploading new apks/aabs) - valid values are #{Supply::ReleaseStatus::ALL.join(', ')}} (default; fastlane picks completed vs draft when uploading)",
+                                     description: "Release status (used when uploading new apks/aabs) - valid values are #{Supply::ReleaseStatus::ALL.join(', ')}",
                                      default_value: Supply::ReleaseStatus::COMPLETED,
                                      default_value_dynamic: true,
                                      verify_block: proc do |value|
-                                                     UI.user_error!("Value must be one of '#{Supply::ReleaseStatus::ALL.join(', ')}'") unless Supply::ReleaseStatus::ALL.include?(value)
-                                                  end),
+                                                     UI.user_error!("Value must be one of '#{Supply::RELEASE_STATUS}'") unless Supply::ReleaseStatus::ALL.include?(value)
+                                                   end),
         FastlaneCore::ConfigItem.new(key: :track,
                                      short_option: "-a",
                                      env_name: "SUPPLY_TRACK",

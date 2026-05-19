@@ -468,7 +468,6 @@ describe Supply do
         Supply.config = config
         allow(Supply::Client).to receive(:make_from_config).and_return(client)
         allow(client).to receive(:tracks).with('alpha').and_return([track])
-        allow(client).to receive(:get_edit_track).with('alpha').and_return(track)
         allow(release).to receive(:version_codes).and_return([version_code])
         allow(client).to receive(:update_track)
       end
