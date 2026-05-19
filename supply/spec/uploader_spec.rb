@@ -223,9 +223,7 @@ describe Supply do
           allow(client).to receive(:upload_apk).with("some/path/app-v#{version_code}.apk").and_return(version_code) # newly uploaded version code
         end
         allow(client).to receive(:upload_changelogs).and_return(nil)
-        track = double('track', releases: [release])
-        allow(client).to receive(:tracks).with('track-name').and_return([track])
-        allow(client).to receive(:get_edit_track).with('track-name').and_return(track)
+        allow(client).to receive(:tracks).with('track-name').and_return([double('tracks', releases: [ release ])])
         languages.each do |lang|
           allow(client).to receive(:listing_for_language).with(lang).and_return(Supply::Listing.new(client, lang))
         end
