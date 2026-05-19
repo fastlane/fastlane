@@ -195,7 +195,7 @@ If you want _supply_ to upload with more than 10 threads in parallel then you ne
 - `:release_status`
   - Used when uploading with `:apk_path`, `:apk_paths`, `:aab_path`, and `:aab_paths`
   - Can set as  "draft" to complete the release at some other time
-  - Defaults to "fastlane_automatic"
+  - Defaults to "completed"
 - `:version_code`
   - Used for `:update_rollout`, `:track_promote_to`, and uploading of meta data and screenshots
 - `:skip_upload_changelogs`
