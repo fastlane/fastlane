@@ -237,7 +237,7 @@ GEM
     mime-types-data (3.2024.0206)
     mini_magick (4.12.0)
     mini_mime (1.1.5)
-    multi_json (1.21.1)
+    multi_json (1.19.1)
     multipart-post (2.4.1)
     mustermann (2.0.2)
       ruby2_keywords (~> 0.0.1)
