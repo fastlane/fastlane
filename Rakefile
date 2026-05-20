@@ -1,5 +1,7 @@
 require "bundler/gem_tasks"
 
+Dir.glob("internal/rakelib/*.rake").each { |r| load r }
+
 task(:test_all) do
   formatter = "--format progress"
   formatter += " -r rspec_junit_formatter --format RspecJunitFormatter -o #{ENV['CIRCLE_TEST_REPORTS']}/rspec/fastlane-junit-results.xml" if ENV["CIRCLE_TEST_REPORTS"]
