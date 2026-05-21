@@ -2,7 +2,7 @@ require 'json'
 require 'yaml'
 
 def load_fastlane_members
-  team_path = File.expand_path('../team.json', __dir__)
+  team_path = File.expand_path('../../team.json', __dir__)
   data = JSON.parse(File.read(team_path))
   members = data.keys.map { |u| u.to_s.downcase }
   members << 'fastlane-bot'
@@ -10,7 +10,7 @@ def load_fastlane_members
 end
 
 def load_tool_labels
-  labeler_path = File.expand_path('../.github/labeler.yml', __dir__)
+  labeler_path = File.expand_path('../../.github/labeler.yml', __dir__)
   yaml = YAML.safe_load(File.read(labeler_path)) || {}
   tool_labels = yaml.keys.grep(/^tool: /)
   tool_labels.uniq.freeze
@@ -74,11 +74,11 @@ task(:issue_stats) do
 
   raise "Please set GITHUB_SCRIPT_TOKEN in your environment with a GitHub personal access token value".red if GITHUB_TOKEN.to_s.empty?
 
-  QUERY_START_TIME = (Time.now.utc - (QUERY_DAYS * SECONDS_PER_DAY)).freeze
+  query_start_time = (Time.now.utc - (QUERY_DAYS * SECONDS_PER_DAY)).freeze
   puts("Fetching GitHub issues...")
 
   # Fetch only issues updated within the query time period to keep our GitHub request count reasonable
-  since = QUERY_START_TIME.strftime("%Y-%m-%dT%H:%M:%SZ")
+  since = query_start_time.strftime("%Y-%m-%dT%H:%M:%SZ")
   client = Octokit::Client.new(access_token: GITHUB_TOKEN)
   client.auto_paginate = true
   begin
@@ -109,15 +109,15 @@ task(:issue_stats) do
   end
 
   issue_counts_by_label = issues_by_labels.map do |label, issues|
-    return [label, 0, 0, 0] unless issues
+    next [label, 0, 0, 0] unless issues
 
     opened_issues = issues.select do |issue|
       t = convert_time(issue, 'created_at')
-      t && t > QUERY_START_TIME
+      t && t > query_start_time
     end.count
     closed_issues = issues.select do |issue|
       closed_time = convert_time(issue, 'closed_at')
-      closed_time && closed_time > QUERY_START_TIME
+      closed_time && closed_time > query_start_time
     end.count
     netnet = opened_issues - closed_issues
 
