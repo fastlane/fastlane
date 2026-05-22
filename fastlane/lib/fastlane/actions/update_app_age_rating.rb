@@ -201,7 +201,8 @@ module Fastlane
           new_value = Spaceship::ConnectAPI::AgeRatingDeclaration.map_value_from_itc(new_key, value)
           attrs[new_key] = new_value
         end
-        Spaceship::ConnectAPI::AgeRatingDeclaration.map_deprecation_if_possible(attributes)
+        attributes, = Spaceship::ConnectAPI::AgeRatingDeclaration.map_deprecation_if_possible(attributes)
+        attributes
       end
       private_class_method :build_attributes
     end
