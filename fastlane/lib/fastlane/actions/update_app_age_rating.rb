@@ -80,6 +80,9 @@ module Fastlane
         require 'spaceship'
         require 'json'
 
+        # Honour an API key that was set by app_store_connect_api_key earlier in the lane
+        params[:api_key] ||= Actions.lane_context[SharedValues::APP_STORE_CONNECT_API_KEY]
+
         # Authenticate: API key takes priority, falls back to Apple ID session
         token = Spaceship::ConnectAPI::Token.from(
           hash: params[:api_key],
@@ -193,11 +196,12 @@ module Fastlane
       private_class_method :parse_config
 
       def self.build_attributes(config_json)
-        config_json.each_with_object({}) do |(key, value), attrs|
-          new_key   = Spaceship::ConnectAPI::AgeRatingDeclaration.map_key_from_itc(key)
+        attributes = config_json.each_with_object({}) do |(key, value), attrs|
+          new_key = Spaceship::ConnectAPI::AgeRatingDeclaration.map_key_from_itc(key)
           new_value = Spaceship::ConnectAPI::AgeRatingDeclaration.map_value_from_itc(new_key, value)
           attrs[new_key] = new_value
         end
+        Spaceship::ConnectAPI::AgeRatingDeclaration.map_deprecation_if_possible(attributes)
       end
       private_class_method :build_attributes
     end
