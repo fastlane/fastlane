@@ -4082,6 +4082,7 @@ public func deliver(apiKeyPath: OptionalConfigValue<String?> = .fastlaneDefault(
    - user: Target username or organization name
    - ipa: Path to your IPA file. Optional if you use the _gym_ or _xcodebuild_ action
    - apk: Path to your APK file
+   - aab: Path to your AAB file
    - message: Release Notes
    - distributionKey: Target Distribution Key
    - releaseNote: Release note for distribution page
@@ -4095,6 +4096,7 @@ public func deploygate(apiToken: String,
                        user: String,
                        ipa: OptionalConfigValue<String?> = .fastlaneDefault(nil),
                        apk: OptionalConfigValue<String?> = .fastlaneDefault(nil),
+                       aab: OptionalConfigValue<String?> = .fastlaneDefault(nil),
                        message: String = "No changelog provided",
                        distributionKey: OptionalConfigValue<String?> = .fastlaneDefault(nil),
                        releaseNote: OptionalConfigValue<String?> = .fastlaneDefault(nil),
@@ -4105,6 +4107,7 @@ public func deploygate(apiToken: String,
     let userArg = RubyCommand.Argument(name: "user", value: user, type: nil)
     let ipaArg = ipa.asRubyArgument(name: "ipa", type: nil)
     let apkArg = apk.asRubyArgument(name: "apk", type: nil)
+    let aabArg = aab.asRubyArgument(name: "aab", type: nil)
     let messageArg = RubyCommand.Argument(name: "message", value: message, type: nil)
     let distributionKeyArg = distributionKey.asRubyArgument(name: "distribution_key", type: nil)
     let releaseNoteArg = releaseNote.asRubyArgument(name: "release_note", type: nil)
@@ -4114,6 +4117,7 @@ public func deploygate(apiToken: String,
                                           userArg,
                                           ipaArg,
                                           apkArg,
+                                          aabArg,
                                           messageArg,
                                           distributionKeyArg,
                                           releaseNoteArg,
