@@ -135,7 +135,10 @@ module Fastlane
       FileUtils.mkdir_p(target_path)
       docs_dir = File.join(target_path, "docs")
       generated_actions_dir = File.join("generated", "actions")
+      FileUtils.rm_rf(File.join(docs_dir, generated_actions_dir))
+
       FileUtils.mkdir_p(File.join(docs_dir, generated_actions_dir))
+      FileUtils.mkdir_p(File.join(docs_dir, "img", "actions"))
 
       # Generate actions.md
       template = File.join(Fastlane::ROOT, "lib/assets/Actions.md.erb")
@@ -144,7 +147,6 @@ module Fastlane
 
       # Generate actions sub pages (e.g. generated/actions/slather.md, generated/actions/scan.md)
       all_actions_ref_yml = []
-      FileUtils.mkdir_p(File.join(docs_dir, generated_actions_dir))
       ActionsList.all_actions do |action|
         @action = action # to provide a reference in the .html.erb template
         @action_filename = filename_for_action(action)
