@@ -656,6 +656,8 @@ public func appledoc(input: [String],
    - useLiveVersion: Force usage of live version rather than edit version
    - metadataPath: Path to the folder containing the metadata files
    - screenshotsPath: Path to the folder containing the screenshots
+   - appClipHeaderImagesPath: Path to the folder containing the app clip header images
+   - appClipDefaultExperienceMetadataPath: Path to the folder containing the app clip default experience metadata
    - appPreviewsPath: Path to the folder containing localized App Preview videos
    - previewFrameTimeCode: Time code for the App Preview still frame written as hour:minute:second:centisecond (e.g. 00:00:00:01)
    - overwritePreviewVideos: Clear all previously uploaded App Preview videos before uploading the new ones
@@ -698,6 +700,7 @@ public func appledoc(input: [String],
    - secondarySecondSubCategory: Metadata: The english name of the secondary second sub category (e.g. `Educational`, `Puzzle`)
    - tradeRepresentativeContactInformation: **DEPRECATED!** This is no longer used by App Store Connect - Metadata: A hash containing the trade representative contact information
    - appReviewInformation: Metadata: A hash containing the review information
+   - appClipReviewInformation: Metadata: A hash containing the app clip review information
    - appReviewAttachmentFile: Metadata: Path to the app review attachment file
    - description: Metadata: The localised app description
    - name: Metadata: The localised app name
@@ -712,6 +715,8 @@ public func appledoc(input: [String],
    - languages: Metadata: List of languages to activate
    - ignoreLanguageDirectoryValidation: Ignore errors when invalid languages are found in metadata and screenshot directories
    - precheckIncludeInAppPurchases: Should precheck check in-app purchases?
+   - appClipDefaultExperienceSubtitle: The localized subtitle for the default app clip experience
+   - appClipDefaultExperienceAction: Action for the default app clip experience (OPEN, VIEW, PLAY)
    - app: The (spaceship) app ID of the app you want to use/modify
 
  Using _upload_to_app_store_ after _build_app_ and _capture_screenshots_ will automatically upload the latest ipa and screenshots with no other configuration.
@@ -734,6 +739,8 @@ public func appstore(apiKeyPath: OptionalConfigValue<String?> = .fastlaneDefault
                      useLiveVersion: OptionalConfigValue<Bool> = .fastlaneDefault(false),
                      metadataPath: OptionalConfigValue<String?> = .fastlaneDefault(nil),
                      screenshotsPath: OptionalConfigValue<String?> = .fastlaneDefault(nil),
+                     appClipHeaderImagesPath: OptionalConfigValue<String?> = .fastlaneDefault(nil),
+                     appClipDefaultExperienceMetadataPath: OptionalConfigValue<String?> = .fastlaneDefault(nil),
                      appPreviewsPath: OptionalConfigValue<String?> = .fastlaneDefault(nil),
                      previewFrameTimeCode: String = "00:00:05:00",
                      overwritePreviewVideos: OptionalConfigValue<Bool> = .fastlaneDefault(false),
@@ -776,6 +783,7 @@ public func appstore(apiKeyPath: OptionalConfigValue<String?> = .fastlaneDefault
                      secondarySecondSubCategory: OptionalConfigValue<String?> = .fastlaneDefault(nil),
                      tradeRepresentativeContactInformation: OptionalConfigValue<[String: Any]?> = .fastlaneDefault(nil),
                      appReviewInformation: OptionalConfigValue<[String: Any]?> = .fastlaneDefault(nil),
+                     appClipReviewInformation: OptionalConfigValue<[String: Any]?> = .fastlaneDefault(nil),
                      appReviewAttachmentFile: OptionalConfigValue<String?> = .fastlaneDefault(nil),
                      description: OptionalConfigValue<[String: Any]?> = .fastlaneDefault(nil),
                      name: OptionalConfigValue<[String: Any]?> = .fastlaneDefault(nil),
@@ -790,6 +798,8 @@ public func appstore(apiKeyPath: OptionalConfigValue<String?> = .fastlaneDefault
                      languages: OptionalConfigValue<[String]?> = .fastlaneDefault(nil),
                      ignoreLanguageDirectoryValidation: OptionalConfigValue<Bool> = .fastlaneDefault(false),
                      precheckIncludeInAppPurchases: OptionalConfigValue<Bool> = .fastlaneDefault(true),
+                     appClipDefaultExperienceSubtitle: OptionalConfigValue<[String: Any]?> = .fastlaneDefault(nil),
+                     appClipDefaultExperienceAction: OptionalConfigValue<String?> = .fastlaneDefault(nil),
                      app: OptionalConfigValue<Int?> = .fastlaneDefault(nil))
 {
     let apiKeyPathArg = apiKeyPath.asRubyArgument(name: "api_key_path", type: nil)
@@ -805,6 +815,8 @@ public func appstore(apiKeyPath: OptionalConfigValue<String?> = .fastlaneDefault
     let useLiveVersionArg = useLiveVersion.asRubyArgument(name: "use_live_version", type: nil)
     let metadataPathArg = metadataPath.asRubyArgument(name: "metadata_path", type: nil)
     let screenshotsPathArg = screenshotsPath.asRubyArgument(name: "screenshots_path", type: nil)
+    let appClipHeaderImagesPathArg = appClipHeaderImagesPath.asRubyArgument(name: "app_clip_header_images_path", type: nil)
+    let appClipDefaultExperienceMetadataPathArg = appClipDefaultExperienceMetadataPath.asRubyArgument(name: "app_clip_default_experience_metadata_path", type: nil)
     let appPreviewsPathArg = appPreviewsPath.asRubyArgument(name: "app_previews_path", type: nil)
     let previewFrameTimeCodeArg = RubyCommand.Argument(name: "preview_frame_time_code", value: previewFrameTimeCode, type: nil)
     let overwritePreviewVideosArg = overwritePreviewVideos.asRubyArgument(name: "overwrite_preview_videos", type: nil)
@@ -847,6 +859,7 @@ public func appstore(apiKeyPath: OptionalConfigValue<String?> = .fastlaneDefault
     let secondarySecondSubCategoryArg = secondarySecondSubCategory.asRubyArgument(name: "secondary_second_sub_category", type: nil)
     let tradeRepresentativeContactInformationArg = tradeRepresentativeContactInformation.asRubyArgument(name: "trade_representative_contact_information", type: nil)
     let appReviewInformationArg = appReviewInformation.asRubyArgument(name: "app_review_information", type: nil)
+    let appClipReviewInformationArg = appClipReviewInformation.asRubyArgument(name: "app_clip_review_information", type: nil)
     let appReviewAttachmentFileArg = appReviewAttachmentFile.asRubyArgument(name: "app_review_attachment_file", type: nil)
     let descriptionArg = description.asRubyArgument(name: "description", type: nil)
     let nameArg = name.asRubyArgument(name: "name", type: nil)
@@ -861,6 +874,8 @@ public func appstore(apiKeyPath: OptionalConfigValue<String?> = .fastlaneDefault
     let languagesArg = languages.asRubyArgument(name: "languages", type: nil)
     let ignoreLanguageDirectoryValidationArg = ignoreLanguageDirectoryValidation.asRubyArgument(name: "ignore_language_directory_validation", type: nil)
     let precheckIncludeInAppPurchasesArg = precheckIncludeInAppPurchases.asRubyArgument(name: "precheck_include_in_app_purchases", type: nil)
+    let appClipDefaultExperienceSubtitleArg = appClipDefaultExperienceSubtitle.asRubyArgument(name: "app_clip_default_experience_subtitle", type: nil)
+    let appClipDefaultExperienceActionArg = appClipDefaultExperienceAction.asRubyArgument(name: "app_clip_default_experience_action", type: nil)
     let appArg = app.asRubyArgument(name: "app", type: nil)
     let array: [RubyCommand.Argument?] = [apiKeyPathArg,
                                           apiKeyArg,
@@ -875,6 +890,8 @@ public func appstore(apiKeyPath: OptionalConfigValue<String?> = .fastlaneDefault
                                           useLiveVersionArg,
                                           metadataPathArg,
                                           screenshotsPathArg,
+                                          appClipHeaderImagesPathArg,
+                                          appClipDefaultExperienceMetadataPathArg,
                                           appPreviewsPathArg,
                                           previewFrameTimeCodeArg,
                                           overwritePreviewVideosArg,
@@ -917,6 +934,7 @@ public func appstore(apiKeyPath: OptionalConfigValue<String?> = .fastlaneDefault
                                           secondarySecondSubCategoryArg,
                                           tradeRepresentativeContactInformationArg,
                                           appReviewInformationArg,
+                                          appClipReviewInformationArg,
                                           appReviewAttachmentFileArg,
                                           descriptionArg,
                                           nameArg,
@@ -931,6 +949,8 @@ public func appstore(apiKeyPath: OptionalConfigValue<String?> = .fastlaneDefault
                                           languagesArg,
                                           ignoreLanguageDirectoryValidationArg,
                                           precheckIncludeInAppPurchasesArg,
+                                          appClipDefaultExperienceSubtitleArg,
+                                          appClipDefaultExperienceActionArg,
                                           appArg]
     let args: [RubyCommand.Argument] = array
         .filter { $0?.value != nil }
@@ -3791,6 +3811,8 @@ public func deleteKeychain(name: OptionalConfigValue<String?> = .fastlaneDefault
    - useLiveVersion: Force usage of live version rather than edit version
    - metadataPath: Path to the folder containing the metadata files
    - screenshotsPath: Path to the folder containing the screenshots
+   - appClipHeaderImagesPath: Path to the folder containing the app clip header images
+   - appClipDefaultExperienceMetadataPath: Path to the folder containing the app clip default experience metadata
    - appPreviewsPath: Path to the folder containing localized App Preview videos
    - previewFrameTimeCode: Time code for the App Preview still frame written as hour:minute:second:centisecond (e.g. 00:00:00:01)
    - overwritePreviewVideos: Clear all previously uploaded App Preview videos before uploading the new ones
@@ -3833,6 +3855,7 @@ public func deleteKeychain(name: OptionalConfigValue<String?> = .fastlaneDefault
    - secondarySecondSubCategory: Metadata: The english name of the secondary second sub category (e.g. `Educational`, `Puzzle`)
    - tradeRepresentativeContactInformation: **DEPRECATED!** This is no longer used by App Store Connect - Metadata: A hash containing the trade representative contact information
    - appReviewInformation: Metadata: A hash containing the review information
+   - appClipReviewInformation: Metadata: A hash containing the app clip review information
    - appReviewAttachmentFile: Metadata: Path to the app review attachment file
    - description: Metadata: The localised app description
    - name: Metadata: The localised app name
@@ -3847,6 +3870,8 @@ public func deleteKeychain(name: OptionalConfigValue<String?> = .fastlaneDefault
    - languages: Metadata: List of languages to activate
    - ignoreLanguageDirectoryValidation: Ignore errors when invalid languages are found in metadata and screenshot directories
    - precheckIncludeInAppPurchases: Should precheck check in-app purchases?
+   - appClipDefaultExperienceSubtitle: The localized subtitle for the default app clip experience
+   - appClipDefaultExperienceAction: Action for the default app clip experience (OPEN, VIEW, PLAY)
    - app: The (spaceship) app ID of the app you want to use/modify
 
  Using _upload_to_app_store_ after _build_app_ and _capture_screenshots_ will automatically upload the latest ipa and screenshots with no other configuration.
@@ -3869,6 +3894,8 @@ public func deliver(apiKeyPath: OptionalConfigValue<String?> = .fastlaneDefault(
                     useLiveVersion: OptionalConfigValue<Bool> = .fastlaneDefault(deliverfile.useLiveVersion),
                     metadataPath: OptionalConfigValue<String?> = .fastlaneDefault(deliverfile.metadataPath),
                     screenshotsPath: OptionalConfigValue<String?> = .fastlaneDefault(deliverfile.screenshotsPath),
+                    appClipHeaderImagesPath: OptionalConfigValue<String?> = .fastlaneDefault(deliverfile.appClipHeaderImagesPath),
+                    appClipDefaultExperienceMetadataPath: OptionalConfigValue<String?> = .fastlaneDefault(deliverfile.appClipDefaultExperienceMetadataPath),
                     appPreviewsPath: OptionalConfigValue<String?> = .fastlaneDefault(deliverfile.appPreviewsPath),
                     previewFrameTimeCode: String = deliverfile.previewFrameTimeCode,
                     overwritePreviewVideos: OptionalConfigValue<Bool> = .fastlaneDefault(deliverfile.overwritePreviewVideos),
@@ -3911,6 +3938,7 @@ public func deliver(apiKeyPath: OptionalConfigValue<String?> = .fastlaneDefault(
                     secondarySecondSubCategory: OptionalConfigValue<String?> = .fastlaneDefault(deliverfile.secondarySecondSubCategory),
                     tradeRepresentativeContactInformation: OptionalConfigValue<[String: Any]?> = .fastlaneDefault(deliverfile.tradeRepresentativeContactInformation),
                     appReviewInformation: OptionalConfigValue<[String: Any]?> = .fastlaneDefault(deliverfile.appReviewInformation),
+                    appClipReviewInformation: OptionalConfigValue<[String: Any]?> = .fastlaneDefault(deliverfile.appClipReviewInformation),
                     appReviewAttachmentFile: OptionalConfigValue<String?> = .fastlaneDefault(deliverfile.appReviewAttachmentFile),
                     description: OptionalConfigValue<[String: Any]?> = .fastlaneDefault(deliverfile.description),
                     name: OptionalConfigValue<[String: Any]?> = .fastlaneDefault(deliverfile.name),
@@ -3925,6 +3953,8 @@ public func deliver(apiKeyPath: OptionalConfigValue<String?> = .fastlaneDefault(
                     languages: OptionalConfigValue<[String]?> = .fastlaneDefault(deliverfile.languages),
                     ignoreLanguageDirectoryValidation: OptionalConfigValue<Bool> = .fastlaneDefault(deliverfile.ignoreLanguageDirectoryValidation),
                     precheckIncludeInAppPurchases: OptionalConfigValue<Bool> = .fastlaneDefault(deliverfile.precheckIncludeInAppPurchases),
+                    appClipDefaultExperienceSubtitle: OptionalConfigValue<[String: Any]?> = .fastlaneDefault(deliverfile.appClipDefaultExperienceSubtitle),
+                    appClipDefaultExperienceAction: OptionalConfigValue<String?> = .fastlaneDefault(deliverfile.appClipDefaultExperienceAction),
                     app: OptionalConfigValue<Int?> = .fastlaneDefault(deliverfile.app))
 {
     let apiKeyPathArg = apiKeyPath.asRubyArgument(name: "api_key_path", type: nil)
@@ -3940,6 +3970,8 @@ public func deliver(apiKeyPath: OptionalConfigValue<String?> = .fastlaneDefault(
     let useLiveVersionArg = useLiveVersion.asRubyArgument(name: "use_live_version", type: nil)
     let metadataPathArg = metadataPath.asRubyArgument(name: "metadata_path", type: nil)
     let screenshotsPathArg = screenshotsPath.asRubyArgument(name: "screenshots_path", type: nil)
+    let appClipHeaderImagesPathArg = appClipHeaderImagesPath.asRubyArgument(name: "app_clip_header_images_path", type: nil)
+    let appClipDefaultExperienceMetadataPathArg = appClipDefaultExperienceMetadataPath.asRubyArgument(name: "app_clip_default_experience_metadata_path", type: nil)
     let appPreviewsPathArg = appPreviewsPath.asRubyArgument(name: "app_previews_path", type: nil)
     let previewFrameTimeCodeArg = RubyCommand.Argument(name: "preview_frame_time_code", value: previewFrameTimeCode, type: nil)
     let overwritePreviewVideosArg = overwritePreviewVideos.asRubyArgument(name: "overwrite_preview_videos", type: nil)
@@ -3982,6 +4014,7 @@ public func deliver(apiKeyPath: OptionalConfigValue<String?> = .fastlaneDefault(
     let secondarySecondSubCategoryArg = secondarySecondSubCategory.asRubyArgument(name: "secondary_second_sub_category", type: nil)
     let tradeRepresentativeContactInformationArg = tradeRepresentativeContactInformation.asRubyArgument(name: "trade_representative_contact_information", type: nil)
     let appReviewInformationArg = appReviewInformation.asRubyArgument(name: "app_review_information", type: nil)
+    let appClipReviewInformationArg = appClipReviewInformation.asRubyArgument(name: "app_clip_review_information", type: nil)
     let appReviewAttachmentFileArg = appReviewAttachmentFile.asRubyArgument(name: "app_review_attachment_file", type: nil)
     let descriptionArg = description.asRubyArgument(name: "description", type: nil)
     let nameArg = name.asRubyArgument(name: "name", type: nil)
@@ -3996,6 +4029,8 @@ public func deliver(apiKeyPath: OptionalConfigValue<String?> = .fastlaneDefault(
     let languagesArg = languages.asRubyArgument(name: "languages", type: nil)
     let ignoreLanguageDirectoryValidationArg = ignoreLanguageDirectoryValidation.asRubyArgument(name: "ignore_language_directory_validation", type: nil)
     let precheckIncludeInAppPurchasesArg = precheckIncludeInAppPurchases.asRubyArgument(name: "precheck_include_in_app_purchases", type: nil)
+    let appClipDefaultExperienceSubtitleArg = appClipDefaultExperienceSubtitle.asRubyArgument(name: "app_clip_default_experience_subtitle", type: nil)
+    let appClipDefaultExperienceActionArg = appClipDefaultExperienceAction.asRubyArgument(name: "app_clip_default_experience_action", type: nil)
     let appArg = app.asRubyArgument(name: "app", type: nil)
     let array: [RubyCommand.Argument?] = [apiKeyPathArg,
                                           apiKeyArg,
@@ -4010,6 +4045,8 @@ public func deliver(apiKeyPath: OptionalConfigValue<String?> = .fastlaneDefault(
                                           useLiveVersionArg,
                                           metadataPathArg,
                                           screenshotsPathArg,
+                                          appClipHeaderImagesPathArg,
+                                          appClipDefaultExperienceMetadataPathArg,
                                           appPreviewsPathArg,
                                           previewFrameTimeCodeArg,
                                           overwritePreviewVideosArg,
@@ -4052,6 +4089,7 @@ public func deliver(apiKeyPath: OptionalConfigValue<String?> = .fastlaneDefault(
                                           secondarySecondSubCategoryArg,
                                           tradeRepresentativeContactInformationArg,
                                           appReviewInformationArg,
+                                          appClipReviewInformationArg,
                                           appReviewAttachmentFileArg,
                                           descriptionArg,
                                           nameArg,
@@ -4066,6 +4104,8 @@ public func deliver(apiKeyPath: OptionalConfigValue<String?> = .fastlaneDefault(
                                           languagesArg,
                                           ignoreLanguageDirectoryValidationArg,
                                           precheckIncludeInAppPurchasesArg,
+                                          appClipDefaultExperienceSubtitleArg,
+                                          appClipDefaultExperienceActionArg,
                                           appArg]
     let args: [RubyCommand.Argument] = array
         .filter { $0?.value != nil }
@@ -7436,8 +7476,6 @@ public func nexusUpload(file: String,
 
  - parameters:
    - package: Path to package to notarize, e.g. .app bundle or disk image
-   - useNotarytool: Whether to `xcrun notarytool` or `xcrun altool`
-   - tryEarlyStapling: Whether to try early stapling while the notarization request is in progress
    - skipStapling: Do not staple the notarization ticket to the artifact; useful for single file executables and ZIP archives
    - bundleId: Bundle identifier to uniquely identify the package
    - username: Apple ID username
@@ -7448,8 +7486,6 @@ public func nexusUpload(file: String,
    - apiKey: Your App Store Connect API Key information (https://docs.fastlane.tools/app-store-connect-api/#using-fastlane-api-key-hash-option)
  */
 public func notarize(package: String,
-                     useNotarytool: OptionalConfigValue<Bool> = .fastlaneDefault(true),
-                     tryEarlyStapling: OptionalConfigValue<Bool> = .fastlaneDefault(false),
                      skipStapling: OptionalConfigValue<Bool> = .fastlaneDefault(false),
                      bundleId: OptionalConfigValue<String?> = .fastlaneDefault(nil),
                      username: OptionalConfigValue<String?> = .fastlaneDefault(nil),
@@ -7460,8 +7496,6 @@ public func notarize(package: String,
                      apiKey: OptionalConfigValue<[String: Any]?> = .fastlaneDefault(nil))
 {
     let packageArg = RubyCommand.Argument(name: "package", value: package, type: nil)
-    let useNotarytoolArg = useNotarytool.asRubyArgument(name: "use_notarytool", type: nil)
-    let tryEarlyStaplingArg = tryEarlyStapling.asRubyArgument(name: "try_early_stapling", type: nil)
     let skipStaplingArg = skipStapling.asRubyArgument(name: "skip_stapling", type: nil)
     let bundleIdArg = bundleId.asRubyArgument(name: "bundle_id", type: nil)
     let usernameArg = username.asRubyArgument(name: "username", type: nil)
@@ -7471,8 +7505,6 @@ public func notarize(package: String,
     let apiKeyPathArg = apiKeyPath.asRubyArgument(name: "api_key_path", type: nil)
     let apiKeyArg = apiKey.asRubyArgument(name: "api_key", type: nil)
     let array: [RubyCommand.Argument?] = [packageArg,
-                                          useNotarytoolArg,
-                                          tryEarlyStaplingArg,
                                           skipStaplingArg,
                                           bundleIdArg,
                                           usernameArg,
@@ -7842,6 +7874,8 @@ public func pem(platform: String = "ios",
    - skipSubmission: Skip the distributing action of pilot and only upload the ipa file
    - skipWaitingForBuildProcessing: If set to true, the `distribute_external` option won't work and no build will be distributed to testers. (You might want to use this option if you are using this action on CI and have to pay for 'minutes used' on your CI plan). If set to `true` and a changelog is provided, it will partially wait for the build to appear on AppStore Connect so the changelog can be set, and skip the remaining processing steps
    - updateBuildInfoOnUpload: **DEPRECATED!** Update build info immediately after validation. This is deprecated and will be removed in a future release. App Store Connect no longer supports setting build info until after build processing has completed, which is when build info is updated by default
+   - appClipInvocations: Add beta app clip invocations to your builds in TestFlight
+   - overwriteAppClipInvocations: Clear all previous beta app clip invocations before adding new ones
    - distributeOnly: Distribute a previously uploaded build (equivalent to the `fastlane pilot distribute` command)
    - usesNonExemptEncryption: Provide the 'Uses Non-Exempt Encryption' for export compliance. This is used if there is 'ITSAppUsesNonExemptEncryption' is not set in the Info.plist
    - distributeExternal: Should the build be distributed to external testers? If set to true, use of `groups` option is required
@@ -7886,6 +7920,8 @@ public func pilot(apiKeyPath: OptionalConfigValue<String?> = .fastlaneDefault(ni
                   skipSubmission: OptionalConfigValue<Bool> = .fastlaneDefault(false),
                   skipWaitingForBuildProcessing: OptionalConfigValue<Bool> = .fastlaneDefault(false),
                   updateBuildInfoOnUpload: OptionalConfigValue<Bool> = .fastlaneDefault(false),
+                  appClipInvocations: OptionalConfigValue<[String]?> = .fastlaneDefault(nil),
+                  overwriteAppClipInvocations: OptionalConfigValue<Bool> = .fastlaneDefault(false),
                   distributeOnly: OptionalConfigValue<Bool> = .fastlaneDefault(false),
                   usesNonExemptEncryption: OptionalConfigValue<Bool> = .fastlaneDefault(false),
                   distributeExternal: OptionalConfigValue<Bool> = .fastlaneDefault(false),
@@ -7927,6 +7963,8 @@ public func pilot(apiKeyPath: OptionalConfigValue<String?> = .fastlaneDefault(ni
     let skipSubmissionArg = skipSubmission.asRubyArgument(name: "skip_submission", type: nil)
     let skipWaitingForBuildProcessingArg = skipWaitingForBuildProcessing.asRubyArgument(name: "skip_waiting_for_build_processing", type: nil)
     let updateBuildInfoOnUploadArg = updateBuildInfoOnUpload.asRubyArgument(name: "update_build_info_on_upload", type: nil)
+    let appClipInvocationsArg = appClipInvocations.asRubyArgument(name: "app_clip_invocations", type: nil)
+    let overwriteAppClipInvocationsArg = overwriteAppClipInvocations.asRubyArgument(name: "overwrite_app_clip_invocations", type: nil)
     let distributeOnlyArg = distributeOnly.asRubyArgument(name: "distribute_only", type: nil)
     let usesNonExemptEncryptionArg = usesNonExemptEncryption.asRubyArgument(name: "uses_non_exempt_encryption", type: nil)
     let distributeExternalArg = distributeExternal.asRubyArgument(name: "distribute_external", type: nil)
@@ -7967,6 +8005,8 @@ public func pilot(apiKeyPath: OptionalConfigValue<String?> = .fastlaneDefault(ni
                                           skipSubmissionArg,
                                           skipWaitingForBuildProcessingArg,
                                           updateBuildInfoOnUploadArg,
+                                          appClipInvocationsArg,
+                                          overwriteAppClipInvocationsArg,
                                           distributeOnlyArg,
                                           usesNonExemptEncryptionArg,
                                           distributeExternalArg,
@@ -10335,6 +10375,7 @@ public func skipDocs() {
    - username: Overrides the webhook's username property if use_webhook_configured_username_and_icon is false
    - iconUrl: Specifies a URL of an image to use as the photo of the message. Overrides the webhook's image property if use_webhook_configured_username_and_icon is false
    - iconEmoji: Specifies an emoji (using colon shortcodes, eg. :white_check_mark:) to use as the photo of the message. Overrides the webhook's image property if use_webhook_configured_username_and_icon is false. This parameter takes precedence over icon_url
+   - threadTs: Specifies a thread timestamp to reply to a message in a thread
    - payload: Add additional information to this post. payload must be a hash containing any key with any value
    - defaultPayloads: Specifies default payloads to include. Pass an empty array to suppress all the default payloads
    - attachmentProperties: Merge additional properties in the slack attachment, see https://api.slack.com/docs/attachments
@@ -10352,6 +10393,7 @@ public func slack(message: OptionalConfigValue<String?> = .fastlaneDefault(nil),
                   username: String = "fastlane",
                   iconUrl: String = "https://fastlane.tools/assets/img/fastlane_icon.png",
                   iconEmoji: OptionalConfigValue<String?> = .fastlaneDefault(nil),
+                  threadTs: OptionalConfigValue<String?> = .fastlaneDefault(nil),
                   payload: [String: Any] = [:],
                   defaultPayloads: [String] = ["lane", "test_result", "git_branch", "git_author", "last_git_commit", "last_git_commit_hash"],
                   attachmentProperties: [String: Any] = [:],
@@ -10367,6 +10409,7 @@ public func slack(message: OptionalConfigValue<String?> = .fastlaneDefault(nil),
     let usernameArg = RubyCommand.Argument(name: "username", value: username, type: nil)
     let iconUrlArg = RubyCommand.Argument(name: "icon_url", value: iconUrl, type: nil)
     let iconEmojiArg = iconEmoji.asRubyArgument(name: "icon_emoji", type: nil)
+    let threadTsArg = threadTs.asRubyArgument(name: "thread_ts", type: nil)
     let payloadArg = RubyCommand.Argument(name: "payload", value: payload, type: nil)
     let defaultPayloadsArg = RubyCommand.Argument(name: "default_payloads", value: defaultPayloads, type: nil)
     let attachmentPropertiesArg = RubyCommand.Argument(name: "attachment_properties", value: attachmentProperties, type: nil)
@@ -10381,6 +10424,7 @@ public func slack(message: OptionalConfigValue<String?> = .fastlaneDefault(nil),
                                           usernameArg,
                                           iconUrlArg,
                                           iconEmojiArg,
+                                          threadTsArg,
                                           payloadArg,
                                           defaultPayloadsArg,
                                           attachmentPropertiesArg,
@@ -11749,6 +11793,8 @@ public func testfairy(apiKey: String,
    - skipSubmission: Skip the distributing action of pilot and only upload the ipa file
    - skipWaitingForBuildProcessing: If set to true, the `distribute_external` option won't work and no build will be distributed to testers. (You might want to use this option if you are using this action on CI and have to pay for 'minutes used' on your CI plan). If set to `true` and a changelog is provided, it will partially wait for the build to appear on AppStore Connect so the changelog can be set, and skip the remaining processing steps
    - updateBuildInfoOnUpload: **DEPRECATED!** Update build info immediately after validation. This is deprecated and will be removed in a future release. App Store Connect no longer supports setting build info until after build processing has completed, which is when build info is updated by default
+   - appClipInvocations: Add beta app clip invocations to your builds in TestFlight
+   - overwriteAppClipInvocations: Clear all previous beta app clip invocations before adding new ones
    - distributeOnly: Distribute a previously uploaded build (equivalent to the `fastlane pilot distribute` command)
    - usesNonExemptEncryption: Provide the 'Uses Non-Exempt Encryption' for export compliance. This is used if there is 'ITSAppUsesNonExemptEncryption' is not set in the Info.plist
    - distributeExternal: Should the build be distributed to external testers? If set to true, use of `groups` option is required
@@ -11793,6 +11839,8 @@ public func testflight(apiKeyPath: OptionalConfigValue<String?> = .fastlaneDefau
                        skipSubmission: OptionalConfigValue<Bool> = .fastlaneDefault(false),
                        skipWaitingForBuildProcessing: OptionalConfigValue<Bool> = .fastlaneDefault(false),
                        updateBuildInfoOnUpload: OptionalConfigValue<Bool> = .fastlaneDefault(false),
+                       appClipInvocations: OptionalConfigValue<[String]?> = .fastlaneDefault(nil),
+                       overwriteAppClipInvocations: OptionalConfigValue<Bool> = .fastlaneDefault(false),
                        distributeOnly: OptionalConfigValue<Bool> = .fastlaneDefault(false),
                        usesNonExemptEncryption: OptionalConfigValue<Bool> = .fastlaneDefault(false),
                        distributeExternal: OptionalConfigValue<Bool> = .fastlaneDefault(false),
@@ -11834,6 +11882,8 @@ public func testflight(apiKeyPath: OptionalConfigValue<String?> = .fastlaneDefau
     let skipSubmissionArg = skipSubmission.asRubyArgument(name: "skip_submission", type: nil)
     let skipWaitingForBuildProcessingArg = skipWaitingForBuildProcessing.asRubyArgument(name: "skip_waiting_for_build_processing", type: nil)
     let updateBuildInfoOnUploadArg = updateBuildInfoOnUpload.asRubyArgument(name: "update_build_info_on_upload", type: nil)
+    let appClipInvocationsArg = appClipInvocations.asRubyArgument(name: "app_clip_invocations", type: nil)
+    let overwriteAppClipInvocationsArg = overwriteAppClipInvocations.asRubyArgument(name: "overwrite_app_clip_invocations", type: nil)
     let distributeOnlyArg = distributeOnly.asRubyArgument(name: "distribute_only", type: nil)
     let usesNonExemptEncryptionArg = usesNonExemptEncryption.asRubyArgument(name: "uses_non_exempt_encryption", type: nil)
     let distributeExternalArg = distributeExternal.asRubyArgument(name: "distribute_external", type: nil)
@@ -11874,6 +11924,8 @@ public func testflight(apiKeyPath: OptionalConfigValue<String?> = .fastlaneDefau
                                           skipSubmissionArg,
                                           skipWaitingForBuildProcessingArg,
                                           updateBuildInfoOnUploadArg,
+                                          appClipInvocationsArg,
+                                          overwriteAppClipInvocationsArg,
                                           distributeOnlyArg,
                                           usesNonExemptEncryptionArg,
                                           distributeExternalArg,
@@ -12659,6 +12711,8 @@ public func uploadSymbolsToSentry(apiHost: String = "https://app.getsentry.com/a
    - useLiveVersion: Force usage of live version rather than edit version
    - metadataPath: Path to the folder containing the metadata files
    - screenshotsPath: Path to the folder containing the screenshots
+   - appClipHeaderImagesPath: Path to the folder containing the app clip header images
+   - appClipDefaultExperienceMetadataPath: Path to the folder containing the app clip default experience metadata
    - appPreviewsPath: Path to the folder containing localized App Preview videos
    - previewFrameTimeCode: Time code for the App Preview still frame written as hour:minute:second:centisecond (e.g. 00:00:00:01)
    - overwritePreviewVideos: Clear all previously uploaded App Preview videos before uploading the new ones
@@ -12701,6 +12755,7 @@ public func uploadSymbolsToSentry(apiHost: String = "https://app.getsentry.com/a
    - secondarySecondSubCategory: Metadata: The english name of the secondary second sub category (e.g. `Educational`, `Puzzle`)
    - tradeRepresentativeContactInformation: **DEPRECATED!** This is no longer used by App Store Connect - Metadata: A hash containing the trade representative contact information
    - appReviewInformation: Metadata: A hash containing the review information
+   - appClipReviewInformation: Metadata: A hash containing the app clip review information
    - appReviewAttachmentFile: Metadata: Path to the app review attachment file
    - description: Metadata: The localised app description
    - name: Metadata: The localised app name
@@ -12715,6 +12770,8 @@ public func uploadSymbolsToSentry(apiHost: String = "https://app.getsentry.com/a
    - languages: Metadata: List of languages to activate
    - ignoreLanguageDirectoryValidation: Ignore errors when invalid languages are found in metadata and screenshot directories
    - precheckIncludeInAppPurchases: Should precheck check in-app purchases?
+   - appClipDefaultExperienceSubtitle: The localized subtitle for the default app clip experience
+   - appClipDefaultExperienceAction: Action for the default app clip experience (OPEN, VIEW, PLAY)
    - app: The (spaceship) app ID of the app you want to use/modify
 
  Using _upload_to_app_store_ after _build_app_ and _capture_screenshots_ will automatically upload the latest ipa and screenshots with no other configuration.
@@ -12737,6 +12794,8 @@ public func uploadToAppStore(apiKeyPath: OptionalConfigValue<String?> = .fastlan
                              useLiveVersion: OptionalConfigValue<Bool> = .fastlaneDefault(false),
                              metadataPath: OptionalConfigValue<String?> = .fastlaneDefault(nil),
                              screenshotsPath: OptionalConfigValue<String?> = .fastlaneDefault(nil),
+                             appClipHeaderImagesPath: OptionalConfigValue<String?> = .fastlaneDefault(nil),
+                             appClipDefaultExperienceMetadataPath: OptionalConfigValue<String?> = .fastlaneDefault(nil),
                              appPreviewsPath: OptionalConfigValue<String?> = .fastlaneDefault(nil),
                              previewFrameTimeCode: String = "00:00:05:00",
                              overwritePreviewVideos: OptionalConfigValue<Bool> = .fastlaneDefault(false),
@@ -12779,6 +12838,7 @@ public func uploadToAppStore(apiKeyPath: OptionalConfigValue<String?> = .fastlan
                              secondarySecondSubCategory: OptionalConfigValue<String?> = .fastlaneDefault(nil),
                              tradeRepresentativeContactInformation: OptionalConfigValue<[String: Any]?> = .fastlaneDefault(nil),
                              appReviewInformation: OptionalConfigValue<[String: Any]?> = .fastlaneDefault(nil),
+                             appClipReviewInformation: OptionalConfigValue<[String: Any]?> = .fastlaneDefault(nil),
                              appReviewAttachmentFile: OptionalConfigValue<String?> = .fastlaneDefault(nil),
                              description: OptionalConfigValue<[String: Any]?> = .fastlaneDefault(nil),
                              name: OptionalConfigValue<[String: Any]?> = .fastlaneDefault(nil),
@@ -12793,6 +12853,8 @@ public func uploadToAppStore(apiKeyPath: OptionalConfigValue<String?> = .fastlan
                              languages: OptionalConfigValue<[String]?> = .fastlaneDefault(nil),
                              ignoreLanguageDirectoryValidation: OptionalConfigValue<Bool> = .fastlaneDefault(false),
                              precheckIncludeInAppPurchases: OptionalConfigValue<Bool> = .fastlaneDefault(true),
+                             appClipDefaultExperienceSubtitle: OptionalConfigValue<[String: Any]?> = .fastlaneDefault(nil),
+                             appClipDefaultExperienceAction: OptionalConfigValue<String?> = .fastlaneDefault(nil),
                              app: OptionalConfigValue<Int?> = .fastlaneDefault(nil))
 {
     let apiKeyPathArg = apiKeyPath.asRubyArgument(name: "api_key_path", type: nil)
@@ -12808,6 +12870,8 @@ public func uploadToAppStore(apiKeyPath: OptionalConfigValue<String?> = .fastlan
     let useLiveVersionArg = useLiveVersion.asRubyArgument(name: "use_live_version", type: nil)
     let metadataPathArg = metadataPath.asRubyArgument(name: "metadata_path", type: nil)
     let screenshotsPathArg = screenshotsPath.asRubyArgument(name: "screenshots_path", type: nil)
+    let appClipHeaderImagesPathArg = appClipHeaderImagesPath.asRubyArgument(name: "app_clip_header_images_path", type: nil)
+    let appClipDefaultExperienceMetadataPathArg = appClipDefaultExperienceMetadataPath.asRubyArgument(name: "app_clip_default_experience_metadata_path", type: nil)
     let appPreviewsPathArg = appPreviewsPath.asRubyArgument(name: "app_previews_path", type: nil)
     let previewFrameTimeCodeArg = RubyCommand.Argument(name: "preview_frame_time_code", value: previewFrameTimeCode, type: nil)
     let overwritePreviewVideosArg = overwritePreviewVideos.asRubyArgument(name: "overwrite_preview_videos", type: nil)
@@ -12850,6 +12914,7 @@ public func uploadToAppStore(apiKeyPath: OptionalConfigValue<String?> = .fastlan
     let secondarySecondSubCategoryArg = secondarySecondSubCategory.asRubyArgument(name: "secondary_second_sub_category", type: nil)
     let tradeRepresentativeContactInformationArg = tradeRepresentativeContactInformation.asRubyArgument(name: "trade_representative_contact_information", type: nil)
     let appReviewInformationArg = appReviewInformation.asRubyArgument(name: "app_review_information", type: nil)
+    let appClipReviewInformationArg = appClipReviewInformation.asRubyArgument(name: "app_clip_review_information", type: nil)
     let appReviewAttachmentFileArg = appReviewAttachmentFile.asRubyArgument(name: "app_review_attachment_file", type: nil)
     let descriptionArg = description.asRubyArgument(name: "description", type: nil)
     let nameArg = name.asRubyArgument(name: "name", type: nil)
@@ -12864,6 +12929,8 @@ public func uploadToAppStore(apiKeyPath: OptionalConfigValue<String?> = .fastlan
     let languagesArg = languages.asRubyArgument(name: "languages", type: nil)
     let ignoreLanguageDirectoryValidationArg = ignoreLanguageDirectoryValidation.asRubyArgument(name: "ignore_language_directory_validation", type: nil)
     let precheckIncludeInAppPurchasesArg = precheckIncludeInAppPurchases.asRubyArgument(name: "precheck_include_in_app_purchases", type: nil)
+    let appClipDefaultExperienceSubtitleArg = appClipDefaultExperienceSubtitle.asRubyArgument(name: "app_clip_default_experience_subtitle", type: nil)
+    let appClipDefaultExperienceActionArg = appClipDefaultExperienceAction.asRubyArgument(name: "app_clip_default_experience_action", type: nil)
     let appArg = app.asRubyArgument(name: "app", type: nil)
     let array: [RubyCommand.Argument?] = [apiKeyPathArg,
                                           apiKeyArg,
@@ -12878,6 +12945,8 @@ public func uploadToAppStore(apiKeyPath: OptionalConfigValue<String?> = .fastlan
                                           useLiveVersionArg,
                                           metadataPathArg,
                                           screenshotsPathArg,
+                                          appClipHeaderImagesPathArg,
+                                          appClipDefaultExperienceMetadataPathArg,
                                           appPreviewsPathArg,
                                           previewFrameTimeCodeArg,
                                           overwritePreviewVideosArg,
@@ -12920,6 +12989,7 @@ public func uploadToAppStore(apiKeyPath: OptionalConfigValue<String?> = .fastlan
                                           secondarySecondSubCategoryArg,
                                           tradeRepresentativeContactInformationArg,
                                           appReviewInformationArg,
+                                          appClipReviewInformationArg,
                                           appReviewAttachmentFileArg,
                                           descriptionArg,
                                           nameArg,
@@ -12934,6 +13004,8 @@ public func uploadToAppStore(apiKeyPath: OptionalConfigValue<String?> = .fastlan
                                           languagesArg,
                                           ignoreLanguageDirectoryValidationArg,
                                           precheckIncludeInAppPurchasesArg,
+                                          appClipDefaultExperienceSubtitleArg,
+                                          appClipDefaultExperienceActionArg,
                                           appArg]
     let args: [RubyCommand.Argument] = array
         .filter { $0?.value != nil }
@@ -13192,6 +13264,8 @@ public func uploadToPlayStoreInternalAppSharing(packageName: String,
    - skipSubmission: Skip the distributing action of pilot and only upload the ipa file
    - skipWaitingForBuildProcessing: If set to true, the `distribute_external` option won't work and no build will be distributed to testers. (You might want to use this option if you are using this action on CI and have to pay for 'minutes used' on your CI plan). If set to `true` and a changelog is provided, it will partially wait for the build to appear on AppStore Connect so the changelog can be set, and skip the remaining processing steps
    - updateBuildInfoOnUpload: **DEPRECATED!** Update build info immediately after validation. This is deprecated and will be removed in a future release. App Store Connect no longer supports setting build info until after build processing has completed, which is when build info is updated by default
+   - appClipInvocations: Add beta app clip invocations to your builds in TestFlight
+   - overwriteAppClipInvocations: Clear all previous beta app clip invocations before adding new ones
    - distributeOnly: Distribute a previously uploaded build (equivalent to the `fastlane pilot distribute` command)
    - usesNonExemptEncryption: Provide the 'Uses Non-Exempt Encryption' for export compliance. This is used if there is 'ITSAppUsesNonExemptEncryption' is not set in the Info.plist
    - distributeExternal: Should the build be distributed to external testers? If set to true, use of `groups` option is required
@@ -13236,6 +13310,8 @@ public func uploadToTestflight(apiKeyPath: OptionalConfigValue<String?> = .fastl
                                skipSubmission: OptionalConfigValue<Bool> = .fastlaneDefault(false),
                                skipWaitingForBuildProcessing: OptionalConfigValue<Bool> = .fastlaneDefault(false),
                                updateBuildInfoOnUpload: OptionalConfigValue<Bool> = .fastlaneDefault(false),
+                               appClipInvocations: OptionalConfigValue<[String]?> = .fastlaneDefault(nil),
+                               overwriteAppClipInvocations: OptionalConfigValue<Bool> = .fastlaneDefault(false),
                                distributeOnly: OptionalConfigValue<Bool> = .fastlaneDefault(false),
                                usesNonExemptEncryption: OptionalConfigValue<Bool> = .fastlaneDefault(false),
                                distributeExternal: OptionalConfigValue<Bool> = .fastlaneDefault(false),
@@ -13277,6 +13353,8 @@ public func uploadToTestflight(apiKeyPath: OptionalConfigValue<String?> = .fastl
     let skipSubmissionArg = skipSubmission.asRubyArgument(name: "skip_submission", type: nil)
     let skipWaitingForBuildProcessingArg = skipWaitingForBuildProcessing.asRubyArgument(name: "skip_waiting_for_build_processing", type: nil)
     let updateBuildInfoOnUploadArg = updateBuildInfoOnUpload.asRubyArgument(name: "update_build_info_on_upload", type: nil)
+    let appClipInvocationsArg = appClipInvocations.asRubyArgument(name: "app_clip_invocations", type: nil)
+    let overwriteAppClipInvocationsArg = overwriteAppClipInvocations.asRubyArgument(name: "overwrite_app_clip_invocations", type: nil)
     let distributeOnlyArg = distributeOnly.asRubyArgument(name: "distribute_only", type: nil)
     let usesNonExemptEncryptionArg = usesNonExemptEncryption.asRubyArgument(name: "uses_non_exempt_encryption", type: nil)
     let distributeExternalArg = distributeExternal.asRubyArgument(name: "distribute_external", type: nil)
@@ -13317,6 +13395,8 @@ public func uploadToTestflight(apiKeyPath: OptionalConfigValue<String?> = .fastl
                                           skipSubmissionArg,
                                           skipWaitingForBuildProcessingArg,
                                           updateBuildInfoOnUploadArg,
+                                          appClipInvocationsArg,
+                                          overwriteAppClipInvocationsArg,
                                           distributeOnlyArg,
                                           usesNonExemptEncryptionArg,
                                           distributeExternalArg,
@@ -13976,4 +14056,4 @@ public let snapshotfile: Snapshotfile = .init()
 
 // Please don't remove the lines below
 // They are used to detect outdated files
-// FastlaneRunnerAPIVersion [0.9.200]
+// FastlaneRunnerAPIVersion [0.9.201]
