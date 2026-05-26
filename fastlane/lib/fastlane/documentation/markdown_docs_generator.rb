@@ -188,7 +188,7 @@ module Fastlane
       File.write(mkdocs_yml_path, mkdocs_yml.to_yaml)
 
       # Copy over the assets from the `actions/docs/assets` directory
-      Dir[File.join(custom_action_docs_path, "assets", "*")].each do |current_asset_path|
+      Dir[File.join(Fastlane::ROOT, custom_action_docs_path, "assets", "*")].each do |current_asset_path|
         UI.message("Copying asset #{current_asset_path}")
         FileUtils.cp(current_asset_path, File.join(docs_dir, "img", "actions", File.basename(current_asset_path)))
       end
