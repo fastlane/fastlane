@@ -8,7 +8,7 @@ module Spaceship
     # otherwise fallback to $verbose
     def self.verbose?
       if Object.const_defined?("FastlaneCore")
-        return FastlaneCore::Globals.verbose? # rubocop:disable Require/MissingRequireStatement
+        return FastlaneCore::Globals.verbose?
       end
       return $verbose
     end
