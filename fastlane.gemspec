@@ -73,7 +73,7 @@ Gem::Specification.new do |spec|
   spec.add_dependency('fastimage', '>= 2.1.0', '< 3.0.0') # fetch the image sizes from the screenshots
   spec.add_dependency('fastlane-sirp', '>= 1.1.0') # used for sirp login
   spec.add_dependency('gh_inspector', '>= 1.1.2', '< 2.0.0') # search for issues on GitHub when something goes wrong
-  spec.add_dependency('google-apis-androidpublisher_v3', '~> 0.3') # Google API Client to access Play Publishing API
+  spec.add_dependency('google-apis-androidpublisher_v3', '~> 0.99.0') # Google API Client to access Play Publishing API
   spec.add_dependency('google-apis-playcustomapp_v1', '~> 0.1') # Google API Client to access Custom app Publishing API
   spec.add_dependency('google-cloud-env', '>= 1.6.0', '< 2.3.0') # Must be < 2.3.0 to support Ruby 3.0
   spec.add_dependency('google-cloud-storage', '~> 1.31') # Access Google Cloud Storage for match
