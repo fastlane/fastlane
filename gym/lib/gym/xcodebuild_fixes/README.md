@@ -1,6 +1,6 @@
 ## Fixes
 
-This directory contains all the (hopefully temporary) work-arounds to make the `ipa` export work. 
+This directory contains all the (hopefully temporary) workarounds to make the `ipa` export work. 
 
 `xcodebuild` doesn't get the same set of features as Xcode does (e.g. WatchKit app export, Swift export and more)
 

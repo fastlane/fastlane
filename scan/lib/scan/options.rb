@@ -125,7 +125,7 @@ module Scan
         # tests to run
         FastlaneCore::ConfigItem.new(key: :only_testing,
                                      env_name: "SCAN_ONLY_TESTING",
-                                     description: "Array of strings matching Test Bundle/Test Suite/Test Cases to run",
+                                     description: "Array of test identifiers to run. Expected format: TestTarget[/TestSuite[/TestCase]]",
                                      optional: true,
                                      is_string: false,
                                      verify_block: proc do |value|
@@ -133,7 +133,7 @@ module Scan
                                      end),
         FastlaneCore::ConfigItem.new(key: :skip_testing,
                                      env_name: "SCAN_SKIP_TESTING",
-                                     description: "Array of strings matching Test Bundle/Test Suite/Test Cases to skip",
+                                     description: "Array of test identifiers to skip. Expected format: TestTarget[/TestSuite[/TestCase]]",
                                      optional: true,
                                      is_string: false,
                                      verify_block: proc do |value|
@@ -269,7 +269,7 @@ module Scan
                                      default_value: Fastlane::Helper::XcodebuildFormatterHelper.xcbeautify_installed? ? 'xcbeautify' : 'xcpretty',
                                      default_value_dynamic: true),
         FastlaneCore::ConfigItem.new(key: :output_remove_retry_attempts,
-                                     env_name: "SCAN_OUTPUT_REMOVE_RETRY_ATTEMPS",
+                                     env_names: ["SCAN_OUTPUT_REMOVE_RETRY_ATTEMPS", "SCAN_OUTPUT_REMOVE_RETRY_ATTEMPTS"], # The version with typo must be deprecated
                                      description: "Remove retry attempts from test results table and the JUnit report (if not using xcpretty)",
                                      type: Boolean,
                                      default_value: false),
@@ -512,6 +512,11 @@ module Scan
                                     description: "Sets a custom path for Swift Package Manager dependencies",
                                     type: String,
                                     optional: true),
+        FastlaneCore::ConfigItem.new(key: :package_cache_path,
+                                     env_name: "SCAN_PACKAGE_CACHE_PATH",
+                                     description: "Sets a custom package cache path for Swift Package Manager dependencies",
+                                     type: String,
+                                     optional: true),
         FastlaneCore::ConfigItem.new(key: :skip_package_dependencies_resolution,
                                      env_name: "SCAN_SKIP_PACKAGE_DEPENDENCIES_RESOLUTION",
                                      description: "Skips resolution of Swift Package Manager dependencies",
@@ -519,7 +524,12 @@ module Scan
                                      default_value: false),
         FastlaneCore::ConfigItem.new(key: :disable_package_automatic_updates,
                                      env_name: "SCAN_DISABLE_PACKAGE_AUTOMATIC_UPDATES",
-                                     description: "Prevents packages from automatically being resolved to versions other than those recorded in the `Package.resolved` file",
+                                     description: "Prevents packages from automatically being resolved to versions other than those recorded in the `Package.resolved` file. This translates in the option `-disableAutomaticPackageResolution` being passed to xcodebuild",
+                                     type: Boolean,
+                                     default_value: false),
+        FastlaneCore::ConfigItem.new(key: :skip_package_repository_fetches,
+                                     env_name: "SCAN_SKIP_PACKAGE_REPOSITORY_FETCHES",
+                                     description: "Skips updating package dependencies from their remote. This translates in the option `-skipPackageUpdates` being passed to xcodebuild",
                                      type: Boolean,
                                      default_value: false),
         FastlaneCore::ConfigItem.new(key: :use_system_scm,
@@ -537,7 +547,16 @@ module Scan
                                     env_name: "SCAN_FAIL_BUILD",
                                     description: "Should this step stop the build if the tests fail? Set this to false if you're using trainer",
                                     type: Boolean,
-                                    default_value: true)
+                                    default_value: true),
+        FastlaneCore::ConfigItem.new(key: :package_authorization_provider,
+                                    env_name: "SCAN_PACKAGE_AUTHORIZATION_PROVIDER",
+                                    description: "Lets xcodebuild use a specified package authorization provider (keychain|netrc)",
+                                    optional: true,
+                                    type: String,
+                                    verify_block: proc do |value|
+                                      av = %w(netrc keychain)
+                                      UI.user_error!("Unsupported authorization provider '#{value}', must be: #{av}") unless av.include?(value)
+                                    end)
 
       ]
     end

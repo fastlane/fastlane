@@ -1,0 +1,738 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 77;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		4784B5B12D698490005AF8A9 /* XCTest.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 4784B5B02D698490005AF8A9 /* XCTest.framework */; };
+		4784B5B22D698490005AF8A9 /* XCTest.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 4784B5B02D698490005AF8A9 /* XCTest.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
+		47A94E9F2D697D7D008AA4CD /* TestPlan.xctestplan in Resources */ = {isa = PBXBuildFile; fileRef = 47A94E9E2D697D7D008AA4CD /* TestPlan.xctestplan */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXContainerItemProxy section */
+		4784B5962D6981DF005AF8A9 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 47A94E542D696FC6008AA4CD /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 47A94E5B2D696FC6008AA4CD;
+			remoteInfo = FastlaneTrainerExample;
+		};
+		47A94E6D2D696FC8008AA4CD /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 47A94E542D696FC6008AA4CD /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 47A94E5B2D696FC6008AA4CD;
+			remoteInfo = FastlaneTrainerExample;
+		};
+		47A94E772D696FC8008AA4CD /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 47A94E542D696FC6008AA4CD /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 47A94E5B2D696FC6008AA4CD;
+			remoteInfo = FastlaneTrainerExample;
+		};
+/* End PBXContainerItemProxy section */
+
+/* Begin PBXCopyFilesBuildPhase section */
+		4784B5B32D698490005AF8A9 /* Embed Frameworks */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "";
+			dstSubfolderSpec = 10;
+			files = (
+				4784B5B22D698490005AF8A9 /* XCTest.framework in Embed Frameworks */,
+			);
+			name = "Embed Frameworks";
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXCopyFilesBuildPhase section */
+
+/* Begin PBXFileReference section */
+		4784B5B02D698490005AF8A9 /* XCTest.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = XCTest.framework; path = Platforms/iPhoneOS.platform/Developer/Library/Frameworks/XCTest.framework; sourceTree = DEVELOPER_DIR; };
+		47A94E5C2D696FC6008AA4CD /* FastlaneTrainerExample.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = FastlaneTrainerExample.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		47A94E6C2D696FC8008AA4CD /* FastlaneTrainerExampleTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = FastlaneTrainerExampleTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		47A94E762D696FC8008AA4CD /* FastlaneTrainerExampleUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = FastlaneTrainerExampleUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		47A94E8F2D697052008AA4CD /* FastlaneTrainerExampleXCTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = FastlaneTrainerExampleXCTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		47A94E9E2D697D7D008AA4CD /* TestPlan.xctestplan */ = {isa = PBXFileReference; lastKnownFileType = text; path = TestPlan.xctestplan; sourceTree = "<group>"; };
+/* End PBXFileReference section */
+
+/* Begin PBXFileSystemSynchronizedRootGroup section */
+		47A94E5E2D696FC6008AA4CD /* FastlaneTrainerExample */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			path = FastlaneTrainerExample;
+			sourceTree = "<group>";
+		};
+		47A94E6F2D696FC8008AA4CD /* FastlaneTrainerExampleTests */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			path = FastlaneTrainerExampleTests;
+			sourceTree = "<group>";
+		};
+		47A94E792D696FC8008AA4CD /* FastlaneTrainerExampleUITests */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			path = FastlaneTrainerExampleUITests;
+			sourceTree = "<group>";
+		};
+		47A94E902D697052008AA4CD /* FastlaneTrainerExampleXCTests */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			path = FastlaneTrainerExampleXCTests;
+			sourceTree = "<group>";
+		};
+/* End PBXFileSystemSynchronizedRootGroup section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		47A94E592D696FC6008AA4CD /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		47A94E692D696FC8008AA4CD /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		47A94E732D696FC8008AA4CD /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		47A94E8C2D697052008AA4CD /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				4784B5B12D698490005AF8A9 /* XCTest.framework in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		4784B5AF2D698490005AF8A9 /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+				4784B5B02D698490005AF8A9 /* XCTest.framework */,
+			);
+			name = Frameworks;
+			sourceTree = "<group>";
+		};
+		47A94E532D696FC6008AA4CD = {
+			isa = PBXGroup;
+			children = (
+				47A94E9E2D697D7D008AA4CD /* TestPlan.xctestplan */,
+				47A94E5E2D696FC6008AA4CD /* FastlaneTrainerExample */,
+				47A94E6F2D696FC8008AA4CD /* FastlaneTrainerExampleTests */,
+				47A94E792D696FC8008AA4CD /* FastlaneTrainerExampleUITests */,
+				47A94E902D697052008AA4CD /* FastlaneTrainerExampleXCTests */,
+				4784B5AF2D698490005AF8A9 /* Frameworks */,
+				47A94E5D2D696FC6008AA4CD /* Products */,
+			);
+			sourceTree = "<group>";
+		};
+		47A94E5D2D696FC6008AA4CD /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				47A94E5C2D696FC6008AA4CD /* FastlaneTrainerExample.app */,
+				47A94E6C2D696FC8008AA4CD /* FastlaneTrainerExampleTests.xctest */,
+				47A94E762D696FC8008AA4CD /* FastlaneTrainerExampleUITests.xctest */,
+				47A94E8F2D697052008AA4CD /* FastlaneTrainerExampleXCTests.xctest */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		47A94E5B2D696FC6008AA4CD /* FastlaneTrainerExample */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 47A94E802D696FC8008AA4CD /* Build configuration list for PBXNativeTarget "FastlaneTrainerExample" */;
+			buildPhases = (
+				47A94E582D696FC6008AA4CD /* Sources */,
+				47A94E592D696FC6008AA4CD /* Frameworks */,
+				47A94E5A2D696FC6008AA4CD /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			fileSystemSynchronizedGroups = (
+				47A94E5E2D696FC6008AA4CD /* FastlaneTrainerExample */,
+			);
+			name = FastlaneTrainerExample;
+			packageProductDependencies = (
+			);
+			productName = FastlaneTrainerExample;
+			productReference = 47A94E5C2D696FC6008AA4CD /* FastlaneTrainerExample.app */;
+			productType = "com.apple.product-type.application";
+		};
+		47A94E6B2D696FC8008AA4CD /* FastlaneTrainerExampleTests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 47A94E832D696FC8008AA4CD /* Build configuration list for PBXNativeTarget "FastlaneTrainerExampleTests" */;
+			buildPhases = (
+				47A94E682D696FC8008AA4CD /* Sources */,
+				47A94E692D696FC8008AA4CD /* Frameworks */,
+				47A94E6A2D696FC8008AA4CD /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				47A94E6E2D696FC8008AA4CD /* PBXTargetDependency */,
+			);
+			fileSystemSynchronizedGroups = (
+				47A94E6F2D696FC8008AA4CD /* FastlaneTrainerExampleTests */,
+			);
+			name = FastlaneTrainerExampleTests;
+			packageProductDependencies = (
+			);
+			productName = FastlaneTrainerExampleTests;
+			productReference = 47A94E6C2D696FC8008AA4CD /* FastlaneTrainerExampleTests.xctest */;
+			productType = "com.apple.product-type.bundle.unit-test";
+		};
+		47A94E752D696FC8008AA4CD /* FastlaneTrainerExampleUITests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 47A94E862D696FC8008AA4CD /* Build configuration list for PBXNativeTarget "FastlaneTrainerExampleUITests" */;
+			buildPhases = (
+				47A94E722D696FC8008AA4CD /* Sources */,
+				47A94E732D696FC8008AA4CD /* Frameworks */,
+				47A94E742D696FC8008AA4CD /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				47A94E782D696FC8008AA4CD /* PBXTargetDependency */,
+			);
+			fileSystemSynchronizedGroups = (
+				47A94E792D696FC8008AA4CD /* FastlaneTrainerExampleUITests */,
+			);
+			name = FastlaneTrainerExampleUITests;
+			packageProductDependencies = (
+			);
+			productName = FastlaneTrainerExampleUITests;
+			productReference = 47A94E762D696FC8008AA4CD /* FastlaneTrainerExampleUITests.xctest */;
+			productType = "com.apple.product-type.bundle.ui-testing";
+		};
+		47A94E8E2D697052008AA4CD /* FastlaneTrainerExampleXCTests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 47A94E952D697052008AA4CD /* Build configuration list for PBXNativeTarget "FastlaneTrainerExampleXCTests" */;
+			buildPhases = (
+				47A94E8B2D697052008AA4CD /* Sources */,
+				47A94E8C2D697052008AA4CD /* Frameworks */,
+				47A94E8D2D697052008AA4CD /* Resources */,
+				4784B5B32D698490005AF8A9 /* Embed Frameworks */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				4784B5972D6981DF005AF8A9 /* PBXTargetDependency */,
+			);
+			fileSystemSynchronizedGroups = (
+				47A94E902D697052008AA4CD /* FastlaneTrainerExampleXCTests */,
+			);
+			name = FastlaneTrainerExampleXCTests;
+			packageProductDependencies = (
+			);
+			productName = FastlaneTrainerExampleXCTests;
+			productReference = 47A94E8F2D697052008AA4CD /* FastlaneTrainerExampleXCTests.xctest */;
+			productType = "com.apple.product-type.bundle.unit-test";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		47A94E542D696FC6008AA4CD /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				BuildIndependentTargetsInParallel = 1;
+				LastSwiftUpdateCheck = 1620;
+				LastUpgradeCheck = 1620;
+				TargetAttributes = {
+					47A94E5B2D696FC6008AA4CD = {
+						CreatedOnToolsVersion = 16.2;
+					};
+					47A94E6B2D696FC8008AA4CD = {
+						CreatedOnToolsVersion = 16.2;
+						TestTargetID = 47A94E5B2D696FC6008AA4CD;
+					};
+					47A94E752D696FC8008AA4CD = {
+						CreatedOnToolsVersion = 16.2;
+						TestTargetID = 47A94E5B2D696FC6008AA4CD;
+					};
+					47A94E8E2D697052008AA4CD = {
+						CreatedOnToolsVersion = 16.2;
+						TestTargetID = 47A94E5B2D696FC6008AA4CD;
+					};
+				};
+			};
+			buildConfigurationList = 47A94E572D696FC6008AA4CD /* Build configuration list for PBXProject "FastlaneTrainerExample" */;
+			developmentRegion = en;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				en,
+				Base,
+			);
+			mainGroup = 47A94E532D696FC6008AA4CD;
+			minimizedProjectReferenceProxies = 1;
+			preferredProjectObjectVersion = 77;
+			productRefGroup = 47A94E5D2D696FC6008AA4CD /* Products */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				47A94E5B2D696FC6008AA4CD /* FastlaneTrainerExample */,
+				47A94E6B2D696FC8008AA4CD /* FastlaneTrainerExampleTests */,
+				47A94E752D696FC8008AA4CD /* FastlaneTrainerExampleUITests */,
+				47A94E8E2D697052008AA4CD /* FastlaneTrainerExampleXCTests */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXResourcesBuildPhase section */
+		47A94E5A2D696FC6008AA4CD /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				47A94E9F2D697D7D008AA4CD /* TestPlan.xctestplan in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		47A94E6A2D696FC8008AA4CD /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		47A94E742D696FC8008AA4CD /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		47A94E8D2D697052008AA4CD /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXResourcesBuildPhase section */
+
+/* Begin PBXSourcesBuildPhase section */
+		47A94E582D696FC6008AA4CD /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		47A94E682D696FC8008AA4CD /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		47A94E722D696FC8008AA4CD /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		47A94E8B2D697052008AA4CD /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin PBXTargetDependency section */
+		4784B5972D6981DF005AF8A9 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 47A94E5B2D696FC6008AA4CD /* FastlaneTrainerExample */;
+			targetProxy = 4784B5962D6981DF005AF8A9 /* PBXContainerItemProxy */;
+		};
+		47A94E6E2D696FC8008AA4CD /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 47A94E5B2D696FC6008AA4CD /* FastlaneTrainerExample */;
+			targetProxy = 47A94E6D2D696FC8008AA4CD /* PBXContainerItemProxy */;
+		};
+		47A94E782D696FC8008AA4CD /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 47A94E5B2D696FC6008AA4CD /* FastlaneTrainerExample */;
+			targetProxy = 47A94E772D696FC8008AA4CD /* PBXContainerItemProxy */;
+		};
+/* End PBXTargetDependency section */
+
+/* Begin XCBuildConfiguration section */
+		47A94E7E2D696FC8008AA4CD /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_TESTABILITY = YES;
+				ENABLE_USER_SCRIPT_SANDBOXING = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu17;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+				);
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 18.2;
+				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
+				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
+				MTL_FAST_MATH = YES;
+				ONLY_ACTIVE_ARCH = YES;
+				SDKROOT = iphoneos;
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "DEBUG $(inherited)";
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+			};
+			name = Debug;
+		};
+		47A94E7F2D696FC8008AA4CD /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				ENABLE_NS_ASSERTIONS = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_USER_SCRIPT_SANDBOXING = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu17;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 18.2;
+				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
+				MTL_ENABLE_DEBUG_INFO = NO;
+				MTL_FAST_MATH = YES;
+				SDKROOT = iphoneos;
+				SWIFT_COMPILATION_MODE = wholemodule;
+				VALIDATE_PRODUCT = YES;
+			};
+			name = Release;
+		};
+		47A94E812D696FC8008AA4CD /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_ASSET_PATHS = "\"FastlaneTrainerExample/Preview Content\"";
+				ENABLE_PREVIEWS = YES;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
+				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
+				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = org.fastlane.FastlaneTrainerExample;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
+				SUPPORTS_MACCATALYST = NO;
+				SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD = NO;
+				SUPPORTS_XR_DESIGNED_FOR_IPHONE_IPAD = NO;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Debug;
+		};
+		47A94E822D696FC8008AA4CD /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_ASSET_PATHS = "\"FastlaneTrainerExample/Preview Content\"";
+				ENABLE_PREVIEWS = YES;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
+				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
+				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = org.fastlane.FastlaneTrainerExample;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
+				SUPPORTS_MACCATALYST = NO;
+				SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD = NO;
+				SUPPORTS_XR_DESIGNED_FOR_IPHONE_IPAD = NO;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Release;
+		};
+		47A94E842D696FC8008AA4CD /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				GENERATE_INFOPLIST_FILE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 18.2;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = org.fastlane.FastlaneTrainerExampleTests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
+				SUPPORTS_MACCATALYST = NO;
+				SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD = NO;
+				SUPPORTS_XR_DESIGNED_FOR_IPHONE_IPAD = NO;
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/FastlaneTrainerExample.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/FastlaneTrainerExample";
+			};
+			name = Debug;
+		};
+		47A94E852D696FC8008AA4CD /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				GENERATE_INFOPLIST_FILE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 18.2;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = org.fastlane.FastlaneTrainerExampleTests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
+				SUPPORTS_MACCATALYST = NO;
+				SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD = NO;
+				SUPPORTS_XR_DESIGNED_FOR_IPHONE_IPAD = NO;
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/FastlaneTrainerExample.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/FastlaneTrainerExample";
+			};
+			name = Release;
+		};
+		47A94E872D696FC8008AA4CD /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				GENERATE_INFOPLIST_FILE = YES;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = org.fastlane.FastlaneTrainerExampleUITests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				PROVISIONING_PROFILE = "";
+				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
+				SUPPORTS_MACCATALYST = NO;
+				SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD = NO;
+				SUPPORTS_XR_DESIGNED_FOR_IPHONE_IPAD = NO;
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_TARGET_NAME = FastlaneTrainerExample;
+			};
+			name = Debug;
+		};
+		47A94E882D696FC8008AA4CD /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				GENERATE_INFOPLIST_FILE = YES;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = org.fastlane.FastlaneTrainerExampleUITests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				PROVISIONING_PROFILE = "";
+				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
+				SUPPORTS_MACCATALYST = NO;
+				SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD = NO;
+				SUPPORTS_XR_DESIGNED_FOR_IPHONE_IPAD = NO;
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_TARGET_NAME = FastlaneTrainerExample;
+			};
+			name = Release;
+		};
+		47A94E962D697052008AA4CD /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				GENERATE_INFOPLIST_FILE = YES;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = org.fastlane.FastlaneTrainerExampleXCTests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
+				SUPPORTS_MACCATALYST = NO;
+				SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD = NO;
+				SUPPORTS_XR_DESIGNED_FOR_IPHONE_IPAD = NO;
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/FastlaneTrainerExample.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/FastlaneTrainerExample";
+				TEST_TARGET_NAME = FastlaneTrainerExample;
+			};
+			name = Debug;
+		};
+		47A94E972D697052008AA4CD /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				GENERATE_INFOPLIST_FILE = YES;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = org.fastlane.FastlaneTrainerExampleXCTests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
+				SUPPORTS_MACCATALYST = NO;
+				SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD = NO;
+				SUPPORTS_XR_DESIGNED_FOR_IPHONE_IPAD = NO;
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/FastlaneTrainerExample.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/FastlaneTrainerExample";
+				TEST_TARGET_NAME = FastlaneTrainerExample;
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		47A94E572D696FC6008AA4CD /* Build configuration list for PBXProject "FastlaneTrainerExample" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				47A94E7E2D696FC8008AA4CD /* Debug */,
+				47A94E7F2D696FC8008AA4CD /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		47A94E802D696FC8008AA4CD /* Build configuration list for PBXNativeTarget "FastlaneTrainerExample" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				47A94E812D696FC8008AA4CD /* Debug */,
+				47A94E822D696FC8008AA4CD /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		47A94E832D696FC8008AA4CD /* Build configuration list for PBXNativeTarget "FastlaneTrainerExampleTests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				47A94E842D696FC8008AA4CD /* Debug */,
+				47A94E852D696FC8008AA4CD /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		47A94E862D696FC8008AA4CD /* Build configuration list for PBXNativeTarget "FastlaneTrainerExampleUITests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				47A94E872D696FC8008AA4CD /* Debug */,
+				47A94E882D696FC8008AA4CD /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		47A94E952D697052008AA4CD /* Build configuration list for PBXNativeTarget "FastlaneTrainerExampleXCTests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				47A94E962D697052008AA4CD /* Debug */,
+				47A94E972D697052008AA4CD /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+/* End XCConfigurationList section */
+	};
+	rootObject = 47A94E542D696FC6008AA4CD /* Project object */;
+}

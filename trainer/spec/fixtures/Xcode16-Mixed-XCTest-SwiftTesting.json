@@ -1,0 +1,1764 @@
+{
+  "devices" : [
+    {
+      "architecture" : "arm64",
+      "deviceId" : "1D56D717-7C7E-4CC2-8B03-608FF61C4407",
+      "deviceName" : "iPhone 16 Pro",
+      "modelName" : "iPhone 16 Pro",
+      "osVersion" : "18.2",
+      "platform" : "iOS Simulator"
+    }
+  ],
+  "testNodes" : [
+    {
+      "children" : [
+        {
+          "children" : [
+            {
+              "children" : [
+                {
+                  "children" : [
+                    {
+                      "children" : [
+                        {
+                          "name" : "FastlaneTrainerExampleUITests.swift:129: XCTAssertTrue failed",
+                          "nodeType" : "Failure Message",
+                          "result" : "Failed"
+                        }
+                      ],
+                      "duration" : "6s",
+                      "name" : "Retry 1",
+                      "nodeIdentifier" : "1",
+                      "nodeType" : "Repetition",
+                      "result" : "Failed"
+                    },
+                    {
+                      "children" : [
+                        {
+                          "name" : "FastlaneTrainerExampleUITests.swift:129: XCTAssertTrue failed",
+                          "nodeType" : "Failure Message",
+                          "result" : "Failed"
+                        }
+                      ],
+                      "duration" : "4s",
+                      "name" : "Retry 2",
+                      "nodeIdentifier" : "2",
+                      "nodeType" : "Repetition",
+                      "result" : "Failed"
+                    }
+                  ],
+                  "details" : "Failed after 2 retries",
+                  "duration" : "5s",
+                  "name" : "testAccessibilityAndScreenshots()",
+                  "nodeIdentifier" : "FastlaneTrainerExampleUITests/testAccessibilityAndScreenshots()",
+                  "nodeType" : "Test Case",
+                  "result" : "Failed"
+                },
+                {
+                  "duration" : "6s",
+                  "name" : "testAlertHandling()",
+                  "nodeIdentifier" : "FastlaneTrainerExampleUITests/testAlertHandling()",
+                  "nodeType" : "Test Case",
+                  "result" : "Passed"
+                },
+                {
+                  "children" : [
+                    {
+                      "children" : [
+                        {
+                          "name" : "FastlaneTrainerExampleUITests.swift:43: Failed to tap \"Details\" Button: No matches found for first query match sequence: `Descendants matching type Button` -> `Elements matching predicate '\"Details\" IN identifiers'`, given input App element pid: 44723",
+                          "nodeType" : "Failure Message",
+                          "result" : "Failed"
+                        }
+                      ],
+                      "duration" : "8s",
+                      "name" : "Retry 1",
+                      "nodeIdentifier" : "1",
+                      "nodeType" : "Repetition",
+                      "result" : "Failed"
+                    },
+                    {
+                      "children" : [
+                        {
+                          "name" : "FastlaneTrainerExampleUITests.swift:43: Failed to tap \"Details\" Button: No matches found for first query match sequence: `Descendants matching type Button` -> `Elements matching predicate '\"Details\" IN identifiers'`, given input App element pid: 44787",
+                          "nodeType" : "Failure Message",
+                          "result" : "Failed"
+                        }
+                      ],
+                      "duration" : "8s",
+                      "name" : "Retry 2",
+                      "nodeIdentifier" : "2",
+                      "nodeType" : "Repetition",
+                      "result" : "Failed"
+                    }
+                  ],
+                  "details" : "Failed after 2 retries",
+                  "duration" : "8s",
+                  "name" : "testBasicNavigation()",
+                  "nodeIdentifier" : "FastlaneTrainerExampleUITests/testBasicNavigation()",
+                  "nodeType" : "Test Case",
+                  "result" : "Failed"
+                },
+                {
+                  "children" : [
+                    {
+                      "children" : [
+                        {
+                          "name" : "FastlaneTrainerExampleUITests.swift:108: XCTAssertTrue failed",
+                          "nodeType" : "Failure Message",
+                          "result" : "Failed"
+                        }
+                      ],
+                      "duration" : "4s",
+                      "name" : "Retry 1",
+                      "nodeIdentifier" : "1",
+                      "nodeType" : "Repetition",
+                      "result" : "Failed"
+                    },
+                    {
+                      "children" : [
+                        {
+                          "name" : "FastlaneTrainerExampleUITests.swift:108: XCTAssertTrue failed",
+                          "nodeType" : "Failure Message",
+                          "result" : "Failed"
+                        }
+                      ],
+                      "duration" : "4s",
+                      "name" : "Retry 2",
+                      "nodeIdentifier" : "2",
+                      "nodeType" : "Repetition",
+                      "result" : "Failed"
+                    }
+                  ],
+                  "details" : "Failed after 2 retries",
+                  "duration" : "4s",
+                  "name" : "testGesturesAndInteractions()",
+                  "nodeIdentifier" : "FastlaneTrainerExampleUITests/testGesturesAndInteractions()",
+                  "nodeType" : "Test Case",
+                  "result" : "Failed"
+                },
+                {
+                  "duration" : "22s",
+                  "name" : "testLaunchPerformance()",
+                  "nodeIdentifier" : "FastlaneTrainerExampleUITests/testLaunchPerformance()",
+                  "nodeType" : "Test Case",
+                  "result" : "Passed"
+                },
+                {
+                  "children" : [
+                    {
+                      "children" : [
+                        {
+                          "name" : "FastlaneTrainerExampleUITests.swift:68: XCTAssertEqual failed: (\"Optional(\"Search\")\") is not equal to (\"Optional(\"\")\")",
+                          "nodeType" : "Failure Message",
+                          "result" : "Failed"
+                        }
+                      ],
+                      "duration" : "6s",
+                      "name" : "Retry 1",
+                      "nodeIdentifier" : "1",
+                      "nodeType" : "Repetition",
+                      "result" : "Failed"
+                    },
+                    {
+                      "children" : [
+                        {
+                          "name" : "FastlaneTrainerExampleUITests.swift:68: XCTAssertEqual failed: (\"Optional(\"Search\")\") is not equal to (\"Optional(\"\")\")",
+                          "nodeType" : "Failure Message",
+                          "result" : "Failed"
+                        }
+                      ],
+                      "duration" : "6s",
+                      "name" : "Retry 2",
+                      "nodeIdentifier" : "2",
+                      "nodeType" : "Repetition",
+                      "result" : "Failed"
+                    }
+                  ],
+                  "details" : "Failed after 2 retries",
+                  "duration" : "6s",
+                  "name" : "testTextInputAndValidation()",
+                  "nodeIdentifier" : "FastlaneTrainerExampleUITests/testTextInputAndValidation()",
+                  "nodeType" : "Test Case",
+                  "result" : "Failed"
+                }
+              ],
+              "name" : "FastlaneTrainerExampleUITests",
+              "nodeType" : "Test Suite",
+              "result" : "Failed"
+            },
+            {
+              "children" : [
+                {
+                  "children" : [
+                    {
+                      "name" : "1, 1",
+                      "nodeType" : "Arguments",
+                      "result" : "Passed"
+                    },
+                    {
+                      "name" : "1, 4",
+                      "nodeType" : "Arguments",
+                      "result" : "Passed"
+                    },
+                    {
+                      "name" : "2, 1",
+                      "nodeType" : "Arguments",
+                      "result" : "Passed"
+                    },
+                    {
+                      "name" : "4, 2",
+                      "nodeType" : "Arguments",
+                      "result" : "Passed"
+                    }
+                  ],
+                  "duration" : "5s",
+                  "name" : "testLaunch()",
+                  "nodeIdentifier" : "FastlaneTrainerExampleUITestsLaunchTests/testLaunch",
+                  "nodeType" : "Test Case",
+                  "result" : "Passed"
+                }
+              ],
+              "name" : "FastlaneTrainerExampleUITestsLaunchTests",
+              "nodeType" : "Test Suite",
+              "result" : "Passed"
+            }
+          ],
+          "name" : "FastlaneTrainerExampleUITests",
+          "nodeType" : "UI test bundle",
+          "result" : "Failed"
+        },
+        {
+          "children" : [
+            {
+              "children" : [
+                {
+                  "children" : [
+                    {
+                      "children" : [
+                        {
+                          "children" : [
+                            {
+                              "children" : [
+                                {
+                                  "duration" : "0,012s",
+                                  "name" : "Retry 1",
+                                  "nodeIdentifier" : "1",
+                                  "nodeType" : "Repetition",
+                                  "result" : "Passed"
+                                },
+                                {
+                                  "duration" : "0,0095s",
+                                  "name" : "Retry 2",
+                                  "nodeIdentifier" : "2",
+                                  "nodeType" : "Repetition",
+                                  "result" : "Passed"
+                                }
+                              ],
+                              "duration" : "0,011s",
+                              "name" : "Password complexity",
+                              "nodeIdentifier" : "FastlaneTrainerTests/UserTests/RegistrationTests/PasswordTests/testPasswordComplexity()",
+                              "nodeType" : "Test Case",
+                              "result" : "Passed"
+                            },
+                            {
+                              "children" : [
+                                {
+                                  "children" : [
+                                    {
+                                      "name" : "FastlaneTrainerExampleTests.swift:156: Expectation failed: (password.count → 11) < 8\nPassword 'justbarely8' is too short",
+                                      "nodeType" : "Failure Message",
+                                      "result" : "Failed"
+                                    },
+                                    {
+                                      "name" : "FastlaneTrainerExampleTests.swift:156: Expectation failed: (password.count → 16) < 8\nPassword 'thisislongenough' is too short",
+                                      "nodeType" : "Failure Message",
+                                      "result" : "Failed"
+                                    }
+                                  ],
+                                  "duration" : "0,013s",
+                                  "name" : "Retry 1",
+                                  "nodeIdentifier" : "1",
+                                  "nodeType" : "Repetition",
+                                  "result" : "Failed"
+                                },
+                                {
+                                  "children" : [
+                                    {
+                                      "name" : "FastlaneTrainerExampleTests.swift:156: Expectation failed: (password.count → 11) < 8\nPassword 'justbarely8' is too short",
+                                      "nodeType" : "Failure Message",
+                                      "result" : "Failed"
+                                    },
+                                    {
+                                      "name" : "FastlaneTrainerExampleTests.swift:156: Expectation failed: (password.count → 16) < 8\nPassword 'thisislongenough' is too short",
+                                      "nodeType" : "Failure Message",
+                                      "result" : "Failed"
+                                    }
+                                  ],
+                                  "duration" : "0,011s",
+                                  "name" : "Retry 2",
+                                  "nodeIdentifier" : "2",
+                                  "nodeType" : "Repetition",
+                                  "result" : "Failed"
+                                }
+                              ],
+                              "details" : "Failed after 2 retries",
+                              "duration" : "0,012s",
+                              "name" : "Password length requirements",
+                              "nodeIdentifier" : "FastlaneTrainerTests/UserTests/RegistrationTests/PasswordTests/testPasswordLength()",
+                              "nodeType" : "Test Case",
+                              "result" : "Failed"
+                            }
+                          ],
+                          "name" : "Password Validation",
+                          "nodeType" : "Test Suite",
+                          "result" : "Failed"
+                        },
+                        {
+                          "children" : [
+                            {
+                              "children" : [
+                                {
+                                  "duration" : "0,012s",
+                                  "name" : "Retry 1",
+                                  "nodeIdentifier" : "1",
+                                  "nodeType" : "Repetition",
+                                  "result" : "Passed"
+                                },
+                                {
+                                  "duration" : "0,0095s",
+                                  "name" : "Retry 2",
+                                  "nodeIdentifier" : "2",
+                                  "nodeType" : "Repetition",
+                                  "result" : "Passed"
+                                }
+                              ],
+                              "duration" : "0,011s",
+                              "name" : "Valid email formats",
+                              "nodeIdentifier" : "FastlaneTrainerTests/UserTests/RegistrationTests/EmailTests/testValidEmails()",
+                              "nodeType" : "Test Case",
+                              "result" : "Passed"
+                            }
+                          ],
+                          "name" : "Email Validation",
+                          "nodeType" : "Test Suite",
+                          "result" : "Passed"
+                        },
+                        {
+                          "children" : [
+                            {
+                              "duration" : "0,0052s",
+                              "name" : "Retry 1",
+                              "nodeIdentifier" : "1",
+                              "nodeType" : "Repetition",
+                              "result" : "Passed"
+                            },
+                            {
+                              "duration" : "0,013s",
+                              "name" : "Retry 2",
+                              "nodeIdentifier" : "2",
+                              "nodeType" : "Repetition",
+                              "result" : "Passed"
+                            }
+                          ],
+                          "duration" : "0,0091s",
+                          "name" : "Basic registration",
+                          "nodeIdentifier" : "FastlaneTrainerTests/UserTests/RegistrationTests/testBasicRegistration()",
+                          "nodeType" : "Test Case",
+                          "result" : "Passed"
+                        }
+                      ],
+                      "name" : "Registration",
+                      "nodeType" : "Test Suite",
+                      "result" : "Failed"
+                    },
+                    {
+                      "children" : [
+                        {
+                          "children" : [
+                            {
+                              "children" : [
+                                {
+                                  "children" : [
+                                    {
+                                      "duration" : "0,0026s",
+                                      "name" : "Retry 1",
+                                      "nodeIdentifier" : "1",
+                                      "nodeType" : "Repetition",
+                                      "result" : "Passed"
+                                    },
+                                    {
+                                      "duration" : "0,006s",
+                                      "name" : "Retry 2",
+                                      "nodeIdentifier" : "2",
+                                      "nodeType" : "Repetition",
+                                      "result" : "Passed"
+                                    }
+                                  ],
+                                  "name" : "(setting: \"email\", isPrivate: true)",
+                                  "nodeType" : "Arguments",
+                                  "result" : "Passed"
+                                },
+                                {
+                                  "children" : [
+                                    {
+                                      "duration" : "0,0023s",
+                                      "name" : "Retry 1",
+                                      "nodeIdentifier" : "1",
+                                      "nodeType" : "Repetition",
+                                      "result" : "Passed"
+                                    },
+                                    {
+                                      "duration" : "0,006s",
+                                      "name" : "Retry 2",
+                                      "nodeIdentifier" : "2",
+                                      "nodeType" : "Repetition",
+                                      "result" : "Passed"
+                                    }
+                                  ],
+                                  "name" : "(setting: \"name\", isPrivate: false)",
+                                  "nodeType" : "Arguments",
+                                  "result" : "Passed"
+                                },
+                                {
+                                  "children" : [
+                                    {
+                                      "duration" : "0,0023s",
+                                      "name" : "Retry 1",
+                                      "nodeIdentifier" : "1",
+                                      "nodeType" : "Repetition",
+                                      "result" : "Passed"
+                                    },
+                                    {
+                                      "duration" : "0,0071s",
+                                      "name" : "Retry 2",
+                                      "nodeIdentifier" : "2",
+                                      "nodeType" : "Repetition",
+                                      "result" : "Passed"
+                                    }
+                                  ],
+                                  "name" : "(setting: \"profile\", isPrivate: true)",
+                                  "nodeType" : "Arguments",
+                                  "result" : "Passed"
+                                }
+                              ],
+                              "duration" : "0,0044s",
+                              "name" : "Privacy settings",
+                              "nodeIdentifier" : "FastlaneTrainerTests/UserTests/ProfileTests/SettingsTests/testPrivacySettings(_:)",
+                              "nodeType" : "Test Case",
+                              "result" : "Passed"
+                            }
+                          ],
+                          "name" : "Settings",
+                          "nodeType" : "Test Suite",
+                          "result" : "Passed"
+                        },
+                        {
+                          "children" : [
+                            {
+                              "children" : [
+                                {
+                                  "duration" : "0,014s",
+                                  "name" : "Retry 1",
+                                  "nodeIdentifier" : "1",
+                                  "nodeType" : "Repetition",
+                                  "result" : "Passed"
+                                },
+                                {
+                                  "duration" : "0,0094s",
+                                  "name" : "Retry 2",
+                                  "nodeIdentifier" : "2",
+                                  "nodeType" : "Repetition",
+                                  "result" : "Passed"
+                                }
+                              ],
+                              "duration" : "0,012s",
+                              "name" : "Avatar dimensions",
+                              "nodeIdentifier" : "FastlaneTrainerTests/UserTests/ProfileTests/AvatarTests/testAvatarDimensions()",
+                              "nodeType" : "Test Case",
+                              "result" : "Passed"
+                            },
+                            {
+                              "children" : [
+                                {
+                                  "children" : [
+                                    {
+                                      "duration" : "0,0026s",
+                                      "name" : "Retry 1",
+                                      "nodeIdentifier" : "1",
+                                      "nodeType" : "Repetition",
+                                      "result" : "Passed"
+                                    },
+                                    {
+                                      "duration" : "0,006s",
+                                      "name" : "Retry 2",
+                                      "nodeIdentifier" : "2",
+                                      "nodeType" : "Repetition",
+                                      "result" : "Passed"
+                                    }
+                                  ],
+                                  "name" : "\"gif\"",
+                                  "nodeType" : "Arguments",
+                                  "result" : "Passed"
+                                },
+                                {
+                                  "children" : [
+                                    {
+                                      "duration" : "0,0025s",
+                                      "name" : "Retry 1",
+                                      "nodeIdentifier" : "1",
+                                      "nodeType" : "Repetition",
+                                      "result" : "Passed"
+                                    },
+                                    {
+                                      "duration" : "0,0063s",
+                                      "name" : "Retry 2",
+                                      "nodeIdentifier" : "2",
+                                      "nodeType" : "Repetition",
+                                      "result" : "Passed"
+                                    }
+                                  ],
+                                  "name" : "\"jpg\"",
+                                  "nodeType" : "Arguments",
+                                  "result" : "Passed"
+                                },
+                                {
+                                  "children" : [
+                                    {
+                                      "duration" : "0,0025s",
+                                      "name" : "Retry 1",
+                                      "nodeIdentifier" : "1",
+                                      "nodeType" : "Repetition",
+                                      "result" : "Passed"
+                                    },
+                                    {
+                                      "duration" : "0,0059s",
+                                      "name" : "Retry 2",
+                                      "nodeIdentifier" : "2",
+                                      "nodeType" : "Repetition",
+                                      "result" : "Passed"
+                                    }
+                                  ],
+                                  "name" : "\"png\"",
+                                  "nodeType" : "Arguments",
+                                  "result" : "Passed"
+                                }
+                              ],
+                              "duration" : "0,0043s",
+                              "name" : "Avatar file types",
+                              "nodeIdentifier" : "FastlaneTrainerTests/UserTests/ProfileTests/AvatarTests/testAvatarFileTypes(_:)",
+                              "nodeType" : "Test Case",
+                              "result" : "Passed"
+                            }
+                          ],
+                          "name" : "Avatar",
+                          "nodeType" : "Test Suite",
+                          "result" : "Passed"
+                        }
+                      ],
+                      "name" : "Profile Management",
+                      "nodeType" : "Test Suite",
+                      "result" : "Passed"
+                    }
+                  ],
+                  "name" : "User Management",
+                  "nodeType" : "Test Suite",
+                  "result" : "Failed"
+                },
+                {
+                  "children" : [
+                    {
+                      "children" : [
+                        {
+                          "children" : [
+                            {
+                              "children" : [
+                                {
+                                  "children" : [
+                                    {
+                                      "duration" : "0,0029s",
+                                      "name" : "Retry 1",
+                                      "nodeIdentifier" : "1",
+                                      "nodeType" : "Repetition",
+                                      "result" : "Passed"
+                                    },
+                                    {
+                                      "duration" : "0,0048s",
+                                      "name" : "Retry 2",
+                                      "nodeIdentifier" : "2",
+                                      "nodeType" : "Repetition",
+                                      "result" : "Passed"
+                                    }
+                                  ],
+                                  "name" : "\"normal post\"",
+                                  "nodeType" : "Arguments",
+                                  "result" : "Passed"
+                                },
+                                {
+                                  "children" : [
+                                    {
+                                      "duration" : "0,012s",
+                                      "name" : "Retry 1",
+                                      "nodeIdentifier" : "1",
+                                      "nodeType" : "Repetition",
+                                      "result" : "Passed"
+                                    },
+                                    {
+                                      "duration" : "0,0045s",
+                                      "name" : "Retry 2",
+                                      "nodeIdentifier" : "2",
+                                      "nodeType" : "Repetition",
+                                      "result" : "Passed"
+                                    }
+                                  ],
+                                  "name" : "\"post with @mention\"",
+                                  "nodeType" : "Arguments",
+                                  "result" : "Passed"
+                                },
+                                {
+                                  "children" : [
+                                    {
+                                      "duration" : "0,012s",
+                                      "name" : "Retry 1",
+                                      "nodeIdentifier" : "1",
+                                      "nodeType" : "Repetition",
+                                      "result" : "Passed"
+                                    },
+                                    {
+                                      "duration" : "0,0046s",
+                                      "name" : "Retry 2",
+                                      "nodeIdentifier" : "2",
+                                      "nodeType" : "Repetition",
+                                      "result" : "Passed"
+                                    }
+                                  ],
+                                  "name" : "\"post with #hashtag\"",
+                                  "nodeType" : "Arguments",
+                                  "result" : "Passed"
+                                }
+                              ],
+                              "duration" : "0,0067s",
+                              "name" : "Content filtering",
+                              "nodeIdentifier" : "FastlaneTrainerTests/ContentTests/PostTests/ModerationTests/testContentFiltering(_:)",
+                              "nodeType" : "Test Case",
+                              "result" : "Passed"
+                            }
+                          ],
+                          "name" : "Moderation",
+                          "nodeType" : "Test Suite",
+                          "result" : "Passed"
+                        },
+                        {
+                          "children" : [
+                            {
+                              "children" : [
+                                {
+                                  "children" : [
+                                    {
+                                      "name" : "FastlaneTrainerExampleTests.swift:226: Expectation failed: (longPost.count → 1000) <= 500",
+                                      "nodeType" : "Failure Message",
+                                      "result" : "Failed"
+                                    }
+                                  ],
+                                  "duration" : "0,012s",
+                                  "name" : "Retry 1",
+                                  "nodeIdentifier" : "1",
+                                  "nodeType" : "Repetition",
+                                  "result" : "Failed"
+                                },
+                                {
+                                  "children" : [
+                                    {
+                                      "name" : "FastlaneTrainerExampleTests.swift:226: Expectation failed: (longPost.count → 1000) <= 500",
+                                      "nodeType" : "Failure Message",
+                                      "result" : "Failed"
+                                    }
+                                  ],
+                                  "duration" : "0,011s",
+                                  "name" : "Retry 2",
+                                  "nodeIdentifier" : "2",
+                                  "nodeType" : "Repetition",
+                                  "result" : "Failed"
+                                }
+                              ],
+                              "details" : "Failed after 2 retries",
+                              "duration" : "0,011s",
+                              "name" : "Post length validation",
+                              "nodeIdentifier" : "FastlaneTrainerTests/ContentTests/PostTests/CreationTests/testPostLength()",
+                              "nodeType" : "Test Case",
+                              "result" : "Failed"
+                            }
+                          ],
+                          "name" : "Creation",
+                          "nodeType" : "Test Suite",
+                          "result" : "Failed"
+                        }
+                      ],
+                      "name" : "Posts",
+                      "nodeType" : "Test Suite",
+                      "result" : "Failed"
+                    }
+                  ],
+                  "name" : "Content Management",
+                  "nodeType" : "Test Suite",
+                  "result" : "Failed"
+                },
+                {
+                  "children" : [
+                    {
+                      "children" : [
+                        {
+                          "children" : [
+                            {
+                              "children" : [
+                                {
+                                  "name" : "FastlaneTrainerExampleTests.swift:291: Caught error: TestError(message: \"Test requires network access\")",
+                                  "nodeType" : "Failure Message",
+                                  "result" : "Failed"
+                                }
+                              ],
+                              "duration" : "0,0052s",
+                              "name" : "Retry 1",
+                              "nodeIdentifier" : "1",
+                              "nodeType" : "Repetition",
+                              "result" : "Failed"
+                            },
+                            {
+                              "children" : [
+                                {
+                                  "name" : "FastlaneTrainerExampleTests.swift:291: Caught error: TestError(message: \"Test requires network access\")",
+                                  "nodeType" : "Failure Message",
+                                  "result" : "Failed"
+                                }
+                              ],
+                              "duration" : "0,014s",
+                              "name" : "Retry 2",
+                              "nodeIdentifier" : "2",
+                              "nodeType" : "Repetition",
+                              "result" : "Failed"
+                            }
+                          ],
+                          "details" : "Failed after 2 retries",
+                          "duration" : "0,0098s",
+                          "name" : "Network-dependent test",
+                          "nodeIdentifier" : "FastlaneTrainerTests/SkipTests/ResourceTests/testWithNetworkRequirement()",
+                          "nodeType" : "Test Case",
+                          "result" : "Failed",
+                          "tags" : [
+                            "network"
+                          ]
+                        },
+                        {
+                          "children" : [
+                            {
+                              "children" : [
+                                {
+                                  "name" : "FastlaneTrainerExampleTests.swift:301: Caught error: TestError(message: \"Database not available\")",
+                                  "nodeType" : "Failure Message",
+                                  "result" : "Failed"
+                                }
+                              ],
+                              "duration" : "0,0052s",
+                              "name" : "Retry 1",
+                              "nodeIdentifier" : "1",
+                              "nodeType" : "Repetition",
+                              "result" : "Failed"
+                            },
+                            {
+                              "children" : [
+                                {
+                                  "name" : "FastlaneTrainerExampleTests.swift:301: Caught error: TestError(message: \"Database not available\")",
+                                  "nodeType" : "Failure Message",
+                                  "result" : "Failed"
+                                }
+                              ],
+                              "duration" : "0,013s",
+                              "name" : "Retry 2",
+                              "nodeIdentifier" : "2",
+                              "nodeType" : "Repetition",
+                              "result" : "Failed"
+                            }
+                          ],
+                          "details" : "Failed after 2 retries",
+                          "duration" : "0,0092s",
+                          "name" : "Database test with cleanup",
+                          "nodeIdentifier" : "FastlaneTrainerTests/SkipTests/ResourceTests/testWithDatabaseCleanup()",
+                          "nodeType" : "Test Case",
+                          "result" : "Failed",
+                          "tags" : [
+                            "database"
+                          ]
+                        }
+                      ],
+                      "name" : "Resource-Dependent Tests",
+                      "nodeType" : "Test Suite",
+                      "result" : "Failed"
+                    },
+                    {
+                      "children" : [
+                        {
+                          "children" : [
+                            {
+                              "children" : [
+                                {
+                                  "name" : "Test 'Premium feature test' skipped: Premium features not available",
+                                  "nodeType" : "Failure Message",
+                                  "result" : "Skipped"
+                                }
+                              ],
+                              "duration" : "0,0019s",
+                              "name" : "Retry 1",
+                              "nodeIdentifier" : "1",
+                              "nodeType" : "Repetition",
+                              "result" : "Skipped"
+                            },
+                            {
+                              "children" : [
+                                {
+                                  "name" : "Test 'Premium feature test' skipped: Premium features not available",
+                                  "nodeType" : "Failure Message",
+                                  "result" : "Skipped"
+                                }
+                              ],
+                              "duration" : "0,0035s",
+                              "name" : "Retry 2",
+                              "nodeIdentifier" : "2",
+                              "nodeType" : "Repetition",
+                              "result" : "Skipped"
+                            }
+                          ],
+                          "duration" : "0,0027s",
+                          "name" : "Premium feature test",
+                          "nodeIdentifier" : "FastlaneTrainerTests/SkipTests/FeatureFlagTests/testPremiumFeature()",
+                          "nodeType" : "Test Case",
+                          "result" : "Skipped",
+                          "tags" : [
+                            "validation"
+                          ]
+                        },
+                        {
+                          "children" : [
+                            {
+                              "children" : [
+                                {
+                                  "duration" : "0,0031s",
+                                  "name" : "Retry 1",
+                                  "nodeIdentifier" : "1",
+                                  "nodeType" : "Repetition",
+                                  "result" : "Passed"
+                                },
+                                {
+                                  "duration" : "0,0044s",
+                                  "name" : "Retry 2",
+                                  "nodeIdentifier" : "2",
+                                  "nodeType" : "Repetition",
+                                  "result" : "Passed"
+                                }
+                              ],
+                              "name" : "\"basic_feature\"",
+                              "nodeType" : "Arguments",
+                              "result" : "Passed"
+                            },
+                            {
+                              "children" : [
+                                {
+                                  "children" : [
+                                    {
+                                      "name" : "FastlaneTrainerExampleTests.swift:334: Caught error: TestError(message: \"Feature \\'experimental_feature\\' is not enabled\")",
+                                      "nodeType" : "Failure Message",
+                                      "result" : "Failed"
+                                    }
+                                  ],
+                                  "duration" : "0,0051s",
+                                  "name" : "Retry 1",
+                                  "nodeIdentifier" : "1",
+                                  "nodeType" : "Repetition",
+                                  "result" : "Failed"
+                                },
+                                {
+                                  "children" : [
+                                    {
+                                      "name" : "FastlaneTrainerExampleTests.swift:334: Caught error: TestError(message: \"Feature \\'experimental_feature\\' is not enabled\")",
+                                      "nodeType" : "Failure Message",
+                                      "result" : "Failed"
+                                    }
+                                  ],
+                                  "duration" : "0,0059s",
+                                  "name" : "Retry 2",
+                                  "nodeIdentifier" : "2",
+                                  "nodeType" : "Repetition",
+                                  "result" : "Failed"
+                                }
+                              ],
+                              "details" : "Failed after 2 retries",
+                              "name" : "\"experimental_feature\"",
+                              "nodeType" : "Arguments",
+                              "result" : "Failed"
+                            },
+                            {
+                              "children" : [
+                                {
+                                  "children" : [
+                                    {
+                                      "name" : "FastlaneTrainerExampleTests.swift:334: Caught error: TestError(message: \"Feature \\'premium_feature\\' is not enabled\")",
+                                      "nodeType" : "Failure Message",
+                                      "result" : "Failed"
+                                    }
+                                  ],
+                                  "duration" : "0,005s",
+                                  "name" : "Retry 1",
+                                  "nodeIdentifier" : "1",
+                                  "nodeType" : "Repetition",
+                                  "result" : "Failed"
+                                },
+                                {
+                                  "children" : [
+                                    {
+                                      "name" : "FastlaneTrainerExampleTests.swift:334: Caught error: TestError(message: \"Feature \\'premium_feature\\' is not enabled\")",
+                                      "nodeType" : "Failure Message",
+                                      "result" : "Failed"
+                                    }
+                                  ],
+                                  "duration" : "0,0061s",
+                                  "name" : "Retry 2",
+                                  "nodeIdentifier" : "2",
+                                  "nodeType" : "Repetition",
+                                  "result" : "Failed"
+                                }
+                              ],
+                              "details" : "Failed after 2 retries",
+                              "name" : "\"premium_feature\"",
+                              "nodeType" : "Arguments",
+                              "result" : "Failed"
+                            }
+                          ],
+                          "duration" : "0,0049s",
+                          "name" : "Feature flag dependent tests",
+                          "nodeIdentifier" : "FastlaneTrainerTests/SkipTests/FeatureFlagTests/testFeatureFlag(_:)",
+                          "nodeType" : "Test Case",
+                          "result" : "Failed"
+                        }
+                      ],
+                      "name" : "Feature Flag Tests",
+                      "nodeType" : "Test Suite",
+                      "result" : "Failed"
+                    },
+                    {
+                      "children" : [
+                        {
+                          "children" : [
+                            {
+                              "children" : [
+                                {
+                                  "name" : "Test 'Production config test' skipped: Test only runs in production",
+                                  "nodeType" : "Failure Message",
+                                  "result" : "Skipped"
+                                }
+                              ],
+                              "duration" : "0,0021s",
+                              "name" : "Retry 1",
+                              "nodeIdentifier" : "1",
+                              "nodeType" : "Repetition",
+                              "result" : "Skipped"
+                            },
+                            {
+                              "children" : [
+                                {
+                                  "name" : "Test 'Production config test' skipped: Test only runs in production",
+                                  "nodeType" : "Failure Message",
+                                  "result" : "Skipped"
+                                }
+                              ],
+                              "duration" : "0,00021s",
+                              "name" : "Retry 2",
+                              "nodeIdentifier" : "2",
+                              "nodeType" : "Repetition",
+                              "result" : "Skipped"
+                            }
+                          ],
+                          "duration" : "0,0011s",
+                          "name" : "Production config test",
+                          "nodeIdentifier" : "FastlaneTrainerTests/SkipTests/EnvironmentTests/testProductionConfig()",
+                          "nodeType" : "Test Case",
+                          "result" : "Skipped"
+                        },
+                        {
+                          "children" : [
+                            {
+                              "children" : [
+                                {
+                                  "name" : "Test 'CI environment test' skipped: Test only runs in CI environment",
+                                  "nodeType" : "Failure Message",
+                                  "result" : "Skipped"
+                                }
+                              ],
+                              "duration" : "0,00004s",
+                              "name" : "Retry 1",
+                              "nodeIdentifier" : "1",
+                              "nodeType" : "Repetition",
+                              "result" : "Skipped"
+                            },
+                            {
+                              "children" : [
+                                {
+                                  "name" : "Test 'CI environment test' skipped: Test only runs in CI environment",
+                                  "nodeType" : "Failure Message",
+                                  "result" : "Skipped"
+                                }
+                              ],
+                              "duration" : "0,0025s",
+                              "name" : "Retry 2",
+                              "nodeIdentifier" : "2",
+                              "nodeType" : "Repetition",
+                              "result" : "Skipped"
+                            }
+                          ],
+                          "duration" : "0,0013s",
+                          "name" : "CI environment test",
+                          "nodeIdentifier" : "FastlaneTrainerTests/SkipTests/EnvironmentTests/testCIOnly()",
+                          "nodeType" : "Test Case",
+                          "result" : "Skipped"
+                        }
+                      ],
+                      "name" : "Environment-Dependent Tests",
+                      "nodeType" : "Test Suite",
+                      "result" : "Skipped"
+                    },
+                    {
+                      "children" : [
+                        {
+                          "duration" : "0,0047s",
+                          "name" : "Retry 1",
+                          "nodeIdentifier" : "1",
+                          "nodeType" : "Repetition",
+                          "result" : "Passed"
+                        },
+                        {
+                          "duration" : "0,014s",
+                          "name" : "Retry 2",
+                          "nodeIdentifier" : "2",
+                          "nodeType" : "Repetition",
+                          "result" : "Passed"
+                        }
+                      ],
+                      "duration" : "0,0093s",
+                      "name" : "Version-dependent test",
+                      "nodeIdentifier" : "FastlaneTrainerTests/SkipTests/testNewOSFeature()",
+                      "nodeType" : "Test Case",
+                      "result" : "Passed"
+                    },
+                    {
+                      "children" : [
+                        {
+                          "children" : [
+                            {
+                              "name" : "Test 'Unconditionally skipped test' skipped: Feature pending implementation",
+                              "nodeType" : "Failure Message",
+                              "result" : "Skipped"
+                            }
+                          ],
+                          "duration" : "0,000029s",
+                          "name" : "Retry 1",
+                          "nodeIdentifier" : "1",
+                          "nodeType" : "Repetition",
+                          "result" : "Skipped"
+                        },
+                        {
+                          "children" : [
+                            {
+                              "name" : "Test 'Unconditionally skipped test' skipped: Feature pending implementation",
+                              "nodeType" : "Failure Message",
+                              "result" : "Skipped"
+                            }
+                          ],
+                          "duration" : "0,00063s",
+                          "name" : "Retry 2",
+                          "nodeIdentifier" : "2",
+                          "nodeType" : "Repetition",
+                          "result" : "Skipped"
+                        }
+                      ],
+                      "duration" : "0,00033s",
+                      "name" : "Unconditionally skipped test",
+                      "nodeIdentifier" : "FastlaneTrainerTests/SkipTests/testSkippedFeature()",
+                      "nodeType" : "Test Case",
+                      "result" : "Skipped"
+                    },
+                    {
+                      "children" : [
+                        {
+                          "children" : [
+                            {
+                              "name" : "Test 'Platform-specific test' skipped: Test only runs in Catalyst",
+                              "nodeType" : "Failure Message",
+                              "result" : "Skipped"
+                            }
+                          ],
+                          "duration" : "0,00013s",
+                          "name" : "Retry 1",
+                          "nodeIdentifier" : "1",
+                          "nodeType" : "Repetition",
+                          "result" : "Skipped"
+                        },
+                        {
+                          "children" : [
+                            {
+                              "name" : "Test 'Platform-specific test' skipped: Test only runs in Catalyst",
+                              "nodeType" : "Failure Message",
+                              "result" : "Skipped"
+                            }
+                          ],
+                          "duration" : "0,0042s",
+                          "name" : "Retry 2",
+                          "nodeIdentifier" : "2",
+                          "nodeType" : "Repetition",
+                          "result" : "Skipped"
+                        }
+                      ],
+                      "duration" : "0,0022s",
+                      "name" : "Platform-specific test",
+                      "nodeIdentifier" : "FastlaneTrainerTests/SkipTests/testCatalystOnly()",
+                      "nodeType" : "Test Case",
+                      "result" : "Skipped"
+                    }
+                  ],
+                  "name" : "Test Skipping Demonstrations",
+                  "nodeType" : "Test Suite",
+                  "result" : "Failed"
+                },
+                {
+                  "children" : [
+                    {
+                      "children" : [
+                        {
+                          "duration" : "0,0045s",
+                          "name" : "Retry 1",
+                          "nodeIdentifier" : "1",
+                          "nodeType" : "Repetition",
+                          "result" : "Passed"
+                        },
+                        {
+                          "duration" : "0,012s",
+                          "name" : "Retry 2",
+                          "nodeIdentifier" : "2",
+                          "nodeType" : "Repetition",
+                          "result" : "Passed"
+                        }
+                      ],
+                      "duration" : "0,0085s",
+                      "name" : "Basic arithmetic",
+                      "nodeIdentifier" : "FastlaneTrainerTests/MathTests/testArithmetic()",
+                      "nodeType" : "Test Case",
+                      "result" : "Passed"
+                    }
+                  ],
+                  "name" : "Math Operations",
+                  "nodeType" : "Test Suite",
+                  "result" : "Passed"
+                },
+                {
+                  "children" : [
+                    {
+                      "children" : [
+                        {
+                          "duration" : "0,0043s",
+                          "name" : "Retry 1",
+                          "nodeIdentifier" : "1",
+                          "nodeType" : "Repetition",
+                          "result" : "Passed"
+                        },
+                        {
+                          "duration" : "0,012s",
+                          "name" : "Retry 2",
+                          "nodeIdentifier" : "2",
+                          "nodeType" : "Repetition",
+                          "result" : "Passed"
+                        }
+                      ],
+                      "duration" : "0,0084s",
+                      "name" : "String transformations",
+                      "nodeIdentifier" : "FastlaneTrainerTests/StringTests/testTransformations()",
+                      "nodeType" : "Test Case",
+                      "result" : "Passed"
+                    },
+                    {
+                      "children" : [
+                        {
+                          "duration" : "0,0045s",
+                          "name" : "Retry 1",
+                          "nodeIdentifier" : "1",
+                          "nodeType" : "Repetition",
+                          "result" : "Passed"
+                        },
+                        {
+                          "duration" : "0,012s",
+                          "name" : "Retry 2",
+                          "nodeIdentifier" : "2",
+                          "nodeType" : "Repetition",
+                          "result" : "Passed"
+                        }
+                      ],
+                      "duration" : "0,0085s",
+                      "name" : "String concatenation",
+                      "nodeIdentifier" : "FastlaneTrainerTests/StringTests/testConcatenation()",
+                      "nodeType" : "Test Case",
+                      "result" : "Passed"
+                    }
+                  ],
+                  "name" : "String Operations",
+                  "nodeType" : "Test Suite",
+                  "result" : "Passed"
+                },
+                {
+                  "children" : [
+                    {
+                      "duration" : "0,0068s",
+                      "name" : "Retry 1",
+                      "nodeIdentifier" : "1",
+                      "nodeType" : "Repetition",
+                      "result" : "Passed"
+                    },
+                    {
+                      "duration" : "0,018s",
+                      "name" : "Retry 2",
+                      "nodeIdentifier" : "2",
+                      "nodeType" : "Repetition",
+                      "result" : "Passed"
+                    }
+                  ],
+                  "duration" : "0,012s",
+                  "name" : "Simple string validation",
+                  "nodeIdentifier" : "FastlaneTrainerTests/testBasicString()",
+                  "nodeType" : "Test Case",
+                  "result" : "Passed",
+                  "tags" : [
+                    "basic",
+                    "string",
+                    "validation"
+                  ]
+                },
+                {
+                  "children" : [
+                    {
+                      "children" : [
+                        {
+                          "name" : "Test 'Skipped test with condition' skipped: Feature not yet implemented",
+                          "nodeType" : "Failure Message",
+                          "result" : "Skipped"
+                        }
+                      ],
+                      "duration" : "0,0021s",
+                      "name" : "Retry 1",
+                      "nodeIdentifier" : "1",
+                      "nodeType" : "Repetition",
+                      "result" : "Skipped"
+                    },
+                    {
+                      "children" : [
+                        {
+                          "name" : "Test 'Skipped test with condition' skipped: Feature not yet implemented",
+                          "nodeType" : "Failure Message",
+                          "result" : "Skipped"
+                        }
+                      ],
+                      "duration" : "0,0081s",
+                      "name" : "Retry 2",
+                      "nodeIdentifier" : "2",
+                      "nodeType" : "Repetition",
+                      "result" : "Skipped"
+                    }
+                  ],
+                  "duration" : "0,0051s",
+                  "name" : "Skipped test with condition",
+                  "nodeIdentifier" : "FastlaneTrainerTests/testSkippedFeature()",
+                  "nodeType" : "Test Case",
+                  "result" : "Skipped"
+                },
+                {
+                  "children" : [
+                    {
+                      "duration" : "0,0056s",
+                      "name" : "Retry 1",
+                      "nodeIdentifier" : "1",
+                      "nodeType" : "Repetition",
+                      "result" : "Passed"
+                    },
+                    {
+                      "duration" : "0,02s",
+                      "name" : "Retry 2",
+                      "nodeIdentifier" : "2",
+                      "nodeType" : "Repetition",
+                      "result" : "Passed"
+                    }
+                  ],
+                  "duration" : "0,013s",
+                  "name" : "Simple number validation",
+                  "nodeIdentifier" : "FastlaneTrainerTests/testBasicNumber()",
+                  "nodeType" : "Test Case",
+                  "result" : "Passed",
+                  "tags" : [
+                    "number",
+                    "basic",
+                    "validation"
+                  ]
+                },
+                {
+                  "children" : [
+                    {
+                      "children" : [
+                        {
+                          "name" : "FastlaneTrainerExampleTests.swift:116: Caught error: TestError(message: \"Experimental features not enabled\")",
+                          "nodeType" : "Failure Message",
+                          "result" : "Failed"
+                        }
+                      ],
+                      "duration" : "0,017s",
+                      "name" : "Retry 1",
+                      "nodeIdentifier" : "1",
+                      "nodeType" : "Repetition",
+                      "result" : "Failed"
+                    },
+                    {
+                      "children" : [
+                        {
+                          "name" : "FastlaneTrainerExampleTests.swift:116: Caught error: TestError(message: \"Experimental features not enabled\")",
+                          "nodeType" : "Failure Message",
+                          "result" : "Failed"
+                        }
+                      ],
+                      "duration" : "0,019s",
+                      "name" : "Retry 2",
+                      "nodeIdentifier" : "2",
+                      "nodeType" : "Repetition",
+                      "result" : "Failed"
+                    }
+                  ],
+                  "details" : "Failed after 2 retries",
+                  "duration" : "0,018s",
+                  "name" : "Conditionally skipped test",
+                  "nodeIdentifier" : "FastlaneTrainerTests/testConditionalSkip()",
+                  "nodeType" : "Test Case",
+                  "result" : "Failed"
+                },
+                {
+                  "children" : [
+                    {
+                      "duration" : "1s",
+                      "name" : "Retry 1",
+                      "nodeIdentifier" : "1",
+                      "nodeType" : "Repetition",
+                      "result" : "Passed"
+                    },
+                    {
+                      "duration" : "1s",
+                      "name" : "Retry 2",
+                      "nodeIdentifier" : "2",
+                      "nodeType" : "Repetition",
+                      "result" : "Passed"
+                    }
+                  ],
+                  "duration" : "1s",
+                  "name" : "Async operation test",
+                  "nodeIdentifier" : "FastlaneTrainerTests/testAsyncOperation()",
+                  "nodeType" : "Test Case",
+                  "result" : "Passed",
+                  "tags" : [
+                    "async"
+                  ]
+                },
+                {
+                  "children" : [
+                    {
+                      "children" : [
+                        {
+                          "children" : [
+                            {
+                              "name" : "FastlaneTrainerExampleTests.swift:50: Expectation failed: (input.count → 15) < 8",
+                              "nodeType" : "Failure Message",
+                              "result" : "Failed"
+                            }
+                          ],
+                          "duration" : "0,0037s",
+                          "name" : "Retry 1",
+                          "nodeIdentifier" : "1",
+                          "nodeType" : "Repetition",
+                          "result" : "Failed"
+                        },
+                        {
+                          "children" : [
+                            {
+                              "name" : "FastlaneTrainerExampleTests.swift:50: Expectation failed: (input.count → 15) < 8",
+                              "nodeType" : "Failure Message",
+                              "result" : "Failed"
+                            }
+                          ],
+                          "duration" : "0,0092s",
+                          "name" : "Retry 2",
+                          "nodeIdentifier" : "2",
+                          "nodeType" : "Repetition",
+                          "result" : "Failed"
+                        }
+                      ],
+                      "details" : "Failed after 2 retries",
+                      "name" : "\"FastlaneTrainer\"",
+                      "nodeType" : "Arguments",
+                      "result" : "Failed"
+                    },
+                    {
+                      "children" : [
+                        {
+                          "duration" : "0,0034s",
+                          "name" : "Retry 1",
+                          "nodeIdentifier" : "1",
+                          "nodeType" : "Repetition",
+                          "result" : "Passed"
+                        },
+                        {
+                          "duration" : "0,0099s",
+                          "name" : "Retry 2",
+                          "nodeIdentifier" : "2",
+                          "nodeType" : "Repetition",
+                          "result" : "Passed"
+                        }
+                      ],
+                      "name" : "\"Hello\"",
+                      "nodeType" : "Arguments",
+                      "result" : "Passed"
+                    },
+                    {
+                      "children" : [
+                        {
+                          "duration" : "0,0034s",
+                          "name" : "Retry 1",
+                          "nodeIdentifier" : "1",
+                          "nodeType" : "Repetition",
+                          "result" : "Passed"
+                        },
+                        {
+                          "duration" : "0,0071s",
+                          "name" : "Retry 2",
+                          "nodeIdentifier" : "2",
+                          "nodeType" : "Repetition",
+                          "result" : "Passed"
+                        }
+                      ],
+                      "name" : "\"World\"",
+                      "nodeType" : "Arguments",
+                      "result" : "Passed"
+                    }
+                  ],
+                  "duration" : "0,0061s",
+                  "name" : "Validate multiple strings",
+                  "nodeIdentifier" : "FastlaneTrainerTests/testMultipleStrings(_:)",
+                  "nodeType" : "Test Case",
+                  "result" : "Failed"
+                },
+                {
+                  "children" : [
+                    {
+                      "children" : [
+                        {
+                          "duration" : "0,0033s",
+                          "name" : "Retry 1",
+                          "nodeIdentifier" : "1",
+                          "nodeType" : "Repetition",
+                          "result" : "Passed"
+                        },
+                        {
+                          "duration" : "0,0088s",
+                          "name" : "Retry 2",
+                          "nodeIdentifier" : "2",
+                          "nodeType" : "Repetition",
+                          "result" : "Passed"
+                        }
+                      ],
+                      "name" : "(min: 0, max: 10)",
+                      "nodeType" : "Arguments",
+                      "result" : "Passed"
+                    },
+                    {
+                      "children" : [
+                        {
+                          "duration" : "0,0034s",
+                          "name" : "Retry 1",
+                          "nodeIdentifier" : "1",
+                          "nodeType" : "Repetition",
+                          "result" : "Passed"
+                        },
+                        {
+                          "duration" : "0,01s",
+                          "name" : "Retry 2",
+                          "nodeIdentifier" : "2",
+                          "nodeType" : "Repetition",
+                          "result" : "Passed"
+                        }
+                      ],
+                      "name" : "(min: 10, max: 20)",
+                      "nodeType" : "Arguments",
+                      "result" : "Passed"
+                    },
+                    {
+                      "children" : [
+                        {
+                          "duration" : "0,0033s",
+                          "name" : "Retry 1",
+                          "nodeIdentifier" : "1",
+                          "nodeType" : "Repetition",
+                          "result" : "Passed"
+                        },
+                        {
+                          "duration" : "0,0088s",
+                          "name" : "Retry 2",
+                          "nodeIdentifier" : "2",
+                          "nodeType" : "Repetition",
+                          "result" : "Passed"
+                        }
+                      ],
+                      "name" : "(min: 20, max: 30)",
+                      "nodeType" : "Arguments",
+                      "result" : "Passed"
+                    }
+                  ],
+                  "duration" : "0,0063s",
+                  "name" : "Test number ranges",
+                  "nodeIdentifier" : "FastlaneTrainerTests/testNumberRanges(range:)",
+                  "nodeType" : "Test Case",
+                  "result" : "Passed"
+                },
+                {
+                  "children" : [
+                    {
+                      "children" : [
+                        {
+                          "duration" : "1s",
+                          "name" : "Retry 1",
+                          "nodeIdentifier" : "1",
+                          "nodeType" : "Repetition",
+                          "result" : "Passed"
+                        },
+                        {
+                          "duration" : "1s",
+                          "name" : "Retry 2",
+                          "nodeIdentifier" : "2",
+                          "nodeType" : "Repetition",
+                          "result" : "Passed"
+                        }
+                      ],
+                      "name" : "1",
+                      "nodeType" : "Arguments",
+                      "result" : "Passed"
+                    },
+                    {
+                      "children" : [
+                        {
+                          "duration" : "2s",
+                          "name" : "Retry 1",
+                          "nodeIdentifier" : "1",
+                          "nodeType" : "Repetition",
+                          "result" : "Passed"
+                        },
+                        {
+                          "duration" : "2s",
+                          "name" : "Retry 2",
+                          "nodeIdentifier" : "2",
+                          "nodeType" : "Repetition",
+                          "result" : "Passed"
+                        }
+                      ],
+                      "name" : "2",
+                      "nodeType" : "Arguments",
+                      "result" : "Passed"
+                    },
+                    {
+                      "children" : [
+                        {
+                          "duration" : "3s",
+                          "name" : "Retry 1",
+                          "nodeIdentifier" : "1",
+                          "nodeType" : "Repetition",
+                          "result" : "Passed"
+                        },
+                        {
+                          "duration" : "3s",
+                          "name" : "Retry 2",
+                          "nodeIdentifier" : "2",
+                          "nodeType" : "Repetition",
+                          "result" : "Passed"
+                        }
+                      ],
+                      "name" : "3",
+                      "nodeType" : "Arguments",
+                      "result" : "Passed"
+                    }
+                  ],
+                  "duration" : "2s",
+                  "name" : "Multiple async operations",
+                  "nodeIdentifier" : "FastlaneTrainerTests/testMultipleAsyncOperations(_:)",
+                  "nodeType" : "Test Case",
+                  "result" : "Passed",
+                  "tags" : [
+                    "async",
+                    "performance"
+                  ]
+                }
+              ],
+              "name" : "FastlaneTrainer Tests",
+              "nodeType" : "Test Suite",
+              "result" : "Failed"
+            }
+          ],
+          "name" : "FastlaneTrainerExampleTests",
+          "nodeType" : "Unit test bundle",
+          "result" : "Failed"
+        },
+        {
+          "children" : [
+            {
+              "children" : [
+                {
+                  "duration" : "0,0014s",
+                  "name" : "testA_FirstTest()",
+                  "nodeIdentifier" : "FastlaneTrainerExampleXCTests/testA_FirstTest()",
+                  "nodeType" : "Test Case",
+                  "result" : "Passed"
+                },
+                {
+                  "duration" : "0,11s",
+                  "name" : "testAsyncOperation()",
+                  "nodeIdentifier" : "FastlaneTrainerExampleXCTests/testAsyncOperation()",
+                  "nodeType" : "Test Case",
+                  "result" : "Passed"
+                },
+                {
+                  "duration" : "0,1s",
+                  "name" : "testAsyncOperationWithExpectation()",
+                  "nodeIdentifier" : "FastlaneTrainerExampleXCTests/testAsyncOperationWithExpectation()",
+                  "nodeType" : "Test Case",
+                  "result" : "Passed"
+                },
+                {
+                  "duration" : "0,0012s",
+                  "name" : "testB_SecondTest()",
+                  "nodeIdentifier" : "FastlaneTrainerExampleXCTests/testB_SecondTest()",
+                  "nodeType" : "Test Case",
+                  "result" : "Passed"
+                },
+                {
+                  "children" : [
+                    {
+                      "children" : [
+                        {
+                          "name" : "FastlaneTrainerExampleXCTests.swift:53: XCTAssertFalse failed - False should be false",
+                          "nodeType" : "Failure Message",
+                          "result" : "Failed"
+                        }
+                      ],
+                      "duration" : "0,032s",
+                      "name" : "Retry 1",
+                      "nodeIdentifier" : "1",
+                      "nodeType" : "Repetition",
+                      "result" : "Failed"
+                    },
+                    {
+                      "children" : [
+                        {
+                          "name" : "FastlaneTrainerExampleXCTests.swift:53: XCTAssertFalse failed - False should be false",
+                          "nodeType" : "Failure Message",
+                          "result" : "Failed"
+                        }
+                      ],
+                      "duration" : "0,0022s",
+                      "name" : "Retry 2",
+                      "nodeIdentifier" : "2",
+                      "nodeType" : "Repetition",
+                      "result" : "Failed"
+                    }
+                  ],
+                  "details" : "Failed after 2 retries",
+                  "duration" : "0,017s",
+                  "name" : "testBasicAssertions()",
+                  "nodeIdentifier" : "FastlaneTrainerExampleXCTests/testBasicAssertions()",
+                  "nodeType" : "Test Case",
+                  "result" : "Failed"
+                },
+                {
+                  "children" : [
+                    {
+                      "children" : [
+                        {
+                          "name" : "Test skipped - Skipping slow tests",
+                          "nodeType" : "Failure Message",
+                          "result" : "Skipped"
+                        }
+                      ],
+                      "duration" : "0,0062s",
+                      "name" : "Retry 1",
+                      "nodeIdentifier" : "1",
+                      "nodeType" : "Repetition",
+                      "result" : "Skipped"
+                    }
+                  ],
+                  "duration" : "0,0062s",
+                  "name" : "testConditionalExecution()",
+                  "nodeIdentifier" : "FastlaneTrainerExampleXCTests/testConditionalExecution()",
+                  "nodeType" : "Test Case",
+                  "result" : "Skipped"
+                },
+                {
+                  "duration" : "0,21s",
+                  "name" : "testMultipleExpectations()",
+                  "nodeIdentifier" : "FastlaneTrainerExampleXCTests/testMultipleExpectations()",
+                  "nodeType" : "Test Case",
+                  "result" : "Passed"
+                },
+                {
+                  "duration" : "0,27s",
+                  "name" : "testPerformance()",
+                  "nodeIdentifier" : "FastlaneTrainerExampleXCTests/testPerformance()",
+                  "nodeType" : "Test Case",
+                  "result" : "Passed"
+                },
+                {
+                  "duration" : "0,049s",
+                  "name" : "testPerformanceWithMetrics()",
+                  "nodeIdentifier" : "FastlaneTrainerExampleXCTests/testPerformanceWithMetrics()",
+                  "nodeType" : "Test Case",
+                  "result" : "Passed"
+                },
+                {
+                  "duration" : "0,00059s",
+                  "name" : "testPlatformSpecific()",
+                  "nodeIdentifier" : "FastlaneTrainerExampleXCTests/testPlatformSpecific()",
+                  "nodeType" : "Test Case",
+                  "result" : "Passed"
+                },
+                {
+                  "duration" : "0,00057s",
+                  "name" : "testThrowingOperation()",
+                  "nodeIdentifier" : "FastlaneTrainerExampleXCTests/testThrowingOperation()",
+                  "nodeType" : "Test Case",
+                  "result" : "Passed"
+                }
+              ],
+              "name" : "FastlaneTrainerExampleXCTests",
+              "nodeType" : "Test Suite",
+              "result" : "Failed"
+            }
+          ],
+          "name" : "FastlaneTrainerExampleXCTests",
+          "nodeType" : "Unit test bundle",
+          "result" : "Failed"
+        }
+      ],
+      "name" : "TestPlan",
+      "nodeType" : "Test Plan",
+      "result" : "Failed"
+    }
+  ],
+  "testPlanConfigurations" : [
+    {
+      "configurationId" : "1",
+      "configurationName" : "MyTestPlanConfig"
+    }
+  ]
+}

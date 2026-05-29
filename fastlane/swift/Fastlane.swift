@@ -1,7 +1,8 @@
 // Fastlane.swift
-// Copyright (c) 2023 FastlaneTools
+// Copyright (c) 2026 FastlaneTools
 
 import Foundation
+
 /**
  Run ADB Actions
 
@@ -134,7 +135,7 @@ public func addGitTag(tag: OptionalConfigValue<String?> = .fastlaneDefault(nil),
  - parameters:
    - apiKeyPath: Path to your App Store Connect API Key JSON file (https://docs.fastlane.tools/app-store-connect-api/#using-fastlane-api-key-json-file)
    - apiKey: Your App Store Connect API Key information (https://docs.fastlane.tools/app-store-connect-api/#using-fastlane-api-key-hash-option)
-   - initialBuildNumber: sets the build number to given value if no build is in current train
+   - initialBuildNumber: sets the build number to given value if no build (upload) is in current train
    - appIdentifier: The bundle identifier of your app
    - username: Your Apple ID Username
    - teamId: The ID of your App Store Connect team if you're in multiple teams
@@ -189,7 +190,7 @@ public func appStoreBuildNumber(apiKeyPath: OptionalConfigValue<String?> = .fast
 
  - parameters:
    - keyId: The key ID
-   - issuerId: The issuer ID
+   - issuerId: The issuer ID. It should be nil if the key is individual API key
    - keyFilepath: The path to the key p8 file
    - keyContent: The content of the key p8 file
    - isKeyContentBase64: Whether :key_content is Base64 encoded or not
@@ -200,7 +201,7 @@ public func appStoreBuildNumber(apiKeyPath: OptionalConfigValue<String?> = .fast
  Load the App Store Connect API token to use in other fastlane tools and actions
  */
 public func appStoreConnectApiKey(keyId: String,
-                                  issuerId: String,
+                                  issuerId: OptionalConfigValue<String?> = .fastlaneDefault(nil),
                                   keyFilepath: OptionalConfigValue<String?> = .fastlaneDefault(nil),
                                   keyContent: OptionalConfigValue<String?> = .fastlaneDefault(nil),
                                   isKeyContentBase64: OptionalConfigValue<Bool> = .fastlaneDefault(false),
@@ -209,7 +210,7 @@ public func appStoreConnectApiKey(keyId: String,
                                   setSpaceshipToken: OptionalConfigValue<Bool> = .fastlaneDefault(true))
 {
     let keyIdArg = RubyCommand.Argument(name: "key_id", value: keyId, type: nil)
-    let issuerIdArg = RubyCommand.Argument(name: "issuer_id", value: issuerId, type: nil)
+    let issuerIdArg = issuerId.asRubyArgument(name: "issuer_id", type: nil)
     let keyFilepathArg = keyFilepath.asRubyArgument(name: "key_filepath", type: nil)
     let keyContentArg = keyContent.asRubyArgument(name: "key_content", type: nil)
     let isKeyContentBase64Arg = isKeyContentBase64.asRubyArgument(name: "is_key_content_base64", type: nil)
@@ -655,28 +656,36 @@ public func appledoc(input: [String],
    - useLiveVersion: Force usage of live version rather than edit version
    - metadataPath: Path to the folder containing the metadata files
    - screenshotsPath: Path to the folder containing the screenshots
+   - appClipHeaderImagesPath: Path to the folder containing the app clip header images
+   - appClipDefaultExperienceMetadataPath: Path to the folder containing the app clip default experience metadata
+   - appPreviewsPath: Path to the folder containing localized App Preview videos
+   - previewFrameTimeCode: Time code for the App Preview still frame written as hour:minute:second:centisecond (e.g. 00:00:00:01)
+   - overwritePreviewVideos: Clear all previously uploaded App Preview videos before uploading the new ones
    - skipBinaryUpload: Skip uploading an ipa or pkg to App Store Connect
    - skipScreenshots: Don't upload the screenshots
    - skipMetadata: Don't upload the metadata (e.g. title, description). This will still upload screenshots
    - skipAppVersionUpdate: Don’t create or update the app version that is being prepared for submission
    - force: Skip verification of HTML preview file
    - overwriteScreenshots: Clear all previously uploaded screenshots before uploading the new ones
+   - screenshotProcessingTimeout: Timeout in seconds to wait before considering screenshot processing as failed, used to handle cases where uploads to the App Store are stuck in processing
    - syncScreenshots: Sync screenshots with local ones. This is currently beta option so set true to 'FASTLANE_ENABLE_BETA_DELIVER_SYNC_SCREENSHOTS' environment variable as well
    - submitForReview: Submit the new version for Review after uploading everything
    - verifyOnly: Verifies archive with App Store Connect without uploading
    - rejectIfPossible: Rejects the previously submitted build if it's in a state where it's possible
-   - automaticRelease: Should the app be automatically released once it's approved? (Can not be used together with `auto_release_date`)
-   - autoReleaseDate: Date in milliseconds for automatically releasing on pending approval (Can not be used together with `automatic_release`)
+   - versionCheckWaitRetryLimit: After submitting a new version, App Store Connect takes some time to recognize the new version and we must wait until it's available before attempting to upload metadata for it. There is a mechanism that will check if it's available and retry with an exponential backoff if it's not available yet. This option specifies how many times we should retry before giving up. Setting this to a value below 5 is not recommended and will likely cause failures. Increase this parameter when Apple servers seem to be degraded or slow
+   - automaticRelease: Should the app be automatically released once it's approved? (Cannot be used together with `auto_release_date`)
+   - autoReleaseDate: Date in milliseconds for automatically releasing on pending approval (Cannot be used together with `automatic_release`)
    - phasedRelease: Enable the phased release feature of iTC
    - resetRatings: Reset the summary rating when you release a new version of the application
    - priceTier: The price tier of this application
    - appRatingConfigPath: Path to the app rating's config
-   - submissionInformation: Extra information for the submission (e.g. compliance specifications, IDFA settings)
+   - submissionInformation: Extra information for the submission (e.g. compliance specifications)
    - teamId: The ID of your App Store Connect team if you're in multiple teams
    - teamName: The name of your App Store Connect team if you're in multiple teams
    - devPortalTeamId: The short ID of your Developer Portal team, if you're in multiple teams. Different from your iTC team ID!
    - devPortalTeamName: The name of your Developer Portal team if you're in multiple teams
    - itcProvider: The provider short name to be used with the iTMSTransporter to identify your team. This value will override the automatically detected provider short name. To get provider short name run `pathToXcode.app/Contents/Applications/Application\ Loader.app/Contents/itms/bin/iTMSTransporter -m provider -u 'USERNAME' -p 'PASSWORD' -account_type itunes_connect -v off`. The short names of providers should be listed in the second column
+   - providerPublicId: The provider public ID to be used with altool (--provider-public-id). This value will override the automatically detected provider value for altool uploads. Required after Xcode 26 when your account is associated with multiple providers and using username/app-password authentication
    - runPrecheckBeforeSubmit: Run precheck before submitting to app review
    - precheckDefaultRuleLevel: The default precheck rule level unless otherwise configured
    - individualMetadataItems: **DEPRECATED!** Removed after the migration to the new App Store Connect API in June 2020 - An array of localized metadata items to upload individually by language so that errors can be identified. E.g. ['name', 'keywords', 'description']. Note: slow
@@ -691,6 +700,7 @@ public func appledoc(input: [String],
    - secondarySecondSubCategory: Metadata: The english name of the secondary second sub category (e.g. `Educational`, `Puzzle`)
    - tradeRepresentativeContactInformation: **DEPRECATED!** This is no longer used by App Store Connect - Metadata: A hash containing the trade representative contact information
    - appReviewInformation: Metadata: A hash containing the review information
+   - appClipReviewInformation: Metadata: A hash containing the app clip review information
    - appReviewAttachmentFile: Metadata: Path to the app review attachment file
    - description: Metadata: The localised app description
    - name: Metadata: The localised app name
@@ -705,6 +715,8 @@ public func appledoc(input: [String],
    - languages: Metadata: List of languages to activate
    - ignoreLanguageDirectoryValidation: Ignore errors when invalid languages are found in metadata and screenshot directories
    - precheckIncludeInAppPurchases: Should precheck check in-app purchases?
+   - appClipDefaultExperienceSubtitle: The localized subtitle for the default app clip experience
+   - appClipDefaultExperienceAction: Action for the default app clip experience (OPEN, VIEW, PLAY)
    - app: The (spaceship) app ID of the app you want to use/modify
 
  Using _upload_to_app_store_ after _build_app_ and _capture_screenshots_ will automatically upload the latest ipa and screenshots with no other configuration.
@@ -712,7 +724,7 @@ public func appledoc(input: [String],
  If you don't want to verify an HTML preview for App Store builds, use the `:force` option.
  This is useful when running _fastlane_ on your Continuous Integration server:
  `_upload_to_app_store_(force: true)`
- If your account is on multiple teams and you need to tell the `iTMSTransporter` which 'provider' to use, you can set the `:itc_provider` option to pass this info.
+ If your account is on multiple teams and you need to tell the transporter which provider to use, you can set `:itc_provider` or `:provider_public_id`.
  */
 public func appstore(apiKeyPath: OptionalConfigValue<String?> = .fastlaneDefault(nil),
                      apiKey: OptionalConfigValue<[String: Any]?> = .fastlaneDefault(nil),
@@ -727,16 +739,23 @@ public func appstore(apiKeyPath: OptionalConfigValue<String?> = .fastlaneDefault
                      useLiveVersion: OptionalConfigValue<Bool> = .fastlaneDefault(false),
                      metadataPath: OptionalConfigValue<String?> = .fastlaneDefault(nil),
                      screenshotsPath: OptionalConfigValue<String?> = .fastlaneDefault(nil),
+                     appClipHeaderImagesPath: OptionalConfigValue<String?> = .fastlaneDefault(nil),
+                     appClipDefaultExperienceMetadataPath: OptionalConfigValue<String?> = .fastlaneDefault(nil),
+                     appPreviewsPath: OptionalConfigValue<String?> = .fastlaneDefault(nil),
+                     previewFrameTimeCode: String = "00:00:05:00",
+                     overwritePreviewVideos: OptionalConfigValue<Bool> = .fastlaneDefault(false),
                      skipBinaryUpload: OptionalConfigValue<Bool> = .fastlaneDefault(false),
                      skipScreenshots: OptionalConfigValue<Bool> = .fastlaneDefault(false),
                      skipMetadata: OptionalConfigValue<Bool> = .fastlaneDefault(false),
                      skipAppVersionUpdate: OptionalConfigValue<Bool> = .fastlaneDefault(false),
                      force: OptionalConfigValue<Bool> = .fastlaneDefault(false),
                      overwriteScreenshots: OptionalConfigValue<Bool> = .fastlaneDefault(false),
+                     screenshotProcessingTimeout: Int = 3600,
                      syncScreenshots: OptionalConfigValue<Bool> = .fastlaneDefault(false),
                      submitForReview: OptionalConfigValue<Bool> = .fastlaneDefault(false),
                      verifyOnly: OptionalConfigValue<Bool> = .fastlaneDefault(false),
                      rejectIfPossible: OptionalConfigValue<Bool> = .fastlaneDefault(false),
+                     versionCheckWaitRetryLimit: Int = 7,
                      automaticRelease: OptionalConfigValue<Bool?> = .fastlaneDefault(nil),
                      autoReleaseDate: OptionalConfigValue<Int?> = .fastlaneDefault(nil),
                      phasedRelease: OptionalConfigValue<Bool> = .fastlaneDefault(false),
@@ -749,6 +768,7 @@ public func appstore(apiKeyPath: OptionalConfigValue<String?> = .fastlaneDefault
                      devPortalTeamId: OptionalConfigValue<String?> = .fastlaneDefault(nil),
                      devPortalTeamName: OptionalConfigValue<String?> = .fastlaneDefault(nil),
                      itcProvider: OptionalConfigValue<String?> = .fastlaneDefault(nil),
+                     providerPublicId: OptionalConfigValue<String?> = .fastlaneDefault(nil),
                      runPrecheckBeforeSubmit: OptionalConfigValue<Bool> = .fastlaneDefault(true),
                      precheckDefaultRuleLevel: String = "warn",
                      individualMetadataItems: OptionalConfigValue<[String]?> = .fastlaneDefault(nil),
@@ -763,6 +783,7 @@ public func appstore(apiKeyPath: OptionalConfigValue<String?> = .fastlaneDefault
                      secondarySecondSubCategory: OptionalConfigValue<String?> = .fastlaneDefault(nil),
                      tradeRepresentativeContactInformation: OptionalConfigValue<[String: Any]?> = .fastlaneDefault(nil),
                      appReviewInformation: OptionalConfigValue<[String: Any]?> = .fastlaneDefault(nil),
+                     appClipReviewInformation: OptionalConfigValue<[String: Any]?> = .fastlaneDefault(nil),
                      appReviewAttachmentFile: OptionalConfigValue<String?> = .fastlaneDefault(nil),
                      description: OptionalConfigValue<[String: Any]?> = .fastlaneDefault(nil),
                      name: OptionalConfigValue<[String: Any]?> = .fastlaneDefault(nil),
@@ -777,6 +798,8 @@ public func appstore(apiKeyPath: OptionalConfigValue<String?> = .fastlaneDefault
                      languages: OptionalConfigValue<[String]?> = .fastlaneDefault(nil),
                      ignoreLanguageDirectoryValidation: OptionalConfigValue<Bool> = .fastlaneDefault(false),
                      precheckIncludeInAppPurchases: OptionalConfigValue<Bool> = .fastlaneDefault(true),
+                     appClipDefaultExperienceSubtitle: OptionalConfigValue<[String: Any]?> = .fastlaneDefault(nil),
+                     appClipDefaultExperienceAction: OptionalConfigValue<String?> = .fastlaneDefault(nil),
                      app: OptionalConfigValue<Int?> = .fastlaneDefault(nil))
 {
     let apiKeyPathArg = apiKeyPath.asRubyArgument(name: "api_key_path", type: nil)
@@ -792,16 +815,23 @@ public func appstore(apiKeyPath: OptionalConfigValue<String?> = .fastlaneDefault
     let useLiveVersionArg = useLiveVersion.asRubyArgument(name: "use_live_version", type: nil)
     let metadataPathArg = metadataPath.asRubyArgument(name: "metadata_path", type: nil)
     let screenshotsPathArg = screenshotsPath.asRubyArgument(name: "screenshots_path", type: nil)
+    let appClipHeaderImagesPathArg = appClipHeaderImagesPath.asRubyArgument(name: "app_clip_header_images_path", type: nil)
+    let appClipDefaultExperienceMetadataPathArg = appClipDefaultExperienceMetadataPath.asRubyArgument(name: "app_clip_default_experience_metadata_path", type: nil)
+    let appPreviewsPathArg = appPreviewsPath.asRubyArgument(name: "app_previews_path", type: nil)
+    let previewFrameTimeCodeArg = RubyCommand.Argument(name: "preview_frame_time_code", value: previewFrameTimeCode, type: nil)
+    let overwritePreviewVideosArg = overwritePreviewVideos.asRubyArgument(name: "overwrite_preview_videos", type: nil)
     let skipBinaryUploadArg = skipBinaryUpload.asRubyArgument(name: "skip_binary_upload", type: nil)
     let skipScreenshotsArg = skipScreenshots.asRubyArgument(name: "skip_screenshots", type: nil)
     let skipMetadataArg = skipMetadata.asRubyArgument(name: "skip_metadata", type: nil)
     let skipAppVersionUpdateArg = skipAppVersionUpdate.asRubyArgument(name: "skip_app_version_update", type: nil)
     let forceArg = force.asRubyArgument(name: "force", type: nil)
     let overwriteScreenshotsArg = overwriteScreenshots.asRubyArgument(name: "overwrite_screenshots", type: nil)
+    let screenshotProcessingTimeoutArg = RubyCommand.Argument(name: "screenshot_processing_timeout", value: screenshotProcessingTimeout, type: nil)
     let syncScreenshotsArg = syncScreenshots.asRubyArgument(name: "sync_screenshots", type: nil)
     let submitForReviewArg = submitForReview.asRubyArgument(name: "submit_for_review", type: nil)
     let verifyOnlyArg = verifyOnly.asRubyArgument(name: "verify_only", type: nil)
     let rejectIfPossibleArg = rejectIfPossible.asRubyArgument(name: "reject_if_possible", type: nil)
+    let versionCheckWaitRetryLimitArg = RubyCommand.Argument(name: "version_check_wait_retry_limit", value: versionCheckWaitRetryLimit, type: nil)
     let automaticReleaseArg = automaticRelease.asRubyArgument(name: "automatic_release", type: nil)
     let autoReleaseDateArg = autoReleaseDate.asRubyArgument(name: "auto_release_date", type: nil)
     let phasedReleaseArg = phasedRelease.asRubyArgument(name: "phased_release", type: nil)
@@ -814,6 +844,7 @@ public func appstore(apiKeyPath: OptionalConfigValue<String?> = .fastlaneDefault
     let devPortalTeamIdArg = devPortalTeamId.asRubyArgument(name: "dev_portal_team_id", type: nil)
     let devPortalTeamNameArg = devPortalTeamName.asRubyArgument(name: "dev_portal_team_name", type: nil)
     let itcProviderArg = itcProvider.asRubyArgument(name: "itc_provider", type: nil)
+    let providerPublicIdArg = providerPublicId.asRubyArgument(name: "provider_public_id", type: nil)
     let runPrecheckBeforeSubmitArg = runPrecheckBeforeSubmit.asRubyArgument(name: "run_precheck_before_submit", type: nil)
     let precheckDefaultRuleLevelArg = RubyCommand.Argument(name: "precheck_default_rule_level", value: precheckDefaultRuleLevel, type: nil)
     let individualMetadataItemsArg = individualMetadataItems.asRubyArgument(name: "individual_metadata_items", type: nil)
@@ -828,6 +859,7 @@ public func appstore(apiKeyPath: OptionalConfigValue<String?> = .fastlaneDefault
     let secondarySecondSubCategoryArg = secondarySecondSubCategory.asRubyArgument(name: "secondary_second_sub_category", type: nil)
     let tradeRepresentativeContactInformationArg = tradeRepresentativeContactInformation.asRubyArgument(name: "trade_representative_contact_information", type: nil)
     let appReviewInformationArg = appReviewInformation.asRubyArgument(name: "app_review_information", type: nil)
+    let appClipReviewInformationArg = appClipReviewInformation.asRubyArgument(name: "app_clip_review_information", type: nil)
     let appReviewAttachmentFileArg = appReviewAttachmentFile.asRubyArgument(name: "app_review_attachment_file", type: nil)
     let descriptionArg = description.asRubyArgument(name: "description", type: nil)
     let nameArg = name.asRubyArgument(name: "name", type: nil)
@@ -842,6 +874,8 @@ public func appstore(apiKeyPath: OptionalConfigValue<String?> = .fastlaneDefault
     let languagesArg = languages.asRubyArgument(name: "languages", type: nil)
     let ignoreLanguageDirectoryValidationArg = ignoreLanguageDirectoryValidation.asRubyArgument(name: "ignore_language_directory_validation", type: nil)
     let precheckIncludeInAppPurchasesArg = precheckIncludeInAppPurchases.asRubyArgument(name: "precheck_include_in_app_purchases", type: nil)
+    let appClipDefaultExperienceSubtitleArg = appClipDefaultExperienceSubtitle.asRubyArgument(name: "app_clip_default_experience_subtitle", type: nil)
+    let appClipDefaultExperienceActionArg = appClipDefaultExperienceAction.asRubyArgument(name: "app_clip_default_experience_action", type: nil)
     let appArg = app.asRubyArgument(name: "app", type: nil)
     let array: [RubyCommand.Argument?] = [apiKeyPathArg,
                                           apiKeyArg,
@@ -856,16 +890,23 @@ public func appstore(apiKeyPath: OptionalConfigValue<String?> = .fastlaneDefault
                                           useLiveVersionArg,
                                           metadataPathArg,
                                           screenshotsPathArg,
+                                          appClipHeaderImagesPathArg,
+                                          appClipDefaultExperienceMetadataPathArg,
+                                          appPreviewsPathArg,
+                                          previewFrameTimeCodeArg,
+                                          overwritePreviewVideosArg,
                                           skipBinaryUploadArg,
                                           skipScreenshotsArg,
                                           skipMetadataArg,
                                           skipAppVersionUpdateArg,
                                           forceArg,
                                           overwriteScreenshotsArg,
+                                          screenshotProcessingTimeoutArg,
                                           syncScreenshotsArg,
                                           submitForReviewArg,
                                           verifyOnlyArg,
                                           rejectIfPossibleArg,
+                                          versionCheckWaitRetryLimitArg,
                                           automaticReleaseArg,
                                           autoReleaseDateArg,
                                           phasedReleaseArg,
@@ -878,6 +919,7 @@ public func appstore(apiKeyPath: OptionalConfigValue<String?> = .fastlaneDefault
                                           devPortalTeamIdArg,
                                           devPortalTeamNameArg,
                                           itcProviderArg,
+                                          providerPublicIdArg,
                                           runPrecheckBeforeSubmitArg,
                                           precheckDefaultRuleLevelArg,
                                           individualMetadataItemsArg,
@@ -892,6 +934,7 @@ public func appstore(apiKeyPath: OptionalConfigValue<String?> = .fastlaneDefault
                                           secondarySecondSubCategoryArg,
                                           tradeRepresentativeContactInformationArg,
                                           appReviewInformationArg,
+                                          appClipReviewInformationArg,
                                           appReviewAttachmentFileArg,
                                           descriptionArg,
                                           nameArg,
@@ -906,6 +949,8 @@ public func appstore(apiKeyPath: OptionalConfigValue<String?> = .fastlaneDefault
                                           languagesArg,
                                           ignoreLanguageDirectoryValidationArg,
                                           precheckIncludeInAppPurchasesArg,
+                                          appClipDefaultExperienceSubtitleArg,
+                                          appClipDefaultExperienceActionArg,
                                           appArg]
     let args: [RubyCommand.Argument] = array
         .filter { $0?.value != nil }
@@ -1289,6 +1334,7 @@ public func buildAndroidApp(task: OptionalConfigValue<String?> = .fastlaneDefaul
    - clean: Should the project be cleaned before building it?
    - outputDirectory: The directory in which the ipa file should be stored in
    - outputName: The name of the resulting ipa file
+   - appName: App name to use in logfile name
    - configuration: The configuration to use when building the app. Defaults to 'Release'
    - silent: Hide all information that's not necessary while building
    - codesigningIdentity: The name of the code signing identity to use. It has to match the name exactly. e.g. 'iPhone Distribution: SunApps GmbH'
@@ -1330,9 +1376,13 @@ public func buildAndroidApp(task: OptionalConfigValue<String?> = .fastlaneDefaul
    - skipProfileDetection: Do not try to build a profile mapping from the xcodeproj. Match or a manually provided mapping should be used
    - xcodebuildCommand: Allows for override of the default `xcodebuild` command
    - clonedSourcePackagesPath: Sets a custom path for Swift Package Manager dependencies
+   - packageCachePath: Sets a custom package cache path for Swift Package Manager dependencies
    - skipPackageDependenciesResolution: Skips resolution of Swift Package Manager dependencies
-   - disablePackageAutomaticUpdates: Prevents packages from automatically being resolved to versions other than those recorded in the `Package.resolved` file
+   - disablePackageAutomaticUpdates: Prevents packages from automatically being resolved to versions other than those recorded in the `Package.resolved` file. This translates in the option `-disableAutomaticPackageResolution` being passed to xcodebuild
+   - skipPackageRepositoryFetches: Skips updating package dependencies from their remote. This translates in the option `-skipPackageUpdates` being passed to xcodebuild
    - useSystemScm: Lets xcodebuild use system's scm configuration
+   - packageAuthorizationProvider: Lets xcodebuild use a specified package authorization provider (keychain|netrc)
+   - generateAppstoreInfo: Generate AppStoreInfo.plist using swinfo for app-store exports
 
  - returns: The absolute path to the generated ipa file
 
@@ -1344,6 +1394,7 @@ public func buildAndroidApp(task: OptionalConfigValue<String?> = .fastlaneDefaul
                                         clean: OptionalConfigValue<Bool> = .fastlaneDefault(false),
                                         outputDirectory: String = ".",
                                         outputName: OptionalConfigValue<String?> = .fastlaneDefault(nil),
+                                        appName: OptionalConfigValue<String?> = .fastlaneDefault(nil),
                                         configuration: OptionalConfigValue<String?> = .fastlaneDefault(nil),
                                         silent: OptionalConfigValue<Bool> = .fastlaneDefault(false),
                                         codesigningIdentity: OptionalConfigValue<String?> = .fastlaneDefault(nil),
@@ -1385,9 +1436,13 @@ public func buildAndroidApp(task: OptionalConfigValue<String?> = .fastlaneDefaul
                                         skipProfileDetection: OptionalConfigValue<Bool> = .fastlaneDefault(false),
                                         xcodebuildCommand: String = "xcodebuild",
                                         clonedSourcePackagesPath: OptionalConfigValue<String?> = .fastlaneDefault(nil),
+                                        packageCachePath: OptionalConfigValue<String?> = .fastlaneDefault(nil),
                                         skipPackageDependenciesResolution: OptionalConfigValue<Bool> = .fastlaneDefault(false),
                                         disablePackageAutomaticUpdates: OptionalConfigValue<Bool> = .fastlaneDefault(false),
-                                        useSystemScm: OptionalConfigValue<Bool> = .fastlaneDefault(false)) -> String
+                                        skipPackageRepositoryFetches: OptionalConfigValue<Bool> = .fastlaneDefault(false),
+                                        useSystemScm: OptionalConfigValue<Bool> = .fastlaneDefault(false),
+                                        packageAuthorizationProvider: OptionalConfigValue<String?> = .fastlaneDefault(nil),
+                                        generateAppstoreInfo: OptionalConfigValue<Bool> = .fastlaneDefault(false)) -> String
 {
     let workspaceArg = workspace.asRubyArgument(name: "workspace", type: nil)
     let projectArg = project.asRubyArgument(name: "project", type: nil)
@@ -1395,6 +1450,7 @@ public func buildAndroidApp(task: OptionalConfigValue<String?> = .fastlaneDefaul
     let cleanArg = clean.asRubyArgument(name: "clean", type: nil)
     let outputDirectoryArg = RubyCommand.Argument(name: "output_directory", value: outputDirectory, type: nil)
     let outputNameArg = outputName.asRubyArgument(name: "output_name", type: nil)
+    let appNameArg = appName.asRubyArgument(name: "app_name", type: nil)
     let configurationArg = configuration.asRubyArgument(name: "configuration", type: nil)
     let silentArg = silent.asRubyArgument(name: "silent", type: nil)
     let codesigningIdentityArg = codesigningIdentity.asRubyArgument(name: "codesigning_identity", type: nil)
@@ -1436,15 +1492,20 @@ public func buildAndroidApp(task: OptionalConfigValue<String?> = .fastlaneDefaul
     let skipProfileDetectionArg = skipProfileDetection.asRubyArgument(name: "skip_profile_detection", type: nil)
     let xcodebuildCommandArg = RubyCommand.Argument(name: "xcodebuild_command", value: xcodebuildCommand, type: nil)
     let clonedSourcePackagesPathArg = clonedSourcePackagesPath.asRubyArgument(name: "cloned_source_packages_path", type: nil)
+    let packageCachePathArg = packageCachePath.asRubyArgument(name: "package_cache_path", type: nil)
     let skipPackageDependenciesResolutionArg = skipPackageDependenciesResolution.asRubyArgument(name: "skip_package_dependencies_resolution", type: nil)
     let disablePackageAutomaticUpdatesArg = disablePackageAutomaticUpdates.asRubyArgument(name: "disable_package_automatic_updates", type: nil)
+    let skipPackageRepositoryFetchesArg = skipPackageRepositoryFetches.asRubyArgument(name: "skip_package_repository_fetches", type: nil)
     let useSystemScmArg = useSystemScm.asRubyArgument(name: "use_system_scm", type: nil)
+    let packageAuthorizationProviderArg = packageAuthorizationProvider.asRubyArgument(name: "package_authorization_provider", type: nil)
+    let generateAppstoreInfoArg = generateAppstoreInfo.asRubyArgument(name: "generate_appstore_info", type: nil)
     let array: [RubyCommand.Argument?] = [workspaceArg,
                                           projectArg,
                                           schemeArg,
                                           cleanArg,
                                           outputDirectoryArg,
                                           outputNameArg,
+                                          appNameArg,
                                           configurationArg,
                                           silentArg,
                                           codesigningIdentityArg,
@@ -1486,9 +1547,13 @@ public func buildAndroidApp(task: OptionalConfigValue<String?> = .fastlaneDefaul
                                           skipProfileDetectionArg,
                                           xcodebuildCommandArg,
                                           clonedSourcePackagesPathArg,
+                                          packageCachePathArg,
                                           skipPackageDependenciesResolutionArg,
                                           disablePackageAutomaticUpdatesArg,
-                                          useSystemScmArg]
+                                          skipPackageRepositoryFetchesArg,
+                                          useSystemScmArg,
+                                          packageAuthorizationProviderArg,
+                                          generateAppstoreInfoArg]
     let args: [RubyCommand.Argument] = array
         .filter { $0?.value != nil }
         .compactMap { $0 }
@@ -1506,6 +1571,7 @@ public func buildAndroidApp(task: OptionalConfigValue<String?> = .fastlaneDefaul
    - clean: Should the project be cleaned before building it?
    - outputDirectory: The directory in which the ipa file should be stored in
    - outputName: The name of the resulting ipa file
+   - appName: App name to use in logfile name
    - configuration: The configuration to use when building the app. Defaults to 'Release'
    - silent: Hide all information that's not necessary while building
    - codesigningIdentity: The name of the code signing identity to use. It has to match the name exactly. e.g. 'iPhone Distribution: SunApps GmbH'
@@ -1544,9 +1610,13 @@ public func buildAndroidApp(task: OptionalConfigValue<String?> = .fastlaneDefaul
    - skipProfileDetection: Do not try to build a profile mapping from the xcodeproj. Match or a manually provided mapping should be used
    - xcodebuildCommand: Allows for override of the default `xcodebuild` command
    - clonedSourcePackagesPath: Sets a custom path for Swift Package Manager dependencies
+   - packageCachePath: Sets a custom package cache path for Swift Package Manager dependencies
    - skipPackageDependenciesResolution: Skips resolution of Swift Package Manager dependencies
-   - disablePackageAutomaticUpdates: Prevents packages from automatically being resolved to versions other than those recorded in the `Package.resolved` file
+   - disablePackageAutomaticUpdates: Prevents packages from automatically being resolved to versions other than those recorded in the `Package.resolved` file. This translates in the option `-disableAutomaticPackageResolution` being passed to xcodebuild
+   - skipPackageRepositoryFetches: Skips updating package dependencies from their remote. This translates in the option `-skipPackageUpdates` being passed to xcodebuild
    - useSystemScm: Lets xcodebuild use system's scm configuration
+   - packageAuthorizationProvider: Lets xcodebuild use a specified package authorization provider (keychain|netrc)
+   - generateAppstoreInfo: Generate AppStoreInfo.plist using swinfo for app-store exports
 
  - returns: The absolute path to the generated ipa file
 
@@ -1558,6 +1628,7 @@ public func buildAndroidApp(task: OptionalConfigValue<String?> = .fastlaneDefaul
                                            clean: OptionalConfigValue<Bool> = .fastlaneDefault(false),
                                            outputDirectory: String = ".",
                                            outputName: OptionalConfigValue<String?> = .fastlaneDefault(nil),
+                                           appName: OptionalConfigValue<String?> = .fastlaneDefault(nil),
                                            configuration: OptionalConfigValue<String?> = .fastlaneDefault(nil),
                                            silent: OptionalConfigValue<Bool> = .fastlaneDefault(false),
                                            codesigningIdentity: OptionalConfigValue<String?> = .fastlaneDefault(nil),
@@ -1596,9 +1667,13 @@ public func buildAndroidApp(task: OptionalConfigValue<String?> = .fastlaneDefaul
                                            skipProfileDetection: OptionalConfigValue<Bool> = .fastlaneDefault(false),
                                            xcodebuildCommand: String = "xcodebuild",
                                            clonedSourcePackagesPath: OptionalConfigValue<String?> = .fastlaneDefault(nil),
+                                           packageCachePath: OptionalConfigValue<String?> = .fastlaneDefault(nil),
                                            skipPackageDependenciesResolution: OptionalConfigValue<Bool> = .fastlaneDefault(false),
                                            disablePackageAutomaticUpdates: OptionalConfigValue<Bool> = .fastlaneDefault(false),
-                                           useSystemScm: OptionalConfigValue<Bool> = .fastlaneDefault(false)) -> String
+                                           skipPackageRepositoryFetches: OptionalConfigValue<Bool> = .fastlaneDefault(false),
+                                           useSystemScm: OptionalConfigValue<Bool> = .fastlaneDefault(false),
+                                           packageAuthorizationProvider: OptionalConfigValue<String?> = .fastlaneDefault(nil),
+                                           generateAppstoreInfo: OptionalConfigValue<Bool> = .fastlaneDefault(false)) -> String
 {
     let workspaceArg = workspace.asRubyArgument(name: "workspace", type: nil)
     let projectArg = project.asRubyArgument(name: "project", type: nil)
@@ -1606,6 +1681,7 @@ public func buildAndroidApp(task: OptionalConfigValue<String?> = .fastlaneDefaul
     let cleanArg = clean.asRubyArgument(name: "clean", type: nil)
     let outputDirectoryArg = RubyCommand.Argument(name: "output_directory", value: outputDirectory, type: nil)
     let outputNameArg = outputName.asRubyArgument(name: "output_name", type: nil)
+    let appNameArg = appName.asRubyArgument(name: "app_name", type: nil)
     let configurationArg = configuration.asRubyArgument(name: "configuration", type: nil)
     let silentArg = silent.asRubyArgument(name: "silent", type: nil)
     let codesigningIdentityArg = codesigningIdentity.asRubyArgument(name: "codesigning_identity", type: nil)
@@ -1644,15 +1720,20 @@ public func buildAndroidApp(task: OptionalConfigValue<String?> = .fastlaneDefaul
     let skipProfileDetectionArg = skipProfileDetection.asRubyArgument(name: "skip_profile_detection", type: nil)
     let xcodebuildCommandArg = RubyCommand.Argument(name: "xcodebuild_command", value: xcodebuildCommand, type: nil)
     let clonedSourcePackagesPathArg = clonedSourcePackagesPath.asRubyArgument(name: "cloned_source_packages_path", type: nil)
+    let packageCachePathArg = packageCachePath.asRubyArgument(name: "package_cache_path", type: nil)
     let skipPackageDependenciesResolutionArg = skipPackageDependenciesResolution.asRubyArgument(name: "skip_package_dependencies_resolution", type: nil)
     let disablePackageAutomaticUpdatesArg = disablePackageAutomaticUpdates.asRubyArgument(name: "disable_package_automatic_updates", type: nil)
+    let skipPackageRepositoryFetchesArg = skipPackageRepositoryFetches.asRubyArgument(name: "skip_package_repository_fetches", type: nil)
     let useSystemScmArg = useSystemScm.asRubyArgument(name: "use_system_scm", type: nil)
+    let packageAuthorizationProviderArg = packageAuthorizationProvider.asRubyArgument(name: "package_authorization_provider", type: nil)
+    let generateAppstoreInfoArg = generateAppstoreInfo.asRubyArgument(name: "generate_appstore_info", type: nil)
     let array: [RubyCommand.Argument?] = [workspaceArg,
                                           projectArg,
                                           schemeArg,
                                           cleanArg,
                                           outputDirectoryArg,
                                           outputNameArg,
+                                          appNameArg,
                                           configurationArg,
                                           silentArg,
                                           codesigningIdentityArg,
@@ -1691,9 +1772,13 @@ public func buildAndroidApp(task: OptionalConfigValue<String?> = .fastlaneDefaul
                                           skipProfileDetectionArg,
                                           xcodebuildCommandArg,
                                           clonedSourcePackagesPathArg,
+                                          packageCachePathArg,
                                           skipPackageDependenciesResolutionArg,
                                           disablePackageAutomaticUpdatesArg,
-                                          useSystemScmArg]
+                                          skipPackageRepositoryFetchesArg,
+                                          useSystemScmArg,
+                                          packageAuthorizationProviderArg,
+                                          generateAppstoreInfoArg]
     let args: [RubyCommand.Argument] = array
         .filter { $0?.value != nil }
         .compactMap { $0 }
@@ -1711,6 +1796,7 @@ public func buildAndroidApp(task: OptionalConfigValue<String?> = .fastlaneDefaul
    - clean: Should the project be cleaned before building it?
    - outputDirectory: The directory in which the ipa file should be stored in
    - outputName: The name of the resulting ipa file
+   - appName: App name to use in logfile name
    - configuration: The configuration to use when building the app. Defaults to 'Release'
    - silent: Hide all information that's not necessary while building
    - codesigningIdentity: The name of the code signing identity to use. It has to match the name exactly. e.g. 'iPhone Distribution: SunApps GmbH'
@@ -1750,9 +1836,13 @@ public func buildAndroidApp(task: OptionalConfigValue<String?> = .fastlaneDefaul
    - skipProfileDetection: Do not try to build a profile mapping from the xcodeproj. Match or a manually provided mapping should be used
    - xcodebuildCommand: Allows for override of the default `xcodebuild` command
    - clonedSourcePackagesPath: Sets a custom path for Swift Package Manager dependencies
+   - packageCachePath: Sets a custom package cache path for Swift Package Manager dependencies
    - skipPackageDependenciesResolution: Skips resolution of Swift Package Manager dependencies
-   - disablePackageAutomaticUpdates: Prevents packages from automatically being resolved to versions other than those recorded in the `Package.resolved` file
+   - disablePackageAutomaticUpdates: Prevents packages from automatically being resolved to versions other than those recorded in the `Package.resolved` file. This translates in the option `-disableAutomaticPackageResolution` being passed to xcodebuild
+   - skipPackageRepositoryFetches: Skips updating package dependencies from their remote. This translates in the option `-skipPackageUpdates` being passed to xcodebuild
    - useSystemScm: Lets xcodebuild use system's scm configuration
+   - packageAuthorizationProvider: Lets xcodebuild use a specified package authorization provider (keychain|netrc)
+   - generateAppstoreInfo: Generate AppStoreInfo.plist using swinfo for app-store exports
 
  - returns: The absolute path to the generated ipa file
 
@@ -1764,6 +1854,7 @@ public func buildAndroidApp(task: OptionalConfigValue<String?> = .fastlaneDefaul
                                            clean: OptionalConfigValue<Bool> = .fastlaneDefault(false),
                                            outputDirectory: String = ".",
                                            outputName: OptionalConfigValue<String?> = .fastlaneDefault(nil),
+                                           appName: OptionalConfigValue<String?> = .fastlaneDefault(nil),
                                            configuration: OptionalConfigValue<String?> = .fastlaneDefault(nil),
                                            silent: OptionalConfigValue<Bool> = .fastlaneDefault(false),
                                            codesigningIdentity: OptionalConfigValue<String?> = .fastlaneDefault(nil),
@@ -1803,9 +1894,13 @@ public func buildAndroidApp(task: OptionalConfigValue<String?> = .fastlaneDefaul
                                            skipProfileDetection: OptionalConfigValue<Bool> = .fastlaneDefault(false),
                                            xcodebuildCommand: String = "xcodebuild",
                                            clonedSourcePackagesPath: OptionalConfigValue<String?> = .fastlaneDefault(nil),
+                                           packageCachePath: OptionalConfigValue<String?> = .fastlaneDefault(nil),
                                            skipPackageDependenciesResolution: OptionalConfigValue<Bool> = .fastlaneDefault(false),
                                            disablePackageAutomaticUpdates: OptionalConfigValue<Bool> = .fastlaneDefault(false),
-                                           useSystemScm: OptionalConfigValue<Bool> = .fastlaneDefault(false)) -> String
+                                           skipPackageRepositoryFetches: OptionalConfigValue<Bool> = .fastlaneDefault(false),
+                                           useSystemScm: OptionalConfigValue<Bool> = .fastlaneDefault(false),
+                                           packageAuthorizationProvider: OptionalConfigValue<String?> = .fastlaneDefault(nil),
+                                           generateAppstoreInfo: OptionalConfigValue<Bool> = .fastlaneDefault(false)) -> String
 {
     let workspaceArg = workspace.asRubyArgument(name: "workspace", type: nil)
     let projectArg = project.asRubyArgument(name: "project", type: nil)
@@ -1813,6 +1908,7 @@ public func buildAndroidApp(task: OptionalConfigValue<String?> = .fastlaneDefaul
     let cleanArg = clean.asRubyArgument(name: "clean", type: nil)
     let outputDirectoryArg = RubyCommand.Argument(name: "output_directory", value: outputDirectory, type: nil)
     let outputNameArg = outputName.asRubyArgument(name: "output_name", type: nil)
+    let appNameArg = appName.asRubyArgument(name: "app_name", type: nil)
     let configurationArg = configuration.asRubyArgument(name: "configuration", type: nil)
     let silentArg = silent.asRubyArgument(name: "silent", type: nil)
     let codesigningIdentityArg = codesigningIdentity.asRubyArgument(name: "codesigning_identity", type: nil)
@@ -1852,15 +1948,20 @@ public func buildAndroidApp(task: OptionalConfigValue<String?> = .fastlaneDefaul
     let skipProfileDetectionArg = skipProfileDetection.asRubyArgument(name: "skip_profile_detection", type: nil)
     let xcodebuildCommandArg = RubyCommand.Argument(name: "xcodebuild_command", value: xcodebuildCommand, type: nil)
     let clonedSourcePackagesPathArg = clonedSourcePackagesPath.asRubyArgument(name: "cloned_source_packages_path", type: nil)
+    let packageCachePathArg = packageCachePath.asRubyArgument(name: "package_cache_path", type: nil)
     let skipPackageDependenciesResolutionArg = skipPackageDependenciesResolution.asRubyArgument(name: "skip_package_dependencies_resolution", type: nil)
     let disablePackageAutomaticUpdatesArg = disablePackageAutomaticUpdates.asRubyArgument(name: "disable_package_automatic_updates", type: nil)
+    let skipPackageRepositoryFetchesArg = skipPackageRepositoryFetches.asRubyArgument(name: "skip_package_repository_fetches", type: nil)
     let useSystemScmArg = useSystemScm.asRubyArgument(name: "use_system_scm", type: nil)
+    let packageAuthorizationProviderArg = packageAuthorizationProvider.asRubyArgument(name: "package_authorization_provider", type: nil)
+    let generateAppstoreInfoArg = generateAppstoreInfo.asRubyArgument(name: "generate_appstore_info", type: nil)
     let array: [RubyCommand.Argument?] = [workspaceArg,
                                           projectArg,
                                           schemeArg,
                                           cleanArg,
                                           outputDirectoryArg,
                                           outputNameArg,
+                                          appNameArg,
                                           configurationArg,
                                           silentArg,
                                           codesigningIdentityArg,
@@ -1900,9 +2001,13 @@ public func buildAndroidApp(task: OptionalConfigValue<String?> = .fastlaneDefaul
                                           skipProfileDetectionArg,
                                           xcodebuildCommandArg,
                                           clonedSourcePackagesPathArg,
+                                          packageCachePathArg,
                                           skipPackageDependenciesResolutionArg,
                                           disablePackageAutomaticUpdatesArg,
-                                          useSystemScmArg]
+                                          skipPackageRepositoryFetchesArg,
+                                          useSystemScmArg,
+                                          packageAuthorizationProviderArg,
+                                          generateAppstoreInfoArg]
     let args: [RubyCommand.Argument] = array
         .filter { $0?.value != nil }
         .compactMap { $0 }
@@ -2108,8 +2213,8 @@ public func captureAndroidScreenshots(androidHome: OptionalConfigValue<String?> 
  Generate new localized screenshots on multiple devices (via _snapshot_)
 
  - parameters:
-   - workspace: Path the workspace file
-   - project: Path the project file
+   - workspace: Path to the workspace file
+   - project: Path to the project file
    - xcargs: Pass additional arguments to xcodebuild for the test phase. Be sure to quote the setting names and values e.g. OTHER_LDFLAGS="-ObjC -lstdc++"
    - xcconfig: Use an extra XCCONFIG file to build your app
    - devices: A list of devices you want to take the screenshots from
@@ -2147,8 +2252,11 @@ public func captureAndroidScreenshots(androidHome: OptionalConfigValue<String?> 
    - concurrentSimulators: Take snapshots on multiple simulators concurrently. Note: This option is only applicable when running against Xcode 9
    - disableSlideToType: Disable the simulator from showing the 'Slide to type' prompt
    - clonedSourcePackagesPath: Sets a custom path for Swift Package Manager dependencies
+   - packageCachePath: Sets a custom package cache path for Swift Package Manager dependencies
    - skipPackageDependenciesResolution: Skips resolution of Swift Package Manager dependencies
-   - disablePackageAutomaticUpdates: Prevents packages from automatically being resolved to versions other than those recorded in the `Package.resolved` file
+   - disablePackageAutomaticUpdates: Prevents packages from automatically being resolved to versions other than those recorded in the `Package.resolved` file. This translates in the option `-disableAutomaticPackageResolution` being passed to xcodebuild
+   - skipPackageRepositoryFetches: Skips updating package dependencies from their remote. This translates in the option `-skipPackageUpdates` being passed to xcodebuild
+   - packageAuthorizationProvider: Lets xcodebuild use a specified package authorization provider (keychain|netrc)
    - testplan: The testplan associated with the scheme that should be used for testing
    - onlyTesting: Array of strings matching Test Bundle/Test Suite/Test Cases to run
    - skipTesting: Array of strings matching Test Bundle/Test Suite/Test Cases to skip
@@ -2197,8 +2305,11 @@ public func captureIosScreenshots(workspace: OptionalConfigValue<String?> = .fas
                                   concurrentSimulators: OptionalConfigValue<Bool> = .fastlaneDefault(true),
                                   disableSlideToType: OptionalConfigValue<Bool> = .fastlaneDefault(false),
                                   clonedSourcePackagesPath: OptionalConfigValue<String?> = .fastlaneDefault(nil),
+                                  packageCachePath: OptionalConfigValue<String?> = .fastlaneDefault(nil),
                                   skipPackageDependenciesResolution: OptionalConfigValue<Bool> = .fastlaneDefault(false),
                                   disablePackageAutomaticUpdates: OptionalConfigValue<Bool> = .fastlaneDefault(false),
+                                  skipPackageRepositoryFetches: OptionalConfigValue<Bool> = .fastlaneDefault(false),
+                                  packageAuthorizationProvider: OptionalConfigValue<String?> = .fastlaneDefault(nil),
                                   testplan: OptionalConfigValue<String?> = .fastlaneDefault(nil),
                                   onlyTesting: Any? = nil,
                                   skipTesting: Any? = nil,
@@ -2247,8 +2358,11 @@ public func captureIosScreenshots(workspace: OptionalConfigValue<String?> = .fas
     let concurrentSimulatorsArg = concurrentSimulators.asRubyArgument(name: "concurrent_simulators", type: nil)
     let disableSlideToTypeArg = disableSlideToType.asRubyArgument(name: "disable_slide_to_type", type: nil)
     let clonedSourcePackagesPathArg = clonedSourcePackagesPath.asRubyArgument(name: "cloned_source_packages_path", type: nil)
+    let packageCachePathArg = packageCachePath.asRubyArgument(name: "package_cache_path", type: nil)
     let skipPackageDependenciesResolutionArg = skipPackageDependenciesResolution.asRubyArgument(name: "skip_package_dependencies_resolution", type: nil)
     let disablePackageAutomaticUpdatesArg = disablePackageAutomaticUpdates.asRubyArgument(name: "disable_package_automatic_updates", type: nil)
+    let skipPackageRepositoryFetchesArg = skipPackageRepositoryFetches.asRubyArgument(name: "skip_package_repository_fetches", type: nil)
+    let packageAuthorizationProviderArg = packageAuthorizationProvider.asRubyArgument(name: "package_authorization_provider", type: nil)
     let testplanArg = testplan.asRubyArgument(name: "testplan", type: nil)
     let onlyTestingArg = RubyCommand.Argument(name: "only_testing", value: onlyTesting, type: nil)
     let skipTestingArg = RubyCommand.Argument(name: "skip_testing", value: skipTesting, type: nil)
@@ -2296,8 +2410,11 @@ public func captureIosScreenshots(workspace: OptionalConfigValue<String?> = .fas
                                           concurrentSimulatorsArg,
                                           disableSlideToTypeArg,
                                           clonedSourcePackagesPathArg,
+                                          packageCachePathArg,
                                           skipPackageDependenciesResolutionArg,
                                           disablePackageAutomaticUpdatesArg,
+                                          skipPackageRepositoryFetchesArg,
+                                          packageAuthorizationProviderArg,
                                           testplanArg,
                                           onlyTestingArg,
                                           skipTestingArg,
@@ -2317,8 +2434,8 @@ public func captureIosScreenshots(workspace: OptionalConfigValue<String?> = .fas
  Alias for the `capture_ios_screenshots` action
 
  - parameters:
-   - workspace: Path the workspace file
-   - project: Path the project file
+   - workspace: Path to the workspace file
+   - project: Path to the project file
    - xcargs: Pass additional arguments to xcodebuild for the test phase. Be sure to quote the setting names and values e.g. OTHER_LDFLAGS="-ObjC -lstdc++"
    - xcconfig: Use an extra XCCONFIG file to build your app
    - devices: A list of devices you want to take the screenshots from
@@ -2356,8 +2473,11 @@ public func captureIosScreenshots(workspace: OptionalConfigValue<String?> = .fas
    - concurrentSimulators: Take snapshots on multiple simulators concurrently. Note: This option is only applicable when running against Xcode 9
    - disableSlideToType: Disable the simulator from showing the 'Slide to type' prompt
    - clonedSourcePackagesPath: Sets a custom path for Swift Package Manager dependencies
+   - packageCachePath: Sets a custom package cache path for Swift Package Manager dependencies
    - skipPackageDependenciesResolution: Skips resolution of Swift Package Manager dependencies
-   - disablePackageAutomaticUpdates: Prevents packages from automatically being resolved to versions other than those recorded in the `Package.resolved` file
+   - disablePackageAutomaticUpdates: Prevents packages from automatically being resolved to versions other than those recorded in the `Package.resolved` file. This translates in the option `-disableAutomaticPackageResolution` being passed to xcodebuild
+   - skipPackageRepositoryFetches: Skips updating package dependencies from their remote. This translates in the option `-skipPackageUpdates` being passed to xcodebuild
+   - packageAuthorizationProvider: Lets xcodebuild use a specified package authorization provider (keychain|netrc)
    - testplan: The testplan associated with the scheme that should be used for testing
    - onlyTesting: Array of strings matching Test Bundle/Test Suite/Test Cases to run
    - skipTesting: Array of strings matching Test Bundle/Test Suite/Test Cases to skip
@@ -2406,8 +2526,11 @@ public func captureScreenshots(workspace: OptionalConfigValue<String?> = .fastla
                                concurrentSimulators: OptionalConfigValue<Bool> = .fastlaneDefault(true),
                                disableSlideToType: OptionalConfigValue<Bool> = .fastlaneDefault(false),
                                clonedSourcePackagesPath: OptionalConfigValue<String?> = .fastlaneDefault(nil),
+                               packageCachePath: OptionalConfigValue<String?> = .fastlaneDefault(nil),
                                skipPackageDependenciesResolution: OptionalConfigValue<Bool> = .fastlaneDefault(false),
                                disablePackageAutomaticUpdates: OptionalConfigValue<Bool> = .fastlaneDefault(false),
+                               skipPackageRepositoryFetches: OptionalConfigValue<Bool> = .fastlaneDefault(false),
+                               packageAuthorizationProvider: OptionalConfigValue<String?> = .fastlaneDefault(nil),
                                testplan: OptionalConfigValue<String?> = .fastlaneDefault(nil),
                                onlyTesting: Any? = nil,
                                skipTesting: Any? = nil,
@@ -2456,8 +2579,11 @@ public func captureScreenshots(workspace: OptionalConfigValue<String?> = .fastla
     let concurrentSimulatorsArg = concurrentSimulators.asRubyArgument(name: "concurrent_simulators", type: nil)
     let disableSlideToTypeArg = disableSlideToType.asRubyArgument(name: "disable_slide_to_type", type: nil)
     let clonedSourcePackagesPathArg = clonedSourcePackagesPath.asRubyArgument(name: "cloned_source_packages_path", type: nil)
+    let packageCachePathArg = packageCachePath.asRubyArgument(name: "package_cache_path", type: nil)
     let skipPackageDependenciesResolutionArg = skipPackageDependenciesResolution.asRubyArgument(name: "skip_package_dependencies_resolution", type: nil)
     let disablePackageAutomaticUpdatesArg = disablePackageAutomaticUpdates.asRubyArgument(name: "disable_package_automatic_updates", type: nil)
+    let skipPackageRepositoryFetchesArg = skipPackageRepositoryFetches.asRubyArgument(name: "skip_package_repository_fetches", type: nil)
+    let packageAuthorizationProviderArg = packageAuthorizationProvider.asRubyArgument(name: "package_authorization_provider", type: nil)
     let testplanArg = testplan.asRubyArgument(name: "testplan", type: nil)
     let onlyTestingArg = RubyCommand.Argument(name: "only_testing", value: onlyTesting, type: nil)
     let skipTestingArg = RubyCommand.Argument(name: "skip_testing", value: skipTesting, type: nil)
@@ -2505,8 +2631,11 @@ public func captureScreenshots(workspace: OptionalConfigValue<String?> = .fastla
                                           concurrentSimulatorsArg,
                                           disableSlideToTypeArg,
                                           clonedSourcePackagesPathArg,
+                                          packageCachePathArg,
                                           skipPackageDependenciesResolutionArg,
                                           disablePackageAutomaticUpdatesArg,
+                                          skipPackageRepositoryFetchesArg,
+                                          packageAuthorizationProviderArg,
                                           testplanArg,
                                           onlyTestingArg,
                                           skipTestingArg,
@@ -2661,7 +2790,7 @@ public func cert(development: OptionalConfigValue<Bool> = .fastlaneDefault(false
                  teamName: OptionalConfigValue<String?> = .fastlaneDefault(nil),
                  filename: OptionalConfigValue<String?> = .fastlaneDefault(nil),
                  outputPath: String = ".",
-                 keychainPath: String,
+                 keychainPath: OptionalConfigValue<String?> = .fastlaneDefault(nil),
                  keychainPassword: OptionalConfigValue<String?> = .fastlaneDefault(nil),
                  skipSetPartitionList: OptionalConfigValue<Bool> = .fastlaneDefault(false),
                  platform: String = "ios")
@@ -2677,7 +2806,7 @@ public func cert(development: OptionalConfigValue<Bool> = .fastlaneDefault(false
     let teamNameArg = teamName.asRubyArgument(name: "team_name", type: nil)
     let filenameArg = filename.asRubyArgument(name: "filename", type: nil)
     let outputPathArg = RubyCommand.Argument(name: "output_path", value: outputPath, type: nil)
-    let keychainPathArg = RubyCommand.Argument(name: "keychain_path", value: keychainPath, type: nil)
+    let keychainPathArg = keychainPath.asRubyArgument(name: "keychain_path", type: nil)
     let keychainPasswordArg = keychainPassword.asRubyArgument(name: "keychain_password", type: nil)
     let skipSetPartitionListArg = skipSetPartitionList.asRubyArgument(name: "skip_set_partition_list", type: nil)
     let platformArg = RubyCommand.Argument(name: "platform", value: platform, type: nil)
@@ -2718,6 +2847,7 @@ public func cert(development: OptionalConfigValue<Bool> = .fastlaneDefault(false
    - quiet: Whether or not to disable changelog output
    - includeMerges: **DEPRECATED!** Use `:merge_commit_filtering` instead - Whether or not to include any commits that are merges
    - mergeCommitFiltering: Controls inclusion of merge commits when collecting the changelog. Valid values: 'include_merges', 'exclude_merges', 'only_include_merges'
+   - appPath: Scopes the changelog to a specific subdirectory of the repository
 
  - returns: Returns a String containing your formatted git commits
 
@@ -2733,7 +2863,8 @@ public func cert(development: OptionalConfigValue<Bool> = .fastlaneDefault(false
                                                        matchLightweightTag: OptionalConfigValue<Bool> = .fastlaneDefault(true),
                                                        quiet: OptionalConfigValue<Bool> = .fastlaneDefault(false),
                                                        includeMerges: OptionalConfigValue<Bool?> = .fastlaneDefault(nil),
-                                                       mergeCommitFiltering: String = "include_merges") -> String
+                                                       mergeCommitFiltering: String = "include_merges",
+                                                       appPath: OptionalConfigValue<String?> = .fastlaneDefault(nil)) -> String
 {
     let betweenArg = between.asRubyArgument(name: "between", type: nil)
     let commitsCountArg = commitsCount.asRubyArgument(name: "commits_count", type: nil)
@@ -2746,6 +2877,7 @@ public func cert(development: OptionalConfigValue<Bool> = .fastlaneDefault(false
     let quietArg = quiet.asRubyArgument(name: "quiet", type: nil)
     let includeMergesArg = includeMerges.asRubyArgument(name: "include_merges", type: nil)
     let mergeCommitFilteringArg = RubyCommand.Argument(name: "merge_commit_filtering", value: mergeCommitFiltering, type: nil)
+    let appPathArg = appPath.asRubyArgument(name: "app_path", type: nil)
     let array: [RubyCommand.Argument?] = [betweenArg,
                                           commitsCountArg,
                                           pathArg,
@@ -2756,7 +2888,8 @@ public func cert(development: OptionalConfigValue<Bool> = .fastlaneDefault(false
                                           matchLightweightTagArg,
                                           quietArg,
                                           includeMergesArg,
-                                          mergeCommitFilteringArg]
+                                          mergeCommitFilteringArg,
+                                          appPathArg]
     let args: [RubyCommand.Argument] = array
         .filter { $0?.value != nil }
         .compactMap { $0 }
@@ -3013,15 +3146,6 @@ public func cloc(binaryPath: String = "/usr/local/bin/cloc",
 }
 
 /**
- Print a Club Mate in your build output
- */
-public func clubmate() {
-    let args: [RubyCommand.Argument] = []
-    let command = RubyCommand(commandID: "", methodName: "clubmate", className: nil, args: args)
-    _ = runner.executeCommand(command)
-}
-
-/**
  Runs `pod install` for the project
 
  - parameters:
@@ -3095,7 +3219,7 @@ public func cocoapods(repoUpdate: OptionalConfigValue<Bool> = .fastlaneDefault(f
     - repositoryName: The path to your repo, e.g. 'fastlane/fastlane'
     - serverUrl: The server url. e.g. 'https://your.internal.github.host/api/v3' (Default: 'https://api.github.com')
     - apiToken: Personal API Token for GitHub - generate one at https://github.com/settings/tokens
-    - apiBearer: Use a Bearer authorization token. Usually generated by Github Apps, e.g. GitHub Actions GITHUB_TOKEN environment variable
+    - apiBearer: Use a Bearer authorization token. Usually generated by GitHub Apps, e.g. GitHub Actions GITHUB_TOKEN environment variable
     - branch: The branch that the file should be committed on (default: master)
     - path: The relative path to your file from project root e.g. assets/my_app.xcarchive
     - message: The commit message. Defaults to the file name
@@ -3227,8 +3351,8 @@ public func copyArtifacts(keepOriginal: OptionalConfigValue<Bool> = .fastlaneDef
  Create Managed Google Play Apps
 
  - parameters:
-   - jsonKey: The path to a file containing service account JSON, used to authenticate with Google
-   - jsonKeyData: The raw service account JSON data used to authenticate with Google
+   - jsonKey: The path to a Google credentials JSON file (Application Default, Workload Identity, or Service Account), used to authenticate with Google
+   - jsonKeyData: The raw content of a Google credentials JSON file (Application Default, Workload Identity, or Service Account) used to authenticate with Google
    - developerAccountId: The ID of your Google Play Console account. Can be obtained from the URL when you log in (`https://play.google.com/apps/publish/?account=...` or when you 'Obtain private app publishing rights' (https://developers.google.com/android/work/play/custom-app-api/get-started#retrieve_the_developer_account_id)
    - apk: Path to the APK file to upload
    - appTitle: App Title
@@ -3287,7 +3411,7 @@ public func createAppOnManagedPlayStore(jsonKey: OptionalConfigValue<String?> = 
    - skipItc: Skip the creation of the app on App Store Connect
    - itcUsers: Array of App Store Connect users. If provided, you can limit access to this newly created app for users with the App Manager, Developer, Marketer or Sales roles
    - enabledFeatures: **DEPRECATED!** Please use `enable_services` instead - Array with Spaceship App Services
-   - enableServices: Array with Spaceship App Services (e.g. access_wifi: (on|off), app_attest: (on|off), app_group: (on|off), apple_pay: (on|off), associated_domains: (on|off), auto_fill_credential: (on|off), class_kit: (on|off), icloud: (legacy|cloudkit), custom_network_protocol: (on|off), data_protection: (complete|unlessopen|untilfirstauth), extended_virtual_address_space: (on|off), family_controls: (on|off), file_provider_testing_mode: (on|off), fonts: (on|off), game_center: (ios|mac), health_kit: (on|off), hls_interstitial_preview: (on|off), home_kit: (on|off), hotspot: (on|off), in_app_purchase: (on|off), inter_app_audio: (on|off), low_latency_hls: (on|off), managed_associated_domains: (on|off), maps: (on|off), multipath: (on|off), network_extension: (on|off), nfc_tag_reading: (on|off), personal_vpn: (on|off), passbook: (on|off), push_notification: (on|off), sign_in_with_apple: (on), siri_kit: (on|off), system_extension: (on|off), user_management: (on|off), vpn_configuration: (on|off), wallet: (on|off), wireless_accessory: (on|off), car_play_audio_app: (on|off), car_play_messaging_app: (on|off), car_play_navigation_app: (on|off), car_play_voip_calling_app: (on|off), critical_alerts: (on|off), hotspot_helper: (on|off), driver_kit: (on|off), driver_kit_endpoint_security: (on|off), driver_kit_family_hid_device: (on|off), driver_kit_family_networking: (on|off), driver_kit_family_serial: (on|off), driver_kit_hid_event_service: (on|off), driver_kit_transport_hid: (on|off), multitasking_camera_access: (on|off), sf_universal_link_api: (on|off), vp9_decoder: (on|off), music_kit: (on|off), shazam_kit: (on|off), communication_notifications: (on|off), group_activities: (on|off), health_kit_estimate_recalibration: (on|off), time_sensitive_notifications: (on|off))
+   - enableServices: Array with Spaceship App Services (e.g. access_wifi: (on|off), app_attest: (on|off), app_group: (on|off), apple_pay: (on|off), associated_domains: (on|off), auto_fill_credential: (on|off), class_kit: (on|off), declared_age_range: (on|off), icloud: (legacy|cloudkit), custom_network_protocol: (on|off), data_protection: (complete|unlessopen|untilfirstauth), extended_virtual_address_space: (on|off), family_controls: (on|off), file_provider_testing_mode: (on|off), fonts: (on|off), game_center: (ios|mac), health_kit: (on|off), hls_interstitial_preview: (on|off), home_kit: (on|off), hotspot: (on|off), in_app_purchase: (on|off), inter_app_audio: (on|off), low_latency_hls: (on|off), managed_associated_domains: (on|off), maps: (on|off), multipath: (on|off), network_extension: (on|off), nfc_tag_reading: (on|off), personal_vpn: (on|off), passbook: (on|off), push_notification: (on|off), sign_in_with_apple: (on), siri_kit: (on|off), system_extension: (on|off), user_management: (on|off), vpn_configuration: (on|off), wallet: (on|off), wireless_accessory: (on|off), car_play_audio_app: (on|off), car_play_messaging_app: (on|off), car_play_navigation_app: (on|off), car_play_voip_calling_app: (on|off), critical_alerts: (on|off), hotspot_helper: (on|off), driver_kit: (on|off), driver_kit_endpoint_security: (on|off), driver_kit_family_hid_device: (on|off), driver_kit_family_networking: (on|off), driver_kit_family_serial: (on|off), driver_kit_hid_event_service: (on|off), driver_kit_transport_hid: (on|off), multitasking_camera_access: (on|off), sf_universal_link_api: (on|off), vp9_decoder: (on|off), music_kit: (on|off), shazam_kit: (on|off), communication_notifications: (on|off), group_activities: (on|off), health_kit_estimate_recalibration: (on|off), time_sensitive_notifications: (on|off))
    - skipDevcenter: Skip the creation of the app on the Apple Developer Portal
    - teamId: The ID of your Developer Portal team if you're in multiple teams
    - teamName: The name of your Developer Portal team if you're in multiple teams
@@ -3421,7 +3545,7 @@ public func createKeychain(name: OptionalConfigValue<String?> = .fastlaneDefault
 
  - parameters:
    - apiToken: Personal API Token for GitHub - generate one at https://github.com/settings/tokens
-   - apiBearer: Use a Bearer authorization token. Usually generated by Github Apps, e.g. GitHub Actions GITHUB_TOKEN environment variable
+   - apiBearer: Use a Bearer authorization token. Usually generated by GitHub Apps, e.g. GitHub Actions GITHUB_TOKEN environment variable
    - repo: The name of the repository you want to submit the pull request to
    - title: The title of the pull request
    - body: The contents of the pull request
@@ -3687,28 +3811,36 @@ public func deleteKeychain(name: OptionalConfigValue<String?> = .fastlaneDefault
    - useLiveVersion: Force usage of live version rather than edit version
    - metadataPath: Path to the folder containing the metadata files
    - screenshotsPath: Path to the folder containing the screenshots
+   - appClipHeaderImagesPath: Path to the folder containing the app clip header images
+   - appClipDefaultExperienceMetadataPath: Path to the folder containing the app clip default experience metadata
+   - appPreviewsPath: Path to the folder containing localized App Preview videos
+   - previewFrameTimeCode: Time code for the App Preview still frame written as hour:minute:second:centisecond (e.g. 00:00:00:01)
+   - overwritePreviewVideos: Clear all previously uploaded App Preview videos before uploading the new ones
    - skipBinaryUpload: Skip uploading an ipa or pkg to App Store Connect
    - skipScreenshots: Don't upload the screenshots
    - skipMetadata: Don't upload the metadata (e.g. title, description). This will still upload screenshots
    - skipAppVersionUpdate: Don’t create or update the app version that is being prepared for submission
    - force: Skip verification of HTML preview file
    - overwriteScreenshots: Clear all previously uploaded screenshots before uploading the new ones
+   - screenshotProcessingTimeout: Timeout in seconds to wait before considering screenshot processing as failed, used to handle cases where uploads to the App Store are stuck in processing
    - syncScreenshots: Sync screenshots with local ones. This is currently beta option so set true to 'FASTLANE_ENABLE_BETA_DELIVER_SYNC_SCREENSHOTS' environment variable as well
    - submitForReview: Submit the new version for Review after uploading everything
    - verifyOnly: Verifies archive with App Store Connect without uploading
    - rejectIfPossible: Rejects the previously submitted build if it's in a state where it's possible
-   - automaticRelease: Should the app be automatically released once it's approved? (Can not be used together with `auto_release_date`)
-   - autoReleaseDate: Date in milliseconds for automatically releasing on pending approval (Can not be used together with `automatic_release`)
+   - versionCheckWaitRetryLimit: After submitting a new version, App Store Connect takes some time to recognize the new version and we must wait until it's available before attempting to upload metadata for it. There is a mechanism that will check if it's available and retry with an exponential backoff if it's not available yet. This option specifies how many times we should retry before giving up. Setting this to a value below 5 is not recommended and will likely cause failures. Increase this parameter when Apple servers seem to be degraded or slow
+   - automaticRelease: Should the app be automatically released once it's approved? (Cannot be used together with `auto_release_date`)
+   - autoReleaseDate: Date in milliseconds for automatically releasing on pending approval (Cannot be used together with `automatic_release`)
    - phasedRelease: Enable the phased release feature of iTC
    - resetRatings: Reset the summary rating when you release a new version of the application
    - priceTier: The price tier of this application
    - appRatingConfigPath: Path to the app rating's config
-   - submissionInformation: Extra information for the submission (e.g. compliance specifications, IDFA settings)
+   - submissionInformation: Extra information for the submission (e.g. compliance specifications)
    - teamId: The ID of your App Store Connect team if you're in multiple teams
    - teamName: The name of your App Store Connect team if you're in multiple teams
    - devPortalTeamId: The short ID of your Developer Portal team, if you're in multiple teams. Different from your iTC team ID!
    - devPortalTeamName: The name of your Developer Portal team if you're in multiple teams
    - itcProvider: The provider short name to be used with the iTMSTransporter to identify your team. This value will override the automatically detected provider short name. To get provider short name run `pathToXcode.app/Contents/Applications/Application\ Loader.app/Contents/itms/bin/iTMSTransporter -m provider -u 'USERNAME' -p 'PASSWORD' -account_type itunes_connect -v off`. The short names of providers should be listed in the second column
+   - providerPublicId: The provider public ID to be used with altool (--provider-public-id). This value will override the automatically detected provider value for altool uploads. Required after Xcode 26 when your account is associated with multiple providers and using username/app-password authentication
    - runPrecheckBeforeSubmit: Run precheck before submitting to app review
    - precheckDefaultRuleLevel: The default precheck rule level unless otherwise configured
    - individualMetadataItems: **DEPRECATED!** Removed after the migration to the new App Store Connect API in June 2020 - An array of localized metadata items to upload individually by language so that errors can be identified. E.g. ['name', 'keywords', 'description']. Note: slow
@@ -3723,6 +3855,7 @@ public func deleteKeychain(name: OptionalConfigValue<String?> = .fastlaneDefault
    - secondarySecondSubCategory: Metadata: The english name of the secondary second sub category (e.g. `Educational`, `Puzzle`)
    - tradeRepresentativeContactInformation: **DEPRECATED!** This is no longer used by App Store Connect - Metadata: A hash containing the trade representative contact information
    - appReviewInformation: Metadata: A hash containing the review information
+   - appClipReviewInformation: Metadata: A hash containing the app clip review information
    - appReviewAttachmentFile: Metadata: Path to the app review attachment file
    - description: Metadata: The localised app description
    - name: Metadata: The localised app name
@@ -3737,6 +3870,8 @@ public func deleteKeychain(name: OptionalConfigValue<String?> = .fastlaneDefault
    - languages: Metadata: List of languages to activate
    - ignoreLanguageDirectoryValidation: Ignore errors when invalid languages are found in metadata and screenshot directories
    - precheckIncludeInAppPurchases: Should precheck check in-app purchases?
+   - appClipDefaultExperienceSubtitle: The localized subtitle for the default app clip experience
+   - appClipDefaultExperienceAction: Action for the default app clip experience (OPEN, VIEW, PLAY)
    - app: The (spaceship) app ID of the app you want to use/modify
 
  Using _upload_to_app_store_ after _build_app_ and _capture_screenshots_ will automatically upload the latest ipa and screenshots with no other configuration.
@@ -3744,7 +3879,7 @@ public func deleteKeychain(name: OptionalConfigValue<String?> = .fastlaneDefault
  If you don't want to verify an HTML preview for App Store builds, use the `:force` option.
  This is useful when running _fastlane_ on your Continuous Integration server:
  `_upload_to_app_store_(force: true)`
- If your account is on multiple teams and you need to tell the `iTMSTransporter` which 'provider' to use, you can set the `:itc_provider` option to pass this info.
+ If your account is on multiple teams and you need to tell the transporter which provider to use, you can set `:itc_provider` or `:provider_public_id`.
  */
 public func deliver(apiKeyPath: OptionalConfigValue<String?> = .fastlaneDefault(deliverfile.apiKeyPath),
                     apiKey: OptionalConfigValue<[String: Any]?> = .fastlaneDefault(deliverfile.apiKey),
@@ -3759,16 +3894,23 @@ public func deliver(apiKeyPath: OptionalConfigValue<String?> = .fastlaneDefault(
                     useLiveVersion: OptionalConfigValue<Bool> = .fastlaneDefault(deliverfile.useLiveVersion),
                     metadataPath: OptionalConfigValue<String?> = .fastlaneDefault(deliverfile.metadataPath),
                     screenshotsPath: OptionalConfigValue<String?> = .fastlaneDefault(deliverfile.screenshotsPath),
+                    appClipHeaderImagesPath: OptionalConfigValue<String?> = .fastlaneDefault(deliverfile.appClipHeaderImagesPath),
+                    appClipDefaultExperienceMetadataPath: OptionalConfigValue<String?> = .fastlaneDefault(deliverfile.appClipDefaultExperienceMetadataPath),
+                    appPreviewsPath: OptionalConfigValue<String?> = .fastlaneDefault(deliverfile.appPreviewsPath),
+                    previewFrameTimeCode: String = deliverfile.previewFrameTimeCode,
+                    overwritePreviewVideos: OptionalConfigValue<Bool> = .fastlaneDefault(deliverfile.overwritePreviewVideos),
                     skipBinaryUpload: OptionalConfigValue<Bool> = .fastlaneDefault(deliverfile.skipBinaryUpload),
                     skipScreenshots: OptionalConfigValue<Bool> = .fastlaneDefault(deliverfile.skipScreenshots),
                     skipMetadata: OptionalConfigValue<Bool> = .fastlaneDefault(deliverfile.skipMetadata),
                     skipAppVersionUpdate: OptionalConfigValue<Bool> = .fastlaneDefault(deliverfile.skipAppVersionUpdate),
                     force: OptionalConfigValue<Bool> = .fastlaneDefault(deliverfile.force),
                     overwriteScreenshots: OptionalConfigValue<Bool> = .fastlaneDefault(deliverfile.overwriteScreenshots),
+                    screenshotProcessingTimeout: Int = deliverfile.screenshotProcessingTimeout,
                     syncScreenshots: OptionalConfigValue<Bool> = .fastlaneDefault(deliverfile.syncScreenshots),
                     submitForReview: OptionalConfigValue<Bool> = .fastlaneDefault(deliverfile.submitForReview),
                     verifyOnly: OptionalConfigValue<Bool> = .fastlaneDefault(deliverfile.verifyOnly),
                     rejectIfPossible: OptionalConfigValue<Bool> = .fastlaneDefault(deliverfile.rejectIfPossible),
+                    versionCheckWaitRetryLimit: Int = deliverfile.versionCheckWaitRetryLimit,
                     automaticRelease: OptionalConfigValue<Bool?> = .fastlaneDefault(deliverfile.automaticRelease),
                     autoReleaseDate: OptionalConfigValue<Int?> = .fastlaneDefault(deliverfile.autoReleaseDate),
                     phasedRelease: OptionalConfigValue<Bool> = .fastlaneDefault(deliverfile.phasedRelease),
@@ -3781,6 +3923,7 @@ public func deliver(apiKeyPath: OptionalConfigValue<String?> = .fastlaneDefault(
                     devPortalTeamId: OptionalConfigValue<String?> = .fastlaneDefault(deliverfile.devPortalTeamId),
                     devPortalTeamName: OptionalConfigValue<String?> = .fastlaneDefault(deliverfile.devPortalTeamName),
                     itcProvider: OptionalConfigValue<String?> = .fastlaneDefault(deliverfile.itcProvider),
+                    providerPublicId: OptionalConfigValue<String?> = .fastlaneDefault(deliverfile.providerPublicId),
                     runPrecheckBeforeSubmit: OptionalConfigValue<Bool> = .fastlaneDefault(deliverfile.runPrecheckBeforeSubmit),
                     precheckDefaultRuleLevel: Any = deliverfile.precheckDefaultRuleLevel,
                     individualMetadataItems: OptionalConfigValue<[String]?> = .fastlaneDefault(deliverfile.individualMetadataItems),
@@ -3795,6 +3938,7 @@ public func deliver(apiKeyPath: OptionalConfigValue<String?> = .fastlaneDefault(
                     secondarySecondSubCategory: OptionalConfigValue<String?> = .fastlaneDefault(deliverfile.secondarySecondSubCategory),
                     tradeRepresentativeContactInformation: OptionalConfigValue<[String: Any]?> = .fastlaneDefault(deliverfile.tradeRepresentativeContactInformation),
                     appReviewInformation: OptionalConfigValue<[String: Any]?> = .fastlaneDefault(deliverfile.appReviewInformation),
+                    appClipReviewInformation: OptionalConfigValue<[String: Any]?> = .fastlaneDefault(deliverfile.appClipReviewInformation),
                     appReviewAttachmentFile: OptionalConfigValue<String?> = .fastlaneDefault(deliverfile.appReviewAttachmentFile),
                     description: OptionalConfigValue<[String: Any]?> = .fastlaneDefault(deliverfile.description),
                     name: OptionalConfigValue<[String: Any]?> = .fastlaneDefault(deliverfile.name),
@@ -3809,6 +3953,8 @@ public func deliver(apiKeyPath: OptionalConfigValue<String?> = .fastlaneDefault(
                     languages: OptionalConfigValue<[String]?> = .fastlaneDefault(deliverfile.languages),
                     ignoreLanguageDirectoryValidation: OptionalConfigValue<Bool> = .fastlaneDefault(deliverfile.ignoreLanguageDirectoryValidation),
                     precheckIncludeInAppPurchases: OptionalConfigValue<Bool> = .fastlaneDefault(deliverfile.precheckIncludeInAppPurchases),
+                    appClipDefaultExperienceSubtitle: OptionalConfigValue<[String: Any]?> = .fastlaneDefault(deliverfile.appClipDefaultExperienceSubtitle),
+                    appClipDefaultExperienceAction: OptionalConfigValue<String?> = .fastlaneDefault(deliverfile.appClipDefaultExperienceAction),
                     app: OptionalConfigValue<Int?> = .fastlaneDefault(deliverfile.app))
 {
     let apiKeyPathArg = apiKeyPath.asRubyArgument(name: "api_key_path", type: nil)
@@ -3824,16 +3970,23 @@ public func deliver(apiKeyPath: OptionalConfigValue<String?> = .fastlaneDefault(
     let useLiveVersionArg = useLiveVersion.asRubyArgument(name: "use_live_version", type: nil)
     let metadataPathArg = metadataPath.asRubyArgument(name: "metadata_path", type: nil)
     let screenshotsPathArg = screenshotsPath.asRubyArgument(name: "screenshots_path", type: nil)
+    let appClipHeaderImagesPathArg = appClipHeaderImagesPath.asRubyArgument(name: "app_clip_header_images_path", type: nil)
+    let appClipDefaultExperienceMetadataPathArg = appClipDefaultExperienceMetadataPath.asRubyArgument(name: "app_clip_default_experience_metadata_path", type: nil)
+    let appPreviewsPathArg = appPreviewsPath.asRubyArgument(name: "app_previews_path", type: nil)
+    let previewFrameTimeCodeArg = RubyCommand.Argument(name: "preview_frame_time_code", value: previewFrameTimeCode, type: nil)
+    let overwritePreviewVideosArg = overwritePreviewVideos.asRubyArgument(name: "overwrite_preview_videos", type: nil)
     let skipBinaryUploadArg = skipBinaryUpload.asRubyArgument(name: "skip_binary_upload", type: nil)
     let skipScreenshotsArg = skipScreenshots.asRubyArgument(name: "skip_screenshots", type: nil)
     let skipMetadataArg = skipMetadata.asRubyArgument(name: "skip_metadata", type: nil)
     let skipAppVersionUpdateArg = skipAppVersionUpdate.asRubyArgument(name: "skip_app_version_update", type: nil)
     let forceArg = force.asRubyArgument(name: "force", type: nil)
     let overwriteScreenshotsArg = overwriteScreenshots.asRubyArgument(name: "overwrite_screenshots", type: nil)
+    let screenshotProcessingTimeoutArg = RubyCommand.Argument(name: "screenshot_processing_timeout", value: screenshotProcessingTimeout, type: nil)
     let syncScreenshotsArg = syncScreenshots.asRubyArgument(name: "sync_screenshots", type: nil)
     let submitForReviewArg = submitForReview.asRubyArgument(name: "submit_for_review", type: nil)
     let verifyOnlyArg = verifyOnly.asRubyArgument(name: "verify_only", type: nil)
     let rejectIfPossibleArg = rejectIfPossible.asRubyArgument(name: "reject_if_possible", type: nil)
+    let versionCheckWaitRetryLimitArg = RubyCommand.Argument(name: "version_check_wait_retry_limit", value: versionCheckWaitRetryLimit, type: nil)
     let automaticReleaseArg = automaticRelease.asRubyArgument(name: "automatic_release", type: nil)
     let autoReleaseDateArg = autoReleaseDate.asRubyArgument(name: "auto_release_date", type: nil)
     let phasedReleaseArg = phasedRelease.asRubyArgument(name: "phased_release", type: nil)
@@ -3846,6 +3999,7 @@ public func deliver(apiKeyPath: OptionalConfigValue<String?> = .fastlaneDefault(
     let devPortalTeamIdArg = devPortalTeamId.asRubyArgument(name: "dev_portal_team_id", type: nil)
     let devPortalTeamNameArg = devPortalTeamName.asRubyArgument(name: "dev_portal_team_name", type: nil)
     let itcProviderArg = itcProvider.asRubyArgument(name: "itc_provider", type: nil)
+    let providerPublicIdArg = providerPublicId.asRubyArgument(name: "provider_public_id", type: nil)
     let runPrecheckBeforeSubmitArg = runPrecheckBeforeSubmit.asRubyArgument(name: "run_precheck_before_submit", type: nil)
     let precheckDefaultRuleLevelArg = RubyCommand.Argument(name: "precheck_default_rule_level", value: precheckDefaultRuleLevel, type: nil)
     let individualMetadataItemsArg = individualMetadataItems.asRubyArgument(name: "individual_metadata_items", type: nil)
@@ -3860,6 +4014,7 @@ public func deliver(apiKeyPath: OptionalConfigValue<String?> = .fastlaneDefault(
     let secondarySecondSubCategoryArg = secondarySecondSubCategory.asRubyArgument(name: "secondary_second_sub_category", type: nil)
     let tradeRepresentativeContactInformationArg = tradeRepresentativeContactInformation.asRubyArgument(name: "trade_representative_contact_information", type: nil)
     let appReviewInformationArg = appReviewInformation.asRubyArgument(name: "app_review_information", type: nil)
+    let appClipReviewInformationArg = appClipReviewInformation.asRubyArgument(name: "app_clip_review_information", type: nil)
     let appReviewAttachmentFileArg = appReviewAttachmentFile.asRubyArgument(name: "app_review_attachment_file", type: nil)
     let descriptionArg = description.asRubyArgument(name: "description", type: nil)
     let nameArg = name.asRubyArgument(name: "name", type: nil)
@@ -3874,6 +4029,8 @@ public func deliver(apiKeyPath: OptionalConfigValue<String?> = .fastlaneDefault(
     let languagesArg = languages.asRubyArgument(name: "languages", type: nil)
     let ignoreLanguageDirectoryValidationArg = ignoreLanguageDirectoryValidation.asRubyArgument(name: "ignore_language_directory_validation", type: nil)
     let precheckIncludeInAppPurchasesArg = precheckIncludeInAppPurchases.asRubyArgument(name: "precheck_include_in_app_purchases", type: nil)
+    let appClipDefaultExperienceSubtitleArg = appClipDefaultExperienceSubtitle.asRubyArgument(name: "app_clip_default_experience_subtitle", type: nil)
+    let appClipDefaultExperienceActionArg = appClipDefaultExperienceAction.asRubyArgument(name: "app_clip_default_experience_action", type: nil)
     let appArg = app.asRubyArgument(name: "app", type: nil)
     let array: [RubyCommand.Argument?] = [apiKeyPathArg,
                                           apiKeyArg,
@@ -3888,16 +4045,23 @@ public func deliver(apiKeyPath: OptionalConfigValue<String?> = .fastlaneDefault(
                                           useLiveVersionArg,
                                           metadataPathArg,
                                           screenshotsPathArg,
+                                          appClipHeaderImagesPathArg,
+                                          appClipDefaultExperienceMetadataPathArg,
+                                          appPreviewsPathArg,
+                                          previewFrameTimeCodeArg,
+                                          overwritePreviewVideosArg,
                                           skipBinaryUploadArg,
                                           skipScreenshotsArg,
                                           skipMetadataArg,
                                           skipAppVersionUpdateArg,
                                           forceArg,
                                           overwriteScreenshotsArg,
+                                          screenshotProcessingTimeoutArg,
                                           syncScreenshotsArg,
                                           submitForReviewArg,
                                           verifyOnlyArg,
                                           rejectIfPossibleArg,
+                                          versionCheckWaitRetryLimitArg,
                                           automaticReleaseArg,
                                           autoReleaseDateArg,
                                           phasedReleaseArg,
@@ -3910,6 +4074,7 @@ public func deliver(apiKeyPath: OptionalConfigValue<String?> = .fastlaneDefault(
                                           devPortalTeamIdArg,
                                           devPortalTeamNameArg,
                                           itcProviderArg,
+                                          providerPublicIdArg,
                                           runPrecheckBeforeSubmitArg,
                                           precheckDefaultRuleLevelArg,
                                           individualMetadataItemsArg,
@@ -3924,6 +4089,7 @@ public func deliver(apiKeyPath: OptionalConfigValue<String?> = .fastlaneDefault(
                                           secondarySecondSubCategoryArg,
                                           tradeRepresentativeContactInformationArg,
                                           appReviewInformationArg,
+                                          appClipReviewInformationArg,
                                           appReviewAttachmentFileArg,
                                           descriptionArg,
                                           nameArg,
@@ -3938,6 +4104,8 @@ public func deliver(apiKeyPath: OptionalConfigValue<String?> = .fastlaneDefault(
                                           languagesArg,
                                           ignoreLanguageDirectoryValidationArg,
                                           precheckIncludeInAppPurchasesArg,
+                                          appClipDefaultExperienceSubtitleArg,
+                                          appClipDefaultExperienceActionArg,
                                           appArg]
     let args: [RubyCommand.Argument] = array
         .filter { $0?.value != nil }
@@ -4079,7 +4247,7 @@ public func downloadAppPrivacyDetailsFromAppStore(username: String,
    - appIdentifier: The bundle identifier of your app
    - teamId: The ID of your App Store Connect team if you're in multiple teams
    - teamName: The name of your App Store Connect team if you're in multiple teams
-   - platform: The app platform for dSYMs you wish to download (ios, appletvos)
+   - platform: The app platform for dSYMs you wish to download (ios, xros, appletvos)
    - version: The app version for dSYMs you wish to download, pass in 'latest' to download only the latest build's dSYMs or 'live' to download only the live version dSYMs
    - buildNumber: The app build_number for dSYMs you wish to download
    - minVersion: The minimum app version for dSYMs you wish to download
@@ -4159,8 +4327,8 @@ public func downloadDsyms(apiKeyPath: OptionalConfigValue<String?> = .fastlaneDe
    - metadataPath: Path to the directory containing the metadata files
    - key: **DEPRECATED!** Use `--json_key` instead - The p12 File used to authenticate with Google
    - issuer: **DEPRECATED!** Use `--json_key` instead - The issuer of the p12 file (email address of the service account)
-   - jsonKey: The path to a file containing service account JSON, used to authenticate with Google
-   - jsonKeyData: The raw service account JSON data used to authenticate with Google
+   - jsonKey: The path to a Google credentials JSON file (Application Default, Workload Identity, or Service Account), used to authenticate with Google
+   - jsonKeyData: The raw content of a Google credentials JSON file (Application Default, Workload Identity, or Service Account), used to authenticate with Google
    - rootUrl: Root URL for the Google Play API. The provided URL will be used for API calls in place of https://www.googleapis.com/
    - timeout: Timeout for read, open, and send (in seconds)
 
@@ -4210,8 +4378,8 @@ public func downloadFromPlayStore(packageName: String,
  - parameters:
    - packageName: The package name of the application to use
    - versionCode: The versionCode for which to download the generated APK
-   - jsonKey: The path to a file containing service account JSON, used to authenticate with Google
-   - jsonKeyData: The raw service account JSON data used to authenticate with Google
+   - jsonKey: The path to a Google credentials JSON file (Application Default, Workload Identity, or Service Account), used to authenticate with Google
+   - jsonKeyData: The raw content of a Google credentials JSON file (Application Default, Workload Identity, or Service Account), used to authenticate with Google
    - rootUrl: Root URL for the Google Play API. The provided URL will be used for API calls in place of https://www.googleapis.com/
    - timeout: Timeout for read, open, and send (in seconds)
    - destination: The path on disk where to download the Generated Universal APK
@@ -4801,7 +4969,7 @@ public func getCertificates(development: OptionalConfigValue<Bool> = .fastlaneDe
                             teamName: OptionalConfigValue<String?> = .fastlaneDefault(nil),
                             filename: OptionalConfigValue<String?> = .fastlaneDefault(nil),
                             outputPath: String = ".",
-                            keychainPath: String,
+                            keychainPath: OptionalConfigValue<String?> = .fastlaneDefault(nil),
                             keychainPassword: OptionalConfigValue<String?> = .fastlaneDefault(nil),
                             skipSetPartitionList: OptionalConfigValue<Bool> = .fastlaneDefault(false),
                             platform: String = "ios")
@@ -4817,7 +4985,7 @@ public func getCertificates(development: OptionalConfigValue<Bool> = .fastlaneDe
     let teamNameArg = teamName.asRubyArgument(name: "team_name", type: nil)
     let filenameArg = filename.asRubyArgument(name: "filename", type: nil)
     let outputPathArg = RubyCommand.Argument(name: "output_path", value: outputPath, type: nil)
-    let keychainPathArg = RubyCommand.Argument(name: "keychain_path", value: keychainPath, type: nil)
+    let keychainPathArg = keychainPath.asRubyArgument(name: "keychain_path", type: nil)
     let keychainPasswordArg = keychainPassword.asRubyArgument(name: "keychain_password", type: nil)
     let skipSetPartitionListArg = skipSetPartitionList.asRubyArgument(name: "skip_set_partition_list", type: nil)
     let platformArg = RubyCommand.Argument(name: "platform", value: platform, type: nil)
@@ -4851,7 +5019,7 @@ public func getCertificates(development: OptionalConfigValue<Bool> = .fastlaneDe
    - serverUrl: The server url. e.g. 'https://your.github.server/api/v3' (Default: 'https://api.github.com')
    - version: The version tag of the release to check
    - apiToken: GitHub Personal Token (required for private repositories)
-   - apiBearer: Use a Bearer authorization token. Usually generated by Github Apps, e.g. GitHub Actions GITHUB_TOKEN environment variable
+   - apiBearer: Use a Bearer authorization token. Usually generated by GitHub Apps, e.g. GitHub Actions GITHUB_TOKEN environment variable
 
  This will return all information about a release. For example:|
  |
@@ -5022,8 +5190,12 @@ public func getManagedPlayStorePublishingRights(jsonKey: OptionalConfigValue<Str
    - skipCertificateVerification: Skips the verification of the certificates for every existing profiles. This will make sure the provisioning profile can be used on the local machine
    - platform: Set the provisioning profile's platform (i.e. ios, tvos, macos, catalyst)
    - readonly: Only fetch existing profile, don't generate new ones
-   - templateName: The name of provisioning profile template. If the developer account has provisioning profile templates (aka: custom entitlements), the template name can be found by inspecting the Entitlements drop-down while creating/editing a provisioning profile (e.g. "Apple Pay Pass Suppression Development")
+   - templateName: **DEPRECATED!** Removed since May 2025 on App Store Connect API OpenAPI v3.8.0 - Learn more: https://docs.fastlane.tools/actions/match/#managed-capabilities - The name of provisioning profile template. If the developer account has provisioning profile templates (aka: custom entitlements), the template name can be found by inspecting the Entitlements drop-down while creating/editing a provisioning profile (e.g. "Apple Pay Pass Suppression Development")
    - failOnNameTaken: Should the command fail if it was about to create a duplicate of an existing provisioning profile. It can happen due to issues on Apple Developer Portal, when profile to be recreated was not properly deleted first
+   - cachedCertificates: A list of cached certificates
+   - cachedDevices: A list of cached devices
+   - cachedBundleIds: A list of cached bundle ids
+   - cachedProfiles: A list of cached bundle ids
 
  - returns: The UUID of the profile sigh just fetched/generated
 
@@ -5053,7 +5225,11 @@ public func getManagedPlayStorePublishingRights(jsonKey: OptionalConfigValue<Str
                                                       platform: Any = "ios",
                                                       readonly: OptionalConfigValue<Bool> = .fastlaneDefault(false),
                                                       templateName: OptionalConfigValue<String?> = .fastlaneDefault(nil),
-                                                      failOnNameTaken: OptionalConfigValue<Bool> = .fastlaneDefault(false)) -> String
+                                                      failOnNameTaken: OptionalConfigValue<Bool> = .fastlaneDefault(false),
+                                                      cachedCertificates: Any? = nil,
+                                                      cachedDevices: Any? = nil,
+                                                      cachedBundleIds: Any? = nil,
+                                                      cachedProfiles: Any? = nil) -> String
 {
     let adhocArg = adhoc.asRubyArgument(name: "adhoc", type: nil)
     let developerIdArg = developerId.asRubyArgument(name: "developer_id", type: nil)
@@ -5080,6 +5256,10 @@ public func getManagedPlayStorePublishingRights(jsonKey: OptionalConfigValue<Str
     let readonlyArg = readonly.asRubyArgument(name: "readonly", type: nil)
     let templateNameArg = templateName.asRubyArgument(name: "template_name", type: nil)
     let failOnNameTakenArg = failOnNameTaken.asRubyArgument(name: "fail_on_name_taken", type: nil)
+    let cachedCertificatesArg = RubyCommand.Argument(name: "cached_certificates", value: cachedCertificates, type: nil)
+    let cachedDevicesArg = RubyCommand.Argument(name: "cached_devices", value: cachedDevices, type: nil)
+    let cachedBundleIdsArg = RubyCommand.Argument(name: "cached_bundle_ids", value: cachedBundleIds, type: nil)
+    let cachedProfilesArg = RubyCommand.Argument(name: "cached_profiles", value: cachedProfiles, type: nil)
     let array: [RubyCommand.Argument?] = [adhocArg,
                                           developerIdArg,
                                           developmentArg,
@@ -5104,7 +5284,11 @@ public func getManagedPlayStorePublishingRights(jsonKey: OptionalConfigValue<Str
                                           platformArg,
                                           readonlyArg,
                                           templateNameArg,
-                                          failOnNameTakenArg]
+                                          failOnNameTakenArg,
+                                          cachedCertificatesArg,
+                                          cachedDevicesArg,
+                                          cachedBundleIdsArg,
+                                          cachedProfilesArg]
     let args: [RubyCommand.Argument] = array
         .filter { $0?.value != nil }
         .compactMap { $0 }
@@ -5230,17 +5414,21 @@ public func getPushCertificate(platform: String = "ios",
  - parameters:
    - path: The file(s) and path(s) you want to add
    - shellEscape: Shell escapes paths (set to false if using wildcards or manually escaping spaces in :path)
+   - force: Allow adding otherwise ignored files
    - pathspec: **DEPRECATED!** Use `--path` instead - The pathspec you want to add files from
  */
 public func gitAdd(path: OptionalConfigValue<[String]?> = .fastlaneDefault(nil),
                    shellEscape: OptionalConfigValue<Bool> = .fastlaneDefault(true),
+                   force: OptionalConfigValue<Bool> = .fastlaneDefault(false),
                    pathspec: OptionalConfigValue<String?> = .fastlaneDefault(nil))
 {
     let pathArg = path.asRubyArgument(name: "path", type: nil)
     let shellEscapeArg = shellEscape.asRubyArgument(name: "shell_escape", type: nil)
+    let forceArg = force.asRubyArgument(name: "force", type: nil)
     let pathspecArg = pathspec.asRubyArgument(name: "pathspec", type: nil)
     let array: [RubyCommand.Argument?] = [pathArg,
                                           shellEscapeArg,
+                                          forceArg,
                                           pathspecArg]
     let args: [RubyCommand.Argument] = array
         .filter { $0?.value != nil }
@@ -5252,7 +5440,7 @@ public func gitAdd(path: OptionalConfigValue<[String]?> = .fastlaneDefault(nil),
 /**
  Returns the name of the current git branch, possibly as managed by CI ENV vars
 
- If no branch could be found, this action will return an empty string. This is a wrapper for the internal action Actions.git_branch
+ If no branch could be found, this action will return an empty string. If `FL_GIT_BRANCH_DONT_USE_ENV_VARS` is `true`, it'll ignore CI ENV vars. This is a wrapper for the internal action Actions.git_branch
  */
 @discardableResult public func gitBranch() -> String {
     let args: [RubyCommand.Argument] = []
@@ -5381,7 +5569,7 @@ public func gitSubmoduleUpdate(recursive: OptionalConfigValue<Bool> = .fastlaneD
  - parameters:
    - serverUrl: The server url. e.g. 'https://your.internal.github.host/api/v3' (Default: 'https://api.github.com')
    - apiToken: Personal API Token for GitHub - generate one at https://github.com/settings/tokens
-   - apiBearer: Use a Bearer authorization token. Usually generated by Github Apps, e.g. GitHub Actions GITHUB_TOKEN environment variable
+   - apiBearer: Use a Bearer authorization token. Usually generated by GitHub Apps, e.g. GitHub Actions GITHUB_TOKEN environment variable
    - httpMethod: The HTTP method. e.g. GET / POST
    - body: The request body in JSON or hash format
    - rawBody: The request body taken verbatim instead of as JSON, useful for file uploads
@@ -5446,8 +5634,8 @@ public func githubApi(serverUrl: String = "https://api.github.com",
    - track: The track of the application to use. The default available tracks are: production, beta, alpha, internal
    - key: **DEPRECATED!** Use `--json_key` instead - The p12 File used to authenticate with Google
    - issuer: **DEPRECATED!** Use `--json_key` instead - The issuer of the p12 file (email address of the service account)
-   - jsonKey: The path to a file containing service account JSON, used to authenticate with Google
-   - jsonKeyData: The raw service account JSON data used to authenticate with Google
+   - jsonKey: The path to a Google credentials JSON file (Application Default, Workload Identity, or Service Account), used to authenticate with Google
+   - jsonKeyData: The raw content of a Google credentials JSON file (Application Default, Workload Identity, or Service Account), used to authenticate with Google
    - rootUrl: Root URL for the Google Play API. The provided URL will be used for API calls in place of https://www.googleapis.com/
    - timeout: Timeout for read, open, and send (in seconds)
 
@@ -5495,8 +5683,8 @@ public func googlePlayTrackReleaseNames(packageName: String,
    - track: The track of the application to use. The default available tracks are: production, beta, alpha, internal
    - key: **DEPRECATED!** Use `--json_key` instead - The p12 File used to authenticate with Google
    - issuer: **DEPRECATED!** Use `--json_key` instead - The issuer of the p12 file (email address of the service account)
-   - jsonKey: The path to a file containing service account JSON, used to authenticate with Google
-   - jsonKeyData: The raw service account JSON data used to authenticate with Google
+   - jsonKey: The path to a Google credentials JSON file (Application Default, Workload Identity, or Service Account), used to authenticate with Google
+   - jsonKeyData: The raw content of a Google credentials JSON file (Application Default, Workload Identity, or Service Account), used to authenticate with Google
    - rootUrl: Root URL for the Google Play API. The provided URL will be used for API calls in place of https://www.googleapis.com/
    - timeout: Timeout for read, open, and send (in seconds)
 
@@ -5611,6 +5799,7 @@ public func gradle(task: OptionalConfigValue<String?> = .fastlaneDefault(nil),
    - clean: Should the project be cleaned before building it?
    - outputDirectory: The directory in which the ipa file should be stored in
    - outputName: The name of the resulting ipa file
+   - appName: App name to use in logfile name
    - configuration: The configuration to use when building the app. Defaults to 'Release'
    - silent: Hide all information that's not necessary while building
    - codesigningIdentity: The name of the code signing identity to use. It has to match the name exactly. e.g. 'iPhone Distribution: SunApps GmbH'
@@ -5652,9 +5841,13 @@ public func gradle(task: OptionalConfigValue<String?> = .fastlaneDefault(nil),
    - skipProfileDetection: Do not try to build a profile mapping from the xcodeproj. Match or a manually provided mapping should be used
    - xcodebuildCommand: Allows for override of the default `xcodebuild` command
    - clonedSourcePackagesPath: Sets a custom path for Swift Package Manager dependencies
+   - packageCachePath: Sets a custom package cache path for Swift Package Manager dependencies
    - skipPackageDependenciesResolution: Skips resolution of Swift Package Manager dependencies
-   - disablePackageAutomaticUpdates: Prevents packages from automatically being resolved to versions other than those recorded in the `Package.resolved` file
+   - disablePackageAutomaticUpdates: Prevents packages from automatically being resolved to versions other than those recorded in the `Package.resolved` file. This translates in the option `-disableAutomaticPackageResolution` being passed to xcodebuild
+   - skipPackageRepositoryFetches: Skips updating package dependencies from their remote. This translates in the option `-skipPackageUpdates` being passed to xcodebuild
    - useSystemScm: Lets xcodebuild use system's scm configuration
+   - packageAuthorizationProvider: Lets xcodebuild use a specified package authorization provider (keychain|netrc)
+   - generateAppstoreInfo: Generate AppStoreInfo.plist using swinfo for app-store exports
 
  - returns: The absolute path to the generated ipa file
 
@@ -5666,6 +5859,7 @@ public func gradle(task: OptionalConfigValue<String?> = .fastlaneDefault(nil),
                                    clean: OptionalConfigValue<Bool> = .fastlaneDefault(gymfile.clean),
                                    outputDirectory: String = gymfile.outputDirectory,
                                    outputName: OptionalConfigValue<String?> = .fastlaneDefault(gymfile.outputName),
+                                   appName: OptionalConfigValue<String?> = .fastlaneDefault(gymfile.appName),
                                    configuration: OptionalConfigValue<String?> = .fastlaneDefault(gymfile.configuration),
                                    silent: OptionalConfigValue<Bool> = .fastlaneDefault(gymfile.silent),
                                    codesigningIdentity: OptionalConfigValue<String?> = .fastlaneDefault(gymfile.codesigningIdentity),
@@ -5707,9 +5901,13 @@ public func gradle(task: OptionalConfigValue<String?> = .fastlaneDefault(nil),
                                    skipProfileDetection: OptionalConfigValue<Bool> = .fastlaneDefault(gymfile.skipProfileDetection),
                                    xcodebuildCommand: String = gymfile.xcodebuildCommand,
                                    clonedSourcePackagesPath: OptionalConfigValue<String?> = .fastlaneDefault(gymfile.clonedSourcePackagesPath),
+                                   packageCachePath: OptionalConfigValue<String?> = .fastlaneDefault(gymfile.packageCachePath),
                                    skipPackageDependenciesResolution: OptionalConfigValue<Bool> = .fastlaneDefault(gymfile.skipPackageDependenciesResolution),
                                    disablePackageAutomaticUpdates: OptionalConfigValue<Bool> = .fastlaneDefault(gymfile.disablePackageAutomaticUpdates),
-                                   useSystemScm: OptionalConfigValue<Bool> = .fastlaneDefault(gymfile.useSystemScm)) -> String
+                                   skipPackageRepositoryFetches: OptionalConfigValue<Bool> = .fastlaneDefault(gymfile.skipPackageRepositoryFetches),
+                                   useSystemScm: OptionalConfigValue<Bool> = .fastlaneDefault(gymfile.useSystemScm),
+                                   packageAuthorizationProvider: OptionalConfigValue<String?> = .fastlaneDefault(gymfile.packageAuthorizationProvider),
+                                   generateAppstoreInfo: OptionalConfigValue<Bool> = .fastlaneDefault(gymfile.generateAppstoreInfo)) -> String
 {
     let workspaceArg = workspace.asRubyArgument(name: "workspace", type: nil)
     let projectArg = project.asRubyArgument(name: "project", type: nil)
@@ -5717,6 +5915,7 @@ public func gradle(task: OptionalConfigValue<String?> = .fastlaneDefault(nil),
     let cleanArg = clean.asRubyArgument(name: "clean", type: nil)
     let outputDirectoryArg = RubyCommand.Argument(name: "output_directory", value: outputDirectory, type: nil)
     let outputNameArg = outputName.asRubyArgument(name: "output_name", type: nil)
+    let appNameArg = appName.asRubyArgument(name: "app_name", type: nil)
     let configurationArg = configuration.asRubyArgument(name: "configuration", type: nil)
     let silentArg = silent.asRubyArgument(name: "silent", type: nil)
     let codesigningIdentityArg = codesigningIdentity.asRubyArgument(name: "codesigning_identity", type: nil)
@@ -5758,15 +5957,20 @@ public func gradle(task: OptionalConfigValue<String?> = .fastlaneDefault(nil),
     let skipProfileDetectionArg = skipProfileDetection.asRubyArgument(name: "skip_profile_detection", type: nil)
     let xcodebuildCommandArg = RubyCommand.Argument(name: "xcodebuild_command", value: xcodebuildCommand, type: nil)
     let clonedSourcePackagesPathArg = clonedSourcePackagesPath.asRubyArgument(name: "cloned_source_packages_path", type: nil)
+    let packageCachePathArg = packageCachePath.asRubyArgument(name: "package_cache_path", type: nil)
     let skipPackageDependenciesResolutionArg = skipPackageDependenciesResolution.asRubyArgument(name: "skip_package_dependencies_resolution", type: nil)
     let disablePackageAutomaticUpdatesArg = disablePackageAutomaticUpdates.asRubyArgument(name: "disable_package_automatic_updates", type: nil)
+    let skipPackageRepositoryFetchesArg = skipPackageRepositoryFetches.asRubyArgument(name: "skip_package_repository_fetches", type: nil)
     let useSystemScmArg = useSystemScm.asRubyArgument(name: "use_system_scm", type: nil)
+    let packageAuthorizationProviderArg = packageAuthorizationProvider.asRubyArgument(name: "package_authorization_provider", type: nil)
+    let generateAppstoreInfoArg = generateAppstoreInfo.asRubyArgument(name: "generate_appstore_info", type: nil)
     let array: [RubyCommand.Argument?] = [workspaceArg,
                                           projectArg,
                                           schemeArg,
                                           cleanArg,
                                           outputDirectoryArg,
                                           outputNameArg,
+                                          appNameArg,
                                           configurationArg,
                                           silentArg,
                                           codesigningIdentityArg,
@@ -5808,9 +6012,13 @@ public func gradle(task: OptionalConfigValue<String?> = .fastlaneDefault(nil),
                                           skipProfileDetectionArg,
                                           xcodebuildCommandArg,
                                           clonedSourcePackagesPathArg,
+                                          packageCachePathArg,
                                           skipPackageDependenciesResolutionArg,
                                           disablePackageAutomaticUpdatesArg,
-                                          useSystemScmArg]
+                                          skipPackageRepositoryFetchesArg,
+                                          useSystemScmArg,
+                                          packageAuthorizationProviderArg,
+                                          generateAppstoreInfoArg]
     let args: [RubyCommand.Argument] = array
         .filter { $0?.value != nil }
         .compactMap { $0 }
@@ -5907,65 +6115,6 @@ public func hgPush(force: OptionalConfigValue<Bool> = .fastlaneDefault(false),
         .filter { $0?.value != nil }
         .compactMap { $0 }
     let command = RubyCommand(commandID: "", methodName: "hg_push", className: nil, args: args)
-    _ = runner.executeCommand(command)
-}
-
-/**
- Send a error/success message to [HipChat](https://www.hipchat.com/)
-
- - parameters:
-   - message: The message to post on HipChat
-   - channel: The room or @username
-   - apiToken: Hipchat API Token
-   - customColor: Specify a custom color, this overrides the success boolean. Can be one of 'yellow', 'red', 'green', 'purple', 'gray', or 'random'
-   - success: Was this build successful? (true/false)
-   - version: Version of the Hipchat API. Must be 1 or 2
-   - notifyRoom: Should the people in the room be notified? (true/false)
-   - apiHost: The host of the HipChat-Server API
-   - messageFormat: Format of the message to post. Must be either 'html' or 'text'
-   - includeHtmlHeader: Should html formatted messages include a preformatted header? (true/false)
-   - from: Name the message will appear to be sent from
-
- Send a message to **room** (by default) or a direct message to **@username** with success (green) or failure (red) status.
- */
-public func hipchat(message: String = "",
-                    channel: String,
-                    apiToken: String,
-                    customColor: OptionalConfigValue<String?> = .fastlaneDefault(nil),
-                    success: OptionalConfigValue<Bool> = .fastlaneDefault(true),
-                    version: String,
-                    notifyRoom: OptionalConfigValue<Bool> = .fastlaneDefault(false),
-                    apiHost: String = "api.hipchat.com",
-                    messageFormat: String = "html",
-                    includeHtmlHeader: OptionalConfigValue<Bool> = .fastlaneDefault(true),
-                    from: String = "fastlane")
-{
-    let messageArg = RubyCommand.Argument(name: "message", value: message, type: nil)
-    let channelArg = RubyCommand.Argument(name: "channel", value: channel, type: nil)
-    let apiTokenArg = RubyCommand.Argument(name: "api_token", value: apiToken, type: nil)
-    let customColorArg = customColor.asRubyArgument(name: "custom_color", type: nil)
-    let successArg = success.asRubyArgument(name: "success", type: nil)
-    let versionArg = RubyCommand.Argument(name: "version", value: version, type: nil)
-    let notifyRoomArg = notifyRoom.asRubyArgument(name: "notify_room", type: nil)
-    let apiHostArg = RubyCommand.Argument(name: "api_host", value: apiHost, type: nil)
-    let messageFormatArg = RubyCommand.Argument(name: "message_format", value: messageFormat, type: nil)
-    let includeHtmlHeaderArg = includeHtmlHeader.asRubyArgument(name: "include_html_header", type: nil)
-    let fromArg = RubyCommand.Argument(name: "from", value: from, type: nil)
-    let array: [RubyCommand.Argument?] = [messageArg,
-                                          channelArg,
-                                          apiTokenArg,
-                                          customColorArg,
-                                          successArg,
-                                          versionArg,
-                                          notifyRoomArg,
-                                          apiHostArg,
-                                          messageFormatArg,
-                                          includeHtmlHeaderArg,
-                                          fromArg]
-    let args: [RubyCommand.Argument] = array
-        .filter { $0?.value != nil }
-        .compactMap { $0 }
-    let command = RubyCommand(commandID: "", methodName: "hipchat", className: nil, args: args)
     _ = runner.executeCommand(command)
 }
 
@@ -6137,6 +6286,7 @@ public func ifttt(apiKey: String,
  - parameters:
    - certificatePath: Path to certificate
    - certificatePassword: Certificate password
+   - certificateFormat: Format of the certificate. Check the '-f' switch from 'security import --help' command
    - keychainName: Keychain the items should be imported to
    - keychainPath: Path to the Keychain file to which the items should be imported
    - keychainPassword: The password for the keychain. Note that for the login keychain this is your user's password
@@ -6146,6 +6296,7 @@ public func ifttt(apiKey: String,
  */
 public func importCertificate(certificatePath: String,
                               certificatePassword: OptionalConfigValue<String?> = .fastlaneDefault(nil),
+                              certificateFormat: OptionalConfigValue<String?> = .fastlaneDefault(nil),
                               keychainName: String,
                               keychainPath: OptionalConfigValue<String?> = .fastlaneDefault(nil),
                               keychainPassword: OptionalConfigValue<String?> = .fastlaneDefault(nil),
@@ -6153,12 +6304,14 @@ public func importCertificate(certificatePath: String,
 {
     let certificatePathArg = RubyCommand.Argument(name: "certificate_path", value: certificatePath, type: nil)
     let certificatePasswordArg = certificatePassword.asRubyArgument(name: "certificate_password", type: nil)
+    let certificateFormatArg = certificateFormat.asRubyArgument(name: "certificate_format", type: nil)
     let keychainNameArg = RubyCommand.Argument(name: "keychain_name", value: keychainName, type: nil)
     let keychainPathArg = keychainPath.asRubyArgument(name: "keychain_path", type: nil)
     let keychainPasswordArg = keychainPassword.asRubyArgument(name: "keychain_password", type: nil)
     let logOutputArg = logOutput.asRubyArgument(name: "log_output", type: nil)
     let array: [RubyCommand.Argument?] = [certificatePathArg,
                                           certificatePasswordArg,
+                                          certificateFormatArg,
                                           keychainNameArg,
                                           keychainPathArg,
                                           keychainPasswordArg,
@@ -6231,12 +6384,12 @@ public func importCertificate(certificatePath: String,
  Installs an .ipa file on a connected iOS-device via usb or wifi
 
  - parameters:
-   - extra: Extra Commandline arguments passed to ios-deploy
+   - extra: Extra Command-line arguments passed to ios-deploy
    - deviceId: id of the device / if not set defaults to first found device
    - skipWifi: Do not search for devices via WiFi
    - ipa: The IPA file to put on the device
 
- Installs the ipa on the device. If no id is given, the first found iOS device will be used. Works via USB or Wi-Fi. This requires `ios-deploy` to be installed. Please have a look at [ios-deploy](https://github.com/ios-control/ios-deploy). To quickly install it, use `npm -g i ios-deploy`
+ Installs the ipa on the device. If no id is given, the first found iOS device will be used. Works via USB or Wi-Fi. This requires `ios-deploy` to be installed. Please have a look at [ios-deploy](https://github.com/ios-control/ios-deploy). To quickly install it, use `brew install ios-deploy`
  */
 public func installOnDevice(extra: OptionalConfigValue<String?> = .fastlaneDefault(nil),
                             deviceId: OptionalConfigValue<String?> = .fastlaneDefault(nil),
@@ -6412,7 +6565,7 @@ public func ipa(workspace: OptionalConfigValue<String?> = .fastlaneDefault(nil),
 
  - parameters:
    - config: Path to jazzy config file
-   - moduleVersion: Version string to use as part of the the default docs title and inside the docset
+   - moduleVersion: Version string to use as part of the default docs title and inside the docset
  */
 public func jazzy(config: OptionalConfigValue<String?> = .fastlaneDefault(nil),
                   moduleVersion: OptionalConfigValue<String?> = .fastlaneDefault(nil))
@@ -6524,7 +6677,7 @@ public func jazzy(config: OptionalConfigValue<String?> = .fastlaneDefault(nil),
    - username: Your Apple ID Username
    - version: The version number whose latest build number we want
    - platform: The platform to use (optional)
-   - initialBuildNumber: sets the build number to given value if no build is in current train
+   - initialBuildNumber: sets the build number to given value if no build (upload) is in current train
    - teamId: The ID of your App Store Connect team if you're in multiple teams
    - teamName: The name of your App Store Connect team if you're in multiple teams
 
@@ -6732,6 +6885,7 @@ public func makeChangelogFromJenkins(fallbackChangelog: String = "",
    - s3Region: Name of the S3 region
    - s3AccessKey: S3 access key
    - s3SecretAccessKey: S3 secret access key
+   - s3SessionToken: S3 session token
    - s3Bucket: Name of the S3 bucket
    - s3ObjectPrefix: Prefix to be used on all objects uploaded to S3
    - s3SkipEncryption: Skip encryption of all objects uploaded to S3. WARNING: only enable this on S3 buckets with sufficiently restricted permissions and server-side encryption enabled. See https://docs.aws.amazon.com/AmazonS3/latest/userguide/UsingEncryption.html
@@ -6745,18 +6899,20 @@ public func makeChangelogFromJenkins(fallbackChangelog: String = "",
    - forceForNewDevices: Renew the provisioning profiles if the device count on the developer portal has changed. Ignored for profile types 'appstore' and 'developer_id'
    - includeMacInProfiles: Include Apple Silicon Mac devices in provisioning profiles for iOS/iPadOS apps
    - includeAllCertificates: Include all matching certificates in the provisioning profile. Works only for the 'development' provisioning profile type
+   - certificateId: Select certificate by id. Useful if multiple certificates are stored in one place
    - forceForNewCertificates: Renew the provisioning profiles if the certificate count on the developer portal has changed. Works only for the 'development' provisioning profile type. Requires 'include_all_certificates' option to be 'true'
    - skipConfirmation: Disables confirmation prompts during nuke, answering them with yes
    - safeRemoveCerts: Remove certs from repository during nuke without revoking them on the developer portal
    - skipDocs: Skip generation of a README.md for the created git repository
    - platform: Set the provisioning profile's platform to work with (i.e. ios, tvos, macos, catalyst)
    - deriveCatalystAppIdentifier: Enable this if you have the Mac Catalyst capability enabled and your project was created with Xcode 11.3 or earlier. Prepends 'maccatalyst.' to the app identifier for the provisioning profile mapping
-   - templateName: The name of provisioning profile template. If the developer account has provisioning profile templates (aka: custom entitlements), the template name can be found by inspecting the Entitlements drop-down while creating/editing a provisioning profile (e.g. "Apple Pay Pass Suppression Development")
+   - templateName: **DEPRECATED!** Removed since May 2025 on App Store Connect API OpenAPI v3.8.0 - Learn more: https://docs.fastlane.tools/actions/match/#managed-capabilities - The name of provisioning profile template. If the developer account has provisioning profile templates (aka: custom entitlements), the template name can be found by inspecting the Entitlements drop-down while creating/editing a provisioning profile (e.g. "Apple Pay Pass Suppression Development")
    - profileName: A custom name for the provisioning profile. This will replace the default provisioning profile name if specified
    - failOnNameTaken: Should the command fail if it was about to create a duplicate of an existing provisioning profile. It can happen due to issues on Apple Developer Portal, when profile to be recreated was not properly deleted first
    - skipCertificateMatching: Set to true if there is no access to Apple developer portal but there are certificates, keys and profiles provided. Only works with match import action
    - outputPath: Path in which to export certificates, key and profile
    - skipSetPartitionList: Skips setting the partition list (which can sometimes take a long time). Setting the partition list is usually needed to prevent Xcode from prompting to allow a cert to be used for signing
+   - forceLegacyEncryption: Force encryption to use legacy cbc algorithm for backwards compatibility with older match versions
    - verbose: Print out extra information and all commands
 
  More information: https://docs.fastlane.tools/actions/match/
@@ -6789,6 +6945,7 @@ public func match(type: String = matchfile.type,
                   s3Region: OptionalConfigValue<String?> = .fastlaneDefault(matchfile.s3Region),
                   s3AccessKey: OptionalConfigValue<String?> = .fastlaneDefault(matchfile.s3AccessKey),
                   s3SecretAccessKey: OptionalConfigValue<String?> = .fastlaneDefault(matchfile.s3SecretAccessKey),
+                  s3SessionToken: OptionalConfigValue<String?> = .fastlaneDefault(matchfile.s3SessionToken),
                   s3Bucket: OptionalConfigValue<String?> = .fastlaneDefault(matchfile.s3Bucket),
                   s3ObjectPrefix: OptionalConfigValue<String?> = .fastlaneDefault(matchfile.s3ObjectPrefix),
                   s3SkipEncryption: OptionalConfigValue<Bool> = .fastlaneDefault(matchfile.s3SkipEncryption),
@@ -6802,6 +6959,7 @@ public func match(type: String = matchfile.type,
                   forceForNewDevices: OptionalConfigValue<Bool> = .fastlaneDefault(matchfile.forceForNewDevices),
                   includeMacInProfiles: OptionalConfigValue<Bool> = .fastlaneDefault(matchfile.includeMacInProfiles),
                   includeAllCertificates: OptionalConfigValue<Bool> = .fastlaneDefault(matchfile.includeAllCertificates),
+                  certificateId: OptionalConfigValue<String?> = .fastlaneDefault(matchfile.certificateId),
                   forceForNewCertificates: OptionalConfigValue<Bool> = .fastlaneDefault(matchfile.forceForNewCertificates),
                   skipConfirmation: OptionalConfigValue<Bool> = .fastlaneDefault(matchfile.skipConfirmation),
                   safeRemoveCerts: OptionalConfigValue<Bool> = .fastlaneDefault(matchfile.safeRemoveCerts),
@@ -6814,6 +6972,7 @@ public func match(type: String = matchfile.type,
                   skipCertificateMatching: OptionalConfigValue<Bool> = .fastlaneDefault(matchfile.skipCertificateMatching),
                   outputPath: OptionalConfigValue<String?> = .fastlaneDefault(matchfile.outputPath),
                   skipSetPartitionList: OptionalConfigValue<Bool> = .fastlaneDefault(matchfile.skipSetPartitionList),
+                  forceLegacyEncryption: OptionalConfigValue<Bool> = .fastlaneDefault(matchfile.forceLegacyEncryption),
                   verbose: OptionalConfigValue<Bool> = .fastlaneDefault(matchfile.verbose))
 {
     let typeArg = RubyCommand.Argument(name: "type", value: type, type: nil)
@@ -6844,6 +7003,7 @@ public func match(type: String = matchfile.type,
     let s3RegionArg = s3Region.asRubyArgument(name: "s3_region", type: nil)
     let s3AccessKeyArg = s3AccessKey.asRubyArgument(name: "s3_access_key", type: nil)
     let s3SecretAccessKeyArg = s3SecretAccessKey.asRubyArgument(name: "s3_secret_access_key", type: nil)
+    let s3SessionTokenArg = s3SessionToken.asRubyArgument(name: "s3_session_token", type: nil)
     let s3BucketArg = s3Bucket.asRubyArgument(name: "s3_bucket", type: nil)
     let s3ObjectPrefixArg = s3ObjectPrefix.asRubyArgument(name: "s3_object_prefix", type: nil)
     let s3SkipEncryptionArg = s3SkipEncryption.asRubyArgument(name: "s3_skip_encryption", type: nil)
@@ -6857,6 +7017,7 @@ public func match(type: String = matchfile.type,
     let forceForNewDevicesArg = forceForNewDevices.asRubyArgument(name: "force_for_new_devices", type: nil)
     let includeMacInProfilesArg = includeMacInProfiles.asRubyArgument(name: "include_mac_in_profiles", type: nil)
     let includeAllCertificatesArg = includeAllCertificates.asRubyArgument(name: "include_all_certificates", type: nil)
+    let certificateIdArg = certificateId.asRubyArgument(name: "certificate_id", type: nil)
     let forceForNewCertificatesArg = forceForNewCertificates.asRubyArgument(name: "force_for_new_certificates", type: nil)
     let skipConfirmationArg = skipConfirmation.asRubyArgument(name: "skip_confirmation", type: nil)
     let safeRemoveCertsArg = safeRemoveCerts.asRubyArgument(name: "safe_remove_certs", type: nil)
@@ -6869,6 +7030,7 @@ public func match(type: String = matchfile.type,
     let skipCertificateMatchingArg = skipCertificateMatching.asRubyArgument(name: "skip_certificate_matching", type: nil)
     let outputPathArg = outputPath.asRubyArgument(name: "output_path", type: nil)
     let skipSetPartitionListArg = skipSetPartitionList.asRubyArgument(name: "skip_set_partition_list", type: nil)
+    let forceLegacyEncryptionArg = forceLegacyEncryption.asRubyArgument(name: "force_legacy_encryption", type: nil)
     let verboseArg = verbose.asRubyArgument(name: "verbose", type: nil)
     let array: [RubyCommand.Argument?] = [typeArg,
                                           additionalCertTypesArg,
@@ -6898,6 +7060,7 @@ public func match(type: String = matchfile.type,
                                           s3RegionArg,
                                           s3AccessKeyArg,
                                           s3SecretAccessKeyArg,
+                                          s3SessionTokenArg,
                                           s3BucketArg,
                                           s3ObjectPrefixArg,
                                           s3SkipEncryptionArg,
@@ -6911,6 +7074,7 @@ public func match(type: String = matchfile.type,
                                           forceForNewDevicesArg,
                                           includeMacInProfilesArg,
                                           includeAllCertificatesArg,
+                                          certificateIdArg,
                                           forceForNewCertificatesArg,
                                           skipConfirmationArg,
                                           safeRemoveCertsArg,
@@ -6923,6 +7087,7 @@ public func match(type: String = matchfile.type,
                                           skipCertificateMatchingArg,
                                           outputPathArg,
                                           skipSetPartitionListArg,
+                                          forceLegacyEncryptionArg,
                                           verboseArg]
     let args: [RubyCommand.Argument] = array
         .filter { $0?.value != nil }
@@ -6963,6 +7128,7 @@ public func match(type: String = matchfile.type,
    - s3Region: Name of the S3 region
    - s3AccessKey: S3 access key
    - s3SecretAccessKey: S3 secret access key
+   - s3SessionToken: S3 session token
    - s3Bucket: Name of the S3 bucket
    - s3ObjectPrefix: Prefix to be used on all objects uploaded to S3
    - s3SkipEncryption: Skip encryption of all objects uploaded to S3. WARNING: only enable this on S3 buckets with sufficiently restricted permissions and server-side encryption enabled. See https://docs.aws.amazon.com/AmazonS3/latest/userguide/UsingEncryption.html
@@ -6976,18 +7142,20 @@ public func match(type: String = matchfile.type,
    - forceForNewDevices: Renew the provisioning profiles if the device count on the developer portal has changed. Ignored for profile types 'appstore' and 'developer_id'
    - includeMacInProfiles: Include Apple Silicon Mac devices in provisioning profiles for iOS/iPadOS apps
    - includeAllCertificates: Include all matching certificates in the provisioning profile. Works only for the 'development' provisioning profile type
+   - certificateId: Select certificate by id. Useful if multiple certificates are stored in one place
    - forceForNewCertificates: Renew the provisioning profiles if the certificate count on the developer portal has changed. Works only for the 'development' provisioning profile type. Requires 'include_all_certificates' option to be 'true'
    - skipConfirmation: Disables confirmation prompts during nuke, answering them with yes
    - safeRemoveCerts: Remove certs from repository during nuke without revoking them on the developer portal
    - skipDocs: Skip generation of a README.md for the created git repository
    - platform: Set the provisioning profile's platform to work with (i.e. ios, tvos, macos, catalyst)
    - deriveCatalystAppIdentifier: Enable this if you have the Mac Catalyst capability enabled and your project was created with Xcode 11.3 or earlier. Prepends 'maccatalyst.' to the app identifier for the provisioning profile mapping
-   - templateName: The name of provisioning profile template. If the developer account has provisioning profile templates (aka: custom entitlements), the template name can be found by inspecting the Entitlements drop-down while creating/editing a provisioning profile (e.g. "Apple Pay Pass Suppression Development")
+   - templateName: **DEPRECATED!** Removed since May 2025 on App Store Connect API OpenAPI v3.8.0 - Learn more: https://docs.fastlane.tools/actions/match/#managed-capabilities - The name of provisioning profile template. If the developer account has provisioning profile templates (aka: custom entitlements), the template name can be found by inspecting the Entitlements drop-down while creating/editing a provisioning profile (e.g. "Apple Pay Pass Suppression Development")
    - profileName: A custom name for the provisioning profile. This will replace the default provisioning profile name if specified
    - failOnNameTaken: Should the command fail if it was about to create a duplicate of an existing provisioning profile. It can happen due to issues on Apple Developer Portal, when profile to be recreated was not properly deleted first
    - skipCertificateMatching: Set to true if there is no access to Apple developer portal but there are certificates, keys and profiles provided. Only works with match import action
    - outputPath: Path in which to export certificates, key and profile
    - skipSetPartitionList: Skips setting the partition list (which can sometimes take a long time). Setting the partition list is usually needed to prevent Xcode from prompting to allow a cert to be used for signing
+   - forceLegacyEncryption: Force encryption to use legacy cbc algorithm for backwards compatibility with older match versions
    - verbose: Print out extra information and all commands
 
  Use the match_nuke action to revoke your certificates and provisioning profiles.
@@ -7024,6 +7192,7 @@ public func matchNuke(type: String = "development",
                       s3Region: OptionalConfigValue<String?> = .fastlaneDefault(nil),
                       s3AccessKey: OptionalConfigValue<String?> = .fastlaneDefault(nil),
                       s3SecretAccessKey: OptionalConfigValue<String?> = .fastlaneDefault(nil),
+                      s3SessionToken: OptionalConfigValue<String?> = .fastlaneDefault(nil),
                       s3Bucket: OptionalConfigValue<String?> = .fastlaneDefault(nil),
                       s3ObjectPrefix: OptionalConfigValue<String?> = .fastlaneDefault(nil),
                       s3SkipEncryption: OptionalConfigValue<Bool> = .fastlaneDefault(false),
@@ -7037,6 +7206,7 @@ public func matchNuke(type: String = "development",
                       forceForNewDevices: OptionalConfigValue<Bool> = .fastlaneDefault(false),
                       includeMacInProfiles: OptionalConfigValue<Bool> = .fastlaneDefault(false),
                       includeAllCertificates: OptionalConfigValue<Bool> = .fastlaneDefault(false),
+                      certificateId: OptionalConfigValue<String?> = .fastlaneDefault(nil),
                       forceForNewCertificates: OptionalConfigValue<Bool> = .fastlaneDefault(false),
                       skipConfirmation: OptionalConfigValue<Bool> = .fastlaneDefault(false),
                       safeRemoveCerts: OptionalConfigValue<Bool> = .fastlaneDefault(false),
@@ -7049,6 +7219,7 @@ public func matchNuke(type: String = "development",
                       skipCertificateMatching: OptionalConfigValue<Bool> = .fastlaneDefault(false),
                       outputPath: OptionalConfigValue<String?> = .fastlaneDefault(nil),
                       skipSetPartitionList: OptionalConfigValue<Bool> = .fastlaneDefault(false),
+                      forceLegacyEncryption: OptionalConfigValue<Bool> = .fastlaneDefault(false),
                       verbose: OptionalConfigValue<Bool> = .fastlaneDefault(false))
 {
     let typeArg = RubyCommand.Argument(name: "type", value: type, type: nil)
@@ -7079,6 +7250,7 @@ public func matchNuke(type: String = "development",
     let s3RegionArg = s3Region.asRubyArgument(name: "s3_region", type: nil)
     let s3AccessKeyArg = s3AccessKey.asRubyArgument(name: "s3_access_key", type: nil)
     let s3SecretAccessKeyArg = s3SecretAccessKey.asRubyArgument(name: "s3_secret_access_key", type: nil)
+    let s3SessionTokenArg = s3SessionToken.asRubyArgument(name: "s3_session_token", type: nil)
     let s3BucketArg = s3Bucket.asRubyArgument(name: "s3_bucket", type: nil)
     let s3ObjectPrefixArg = s3ObjectPrefix.asRubyArgument(name: "s3_object_prefix", type: nil)
     let s3SkipEncryptionArg = s3SkipEncryption.asRubyArgument(name: "s3_skip_encryption", type: nil)
@@ -7092,6 +7264,7 @@ public func matchNuke(type: String = "development",
     let forceForNewDevicesArg = forceForNewDevices.asRubyArgument(name: "force_for_new_devices", type: nil)
     let includeMacInProfilesArg = includeMacInProfiles.asRubyArgument(name: "include_mac_in_profiles", type: nil)
     let includeAllCertificatesArg = includeAllCertificates.asRubyArgument(name: "include_all_certificates", type: nil)
+    let certificateIdArg = certificateId.asRubyArgument(name: "certificate_id", type: nil)
     let forceForNewCertificatesArg = forceForNewCertificates.asRubyArgument(name: "force_for_new_certificates", type: nil)
     let skipConfirmationArg = skipConfirmation.asRubyArgument(name: "skip_confirmation", type: nil)
     let safeRemoveCertsArg = safeRemoveCerts.asRubyArgument(name: "safe_remove_certs", type: nil)
@@ -7104,6 +7277,7 @@ public func matchNuke(type: String = "development",
     let skipCertificateMatchingArg = skipCertificateMatching.asRubyArgument(name: "skip_certificate_matching", type: nil)
     let outputPathArg = outputPath.asRubyArgument(name: "output_path", type: nil)
     let skipSetPartitionListArg = skipSetPartitionList.asRubyArgument(name: "skip_set_partition_list", type: nil)
+    let forceLegacyEncryptionArg = forceLegacyEncryption.asRubyArgument(name: "force_legacy_encryption", type: nil)
     let verboseArg = verbose.asRubyArgument(name: "verbose", type: nil)
     let array: [RubyCommand.Argument?] = [typeArg,
                                           additionalCertTypesArg,
@@ -7133,6 +7307,7 @@ public func matchNuke(type: String = "development",
                                           s3RegionArg,
                                           s3AccessKeyArg,
                                           s3SecretAccessKeyArg,
+                                          s3SessionTokenArg,
                                           s3BucketArg,
                                           s3ObjectPrefixArg,
                                           s3SkipEncryptionArg,
@@ -7146,6 +7321,7 @@ public func matchNuke(type: String = "development",
                                           forceForNewDevicesArg,
                                           includeMacInProfilesArg,
                                           includeAllCertificatesArg,
+                                          certificateIdArg,
                                           forceForNewCertificatesArg,
                                           skipConfirmationArg,
                                           safeRemoveCertsArg,
@@ -7158,6 +7334,7 @@ public func matchNuke(type: String = "development",
                                           skipCertificateMatchingArg,
                                           outputPathArg,
                                           skipSetPartitionListArg,
+                                          forceLegacyEncryptionArg,
                                           verboseArg]
     let args: [RubyCommand.Argument] = array
         .filter { $0?.value != nil }
@@ -7184,7 +7361,7 @@ public func minFastlaneVersion() {
  - parameters:
    - username: Your Apple ID Username
    - appIdentifier: App Identifier (Bundle ID, e.g. com.krausefx.app)
-   - services: Array with Spaceship App Services (e.g. access_wifi: (on|off)(:on|:off)(true|false), app_attest: (on|off)(:on|:off)(true|false), app_group: (on|off)(:on|:off)(true|false), apple_pay: (on|off)(:on|:off)(true|false), associated_domains: (on|off)(:on|:off)(true|false), auto_fill_credential: (on|off)(:on|:off)(true|false), class_kit: (on|off)(:on|:off)(true|false), icloud: (legacy|cloudkit)(:on|:off)(true|false), custom_network_protocol: (on|off)(:on|:off)(true|false), data_protection: (complete|unlessopen|untilfirstauth)(:on|:off)(true|false), extended_virtual_address_space: (on|off)(:on|:off)(true|false), family_controls: (on|off)(:on|:off)(true|false), file_provider_testing_mode: (on|off)(:on|:off)(true|false), fonts: (on|off)(:on|:off)(true|false), game_center: (ios|mac)(:on|:off)(true|false), health_kit: (on|off)(:on|:off)(true|false), hls_interstitial_preview: (on|off)(:on|:off)(true|false), home_kit: (on|off)(:on|:off)(true|false), hotspot: (on|off)(:on|:off)(true|false), in_app_purchase: (on|off)(:on|:off)(true|false), inter_app_audio: (on|off)(:on|:off)(true|false), low_latency_hls: (on|off)(:on|:off)(true|false), managed_associated_domains: (on|off)(:on|:off)(true|false), maps: (on|off)(:on|:off)(true|false), multipath: (on|off)(:on|:off)(true|false), network_extension: (on|off)(:on|:off)(true|false), nfc_tag_reading: (on|off)(:on|:off)(true|false), personal_vpn: (on|off)(:on|:off)(true|false), passbook: (on|off)(:on|:off)(true|false), push_notification: (on|off)(:on|:off)(true|false), sign_in_with_apple: (on)(:on|:off)(true|false), siri_kit: (on|off)(:on|:off)(true|false), system_extension: (on|off)(:on|:off)(true|false), user_management: (on|off)(:on|:off)(true|false), vpn_configuration: (on|off)(:on|:off)(true|false), wallet: (on|off)(:on|:off)(true|false), wireless_accessory: (on|off)(:on|:off)(true|false), car_play_audio_app: (on|off)(:on|:off)(true|false), car_play_messaging_app: (on|off)(:on|:off)(true|false), car_play_navigation_app: (on|off)(:on|:off)(true|false), car_play_voip_calling_app: (on|off)(:on|:off)(true|false), critical_alerts: (on|off)(:on|:off)(true|false), hotspot_helper: (on|off)(:on|:off)(true|false), driver_kit: (on|off)(:on|:off)(true|false), driver_kit_endpoint_security: (on|off)(:on|:off)(true|false), driver_kit_family_hid_device: (on|off)(:on|:off)(true|false), driver_kit_family_networking: (on|off)(:on|:off)(true|false), driver_kit_family_serial: (on|off)(:on|:off)(true|false), driver_kit_hid_event_service: (on|off)(:on|:off)(true|false), driver_kit_transport_hid: (on|off)(:on|:off)(true|false), multitasking_camera_access: (on|off)(:on|:off)(true|false), sf_universal_link_api: (on|off)(:on|:off)(true|false), vp9_decoder: (on|off)(:on|:off)(true|false), music_kit: (on|off)(:on|:off)(true|false), shazam_kit: (on|off)(:on|:off)(true|false), communication_notifications: (on|off)(:on|:off)(true|false), group_activities: (on|off)(:on|:off)(true|false), health_kit_estimate_recalibration: (on|off)(:on|:off)(true|false), time_sensitive_notifications: (on|off)(:on|:off)(true|false))
+   - services: Array with Spaceship App Services (e.g. access_wifi: (on|off)(:on|:off)(true|false), app_attest: (on|off)(:on|:off)(true|false), app_group: (on|off)(:on|:off)(true|false), apple_pay: (on|off)(:on|:off)(true|false), associated_domains: (on|off)(:on|:off)(true|false), auto_fill_credential: (on|off)(:on|:off)(true|false), class_kit: (on|off)(:on|:off)(true|false), declared_age_range: (on|off)(:on|:off)(true|false), icloud: (legacy|cloudkit)(:on|:off)(true|false), custom_network_protocol: (on|off)(:on|:off)(true|false), data_protection: (complete|unlessopen|untilfirstauth)(:on|:off)(true|false), extended_virtual_address_space: (on|off)(:on|:off)(true|false), family_controls: (on|off)(:on|:off)(true|false), file_provider_testing_mode: (on|off)(:on|:off)(true|false), fonts: (on|off)(:on|:off)(true|false), game_center: (ios|mac)(:on|:off)(true|false), health_kit: (on|off)(:on|:off)(true|false), hls_interstitial_preview: (on|off)(:on|:off)(true|false), home_kit: (on|off)(:on|:off)(true|false), hotspot: (on|off)(:on|:off)(true|false), in_app_purchase: (on|off)(:on|:off)(true|false), inter_app_audio: (on|off)(:on|:off)(true|false), low_latency_hls: (on|off)(:on|:off)(true|false), managed_associated_domains: (on|off)(:on|:off)(true|false), maps: (on|off)(:on|:off)(true|false), multipath: (on|off)(:on|:off)(true|false), network_extension: (on|off)(:on|:off)(true|false), nfc_tag_reading: (on|off)(:on|:off)(true|false), personal_vpn: (on|off)(:on|:off)(true|false), passbook: (on|off)(:on|:off)(true|false), push_notification: (on|off)(:on|:off)(true|false), sign_in_with_apple: (on)(:on|:off)(true|false), siri_kit: (on|off)(:on|:off)(true|false), system_extension: (on|off)(:on|:off)(true|false), user_management: (on|off)(:on|:off)(true|false), vpn_configuration: (on|off)(:on|:off)(true|false), wallet: (on|off)(:on|:off)(true|false), wireless_accessory: (on|off)(:on|:off)(true|false), car_play_audio_app: (on|off)(:on|:off)(true|false), car_play_messaging_app: (on|off)(:on|:off)(true|false), car_play_navigation_app: (on|off)(:on|:off)(true|false), car_play_voip_calling_app: (on|off)(:on|:off)(true|false), critical_alerts: (on|off)(:on|:off)(true|false), hotspot_helper: (on|off)(:on|:off)(true|false), driver_kit: (on|off)(:on|:off)(true|false), driver_kit_endpoint_security: (on|off)(:on|:off)(true|false), driver_kit_family_hid_device: (on|off)(:on|:off)(true|false), driver_kit_family_networking: (on|off)(:on|:off)(true|false), driver_kit_family_serial: (on|off)(:on|:off)(true|false), driver_kit_hid_event_service: (on|off)(:on|:off)(true|false), driver_kit_transport_hid: (on|off)(:on|:off)(true|false), multitasking_camera_access: (on|off)(:on|:off)(true|false), sf_universal_link_api: (on|off)(:on|:off)(true|false), vp9_decoder: (on|off)(:on|:off)(true|false), music_kit: (on|off)(:on|:off)(true|false), shazam_kit: (on|off)(:on|:off)(true|false), communication_notifications: (on|off)(:on|:off)(true|false), group_activities: (on|off)(:on|:off)(true|false), health_kit_estimate_recalibration: (on|off)(:on|:off)(true|false), time_sensitive_notifications: (on|off)(:on|:off)(true|false))
    - teamId: The ID of your Developer Portal team if you're in multiple teams
    - teamName: The name of your Developer Portal team if you're in multiple teams
 
@@ -7299,8 +7476,6 @@ public func nexusUpload(file: String,
 
  - parameters:
    - package: Path to package to notarize, e.g. .app bundle or disk image
-   - useNotarytool: Whether to `xcrun notarytool` or `xcrun altool`
-   - tryEarlyStapling: Whether to try early stapling while the notarization request is in progress
    - skipStapling: Do not staple the notarization ticket to the artifact; useful for single file executables and ZIP archives
    - bundleId: Bundle identifier to uniquely identify the package
    - username: Apple ID username
@@ -7311,8 +7486,6 @@ public func nexusUpload(file: String,
    - apiKey: Your App Store Connect API Key information (https://docs.fastlane.tools/app-store-connect-api/#using-fastlane-api-key-hash-option)
  */
 public func notarize(package: String,
-                     useNotarytool: OptionalConfigValue<Bool> = .fastlaneDefault(true),
-                     tryEarlyStapling: OptionalConfigValue<Bool> = .fastlaneDefault(false),
                      skipStapling: OptionalConfigValue<Bool> = .fastlaneDefault(false),
                      bundleId: OptionalConfigValue<String?> = .fastlaneDefault(nil),
                      username: OptionalConfigValue<String?> = .fastlaneDefault(nil),
@@ -7323,8 +7496,6 @@ public func notarize(package: String,
                      apiKey: OptionalConfigValue<[String: Any]?> = .fastlaneDefault(nil))
 {
     let packageArg = RubyCommand.Argument(name: "package", value: package, type: nil)
-    let useNotarytoolArg = useNotarytool.asRubyArgument(name: "use_notarytool", type: nil)
-    let tryEarlyStaplingArg = tryEarlyStapling.asRubyArgument(name: "try_early_stapling", type: nil)
     let skipStaplingArg = skipStapling.asRubyArgument(name: "skip_stapling", type: nil)
     let bundleIdArg = bundleId.asRubyArgument(name: "bundle_id", type: nil)
     let usernameArg = username.asRubyArgument(name: "username", type: nil)
@@ -7334,8 +7505,6 @@ public func notarize(package: String,
     let apiKeyPathArg = apiKeyPath.asRubyArgument(name: "api_key_path", type: nil)
     let apiKeyArg = apiKey.asRubyArgument(name: "api_key", type: nil)
     let array: [RubyCommand.Argument?] = [packageArg,
-                                          useNotarytoolArg,
-                                          tryEarlyStaplingArg,
                                           skipStaplingArg,
                                           bundleIdArg,
                                           usernameArg,
@@ -7528,6 +7697,7 @@ public func oclint(oclintPath: String = "oclint",
    - appName: OneSignal App Name. This is required when creating an app (in other words, when `:app_id` is not set, and optional when updating an app
    - androidToken: ANDROID GCM KEY
    - androidGcmSenderId: GCM SENDER ID
+   - fcmJson: FCM Service Account JSON File (in .json format)
    - apnsP12: APNS P12 File (in .p12 format)
    - apnsP12Password: APNS P12 password
    - apnsEnv: APNS environment
@@ -7540,6 +7710,7 @@ public func onesignal(appId: OptionalConfigValue<String?> = .fastlaneDefault(nil
                       appName: OptionalConfigValue<String?> = .fastlaneDefault(nil),
                       androidToken: OptionalConfigValue<String?> = .fastlaneDefault(nil),
                       androidGcmSenderId: OptionalConfigValue<String?> = .fastlaneDefault(nil),
+                      fcmJson: OptionalConfigValue<String?> = .fastlaneDefault(nil),
                       apnsP12: OptionalConfigValue<String?> = .fastlaneDefault(nil),
                       apnsP12Password: OptionalConfigValue<String?> = .fastlaneDefault(nil),
                       apnsEnv: String = "production",
@@ -7550,6 +7721,7 @@ public func onesignal(appId: OptionalConfigValue<String?> = .fastlaneDefault(nil
     let appNameArg = appName.asRubyArgument(name: "app_name", type: nil)
     let androidTokenArg = androidToken.asRubyArgument(name: "android_token", type: nil)
     let androidGcmSenderIdArg = androidGcmSenderId.asRubyArgument(name: "android_gcm_sender_id", type: nil)
+    let fcmJsonArg = fcmJson.asRubyArgument(name: "fcm_json", type: nil)
     let apnsP12Arg = apnsP12.asRubyArgument(name: "apns_p12", type: nil)
     let apnsP12PasswordArg = apnsP12Password.asRubyArgument(name: "apns_p12_password", type: nil)
     let apnsEnvArg = RubyCommand.Argument(name: "apns_env", value: apnsEnv, type: nil)
@@ -7559,6 +7731,7 @@ public func onesignal(appId: OptionalConfigValue<String?> = .fastlaneDefault(nil
                                           appNameArg,
                                           androidTokenArg,
                                           androidGcmSenderIdArg,
+                                          fcmJsonArg,
                                           apnsP12Arg,
                                           apnsP12PasswordArg,
                                           apnsEnvArg,
@@ -7573,7 +7746,7 @@ public func onesignal(appId: OptionalConfigValue<String?> = .fastlaneDefault(nil
 /**
  This will prevent reports from being uploaded when _fastlane_ crashes
 
- _fastlane_ doesn't have crash reporting any more. Feel free to remove `opt_out_crash_reporting` from your Fastfile.
+ _fastlane_ doesn't have crash reporting anymore. Feel free to remove `opt_out_crash_reporting` from your Fastfile.
  */
 public func optOutCrashReporting() {
     let args: [RubyCommand.Argument] = []
@@ -7701,6 +7874,8 @@ public func pem(platform: String = "ios",
    - skipSubmission: Skip the distributing action of pilot and only upload the ipa file
    - skipWaitingForBuildProcessing: If set to true, the `distribute_external` option won't work and no build will be distributed to testers. (You might want to use this option if you are using this action on CI and have to pay for 'minutes used' on your CI plan). If set to `true` and a changelog is provided, it will partially wait for the build to appear on AppStore Connect so the changelog can be set, and skip the remaining processing steps
    - updateBuildInfoOnUpload: **DEPRECATED!** Update build info immediately after validation. This is deprecated and will be removed in a future release. App Store Connect no longer supports setting build info until after build processing has completed, which is when build info is updated by default
+   - appClipInvocations: Add beta app clip invocations to your builds in TestFlight
+   - overwriteAppClipInvocations: Clear all previous beta app clip invocations before adding new ones
    - distributeOnly: Distribute a previously uploaded build (equivalent to the `fastlane pilot distribute` command)
    - usesNonExemptEncryption: Provide the 'Uses Non-Exempt Encryption' for export compliance. This is used if there is 'ITSAppUsesNonExemptEncryption' is not set in the Info.plist
    - distributeExternal: Should the build be distributed to external testers? If set to true, use of `groups` option is required
@@ -7717,6 +7892,7 @@ public func pem(platform: String = "ios",
    - teamName: The name of your App Store Connect team if you're in multiple teams
    - devPortalTeamId: The short ID of your team in the developer portal, if you're in multiple teams. Different from your iTC team ID!
    - itcProvider: The provider short name to be used with the iTMSTransporter to identify your team. This value will override the automatically detected provider short name. To get provider short name run `pathToXcode.app/Contents/Applications/Application\ Loader.app/Contents/itms/bin/iTMSTransporter -m provider -u 'USERNAME' -p 'PASSWORD' -account_type itunes_connect -v off`. The short names of providers should be listed in the second column
+   - providerPublicId: The provider public ID to be used with altool (--provider-public-id). This value will override the automatically detected provider value for altool uploads. Required after Xcode 26 when your account is associated with multiple providers and using username/app-password authentication
    - waitProcessingInterval: Interval in seconds to wait for App Store Connect processing
    - waitProcessingTimeoutDuration: Timeout duration in seconds to wait for App Store Connect processing. If set, after exceeding timeout duration, this will `force stop` to wait for App Store Connect processing and exit with exception
    - waitForUploadedBuild: **DEPRECATED!** No longer needed with the transition over to the App Store Connect API - Use version info from uploaded ipa file to determine what build to use for distribution. If set to false, latest processing or any latest build will be used
@@ -7744,6 +7920,8 @@ public func pilot(apiKeyPath: OptionalConfigValue<String?> = .fastlaneDefault(ni
                   skipSubmission: OptionalConfigValue<Bool> = .fastlaneDefault(false),
                   skipWaitingForBuildProcessing: OptionalConfigValue<Bool> = .fastlaneDefault(false),
                   updateBuildInfoOnUpload: OptionalConfigValue<Bool> = .fastlaneDefault(false),
+                  appClipInvocations: OptionalConfigValue<[String]?> = .fastlaneDefault(nil),
+                  overwriteAppClipInvocations: OptionalConfigValue<Bool> = .fastlaneDefault(false),
                   distributeOnly: OptionalConfigValue<Bool> = .fastlaneDefault(false),
                   usesNonExemptEncryption: OptionalConfigValue<Bool> = .fastlaneDefault(false),
                   distributeExternal: OptionalConfigValue<Bool> = .fastlaneDefault(false),
@@ -7760,6 +7938,7 @@ public func pilot(apiKeyPath: OptionalConfigValue<String?> = .fastlaneDefault(ni
                   teamName: OptionalConfigValue<String?> = .fastlaneDefault(nil),
                   devPortalTeamId: OptionalConfigValue<String?> = .fastlaneDefault(nil),
                   itcProvider: OptionalConfigValue<String?> = .fastlaneDefault(nil),
+                  providerPublicId: OptionalConfigValue<String?> = .fastlaneDefault(nil),
                   waitProcessingInterval: Int = 30,
                   waitProcessingTimeoutDuration: OptionalConfigValue<Int?> = .fastlaneDefault(nil),
                   waitForUploadedBuild: OptionalConfigValue<Bool> = .fastlaneDefault(false),
@@ -7784,6 +7963,8 @@ public func pilot(apiKeyPath: OptionalConfigValue<String?> = .fastlaneDefault(ni
     let skipSubmissionArg = skipSubmission.asRubyArgument(name: "skip_submission", type: nil)
     let skipWaitingForBuildProcessingArg = skipWaitingForBuildProcessing.asRubyArgument(name: "skip_waiting_for_build_processing", type: nil)
     let updateBuildInfoOnUploadArg = updateBuildInfoOnUpload.asRubyArgument(name: "update_build_info_on_upload", type: nil)
+    let appClipInvocationsArg = appClipInvocations.asRubyArgument(name: "app_clip_invocations", type: nil)
+    let overwriteAppClipInvocationsArg = overwriteAppClipInvocations.asRubyArgument(name: "overwrite_app_clip_invocations", type: nil)
     let distributeOnlyArg = distributeOnly.asRubyArgument(name: "distribute_only", type: nil)
     let usesNonExemptEncryptionArg = usesNonExemptEncryption.asRubyArgument(name: "uses_non_exempt_encryption", type: nil)
     let distributeExternalArg = distributeExternal.asRubyArgument(name: "distribute_external", type: nil)
@@ -7800,6 +7981,7 @@ public func pilot(apiKeyPath: OptionalConfigValue<String?> = .fastlaneDefault(ni
     let teamNameArg = teamName.asRubyArgument(name: "team_name", type: nil)
     let devPortalTeamIdArg = devPortalTeamId.asRubyArgument(name: "dev_portal_team_id", type: nil)
     let itcProviderArg = itcProvider.asRubyArgument(name: "itc_provider", type: nil)
+    let providerPublicIdArg = providerPublicId.asRubyArgument(name: "provider_public_id", type: nil)
     let waitProcessingIntervalArg = RubyCommand.Argument(name: "wait_processing_interval", value: waitProcessingInterval, type: nil)
     let waitProcessingTimeoutDurationArg = waitProcessingTimeoutDuration.asRubyArgument(name: "wait_processing_timeout_duration", type: nil)
     let waitForUploadedBuildArg = waitForUploadedBuild.asRubyArgument(name: "wait_for_uploaded_build", type: nil)
@@ -7823,6 +8005,8 @@ public func pilot(apiKeyPath: OptionalConfigValue<String?> = .fastlaneDefault(ni
                                           skipSubmissionArg,
                                           skipWaitingForBuildProcessingArg,
                                           updateBuildInfoOnUploadArg,
+                                          appClipInvocationsArg,
+                                          overwriteAppClipInvocationsArg,
                                           distributeOnlyArg,
                                           usesNonExemptEncryptionArg,
                                           distributeExternalArg,
@@ -7839,6 +8023,7 @@ public func pilot(apiKeyPath: OptionalConfigValue<String?> = .fastlaneDefault(ni
                                           teamNameArg,
                                           devPortalTeamIdArg,
                                           itcProviderArg,
+                                          providerPublicIdArg,
                                           waitProcessingIntervalArg,
                                           waitProcessingTimeoutDurationArg,
                                           waitForUploadedBuildArg,
@@ -8182,7 +8367,7 @@ public func println(message: OptionalConfigValue<String?> = .fastlaneDefault(nil
    - skipItc: Skip the creation of the app on App Store Connect
    - itcUsers: Array of App Store Connect users. If provided, you can limit access to this newly created app for users with the App Manager, Developer, Marketer or Sales roles
    - enabledFeatures: **DEPRECATED!** Please use `enable_services` instead - Array with Spaceship App Services
-   - enableServices: Array with Spaceship App Services (e.g. access_wifi: (on|off), app_attest: (on|off), app_group: (on|off), apple_pay: (on|off), associated_domains: (on|off), auto_fill_credential: (on|off), class_kit: (on|off), icloud: (legacy|cloudkit), custom_network_protocol: (on|off), data_protection: (complete|unlessopen|untilfirstauth), extended_virtual_address_space: (on|off), family_controls: (on|off), file_provider_testing_mode: (on|off), fonts: (on|off), game_center: (ios|mac), health_kit: (on|off), hls_interstitial_preview: (on|off), home_kit: (on|off), hotspot: (on|off), in_app_purchase: (on|off), inter_app_audio: (on|off), low_latency_hls: (on|off), managed_associated_domains: (on|off), maps: (on|off), multipath: (on|off), network_extension: (on|off), nfc_tag_reading: (on|off), personal_vpn: (on|off), passbook: (on|off), push_notification: (on|off), sign_in_with_apple: (on), siri_kit: (on|off), system_extension: (on|off), user_management: (on|off), vpn_configuration: (on|off), wallet: (on|off), wireless_accessory: (on|off), car_play_audio_app: (on|off), car_play_messaging_app: (on|off), car_play_navigation_app: (on|off), car_play_voip_calling_app: (on|off), critical_alerts: (on|off), hotspot_helper: (on|off), driver_kit: (on|off), driver_kit_endpoint_security: (on|off), driver_kit_family_hid_device: (on|off), driver_kit_family_networking: (on|off), driver_kit_family_serial: (on|off), driver_kit_hid_event_service: (on|off), driver_kit_transport_hid: (on|off), multitasking_camera_access: (on|off), sf_universal_link_api: (on|off), vp9_decoder: (on|off), music_kit: (on|off), shazam_kit: (on|off), communication_notifications: (on|off), group_activities: (on|off), health_kit_estimate_recalibration: (on|off), time_sensitive_notifications: (on|off))
+   - enableServices: Array with Spaceship App Services (e.g. access_wifi: (on|off), app_attest: (on|off), app_group: (on|off), apple_pay: (on|off), associated_domains: (on|off), auto_fill_credential: (on|off), class_kit: (on|off), declared_age_range: (on|off), icloud: (legacy|cloudkit), custom_network_protocol: (on|off), data_protection: (complete|unlessopen|untilfirstauth), extended_virtual_address_space: (on|off), family_controls: (on|off), file_provider_testing_mode: (on|off), fonts: (on|off), game_center: (ios|mac), health_kit: (on|off), hls_interstitial_preview: (on|off), home_kit: (on|off), hotspot: (on|off), in_app_purchase: (on|off), inter_app_audio: (on|off), low_latency_hls: (on|off), managed_associated_domains: (on|off), maps: (on|off), multipath: (on|off), network_extension: (on|off), nfc_tag_reading: (on|off), personal_vpn: (on|off), passbook: (on|off), push_notification: (on|off), sign_in_with_apple: (on), siri_kit: (on|off), system_extension: (on|off), user_management: (on|off), vpn_configuration: (on|off), wallet: (on|off), wireless_accessory: (on|off), car_play_audio_app: (on|off), car_play_messaging_app: (on|off), car_play_navigation_app: (on|off), car_play_voip_calling_app: (on|off), critical_alerts: (on|off), hotspot_helper: (on|off), driver_kit: (on|off), driver_kit_endpoint_security: (on|off), driver_kit_family_hid_device: (on|off), driver_kit_family_networking: (on|off), driver_kit_family_serial: (on|off), driver_kit_hid_event_service: (on|off), driver_kit_transport_hid: (on|off), multitasking_camera_access: (on|off), sf_universal_link_api: (on|off), vp9_decoder: (on|off), music_kit: (on|off), shazam_kit: (on|off), communication_notifications: (on|off), group_activities: (on|off), health_kit_estimate_recalibration: (on|off), time_sensitive_notifications: (on|off))
    - skipDevcenter: Skip the creation of the app on the Apple Developer Portal
    - teamId: The ID of your Developer Portal team if you're in multiple teams
    - teamName: The name of your Developer Portal team if you're in multiple teams
@@ -8598,6 +8783,7 @@ public func resetSimulatorContents(ios: OptionalConfigValue<[String]?> = .fastla
    - bundleId: Set new bundle ID during resign (`CFBundleIdentifier`)
    - useAppEntitlements: Extract app bundle codesigning entitlements and combine with entitlements from new provisioning profile
    - keychainPath: Provide a path to a keychain file that should be used by `/usr/bin/codesign`
+   - pagesize: Page size in bytes passed to `/usr/bin/codesign --pagesize` (must be a power of two)
  */
 public func resign(ipa: String,
                    signingIdentity: String,
@@ -8609,7 +8795,8 @@ public func resign(ipa: String,
                    bundleVersion: OptionalConfigValue<String?> = .fastlaneDefault(nil),
                    bundleId: OptionalConfigValue<String?> = .fastlaneDefault(nil),
                    useAppEntitlements: OptionalConfigValue<Bool?> = .fastlaneDefault(nil),
-                   keychainPath: OptionalConfigValue<String?> = .fastlaneDefault(nil))
+                   keychainPath: OptionalConfigValue<String?> = .fastlaneDefault(nil),
+                   pagesize: OptionalConfigValue<Int?> = .fastlaneDefault(nil))
 {
     let ipaArg = RubyCommand.Argument(name: "ipa", value: ipa, type: nil)
     let signingIdentityArg = RubyCommand.Argument(name: "signing_identity", value: signingIdentity, type: nil)
@@ -8622,6 +8809,7 @@ public func resign(ipa: String,
     let bundleIdArg = bundleId.asRubyArgument(name: "bundle_id", type: nil)
     let useAppEntitlementsArg = useAppEntitlements.asRubyArgument(name: "use_app_entitlements", type: nil)
     let keychainPathArg = keychainPath.asRubyArgument(name: "keychain_path", type: nil)
+    let pagesizeArg = pagesize.asRubyArgument(name: "pagesize", type: nil)
     let array: [RubyCommand.Argument?] = [ipaArg,
                                           signingIdentityArg,
                                           entitlementsArg,
@@ -8632,7 +8820,8 @@ public func resign(ipa: String,
                                           bundleVersionArg,
                                           bundleIdArg,
                                           useAppEntitlementsArg,
-                                          keychainPathArg]
+                                          keychainPathArg,
+                                          pagesizeArg]
     let args: [RubyCommand.Argument] = array
         .filter { $0?.value != nil }
         .compactMap { $0 }
@@ -8641,7 +8830,7 @@ public func resign(ipa: String,
 }
 
 /**
- This action restore your file that was backuped with the `backup_file` action
+ This action restore your file that was backed up with the `backup_file` action
 
  - parameter path: Original file name you want to restore
  */
@@ -8741,8 +8930,8 @@ public func rubyVersion() {
    - prelaunchSimulator: Enabling this option will launch the first simulator prior to calling any xcodebuild command
    - reinstallApp: Enabling this option will automatically uninstall the application before running it
    - appIdentifier: The bundle identifier of the app to uninstall (only needed when enabling reinstall_app)
-   - onlyTesting: Array of strings matching Test Bundle/Test Suite/Test Cases to run
-   - skipTesting: Array of strings matching Test Bundle/Test Suite/Test Cases to skip
+   - onlyTesting: Array of test identifiers to run. Expected format: TestTarget[/TestSuite[/TestCase]]
+   - skipTesting: Array of test identifiers to skip. Expected format: TestTarget[/TestSuite[/TestCase]]
    - testplan: The testplan associated with the scheme that should be used for testing
    - onlyTestConfigurations: Array of strings matching test plan configurations to run
    - skipTestConfigurations: Array of strings matching test plan configurations to skip
@@ -8800,11 +8989,14 @@ public func rubyVersion() {
    - customReportFileName: **DEPRECATED!** Use `--output_files` instead - Sets custom full report file name when generating a single report
    - xcodebuildCommand: Allows for override of the default `xcodebuild` command
    - clonedSourcePackagesPath: Sets a custom path for Swift Package Manager dependencies
+   - packageCachePath: Sets a custom package cache path for Swift Package Manager dependencies
    - skipPackageDependenciesResolution: Skips resolution of Swift Package Manager dependencies
-   - disablePackageAutomaticUpdates: Prevents packages from automatically being resolved to versions other than those recorded in the `Package.resolved` file
+   - disablePackageAutomaticUpdates: Prevents packages from automatically being resolved to versions other than those recorded in the `Package.resolved` file. This translates in the option `-disableAutomaticPackageResolution` being passed to xcodebuild
+   - skipPackageRepositoryFetches: Skips updating package dependencies from their remote. This translates in the option `-skipPackageUpdates` being passed to xcodebuild
    - useSystemScm: Lets xcodebuild use system's scm configuration
    - numberOfRetries: The number of times a test can fail
    - failBuild: Should this step stop the build if the tests fail? Set this to false if you're using trainer
+   - packageAuthorizationProvider: Lets xcodebuild use a specified package authorization provider (keychain|netrc)
 
  - returns: Outputs hash of results with the following keys: :number_of_tests, :number_of_failures, :number_of_retries, :number_of_tests_excluding_retries, :number_of_failures_excluding_retries
 
@@ -8883,11 +9075,14 @@ public func rubyVersion() {
                                         customReportFileName: OptionalConfigValue<String?> = .fastlaneDefault(nil),
                                         xcodebuildCommand: String = "env NSUnbufferedIO=YES xcodebuild",
                                         clonedSourcePackagesPath: OptionalConfigValue<String?> = .fastlaneDefault(nil),
+                                        packageCachePath: OptionalConfigValue<String?> = .fastlaneDefault(nil),
                                         skipPackageDependenciesResolution: OptionalConfigValue<Bool> = .fastlaneDefault(false),
                                         disablePackageAutomaticUpdates: OptionalConfigValue<Bool> = .fastlaneDefault(false),
+                                        skipPackageRepositoryFetches: OptionalConfigValue<Bool> = .fastlaneDefault(false),
                                         useSystemScm: OptionalConfigValue<Bool> = .fastlaneDefault(false),
                                         numberOfRetries: Int = 0,
-                                        failBuild: OptionalConfigValue<Bool> = .fastlaneDefault(true)) -> [String: Any]
+                                        failBuild: OptionalConfigValue<Bool> = .fastlaneDefault(true),
+                                        packageAuthorizationProvider: OptionalConfigValue<String?> = .fastlaneDefault(nil)) -> [String: Any]
 {
     let workspaceArg = workspace.asRubyArgument(name: "workspace", type: nil)
     let projectArg = project.asRubyArgument(name: "project", type: nil)
@@ -8962,11 +9157,14 @@ public func rubyVersion() {
     let customReportFileNameArg = customReportFileName.asRubyArgument(name: "custom_report_file_name", type: nil)
     let xcodebuildCommandArg = RubyCommand.Argument(name: "xcodebuild_command", value: xcodebuildCommand, type: nil)
     let clonedSourcePackagesPathArg = clonedSourcePackagesPath.asRubyArgument(name: "cloned_source_packages_path", type: nil)
+    let packageCachePathArg = packageCachePath.asRubyArgument(name: "package_cache_path", type: nil)
     let skipPackageDependenciesResolutionArg = skipPackageDependenciesResolution.asRubyArgument(name: "skip_package_dependencies_resolution", type: nil)
     let disablePackageAutomaticUpdatesArg = disablePackageAutomaticUpdates.asRubyArgument(name: "disable_package_automatic_updates", type: nil)
+    let skipPackageRepositoryFetchesArg = skipPackageRepositoryFetches.asRubyArgument(name: "skip_package_repository_fetches", type: nil)
     let useSystemScmArg = useSystemScm.asRubyArgument(name: "use_system_scm", type: nil)
     let numberOfRetriesArg = RubyCommand.Argument(name: "number_of_retries", value: numberOfRetries, type: nil)
     let failBuildArg = failBuild.asRubyArgument(name: "fail_build", type: nil)
+    let packageAuthorizationProviderArg = packageAuthorizationProvider.asRubyArgument(name: "package_authorization_provider", type: nil)
     let array: [RubyCommand.Argument?] = [workspaceArg,
                                           projectArg,
                                           packagePathArg,
@@ -9040,11 +9238,14 @@ public func rubyVersion() {
                                           customReportFileNameArg,
                                           xcodebuildCommandArg,
                                           clonedSourcePackagesPathArg,
+                                          packageCachePathArg,
                                           skipPackageDependenciesResolutionArg,
                                           disablePackageAutomaticUpdatesArg,
+                                          skipPackageRepositoryFetchesArg,
                                           useSystemScmArg,
                                           numberOfRetriesArg,
-                                          failBuildArg]
+                                          failBuildArg,
+                                          packageAuthorizationProviderArg]
     let args: [RubyCommand.Argument] = array
         .filter { $0?.value != nil }
         .compactMap { $0 }
@@ -9172,8 +9373,8 @@ public func say(text: [String],
    - prelaunchSimulator: Enabling this option will launch the first simulator prior to calling any xcodebuild command
    - reinstallApp: Enabling this option will automatically uninstall the application before running it
    - appIdentifier: The bundle identifier of the app to uninstall (only needed when enabling reinstall_app)
-   - onlyTesting: Array of strings matching Test Bundle/Test Suite/Test Cases to run
-   - skipTesting: Array of strings matching Test Bundle/Test Suite/Test Cases to skip
+   - onlyTesting: Array of test identifiers to run. Expected format: TestTarget[/TestSuite[/TestCase]]
+   - skipTesting: Array of test identifiers to skip. Expected format: TestTarget[/TestSuite[/TestCase]]
    - testplan: The testplan associated with the scheme that should be used for testing
    - onlyTestConfigurations: Array of strings matching test plan configurations to run
    - skipTestConfigurations: Array of strings matching test plan configurations to skip
@@ -9231,11 +9432,14 @@ public func say(text: [String],
    - customReportFileName: **DEPRECATED!** Use `--output_files` instead - Sets custom full report file name when generating a single report
    - xcodebuildCommand: Allows for override of the default `xcodebuild` command
    - clonedSourcePackagesPath: Sets a custom path for Swift Package Manager dependencies
+   - packageCachePath: Sets a custom package cache path for Swift Package Manager dependencies
    - skipPackageDependenciesResolution: Skips resolution of Swift Package Manager dependencies
-   - disablePackageAutomaticUpdates: Prevents packages from automatically being resolved to versions other than those recorded in the `Package.resolved` file
+   - disablePackageAutomaticUpdates: Prevents packages from automatically being resolved to versions other than those recorded in the `Package.resolved` file. This translates in the option `-disableAutomaticPackageResolution` being passed to xcodebuild
+   - skipPackageRepositoryFetches: Skips updating package dependencies from their remote. This translates in the option `-skipPackageUpdates` being passed to xcodebuild
    - useSystemScm: Lets xcodebuild use system's scm configuration
    - numberOfRetries: The number of times a test can fail
    - failBuild: Should this step stop the build if the tests fail? Set this to false if you're using trainer
+   - packageAuthorizationProvider: Lets xcodebuild use a specified package authorization provider (keychain|netrc)
 
  - returns: Outputs hash of results with the following keys: :number_of_tests, :number_of_failures, :number_of_retries, :number_of_tests_excluding_retries, :number_of_failures_excluding_retries
 
@@ -9314,11 +9518,14 @@ public func say(text: [String],
                                     customReportFileName: OptionalConfigValue<String?> = .fastlaneDefault(scanfile.customReportFileName),
                                     xcodebuildCommand: String = scanfile.xcodebuildCommand,
                                     clonedSourcePackagesPath: OptionalConfigValue<String?> = .fastlaneDefault(scanfile.clonedSourcePackagesPath),
+                                    packageCachePath: OptionalConfigValue<String?> = .fastlaneDefault(scanfile.packageCachePath),
                                     skipPackageDependenciesResolution: OptionalConfigValue<Bool> = .fastlaneDefault(scanfile.skipPackageDependenciesResolution),
                                     disablePackageAutomaticUpdates: OptionalConfigValue<Bool> = .fastlaneDefault(scanfile.disablePackageAutomaticUpdates),
+                                    skipPackageRepositoryFetches: OptionalConfigValue<Bool> = .fastlaneDefault(scanfile.skipPackageRepositoryFetches),
                                     useSystemScm: OptionalConfigValue<Bool> = .fastlaneDefault(scanfile.useSystemScm),
                                     numberOfRetries: Int = scanfile.numberOfRetries,
-                                    failBuild: OptionalConfigValue<Bool> = .fastlaneDefault(scanfile.failBuild)) -> [String: Any]
+                                    failBuild: OptionalConfigValue<Bool> = .fastlaneDefault(scanfile.failBuild),
+                                    packageAuthorizationProvider: OptionalConfigValue<String?> = .fastlaneDefault(scanfile.packageAuthorizationProvider)) -> [String: Any]
 {
     let workspaceArg = workspace.asRubyArgument(name: "workspace", type: nil)
     let projectArg = project.asRubyArgument(name: "project", type: nil)
@@ -9393,11 +9600,14 @@ public func say(text: [String],
     let customReportFileNameArg = customReportFileName.asRubyArgument(name: "custom_report_file_name", type: nil)
     let xcodebuildCommandArg = RubyCommand.Argument(name: "xcodebuild_command", value: xcodebuildCommand, type: nil)
     let clonedSourcePackagesPathArg = clonedSourcePackagesPath.asRubyArgument(name: "cloned_source_packages_path", type: nil)
+    let packageCachePathArg = packageCachePath.asRubyArgument(name: "package_cache_path", type: nil)
     let skipPackageDependenciesResolutionArg = skipPackageDependenciesResolution.asRubyArgument(name: "skip_package_dependencies_resolution", type: nil)
     let disablePackageAutomaticUpdatesArg = disablePackageAutomaticUpdates.asRubyArgument(name: "disable_package_automatic_updates", type: nil)
+    let skipPackageRepositoryFetchesArg = skipPackageRepositoryFetches.asRubyArgument(name: "skip_package_repository_fetches", type: nil)
     let useSystemScmArg = useSystemScm.asRubyArgument(name: "use_system_scm", type: nil)
     let numberOfRetriesArg = RubyCommand.Argument(name: "number_of_retries", value: numberOfRetries, type: nil)
     let failBuildArg = failBuild.asRubyArgument(name: "fail_build", type: nil)
+    let packageAuthorizationProviderArg = packageAuthorizationProvider.asRubyArgument(name: "package_authorization_provider", type: nil)
     let array: [RubyCommand.Argument?] = [workspaceArg,
                                           projectArg,
                                           packagePathArg,
@@ -9471,11 +9681,14 @@ public func say(text: [String],
                                           customReportFileNameArg,
                                           xcodebuildCommandArg,
                                           clonedSourcePackagesPathArg,
+                                          packageCachePathArg,
                                           skipPackageDependenciesResolutionArg,
                                           disablePackageAutomaticUpdatesArg,
+                                          skipPackageRepositoryFetchesArg,
                                           useSystemScmArg,
                                           numberOfRetriesArg,
-                                          failBuildArg]
+                                          failBuildArg,
+                                          packageAuthorizationProviderArg]
     let args: [RubyCommand.Argument] = array
         .filter { $0?.value != nil }
         .compactMap { $0 }
@@ -9658,7 +9871,7 @@ public func setBuildNumberRepository(useHgRevisionNumber: OptionalConfigValue<Bo
    - changelog: Changelog text that should be uploaded to App Store Connect
    - teamId: The ID of your App Store Connect team if you're in multiple teams
    - teamName: The name of your App Store Connect team if you're in multiple teams
-   - platform: The platform of the app (ios, appletvos, mac)
+   - platform: The platform of the app (ios, appletvos, xros, mac)
 
  This is useful if you have only one changelog for all languages.
  You can store the changelog in `./changelog.txt` and it will automatically get loaded from there. This integration is useful if you support e.g. 10 languages and want to use the same "What's new"-text for all languages.
@@ -9706,7 +9919,7 @@ public func setChangelog(apiKeyPath: OptionalConfigValue<String?> = .fastlaneDef
     - repositoryName: The path to your repo, e.g. 'fastlane/fastlane'
     - serverUrl: The server url. e.g. 'https://your.internal.github.host/api/v3' (Default: 'https://api.github.com')
     - apiToken: Personal API Token for GitHub - generate one at https://github.com/settings/tokens
-    - apiBearer: Use a Bearer authorization token. Usually generated by Github Apps, e.g. GitHub Actions GITHUB_TOKEN environment variable
+    - apiBearer: Use a Bearer authorization token. Usually generated by GitHub Apps, e.g. GitHub Actions GITHUB_TOKEN environment variable
     - tagName: Pass in the tag name
     - name: Name of this release
     - commitish: Specifies the commitish value that determines where the Git tag is created from. Can be any branch or commit SHA. Unused if the Git tag already exists. Default: the repository's default branch (usually master)
@@ -9838,6 +10051,7 @@ public func setPodKey(useBundleExec: OptionalConfigValue<Bool> = .fastlaneDefaul
    - force: Force setup, even if not executed by CI
    - provider: CI provider. If none is set, the provider is detected automatically
    - timeout: Set a custom timeout in seconds for keychain.  Set `0` if you want to specify 'no time-out'
+   - keychainName: Set a custom keychain name
 
  - Creates a new temporary keychain for use with match|
  - Switches match to `readonly` mode to not create new profiles/cert on CI|
@@ -9847,14 +10061,17 @@ public func setPodKey(useBundleExec: OptionalConfigValue<Bool> = .fastlaneDefaul
  */
 public func setupCi(force: OptionalConfigValue<Bool> = .fastlaneDefault(false),
                     provider: OptionalConfigValue<String?> = .fastlaneDefault(nil),
-                    timeout: Int = 3600)
+                    timeout: Int = 3600,
+                    keychainName: String = "fastlane_tmp_keychain")
 {
     let forceArg = force.asRubyArgument(name: "force", type: nil)
     let providerArg = provider.asRubyArgument(name: "provider", type: nil)
     let timeoutArg = RubyCommand.Argument(name: "timeout", value: timeout, type: nil)
+    let keychainNameArg = RubyCommand.Argument(name: "keychain_name", value: keychainName, type: nil)
     let array: [RubyCommand.Argument?] = [forceArg,
                                           providerArg,
-                                          timeoutArg]
+                                          timeoutArg,
+                                          keychainNameArg]
     let args: [RubyCommand.Argument] = array
         .filter { $0?.value != nil }
         .compactMap { $0 }
@@ -10029,8 +10246,12 @@ public func setupTravis(force: OptionalConfigValue<Bool> = .fastlaneDefault(fals
    - skipCertificateVerification: Skips the verification of the certificates for every existing profiles. This will make sure the provisioning profile can be used on the local machine
    - platform: Set the provisioning profile's platform (i.e. ios, tvos, macos, catalyst)
    - readonly: Only fetch existing profile, don't generate new ones
-   - templateName: The name of provisioning profile template. If the developer account has provisioning profile templates (aka: custom entitlements), the template name can be found by inspecting the Entitlements drop-down while creating/editing a provisioning profile (e.g. "Apple Pay Pass Suppression Development")
+   - templateName: **DEPRECATED!** Removed since May 2025 on App Store Connect API OpenAPI v3.8.0 - Learn more: https://docs.fastlane.tools/actions/match/#managed-capabilities - The name of provisioning profile template. If the developer account has provisioning profile templates (aka: custom entitlements), the template name can be found by inspecting the Entitlements drop-down while creating/editing a provisioning profile (e.g. "Apple Pay Pass Suppression Development")
    - failOnNameTaken: Should the command fail if it was about to create a duplicate of an existing provisioning profile. It can happen due to issues on Apple Developer Portal, when profile to be recreated was not properly deleted first
+   - cachedCertificates: A list of cached certificates
+   - cachedDevices: A list of cached devices
+   - cachedBundleIds: A list of cached bundle ids
+   - cachedProfiles: A list of cached bundle ids
 
  - returns: The UUID of the profile sigh just fetched/generated
 
@@ -10060,7 +10281,11 @@ public func setupTravis(force: OptionalConfigValue<Bool> = .fastlaneDefault(fals
                                     platform: Any = "ios",
                                     readonly: OptionalConfigValue<Bool> = .fastlaneDefault(false),
                                     templateName: OptionalConfigValue<String?> = .fastlaneDefault(nil),
-                                    failOnNameTaken: OptionalConfigValue<Bool> = .fastlaneDefault(false)) -> String
+                                    failOnNameTaken: OptionalConfigValue<Bool> = .fastlaneDefault(false),
+                                    cachedCertificates: Any? = nil,
+                                    cachedDevices: Any? = nil,
+                                    cachedBundleIds: Any? = nil,
+                                    cachedProfiles: Any? = nil) -> String
 {
     let adhocArg = adhoc.asRubyArgument(name: "adhoc", type: nil)
     let developerIdArg = developerId.asRubyArgument(name: "developer_id", type: nil)
@@ -10087,6 +10312,10 @@ public func setupTravis(force: OptionalConfigValue<Bool> = .fastlaneDefault(fals
     let readonlyArg = readonly.asRubyArgument(name: "readonly", type: nil)
     let templateNameArg = templateName.asRubyArgument(name: "template_name", type: nil)
     let failOnNameTakenArg = failOnNameTaken.asRubyArgument(name: "fail_on_name_taken", type: nil)
+    let cachedCertificatesArg = RubyCommand.Argument(name: "cached_certificates", value: cachedCertificates, type: nil)
+    let cachedDevicesArg = RubyCommand.Argument(name: "cached_devices", value: cachedDevices, type: nil)
+    let cachedBundleIdsArg = RubyCommand.Argument(name: "cached_bundle_ids", value: cachedBundleIds, type: nil)
+    let cachedProfilesArg = RubyCommand.Argument(name: "cached_profiles", value: cachedProfiles, type: nil)
     let array: [RubyCommand.Argument?] = [adhocArg,
                                           developerIdArg,
                                           developmentArg,
@@ -10111,7 +10340,11 @@ public func setupTravis(force: OptionalConfigValue<Bool> = .fastlaneDefault(fals
                                           platformArg,
                                           readonlyArg,
                                           templateNameArg,
-                                          failOnNameTakenArg]
+                                          failOnNameTakenArg,
+                                          cachedCertificatesArg,
+                                          cachedDevicesArg,
+                                          cachedBundleIdsArg,
+                                          cachedProfilesArg]
     let args: [RubyCommand.Argument] = array
         .filter { $0?.value != nil }
         .compactMap { $0 }
@@ -10140,7 +10373,9 @@ public func skipDocs() {
    - useWebhookConfiguredUsernameAndIcon: Use webhook's default username and icon settings? (true/false)
    - slackUrl: Create an Incoming WebHook for your Slack group
    - username: Overrides the webhook's username property if use_webhook_configured_username_and_icon is false
-   - iconUrl: Overrides the webhook's image property if use_webhook_configured_username_and_icon is false
+   - iconUrl: Specifies a URL of an image to use as the photo of the message. Overrides the webhook's image property if use_webhook_configured_username_and_icon is false
+   - iconEmoji: Specifies an emoji (using colon shortcodes, eg. :white_check_mark:) to use as the photo of the message. Overrides the webhook's image property if use_webhook_configured_username_and_icon is false. This parameter takes precedence over icon_url
+   - threadTs: Specifies a thread timestamp to reply to a message in a thread
    - payload: Add additional information to this post. payload must be a hash containing any key with any value
    - defaultPayloads: Specifies default payloads to include. Pass an empty array to suppress all the default payloads
    - attachmentProperties: Merge additional properties in the slack attachment, see https://api.slack.com/docs/attachments
@@ -10157,6 +10392,8 @@ public func slack(message: OptionalConfigValue<String?> = .fastlaneDefault(nil),
                   slackUrl: String,
                   username: String = "fastlane",
                   iconUrl: String = "https://fastlane.tools/assets/img/fastlane_icon.png",
+                  iconEmoji: OptionalConfigValue<String?> = .fastlaneDefault(nil),
+                  threadTs: OptionalConfigValue<String?> = .fastlaneDefault(nil),
                   payload: [String: Any] = [:],
                   defaultPayloads: [String] = ["lane", "test_result", "git_branch", "git_author", "last_git_commit", "last_git_commit_hash"],
                   attachmentProperties: [String: Any] = [:],
@@ -10171,6 +10408,8 @@ public func slack(message: OptionalConfigValue<String?> = .fastlaneDefault(nil),
     let slackUrlArg = RubyCommand.Argument(name: "slack_url", value: slackUrl, type: nil)
     let usernameArg = RubyCommand.Argument(name: "username", value: username, type: nil)
     let iconUrlArg = RubyCommand.Argument(name: "icon_url", value: iconUrl, type: nil)
+    let iconEmojiArg = iconEmoji.asRubyArgument(name: "icon_emoji", type: nil)
+    let threadTsArg = threadTs.asRubyArgument(name: "thread_ts", type: nil)
     let payloadArg = RubyCommand.Argument(name: "payload", value: payload, type: nil)
     let defaultPayloadsArg = RubyCommand.Argument(name: "default_payloads", value: defaultPayloads, type: nil)
     let attachmentPropertiesArg = RubyCommand.Argument(name: "attachment_properties", value: attachmentProperties, type: nil)
@@ -10184,6 +10423,8 @@ public func slack(message: OptionalConfigValue<String?> = .fastlaneDefault(nil),
                                           slackUrlArg,
                                           usernameArg,
                                           iconUrlArg,
+                                          iconEmojiArg,
+                                          threadTsArg,
                                           payloadArg,
                                           defaultPayloadsArg,
                                           attachmentPropertiesArg,
@@ -10198,55 +10439,6 @@ public func slack(message: OptionalConfigValue<String?> = .fastlaneDefault(nil),
 }
 
 /**
- Show a train of the fastlane progress
-
- - returns: A string that is being sent to slack
- */
-public func slackTrain() {
-    let args: [RubyCommand.Argument] = []
-    let command = RubyCommand(commandID: "", methodName: "slack_train", className: nil, args: args)
-    _ = runner.executeCommand(command)
-}
-
-/**
-
- */
-public func slackTrainCrash() {
-    let args: [RubyCommand.Argument] = []
-    let command = RubyCommand(commandID: "", methodName: "slack_train_crash", className: nil, args: args)
-    _ = runner.executeCommand(command)
-}
-
-/**
- Show a train of the fastlane progress
-
- - parameters:
-   - distance: How many rails do we need?
-   - train: Train emoji
-   - rail: Character or emoji for the rail
-   - reverseDirection: Pass true if you want the train to go from left to right
- */
-public func slackTrainStart(distance: Int = 5,
-                            train: String = "🚝",
-                            rail: String = "=",
-                            reverseDirection: OptionalConfigValue<Bool> = .fastlaneDefault(false))
-{
-    let distanceArg = RubyCommand.Argument(name: "distance", value: distance, type: nil)
-    let trainArg = RubyCommand.Argument(name: "train", value: train, type: nil)
-    let railArg = RubyCommand.Argument(name: "rail", value: rail, type: nil)
-    let reverseDirectionArg = reverseDirection.asRubyArgument(name: "reverse_direction", type: nil)
-    let array: [RubyCommand.Argument?] = [distanceArg,
-                                          trainArg,
-                                          railArg,
-                                          reverseDirectionArg]
-    let args: [RubyCommand.Argument] = array
-        .filter { $0?.value != nil }
-        .compactMap { $0 }
-    let command = RubyCommand(commandID: "", methodName: "slack_train_start", className: nil, args: args)
-    _ = runner.executeCommand(command)
-}
-
-/**
  Use slather to generate a code coverage report
 
  - parameters:
@@ -10256,7 +10448,7 @@ public func slackTrainStart(distance: Int = 5,
    - scheme: Scheme to use when calling slather
    - configuration: Configuration to use when calling slather (since slather-2.4.1)
    - inputFormat: The input format that slather should look for
-   - github: Tell slather that it is running on Github Actions
+   - github: Tell slather that it is running on GitHub Actions
    - buildkite: Tell slather that it is running on Buildkite
    - teamcity: Tell slather that it is running on TeamCity
    - jenkins: Tell slather that it is running on Jenkins
@@ -10282,6 +10474,7 @@ public func slackTrainStart(distance: Int = 5,
    - arch: Specify which architecture the binary file is in. Needed for universal binaries
    - sourceFiles: A Dir.glob compatible pattern used to limit the lookup to specific source files. Ignored in gcov mode
    - decimals: The amount of decimals to use for % coverage reporting
+   - ymlfile: Relative path to a file used in place of '.slather.yml'
 
  Slather works with multiple code coverage formats, including Xcode 7 code coverage.
  Slather is available at [https://github.com/SlatherOrg/slather](https://github.com/SlatherOrg/slather).
@@ -10317,7 +10510,8 @@ public func slather(buildDirectory: OptionalConfigValue<String?> = .fastlaneDefa
                     binaryFile: OptionalConfigValue<[String]?> = .fastlaneDefault(nil),
                     arch: OptionalConfigValue<String?> = .fastlaneDefault(nil),
                     sourceFiles: OptionalConfigValue<Bool> = .fastlaneDefault(false),
-                    decimals: OptionalConfigValue<Bool> = .fastlaneDefault(false))
+                    decimals: OptionalConfigValue<Bool> = .fastlaneDefault(false),
+                    ymlfile: OptionalConfigValue<String?> = .fastlaneDefault(nil))
 {
     let buildDirectoryArg = buildDirectory.asRubyArgument(name: "build_directory", type: nil)
     let projArg = proj.asRubyArgument(name: "proj", type: nil)
@@ -10351,6 +10545,7 @@ public func slather(buildDirectory: OptionalConfigValue<String?> = .fastlaneDefa
     let archArg = arch.asRubyArgument(name: "arch", type: nil)
     let sourceFilesArg = sourceFiles.asRubyArgument(name: "source_files", type: nil)
     let decimalsArg = decimals.asRubyArgument(name: "decimals", type: nil)
+    let ymlfileArg = ymlfile.asRubyArgument(name: "ymlfile", type: nil)
     let array: [RubyCommand.Argument?] = [buildDirectoryArg,
                                           projArg,
                                           workspaceArg,
@@ -10382,7 +10577,8 @@ public func slather(buildDirectory: OptionalConfigValue<String?> = .fastlaneDefa
                                           binaryFileArg,
                                           archArg,
                                           sourceFilesArg,
-                                          decimalsArg]
+                                          decimalsArg,
+                                          ymlfileArg]
     let args: [RubyCommand.Argument] = array
         .filter { $0?.value != nil }
         .compactMap { $0 }
@@ -10394,8 +10590,8 @@ public func slather(buildDirectory: OptionalConfigValue<String?> = .fastlaneDefa
  Alias for the `capture_ios_screenshots` action
 
  - parameters:
-   - workspace: Path the workspace file
-   - project: Path the project file
+   - workspace: Path to the workspace file
+   - project: Path to the project file
    - xcargs: Pass additional arguments to xcodebuild for the test phase. Be sure to quote the setting names and values e.g. OTHER_LDFLAGS="-ObjC -lstdc++"
    - xcconfig: Use an extra XCCONFIG file to build your app
    - devices: A list of devices you want to take the screenshots from
@@ -10433,8 +10629,11 @@ public func slather(buildDirectory: OptionalConfigValue<String?> = .fastlaneDefa
    - concurrentSimulators: Take snapshots on multiple simulators concurrently. Note: This option is only applicable when running against Xcode 9
    - disableSlideToType: Disable the simulator from showing the 'Slide to type' prompt
    - clonedSourcePackagesPath: Sets a custom path for Swift Package Manager dependencies
+   - packageCachePath: Sets a custom package cache path for Swift Package Manager dependencies
    - skipPackageDependenciesResolution: Skips resolution of Swift Package Manager dependencies
-   - disablePackageAutomaticUpdates: Prevents packages from automatically being resolved to versions other than those recorded in the `Package.resolved` file
+   - disablePackageAutomaticUpdates: Prevents packages from automatically being resolved to versions other than those recorded in the `Package.resolved` file. This translates in the option `-disableAutomaticPackageResolution` being passed to xcodebuild
+   - skipPackageRepositoryFetches: Skips updating package dependencies from their remote. This translates in the option `-skipPackageUpdates` being passed to xcodebuild
+   - packageAuthorizationProvider: Lets xcodebuild use a specified package authorization provider (keychain|netrc)
    - testplan: The testplan associated with the scheme that should be used for testing
    - onlyTesting: Array of strings matching Test Bundle/Test Suite/Test Cases to run
    - skipTesting: Array of strings matching Test Bundle/Test Suite/Test Cases to skip
@@ -10483,8 +10682,11 @@ public func snapshot(workspace: OptionalConfigValue<String?> = .fastlaneDefault(
                      concurrentSimulators: OptionalConfigValue<Bool> = .fastlaneDefault(snapshotfile.concurrentSimulators),
                      disableSlideToType: OptionalConfigValue<Bool> = .fastlaneDefault(snapshotfile.disableSlideToType),
                      clonedSourcePackagesPath: OptionalConfigValue<String?> = .fastlaneDefault(snapshotfile.clonedSourcePackagesPath),
+                     packageCachePath: OptionalConfigValue<String?> = .fastlaneDefault(snapshotfile.packageCachePath),
                      skipPackageDependenciesResolution: OptionalConfigValue<Bool> = .fastlaneDefault(snapshotfile.skipPackageDependenciesResolution),
                      disablePackageAutomaticUpdates: OptionalConfigValue<Bool> = .fastlaneDefault(snapshotfile.disablePackageAutomaticUpdates),
+                     skipPackageRepositoryFetches: OptionalConfigValue<Bool> = .fastlaneDefault(snapshotfile.skipPackageRepositoryFetches),
+                     packageAuthorizationProvider: OptionalConfigValue<String?> = .fastlaneDefault(snapshotfile.packageAuthorizationProvider),
                      testplan: OptionalConfigValue<String?> = .fastlaneDefault(snapshotfile.testplan),
                      onlyTesting: Any? = snapshotfile.onlyTesting,
                      skipTesting: Any? = snapshotfile.skipTesting,
@@ -10533,8 +10735,11 @@ public func snapshot(workspace: OptionalConfigValue<String?> = .fastlaneDefault(
     let concurrentSimulatorsArg = concurrentSimulators.asRubyArgument(name: "concurrent_simulators", type: nil)
     let disableSlideToTypeArg = disableSlideToType.asRubyArgument(name: "disable_slide_to_type", type: nil)
     let clonedSourcePackagesPathArg = clonedSourcePackagesPath.asRubyArgument(name: "cloned_source_packages_path", type: nil)
+    let packageCachePathArg = packageCachePath.asRubyArgument(name: "package_cache_path", type: nil)
     let skipPackageDependenciesResolutionArg = skipPackageDependenciesResolution.asRubyArgument(name: "skip_package_dependencies_resolution", type: nil)
     let disablePackageAutomaticUpdatesArg = disablePackageAutomaticUpdates.asRubyArgument(name: "disable_package_automatic_updates", type: nil)
+    let skipPackageRepositoryFetchesArg = skipPackageRepositoryFetches.asRubyArgument(name: "skip_package_repository_fetches", type: nil)
+    let packageAuthorizationProviderArg = packageAuthorizationProvider.asRubyArgument(name: "package_authorization_provider", type: nil)
     let testplanArg = testplan.asRubyArgument(name: "testplan", type: nil)
     let onlyTestingArg = RubyCommand.Argument(name: "only_testing", value: onlyTesting, type: nil)
     let skipTestingArg = RubyCommand.Argument(name: "skip_testing", value: skipTesting, type: nil)
@@ -10582,8 +10787,11 @@ public func snapshot(workspace: OptionalConfigValue<String?> = .fastlaneDefault(
                                           concurrentSimulatorsArg,
                                           disableSlideToTypeArg,
                                           clonedSourcePackagesPathArg,
+                                          packageCachePathArg,
                                           skipPackageDependenciesResolutionArg,
                                           disablePackageAutomaticUpdatesArg,
+                                          skipPackageRepositoryFetchesArg,
+                                          packageAuthorizationProviderArg,
                                           testplanArg,
                                           onlyTestingArg,
                                           skipTestingArg,
@@ -10612,7 +10820,8 @@ public func snapshot(workspace: OptionalConfigValue<String?> = .fastlaneDefault(
    - projectLanguage: Language key, e.g. objc
    - sourceEncoding: Used encoding of source files, e.g., UTF-8
    - sonarRunnerArgs: Pass additional arguments to sonar-scanner. Be sure to provide the arguments with a leading `-D` e.g. FL_SONAR_RUNNER_ARGS="-Dsonar.verbose=true"
-   - sonarLogin: Pass the Sonar Login token (e.g: xxxxxxprivate_token_XXXXbXX7e)
+   - sonarLogin: **DEPRECATED!** Login and password were deprecated in favor of login token. See https://community.sonarsource.com/t/deprecating-sonar-login-and-sonar-password-in-favor-of-sonar-token/95829 for more details - Pass the Sonar Login Token (e.g: xxxxxxprivate_token_XXXXbXX7e)
+   - sonarToken: Pass the Sonar Token (e.g: xxxxxxprivate_token_XXXXbXX7e)
    - sonarUrl: Pass the url of the Sonar server
    - sonarOrganization: Key of the organization on SonarCloud
    - branchName: Pass the branch name which is getting scanned
@@ -10635,6 +10844,7 @@ public func sonar(projectConfigurationPath: OptionalConfigValue<String?> = .fast
                   sourceEncoding: OptionalConfigValue<String?> = .fastlaneDefault(nil),
                   sonarRunnerArgs: OptionalConfigValue<String?> = .fastlaneDefault(nil),
                   sonarLogin: OptionalConfigValue<String?> = .fastlaneDefault(nil),
+                  sonarToken: OptionalConfigValue<String?> = .fastlaneDefault(nil),
                   sonarUrl: OptionalConfigValue<String?> = .fastlaneDefault(nil),
                   sonarOrganization: OptionalConfigValue<String?> = .fastlaneDefault(nil),
                   branchName: OptionalConfigValue<String?> = .fastlaneDefault(nil),
@@ -10652,6 +10862,7 @@ public func sonar(projectConfigurationPath: OptionalConfigValue<String?> = .fast
     let sourceEncodingArg = sourceEncoding.asRubyArgument(name: "source_encoding", type: nil)
     let sonarRunnerArgsArg = sonarRunnerArgs.asRubyArgument(name: "sonar_runner_args", type: nil)
     let sonarLoginArg = sonarLogin.asRubyArgument(name: "sonar_login", type: nil)
+    let sonarTokenArg = sonarToken.asRubyArgument(name: "sonar_token", type: nil)
     let sonarUrlArg = sonarUrl.asRubyArgument(name: "sonar_url", type: nil)
     let sonarOrganizationArg = sonarOrganization.asRubyArgument(name: "sonar_organization", type: nil)
     let branchNameArg = branchName.asRubyArgument(name: "branch_name", type: nil)
@@ -10668,6 +10879,7 @@ public func sonar(projectConfigurationPath: OptionalConfigValue<String?> = .fast
                                           sourceEncodingArg,
                                           sonarRunnerArgsArg,
                                           sonarLoginArg,
+                                          sonarTokenArg,
                                           sonarUrlArg,
                                           sonarOrganizationArg,
                                           branchNameArg,
@@ -10855,7 +11067,9 @@ public func splunkmint(dsym: OptionalConfigValue<String?> = .fastlaneDefault(nil
  - parameters:
    - command: The swift command (one of: build, test, clean, reset, update, resolve, generate-xcodeproj, init)
    - enableCodeCoverage: Enables code coverage for the generated Xcode project when using the 'generate-xcodeproj' and the 'test' command
-   - buildPath: Specify build/cache directory [default: ./.build]
+   - scratchPath: Specify build/cache directory [default: ./.build]
+   - parallel: Enables running tests in parallel when using the 'test' command
+   - buildPath: **DEPRECATED!** `build_path` option is deprecated, use `scratch_path` instead - Specify build/cache directory [default: ./.build]
    - packagePath: Change working directory before any other operation
    - xcconfig: Use xcconfig file to override swift package generate-xcodeproj defaults
    - configuration: Build with configuration (debug|release) [default: debug]
@@ -10863,9 +11077,14 @@ public func splunkmint(dsym: OptionalConfigValue<String?> = .fastlaneDefault(nil
    - xcprettyOutput: Specifies the output type for xcpretty. eg. 'test', or 'simple'
    - xcprettyArgs: Pass in xcpretty additional command line arguments (e.g. '--test --no-color' or '--tap --no-utf'), requires xcpretty_output to be specified also
    - verbose: Increase verbosity of informational output
+   - veryVerbose: Increase verbosity to include debug output
+   - simulator: Specifies the simulator to pass for Swift Compiler (one of: iphonesimulator, macosx)
+   - simulatorArch: Specifies the architecture of the simulator to pass for Swift Compiler (one of: x86_64, arm64). Requires the simulator option to be specified also, otherwise, it's ignored
  */
 public func spm(command: String = "build",
                 enableCodeCoverage: OptionalConfigValue<Bool?> = .fastlaneDefault(nil),
+                scratchPath: OptionalConfigValue<String?> = .fastlaneDefault(nil),
+                parallel: OptionalConfigValue<Bool> = .fastlaneDefault(false),
                 buildPath: OptionalConfigValue<String?> = .fastlaneDefault(nil),
                 packagePath: OptionalConfigValue<String?> = .fastlaneDefault(nil),
                 xcconfig: OptionalConfigValue<String?> = .fastlaneDefault(nil),
@@ -10873,10 +11092,15 @@ public func spm(command: String = "build",
                 disableSandbox: OptionalConfigValue<Bool> = .fastlaneDefault(false),
                 xcprettyOutput: OptionalConfigValue<String?> = .fastlaneDefault(nil),
                 xcprettyArgs: OptionalConfigValue<String?> = .fastlaneDefault(nil),
-                verbose: OptionalConfigValue<Bool> = .fastlaneDefault(false))
+                verbose: OptionalConfigValue<Bool> = .fastlaneDefault(false),
+                veryVerbose: OptionalConfigValue<Bool> = .fastlaneDefault(false),
+                simulator: OptionalConfigValue<String?> = .fastlaneDefault(nil),
+                simulatorArch: String = "arm64")
 {
     let commandArg = RubyCommand.Argument(name: "command", value: command, type: nil)
     let enableCodeCoverageArg = enableCodeCoverage.asRubyArgument(name: "enable_code_coverage", type: nil)
+    let scratchPathArg = scratchPath.asRubyArgument(name: "scratch_path", type: nil)
+    let parallelArg = parallel.asRubyArgument(name: "parallel", type: nil)
     let buildPathArg = buildPath.asRubyArgument(name: "build_path", type: nil)
     let packagePathArg = packagePath.asRubyArgument(name: "package_path", type: nil)
     let xcconfigArg = xcconfig.asRubyArgument(name: "xcconfig", type: nil)
@@ -10885,8 +11109,13 @@ public func spm(command: String = "build",
     let xcprettyOutputArg = xcprettyOutput.asRubyArgument(name: "xcpretty_output", type: nil)
     let xcprettyArgsArg = xcprettyArgs.asRubyArgument(name: "xcpretty_args", type: nil)
     let verboseArg = verbose.asRubyArgument(name: "verbose", type: nil)
+    let veryVerboseArg = veryVerbose.asRubyArgument(name: "very_verbose", type: nil)
+    let simulatorArg = simulator.asRubyArgument(name: "simulator", type: nil)
+    let simulatorArchArg = RubyCommand.Argument(name: "simulator_arch", value: simulatorArch, type: nil)
     let array: [RubyCommand.Argument?] = [commandArg,
                                           enableCodeCoverageArg,
+                                          scratchPathArg,
+                                          parallelArg,
                                           buildPathArg,
                                           packagePathArg,
                                           xcconfigArg,
@@ -10894,7 +11123,10 @@ public func spm(command: String = "build",
                                           disableSandboxArg,
                                           xcprettyOutputArg,
                                           xcprettyArgsArg,
-                                          verboseArg]
+                                          verboseArg,
+                                          veryVerboseArg,
+                                          simulatorArg,
+                                          simulatorArchArg]
     let args: [RubyCommand.Argument] = array
         .filter { $0?.value != nil }
         .compactMap { $0 }
@@ -10954,8 +11186,8 @@ public func ssh(username: String,
    - metadataPath: Path to the directory containing the metadata files
    - key: **DEPRECATED!** Use `--json_key` instead - The p12 File used to authenticate with Google
    - issuer: **DEPRECATED!** Use `--json_key` instead - The issuer of the p12 file (email address of the service account)
-   - jsonKey: The path to a file containing service account JSON, used to authenticate with Google
-   - jsonKeyData: The raw service account JSON data used to authenticate with Google
+   - jsonKey: The path to a Google credentials JSON file (Application Default, Workload Identity, or Service Account), used to authenticate with Google
+   - jsonKeyData: The raw content of a Google credentials JSON file (Application Default, Workload Identity, or Service Account), used to authenticate with Google
    - apk: Path to the APK file to upload
    - apkPaths: An array of paths to APK files to upload
    - aab: Path to the AAB file to upload
@@ -11134,6 +11366,7 @@ public func supply(packageName: String,
    - format: Format code when mode is :autocorrect
    - noCache: Ignore the cache when mode is :autocorrect or :lint
    - compilerLogPath: Compiler log path when mode is :analyze
+   - progress: Show a live-updating progress bar instead of each file being processed
  */
 public func swiftlint(mode: String = "lint",
                       path: OptionalConfigValue<String?> = .fastlaneDefault(nil),
@@ -11148,7 +11381,8 @@ public func swiftlint(mode: String = "lint",
                       executable: OptionalConfigValue<String?> = .fastlaneDefault(nil),
                       format: OptionalConfigValue<Bool> = .fastlaneDefault(false),
                       noCache: OptionalConfigValue<Bool> = .fastlaneDefault(false),
-                      compilerLogPath: OptionalConfigValue<String?> = .fastlaneDefault(nil))
+                      compilerLogPath: OptionalConfigValue<String?> = .fastlaneDefault(nil),
+                      progress: OptionalConfigValue<Bool> = .fastlaneDefault(false))
 {
     let modeArg = RubyCommand.Argument(name: "mode", value: mode, type: nil)
     let pathArg = path.asRubyArgument(name: "path", type: nil)
@@ -11164,6 +11398,7 @@ public func swiftlint(mode: String = "lint",
     let formatArg = format.asRubyArgument(name: "format", type: nil)
     let noCacheArg = noCache.asRubyArgument(name: "no_cache", type: nil)
     let compilerLogPathArg = compilerLogPath.asRubyArgument(name: "compiler_log_path", type: nil)
+    let progressArg = progress.asRubyArgument(name: "progress", type: nil)
     let array: [RubyCommand.Argument?] = [modeArg,
                                           pathArg,
                                           outputFileArg,
@@ -11177,7 +11412,8 @@ public func swiftlint(mode: String = "lint",
                                           executableArg,
                                           formatArg,
                                           noCacheArg,
-                                          compilerLogPathArg]
+                                          compilerLogPathArg,
+                                          progressArg]
     let args: [RubyCommand.Argument] = array
         .filter { $0?.value != nil }
         .compactMap { $0 }
@@ -11217,6 +11453,7 @@ public func swiftlint(mode: String = "lint",
    - s3Region: Name of the S3 region
    - s3AccessKey: S3 access key
    - s3SecretAccessKey: S3 secret access key
+   - s3SessionToken: S3 session token
    - s3Bucket: Name of the S3 bucket
    - s3ObjectPrefix: Prefix to be used on all objects uploaded to S3
    - s3SkipEncryption: Skip encryption of all objects uploaded to S3. WARNING: only enable this on S3 buckets with sufficiently restricted permissions and server-side encryption enabled. See https://docs.aws.amazon.com/AmazonS3/latest/userguide/UsingEncryption.html
@@ -11230,18 +11467,20 @@ public func swiftlint(mode: String = "lint",
    - forceForNewDevices: Renew the provisioning profiles if the device count on the developer portal has changed. Ignored for profile types 'appstore' and 'developer_id'
    - includeMacInProfiles: Include Apple Silicon Mac devices in provisioning profiles for iOS/iPadOS apps
    - includeAllCertificates: Include all matching certificates in the provisioning profile. Works only for the 'development' provisioning profile type
+   - certificateId: Select certificate by id. Useful if multiple certificates are stored in one place
    - forceForNewCertificates: Renew the provisioning profiles if the certificate count on the developer portal has changed. Works only for the 'development' provisioning profile type. Requires 'include_all_certificates' option to be 'true'
    - skipConfirmation: Disables confirmation prompts during nuke, answering them with yes
    - safeRemoveCerts: Remove certs from repository during nuke without revoking them on the developer portal
    - skipDocs: Skip generation of a README.md for the created git repository
    - platform: Set the provisioning profile's platform to work with (i.e. ios, tvos, macos, catalyst)
    - deriveCatalystAppIdentifier: Enable this if you have the Mac Catalyst capability enabled and your project was created with Xcode 11.3 or earlier. Prepends 'maccatalyst.' to the app identifier for the provisioning profile mapping
-   - templateName: The name of provisioning profile template. If the developer account has provisioning profile templates (aka: custom entitlements), the template name can be found by inspecting the Entitlements drop-down while creating/editing a provisioning profile (e.g. "Apple Pay Pass Suppression Development")
+   - templateName: **DEPRECATED!** Removed since May 2025 on App Store Connect API OpenAPI v3.8.0 - Learn more: https://docs.fastlane.tools/actions/match/#managed-capabilities - The name of provisioning profile template. If the developer account has provisioning profile templates (aka: custom entitlements), the template name can be found by inspecting the Entitlements drop-down while creating/editing a provisioning profile (e.g. "Apple Pay Pass Suppression Development")
    - profileName: A custom name for the provisioning profile. This will replace the default provisioning profile name if specified
    - failOnNameTaken: Should the command fail if it was about to create a duplicate of an existing provisioning profile. It can happen due to issues on Apple Developer Portal, when profile to be recreated was not properly deleted first
    - skipCertificateMatching: Set to true if there is no access to Apple developer portal but there are certificates, keys and profiles provided. Only works with match import action
    - outputPath: Path in which to export certificates, key and profile
    - skipSetPartitionList: Skips setting the partition list (which can sometimes take a long time). Setting the partition list is usually needed to prevent Xcode from prompting to allow a cert to be used for signing
+   - forceLegacyEncryption: Force encryption to use legacy cbc algorithm for backwards compatibility with older match versions
    - verbose: Print out extra information and all commands
 
  More information: https://docs.fastlane.tools/actions/match/
@@ -11274,6 +11513,7 @@ public func syncCodeSigning(type: String = "development",
                             s3Region: OptionalConfigValue<String?> = .fastlaneDefault(nil),
                             s3AccessKey: OptionalConfigValue<String?> = .fastlaneDefault(nil),
                             s3SecretAccessKey: OptionalConfigValue<String?> = .fastlaneDefault(nil),
+                            s3SessionToken: OptionalConfigValue<String?> = .fastlaneDefault(nil),
                             s3Bucket: OptionalConfigValue<String?> = .fastlaneDefault(nil),
                             s3ObjectPrefix: OptionalConfigValue<String?> = .fastlaneDefault(nil),
                             s3SkipEncryption: OptionalConfigValue<Bool> = .fastlaneDefault(false),
@@ -11287,6 +11527,7 @@ public func syncCodeSigning(type: String = "development",
                             forceForNewDevices: OptionalConfigValue<Bool> = .fastlaneDefault(false),
                             includeMacInProfiles: OptionalConfigValue<Bool> = .fastlaneDefault(false),
                             includeAllCertificates: OptionalConfigValue<Bool> = .fastlaneDefault(false),
+                            certificateId: OptionalConfigValue<String?> = .fastlaneDefault(nil),
                             forceForNewCertificates: OptionalConfigValue<Bool> = .fastlaneDefault(false),
                             skipConfirmation: OptionalConfigValue<Bool> = .fastlaneDefault(false),
                             safeRemoveCerts: OptionalConfigValue<Bool> = .fastlaneDefault(false),
@@ -11299,6 +11540,7 @@ public func syncCodeSigning(type: String = "development",
                             skipCertificateMatching: OptionalConfigValue<Bool> = .fastlaneDefault(false),
                             outputPath: OptionalConfigValue<String?> = .fastlaneDefault(nil),
                             skipSetPartitionList: OptionalConfigValue<Bool> = .fastlaneDefault(false),
+                            forceLegacyEncryption: OptionalConfigValue<Bool> = .fastlaneDefault(false),
                             verbose: OptionalConfigValue<Bool> = .fastlaneDefault(false))
 {
     let typeArg = RubyCommand.Argument(name: "type", value: type, type: nil)
@@ -11329,6 +11571,7 @@ public func syncCodeSigning(type: String = "development",
     let s3RegionArg = s3Region.asRubyArgument(name: "s3_region", type: nil)
     let s3AccessKeyArg = s3AccessKey.asRubyArgument(name: "s3_access_key", type: nil)
     let s3SecretAccessKeyArg = s3SecretAccessKey.asRubyArgument(name: "s3_secret_access_key", type: nil)
+    let s3SessionTokenArg = s3SessionToken.asRubyArgument(name: "s3_session_token", type: nil)
     let s3BucketArg = s3Bucket.asRubyArgument(name: "s3_bucket", type: nil)
     let s3ObjectPrefixArg = s3ObjectPrefix.asRubyArgument(name: "s3_object_prefix", type: nil)
     let s3SkipEncryptionArg = s3SkipEncryption.asRubyArgument(name: "s3_skip_encryption", type: nil)
@@ -11342,6 +11585,7 @@ public func syncCodeSigning(type: String = "development",
     let forceForNewDevicesArg = forceForNewDevices.asRubyArgument(name: "force_for_new_devices", type: nil)
     let includeMacInProfilesArg = includeMacInProfiles.asRubyArgument(name: "include_mac_in_profiles", type: nil)
     let includeAllCertificatesArg = includeAllCertificates.asRubyArgument(name: "include_all_certificates", type: nil)
+    let certificateIdArg = certificateId.asRubyArgument(name: "certificate_id", type: nil)
     let forceForNewCertificatesArg = forceForNewCertificates.asRubyArgument(name: "force_for_new_certificates", type: nil)
     let skipConfirmationArg = skipConfirmation.asRubyArgument(name: "skip_confirmation", type: nil)
     let safeRemoveCertsArg = safeRemoveCerts.asRubyArgument(name: "safe_remove_certs", type: nil)
@@ -11354,6 +11598,7 @@ public func syncCodeSigning(type: String = "development",
     let skipCertificateMatchingArg = skipCertificateMatching.asRubyArgument(name: "skip_certificate_matching", type: nil)
     let outputPathArg = outputPath.asRubyArgument(name: "output_path", type: nil)
     let skipSetPartitionListArg = skipSetPartitionList.asRubyArgument(name: "skip_set_partition_list", type: nil)
+    let forceLegacyEncryptionArg = forceLegacyEncryption.asRubyArgument(name: "force_legacy_encryption", type: nil)
     let verboseArg = verbose.asRubyArgument(name: "verbose", type: nil)
     let array: [RubyCommand.Argument?] = [typeArg,
                                           additionalCertTypesArg,
@@ -11383,6 +11628,7 @@ public func syncCodeSigning(type: String = "development",
                                           s3RegionArg,
                                           s3AccessKeyArg,
                                           s3SecretAccessKeyArg,
+                                          s3SessionTokenArg,
                                           s3BucketArg,
                                           s3ObjectPrefixArg,
                                           s3SkipEncryptionArg,
@@ -11396,6 +11642,7 @@ public func syncCodeSigning(type: String = "development",
                                           forceForNewDevicesArg,
                                           includeMacInProfilesArg,
                                           includeAllCertificatesArg,
+                                          certificateIdArg,
                                           forceForNewCertificatesArg,
                                           skipConfirmationArg,
                                           safeRemoveCertsArg,
@@ -11408,6 +11655,7 @@ public func syncCodeSigning(type: String = "development",
                                           skipCertificateMatchingArg,
                                           outputPathArg,
                                           skipSetPartitionListArg,
+                                          forceLegacyEncryptionArg,
                                           verboseArg]
     let args: [RubyCommand.Argument] = array
         .filter { $0?.value != nil }
@@ -11435,7 +11683,7 @@ public func teamName() {
 }
 
 /**
- Upload a new build to [TestFairy](https://www.testfairy.com/)
+ Upload a new build to SauceLabs' TestFairy
 
  - parameters:
    - apiKey: API Key for TestFairy
@@ -11449,10 +11697,17 @@ public func teamName() {
    - autoUpdate: Allows an easy upgrade of all users to the current version. To enable set to 'on'
    - notify: Send email to testers
    - options: Array of options (shake,video_only_wifi,anonymous)
-   - custom: Array of custom options. Contact support@testfairy.com for more information
+   - custom: Array of custom options. Contact support for more information
    - timeout: Request timeout in seconds
+   - tags: Custom tags that can be used to organize your builds
+   - folderName: Name of the dashboard folder that contains this app
+   - landingPageMode: Visibility of build landing after upload. Can be 'open' or 'closed'
+   - uploadToSaucelabs: Upload file directly to Sauce Labs. It can be 'on' or 'off'
+   - platform: Use if upload build is not iOS or Android. Contact support for more information
 
- You can retrieve your API key on [your settings page](https://free.testfairy.com/settings/)
+ Upload a new build to [TestFairy](https://saucelabs.com/products/mobile-testing/app-betas).
+ You can retrieve your API key on [your settings page](https://app.testfairy.com/settings/access-key)
+
  */
 public func testfairy(apiKey: String,
                       ipa: OptionalConfigValue<String?> = .fastlaneDefault(nil),
@@ -11466,7 +11721,12 @@ public func testfairy(apiKey: String,
                       notify: String = "off",
                       options: [String] = [],
                       custom: String = "",
-                      timeout: OptionalConfigValue<Int?> = .fastlaneDefault(nil))
+                      timeout: OptionalConfigValue<Int?> = .fastlaneDefault(nil),
+                      tags: [String] = [],
+                      folderName: String = "",
+                      landingPageMode: String = "open",
+                      uploadToSaucelabs: String = "off",
+                      platform: String = "")
 {
     let apiKeyArg = RubyCommand.Argument(name: "api_key", value: apiKey, type: nil)
     let ipaArg = ipa.asRubyArgument(name: "ipa", type: nil)
@@ -11481,6 +11741,11 @@ public func testfairy(apiKey: String,
     let optionsArg = RubyCommand.Argument(name: "options", value: options, type: nil)
     let customArg = RubyCommand.Argument(name: "custom", value: custom, type: nil)
     let timeoutArg = timeout.asRubyArgument(name: "timeout", type: nil)
+    let tagsArg = RubyCommand.Argument(name: "tags", value: tags, type: nil)
+    let folderNameArg = RubyCommand.Argument(name: "folder_name", value: folderName, type: nil)
+    let landingPageModeArg = RubyCommand.Argument(name: "landing_page_mode", value: landingPageMode, type: nil)
+    let uploadToSaucelabsArg = RubyCommand.Argument(name: "upload_to_saucelabs", value: uploadToSaucelabs, type: nil)
+    let platformArg = RubyCommand.Argument(name: "platform", value: platform, type: nil)
     let array: [RubyCommand.Argument?] = [apiKeyArg,
                                           ipaArg,
                                           apkArg,
@@ -11493,7 +11758,12 @@ public func testfairy(apiKey: String,
                                           notifyArg,
                                           optionsArg,
                                           customArg,
-                                          timeoutArg]
+                                          timeoutArg,
+                                          tagsArg,
+                                          folderNameArg,
+                                          landingPageModeArg,
+                                          uploadToSaucelabsArg,
+                                          platformArg]
     let args: [RubyCommand.Argument] = array
         .filter { $0?.value != nil }
         .compactMap { $0 }
@@ -11523,6 +11793,8 @@ public func testfairy(apiKey: String,
    - skipSubmission: Skip the distributing action of pilot and only upload the ipa file
    - skipWaitingForBuildProcessing: If set to true, the `distribute_external` option won't work and no build will be distributed to testers. (You might want to use this option if you are using this action on CI and have to pay for 'minutes used' on your CI plan). If set to `true` and a changelog is provided, it will partially wait for the build to appear on AppStore Connect so the changelog can be set, and skip the remaining processing steps
    - updateBuildInfoOnUpload: **DEPRECATED!** Update build info immediately after validation. This is deprecated and will be removed in a future release. App Store Connect no longer supports setting build info until after build processing has completed, which is when build info is updated by default
+   - appClipInvocations: Add beta app clip invocations to your builds in TestFlight
+   - overwriteAppClipInvocations: Clear all previous beta app clip invocations before adding new ones
    - distributeOnly: Distribute a previously uploaded build (equivalent to the `fastlane pilot distribute` command)
    - usesNonExemptEncryption: Provide the 'Uses Non-Exempt Encryption' for export compliance. This is used if there is 'ITSAppUsesNonExemptEncryption' is not set in the Info.plist
    - distributeExternal: Should the build be distributed to external testers? If set to true, use of `groups` option is required
@@ -11539,6 +11811,7 @@ public func testfairy(apiKey: String,
    - teamName: The name of your App Store Connect team if you're in multiple teams
    - devPortalTeamId: The short ID of your team in the developer portal, if you're in multiple teams. Different from your iTC team ID!
    - itcProvider: The provider short name to be used with the iTMSTransporter to identify your team. This value will override the automatically detected provider short name. To get provider short name run `pathToXcode.app/Contents/Applications/Application\ Loader.app/Contents/itms/bin/iTMSTransporter -m provider -u 'USERNAME' -p 'PASSWORD' -account_type itunes_connect -v off`. The short names of providers should be listed in the second column
+   - providerPublicId: The provider public ID to be used with altool (--provider-public-id). This value will override the automatically detected provider value for altool uploads. Required after Xcode 26 when your account is associated with multiple providers and using username/app-password authentication
    - waitProcessingInterval: Interval in seconds to wait for App Store Connect processing
    - waitProcessingTimeoutDuration: Timeout duration in seconds to wait for App Store Connect processing. If set, after exceeding timeout duration, this will `force stop` to wait for App Store Connect processing and exit with exception
    - waitForUploadedBuild: **DEPRECATED!** No longer needed with the transition over to the App Store Connect API - Use version info from uploaded ipa file to determine what build to use for distribution. If set to false, latest processing or any latest build will be used
@@ -11566,6 +11839,8 @@ public func testflight(apiKeyPath: OptionalConfigValue<String?> = .fastlaneDefau
                        skipSubmission: OptionalConfigValue<Bool> = .fastlaneDefault(false),
                        skipWaitingForBuildProcessing: OptionalConfigValue<Bool> = .fastlaneDefault(false),
                        updateBuildInfoOnUpload: OptionalConfigValue<Bool> = .fastlaneDefault(false),
+                       appClipInvocations: OptionalConfigValue<[String]?> = .fastlaneDefault(nil),
+                       overwriteAppClipInvocations: OptionalConfigValue<Bool> = .fastlaneDefault(false),
                        distributeOnly: OptionalConfigValue<Bool> = .fastlaneDefault(false),
                        usesNonExemptEncryption: OptionalConfigValue<Bool> = .fastlaneDefault(false),
                        distributeExternal: OptionalConfigValue<Bool> = .fastlaneDefault(false),
@@ -11582,6 +11857,7 @@ public func testflight(apiKeyPath: OptionalConfigValue<String?> = .fastlaneDefau
                        teamName: OptionalConfigValue<String?> = .fastlaneDefault(nil),
                        devPortalTeamId: OptionalConfigValue<String?> = .fastlaneDefault(nil),
                        itcProvider: OptionalConfigValue<String?> = .fastlaneDefault(nil),
+                       providerPublicId: OptionalConfigValue<String?> = .fastlaneDefault(nil),
                        waitProcessingInterval: Int = 30,
                        waitProcessingTimeoutDuration: OptionalConfigValue<Int?> = .fastlaneDefault(nil),
                        waitForUploadedBuild: OptionalConfigValue<Bool> = .fastlaneDefault(false),
@@ -11606,6 +11882,8 @@ public func testflight(apiKeyPath: OptionalConfigValue<String?> = .fastlaneDefau
     let skipSubmissionArg = skipSubmission.asRubyArgument(name: "skip_submission", type: nil)
     let skipWaitingForBuildProcessingArg = skipWaitingForBuildProcessing.asRubyArgument(name: "skip_waiting_for_build_processing", type: nil)
     let updateBuildInfoOnUploadArg = updateBuildInfoOnUpload.asRubyArgument(name: "update_build_info_on_upload", type: nil)
+    let appClipInvocationsArg = appClipInvocations.asRubyArgument(name: "app_clip_invocations", type: nil)
+    let overwriteAppClipInvocationsArg = overwriteAppClipInvocations.asRubyArgument(name: "overwrite_app_clip_invocations", type: nil)
     let distributeOnlyArg = distributeOnly.asRubyArgument(name: "distribute_only", type: nil)
     let usesNonExemptEncryptionArg = usesNonExemptEncryption.asRubyArgument(name: "uses_non_exempt_encryption", type: nil)
     let distributeExternalArg = distributeExternal.asRubyArgument(name: "distribute_external", type: nil)
@@ -11622,6 +11900,7 @@ public func testflight(apiKeyPath: OptionalConfigValue<String?> = .fastlaneDefau
     let teamNameArg = teamName.asRubyArgument(name: "team_name", type: nil)
     let devPortalTeamIdArg = devPortalTeamId.asRubyArgument(name: "dev_portal_team_id", type: nil)
     let itcProviderArg = itcProvider.asRubyArgument(name: "itc_provider", type: nil)
+    let providerPublicIdArg = providerPublicId.asRubyArgument(name: "provider_public_id", type: nil)
     let waitProcessingIntervalArg = RubyCommand.Argument(name: "wait_processing_interval", value: waitProcessingInterval, type: nil)
     let waitProcessingTimeoutDurationArg = waitProcessingTimeoutDuration.asRubyArgument(name: "wait_processing_timeout_duration", type: nil)
     let waitForUploadedBuildArg = waitForUploadedBuild.asRubyArgument(name: "wait_for_uploaded_build", type: nil)
@@ -11645,6 +11924,8 @@ public func testflight(apiKeyPath: OptionalConfigValue<String?> = .fastlaneDefau
                                           skipSubmissionArg,
                                           skipWaitingForBuildProcessingArg,
                                           updateBuildInfoOnUploadArg,
+                                          appClipInvocationsArg,
+                                          overwriteAppClipInvocationsArg,
                                           distributeOnlyArg,
                                           usesNonExemptEncryptionArg,
                                           distributeExternalArg,
@@ -11661,6 +11942,7 @@ public func testflight(apiKeyPath: OptionalConfigValue<String?> = .fastlaneDefau
                                           teamNameArg,
                                           devPortalTeamIdArg,
                                           itcProviderArg,
+                                          providerPublicIdArg,
                                           waitProcessingIntervalArg,
                                           waitProcessingTimeoutDurationArg,
                                           waitForUploadedBuildArg,
@@ -11683,6 +11965,7 @@ public func testflight(apiKeyPath: OptionalConfigValue<String?> = .fastlaneDefau
    - outputFilename: Filename the xml file should be written to. Defaults to name of input file. (Only works if one input file is used)
    - failBuild: Should this step stop the build if the tests fail? Set this to false if you're handling this with a test reporter
    - xcprettyNaming: Produces class name and test name identical to xcpretty naming in junit file
+   - forceLegacyXcresulttool: Force the use of the '--legacy' flag for xcresulttool instead of using the new commands
    - silent: Silences all output
    - outputRemoveRetryAttempts: Doesn't include retry attempts in the output
 
@@ -11694,6 +11977,7 @@ public func trainer(path: String = ".",
                     outputFilename: OptionalConfigValue<String?> = .fastlaneDefault(nil),
                     failBuild: OptionalConfigValue<Bool> = .fastlaneDefault(true),
                     xcprettyNaming: OptionalConfigValue<Bool> = .fastlaneDefault(false),
+                    forceLegacyXcresulttool: OptionalConfigValue<Bool> = .fastlaneDefault(false),
                     silent: OptionalConfigValue<Bool> = .fastlaneDefault(false),
                     outputRemoveRetryAttempts: OptionalConfigValue<Bool> = .fastlaneDefault(false))
 {
@@ -11703,6 +11987,7 @@ public func trainer(path: String = ".",
     let outputFilenameArg = outputFilename.asRubyArgument(name: "output_filename", type: nil)
     let failBuildArg = failBuild.asRubyArgument(name: "fail_build", type: nil)
     let xcprettyNamingArg = xcprettyNaming.asRubyArgument(name: "xcpretty_naming", type: nil)
+    let forceLegacyXcresulttoolArg = forceLegacyXcresulttool.asRubyArgument(name: "force_legacy_xcresulttool", type: nil)
     let silentArg = silent.asRubyArgument(name: "silent", type: nil)
     let outputRemoveRetryAttemptsArg = outputRemoveRetryAttempts.asRubyArgument(name: "output_remove_retry_attempts", type: nil)
     let array: [RubyCommand.Argument?] = [pathArg,
@@ -11711,6 +11996,7 @@ public func trainer(path: String = ".",
                                           outputFilenameArg,
                                           failBuildArg,
                                           xcprettyNamingArg,
+                                          forceLegacyXcresulttoolArg,
                                           silentArg,
                                           outputRemoveRetryAttemptsArg]
     let args: [RubyCommand.Argument] = array
@@ -12425,28 +12711,36 @@ public func uploadSymbolsToSentry(apiHost: String = "https://app.getsentry.com/a
    - useLiveVersion: Force usage of live version rather than edit version
    - metadataPath: Path to the folder containing the metadata files
    - screenshotsPath: Path to the folder containing the screenshots
+   - appClipHeaderImagesPath: Path to the folder containing the app clip header images
+   - appClipDefaultExperienceMetadataPath: Path to the folder containing the app clip default experience metadata
+   - appPreviewsPath: Path to the folder containing localized App Preview videos
+   - previewFrameTimeCode: Time code for the App Preview still frame written as hour:minute:second:centisecond (e.g. 00:00:00:01)
+   - overwritePreviewVideos: Clear all previously uploaded App Preview videos before uploading the new ones
    - skipBinaryUpload: Skip uploading an ipa or pkg to App Store Connect
    - skipScreenshots: Don't upload the screenshots
    - skipMetadata: Don't upload the metadata (e.g. title, description). This will still upload screenshots
    - skipAppVersionUpdate: Don’t create or update the app version that is being prepared for submission
    - force: Skip verification of HTML preview file
    - overwriteScreenshots: Clear all previously uploaded screenshots before uploading the new ones
+   - screenshotProcessingTimeout: Timeout in seconds to wait before considering screenshot processing as failed, used to handle cases where uploads to the App Store are stuck in processing
    - syncScreenshots: Sync screenshots with local ones. This is currently beta option so set true to 'FASTLANE_ENABLE_BETA_DELIVER_SYNC_SCREENSHOTS' environment variable as well
    - submitForReview: Submit the new version for Review after uploading everything
    - verifyOnly: Verifies archive with App Store Connect without uploading
    - rejectIfPossible: Rejects the previously submitted build if it's in a state where it's possible
-   - automaticRelease: Should the app be automatically released once it's approved? (Can not be used together with `auto_release_date`)
-   - autoReleaseDate: Date in milliseconds for automatically releasing on pending approval (Can not be used together with `automatic_release`)
+   - versionCheckWaitRetryLimit: After submitting a new version, App Store Connect takes some time to recognize the new version and we must wait until it's available before attempting to upload metadata for it. There is a mechanism that will check if it's available and retry with an exponential backoff if it's not available yet. This option specifies how many times we should retry before giving up. Setting this to a value below 5 is not recommended and will likely cause failures. Increase this parameter when Apple servers seem to be degraded or slow
+   - automaticRelease: Should the app be automatically released once it's approved? (Cannot be used together with `auto_release_date`)
+   - autoReleaseDate: Date in milliseconds for automatically releasing on pending approval (Cannot be used together with `automatic_release`)
    - phasedRelease: Enable the phased release feature of iTC
    - resetRatings: Reset the summary rating when you release a new version of the application
    - priceTier: The price tier of this application
    - appRatingConfigPath: Path to the app rating's config
-   - submissionInformation: Extra information for the submission (e.g. compliance specifications, IDFA settings)
+   - submissionInformation: Extra information for the submission (e.g. compliance specifications)
    - teamId: The ID of your App Store Connect team if you're in multiple teams
    - teamName: The name of your App Store Connect team if you're in multiple teams
    - devPortalTeamId: The short ID of your Developer Portal team, if you're in multiple teams. Different from your iTC team ID!
    - devPortalTeamName: The name of your Developer Portal team if you're in multiple teams
    - itcProvider: The provider short name to be used with the iTMSTransporter to identify your team. This value will override the automatically detected provider short name. To get provider short name run `pathToXcode.app/Contents/Applications/Application\ Loader.app/Contents/itms/bin/iTMSTransporter -m provider -u 'USERNAME' -p 'PASSWORD' -account_type itunes_connect -v off`. The short names of providers should be listed in the second column
+   - providerPublicId: The provider public ID to be used with altool (--provider-public-id). This value will override the automatically detected provider value for altool uploads. Required after Xcode 26 when your account is associated with multiple providers and using username/app-password authentication
    - runPrecheckBeforeSubmit: Run precheck before submitting to app review
    - precheckDefaultRuleLevel: The default precheck rule level unless otherwise configured
    - individualMetadataItems: **DEPRECATED!** Removed after the migration to the new App Store Connect API in June 2020 - An array of localized metadata items to upload individually by language so that errors can be identified. E.g. ['name', 'keywords', 'description']. Note: slow
@@ -12461,6 +12755,7 @@ public func uploadSymbolsToSentry(apiHost: String = "https://app.getsentry.com/a
    - secondarySecondSubCategory: Metadata: The english name of the secondary second sub category (e.g. `Educational`, `Puzzle`)
    - tradeRepresentativeContactInformation: **DEPRECATED!** This is no longer used by App Store Connect - Metadata: A hash containing the trade representative contact information
    - appReviewInformation: Metadata: A hash containing the review information
+   - appClipReviewInformation: Metadata: A hash containing the app clip review information
    - appReviewAttachmentFile: Metadata: Path to the app review attachment file
    - description: Metadata: The localised app description
    - name: Metadata: The localised app name
@@ -12475,6 +12770,8 @@ public func uploadSymbolsToSentry(apiHost: String = "https://app.getsentry.com/a
    - languages: Metadata: List of languages to activate
    - ignoreLanguageDirectoryValidation: Ignore errors when invalid languages are found in metadata and screenshot directories
    - precheckIncludeInAppPurchases: Should precheck check in-app purchases?
+   - appClipDefaultExperienceSubtitle: The localized subtitle for the default app clip experience
+   - appClipDefaultExperienceAction: Action for the default app clip experience (OPEN, VIEW, PLAY)
    - app: The (spaceship) app ID of the app you want to use/modify
 
  Using _upload_to_app_store_ after _build_app_ and _capture_screenshots_ will automatically upload the latest ipa and screenshots with no other configuration.
@@ -12482,7 +12779,7 @@ public func uploadSymbolsToSentry(apiHost: String = "https://app.getsentry.com/a
  If you don't want to verify an HTML preview for App Store builds, use the `:force` option.
  This is useful when running _fastlane_ on your Continuous Integration server:
  `_upload_to_app_store_(force: true)`
- If your account is on multiple teams and you need to tell the `iTMSTransporter` which 'provider' to use, you can set the `:itc_provider` option to pass this info.
+ If your account is on multiple teams and you need to tell the transporter which provider to use, you can set `:itc_provider` or `:provider_public_id`.
  */
 public func uploadToAppStore(apiKeyPath: OptionalConfigValue<String?> = .fastlaneDefault(nil),
                              apiKey: OptionalConfigValue<[String: Any]?> = .fastlaneDefault(nil),
@@ -12497,16 +12794,23 @@ public func uploadToAppStore(apiKeyPath: OptionalConfigValue<String?> = .fastlan
                              useLiveVersion: OptionalConfigValue<Bool> = .fastlaneDefault(false),
                              metadataPath: OptionalConfigValue<String?> = .fastlaneDefault(nil),
                              screenshotsPath: OptionalConfigValue<String?> = .fastlaneDefault(nil),
+                             appClipHeaderImagesPath: OptionalConfigValue<String?> = .fastlaneDefault(nil),
+                             appClipDefaultExperienceMetadataPath: OptionalConfigValue<String?> = .fastlaneDefault(nil),
+                             appPreviewsPath: OptionalConfigValue<String?> = .fastlaneDefault(nil),
+                             previewFrameTimeCode: String = "00:00:05:00",
+                             overwritePreviewVideos: OptionalConfigValue<Bool> = .fastlaneDefault(false),
                              skipBinaryUpload: OptionalConfigValue<Bool> = .fastlaneDefault(false),
                              skipScreenshots: OptionalConfigValue<Bool> = .fastlaneDefault(false),
                              skipMetadata: OptionalConfigValue<Bool> = .fastlaneDefault(false),
                              skipAppVersionUpdate: OptionalConfigValue<Bool> = .fastlaneDefault(false),
                              force: OptionalConfigValue<Bool> = .fastlaneDefault(false),
                              overwriteScreenshots: OptionalConfigValue<Bool> = .fastlaneDefault(false),
+                             screenshotProcessingTimeout: Int = 3600,
                              syncScreenshots: OptionalConfigValue<Bool> = .fastlaneDefault(false),
                              submitForReview: OptionalConfigValue<Bool> = .fastlaneDefault(false),
                              verifyOnly: OptionalConfigValue<Bool> = .fastlaneDefault(false),
                              rejectIfPossible: OptionalConfigValue<Bool> = .fastlaneDefault(false),
+                             versionCheckWaitRetryLimit: Int = 7,
                              automaticRelease: OptionalConfigValue<Bool?> = .fastlaneDefault(nil),
                              autoReleaseDate: OptionalConfigValue<Int?> = .fastlaneDefault(nil),
                              phasedRelease: OptionalConfigValue<Bool> = .fastlaneDefault(false),
@@ -12519,6 +12823,7 @@ public func uploadToAppStore(apiKeyPath: OptionalConfigValue<String?> = .fastlan
                              devPortalTeamId: OptionalConfigValue<String?> = .fastlaneDefault(nil),
                              devPortalTeamName: OptionalConfigValue<String?> = .fastlaneDefault(nil),
                              itcProvider: OptionalConfigValue<String?> = .fastlaneDefault(nil),
+                             providerPublicId: OptionalConfigValue<String?> = .fastlaneDefault(nil),
                              runPrecheckBeforeSubmit: OptionalConfigValue<Bool> = .fastlaneDefault(true),
                              precheckDefaultRuleLevel: String = "warn",
                              individualMetadataItems: OptionalConfigValue<[String]?> = .fastlaneDefault(nil),
@@ -12533,6 +12838,7 @@ public func uploadToAppStore(apiKeyPath: OptionalConfigValue<String?> = .fastlan
                              secondarySecondSubCategory: OptionalConfigValue<String?> = .fastlaneDefault(nil),
                              tradeRepresentativeContactInformation: OptionalConfigValue<[String: Any]?> = .fastlaneDefault(nil),
                              appReviewInformation: OptionalConfigValue<[String: Any]?> = .fastlaneDefault(nil),
+                             appClipReviewInformation: OptionalConfigValue<[String: Any]?> = .fastlaneDefault(nil),
                              appReviewAttachmentFile: OptionalConfigValue<String?> = .fastlaneDefault(nil),
                              description: OptionalConfigValue<[String: Any]?> = .fastlaneDefault(nil),
                              name: OptionalConfigValue<[String: Any]?> = .fastlaneDefault(nil),
@@ -12547,6 +12853,8 @@ public func uploadToAppStore(apiKeyPath: OptionalConfigValue<String?> = .fastlan
                              languages: OptionalConfigValue<[String]?> = .fastlaneDefault(nil),
                              ignoreLanguageDirectoryValidation: OptionalConfigValue<Bool> = .fastlaneDefault(false),
                              precheckIncludeInAppPurchases: OptionalConfigValue<Bool> = .fastlaneDefault(true),
+                             appClipDefaultExperienceSubtitle: OptionalConfigValue<[String: Any]?> = .fastlaneDefault(nil),
+                             appClipDefaultExperienceAction: OptionalConfigValue<String?> = .fastlaneDefault(nil),
                              app: OptionalConfigValue<Int?> = .fastlaneDefault(nil))
 {
     let apiKeyPathArg = apiKeyPath.asRubyArgument(name: "api_key_path", type: nil)
@@ -12562,16 +12870,23 @@ public func uploadToAppStore(apiKeyPath: OptionalConfigValue<String?> = .fastlan
     let useLiveVersionArg = useLiveVersion.asRubyArgument(name: "use_live_version", type: nil)
     let metadataPathArg = metadataPath.asRubyArgument(name: "metadata_path", type: nil)
     let screenshotsPathArg = screenshotsPath.asRubyArgument(name: "screenshots_path", type: nil)
+    let appClipHeaderImagesPathArg = appClipHeaderImagesPath.asRubyArgument(name: "app_clip_header_images_path", type: nil)
+    let appClipDefaultExperienceMetadataPathArg = appClipDefaultExperienceMetadataPath.asRubyArgument(name: "app_clip_default_experience_metadata_path", type: nil)
+    let appPreviewsPathArg = appPreviewsPath.asRubyArgument(name: "app_previews_path", type: nil)
+    let previewFrameTimeCodeArg = RubyCommand.Argument(name: "preview_frame_time_code", value: previewFrameTimeCode, type: nil)
+    let overwritePreviewVideosArg = overwritePreviewVideos.asRubyArgument(name: "overwrite_preview_videos", type: nil)
     let skipBinaryUploadArg = skipBinaryUpload.asRubyArgument(name: "skip_binary_upload", type: nil)
     let skipScreenshotsArg = skipScreenshots.asRubyArgument(name: "skip_screenshots", type: nil)
     let skipMetadataArg = skipMetadata.asRubyArgument(name: "skip_metadata", type: nil)
     let skipAppVersionUpdateArg = skipAppVersionUpdate.asRubyArgument(name: "skip_app_version_update", type: nil)
     let forceArg = force.asRubyArgument(name: "force", type: nil)
     let overwriteScreenshotsArg = overwriteScreenshots.asRubyArgument(name: "overwrite_screenshots", type: nil)
+    let screenshotProcessingTimeoutArg = RubyCommand.Argument(name: "screenshot_processing_timeout", value: screenshotProcessingTimeout, type: nil)
     let syncScreenshotsArg = syncScreenshots.asRubyArgument(name: "sync_screenshots", type: nil)
     let submitForReviewArg = submitForReview.asRubyArgument(name: "submit_for_review", type: nil)
     let verifyOnlyArg = verifyOnly.asRubyArgument(name: "verify_only", type: nil)
     let rejectIfPossibleArg = rejectIfPossible.asRubyArgument(name: "reject_if_possible", type: nil)
+    let versionCheckWaitRetryLimitArg = RubyCommand.Argument(name: "version_check_wait_retry_limit", value: versionCheckWaitRetryLimit, type: nil)
     let automaticReleaseArg = automaticRelease.asRubyArgument(name: "automatic_release", type: nil)
     let autoReleaseDateArg = autoReleaseDate.asRubyArgument(name: "auto_release_date", type: nil)
     let phasedReleaseArg = phasedRelease.asRubyArgument(name: "phased_release", type: nil)
@@ -12584,6 +12899,7 @@ public func uploadToAppStore(apiKeyPath: OptionalConfigValue<String?> = .fastlan
     let devPortalTeamIdArg = devPortalTeamId.asRubyArgument(name: "dev_portal_team_id", type: nil)
     let devPortalTeamNameArg = devPortalTeamName.asRubyArgument(name: "dev_portal_team_name", type: nil)
     let itcProviderArg = itcProvider.asRubyArgument(name: "itc_provider", type: nil)
+    let providerPublicIdArg = providerPublicId.asRubyArgument(name: "provider_public_id", type: nil)
     let runPrecheckBeforeSubmitArg = runPrecheckBeforeSubmit.asRubyArgument(name: "run_precheck_before_submit", type: nil)
     let precheckDefaultRuleLevelArg = RubyCommand.Argument(name: "precheck_default_rule_level", value: precheckDefaultRuleLevel, type: nil)
     let individualMetadataItemsArg = individualMetadataItems.asRubyArgument(name: "individual_metadata_items", type: nil)
@@ -12598,6 +12914,7 @@ public func uploadToAppStore(apiKeyPath: OptionalConfigValue<String?> = .fastlan
     let secondarySecondSubCategoryArg = secondarySecondSubCategory.asRubyArgument(name: "secondary_second_sub_category", type: nil)
     let tradeRepresentativeContactInformationArg = tradeRepresentativeContactInformation.asRubyArgument(name: "trade_representative_contact_information", type: nil)
     let appReviewInformationArg = appReviewInformation.asRubyArgument(name: "app_review_information", type: nil)
+    let appClipReviewInformationArg = appClipReviewInformation.asRubyArgument(name: "app_clip_review_information", type: nil)
     let appReviewAttachmentFileArg = appReviewAttachmentFile.asRubyArgument(name: "app_review_attachment_file", type: nil)
     let descriptionArg = description.asRubyArgument(name: "description", type: nil)
     let nameArg = name.asRubyArgument(name: "name", type: nil)
@@ -12612,6 +12929,8 @@ public func uploadToAppStore(apiKeyPath: OptionalConfigValue<String?> = .fastlan
     let languagesArg = languages.asRubyArgument(name: "languages", type: nil)
     let ignoreLanguageDirectoryValidationArg = ignoreLanguageDirectoryValidation.asRubyArgument(name: "ignore_language_directory_validation", type: nil)
     let precheckIncludeInAppPurchasesArg = precheckIncludeInAppPurchases.asRubyArgument(name: "precheck_include_in_app_purchases", type: nil)
+    let appClipDefaultExperienceSubtitleArg = appClipDefaultExperienceSubtitle.asRubyArgument(name: "app_clip_default_experience_subtitle", type: nil)
+    let appClipDefaultExperienceActionArg = appClipDefaultExperienceAction.asRubyArgument(name: "app_clip_default_experience_action", type: nil)
     let appArg = app.asRubyArgument(name: "app", type: nil)
     let array: [RubyCommand.Argument?] = [apiKeyPathArg,
                                           apiKeyArg,
@@ -12626,16 +12945,23 @@ public func uploadToAppStore(apiKeyPath: OptionalConfigValue<String?> = .fastlan
                                           useLiveVersionArg,
                                           metadataPathArg,
                                           screenshotsPathArg,
+                                          appClipHeaderImagesPathArg,
+                                          appClipDefaultExperienceMetadataPathArg,
+                                          appPreviewsPathArg,
+                                          previewFrameTimeCodeArg,
+                                          overwritePreviewVideosArg,
                                           skipBinaryUploadArg,
                                           skipScreenshotsArg,
                                           skipMetadataArg,
                                           skipAppVersionUpdateArg,
                                           forceArg,
                                           overwriteScreenshotsArg,
+                                          screenshotProcessingTimeoutArg,
                                           syncScreenshotsArg,
                                           submitForReviewArg,
                                           verifyOnlyArg,
                                           rejectIfPossibleArg,
+                                          versionCheckWaitRetryLimitArg,
                                           automaticReleaseArg,
                                           autoReleaseDateArg,
                                           phasedReleaseArg,
@@ -12648,6 +12974,7 @@ public func uploadToAppStore(apiKeyPath: OptionalConfigValue<String?> = .fastlan
                                           devPortalTeamIdArg,
                                           devPortalTeamNameArg,
                                           itcProviderArg,
+                                          providerPublicIdArg,
                                           runPrecheckBeforeSubmitArg,
                                           precheckDefaultRuleLevelArg,
                                           individualMetadataItemsArg,
@@ -12662,6 +12989,7 @@ public func uploadToAppStore(apiKeyPath: OptionalConfigValue<String?> = .fastlan
                                           secondarySecondSubCategoryArg,
                                           tradeRepresentativeContactInformationArg,
                                           appReviewInformationArg,
+                                          appClipReviewInformationArg,
                                           appReviewAttachmentFileArg,
                                           descriptionArg,
                                           nameArg,
@@ -12676,6 +13004,8 @@ public func uploadToAppStore(apiKeyPath: OptionalConfigValue<String?> = .fastlan
                                           languagesArg,
                                           ignoreLanguageDirectoryValidationArg,
                                           precheckIncludeInAppPurchasesArg,
+                                          appClipDefaultExperienceSubtitleArg,
+                                          appClipDefaultExperienceActionArg,
                                           appArg]
     let args: [RubyCommand.Argument] = array
         .filter { $0?.value != nil }
@@ -12697,8 +13027,8 @@ public func uploadToAppStore(apiKeyPath: OptionalConfigValue<String?> = .fastlan
    - metadataPath: Path to the directory containing the metadata files
    - key: **DEPRECATED!** Use `--json_key` instead - The p12 File used to authenticate with Google
    - issuer: **DEPRECATED!** Use `--json_key` instead - The issuer of the p12 file (email address of the service account)
-   - jsonKey: The path to a file containing service account JSON, used to authenticate with Google
-   - jsonKeyData: The raw service account JSON data used to authenticate with Google
+   - jsonKey: The path to a Google credentials JSON file (Application Default, Workload Identity, or Service Account), used to authenticate with Google
+   - jsonKeyData: The raw content of a Google credentials JSON file (Application Default, Workload Identity, or Service Account), used to authenticate with Google
    - apk: Path to the APK file to upload
    - apkPaths: An array of paths to APK files to upload
    - aab: Path to the AAB file to upload
@@ -12864,8 +13194,8 @@ public func uploadToPlayStore(packageName: String,
 
  - parameters:
    - packageName: The package name of the application to use
-   - jsonKey: The path to a file containing service account JSON, used to authenticate with Google
-   - jsonKeyData: The raw service account JSON data used to authenticate with Google
+   - jsonKey: The path to a Google credentials JSON file (Application Default, Workload Identity, or Service Account), used to authenticate with Google
+   - jsonKeyData: The raw content of a Google credentials JSON file (Application Default, Workload Identity, or Service Account), used to authenticate with Google
    - apk: Path to the APK file to upload
    - apkPaths: An array of paths to APK files to upload
    - aab: Path to the AAB file to upload
@@ -12934,6 +13264,8 @@ public func uploadToPlayStoreInternalAppSharing(packageName: String,
    - skipSubmission: Skip the distributing action of pilot and only upload the ipa file
    - skipWaitingForBuildProcessing: If set to true, the `distribute_external` option won't work and no build will be distributed to testers. (You might want to use this option if you are using this action on CI and have to pay for 'minutes used' on your CI plan). If set to `true` and a changelog is provided, it will partially wait for the build to appear on AppStore Connect so the changelog can be set, and skip the remaining processing steps
    - updateBuildInfoOnUpload: **DEPRECATED!** Update build info immediately after validation. This is deprecated and will be removed in a future release. App Store Connect no longer supports setting build info until after build processing has completed, which is when build info is updated by default
+   - appClipInvocations: Add beta app clip invocations to your builds in TestFlight
+   - overwriteAppClipInvocations: Clear all previous beta app clip invocations before adding new ones
    - distributeOnly: Distribute a previously uploaded build (equivalent to the `fastlane pilot distribute` command)
    - usesNonExemptEncryption: Provide the 'Uses Non-Exempt Encryption' for export compliance. This is used if there is 'ITSAppUsesNonExemptEncryption' is not set in the Info.plist
    - distributeExternal: Should the build be distributed to external testers? If set to true, use of `groups` option is required
@@ -12950,6 +13282,7 @@ public func uploadToPlayStoreInternalAppSharing(packageName: String,
    - teamName: The name of your App Store Connect team if you're in multiple teams
    - devPortalTeamId: The short ID of your team in the developer portal, if you're in multiple teams. Different from your iTC team ID!
    - itcProvider: The provider short name to be used with the iTMSTransporter to identify your team. This value will override the automatically detected provider short name. To get provider short name run `pathToXcode.app/Contents/Applications/Application\ Loader.app/Contents/itms/bin/iTMSTransporter -m provider -u 'USERNAME' -p 'PASSWORD' -account_type itunes_connect -v off`. The short names of providers should be listed in the second column
+   - providerPublicId: The provider public ID to be used with altool (--provider-public-id). This value will override the automatically detected provider value for altool uploads. Required after Xcode 26 when your account is associated with multiple providers and using username/app-password authentication
    - waitProcessingInterval: Interval in seconds to wait for App Store Connect processing
    - waitProcessingTimeoutDuration: Timeout duration in seconds to wait for App Store Connect processing. If set, after exceeding timeout duration, this will `force stop` to wait for App Store Connect processing and exit with exception
    - waitForUploadedBuild: **DEPRECATED!** No longer needed with the transition over to the App Store Connect API - Use version info from uploaded ipa file to determine what build to use for distribution. If set to false, latest processing or any latest build will be used
@@ -12977,6 +13310,8 @@ public func uploadToTestflight(apiKeyPath: OptionalConfigValue<String?> = .fastl
                                skipSubmission: OptionalConfigValue<Bool> = .fastlaneDefault(false),
                                skipWaitingForBuildProcessing: OptionalConfigValue<Bool> = .fastlaneDefault(false),
                                updateBuildInfoOnUpload: OptionalConfigValue<Bool> = .fastlaneDefault(false),
+                               appClipInvocations: OptionalConfigValue<[String]?> = .fastlaneDefault(nil),
+                               overwriteAppClipInvocations: OptionalConfigValue<Bool> = .fastlaneDefault(false),
                                distributeOnly: OptionalConfigValue<Bool> = .fastlaneDefault(false),
                                usesNonExemptEncryption: OptionalConfigValue<Bool> = .fastlaneDefault(false),
                                distributeExternal: OptionalConfigValue<Bool> = .fastlaneDefault(false),
@@ -12993,6 +13328,7 @@ public func uploadToTestflight(apiKeyPath: OptionalConfigValue<String?> = .fastl
                                teamName: OptionalConfigValue<String?> = .fastlaneDefault(nil),
                                devPortalTeamId: OptionalConfigValue<String?> = .fastlaneDefault(nil),
                                itcProvider: OptionalConfigValue<String?> = .fastlaneDefault(nil),
+                               providerPublicId: OptionalConfigValue<String?> = .fastlaneDefault(nil),
                                waitProcessingInterval: Int = 30,
                                waitProcessingTimeoutDuration: OptionalConfigValue<Int?> = .fastlaneDefault(nil),
                                waitForUploadedBuild: OptionalConfigValue<Bool> = .fastlaneDefault(false),
@@ -13017,6 +13353,8 @@ public func uploadToTestflight(apiKeyPath: OptionalConfigValue<String?> = .fastl
     let skipSubmissionArg = skipSubmission.asRubyArgument(name: "skip_submission", type: nil)
     let skipWaitingForBuildProcessingArg = skipWaitingForBuildProcessing.asRubyArgument(name: "skip_waiting_for_build_processing", type: nil)
     let updateBuildInfoOnUploadArg = updateBuildInfoOnUpload.asRubyArgument(name: "update_build_info_on_upload", type: nil)
+    let appClipInvocationsArg = appClipInvocations.asRubyArgument(name: "app_clip_invocations", type: nil)
+    let overwriteAppClipInvocationsArg = overwriteAppClipInvocations.asRubyArgument(name: "overwrite_app_clip_invocations", type: nil)
     let distributeOnlyArg = distributeOnly.asRubyArgument(name: "distribute_only", type: nil)
     let usesNonExemptEncryptionArg = usesNonExemptEncryption.asRubyArgument(name: "uses_non_exempt_encryption", type: nil)
     let distributeExternalArg = distributeExternal.asRubyArgument(name: "distribute_external", type: nil)
@@ -13033,6 +13371,7 @@ public func uploadToTestflight(apiKeyPath: OptionalConfigValue<String?> = .fastl
     let teamNameArg = teamName.asRubyArgument(name: "team_name", type: nil)
     let devPortalTeamIdArg = devPortalTeamId.asRubyArgument(name: "dev_portal_team_id", type: nil)
     let itcProviderArg = itcProvider.asRubyArgument(name: "itc_provider", type: nil)
+    let providerPublicIdArg = providerPublicId.asRubyArgument(name: "provider_public_id", type: nil)
     let waitProcessingIntervalArg = RubyCommand.Argument(name: "wait_processing_interval", value: waitProcessingInterval, type: nil)
     let waitProcessingTimeoutDurationArg = waitProcessingTimeoutDuration.asRubyArgument(name: "wait_processing_timeout_duration", type: nil)
     let waitForUploadedBuildArg = waitForUploadedBuild.asRubyArgument(name: "wait_for_uploaded_build", type: nil)
@@ -13056,6 +13395,8 @@ public func uploadToTestflight(apiKeyPath: OptionalConfigValue<String?> = .fastl
                                           skipSubmissionArg,
                                           skipWaitingForBuildProcessingArg,
                                           updateBuildInfoOnUploadArg,
+                                          appClipInvocationsArg,
+                                          overwriteAppClipInvocationsArg,
                                           distributeOnlyArg,
                                           usesNonExemptEncryptionArg,
                                           distributeExternalArg,
@@ -13072,6 +13413,7 @@ public func uploadToTestflight(apiKeyPath: OptionalConfigValue<String?> = .fastl
                                           teamNameArg,
                                           devPortalTeamIdArg,
                                           itcProviderArg,
+                                          providerPublicIdArg,
                                           waitProcessingIntervalArg,
                                           waitProcessingTimeoutDurationArg,
                                           waitForUploadedBuildArg,
@@ -13085,15 +13427,15 @@ public func uploadToTestflight(apiKeyPath: OptionalConfigValue<String?> = .fastl
 }
 
 /**
- Validate that the Google Play Store `json_key` works
+ Validate Google credentials JSON for the Google Play Store
 
  - parameters:
-   - jsonKey: The path to a file containing service account JSON, used to authenticate with Google
-   - jsonKeyData: The raw service account JSON data used to authenticate with Google
+   - jsonKey: The path to a Google credentials JSON file (Application Default, Workload Identity, or Service Account), used to authenticate with Google
+   - jsonKeyData: The raw content of a Google credentials JSON file (Application Default, Workload Identity, or Service Account), used to authenticate with Google
    - rootUrl: Root URL for the Google Play API. The provided URL will be used for API calls in place of https://www.googleapis.com/
    - timeout: Timeout for read, open, and send (in seconds)
 
- Use this action to test and validate your private key json key file used to connect and authenticate with the Google Play API
+ Use this action to test and validate your Google credentials JSON file (of type authorized_user, external_account, service_account) used to connect and authenticate with the Google Play API
  */
 public func validatePlayStoreJsonKey(jsonKey: OptionalConfigValue<String?> = .fastlaneDefault(nil),
                                      jsonKeyData: OptionalConfigValue<String?> = .fastlaneDefault(nil),
@@ -13441,7 +13783,11 @@ public func xcodebuild() {
    - configuration: The configuration used when building the app. Defaults to 'Release'
    - sourceDirectory: The path to project's root directory
    - derivedDataPath: The directory where build products and other derived data will go
+   - xccovFileDirectPath: The path or array of paths to the xccoverage/xccovreport/xcresult files to parse to generate code coverage
    - outputDirectory: The directory in which all reports will be stored
+   - clonedSourcePackagesPath: Sets a custom path for Swift Package Manager dependencies
+   - useSystemScm: Lets xcodebuild use system's scm configuration
+   - isSwiftPackage: Enables generating coverage reports for Package.swift derived projects
    - htmlReport: Produce an HTML report
    - markdownReport: Produce a Markdown report
    - jsonReport: Produce a JSON report
@@ -13453,6 +13799,7 @@ public func xcodebuild() {
    - slackMessage: The message which is published together with a successful report
    - ignoreFilePath: Relative or absolute path to the file containing the list of ignored files
    - includeTestTargets: Enables coverage reports for .xctest targets
+   - includeZeroTargets: Final report will include target even if the coverage is 0%
    - excludeTargets: Comma separated list of targets to exclude from coverage report
    - includeTargets: Comma separated list of targets to include in coverage report. If specified then exlude_targets will be ignored
    - onlyProjectTargets: Display the coverage only for main project targets (e.g. skip Pods targets)
@@ -13465,7 +13812,7 @@ public func xcodebuild() {
    - legacySupport: Whether xcov should parse a xccoverage file instead on xccovreport
 
  Create nice code coverage reports and post coverage summaries on Slack *(xcov gem is required)*.
- More information: [https://github.com/nakiostudio/xcov](https://github.com/nakiostudio/xcov).
+ More information: [https://github.com/fastlane-community/xcov](https://github.com/fastlane-community/xcov).
  */
 public func xcov(workspace: OptionalConfigValue<String?> = .fastlaneDefault(nil),
                  project: OptionalConfigValue<String?> = .fastlaneDefault(nil),
@@ -13473,7 +13820,11 @@ public func xcov(workspace: OptionalConfigValue<String?> = .fastlaneDefault(nil)
                  configuration: OptionalConfigValue<String?> = .fastlaneDefault(nil),
                  sourceDirectory: OptionalConfigValue<String?> = .fastlaneDefault(nil),
                  derivedDataPath: OptionalConfigValue<String?> = .fastlaneDefault(nil),
+                 xccovFileDirectPath: OptionalConfigValue<[String]?> = .fastlaneDefault(nil),
                  outputDirectory: String = "./xcov_report",
+                 clonedSourcePackagesPath: OptionalConfigValue<String?> = .fastlaneDefault(nil),
+                 useSystemScm: OptionalConfigValue<Bool> = .fastlaneDefault(false),
+                 isSwiftPackage: OptionalConfigValue<Bool> = .fastlaneDefault(false),
                  htmlReport: OptionalConfigValue<Bool> = .fastlaneDefault(true),
                  markdownReport: OptionalConfigValue<Bool> = .fastlaneDefault(false),
                  jsonReport: OptionalConfigValue<Bool> = .fastlaneDefault(false),
@@ -13485,6 +13836,7 @@ public func xcov(workspace: OptionalConfigValue<String?> = .fastlaneDefault(nil)
                  slackMessage: String = "Your *xcov* coverage report",
                  ignoreFilePath: String = "./.xcovignore",
                  includeTestTargets: OptionalConfigValue<Bool> = .fastlaneDefault(false),
+                 includeZeroTargets: OptionalConfigValue<Bool> = .fastlaneDefault(true),
                  excludeTargets: OptionalConfigValue<String?> = .fastlaneDefault(nil),
                  includeTargets: OptionalConfigValue<String?> = .fastlaneDefault(nil),
                  onlyProjectTargets: OptionalConfigValue<Bool> = .fastlaneDefault(false),
@@ -13493,7 +13845,7 @@ public func xcov(workspace: OptionalConfigValue<String?> = .fastlaneDefault(nil)
                  coverallsServiceJobId: OptionalConfigValue<String?> = .fastlaneDefault(nil),
                  coverallsRepoToken: OptionalConfigValue<String?> = .fastlaneDefault(nil),
                  xcconfig: OptionalConfigValue<String?> = .fastlaneDefault(nil),
-                 ideFoundationPath: String = "/Applications/Xcode-14.3.0.app/Contents/Developer/../Frameworks/IDEFoundation.framework/Versions/A/IDEFoundation",
+                 ideFoundationPath: String = "/Applications/Xcode_16.4.app/Contents/Developer/../Frameworks/IDEFoundation.framework/Versions/A/IDEFoundation",
                  legacySupport: OptionalConfigValue<Bool> = .fastlaneDefault(false))
 {
     let workspaceArg = workspace.asRubyArgument(name: "workspace", type: nil)
@@ -13502,7 +13854,11 @@ public func xcov(workspace: OptionalConfigValue<String?> = .fastlaneDefault(nil)
     let configurationArg = configuration.asRubyArgument(name: "configuration", type: nil)
     let sourceDirectoryArg = sourceDirectory.asRubyArgument(name: "source_directory", type: nil)
     let derivedDataPathArg = derivedDataPath.asRubyArgument(name: "derived_data_path", type: nil)
+    let xccovFileDirectPathArg = xccovFileDirectPath.asRubyArgument(name: "xccov_file_direct_path", type: nil)
     let outputDirectoryArg = RubyCommand.Argument(name: "output_directory", value: outputDirectory, type: nil)
+    let clonedSourcePackagesPathArg = clonedSourcePackagesPath.asRubyArgument(name: "cloned_source_packages_path", type: nil)
+    let useSystemScmArg = useSystemScm.asRubyArgument(name: "use_system_scm", type: nil)
+    let isSwiftPackageArg = isSwiftPackage.asRubyArgument(name: "is_swift_package", type: nil)
     let htmlReportArg = htmlReport.asRubyArgument(name: "html_report", type: nil)
     let markdownReportArg = markdownReport.asRubyArgument(name: "markdown_report", type: nil)
     let jsonReportArg = jsonReport.asRubyArgument(name: "json_report", type: nil)
@@ -13514,6 +13870,7 @@ public func xcov(workspace: OptionalConfigValue<String?> = .fastlaneDefault(nil)
     let slackMessageArg = RubyCommand.Argument(name: "slack_message", value: slackMessage, type: nil)
     let ignoreFilePathArg = RubyCommand.Argument(name: "ignore_file_path", value: ignoreFilePath, type: nil)
     let includeTestTargetsArg = includeTestTargets.asRubyArgument(name: "include_test_targets", type: nil)
+    let includeZeroTargetsArg = includeZeroTargets.asRubyArgument(name: "include_zero_targets", type: nil)
     let excludeTargetsArg = excludeTargets.asRubyArgument(name: "exclude_targets", type: nil)
     let includeTargetsArg = includeTargets.asRubyArgument(name: "include_targets", type: nil)
     let onlyProjectTargetsArg = onlyProjectTargets.asRubyArgument(name: "only_project_targets", type: nil)
@@ -13530,7 +13887,11 @@ public func xcov(workspace: OptionalConfigValue<String?> = .fastlaneDefault(nil)
                                           configurationArg,
                                           sourceDirectoryArg,
                                           derivedDataPathArg,
+                                          xccovFileDirectPathArg,
                                           outputDirectoryArg,
+                                          clonedSourcePackagesPathArg,
+                                          useSystemScmArg,
+                                          isSwiftPackageArg,
                                           htmlReportArg,
                                           markdownReportArg,
                                           jsonReportArg,
@@ -13542,6 +13903,7 @@ public func xcov(workspace: OptionalConfigValue<String?> = .fastlaneDefault(nil)
                                           slackMessageArg,
                                           ignoreFilePathArg,
                                           includeTestTargetsArg,
+                                          includeZeroTargetsArg,
                                           excludeTargetsArg,
                                           includeTargetsArg,
                                           onlyProjectTargetsArg,
@@ -13642,7 +14004,7 @@ public func xcversion(version: String) {
     return runner.executeCommand(command)
 }
 
-// These are all the parsing functions needed to transform our data into the expected types
+/// These are all the parsing functions needed to transform our data into the expected types
 func parseArray(fromString: String, function: String = #function) -> [String] {
     verbose(message: "parsing an Array from data: \(fromString), from function: \(function)")
     let potentialArray: String
@@ -13651,8 +14013,7 @@ func parseArray(fromString: String, function: String = #function) -> [String] {
     } else {
         potentialArray = fromString
     }
-    let array: [String] = try! JSONSerialization.jsonObject(with: potentialArray.data(using: .utf8)!, options: []) as! [String]
-    return array
+    return try! JSONSerialization.jsonObject(with: potentialArray.data(using: .utf8)!, options: []) as! [String]
 }
 
 func parseDictionary(fromString: String, function: String = #function) -> [String: String] {
@@ -13672,8 +14033,7 @@ func parseDictionaryHelper(fromString: String, function: String = #function) -> 
     } else {
         potentialDictionary = fromString
     }
-    let dictionary: [String: Any] = try! JSONSerialization.jsonObject(with: potentialDictionary.data(using: .utf8)!, options: []) as! [String: Any]
-    return dictionary
+    return try! JSONSerialization.jsonObject(with: potentialDictionary.data(using: .utf8)!, options: []) as! [String: Any]
 }
 
 func parseBool(fromString: String, function: String = #function) -> Bool {
@@ -13696,4 +14056,4 @@ public let snapshotfile: Snapshotfile = .init()
 
 // Please don't remove the lines below
 // They are used to detect outdated files
-// FastlaneRunnerAPIVersion [0.9.173]
+// FastlaneRunnerAPIVersion [0.9.201]

@@ -1,0 +1,16 @@
+# It takes a lot of disk space to commit the `Data/` directory in the `.xcresult` bundle, while the `database.sqlite3` file
+# is enough for `xcresulttool` to work (at least for the cases we have in the `trainer` specs suite and for Xcode 16+).
+#
+# Tip: to generate the `database.sqlite3` file from the `Data/` directory if it doesn't exist, run the following command:
+#
+# ```bash
+# xcrun xcresulttool get test-results tests --path Xcode16-Mixed-XCTest-SwiftTesting-Project.xcresult
+# ```
+*.xcresult/Data
+!*.xcresult/database.sqlite3
+
+# For old `.xcresult` bundle fixtures (< Xcode 15) that were introduced in this repo before we added Xcode 16 support,
+# let's keep the status quo and still keep the whole `Data/` directory committed, especially since those fixtures are used
+# by the legacy versions of `xcresulttool` that might (?) not support the `database.sqlite3` format.
+!Test.*.xcresult/Data
+Test.*.xcresult/database.sqlite3

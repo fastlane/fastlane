@@ -1,5 +1,5 @@
 // RunnerArgument.swift
-// Copyright (c) 2023 FastlaneTools
+// Copyright (c) 2026 FastlaneTools
 
 //
 //  ** NOTE **

@@ -2,6 +2,12 @@
 
 For detailed instructions on how to get started with contributing to _fastlane_, first check out [YourFirstPR.md][first-pr] and [Testing.md](Testing.md). This guide will focus on more advanced instructions on how to debug _fastlane_ and _spaceship_ issues and work on patches.
 
+## Experiment with the _fastlane_ internals
+
+Open a _fastlane_ console by running `fastlane console` inside or outside your project.
+
+This will allow you to invoke any of the _fastlane_ modules and classes and test their behavior.
+
 ## Debug using [pry](https://pry.github.io/)
 
 Before you’re able to use [pry](https://pry.github.io/), make sure to have completed the [YourFirstPR.md][first-pr] setup part, as this will install all required development dependencies.
@@ -27,6 +33,10 @@ DEBUG=1 bundle exec rspec
 
 You will then jump into an interactive debugger that allows you to print out variables, call methods and [much more](https://github.com/pry/pry/wiki).
 To continue running the original script use `control` + `d`
+
+## Running fastlane within a IRB console
+
+You can open an IRB console by running `bin/console`
 
 ## Debugging and patching [_spaceship_](https://github.com/fastlane/fastlane/tree/master/spaceship) problems
 
@@ -93,6 +103,10 @@ To run the newly created script, run
 ```
 SPACESHIP_DEBUG=1 bundle exec rake debug
 ```
+
+### Running the spaceship playground
+
+You can open an interactive _spaceship_ session console by running `fastlane spaceship`
 
 ### Additional Information
 See also the [Debugging _spaceship_](spaceship/docs/Debugging.md) documentation.

@@ -199,7 +199,7 @@ describe Fastlane do
 
         # Actually, `git checkout` makes sure of this, but I think it's ok to
         # keep this test, in case we change the implementation.
-        it "works with inexistent paths" do
+        it "works with nonexistent paths" do
           expect(UI).to receive(:important).with('Works since v1')
 
           expect do
@@ -303,6 +303,29 @@ describe Fastlane do
             works
           end").runner.execute(:test)
         end
+      end
+
+      it "works with one HTTP header" do
+        header = 'Authorization: Basic my_base_64_key'
+
+        allow(Fastlane::Actions).to receive(:sh).and_call_original
+        expect(Fastlane::Actions).to receive(:sh).with(any_args, '--config', "http.extraHeader=#{header}")
+
+        Fastlane::FastFile.new.parse("lane :test do
+          import_from_git(url: '#{source_directory_path}', git_extra_headers: ['#{header}'])
+        end").runner.execute(:test)
+      end
+
+      it "works with two HTTP headers" do
+        first_header = 'Authorization: Basic my_base_64_key'
+        second_header = 'Cache-Control: no-cache'
+
+        allow(Fastlane::Actions).to receive(:sh).and_call_original
+        expect(Fastlane::Actions).to receive(:sh).with(any_args, '--config', "http.extraHeader=#{first_header}", '--config', "http.extraHeader=#{second_header}")
+
+        Fastlane::FastFile.new.parse("lane :test do
+          import_from_git(url: '#{source_directory_path}', git_extra_headers: ['#{first_header}', '#{second_header}'])
+        end").runner.execute(:test)
       end
 
       after :all do

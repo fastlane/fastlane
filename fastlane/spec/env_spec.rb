@@ -4,7 +4,7 @@ require "fastlane/cli_tools_distributor"
 describe Fastlane do
   describe Fastlane::EnvironmentPrinter do
     before do
-      stub_request(:get, %r{https:\/\/rubygems.org\/api\/v1\/gems\/.*}).
+      stub_request(:get, %r{https://rubygems\.org\/api\/v1\/gems\/.*}).
         to_return(status: 200, body: '{"version": "0.16.2"}', headers: {})
     end
 
