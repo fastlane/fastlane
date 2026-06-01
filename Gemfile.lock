@@ -30,7 +30,7 @@ PATH
       highline (~> 2.0)
       http-cookie (~> 1.0.5)
       json (< 3.0.0)
-      jwt (>= 2.1.0, < 4)
+      jwt (>= 2.10.3, < 4, != 3.1.2, != 3.1.1, != 3.1.0, != 3.0.0)
       logger (>= 1.6, < 2.0)
       mini_magick (>= 4.9.4, < 5.0.0)
       multipart-post (>= 2.0.0, < 3.0.0)
@@ -220,7 +220,8 @@ GEM
     interception (0.5)
     jmespath (1.6.2)
     json (2.5.1)
-    jwt (2.7.1)
+    jwt (2.10.3)
+      base64
     kramdown (2.4.0)
       rexml
     kramdown-parser-gfm (1.1.0)
