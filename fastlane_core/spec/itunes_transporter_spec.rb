@@ -1672,6 +1672,8 @@ describe FastlaneCore do
     def written_key(api_key)
       prepared = transporter.prepare(original_api_key: api_key)
       File.read(File.join(prepared[:key_dir], "AuthKey_#{prepared[:key_id]}.p8"))
+    ensure
+      FileUtils.remove_entry(prepared[:key_dir]) if prepared && Dir.exist?(prepared[:key_dir])
     end
 
     it "decodes the key when is_key_content_base64 is true" do
