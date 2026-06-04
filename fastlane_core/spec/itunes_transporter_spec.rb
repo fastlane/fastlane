@@ -1664,4 +1664,31 @@ describe FastlaneCore do
     end
 
   end
+
+  describe "#prepare writes the .p8 key file" do
+    let(:pem) { "-----BEGIN PRIVATE KEY-----\nMIGTAgEAMBMGByqG\n-----END PRIVATE KEY-----\n" }
+    let(:transporter) { FastlaneCore::AltoolTransporterExecutor.new }
+
+    def written_key(api_key)
+      prepared = transporter.prepare(original_api_key: api_key)
+      File.read(File.join(prepared[:key_dir], "AuthKey_#{prepared[:key_id]}.p8"))
+    ensure
+      FileUtils.remove_entry(prepared[:key_dir]) if prepared && Dir.exist?(prepared[:key_dir])
+    end
+
+    it "decodes the key when is_key_content_base64 is true" do
+      key = api_key.merge(key: Base64.strict_encode64(pem), is_key_content_base64: true)
+      expect(written_key(key)).to eq(pem)
+    end
+
+    it "writes the key verbatim when is_key_content_base64 is false" do
+      key = api_key.merge(key: pem, is_key_content_base64: false)
+      expect(written_key(key)).to eq(pem)
+    end
+
+    it "writes the key verbatim when is_key_content_base64 is absent" do
+      key = api_key.merge(key: pem)
+      expect(written_key(key)).to eq(pem)
+    end
+  end
 end

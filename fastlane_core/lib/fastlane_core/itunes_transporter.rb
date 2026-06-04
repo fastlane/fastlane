@@ -1,6 +1,7 @@
 require 'shellwords'
 require 'tmpdir'
 require 'fileutils'
+require 'base64'
 require 'credentials_manager/account_manager'
 require 'securerandom'
 
@@ -83,9 +84,14 @@ module FastlaneCore
       else
         api_key[:key_dir] = Dir.mktmpdir("deliver-")
       end
-      # Specified p8 needs to be generated to call altool or iTMSTransporter
+      # Specified p8 needs to be generated to call altool or iTMSTransporter.
+      # The key may be Base64 encoded (e.g. when passed via an ENV var); altool and
+      # iTMSTransporter expect the raw .p8 contents, so decode it first. Spaceship
+      # decodes on its own, but the transporter wrote the value verbatim before this,
+      # producing an unparsable key and a "bearer token invalid" error.
+      key_content = api_key[:is_key_content_base64] ? Base64.decode64(api_key[:key]) : api_key[:key]
       File.open(File.join(api_key[:key_dir], "AuthKey_#{api_key[:key_id]}.p8"), "wb") do |p8|
-        p8.write(api_key[:key])
+        p8.write(key_content)
       end
       api_key
     end
