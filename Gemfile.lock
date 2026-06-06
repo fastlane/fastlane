@@ -33,6 +33,7 @@ PATH
       jwt (>= 2.10.3, < 4)
       logger (>= 1.6, < 2.0)
       mini_magick (>= 4.9.4, < 5.0.0)
+      multi_json (~> 1.12)
       multipart-post (>= 2.0.0, < 3.0.0)
       mutex_m (~> 0.3)
       naturally (~> 2.2)
