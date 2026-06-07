@@ -82,6 +82,7 @@ Gem::Specification.new do |spec|
   spec.add_dependency('json', '< 3.0.0') # Because sometimes it's just not installed
   spec.add_dependency('jwt', '>= 2.10.3', '< 4') # Used for generating authentication tokens for App Store Connect API
   spec.add_dependency('mini_magick', '>= 4.9.4', '< 5.0.0') # To open, edit and export PSD files
+  spec.add_dependency('multi_json', '~> 1.12') # Needed for upstream Google bug: googleapis/google-api-ruby-client/issues/26611
   spec.add_dependency('multipart-post', '>= 2.0.0', '< 3.0.0') # Needed for uploading builds to appetize
   spec.add_dependency('naturally', '~> 2.2') # Used to sort strings with numbers in a human-friendly way
   spec.add_dependency('optparse', '>= 0.1.1', '< 1.0.0') # Used to parse options with Commander
