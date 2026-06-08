@@ -112,17 +112,21 @@ describe Fastlane do
           platform: 'IOS'
         ).once
 
-        Fastlane::Actions::RegisterDevicesAction.run(
-          platform: 'ios',
-          devices_file: devices_list_with_hyphen,
-          username: 'test@test.com'
-        )
+        result1 = Fastlane::FastFile.new.parse("lane :test do
+            register_devices(
+              username: 'test@test.com',
+              devices_file: '#{devices_list_with_hyphen}',
+              platform: 'ios'
+            )
+          end").runner.execute(:test)
 
-        Fastlane::Actions::RegisterDevicesAction.run(
-          platform: 'ios',
-          devices_file: devices_list_normalized,
-          username: 'test@test.com'
-        )
+        result2 = Fastlane::FastFile.new.parse("lane :test do
+            register_devices(
+              username: 'test@test.com',
+              devices_file: '#{devices_list_normalized}',
+              platform: 'ios'
+            )
+          end").runner.execute(:test)
       end
 
       describe "displays error messages" do
