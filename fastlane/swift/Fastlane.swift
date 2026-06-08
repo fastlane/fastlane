@@ -2260,6 +2260,7 @@ public func captureAndroidScreenshots(androidHome: OptionalConfigValue<String?> 
    - testplan: The testplan associated with the scheme that should be used for testing
    - onlyTesting: Array of strings matching Test Bundle/Test Suite/Test Cases to run
    - skipTesting: Array of strings matching Test Bundle/Test Suite/Test Cases to skip
+   - runRosettaSimulator: Run simulator in a Rosetta mode
    - xcodebuildFormatter: xcodebuild formatter to use (ex: 'xcbeautify', 'xcbeautify --quieter', 'xcpretty', 'xcpretty -test'). Use empty string (ex: '') to disable any formatter (More information: https://docs.fastlane.tools/best-practices/xcodebuild-formatters/)
    - xcprettyArgs: **DEPRECATED!** Use `xcodebuild_formatter: ''` instead - Additional xcpretty arguments
    - disableXcpretty: Disable xcpretty formatting of build
@@ -2313,6 +2314,7 @@ public func captureIosScreenshots(workspace: OptionalConfigValue<String?> = .fas
                                   testplan: OptionalConfigValue<String?> = .fastlaneDefault(nil),
                                   onlyTesting: Any? = nil,
                                   skipTesting: Any? = nil,
+                                  runRosettaSimulator: OptionalConfigValue<Bool> = .fastlaneDefault(false),
                                   xcodebuildFormatter: String = "xcbeautify",
                                   xcprettyArgs: OptionalConfigValue<String?> = .fastlaneDefault(nil),
                                   disableXcpretty: OptionalConfigValue<Bool?> = .fastlaneDefault(nil),
@@ -2366,6 +2368,7 @@ public func captureIosScreenshots(workspace: OptionalConfigValue<String?> = .fas
     let testplanArg = testplan.asRubyArgument(name: "testplan", type: nil)
     let onlyTestingArg = RubyCommand.Argument(name: "only_testing", value: onlyTesting, type: nil)
     let skipTestingArg = RubyCommand.Argument(name: "skip_testing", value: skipTesting, type: nil)
+    let runRosettaSimulatorArg = runRosettaSimulator.asRubyArgument(name: "run_rosetta_simulator", type: nil)
     let xcodebuildFormatterArg = RubyCommand.Argument(name: "xcodebuild_formatter", value: xcodebuildFormatter, type: nil)
     let xcprettyArgsArg = xcprettyArgs.asRubyArgument(name: "xcpretty_args", type: nil)
     let disableXcprettyArg = disableXcpretty.asRubyArgument(name: "disable_xcpretty", type: nil)
@@ -2418,6 +2421,7 @@ public func captureIosScreenshots(workspace: OptionalConfigValue<String?> = .fas
                                           testplanArg,
                                           onlyTestingArg,
                                           skipTestingArg,
+                                          runRosettaSimulatorArg,
                                           xcodebuildFormatterArg,
                                           xcprettyArgsArg,
                                           disableXcprettyArg,
@@ -2481,6 +2485,7 @@ public func captureIosScreenshots(workspace: OptionalConfigValue<String?> = .fas
    - testplan: The testplan associated with the scheme that should be used for testing
    - onlyTesting: Array of strings matching Test Bundle/Test Suite/Test Cases to run
    - skipTesting: Array of strings matching Test Bundle/Test Suite/Test Cases to skip
+   - runRosettaSimulator: Run simulator in a Rosetta mode
    - xcodebuildFormatter: xcodebuild formatter to use (ex: 'xcbeautify', 'xcbeautify --quieter', 'xcpretty', 'xcpretty -test'). Use empty string (ex: '') to disable any formatter (More information: https://docs.fastlane.tools/best-practices/xcodebuild-formatters/)
    - xcprettyArgs: **DEPRECATED!** Use `xcodebuild_formatter: ''` instead - Additional xcpretty arguments
    - disableXcpretty: Disable xcpretty formatting of build
@@ -2534,6 +2539,7 @@ public func captureScreenshots(workspace: OptionalConfigValue<String?> = .fastla
                                testplan: OptionalConfigValue<String?> = .fastlaneDefault(nil),
                                onlyTesting: Any? = nil,
                                skipTesting: Any? = nil,
+                               runRosettaSimulator: OptionalConfigValue<Bool> = .fastlaneDefault(false),
                                xcodebuildFormatter: String = "xcbeautify",
                                xcprettyArgs: OptionalConfigValue<String?> = .fastlaneDefault(nil),
                                disableXcpretty: OptionalConfigValue<Bool?> = .fastlaneDefault(nil),
@@ -2587,6 +2593,7 @@ public func captureScreenshots(workspace: OptionalConfigValue<String?> = .fastla
     let testplanArg = testplan.asRubyArgument(name: "testplan", type: nil)
     let onlyTestingArg = RubyCommand.Argument(name: "only_testing", value: onlyTesting, type: nil)
     let skipTestingArg = RubyCommand.Argument(name: "skip_testing", value: skipTesting, type: nil)
+    let runRosettaSimulatorArg = runRosettaSimulator.asRubyArgument(name: "run_rosetta_simulator", type: nil)
     let xcodebuildFormatterArg = RubyCommand.Argument(name: "xcodebuild_formatter", value: xcodebuildFormatter, type: nil)
     let xcprettyArgsArg = xcprettyArgs.asRubyArgument(name: "xcpretty_args", type: nil)
     let disableXcprettyArg = disableXcpretty.asRubyArgument(name: "disable_xcpretty", type: nil)
@@ -2639,6 +2646,7 @@ public func captureScreenshots(workspace: OptionalConfigValue<String?> = .fastla
                                           testplanArg,
                                           onlyTestingArg,
                                           skipTestingArg,
+                                          runRosettaSimulatorArg,
                                           xcodebuildFormatterArg,
                                           xcprettyArgsArg,
                                           disableXcprettyArg,
@@ -10637,6 +10645,7 @@ public func slather(buildDirectory: OptionalConfigValue<String?> = .fastlaneDefa
    - testplan: The testplan associated with the scheme that should be used for testing
    - onlyTesting: Array of strings matching Test Bundle/Test Suite/Test Cases to run
    - skipTesting: Array of strings matching Test Bundle/Test Suite/Test Cases to skip
+   - runRosettaSimulator: Run simulator in a Rosetta mode
    - xcodebuildFormatter: xcodebuild formatter to use (ex: 'xcbeautify', 'xcbeautify --quieter', 'xcpretty', 'xcpretty -test'). Use empty string (ex: '') to disable any formatter (More information: https://docs.fastlane.tools/best-practices/xcodebuild-formatters/)
    - xcprettyArgs: **DEPRECATED!** Use `xcodebuild_formatter: ''` instead - Additional xcpretty arguments
    - disableXcpretty: Disable xcpretty formatting of build
@@ -10690,6 +10699,7 @@ public func snapshot(workspace: OptionalConfigValue<String?> = .fastlaneDefault(
                      testplan: OptionalConfigValue<String?> = .fastlaneDefault(snapshotfile.testplan),
                      onlyTesting: Any? = snapshotfile.onlyTesting,
                      skipTesting: Any? = snapshotfile.skipTesting,
+                     runRosettaSimulator: OptionalConfigValue<Bool> = .fastlaneDefault(snapshotfile.runRosettaSimulator),
                      xcodebuildFormatter: String = snapshotfile.xcodebuildFormatter,
                      xcprettyArgs: OptionalConfigValue<String?> = .fastlaneDefault(snapshotfile.xcprettyArgs),
                      disableXcpretty: OptionalConfigValue<Bool?> = .fastlaneDefault(snapshotfile.disableXcpretty),
@@ -10743,6 +10753,7 @@ public func snapshot(workspace: OptionalConfigValue<String?> = .fastlaneDefault(
     let testplanArg = testplan.asRubyArgument(name: "testplan", type: nil)
     let onlyTestingArg = RubyCommand.Argument(name: "only_testing", value: onlyTesting, type: nil)
     let skipTestingArg = RubyCommand.Argument(name: "skip_testing", value: skipTesting, type: nil)
+    let runRosettaSimulatorArg = runRosettaSimulator.asRubyArgument(name: "run_rosetta_simulator", type: nil)
     let xcodebuildFormatterArg = RubyCommand.Argument(name: "xcodebuild_formatter", value: xcodebuildFormatter, type: nil)
     let xcprettyArgsArg = xcprettyArgs.asRubyArgument(name: "xcpretty_args", type: nil)
     let disableXcprettyArg = disableXcpretty.asRubyArgument(name: "disable_xcpretty", type: nil)
@@ -10795,6 +10806,7 @@ public func snapshot(workspace: OptionalConfigValue<String?> = .fastlaneDefault(
                                           testplanArg,
                                           onlyTestingArg,
                                           skipTestingArg,
+                                          runRosettaSimulatorArg,
                                           xcodebuildFormatterArg,
                                           xcprettyArgsArg,
                                           disableXcprettyArg,
@@ -12122,6 +12134,51 @@ public func unlockKeychain(path: String = "login",
         .filter { $0?.value != nil }
         .compactMap { $0 }
     let command = RubyCommand(commandID: "", methodName: "unlock_keychain", className: nil, args: args)
+    _ = runner.executeCommand(command)
+}
+
+/**
+ Update your app's age rating on App Store Connect
+
+ - parameters:
+   - apiKeyPath: Path to your App Store Connect API Key JSON file (https://docs.fastlane.tools/app-store-connect-api/)
+   - apiKey: Your App Store Connect API Key information (https://docs.fastlane.tools/app-store-connect-api/)
+   - appIdentifier: The bundle identifier of your app
+   - username: Your Apple ID username
+   - ageRatingConfigPath: Path to the JSON file containing the age rating configuration
+   - teamId: The ID of your App Store Connect team if you're in multiple teams
+   - teamName: The name of your App Store Connect team if you're in multiple teams
+
+ - returns: Returns true if the age rating was successfully updated
+
+ Updates only the age rating of your app on App Store Connect without touching any other metadata, screenshots, or binaries. Useful for CI pipelines that need to update age ratings independently of an app release. Supports both API key and Apple ID authentication.
+ */
+public func updateAppAgeRating(apiKeyPath: OptionalConfigValue<String?> = .fastlaneDefault(nil),
+                               apiKey: OptionalConfigValue<[String: Any]?> = .fastlaneDefault(nil),
+                               appIdentifier: String,
+                               username: OptionalConfigValue<String?> = .fastlaneDefault(nil),
+                               ageRatingConfigPath: String,
+                               teamId: OptionalConfigValue<String?> = .fastlaneDefault(nil),
+                               teamName: OptionalConfigValue<String?> = .fastlaneDefault(nil))
+{
+    let apiKeyPathArg = apiKeyPath.asRubyArgument(name: "api_key_path", type: nil)
+    let apiKeyArg = apiKey.asRubyArgument(name: "api_key", type: nil)
+    let appIdentifierArg = RubyCommand.Argument(name: "app_identifier", value: appIdentifier, type: nil)
+    let usernameArg = username.asRubyArgument(name: "username", type: nil)
+    let ageRatingConfigPathArg = RubyCommand.Argument(name: "age_rating_config_path", value: ageRatingConfigPath, type: nil)
+    let teamIdArg = teamId.asRubyArgument(name: "team_id", type: nil)
+    let teamNameArg = teamName.asRubyArgument(name: "team_name", type: nil)
+    let array: [RubyCommand.Argument?] = [apiKeyPathArg,
+                                          apiKeyArg,
+                                          appIdentifierArg,
+                                          usernameArg,
+                                          ageRatingConfigPathArg,
+                                          teamIdArg,
+                                          teamNameArg]
+    let args: [RubyCommand.Argument] = array
+        .filter { $0?.value != nil }
+        .compactMap { $0 }
+    let command = RubyCommand(commandID: "", methodName: "update_app_age_rating", className: nil, args: args)
     _ = runner.executeCommand(command)
 }
 
@@ -14056,4 +14113,4 @@ public let snapshotfile: Snapshotfile = .init()
 
 // Please don't remove the lines below
 // They are used to detect outdated files
-// FastlaneRunnerAPIVersion [0.9.201]
+// FastlaneRunnerAPIVersion [0.9.202]
