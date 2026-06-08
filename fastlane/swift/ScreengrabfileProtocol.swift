@@ -161,4 +161,4 @@ public extension ScreengrabfileProtocol {
 
 // Please don't remove the lines below
 // They are used to detect outdated files
-// FastlaneRunnerAPIVersion [0.9.146]
+// FastlaneRunnerAPIVersion [0.9.147]
