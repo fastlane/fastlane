@@ -1,7 +1,7 @@
 PATH
   remote: .
   specs:
-    fastlane (2.234.0)
+    fastlane (2.235.0)
       CFPropertyList (>= 2.3, < 5.0.0)
       abbrev (~> 0.1)
       addressable (>= 2.8, < 3.0.0)
@@ -30,9 +30,10 @@ PATH
       highline (~> 2.0)
       http-cookie (~> 1.0.5)
       json (< 3.0.0)
-      jwt (>= 2.1.0, < 4)
+      jwt (>= 2.10.3, < 4)
       logger (>= 1.6, < 2.0)
       mini_magick (>= 4.9.4, < 5.0.0)
+      multi_json (~> 1.12)
       multipart-post (>= 2.0.0, < 3.0.0)
       mutex_m (~> 0.3)
       naturally (~> 2.2)
@@ -220,7 +221,8 @@ GEM
     interception (0.5)
     jmespath (1.6.2)
     json (2.5.1)
-    jwt (2.7.1)
+    jwt (2.10.3)
+      base64
     kramdown (2.4.0)
       rexml
     kramdown-parser-gfm (1.1.0)

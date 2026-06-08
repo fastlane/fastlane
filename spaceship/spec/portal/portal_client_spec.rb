@@ -137,7 +137,7 @@ describe Spaceship::Client do
       end
 
       it 'sanitizes invalid characters and appends md5 hash when input changed' do
-        input = 'Development App λ@&*"'
+        input = 'Development App. λ@&*"'
         expected = 'Development App  ' + Digest::MD5.hexdigest(input)
         expect(subject.send(:valid_name_for, input)).to eq(expected)
       end

@@ -294,9 +294,6 @@ module Screengrab
 
     def pull_screenshots_from_device(locale, device_serial, device_type_dir_name)
       UI.message("Pulling captured screenshots for locale #{locale} from the device")
-      starting_screenshot_count = screenshot_file_names_in(@config[:output_directory], device_type_dir_name).length
-
-      UI.verbose("Starting screenshot count is: #{starting_screenshot_count}")
 
       device_screenshots_paths = [
         determine_external_screenshots_path(device_serial, @config[:app_package_name], [locale]),
@@ -306,7 +303,7 @@ module Screengrab
       # Make a temp directory into which to pull the screenshots before they are moved to their final location.
       # This makes directory cleanup easier, as the temp directory will be removed when the block completes.
 
-      Dir.mktmpdir do |tempdir|
+      copied_screenshot_count = Dir.mktmpdir do |tempdir|
         device_screenshots_paths.each do |(device_path, needs_run_as)|
           if_device_path_exists(@config[:app_package_name], device_serial, device_path, needs_run_as) do |path|
             UI.message(path)
@@ -337,19 +334,12 @@ module Screengrab
         move_pulled_screenshots(locale, tempdir, device_type_dir_name)
       end
 
-      ending_screenshot_count = screenshot_file_names_in(@config[:output_directory], device_type_dir_name).length
-
-      UI.verbose("Ending screenshot count is: #{ending_screenshot_count}")
-
-      # Because we can't guarantee the screenshot output directory will be empty when we pull, we determine
-      # success based on whether there are more screenshots there than when we started.
-      # This is only applicable though when `clear_previous_screenshots` is set to `true`.
-      if starting_screenshot_count == ending_screenshot_count && @config[:clear_previous_screenshots]
+      if copied_screenshot_count.zero? && @config[:clear_previous_screenshots]
         UI.error("Make sure you've used Screengrab.screenshot() in your tests and that your expected tests are being run.")
         UI.abort_with_message!("No screenshots were detected 📷❌")
       end
 
-      ending_screenshot_count - starting_screenshot_count
+      copied_screenshot_count
     end
 
     def move_pulled_screenshots(locale, pull_dir, device_type_dir_name)
@@ -359,8 +349,11 @@ module Screengrab
       #   [pull_dir]/screengrab/en-US/images/screenshots
       screenshots_dir_pattern = File.join(pull_dir, '**', "screenshots")
 
+      copied_screenshot_count = 0
+
       Dir.glob(screenshots_dir_pattern, File::FNM_CASEFOLD).each do |screenshots_dir|
         src_screenshots = Dir.glob(File.join(screenshots_dir, '*.png'), File::FNM_CASEFOLD)
+        next if src_screenshots.empty?
 
         # The :output_directory is the final location for the screenshots, so we begin by replacing
         # the temp directory portion of the path, with the output directory
@@ -380,8 +373,11 @@ module Screengrab
 
         FileUtils.mkdir_p(dest_dir)
         FileUtils.cp_r(src_screenshots, dest_dir)
+        copied_screenshot_count += src_screenshots.length
         UI.success("Screenshots copied to #{dest_dir}")
       end
+
+      copied_screenshot_count
     end
 
     # Some device commands fail if executed against a device path that does not exist, so this helper method
@@ -392,7 +388,8 @@ module Screengrab
 
       return if run_adb_command("-s #{device_serial.shellescape} shell#{run_as} ls #{device_path.shellescape.shellescape}",
                                 print_all: false,
-                                print_command: false).include?('No such file')
+                                print_command: false,
+                                suppress_error_output: true).include?('No such file')
 
       yield(device_path)
     rescue
@@ -408,7 +405,8 @@ module Screengrab
       packages.split("\n").map { |package| package.gsub("package:", "") }
     end
 
-    def run_adb_command(command, print_all: false, print_command: false, raise_errors: true)
+    def run_adb_command(command, print_all: false, print_command: false, raise_errors: true,
+                        suppress_error_output: false)
       adb_host = @config[:adb_host]
       host = adb_host.nil? ? '' : "-H #{adb_host.shellescape} "
       output = ''
@@ -417,6 +415,7 @@ module Screengrab
         cmdout = @executor.execute(command: @android_env.adb_path + " " + host + command,
                                   print_all: print_all,
                                   print_command: print_command,
+                                  suppress_error_output: suppress_error_output,
                                   error: raise_errors ? nil : proc { |out, status| errout = out }) || ''
         output = errout || cmdout
       rescue => ex

@@ -40,6 +40,10 @@ jobs:
         shell: bash
         run: gem install --no-document --env-shebang "${{ steps.build.outputs.gem_file }}"
 
+      - name: Dump installed gems
+        shell: bash
+        run: gem list
+
       - name: Run module tests against built gem
         shell: bash
         run: ./.github/scripts/run_module_tests.sh

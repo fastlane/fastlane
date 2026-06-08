@@ -29,9 +29,14 @@ module FastlaneCore
       # @param prefix [Array] An array containing a prefix + block which might get applied to the output
       # @param loading [String] A loading string that is shown before the first output
       # @param suppress_output [Boolean] Should we print the command's output?
+      # @param suppress_error_output [Boolean] Suppress replaying output and printing the exit status
+      #   when the command fails, unless verbose output is enabled.
       # @return [String] All the output as string
-      def execute(command: nil, print_all: false, print_command: true, error: nil, prefix: nil, loading: nil, suppress_output: false)
-        print_all = true if FastlaneCore::Globals.verbose?
+      def execute(command: nil, print_all: false, print_command: true, error: nil, prefix: nil, loading: nil,
+                  suppress_output: false, suppress_error_output: false)
+        verbose = FastlaneCore::Globals.verbose?
+        print_all = true if verbose
+        suppress_error_output = false if verbose
         prefix ||= {}
 
         output = []
@@ -67,7 +72,7 @@ module FastlaneCore
           # > invalid byte sequence in US-ASCII (ArgumentError)
           output << ex.to_s
           o = output.join("\n")
-          puts(o)
+          puts(o) unless suppress_error_output
           if error
             error.call(o, nil)
           else
@@ -79,9 +84,12 @@ module FastlaneCore
         if status != 0
           is_output_already_printed = print_all && !suppress_output
           o = output.join("\n")
-          puts(o) unless is_output_already_printed
 
-          UI.error("Exit status: #{status}")
+          unless suppress_error_output
+            puts(o) unless is_output_already_printed
+            UI.error("Exit status: #{status}")
+          end
+
           if error
             error.call(o, status)
           else
