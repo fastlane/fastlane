@@ -66,4 +66,3 @@ gem "yard", "~> 0.9.11"
 gemspec(path: ".")
 
 eval_gemfile("fastlane/Pluginfile")
-gem 'addressable', '2.9.0'

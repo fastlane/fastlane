@@ -4,7 +4,7 @@ PATH
     fastlane (2.235.0)
       CFPropertyList (>= 2.3, < 5.0.0)
       abbrev (~> 0.1)
-      addressable (>= 2.8, < 3.0.0)
+      addressable (>= 2.9.0, < 3.0.0)
       artifactory (~> 3.0)
       aws-sdk-s3 (~> 1.197)
       babosa (>= 1.0.3, < 2.0.0)
@@ -397,7 +397,6 @@ PLATFORMS
   ruby
 
 DEPENDENCIES
-  addressable (= 2.9.0)
   climate_control (~> 0.2.0)
   coveralls (~> 0.8.13)
   danger (~> 8.0)
