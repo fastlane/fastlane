@@ -1,0 +1,39 @@
+---
+name: Release Step 3 - Create Docs PR
+
+on:
+  workflow_dispatch:
+
+jobs:
+  create_github_release:
+    runs-on: macos-latest
+
+    permissions:
+      packages: write
+      contents: write
+      id-token: write
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v6
+
+      - name: Set up Ruby
+        uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: '3.2'
+
+      - name: Install fastlane
+        run: bundle install
+
+      # TODO 1: We need a deployment key for permission to push to fastlane/docs
+      # TODO 2: We need to figure out how to open a PR in another repo from fastlane/fastlane
+      # TODO 3: We need update_docs to support using a pre-cloned repo instead of cloning itself to control auth
+      # TODO 4: Cleanup Part 1 and 2 to remove dependency on fastlane/docs key names and/or standarize them
+      - name: Run fastlane
+        env:
+          GITHUB_USER_NAME: fastlane
+          GITHUB_API_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_API_BEARER: ${{ secrets.GITHUB_TOKEN }}
+          FASTLANE_RELEASE_API_BEARER: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          bundle exec fastlane update_docs
