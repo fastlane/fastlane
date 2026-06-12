@@ -396,7 +396,7 @@ module FastlaneCore
       if xcode_at_least_13 && options[:destination]
         begin
           destination = options[:destination]
-          destination = destination.first if destination.is_a?(Array)
+          destination = destination.first if destination.kind_of?(Array)
           destination_parameter = " " + "-destination #{destination.shellescape}"
         rescue => ex
           # xcodebuild command can continue without destination parameter, so
