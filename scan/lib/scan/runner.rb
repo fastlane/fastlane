@@ -263,7 +263,13 @@ module Scan
       zip_build_products
       copy_xctestrun
 
-      return nil if Scan.config[:build_for_testing]
+      # Ensure we still fail the step on any non-zero exit status from xcodebuild.
+      if Scan.config[:build_for_testing]
+        unless tests_exit_status == 0
+          UI.build_failure!("Build for testing failed. Exit status: #{tests_exit_status}")
+        end
+        return nil
+      end
 
       results = trainer_test_results
 

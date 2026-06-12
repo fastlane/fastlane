@@ -157,6 +157,37 @@ describe Scan do
           end.to raise_error(FastlaneCore::Interface::FastlaneTestFailure, "Test execution failed. Exit status: 1")
         end
       end
+
+      describe "when :build_for_testing is true" do
+        it "fails the run if xcodebuild exits with a non-zero status even when error output contains 'Executed'", requires_xcodebuild: true do
+          Scan.config = FastlaneCore::Configuration.create(Scan::Options.available_options, {
+            output_directory: '/tmp/scan_results',
+            project: './scan/examples/standard/app.xcodeproj',
+            build_for_testing: true,
+            fail_build: true
+          })
+
+          test_command_generator = @scan.instance_variable_get(:@test_command_generator)
+          allow(test_command_generator).to receive(:generate).and_return("xcodebuild build-for-testing")
+
+          error_output = <<~ERROR
+            Some random xcodebuild failure output
+            /tmp/MyAppTestsFileThatContainsWordExecuted.swift:12: error: Something broke
+          ERROR
+
+          expect(Scan::ErrorHandler).to receive(:handle_build_error).with(error_output, anything).and_call_original
+
+          allow(FastlaneCore::CommandExecutor).to receive(:execute) do |command:, print_all:, print_command:, prefix:, loading:, suppress_output:, error:|
+            system("ruby -e 'exit 65'")
+            error.call(error_output)
+            ""
+          end
+
+          expect do
+            @scan.run
+          end.to raise_error(FastlaneCore::Interface::FastlaneBuildFailure, "Build for testing failed. Exit status: 65")
+        end
+      end
     end
 
     describe "retry_execute" do
