@@ -56,7 +56,7 @@ Gem::Specification.new do |spec|
   spec.executables = spec.files.grep(%r{^bin/}) { |f| File.basename(f) } - ["console"]
   spec.require_paths = Dir["*/lib"]
 
-  spec.add_dependency('addressable', '>= 2.8', '< 3.0.0') # Support for URI templates
+  spec.add_dependency('addressable', '>= 2.9.0', '< 3.0.0') # Support for URI templates
   spec.add_dependency('artifactory', '~> 3.0') # Used to export to an artifactory server
   spec.add_dependency('aws-sdk-s3', '~> 1.197') # Used for S3 storage in fastlane match
   spec.add_dependency('babosa', '>= 1.0.3', '< 2.0.0') # library for creating human-friendly identifiers, aka "slugs"
