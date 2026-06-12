@@ -341,4 +341,243 @@ describe "resign.sh" do
       end
     end
   end
+
+  # ─── Group E: Bundle ID replacement (current resign.sh implementation) ─
+  # Tests the actual sed logic from resign.sh lines 859-862:
+  #   1. Dots in bundle IDs are escaped to \. for sed
+  #   2. sed regex anchors on <string> followed by a 10-char [A-Z0-9] team ID prefix
+  # This group validates the PR #22058 fix and tests the actual sed commands
+  # from resign.sh. The dot-escaping and sed lines are extracted from resign.sh
+  # at runtime using grep, so changes to the implementation are automatically picked up.
+  describe "bundle ID replacement (current implementation)" do
+    before(:each) do
+      skip("resign.sh not found") unless File.exist?(RESIGN_SH_PATH)
+      skip("BSD sed required (macOS only)") unless RUBY_PLATFORM.include?("darwin")
+    end
+
+    # Runs the actual dot-escaping and sed replacement lines from resign.sh
+    def run_current_sed_replacement(input_xml, old_id, new_id)
+      Dir.mktmpdir do |dir|
+        file_path = File.join(dir, "entitlements.plist")
+        File.write(file_path, input_xml)
+        # Extract the dot-escaping and sed replacement lines directly from resign.sh.
+        # This ensures tests always run the real implementation, not a copy.
+        script = <<~BASH
+          OLD_BUNDLE_ID="#{old_id}"
+          NEW_BUNDLE_ID="#{new_id}"
+          # Run the dot-escaping lines extracted from resign.sh
+          eval "$(grep '_BUNDLE_ID=.*//\\.' "#{RESIGN_SH_PATH}")"
+          # Run the sed replacement lines extracted from resign.sh
+          eval "$(grep '/usr/bin/sed.*BUNDLE_ID' "#{RESIGN_SH_PATH}" | sed 's|"$PATCHED_ENTITLEMENTS"|"#{file_path}"|g')"
+          cat "#{file_path}"
+        BASH
+        stdout, _, status = run_bash(script)
+        expect(status.success?).to be(true), "sed command failed"
+        stdout
+      end
+    end
+
+    # --- Basic replacement with 10-char team ID prefix (PASS) ---
+
+    it "replaces bundle ID in application-identifier entitlement" do
+      input = "<string>AB1GP98Q19.com.old.app</string>"
+      result = run_current_sed_replacement(input, "com.old.app", "com.new.app")
+      expect(result.strip).to eq("<string>AB1GP98Q19.com.new.app</string>")
+    end
+
+    it "preserves the original team ID prefix after replacement" do
+      input = "<string>TEAMIDPREF.com.old.app</string>"
+      result = run_current_sed_replacement(input, "com.old.app", "com.new.app")
+      expect(result.strip).to eq("<string>TEAMIDPREF.com.new.app</string>")
+    end
+
+    it "replaces multiple occurrences on separate lines" do
+      input = <<~XML
+        <string>ABCDE12345.com.old.app</string>
+        <string>ABCDE12345.com.old.app</string>
+      XML
+      result = run_current_sed_replacement(input, "com.old.app", "com.new.app")
+      expect(result.scan("ABCDE12345.com.new.app").length).to eq(2)
+    end
+
+    it "handles multi-component bundle IDs" do
+      input = "<string>ABCDE12345.com.example.my.deep.app</string>"
+      result = run_current_sed_replacement(input, "com.example.my.deep.app", "com.newco.other.app")
+      expect(result.strip).to eq("<string>ABCDE12345.com.newco.other.app</string>")
+    end
+
+    it "does not replace inside <key> tags" do
+      input = <<~XML
+        <key>com.old.app</key>
+        <string>ABCDE12345.com.old.app</string>
+      XML
+      result = run_current_sed_replacement(input, "com.old.app", "com.new.app")
+      expect(result).to include("<key>com.old.app</key>")
+      expect(result).to include("<string>ABCDE12345.com.new.app</string>")
+    end
+
+    # --- Dot escaping (PASS) ---
+
+    it "treats dots as literal characters, not regex wildcards" do
+      input = "<string>ABCDE12345.comXoldXapp</string>"
+      result = run_current_sed_replacement(input, "com.old.app", "com.new.app")
+      expect(result.strip).to eq("<string>ABCDE12345.comXoldXapp</string>")
+    end
+
+    # --- The original substring collision bug - PR #22058 fix target (PASS) ---
+
+    it "does not corrupt entitlements when old bundle ID is a substring of new bundle ID" do
+      input = "<string>ABCDE12345.example.foo</string>"
+      result = run_current_sed_replacement(input, "example.foo", "com.test.example.foo")
+      expect(result.strip).to eq("<string>ABCDE12345.com.test.example.foo</string>")
+    end
+
+    # Exact scenario from PR #22058: entitlements already contain the new bundle ID
+    # (com.test.example.foo) and old ID (example.foo) is a substring of it.
+    # The old sed would find "example.foo" inside "com.test.example.foo" and produce
+    # "com.test.com.test.example.foo" (duplicated segments), corrupting the entitlements.
+    it "does not double-replace when entitlements already contain the new bundle ID" do
+      input = "<string>AB1GP98Q19.com.test.example.foo</string>"
+      result = run_current_sed_replacement(input, "example.foo", "com.test.example.foo")
+      expect(result.strip).to eq("<string>AB1GP98Q19.com.test.example.foo</string>")
+    end
+
+    it "does not double-replace when new ID contains old ID" do
+      input = "<string>ABCDE12345.com.old.app</string>"
+      result = run_current_sed_replacement(input, "com.old.app", "com.old.app.extended")
+      expect(result.strip).to eq("<string>ABCDE12345.com.old.app.extended</string>")
+    end
+
+    # --- Keychain access groups - uses team ID prefix (PASS) ---
+
+    it "replaces bundle ID in keychain-access-groups entitlement" do
+      input = <<~XML
+        <key>keychain-access-groups</key>
+        <array>
+          <string>ABCDE12345.com.old.app</string>
+        </array>
+      XML
+      result = run_current_sed_replacement(input, "com.old.app", "com.new.app")
+      expect(result).to include("<string>ABCDE12345.com.new.app</string>")
+    end
+
+    it "does not replace keychain entry where old ID is only a prefix" do
+      input = <<~XML
+        <key>keychain-access-groups</key>
+        <array>
+          <string>ABCDE12345.com.old.app</string>
+          <string>ABCDE12345.com.old.app.share</string>
+        </array>
+      XML
+      result = run_current_sed_replacement(input, "com.old.app", "com.new.app")
+      expect(result).to include("<string>ABCDE12345.com.new.app</string>")
+      expect(result).to include("<string>ABCDE12345.com.old.app.share</string>")
+    end
+
+    # --- Different team ID formats (PASS) ---
+
+    it "works with all-numeric team ID" do
+      input = "<string>1234567890.com.old.app</string>"
+      result = run_current_sed_replacement(input, "com.old.app", "com.new.app")
+      expect(result.strip).to eq("<string>1234567890.com.new.app</string>")
+    end
+
+    it "works with all-uppercase team ID" do
+      input = "<string>ABCDEFGHIJ.com.old.app</string>"
+      result = run_current_sed_replacement(input, "com.old.app", "com.new.app")
+      expect(result.strip).to eq("<string>ABCDEFGHIJ.com.new.app</string>")
+    end
+
+    it "works with mixed alphanumeric team ID" do
+      input = "<string>A1B2C3D4E5.com.old.app</string>"
+      result = run_current_sed_replacement(input, "com.old.app", "com.new.app")
+      expect(result.strip).to eq("<string>A1B2C3D4E5.com.new.app</string>")
+    end
+
+    # --- REGRESSION: App Groups not replaced ("group" prefix != 10-char team ID) ---
+
+    it "replaces bundle ID in app group entitlements" do
+      input = <<~XML
+        <key>com.apple.security.application-groups</key>
+        <array>
+          <string>group.com.old.app</string>
+        </array>
+      XML
+      result = run_current_sed_replacement(input, "com.old.app", "com.new.app")
+      expect(result).to include("<string>group.com.new.app</string>")
+    end
+
+    # --- REGRESSION: iCloud containers not replaced ("iCloud" prefix != 10-char team ID) ---
+
+    it "replaces bundle ID in iCloud container identifiers" do
+      input = <<~XML
+        <key>com.apple.developer.icloud-container-identifiers</key>
+        <array>
+          <string>iCloud.com.old.app</string>
+        </array>
+      XML
+      result = run_current_sed_replacement(input, "com.old.app", "com.new.app")
+      expect(result).to include("<string>iCloud.com.new.app</string>")
+    end
+
+    it "replaces bundle ID in ubiquity-kvstore-identifier" do
+      input = <<~XML
+        <key>com.apple.developer.ubiquity-kvstore-identifier</key>
+        <string>iCloud.com.old.app</string>
+      XML
+      result = run_current_sed_replacement(input, "com.old.app", "com.new.app")
+      expect(result).to include("<string>iCloud.com.new.app</string>")
+    end
+
+    # --- REGRESSION: Bare bundle ID without any prefix ---
+
+    it "replaces bare bundle ID without prefix" do
+      input = "<string>com.old.app</string>"
+      result = run_current_sed_replacement(input, "com.old.app", "com.new.app")
+      expect(result.strip).to eq("<string>com.new.app</string>")
+    end
+
+    # --- Full realistic entitlements plist ---
+
+    it "replaces all bundle ID occurrences in a full entitlements plist" do
+      input = <<~XML
+        <?xml version="1.0" encoding="UTF-8"?>
+        <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+        <plist version="1.0">
+        <dict>
+          <key>application-identifier</key>
+          <string>ABCDE12345.com.old.app</string>
+          <key>keychain-access-groups</key>
+          <array>
+            <string>ABCDE12345.com.old.app</string>
+          </array>
+          <key>com.apple.security.application-groups</key>
+          <array>
+            <string>group.com.old.app</string>
+          </array>
+          <key>com.apple.developer.icloud-container-identifiers</key>
+          <array>
+            <string>iCloud.com.old.app</string>
+          </array>
+          <key>com.apple.developer.ubiquity-kvstore-identifier</key>
+          <string>ABCDE12345.com.old.app</string>
+          <key>aps-environment</key>
+          <string>production</string>
+        </dict>
+        </plist>
+      XML
+      result = run_current_sed_replacement(input, "com.old.app", "com.new.app")
+
+      # Team-ID-prefixed entries should be replaced
+      expect(result).to include("<string>ABCDE12345.com.new.app</string>")
+      expect(result).not_to include("<string>ABCDE12345.com.old.app</string>")
+
+      # App group and iCloud entries should also be replaced
+      expect(result).to include("<string>group.com.new.app</string>")
+      expect(result).to include("<string>iCloud.com.new.app</string>")
+
+      # aps-environment is unrelated and should be untouched
+      expect(result).to include("<string>production</string>")
+    end
+  end
 end
