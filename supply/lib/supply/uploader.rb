@@ -216,7 +216,7 @@ module Supply
         release.user_fraction = rollout
       else
         release.status = Supply.config[:track_promote_release_status]
-        release.user_fraction = nil
+        release.user_fraction = rollout
       end
 
       if track_to
