@@ -271,8 +271,8 @@ describe Supply do
           skip_upload_images: true,
           skip_upload_screenshots: true,
           skip_upload_changelogs: true,
-          version_codes_to_retain: [1775721088],
-          version_code: 1776275968,
+          version_codes_to_retain: [1_775_721_088],
+          version_code: 1_776_275_968,
           rollout: nil,
           release_status: Supply::ReleaseStatus::COMPLETED,
           track_promote_release_status: Supply::ReleaseStatus::COMPLETED,
@@ -327,8 +327,8 @@ describe Supply do
           skip_upload_images: true,
           skip_upload_screenshots: true,
           skip_upload_changelogs: true,
-          version_codes_to_retain: [1775721088],
-          version_code: 1776275968,
+          version_codes_to_retain: [1_775_721_088],
+          version_code: 1_776_275_968,
           rollout: nil,
           release_status: Supply::ReleaseStatus::COMPLETED,
           track_promote_release_status: Supply::ReleaseStatus::COMPLETED,
@@ -347,11 +347,11 @@ describe Supply do
         allow(client).to receive(:begin_edit)
         allow(client).to receive(:commit_current_edit!)
         # Simulate AAB upload returning a new version code
-        allow(uploader).to receive(:upload_bundles).and_return([1776275968])
+        allow(uploader).to receive(:upload_bundles).and_return([1_776_275_968])
         allow(uploader).to receive(:upload_mapping)
 
         # update_track must be called with BOTH the new version AND the retained code
-        expect(uploader).to receive(:update_track).with([1776275968, 1775721088])
+        expect(uploader).to receive(:update_track).with([1_776_275_968, 1_775_721_088])
         expect(uploader).not_to receive(:promote_track)
 
         uploader.perform_upload
