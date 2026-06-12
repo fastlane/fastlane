@@ -1,0 +1,22 @@
+{
+  "runtimes" : [
+    {
+      "identifier" : "com.apple.CoreSimulator.SimRuntime.iOS-12-0",
+      "version" : "12.0",
+      "name" : "iOS 12.0",
+      "isAvailable" : true
+    },
+    {
+      "identifier" : "com.apple.CoreSimulator.SimRuntime.iOS-12-1",
+      "version" : "12.1",
+      "name" : "iOS 12.1",
+      "isAvailable" : false
+    },
+    {
+      "identifier" : "com.apple.CoreSimulator.SimRuntime.watchOS-5-0",
+      "version" : "5.0",
+      "name" : "watchOS 5.0",
+      "isAvailable" : true
+    }
+  ]
+}

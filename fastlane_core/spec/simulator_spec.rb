@@ -3,24 +3,49 @@ require 'open3'
 describe FastlaneCore do
   describe FastlaneCore::Simulator do
     before do
-      @valid_simulators = "== Devices ==
--- iOS 7.1 --
-    iPhone 4s (8E3D97C4-1143-4E84-8D57-F697140F2ED0) (Shutdown) (unavailable, failed to open liblaunch_sim.dylib)
-    iPhone 5 (65D0F571-1260-4241-9583-611EAF4D56AE) (Shutdown) (unavailable, failed to open liblaunch_sim.dylib)
--- iOS 8.1 --
-    iPhone 4s (DBABD2A2-0144-44B0-8F93-263EB656FC13) (Shutdown)
-    iPhone 5 (0D80C781-8702-4156-855E-A9B737FF92D3) (Booted)
--- iOS 9.1 --
-    iPhone 6s Plus (BB65C267-FAE9-4CB7-AE31-A5D9BA393AF0) (Shutdown)
-    Resizable iPad (B323CCB4-840B-4B26-B57B-71681D6C30C2) (Shutdown) (unavailable, device type profile not found)
-    iPad Air 2 (961A7DF9-F442-4CA5-B28E-D96288D39DCA) (Shutdown)
--- tvOS 9.0 --
-    Apple TV 1080p (D239A51B-A61C-4B60-B4D6-B7EC16595128) (Shutdown)
--- watchOS 2.0 --
-    Apple Watch - 38mm (FE0C82A5-CDD2-4062-A62C-21278EEE32BB) (Shutdown)
-    Apple Watch - 38mm (66D1BF17-3003-465F-A165-E6E3A565E5EB) (Booted)
-"
+      @valid_devices_json = JSON.generate({
+        "devices" => {
+          "com.apple.CoreSimulator.SimRuntime.iOS-7-1" => [
+            { "name" => "iPhone 4s", "udid" => "8E3D97C4-1143-4E84-8D57-F697140F2ED0", "state" => "Shutdown", "isAvailable" => false },
+            { "name" => "iPhone 5", "udid" => "65D0F571-1260-4241-9583-611EAF4D56AE", "state" => "Shutdown", "isAvailable" => false }
+          ],
+          "com.apple.CoreSimulator.SimRuntime.iOS-8-1" => [
+            { "name" => "iPhone 4s", "udid" => "DBABD2A2-0144-44B0-8F93-263EB656FC13", "state" => "Shutdown", "isAvailable" => true },
+            { "name" => "iPhone 5", "udid" => "0D80C781-8702-4156-855E-A9B737FF92D3", "state" => "Booted", "isAvailable" => true }
+          ],
+          "com.apple.CoreSimulator.SimRuntime.iOS-9-1" => [
+            { "name" => "iPhone 6s Plus", "udid" => "BB65C267-FAE9-4CB7-AE31-A5D9BA393AF0", "state" => "Shutdown", "isAvailable" => true },
+            { "name" => "Resizable iPad", "udid" => "B323CCB4-840B-4B26-B57B-71681D6C30C2", "state" => "Shutdown", "isAvailable" => false },
+            { "name" => "iPad Air 2", "udid" => "961A7DF9-F442-4CA5-B28E-D96288D39DCA", "state" => "Shutdown", "isAvailable" => true }
+          ],
+          "com.apple.CoreSimulator.SimRuntime.tvOS-9-0" => [
+            { "name" => "Apple TV 1080p", "udid" => "D239A51B-A61C-4B60-B4D6-B7EC16595128", "state" => "Shutdown", "isAvailable" => true }
+          ],
+          "com.apple.CoreSimulator.SimRuntime.watchOS-2-0" => [
+            { "name" => "Apple Watch - 38mm", "udid" => "FE0C82A5-CDD2-4062-A62C-21278EEE32BB", "state" => "Shutdown", "isAvailable" => true },
+            { "name" => "Apple Watch - 38mm", "udid" => "66D1BF17-3003-465F-A165-E6E3A565E5EB", "state" => "Booted", "isAvailable" => true }
+          ]
+        }
+      })
+
+      @valid_runtimes_json = JSON.generate({
+        "runtimes" => [
+          { "identifier" => "com.apple.CoreSimulator.SimRuntime.iOS-7-1", "version" => "7.1", "isAvailable" => false },
+          { "identifier" => "com.apple.CoreSimulator.SimRuntime.iOS-8-1", "version" => "8.1", "isAvailable" => true },
+          { "identifier" => "com.apple.CoreSimulator.SimRuntime.iOS-9-1", "version" => "9.1", "isAvailable" => true },
+          { "identifier" => "com.apple.CoreSimulator.SimRuntime.tvOS-9-0", "version" => "9.0", "isAvailable" => true },
+          { "identifier" => "com.apple.CoreSimulator.SimRuntime.watchOS-2-0", "version" => "2.0", "isAvailable" => true }
+        ]
+      })
+
       FastlaneCore::Simulator.clear_cache
+    end
+
+    # Helper to mock the two JSON simctl calls
+    def mock_simctl_json(devices_json, runtimes_json)
+      status = double('status', "success?": true)
+      expect(Open3).to receive(:capture2).with('xcrun simctl list -j devices').and_return([devices_json, status])
+      expect(Open3).to receive(:capture2).with('xcrun simctl list -j runtimes').and_return([runtimes_json, status])
     end
 
     it "can launch Simulator.app for a simulator device" do
@@ -53,9 +78,8 @@ describe FastlaneCore do
     end
 
     it "raises an error if xcrun CLI prints garbage" do
-      response = "response"
-      expect(response).to receive(:read).and_return("💩")
-      expect(Open3).to receive(:popen3).with("xcrun simctl list devices").and_yield(nil, response, nil, nil)
+      status = double('status', "success?": true)
+      expect(Open3).to receive(:capture2).with('xcrun simctl list -j devices').and_return(['garbage', status])
 
       expect do
         devices = FastlaneCore::Simulator.all
@@ -63,9 +87,7 @@ describe FastlaneCore do
     end
 
     it "properly parses the simctl output and generates Device objects for iOS" do
-      response = "response"
-      expect(response).to receive(:read).and_return(@valid_simulators)
-      expect(Open3).to receive(:popen3).with("xcrun simctl list devices").and_yield(nil, response, nil, nil)
+      mock_simctl_json(@valid_devices_json, @valid_runtimes_json)
 
       devices = FastlaneCore::Simulator.all
       expect(devices.count).to eq(4)
@@ -93,9 +115,7 @@ describe FastlaneCore do
     end
 
     it "properly parses the simctl output and generates Device objects for tvOS" do
-      response = "response"
-      expect(response).to receive(:read).and_return(@valid_simulators)
-      expect(Open3).to receive(:popen3).with("xcrun simctl list devices").and_yield(nil, response, nil, nil)
+      mock_simctl_json(@valid_devices_json, @valid_runtimes_json)
 
       devices = FastlaneCore::SimulatorTV.all
       expect(devices.count).to eq(1)
@@ -108,9 +128,7 @@ describe FastlaneCore do
     end
 
     it "properly parses the simctl output and generates Device objects for watchOS" do
-      response = "response"
-      expect(response).to receive(:read).and_return(@valid_simulators)
-      expect(Open3).to receive(:popen3).with("xcrun simctl list devices").and_yield(nil, response, nil, nil)
+      mock_simctl_json(@valid_devices_json, @valid_runtimes_json)
 
       devices = FastlaneCore::SimulatorWatch.all
       expect(devices.count).to eq(2)
