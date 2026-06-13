@@ -258,7 +258,7 @@ describe Supply do
       it_behaves_like 'run supply to upload metadata', version_codes: [3], with_explicit_changelogs: false
     end
 
-    describe 'perform_upload with version_codes_to_retain in promote-only mode' do
+    describe '#perform_upload with version_codes_to_retain in promote-only mode' do
       let(:client) { double('client') }
       let(:config) do
         {
@@ -312,7 +312,7 @@ describe Supply do
       end
     end
 
-    describe 'perform_upload with version_codes_to_retain when uploading new binaries' do
+    describe '#perform_upload with version_codes_to_retain when uploading new binaries' do
       let(:client) { double('client') }
       let(:config) do
         {

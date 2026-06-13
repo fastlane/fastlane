@@ -19,11 +19,9 @@ module Supply
 
       track_to_update = Supply.config[:track]
 
-      # Determine whether we are in upload mode (new binaries were provided/uploaded)
-      # vs. promote-only mode (skip_upload_apk + skip_upload_aab both true).
-      # version_codes_to_retain must only influence the track update when we are
-      # actually uploading — appending retained codes before this check caused
-      # promote-only runs to take the upload path and deactivate the new bundle.
+      # Capture whether any new binaries were actually uploaded before appending
+      # version_codes_to_retain. The branch below uses this flag so that retained
+      # codes do not cause a promote-only run to take the upload path.
       # See: https://github.com/fastlane/fastlane/issues/29984
       uploading_new_binaries = !apk_version_codes.empty?
 
