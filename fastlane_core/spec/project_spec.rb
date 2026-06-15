@@ -1,3 +1,5 @@
+require 'shellwords'
+
 describe FastlaneCore do
   describe FastlaneCore::Project do
     describe 'project and workspace detection' do
@@ -665,7 +667,8 @@ describe FastlaneCore do
               project: "./fastlane_core/spec/fixtures/projects/Example.xcodeproj",
               destination: ["platform=iOS Simulator,id=ABC123", "platform=iOS Simulator,id=DEF456"]
             })
-            command = "xcodebuild -showBuildSettings -project ./fastlane_core/spec/fixtures/projects/Example.xcodeproj -destination platform\\=iOS\\ Simulator,id\\=ABC123 2>&1"
+            destination = Shellwords.escape("platform=iOS Simulator,id=ABC123")
+            command = "xcodebuild -showBuildSettings -project ./fastlane_core/spec/fixtures/projects/Example.xcodeproj -destination #{destination} 2>&1"
             expect(project.build_xcodebuild_showbuildsettings_command).to eq(command)
           end
 
@@ -674,7 +677,8 @@ describe FastlaneCore do
               project: "./fastlane_core/spec/fixtures/projects/Example.xcodeproj",
               destination: ["platform=iOS Simulator,id=ABC123", "platform=iOS Simulator,id=DEF456"]
               })
-            command = "xcodebuild -resolvePackageDependencies -project ./fastlane_core/spec/fixtures/projects/Example.xcodeproj -destination platform\\=iOS\\ Simulator,id\\=ABC123"
+            destination = Shellwords.escape("platform=iOS Simulator,id=ABC123")
+            command = "xcodebuild -resolvePackageDependencies -project ./fastlane_core/spec/fixtures/projects/Example.xcodeproj -destination #{destination}"
             expect(project.build_xcodebuild_resolvepackagedependencies_command).to eq(command)
           end
         end
