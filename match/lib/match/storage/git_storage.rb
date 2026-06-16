@@ -111,7 +111,7 @@ module Match
 
         begin
           # GIT_TERMINAL_PROMPT will fail the `git clone` command if user credentials are missing
-          Helper.with_env_values('GIT_TERMINAL_PROMPT' => '0') do
+          Helper.with_env_values(git_env_values) do
             FastlaneCore::CommandExecutor.execute(command: command,
                                                 print_all: FastlaneCore::Globals.verbose?,
                                             print_command: FastlaneCore::Globals.verbose?)
@@ -252,7 +252,7 @@ module Match
         commands << git_push_command
 
         UI.message("Pushing changes to remote git repo...")
-        Helper.with_env_values('GIT_TERMINAL_PROMPT' => '0') do
+        Helper.with_env_values(git_env_values) do
           commands.each do |command|
             FastlaneCore::CommandExecutor.execute(command: command,
                                                 print_all: FastlaneCore::Globals.verbose?,
@@ -262,6 +262,18 @@ module Match
       rescue => ex
         UI.error("Couldn't commit or push changes back to git...")
         UI.error(ex)
+      end
+
+      def git_env_values
+        env_values = { 'GIT_TERMINAL_PROMPT' => '0' }
+        env_values['GIT_SSH_COMMAND'] = non_interactive_git_ssh_command if ENV['GIT_SSH_COMMAND']
+        env_values
+      end
+
+      def non_interactive_git_ssh_command
+        ssh_command = ENV['GIT_SSH_COMMAND']
+        return ssh_command if ssh_command.include?('BatchMode=yes')
+        "#{ssh_command} -o BatchMode=yes"
       end
     end
   end

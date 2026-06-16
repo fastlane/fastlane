@@ -268,5 +268,25 @@ describe Match do
         end
       end
     end
+
+    describe "#git_env_values" do
+      it "returns default env when GIT_SSH_COMMAND is unset" do
+        allow(ENV).to receive(:[]).with('GIT_SSH_COMMAND').and_return(nil)
+        storage = Match::Storage::GitStorage.new
+        expect(storage.send(:git_env_values)).to eq({ 'GIT_TERMINAL_PROMPT' => '0' })
+      end
+
+      it "appends BatchMode=yes when GIT_SSH_COMMAND exists" do
+        allow(ENV).to receive(:[]).with('GIT_SSH_COMMAND').and_return('ssh -v')
+        storage = Match::Storage::GitStorage.new
+        expect(storage.send(:git_env_values)['GIT_SSH_COMMAND']).to eq('ssh -v -o BatchMode=yes')
+      end
+
+      it "does not duplicate if BatchMode already exists" do
+        allow(ENV).to receive(:[]).with('GIT_SSH_COMMAND').and_return('ssh -o BatchMode=yes')
+        storage = Match::Storage::GitStorage.new
+        expect(storage.send(:git_env_values)['GIT_SSH_COMMAND']).to eq('ssh -o BatchMode=yes')
+      end
+    end
   end
 end
