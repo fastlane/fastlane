@@ -35,21 +35,35 @@ module Fastlane
           UI.message("Using #{max_worker_threads} threads for Crashlytics dSYM upload 🏎")
         end
 
+        upload_results = Queue.new
         worker = FastlaneCore::QueueWorker.new(max_worker_threads) do |dsym_path|
-          handle_dsym(params, dsym_path, max_worker_threads)
+          upload_results << handle_dsym(params, dsym_path)
         end
         worker.batch_enqueue(dsym_paths)
         worker.start
-        UI.success("Successfully uploaded dSYM files to Crashlytics 💯")
+
+        # Convert Queue to Array
+        results = []
+        results << upload_results.pop until upload_results.empty?
+
+        if results.all?
+          UI.success("Successfully uploaded dSYM files to Crashlytics 💯")
+        elsif results.any?
+          UI.success("Successfully uploaded some dSYM files to Crashlytics 💯")
+          UI.important("Some dSYM files failed to upload, see the errors above")
+        else
+          UI.user_error!("Service failed to upload any dSYM files to Crashlytics")
+        end
       end
 
       # @param current_path this is a path to either a dSYM or a zipped dSYM
       #   this might also be either nested or not, we're flexible
-      def self.handle_dsym(params, current_path, max_worker_threads)
+      def self.handle_dsym(params, current_path)
         if current_path.end_with?(".dSYM", ".zip")
-          upload_dsym(params, current_path)
+          return upload_dsym(params, current_path)
         else
           UI.error("Don't know how to handle '#{current_path}'")
+          return false
         end
       end
 
@@ -73,8 +87,10 @@ module Fastlane
           command_to_execute = command.join(" ")
           UI.verbose("upload_dsym using command: #{command_to_execute}")
           Actions.sh(command_to_execute, log: params[:debug])
+          return true
         rescue => ex
           UI.error(ex.to_s) # it fails, however we don't want to fail everything just for this
+          return false
         end
       end
 
