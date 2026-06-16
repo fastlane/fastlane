@@ -3,8 +3,8 @@
 version: 2.1
 orbs:
   shellcheck: circleci/shellcheck@2.2.2 # brew install shellcheck stopped working so using this
-  macos: circleci/macos@2
-  ruby: circleci/ruby@2.5.4
+  macos: circleci/macos@3.0.0
+  ruby: circleci/ruby@3.0.0
 
 aliases:
   # common - cache
