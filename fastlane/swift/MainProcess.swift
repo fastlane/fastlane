@@ -60,8 +60,15 @@ class MainProcess {
         // 3. Gemfile in the working directory -> bundle exec fastlane
         // 4. fastlane on PATH
         private func fastlaneLaunchArguments() -> [String] {
-            if let bin = ProcessInfo.processInfo.environment["FASTLANE_SPM_BIN"], !bin.isEmpty {
-                return bin.split(separator: " ").map(String.init)
+            if let bin = ProcessInfo.processInfo.environment["FASTLANE_SPM_BIN"] {
+                // split(separator:) omits empty subsequences, so a blank or
+                // whitespace-only value yields an empty argv; fall through to
+                // the normal resolution chain instead of launching `env` with
+                // no command.
+                let arguments = bin.split(separator: " ").map(String.init)
+                if !arguments.isEmpty {
+                    return arguments
+                }
             }
             let workingDirectory = FileManager.default.currentDirectoryPath
             let binstub = workingDirectory + "/bin/fastlane"
@@ -93,9 +100,23 @@ class MainProcess {
             }
             // Don't leak the socket server: it's still running (just not
             // listening yet) on this timeout path, so terminate it before exit.
-            serverProcess.terminate()
+            terminate(serverProcess: serverProcess)
             log(message: "fastlane socket_server did not start listening on port \(port) within 30 seconds")
             exit(1)
+        }
+
+        // Terminate the socket server, escalating SIGTERM to SIGKILL if it
+        // doesn't exit promptly, so the timeout path never leaves an orphan.
+        private func terminate(serverProcess: Process) {
+            serverProcess.terminate()
+            let killDeadline = Date(timeIntervalSinceNow: 2)
+            while serverProcess.isRunning, Date() < killDeadline {
+                Thread.sleep(forTimeInterval: 0.1)
+            }
+            if serverProcess.isRunning {
+                _ = outputOfProcess(arguments: ["/bin/kill", "-9", String(serverProcess.processIdentifier)])
+                serverProcess.waitUntilExit()
+            }
         }
 
         // Clears a stale socket server left by a previously crashed run on this
@@ -109,7 +130,16 @@ class MainProcess {
         }
 
         private func isPortListening(_ port: UInt32) -> Bool {
-            return !outputOfProcess(arguments: [lsofPath, "-t", "-nP", "-iTCP:\(port)", "-sTCP:LISTEN"]).isEmpty
+            let result = runProcess(arguments: [lsofPath, "-t", "-nP", "-iTCP:\(port)", "-sTCP:LISTEN"])
+            // `env` exits 127 when lsof can't be found. Without this guard the
+            // probe would silently return false on every poll, then kill the
+            // freshly launched server after the 30s timeout with a misleading
+            // "did not start listening" message. Fail fast with the real cause.
+            if result.status == 127 {
+                log(message: "Could not run lsof (\(lsofPath)) to check socket server readiness. lsof ships at /usr/sbin/lsof on macOS; ensure it is installed and reachable.")
+                exit(1)
+            }
+            return !result.output.isEmpty
         }
 
         // Prefer the absolute macOS path so port checks don't depend on PATH;
@@ -120,6 +150,10 @@ class MainProcess {
         }
 
         private func outputOfProcess(arguments: [String]) -> String {
+            return runProcess(arguments: arguments).output
+        }
+
+        private func runProcess(arguments: [String]) -> (output: String, status: Int32) {
             let process = Process()
             let pipe = Pipe()
             process.launchPath = "/usr/bin/env"
@@ -129,7 +163,7 @@ class MainProcess {
             process.launch()
             process.waitUntilExit()
             let data = pipe.fileHandleForReading.readDataToEndOfFile()
-            return String(data: data, encoding: .utf8) ?? ""
+            return (String(data: data, encoding: .utf8) ?? "", process.terminationStatus)
         }
     #endif
 }
