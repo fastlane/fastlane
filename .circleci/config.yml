@@ -58,7 +58,7 @@ jobs:
       - *cache_restore_git
       - checkout
       - *cache_save_git
-      - macos/switch-ruby:
+      - ruby/install:
           version: << parameters.ruby_version >>
       - run:
           name: debug | ruby version
@@ -66,8 +66,7 @@ jobs:
             ruby -v
       - run:
           name: Setup Build
-          command: |
-            mkdir -p ~/test-reports
+          command: mkdir -p ~/test-reports
       - ruby/install-deps
       - run:
           name: Check PR Metadata
@@ -145,7 +144,7 @@ jobs:
       - *cache_restore_git
       - checkout
       - *cache_save_git
-      - macos/switch-ruby:
+      - ruby/install:
           version: << parameters.ruby_version >>
       - ruby/install-deps
       - run: bundle exec fastlane generate_swift_api
