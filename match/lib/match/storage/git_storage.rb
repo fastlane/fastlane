@@ -266,12 +266,16 @@ module Match
 
       def git_env_values
         env_values = { 'GIT_TERMINAL_PROMPT' => '0' }
-        env_values['GIT_SSH_COMMAND'] = non_interactive_git_ssh_command if ENV['GIT_SSH_COMMAND']
+        env_values['GIT_SSH_COMMAND'] = non_interactive_git_ssh_command
         env_values
       end
 
       def non_interactive_git_ssh_command
         ssh_command = ENV['GIT_SSH_COMMAND']
+
+        if ssh_command.nil? || ssh_command.empty?
+          return "ssh -o BatchMode=yes"
+        end
         return ssh_command if ssh_command.include?('BatchMode=yes')
         "#{ssh_command} -o BatchMode=yes"
       end
