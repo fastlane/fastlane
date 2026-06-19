@@ -222,5 +222,49 @@ describe Spaceship::ConnectAPI::Tunes::Client do
         end
       end
     end
+
+    describe "appInfoLocalizations" do
+      context 'post_app_info_localization' do
+        let(:app_info_id) { "123456789" }
+        let(:attributes) { { locale: "en-US", name: "My App" } }
+        let(:path) { "v1/appInfoLocalizations" }
+        let(:body) do
+          {
+            data: {
+              type: "appInfoLocalizations",
+              attributes: attributes,
+              relationships: {
+                appInfo: {
+                  data: {
+                    type: "appInfos",
+                    id: app_info_id
+                  }
+                }
+              }
+            }
+          }
+        end
+
+        it 'uses the appInfo relationship' do
+          url = path
+          req_mock = test_request_body(url, body)
+
+          expect(client).to receive(:request).with(:post).and_yield(req_mock).and_return(req_mock)
+          client.post_app_info_localization(app_info_id: app_info_id, attributes: attributes)
+        end
+      end
+
+      context 'delete_app_info_localization' do
+        let(:app_info_localization_id) { "123456789" }
+        let(:path) { "v1/appInfoLocalizations/#{app_info_localization_id}" }
+
+        it 'succeeds' do
+          params = {}
+          req_mock = test_request_params(path, params)
+          expect(client).to receive(:request).with(:delete).and_yield(req_mock).and_return(req_mock)
+          client.delete_app_info_localization(app_info_localization_id: app_info_localization_id)
+        end
+      end
+    end
   end
 end
