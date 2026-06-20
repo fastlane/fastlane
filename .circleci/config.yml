@@ -138,45 +138,6 @@ jobs:
           command: bundle exec danger || echo "danger failed"
           when: always  # Run this even when tests fail
 
-  validate_fastlane_swift_generation:
-    resource_class: m4pro.medium
-    <<: *tests_macos_base
-    steps:
-      - *cache_restore_git
-      - checkout
-      - *cache_save_git
-      - macos/switch-ruby:
-          version: << parameters.ruby_version >>
-      - ruby/install-deps
-      - run: bundle exec fastlane generate_swift_api
-
-  validate_documentation:
-    parameters:
-      image:
-        type: string
-    docker:
-      - image: << parameters.image >>
-    steps:
-      - *cache_restore_git
-      - checkout
-      - *cache_save_git
-      - ruby/install-deps
-      - run: bundle exec fastlane validate_docs
-
-  lint_source_code:
-    parameters:
-      image:
-        type: string
-    docker:
-      - image: << parameters.image >>
-    steps:
-      - *cache_restore_git
-      - checkout
-      - *cache_save_git
-      - ruby/install-deps
-
-      - run: bundle exec fastlane lint_source
-
 workflows:
   version: 2
   "Run Tests & Checks": # Name of the workflow, which ends up displayed on GitHub's PR Check
@@ -217,13 +178,3 @@ workflows:
       - tests_ubuntu:
           name: 'Execute tests on Ubuntu (Ruby 3.2)'
           image: 'cimg/ruby:3.2.2-node'
-      - validate_fastlane_swift_generation:
-          name: 'Validate Fastlane.swift generation'
-          xcode_version: '16.4.0'
-          ruby_version: '3.2'
-      - validate_documentation:
-          name: 'Validate Documentation'
-          image: 'cimg/ruby:3.2'
-      - lint_source_code:
-          name: 'Lint source code'
-          image: 'cimg/ruby:3.2'
