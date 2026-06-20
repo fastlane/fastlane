@@ -142,6 +142,8 @@ fastlane produce enable_services --help
 --custom-network-protocol             Enable Custom Network Protocol
 --data-protection STRING              Enable Data Protection, suitable values are "complete", "unlessopen" and "untilfirstauth"
 --extended-virtual-address-space      Enable Extended Virtual Address Space
+--increased-memory-limit              Enable Increased Memory Limit
+--increased-memory-limit-debugging    Enable Increased Debugging Memory Limit
 --declared-age-range                  Enable Declared Age Range capability
 --game-center STRING                  Enable Game Center, suitable values are "ios" and "macos
 --health-kit                          Enable Health Kit
@@ -206,6 +208,8 @@ fastlane produce disable_services --help
 --custom-network-protocol             Disable Custom Network Protocol
 --data-protection STRING              Disable Data Protection
 --extended-virtual-address-space      Disable Extended Virtual Address Space
+--increased-memory-limit              Disable Increased Memory Limit
+--increased-memory-limit-debugging    Disable Increased Debugging Memory Limit
 --declared-age-range                  Disable Declared Age Range capability
 --game-center STRING                  Disable Game Center
 --health-kit                          Disable Health Kit
@@ -325,6 +329,8 @@ lane :release do
       custom_network_protocol: "on",            # Valid values: "on", "off"
       data_protection: "complete",              # Valid values: "complete", "unlessopen", "untilfirstauth", "off"
       extended_virtual_address_space: "on",     # Valid values: "on", "off"
+      increased_memory_limit: "on",             # Valid values: "on", "off"
+      increased_memory_limit_debugging: "on",   # Valid values: "on", "off"
       file_provider_testing_mode: "on",         # Valid values: "on", "off"
       fonts: "on",                              # Valid values: "on", "off"
       game_center: "ios",                       # Valid values: "ios", "macos", off"
