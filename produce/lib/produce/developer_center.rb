@@ -32,7 +32,6 @@ module Produce
         SERVICE_UNLESS_OPEN,
         SERVICE_UNTIL_FIRST_LAUNCH
       ],
-      extended_virtual_address_space: [SERVICE_ON, SERVICE_OFF],
       family_controls: [SERVICE_ON, SERVICE_OFF],
       file_provider_testing_mode: [SERVICE_ON, SERVICE_OFF],
       fonts: [SERVICE_ON, SERVICE_OFF],
@@ -81,6 +80,9 @@ module Produce
       group_activities: [SERVICE_ON, SERVICE_OFF],
       health_kit_estimate_recalibration: [SERVICE_ON, SERVICE_OFF],
       time_sensitive_notifications: [SERVICE_ON, SERVICE_OFF],
+      extended_virtual_address_space: [SERVICE_ON, SERVICE_OFF],
+      increased_memory_limit: [SERVICE_ON, SERVICE_OFF],
+      increased_memory_limit_debugging: [SERVICE_ON, SERVICE_OFF],
     }
     def run
       login
