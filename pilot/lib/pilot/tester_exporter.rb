@@ -13,6 +13,7 @@ module Pilot
       app = find_app(apple_id: options[:apple_id], app_identifier: options[:app_identifier])
       if app
         testers = app.get_beta_testers(includes: "apps,betaGroups")
+        fetch_and_assign_metrics(app: app, testers: testers)
       else
         testers = Spaceship::ConnectAPI::BetaTester.all(includes: "apps,betaGroups")
       end
@@ -52,6 +53,19 @@ module Pilot
       end
 
       UI.user_error!("You must include an `app_identifier` to `list_testers`")
+    end
+
+    private
+
+    def fetch_and_assign_metrics(app:, testers:)
+      return if testers.empty?
+
+      testers.each do |tester|
+        metrics = Spaceship::ConnectAPI.get_beta_tester_metrics(
+          filter: { apps: app.id, betaTesters: tester.id }
+        ).to_models
+        tester.beta_tester_metrics = metrics
+      end
     end
   end
 end

@@ -34,6 +34,11 @@ module Pilot
       tester = find_app_tester(email: config[:email], app: app)
       UI.user_error!("Tester #{config[:email]} not found") unless tester
 
+      metrics = Spaceship::ConnectAPI.get_beta_tester_metrics(
+        filter: { apps: app.id, betaTesters: tester.id }
+      ).to_models
+      tester.beta_tester_metrics = metrics
+
       describe_tester(tester)
       return tester
     end
