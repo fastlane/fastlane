@@ -68,9 +68,9 @@ Gem::Specification.new do |spec|
   spec.add_dependency('emoji_regex', '>= 0.1', '< 4.0') # Used to scan for Emoji in the changelog
   spec.add_dependency('excon', '>= 0.71.0', '< 2.0.0') # Great HTTP Client
   spec.add_dependency('faraday', '~> 2.0') # The faraday gem is used for deploygate, hockey and testfairy actions.
-  spec.add_dependency('faraday-cookie_jar', '~> 0.0.8') # Cookie jar middleware for faraday (0.0.8+ supports Faraday 2)
+  spec.add_dependency('faraday-cookie_jar', '~> 0.0.6') # Spaceship uses this to store cookies for the session, when authorizing with login/password.
   spec.add_dependency('faraday-follow_redirects', '~> 0.3') # Replaces FaradayMiddleware::FollowRedirects from faraday_middleware
-  spec.add_dependency('faraday-multipart', '~> 1.0') # Multipart request middleware, extracted from faraday core in Faraday 2
+  spec.add_dependency('faraday-multipart', '~> 1.0') # Converts Request.body into a multipart.
   spec.add_dependency('faraday-retry', '~> 2.0') # Retry request middleware, extracted from faraday core in Faraday 2
   spec.add_dependency('fastimage', '>= 2.1.0', '< 3.0.0') # fetch the image sizes from the screenshots
   spec.add_dependency('fastlane-sirp', '>= 1.1.0') # used for sirp login
