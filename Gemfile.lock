@@ -18,7 +18,7 @@ PATH
       emoji_regex (>= 0.1, < 4.0)
       excon (>= 0.71.0, < 2.0.0)
       faraday (~> 2.0)
-      faraday-cookie_jar (~> 0.0.8)
+      faraday-cookie_jar (~> 0.0.6)
       faraday-follow_redirects (~> 0.3)
       faraday-multipart (~> 1.0)
       faraday-retry (~> 2.0)
