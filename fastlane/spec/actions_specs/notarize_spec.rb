@@ -36,17 +36,6 @@ describe Fastlane do
         end.to raise_error("Unresolved conflict between options: 'username' and 'api_key'")
       end
 
-      it "forbids to provide both :skip_stapling and :try_early_stapling" do
-        expect do
-          Fastlane::FastFile.new.parse("lane :test do
-            notarize(
-              skip_stapling: true,
-              try_early_stapling: true
-            )
-          end").runner.execute(:test)
-        end.to raise_error("Unresolved conflict between options: 'skip_stapling' and 'try_early_stapling'")
-      end
-
       context "with notary tool" do
         let(:package) { Tempfile.new('app.ipa.zip') }
         let(:bundle_id) { 'com.some.app' }
@@ -65,7 +54,6 @@ describe Fastlane do
 
             result = Fastlane::FastFile.new.parse("lane :test do
               notarize(
-                use_notarytool: true,
                 package: '#{package.path}',
                 bundle_id: '#{bundle_id}',
                 username: '#{username}',
@@ -83,7 +71,6 @@ describe Fastlane do
 
             result = Fastlane::FastFile.new.parse("lane :test do
               notarize(
-                use_notarytool: true,
                 package: '#{package.path}',
                 bundle_id: '#{bundle_id}',
                 username: '#{username}',
@@ -102,7 +89,6 @@ describe Fastlane do
 
             result = Fastlane::FastFile.new.parse("lane :test do
               notarize(
-                use_notarytool: true,
                 package: '#{package.path}',
                 bundle_id: '#{bundle_id}',
                 username: '#{username}',
@@ -120,7 +106,6 @@ describe Fastlane do
             expect do
               result = Fastlane::FastFile.new.parse("lane :test do
                 notarize(
-                  use_notarytool: true,
                   package: '#{package.path}',
                   bundle_id: '#{bundle_id}',
                   username: '#{username}',

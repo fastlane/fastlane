@@ -70,9 +70,7 @@ module Fastlane
         end
 
         # Rejecting key `upload_url` and `timeout` as we don't need it in options
-        client_options = Hash[params.values.reject do |key, value|
-          [:upload_url, :timeout].include?(key)
-        end.map do |key, value|
+        client_options = Hash[params.values.except(:upload_url, :timeout).map do |key, value|
           case key
           when :api_key
             [key, value]
