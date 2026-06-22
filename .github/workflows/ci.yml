@@ -23,7 +23,7 @@ jobs:
         include:
           - { xcode: '', ruby: '3.2', rubyopt: '', os: 'windows-2022' }
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v7
 
       - name: Select Xcode ${{ matrix.xcode }}
         if: runner.os == 'macOS'
