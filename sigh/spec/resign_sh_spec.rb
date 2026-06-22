@@ -343,12 +343,13 @@ describe "resign.sh" do
   end
 
   # ─── Group E: Bundle ID replacement (current resign.sh implementation) ─
-  # Tests the actual sed logic from resign.sh lines 859-862:
-  #   1. Dots in bundle IDs are escaped to \. for sed
-  #   2. sed regex anchors on <string> followed by a 10-char [A-Z0-9] team ID prefix
-  # This group validates the PR #22058 fix and tests the actual sed commands
-  # from resign.sh. The dot-escaping and sed lines are extracted from resign.sh
-  # at runtime using grep, so changes to the implementation are automatically picked up.
+  # Validates the PR #22058 fix in the bundle-ID replacement block of resign.sh:
+  #   1. Dots in OLD_BUNDLE_ID are escaped to \. so sed treats them literally
+  #   2. sed anchors on <string> followed by a known prefix — a 10-char [A-Z0-9]
+  #      Apple Team ID, "group" (app groups), or "iCloud" (iCloud containers) — and
+  #      a second pass replaces a bare <string>bundleid</string> with no prefix
+  # The dot-escaping and sed lines are extracted from resign.sh at runtime using grep,
+  # so changes to the implementation are automatically picked up.
   describe "bundle ID replacement (current implementation)" do
     before(:each) do
       skip("resign.sh not found") unless File.exist?(RESIGN_SH_PATH)
@@ -365,7 +366,7 @@ describe "resign.sh" do
         script = <<~BASH
           OLD_BUNDLE_ID="#{old_id}"
           NEW_BUNDLE_ID="#{new_id}"
-          # Run the dot-escaping lines extracted from resign.sh
+          # Run the dot-escaping line extracted from resign.sh
           eval "$(grep '_BUNDLE_ID=.*//\\.' "#{RESIGN_SH_PATH}")"
           # Run the sed replacement lines extracted from resign.sh
           eval "$(grep '/usr/bin/sed.*BUNDLE_ID' "#{RESIGN_SH_PATH}" | sed 's|"$PATCHED_ENTITLEMENTS"|"#{file_path}"|g')"
@@ -535,6 +536,22 @@ describe "resign.sh" do
       input = "<string>com.old.app</string>"
       result = run_current_sed_replacement(input, "com.old.app", "com.new.app")
       expect(result.strip).to eq("<string>com.new.app</string>")
+    end
+
+    # --- Intentional non-replacement: identifiers NOT derived from the bundle ID ---
+    # These values embed the bundle ID behind a prefix that is not a Team ID / group / iCloud,
+    # so they are deliberately left untouched (the allow-list in resign.sh is intentional).
+
+    it "leaves merchant identifiers untouched" do
+      input = "<string>merchant.com.old.app</string>"
+      result = run_current_sed_replacement(input, "com.old.app", "com.new.app")
+      expect(result.strip).to eq("<string>merchant.com.old.app</string>")
+    end
+
+    it "leaves pass type identifiers untouched even with a team ID prefix" do
+      input = "<string>AB1GP98Q19.pass.com.old.app</string>"
+      result = run_current_sed_replacement(input, "com.old.app", "com.new.app")
+      expect(result.strip).to eq("<string>AB1GP98Q19.pass.com.old.app</string>")
     end
 
     # --- Full realistic entitlements plist ---
