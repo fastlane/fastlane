@@ -133,9 +133,10 @@ describe Pilot::TesterManager do
     end
 
     describe "when asked to find an existing tester" do
+      let(:fake_app_id) { "123456789" }
       let(:find_tester_options) do
         FastlaneCore::Configuration.create(Pilot::Options.available_options, {
-          apple_id: '123456789',
+          apple_id: fake_app_id,
           email: fake_tester.email
         })
       end
@@ -146,15 +147,19 @@ describe Pilot::TesterManager do
           installedCfBundleVersion: "100"
         })
       end
+      let(:fake_metrics_filter) { { apps: fake_app_id, betaTesters: fake_tester.id } }
       let(:fake_metrics_response) { double("metrics_response", to_models: [fake_metric]) }
 
-      it "returns tester with metrics fetched and assigned" do
+      before(:each) do
         allow(tester_manager).to receive(:find_app_tester).and_return(fake_tester)
-        allow(fake_app).to receive(:id).and_return("123456789")
-        allow(Spaceship::ConnectAPI).to receive(:get_beta_tester_metrics)
-          .with(filter: { apps: "123456789", betaTesters: fake_tester.id })
-          .and_return(fake_metrics_response)
+        allow(fake_app).to receive(:id).and_return(fake_app_id)
         allow(Terminal::Table).to receive(:new)
+      end
+
+      it "returns tester with metrics fetched and assigned" do
+        allow(Spaceship::ConnectAPI).to receive(:get_beta_tester_metrics)
+          .with(filter: fake_metrics_filter)
+          .and_return(fake_metrics_response)
 
         tester = tester_manager.find_tester(find_tester_options)
 
@@ -162,12 +167,8 @@ describe Pilot::TesterManager do
       end
 
       it "fetches metrics from the dedicated endpoint for the correct app and tester" do
-        allow(tester_manager).to receive(:find_app_tester).and_return(fake_tester)
-        allow(fake_app).to receive(:id).and_return("123456789")
-        allow(Terminal::Table).to receive(:new)
-
         expect(Spaceship::ConnectAPI).to receive(:get_beta_tester_metrics)
-          .with(filter: { apps: "123456789", betaTesters: fake_tester.id })
+          .with(filter: fake_metrics_filter)
           .and_return(fake_metrics_response)
 
         tester_manager.find_tester(find_tester_options)
