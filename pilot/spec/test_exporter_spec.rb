@@ -42,6 +42,51 @@ describe Pilot::TesterExporter do
       end
     end
 
+    context "when able to find app using apple_id and app_identifier with testers having metrics" do
+      let(:fake_beta_group) do
+        Spaceship::ConnectAPI::BetaGroup.new("1", { name: "Beta Group" })
+      end
+      let(:fake_tester) do
+        Spaceship::ConnectAPI::BetaTester.new("1", {
+          firstName: 'John',
+          lastName: 'Doe',
+          email: 'john@example.com',
+          betaGroups: [fake_beta_group]
+        })
+      end
+      let(:fake_metric) do
+        Spaceship::ConnectAPI::BetaTesterMetric.new("m1", {
+          betaTesterState: "INSTALLED",
+          installedCfBundleShortVersionString: "1.0.0",
+          installedCfBundleVersion: "100"
+        })
+      end
+      let(:fake_app) { double("app", id: "app123") }
+      let(:fake_metrics_response) { double("metrics_response", to_models: [fake_metric]) }
+
+      before(:each) do
+        allow(fake_app).to receive(:get_beta_testers).with(includes: "apps,betaGroups").and_return([fake_tester])
+        allow(fake_tester_exporter).to receive(:find_app).with(apple_id: fake_apple_id, app_identifier: fake_app_identifier).and_return(fake_app)
+        allow(Spaceship::ConnectAPI).to receive(:get_beta_tester_metrics)
+          .with(filter: { apps: "app123", betaTesters: "1" })
+          .and_return(fake_metrics_response)
+      end
+
+      it "fetches metrics for each tester" do
+        expect(Spaceship::ConnectAPI).to receive(:get_beta_tester_metrics)
+          .with(filter: { apps: "app123", betaTesters: "1" })
+          .and_return(fake_metrics_response)
+
+        fake_tester_exporter.export_testers(fake_input_options)
+      end
+
+      it "assigns metrics to each tester" do
+        fake_tester_exporter.export_testers(fake_input_options)
+
+        expect(fake_tester.beta_tester_metrics).to eq([fake_metric])
+      end
+    end
+
     context "when failed to find app using apple_id and app_identifier" do
       let(:fake_app) { "fake app" }
 
