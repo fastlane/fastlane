@@ -139,6 +139,20 @@ describe Fastlane do
           expect(result).to eq("swiftlint lint #{path}")
         end
 
+        it "passes path after option flags as a positional argument for swiftlint 0.48.0 and above" do
+          allow(Fastlane::Actions::SwiftlintAction).to receive(:swiftlint_version).and_return(Gem::Version.new('0.48.0'))
+          path = "./spec/fixtures"
+          result = Fastlane::FastFile.new.parse("
+            lane :test do
+              swiftlint(
+                path: '#{path}',
+                strict: true
+              )
+            end").runner.execute(:test)
+
+          expect(result).to eq("swiftlint lint --strict #{path}")
+        end
+
         it "escapes spaces when passing path as a positional argument" do
           allow(Fastlane::Actions::SwiftlintAction).to receive(:swiftlint_version).and_return(Gem::Version.new('0.48.0'))
           allow(File).to receive(:exist?).and_return(true)
