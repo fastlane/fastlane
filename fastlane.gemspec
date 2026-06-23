@@ -66,7 +66,7 @@ Gem::Specification.new do |spec|
   spec.add_dependency('commander', '~> 4.6') # CLI parser
   spec.add_dependency('dotenv', '>= 2.1.1', '< 3.0.0')
   spec.add_dependency('emoji_regex', '>= 0.1', '< 4.0') # Used to scan for Emoji in the changelog
-  spec.add_dependency('excon', '>= 0.71.0', '< 1.0.0') # Great HTTP Client
+  spec.add_dependency('excon', '>= 0.71.0', '< 2.0.0') # Great HTTP Client
   spec.add_dependency('faraday_middleware', '~> 1.0') # Same as faraday
   spec.add_dependency('faraday-cookie_jar', '~> 0.0.6')
   spec.add_dependency('faraday', '~> 1.0') # The faraday gem is used for deploygate, hockey and testfairy actions.
