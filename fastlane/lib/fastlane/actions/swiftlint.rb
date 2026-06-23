@@ -37,6 +37,8 @@ module Fastlane
           command << " --use-script-input-files"
         end
 
+        command << path_argument(params) if params[:path]
+
         command << " > #{params[:output_file].shellescape}" if params[:output_file]
 
         begin
@@ -57,7 +59,6 @@ module Fastlane
         command << supported_no_cache_option(params) if params[:no_cache]
         command << " --compiler-log-path #{params[:compiler_log_path].shellescape}" if params[:compiler_log_path]
         command << supported_option_switch(params, :progress, "0.49.1", true) if params[:progress]
-        command << path_argument(params) if params[:path]
         return command
       end
 
