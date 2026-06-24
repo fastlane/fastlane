@@ -258,6 +258,106 @@ describe Supply do
       it_behaves_like 'run supply to upload metadata', version_codes: [3], with_explicit_changelogs: false
     end
 
+    describe '#perform_upload with version_codes_to_retain in promote-only mode' do
+      let(:client) { double('client') }
+      let(:config) do
+        {
+          package_name: 'com.example.app',
+          track: 'internal',
+          track_promote_to: 'production',
+          skip_upload_apk: true,
+          skip_upload_aab: true,
+          skip_upload_metadata: true,
+          skip_upload_images: true,
+          skip_upload_screenshots: true,
+          skip_upload_changelogs: true,
+          version_codes_to_retain: [1_775_721_088],
+          version_code: 1_776_275_968,
+          rollout: nil,
+          release_status: Supply::ReleaseStatus::COMPLETED,
+          track_promote_release_status: Supply::ReleaseStatus::COMPLETED,
+          validate_only: false,
+          metadata_path: nil
+        }
+      end
+
+      before do
+        Supply.config = config
+      end
+
+      it 'calls promote_track instead of update_track when skip_upload_apk and skip_upload_aab are true' do
+        uploader = Supply::Uploader.new
+        allow(uploader).to receive(:client).and_return(client)
+        allow(client).to receive(:begin_edit)
+        allow(client).to receive(:commit_current_edit!)
+
+        # THE CRITICAL ASSERTION: promote_track must be called, update_track must NOT
+        expect(uploader).to receive(:promote_track).once
+        expect(uploader).not_to receive(:update_track)
+
+        uploader.perform_upload
+      end
+
+      it 'does NOT call update_track with only version_codes_to_retain when no binaries uploaded' do
+        uploader = Supply::Uploader.new
+        allow(uploader).to receive(:client).and_return(client)
+        allow(client).to receive(:begin_edit)
+        allow(client).to receive(:commit_current_edit!)
+        allow(uploader).to receive(:promote_track)
+
+        # update_track must never be called in promote-only mode
+        expect(uploader).not_to receive(:update_track)
+
+        uploader.perform_upload
+      end
+    end
+
+    describe '#perform_upload with version_codes_to_retain when uploading new binaries' do
+      let(:client) { double('client') }
+      let(:config) do
+        {
+          package_name: 'com.example.app',
+          track: 'internal',
+          track_promote_to: nil,
+          skip_upload_apk: true,
+          skip_upload_aab: false,
+          aab: '/tmp/app.aab',
+          aab_paths: nil,
+          skip_upload_metadata: true,
+          skip_upload_images: true,
+          skip_upload_screenshots: true,
+          skip_upload_changelogs: true,
+          version_codes_to_retain: [1_775_721_088],
+          version_code: 1_776_275_968,
+          rollout: nil,
+          release_status: Supply::ReleaseStatus::COMPLETED,
+          track_promote_release_status: Supply::ReleaseStatus::COMPLETED,
+          validate_only: false,
+          metadata_path: nil
+        }
+      end
+
+      before do
+        Supply.config = config
+      end
+
+      it 'calls update_track with both new version code and retained codes when uploading' do
+        uploader = Supply::Uploader.new
+        allow(uploader).to receive(:client).and_return(client)
+        allow(client).to receive(:begin_edit)
+        allow(client).to receive(:commit_current_edit!)
+        # Simulate AAB upload returning a new version code
+        allow(uploader).to receive(:upload_bundles).and_return([1_776_275_968])
+        allow(uploader).to receive(:upload_mapping)
+
+        # update_track must be called with BOTH the new version AND the retained code
+        expect(uploader).to receive(:update_track).with([1_776_275_968, 1_775_721_088])
+        expect(uploader).not_to receive(:promote_track)
+
+        uploader.perform_upload
+      end
+    end
+
     context 'when sync_image_upload is set' do
       let(:client) { double('client') }
       let(:language) { 'pt-BR' }
@@ -596,6 +696,16 @@ describe Supply do
         end
 
         it 'raises an error' do
+          expect { subject.update_rollout }.to raise_error(/Unable to find the requested release on track/)
+        end
+      end
+
+      context 'when track releases is nil' do
+        before do
+          allow(track).to receive(:releases).and_return(nil)
+        end
+
+        it 'does not crash and raises an error about missing release' do
           expect { subject.update_rollout }.to raise_error(/Unable to find the requested release on track/)
         end
       end

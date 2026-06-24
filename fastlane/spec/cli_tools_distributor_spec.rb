@@ -76,6 +76,18 @@ describe Fastlane::CLIToolsDistributor do
         end.to raise_error(SystemExit)
       end
     end
+
+    it "throws the original error if UpdateChecker also fails" do
+      FastlaneSpec::Env.with_ARGV(["beta"]) do
+        expect(FastlaneCore::FastlaneFolder).to receive(:fastfile_path).and_return("./fastlane/spec/fixtures/fastfiles/FastfileErrorInError").at_least(:once)
+        expect(FastlaneCore::UpdateChecker).to receive(:start_looking_for_update).with('fastlane')
+        expect(FastlaneCore::UpdateChecker).to receive(:show_update_status).with('fastlane', Fastlane::VERSION).and_raise(LoadError)
+        expect_any_instance_of(Commander::Runner).to receive(:abort).with("\n[!] Original error".red).and_raise(SystemExit) # mute console output from `abort`
+        expect do
+          Fastlane::CLIToolsDistributor.take_off
+        end.to raise_error(SystemExit)
+      end
+    end
   end
 
   describe "dotenv loading" do

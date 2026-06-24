@@ -143,6 +143,9 @@ public protocol SnapshotfileProtocol: AnyObject {
     /// Array of strings matching Test Bundle/Test Suite/Test Cases to skip
     var skipTesting: String? { get }
 
+    /// Run simulator in a Rosetta mode
+    var runRosettaSimulator: Bool { get }
+
     /// xcodebuild formatter to use (ex: 'xcbeautify', 'xcbeautify --quieter', 'xcpretty', 'xcpretty -test'). Use empty string (ex: '') to disable any formatter (More information: https://docs.fastlane.tools/best-practices/xcodebuild-formatters/)
     var xcodebuildFormatter: String { get }
 
@@ -348,6 +351,10 @@ public extension SnapshotfileProtocol {
         return nil
     }
 
+    var runRosettaSimulator: Bool {
+        return false
+    }
+
     var xcodebuildFormatter: String {
         return "xcbeautify"
     }
@@ -371,4 +378,4 @@ public extension SnapshotfileProtocol {
 
 // Please don't remove the lines below
 // They are used to detect outdated files
-// FastlaneRunnerAPIVersion [0.9.134]
+// FastlaneRunnerAPIVersion [0.9.142]

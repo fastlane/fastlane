@@ -22,7 +22,7 @@ jobs:
         ruby: ['3.3', '3.4']
     runs-on: ${{ matrix.os }}
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v7
 
       - uses: ruby/setup-ruby@v1
         with:
@@ -40,6 +40,10 @@ jobs:
         shell: bash
         run: gem install --no-document --env-shebang "${{ steps.build.outputs.gem_file }}"
 
+      - name: Dump installed gems
+        shell: bash
+        run: gem list
+
       - name: Run module tests against built gem
         shell: bash
         run: ./.github/scripts/run_module_tests.sh
@@ -49,6 +53,9 @@ jobs:
         run: |
           set -euo pipefail
           export PATH="$GEM_HOME/bin:$PATH"
+
+          # Verify executables
+          ruby -e "require 'rubygems/package'; spec = Gem::Package.new('${{ steps.build.outputs.gem_file }}').spec; expected = %w(bin-proxy fastlane match_file); puts \"Gem executables: #{spec.executables}\"; exit(1) unless spec.executables.sort == expected.sort"
 
           # Determine installed fastlane version from the gem
           FASTLANE_VERSION=$(ruby -e "require 'fastlane'; puts Fastlane::VERSION")

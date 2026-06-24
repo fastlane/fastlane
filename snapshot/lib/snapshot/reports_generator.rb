@@ -21,9 +21,9 @@ module Snapshot
       @data_by_language = {}
       @data_by_screen = {}
 
-      Dir[File.join(screens_path, "*")].sort.each do |language_folder|
+      Dir[File.join(screens_path, "*")].each do |language_folder|
         language = File.basename(language_folder)
-        Dir[File.join(language_folder, '*.png')].sort.each do |screenshot|
+        Dir[File.join(language_folder, '*.png')].each do |screenshot|
           file_name = File.basename(screenshot)
           available_devices.each do |key_name, output_name|
             next unless file_name.include?(key_name)
@@ -84,6 +84,13 @@ module Snapshot
       {
         # snapshot in Xcode 9 saves screenshots with the SIMULATOR_DEVICE_NAME
         # which includes spaces
+        'iPhone 17 Pro Max' => "iPhone 17 Pro Max",
+        'iPhone 17 Pro' => "iPhone 17 Pro",
+        'iPhone 17' => "iPhone 17",
+        'iPhone 16 Pro Max' => "iPhone 16 Pro Max",
+        'iPhone 16 Pro' => "iPhone 16 Pro",
+        'iPhone 16 Plus' => "iPhone 16 Plus",
+        'iPhone 16' => "iPhone 16",
         'iPhone 15 Pro Max' => "iPhone 15 Pro Max",
         'iPhone 15 Pro' => "iPhone 15 Pro",
         'iPhone 15 Plus' => "iPhone 15 Plus",

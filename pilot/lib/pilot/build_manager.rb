@@ -293,6 +293,9 @@ module Pilot
           auto_notify_enabled: options[:notify_external_testers]
         })
       end
+
+      # Handle beta app clip invocations
+      update_app_clip_invocations(options: options, build: build)
     end
 
     def self.truncate_changelog(changelog)
@@ -323,7 +326,7 @@ module Pilot
 
     def self.strip_emoji(changelog)
       if changelog && changelog =~ emoji_regex
-        changelog.gsub!(emoji_regex, "")
+        changelog = changelog.gsub(emoji_regex, "")
         UI.important("Emoji symbols have been removed from the changelog, since they're not allowed by Apple.")
       end
       changelog
@@ -331,7 +334,7 @@ module Pilot
 
     def self.strip_less_than_sign(changelog)
       if changelog && changelog.include?("<")
-        changelog.delete!("<")
+        changelog = changelog.delete("<")
         UI.important("Less than signs (<) have been removed from the changelog, since they're not allowed by Apple.")
       end
       changelog
@@ -398,7 +401,7 @@ module Pilot
 
     # If App Store Connect API token, use token.
     # If api_key is specified and it is an Individual API Key, don't use token but use username.
-    # If itc_provider was explicitly specified, use it.
+    # If itc_provider or provider_public_id was explicitly specified, use it.
     # If there are multiple teams, infer the provider from the selected team name.
     # If there are fewer than two teams, don't infer the provider.
     def transporter_for_selected_team(options)
@@ -414,24 +417,16 @@ module Pilot
                   api_key
                 end
 
-      # Currently no kind of transporters accept an Individual API Key. Use username and app-specific password instead.
-      # See https://github.com/fastlane/fastlane/issues/22115
-      is_individual_key = !api_key.nil? && api_key[:issuer_id].nil?
-      if is_individual_key
-        api_key = nil
-        api_token = nil
-      end
-
       unless api_token.nil?
         api_token.refresh! if api_token.expired?
-        return FastlaneCore::ItunesTransporter.new(nil, nil, false, nil, api_token.text, altool_compatible_command: true, api_key: api_key)
+        return FastlaneCore::ItunesTransporter.new(nil, nil, false, nil, api_token.text, altool_compatible_command: true, api_key: api_key, provider_public_id: nil)
       end
 
       # Otherwise use username and password
       tunes_client = Spaceship::ConnectAPI.client ? Spaceship::ConnectAPI.client.tunes_client : nil
 
-      generic_transporter = FastlaneCore::ItunesTransporter.new(options[:username], nil, false, options[:itc_provider], altool_compatible_command: true, api_key: api_key)
-      return generic_transporter if options[:itc_provider] || tunes_client.nil?
+      generic_transporter = FastlaneCore::ItunesTransporter.new(options[:username], nil, false, options[:itc_provider], altool_compatible_command: true, api_key: api_key, provider_public_id: options[:provider_public_id])
+      return generic_transporter if options[:itc_provider] || options[:provider_public_id] || tunes_client.nil?
       return generic_transporter unless tunes_client.teams.count > 1
 
       begin
@@ -617,6 +612,70 @@ module Pilot
       else
         if attributes[:autoNotifyEnabled]
           UI.important("Unable to auto notify testers as the build did not include beta detail information - this is likely a temporary issue on TestFlight.")
+        end
+      end
+    end
+
+    def update_app_clip_invocations(options:, build:)
+      app_clip_invocations = options[:app_clip_invocations]
+      return unless app_clip_invocations
+
+      app_clip_build_bundle = build.build_bundles.find { |bundle| bundle.bundle_type.eql?("APP_CLIP") }
+      unless app_clip_build_bundle
+        UI.important("Skipping adding the app clip invocations. Cannot find the app clip build bundle for this build.")
+        return
+      end
+
+      # Beta app clip invocations from previous builds may be copied by ASC over to the uploaded
+      # build, so we have to check against what the user specified.
+      existing_invocations = Spaceship::ConnectAPI::BetaAppClipInvocation.find_all(build_bundle_id: app_clip_build_bundle.id)
+
+      if options[:overwrite_app_clip_invocations]
+        existing_invocations.each do |existing_invocation|
+          existing_invocation.delete
+          UI.message("Deleted existing beta app clip invocation: #{existing_invocation.url}")
+        end
+        existing_invocations = []
+      end
+
+      app_clip_invocations.each do |invocation|
+        # This is an additive function, meaning it won't delete existing invocations only update their localizations if needed.
+        existing_invocation = existing_invocations.find { |i| i.url.eql?(invocation[:url]) }
+
+        if existing_invocation.nil?
+          # Create it
+          localized_titles = []
+          invocation[:title].keys.map { |locale|
+            localized_titles << {
+              locale: locale,
+              title: invocation[:title][locale]
+            }
+          }
+
+          Spaceship::ConnectAPI::BetaAppClipInvocation.create(build_bundle_id: app_clip_build_bundle.id, attributes: { url: invocation[:url] }, localized_titles: localized_titles)
+          UI.message("Created beta app clip invocation for #{invocation[:url]}")
+        else
+          # Check if we should update it
+          existing_invocation_localizations = existing_invocation.beta_app_clip_invocation_localizations
+
+          invocation[:title].keys.each do |locale|
+            existing_localization = existing_invocation_localizations.find { |l| l.locale.eql?(locale.to_s) }
+
+            invocation_title = invocation[:title][locale]
+            if existing_localization.nil?
+              # Create the localization
+              Spaceship::ConnectAPI::BetaAppClipInvocationLocalization.create(beta_app_clip_invocation_id: existing_invocation.id, attributes: { locale: locale, title: invocation_title })
+              UI.message("Created beta app clip localization #{locale} #{invocation[:url]}")
+            else
+              # Check if we should update it
+              if !existing_localization.title.eql?(invocation_title)
+                existing_localization.update(attributes: { title: invocation_title })
+                UI.message("Updated beta app clip localization #{locale} #{invocation[:url]}")
+              else
+                UI.message("Skipping beta app clip localization #{locale} as it already exists.")
+              end
+            end
+          end
         end
       end
     end
