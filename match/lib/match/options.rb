@@ -299,7 +299,7 @@ module Match
                                      default_value: false),
         FastlaneCore::ConfigItem.new(key: :renew_expired_certs,
                                      env_name: "MATCH_RENEW_EXPIRED_CERTS",
-                                     description: "Automatically renew expired certificates. Note: to renew `developer_id` and `developer_id_installer` certificates you must log in with the Account Holder account by using username and password; App Store Connect API key doesn't work in this case",
+                                     description: "Automatically renew expired certificates. Note: to renew `developer_id` and `developer_id_installer` certificates you must log in with the Account Holder account by using username and password; App Store Connect API key doesn't work in this case. The expired certificate is removed from the match storage and a new one is created, but the old certificate is not revoked on the Apple Developer Portal — run `fastlane match nuke` if you need to free up certificate slots",
                                      type: Boolean,
                                      default_value: true),
         FastlaneCore::ConfigItem.new(key: :skip_confirmation,
