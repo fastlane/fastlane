@@ -273,6 +273,11 @@ module Scan
                                      description: "Remove retry attempts from test results table and the JUnit report (if not using xcpretty)",
                                      type: Boolean,
                                      default_value: false),
+        FastlaneCore::ConfigItem.new(key: :force_legacy_xcresulttool,
+                                     env_names: ["SCAN_FORCE_LEGACY_XCRESULTTOOL", "TRAINER_FORCE_LEGACY_XCRESULTTOOL"],
+                                     description: "Force the use of the '--legacy' flag for xcresulttool instead of using the new commands",
+                                     type: Boolean,
+                                     default_value: false),
 
         # xcpretty
         FastlaneCore::ConfigItem.new(key: :disable_xcpretty,
