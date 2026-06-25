@@ -401,6 +401,56 @@ describe Match do
           # Rely on expectations defined above.
         end
 
+        it "does not renew an outdated developer_id certificate when authenticated with an App Store Connect API token", requires_security: true do
+          # GIVEN
+          # `developer_id` certificates can't be renewed with a Connect API token
+          # (account holder login is required), so match must not delete/regenerate
+          # them even when `renew_expired_certs` is enabled.
+
+          # Downloaded and decrypted storage location.
+          repo_dir = "./match/spec/fixtures/invalid"
+          stored_invalid_cert_path = "#{repo_dir}/certs/developer_id_application/F7P4EE896K.cer"
+
+          # match options
+          match_test_options = {
+            type: "developer_id",
+            renew_expired_certs: true,
+            skip_provisioning_profiles: true # We test certificate renewal, not profile.
+          }
+          match_config = create_match_config_with_git_storage(extra_values: match_test_options)
+
+          create_fake_cache
+
+          # EXPECTATIONS
+
+          # Authenticated with a Connect API token rather than account holder login.
+          allow(Spaceship::ConnectAPI).to receive(:token).and_return("fake_api_token")
+
+          # Storage
+          fake_storage = create_fake_storage(match_config: match_config, repo_dir: repo_dir)
+          # Ensure nothing is written back to storage.
+          expect(fake_storage).not_to receive(:save_changes!)
+
+          # Encryption
+          create_fake_encryption(storage: fake_storage)
+
+          # Spaceship ensure helper
+          create_fake_spaceship_ensure
+
+          # Utils
+          # Stored certificate is invalid, but it must not be renewed via API.
+          expect(Match::Utils).to receive(:is_cert_valid?).with(stored_invalid_cert_path).and_return(false)
+
+          # Ensure the certificate is neither removed nor regenerated.
+          expect(File).not_to receive(:delete)
+          expect(Match::Generator).not_to receive(:generate_certificate)
+
+          # WHEN / THEN
+          expect do
+            Match::Runner.new.run(match_config)
+          end.to raise_error("Your certificate 'F7P4EE896K.cer' is not valid, please check end date and renew it if necessary")
+        end
+
         it "skips provisioning profiles when skip_provisioning_profiles set to true", requires_security: true do
           git_url = "https://github.com/fastlane/fastlane/tree/master/certificates"
           values = {
