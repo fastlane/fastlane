@@ -174,6 +174,8 @@ module Match
       is_cert_renewable = is_authenticated_with_login || is_cert_renewable_via_api
 
       # Validate existing certificate first.
+      # NOTE: only a single certificate is considered here — the one matching
+      # `certificate_id`, or otherwise the last one found for this type.
       if renew_expired_certs && is_cert_renewable && storage_has_certs && !params[:readonly]
         cert_path = select_cert_or_key(paths: certs, certificate_id: certificate_id)
 
