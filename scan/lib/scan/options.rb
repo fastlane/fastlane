@@ -1,4 +1,5 @@
 require 'fastlane_core/configuration/config_item'
+require 'fastlane/helper/xcodebuild_formatter_helper'
 require 'credentials_manager/appfile_config'
 require_relative 'module'
 
@@ -60,7 +61,7 @@ module Scan
                                      optional: true,
                                      is_string: true,
                                      env_name: "SCAN_DEVICE",
-                                     description: "The name of the simulator type you want to run tests on (e.g. 'iPhone 6')",
+                                     description: "The name of the simulator type you want to run tests on (e.g. 'iPhone 6' or 'iPhone SE (2nd generation) (14.5)')",
                                      conflicting_options: [:devices],
                                      conflict_block: proc do |value|
                                        UI.user_error!("You can't use 'device' and 'devices' options in one run")
@@ -70,7 +71,7 @@ module Scan
                                      is_string: false,
                                      env_name: "SCAN_DEVICES",
                                      type: Array,
-                                     description: "Array of devices to run the tests on (e.g. ['iPhone 6', 'iPad Air'])",
+                                     description: "Array of devices to run the tests on (e.g. ['iPhone 6', 'iPad Air', 'iPhone SE (2nd generation) (14.5)'])",
                                      conflicting_options: [:device],
                                      conflict_block: proc do |value|
                                        UI.user_error!("You can't use 'device' and 'devices' options in one run")
@@ -124,7 +125,7 @@ module Scan
         # tests to run
         FastlaneCore::ConfigItem.new(key: :only_testing,
                                      env_name: "SCAN_ONLY_TESTING",
-                                     description: "Array of strings matching Test Bundle/Test Suite/Test Cases to run",
+                                     description: "Array of test identifiers to run. Expected format: TestTarget[/TestSuite[/TestCase]]",
                                      optional: true,
                                      is_string: false,
                                      verify_block: proc do |value|
@@ -132,7 +133,7 @@ module Scan
                                      end),
         FastlaneCore::ConfigItem.new(key: :skip_testing,
                                      env_name: "SCAN_SKIP_TESTING",
-                                     description: "Array of strings matching Test Bundle/Test Suite/Test Cases to skip",
+                                     description: "Array of test identifiers to skip. Expected format: TestTarget[/TestSuite[/TestCase]]",
                                      optional: true,
                                      is_string: false,
                                      verify_block: proc do |value|
@@ -214,11 +215,7 @@ module Scan
                                      description: "Should the HTML report be opened when tests are completed?",
                                      is_string: false,
                                      default_value: false),
-        FastlaneCore::ConfigItem.new(key: :disable_xcpretty,
-                                     env_name: "SCAN_DISABLE_XCPRETTY",
-                                     description: "Disable xcpretty formatting of build, similar to `output_style='raw'` but this will also skip the test results table",
-                                     type: Boolean,
-                                     optional: true),
+
         FastlaneCore::ConfigItem.new(key: :output_directory,
                                      short_option: "-o",
                                      env_name: "SCAN_OUTPUT_DIRECTORY",
@@ -227,6 +224,7 @@ module Scan
                                      code_gen_default_value: "./test_output",
                                      default_value: File.join(containing, "test_output"),
                                      default_value_dynamic: true),
+
         FastlaneCore::ConfigItem.new(key: :output_style,
                                      short_option: "-b",
                                      env_name: "SCAN_OUTPUT_STYLE",
@@ -263,9 +261,35 @@ module Scan
                                      description: "Suppress the output of xcodebuild to stdout. Output is still saved in buildlog_path",
                                      optional: true,
                                      type: Boolean),
+
+        FastlaneCore::ConfigItem.new(key: :xcodebuild_formatter,
+                                     env_names: ["SCAN_XCODEBUILD_FORMATTER", "FASTLANE_XCODEBUILD_FORMATTER"],
+                                     description: "xcodebuild formatter to use (ex: 'xcbeautify', 'xcbeautify --quieter', 'xcpretty', 'xcpretty -test'). Use empty string (ex: '') to disable any formatter (More information: https://docs.fastlane.tools/best-practices/xcodebuild-formatters/)",
+                                     type: String,
+                                     default_value: Fastlane::Helper::XcodebuildFormatterHelper.xcbeautify_installed? ? 'xcbeautify' : 'xcpretty',
+                                     default_value_dynamic: true),
+        FastlaneCore::ConfigItem.new(key: :output_remove_retry_attempts,
+                                     env_names: ["SCAN_OUTPUT_REMOVE_RETRY_ATTEMPS", "SCAN_OUTPUT_REMOVE_RETRY_ATTEMPTS"], # The version with typo must be deprecated
+                                     description: "Remove retry attempts from test results table and the JUnit report (if not using xcpretty)",
+                                     type: Boolean,
+                                     default_value: false),
+
+        # xcpretty
+        FastlaneCore::ConfigItem.new(key: :disable_xcpretty,
+                                     env_name: "SCAN_DISABLE_XCPRETTY",
+                                     deprecated: "Use `output_style: 'raw'` instead",
+                                     description: "Disable xcpretty formatting of build, similar to `output_style='raw'` but this will also skip the test results table",
+                                     type: Boolean,
+                                     optional: true),
         FastlaneCore::ConfigItem.new(key: :formatter,
                                      short_option: "-n",
                                      env_name: "SCAN_FORMATTER",
+                                     deprecated: "Use 'xcpretty_formatter' instead",
+                                     description: "A custom xcpretty formatter to use",
+                                     optional: true),
+        FastlaneCore::ConfigItem.new(key: :xcpretty_formatter,
+                                     short_option: "-N",
+                                     env_name: "SCAN_XCPRETTY_FORMATTER",
                                      description: "A custom xcpretty formatter to use",
                                      optional: true),
         FastlaneCore::ConfigItem.new(key: :xcpretty_args,
@@ -273,6 +297,7 @@ module Scan
                                      description: "Pass in xcpretty additional command line arguments (e.g. '--test --no-color' or '--tap --no-utf')",
                                      type: String,
                                      optional: true),
+
         FastlaneCore::ConfigItem.new(key: :derived_data_path,
                                      short_option: "-j",
                                      env_name: "SCAN_DERIVED_DATA_PATH",
@@ -290,6 +315,11 @@ module Scan
                                      env_name: "SCAN_OUTPUT_XCTESTRUN",
                                      description: "Should provide additional copy of .xctestrun file (settings.xctestrun) and place in output path?",
                                      default_value: false),
+        FastlaneCore::ConfigItem.new(key: :result_bundle_path,
+                                     env_name: "SCAN_RESULT_BUNDLE_PATH",
+                                     description: "Custom path for the result bundle, overrides result_bundle",
+                                     type: String,
+                                     optional: true),
         FastlaneCore::ConfigItem.new(key: :result_bundle,
                                      short_option: "-z",
                                      env_name: "SCAN_RESULT_BUNDLE",
@@ -303,6 +333,11 @@ module Scan
                                      default_value: false),
 
         # concurrency
+        FastlaneCore::ConfigItem.new(key: :parallel_testing,
+                                     type: Boolean,
+                                     env_name: "SCAN_PARALLEL_TESTING",
+                                     description: "Optionally override the per-target setting in the scheme for running tests in parallel. Equivalent to -parallel-testing-enabled",
+                                     optional: true),
         FastlaneCore::ConfigItem.new(key: :concurrent_workers,
                                      type: Integer,
                                      env_name: "SCAN_CONCURRENT_WORKERS",
@@ -445,6 +480,11 @@ module Scan
                                      description: "Use only if you're a pro, use the other options instead",
                                      is_string: false,
                                      optional: true),
+        FastlaneCore::ConfigItem.new(key: :run_rosetta_simulator,
+                                     env_name: "SCAN_RUN_ROSETTA_SIMULATOR",
+                                     description: "Adds arch=x86_64 to the xcodebuild 'destination' argument to run simulator in a Rosetta mode",
+                                     type: Boolean,
+                                     default_value: false),
         FastlaneCore::ConfigItem.new(key: :catalyst_platform,
                                      env_name: "SCAN_CATALYST_PLATFORM",
                                      description: "Platform to build when using a Catalyst enabled app. Valid values are: ios, macos",
@@ -472,6 +512,11 @@ module Scan
                                     description: "Sets a custom path for Swift Package Manager dependencies",
                                     type: String,
                                     optional: true),
+        FastlaneCore::ConfigItem.new(key: :package_cache_path,
+                                     env_name: "SCAN_PACKAGE_CACHE_PATH",
+                                     description: "Sets a custom package cache path for Swift Package Manager dependencies",
+                                     type: String,
+                                     optional: true),
         FastlaneCore::ConfigItem.new(key: :skip_package_dependencies_resolution,
                                      env_name: "SCAN_SKIP_PACKAGE_DEPENDENCIES_RESOLUTION",
                                      description: "Skips resolution of Swift Package Manager dependencies",
@@ -479,7 +524,12 @@ module Scan
                                      default_value: false),
         FastlaneCore::ConfigItem.new(key: :disable_package_automatic_updates,
                                      env_name: "SCAN_DISABLE_PACKAGE_AUTOMATIC_UPDATES",
-                                     description: "Prevents packages from automatically being resolved to versions other than those recorded in the `Package.resolved` file",
+                                     description: "Prevents packages from automatically being resolved to versions other than those recorded in the `Package.resolved` file. This translates in the option `-disableAutomaticPackageResolution` being passed to xcodebuild",
+                                     type: Boolean,
+                                     default_value: false),
+        FastlaneCore::ConfigItem.new(key: :skip_package_repository_fetches,
+                                     env_name: "SCAN_SKIP_PACKAGE_REPOSITORY_FETCHES",
+                                     description: "Skips updating package dependencies from their remote. This translates in the option `-skipPackageUpdates` being passed to xcodebuild",
                                      type: Boolean,
                                      default_value: false),
         FastlaneCore::ConfigItem.new(key: :use_system_scm,
@@ -490,9 +540,23 @@ module Scan
                                     default_value: false),
         FastlaneCore::ConfigItem.new(key: :number_of_retries,
                                     env_name: 'SCAN_NUMBER_OF_RETRIES',
-                                    description: "The number of times a test can fail before scan should stop retrying",
+                                    description: "The number of times a test can fail",
                                     type: Integer,
-                                    default_value: 0)
+                                    default_value: 0),
+        FastlaneCore::ConfigItem.new(key: :fail_build,
+                                    env_name: "SCAN_FAIL_BUILD",
+                                    description: "Should this step stop the build if the tests fail? Set this to false if you're using trainer",
+                                    type: Boolean,
+                                    default_value: true),
+        FastlaneCore::ConfigItem.new(key: :package_authorization_provider,
+                                    env_name: "SCAN_PACKAGE_AUTHORIZATION_PROVIDER",
+                                    description: "Lets xcodebuild use a specified package authorization provider (keychain|netrc)",
+                                    optional: true,
+                                    type: String,
+                                    verify_block: proc do |value|
+                                      av = %w(netrc keychain)
+                                      UI.user_error!("Unsupported authorization provider '#{value}', must be: #{av}") unless av.include?(value)
+                                    end)
 
       ]
     end

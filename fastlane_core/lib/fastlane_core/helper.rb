@@ -3,6 +3,7 @@ require 'colored'
 require 'tty-spinner'
 require 'pathname'
 
+require_relative 'command_executor'
 require_relative 'fastlane_folder'
 require_relative 'ui/ui'
 require_relative 'env'
@@ -74,7 +75,7 @@ module FastlaneCore
       return true if self.is_circle_ci?
 
       # Check for Jenkins, Travis CI, ... environment variables
-      ['JENKINS_HOME', 'JENKINS_URL', 'TRAVIS', 'CI', 'APPCENTER_BUILD_ID', 'TEAMCITY_VERSION', 'GO_PIPELINE_NAME', 'bamboo_buildKey', 'GITLAB_CI', 'XCS', 'TF_BUILD', 'GITHUB_ACTION', 'GITHUB_ACTIONS', 'BITRISE_IO', 'BUDDY'].each do |current|
+      ['JENKINS_HOME', 'JENKINS_URL', 'TRAVIS', 'CI', 'APPCENTER_BUILD_ID', 'TEAMCITY_VERSION', 'GO_PIPELINE_NAME', 'bamboo_buildKey', 'GITLAB_CI', 'XCS', 'TF_BUILD', 'GITHUB_ACTION', 'GITHUB_ACTIONS', 'BITRISE_IO', 'BUDDY', 'CODEBUILD_BUILD_ARN'].each do |current|
         return true if FastlaneCore::Env.truthy?(current)
       end
       return false
@@ -82,6 +83,11 @@ module FastlaneCore
 
     def self.is_circle_ci?
       return ENV.key?('CIRCLECI')
+    end
+
+    # @return [boolean] true if environment variable CODEBUILD_BUILD_ARN is set
+    def self.is_codebuild?
+      return ENV.key?('CODEBUILD_BUILD_ARN')
     end
 
     def self.operating_system
@@ -179,8 +185,8 @@ module FastlaneCore
 
     # @return Swift version
     def self.swift_version
-      if system("which swift > /dev/null 2>&1")
-        output = `swift --version`
+      if self.which('swift')
+        output = `swift --version 2> /dev/null`
         return output.split("\n").first.match(/version ([0-9.]+)/).captures.first
       end
       return nil
@@ -295,6 +301,18 @@ module FastlaneCore
 
     # helper methods
     #
+
+    # Cross-platform way of finding an executable in the $PATH.
+    # Returns the full path to the executable, or nil if not found.
+    # Unlike shelling out to `which`, this produces no output, making
+    # it suitable for CI environments.
+    #
+    #   Helper.which('ruby') #=> "/usr/bin/ruby"
+    #   Helper.which('not_real') #=> nil
+    #
+    def self.which(cmd)
+      FastlaneCore::CommandExecutor.which(cmd)
+    end
 
     # Runs a given command using backticks (`)
     # and prints them out using the UI.command method
@@ -480,21 +498,6 @@ module FastlaneCore
           return password
         end
         UI.error("Your entries do not match. Please try again")
-      end
-    end
-
-    # URI.open added by `require 'open-uri'` is not available in Ruby 2.4. This helper lets you open a URI
-    # by choosing appropriate interface to do so depending on Ruby version. This helper is subject to be removed
-    # when fastlane drops Ruby 2.4 support.
-    def self.open_uri(*rest, &block)
-      require 'open-uri'
-
-      if Gem::Version.new(RUBY_VERSION) < Gem::Version.new('2.5')
-        dup = rest.dup
-        uri = dup.shift
-        URI.parse(uri).open(*dup, &block)
-      else
-        URI.open(*rest, &block)
       end
     end
   end

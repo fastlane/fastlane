@@ -60,7 +60,7 @@ describe FastlaneCore::IOSAppIdentifierGuesser do
       expect(FastlaneCore::IOSAppIdentifierGuesser.guess_app_identifier([])).to eq("Deliverfile.bundle.id")
     end
 
-    it 'catches common permuations of application id with swift matcher' do
+    it 'catches common permutations of application id with swift matcher' do
       expected_app_ids = [
         "a.c.b",
         "a.c.b",

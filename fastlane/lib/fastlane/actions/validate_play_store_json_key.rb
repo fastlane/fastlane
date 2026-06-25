@@ -21,7 +21,7 @@ module Fastlane
       end
 
       def self.description
-        "Validate that the Google Play Store `json_key` works"
+        "Validate Google credentials JSON for the Google Play Store"
       end
 
       def self.authors
@@ -29,7 +29,7 @@ module Fastlane
       end
 
       def self.details
-        "Use this action to test and validate your private key json key file used to connect and authenticate with the Google Play API"
+        "Use this action to test and validate your Google credentials JSON file (of type authorized_user, external_account, service_account) used to connect and authenticate with the Google Play API"
       end
 
       def self.example_code
@@ -47,7 +47,7 @@ module Fastlane
                                        short_option: "-j",
                                        conflicting_options: [:json_key_data],
                                        optional: true,
-                                       description: "The path to a file containing service account JSON, used to authenticate with Google",
+                                       description: "The path to a Google credentials JSON file (Application Default, Workload Identity, or Service Account), used to authenticate with Google",
                                        code_gen_sensitive: true,
                                        default_value: CredentialsManager::AppfileConfig.try_fetch_value(:json_key_file),
                                        default_value_dynamic: true,
@@ -60,7 +60,7 @@ module Fastlane
                                        short_option: "-c",
                                        conflicting_options: [:json_key],
                                        optional: true,
-                                       description: "The raw service account JSON data used to authenticate with Google",
+                                       description: "The raw content of a Google credentials JSON file (Application Default, Workload Identity, or Service Account), used to authenticate with Google",
                                        code_gen_sensitive: true,
                                        default_value: CredentialsManager::AppfileConfig.try_fetch_value(:json_key_data_raw),
                                        default_value_dynamic: true,

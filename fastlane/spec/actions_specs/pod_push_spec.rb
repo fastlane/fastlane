@@ -107,6 +107,22 @@ describe Fastlane do
 
         expect(result).to eq("pod trunk push --synchronous")
       end
+
+      it "generates the correct pod push command with the no overwrite parameter" do
+        result = Fastlane::FastFile.new.parse("lane :test do
+          pod_push(no_overwrite: true)
+        end").runner.execute(:test)
+
+        expect(result).to eq("pod trunk push --no-overwrite")
+      end
+
+      it "generates the correct pod push command with the local only parameter" do
+        result = Fastlane::FastFile.new.parse("lane :test do
+          pod_push(local_only: true)
+        end").runner.execute(:test)
+
+        expect(result).to eq("pod trunk push --local-only")
+      end
     end
   end
 end

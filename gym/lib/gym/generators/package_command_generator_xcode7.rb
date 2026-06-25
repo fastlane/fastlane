@@ -24,7 +24,7 @@ module Gym
         parts += options
         parts += pipe
 
-        File.write(config_path, config_content) # overwrite everytime. Could be optimized
+        File.write(config_path, config_content) # overwrite every time. Could be optimized
 
         parts
       end
@@ -52,7 +52,7 @@ module Gym
         Gym.cache[:temporary_output_path] ||= Dir.mktmpdir('gym_output')
       end
 
-      # Wrap xcodebuild to work-around ipatool dependency to system ruby
+      # Wrap xcodebuild to work around ipatool dependency to system ruby
       def wrap_xcodebuild
         require 'fileutils'
         @wrapped_xcodebuild_path ||= File.join(Gym::ROOT, "lib/assets/wrap_xcodebuild/xcbuild-safe.sh")
@@ -111,7 +111,7 @@ module Gym
         Gym.cache[:binary_path]
       end
 
-      # The path the the dsym file for this app. Might be nil
+      # The path of the dSYM file for this app. Might be nil
       def dsym_path
         Dir[BuildCommandGenerator.archive_path + "/**/*.app.dSYM"].last
       end

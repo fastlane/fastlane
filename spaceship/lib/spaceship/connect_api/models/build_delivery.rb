@@ -27,7 +27,8 @@ module Spaceship
       def self.all(client: nil, app_id: nil, version: nil, build_number: nil)
         client ||= Spaceship::ConnectAPI
         resps = client.get_build_deliveries(
-          filter: { app: app_id, cfBundleShortVersionString: version, cfBundleVersion: build_number },
+          app_id: app_id,
+          filter: { cfBundleShortVersionString: version, cfBundleVersion: build_number },
           limit: 1
         ).all_pages
         return resps.flat_map(&:to_models)

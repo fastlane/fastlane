@@ -16,6 +16,22 @@ module Supply
       version_codes
     end
 
+    def track_meta
+      track = Supply.config[:track]
+
+      client.begin_edit(package_name: Supply.config[:package_name])
+      meta = client.get_edit_track(track)
+      client.abort_current_edit
+
+      if meta.nil?
+        UI.important("No metadata found for track '#{track}'")
+      else
+        UI.success("Retrieved metadata for track '#{track}'")
+      end
+
+      meta
+    end
+
     def track_release_names
       track = Supply.config[:track]
 

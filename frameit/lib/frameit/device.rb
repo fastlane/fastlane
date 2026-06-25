@@ -51,7 +51,7 @@ module Frameit
       found_device = nil
       filename_device = nil
       filename = Pathname.new(path).basename.to_s
-      Devices.constants.each do |c|
+      Devices.constants.sort_by(&:length).reverse_each do |c|
         device = Devices.const_get(c)
         next unless device.resolutions.include?(size)
         # assign to filename_device if the filename contains the formatted name / id and its priority is higher than the current filename_device
@@ -71,9 +71,9 @@ module Frameit
       return nil
     end
 
-    # Previously ENV[FRAMEIT_FORCE_DEVICE_TYPE] was matched to Deliver::AppScreenshot::ScreenSize constants. However,
+    # Previously ENV[FRAMEIT_FORCE_DEVICE_TYPE] was matched to Deliver::AppScreenshot display type strings.
     # options.rb defined a few Apple devices with unspecified IDs, this option was never read from Frameit.config.
-    # Therefore this function matches both ScreenSize constants and formatted names to maintain backward compatibility.
+    # Therefore this function matches both DisplayType constants and formatted names to maintain backward compatibility.
     def self.find_device_by_id_or_name(id)
       return nil if id.nil?
       found_device = nil

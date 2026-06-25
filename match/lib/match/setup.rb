@@ -15,7 +15,7 @@ module Match
         self.storage_options
       )
 
-      storage = Storage.for_mode(storage_mode, {})
+      storage = Storage.from_params({ storage_mode: storage_mode })
 
       specific_content = storage.generate_matchfile_content
       UI.crash!("Looks like `generate_matchfile_content` was `nil` for `#{storage_mode}`") if specific_content.nil?
@@ -34,7 +34,7 @@ module Match
     end
 
     def storage_options
-      return ["git", "google_cloud", "s3"]
+      return ["git", "google_cloud", "s3", "gitlab_secure_files"]
     end
   end
 end

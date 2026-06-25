@@ -1,5 +1,5 @@
 // SocketClient.swift
-// Copyright (c) 2021 FastlaneTools
+// Copyright (c) 2026 FastlaneTools
 
 //
 //  ** NOTE **
@@ -51,9 +51,9 @@ class SocketClient: NSObject {
 
     private(set) weak var socketDelegate: SocketClientDelegateProtocol?
 
-    public private(set) var socketStatus: SocketStatus
+    private(set) var socketStatus: SocketStatus
 
-    // localhost only, this prevents other computers from connecting
+    /// localhost only, this prevents other computers from connecting
     init(host: String = "localhost", port: UInt32 = 2000, commandTimeoutSeconds: Int = defaultCommandTimeoutSeconds, socketDelegate: SocketClientDelegateProtocol) {
         self.host = host
         self.port = port
@@ -110,13 +110,13 @@ class SocketClient: NSObject {
         socketDelegate?.connectionsOpened()
     }
 
-    public func send(rubyCommand: RubyCommandable) {
+    func send(rubyCommand: RubyCommandable) {
         verbose(message: "sending: \(rubyCommand.json)")
         send(string: rubyCommand.json)
         writeSemaphore.signal()
     }
 
-    public func sendComplete() {
+    func sendComplete() {
         closeSession(sendAbort: true)
     }
 
@@ -144,7 +144,11 @@ class SocketClient: NSObject {
 
     private func sendThroughQueue(string: String) {
         let data = string.data(using: .utf8)!
-        _ = data.withUnsafeBytes { self.outputStream.write($0, maxLength: data.count) }
+        data.withUnsafeBytes { (buffer: UnsafeRawBufferPointer) in
+            if let buffer = buffer.baseAddress {
+                self.outputStream.write(buffer.assumingMemoryBound(to: UInt8.self), maxLength: data.count)
+            }
+        }
     }
 
     private func privateSend(string: String) {
@@ -189,11 +193,11 @@ class SocketClient: NSObject {
         socketDelegate?.connectionsClosed()
     }
 
-    public func enter() {
+    func enter() {
         dispatchGroup.enter()
     }
 
-    public func leave() {
+    func leave() {
         readSemaphore.signal()
         writeSemaphore.signal()
     }
@@ -202,7 +206,7 @@ class SocketClient: NSObject {
 extension SocketClient: StreamDelegate {
     func stream(_ aStream: Stream, handle eventCode: Stream.Event) {
         guard !cleaningUpAfterDone else {
-            // Still getting response from server eventhough we are done.
+            // Still getting response from server even though we are done.
             // No big deal, we're closing the streams anyway.
             // That being said, we need to balance out the dispatchGroups
             dispatchGroup.leave()
@@ -240,7 +244,7 @@ extension SocketClient: StreamDelegate {
 
             case Stream.Event.errorOccurred:
                 // probably safe to close all the things because Ruby already disconnected
-                verbose(message: "output stream recevied error")
+                verbose(message: "output stream received error")
 
             case Stream.Event.endEncountered:
                 // nothing special here
@@ -306,7 +310,7 @@ extension SocketClient: StreamDelegate {
             LaneFile.fastfileInstance?.onError(currentLane: ArgumentProcessor(args: CommandLine.arguments).currentLane, errorInfo: failureInformation.joined(), errorClass: failureClass, errorMessage: failureMessage)
             socketDelegate?.commandExecuted(serverResponse: .serverError) {
                 $0.writeSemaphore.signal()
-                self.handleFailure(message: failureInformation)
+                self.handleFailure(message: failureMessage.map { m in [m] + failureInformation } ?? failureInformation)
             }
 
         case let .parseFailure(failureInformation):

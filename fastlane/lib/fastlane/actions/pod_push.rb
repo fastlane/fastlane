@@ -59,6 +59,14 @@ module Fastlane
           command << "--synchronous"
         end
 
+        if params[:no_overwrite]
+          command << "--no-overwrite"
+        end
+
+        if params[:local_only]
+          command << "--local-only"
+        end
+
         result = Actions.sh(command.join(' '))
         UI.success("Successfully pushed Podspec ⬆️ ")
         return result
@@ -143,7 +151,17 @@ module Fastlane
                                        description: "If validation depends on other recently pushed pods, synchronize",
                                        optional: true,
                                        type: Boolean,
-                                       env_name: "FL_POD_PUSH_SYNCHRONOUS")
+                                       env_name: "FL_POD_PUSH_SYNCHRONOUS"),
+          FastlaneCore::ConfigItem.new(key: :no_overwrite,
+                                       description: "Disallow pushing that would overwrite an existing spec",
+                                       optional: true,
+                                       type: Boolean,
+                                       env_name: "FL_POD_PUSH_NO_OVERWRITE"),
+          FastlaneCore::ConfigItem.new(key: :local_only,
+                                       description: "Does not perform the step of pushing REPO to its remote",
+                                       optional: true,
+                                       type: Boolean,
+                                       env_name: "FL_POD_PUSH_LOCAL_ONLY")
         ]
       end
 

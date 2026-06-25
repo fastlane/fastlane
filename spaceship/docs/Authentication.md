@@ -12,7 +12,7 @@ Login with API tokens is not supported yet as API access is not generally availa
 
 If your developer Apple ID has [Two-factor Authentication enabled](https://developer.apple.com/support/account/authentication/) _spaceship_ will also ask you for the security code that was pushed to your devices after successfully entering username and password.
 
-If you can not access any of your trusted devices, or just prefer it, you can also switch to the SMS based flow by entering `sms` at this prompt. _spaceship_ will then present you with a selection of your trusted phone numbers, and after choosing you can enter the security code you were sent by SMS.
+If you cannot access any of your trusted devices, or just prefer it, you can also switch to the SMS based flow by entering `sms` at this prompt. _spaceship_ will then present you with a selection of your trusted phone numbers, and after choosing you can enter the security code you were sent by SMS.
 
 _spaceship_ also supports legacy [Two-step verification](https://support.apple.com/en-us/HT204152) that is still active for some Apple IDs.
 
@@ -26,4 +26,6 @@ Note that Apple does not always allow in all situations. For example for individ
 
 If you _always_ want your security sent via SMS to a specific trusted phone number you can set the `SPACESHIP_2FA_SMS_DEFAULT_PHONE_NUMBER` environment variable to that phone number. The phone number should be specified in the same format as it is displayed in your [Apple ID console](https://appleid.apple.com/) under `TRUSTED PHONE NUMBERS`, e.g. `+49 123 4567890`, `+1-555-123-4567` or similar. Do not leave off the country code or add or remove any numbers, otherwise fastlane will not be able to match the masked value from Apple's API and select the correct number.
 
+## Checking if a session is valid
 
+The `--check_session` flag can be passed if you wish to check if the locally stored session for a user is still valid. This is useful for local testing and CI workflows.

@@ -1,11 +1,11 @@
 // SnapshotfileProtocol.swift
-// Copyright (c) 2021 FastlaneTools
+// Copyright (c) 2026 FastlaneTools
 
-public protocol SnapshotfileProtocol: class {
-    /// Path the workspace file
+public protocol SnapshotfileProtocol: AnyObject {
+    /// Path to the workspace file
     var workspace: String? { get }
 
-    /// Path the project file
+    /// Path to the project file
     var project: String? { get }
 
     /// Pass additional arguments to xcodebuild for the test phase. Be sure to quote the setting names and values e.g. OTHER_LDFLAGS="-ObjC -lstdc++"
@@ -53,7 +53,7 @@ public protocol SnapshotfileProtocol: class {
     /// Enabling this option will automatically override the status bar to show 9:41 AM, full battery, and full reception (Adjust 'SNAPSHOT_SIMULATOR_WAIT_FOR_BOOT_TIMEOUT' environment variable if override status bar is not working. Might be because simulator is not fully booted. Defaults to 10 seconds)
     var overrideStatusBar: Bool { get }
 
-    /// Fully customize the status bar by setting each option here. See `xcrun simctl status_bar --help`
+    /// Fully customize the status bar by setting each option here. Requires `override_status_bar` to be set to `true`. See `xcrun simctl status_bar --help`
     var overrideStatusBarArguments: String? { get }
 
     /// Enabling this option will configure the Simulator's system language
@@ -85,9 +85,6 @@ public protocol SnapshotfileProtocol: class {
 
     /// The configuration to use when building the app. Defaults to 'Release'
     var configuration: String? { get }
-
-    /// Additional xcpretty arguments
-    var xcprettyArgs: String? { get }
 
     /// The SDK that should be used for building the application
     var sdk: String? { get }
@@ -122,11 +119,20 @@ public protocol SnapshotfileProtocol: class {
     /// Sets a custom path for Swift Package Manager dependencies
     var clonedSourcePackagesPath: String? { get }
 
+    /// Sets a custom package cache path for Swift Package Manager dependencies
+    var packageCachePath: String? { get }
+
     /// Skips resolution of Swift Package Manager dependencies
     var skipPackageDependenciesResolution: Bool { get }
 
-    /// Prevents packages from automatically being resolved to versions other than those recorded in the `Package.resolved` file
+    /// Prevents packages from automatically being resolved to versions other than those recorded in the `Package.resolved` file. This translates in the option `-disableAutomaticPackageResolution` being passed to xcodebuild
     var disablePackageAutomaticUpdates: Bool { get }
+
+    /// Skips updating package dependencies from their remote. This translates in the option `-skipPackageUpdates` being passed to xcodebuild
+    var skipPackageRepositoryFetches: Bool { get }
+
+    /// Lets xcodebuild use a specified package authorization provider (keychain|netrc)
+    var packageAuthorizationProvider: String? { get }
 
     /// The testplan associated with the scheme that should be used for testing
     var testplan: String? { get }
@@ -136,6 +142,15 @@ public protocol SnapshotfileProtocol: class {
 
     /// Array of strings matching Test Bundle/Test Suite/Test Cases to skip
     var skipTesting: String? { get }
+
+    /// Run simulator in a Rosetta mode
+    var runRosettaSimulator: Bool { get }
+
+    /// xcodebuild formatter to use (ex: 'xcbeautify', 'xcbeautify --quieter', 'xcpretty', 'xcpretty -test'). Use empty string (ex: '') to disable any formatter (More information: https://docs.fastlane.tools/best-practices/xcodebuild-formatters/)
+    var xcodebuildFormatter: String { get }
+
+    /// **DEPRECATED!** Use `xcodebuild_formatter: ''` instead - Additional xcpretty arguments
+    var xcprettyArgs: String? { get }
 
     /// Disable xcpretty formatting of build
     var disableXcpretty: Bool? { get }
@@ -148,56 +163,219 @@ public protocol SnapshotfileProtocol: class {
 }
 
 public extension SnapshotfileProtocol {
-    var workspace: String? { return nil }
-    var project: String? { return nil }
-    var xcargs: String? { return nil }
-    var xcconfig: String? { return nil }
-    var devices: [String]? { return nil }
-    var languages: [String] { return ["en-US"] }
-    var launchArguments: [String] { return [""] }
-    var outputDirectory: String { return "screenshots" }
-    var outputSimulatorLogs: Bool { return false }
-    var iosVersion: String? { return nil }
-    var skipOpenSummary: Bool { return false }
-    var skipHelperVersionCheck: Bool { return false }
-    var clearPreviousScreenshots: Bool { return false }
-    var reinstallApp: Bool { return false }
-    var eraseSimulator: Bool { return false }
-    var headless: Bool { return true }
-    var overrideStatusBar: Bool { return false }
-    var overrideStatusBarArguments: String? { return nil }
-    var localizeSimulator: Bool { return false }
-    var darkMode: Bool? { return nil }
-    var appIdentifier: String? { return nil }
-    var addPhotos: [String]? { return nil }
-    var addVideos: [String]? { return nil }
-    var htmlTemplate: String? { return nil }
-    var buildlogPath: String { return "~/Library/Logs/snapshot" }
-    var clean: Bool { return false }
-    var testWithoutBuilding: Bool? { return nil }
-    var configuration: String? { return nil }
-    var xcprettyArgs: String? { return nil }
-    var sdk: String? { return nil }
-    var scheme: String? { return nil }
-    var numberOfRetries: Int { return 1 }
-    var stopAfterFirstError: Bool { return false }
-    var derivedDataPath: String? { return nil }
-    var resultBundle: Bool { return false }
-    var testTargetName: String? { return nil }
-    var namespaceLogFiles: String? { return nil }
-    var concurrentSimulators: Bool { return true }
-    var disableSlideToType: Bool { return false }
-    var clonedSourcePackagesPath: String? { return nil }
-    var skipPackageDependenciesResolution: Bool { return false }
-    var disablePackageAutomaticUpdates: Bool { return false }
-    var testplan: String? { return nil }
-    var onlyTesting: String? { return nil }
-    var skipTesting: String? { return nil }
-    var disableXcpretty: Bool? { return nil }
-    var suppressXcodeOutput: Bool? { return nil }
-    var useSystemScm: Bool { return false }
+    var workspace: String? {
+        return nil
+    }
+
+    var project: String? {
+        return nil
+    }
+
+    var xcargs: String? {
+        return nil
+    }
+
+    var xcconfig: String? {
+        return nil
+    }
+
+    var devices: [String]? {
+        return nil
+    }
+
+    var languages: [String] {
+        return ["en-US"]
+    }
+
+    var launchArguments: [String] {
+        return [""]
+    }
+
+    var outputDirectory: String {
+        return "screenshots"
+    }
+
+    var outputSimulatorLogs: Bool {
+        return false
+    }
+
+    var iosVersion: String? {
+        return nil
+    }
+
+    var skipOpenSummary: Bool {
+        return false
+    }
+
+    var skipHelperVersionCheck: Bool {
+        return false
+    }
+
+    var clearPreviousScreenshots: Bool {
+        return false
+    }
+
+    var reinstallApp: Bool {
+        return false
+    }
+
+    var eraseSimulator: Bool {
+        return false
+    }
+
+    var headless: Bool {
+        return true
+    }
+
+    var overrideStatusBar: Bool {
+        return false
+    }
+
+    var overrideStatusBarArguments: String? {
+        return nil
+    }
+
+    var localizeSimulator: Bool {
+        return false
+    }
+
+    var darkMode: Bool? {
+        return nil
+    }
+
+    var appIdentifier: String? {
+        return nil
+    }
+
+    var addPhotos: [String]? {
+        return nil
+    }
+
+    var addVideos: [String]? {
+        return nil
+    }
+
+    var htmlTemplate: String? {
+        return nil
+    }
+
+    var buildlogPath: String {
+        return "~/Library/Logs/snapshot"
+    }
+
+    var clean: Bool {
+        return false
+    }
+
+    var testWithoutBuilding: Bool? {
+        return nil
+    }
+
+    var configuration: String? {
+        return nil
+    }
+
+    var sdk: String? {
+        return nil
+    }
+
+    var scheme: String? {
+        return nil
+    }
+
+    var numberOfRetries: Int {
+        return 1
+    }
+
+    var stopAfterFirstError: Bool {
+        return false
+    }
+
+    var derivedDataPath: String? {
+        return nil
+    }
+
+    var resultBundle: Bool {
+        return false
+    }
+
+    var testTargetName: String? {
+        return nil
+    }
+
+    var namespaceLogFiles: String? {
+        return nil
+    }
+
+    var concurrentSimulators: Bool {
+        return true
+    }
+
+    var disableSlideToType: Bool {
+        return false
+    }
+
+    var clonedSourcePackagesPath: String? {
+        return nil
+    }
+
+    var packageCachePath: String? {
+        return nil
+    }
+
+    var skipPackageDependenciesResolution: Bool {
+        return false
+    }
+
+    var disablePackageAutomaticUpdates: Bool {
+        return false
+    }
+
+    var skipPackageRepositoryFetches: Bool {
+        return false
+    }
+
+    var packageAuthorizationProvider: String? {
+        return nil
+    }
+
+    var testplan: String? {
+        return nil
+    }
+
+    var onlyTesting: String? {
+        return nil
+    }
+
+    var skipTesting: String? {
+        return nil
+    }
+
+    var runRosettaSimulator: Bool {
+        return false
+    }
+
+    var xcodebuildFormatter: String {
+        return "xcbeautify"
+    }
+
+    var xcprettyArgs: String? {
+        return nil
+    }
+
+    var disableXcpretty: Bool? {
+        return nil
+    }
+
+    var suppressXcodeOutput: Bool? {
+        return nil
+    }
+
+    var useSystemScm: Bool {
+        return false
+    }
 }
 
 // Please don't remove the lines below
 // They are used to detect outdated files
-// FastlaneRunnerAPIVersion [0.9.78]
+// FastlaneRunnerAPIVersion [0.9.142]

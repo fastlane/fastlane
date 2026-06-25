@@ -179,7 +179,7 @@ class String
 
   def markdown_clean_heredoc!
     self.chomp! # remove the last new line added by the heredoc
-    self.dedent! # remove the leading whitespace (similar to the squigly heredoc `<<~`)
+    self.dedent! # remove the leading whitespace (similar to the squiggly heredoc `<<~`)
   end
 
   def dedent!

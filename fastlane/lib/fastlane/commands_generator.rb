@@ -36,7 +36,8 @@ module Fastlane
       # do not use "include" as it may be some where in the commandline where "env" is required, therefore explicit index->0
       unless ARGV[0] == "env" || CLIToolsDistributor.running_version_command? || CLIToolsDistributor.running_help_command?
         # *after* loading the plugins
-        Fastlane.plugin_manager.load_plugins
+        hide_plugins_table = FastlaneCore::Env.truthy?("FASTLANE_HIDE_PLUGINS_TABLE")
+        Fastlane.plugin_manager.load_plugins(print_table: !hide_plugins_table)
         Fastlane::PluginUpdateManager.start_looking_for_updates
       end
       self.new.run
@@ -67,7 +68,7 @@ module Fastlane
       return if $troubleshoot
       UI.error("---")
       UI.error("Are you sure you want to enable '--troubleshoot'?")
-      UI.error("All commmands will run in full unfiltered output mode.")
+      UI.error("All commands will run in full unfiltered output mode.")
       UI.error("Sensitive data, like passwords, could be printed to the log.")
       UI.error("---")
       if UI.confirm("Do you really want to enable --troubleshoot")
@@ -210,7 +211,7 @@ module Fastlane
         c.action do |args, options|
           if ensure_fastfile
             ff = Fastlane::FastFile.new(File.join(FastlaneCore::FastlaneFolder.path || '.', 'Fastfile'))
-            UI.message("You don't need to run `fastlane docs` manually any more, this will be done automatically for you when running a lane.")
+            UI.message("You don't need to run `fastlane docs` manually anymore, this will be done automatically for you when running a lane.")
             Fastlane::DocsGenerator.run(ff)
           end
         end
@@ -245,6 +246,15 @@ module Fastlane
         c.action do |args, options|
           require 'fastlane/documentation/actions_list'
           Fastlane::ActionsList.run(filter: args.first)
+        end
+      end
+
+      command :console do |c|
+        c.syntax = 'fastlane console'
+        c.description = 'Opens an interactive developer console'
+        c.action do |args, options|
+          require 'fastlane/console'
+          Fastlane::Console.execute(args, options)
         end
       end
 

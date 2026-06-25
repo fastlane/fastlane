@@ -13,6 +13,24 @@ describe Fastlane::Actions::GitBranchAction do
     end
   end
 
+  describe "CI set ENV values but FL_GIT_BRANCH_DONT_USE_ENV_VARS is true" do
+    Fastlane::Actions::SharedValues::GIT_BRANCH_ENV_VARS.each do |env_var|
+      it "gets the value from Git directly with #{env_var}" do
+        expect(Fastlane::Actions).to receive(:sh)
+          .with("git rev-parse --abbrev-ref HEAD", log: false)
+          .and_return("branch-name-from-git")
+
+        FastlaneSpec::Env.with_env_values(env_var => "#{env_var}-branch-name", 'FL_GIT_BRANCH_DONT_USE_ENV_VARS' => 'true') do
+          result = Fastlane::FastFile.new.parse("lane :test do
+            git_branch
+          end").runner.execute(:test)
+
+          expect(result).to eq("branch-name-from-git")
+        end
+      end
+    end
+  end
+
   describe "with no CI set ENV values" do
     it "gets the value from Git directly" do
       expect(Fastlane::Actions).to receive(:sh)

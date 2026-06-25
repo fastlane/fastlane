@@ -86,7 +86,7 @@
     "contentHosting": null,
     "contentHostingData": null,
     "reviewNotes": {
-      "value": "Review Notes with atleast 10 characters",
+      "value": "Review Notes with at least 10 characters",
       "isEditable": true,
       "isRequired": false,
       "errorKeys": null,

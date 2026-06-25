@@ -22,6 +22,7 @@ describe Fastlane::Actions do
           message: message,
           success: false,
           channel: channel,
+          icon_emoji: ':white_check_mark:',
           payload: {
             'Build Date' => Time.new.to_s,
             'Built by' => 'Jenkins'
@@ -46,7 +47,9 @@ describe Fastlane::Actions do
           ],
           link_names: false,
           icon_url: 'https://fastlane.tools/assets/img/fastlane_icon.png',
-          fail_on_error: true
+          icon_emoji: ':white_check_mark:',
+          fail_on_error: true,
+          thread_ts: nil
         }
         expect(subject).to receive(:post_message).with(expected_args)
         subject.run(options)
@@ -267,6 +270,26 @@ describe Fastlane::Actions do
               pretext: expected_pretext
             )
           ]
+        )
+        expect(subject).to receive(:post_message).with(expected_args)
+        subject.run(options)
+      end
+
+      it 'passes thread_ts to post_message when provided' do
+        channel = "#myChannel"
+        message = "Custom Message"
+        thread_ts = "1234567890.123456"
+
+        options = FastlaneCore::Configuration.create(Fastlane::Actions::SlackAction.available_options, {
+          slack_url: 'https://127.0.0.1',
+          message: message,
+          success: true,
+          channel: channel,
+          thread_ts: thread_ts
+        })
+
+        expected_args = hash_including(
+          thread_ts: thread_ts
         )
         expect(subject).to receive(:post_message).with(expected_args)
         subject.run(options)

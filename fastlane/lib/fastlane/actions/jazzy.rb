@@ -25,7 +25,7 @@ module Fastlane
                                        optional: true),
           FastlaneCore::ConfigItem.new(key: :module_version,
                                        env_name: 'FL_JAZZY_MODULE_VERSION',
-                                       description: 'Version string to use as part of the the default docs title and inside the docset',
+                                       description: 'Version string to use as part of the default docs title and inside the docset',
                                        optional: true)
         ]
       end

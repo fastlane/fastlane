@@ -1,5 +1,5 @@
 describe Spaceship::Tunes::Members do
-  before { Spaceship::Tunes.login }
+  include_examples "common spaceship login"
   before { TunesStubbing.itc_stub_members }
   let(:client) { Spaceship::AppVersion.client }
 
@@ -10,7 +10,7 @@ describe Spaceship::Tunes::Members do
 
       member = Spaceship::Members.find("hjanuschka+no-accept@gmail.com")
       expect(member.has_all_apps).to eq(false)
-      expect(member.selected_apps.first.name).to eq("App Name 1")
+      expect(member.selected_apps.find { |a| a.apple_id == "898536088" }.name).to eq("App Name 1")
     end
 
     it "checks if invitation is accepted" do

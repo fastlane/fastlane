@@ -45,9 +45,27 @@ describe Spaceship::ConnectAPI::Tunes::Client do
       return req_mock
     end
 
+    describe "appAvailabilities" do
+      context 'get_app_availabilities' do
+        let(:path) { "v2/appAvailabilities" }
+        let(:app_id) { "123" }
+
+        it 'succeeds' do
+          url = "#{path}/#{app_id}"
+          params = {
+            include: "territoryAvailabilities",
+            limit: { "territoryAvailabilities": 200 }
+          }
+          req_mock = test_request_params(url, params)
+          expect(client).to receive(:request).with(:get).and_yield(req_mock).and_return(req_mock)
+          client.get_app_availabilities(app_id: app_id, includes: "territoryAvailabilities", limit: { "territoryAvailabilities": 200 })
+        end
+      end
+    end
+
     describe "appStoreVersionReleaseRequests" do
       context 'post_app_store_version_release_request' do
-        let(:path) { "appStoreVersionReleaseRequests" }
+        let(:path) { "v1/appStoreVersionReleaseRequests" }
         let(:app_store_version_id) { "123" }
         let(:body) do
           {
@@ -71,6 +89,180 @@ describe Spaceship::ConnectAPI::Tunes::Client do
 
           expect(client).to receive(:request).with(:post).and_yield(req_mock).and_return(req_mock)
           client.post_app_store_version_release_request(app_store_version_id: app_store_version_id)
+        end
+      end
+    end
+
+    describe "reviewSubmissions" do
+      context 'get_review_submissions' do
+        let(:app_id) { "123456789-app" }
+        let(:path) { "v1/apps/#{app_id}/reviewSubmissions" }
+
+        it 'succeeds' do
+          params = {}
+          req_mock = test_request_params(path, params)
+          expect(client).to receive(:request).with(:get).and_yield(req_mock).and_return(req_mock)
+          client.get_review_submissions(app_id: app_id)
+        end
+      end
+
+      context 'get_review_submission' do
+        let(:review_submission_id) { "123456789" }
+        let(:path) { "v1/reviewSubmissions/#{review_submission_id}" }
+
+        it 'succeeds' do
+          params = {}
+          req_mock = test_request_params(path, params)
+          expect(client).to receive(:request).with(:get).and_yield(req_mock).and_return(req_mock)
+          client.get_review_submission(review_submission_id: review_submission_id)
+        end
+      end
+
+      context 'post_review_submission' do
+        let(:app_id) { "123456789-app" }
+        let(:platform) { Spaceship::ConnectAPI::Platform::IOS }
+        let(:path) { "v1/reviewSubmissions" }
+        let(:body) do
+          {
+            data: {
+              type: "reviewSubmissions",
+              attributes: {
+                platform: platform
+              },
+              relationships: {
+                app: {
+                  data: {
+                    type: "apps",
+                    id: app_id
+                  }
+                }
+              }
+            }
+          }
+        end
+
+        it 'succeeds' do
+          url = path
+          req_mock = test_request_body(url, body)
+
+          expect(client).to receive(:request).with(:post).and_yield(req_mock).and_return(req_mock)
+          client.post_review_submission(app_id: app_id, platform: platform)
+        end
+      end
+
+      context 'patch_review_submission' do
+        let(:review_submission_id) { "123456789" }
+        let(:attributes) { { submitted: true } }
+        let(:path) { "v1/reviewSubmissions/#{review_submission_id}" }
+        let(:body) do
+          {
+            data: {
+              type: "reviewSubmissions",
+              id: review_submission_id,
+              attributes: attributes
+            }
+          }
+        end
+
+        it 'succeeds' do
+          url = path
+          req_mock = test_request_body(url, body)
+
+          expect(client).to receive(:request).with(:patch).and_yield(req_mock).and_return(req_mock)
+          client.patch_review_submission(review_submission_id: review_submission_id, attributes: attributes)
+        end
+      end
+    end
+
+    describe "reviewSubmissionItems" do
+      context 'get_review_submission_items' do
+        let(:review_submission_id) { "123456789" }
+        let(:path) { "v1/reviewSubmissions/#{review_submission_id}/items" }
+
+        it 'succeeds' do
+          params = {}
+          req_mock = test_request_params(path, params)
+          expect(client).to receive(:request).with(:get).and_yield(req_mock).and_return(req_mock)
+          client.get_review_submission_items(review_submission_id: review_submission_id)
+        end
+      end
+
+      context 'post_review_submission_item' do
+        let(:review_submission_id) { "123456789" }
+        let(:app_store_version_id) { "123456789-app-store-version" }
+        let(:path) { "v1/reviewSubmissionItems" }
+        let(:body) do
+          {
+            data: {
+              type: "reviewSubmissionItems",
+              relationships: {
+                reviewSubmission: {
+                  data: {
+                    type: "reviewSubmissions",
+                    id: review_submission_id
+                  }
+                },
+                appStoreVersion: {
+                  data: {
+                    type: "appStoreVersions",
+                    id: app_store_version_id
+                  }
+                }
+              }
+            }
+          }
+        end
+
+        it 'succeeds' do
+          url = path
+          req_mock = test_request_body(url, body)
+
+          expect(client).to receive(:request).with(:post).and_yield(req_mock).and_return(req_mock)
+          client.post_review_submission_item(review_submission_id: review_submission_id, app_store_version_id: app_store_version_id)
+        end
+      end
+    end
+
+    describe "appInfoLocalizations" do
+      context 'post_app_info_localization' do
+        let(:app_info_id) { "123456789" }
+        let(:attributes) { { locale: "en-US", name: "My App" } }
+        let(:path) { "v1/appInfoLocalizations" }
+        let(:body) do
+          {
+            data: {
+              type: "appInfoLocalizations",
+              attributes: attributes,
+              relationships: {
+                appInfo: {
+                  data: {
+                    type: "appInfos",
+                    id: app_info_id
+                  }
+                }
+              }
+            }
+          }
+        end
+
+        it 'uses the appInfo relationship' do
+          url = path
+          req_mock = test_request_body(url, body)
+
+          expect(client).to receive(:request).with(:post).and_yield(req_mock).and_return(req_mock)
+          client.post_app_info_localization(app_info_id: app_info_id, attributes: attributes)
+        end
+      end
+
+      context 'delete_app_info_localization' do
+        let(:app_info_localization_id) { "123456789" }
+        let(:path) { "v1/appInfoLocalizations/#{app_info_localization_id}" }
+
+        it 'succeeds' do
+          params = {}
+          req_mock = test_request_params(path, params)
+          expect(client).to receive(:request).with(:delete).and_yield(req_mock).and_return(req_mock)
+          client.delete_app_info_localization(app_info_localization_id: app_info_localization_id)
         end
       end
     end

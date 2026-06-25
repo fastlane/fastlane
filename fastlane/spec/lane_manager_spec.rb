@@ -46,7 +46,7 @@ describe Fastlane do
         it "Supports running a lane with custom Fastfile path" do
           path = "./fastlane/spec/fixtures/fastfiles/FastfileCruiseLane"
 
-          ff = Fastlane::LaneManager.cruise_lane(nil, 'test', nil, nil, path)
+          ff = Fastlane::LaneManager.cruise_lane(nil, 'test', nil, path)
           lanes = ff.runner.lanes
           expect(lanes[nil][:test].description).to eq(["test description for cruise lanes"])
           expect(lanes[:ios][:apple].description).to eq([])

@@ -1,0 +1,25 @@
+{
+  "data" : {
+    "type" : "reviewSubmissions",
+    "id" : "123456789",
+    "attributes" : {
+      "platform" : "IOS",
+      "submittedDate" : "2021-03-01T10:00:00.123Z",
+      "state" : "WAITING_FOR_REVIEW"
+    },
+    "relationships" : {
+      "items" : {
+        "links" : {
+          "self" : "https://appstoreconnect.apple.com/iris/v1/reviewSubmissions/123456789/relationships/items",
+          "related" : "https://appstoreconnect.apple.com/iris/v1/reviewSubmissions/123456789/items"
+        }
+      }
+    },
+    "links" : {
+      "self" : "https://appstoreconnect.apple.com/iris/v1/reviewSubmissions/123456789"
+    }
+  },
+  "links" : {
+    "self" : "https://appstoreconnect.apple.com/iris/v1/reviewSubmissions/123456789"
+  }
+}

@@ -15,6 +15,27 @@ describe Fastlane do
         }.to_json
       end
 
+      it "file at :api_key_path must exist" do
+        expect do
+          Fastlane::FastFile.new.parse("lane :test do
+            notarize(
+              api_key_path: '/tmp/file_does_not_exist'
+            )
+          end").runner.execute(:test)
+        end.to raise_error("API Key not found at '/tmp/file_does_not_exist'")
+      end
+
+      it "forbids to provide both :username and :api_key" do
+        expect do
+          Fastlane::FastFile.new.parse("lane :test do
+            notarize(
+              username: 'myusername@example.com',
+              api_key: {'anykey' => 'anyvalue'}
+            )
+          end").runner.execute(:test)
+        end.to raise_error("Unresolved conflict between options: 'username' and 'api_key'")
+      end
+
       context "with notary tool" do
         let(:package) { Tempfile.new('app.ipa.zip') }
         let(:bundle_id) { 'com.some.app' }
@@ -33,11 +54,46 @@ describe Fastlane do
 
             result = Fastlane::FastFile.new.parse("lane :test do
               notarize(
-                use_notarytool: true,
                 package: '#{package.path}',
                 bundle_id: '#{bundle_id}',
                 username: '#{username}',
                 asc_provider: '#{asc_provider}',
+              )
+            end").runner.execute(:test)
+          end
+
+          it "successful with verbose option" do
+            stub_const('ENV', { "FASTLANE_APPLE_APPLICATION_SPECIFIC_PASSWORD" => app_specific_password })
+
+            expect(Fastlane::Actions).to receive(:sh).with("xcrun notarytool submit #{package.path} --output-format json --wait --apple-id #{username} --password #{app_specific_password} --team-id #{asc_provider} --verbose", { error_callback: anything, log: true }).and_return(success_submit_response)
+
+            expect(Fastlane::Actions).to receive(:sh).with("xcrun stapler staple #{package.path}", { log: true })
+
+            result = Fastlane::FastFile.new.parse("lane :test do
+              notarize(
+                package: '#{package.path}',
+                bundle_id: '#{bundle_id}',
+                username: '#{username}',
+                asc_provider: '#{asc_provider}',
+                verbose: true
+              )
+            end").runner.execute(:test)
+          end
+
+          it "successful with skip_stapling" do
+            stub_const('ENV', { "FASTLANE_APPLE_APPLICATION_SPECIFIC_PASSWORD" => app_specific_password })
+
+            expect(Fastlane::Actions).to receive(:sh).with("xcrun notarytool submit #{package.path} --output-format json --wait --apple-id #{username} --password #{app_specific_password} --team-id #{asc_provider}", { error_callback: anything, log: false }).and_return(success_submit_response)
+
+            expect(Fastlane::Actions).not_to receive(:sh).with("xcrun stapler staple #{package.path}", { log: false })
+
+            result = Fastlane::FastFile.new.parse("lane :test do
+              notarize(
+                package: '#{package.path}',
+                bundle_id: '#{bundle_id}',
+                username: '#{username}',
+                asc_provider: '#{asc_provider}',
+                skip_stapling: true
               )
             end").runner.execute(:test)
           end
@@ -50,14 +106,13 @@ describe Fastlane do
             expect do
               result = Fastlane::FastFile.new.parse("lane :test do
                 notarize(
-                  use_notarytool: true,
                   package: '#{package.path}',
                   bundle_id: '#{bundle_id}',
                   username: '#{username}',
                   asc_provider: '#{asc_provider}',
                 )
               end").runner.execute(:test)
-            end.to raise_error(FastlaneCore::Interface::FastlaneError, "Could not notarize package with message 'Archive contains critical validation errors'")
+            end.to raise_error(FastlaneCore::Interface::FastlaneError, "Could not notarize package. To see the error, please set 'print_log' to true.")
           end
         end
       end

@@ -53,7 +53,7 @@ module Frameit
 
     def print_disclaimer
       UI.header("Device frames disclaimer")
-      UI.important("All used device frames are available via Facebook Design: http://facebook.design/devices")
+      UI.important("All used device frames are available via Facebook Design: https://design.facebook.com/toolsandresources/devices/")
       UI.message("----------------------------------------")
       UI.message("While Facebook has redrawn and shares these assets for the benefit")
       UI.message("of the design community, Facebook does not own any of the underlying")

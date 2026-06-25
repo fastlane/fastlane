@@ -43,6 +43,21 @@ module Spaceship
     end
   end
 
+  # User doesn't have enough permission for given action
+  class SIRPAuthenticationError < BasicPreferredInfoError
+    TITLE = 'Authentication issue validating secrets:'.freeze
+
+    def preferred_error_info
+      message ? [TITLE, message] : nil
+    end
+
+    # We don't want to show similar GitHub issues, as the error message
+    # should be pretty clear
+    def show_github_issues
+      false
+    end
+  end
+
   # Raised when 429 is received from App Store Connect
   class TooManyRequestsError < BasicPreferredInfoError
     attr_reader :retry_after
@@ -98,4 +113,40 @@ module Spaceship
 
   # Raised when 403 is received from portal request
   class AccessForbiddenError < BasicPreferredInfoError; end
+
+  # Base class for errors coming from App Store Connect locale changes
+  class AppStoreLocaleError < BasicPreferredInfoError
+    def initialize(locale, error)
+      error_message = error.respond_to?(:message) ? error.message : error.to_s
+      locale_str = locale || "unknown"
+      @message = "An exception has occurred for locale: #{locale_str}.\nError: #{error_message}"
+      super(@message)
+    end
+
+    # no need to search github issues since the error is specific
+    def show_github_issues
+      false
+    end
+  end
+
+  # Raised for localized text errors from App Store Connect
+  class AppStoreLocalizationError < AppStoreLocaleError
+    def preferred_error_info
+      "#{@message}\nCheck the localization requirements here: https://developer.apple.com/help/app-store-connect/manage-app-information/localize-app-information"
+    end
+  end
+
+  # Raised for localized screenshots errors from App Store Connect
+  class AppStoreScreenshotError < AppStoreLocaleError
+    def preferred_error_info
+      "#{@message}\nCheck the screenshot requirements here: https://developer.apple.com/help/app-store-connect/reference/screenshot-specifications"
+    end
+  end
+
+  # Raised for localized app preview errors from App Store Connect
+  class AppStoreAppPreviewError < AppStoreLocaleError
+    def preferred_error_info
+      "#{@message}\nCheck the app preview requirements here: https://developer.apple.com/help/app-store-connect/reference/app-preview-specifications"
+    end
+  end
 end

@@ -1,9 +1,10 @@
 describe Fastlane do
   describe Fastlane::FastFile do
-    build_log_path = File.expand_path("#{FastlaneCore::Helper.buildlog_path}/fastlane/xcbuild/#{Time.now.strftime('%F')}/#{Process.pid}/xcodebuild.log")
+    let(:build_log_path) { File.expand_path("#{FastlaneCore::Helper.buildlog_path}/fastlane/xcbuild/#{Time.now.strftime('%F')}/#{Process.pid}/xcodebuild.log") }
 
     describe "Xcodebuild Integration" do
       before :each do
+        allow(Time).to receive(:now).and_return(Time.at(1_420_063_200))
         Fastlane::Actions.lane_context.delete(:IPA_OUTPUT_PATH)
         Fastlane::Actions.lane_context.delete(:XCODEBUILD_ARCHIVE)
       end
@@ -556,6 +557,44 @@ describe Fastlane do
           + "test " \
           + "-enableThreadSanitizer \"NO\" " \
           + "| tee '#{build_log_path}' | xcpretty --color --test"
+        )
+      end
+    end
+
+    describe 'overriding xcodebuild architecture' do
+      it 'does not override the architecture if the option is not present' do
+        result = Fastlane::FastFile.new.parse("lane :build do
+          xcodebuild(
+            scheme: 'MyApp',
+            workspace: 'MyApp.xcworkspace',
+          )
+        end").runner.execute(:build)
+
+        expect(result).to eq(
+          "set -o pipefail && " \
+          + "xcodebuild " \
+          + "-scheme \"MyApp\" " \
+          + "-workspace \"MyApp.xcworkspace\" " \
+          + "| tee '#{build_log_path}' | xcpretty --color --simple"
+        )
+      end
+
+      it 'overrides the architecture with what is specified if the option is present' do
+        result = Fastlane::FastFile.new.parse("lane :build do
+          xcodebuild(
+            scheme: 'MyApp',
+            workspace: 'MyApp.xcworkspace',
+            xcodebuild_architecture: 'x86_64'
+          )
+        end").runner.execute(:build)
+
+        expect(result).to eq(
+          "set -o pipefail && " \
+          + "arch -x86_64 " \
+          + "xcodebuild " \
+          + "-scheme \"MyApp\" " \
+          + "-workspace \"MyApp.xcworkspace\" " \
+          + "| tee '#{build_log_path}' | xcpretty --color --simple"
         )
       end
     end

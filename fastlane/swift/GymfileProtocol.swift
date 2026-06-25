@@ -1,7 +1,7 @@
 // GymfileProtocol.swift
-// Copyright (c) 2021 FastlaneTools
+// Copyright (c) 2026 FastlaneTools
 
-public protocol GymfileProtocol: class {
+public protocol GymfileProtocol: AnyObject {
     /// Path to the workspace file
     var workspace: String? { get }
 
@@ -19,6 +19,9 @@ public protocol GymfileProtocol: class {
 
     /// The name of the resulting ipa file
     var outputName: String? { get }
+
+    /// App name to use in logfile name
+    var appName: String? { get }
 
     /// The configuration to use when building the app. Defaults to 'Release'
     var configuration: String? { get }
@@ -104,7 +107,13 @@ public protocol GymfileProtocol: class {
     /// Suppress the output of xcodebuild to stdout. Output is still saved in buildlog_path
     var suppressXcodeOutput: Bool? { get }
 
-    /// Disable xcpretty formatting of build output
+    /// xcodebuild formatter to use (ex: 'xcbeautify', 'xcbeautify --quieter', 'xcpretty', 'xcpretty -test'). Use empty string (ex: '') to disable any formatter (More information: https://docs.fastlane.tools/best-practices/xcodebuild-formatters/)
+    var xcodebuildFormatter: String { get }
+
+    /// Create a build timing summary
+    var buildTimingSummary: Bool { get }
+
+    /// **DEPRECATED!** Use `xcodebuild_formatter: ''` instead - Disable xcpretty formatting of build output
     var disableXcpretty: Bool? { get }
 
     /// Use the test (RSpec style) format for build output
@@ -122,78 +131,265 @@ public protocol GymfileProtocol: class {
     /// Have xcpretty create a JSON compilation database at the provided path
     var xcprettyReportJson: String? { get }
 
-    /// Analyze the project build time and store the output in 'culprits.txt' file
-    var analyzeBuildTime: Bool? { get }
-
     /// Have xcpretty use unicode encoding when reporting builds
     var xcprettyUtf: Bool? { get }
+
+    /// Analyze the project build time and store the output in 'culprits.txt' file
+    var analyzeBuildTime: Bool? { get }
 
     /// Do not try to build a profile mapping from the xcodeproj. Match or a manually provided mapping should be used
     var skipProfileDetection: Bool { get }
 
+    /// Allows for override of the default `xcodebuild` command
+    var xcodebuildCommand: String { get }
+
     /// Sets a custom path for Swift Package Manager dependencies
     var clonedSourcePackagesPath: String? { get }
+
+    /// Sets a custom package cache path for Swift Package Manager dependencies
+    var packageCachePath: String? { get }
 
     /// Skips resolution of Swift Package Manager dependencies
     var skipPackageDependenciesResolution: Bool { get }
 
-    /// Prevents packages from automatically being resolved to versions other than those recorded in the `Package.resolved` file
+    /// Prevents packages from automatically being resolved to versions other than those recorded in the `Package.resolved` file. This translates in the option `-disableAutomaticPackageResolution` being passed to xcodebuild
     var disablePackageAutomaticUpdates: Bool { get }
+
+    /// Skips updating package dependencies from their remote. This translates in the option `-skipPackageUpdates` being passed to xcodebuild
+    var skipPackageRepositoryFetches: Bool { get }
 
     /// Lets xcodebuild use system's scm configuration
     var useSystemScm: Bool { get }
+
+    /// Lets xcodebuild use a specified package authorization provider (keychain|netrc)
+    var packageAuthorizationProvider: String? { get }
+
+    /// Generate AppStoreInfo.plist using swinfo for app-store exports
+    var generateAppstoreInfo: Bool { get }
 }
 
 public extension GymfileProtocol {
-    var workspace: String? { return nil }
-    var project: String? { return nil }
-    var scheme: String? { return nil }
-    var clean: Bool { return false }
-    var outputDirectory: String { return "." }
-    var outputName: String? { return nil }
-    var configuration: String? { return nil }
-    var silent: Bool { return false }
-    var codesigningIdentity: String? { return nil }
-    var skipPackageIpa: Bool { return false }
-    var skipPackagePkg: Bool { return false }
-    var includeSymbols: Bool? { return nil }
-    var includeBitcode: Bool? { return nil }
-    var exportMethod: String? { return nil }
-    var exportOptions: [String: Any]? { return nil }
-    var exportXcargs: String? { return nil }
-    var skipBuildArchive: Bool? { return nil }
-    var skipArchive: Bool? { return nil }
-    var skipCodesigning: Bool? { return nil }
-    var catalystPlatform: String? { return nil }
-    var installerCertName: String? { return nil }
-    var buildPath: String? { return nil }
-    var archivePath: String? { return nil }
-    var derivedDataPath: String? { return nil }
-    var resultBundle: Bool { return false }
-    var resultBundlePath: String? { return nil }
-    var buildlogPath: String { return "~/Library/Logs/gym" }
-    var sdk: String? { return nil }
-    var toolchain: String? { return nil }
-    var destination: String? { return nil }
-    var exportTeamId: String? { return nil }
-    var xcargs: String? { return nil }
-    var xcconfig: String? { return nil }
-    var suppressXcodeOutput: Bool? { return nil }
-    var disableXcpretty: Bool? { return nil }
-    var xcprettyTestFormat: Bool? { return nil }
-    var xcprettyFormatter: String? { return nil }
-    var xcprettyReportJunit: String? { return nil }
-    var xcprettyReportHtml: String? { return nil }
-    var xcprettyReportJson: String? { return nil }
-    var analyzeBuildTime: Bool? { return nil }
-    var xcprettyUtf: Bool? { return nil }
-    var skipProfileDetection: Bool { return false }
-    var clonedSourcePackagesPath: String? { return nil }
-    var skipPackageDependenciesResolution: Bool { return false }
-    var disablePackageAutomaticUpdates: Bool { return false }
-    var useSystemScm: Bool { return false }
+    var workspace: String? {
+        return nil
+    }
+
+    var project: String? {
+        return nil
+    }
+
+    var scheme: String? {
+        return nil
+    }
+
+    var clean: Bool {
+        return false
+    }
+
+    var outputDirectory: String {
+        return "."
+    }
+
+    var outputName: String? {
+        return nil
+    }
+
+    var appName: String? {
+        return nil
+    }
+
+    var configuration: String? {
+        return nil
+    }
+
+    var silent: Bool {
+        return false
+    }
+
+    var codesigningIdentity: String? {
+        return nil
+    }
+
+    var skipPackageIpa: Bool {
+        return false
+    }
+
+    var skipPackagePkg: Bool {
+        return false
+    }
+
+    var includeSymbols: Bool? {
+        return nil
+    }
+
+    var includeBitcode: Bool? {
+        return nil
+    }
+
+    var exportMethod: String? {
+        return nil
+    }
+
+    var exportOptions: [String: Any]? {
+        return nil
+    }
+
+    var exportXcargs: String? {
+        return nil
+    }
+
+    var skipBuildArchive: Bool? {
+        return nil
+    }
+
+    var skipArchive: Bool? {
+        return nil
+    }
+
+    var skipCodesigning: Bool? {
+        return nil
+    }
+
+    var catalystPlatform: String? {
+        return nil
+    }
+
+    var installerCertName: String? {
+        return nil
+    }
+
+    var buildPath: String? {
+        return nil
+    }
+
+    var archivePath: String? {
+        return nil
+    }
+
+    var derivedDataPath: String? {
+        return nil
+    }
+
+    var resultBundle: Bool {
+        return false
+    }
+
+    var resultBundlePath: String? {
+        return nil
+    }
+
+    var buildlogPath: String {
+        return "~/Library/Logs/gym"
+    }
+
+    var sdk: String? {
+        return nil
+    }
+
+    var toolchain: String? {
+        return nil
+    }
+
+    var destination: String? {
+        return nil
+    }
+
+    var exportTeamId: String? {
+        return nil
+    }
+
+    var xcargs: String? {
+        return nil
+    }
+
+    var xcconfig: String? {
+        return nil
+    }
+
+    var suppressXcodeOutput: Bool? {
+        return nil
+    }
+
+    var xcodebuildFormatter: String {
+        return "xcbeautify"
+    }
+
+    var buildTimingSummary: Bool {
+        return false
+    }
+
+    var disableXcpretty: Bool? {
+        return nil
+    }
+
+    var xcprettyTestFormat: Bool? {
+        return nil
+    }
+
+    var xcprettyFormatter: String? {
+        return nil
+    }
+
+    var xcprettyReportJunit: String? {
+        return nil
+    }
+
+    var xcprettyReportHtml: String? {
+        return nil
+    }
+
+    var xcprettyReportJson: String? {
+        return nil
+    }
+
+    var xcprettyUtf: Bool? {
+        return nil
+    }
+
+    var analyzeBuildTime: Bool? {
+        return nil
+    }
+
+    var skipProfileDetection: Bool {
+        return false
+    }
+
+    var xcodebuildCommand: String {
+        return "xcodebuild"
+    }
+
+    var clonedSourcePackagesPath: String? {
+        return nil
+    }
+
+    var packageCachePath: String? {
+        return nil
+    }
+
+    var skipPackageDependenciesResolution: Bool {
+        return false
+    }
+
+    var disablePackageAutomaticUpdates: Bool {
+        return false
+    }
+
+    var skipPackageRepositoryFetches: Bool {
+        return false
+    }
+
+    var useSystemScm: Bool {
+        return false
+    }
+
+    var packageAuthorizationProvider: String? {
+        return nil
+    }
+
+    var generateAppstoreInfo: Bool {
+        return false
+    }
 }
 
 // Please don't remove the lines below
 // They are used to detect outdated files
-// FastlaneRunnerAPIVersion [0.9.89]
+// FastlaneRunnerAPIVersion [0.9.153]

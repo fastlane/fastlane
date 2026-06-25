@@ -14,9 +14,72 @@ class ConnectAPIStubbing
         WebMock::API.stub_request(*args)
       end
 
+      def stub_get_app_availabilities_ready_for_distribution
+        stub_request(:get, "https://appstoreconnect.apple.com/iris/v2/appAvailabilities/123456789?include=territoryAvailabilities&limit%5BterritoryAvailabilities%5D=200").
+          to_return(status: 200, body: read_fixture_file('app_availabilities_ready_for_distribution.json'), headers: { 'Content-Type' => 'application/json' })
+      end
+
+      def stub_get_app_availabilities_removed_from_sale
+        stub_request(:get, "https://appstoreconnect.apple.com/iris/v2/appAvailabilities/123456789?include=territoryAvailabilities&limit%5BterritoryAvailabilities%5D=200").
+          to_return(status: 200, body: read_fixture_file('app_availabilities_removed_app.json'), headers: { 'Content-Type' => 'application/json' })
+      end
+
+      def stub_get_app_infos
+        stub_request(:get, "https://appstoreconnect.apple.com/iris/v1/apps/123456789/appInfos").
+          to_return(status: 200, body: read_fixture_file('app_infos.json'), headers: { 'Content-Type' => 'application/json' })
+      end
+
       def stub_app_store_version_release_request
         stub_request(:post, "https://appstoreconnect.apple.com/iris/v1/appStoreVersionReleaseRequests").
           to_return(status: 200, body: read_fixture_file('app_store_version_release_request.json'), headers: { 'Content-Type' => 'application/json' })
+      end
+
+      def stub_create_review_submission
+        stub_request(:post, "https://appstoreconnect.apple.com/iris/v1/reviewSubmissions").
+          to_return(status: 200, body: read_fixture_file('review_submission_created.json'), headers: { 'Content-Type' => 'application/json' })
+      end
+
+      def stub_cancel_review_submission
+        stub_request(:patch, "https://appstoreconnect.apple.com/iris/v1/reviewSubmissions/123456789").
+          with(body: { data: WebMock::API.hash_including({ attributes: { canceled: true } }) }).
+          to_return(status: 200, body: read_fixture_file('review_submission_cancelled.json'), headers: { 'Content-Type' => 'application/json' })
+      end
+
+      def stub_get_review_submission
+        stub_request(:get, "https://appstoreconnect.apple.com/iris/v1/reviewSubmissions/123456789").
+          to_return(status: 200, body: read_fixture_file('review_submission.json'), headers: { 'Content-Type' => 'application/json' })
+      end
+
+      def stub_get_review_submissions
+        stub_request(:get, "https://appstoreconnect.apple.com/iris/v1/apps/123456789-app/reviewSubmissions").
+          to_return(status: 200, body: read_fixture_file('review_submissions.json'), headers: { 'Content-Type' => 'application/json' })
+      end
+
+      def stub_submit_review_submission
+        stub_request(:patch, "https://appstoreconnect.apple.com/iris/v1/reviewSubmissions/123456789").
+          with(body: { data: WebMock::API.hash_including({ attributes: { submitted: true } }) }).
+          to_return(status: 200, body: read_fixture_file('review_submission_submitted.json'), headers: { 'Content-Type' => 'application/json' })
+      end
+
+      def stub_create_review_submission_item
+        stub_request(:post, "https://appstoreconnect.apple.com/iris/v1/reviewSubmissionItems").
+          to_return(status: 200, body: read_fixture_file('review_submission_item_created.json'), headers: { 'Content-Type' => 'application/json' })
+      end
+
+      def stub_get_review_submission_items
+        stub_request(:get, "https://appstoreconnect.apple.com/iris/v1/reviewSubmissions/123456789/items").
+          to_return(status: 200, body: read_fixture_file('review_submission_items.json'), headers: { 'Content-Type' => 'application/json' })
+      end
+
+      def stub_webhooks
+        stub_request(:get, "https://api.appstoreconnect.apple.com/v1/apps/123456789/webhooks").
+          to_return(status: 200, body: read_fixture_file('webhooks.json'), headers: { 'Content-Type' => 'application/json' })
+
+        stub_request(:post, "https://api.appstoreconnect.apple.com/v1/webhooks").
+          to_return(status: 200, body: read_fixture_file('webhook.json'), headers: { 'Content-Type' => 'application/json' })
+
+        stub_request(:delete, "https://api.appstoreconnect.apple.com/v1/webhooks/webhook-123").
+          to_return(status: 200, body: "", headers: {})
       end
     end
   end

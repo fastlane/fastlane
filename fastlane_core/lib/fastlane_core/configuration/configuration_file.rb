@@ -48,7 +48,7 @@ module FastlaneCore
 
         print_resulting_config_values unless skip_printing_values # only on success
       rescue SyntaxError => ex
-        line = ex.to_s.match(/\(eval\):(\d+)/)[1]
+        line = ex.to_s.match(/\(eval.*\):(\d+)/)[1]
         UI.error("Error in your #{File.basename(path)} at line #{line}")
         UI.content_error(content, line)
         UI.user_error!("Syntax error in your configuration file '#{path}' on line #{line}: #{ex}")

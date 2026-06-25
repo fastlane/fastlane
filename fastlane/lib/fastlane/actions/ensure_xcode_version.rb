@@ -75,7 +75,7 @@ module Fastlane
         [
           "If building your app requires a specific version of Xcode, you can invoke this command before using gym.",
           "For example, to ensure that a beta version of Xcode is not accidentally selected to build, which would make uploading to TestFlight fail.",
-          "You can either manually provide a specific version using `version: ` or you make use of the `.xcode-version` file.",
+          "You can either manually provide a specific version using `version:` or you make use of the `.xcode-version` file.",
           "Using the `strict` parameter, you can either verify the full set of version numbers strictly (i.e. `11.3.1`) or only a subset of them (i.e. `11.3` or `11`)."
         ].join("\n")
       end
@@ -118,6 +118,10 @@ module Fastlane
 
       def self.is_supported?(platform)
         [:ios, :mac].include?(platform)
+      end
+
+      def self.deprecated_notes
+        "The xcode-install gem, which this action depends on, has been sunset. Please migrate to [xcodes](https://docs.fastlane.tools/actions/xcodes). You can find a migration guide here: [xcpretty/xcode-install/MIGRATION.md](https://github.com/xcpretty/xcode-install/blob/master/MIGRATION.md)"
       end
     end
   end

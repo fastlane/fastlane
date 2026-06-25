@@ -37,7 +37,7 @@ describe Fastlane do
         Fastlane::DocsGenerator.run(ff, output_path)
         output = File.read(output_path)
 
-        expect(output).to include('gem install fastlane')
+        expect(output).to include('installation instructions')
         expect(output).to include('such smooth')
         expect(output).to_not(include('private'))
       end

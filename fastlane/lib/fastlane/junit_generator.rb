@@ -12,7 +12,7 @@ module Fastlane
       xml_path = File.join(Fastlane::ROOT, "lib/assets/report_template.xml.erb")
       xml = ERB.new(File.read(xml_path)).result(binding) # https://web.archive.org/web/20160430190141/www.rrn.dk/rubys-erb-templating-system
 
-      xml = xml.gsub('system_', 'system-').delete("\e") # Jenkins can not parse 'ESC' symbol
+      xml = xml.gsub('system_', 'system-').delete("\e") # Jenkins cannot parse 'ESC' symbol
 
       begin
         File.write(path, xml)

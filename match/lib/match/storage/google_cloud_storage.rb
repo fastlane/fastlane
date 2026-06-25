@@ -48,7 +48,8 @@ module Match
           team_id: params[:team_id],
           team_name: params[:team_name],
           api_key_path: params[:api_key_path],
-          api_key: params[:api_key]
+          api_key: params[:api_key],
+          skip_google_cloud_account_confirmation: params[:skip_google_cloud_account_confirmation]
         )
       end
 
@@ -62,7 +63,8 @@ module Match
                      team_id: nil,
                      team_name: nil,
                      api_key_path: nil,
-                     api_key: nil)
+                     api_key: nil,
+                     skip_google_cloud_account_confirmation: nil)
         @type = type if type
         @platform = platform if platform
         @google_cloud_project_id = google_cloud_project_id if google_cloud_project_id
@@ -76,8 +78,7 @@ module Match
         @api_key_path = api_key_path
         @api_key = api_key
 
-        @google_cloud_keys_file = ensure_keys_file_exists(google_cloud_keys_file, google_cloud_project_id)
-
+        @google_cloud_keys_file = ensure_keys_file_exists(google_cloud_keys_file, google_cloud_project_id, skip_google_cloud_account_confirmation)
         if self.google_cloud_keys_file.to_s.length > 0
           # Extract the Project ID from the `JSON` file
           # so the user doesn't have to provide it manually
@@ -223,7 +224,7 @@ module Match
 
       # This method will make sure the keys file exists
       # If it's missing, it will help the user set things up
-      def ensure_keys_file_exists(google_cloud_keys_file, google_cloud_project_id)
+      def ensure_keys_file_exists(google_cloud_keys_file, google_cloud_project_id, skip_google_cloud_account_confirmation)
         if google_cloud_keys_file && File.exist?(google_cloud_keys_file)
           return google_cloud_keys_file
         end
@@ -251,7 +252,7 @@ module Match
             # we can continue and ask the user if they want to use a keys file.
           end
 
-          if application_default_keys && UI.confirm("Do you want to use this system's Google Cloud application default keys?")
+          if application_default_keys && (skip_google_cloud_account_confirmation || UI.confirm("Do you want to use this system's Google Cloud application default keys?"))
             return nil
           end
         end

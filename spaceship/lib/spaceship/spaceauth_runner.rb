@@ -16,7 +16,7 @@ module Spaceship
 
     def run
       begin
-        puts("Logging into to App Store Connect (#{@username})...")
+        puts("Logging into to App Store Connect (#{@username})...") unless Spaceship::Globals.check_session
         Spaceship::Tunes.login(@username)
         puts("Successfully logged in to App Store Connect".green)
         puts("")
@@ -68,21 +68,11 @@ module Spaceship
     end
 
     def load_cookies(content)
-      # When Ruby 2.5 support is dropped, we can safely get rid of the latter branch.
-      if YAML.name == 'Psych' && Gem::Version.new(Psych::VERSION) >= Gem::Version.new('3.1')
-        YAML.safe_load(
-          content,
-          permitted_classes: [HTTP::Cookie, Time],
-          aliases: true
-        )
-      else
-        YAML.safe_load(
-          content,
-          [HTTP::Cookie, Time], # classes allowlist
-          [],                   # symbols allowlist
-          true                  # allow YAML aliases
-        )
-      end
+      YAML.safe_load(
+        content,
+        permitted_classes: [HTTP::Cookie, Time],
+        aliases: true
+      )
     end
 
     def session_string

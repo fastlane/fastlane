@@ -94,7 +94,7 @@ module Supply
                                      short_option: "-j",
                                      conflicting_options: [:issuer, :key, :json_key_data],
                                      optional: true, # this shouldn't be optional but is until --key and --issuer are completely removed
-                                     description: "The path to a file containing service account JSON, used to authenticate with Google",
+                                     description: "The path to a Google credentials JSON file (Application Default, Workload Identity, or Service Account), used to authenticate with Google",
                                      code_gen_sensitive: true,
                                      default_value: CredentialsManager::AppfileConfig.try_fetch_value(:json_key_file),
                                      default_value_dynamic: true,
@@ -107,7 +107,7 @@ module Supply
                                      short_option: "-c",
                                      conflicting_options: [:issuer, :key, :json_key],
                                      optional: true,
-                                     description: "The raw service account JSON data used to authenticate with Google",
+                                     description: "The raw content of a Google credentials JSON file (Application Default, Workload Identity, or Service Account), used to authenticate with Google",
                                      code_gen_sensitive: true,
                                      default_value: CredentialsManager::AppfileConfig.try_fetch_value(:json_key_data_raw),
                                      default_value_dynamic: true,
@@ -210,6 +210,11 @@ module Supply
                                      description: "Whether to skip uploading SCREENSHOTS",
                                      type: Boolean,
                                      default_value: false),
+        FastlaneCore::ConfigItem.new(key: :sync_image_upload,
+                                     env_name: "SUPPLY_SYNC_IMAGE_UPLOAD",
+                                     description: "Whether to use sha256 comparison to skip upload of images and screenshots that are already in Play Store",
+                                     type: Boolean,
+                                     default_value: false),
         FastlaneCore::ConfigItem.new(key: :track_promote_to,
                                      env_name: "SUPPLY_TRACK_PROMOTE_TO",
                                      optional: true,
@@ -217,6 +222,14 @@ module Supply
                                      verify_block: proc do |value|
                                        UI.user_error!("'rollout' is no longer a valid track name - please use 'production' instead") if value.casecmp('rollout').zero?
                                      end),
+        FastlaneCore::ConfigItem.new(key: :track_promote_release_status,
+                                     env_name: "SUPPLY_TRACK_PROMOTE_RELEASE_STATUS",
+                                     optional: true,
+                                     description: "Promoted track release status (used when promoting a track) - valid values are #{Supply::ReleaseStatus::ALL.join(', ')}",
+                                     default_value: Supply::ReleaseStatus::COMPLETED,
+                                     verify_block: proc do |value|
+                                                     UI.user_error!("Value must be one of '#{Supply::RELEASE_STATUS}'") unless Supply::ReleaseStatus::ALL.include?(value)
+                                                   end),
         FastlaneCore::ConfigItem.new(key: :validate_only,
                                      env_name: "SUPPLY_VALIDATE_ONLY",
                                      optional: true,

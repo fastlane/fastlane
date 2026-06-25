@@ -18,6 +18,7 @@ require_relative 'tunes/errors'
 require_relative 'globals'
 require_relative 'provider'
 require_relative 'stats_middleware'
+require_relative 'hashcash'
 
 Faraday::Utils.default_params_encoder = Faraday::FlatParamsEncoder
 
@@ -70,10 +71,10 @@ module Spaceship
 
     # @return (Array) A list of all available teams
     def teams
-      user_details_data['associatedAccounts'].sort_by do |team|
+      user_details_data['availableProviders'].sort_by do |team|
         [
-          team['contentProvider']['name'],
-          team['contentProvider']['contentProviderId']
+          team['name'],
+          team['providerId']
         ]
       end
     end
@@ -124,8 +125,8 @@ module Spaceship
     #  "userName"=>"detlef@krausefx.com"}
     def user_details_data
       return @_cached_user_details if @_cached_user_details
-      r = request(:get, '/WebObjects/iTunesConnect.woa/ra/user/detail')
-      @_cached_user_details = parse_response(r, 'data')
+      r = request(:get, "https://appstoreconnect.apple.com/olympus/v1/session")
+      @_cached_user_details = parse_response(r)
     end
 
     # @return (String) The currently selected Team ID
@@ -135,7 +136,7 @@ module Spaceship
       if teams.count > 1
         puts("The current user is in #{teams.count} teams. Pass a team ID or call `select_team` to choose a team. Using the first one for now.")
       end
-      @current_team_id ||= user_details_data['sessionToken']['contentProviderId']
+      @current_team_id ||= user_details_data['provider']['providerId']
     end
 
     # Set a new team ID which will be used from now on
@@ -144,12 +145,11 @@ module Spaceship
       # following confusing error message
       #
       #     invalid content provider id
-      #
       available_teams = teams.collect do |team|
         {
-          team_id: (team["contentProvider"] || {})["contentProviderId"],
-          public_team_id: (team["contentProvider"] || {})["contentProviderPublicId"],
-          team_name: (team["contentProvider"] || {})["name"]
+          team_id: team["providerId"],
+          public_team_id: team["publicProviderId"],
+          team_name: team["name"]
         }
       end
 
@@ -163,21 +163,10 @@ module Spaceship
       end
 
       response = request(:post) do |req|
-        req.url("https://appstoreconnect.apple.com/olympus/v1/providerSwitchRequests")
-        req.body = {
-          "data": {
-            "type": "providerSwitchRequests",
-            "relationships": {
-              "provider": {
-                "data": {
-                  "type": "providers",
-                  "id": result[:public_team_id]
-                }
-              }
-            }
-          }
-        }.to_json
+        req.url("https://appstoreconnect.apple.com/olympus/v1/session")
+        req.body = { "provider": { "providerId": result[:team_id] } }.to_json
         req.headers['Content-Type'] = 'application/json'
+        req.headers['X-Requested-With'] = 'olympus-ui'
       end
 
       handle_itc_response(response.body)
@@ -391,10 +380,11 @@ module Spaceship
 
         keychain_entry = CredentialsManager::AccountManager.new(user: user, password: password)
         user ||= keychain_entry.user
-        password = keychain_entry.password
+        password = keychain_entry.password(ask_if_missing: !Spaceship::Globals.check_session)
       end
 
       if user.to_s.strip.empty? || password.to_s.strip.empty?
+        exit_with_session_state(user, false) if Spaceship::Globals.check_session
         raise NoUserCredentialsError.new, "No login data provided"
       end
 
@@ -413,21 +403,16 @@ module Spaceship
       end
     end
 
-    # This method is used for both the Apple Dev Portal and App Store Connect
-    # This will also handle 2 step verification and 2 factor authentication
+    # Check if we have a cached/valid session
     #
-    # It is called in `send_login_request` of sub classes (which the method `login`, above, transferred over to via `do_login`)
-    # rubocop:disable Metrics/PerceivedComplexity
-    def send_shared_login_request(user, password)
-      # Check if we have a cached/valid session
-      #
-      # Background:
-      # December 4th 2017 Apple introduced a rate limit - which is of course fine by itself -
-      # but unfortunately also rate limits successful logins. If you call multiple tools in a
-      # lane (e.g. call match 5 times), this would lock you out of the account for a while.
-      # By loading existing sessions and checking if they're valid, we're sending less login requests.
-      # More context on why this change was necessary https://github.com/fastlane/fastlane/pull/11108
-      #
+    # Background:
+    # December 4th 2017 Apple introduced a rate limit - which is of course fine by itself -
+    # but unfortunately also rate limits successful logins. If you call multiple tools in a
+    # lane (e.g. call match 5 times), this would lock you out of the account for a while.
+    # By loading existing sessions and checking if they're valid, we're sending less login requests.
+    # More context on why this change was necessary https://github.com/fastlane/fastlane/pull/11108
+    #
+    def has_valid_session
       # If there was a successful manual login before, we have a session on disk
       if load_session_from_file
         # Check if the session is still valid here
@@ -444,7 +429,7 @@ module Spaceship
           # which is common, as the session automatically invalidates after x hours (we don't know x)
           # In this case we don't actually care about the exact exception, and why it was failing
           # because either way, we'll have to do a fresh login, where we do the actual error handling
-          puts("Available session is not valid any more. Continuing with normal login.")
+          puts("Available session is not valid anymore. Continuing with normal login.")
         end
       end
       #
@@ -462,12 +447,131 @@ module Spaceship
       #
       # After this point, we sure have no valid session any more and have to create a new one
       #
+      return false
+    end
+
+    def do_sirp(user, password, modified_cookie)
+      require 'fastlane-sirp'
+      require 'base64'
+
+      client = SIRP::Client.new(2048)
+      a = client.start_authentication
+
+      data = {
+        a: Base64.strict_encode64(to_byte(a)),
+        accountName: user,
+        protocols: ['s2k', 's2k_fo']
+      }
+
+      response = request(:post) do |req|
+        req.url("https://idmsa.apple.com/appleauth/auth/signin/init")
+        req.body = data.to_json
+        req.headers['Content-Type'] = 'application/json'
+        req.headers['X-Requested-With'] = 'XMLHttpRequest'
+        req.headers['X-Apple-Widget-Key'] = self.itc_service_key
+        req.headers['Accept'] = 'application/json, text/javascript'
+        req.headers["Cookie"] = modified_cookie if modified_cookie
+      end
+
+      puts("Received SIRP signin init response: #{response.body}") if Spaceship::Globals.verbose?
+
+      body = response.body
+      unless body.kind_of?(Hash)
+        raise UnexpectedResponse, "Expected JSON response, but got #{body.class}: #{body.to_s[0..1000]}"
+      end
+
+      if body["serviceErrors"]
+        raise UnexpectedResponse, body
+      end
+
+      iterations = body["iteration"]
+      salt = Base64.strict_decode64(body["salt"])
+      b = Base64.strict_decode64(body["b"])
+      c = body["c"]
+      protocol = body["protocol"]
+
+      key_length = 32
+      encrypted_password = pbkdf2(password, salt, iterations, key_length, protocol)
+
+      m1 = client.process_challenge(
+        user,
+        to_hex(encrypted_password),
+        to_hex(salt),
+        to_hex(b),
+        is_password_encrypted: true
+      )
+      m2 = client.H_AMK
+
+      if m1 == false
+        puts("Error processing SIRP challenge") if Spaceship::Globals.verbose?
+        raise SIRPAuthenticationError
+      end
 
       data = {
         accountName: user,
-        password: password,
-        rememberMe: true
+        c: c,
+        m1: Base64.encode64(to_byte(m1)).strip,
+        m2: Base64.encode64(to_byte(m2)).strip,
+        rememberMe: false
       }
+
+      hashcash = self.fetch_hashcash
+
+      response = request(:post) do |req|
+        req.url("https://idmsa.apple.com/appleauth/auth/signin/complete?isRememberMeEnabled=false")
+        req.body = data.to_json
+        req.headers['Content-Type'] = 'application/json'
+        req.headers['X-Requested-With'] = 'XMLHttpRequest'
+        req.headers['X-Apple-Widget-Key'] = self.itc_service_key
+        req.headers['Accept'] = 'application/json, text/javascript'
+        req.headers["Cookie"] = modified_cookie if modified_cookie
+        req.headers["X-Apple-HC"] = hashcash if hashcash
+      end
+
+      puts("Completed SIRP authentication with status of #{response.status}") if Spaceship::Globals.verbose?
+
+      return response
+    end
+
+    def pbkdf2(password, salt, iterations, key_length, protocol, digest = OpenSSL::Digest::SHA256.new)
+      require 'openssl'
+
+      unless %w[s2k s2k_fo].include?(protocol)
+        raise SIRPAuthenticationError, "Unsupported protocol '#{protocol}' for pbkdf2"
+      end
+
+      password = OpenSSL::Digest::SHA256.digest(password)
+
+      if protocol == 's2k_fo'
+        puts("Using legacy s2k_fo protocol for password digest") if Spaceship::Globals.verbose?
+        password = to_hex(password)
+      end
+
+      OpenSSL::PKCS5.pbkdf2_hmac(password, salt, iterations, key_length, digest)
+    end
+
+    def to_hex(str)
+      str.unpack1('H*')
+    end
+
+    def to_byte(str)
+      [str].pack('H*')
+    end
+
+    # This method is used for both the Apple Dev Portal and App Store Connect
+    # This will also handle 2 step verification and 2 factor authentication
+    #
+    # It is called in `send_login_request` of sub classes (which the method `login`, above, transferred over to via `do_login`)
+    # rubocop:disable Metrics/PerceivedComplexity
+    def send_shared_login_request(user, password)
+      # Check if the cache or FASTLANE_SESSION is still valid
+      has_valid_session = self.has_valid_session
+
+      # Exit if `--check_session` flag was passed
+      exit_with_session_state(user, has_valid_session) if Spaceship::Globals.check_session
+
+      # If the session is valid no need to attempt to generate a new one.
+      return true if has_valid_session
 
       begin
         # The below workaround is only needed for 2 step verified machines
@@ -489,15 +593,7 @@ module Spaceship
           modified_cookie.gsub!(unescaped_important_cookie, escaped_important_cookie)
         end
 
-        response = request(:post) do |req|
-          req.url("https://idmsa.apple.com/appleauth/auth/signin")
-          req.body = data.to_json
-          req.headers['Content-Type'] = 'application/json'
-          req.headers['X-Requested-With'] = 'XMLHttpRequest'
-          req.headers['X-Apple-Widget-Key'] = self.itc_service_key
-          req.headers['Accept'] = 'application/json, text/javascript'
-          req.headers["Cookie"] = modified_cookie if modified_cookie
-        end
+        response = perform_login_method(user, password, modified_cookie)
       rescue UnauthorizedAccessError
         raise InvalidUserCredentialsError.new, "Invalid username and password combination. Used '#{user}' as the username."
       end
@@ -524,7 +620,6 @@ module Spaceship
 
           if try_upgrade_2fa_later(response)
             store_cookie
-            fetch_olympus_session
             return true
           end
 
@@ -533,7 +628,7 @@ module Spaceship
           raise AppleIDAndPrivacyAcknowledgementNeeded.new, "Need to acknowledge to Apple's Apple ID and Privacy statement. " \
                                                             "Please manually log into https://appleid.apple.com (or https://appstoreconnect.apple.com) to acknowledge the statement. " \
                                                             "Your account might also be asked to upgrade to 2FA. " \
-                                                            "Set SPACESHIP_SKIP_2FA_UPGRADE=1 for fastlane to automaticaly bypass 2FA upgrade if possible."
+                                                            "Set SPACESHIP_SKIP_2FA_UPGRADE=1 for fastlane to automatically bypass 2FA upgrade if possible."
         elsif (response['Set-Cookie'] || "").include?("itctx")
           raise "Looks like your Apple ID is not enabled for App Store Connect, make sure to be able to login online"
         else
@@ -543,6 +638,55 @@ module Spaceship
       end
     end
     # rubocop:enable Metrics/PerceivedComplexity
+
+    def perform_login_method(user, password, modified_cookie)
+      do_legacy_signin = ENV['FASTLANE_USE_LEGACY_PRE_SIRP_AUTH']
+      if do_legacy_signin
+        puts("Starting legacy Apple ID login") if Spaceship::Globals.verbose?
+
+        # Fixes issue https://github.com/fastlane/fastlane/issues/21071
+        # On 2023-02-23, Apple added a custom implementation
+        # of hashcash to their auth flow
+        # hashcash = nil
+        hashcash = self.fetch_hashcash
+
+        data = {
+          accountName: user,
+          password: password,
+          rememberMe: true
+        }
+
+        return request(:post) do |req|
+          req.url("https://idmsa.apple.com/appleauth/auth/signin")
+          req.body = data.to_json
+          req.headers['Content-Type'] = 'application/json'
+          req.headers['X-Requested-With'] = 'XMLHttpRequest'
+          req.headers['X-Apple-Widget-Key'] = self.itc_service_key
+          req.headers['Accept'] = 'application/json, text/javascript'
+          req.headers["Cookie"] = modified_cookie if modified_cookie
+          req.headers["X-Apple-HC"] = hashcash if hashcash
+        end
+      else
+        # Fixes issue https://github.com/fastlane/fastlane/issues/26368#issuecomment-2424190032
+        puts("Starting SIRP Apple ID login") if Spaceship::Globals.verbose?
+        return do_sirp(user, password, modified_cookie)
+      end
+    end
+
+    def fetch_hashcash
+      response = request(:get, "https://idmsa.apple.com/appleauth/auth/signin?widgetKey=#{self.itc_service_key}")
+      headers = response.headers
+
+      bits = headers["X-Apple-HC-Bits"]
+      challenge = headers["X-Apple-HC-Challenge"]
+
+      if bits.nil? || challenge.nil?
+        puts("Unable to find 'X-Apple-HC-Bits' and 'X-Apple-HC-Challenge' to make hashcash")
+        return nil
+      end
+
+      return Spaceship::Hashcash.make(bits: bits, challenge: challenge)
+    end
 
     # Get the `itctx` from the new (22nd May 2017) API endpoint "olympus"
     # Update (29th March 2019) olympus migrates to new appstoreconnect API
@@ -564,6 +708,13 @@ module Spaceship
       end
 
       return false
+    end
+
+    # This method is used to log if the session is valid or not and then exit
+    # It is called when the `--check_session` flag is passed
+    def exit_with_session_state(user, has_valid_session)
+      puts("#{has_valid_session ? 'Valid' : 'No valid'} session found (#{user}). Exiting.")
+      exit(has_valid_session)
     end
 
     def itc_service_key
@@ -909,6 +1060,10 @@ module Spaceship
           raise BadGatewayError.new, "Apple 502 detected - this might be temporary server error, try again later"
         end
 
+        if response.body.to_s.include?("<title>503 Service Temporarily Unavailable</title>") || response.body.to_s.include?("<h1>503 Service Temporarily Unavailable</h1>")
+          raise AppleTimeoutError.new, "Apple 503 detected - this might be temporary server error, check https://developer.apple.com/system-status/ to see if there is a known downtime"
+        end
+
         return response
       end
     end
@@ -925,6 +1080,12 @@ module Spaceship
         raise AccessForbiddenError.new, msg
       when 429
         raise TooManyRequestsError, response.to_hash
+      when 502
+        raise BadGatewayError.new, "Apple 502 detected - this might be temporary server error, try again later"
+      when 503
+        raise AppleTimeoutError.new, "Apple 503 detected - this might be temporary server error, check https://developer.apple.com/system-status/ to see if there is a known downtime"
+      when 504
+        raise GatewayTimeoutError.new, "Apple 504 detected - this might be temporary server error, try again later"
       end
     end
 

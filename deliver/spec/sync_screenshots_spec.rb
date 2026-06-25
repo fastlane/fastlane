@@ -2,11 +2,9 @@ require 'deliver/sync_screenshots'
 require 'fakefs/spec_helpers'
 
 describe Deliver::SyncScreenshots do
-  describe '#do_replace_screeshots' do
-    subject { described_class.new(app: nil, platform: nil) }
+  describe '#do_replace_screenshots' do
 
-    DisplayType = Spaceship::ConnectAPI::AppScreenshotSet::DisplayType
-    ScreenSize = Deliver::AppScreenshot::ScreenSize
+    subject { described_class.new(app: nil, platform: nil) }
 
     before do
       # To emulate checksum calculation, return the given path as a checksum
@@ -20,10 +18,10 @@ describe Deliver::SyncScreenshots do
     context 'ASC has nothing and going to add screenshots' do
       let(:screenshots) do
         [
-          mock_screenshot(path: '5.5_1.jpg', screen_size: ScreenSize::IOS_55),
-          mock_screenshot(path: '5.5_2.jpg', screen_size: ScreenSize::IOS_55),
-          mock_screenshot(path: '6.5_1.jpg', screen_size: ScreenSize::IOS_65),
-          mock_screenshot(path: '6.5_2.jpg', screen_size: ScreenSize::IOS_65)
+          mock_screenshot(path: '5.5_1.jpg', display_type: Deliver::AppScreenshot::DisplayType::APP_IPHONE_55),
+          mock_screenshot(path: '5.5_2.jpg', display_type: Deliver::AppScreenshot::DisplayType::APP_IPHONE_55),
+          mock_screenshot(path: '6.5_1.jpg', display_type: Deliver::AppScreenshot::DisplayType::APP_IPHONE_65),
+          mock_screenshot(path: '6.5_2.jpg', display_type: Deliver::AppScreenshot::DisplayType::APP_IPHONE_65)
         ]
       end
 
@@ -40,7 +38,7 @@ describe Deliver::SyncScreenshots do
         )
       end
 
-      it 'should enqueue upload jobs for the screenshots that not exsit on App Store Connect' do
+      it 'should enqueue upload jobs for the screenshots that do not exist on App Store Connect' do
         delete_worker = mock_queue_worker([])
         upload_worker = mock_queue_worker([Deliver::SyncScreenshots::UploadScreenshotJob.new(app_screenshot_set_55, screenshots[0].path),
                                            Deliver::SyncScreenshots::UploadScreenshotJob.new(app_screenshot_set_55, screenshots[1].path),
@@ -53,10 +51,10 @@ describe Deliver::SyncScreenshots do
     context 'ASC has a screenshot on each screenshot set and going to add another screenshot' do
       let(:screenshots) do
         [
-          mock_screenshot(path: '5.5_1.jpg', screen_size: ScreenSize::IOS_55),
-          mock_screenshot(path: '5.5_2.jpg', screen_size: ScreenSize::IOS_55),
-          mock_screenshot(path: '6.5_1.jpg', screen_size: ScreenSize::IOS_65),
-          mock_screenshot(path: '6.5_2.jpg', screen_size: ScreenSize::IOS_65)
+          mock_screenshot(path: '5.5_1.jpg', display_type: Deliver::AppScreenshot::DisplayType::APP_IPHONE_55),
+          mock_screenshot(path: '5.5_2.jpg', display_type: Deliver::AppScreenshot::DisplayType::APP_IPHONE_55),
+          mock_screenshot(path: '6.5_1.jpg', display_type: Deliver::AppScreenshot::DisplayType::APP_IPHONE_65),
+          mock_screenshot(path: '6.5_2.jpg', display_type: Deliver::AppScreenshot::DisplayType::APP_IPHONE_65)
         ]
       end
 
@@ -75,7 +73,7 @@ describe Deliver::SyncScreenshots do
         )
       end
 
-      it 'should enqueue upload jobs for the screenshots that not exsit on App Store Connect' do
+      it 'should enqueue upload jobs for the screenshots that do not exist on App Store Connect' do
         delete_worker = mock_queue_worker([])
         upload_worker = mock_queue_worker([Deliver::SyncScreenshots::UploadScreenshotJob.new(app_screenshot_set_55, screenshots[1].path),
                                            Deliver::SyncScreenshots::UploadScreenshotJob.new(app_screenshot_set_65, screenshots[3].path)])
@@ -106,7 +104,7 @@ describe Deliver::SyncScreenshots do
         )
       end
 
-      it 'should enqueue delete jobs for the screenshots that not exsit on local' do
+      it 'should enqueue delete jobs for the screenshots that do not exist on local' do
         delete_worker = mock_queue_worker([Deliver::SyncScreenshots::DeleteScreenshotJob.new(app_screenshots[0], en_US.locale),
                                            Deliver::SyncScreenshots::DeleteScreenshotJob.new(app_screenshots[1], en_US.locale)])
         upload_worker = mock_queue_worker([])
@@ -126,10 +124,10 @@ describe Deliver::SyncScreenshots do
 
       let(:screenshots) do
         [
-          mock_screenshot(path: '5.5_1.jpg', screen_size: ScreenSize::IOS_55),
-          mock_screenshot(path: '5.5_2_improved.jpg', screen_size: ScreenSize::IOS_55),
-          mock_screenshot(path: '6.5_1.jpg', screen_size: ScreenSize::IOS_65),
-          mock_screenshot(path: '6.5_2_improved.jpg', screen_size: ScreenSize::IOS_65)
+          mock_screenshot(path: '5.5_1.jpg', display_type: Deliver::AppScreenshot::DisplayType::APP_IPHONE_55),
+          mock_screenshot(path: '5.5_2_improved.jpg', display_type: Deliver::AppScreenshot::DisplayType::APP_IPHONE_55),
+          mock_screenshot(path: '6.5_1.jpg', display_type: Deliver::AppScreenshot::DisplayType::APP_IPHONE_65),
+          mock_screenshot(path: '6.5_2_improved.jpg', display_type: Deliver::AppScreenshot::DisplayType::APP_IPHONE_65)
         ]
       end
 
@@ -194,12 +192,12 @@ describe Deliver::SyncScreenshots do
       screenshot
     end
 
-    def mock_screenshot(path: '/path/to/screenshot', language: 'en-US', screen_size: Deliver::AppScreenshot::ScreenSize::IOS_55)
+    def mock_screenshot(path: '/path/to/screenshot', language: 'en-US', display_type: Deliver::AppScreenshot::DisplayType::APP_IPHONE_55)
       screenshot = double(
         'Deliver::AppScreenshot',
         path: path,
         language: language,
-        device_type: screen_size
+        display_type: display_type
       )
       allow(screenshot).to receive(:kind_of?).with(Deliver::AppScreenshot).and_return(true)
       screenshot

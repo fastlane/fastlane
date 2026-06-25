@@ -24,7 +24,7 @@ describe Pilot::TesterImporter do
 
     context "when testers CSV file path is given" do
       let(:fake_tester_manager) { double("tester manager") }
-      let(:fake_testers_file_path) { "fake testers_file_path" }
+      let(:fake_testers_file_path) { Tempfile.new("fake testers_file_path").path }
       let(:fake_input_options) do
         {
           testers_file_path: fake_testers_file_path
@@ -75,7 +75,7 @@ describe Pilot::TesterImporter do
           allow(CSV).to receive(:foreach).with(fake_testers_file_path, "r").and_yield(fake_row)
         end
 
-        context "when tester manger succeed to add a new tester" do
+        context "when tester manager succeeded to add a new tester" do
           before(:each) do
             expect(fake_tester_manager).to receive(:add_tester).with({
               first_name: "FirstName",
@@ -92,7 +92,7 @@ describe Pilot::TesterImporter do
           end
         end
 
-        context "when tester manger failed to add a new tester" do
+        context "when tester manager failed to add a new tester" do
           let(:fake_exception) { "fake exception" }
 
           before(:each) do

@@ -25,6 +25,8 @@ module Fastlane
         cmd << "pr #{pr}" if pr
 
         ENV['DANGER_GITHUB_API_TOKEN'] = params[:github_api_token] if params[:github_api_token]
+        ENV['DANGER_GITHUB_HOST'] = params[:github_enterprise_host] if params[:github_enterprise_host]
+        ENV['DANGER_GITHUB_API_BASE_URL'] = params[:github_enterprise_api_base_url] if params[:github_enterprise_api_base_url]
 
         Actions.sh(cmd.join(' '))
       end
@@ -63,6 +65,18 @@ module Fastlane
           FastlaneCore::ConfigItem.new(key: :github_api_token,
                                        env_name: "FL_DANGER_GITHUB_API_TOKEN",
                                        description: "GitHub API token for danger",
+                                       sensitive: true,
+                                       code_gen_sensitive: true,
+                                       optional: true),
+          FastlaneCore::ConfigItem.new(key: :github_enterprise_host,
+                                       env_name: "FL_DANGER_GITHUB_ENTERPRISE_HOST",
+                                       description: "GitHub host URL for GitHub Enterprise",
+                                       sensitive: true,
+                                       code_gen_sensitive: true,
+                                       optional: true),
+          FastlaneCore::ConfigItem.new(key: :github_enterprise_api_base_url,
+                                       env_name: "FL_DANGER_GITHUB_ENTERPRISE_API_BASE_URL",
+                                       description: "GitHub API base URL for GitHub Enterprise",
                                        sensitive: true,
                                        code_gen_sensitive: true,
                                        optional: true),

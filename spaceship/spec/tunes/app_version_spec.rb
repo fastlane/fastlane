@@ -1,8 +1,8 @@
 describe Spaceship::AppVersion, all: true do
-  before { Spaceship::Tunes.login }
+  include_examples "common spaceship login"
 
   let(:client) { Spaceship::AppVersion.client }
-  let(:app) { Spaceship::Application.all.first }
+  let(:app) { Spaceship::Application.all.find { |a| a.apple_id == "898536088" } }
 
   describe "successfully loads and parses the app version" do
     it "inspect works" do
@@ -76,14 +76,14 @@ describe Spaceship::AppVersion, all: true do
         })
       end
 
-      it "increquent_mild" do
+      it "infrequent_mild" do
         val = @v.raw_data['ratings']['nonBooleanDescriptors'].find do |a|
           a['name'].include?('CARTOON_FANTASY_VIOLENCE')
         end
         expect(val['level']).to eq("ITC.apps.ratings.level.INFREQUENT_MILD")
       end
 
-      it "increquent_mild" do
+      it "infrequent_mild" do
         val = @v.raw_data['ratings']['nonBooleanDescriptors'].find do |a|
           a['name'].include?('CARTOON_FANTASY_VIOLENCE')
         end
@@ -113,7 +113,7 @@ describe Spaceship::AppVersion, all: true do
     end
 
     describe "#candidate_builds" do
-      it "proplery fetches and parses all builds ready to be deployed" do
+      it "properly fetches and parses all builds ready to be deployed" do
         version = app.edit_version
         res = version.candidate_builds
         build = res.first
@@ -243,14 +243,19 @@ describe Spaceship::AppVersion, all: true do
   end
 
   describe "Modifying the app version" do
-    let(:version) { Spaceship::Application.all.first.edit_version }
+    let(:version) { app.edit_version }
 
     it "doesn't allow modification of localized properties without the language" do
       begin
         version.description = "Yes"
         raise "Should raise exception before"
       rescue NoMethodError => ex
-        expect(ex.to_s).to include("undefined method `description='")
+        expected_message = if Gem::Version.create('3.4.0') <= Gem::Version.create(RUBY_VERSION)
+                             "undefined method 'description='"
+                           else
+                             "undefined method `description='"
+                           end
+        expect(ex.to_s).to include(expected_message)
       end
     end
 
@@ -599,7 +604,7 @@ describe Spaceship::AppVersion, all: true do
         it "fails with error if the screenshot to remove doesn't exist" do
           expect do
             version.upload_screenshot!(nil, 5, "English", 'iphone4', false)
-          end.to raise_error("cannot remove screenshot with non existing sort_order")
+          end.to raise_error("cannot remove screenshot with nonexistent sort_order")
         end
       end
     end
@@ -725,7 +730,7 @@ describe Spaceship::AppVersion, all: true do
   end
 
   describe "Modifying the app live version" do
-    let(:version) { Spaceship::Application.all.first.live_version }
+    let(:version) { app.live_version }
 
     describe "Generate promo codes", focus: true do
       it "fetches remaining promocodes" do
@@ -751,7 +756,6 @@ describe Spaceship::AppVersion, all: true do
   describe "Validate attachment file" do
     before { Spaceship::Tunes.login }
     let(:client) { Spaceship::AppVersion.client }
-    let(:app) { Spaceship::Application.all.first }
     describe "successfully loads and parses the app version and attachment" do
       it "contains the right information" do
         TunesStubbing.itc_stub_app_attachment

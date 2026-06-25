@@ -20,7 +20,7 @@ describe FastlaneCore do
       end
 
       it 'returns true for all special characters' do
-        special_chars = %w[! @ # $ % ^ & * ( ) + = [ ] " ' ; : < > ? / \ | { } , ~ `]
+        special_chars = %w[! @ # $ % ^ & * ( ) + = [ ] " ' ; : < > ? / \\ | { } , ~ `]
 
         special_chars.each do |c|
           is_valid = special_chars?("something_#{c}.ipa")

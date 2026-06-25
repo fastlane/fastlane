@@ -1,9 +1,11 @@
 require 'fastlane_core/configuration/config_item'
 require 'fastlane_core/device_manager'
+require 'fastlane/helper/xcodebuild_formatter_helper'
 require 'credentials_manager/appfile_config'
 require_relative 'module'
 
 module Snapshot
+  # rubocop:disable Metrics/ClassLength
   class Options
     def self.verify_type(item_name, acceptable_types, value)
       type_ok = [Array, String].any? { |type| value.kind_of?(type) }
@@ -11,14 +13,18 @@ module Snapshot
     end
 
     def self.available_options
+      @options ||= plain_options
+    end
+
+    def self.plain_options
       output_directory = (File.directory?("fastlane") ? "fastlane/screenshots" : "screenshots")
 
-      @options ||= [
+      [
         FastlaneCore::ConfigItem.new(key: :workspace,
                                      short_option: "-w",
                                      env_name: "SNAPSHOT_WORKSPACE",
                                      optional: true,
-                                     description: "Path the workspace file",
+                                     description: "Path to the workspace file",
                                      verify_block: proc do |value|
                                        v = File.expand_path(value.to_s)
                                        UI.user_error!("Workspace file not found at path '#{v}'") unless File.exist?(v)
@@ -29,7 +35,7 @@ module Snapshot
                                      short_option: "-p",
                                      optional: true,
                                      env_name: "SNAPSHOT_PROJECT",
-                                     description: "Path the project file",
+                                     description: "Path to the project file",
                                      verify_block: proc do |value|
                                        v = File.expand_path(value.to_s)
                                        UI.user_error!("Project file not found at path '#{v}'") unless File.exist?(v)
@@ -128,7 +134,7 @@ module Snapshot
                                      is_string: false),
         FastlaneCore::ConfigItem.new(key: :override_status_bar_arguments,
                                      env_name: 'SNAPSHOT_OVERRIDE_STATUS_BAR_ARGUMENTS',
-                                     description: "Fully customize the status bar by setting each option here. See `xcrun simctl status_bar --help`",
+                                     description: "Fully customize the status bar by setting each option here. Requires `override_status_bar` to be set to `true`. See `xcrun simctl status_bar --help`",
                                      optional: true,
                                      type: String),
         FastlaneCore::ConfigItem.new(key: :localize_simulator,
@@ -194,12 +200,6 @@ module Snapshot
                                      description: "The configuration to use when building the app. Defaults to 'Release'",
                                      default_value_dynamic: true,
                                      optional: true),
-        FastlaneCore::ConfigItem.new(key: :xcpretty_args,
-                                     short_option: "-x",
-                                     env_name: "SNAPSHOT_XCPRETTY_ARGS",
-                                     description: "Additional xcpretty arguments",
-                                     is_string: true,
-                                     optional: true),
         FastlaneCore::ConfigItem.new(key: :sdk,
                                      short_option: "-k",
                                      env_name: "SNAPSHOT_SDK",
@@ -258,6 +258,11 @@ module Snapshot
                                      description: "Sets a custom path for Swift Package Manager dependencies",
                                      type: String,
                                      optional: true),
+        FastlaneCore::ConfigItem.new(key: :package_cache_path,
+                                     env_name: "SNAPSHOT_PACKAGE_CACHE_PATH",
+                                     description: "Sets a custom package cache path for Swift Package Manager dependencies",
+                                     type: String,
+                                     optional: true),
         FastlaneCore::ConfigItem.new(key: :skip_package_dependencies_resolution,
                                      env_name: "SNAPSHOT_SKIP_PACKAGE_DEPENDENCIES_RESOLUTION",
                                      description: "Skips resolution of Swift Package Manager dependencies",
@@ -265,9 +270,23 @@ module Snapshot
                                      default_value: false),
         FastlaneCore::ConfigItem.new(key: :disable_package_automatic_updates,
                                      env_name: "SNAPSHOT_DISABLE_PACKAGE_AUTOMATIC_UPDATES",
-                                     description: "Prevents packages from automatically being resolved to versions other than those recorded in the `Package.resolved` file",
+                                     description: "Prevents packages from automatically being resolved to versions other than those recorded in the `Package.resolved` file. This translates in the option `-disableAutomaticPackageResolution` being passed to xcodebuild",
                                      type: Boolean,
                                      default_value: false),
+        FastlaneCore::ConfigItem.new(key: :skip_package_repository_fetches,
+                                     env_name: "SNAPSHOT_SKIP_PACKAGE_REPOSITORY_FETCHES",
+                                     description: "Skips updating package dependencies from their remote. This translates in the option `-skipPackageUpdates` being passed to xcodebuild",
+                                     type: Boolean,
+                                     default_value: false),
+        FastlaneCore::ConfigItem.new(key: :package_authorization_provider,
+                                     env_name: "SNAPSHOT_PACKAGE_AUTHORIZATION_PROVIDER",
+                                     description: "Lets xcodebuild use a specified package authorization provider (keychain|netrc)",
+                                     optional: true,
+                                     type: String,
+                                     verify_block: proc do |value|
+                                       av = %w(netrc keychain)
+                                       UI.user_error!("Unsupported authorization provider '#{value}', must be: #{av}") unless av.include?(value)
+                                     end),
         FastlaneCore::ConfigItem.new(key: :testplan,
                                      env_name: "SNAPSHOT_TESTPLAN",
                                      description: "The testplan associated with the scheme that should be used for testing",
@@ -289,11 +308,33 @@ module Snapshot
                                      verify_block: proc do |value|
                                        verify_type('skip_testing', [Array, String], value)
                                      end),
+        FastlaneCore::ConfigItem.new(key: :run_rosetta_simulator,
+                                     env_name: "SNAPSHOT_RUN_ROSETTA_SIMULATOR",
+                                     description: "Run simulator in a Rosetta mode",
+                                     type: Boolean,
+                                     default_value: false),
+
+        FastlaneCore::ConfigItem.new(key: :xcodebuild_formatter,
+                                     env_names: ["SNAPSHOT_XCODEBUILD_FORMATTER", "FASTLANE_XCODEBUILD_FORMATTER"],
+                                     description: "xcodebuild formatter to use (ex: 'xcbeautify', 'xcbeautify --quieter', 'xcpretty', 'xcpretty -test'). Use empty string (ex: '') to disable any formatter (More information: https://docs.fastlane.tools/best-practices/xcodebuild-formatters/)",
+                                     type: String,
+                                     default_value: Fastlane::Helper::XcodebuildFormatterHelper.xcbeautify_installed? ? 'xcbeautify' : 'xcpretty',
+                                     default_value_dynamic: true),
+
+        # xcpretty
+        FastlaneCore::ConfigItem.new(key: :xcpretty_args,
+                                     short_option: "-x",
+                                     env_name: "SNAPSHOT_XCPRETTY_ARGS",
+                                     deprecated: "Use `xcodebuild_formatter: ''` instead",
+                                     description: "Additional xcpretty arguments",
+                                     is_string: true,
+                                     optional: true),
         FastlaneCore::ConfigItem.new(key: :disable_xcpretty,
                                      env_name: "SNAPSHOT_DISABLE_XCPRETTY",
                                      description: "Disable xcpretty formatting of build",
                                      type: Boolean,
                                      optional: true),
+
         FastlaneCore::ConfigItem.new(key: :suppress_xcode_output,
                                      env_name: "SNAPSHOT_SUPPRESS_XCODE_OUTPUT",
                                      description: "Suppress the output of xcodebuild to stdout. Output is still saved in buildlog_path",
@@ -307,4 +348,5 @@ module Snapshot
       ]
     end
   end
+  # rubocop:enable Metrics/ClassLength
 end
