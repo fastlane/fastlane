@@ -93,7 +93,7 @@ describe Commander::Runner do
       runner = Commander::Runner.new
       error = FastlaneCore::Interface::FastlaneShellError.new(show_github_issues: false)
       allow(error).to receive(:message).and_return('error message')
-      expect(runner).to_not receive(:show_github_issues)
+      expect(runner).to_not(receive(:show_github_issues))
       expect(runner).to receive(:display_user_error!)
 
       runner.rescue_fastlane_error(error)
