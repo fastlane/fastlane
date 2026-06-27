@@ -102,7 +102,7 @@ module Fastlane
         params = fill_in_default_values(params)
 
         # Maps nice developer param names to Shenzhen's `ipa build` arguments
-        params.collect do |k, v|
+        params.filter_map do |k, v|
           v ||= ''
           if ARGS_MAP[k]
             if k == :clean
@@ -114,7 +114,7 @@ module Fastlane
               "#{ARGS_MAP[k]} #{value}".strip
             end
           end
-        end.compact
+        end
       end
 
       def self.fill_in_default_values(params)

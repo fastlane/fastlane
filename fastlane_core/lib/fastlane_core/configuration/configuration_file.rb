@@ -67,9 +67,9 @@ module FastlaneCore
         return
       end
 
-      rows = self.modified_values.collect do |key, value|
+      rows = self.modified_values.filter_map do |key, value|
         [key, value] if value.to_s.length > 0
-      end.compact
+      end
 
       puts("")
       puts(Terminal::Table.new(rows: FastlaneCore::PrintTable.transform_output(rows),

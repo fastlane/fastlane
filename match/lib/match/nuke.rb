@@ -196,9 +196,9 @@ module Match
         input_indexes = UI.input("Enter the \"Option\" number(s) from the table above? (comma-separated)").split(',')
 
         # Get certificates from option indexes
-        self.certs = input_indexes.map do |index|
+        self.certs = input_indexes.filter_map do |index|
           self.certs[index.to_i - 1]
-        end.compact
+        end
 
         if self.certs.empty?
           UI.user_error!("No certificates were selected based on option number(s) entered")

@@ -74,7 +74,7 @@ describe Deliver::UploadMetadata do
 
       expect(FastlaneCore::UI).to receive(:important).with("Skipping age rating update because app info could not be fetched.")
 
-      uploader.send("app_rating", nil)
+      uploader.send(:app_rating, nil)
     end
   end
 
@@ -99,7 +99,7 @@ describe Deliver::UploadMetadata do
         options[:app_review_information] = {}
 
         expect(FastlaneCore::UI).not_to receive(:message).with("Uploading app review information to App Store Connect")
-        uploader.send("review_information", version)
+        uploader.send(:review_information, version)
       end
 
       it "successfully set review information" do
@@ -117,7 +117,7 @@ describe Deliver::UploadMetadata do
 
         expect(FastlaneCore::UI).to receive(:message).with("Uploading app review information to App Store Connect")
 
-        uploader.send("review_information", version)
+        uploader.send(:review_information, version)
       end
     end
 
@@ -133,7 +133,7 @@ describe Deliver::UploadMetadata do
             "demo_account_required" => true
           })
 
-          uploader.send("review_information", version)
+          uploader.send(:review_information, version)
         end
       end
 
@@ -146,7 +146,7 @@ describe Deliver::UploadMetadata do
             "demo_account_required" => false
           })
 
-          uploader.send("review_information", version)
+          uploader.send(:review_information, version)
         end
       end
 
@@ -159,7 +159,7 @@ describe Deliver::UploadMetadata do
             "demo_account_required" => false
           })
 
-          uploader.send("review_information", version)
+          uploader.send(:review_information, version)
         end
       end
     end

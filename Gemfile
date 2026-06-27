@@ -27,6 +27,8 @@ gem "openssl",
     "!= 3.3.0"
 # Fast XML parser and object marshaller.
 gem "ox", "~> 2.14"
+# Provides parallel processes for Rubocop, anything 2.x is Ruby >= 3.3 while fastlane uses a `required_ruby_version` of `>= 3.0`.
+gem "parallel", "~> 1.28"
 # Provides an interactive debugging environment for Ruby.
 gem "pry"
 # A plugin for pry that adds step-by-step debugging and stack navigation.
@@ -45,7 +47,7 @@ gem "rb-readline"
 # Behavior-driven testing tool for Ruby.
 gem "rspec", "~> 3.10"
 # Formatter for RSpec to generate JUnit compatible reports.
-gem "rspec_junit_formatter", "~> 0.4.1"
+gem "rspec_junit_formatter", "~> 0.6.0"
 # A Ruby static code analyzer and formatter.
 gem "rubocop", Fastlane::RUBOCOP_REQUIREMENT
 # A collection of RuboCop cops for performance optimizations.

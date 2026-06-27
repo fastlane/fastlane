@@ -63,7 +63,7 @@ module Snapshot
             device_batches = by_simulator_version.flat_map { |a| a.each_slice(default_number_of_simultaneous_simulators).to_a }
           else
             # Put each device in it's own array to run tests one at a time
-            device_batches = launcher_config.devices.map { |d| [d] }
+            device_batches = launcher_config.devices.zip
           end
 
           device_batches.each do |devices|

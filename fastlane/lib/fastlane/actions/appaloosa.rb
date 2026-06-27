@@ -95,10 +95,10 @@ module Fastlane
       def self.screenshots_list(path, locale, device)
         return warning_detected("screenshots folder not found") unless Dir.exist?("#{path}/#{locale}")
         list = Dir.entries("#{path}/#{locale}") - ['.', '..']
-        list.map do |screen|
+        list.filter_map do |screen|
           next if screen.match(device).nil?
           "#{path}/#{locale}#{screen}" unless Dir.exist?("#{path}/#{locale}#{screen}")
-        end.compact
+        end
       end
 
       def self.upload_on_appaloosa(api_key, store_id, binary_path, screenshots, group_ids, description, changelog)
@@ -146,9 +146,9 @@ module Fastlane
       end
 
       def self.get_env_value(option)
-        available_options.map do |opt|
+        available_options.filter_map do |opt|
           opt if opt.key == option.to_sym
-        end.compact[0].default_value
+        end[0].default_value
       end
 
       def self.error_detected(errors)

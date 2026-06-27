@@ -109,7 +109,7 @@ module Fastlane
       def self.xcconfig_include_paths(content, path)
         in_block_comment = false
 
-        content.each_line.map do |line|
+        content.each_line.filter_map do |line|
           line_without_ending = line.chomp
           active_line, in_block_comment = uncomment_xcconfig_line(line_without_ending, in_block_comment)
           include = active_line.match(/^\s*#include\??\s*"(.+)"/)
@@ -118,7 +118,7 @@ module Fastlane
           include_path = include[1]
           include_path = "#{include_path}.xcconfig" if File.extname(include_path).empty?
           File.expand_path(include_path, File.dirname(path))
-        end.compact
+        end
       end
 
       def self.uncomment_xcconfig_line(line, in_block_comment)

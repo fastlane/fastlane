@@ -1,6 +1,7 @@
 require 'spaceship/tunes/language_item'
 require 'spaceship/tunes/iap_list'
 require 'fastlane/markdown_table_formatter'
+require 'ostruct'
 
 require_relative 'module'
 require_relative 'item_to_check'

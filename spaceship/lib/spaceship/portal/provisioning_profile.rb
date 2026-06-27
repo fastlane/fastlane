@@ -435,8 +435,8 @@ module Spaceship
             name,
             distribution_method,
             app.app_id,
-            certificates.map(&:id).compact,
-            devices.map(&:id).compact,
+            certificates.filter_map(&:id),
+            devices.filter_map(&:id),
             mac: mac?,
             sub_platform: tvos? ? 'tvOS' : nil,
             template_name: is_template_profile ? template.purpose_name : nil
