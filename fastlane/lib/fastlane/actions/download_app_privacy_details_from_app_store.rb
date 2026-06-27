@@ -22,7 +22,7 @@ module Fastlane
         raw_usages = download_app_data_usages(params, app)
 
         usages_config = []
-        if raw_usages.count == 1 && raw_usages.first.data_protection.id == Spaceship::ConnectAPI::AppDataUsageDataProtection::ID::DATA_NOT_COLLECTED
+        if raw_usages.one? && raw_usages.first.data_protection.id == Spaceship::ConnectAPI::AppDataUsageDataProtection::ID::DATA_NOT_COLLECTED
           usages_config << {
             "data_protections" => [Spaceship::ConnectAPI::AppDataUsageDataProtection::ID::DATA_NOT_COLLECTED]
           }

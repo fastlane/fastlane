@@ -52,9 +52,8 @@ module Precheck
     end
 
     def hashed_curse_word_set
-      curse_hashes = []
-      File.open(File.dirname(__FILE__) + '/rules_data/curse_word_hashes/en_us.txt').each do |line|
-        curse_hashes << line.to_s.strip
+      curse_hashes = File.open(File.dirname(__FILE__) + '/rules_data/curse_word_hashes/en_us.txt').map do |line|
+        line.to_s.strip
       end
       return curse_hashes.to_set
     end

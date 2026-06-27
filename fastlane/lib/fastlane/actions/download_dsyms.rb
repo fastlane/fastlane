@@ -140,7 +140,7 @@ module Fastlane
           end
         end
 
-        if dsym_urls.count == 0
+        if dsym_urls.none?
           UI.message("No dSYM URL for #{build.version} (#{build.app_version})")
         else
           dsym_urls.each do |url|

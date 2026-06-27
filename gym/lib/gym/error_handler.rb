@@ -170,7 +170,7 @@ module Gym
 
         export_options = Gym.config[:export_options] || {}
         provisioning_profiles = export_options[:provisioningProfiles] || []
-        if provisioning_profiles.count == 0
+        if provisioning_profiles.none?
           UI.error("Looks like no provisioning profile mapping was provided")
           UI.error("Please check the complete output, in particular the very top")
           UI.error("and see if you can find more information. You can also run fastlane")

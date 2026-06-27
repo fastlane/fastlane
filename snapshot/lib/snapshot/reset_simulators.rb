@@ -76,7 +76,7 @@ module Snapshot
     end
 
     def self.filter_runtimes(all_runtimes, os = 'iOS', versions = [])
-      all_runtimes.select { |v, id| v[/^#{os}/] }.select { |v, id| v[/#{versions.join("|")}$/] }.uniq
+      all_runtimes.select { |v, id| v[/^#{os}/] }.select { |v, id| v[/#{versions.join('|')}$/] }.uniq
     end
 
     def self.devices

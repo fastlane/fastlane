@@ -19,7 +19,7 @@ module Frameit
     @frames_version = "latest"
 
     config_files = Dir["./**/Framefile.json"]
-    if config_files.count > 0
+    if config_files.any?
       config = ConfigParser.new.load(config_files.first)
       if config.data["device_frame_version"].to_s.length > 0
         @frames_version = config.data["device_frame_version"]

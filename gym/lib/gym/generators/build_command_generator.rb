@@ -25,7 +25,7 @@ module Gym
       # @return [Array] The array with all the components to join
       def project_path_array
         proj = Gym.project.xcodebuild_parameters
-        return proj if proj.count > 0
+        return proj if proj.any?
         UI.user_error!("No project/workspace found")
       end
 

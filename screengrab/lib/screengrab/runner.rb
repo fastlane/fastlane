@@ -11,7 +11,6 @@ module Screengrab
     def initialize(executor = FastlaneCore::CommandExecutor,
                    config = Screengrab.config,
                    android_env = Screengrab.android_environment)
-
       @executor = executor
       @config = config
       @android_env = android_env

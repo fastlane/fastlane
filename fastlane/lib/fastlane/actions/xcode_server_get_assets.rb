@@ -35,7 +35,7 @@ module Fastlane
 
         # match the bot name with a found bot, otherwise fail
         found_bots = bots.select { |bot| bot['name'] == bot_name }
-        UI.user_error!("Failed to find a Bot with name #{bot_name} on server #{host}, only available Bots: #{bot_names}") if found_bots.count == 0
+        UI.user_error!("Failed to find a Bot with name #{bot_name} on server #{host}, only available Bots: #{bot_names}") if found_bots.none?
 
         bot = found_bots[0]
 
@@ -43,7 +43,7 @@ module Fastlane
 
         # we have our bot, get finished integrations, sorted from newest to oldest
         integrations = xcs.fetch_integrations(bot['_id']).select { |i| i['currentStep'] == 'completed' }
-        UI.user_error!("Failed to find any completed integration for Bot \"#{bot_name}\"") if (integrations || []).count == 0
+        UI.user_error!("Failed to find any completed integration for Bot \"#{bot_name}\"") if (integrations || []).none?
 
         # if no integration number is specified, pick the newest one (this is sorted from newest to oldest)
         if integration_number_override

@@ -531,7 +531,7 @@ module Deliver
       languages = (languages || []).reject { |lang| lang == "default" }
       locales_to_enable = languages - localizations.map(&:locale)
 
-      if locales_to_enable.count > 0
+      if locales_to_enable.any?
         lng_text = "language"
         lng_text += "s" if locales_to_enable.count != 1
         Helper.show_loading_indicator("Activating info #{lng_text} #{locales_to_enable.join(', ')}...")
@@ -566,7 +566,7 @@ module Deliver
       languages = (languages || []).reject { |lang| lang == "default" }
       locales_to_enable = languages - localizations.map(&:locale)
 
-      if locales_to_enable.count > 0
+      if locales_to_enable.any?
         lng_text = "language"
         lng_text += "s" if locales_to_enable.count != 1
         Helper.show_loading_indicator("Activating version #{lng_text} #{locales_to_enable.join(', ')}...")

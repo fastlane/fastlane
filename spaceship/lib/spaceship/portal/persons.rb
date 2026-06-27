@@ -27,9 +27,8 @@ module Spaceship
           if invitees.kind_of?(Hash)
             return Spaceship::Portal::Invite.factory(invitees)
           end
-          final_invitees = []
-          invitees.each do |invitee|
-            final_invitees << Spaceship::Portal::Invite.factory(invitee)
+          final_invitees = invitees.map do |invitee|
+            Spaceship::Portal::Invite.factory(invitee)
           end
           return final_invitees
         end

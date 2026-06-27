@@ -18,7 +18,7 @@ module Fastlane
         # Defaulting to mac specific values
         params[:catalyst_platform] = "macos"
 
-        super(params)
+        super
       end
 
       #####################################################

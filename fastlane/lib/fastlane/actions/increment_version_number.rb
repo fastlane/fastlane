@@ -65,7 +65,7 @@ module Fastlane
             version_array[2] = 0 if version_array[2]
             next_version_number = version_array.join(".")
           when "major"
-            UI.user_error!(version_token_error) if version_array.count == 0
+            UI.user_error!(version_token_error) if version_array.none?
             version_array[0] = version_array[0] + 1
             version_array[1] = 0 if version_array[1]
             version_array[2] = 0 if version_array[2]

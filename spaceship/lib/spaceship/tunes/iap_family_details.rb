@@ -51,9 +51,8 @@ module Spaceship
           # input that comes from iTC api
           return
         end
-        new_versions = []
-        value.each do |language, current_version|
-          new_versions << {
+        new_versions = value.map do |language, current_version|
+          {
             "value" =>   {
               "subscriptionName" =>  { "value" => current_version[:subscription_name] },
               "name" =>  { "value" => current_version[:name] },
@@ -69,9 +68,8 @@ module Spaceship
       # modify existing family
       def save!
         # Transform localization versions back to original format.
-        versions_array = []
-        versions.each do |language_code, value|
-          versions_array << {
+        versions_array = versions.map do |language_code, value|
+          {
                                "value" => {
                                  "subscriptionName" => { "value" => value[:subscription_name] },
                                  "name" => { "value" => value[:name] },

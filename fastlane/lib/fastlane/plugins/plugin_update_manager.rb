@@ -20,7 +20,7 @@ module Fastlane
       # We set self.server_results to be nil
       # this way the table is not printed twice
       # (next to the summary table or when an exception happens)
-      return unless self.server_results.count > 0
+      return unless self.server_results.any?
 
       rows = []
       self.plugin_references.each do |plugin_name, current_plugin|

@@ -142,7 +142,7 @@ module Gym
     # Makes sure the archive is there and valid
     def verify_archive
       # from https://github.com/fastlane/fastlane/issues/3179
-      if (Dir[BuildCommandGenerator.archive_path + "/*"]).count == 0
+      if (Dir[BuildCommandGenerator.archive_path + "/*"]).none?
         ErrorHandler.handle_empty_archive
       end
     end

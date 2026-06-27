@@ -34,7 +34,7 @@ module Fastlane
       puts(Terminal::Table.new(params))
       puts("")
 
-      if plugins.count == 1
+      if plugins.one?
         print_plugin_details(plugins.last)
       end
     end

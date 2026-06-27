@@ -71,8 +71,8 @@ module Snapshot
           end
         end
       end
-      launcher_config.devices.each_with_object({}) do |device, results_hash|
-        results_hash[device] = languages_finished
+      launcher_config.devices.to_h do |device|
+        [device, languages_finished]
       end
     end
 

@@ -35,7 +35,7 @@ module Frameit
     def frames_exist?(version: "latest")
       version_path = File.join(templates_path, "version.txt")
       version = File.read(version_path) if File.exist?(version_path)
-      Dir["#{templates_path}/*.png"].count > 0 && version.to_i > 0
+      Dir["#{templates_path}/*.png"].any? && version.to_i > 0
     end
 
     def self.templates_path

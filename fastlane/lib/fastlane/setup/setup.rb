@@ -71,14 +71,14 @@ module Fastlane
       # Currently we prefer iOS app projects, as the `init` process is
       # more intelligent and does more things. The user can easily add
       # the `:android` platform to the resulting Fastfile
-      if ios_projects.count > 0
+      if ios_projects.any?
         current_directory = ios_projects.find_all do |current_project_path|
-          current_project_path.split(File::Separator).count == 1
+          current_project_path.split(File::Separator).one?
         end
         chosen_project = nil
         had_multiple_projects_to_choose_from = false
 
-        if current_directory.count == 1
+        if current_directory.one?
           chosen_project = current_directory.first
         elsif current_directory.count > 1
           if current_directory.count == 2
@@ -110,7 +110,7 @@ module Fastlane
           project_path: chosen_project,
           had_multiple_projects_to_choose_from: had_multiple_projects_to_choose_from
         ).setup_ios
-      elsif android_projects.count > 0
+      elsif android_projects.any?
         UI.message("Detected an Android project in the current directory...")
         SetupAndroid.new.setup_android
       else

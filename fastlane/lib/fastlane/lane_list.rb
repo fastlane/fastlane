@@ -78,7 +78,7 @@ module Fastlane
       all_keys.unshift(nil) # because we want root elements on top. always! They have key nil
 
       all_keys.each do |platform|
-        next if (lanes[platform] || []).count == 0
+        next if (lanes[platform] || []).none?
 
         plat_text = platform
         plat_text = "general" if platform.to_s.empty?
@@ -91,7 +91,7 @@ module Fastlane
           next if lane.is_private
 
           output += "----- fastlane #{lane.pretty_name}".green
-          if lane.description.count > 0
+          if lane.description.any?
             output += "\n" + lane.description.join("\n") + "\n\n"
           else
             output += "\n\n"
@@ -115,7 +115,7 @@ module Fastlane
       all_keys = ff.runner.lanes.keys
 
       all_keys.each do |platform|
-        next if (ff.runner.lanes[platform] || []).count == 0
+        next if (ff.runner.lanes[platform] || []).none?
 
         output[platform] ||= {}
 

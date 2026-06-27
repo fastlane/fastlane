@@ -46,6 +46,6 @@ class String
     return self[0..length] if length < omission.length
     len = (length - omission.length) / 2
     s_len = len - length % 2
-    self[0..s_len] + omission + self[self.length - len..self.length]
+    self[0..s_len] + omission + self[(self.length - len)..self.length]
   end
 end

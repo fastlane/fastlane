@@ -24,7 +24,7 @@ module Fastlane
           current << action.description.to_s.remove_markdown if action.description
 
           authors = Array(action.author || action.authors)
-          current << authors.first.green if authors.count == 1
+          current << authors.first.green if authors.one?
           current << "Multiple".green if authors.count > 1
         else
           UI.error(action_subclass_error(name))

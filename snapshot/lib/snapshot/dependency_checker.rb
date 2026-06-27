@@ -42,7 +42,7 @@ module Snapshot
 
     def self.check_simulators
       FastlaneCore::UI.verbose("Found #{FastlaneCore::Simulator.all.count} simulators.")
-      if FastlaneCore::Simulator.all.count == 0
+      if FastlaneCore::Simulator.all.none?
         FastlaneCore::UI.error('#############################################################')
         FastlaneCore::UI.error("# You have to add new simulators using Xcode")
         FastlaneCore::UI.error("# You can let snapshot create new simulators: 'fastlane snapshot reset_simulators'")

@@ -228,7 +228,7 @@ module Spaceship
 
     # see `sms_fallback` + account has only one trusted number for receiving an sms
     def sms_automatically_sent(response)
-      (response.body["trustedPhoneNumbers"] || []).count == 1 && sms_fallback(response)
+      (response.body["trustedPhoneNumbers"] || []).one? && sms_fallback(response)
     end
 
     # extracted into its own method for testing

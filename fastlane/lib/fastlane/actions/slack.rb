@@ -12,7 +12,7 @@ module Fastlane
         end
 
         def run(options)
-          options[:message] = self.class.trim_message(options[:message].to_s || '')
+          options[:message] = self.class.trim_message(options[:message].to_s)
           options[:message] = Fastlane::Notification::Slack::LinkConverter.convert(options[:message])
 
           options[:pretext] = options[:pretext].gsub('\n', "\n") unless options[:pretext].nil?

@@ -19,7 +19,7 @@ end
 
 input_file = ARGV.shift
 
-if ARGV.count > 0
+if ARGV.any?
   output_file = ARGV.shift
 else
   output_file = input_file

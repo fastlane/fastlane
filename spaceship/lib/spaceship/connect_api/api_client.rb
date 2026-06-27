@@ -1,9 +1,9 @@
 
 require_relative '../client'
-require_relative './response'
+require_relative 'response'
 require_relative '../client'
-require_relative './response'
-require_relative './token_refresh_middleware'
+require_relative 'response'
+require_relative 'token_refresh_middleware'
 
 require_relative '../stats_middleware'
 

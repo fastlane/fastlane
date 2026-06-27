@@ -57,12 +57,12 @@ module Match
         files_to_delete ||= []
         files_to_delete -= files_to_commit # Make sure we are not removing added files.
 
-        if files_to_commit.count == 0 && files_to_delete.count == 0
+        if files_to_commit.none? && files_to_delete.none?
           UI.user_error!("Neither `files_to_commit` nor `files_to_delete` were provided to the `save_changes!` method call")
         end
 
         Dir.chdir(File.expand_path(self.working_directory)) do
-          if files_to_commit.count > 0 # everything that isn't `match nuke`
+          if files_to_commit.any? # everything that isn't `match nuke`
             if !File.exist?(MATCH_VERSION_FILE_NAME) || File.read(MATCH_VERSION_FILE_NAME) != Fastlane::VERSION.to_s
               files_to_commit << MATCH_VERSION_FILE_NAME
               File.write(MATCH_VERSION_FILE_NAME, Fastlane::VERSION) # stored unencrypted
@@ -79,7 +79,7 @@ module Match
             UI.message("Finished uploading files to #{self.human_readable_description}")
           end
 
-          if files_to_delete.count > 0
+          if files_to_delete.any?
             self.delete_files(files_to_delete: files_to_delete, custom_message: custom_message)
             UI.message("Finished deleting files from #{self.human_readable_description}")
           end

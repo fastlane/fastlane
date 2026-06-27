@@ -6,11 +6,9 @@ module Spaceship
       class << self
         def all
           response = client.members
-          return_members = []
-          response.each  do |member|
-            return_members << Tunes::Member.factory(member)
+          response.map do |member|
+            Tunes::Member.factory(member)
           end
-          return_members
         end
 
         def find(email)

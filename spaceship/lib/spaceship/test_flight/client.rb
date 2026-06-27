@@ -187,14 +187,14 @@ module Spaceship
         next_link = link_from_response.call(response)
         result = Array(handle_response(response))
         resulting_array += result
-        return resulting_array if result.count == 0
+        return resulting_array if result.none?
 
         until next_link.nil?
           response = request(:get, next_link)
           result = Array(handle_response(response))
           next_link = link_from_response.call(response)
 
-          break if result.count == 0
+          break if result.none?
 
           resulting_array += result
         end

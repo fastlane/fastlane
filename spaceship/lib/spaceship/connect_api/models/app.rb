@@ -1,5 +1,5 @@
 require_relative '../model'
-require_relative './build'
+require_relative 'build'
 
 # rubocop:disable Metrics/ClassLength
 module Spaceship

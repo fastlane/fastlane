@@ -8,7 +8,7 @@ module Fastlane
         UI.user_error!("Missing environment variable(s) '#{missing_variables.join('\', \'')}'") unless missing_variables.empty?
 
         is_one = variables.length == 1
-        UI.success("Environment variable#{is_one ? '' : 's'} '#{variables.join('\', \'')}' #{is_one ? 'is' : 'are'} set!")
+        UI.success("Environment variable#{'s' unless is_one} '#{variables.join('\', \'')}' #{is_one ? 'is' : 'are'} set!")
       end
 
       def self.description

@@ -1,6 +1,6 @@
 require_relative 'helper'
 require 'xcodeproj'
-require_relative './configuration/configuration'
+require_relative 'configuration/configuration'
 require 'fastlane_core/command_executor'
 
 module FastlaneCore
@@ -148,7 +148,7 @@ module FastlaneCore
 
       return if options[:scheme].to_s.length > 0
 
-      if schemes.count == 1
+      if schemes.one?
         options[:scheme] = schemes.last
       elsif schemes.count > 1
         preferred = nil
@@ -156,7 +156,7 @@ module FastlaneCore
           preferred = schemes.find_all { |a| a.downcase.include?(preferred_to_include.downcase) }
         end
 
-        if preferred_to_include && preferred.count == 1
+        if preferred_to_include && preferred.one?
           options[:scheme] = preferred.last
         elsif automated_scheme_selection? && schemes.include?(project_name)
           UI.important("Using scheme matching project name (#{project_name}).")
@@ -413,7 +413,7 @@ module FastlaneCore
     def build_settings(key: nil, optional: true)
       unless @build_settings
         if is_workspace
-          if schemes.count == 0
+          if schemes.none?
             UI.user_error!("Could not find any schemes for Xcode workspace at path '#{self.path}'. Please make sure that the schemes you want to use are marked as `Shared` from Xcode.")
           end
           options[:scheme] ||= schemes.first

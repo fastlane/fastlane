@@ -45,7 +45,7 @@ module Match
         FastlaneCore::CommanderGenerator.new.generate(Match::Options.available_options, command: c)
 
         c.action do |args, options|
-          if args.count > 0
+          if args.any?
             FastlaneCore::UI.user_error!("Please run `fastlane match [type]`, allowed values: development, adhoc, enterprise  or appstore")
           end
 

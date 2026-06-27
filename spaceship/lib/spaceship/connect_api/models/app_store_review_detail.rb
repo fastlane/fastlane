@@ -1,5 +1,5 @@
 require_relative '../model'
-require_relative './app_store_review_attachment'
+require_relative 'app_store_review_attachment'
 
 module Spaceship
   class ConnectAPI

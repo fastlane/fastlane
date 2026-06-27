@@ -1,6 +1,6 @@
 require_relative '../model'
-require_relative './app_preview_set'
-require_relative './app_screenshot_set'
+require_relative 'app_preview_set'
+require_relative 'app_screenshot_set'
 require_relative '../../errors'
 
 module Spaceship

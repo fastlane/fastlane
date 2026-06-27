@@ -85,69 +85,69 @@ module CredentialsManager
     # Setters
 
     # iOS
-    def app_identifier(*args, &block)
-      setter(:app_identifier, *args, &block)
+    def app_identifier(...)
+      setter(:app_identifier, ...)
     end
 
-    def apple_id(*args, &block)
-      setter(:apple_id, *args, &block)
+    def apple_id(...)
+      setter(:apple_id, ...)
     end
 
-    def apple_dev_portal_id(*args, &block)
-      setter(:apple_dev_portal_id, *args, &block)
+    def apple_dev_portal_id(...)
+      setter(:apple_dev_portal_id, ...)
     end
 
-    def itunes_connect_id(*args, &block)
-      setter(:itunes_connect_id, *args, &block)
+    def itunes_connect_id(...)
+      setter(:itunes_connect_id, ...)
     end
 
     # Developer Portal
-    def team_id(*args, &block)
-      setter(:team_id, *args, &block)
+    def team_id(...)
+      setter(:team_id, ...)
     end
 
-    def team_name(*args, &block)
-      setter(:team_name, *args, &block)
+    def team_name(...)
+      setter(:team_name, ...)
     end
 
     # App Store Connect
-    def itc_team_id(*args, &block)
-      setter(:itc_team_id, *args, &block)
+    def itc_team_id(...)
+      setter(:itc_team_id, ...)
     end
 
-    def itc_team_name(*args, &block)
-      setter(:itc_team_name, *args, &block)
+    def itc_team_name(...)
+      setter(:itc_team_name, ...)
     end
 
-    def itc_provider(*args, &block)
-      setter(:itc_provider, *args, &block)
+    def itc_provider(...)
+      setter(:itc_provider, ...)
     end
 
-    def provider_public_id(*args, &block)
-      setter(:provider_public_id, *args, &block)
+    def provider_public_id(...)
+      setter(:provider_public_id, ...)
     end
 
     # Android
-    def json_key_file(*args, &block)
-      setter(:json_key_file, *args, &block)
+    def json_key_file(...)
+      setter(:json_key_file, ...)
     end
 
-    def json_key_data_raw(*args, &block)
-      setter(:json_key_data_raw, *args, &block)
+    def json_key_data_raw(...)
+      setter(:json_key_data_raw, ...)
     end
 
-    def issuer(*args, &block)
+    def issuer(...)
       puts("Appfile: DEPRECATED issuer: use json_key_file instead".red)
-      setter(:issuer, *args, &block)
+      setter(:issuer, ...)
     end
 
-    def package_name(*args, &block)
-      setter(:package_name, *args, &block)
+    def package_name(...)
+      setter(:package_name, ...)
     end
 
-    def keyfile(*args, &block)
+    def keyfile(...)
       puts("Appfile: DEPRECATED keyfile: use json_key_file instead".red)
-      setter(:keyfile, *args, &block)
+      setter(:keyfile, ...)
     end
 
     # Override Appfile configuration for a specific lane.

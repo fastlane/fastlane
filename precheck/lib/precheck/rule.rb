@@ -46,7 +46,6 @@ module Precheck
                    deprecated: nil,
                    sensitive: nil,
                    display_in_shell: nil)
-
       super(key: self.class.key,
             env_name: self.class.env_name,
             description: self.class.description,

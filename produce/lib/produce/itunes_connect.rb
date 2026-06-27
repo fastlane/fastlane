@@ -38,7 +38,7 @@ module Produce
         end
 
         # Produce.config[:itc_users]
-        application = Spaceship::ConnectAPI::App.create(
+        Spaceship::ConnectAPI::App.create(
           name: Produce.config[:app_name],
           version_string: Produce.config[:app_version] || "1.0",
           sku: Produce.config[:sku].to_s,
@@ -71,7 +71,7 @@ module Produce
         # Add users to app
         unless user_ids.empty?
           application.add_users(user_ids: user_ids)
-          UI.message("Successfully added #{user_ids.size} #{user_ids.count == 1 ? 'user' : 'users'} to app")
+          UI.message("Successfully added #{user_ids.size} #{user_ids.one? ? 'user' : 'users'} to app")
         end
 
         UI.success("Successfully created new app '#{Produce.config[:app_name]}' on App Store Connect with ID #{application.id}")

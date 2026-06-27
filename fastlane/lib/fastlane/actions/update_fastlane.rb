@@ -39,7 +39,7 @@ module Fastlane
         highest_versions = updater.highest_installed_gems.keep_if { |key| tools_to_update.include?(key) }
         update_needed = updater.which_to_update(highest_versions, tools_to_update)
 
-        if update_needed.count == 0
+        if update_needed.none?
           UI.success("Nothing to update ✅")
           return
         end

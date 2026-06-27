@@ -19,7 +19,7 @@ module Fastlane
         # Defaulting to ios specific values
         params[:catalyst_platform] = "ios"
 
-        super(params)
+        super
       end
 
       #####################################################

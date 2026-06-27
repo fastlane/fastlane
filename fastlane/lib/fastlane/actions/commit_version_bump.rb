@@ -39,7 +39,7 @@ module Fastlane
           xcodeproj_paths = Fastlane::Helper::XcodeprojHelper.find(repo_path)
 
           # no projects found: error
-          UI.user_error!('Could not find a .xcodeproj in the current repository\'s working directory.') if xcodeproj_paths.count == 0
+          UI.user_error!('Could not find a .xcodeproj in the current repository\'s working directory.') if xcodeproj_paths.none?
 
           # too many projects found: error
           if xcodeproj_paths.count > 1

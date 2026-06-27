@@ -36,8 +36,8 @@ module Spaceship
           reader = value.to_sym
           writer = "#{value}=".to_sym
 
-          has_reader = instance_methods.include?(reader)
-          has_writer = instance_methods.include?(writer)
+          has_reader = method_defined?(reader)
+          has_writer = method_defined?(writer)
 
           send(:attr_reader, value) unless has_reader
           send(:attr_writer, value) unless has_writer

@@ -5,7 +5,7 @@ require 'google/cloud/storage'
 require_relative '../options'
 require_relative '../module'
 require_relative '../spaceship_ensure'
-require_relative './interface'
+require_relative 'interface'
 
 module Match
   module Storage

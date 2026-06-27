@@ -26,9 +26,8 @@ module Deliver
       end
 
       localizations = version.get_app_store_version_localizations
-      threads = []
-      localizations.each do |localization|
-        threads << Thread.new do
+      threads = localizations.map do |localization|
+        Thread.new do
           download_screenshots(folder_path, localization)
         end
       end

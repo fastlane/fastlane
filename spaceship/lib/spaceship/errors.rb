@@ -81,7 +81,7 @@ module Spaceship
     attr_reader :error_info
 
     def initialize(error_info = nil)
-      super(error_info)
+      super
       @error_info = error_info
     end
 

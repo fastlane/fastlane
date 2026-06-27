@@ -2,7 +2,7 @@ require "fastlane_core/core_ext/cfpropertylist"
 
 describe "Extension to CFPropertyList" do
   let(:array) { [1, 2, 3] }
-  let(:hash) { ["key" => "value"] }
+  let(:hash) { [{ "key" => "value" }] }
 
   it "adds a #to_binary_plist method to Array" do
     expect(array).to respond_to(:to_binary_plist)

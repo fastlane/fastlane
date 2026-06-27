@@ -1,6 +1,6 @@
 require_relative '../model'
-require_relative './actor'
-require_relative './review_rejection'
+require_relative 'actor'
+require_relative 'review_rejection'
 
 module Spaceship
   class ConnectAPI

@@ -71,8 +71,8 @@ module RuboCop
       end
 
       def has_output_method?(node)
-        return if node.nil?
-        return if self.shared_values_constants.empty?
+        return false if node.nil?
+        return false if self.shared_values_constants.empty?
 
         if node.defs_type? # A single method
           add_offense(node, location: :expression, message: MISSING_OUTPUT_METHOD_MSG) unless output_method?(node)

@@ -39,6 +39,7 @@ module Trainer
 
       # Allows iteration over test suites. Used by TestParser to collect test results
       include Enumerable
+
       def each(&block)
         test_suites.map { |suite| suite.to_hash(output_remove_retry_attempts: output_remove_retry_attempts) }.each(&block)
       end
@@ -82,7 +83,7 @@ module Trainer
         doc.add(testsuites)
 
         formatter = REXML::Formatters::Pretty.new
-        output = String.new
+        output = ''
         formatter.write(doc, output)
         output
       end

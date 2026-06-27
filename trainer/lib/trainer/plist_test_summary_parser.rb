@@ -36,7 +36,7 @@ module Trainer
             end
           }
           summary_row[:number_of_tests] = summary_row[:tests].count
-          summary_row[:number_of_failures] = summary_row[:tests].find_all { |a| (a[:failures] || []).count > 0 }.count
+          summary_row[:number_of_failures] = summary_row[:tests].find_all { |a| (a[:failures] || []).any? }.count
 
           # Makes sure that plist support matches data output of xcresult
           summary_row[:number_of_tests_excluding_retries] = summary_row[:number_of_tests]

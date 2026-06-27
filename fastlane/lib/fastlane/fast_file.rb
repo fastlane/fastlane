@@ -167,7 +167,7 @@ module Fastlane
     def is_platform_block?(key)
       UI.crash!('No key given') unless key
 
-      return false if self.runner.lanes.fetch(nil, {}).fetch(key.to_sym, nil)
+      return false if self.runner.lanes.dig(nil, key.to_sym)
       return true if self.runner.lanes[key.to_sym].kind_of?(Hash)
 
       if key.to_sym == :update
@@ -200,7 +200,7 @@ module Fastlane
     def sh(*args, &b)
       # First accepts hash (or named keywords) like other actions
       # Otherwise uses sh method that doesn't have an interface like an action
-      if args.count == 1 && args.first.kind_of?(Hash)
+      if args.one? && args.first.kind_of?(Hash)
         options = args.first
         command = options.delete(:command)
 
@@ -376,7 +376,7 @@ module Fastlane
           unless is_eligible_for_caching
             # We also want to check out all the local actions of this fastlane setup
             containing = path.split(File::SEPARATOR)[0..-2]
-            containing = "." if containing.count == 0
+            containing = "." if containing.none?
             actions_folder = File.join(containing, "actions")
             begin
               Actions.sh("cd #{clone_folder.shellescape} && git checkout #{checkout_param.shellescape} #{actions_folder.shellescape}")

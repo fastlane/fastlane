@@ -136,7 +136,7 @@ module Snapshot
         # it is iOS or tvOS, therefore, if there is more than 1
         # device in the array, and they are not all iOS or tvOS
         # as checked above, that would imply that this is a mixed bag
-        return devices.count == 1
+        return devices.one?
       end
 
       private

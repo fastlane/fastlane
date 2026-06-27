@@ -38,7 +38,7 @@ module Deliver
       languages = screenshots_per_language.keys
       locales_to_enable = languages - localizations.map(&:locale)
 
-      if locales_to_enable.count > 0
+      if locales_to_enable.any?
         lng_text = "language"
         lng_text += "s" if locales_to_enable.count != 1
         Helper.show_loading_indicator("Activating #{lng_text} #{locales_to_enable.join(', ')}...")

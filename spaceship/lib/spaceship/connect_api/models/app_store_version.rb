@@ -1,6 +1,6 @@
 require_relative '../model'
-require_relative './app_store_review_detail'
-require_relative './app_store_version_localization'
+require_relative 'app_store_review_detail'
+require_relative 'app_store_version_localization'
 
 module Spaceship
   class ConnectAPI

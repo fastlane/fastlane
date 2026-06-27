@@ -20,7 +20,7 @@ module Fastlane
         # Else from GRADLE_AAB_OUTPUT_PATH
         if params[:aab].nil?
           all_aab_paths = Actions.lane_context[SharedValues::GRADLE_ALL_AAB_OUTPUT_PATHS] || []
-          if all_aab_paths.count == 1
+          if all_aab_paths.one?
             params[:aab] = all_aab_paths.first
           else
             params[:aab] = Actions.lane_context[SharedValues::GRADLE_AAB_OUTPUT_PATH]

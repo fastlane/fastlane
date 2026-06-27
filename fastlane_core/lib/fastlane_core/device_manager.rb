@@ -40,7 +40,7 @@ module FastlaneCore
           UI.user_error!("xcrun simctl not working.")
         end
 
-        output.split(/\n/).each do |line|
+        output.split("\n").each do |line|
           next if line =~ /unavailable/
           next if line =~ /^== /
           if line =~ /^-- /
@@ -78,7 +78,7 @@ module FastlaneCore
                        end
 
         devices = [] # Return early if no supported devices are being searched for
-        if device_types.count == 0
+        if device_types.none?
           return devices
         end
 
@@ -92,13 +92,13 @@ module FastlaneCore
 
         discover_devices(result[0], device_types, device_uuids) if result[0]
 
-        if device_uuids.count > 0 # instruments takes a little while to return so skip it if we have no devices
+        if device_uuids.any? # instruments takes a little while to return so skip it if we have no devices
           instruments_devices_output = ''
           Open3.popen3("instruments -s devices") do |stdin, stdout, stderr, wait_thr|
             instruments_devices_output = stdout.read
           end
 
-          instruments_devices_output.split(/\n/).each do |instruments_device|
+          instruments_devices_output.split("\n").each do |instruments_device|
             device_uuids.each do |device_uuid|
               match = instruments_device.match(/(.+) \(([0-9.]+)\) \[(\h{40}|\h{8}-\h{16})\]?/)
               if match && match[3].delete("-") == device_uuid

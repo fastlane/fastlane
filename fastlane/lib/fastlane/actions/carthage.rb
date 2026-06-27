@@ -9,11 +9,11 @@ module Fastlane
         command_name = params[:command]
         cmd << command_name
 
-        if command_name == "archive" && params[:frameworks].count > 0
+        if command_name == "archive" && params[:frameworks].any?
           cmd.concat(params[:frameworks])
         # "update", "build" and "bootstrap" are the only commands that support "--derived-data" parameter
         elsif ["update", "build", "bootstrap"].include?(command_name)
-          cmd.concat(params[:dependencies]) if params[:dependencies].count > 0
+          cmd.concat(params[:dependencies]) if params[:dependencies].any?
           cmd << "--derived-data #{params[:derived_data].shellescape}" if params[:derived_data]
         end
 
@@ -42,7 +42,7 @@ module Fastlane
 
       def self.validate(params)
         command_name = params[:command]
-        if command_name != "archive" && params[:frameworks].count > 0
+        if command_name != "archive" && params[:frameworks].any?
           UI.user_error!("Frameworks option is available only for 'archive' command.")
         end
         if command_name != "archive" && params[:output]

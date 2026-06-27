@@ -1,6 +1,6 @@
 require_relative '../model'
 require_relative '../file_uploader'
-require_relative './app_screenshot_set'
+require_relative 'app_screenshot_set'
 require 'spaceship/globals'
 
 require 'digest/md5'

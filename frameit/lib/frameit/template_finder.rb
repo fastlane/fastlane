@@ -16,14 +16,14 @@ module Frameit
       UI.verbose("Looking for #{filename} and found #{templates.count} template(s)")
 
       return filename if Helper.test?
-      if templates.count == 0 && !screenshot.color.nil? && screenshot.color != screenshot.default_color
+      if templates.none? && !screenshot.color.nil? && screenshot.color != screenshot.default_color
         filename = create_file_name(screenshot.device_name, screenshot.default_color)
         UI.important("Unfortunately device type '#{screenshot.device_name}' is not available in #{screenshot.color}, falling back to " + (screenshot.default_color.nil? ? "default" : screenshot.default_color) + "...")
         templates = Dir["#{FrameDownloader.templates_path}/#{filename}.{png,jpg}"] # ~/.frameit folder
         UI.verbose("Looking for #{filename} and found #{templates.count} template(s)")
       end
 
-      if templates.count == 0
+      if templates.none?
         if screenshot.deliver_screen_id == DEVICE_SCREEN_IDS[DisplayType::APP_IPHONE_35]
           UI.important("Unfortunately 3.5\" device frames were discontinued. Skipping screen '#{screenshot.path}'")
           UI.error("Looked for: '#{filename}.png'")

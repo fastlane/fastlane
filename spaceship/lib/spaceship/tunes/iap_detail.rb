@@ -94,9 +94,8 @@ module Spaceship
           # input that comes from iTC api
           return
         end
-        new_versions = []
-        value.each do |language, current_version|
-          new_versions << {
+        new_versions = value.map do |language, current_version|
+          {
             "value" =>   {
               "name" =>  { "value" => current_version[:name] },
               "description" =>  { "value" => current_version[:description] },
@@ -164,9 +163,8 @@ module Spaceship
       # Saves the current In-App-Purchase
       def save!
         # Transform localization versions back to original format.
-        versions_array = []
-        versions.each do |language, value|
-          versions_array << {
+        versions_array = versions.map do |language, value|
+          {
                     "value" =>  {
                       "description" => { "value" => value[:description] },
                       "name" => { "value" => value[:name] },

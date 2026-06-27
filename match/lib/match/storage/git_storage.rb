@@ -1,7 +1,7 @@
 require 'fastlane_core/command_executor'
 
 require_relative '../module'
-require_relative './interface'
+require_relative 'interface'
 
 module Match
   module Storage
@@ -140,7 +140,7 @@ module Match
       end
 
       def delete_files(files_to_delete: [], custom_message: nil)
-        if files_to_delete.count > 0
+        if files_to_delete.any?
           commands = files_to_delete.map { |filename|  "git --literal-pathspecs rm -- #{filename.shellescape}" }
           git_push(commands: commands, commit_message: custom_message)
         end
@@ -216,7 +216,7 @@ module Match
 
       # Checks if a specific branch exists in the git repo
       def branch_exists?(branch)
-        return unless self.working_directory
+        return false unless self.working_directory
 
         result = Dir.chdir(self.working_directory) do
           FastlaneCore::CommandExecutor.execute(command: "git --no-pager branch --list origin/#{branch.shellescape} --no-color -r",

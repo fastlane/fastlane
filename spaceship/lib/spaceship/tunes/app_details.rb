@@ -94,37 +94,37 @@ module Spaceship
       def primary_category=(value)
         value = prefix_apps(value)
         value = prefix_mzgenre(value)
-        super(value)
+        super
       end
 
       def primary_first_sub_category=(value)
         value = prefix_apps(value)
         value = prefix_mzgenre(value)
-        super(value)
+        super
       end
 
       def primary_second_sub_category=(value)
         value = prefix_apps(value)
         value = prefix_mzgenre(value)
-        super(value)
+        super
       end
 
       def secondary_category=(value)
         value = prefix_apps(value)
         value = prefix_mzgenre(value)
-        super(value)
+        super
       end
 
       def secondary_first_sub_category=(value)
         value = prefix_apps(value)
         value = prefix_mzgenre(value)
-        super(value)
+        super
       end
 
       def secondary_second_sub_category=(value)
         value = prefix_apps(value)
         value = prefix_mzgenre(value)
-        super(value)
+        super
       end
 
       #####################################################

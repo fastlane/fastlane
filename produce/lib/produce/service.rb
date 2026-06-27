@@ -64,7 +64,7 @@ module Produce
                       :wireless_accessory, :driver_kit, :driver_kit_endpoint_security, :driver_kit_family_hid_device, :driver_kit_family_networking, :driver_kit_family_serial,
                       :driver_kit_hid_event_service, :driver_kit_transport_hid, :multitasking_camera_access, :sf_universal_link_api, :vp9_decoder, :music_kit, :shazam_kit,
                       :communication_notifications, :group_activities, :health_kit_estimate_recalibration, :time_sensitive_notifications]
-      options.__hash__.select { |key, value| allowed_keys.include?(key) }
+      options.__hash__.slice(*allowed_keys)
     end
 
     # @return (Hash) Settings configuration for a key-settings combination

@@ -21,7 +21,7 @@ module Fastlane
         # Allows adding of additional multiple dsym_paths since :dsym_path can be autoset by other actions
         dsym_paths += params[:dsym_paths] if params[:dsym_paths]
 
-        if dsym_paths.count == 0
+        if dsym_paths.none?
           UI.error("Couldn't find any dSYMs, please pass them using the dsym_path option")
           return nil
         end

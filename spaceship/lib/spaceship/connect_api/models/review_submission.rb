@@ -1,5 +1,5 @@
 require_relative '../model'
-require_relative './review_submission_item'
+require_relative 'review_submission_item'
 
 module Spaceship
   class ConnectAPI

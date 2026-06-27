@@ -79,7 +79,9 @@ module Fastlane
         end
 
         if params[:proj] || has_config_file?(params)
+          # rubocop:disable Lint/Void
           true
+          # rubocop:enable Lint/Void
         else
           UI.user_error!("You have to provide a project with `:proj` or use a .slather.yml")
         end

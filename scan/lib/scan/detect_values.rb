@@ -39,7 +39,7 @@ module Scan
       end
 
       devices = Scan.config[:devices] || Array(Scan.config[:device]) # important to use Array(nil) for when the value is nil
-      if devices.count > 0
+      if devices.any?
         detect_simulator(devices, '', '', '', nil)
       elsif Scan.project
         if Scan.project.ios?
@@ -227,9 +227,9 @@ module Scan
           display_device = "'#{device_string}'"
 
           set + (
-            if pieces.count == 0
+            if pieces.none?
               [] # empty array
-            elsif pieces.count == 1
+            elsif pieces.one?
               [ highest_compatible_simulator(simulators, pieces.first) ].compact
             else # pieces.count == 2 -- mathematically, because of the 'end of line' part of our regular expression
               version = pieces[1].tr('()', '')
@@ -257,7 +257,7 @@ module Scan
 
       unless Scan.config[:skip_detect_devices]
         default = lambda do
-          UI.error("Couldn't find any matching simulators for '#{devices}' - falling back to default simulator") if (devices || []).count > 0
+          UI.error("Couldn't find any matching simulators for '#{devices}' - falling back to default simulator") if (devices || []).any?
 
           result = [ highest_compatible_simulator(simulators, default_device_name) || simulators.first ]
 
@@ -297,7 +297,7 @@ module Scan
       # building up the destination now
       if Scan.building_mac_catalyst_for_mac?
         Scan.config[:destination] = ["platform=macOS,variant=Mac Catalyst"]
-      elsif Scan.devices && Scan.devices.count > 0
+      elsif Scan.devices && Scan.devices.any?
         # Explicitly run simulator in Rosetta (needed for Xcode 14.3 and up)
         # Fixes https://github.com/fastlane/fastlane/issues/21194
         arch = ""

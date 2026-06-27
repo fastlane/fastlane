@@ -76,7 +76,7 @@ module Supply
         UI.success("Successfully uploaded AAB to Internal App Sharing URL: #{download_url}")
       end
 
-      if download_urls.count == 1
+      if download_urls.one?
         return download_urls.first
       else
         return download_urls
@@ -308,7 +308,7 @@ module Supply
       Supply::SCREENSHOT_TYPES.each do |screenshot_type|
         search = File.join(metadata_path, language, Supply::IMAGES_FOLDER_NAME, screenshot_type, "*.#{IMAGE_FILE_EXTENSIONS}")
         paths = Dir.glob(search, File::FNM_CASEFOLD).sort
-        next unless paths.count > 0
+        next unless paths.any?
 
         if Supply.config[:sync_image_upload]
           UI.message("🔍 Checking #{screenshot_type} checksums...")
@@ -342,10 +342,8 @@ module Supply
       apk_paths = [Supply.config[:apk]] unless (apk_paths = Supply.config[:apk_paths])
       apk_paths.compact!
 
-      apk_version_codes = []
-
-      apk_paths.each do |apk_path|
-        apk_version_codes.push(upload_binary_data(apk_path))
+      apk_version_codes = apk_paths.map do |apk_path|
+        upload_binary_data(apk_path)
       end
 
       return apk_version_codes

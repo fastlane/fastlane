@@ -11,7 +11,7 @@ module Terminal
     class Cell
       def lines
         # @value.to_s.split(/\n/)
-        @value.to_s.encode("utf-8", invalid: :replace).split(/\n/)
+        @value.to_s.encode("utf-8", invalid: :replace).split("\n")
       end
     end
   end

@@ -97,7 +97,7 @@ module FastlaneCore
           end
         }
         summary_row[:number_of_tests] = summary_row[:tests].count
-        summary_row[:number_of_failures] = summary_row[:tests].find_all { |a| (a[:failures] || []).count > 0 }.count
+        summary_row[:number_of_failures] = summary_row[:tests].find_all { |a| (a[:failures] || []).any? }.count
         summary_row
       end
       self.data.first[:run_destination_name] = self.raw_json["RunDestination"]["Name"]

@@ -278,9 +278,9 @@ module Spaceship
           certificate_parameter ||= [certificate.id]
 
           # Fix https://github.com/KrauseFx/fastlane/issues/349
-          certificate_parameter = certificate_parameter.first if certificate_parameter.count == 1
+          certificate_parameter = certificate_parameter.first if certificate_parameter.one?
 
-          if devices.nil? || devices.count == 0
+          if devices.nil? || devices.none?
             if self == Development || self == AdHoc
               # For Development and AdHoc we usually want all compatible devices by default
               if mac
@@ -499,7 +499,7 @@ module Spaceship
       # Is the certificate of this profile available?
       # @return (Bool) is the certificate valid?
       def certificate_valid?
-        return false if (certificates || []).count == 0
+        return false if (certificates || []).none?
 
         all_certificate_ids = Spaceship::Portal::Certificate.all(mac: mac?).collect(&:id)
         certificates.each do |c|
@@ -553,7 +553,7 @@ module Spaceship
         if @certificates
           # `@certificates` can be pre-populated from different sources (e.g. Xcode API/raw data).
           # Filter to only real Certificate objects rather than clearing all on a single stray value.
-          @certificates = @certificates.compact.select { |c| c.kind_of?(Spaceship::Portal::Certificate) }
+          @certificates = @certificates.compact.grep(Spaceship::Portal::Certificate)
         end
 
         if (@certificates || []).empty?

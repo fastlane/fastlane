@@ -15,7 +15,7 @@ module Sigh
         (profile.status == "Invalid" or profile.status == "Expired")
       end
 
-      if broken_profiles.count == 0
+      if broken_profiles.none?
         UI.success("All provisioning profiles are valid, nothing to do")
         return
       end

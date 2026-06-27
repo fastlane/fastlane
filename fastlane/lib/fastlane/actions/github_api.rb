@@ -179,7 +179,7 @@ module Fastlane
             path: "/repos/:owner/:repo/readme",
             body: { ref: "master" }
           )',
-            '# Alternatively call directly with optional error handling or block usage
+            %{# Alternatively call directly with optional error handling or block usage
             GithubApiAction.run(
               server_url: "https://api.github.com",
               api_token: ENV["GITHUB_TOKEN"],
@@ -196,7 +196,7 @@ module Fastlane
             ) do |result|
               UI.message("JSON returned: #{result[:json]}")
             end
-          '
+          }
           ]
         end
 

@@ -290,16 +290,16 @@ module Fastlane
 
       def self.example_code
         [
-          'testfairy(
+          %{testfairy(
             api_key: "...",
             ipa: "./ipa_file.ipa",
             comment: "Build #{lane_context[SharedValues::BUILD_NUMBER]}",
-          )',
-          'testfairy(
+          )},
+          %{testfairy(
             api_key: "...",
             apk: "../build/app/outputs/apk/qa/release/app-qa-release.apk",
             comment: "Build #{lane_context[SharedValues::BUILD_NUMBER]}",
-           )'
+           )}
         ]
       end
 

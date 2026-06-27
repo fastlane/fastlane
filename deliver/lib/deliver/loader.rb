@@ -86,7 +86,7 @@ module Deliver
     # @return [Array<Deliver::AppScreenshot>] The list of AppScreenshot that exist under given `root` directory
     def self.load_app_screenshots(root, ignore_validation)
       screenshots = language_folders(root, ignore_validation, true).flat_map do |language_folder|
-        paths = if language_folder.framed_file_paths.count > 0
+        paths = if language_folder.framed_file_paths.any?
                   UI.important("Framed screenshots are detected! 🖼 Non-framed screenshot files may be skipped. 🏃")
                   # watchOS screenshots can be picked up even when framed ones were found since frameit doesn't support watchOS screenshots
                   framed_or_watch, skipped = language_folder.file_paths.partition { |path| path.downcase.include?('framed') || path.downcase.include?('watch') }

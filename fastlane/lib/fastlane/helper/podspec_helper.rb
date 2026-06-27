@@ -32,8 +32,8 @@ module Fastlane
         UI.user_error!("Do not support bump of 'appendix', please use `update_version_appendix(appendix)` instead") if bump_type == 'appendix'
 
         major = version_match[:major].to_i
-        minor = version_match[:minor].to_i || 0
-        patch = version_match[:patch].to_i || 0
+        minor = version_match[:minor].to_i
+        patch = version_match[:patch].to_i
 
         case bump_type
         when 'patch'
@@ -56,8 +56,8 @@ module Fastlane
 
         new_appendix = new_appendix.sub(".", "") if new_appendix.start_with?(".")
         major = version_match[:major].to_i
-        minor = version_match[:minor].to_i || 0
-        patch = version_match[:patch].to_i || 0
+        minor = version_match[:minor].to_i
+        patch = version_match[:patch].to_i
 
         @version_value = "#{major}.#{minor}.#{patch}.#{new_appendix}"
       end

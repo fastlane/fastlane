@@ -55,7 +55,7 @@ module Sigh
       soon = (Date.today + 30).to_datetime
 
       profiles_valid = profiles.select { |profile| profile["ExpirationDate"] > now && profile["ExpirationDate"] > soon }
-      if profiles_valid.count > 0
+      if profiles_valid.any?
         UI.message("Provisioning profiles installed")
         UI.message("Valid:")
         profiles_valid.each do |profile|
@@ -64,7 +64,7 @@ module Sigh
       end
 
       profiles_soon = profiles.select { |profile| profile["ExpirationDate"] > now && profile["ExpirationDate"] < soon }
-      if profiles_soon.count > 0
+      if profiles_soon.any?
         UI.message("")
         UI.message("Expiring within 30 days:")
         profiles_soon.each do |profile|
@@ -73,7 +73,7 @@ module Sigh
       end
 
       profiles_expired = profiles.select { |profile| profile["ExpirationDate"] < now }
-      if profiles_expired.count > 0
+      if profiles_expired.any?
         UI.message("")
         UI.message("Expired:")
         profiles_expired.each do |profile|
@@ -84,11 +84,11 @@ module Sigh
       UI.message("")
       UI.message("Summary")
       UI.message("#{profiles.count} installed profiles")
-      UI.message("#{profiles_expired.count} are expired".red) if profiles_expired.count > 0
+      UI.message("#{profiles_expired.count} are expired".red) if profiles_expired.any?
       UI.message("#{profiles_soon.count} are valid but will expire within 30 days".yellow)
       UI.message("#{profiles_valid.count} are valid".green)
 
-      UI.message("You can remove all expired profiles using `fastlane sigh manage -e`") if profiles_expired.count > 0
+      UI.message("You can remove all expired profiles using `fastlane sigh manage -e`") if profiles_expired.any?
     end
 
     def self.profile_info(profile)

@@ -115,7 +115,7 @@ module Match
         end
       end
 
-      has_file_changes = self.files_to_commit.count > 0 || self.files_to_delete.count > 0
+      has_file_changes = self.files_to_commit.any? || self.files_to_delete.any?
       if has_file_changes && !params[:readonly]
         encryption.encrypt_files if encryption
         storage.save_changes!(files_to_commit: self.files_to_commit, files_to_delete: self.files_to_delete)
@@ -165,7 +165,7 @@ module Match
       certs = Dir[File.join(prefixed_working_directory, "certs", cert_type.to_s, "*.cer")]
       keys = Dir[File.join(prefixed_working_directory, "certs", cert_type.to_s, "*.p12")]
 
-      storage_has_certs = certs.count != 0 && keys.count != 0
+      storage_has_certs = certs.any? && keys.any?
 
       # Determine if cert is renewable.
       # Can't renew developer_id certs with Connect API token. Account holder access is required.

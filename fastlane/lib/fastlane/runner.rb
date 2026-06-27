@@ -24,7 +24,7 @@ module Fastlane
       self.current_lane = lane.to_sym
       self.current_platform = (platform ? platform.to_sym : nil)
 
-      lane_obj = lanes.fetch(current_platform, {}).fetch(current_lane, nil)
+      lane_obj = lanes.dig(current_platform, current_lane)
 
       UI.user_error!("Could not find lane '#{full_lane_name}'. Available lanes: #{available_lanes.join(', ')}") unless lane_obj
       UI.user_error!("You can't call the private lane '#{lane}' directly") if lane_obj.is_private
@@ -183,8 +183,8 @@ module Fastlane
     end
 
     def try_switch_to_lane(new_lane, parameters)
-      block = lanes.fetch(current_platform, {}).fetch(new_lane, nil)
-      block ||= lanes.fetch(nil, {}).fetch(new_lane, nil) # fallback to general lane for multiple platforms
+      block = lanes.dig(current_platform, new_lane)
+      block ||= lanes.dig(nil, new_lane) # fallback to general lane for multiple platforms
       if block
         original_full = full_lane_name
         original_lane = current_lane
@@ -233,9 +233,9 @@ module Fastlane
 
           # arguments is an array by default, containing an hash with the actual parameters
           # Since we usually just need the passed hash, we'll just use the first object if there is only one
-          if arguments.count == 0
+          if arguments.none?
             configurations = ConfigurationHelper.parse(class_ref, {}) # no parameters => empty hash
-          elsif arguments.count == 1 && arguments.first.kind_of?(Hash)
+          elsif arguments.one? && arguments.first.kind_of?(Hash)
             configurations = ConfigurationHelper.parse(class_ref, arguments.first) # Correct configuration passed
           elsif !class_ref.available_options
             # This action does not use the new action format

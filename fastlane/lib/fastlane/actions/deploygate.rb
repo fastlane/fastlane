@@ -44,9 +44,7 @@ module Fastlane
         api_token = options[:api_token]
         user_name = options[:user]
         binary = options[:ipa] || options[:apk]
-        upload_options = options.values.select do |key, _|
-          [:message, :distribution_key, :release_note, :disable_notify, :distribution_name].include?(key)
-        end
+        upload_options = options.values.slice(:message, :distribution_key, :release_note, :disable_notify, :distribution_name)
 
         UI.user_error!('missing `ipa` and `apk`. deploygate action needs least one.') unless binary
 
@@ -178,22 +176,22 @@ module Fastlane
 
       def self.example_code
         [
-          'deploygate(
+          %{deploygate(
             api_token: "...",
             user: "target username or organization name",
             ipa: "./ipa_file.ipa",
             message: "Build #{lane_context[SharedValues::BUILD_NUMBER]}",
             distribution_key: "(Optional) Target Distribution Key",
             distribution_name: "(Optional) Target Distribution Name"
-          )',
-          'deploygate(
+          )},
+          %{deploygate(
             api_token: "...",
             user: "target username or organization name",
             apk: "./apk_file.apk",
             message: "Build #{lane_context[SharedValues::BUILD_NUMBER]}",
             distribution_key: "(Optional) Target Distribution Key",
             distribution_name: "(Optional) Target Distribution Name"
-          )'
+          )}
         ]
       end
 

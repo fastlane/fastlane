@@ -21,7 +21,7 @@ module Deliver
       validate_path!
 
       localizations = editable_version.get_app_store_version_localizations
-      locale_by_code = localizations.each_with_object({}) { |l, h| h[l.locale] = l }
+      locale_by_code = localizations.to_h { |l| [l.locale, l] }
 
       video_previews_per_locale = discover_videos(@app_previews_path)
       if video_previews_per_locale.empty?
@@ -85,14 +85,14 @@ module Deliver
 
       sets_by_preview_type = localization
                              .get_app_preview_sets(includes: "appPreviews")
-                             .each_with_object({}) { |set, h| h[set.preview_type] = set }
+                             .to_h { |set| [set.preview_type, set] }
 
       if @overwrite
         delete_existing_previews(localization, sets_by_preview_type.values)
         # re-fetch sets after deletes
         sets_by_preview_type = localization
                                .get_app_preview_sets(includes: "appPreviews")
-                               .each_with_object({}) { |set, h| h[set.preview_type] = set }
+                               .to_h { |set| [set.preview_type, set] }
       end
 
       # group videos by preview type to enforce a max of 3 per locale AND type

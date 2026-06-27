@@ -29,9 +29,8 @@ module Deliver
 
       localizations = Spaceship::ConnectAPI::AppClipDefaultExperienceLocalization.find_all(app_clip_default_experience_id: default_experience.id, includes: 'appClipHeaderImage')
 
-      threads = []
-      localizations.each do |localization|
-        threads << Thread.new do
+      threads = localizations.map do |localization|
+        Thread.new do
           download_app_clip_header_image(folder_path, localization)
         end
       end

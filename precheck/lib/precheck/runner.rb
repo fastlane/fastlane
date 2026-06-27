@@ -131,9 +131,8 @@ module Precheck
     end
 
     def rendered_failed_results_table(failed_results: nil)
-      rows = []
-      failed_results.each do |failed_result|
-        rows << [failed_result.rule.key, failed_result.item.friendly_name]
+      rows = failed_results.map do |failed_result|
+        [failed_result.rule.key, failed_result.item.friendly_name]
       end
 
       return Terminal::Table.new(
@@ -144,9 +143,8 @@ module Precheck
     end
 
     def rendered_rules_checked_table(rules_checked: nil)
-      rows = []
-      rules_checked.each do |rule|
-        rows << [rule.key, rule.description]
+      rows = rules_checked.map do |rule|
+        [rule.key, rule.description]
       end
 
       return Terminal::Table.new(
@@ -159,9 +157,8 @@ module Precheck
     def rendered_skipped_rules_table(skipped_rules: nil)
       return nil if skipped_rules.empty?
 
-      rows = []
-      skipped_rules.each do |rule|
-        rows << [rule.key, rule.description]
+      rows = skipped_rules.map do |rule|
+        [rule.key, rule.description]
       end
 
       return Terminal::Table.new(
@@ -172,9 +169,8 @@ module Precheck
     end
 
     def build_items_not_checked_table(items_not_checked: nil)
-      rows = []
-      items_not_checked.each do |item|
-        rows << [item.item_name, item.friendly_name]
+      rows = items_not_checked.map do |item|
+        [item.item_name, item.friendly_name]
       end
 
       return Terminal::Table.new(

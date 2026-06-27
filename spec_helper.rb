@@ -164,7 +164,7 @@ module FastlaneSpec
     end
 
     def self.with_global_key_values(global_store, hash)
-      old_vals = global_store.select { |k, v| hash.include?(k) }
+      old_vals = global_store.slice(*hash)
       hash.each { |k, v| global_store[k] = v }
       yield
     ensure

@@ -109,7 +109,7 @@ module Fastlane
     # @raise [ArgumentError] If no arguments passed
     # @return [String] A shell command representing the arguments passed in
     def self.shell_command_from_args(*args)
-      raise ArgumentError, "sh requires at least one argument" unless args.count > 0
+      raise ArgumentError, "sh requires at least one argument" unless args.any?
 
       command = ""
 
@@ -122,7 +122,7 @@ module Fastlane
       if args.first.kind_of?(Array)
         command += args.shift.first.shellescape + " " + args.shelljoin
         command.chomp!(" ")
-      elsif args.count == 1 && args.first.kind_of?(String)
+      elsif args.one? && args.first.kind_of?(String)
         command += args.first
       else
         command += args.shelljoin

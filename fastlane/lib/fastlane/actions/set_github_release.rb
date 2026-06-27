@@ -65,7 +65,7 @@ module Fastlane
           Actions.lane_context[SharedValues::SET_GITHUB_RELEASE_JSON] = json
 
           assets = params[:upload_assets]
-          if assets && assets.count > 0
+          if assets && assets.any?
             # upload assets
             self.upload_assets(assets, json['upload_url'], api_token, api_bearer)
 

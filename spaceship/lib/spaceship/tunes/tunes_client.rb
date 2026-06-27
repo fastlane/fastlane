@@ -78,7 +78,7 @@ module Spaceship
         puts("Could not find team with name '#{t_name}', trying to fallback to default team") if t_id.length.zero?
       end
 
-      t_id = teams.first['providerId'].to_s if teams.count == 1
+      t_id = teams.first['providerId'].to_s if teams.one?
 
       if t_id.length > 0
         puts("Looking for App Store Connect Team with ID #{t_id}") if Spaceship::Globals.verbose?
@@ -153,7 +153,7 @@ module Spaceship
       error_map = {}
       keys.each do |key|
         errors = sub_section.fetch(key, [])
-        error_map[key] = errors if errors.count > 0
+        error_map[key] = errors if errors.any?
       end
       return error_map
     end
@@ -175,7 +175,7 @@ module Spaceship
       errors_in_version_info = fetch_errors_in_data(data_section: data, sub_section_name: "versionInfo", keys: error_and_info_keys_to_check)
 
       # If we have any errors or "info" we need to treat them as warnings or errors
-      if errors_in_data.count == 0 && errors_in_version_info.count == 0
+      if errors_in_data.none? && errors_in_version_info.none?
         logger.debug("Request was successful")
       end
 
@@ -189,7 +189,7 @@ module Spaceship
           hash.each do |key, value|
             errors += handle_response_hash.call(value, current_language)
 
-            next unless key == 'errorKeys' && value.kind_of?(Array) && value.count > 0
+            next unless key == 'errorKeys' && value.kind_of?(Array) && value.any?
             # Prepend the error with the language so it's easier to understand for the user
             errors += value.collect do |current_error_message|
               current_language ? "[#{current_language}]: #{current_error_message}" : current_error_message
@@ -216,16 +216,16 @@ module Spaceship
 
       # Sometimes there is a different kind of error in the JSON response
       # e.g. {"warn"=>nil, "error"=>["operation_failed"], "info"=>nil}
-      different_error = raw.fetch('messages', {}).fetch('error', nil)
+      different_error = raw.dig('messages', 'error')
       errors << different_error if different_error
 
-      if errors.count > 0 # they are separated by `.` by default
+      if errors.any? # they are separated by `.` by default
         # Sample `error` content: [["Forbidden"]]
-        if errors.count == 1 && errors.first == "You haven't made any changes."
+        if errors.one? && errors.first == "You haven't made any changes."
           # This is a special error which we really don't care about
-        elsif errors.count == 1 && errors.first.include?("try again later")
+        elsif errors.one? && errors.first.include?("try again later")
           raise ITunesConnectTemporaryError.new, errors.first
-        elsif errors.count == 1 && errors.first.include?("Forbidden")
+        elsif errors.one? && errors.first.include?("Forbidden")
           raise_insufficient_permission_error!
         elsif flaky_api_call
           raise ITunesConnectPotentialServerError.new, errors.join(' ')
@@ -471,7 +471,7 @@ module Spaceship
         all_reviews.concat(parse_response(r, 'data')['reviews'])
 
         # The following lines throw errors when there are no reviews so exit out of the loop before them if the app has no reviews
-        break if all_reviews.count == 0
+        break if all_reviews.none?
 
         last_review_date = Time.at(all_reviews[-1]['value']['lastModified'] / 1000)
 
@@ -665,9 +665,9 @@ module Spaceship
       # values that can cause a failure (invalid dates) so we are removing it
       data.delete('preOrder')
 
-      first_price = (data["pricingIntervalsFieldTO"]["value"] || []).count == 0 # first price
+      first_price = (data["pricingIntervalsFieldTO"]["value"] || []).none? # first price
       data["pricingIntervalsFieldTO"]["value"] ||= []
-      data["pricingIntervalsFieldTO"]["value"] << {} if data["pricingIntervalsFieldTO"]["value"].count == 0
+      data["pricingIntervalsFieldTO"]["value"] << {} if data["pricingIntervalsFieldTO"]["value"].none?
       data["pricingIntervalsFieldTO"]["value"].first["tierStem"] = price_tier.to_s
 
       effective_date = (first_price ? nil : Time.now.to_i * 1000)
@@ -1152,7 +1152,6 @@ module Spaceship
                                             is_exempt: false,
                                             proprietary: false,
                                             third_party: false)
-
       build_info = get_build_info_for_review(app_id: app_id, train: train, build_number: build_number, platform: platform)
       # Now fill in the values provided by the user
 
@@ -1444,9 +1443,8 @@ module Spaceship
         end
       end
 
-      versions_array = []
-      versions.each do |k, v|
-        versions_array << {
+      versions_array = versions.map do |k, v|
+        {
                   value: {
                     description: { value: v[:description] },
                     name: { value: v[:name] },

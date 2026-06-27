@@ -27,9 +27,8 @@ module Spaceship
       # }
 
       def create!(name: nil, product_id: nil, reference_name: nil, versions: {})
-        versions_array = []
-        versions.each do |language_code, value|
-          versions_array << {
+        versions_array = versions.map do |language_code, value|
+          {
                     value: {
                       subscriptionName: { value: value[:subscription_name] },
                       name: { value: value[:name] },

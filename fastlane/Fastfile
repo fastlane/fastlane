@@ -226,7 +226,7 @@ lane :generate_fastlane_swift_runner_manifest do |options|
                        .select { |file| file.name.end_with?(".swift") }
 
   # It is assumed that all Swift files we're including are contained in the root group, or 1 group deep
-  swift_filenames_to_group_name = swift_files.each_with_object({}) { |file, object| object[file.name] = file.parent.name }
+  swift_filenames_to_group_name = swift_files.to_h { |file| [file.name, file.parent.name] }
 
   manifest_path = File.expand_path(File.join(swift_folder, "/upgrade_manifest.json"))
   File.write(manifest_path, swift_filenames_to_group_name.to_json)

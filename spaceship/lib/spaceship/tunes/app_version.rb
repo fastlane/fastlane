@@ -755,7 +755,7 @@ module Spaceship
 
         languages = raw_data_details.select { |d| d["language"] == language }
         # IDEA: better error for nonexistent language
-        raise "#{language} isn't an activated language" unless languages.count > 0
+        raise "#{language} isn't an activated language" unless languages.any?
         lang_details = languages[0]
         display_families = lang_details["displayFamilies"]["value"]
         device_details = display_families.find { |display_family| display_family['name'] == device }
@@ -774,11 +774,11 @@ module Spaceship
           (language_details || []).each do |device_language_details|
             # Do not enable scaling if a screenshot already exists
             next if device_language_details["screenshots"].nil?
-            next if device_language_details["screenshots"]["value"].count > 0
+            next if device_language_details["screenshots"]["value"].any?
 
             # Do not enable scaling if a trailer already exists
             next if device_language_details["trailers"].nil?
-            next if device_language_details["trailers"]["value"].count > 0
+            next if device_language_details["trailers"]["value"].any?
 
             # The current row includes screenshots for all device types
             # so we need to enable scaling for both iOS and watchOS apps
@@ -800,7 +800,7 @@ module Spaceship
       def setup_screenshots_for(row)
         return [] if row.nil? || row["displayFamilies"].nil?
 
-        display_families = row.fetch("displayFamilies", {}).fetch("value", nil)
+        display_families = row.dig("displayFamilies", "value")
         return [] unless display_families
 
         result = []
@@ -893,7 +893,7 @@ module Spaceship
       def setup_messages_screenshots_for(row)
         return [] if row.nil? || row["displayFamilies"].nil?
 
-        display_families = row.fetch("displayFamilies", {}).fetch("value", nil)
+        display_families = row.dig("displayFamilies", "value")
         return [] unless display_families
 
         result = []
@@ -927,7 +927,7 @@ module Spaceship
       def setup_trailers_for(row)
         return [] if row.nil? || row["displayFamilies"].nil?
 
-        display_families = row.fetch("displayFamilies", {}).fetch("value", nil)
+        display_families = row.dig("displayFamilies", "value")
         return [] unless display_families
 
         result = []

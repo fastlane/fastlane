@@ -27,7 +27,7 @@ module Fastlane
           end
 
           new_devices = devices_file.drop(1).map do |row|
-            if row.count == 1
+            if row.one?
               UI.user_error!("Invalid device line, ensure you are using tabs (NOT spaces). See Apple's sample/spec here: https://developer.apple.com/account/resources/downloads/Multiple-Upload-Samples.zip")
             elsif !(2..3).cover?(row.count)
               UI.user_error!("Invalid device line, please provide a file according to the Apple Sample UDID file (https://developer.apple.com/account/resources/downloads/Multiple-Upload-Samples.zip)")

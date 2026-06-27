@@ -63,7 +63,7 @@ module Match
         UI.user_error!("`fastlane match nuke` doesn't delete anything when running with --readonly enabled")
       end
 
-      if (self.certs + self.profiles + self.files).count > 0
+      if (self.certs + self.profiles + self.files).any?
         unless params[:skip_confirmation]
           UI.error("---")
           remove_or_revoke_message = self.safe_remove_certs ? "remove" : "revoke"
@@ -211,7 +211,7 @@ module Match
     # Print tables to ask the user
     def print_tables
       puts("")
-      if self.certs.count > 0
+      if self.certs.any?
         rows = self.certs.collect do |cert|
           cert_expiration = cert.expiration_date.nil? ? "Unknown" : Time.parse(cert.expiration_date).strftime("%Y-%m-%d")
           [cert.name, cert.id, cert.class.to_s.split("::").last, cert_expiration]
@@ -224,7 +224,7 @@ module Match
         puts("")
       end
 
-      if self.profiles.count > 0
+      if self.profiles.any?
         rows = self.profiles.collect do |p|
           status = p.valid? ? p.profile_state.green : p.profile_state.red
 
@@ -240,7 +240,7 @@ module Match
         puts("")
       end
 
-      if self.files.count > 0
+      if self.files.any?
         rows = self.files.collect do |f|
           components = f.split(File::SEPARATOR)[-3..-1]
 
@@ -260,7 +260,7 @@ module Match
     end
 
     def nuke_it_now!
-      UI.header("Deleting #{self.profiles.count} provisioning profiles...") unless self.profiles.count == 0
+      UI.header("Deleting #{self.profiles.count} provisioning profiles...") unless self.profiles.none?
       self.profiles.each do |profile|
         UI.message("Deleting profile '#{profile.name}' (#{profile.id})...")
         begin
@@ -272,7 +272,7 @@ module Match
       end
 
       removing_or_revoking_message = self.safe_remove_certs ? "Removing" : "Revoking"
-      UI.header("#{removing_or_revoking_message} #{self.certs.count} certificates...") unless self.certs.count == 0
+      UI.header("#{removing_or_revoking_message} #{self.certs.count} certificates...") unless self.certs.none?
       self.certs.each do |cert|
         if self.safe_remove_certs
           UI.message("Certificate '#{cert.name}' (#{cert.id}) will be removed from repository without revoking it")
@@ -288,12 +288,12 @@ module Match
         UI.success("Successfully deleted certificate")
       end
 
-      files_to_delete = delete_files! if self.files.count > 0
+      files_to_delete = delete_files! if self.files.any?
       files_to_delete ||= []
 
       self.encryption.encrypt_files if self.encryption
 
-      if files_to_delete.count > 0
+      if files_to_delete.any?
         # Now we need to save all this to the storage too, if needed
         message = ["[fastlane]", "Nuked", "files", "for", type.to_s].join(" ")
         self.storage.save_changes!(files_to_commit: [],

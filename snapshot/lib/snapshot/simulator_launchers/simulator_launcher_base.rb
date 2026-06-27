@@ -126,7 +126,7 @@ module Snapshot
       # "Booted" status is not enough for to adjust the status bar
       # Simulator could still be booting with Apple logo
       # Need to wait "some amount of time" until home screen shows
-      boot_sleep = ENV["SNAPSHOT_SIMULATOR_WAIT_FOR_BOOT_TIMEOUT"].to_i || 10
+      boot_sleep = ENV["SNAPSHOT_SIMULATOR_WAIT_FOR_BOOT_TIMEOUT"].to_i
       UI.message("Waiting #{boot_sleep} seconds for device to fully boot before overriding status bar... Set 'SNAPSHOT_SIMULATOR_WAIT_FOR_BOOT_TIMEOUT' environment variable to adjust timeout")
       sleep(boot_sleep) if boot_sleep > 0
 

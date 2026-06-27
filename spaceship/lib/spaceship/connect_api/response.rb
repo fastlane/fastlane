@@ -1,9 +1,10 @@
-require_relative './model'
+require_relative 'model'
 
 module Spaceship
   class ConnectAPI
     class Response
       include Enumerable
+
       attr_reader :body
       attr_reader :status
       attr_reader :headers

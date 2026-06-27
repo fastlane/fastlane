@@ -23,7 +23,7 @@ module Fastlane
             end
 
             # attach our exclude patterns to the command
-            clean_command += ' ' + params[:exclude].map { |exclude| '-e ' + exclude.shellescape }.join(' ') unless params[:exclude].count == 0
+            clean_command += ' ' + params[:exclude].map { |exclude| '-e ' + exclude.shellescape }.join(' ') unless params[:exclude].none?
 
             Actions.sh(clean_command) unless params[:skip_clean]
 

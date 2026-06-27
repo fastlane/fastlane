@@ -64,7 +64,7 @@ module Produce
     end
 
     def pluralize(singular, arr)
-      return singular if arr.count == 1
+      return singular if arr.one?
 
       "#{singular}s"
     end

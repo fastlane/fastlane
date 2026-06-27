@@ -227,7 +227,7 @@ module Deliver
 
     def self.calculate_display_type(path)
       size = FastImage.size(path)
-      UI.user_error!("Could not find or parse file at path '#{path}'") if size.nil? || size.count == 0
+      UI.user_error!("Could not find or parse file at path '#{path}'") if size.nil? || size.none?
 
       path_component = Pathname.new(path).each_filename.to_a[-3]
       is_imessage = path_component.eql?("iMessage")

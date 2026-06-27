@@ -114,7 +114,7 @@ module Produce
         c.action do |args, options|
           # Filter the options so that we can still build the configuration
           allowed_keys = Produce::Options.available_options.collect(&:key)
-          Produce.config = FastlaneCore::Configuration.create(Produce::Options.available_options, options.__hash__.select { |key, value| allowed_keys.include?(key) })
+          Produce.config = FastlaneCore::Configuration.create(Produce::Options.available_options, options.__hash__.slice(*allowed_keys))
 
           require 'produce/service'
           Produce::Service.enable(options, args)
@@ -192,7 +192,7 @@ module Produce
         c.action do |args, options|
           # Filter the options so that we can still build the configuration
           allowed_keys = Produce::Options.available_options.collect(&:key)
-          Produce.config = FastlaneCore::Configuration.create(Produce::Options.available_options, options.__hash__.select { |key, value| allowed_keys.include?(key) })
+          Produce.config = FastlaneCore::Configuration.create(Produce::Options.available_options, options.__hash__.slice(*allowed_keys))
 
           require 'produce/service'
           Produce::Service.disable(options, args)
@@ -209,7 +209,7 @@ module Produce
         c.action do |args, options|
           # Filter the options so that we can still build the configuration
           allowed_keys = Produce::Options.available_options.collect(&:key)
-          Produce.config = FastlaneCore::Configuration.create(Produce::Options.available_options, options.__hash__.select { |key, value| allowed_keys.include?(key) })
+          Produce.config = FastlaneCore::Configuration.create(Produce::Options.available_options, options.__hash__.slice(*allowed_keys))
 
           require 'produce/service'
           require 'terminal-table'
@@ -238,7 +238,7 @@ module Produce
 
         c.action do |args, options|
           allowed_keys = Produce::Options.available_options.collect(&:key)
-          Produce.config = FastlaneCore::Configuration.create(Produce::Options.available_options, options.__hash__.select { |key, value| allowed_keys.include?(key) })
+          Produce.config = FastlaneCore::Configuration.create(Produce::Options.available_options, options.__hash__.slice(*allowed_keys))
 
           require 'produce/group'
           Produce::Group.new.create(options, args)
@@ -272,7 +272,7 @@ module Produce
 
         c.action do |args, options|
           allowed_keys = Produce::Options.available_options.collect(&:key)
-          Produce.config = FastlaneCore::Configuration.create(Produce::Options.available_options, options.__hash__.select { |key, value| allowed_keys.include?(key) })
+          Produce.config = FastlaneCore::Configuration.create(Produce::Options.available_options, options.__hash__.slice(*allowed_keys))
 
           require 'produce/cloud_container'
           Produce::CloudContainer.new.create(options, args)
@@ -309,7 +309,7 @@ module Produce
           all_options = Produce::Options.available_options + extra_options
           allowed_keys = all_options.collect(&:key)
 
-          Produce.config = FastlaneCore::Configuration.create(all_options, options.__hash__.select { |key, value| allowed_keys.include?(key) })
+          Produce.config = FastlaneCore::Configuration.create(all_options, options.__hash__.slice(*allowed_keys))
 
           require 'produce/merchant'
           Produce::Merchant.new.create(options, args)

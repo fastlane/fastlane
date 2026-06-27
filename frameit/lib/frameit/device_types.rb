@@ -1,5 +1,5 @@
 require_relative 'module'
-require_relative './device'
+require_relative 'device'
 require 'spaceship/connect_api/models/app_screenshot_set'
 
 module Frameit

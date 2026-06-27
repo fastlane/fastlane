@@ -25,7 +25,7 @@ module Snapshot
         matches = output.scan(/snapshot: (.*)/)
       end
 
-      if to_store.count == 0 && matches.count == 0
+      if to_store.none? && matches.none?
         return false
       end
 

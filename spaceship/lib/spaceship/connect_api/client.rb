@@ -1,8 +1,8 @@
-require_relative './token'
-require_relative './provisioning/provisioning'
-require_relative './testflight/testflight'
-require_relative './tunes/tunes'
-require_relative './users/users'
+require_relative 'token'
+require_relative 'provisioning/provisioning'
+require_relative 'testflight/testflight'
+require_relative 'tunes/tunes'
+require_relative 'users/users'
 
 module Spaceship
   class ConnectAPI

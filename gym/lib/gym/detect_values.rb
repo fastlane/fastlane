@@ -86,7 +86,7 @@ module Gym
                                                            export_method: Gym.config[:export_method])
       end
 
-      return if hash_to_use.count == 0 # We don't want to set a mapping if we don't have one
+      return if hash_to_use.none? # We don't want to set a mapping if we don't have one
       Gym.config[:export_options][:provisioningProfiles] = hash_to_use
       UI.message("Detected provisioning profile mapping: #{hash_to_use}")
     rescue => ex
@@ -163,7 +163,7 @@ module Gym
     def self.detect_configuration
       config = Gym.config
       configurations = Gym.project.configurations
-      return if configurations.count == 0 # this is an optional value anyway
+      return if configurations.none? # this is an optional value anyway
 
       if config[:configuration]
         # Verify the configuration is available

@@ -144,11 +144,11 @@ module Spaceship
             # More context https://github.com/fastlane/fastlane/issues/11481
             # That's why we have the `begin` `rescue` code here
             begin
-              remove_method(getter) if public_instance_methods.include?(getter)
+              remove_method(getter) if public_method_defined?(getter)
             rescue NameError
             end
             begin
-              remove_method(setter) if public_instance_methods.include?(setter)
+              remove_method(setter) if public_method_defined?(setter)
             rescue NameError
             end
           end
@@ -247,7 +247,7 @@ module Spaceship
     def self.attr_accessor(*vars)
       @attributes ||= []
       @attributes.concat(vars)
-      super(*vars)
+      super
     end
 
     def self.attributes

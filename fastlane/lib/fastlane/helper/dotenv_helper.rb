@@ -17,7 +17,7 @@ module Fastlane
         search_paths << path + "/.." unless path.nil?
         search_paths.compact!
         search_paths.find do |dir|
-          Dir.glob(File.join(dir, '*.env*'), File::FNM_DOTMATCH).count > 0
+          Dir.glob(File.join(dir, '*.env*'), File::FNM_DOTMATCH).any?
         end
       end
 

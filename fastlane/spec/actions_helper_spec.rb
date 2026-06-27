@@ -62,7 +62,7 @@ describe Fastlane do
     describe "#deprecated_actions" do
       it "is class action" do
         Fastlane::Actions.load_external_actions("./fastlane/spec/fixtures/actions")
-        require_relative './fixtures/broken_actions/broken_action.rb'
+        require_relative 'fixtures/broken_actions/broken_action.rb'
 
         # An action
         example_action_ref = Fastlane::Actions.action_class_ref("example_action")
@@ -78,8 +78,8 @@ describe Fastlane do
 
       it "is action deprecated" do
         Fastlane::Actions.load_external_actions("./fastlane/spec/fixtures/actions")
-        require_relative './fixtures/broken_actions/broken_action.rb'
-        require_relative './fixtures/deprecated_actions/deprecated_action.rb'
+        require_relative 'fixtures/broken_actions/broken_action.rb'
+        require_relative 'fixtures/deprecated_actions/deprecated_action.rb'
 
         # An action (not deprecated)
         example_action_ref = Fastlane::Actions.action_class_ref("example_action")

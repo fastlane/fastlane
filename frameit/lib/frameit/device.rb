@@ -46,7 +46,7 @@ module Frameit
     def self.detect_device(path, platform)
       size = FastImage.size(path)
 
-      UI.user_error!("Could not find or parse file at path '#{path}'") if size.nil? || size.count == 0
+      UI.user_error!("Could not find or parse file at path '#{path}'") if size.nil? || size.none?
 
       found_device = nil
       filename_device = nil

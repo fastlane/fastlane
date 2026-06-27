@@ -9,7 +9,7 @@ class TestFlightTestClient < Spaceship::TestFlight::Client
   end
 
   def handle_response(response)
-    super(response)
+    super
   end
 end
 

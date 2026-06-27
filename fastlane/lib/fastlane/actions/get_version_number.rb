@@ -58,7 +58,7 @@ module Fastlane
           end
 
           # Returns if only one non-test target
-          if non_test_targets.count == 1
+          if non_test_targets.one?
             return non_test_targets.first
           end
 

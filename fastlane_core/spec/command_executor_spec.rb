@@ -95,7 +95,9 @@ Shopping list:
           FastlaneCore::CommandExecutor.execute(
             command: failing_command,
             print_all: true,
-            error: proc do |_error_output| end
+            error: proc do |_error_output|
+
+            end
           )
         end.not_to output(failing_command_output).to_stdout
       end
@@ -119,7 +121,9 @@ Shopping list:
           FastlaneCore::CommandExecutor.execute(
             command: failing_command,
             print_all: false,
-            error: proc do |_error_output| end
+            error: proc do |_error_output|
+
+            end
           )
         end.to output(failing_command_output).to_stdout
 
@@ -128,7 +132,9 @@ Shopping list:
             command: failing_command,
             print_all: true,
             suppress_output: true,
-            error: proc do |_error_output| end
+            error: proc do |_error_output|
+
+            end
           )
         end.to output(failing_command_output).to_stdout
       end

@@ -5,9 +5,8 @@ module Fastlane
         require 'fastlane_core/print_table'
         require 'spaceship'
 
-        rows = []
-        Spaceship::StatsMiddleware.service_stats.each do |service, count|
-          rows << [service.name, service.auth_type, service.url, count]
+        rows = Spaceship::StatsMiddleware.service_stats.map do |service, count|
+          [service.name, service.auth_type, service.url, count]
         end
 
         puts("")
@@ -19,9 +18,8 @@ module Fastlane
         puts("")
 
         if params[:print_request_logs]
-          log_rows = []
-          Spaceship::StatsMiddleware.request_logs.each do |request_log|
-            log_rows << [request_log.auth_type, request_log.url]
+          log_rows = Spaceship::StatsMiddleware.request_logs.map do |request_log|
+            [request_log.auth_type, request_log.url]
           end
 
           puts("")

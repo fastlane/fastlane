@@ -345,7 +345,7 @@ module Fastlane
       self.automatic_versioning_enabled = false
 
       paths = self.project.project_paths
-      return false if paths.count == 0
+      return false if paths.none?
 
       result = Fastlane::Actions::GetBuildNumberAction.run({
         project: paths.first, # most of the times, there will only be one project in there

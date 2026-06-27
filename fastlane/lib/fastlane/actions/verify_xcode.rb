@@ -93,7 +93,7 @@ module Fastlane
           errors << current
         end
 
-        if errors.count > 0
+        if errors.any?
           show_and_raise_error(errors.join("\n"), params[:xcode_path])
         end
 

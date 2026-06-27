@@ -197,10 +197,18 @@ describe Fastlane::Actions::UpdateAppAgeRatingAction do
 
   # ---------------------------------------------------------------------------
   describe '.is_supported?' do
-    it 'returns true for :ios'      do expect(described_class.is_supported?(:ios)).to   be(true)  end
-    it 'returns true for :mac'      do expect(described_class.is_supported?(:mac)).to   be(true)  end
-    it 'returns true for :tvos'     do expect(described_class.is_supported?(:tvos)).to  be(true)  end
-    it 'returns false for :android' do expect(described_class.is_supported?(:android)).to be(false) end
+    it 'returns true for :ios' do
+      expect(described_class.is_supported?(:ios)).to   be(true)
+    end
+    it 'returns true for :mac' do
+      expect(described_class.is_supported?(:mac)).to   be(true)
+    end
+    it 'returns true for :tvos' do
+      expect(described_class.is_supported?(:tvos)).to  be(true)
+    end
+    it 'returns false for :android' do
+      expect(described_class.is_supported?(:android)).to be(false)
+    end
   end
 
   # ---------------------------------------------------------------------------

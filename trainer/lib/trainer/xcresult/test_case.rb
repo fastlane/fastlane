@@ -51,7 +51,7 @@ module Trainer
           node_for_attributes = arg_node || node
 
           retries = Helper.find_json_children(node_for_attributes, 'Repetition', 'Test Case Run')
-                         &.map { |rep_node| Repetition.from_json(node: rep_node) } || []
+                          &.map { |rep_node| Repetition.from_json(node: rep_node) } || []
 
           failure_messages = if retries.empty?
                                extract_failure_messages(node_for_attributes)

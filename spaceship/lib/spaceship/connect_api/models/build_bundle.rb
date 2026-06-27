@@ -1,5 +1,5 @@
 require_relative '../model'
-require_relative './build_bundle_file_sizes'
+require_relative 'build_bundle_file_sizes'
 module Spaceship
   class ConnectAPI
     class BuildBundle

@@ -26,7 +26,7 @@ module Fastlane
           url = "https://rubygems.org/api/v1/search.json?query=fastlane-plugin-&page=#{page}"
           puts("RubyGems API Request: #{url}")
           results = JSON.parse(URI.open(url).read)
-          break if results.count == 0
+          break if results.none?
 
           plugins += results.collect do |current|
             next if self.hidden_plugins.include?(current['name'])

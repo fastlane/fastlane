@@ -16,7 +16,7 @@ module Fastlane
 
         if extensions.count > 1
           command << " --include=\\*.{#{extensions.join(',')}}"
-        elsif extensions.count > 0
+        elsif extensions.any?
           command << " --include=\\*.#{extensions.join(',')}"
         end
 
@@ -37,12 +37,9 @@ module Fastlane
         #   ./fastlane.gemspec:  spec.add_development_dependency 'my_word'
         #   ./Gemfile.lock:    my_word (0.10.1)
 
-        found = []
-        results.split("\n").each do |current_raw|
-          found << current_raw.strip
-        end
+        found = results.split("\n").map(&:strip)
 
-        UI.user_error!("Found debug code '#{params[:text]}': \n\n#{found.join("\n")}") if found.count > 0
+        UI.user_error!("Found debug code '#{params[:text]}': \n\n#{found.join("\n")}") if found.any?
         UI.message("No debug code found in code base 🐛")
       end
 

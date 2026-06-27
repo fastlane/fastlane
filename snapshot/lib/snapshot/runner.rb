@@ -50,7 +50,7 @@ module Snapshot
 
       print_results(results)
 
-      UI.test_failure!(launcher.collected_errors.uniq.join('; ')) if launcher.collected_errors.count > 0
+      UI.test_failure!(launcher.collected_errors.uniq.join('; ')) if launcher.collected_errors.any?
 
       # Generate HTML report
       ReportsGenerator.new.generate
@@ -63,7 +63,7 @@ module Snapshot
     end
 
     def print_results(results)
-      return if results.count == 0
+      return if results.none?
 
       rows = []
       results.each do |device, languages|

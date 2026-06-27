@@ -29,9 +29,8 @@ module Spaceship
       }
 
       def roles
-        parsed_roles = []
-        raw_data["roles"].each do |role|
-          parsed_roles << role["value"]["name"]
+        parsed_roles = raw_data["roles"].map do |role|
+          role["value"]["name"]
         end
         return parsed_roles
       end
@@ -55,10 +54,9 @@ module Spaceship
       end
 
       def selected_apps
-        parsed_apps = []
         all_apps = Application.all
-        raw_data["userSoftwares"]["value"]["grantedSoftwareAdamIds"].each do |app_id|
-          parsed_apps << all_apps.select { |app| app.apple_id == app_id }
+        parsed_apps = raw_data["userSoftwares"]["value"]["grantedSoftwareAdamIds"].map do |app_id|
+          all_apps.select { |app| app.apple_id == app_id }
         end
         return parsed_apps.flatten
       end

@@ -37,7 +37,7 @@ module Sigh
       profiles = [] if Sigh.config[:skip_fetch_profiles]
       profiles ||= fetch_profiles # download the profile if it's there
 
-      if profiles.count > 0
+      if profiles.any?
         UI.success("Found #{profiles.count} matching profile(s)")
         profile = profiles.first
 
@@ -195,7 +195,7 @@ module Sigh
       filtered = profiles.select { |p| p.name.strip == Sigh.config[:provisioning_name].strip }
       if Sigh.config[:ignore_profiles_with_different_name]
         profiles = filtered
-      elsif (filtered || []).count > 0
+      elsif (filtered || []).any?
         profiles = filtered
       end
       profiles
@@ -286,7 +286,7 @@ module Sigh
         end
       end
 
-      if certificates.count == 0
+      if certificates.none?
         filters = ""
         filters << "Owner Name: '#{Sigh.config[:cert_owner_name]}' " if Sigh.config[:cert_owner_name]
         filters << "Certificate ID: '#{Sigh.config[:cert_id]}' " if Sigh.config[:cert_id]

@@ -64,7 +64,7 @@ module Fastlane
             stdout << return_value[:stdout]
           end
         end
-        command_word = params[:commands].count == 1 ? "command" : "commands"
+        command_word = params[:commands].one? ? "command" : "commands"
         UI.success("Successfully executed #{params[:commands].count} #{command_word} on host #{params[:host]}")
         Actions.lane_context[SharedValues::SSH_STDOUT_VALUE] = stdout
         Actions.lane_context[SharedValues::SSH_STDERR_VALUE] = stderr

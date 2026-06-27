@@ -41,11 +41,9 @@ module Fastlane
     end
 
     def header_separator_row
-      output = []
-      [*0...table.first.length].each do |column|
-        output.push(separator(column_width(column)))
+      [*0...table.first.length].map do |column|
+        separator(column_width(column))
       end
-      output
     end
 
     def to_md

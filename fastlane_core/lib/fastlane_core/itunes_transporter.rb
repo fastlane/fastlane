@@ -125,7 +125,7 @@ module FastlaneCore
         @errors << "The call to the iTMSTransporter completed with a non-zero exit status: #{exit_status}. This indicates a failure."
       end
 
-      if @warnings.count > 0
+      if @warnings.any?
         UI.important(@warnings.join("\n"))
       end
 
@@ -133,7 +133,7 @@ module FastlaneCore
         raise TransporterRequiresApplicationSpecificPasswordError
       end
 
-      if @errors.count > 0 && @all_lines.count > 0
+      if @errors.any? && @all_lines.any?
         # Print out the last 15 lines, this is key for non-verbose mode
         @all_lines.last(15).each do |line|
           UI.important("[iTMSTransporter] #{line}")
@@ -146,7 +146,7 @@ module FastlaneCore
       #  iTMSTransporter file transfer fails; iTMSTransporter will log an error
       #  but will then retry; if that retry is successful, we will see the error
       #  logged, but since the status code is zero, we want to return success
-      if @errors.count > 0 && exit_status.zero?
+      if @errors.any? && exit_status.zero?
         UI.important("Although errors occurred during execution of iTMSTransporter, it returned success status.")
       end
 
@@ -155,7 +155,7 @@ module FastlaneCore
     end
 
     def displayable_errors
-      @errors.map { |error| "[Transporter Error Output]: #{error}" }.join("\n").gsub!(/"/, "")
+      @errors.map { |error| "[Transporter Error Output]: #{error}" }.join("\n").gsub!('"', "")
     end
 
     def parse_provider_info(lines)
@@ -521,7 +521,7 @@ module FastlaneCore
       end
 
       # use standard behavior for other file types or macOS platform
-      super(source)
+      super
     end
 
     private
@@ -981,7 +981,9 @@ module FastlaneCore
 
     private
 
+    # rubocop:disable Lint/UselessConstantScoping
     TWO_FACTOR_ENV_VARIABLE = "FASTLANE_APPLE_APPLICATION_SPECIFIC_PASSWORD"
+    # rubocop:enable Lint/UselessConstantScoping
 
     # Returns whether altool should be used or ItunesTransporter should be used
     def should_use_altool?(altool_compatible_command, use_shell_script)

@@ -139,7 +139,7 @@ module Trainer
         self.subtests = fetch_values(data, "subtests").map do |subtests_data|
           ActionTestSummaryIdentifiableObject.create(subtests_data, self)
         end
-        super(data, parent)
+        super
       end
 
       def all_subtests
@@ -169,7 +169,7 @@ module Trainer
         self.performance_metrics_count = fetch_value(data, "performanceMetricsCount")
         self.failure_summaries_count = fetch_value(data, "failureSummariesCount")
         self.activity_summaries_count = fetch_value(data, "activitySummariesCount")
-        super(data, parent)
+        super
       end
 
       def all_subtests
@@ -515,7 +515,7 @@ module Trainer
             }
 
             row[:number_of_tests] = row[:tests].count
-            row[:number_of_failures] = row[:tests].find_all { |a| (a[:failures] || []).count > 0 }.count
+            row[:number_of_failures] = row[:tests].find_all { |a| (a[:failures] || []).any? }.count
 
             # Used for seeing if any tests continued to fail after all of the Xcode 13 (and up) retries have finished
             unique_tests = tests_by_identifier.values || []

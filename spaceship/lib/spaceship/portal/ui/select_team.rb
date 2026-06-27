@@ -50,7 +50,7 @@ module Spaceship
       def select_team(team_id: nil, team_name: nil)
         teams = client.teams
 
-        if teams.count == 0
+        if teams.none?
           puts("No teams available on the Developer Portal")
           puts("You must accept an invitation to a team for it to be available")
           puts("To learn more about teams and how to use them visit https://developer.apple.com/library/ios/documentation/IDEs/Conceptual/AppDistributionGuide/ManagingYourTeam/ManagingYourTeam.html")
@@ -85,7 +85,7 @@ module Spaceship
           puts("Couldn't find team with Name '#{team_name}. Make sure you have the proper permissions for this team'")
         end
 
-        return teams[0]['teamId'] if teams.count == 1 # user is just in one team
+        return teams[0]['teamId'] if teams.one? # user is just in one team
 
         unless self.class.interactive?
           puts("Multiple teams found on the Developer Portal, Your Terminal is running in non-interactive mode! Cannot continue from here.")

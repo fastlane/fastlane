@@ -170,11 +170,7 @@ module Spaceship
       end
 
       def platforms
-        platforms = []
-        version_sets.each do |version_set|
-          platforms << version_set.platform
-        end
-        platforms
+        version_sets.map(&:platform)
       end
 
       def type

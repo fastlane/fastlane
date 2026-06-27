@@ -269,7 +269,7 @@ module Spaceship
     #
     # @return (String) the cookie-string in the RFC6265 format: https://tools.ietf.org/html/rfc6265#section-4.2.1
     def cookie
-      @cookie.map(&:to_s).join(';')
+      @cookie.join(';')
     end
 
     def store_cookie(path: nil)
@@ -980,7 +980,7 @@ module Spaceship
     # Is called from `parse_response` to store the latest csrf_token (if available)
     def store_csrf_tokens(response)
       if response && response.headers
-        tokens = response.headers.select { |k, v| %w(csrf csrf_ts).include?(k) }
+        tokens = response.headers.slice('csrf', 'csrf_ts')
         if tokens && !tokens.empty?
           @csrf_tokens = tokens
         end

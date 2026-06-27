@@ -25,6 +25,18 @@ AllCops:
     - '**/spec/fixtures/broken_files/broken_file.rb'
     - '**/*.provisionprofile'
 
+# often we want to keep non-? predicate methods for backwards compatibility
+Naming/PredicateMethod:
+  Enabled: false
+
+# splitting files would be a too large refactor
+Style/OneClassPerFile:
+  Enabled: false
+
+# we often use File.open without a block for simple cases
+Style/FileOpen:
+  Enabled: false
+
 Lint/ErbNewArguments:
   Enabled: false
 
@@ -254,7 +266,7 @@ Lint/ParenthesesAsGroupedExpression:
 
 # This would reject is_ in front of methods
 # We use `is_supported?` everywhere already
-Naming/PredicateName:
+Naming/PredicatePrefix:
   Enabled: false
 
 # We allow the $

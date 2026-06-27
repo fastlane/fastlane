@@ -2,7 +2,7 @@ require 'net/http/post/multipart'
 require 'securerandom'
 
 require_relative '../../module'
-require_relative './secure_file'
+require_relative 'secure_file'
 
 module Match
   module Storage
@@ -47,13 +47,9 @@ module Match
 
             res = execute_request(url, request)
 
-            data = []
-
-            JSON.parse(res.body).each do |file|
-              data << SecureFile.new(client: self, file: file)
+            JSON.parse(res.body).map do |file|
+              SecureFile.new(client: self, file: file)
             end
-
-            data
           end
         end
 
