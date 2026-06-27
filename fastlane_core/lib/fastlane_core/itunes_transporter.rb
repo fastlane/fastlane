@@ -403,10 +403,6 @@ module FastlaneCore
 
     private
 
-    def file_upload_option(source)
-      "-f #{source.shellescape}"
-    end
-
     def platform_option(platform)
       "-t #{platform == 'osx' ? 'macos' : platform}"
     end
@@ -482,7 +478,7 @@ module FastlaneCore
         '"' + Helper.transporter_path + '"',
         '-m verify',
         build_credential_params(username, password, jwt),
-        "-f #{source.shellescape}",
+        file_upload_option(source),
         ("-WONoPause true" if Helper.windows?), # Windows only: process instantly returns instead of waiting for key press
         ("-itc_provider #{provider_short_name}" if jwt.nil? && !provider_short_name.to_s.empty?)
       ].compact.join(' ')

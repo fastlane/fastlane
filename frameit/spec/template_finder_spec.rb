@@ -113,6 +113,18 @@ describe Frameit do
 
         expect(Frameit::TemplateFinder.get_template(screenshot)).to eq(expected_result)
       end
+
+      it 'finds an iPhone 17 Pro' do
+        screenshot = make_screenshot({
+                                         device_name: 'Apple iPhone 17 Pro',
+                                         color: 'Silver',
+                                         orientation_name: 'Vert',
+                                         deliver_screen_id: DEVICE_SCREEN_IDS[DisplayType::APP_IPHONE_61]
+        })
+        expected_result = 'Apple iPhone 17 Pro Silver'
+
+        expect(Frameit::TemplateFinder.get_template(screenshot)).to eq(expected_result)
+      end
     end
   end
 end

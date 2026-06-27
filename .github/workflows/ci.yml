@@ -9,6 +9,9 @@ concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: true
 
+permissions:
+  contents: read
+
 env:
   TEST_REPORTS: ${{ github.workspace }}/test-reports
   CIRCLE_TEST_REPORTS: ${{ github.workspace }}/test-reports
@@ -23,7 +26,7 @@ jobs:
         include:
           - { xcode: '', ruby: '3.2', rubyopt: '', os: 'windows-2022' }
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v7
 
       - name: Select Xcode ${{ matrix.xcode }}
         if: runner.os == 'macOS'
@@ -87,3 +90,49 @@ jobs:
           name: ruby_warnings-${{ matrix.xcode }}-ruby-${{ matrix.ruby }}.txt
           path: ${{ env.TEST_REPORTS }}/ruby_warnings.txt
           if-no-files-found: ignore
+
+  validate_fastlane_swift_generation:
+    name: Validate Fastlane.swift generation
+    runs-on: macos-26
+    steps:
+      - uses: actions/checkout@v6
+
+      - uses: maxim-lobanov/setup-xcode@v1
+        with:
+          xcode-version: '26.3'
+
+      - uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: '3.4'
+          bundler-cache: true
+
+      - name: Generate Swift API
+        run: bundle exec fastlane generate_swift_api
+
+  validate_documentation:
+    name: Validate Documentation
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v6
+
+      - uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: '3.4'
+          bundler-cache: true
+
+      - name: Validate docs
+        run: bundle exec fastlane validate_docs
+
+  lint_source_code:
+    name: Lint source code
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v6
+
+      - uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: '3.4'
+          bundler-cache: true
+
+      - name: Lint
+        run: bundle exec fastlane lint_source

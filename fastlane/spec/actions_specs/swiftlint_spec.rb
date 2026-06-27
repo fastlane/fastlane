@@ -126,6 +126,62 @@ describe Fastlane do
           expect(result).to eq("swiftlint lint --path #{path}")
         end
 
+        it "passes path as a positional argument for swiftlint 0.48.0 and above" do
+          allow(Fastlane::Actions::SwiftlintAction).to receive(:swiftlint_version).and_return(Gem::Version.new('0.48.0'))
+          path = "./spec/fixtures"
+          result = Fastlane::FastFile.new.parse("
+            lane :test do
+              swiftlint(
+                path: '#{path}'
+              )
+            end").runner.execute(:test)
+
+          expect(result).to eq("swiftlint lint #{path}")
+        end
+
+        it "passes path after option flags as a positional argument for swiftlint 0.48.0 and above" do
+          allow(Fastlane::Actions::SwiftlintAction).to receive(:swiftlint_version).and_return(Gem::Version.new('0.48.0'))
+          path = "./spec/fixtures"
+          result = Fastlane::FastFile.new.parse("
+            lane :test do
+              swiftlint(
+                path: '#{path}',
+                strict: true
+              )
+            end").runner.execute(:test)
+
+          expect(result).to eq("swiftlint lint --strict #{path}")
+        end
+
+        it "appends the positional path after --use-script-input-files for swiftlint 0.48.0 and above" do
+          allow(Fastlane::Actions::SwiftlintAction).to receive(:swiftlint_version).and_return(Gem::Version.new('0.48.0'))
+          allow(File).to receive(:exist?).and_return(true)
+          path = "./spec/fixtures"
+          result = Fastlane::FastFile.new.parse("
+            lane :test do
+              swiftlint(
+                path: '#{path}',
+                files: ['AppDelegate.swift']
+              )
+            end").runner.execute(:test)
+
+          expect(result).to eq("SCRIPT_INPUT_FILE_COUNT=1 SCRIPT_INPUT_FILE_0=AppDelegate.swift swiftlint lint --use-script-input-files #{path}")
+        end
+
+        it "escapes spaces when passing path as a positional argument" do
+          allow(Fastlane::Actions::SwiftlintAction).to receive(:swiftlint_version).and_return(Gem::Version.new('0.48.0'))
+          allow(File).to receive(:exist?).and_return(true)
+          path = "./spec/my fixtures"
+          result = Fastlane::FastFile.new.parse("
+            lane :test do
+              swiftlint(
+                path: '#{path}'
+              )
+            end").runner.execute(:test)
+
+          expect(result).to eq("swiftlint lint #{path.shellescape}")
+        end
+
         it "adds invalid path option" do
           path = "./non/existent/path"
           expect do

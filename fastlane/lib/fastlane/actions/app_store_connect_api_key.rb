@@ -9,8 +9,8 @@ module Fastlane
 
     class AppStoreConnectApiKeyAction < Action
       def self.run(options)
-        key_id = options[:key_id]
-        issuer_id = options[:issuer_id]
+        key_id = options[:key_id]&.strip
+        issuer_id = options[:issuer_id]&.strip
         key_content = options[:key_content]
         is_key_content_base64 = options[:is_key_content_base64]
         key_filepath = options[:key_filepath]

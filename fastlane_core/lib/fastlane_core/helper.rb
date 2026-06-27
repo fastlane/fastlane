@@ -3,6 +3,7 @@ require 'colored'
 require 'tty-spinner'
 require 'pathname'
 
+require_relative 'command_executor'
 require_relative 'fastlane_folder'
 require_relative 'ui/ui'
 require_relative 'env'
@@ -184,7 +185,7 @@ module FastlaneCore
 
     # @return Swift version
     def self.swift_version
-      if system("which swift > /dev/null 2>&1")
+      if self.which('swift')
         output = `swift --version 2> /dev/null`
         return output.split("\n").first.match(/version ([0-9.]+)/).captures.first
       end
@@ -300,6 +301,18 @@ module FastlaneCore
 
     # helper methods
     #
+
+    # Cross-platform way of finding an executable in the $PATH.
+    # Returns the full path to the executable, or nil if not found.
+    # Unlike shelling out to `which`, this produces no output, making
+    # it suitable for CI environments.
+    #
+    #   Helper.which('ruby') #=> "/usr/bin/ruby"
+    #   Helper.which('not_real') #=> nil
+    #
+    def self.which(cmd)
+      FastlaneCore::CommandExecutor.which(cmd)
+    end
 
     # Runs a given command using backticks (`)
     # and prints them out using the UI.command method
