@@ -462,25 +462,25 @@ describe Fastlane do
 
       it "properly shows an error message when there is a syntax error in the Fastfile" do
         allow(FastlaneCore::FastlaneFolder).to receive(:path).and_return(nil)
-        expect(UI).to receive(:content_error).with(<<-RUBY.chomp, "17")
+        expect(UI).to receive(:content_error).with(<<~RUBY.chomp, "17")
 
 
 
-# empty lines to test the line parsing as well
-
-
-
-
+          # empty lines to test the line parsing as well
 
 
 
 
 
 
-lane :beta do
-  sigh(app_identifier: "hi"
-end
-RUBY
+
+
+
+
+          lane :beta do
+            sigh(app_identifier: "hi"
+          end
+        RUBY
         expected_message = if Gem::Version.create('3.4.0') <= Gem::Version.create(RUBY_VERSION)
                              %r{Syntax error in your Fastfile on line 17: fastlane/spec/fixtures/fastfiles/FastfileSyntaxError:17: syntax error found}
                            else
@@ -519,25 +519,25 @@ RUBY
       it "properly shows an error message when there is a syntax error in the imported Fastfile" do
         allow(FastlaneCore::FastlaneFolder).to receive(:path).and_return(nil)
         ff = Fastlane::FastFile.new('./fastlane/spec/fixtures/fastfiles/Fastfile')
-        expect(UI).to receive(:content_error).with(<<-RUBY.chomp, "17")
+        expect(UI).to receive(:content_error).with(<<~RUBY.chomp, "17")
 
 
 
-# empty lines to test the line parsing as well
-
-
-
-
+          # empty lines to test the line parsing as well
 
 
 
 
 
 
-lane :beta do
-  sigh(app_identifier: "hi"
-end
-RUBY
+
+
+
+
+          lane :beta do
+            sigh(app_identifier: "hi"
+          end
+        RUBY
         expected_message = if Gem::Version.create('3.4.0') <= Gem::Version.create(RUBY_VERSION)
                              %r{Syntax error in your Fastfile on line 17: fastlane/spec/fixtures/fastfiles/FastfileSyntaxError:17: syntax error found}
                            else

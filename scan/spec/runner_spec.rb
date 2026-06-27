@@ -181,11 +181,11 @@ describe Scan do
       end
 
       it "retry a failed test", requires_xcodebuild: true do
-        error_output = <<-ERROR_OUTPUT
-Failing tests:
-  FastlaneAppTests:
-          FastlaneAppTests.testCoinToss()
-          -[FastlaneAppTestsOC testCoinTossOC]
+        error_output = <<~ERROR_OUTPUT
+          Failing tests:
+            FastlaneAppTests:
+                    FastlaneAppTests.testCoinToss()
+                    -[FastlaneAppTestsOC testCoinTossOC]
           ERROR_OUTPUT
 
         expect(Fastlane::UI).to receive(:important).with("Retrying tests: FastlaneAppTests/FastlaneAppTests/testCoinToss, FastlaneAppTests/FastlaneAppTestsOC/testCoinTossOC").once
@@ -196,11 +196,11 @@ Failing tests:
       end
 
       it "retry a failed test when project scheme name has non-whitespace character", requires_xcodebuild: true do
-        error_output = <<-ERROR_OUTPUT
-Failing tests:
-  Fastlane-App-Tests:
-          FastlaneAppTests.testCoinToss()
-          -[FastlaneAppTestsOC testCoinTossOC]
+        error_output = <<~ERROR_OUTPUT
+          Failing tests:
+            Fastlane-App-Tests:
+                    FastlaneAppTests.testCoinToss()
+                    -[FastlaneAppTestsOC testCoinTossOC]
           ERROR_OUTPUT
 
         expect(Fastlane::UI).to receive(:important).with("Retrying tests: Fastlane-App-Tests/FastlaneAppTests/testCoinToss, Fastlane-App-Tests/FastlaneAppTestsOC/testCoinTossOC").once
@@ -211,11 +211,11 @@ Failing tests:
       end
 
       it "fail to parse error output", requires_xcodebuild: true do
-        error_output = <<-ERROR_OUTPUT
-Failing tests:
-FastlaneAppTests:
-FastlaneAppTests.testCoinToss()
--[FastlaneAppTestsOC testCoinTossOC]
+        error_output = <<~ERROR_OUTPUT
+          Failing tests:
+          FastlaneAppTests:
+          FastlaneAppTests.testCoinToss()
+          -[FastlaneAppTestsOC testCoinTossOC]
           ERROR_OUTPUT
 
         expect do

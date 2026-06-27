@@ -159,10 +159,6 @@ Style/DoubleNegation:
 Style/SymbolArray:
   Enabled: false
 
-# We still support Ruby 2.0.0
-Layout/HeredocIndentation:
-  Enabled: false
-
 # This cop would not work fine with rspec
 Style/MixinGrouping:
   Exclude:

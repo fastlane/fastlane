@@ -628,7 +628,7 @@ private_lane :ensure_special_docs_code_samples do
   all_content = ""
   files = Dir["../fastlane/lib/fastlane/actions/docs/*.md"]
   files.each do |special_docs_page_path|
-    all_content += File.read(special_docs_page_path)
+    all_content += File.read(special_docs_page_path, encoding: "utf-8")
   end
   test_sample_code(content: all_content) # to not have to call the action 200 times
   UI.success("✅  All fastlane action special docs code samples (from #{files.length} files) work as expected")

@@ -2,7 +2,8 @@ module Fastlane
   module Actions
     class TestSampleCodeAction < Action
       def self.run(params)
-        content = params[:content] || File.read(params[:path])
+        content = params[:content] || File.read(params[:path], encoding: "utf-8")
+        content = content.encode("utf-8", invalid: :replace, undef: :replace, replace: "")
         fill_in_env_variables
 
         errors = []

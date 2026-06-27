@@ -178,35 +178,35 @@ describe Spaceship::Client do
     end
 
     it "raises BadGatewayError when response contains 'Bad Gateway'" do
-      body = <<BODY
-      <!DOCTYPE html>
-<html lang="en">
-<head>
-    <style>
-        body {
-            font-family: "Helvetica Neue", "HelveticaNeue", Helvetica, Arial, sans-serif;
-            font-size: 15px;
-            font-weight: 200;
-            line-height: 20px;
-            color: #4c4c4c;
-            text-align: center;
-        }
+      body = <<~BODY
+              <!DOCTYPE html>
+        <html lang="en">
+        <head>
+            <style>
+                body {
+                    font-family: "Helvetica Neue", "HelveticaNeue", Helvetica, Arial, sans-serif;
+                    font-size: 15px;
+                    font-weight: 200;
+                    line-height: 20px;
+                    color: #4c4c4c;
+                    text-align: center;
+                }
 
-        .section {
-            margin-top: 50px;
-        }
-    </style>
-</head>
-<body>
-<div class="section">
-    <h1>&#63743;</h1>
+                .section {
+                    margin-top: 50px;
+                }
+            </style>
+        </head>
+        <body>
+        <div class="section">
+            <h1>&#63743;</h1>
 
-    <h3>Bad Gateway</h3>
-    <p>Correlation Key: XXXXXXXXXXXXXXXXXXXX</p>
-</div>
-</body>
-</html>
-BODY
+            <h3>Bad Gateway</h3>
+            <p>Correlation Key: XXXXXXXXXXXXXXXXXXXX</p>
+        </div>
+        </body>
+        </html>
+      BODY
       stub_client_retry_auth(502, 1, 200, body)
 
       expect do
@@ -249,35 +249,35 @@ BODY
     end
 
     it "raises BadGatewayError when response contains 'Bad Gateway'" do
-      body = <<BODY
-      <!DOCTYPE html>
-<html lang="en">
-<head>
-    <style>
-        body {
-            font-family: "Helvetica Neue", "HelveticaNeue", Helvetica, Arial, sans-serif;
-            font-size: 15px;
-            font-weight: 200;
-            line-height: 20px;
-            color: #4c4c4c;
-            text-align: center;
-        }
+      body = <<~BODY
+              <!DOCTYPE html>
+        <html lang="en">
+        <head>
+            <style>
+                body {
+                    font-family: "Helvetica Neue", "HelveticaNeue", Helvetica, Arial, sans-serif;
+                    font-size: 15px;
+                    font-weight: 200;
+                    line-height: 20px;
+                    color: #4c4c4c;
+                    text-align: center;
+                }
 
-        .section {
-            margin-top: 50px;
-        }
-    </style>
-</head>
-<body>
-<div class="section">
-    <h1>&#63743;</h1>
+                .section {
+                    margin-top: 50px;
+                }
+            </style>
+        </head>
+        <body>
+        <div class="section">
+            <h1>&#63743;</h1>
 
-    <h3>Bad Gateway</h3>
-    <p>Correlation Key: XXXXXXXXXXXXXXXXXXXX</p>
-</div>
-</body>
-</html>
-BODY
+            <h3>Bad Gateway</h3>
+            <p>Correlation Key: XXXXXXXXXXXXXXXXXXXX</p>
+        </div>
+        </body>
+        </html>
+      BODY
       stub_client_retry_auth(502, 1, 200, body)
 
       expect do

@@ -65,9 +65,11 @@ module Fastlane
 
       def self.example_code
         [
-          %{spec = read_podspec
-          version = spec["version"]
-          puts "Using Version #{version}"},
+          <<~CODE,
+            spec = read_podspec
+            version = spec["version"]
+            puts "Using Version \#{version}"
+          CODE
           'spec = read_podspec(path: "./XcodeServerSDK.podspec")'
         ]
       end

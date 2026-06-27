@@ -78,11 +78,11 @@ describe FastlaneCore do
 
         # We are implicitly also checking that the error was not rethrown because that would
         # have crashed the test
-        expect(result).to eq(<<-LIST.chomp)
-Shopping list:
-  - Milk
-  - Bread
-  - Muffins
+        expect(result).to eq(<<~LIST.chomp)
+          Shopping list:
+            - Milk
+            - Bread
+            - Muffins
         LIST
       end
 

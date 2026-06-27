@@ -179,24 +179,25 @@ module Fastlane
             path: "/repos/:owner/:repo/readme",
             body: { ref: "master" }
           )',
-            %{# Alternatively call directly with optional error handling or block usage
-            GithubApiAction.run(
-              server_url: "https://api.github.com",
-              api_token: ENV["GITHUB_TOKEN"],
-              http_method: "GET",
-              path: "/repos/:owner/:repo/readme",
-              error_handlers: {
-                404 => proc do |result|
-                  UI.message("Something went wrong - I couldn\'t find it...")
-                end,
-                \'*\' => proc do |result|
-                  UI.message("Handle all error codes other than 404")
-                end
-              }
-            ) do |result|
-              UI.message("JSON returned: #{result[:json]}")
-            end
-          }
+            <<~CODE
+              # Alternatively call directly with optional error handling or block usage
+              GithubApiAction.run(
+                server_url: "https://api.github.com",
+                api_token: ENV["GITHUB_TOKEN"],
+                http_method: "GET",
+                path: "/repos/:owner/:repo/readme",
+                error_handlers: {
+                  404 => proc do |result|
+                    UI.message("Something went wrong - I couldn't find it...")
+                  end,
+                  '*' => proc do |result|
+                    UI.message("Handle all error codes other than 404")
+                  end
+                }
+              ) do |result|
+                UI.message("JSON returned: \#{result[:json]}")
+              end
+            CODE
           ]
         end
 
