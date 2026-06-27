@@ -304,7 +304,7 @@ module Match
                                                   "The expired certificate is removed from the match storage and a new one is created, but the old certificate is not revoked on the " \
                                                   "Apple Developer Portal — run `fastlane match nuke` if you need to free up certificate slots",
                                      type: Boolean,
-                                     default_value: true),
+                                     default_value: false),
         FastlaneCore::ConfigItem.new(key: :skip_confirmation,
                                      env_name: "MATCH_SKIP_CONFIRMATION",
                                      description: "Disables confirmation prompts during nuke, answering them with yes",
