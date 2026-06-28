@@ -85,12 +85,12 @@ module Match
       end
 
       # Certificate
-      cert_id = fetch_certificate(params: params, renew_expired_certs: false)
+      cert_id = fetch_certificate(params: params, renew_expired_certs: params[:renew_expired_certs])
 
       # Mac Installer Distribution Certificate
       additional_cert_types = params[:additional_cert_types] || []
       cert_ids = additional_cert_types.map do |additional_cert_type|
-        fetch_certificate(params: params, renew_expired_certs: false, specific_cert_type: additional_cert_type)
+        fetch_certificate(params: params, renew_expired_certs: params[:renew_expired_certs], specific_cert_type: additional_cert_type)
       end
 
       profile_type = Sigh.profile_type_for_distribution_type(
@@ -174,6 +174,8 @@ module Match
       is_cert_renewable = is_authenticated_with_login || is_cert_renewable_via_api
 
       # Validate existing certificate first.
+      # NOTE: only a single certificate is considered here — the one matching
+      # `certificate_id`, or otherwise the last one found for this type.
       if renew_expired_certs && is_cert_renewable && storage_has_certs && !params[:readonly]
         cert_path = select_cert_or_key(paths: certs, certificate_id: certificate_id)
 
