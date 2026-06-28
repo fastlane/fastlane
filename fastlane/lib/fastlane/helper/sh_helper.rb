@@ -66,11 +66,11 @@ module Fastlane
         # relevant platforms.
         if exit_status.exitstatus != 0
           message = if print_command
-                      "Exit status of command '#{shell_command}' was #{exit_status.exitstatus} instead of 0."
+                      "Exit status of command '#{shell_command}' was #{exit_status.exitstatus} instead of 0.\n"
                     else
-                      "Shell command exited with exit status #{exit_status.exitstatus} instead of 0."
+                      "Shell command exited with exit status #{exit_status.exitstatus} instead of 0.\n"
                     end
-          message += "\n#{result[-500..-1]}" if print_command_output && !$stdout.isatty
+          message += (result.length > 500 ? result[-500..-1] : result).to_s if print_command_output && !$stdout.isatty
 
           if error_callback || block_given?
             UI.error(message)
