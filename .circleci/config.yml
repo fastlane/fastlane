@@ -3,8 +3,8 @@
 version: 2.1
 orbs:
   shellcheck: circleci/shellcheck@2.2.2 # brew install shellcheck stopped working so using this
-  macos: circleci/macos@2
-  ruby: circleci/ruby@2.5.4
+  macos: circleci/macos@3.0.0
+  ruby: circleci/ruby@3.0.0
 
 aliases:
   # common - cache
@@ -171,6 +171,11 @@ workflows:
           name: 'Execute tests on macOS (Xcode 26.5.0, Ruby 3.4)'
           xcode_version: '26.5.0'
           ruby_version: '3.4'
+          ruby_opt: -W:deprecated
+      - tests_macos:
+          name: 'Execute tests on macOS (Xcode 26.2.0, Ruby 4.0)'
+          xcode_version: '26.2.0'
+          ruby_version: '4.0.5'
           ruby_opt: -W:deprecated
       - tests_ubuntu:
           name: 'Execute tests on Ubuntu (Ruby 3.0)'
