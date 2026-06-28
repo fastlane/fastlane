@@ -27,7 +27,7 @@ module Match
     type = type.to_s.downcase
     return :mac_installer_distribution if type == "mac_installer_distribution"
     return :developer_id_installer if type == "developer_id_installer"
-    return :developer_id_application if type == "developer_id"
+    return :developer_id_application if type == "developer_id" || type == "developer_id_application"
     return :enterprise if type == "enterprise"
     return :development if type == "development"
     return :distribution if ["adhoc", "appstore", "distribution"].include?(type)
