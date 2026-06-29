@@ -55,7 +55,6 @@ module Fastlane
 
         print_lane_context
         print_error_line(ex)
-        UI.error(ex.to_s) if ex.kind_of?(StandardError) # we don't want to print things like 'system exit'
         e = ex
       end
 
