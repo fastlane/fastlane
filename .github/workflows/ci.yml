@@ -95,7 +95,7 @@ jobs:
     name: Validate Fastlane.swift generation
     runs-on: macos-26
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v7
 
       - uses: maxim-lobanov/setup-xcode@v1
         with:
@@ -113,7 +113,7 @@ jobs:
     name: Validate Documentation
     runs-on: ubuntu-24.04
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v7
 
       - uses: ruby/setup-ruby@v1
         with:
@@ -127,7 +127,7 @@ jobs:
     name: Lint source code
     runs-on: ubuntu-24.04
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v7
 
       - uses: ruby/setup-ruby@v1
         with:
