@@ -10,12 +10,16 @@ gem "climate_control", "~> 0.2.0"
 # A tool for integrating Coveralls.io with Ruby apps.
 gem "coveralls", "~> 0.8.13"
 # Automates code review chores.
-gem "danger", "~> 8.0"
+gem "danger", "~> 9.0"
 # Plugin for Danger that reports JUnit test results.
 gem "danger-junit", "~> 1.0"
 # A fake filesystem.
 # Version 3.0.2 requires Ruby >=3.2, while fastlane uses a `required_ruby_version` of `>= 3.0`.
 gem "fakefs", ['>= 1.8', '< 3.0.2']
+# Danger 9 pulls in faraday-http-cache; 2.6.0+ requires Ruby 3.2+.
+gem "faraday-http-cache", "< 2.6"
+# Version 2 requires Ruby >=3.2, while fastlane uses a `required_ruby_version` of `>= 3.0`.
+gem "git", "< 2"
 # for file uploads with Faraday
 gem "mime-types", ['>= 1.16', '< 4.0']
 # standard library for OpenSSL has affected versions (unable to get certificate CRL) - ruby/openssl/issues/949
