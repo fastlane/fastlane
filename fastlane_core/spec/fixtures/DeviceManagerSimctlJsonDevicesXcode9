@@ -1,0 +1,154 @@
+{
+  "devices" : {
+    "com.apple.CoreSimulator.SimRuntime.iOS-11-0" : [
+      {
+        "name" : "iPhone 5s",
+        "udid" : "D78B5541-4BAF-4C4D-A666-7BCFBD9A01B0",
+        "state" : "Shutdown",
+        "isAvailable" : true
+      },
+      {
+        "name" : "iPhone 6",
+        "udid" : "0BD15B40-0F9F-476E-94FE-C661B4B168D9",
+        "state" : "Shutdown",
+        "isAvailable" : true
+      },
+      {
+        "name" : "iPhone 6 Plus",
+        "udid" : "1012C880-9F15-4D64-974D-EDFFB5398353",
+        "state" : "Shutdown",
+        "isAvailable" : true
+      },
+      {
+        "name" : "iPhone 6s",
+        "udid" : "5B9D4CDF-586C-4100-BE77-3CD7BFDB3919",
+        "state" : "Shutdown",
+        "isAvailable" : true
+      },
+      {
+        "name" : "iPhone 6s Plus",
+        "udid" : "B1A8564E-0313-4E98-94F0-4E962145F31F",
+        "state" : "Shutdown",
+        "isAvailable" : true
+      },
+      {
+        "name" : "iPhone 7",
+        "udid" : "0157672C-3DB1-4EC1-82CB-42432AB89D99",
+        "state" : "Shutdown",
+        "isAvailable" : true
+      },
+      {
+        "name" : "iPhone 7 Plus",
+        "udid" : "B99D967F-D037-4544-8545-8F6CA7842679",
+        "state" : "Shutdown",
+        "isAvailable" : true
+      },
+      {
+        "name" : "iPhone SE",
+        "udid" : "4EC8CAF1-113D-426F-AA4E-A800396EE84B",
+        "state" : "Shutdown",
+        "isAvailable" : true
+      },
+      {
+        "name" : "iPad Air",
+        "udid" : "87A0833E-2789-4797-A0F6-98FAC38C7B50",
+        "state" : "Shutdown",
+        "isAvailable" : true
+      },
+      {
+        "name" : "iPad Air 2",
+        "udid" : "D7DF2739-06E0-4AF3-B915-44766593DE3E",
+        "state" : "Shutdown",
+        "isAvailable" : true
+      },
+      {
+        "name" : "iPad (5th generation)",
+        "udid" : "852A5796-63C3-4641-9825-65EBDC5C4259",
+        "state" : "Shutdown",
+        "isAvailable" : true
+      },
+      {
+        "name" : "iPad Pro (9.7-inch)",
+        "udid" : "516CD2B9-15F1-4BD4-BF0D-99F794EA4D6E",
+        "state" : "Shutdown",
+        "isAvailable" : true
+      },
+      {
+        "name" : "iPad Pro (12.9-inch)",
+        "udid" : "C7C55339-DE8F-4DA3-B94A-09879CB1E5B5",
+        "state" : "Shutdown",
+        "isAvailable" : true
+      },
+      {
+        "name" : "iPad Pro (12.9-inch) (2nd generation)",
+        "udid" : "D2408DE5-C74F-4AD1-93FA-CC083D438321",
+        "state" : "Shutdown",
+        "isAvailable" : true
+      },
+      {
+        "name" : "iPad Pro (10.5-inch)",
+        "udid" : "ED8B6B96-11CC-4848-93B8-4D5D627ABF7E",
+        "state" : "Shutdown",
+        "isAvailable" : true
+      }
+    ],
+    "com.apple.CoreSimulator.SimRuntime.tvOS-11-0" : [
+      {
+        "name" : "Apple TV 1080p",
+        "udid" : "FFA6ECC3-89A0-43E3-8AE3-C050853617A4",
+        "state" : "Shutdown",
+        "isAvailable" : true
+      }
+    ],
+    "com.apple.CoreSimulator.SimRuntime.watchOS-4-0" : [
+      {
+        "name" : "Apple Watch - 38mm",
+        "udid" : "550F7050-9513-401C-B44B-6274513BE525",
+        "state" : "Shutdown",
+        "isAvailable" : true
+      },
+      {
+        "name" : "Apple Watch - 42mm",
+        "udid" : "86E08B2D-3F6B-40F9-989C-FCFF3B354E78",
+        "state" : "Shutdown",
+        "isAvailable" : true
+      },
+      {
+        "name" : "Apple Watch Series 2 - 38mm",
+        "udid" : "E5465A07-26E1-41D4-B952-B5A5DA51722B",
+        "state" : "Shutdown",
+        "isAvailable" : true
+      },
+      {
+        "name" : "Apple Watch Series 2 - 42mm",
+        "udid" : "246B4562-0417-4286-A25A-B851A1033525",
+        "state" : "Shutdown",
+        "isAvailable" : true
+      }
+    ],
+    "com.apple.CoreSimulator.SimRuntime.iOS-10-3" : [
+      {
+        "name" : "iPhone 5",
+        "udid" : "BEA81416-2840-453A-8EB1-A46D7264FFF4",
+        "state" : "Shutdown",
+        "isAvailable" : false
+      }
+    ],
+    "com.apple.CoreSimulator.SimRuntime.tvOS-10-2" : [
+      {
+        "name" : "Apple TV 1080p",
+        "udid" : "2473992F-2335-4D91-B6DB-ED03963AD54D",
+        "state" : "Shutdown",
+        "isAvailable" : false
+      }
+    ],
+    "com.apple.CoreSimulator.SimRuntime.watchOS-3-2" : [
+      {
+        "name" : "Apple Watch - 38mm",
+        "udid" : "ED95E48F-DBB8-4F40-BE3E-C869F31BF8E0",
+        "state" : "Shutdown",
+        "isAvailable" : false
+      }
+    ]
+  }
+}

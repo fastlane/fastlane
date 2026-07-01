@@ -1,0 +1,26 @@
+{
+  "devices" : {
+    "com.apple.CoreSimulator.SimRuntime.iOS-26-3" : [
+      {
+        "name" : "iPhone 17 Pro",
+        "udid" : "E2FB1234-ABCD-4567-8901-234567890ABC",
+        "state" : "Shutdown",
+        "isAvailable" : true
+      },
+      {
+        "name" : "iPhone 17 Pro Max",
+        "udid" : "F3AC5678-DCBA-7654-1098-CBA987654321",
+        "state" : "Booted",
+        "isAvailable" : true
+      }
+    ],
+    "com.apple.CoreSimulator.SimRuntime.xrOS-2-0" : [
+      {
+        "name" : "Apple Vision Pro",
+        "udid" : "A1B2C3D4-E5F6-7890-ABCD-EF1234567890",
+        "state" : "Shutdown",
+        "isAvailable" : true
+      }
+    ]
+  }
+}
