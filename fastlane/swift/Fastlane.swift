@@ -7895,7 +7895,7 @@ public func pem(platform: String = "ios",
    - lastName: The tester's last name
    - email: The tester's email
    - testersFilePath: Path to a CSV file of testers
-   - groups: Associate tester to one group or more by group name / group id. E.g. `-g "Team 1","Team 2"` This is required when `distribute_external` option is set to true or when we want to add a tester to one or more external testing groups
+   - groups: Associate tester to one group or more by group name / group id. E.g. `-g "Team 1","a06cf5b5-95a9-4beb-88c6-f22bd6b3f7a2"` This is required when `distribute_external` option is set to true or when we want to add a tester to one or more external testing groups
    - teamId: The ID of your App Store Connect team if you're in multiple teams
    - teamName: The name of your App Store Connect team if you're in multiple teams
    - devPortalTeamId: The short ID of your team in the developer portal, if you're in multiple teams. Different from your iTC team ID!
@@ -11818,7 +11818,7 @@ public func testfairy(apiKey: String,
    - lastName: The tester's last name
    - email: The tester's email
    - testersFilePath: Path to a CSV file of testers
-   - groups: Associate tester to one group or more by group name / group id. E.g. `-g "Team 1","Team 2"` This is required when `distribute_external` option is set to true or when we want to add a tester to one or more external testing groups
+   - groups: Associate tester to one group or more by group name / group id. E.g. `-g "Team 1","a06cf5b5-95a9-4beb-88c6-f22bd6b3f7a2"` This is required when `distribute_external` option is set to true or when we want to add a tester to one or more external testing groups
    - teamId: The ID of your App Store Connect team if you're in multiple teams
    - teamName: The name of your App Store Connect team if you're in multiple teams
    - devPortalTeamId: The short ID of your team in the developer portal, if you're in multiple teams. Different from your iTC team ID!
@@ -13334,7 +13334,7 @@ public func uploadToPlayStoreInternalAppSharing(packageName: String,
    - lastName: The tester's last name
    - email: The tester's email
    - testersFilePath: Path to a CSV file of testers
-   - groups: Associate tester to one group or more by group name / group id. E.g. `-g "Team 1","Team 2"` This is required when `distribute_external` option is set to true or when we want to add a tester to one or more external testing groups
+   - groups: Associate tester to one group or more by group name / group id. E.g. `-g "Team 1","a06cf5b5-95a9-4beb-88c6-f22bd6b3f7a2"` This is required when `distribute_external` option is set to true or when we want to add a tester to one or more external testing groups
    - teamId: The ID of your App Store Connect team if you're in multiple teams
    - teamName: The name of your App Store Connect team if you're in multiple teams
    - devPortalTeamId: The short ID of your team in the developer portal, if you're in multiple teams. Different from your iTC team ID!
