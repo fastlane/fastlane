@@ -113,7 +113,8 @@ describe FastlaneCore do
 
     def altool_upload_command(api_key: nil, platform: "macos", provider_short_name: "", provider_public_id: "", use_asset_path: false)
       use_api_key = !api_key.nil?
-      upload_part = use_asset_path ? "-assetFile /tmp/#{random_uuid}.ipa" : "-f /tmp/my.app.id.itmsp"
+      # altool never supports -assetFile, so even asset paths use -f
+      upload_part = use_asset_path ? "-f /tmp/#{random_uuid}.ipa" : "-f /tmp/my.app.id.itmsp"
       escaped_password = password.shellescape
 
       [
@@ -128,6 +129,26 @@ describe FastlaneCore do
         ("-t #{platform}"),
         upload_part,
         "-k 100000"
+      ].compact.join(' ')
+    end
+
+    def altool_verify_command(api_key: nil, platform: "macos", provider_short_name: "", provider_public_id: "", use_asset_path: false)
+      use_api_key = !api_key.nil?
+      # altool never supports -assetFile, so even asset paths use -f
+      verify_part = use_asset_path ? "-f /tmp/#{random_uuid}.ipa" : "-f /tmp/my.app.id.itmsp"
+      escaped_password = password.shellescape
+
+      [
+        "xcrun altool",
+        "--validate-app",
+        ("-u #{email.shellescape}" unless use_api_key),
+        ("-p #{escaped_password}" unless use_api_key),
+        ("--apiKey #{api_key[:key_id]}" if use_api_key),
+        ("--apiIssuer #{api_key[:issuer_id]}" if use_api_key),
+        ("--asc-provider #{provider_short_name}" unless use_api_key || provider_short_name.to_s.empty?),
+        ("--provider-public-id #{provider_public_id}" unless use_api_key || provider_public_id.to_s.empty?),
+        ("-t #{platform}"),
+        verify_part
       ].compact.join(' ')
     end
 
@@ -1197,7 +1218,7 @@ describe FastlaneCore do
           end
 
           context "upload command generation with .ipa source (asset file)" do
-            it "uses -assetFile instead of -f for .ipa files" do
+            it "still uses -f for .ipa files since altool does not support -assetFile" do
               expect(Dir).to receive(:tmpdir).and_return("/tmp")
               expect(FileUtils).to receive(:cp)
 
@@ -1205,6 +1226,19 @@ describe FastlaneCore do
                                                                 altool_compatible_command: true)
               expect(transporter.upload(asset_path: '/tmp/my_app.ipa', platform: "osx")).to eq(
                 altool_upload_command(use_asset_path: true, provider_short_name: "")
+              )
+            end
+          end
+
+          context "verify command generation with .ipa source (asset file)" do
+            it "still uses -f for .ipa files since altool does not support -assetFile" do
+              expect(Dir).to receive(:tmpdir).and_return("/tmp")
+              expect(FileUtils).to receive(:cp)
+
+              transporter = FastlaneCore::ItunesTransporter.new(email, password, false, nil, nil,
+                                                                altool_compatible_command: true)
+              expect(transporter.verify(asset_path: '/tmp/my_app.ipa', platform: "osx")).to eq(
+                altool_verify_command(use_asset_path: true, provider_short_name: "")
               )
             end
           end
