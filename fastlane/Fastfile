@@ -363,10 +363,10 @@ private_lane :github_changelog do |options|
 
     if item_infos.size == 0
       # In non-interactive mode (e.g. CI) we can't prompt, so skip the commit instead of crashing
-      if !UI.interactive? || UI.confirm("Error generating changelog. No commit found for #{sha}. Skip?")
+      if !UI.interactive? || UI.confirm("Error generating changelog. No pull request found for commit #{sha}. Skip?")
         next
       else
-        UI.user_error!("Cannot generate changelog. No commit found for #{sha}")
+        UI.user_error!("Cannot generate changelog. No pull request found for commit #{sha}")
       end
     elsif item_infos.size == 1 || !UI.interactive?
       message = item_infos[0][0]
