@@ -24,7 +24,16 @@ jobs:
       fail-fast: true
       matrix:
         include:
+          - { xcode: '16.4.0', ruby: '3.1', rubyopt: '-W:deprecated', os: 'macos-15' }
+          - { xcode: '16.4.0', ruby: '3.2', rubyopt: '-W:deprecated', os: 'macos-15' }
+          - { xcode: '16.4.0', ruby: '3.3', rubyopt: '-W:deprecated', os: 'macos-15' }
+          - { xcode: '16.4.0', ruby: '3.4', rubyopt: '-W:deprecated', os: 'macos-15' }
+          - { xcode: '26.1.1', ruby: '3.4', rubyopt: '-W:deprecated', os: 'macos-26' }
+          - { xcode: '26.2.0', ruby: '3.4', rubyopt: '-W:deprecated', os: 'macos-26' }
+          - { xcode: '26.5.0', ruby: '4.0', rubyopt: '-W:deprecated', os: 'macos-26' }
           - { xcode: '', ruby: '3.2', rubyopt: '', os: 'windows-2022' }
+          - { xcode: '', ruby: '3.0', rubyopt: '', os: 'ubuntu-24.04' }
+          - { xcode: '', ruby: '3.2', rubyopt: '', os: 'ubuntu-24.04' }
     steps:
       - uses: actions/checkout@v7
 
