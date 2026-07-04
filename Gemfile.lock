@@ -125,9 +125,6 @@ GEM
       no_proxy_fix
       octokit (~> 4.7)
       terminal-table (>= 1, < 4)
-    danger-junit (1.0.2)
-      danger (> 2.0)
-      ox (~> 2.0)
     debug_inspector (1.0.0)
     declarative (0.0.20)
     diff-lcs (1.5.0)
@@ -300,8 +297,6 @@ GEM
       diff-lcs (>= 1.2.0, < 2.0)
       rspec-support (~> 3.12.0)
     rspec-support (3.12.1)
-    rspec_junit_formatter (0.4.1)
-      rspec-core (>= 2, < 4, != 2.12.0)
     rubocop (1.50.2)
       json (~> 2.3)
       parallel (~> 1.10)
@@ -401,7 +396,6 @@ DEPENDENCIES
   climate_control (~> 0.2.0)
   coveralls (~> 0.8.13)
   danger (~> 8.0)
-  danger-junit (~> 1.0)
   fakefs (>= 1.8, < 3.0.2)
   fastlane!
   fastlane-plugin-ruby
@@ -416,7 +410,6 @@ DEPENDENCIES
   rake
   rb-readline
   rspec (~> 3.10)
-  rspec_junit_formatter (~> 0.4.1)
   rubocop (= 1.50.2)
   rubocop-performance
   rubocop-require_tools

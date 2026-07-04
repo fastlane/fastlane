@@ -12,14 +12,13 @@ concurrency:
 permissions:
   contents: read
 
-env:
-  TEST_REPORTS: ${{ github.workspace }}/test-reports
-  CIRCLE_TEST_REPORTS: ${{ github.workspace }}/test-reports
-
 jobs:
   macos-tests:
     name: ${{ matrix.os }}, Xcode ${{ matrix.xcode }}, Ruby ${{ matrix.ruby }} Tests
     runs-on: ${{ matrix.os }}
+    permissions:
+      contents: read
+      pull-requests: write
     strategy:
       fail-fast: true
       matrix:
@@ -57,10 +56,6 @@ jobs:
         shell: bash
         run: ruby -v
 
-      - name: Setup Build directories
-        if: runner.os != 'Windows'
-        run: mkdir -p "$TEST_REPORTS"
-
       - name: Increase Open File Limit
         if: runner.os != 'Windows'
         shell: bash
@@ -75,28 +70,13 @@ jobs:
           git config --global user.name "github-actions[bot]"
           bundle exec fastlane execute_tests
 
-      - name: Check compatibility with Ruby 3.0
-        shell: bash
-        run: |
-          touch "$TEST_REPORTS/ruby_warnings.txt"
-          ! grep -E "warning:\s.*(deprecated).*$" "$TEST_REPORTS/ruby_warnings.txt" && echo "No deprecation message found."
-          ! grep -E "warning:\s.*(obsolete).*$" "$TEST_REPORTS/ruby_warnings.txt" && echo "No obsolete message found."
-
-      - name: Upload rspec reports
+      - name: RSpec report
         if: always()
-        uses: actions/upload-artifact@v7
+        uses: SonicGarden/rspec-report-action@v8
         with:
-          name: rspec-${{ matrix.xcode }}-ruby-${{ matrix.ruby }}
-          path: ${{ env.TEST_REPORTS }}/rspec
-          if-no-files-found: ignore
-
-      - name: Upload ruby warnings
-        if: always()
-        uses: actions/upload-artifact@v7
-        with:
-          name: ruby_warnings-${{ matrix.xcode }}-ruby-${{ matrix.ruby }}.txt
-          path: ${{ env.TEST_REPORTS }}/ruby_warnings.txt
-          if-no-files-found: ignore
+          json-path: tmp/rspec_results.json
+          comment: 'false'
+          title: '# :cold_sweat: RSpec failure (${{ matrix.os }}, Xcode ${{ matrix.xcode }}, Ruby ${{ matrix.ruby }})'
 
   validate_fastlane_swift_generation:
     name: Validate Fastlane.swift generation

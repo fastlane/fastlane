@@ -11,8 +11,6 @@ gem "climate_control", "~> 0.2.0"
 gem "coveralls", "~> 0.8.13"
 # Automates code review chores.
 gem "danger", "~> 8.0"
-# Plugin for Danger that reports JUnit test results.
-gem "danger-junit", "~> 1.0"
 # A fake filesystem.
 # Version 3.0.2 requires Ruby >=3.2, while fastlane uses a `required_ruby_version` of `>= 3.0`.
 gem "fakefs", ['>= 1.8', '< 3.0.2']
@@ -44,8 +42,6 @@ gem "rake"
 gem "rb-readline"
 # Behavior-driven testing tool for Ruby.
 gem "rspec", "~> 3.10"
-# Formatter for RSpec to generate JUnit compatible reports.
-gem "rspec_junit_formatter", "~> 0.4.1"
 # A Ruby static code analyzer and formatter.
 gem "rubocop", Fastlane::RUBOCOP_REQUIREMENT
 # A collection of RuboCop cops for performance optimizations.
