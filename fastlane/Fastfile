@@ -104,7 +104,7 @@ lane :bump do |options|
 
   verify_env_variables
   verify_ruby_gem_credentials unless is_automated_bump
-  ensure_git_branch(branch: "master")
+  ensure_git_branch(branch: "fix-release-non-interactive-test")
   ensure_git_status_clean
 
   github_api_token = ENV["FL_GITHUB_RELEASE_API_TOKEN"]
