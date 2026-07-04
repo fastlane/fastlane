@@ -134,6 +134,9 @@ public protocol MatchfileProtocol: AnyObject {
     /// Renew the provisioning profiles if the certificate count on the developer portal has changed. Works only for the 'development' provisioning profile type. Requires 'include_all_certificates' option to be 'true'
     var forceForNewCertificates: Bool { get }
 
+    /// Automatically renew expired certificates. Note: to renew `developer_id` and `developer_id_installer` certificates you must log in with the Account Holder account by using username and password; App Store Connect API key doesn't work in this case. The expired certificate is removed from the match storage and a new one is created, but the old certificate is not revoked on the Apple Developer Portal — run `fastlane match nuke` if you need to free up certificate slots
+    var renewExpiredCerts: Bool { get }
+
     /// Disables confirmation prompts during nuke, answering them with yes
     var skipConfirmation: Bool { get }
 
@@ -351,6 +354,10 @@ public extension MatchfileProtocol {
         return false
     }
 
+    var renewExpiredCerts: Bool {
+        return false
+    }
+
     var skipConfirmation: Bool {
         return false
     }
@@ -406,4 +413,4 @@ public extension MatchfileProtocol {
 
 // Please don't remove the lines below
 // They are used to detect outdated files
-// FastlaneRunnerAPIVersion [0.9.147]
+// FastlaneRunnerAPIVersion [0.9.148]
