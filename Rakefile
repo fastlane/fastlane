@@ -4,8 +4,8 @@ Dir.glob("internal/rakelib/*.rake").each { |r| load r }
 
 task(:test_all) do
   formatter = "--format progress"
-  # On CI, also write a JSON report for SonicGarden/rspec-report-action to summarize failures on the PR
-  formatter += " --format json --out tmp/rspec_results.json" if ENV["GITHUB_ACTIONS"]
+  # On GitHub Actions - automatically write out the rspec logs to be parsed later.
+  formatter += " --format json --out rspec_logs.json" if ENV["GITHUB_ACTIONS"]
   command = "rspec --pattern spec/**/*_spec.rb,*/spec/**/*_spec.rb #{formatter} #{ENV['RSPEC_ARGS']}"
 
   sh(command)

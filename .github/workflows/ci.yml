@@ -74,7 +74,7 @@ jobs:
         if: always()
         uses: SonicGarden/rspec-report-action@v8
         with:
-          json-path: tmp/rspec_results.json
+          json-path: rspec_logs.json
           comment: 'false'
           title: '# :cold_sweat: RSpec failure (${{ matrix.os }}, Xcode ${{ matrix.xcode }}, Ruby ${{ matrix.ruby }})'
 
