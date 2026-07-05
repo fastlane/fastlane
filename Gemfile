@@ -11,8 +11,6 @@ gem "climate_control", "~> 0.2.0"
 gem "coveralls", "~> 0.8.13"
 # Automates code review chores.
 gem "danger", "~> 9.0"
-# Plugin for Danger that reports JUnit test results.
-gem "danger-junit", "~> 1.0"
 # A fake filesystem.
 # Version 3.0.2 requires Ruby >=3.2, while fastlane uses a `required_ruby_version` of `>= 3.0`.
 gem "fakefs", ['>= 1.8', '< 3.0.2']
