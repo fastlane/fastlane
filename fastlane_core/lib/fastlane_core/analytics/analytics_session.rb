@@ -13,9 +13,11 @@ module FastlaneCore
     def initialize(analytics_ingester_client: AnalyticsIngesterClient.new(GA_TRACKING))
       # GA4 requires a numeric session ID for events to be attributed to a session
       @session_id = Time.now.to_i.to_s
+      @session_start_time = Time.now
       @client = analytics_ingester_client
       @threads = []
-      @launch_event_sent = false
+      @launch_event = nil
+      @launch_event_captured = false
     end
 
     def action_launched(launch_context: nil)
@@ -23,11 +25,11 @@ module FastlaneCore
         show_message
       end
 
-      if @launch_event_sent || launch_context.p_hash.nil?
+      if @launch_event_captured || launch_context.p_hash.nil?
         return
       end
 
-      @launch_event_sent = true
+      @launch_event_captured = true
       builder = AnalyticsEventBuilder.new(
         p_hash: launch_context.p_hash,
         session_id: session_id,
@@ -36,11 +38,9 @@ module FastlaneCore
         build_tool_version: launch_context.build_tool_version
       )
 
-      launch_event = builder.new_event(:launch)
-      post_thread = client.post_event(launch_event)
-      unless post_thread.nil?
-        @threads << post_thread
-      end
+      # The event is not posted until finalize_session, so that the
+      # run duration can be reported as GA4 engagement time
+      @launch_event = builder.new_event(:launch)
     end
 
     def action_completed(completion_context: nil)
@@ -65,6 +65,15 @@ module FastlaneCore
     end
 
     def finalize_session
+      unless @launch_event.nil?
+        @launch_event[:engagement_time_msec] = ((Time.now - @session_start_time) * 1000).round
+        post_thread = client.post_event(@launch_event)
+        unless post_thread.nil?
+          @threads << post_thread
+        end
+        @launch_event = nil
+      end
+
       @threads.map(&:join)
     end
   end

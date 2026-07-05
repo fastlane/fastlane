@@ -34,6 +34,10 @@ module FastlaneCore
 
     def post_request(event)
       connection = Faraday.new(GA_URL) do |conn|
+        # This request runs while fastlane is shutting down,
+        # so keep the timeouts short to not delay the user
+        conn.options.open_timeout = 5
+        conn.options.timeout = 5
         conn.adapter(Faraday.default_adapter)
       end
       connection.headers[:user_agent] = 'fastlane/' + Fastlane::VERSION
@@ -46,7 +50,8 @@ module FastlaneCore
         sid: event[:session_id],       # Session ID
         _ss: "1",                      # Session start
         seg: "1",                      # Session engaged
-        _et: "100",                    # Engagement time in ms, required for events to count towards active users
+        # Engagement time in ms, required for events to count towards active users
+        _et: (event[:engagement_time_msec] || 100).to_s,
         en: event[:name].to_s          # Event name
       }
       (event[:params] || {}).each do |key, value|

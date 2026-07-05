@@ -8,6 +8,7 @@ describe FastlaneCore::AnalyticsIngesterClient do
       client_id: 'some_hash',
       session_id: '1750000000',
       name: :launch,
+      engagement_time_msec: 45_000,
       params: {
         fastlane_client_language: :ruby,
         fastlane_version: '2.228.0',
@@ -43,7 +44,7 @@ describe FastlaneCore::AnalyticsIngesterClient do
                'sid' => '1750000000',
                '_ss' => '1',
                'seg' => '1',
-               '_et' => '100',
+               '_et' => '45000',
                'en' => 'launch',
                'ep.fastlane_client_language' => 'ruby',
                'ep.fastlane_version' => '2.228.0',

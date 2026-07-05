@@ -24,11 +24,19 @@ describe FastlaneCore::AnalyticsSession do
       )
     end
 
-    it "posts a launch event with the environment params" do
+    it "does not post the launch event before the session is finalized" do
+      expect(ingester_client).not_to receive(:post_event)
+
+      session.action_launched(launch_context: launch_context)
+    end
+
+    it "posts a launch event with the environment params and run duration on finalize" do
       expect(ingester_client).to receive(:post_event) do |event|
         expect(event[:client_id]).to eq('some_hash')
         expect(event[:session_id]).to eq(session.session_id)
         expect(event[:name]).to eq(:launch)
+        expect(event[:engagement_time_msec]).to be_kind_of(Integer)
+        expect(event[:engagement_time_msec]).to be >= 0
         expect(event[:params][:fastlane_client_language]).to eq(:ruby)
         expect(event[:params][:build_tool_version]).to eq('android')
         expect(event[:params][:ruby_version]).to eq(RUBY_VERSION)
@@ -37,6 +45,7 @@ describe FastlaneCore::AnalyticsSession do
       end
 
       session.action_launched(launch_context: launch_context)
+      session.finalize_session
     end
 
     it "only sends the launch event once per session" do
@@ -44,6 +53,8 @@ describe FastlaneCore::AnalyticsSession do
 
       session.action_launched(launch_context: launch_context)
       session.action_launched(launch_context: launch_context)
+      session.finalize_session
+      session.finalize_session
     end
 
     it "does not send an event when p_hash is nil" do
@@ -51,6 +62,13 @@ describe FastlaneCore::AnalyticsSession do
       expect(ingester_client).not_to receive(:post_event)
 
       session.action_launched(launch_context: launch_context)
+      session.finalize_session
+    end
+
+    it "does not send an event when no action was launched" do
+      expect(ingester_client).not_to receive(:post_event)
+
+      session.finalize_session
     end
   end
 end
