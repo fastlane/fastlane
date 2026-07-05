@@ -107,6 +107,9 @@ public protocol ScanfileProtocol: AnyObject {
     /// Remove retry attempts from test results table and the JUnit report (if not using xcpretty)
     var outputRemoveRetryAttempts: Bool { get }
 
+    /// Force the use of the '--legacy' flag for xcresulttool instead of using the new commands
+    var forceLegacyXcresulttool: Bool { get }
+
     /// **DEPRECATED!** Use `output_style: 'raw'` instead - Disable xcpretty formatting of build, similar to `output_style='raw'` but this will also skip the test results table
     var disableXcpretty: Bool? { get }
 
@@ -387,6 +390,10 @@ public extension ScanfileProtocol {
         return false
     }
 
+    var forceLegacyXcresulttool: Bool {
+        return false
+    }
+
     var disableXcpretty: Bool? {
         return nil
     }
@@ -574,4 +581,4 @@ public extension ScanfileProtocol {
 
 // Please don't remove the lines below
 // They are used to detect outdated files
-// FastlaneRunnerAPIVersion [0.9.158]
+// FastlaneRunnerAPIVersion [0.9.159]
