@@ -4,15 +4,15 @@ require_relative 'analytics_event_builder'
 
 module FastlaneCore
   class AnalyticsSession
-    GA_TRACKING = "UA-121171860-1"
+    GA_TRACKING = "G-94HQ3VVP0X"
 
     private_constant :GA_TRACKING
     attr_accessor :session_id
     attr_accessor :client
 
     def initialize(analytics_ingester_client: AnalyticsIngesterClient.new(GA_TRACKING))
-      require 'securerandom'
-      @session_id = SecureRandom.uuid
+      # GA4 requires a numeric session ID for events to be attributed to a session
+      @session_id = Time.now.to_i.to_s
       @client = analytics_ingester_client
       @threads = []
       @launch_event_sent = false
@@ -32,7 +32,8 @@ module FastlaneCore
         p_hash: launch_context.p_hash,
         session_id: session_id,
         action_name: nil,
-        fastlane_client_language: launch_context.fastlane_client_language
+        fastlane_client_language: launch_context.fastlane_client_language,
+        build_tool_version: launch_context.build_tool_version
       )
 
       launch_event = builder.new_event(:launch)

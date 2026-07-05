@@ -34,21 +34,28 @@ module FastlaneCore
 
     def post_request(event)
       connection = Faraday.new(GA_URL) do |conn|
-        conn.request(:url_encoded)
         conn.adapter(Faraday.default_adapter)
       end
       connection.headers[:user_agent] = 'fastlane/' + Fastlane::VERSION
-      connection.post("/collect", {
-        v: "1",                                            # API Version
-        tid: @ga_tracking,                                 # Tracking ID / Property ID
-        cid: event[:client_id],                            # Client ID
-        t: "event",                                        # Event hit type
-        ec: event[:category],                              # Event category
-        ea: event[:action],                                # Event action
-        el: event[:label] || "na",                         # Event label
-        ev: event[:value] || "0",                          # Event value
-        aip: "1"                                           # IP anonymization
-      })
+
+      # GA4 protocol, event parameters are sent as `ep.<name>` query parameters
+      params = {
+        v: "2",                        # Protocol version (GA4)
+        tid: @ga_tracking,             # GA4 measurement ID
+        cid: event[:client_id],        # Client ID
+        sid: event[:session_id],       # Session ID
+        _ss: "1",                      # Session start
+        seg: "1",                      # Session engaged
+        _et: "100",                    # Engagement time in ms, required for events to count towards active users
+        en: event[:name].to_s          # Event name
+      }
+      (event[:params] || {}).each do |key, value|
+        params["ep.#{key}"] = value.to_s
+      end
+
+      connection.post("/g/collect") do |request|
+        request.params = params
+      end
     end
   end
 end
