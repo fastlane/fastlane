@@ -412,6 +412,16 @@ module FastlaneCore
     # @param [String] The key of which we want the value for (e.g. "PRODUCT_NAME")
     def build_settings(key: nil, optional: true)
       unless @build_settings
+        if (disallowed_by = xcodebuild_settings_lookup_disallowed_by)
+          message = "Could not read the '#{key}' build setting: fetching build settings by running" \
+            " `xcodebuild -showBuildSettings` is disallowed by #{disallowed_by}."
+          trigger = caller.find { |frame| !frame.include?("fastlane_core/lib/") }
+          message += "\nThe build setting lookup was triggered by: #{trigger}" if trigger
+          message += "\nTo fix this, manually specify the option whose automatic detection required the '#{key}' build setting," \
+            " or remove #{disallowed_by} to allow fastlane to fetch it automatically."
+          UI.user_error!(message)
+        end
+
         if is_workspace
           if schemes.count == 0
             UI.user_error!("Could not find any schemes for Xcode workspace at path '#{self.path}'. Please make sure that the schemes you want to use are marked as `Shared` from Xcode.")
@@ -562,6 +572,15 @@ module FastlaneCore
     # matching project name?
     def automated_scheme_selection?
       FastlaneCore::Env.truthy?("AUTOMATED_SCHEME_SELECTION")
+    end
+
+    # Returns a description of what disallowed fetching build settings via the
+    # (potentially slow on large projects) `xcodebuild -showBuildSettings` command,
+    # or nil if the lookup is allowed
+    def xcodebuild_settings_lookup_disallowed_by
+      return "the FASTLANE_DISALLOW_XCODEBUILD_SETTINGS_LOOKUP environment variable" if FastlaneCore::Env.truthy?("FASTLANE_DISALLOW_XCODEBUILD_SETTINGS_LOOKUP")
+      return "the `disallow_xcodebuild_settings_lookup` option" if options[:disallow_xcodebuild_settings_lookup]
+      nil
     end
   end
 end
