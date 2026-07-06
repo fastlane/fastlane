@@ -415,10 +415,10 @@ module FastlaneCore
         if (disallowed_by = xcodebuild_settings_lookup_disallowed_by)
           message = "Could not read the '#{key}' build setting: fetching build settings by running" \
             " `xcodebuild -showBuildSettings` is disallowed by #{disallowed_by}."
-          trigger = caller.find { |frame| !frame.include?("fastlane_core/lib/") }
+          trigger = caller.find { |frame| !frame.start_with?(__FILE__) }
           message += "\nThe build setting lookup was triggered by: #{trigger}" if trigger
           message += "\nTo fix this, manually specify the option whose automatic detection required the '#{key}' build setting," \
-            " or remove #{disallowed_by} to allow fastlane to fetch it automatically."
+            " or disable #{disallowed_by} to allow fastlane to fetch it automatically."
           UI.user_error!(message)
         end
 
