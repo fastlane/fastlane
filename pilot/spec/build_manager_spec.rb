@@ -41,6 +41,16 @@ describe "Build Manager" do
       changelog = Pilot::BuildManager.sanitize_changelog(changelog)
       expect(changelog).to eq(File.read("./pilot/spec/fixtures/build_manager/changelog_long_truncated"))
     end
+    it "accepts a frozen changelog containing emoji" do
+      changelog = "I'm 🦇B🏧an🪴!".freeze
+      changelog = Pilot::BuildManager.sanitize_changelog(changelog)
+      expect(changelog).to eq("I'm Ban!")
+    end
+    it "accepts a frozen changelog containing less than signs" do
+      changelog = "I'm <script>man<<!".freeze
+      changelog = Pilot::BuildManager.sanitize_changelog(changelog)
+      expect(changelog).to eq("I'm script>man!")
+    end
   end
 
   describe ".has_changelog_or_whats_new?" do
@@ -599,6 +609,13 @@ describe "Build Manager" do
   end
 
   describe "#upload" do
+    before(:each) do
+      # Prevent class-level Spaceship::ConnectAPI.client state from leaking
+      # in from other spec files (e.g. spaceship_spec.rb sets a real client
+      # that holds references to doubles which expire between examples).
+      allow(Spaceship::ConnectAPI).to receive(:client).and_return(nil)
+    end
+
     describe "shows the correct notices" do
       let(:fake_build_manager) { Pilot::BuildManager.new }
       let(:fake_app_id) { 123 }

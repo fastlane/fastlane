@@ -323,7 +323,7 @@ module Pilot
 
     def self.strip_emoji(changelog)
       if changelog && changelog =~ emoji_regex
-        changelog.gsub!(emoji_regex, "")
+        changelog = changelog.gsub(emoji_regex, "")
         UI.important("Emoji symbols have been removed from the changelog, since they're not allowed by Apple.")
       end
       changelog
@@ -331,7 +331,7 @@ module Pilot
 
     def self.strip_less_than_sign(changelog)
       if changelog && changelog.include?("<")
-        changelog.delete!("<")
+        changelog = changelog.delete("<")
         UI.important("Less than signs (<) have been removed from the changelog, since they're not allowed by Apple.")
       end
       changelog
