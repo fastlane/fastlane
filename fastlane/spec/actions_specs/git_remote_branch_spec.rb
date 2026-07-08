@@ -44,7 +44,7 @@ describe Fastlane do
         test_directory_path = Dir.mktmpdir(directory)
 
         Dir.chdir(test_directory_path) do
-          `git init`
+          `git -c init.defaultBranch=main init`
 
           File.write('test_file', <<-TESTFILE)
               'Hello'

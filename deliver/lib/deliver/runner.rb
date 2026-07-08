@@ -9,8 +9,11 @@ require_relative 'html_generator'
 require_relative 'submit_for_review'
 require_relative 'upload_price_tier'
 require_relative 'upload_metadata'
+require_relative 'upload_app_clip_default_experience_metadata'
+require_relative 'upload_app_clip_default_experience_header_images'
 require_relative 'upload_screenshots'
 require_relative 'sync_screenshots'
+require_relative 'sync_app_previews'
 require_relative 'detect_values'
 
 module Deliver
@@ -55,7 +58,7 @@ module Deliver
       verify_version if options[:app_version].to_s.length > 0 && !options[:skip_app_version_update]
 
       # Rejecting before upload meta
-      # Screenshots can not be update/deleted if in waiting for review
+      # Screenshots cannot be updated or deleted if the app is in the "waiting for review" state
       reject_version_if_possible if options[:reject_if_possible]
 
       upload_metadata
@@ -107,7 +110,7 @@ module Deliver
       begin
         precheck_success = Precheck::Runner.new.run
       rescue => ex
-        UI.error("fastlane precheck just tried to inspect your app's metadata for App Store guideline violations and ran into a problem. We're not sure what the problem was, but precheck failed to finished. You can run it in verbose mode if you want to see the whole error. We'll have a fix out soon 🚀")
+        UI.error("fastlane precheck just tried to inspect your app's metadata for App Store guideline violations and ran into a problem. We're not sure what the problem was, but precheck failed to finish. You can run it in verbose mode if you want to see the whole error. We'll have a fix out soon 🚀")
         UI.verbose(ex.inspect)
         UI.verbose(ex.backtrace.join("\n"))
       end
@@ -135,27 +138,44 @@ module Deliver
 
     # Upload all metadata, screenshots, pricing information, etc. to App Store Connect
     def upload_metadata
-      upload_metadata = UploadMetadata.new
+      # App clip experience metadata upload must happen before the upload metadata step. The app
+      # clip app store review detail upload depends on there being a valid app clip default
+      # experience on the edit version.
+      UploadAppClipDefaultExperienceMetadata.new.upload_metadata(options)
+      UploadAppClipDefaultExperienceHeaderImages.new.find_and_upload(options)
+
+      upload_metadata = UploadMetadata.new(options)
       upload_screenshots = UploadScreenshots.new
 
       # First, collect all the things for the HTML Report
       screenshots = upload_screenshots.collect_screenshots(options)
-      upload_metadata.load_from_filesystem(options)
+      upload_metadata.load_from_filesystem
 
       # Assign "default" values to all languages
-      upload_metadata.assign_defaults(options)
+      upload_metadata.assign_defaults
 
       # Validate
       validate_html(screenshots)
 
       # Commit
-      upload_metadata.upload(options)
+      upload_metadata.upload
 
       if options[:sync_screenshots]
         sync_screenshots = SyncScreenshots.new(app: Deliver.cache[:app], platform: Spaceship::ConnectAPI::Platform.map(options[:platform]))
         sync_screenshots.sync(screenshots)
       else
         upload_screenshots.upload(options, screenshots)
+      end
+
+      if options[:app_previews_path]
+        previews = Deliver::SyncAppPreviews.new(
+          app: Deliver.cache[:app],
+          platform: Spaceship::ConnectAPI::Platform.map(options[:platform]),
+          app_previews_path: options[:app_previews_path],
+          preview_frame_time_code: options[:preview_frame_time_code],
+          overwrite_preview_videos: options[:overwrite_preview_videos]
+        )
+        previews.sync_from_path
       end
 
       UploadPriceTier.new.upload(options)
@@ -172,14 +192,14 @@ module Deliver
       transporter = transporter_for_selected_team
 
       case platform
-      when "ios", "appletvos"
+      when "ios", "appletvos", "xros"
         package_path = FastlaneCore::IpaUploadPackageBuilder.new.generate(
           app_id: Deliver.cache[:app].id,
           ipa_path: ipa_path,
           package_path: "/tmp",
           platform: platform
         )
-        result = transporter.verify(package_path: package_path)
+        result = transporter.verify(package_path: package_path, asset_path: ipa_path, platform: platform)
       when "osx"
         package_path = FastlaneCore::PkgUploadPackageBuilder.new.generate(
           app_id: Deliver.cache[:app].id,
@@ -187,7 +207,7 @@ module Deliver
           package_path: "/tmp",
           platform: platform
         )
-        result = transporter.verify(package_path: package_path)
+        result = transporter.verify(package_path: package_path, asset_path: pkg_path, platform: platform)
       else
         UI.user_error!("No suitable file found for verify for platform: #{options[:platform]}")
       end
@@ -206,10 +226,10 @@ module Deliver
       pkg_path = options[:pkg]
 
       platform = options[:platform]
-      transporter = transporter_for_selected_team(upload: true)
+      transporter = transporter_for_selected_team
 
       case platform
-      when "ios", "appletvos"
+      when "ios", "appletvos", "xros"
         package_path = FastlaneCore::IpaUploadPackageBuilder.new.generate(
           app_id: Deliver.cache[:app].id,
           ipa_path: ipa_path,
@@ -231,7 +251,8 @@ module Deliver
 
       unless result
         transporter_errors = transporter.displayable_errors
-        UI.user_error!("Error uploading ipa file: \n #{transporter_errors}")
+        file_type = platform == "osx" ? "pkg" : "ipa"
+        UI.user_error!("Error uploading #{file_type} file: \n #{transporter_errors}")
       end
     end
 
@@ -245,13 +266,9 @@ module Deliver
         UI.message("Review submission cancellation has been requested")
 
         # An app version won't get removed from review instantly
-        # Polling until app version has a state of DEVELOPER_REJECT
+        # Polling until there is no longer an in-progress version
         loop do
-          version = app.get_edit_app_store_version(platform: platform)
-          if version.app_store_state == Spaceship::ConnectAPI::AppStoreVersion::AppStoreState::DEVELOPER_REJECTED
-            break
-          end
-
+          break if app.get_in_progress_review_submission(platform: platform).nil?
           UI.message("Waiting for cancellation to take effect...")
           sleep(15)
         end
@@ -267,10 +284,11 @@ module Deliver
     private
 
     # If App Store Connect API token, use token.
-    # If itc_provider was explicitly specified, use it.
+    # If api_key is specified and it is an Individual API Key, don't use token but use username.
+    # If itc_provider or provider_public_id was explicitly specified, use it.
     # If there are multiple teams, infer the provider from the selected team name.
     # If there are fewer than two teams, don't infer the provider.
-    def transporter_for_selected_team(upload: false)
+    def transporter_for_selected_team
       # Use JWT auth
       api_token = Spaceship::ConnectAPI.token
       api_key = if options[:api_key].nil? && !api_token.nil?
@@ -285,20 +303,21 @@ module Deliver
 
       unless api_token.nil?
         api_token.refresh! if api_token.expired?
-        return FastlaneCore::ItunesTransporter.new(nil, nil, false, nil, api_token.text, upload: upload, api_key: api_key)
+        return FastlaneCore::ItunesTransporter.new(nil, nil, false, nil, api_token.text, altool_compatible_command: true, api_key: api_key, provider_public_id: nil)
       end
 
       tunes_client = Spaceship::ConnectAPI.client.tunes_client
 
-      generic_transporter = FastlaneCore::ItunesTransporter.new(options[:username], nil, false, options[:itc_provider], upload: upload, api_key: api_key)
-      return generic_transporter unless options[:itc_provider].nil? && tunes_client.teams.count > 1
+      generic_transporter = FastlaneCore::ItunesTransporter.new(options[:username], nil, false, options[:itc_provider], altool_compatible_command: true, api_key: api_key, provider_public_id: options[:provider_public_id])
+      return generic_transporter if options[:itc_provider] || options[:provider_public_id] || tunes_client.nil?
+      return generic_transporter unless tunes_client.teams.count > 1
 
       begin
         team = tunes_client.teams.find { |t| t['providerId'].to_s == tunes_client.team_id }
         name = team['name']
         provider_id = generic_transporter.provider_ids[name]
         UI.verbose("Inferred provider id #{provider_id} for team #{name}.")
-        return FastlaneCore::ItunesTransporter.new(options[:username], nil, false, provider_id, upload: upload, api_key: api_key)
+        return FastlaneCore::ItunesTransporter.new(options[:username], nil, false, provider_id, altool_compatible_command: true, api_key: api_key)
       rescue => ex
         UI.verbose("Couldn't infer a provider short name for team with id #{tunes_client.team_id} automatically: #{ex}. Proceeding without provider short name.")
         return generic_transporter

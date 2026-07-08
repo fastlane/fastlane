@@ -1,6 +1,8 @@
 describe Supply do
   describe Supply::Client do
     let(:service_account_file) { File.read(fixture_file("sample-service-account.json")) }
+    let(:external_account_file) { File.read(fixture_file("sample-external-account.json")) }
+    let(:authorized_user_file) { File.read(fixture_file("sample-authorized-user.json")) }
     before do
       stub_request(:post, "https://www.googleapis.com/oauth2/v4/token").
         to_return(status: 200, body: '{}', headers: { 'Content-Type' => 'application/json' })
@@ -8,23 +10,117 @@ describe Supply do
         to_return(status: 200, body: '{}', headers: { 'Content-Type' => 'application/json' })
     end
 
-    it "displays error messages from the API" do
-      stub_request(:post, "https://androidpublisher.googleapis.com/upload/androidpublisher/v3/applications/test-app/edits/1/listings/en-US/icon").
-        to_return(status: 403, body: '{"error":{"message":"Ensure project settings are enabled."}}', headers: { 'Content-Type' => 'application/json' })
+    describe "initialize client" do
+      it "with external account credentials" do
+        stub_request(:get, "https://credential-source.example.com/token").
+          to_return(status: 200, body: '{"value": "access-token"}', headers: { 'Content-Type' => 'application/json' })
+        stub_request(:post, "https://sts.googleapis.com/v1/token").
+          to_return(status: 200, body: '{}', headers: { 'Content-Type' => 'application/json' })
+        stub_request(:post, "https://iamcredentials.googleapis.com/v1/projects/-/serviceAccounts/fastlane@fastlane-tools.iam.gserviceaccount.com:generateAccessToken").
+          to_return(status: 200, body: '{}', headers: { 'Content-Type' => 'application/json' })
 
-      expect(UI).to receive(:user_error!).with("Google Api Error: Invalid request - Ensure project settings are enabled.")
+        Supply::Client.new(service_account_json: StringIO.new(external_account_file), params: { timeout: 1 })
+      end
 
-      current_edit = double
-      allow(current_edit).to receive(:id).and_return(1)
+      it "with external account credentials from file" do
+        stub_request(:get, "https://credential-source.example.com/token").
+          to_return(status: 200, body: '{"value": "access-token"}', headers: { 'Content-Type' => 'application/json' })
+        stub_request(:post, "https://sts.googleapis.com/v1/token").
+          to_return(status: 200, body: '{}', headers: { 'Content-Type' => 'application/json' })
+        stub_request(:post, "https://iamcredentials.googleapis.com/v1/projects/-/serviceAccounts/fastlane@fastlane-tools.iam.gserviceaccount.com:generateAccessToken").
+          to_return(status: 200, body: '{}', headers: { 'Content-Type' => 'application/json' })
 
-      client = Supply::Client.new(service_account_json: StringIO.new(service_account_file), params: { timeout: 1 })
-      allow(client).to receive(:ensure_active_edit!)
-      allow(client).to receive(:current_edit).and_return(current_edit)
+        file_path = fixture_file("sample-external-account.json")
+        Supply::Client.make_from_config(params: { json_key: file_path, timeout: 1 })
+      end
 
-      client.begin_edit(package_name: 'test-app')
-      client.upload_image(image_path: fixture_file("playstore-icon.png"),
-                          image_type: "icon",
-                            language: "en-US")
+      it "with authorized_user credentials" do
+        stub_request(:post, "https://oauth2.googleapis.com/token").
+          to_return(status: 200, body: '{"access_token": "fake-access-token", "token_type": "Bearer", "expires_in": 3600}', headers: { 'Content-Type' => 'application/json' })
+
+        Supply::Client.new(service_account_json: StringIO.new(authorized_user_file), params: { timeout: 1 })
+      end
+
+      it "with authorized_user credentials from file" do
+        stub_request(:post, "https://oauth2.googleapis.com/token").
+          to_return(status: 200, body: '{"access_token": "fake-access-token", "token_type": "Bearer", "expires_in": 3600}', headers: { 'Content-Type' => 'application/json' })
+
+        file_path = fixture_file("sample-authorized-user.json")
+        Supply::Client.make_from_config(params: { json_key: file_path, timeout: 1 })
+      end
+
+      it "with Application Default Credentials when no json_key is provided" do
+        mock_auth_client = double("auth_client")
+        allow(Google::Auth).to receive(:get_application_default).with(Supply::Client::SCOPE).and_return(mock_auth_client)
+        allow(mock_auth_client).to receive(:fetch_access_token!)
+
+        Supply::Client.make_from_config(params: { timeout: 1 })
+      end
+
+      it "raises an informative error when no credentials are found" do
+        allow(Google::Auth).to receive(:get_application_default).and_raise(RuntimeError, "Your credentials were not found.")
+        allow(UI).to receive(:interactive?).and_return(false)
+
+        expect {
+          Supply::Client.make_from_config(params: { timeout: 1 })
+        }.to raise_error(FastlaneCore::Interface::FastlaneError, /json_key.*GOOGLE_APPLICATION_CREDENTIALS.*gcloud/m)
+      end
+    end
+
+    describe "displays error messages from the API" do
+      it "with no retries" do
+        stub_request(:post, "https://androidpublisher.googleapis.com/upload/androidpublisher/v3/applications/test-app/edits/1/listings/en-US/icon").
+          to_return(status: 403, body: '{"error":{"message":"Ensure project settings are enabled."}}', headers: { 'Content-Type' => 'application/json' })
+
+        current_edit = double
+        allow(current_edit).to receive(:id).and_return(1)
+
+        client = Supply::Client.new(service_account_json: StringIO.new(service_account_file), params: { timeout: 1 })
+        allow(client).to receive(:ensure_active_edit!)
+        allow(client).to receive(:current_edit).and_return(current_edit)
+
+        client.begin_edit(package_name: 'test-app')
+        expect {
+          client.upload_image(image_path: fixture_file("playstore-icon.png"),
+                              image_type: "icon",
+                                language: "en-US")
+        }.to raise_error(FastlaneCore::Interface::FastlaneError, "Google Api Error: Invalid request - Ensure project settings are enabled.")
+      end
+
+      it "displays error messages for invalid json" do
+        expect {
+          Supply::Client.new(service_account_json: StringIO.new("{/asdf"), params: { timeout: 1 })
+        }.to raise_error(FastlaneCore::Interface::FastlaneError, "Invalid Google Credentials file provided - unable to parse json.")
+      end
+
+      it "displays error messages for missing credential type" do
+        expect {
+          Supply::Client.new(service_account_json: StringIO.new("{}"), params: { timeout: 1 })
+        }.to raise_error(FastlaneCore::Interface::FastlaneError, "Invalid Google Credentials file provided - no credential type found.")
+      end
+
+      it "with 5 retries" do
+        stub_const("ENV", { 'SUPPLY_UPLOAD_MAX_RETRIES' => 5 })
+
+        stub_request(:post, "https://androidpublisher.googleapis.com/upload/androidpublisher/v3/applications/test-app/edits/1/listings/en-US/icon").
+          to_return(status: 403, body: '{"error":{"message":"Ensure project settings are enabled."}}', headers: { 'Content-Type' => 'application/json' })
+
+        expect(UI).to receive(:error).with("Google Api Error: Invalid request - Ensure project settings are enabled. - Retrying...").exactly(5).times
+
+        current_edit = double
+        allow(current_edit).to receive(:id).and_return(1)
+
+        client = Supply::Client.new(service_account_json: StringIO.new(service_account_file), params: { timeout: 1 })
+        allow(client).to receive(:ensure_active_edit!)
+        allow(client).to receive(:current_edit).and_return(current_edit)
+
+        client.begin_edit(package_name: 'test-app')
+        expect {
+          client.upload_image(image_path: fixture_file("playstore-icon.png"),
+                              image_type: "icon",
+                                language: "en-US")
+        }.to raise_error(FastlaneCore::Interface::FastlaneError, "Google Api Error: Invalid request - Ensure project settings are enabled.")
+      end
     end
 
     describe "AndroidPublisher" do
@@ -40,6 +136,8 @@ describe Supply do
         expect(subject.class.method_defined?(:get_edit_listing)).to eq(true)
         expect(subject.class.method_defined?(:list_edit_apks)).to eq(true)
         expect(subject.class.method_defined?(:list_edit_bundles)).to eq(true)
+        expect(subject.class.method_defined?(:list_generatedapks)).to eq(true)
+        expect(subject.class.method_defined?(:download_generatedapk)).to eq(true)
         expect(subject.class.method_defined?(:update_edit_listing)).to eq(true)
         expect(subject.class.method_defined?(:upload_edit_apk)).to eq(true)
         expect(subject.class.method_defined?(:upload_edit_deobfuscationfile)).to eq(true)
@@ -52,9 +150,76 @@ describe Supply do
         expect(subject.class.method_defined?(:list_edit_images)).to eq(true)
         expect(subject.class.method_defined?(:upload_edit_image)).to eq(true)
         expect(subject.class.method_defined?(:deleteall_edit_image)).to eq(true)
+        expect(subject.class.method_defined?(:delete_edit_image)).to eq(true)
         expect(subject.class.method_defined?(:upload_edit_expansionfile)).to eq(true)
         expect(subject.class.method_defined?(:uploadapk_internalappsharingartifact)).to eq(true)
         expect(subject.class.method_defined?(:uploadbundle_internalappsharingartifact)).to eq(true)
+      end
+    end
+
+    describe "#get_edit_track" do
+      let(:service_account_file) { File.read(fixture_file("sample-service-account.json")) }
+
+      before do
+        stub_request(:post, "https://www.googleapis.com/oauth2/v4/token").
+          to_return(status: 200, body: '{}', headers: { 'Content-Type' => 'application/json' })
+        stub_request(:post, "https://androidpublisher.googleapis.com/androidpublisher/v3/applications/pkg-meta/edits").
+          to_return(status: 200, body: '{"id":"edit-meta-1"}', headers: { 'Content-Type' => 'application/json' })
+      end
+
+      it "returns a Track from the Android Publisher API" do
+        stub_request(:get, "https://androidpublisher.googleapis.com/androidpublisher/v3/applications/pkg-meta/edits/edit-meta-1/tracks/production").
+          to_return(
+            status: 200,
+            body: '{"track":"production","releases":[{"name":"1.0.0","versionCodes":["42"],"status":"completed"}]}',
+            headers: { 'Content-Type' => 'application/json' }
+          )
+
+        client = Supply::Client.new(service_account_json: StringIO.new(service_account_file), params: { timeout: 1 })
+        client.begin_edit(package_name: "pkg-meta")
+        result = client.get_edit_track("production")
+
+        expect(result).to be_a(AndroidPublisher::Track)
+        expect(result.track).to eq("production")
+        expect(result.releases.length).to eq(1)
+        expect(result.releases.first.version_codes).to eq(["42"])
+      end
+
+      it "returns nil when the track is empty (trackEmpty)" do
+        stub_request(:get, "https://androidpublisher.googleapis.com/androidpublisher/v3/applications/pkg-meta/edits/edit-meta-1/tracks/internal").
+          to_return(
+            status: 404,
+            body: {
+              error: {
+                code: 404,
+                message: "track empty",
+                details: [{ "@type" => "type.googleapis.com/google.rpc.ErrorInfo", "reason" => "trackEmpty" }]
+              }
+            }.to_json,
+            headers: { 'Content-Type' => 'application/json' }
+          )
+
+        client = Supply::Client.new(service_account_json: StringIO.new(service_account_file), params: { timeout: 1 })
+        client.begin_edit(package_name: "pkg-meta")
+        expect(client.get_edit_track("internal")).to be_nil
+      end
+
+      it "returns nil when the track is not found" do
+        stub_request(:get, "https://androidpublisher.googleapis.com/androidpublisher/v3/applications/pkg-meta/edits/edit-meta-1/tracks/unknown-track").
+          to_return(status: 404, body: '{"error":{"message":"Track not found"}}', headers: { 'Content-Type' => 'application/json' })
+
+        client = Supply::Client.new(service_account_json: StringIO.new(service_account_file), params: { timeout: 1 })
+        client.begin_edit(package_name: "pkg-meta")
+        expect(client.get_edit_track("unknown-track")).to be_nil
+      end
+
+      it "re-raises on other client errors" do
+        stub_request(:get, "https://androidpublisher.googleapis.com/androidpublisher/v3/applications/pkg-meta/edits/edit-meta-1/tracks/production").
+          to_return(status: 403, body: '{"error":{"message":"forbidden"}}', headers: { 'Content-Type' => 'application/json' })
+
+        client = Supply::Client.new(service_account_json: StringIO.new(service_account_file), params: { timeout: 1 })
+        client.begin_edit(package_name: "pkg-meta")
+        expect { client.get_edit_track("production") }.to raise_error(Google::Apis::ClientError)
       end
     end
   end

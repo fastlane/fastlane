@@ -1,0 +1,664 @@
+{
+  "data": [
+    {
+      "type": "buildBundleFileSizes",
+      "id": "82ee11de-a206-371c-8e4f-a79b9185c962",
+      "attributes": {
+        "deviceModel": "Universal",
+        "osVersion": "Universal",
+        "downloadBytes": 54844802,
+        "installBytes": 74799104
+      },
+      "links": {
+        "self": "https://api.appstoreconnect.apple.com/v1/buildBundleFileSizes/82ee11de-a206-371c-8e4f-a79b9185c962"
+      }
+    },
+    {
+      "type": "buildBundleFileSizes",
+      "id": "121d59b9-7e32-32d7-a2ff-72faa22e5119",
+      "attributes": {
+        "deviceModel": "iPhone11,2",
+        "osVersion": "Universal",
+        "downloadBytes": 26993077,
+        "installBytes": 71567360
+      },
+      "links": {
+        "self": "https://api.appstoreconnect.apple.com/v1/buildBundleFileSizes/121d59b9-7e32-32d7-a2ff-72faa22e5119"
+      }
+    },
+    {
+      "type": "buildBundleFileSizes",
+      "id": "02c9673e-e2b7-3c57-b8f0-6a64c5f08d24",
+      "attributes": {
+        "deviceModel": "iPhone15,2",
+        "osVersion": "Universal",
+        "downloadBytes": 26858254,
+        "installBytes": 71147520
+      },
+      "links": {
+        "self": "https://api.appstoreconnect.apple.com/v1/buildBundleFileSizes/02c9673e-e2b7-3c57-b8f0-6a64c5f08d24"
+      }
+    },
+    {
+      "type": "buildBundleFileSizes",
+      "id": "857d5396-f1da-3c2e-b086-458608feefea",
+      "attributes": {
+        "deviceModel": "iPhone11,6",
+        "osVersion": "Universal",
+        "downloadBytes": 26993077,
+        "installBytes": 71567360
+      },
+      "links": {
+        "self": "https://api.appstoreconnect.apple.com/v1/buildBundleFileSizes/857d5396-f1da-3c2e-b086-458608feefea"
+      }
+    },
+    {
+      "type": "buildBundleFileSizes",
+      "id": "42b2f737-96a0-3f06-b716-5624d6944c6c",
+      "attributes": {
+        "deviceModel": "iPhone13,4",
+        "osVersion": "Universal",
+        "downloadBytes": 26993077,
+        "installBytes": 71567360
+      },
+      "links": {
+        "self": "https://api.appstoreconnect.apple.com/v1/buildBundleFileSizes/42b2f737-96a0-3f06-b716-5624d6944c6c"
+      }
+    },
+    {
+      "type": "buildBundleFileSizes",
+      "id": "e3fbb3ed-1d89-311f-a561-dabff3092c0e",
+      "attributes": {
+        "deviceModel": "iPhone13,3",
+        "osVersion": "Universal",
+        "downloadBytes": 26993077,
+        "installBytes": 71567360
+      },
+      "links": {
+        "self": "https://api.appstoreconnect.apple.com/v1/buildBundleFileSizes/e3fbb3ed-1d89-311f-a561-dabff3092c0e"
+      }
+    },
+    {
+      "type": "buildBundleFileSizes",
+      "id": "f1e4bee4-67e1-3461-93bc-08eedb112279",
+      "attributes": {
+        "deviceModel": "iPhone8,4",
+        "osVersion": "Universal",
+        "downloadBytes": 26129080,
+        "installBytes": 70711296
+      },
+      "links": {
+        "self": "https://api.appstoreconnect.apple.com/v1/buildBundleFileSizes/f1e4bee4-67e1-3461-93bc-08eedb112279"
+      }
+    },
+    {
+      "type": "buildBundleFileSizes",
+      "id": "a02e030c-4b3f-3f8d-a240-9d7992405e40",
+      "attributes": {
+        "deviceModel": "iPhone13,2",
+        "osVersion": "Universal",
+        "downloadBytes": 26993077,
+        "installBytes": 71567360
+      },
+      "links": {
+        "self": "https://api.appstoreconnect.apple.com/v1/buildBundleFileSizes/a02e030c-4b3f-3f8d-a240-9d7992405e40"
+      }
+    },
+    {
+      "type": "buildBundleFileSizes",
+      "id": "51658926-03f0-34bb-9a29-f4eefbdf5525",
+      "attributes": {
+        "deviceModel": "iPhone11,4",
+        "osVersion": "Universal",
+        "downloadBytes": 26993077,
+        "installBytes": 71567360
+      },
+      "links": {
+        "self": "https://api.appstoreconnect.apple.com/v1/buildBundleFileSizes/51658926-03f0-34bb-9a29-f4eefbdf5525"
+      }
+    },
+    {
+      "type": "buildBundleFileSizes",
+      "id": "068350b0-a790-35b9-885b-96543cc88b43",
+      "attributes": {
+        "deviceModel": "iPhone8,1",
+        "osVersion": "Universal",
+        "downloadBytes": 26129080,
+        "installBytes": 70711296
+      },
+      "links": {
+        "self": "https://api.appstoreconnect.apple.com/v1/buildBundleFileSizes/068350b0-a790-35b9-885b-96543cc88b43"
+      }
+    },
+    {
+      "type": "buildBundleFileSizes",
+      "id": "90527449-f17f-35bc-8495-d1e194f762af",
+      "attributes": {
+        "deviceModel": "iPhone13,1",
+        "osVersion": "Universal",
+        "downloadBytes": 26993077,
+        "installBytes": 71567360
+      },
+      "links": {
+        "self": "https://api.appstoreconnect.apple.com/v1/buildBundleFileSizes/90527449-f17f-35bc-8495-d1e194f762af"
+      }
+    },
+    {
+      "type": "buildBundleFileSizes",
+      "id": "afb9b5cb-55f7-3f30-bbc5-d55f161b0ef6",
+      "attributes": {
+        "deviceModel": "iPhone8,2",
+        "osVersion": "Universal",
+        "downloadBytes": 26993061,
+        "installBytes": 71567360
+      },
+      "links": {
+        "self": "https://api.appstoreconnect.apple.com/v1/buildBundleFileSizes/afb9b5cb-55f7-3f30-bbc5-d55f161b0ef6"
+      }
+    },
+    {
+      "type": "buildBundleFileSizes",
+      "id": "a3f1bf19-6453-3273-8fd1-8734f99b985a",
+      "attributes": {
+        "deviceModel": "iPad8,12",
+        "osVersion": "Universal",
+        "downloadBytes": 26134057,
+        "installBytes": 70719488
+      },
+      "links": {
+        "self": "https://api.appstoreconnect.apple.com/v1/buildBundleFileSizes/a3f1bf19-6453-3273-8fd1-8734f99b985a"
+      }
+    },
+    {
+      "type": "buildBundleFileSizes",
+      "id": "d3495a16-aa72-3bfd-8740-b4cbeb7b32b1",
+      "attributes": {
+        "deviceModel": "iPad8,11",
+        "osVersion": "Universal",
+        "downloadBytes": 26134057,
+        "installBytes": 70719488
+      },
+      "links": {
+        "self": "https://api.appstoreconnect.apple.com/v1/buildBundleFileSizes/d3495a16-aa72-3bfd-8740-b4cbeb7b32b1"
+      }
+    },
+    {
+      "type": "buildBundleFileSizes",
+      "id": "b1a82c0f-f125-39e9-9d39-21d022b9d27c",
+      "attributes": {
+        "deviceModel": "iPad8,10",
+        "osVersion": "Universal",
+        "downloadBytes": 26134057,
+        "installBytes": 70719488
+      },
+      "links": {
+        "self": "https://api.appstoreconnect.apple.com/v1/buildBundleFileSizes/b1a82c0f-f125-39e9-9d39-21d022b9d27c"
+      }
+    },
+    {
+      "type": "buildBundleFileSizes",
+      "id": "f82c5061-5a5d-3638-87ac-d9e6a70057ec",
+      "attributes": {
+        "deviceModel": "iPhone11,8",
+        "osVersion": "Universal",
+        "downloadBytes": 26134954,
+        "installBytes": 70719488
+      },
+      "links": {
+        "self": "https://api.appstoreconnect.apple.com/v1/buildBundleFileSizes/f82c5061-5a5d-3638-87ac-d9e6a70057ec"
+      }
+    },
+    {
+      "type": "buildBundleFileSizes",
+      "id": "06c90d4f-640d-321c-9c67-2e92b975eeb2",
+      "attributes": {
+        "deviceModel": "iPhone15,3",
+        "osVersion": "Universal",
+        "downloadBytes": 26858254,
+        "installBytes": 71147520
+      },
+      "links": {
+        "self": "https://api.appstoreconnect.apple.com/v1/buildBundleFileSizes/06c90d4f-640d-321c-9c67-2e92b975eeb2"
+      }
+    },
+    {
+      "type": "buildBundleFileSizes",
+      "id": "77a3c195-8aca-3b22-a5e6-721f97df9045",
+      "attributes": {
+        "deviceModel": "iPad7,6",
+        "osVersion": "Universal",
+        "downloadBytes": 26133961,
+        "installBytes": 70719488
+      },
+      "links": {
+        "self": "https://api.appstoreconnect.apple.com/v1/buildBundleFileSizes/77a3c195-8aca-3b22-a5e6-721f97df9045"
+      }
+    },
+    {
+      "type": "buildBundleFileSizes",
+      "id": "d3a4415c-5d63-32e1-9581-edd08576b5eb",
+      "attributes": {
+        "deviceModel": "iPad7,5",
+        "osVersion": "Universal",
+        "downloadBytes": 26133961,
+        "installBytes": 70719488
+      },
+      "links": {
+        "self": "https://api.appstoreconnect.apple.com/v1/buildBundleFileSizes/d3a4415c-5d63-32e1-9581-edd08576b5eb"
+      }
+    },
+    {
+      "type": "buildBundleFileSizes",
+      "id": "7eb1df6a-daec-3689-8535-fcf462132df5",
+      "attributes": {
+        "deviceModel": "iPad7,4",
+        "osVersion": "Universal",
+        "downloadBytes": 26134057,
+        "installBytes": 70719488
+      },
+      "links": {
+        "self": "https://api.appstoreconnect.apple.com/v1/buildBundleFileSizes/7eb1df6a-daec-3689-8535-fcf462132df5"
+      }
+    },
+    {
+      "type": "buildBundleFileSizes",
+      "id": "b86021ef-9d3e-3d90-a1b4-259b83067b95",
+      "attributes": {
+        "deviceModel": "iPad7,3",
+        "osVersion": "Universal",
+        "downloadBytes": 26134057,
+        "installBytes": 70719488
+      },
+      "links": {
+        "self": "https://api.appstoreconnect.apple.com/v1/buildBundleFileSizes/b86021ef-9d3e-3d90-a1b4-259b83067b95"
+      }
+    },
+    {
+      "type": "buildBundleFileSizes",
+      "id": "0a2150b6-f162-3f19-8592-f94701df66f7",
+      "attributes": {
+        "deviceModel": "iPad5,4",
+        "osVersion": "Universal",
+        "downloadBytes": 26133961,
+        "installBytes": 70719488
+      },
+      "links": {
+        "self": "https://api.appstoreconnect.apple.com/v1/buildBundleFileSizes/0a2150b6-f162-3f19-8592-f94701df66f7"
+      }
+    },
+    {
+      "type": "buildBundleFileSizes",
+      "id": "1386996a-38ba-3ab8-abee-42d52f1f60f5",
+      "attributes": {
+        "deviceModel": "iPad7,2",
+        "osVersion": "Universal",
+        "downloadBytes": 26134057,
+        "installBytes": 70719488
+      },
+      "links": {
+        "self": "https://api.appstoreconnect.apple.com/v1/buildBundleFileSizes/1386996a-38ba-3ab8-abee-42d52f1f60f5"
+      }
+    },
+    {
+      "type": "buildBundleFileSizes",
+      "id": "d4f7987c-a620-3a43-8ba3-8daed5a4d11d",
+      "attributes": {
+        "deviceModel": "iPad5,3",
+        "osVersion": "Universal",
+        "downloadBytes": 26133961,
+        "installBytes": 70719488
+      },
+      "links": {
+        "self": "https://api.appstoreconnect.apple.com/v1/buildBundleFileSizes/d4f7987c-a620-3a43-8ba3-8daed5a4d11d"
+      }
+    },
+    {
+      "type": "buildBundleFileSizes",
+      "id": "09ebaf3a-2c1d-3a3e-8328-7097bca90a0b",
+      "attributes": {
+        "deviceModel": "iPad13,10",
+        "osVersion": "Universal",
+        "downloadBytes": 26134057,
+        "installBytes": 70719488
+      },
+      "links": {
+        "self": "https://api.appstoreconnect.apple.com/v1/buildBundleFileSizes/09ebaf3a-2c1d-3a3e-8328-7097bca90a0b"
+      }
+    },
+    {
+      "type": "buildBundleFileSizes",
+      "id": "4322fac7-b2b8-3e46-95c1-48383f81360c",
+      "attributes": {
+        "deviceModel": "iPad7,1",
+        "osVersion": "Universal",
+        "downloadBytes": 26134057,
+        "installBytes": 70719488
+      },
+      "links": {
+        "self": "https://api.appstoreconnect.apple.com/v1/buildBundleFileSizes/4322fac7-b2b8-3e46-95c1-48383f81360c"
+      }
+    },
+    {
+      "type": "buildBundleFileSizes",
+      "id": "293dcdb4-56e8-38ce-8bf8-bba1d86d0e48",
+      "attributes": {
+        "deviceModel": "iPad5,2",
+        "osVersion": "Universal",
+        "downloadBytes": 26133961,
+        "installBytes": 70719488
+      },
+      "links": {
+        "self": "https://api.appstoreconnect.apple.com/v1/buildBundleFileSizes/293dcdb4-56e8-38ce-8bf8-bba1d86d0e48"
+      }
+    },
+    {
+      "type": "buildBundleFileSizes",
+      "id": "c2342fd7-82eb-30c8-8648-a0c4cf8b9761",
+      "attributes": {
+        "deviceModel": "iPad5,1",
+        "osVersion": "Universal",
+        "downloadBytes": 26133961,
+        "installBytes": 70719488
+      },
+      "links": {
+        "self": "https://api.appstoreconnect.apple.com/v1/buildBundleFileSizes/c2342fd7-82eb-30c8-8648-a0c4cf8b9761"
+      }
+    },
+    {
+      "type": "buildBundleFileSizes",
+      "id": "9dbffd5c-3717-32c8-b6cf-e6617ba66cdf",
+      "attributes": {
+        "deviceModel": "iPad6,11",
+        "osVersion": "Universal",
+        "downloadBytes": 26133961,
+        "installBytes": 70719488
+      },
+      "links": {
+        "self": "https://api.appstoreconnect.apple.com/v1/buildBundleFileSizes/9dbffd5c-3717-32c8-b6cf-e6617ba66cdf"
+      }
+    },
+    {
+      "type": "buildBundleFileSizes",
+      "id": "8b2441aa-4a30-3382-9029-e2da3ab60aa2",
+      "attributes": {
+        "deviceModel": "iPad6,12",
+        "osVersion": "Universal",
+        "downloadBytes": 26133961,
+        "installBytes": 70719488
+      },
+      "links": {
+        "self": "https://api.appstoreconnect.apple.com/v1/buildBundleFileSizes/8b2441aa-4a30-3382-9029-e2da3ab60aa2"
+      }
+    },
+    {
+      "type": "buildBundleFileSizes",
+      "id": "25f7c7de-cebf-3ed1-bbd1-a0d1abf23681",
+      "attributes": {
+        "deviceModel": "iPad12,1",
+        "osVersion": "Universal",
+        "downloadBytes": 25998391,
+        "installBytes": 70299648
+      },
+      "links": {
+        "self": "https://api.appstoreconnect.apple.com/v1/buildBundleFileSizes/25f7c7de-cebf-3ed1-bbd1-a0d1abf23681"
+      }
+    },
+    {
+      "type": "buildBundleFileSizes",
+      "id": "be96f3fb-4877-394f-b303-585e63707cb2",
+      "attributes": {
+        "deviceModel": "iPad12,2",
+        "osVersion": "Universal",
+        "downloadBytes": 25998391,
+        "installBytes": 70299648
+      },
+      "links": {
+        "self": "https://api.appstoreconnect.apple.com/v1/buildBundleFileSizes/be96f3fb-4877-394f-b303-585e63707cb2"
+      }
+    },
+    {
+      "type": "buildBundleFileSizes",
+      "id": "62ab5071-1ec1-3c43-9f98-c040319346cf",
+      "attributes": {
+        "deviceModel": "iPad14,1",
+        "osVersion": "Universal",
+        "downloadBytes": 25998584,
+        "installBytes": 70299648
+      },
+      "links": {
+        "self": "https://api.appstoreconnect.apple.com/v1/buildBundleFileSizes/62ab5071-1ec1-3c43-9f98-c040319346cf"
+      }
+    },
+    {
+      "type": "buildBundleFileSizes",
+      "id": "3dc4d7b7-87f3-3e7a-814d-f7a2c1e43a51",
+      "attributes": {
+        "deviceModel": "iPad14,2",
+        "osVersion": "Universal",
+        "downloadBytes": 25998584,
+        "installBytes": 70299648
+      },
+      "links": {
+        "self": "https://api.appstoreconnect.apple.com/v1/buildBundleFileSizes/3dc4d7b7-87f3-3e7a-814d-f7a2c1e43a51"
+      }
+    },
+    {
+      "type": "buildBundleFileSizes",
+      "id": "7197f57b-45ce-3337-869c-fef13fec65e9",
+      "attributes": {
+        "deviceModel": "iPhone10,3",
+        "osVersion": "Universal",
+        "downloadBytes": 26993077,
+        "installBytes": 71567360
+      },
+      "links": {
+        "self": "https://api.appstoreconnect.apple.com/v1/buildBundleFileSizes/7197f57b-45ce-3337-869c-fef13fec65e9"
+      }
+    },
+    {
+      "type": "buildBundleFileSizes",
+      "id": "7e199a22-c402-3f58-a722-a1e5e7cddd8e",
+      "attributes": {
+        "deviceModel": "iPhone12,1",
+        "osVersion": "Universal",
+        "downloadBytes": 26134954,
+        "installBytes": 70719488
+      },
+      "links": {
+        "self": "https://api.appstoreconnect.apple.com/v1/buildBundleFileSizes/7e199a22-c402-3f58-a722-a1e5e7cddd8e"
+      }
+    },
+    {
+      "type": "buildBundleFileSizes",
+      "id": "0304f73e-e330-3ed4-9af8-c7591a37ac3f",
+      "attributes": {
+        "deviceModel": "iPhone10,2",
+        "osVersion": "Universal",
+        "downloadBytes": 26993077,
+        "installBytes": 71567360
+      },
+      "links": {
+        "self": "https://api.appstoreconnect.apple.com/v1/buildBundleFileSizes/0304f73e-e330-3ed4-9af8-c7591a37ac3f"
+      }
+    },
+    {
+      "type": "buildBundleFileSizes",
+      "id": "6038d6ca-0186-3bc4-bcee-3d16fc63f9ae",
+      "attributes": {
+        "deviceModel": "iPhone9,4",
+        "osVersion": "Universal",
+        "downloadBytes": 26993077,
+        "installBytes": 71567360
+      },
+      "links": {
+        "self": "https://api.appstoreconnect.apple.com/v1/buildBundleFileSizes/6038d6ca-0186-3bc4-bcee-3d16fc63f9ae"
+      }
+    },
+    {
+      "type": "buildBundleFileSizes",
+      "id": "2472a246-5326-3fce-a417-1c6b2729bbec",
+      "attributes": {
+        "deviceModel": "iPhone10,1",
+        "osVersion": "Universal",
+        "downloadBytes": 26129086,
+        "installBytes": 70711296
+      },
+      "links": {
+        "self": "https://api.appstoreconnect.apple.com/v1/buildBundleFileSizes/2472a246-5326-3fce-a417-1c6b2729bbec"
+      }
+    },
+    {
+      "type": "buildBundleFileSizes",
+      "id": "b25f0859-210d-3ca3-b233-274dc1e6171f",
+      "attributes": {
+        "deviceModel": "iPhone14,3",
+        "osVersion": "Universal",
+        "downloadBytes": 26858254,
+        "installBytes": 71147520
+      },
+      "links": {
+        "self": "https://api.appstoreconnect.apple.com/v1/buildBundleFileSizes/b25f0859-210d-3ca3-b233-274dc1e6171f"
+      }
+    },
+    {
+      "type": "buildBundleFileSizes",
+      "id": "2a0ed5d4-9e07-34fc-8756-22e285dd7049",
+      "attributes": {
+        "deviceModel": "iPhone9,2",
+        "osVersion": "Universal",
+        "downloadBytes": 26993077,
+        "installBytes": 71567360
+      },
+      "links": {
+        "self": "https://api.appstoreconnect.apple.com/v1/buildBundleFileSizes/2a0ed5d4-9e07-34fc-8756-22e285dd7049"
+      }
+    },
+    {
+      "type": "buildBundleFileSizes",
+      "id": "503ff3de-c9c3-3354-a2d2-66be847aa844",
+      "attributes": {
+        "deviceModel": "iPhone12,5",
+        "osVersion": "Universal",
+        "downloadBytes": 26993077,
+        "installBytes": 71567360
+      },
+      "links": {
+        "self": "https://api.appstoreconnect.apple.com/v1/buildBundleFileSizes/503ff3de-c9c3-3354-a2d2-66be847aa844"
+      }
+    },
+    {
+      "type": "buildBundleFileSizes",
+      "id": "0622bd53-ba85-3fcc-85a4-702e3e4b865d",
+      "attributes": {
+        "deviceModel": "iPhone14,2",
+        "osVersion": "Universal",
+        "downloadBytes": 26858254,
+        "installBytes": 71147520
+      },
+      "links": {
+        "self": "https://api.appstoreconnect.apple.com/v1/buildBundleFileSizes/0622bd53-ba85-3fcc-85a4-702e3e4b865d"
+      }
+    },
+    {
+      "type": "buildBundleFileSizes",
+      "id": "9505b4cd-3179-3663-b14d-e05349f1ea59",
+      "attributes": {
+        "deviceModel": "iPhone10,6",
+        "osVersion": "Universal",
+        "downloadBytes": 26993077,
+        "installBytes": 71567360
+      },
+      "links": {
+        "self": "https://api.appstoreconnect.apple.com/v1/buildBundleFileSizes/9505b4cd-3179-3663-b14d-e05349f1ea59"
+      }
+    },
+    {
+      "type": "buildBundleFileSizes",
+      "id": "bd3ebfda-4852-3f42-874c-a2b2cdfd9c5e",
+      "attributes": {
+        "deviceModel": "iPhone9,3",
+        "osVersion": "Universal",
+        "downloadBytes": 26129086,
+        "installBytes": 70711296
+      },
+      "links": {
+        "self": "https://api.appstoreconnect.apple.com/v1/buildBundleFileSizes/bd3ebfda-4852-3f42-874c-a2b2cdfd9c5e"
+      }
+    },
+    {
+      "type": "buildBundleFileSizes",
+      "id": "320693f6-1990-33e9-808f-5a42cab47797",
+      "attributes": {
+        "deviceModel": "iPhone10,5",
+        "osVersion": "Universal",
+        "downloadBytes": 26993077,
+        "installBytes": 71567360
+      },
+      "links": {
+        "self": "https://api.appstoreconnect.apple.com/v1/buildBundleFileSizes/320693f6-1990-33e9-808f-5a42cab47797"
+      }
+    },
+    {
+      "type": "buildBundleFileSizes",
+      "id": "5f9eae7a-f7e9-3475-8625-81e84e40b079",
+      "attributes": {
+        "deviceModel": "iPhone12,3",
+        "osVersion": "Universal",
+        "downloadBytes": 26993077,
+        "installBytes": 71567360
+      },
+      "links": {
+        "self": "https://api.appstoreconnect.apple.com/v1/buildBundleFileSizes/5f9eae7a-f7e9-3475-8625-81e84e40b079"
+      }
+    },
+    {
+      "type": "buildBundleFileSizes",
+      "id": "0b0c3e9b-7c19-3d6f-8a48-59ef1335a3bb",
+      "attributes": {
+        "deviceModel": "iPhone10,4",
+        "osVersion": "Universal",
+        "downloadBytes": 26129086,
+        "installBytes": 70711296
+      },
+      "links": {
+        "self": "https://api.appstoreconnect.apple.com/v1/buildBundleFileSizes/0b0c3e9b-7c19-3d6f-8a48-59ef1335a3bb"
+      }
+    },
+    {
+      "type": "buildBundleFileSizes",
+      "id": "9f5d4b3c-d7b3-3bd0-87ae-9fa60d915e95",
+      "attributes": {
+        "deviceModel": "iPhone9,1",
+        "osVersion": "Universal",
+        "downloadBytes": 26129086,
+        "installBytes": 70711296
+      },
+      "links": {
+        "self": "https://api.appstoreconnect.apple.com/v1/buildBundleFileSizes/9f5d4b3c-d7b3-3bd0-87ae-9fa60d915e95"
+      }
+    },
+    {
+      "type": "buildBundleFileSizes",
+      "id": "c33701dc-c57f-3eff-ac67-364a6f9f9a28",
+      "attributes": {
+        "deviceModel": "iPad7,12",
+        "osVersion": "Universal",
+        "downloadBytes": 26133961,
+        "installBytes": 70719488
+      },
+      "links": {
+        "self": "https://api.appstoreconnect.apple.com/v1/buildBundleFileSizes/c33701dc-c57f-3eff-ac67-364a6f9f9a28"
+      }
+    }
+  ],
+  "links": {
+    "self": "https://api.appstoreconnect.apple.com/v1/buildBundles/48a9bb1f-5f0f-4133-8c72-3fb93e92603a/buildBundleFileSizes",
+    "next": "https://api.appstoreconnect.apple.com/v1/buildBundles/48a9bb1f-5f0f-4133-8c72-3fb93e92603a/buildBundleFileSizes?cursor=Mg.AIdNGDM&limit=50"
+  },
+  "meta": {
+    "paging": {
+      "total": 90,
+      "limit": 50
+    }
+  }
+}

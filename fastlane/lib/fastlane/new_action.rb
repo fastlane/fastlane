@@ -7,7 +7,7 @@ module Fastlane
     end
 
     def self.fetch_name
-      puts("Must be lower case, and use a '_' between words. Do not use '.'".green)
+      puts("Must be lowercase, and use a '_' between words. Do not use '.'".green)
       puts("examples: 'testflight', 'upload_to_s3'".green)
       name = UI.input("Name of your action: ")
       until name_valid?(name)

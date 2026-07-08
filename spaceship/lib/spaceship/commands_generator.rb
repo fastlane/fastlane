@@ -40,10 +40,17 @@ module Spaceship
       command :spaceauth do |c|
         c.syntax = 'fastlane spaceship spaceauth'
         c.description = 'Authentication helper for spaceship/fastlane to work with Apple 2-Step/2FA'
-        c.option('--copy_to_clipboard', 'Whether the session string should be copied to clipboard. For more info see https://docs.fastlane.tools/best-practices/continuous-integration/#storing-a-manually-verified-session-using-spaceauth`')
+        c.option('--copy_to_clipboard VALUE', 'Whether the session string should be copied to clipboard (true/false). For more info see https://docs.fastlane.tools/best-practices/continuous-integration/#storing-a-manually-verified-session-using-spaceauth`')
         c.option('--check_session', 'Check to see if there is a valid session (either in the cache or via FASTLANE_SESSION). Sets the exit code to 0 if the session is valid or 1 if not.') { Spaceship::Globals.check_session = true }
         c.action do |args, options|
-          Spaceship::SpaceauthRunner.new(username: options.user, copy_to_clipboard: options.copy_to_clipboard).run
+          copy_to_clipboard = if options.copy_to_clipboard.nil?
+                                nil
+                              elsif %w(yes YES true TRUE on ON).include?(options.copy_to_clipboard.to_s)
+                                true
+                              elsif %w(no NO false FALSE off OFF).include?(options.copy_to_clipboard.to_s)
+                                false
+                              end
+          Spaceship::SpaceauthRunner.new(username: options.user, copy_to_clipboard: copy_to_clipboard).run
         end
       end
 

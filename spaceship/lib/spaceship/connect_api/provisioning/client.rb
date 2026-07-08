@@ -16,7 +16,7 @@ module Spaceship
         end
 
         def self.hostname
-          'https://developer.apple.com/services-account/v1/'
+          'https://developer.apple.com/services-account/'
         end
 
         #

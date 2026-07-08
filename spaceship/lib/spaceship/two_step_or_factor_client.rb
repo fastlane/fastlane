@@ -61,9 +61,17 @@ module Spaceship
 
       # Send token to server to get a valid session
       r = request(:post) do |req|
-        req.url("https://idmsa.apple.com/appleauth/auth/verify/device/#{device_id}/securitycode")
+        req.url("https://idmsa.apple.com/appleauth/auth/verify/phone/securitycode")
         req.headers['Content-Type'] = 'application/json'
-        req.body = { "code" => code.to_s }.to_json
+        req.body = {
+          "phoneNumber": {
+            "id": device_id
+          },
+          "securityCode": {
+            "code" => code.to_s
+          },
+          "mode": "sms"
+        }.to_json
         update_request_headers(req)
       end
 
@@ -256,7 +264,8 @@ If it is, please open an issue at https://github.com/fastlane/fastlane/issues/ne
     end
 
     def match_phone_to_masked_phone(phone_number, masked_number)
-      characters_to_remove_from_phone_numbers = ' \-()"'
+      # Apple's response sometimes contains NBSP instead of a plain space.
+      characters_to_remove_from_phone_numbers = "  \\-()\""
 
       # start with e.g. +49 162 1234585 or +1-123-456-7866
       phone_number = phone_number.tr(characters_to_remove_from_phone_numbers, '')

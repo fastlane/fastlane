@@ -115,7 +115,7 @@ describe FastlaneCore do
         it "properly shows an error message when there is a syntax error in the Fastfile" do
           config = FastlaneCore::Configuration.create(options, {})
           expect do
-            config.load_configuration_file('./fastlane_core/spec/fixtures/ConfigSytnaxError')
+            config.load_configuration_file('./fastlane_core/spec/fixtures/ConfigSyntaxError')
           end.to raise_error(/Syntax error in your configuration file .* on line 15/)
         end
       end

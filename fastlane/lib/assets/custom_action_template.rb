@@ -7,7 +7,7 @@ module Fastlane
     class [[NAME_CLASS]] < Action
       def self.run(params)
         # fastlane will take care of reading in the parameter and fetching the environment variable:
-        UI.message "Parameter API Token: #{params[:api_token]}"
+        UI.message("Parameter API Token: #{params[:api_token]}")
 
         # sh "shellcommand ./path"
 
@@ -19,13 +19,13 @@ module Fastlane
       #####################################################
 
       def self.description
-        "A short description with <= 80 characters of what this action does"
+        'A short description with <= 80 characters of what this action does'
       end
 
       def self.details
         # Optional:
         # this is your chance to provide a more detailed description of this action
-        "You can use this action to do cool things..."
+        'You can use this action to do cool things...'
       end
 
       def self.available_options
@@ -34,17 +34,23 @@ module Fastlane
         # Below a few examples
         [
           FastlaneCore::ConfigItem.new(key: :api_token,
-                                       env_name: "FL_[[NAME_UP]]_API_TOKEN", # The name of the environment variable
-                                       description: "API Token for [[NAME_CLASS]]", # a short description of this parameter
+                                       # The name of the environment variable
+                                       env_name: 'FL_[[NAME_UP]]_API_TOKEN',
+                                       # a short description of this parameter
+                                       description: 'API Token for [[NAME_CLASS]]',
                                        verify_block: proc do |value|
-                                          UI.user_error!("No API token for [[NAME_CLASS]] given, pass using `api_token: 'token'`") unless (value and not value.empty?)
-                                          # UI.user_error!("Couldn't find file at path '#{value}'") unless File.exist?(value)
+                                         unless value && !value.empty?
+                                           UI.user_error!("No API token for [[NAME_CLASS]] given, pass using `api_token: 'token'`")
+                                         end
+                                         # UI.user_error!("Couldn't find file at path '#{value}'") unless File.exist?(value)
                                        end),
           FastlaneCore::ConfigItem.new(key: :development,
-                                       env_name: "FL_[[NAME_UP]]_DEVELOPMENT",
-                                       description: "Create a development certificate instead of a distribution one",
-                                       is_string: false, # true: verifies the input is a string, false: every kind of value
-                                       default_value: false) # the default value if the user didn't provide one
+                                       env_name: 'FL_[[NAME_UP]]_DEVELOPMENT',
+                                       description: 'Create a development certificate instead of a distribution one',
+                                       # true: verifies the input is a string, false: every kind of value
+                                       is_string: false,
+                                       # the default value if the user didn't provide one
+                                       default_value: false)
         ]
       end
 
@@ -62,7 +68,7 @@ module Fastlane
 
       def self.authors
         # So no one will ever forget your contribution to fastlane :) You are awesome btw!
-        ["Your GitHub/Twitter Name"]
+        ['Your GitHub/Twitter Name']
       end
 
       def self.is_supported?(platform)

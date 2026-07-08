@@ -8,7 +8,7 @@ module Fastlane
         command << upload_url(params[:app_id].shellescape)
 
         # Fastlane::Actions.sh has buffering issues, no progress bar is shown in real time
-        # will reanable it when it is fixed
+        # will reenable it when it is fixed
         # result = Fastlane::Actions.sh(command.join(' '), log: false)
         shell_command = command.join(' ')
         return shell_command if Helper.test?

@@ -101,7 +101,11 @@ module Fastlane
       end
 
       def self.category
-        :building
+        :deprecated
+      end
+
+      def self.deprecated_notes
+        "The xcode-install gem, which this action depends on, has been sunset. Please migrate to [xcodes](https://docs.fastlane.tools/actions/xcodes). You can find a migration guide here: [xcpretty/xcode-install/MIGRATION.md](https://github.com/xcpretty/xcode-install/blob/master/MIGRATION.md)"
       end
     end
   end

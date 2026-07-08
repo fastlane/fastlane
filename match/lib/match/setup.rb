@@ -15,7 +15,7 @@ module Match
         self.storage_options
       )
 
-      storage = Storage.for_mode(storage_mode, {})
+      storage = Storage.from_params({ storage_mode: storage_mode })
 
       specific_content = storage.generate_matchfile_content
       UI.crash!("Looks like `generate_matchfile_content` was `nil` for `#{storage_mode}`") if specific_content.nil?

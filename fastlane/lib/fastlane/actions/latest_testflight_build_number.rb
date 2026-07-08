@@ -83,11 +83,11 @@ module Fastlane
                                        optional: true,
                                        default_value: "ios",
                                        verify_block: proc do |value|
-                                         UI.user_error!("The platform can only be ios, osx, or appletvos") unless %('osx', ios', 'appletvos').include?(value)
+                                         UI.user_error!("The platform can only be ios, osx, xros or appletvos/tvos") unless %w(ios osx xros appletvos tvos).include?(value)
                                        end),
           FastlaneCore::ConfigItem.new(key: :initial_build_number,
                                        env_name: "INITIAL_BUILD_NUMBER",
-                                       description: "sets the build number to given value if no build is in current train",
+                                       description: "sets the build number to given value if no build (upload) is in current train",
                                        default_value: 1,
                                        skip_type_validation: true), # allow Integer, String
           FastlaneCore::ConfigItem.new(key: :team_id,
