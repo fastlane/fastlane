@@ -74,7 +74,7 @@ end
 
 def create_fake_encryption(storage:)
   fake_encryption = "fake_encryption"
-  expect(Match::Encryption::OpenSSL).to receive(:new).with(keychain_name: storage.git_url, working_directory: storage.working_directory).and_return(fake_encryption)
+  expect(Match::Encryption::OpenSSL).to receive(:new).with(keychain_name: storage.git_url, working_directory: storage.working_directory, force_legacy_encryption: false).and_return(fake_encryption)
 
   # Ensure files from storage are decrypted.
   expect(fake_encryption).to receive(:decrypt_files).and_return(nil)
@@ -91,6 +91,14 @@ def create_fake_spaceship_ensure
   expect(spaceship_ensure).to receive(:bundle_identifier_exists).and_return(true)
 
   return spaceship_ensure
+end
+
+def provisioning_path_for_xcode_version(xcode_version)
+  if xcode_version.split('.')[0].to_i < 16
+    return File.join(File.expand_path("~"), "Library/MobileDevice/Provisioning Profiles")
+  else
+    return File.join(File.expand_path("~"), "Library/Developer/Xcode/UserData/Provisioning Profiles")
+  end
 end
 
 def create_fake_cache(allow_usage: true)

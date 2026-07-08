@@ -32,8 +32,8 @@ module Match
         username: params[:username],
         team_id: params[:team_id],
         team_name: params[:team_name],
-        keychain_path: FastlaneCore::Helper.keychain_path(params[:keychain_name]),
-        keychain_password: params[:keychain_password],
+        keychain_path: Helper.mac? ? FastlaneCore::Helper.keychain_path(params[:keychain_name]) : nil,
+        keychain_password: Helper.mac? ? params[:keychain_password] : nil,
         skip_set_partition_list: params[:skip_set_partition_list]
       })
 
@@ -115,7 +115,9 @@ module Match
       arguments = FastlaneCore::Configuration.create(Sigh::Options.available_options, values)
 
       Sigh.config = arguments
-      path = Sigh::Manager.start
+
+      keychain_path = FastlaneCore::Helper.keychain_path(params[:keychain_name]) if Helper.mac? && params[:keychain_name]
+      path = Sigh::Manager.start(keychain_path: keychain_path)
       return path
     end
 

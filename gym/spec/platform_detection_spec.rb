@@ -9,6 +9,8 @@ describe Gym do
 
     expect(Gym.building_for_mac?).to eq(false)
     expect(Gym.building_for_ios?).to eq(true)
+    expect(Gym.building_for_ipa?).to eq(true)
+    expect(Gym.building_for_pkg?).to eq(false)
     expect(Gym.building_multiplatform_for_ios?).to eq(true)
   end
 
@@ -22,6 +24,8 @@ describe Gym do
 
     expect(Gym.building_for_ios?).to eq(false)
     expect(Gym.building_for_mac?).to eq(true)
+    expect(Gym.building_for_ipa?).to eq(false)
+    expect(Gym.building_for_pkg?).to eq(true)
     expect(Gym.building_multiplatform_for_mac?).to eq(true)
   end
 
@@ -29,12 +33,16 @@ describe Gym do
     options = { project: "./gym/examples/visionos/VisionExample.xcodeproj", sdk: "xros", skip_package_dependencies_resolution: true }
     Gym.config = FastlaneCore::Configuration.create(Gym::Options.available_options, options)
 
+    skip "visionOS SDK not available on this machine" unless Gym.project.supported_platforms.include?(:visionOS)
+
     expect(Gym.project.multiplatform?).to eq(false)
     expect(Gym.project.visionos?).to eq(true)
     expect(Gym.project.ios?).to eq(false)
 
     expect(Gym.building_for_ios?).to eq(true)
     expect(Gym.building_for_mac?).to eq(false)
+    expect(Gym.building_for_ipa?).to eq(true)
+    expect(Gym.building_for_pkg?).to eq(false)
     expect(Gym.building_multiplatform_for_mac?).to eq(false)
   end
 end

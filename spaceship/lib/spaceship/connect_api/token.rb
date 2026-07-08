@@ -29,6 +29,7 @@ module Spaceship
       attr_accessor :in_house
 
       def self.from(hash: nil, filepath: nil)
+        # FIXME: Ensure `in_house` value is a boolean.
         api_token ||= self.create(**hash.transform_keys(&:to_sym)) if hash
         api_token ||= self.from_json_file(filepath) if filepath
         return api_token
@@ -101,7 +102,7 @@ module Spaceship
           # Reduce the issued-at-time in case our time is slighly ahead of Apple's servers, which causes the token to be rejected.
           iat: now.to_i - 60,
           exp: @expiration.to_i,
-          aud: 'appstoreconnect-v1'
+          aud: @in_house ? 'apple-developer-enterprise-v1' : 'appstoreconnect-v1'
         }
         if issuer_id
           payload[:iss] = issuer_id

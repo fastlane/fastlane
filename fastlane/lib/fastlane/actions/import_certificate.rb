@@ -6,7 +6,7 @@ module Fastlane
       def self.run(params)
         keychain_path = params[:keychain_path] || FastlaneCore::Helper.keychain_path(params[:keychain_name])
 
-        FastlaneCore::KeychainImporter.import_file(params[:certificate_path], keychain_path, keychain_password: params[:keychain_password], certificate_password: params[:certificate_password], output: params[:log_output])
+        FastlaneCore::KeychainImporter.import_file(params[:certificate_path], keychain_path, keychain_password: params[:keychain_password], certificate_password: params[:certificate_password], certificate_format: params[:certificate_format], output: params[:log_output])
       end
 
       def self.description
@@ -22,6 +22,9 @@ module Fastlane
                                        description: "Certificate password",
                                        sensitive: true,
                                        default_value: "",
+                                       optional: true),
+          FastlaneCore::ConfigItem.new(key: :certificate_format,
+                                       description: "Format of the certificate. Check the '-f' switch from 'security import --help' command",
                                        optional: true),
           FastlaneCore::ConfigItem.new(key: :keychain_name,
                                        env_name: "KEYCHAIN_NAME",
@@ -65,6 +68,11 @@ module Fastlane
           )',
           'import_certificate(
             certificate_path: "certs/development.cer"
+          )',
+          'import_certificate(
+            certificate_path: "certs/dist.p12",
+            certificate_password: ENV["CERTIFICATE_PASSWORD"] || "default",
+            certificate_format: "pkcs12"
           )'
         ]
       end

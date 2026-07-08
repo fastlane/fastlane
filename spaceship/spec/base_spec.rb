@@ -1,4 +1,5 @@
 describe Spaceship::Base do
+  include_examples "common spaceship login", true
   before { Spaceship.login }
   let(:client) { Spaceship::App.client }
 

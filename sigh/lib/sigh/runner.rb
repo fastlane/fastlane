@@ -84,7 +84,7 @@ module Sigh
 
       includes = 'bundleId'
 
-      unless Sigh.config[:skip_certificate_verification] || Sigh.config[:include_all_certificates]
+      unless (Sigh.config[:skip_certificate_verification] || Sigh.config[:include_all_certificates]) && Sigh.config[:cert_id].to_s.length == 0
         includes += ',certificates'
       end
 
@@ -105,6 +105,8 @@ module Sigh
 
       # Take the provisioning profile name into account
       results = filter_profiles_by_name(results) if Sigh.config[:provisioning_name].to_s.length > 0
+      # Take the cert_id into account
+      results = filter_profiles_by_cert_id(results) if Sigh.config[:cert_id].to_s.length > 0
       return results if Sigh.config[:skip_certificate_verification] || Sigh.config[:include_all_certificates]
 
       UI.message("Verifying certificates...")
@@ -174,13 +176,16 @@ module Sigh
 
       UI.important("Creating new provisioning profile for '#{Sigh.config[:app_identifier]}' with name '#{name}' for '#{Sigh.config[:platform]}' platform")
 
+      unless Sigh.config[:template_name].nil?
+        UI.important("Template name is set to '#{Sigh.config[:template_name]}', however, this is not supported by the App Store Connect API anymore, since May 2025. The template name will be ignored. For more information: https://docs.fastlane.tools/actions/match/#managed-capabilities")
+      end
+
       profile = Spaceship::ConnectAPI::Profile.create(
         name: name,
         profile_type: profile_type,
         bundle_id_id: bundle_id.id,
         certificate_ids: certificates_to_use.map(&:id),
-        device_ids: devices_to_use.map(&:id),
-        template_name: Sigh.config[:template_name]
+        device_ids: devices_to_use.map(&:id)
       )
 
       profile
@@ -194,6 +199,21 @@ module Sigh
         profiles = filtered
       end
       profiles
+    end
+
+    def filter_profiles_by_cert_id(profiles)
+      filtered = profiles.find_all do |current_profile|
+        valid_cert_id = false
+        current_profile.certificates.each do |cert|
+          if cert.id == Sigh.config[:cert_id].to_s
+            valid_cert_id = true
+          else
+            UI.message("Provisioning Profile cert_id : '#{cert.id}' does not match given cert_id : '#{Sigh.config[:cert_id]}', skipping this one...")
+          end
+        end
+        valid_cert_id
+      end
+      filtered
     end
 
     def fetch_certificates(certificate_types)

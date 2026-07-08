@@ -114,6 +114,7 @@ module Sigh
         c.option('--use_app_entitlements', 'Extract app bundle codesigning entitlements and combine with entitlements from new provisioning profile.')
         c.option('-g', '--new_bundle_id STRING', String, 'New application bundle ID (CFBundleIdentifier)')
         c.option('--keychain_path STRING', String, 'Path to the keychain that /usr/bin/codesign should use')
+        c.option('--page_size STRING', String, 'Page size in bytes for codesign --pagesize (power of two)')
 
         c.action do |args, options|
           Sigh::Resign.new.run(options, args)
