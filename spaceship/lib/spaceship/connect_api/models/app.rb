@@ -232,15 +232,17 @@ module Spaceship
       end
 
       # This will return the latest version that is available on the App Store.
-      # By default, when limit is nil, it will eagerly fetch all versions, sort them, and then return the last one.
-      # If you set a limit, it will only fetch the latest versions (which is much faster), and then return the last one.
-      # However, if Apple changes the way they sort versions, this might not return the latest versions, hence why
-      # the default behavior is to fetch all versions.
-      # Unfortunately, there's no way to sort by version number on the server side, so we have to do it on the client side.
-      # Pass in a limit knowing the risks of this changing silently in the future.
-      def get_latest_app_store_version(client: nil, platform: nil, includes: nil, limit: nil)
+      # By default, it will only fetch the latest version (limit: 1), which is much faster than fetching all versions,
+      # relying on the App Store Connect API returning the versions sorted by most recent first.
+      # If Apple changes the way they sort versions, this might not return the latest version. As a safeguard,
+      # you can set the SPACESHIP_FETCH_ALL_APP_STORE_VERSIONS environment variable (or pass limit: nil) to
+      # eagerly fetch all versions, sort them, and then return the latest one.
+      # Unfortunately, there's no way to sort by version number on the server side, so when fetching all versions
+      # the sorting has to be done on the client side.
+      def get_latest_app_store_version(client: nil, platform: nil, includes: nil, limit: 1)
         client ||= Spaceship::ConnectAPI
         platform ||= Spaceship::ConnectAPI::Platform::IOS
+        limit = nil if ENV["SPACESHIP_FETCH_ALL_APP_STORE_VERSIONS"]
         filter = {
           platform: platform
         }
