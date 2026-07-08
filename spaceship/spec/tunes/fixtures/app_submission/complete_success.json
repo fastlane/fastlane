@@ -27,12 +27,6 @@
                 "isEditable": false,
                 "isRequired": false,
                 "value": null
-            },
-            "usesIdfa": {
-                "errorKeys": null,
-                "isEditable": false,
-                "isRequired": true,
-                "value": null
             }
         },
         "contentRights": null,

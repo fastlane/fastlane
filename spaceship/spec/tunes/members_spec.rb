@@ -1,5 +1,5 @@
 describe Spaceship::Tunes::Members do
-  before { Spaceship::Tunes.login }
+  include_examples "common spaceship login"
   before { TunesStubbing.itc_stub_members }
 
   describe "members" do
