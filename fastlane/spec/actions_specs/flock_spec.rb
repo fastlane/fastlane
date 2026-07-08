@@ -14,7 +14,7 @@ describe Fastlane do
       context 'options' do
         before do
           ENV['FL_FLOCK_BASE_URL'] = 'https://example.com'
-          stub_request(:any, /example.com/)
+          stub_request(:any, /example\.com/)
         end
 
         it 'requires message' do

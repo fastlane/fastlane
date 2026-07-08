@@ -5,6 +5,7 @@ module Fastlane
     end
 
     class IncrementVersionNumberAction < Action
+      require 'fastlane/helper/xcodeproj_helper'
       require 'shellwords'
 
       def self.is_supported?(platform)
@@ -23,12 +24,20 @@ module Fastlane
           '&&'
         ].join(' ')
 
+        version_number_build_setting = nil
+
         begin
           current_version = Actions
                             .sh("#{command_prefix} agvtool what-marketing-version -terse1", log: FastlaneCore::Globals.verbose?)
                             .split("\n")
                             .last
                             .strip
+
+          if current_version =~ /\$\(([\w\-]+)\)/ || current_version =~ /\$\{([\w\-]+)\}/
+            version_number_build_setting = $1
+            UI.verbose("agvtool returned #{current_version}, resolving it...")
+            current_version = GetVersionNumberAction.run(xcodeproj: params[:xcodeproj])
+          end
         rescue
           current_version = ''
         end
@@ -75,6 +84,12 @@ module Fastlane
           Actions.lane_context[SharedValues::VERSION_NUMBER] = command
         else
           Actions.sh(command)
+          version_number_build_setting ||= "MARKETING_VERSION"
+          update_project_version_build_setting(
+            params[:xcodeproj],
+            version_number_build_setting,
+            next_version_number.to_s.strip
+          )
           Actions.lane_context[SharedValues::VERSION_NUMBER] = next_version_number
         end
 
@@ -94,6 +109,24 @@ module Fastlane
 
       def self.version_token_error
         "Can't increment version"
+      end
+
+      def self.update_project_version_build_setting(xcodeproj_path_or_dir, build_setting, version_number)
+        project_path_or_dir = xcodeproj_path_or_dir
+        if project_path_or_dir.nil?
+          xcodeproj_paths = Dir.glob("./*.xcodeproj")
+          return if xcodeproj_paths.empty?
+
+          if xcodeproj_paths.size > 1
+            return
+          end
+
+          project_path_or_dir = xcodeproj_paths.first
+        end
+
+        project = Fastlane::Helper::XcodeprojHelper.get_project!(project_path_or_dir)
+        changed = Fastlane::Helper::XcodeprojHelper.update_project_build_setting(project, build_setting, version_number)
+        project.save if changed[:project]
       end
 
       def self.description

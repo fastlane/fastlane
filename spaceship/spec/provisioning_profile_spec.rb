@@ -1,4 +1,6 @@
 describe Spaceship::ProvisioningProfile do
+  # Skip tunes login and login with portal
+  include_examples "common spaceship login", true
   before { Spaceship.login }
   let(:client) { Spaceship::ProvisioningProfile.client }
   let(:cert_id) { "C8DL7464RQ" }
@@ -55,14 +57,8 @@ describe Spaceship::ProvisioningProfile do
   end
 
   describe '#all via xcode api' do
-    around(:all) do |example|
-      switch = ENV['SPACESHIP_AVOID_XCODE_API']
-      example.run
-      ENV['SPACESHIP_AVOID_XCODE_API'] = switch
-    end
-
     it 'should use the Xcode api to get provisioning profiles and their appIds' do
-      ENV['SPACESHIP_AVOID_XCODE_API'] = nil
+      stub_const('ENV', { "SPACESHIP_AVOID_XCODE_API" => nil })
       expect(client).to receive(:provisioning_profiles_via_xcode_api).and_call_original
       expect(client).not_to(receive(:provisioning_profiles))
       expect(client).not_to(receive(:provisioning_profile_details))
@@ -70,7 +66,7 @@ describe Spaceship::ProvisioningProfile do
     end
 
     it 'should use the developer portal api to get provisioning profiles and their appIds' do
-      ENV['SPACESHIP_AVOID_XCODE_API'] = 'true'
+      stub_const('ENV', { "SPACESHIP_AVOID_XCODE_API" => 'true' })
       expect(client).not_to(receive(:provisioning_profiles_via_xcode_api))
       expect(client).to receive(:provisioning_profiles).and_call_original
       expect(client).to receive(:provisioning_profile_details).and_call_original.exactly(7).times
@@ -145,12 +141,20 @@ describe Spaceship::ProvisioningProfile do
   describe '#valid?' do
     it "Valid profile" do
       p = Spaceship::ProvisioningProfile.all.first
+      p.expires = Time.now.utc + 60
       expect(p.valid?).to eq(true)
     end
 
-    it "Invalid profile" do
+    it "Invalid profile with expired status" do
       profile = Spaceship::ProvisioningProfile.all.first
       profile.status = 'Expired'
+      expect(profile.valid?).to eq(false)
+    end
+
+    it "Invalid profile with active status but expired date" do
+      profile = Spaceship::ProvisioningProfile.all.first
+      profile.status = 'Active'
+      profile.expires = Time.now.utc
       expect(profile.valid?).to eq(false)
     end
   end
@@ -286,10 +290,36 @@ describe Spaceship::ProvisioningProfile do
       profile.repair!
     end
 
+    it "raises when no valid signing certificates are available" do
+      allow(profile).to receive(:certificate_valid?).and_return(false)
+      allow(profile).to receive(:suggested_certificates).and_return([])
+      expect do
+        profile.repair!
+      end.to raise_error(/No valid signing certificates were found/)
+    end
+
+    it "handles nil certificates in the certificate list" do
+      original_details = profile.profile_details
+      certificates_with_nil = original_details["certificates"].dup
+      certificates_with_nil << nil
+
+      allow(profile).to receive(:profile_details).and_return(original_details.merge("certificates" => certificates_with_nil))
+
+      expect(client).to receive(:repair_provisioning_profile!).with('PP00000006', 'delete.me.please AppStore', 'store', '2UMR2S6P4L', [cert_id], [], mac: false, sub_platform: nil, template_name: nil).and_return({})
+      profile.repair!
+    end
+
     it "update the certificate if the current one is invalid" do
       expect(profile.certificates.first.id).to eq("3BH4JJSWM4")
       expect(client).to receive(:repair_provisioning_profile!).with('PP00000006', 'delete.me.please AppStore', 'store', '2UMR2S6P4L', [cert_id], [], mac: false, sub_platform: nil, template_name: nil).and_return({})
       profile.repair! # repair will replace the old certificate with the new one
+    end
+
+    it "ignores nil entries when collecting certificate ids" do
+      valid_cert = Spaceship::Certificate.all.first
+      profile.certificates = [valid_cert, nil]
+      expect(client).to receive(:repair_provisioning_profile!).with('PP00000006', 'delete.me.please AppStore', 'store', '2UMR2S6P4L', [valid_cert.id], [], mac: false, sub_platform: nil, template_name: nil).and_return({})
+      profile.repair!
     end
 
     it "repairs an existing profile with no devices" do

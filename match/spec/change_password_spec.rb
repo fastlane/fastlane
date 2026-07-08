@@ -18,7 +18,7 @@ describe Match do
       repo_dir = Dir.mktmpdir
 
       fake_storage = "fake_storage"
-      expect(Match::Storage::GitStorage).to receive(:configure).with(
+      expect(Match::Storage::GitStorage).to receive(:configure).with({
         git_url: git_url,
         shallow_clone: true,
         skip_docs: false,
@@ -31,7 +31,7 @@ describe Match do
         git_private_key: nil,
         type: config[:type],
         platform: config[:platform]
-      ).and_return(fake_storage)
+      }).and_return(fake_storage)
 
       allow(fake_storage).to receive(:download)
       allow(fake_storage).to receive(:working_directory).and_return(repo_dir)

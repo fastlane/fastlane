@@ -23,6 +23,8 @@ module Spaceship
       attr_accessor :distribution_type
       attr_accessor :educationDiscountType
 
+      attr_accessor :app_clip_default_experience
+
       module ContentRightsDeclaration
         USES_THIRD_PARTY_CONTENT = "USES_THIRD_PARTY_CONTENT"
         DOES_NOT_USE_THIRD_PARTY_CONTENT = "DOES_NOT_USE_THIRD_PARTY_CONTENT"
@@ -55,7 +57,8 @@ module Spaceship
 
         "appStoreVersions" => "app_store_versions",
         # This attribute is already deprecated. It will be removed in a future release.
-        "prices" => "prices"
+        "prices" => "prices",
+        "appClipDefaultExperience" => "app_clip_default_experience"
       })
 
       ESSENTIAL_INCLUDES = [
@@ -116,40 +119,45 @@ module Spaceship
       def fetch_live_app_info(client: nil, includes: Spaceship::ConnectAPI::AppInfo::ESSENTIAL_INCLUDES)
         client ||= Spaceship::ConnectAPI
         states = [
-          Spaceship::ConnectAPI::AppInfo::AppStoreState::READY_FOR_SALE,
-          Spaceship::ConnectAPI::AppInfo::AppStoreState::PENDING_APPLE_RELEASE,
-          Spaceship::ConnectAPI::AppInfo::AppStoreState::PENDING_DEVELOPER_RELEASE,
-          Spaceship::ConnectAPI::AppInfo::AppStoreState::PROCESSING_FOR_APP_STORE,
-          Spaceship::ConnectAPI::AppInfo::AppStoreState::IN_REVIEW,
-          Spaceship::ConnectAPI::AppInfo::AppStoreState::DEVELOPER_REMOVED_FROM_SALE
+          Spaceship::ConnectAPI::AppInfo::State::READY_FOR_DISTRIBUTION,
+          Spaceship::ConnectAPI::AppInfo::State::PENDING_RELEASE,
+          Spaceship::ConnectAPI::AppInfo::State::IN_REVIEW
         ]
 
         resp = client.get_app_infos(app_id: id, includes: includes)
         return resp.to_models.select do |model|
-          states.include?(model.app_store_state)
+          states.include?(model.state)
         end.first
       end
 
       def fetch_edit_app_info(client: nil, includes: Spaceship::ConnectAPI::AppInfo::ESSENTIAL_INCLUDES)
         client ||= Spaceship::ConnectAPI
         states = [
-          Spaceship::ConnectAPI::AppInfo::AppStoreState::PREPARE_FOR_SUBMISSION,
-          Spaceship::ConnectAPI::AppInfo::AppStoreState::DEVELOPER_REJECTED,
-          Spaceship::ConnectAPI::AppInfo::AppStoreState::REJECTED,
-          Spaceship::ConnectAPI::AppInfo::AppStoreState::METADATA_REJECTED,
-          Spaceship::ConnectAPI::AppInfo::AppStoreState::WAITING_FOR_REVIEW,
-          Spaceship::ConnectAPI::AppInfo::AppStoreState::INVALID_BINARY
+          Spaceship::ConnectAPI::AppInfo::State::PREPARE_FOR_SUBMISSION,
+          Spaceship::ConnectAPI::AppInfo::State::DEVELOPER_REJECTED,
+          Spaceship::ConnectAPI::AppInfo::State::REJECTED,
+          Spaceship::ConnectAPI::AppInfo::State::WAITING_FOR_REVIEW
         ]
 
         resp = client.get_app_infos(app_id: id, includes: includes)
         return resp.to_models.select do |model|
-          states.include?(model.app_store_state)
+          states.include?(model.state)
         end.first
       end
 
       def fetch_latest_app_info(client: nil, includes: Spaceship::ConnectAPI::AppInfo::ESSENTIAL_INCLUDES)
         client ||= Spaceship::ConnectAPI
         resp = client.get_app_infos(app_id: id, includes: includes)
+        return resp.to_models.first
+      end
+
+      #
+      # App Availabilities
+      #
+
+      def get_app_availabilities(client: nil, filter: {}, includes: "territoryAvailabilities", limit: { "territoryAvailabilities": 200 })
+        client ||= Spaceship::ConnectAPI
+        resp = client.get_app_availabilities(app_id: id, filter: filter, includes: includes, limit: limit, sort: nil)
         return resp.to_models.first
       end
 
@@ -182,11 +190,11 @@ module Spaceship
         client ||= Spaceship::ConnectAPI
         platform ||= Spaceship::ConnectAPI::Platform::IOS
         filter = {
-          appStoreState: [
-            Spaceship::ConnectAPI::AppStoreVersion::AppStoreState::PENDING_APPLE_RELEASE,
-            Spaceship::ConnectAPI::AppStoreVersion::AppStoreState::PENDING_DEVELOPER_RELEASE,
-            Spaceship::ConnectAPI::AppStoreVersion::AppStoreState::IN_REVIEW,
-            Spaceship::ConnectAPI::AppStoreVersion::AppStoreState::WAITING_FOR_REVIEW
+          appVersionState: [
+            Spaceship::ConnectAPI::AppStoreVersion::AppVersionState::PENDING_APPLE_RELEASE,
+            Spaceship::ConnectAPI::AppStoreVersion::AppVersionState::PENDING_DEVELOPER_RELEASE,
+            Spaceship::ConnectAPI::AppStoreVersion::AppVersionState::IN_REVIEW,
+            Spaceship::ConnectAPI::AppStoreVersion::AppVersionState::WAITING_FOR_REVIEW
           ].join(","),
           platform: platform
         }
@@ -247,9 +255,9 @@ module Spaceship
         client ||= Spaceship::ConnectAPI
         platform ||= Spaceship::ConnectAPI::Platform::IOS
         filter = {
-          appStoreState: [
-            Spaceship::ConnectAPI::AppStoreVersion::AppStoreState::READY_FOR_SALE,
-            Spaceship::ConnectAPI::AppStoreVersion::AppStoreState::DEVELOPER_REMOVED_FROM_SALE
+          appVersionState: [
+            Spaceship::ConnectAPI::AppStoreVersion::AppVersionState::READY_FOR_DISTRIBUTION,
+            Spaceship::ConnectAPI::AppStoreVersion::AppVersionState::PROCESSING_FOR_DISTRIBUTION
           ].join(","),
           platform: platform
         }
@@ -260,13 +268,13 @@ module Spaceship
         client ||= Spaceship::ConnectAPI
         platform ||= Spaceship::ConnectAPI::Platform::IOS
         filter = {
-          appStoreState: [
-            Spaceship::ConnectAPI::AppStoreVersion::AppStoreState::PREPARE_FOR_SUBMISSION,
-            Spaceship::ConnectAPI::AppStoreVersion::AppStoreState::DEVELOPER_REJECTED,
-            Spaceship::ConnectAPI::AppStoreVersion::AppStoreState::REJECTED,
-            Spaceship::ConnectAPI::AppStoreVersion::AppStoreState::METADATA_REJECTED,
-            Spaceship::ConnectAPI::AppStoreVersion::AppStoreState::WAITING_FOR_REVIEW,
-            Spaceship::ConnectAPI::AppStoreVersion::AppStoreState::INVALID_BINARY
+          appVersionState: [
+            Spaceship::ConnectAPI::AppStoreVersion::AppVersionState::PREPARE_FOR_SUBMISSION,
+            Spaceship::ConnectAPI::AppStoreVersion::AppVersionState::DEVELOPER_REJECTED,
+            Spaceship::ConnectAPI::AppStoreVersion::AppVersionState::REJECTED,
+            Spaceship::ConnectAPI::AppStoreVersion::AppVersionState::METADATA_REJECTED,
+            Spaceship::ConnectAPI::AppStoreVersion::AppVersionState::WAITING_FOR_REVIEW,
+            Spaceship::ConnectAPI::AppStoreVersion::AppVersionState::INVALID_BINARY
           ].join(","),
           platform: platform
         }
@@ -281,7 +289,7 @@ module Spaceship
         client ||= Spaceship::ConnectAPI
         platform ||= Spaceship::ConnectAPI::Platform::IOS
         filter = {
-          appStoreState: Spaceship::ConnectAPI::AppStoreVersion::AppStoreState::IN_REVIEW,
+          appVersionState: Spaceship::ConnectAPI::AppStoreVersion::AppVersionState::IN_REVIEW,
           platform: platform
         }
         return get_app_store_versions(client: client, filter: filter, includes: includes).first
@@ -291,9 +299,9 @@ module Spaceship
         client ||= Spaceship::ConnectAPI
         platform ||= Spaceship::ConnectAPI::Platform::IOS
         filter = {
-          appStoreState: [
-            Spaceship::ConnectAPI::AppStoreVersion::AppStoreState::PENDING_APPLE_RELEASE,
-            Spaceship::ConnectAPI::AppStoreVersion::AppStoreState::PENDING_DEVELOPER_RELEASE
+          appVersionState: [
+            Spaceship::ConnectAPI::AppStoreVersion::AppVersionState::PENDING_APPLE_RELEASE,
+            Spaceship::ConnectAPI::AppStoreVersion::AppVersionState::PENDING_DEVELOPER_RELEASE
           ].join(','),
           platform: platform
         }
@@ -303,12 +311,11 @@ module Spaceship
       def get_app_store_versions(client: nil, filter: {}, includes: Spaceship::ConnectAPI::AppStoreVersion::ESSENTIAL_INCLUDES, limit: nil)
         # This API doesn't support "sort" (as of App Store Connect OpenAPI spec v2.4.0)
         client ||= Spaceship::ConnectAPI
+        resp = client.get_app_store_versions(app_id: id, filter: filter, includes: includes, limit: limit)
         if limit.nil?
-          resps = client.get_app_store_versions(app_id: id, filter: filter, includes: includes, limit: limit).all_pages
-          return resps.flat_map(&:to_models)
+          resp.all_pages.flat_map(&:to_models)
         else
-          resp = client.get_app_store_versions(app_id: id, filter: filter, includes: includes, limit: limit)
-          return resp.to_models
+          resp.to_models
         end
       end
 
@@ -365,12 +372,11 @@ module Spaceship
         filter ||= {}
         filter[:app] = id
 
+        resp = client.get_builds(filter: filter, includes: includes, limit: limit, sort: sort)
         if limit.nil?
-          resps = client.get_builds(filter: filter, includes: includes, limit: limit, sort: sort).all_pages
-          return resps.flat_map(&:to_models)
+          resp.all_pages.flat_map(&:to_models)
         else
-          resp = client.get_builds(filter: filter, includes: includes, limit: limit, sort: sort)
-          return resp.to_models
+          resp.to_models
         end
       end
 
@@ -489,6 +495,16 @@ module Spaceship
         user_ids.each do |user_id|
           client.delete_user_visible_apps(user_id: user_id, app_ids: [id])
         end
+      end
+
+      #
+      # App Clips
+      #
+
+      def get_app_clips(client: nil, filter: {}, includes: nil, limit: nil, sort: nil)
+        client ||= Spaceship::ConnectAPI
+        resps = client.get_app_clips(app_id: id, filter: filter, includes: includes, limit: limit, sort: sort).all_pages
+        resps.flat_map(&:to_models)
       end
     end
   end

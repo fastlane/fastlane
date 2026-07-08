@@ -25,6 +25,14 @@ module Gym
       require 'gym/xcodebuild_fixes/generic_archive_fix'
     end
 
+    def building_for_ipa?
+      return !building_for_pkg?
+    end
+
+    def building_for_pkg?
+      return building_for_mac?
+    end
+
     def building_for_ios?
       if Gym.project.mac?
         # Can be building for iOS if mac project and catalyst or multiplatform and set to iOS
@@ -33,8 +41,8 @@ module Gym
         # Can be iOS project and build for mac if catalyst
         return false if building_mac_catalyst_for_mac?
 
-        # Can be iOS project if iOS, tvOS, or watchOS
-        return Gym.project.ios? || Gym.project.tvos? || Gym.project.watchos?
+        # Can be iOS project if iOS, tvOS, watchOS, or visionOS
+        return Gym.project.ios? || Gym.project.tvos? || Gym.project.watchos? || Gym.project.visionos?
       end
     end
 
@@ -43,10 +51,7 @@ module Gym
         # Can be a mac project and not build mac if catalyst
         return building_mac_catalyst_for_mac?
       else
-        # Can be mac project but multiplatform and building for iOS
-        return false if building_multiplatform_for_ios?
-
-        return Gym.project.mac?
+        return (!Gym.project.multiplatform? && Gym.project.mac?) || building_multiplatform_for_mac?
       end
     end
 

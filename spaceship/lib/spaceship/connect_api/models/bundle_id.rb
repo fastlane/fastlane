@@ -1,4 +1,4 @@
-require_relative '../model'
+require_relative '../../connect_api'
 require_relative './bundle_id_capability'
 module Spaceship
   class ConnectAPI
@@ -39,7 +39,7 @@ module Spaceship
       # API
       #
 
-      def self.all(client: nil, filter: {}, includes: nil, fields: nil, limit: nil, sort: nil)
+      def self.all(client: nil, filter: {}, includes: nil, fields: nil, limit: Spaceship::ConnectAPI::MAX_OBJECTS_PER_PAGE_LIMIT, sort: nil)
         client ||= Spaceship::ConnectAPI
         resps = client.get_bundle_ids(filter: filter, includes: includes, fields: fields, limit: nil, sort: nil).all_pages
         return resps.flat_map(&:to_models)

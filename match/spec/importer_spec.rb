@@ -123,7 +123,7 @@ describe Match do
     end
 
     def setup_fake_storage(repo_dir, config)
-      expect(Match::Storage::GitStorage).to receive(:configure).with(
+      expect(Match::Storage::GitStorage).to receive(:configure).with({
         git_url: config[:git_url],
         shallow_clone: true,
         skip_docs: false,
@@ -136,7 +136,7 @@ describe Match do
         clone_branch_directly: false,
         type: config[:type],
         platform: config[:platform]
-      ).and_return(fake_storage)
+      }).and_return(fake_storage)
 
       expect(fake_storage).to receive(:download).and_return(nil)
       allow(fake_storage).to receive(:working_directory).and_return(repo_dir)

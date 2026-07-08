@@ -21,7 +21,7 @@ module Gym
           print("Invalid code signing settings")
           print("Your project defines a provisioning profile that doesn't match the bundle identifier of your app")
           print("Make sure you use the correct provisioning profile for this app")
-          print("Take a look at the ouptput above for more information")
+          print("Take a look at the output above for more information")
           print("You can follow this guide: https://docs.fastlane.tools/codesigning/GettingStarted/")
         when /provisioning profiles matching the bundle identifier .(.*)./ # the . around the (.*) are for the strange "
           print("You don't have the provisioning profile for '#{$1}' installed on the local machine")
@@ -151,9 +151,19 @@ module Gym
         # `xcodebuild` doesn't properly mark lines as failure reason or important information
         # so we assume that the last few lines show the error message that's relevant
         # (at least that's what was correct during testing)
-        log_content = File.read(log_path).split("\n").last(5)
+        log_lines = File.read(log_path).split("\n")
+        log_content = log_lines.last(5)
         log_content.each do |row|
           UI.command_output(row)
+        end
+
+        # If we didn't find the error in the last 5 lines, let's search for it
+        # This is specifically for errors that might be buried by subsequent warnings
+        last_5_lines = log_content.join("\n")
+        unless last_5_lines.include?("error:")
+          UI.verbose("Error not found in last 5 lines, searching for it in the log...")
+          error_line = log_lines.reverse.find { |l| l.include?("error:") }
+          UI.command_output(error_line) if error_line
         end
 
         UI.message("")

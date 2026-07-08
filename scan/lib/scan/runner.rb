@@ -216,6 +216,7 @@ module Scan
       params = {
         path: result_bundle_path,
         output_remove_retry_attempts: Scan.config[:output_remove_retry_attempts],
+        force_legacy_xcresulttool: Scan.config[:force_legacy_xcresulttool],
         silent: !FastlaneCore::Globals.verbose?
       }
 
@@ -397,7 +398,7 @@ module Scan
 
       # Return early unless the user wants to prelaunch simulators. Or if the user wants simulator logs
       # then we must prelaunch simulators because Xcode's headless
-      # mode launches and shutsdown the simulators before we can collect the logs.
+      # mode launches and shuts down the simulators before we can collect the logs.
       return unless Scan.config[:prelaunch_simulator] || Scan.config[:include_simulator_logs]
 
       devices_to_shutdown = []

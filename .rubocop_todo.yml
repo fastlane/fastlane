@@ -6,13 +6,6 @@
 # Note that changes in the inspected code, or installation of new
 # versions of RuboCop, may require this file to be generated again.
 
-# Offense count: 8
-# Configuration parameters: EnforcedStyle, AllowedGems, Include.
-# SupportedStyles: Gemfile, gems.rb, gemspec
-# Include: **/*.gemspec, **/Gemfile, **/gems.rb
-Gemspec/DevelopmentDependencies:
-  Enabled: false
-
 # Offense count: 6
 # This cop supports safe autocorrection (--autocorrect).
 # Configuration parameters: TreatCommentsAsGroupSeparators, ConsiderPunctuation, Include.

@@ -4,6 +4,12 @@ module Spaceship
   class ConnectAPI
     module Tunes
       module API
+        module Version
+          V1 = "v1"
+          V2 = "v2"
+          V3 = "v3"
+        end
+
         def tunes_request_client=(tunes_request_client)
           @tunes_request_client = tunes_request_client
         end
@@ -21,7 +27,7 @@ module Spaceship
           raise "Keyword 'app_store_version_id' is deprecated and 'app_info_id' is required" if app_store_version_id || app_info_id.nil?
 
           params = tunes_request_client.build_params(filter: nil, includes: nil, limit: nil, sort: nil)
-          tunes_request_client.get("appInfos/#{app_info_id}/ageRatingDeclaration", params)
+          tunes_request_client.get("#{Version::V1}/appInfos/#{app_info_id}/ageRatingDeclaration", params)
         end
 
         def patch_age_rating_declaration(age_rating_declaration_id: nil, attributes: nil)
@@ -33,7 +39,7 @@ module Spaceship
             }
           }
 
-          tunes_request_client.patch("ageRatingDeclarations/#{age_rating_declaration_id}", body)
+          tunes_request_client.patch("#{Version::V1}/ageRatingDeclarations/#{age_rating_declaration_id}", body)
         end
 
         #
@@ -94,7 +100,7 @@ module Spaceship
             }
           end
 
-          app_store_verions_data = platforms.map do |platform|
+          data_for_app_store_versions = platforms.map do |platform|
             {
               type: "appStoreVersions",
               id: "${store-version-#{platform}}"
@@ -103,7 +109,7 @@ module Spaceship
 
           relationships = {
             appStoreVersions: {
-              data: app_store_verions_data
+              data: data_for_app_store_versions
             },
             appInfos: {
               data: [
@@ -131,7 +137,7 @@ module Spaceship
             included: included
           }
 
-          tunes_request_client.post("apps", body)
+          tunes_request_client.post("#{Version::V1}/apps", body)
         end
 
         # Updates app attributes, price tier, visibility in regions or countries.
@@ -160,9 +166,6 @@ module Spaceship
             included << {
               type: "appPrices",
               id: "${price1}",
-              attributes: {
-                startDate: nil
-              },
               relationships: {
                 app: {
                   data: {
@@ -209,7 +212,7 @@ module Spaceship
           }
           body[:included] = included unless included.empty?
 
-          tunes_request_client.patch("apps/#{app_id}", body)
+          tunes_request_client.patch("#{Version::V1}/apps/#{app_id}", body)
         end
 
         #
@@ -218,7 +221,7 @@ module Spaceship
 
         def get_app_data_usages(app_id: nil, filter: {}, includes: nil, limit: nil, sort: nil)
           params = tunes_request_client.build_params(filter: filter, includes: includes, limit: limit, sort: sort)
-          tunes_request_client.get("apps/#{app_id}/dataUsages", params)
+          tunes_request_client.get("#{Version::V1}/apps/#{app_id}/dataUsages", params)
         end
 
         def post_app_data_usage(app_id:, app_data_usage_category_id: nil, app_data_usage_protection_id: nil, app_data_usage_purpose_id: nil)
@@ -267,11 +270,11 @@ module Spaceship
             }
           }
 
-          tunes_request_client.post("appDataUsages", body)
+          tunes_request_client.post("#{Version::V1}/appDataUsages", body)
         end
 
         def delete_app_data_usage(app_data_usage_id: nil)
-          tunes_request_client.delete("appDataUsages/#{app_data_usage_id}")
+          tunes_request_client.delete("#{Version::V1}/appDataUsages/#{app_data_usage_id}")
         end
 
         #
@@ -280,7 +283,7 @@ module Spaceship
 
         def get_app_data_usage_categories(filter: {}, includes: nil, limit: nil, sort: nil)
           params = tunes_request_client.build_params(filter: filter, includes: includes, limit: limit, sort: sort)
-          tunes_request_client.get("appDataUsageCategories", params)
+          tunes_request_client.get("#{Version::V1}/appDataUsageCategories", params)
         end
 
         #
@@ -289,7 +292,7 @@ module Spaceship
 
         def get_app_data_usage_purposes(filter: {}, includes: nil, limit: nil, sort: nil)
           params = tunes_request_client.build_params(filter: filter, includes: includes, limit: limit, sort: sort)
-          tunes_request_client.get("appDataUsagePurposes", params)
+          tunes_request_client.get("#{Version::V1}/appDataUsagePurposes", params)
         end
 
         #
@@ -298,7 +301,7 @@ module Spaceship
 
         def get_app_data_usages_publish_state(app_id: nil)
           params = tunes_request_client.build_params(filter: nil, includes: nil, limit: nil, sort: nil)
-          tunes_request_client.get("apps/#{app_id}/dataUsagePublishState", params)
+          tunes_request_client.get("#{Version::V1}/apps/#{app_id}/dataUsagePublishState", params)
         end
 
         def patch_app_data_usages_publish_state(app_data_usages_publish_state_id: nil, published: nil)
@@ -312,7 +315,7 @@ module Spaceship
             }
           }
 
-          tunes_request_client.patch("appDataUsagesPublishState/#{app_data_usages_publish_state_id}", body)
+          tunes_request_client.patch("#{Version::V1}/appDataUsagesPublishState/#{app_data_usages_publish_state_id}", body)
         end
 
         #
@@ -321,7 +324,7 @@ module Spaceship
 
         def get_app_preview(app_preview_id: nil)
           params = tunes_request_client.build_params(filter: nil, includes: nil, limit: nil, sort: nil)
-          tunes_request_client.get("appPreviews/#{app_preview_id}", params)
+          tunes_request_client.get("#{Version::V1}/appPreviews/#{app_preview_id}", params)
         end
 
         def post_app_preview(app_preview_set_id: nil, attributes: {})
@@ -340,7 +343,7 @@ module Spaceship
             }
           }
 
-          tunes_request_client.post("appPreviews", body)
+          tunes_request_client.post("#{Version::V1}/appPreviews", body)
         end
 
         def patch_app_preview(app_preview_id: nil, attributes: {})
@@ -352,26 +355,26 @@ module Spaceship
             }
           }
 
-          tunes_request_client.patch("appPreviews/#{app_preview_id}", body)
+          tunes_request_client.patch("#{Version::V1}/appPreviews/#{app_preview_id}", body)
         end
 
         def delete_app_preview(app_preview_id: nil)
           params = tunes_request_client.build_params(filter: nil, includes: nil, limit: nil, sort: nil)
-          tunes_request_client.delete("appPreviews/#{app_preview_id}", params)
+          tunes_request_client.delete("#{Version::V1}/appPreviews/#{app_preview_id}", params)
         end
 
         #
         # appPreviewSets
         #
 
-        def get_app_preview_sets(filter: {}, includes: nil, limit: nil, sort: nil)
+        def get_app_preview_sets(app_store_version_localization_id: nil, filter: {}, includes: nil, limit: nil, sort: nil)
           params = tunes_request_client.build_params(filter: filter, includes: includes, limit: limit, sort: sort)
-          tunes_request_client.get("appPreviewSets", params)
+          tunes_request_client.get("#{Version::V1}/appStoreVersionLocalizations/#{app_store_version_localization_id}/appPreviewSets", params)
         end
 
         def get_app_preview_set(app_preview_set_id: nil, filter: {}, includes: nil, limit: nil, sort: nil)
           params = tunes_request_client.build_params(filter: filter, includes: includes, limit: limit, sort: sort)
-          tunes_request_client.get("appPreviewSets/#{app_preview_set_id}", params)
+          tunes_request_client.get("#{Version::V1}/appPreviewSets/#{app_preview_set_id}", params)
         end
 
         def post_app_preview_set(app_store_version_localization_id: nil, attributes: {})
@@ -390,12 +393,12 @@ module Spaceship
             }
           }
 
-          tunes_request_client.post("appPreviewSets", body)
+          tunes_request_client.post("#{Version::V1}/appPreviewSets", body)
         end
 
         def delete_app_preview_set(app_preview_set_id: nil)
           params = tunes_request_client.build_params(filter: nil, includes: nil, limit: nil, sort: nil)
-          tunes_request_client.delete("appPreviewSets/#{app_preview_set_id}", params)
+          tunes_request_client.delete("#{Version::V1}/appPreviewSets/#{app_preview_set_id}", params)
         end
 
         def patch_app_preview_set_previews(app_preview_set_id: nil, app_preview_ids: nil)
@@ -410,7 +413,16 @@ module Spaceship
             end
           }
 
-          tunes_request_client.patch("appPreviewSets/#{app_preview_set_id}/relationships/appPreviews", body)
+          tunes_request_client.patch("#{Version::V1}/appPreviewSets/#{app_preview_set_id}/relationships/appPreviews", body)
+        end
+
+        #
+        # appAvailabilities
+        #
+
+        def get_app_availabilities(app_id: nil, filter: nil, includes: nil, limit: nil, sort: nil)
+          params = tunes_request_client.build_params(filter: nil, includes: includes, limit: limit, sort: nil)
+          tunes_request_client.get("#{Version::V2}/appAvailabilities/#{app_id}", params)
         end
 
         #
@@ -419,7 +431,7 @@ module Spaceship
 
         def get_available_territories(app_id: nil, filter: {}, includes: nil, limit: nil, sort: nil)
           params = tunes_request_client.build_params(filter: filter, includes: includes, limit: limit, sort: sort)
-          tunes_request_client.get("apps/#{app_id}/availableTerritories", params)
+          tunes_request_client.get("#{Version::V1}/apps/#{app_id}/availableTerritories", params)
         end
 
         #
@@ -428,12 +440,12 @@ module Spaceship
 
         def get_app_prices(app_id: nil, filter: {}, includes: nil, limit: nil, sort: nil)
           params = tunes_request_client.build_params(filter: filter, includes: includes, limit: limit, sort: sort)
-          tunes_request_client.get("appPrices", params)
+          tunes_request_client.get("#{Version::V1}/appPrices", params)
         end
 
         def get_app_price(app_price_id: nil, filter: {}, includes: nil, limit: nil, sort: nil)
           params = tunes_request_client.build_params(filter: filter, includes: includes, limit: limit, sort: sort)
-          tunes_request_client.get("appPrices/#{app_price_id}", params)
+          tunes_request_client.get("#{Version::V1}/appPrices/#{app_price_id}", params)
         end
 
         #
@@ -441,7 +453,7 @@ module Spaceship
         #
         def get_app_price_points(filter: {}, includes: nil, limit: nil, sort: nil)
           params = tunes_request_client.build_params(filter: filter, includes: includes, limit: limit, sort: sort)
-          tunes_request_client.get("appPricePoints", params)
+          tunes_request_client.get("#{Version::V1}/appPricePoints", params)
         end
 
         #
@@ -464,7 +476,7 @@ module Spaceship
             }
           }
 
-          tunes_request_client.post("appStoreReviewAttachments", body)
+          tunes_request_client.post("#{Version::V1}/appStoreReviewAttachments", body)
         end
 
         def patch_app_store_review_attachment(app_store_review_attachment_id: nil, attributes: {})
@@ -476,12 +488,12 @@ module Spaceship
             }
           }
 
-          tunes_request_client.patch("appStoreReviewAttachments/#{app_store_review_attachment_id}", body)
+          tunes_request_client.patch("#{Version::V1}/appStoreReviewAttachments/#{app_store_review_attachment_id}", body)
         end
 
         def delete_app_store_review_attachment(app_store_review_attachment_id: nil)
           params = tunes_request_client.build_params(filter: nil, includes: nil, limit: nil, sort: nil)
-          tunes_request_client.delete("appStoreReviewAttachments/#{app_store_review_attachment_id}", params)
+          tunes_request_client.delete("#{Version::V1}/appStoreReviewAttachments/#{app_store_review_attachment_id}", params)
         end
 
         #
@@ -490,12 +502,12 @@ module Spaceship
 
         def get_app_screenshot_sets(app_store_version_localization_id: nil, filter: {}, includes: nil, limit: nil, sort: nil)
           params = tunes_request_client.build_params(filter: filter, includes: includes, limit: limit, sort: sort)
-          tunes_request_client.get("appStoreVersionLocalizations/#{app_store_version_localization_id}/appScreenshotSets", params)
+          tunes_request_client.get("#{Version::V1}/appStoreVersionLocalizations/#{app_store_version_localization_id}/appScreenshotSets", params)
         end
 
         def get_app_screenshot_set(app_screenshot_set_id: nil, filter: {}, includes: nil, limit: nil, sort: nil)
           params = tunes_request_client.build_params(filter: filter, includes: includes, limit: limit, sort: sort)
-          tunes_request_client.get("appScreenshotSets/#{app_screenshot_set_id}", params)
+          tunes_request_client.get("#{Version::V1}/appScreenshotSets/#{app_screenshot_set_id}", params)
         end
 
         def post_app_screenshot_set(app_store_version_localization_id: nil, attributes: {})
@@ -514,7 +526,7 @@ module Spaceship
             }
           }
 
-          tunes_request_client.post("appScreenshotSets", body)
+          tunes_request_client.post("#{Version::V1}/appScreenshotSets", body)
         end
 
         def patch_app_screenshot_set_screenshots(app_screenshot_set_id: nil, app_screenshot_ids: nil)
@@ -529,12 +541,12 @@ module Spaceship
             end
           }
 
-          tunes_request_client.patch("appScreenshotSets/#{app_screenshot_set_id}/relationships/appScreenshots", body)
+          tunes_request_client.patch("#{Version::V1}/appScreenshotSets/#{app_screenshot_set_id}/relationships/appScreenshots", body)
         end
 
         def delete_app_screenshot_set(app_screenshot_set_id: nil)
           params = tunes_request_client.build_params(filter: nil, includes: nil, limit: nil, sort: nil)
-          tunes_request_client.delete("appScreenshotSets/#{app_screenshot_set_id}", params)
+          tunes_request_client.delete("#{Version::V1}/appScreenshotSets/#{app_screenshot_set_id}", params)
         end
 
         #
@@ -543,7 +555,7 @@ module Spaceship
 
         def get_app_screenshot(app_screenshot_id: nil)
           params = tunes_request_client.build_params(filter: nil, includes: nil, limit: nil, sort: nil)
-          tunes_request_client.get("appScreenshots/#{app_screenshot_id}", params)
+          tunes_request_client.get("#{Version::V1}/appScreenshots/#{app_screenshot_id}", params)
         end
 
         def post_app_screenshot(app_screenshot_set_id: nil, attributes: {})
@@ -562,7 +574,7 @@ module Spaceship
             }
           }
 
-          tunes_request_client.post("appScreenshots", body, tries: 1)
+          tunes_request_client.post("#{Version::V1}/appScreenshots", body, tries: 1)
         end
 
         def patch_app_screenshot(app_screenshot_id: nil, attributes: {})
@@ -574,12 +586,12 @@ module Spaceship
             }
           }
 
-          tunes_request_client.patch("appScreenshots/#{app_screenshot_id}", body)
+          tunes_request_client.patch("#{Version::V1}/appScreenshots/#{app_screenshot_id}", body)
         end
 
         def delete_app_screenshot(app_screenshot_id: nil)
           params = tunes_request_client.build_params(filter: nil, includes: nil, limit: nil, sort: nil)
-          tunes_request_client.delete("appScreenshots/#{app_screenshot_id}", params)
+          tunes_request_client.delete("#{Version::V1}/appScreenshots/#{app_screenshot_id}", params)
         end
 
         #
@@ -588,7 +600,7 @@ module Spaceship
 
         def get_app_infos(app_id: nil, filter: {}, includes: nil, limit: nil, sort: nil)
           params = tunes_request_client.build_params(filter: filter, includes: includes, limit: limit, sort: sort)
-          tunes_request_client.get("apps/#{app_id}/appInfos", params)
+          tunes_request_client.get("#{Version::V1}/apps/#{app_id}/appInfos", params)
         end
 
         def patch_app_info(app_info_id: nil, attributes: {})
@@ -604,7 +616,7 @@ module Spaceship
             data: data
           }
 
-          tunes_request_client.patch("appInfos/#{app_info_id}", body)
+          tunes_request_client.patch("#{Version::V1}/appInfos/#{app_info_id}", body)
         end
 
         #
@@ -682,12 +694,12 @@ module Spaceship
             data: data
           }
 
-          tunes_request_client.patch("appInfos/#{app_info_id}", body)
+          tunes_request_client.patch("#{Version::V1}/appInfos/#{app_info_id}", body)
         end
 
         def delete_app_info(app_info_id: nil)
           params = tunes_request_client.build_params(filter: nil, includes: nil, limit: nil, sort: nil)
-          tunes_request_client.delete("appInfos/#{app_info_id}", params)
+          tunes_request_client.delete("#{Version::V1}/appInfos/#{app_info_id}", params)
         end
 
         #
@@ -696,7 +708,7 @@ module Spaceship
 
         def get_app_info_localizations(app_info_id: nil, filter: {}, includes: nil, limit: nil, sort: nil)
           params = tunes_request_client.build_params(filter: filter, includes: includes, limit: limit, sort: sort)
-          tunes_request_client.get("appInfos/#{app_info_id}/appInfoLocalizations", params)
+          tunes_request_client.get("#{Version::V1}/appInfos/#{app_info_id}/appInfoLocalizations", params)
         end
 
         def post_app_info_localization(app_info_id: nil, attributes: {})
@@ -705,9 +717,9 @@ module Spaceship
               type: "appInfoLocalizations",
               attributes: attributes,
               relationships: {
-                appStoreVersion: {
+                appInfo: {
                   data: {
-                    type: "appStoreVersions",
+                    type: "appInfos",
                     id: app_info_id
                   }
                 }
@@ -715,7 +727,7 @@ module Spaceship
             }
           }
 
-          tunes_request_client.post("appInfoLocalizations", body)
+          tunes_request_client.post("#{Version::V1}/appInfoLocalizations", body)
         end
 
         def patch_app_info_localization(app_info_localization_id: nil, attributes: {})
@@ -727,7 +739,12 @@ module Spaceship
             }
           }
 
-          tunes_request_client.patch("appInfoLocalizations/#{app_info_localization_id}", body)
+          tunes_request_client.patch("#{Version::V1}/appInfoLocalizations/#{app_info_localization_id}", body)
+        end
+
+        def delete_app_info_localization(app_info_localization_id: nil)
+          params = tunes_request_client.build_params(filter: nil, includes: nil, limit: nil, sort: nil)
+          tunes_request_client.delete("#{Version::V1}/appInfoLocalizations/#{app_info_localization_id}", params)
         end
 
         #
@@ -736,7 +753,7 @@ module Spaceship
 
         def get_app_store_review_detail(app_store_version_id: nil, filter: {}, includes: nil, limit: nil, sort: nil)
           params = tunes_request_client.build_params(filter: filter, includes: includes, limit: limit, sort: sort)
-          tunes_request_client.get("appStoreVersions/#{app_store_version_id}/appStoreReviewDetail", params)
+          tunes_request_client.get("#{Version::V1}/appStoreVersions/#{app_store_version_id}/appStoreReviewDetail", params)
         end
 
         def post_app_store_review_detail(app_store_version_id: nil, attributes: {})
@@ -755,7 +772,7 @@ module Spaceship
             }
           }
 
-          tunes_request_client.post("appStoreReviewDetails", body)
+          tunes_request_client.post("#{Version::V1}/appStoreReviewDetails", body)
         end
 
         def patch_app_store_review_detail(app_store_review_detail_id: nil, attributes: {})
@@ -767,7 +784,42 @@ module Spaceship
             }
           }
 
-          tunes_request_client.patch("appStoreReviewDetails/#{app_store_review_detail_id}", body)
+          tunes_request_client.patch("#{Version::V1}/appStoreReviewDetails/#{app_store_review_detail_id}", body)
+        end
+
+        #
+        # appClipAppStoreReviewDetails
+        #
+
+        def post_app_clip_app_store_review_detail(app_clip_default_experience_id: nil, attributes: {})
+          body = {
+            data: {
+              type: "appClipAppStoreReviewDetails",
+              attributes: attributes,
+              relationships: {
+                appClipDefaultExperience: {
+                  data: {
+                    type: "appClipDefaultExperiences",
+                    id: app_clip_default_experience_id
+                  }
+                }
+              }
+            }
+          }
+
+          tunes_request_client.post("#{Version::V1}/appClipAppStoreReviewDetails", body)
+        end
+
+        def patch_app_clip_app_store_review_detail(app_clip_app_store_review_detail_id: nil, attributes: {})
+          body = {
+            data: {
+              type: "appClipAppStoreReviewDetails",
+              id: app_clip_app_store_review_detail_id,
+              attributes: attributes
+            }
+          }
+
+          tunes_request_client.patch("#{Version::V1}/appClipAppStoreReviewDetails/#{app_clip_app_store_review_detail_id}", body)
         end
 
         #
@@ -776,12 +828,12 @@ module Spaceship
 
         def get_app_store_version_localizations(app_store_version_id: nil, filter: {}, includes: nil, limit: nil, sort: nil)
           params = tunes_request_client.build_params(filter: filter, includes: includes, limit: limit, sort: sort)
-          tunes_request_client.get("appStoreVersions/#{app_store_version_id}/appStoreVersionLocalizations", params)
+          tunes_request_client.get("#{Version::V1}/appStoreVersions/#{app_store_version_id}/appStoreVersionLocalizations", params)
         end
 
         def get_app_store_version_localization(app_store_version_localization_id: nil, filter: {}, includes: nil, limit: nil, sort: nil)
           params = tunes_request_client.build_params(filter: nil, includes: nil, limit: nil, sort: nil)
-          tunes_request_client.get("appStoreVersionLocalizations/#{app_store_version_localization_id}", params)
+          tunes_request_client.get("#{Version::V1}/appStoreVersionLocalizations/#{app_store_version_localization_id}", params)
         end
 
         def post_app_store_version_localization(app_store_version_id: nil, attributes: {})
@@ -800,7 +852,7 @@ module Spaceship
             }
           }
 
-          tunes_request_client.post("appStoreVersionLocalizations", body)
+          tunes_request_client.post("#{Version::V1}/appStoreVersionLocalizations", body)
         end
 
         def patch_app_store_version_localization(app_store_version_localization_id: nil, attributes: {})
@@ -812,12 +864,12 @@ module Spaceship
             }
           }
 
-          tunes_request_client.patch("appStoreVersionLocalizations/#{app_store_version_localization_id}", body)
+          tunes_request_client.patch("#{Version::V1}/appStoreVersionLocalizations/#{app_store_version_localization_id}", body)
         end
 
         def delete_app_store_version_localization(app_store_version_localization_id: nil)
           params = tunes_request_client.build_params(filter: nil, includes: nil, limit: nil, sort: nil)
-          tunes_request_client.delete("appStoreVersionLocalizations/#{app_store_version_localization_id}", params)
+          tunes_request_client.delete("#{Version::V1}/appStoreVersionLocalizations/#{app_store_version_localization_id}", params)
         end
 
         #
@@ -826,7 +878,7 @@ module Spaceship
 
         def get_app_store_version_phased_release(app_store_version_id: nil)
           params = tunes_request_client.build_params(filter: nil, includes: nil, limit: nil, sort: nil)
-          tunes_request_client.get("appStoreVersions/#{app_store_version_id}/appStoreVersionPhasedRelease", params)
+          tunes_request_client.get("#{Version::V1}/appStoreVersions/#{app_store_version_id}/appStoreVersionPhasedRelease", params)
         end
 
         def post_app_store_version_phased_release(app_store_version_id: nil, attributes: {})
@@ -845,7 +897,7 @@ module Spaceship
             }
           }
 
-          tunes_request_client.post("appStoreVersionPhasedReleases", body)
+          tunes_request_client.post("#{Version::V1}/appStoreVersionPhasedReleases", body)
         end
 
         def patch_app_store_version_phased_release(app_store_version_phased_release_id: nil, attributes: {})
@@ -857,12 +909,12 @@ module Spaceship
             }
           }
 
-          tunes_request_client.patch("appStoreVersionPhasedReleases/#{app_store_version_phased_release_id}", body)
+          tunes_request_client.patch("#{Version::V1}/appStoreVersionPhasedReleases/#{app_store_version_phased_release_id}", body)
         end
 
         def delete_app_store_version_phased_release(app_store_version_phased_release_id: nil)
           params = tunes_request_client.build_params(filter: nil, includes: nil, limit: nil, sort: nil)
-          tunes_request_client.delete("appStoreVersionPhasedReleases/#{app_store_version_phased_release_id}", params)
+          tunes_request_client.delete("#{Version::V1}/appStoreVersionPhasedReleases/#{app_store_version_phased_release_id}", params)
         end
 
         #
@@ -871,12 +923,12 @@ module Spaceship
 
         def get_app_store_versions(app_id: nil, filter: {}, includes: nil, limit: nil, sort: nil)
           params = tunes_request_client.build_params(filter: filter, includes: includes, limit: limit, sort: sort)
-          tunes_request_client.get("apps/#{app_id}/appStoreVersions", params)
+          tunes_request_client.get("#{Version::V1}/apps/#{app_id}/appStoreVersions", params)
         end
 
         def get_app_store_version(app_store_version_id: nil, includes: nil)
           params = tunes_request_client.build_params(filter: nil, includes: includes, limit: nil, sort: nil)
-          tunes_request_client.get("appStoreVersions/#{app_store_version_id}", params)
+          tunes_request_client.get("#{Version::V1}/appStoreVersions/#{app_store_version_id}", params)
         end
 
         def post_app_store_version(app_id: nil, attributes: {})
@@ -895,7 +947,7 @@ module Spaceship
             }
           }
 
-          tunes_request_client.post("appStoreVersions", body)
+          tunes_request_client.post("#{Version::V1}/appStoreVersions", body)
         end
 
         def patch_app_store_version(app_store_version_id: nil, attributes: {})
@@ -907,7 +959,7 @@ module Spaceship
             }
           }
 
-          tunes_request_client.patch("appStoreVersions/#{app_store_version_id}", body)
+          tunes_request_client.patch("#{Version::V1}/appStoreVersions/#{app_store_version_id}", body)
         end
 
         def patch_app_store_version_with_build(app_store_version_id: nil, build_id: nil)
@@ -931,7 +983,7 @@ module Spaceship
             }
           }
 
-          tunes_request_client.patch("appStoreVersions/#{app_store_version_id}", body)
+          tunes_request_client.patch("#{Version::V1}/appStoreVersions/#{app_store_version_id}", body)
         end
 
         #
@@ -940,7 +992,7 @@ module Spaceship
 
         def get_reset_ratings_request(app_store_version_id: nil)
           params = tunes_request_client.build_params(filter: nil, includes: nil, limit: nil, sort: nil)
-          tunes_request_client.get("appStoreVersions/#{app_store_version_id}/resetRatingsRequest", params)
+          tunes_request_client.get("#{Version::V1}/appStoreVersions/#{app_store_version_id}/resetRatingsRequest", params)
         end
 
         def post_reset_ratings_request(app_store_version_id: nil)
@@ -958,12 +1010,12 @@ module Spaceship
             }
           }
 
-          tunes_request_client.post("resetRatingsRequests", body)
+          tunes_request_client.post("#{Version::V1}/resetRatingsRequests", body)
         end
 
         def delete_reset_ratings_request(reset_ratings_request_id: nil)
           params = tunes_request_client.build_params(filter: nil, includes: nil, limit: nil, sort: nil)
-          tunes_request_client.delete("resetRatingsRequests/#{reset_ratings_request_id}", params)
+          tunes_request_client.delete("#{Version::V1}/resetRatingsRequests/#{reset_ratings_request_id}", params)
         end
 
         #
@@ -972,7 +1024,7 @@ module Spaceship
 
         def get_app_store_version_submission(app_store_version_id: nil)
           params = tunes_request_client.build_params(filter: nil, includes: nil, limit: nil, sort: nil)
-          tunes_request_client.get("appStoreVersions/#{app_store_version_id}/appStoreVersionSubmission", params)
+          tunes_request_client.get("#{Version::V1}/appStoreVersions/#{app_store_version_id}/appStoreVersionSubmission", params)
         end
 
         def post_app_store_version_submission(app_store_version_id: nil)
@@ -990,12 +1042,12 @@ module Spaceship
             }
           }
 
-          tunes_request_client.post("appStoreVersionSubmissions", body)
+          tunes_request_client.post("#{Version::V1}/appStoreVersionSubmissions", body)
         end
 
         def delete_app_store_version_submission(app_store_version_submission_id: nil)
           params = tunes_request_client.build_params(filter: nil, includes: nil, limit: nil, sort: nil)
-          tunes_request_client.delete("appStoreVersionSubmissions/#{app_store_version_submission_id}", params)
+          tunes_request_client.delete("#{Version::V1}/appStoreVersionSubmissions/#{app_store_version_submission_id}", params)
         end
 
         #
@@ -1017,7 +1069,7 @@ module Spaceship
               }
           }
 
-          tunes_request_client.post("appStoreVersionReleaseRequests", body)
+          tunes_request_client.post("#{Version::V1}/appStoreVersionReleaseRequests", body)
         end
 
         #
@@ -1026,7 +1078,7 @@ module Spaceship
 
         def get_custom_app_users(app_id: nil, filter: nil, includes: nil, limit: nil, sort: nil)
           params = tunes_request_client.build_params(filter: filter, includes: includes, limit: limit, sort: sort)
-          tunes_request_client.get("apps/#{app_id}/customAppUsers", params)
+          tunes_request_client.get("#{Version::V1}/apps/#{app_id}/customAppUsers", params)
         end
 
         def post_custom_app_user(app_id: nil, apple_id: nil)
@@ -1047,12 +1099,12 @@ module Spaceship
               }
           }
 
-          tunes_request_client.post("customAppUsers", body)
+          tunes_request_client.post("#{Version::V1}/customAppUsers", body)
         end
 
         def delete_custom_app_user(custom_app_user_id: nil)
           params = tunes_request_client.build_params(filter: nil, includes: nil, limit: nil, sort: nil)
-          tunes_request_client.delete("customAppUsers/#{custom_app_user_id}", params)
+          tunes_request_client.delete("#{Version::V1}/customAppUsers/#{custom_app_user_id}", params)
         end
 
         #
@@ -1061,7 +1113,7 @@ module Spaceship
 
         def get_custom_app_organization(app_id: nil, filter: nil, includes: nil, limit: nil, sort: nil)
           params = tunes_request_client.build_params(filter: filter, includes: includes, limit: limit, sort: sort)
-          tunes_request_client.get("apps/#{app_id}/customAppOrganizations", params)
+          tunes_request_client.get("#{Version::V1}/apps/#{app_id}/customAppOrganizations", params)
         end
 
         def post_custom_app_organization(app_id: nil, device_enrollment_program_id: nil, name: nil)
@@ -1083,57 +1135,12 @@ module Spaceship
               }
           }
 
-          tunes_request_client.post("customAppOrganizations", body)
+          tunes_request_client.post("#{Version::V1}/customAppOrganizations", body)
         end
 
         def delete_custom_app_organization(custom_app_organization_id: nil)
           params = tunes_request_client.build_params(filter: nil, includes: nil, limit: nil, sort: nil)
-          tunes_request_client.delete("customAppOrganizations/#{custom_app_organization_id}", params)
-        end
-
-        #
-        # idfaDeclarations
-        #
-
-        def get_idfa_declaration(app_store_version_id: nil)
-          params = tunes_request_client.build_params(filter: nil, includes: nil, limit: nil, sort: nil)
-          tunes_request_client.get("appStoreVersions/#{app_store_version_id}/idfaDeclaration", params)
-        end
-
-        def post_idfa_declaration(app_store_version_id: nil, attributes: nil)
-          body = {
-            data: {
-              type: "idfaDeclarations",
-              attributes: attributes,
-              relationships: {
-                appStoreVersion: {
-                  data: {
-                    type: "appStoreVersions",
-                    id: app_store_version_id
-                  }
-                }
-              }
-            }
-          }
-
-          tunes_request_client.post("idfaDeclarations", body)
-        end
-
-        def patch_idfa_declaration(idfa_declaration_id: nil, attributes: nil)
-          body = {
-            data: {
-              type: "idfaDeclarations",
-              id: idfa_declaration_id,
-              attributes: attributes
-            }
-          }
-
-          tunes_request_client.patch("idfaDeclarations/#{idfa_declaration_id}", body)
-        end
-
-        def delete_idfa_declaration(idfa_declaration_id: nil)
-          params = tunes_request_client.build_params(filter: nil, includes: nil, limit: nil, sort: nil)
-          tunes_request_client.delete("idfaDeclarations/#{idfa_declaration_id}", params)
+          tunes_request_client.delete("#{Version::V1}/customAppOrganizations/#{custom_app_organization_id}", params)
         end
 
         #
@@ -1142,12 +1149,12 @@ module Spaceship
 
         def get_review_submissions(app_id:, filter: {}, includes: nil, limit: nil, sort: nil)
           params = tunes_request_client.build_params(filter: filter, includes: includes, limit: limit, sort: sort)
-          tunes_request_client.get("apps/#{app_id}/reviewSubmissions", params)
+          tunes_request_client.get("#{Version::V1}/apps/#{app_id}/reviewSubmissions", params)
         end
 
         def get_review_submission(review_submission_id:, filter: {}, includes: nil, limit: nil, sort: nil)
           params = tunes_request_client.build_params(filter: filter, includes: includes, limit: limit, sort: sort)
-          tunes_request_client.get("reviewSubmissions/#{review_submission_id}", params)
+          tunes_request_client.get("#{Version::V1}/reviewSubmissions/#{review_submission_id}", params)
         end
 
         def post_review_submission(app_id:, platform:)
@@ -1168,7 +1175,7 @@ module Spaceship
             }
           }
 
-          tunes_request_client.post("reviewSubmissions", body)
+          tunes_request_client.post("#{Version::V1}/reviewSubmissions", body)
         end
 
         def patch_review_submission(review_submission_id:, attributes: nil)
@@ -1180,7 +1187,7 @@ module Spaceship
             }
           }
 
-          tunes_request_client.patch("reviewSubmissions/#{review_submission_id}", body)
+          tunes_request_client.patch("#{Version::V1}/reviewSubmissions/#{review_submission_id}", body)
         end
 
         #
@@ -1189,7 +1196,7 @@ module Spaceship
 
         def get_review_submission_items(review_submission_id:, filter: {}, includes: nil, limit: nil, sort: nil)
           params = tunes_request_client.build_params(filter: filter, includes: includes, limit: limit, sort: sort)
-          tunes_request_client.get("reviewSubmissions/#{review_submission_id}/items", params)
+          tunes_request_client.get("#{Version::V1}/reviewSubmissions/#{review_submission_id}/items", params)
         end
 
         def post_review_submission_item(review_submission_id:, app_store_version_id: nil)
@@ -1216,7 +1223,7 @@ module Spaceship
             }
           end
 
-          tunes_request_client.post("reviewSubmissionItems", body)
+          tunes_request_client.post("#{Version::V1}/reviewSubmissionItems", body)
         end
 
         #
@@ -1225,7 +1232,7 @@ module Spaceship
 
         def get_sandbox_testers(filter: nil, includes: nil, limit: nil, sort: nil)
           params = tunes_request_client.build_params(filter: filter, includes: includes, limit: limit, sort: sort)
-          tunes_request_client.get("sandboxTesters", params)
+          tunes_request_client.get("#{Version::V1}/sandboxTesters", params)
         end
 
         def post_sandbox_tester(attributes: {})
@@ -1236,12 +1243,12 @@ module Spaceship
             }
           }
 
-          tunes_request_client.post("sandboxTesters", body)
+          tunes_request_client.post("#{Version::V1}/sandboxTesters", body)
         end
 
         def delete_sandbox_tester(sandbox_tester_id: nil)
           params = tunes_request_client.build_params(filter: nil, includes: nil, limit: nil, sort: nil)
-          tunes_request_client.delete("sandboxTesters/#{sandbox_tester_id}", params)
+          tunes_request_client.delete("#{Version::V1}/sandboxTesters/#{sandbox_tester_id}", params)
         end
 
         #
@@ -1250,30 +1257,324 @@ module Spaceship
 
         def get_territories(filter: {}, includes: nil, limit: nil, sort: nil)
           params = tunes_request_client.build_params(filter: nil, includes: nil, limit: nil, sort: nil)
-          tunes_request_client.get("territories", params)
+          tunes_request_client.get("#{Version::V1}/territories", params)
         end
 
         #
         # resolutionCenter
         #
         # As of 2022-11-11:
-        # This is not official available throught the App Store Connect API using an API Key.
+        # This is not official available through the App Store Connect API using an API Key.
         # This is only works with Apple ID auth.
         #
 
         def get_resolution_center_threads(filter: {}, includes: nil)
           params = tunes_request_client.build_params(filter: filter, includes: includes)
-          tunes_request_client.get('resolutionCenterThreads', params)
+          tunes_request_client.get("#{Version::V1}/resolutionCenterThreads", params)
         end
 
         def get_resolution_center_messages(thread_id:, filter: {}, includes: nil)
           params = tunes_request_client.build_params(filter: filter, includes: includes)
-          tunes_request_client.get("resolutionCenterThreads/#{thread_id}/resolutionCenterMessages", params)
+          tunes_request_client.get("#{Version::V1}/resolutionCenterThreads/#{thread_id}/resolutionCenterMessages", params)
         end
 
         def get_review_rejection(filter: {}, includes: nil)
           params = tunes_request_client.build_params(filter: filter, includes: includes)
-          tunes_request_client.get("reviewRejections", params)
+          tunes_request_client.get("#{Version::V1}/reviewRejections", params)
+        end
+
+        #
+        # webhooks
+        #
+
+        def get_webhooks(app_id:, filter: {}, includes: nil, limit: nil, sort: nil)
+          params = tunes_request_client.build_params(filter: filter, includes: includes, limit: limit, sort: sort)
+          tunes_request_client.get("#{Version::V1}/apps/#{app_id}/webhooks", params)
+        end
+
+        def post_webhook(app_id:, enabled:, event_types:, name:, secret:, url:)
+          body = {
+            data: {
+              type: "webhooks",
+              attributes: {
+                enabled: enabled,
+                eventTypes: event_types,
+                name: name,
+                secret: secret,
+                url: url
+              },
+              relationships: {
+                app: {
+                  data: {
+                    id: app_id,
+                    type: "apps"
+                  }
+                }
+              }
+            }
+          }
+
+          tunes_request_client.post("#{Version::V1}/webhooks", body)
+        end
+
+        def delete_webhook(webhook_id:)
+          tunes_request_client.delete("#{Version::V1}/webhooks/#{webhook_id}")
+        end
+
+        #
+        # appClips
+        #
+
+        def get_app_clips(app_id:, filter: {}, includes: nil, limit: nil, sort: nil)
+          params = tunes_request_client.build_params(filter: filter, includes: includes, limit: limit, sort: sort)
+          tunes_request_client.get("#{Version::V1}/apps/#{app_id}/appClips", params)
+        end
+
+        #
+        # appClipDefaultExperiences
+        #
+
+        def get_app_clip_default_experience(app_clip_default_experience_id:, filter: {}, includes: nil, limit: nil, sort: nil)
+          params = tunes_request_client.build_params(filter: filter, includes: includes, limit: limit, sort: sort)
+          tunes_request_client.get("#{Version::V1}/appClipDefaultExperiences/#{app_clip_default_experience_id}", params)
+        end
+
+        def get_app_clip_default_experience_localizations(app_clip_default_experience_id:, filter: {}, includes: nil, limit: nil, sort: nil)
+          params = tunes_request_client.build_params(filter: filter, includes: includes, limit: limit, sort: sort)
+          tunes_request_client.get("#{Version::V1}/appClipDefaultExperiences/#{app_clip_default_experience_id}/appClipDefaultExperienceLocalizations", params)
+        end
+
+        # https://developer.apple.com/documentation/appstoreconnectapi/create_a_default_app_clip_experience
+        def post_app_clip_default_experience(app_clip_id: nil, app_store_version_id: nil, attributes:, template_default_experience_id: nil)
+          body = {
+            data: {
+              type: "appClipDefaultExperiences",
+              relationships: {
+                appClip: {
+                  data: {
+                    type: 'appClips',
+                    id: app_clip_id
+                  }
+                },
+                releaseWithAppStoreVersion: {
+                  data: {
+                    type: "appStoreVersions",
+                    id: app_store_version_id
+                  }
+                }
+              }
+            }
+          }
+
+          body[:data][:attributes] = attributes unless attributes.nil?
+
+          unless template_default_experience_id.nil?
+            body[:data][:relationships][:appClipDefaultExperienceTemplate] = {
+              data: {
+                id: template_default_experience_id,
+                type: 'appClipDefaultExperiences'
+              }
+            }
+          end
+
+          tunes_request_client.post("#{Version::V1}/appClipDefaultExperiences", body)
+        end
+
+        # https://developer.apple.com/documentation/appstoreconnectapi/modify_a_default_app_clip_experience
+        def patch_app_clip_default_experience(default_experience_id: nil, attributes: {})
+          body = {
+            data: {
+              id: default_experience_id,
+              type: "appClipDefaultExperiences",
+              attributes: attributes
+            }
+          }
+
+          tunes_request_client.patch("#{Version::V1}/appClipDefaultExperiences/#{default_experience_id}", body)
+        end
+
+        #
+        # appClipDefaultExperienceLocalizations
+        #
+
+        def get_app_clip_default_experience_header_image(app_clip_default_experience_localization_id:, filter: {}, includes: nil, limit: nil, sort: nil)
+          params = tunes_request_client.build_params(filter: filter, includes: includes, limit: limit, sort: sort)
+          tunes_request_client.get("#{Version::V1}/appClipDefaultExperienceLocalizations/#{app_clip_default_experience_localization_id}/relationships/appClipHeaderImage", params)
+        end
+
+        # https://developer.apple.com/documentation/appstoreconnectapi/create_the_localized_metadata_for_a_default_app_clip_experience
+        def post_app_clip_default_experience_localization(default_experience_id: nil, attributes: {})
+          body = {
+            data: {
+              type: "appClipDefaultExperienceLocalizations",
+              attributes: attributes,
+              relationships: {
+                appClipDefaultExperience: {
+                  data: {
+                    type: 'appClipDefaultExperiences',
+                    id: default_experience_id
+                  }
+                }
+              }
+            }
+          }
+
+          tunes_request_client.post("#{Version::V1}/appClipDefaultExperienceLocalizations", body)
+        end
+
+        # https://developer.apple.com/documentation/appstoreconnectapi/modify_the_localization_for_a_default_app_clip_experience
+        def patch_app_clip_default_experience_localization(app_clip_default_experience_localization_id: nil, attributes: {})
+          body = {
+            data: {
+              id: app_clip_default_experience_localization_id,
+              type: "appClipDefaultExperienceLocalizations",
+              attributes: attributes
+            }
+          }
+
+          tunes_request_client.patch("#{Version::V1}/appClipDefaultExperienceLocalizations/#{app_clip_default_experience_localization_id}", body)
+        end
+
+        #
+        # appClipHeaderImages
+        #
+
+        # https://developer.apple.com/documentation/appstoreconnectapi/read_the_app_clip_card_image
+        def get_app_clip_header_image(app_clip_header_image_id:, filter: {}, includes: nil, limit: nil, sort: nil)
+          params = tunes_request_client.build_params(filter: filter, includes: includes, limit: limit, sort: sort)
+          tunes_request_client.get("#{Version::V1}/appClipHeaderImages/#{app_clip_header_image_id}", params)
+        end
+
+        # https://developer.apple.com/documentation/appstoreconnectapi/create_an_app_clip_card_image_for_a_default_app_clip_experience
+        def post_app_clip_header_image(app_clip_default_experience_localization_id: nil, attributes: {})
+          body = {
+            data: {
+              type: "appClipHeaderImages",
+              attributes: attributes,
+              relationships: {
+                appClipDefaultExperienceLocalization: {
+                  data: {
+                    type: 'appClipDefaultExperienceLocalizations',
+                    id: app_clip_default_experience_localization_id
+                  }
+                }
+              }
+            }
+          }
+
+          tunes_request_client.post("#{Version::V1}/appClipHeaderImages", body)
+        end
+
+        # https://developer.apple.com/documentation/appstoreconnectapi/modify_an_app_clip_card_image
+        def patch_app_clip_header_image(app_clip_header_image_id: nil, attributes: {})
+          body = {
+            data: {
+              type: "appClipHeaderImages",
+              id: app_clip_header_image_id,
+              attributes: attributes
+            }
+          }
+
+          tunes_request_client.patch("#{Version::V1}/appClipHeaderImages/#{app_clip_header_image_id}", body)
+        end
+
+        # https://developer.apple.com/documentation/appstoreconnectapi/delete_a_default_app_clip_experience_image
+        def delete_app_clip_header_image(app_clip_header_image_id: nil)
+          tunes_request_client.delete("#{Version::V1}/appClipHeaderImages/#{app_clip_header_image_id}")
+        end
+
+        #
+        # betaAppClipInvocations
+        #
+
+        def get_build_bundles_beta_app_clip_invocations(build_bundle_id:, filter: {}, includes: nil, limit: nil, sort: nil)
+          params = tunes_request_client.build_params(filter: filter, includes: includes, limit: limit, sort: sort)
+          tunes_request_client.get("#{Version::V1}/buildBundles/#{build_bundle_id}/betaAppClipInvocations", params)
+        end
+
+        # https://developer.apple.com/documentation/appstoreconnectapi/create_an_app_clip_invocation_for_testers_in_testflight
+        def post_beta_app_clip_invocations(build_bundle_id:, attributes:, localized_titles:)
+          included = []
+          included_ids = []
+
+          localized_titles.each do |localized_title|
+            id = "${beta-app-clip-localized-invocation-#{localized_title[:locale]}}"
+            included << {
+              type: 'betaAppClipInvocationLocalizations',
+              id: id,
+              attributes: localized_title
+            }
+            included_ids << id
+          end
+
+          body = {
+            data: {
+              type: "betaAppClipInvocations",
+              # required attribute: url
+              attributes: attributes,
+              relationships: {
+                betaAppClipInvocationLocalizations: {
+                  data: included_ids.map { |id|
+                    {
+                      type: 'betaAppClipInvocationLocalizations',
+                      id: id
+                    }
+                  }
+                },
+                buildBundle: {
+                  data: {
+                    type: 'buildBundles',
+                    id: build_bundle_id,
+                  }
+                }
+              }
+            },
+            included: included
+          }
+
+          tunes_request_client.post("#{Version::V1}/betaAppClipInvocations", body)
+        end
+
+        def delete_beta_app_clip_invocation(beta_app_clip_invocation_id:)
+          tunes_request_client.delete("#{Version::V1}/betaAppClipInvocations/#{beta_app_clip_invocation_id}")
+        end
+
+        #
+        # betaAppClipInvocationLocalizations
+        #
+
+        # https://developer.apple.com/documentation/appstoreconnectapi/create_localized_metadata_for_a_beta_app_clip_invocation
+        def post_beta_app_clip_invocation_localization(beta_app_clip_invocation_id:, attributes:)
+          body = {
+            data: {
+              type: "betaAppClipInvocationLocalizations",
+              # required attributes: locale, title
+              attributes: attributes,
+              relationships: {
+                betaAppClipInvocation: {
+                  data: {
+                    type: 'betaAppClipInvocations',
+                    id: beta_app_clip_invocation_id,
+                  }
+                }
+              }
+            }
+          }
+
+          tunes_request_client.post("#{Version::V1}/betaAppClipInvocationLocalizations", body)
+        end
+
+        # https://developer.apple.com/documentation/appstoreconnectapi/modify_localized_metadata_of_an_app_clip_invocation_for_testers
+        def patch_beta_app_clip_invocation_localization(beta_app_clip_invocation_localization_id:, attributes:)
+          body = {
+            data: {
+              type: "betaAppClipInvocationLocalizations",
+              id: beta_app_clip_invocation_localization_id,
+              attributes: attributes
+            }
+          }
+
+          tunes_request_client.patch("#{Version::V1}/betaAppClipInvocationLocalizations/#{beta_app_clip_invocation_localization_id}", body)
         end
       end
     end

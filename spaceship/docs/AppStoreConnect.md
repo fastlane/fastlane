@@ -15,6 +15,7 @@
   * [App Analytics](#app-analytics)
   * [Bundle Id](#bundle-id-auth-key)
   * [Bundle Id Capability](#bundle-id-capability-auth-key)
+  * [Webhooks](#webhooks-auth-key)
 - [License](#license)
 
 ## Usage
@@ -67,7 +68,7 @@ end
 app = Spaceship::ConnectAPI::App.create(name: "App Name",
                                         version_string: "1.0", # initial version
                                         sku: "123",
-                                        primary_locale: "English",
+                                        primary_locale: "en-us",
                                         bundle_id: "com.krausefx.app",
                                         platforms: ["IOS"],
                                         company_name: "krause inc")
@@ -102,7 +103,7 @@ With _spaceship_ you can access the versions like this
 
 ```ruby
 app.get_live_app_store_version # the version that's currently available in the App Store
-app.get_edit_app_store_version # the version that's in `Prepare for Submission`, `Metadata Rejected`, `Rejected`, `Developer Rejcted`, `Waiting for Review`, `Invalid Binary` mode
+app.get_edit_app_store_version # the version that's in `Prepare for Submission`, `Metadata Rejected`, `Rejected`, `Developer Rejected`, `Waiting for Review`, `Invalid Binary` mode
 app.get_latest_app_store_version # the version that's the latest one
 app.get_pending_release_app_store_version # the version that's in `Pending Developer Release` or `Pending Apple Release` mode
 app.get_in_review_app_store_version # the version that is in `In Review` mode
@@ -114,10 +115,10 @@ You can then go ahead and modify app metadata on the version objects:
 v = app.get_edit_app_store_version
 
 # Access information
-v.app_store_state         # => "Waiting for Review"
+v.app_version_state       # => "Waiting for Review"
 v.version_string          # => "0.9.14"
 
-# Build is not always available in all app_store_state, e.g. not available in `Prepare for Submission`
+# Build is not always available in all app_version_state, e.g. not available in `Prepare for Submission`
 build_number = v.build.nil? ? nil : v.build.version
 
 # Update app metadata
@@ -162,12 +163,12 @@ Available options:
 attr_accessor :platform
 attr_accessor :version_string
 attr_accessor :app_store_state
+attr_accessor :app_version_state
 attr_accessor :store_icon
 attr_accessor :watch_store_icon
 attr_accessor :copyright
 attr_accessor :release_type
 attr_accessor :earliest_release_date
-attr_accessor :uses_idfa
 attr_accessor :is_watch_only
 attr_accessor :downloadable
 attr_accessor :created_date
@@ -220,7 +221,7 @@ version.select_build(build_id: build.id)
 ### Submit app for App Store Review
 
 ```ruby
-# Check out submit_for_review.rb to get an overview how to modify idfa, submission information
+# Check out submit_for_review.rb to get an overview how to modify submission information
 version.create_app_store_version_submission
 ```
 
@@ -446,10 +447,34 @@ bundle_id_capability = Spaceship::ConnectAPI::BundleIdCapability.create(bundle_i
 
 # Delete an capability from bundle identifier
 capabilities.each do |capability|
-  if capability.capatility_type == Spacehship::ConnectAPI::BundleIdCapability::Type::MAPS
+  if capability.capability_type == Spaceship::ConnectAPI::BundleIdCapability::Type::MAPS
     capability.delete!
   end
 end
+```
+
+### Webhooks (Auth Key)
+
+```ruby
+app = Spaceship::ConnectAPI::App.find("com.krausefx.app")
+
+# Fetch all webhooks
+webhooks = Spaceship::ConnectAPI::Webhook.all(app_id: app.id)
+
+# Create a new webhook
+new_webhook = Spaceship::ConnectAPI::Webhook.create(
+  app_id:      app.id,
+  event_types: [
+    Spaceship::ConnectAPI::Webhook::EventType::APP_STORE_VERSION_APP_VERSION_STATE_UPDATED,
+  ],
+  name:         'Webhook Name',
+  secret:       'secret1234',
+  url:          'https://webhook.example.com'
+)
+
+# Delete a webhook
+webhooks.first.delete!
+new_webhook.delete!
 ```
 
 ## License

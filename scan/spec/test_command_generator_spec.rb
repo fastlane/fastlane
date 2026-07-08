@@ -63,9 +63,7 @@ describe Scan do
     allow(response).to receive(:read).and_return(@valid_simulators)
     allow(Open3).to receive(:popen3).with("xcrun simctl list devices").and_yield(nil, response, nil, nil)
 
-    rt_response = ""
-    allow(rt_response).to receive(:read).and_return("no\n")
-    allow(Open3).to receive(:popen3).with("xcrun simctl list runtimes").and_yield(nil, rt_response, nil, nil)
+    allow(Open3).to receive(:capture3).with("xcrun simctl runtime -h").and_return([nil, 'Usage: simctl runtime <operation> <arguments>', nil])
 
     allow(FastlaneCore::Helper).to receive(:xcode_at_least?).and_return(false)
     allow(FastlaneCore::CommandExecutor).to receive(:execute).with(command: "sw_vers -productVersion", print_all: false, print_command: false).and_return('10.12.1')
@@ -497,7 +495,7 @@ describe Scan do
                                          "-project ./scan/examples/standard/app.xcodeproj",
                                          "-destination 'platform=iOS Simulator,id=E697990C-3A83-4C01-83D1-C367011B31EE'",
                                          "-derivedDataPath #{Scan.config[:derived_data_path].shellescape}",
-                                         "-resultBundlePath './fastlane/test_output/app.test_result'",
+                                         "-resultBundlePath ./fastlane/test_output/app.test_result",
                                          :build,
                                          :test
                                        ])
@@ -518,7 +516,28 @@ describe Scan do
                                          "-project ./scan/examples/standard/app.xcodeproj",
                                          "-destination 'platform=iOS Simulator,id=E697990C-3A83-4C01-83D1-C367011B31EE'",
                                          "-derivedDataPath #{Scan.config[:derived_data_path].shellescape}",
-                                         "-resultBundlePath './fastlane/test_output/app.xcresult'",
+                                         "-resultBundlePath ./fastlane/test_output/app.xcresult",
+                                         :build,
+                                         :test
+                                       ])
+        end
+
+        it "uses the correct build command with the example project when using Xcode 11 or later and a custom result bundle path", requires_xcodebuild: true do
+          allow(FastlaneCore::Helper).to receive(:xcode_version).and_return('11')
+          log_path = File.expand_path("~/Library/Logs/scan/app-app.log")
+
+          options = { project: "./scan/examples/standard/app.xcodeproj", result_bundle_path: "./my_test_output/Alice's Man$ion backtick` quote\" 2024-09-30 at 5.10.35 PM (1).xcresult", scheme: 'app' }
+          Scan.config = FastlaneCore::Configuration.create(Scan::Options.available_options, options)
+
+          result = @test_command_generator.generate
+          expect(result).to start_with([
+                                         "set -o pipefail &&",
+                                         "env NSUnbufferedIO=YES xcodebuild",
+                                         "-scheme app",
+                                         "-project ./scan/examples/standard/app.xcodeproj",
+                                         "-destination 'platform=iOS Simulator,id=E697990C-3A83-4C01-83D1-C367011B31EE'",
+                                         "-derivedDataPath #{Scan.config[:derived_data_path].shellescape}",
+                                         "-resultBundlePath ./my_test_output/Alice\\'s\\ Man\\$ion\\ backtick\\`\\ quote\\\"\\ 2024-09-30\\ at\\ 5.10.35\\ PM\\ \\(1\\).xcresult",
                                          :build,
                                          :test
                                        ])

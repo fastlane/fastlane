@@ -40,13 +40,13 @@ module Fastlane
       return_val = nil
 
       path_to_use = FastlaneCore::FastlaneFolder.path || Dir.pwd
-      parameters ||= {}
+      parameters ||= {} # by default no parameters
       begin
         Dir.chdir(path_to_use) do # the file is located in the fastlane folder
           execute_flow_block(before_all_blocks, current_platform, current_lane, parameters)
           execute_flow_block(before_each_blocks, current_platform, current_lane, parameters)
 
-          return_val = lane_obj.call(parameters) # by default no parameters
+          return_val = lane_obj.call(parameters)
 
           # after blocks are only called if no exception was raised before
           # Call the platform specific after block and then the general one
@@ -124,7 +124,7 @@ module Fastlane
 
     # This is being called from `method_missing` from the Fastfile
     # It's also used when an action is called from another action
-    # @param from_action Indicates if this action is being trigged by another action.
+    # @param from_action Indicates if this action is being triggered by another action.
     #                    If so, it won't show up in summary.
     def trigger_action_by_name(method_sym, custom_dir, from_action, *arguments)
       # First, check if there is a predefined method in the actions folder

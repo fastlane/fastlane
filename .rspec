@@ -3,6 +3,7 @@ require 'rspec/core/rake_task'
 RSpec::Core::RakeTask.new(:spec)
 
 --default-path ./
+--exclude-pattern 'vendor/**/*_spec.rb'
 --require ./spec_helper
 --color
 --format d

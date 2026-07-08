@@ -1,0 +1,60 @@
+#!/usr/bin/env ruby
+require 'match'
+
+# CLI to encrypt/decrypt files using fastlane match encryption layer
+
+def usage
+  puts("USAGE: [encrypt|decrypt] input_path [output_path]")
+  exit(-1)
+end
+
+if ARGV.count < 2 || ARGV.count > 3
+  usage
+end
+
+method_name = ARGV.shift
+unless ['encrypt', 'decrypt'].include?(method_name)
+  usage
+end
+
+input_file = ARGV.shift
+
+if ARGV.count > 0
+  output_file = ARGV.shift
+else
+  output_file = input_file
+end
+
+def ask_password(msg)
+  ask(msg) do |q|
+    q.whitespace = :chomp
+    q.echo = "*"
+  end
+end
+
+def ask_password_twice
+  password = ask_password("Enter the password: ")
+  return "" if password.empty? || password == "\u0003" # CTRL-C char
+  other = ask_password("Enter the password again: ")
+  if other == password
+    return password
+  else
+    return nil
+  end
+end
+
+# read the password
+password = nil
+loop do
+  password = ask_password_twice
+  break unless password.nil?
+end
+
+exit if password.empty?
+
+begin
+  Match::Encryption::MatchFileEncryption.new.send(method_name, file_path: input_file, password: password, output_path: output_file)
+rescue => e
+  puts("ERROR #{method_name}ing. [#{e}]. Check your password")
+  usage
+end

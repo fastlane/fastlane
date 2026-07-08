@@ -3,12 +3,13 @@ inherit_from: .rubocop_todo.yml
 require:
   - rubocop/require_tools
   - rubocop-performance
-  - ./rubocop/fork_usage.rb
-  - ./rubocop/missing_keys_on_shared_area.rb
-  - ./rubocop/is_string_usage.rb
+  - ./internal/rubocop/fork_usage.rb
+  - ./internal/rubocop/missing_keys_on_shared_area.rb
+  - ./internal/rubocop/is_string_usage.rb
 
 AllCops:
-  TargetRubyVersion: 2.6
+  TargetRubyVersion: 3.0
+  SuggestExtensions: false
   NewCops: enable
   Include:
     - '**/*.rb'
@@ -202,7 +203,7 @@ Style/RedundantReturn:
 Style/IfUnlessModifier:
   Enabled: false
 
-# and and or is okay
+# "and" and "or" are okay
 Style/AndOr:
   Enabled: true
   EnforcedStyle: conditionals
@@ -341,3 +342,12 @@ Style/MethodCallWithArgsParentheses:
     - 'context'
     - 'before'
     - 'after'
+
+# Sorts the gems in the Gemfile alphabetically.
+Bundler/OrderedGems:
+  Enabled: true
+  TreatCommentsAsGroupSeparators: false
+
+Gemspec/DevelopmentDependencies:
+   Enabled: true
+   EnforcedStyle: Gemfile

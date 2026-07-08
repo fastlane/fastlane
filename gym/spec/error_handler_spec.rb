@@ -55,6 +55,17 @@ Code signing is required for product type 'Application' in SDK 'iOS 11.0'
       Gym::ErrorHandler.handle_build_error(code_signing_output)
     end
 
+    it "prints the error even if it's not in the last 5 lines" do
+      buried_error_output = "error: buried here\n" + (1..10).map { |i| "warning #{i}" }.join("\n")
+      mock_gym_path(buried_error_output)
+
+      expect(UI).to receive(:command_output).with("error: buried here")
+      expect(UI).to receive(:command_output).at_least(5).times
+      expect(UI).to receive(:build_failure!)
+
+      Gym::ErrorHandler.handle_build_error(buried_error_output)
+    end
+
     it "prints mismatch between the export_method and the selected profiles only once" do
       mock_gym_path(@output)
       expect(UI).to receive(:build_failure!).with("Error building the application - see the log above", error_info: @output)
