@@ -348,8 +348,16 @@ module FastlaneCore
         proj << "-clonedSourcePackagesDirPath #{options[:cloned_source_packages_path].shellescape}"
       end
 
+      if xcode_at_least_11 && options[:package_cache_path]
+        proj << "-packageCachePath #{options[:package_cache_path].shellescape}"
+      end
+
       if xcode_at_least_11 && options[:disable_package_automatic_updates]
         proj << "-disableAutomaticPackageResolution"
+      end
+
+      if xcode_at_least_11 && options[:skip_package_repository_fetches]
+        proj << "-skipPackageUpdates"
       end
 
       return proj
@@ -387,7 +395,9 @@ module FastlaneCore
       xcode_at_least_13 = FastlaneCore::Helper.xcode_at_least?("13")
       if xcode_at_least_13 && options[:destination]
         begin
-          destination_parameter = " " + "-destination #{options[:destination].shellescape}"
+          destination = options[:destination]
+          destination = destination.first if destination.kind_of?(Array)
+          destination_parameter = " " + "-destination #{destination.shellescape}"
         rescue => ex
           # xcodebuild command can continue without destination parameter, so
           # we really don't care about this exception if something goes wrong with shellescape

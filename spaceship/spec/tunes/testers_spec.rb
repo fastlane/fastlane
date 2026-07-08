@@ -1,5 +1,5 @@
 describe Spaceship::Tunes::SandboxTester do
-  before { Spaceship::Tunes.login }
+  include_examples "common spaceship login"
 
   let(:client) { Spaceship::AppSubmission.client }
   let(:app) { Spaceship::Application.all.first }

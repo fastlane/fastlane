@@ -93,7 +93,9 @@ module Deliver
 
       # Verify all screenshots have been deleted
       # Sometimes API requests will fail but screenshots will still be deleted
-      count = iterator.each_app_screenshot_set.map { |_, app_screenshot_set| app_screenshot_set }
+      count = iterator.each_app_screenshot_set
+                      .select { |localization, _| screenshots_per_language.keys.include?(localization.locale) }
+                      .map { |_, app_screenshot_set| app_screenshot_set }
                       .reduce(0) { |sum, app_screenshot_set| sum + app_screenshot_set.app_screenshots.size }
 
       UI.important("Number of screenshots not deleted: #{count}")
@@ -134,7 +136,7 @@ module Deliver
         number_of_screenshots_per_set[app_screenshot_set] ||= (app_screenshot_set.app_screenshots || []).count
 
         if number_of_screenshots_per_set[app_screenshot_set] >= 10
-          UI.error("Too many screenshots found for device '#{screenshot.device_type}' in '#{screenshot.language}', skipping this one (#{screenshot.path})")
+          UI.error("Too many screenshots found for device '#{screenshot.display_type}' in '#{screenshot.language}', skipping this one (#{screenshot.path})")
           next
         end
 
@@ -199,7 +201,7 @@ module Deliver
         iterator.each_app_screenshot.select { |_, _, app_screenshot| app_screenshot.error? }.each do |localization, _, app_screenshot|
           UI.error("#{app_screenshot.file_name} for #{localization.locale} has error(s) - #{app_screenshot.error_messages.join(', ')}")
         end
-        incomplete_screenshot_count = states.reject { |k, v| k == 'COMPLETE' }.reduce(0) { |sum, (k, v)| sum + v }
+        incomplete_screenshot_count = states.except('COMPLETE').reduce(0) { |sum, (k, v)| sum + v }
         UI.user_error!("Failed verification of all screenshots uploaded... #{incomplete_screenshot_count} incomplete screenshot(s) still exist")
       else
         UI.error("Failed to upload all screenshots... Tries remaining: #{tries}")

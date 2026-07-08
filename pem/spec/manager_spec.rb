@@ -8,7 +8,7 @@ describe PEM do
     end
 
     before :all do
-      FileUtils.mkdir("tmp")
+      FileUtils.mkdir_p("tmp")
     end
 
     it "Successful run" do

@@ -1,5 +1,5 @@
 describe Spaceship::AppSubmission do
-  before { Spaceship::Tunes.login }
+  include_examples "common spaceship login"
 
   let(:client) { Spaceship::AppSubmission.client }
   let(:app) { Spaceship::Application.all.find { |a| a.apple_id == "898536088" } }
