@@ -91,9 +91,9 @@ module FastlaneCore
     end
 
     def self.operating_system
-      return "macOS" if RUBY_PLATFORM.downcase.include?("darwin")
-      return "Windows" if RUBY_PLATFORM.downcase.include?("mswin")
-      return "Linux" if RUBY_PLATFORM.downcase.include?("linux")
+      return "macOS" if self.mac?
+      return "Windows" if self.windows?
+      return "Linux" if self.linux?
       return "Unknown"
     end
 
