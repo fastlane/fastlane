@@ -412,7 +412,7 @@ DEPENDENCIES
   webmock (~> 3.18)
   xcode-install (>= 2.6.7)
   xcov (~> 1.9.0)
-  yard (= 0.9.42)
+  yard (~> 0.9.42)
 
 BUNDLED WITH
    2.5.23
