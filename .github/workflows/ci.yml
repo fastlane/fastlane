@@ -9,21 +9,30 @@ concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: true
 
-env:
-  TEST_REPORTS: ${{ github.workspace }}/test-reports
-  CIRCLE_TEST_REPORTS: ${{ github.workspace }}/test-reports
+permissions:
+  contents: read
 
 jobs:
   macos-tests:
     name: ${{ matrix.os }}, Xcode ${{ matrix.xcode }}, Ruby ${{ matrix.ruby }} Tests
     runs-on: ${{ matrix.os }}
+    permissions:
+      contents: read
+      pull-requests: write
     strategy:
       fail-fast: true
       matrix:
         include:
+          - { xcode: '16.4.0', ruby: '3.1', rubyopt: '', os: 'macos-15' }
+          - { xcode: '16.4.0', ruby: '3.2', rubyopt: '', os: 'macos-15' }
+          - { xcode: '16.4.0', ruby: '3.3', rubyopt: '', os: 'macos-15' }
+          - { xcode: '16.4.0', ruby: '3.4', rubyopt: '', os: 'macos-15' }
+          - { xcode: '26.5', ruby: '3.4', rubyopt: '-W0', os: 'macos-26' }
+          - { xcode: '26.6', ruby: '3.4', rubyopt: '-W0', os: 'macos-26' }
           - { xcode: '', ruby: '3.2', rubyopt: '', os: 'windows-2022' }
+          - { xcode: '', ruby: '3.0', rubyopt: '', os: 'ubuntu-24.04' }
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v7
 
       - name: Select Xcode ${{ matrix.xcode }}
         if: runner.os == 'macOS'
@@ -47,10 +56,6 @@ jobs:
         shell: bash
         run: ruby -v
 
-      - name: Setup Build directories
-        if: runner.os != 'Windows'
-        run: mkdir -p "$TEST_REPORTS"
-
       - name: Increase Open File Limit
         if: runner.os != 'Windows'
         shell: bash
@@ -65,25 +70,56 @@ jobs:
           git config --global user.name "github-actions[bot]"
           bundle exec fastlane execute_tests
 
-      - name: Check compatibility with Ruby 3.0
-        shell: bash
-        run: |
-          touch "$TEST_REPORTS/ruby_warnings.txt"
-          ! grep -E "warning:\s.*(deprecated).*$" "$TEST_REPORTS/ruby_warnings.txt" && echo "No deprecation message found."
-          ! grep -E "warning:\s.*(obsolete).*$" "$TEST_REPORTS/ruby_warnings.txt" && echo "No obsolete message found."
-
-      - name: Upload rspec reports
+      - name: RSpec report
         if: always()
-        uses: actions/upload-artifact@v7
+        uses: SonicGarden/rspec-report-action@v8
         with:
-          name: rspec-${{ matrix.xcode }}-ruby-${{ matrix.ruby }}
-          path: ${{ env.TEST_REPORTS }}/rspec
-          if-no-files-found: ignore
+          json-path: rspec_logs.json
+          comment: 'false'
+          title: '# :cold_sweat: RSpec failure (${{ matrix.os }}, Xcode ${{ matrix.xcode }}, Ruby ${{ matrix.ruby }})'
 
-      - name: Upload ruby warnings
-        if: always()
-        uses: actions/upload-artifact@v7
+  validate_fastlane_swift_generation:
+    name: Validate Fastlane.swift generation
+    runs-on: macos-26
+    steps:
+      - uses: actions/checkout@v7
+
+      - uses: maxim-lobanov/setup-xcode@v1
         with:
-          name: ruby_warnings-${{ matrix.xcode }}-ruby-${{ matrix.ruby }}.txt
-          path: ${{ env.TEST_REPORTS }}/ruby_warnings.txt
-          if-no-files-found: ignore
+          xcode-version: '26.3'
+
+      - uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: '3.4'
+          bundler-cache: true
+
+      - name: Generate Swift API
+        run: bundle exec fastlane generate_swift_api
+
+  validate_documentation:
+    name: Validate Documentation
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v7
+
+      - uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: '3.4'
+          bundler-cache: true
+
+      - name: Validate docs
+        run: bundle exec fastlane validate_docs
+
+  lint_source_code:
+    name: Lint source code
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v7
+
+      - uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: '3.4'
+          bundler-cache: true
+
+      - name: Lint
+        run: bundle exec fastlane lint_source

@@ -186,6 +186,7 @@ describe Match do
             type: "appstore",
             git_url: git_url,
             username: "flapple@something.com",
+            renew_expired_certs: false,
             readonly: true
           }
 
@@ -207,6 +208,44 @@ describe Match do
           expect(Match::SpaceshipEnsure).not_to receive(:new)
 
           expect(Match::Utils).to receive(:is_cert_valid?).and_return(false)
+
+          expect do
+            Match::Runner.new.run(config)
+          end.to raise_error("Your certificate 'E7P4EE896K.cer' is not valid, please check end date and renew it if necessary")
+        end
+
+        it "does not renew an outdated certificate in readonly mode even when renew_expired_certs is true", requires_security: true do
+          git_url = "https://github.com/fastlane/fastlane/tree/master/certificates"
+          values = {
+            app_identifier: "tools.fastlane.app",
+            type: "appstore",
+            git_url: git_url,
+            username: "flapple@something.com",
+            renew_expired_certs: true,
+            readonly: true
+          }
+
+          config = FastlaneCore::Configuration.create(Match::Options.available_options, values)
+          repo_dir = "./match/spec/fixtures/existing"
+
+          create_fake_cache
+
+          fake_storage = create_fake_storage(match_config: config, repo_dir: repo_dir)
+          # Ensure no changes are written back to storage in readonly mode.
+          expect(fake_storage).not_to receive(:save_changes!)
+
+          fake_encryption = "fake_encryption"
+          expect(Match::Encryption::OpenSSL).to receive(:new).with(keychain_name: fake_storage.git_url, working_directory: fake_storage.working_directory, force_legacy_encryption: false).and_return(fake_encryption)
+          expect(fake_encryption).to receive(:decrypt_files).and_return(nil)
+
+          spaceship = "spaceship"
+          allow(spaceship).to receive(:team_id).and_return("")
+          expect(Match::SpaceshipEnsure).not_to receive(:new)
+
+          # Stored certificate is invalid, but in readonly mode we must not touch it.
+          expect(Match::Utils).to receive(:is_cert_valid?).and_return(false)
+          expect(File).not_to receive(:delete)
+          expect(Match::Generator).not_to receive(:generate_certificate)
 
           expect do
             Match::Runner.new.run(config)
@@ -270,6 +309,146 @@ describe Match do
 
           # THEN
           # Rely on expectations defined above.
+        end
+
+        it "renews an outdated certificate", requires_security: true do
+          # GIVEN
+
+          # Downloaded and decrypted storage location.
+          repo_dir = "./match/spec/fixtures/invalid"
+          #   Invalid cert and key
+          stored_invalid_cert_path = "#{repo_dir}/certs/distribution/F7P4EE896K.cer"
+          stored_invalid_key_path = "#{repo_dir}/certs/distribution/F7P4EE896K.p12"
+
+          #   Valid cert and key
+          new_stored_valid_cert_path = "./match/spec/fixtures/valid/certs/distribution/E7P4EE896K.cer"
+          new_stored_valid_key_path = "./match/spec/fixtures/valid/certs/distribution/E7P4EE896K.p12"
+
+          # match options
+          match_test_options = {
+            renew_expired_certs: true, # Current test suite.
+            skip_provisioning_profiles: true # We test certificate renewal, not profile.
+          }
+          match_config = create_match_config_with_git_storage(extra_values: match_test_options)
+
+          fake_cache = create_fake_cache
+
+          # EXPECTATIONS
+
+          # Storage
+          fake_storage = create_fake_storage(match_config: match_config, repo_dir: repo_dir)
+          begin # Ensure old certificates are removed from the storage and new are added.
+            expect(fake_storage).to receive(:save_changes!).with(
+              files_to_commit: [
+                new_stored_valid_cert_path,
+                new_stored_valid_key_path # this is important, as a cert consists out of 2 files
+              ],
+              files_to_delete: [
+                stored_invalid_cert_path,
+                stored_invalid_key_path
+              ]
+            )
+          end
+
+          # Encryption
+          fake_encryption = create_fake_encryption(storage: fake_storage)
+          # Ensure new files are encrypted.
+          expect(fake_encryption).to receive(:encrypt_files).and_return(nil)
+
+          # Certificate generator
+          # Ensure a new certificate is generated.
+          expect(Match::Generator).to receive(:generate_certificate).with(match_config, :distribution, fake_storage.working_directory, specific_cert_type: nil).and_return(new_stored_valid_cert_path)
+
+          # Spaceship ensure helper
+          spaceship_ensure = create_fake_spaceship_ensure
+          begin # Ensure match checks validity of the new certificate.
+            profile_type = Sigh.profile_type_for_distribution_type(
+              platform: match_config[:platform],
+              distribution_type: match_config[:type]
+            )
+
+            certificates_exists_params = {
+              username: match_config[:username],
+              certificate_ids: ['E7P4EE896K'],
+              cached_certificates: fake_cache.certificates,
+              platform: match_config[:platform],
+              profile_type: profile_type
+            }
+            expect(spaceship_ensure).to receive(:certificates_exists).with(certificates_exists_params).and_return(true)
+          end
+
+          # Utils
+          # Ensure match validates stored certificate and make it invalid for the current test suite.
+          expect(Match::Utils).to receive(:is_cert_valid?).with(stored_invalid_cert_path).and_return(false)
+
+          # File system
+          begin # Ensure old certificates are removed from the file system.
+            expect(File).to receive(:delete).with(stored_invalid_cert_path).and_return(nil)
+            expect(File).to receive(:delete).with(stored_invalid_key_path).and_return(nil)
+          end
+
+          # Extra
+          begin # Ensure profiles are not created, not installed, and not validated.
+            expect(Match::Generator).not_to receive(:generate_provisioning_profile)
+            expect(FastlaneCore::ProvisioningProfile).not_to receive(:install)
+            expect(spaceship_ensure).not_to receive(:profile_exists)
+          end
+
+          # WHEN
+          Match::Runner.new.run(match_config)
+
+          # THEN
+          # Rely on expectations defined above.
+        end
+
+        it "does not renew an outdated developer_id certificate when authenticated with an App Store Connect API token", requires_security: true do
+          # GIVEN
+          # `developer_id` certificates can't be renewed with a Connect API token
+          # (account holder login is required), so match must not delete/regenerate
+          # them even when `renew_expired_certs` is enabled.
+
+          # Downloaded and decrypted storage location.
+          repo_dir = "./match/spec/fixtures/invalid"
+          stored_invalid_cert_path = "#{repo_dir}/certs/developer_id_application/F7P4EE896K.cer"
+
+          # match options
+          match_test_options = {
+            type: "developer_id",
+            renew_expired_certs: true,
+            skip_provisioning_profiles: true # We test certificate renewal, not profile.
+          }
+          match_config = create_match_config_with_git_storage(extra_values: match_test_options)
+
+          create_fake_cache
+
+          # EXPECTATIONS
+
+          # Authenticated with a Connect API token rather than account holder login.
+          allow(Spaceship::ConnectAPI).to receive(:token).and_return("fake_api_token")
+
+          # Storage
+          fake_storage = create_fake_storage(match_config: match_config, repo_dir: repo_dir)
+          # Ensure nothing is written back to storage.
+          expect(fake_storage).not_to receive(:save_changes!)
+
+          # Encryption
+          create_fake_encryption(storage: fake_storage)
+
+          # Spaceship ensure helper
+          create_fake_spaceship_ensure
+
+          # Utils
+          # Stored certificate is invalid, but it must not be renewed via API.
+          expect(Match::Utils).to receive(:is_cert_valid?).with(stored_invalid_cert_path).and_return(false)
+
+          # Ensure the certificate is neither removed nor regenerated.
+          expect(File).not_to receive(:delete)
+          expect(Match::Generator).not_to receive(:generate_certificate)
+
+          # WHEN / THEN
+          expect do
+            Match::Runner.new.run(match_config)
+          end.to raise_error("Your certificate 'F7P4EE896K.cer' is not valid, please check end date and renew it if necessary")
         end
 
         it "skips provisioning profiles when skip_provisioning_profiles set to true", requires_security: true do
@@ -362,6 +541,238 @@ describe Match do
           expect do
             Match::Runner.new.run(config)
           end.to raise_error("You defined the profile type 'enterprise', but your Apple account doesn't support In-House profiles")
+        end
+      end
+    end
+
+    describe '#select_cert_or_key' do
+      let(:runner) { Match::Runner.new }
+      let(:cert_paths) do
+        [
+          "/fake/certs/distribution/AAAA111111.cer",
+          "/fake/certs/distribution/BBBB222222.cer",
+          "/fake/certs/distribution/CCCC333333.cer"
+        ]
+      end
+      let(:key_paths) do
+        [
+          "/fake/certs/distribution/AAAA111111.p12",
+          "/fake/certs/distribution/BBBB222222.p12"
+        ]
+      end
+
+      it "returns the last path when no certificate_id is provided" do
+        result = runner.send(:select_cert_or_key, paths: cert_paths)
+        expect(result).to eq("/fake/certs/distribution/CCCC333333.cer")
+      end
+
+      it "returns the last path when certificate_id is nil" do
+        result = runner.send(:select_cert_or_key, paths: cert_paths, certificate_id: nil)
+        expect(result).to eq("/fake/certs/distribution/CCCC333333.cer")
+      end
+
+      it "returns the last path when certificate_id is an empty string" do
+        result = runner.send(:select_cert_or_key, paths: cert_paths, certificate_id: "")
+        expect(result).to eq("/fake/certs/distribution/CCCC333333.cer")
+      end
+
+      it "returns the last path when certificate_id is whitespace-only" do
+        result = runner.send(:select_cert_or_key, paths: cert_paths, certificate_id: "  ")
+        expect(result).to eq("/fake/certs/distribution/CCCC333333.cer")
+      end
+
+      it "selects the matching path when certificate_id matches exactly" do
+        result = runner.send(:select_cert_or_key, paths: cert_paths, certificate_id: "BBBB222222")
+        expect(result).to eq("/fake/certs/distribution/BBBB222222.cer")
+      end
+
+      it "does not substring-match certificate_id" do
+        expect do
+          runner.send(:select_cert_or_key, paths: cert_paths, certificate_id: "BBBB")
+        end.to raise_error(FastlaneCore::Interface::FastlaneError, "No certificate or key found for certificate_id 'BBBB'")
+      end
+
+      it "raises an error when certificate_id does not match any path" do
+        expect do
+          runner.send(:select_cert_or_key, paths: cert_paths, certificate_id: "NONEXISTENT")
+        end.to raise_error(FastlaneCore::Interface::FastlaneError, "No certificate or key found for certificate_id 'NONEXISTENT'")
+      end
+
+      it "works with .p12 key paths" do
+        result = runner.send(:select_cert_or_key, paths: key_paths, certificate_id: "AAAA111111")
+        expect(result).to eq("/fake/certs/distribution/AAAA111111.p12")
+      end
+    end
+
+    describe '#fetch_certificate certificate_id param resolution' do
+      let(:runner) { Match::Runner.new }
+
+      before do
+        allow(Spaceship::ConnectAPI).to receive(:token).and_return("fake_token")
+      end
+
+      it "uses certificate_id param to select the correct certificate" do
+        Dir.mktmpdir do |dir|
+          # Create two certs and keys
+          cert_dir = File.join(dir, "certs", "distribution")
+          FileUtils.mkdir_p(cert_dir)
+          File.write(File.join(cert_dir, "FIRST11111.cer"), "cert1")
+          File.write(File.join(cert_dir, "FIRST11111.p12"), "key1")
+          File.write(File.join(cert_dir, "SECOND2222.cer"), "cert2")
+          File.write(File.join(cert_dir, "SECOND2222.p12"), "key2")
+
+          allow(runner).to receive(:prefixed_working_directory).and_return(dir)
+          allow(Match::Utils).to receive(:is_cert_valid?).and_return(true)
+          allow(Match::Utils).to receive(:get_cert_info).and_return([["Common Name", "test"]])
+          allow(FastlaneCore::Helper).to receive(:mac?).and_return(false)
+
+          values = {
+            app_identifier: "com.test.app",
+            type: "appstore",
+            git_url: "https://example.com",
+            certificate_id: "FIRST11111"
+          }
+          config = FastlaneCore::Configuration.create(Match::Options.available_options, values)
+
+          cert_id = runner.send(:fetch_certificate, params: config)
+          expect(cert_id).to eq("FIRST11111")
+        end
+      end
+
+      it "uses MATCH_CERTIFICATE_ID env var for backward compatibility" do
+        Dir.mktmpdir do |dir|
+          cert_dir = File.join(dir, "certs", "distribution")
+          FileUtils.mkdir_p(cert_dir)
+          File.write(File.join(cert_dir, "FIRST11111.cer"), "cert1")
+          File.write(File.join(cert_dir, "FIRST11111.p12"), "key1")
+          File.write(File.join(cert_dir, "SECOND2222.cer"), "cert2")
+          File.write(File.join(cert_dir, "SECOND2222.p12"), "key2")
+
+          allow(runner).to receive(:prefixed_working_directory).and_return(dir)
+          allow(Match::Utils).to receive(:is_cert_valid?).and_return(true)
+          allow(Match::Utils).to receive(:get_cert_info).and_return([["Common Name", "test"]])
+          allow(FastlaneCore::Helper).to receive(:mac?).and_return(false)
+
+          ENV['MATCH_CERTIFICATE_ID'] = 'FIRST11111'
+          begin
+            values = {
+              app_identifier: "com.test.app",
+              type: "appstore",
+              git_url: "https://example.com"
+            }
+            config = FastlaneCore::Configuration.create(Match::Options.available_options, values)
+
+            cert_id = runner.send(:fetch_certificate, params: config)
+            expect(cert_id).to eq("FIRST11111")
+          ensure
+            ENV.delete('MATCH_CERTIFICATE_ID')
+          end
+        end
+      end
+
+      it "prefers explicit param over env var" do
+        Dir.mktmpdir do |dir|
+          cert_dir = File.join(dir, "certs", "distribution")
+          FileUtils.mkdir_p(cert_dir)
+          File.write(File.join(cert_dir, "FIRST11111.cer"), "cert1")
+          File.write(File.join(cert_dir, "FIRST11111.p12"), "key1")
+          File.write(File.join(cert_dir, "SECOND2222.cer"), "cert2")
+          File.write(File.join(cert_dir, "SECOND2222.p12"), "key2")
+
+          allow(runner).to receive(:prefixed_working_directory).and_return(dir)
+          allow(Match::Utils).to receive(:is_cert_valid?).and_return(true)
+          allow(Match::Utils).to receive(:get_cert_info).and_return([["Common Name", "test"]])
+          allow(FastlaneCore::Helper).to receive(:mac?).and_return(false)
+
+          ENV['MATCH_CERTIFICATE_ID'] = 'SECOND2222'
+          begin
+            values = {
+              app_identifier: "com.test.app",
+              type: "appstore",
+              git_url: "https://example.com",
+              certificate_id: "FIRST11111"
+            }
+            config = FastlaneCore::Configuration.create(Match::Options.available_options, values)
+
+            cert_id = runner.send(:fetch_certificate, params: config)
+            expect(cert_id).to eq("FIRST11111")
+          ensure
+            ENV.delete('MATCH_CERTIFICATE_ID')
+          end
+        end
+      end
+
+      it "imports the matching .p12 key when certificate_id is set and on macOS" do
+        Dir.mktmpdir do |dir|
+          cert_dir = File.join(dir, "certs", "distribution")
+          FileUtils.mkdir_p(cert_dir)
+          File.write(File.join(cert_dir, "FIRST11111.cer"), "cert1")
+          File.write(File.join(cert_dir, "FIRST11111.p12"), "key1")
+          File.write(File.join(cert_dir, "SECOND2222.cer"), "cert2")
+          File.write(File.join(cert_dir, "SECOND2222.p12"), "key2")
+
+          allow(runner).to receive(:prefixed_working_directory).and_return(dir)
+          allow(Match::Utils).to receive(:is_cert_valid?).and_return(true)
+          allow(Match::Utils).to receive(:get_cert_info).and_return([["Common Name", "test"]])
+          allow(FastlaneCore::Helper).to receive(:mac?).and_return(true)
+          allow(FastlaneCore::Helper).to receive(:xcode_at_least?).and_return(false)
+          allow(FastlaneCore::CertChecker).to receive(:installed?).and_return(false)
+
+          expected_cert_path = File.join(cert_dir, "FIRST11111.cer")
+          expected_key_path = File.join(cert_dir, "FIRST11111.p12")
+
+          expect(Match::Utils).to receive(:import).with(expected_cert_path, "login.keychain", password: nil).ordered
+          expect(Match::Utils).to receive(:import).with(expected_key_path, "login.keychain", password: nil).ordered
+
+          values = {
+            app_identifier: "com.test.app",
+            type: "appstore",
+            git_url: "https://example.com",
+            certificate_id: "FIRST11111"
+          }
+          config = FastlaneCore::Configuration.create(Match::Options.available_options, values)
+
+          cert_id = runner.send(:fetch_certificate, params: config)
+          expect(cert_id).to eq("FIRST11111")
+        end
+      end
+
+      it "ignores certificate_id when fetching additional cert types" do
+        Dir.mktmpdir do |dir|
+          # Primary cert type directory with the target certificate
+          primary_dir = File.join(dir, "certs", "distribution")
+          FileUtils.mkdir_p(primary_dir)
+          File.write(File.join(primary_dir, "FIRST11111.cer"), "cert1")
+          File.write(File.join(primary_dir, "FIRST11111.p12"), "key1")
+
+          # Additional cert type directory with different certificates
+          additional_dir = File.join(dir, "certs", "mac_installer_distribution")
+          FileUtils.mkdir_p(additional_dir)
+          File.write(File.join(additional_dir, "INSTALLER1.cer"), "cert2")
+          File.write(File.join(additional_dir, "INSTALLER1.p12"), "key2")
+          File.write(File.join(additional_dir, "INSTALLER2.cer"), "cert3")
+          File.write(File.join(additional_dir, "INSTALLER2.p12"), "key3")
+
+          allow(runner).to receive(:prefixed_working_directory).and_return(dir)
+          allow(Match::Utils).to receive(:is_cert_valid?).and_return(true)
+          allow(Match::Utils).to receive(:get_cert_info).and_return([["Common Name", "test"]])
+          allow(FastlaneCore::Helper).to receive(:mac?).and_return(false)
+
+          values = {
+            app_identifier: "com.test.app",
+            type: "appstore",
+            git_url: "https://example.com",
+            certificate_id: "FIRST11111"
+          }
+          config = FastlaneCore::Configuration.create(Match::Options.available_options, values)
+
+          # Primary cert should use certificate_id
+          cert_id = runner.send(:fetch_certificate, params: config)
+          expect(cert_id).to eq("FIRST11111")
+
+          # Additional cert type should ignore certificate_id and pick the last cert
+          additional_cert_id = runner.send(:fetch_certificate, params: config, specific_cert_type: "mac_installer_distribution")
+          expect(additional_cert_id).to eq("INSTALLER2")
         end
       end
     end

@@ -15,23 +15,29 @@ module Precheck
     end
 
     def self.description
-      "using a copyright date that is any different from this current year, or missing a date"
-    end
-
-    def pass_if_empty?
-      return false
+      "using a copyright year in the future, or missing a copyright year"
     end
 
     def supported_fields_symbol_set
       [:copyright].to_set
     end
 
-    def word_search_type
-      WORD_SEARCH_TYPES[:fail_on_exclusion]
+    def rule_block
+      return lambda { |text|
+        year = copyright_year(text)
+        if year.nil?
+          RuleReturn.new(validation_state: VALIDATION_STATES[:failed], failure_data: "missing copyright year")
+        elsif year > DateTime.now.year
+          RuleReturn.new(validation_state: VALIDATION_STATES[:failed], failure_data: "copyright year is in the future: #{year}")
+        else
+          RuleReturn.new(validation_state: VALIDATION_STATES[:passed])
+        end
+      }
     end
 
-    def lowercased_words_to_look_for
-      [DateTime.now.year.to_s]
+    def copyright_year(text)
+      match = text.to_s.match(/\b(?:19|20)\d{2}\b/)
+      match && match[0].to_i
     end
   end
 end

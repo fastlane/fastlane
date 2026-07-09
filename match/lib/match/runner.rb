@@ -85,12 +85,12 @@ module Match
       end
 
       # Certificate
-      cert_id = fetch_certificate(params: params, renew_expired_certs: false)
+      cert_id = fetch_certificate(params: params, renew_expired_certs: params[:renew_expired_certs])
 
       # Mac Installer Distribution Certificate
       additional_cert_types = params[:additional_cert_types] || []
       cert_ids = additional_cert_types.map do |additional_cert_type|
-        fetch_certificate(params: params, renew_expired_certs: false, specific_cert_type: additional_cert_type)
+        fetch_certificate(params: params, renew_expired_certs: params[:renew_expired_certs], specific_cert_type: additional_cert_type)
       end
 
       profile_type = Sigh.profile_type_for_distribution_type(
@@ -160,6 +160,7 @@ module Match
 
     def fetch_certificate(params: nil, renew_expired_certs: false, specific_cert_type: nil)
       cert_type = Match.cert_type_sym(specific_cert_type || params[:type])
+      certificate_id = specific_cert_type.nil? ? params[:certificate_id] : nil
 
       certs = Dir[File.join(prefixed_working_directory, "certs", cert_type.to_s, "*.cer")]
       keys = Dir[File.join(prefixed_working_directory, "certs", cert_type.to_s, "*.p12")]
@@ -173,8 +174,10 @@ module Match
       is_cert_renewable = is_authenticated_with_login || is_cert_renewable_via_api
 
       # Validate existing certificate first.
+      # NOTE: only a single certificate is considered here — the one matching
+      # `certificate_id`, or otherwise the last one found for this type.
       if renew_expired_certs && is_cert_renewable && storage_has_certs && !params[:readonly]
-        cert_path = select_cert_or_key(paths: certs)
+        cert_path = select_cert_or_key(paths: certs, certificate_id: certificate_id)
 
         unless Utils.is_cert_valid?(cert_path)
           UI.important("Removing invalid certificate '#{File.basename(cert_path)}'")
@@ -209,7 +212,7 @@ module Match
         # Reset certificates cache since we have a new cert.
         self.cache.reset_certificates
       else
-        cert_path = select_cert_or_key(paths: certs)
+        cert_path = select_cert_or_key(paths: certs, certificate_id: certificate_id)
 
         # Check validity of certificate
         if Utils.is_cert_valid?(cert_path)
@@ -233,7 +236,7 @@ module Match
             # Import the private key
             # there seems to be no good way to check if it's already installed - so just install it
             # Key will only be added to the partition list if it isn't already installed
-            Utils.import(select_cert_or_key(paths: keys), params[:keychain_name], password: params[:keychain_password])
+            Utils.import(select_cert_or_key(paths: keys, certificate_id: certificate_id), params[:keychain_name], password: params[:keychain_password])
           end
         else
           UI.message("Skipping installation of certificate as it would not work on this operating system.")
@@ -241,7 +244,7 @@ module Match
 
         if params[:output_path]
           FileUtils.cp(cert_path, params[:output_path])
-          FileUtils.cp(select_cert_or_key(paths: keys), params[:output_path])
+          FileUtils.cp(select_cert_or_key(paths: keys, certificate_id: certificate_id), params[:output_path])
         end
 
         # Get and print info of certificate
@@ -253,9 +256,13 @@ module Match
     end
 
     # @return [String] Path to certificate or P12 key
-    def select_cert_or_key(paths:)
-      cert_id_path = ENV['MATCH_CERTIFICATE_ID'] ? paths.find { |path| path.include?(ENV['MATCH_CERTIFICATE_ID']) } : nil
-      cert_id_path || paths.last
+    def select_cert_or_key(paths:, certificate_id: nil)
+      return paths.last if certificate_id.to_s.strip.empty?
+
+      cert_id_path = paths.find { |path| File.basename(path, File.extname(path)) == certificate_id }
+      return cert_id_path if cert_id_path
+
+      UI.user_error!("No certificate or key found for certificate_id '#{certificate_id}'")
     end
 
     # rubocop:disable Metrics/PerceivedComplexity

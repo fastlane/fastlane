@@ -1,3 +1,5 @@
+require 'shellwords'
+
 describe FastlaneCore do
   describe FastlaneCore::Project do
     describe 'project and workspace detection' do
@@ -655,6 +657,28 @@ describe FastlaneCore do
               destination: "FakeDestination"
               })
             command = "xcodebuild -resolvePackageDependencies -project ./fastlane_core/spec/fixtures/projects/Example.xcodeproj -destination FakeDestination"
+            expect(project.build_xcodebuild_resolvepackagedependencies_command).to eq(command)
+          end
+        end
+
+        context "when destination parameter is provided as an array" do
+          it 'generates an xcodebuild -showBuildSettings command that uses the first destination', requires_xcode: true do
+            project = FastlaneCore::Project.new({
+              project: "./fastlane_core/spec/fixtures/projects/Example.xcodeproj",
+              destination: ["platform=iOS Simulator,id=ABC123", "platform=iOS Simulator,id=DEF456"]
+            })
+            destination = "platform=iOS Simulator,id=ABC123".shellescape
+            command = "xcodebuild -showBuildSettings -project ./fastlane_core/spec/fixtures/projects/Example.xcodeproj -destination #{destination} 2>&1"
+            expect(project.build_xcodebuild_showbuildsettings_command).to eq(command)
+          end
+
+          it 'generates an xcodebuild -resolvePackageDependencies command that uses the first destination' do
+            project = FastlaneCore::Project.new({
+              project: "./fastlane_core/spec/fixtures/projects/Example.xcodeproj",
+              destination: ["platform=iOS Simulator,id=ABC123", "platform=iOS Simulator,id=DEF456"]
+              })
+            destination = "platform=iOS Simulator,id=ABC123".shellescape
+            command = "xcodebuild -resolvePackageDependencies -project ./fastlane_core/spec/fixtures/projects/Example.xcodeproj -destination #{destination}"
             expect(project.build_xcodebuild_resolvepackagedependencies_command).to eq(command)
           end
         end

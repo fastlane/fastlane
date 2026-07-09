@@ -1,9 +1,10 @@
 describe Fastlane do
   describe Fastlane::FastFile do
-    build_log_path = File.expand_path("#{FastlaneCore::Helper.buildlog_path}/fastlane/xcbuild/#{Time.now.strftime('%F')}/#{Process.pid}/xcodebuild.log")
+    let(:build_log_path) { File.expand_path("#{FastlaneCore::Helper.buildlog_path}/fastlane/xcbuild/#{Time.now.strftime('%F')}/#{Process.pid}/xcodebuild.log") }
 
     describe "Xcodebuild Integration" do
       before :each do
+        allow(Time).to receive(:now).and_return(Time.at(1_420_063_200))
         Fastlane::Actions.lane_context.delete(:IPA_OUTPUT_PATH)
         Fastlane::Actions.lane_context.delete(:XCODEBUILD_ARCHIVE)
       end

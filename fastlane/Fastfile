@@ -2,6 +2,7 @@ require 'fileutils'
 fastlane_require 'xcodeproj'
 
 skip_docs # Do not create fastlane/README.txt
+opt_out_usage # Do not report analytics for runs of fastlane on the fastlane repo itself
 
 # Test and Validate
 
@@ -458,18 +459,9 @@ lane :update_docs do |options|
     docs_path = generate_markdown_docs(target_path: ".")
     yml_path = File.expand_path("./mkdocs.yml")
     actions_md_path = File.expand_path(File.join(docs_path, "docs/generated/actions.md"))
-    action_docs = Dir[File.join(docs_path, "docs", "generated", "actions", "*")].collect do |current|
-      File.expand_path(current) # to make sure we commit the change
-    end
 
-    # Copy over the custom assets
-    custom_action_docs_path = "lib/fastlane/actions/docs/"
-    custom_assets = Dir[File.join(Fastlane::ROOT, custom_action_docs_path, "assets", "*")].collect do |current_asset_path|
-      current_output_path = File.join("docs/img/actions", File.basename(current_asset_path))
-      FileUtils.cp(current_asset_path, current_output_path)
-
-      File.expand_path(current_output_path) # to make sure we commit the change
-    end
+    action_docs_dir = File.join(docs_path, "docs/generated/actions")
+    custom_assets_dir = File.join(docs_path, "docs/img/actions")
 
     # We want to align fastlane/docs "fastlane" version with the latest released version.
     # This ensures documentation tests leverage the latest action parameters and code samples.
@@ -495,7 +487,7 @@ lane :update_docs do |options|
 
       Dir.chdir("fastlane") do # this is an assumption of fastlane, that we have to .. when shelling out
         # Commit the changes
-        changes_to_commit = [plugin_scores_cache_path, actions_md_path, "Gemfile.lock", plugins_path, yml_path] + action_docs + custom_assets
+        changes_to_commit = [plugin_scores_cache_path, actions_md_path, "Gemfile.lock", plugins_path, yml_path, action_docs_dir, custom_assets_dir]
         git_add(path: changes_to_commit)
         git_commit(path: changes_to_commit,
                 message: "Update docs for latest fastlane release #{version} (actions.md, available-plugins.md) 🚀")

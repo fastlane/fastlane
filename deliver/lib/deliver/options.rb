@@ -127,6 +127,30 @@ module Deliver
                                      env_name: "DELIVER_SCREENSHOTS_PATH",
                                      description: "Path to the folder containing the screenshots",
                                      optional: true),
+        FastlaneCore::ConfigItem.new(key: :app_clip_header_images_path,
+                                     env_name: "DELIVER_APP_CLIP_HEADER_IMAGES_PATH",
+                                     description: "Path to the folder containing the app clip header images",
+                                     optional: true),
+        FastlaneCore::ConfigItem.new(key: :app_clip_default_experience_metadata_path,
+                                     env_name: "DELIVER_APP_CLIP_DEFAULT_EXPERIENCE_METADATA_PATH",
+                                     description: "Path to the folder containing the app clip default experience metadata",
+                                     optional: true),
+
+        # app previews (videos)
+        FastlaneCore::ConfigItem.new(key: :app_previews_path,
+                                     env_name: "DELIVER_APP_PREVIEWS_PATH",
+                                     description: "Path to the folder containing localized App Preview videos",
+                                     optional: true),
+        FastlaneCore::ConfigItem.new(key: :preview_frame_time_code,
+                                     env_name: "DELIVER_PREVIEW_FRAME_TIME_CODE",
+                                     description: "Time code for the App Preview still frame written as hour:minute:second:centisecond (e.g. 00:00:00:01)",
+                                     optional: true,
+                                     default_value: "00:00:05:00"),
+        FastlaneCore::ConfigItem.new(key: :overwrite_preview_videos,
+                                     env_name: "DELIVER_OVERWRITE_PREVIEW_VIDEOS",
+                                     description: "Clear all previously uploaded App Preview videos before uploading the new ones",
+                                     type: Boolean,
+                                     default_value: false),
 
         # skip
         FastlaneCore::ConfigItem.new(key: :skip_binary_upload,
@@ -307,6 +331,13 @@ module Deliver
                                      code_gen_sensitive: true,
                                      default_value: CredentialsManager::AppfileConfig.try_fetch_value(:itc_provider),
                                      default_value_dynamic: true),
+        FastlaneCore::ConfigItem.new(key: :provider_public_id,
+                                     env_name: "DELIVER_PROVIDER_PUBLIC_ID",
+                                     description: "The provider public ID to be used with altool (--provider-public-id). This value will override the automatically detected provider value for altool uploads. Required after Xcode 26 when your account is associated with multiple providers and using username/app-password authentication",
+                                     optional: true,
+                                     code_gen_sensitive: true,
+                                     default_value: CredentialsManager::AppfileConfig.try_fetch_value(:provider_public_id),
+                                     default_value_dynamic: true),
         # rubocop:enable Layout/LineLength
 
         # precheck
@@ -379,6 +410,10 @@ module Deliver
                                      type: Hash),
         FastlaneCore::ConfigItem.new(key: :app_review_information,
                                      description: "Metadata: A hash containing the review information",
+                                     optional: true,
+                                     type: Hash),
+        FastlaneCore::ConfigItem.new(key: :app_clip_review_information,
+                                     description: "Metadata: A hash containing the app clip review information",
                                      optional: true,
                                      type: Hash),
         FastlaneCore::ConfigItem.new(key: :app_review_attachment_file,
@@ -460,6 +495,17 @@ module Deliver
                                      type: Boolean,
                                      optional: true,
                                      default_value: true),
+
+        # app clip default experience
+        FastlaneCore::ConfigItem.new(key: :app_clip_default_experience_subtitle,
+                                     env_name: "DELIVER_APP_CLIP_DEFAULT_EXPERIENCE_SUBTITLE",
+                                     description: "The localized subtitle for the default app clip experience",
+                                     optional: true,
+                                     type: Hash),
+        FastlaneCore::ConfigItem.new(key: :app_clip_default_experience_action,
+                                     env_name: "DELIVER_APP_CLIP_DEFAULT_EXPERIENCE_ACTION",
+                                     description: "Action for the default app clip experience (OPEN, VIEW, PLAY)",
+                                     optional: true),
 
         # internal
         FastlaneCore::ConfigItem.new(key: :app,

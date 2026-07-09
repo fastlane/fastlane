@@ -119,6 +119,8 @@ module Gym
       end
 
       def pipe_xcpretty
+        UI.important("Using xcpretty can result in missing some build errors and is slower than the preferred xcbeautify. See https://docs.fastlane.tools/best-practices/xcodebuild-formatters/ for more information.")
+
         pipe = []
 
         formatter = Gym.config[:xcpretty_formatter]
@@ -152,7 +154,8 @@ module Gym
       end
 
       def xcodebuild_log_path
-        file_name = "#{Gym.project.app_name}-#{Gym.config[:scheme]}.log"
+        app_name = Gym.config[:app_name] || Gym.project.app_name
+        file_name = "#{app_name}-#{Gym.config[:scheme]}.log"
         containing = File.expand_path(Gym.config[:buildlog_path])
         FileUtils.mkdir_p(containing)
 
