@@ -61,7 +61,7 @@ gem "xcode-install", ">= 2.6.7"
 # Used for xcov's parameters generation: https://github.com/fastlane/fastlane/pull/12416
 gem "xcov", "~> 1.9.0"
 # A documentation generation tool for Ruby.
-gem "yard", "~> 0.9.11"
+gem "yard", "~> 0.9.42"
 
 gemspec(path: ".")
 
