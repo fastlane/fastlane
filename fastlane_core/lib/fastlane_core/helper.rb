@@ -94,6 +94,7 @@ module FastlaneCore
       return "macOS" if self.mac?
       return "Windows" if self.windows?
       return "Linux" if self.linux?
+      return "Java" if RUBY_PLATFORM =~ /java/
       return "Unknown"
     end
 
