@@ -28,6 +28,14 @@ AllCops:
 Lint/ErbNewArguments:
   Enabled: false
 
+# Ruby 3.1's hash value shorthand (`{ foo: }`) is allowed, but not enforced
+Style/HashSyntax:
+  EnforcedShorthandSyntax: either
+
+# Keep explicit block arguments (`&block`) instead of Ruby 3.1's anonymous `&`
+Naming/BlockForwarding:
+  EnforcedStyle: explicit
+
 Style/SlicingWithRange:
   Enabled: false
 
