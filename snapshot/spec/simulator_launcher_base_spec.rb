@@ -3,6 +3,64 @@ describe Snapshot do
     let(:device_udid) { "123456789" }
     let(:paths) { ['./logo.png'] }
 
+    describe '#prepare_simulators_for_launch' do
+      let(:launcher_config) do
+        instance_double(
+          Snapshot::SimulatorLauncherConfiguration,
+          headless: headless,
+          erase_simulator: false,
+          localize_simulator: false,
+          dark_mode: nil,
+          reinstall_app: false,
+          disable_slide_to_type: false
+        )
+      end
+      let(:headless) { false }
+      let(:launcher) { Snapshot::SimulatorLauncherBase.new(launcher_configuration: launcher_config) }
+      let(:simulator_path) { "/Applications/Xcode.app/Contents/Developer/Applications/Simulator.app" }
+
+      before do
+        allow(Snapshot).to receive(:kill_simulator)
+        allow(Fastlane::Helper).to receive(:backticks)
+          .with("xcrun simctl shutdown booted", print: FastlaneCore::Globals.verbose?)
+          .and_return("")
+        allow(Snapshot::Fixes::SimulatorZoomFix).to receive(:patch)
+        allow(Snapshot::Fixes::HardwareKeyboardFix).to receive(:patch)
+        allow(Snapshot::Fixes::SharedPasteboardFix).to receive(:patch)
+        allow(Fastlane::Helper).to receive(:xcode_path).and_return("/Applications/Xcode.app/Contents/Developer")
+      end
+
+      it "opens the first requested simulator" do
+        allow(Snapshot::TestCommandGenerator).to receive(:device_udid).with("iPhone 16 Pro").and_return(device_udid)
+
+        expect(Fastlane::Helper).to receive(:backticks)
+          .with("open -a #{simulator_path} -g --args -CurrentDeviceUDID #{device_udid}", print: FastlaneCore::Globals.verbose?)
+          .and_return("")
+
+        launcher.prepare_simulators_for_launch(["iPhone 16 Pro", "iPad Pro 13-inch (M4)"])
+      end
+
+      it "preserves the generic Simulator launch when the device cannot be resolved" do
+        allow(Snapshot::TestCommandGenerator).to receive(:device_udid).with("Mac").and_return(nil)
+
+        expect(Fastlane::Helper).to receive(:backticks)
+          .with("open -a #{simulator_path} -g", print: FastlaneCore::Globals.verbose?)
+          .and_return("")
+
+        launcher.prepare_simulators_for_launch(["Mac"])
+      end
+
+      it "does not resolve or open a simulator when running headlessly" do
+        allow(launcher_config).to receive(:headless).and_return(true)
+
+        expect(Snapshot::TestCommandGenerator).not_to receive(:device_udid)
+        expect(Fastlane::Helper).not_to receive(:backticks)
+          .with(match(/^open /), print: FastlaneCore::Globals.verbose?)
+
+        launcher.prepare_simulators_for_launch(["iPhone 16 Pro"])
+      end
+    end
+
     describe '#add_media' do
       it "should call simctl addmedia", requires_xcode: true do
         allow(Snapshot::TestCommandGenerator).to receive(:device_udid).and_return(device_udid)
