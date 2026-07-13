@@ -55,8 +55,9 @@ module Fastlane
         existing_devices = Spaceship::ConnectAPI::Device.all
 
         device_objs = new_devices.map do |device|
+          normalized_udid = device[0].tr("-", "")
           existing_device = existing_devices.find do |ed|
-            ed.udid.tr("-", "").casecmp(device[0].tr("-", "")).zero?
+            ed.udid.tr("-", "").casecmp(normalized_udid).zero?
           end
 
           if existing_device
