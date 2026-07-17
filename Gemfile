@@ -11,6 +11,8 @@ gem "climate_control", "~> 0.2.0"
 gem "coveralls", "~> 0.8.13"
 # Automates code review chores.
 gem "danger", "~> 9.0"
+# erb >= 5.0 (pulled in transitively by irb -> rdoc) requires Ruby >= 3.2, while fastlane supports Ruby >= 3.0.
+gem "erb", "< 5.0"
 # A fake filesystem.
 # Version 3.0.2 requires Ruby >=3.2, while fastlane uses a `required_ruby_version` of `>= 3.0`.
 gem "fakefs", ['>= 1.8', '< 3.0.2']
@@ -44,6 +46,8 @@ gem "rake"
 # A readline implementation in Ruby
 # See: https://github.com/deivid-rodriguez/byebug/issues/289#issuecomment-251383465
 gem "rb-readline"
+# rdoc >= 8.0 (pulled in transitively by irb) requires Ruby >= 3.2, while fastlane supports Ruby >= 3.0.
+gem "rdoc", "< 8.0"
 # Behavior-driven testing tool for Ruby.
 gem "rspec", "~> 3.10"
 # A Ruby static code analyzer and formatter.
