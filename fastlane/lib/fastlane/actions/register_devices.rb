@@ -55,8 +55,14 @@ module Fastlane
         existing_devices = Spaceship::ConnectAPI::Device.all
 
         device_objs = new_devices.map do |device|
-          if existing_devices.map(&:udid).map(&:downcase).include?(device[0].downcase)
-            UI.verbose("UDID #{device[0]} already exists - Skipping...")
+          normalized_udid = device[0].tr("-", "")
+          existing_device = existing_devices.find do |ed|
+            ed.udid.tr("-", "").casecmp(normalized_udid).zero?
+          end
+
+          if existing_device
+            UI.verbose("UDID #{existing_device.udid} already exists - Skipping...")
+
             next
           end
 
@@ -74,8 +80,12 @@ module Fastlane
           try_create_device(name: device[1], platform: device_platform, udid: device[0])
         end
 
-        UI.success("Successfully registered new devices.")
-        return device_objs
+        if device_objs.compact.empty?
+          UI.success("No new devices to register")
+        else
+          UI.success("Successfully registered new devices.")
+        end
+        return device_objs.compact
       end
 
       def self.try_create_device(name: nil, platform: nil, udid: nil)

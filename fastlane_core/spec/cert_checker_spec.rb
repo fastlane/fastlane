@@ -59,6 +59,18 @@ describe FastlaneCore do
 
         expect(FastlaneCore::CertChecker.installed_wwdr_certificates).to eq([])
       end
+
+      it "should find Developer ID certificates by their own common name" do
+        expect(FastlaneCore::CertChecker).to receive(:wwdr_keychain).and_return('login.keychain')
+
+        expect(FastlaneCore::Helper).to receive(:backticks).with(/security find-certificate -a -c 'Apple Worldwide Developer Relations'/, { print: false }).and_return("")
+        expect(FastlaneCore::Helper).to receive(:backticks).with(/security find-certificate -a -c 'Developer ID Certification Authority'/, { print: false }).and_return("-----BEGIN CERTIFICATE-----\nDEV-ID-G2\n-----END CERTIFICATE-----\n")
+
+        allow(Digest::SHA256).to receive(:hexdigest).with(cert.to_der).and_return('f16cd3c54c7f83cea4bf1a3e6a0819c8aaa8e4a1528fd144715f350643d2df3a')
+        allow(OpenSSL::X509::Certificate).to receive(:new).and_return(cert)
+
+        expect(FastlaneCore::CertChecker.installed_wwdr_certificates).to eq(['DEV-ID-G2'])
+      end
     end
 
     describe '#install_missing_wwdr_certificates' do
@@ -116,7 +128,7 @@ describe FastlaneCore do
 
       it 'should shell escape keychain names when checking for installation' do
         expect(FastlaneCore::CertChecker).to receive(:wwdr_keychain).and_return(keychain_name)
-        expect(FastlaneCore::Helper).to receive(:backticks).with(name_regex, { print: false }).and_return("")
+        expect(FastlaneCore::Helper).to receive(:backticks).with(name_regex, { print: false }).twice.and_return("")
 
         FastlaneCore::CertChecker.installed_wwdr_certificates
       end
