@@ -1,4 +1,16 @@
 describe Match do
+  context "#environments" do
+    it "contains pass_type_id" do
+      expect(Match.environments).to include("pass_type_id")
+    end
+  end
+
+  context "#cert_type_sym" do
+    it "maps pass_type_id to :pass_type_id" do
+      expect(Match.cert_type_sym("pass_type_id")).to eq(:pass_type_id)
+    end
+  end
+
   context "#profile_types" do
     it "profile types for appstore" do
       profiles = Match.profile_types("appstore")

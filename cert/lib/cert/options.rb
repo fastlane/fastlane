@@ -21,9 +21,13 @@ module Cert
                                      optional: true,
                                      verify_block: proc do |value|
                                        value = value.to_s
-                                       types = %w(mac_installer_distribution developer_id_installer developer_id_application developer_id_kext)
+                                       types = %w(mac_installer_distribution developer_id_installer developer_id_application developer_id_kext pass_type_id)
                                        UI.user_error!("Unsupported types, must be: #{types}") unless types.include?(value)
                                      end),
+        FastlaneCore::ConfigItem.new(key: :identifier,
+                                     env_name: "CERT_IDENTIFIER",
+                                     description: "The identifier the certificate type is associated with, for certificate types that are bound to an identifier (e.g. the Pass Type ID identifier 'pass.com.example.mypass' when :type is 'pass_type_id'). The identifier needs to be registered on the Developer Portal before use",
+                                     optional: true),
         FastlaneCore::ConfigItem.new(key: :force,
                                      env_name: "CERT_FORCE",
                                      description: "Create a certificate even if an existing certificate exists",

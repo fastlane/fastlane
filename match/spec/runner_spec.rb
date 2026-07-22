@@ -63,7 +63,7 @@ describe Match do
           expect(fake_storage).to receive(:clear_changes).and_return(nil)
           allow(fake_storage).to receive(:working_directory).and_return(repo_dir)
           allow(fake_storage).to receive(:prefixed_working_directory).and_return(repo_dir)
-          expect(Match::Generator).to receive(:generate_certificate).with(config, :distribution, fake_storage.working_directory, specific_cert_type: nil).and_return(cert_path)
+          expect(Match::Generator).to receive(:generate_certificate).with(config, :distribution, fake_storage.working_directory, specific_cert_type: nil, identifier: nil).and_return(cert_path)
           expect(Match::Generator).to receive(:generate_provisioning_profile).with(params: config,
                                                                                 prov_type: :appstore,
                                                                            certificate_id: "something",
@@ -289,7 +289,7 @@ describe Match do
 
           # Certificates
           # Ensure a new certificate is not generated.
-          expect(Match::Generator).not_to receive(:generate_certificate).with(match_config, :distribution, fake_storage.working_directory, specific_cert_type: nil)
+          expect(Match::Generator).not_to receive(:generate_certificate).with(match_config, :distribution, fake_storage.working_directory, specific_cert_type: nil, identifier: nil)
 
           # Profiles
           begin # Ensure profiles are installed, but not validated.
@@ -357,7 +357,7 @@ describe Match do
 
           # Certificate generator
           # Ensure a new certificate is generated.
-          expect(Match::Generator).to receive(:generate_certificate).with(match_config, :distribution, fake_storage.working_directory, specific_cert_type: nil).and_return(new_stored_valid_cert_path)
+          expect(Match::Generator).to receive(:generate_certificate).with(match_config, :distribution, fake_storage.working_directory, specific_cert_type: nil, identifier: nil).and_return(new_stored_valid_cert_path)
 
           # Spaceship ensure helper
           spaceship_ensure = create_fake_spaceship_ensure
@@ -488,7 +488,7 @@ describe Match do
           expect(fake_storage).to receive(:clear_changes).and_return(nil)
           allow(fake_storage).to receive(:working_directory).and_return(repo_dir)
           allow(fake_storage).to receive(:prefixed_working_directory).and_return(repo_dir)
-          expect(Match::Generator).to receive(:generate_certificate).with(config, :distribution, fake_storage.working_directory, specific_cert_type: nil).and_return(cert_path)
+          expect(Match::Generator).to receive(:generate_certificate).with(config, :distribution, fake_storage.working_directory, specific_cert_type: nil, identifier: nil).and_return(cert_path)
           expect(Match::Generator).to_not(receive(:generate_provisioning_profile))
           expect(FastlaneCore::ProvisioningProfile).to_not(receive(:install))
           expect(fake_storage).to receive(:save_changes!).with(
@@ -542,6 +542,78 @@ describe Match do
             Match::Runner.new.run(config)
           end.to raise_error("You defined the profile type 'enterprise', but your Apple account doesn't support In-House profiles")
         end
+      end
+    end
+
+    describe "pass_type_id type" do
+      before do
+        allow(FastlaneCore::Helper).to receive(:mac?).and_return(true)
+        stub_const('ENV', { "MATCH_PASSWORD" => '2"QAHg@v(Qp{=*n^' })
+      end
+
+      it "creates a pass type id certificate and skips provisioning profiles", requires_security: true do
+        git_url = "https://github.com/fastlane/fastlane/tree/master/certificates"
+        values = {
+          app_identifier: "pass.com.example.mypass",
+          type: "pass_type_id",
+          git_url: git_url,
+          username: "flapple@something.com"
+        }
+
+        config = FastlaneCore::Configuration.create(Match::Options.available_options, values)
+        repo_dir = Dir.mktmpdir
+        cert_path = File.join(repo_dir, "something.cer")
+
+        create_fake_cache
+        fake_storage = create_fake_storage(match_config: config, repo_dir: repo_dir)
+
+        expect(Match::Generator).to receive(:generate_certificate).with(config, :pass_type_id, repo_dir, specific_cert_type: nil, identifier: "pass.com.example.mypass").and_return(cert_path)
+        expect(Match::Generator).not_to receive(:generate_provisioning_profile)
+
+        expect(fake_storage).to receive(:save_changes!).with(
+          files_to_commit: [
+            cert_path,
+            File.join(repo_dir, "something.p12")
+          ],
+          files_to_delete: []
+        )
+
+        spaceship = "spaceship"
+        allow(spaceship).to receive(:team_id).and_return("")
+        expect(Match::SpaceshipEnsure).to receive(:new).and_return(spaceship)
+        expect(spaceship).to receive(:pass_type_id_exists).with(username: "flapple@something.com", pass_type_identifier: "pass.com.example.mypass").and_return(true)
+        expect(spaceship).not_to receive(:bundle_identifier_exists)
+        expect(spaceship).to receive(:certificates_exists).and_return(true)
+
+        Match::Runner.new.run(config)
+      end
+
+      it "fails when multiple pass type identifiers are given" do
+        values = {
+          app_identifier: ["pass.com.example.a", "pass.com.example.b"],
+          type: "pass_type_id",
+          git_url: "https://github.com/fastlane/fastlane/tree/master/certificates",
+          username: "flapple@something.com"
+        }
+        config = FastlaneCore::Configuration.create(Match::Options.available_options, values)
+
+        expect do
+          Match::Runner.new.run(config)
+        end.to raise_error(/Only one Pass Type ID identifier can be synced/)
+      end
+
+      it "fails when the identifier does not start with 'pass.'" do
+        values = {
+          app_identifier: "com.example.app",
+          type: "pass_type_id",
+          git_url: "https://github.com/fastlane/fastlane/tree/master/certificates",
+          username: "flapple@something.com"
+        }
+        config = FastlaneCore::Configuration.create(Match::Options.available_options, values)
+
+        expect do
+          Match::Runner.new.run(config)
+        end.to raise_error(/Pass Type ID identifiers need to start with 'pass\.'/)
       end
     end
 

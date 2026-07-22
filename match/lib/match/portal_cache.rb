@@ -8,14 +8,23 @@ module Match
         require_relative 'profile_includes'
         require 'sigh'
 
-        profile_type = Sigh.profile_type_for_distribution_type(
-          platform: params[:platform],
-          distribution_type: params[:type]
-        )
+        # Pass Type ID certificates don't use provisioning profiles,
+        # so there is no profile type to determine certificate types from
+        if params[:type] == "pass_type_id"
+          profile_type = nil
+          certificate_types = [Spaceship::ConnectAPI::Certificate::CertificateType::PASS_TYPE_ID]
+        else
+          profile_type = Sigh.profile_type_for_distribution_type(
+            platform: params[:platform],
+            distribution_type: params[:type]
+          )
+          certificate_types = nil
+        end
 
         cache = Portal::Cache.new(
           platform: params[:platform],
           profile_type: profile_type,
+          certificate_types: certificate_types,
           additional_cert_types: params[:additional_cert_types],
           bundle_id_identifiers: bundle_id_identifiers,
           needs_profiles_devices: ProfileIncludes.can_force_include_all_devices?(params: params, notify: true),
@@ -26,11 +35,12 @@ module Match
         return cache
       end
 
-      attr_reader :platform, :profile_type, :bundle_id_identifiers, :additional_cert_types, :needs_profiles_devices, :needs_profiles_certificate_content, :include_mac_in_profiles
+      attr_reader :platform, :profile_type, :certificate_types, :bundle_id_identifiers, :additional_cert_types, :needs_profiles_devices, :needs_profiles_certificate_content, :include_mac_in_profiles
 
-      def initialize(platform:, profile_type:, additional_cert_types:, bundle_id_identifiers:, needs_profiles_devices:, needs_profiles_certificate_content:, include_mac_in_profiles:)
+      def initialize(platform:, profile_type:, additional_cert_types:, bundle_id_identifiers:, needs_profiles_devices:, needs_profiles_certificate_content:, include_mac_in_profiles:, certificate_types: nil)
         @platform = platform
         @profile_type = profile_type
+        @certificate_types = certificate_types
 
         # Bundle Ids
         @bundle_id_identifiers = bundle_id_identifiers
@@ -77,7 +87,8 @@ module Match
         @certificates ||= Match::Portal::Fetcher.certificates(
           platform: @platform,
           profile_type: @profile_type,
-          additional_cert_types: @additional_cert_types
+          additional_cert_types: @additional_cert_types,
+          certificate_types: @certificate_types
         )
 
         return @certificates.dup

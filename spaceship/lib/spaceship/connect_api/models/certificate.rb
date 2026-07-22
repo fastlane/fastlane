@@ -42,6 +42,8 @@ module Spaceship
         DEVELOPER_ID_KEXT = "DEVELOPER_ID_KEXT"
         DEVELOPER_ID_APPLICATION = "DEVELOPER_ID_APPLICATION"
         DEVELOPER_ID_APPLICATION_G2 = "DEVELOPER_ID_APPLICATION_G2"
+        PASS_TYPE_ID = "PASS_TYPE_ID"
+        PASS_TYPE_ID_WITH_NFC = "PASS_TYPE_ID_WITH_NFC"
 
         # As of 2021-11-09, this is only available with Apple ID auth
         DEVELOPER_ID_INSTALLER = "DEVELOPER_ID_INSTALLER"
@@ -116,13 +118,26 @@ module Spaceship
         return certs
       end
 
-      def self.create(client: nil, certificate_type: nil, csr_content: nil)
+      # @param pass_type_id (String): The id of the passTypeIds resource, required when
+      #   creating a PASS_TYPE_ID or PASS_TYPE_ID_WITH_NFC certificate
+      def self.create(client: nil, certificate_type: nil, csr_content: nil, pass_type_id: nil)
         client ||= Spaceship::ConnectAPI
         attributes = {
           certificateType: certificate_type,
           csrContent: csr_content
         }
-        resp = client.post_certificate(attributes: attributes)
+        relationships = nil
+        if pass_type_id
+          relationships = {
+            passTypeId: {
+              data: {
+                type: "passTypeIds",
+                id: pass_type_id
+              }
+            }
+          }
+        end
+        resp = client.post_certificate(attributes: attributes, relationships: relationships)
         return resp.to_models.first
       end
 

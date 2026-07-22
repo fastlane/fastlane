@@ -71,6 +71,46 @@ describe Spaceship::ConnectAPI::Certificate do
     end
   end
 
+  describe '#create' do
+    it 'creates a certificate without relationships by default' do
+      expect(Spaceship::ConnectAPI).to receive(:post_certificate).with(
+        attributes: {
+          certificateType: Spaceship::ConnectAPI::Certificate::CertificateType::IOS_DISTRIBUTION,
+          csrContent: "csr content"
+        },
+        relationships: nil
+      ).and_return(double(to_models: []))
+
+      Spaceship::ConnectAPI::Certificate.create(
+        certificate_type: Spaceship::ConnectAPI::Certificate::CertificateType::IOS_DISTRIBUTION,
+        csr_content: "csr content"
+      )
+    end
+
+    it 'creates a Pass Type ID certificate with a passTypeId relationship' do
+      expect(Spaceship::ConnectAPI).to receive(:post_certificate).with(
+        attributes: {
+          certificateType: Spaceship::ConnectAPI::Certificate::CertificateType::PASS_TYPE_ID,
+          csrContent: "csr content"
+        },
+        relationships: {
+          passTypeId: {
+            data: {
+              type: "passTypeIds",
+              id: "4B77K434AB"
+            }
+          }
+        }
+      ).and_return(double(to_models: []))
+
+      Spaceship::ConnectAPI::Certificate.create(
+        certificate_type: Spaceship::ConnectAPI::Certificate::CertificateType::PASS_TYPE_ID,
+        csr_content: "csr content",
+        pass_type_id: "4B77K434AB"
+      )
+    end
+  end
+
   describe '#valid?' do
     let!(:certificate) do
       certificates_response = JSON.parse(File.read(File.join('spaceship', 'spec', 'connect_api', 'fixtures', 'provisioning', 'certificates.json')))

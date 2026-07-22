@@ -13,6 +13,7 @@ require 'spaceship/connect_api/models/bundle_id'
 require 'spaceship/connect_api/models/capabilities'
 require 'spaceship/connect_api/models/certificate'
 require 'spaceship/connect_api/models/device'
+require 'spaceship/connect_api/models/pass_type_id'
 require 'spaceship/connect_api/models/profile'
 
 require 'spaceship/connect_api/models/user'
