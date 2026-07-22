@@ -4,14 +4,14 @@ require_relative 'profile_includes'
 module Match
   # Generate missing resources
   class Generator
-    def self.generate_certificate(params, cert_type, working_directory, specific_cert_type: nil)
+    def self.generate_certificate(params, cert_type, working_directory, specific_cert_type: nil, identifier: nil)
       require 'cert/runner'
       require 'cert/options'
 
       output_path = File.join(working_directory, "certs", cert_type.to_s)
 
-      # Mapping match option to cert option for "Developer ID Application"
-      if cert_type.to_sym == :developer_id_application
+      # Mapping match option to cert option for "Developer ID Application" and "Pass Type ID"
+      if [:developer_id_application, :pass_type_id].include?(cert_type.to_sym)
         specific_cert_type = cert_type.to_s
       end
 
@@ -24,6 +24,7 @@ module Match
         platform: platform,
         development: params[:type] == "development",
         type: specific_cert_type,
+        identifier: identifier,
         generate_apple_certs: params[:generate_apple_certs],
         output_path: output_path,
         force: true, # we don't need a certificate without its private key, we only care about a new certificate

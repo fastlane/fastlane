@@ -264,6 +264,22 @@ git_branch("master")
 
 _match_ will reuse certificates and will create separate provisioning profiles for each app.
 
+#### Pass Type ID (Wallet pass) certificates
+
+_match_ can also create and sync Pass Type ID certificates (historically known as Passbook certificates), which are used to sign Apple Wallet passes. Pass the Pass Type ID identifier (it always starts with `pass.`) as the `app_identifier`:
+
+```no-highlight
+fastlane match pass_type_id --app_identifier pass.com.example.mypass
+```
+
+or in your `Fastfile`:
+
+```ruby-skip-tests
+match(type: "pass_type_id", app_identifier: "pass.com.example.mypass")
+```
+
+The Pass Type ID needs to be [registered on the Apple Developer Portal](https://developer.apple.com/account/resources/identifiers/list/passTypeId) first. Since Pass Type ID certificates don't use provisioning profiles, only the certificate and its private key are created and synced. Note that only one Pass Type ID identifier can be synced per _match_ run - use separate storage (e.g. a separate git branch) for each Pass Type ID.
+
 #### Passphrase
 
 *Git Repo storage only*

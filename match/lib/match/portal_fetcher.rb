@@ -24,9 +24,9 @@ module Match
         profiles
       end
 
-      def self.certificates(platform:, profile_type:, additional_cert_types:)
+      def self.certificates(platform:, profile_type:, additional_cert_types: nil, certificate_types: nil)
         require 'sigh'
-        certificate_types = Sigh.certificate_types_for_profile_and_platform(platform: platform, profile_type: profile_type)
+        certificate_types ||= Sigh.certificate_types_for_profile_and_platform(platform: platform, profile_type: profile_type)
 
         additional_cert_types ||= []
         additional_cert_types.map! do |cert_type|
