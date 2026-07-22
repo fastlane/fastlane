@@ -131,5 +131,48 @@ describe Pilot::TesterManager do
         tester_manager.remove_tester(remove_tester_options)
       end
     end
+
+    describe "when asked to find an existing tester" do
+      let(:fake_app_id) { "123456789" }
+      let(:find_tester_options) do
+        FastlaneCore::Configuration.create(Pilot::Options.available_options, {
+          apple_id: fake_app_id,
+          email: fake_tester.email
+        })
+      end
+      let(:fake_metric) do
+        Spaceship::ConnectAPI::BetaTesterMetric.new("m1", {
+          betaTesterState: "INSTALLED",
+          installedCfBundleShortVersionString: "1.0.0",
+          installedCfBundleVersion: "100"
+        })
+      end
+      let(:fake_metrics_filter) { { apps: fake_app_id, betaTesters: fake_tester.id } }
+      let(:fake_metrics_response) { double("metrics_response", to_models: [fake_metric]) }
+
+      before(:each) do
+        allow(tester_manager).to receive(:find_app_tester).and_return(fake_tester)
+        allow(fake_app).to receive(:id).and_return(fake_app_id)
+        allow(Terminal::Table).to receive(:new)
+      end
+
+      it "returns tester with metrics fetched and assigned" do
+        allow(Spaceship::ConnectAPI).to receive(:get_beta_tester_metrics)
+          .with(filter: fake_metrics_filter)
+          .and_return(fake_metrics_response)
+
+        tester = tester_manager.find_tester(find_tester_options)
+
+        expect(tester.beta_tester_metrics).to eq([fake_metric])
+      end
+
+      it "fetches metrics from the dedicated endpoint for the correct app and tester" do
+        expect(Spaceship::ConnectAPI).to receive(:get_beta_tester_metrics)
+          .with(filter: fake_metrics_filter)
+          .and_return(fake_metrics_response)
+
+        tester_manager.find_tester(find_tester_options)
+      end
+    end
   end
 end
