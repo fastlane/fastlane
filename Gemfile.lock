@@ -27,10 +27,9 @@ PATH
       gh_inspector (>= 1.1.2, < 2.0.0)
       google-apis-androidpublisher_v3 (~> 0.3)
       google-apis-playcustomapp_v1 (~> 0.1)
-      google-cloud-env (>= 1.6.0, < 2.3.0)
+      google-cloud-env (>= 1.6.0, < 2.4.0)
       google-cloud-storage (~> 1.31)
       highline (~> 2.0)
-      http-cookie (~> 1.0.5)
       json (< 3.0.0)
       jwt (>= 2.10.3, < 4)
       logger (>= 1.6, < 2.0)
@@ -183,8 +182,9 @@ GEM
     google-cloud-core (1.6.1)
       google-cloud-env (>= 1.0, < 3.a)
       google-cloud-errors (~> 1.0)
-    google-cloud-env (1.6.0)
-      faraday (>= 0.17.3, < 3.0)
+    google-cloud-env (2.3.1)
+      base64 (~> 0.2)
+      faraday (>= 1.0, < 3.a)
     google-cloud-errors (1.3.1)
     google-cloud-storage (1.45.0)
       addressable (~> 2.8)
@@ -202,12 +202,12 @@ GEM
       signet (>= 0.16, < 2.a)
     hashdiff (1.1.1)
     highline (2.0.3)
-    http-cookie (1.0.8)
+    http-cookie (1.1.6)
       domain_name (~> 0.5)
     httpclient (2.8.3)
     interception (0.5)
     jmespath (1.6.2)
-    json (2.5.1)
+    json (2.21.1)
     jwt (2.10.3)
       base64
     kramdown (2.5.2)
@@ -417,4 +417,4 @@ DEPENDENCIES
   yard (~> 0.9.42)
 
 BUNDLED WITH
-   2.5.23
+   2.6.9
