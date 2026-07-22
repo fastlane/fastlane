@@ -80,7 +80,6 @@ Gem::Specification.new do |spec|
   spec.add_dependency('google-cloud-env', '>= 1.6.0', '< 2.4.0') # Must be < 2.4.0 to support Ruby 3.1
   spec.add_dependency('google-cloud-storage', '~> 1.31') # Access Google Cloud Storage for match
   spec.add_dependency('highline', '~> 2.0') # user inputs (e.g. passwords)
-  spec.add_dependency('http-cookie', '~> 1.0.5') # Must be 1.0.5+ for Ruby 3 compatibility: https://github.com/sparklemotion/http-cookie/commit/d12449a983d3dd660c5fe1f2b135c35e83755cc3
   spec.add_dependency('json', '< 3.0.0') # Because sometimes it's just not installed
   spec.add_dependency('jwt', '>= 2.10.3', '< 4') # Used for generating authentication tokens for App Store Connect API
   spec.add_dependency('mini_magick', '>= 4.9.4', '< 5.0.0') # To open, edit and export PSD files
