@@ -226,6 +226,13 @@ _fastlane_ tracks a few key metrics to understand how developers are using the t
 
 * The number of _fastlane_ runs
 * A salted hash of the app identifier or package name, which helps us anonymously identify unique usage of _fastlane_
+* How _fastlane_ is executed (Swift vs Ruby)
+* The _fastlane_ version
+* How _fastlane_ was installed (Homebrew, gem, bundler, etc)
+* The Ruby version
+* The Operating System in use
+* The Xcode version
+* Whether it was run in non-interactively or interactively
 
 You can easily opt-out of metrics collection by adding `opt_out_usage` at the top of your `Fastfile` or by setting the environment variable `FASTLANE_OPT_OUT_USAGE`. [Check out the metrics code on GitHub](https://github.com/fastlane/fastlane/tree/master/fastlane_core/lib/fastlane_core/analytics)
 
