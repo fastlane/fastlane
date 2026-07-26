@@ -16,37 +16,69 @@ module Supply
     def self.make_from_config(params: nil)
       params ||= Supply.config
       service_account_data = self.service_account_authentication(params: params)
-      return self.new(service_account_json: service_account_data, params: params)
+
+      if service_account_data
+        return self.new(service_account_json: service_account_data, params: params)
+      end
+
+      # No explicit credentials — try Application Default Credentials discovery
+      # (GOOGLE_APPLICATION_CREDENTIALS env var, ~/.config/gcloud/application_default_credentials.json, or GCE metadata)
+      UI.verbose("No json_key provided, attempting Application Default Credentials...")
+      begin
+        auth_client = Google::Auth.get_application_default(self::SCOPE)
+        return self.new(auth_client: auth_client, params: params)
+      rescue RuntimeError => e
+        UI.verbose("Application Default Credentials not available: #{e.message}")
+      end
+
+      if UI.interactive?
+        UI.important("To not be asked about this value, you can specify it using 'json_key'")
+        json_key_path = UI.input("The service account json file used to authenticate with Google: ")
+        json_key_path = File.expand_path(json_key_path)
+        UI.user_error!("Could not find service account json file at path '#{json_key_path}'") unless File.exist?(json_key_path)
+        params[:json_key] = json_key_path
+        return self.new(service_account_json: File.open(json_key_path), params: params)
+      else
+        UI.user_error!("Could not load Google credentials. Provide 'json_key'/'json_key_data', set GOOGLE_APPLICATION_CREDENTIALS, or run: gcloud auth application-default login --scopes=openid,email,https://www.googleapis.com/auth/androidpublisher")
+      end
     end
 
     # Supply authentication file
+    # Returns an IO object for the credentials file, or nil if no explicit credentials were provided.
     def self.service_account_authentication(params: nil)
-      unless params[:json_key] || params[:json_key_data]
-        if UI.interactive?
-          UI.important("To not be asked about this value, you can specify it using 'json_key'")
-          json_key_path = UI.input("The service account json file used to authenticate with Google: ")
-          json_key_path = File.expand_path(json_key_path)
-
-          UI.user_error!("Could not find service account json file at path '#{json_key_path}'") unless File.exist?(json_key_path)
-          params[:json_key] = json_key_path
-        else
-          UI.user_error!("Could not load Google authentication. Make sure it has been added as an environment variable in 'json_key' or 'json_key_data'")
-        end
-      end
-
       if params[:json_key]
-        service_account_json = File.open(File.expand_path(params[:json_key]))
+        File.open(File.expand_path(params[:json_key]))
       elsif params[:json_key_data]
-        service_account_json = StringIO.new(params[:json_key_data])
+        StringIO.new(params[:json_key_data])
       end
-
-      service_account_json
     end
 
     # Initializes the service and its auth_client using the specified information
     # @param service_account_json: The raw service account Json data
-    def initialize(service_account_json: nil, params: nil)
-      auth_client = Google::Auth::ServiceAccountCredentials.make_creds(json_key_io: service_account_json, scope: self.class::SCOPE)
+    # @param auth_client: A pre-built auth client (e.g. from Application Default Credentials discovery)
+    def initialize(service_account_json: nil, auth_client: nil, params: nil)
+      if auth_client.nil?
+        # decode the json and check its type
+        begin
+          json_content = service_account_json.read
+          google_credentials = JSON.parse(json_content)
+          service_account_json.rewind
+        rescue JSON::ParserError
+          UI.user_error!("Invalid Google Credentials file provided - unable to parse json.")
+        end
+
+        # use correct credential class based on type
+        case google_credentials['type']
+        when "authorized_user"
+          auth_client = Google::Auth::UserRefreshCredentials.make_creds(json_key_io: service_account_json, scope: self.class::SCOPE)
+        when "external_account"
+          auth_client = Google::Auth::ExternalAccount::Credentials.make_creds(json_key_io: service_account_json, scope: self.class::SCOPE)
+        when "service_account"
+          auth_client = Google::Auth::ServiceAccountCredentials.make_creds(json_key_io: service_account_json, scope: self.class::SCOPE)
+        else
+          UI.user_error!("Invalid Google Credentials file provided - no credential type found.")
+        end
+      end
 
       UI.verbose("Fetching a new access token from Google...")
 
@@ -89,6 +121,11 @@ module Supply
 
       if error
         message = error["error"] && error["error"]["message"]
+        details = error["error"] && error["error"]["details"]
+        if details&.any? { |d| d["reason"] == "ACCESS_TOKEN_SCOPE_INSUFFICIENT" }
+          UI.important("Your credentials are missing the required scope. If using Application Default Credentials, re-run:")
+          UI.important("  gcloud auth application-default login --scopes=openid,email,https://www.googleapis.com/auth/androidpublisher")
+        end
       else
         message = e.body
       end
@@ -120,7 +157,7 @@ module Supply
     def self.service_account_authentication(params: nil)
       if params[:json_key] || params[:json_key_data]
         super(params: params)
-      elsif params[:key] && params[:issuer]
+      elsif params.respond_to?(:all_keys) && params.all_keys.include?(:key) && params[:key] && params[:issuer]
         require 'google/api_client/auth/key_utils'
         UI.important("This type of authentication is deprecated. Please consider using JSON authentication instead")
         key = Google::APIClient::KeyUtils.load_from_pkcs12(File.expand_path(params[:key]), 'notasecret')
@@ -130,8 +167,6 @@ module Supply
         }
         service_account_json = StringIO.new(JSON.dump(cred_json))
         service_account_json
-      else
-        UI.user_error!("No authentication parameters were specified. These must be provided in order to authenticate with Google")
       end
     end
 
@@ -270,7 +305,7 @@ module Supply
       ensure_active_edit!
 
       # Verify that tracks have releases
-      filtered_tracks = tracks.select { |t| !t.releases.nil? && t.releases.any? { |r| r.name == version } }
+      filtered_tracks = tracks.select { |t| !t.releases.nil? && t.releases.any? { |r| r&.name == version } }
 
       if filtered_tracks.length > 1
         # Prefer tracks in production, beta, alpha, internal order
@@ -286,7 +321,7 @@ module Supply
         UI.message("Found '#{version}' in '#{filtered_track.track}' track.")
       end
 
-      filtered_release = filtered_track.releases.first { |r| !r.name.nil? && r.name == version }
+      filtered_release = filtered_track.releases.first { |r| !(r&.name).nil? && r&.name == version }
 
       # Since we can release on Internal/Alpha/Beta without release notes.
       if filtered_release.release_notes.nil?
@@ -300,13 +335,13 @@ module Supply
     end
 
     def latest_version(track)
-      latest_version = tracks.select { |t| t.track == Supply::Tracks::DEFAULT }.map(&:releases).flatten.reject { |r| r.name.nil? }.max_by(&:name)
+      latest_version = tracks.select { |t| t.track == Supply::Tracks::DEFAULT }.map(&:releases).flatten.reject { |r| (r&.name).nil? }.max_by(&:name)
 
       # Check if user specified '--track' option if version information from 'production' track is nil
       if latest_version.nil? && track == Supply::Tracks::DEFAULT
         UI.user_error!(%(Unable to find latest version information from "#{Supply::Tracks::DEFAULT}" track. Please specify track information by using the '--track' option.))
       else
-        latest_version = tracks.select { |t| t.track == track }.map(&:releases).flatten.reject { |r| r.name.nil? }.max_by(&:name)
+        latest_version = tracks.select { |t| t.track == track }.map(&:releases).flatten.reject { |r| (r&.name).nil? }.max_by(&:name)
       end
 
       return latest_version
@@ -471,38 +506,33 @@ module Supply
       end
     end
 
-    # Get list of version codes for track
-    def track_version_codes(track)
+    def get_edit_track(track)
       ensure_active_edit!
 
       begin
-        result = client.get_edit_track(
+        client.get_edit_track(
           current_package_name,
           current_edit.id,
           track
         )
-        return result.releases.flat_map(&:version_codes) || []
       rescue Google::Apis::ClientError => e
-        return [] if e.status_code == 404 && (e.to_s.include?("trackEmpty") || e.to_s.include?("Track not found"))
-        raise
+        text = [e.message, e.body.to_s].compact.join("\n").downcase
+        is_empty = text.include?("track empty") || text.include?("trackempty") || text.include?("track not found")
+        raise unless e.status_code == 404 && is_empty
+        nil
       end
+    end
+
+    # Get list of version codes for track
+    def track_version_codes(track)
+      result = get_edit_track(track)
+      result&.releases&.flat_map(&:version_codes) || []
     end
 
     # Get list of release names for track
     def track_releases(track)
-      ensure_active_edit!
-
-      begin
-        result = client.get_edit_track(
-          current_package_name,
-          current_edit.id,
-          track
-        )
-        return result.releases || []
-      rescue Google::Apis::ClientError => e
-        return [] if e.status_code == 404 && e.to_s.include?("trackEmpty")
-        raise
-      end
+      result = get_edit_track(track)
+      result&.releases || []
     end
 
     def upload_changelogs(track, track_name)

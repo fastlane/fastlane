@@ -1,5 +1,5 @@
 describe Spaceship::ConnectAPI::BuildBundleFileSizes do
-  before { Spaceship::Tunes.login }
+  include_examples "common spaceship login"
 
   describe '#Spaceship::ConnectAPI' do
     it '#get_build_bundles_build_bundle_file_sizes' do

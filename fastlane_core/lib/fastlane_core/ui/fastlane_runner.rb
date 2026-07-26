@@ -167,7 +167,7 @@ module Commander
         end
       rescue FastlaneCore::Interface::FastlaneCommonException => e # these are exceptions that we don't count as crashes
         display_user_error!(e, e.to_s)
-      rescue FastlaneCore::Interface::FastlaneError => e # user_error!
+      rescue FastlaneCore::Interface::FastlaneError, FastlaneCore::Interface::FastlaneShellError => e # user_error! or shell_error!
         rescue_fastlane_error(e)
       rescue Errno::ENOENT => e
         rescue_file_error(e)
@@ -243,10 +243,6 @@ module Commander
       ui.error(e.to_s)
       ui.error("")
       ui.error("SSL errors can be caused by various components on your local machine.")
-      if Gem::Version.new(RUBY_VERSION) < Gem::Version.new('2.1')
-        ui.error("Apple has recently changed their servers to require TLS 1.2, which may")
-        ui.error("not be available to your system installed Ruby (#{RUBY_VERSION})")
-      end
       ui.error("")
       ui.error("The best solution is to use the self-contained fastlane version.")
       ui.error("Which ships with a bundled OpenSSL,ruby and all gems - so you don't depend on system libraries")

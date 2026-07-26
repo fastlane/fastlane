@@ -7,7 +7,27 @@
         "lastName" : "AreCute",
         "email" : "email@email.com",
         "inviteType" : "EMAIL",
-        "invitation" : null
+        "isDeleted": false,
+        "betaTesterState": "INSTALLED",
+        "lastModifiedDate": "2024-01-21T20:52:18.921-08:00",
+        "installedCfBundleShortVersionString": "1.3.300",
+        "installedCfBundleVersion": "1113",
+        "removeAfterDate": "2024-04-20T00:00:00-07:00",
+        "latestExpiringCfBundleShortVersionString": "1.3.300",
+        "latestExpiringCfBundleVersionString": "1113",
+        "installedDevice": "iPhone14_7",
+        "installedOsVersion": "17.2.1",
+        "installedDevicePlatform": "IOS",
+        "latestInstalledDevice": "iPhone14_7",
+        "latestInstalledOsVersion": "17.2.1",
+        "latestInstalledDevicePlatform": "IOS",
+        "numberOfInstalledDevices": 1.0,
+        "appDevices": [{
+          "model": "iPhone14_7",
+          "platform": "IOS",
+          "osVersion": "17.2.1",
+          "appBuildVersion": "1.3.300 (1113)"
+        }]
       },
       "relationships" : {
         "apps" : {

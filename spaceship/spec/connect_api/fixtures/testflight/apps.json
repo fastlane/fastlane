@@ -1062,10 +1062,10 @@
       "platform" : "IOS",
       "versionString" : "1.0",
       "appStoreState" : "PREPARE_FOR_SUBMISSION",
+      "appVersionState" : "PREPARE_FOR_SUBMISSION",
       "copyright" : null,
       "releaseType" : "AFTER_APPROVAL",
       "earliestReleaseDate" : null,
-      "usesIdfa" : null,
       "downloadable" : true,
       "createdDate" : "2022-07-18T11:17:21-07:00"
     },
@@ -1112,12 +1112,6 @@
           "related" : "https://api.appstoreconnect.apple.com/v1/appStoreVersions/2c2e7526-bde0-4878-b04b-89d20dd2a692/appStoreVersionSubmission"
         }
       },
-      "idfaDeclaration" : {
-        "links" : {
-          "self" : "https://api.appstoreconnect.apple.com/v1/appStoreVersions/2c2e7526-bde0-4878-b04b-89d20dd2a692/relationships/idfaDeclaration",
-          "related" : "https://api.appstoreconnect.apple.com/v1/appStoreVersions/2c2e7526-bde0-4878-b04b-89d20dd2a692/idfaDeclaration"
-        }
-      },
       "appClipDefaultExperience" : {
         "links" : {
           "self" : "https://api.appstoreconnect.apple.com/v1/appStoreVersions/2c2e7526-bde0-4878-b04b-89d20dd2a692/relationships/appClipDefaultExperience",
@@ -1147,10 +1141,10 @@
       "platform" : "IOS",
       "versionString" : "1.0",
       "appStoreState" : "PREPARE_FOR_SUBMISSION",
+      "appVersionState" : "PREPARE_FOR_SUBMISSION",
       "copyright" : null,
       "releaseType" : "AFTER_APPROVAL",
       "earliestReleaseDate" : null,
-      "usesIdfa" : null,
       "downloadable" : true,
       "createdDate" : "2022-06-14T19:38:26-07:00"
     },
@@ -1195,12 +1189,6 @@
         "links" : {
           "self" : "https://api.appstoreconnect.apple.com/v1/appStoreVersions/9e70d45f-bfc2-43a6-ab98-09fad49459f1/relationships/appStoreVersionSubmission",
           "related" : "https://api.appstoreconnect.apple.com/v1/appStoreVersions/9e70d45f-bfc2-43a6-ab98-09fad49459f1/appStoreVersionSubmission"
-        }
-      },
-      "idfaDeclaration" : {
-        "links" : {
-          "self" : "https://api.appstoreconnect.apple.com/v1/appStoreVersions/9e70d45f-bfc2-43a6-ab98-09fad49459f1/relationships/idfaDeclaration",
-          "related" : "https://api.appstoreconnect.apple.com/v1/appStoreVersions/9e70d45f-bfc2-43a6-ab98-09fad49459f1/idfaDeclaration"
         }
       },
       "appClipDefaultExperience" : {

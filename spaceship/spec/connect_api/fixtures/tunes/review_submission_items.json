@@ -34,7 +34,6 @@
       "copyright" : "ACME Apps 2021",
       "downloadable" : true,
       "earliestReleaseDate" : null,
-      "usesIdfa" : true,
       "versionString" : "1.0.1",
       "promotedDate" : null,
       "platform" : "IOS",
@@ -46,19 +45,14 @@
       "isWatchOnly" : false,
       "createdDate" : "2021-01-01T10:10:10-07:00",
       "releaseType" : "MANUAL",
-      "appStoreState" : "READY_FOR_REVIEW"
+      "appStoreState" : "READY_FOR_REVIEW",
+      "appVersionState" : "READY_FOR_REVIEW"
     },
     "relationships" : {
       "appStoreVersionLocalizations" : {
         "links" : {
           "self" : "https://appstoreconnect.apple.com/iris/v1/appStoreVersions/123456789-app-store-version/relationships/appStoreVersionLocalizations",
           "related" : "https://appstoreconnect.apple.com/iris/v1/appStoreVersions/123456789-app-store-version/appStoreVersionLocalizations"
-        }
-      },
-      "idfaDeclaration" : {
-        "links" : {
-          "self" : "https://appstoreconnect.apple.com/iris/v1/appStoreVersions/123456789-app-store-version/relationships/idfaDeclaration",
-          "related" : "https://appstoreconnect.apple.com/iris/v1/appStoreVersions/123456789-app-store-version/idfaDeclaration"
         }
       },
       "appStoreReviewDetail" : {

@@ -1,5 +1,5 @@
 // LaneFileProtocol.swift
-// Copyright (c) 2024 FastlaneTools
+// Copyright (c) 2026 FastlaneTools
 
 //
 //  ** NOTE **
@@ -21,7 +21,9 @@ public protocol LaneFileProtocol: AnyObject {
 }
 
 public extension LaneFileProtocol {
-    var fastlaneVersion: String { return "" } // Defaults to "" because that means any is fine
+    var fastlaneVersion: String {
+        return ""
+    } // Defaults to "" because that means any is fine
     func beforeAll(with _: String) {} // No-op by default
     func afterAll(with _: String) {} // No-op by default
     func recordLaneDescriptions() {} // No-op by default
@@ -40,7 +42,11 @@ open class LaneFile: NSObject, LaneFileProtocol {
         return String(laneName.prefix(laneName.count - 12))
     }
 
-    public func onError(currentLane: String, errorInfo _: String, errorClass _: String?, errorMessage _: String?) {
+    open func beforeAll(with _: String) {}
+
+    open func afterAll(with _: String) {}
+
+    open func onError(currentLane: String, errorInfo _: String, errorClass _: String?, errorMessage _: String?) {
         LaneFile.onErrorCalled.insert(currentLane)
     }
 
@@ -68,7 +74,7 @@ open class LaneFile: NSObject, LaneFileProtocol {
 
     public static var lanes: [String: String] {
         var laneToMethodName: [String: String] = [:]
-        laneFunctionNames.forEach { name in
+        for name in laneFunctionNames {
             let lowercasedName = name.lowercased()
             if lowercasedName.hasSuffix("lane") {
                 laneToMethodName[lowercasedName] = name
