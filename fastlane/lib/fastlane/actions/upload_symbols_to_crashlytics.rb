@@ -78,13 +78,20 @@ module Fastlane
         end
         command << "-p #{params[:platform] == 'appletvos' ? 'tvos' : params[:platform]}"
         command << File.expand_path(path).shellescape
+
         begin
           command_to_execute = command.join(" ")
           UI.verbose("upload_dsym using command: #{command_to_execute}")
           Actions.sh(command_to_execute, log: params[:debug])
           return true
         rescue => ex
-          UI.error(ex.to_s) # it fails, however we don't want to fail everything just for this
+          # If it fails - emit the warning, then continue (or crash) depending on "fail_on_error"
+          UI.error(ex.to_s)
+
+          if params[:fail_on_error] == true
+            raise
+          end
+
           return false
         end
       end
@@ -129,7 +136,10 @@ module Fastlane
       end
 
       def self.details
-        "This action allows you to upload symbolication files to Crashlytics. It's extra useful if you use it to download the latest dSYM files from Apple when you use Bitcode. This action will not fail the build if one of the uploads failed. The reason for that is that sometimes some of dSYM files are invalid, and we don't want them to fail the complete build."
+        [
+          "This action allows you to upload symbolication files to Crashlytics. It's extra useful if you use it to download the latest dSYM files from Apple when you use Bitcode. This action will not fail the build if one of the uploads failed by default.",
+          "The reason for that is that sometimes some of dSYM files are invalid, and we don't want them to fail the complete build. However, fail_on_build parameter can be used to prevent this behavior."
+        ].join("\n")
       end
 
       def self.available_options
@@ -206,6 +216,11 @@ module Fastlane
                                          min_threads = 1
                                          UI.user_error!("Too few threads (#{value}) minimum number of threads: #{min_threads}") unless value >= min_threads
                                        end),
+          FastlaneCore::ConfigItem.new(key: :fail_on_error,
+                                       env_name: "FL_UPLOAD_SYMBOLS_TO_CRASHLYTICS_FAIL_ON_ERROR",
+                                       description: "Should the action fail when an upload fails?",
+                                       type: Boolean,
+                                       default_value: false),
           FastlaneCore::ConfigItem.new(key: :debug,
                                        env_name: "FL_UPLOAD_SYMBOLS_TO_CRASHLYTICS_DEBUG",
                                        description: "Enable debug mode for upload-symbols",
