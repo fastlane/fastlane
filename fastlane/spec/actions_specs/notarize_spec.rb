@@ -38,7 +38,6 @@ describe Fastlane do
 
       context "with notary tool" do
         let(:package) { Tempfile.new('app.ipa.zip') }
-        let(:bundle_id) { 'com.some.app' }
 
         context "with Apple ID" do
           let(:username) { 'myusername@example.com' }
@@ -55,7 +54,6 @@ describe Fastlane do
             result = Fastlane::FastFile.new.parse("lane :test do
               notarize(
                 package: '#{package.path}',
-                bundle_id: '#{bundle_id}',
                 username: '#{username}',
                 asc_provider: '#{asc_provider}',
               )
@@ -72,7 +70,6 @@ describe Fastlane do
             result = Fastlane::FastFile.new.parse("lane :test do
               notarize(
                 package: '#{package.path}',
-                bundle_id: '#{bundle_id}',
                 username: '#{username}',
                 asc_provider: '#{asc_provider}',
                 verbose: true
@@ -90,7 +87,6 @@ describe Fastlane do
             result = Fastlane::FastFile.new.parse("lane :test do
               notarize(
                 package: '#{package.path}',
-                bundle_id: '#{bundle_id}',
                 username: '#{username}',
                 asc_provider: '#{asc_provider}',
                 skip_stapling: true
@@ -107,7 +103,6 @@ describe Fastlane do
               result = Fastlane::FastFile.new.parse("lane :test do
                 notarize(
                   package: '#{package.path}',
-                  bundle_id: '#{bundle_id}',
                   username: '#{username}',
                   asc_provider: '#{asc_provider}',
                 )

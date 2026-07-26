@@ -2958,7 +2958,7 @@ public func chatwork(apiToken: String,
    - curseWords: including words that might be considered objectionable
    - freeStuffInIap: using text indicating that your IAP is free
    - customText: mentioning any of the user-specified words passed to custom_text(data: [words])
-   - copyrightDate: using a copyright date that is any different from this current year, or missing a date
+   - copyrightDate: using a copyright year in the future, or missing a copyright year
    - unreachableUrls: unreachable URLs in app metadata
 
  - returns: true if precheck passes, else, false
@@ -6909,6 +6909,7 @@ public func makeChangelogFromJenkins(fallbackChangelog: String = "",
    - includeAllCertificates: Include all matching certificates in the provisioning profile. Works only for the 'development' provisioning profile type
    - certificateId: Select certificate by id. Useful if multiple certificates are stored in one place
    - forceForNewCertificates: Renew the provisioning profiles if the certificate count on the developer portal has changed. Works only for the 'development' provisioning profile type. Requires 'include_all_certificates' option to be 'true'
+   - renewExpiredCerts: Automatically renew expired certificates. Note: to renew `developer_id` and `developer_id_installer` certificates you must log in with the Account Holder account by using username and password; App Store Connect API key doesn't work in this case. The expired certificate is removed from the match storage and a new one is created, but the old certificate is not revoked on the Apple Developer Portal — run `fastlane match nuke` if you need to free up certificate slots
    - skipConfirmation: Disables confirmation prompts during nuke, answering them with yes
    - safeRemoveCerts: Remove certs from repository during nuke without revoking them on the developer portal
    - skipDocs: Skip generation of a README.md for the created git repository
@@ -6969,6 +6970,7 @@ public func match(type: String = matchfile.type,
                   includeAllCertificates: OptionalConfigValue<Bool> = .fastlaneDefault(matchfile.includeAllCertificates),
                   certificateId: OptionalConfigValue<String?> = .fastlaneDefault(matchfile.certificateId),
                   forceForNewCertificates: OptionalConfigValue<Bool> = .fastlaneDefault(matchfile.forceForNewCertificates),
+                  renewExpiredCerts: OptionalConfigValue<Bool> = .fastlaneDefault(matchfile.renewExpiredCerts),
                   skipConfirmation: OptionalConfigValue<Bool> = .fastlaneDefault(matchfile.skipConfirmation),
                   safeRemoveCerts: OptionalConfigValue<Bool> = .fastlaneDefault(matchfile.safeRemoveCerts),
                   skipDocs: OptionalConfigValue<Bool> = .fastlaneDefault(matchfile.skipDocs),
@@ -7027,6 +7029,7 @@ public func match(type: String = matchfile.type,
     let includeAllCertificatesArg = includeAllCertificates.asRubyArgument(name: "include_all_certificates", type: nil)
     let certificateIdArg = certificateId.asRubyArgument(name: "certificate_id", type: nil)
     let forceForNewCertificatesArg = forceForNewCertificates.asRubyArgument(name: "force_for_new_certificates", type: nil)
+    let renewExpiredCertsArg = renewExpiredCerts.asRubyArgument(name: "renew_expired_certs", type: nil)
     let skipConfirmationArg = skipConfirmation.asRubyArgument(name: "skip_confirmation", type: nil)
     let safeRemoveCertsArg = safeRemoveCerts.asRubyArgument(name: "safe_remove_certs", type: nil)
     let skipDocsArg = skipDocs.asRubyArgument(name: "skip_docs", type: nil)
@@ -7084,6 +7087,7 @@ public func match(type: String = matchfile.type,
                                           includeAllCertificatesArg,
                                           certificateIdArg,
                                           forceForNewCertificatesArg,
+                                          renewExpiredCertsArg,
                                           skipConfirmationArg,
                                           safeRemoveCertsArg,
                                           skipDocsArg,
@@ -7152,6 +7156,7 @@ public func match(type: String = matchfile.type,
    - includeAllCertificates: Include all matching certificates in the provisioning profile. Works only for the 'development' provisioning profile type
    - certificateId: Select certificate by id. Useful if multiple certificates are stored in one place
    - forceForNewCertificates: Renew the provisioning profiles if the certificate count on the developer portal has changed. Works only for the 'development' provisioning profile type. Requires 'include_all_certificates' option to be 'true'
+   - renewExpiredCerts: Automatically renew expired certificates. Note: to renew `developer_id` and `developer_id_installer` certificates you must log in with the Account Holder account by using username and password; App Store Connect API key doesn't work in this case. The expired certificate is removed from the match storage and a new one is created, but the old certificate is not revoked on the Apple Developer Portal — run `fastlane match nuke` if you need to free up certificate slots
    - skipConfirmation: Disables confirmation prompts during nuke, answering them with yes
    - safeRemoveCerts: Remove certs from repository during nuke without revoking them on the developer portal
    - skipDocs: Skip generation of a README.md for the created git repository
@@ -7216,6 +7221,7 @@ public func matchNuke(type: String = "development",
                       includeAllCertificates: OptionalConfigValue<Bool> = .fastlaneDefault(false),
                       certificateId: OptionalConfigValue<String?> = .fastlaneDefault(nil),
                       forceForNewCertificates: OptionalConfigValue<Bool> = .fastlaneDefault(false),
+                      renewExpiredCerts: OptionalConfigValue<Bool> = .fastlaneDefault(false),
                       skipConfirmation: OptionalConfigValue<Bool> = .fastlaneDefault(false),
                       safeRemoveCerts: OptionalConfigValue<Bool> = .fastlaneDefault(false),
                       skipDocs: OptionalConfigValue<Bool> = .fastlaneDefault(false),
@@ -7274,6 +7280,7 @@ public func matchNuke(type: String = "development",
     let includeAllCertificatesArg = includeAllCertificates.asRubyArgument(name: "include_all_certificates", type: nil)
     let certificateIdArg = certificateId.asRubyArgument(name: "certificate_id", type: nil)
     let forceForNewCertificatesArg = forceForNewCertificates.asRubyArgument(name: "force_for_new_certificates", type: nil)
+    let renewExpiredCertsArg = renewExpiredCerts.asRubyArgument(name: "renew_expired_certs", type: nil)
     let skipConfirmationArg = skipConfirmation.asRubyArgument(name: "skip_confirmation", type: nil)
     let safeRemoveCertsArg = safeRemoveCerts.asRubyArgument(name: "safe_remove_certs", type: nil)
     let skipDocsArg = skipDocs.asRubyArgument(name: "skip_docs", type: nil)
@@ -7331,6 +7338,7 @@ public func matchNuke(type: String = "development",
                                           includeAllCertificatesArg,
                                           certificateIdArg,
                                           forceForNewCertificatesArg,
+                                          renewExpiredCertsArg,
                                           skipConfirmationArg,
                                           safeRemoveCertsArg,
                                           skipDocsArg,
@@ -8959,6 +8967,7 @@ public func rubyVersion() {
    - suppressXcodeOutput: Suppress the output of xcodebuild to stdout. Output is still saved in buildlog_path
    - xcodebuildFormatter: xcodebuild formatter to use (ex: 'xcbeautify', 'xcbeautify --quieter', 'xcpretty', 'xcpretty -test'). Use empty string (ex: '') to disable any formatter (More information: https://docs.fastlane.tools/best-practices/xcodebuild-formatters/)
    - outputRemoveRetryAttempts: Remove retry attempts from test results table and the JUnit report (if not using xcpretty)
+   - forceLegacyXcresulttool: Force the use of the '--legacy' flag for xcresulttool instead of using the new commands
    - disableXcpretty: **DEPRECATED!** Use `output_style: 'raw'` instead - Disable xcpretty formatting of build, similar to `output_style='raw'` but this will also skip the test results table
    - formatter: **DEPRECATED!** Use 'xcpretty_formatter' instead - A custom xcpretty formatter to use
    - xcprettyFormatter: A custom xcpretty formatter to use
@@ -9045,6 +9054,7 @@ public func rubyVersion() {
                                         suppressXcodeOutput: OptionalConfigValue<Bool?> = .fastlaneDefault(nil),
                                         xcodebuildFormatter: String = "xcbeautify",
                                         outputRemoveRetryAttempts: OptionalConfigValue<Bool> = .fastlaneDefault(false),
+                                        forceLegacyXcresulttool: OptionalConfigValue<Bool> = .fastlaneDefault(false),
                                         disableXcpretty: OptionalConfigValue<Bool?> = .fastlaneDefault(nil),
                                         formatter: OptionalConfigValue<String?> = .fastlaneDefault(nil),
                                         xcprettyFormatter: OptionalConfigValue<String?> = .fastlaneDefault(nil),
@@ -9127,6 +9137,7 @@ public func rubyVersion() {
     let suppressXcodeOutputArg = suppressXcodeOutput.asRubyArgument(name: "suppress_xcode_output", type: nil)
     let xcodebuildFormatterArg = RubyCommand.Argument(name: "xcodebuild_formatter", value: xcodebuildFormatter, type: nil)
     let outputRemoveRetryAttemptsArg = outputRemoveRetryAttempts.asRubyArgument(name: "output_remove_retry_attempts", type: nil)
+    let forceLegacyXcresulttoolArg = forceLegacyXcresulttool.asRubyArgument(name: "force_legacy_xcresulttool", type: nil)
     let disableXcprettyArg = disableXcpretty.asRubyArgument(name: "disable_xcpretty", type: nil)
     let formatterArg = formatter.asRubyArgument(name: "formatter", type: nil)
     let xcprettyFormatterArg = xcprettyFormatter.asRubyArgument(name: "xcpretty_formatter", type: nil)
@@ -9208,6 +9219,7 @@ public func rubyVersion() {
                                           suppressXcodeOutputArg,
                                           xcodebuildFormatterArg,
                                           outputRemoveRetryAttemptsArg,
+                                          forceLegacyXcresulttoolArg,
                                           disableXcprettyArg,
                                           formatterArg,
                                           xcprettyFormatterArg,
@@ -9402,6 +9414,7 @@ public func say(text: [String],
    - suppressXcodeOutput: Suppress the output of xcodebuild to stdout. Output is still saved in buildlog_path
    - xcodebuildFormatter: xcodebuild formatter to use (ex: 'xcbeautify', 'xcbeautify --quieter', 'xcpretty', 'xcpretty -test'). Use empty string (ex: '') to disable any formatter (More information: https://docs.fastlane.tools/best-practices/xcodebuild-formatters/)
    - outputRemoveRetryAttempts: Remove retry attempts from test results table and the JUnit report (if not using xcpretty)
+   - forceLegacyXcresulttool: Force the use of the '--legacy' flag for xcresulttool instead of using the new commands
    - disableXcpretty: **DEPRECATED!** Use `output_style: 'raw'` instead - Disable xcpretty formatting of build, similar to `output_style='raw'` but this will also skip the test results table
    - formatter: **DEPRECATED!** Use 'xcpretty_formatter' instead - A custom xcpretty formatter to use
    - xcprettyFormatter: A custom xcpretty formatter to use
@@ -9488,6 +9501,7 @@ public func say(text: [String],
                                     suppressXcodeOutput: OptionalConfigValue<Bool?> = .fastlaneDefault(scanfile.suppressXcodeOutput),
                                     xcodebuildFormatter: String = scanfile.xcodebuildFormatter,
                                     outputRemoveRetryAttempts: OptionalConfigValue<Bool> = .fastlaneDefault(scanfile.outputRemoveRetryAttempts),
+                                    forceLegacyXcresulttool: OptionalConfigValue<Bool> = .fastlaneDefault(scanfile.forceLegacyXcresulttool),
                                     disableXcpretty: OptionalConfigValue<Bool?> = .fastlaneDefault(scanfile.disableXcpretty),
                                     formatter: OptionalConfigValue<String?> = .fastlaneDefault(scanfile.formatter),
                                     xcprettyFormatter: OptionalConfigValue<String?> = .fastlaneDefault(scanfile.xcprettyFormatter),
@@ -9570,6 +9584,7 @@ public func say(text: [String],
     let suppressXcodeOutputArg = suppressXcodeOutput.asRubyArgument(name: "suppress_xcode_output", type: nil)
     let xcodebuildFormatterArg = RubyCommand.Argument(name: "xcodebuild_formatter", value: xcodebuildFormatter, type: nil)
     let outputRemoveRetryAttemptsArg = outputRemoveRetryAttempts.asRubyArgument(name: "output_remove_retry_attempts", type: nil)
+    let forceLegacyXcresulttoolArg = forceLegacyXcresulttool.asRubyArgument(name: "force_legacy_xcresulttool", type: nil)
     let disableXcprettyArg = disableXcpretty.asRubyArgument(name: "disable_xcpretty", type: nil)
     let formatterArg = formatter.asRubyArgument(name: "formatter", type: nil)
     let xcprettyFormatterArg = xcprettyFormatter.asRubyArgument(name: "xcpretty_formatter", type: nil)
@@ -9651,6 +9666,7 @@ public func say(text: [String],
                                           suppressXcodeOutputArg,
                                           xcodebuildFormatterArg,
                                           outputRemoveRetryAttemptsArg,
+                                          forceLegacyXcresulttoolArg,
                                           disableXcprettyArg,
                                           formatterArg,
                                           xcprettyFormatterArg,
@@ -11481,6 +11497,7 @@ public func swiftlint(mode: String = "lint",
    - includeAllCertificates: Include all matching certificates in the provisioning profile. Works only for the 'development' provisioning profile type
    - certificateId: Select certificate by id. Useful if multiple certificates are stored in one place
    - forceForNewCertificates: Renew the provisioning profiles if the certificate count on the developer portal has changed. Works only for the 'development' provisioning profile type. Requires 'include_all_certificates' option to be 'true'
+   - renewExpiredCerts: Automatically renew expired certificates. Note: to renew `developer_id` and `developer_id_installer` certificates you must log in with the Account Holder account by using username and password; App Store Connect API key doesn't work in this case. The expired certificate is removed from the match storage and a new one is created, but the old certificate is not revoked on the Apple Developer Portal — run `fastlane match nuke` if you need to free up certificate slots
    - skipConfirmation: Disables confirmation prompts during nuke, answering them with yes
    - safeRemoveCerts: Remove certs from repository during nuke without revoking them on the developer portal
    - skipDocs: Skip generation of a README.md for the created git repository
@@ -11541,6 +11558,7 @@ public func syncCodeSigning(type: String = "development",
                             includeAllCertificates: OptionalConfigValue<Bool> = .fastlaneDefault(false),
                             certificateId: OptionalConfigValue<String?> = .fastlaneDefault(nil),
                             forceForNewCertificates: OptionalConfigValue<Bool> = .fastlaneDefault(false),
+                            renewExpiredCerts: OptionalConfigValue<Bool> = .fastlaneDefault(false),
                             skipConfirmation: OptionalConfigValue<Bool> = .fastlaneDefault(false),
                             safeRemoveCerts: OptionalConfigValue<Bool> = .fastlaneDefault(false),
                             skipDocs: OptionalConfigValue<Bool> = .fastlaneDefault(false),
@@ -11599,6 +11617,7 @@ public func syncCodeSigning(type: String = "development",
     let includeAllCertificatesArg = includeAllCertificates.asRubyArgument(name: "include_all_certificates", type: nil)
     let certificateIdArg = certificateId.asRubyArgument(name: "certificate_id", type: nil)
     let forceForNewCertificatesArg = forceForNewCertificates.asRubyArgument(name: "force_for_new_certificates", type: nil)
+    let renewExpiredCertsArg = renewExpiredCerts.asRubyArgument(name: "renew_expired_certs", type: nil)
     let skipConfirmationArg = skipConfirmation.asRubyArgument(name: "skip_confirmation", type: nil)
     let safeRemoveCertsArg = safeRemoveCerts.asRubyArgument(name: "safe_remove_certs", type: nil)
     let skipDocsArg = skipDocs.asRubyArgument(name: "skip_docs", type: nil)
@@ -11656,6 +11675,7 @@ public func syncCodeSigning(type: String = "development",
                                           includeAllCertificatesArg,
                                           certificateIdArg,
                                           forceForNewCertificatesArg,
+                                          renewExpiredCertsArg,
                                           skipConfirmationArg,
                                           safeRemoveCertsArg,
                                           skipDocsArg,
@@ -13902,7 +13922,7 @@ public func xcov(workspace: OptionalConfigValue<String?> = .fastlaneDefault(nil)
                  coverallsServiceJobId: OptionalConfigValue<String?> = .fastlaneDefault(nil),
                  coverallsRepoToken: OptionalConfigValue<String?> = .fastlaneDefault(nil),
                  xcconfig: OptionalConfigValue<String?> = .fastlaneDefault(nil),
-                 ideFoundationPath: String = "/Applications/Xcode_16.4.app/Contents/Developer/../Frameworks/IDEFoundation.framework/Versions/A/IDEFoundation",
+                 ideFoundationPath: String = "/Applications/Xcode_26.5.app/Contents/Developer/../Frameworks/IDEFoundation.framework/Versions/A/IDEFoundation",
                  legacySupport: OptionalConfigValue<Bool> = .fastlaneDefault(false))
 {
     let workspaceArg = workspace.asRubyArgument(name: "workspace", type: nil)
@@ -14113,4 +14133,4 @@ public let snapshotfile: Snapshotfile = .init()
 
 // Please don't remove the lines below
 // They are used to detect outdated files
-// FastlaneRunnerAPIVersion [0.9.203]
+// FastlaneRunnerAPIVersion [0.9.204]

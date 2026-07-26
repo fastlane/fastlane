@@ -8,33 +8,33 @@ Gem::Specification.new do |spec|
   spec.name          = "fastlane"
   spec.version       = Fastlane::VERSION
   # list of authors is regenerated and resorted on each release
-  spec.authors       = ["Manish Rathi",
-                        "Max Ott",
-                        "Jan Piotrowski",
-                        "Matthew Ellis",
-                        "Maksym Grebenets",
-                        "Felix Krause",
-                        "Jimmy Dee",
-                        "Łukasz Grabowski",
-                        "Helmut Januschka",
-                        "Jérôme Lacoste",
-                        "Connor Tumbleson",
-                        "Luka Mirosevic",
-                        "Satoshi Namai",
-                        "Roger Oba",
-                        "Jorge Revuelta H",
-                        "Andrew McBurney",
+  spec.authors       = ["Jimmy Dee",
+                        "Josh Holtz",
                         "Joshua Liebowitz",
                         "Daniel Jankowski",
-                        "Stefan Natchev",
-                        "Fumiya Nakamura",
+                        "Satoshi Namai",
+                        "Luka Mirosevic",
                         "Olivier Halligon",
-                        "Danielle Tomlinson",
-                        "Iulian Onofrei",
+                        "Maksym Grebenets",
+                        "Roger Oba",
+                        "Andrew McBurney",
+                        "Manish Rathi",
+                        "Connor Tumbleson",
+                        "Jorge Revuelta H",
+                        "Felix Krause",
+                        "Jérôme Lacoste",
+                        "Stefan Natchev",
                         "Manu Wallner",
+                        "Fumiya Nakamura",
+                        "Łukasz Grabowski",
+                        "Jan Piotrowski",
+                        "Iulian Onofrei",
                         "Aaron Brager",
                         "Kohki Miki",
-                        "Josh Holtz"]
+                        "Max Ott",
+                        "Matthew Ellis",
+                        "Helmut Januschka",
+                        "Danielle Tomlinson"]
 
   spec.email         = ["fastlane@krausefx.com"]
   spec.summary       = Fastlane::SUMMARY
@@ -67,9 +67,11 @@ Gem::Specification.new do |spec|
   spec.add_dependency('dotenv', '>= 2.1.1', '< 3.0.0')
   spec.add_dependency('emoji_regex', '>= 0.1', '< 4.0') # Used to scan for Emoji in the changelog
   spec.add_dependency('excon', '>= 0.71.0', '< 2.0.0') # Great HTTP Client
-  spec.add_dependency('faraday_middleware', '~> 1.0') # Same as faraday
-  spec.add_dependency('faraday-cookie_jar', '~> 0.0.6')
-  spec.add_dependency('faraday', '~> 1.0') # The faraday gem is used for deploygate, hockey and testfairy actions.
+  spec.add_dependency('faraday', '~> 2.7') # The faraday gem is used for deploygate, hockey and testfairy actions.
+  spec.add_dependency('faraday-cookie_jar', '~> 0.0.8') # Spaceship uses this to store cookies for the session, when authorizing with login/password.
+  spec.add_dependency('faraday-follow_redirects', '~> 0.3') # Replaces FaradayMiddleware::FollowRedirects from faraday_middleware
+  spec.add_dependency('faraday-multipart', '~> 1.0') # Converts Request.body into a multipart.
+  spec.add_dependency('faraday-retry', '~> 2.0') # Retry request middleware, extracted from faraday core in Faraday 2
   spec.add_dependency('fastimage', '>= 2.1.0', '< 3.0.0') # fetch the image sizes from the screenshots
   spec.add_dependency('fastlane-sirp', '>= 1.1.0') # used for sirp login
   spec.add_dependency('gh_inspector', '>= 1.1.2', '< 2.0.0') # search for issues on GitHub when something goes wrong
@@ -105,6 +107,7 @@ Gem::Specification.new do |spec|
   spec.add_dependency('csv', '~> 3.3') # 3.4 - workaround for sinatra as can't upgrade to 4.x yet
   spec.add_dependency('mutex_m', '~> 0.3') # 3.4 - workaround for httpclient as can't upgrade to 2.9 yet
   spec.add_dependency('nkf', '~> 0.2') # 3.4 - workaround for CFPropertyList as can't upgrade to 4.x yet
+  spec.add_dependency('irb', '>= 1.8') # 4.0 - stdlib gem removed from default set; used by `fastlane console`
   spec.add_dependency('logger', '>= 1.6', '< 2.0') # 4.0 - stdlib gem removed from default set
   spec.add_dependency('benchmark', '>= 0.1.0') # 4.1 - stdlib gem removed from default set
   spec.add_dependency('ostruct', '>= 0.1.0') # 4.1 - stdlib gem removed from default set

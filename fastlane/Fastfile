@@ -2,6 +2,7 @@ require 'fileutils'
 fastlane_require 'xcodeproj'
 
 skip_docs # Do not create fastlane/README.txt
+opt_out_usage # Do not report analytics for runs of fastlane on the fastlane repo itself
 
 # Test and Validate
 

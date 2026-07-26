@@ -4,7 +4,6 @@ module Fastlane
       # rubocop:disable Metrics/PerceivedComplexity
       def self.run(params)
         package_path = params[:package]
-        bundle_id = params[:bundle_id]
         skip_stapling = params[:skip_stapling]
         print_log = params[:print_log]
         verbose = params[:verbose]
@@ -15,7 +14,7 @@ module Fastlane
         end
         api_key = Spaceship::ConnectAPI::Token.from(hash: params[:api_key], filepath: params[:api_key_path])
 
-        # Compress and read bundle identifier only for .app bundle.
+        # Compress only if .app bundle
         compressed_package_path = nil
         if File.extname(package_path) == '.app'
           compressed_package_path = "#{package_path}.zip"
@@ -23,22 +22,12 @@ module Fastlane
             "ditto -c -k --rsrc --keepParent \"#{package_path}\" \"#{compressed_package_path}\"",
             log: verbose
           )
-
-          unless bundle_id
-            info_plist_path = File.join(package_path, 'Contents', 'Info.plist')
-            bundle_id = Actions.sh(
-              "/usr/libexec/PlistBuddy -c \"Print :CFBundleIdentifier\" \"#{info_plist_path}\"",
-              log: verbose
-            ).strip
-          end
         end
 
-        UI.user_error!('Could not read bundle identifier, provide as a parameter') unless bundle_id
-
-        notarytool(params, package_path, bundle_id, skip_stapling, print_log, verbose, api_key, compressed_package_path)
+        notarytool(params, package_path, skip_stapling, print_log, verbose, api_key, compressed_package_path)
       end
 
-      def self.notarytool(params, package_path, bundle_id, skip_stapling, print_log, verbose, api_key, compressed_package_path)
+      def self.notarytool(params, package_path, skip_stapling, print_log, verbose, api_key, compressed_package_path)
         temp_file = nil
 
         # Create authorization part of command with either API Key or Apple ID
@@ -154,10 +143,6 @@ module Fastlane
                                        optional: true,
                                        default_value: false,
                                        type: Boolean),
-          FastlaneCore::ConfigItem.new(key: :bundle_id,
-                                       env_name: 'FL_NOTARIZE_BUNDLE_ID',
-                                       description: 'Bundle identifier to uniquely identify the package',
-                                       optional: true),
           FastlaneCore::ConfigItem.new(key: :username,
                                        env_name: 'FL_NOTARIZE_USERNAME',
                                        description: 'Apple ID username',

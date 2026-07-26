@@ -403,6 +403,12 @@ module FastlaneCore
 
     private
 
+    def file_upload_option(source)
+      # altool's --upload-app and --validate-app only support the -f flag,
+      # unlike iTMSTransporter which requires -assetFile for .ipa/.pkg since 2026.
+      "-f #{source.shellescape}"
+    end
+
     def platform_option(platform)
       "-t #{platform == 'osx' ? 'macos' : platform}"
     end
