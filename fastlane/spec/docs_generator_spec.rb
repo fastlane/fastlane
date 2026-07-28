@@ -9,7 +9,7 @@ describe Fastlane do
 
       output = File.read(output_path)
 
-      expect(output).to include('gem install fastlane')
+      expect(output).to include('installation instructions')
       expect(output).to include('# Available Actions')
       expect(output).to include('### test')
       expect(output).to include('# iOS')
@@ -28,7 +28,7 @@ describe Fastlane do
 
       output = File.read(output_path)
 
-      expect(output).to include('gem install fastlane')
+      expect(output).to include('installation instructions')
       expect(output).to include('# Available Actions')
       expect(output).to include('## Android')
       expect(output).to include('### android lane')

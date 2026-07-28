@@ -8,7 +8,7 @@ module Fastlane
       # rubocop:disable Metrics/PerceivedComplexity
       def self.run(params)
         oclint_path = params[:oclint_path]
-        if `which #{oclint_path}`.to_s.empty? && !Helper.test?
+        unless Helper.which(oclint_path) || Helper.test?
           UI.user_error!("You have to install oclint or provide path to oclint binary. Fore more details: ") + "http://docs.oclint.org/en/stable/intro/installation.html".yellow
         end
 
@@ -179,17 +179,17 @@ module Fastlane
                                        type: Array,
                                        optional: true),
           FastlaneCore::ConfigItem.new(key: :max_priority_1,
-                                       env_name: 'FL_OCLINT_MAX_PRIOTITY_1',
+                                       env_names: ["FL_OCLINT_MAX_PRIOTITY_1", "FL_OCLINT_MAX_PRIORITY_1"], # The version with typo must be deprecated
                                        description: 'The max allowed number of priority 1 violations',
                                        type: Integer,
                                        optional: true),
           FastlaneCore::ConfigItem.new(key: :max_priority_2,
-                                       env_name: 'FL_OCLINT_MAX_PRIOTITY_2',
+                                       env_names: ["FL_OCLINT_MAX_PRIOTITY_2", "FL_OCLINT_MAX_PRIORITY_2"], # The version with typo must be deprecated
                                        description: 'The max allowed number of priority 2 violations',
                                        type: Integer,
                                        optional: true),
           FastlaneCore::ConfigItem.new(key: :max_priority_3,
-                                       env_name: 'FL_OCLINT_MAX_PRIOTITY_3',
+                                       env_names: ["FL_OCLINT_MAX_PRIOTITY_3", "FL_OCLINT_MAX_PRIORITY_3"], # The version with typo must be deprecated
                                        description: 'The max allowed number of priority 3 violations',
                                        type: Integer,
                                        optional: true),

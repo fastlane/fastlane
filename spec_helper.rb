@@ -53,7 +53,7 @@ RSpec.configure do |config|
       # no method implemented
     end
 
-    # Make sure PATH didnt get emptied during execution of previous (!) test
+    # Make sure PATH didn't get emptied during execution of previous (!) test
     expect(ENV['PATH']).to be_truthy, "PATH is missing. (Previous test probably emptied it.)"
   end
 
@@ -104,10 +104,13 @@ RSpec.configure do |config|
   end
 
   # skip some more tests if run on on Windows
-  if FastlaneCore::Helper.windows?
+  if FastlaneCore::Helper.windows? || !system('which xar')
     config.define_derived_metadata(:requires_xar) do |meta|
-      meta[:skip] = "Skipped: Requires `xar` to be installed (which is not possible on Windows and no workaround has been implemented)"
+      meta[:skip] = "Skipped: Requires `xar` to be installed (which is not possible on Windows and some Linux distros and no workaround has been implemented)"
     end
+  end
+
+  if FastlaneCore::Helper.windows?
     config.define_derived_metadata(:requires_pty) do |meta|
       meta[:skip] = "Skipped: Requires `pty` to be available (which is not possible on Windows and no workaround has been implemented)"
     end

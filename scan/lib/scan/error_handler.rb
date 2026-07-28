@@ -27,8 +27,22 @@ module Scan
           print("If you are using zshell or another shell, make sure to edit the correct bash file.")
           print("For more information visit this stackoverflow answer:")
           print("https://stackoverflow.com/a/17031697/445598")
+        when /Testing failed on/
+          # This is important because xcbeautify and raw output will print:
+          # Testing failed on 'iPhone 13 Pro Max'
+          # when multiple devices are use.
+          # xcpretty hides this output so its not an issue with xcpretty.
+          # We need to catch "Testing failed on" before "Test failed"
+          # so that an error isn't raised.
+          # Raising an error prevents trainer from processing the xcresult
+          return
         when /Testing failed/
           UI.build_failure!("Error building the application. #{details}")
+        when /Testing started.*\*\* TEST FAILED \*\*/m, /Testing started.*\*\* TEST EXECUTE FAILED \*\*/m
+          # Xcode 26+: If we see both "Testing started" and "** TEST FAILED **"
+          # or "** TEST EXECUTE FAILED **" (test-without-building), then tests
+          # were executed but failed.
+          return
         when /Executed/, /Failing tests:/
           # this is *really* important:
           # we don't want to raise an exception here

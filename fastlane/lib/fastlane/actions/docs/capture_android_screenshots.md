@@ -25,13 +25,14 @@ gem install fastlane
 ```
 
 ##### Gradle dependency
+
 ```java
 androidTestImplementation 'tools.fastlane:screengrab:x.x.x'
 ```
 
 The latest version is [ ![Download](https://maven-badges.herokuapp.com/maven-central/tools.fastlane/screengrab/badge.svg)](https://search.maven.org/artifact/tools.fastlane/screengrab)
 
-As of Screengrab version 2.0.0, all Android test dependencies are AndroidX dependencies. This means a device with API 18+, Android 4.3 or greater is required. If you wish to capture screenshots with an older Android OS, then you must use a 1.x.x version.
+As of _screengrab_ version 2.0.0, all Android test dependencies are AndroidX dependencies. This means a device with API 18+, Android 4.3 or greater is required. If you wish to capture screenshots with an older Android OS, then you must use a 1.x.x version.
 
 ##### Configuring your Manifest Permissions
 
@@ -60,17 +61,23 @@ Ensure that the following permissions exist in your **src/debug/AndroidManifest.
 ##### Configuring your <a href="#ui-tests">UI Tests</a> for Screenshots
 
 1. Add `LocaleTestRule` to your tests class to handle automatic switching of locales.
+
    If you're using Java use:
+
    ```java
    @ClassRule
    public static final LocaleTestRule localeTestRule = new LocaleTestRule();
    ```
+
    If you're using Kotlin use:
+
    ```kotlin
    @Rule @JvmField
    val localeTestRule = LocaleTestRule()
    ```
+
    The `@JvmField` annotation is important. It won't work like this:
+
    ```kotlin
    companion object {
        @get:ClassRule
@@ -80,10 +87,11 @@ Ensure that the following permissions exist in your **src/debug/AndroidManifest.
 
 2. To capture screenshots, add the following to your tests `Screengrab.screenshot("name_of_screenshot_here");` on the appropriate screens
 
-# Generating Screenshots with Screengrab
+# Generating Screenshots with _screengrab_
 - Then, before running `fastlane screengrab` you'll need a debug and test apk
   - You can create your APKs manually with `./gradlew assembleDebug assembleAndroidTest`
   - You can also create a lane and use `build_android_app`:
+
     ```ruby
     desc "Build debug and test APK for screenshots"
     lane :build_and_screengrab do
@@ -163,7 +171,9 @@ fastlane action screengrab
 Check out [Testing UI for a Single App](http://developer.android.com/training/testing/ui-testing/espresso-testing.html) for an introduction to using Espresso for UI testing.
 
 ##### Example UI Test Class (Using JUnit4)
+
 Java:
+
 ```java
 @RunWith(JUnit4.class)
 public class JUnit4StyleTests {
@@ -182,9 +192,10 @@ public class JUnit4StyleTests {
         Screengrab.screenshot("after_button_click");
     }
 }
-
 ```
+
 Kotlin:
+
 ```kotlin
 @RunWith(JUnit4.class)
 class JUnit4StyleTests {
@@ -203,7 +214,6 @@ class JUnit4StyleTests {
         Screengrab.screenshot("after_button_click")
     }
 }
-
 ```
 
 There is an [example project](https://github.com/fastlane/fastlane/tree/master/screengrab/example/src/androidTest/java/tools/fastlane/localetester) showing how to use JUnit 3 or 4 and Espresso with the screengrab Java library to capture screenshots during a UI test run.
@@ -218,12 +228,13 @@ When using JUnit 3 you'll need to add a bit more code:
 
 ## Clean Status Bar
 
-Screengrab can clean your status bar to make your screenshots even more beautiful.
+_screengrab_ can clean your status bar to make your screenshots even more beautiful.
 It is simply a wrapper that allows configuring SystemUI DemoMode in your code.
 Note: the clean status bar feature is only supported on devices with *API level >= 23*.
 
 You can enable and disable the clean status bar at any moment during your tests.
 In most cases you probably want to do this in the @BeforeClass and @AfterClass methods.
+
 ```java
 @BeforeClass
 public static void beforeAll() {
@@ -238,6 +249,7 @@ public static void afterAll() {
 
 Have a look at the methods of the `CleanStatusBar` class to customize the status bar even more.
 You could for example show the Bluetooth icon and the LTE text.
+
 ```java
 new CleanStatusBar()
     .setBluetoothState(BluetoothState.DISCONNECTED)
@@ -283,6 +295,7 @@ if (extras != null) {
 For some apps, it is helpful to know when _screengrab_ is running so that you can display specific data for your screenshots. For iOS fastlane users, this is much like "FASTLANE_SNAPSHOT". In order to do this, you'll need to have at least two product flavors of your app.
 
 Add two product flavors to the app-level build.gradle file:
+
 ```
 android {
 ...
@@ -300,6 +313,7 @@ android {
 ```
 
 Check for the existence of that flavor (i.e screengrab) in your app code as follows in order to use mock data or customize data for screenshots:
+
 ```
 if (BuildConfig.FLAVOR == "screengrab") {
     System.out.println("screengrab is running!");
@@ -307,14 +321,17 @@ if (BuildConfig.FLAVOR == "screengrab") {
 ```
 
 When running _screengrab_, do the following to build the flavor you want as well as the test apk. Note that you use "assembleFlavor_name" where Flavor_name is the flavor name, capitalized (i.e. Screengrab).
+
 ```
 ./gradlew assembleScreengrab assembleAndroidTest
 ```
 
 Run _screengrab_:
+
 ```
 fastlane screengrab
 ```
+
 _screengrab_ will ask you to select the debug and test apps (which you can then add to your Screengrabfile to skip this step later).
 
 The debug apk should be somewhere like this:

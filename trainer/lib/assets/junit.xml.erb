@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<% number_of_tests = 0 %>
+<% number_of_failures = 0 %>
+<% @results.each { |a| number_of_tests += a[:number_of_tests_excluding_retries] } %>
+<% @results.each { |a| number_of_failures += a[:number_of_failures_excluding_retries] } %>
+
+<testsuites tests="<%= number_of_tests %>" failures="<%= number_of_failures %>">
+  <% @results.each do |testsuite| %>
+    <testsuite name=<%= (testsuite[:target_name].nil? ? testsuite[:test_name] : testsuite[:target_name]).encode(:xml => :attr) %> tests="<%= testsuite[:number_of_tests_excluding_retries] %>" failures="<%= testsuite[:number_of_failures_excluding_retries] %>" <% if testsuite[:number_of_skipped] %>skipped="<%= testsuite[:number_of_skipped] %>" <% end %>time="<%= testsuite[:duration] %>">
+      <% unless testsuite[:configuration_name].nil? %>
+        <properties>
+          <property name="Configuration" value="<%= testsuite[:configuration_name] %>"/>
+        </properties>
+      <% end %>
+      <% testsuite[:tests].each do |test| %>
+        <testcase classname=<%= test[:test_group].encode(:xml => :attr) %> name=<%= test[:name].encode(:xml => :attr) %> time="<%= test[:duration] %>">
+          <% (test[:failures] || []).each do |failure| %>
+            <failure message=<%= failure[:failure_message].encode(:xml => :attr) %>>
+            </failure>
+          <% end %>
+          <% if test[:skipped] %>
+            <skipped/>
+          <% end %>
+        </testcase>
+      <% end %>
+    </testsuite>
+  <% end %>
+</testsuites>

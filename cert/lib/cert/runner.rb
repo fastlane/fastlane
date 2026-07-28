@@ -12,10 +12,14 @@ module Cert
     def launch
       run
 
-      installed = FastlaneCore::CertChecker.installed?(ENV["CER_FILE_PATH"], in_keychain: ENV["CER_KEYCHAIN_PATH"])
-      UI.message("Verifying the certificate is properly installed locally...")
-      UI.user_error!("Could not find the newly generated certificate installed", show_github_issues: true) unless installed
-      UI.success("Successfully installed certificate #{ENV['CER_CERTIFICATE_ID']}")
+      if Helper.mac?
+        UI.message("Verifying the certificate is properly installed locally...")
+        installed = FastlaneCore::CertChecker.installed?(ENV["CER_FILE_PATH"], in_keychain: ENV["CER_KEYCHAIN_PATH"])
+        UI.user_error!("Could not find the newly generated certificate installed", show_github_issues: true) unless installed
+        UI.success("Successfully installed certificate #{ENV['CER_CERTIFICATE_ID']}")
+      else
+        UI.message("Skipping verifying certificates as it would not work on this operating system.")
+      end
       return ENV["CER_FILE_PATH"]
     end
 
@@ -45,7 +49,7 @@ module Cert
 
       should_create = Cert.config[:force]
       unless should_create
-        cert_path = find_existing_cert
+        cert_path = find_existing_cert if Helper.mac?
         should_create = cert_path.nil?
       end
 
@@ -138,24 +142,35 @@ module Cert
     # All certificates of this type
     def certificates
       filter = {
-        certificateType: certificate_type
+        certificateType: certificate_types.join(",")
       }
       return Spaceship::ConnectAPI::Certificate.all(filter: filter)
     end
 
-    # The kind of certificate we're interested in
+    # The kind of certificate we're interested in (for creating)
     def certificate_type
+      return certificate_types.first
+    end
+
+    # The kind of certificates we're interested in (for listing)
+    def certificate_types
       if Cert.config[:type]
         case Cert.config[:type].to_sym
         when :mac_installer_distribution
-          return Spaceship::ConnectAPI::Certificate::CertificateType::MAC_INSTALLER_DISTRIBUTION
+          return [Spaceship::ConnectAPI::Certificate::CertificateType::MAC_INSTALLER_DISTRIBUTION]
         when :developer_id_application
-          return Spaceship::ConnectAPI::Certificate::CertificateType::DEVELOPER_ID_APPLICATION
+          return [
+            Spaceship::ConnectAPI::Certificate::CertificateType::DEVELOPER_ID_APPLICATION_G2,
+            Spaceship::ConnectAPI::Certificate::CertificateType::DEVELOPER_ID_APPLICATION
+          ]
         when :developer_id_kext
-          return Spaceship::ConnectAPI::Certificate::CertificateType::DEVELOPER_ID_KEXT
+          return [Spaceship::ConnectAPI::Certificate::CertificateType::DEVELOPER_ID_KEXT]
         when :developer_id_installer
-          raise "Cannot do with ASC API?"
-          # return Spaceship.certificate.developer_id_installer
+          if !Spaceship::ConnectAPI.token.nil?
+            raise "As of 2021-11-09, the App Store Connect API does not allow accessing DEVELOPER_ID_INSTALLER with the API Key. Please file an issue on GitHub if this has changed and needs to be updated"
+          else
+            return [Spaceship::ConnectAPI::Certificate::CertificateType::DEVELOPER_ID_INSTALLER]
+          end
         else
           UI.user_error("Unaccepted value for :type - #{Cert.config[:type]}")
         end
@@ -179,7 +194,7 @@ module Cert
         end
       end
 
-      return cert_type
+      return [cert_type]
     end
 
     def create_certificate
@@ -212,17 +227,25 @@ module Cert
 
       cert_path = store_certificate(certificate, Cert.config[:filename])
 
-      # Import all the things into the Keychain
-      keychain = File.expand_path(Cert.config[:keychain_path])
-      password = Cert.config[:keychain_password]
-      FastlaneCore::KeychainImporter.import_file(private_key_path, keychain, keychain_password: password, skip_set_partition_list: Cert.config[:skip_set_partition_list])
-      FastlaneCore::KeychainImporter.import_file(cert_path, keychain, keychain_password: password, skip_set_partition_list: Cert.config[:skip_set_partition_list])
+      if Helper.mac?
+        # Import all the things into the Keychain
+        keychain = File.expand_path(Cert.config[:keychain_path])
+        password = Cert.config[:keychain_password]
+        FastlaneCore::KeychainImporter.import_file(private_key_path, keychain, keychain_password: password, skip_set_partition_list: Cert.config[:skip_set_partition_list])
+        FastlaneCore::KeychainImporter.import_file(cert_path, keychain, keychain_password: password, skip_set_partition_list: Cert.config[:skip_set_partition_list])
+      else
+        UI.message("Skipping importing certificates as it would not work on this operating system.")
+      end
 
       # Environment variables for the fastlane action
       ENV["CER_CERTIFICATE_ID"] = certificate.id
       ENV["CER_FILE_PATH"] = cert_path
 
-      UI.success("Successfully generated #{certificate.id} which was imported to the local machine.")
+      if Helper.mac?
+        UI.success("Successfully generated #{certificate.id} which was imported to the local machine.")
+      else
+        UI.success("Successfully generated #{certificate.id}")
+      end
 
       return cert_path
     end

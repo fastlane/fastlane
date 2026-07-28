@@ -38,6 +38,24 @@ describe Fastlane do
         expect(ENV['DANGER_GITHUB_API_TOKEN']).to eq("1234")
       end
 
+      it "sets github enterprise host" do
+        result = Fastlane::FastFile.new.parse("lane :test do
+          danger(github_enterprise_host: 'test.de')
+        end").runner.execute(:test)
+
+        expect(result).to eq("bundle exec danger")
+        expect(ENV['DANGER_GITHUB_HOST']).to eq("test.de")
+      end
+
+      it "sets github enterprise api base url" do
+        result = Fastlane::FastFile.new.parse("lane :test do
+          danger(github_enterprise_api_base_url: 'https://test.de/api/v3')
+        end").runner.execute(:test)
+
+        expect(result).to eq("bundle exec danger")
+        expect(ENV['DANGER_GITHUB_API_BASE_URL']).to eq("https://test.de/api/v3")
+      end
+
       it "appends danger_id" do
         result = Fastlane::FastFile.new.parse("lane :test do
           danger(danger_id: 'unit-tests')
@@ -117,6 +135,23 @@ describe Fastlane do
 
         expect(result).to eq("bundle exec danger --head=master")
       end
+
+      it "appends fail-if-no-pr flag when set" do
+        result = Fastlane::FastFile.new.parse("lane :test do
+          danger(fail_if_no_pr: true)
+        end").runner.execute(:test)
+
+        expect(result).to eq("bundle exec danger --fail-if-no-pr=true")
+      end
+
+      it "does not append fail-if-no-pr flag when unset" do
+        result = Fastlane::FastFile.new.parse("lane :test do
+          danger(fail_if_no_pr: false)
+        end").runner.execute(:test)
+
+        expect(result).to eq("bundle exec danger")
+      end
+
     end
   end
 end

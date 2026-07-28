@@ -16,37 +16,69 @@ module Supply
     def self.make_from_config(params: nil)
       params ||= Supply.config
       service_account_data = self.service_account_authentication(params: params)
-      return self.new(service_account_json: service_account_data, params: params)
+
+      if service_account_data
+        return self.new(service_account_json: service_account_data, params: params)
+      end
+
+      # No explicit credentials — try Application Default Credentials discovery
+      # (GOOGLE_APPLICATION_CREDENTIALS env var, ~/.config/gcloud/application_default_credentials.json, or GCE metadata)
+      UI.verbose("No json_key provided, attempting Application Default Credentials...")
+      begin
+        auth_client = Google::Auth.get_application_default(self::SCOPE)
+        return self.new(auth_client: auth_client, params: params)
+      rescue RuntimeError => e
+        UI.verbose("Application Default Credentials not available: #{e.message}")
+      end
+
+      if UI.interactive?
+        UI.important("To not be asked about this value, you can specify it using 'json_key'")
+        json_key_path = UI.input("The service account json file used to authenticate with Google: ")
+        json_key_path = File.expand_path(json_key_path)
+        UI.user_error!("Could not find service account json file at path '#{json_key_path}'") unless File.exist?(json_key_path)
+        params[:json_key] = json_key_path
+        return self.new(service_account_json: File.open(json_key_path), params: params)
+      else
+        UI.user_error!("Could not load Google credentials. Provide 'json_key'/'json_key_data', set GOOGLE_APPLICATION_CREDENTIALS, or run: gcloud auth application-default login --scopes=openid,email,https://www.googleapis.com/auth/androidpublisher")
+      end
     end
 
     # Supply authentication file
+    # Returns an IO object for the credentials file, or nil if no explicit credentials were provided.
     def self.service_account_authentication(params: nil)
-      unless params[:json_key] || params[:json_key_data]
-        if UI.interactive?
-          UI.important("To not be asked about this value, you can specify it using 'json_key'")
-          json_key_path = UI.input("The service account json file used to authenticate with Google: ")
-          json_key_path = File.expand_path(json_key_path)
-
-          UI.user_error!("Could not find service account json file at path '#{json_key_path}'") unless File.exist?(json_key_path)
-          params[:json_key] = json_key_path
-        else
-          UI.user_error!("Could not load Google authentication. Make sure it has been added as an environment variable in 'json_key' or 'json_key_data'")
-        end
-      end
-
       if params[:json_key]
-        service_account_json = File.open(File.expand_path(params[:json_key]))
+        File.open(File.expand_path(params[:json_key]))
       elsif params[:json_key_data]
-        service_account_json = StringIO.new(params[:json_key_data])
+        StringIO.new(params[:json_key_data])
       end
-
-      service_account_json
     end
 
     # Initializes the service and its auth_client using the specified information
     # @param service_account_json: The raw service account Json data
-    def initialize(service_account_json: nil, params: nil)
-      auth_client = Google::Auth::ServiceAccountCredentials.make_creds(json_key_io: service_account_json, scope: self.class::SCOPE)
+    # @param auth_client: A pre-built auth client (e.g. from Application Default Credentials discovery)
+    def initialize(service_account_json: nil, auth_client: nil, params: nil)
+      if auth_client.nil?
+        # decode the json and check its type
+        begin
+          json_content = service_account_json.read
+          google_credentials = JSON.parse(json_content)
+          service_account_json.rewind
+        rescue JSON::ParserError
+          UI.user_error!("Invalid Google Credentials file provided - unable to parse json.")
+        end
+
+        # use correct credential class based on type
+        case google_credentials['type']
+        when "authorized_user"
+          auth_client = Google::Auth::UserRefreshCredentials.make_creds(json_key_io: service_account_json, scope: self.class::SCOPE)
+        when "external_account"
+          auth_client = Google::Auth::ExternalAccount::Credentials.make_creds(json_key_io: service_account_json, scope: self.class::SCOPE)
+        when "service_account"
+          auth_client = Google::Auth::ServiceAccountCredentials.make_creds(json_key_io: service_account_json, scope: self.class::SCOPE)
+        else
+          UI.user_error!("Invalid Google Credentials file provided - no credential type found.")
+        end
+      end
 
       UI.verbose("Fetching a new access token from Google...")
 
@@ -78,6 +110,7 @@ module Supply
     private
 
     def call_google_api
+      tries_left ||= (ENV["SUPPLY_UPLOAD_MAX_RETRIES"] || 0).to_i
       yield if block_given?
     rescue Google::Apis::Error => e
       error = begin
@@ -88,11 +121,22 @@ module Supply
 
       if error
         message = error["error"] && error["error"]["message"]
+        details = error["error"] && error["error"]["details"]
+        if details&.any? { |d| d["reason"] == "ACCESS_TOKEN_SCOPE_INSUFFICIENT" }
+          UI.important("Your credentials are missing the required scope. If using Application Default Credentials, re-run:")
+          UI.important("  gcloud auth application-default login --scopes=openid,email,https://www.googleapis.com/auth/androidpublisher")
+        end
       else
         message = e.body
       end
 
-      UI.user_error!("Google Api Error: #{e.message} - #{message}")
+      if tries_left.positive?
+        UI.error("Google Api Error: #{e.message} - #{message} - Retrying...")
+        tries_left -= 1
+        retry
+      else
+        UI.user_error!("Google Api Error: #{e.message} - #{message}")
+      end
     end
   end
 
@@ -113,7 +157,7 @@ module Supply
     def self.service_account_authentication(params: nil)
       if params[:json_key] || params[:json_key_data]
         super(params: params)
-      elsif params[:key] && params[:issuer]
+      elsif params.respond_to?(:all_keys) && params.all_keys.include?(:key) && params[:key] && params[:issuer]
         require 'google/api_client/auth/key_utils'
         UI.important("This type of authentication is deprecated. Please consider using JSON authentication instead")
         key = Google::APIClient::KeyUtils.load_from_pkcs12(File.expand_path(params[:key]), 'notasecret')
@@ -123,8 +167,6 @@ module Supply
         }
         service_account_json = StringIO.new(JSON.dump(cred_json))
         service_account_json
-      else
-        UI.user_error!("No authentication parameters were specified. These must be provided in order to authenticate with Google")
       end
     end
 
@@ -263,17 +305,12 @@ module Supply
       ensure_active_edit!
 
       # Verify that tracks have releases
-      filtered_tracks = tracks.select { |t| !t.releases.nil? && t.releases.any? { |r| r.name == version } }
+      filtered_tracks = tracks.select { |t| !t.releases.nil? && t.releases.any? { |r| r&.name == version } }
 
       if filtered_tracks.length > 1
-        # Production track takes precedence if version is present in multiple tracks
+        # Prefer tracks in production, beta, alpha, internal order
         # E.g.: A release might've been promoted from Alpha/Beta track. This means the release will be present in two or more tracks
-        if filtered_tracks.any? { |t| t.track == Supply::Tracks::DEFAULT }
-          filtered_tracks = filtered_tracks.select { |t| t.track == Supply::Tracks::DEFAULT }
-        else
-          # E.g.: A release might be in both Alpha & Beta (not sure if this is possible, just catching if it ever happens), giving Beta precedence.
-          filtered_tracks = filtered_tracks.select { |t| t.track == Supply::Tracks::BETA }
-        end
+        filtered_tracks = filtered_tracks.sort_by { |t| Supply::Tracks::DEFAULTS.index(t.track) || Float::INFINITY }
       end
 
       filtered_track = filtered_tracks.first
@@ -284,7 +321,7 @@ module Supply
         UI.message("Found '#{version}' in '#{filtered_track.track}' track.")
       end
 
-      filtered_release = filtered_track.releases.first { |r| !r.name.nil? && r.name == version }
+      filtered_release = filtered_track.releases.first { |r| !(r&.name).nil? && r&.name == version }
 
       # Since we can release on Internal/Alpha/Beta without release notes.
       if filtered_release.release_notes.nil?
@@ -298,16 +335,49 @@ module Supply
     end
 
     def latest_version(track)
-      latest_version = tracks.select { |t| t.track == Supply::Tracks::DEFAULT }.map(&:releases).flatten.reject { |r| r.name.nil? }.max_by(&:name)
+      latest_version = tracks.select { |t| t.track == Supply::Tracks::DEFAULT }.map(&:releases).flatten.reject { |r| (r&.name).nil? }.max_by(&:name)
 
       # Check if user specified '--track' option if version information from 'production' track is nil
       if latest_version.nil? && track == Supply::Tracks::DEFAULT
         UI.user_error!(%(Unable to find latest version information from "#{Supply::Tracks::DEFAULT}" track. Please specify track information by using the '--track' option.))
       else
-        latest_version = tracks.select { |t| t.track == track }.map(&:releases).flatten.reject { |r| r.name.nil? }.max_by(&:name)
+        latest_version = tracks.select { |t| t.track == track }.map(&:releases).flatten.reject { |r| (r&.name).nil? }.max_by(&:name)
       end
 
       return latest_version
+    end
+
+    # Get the list of Universal APKs generated by Google from the AAB for a particular version code
+    #
+    # @param [Fixnum] version_code
+    #   Version code of the app bundle.
+    # @raise [FastlaneError] (Google Api Error) If no APK was found for the provided `package_name` and `version_code`
+    # @return [Array<GeneratedUniversalApk>]
+    #
+    def list_generated_universal_apks(package_name:, version_code:)
+      result = call_google_api { client.list_generatedapks(package_name, version_code) }
+
+      result.generated_apks.map do |row|
+        GeneratedUniversalApk.new(package_name, version_code, row.certificate_sha256_hash, row.generated_universal_apk.download_id)
+      end
+    end
+
+    # Download a Universal APK generated by Google for a particular version code
+    #
+    # @param [Supply::GeneratedUniversalApk] generated_universal_apk
+    #   The GeneratedUniversalApk object retrieved from a call to `list_generated_universal_apks`
+    # @param [IO, String] destination
+    #   IO stream or filename to receive content download
+    #
+    def download_generated_universal_apk(generated_universal_apk:, destination:)
+      call_google_api {
+        client.download_generatedapk(
+          generated_universal_apk.package_name,
+          generated_universal_apk.version_code,
+          generated_universal_apk.download_id,
+          download_dest: destination
+        )
+      }
     end
 
     #####################################################
@@ -436,38 +506,33 @@ module Supply
       end
     end
 
-    # Get list of version codes for track
-    def track_version_codes(track)
+    def get_edit_track(track)
       ensure_active_edit!
 
       begin
-        result = client.get_edit_track(
+        client.get_edit_track(
           current_package_name,
           current_edit.id,
           track
         )
-        return result.releases.flat_map(&:version_codes) || []
       rescue Google::Apis::ClientError => e
-        return [] if e.status_code == 404 && (e.to_s.include?("trackEmpty") || e.to_s.include?("Track not found"))
-        raise
+        text = [e.message, e.body.to_s].compact.join("\n").downcase
+        is_empty = text.include?("track empty") || text.include?("trackempty") || text.include?("track not found")
+        raise unless e.status_code == 404 && is_empty
+        nil
       end
+    end
+
+    # Get list of version codes for track
+    def track_version_codes(track)
+      result = get_edit_track(track)
+      result&.releases&.flat_map(&:version_codes) || []
     end
 
     # Get list of release names for track
     def track_releases(track)
-      ensure_active_edit!
-
-      begin
-        result = client.get_edit_track(
-          current_package_name,
-          current_edit.id,
-          track
-        )
-        return result.releases || []
-      rescue Google::Apis::ClientError => e
-        return [] if e.status_code == 404 && e.to_s.include?("trackEmpty")
-        raise
-      end
+      result = get_edit_track(track)
+      result&.releases || []
     end
 
     def upload_changelogs(track, track_name)
@@ -504,6 +569,12 @@ module Supply
     # @!group Screenshots
     #####################################################
 
+    # Fetch all the images of a given type and for a given language of your store listing
+    #
+    # @param [String] image_type Typically one of the elements of either Supply::IMAGES_TYPES or Supply::SCREENSHOT_TYPES
+    # @param [String] language Localization code (a BCP-47 language tag; for example, "de-AT" for  Austrian German).
+    # @return [Array<ImageListing>] A list of ImageListing instances describing each image with its id, sha256 and url
+    #
     def fetch_images(image_type: nil, language: nil)
       ensure_active_edit!
 
@@ -516,29 +587,17 @@ module Supply
         )
       end
 
-      urls = (result.images || []).map(&:url)
-      images = urls.map do |url|
-        uri = URI.parse(url)
-        clean_url = [
-          uri.scheme,
-          uri.userinfo,
-          uri.host,
-          uri.port,
-          uri.path
-        ].join
-
-        UI.verbose("Initial URL received: '#{url}'")
-        UI.verbose("Removed params ('#{uri.query}') from the URL")
-        UI.verbose("URL after removing params: '#{clean_url}'")
-
-        full_url = "#{url}=s0" # '=s0' param ensures full image size is returned (https://github.com/fastlane/fastlane/pull/14322#issuecomment-473012462)
-        full_url
+      (result.images || []).map do |row|
+        full_url = "#{row.url}=s0" # '=s0' param ensures full image size is returned (https://github.com/fastlane/fastlane/pull/14322#issuecomment-473012462)
+        ImageListing.new(row.id, row.sha1, row.sha256, full_url)
       end
-
-      return images
     end
 
-    # @param image_type (e.g. phoneScreenshots, sevenInchScreenshots, ...)
+    # Upload an image or screenshot of a specific type for a given language to your store listing
+    #
+    # @param [String] image_type (e.g. phoneScreenshots, sevenInchScreenshots, ...)
+    # @param [String] language localization code (i.e. BCP-47 language tag as in `pt-BR`)
+    #
     def upload_image(image_path: nil, image_type: nil, language: nil)
       ensure_active_edit!
 
@@ -554,6 +613,11 @@ module Supply
       end
     end
 
+    # Remove all screenshots of a given image_type and language from the store listing
+    #
+    # @param [String] image_type (e.g. phoneScreenshots, sevenInchScreenshots, ...)
+    # @param [String] language localization code (i.e. BCP-47 language tag as in `pt-BR`)
+    #
     def clear_screenshots(image_type: nil, language: nil)
       ensure_active_edit!
 
@@ -563,6 +627,26 @@ module Supply
           current_edit.id,
           language,
           image_type
+        )
+      end
+    end
+
+    # Remove a specific screenshot of a given image_type and language from the store listing
+    #
+    # @param [String] image_type (e.g. phoneScreenshots, sevenInchScreenshots, ...)
+    # @param [String] language localization code (i.e. BCP-47 language tag as in `pt-BR`)
+    # @param [String] image_id The id of the screenshot to remove (as per `ImageListing#id`)
+    #
+    def clear_screenshot(image_type: nil, language: nil, image_id: nil)
+      ensure_active_edit!
+
+      call_google_api do
+        client.delete_edit_image(
+          current_package_name,
+          current_edit.id,
+          language,
+          image_type,
+          image_id
         )
       end
     end

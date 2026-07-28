@@ -135,7 +135,7 @@ module Fastlane
       runner_source_resources = "#{Fastlane::ROOT}/swift/."
       destination_path = File.expand_path('swift', FastlaneCore::FastlaneFolder.path)
 
-      # Return eearly if already setup
+      # Return early if already setup
       return if File.exist?(destination_path)
 
       # Show message if Fastfile.swift exists but missing Swift classes and Xcode project

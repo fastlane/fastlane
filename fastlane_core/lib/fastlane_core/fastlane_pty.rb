@@ -10,17 +10,26 @@ end
 
 module FastlaneCore
   class FastlanePtyError < StandardError
-    attr_reader :exit_status
-    def initialize(e, exit_status)
+    attr_reader :exit_status, :process_status
+    def initialize(e, exit_status, process_status)
       super(e)
       set_backtrace(e.backtrace) if e
       @exit_status = exit_status
+      @process_status = process_status
     end
   end
 
   class FastlanePty
-    def self.spawn(command)
+    def self.spawn(command, &block)
+      spawn_with_pty(command, &block)
+    rescue LoadError
+      spawn_with_popen(command, &block)
+    end
+
+    def self.spawn_with_pty(original_command, &block)
       require 'pty'
+      # this forces the PTY flush - fixes #21792
+      command = ENV['FASTLANE_EXEC_FLUSH_PTY_WORKAROUND'] ? "#{original_command};" : original_command
       PTY.spawn(command) do |command_stdout, command_stdin, pid|
         begin
           yield(command_stdout, command_stdin, pid)
@@ -30,6 +39,8 @@ module FastlaneCore
           # This is expected on some linux systems, that indicates that the subcommand finished
           # and we kept trying to read, ignore it
         ensure
+          command_stdin.close
+          command_stdout.close
           begin
             Process.wait(pid)
           rescue Errno::ECHILD, PTY::ChildExited
@@ -37,21 +48,36 @@ module FastlaneCore
           end
         end
       end
-      $?.exitstatus
-    rescue LoadError
+      status = self.process_status
+      raise StandardError, "Process crashed" if status.signaled?
+      status.exitstatus
+    rescue StandardError => e
+      # Wrapping any error in FastlanePtyError to allow callers to see and use
+      # $?.exitstatus that would usually get returned
+      status = self.process_status
+      raise FastlanePtyError.new(e, status.exitstatus || e.exit_status, status)
+    end
+
+    def self.spawn_with_popen(command, &block)
+      status = nil
       require 'open3'
       Open3.popen2e(command) do |command_stdin, command_stdout, p| # note the inversion
-        yield(command_stdout, command_stdin, p.value.pid)
-
+        status = p.value
+        yield(command_stdout, command_stdin, status.pid)
         command_stdin.close
         command_stdout.close
-        p.value.exitstatus
+        raise StandardError, "Process crashed" if status.signaled?
+        status.exitstatus
       end
     rescue StandardError => e
-      # Wrapping any error in FastlanePtyError to allow
-      # callers to see and use $?.exitstatus that
-      # would usually get returned
-      raise FastlanePtyError.new(e, $?.exitstatus)
+      # Wrapping any error in FastlanePtyError to allow callers to see and use
+      # $?.exitstatus that would usually get returned
+      raise FastlanePtyError.new(e, status.exitstatus || e.exit_status, status)
+    end
+
+    # to ease mocking
+    def self.process_status
+      $?
     end
   end
 end

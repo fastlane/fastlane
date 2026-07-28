@@ -62,6 +62,7 @@ describe Fastlane do
           upload_to_play_store
           upload_to_play_store_internal_app_sharing
           upload_to_testflight
+          download_universal_apk_from_google_play
           puts
           println
           echo
@@ -72,6 +73,7 @@ describe Fastlane do
           update_fastlane
           s3
           match_nuke
+          trainer
         )
       end
 

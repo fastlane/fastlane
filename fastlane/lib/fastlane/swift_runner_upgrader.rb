@@ -45,7 +45,9 @@ module Fastlane
     end
 
     def upgrade_if_needed!(dry_run: false)
-      upgraded = add_missing_groups_and_files!(dry_run: dry_run)
+      upgraded = add_missing_flags!(dry_run: dry_run)
+      upgraded = add_missing_copy_phase!(dry_run: dry_run) || upgraded
+      upgraded = add_missing_groups_and_files!(dry_run: dry_run) || upgraded
       upgraded = upgrade_files!(dry_run: dry_run) || upgraded
       upgraded = add_new_files_to_groups! || upgraded
 
@@ -161,7 +163,7 @@ module Fastlane
         group_name = group.name.downcase
         manifest_group_filenames = inverted_hash[group_name]
 
-        # compare the current group files to what the manifest says should minially be there
+        # compare the current group files to what the manifest says should minimally be there
         manifest_group_filenames.each do |filename|
           # current group is missing a file from the manifest, need to add it
           next if existing_group_files_set.include?(filename)
@@ -207,6 +209,60 @@ module Fastlane
       end
 
       return true # yup, we definitely updated groups
+    end
+
+    # adds build_settings flags to fastlane_runner_target
+    def add_missing_flags!(dry_run: false)
+      # Check if upgrade is needed
+      # If fastlane build settings exists already, we don't need any more changes to the Xcode project
+      self.fastlane_runner_target.build_configurations.each { |config|
+        return true if dry_run && config.build_settings["CODE_SIGN_IDENTITY"].nil?
+        return true if dry_run && config.build_settings["MACOSX_DEPLOYMENT_TARGET"].nil?
+      }
+      return false if dry_run
+
+      # Proceed to upgrade
+      self.fastlane_runner_target.build_configurations.each { |config|
+        config.build_settings["CODE_SIGN_IDENTITY"] = "-"
+        config.build_settings["MACOSX_DEPLOYMENT_TARGET"] = "14.6"
+      }
+      target_project.save
+    end
+
+    # adds new copy files build phase to fastlane_runner_target
+    def add_missing_copy_phase!(dry_run: false)
+      # Check if upgrade is needed
+
+      # Check if Copy Files build phase contains FastlaneRunner target.
+      phase_copy_sign = self.fastlane_runner_target.copy_files_build_phases.map(&:files).flatten.select { |file| file.display_name == "FastlaneRunner" }.first
+
+      # If fastlane copy files build phase exists already, we don't need any more changes to the Xcode project
+      phase_copy_sign = self.fastlane_runner_target.copy_files_build_phases.select { |phase_copy| phase_copy.name == "FastlaneRunnerCopySigned" }.first unless phase_copy_sign
+
+      return true if dry_run && phase_copy_sign.nil?
+
+      return false if dry_run
+
+      # Proceed to upgrade
+      old_phase_copy_sign = self.fastlane_runner_target.shell_script_build_phases.select { |phase_copy| phase_copy.shell_script == "cd \"${SRCROOT}\"\ncd ../..\ncp \"${TARGET_BUILD_DIR}/${EXECUTABLE_PATH}\" .\n" }.first
+      old_phase_copy_sign.remove_from_project unless old_phase_copy_sign.nil?
+
+      unless phase_copy_sign
+        # Create a copy files build phase
+        phase_copy_sign = self.fastlane_runner_target.new_copy_files_build_phase("FastlaneRunnerCopySigned")
+        phase_copy_sign.dst_path = "$SRCROOT/../.."
+        phase_copy_sign.dst_subfolder_spec = "0"
+        phase_copy_sign.run_only_for_deployment_postprocessing = "0"
+        targetBinaryReference = self.fastlane_runner_target.product_reference
+        phase_copy_sign.add_file_reference(targetBinaryReference)
+
+        # Set "Code sign on copy" flag on Xcode for fastlane_runner_target
+        targetBinaryReference.build_files.each { |target_binary_build_file_reference|
+          target_binary_build_file_reference.settings = { "ATTRIBUTES": ["CodeSignOnCopy"] }
+        }
+      end
+
+      target_project.save
     end
   end
 end

@@ -367,7 +367,7 @@ func parseInt(fromString: String, function: String = #function) -> Int {
       protocol_content_array = []
       protocol_name = tool_swift_function.protocol_name
 
-      protocol_content_array << "public protocol #{protocol_name}: class {"
+      protocol_content_array << "public protocol #{protocol_name}: AnyObject {"
       protocol_content_array += tool_swift_function.swift_vars
       protocol_content_array << "}"
       protocol_content_array << ""

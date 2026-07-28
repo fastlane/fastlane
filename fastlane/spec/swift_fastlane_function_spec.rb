@@ -27,7 +27,7 @@ describe Fastlane do
     end
 
     describe 'swift_return_value_documentation' do
-      it 'generates nil for fuctions with no return value' do
+      it 'generates nil for functions with no return value' do
         swift_function = Fastlane::SwiftFunction.new
         result = swift_function.swift_return_value_documentation
 

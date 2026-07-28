@@ -25,6 +25,7 @@ describe Match do
     end
 
     it "raises an exception if invalid password is passed" do
+      stub_const('ENV', { "MATCH_PASSWORD" => '2"QAHg@v(Qp{=*n^' })
       @e.encrypt_files
       expect(File.read(@full_path)).to_not(eq(@content))
 
@@ -57,6 +58,53 @@ describe Match do
       stub_const('ENV', { "MATCH_PASSWORD" => new_password })
       @e.decrypt_files
       expect(File.binread(@full_path)).to eq(@content)
+    end
+
+    describe "behavior of force_legacy_encryption parameter" do
+
+      before do
+        @match_encryption_double = instance_double(Match::Encryption::MatchFileEncryption)
+
+        expect(Match::Encryption::MatchFileEncryption)
+          .to(receive(:new))
+          .and_return(@match_encryption_double)
+      end
+
+      it "defaults to false and uses v2 encryption" do
+        expect(@match_encryption_double)
+          .to(receive(:encrypt))
+          .with(file_path: anything, password: anything, version: 2)
+
+        @e.encrypt_files
+      end
+
+      it "uses v1 when force_legacy_encryption is true" do
+        enc = Match::Encryption::OpenSSL.new(
+          keychain_name: @git_url,
+          working_directory: @directory,
+          force_legacy_encryption: true
+        )
+
+        expect(@match_encryption_double)
+          .to(receive(:encrypt))
+          .with(file_path: anything, password: anything, version: 1)
+
+        enc.encrypt_files
+      end
+
+      it "uses v2 when force_legacy_encryption is false" do
+        enc = Match::Encryption::OpenSSL.new(
+          keychain_name: @git_url,
+          working_directory: @directory,
+          force_legacy_encryption: false
+        )
+
+        expect(@match_encryption_double)
+          .to(receive(:encrypt))
+          .with(file_path: anything, password: anything, version: 2)
+
+        enc.encrypt_files
+      end
     end
   end
 end

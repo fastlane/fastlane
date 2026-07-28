@@ -1,4 +1,5 @@
 describe Spaceship::Base do
+  include_examples "common spaceship login", true
   before { Spaceship.login }
   let(:client) { Spaceship::App.client }
 
@@ -19,7 +20,7 @@ describe Spaceship::Base do
 
     it "prints out references" do
       Spaceship::Tunes.login
-      app = Spaceship::Application.all.first
+      app = Spaceship::Application.all.find { |a| a.apple_id == "898536088" }
       v = app.live_version
       output = v.inspect
       expect(output).to include("Tunes::AppVersion")

@@ -8,22 +8,22 @@ module Spaceship
       #   this version is for
       attr_accessor :application
 
-      # @return (Integer) total number of ratings recevied
+      # @return (Integer) total number of ratings received
       attr_accessor :rating_count
 
-      # @return (Integer) total number of one star ratings recevied
+      # @return (Integer) total number of one star ratings received
       attr_accessor :one_star_rating_count
 
-      # @return (Integer) total number of two star ratings recevied
+      # @return (Integer) total number of two star ratings received
       attr_accessor :two_star_rating_count
 
-      # @return (Integer) total number of three star ratings recevied
+      # @return (Integer) total number of three star ratings received
       attr_accessor :three_star_rating_count
 
-      # @return (Integer) total number of four star ratings recevied
+      # @return (Integer) total number of four star ratings received
       attr_accessor :four_star_rating_count
 
-      # @return (Integer) total number of five star ratings recevied
+      # @return (Integer) total number of five star ratings received
       attr_accessor :five_star_rating_count
 
       attr_mapping({

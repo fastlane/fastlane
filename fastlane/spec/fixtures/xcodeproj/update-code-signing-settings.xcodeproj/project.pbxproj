@@ -425,6 +425,7 @@
 		77C503131DD3175E00AC8FF0 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				CODE_SIGN_ENTITLEMENTS = today/Test.entitlements;
 				CODE_SIGN_IDENTITY = "iPhone Distribution";
 				CODE_SIGN_STYLE = Automatic;
 				DEVELOPMENT_TEAM = G3KGXDXQL9;
@@ -442,6 +443,7 @@
 		77C503141DD3175E00AC8FF0 /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+			    CODE_SIGN_ENTITLEMENTS = today/Test.entitlements;
 				CODE_SIGN_IDENTITY = "iPhone Distribution";
 				CODE_SIGN_STYLE = Automatic;
 				DEVELOPMENT_TEAM = G3KGXDXQL9;

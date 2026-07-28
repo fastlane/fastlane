@@ -128,6 +128,34 @@ describe Fastlane do
         end
       end
 
+      it "sets code sign entitlements file" do
+        # G3KGXDXQL9
+        allow(UI).to receive(:success)
+        expect(UI).to receive(:success).with("Successfully updated project settings to use Code Sign Style = 'Manual'")
+
+        ["Debug", "Release"].each do |configuration|
+          expect(UI).to receive(:important).with("Set Team id to: G3KGXDXQL9 for target: demo for build configuration: #{configuration}")
+          expect(UI).to receive(:important).with("Set Team id to: G3KGXDXQL9 for target: today for build configuration: #{configuration}")
+          expect(UI).to receive(:important).with("Set Entitlements file path to: Test.entitlements for target: demo for build configuration: #{configuration}")
+          expect(UI).to receive(:important).with("Set Entitlements file path to: Test.entitlements for target: today for build configuration: #{configuration}")
+        end
+
+        result = Fastlane::FastFile.new.parse("lane :test do
+          update_code_signing_settings(use_automatic_signing: false, path: '#{project_path}', team_id: 'G3KGXDXQL9', entitlements_file_path: 'Test.entitlements')
+        end").runner.execute(:test)
+        expect(result).to eq(false)
+
+        project = Xcodeproj::Project.open(project_path)
+        project.targets.each do |target|
+          target.build_configuration_list.get_setting("CODE_SIGN_STYLE").map do |build_config, value|
+            expect(value).to eq("Manual")
+          end
+          target.build_configuration_list.get_setting("CODE_SIGN_ENTITLEMENTS").map do |build_config, value|
+            expect(value).to eq("Test.entitlements")
+          end
+        end
+      end
+
       it "sets profile name" do
         # G3KGXDXQL9
         allow(UI).to receive(:success)

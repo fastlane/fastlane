@@ -86,11 +86,13 @@ module FastlaneCore
 
     def header(message)
       format = format_string
-      if message.length + 8 < TTY::Screen.width - format.length
+      # clamp to zero to prevent negative argument error below
+      available_width = [0, TTY::Screen.width - format.length].max
+      if message.length + 8 < available_width
         message = "--- #{message} ---"
         i = message.length
       else
-        i = TTY::Screen.width - format.length
+        i = available_width
       end
       success("-" * i)
       success(message)
@@ -106,12 +108,14 @@ module FastlaneCore
       start_line = error_line - 2 < 1 ? 1 : error_line - 2
       end_line = error_line + 2 < contents.length ? error_line + 2 : contents.length
 
+      error('```')
       Range.new(start_line, end_line).each do |line|
         str = line == error_line ? " => " : "    "
         str << line.to_s.rjust(Math.log10(end_line) + 1)
         str << ":\t#{contents[line - 1]}"
         error(str)
       end
+      error('```')
     end
 
     #####################################################

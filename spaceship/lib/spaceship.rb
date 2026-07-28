@@ -3,6 +3,7 @@ require_relative 'spaceship/base'
 require_relative 'spaceship/client'
 require_relative 'spaceship/provider'
 require_relative 'spaceship/launcher'
+require_relative 'spaceship/hashcash'
 
 # Middleware
 require_relative 'spaceship/stats_middleware'

@@ -12,11 +12,18 @@ module Fastlane
         require 'net/http'
         require 'date'
 
-        # Team selection passed though FASTLANE_ITC_TEAM_ID and FASTLANE_ITC_TEAM_NAME environment variables
-        # Prompts select team if multiple teams and none specified
-        UI.message("Login to App Store Connect (#{params[:username]})")
-        Spaceship::ConnectAPI.login(params[:username], use_portal: false, use_tunes: true)
-        UI.message("Login successful")
+        if (api_token = Spaceship::ConnectAPI::Token.from(hash: params[:api_key], filepath: params[:api_key_path]))
+          UI.message("Creating authorization token for App Store Connect API")
+          Spaceship::ConnectAPI.token = api_token
+        elsif !Spaceship::ConnectAPI.token.nil?
+          UI.message("Using existing authorization token for App Store Connect API")
+        else
+          # Team selection passed though FASTLANE_ITC_TEAM_ID and FASTLANE_ITC_TEAM_NAME environment variables
+          # Prompts select team if multiple teams and none specified
+          UI.message("Login to App Store Connect (#{params[:username]})")
+          Spaceship::ConnectAPI.login(params[:username], use_portal: false, use_tunes: true)
+          UI.message("Login successful")
+        end
 
         # Get App
         app = Spaceship::ConnectAPI::App.find(params[:app_identifier])
@@ -68,10 +75,11 @@ module Fastlane
 
         filter = { app: app.id }
         filter["preReleaseVersion.platform"] = platform
-        build_resps = Spaceship::ConnectAPI.get_builds(filter: filter, sort: "-uploadedDate", includes: "preReleaseVersion").all_pages
-        builds = build_resps.flat_map(&:to_models)
+        filter["preReleaseVersion.version"] = version if version
+        filter["version"] = build_number if build_number
+        build_resp = Spaceship::ConnectAPI.get_builds(filter: filter, sort: "-uploadedDate", includes: "preReleaseVersion,buildBundles")
 
-        builds.each do |build|
+        build_resp.all_pages_each do |build|
           asc_app_version = build.app_version
           asc_build_number = build.version
           uploaded_date = DateTime.parse(build.uploaded_date)
@@ -93,7 +101,7 @@ module Fastlane
 
           if after_uploaded_date && after_uploaded_date >= uploaded_date
             UI.verbose("Upload date #{after_uploaded_date} not reached: #{uploaded_date}")
-            next
+            break
           end
 
           message = []
@@ -107,46 +115,37 @@ module Fastlane
           end
 
           UI.verbose("Build_version: #{asc_build_number} matches #{build_number}, grabbing dsym_url") if build_number
-          get_details_and_download_dsym(app: app, train: asc_app_version, build_number: asc_build_number, uploaded_date: uploaded_date, platform: itc_platform, wait_for_dsym_processing: wait_for_dsym_processing, wait_timeout: wait_timeout, output_directory: output_directory)
+          download_dsym(build: build, app: app, wait_for_dsym_processing: wait_for_dsym_processing, wait_timeout: wait_timeout, output_directory: output_directory)
         end
       end
 
-      def self.get_details_and_download_dsym(app: nil, train: nil, build_number: nil, uploaded_date: nil, platform: nil, wait_for_dsym_processing: nil, wait_timeout: nil, output_directory: nil)
+      def self.download_dsym(build: nil, app: nil, wait_for_dsym_processing: nil, wait_timeout: nil, output_directory: nil)
         start = Time.now
-        download_url = nil
+        dsym_urls = []
 
         loop do
-          begin
-            resp = Spaceship::Tunes.client.build_details(app_id: app.id, train: train, build_number: build_number, platform: platform)
+          build_bundles = build.build_bundles.select { |b| b.includes_symbols == true }
+          dsym_urls = build_bundles.map(&:dsym_url).compact
 
-            resp['apple_id'] = app.id
-            build_details = Spaceship::Tunes::BuildDetails.factory(resp)
+          break if build_bundles.count == dsym_urls.count
 
-            download_url = build_details.dsym_url
-            UI.verbose("dsym_url: #{download_url}")
-          rescue Spaceship::TunesClient::ITunesConnectError => ex
-            UI.error("Error accessing dSYM file for build\n\n#{build}\n\nException: #{ex}")
+          if !wait_for_dsym_processing || (Time.now - start) > wait_timeout
+            # In some cases, AppStoreConnect does not process the dSYMs, thus no error should be thrown.
+            UI.message("Could not find any dSYM for #{build.version} (#{build.app_version})")
+            break
+          else
+            UI.message("Waiting for dSYM file to appear...")
+            sleep(30) unless FastlaneCore::Helper.is_test?
+            build = Spaceship::ConnectAPI::Build.get(build_id: build.id)
           end
-
-          unless download_url
-            if !wait_for_dsym_processing || (Time.now - start) > wait_timeout
-              # In some cases, AppStoreConnect does not process the dSYMs, thus no error should be thrown.
-              UI.message("Could not find any dSYM for #{build_number} (#{train})")
-            else
-              UI.message("Waiting for dSYM file to appear...")
-              sleep(30)
-              next
-            end
-          end
-
-          break
         end
 
-        if download_url
-          self.download(download_url, app.bundle_id, train, build_number, uploaded_date, output_directory)
-          return if build_number
+        if dsym_urls.count == 0
+          UI.message("No dSYM URL for #{build.version} (#{build.app_version})")
         else
-          UI.message("No dSYM URL for #{build_number} (#{train})")
+          dsym_urls.each do |url|
+            self.download(url, build, app, output_directory)
+          end
         end
       end
       # rubocop:enable Metrics/PerceivedComplexity
@@ -154,7 +153,7 @@ module Fastlane
       def self.get_latest_build!(app_id: nil, platform: nil)
         filter = { app: app_id }
         filter["preReleaseVersion.platform"] = platform
-        latest_build = Spaceship::ConnectAPI.get_builds(filter: filter, sort: "-uploadedDate", includes: "preReleaseVersion").first
+        latest_build = Spaceship::ConnectAPI.get_builds(filter: filter, sort: "-uploadedDate", includes: "preReleaseVersion,buildBundles").first
 
         if latest_build.nil?
           UI.user_error!("Could not find any build for platform #{platform}") if platform
@@ -164,18 +163,18 @@ module Fastlane
         return latest_build
       end
 
-      def self.download(download_url, bundle_id, train_number, build_version, uploaded_date, output_directory)
+      def self.download(download_url, build, app, output_directory)
         result = self.download_file(download_url)
-        path   = write_dsym(result, bundle_id, train_number, build_version, output_directory)
-        UI.success("🔑  Successfully downloaded dSYM file for #{train_number} - #{build_version} to '#{path}'")
+        path   = write_dsym(result, app.bundle_id, build.app_version, build.version, output_directory)
+        UI.success("🔑  Successfully downloaded dSYM file for #{build.app_version} - #{build.version} to '#{path}'")
 
         Actions.lane_context[SharedValues::DSYM_PATHS] ||= []
         Actions.lane_context[SharedValues::DSYM_PATHS] << File.expand_path(path)
 
-        unless uploaded_date.nil?
-          Actions.lane_context[SharedValues::DSYM_LATEST_UPLOADED_DATE] ||= uploaded_date
+        unless build.uploaded_date.nil?
+          Actions.lane_context[SharedValues::DSYM_LATEST_UPLOADED_DATE] ||= build.uploaded_date
           current_latest = Actions.lane_context[SharedValues::DSYM_LATEST_UPLOADED_DATE]
-          Actions.lane_context[SharedValues::DSYM_LATEST_UPLOADED_DATE] = [current_latest, uploaded_date].max
+          Actions.lane_context[SharedValues::DSYM_LATEST_UPLOADED_DATE] = [current_latest, build.uploaded_date].max
           UI.verbose("Most recent build uploaded_date #{Actions.lane_context[SharedValues::DSYM_LATEST_UPLOADED_DATE]}")
         end
       end
@@ -234,6 +233,23 @@ module Fastlane
         user ||= CredentialsManager::AppfileConfig.try_fetch_value(:apple_id)
 
         [
+          FastlaneCore::ConfigItem.new(key: :api_key_path,
+                                       env_names: ["DOWNLOAD_DSYMS_API_KEY_PATH", "APP_STORE_CONNECT_API_KEY_PATH"],
+                                       description: "Path to your App Store Connect API Key JSON file (https://docs.fastlane.tools/app-store-connect-api/#using-fastlane-api-key-json-file)",
+                                       optional: true,
+                                       conflicting_options: [:api_key],
+                                       verify_block: proc do |value|
+                                         UI.user_error!("Couldn't find API key JSON file at path '#{value}'") unless File.exist?(value)
+                                       end),
+          FastlaneCore::ConfigItem.new(key: :api_key,
+                                       env_names: ["DOWNLOAD_DSYMS_API_KEY", "APP_STORE_CONNECT_API_KEY"],
+                                       description: "Your App Store Connect API Key information (https://docs.fastlane.tools/app-store-connect-api/#use-return-value-and-pass-in-as-an-option)",
+                                       type: Hash,
+                                       default_value: Fastlane::Actions.lane_context[Fastlane::Actions::SharedValues::APP_STORE_CONNECT_API_KEY],
+                                       default_value_dynamic: true,
+                                       optional: true,
+                                       sensitive: true,
+                                       conflicting_options: [:api_key_path]),
           FastlaneCore::ConfigItem.new(key: :username,
                                        short_option: "-u",
                                        env_name: "DOWNLOAD_DSYMS_USERNAME",
@@ -274,7 +290,7 @@ module Fastlane
           FastlaneCore::ConfigItem.new(key: :platform,
                                        short_option: "-p",
                                        env_name: "DOWNLOAD_DSYMS_PLATFORM",
-                                       description: "The app platform for dSYMs you wish to download (ios, appletvos)",
+                                       description: "The app platform for dSYMs you wish to download (ios, xros, appletvos)",
                                        default_value: :ios),
           FastlaneCore::ConfigItem.new(key: :version,
                                        short_option: "-v",
@@ -335,7 +351,7 @@ module Fastlane
       end
 
       def self.is_supported?(platform)
-        [:ios, :appletvos].include?(platform)
+        [:ios, :appletvos, :xros].include?(platform)
       end
 
       def self.example_code

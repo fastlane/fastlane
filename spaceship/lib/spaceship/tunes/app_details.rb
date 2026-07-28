@@ -11,7 +11,7 @@ module Spaceship
       # Localized values
       ####
 
-      # @return (Array) Raw access the all available languages. You shouldn't use it probbaly
+      # @return (Array) Raw access the all available languages. You shouldn't use it probably
       attr_accessor :languages
 
       # @return (Hash) A hash representing the app name in all languages
@@ -23,7 +23,7 @@ module Spaceship
       # @return (Hash) A hash representing the privacy URL in all languages
       attr_reader :privacy_url
 
-      # @return (Hash) A hash prepresenting the privacy URL in all languages for Apple TV
+      # @return (Hash) A hash representing the privacy URL in all languages for Apple TV
       attr_reader :apple_tv_privacy_policy
 
       # Categories (e.g. MZGenre.Business)

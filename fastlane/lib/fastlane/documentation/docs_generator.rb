@@ -4,21 +4,18 @@ module Fastlane
       output_path ||= File.join(FastlaneCore::FastlaneFolder.path || '.', 'README.md')
 
       output = ["fastlane documentation"]
-      output << "================"
+      output << "----"
+      output << ""
 
       output << "# Installation"
       output << ""
       output << "Make sure you have the latest version of the Xcode command line tools installed:"
       output << ""
-      output << "```"
+      output << "```sh"
       output << "xcode-select --install"
       output << "```"
       output << ""
-      output << "Install _fastlane_ using"
-      output << "```"
-      output << "[sudo] gem install fastlane -NV"
-      output << "```"
-      output << "or alternatively using `brew install fastlane`"
+      output << "For _fastlane_ installation instructions, see [Installing _fastlane_](https://docs.fastlane.tools/#installing-fastlane)"
       output << ""
       output << "# Available Actions"
 
@@ -32,7 +29,10 @@ module Fastlane
           next
         end
 
-        output << "## #{formatted_platform(platform)}" if platform
+        if platform
+          output << ""
+          output << "## #{formatted_platform(platform)}"
+        end
 
         lanes.each do |lane_name, lane|
           next if lane.is_private
@@ -45,8 +45,10 @@ module Fastlane
       end
 
       output << "This README.md is auto-generated and will be re-generated every time [_fastlane_](https://fastlane.tools) is run."
-      output << "More information about fastlane can be found on [fastlane.tools](https://fastlane.tools)."
-      output << "The documentation of fastlane can be found on [docs.fastlane.tools](https://docs.fastlane.tools)."
+      output << ""
+      output << "More information about _fastlane_ can be found on [fastlane.tools](https://fastlane.tools)."
+      output << ""
+      output << "The documentation of _fastlane_ can be found on [docs.fastlane.tools](https://docs.fastlane.tools)."
       output << ""
 
       begin
@@ -78,10 +80,13 @@ module Fastlane
       full_name = [platform, lane].reject(&:nil?).join(' ')
 
       output = []
+      output << ""
       output << "### #{full_name}"
+      output << ""
+      output << "```sh"
+      output << "[bundle exec] fastlane #{full_name}"
       output << "```"
-      output << "fastlane #{full_name}"
-      output << "```"
+      output << ""
       output << description
       output
     end

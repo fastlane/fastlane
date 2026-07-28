@@ -1,0 +1,125 @@
+name: CI
+
+on:
+  push:
+    branches: [ master ]
+  pull_request:
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+jobs:
+  macos-tests:
+    name: ${{ matrix.os }}, Xcode ${{ matrix.xcode }}, Ruby ${{ matrix.ruby }} Tests
+    runs-on: ${{ matrix.os }}
+    permissions:
+      contents: read
+      pull-requests: write
+    strategy:
+      fail-fast: true
+      matrix:
+        include:
+          - { xcode: '16.4.0', ruby: '3.1', rubyopt: '', os: 'macos-15' }
+          - { xcode: '16.4.0', ruby: '3.2', rubyopt: '', os: 'macos-15' }
+          - { xcode: '16.4.0', ruby: '3.3', rubyopt: '', os: 'macos-15' }
+          - { xcode: '16.4.0', ruby: '3.4', rubyopt: '', os: 'macos-15' }
+          - { xcode: '26.5', ruby: '3.4', rubyopt: '-W0', os: 'macos-26' }
+          - { xcode: '26.6', ruby: '3.4', rubyopt: '-W0', os: 'macos-26' }
+          - { xcode: '', ruby: '3.2', rubyopt: '', os: 'windows-2022' }
+          - { xcode: '', ruby: '3.0', rubyopt: '', os: 'ubuntu-24.04' }
+    steps:
+      - uses: actions/checkout@v7
+
+      - name: Select Xcode ${{ matrix.xcode }}
+        if: runner.os == 'macOS'
+        uses: maxim-lobanov/setup-xcode@v1
+        with:
+          xcode-version: ${{ matrix.xcode }}
+
+      - name: Debug | Xcode version
+        if: runner.os == 'macOS'
+        run: |
+          xcodebuild -version
+          xcode-select -p
+
+      - name: Set up Ruby ${{ matrix.ruby }}
+        uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: ${{ matrix.ruby }}
+          bundler-cache: true
+
+      - name: Debug | Ruby version
+        shell: bash
+        run: ruby -v
+
+      - name: Increase Open File Limit
+        if: runner.os != 'Windows'
+        shell: bash
+        run: ulimit -n 65536
+
+      - name: Run tests
+        env:
+          RUBYOPT: ${{ matrix.rubyopt }}
+        shell: bash
+        run: |
+          git config --global user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git config --global user.name "github-actions[bot]"
+          bundle exec fastlane execute_tests
+
+      - name: RSpec report
+        if: always()
+        uses: SonicGarden/rspec-report-action@v8
+        with:
+          json-path: rspec_logs.json
+          comment: 'false'
+          title: '# :cold_sweat: RSpec failure (${{ matrix.os }}, Xcode ${{ matrix.xcode }}, Ruby ${{ matrix.ruby }})'
+
+  validate_fastlane_swift_generation:
+    name: Validate Fastlane.swift generation
+    runs-on: macos-26
+    steps:
+      - uses: actions/checkout@v7
+
+      - uses: maxim-lobanov/setup-xcode@v1
+        with:
+          xcode-version: '26.3'
+
+      - uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: '3.4'
+          bundler-cache: true
+
+      - name: Generate Swift API
+        run: bundle exec fastlane generate_swift_api
+
+  validate_documentation:
+    name: Validate Documentation
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v7
+
+      - uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: '3.4'
+          bundler-cache: true
+
+      - name: Validate docs
+        run: bundle exec fastlane validate_docs
+
+  lint_source_code:
+    name: Lint source code
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v7
+
+      - uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: '3.4'
+          bundler-cache: true
+
+      - name: Lint
+        run: bundle exec fastlane lint_source

@@ -1,9 +1,9 @@
 describe Spaceship::Tunes::Availability do
-  before { Spaceship::Tunes.login }
+  include_examples "common spaceship login"
   before { TunesStubbing.itc_stub_app_pricing_intervals }
 
   let(:client) { Spaceship::AppVersion.client }
-  let(:app) { Spaceship::Application.all.first }
+  let(:app) { Spaceship::Application.all.find { |a| a.apple_id == "898536088" } }
 
   describe "availability" do
     it "inspect works" do

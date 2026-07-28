@@ -1,4 +1,4 @@
-require_relative '../model'
+require_relative '../../connect_api'
 
 require 'openssl'
 
@@ -41,6 +41,10 @@ module Spaceship
         MAC_APP_DEVELOPMENT = "MAC_APP_DEVELOPMENT"
         DEVELOPER_ID_KEXT = "DEVELOPER_ID_KEXT"
         DEVELOPER_ID_APPLICATION = "DEVELOPER_ID_APPLICATION"
+        DEVELOPER_ID_APPLICATION_G2 = "DEVELOPER_ID_APPLICATION_G2"
+
+        # As of 2021-11-09, this is only available with Apple ID auth
+        DEVELOPER_ID_INSTALLER = "DEVELOPER_ID_INSTALLER"
       end
 
       def self.type
@@ -48,10 +52,11 @@ module Spaceship
       end
 
       def valid?
+        return false if expiration_date.nil? || expiration_date.empty?
         Time.parse(expiration_date) > Time.now
       end
 
-      # Create a new code signing request that can be used to
+      # Create a new cert signing request that can be used to
       # generate a new certificate
       # @example
       #  Create a new certificate signing request
@@ -67,7 +72,7 @@ module Spaceship
                                                 ['CN', 'PEM', OpenSSL::ASN1::UTF8STRING]
                                               ])
         csr.public_key = key.public_key
-        csr.sign(key, OpenSSL::Digest::SHA1.new)
+        csr.sign(key, OpenSSL::Digest::SHA256.new)
         return [csr, key]
       end
 
@@ -75,10 +80,40 @@ module Spaceship
       # API
       #
 
-      def self.all(client: nil, filter: {}, includes: nil, limit: nil, sort: nil)
+      # Certificate types not supported by the App Store Connect API.
+      # https://api.appstoreconnect.apple.com/v1/certificates?filter[certificateType]=DEVELOPER_ID_APPLICATION_G2
+      # Radar: FB21181137.
+      UNSUPPORTED_CERTIFICATE_TYPE_FILTERS = [
+        CertificateType::DEVELOPER_ID_APPLICATION_G2
+      ]
+
+      def self.all(client: nil, filter: {}, includes: nil, fields: nil, limit: Spaceship::ConnectAPI::MAX_OBJECTS_PER_PAGE_LIMIT, sort: nil)
         client ||= Spaceship::ConnectAPI
-        resps = client.get_certificates(filter: filter, includes: includes).all_pages
-        return resps.flat_map(&:to_models)
+
+        new_filter = filter.dup
+
+        has_unsupported_cert_types_filter = filter[:certificateType] && UNSUPPORTED_CERTIFICATE_TYPE_FILTERS.any? { |type| filter[:certificateType].include?(type) }
+
+        # If the filter contains unsupported certificate types:
+        # - remove the certificateType filter completely and fetch all certificates
+        # - filter fetched certificates later by the given certificate types
+        if has_unsupported_cert_types_filter
+          new_filter[:certificateType] = nil
+        end
+        new_filter.compact!
+
+        resps = client.get_certificates(filter: new_filter, includes: includes, fields: fields, limit: limit, sort: sort).all_pages
+
+        certs = resps.flat_map(&:to_models)
+
+        if has_unsupported_cert_types_filter
+          # Filter fetched certificates by the given certificate types if we encountered unsupported certificate types in the filter previously.
+          certs.select! do |cert|
+            filter[:certificateType].include?(cert.certificate_type)
+          end
+        end
+
+        return certs
       end
 
       def self.create(client: nil, certificate_type: nil, csr_content: nil)

@@ -17,9 +17,9 @@ describe Fastlane do
         end.to raise_error(/The Fastfile requires a fastlane version of >= 9999./)
       end
 
-      it "raises an exception if it's an old version in a non-bundler environement" do
+      it "raises an exception if it's an old version in a non-bundler environment" do
         expect do
-          # We have to clean ENV to be sure that Bundler environement is not defined.
+          # We have to clean ENV to be sure that Bundler environment is not defined.
           stub_const('ENV', {})
           expect(FastlaneCore::Changelog).to receive(:show_changes).with("fastlane", Fastlane::VERSION, update_gem_command: "gem install fastlane")
 
@@ -29,11 +29,11 @@ describe Fastlane do
         end.to raise_error("The Fastfile requires a fastlane version of >= 9999. You are on #{Fastlane::VERSION}.")
       end
 
-      it "raises an exception if it's an old version in a bundler environement" do
+      it "raises an exception if it's an old version in a bundler environment" do
         expect do
           expect(FastlaneCore::Changelog).to receive(:show_changes).with("fastlane", Fastlane::VERSION, update_gem_command: "bundle update fastlane")
 
-          # Let's define BUNDLE_BIN_PATH in ENV to simulate a bundler environement
+          # Let's define BUNDLE_BIN_PATH in ENV to simulate a bundler environment
           stub_const('ENV', { 'BUNDLE_BIN_PATH' => '/fake/elsewhere' })
           Fastlane::FastFile.new.parse("lane :test do
             min_fastlane_version '9999'

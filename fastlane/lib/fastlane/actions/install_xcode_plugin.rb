@@ -3,6 +3,7 @@ module Fastlane
     class InstallXcodePluginAction < Action
       def self.run(params)
         require 'fileutils'
+        require 'tmpdir'
 
         if params[:github]
           base_api_url = params[:github].sub('https://github.com', 'https://api.github.com/repos')
@@ -25,10 +26,10 @@ module Fastlane
         end
 
         zip_path = File.join(Dir.tmpdir, 'plugin.zip')
-        sh("curl -Lso #{zip_path} #{params[:url]}")
+        Action.sh("curl", "-L", "-s", "-o", zip_path, params[:url])
         plugins_path = "#{ENV['HOME']}/Library/Application Support/Developer/Shared/Xcode/Plug-ins"
         FileUtils.mkdir_p(plugins_path)
-        Action.sh("unzip -qo '#{zip_path}' -d '#{plugins_path}'")
+        Action.sh("unzip", "-qo", zip_path, "-d", plugins_path)
 
         UI.success("Plugin #{File.basename(params[:url], '.zip')} installed successfully")
         UI.message("Please restart Xcode to use the newly installed plugin")

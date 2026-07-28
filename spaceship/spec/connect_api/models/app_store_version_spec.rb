@@ -1,5 +1,5 @@
 describe Spaceship::ConnectAPI::AppStoreVersion do
-  before { Spaceship::Tunes.login }
+  include_examples "common spaceship login"
 
   describe "AppStoreVersion object" do
     describe "reverse maps attributes" do

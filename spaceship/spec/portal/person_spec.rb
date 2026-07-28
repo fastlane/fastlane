@@ -1,4 +1,6 @@
 describe Spaceship::Portal::Persons do
+  # Skip tunes login and login with portal
+  include_examples "common spaceship login", true
   before { Spaceship.login }
   let(:client) { Spaceship::Persons.client }
   it "should factor a new person object" do
@@ -32,7 +34,7 @@ describe Spaceship::Portal::Persons do
     expect(person.joined).to eq(joined)
   end
 
-  it "should be OK if person date format is unparseable" do
+  it "should be OK if person date format is unparsable" do
     joined = "This is clearly not a timestamp"
     attrs = {
       "personId" => "1234",

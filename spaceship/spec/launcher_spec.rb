@@ -69,7 +69,7 @@ describe Spaceship do
         clean_launcher = Spaceship::Launcher.new
         clean_launcher.login(username, password)
 
-        expect(clean_launcher.client).to receive(:create_certificate!).with('BKLRAVXMGM', /BEGIN CERTIFICATE REQUEST/, 'B7JBD8LHAA', false) do
+        expect(clean_launcher.client).to receive(:create_certificate!).with('JKG5JZ54H7', /BEGIN CERTIFICATE REQUEST/, 'B7JBD8LHAA', false) do
           JSON.parse(PortalStubbing.adp_read_fixture_file('certificateCreate.certRequest.json'))
         end
 

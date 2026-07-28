@@ -158,7 +158,7 @@ describe Fastlane do
         expect(result).not_to(include('--proxy-user'))
       end
 
-      it "show progres bar option is used" do
+      it "show progress bar option is used" do
         ENV['DSYM_OUTPUT_PATH'] = nil
         ENV['DSYM_ZIP_PATH'] = nil
         Fastlane::Actions.lane_context[Fastlane::Actions::SharedValues::DSYM_OUTPUT_PATH] = nil

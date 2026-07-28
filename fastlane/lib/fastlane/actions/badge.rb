@@ -63,7 +63,7 @@ module Fastlane
         [
           FastlaneCore::ConfigItem.new(key: :dark,
                                        env_name: "FL_BADGE_DARK",
-                                       description: "Adds a dark flavored badge ontop of your icon",
+                                       description: "Adds a dark flavored badge on top of your icon",
                                        optional: true,
                                        type: Boolean,
                                        verify_block: proc do |value|

@@ -1,5 +1,6 @@
 require 'fastlane_core/configuration/config_item'
 require 'credentials_manager/appfile_config'
+require 'fastlane/helper/lane_helper'
 
 require_relative 'module'
 
@@ -10,6 +11,14 @@ module PEM
       user ||= CredentialsManager::AppfileConfig.try_fetch_value(:apple_id)
 
       [
+        FastlaneCore::ConfigItem.new(key: :platform,
+                                     description: "Set certificate's platform. Used for creation of production & development certificates. Supported platforms: ios, macos",
+                                     short_option: "-m",
+                                     env_name: "PEM_PLATFORM",
+                                     default_value: "ios",
+                                     verify_block: proc do |value|
+                                       UI.user_error!("The platform can only be ios or macos") unless ['ios', 'macos'].include?(value)
+                                     end),
         FastlaneCore::ConfigItem.new(key: :development,
                                      env_name: "PEM_DEVELOPMENT",
                                      description: "Renew the development push certificate instead of the production one",

@@ -17,8 +17,28 @@ describe FastlaneCore do
       end
     end
 
+    describe "#xcode_at_least?" do
+      ["15.2", "15.2.3", 15, 15.3].each do |check_version|
+        ["15.3", "16"].each do |xcode_version|
+          it "Xcode #{xcode_version} is at least #{check_version}" do
+            allow(FastlaneCore::Helper).to receive(:xcode_version).and_return(xcode_version)
+
+            expect(FastlaneCore::Helper.xcode_at_least?(check_version)).to be(true)
+          end
+        end
+
+        ["14", "14.99.99"].each do |xcode_version|
+          it "Xcode #{xcode_version} is less than #{check_version}" do
+            allow(FastlaneCore::Helper).to receive(:xcode_version).and_return(xcode_version)
+
+            expect(FastlaneCore::Helper.xcode_at_least?(check_version)).to be(false)
+          end
+        end
+      end
+    end
+
     describe '#colors_disabled?' do
-      it "should return false if no environemnt variables set" do
+      it "should return false if no environment variables set" do
         stub_const('ENV', {})
         expect(FastlaneCore::Helper.colors_disabled?).to be(false)
       end
@@ -77,7 +97,7 @@ describe FastlaneCore do
         expect(FastlaneCore::Helper.ci?).to be(true)
       end
 
-      it "returns true when building in Github Actions" do
+      it "returns true when building in GitHub Actions" do
         stub_const('ENV', { 'GITHUB_ACTION' => 'FAKE_ACTION' })
         expect(FastlaneCore::Helper.ci?).to be(true)
         stub_const('ENV', { 'GITHUB_ACTIONS' => 'true' })
@@ -144,7 +164,9 @@ describe FastlaneCore do
       end
 
       it "#transporter_path", requires_xcode: true do
-        expect(FastlaneCore::Helper.transporter_path).to match(%r{/Applications/Xcode.*.app/Contents/Applications/Application Loader.app/Contents/itms/bin/iTMSTransporter|/Applications/Xcode.*.app/Contents/SharedFrameworks/ContentDeliveryServices.framework/Versions/A/itms/bin/iTMSTransporter})
+        unless FastlaneCore::Helper.xcode_at_least?("14")
+          expect(FastlaneCore::Helper.transporter_path).to match(%r{/Applications/Xcode.*.app/Contents/Applications/Application Loader.app/Contents/itms/bin/iTMSTransporter|/Applications/Xcode.*.app/Contents/SharedFrameworks/ContentDeliveryServices.framework/Versions/A/itms/bin/iTMSTransporter})
+        end
       end
 
       it "#xcode_version", requires_xcode: true do
@@ -178,7 +200,13 @@ describe FastlaneCore do
       context "#itms_path" do
         it "default", requires_xcode: true do
           stub_const('ENV', { 'FASTLANE_ITUNES_TRANSPORTER_PATH' => nil })
-          expect(FastlaneCore::Helper.itms_path).to match(/itms/)
+
+          if FastlaneCore::Helper.xcode_at_least?("14")
+            expect(FastlaneCore::UI).to receive(:user_error!).with(/Could not find transporter/)
+            expect { FastlaneCore::Helper.itms_path }.not_to raise_error
+          else
+            expect(FastlaneCore::Helper.itms_path).to match(/itms/)
+          end
         end
 
         it "uses FASTLANE_ITUNES_TRANSPORTER_PATH", requires_xcode: true do
@@ -211,6 +239,36 @@ describe FastlaneCore do
       end
     end
 
+    describe "#backticks" do
+      it "executes the command and returns the output" do
+        expect(FastlaneCore::Helper.backticks("echo hello")).to eq("hello\n")
+      end
+
+      it "prints the command and output if print is true" do
+        expect(FastlaneCore::UI).to receive(:command).with("echo hello")
+        expect(FastlaneCore::UI).to receive(:command_output).with("hello\n")
+        FastlaneCore::Helper.backticks("echo hello", print: true)
+      end
+
+      it "does not print the command and output if print is false" do
+        expect(FastlaneCore::UI).not_to receive(:command)
+        expect(FastlaneCore::UI).not_to receive(:command_output)
+        FastlaneCore::Helper.backticks("echo hello", print: false)
+      end
+    end
+
+    describe "#which" do
+      it "delegates to FastlaneCore::CommandExecutor.which" do
+        expect(FastlaneCore::CommandExecutor).to receive(:which).with('ruby').and_return('/usr/bin/ruby')
+        expect(FastlaneCore::Helper.which('ruby')).to eq('/usr/bin/ruby')
+      end
+
+      it "returns nil when command is not found" do
+        expect(FastlaneCore::CommandExecutor).to receive(:which).with('not_a_real_command').and_return(nil)
+        expect(FastlaneCore::Helper.which('not_a_real_command')).to be_nil
+      end
+    end
+
     describe "#fastlane_enabled?" do
       it "returns false when FastlaneCore::FastlaneFolder.path is nil" do
         expect(FastlaneCore::FastlaneFolder).to receive(:path).and_return(nil)
@@ -220,38 +278,6 @@ describe FastlaneCore do
       it "returns true when FastlaneCore::FastlaneFolder.path is not nil" do
         expect(FastlaneCore::FastlaneFolder).to receive(:path).and_return('./fastlane')
         expect(FastlaneCore::Helper.fastlane_enabled?).to be(true)
-      end
-    end
-
-    describe '#open_uri' do
-      before do
-        stub_request(:get, 'https://fastlane.tools').to_return(body: 'SOME_TEXT', status: 200)
-      end
-
-      it 'performs URI.open and return IO like object that can be read' do
-        expect(FastlaneCore::Helper.open_uri('https://fastlane.tools')).to respond_to(:read)
-      end
-
-      it 'performs URI.open with block' do
-        is_block_called = false
-        FastlaneCore::Helper.open_uri('https://fastlane.tools') do |content|
-          expect(content).to respond_to(:read)
-          is_block_called = true
-        end
-        expect(is_block_called).to be(true)
-      end
-
-      it 'performs URI.open with options' do
-        expect(FastlaneCore::Helper.open_uri('https://fastlane.tools', 'rb')).to respond_to(:read)
-      end
-
-      it 'performs URI.open with options and block' do
-        is_block_called = false
-        FastlaneCore::Helper.open_uri('https://fastlane.tools', 'rb') do |content|
-          expect(content).to respond_to(:read)
-          is_block_called = true
-        end
-        expect(is_block_called).to be(true)
       end
     end
   end

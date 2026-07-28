@@ -22,7 +22,7 @@ module Fastlane
       end
 
       # loads the dotenvs. First the .env and .env.default and
-      # then override with all speficied extra environments
+      # then override with all specified extra environments
       def self.load_dot_envs_from(env_cl_param, base_path)
         require 'dotenv'
 

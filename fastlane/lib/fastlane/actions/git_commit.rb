@@ -2,22 +2,20 @@ module Fastlane
   module Actions
     class GitCommitAction < Action
       def self.run(params)
-        paths = params[:path].map(&:shellescape).join(' ')
-
-        skip_git_hooks = params[:skip_git_hooks] ? '--no-verify' : ''
+        paths = params[:path]
+        skip_git_hooks = params[:skip_git_hooks] ? ['--no-verify'] : []
 
         if params[:allow_nothing_to_commit]
           # Here we check if the path passed in parameter contains any modification
           # and we skip the `git commit` command if there is none.
           # That means you can have other files modified that are not in the path parameter
           # and still make use of allow_nothing_to_commit.
-          repo_clean = Actions.sh("git status #{paths} --porcelain").empty?
+          repo_clean = Actions.sh('git', 'status', *paths, '--porcelain').empty?
           UI.success("Nothing to commit, working tree clean ✅.") if repo_clean
           return if repo_clean
         end
 
-        command = "git commit -m #{params[:message].shellescape} #{paths} #{skip_git_hooks}".strip
-        result = Actions.sh(command)
+        result = Actions.sh('git', 'commit', '-m', params[:message], *paths, *skip_git_hooks)
         UI.success("Successfully committed \"#{params[:path]}\" 💾.")
         return result
       end
