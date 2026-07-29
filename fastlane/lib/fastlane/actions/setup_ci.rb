@@ -41,7 +41,7 @@ module Fastlane
         UI.message("Creating temporary keychain: \"#{keychain_name}\".")
         Actions::CreateKeychainAction.run(
           name: keychain_name,
-          default_keychain: true,
+          default_keychain: params[:set_default_keychain],
           unlock: true,
           timeout: params[:timeout],
           lock_when_sleeps: true,
@@ -113,7 +113,12 @@ module Fastlane
                                        env_name: "FL_SETUP_CI_KEYCHAIN_NAME",
                                        description: "Set a custom keychain name",
                                        type: String,
-                                       default_value: "fastlane_tmp_keychain")
+                                       default_value: "fastlane_tmp_keychain"),
+          FastlaneCore::ConfigItem.new(key: :set_default_keychain,
+                                       env_name: "FL_SETUP_CI_SET_DEFAULT_KEYCHAIN",
+                                       description: "Set the temporary keychain as the system default",
+                                       type: Boolean,
+                                       default_value: true)
         ]
       end
 

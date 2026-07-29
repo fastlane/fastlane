@@ -20,10 +20,3 @@ jobs:
 
       - name: Run tests
         run: bundle exec rake
-
-      - name: Upload artifact
-        uses: actions/upload-artifact@v5
-        if: failure()
-        with:
-          name: test-results-ruby-${{ matrix.ruby-version }}
-          path: test-results

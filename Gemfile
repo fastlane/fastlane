@@ -10,15 +10,16 @@ gem "climate_control", "~> 0.2.0"
 # A tool for integrating Coveralls.io with Ruby apps.
 gem "coveralls", "~> 0.8.13"
 # Automates code review chores.
-gem "danger", "~> 8.0"
-# Plugin for Danger that reports JUnit test results.
-gem "danger-junit", "~> 1.0"
-# domain_name 0.6.x requires Ruby >= 2.7.0, while fastlane uses a
-# `required_ruby_version` of `>= 2.6`.
-gem "domain_name", "< 0.6"
+gem "danger", "~> 9.0"
+# erb >= 5.0 (pulled in transitively by irb -> rdoc) requires Ruby >= 3.2, while fastlane supports Ruby >= 3.0.
+gem "erb", "< 5.0"
 # A fake filesystem.
-# Version 1.9+ requires Ruby >=2.7, while fastlane uses a `required_ruby_version` of `>= 2.6`.
-gem "fakefs", "1.8"
+# Version 3.0.2 requires Ruby >=3.2, while fastlane uses a `required_ruby_version` of `>= 3.0`.
+gem "fakefs", ['>= 1.8', '< 3.0.2']
+# Danger 9 pulls in faraday-http-cache; 2.6.0+ requires Ruby 3.2+.
+gem "faraday-http-cache", "< 2.6"
+# Version 2 requires Ruby >=3.2, while fastlane uses a `required_ruby_version` of `>= 3.0`.
+gem "git", "< 2"
 # for file uploads with Faraday
 gem "mime-types", ['>= 1.16', '< 4.0']
 # standard library for OpenSSL has affected versions (unable to get certificate CRL) - ruby/openssl/issues/949
@@ -29,8 +30,7 @@ gem "openssl",
     "!= 3.2.1",
     "!= 3.3.0"
 # Fast XML parser and object marshaller.
-# Version 2.14.15+ requires Ruby >=2.7, while fastlane uses a `required_ruby_version` of `>= 2.6`.
-gem "ox", "2.14.14"
+gem "ox", "~> 2.14"
 # Provides an interactive debugging environment for Ruby.
 gem "pry"
 # A plugin for pry that adds step-by-step debugging and stack navigation.
@@ -39,18 +39,17 @@ gem "pry-byebug"
 gem "pry-rescue"
 # A plugin for pry that enables exploring the call stack.
 gem "pry-stack_explorer"
-# public_suffix >= 6.0 requires Ruby >= 3.0, while fastlane uses a
-# `required_ruby_version` of `>= 2.6`.
-gem "public_suffix", "< 6.0"
+# public_suffix >= 7.0 requires Ruby >= 3.2, while fastlane uses a `required_ruby_version` of `>= 3.0`.
+gem "public_suffix", "< 7.0"
 # A simple task automation tool.
 gem "rake"
 # A readline implementation in Ruby
 # See: https://github.com/deivid-rodriguez/byebug/issues/289#issuecomment-251383465
 gem "rb-readline"
+# rdoc >= 8.0 (pulled in transitively by irb) requires Ruby >= 3.2, while fastlane supports Ruby >= 3.0.
+gem "rdoc", "< 8.0"
 # Behavior-driven testing tool for Ruby.
 gem "rspec", "~> 3.10"
-# Formatter for RSpec to generate JUnit compatible reports.
-gem "rspec_junit_formatter", "~> 0.4.1"
 # A Ruby static code analyzer and formatter.
 gem "rubocop", Fastlane::RUBOCOP_REQUIREMENT
 # A collection of RuboCop cops for performance optimizations.
@@ -66,7 +65,7 @@ gem "xcode-install", ">= 2.6.7"
 # Used for xcov's parameters generation: https://github.com/fastlane/fastlane/pull/12416
 gem "xcov", "~> 1.9.0"
 # A documentation generation tool for Ruby.
-gem "yard", "~> 0.9.11"
+gem "yard", "~> 0.9.42"
 
 gemspec(path: ".")
 

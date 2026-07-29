@@ -216,6 +216,7 @@ module Scan
       params = {
         path: result_bundle_path,
         output_remove_retry_attempts: Scan.config[:output_remove_retry_attempts],
+        force_legacy_xcresulttool: Scan.config[:force_legacy_xcresulttool],
         silent: !FastlaneCore::Globals.verbose?
       }
 

@@ -236,6 +236,87 @@ describe Screengrab::Runner do
     end
   end
 
+  describe :if_device_path_exists do
+    let(:device_serial) { 'device_serial' }
+    let(:app_package_name) { 'tools.fastlane.dev' }
+    let(:device_path) { '/data/data/tools.fastlane.dev/app_screengrab/en-US/images/screenshots' }
+
+    before do
+      expect(mock_android_environment).to receive(:adb_path).and_return("adb")
+    end
+
+    it 'checks missing paths without printing expected adb failures' do
+      expect(mock_executor).to receive(:execute)
+        .with(hash_including(
+                command: "adb -s #{device_serial} shell run-as #{app_package_name} ls #{device_path}",
+                print_all: false,
+                print_command: false,
+                suppress_error_output: true
+              ))
+        .and_return("ls: #{device_path}: No such file or directory")
+
+      expect do |probe|
+        @runner.if_device_path_exists(app_package_name, device_serial, device_path, true, &probe)
+      end.not_to yield_control
+    end
+  end
+
+  describe :pull_screenshots_from_device do
+    let(:locale) { 'en-US' }
+    let(:device_serial) { 'device_serial' }
+    let(:device_type_dir_name) { 'phoneScreenshots' }
+
+    before do
+      config[:app_package_name] = 'tools.fastlane.dev'
+      config[:clear_previous_screenshots] = false
+      config[:output_directory] = Dir.mktmpdir
+
+      existing_screenshots_dir = File.join(config[:output_directory], locale, 'images', device_type_dir_name)
+      FileUtils.mkdir_p(existing_screenshots_dir)
+      FileUtils.touch(File.join(existing_screenshots_dir, 'screenshot.png'))
+
+      allow(@runner).to receive(:determine_external_screenshots_path).and_return([])
+      allow(@runner).to receive(:determine_internal_screenshots_paths).and_return([])
+      allow(@runner).to receive(:move_pulled_screenshots).and_return(1)
+    end
+
+    after do
+      FileUtils.remove_entry(config[:output_directory])
+    end
+
+    it 'returns the number of screenshots copied even when existing files are overwritten' do
+      expect(@runner.pull_screenshots_from_device(locale, device_serial, device_type_dir_name)).to eq(1)
+    end
+  end
+
+  describe :move_pulled_screenshots do
+    let(:locale) { 'en-US' }
+    let(:device_type_dir_name) { 'phoneScreenshots' }
+
+    before do
+      config[:output_directory] = Dir.mktmpdir
+    end
+
+    after do
+      FileUtils.remove_entry(config[:output_directory])
+    end
+
+    it 'returns the number of screenshots copied' do
+      Dir.mktmpdir do |pull_dir|
+        screenshots_dir = File.join(pull_dir, 'screenshots')
+        FileUtils.mkdir_p(screenshots_dir)
+        FileUtils.touch(File.join(screenshots_dir, 'first.png'))
+        FileUtils.touch(File.join(screenshots_dir, 'second.png'))
+
+        copied_count = @runner.move_pulled_screenshots(locale, pull_dir, device_type_dir_name)
+        destination_dir = File.join(config[:output_directory], locale, 'images', device_type_dir_name)
+
+        expect(copied_count).to eq(2)
+        expect(Dir.glob(File.join(destination_dir, '*.png')).length).to eq(2)
+      end
+    end
+  end
+
   describe :select_device do
     it 'connects to host if specified' do
       config[:adb_host] = "device_farm"
