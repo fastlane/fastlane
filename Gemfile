@@ -57,7 +57,7 @@ gem "rubocop-performance"
 # A RuboCop extension focused on enforcing tools.
 gem "rubocop-require_tools"
 # Used to mock servers.
-gem "sinatra", [">= 2.2.3", "< 3.0"]
+gem "sinatra", "~> 4.2"
 # A library for stubbing and setting expectations on HTTP requests.
 gem "webmock", "~> 3.18"
 # Needed for running xcode-install related tests.
