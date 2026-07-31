@@ -17,7 +17,7 @@ module Fastlane
             params[:api_key] ||= Actions.lane_context[SharedValues::APP_STORE_CONNECT_API_KEY]
           end
 
-          Cert.config = params # we alread have the finished config
+          Cert.config = params # we already have the finished config
 
           Cert::Runner.new.launch
           cert_file_path = ENV["CER_FILE_PATH"]

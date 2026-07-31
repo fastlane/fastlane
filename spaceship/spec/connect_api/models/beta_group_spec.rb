@@ -1,5 +1,5 @@
 describe Spaceship::ConnectAPI::BetaGroup do
-  before { Spaceship::Tunes.login }
+  include_examples "common spaceship login"
 
   describe '#Spaceship::ConnectAPI' do
     it '#get_beta_groups' do

@@ -65,6 +65,15 @@ module Fastlane
           end
         end
 
+        # Ruby version warning
+        if Gem::Version.new(RUBY_VERSION) < Gem::Version.new(Fastlane::SUGGESTED_MINIMUM_RUBY) && !FastlaneCore::Env.truthy?("FASTLANE_SKIP_RUBY_VERSION_WARNING")
+          warn = "WARNING: Support for your Ruby version (#{RUBY_VERSION}) is going away. fastlane will soon require Ruby #{Fastlane::SUGGESTED_MINIMUM_RUBY} or newer."
+          UI.important(warn)
+          at_exit do
+            UI.important(warn)
+          end
+        end
+
         # Needs to go after load_dot_env for variable FASTLANE_SKIP_UPDATE_CHECK
         FastlaneCore::UpdateChecker.start_looking_for_update('fastlane')
 
@@ -123,7 +132,16 @@ module Fastlane
           Fastlane::CommandsGenerator.start
         end
       ensure
-        FastlaneCore::UpdateChecker.show_update_status('fastlane', Fastlane::VERSION)
+        # If the ruby setup if broken, and UpdateChecker fails catastrophically,
+        # we don't want to hide the original exception. We just print it
+        # see https://github.com/fastlane/fastlane/issues/29916
+        begin
+          FastlaneCore::UpdateChecker.show_update_status('fastlane', Fastlane::VERSION)
+        # rubocop:disable Lint/RescueException
+        rescue Exception => e
+          UI.error(e.to_s)
+        end
+        # rubocop:enable Lint/RescueException
       end
 
       def map_aliased_tools(tool_name)
@@ -162,7 +180,7 @@ module Fastlane
       end
 
       def print_bundle_exec_warning(is_slow: false)
-        return if FastlaneCore::Helper.bundler? # user is alread using bundler
+        return if FastlaneCore::Helper.bundler? # user is already using bundler
         return if FastlaneCore::Env.truthy?('SKIP_SLOW_FASTLANE_WARNING') # user disabled the warnings
         return if FastlaneCore::Helper.contained_fastlane? # user uses the bundled fastlane
 

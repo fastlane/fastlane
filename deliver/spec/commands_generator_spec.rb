@@ -211,7 +211,7 @@ describe Deliver::CommandsGenerator do
 
       expect(Deliver::Runner).to receive(:new) do |actual_options|
         expect(expected_options._values).to eq(actual_options._values)
-        # ugly work-around to do the work that DetectValues would normally do
+        # ugly workaround to do the work that DetectValues would normally do
         Deliver.cache[:app] = fake_app
       end
 

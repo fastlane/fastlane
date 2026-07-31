@@ -86,11 +86,53 @@ describe Spaceship::ConnectAPI::App do
       expect(model.bundle_id).to eq("com.joshholtz.FastlaneTest")
     end
 
+    it('fetches live app info') do
+      ConnectAPIStubbing::Tunes.stub_get_app_infos
+      app = Spaceship::ConnectAPI::App.new("123456789", [])
+
+      info = app.fetch_live_app_info(includes: nil)
+      expect(info.id).to eq("1111-11111")
+      expect(info.app_store_age_rating).to eq("FOUR_PLUS")
+      expect(info.app_store_state).to eq("READY_FOR_SALE")
+      expect(info.state).to eq("READY_FOR_DISTRIBUTION")
+    end
+
+    it('fetches edit app info') do
+      ConnectAPIStubbing::Tunes.stub_get_app_infos
+      app = Spaceship::ConnectAPI::App.new("123456789", [])
+
+      info = app.fetch_edit_app_info(includes: nil)
+      expect(info.id).to eq("1111-2222")
+      expect(info.app_store_age_rating).to eq("FOUR_PLUS")
+      expect(info.app_store_state).to eq("PREPARE_FOR_SUBMISSION")
+      expect(info.state).to eq("PREPARE_FOR_SUBMISSION")
+    end
+
     it 'creates beta group' do
       app = Spaceship::ConnectAPI::App.find("com.joshholtz.FastlaneTest")
 
       model = app.create_beta_group(group_name: "Brand New Group", public_link_enabled: false, public_link_limit: 10_000, public_link_limit_enabled: false)
       expect(model.id).to eq("123456789")
+      expect(model.is_internal_group).to eq(false)
+      expect(model.has_access_to_all_builds).to be_nil
+
+      # `has_access_to_all_builds` is ignored for external groups
+      model = app.create_beta_group(group_name: "Brand New Group", public_link_enabled: false, public_link_limit: 10_000, public_link_limit_enabled: false, has_access_to_all_builds: true)
+      expect(model.id).to eq("123456789")
+      expect(model.is_internal_group).to eq(false)
+      expect(model.has_access_to_all_builds).to be_nil
+
+      # `has_access_to_all_builds` is set to `true` by default for internal groups
+      model = app.create_beta_group(group_name: "Brand New Group", is_internal_group: true, public_link_enabled: false, public_link_limit: 10_000, public_link_limit_enabled: false)
+      expect(model.id).to eq("123456789")
+      expect(model.is_internal_group).to eq(true)
+      expect(model.has_access_to_all_builds).to eq(true)
+
+      # `has_access_to_all_builds` can be set to `false` for internal groups
+      model = app.create_beta_group(group_name: "Brand New Group", is_internal_group: true, public_link_enabled: false, public_link_limit: 10_000, public_link_limit_enabled: false, has_access_to_all_builds: false)
+      expect(model.id).to eq("123456789")
+      expect(model.is_internal_group).to eq(true)
+      expect(model.has_access_to_all_builds).to eq(false)
     end
 
     it '#get_review_submissions' do
@@ -113,6 +155,36 @@ describe Spaceship::ConnectAPI::App do
       expect(review_submission.id).to eq("123456789")
       expect(review_submission.platform).to eq(Spaceship::ConnectAPI::Platform::IOS)
       expect(review_submission.state).to eq(Spaceship::ConnectAPI::ReviewSubmission::ReviewSubmissionState::READY_FOR_REVIEW)
+    end
+  end
+
+  describe("#get_app_availabilities") do
+    it('gets app availabilities when app is ready for distribution') do
+      ConnectAPIStubbing::Tunes.stub_get_app_availabilities_ready_for_distribution
+      app = Spaceship::ConnectAPI::App.new("123456789", [])
+
+      availabilities = app.get_app_availabilities
+
+      expect(availabilities.availableInNewTerritories).to be(false)
+      expect(availabilities.territory_availabilities.count).to eq(2)
+      expect(availabilities.territory_availabilities[0].available).to be(true)
+      expect(availabilities.territory_availabilities[1].available).to be(true)
+      expect(availabilities.territory_availabilities[0].contentStatuses).to eq(["AVAILABLE"])
+      expect(availabilities.territory_availabilities[1].contentStatuses).to eq(["AVAILABLE"])
+    end
+
+    it('gets app availabilities when app is removed from sale') do
+      ConnectAPIStubbing::Tunes.stub_get_app_availabilities_removed_from_sale
+      app = Spaceship::ConnectAPI::App.new("123456789", [])
+
+      availabilities = app.get_app_availabilities
+
+      expect(availabilities.availableInNewTerritories).to be(false)
+      expect(availabilities.territory_availabilities.count).to eq(2)
+      expect(availabilities.territory_availabilities[0].available).to be(false)
+      expect(availabilities.territory_availabilities[1].available).to be(false)
+      expect(availabilities.territory_availabilities[0].contentStatuses).to eq(["CANNOT_SELL"])
+      expect(availabilities.territory_availabilities[1].contentStatuses).to eq(["CANNOT_SELL"])
     end
   end
 end

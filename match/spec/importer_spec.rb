@@ -123,7 +123,7 @@ describe Match do
     end
 
     def setup_fake_storage(repo_dir, config)
-      expect(Match::Storage::GitStorage).to receive(:configure).with(
+      expect(Match::Storage::GitStorage).to receive(:configure).with({
         git_url: config[:git_url],
         shallow_clone: true,
         skip_docs: false,
@@ -135,24 +135,8 @@ describe Match do
         git_bearer_authorization: nil,
         clone_branch_directly: false,
         type: config[:type],
-        platform: config[:platform],
-        google_cloud_bucket_name: "",
-        google_cloud_keys_file: "",
-        google_cloud_project_id: "",
-        skip_google_cloud_account_confirmation: false,
-        s3_bucket: nil,
-        s3_region: nil,
-        s3_access_key: nil,
-        s3_secret_access_key: nil,
-        s3_object_prefix: nil,
-        gitlab_project: nil,
-        readonly: false,
-        username: config[:username],
-        team_id: nil,
-        team_name: nil,
-        api_key_path: nil,
-        api_key: nil
-      ).and_return(fake_storage)
+        platform: config[:platform]
+      }).and_return(fake_storage)
 
       expect(fake_storage).to receive(:download).and_return(nil)
       allow(fake_storage).to receive(:working_directory).and_return(repo_dir)

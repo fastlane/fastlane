@@ -41,7 +41,7 @@ module Fastlane
       end
 
       def self.detect_appium(params)
-        appium_path = params[:appium_path] || `which appium`.to_s.strip
+        appium_path = params[:appium_path] || Helper.which('appium').to_s
 
         if appium_path.empty?
           if File.exist?(APPIUM_PATH_HOMEBREW)
@@ -90,7 +90,7 @@ module Fastlane
               port: params[:port],
               appium_lib: appium_lib
             ).start_driver
-            Appium.promote_appium_methods(RSpec::Core::ExampleGroup)
+            Appium.promote_appium_methods(RSpec::Core::ExampleGroup, @driver)
           end
 
           c.after(:each) do

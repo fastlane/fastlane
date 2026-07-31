@@ -16,11 +16,11 @@ describe Fastlane do
 
       it "Should not print sonar command" do
         allow(FastlaneCore::FastlaneFolder).to receive(:path).and_return(nil)
-        expected_command = "cd #{File.expand_path('.').shellescape} && sonar-scanner -Dsonar.login=\"asdf\""
+        expected_command = "cd #{File.expand_path('.').shellescape} && sonar-scanner -Dsonar.token=\"asdf\""
         expect(Fastlane::Actions::SonarAction).to receive(:verify_sonar_scanner_binary).and_return(true)
         expect(Fastlane::Actions).to receive(:sh_control_output).with(expected_command, print_command: false, print_command_output: true).and_call_original
         Fastlane::FastFile.new.parse("lane :sonar_test do
-          sonar(sonar_login: 'asdf')
+          sonar(sonar_token: 'asdf')
         end").runner.execute(:sonar_test)
       end
 
@@ -38,7 +38,7 @@ describe Fastlane do
             exclusions: '/Sources/Excluded',
             project_language: 'ruby',
             source_encoding: 'utf-8',
-            sonar_login: 'sonar-login',
+            sonar_token: 'sonar-token',
             sonar_url: 'http://www.sonarqube.com',
             sonar_organization: 'org-key',
             branch_name: 'branch-name',
@@ -57,7 +57,7 @@ describe Fastlane do
                     -Dsonar.exclusions=\"/Sources/Excluded\"
                     -Dsonar.language=\"ruby\"
                     -Dsonar.sourceEncoding=\"utf-8\"
-                    -Dsonar.login=\"sonar-login\"
+                    -Dsonar.token=\"sonar-token\"
                     -Dsonar.host.url=\"http://www.sonarqube.com\"
                     -Dsonar.organization=\"org-key\"
                     -Dsonar.branch.name=\"branch-name\"

@@ -520,7 +520,7 @@ describe Pilot do
           end
 
           it "asks user to enter the app's platform manually" do
-            expect(UI).to receive(:input).with("Please enter the app's platform (appletvos, ios, osx): ").and_return(fake_app_platform)
+            expect(UI).to receive(:input).with("Please enter the app's platform (appletvos, ios, osx, xros): ").and_return(fake_app_platform)
 
             fetch_app_platform_result = fake_manager.fetch_app_platform
 
@@ -542,7 +542,7 @@ describe Pilot do
           end
 
           it "asks user to enter the app's platform manually" do
-            expect(UI).to receive(:input).with("Please enter the app's platform (appletvos, ios, osx): ").and_return(fake_app_platform)
+            expect(UI).to receive(:input).with("Please enter the app's platform (appletvos, ios, osx, xros): ").and_return(fake_app_platform)
 
             fetch_app_platform_result = fake_manager.fetch_app_platform
 
@@ -566,7 +566,7 @@ describe Pilot do
           end
 
           it "does not ask user to enter the app's platform manually" do
-            expect(UI).not_to receive(:input).with("Please enter the app's platform (appletvos, ios, osx): ")
+            expect(UI).not_to receive(:input).with("Please enter the app's platform (appletvos, ios, osx, xros): ")
 
             fetch_app_platform_result = fake_manager.fetch_app_platform(required: false)
 
@@ -589,12 +589,12 @@ describe Pilot do
 
           allow(UI)
             .to receive(:input)
-            .with("Please enter the app's platform (appletvos, ios, osx): ")
+            .with("Please enter the app's platform (appletvos, ios, osx, xros): ")
             .and_return(invalid_app_platform)
         end
 
         it "raises the 'invalid platform' exception" do
-          expect(UI).to receive(:user_error!).with("App Platform must be ios, appletvos, or osx")
+          expect(UI).to receive(:user_error!).with("App Platform must be ios, appletvos, osx, or xros")
 
           fake_manager.fetch_app_platform
         end

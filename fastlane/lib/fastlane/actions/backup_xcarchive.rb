@@ -15,7 +15,7 @@ module Fastlane
         zip_filename = params[:zip_filename]
         versioned = params[:versioned]
 
-        # Prepare destionation folder
+        # Prepare destination folder
         full_destination = base_destination
 
         if versioned

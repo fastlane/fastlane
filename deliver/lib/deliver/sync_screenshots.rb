@@ -45,7 +45,7 @@ module Deliver
 
       unless FastlaneCore::Feature.enabled?('FASTLANE_ENABLE_BETA_DELIVER_SYNC_SCREENSHOTS')
         UI.user_error!('Please set a value to "FASTLANE_ENABLE_BETA_DELIVER_SYNC_SCREENSHOTS" environment variable ' \
-                       'if you acknowleage the risk and try this out.')
+                       'if you acknowledge the risk and try this out.')
       end
 
       UI.important("Will begin uploading snapshots for '#{version.version_string}' on App Store Connect")
@@ -106,7 +106,7 @@ module Deliver
       local_screenshots = iterator.each_local_screenshot(screenshots.group_by(&:language)).map do |localization, app_screenshot_set, screenshot, index|
         if index >= 10
           UI.user_error!("Found #{localization.locale} has more than 10 screenshots for #{app_screenshot_set.screenshot_display_type}. "\
-                         "Make sure containts only necessary screenshots.")
+                         "Make sure contains only necessary screenshots.")
         end
         ScreenshotComparable.create_from_local(screenshot: screenshot, app_screenshot_set: app_screenshot_set)
       end

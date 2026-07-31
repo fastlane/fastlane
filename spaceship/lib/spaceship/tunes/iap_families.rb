@@ -13,7 +13,7 @@ module Spaceship
       # @param name (String) Familyname
       # @param product_id (String) New Product's id
       # @param reference_name (String) Reference name of the new product
-      # @param versions (Hash) Localized Familie names
+      # @param versions (Hash) Localized Family names
       # @example
       #  versions: {
       #  'de-DE': {
