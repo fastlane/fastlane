@@ -385,7 +385,7 @@ GEM
       addressable (>= 2.8.0)
       crack (>= 0.3.2)
       hashdiff (>= 0.4.0, < 2.0.0)
-    webrick (1.8.1)
+    webrick (1.9.2)
     word_wrap (1.0.0)
     xcode-install (2.6.8)
       claide (>= 0.9.1, < 1.1.0)
