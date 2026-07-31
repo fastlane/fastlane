@@ -42,7 +42,7 @@ module Fastlane
 
       result = ''
       exit_status = nil
-      if Helper.sh_enabled?
+      if FastlaneCore::Helper.sh_enabled?
         # The argument list is passed directly to Open3.popen2e, which
         # handles the variadic argument list in the same way as Kernel#spawn.
         # (http://ruby-doc.org/core-2.4.2/Kernel.html#method-i-spawn) or
@@ -65,12 +65,16 @@ module Fastlane
         # with previous implementations of sh and... probably portable to all
         # relevant platforms.
         if exit_status.exitstatus != 0
+          # Due to some output and build systems having 30-80k lines of output.
+          # We will truncate what we will show to recap the failure.
+          truncated_msg = result.length > 500 ? result[-500..-1] : result
+
           message = if print_command
-                      "Exit status of command '#{shell_command}' was #{exit_status.exitstatus} instead of 0."
+                      "Exit status of command '#{shell_command}' was #{exit_status.exitstatus} instead of 0.\n"
                     else
-                      "Shell command exited with exit status #{exit_status.exitstatus} instead of 0."
+                      "Shell command exited with exit status #{exit_status.exitstatus} instead of 0.\n"
                     end
-          message += "\n#{result}" if print_command_output
+          message += (truncated_msg).to_s if print_command_output && !$stdout.isatty
 
           if error_callback || block_given?
             UI.error(message)

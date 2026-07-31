@@ -1,0 +1,29 @@
+{
+  "appletvos16.4" : {
+    "chosenRuntimeBuild" : "20L494",
+    "defaultBuild" : "20L489",
+    "platform" : "com.apple.platform.appletvos",
+    "preferredBuild" : "20L494",
+    "sdkBuild" : "20L489",
+    "sdkDirectory" : "\/Applications\/Xcode14.app\/Contents\/Developer\/Platforms\/AppleTVOS.platform\/Developer\/SDKs\/AppleTVOS16.4.sdk",
+    "sdkVersion" : "16.4"
+  },
+  "iphoneos16.4" : {
+    "chosenRuntimeBuild" : "20E247",
+    "defaultBuild" : "20E247",
+    "platform" : "com.apple.platform.iphoneos",
+    "preferredBuild" : "20E247",
+    "sdkBuild" : "20E238",
+    "sdkDirectory" : "\/Applications\/Xcode14.app\/Contents\/Developer\/Platforms\/iPhoneOS.platform\/Developer\/SDKs\/iPhoneOS.sdk",
+    "sdkVersion" : "16.4"
+  },
+  "watchos9.4" : {
+    "chosenRuntimeBuild" : "20T253",
+    "defaultBuild" : "20T248",
+    "platform" : "com.apple.platform.watchos",
+    "preferredBuild" : "20T253",
+    "sdkBuild" : "20T248",
+    "sdkDirectory" : "\/Applications\/Xcode14.app\/Contents\/Developer\/Platforms\/WatchOS.platform\/Developer\/SDKs\/WatchOS9.4.sdk",
+    "sdkVersion" : "9.4"
+  }
+}

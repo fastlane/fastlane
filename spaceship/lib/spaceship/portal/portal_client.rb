@@ -10,6 +10,7 @@ require_relative 'provisioning_profile'
 require_relative 'certificate'
 require_relative 'website_push'
 require_relative 'persons'
+require_relative 'key'
 
 module Spaceship
   # rubocop:disable Metrics/ClassLength
@@ -189,7 +190,7 @@ module Spaceship
 
     def valid_name_for(input)
       latinized = input.to_slug.transliterate
-      latinized = latinized.gsub(/[^0-9A-Za-z\d\s]/, '') # remove non-valid characters
+      latinized = latinized.gsub(/[^[:ascii:]]|[\.@&*"]/, '') # remove non-valid characters
       # Check if the input string was modified, since it might be empty now
       # (if it only contained non-latin symbols) or the duplicate of another app
       if latinized != input
@@ -780,13 +781,39 @@ module Spaceship
     def create_key!(name: nil, service_configs: nil)
       fetch_csrf_token_for_keys
 
+      service_configs_requests = (service_configs || {}).map do |service_id, configs|
+        if service_id == Spaceship::Portal::Key::MUSIC_KIT_ID
+          {
+            serviceId: service_id,
+            isNew: true,
+            identifiers: configs[:identifiers] || {}
+          }
+        elsif service_id == Spaceship::Portal::Key::DEVICE_CHECK_ID
+          {
+            serviceId: service_id,
+            isNew: true,
+            identifiers: configs[:identifiers] || {}
+          }
+        elsif service_id == Spaceship::Portal::Key::APNS_ID
+          {
+            serviceId: service_id,
+            isNew: true,
+            identifiers: configs[:identifiers] || {},
+            environment: configs[:environment] || "all",
+            scope: configs[:scope] || "team"
+          }
+        else
+          raise "Unknown service id: #{service_id}"
+        end
+      end
+
       params = {
         name: name,
-        serviceConfigurations: service_configs,
+        serviceConfigurationsRequests: service_configs_requests,
         teamId: team_id
       }
 
-      response = request(:post, 'account/auth/key/create') do |req|
+      response = request(:post, 'account/auth/key/v2/create') do |req|
         req.headers['Content-Type'] = 'application/json'
         req.body = params.to_json
       end

@@ -34,36 +34,16 @@ module Match
 
       spaceship_login
 
-      self.storage = Storage.for_mode(params[:storage_mode], {
-        git_url: params[:git_url],
-        shallow_clone: params[:shallow_clone],
-        skip_docs: params[:skip_docs],
-        git_branch: params[:git_branch],
-        git_full_name: params[:git_full_name],
-        git_user_email: params[:git_user_email],
-
-        git_private_key: params[:git_private_key],
-        git_basic_authorization: params[:git_basic_authorization],
-        git_bearer_authorization: params[:git_bearer_authorization],
-
-        clone_branch_directly: params[:clone_branch_directly],
-        google_cloud_bucket_name: params[:google_cloud_bucket_name].to_s,
-        google_cloud_keys_file: params[:google_cloud_keys_file].to_s,
-        google_cloud_project_id: params[:google_cloud_project_id].to_s,
-        s3_region: params[:s3_region].to_s,
-        s3_access_key: params[:s3_access_key].to_s,
-        s3_secret_access_key: params[:s3_secret_access_key].to_s,
-        s3_bucket: params[:s3_bucket].to_s,
-        s3_object_prefix: params[:s3_object_prefix].to_s,
-        gitlab_project: params[:gitlab_project],
-        team_id: params[:team_id] || Spaceship::ConnectAPI.client.portal_team_id
-      })
+      self.storage = Storage.from_params(params)
       self.storage.download
 
       # After the download was complete
       self.encryption = Encryption.for_storage_mode(params[:storage_mode], {
         git_url: params[:git_url],
-        working_directory: storage.working_directory
+        s3_bucket: params[:s3_bucket],
+        s3_skip_encryption: params[:s3_skip_encryption],
+        working_directory: storage.working_directory,
+        force_legacy_encryption: params[:force_legacy_encryption]
       })
       self.encryption.decrypt_files if self.encryption
 
@@ -103,6 +83,8 @@ module Match
       else
         UI.success("No relevant certificates or provisioning profiles found, nothing to nuke here :)")
       end
+    ensure
+      self.storage.clear_changes if self.storage
     end
 
     # Be smart about optional values here
@@ -132,7 +114,7 @@ module Match
         end
         UI.error("---")
         print_safe_remove_certs_hint
-        UI.user_error!("Enterprise account nuke cancelled") unless UI.confirm("Do you really want to nuke your Enterprise account?")
+        UI.user_error!("Enterprise account nuke cancelled") unless params[:skip_confirmation] || UI.confirm("Do you really want to nuke your Enterprise account?")
       end
     end
 
@@ -186,6 +168,12 @@ module Match
     end
 
     def filter_by_cert
+      certificate_id = self.params[:certificate_id].to_s.strip
+      unless certificate_id.empty?
+        filter_by_certificate_ids([certificate_id], missing_error_message: "No certificate found for certificate_id '#{certificate_id}'")
+        return
+      end
+
       # Force will continue to revoke and delete all certificates and profiles
       return if self.params[:force] || !UI.interactive?
       return if self.certs.count < 2
@@ -204,7 +192,7 @@ module Match
       puts("")
 
       UI.important("By default, all listed certificates and profiles will be nuked")
-      if UI.confirm("Do you want to only nuke specific certificates and their associated profiles?")
+      if !params[:skip_confirmation] && UI.confirm("Do you want to only nuke specific certificates and their associated profiles?")
         input_indexes = UI.input("Enter the \"Option\" number(s) from the table above? (comma-separated)").split(',')
 
         # Get certificates from option indexes
@@ -216,44 +204,7 @@ module Match
           UI.user_error!("No certificates were selected based on option number(s) entered")
         end
 
-        # Do profile selection logic
-        cert_ids = self.certs.map(&:id)
-        self.profiles = self.profiles.select do |profile|
-          profile_cert_ids = profile.certificates.map(&:id)
-          (cert_ids & profile_cert_ids).any?
-        end
-
-        # Do file selection logic
-        self.files = self.files.select do |f|
-          found = false
-
-          ext = File.extname(f)
-          filename = File.basename(f, ".*")
-
-          # Attempt to find cert based on filename
-          if ext == ".cer" || ext == ".p12"
-            found ||= self.certs.any? do |cert|
-              filename == cert.id.to_s
-            end
-          end
-
-          # Attempt to find profile matched on UUIDs in profile
-          if ext == ".mobileprovision" || ext == ".provisionprofile"
-            storage_uuid = FastlaneCore::ProvisioningProfile.uuid(f)
-
-            found ||= self.profiles.any? do |profile|
-              tmp_file = Tempfile.new
-              tmp_file.write(Base64.decode64(profile.profile_content))
-              tmp_file.close
-
-              # Compare profile uuid in storage to profile uuid on developer portal
-              portal_uuid = FastlaneCore::ProvisioningProfile.uuid(tmp_file.path)
-              storage_uuid == portal_uuid
-            end
-          end
-
-          found
-        end
+        filter_profiles_and_files_by_selected_certificates
       end
     end
 
@@ -373,6 +324,57 @@ module Match
         UI.success("Successfully deleted file")
 
         file
+      end
+    end
+
+    def filter_by_certificate_ids(certificate_ids, missing_error_message: nil)
+      certificate_ids = certificate_ids.map { |id| id.to_s.strip }.reject(&:empty?)
+      self.certs = self.certs.select do |cert|
+        certificate_ids.include?(cert.id.to_s)
+      end
+
+      UI.user_error!(missing_error_message || "No certificates were selected") if self.certs.empty?
+
+      filter_profiles_and_files_by_selected_certificates
+    end
+
+    def filter_profiles_and_files_by_selected_certificates
+      # Do profile selection logic
+      cert_ids = self.certs.map { |cert| cert.id.to_s }
+      self.profiles = self.profiles.reject do |profile|
+        profile_cert_ids = profile.certificates.map { |cert| cert.id.to_s }
+        (cert_ids & profile_cert_ids).empty?
+      end
+
+      profile_uuids = self.profiles.map do |profile|
+        Tempfile.create("profile") do |tmp_file|
+          tmp_file.binmode
+          tmp_file.write(Base64.decode64(profile.profile_content))
+          tmp_file.flush
+
+          FastlaneCore::ProvisioningProfile.uuid(tmp_file.path)
+        end
+      end
+
+      # Do file selection logic
+      self.files = self.files.select do |f|
+        found = false
+
+        ext = File.extname(f)
+        filename = File.basename(f, ".*")
+
+        # Attempt to find cert based on filename
+        if ext == ".cer" || ext == ".p12"
+          found ||= cert_ids.include?(filename)
+        end
+
+        # Attempt to find profile matched on UUIDs in profile
+        if ext == ".mobileprovision" || ext == ".provisionprofile"
+          storage_uuid = FastlaneCore::ProvisioningProfile.uuid(f)
+          found ||= profile_uuids.include?(storage_uuid)
+        end
+
+        found
       end
     end
 

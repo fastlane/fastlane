@@ -27,6 +27,24 @@ describe Fastlane::Actions do
 
           expect(UI).to have_received(:shell_error!).with("Exit status of command 'exit 1' was 1 instead of 0.\n")
         end
+
+        it "includes command output in error message when not a TTY" do
+          allow(FastlaneCore::UI).to receive(:shell_error!)
+          expect_command("exit 1", exitstatus: 1, output: "Error details")
+          allow($stdout).to receive(:isatty).and_return(false)
+          Fastlane::Actions.sh("exit 1")
+
+          expect(UI).to have_received(:shell_error!).with(match(/Error details/))
+        end
+
+        it "does not include command output in error message when it is a TTY" do
+          allow(FastlaneCore::UI).to receive(:shell_error!)
+          expect_command("exit 1", exitstatus: 1, output: "Error details")
+          allow($stdout).to receive(:isatty).and_return(true)
+          Fastlane::Actions.sh("exit 1")
+
+          expect(UI).to have_received(:shell_error!).with("Exit status of command 'exit 1' was 1 instead of 0.\n")
+        end
       end
     end
 

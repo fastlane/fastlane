@@ -6,9 +6,10 @@ module Fastlane
       attr_reader :access_key
       attr_reader :region
 
-      def initialize(access_key: nil, secret_access_key: nil, region: nil, s3_client: nil)
+      def initialize(access_key: nil, secret_access_key: nil, session_token: nil, region: nil, s3_client: nil)
         @access_key = access_key
         @secret_access_key = secret_access_key
+        @session_token = session_token
         @region = region
 
         @client = s3_client
@@ -39,6 +40,10 @@ module Fastlane
         obj.public_url.to_s
       end
 
+      def download_file(bucket_name, key, destination_path)
+        Aws::S3::TransferManager.new(client: client).download_file(destination_path, bucket: bucket_name, key: key)
+      end
+
       def delete_file(bucket_name, file_name)
         bucket = find_bucket!(bucket_name)
         file = bucket.object(file_name)
@@ -55,6 +60,7 @@ module Fastlane
       private
 
       attr_reader :secret_access_key
+      attr_reader :session_token
 
       def client
         @client ||= Aws::S3::Client.new(
@@ -70,7 +76,8 @@ module Fastlane
 
         Aws::Credentials.new(
           access_key,
-          secret_access_key
+          secret_access_key,
+          session_token
         )
       end
     end

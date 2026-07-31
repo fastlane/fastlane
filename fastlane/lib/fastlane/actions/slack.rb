@@ -27,6 +27,7 @@ module Fastlane
           slack_attachment = self.class.generate_slack_attachments(options)
           link_names = options[:link_names]
           icon_url = options[:use_webhook_configured_username_and_icon] ? nil : options[:icon_url]
+          icon_emoji = options[:use_webhook_configured_username_and_icon] ? nil : options[:icon_emoji]
 
           post_message(
             channel: channel,
@@ -34,17 +35,21 @@ module Fastlane
             attachments: [slack_attachment],
             link_names: link_names,
             icon_url: icon_url,
-            fail_on_error: options[:fail_on_error]
+            icon_emoji: icon_emoji,
+            fail_on_error: options[:fail_on_error],
+            thread_ts: options[:thread_ts]
           )
         end
 
-        def post_message(channel:, username:, attachments:, link_names:, icon_url:, fail_on_error:)
+        def post_message(channel:, username:, attachments:, link_names:, icon_url:, icon_emoji:, fail_on_error:, thread_ts: nil)
           @notifier.post_to_legacy_incoming_webhook(
             channel: channel,
             username: username,
             link_names: link_names,
             icon_url: icon_url,
-            attachments: attachments
+            icon_emoji: icon_emoji,
+            attachments: attachments,
+            thread_ts: thread_ts
           )
           UI.success('Successfully sent Slack notification')
         rescue => error
@@ -211,8 +216,16 @@ module Fastlane
                                        optional: true),
           FastlaneCore::ConfigItem.new(key: :icon_url,
                                        env_name: "FL_SLACK_ICON_URL",
-                                       description: "Overrides the webhook's image property if use_webhook_configured_username_and_icon is false",
+                                       description: "Specifies a URL of an image to use as the photo of the message. Overrides the webhook's image property if use_webhook_configured_username_and_icon is false",
                                        default_value: "https://fastlane.tools/assets/img/fastlane_icon.png",
+                                       optional: true),
+          FastlaneCore::ConfigItem.new(key: :icon_emoji,
+                                       env_name: "FL_SLACK_ICON_EMOJI",
+                                       description: "Specifies an emoji (using colon shortcodes, eg. :white_check_mark:) to use as the photo of the message. Overrides the webhook's image property if use_webhook_configured_username_and_icon is false. This parameter takes precedence over icon_url",
+                                       optional: true),
+          FastlaneCore::ConfigItem.new(key: :thread_ts,
+                                       env_name: "FL_SLACK_THREAD_TS",
+                                       description: "Specifies a thread timestamp to reply to a message in a thread",
                                        optional: true),
           FastlaneCore::ConfigItem.new(key: :payload,
                                        env_name: "FL_SLACK_PAYLOAD",

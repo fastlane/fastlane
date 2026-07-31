@@ -34,6 +34,7 @@ describe Fastlane do
       allow(request).to receive(:body=).with(kind_of(String)).and_return(response)
 
       allow(response).to receive(:body).and_return(response_string)
+      allow(response).to receive(:code).and_return('200')
     end
 
     describe "Appetize Integration" do
@@ -70,6 +71,19 @@ describe Fastlane do
         expect(Fastlane::Actions.lane_context[Fastlane::Actions::SharedValues::APPETIZE_APP_URL]).to eql('https://appetize.io/app/sKdfjL')
         expect(Fastlane::Actions.lane_context[Fastlane::Actions::SharedValues::APPETIZE_MANAGE_URL]).to eql('https://appetize.io/manage/private_Djksfj')
         expect(Fastlane::Actions.lane_context[Fastlane::Actions::SharedValues::APPETIZE_API_HOST]).to eql('api.appetize.io')
+      end
+
+      it "raises an error when the API returns an unsuccessful status code" do
+        allow(response).to receive(:code).and_return('401')
+        allow(response).to receive(:body).and_return('{"message": "Invalid Key"}')
+        expect do
+          Fastlane::FastFile.new.parse("lane :test do
+            appetize({
+              api_token: '#{api_token}',
+              url: '#{url}'
+            })
+          end").runner.execute(:test)
+        end.to raise_error(FastlaneCore::Interface::FastlaneError, /Error uploading to Appetize.io: received HTTP 401 with body {"message": "Invalid Key"}/)
       end
 
       it "works with custom API host" do

@@ -15,42 +15,16 @@ module Match
       profile_path = ensure_valid_file_path(profile_path, "Provisioning profile", ".mobileprovision or .provisionprofile", optional: true)
 
       # Storage
-      storage = Storage.for_mode(params[:storage_mode], {
-        git_url: params[:git_url],
-        shallow_clone: params[:shallow_clone],
-        skip_docs: params[:skip_docs],
-        git_branch: params[:git_branch],
-        git_full_name: params[:git_full_name],
-        git_user_email: params[:git_user_email],
-        git_private_key: params[:git_private_key],
-        git_basic_authorization: params[:git_basic_authorization],
-        git_bearer_authorization: params[:git_bearer_authorization],
-        clone_branch_directly: params[:clone_branch_directly],
-        type: params[:type].to_s,
-        platform: params[:platform].to_s,
-        google_cloud_bucket_name: params[:google_cloud_bucket_name].to_s,
-        google_cloud_keys_file: params[:google_cloud_keys_file].to_s,
-        google_cloud_project_id: params[:google_cloud_project_id].to_s,
-        skip_google_cloud_account_confirmation: params[:skip_google_cloud_account_confirmation],
-        s3_bucket: params[:s3_bucket],
-        s3_region: params[:s3_region],
-        s3_access_key: params[:s3_access_key],
-        s3_secret_access_key: params[:s3_secret_access_key],
-        s3_object_prefix: params[:s3_object_prefix],
-        gitlab_project: params[:gitlab_project],
-        readonly: params[:readonly],
-        username: params[:username],
-        team_id: params[:team_id],
-        team_name: params[:team_name],
-        api_key_path: params[:api_key_path],
-        api_key: params[:api_key]
-      })
+      storage = Storage.from_params(params)
       storage.download
 
       # Encryption
       encryption = Encryption.for_storage_mode(params[:storage_mode], {
         git_url: params[:git_url],
-        working_directory: storage.working_directory
+        s3_bucket: params[:s3_bucket],
+        s3_skip_encryption: params[:s3_skip_encryption],
+        working_directory: storage.working_directory,
+        force_legacy_encryption: params[:force_legacy_encryption]
       })
       encryption.decrypt_files if encryption
       UI.success("Repo is at: '#{storage.working_directory}'")
@@ -79,6 +53,10 @@ module Match
       when :mac_installer_distribution
         certificate_type = [
           Spaceship::ConnectAPI::Certificate::CertificateType::MAC_INSTALLER_DISTRIBUTION
+        ].join(',')
+      when :developer_id_installer
+        certificate_type = [
+          Spaceship::ConnectAPI::Certificate::CertificateType::DEVELOPER_ID_INSTALLER
         ].join(',')
       else
         UI.user_error!("Cert type '#{cert_type}' is not supported")
@@ -144,6 +122,8 @@ module Match
       # Encrypt and commit
       encryption.encrypt_files if encryption
       storage.save_changes!(files_to_commit: files_to_commit)
+    ensure
+      storage.clear_changes if storage
     end
 
     def ensure_valid_file_path(file_path, file_description, file_extension, optional: false)

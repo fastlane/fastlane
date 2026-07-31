@@ -111,7 +111,8 @@ describe Fastlane do
               upload_url: 'https://your-subdomain.testfairy.com',
               comment: 'Test Comment!',
               testers_groups: ['group1', 'group2'],
-              custom: 'custom argument'
+              custom: 'custom argument',
+              tags: ['tag1', 'tag2', 'tag3']
             })
           end").runner.execute(:test)
         end.not_to(raise_error)

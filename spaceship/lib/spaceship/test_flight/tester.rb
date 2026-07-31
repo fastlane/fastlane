@@ -94,7 +94,7 @@ module Spaceship
 
       # @return (Spaceship::TestFlight::Tester) Returns the testers matching the parameter.
       # ITC searches all fields, and is full text. The search results are the union of all words in the search text
-      # @param text (String) (required): Value used to filter the tester, case insensitive
+      # @param text (String) (required): Value used to filter the tester, case-insensitive
       def self.search(app_id: nil, text: nil, is_email_exact_match: false)
         text = text.strip
         testers_matching_text = client.search_for_tester_in_app(app_id: app_id, text: text).map { |data| self.new(data) }

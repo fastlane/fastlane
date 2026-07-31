@@ -1,4 +1,7 @@
 describe Spaceship::Portal::ProvisioningProfileTemplate do
+  # Skip tunes login and login with portal
+  include_examples "common spaceship login", true
+  before { Spaceship.login }
   it "should factor a new provisioning profile template" do
     attrs = {
       "description" => "Template description",

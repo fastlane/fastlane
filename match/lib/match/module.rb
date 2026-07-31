@@ -11,7 +11,7 @@ module Match
   DESCRIPTION = "Easily sync your certificates and profiles across your team"
 
   def self.environments
-    return %w(appstore adhoc development enterprise developer_id mac_installer_distribution)
+    return %w(appstore adhoc development enterprise developer_id mac_installer_distribution developer_id_installer)
   end
 
   def self.storage_modes
@@ -23,7 +23,8 @@ module Match
   end
 
   def self.cert_type_sym(type)
-    type = type.to_s
+    # To determine certificate types to fetch from the portal, we use `Sigh.certificate_types_for_profile_and_platform`, and it returns typed `Spaceship::ConnectAPI::Certificate::CertificateType` with the same values but uppercased, so we downcase them here
+    type = type.to_s.downcase
     return :mac_installer_distribution if type == "mac_installer_distribution"
     return :developer_id_installer if type == "developer_id_installer"
     return :developer_id_application if type == "developer_id"

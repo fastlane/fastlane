@@ -5,6 +5,7 @@ module Spaceship
       include Spaceship::ConnectAPI::Model
 
       attr_accessor :app_store_state
+      attr_accessor :state
       attr_accessor :app_store_age_rating
       attr_accessor :brazil_age_rating
       attr_accessor :kids_age_band
@@ -16,20 +17,41 @@ module Spaceship
       attr_accessor :secondary_subcategory_one
       attr_accessor :secondary_subcategory_two
 
+      # Deprecated in App Store Connect API specification 3.3
       module AppStoreState
-        READY_FOR_SALE = "READY_FOR_SALE"
-        PROCESSING_FOR_APP_STORE = "PROCESSING_FOR_APP_STORE"
-        PENDING_DEVELOPER_RELEASE = "PENDING_DEVELOPER_RELEASE"
-        PENDING_APPLE_RELEASE = "PENDING_APPLE_RELEASE"
-        IN_REVIEW = "IN_REVIEW"
-        WAITING_FOR_REVIEW = "WAITING_FOR_REVIEW"
+        ACCEPTED = "ACCEPTED"
         DEVELOPER_REJECTED = "DEVELOPER_REJECTED"
         DEVELOPER_REMOVED_FROM_SALE = "DEVELOPER_REMOVED_FROM_SALE"
+        IN_REVIEW = "IN_REVIEW"
+        INVALID_BINARY = "INVALID_BINARY"
+        METADATA_REJECTED = "METADATA_REJECTED"
+        PENDING_APPLE_RELEASE = "PENDING_APPLE_RELEASE"
+        PENDING_CONTRACT = "PENDING_CONTRACT"
+        PENDING_DEVELOPER_RELEASE = "PENDING_DEVELOPER_RELEASE"
+        PREORDER_READY_FOR_SALE = "PREORDER_READY_FOR_SALE"
+        PREPARE_FOR_SUBMISSION = "PREPARE_FOR_SUBMISSION"
+        PROCESSING_FOR_APP_STORE = "PROCESSING_FOR_APP_STORE"
+        READY_FOR_REVIEW = "READY_FOR_REVIEW"
+        READY_FOR_SALE = "READY_FOR_SALE"
+        REJECTED = "REJECTED"
+        REMOVED_FROM_SALE = "REMOVED_FROM_SALE"
+        REPLACED_WITH_NEW_VERSION = "REPLACED_WITH_NEW_VERSION"
+        WAITING_FOR_EXPORT_COMPLIANCE = "WAITING_FOR_EXPORT_COMPLIANCE"
+        WAITING_FOR_REVIEW = "WAITING_FOR_REVIEW"
+        NOT_APPLICABLE = "NOT_APPLICABLE"
+      end
+
+      module State
+        ACCEPTED = "ACCEPTED"
+        DEVELOPER_REJECTED = "DEVELOPER_REJECTED"
+        IN_REVIEW = "IN_REVIEW"
+        PENDING_RELEASE = "PENDING_RELEASE"
+        PREPARE_FOR_SUBMISSION = "PREPARE_FOR_SUBMISSION"
+        READY_FOR_DISTRIBUTION = "READY_FOR_DISTRIBUTION"
         READY_FOR_REVIEW = "READY_FOR_REVIEW"
         REJECTED = "REJECTED"
-        PREPARE_FOR_SUBMISSION = "PREPARE_FOR_SUBMISSION"
-        METADATA_REJECTED = "METADATA_REJECTED"
-        INVALID_BINARY = "INVALID_BINARY"
+        REPLACED_WITH_NEW_INFO = "REPLACED_WITH_NEW_INFO"
+        WAITING_FOR_REVIEW = "WAITING_FOR_REVIEW"
       end
 
       module AppStoreAgeRating
@@ -38,6 +60,7 @@ module Spaceship
 
       attr_mapping({
         "appStoreState" => "app_store_state",
+        "state" => "state",
         "appStoreAgeRating" => "app_store_age_rating",
         "brazilAgeRating" => "brazil_age_rating",
         "kidsAgeBand" => "kids_age_band",

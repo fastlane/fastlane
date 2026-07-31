@@ -36,20 +36,8 @@ describe Fastlane do
         end.to raise_error("Unresolved conflict between options: 'username' and 'api_key'")
       end
 
-      it "forbids to provide both :skip_stapling and :try_early_stapling" do
-        expect do
-          Fastlane::FastFile.new.parse("lane :test do
-            notarize(
-              skip_stapling: true,
-              try_early_stapling: true
-            )
-          end").runner.execute(:test)
-        end.to raise_error("Unresolved conflict between options: 'skip_stapling' and 'try_early_stapling'")
-      end
-
       context "with notary tool" do
         let(:package) { Tempfile.new('app.ipa.zip') }
-        let(:bundle_id) { 'com.some.app' }
 
         context "with Apple ID" do
           let(:username) { 'myusername@example.com' }
@@ -65,11 +53,26 @@ describe Fastlane do
 
             result = Fastlane::FastFile.new.parse("lane :test do
               notarize(
-                use_notarytool: true,
                 package: '#{package.path}',
-                bundle_id: '#{bundle_id}',
                 username: '#{username}',
                 asc_provider: '#{asc_provider}',
+              )
+            end").runner.execute(:test)
+          end
+
+          it "successful with verbose option" do
+            stub_const('ENV', { "FASTLANE_APPLE_APPLICATION_SPECIFIC_PASSWORD" => app_specific_password })
+
+            expect(Fastlane::Actions).to receive(:sh).with("xcrun notarytool submit #{package.path} --output-format json --wait --apple-id #{username} --password #{app_specific_password} --team-id #{asc_provider} --verbose", { error_callback: anything, log: true }).and_return(success_submit_response)
+
+            expect(Fastlane::Actions).to receive(:sh).with("xcrun stapler staple #{package.path}", { log: true })
+
+            result = Fastlane::FastFile.new.parse("lane :test do
+              notarize(
+                package: '#{package.path}',
+                username: '#{username}',
+                asc_provider: '#{asc_provider}',
+                verbose: true
               )
             end").runner.execute(:test)
           end
@@ -83,9 +86,7 @@ describe Fastlane do
 
             result = Fastlane::FastFile.new.parse("lane :test do
               notarize(
-                use_notarytool: true,
                 package: '#{package.path}',
-                bundle_id: '#{bundle_id}',
                 username: '#{username}',
                 asc_provider: '#{asc_provider}',
                 skip_stapling: true
@@ -101,14 +102,12 @@ describe Fastlane do
             expect do
               result = Fastlane::FastFile.new.parse("lane :test do
                 notarize(
-                  use_notarytool: true,
                   package: '#{package.path}',
-                  bundle_id: '#{bundle_id}',
                   username: '#{username}',
                   asc_provider: '#{asc_provider}',
                 )
               end").runner.execute(:test)
-            end.to raise_error(FastlaneCore::Interface::FastlaneError, "Could not notarize package with message 'Archive contains critical validation errors'")
+            end.to raise_error(FastlaneCore::Interface::FastlaneError, "Could not notarize package. To see the error, please set 'print_log' to true.")
           end
         end
       end

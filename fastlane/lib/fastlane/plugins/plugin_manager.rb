@@ -156,9 +156,10 @@ module Fastlane
 
     def self.fetch_gem_info_from_rubygems(gem_name)
       require 'json'
+      require 'open-uri'
       url = "https://rubygems.org/api/v1/gems/#{gem_name}.json"
       begin
-        JSON.parse(FastlaneCore::Helper.open_uri(url).read)
+        JSON.parse(URI.open(url).read)
       rescue
         nil
       end

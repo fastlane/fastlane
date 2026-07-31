@@ -1,4 +1,5 @@
 require_relative '../model'
+require_relative '../../errors'
 module Spaceship
   class ConnectAPI
     class AppInfoLocalization
@@ -32,11 +33,15 @@ module Spaceship
         client ||= Spaceship::ConnectAPI
         attributes = reverse_attr_mapping(attributes)
         client.patch_app_info_localization(app_info_localization_id: id, attributes: attributes)
+      rescue => error
+        raise Spaceship::AppStoreLocalizationError.new(@locale, error)
       end
 
       def delete!(client: nil, filter: {}, includes: nil, limit: nil, sort: nil)
         client ||= Spaceship::ConnectAPI
         client.delete_app_info_localization(app_info_localization_id: id)
+      rescue => error
+        raise Spaceship::AppStoreLocalizationError.new(@locale, error)
       end
     end
   end
