@@ -109,7 +109,6 @@ describe Fastlane::PluginGenerator do
         "gem 'pry'",
         "gem 'rake'",
         "gem 'rspec'",
-        "gem 'rspec_junit_formatter'",
         "gem 'rubocop', '#{Fastlane::RUBOCOP_REQUIREMENT}'",
         "gem 'rubocop-performance'",
         "gem 'rubocop-require_tools'",

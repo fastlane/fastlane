@@ -346,6 +346,58 @@ describe Trainer do
     end
   end
 
+  describe Trainer::XCResult::TestSuite do
+    # Mirrors the LegacyXCResult regression above for the Xcode 16+ xcresult parser:
+    # a test that fails on the first attempt and is skipped on retry must not be
+    # counted as a failure once retry attempts are removed.
+    describe '#to_hash with output_remove_retry_attempts' do
+      let(:test_case) do
+        Trainer::XCResult::TestCase.new(
+          name: "testFlaky()",
+          identifier: "MyTests/testFlaky()",
+          duration: 0.6,
+          result: "Failed",
+          classname: "MyTests",
+          retries: [
+            Trainer::XCResult::Repetition.new(name: "Repetition 1", duration: 0.5, result: "Failed", failure_messages: ["XCTAssertTrue failed"]),
+            Trainer::XCResult::Repetition.new(name: "Retry 2", duration: 0.1, result: "Skipped", failure_messages: ["flaky test"])
+          ]
+        )
+      end
+
+      let(:test_suite) do
+        Trainer::XCResult::TestSuite.new(
+          name: "MyTests",
+          identifier: "MyTests",
+          type: "Unit test bundle",
+          result: "Failed",
+          test_cases: [test_case]
+        )
+      end
+
+      it 'reports counts reflecting only the final skipped attempt when retries are removed' do
+        hash = test_suite.to_hash(output_remove_retry_attempts: true)
+        expect(hash[:number_of_tests]).to eq(1)
+        expect(hash[:number_of_failures]).to eq(0)
+        expect(hash[:number_of_skipped]).to eq(1)
+        expect(hash[:number_of_failures_excluding_retries]).to eq(0)
+        expect(hash[:number_of_retries]).to eq(0)
+      end
+
+      it 'still counts the failure when retries are not removed' do
+        hash = test_suite.to_hash
+        expect(hash[:number_of_failures_excluding_retries]).to eq(1)
+        expect(hash[:number_of_retries]).to eq(2)
+      end
+
+      it 'reports zero failures in the JUnit testsuite attributes when retries are removed' do
+        xml = test_suite.to_xml(output_remove_retry_attempts: true)
+        expect(xml.attribute('failures').value).to eq('0')
+        expect(xml.attribute('skipped').value).to eq('1')
+      end
+    end
+  end
+
   describe Trainer::XCResult::Parser do
     it 'generates same data for legacy and new commands', requires_xcodebuild: true do
       skip "Requires Xcode 16 or higher" unless Trainer::XCResult::Helper.supports_xcresulttool_version_23?

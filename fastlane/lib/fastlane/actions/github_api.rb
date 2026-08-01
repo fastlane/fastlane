@@ -252,6 +252,7 @@ module Fastlane
 
           Excon.defaults[:ssl_verify_peer] = secure
           middlewares = Excon.defaults[:middlewares] + [Excon::Middleware::RedirectFollower] # allow redirect in case of repo renames
+          headers = canonicalize_redirect_redaction_headers(headers)
 
           UI.verbose("#{http_method} : #{url}")
 
@@ -264,6 +265,15 @@ module Fastlane
             debug_request: FastlaneCore::Globals.verbose?,
             debug_response: FastlaneCore::Globals.verbose?
           )
+        end
+
+        def canonicalize_redirect_redaction_headers(headers)
+          redaction_headers = Excon::Middleware::RedirectFollower::REDACTION_HEADERS
+
+          headers.each_with_object({}) do |(header, value), canonical_headers|
+            canonical_header = redaction_headers.find { |redaction_header| redaction_header.casecmp?(header.to_s) }
+            canonical_headers[canonical_header || header] = value
+          end
         end
       end
     end

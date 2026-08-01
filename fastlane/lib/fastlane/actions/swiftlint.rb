@@ -37,6 +37,8 @@ module Fastlane
           command << " --use-script-input-files"
         end
 
+        command << path_argument(params) if params[:path]
+
         command << " > #{params[:output_file].shellescape}" if params[:output_file]
 
         begin
@@ -49,7 +51,6 @@ module Fastlane
 
       def self.optional_flags(params)
         command = ""
-        command << " --path #{params[:path].shellescape}" if params[:path]
         command << supported_option_switch(params, :strict, "0.9.2", true)
         command << " --config #{params[:config_file].shellescape}" if params[:config_file]
         command << " --reporter #{params[:reporter]}" if params[:reporter]
@@ -59,6 +60,14 @@ module Fastlane
         command << " --compiler-log-path #{params[:compiler_log_path].shellescape}" if params[:compiler_log_path]
         command << supported_option_switch(params, :progress, "0.49.1", true) if params[:progress]
         return command
+      end
+
+      def self.path_argument(params)
+        escaped_path = params[:path].shellescape
+        version = swiftlint_version(executable: params[:executable])
+        return " --path #{escaped_path}" if version < Gem::Version.new('0.48.0')
+
+        " #{escaped_path}"
       end
 
       # Get current SwiftLint version

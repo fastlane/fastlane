@@ -395,7 +395,9 @@ module FastlaneCore
       xcode_at_least_13 = FastlaneCore::Helper.xcode_at_least?("13")
       if xcode_at_least_13 && options[:destination]
         begin
-          destination_parameter = " " + "-destination #{options[:destination].shellescape}"
+          destination = options[:destination]
+          destination = destination.first if destination.kind_of?(Array)
+          destination_parameter = " " + "-destination #{destination.shellescape}"
         rescue => ex
           # xcodebuild command can continue without destination parameter, so
           # we really don't care about this exception if something goes wrong with shellescape

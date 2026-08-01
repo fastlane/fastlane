@@ -114,7 +114,7 @@ module Match
         end
         UI.error("---")
         print_safe_remove_certs_hint
-        UI.user_error!("Enterprise account nuke cancelled") unless UI.confirm("Do you really want to nuke your Enterprise account?")
+        UI.user_error!("Enterprise account nuke cancelled") unless params[:skip_confirmation] || UI.confirm("Do you really want to nuke your Enterprise account?")
       end
     end
 
@@ -192,7 +192,7 @@ module Match
       puts("")
 
       UI.important("By default, all listed certificates and profiles will be nuked")
-      if UI.confirm("Do you want to only nuke specific certificates and their associated profiles?")
+      if !params[:skip_confirmation] && UI.confirm("Do you want to only nuke specific certificates and their associated profiles?")
         input_indexes = UI.input("Enter the \"Option\" number(s) from the table above? (comma-separated)").split(',')
 
         # Get certificates from option indexes

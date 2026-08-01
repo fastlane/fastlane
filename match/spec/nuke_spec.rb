@@ -119,5 +119,72 @@ describe Match do
         nuke.filter_by_cert
       end.to raise_error(FastlaneCore::Interface::FastlaneError, "No certificate found for certificate_id '3333333333'")
     end
+
+    describe "skip_confirmation" do
+      it "honors skip_confirmation: true in filter_by_cert" do
+        nuke = Match::Nuke.new
+        nuke.params = {
+          skip_confirmation: true
+        }
+        cert = double("cert", id: "123", name: "cert", expiration_date: "2026-05-09T09:41:00+00:00")
+        allow(cert).to receive(:class).and_return(double("class", split: ["Spaceship", "Certificate"]))
+        nuke.certs = [cert, cert] # Need at least 2 to trigger the selection logic
+
+        expect(UI).not_to receive(:confirm)
+
+        # We need to mock Terminal::Table because filter_by_cert uses it
+        allow(Terminal::Table).to receive(:new).and_return("table")
+
+        nuke.filter_by_cert
+      end
+
+      it "honors skip_confirmation: true in run method" do
+        values = {
+          app_identifier: "tools.fastlane.app",
+          type: "appstore",
+          git_url: "https://github.com/fastlane/fastlane",
+          username: "flapple@something.com",
+          skip_confirmation: true
+        }
+        config = FastlaneCore::Configuration.create(Match::Options.available_options, values)
+
+        nuke = Match::Nuke.new
+
+        allow(nuke).to receive(:spaceship_login)
+        allow(Match::Storage).to receive(:from_params).and_return(double("storage", download: nil, working_directory: "/tmp", clear_changes: nil))
+        allow(Match::Encryption).to receive(:for_storage_mode).and_return(nil)
+        allow(nuke).to receive(:prepare_list)
+        allow(nuke).to receive(:filter_by_cert)
+        allow(nuke).to receive(:print_tables)
+        allow(nuke).to receive(:nuke_it_now!)
+
+        # Mock certs/profiles/files to be non-empty
+        nuke.certs = [double("cert")]
+        nuke.profiles = [double("profile")]
+        nuke.files = [double("file")]
+
+        expect(UI).not_to receive(:confirm).with("Do you really want to nuke everything listed above?")
+
+        nuke.run(config, type: config[:type])
+      end
+
+      it "honors skip_confirmation: true in spaceship_login" do
+        nuke = Match::Nuke.new
+        nuke.params = {
+          skip_confirmation: true,
+          username: "user",
+          team_id: "team"
+        }
+        nuke.type = "enterprise"
+
+        client = double("client", in_house?: true)
+        allow(Spaceship::ConnectAPI).to receive(:client).and_return(client)
+        allow(Spaceship::ConnectAPI).to receive(:login)
+
+        expect(UI).not_to receive(:confirm)
+
+        nuke.spaceship_login
+      end
+    end
   end
 end

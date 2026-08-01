@@ -297,6 +297,14 @@ module Match
                                      description: "Renew the provisioning profiles if the certificate count on the developer portal has changed. Works only for the 'development' provisioning profile type. Requires 'include_all_certificates' option to be 'true'",
                                      type: Boolean,
                                      default_value: false),
+        FastlaneCore::ConfigItem.new(key: :renew_expired_certs,
+                                     env_name: "MATCH_RENEW_EXPIRED_CERTS",
+                                     description: "Automatically renew expired certificates. Note: to renew `developer_id` and `developer_id_installer` certificates " \
+                                                  "you must log in with the Account Holder account by using username and password; App Store Connect API key doesn't work in this case. " \
+                                                  "The expired certificate is removed from the match storage and a new one is created, but the old certificate is not revoked on the " \
+                                                  "Apple Developer Portal — run `fastlane match nuke` if you need to free up certificate slots",
+                                     type: Boolean,
+                                     default_value: false),
         FastlaneCore::ConfigItem.new(key: :skip_confirmation,
                                      env_name: "MATCH_SKIP_CONFIRMATION",
                                      description: "Disables confirmation prompts during nuke, answering them with yes",

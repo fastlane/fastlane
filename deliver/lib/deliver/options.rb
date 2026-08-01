@@ -127,6 +127,14 @@ module Deliver
                                      env_name: "DELIVER_SCREENSHOTS_PATH",
                                      description: "Path to the folder containing the screenshots",
                                      optional: true),
+        FastlaneCore::ConfigItem.new(key: :app_clip_header_images_path,
+                                     env_name: "DELIVER_APP_CLIP_HEADER_IMAGES_PATH",
+                                     description: "Path to the folder containing the app clip header images",
+                                     optional: true),
+        FastlaneCore::ConfigItem.new(key: :app_clip_default_experience_metadata_path,
+                                     env_name: "DELIVER_APP_CLIP_DEFAULT_EXPERIENCE_METADATA_PATH",
+                                     description: "Path to the folder containing the app clip default experience metadata",
+                                     optional: true),
 
         # app previews (videos)
         FastlaneCore::ConfigItem.new(key: :app_previews_path,
@@ -318,7 +326,7 @@ module Deliver
         # rubocop:disable Layout/LineLength
         FastlaneCore::ConfigItem.new(key: :itc_provider,
                                      env_name: "DELIVER_ITC_PROVIDER",
-                                     description: "The provider short name to be used with the iTMSTransporter to identify your team. This value will override the automatically detected provider short name. To get provider short name run `pathToXcode.app/Contents/Applications/Application\\ Loader.app/Contents/itms/bin/iTMSTransporter -m provider -u 'USERNAME' -p 'PASSWORD' -account_type itunes_connect -v off`. The short names of providers should be listed in the second column",
+                                     description: "The provider short name to be used with the iTMSTransporter to identify your team. This value will override the automatically detected provider short name. To get provider short name run `xcrun iTMSTransporter -m provider -u 'USERNAME' -p 'PASSWORD' -account_type itunes_connect -v off`. The short names of providers should be listed in the second column",
                                      optional: true,
                                      code_gen_sensitive: true,
                                      default_value: CredentialsManager::AppfileConfig.try_fetch_value(:itc_provider),
@@ -404,6 +412,10 @@ module Deliver
                                      description: "Metadata: A hash containing the review information",
                                      optional: true,
                                      type: Hash),
+        FastlaneCore::ConfigItem.new(key: :app_clip_review_information,
+                                     description: "Metadata: A hash containing the app clip review information",
+                                     optional: true,
+                                     type: Hash),
         FastlaneCore::ConfigItem.new(key: :app_review_attachment_file,
                                      env_name: "DELIVER_APP_REVIEW_ATTACHMENT_FILE",
                                      description: "Metadata: Path to the app review attachment file",
@@ -483,6 +495,17 @@ module Deliver
                                      type: Boolean,
                                      optional: true,
                                      default_value: true),
+
+        # app clip default experience
+        FastlaneCore::ConfigItem.new(key: :app_clip_default_experience_subtitle,
+                                     env_name: "DELIVER_APP_CLIP_DEFAULT_EXPERIENCE_SUBTITLE",
+                                     description: "The localized subtitle for the default app clip experience",
+                                     optional: true,
+                                     type: Hash),
+        FastlaneCore::ConfigItem.new(key: :app_clip_default_experience_action,
+                                     env_name: "DELIVER_APP_CLIP_DEFAULT_EXPERIENCE_ACTION",
+                                     description: "Action for the default app clip experience (OPEN, VIEW, PLAY)",
+                                     optional: true),
 
         # internal
         FastlaneCore::ConfigItem.new(key: :app,

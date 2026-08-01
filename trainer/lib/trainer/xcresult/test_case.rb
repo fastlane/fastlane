@@ -115,11 +115,30 @@ module Trainer
         @retries&.count || 0
       end
 
-      def total_tests_count
+      # Result of the final attempt (last repetition), or the overall result when there are no retries.
+      # When retry attempts are removed, counts should reflect this final outcome rather than the
+      # aggregate `@result`, which xcresulttool reports as `Failed` even if the test was skipped on retry.
+      def final_result
+        @retries && !@retries.empty? ? @retries.last.result : @result
+      end
+
+      def final_failed?
+        final_result == 'Failed'
+      end
+
+      def final_skipped?
+        final_result == 'Skipped'
+      end
+
+      def total_tests_count(output_remove_retry_attempts: false)
+        return 1 if output_remove_retry_attempts
+
         retries_count > 0 ? retries_count : 1
       end
 
-      def total_failures_count
+      def total_failures_count(output_remove_retry_attempts: false)
+        return final_failed? ? 1 : 0 if output_remove_retry_attempts
+
         if retries_count > 0
           @retries.count(&:failed?)
         elsif failed?

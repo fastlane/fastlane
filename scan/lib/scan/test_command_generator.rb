@@ -177,6 +177,8 @@ module Scan
     end
 
     def pipe_xcpretty
+      UI.important("Using xcpretty can result in missing some build errors and is slower than the preferred xcbeautify. See https://docs.fastlane.tools/best-practices/xcodebuild-formatters/ for more information.")
+
       formatter = []
       if (custom_formatter = Scan.config[:xcpretty_formatter] || Scan.config[:formatter])
         if custom_formatter.end_with?(".rb")

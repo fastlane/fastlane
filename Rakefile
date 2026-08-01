@@ -1,24 +1,14 @@
 require "bundler/gem_tasks"
 
+Dir.glob("internal/rakelib/*.rake").each { |r| load r }
+
 task(:test_all) do
   formatter = "--format progress"
-  formatter += " -r rspec_junit_formatter --format RspecJunitFormatter -o #{ENV['CIRCLE_TEST_REPORTS']}/rspec/fastlane-junit-results.xml" if ENV["CIRCLE_TEST_REPORTS"]
+  # On GitHub Actions - automatically write out the rspec logs to be parsed later.
+  formatter += " --format json --out rspec_logs.json" if ENV["GITHUB_ACTIONS"]
   command = "rspec --pattern spec/**/*_spec.rb,*/spec/**/*_spec.rb #{formatter} #{ENV['RSPEC_ARGS']}"
 
-  run_rspec(command)
-end
-
-def run_rspec(command)
-  # To move Ruby 3.0 or next major version migration going forward, we want to keep monitoring deprecation warnings
-  if Gem.win_platform?
-    # Windows would not work with /bin/bash so skip collecting warnings
-    sh(command)
-  else
-    # Mix stderr into stdout to let handle `tee` it and then collect warnings by filtering stdout out
-    command += " 2>&1 | tee >(grep 'warning:' > #{File.join(ENV['CIRCLE_TEST_REPORTS'], 'ruby_warnings.txt')})" if ENV["CIRCLE_TEST_REPORTS"]
-    # tee >(...) occurs syntax error with `sh` helper which uses /bin/sh by default.
-    sh("/bin/bash -o pipefail -c \"#{command}\"")
-  end
+  sh(command)
 end
 
 # run, displays and saves the list of tests that do not work standalone
@@ -28,7 +18,7 @@ task(:test_all_individually) do
   failed = files.select do |file|
     formatter = "--format progress"
     command = "rspec #{formatter} #{ENV['RSPEC_ARGS']} #{file}"
-    run_rspec(command)
+    sh(command)
     false
   rescue => _
     true

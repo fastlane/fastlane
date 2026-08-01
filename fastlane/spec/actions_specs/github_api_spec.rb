@@ -6,19 +6,53 @@ describe Fastlane do
       let(:headers) do
         {
           'Authorization' => 'Basic MTIzNDU2Nzg5',
-          'Host' => 'api.github.com:443',
+          'Host' => 'api.github.com',
           'User-Agent' => user_agent
         }
       end
       let(:headers_bearer) do
         {
           'Authorization' => 'Bearer 123456789',
-          'Host' => 'api.github.com:443',
+          'Host' => 'api.github.com',
           'User-Agent' => user_agent
         }
       end
 
       context 'successful' do
+        context 'when following redirects' do
+          it 'redacts sensitive headers case-insensitively and preserves legitimate headers' do
+            redirected_headers = nil
+            source_url = 'https://source.test/start'
+            target_url = 'https://target.test/final'
+
+            stub_request(:get, source_url).
+              to_return(status: 302, headers: { 'Location' => target_url })
+            stub_request(:get, target_url).
+              to_return do |request|
+                redirected_headers = request.headers
+                { status: 200, body: response_body }
+              end
+
+            response = Fastlane::Actions::GithubApiAction.send(
+              :call_endpoint,
+              source_url,
+              'GET',
+              {
+                'Authorization' => 'Bearer secret',
+                'Cookie' => 'session=secret',
+                'X-Api-Key' => 'secret-key',
+                'User-Agent' => user_agent
+              },
+              nil,
+              true
+            )
+
+            expect(response.status).to eq(200)
+            expect(redirected_headers.keys.map(&:downcase)).not_to include('authorization', 'cookie', 'x-api-key')
+            expect(redirected_headers['User-Agent']).to eq(user_agent)
+          end
+        end
+
         context 'with api_token' do
           before do
             stub_request(:put, "https://api.github.com/repos/fastlane/fastlane/contents/TEST_FILE.md").
@@ -125,7 +159,7 @@ describe Fastlane do
             let(:headers) do
               {
                 'Authorization' => 'Basic MTIzNDU2Nzg5',
-                'Host' => 'uploads.github.com:443',
+                'Host' => 'uploads.github.com',
                 'User-Agent' => user_agent
               }
             end
@@ -160,7 +194,7 @@ describe Fastlane do
               let(:headers) do
                 {
                   'Authorization' => 'custom',
-                  'Host' => 'uploads.github.com:443',
+                  'Host' => 'uploads.github.com',
                   'User-Agent' => 'fastlane-custom-user-agent',
                   'Content-Type' => 'text/plain'
                 }
@@ -371,7 +405,7 @@ describe Fastlane do
           stub_request(:put, "https://api.github.com/repos/fastlane/fastlane/contents/TEST_FILE.md").
             with(headers: {
                     'Authorization' => 'Basic MTIzNDU2Nzg5',
-                    'Host' => 'api.github.com:443',
+                    'Host' => 'api.github.com',
                     'User-Agent' => 'fastlane-github_api'
                   }).
             to_return(status: 401, body: error_response_body, headers: {})

@@ -34,6 +34,10 @@ describe Deliver::Loader do
       it 'should be same as language name normalized even when case is different' do
         expect(described_class.new(directory_path(language.upcase)).language).to eq(language)
       end
+
+      it 'should be nil for default folder' do
+        expect(described_class.new(directory_path('default')).language).to be_nil
+      end
     end
 
     describe '#valid?' do
@@ -225,6 +229,84 @@ describe Deliver::Loader do
       expect do
         collect_screenshots_from_dir("/Screenshots/")
       end.to raise_error(FastlaneCore::Interface::FastlaneError, /Canceled uploading screenshot/)
+    end
+  end
+
+  describe "#load_app_clip_header_images" do
+    include(FakeFS::SpecHelpers)
+
+    def add_header_image(file)
+      FileUtils.mkdir_p(File.dirname(file))
+      File.open(file, 'w') { |f| f << 'touch' }
+    end
+
+    def collect_header_images_from_dir(dir)
+      Deliver::Loader.load_app_clip_header_images(dir, false)
+    end
+
+    before do
+      allow(FastImage).to receive(:size).and_return([1800, 1200])
+    end
+
+    it "should not find any header images when the directory is empty" do
+      header_images = collect_header_images_from_dir("/AppClipHeaderImages")
+      expect(header_images.count).to eq(0)
+    end
+
+    it "should find header image when present in the directory" do
+      add_header_image("/AppClipHeaderImages/en-US/header.jpg")
+      header_images = collect_header_images_from_dir("/AppClipHeaderImages/")
+      expect(header_images.count).to eq(1)
+      expect(header_images.first.language).to eq("en-US")
+    end
+
+    it "should find header images from multiple languages" do
+      add_header_image("/AppClipHeaderImages/en-US/header.jpg")
+      add_header_image("/AppClipHeaderImages/ko/header.jpg")
+      add_header_image("/AppClipHeaderImages/ja/header.jpg")
+      header_images = collect_header_images_from_dir("/AppClipHeaderImages")
+      expect(header_images.count).to eq(3)
+      expect(header_images.map(&:language)).to contain_exactly("en-US", "ko", "ja")
+    end
+
+    it "should include default folder header image with nil language" do
+      add_header_image("/AppClipHeaderImages/default/header.jpg")
+      add_header_image("/AppClipHeaderImages/en-US/header.jpg")
+      header_images = collect_header_images_from_dir("/AppClipHeaderImages")
+      expect(header_images.count).to eq(2)
+
+      default_image = header_images.find { |img| img.language.nil? }
+      expect(default_image).not_to be_nil
+      expect(default_image.path).to eq("/AppClipHeaderImages/default/header.jpg")
+    end
+
+    it "should validate header images are 1800x1200" do
+      add_header_image("/AppClipHeaderImages/en-US/header.jpg")
+      allow(FastImage).to receive(:size).and_return([1920, 1080])
+
+      expect do
+        collect_header_images_from_dir("/AppClipHeaderImages")
+      end.to raise_error(FastlaneCore::Interface::FastlaneError)
+    end
+
+    it "should validate only one header image per language" do
+      add_header_image("/AppClipHeaderImages/en-US/header1.jpg")
+      add_header_image("/AppClipHeaderImages/en-US/header2.jpg")
+
+      expect do
+        collect_header_images_from_dir("/AppClipHeaderImages")
+      end.to raise_error(FastlaneCore::Interface::FastlaneError)
+    end
+
+    it "should filter out nil languages before validation for duplicate check" do
+      add_header_image("/AppClipHeaderImages/default/header1.jpg")
+      add_header_image("/AppClipHeaderImages/default/header2.jpg")
+
+      # Should not raise error for multiple images in default folder
+      # since nil languages are filtered out during validation
+      header_images = collect_header_images_from_dir("/AppClipHeaderImages")
+      expect(header_images.count).to eq(2)
+      expect(header_images.all? { |img| img.language.nil? }).to be(true)
     end
   end
 end
