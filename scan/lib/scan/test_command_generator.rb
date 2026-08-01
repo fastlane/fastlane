@@ -69,6 +69,14 @@ module Scan
       options << "-enableAddressSanitizer #{config[:address_sanitizer] ? 'YES' : 'NO'}" unless config[:address_sanitizer].nil?
       options << "-enableThreadSanitizer #{config[:thread_sanitizer] ? 'YES' : 'NO'}" unless config[:thread_sanitizer].nil?
       if FastlaneCore::Helper.xcode_at_least?(11)
+        if config[:cloned_source_packages_path] && !options.include?("-clonedSourcePackagesDirPath #{config[:cloned_source_packages_path].shellescape}")
+          options << "-clonedSourcePackagesDirPath #{config[:cloned_source_packages_path].shellescape}"
+        end
+
+        if config[:package_cache_path] && !options.include?("-packageCachePath #{config[:package_cache_path].shellescape}")
+          options << "-packageCachePath #{config[:package_cache_path].shellescape}"
+        end
+
         options << "-testPlan '#{config[:testplan]}'" if config[:testplan]
 
         # detect_values will ensure that these values are present as Arrays if
@@ -169,6 +177,8 @@ module Scan
     end
 
     def pipe_xcpretty
+      UI.important("Using xcpretty can result in missing some build errors and is slower than the preferred xcbeautify. See https://docs.fastlane.tools/best-practices/xcodebuild-formatters/ for more information.")
+
       formatter = []
       if (custom_formatter = Scan.config[:xcpretty_formatter] || Scan.config[:formatter])
         if custom_formatter.end_with?(".rb")

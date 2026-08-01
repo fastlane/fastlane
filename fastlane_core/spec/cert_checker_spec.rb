@@ -12,7 +12,7 @@ describe FastlaneCore do
     describe '#installed_identities' do
       it 'should print an error when no local code signing identities are found' do
         allow(FastlaneCore::CertChecker).to receive(:wwdr_keychain).and_return('login.keychain')
-        allow(FastlaneCore::CertChecker).to receive(:installed_wwdr_certificates).and_return(['G2', 'G3', 'G4', 'G5', 'G6'])
+        allow(FastlaneCore::CertChecker).to receive(:installed_wwdr_certificates).and_return(['G2', 'G3', 'G4', 'G5', 'G6', 'DEV-ID-G1', 'DEV-ID-G2'])
         allow(FastlaneCore::CertChecker).to receive(:list_available_identities).and_return("     0 valid identities found\n")
         expect(FastlaneCore::UI).to receive(:error).with(/There are no local code signing identities found/)
 
@@ -21,7 +21,7 @@ describe FastlaneCore do
 
       it 'should not be fooled by 10 local code signing identities available' do
         allow(FastlaneCore::CertChecker).to receive(:wwdr_keychain).and_return('login.keychain')
-        allow(FastlaneCore::CertChecker).to receive(:installed_wwdr_certificates).and_return(['G2', 'G3', 'G4', 'G5', 'G6'])
+        allow(FastlaneCore::CertChecker).to receive(:installed_wwdr_certificates).and_return(['G2', 'G3', 'G4', 'G5', 'G6', 'DEV-ID-G1', 'DEV-ID-G2'])
         allow(FastlaneCore::CertChecker).to receive(:list_available_identities).and_return("     10 valid identities found\n")
         expect(FastlaneCore::UI).not_to(receive(:error))
 
@@ -59,6 +59,18 @@ describe FastlaneCore do
 
         expect(FastlaneCore::CertChecker.installed_wwdr_certificates).to eq([])
       end
+
+      it "should find Developer ID certificates by their own common name" do
+        expect(FastlaneCore::CertChecker).to receive(:wwdr_keychain).and_return('login.keychain')
+
+        expect(FastlaneCore::Helper).to receive(:backticks).with(/security find-certificate -a -c 'Apple Worldwide Developer Relations'/, { print: false }).and_return("")
+        expect(FastlaneCore::Helper).to receive(:backticks).with(/security find-certificate -a -c 'Developer ID Certification Authority'/, { print: false }).and_return("-----BEGIN CERTIFICATE-----\nDEV-ID-G2\n-----END CERTIFICATE-----\n")
+
+        allow(Digest::SHA256).to receive(:hexdigest).with(cert.to_der).and_return('f16cd3c54c7f83cea4bf1a3e6a0819c8aaa8e4a1528fd144715f350643d2df3a')
+        allow(OpenSSL::X509::Certificate).to receive(:new).and_return(cert)
+
+        expect(FastlaneCore::CertChecker.installed_wwdr_certificates).to eq(['DEV-ID-G2'])
+      end
     end
 
     describe '#install_missing_wwdr_certificates' do
@@ -70,13 +82,16 @@ describe FastlaneCore do
         expect(FastlaneCore::CertChecker).to receive(:install_wwdr_certificate).with('G4', { keychain: "login.keychain" })
         expect(FastlaneCore::CertChecker).to receive(:install_wwdr_certificate).with('G5', { keychain: "login.keychain" })
         expect(FastlaneCore::CertChecker).to receive(:install_wwdr_certificate).with('G6', { keychain: "login.keychain" })
+        expect(FastlaneCore::CertChecker).to receive(:install_wwdr_certificate).with('DEV-ID-G1', { keychain: "login.keychain" })
+        expect(FastlaneCore::CertChecker).to receive(:install_wwdr_certificate).with('DEV-ID-G2', { keychain: "login.keychain" })
         FastlaneCore::CertChecker.install_missing_wwdr_certificates
       end
 
       it 'should install the missing official WWDR certificate' do
         allow(FastlaneCore::CertChecker).to receive(:wwdr_keychain).and_return('login.keychain')
-        allow(FastlaneCore::CertChecker).to receive(:installed_wwdr_certificates).and_return(['G2', 'G3', 'G4', 'G5'])
+        allow(FastlaneCore::CertChecker).to receive(:installed_wwdr_certificates).and_return(['G2', 'G3', 'G4', 'G5', 'DEV-ID-G2'])
         expect(FastlaneCore::CertChecker).to receive(:install_wwdr_certificate).with('G6', { keychain: "login.keychain" })
+        expect(FastlaneCore::CertChecker).to receive(:install_wwdr_certificate).with('DEV-ID-G1', { keychain: "login.keychain" })
         FastlaneCore::CertChecker.install_missing_wwdr_certificates
       end
 
@@ -97,6 +112,12 @@ describe FastlaneCore do
 
         expect(Open3).to receive(:capture3).with(include('https://www.apple.com/certificateauthority/AppleWWDRCAG6.cer')).and_return(["", "", success_status])
         FastlaneCore::CertChecker.install_wwdr_certificate('G6')
+
+        expect(Open3).to receive(:capture3).with(include('https://www.apple.com/certificateauthority/DeveloperIDCA.cer')).and_return(["", "", success_status])
+        FastlaneCore::CertChecker.install_wwdr_certificate('DEV-ID-G1')
+
+        expect(Open3).to receive(:capture3).with(include('https://www.apple.com/certificateauthority/DeveloperIDG2CA.cer')).and_return(["", "", success_status])
+        FastlaneCore::CertChecker.install_wwdr_certificate('DEV-ID-G2')
       end
     end
 
@@ -107,7 +128,7 @@ describe FastlaneCore do
 
       it 'should shell escape keychain names when checking for installation' do
         expect(FastlaneCore::CertChecker).to receive(:wwdr_keychain).and_return(keychain_name)
-        expect(FastlaneCore::Helper).to receive(:backticks).with(name_regex, { print: false }).and_return("")
+        expect(FastlaneCore::Helper).to receive(:backticks).with(name_regex, { print: false }).twice.and_return("")
 
         FastlaneCore::CertChecker.installed_wwdr_certificates
       end
@@ -124,7 +145,7 @@ describe FastlaneCore do
           expect(Open3).to receive(:capture3).with(cmd).and_return(["", "", success_status])
           expect(FastlaneCore::CertChecker).to receive(:wwdr_keychain).and_return(keychain_name)
 
-          allow(FastlaneCore::CertChecker).to receive(:installed_wwdr_certificates).and_return(['G2', 'G3', 'G4', 'G5'])
+          allow(FastlaneCore::CertChecker).to receive(:installed_wwdr_certificates).and_return(['G2', 'G3', 'G4', 'G5', 'DEV-ID-G1', 'DEV-ID-G2'])
           expect(FastlaneCore::CertChecker.install_missing_wwdr_certificates).to be(1)
         end
 
@@ -141,7 +162,7 @@ describe FastlaneCore do
           expect(Open3).to receive(:capture3).with(cmd).and_return(["", "", success_status])
           expect(FastlaneCore::CertChecker).to receive(:wwdr_keychain).and_return(keychain_name)
 
-          allow(FastlaneCore::CertChecker).to receive(:installed_wwdr_certificates).and_return(['G2', 'G3', 'G4', 'G5'])
+          allow(FastlaneCore::CertChecker).to receive(:installed_wwdr_certificates).and_return(['G2', 'G3', 'G4', 'G5', 'DEV-ID-G1', 'DEV-ID-G2'])
           expect(FastlaneCore::CertChecker.install_missing_wwdr_certificates).to be(1)
         end
       end

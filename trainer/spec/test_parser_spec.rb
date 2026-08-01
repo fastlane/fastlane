@@ -278,9 +278,129 @@ describe Trainer do
     end
   end
 
+  describe Trainer::LegacyXCResult::Parser do
+    describe '#summaries_to_data' do
+      context 'when output_remove_retry_attempts is true' do
+        context 'and a test fails on the first attempt then is skipped on retry' do
+          let(:test_group) { double("test_group", name: "MyTests") }
+          let(:failure) { double("failure", failure_message: "XCTAssertTrue failed") }
+
+          let(:failing_test) do
+            t = double("failing_test",
+              name: "testFlaky()",
+              duration: 0.5,
+              test_status: "Failure",
+              parent: test_group)
+            allow(t).to receive(:find_failure).and_return(failure)
+            t
+          end
+
+          let(:skipped_test) do
+            t = double("skipped_test",
+              name: "testFlaky()",
+              duration: 0.1,
+              test_status: "Skipped",
+              parent: test_group)
+            allow(t).to receive(:find_failure).and_return(nil)
+            t
+          end
+
+          let(:testable_summary) do
+            double("testable_summary",
+              all_tests: [failing_test, skipped_test],
+              project_relative_path: "MyApp.xcodeproj",
+              target_name: "MyTests",
+              name: "MyTests")
+          end
+
+          let(:plan_run_summary) do
+            double("plan_run_summary",
+              name: "Test Scheme Action",
+              testable_summaries: [testable_summary])
+          end
+
+          let(:summaries_wrapper) do
+            double("summaries_wrapper", summaries: [plan_run_summary])
+          end
+
+          let(:result) do
+            described_class.send(:summaries_to_data, [summaries_wrapper], [], output_remove_retry_attempts: true)
+          end
+
+          it 'keeps only the final skipped attempt' do
+            expect(result.first[:tests].count).to eq(1)
+            expect(result.first[:tests].first[:skipped]).to eq(true)
+            expect(result.first[:tests].first[:failures]).to be_nil
+          end
+
+          it 'reports counts reflecting only the final skipped attempt' do
+            row = result.first
+            expect(row[:number_of_tests]).to eq(1)
+            expect(row[:number_of_failures]).to eq(0)
+            expect(row[:number_of_skipped]).to eq(1)
+            expect(row[:number_of_failures_excluding_retries]).to eq(0)
+            expect(row[:number_of_retries]).to eq(0)
+          end
+        end
+      end
+    end
+  end
+
+  describe Trainer::XCResult::TestSuite do
+    # Mirrors the LegacyXCResult regression above for the Xcode 16+ xcresult parser:
+    # a test that fails on the first attempt and is skipped on retry must not be
+    # counted as a failure once retry attempts are removed.
+    describe '#to_hash with output_remove_retry_attempts' do
+      let(:test_case) do
+        Trainer::XCResult::TestCase.new(
+          name: "testFlaky()",
+          identifier: "MyTests/testFlaky()",
+          duration: 0.6,
+          result: "Failed",
+          classname: "MyTests",
+          retries: [
+            Trainer::XCResult::Repetition.new(name: "Repetition 1", duration: 0.5, result: "Failed", failure_messages: ["XCTAssertTrue failed"]),
+            Trainer::XCResult::Repetition.new(name: "Retry 2", duration: 0.1, result: "Skipped", failure_messages: ["flaky test"])
+          ]
+        )
+      end
+
+      let(:test_suite) do
+        Trainer::XCResult::TestSuite.new(
+          name: "MyTests",
+          identifier: "MyTests",
+          type: "Unit test bundle",
+          result: "Failed",
+          test_cases: [test_case]
+        )
+      end
+
+      it 'reports counts reflecting only the final skipped attempt when retries are removed' do
+        hash = test_suite.to_hash(output_remove_retry_attempts: true)
+        expect(hash[:number_of_tests]).to eq(1)
+        expect(hash[:number_of_failures]).to eq(0)
+        expect(hash[:number_of_skipped]).to eq(1)
+        expect(hash[:number_of_failures_excluding_retries]).to eq(0)
+        expect(hash[:number_of_retries]).to eq(0)
+      end
+
+      it 'still counts the failure when retries are not removed' do
+        hash = test_suite.to_hash
+        expect(hash[:number_of_failures_excluding_retries]).to eq(1)
+        expect(hash[:number_of_retries]).to eq(2)
+      end
+
+      it 'reports zero failures in the JUnit testsuite attributes when retries are removed' do
+        xml = test_suite.to_xml(output_remove_retry_attempts: true)
+        expect(xml.attribute('failures').value).to eq('0')
+        expect(xml.attribute('skipped').value).to eq('1')
+      end
+    end
+  end
+
   describe Trainer::XCResult::Parser do
     it 'generates same data for legacy and new commands', requires_xcodebuild: true do
-      skip "Requires Xcode 16 or higher" unless Trainer::XCResult::Helper.supports_xcode16_xcresulttool?
+      skip "Requires Xcode 16 or higher" unless Trainer::XCResult::Helper.supports_xcresulttool_version_23?
 
       xcresult_path = File.expand_path('../fixtures/Test.test_result.xcresult', __FILE__)
 
@@ -304,13 +424,13 @@ describe Trainer do
       expect(legacy_parser_data).to eq(new_parser_data)
     end
 
-    describe 'Xcode 16 xcresult bundle' do
+    describe 'Xcode 16 (xcresulttool 23) xcresult bundle' do
       let(:xcresult_path) { File.expand_path('../fixtures/Xcode16-Mixed-XCTest-SwiftTesting.xcresult', __FILE__) }
       let(:json_fixture_path) { File.expand_path("../fixtures/Xcode16-Mixed-XCTest-SwiftTesting.json", __FILE__) }
       let(:json_fixture) { JSON.parse(File.read(json_fixture_path)) }
 
       it 'generates correct JUnit XML including retries', requires_xcodebuild: true do
-        skip "Requires Xcode 16 or higher" unless Trainer::XCResult::Helper.supports_xcode16_xcresulttool?
+        skip "Requires xcresulttool version 23" unless Trainer::XCResult::Helper.supports_xcresulttool_version_23? && !Trainer::XCResult::Helper.supports_xcresulttool_version_24?
 
         # Uncomment this if you want to bypass the xcresult_to_json call during testing
         # allow(Trainer::XCResult::Parser).to receive(:xcresult_to_json).with(xcresult_path).and_return(json_fixture)
@@ -324,7 +444,7 @@ describe Trainer do
       end
 
       it 'generates correct JUnit XML excluding retries', requires_xcodebuild: true do
-        skip "Requires Xcode 16 or higher" unless Trainer::XCResult::Helper.supports_xcode16_xcresulttool?
+        skip "Requires xcresulttool version 23" unless Trainer::XCResult::Helper.supports_xcresulttool_version_23? && !Trainer::XCResult::Helper.supports_xcresulttool_version_24?
 
         # Uncomment this if you want to bypass the xcresult_to_json call during testing
         # allow(Trainer::XCResult::Parser).to receive(:xcresult_to_json).with(xcresult_path).and_return(json_fixture)
@@ -332,6 +452,38 @@ describe Trainer do
         test_plan = Trainer::XCResult::Parser.parse_xcresult(path: xcresult_path, output_remove_retry_attempts: true)
         junit_xml = test_plan.to_xml
         expected_xml_path = File.expand_path('../fixtures/Xcode16-Mixed-XCTest-SwiftTesting-WithoutRetries.junit', __FILE__)
+        expected_xml = File.read(expected_xml_path)
+        expect(junit_xml.chomp).to eq(expected_xml.chomp)
+      end
+    end
+
+    describe 'Xcode 26 (xcresulttool 24) xcresult bundle' do
+      let(:xcresult_path) { File.expand_path('../fixtures/Xcode26-Mixed-XCTest-SwiftTesting.xcresult', __FILE__) }
+      let(:json_fixture_path) { File.expand_path("../fixtures/Xcode26-Mixed-XCTest-SwiftTesting.json", __FILE__) }
+      let(:json_fixture) { JSON.parse(File.read(json_fixture_path)) }
+
+      it 'generates correct JUnit XML including retries', requires_xcodebuild: true do
+        skip "Requires xcresulttool version 24" unless Trainer::XCResult::Helper.supports_xcresulttool_version_24?
+
+        # Uncomment this if you want to bypass the xcresult_to_json call during testing
+        # allow(Trainer::XCResult::Parser).to receive(:xcresult_to_json).with(xcresult_path).and_return(json_fixture)
+        test_plan = Trainer::XCResult::Parser.parse_xcresult(path: xcresult_path)
+        junit_xml = test_plan.to_xml
+
+        expected_xml_path = File.expand_path('../fixtures/Xcode26-Mixed-XCTest-SwiftTesting-WithRetries.junit', __FILE__)
+        expected_xml = File.read(expected_xml_path)
+        expect(junit_xml.chomp).to eq(expected_xml.chomp)
+      end
+
+      it 'generates correct JUnit XML excluding retries', requires_xcodebuild: true do
+        skip "Requires xcresulttool version 24" unless Trainer::XCResult::Helper.supports_xcresulttool_version_24?
+
+        # Uncomment this if you want to bypass the xcresult_to_json call during testing
+        # allow(Trainer::XCResult::Parser).to receive(:xcresult_to_json).with(xcresult_path).and_return(json_fixture)
+
+        test_plan = Trainer::XCResult::Parser.parse_xcresult(path: xcresult_path, output_remove_retry_attempts: true)
+        junit_xml = test_plan.to_xml
+        expected_xml_path = File.expand_path('../fixtures/Xcode26-Mixed-XCTest-SwiftTesting-WithoutRetries.junit', __FILE__)
         expected_xml = File.read(expected_xml_path)
         expect(junit_xml.chomp).to eq(expected_xml.chomp)
       end

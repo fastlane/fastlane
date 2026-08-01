@@ -37,6 +37,17 @@ describe Sigh::CommandsGenerator do
 
       Sigh::CommandsGenerator.start
     end
+
+    it "accepts page_size option" do
+      stub_commander_runner_args(['resign', '--page_size', '16384'])
+
+      options = Commander::Command::Options.new
+      options.page_size = '16384'
+
+      expect_resign_run(options)
+
+      Sigh::CommandsGenerator.start
+    end
   end
 
   describe "renew option handling" do

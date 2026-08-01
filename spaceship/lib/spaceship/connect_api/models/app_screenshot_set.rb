@@ -43,11 +43,14 @@ module Spaceship
         APP_WATCH_SERIES_3 = "APP_WATCH_SERIES_3"
         APP_WATCH_SERIES_4 = "APP_WATCH_SERIES_4"
         APP_WATCH_SERIES_7 = "APP_WATCH_SERIES_7"
+        APP_WATCH_SERIES_10 = "APP_WATCH_SERIES_10"
         APP_WATCH_ULTRA = "APP_WATCH_ULTRA"
 
         APP_APPLE_TV = "APP_APPLE_TV"
 
         APP_DESKTOP = "APP_DESKTOP"
+
+        APP_APPLE_VISION_PRO = "APP_APPLE_VISION_PRO"
 
         ALL_IMESSAGE = [
           IMESSAGE_APP_IPHONE_40,
@@ -98,9 +101,12 @@ module Spaceship
           APP_WATCH_SERIES_3,
           APP_WATCH_SERIES_4,
           APP_WATCH_SERIES_7,
+          APP_WATCH_SERIES_10,
           APP_WATCH_ULTRA,
 
-          APP_DESKTOP
+          APP_DESKTOP,
+
+          APP_APPLE_VISION_PRO
         ]
       end
 

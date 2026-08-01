@@ -495,6 +495,15 @@ module Spaceship
         end
 
         #
+        # buildUploads
+        #
+
+        def get_build_uploads(app_id:, filter: {}, includes: nil, limit: nil, sort: nil)
+          params = test_flight_request_client.build_params(filter: filter, includes: includes, limit: limit, sort: sort)
+          test_flight_request_client.get("#{Version::V1}/apps/#{app_id}/buildUploads", params)
+        end
+
+        #
         # preReleaseVersions
         #
 

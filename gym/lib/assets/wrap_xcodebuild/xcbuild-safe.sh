@@ -28,6 +28,7 @@ if [[ $? -eq 0 ]]; then
   echo "RVM detected, forcing to use system ruby"
   # This allows you to use rvm in a script. Otherwise you get a BS
   # error along the lines of "cannot use rvm as function". Jeez.
+  # shellcheck disable=SC1091
   [[ -s "$HOME/.rvm/scripts/rvm" ]] && source "$HOME/.rvm/scripts/rvm"
 
   # Cause rvm to use system ruby. AFAIK, this is effective only for

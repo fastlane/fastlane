@@ -2,7 +2,7 @@ module Fastlane
   module Helper
     module PluginScoresHelper
       require 'faraday'
-      require 'faraday_middleware'
+      require 'faraday/follow_redirects'
       require 'yaml'
 
       class FastlanePluginRating
@@ -67,7 +67,11 @@ module Fastlane
           }
 
           if File.exist?(cache_path)
-            self.cache = YAML.load_file(cache_path)
+            self.cache = YAML.safe_load(
+              File.read(cache_path),
+              permitted_classes: [Date, Time, Symbol, FastlanePluginAction],
+              aliases: true
+            )
           else
             self.cache = {}
           end
@@ -244,10 +248,10 @@ module Fastlane
           conn = Faraday.new(url: url) do |builder|
             # The order below IS important
             # See bug here https://github.com/lostisland/faraday_middleware/issues/105
-            builder.use(FaradayMiddleware::FollowRedirects)
+            builder.response(:follow_redirects)
             builder.adapter(Faraday.default_adapter)
           end
-          conn.basic_auth(ENV["GITHUB_USER_NAME"], ENV["GITHUB_API_TOKEN"])
+          conn.headers[:authorization] = Faraday::Utils.basic_header_from(ENV["GITHUB_USER_NAME"], ENV["GITHUB_API_TOKEN"])
           response = conn.get('')
           repo_details = JSON.parse(response.body)
 
@@ -256,11 +260,11 @@ module Fastlane
           conn = Faraday.new(url: url) do |builder|
             # The order below IS important
             # See bug here https://github.com/lostisland/faraday_middleware/issues/105
-            builder.use(FaradayMiddleware::FollowRedirects)
+            builder.response(:follow_redirects)
             builder.adapter(Faraday.default_adapter)
           end
 
-          conn.basic_auth(ENV["GITHUB_USER_NAME"], ENV["GITHUB_API_TOKEN"])
+          conn.headers[:authorization] = Faraday::Utils.basic_header_from(ENV["GITHUB_USER_NAME"], ENV["GITHUB_API_TOKEN"])
           response = conn.get('')
           contributor_details = JSON.parse(response.body)
 

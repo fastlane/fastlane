@@ -83,6 +83,38 @@ describe Fastlane do
             described_class.run(force: true, keychain_name: "example_keychain_name")
           end
         end
+
+        describe "set_default_keychain option" do
+          before do
+            allow(FastlaneCore::Helper).to receive(:mac?).and_return(true)
+          end
+
+          it "makes the temporary keychain the system default" do
+            expect(Fastlane::Actions::CreateKeychainAction).to receive(:run).with(hash_including(default_keychain: true))
+
+            Fastlane::FastFile.new.parse("lane :test do
+              setup_ci
+            end").runner.execute(:test)
+          end
+
+          it "keeps the existing default keychain when the option is false" do
+            expect(Fastlane::Actions::CreateKeychainAction).to receive(:run).with(hash_including(default_keychain: false))
+
+            Fastlane::FastFile.new.parse("lane :test do
+              setup_ci(set_default_keychain: false)
+            end").runner.execute(:test)
+          end
+
+          it "keeps the existing default keychain when disabled via ENV" do
+            stub_const("ENV", { "CI" => "anything", "FL_SETUP_CI_SET_DEFAULT_KEYCHAIN" => "false" })
+
+            expect(Fastlane::Actions::CreateKeychainAction).to receive(:run).with(hash_including(default_keychain: false))
+
+            Fastlane::FastFile.new.parse("lane :test do
+              setup_ci
+            end").runner.execute(:test)
+          end
+        end
       end
     end
 

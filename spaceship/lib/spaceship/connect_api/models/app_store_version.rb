@@ -26,6 +26,8 @@ module Spaceship
       attr_accessor :app_store_review_detail
       attr_accessor :app_store_version_localizations
 
+      attr_accessor :app_clip_default_experience
+
       # Deprecated in App Store Connect API specification 3.3
       module AppStoreState
         ACCEPTED = "ACCEPTED"
@@ -98,7 +100,9 @@ module Spaceship
         "build" => "build",
         "appStoreVersionPhasedRelease" => "app_store_version_phased_release",
         "appStoreReviewDetail" => "app_store_review_detail",
-        "appStoreVersionLocalizations" => "app_store_version_localizations"
+        "appStoreVersionLocalizations" => "app_store_version_localizations",
+
+        "appClipDefaultExperience" => "app_clip_default_experience"
       })
 
       ESSENTIAL_INCLUDES = [

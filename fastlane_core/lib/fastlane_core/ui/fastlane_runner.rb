@@ -167,7 +167,7 @@ module Commander
         end
       rescue FastlaneCore::Interface::FastlaneCommonException => e # these are exceptions that we don't count as crashes
         display_user_error!(e, e.to_s)
-      rescue FastlaneCore::Interface::FastlaneError => e # user_error!
+      rescue FastlaneCore::Interface::FastlaneError, FastlaneCore::Interface::FastlaneShellError => e # user_error! or shell_error!
         rescue_fastlane_error(e)
       rescue Errno::ENOENT => e
         rescue_file_error(e)

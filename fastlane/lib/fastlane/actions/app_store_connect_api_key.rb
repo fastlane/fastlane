@@ -9,8 +9,8 @@ module Fastlane
 
     class AppStoreConnectApiKeyAction < Action
       def self.run(options)
-        key_id = options[:key_id]
-        issuer_id = options[:issuer_id]
+        key_id = options[:key_id]&.strip
+        issuer_id = options[:issuer_id]&.strip
         key_content = options[:key_content]
         is_key_content_base64 = options[:is_key_content_base64]
         key_filepath = options[:key_filepath]
@@ -56,7 +56,7 @@ module Fastlane
                                        description: "The key ID"),
           FastlaneCore::ConfigItem.new(key: :issuer_id,
                                        env_name: "APP_STORE_CONNECT_API_KEY_ISSUER_ID",
-                                       description: "The issuer ID. It can be nil if the key is individual API key",
+                                       description: "The issuer ID. It should be nil if the key is individual API key",
                                        optional: true),
           FastlaneCore::ConfigItem.new(key: :key_filepath,
                                        env_name: "APP_STORE_CONNECT_API_KEY_KEY_FILEPATH",
@@ -136,6 +136,10 @@ module Fastlane
           'app_store_connect_api_key(
             key_id: "D83848D23",
             issuer_id: "227b0bbf-ada8-458c-9d62-3d8022b7d07f",
+            key_content: "-----BEGIN EC PRIVATE KEY-----\nfewfawefawfe\n-----END EC PRIVATE KEY-----"
+          )',
+          'app_store_connect_api_key(
+            key_id: "D83848D23", # no issuer_id if the key is individual
             key_content: "-----BEGIN EC PRIVATE KEY-----\nfewfawefawfe\n-----END EC PRIVATE KEY-----"
           )'
         ]
