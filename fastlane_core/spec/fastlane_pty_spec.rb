@@ -14,9 +14,15 @@ describe FastlaneCore do
       end
 
       it 'doesn t return -1 if an exception was raised in the block in PTY.spawn' do
+        status = double("ProcessStatus")
+        allow(status).to receive(:exitstatus) { 0 }
+
+        expect(FastlaneCore::FastlanePty).to receive(:require).with("pty").and_return(nil)
+        allow(FastlaneCore::FastlanePty).to receive(:process_status).and_return(status)
+
         exception = StandardError.new
         expect {
-          exit_status = FastlaneCore::FastlanePty.spawn('echo foo') do |command_stdout, command_stdin, pid|
+          exit_status = FastlaneCore::FastlanePty.spawn('a path of a working exec') do |command_stdout, command_stdin, pid|
             raise exception
           end
         }.to raise_error(FastlaneCore::FastlanePtyError) { |error|
@@ -82,6 +88,26 @@ describe FastlaneCore do
         }.to raise_error(FastlaneCore::FastlanePtyError) { |error|
           expect(error.exit_status).to eq(-1) # command was forced to -1
         }
+      end
+    end
+
+    describe "spawn_with_pty" do
+      it 'passes the command to Pty when FASTLANE_EXEC_FLUSH_PTY_WORKAROUND is not set', requires_pty: true do
+        allow(PTY).to receive(:spawn).with("echo foo")
+
+        FastlaneSpec::Env.with_env_values('FASTLANE_EXEC_FLUSH_PTY_WORKAROUND' => nil) do
+          FastlaneCore::FastlanePty.spawn_with_pty('echo foo') do |command_stdout, command_stdin, pid|
+          end
+        end
+      end
+
+      it 'wraps the command with a workaround when FASTLANE_EXEC_FLUSH_PTY_WORKAROUND is set', requires_pty: true do
+        allow(PTY).to receive(:spawn).with("echo foo;")
+
+        FastlaneSpec::Env.with_env_values('FASTLANE_EXEC_FLUSH_PTY_WORKAROUND' => '1') do
+          FastlaneCore::FastlanePty.spawn_with_pty('echo foo') do |command_stdout, command_stdin, pid|
+          end
+        end
       end
     end
   end

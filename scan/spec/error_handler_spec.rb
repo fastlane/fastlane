@@ -25,6 +25,36 @@ describe Scan do
         end
       end
 
+      describe "when parsing Xcode 26 test failure output" do
+        it "does not report a build failure" do
+          expect(Scan).to receive(:config).and_return({})
+          output = File.open('./scan/spec/fixtures/xcode26_testing_failure.log', &:read)
+          expect do
+            Scan::ErrorHandler.handle_build_error(output, log_path)
+          end.not_to raise_error
+        end
+      end
+
+      describe "when parsing Xcode 26 xcbeautify test failure output" do
+        it "does not report a build failure" do
+          expect(Scan).to receive(:config).and_return({})
+          output = File.open('./scan/spec/fixtures/xcode26_xcbeautify_failure.log', &:read)
+          expect do
+            Scan::ErrorHandler.handle_build_error(output, log_path)
+          end.not_to raise_error
+        end
+      end
+
+      describe "when parsing Xcode 26 test-without-building failure output" do
+        it "does not report a build failure" do
+          expect(Scan).to receive(:config).and_return({})
+          output = File.open('./scan/spec/fixtures/xcode26_test_execute_failure.log', &:read)
+          expect do
+            Scan::ErrorHandler.handle_build_error(output, log_path)
+          end.not_to raise_error
+        end
+      end
+
       describe "when parsing early failure output" do
         let(:output_path) { './scan/spec/fixtures/early_testing_failure.log' }
 

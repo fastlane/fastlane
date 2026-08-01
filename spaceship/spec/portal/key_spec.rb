@@ -51,10 +51,21 @@ describe Spaceship::Portal::Key do
   describe '.create' do
     it 'creates a key with the client' do
       expected_service_configs = {
-        "U27F4V844T" => [],
-        "DQ8HTZ7739" => [],
-        "6A7HVUVQ3M" => ["some-music-id"]
+        "U27F4V844T" => {                # APNS
+          scope: 'team',
+          environment: 'all',
+          identifiers: {}
+        },
+        "DQ8HTZ7739" => {                # DeviceCheck
+          identifiers: {}
+        },
+        "6A7HVUVQ3M" => {                # MusicKit
+          identifiers: {
+            music: ['some-music-id']
+          }
+        }
       }
+
       mock_client_response(:create_key!, with: { name: 'New Key', service_configs: expected_service_configs }) do
         {
           keyId: 'a-new-key-id'

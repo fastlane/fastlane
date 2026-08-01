@@ -55,7 +55,7 @@ describe Spaceship::ConnectAPI::Users::Client do
 
     describe "users" do
       context 'get_users' do
-        let(:path) { "users" }
+        let(:path) { "v1/users" }
 
         it 'succeeds' do
           params = {}
@@ -70,7 +70,7 @@ describe Spaceship::ConnectAPI::Users::Client do
         let(:all_apps_visible) { false }
         let(:provisioning_allowed) { true }
         let(:roles) { ["ADMIN"] }
-        let(:path) { "users/#{user_id}" }
+        let(:path) { "v1/users/#{user_id}" }
         let(:app_ids) { ["456", "789"] }
         let(:body) do
           {
@@ -119,7 +119,7 @@ describe Spaceship::ConnectAPI::Users::Client do
 
       context 'delete_user' do
         let(:user_id) { "123" }
-        let(:path) { "users/#{user_id}" }
+        let(:path) { "v1/users/#{user_id}" }
 
         it 'succeeds' do
           req_mock = test_request(path)
@@ -130,7 +130,7 @@ describe Spaceship::ConnectAPI::Users::Client do
 
       context 'post_user_visible_apps' do
         let(:user_id) { "123" }
-        let(:path) { "users/#{user_id}/relationships/visibleApps" }
+        let(:path) { "v1/users/#{user_id}/relationships/visibleApps" }
         let(:app_ids) { ["456", "789"] }
         let(:body) do
           {
@@ -154,7 +154,7 @@ describe Spaceship::ConnectAPI::Users::Client do
 
       context 'patch_user_visible_apps' do
         let(:user_id) { "123" }
-        let(:path) { "users/#{user_id}/relationships/visibleApps" }
+        let(:path) { "v1/users/#{user_id}/relationships/visibleApps" }
         let(:app_ids) { ["456", "789"] }
         let(:body) do
           {
@@ -178,7 +178,7 @@ describe Spaceship::ConnectAPI::Users::Client do
 
       context 'delete_user_visible_apps' do
         let(:user_id) { "123" }
-        let(:path) { "users/#{user_id}/relationships/visibleApps" }
+        let(:path) { "v1/users/#{user_id}/relationships/visibleApps" }
         let(:app_ids) { ["456", "789"] }
         let(:body) do
           {
@@ -202,7 +202,7 @@ describe Spaceship::ConnectAPI::Users::Client do
 
       context 'get_user_visible_apps' do
         let(:user_id) { "42" }
-        let(:path) { "users/#{user_id}/visibleApps" }
+        let(:path) { "v1/users/#{user_id}/visibleApps" }
 
         it 'succeeds' do
           params = {}
@@ -215,7 +215,7 @@ describe Spaceship::ConnectAPI::Users::Client do
 
     describe "user_invitations" do
       context 'get_user_invitations' do
-        let(:path) { "userInvitations" }
+        let(:path) { "v1/userInvitations" }
 
         it 'succeeds' do
           params = {}
@@ -226,7 +226,7 @@ describe Spaceship::ConnectAPI::Users::Client do
       end
 
       context 'post_user_invitation' do
-        let(:path) { "userInvitations" }
+        let(:path) { "v1/userInvitations" }
         let(:attributes) {
           {
             email: "test@example.com",
@@ -276,7 +276,7 @@ describe Spaceship::ConnectAPI::Users::Client do
 
       context 'delete_user_invitation' do
         let(:invitation_id) { "123" }
-        let(:path) { "userInvitations/#{invitation_id}" }
+        let(:path) { "v1/userInvitations/#{invitation_id}" }
 
         it 'succeeds' do
           req_mock = test_request(path)
@@ -287,7 +287,7 @@ describe Spaceship::ConnectAPI::Users::Client do
 
       context 'get_user_invitation_visible_apps' do
         let(:invitation_id) { "42" }
-        let(:path) { "userInvitations/#{invitation_id}/visibleApps" }
+        let(:path) { "v1/userInvitations/#{invitation_id}/visibleApps" }
 
         it 'succeeds' do
           params = {}

@@ -1,5 +1,7 @@
 describe Spaceship::ProvisioningProfile do
   describe "Development tvOS Profiles" do
+    # Skip tunes login and login with portal
+    include_examples "common spaceship login", true
     before do
       Spaceship.login
       PortalStubbing.adp_enterprise_stubbing
