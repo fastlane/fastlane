@@ -115,7 +115,9 @@ module Match
       arguments = FastlaneCore::Configuration.create(Sigh::Options.available_options, values)
 
       Sigh.config = arguments
-      path = Sigh::Manager.start
+
+      keychain_path = FastlaneCore::Helper.keychain_path(params[:keychain_name]) if Helper.mac? && params[:keychain_name]
+      path = Sigh::Manager.start(keychain_path: keychain_path)
       return path
     end
 

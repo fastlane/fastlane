@@ -1,0 +1,2 @@
+Device ID	Device Name	Device Platform
+A1234567012345678901234	NAME1	ios

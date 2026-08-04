@@ -26,8 +26,10 @@ module FastlaneCore
       spawn_with_popen(command, &block)
     end
 
-    def self.spawn_with_pty(command, &block)
+    def self.spawn_with_pty(original_command, &block)
       require 'pty'
+      # this forces the PTY flush - fixes #21792
+      command = ENV['FASTLANE_EXEC_FLUSH_PTY_WORKAROUND'] ? "#{original_command};" : original_command
       PTY.spawn(command) do |command_stdout, command_stdin, pid|
         begin
           yield(command_stdout, command_stdin, pid)
@@ -37,6 +39,8 @@ module FastlaneCore
           # This is expected on some linux systems, that indicates that the subcommand finished
           # and we kept trying to read, ignore it
         ensure
+          command_stdin.close
+          command_stdout.close
           begin
             Process.wait(pid)
           rescue Errno::ECHILD, PTY::ChildExited

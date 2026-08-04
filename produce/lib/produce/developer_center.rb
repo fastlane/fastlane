@@ -22,6 +22,7 @@ module Produce
       associated_domains: [SERVICE_ON, SERVICE_OFF],
       auto_fill_credential: [SERVICE_ON, SERVICE_OFF],
       class_kit: [SERVICE_ON, SERVICE_OFF],
+      declared_age_range: [SERVICE_ON, SERVICE_OFF],
       icloud: [SERVICE_LEGACY, SERVICE_CLOUDKIT],
       custom_network_protocol: [SERVICE_ON, SERVICE_OFF],
       data_protection: [

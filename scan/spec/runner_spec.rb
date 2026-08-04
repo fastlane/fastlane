@@ -66,6 +66,22 @@ describe Scan do
         end
       end
 
+      describe "with scan option :force_legacy_xcresulttool set to true" do
+        it "forwards force_legacy_xcresulttool to trainer", requires_xcodebuild: true do
+          Scan.config = FastlaneCore::Configuration.create(Scan::Options.available_options, {
+            output_directory: '/tmp/scan_results',
+            project: './scan/examples/standard/app.xcodeproj',
+            force_legacy_xcresulttool: true
+          })
+
+          # This is a needed side effect from running TestCommandGenerator which is not done in this test
+          Scan.cache[:result_bundle_path] = '/tmp/scan_results/test.xcresults'
+
+          expect(Trainer::TestParser).to receive(:auto_convert).with(hash_including(force_legacy_xcresulttool: true)).and_return({})
+          @scan.handle_results(0)
+        end
+      end
+
       describe "Test Failure" do
         it "raises a FastlaneTestFailure instead of a crash or UserError", requires_xcodebuild: true do
           expect do

@@ -26,6 +26,7 @@ module Match
         s3_region = params[:s3_region]
         s3_access_key = params[:s3_access_key]
         s3_secret_access_key = params[:s3_secret_access_key]
+        s3_session_token = params[:s3_session_token]
         s3_bucket = params[:s3_bucket]
         s3_object_prefix = params[:s3_object_prefix]
 
@@ -40,6 +41,7 @@ module Match
           s3_region: s3_region,
           s3_access_key: s3_access_key,
           s3_secret_access_key: s3_secret_access_key,
+          s3_session_token: s3_session_token,
           s3_bucket: s3_bucket,
           s3_object_prefix: s3_object_prefix,
           readonly: params[:readonly],
@@ -54,6 +56,7 @@ module Match
       def initialize(s3_region: nil,
                      s3_access_key: nil,
                      s3_secret_access_key: nil,
+                     s3_session_token: nil,
                      s3_bucket: nil,
                      s3_object_prefix: nil,
                      readonly: nil,
@@ -64,7 +67,7 @@ module Match
                      api_key: nil)
         @s3_bucket = s3_bucket
         @s3_region = s3_region
-        @s3_client = Fastlane::Helper::S3ClientHelper.new(access_key: s3_access_key, secret_access_key: s3_secret_access_key, region: s3_region)
+        @s3_client = Fastlane::Helper::S3ClientHelper.new(access_key: s3_access_key, secret_access_key: s3_secret_access_key, session_token: s3_session_token, region: s3_region)
         @s3_object_prefix = s3_object_prefix.to_s
         @readonly = readonly
         @username = username
@@ -105,12 +108,9 @@ module Match
         # so that we limit the download to only files that are specific to this team, and avoid downloads + decryption of unnecessary files.
         key_prefix = team_id.nil? ? s3_object_prefix : File.join(s3_object_prefix, team_id, '').delete_prefix('/')
 
-        s3_client.find_bucket!(s3_bucket).objects(prefix: key_prefix).each do |object|
-          # Prevent download if the file path is a directory.
-          # We need to check if string ends with "/" instead of using `File.directory?` because
-          # the string represent a remote location, not a local file in disk.
-          next if object.key.end_with?("/")
-
+        objects_to_download = s3_client.find_bucket!(s3_bucket).objects(prefix: key_prefix).reject { |object| object.key.end_with?("/") }
+        UI.message("Downloading #{objects_to_download.count} files from S3 bucket...")
+        objects_to_download.each do |object|
           file_path = strip_s3_object_prefix(object.key) # :s3_object_prefix:team_id/path/to/file
 
           # strip s3_prefix from file_path
@@ -119,7 +119,7 @@ module Match
           FileUtils.mkdir_p(File.expand_path("..", download_path))
           UI.verbose("Downloading file from S3 '#{file_path}' on bucket #{self.s3_bucket}")
 
-          object.download_file(download_path)
+          s3_client.download_file(s3_bucket, object.key, download_path)
         end
         UI.verbose("Successfully downloaded files from S3 to #{self.working_directory}")
       end

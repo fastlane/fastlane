@@ -19,9 +19,15 @@ module Supply
 
       track_to_update = Supply.config[:track]
 
+      # Capture whether any new binaries were actually uploaded before appending
+      # version_codes_to_retain. The branch below uses this flag so that retained
+      # codes do not cause a promote-only run to take the upload path.
+      # See: https://github.com/fastlane/fastlane/issues/29984
+      uploading_new_binaries = !apk_version_codes.empty?
+
       apk_version_codes.concat(Supply.config[:version_codes_to_retain]) if Supply.config[:version_codes_to_retain]
 
-      if !apk_version_codes.empty?
+      if uploading_new_binaries
         # Only update tracks if we have version codes
         # update_track handle setting rollout if needed
         # Updating a track with empty version codes can completely clear out a track
@@ -111,7 +117,7 @@ module Supply
       return nil, nil if tracks.empty?
 
       track = tracks.first
-      releases = track.releases
+      releases = track.releases || []
 
       releases = releases.select { |r| statuses.include?(r.status) } unless statuses.nil? || statuses.empty?
       releases = releases.select { |r| (r.version_codes || []).map(&:to_s).include?(version_code.to_s) } if version_code

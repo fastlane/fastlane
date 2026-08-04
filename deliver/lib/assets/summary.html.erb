@@ -228,10 +228,10 @@
             </div>
           <% elsif @screenshots.count > 0 %>
             <% sc = @screenshots.find_all { |s| s.language == language } %>
-            <% sc_by_size = sc.group_by { |i| i.screen_size } %>
+            <% sc_by_size = sc.group_by { |i| i.display_type } %>
 
-            <% sc_by_size.keys.sort.each do |screen_size| %>
-              <% screenshots = sc_by_size[screen_size].sort { |a, b| [a.path] <=> [b.path] } %>
+            <% sc_by_size.keys.sort.each do |display_type| %>
+              <% screenshots = sc_by_size[display_type].sort { |a, b| [a.path] <=> [b.path] } %>
               <%# we are guaranteed to have at least one element because of the group_by %>
               <h4><%= screenshots[0].formatted_name %></h4>
               <div class="app-screenshot-row">

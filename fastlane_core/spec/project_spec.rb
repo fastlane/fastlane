@@ -1,3 +1,5 @@
+require 'shellwords'
+
 describe FastlaneCore do
   describe FastlaneCore::Project do
     describe 'project and workspace detection' do
@@ -508,6 +510,18 @@ describe FastlaneCore do
       end
     end
 
+    describe "xcodebuild skip_package_repository_fetches" do
+      it 'generates xcodebuild -showBuildSettings command with disabled package fetches' do
+        allow(FastlaneCore::Helper).to receive(:xcode_at_least?).and_return(true)
+        project = FastlaneCore::Project.new({
+          project: "./fastlane_core/spec/fixtures/projects/Example.xcodeproj",
+          skip_package_repository_fetches: true
+        })
+        command = "xcodebuild -showBuildSettings -project ./fastlane_core/spec/fixtures/projects/Example.xcodeproj -skipPackageUpdates 2>&1"
+        expect(project.build_xcodebuild_showbuildsettings_command).to eq(command)
+      end
+    end
+
     describe "xcodebuild package_authorization_provider" do
       it 'generates an xcodebuild -showBuildSettings command that includes package_authorization_provider if provided in options', requires_xcode: true do
         project = FastlaneCore::Project.new({
@@ -572,13 +586,14 @@ describe FastlaneCore do
         expect(project.build_xcodebuild_resolvepackagedependencies_command).to eq(command)
       end
 
-      it 'generates an xcodebuild -resolvePackageDependencies command with a custom resolving path with Xcode >= 11' do
+      it 'generates an xcodebuild -resolvePackageDependencies command with custom resolving paths with Xcode >= 11' do
         allow(FastlaneCore::Helper).to receive(:xcode_at_least?).and_return(true)
         project = FastlaneCore::Project.new({
           project: "./fastlane_core/spec/fixtures/projects/Example.xcodeproj",
-          cloned_source_packages_path: "./path/to/resolve"
+          cloned_source_packages_path: "./path/to/cloned_source_packages",
+          package_cache_path: "./path/to/package_cache"
         })
-        command = "xcodebuild -resolvePackageDependencies -project ./fastlane_core/spec/fixtures/projects/Example.xcodeproj -clonedSourcePackagesDirPath ./path/to/resolve"
+        command = "xcodebuild -resolvePackageDependencies -project ./fastlane_core/spec/fixtures/projects/Example.xcodeproj -clonedSourcePackagesDirPath ./path/to/cloned_source_packages -packageCachePath ./path/to/package_cache"
         expect(project.build_xcodebuild_resolvepackagedependencies_command).to eq(command)
       end
 
@@ -642,6 +657,28 @@ describe FastlaneCore do
               destination: "FakeDestination"
               })
             command = "xcodebuild -resolvePackageDependencies -project ./fastlane_core/spec/fixtures/projects/Example.xcodeproj -destination FakeDestination"
+            expect(project.build_xcodebuild_resolvepackagedependencies_command).to eq(command)
+          end
+        end
+
+        context "when destination parameter is provided as an array" do
+          it 'generates an xcodebuild -showBuildSettings command that uses the first destination', requires_xcode: true do
+            project = FastlaneCore::Project.new({
+              project: "./fastlane_core/spec/fixtures/projects/Example.xcodeproj",
+              destination: ["platform=iOS Simulator,id=ABC123", "platform=iOS Simulator,id=DEF456"]
+            })
+            destination = "platform=iOS Simulator,id=ABC123".shellescape
+            command = "xcodebuild -showBuildSettings -project ./fastlane_core/spec/fixtures/projects/Example.xcodeproj -destination #{destination} 2>&1"
+            expect(project.build_xcodebuild_showbuildsettings_command).to eq(command)
+          end
+
+          it 'generates an xcodebuild -resolvePackageDependencies command that uses the first destination' do
+            project = FastlaneCore::Project.new({
+              project: "./fastlane_core/spec/fixtures/projects/Example.xcodeproj",
+              destination: ["platform=iOS Simulator,id=ABC123", "platform=iOS Simulator,id=DEF456"]
+              })
+            destination = "platform=iOS Simulator,id=ABC123".shellescape
+            command = "xcodebuild -resolvePackageDependencies -project ./fastlane_core/spec/fixtures/projects/Example.xcodeproj -destination #{destination}"
             expect(project.build_xcodebuild_resolvepackagedependencies_command).to eq(command)
           end
         end
