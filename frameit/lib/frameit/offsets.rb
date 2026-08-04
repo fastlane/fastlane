@@ -13,8 +13,9 @@ module Frameit
         @offsets_cache = JSON.parse(File.read(offsets_json_path))
       end
 
-      offset_value = @offsets_cache["portrait"][sanitize_device_name(screenshot.device_name)]
-      UI.error("Tried looking for offset information for 'portrait', #{screenshot.device_name} in '#{offsets_json_path}'") unless offset_value
+      device_name = sanitize_device_name(screenshot.device_name)
+      offset_value = @offsets_cache["portrait"][device_name]
+      UI.error("Tried looking for offset information for 'portrait', #{device_name} in '#{offsets_json_path}'") unless offset_value
       return offset_value
     end
 

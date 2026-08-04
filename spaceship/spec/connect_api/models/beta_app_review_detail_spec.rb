@@ -1,5 +1,5 @@
 describe Spaceship::ConnectAPI::BetaAppReviewDetail do
-  before { Spaceship::Tunes.login }
+  include_examples "common spaceship login"
 
   describe '#Spaceship::ConnectAPI' do
     it '#get_beta_app_review_detail' do

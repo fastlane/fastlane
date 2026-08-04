@@ -249,5 +249,21 @@ describe Spaceship::ConnectAPI::Token do
       expect(header['kid']).to eq(key_id)
       expect(header['typ']).to eq('JWT')
     end
+
+    describe 'audience field for JWT payload' do
+      key = OpenSSL::PKey::EC.generate('prime256v1')
+
+      it 'uses appstoreconnect when in_house is false' do
+        token = Spaceship::ConnectAPI::Token.new(key_id: key_id, key: key, in_house: false)
+        payload, = JWT.decode(token.text, key, true, { algorithm: 'ES256' })
+        expect(payload['aud']).to eq('appstoreconnect-v1')
+      end
+
+      it 'uses enterprise when in_house is true' do
+        token = Spaceship::ConnectAPI::Token.new(key_id: key_id, key: key, in_house: true)
+        payload, = JWT.decode(token.text, key, true, { algorithm: 'ES256' })
+        expect(payload['aud']).to eq('apple-developer-enterprise-v1')
+      end
+    end
   end
 end

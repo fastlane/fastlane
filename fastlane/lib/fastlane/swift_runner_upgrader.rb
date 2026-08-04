@@ -224,7 +224,7 @@ module Fastlane
       # Proceed to upgrade
       self.fastlane_runner_target.build_configurations.each { |config|
         config.build_settings["CODE_SIGN_IDENTITY"] = "-"
-        config.build_settings["MACOSX_DEPLOYMENT_TARGET"] = "10.12"
+        config.build_settings["MACOSX_DEPLOYMENT_TARGET"] = "14.6"
       }
       target_project.save
     end
