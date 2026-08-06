@@ -459,7 +459,7 @@ module Pilot
       if options[:groups]
         app = uploaded_build.app
         beta_groups = app.get_beta_groups.select do |group|
-          options[:groups].include?(group.name) || options[:groups].include?(group.id)
+          group.matches_identifiers?(options[:groups])
         end
 
         unless beta_groups.empty?
