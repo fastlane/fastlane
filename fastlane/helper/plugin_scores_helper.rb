@@ -194,7 +194,7 @@ module Fastlane
         def append_git_data
           Dir.mktmpdir("fastlane-plugin") do |tmp|
             clone_folder = File.join(tmp, self.name)
-            system({"GIT_TERMINAL_PROMPT" => "0"}, "git", "clone", self.homepage, clone_folder)
+            system({ "GIT_TERMINAL_PROMPT" => "0" }, "git", "clone", self.homepage, clone_folder)
 
             break unless File.directory?(clone_folder)
 
