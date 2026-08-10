@@ -1,4 +1,3 @@
-require 'open3'
 require 'spaceship'
 
 require_relative 'module'
@@ -25,7 +24,7 @@ module Deliver
       UI.important("Verifying the upload via the HTML file can be disabled by either adding")
       UI.important("`force true` to your Deliverfile or using `fastlane deliver --force`")
 
-      Dir.chdir(File.dirname(html_path)) { system("open Preview.html") }
+      system("open", html_path)
       okay = UI.confirm("Does the Preview on path '#{html_path}' look okay for you?")
 
       if okay
