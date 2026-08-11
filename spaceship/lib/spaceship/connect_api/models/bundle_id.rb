@@ -81,12 +81,27 @@ module Spaceship
         return resp.to_models.first
       end
 
+      # `patch_bundle_id_capability` (the naive PATCH-this-bundle-ID-with-a-
+      # capability-relationship approach) builds an invalid JSON:API request —
+      # it nests `attributes` inside a relationship's `data` entry, which Apple
+      # rejects: "Unexpected or invalid value at
+      # 'data.relationships.bundleIdCapabilities.data.[0].attributes'".
+      # Capabilities in the App Store Connect API are managed as their own
+      # resources — enable by creating one, disable by deleting it — so that's
+      # what this does instead.
       def update_capability(capability_type, enabled: false, settings: [], client: nil)
         raise "capability_type is required " if capability_type.nil?
 
         client ||= Spaceship::ConnectAPI
-        resp = client.patch_bundle_id_capability(bundle_id_id: id, seed_id: seed_id, enabled: enabled, capability_type: capability_type, settings: settings)
-        return resp.to_models.first
+        existing = get_capabilities(client: client).find { |capability| capability.is_type?(capability_type) }
+
+        if enabled
+          return existing if existing
+          return create_capability(capability_type, settings: settings, client: client)
+        else
+          existing&.delete!(client: client)
+          return nil
+        end
       end
     end
   end
