@@ -420,10 +420,28 @@ module Produce
 
     def bundle_id
       return @bundle_id if @bundle_id
-      UI.message("Starting login with user '#{Produce.config[:username]}'")
-      Spaceship.login(Produce.config[:username], nil)
-      Spaceship.select_team
-      UI.message("Successfully logged in")
+
+      api_token = Spaceship::ConnectAPI::Token.from(hash: Produce.config[:api_key], filepath: Produce.config[:api_key_path])
+      if api_token
+        UI.message("Authenticating with App Store Connect API Key")
+
+        # Not using `Spaceship::ConnectAPI.token = api_token` (which only sets
+        # `token:`) because `patch_bundle_id_capability` (used by
+        # `update_capability` below) always includes `teamId`, resolved via
+        # the *separate* Provisioning::Client's own `team_id` getter — not the
+        # top-level ConnectAPI client. Left uncached, that getter falls back to
+        # a live, session-based lookup with no session to use, crashing on
+        # Apple's non-JSON "Unauthenticated" response. Passing `current_team_id:`
+        # here threads it down into that Provisioning::Client at construction
+        # time so the lookup never fires.
+        Spaceship::ConnectAPI.client = Spaceship::ConnectAPI::Client.new(token: api_token, current_team_id: Produce.config[:team_id])
+      else
+        UI.message("Starting login with user '#{Produce.config[:username]}'")
+        Spaceship.login(Produce.config[:username], nil)
+        Spaceship.select_team
+        UI.message("Successfully logged in")
+      end
+
       @bundle_id ||= Spaceship::ConnectAPI::BundleId.find(Produce.config[:app_identifier].to_s)
     end
   end
