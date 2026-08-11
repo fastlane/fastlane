@@ -78,6 +78,17 @@ class ConnectAPIStubbing
           to_return(status: 200, body: read_fixture_file('bundle_id.json'), headers: { 'Content-Type' => 'application/vnd.api+json' })
       end
 
+      def stub_get_bundle_id_capabilities
+        stub_request(:post, "https://developer.apple.com/services-account/v1/bundleIds/123456789/bundleIdCapabilities").
+          to_return(status: 200, body: read_fixture_file('bundle_id_capabilities_empty.json'), headers: { 'Content-Type' => 'application/vnd.api+json' })
+      end
+
+      def stub_post_bundle_id_capability
+        stub_request(:post, "https://developer.apple.com/services-account/v1/bundleIdCapabilities").
+          with(body: { "data" => { "attributes" => { "capabilityType" => "APP_GROUPS", "settings" => [], "teamId" => "123" }, "type" => "bundleIdCapabilities", "relationships" => { "bundleId" => { "data" => { "type" => "bundleIds", "id" => "123456789" } } } } }).
+          to_return(status: 200, body: read_fixture_file('bundle_id_capability_create.json'), headers: { 'Content-Type' => 'application/vnd.api+json' })
+      end
+
       def stub_available_bundle_id_capabilities
         stub_request(:post, "https://developer.apple.com/services-account/v1/capabilities").
           to_return(status: 200, body: read_fixture_file('capabilities.json'), headers: { 'Content-Type' => 'application/vnd.api+json' })

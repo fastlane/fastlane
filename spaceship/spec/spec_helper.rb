@@ -70,6 +70,8 @@ def before_each_spaceship
   ConnectAPIStubbing::Provisioning.stub_available_bundle_id_capabilities
   ConnectAPIStubbing::Provisioning.stub_bundle_ids
   ConnectAPIStubbing::Provisioning.stub_bundle_id
+  ConnectAPIStubbing::Provisioning.stub_get_bundle_id_capabilities
+  ConnectAPIStubbing::Provisioning.stub_post_bundle_id_capability
   ConnectAPIStubbing::Provisioning.stub_patch_bundle_id_capability
   ConnectAPIStubbing::Provisioning.stub_certificates
   ConnectAPIStubbing::Provisioning.stub_devices

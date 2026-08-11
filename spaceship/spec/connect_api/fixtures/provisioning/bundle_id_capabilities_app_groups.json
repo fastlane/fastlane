@@ -1,0 +1,15 @@
+{
+  "data": [
+    {
+      "type": "bundleIdCapabilities",
+      "id": "123456789_APP_GROUPS",
+      "attributes": {
+        "capabilityType": "APP_GROUPS",
+        "settings": []
+      }
+    }
+  ],
+  "links": {
+    "self": "https://developer.apple.com:443/services-account/v1/bundleIds/123456789/bundleIdCapabilities"
+  }
+}
