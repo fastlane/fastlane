@@ -13,7 +13,7 @@ module Pilot
       UI.user_error!("You must provide 1 or more groups (with the `:groups` option)") unless groups_param
 
       app.get_beta_groups.select do |group|
-        next unless groups_param.include?(group.name)
+        next unless group.matches_identifiers?(groups_param)
         user = {
           email: config[:email],
           firstName: config[:first_name],
@@ -54,7 +54,7 @@ module Pilot
           UI.success("Successfully removed tester #{tester.email} from app: #{app.name}")
         else
           groups = tester.beta_groups.select do |group|
-            config[:groups].include?(group.name)
+            group.matches_identifiers?(config[:groups])
           end
           tester.delete_from_beta_groups(beta_groups: groups)
 
