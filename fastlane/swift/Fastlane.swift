@@ -684,7 +684,7 @@ public func appledoc(input: [String],
    - teamName: The name of your App Store Connect team if you're in multiple teams
    - devPortalTeamId: The short ID of your Developer Portal team, if you're in multiple teams. Different from your iTC team ID!
    - devPortalTeamName: The name of your Developer Portal team if you're in multiple teams
-   - itcProvider: The provider short name to be used with the iTMSTransporter to identify your team. This value will override the automatically detected provider short name. To get provider short name run `pathToXcode.app/Contents/Applications/Application\ Loader.app/Contents/itms/bin/iTMSTransporter -m provider -u 'USERNAME' -p 'PASSWORD' -account_type itunes_connect -v off`. The short names of providers should be listed in the second column
+   - itcProvider: The provider short name to be used with the iTMSTransporter to identify your team. This value will override the automatically detected provider short name. To get provider short name run `xcrun iTMSTransporter -m provider -u 'USERNAME' -p 'PASSWORD' -account_type itunes_connect -v off`. The short names of providers should be listed in the second column
    - providerPublicId: The provider public ID to be used with altool (--provider-public-id). This value will override the automatically detected provider value for altool uploads. Required after Xcode 26 when your account is associated with multiple providers and using username/app-password authentication
    - runPrecheckBeforeSubmit: Run precheck before submitting to app review
    - precheckDefaultRuleLevel: The default precheck rule level unless otherwise configured
@@ -3847,7 +3847,7 @@ public func deleteKeychain(name: OptionalConfigValue<String?> = .fastlaneDefault
    - teamName: The name of your App Store Connect team if you're in multiple teams
    - devPortalTeamId: The short ID of your Developer Portal team, if you're in multiple teams. Different from your iTC team ID!
    - devPortalTeamName: The name of your Developer Portal team if you're in multiple teams
-   - itcProvider: The provider short name to be used with the iTMSTransporter to identify your team. This value will override the automatically detected provider short name. To get provider short name run `pathToXcode.app/Contents/Applications/Application\ Loader.app/Contents/itms/bin/iTMSTransporter -m provider -u 'USERNAME' -p 'PASSWORD' -account_type itunes_connect -v off`. The short names of providers should be listed in the second column
+   - itcProvider: The provider short name to be used with the iTMSTransporter to identify your team. This value will override the automatically detected provider short name. To get provider short name run `xcrun iTMSTransporter -m provider -u 'USERNAME' -p 'PASSWORD' -account_type itunes_connect -v off`. The short names of providers should be listed in the second column
    - providerPublicId: The provider public ID to be used with altool (--provider-public-id). This value will override the automatically detected provider value for altool uploads. Required after Xcode 26 when your account is associated with multiple providers and using username/app-password authentication
    - runPrecheckBeforeSubmit: Run precheck before submitting to app review
    - precheckDefaultRuleLevel: The default precheck rule level unless otherwise configured
@@ -7493,7 +7493,6 @@ public func nexusUpload(file: String,
  - parameters:
    - package: Path to package to notarize, e.g. .app bundle or disk image
    - skipStapling: Do not staple the notarization ticket to the artifact; useful for single file executables and ZIP archives
-   - bundleId: Bundle identifier to uniquely identify the package
    - username: Apple ID username
    - ascProvider: Provider short name for accounts associated with multiple providers
    - printLog: Whether to print notarization log file, listing issues on failure and warnings on success
@@ -7503,7 +7502,6 @@ public func nexusUpload(file: String,
  */
 public func notarize(package: String,
                      skipStapling: OptionalConfigValue<Bool> = .fastlaneDefault(false),
-                     bundleId: OptionalConfigValue<String?> = .fastlaneDefault(nil),
                      username: OptionalConfigValue<String?> = .fastlaneDefault(nil),
                      ascProvider: OptionalConfigValue<String?> = .fastlaneDefault(nil),
                      printLog: OptionalConfigValue<Bool> = .fastlaneDefault(false),
@@ -7513,7 +7511,6 @@ public func notarize(package: String,
 {
     let packageArg = RubyCommand.Argument(name: "package", value: package, type: nil)
     let skipStaplingArg = skipStapling.asRubyArgument(name: "skip_stapling", type: nil)
-    let bundleIdArg = bundleId.asRubyArgument(name: "bundle_id", type: nil)
     let usernameArg = username.asRubyArgument(name: "username", type: nil)
     let ascProviderArg = ascProvider.asRubyArgument(name: "asc_provider", type: nil)
     let printLogArg = printLog.asRubyArgument(name: "print_log", type: nil)
@@ -7522,7 +7519,6 @@ public func notarize(package: String,
     let apiKeyArg = apiKey.asRubyArgument(name: "api_key", type: nil)
     let array: [RubyCommand.Argument?] = [packageArg,
                                           skipStaplingArg,
-                                          bundleIdArg,
                                           usernameArg,
                                           ascProviderArg,
                                           printLogArg,
@@ -7903,11 +7899,11 @@ public func pem(platform: String = "ios",
    - lastName: The tester's last name
    - email: The tester's email
    - testersFilePath: Path to a CSV file of testers
-   - groups: Associate tester to one group or more by group name / group id. E.g. `-g "Team 1","Team 2"` This is required when `distribute_external` option is set to true or when we want to add a tester to one or more external testing groups
+   - groups: Associate tester to one group or more by group name / group id. E.g. `-g "Team 1","a06cf5b5-95a9-4beb-88c6-f22bd6b3f7a2"` This is required when `distribute_external` option is set to true or when we want to add a tester to one or more external testing groups
    - teamId: The ID of your App Store Connect team if you're in multiple teams
    - teamName: The name of your App Store Connect team if you're in multiple teams
    - devPortalTeamId: The short ID of your team in the developer portal, if you're in multiple teams. Different from your iTC team ID!
-   - itcProvider: The provider short name to be used with the iTMSTransporter to identify your team. This value will override the automatically detected provider short name. To get provider short name run `pathToXcode.app/Contents/Applications/Application\ Loader.app/Contents/itms/bin/iTMSTransporter -m provider -u 'USERNAME' -p 'PASSWORD' -account_type itunes_connect -v off`. The short names of providers should be listed in the second column
+   - itcProvider: The provider short name to be used with the iTMSTransporter to identify your team. This value will override the automatically detected provider short name. To get provider short name run `xcrun iTMSTransporter -m provider -u 'USERNAME' -p 'PASSWORD' -account_type itunes_connect -v off`. The short names of providers should be listed in the second column
    - providerPublicId: The provider public ID to be used with altool (--provider-public-id). This value will override the automatically detected provider value for altool uploads. Required after Xcode 26 when your account is associated with multiple providers and using username/app-password authentication
    - waitProcessingInterval: Interval in seconds to wait for App Store Connect processing
    - waitProcessingTimeoutDuration: Timeout duration in seconds to wait for App Store Connect processing. If set, after exceeding timeout duration, this will `force stop` to wait for App Store Connect processing and exit with exception
@@ -8690,6 +8686,7 @@ public func recreateSchemes(project: String) {
  This will register iOS/Mac devices with the Developer Portal so that you can include them in your provisioning profiles.
  This is an optimistic action, in that it will only ever add new devices to the member center, and never remove devices. If a device which has already been registered within the member center is not passed to this action, it will be left alone in the member center and continue to work.
  The action will connect to the Apple Developer Portal using the username you specified in your `Appfile` with `apple_id`, but you can override it using the `username` option, or by setting the env variable `ENV['DELIVER_USER']`.
+ When using `devices_file`, blank lines and lines starting with `#` are ignored, so you can group devices, add notes, or comment out a device row without removing it.
  */
 public func registerDevices(devices: OptionalConfigValue<[String: Any]?> = .fastlaneDefault(nil),
                             devicesFile: OptionalConfigValue<String?> = .fastlaneDefault(nil),
@@ -10076,6 +10073,7 @@ public func setPodKey(useBundleExec: OptionalConfigValue<Bool> = .fastlaneDefaul
    - provider: CI provider. If none is set, the provider is detected automatically
    - timeout: Set a custom timeout in seconds for keychain.  Set `0` if you want to specify 'no time-out'
    - keychainName: Set a custom keychain name
+   - setDefaultKeychain: Set the temporary keychain as the system default
 
  - Creates a new temporary keychain for use with match|
  - Switches match to `readonly` mode to not create new profiles/cert on CI|
@@ -10086,16 +10084,19 @@ public func setPodKey(useBundleExec: OptionalConfigValue<Bool> = .fastlaneDefaul
 public func setupCi(force: OptionalConfigValue<Bool> = .fastlaneDefault(false),
                     provider: OptionalConfigValue<String?> = .fastlaneDefault(nil),
                     timeout: Int = 3600,
-                    keychainName: String = "fastlane_tmp_keychain")
+                    keychainName: String = "fastlane_tmp_keychain",
+                    setDefaultKeychain: OptionalConfigValue<Bool> = .fastlaneDefault(true))
 {
     let forceArg = force.asRubyArgument(name: "force", type: nil)
     let providerArg = provider.asRubyArgument(name: "provider", type: nil)
     let timeoutArg = RubyCommand.Argument(name: "timeout", value: timeout, type: nil)
     let keychainNameArg = RubyCommand.Argument(name: "keychain_name", value: keychainName, type: nil)
+    let setDefaultKeychainArg = setDefaultKeychain.asRubyArgument(name: "set_default_keychain", type: nil)
     let array: [RubyCommand.Argument?] = [forceArg,
                                           providerArg,
                                           timeoutArg,
-                                          keychainNameArg]
+                                          keychainNameArg,
+                                          setDefaultKeychainArg]
     let args: [RubyCommand.Argument] = array
         .filter { $0?.value != nil }
         .compactMap { $0 }
@@ -11104,6 +11105,7 @@ public func splunkmint(dsym: OptionalConfigValue<String?> = .fastlaneDefault(nil
    - disableSandbox: Disable using the sandbox when executing subprocesses
    - xcprettyOutput: Specifies the output type for xcpretty. eg. 'test', or 'simple'
    - xcprettyArgs: Pass in xcpretty additional command line arguments (e.g. '--test --no-color' or '--tap --no-utf'), requires xcpretty_output to be specified also
+   - skipUpdate: Skip updating dependencies from their remote during a resolution
    - verbose: Increase verbosity of informational output
    - veryVerbose: Increase verbosity to include debug output
    - simulator: Specifies the simulator to pass for Swift Compiler (one of: iphonesimulator, macosx)
@@ -11120,6 +11122,7 @@ public func spm(command: String = "build",
                 disableSandbox: OptionalConfigValue<Bool> = .fastlaneDefault(false),
                 xcprettyOutput: OptionalConfigValue<String?> = .fastlaneDefault(nil),
                 xcprettyArgs: OptionalConfigValue<String?> = .fastlaneDefault(nil),
+                skipUpdate: OptionalConfigValue<Bool> = .fastlaneDefault(false),
                 verbose: OptionalConfigValue<Bool> = .fastlaneDefault(false),
                 veryVerbose: OptionalConfigValue<Bool> = .fastlaneDefault(false),
                 simulator: OptionalConfigValue<String?> = .fastlaneDefault(nil),
@@ -11136,6 +11139,7 @@ public func spm(command: String = "build",
     let disableSandboxArg = disableSandbox.asRubyArgument(name: "disable_sandbox", type: nil)
     let xcprettyOutputArg = xcprettyOutput.asRubyArgument(name: "xcpretty_output", type: nil)
     let xcprettyArgsArg = xcprettyArgs.asRubyArgument(name: "xcpretty_args", type: nil)
+    let skipUpdateArg = skipUpdate.asRubyArgument(name: "skip_update", type: nil)
     let verboseArg = verbose.asRubyArgument(name: "verbose", type: nil)
     let veryVerboseArg = veryVerbose.asRubyArgument(name: "very_verbose", type: nil)
     let simulatorArg = simulator.asRubyArgument(name: "simulator", type: nil)
@@ -11151,6 +11155,7 @@ public func spm(command: String = "build",
                                           disableSandboxArg,
                                           xcprettyOutputArg,
                                           xcprettyArgsArg,
+                                          skipUpdateArg,
                                           verboseArg,
                                           veryVerboseArg,
                                           simulatorArg,
@@ -11838,11 +11843,11 @@ public func testfairy(apiKey: String,
    - lastName: The tester's last name
    - email: The tester's email
    - testersFilePath: Path to a CSV file of testers
-   - groups: Associate tester to one group or more by group name / group id. E.g. `-g "Team 1","Team 2"` This is required when `distribute_external` option is set to true or when we want to add a tester to one or more external testing groups
+   - groups: Associate tester to one group or more by group name / group id. E.g. `-g "Team 1","a06cf5b5-95a9-4beb-88c6-f22bd6b3f7a2"` This is required when `distribute_external` option is set to true or when we want to add a tester to one or more external testing groups
    - teamId: The ID of your App Store Connect team if you're in multiple teams
    - teamName: The name of your App Store Connect team if you're in multiple teams
    - devPortalTeamId: The short ID of your team in the developer portal, if you're in multiple teams. Different from your iTC team ID!
-   - itcProvider: The provider short name to be used with the iTMSTransporter to identify your team. This value will override the automatically detected provider short name. To get provider short name run `pathToXcode.app/Contents/Applications/Application\ Loader.app/Contents/itms/bin/iTMSTransporter -m provider -u 'USERNAME' -p 'PASSWORD' -account_type itunes_connect -v off`. The short names of providers should be listed in the second column
+   - itcProvider: The provider short name to be used with the iTMSTransporter to identify your team. This value will override the automatically detected provider short name. To get provider short name run `xcrun iTMSTransporter -m provider -u 'USERNAME' -p 'PASSWORD' -account_type itunes_connect -v off`. The short names of providers should be listed in the second column
    - providerPublicId: The provider public ID to be used with altool (--provider-public-id). This value will override the automatically detected provider value for altool uploads. Required after Xcode 26 when your account is associated with multiple providers and using username/app-password authentication
    - waitProcessingInterval: Interval in seconds to wait for App Store Connect processing
    - waitProcessingTimeoutDuration: Timeout duration in seconds to wait for App Store Connect processing. If set, after exceeding timeout duration, this will `force stop` to wait for App Store Connect processing and exit with exception
@@ -12538,7 +12543,7 @@ public func updateProjectProvisioning(xcodeproj: OptionalConfigValue<String?> = 
    - targets: Name of the targets you want to update
    - teamid: The Team ID you want to use
 
- This action updates the Developer Team ID of your Xcode project.
+ This action updates (or adds) the Developer Team ID of your Xcode project.
  */
 public func updateProjectTeam(path: String,
                               targets: OptionalConfigValue<[String]?> = .fastlaneDefault(nil),
@@ -12687,9 +12692,11 @@ public func uploadAppPrivacyDetailsToAppStore(username: String,
    - binaryPath: The path to the upload-symbols file of the Fabric app
    - platform: The platform of the app (ios, appletvos, mac)
    - dsymWorkerThreads: The number of threads to use for simultaneous dSYM upload
+   - failOnError: Should the action fail when an upload fails?
    - debug: Enable debug mode for upload-symbols
 
- This action allows you to upload symbolication files to Crashlytics. It's extra useful if you use it to download the latest dSYM files from Apple when you use Bitcode. This action will not fail the build if one of the uploads failed. The reason for that is that sometimes some of dSYM files are invalid, and we don't want them to fail the complete build.
+ This action allows you to upload symbolication files to Crashlytics. It's extra useful if you use it to download the latest dSYM files from Apple when you use Bitcode. This action will not fail the build if one of the uploads failed by default.
+ The reason for that is that sometimes some of dSYM files are invalid, and we don't want them to fail the complete build. However, fail_on_build parameter can be used to prevent this behavior.
  */
 public func uploadSymbolsToCrashlytics(dsymPath: String = "./spec/fixtures/dSYM/Themoji2.dSYM",
                                        dsymPaths: OptionalConfigValue<[String]?> = .fastlaneDefault(nil),
@@ -12699,6 +12706,7 @@ public func uploadSymbolsToCrashlytics(dsymPath: String = "./spec/fixtures/dSYM/
                                        binaryPath: OptionalConfigValue<String?> = .fastlaneDefault(nil),
                                        platform: String = "ios",
                                        dsymWorkerThreads: Int = 1,
+                                       failOnError: OptionalConfigValue<Bool> = .fastlaneDefault(false),
                                        debug: OptionalConfigValue<Bool> = .fastlaneDefault(false))
 {
     let dsymPathArg = RubyCommand.Argument(name: "dsym_path", value: dsymPath, type: nil)
@@ -12709,6 +12717,7 @@ public func uploadSymbolsToCrashlytics(dsymPath: String = "./spec/fixtures/dSYM/
     let binaryPathArg = binaryPath.asRubyArgument(name: "binary_path", type: nil)
     let platformArg = RubyCommand.Argument(name: "platform", value: platform, type: nil)
     let dsymWorkerThreadsArg = RubyCommand.Argument(name: "dsym_worker_threads", value: dsymWorkerThreads, type: nil)
+    let failOnErrorArg = failOnError.asRubyArgument(name: "fail_on_error", type: nil)
     let debugArg = debug.asRubyArgument(name: "debug", type: nil)
     let array: [RubyCommand.Argument?] = [dsymPathArg,
                                           dsymPathsArg,
@@ -12718,6 +12727,7 @@ public func uploadSymbolsToCrashlytics(dsymPath: String = "./spec/fixtures/dSYM/
                                           binaryPathArg,
                                           platformArg,
                                           dsymWorkerThreadsArg,
+                                          failOnErrorArg,
                                           debugArg]
     let args: [RubyCommand.Argument] = array
         .filter { $0?.value != nil }
@@ -12816,7 +12826,7 @@ public func uploadSymbolsToSentry(apiHost: String = "https://app.getsentry.com/a
    - teamName: The name of your App Store Connect team if you're in multiple teams
    - devPortalTeamId: The short ID of your Developer Portal team, if you're in multiple teams. Different from your iTC team ID!
    - devPortalTeamName: The name of your Developer Portal team if you're in multiple teams
-   - itcProvider: The provider short name to be used with the iTMSTransporter to identify your team. This value will override the automatically detected provider short name. To get provider short name run `pathToXcode.app/Contents/Applications/Application\ Loader.app/Contents/itms/bin/iTMSTransporter -m provider -u 'USERNAME' -p 'PASSWORD' -account_type itunes_connect -v off`. The short names of providers should be listed in the second column
+   - itcProvider: The provider short name to be used with the iTMSTransporter to identify your team. This value will override the automatically detected provider short name. To get provider short name run `xcrun iTMSTransporter -m provider -u 'USERNAME' -p 'PASSWORD' -account_type itunes_connect -v off`. The short names of providers should be listed in the second column
    - providerPublicId: The provider public ID to be used with altool (--provider-public-id). This value will override the automatically detected provider value for altool uploads. Required after Xcode 26 when your account is associated with multiple providers and using username/app-password authentication
    - runPrecheckBeforeSubmit: Run precheck before submitting to app review
    - precheckDefaultRuleLevel: The default precheck rule level unless otherwise configured
@@ -13354,11 +13364,11 @@ public func uploadToPlayStoreInternalAppSharing(packageName: String,
    - lastName: The tester's last name
    - email: The tester's email
    - testersFilePath: Path to a CSV file of testers
-   - groups: Associate tester to one group or more by group name / group id. E.g. `-g "Team 1","Team 2"` This is required when `distribute_external` option is set to true or when we want to add a tester to one or more external testing groups
+   - groups: Associate tester to one group or more by group name / group id. E.g. `-g "Team 1","a06cf5b5-95a9-4beb-88c6-f22bd6b3f7a2"` This is required when `distribute_external` option is set to true or when we want to add a tester to one or more external testing groups
    - teamId: The ID of your App Store Connect team if you're in multiple teams
    - teamName: The name of your App Store Connect team if you're in multiple teams
    - devPortalTeamId: The short ID of your team in the developer portal, if you're in multiple teams. Different from your iTC team ID!
-   - itcProvider: The provider short name to be used with the iTMSTransporter to identify your team. This value will override the automatically detected provider short name. To get provider short name run `pathToXcode.app/Contents/Applications/Application\ Loader.app/Contents/itms/bin/iTMSTransporter -m provider -u 'USERNAME' -p 'PASSWORD' -account_type itunes_connect -v off`. The short names of providers should be listed in the second column
+   - itcProvider: The provider short name to be used with the iTMSTransporter to identify your team. This value will override the automatically detected provider short name. To get provider short name run `xcrun iTMSTransporter -m provider -u 'USERNAME' -p 'PASSWORD' -account_type itunes_connect -v off`. The short names of providers should be listed in the second column
    - providerPublicId: The provider public ID to be used with altool (--provider-public-id). This value will override the automatically detected provider value for altool uploads. Required after Xcode 26 when your account is associated with multiple providers and using username/app-password authentication
    - waitProcessingInterval: Interval in seconds to wait for App Store Connect processing
    - waitProcessingTimeoutDuration: Timeout duration in seconds to wait for App Store Connect processing. If set, after exceeding timeout duration, this will `force stop` to wait for App Store Connect processing and exit with exception
@@ -13922,7 +13932,7 @@ public func xcov(workspace: OptionalConfigValue<String?> = .fastlaneDefault(nil)
                  coverallsServiceJobId: OptionalConfigValue<String?> = .fastlaneDefault(nil),
                  coverallsRepoToken: OptionalConfigValue<String?> = .fastlaneDefault(nil),
                  xcconfig: OptionalConfigValue<String?> = .fastlaneDefault(nil),
-                 ideFoundationPath: String = "/Applications/Xcode_26.5.app/Contents/Developer/../Frameworks/IDEFoundation.framework/Versions/A/IDEFoundation",
+                 ideFoundationPath: String = "/Applications/Xcode_26.6.app/Contents/Developer/../Frameworks/IDEFoundation.framework/Versions/A/IDEFoundation",
                  legacySupport: OptionalConfigValue<Bool> = .fastlaneDefault(false))
 {
     let workspaceArg = workspace.asRubyArgument(name: "workspace", type: nil)
@@ -14133,4 +14143,4 @@ public let snapshotfile: Snapshotfile = .init()
 
 // Please don't remove the lines below
 // They are used to detect outdated files
-// FastlaneRunnerAPIVersion [0.9.204]
+// FastlaneRunnerAPIVersion [0.9.205]
