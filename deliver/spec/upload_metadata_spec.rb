@@ -78,6 +78,43 @@ describe Deliver::UploadMetadata do
     end
   end
 
+  describe "#routing_app_coverage_file" do
+    let(:uploader) { Deliver::UploadMetadata.new(options) }
+    let(:version) { double("version") }
+
+    context "without routing_app_coverage_file set" do
+      let(:options) { {} }
+
+      it "does not touch the routing app coverage on App Store Connect" do
+        expect(version).not_to(receive(:fetch_routing_app_coverage))
+        expect(version).not_to(receive(:upload_routing_app_coverage))
+
+        uploader.send("routing_app_coverage_file", version)
+      end
+    end
+
+    context "with routing_app_coverage_file set" do
+      let(:geojson_path) { File.join(tmpdir, "coverage.geojson") }
+      let(:options) { { routing_app_coverage_file: geojson_path } }
+
+      it "uploads the file when no coverage exists yet" do
+        expect(version).to receive(:fetch_routing_app_coverage).and_return(nil)
+        expect(version).to receive(:upload_routing_app_coverage).with(path: geojson_path)
+
+        uploader.send("routing_app_coverage_file", version)
+      end
+
+      it "replaces an existing coverage file" do
+        routing_app_coverage = double("routing_app_coverage")
+        expect(version).to receive(:fetch_routing_app_coverage).and_return(routing_app_coverage)
+        expect(routing_app_coverage).to receive(:delete!)
+        expect(version).to receive(:upload_routing_app_coverage).with(path: geojson_path)
+
+        uploader.send("routing_app_coverage_file", version)
+      end
+    end
+  end
+
   describe "#review_information" do
     let(:options) { { metadata_path: tmpdir, app_review_information: app_review_information } }
     let(:version) { double("version") }

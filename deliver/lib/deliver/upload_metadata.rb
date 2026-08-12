@@ -357,6 +357,7 @@ module Deliver
       review_information(version)
       app_clip_review_information(version)
       review_attachment_file(version)
+      routing_app_coverage_file(version)
       app_rating(app_info)
     end
 
@@ -764,6 +765,27 @@ module Deliver
         app_store_review_attachments.each(&:delete!)
         UI.message("Removing review attachment file to App Store Connect") unless app_store_review_attachments.empty?
       end
+    end
+
+    def routing_app_coverage_file(version)
+      # Only touch the routing app coverage when a file was provided,
+      # so versions of routing apps that manage the file outside of
+      # fastlane are left alone
+      return unless options[:routing_app_coverage_file]
+
+      routing_app_coverage = begin
+                               version.fetch_routing_app_coverage
+                             rescue
+                               nil
+                             end # returns no data error so need to rescue
+
+      if routing_app_coverage
+        UI.message("Removing previous routing app coverage file from App Store Connect")
+        routing_app_coverage.delete!
+      end
+
+      UI.message("Uploading routing app coverage file to App Store Connect")
+      version.upload_routing_app_coverage(path: options[:routing_app_coverage_file])
     end
 
     def app_rating(app_info)
