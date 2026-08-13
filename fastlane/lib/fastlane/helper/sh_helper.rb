@@ -51,15 +51,22 @@ module Fastlane
         # sh "ls -la /Applications/Xcode\ 7.3.1.app"
         # sh "ls", "-la", "/Applications/Xcode 7.3.1.app"
         # sh({ "FOO" => "Hello" }, "echo $FOO")
+        sanitized_output = false
         Open3.popen2e(*command) do |stdin, io, thread|
           io.sync = true
           io.each do |line|
-            # Ensure the string being stripped is in valid UTF-8 format; otherwise, it will be replaced with an invalid character.
-            UI.command_output(line.encode('UTF-8', invalid: :replace).strip) if print_command_output
+            if print_command_output
+              # Ensure the string being stripped is in valid UTF-8 format; Otherwise warn at the end
+              text = line.encode('UTF-8', invalid: :replace)
+              UI.command_output(text.strip)
+              sanitized_output = true if text != line
+            end
             result << line
           end
           exit_status = thread.value
         end
+
+        UI.important("Command output wasn't valid UTF-8 and was sanitized. Please report the issue.") if sanitized_output
 
         # Checking Process::Status#exitstatus instead of #success? makes for more
         # testable code. (Tests mock exitstatus only.) This is also consistent
