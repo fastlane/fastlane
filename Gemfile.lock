@@ -218,7 +218,7 @@ GEM
       rdoc (>= 4.0.0)
       reline (>= 0.4.2)
     jmespath (1.6.2)
-    json (2.5.1)
+    json (2.21.2)
     jwt (2.10.3)
       base64
     kramdown (2.5.2)
