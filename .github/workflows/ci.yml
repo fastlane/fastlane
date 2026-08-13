@@ -29,6 +29,7 @@ jobs:
           - { xcode: '16.4.0', ruby: '3.4', rubyopt: '', os: 'macos-15' }
           - { xcode: '26.5', ruby: '3.4', rubyopt: '-W0', os: 'macos-26' }
           - { xcode: '26.6', ruby: '3.4', rubyopt: '-W0', os: 'macos-26' }
+          - { xcode: '26.6', ruby: '4.0', rubyopt: '-W0', os: 'macos-26' }
           - { xcode: '', ruby: '3.2', rubyopt: '', os: 'windows-2022' }
           - { xcode: '', ruby: '3.0', rubyopt: '', os: 'ubuntu-24.04' }
     steps:

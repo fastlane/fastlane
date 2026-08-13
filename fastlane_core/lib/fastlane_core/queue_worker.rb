@@ -36,6 +36,9 @@ module FastlaneCore
       results = Queue.new
       @concurrency.times do
         threads << Thread.new do
+          # Exceptions are re-joined (and raised) below, so this just causes duplicate raised exceptions
+          Thread.current.report_on_exception = false
+
           job = @queue.pop
           while job
             results << @block.call(job)

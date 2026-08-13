@@ -60,7 +60,9 @@ module FastlaneCore
       nil
     end
 
-    # Reads the moov box and returns [w, h] if found in any trak/tkhd, else nil.
+    # Reads the moov box and returns [w, h] from the first trak/tkhd with non-zero dimensions, else nil.
+    # Non-video tracks (e.g. audio) carry a legitimate tkhd width/height of 0x0,
+    # so zero-sized results are skipped to keep scanning for the video track.
     # Input: io (IO) positioned at moov contents; moov_end (Integer) absolute end offset.
     # Output: [width, height] or nil.
     def self.extract_resolution_from_moov(io, moov_end)
@@ -71,7 +73,7 @@ module FastlaneCore
         if atom_type == "trak"
           trak_end = io.pos + (atom_size - 8)
           resolution = extract_resolution_from_trak(io, trak_end)
-          return resolution if resolution
+          return resolution if resolution && resolution[0] > 0 && resolution[1] > 0
           io.seek(trak_end, IO::SEEK_SET)
         else
           skip(io, atom_size - 8)

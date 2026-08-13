@@ -252,7 +252,7 @@ describe "Build Manager" do
           apple_id: 'mock_apple_id',
           app_identifier: 'mock_app_id',
           distribute_external: true,
-          groups: ["Blue Man Group"],
+          groups: ["Blue Man Group", "654"],
           skip_submission: false,
           demo_account_required: true,
           notify_external_testers: true,
@@ -413,9 +413,9 @@ describe "Build Manager" do
         # 2. client.add_beta_groups_to_build is called inside of build.add_beta_groups
         expect(Spaceship::ConnectAPI).to receive(:add_beta_groups_to_build).with({
           build_id: ready_to_submit_mock_build.id,
-          beta_group_ids: [beta_groups[0].id]
+          beta_group_ids: [beta_groups[0].id, beta_groups[1].id]
         }).and_return(Spaceship::ConnectAPI::Response.new)
-        expect(ready_to_submit_mock_build).to receive(:add_beta_groups).with(beta_groups: [beta_groups[0]]).and_wrap_original do |m, *args|
+        expect(ready_to_submit_mock_build).to receive(:add_beta_groups).with(beta_groups: [beta_groups[0], beta_groups[1]]).and_wrap_original do |m, *args|
           options = args.first
           m.call(**options)
         end

@@ -19,6 +19,9 @@ describe Fastlane do
       let(:devices_list_normalized) do
         File.absolute_path('./fastlane/spec/fixtures/actions/register_devices/devices-list-normalized.txt')
       end
+      let(:devices_file_with_comments) do
+        File.absolute_path('./fastlane/spec/fixtures/actions/register_devices/devices-list-with-comments.txt')
+      end
 
       let(:existing_device) { double }
       let(:fake_devices) { [existing_device] }
@@ -124,6 +127,35 @@ describe Fastlane do
             register_devices(
               username: 'test@test.com',
               devices_file: '#{devices_list_normalized}',
+              platform: 'ios'
+            )
+          end").runner.execute(:test)
+      end
+
+      it "registers devices with file containing blank lines and comment lines" do
+        expect(Spaceship::ConnectAPI::Device).to receive(:all).and_return(fake_devices)
+
+        expect(Fastlane::Actions::RegisterDevicesAction).to receive(:try_create_device).with(
+          name: 'NAME1',
+          udid: 'E123456789012345678901234567890123456789',
+          platform: 'IOS'
+        ).once
+        expect(Fastlane::Actions::RegisterDevicesAction).to receive(:try_create_device).with(
+          name: 'NAME2',
+          udid: 'B123456789012345678901234567890123456789',
+          platform: 'IOS'
+        ).once
+        expect(Fastlane::Actions::RegisterDevicesAction).to receive(:try_create_device).with(
+          name: 'NAME3',
+          udid: 'C123456789012345678901234567890123456789',
+          platform: 'IOS'
+        ).once
+        expect(Fastlane::Actions::RegisterDevicesAction).not_to receive(:try_create_device).with(hash_including(name: 'NAME4'))
+
+        result = Fastlane::FastFile.new.parse("lane :test do
+            register_devices(
+              username: 'test@test.com',
+              devices_file: '#{devices_file_with_comments}',
               platform: 'ios'
             )
           end").runner.execute(:test)
