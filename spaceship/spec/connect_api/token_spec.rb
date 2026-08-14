@@ -59,7 +59,7 @@ describe Spaceship::ConnectAPI::Token do
 
       expect do
         Spaceship::ConnectAPI::Token.from_json_file(file.path)
-      end.to raise_error(JSON::ParserError, /unexpected token/)
+      end.to raise_error(JSON::ParserError, /unexpected character: 'abc123' at line 1 column 1/)
     end
 
     it 'raises error with missing all keys' do
