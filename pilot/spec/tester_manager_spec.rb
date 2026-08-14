@@ -10,6 +10,12 @@ describe Pilot::TesterManager do
       })
     end
 
+    let(:second_tester_group) do
+      Spaceship::ConnectAPI::BetaGroup.new("2", {
+        name: "Second Group"
+      })
+    end
+
     let(:app_context_testers) do
       [
         Spaceship::ConnectAPI::BetaTester.new("1", {
@@ -37,7 +43,8 @@ describe Pilot::TesterManager do
       Spaceship::ConnectAPI::BetaTester.new("1", {
         firstName: 'fake',
         lastName: 'tester',
-        email: 'fabric-devtools@gmail.com+fake@gmail.com'
+        email: 'fabric-devtools@gmail.com+fake@gmail.com',
+        betaGroups: [custom_tester_group, second_tester_group]
       })
     end
 
@@ -65,7 +72,7 @@ describe Pilot::TesterManager do
         email: fake_tester.email,
         first_name: fake_tester.first_name,
         last_name: fake_tester.last_name,
-        groups: ["Test Group"]
+        groups: ["Test Group", second_tester_group.id]
       })
     end
 
@@ -104,15 +111,15 @@ describe Pilot::TesterManager do
       end
     end
 
-    describe "when asked to invite a new tester to a specific existing custom group" do
-      it "creates a new tester and adds it to the default group" do
+    describe "when asked to invite a new tester to specific existing custom groups" do
+      it "creates a new tester and adds it to the default groups" do
         allow(tester_manager).to receive(:find_app_tester).and_return(fake_tester)
-        allow(fake_app).to receive(:get_beta_groups).and_return([custom_tester_group])
+        allow(fake_app).to receive(:get_beta_groups).and_return([custom_tester_group, second_tester_group])
 
         expect(custom_tester_group).to receive(:post_bulk_beta_tester_assignments)
+        expect(second_tester_group).to receive(:post_bulk_beta_tester_assignments)
 
-        groups = [custom_tester_group]
-        group_names = groups.map(&:name).join(';')
+        group_names = [custom_tester_group.name, second_tester_group.id].join(';')
         expect(FastlaneCore::UI).to receive(:success).with("Successfully added tester #{fake_tester.email} to app #{fake_app_name} in group(s) #{group_names}")
 
         tester_manager.add_tester(default_add_tester_options_with_group)

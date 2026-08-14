@@ -362,13 +362,21 @@ private_lane :github_changelog do |options|
       [message, username]
     end
 
+    # We may find 0 PRs, 1 PR, n+ PRs and we may be interactive or not. Self recovery exists in non-interactive
+    # User selection is required in interactive
     if item_infos.size == 0
-      if UI.confirm("Error generating changelog. No commit found for #{sha}. Skip?")
+      if !UI.interactive?
+        UI.important("No pull request found for commit #{sha}, falling back to the commit message for the changelog entry")
+      elsif UI.confirm("Error generating changelog. No pull request found for commit #{sha}. Skip?")
         next
       else
-        UI.user_error!("Cannot generate changelog. No commit found for #{sha}")
+        UI.user_error!("Cannot generate changelog. No pull request found for commit #{sha}")
       end
     elsif item_infos.size == 1
+      message = item_infos[0][0]
+      username = item_infos[0][1]
+    elsif !UI.interactive?
+      UI.important("Multiple pull requests found for commit #{sha}: #{item_infos.map { |info| info[0] }.join(', ')} - using the first one")
       message = item_infos[0][0]
       username = item_infos[0][1]
     else
@@ -383,7 +391,7 @@ private_lane :github_changelog do |options|
       username = item_infos[index][1]
     end
 
-    "* #{message} via #{name} (@#{username})"
+    username ? "* #{message} via #{name} (@#{username})" : "* #{message} via #{name}"
   end.compact.join("\n")
 
   formatted
