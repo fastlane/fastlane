@@ -120,23 +120,16 @@ module Produce
       return true
     end
 
-    # App Store Connect API path — used when an API key is configured instead of
-    # a session-based Apple ID login. Only covers app creation itself; inline
-    # capability flags passed to `produce create` aren't mapped here yet (see
-    # `using_connect_api?` call site) — use `produce enable_services` afterward
-    # instead, which fully supports the API key for all capabilities.
+    # App Store Connect API key path — used instead of Spaceship.login.
     def create_new_app_via_connect_api
       config_enabled_services = Produce.config[:enable_services] || Produce.config[:enabled_features]
       if config_enabled_services && !config_enabled_services.empty?
         UI.user_error!("Enabling capabilities inline during `produce create` isn't supported yet when using an API key. Run `produce create` without capability flags, then use `produce enable_services` to enable them (fully supported with an API key).")
       end
 
-      ENV["CREATED_NEW_APP_ID"] = Time.now.to_i.to_s
-
       existing = Spaceship::ConnectAPI::BundleId.find(app_identifier)
       if existing
         UI.success("[DevCenter] App '#{Produce.config[:app_identifier]}' already exists, nothing to do on the Dev Center")
-        ENV["CREATED_NEW_APP_ID"] = nil
         return true
       end
 
@@ -223,14 +216,8 @@ module Produce
       if using_connect_api?
         UI.message("Authenticating with App Store Connect API Key")
 
-        # Not using `Spaceship::ConnectAPI.token = connect_api_token` (which
-        # only sets `token:`) because some ConnectAPI provisioning calls (e.g.
-        # patch_bundle_id_capability) resolve `teamId` via the *separate*
-        # Provisioning::Client's own `team_id` getter — not the top-level
-        # ConnectAPI client. Left uncached, that getter falls back to a live,
-        # session-based lookup with no session to use. Passing
-        # `current_team_id:` here threads it down into that Provisioning::Client
-        # at construction time so the lookup never fires.
+        # `current_team_id:` avoids a live, session-based team_id lookup elsewhere in
+        # ConnectAPI's provisioning client, which has no session to use here.
         Spaceship::ConnectAPI.client = Spaceship::ConnectAPI::Client.new(token: connect_api_token, current_team_id: Produce.config[:team_id])
       else
         Spaceship.login(Produce.config[:username], nil)
