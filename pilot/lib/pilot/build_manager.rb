@@ -698,7 +698,8 @@ module Pilot
       routing_app_coverage =
         begin
           version.fetch_routing_app_coverage
-        rescue StandardError
+        rescue => error
+          UI.important("Error fetching routing app coverage - #{error.message}")
           nil
         end
 

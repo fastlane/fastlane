@@ -774,7 +774,8 @@ module Deliver
       routing_app_coverage =
         begin
           version.fetch_routing_app_coverage
-        rescue StandardError
+        rescue => error
+          UI.error("Error fetching routing app coverage - #{error.message}")
           nil
         end
 
