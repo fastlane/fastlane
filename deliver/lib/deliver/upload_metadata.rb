@@ -768,16 +768,15 @@ module Deliver
     end
 
     def routing_app_coverage_file(version)
-      # Only touch the routing app coverage when a file was provided,
-      # so versions of routing apps that manage the file outside of
-      # fastlane are left alone
+      # Skip logic entirely if no coverage file passed. So status-quo stays the same.
       return unless options[:routing_app_coverage_file]
 
-      routing_app_coverage = begin
-                               version.fetch_routing_app_coverage
-                             rescue
-                               nil
-                             end # returns no data error so need to rescue
+      routing_app_coverage =
+        begin
+          version.fetch_routing_app_coverage
+        rescue StandardError
+          nil
+        end
 
       if routing_app_coverage
         UI.message("Removing previous routing app coverage file from App Store Connect")
