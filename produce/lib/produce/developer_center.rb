@@ -1,5 +1,7 @@
+require 'ostruct'
 require 'spaceship'
 require_relative 'module'
+require_relative 'service'
 
 module Produce
   class DeveloperCenter
@@ -123,9 +125,6 @@ module Produce
     # App Store Connect API key path — used instead of Spaceship.login.
     def create_new_app_via_connect_api
       config_enabled_services = Produce.config[:enable_services] || Produce.config[:enabled_features]
-      if config_enabled_services && !config_enabled_services.empty?
-        UI.user_error!("Enabling capabilities inline during `produce create` isn't supported yet when using an API key. Run `produce create` without capability flags, then use `produce enable_services` to enable them (fully supported with an API key).")
-      end
 
       existing = Spaceship::ConnectAPI::BundleId.find(app_identifier)
       if existing
@@ -142,7 +141,7 @@ module Produce
       UI.crash!("Something went wrong when creating the new app - it's not listed in the apps list") unless bundle_id
 
       UI.message("Created app #{bundle_id.id}")
-      ENV["CREATED_NEW_APP_ID"] = Time.now.to_i.to_s
+      enable_inline_services(config_enabled_services) if config_enabled_services && !config_enabled_services.empty?
       UI.success("Finished creating new app '#{app_name}' on the Dev Center")
 
       return true
@@ -190,6 +189,17 @@ module Produce
     end
 
     private
+
+    # Delegates to Service#update instead of duplicating its ~40-capability mapping.
+    # Skips any capability explicitly marked "off" — meaningless on a brand-new app.
+    def enable_inline_services(config_enabled_services)
+      to_enable = config_enabled_services.reject { |_, v| v == SERVICE_OFF }
+      return if to_enable.empty?
+
+      options = OpenStruct.new(to_enable)
+      options.define_singleton_method(:__hash__) { to_enable }
+      Produce::Service.new.update(true, options)
+    end
 
     def platform
       # This was added to support creation of multiple platforms

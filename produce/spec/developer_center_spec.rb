@@ -57,6 +57,7 @@ describe Produce::DeveloperCenter do
         platform: "IOS",
         identifier: "com.example.app"
       ).and_return(created_app)
+      expect(Produce::Service).not_to receive(:new)
 
       instance = Produce::DeveloperCenter.new
       instance.send(:login)
@@ -65,14 +66,47 @@ describe Produce::DeveloperCenter do
       expect(result).to eq(true)
     end
 
-    it "raises a clear error instead of silently ignoring inline capability flags" do
-      config_with(api_key: api_key, enable_services: { push_notification: "on" })
+    it "enables inline capabilities via the API instead of erroring, skipping ones marked off" do
+      config_with(api_key: api_key, enable_services: { push_notification: "on", app_group: "off" })
       allow(Spaceship::ConnectAPI::BundleId).to receive(:find).and_return(nil)
+      created_app = double("created_bundle_id", id: "ABC123")
+      allow(Spaceship::ConnectAPI::BundleId).to receive(:create).and_return(created_app)
+
+      fake_service = instance_double(Produce::Service)
+      expect(Produce::Service).to receive(:new).and_return(fake_service)
+      expect(fake_service).to receive(:update) do |on, options|
+        expect(on).to eq(true)
+        expect(options.push_notification).to eq("on")
+        expect(options.app_group).to be_nil
+      end
 
       instance = Produce::DeveloperCenter.new
       instance.send(:login)
+      result = instance.create_new_app
 
-      expect { instance.create_new_app }.to raise_error(FastlaneCore::Interface::FastlaneError)
+      expect(result).to eq(true)
+    end
+
+    it "drives the real Produce::Service#update without erroring on the options adapter" do
+      config_with(api_key: api_key, enable_services: { push_notification: "on", app_group: "off" })
+      allow(Spaceship::ConnectAPI::BundleId).to receive(:find).and_return(nil)
+      created_app = double("created_bundle_id", id: "ABC123")
+      allow(Spaceship::ConnectAPI::BundleId).to receive(:create).and_return(created_app)
+
+      fake_bundle_id = double("service_bundle_id")
+      allow_any_instance_of(Produce::Service).to receive(:bundle_id).and_return(fake_bundle_id)
+      expect(fake_bundle_id).to receive(:update_capability).with(
+        Spaceship::ConnectAPI::BundleIdCapability::Type::PUSH_NOTIFICATIONS, enabled: true
+      )
+      expect(fake_bundle_id).not_to receive(:update_capability).with(
+        Spaceship::ConnectAPI::BundleIdCapability::Type::APP_GROUPS, anything
+      )
+
+      instance = Produce::DeveloperCenter.new
+      instance.send(:login)
+      result = instance.create_new_app
+
+      expect(result).to eq(true)
     end
   end
 

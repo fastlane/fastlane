@@ -37,7 +37,7 @@ describe Spaceship::ConnectAPI::BundleId do
       expect(result).to be_an_instance_of(Spaceship::ConnectAPI::BundleIdCapability)
     end
 
-    it 'does not send a create request when the capability is already enabled' do
+    it 'patches the existing capability instead of creating a duplicate when already enabled' do
       stub_request(:post, "https://developer.apple.com/services-account/v1/bundleIds/123456789/bundleIdCapabilities").
         to_return(status: 200, body: ConnectAPIStubbing::Provisioning.read_fixture_file('bundle_id_capabilities_app_groups.json'), headers: { 'Content-Type' => 'application/vnd.api+json' })
 
@@ -45,6 +45,7 @@ describe Spaceship::ConnectAPI::BundleId do
 
       expect(result.capability_type).to eq("APP_GROUPS")
       expect(WebMock).not_to have_requested(:post, "https://developer.apple.com/services-account/v1/bundleIdCapabilities")
+      expect(WebMock).to have_requested(:patch, "https://developer.apple.com/services-account/v1/bundleIdCapabilities/123456789_APP_GROUPS")
     end
 
     it 'deletes the capability when disabling one that exists' do
