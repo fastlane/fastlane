@@ -5311,6 +5311,7 @@ public func getManagedPlayStorePublishingRights(jsonKey: OptionalConfigValue<Str
    - platform: Set certificate's platform. Used for creation of production & development certificates. Supported platforms: ios, macos
    - development: Renew the development push certificate instead of the production one
    - websitePush: Create a Website Push certificate
+   - voipPush: Create a VoIP Services certificate
    - generateP12: Generate a p12 file additionally to a PEM file
    - activeDaysLimit: If the current certificate is active for less than this number of days, generate a new one
    - force: Create a new push certificate, even if the current one is active for 30 (or PEM_ACTIVE_DAYS_LIMIT) more days
@@ -5339,6 +5340,7 @@ public func getManagedPlayStorePublishingRights(jsonKey: OptionalConfigValue<Str
 public func getPushCertificate(platform: String = "ios",
                                development: OptionalConfigValue<Bool> = .fastlaneDefault(false),
                                websitePush: OptionalConfigValue<Bool> = .fastlaneDefault(false),
+                               voipPush: OptionalConfigValue<Bool> = .fastlaneDefault(false),
                                generateP12: OptionalConfigValue<Bool> = .fastlaneDefault(true),
                                activeDaysLimit: Int = 30,
                                force: OptionalConfigValue<Bool> = .fastlaneDefault(false),
@@ -5355,6 +5357,7 @@ public func getPushCertificate(platform: String = "ios",
     let platformArg = RubyCommand.Argument(name: "platform", value: platform, type: nil)
     let developmentArg = development.asRubyArgument(name: "development", type: nil)
     let websitePushArg = websitePush.asRubyArgument(name: "website_push", type: nil)
+    let voipPushArg = voipPush.asRubyArgument(name: "voip_push", type: nil)
     let generateP12Arg = generateP12.asRubyArgument(name: "generate_p12", type: nil)
     let activeDaysLimitArg = RubyCommand.Argument(name: "active_days_limit", value: activeDaysLimit, type: nil)
     let forceArg = force.asRubyArgument(name: "force", type: nil)
@@ -5370,6 +5373,7 @@ public func getPushCertificate(platform: String = "ios",
     let array: [RubyCommand.Argument?] = [platformArg,
                                           developmentArg,
                                           websitePushArg,
+                                          voipPushArg,
                                           generateP12Arg,
                                           activeDaysLimitArg,
                                           forceArg,
@@ -7786,6 +7790,7 @@ public func optOutUsage() {
    - platform: Set certificate's platform. Used for creation of production & development certificates. Supported platforms: ios, macos
    - development: Renew the development push certificate instead of the production one
    - websitePush: Create a Website Push certificate
+   - voipPush: Create a VoIP Services certificate
    - generateP12: Generate a p12 file additionally to a PEM file
    - activeDaysLimit: If the current certificate is active for less than this number of days, generate a new one
    - force: Create a new push certificate, even if the current one is active for 30 (or PEM_ACTIVE_DAYS_LIMIT) more days
@@ -7814,6 +7819,7 @@ public func optOutUsage() {
 public func pem(platform: String = "ios",
                 development: OptionalConfigValue<Bool> = .fastlaneDefault(false),
                 websitePush: OptionalConfigValue<Bool> = .fastlaneDefault(false),
+                voipPush: OptionalConfigValue<Bool> = .fastlaneDefault(false),
                 generateP12: OptionalConfigValue<Bool> = .fastlaneDefault(true),
                 activeDaysLimit: Int = 30,
                 force: OptionalConfigValue<Bool> = .fastlaneDefault(false),
@@ -7830,6 +7836,7 @@ public func pem(platform: String = "ios",
     let platformArg = RubyCommand.Argument(name: "platform", value: platform, type: nil)
     let developmentArg = development.asRubyArgument(name: "development", type: nil)
     let websitePushArg = websitePush.asRubyArgument(name: "website_push", type: nil)
+    let voipPushArg = voipPush.asRubyArgument(name: "voip_push", type: nil)
     let generateP12Arg = generateP12.asRubyArgument(name: "generate_p12", type: nil)
     let activeDaysLimitArg = RubyCommand.Argument(name: "active_days_limit", value: activeDaysLimit, type: nil)
     let forceArg = force.asRubyArgument(name: "force", type: nil)
@@ -7845,6 +7852,7 @@ public func pem(platform: String = "ios",
     let array: [RubyCommand.Argument?] = [platformArg,
                                           developmentArg,
                                           websitePushArg,
+                                          voipPushArg,
                                           generateP12Arg,
                                           activeDaysLimitArg,
                                           forceArg,
