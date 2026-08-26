@@ -74,6 +74,12 @@ If you want to generate a Website Push certificate:
 fastlane pem --website_push
 ```
 
+If you want to generate a VoIP Services certificate (the type PushKit requires):
+
+```no-highlight
+fastlane pem --voip_push
+```
+
 Set a password for your `p12` file:
 
 ```no-highlight
