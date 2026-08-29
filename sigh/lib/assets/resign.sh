@@ -665,9 +665,18 @@ function resign {
         # Get the old and the new team ID
         # Old team ID is not part of app entitlements, have to get it from old embedded provisioning profile
         security cms -D -i "$TEMP_DIR/old-embedded.mobileprovision" > "$TEMP_DIR/old-embedded-profile.plist"
-        OLD_TEAM_ID=$(PlistBuddy -c "Print :TeamIdentifier:0" "$TEMP_DIR/old-embedded-profile.plist")
+        OLD_TEAM_ID=$(PlistBuddy -c "Print :TeamIdentifier:0" "$TEMP_DIR/old-embedded-profile.plist" 2>/dev/null)
+        if [ "$OLD_TEAM_ID" == "" ]; then
+            OLD_TEAM_ID="$OLD_APP_ID"
+        fi
         # New team ID is part of profile entitlements
-        NEW_TEAM_ID=$(PlistBuddy -c "Print com.apple.developer.team-identifier" "$PROFILE_ENTITLEMENTS" | grep -E '^[A-Z0-9]*' -o | tr -d '\n')
+        NEW_TEAM_ID=$(PlistBuddy -c "Print com.apple.developer.team-identifier" "$PROFILE_ENTITLEMENTS" 2>/dev/null | grep -E '^[A-Z0-9]*' -o | tr -d '\n')
+        if [ "$NEW_TEAM_ID" == "" ]; then
+            NEW_TEAM_ID="$TEAM_IDENTIFIER"
+        fi
+        if [ "$NEW_TEAM_ID" == "" ]; then
+            NEW_TEAM_ID="$NEW_APP_ID"
+        fi
 
         log "Patching profile entitlements with values from app entitlements"
         PATCHED_ENTITLEMENTS="$TEMP_DIR/patchedEntitlements"
