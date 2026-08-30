@@ -1,0 +1,58 @@
+{
+  "runtimes" : [
+    {
+      "identifier" : "com.apple.CoreSimulator.SimRuntime.iOS-10-0",
+      "version" : "10.0",
+      "name" : "iOS 10.0",
+      "isAvailable" : true
+    },
+    {
+      "identifier" : "com.apple.CoreSimulator.SimRuntime.tvOS-10-0",
+      "version" : "10.0",
+      "name" : "tvOS 10.0",
+      "isAvailable" : true
+    },
+    {
+      "identifier" : "com.apple.CoreSimulator.SimRuntime.watchOS-3-0",
+      "version" : "3.0",
+      "name" : "watchOS 3.0",
+      "isAvailable" : true
+    },
+    {
+      "identifier" : "com.apple.CoreSimulator.SimRuntime.iOS-9-2",
+      "version" : "9.2",
+      "name" : "iOS 9.2",
+      "isAvailable" : false
+    },
+    {
+      "identifier" : "com.apple.CoreSimulator.SimRuntime.iOS-9-3",
+      "version" : "9.3",
+      "name" : "iOS 9.3",
+      "isAvailable" : false
+    },
+    {
+      "identifier" : "com.apple.CoreSimulator.SimRuntime.tvOS-9-2",
+      "version" : "9.2",
+      "name" : "tvOS 9.2",
+      "isAvailable" : false
+    },
+    {
+      "identifier" : "com.apple.CoreSimulator.SimRuntime.watchOS-2-0",
+      "version" : "2.0",
+      "name" : "watchOS 2.0",
+      "isAvailable" : false
+    },
+    {
+      "identifier" : "com.apple.CoreSimulator.SimRuntime.watchOS-2-1",
+      "version" : "2.1",
+      "name" : "watchOS 2.1",
+      "isAvailable" : false
+    },
+    {
+      "identifier" : "com.apple.CoreSimulator.SimRuntime.watchOS-2-2",
+      "version" : "2.2",
+      "name" : "watchOS 2.2",
+      "isAvailable" : false
+    }
+  ]
+}

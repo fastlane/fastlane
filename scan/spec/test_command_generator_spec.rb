@@ -6,62 +6,12 @@ describe Scan do
   end
 
   before(:each) do
-    @valid_simulators = "== Devices ==
--- iOS 10.0 --
-    iPhone 5 (5FF87891-D7CB-4C65-9F88-701A471223A9) (Shutdown)
-    iPhone 5s (E697990C-3A83-4C01-83D1-C367011B31EE) (Shutdown)
-    iPhone 6 (A35509F5-78A4-4B7D-B199-0F1244A5A7FC) (Shutdown)
-    iPhone 6 Plus (F8E78DE1-F715-46BE-B9FD-4909CC45C05F) (Shutdown)
-    iPhone 6s (021A465B-A294-4D9E-AD07-6BDC8E186343) (Shutdown)
-    iPhone 6s Plus (1891208D-477A-4399-83BE-7D57B176A32B) (Shutdown)
-    iPhone SE (B3D411C0-7FC4-4248-BEB8-7B09668023C8) (Shutdown)
-    iPad Retina (07773A11-417D-4D4C-BC25-1C3444D50836) (Shutdown)
-    iPad Air (2ABEAF08-E480-4617-894F-6BAB587E7963) (Shutdown)
-    iPad Air 2 (DA6C7D10-564B-4563-884D-834EF4F10FB9) (Shutdown)
-    iPad Pro (9.7-inch) (C051C63B-EDF7-4871-860A-BF975B517E94) (Shutdown)
-    iPad Pro (12.9-inch) (EED6BFB4-5DD9-48AB-8573-5172EF6F2A93) (Shutdown)
--- iOS 9.3 --
-    iPhone 4s (238767C4-AF29-4485-878C-7011B98DCB87) (Shutdown)
-    iPhone 5 (B8E05CCB-B97A-41FC-A8A8-2771711690B5) (Shutdown)
-    iPhone 5s (F48E1168-110C-4EC6-805C-6B03A03CAC2D) (Shutdown)
-    iPhone 6 (BD0777BE-32DC-425F-8FC6-10008F7AB814) (Shutdown)
-    iPhone 6 Plus (E9F12F3C-75B9-47D0-998A-02220E1E7E9D) (Shutdown)
-    iPhone 6s (70E1E92F-A292-4980-BC3C-7770C5EEFCFD) (Shutdown)
-    iPhone 6s Plus (A250CEDA-5CCD-4396-B215-19AF6D0B4ADA) (Shutdown)
-    iPad 2 (57344451-50CF-40E1-96FA-DFEFC1107B79) (Shutdown)
-    iPad Retina (AD4384AC-3D47-4B43-B0E2-2020C41D67F5) (Shutdown)
-    iPad Air (DD134998-177F-47DA-99FA-D549D9305476) (Shutdown)
-    iPad Air 2 (9B54C167-21A9-4AD7-97D4-21F2F1D7EAAF) (Shutdown)
-    iPad Pro (61EEEF5C-EA64-47EF-9EED-3075E983FBCD) (Shutdown)
--- iOS 9.0 --
-    iPhone 4s (88975B7F-DE3C-4680-8653-F4212E389E35) (Shutdown)
-    iPhone 5 (9905A018-9DC9-4DD8-BA14-B0B000CC8622) (Shutdown)
-    iPhone 5s (FD90588B-1020-45C5-8EE9-C5CF89A26A22) (Shutdown)
-    iPhone 6 (9A224332-DF90-4A30-BB7B-D0ABFE2A658F) (Shutdown)
-    iPhone 6 Plus (B12E4F8A-00DF-4DFA-AF0F-FCAD6C16CBDE) (Shutdown)
-    iPad 2 (A9B8647B-1C6C-41D5-8B51-B2D0A7FD4549) (Shutdown)
-    iPad Retina (39EAB2A5-FBF8-417C-9578-4C47125E6658) (Shutdown)
-    iPad Air (1D37AF01-FA0A-485A-86CD-A5F26845C528) (Shutdown)
-    iPad Air 2 (90FF95A9-CB0E-4670-B9C4-A9BC6500F4EA) (Shutdown)
--- iOS 8.4 --
-    iPhone 4s (16764BF6-4E85-42CE-9C1E-E5B0185B49BD) (Shutdown)
-    iPhone 5 (6636AA80-6030-468A-8650-479A1A11899A) (Shutdown)
-    iPhone 5s (5E15A2AC-2787-4C8D-8FBA-DF09FD216326) (Shutdown)
-    iPhone 6 (9842E17B-F831-4CEE-BF7A-90EC14A346B7) (Shutdown)
-    iPhone 6 Plus (6B638BF3-773A-4604-BB4A-75C33138C371) (Shutdown)
-    iPad 2 (D15D74A7-338D-4CCC-9FE4-158917220903) (Shutdown)
-    iPad Retina (3482DB34-48FE-4166-9C85-C30042E82DFE) (Shutdown)
-    iPad Air (CF1146F7-9C3C-490A-B41C-38D0674333E6) (Shutdown)
--- tvOS 9.2 --
-    Apple TV 1080p (83C3BAF8-54AD-4403-A688-D0B6E58020AF) (Shutdown)
--- watchOS 2.2 --
-    Apple Watch - 38mm (779DA803-15AF-4E18-86B1-F4BF94547891) (Shutdown)
-    Apple Watch - 42mm (A6371161-FEEA-46E2-9382-0DB41C85FA70) (Shutdown)
-"
     FastlaneCore::Simulator.clear_cache
-    response = "response"
-    allow(response).to receive(:read).and_return(@valid_simulators)
-    allow(Open3).to receive(:popen3).with("xcrun simctl list devices").and_yield(nil, response, nil, nil)
+    devices_json = File.read("./scan/spec/fixtures/SimctlJsonDevices")
+    runtimes_json = File.read("./scan/spec/fixtures/SimctlJsonRuntimes")
+    status = double('status', "success?": true)
+    allow(Open3).to receive(:capture2).with('xcrun simctl list -j devices').and_return([devices_json, status])
+    allow(Open3).to receive(:capture2).with('xcrun simctl list -j runtimes').and_return([runtimes_json, status])
 
     allow(Open3).to receive(:capture3).with("xcrun simctl runtime -h").and_return([nil, 'Usage: simctl runtime <operation> <arguments>', nil])
 
