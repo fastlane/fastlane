@@ -469,7 +469,7 @@ module Spaceship
         req.headers['X-Requested-With'] = 'XMLHttpRequest'
         req.headers['X-Apple-Widget-Key'] = self.itc_service_key
         req.headers['Accept'] = 'application/json, text/javascript'
-        req.headers["Cookie"] = modified_cookie if modified_cookie
+        # req.headers["Cookie"] = modified_cookie if modified_cookie
       end
 
       puts("Received SIRP signin init response: #{response.body}") if Spaceship::Globals.verbose?
@@ -517,13 +517,13 @@ module Spaceship
       hashcash = self.fetch_hashcash
 
       response = request(:post) do |req|
-        req.url("https://idmsa.apple.com/appleauth/auth/signin/complete?isRememberMeEnabled=false")
+        req.url("https://idmsa.apple.com/appleauth/auth/signin/complete")
         req.body = data.to_json
         req.headers['Content-Type'] = 'application/json'
         req.headers['X-Requested-With'] = 'XMLHttpRequest'
         req.headers['X-Apple-Widget-Key'] = self.itc_service_key
         req.headers['Accept'] = 'application/json, text/javascript'
-        req.headers["Cookie"] = modified_cookie if modified_cookie
+        # req.headers["Cookie"] = modified_cookie if modified_cookie
         req.headers["X-Apple-HC"] = hashcash if hashcash
       end
 
@@ -594,6 +594,7 @@ module Spaceship
 
         response = perform_login_method(user, password, modified_cookie)
       rescue UnauthorizedAccessError
+        puts("Received UnauthorizedAccessError(1) with #{response.body}") if Spaceship::Globals.verbose?
         raise InvalidUserCredentialsError.new, "Invalid username and password combination. Used '#{user}' as the username."
       end
 
@@ -601,6 +602,7 @@ module Spaceship
 
       case response.status
       when 403
+        puts("Received UnauthorizedAccessError(2) with #{response.body}") if Spaceship::Globals.verbose?
         raise InvalidUserCredentialsError.new, "Invalid username and password combination. Used '#{user}' as the username."
       when 200
         fetch_olympus_session
@@ -614,6 +616,7 @@ module Spaceship
       else
         if (response.body || "").include?('invalid="true"')
           # User Credentials are wrong
+          puts("Received UnauthorizedAccessError(3) with #{response.body}") if Spaceship::Globals.verbose?
           raise InvalidUserCredentialsError.new, "Invalid username and password combination. Used '#{user}' as the username."
         elsif response.status == 412 && AUTH_TYPES.include?(response.body["authType"])
 
@@ -1070,10 +1073,12 @@ module Spaceship
     def handle_error(response)
       case response.status
       when 401
+        puts("Received 401 with #{response.body}") if Spaceship::Globals.verbose?
         msg = "Auth lost"
         logger.warn(msg)
         raise UnauthorizedAccessError.new, "Unauthorized Access"
       when 403
+        puts("Received 403 with #{response.body}") if Spaceship::Globals.verbose?
         msg = "Access forbidden"
         logger.warn(msg)
         raise AccessForbiddenError.new, msg
