@@ -164,14 +164,19 @@ describe "resign.sh" do
       skip("BSD sed required (macOS only)") unless RUBY_PLATFORM.include?("darwin")
     end
 
-    def run_sed_replacement(input_xml, old_id, new_id)
+    def run_sed_replacement(input_xml, old_id, new_id, old_team_id = "TEAM", new_team_id = "TEAM")
       Dir.mktmpdir do |dir|
         file_path = File.join(dir, "entitlements.plist")
         File.write(file_path, input_xml)
         script = <<~BASH
           OLD_BUNDLE_ID="#{old_id}"
           NEW_BUNDLE_ID="#{new_id}"
-          /usr/bin/sed -i .bak "s!${OLD_BUNDLE_ID}</string>!${NEW_BUNDLE_ID}</string>!g" "#{file_path}"
+          OLD_TEAM_ID="#{old_team_id}"
+          NEW_TEAM_ID="#{new_team_id}"
+          if [ -n "$OLD_TEAM_ID" ] && [ -n "$NEW_TEAM_ID" ]; then
+              /usr/bin/sed -i .bak "s!${OLD_TEAM_ID}\\.${OLD_BUNDLE_ID}</string>!${NEW_TEAM_ID}.${NEW_BUNDLE_ID}</string>!g" "#{file_path}"
+          fi
+          /usr/bin/sed -i .bak "s!<string>${OLD_BUNDLE_ID}</string>!<string>${NEW_BUNDLE_ID}</string>!g" "#{file_path}"
           cat "#{file_path}"
         BASH
         stdout, _, status = run_bash(script)
@@ -182,18 +187,18 @@ describe "resign.sh" do
 
     it "replaces bundle ID before </string> tag" do
       input = "<string>AB1GP98Q19.com.old.app</string>"
-      result = run_sed_replacement(input, "com.old.app", "com.new.app")
+      result = run_sed_replacement(input, "com.old.app", "com.new.app", "AB1GP98Q19", "AB1GP98Q19")
       expect(result.strip).to eq("<string>AB1GP98Q19.com.new.app</string>")
     end
 
     it "replaces multiple occurrences" do
       input = <<~XML
         <string>TEAM.com.old.app</string>
-        <string>group.com.old.app</string>
+        <string>com.old.app</string>
       XML
-      result = run_sed_replacement(input, "com.old.app", "com.new.app")
+      result = run_sed_replacement(input, "com.old.app", "com.new.app", "TEAM", "TEAM")
       expect(result).to include("<string>TEAM.com.new.app</string>")
-      expect(result).to include("<string>group.com.new.app</string>")
+      expect(result).to include("<string>com.new.app</string>")
     end
 
     it "only replaces before </string> tag, not </key>" do
@@ -201,21 +206,21 @@ describe "resign.sh" do
         <key>com.old.app</key>
         <string>TEAM.com.old.app</string>
       XML
-      result = run_sed_replacement(input, "com.old.app", "com.new.app")
+      result = run_sed_replacement(input, "com.old.app", "com.new.app", "TEAM", "TEAM")
       expect(result).to include("<key>com.old.app</key>")
       expect(result).to include("<string>TEAM.com.new.app</string>")
     end
 
     it "preserves team ID prefix" do
       input = "<string>TEAMIDPREF.com.old.app</string>"
-      result = run_sed_replacement(input, "com.old.app", "com.new.app")
+      result = run_sed_replacement(input, "com.old.app", "com.new.app", "TEAMIDPREF", "TEAMIDPREF")
       expect(result.strip).to eq("<string>TEAMIDPREF.com.new.app</string>")
     end
 
-    it "replaces app group entries" do
-      input = "<string>group.com.old.app</string>"
+    it "replaces un-prefixed bundle ID entries" do
+      input = "<string>com.old.app</string>"
       result = run_sed_replacement(input, "com.old.app", "com.new.app")
-      expect(result.strip).to eq("<string>group.com.new.app</string>")
+      expect(result.strip).to eq("<string>com.new.app</string>")
     end
 
     it "does not match partial IDs with extra suffix" do
@@ -223,15 +228,39 @@ describe "resign.sh" do
         <string>TEAM.com.old.app.extra</string>
         <string>TEAM.com.old.app</string>
       XML
-      result = run_sed_replacement(input, "com.old.app", "com.new.app")
+      result = run_sed_replacement(input, "com.old.app", "com.new.app", "TEAM", "TEAM")
       expect(result).to include("<string>TEAM.com.old.app.extra</string>")
       expect(result).to include("<string>TEAM.com.new.app</string>")
     end
 
     it "handles multi-component bundle IDs" do
       input = "<string>TEAM.com.example.my.app</string>"
-      result = run_sed_replacement(input, "com.example.my.app", "com.newco.other.app")
+      result = run_sed_replacement(input, "com.example.my.app", "com.newco.other.app", "TEAM", "TEAM")
       expect(result.strip).to eq("<string>TEAM.com.newco.other.app</string>")
+    end
+
+    it "does not duplicate prefix when new bundle ID has old bundle ID as suffix (issue #30167)" do
+      input = <<~XML
+        <string>NEWTEAM.enterprise.com.old.app</string>
+        <string>OLDTEAM.com.old.app</string>
+        <string>com.old.app</string>
+      XML
+      result = run_sed_replacement(input, "com.old.app", "enterprise.com.old.app", "OLDTEAM", "NEWTEAM")
+      expect(result).to include("<string>NEWTEAM.enterprise.com.old.app</string>")
+      expect(result).not_to include("<string>NEWTEAM.enterprise.enterprise.com.old.app</string>")
+      expect(result).to include("<string>enterprise.com.old.app</string>")
+    end
+
+    it "handles same-team resign with prefixed bundle ID (issue #30167)" do
+      input = <<~XML
+        <string>TEAMID.enterprise.com.old.app</string>
+        <string>TEAMID.com.old.app</string>
+        <string>com.old.app</string>
+      XML
+      result = run_sed_replacement(input, "com.old.app", "enterprise.com.old.app", "TEAMID", "TEAMID")
+      expect(result).to include("<string>TEAMID.enterprise.com.old.app</string>")
+      expect(result).not_to include("<string>TEAMID.enterprise.enterprise.com.old.app</string>")
+      expect(result).to include("<string>enterprise.com.old.app</string>")
     end
   end
 
