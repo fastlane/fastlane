@@ -866,13 +866,20 @@ function resign {
         OLD_BUNDLE_ID="$(PlistBuddy -c "Print :CFBundleIdentifier" "$TEMP_DIR/oldInfo.plist")"
         NEW_BUNDLE_ID="$(bundle_id_for_provision "$NEW_PROVISION")"
         log "Replacing old bundle ID '$OLD_BUNDLE_ID' with new bundle ID '$NEW_BUNDLE_ID' in patched entitlements"
-        # Note: ideally we'd match against the opening <string> tag too, but this isn't possible
-        # because $OLD_BUNDLE_ID and $NEW_BUNDLE_ID do not include the team ID prefix which is
-        # present in the entitlements file.
-        # e.g. <string>AB1GP98Q19.com.example.foo</string>
-        #         vs
-        #      com.example.foo
-        /usr/bin/sed -i .bak "s!${OLD_BUNDLE_ID}</string>!${NEW_BUNDLE_ID}</string>!g" "$PATCHED_ENTITLEMENTS"
+        # Escape dots in OLD only: it is used as a sed regex, where an unescaped '.' matches any char.
+        # NEW appears only in the replacement text, where dots are literal, so it must NOT be escaped.
+        OLD_BUNDLE_ID="${OLD_BUNDLE_ID//./\\.}"
+        # The bundle ID appears in entitlement values as <string>PREFIX.bundleid</string>. We only rewrite
+        # it behind a known prefix so unrelated identifiers stay intact and a substring of the new ID
+        # can't be re-expanded (issue #6331). Recognized prefixes:
+        #   [A-Z0-9]{10}  Apple Team ID  (application-identifier, keychain-access-groups, parent-app-id, ...)
+        #   group         app groups     (com.apple.security.application-groups)
+        #   iCloud        iCloud         (icloud-container-identifiers, ubiquity-kvstore-identifier)
+        # A second pass handles a bare <string>bundleid</string> with no prefix. Identifiers that are NOT
+        # derived from the bundle ID (e.g. merchant.*, pass.*) are intentionally left untouched; add a
+        # prefix here only if a new bundle-ID-bearing entitlement format requires it.
+        /usr/bin/sed -E -i .bak "s!(<string>([A-Z0-9]{10}|group|iCloud))\.${OLD_BUNDLE_ID}</string>!\1.${NEW_BUNDLE_ID}</string>!g" "$PATCHED_ENTITLEMENTS"
+        /usr/bin/sed -i .bak "s!<string>${OLD_BUNDLE_ID}</string>!<string>${NEW_BUNDLE_ID}</string>!g" "$PATCHED_ENTITLEMENTS"
 
         log "Resigning application using certificate: '$CERTIFICATE'"
         log "and patched entitlements:"
