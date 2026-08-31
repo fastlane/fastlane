@@ -19,7 +19,7 @@ module Supply
 
   AVAILABLE_METADATA_FIELDS = %w(title short_description full_description video)
   IMAGES_TYPES = %w(featureGraphic icon tvBanner) # https://developers.google.com/android-publisher/api-ref/rest/v3/AppImageType
-  SCREENSHOT_TYPES = %w(phoneScreenshots sevenInchScreenshots tenInchScreenshots tvScreenshots wearScreenshots)
+  SCREENSHOT_TYPES = %w(phoneScreenshots sevenInchScreenshots tenInchScreenshots tvScreenshots wearScreenshots chromebookScreenshots)
 
   IMAGES_FOLDER_NAME = "images"
   IMAGE_FILE_EXTENSIONS = "{png,jpg,jpeg}"

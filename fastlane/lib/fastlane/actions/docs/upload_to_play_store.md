@@ -145,6 +145,7 @@ You can also supply screenshots by creating directories within the `images` dire
 - `tenInchScreenshots/` (10-inch tablets)
 - `tvScreenshots/`
 - `wearScreenshots/`
+- `chromebookScreenshots/`
 
 You may name images anything you like, but screenshots will appear in the Play Store in alphanumerical filename order.
 Note that these will replace the current images and screenshots on the play store listing, not add to them.

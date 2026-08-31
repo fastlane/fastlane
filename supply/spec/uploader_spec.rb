@@ -710,5 +710,11 @@ describe Supply do
         end
       end
     end
+
+    describe 'Supply::SCREENSHOT_TYPES' do
+      it 'includes chromebookScreenshots' do
+        expect(Supply::SCREENSHOT_TYPES).to include('chromebookScreenshots')
+      end
+    end
   end
 end
