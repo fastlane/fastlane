@@ -52,14 +52,17 @@ describe Spaceship::ConnectAPI::Token do
       expect(token.in_house).to eq(true)
     end
 
-    it 'raises error with invalid JSON' do
+    it 'raises error with invalid JSON without leaking the file contents' do
       file = Tempfile.new('key.json')
-      file.write('abc123')
+      file.write('-----BEGIN PRIVATE KEY-----secret-key-value-----END PRIVATE KEY-----')
       file.close
 
       expect do
         Spaceship::ConnectAPI::Token.from_json_file(file.path)
-      end.to raise_error(JSON::ParserError, /unexpected character: 'abc123' at line 1 column 1/)
+      end.to raise_error do |error|
+        expect(error.message).to eq("Invalid JSON in App Store Connect API key file '#{file.path}'. Expected a JSON file with at least the 'key_id' and 'key' fields.")
+        expect(error.message).not_to include('secret-key-value')
+      end
     end
 
     it 'raises error with missing all keys' do
