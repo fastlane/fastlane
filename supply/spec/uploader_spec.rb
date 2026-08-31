@@ -716,5 +716,33 @@ describe Supply do
         expect(Supply::SCREENSHOT_TYPES).to include('chromebookScreenshots')
       end
     end
+
+    context 'when sync_image_upload is not set' do
+      let(:client) { double('client') }
+      let(:language) { 'en-US' }
+      let(:config) { { metadata_path: 'spec_metadata', sync_image_upload: false } }
+
+      before do
+        Supply.config = config
+        allow(Supply::Client).to receive(:make_from_config).and_return(client)
+      end
+
+      it 'clears and uploads chromebook screenshots when present locally' do
+        chromebook_path = 'spec_metadata/en-US/images/chromebookScreenshots/1.png'
+        allow(Dir).to receive(:glob) do |pattern, *|
+          if pattern.include?('chromebookScreenshots')
+            [chromebook_path]
+          else
+            []
+          end
+        end
+
+        expect(client).to receive(:clear_screenshots).with(image_type: 'chromebookScreenshots', language: language)
+        expect(client).to receive(:upload_image).with(image_path: File.expand_path(chromebook_path), image_type: 'chromebookScreenshots', language: language)
+
+        uploader = Supply::Uploader.new
+        uploader.upload_screenshots(language)
+      end
+    end
   end
 end
