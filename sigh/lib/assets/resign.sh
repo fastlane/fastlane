@@ -670,7 +670,7 @@ function resign {
             OLD_TEAM_ID="$OLD_APP_ID"
         fi
         # New team ID is part of profile entitlements
-        NEW_TEAM_ID=$(PlistBuddy -c "Print com.apple.developer.team-identifier" "$PROFILE_ENTITLEMENTS" 2>/dev/null | grep -E '^[A-Z0-9]*' -o | tr -d '\n')
+        NEW_TEAM_ID=$(PlistBuddy -c "Print :com.apple.developer.team-identifier" "$PROFILE_ENTITLEMENTS" 2>/dev/null | grep -E '^[A-Z0-9]*' -o | tr -d '\n')
         if [ "$NEW_TEAM_ID" == "" ]; then
             NEW_TEAM_ID="$TEAM_IDENTIFIER"
         fi
@@ -880,7 +880,7 @@ function resign {
         # the already-correct values (like <TEAM_ID>.enterprise.com.example.foo) do not have their
         # suffix duplicated.
         if [ -n "$OLD_TEAM_ID" ] && [ -n "$NEW_TEAM_ID" ]; then
-            /usr/bin/sed -i .bak "s!${OLD_TEAM_ID}\.${OLD_BUNDLE_ID}</string>!${NEW_TEAM_ID}.${NEW_BUNDLE_ID}</string>!g" "$PATCHED_ENTITLEMENTS"
+            /usr/bin/sed -i .bak "s!<string>${OLD_TEAM_ID}\.${OLD_BUNDLE_ID}</string>!<string>${NEW_TEAM_ID}.${NEW_BUNDLE_ID}</string>!g" "$PATCHED_ENTITLEMENTS"
         fi
         /usr/bin/sed -i .bak "s!<string>${OLD_BUNDLE_ID}</string>!<string>${NEW_BUNDLE_ID}</string>!g" "$PATCHED_ENTITLEMENTS"
 

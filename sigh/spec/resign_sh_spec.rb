@@ -174,7 +174,7 @@ describe "resign.sh" do
           OLD_TEAM_ID="#{old_team_id}"
           NEW_TEAM_ID="#{new_team_id}"
           if [ -n "$OLD_TEAM_ID" ] && [ -n "$NEW_TEAM_ID" ]; then
-              /usr/bin/sed -i .bak "s!${OLD_TEAM_ID}\\.${OLD_BUNDLE_ID}</string>!${NEW_TEAM_ID}.${NEW_BUNDLE_ID}</string>!g" "#{file_path}"
+              /usr/bin/sed -i .bak "s!<string>${OLD_TEAM_ID}\\.${OLD_BUNDLE_ID}</string>!<string>${NEW_TEAM_ID}.${NEW_BUNDLE_ID}</string>!g" "#{file_path}"
           fi
           /usr/bin/sed -i .bak "s!<string>${OLD_BUNDLE_ID}</string>!<string>${NEW_BUNDLE_ID}</string>!g" "#{file_path}"
           cat "#{file_path}"
