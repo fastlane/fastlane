@@ -173,10 +173,12 @@ describe "resign.sh" do
           NEW_BUNDLE_ID="#{new_id}"
           OLD_TEAM_ID="#{old_team_id}"
           NEW_TEAM_ID="#{new_team_id}"
+          ESCAPED_OLD_BUNDLE_ID="${OLD_BUNDLE_ID//./\\\\.}"
           if [ -n "$OLD_TEAM_ID" ] && [ -n "$NEW_TEAM_ID" ]; then
-              /usr/bin/sed -i .bak "s!<string>${OLD_TEAM_ID}\\.${OLD_BUNDLE_ID}</string>!<string>${NEW_TEAM_ID}.${NEW_BUNDLE_ID}</string>!g" "#{file_path}"
+              /usr/bin/sed -i .bak "s!<string>${OLD_TEAM_ID}\\.${ESCAPED_OLD_BUNDLE_ID}</string>!<string>${NEW_TEAM_ID}.${NEW_BUNDLE_ID}</string>!g" "#{file_path}"
           fi
-          /usr/bin/sed -i .bak "s!<string>${OLD_BUNDLE_ID}</string>!<string>${NEW_BUNDLE_ID}</string>!g" "#{file_path}"
+          /usr/bin/sed -i .bak "s!<string>group\\.${ESCAPED_OLD_BUNDLE_ID}</string>!<string>group.${NEW_BUNDLE_ID}</string>!g" "#{file_path}"
+          /usr/bin/sed -i .bak "s!<string>${ESCAPED_OLD_BUNDLE_ID}</string>!<string>${NEW_BUNDLE_ID}</string>!g" "#{file_path}"
           cat "#{file_path}"
         BASH
         stdout, _, status = run_bash(script)
@@ -194,10 +196,12 @@ describe "resign.sh" do
     it "replaces multiple occurrences" do
       input = <<~XML
         <string>TEAM.com.old.app</string>
+        <string>group.com.old.app</string>
         <string>com.old.app</string>
       XML
       result = run_sed_replacement(input, "com.old.app", "com.new.app", "TEAM", "TEAM")
       expect(result).to include("<string>TEAM.com.new.app</string>")
+      expect(result).to include("<string>group.com.new.app</string>")
       expect(result).to include("<string>com.new.app</string>")
     end
 
@@ -217,6 +221,12 @@ describe "resign.sh" do
       expect(result.strip).to eq("<string>TEAMIDPREF.com.new.app</string>")
     end
 
+    it "replaces app group entries" do
+      input = "<string>group.com.old.app</string>"
+      result = run_sed_replacement(input, "com.old.app", "com.new.app")
+      expect(result.strip).to eq("<string>group.com.new.app</string>")
+    end
+
     it "replaces un-prefixed bundle ID entries" do
       input = "<string>com.old.app</string>"
       result = run_sed_replacement(input, "com.old.app", "com.new.app")
@@ -233,6 +243,12 @@ describe "resign.sh" do
       expect(result).to include("<string>TEAM.com.new.app</string>")
     end
 
+    it "does not match unescaped dots in bundle ID regex" do
+      input = "<string>comXoldXapp</string>"
+      result = run_sed_replacement(input, "com.old.app", "com.new.app")
+      expect(result.strip).to eq("<string>comXoldXapp</string>")
+    end
+
     it "handles multi-component bundle IDs" do
       input = "<string>TEAM.com.example.my.app</string>"
       result = run_sed_replacement(input, "com.example.my.app", "com.newco.other.app", "TEAM", "TEAM")
@@ -243,11 +259,15 @@ describe "resign.sh" do
       input = <<~XML
         <string>NEWTEAM.enterprise.com.old.app</string>
         <string>OLDTEAM.com.old.app</string>
+        <string>group.enterprise.com.old.app</string>
+        <string>group.com.old.app</string>
         <string>com.old.app</string>
       XML
       result = run_sed_replacement(input, "com.old.app", "enterprise.com.old.app", "OLDTEAM", "NEWTEAM")
       expect(result).to include("<string>NEWTEAM.enterprise.com.old.app</string>")
       expect(result).not_to include("<string>NEWTEAM.enterprise.enterprise.com.old.app</string>")
+      expect(result).to include("<string>group.enterprise.com.old.app</string>")
+      expect(result).not_to include("<string>group.enterprise.enterprise.com.old.app</string>")
       expect(result).to include("<string>enterprise.com.old.app</string>")
     end
 
@@ -255,11 +275,15 @@ describe "resign.sh" do
       input = <<~XML
         <string>TEAMID.enterprise.com.old.app</string>
         <string>TEAMID.com.old.app</string>
+        <string>group.enterprise.com.old.app</string>
+        <string>group.com.old.app</string>
         <string>com.old.app</string>
       XML
       result = run_sed_replacement(input, "com.old.app", "enterprise.com.old.app", "TEAMID", "TEAMID")
       expect(result).to include("<string>TEAMID.enterprise.com.old.app</string>")
       expect(result).not_to include("<string>TEAMID.enterprise.enterprise.com.old.app</string>")
+      expect(result).to include("<string>group.enterprise.com.old.app</string>")
+      expect(result).not_to include("<string>group.enterprise.enterprise.com.old.app</string>")
       expect(result).to include("<string>enterprise.com.old.app</string>")
     end
   end

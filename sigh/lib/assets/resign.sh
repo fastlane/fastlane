@@ -875,14 +875,16 @@ function resign {
         OLD_BUNDLE_ID="$(PlistBuddy -c "Print :CFBundleIdentifier" "$TEMP_DIR/oldInfo.plist")"
         NEW_BUNDLE_ID="$(bundle_id_for_provision "$NEW_PROVISION")"
         log "Replacing old bundle ID '$OLD_BUNDLE_ID' with new bundle ID '$NEW_BUNDLE_ID' in patched entitlements"
-        # Anchor the replacement to OLD_TEAM_ID prefix or the opening <string> tag so that
-        # if NEW_BUNDLE_ID contains OLD_BUNDLE_ID as a suffix (e.g. enterprise.com.example.foo),
+        # Anchor the replacement to OLD_TEAM_ID prefix, app group prefix, or the opening <string> tag
+        # so that if NEW_BUNDLE_ID contains OLD_BUNDLE_ID as a suffix (e.g. enterprise.com.example.foo),
         # the already-correct values (like <TEAM_ID>.enterprise.com.example.foo) do not have their
         # suffix duplicated.
+        ESCAPED_OLD_BUNDLE_ID="${OLD_BUNDLE_ID//./\\.}"
         if [ -n "$OLD_TEAM_ID" ] && [ -n "$NEW_TEAM_ID" ]; then
-            /usr/bin/sed -i .bak "s!<string>${OLD_TEAM_ID}\.${OLD_BUNDLE_ID}</string>!<string>${NEW_TEAM_ID}.${NEW_BUNDLE_ID}</string>!g" "$PATCHED_ENTITLEMENTS"
+            /usr/bin/sed -i .bak "s!<string>${OLD_TEAM_ID}\.${ESCAPED_OLD_BUNDLE_ID}</string>!<string>${NEW_TEAM_ID}.${NEW_BUNDLE_ID}</string>!g" "$PATCHED_ENTITLEMENTS"
         fi
-        /usr/bin/sed -i .bak "s!<string>${OLD_BUNDLE_ID}</string>!<string>${NEW_BUNDLE_ID}</string>!g" "$PATCHED_ENTITLEMENTS"
+        /usr/bin/sed -i .bak "s!<string>group\.${ESCAPED_OLD_BUNDLE_ID}</string>!<string>group.${NEW_BUNDLE_ID}</string>!g" "$PATCHED_ENTITLEMENTS"
+        /usr/bin/sed -i .bak "s!<string>${ESCAPED_OLD_BUNDLE_ID}</string>!<string>${NEW_BUNDLE_ID}</string>!g" "$PATCHED_ENTITLEMENTS"
 
         log "Resigning application using certificate: '$CERTIFICATE'"
         log "and patched entitlements:"
