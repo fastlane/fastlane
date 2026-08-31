@@ -14,11 +14,11 @@ gem "danger", "~> 9.0"
 # erb >= 5.0 (pulled in transitively by irb -> rdoc) requires Ruby >= 3.2, while fastlane supports Ruby >= 3.0.
 gem "erb", "< 5.0"
 # A fake filesystem.
-# Version 3.0.2 requires Ruby >=3.2, while fastlane uses a `required_ruby_version` of `>= 3.0`.
+# Version 3.0.2 requires Ruby >=3.2, while fastlane uses a `required_ruby_version` of `>= 3.1`.
 gem "fakefs", ['>= 1.8', '< 3.0.2']
 # Danger 9 pulls in faraday-http-cache; 2.6.0+ requires Ruby 3.2+.
 gem "faraday-http-cache", "< 2.6"
-# Version 2 requires Ruby >=3.2, while fastlane uses a `required_ruby_version` of `>= 3.0`.
+# Version 2 requires Ruby >=3.2, while fastlane uses a `required_ruby_version` of `>= 3.1`.
 gem "git", "< 2"
 # for file uploads with Faraday
 gem "mime-types", ['>= 1.16', '< 4.0']
@@ -39,7 +39,7 @@ gem "pry-byebug"
 gem "pry-rescue"
 # A plugin for pry that enables exploring the call stack.
 gem "pry-stack_explorer"
-# public_suffix >= 7.0 requires Ruby >= 3.2, while fastlane uses a `required_ruby_version` of `>= 3.0`.
+# public_suffix >= 7.0 requires Ruby >= 3.2, while fastlane uses a `required_ruby_version` of `>= 3.1`.
 gem "public_suffix", "< 7.0"
 # A simple task automation tool.
 gem "rake"

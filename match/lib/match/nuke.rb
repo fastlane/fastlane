@@ -341,9 +341,9 @@ module Match
     def filter_profiles_and_files_by_selected_certificates
       # Do profile selection logic
       cert_ids = self.certs.map { |cert| cert.id.to_s }
-      self.profiles = self.profiles.reject do |profile|
+      self.profiles = self.profiles.select do |profile|
         profile_cert_ids = profile.certificates.map { |cert| cert.id.to_s }
-        (cert_ids & profile_cert_ids).empty?
+        cert_ids.intersect?(profile_cert_ids)
       end
 
       profile_uuids = self.profiles.map do |profile|
