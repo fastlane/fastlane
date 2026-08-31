@@ -420,6 +420,14 @@ module Deliver
                                      env_name: "DELIVER_APP_REVIEW_ATTACHMENT_FILE",
                                      description: "Metadata: Path to the app review attachment file",
                                      optional: true),
+        FastlaneCore::ConfigItem.new(key: :routing_app_coverage_file,
+                                     env_name: "DELIVER_ROUTING_APP_COVERAGE_FILE",
+                                     description: "Metadata: Path to the routing app coverage file (`.geojson`) that is required for routing apps",
+                                     optional: true,
+                                     verify_block: proc do |value|
+                                       UI.user_error!("Could not find routing app coverage file at path '#{File.expand_path(value)}'") unless File.exist?(value)
+                                       UI.user_error!("Routing app coverage file must be a .geojson file") unless File.extname(value).casecmp(".geojson").zero?
+                                     end),
         # Localised
         FastlaneCore::ConfigItem.new(key: :description,
                                      description: "Metadata: The localised app description",

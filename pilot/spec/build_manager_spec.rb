@@ -608,6 +608,54 @@ describe "Build Manager" do
     end
   end
 
+  describe "#update_routing_app_coverage" do
+    let(:fake_build_manager) { Pilot::BuildManager.new }
+    let(:fake_app) { double("fake app") }
+    let(:fake_version) { double("fake version") }
+    let(:geojson_path) { "./coverage.geojson" }
+
+    context "without routing_app_coverage_file set" do
+      it "does not touch the routing app coverage on App Store Connect" do
+        expect(fake_build_manager).not_to(receive(:app))
+
+        fake_build_manager.send(:update_routing_app_coverage, {})
+      end
+    end
+
+    context "with routing_app_coverage_file set" do
+      let(:options) { { routing_app_coverage_file: geojson_path } }
+
+      before(:each) do
+        allow(fake_build_manager).to receive(:fetch_app_platform).and_return("ios")
+        allow(fake_build_manager).to receive(:app).and_return(fake_app)
+      end
+
+      it "skips the upload when there is no editable app store version" do
+        expect(fake_app).to receive(:get_edit_app_store_version).with(platform: Spaceship::ConnectAPI::Platform::IOS).and_return(nil)
+
+        fake_build_manager.send(:update_routing_app_coverage, options)
+      end
+
+      it "uploads the file when no coverage exists yet" do
+        expect(fake_app).to receive(:get_edit_app_store_version).with(platform: Spaceship::ConnectAPI::Platform::IOS).and_return(fake_version)
+        expect(fake_version).to receive(:fetch_routing_app_coverage).and_return(nil)
+        expect(fake_version).to receive(:upload_routing_app_coverage).with(path: geojson_path)
+
+        fake_build_manager.send(:update_routing_app_coverage, options)
+      end
+
+      it "replaces an existing coverage file" do
+        routing_app_coverage = double("routing_app_coverage")
+        expect(fake_app).to receive(:get_edit_app_store_version).with(platform: Spaceship::ConnectAPI::Platform::IOS).and_return(fake_version)
+        expect(fake_version).to receive(:fetch_routing_app_coverage).and_return(routing_app_coverage)
+        expect(routing_app_coverage).to receive(:delete!)
+        expect(fake_version).to receive(:upload_routing_app_coverage).with(path: geojson_path)
+
+        fake_build_manager.send(:update_routing_app_coverage, options)
+      end
+    end
+  end
+
   describe "#upload" do
     before(:each) do
       # Prevent class-level Spaceship::ConnectAPI.client state from leaking

@@ -296,6 +296,9 @@ module Pilot
 
       # Handle beta app clip invocations
       update_app_clip_invocations(options: options, build: build)
+
+      # Handle routing app coverage file
+      update_routing_app_coverage(options)
     end
 
     def self.truncate_changelog(changelog)
@@ -678,6 +681,35 @@ module Pilot
           end
         end
       end
+    end
+
+    def update_routing_app_coverage(options)
+      # Skip logic entirely if no coverage file passed. So status-quo stays the same.
+      return unless options[:routing_app_coverage_file]
+
+      # We can only attach a coverage file to build upload - so pick the most recent edit.
+      platform = Spaceship::ConnectAPI::Platform.map(fetch_app_platform)
+      version = app.get_edit_app_store_version(platform: platform)
+      unless version
+        UI.important("Skipping upload of routing app coverage file - could not find an editable app store version")
+        return
+      end
+
+      routing_app_coverage =
+        begin
+          version.fetch_routing_app_coverage
+        rescue => error
+          UI.important("Error fetching routing app coverage - #{error.message}")
+          nil
+        end
+
+      if routing_app_coverage
+        UI.message("Removing previous routing app coverage file from App Store Connect")
+        routing_app_coverage.delete!
+      end
+
+      UI.message("Uploading routing app coverage file to App Store Connect")
+      version.upload_routing_app_coverage(path: options[:routing_app_coverage_file])
     end
   end
   # rubocop:enable Metrics/ClassLength
