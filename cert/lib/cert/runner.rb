@@ -169,7 +169,10 @@ module Cert
           if !Spaceship::ConnectAPI.token.nil?
             raise "As of 2021-11-09, the App Store Connect API does not allow accessing DEVELOPER_ID_INSTALLER with the API Key. Please file an issue on GitHub if this has changed and needs to be updated"
           else
-            return [Spaceship::ConnectAPI::Certificate::CertificateType::DEVELOPER_ID_INSTALLER]
+            return [
+              Spaceship::ConnectAPI::Certificate::CertificateType::DEVELOPER_ID_INSTALLER_G2,
+              Spaceship::ConnectAPI::Certificate::CertificateType::DEVELOPER_ID_INSTALLER
+            ]
           end
         else
           UI.user_error("Unaccepted value for :type - #{Cert.config[:type]}")
