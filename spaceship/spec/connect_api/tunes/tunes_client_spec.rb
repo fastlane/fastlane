@@ -63,6 +63,21 @@ describe Spaceship::ConnectAPI::Tunes::Client do
       end
     end
 
+    describe "availableTerritories" do
+      context 'get_available_territories' do
+        let(:app_id) { "123" }
+        let(:path) { "v2/appAvailabilities" }
+
+        it 'succeeds' do
+          url = "#{path}/#{app_id}/territoryAvailabilities"
+          params = {}
+          req_mock = test_request_params(url, params)
+          expect(client).to receive(:request).with(:get).and_yield(req_mock).and_return(req_mock)
+          client.get_available_territories(app_id: app_id)
+        end
+      end
+    end
+
     describe "appStoreVersionReleaseRequests" do
       context 'post_app_store_version_release_request' do
         let(:path) { "v1/appStoreVersionReleaseRequests" }
