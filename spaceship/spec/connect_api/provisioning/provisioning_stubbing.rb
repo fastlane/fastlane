@@ -106,6 +106,11 @@ class ConnectAPIStubbing
         stub_request(:post, "https://developer.apple.com/services-account/v1/profiles").
           to_return(status: 200, body: read_fixture_file('profiles.json'), headers: { 'Content-Type' => 'application/vnd.api+json' })
       end
+
+      def stub_pass_type_ids
+        stub_request(:post, "https://developer.apple.com/services-account/v1/passTypeIds").
+          to_return(status: 200, body: read_fixture_file('pass_type_ids.json'), headers: { 'Content-Type' => 'application/vnd.api+json' })
+      end
     end
   end
 end
