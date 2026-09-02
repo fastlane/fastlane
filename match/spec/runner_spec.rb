@@ -463,6 +463,62 @@ describe Match do
           # Rely on expectations defined above.
         end
 
+        it "decrypts the working directory again when saving a renewed certificate fails", requires_security: true do
+          # GIVEN
+
+          # Downloaded and decrypted storage location.
+          repo_dir = "./match/spec/fixtures/invalid"
+          #   Invalid cert and key
+          stored_invalid_cert_path = "#{repo_dir}/certs/distribution/F7P4EE896K.cer"
+          stored_invalid_key_path = "#{repo_dir}/certs/distribution/F7P4EE896K.p12"
+
+          #   Valid cert
+          new_stored_valid_cert_path = "./match/spec/fixtures/valid/certs/distribution/E7P4EE896K.cer"
+
+          # match options
+          match_test_options = {
+            renew_expired_certs: true, # Current test suite.
+            skip_provisioning_profiles: true # We test certificate renewal, not profile.
+          }
+          match_config = create_match_config_with_git_storage(extra_values: match_test_options)
+
+          create_fake_cache
+
+          # EXPECTATIONS
+
+          # Storage
+          fake_storage = create_fake_storage(match_config: match_config, repo_dir: repo_dir)
+          # Ensure the immediate upload of the renewed certificate fails.
+          expect(fake_storage).to receive(:save_changes!).and_raise("Couldn't push changes back to git")
+
+          # Encryption
+          # Ensure files are decrypted again even though saving them failed, so the
+          # working directory is never left behind encrypted.
+          fake_encryption = create_fake_encryption(storage: fake_storage, expected_decrypt_count: 2)
+          expect(fake_encryption).to receive(:encrypt_files).and_return(nil)
+
+          # Certificate generator
+          # Ensure a new certificate is generated.
+          expect(Match::Generator).to receive(:generate_certificate).with(match_config, :distribution, fake_storage.working_directory, specific_cert_type: nil).and_return(new_stored_valid_cert_path)
+
+          create_fake_spaceship_ensure
+
+          # Utils
+          # Ensure match validates stored certificate and make it invalid for the current test suite.
+          expect(Match::Utils).to receive(:is_cert_valid?).with(stored_invalid_cert_path).and_return(false)
+
+          # File system
+          begin # Ensure old certificates are removed from the file system.
+            expect(File).to receive(:delete).with(stored_invalid_cert_path).and_return(nil)
+            expect(File).to receive(:delete).with(stored_invalid_key_path).and_return(nil)
+          end
+
+          # WHEN / THEN
+          expect do
+            Match::Runner.new.run(match_config)
+          end.to raise_error("Couldn't push changes back to git")
+        end
+
         it "does not renew an outdated developer_id certificate when authenticated with an App Store Connect API token", requires_security: true do
           # GIVEN
           # `developer_id` certificates can't be renewed with a Connect API token

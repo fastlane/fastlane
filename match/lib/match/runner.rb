@@ -268,10 +268,14 @@ module Match
       return if self.files_to_commit.empty? && self.files_to_delete.empty?
 
       self.encryption.encrypt_files if self.encryption
-      self.storage.save_changes!(files_to_commit: self.files_to_commit,
-                                 files_to_delete: self.files_to_delete,
-                                 clear_working_directory: false)
-      self.encryption.decrypt_files if self.encryption
+      begin
+        self.storage.save_changes!(files_to_commit: self.files_to_commit,
+                                   files_to_delete: self.files_to_delete,
+                                   clear_working_directory: false)
+      ensure
+        # Always hand back a decrypted working directory, 2nd upload will hopefully work.
+        self.encryption.decrypt_files if self.encryption
+      end
 
       # We may have another upload at end (profiles) so reset our cert file(s).
       self.files_to_commit = []
