@@ -179,6 +179,9 @@ public protocol DeliverfileProtocol: AnyObject {
     /// Metadata: Path to the app review attachment file
     var appReviewAttachmentFile: String? { get }
 
+    /// Metadata: Path to the routing app coverage file (`.geojson`) that is required for routing apps
+    var routingAppCoverageFile: String? { get }
+
     /// Metadata: The localised app description
     var description: [String: Any]? { get }
 
@@ -465,6 +468,10 @@ public extension DeliverfileProtocol {
         return nil
     }
 
+    var routingAppCoverageFile: String? {
+        return nil
+    }
+
     var description: [String: Any]? {
         return nil
     }
@@ -532,4 +539,4 @@ public extension DeliverfileProtocol {
 
 // Please don't remove the lines below
 // They are used to detect outdated files
-// FastlaneRunnerAPIVersion [0.9.152]
+// FastlaneRunnerAPIVersion [0.9.153]

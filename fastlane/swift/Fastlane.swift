@@ -702,6 +702,7 @@ public func appledoc(input: [String],
    - appReviewInformation: Metadata: A hash containing the review information
    - appClipReviewInformation: Metadata: A hash containing the app clip review information
    - appReviewAttachmentFile: Metadata: Path to the app review attachment file
+   - routingAppCoverageFile: Metadata: Path to the routing app coverage file (`.geojson`) that is required for routing apps
    - description: Metadata: The localised app description
    - name: Metadata: The localised app name
    - subtitle: Metadata: The localised app subtitle
@@ -785,6 +786,7 @@ public func appstore(apiKeyPath: OptionalConfigValue<String?> = .fastlaneDefault
                      appReviewInformation: OptionalConfigValue<[String: Any]?> = .fastlaneDefault(nil),
                      appClipReviewInformation: OptionalConfigValue<[String: Any]?> = .fastlaneDefault(nil),
                      appReviewAttachmentFile: OptionalConfigValue<String?> = .fastlaneDefault(nil),
+                     routingAppCoverageFile: OptionalConfigValue<String?> = .fastlaneDefault(nil),
                      description: OptionalConfigValue<[String: Any]?> = .fastlaneDefault(nil),
                      name: OptionalConfigValue<[String: Any]?> = .fastlaneDefault(nil),
                      subtitle: OptionalConfigValue<[String: Any]?> = .fastlaneDefault(nil),
@@ -861,6 +863,7 @@ public func appstore(apiKeyPath: OptionalConfigValue<String?> = .fastlaneDefault
     let appReviewInformationArg = appReviewInformation.asRubyArgument(name: "app_review_information", type: nil)
     let appClipReviewInformationArg = appClipReviewInformation.asRubyArgument(name: "app_clip_review_information", type: nil)
     let appReviewAttachmentFileArg = appReviewAttachmentFile.asRubyArgument(name: "app_review_attachment_file", type: nil)
+    let routingAppCoverageFileArg = routingAppCoverageFile.asRubyArgument(name: "routing_app_coverage_file", type: nil)
     let descriptionArg = description.asRubyArgument(name: "description", type: nil)
     let nameArg = name.asRubyArgument(name: "name", type: nil)
     let subtitleArg = subtitle.asRubyArgument(name: "subtitle", type: nil)
@@ -936,6 +939,7 @@ public func appstore(apiKeyPath: OptionalConfigValue<String?> = .fastlaneDefault
                                           appReviewInformationArg,
                                           appClipReviewInformationArg,
                                           appReviewAttachmentFileArg,
+                                          routingAppCoverageFileArg,
                                           descriptionArg,
                                           nameArg,
                                           subtitleArg,
@@ -2848,6 +2852,7 @@ public func cert(development: OptionalConfigValue<Bool> = .fastlaneDefault(false
    - commitsCount: Number of commits to include in changelog, you mustn't use it with :between key at the same time
    - path: Path of the git repository
    - pretty: The format applied to each commit while generating the collected value
+   - matchingPattern: A regexp pattern to filter only the commits matching the pattern
    - dateFormat: The date format applied to each commit while generating the collected value
    - ancestryPath: Whether or not to use ancestry-path param
    - tagMatchPattern: A glob(7) pattern to match against when finding the last git tag
@@ -2865,6 +2870,7 @@ public func cert(development: OptionalConfigValue<Bool> = .fastlaneDefault(false
                                                        commitsCount: OptionalConfigValue<Int?> = .fastlaneDefault(nil),
                                                        path: String = "./",
                                                        pretty: String = "%B",
+                                                       matchingPattern: OptionalConfigValue<String?> = .fastlaneDefault(nil),
                                                        dateFormat: OptionalConfigValue<String?> = .fastlaneDefault(nil),
                                                        ancestryPath: OptionalConfigValue<Bool> = .fastlaneDefault(false),
                                                        tagMatchPattern: OptionalConfigValue<String?> = .fastlaneDefault(nil),
@@ -2878,6 +2884,7 @@ public func cert(development: OptionalConfigValue<Bool> = .fastlaneDefault(false
     let commitsCountArg = commitsCount.asRubyArgument(name: "commits_count", type: nil)
     let pathArg = RubyCommand.Argument(name: "path", value: path, type: nil)
     let prettyArg = RubyCommand.Argument(name: "pretty", value: pretty, type: nil)
+    let matchingPatternArg = matchingPattern.asRubyArgument(name: "matching_pattern", type: nil)
     let dateFormatArg = dateFormat.asRubyArgument(name: "date_format", type: nil)
     let ancestryPathArg = ancestryPath.asRubyArgument(name: "ancestry_path", type: nil)
     let tagMatchPatternArg = tagMatchPattern.asRubyArgument(name: "tag_match_pattern", type: nil)
@@ -2890,6 +2897,7 @@ public func cert(development: OptionalConfigValue<Bool> = .fastlaneDefault(false
                                           commitsCountArg,
                                           pathArg,
                                           prettyArg,
+                                          matchingPatternArg,
                                           dateFormatArg,
                                           ancestryPathArg,
                                           tagMatchPatternArg,
@@ -3865,6 +3873,7 @@ public func deleteKeychain(name: OptionalConfigValue<String?> = .fastlaneDefault
    - appReviewInformation: Metadata: A hash containing the review information
    - appClipReviewInformation: Metadata: A hash containing the app clip review information
    - appReviewAttachmentFile: Metadata: Path to the app review attachment file
+   - routingAppCoverageFile: Metadata: Path to the routing app coverage file (`.geojson`) that is required for routing apps
    - description: Metadata: The localised app description
    - name: Metadata: The localised app name
    - subtitle: Metadata: The localised app subtitle
@@ -3948,6 +3957,7 @@ public func deliver(apiKeyPath: OptionalConfigValue<String?> = .fastlaneDefault(
                     appReviewInformation: OptionalConfigValue<[String: Any]?> = .fastlaneDefault(deliverfile.appReviewInformation),
                     appClipReviewInformation: OptionalConfigValue<[String: Any]?> = .fastlaneDefault(deliverfile.appClipReviewInformation),
                     appReviewAttachmentFile: OptionalConfigValue<String?> = .fastlaneDefault(deliverfile.appReviewAttachmentFile),
+                    routingAppCoverageFile: OptionalConfigValue<String?> = .fastlaneDefault(deliverfile.routingAppCoverageFile),
                     description: OptionalConfigValue<[String: Any]?> = .fastlaneDefault(deliverfile.description),
                     name: OptionalConfigValue<[String: Any]?> = .fastlaneDefault(deliverfile.name),
                     subtitle: OptionalConfigValue<[String: Any]?> = .fastlaneDefault(deliverfile.subtitle),
@@ -4024,6 +4034,7 @@ public func deliver(apiKeyPath: OptionalConfigValue<String?> = .fastlaneDefault(
     let appReviewInformationArg = appReviewInformation.asRubyArgument(name: "app_review_information", type: nil)
     let appClipReviewInformationArg = appClipReviewInformation.asRubyArgument(name: "app_clip_review_information", type: nil)
     let appReviewAttachmentFileArg = appReviewAttachmentFile.asRubyArgument(name: "app_review_attachment_file", type: nil)
+    let routingAppCoverageFileArg = routingAppCoverageFile.asRubyArgument(name: "routing_app_coverage_file", type: nil)
     let descriptionArg = description.asRubyArgument(name: "description", type: nil)
     let nameArg = name.asRubyArgument(name: "name", type: nil)
     let subtitleArg = subtitle.asRubyArgument(name: "subtitle", type: nil)
@@ -4099,6 +4110,7 @@ public func deliver(apiKeyPath: OptionalConfigValue<String?> = .fastlaneDefault(
                                           appReviewInformationArg,
                                           appClipReviewInformationArg,
                                           appReviewAttachmentFileArg,
+                                          routingAppCoverageFileArg,
                                           descriptionArg,
                                           nameArg,
                                           subtitleArg,
@@ -5311,6 +5323,7 @@ public func getManagedPlayStorePublishingRights(jsonKey: OptionalConfigValue<Str
    - platform: Set certificate's platform. Used for creation of production & development certificates. Supported platforms: ios, macos
    - development: Renew the development push certificate instead of the production one
    - websitePush: Create a Website Push certificate
+   - voipPush: Create a VoIP Services certificate
    - generateP12: Generate a p12 file additionally to a PEM file
    - activeDaysLimit: If the current certificate is active for less than this number of days, generate a new one
    - force: Create a new push certificate, even if the current one is active for 30 (or PEM_ACTIVE_DAYS_LIMIT) more days
@@ -5339,6 +5352,7 @@ public func getManagedPlayStorePublishingRights(jsonKey: OptionalConfigValue<Str
 public func getPushCertificate(platform: String = "ios",
                                development: OptionalConfigValue<Bool> = .fastlaneDefault(false),
                                websitePush: OptionalConfigValue<Bool> = .fastlaneDefault(false),
+                               voipPush: OptionalConfigValue<Bool> = .fastlaneDefault(false),
                                generateP12: OptionalConfigValue<Bool> = .fastlaneDefault(true),
                                activeDaysLimit: Int = 30,
                                force: OptionalConfigValue<Bool> = .fastlaneDefault(false),
@@ -5355,6 +5369,7 @@ public func getPushCertificate(platform: String = "ios",
     let platformArg = RubyCommand.Argument(name: "platform", value: platform, type: nil)
     let developmentArg = development.asRubyArgument(name: "development", type: nil)
     let websitePushArg = websitePush.asRubyArgument(name: "website_push", type: nil)
+    let voipPushArg = voipPush.asRubyArgument(name: "voip_push", type: nil)
     let generateP12Arg = generateP12.asRubyArgument(name: "generate_p12", type: nil)
     let activeDaysLimitArg = RubyCommand.Argument(name: "active_days_limit", value: activeDaysLimit, type: nil)
     let forceArg = force.asRubyArgument(name: "force", type: nil)
@@ -5370,6 +5385,7 @@ public func getPushCertificate(platform: String = "ios",
     let array: [RubyCommand.Argument?] = [platformArg,
                                           developmentArg,
                                           websitePushArg,
+                                          voipPushArg,
                                           generateP12Arg,
                                           activeDaysLimitArg,
                                           forceArg,
@@ -6648,7 +6664,7 @@ public func jazzy(config: OptionalConfigValue<String?> = .fastlaneDefault(nil),
 /**
  Return last git commit hash, abbreviated commit hash, commit message and author
 
- - returns: Returns the following dict: {commit_hash: "commit hash", abbreviated_commit_hash: "abbreviated commit hash" author: "Author", author_email: "author email", message: "commit message"}. Example: {:message=>"message", :author=>"author", :author_email=>"author_email", :commit_hash=>"commit_hash", :abbreviated_commit_hash=>"short_hash"}
+ - returns: Returns the following dict: {commit_hash: "commit hash", abbreviated_commit_hash: "abbreviated commit hash" author: "Author", author_email: "author email", message: "commit message"}. Example: {message: "message", author: "author", author_email: "author_email", commit_hash: "commit_hash", abbreviated_commit_hash: "short_hash"}
  */
 @discardableResult public func lastGitCommit() -> [String: String] {
     let args: [RubyCommand.Argument] = []
@@ -7786,6 +7802,7 @@ public func optOutUsage() {
    - platform: Set certificate's platform. Used for creation of production & development certificates. Supported platforms: ios, macos
    - development: Renew the development push certificate instead of the production one
    - websitePush: Create a Website Push certificate
+   - voipPush: Create a VoIP Services certificate
    - generateP12: Generate a p12 file additionally to a PEM file
    - activeDaysLimit: If the current certificate is active for less than this number of days, generate a new one
    - force: Create a new push certificate, even if the current one is active for 30 (or PEM_ACTIVE_DAYS_LIMIT) more days
@@ -7814,6 +7831,7 @@ public func optOutUsage() {
 public func pem(platform: String = "ios",
                 development: OptionalConfigValue<Bool> = .fastlaneDefault(false),
                 websitePush: OptionalConfigValue<Bool> = .fastlaneDefault(false),
+                voipPush: OptionalConfigValue<Bool> = .fastlaneDefault(false),
                 generateP12: OptionalConfigValue<Bool> = .fastlaneDefault(true),
                 activeDaysLimit: Int = 30,
                 force: OptionalConfigValue<Bool> = .fastlaneDefault(false),
@@ -7830,6 +7848,7 @@ public func pem(platform: String = "ios",
     let platformArg = RubyCommand.Argument(name: "platform", value: platform, type: nil)
     let developmentArg = development.asRubyArgument(name: "development", type: nil)
     let websitePushArg = websitePush.asRubyArgument(name: "website_push", type: nil)
+    let voipPushArg = voipPush.asRubyArgument(name: "voip_push", type: nil)
     let generateP12Arg = generateP12.asRubyArgument(name: "generate_p12", type: nil)
     let activeDaysLimitArg = RubyCommand.Argument(name: "active_days_limit", value: activeDaysLimit, type: nil)
     let forceArg = force.asRubyArgument(name: "force", type: nil)
@@ -7845,6 +7864,7 @@ public func pem(platform: String = "ios",
     let array: [RubyCommand.Argument?] = [platformArg,
                                           developmentArg,
                                           websitePushArg,
+                                          voipPushArg,
                                           generateP12Arg,
                                           activeDaysLimitArg,
                                           forceArg,
@@ -7888,6 +7908,7 @@ public func pem(platform: String = "ios",
    - updateBuildInfoOnUpload: **DEPRECATED!** Update build info immediately after validation. This is deprecated and will be removed in a future release. App Store Connect no longer supports setting build info until after build processing has completed, which is when build info is updated by default
    - appClipInvocations: Add beta app clip invocations to your builds in TestFlight
    - overwriteAppClipInvocations: Clear all previous beta app clip invocations before adding new ones
+   - routingAppCoverageFile: Path to the routing app coverage file (`.geojson`) that is required for routing apps. It will be uploaded to the editable App Store version of the app
    - distributeOnly: Distribute a previously uploaded build (equivalent to the `fastlane pilot distribute` command)
    - usesNonExemptEncryption: Provide the 'Uses Non-Exempt Encryption' for export compliance. This is used if there is 'ITSAppUsesNonExemptEncryption' is not set in the Info.plist
    - distributeExternal: Should the build be distributed to external testers? If set to true, use of `groups` option is required
@@ -7934,6 +7955,7 @@ public func pilot(apiKeyPath: OptionalConfigValue<String?> = .fastlaneDefault(ni
                   updateBuildInfoOnUpload: OptionalConfigValue<Bool> = .fastlaneDefault(false),
                   appClipInvocations: OptionalConfigValue<[String]?> = .fastlaneDefault(nil),
                   overwriteAppClipInvocations: OptionalConfigValue<Bool> = .fastlaneDefault(false),
+                  routingAppCoverageFile: OptionalConfigValue<String?> = .fastlaneDefault(nil),
                   distributeOnly: OptionalConfigValue<Bool> = .fastlaneDefault(false),
                   usesNonExemptEncryption: OptionalConfigValue<Bool> = .fastlaneDefault(false),
                   distributeExternal: OptionalConfigValue<Bool> = .fastlaneDefault(false),
@@ -7977,6 +7999,7 @@ public func pilot(apiKeyPath: OptionalConfigValue<String?> = .fastlaneDefault(ni
     let updateBuildInfoOnUploadArg = updateBuildInfoOnUpload.asRubyArgument(name: "update_build_info_on_upload", type: nil)
     let appClipInvocationsArg = appClipInvocations.asRubyArgument(name: "app_clip_invocations", type: nil)
     let overwriteAppClipInvocationsArg = overwriteAppClipInvocations.asRubyArgument(name: "overwrite_app_clip_invocations", type: nil)
+    let routingAppCoverageFileArg = routingAppCoverageFile.asRubyArgument(name: "routing_app_coverage_file", type: nil)
     let distributeOnlyArg = distributeOnly.asRubyArgument(name: "distribute_only", type: nil)
     let usesNonExemptEncryptionArg = usesNonExemptEncryption.asRubyArgument(name: "uses_non_exempt_encryption", type: nil)
     let distributeExternalArg = distributeExternal.asRubyArgument(name: "distribute_external", type: nil)
@@ -8019,6 +8042,7 @@ public func pilot(apiKeyPath: OptionalConfigValue<String?> = .fastlaneDefault(ni
                                           updateBuildInfoOnUploadArg,
                                           appClipInvocationsArg,
                                           overwriteAppClipInvocationsArg,
+                                          routingAppCoverageFileArg,
                                           distributeOnlyArg,
                                           usesNonExemptEncryptionArg,
                                           distributeExternalArg,
@@ -11832,6 +11856,7 @@ public func testfairy(apiKey: String,
    - updateBuildInfoOnUpload: **DEPRECATED!** Update build info immediately after validation. This is deprecated and will be removed in a future release. App Store Connect no longer supports setting build info until after build processing has completed, which is when build info is updated by default
    - appClipInvocations: Add beta app clip invocations to your builds in TestFlight
    - overwriteAppClipInvocations: Clear all previous beta app clip invocations before adding new ones
+   - routingAppCoverageFile: Path to the routing app coverage file (`.geojson`) that is required for routing apps. It will be uploaded to the editable App Store version of the app
    - distributeOnly: Distribute a previously uploaded build (equivalent to the `fastlane pilot distribute` command)
    - usesNonExemptEncryption: Provide the 'Uses Non-Exempt Encryption' for export compliance. This is used if there is 'ITSAppUsesNonExemptEncryption' is not set in the Info.plist
    - distributeExternal: Should the build be distributed to external testers? If set to true, use of `groups` option is required
@@ -11878,6 +11903,7 @@ public func testflight(apiKeyPath: OptionalConfigValue<String?> = .fastlaneDefau
                        updateBuildInfoOnUpload: OptionalConfigValue<Bool> = .fastlaneDefault(false),
                        appClipInvocations: OptionalConfigValue<[String]?> = .fastlaneDefault(nil),
                        overwriteAppClipInvocations: OptionalConfigValue<Bool> = .fastlaneDefault(false),
+                       routingAppCoverageFile: OptionalConfigValue<String?> = .fastlaneDefault(nil),
                        distributeOnly: OptionalConfigValue<Bool> = .fastlaneDefault(false),
                        usesNonExemptEncryption: OptionalConfigValue<Bool> = .fastlaneDefault(false),
                        distributeExternal: OptionalConfigValue<Bool> = .fastlaneDefault(false),
@@ -11921,6 +11947,7 @@ public func testflight(apiKeyPath: OptionalConfigValue<String?> = .fastlaneDefau
     let updateBuildInfoOnUploadArg = updateBuildInfoOnUpload.asRubyArgument(name: "update_build_info_on_upload", type: nil)
     let appClipInvocationsArg = appClipInvocations.asRubyArgument(name: "app_clip_invocations", type: nil)
     let overwriteAppClipInvocationsArg = overwriteAppClipInvocations.asRubyArgument(name: "overwrite_app_clip_invocations", type: nil)
+    let routingAppCoverageFileArg = routingAppCoverageFile.asRubyArgument(name: "routing_app_coverage_file", type: nil)
     let distributeOnlyArg = distributeOnly.asRubyArgument(name: "distribute_only", type: nil)
     let usesNonExemptEncryptionArg = usesNonExemptEncryption.asRubyArgument(name: "uses_non_exempt_encryption", type: nil)
     let distributeExternalArg = distributeExternal.asRubyArgument(name: "distribute_external", type: nil)
@@ -11963,6 +11990,7 @@ public func testflight(apiKeyPath: OptionalConfigValue<String?> = .fastlaneDefau
                                           updateBuildInfoOnUploadArg,
                                           appClipInvocationsArg,
                                           overwriteAppClipInvocationsArg,
+                                          routingAppCoverageFileArg,
                                           distributeOnlyArg,
                                           usesNonExemptEncryptionArg,
                                           distributeExternalArg,
@@ -12844,6 +12872,7 @@ public func uploadSymbolsToSentry(apiHost: String = "https://app.getsentry.com/a
    - appReviewInformation: Metadata: A hash containing the review information
    - appClipReviewInformation: Metadata: A hash containing the app clip review information
    - appReviewAttachmentFile: Metadata: Path to the app review attachment file
+   - routingAppCoverageFile: Metadata: Path to the routing app coverage file (`.geojson`) that is required for routing apps
    - description: Metadata: The localised app description
    - name: Metadata: The localised app name
    - subtitle: Metadata: The localised app subtitle
@@ -12927,6 +12956,7 @@ public func uploadToAppStore(apiKeyPath: OptionalConfigValue<String?> = .fastlan
                              appReviewInformation: OptionalConfigValue<[String: Any]?> = .fastlaneDefault(nil),
                              appClipReviewInformation: OptionalConfigValue<[String: Any]?> = .fastlaneDefault(nil),
                              appReviewAttachmentFile: OptionalConfigValue<String?> = .fastlaneDefault(nil),
+                             routingAppCoverageFile: OptionalConfigValue<String?> = .fastlaneDefault(nil),
                              description: OptionalConfigValue<[String: Any]?> = .fastlaneDefault(nil),
                              name: OptionalConfigValue<[String: Any]?> = .fastlaneDefault(nil),
                              subtitle: OptionalConfigValue<[String: Any]?> = .fastlaneDefault(nil),
@@ -13003,6 +13033,7 @@ public func uploadToAppStore(apiKeyPath: OptionalConfigValue<String?> = .fastlan
     let appReviewInformationArg = appReviewInformation.asRubyArgument(name: "app_review_information", type: nil)
     let appClipReviewInformationArg = appClipReviewInformation.asRubyArgument(name: "app_clip_review_information", type: nil)
     let appReviewAttachmentFileArg = appReviewAttachmentFile.asRubyArgument(name: "app_review_attachment_file", type: nil)
+    let routingAppCoverageFileArg = routingAppCoverageFile.asRubyArgument(name: "routing_app_coverage_file", type: nil)
     let descriptionArg = description.asRubyArgument(name: "description", type: nil)
     let nameArg = name.asRubyArgument(name: "name", type: nil)
     let subtitleArg = subtitle.asRubyArgument(name: "subtitle", type: nil)
@@ -13078,6 +13109,7 @@ public func uploadToAppStore(apiKeyPath: OptionalConfigValue<String?> = .fastlan
                                           appReviewInformationArg,
                                           appClipReviewInformationArg,
                                           appReviewAttachmentFileArg,
+                                          routingAppCoverageFileArg,
                                           descriptionArg,
                                           nameArg,
                                           subtitleArg,
@@ -13353,6 +13385,7 @@ public func uploadToPlayStoreInternalAppSharing(packageName: String,
    - updateBuildInfoOnUpload: **DEPRECATED!** Update build info immediately after validation. This is deprecated and will be removed in a future release. App Store Connect no longer supports setting build info until after build processing has completed, which is when build info is updated by default
    - appClipInvocations: Add beta app clip invocations to your builds in TestFlight
    - overwriteAppClipInvocations: Clear all previous beta app clip invocations before adding new ones
+   - routingAppCoverageFile: Path to the routing app coverage file (`.geojson`) that is required for routing apps. It will be uploaded to the editable App Store version of the app
    - distributeOnly: Distribute a previously uploaded build (equivalent to the `fastlane pilot distribute` command)
    - usesNonExemptEncryption: Provide the 'Uses Non-Exempt Encryption' for export compliance. This is used if there is 'ITSAppUsesNonExemptEncryption' is not set in the Info.plist
    - distributeExternal: Should the build be distributed to external testers? If set to true, use of `groups` option is required
@@ -13399,6 +13432,7 @@ public func uploadToTestflight(apiKeyPath: OptionalConfigValue<String?> = .fastl
                                updateBuildInfoOnUpload: OptionalConfigValue<Bool> = .fastlaneDefault(false),
                                appClipInvocations: OptionalConfigValue<[String]?> = .fastlaneDefault(nil),
                                overwriteAppClipInvocations: OptionalConfigValue<Bool> = .fastlaneDefault(false),
+                               routingAppCoverageFile: OptionalConfigValue<String?> = .fastlaneDefault(nil),
                                distributeOnly: OptionalConfigValue<Bool> = .fastlaneDefault(false),
                                usesNonExemptEncryption: OptionalConfigValue<Bool> = .fastlaneDefault(false),
                                distributeExternal: OptionalConfigValue<Bool> = .fastlaneDefault(false),
@@ -13442,6 +13476,7 @@ public func uploadToTestflight(apiKeyPath: OptionalConfigValue<String?> = .fastl
     let updateBuildInfoOnUploadArg = updateBuildInfoOnUpload.asRubyArgument(name: "update_build_info_on_upload", type: nil)
     let appClipInvocationsArg = appClipInvocations.asRubyArgument(name: "app_clip_invocations", type: nil)
     let overwriteAppClipInvocationsArg = overwriteAppClipInvocations.asRubyArgument(name: "overwrite_app_clip_invocations", type: nil)
+    let routingAppCoverageFileArg = routingAppCoverageFile.asRubyArgument(name: "routing_app_coverage_file", type: nil)
     let distributeOnlyArg = distributeOnly.asRubyArgument(name: "distribute_only", type: nil)
     let usesNonExemptEncryptionArg = usesNonExemptEncryption.asRubyArgument(name: "uses_non_exempt_encryption", type: nil)
     let distributeExternalArg = distributeExternal.asRubyArgument(name: "distribute_external", type: nil)
@@ -13484,6 +13519,7 @@ public func uploadToTestflight(apiKeyPath: OptionalConfigValue<String?> = .fastl
                                           updateBuildInfoOnUploadArg,
                                           appClipInvocationsArg,
                                           overwriteAppClipInvocationsArg,
+                                          routingAppCoverageFileArg,
                                           distributeOnlyArg,
                                           usesNonExemptEncryptionArg,
                                           distributeExternalArg,
@@ -14143,4 +14179,4 @@ public let snapshotfile: Snapshotfile = .init()
 
 // Please don't remove the lines below
 // They are used to detect outdated files
-// FastlaneRunnerAPIVersion [0.9.205]
+// FastlaneRunnerAPIVersion [0.9.206]
