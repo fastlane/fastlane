@@ -292,7 +292,8 @@ lane :create_github_release do |options|
     download_github_release_gem(version: version)
   end
 
-  sh "gem push --key github --host https://rubygems.pkg.github.com/#{github_username} #{gem_path}" unless options[:skip_github_packages]
+  # Unset GEM_HOST_API_KEY as GitHub Action (rubygems/configure-rubygems-credentials) sets it.
+  sh "env -u GEM_HOST_API_KEY gem push --key github --host https://rubygems.pkg.github.com/#{github_username} #{gem_path}" unless options[:skip_github_packages]
 
   sh "gem push #{gem_path}" unless options[:skip_rubygems]
 end
