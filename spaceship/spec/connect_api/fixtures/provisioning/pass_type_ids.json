@@ -1,0 +1,32 @@
+{
+    "data" : [ {
+      "type" : "passTypeIds",
+      "id" : "4B77K434AB",
+      "attributes" : {
+        "identifier" : "pass.com.joshholtz.FastlaneApp",
+        "name" : "Fastlane App Pass"
+      },
+      "links" : {
+        "self" : "https://developer.apple.com:443/services-account/v1/passTypeIds/4B77K434AB"
+      }
+    }, {
+      "type" : "passTypeIds",
+      "id" : "5C88L545BC",
+      "attributes" : {
+        "identifier" : "pass.com.joshholtz.circle.Example",
+        "name" : "Example Pass"
+      },
+      "links" : {
+        "self" : "https://developer.apple.com:443/services-account/v1/passTypeIds/5C88L545BC"
+      }
+    } ],
+    "links" : {
+      "self" : "https://developer.apple.com:443/services-account/v1/passTypeIds"
+    },
+    "meta" : {
+      "paging" : {
+        "total" : 2,
+        "limit" : 200
+      }
+    }
+}

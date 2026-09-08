@@ -151,5 +151,59 @@ describe Cert do
         end
       end
     end
+
+    describe "Pass Type ID certificates" do
+      before do
+        allow(Spaceship::ConnectAPI).to receive(:login).and_return(nil)
+        allow(Spaceship::ConnectAPI).to receive(:client).and_return("client")
+        allow(Spaceship::ConnectAPI.client).to receive(:in_house?).and_return(false)
+
+        options = { type: "pass_type_id", identifier: "pass.com.example.mypass" }
+        Cert.config = FastlaneCore::Configuration.create(Cert::Options.available_options, options)
+      end
+
+      it "requests PASS_TYPE_ID certificates" do
+        expect(Cert::Runner.new.certificate_types).to eq([Spaceship::ConnectAPI::Certificate::CertificateType::PASS_TYPE_ID])
+      end
+
+      it "only considers certificates of the requested pass type identifier" do
+        matching_cert = double(display_name: "pass.com.example.mypass")
+        other_cert = double(display_name: "pass.com.example.otherpass")
+        allow(Spaceship::ConnectAPI::Certificate).to receive(:all).and_return([other_cert, matching_cert])
+
+        expect(Cert::Runner.new.certificates).to eq([matching_cert])
+      end
+
+      it "resolves the pass type id from the identifier" do
+        pass_type = double(identifier: "pass.com.example.mypass", id: "4B77K434AB")
+        allow(Spaceship::ConnectAPI::PassTypeId).to receive(:all).and_return([pass_type])
+
+        expect(Cert::Runner.new.pass_type_id).to eq("4B77K434AB")
+      end
+
+      it "shows an error when the pass type id is not registered on the portal" do
+        allow(Spaceship::ConnectAPI::PassTypeId).to receive(:all).and_return([])
+
+        expect do
+          Cert::Runner.new.pass_type_id
+        end.to raise_error("Couldn't find Pass Type ID 'pass.com.example.mypass' on the Developer Portal")
+      end
+
+      it "requires a identifier when running with type pass_type_id" do
+        Cert.config = FastlaneCore::Configuration.create(Cert::Options.available_options, { type: "pass_type_id" })
+
+        expect do
+          Cert::Runner.new.run
+        end.to raise_error("You need to provide an `identifier` (e.g. 'pass.com.example.mypass') when creating a Pass Type ID certificate")
+      end
+
+      it "requires the identifier to start with 'pass.' when running with type pass_type_id" do
+        Cert.config = FastlaneCore::Configuration.create(Cert::Options.available_options, { type: "pass_type_id", identifier: "com.example.app" })
+
+        expect do
+          Cert::Runner.new.run
+        end.to raise_error("Pass Type ID identifiers need to start with 'pass.' (e.g. 'pass.com.example.mypass'), got: com.example.app")
+      end
+    end
   end
 end

@@ -38,6 +38,25 @@ module Match
 
       update_optional_values_depending_on_storage_type(params)
 
+      if params[:app_identifier].kind_of?(Array)
+        app_identifiers = params[:app_identifier]
+      else
+        app_identifiers = params[:app_identifier].to_s.split(/\s*,\s*/).uniq
+      end
+
+      # sometimes we get an array with arrays, this is a bug. To unblock people using match, I suggest we flatten
+      # then in the future address the root cause of https://github.com/fastlane/fastlane/issues/11324
+      app_identifiers = app_identifiers.flatten.uniq
+
+      # For the 'pass_type_id' type, `app_identifier` holds the Pass Type ID identifier (e.g. 'pass.com.example.mypass')
+      is_pass_type = params[:type] == "pass_type_id"
+      if is_pass_type
+        UI.user_error!("You need to provide the Pass Type ID identifier (e.g. 'pass.com.example.mypass') via the `app_identifier` option when using the 'pass_type_id' type") if app_identifiers.empty?
+        UI.user_error!("Only one Pass Type ID identifier can be synced per `match` run when using the 'pass_type_id' type, but got #{app_identifiers.count}: #{app_identifiers.join(', ')}") if app_identifiers.count > 1
+        invalid_identifiers = app_identifiers.reject { |app_identifier| app_identifier.start_with?("pass.") }
+        UI.user_error!("Pass Type ID identifiers need to start with 'pass.' (e.g. 'pass.com.example.mypass'), got: #{invalid_identifiers.join(', ')}") unless invalid_identifiers.empty?
+      end
+
       # Choose the right storage and encryption implementations
       storage_params = params
       storage_params[:username] = params[:readonly] ? nil : params[:username] # only pass username if not readonly
@@ -61,16 +80,6 @@ module Match
         end
       end
 
-      if params[:app_identifier].kind_of?(Array)
-        app_identifiers = params[:app_identifier]
-      else
-        app_identifiers = params[:app_identifier].to_s.split(/\s*,\s*/).uniq
-      end
-
-      # sometimes we get an array with arrays, this is a bug. To unblock people using match, I suggest we flatten
-      # then in the future address the root cause of https://github.com/fastlane/fastlane/issues/11324
-      app_identifiers = app_identifiers.flatten.uniq
-
       if spaceship
         # Cache bundle ids, certificates, profiles, and devices.
         self.cache = Portal::Cache.build(
@@ -78,14 +87,18 @@ module Match
           bundle_id_identifiers: app_identifiers
         )
 
-        # Verify the App ID (as we don't want 'match' to fail at a later point)
+        # Verify the App ID or Pass Type ID (as we don't want 'match' to fail at a later point)
         app_identifiers.each do |app_identifier|
-          spaceship.bundle_identifier_exists(username: params[:username], app_identifier: app_identifier, cached_bundle_ids: self.cache.bundle_ids)
+          if is_pass_type
+            spaceship.pass_type_id_exists(username: params[:username], pass_type_identifier: app_identifier)
+          else
+            spaceship.bundle_identifier_exists(username: params[:username], app_identifier: app_identifier, cached_bundle_ids: self.cache.bundle_ids)
+          end
         end
       end
 
       # Certificate
-      cert_id = fetch_certificate(params: params, renew_expired_certs: params[:renew_expired_certs])
+      cert_id = fetch_certificate(params: params, renew_expired_certs: params[:renew_expired_certs], identifier: is_pass_type ? app_identifiers.first : nil)
 
       # Mac Installer Distribution Certificate
       additional_cert_types = params[:additional_cert_types] || []
@@ -93,17 +106,21 @@ module Match
         fetch_certificate(params: params, renew_expired_certs: params[:renew_expired_certs], specific_cert_type: additional_cert_type)
       end
 
-      profile_type = Sigh.profile_type_for_distribution_type(
-        platform: params[:platform],
-        distribution_type: params[:type]
-      )
+      unless is_pass_type
+        profile_type = Sigh.profile_type_for_distribution_type(
+          platform: params[:platform],
+          distribution_type: params[:type]
+        )
+      end
 
       cert_ids << cert_id
       spaceship.certificates_exists(username: params[:username], certificate_ids: cert_ids, platform: params[:platform], profile_type: profile_type, cached_certificates: self.cache.certificates) if spaceship
 
       # Provisioning Profiles
 
-      unless params[:skip_provisioning_profiles]
+      if is_pass_type
+        UI.message("Pass Type ID certificates don't use provisioning profiles, skipping profile syncing")
+      elsif !params[:skip_provisioning_profiles]
         app_identifiers.each do |app_identifier|
           loop do
             break if fetch_provisioning_profile(params: params,
@@ -122,8 +139,11 @@ module Match
       end
 
       # Print a summary table for each app_identifier
-      app_identifiers.each do |app_identifier|
-        TablePrinter.print_summary(app_identifier: app_identifier, type: params[:type], platform: params[:platform])
+      # (for pass_type_id there is no provisioning profile to summarize, the certificate info was already printed)
+      unless is_pass_type
+        app_identifiers.each do |app_identifier|
+          TablePrinter.print_summary(app_identifier: app_identifier, type: params[:type], platform: params[:platform])
+        end
       end
 
       UI.success("All required keys, certificates and provisioning profiles are installed 🙌".green)
@@ -156,9 +176,9 @@ module Match
       end
     end
 
-    RENEWABLE_CERT_TYPES_VIA_API = [:mac_installer_distribution, :development, :distribution, :enterprise]
+    RENEWABLE_CERT_TYPES_VIA_API = [:mac_installer_distribution, :development, :distribution, :enterprise, :pass_type_id]
 
-    def fetch_certificate(params: nil, renew_expired_certs: false, specific_cert_type: nil)
+    def fetch_certificate(params: nil, renew_expired_certs: false, specific_cert_type: nil, identifier: nil)
       cert_type = Match.cert_type_sym(specific_cert_type || params[:type])
       certificate_id = specific_cert_type.nil? ? params[:certificate_id] : nil
 
@@ -203,7 +223,7 @@ module Match
       if !storage_has_certs
         UI.important("Couldn't find a valid code signing identity for #{cert_type}... creating one for you now")
         UI.crash!("No code signing identity found and cannot create a new one because you enabled `readonly`") if params[:readonly]
-        cert_path = Generator.generate_certificate(params, cert_type, prefixed_working_directory, specific_cert_type: specific_cert_type)
+        cert_path = Generator.generate_certificate(params, cert_type, prefixed_working_directory, specific_cert_type: specific_cert_type, identifier: identifier)
         private_key_path = cert_path.gsub(".cer", ".p12")
 
         self.files_to_commit << cert_path

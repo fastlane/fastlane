@@ -61,6 +61,20 @@ module Match
       UI.user_error!("Couldn't find bundle identifier '#{app_identifier}' for the user '#{username}'")
     end
 
+    def pass_type_id_exists(username: nil, pass_type_identifier: nil)
+      pass_type_ids = Spaceship::ConnectAPI::PassTypeId.all
+      found = pass_type_ids.any? { |pass_type_id| pass_type_id.identifier == pass_type_identifier }
+      return if found
+
+      UI.error("A Pass Type ID with identifier '#{pass_type_identifier}' needs to exist in order to create a Pass Type ID certificate for it")
+      UI.error("You can register one at https://developer.apple.com/account/resources/identifiers/list/passTypeId")
+      UI.error("================================================================")
+      available_pass_type_ids = pass_type_ids.collect { |p| "#{p.identifier} (#{p.name})" }
+      UI.message("Available Pass Type IDs:\n- #{available_pass_type_ids.join("\n- ")}") unless available_pass_type_ids.empty?
+      UI.error("Make sure to run `fastlane match` with the same user and team every time.")
+      UI.user_error!("Couldn't find Pass Type ID '#{pass_type_identifier}' for the user '#{username}'")
+    end
+
     def certificates_exists(username: nil, certificate_ids: [], platform:, profile_type:, cached_certificates:)
       certificates = cached_certificates
       certificates ||= Match::Portal::Fetcher.certificates(platform: platform, profile_type: profile_type)

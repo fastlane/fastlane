@@ -74,6 +74,7 @@ def before_each_spaceship
   ConnectAPIStubbing::Provisioning.stub_certificates
   ConnectAPIStubbing::Provisioning.stub_devices
   ConnectAPIStubbing::Provisioning.stub_profiles
+  ConnectAPIStubbing::Provisioning.stub_pass_type_ids
 
   ConnectAPIStubbing::TestFlight.stub_apps
   ConnectAPIStubbing::TestFlight.stub_beta_app_localizations
