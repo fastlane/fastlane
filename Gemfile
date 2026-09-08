@@ -69,4 +69,12 @@ gem "yard", "~> 0.9.42"
 
 gemspec(path: ".")
 
+# INTEGRATION TESTING ONLY - revert before merging.
+# Resolve the security gem from main rather than RubyGems: the error handling,
+# the keychain: option and the missing-`security` fix are merged upstream but
+# not yet released.
+gem "security",
+    git: "https://github.com/fastlane-community/security.git",
+    branch: "main"
+
 eval_gemfile("fastlane/Pluginfile")
