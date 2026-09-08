@@ -86,15 +86,16 @@ module Spaceship
 
       def self.create(client: nil, name: nil, profile_type: nil, bundle_id_id: nil, certificate_ids: nil, device_ids: nil, is_offline_profile: false)
         client ||= Spaceship::ConnectAPI
+        attributes = {
+          name: name,
+          profileType: profile_type
+        }
+        attributes[:isOfflineProfile] = true if is_offline_profile
         resp = client.post_profiles(
           bundle_id_id: bundle_id_id,
           certificates: certificate_ids,
           devices: device_ids,
-          attributes: {
-            name: name,
-            profileType: profile_type,
-            isOfflineProfile: is_offline_profile
-          }
+          attributes: attributes
         )
         return resp.to_models.first
       end
