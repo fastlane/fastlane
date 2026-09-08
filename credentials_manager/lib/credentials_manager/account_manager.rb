@@ -50,8 +50,12 @@ module CredentialsManager
       end
 
       unless @password
-        item = Security::InternetPassword.find(server: server_name)
-        @password ||= item.password if item
+        begin
+          item = Security::InternetPassword.find(server: server_name)
+          @password ||= item.password if item
+        rescue Security::Error => ex
+          puts("Could not read the Keychain entry for user '#{user}': #{ex.message}".yellow)
+        end
       end
       ask_for_login while ask_if_missing && @password.to_s.length == 0
       return @password
