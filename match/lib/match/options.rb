@@ -376,7 +376,7 @@ module Match
                                      default_value: false),
         FastlaneCore::ConfigItem.new(key: :offline_profile,
                                      env_name: "MATCH_OFFLINE_PROFILE",
-                                     description: "Enable profile with 'Offline Support' (7 day validity)",
+                                     description: "Enable profile with 'Offline Support' (7 day validity). Requires Apple ID login, not supported with App Store Connect API key authentication",
                                      type: Boolean,
                                      default_value: false),
 

@@ -65,7 +65,7 @@ module Sigh
                                      default_value_dynamic: true),
         FastlaneCore::ConfigItem.new(key: :offline_profile,
                                      env_name: "SIGH_OFFLINE_PROFILE",
-                                     description: "Enable profile with 'Offline Support' (7 day validity)",
+                                     description: "Enable profile with 'Offline Support' (7 day validity). Requires Apple ID login, not supported with App Store Connect API key authentication",
                                      is_string: false,
                                      default_value: false),
 
