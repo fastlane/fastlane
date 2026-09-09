@@ -184,6 +184,16 @@ RSpec.shared_examples("common spaceship login") do |skip_tunes_login|
   let(:password) { 'so_secret' }
 
   before {
-    Spaceship::Tunes.login unless skip_tunes_login
+    unless skip_tunes_login
+      Spaceship::Tunes.login
+
+      # Spaceship::ConnectAPI.client returns a globally held @client when one has
+      # been set, so a client built in an earlier example decides what this one
+      # talks to. Clear it, and log into the portal as well: the implicit client
+      # built in its place only wires up provisioning_request_client when a
+      # cookie, a token or a portal client is present.
+      Spaceship::ConnectAPI.client = nil
+      Spaceship::Portal.login
+    end
   }
 end
