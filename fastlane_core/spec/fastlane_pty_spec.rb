@@ -4,9 +4,15 @@ describe FastlaneCore do
       it 'executes a simple command successfully' do
         @all_lines = []
 
-        exit_status = FastlaneCore::FastlanePty.spawn('echo foo') do |command_stdout, command_stdin, pid|
-          command_stdout.each do |line|
-            @all_lines << line.chomp
+        # Without the workaround this reads back nothing every few thousand runs,
+        # which is #21792 again: a command that exits immediately can leave the
+        # pty with nothing to read. command_executor_spec covers the same path
+        # and sets this for the same reason.
+        exit_status = FastlaneSpec::Env.with_env_values('FASTLANE_EXEC_FLUSH_PTY_WORKAROUND' => '1') do
+          FastlaneCore::FastlanePty.spawn('echo foo') do |command_stdout, command_stdin, pid|
+            command_stdout.each do |line|
+              @all_lines << line.chomp
+            end
           end
         end
         expect(exit_status).to eq(0)
