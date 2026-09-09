@@ -109,7 +109,7 @@ Seven failures are common to all three seeds, so they fail in most orderings and
 
 | Row | Files | Notes |
 | --- | --- | --- |
-| K | `spaceship/spec/connect_api/spaceship_spec.rb:22,32,42,53` | A different file from the `spaceship/spec/spaceship_spec.rb` of row A |
+| K | `spaceship/spec/connect_api/spaceship_spec.rb:22,32,42,53` | **fixed**. The group cleared the three client globals in a `before(:all)`, so the explicit client context assigned `ConnectAPI.client` and the implicit client examples inherited it, doubles included. Cleared per example instead |
 | L | `fastlane_core/spec/project_spec.rb:345,356` | Different lines from the `:453,458,478` that fail locally in any order, so probably genuine rather than environmental |
 | M | `fastlane/spec/ruby_version_warning_spec.rb:10` | |
 

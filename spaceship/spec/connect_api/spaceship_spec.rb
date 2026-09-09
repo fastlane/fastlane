@@ -1,5 +1,10 @@
 describe Spaceship::ConnectAPI do
-  before(:all) do
+  # Per example, not per group: the explicit client context assigns
+  # Spaceship::ConnectAPI.client, and clearing only once at the start of the
+  # group left the implicit client examples inheriting whatever it was set to,
+  # including doubles belonging to an example that had already finished. See
+  # fastlane#30184.
+  before(:each) do
     Spaceship::ConnectAPI.client = nil
     Spaceship::Tunes.client = nil
     Spaceship::Portal.client = nil
