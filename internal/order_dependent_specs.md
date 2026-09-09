@@ -131,8 +131,8 @@ The rest vary by seed, which puts them lower down the ordering space:
 
 | Row | Files | Seen in |
 | --- | --- | --- |
-| N | `fastlane/spec/actions_specs/flock_spec.rb:20` | 2 of 3 |
-| O | `fastlane/spec/actions_specs/xcodebuild_spec.rb:712` | 2 of 3 |
+| N | `fastlane/spec/actions_specs/flock_spec.rb:20` | **fixed**. `FL_FLOCK_MESSAGE` and `FL_FLOCK_TOKEN` were set with raw assignments. They are the options' `env_name`s, so once set, the option is satisfied and the examples asserting it is required stop raising. Scoped with `with_env_values` |
+| O | `fastlane/spec/actions_specs/xcodebuild_spec.rb:712` | **fixed**. Three examples set `XCODE_BUILD_PATH` inline and only two deleted it, and those deletes were in the example body so they were skipped whenever the example failed. Scoped with `with_env_values` |
 | P | `gym/spec/platform_detection_spec.rb:32` | 1 of 3, and fails locally in any order, so check whether it is environmental |
 | Q | `credentials_manager/spec/account_manager_spec.rb:69` | 1 of 3 |
 | R | `fastlane/spec/actions_specs/automatic_code_signing_spec.rb:44` | 1 of 3. This file was fixed for row G, so either an intra group dependency remains inside its pinned scenario, or this is a different failure in the same file |
