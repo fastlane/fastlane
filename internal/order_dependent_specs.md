@@ -14,8 +14,8 @@ Entries stay in the list until the whole suite is stable, not until their own ro
 | D | 4 | 4 | `fastlane/spec/actions_specs/import_from_git_spec.rb` | `FastlaneCore::UI received :important with unexpected arguments`, `expected: 0 times with arguments: (/git checkout/)` | Message expectations that assume the action has not already run and cached in this process | open |
 | E | 2 | 2 | `fastlane_core/spec/command_executor_spec.rb` | `FastlaneCore::Interface::FastlaneError` | Not yet investigated | open |
 | G | 5 | 5 | `fastlane_core/spec/device_manager_spec.rb`, `fastlane/spec/actions_specs/notification_spec.rb`, `fastlane/spec/actions_specs/automatic_code_signing_spec.rb`, `spaceship/spec/two_step_or_factor_client_spec.rb`, `supply/spec/uploader_spec.rb` | assorted | Singles, triaged individually. The supply one looks like a genuine test bug rather than ordering: it calls `all_languages`, which is private | open |
-| H | 1 | 1 | `spaceship/spec/portal/portal_permission_spec.rb` | | Was local only. Appeared on CI for the first time in the run that fixed A, so treat it as probably caused by that change until shown otherwise: making login deterministic everywhere alters the state later specs inherit | open, suspected regression from `b63ab357a` |
-| I | 2 | 0 | `spaceship/spec/portal/certificate_spec.rb` | `WebMock::NetConnectNotAllowedError` on `POST .../certificate/submitCertificateRequest.action` | Missing stub for certificate submission, not a login problem. Previously counted under A because both are blocked requests; the diagnostics separated them | open |
+| H | 1 | 1 | `spaceship/spec/portal/portal_permission_spec.rb` | | Not a regression after all. `spaceship_spec.rb` stamps a client onto model classes through `set_client`, and this spec then reads it instead of the one its own login produced. It only surfaced once row A stopped `spaceship_spec.rb` failing early, so the leak had always been there | **fixed** with row I, 19 to 17 |
+| I | 2 | 0 | `spaceship/spec/portal/certificate_spec.rb` | `WebMock::NetConnectNotAllowedError` on `POST .../certificate/submitCertificateRequest.action` | Same leaked client as row H: the request went out through a client from an earlier example, so the stubs this spec registered did not apply | **fixed** with row H |
 
 ### Update, pinned run at seed 48174
 
@@ -65,6 +65,22 @@ end
 `Spaceship::ConnectAPI` forwards its API methods to whatever that returns, and each client extends the API modules onto itself, so the request clients live on the client instance rather than on the module. Two things therefore decide whether a call works, and both are global. A `@client` set by an earlier example wins outright, whatever this example logged into. Absent that, an implicit client is built from the current tunes and portal clients, and only wires up `provisioning_request_client` when a cookie, token or portal client is present.
 
 That is why neither attempt alone moved the count: touching `.client` built a client and discarded it, and adding the portal login did nothing while a stale `@client` was still being returned. Clearing `@client` and logging into the portal together took the run from 39 failures to 24, removing exactly the 15 in this row and adding none.
+
+### Rows H and I, one cause
+
+`Spaceship::Base` subclasses each hold their own `@client`, stamped on by `set_client` and preferred over `Spaceship::Portal.client`:
+
+```ruby
+def client
+  @client or Spaceship::Portal.client or raise "Please login using ..."
+end
+```
+
+Class level ivars are not inherited, so clearing `PortalBase`'s does nothing for `Spaceship::Certificate`, which is what `method_missing` stamps when a spec calls `Spaceship.certificate`. An example that logs in afresh still gets answered by the client a previous example left on the model class, which is why the error read `User  (Team ID ...)` with an empty user, and why a request went out unstubbed.
+
+Clearing `@client` across the whole `Spaceship::Base` descendant tree in `before_each_spaceship` fixed both rows at once.
+
+Neither was a regression from the row A fix, though H was recorded as a suspected one at the time. Both leaks predated it and were masked because `spaceship_spec.rb` used to fail early on row A and never reached the code that stamps the client. Expect more of this: each fix lets later examples run further, which can expose the next leak.
 
 ## Reading the counts
 

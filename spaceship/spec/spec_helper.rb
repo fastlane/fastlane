@@ -45,8 +45,20 @@ def try_delete(path)
   FileUtils.rm_f(path) if File.exist?(path)
 end
 
+def clear_spaceship_model_clients(klass)
+  klass.instance_variable_set(:@client, nil)
+  klass.subclasses.each { |subclass| clear_spaceship_model_clients(subclass) }
+end
+
 def before_each_spaceship
   @cache_paths.each { |path| try_delete(path) }
+
+  # Spaceship::Base subclasses each hold their own @client, stamped on by
+  # set_client and preferred over Spaceship::Portal.client. Class level ivars are
+  # not inherited, so a client cached on Spaceship::Certificate by one example
+  # keeps answering for later ones even after they log in again. Clear the tree
+  # so each example uses the client its own login produced.
+  clear_spaceship_model_clients(Spaceship::Base)
   ENV["DELIVER_USER"] = "spaceship@krausefx.com"
   ENV["DELIVER_PASSWORD"] = "so_secret"
   ENV['SPACESHIP_AVOID_XCODE_API'] = 'true'
