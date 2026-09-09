@@ -951,6 +951,14 @@ describe "Build Manager" do
   end
 
   describe "#transporter_for_selected_team" do
+    before do
+      # Building an ItunesTransporter looks up an application-specific password in the
+      # keychain before falling back to DELIVER_PASSWORD. Left unstubbed these examples
+      # query the real keychain, so which path they take depends on whoever runs them.
+      # nil is what that lookup returns on a machine with no matching entry.
+      allow(Security::InternetPassword).to receive(:find).and_return(nil)
+    end
+
     let(:fake_manager) { Pilot::BuildManager.new }
     let(:fake_team_api_key_json_path) do
       "./spaceship/spec/connect_api/fixtures/asc_key.json"
