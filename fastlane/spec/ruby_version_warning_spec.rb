@@ -22,6 +22,12 @@ describe Fastlane::CLIToolsDistributor do
         allow(Fastlane::CLIToolsDistributor).to receive(:require).with("fastlane/commands_generator")
         allow(Fastlane::CLIToolsDistributor).to receive(:require).with("tty-spinner")
 
+        # take_off also warns when it finds a Gemfile without bundle exec, and
+        # whether it does depends on the working directory, which other specs
+        # change. The expectations here constrain every call to UI.important, so
+        # that warning fails them. See fastlane#30184.
+        allow(Fastlane::CLIToolsDistributor).to receive(:print_bundle_exec_warning)
+
         allow(Fastlane::CLIToolsDistributor).to receive(:load_dot_env)
         allow(Fastlane::CLIToolsDistributor).to receive(:running_version_command?).and_return(false)
         allow(Fastlane::CLIToolsDistributor).to receive(:running_init_command?).and_return(false)
@@ -51,6 +57,12 @@ describe Fastlane::CLIToolsDistributor do
         allow(Fastlane::CLIToolsDistributor).to receive(:require).with("fastlane/commands_generator")
         allow(Fastlane::CLIToolsDistributor).to receive(:require).with("tty-spinner")
 
+        # take_off also warns when it finds a Gemfile without bundle exec, and
+        # whether it does depends on the working directory, which other specs
+        # change. The expectations here constrain every call to UI.important, so
+        # that warning fails them. See fastlane#30184.
+        allow(Fastlane::CLIToolsDistributor).to receive(:print_bundle_exec_warning)
+
         allow(Fastlane::CLIToolsDistributor).to receive(:load_dot_env)
         allow(Fastlane::CLIToolsDistributor).to receive(:running_version_command?).and_return(false)
         allow(Fastlane::CLIToolsDistributor).to receive(:running_init_command?).and_return(false)
@@ -76,6 +88,12 @@ describe Fastlane::CLIToolsDistributor do
         allow(Fastlane::CLIToolsDistributor).to receive(:require).with("fastlane")
         allow(Fastlane::CLIToolsDistributor).to receive(:require).with("fastlane/commands_generator")
         allow(Fastlane::CLIToolsDistributor).to receive(:require).with("tty-spinner")
+
+        # take_off also warns when it finds a Gemfile without bundle exec, and
+        # whether it does depends on the working directory, which other specs
+        # change. The expectations here constrain every call to UI.important, so
+        # that warning fails them. See fastlane#30184.
+        allow(Fastlane::CLIToolsDistributor).to receive(:print_bundle_exec_warning)
 
         allow(Fastlane::CLIToolsDistributor).to receive(:load_dot_env)
         allow(Fastlane::CLIToolsDistributor).to receive(:running_version_command?).and_return(false)

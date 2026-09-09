@@ -91,6 +91,12 @@ Three ways out were considered. Building a repository per example would be genui
 
 Pinning is the choice for now. It does mean this group no longer contributes evidence of order independence, and it will need revisiting if the suite is ever split across processes, since the group has to stay whole and in order.
 
+### An unfixed leak worth knowing about
+
+Row M was fixed in the spec rather than at its source. Something changes the working directory and does not put it back: seven spec files call `Dir.chdir`, and the repository root contains a Gemfile, which is what made `take_off` print its bundle exec warning. Stubbing that warning makes the spec independent of the working directory, which it should be regardless, but the leak itself is still there and will surface again somewhere else.
+
+Worth finding the culprit and restoring the directory at its source, rather than defending against it one spec at a time.
+
 ## Reading the counts
 
 The failure set changes with the seed. `spaceship/spec` alone gives 17 failures unseeded and 10 on seed 4242, so these totals are a lower bound on the work rather than a total. Measure progress against a fixed seed, then confirm with a couple of others before considering a row closed.
@@ -111,7 +117,7 @@ Seven failures are common to all three seeds, so they fail in most orderings and
 | --- | --- | --- |
 | K | `spaceship/spec/connect_api/spaceship_spec.rb:22,32,42,53` | **fixed**. The group cleared the three client globals in a `before(:all)`, so the explicit client context assigned `ConnectAPI.client` and the implicit client examples inherited it, doubles included. Cleared per example instead |
 | L | `fastlane_core/spec/project_spec.rb:345,356` | **fixed**. `Project.xcode_build_settings_timeout` and `_retries` were set with raw `ENV[...] =` assignments. The group's `before` reset them for examples inside it, so nothing looked wrong, but the values leaked out and later examples saw a timeout of 5 where they expected the default 3. Scoped with `with_env_values` |
-| M | `fastlane/spec/ruby_version_warning_spec.rb:10` | |
+| M | `fastlane/spec/ruby_version_warning_spec.rb:10` | **fixed**, though the underlying leak is elsewhere. `take_off` also warns when it finds a Gemfile and bundle exec was not used, and whether it does depends on the working directory. The expectations here constrain every call to `UI.important`, so that warning failed them. Stubbed, in keeping with the rest of the file, which already mocks most of `take_off`. See the note below on the working directory |
 
 The rest vary by seed, which puts them lower down the ordering space:
 
