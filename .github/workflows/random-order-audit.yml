@@ -1,0 +1,63 @@
+# Runs the suite in a random order, on this branch only.
+#
+# The suite is order dependent today (fastlane#30184): specs leak module level
+# state, so whether a file passes depends on what ran before it. That blocks
+# parallelising the suite, and it is invisible while everything runs in the one
+# order rspec happens to load files in.
+#
+# This job is expected to be red. It exists so the failures are visible and can
+# be worked through, either on this branch or as small separate PRs that merge
+# to master on their own. It is scoped to this branch by name, so merging it
+# never turns it on for master.
+name: Random order audit
+
+on:
+  push:
+    branches: [chore/random_order_audit]
+  workflow_dispatch:
+    inputs:
+      seed:
+        description: "rspec seed, to reproduce a previous run. Leave blank for a new random order."
+        required: false
+        type: string
+
+permissions:
+  contents: read
+
+jobs:
+  random_order:
+    name: "Random order, Xcode 16.4.0, Ruby 3.4"
+    runs-on: macos-15
+    steps:
+      - uses: actions/checkout@v7
+
+      - uses: maxim-lobanov/setup-xcode@v1
+        with:
+          xcode-version: '16.4.0'
+
+      - uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: '3.4'
+          bundler-cache: true
+
+      - name: Increase Open File Limit
+        shell: bash
+        run: ulimit -n 65536
+
+      - name: Run the suite in a random order
+        env:
+          RSPEC_ARGS: "--order random${{ inputs.seed && format(':{0}', inputs.seed) || '' }}"
+        shell: bash
+        run: |
+          echo "RSPEC_ARGS=$RSPEC_ARGS"
+          git config --global user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git config --global user.name "github-actions[bot]"
+          bundle exec fastlane execute_tests
+
+      - name: RSpec report
+        if: always()
+        uses: SonicGarden/rspec-report-action@v8
+        with:
+          json-path: rspec_logs.json
+          comment: 'false'
+          title: '# :game_die: Random order failures'
