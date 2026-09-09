@@ -9,7 +9,7 @@ Entries stay in the list until the whole suite is stable, not until their own ro
 | Row | CI | Local | Files | Symptom | Likely cause | Status |
 | --- | --- | --- | --- | --- | --- | --- |
 | A | 16 | 1 | `spaceship/spec/spaceship_spec.rb` (10), `spaceauth_spec.rb` (6) | `WebMock::NetConnectNotAllowedError` on `POST https://idmsa.apple.com/appleauth/auth/signin/init` | A login ran without the SIRP stub, so a real SRP value was computed and matched none of the recorded request bodies | **fixed** in `b63ab357a`, confirmed at seed 48174: all 16 gone, no `signin/init` request blocked anywhere in the run |
-| B | 15 | 15 | `connect_api/models/`: `device_spec.rb` (8), `certificate_spec.rb` (3), `build_beta_detail_spec.rb`, `beta_build_metric_spec.rb`, `app_store_version_release_request_spec.rb`, `build_delivery_spec.rb` | `TypeError: You need to instantiate this module with provisioning_request_client`, also `test_flight_request_client` and `tunes_request_client` | ConnectAPI sub-clients are module level state that an earlier example instantiates and later ones inherit | open |
+| B | 15 | 15 | `connect_api/models/`: `device_spec.rb` (8), `certificate_spec.rb` (3), `build_beta_detail_spec.rb`, `beta_build_metric_spec.rb`, `app_store_version_release_request_spec.rb`, `build_delivery_spec.rb` | `TypeError: You need to instantiate this module with provisioning_request_client`, also `test_flight_request_client` and `tunes_request_client` | ConnectAPI sub-clients are module level state that an earlier example instantiates and later ones inherit | open, two attempts failed, see below |
 | C | 5 | 5 | `frameit/spec/editor_spec.rb` | `undefined method '[]' for nil` at `frameit/lib/frameit/screenshot.rb:45` | Something another spec's setup populates is nil here | open |
 | D | 4 | 4 | `fastlane/spec/actions_specs/import_from_git_spec.rb` | `FastlaneCore::UI received :important with unexpected arguments`, `expected: 0 times with arguments: (/git checkout/)` | Message expectations that assume the action has not already run and cached in this process | open |
 | E | 2 | 2 | `fastlane_core/spec/command_executor_spec.rb` | `FastlaneCore::Interface::FastlaneError` | Not yet investigated | open |
@@ -34,6 +34,26 @@ That run also totalled 62 failures against 48 at seed 48174. The seeds differ, s
 The diagnostics were wrong in their first form and reported `SRP value was the stubbed one: false` for a request that was not a login at all. The constant is hex and the request body carries its base64, so the comparison could never be true. Fixed to compare the base64 and to only make the claim for `signin/init` requests.
 
 A and B were 30 of the 48 and share a cause: module level singletons in spaceship outliving the example that created them. The obvious remedy does not work. Adding an `after(:each)` that nils `Spaceship::Tunes.client`, `Portal.client` and `ConnectAPI.client` took `spaceship/spec` from 10 failures to 13 on a fixed seed, so some specs rely on the client persisting.
+
+### Row B, what has been ruled out
+
+Two attempts, both measured on the full local run at seed 48174, both leaving the count at 39 with an identical failure set. Neither is committed.
+
+1. Calling `Spaceship::ConnectAPI.client` in the `common spaceship login` before hook, so that constructing a client sets the module ivars. No effect.
+2. Adding `Spaceship::Portal.login` alongside it. Also no effect.
+
+The reason the first attempt could not have worked is worth keeping. `ConnectAPI::Client#set_individual_clients` only assigns the provisioning client behind a guard:
+
+```ruby
+if cookie || token || portal_client
+  self.provisioning_request_client = ...
+```
+
+`common spaceship login` logs into tunes only, so the implicit client is built with `portal_client: nil` and that branch never runs. The same guard shape applies to `tunes_request_client` and `test_flight_request_client`, which is consistent with all three appearing in the failures.
+
+Why the second attempt also failed is not yet understood, and that is the thing to resolve before trying anything else. `set_individual_clients` assigns with `self.provisioning_request_client =` where `self` is a `ConnectAPI::Client` instance, while the failing read happens on the `Spaceship::ConnectAPI` module, reached through `client ||= Spaceship::ConnectAPI` in `Device.all`. Those appear to be different objects. Until it is clear how the ivar ever reaches the module in a passing run, any further fix is guesswork.
+
+The failure is confirmed genuine rather than a stale diagnosis: `TypeError` raised from `provisioning.rb:17` via `get_devices`, `Device.all`, `Device.find_by_udid`, `Device.modify`, `Device.disable`.
 
 ## Reading the counts
 
