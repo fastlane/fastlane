@@ -17,6 +17,14 @@ unless ENV["DEBUG"]
   $stdout = File.open(fastlane_tests_tmpdir, "w")
 end
 
+# FastlaneCore::Shell prints "Logging disabled while running tests" the first
+# time anything touches the logger, and memoises it, so whichever example gets
+# there first absorbs the banner. An example asserting on its own stdout then
+# fails or passes depending on what ran before it. Emit it here instead, while
+# stdout is the redirect above rather than an example's capture. See
+# fastlane#30184.
+FastlaneCore::UI.ui_object.log
+
 if FastlaneCore::Helper.mac?
   xcode_path = FastlaneCore::Helper.xcode_path
   unless xcode_path.include?("Contents/Developer")

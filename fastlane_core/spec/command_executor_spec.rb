@@ -1,3 +1,10 @@
+# FastlanePty requires this lazily, inside spawn_with_pty, so examples below that
+# reference the PTY constant only find it when something has already run a pty
+# backed command in this process. Require it here so they do not depend on that.
+# Guarded because pty is not available on Windows, where those examples are
+# skipped anyway. See fastlane#30184.
+require 'pty' unless FastlaneCore::Helper.windows?
+
 describe FastlaneCore do
   describe FastlaneCore::CommandExecutor do
     describe "execute" do
