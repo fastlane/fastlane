@@ -95,6 +95,36 @@ Pinning is the choice for now. It does mean this group no longer contributes evi
 
 The failure set changes with the seed. `spaceship/spec` alone gives 17 failures unseeded and 10 on seed 4242, so these totals are a lower bound on the work rather than a total. Measure progress against a fixed seed, then confirm with a couple of others before considering a row closed.
 
+## Second batch, found after seed 48174 went green
+
+Unpinning the seed immediately found more. Three runs, three seeds, all red, while the subset job passed on all three: everything below is outside the seventeen files this manifest already tracked.
+
+| Seed | Failures |
+| --- | --- |
+| 1150 | 9 |
+| 21323 | 8 |
+| 40083 | 11 |
+
+Seven failures are common to all three seeds, so they fail in most orderings and seed 48174 was simply lucky for them:
+
+| Row | Files | Notes |
+| --- | --- | --- |
+| K | `spaceship/spec/connect_api/spaceship_spec.rb:22,32,42,53` | A different file from the `spaceship/spec/spaceship_spec.rb` of row A |
+| L | `fastlane_core/spec/project_spec.rb:345,356` | Different lines from the `:453,458,478` that fail locally in any order, so probably genuine rather than environmental |
+| M | `fastlane/spec/ruby_version_warning_spec.rb:10` | |
+
+The rest vary by seed, which puts them lower down the ordering space:
+
+| Row | Files | Seen in |
+| --- | --- | --- |
+| N | `fastlane/spec/actions_specs/flock_spec.rb:20` | 2 of 3 |
+| O | `fastlane/spec/actions_specs/xcodebuild_spec.rb:712` | 2 of 3 |
+| P | `gym/spec/platform_detection_spec.rb:32` | 1 of 3, and fails locally in any order, so check whether it is environmental |
+| Q | `credentials_manager/spec/account_manager_spec.rb:69` | 1 of 3 |
+| R | `fastlane/spec/actions_specs/automatic_code_signing_spec.rb:44` | 1 of 3. This file was fixed for row G, so either an intra group dependency remains inside its pinned scenario, or this is a different failure in the same file |
+
+Seed 1150 reproduces every one of the seven common failures and is pinned in the workflow while these are worked through. Seeds 21323 and 40083 are recorded so the fixes can be validated against orderings other than the one they were developed on.
+
 ## The list
 
 Everything identified so far, from CI or locally. `rake test_order_dependent` reads the paths from this block.

@@ -46,12 +46,13 @@ jobs:
 
       - name: Run the suite in a random order
         env:
-          # Unpinned now that seed 48174 is green, so every run samples a new
-          # ordering. It was pinned while failures were being worked through,
-          # because with a fresh order each time a change in the count says
-          # nothing about whether a fix worked. Pass a seed through
-          # workflow_dispatch to reproduce a specific red run.
-          RSPEC_ARGS: "--order random${{ inputs.seed && format(':{0}', inputs.seed) || '' }}"
+          # Pinned again while a second batch of failures is worked through.
+          # Unpinning after seed 48174 went green immediately found more: seeds
+          # 1150, 21323 and 40083 each fail, with seven failures common to all
+          # three. Pinned so successive runs are comparable, since with a fresh
+          # order each time a change in the count says nothing about whether a
+          # fix worked. Unpin again once this seed is green.
+          RSPEC_ARGS: "--order random:${{ inputs.seed || '1150' }}"
         shell: bash
         run: |
           echo "RSPEC_ARGS=$RSPEC_ARGS"
