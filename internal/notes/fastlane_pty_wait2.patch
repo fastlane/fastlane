@@ -1,0 +1,43 @@
+diff --git a/fastlane_core/lib/fastlane_core/fastlane_pty.rb b/fastlane_core/lib/fastlane_core/fastlane_pty.rb
+index 05af8c3e4..4d92b4543 100644
+--- a/fastlane_core/lib/fastlane_core/fastlane_pty.rb
++++ b/fastlane_core/lib/fastlane_core/fastlane_pty.rb
+@@ -30,6 +30,7 @@ module FastlaneCore
+       require 'pty'
+       # this forces the PTY flush - fixes #21792
+       command = ENV['FASTLANE_EXEC_FLUSH_PTY_WORKAROUND'] ? "#{original_command};" : original_command
++      status = nil
+       PTY.spawn(command) do |command_stdout, command_stdin, pid|
+         begin
+           yield(command_stdout, command_stdin, pid)
+@@ -42,20 +43,25 @@ module FastlaneCore
+           command_stdin.close
+           command_stdout.close
+           begin
+-            Process.wait(pid)
++            # wait2 hands back the status directly. Reading $? instead would mean
++            # carrying it out of here as a thread global, and it is only written
++            # when the wait actually happens: if the child was already reaped, or
++            # a caller stubbed the wait, $? still holds the status of whatever
++            # this thread ran last, and this command reports that instead.
++            _reaped_pid, status = Process.wait2(pid)
+           rescue Errno::ECHILD, PTY::ChildExited
+-            # The process might have exited.
++            # The process might have exited and been reaped already.
+           end
+         end
+       end
+-      status = self.process_status
++      status ||= self.process_status
+       raise StandardError, "Process crashed" if status.signaled?
+       status.exitstatus
+     rescue StandardError => e
+       # Wrapping any error in FastlanePtyError to allow callers to see and use
+       # $?.exitstatus that would usually get returned
+-      status = self.process_status
+-      raise FastlanePtyError.new(e, status.exitstatus || e.exit_status, status)
++      status ||= self.process_status
++      raise FastlanePtyError.new(e, status&.exitstatus || e.exit_status, status)
+     end
+ 
+     def self.spawn_with_popen(command, &block)
