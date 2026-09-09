@@ -344,6 +344,36 @@ module Spaceship
       end
     end
 
+    def merchant_domains(merchant_id, mac: false)
+      r = request(:post, "account/#{platform_slug(mac)}/identifiers/listDomainsForMerchant", {
+        merchantId: merchant_id,
+        teamId: team_id
+      })
+      parse_response(r, 'domainList')
+    end
+
+    def create_merchant_domain!(merchant_id, domain_name, mac: false)
+      ensure_csrf(Spaceship::Portal::Merchant)
+
+      r = request(:post, "account/#{platform_slug(mac)}/identifiers/registerDomain", {
+        domainName: domain_name,
+        merchantId: merchant_id,
+        teamId: team_id
+      })
+      parse_response(r, 'domainList').first
+    end
+
+    def delete_merchant_domain!(domain_id, merchant_id, mac: false)
+      ensure_csrf(Spaceship::Portal::Merchant)
+
+      r = request(:post, "account/#{platform_slug(mac)}/identifiers/removeDomain", {
+        merchantId: merchant_id,
+        domainId: domain_id,
+        teamId: team_id
+      })
+      parse_response(r)
+    end
+
     def create_merchant!(name, bundle_id, mac: false)
       ensure_csrf(Spaceship::Portal::Merchant)
 
