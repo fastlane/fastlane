@@ -110,7 +110,7 @@ Seven failures are common to all three seeds, so they fail in most orderings and
 | Row | Files | Notes |
 | --- | --- | --- |
 | K | `spaceship/spec/connect_api/spaceship_spec.rb:22,32,42,53` | **fixed**. The group cleared the three client globals in a `before(:all)`, so the explicit client context assigned `ConnectAPI.client` and the implicit client examples inherited it, doubles included. Cleared per example instead |
-| L | `fastlane_core/spec/project_spec.rb:345,356` | Different lines from the `:453,458,478` that fail locally in any order, so probably genuine rather than environmental |
+| L | `fastlane_core/spec/project_spec.rb:345,356` | **fixed**. `Project.xcode_build_settings_timeout` and `_retries` were set with raw `ENV[...] =` assignments. The group's `before` reset them for examples inside it, so nothing looked wrong, but the values leaked out and later examples saw a timeout of 5 where they expected the default 3. Scoped with `with_env_values` |
 | M | `fastlane/spec/ruby_version_warning_spec.rb:10` | |
 
 The rest vary by seed, which puts them lower down the ordering space:

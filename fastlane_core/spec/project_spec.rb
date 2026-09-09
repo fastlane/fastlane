@@ -398,45 +398,55 @@ describe FastlaneCore do
       end
     end
 
+    # Scoped rather than assigned: a raw assignment here leaked out of the group
+    # and changed what later examples saw, since the before below only reset it
+    # for examples inside it. See fastlane#30184.
     describe 'Project.xcode_build_settings_timeout' do
-      before do
-        ENV['FASTLANE_XCODEBUILD_SETTINGS_TIMEOUT'] = nil
-      end
       it "returns default value" do
-        expect(FastlaneCore::Project.xcode_build_settings_timeout).to eq(3)
+        FastlaneSpec::Env.with_env_values('FASTLANE_XCODEBUILD_SETTINGS_TIMEOUT' => nil) do
+          expect(FastlaneCore::Project.xcode_build_settings_timeout).to eq(3)
+        end
       end
       it "returns specified value" do
-        ENV['FASTLANE_XCODEBUILD_SETTINGS_TIMEOUT'] = '5'
-        expect(FastlaneCore::Project.xcode_build_settings_timeout).to eq(5)
+        FastlaneSpec::Env.with_env_values('FASTLANE_XCODEBUILD_SETTINGS_TIMEOUT' => '5') do
+          expect(FastlaneCore::Project.xcode_build_settings_timeout).to eq(5)
+        end
       end
       it "returns 0 if empty" do
-        ENV['FASTLANE_XCODEBUILD_SETTINGS_TIMEOUT'] = ''
-        expect(FastlaneCore::Project.xcode_build_settings_timeout).to eq(0)
+        FastlaneSpec::Env.with_env_values('FASTLANE_XCODEBUILD_SETTINGS_TIMEOUT' => '') do
+          expect(FastlaneCore::Project.xcode_build_settings_timeout).to eq(0)
+        end
       end
       it "returns 0 if garbage" do
-        ENV['FASTLANE_XCODEBUILD_SETTINGS_TIMEOUT'] = 'hiho'
-        expect(FastlaneCore::Project.xcode_build_settings_timeout).to eq(0)
+        FastlaneSpec::Env.with_env_values('FASTLANE_XCODEBUILD_SETTINGS_TIMEOUT' => 'hiho') do
+          expect(FastlaneCore::Project.xcode_build_settings_timeout).to eq(0)
+        end
       end
     end
 
+    # Scoped rather than assigned: a raw assignment here leaked out of the group
+    # and changed what later examples saw, since the before below only reset it
+    # for examples inside it. See fastlane#30184.
     describe 'Project.xcode_build_settings_retries' do
-      before do
-        ENV['FASTLANE_XCODEBUILD_SETTINGS_RETRIES'] = nil
-      end
       it "returns default value" do
-        expect(FastlaneCore::Project.xcode_build_settings_retries).to eq(3)
+        FastlaneSpec::Env.with_env_values('FASTLANE_XCODEBUILD_SETTINGS_RETRIES' => nil) do
+          expect(FastlaneCore::Project.xcode_build_settings_retries).to eq(3)
+        end
       end
       it "returns specified value" do
-        ENV['FASTLANE_XCODEBUILD_SETTINGS_RETRIES'] = '5'
-        expect(FastlaneCore::Project.xcode_build_settings_retries).to eq(5)
+        FastlaneSpec::Env.with_env_values('FASTLANE_XCODEBUILD_SETTINGS_RETRIES' => '5') do
+          expect(FastlaneCore::Project.xcode_build_settings_retries).to eq(5)
+        end
       end
       it "returns 0 if empty" do
-        ENV['FASTLANE_XCODEBUILD_SETTINGS_RETRIES'] = ''
-        expect(FastlaneCore::Project.xcode_build_settings_retries).to eq(0)
+        FastlaneSpec::Env.with_env_values('FASTLANE_XCODEBUILD_SETTINGS_RETRIES' => '') do
+          expect(FastlaneCore::Project.xcode_build_settings_retries).to eq(0)
+        end
       end
       it "returns 0 if garbage" do
-        ENV['FASTLANE_XCODEBUILD_SETTINGS_RETRIES'] = 'hiho'
-        expect(FastlaneCore::Project.xcode_build_settings_retries).to eq(0)
+        FastlaneSpec::Env.with_env_values('FASTLANE_XCODEBUILD_SETTINGS_RETRIES' => 'hiho') do
+          expect(FastlaneCore::Project.xcode_build_settings_retries).to eq(0)
+        end
       end
     end
 
