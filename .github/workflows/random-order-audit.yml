@@ -61,3 +61,31 @@ jobs:
           json-path: rspec_logs.json
           comment: 'false'
           title: '# :game_die: Random order failures'
+
+  order_dependent_subset:
+    name: "Known order dependent specs, random order"
+    runs-on: macos-15
+    steps:
+      - uses: actions/checkout@v7
+
+      - uses: maxim-lobanov/setup-xcode@v1
+        with:
+          xcode-version: '16.4.0'
+
+      - uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: '3.4'
+          bundler-cache: true
+
+      - name: Increase Open File Limit
+        shell: bash
+        run: ulimit -n 65536
+
+      # Runs only the files in internal/order_dependent_specs.md. A smaller set
+      # means a different ordering, so this samples contexts the full run never
+      # produces, and it finishes in a fraction of the time. It is a sampler and
+      # not a gate: green here does not mean the suite is order independent.
+      # No seed is pinned on purpose, so each run is a fresh sample.
+      - name: Run the known order dependent specs
+        shell: bash
+        run: bundle exec rake test_order_dependent
