@@ -1,4 +1,20 @@
 require 'plist'
+require 'fastlane-sirp'
+
+# The login stubs in tunes/tunes_stubbing.rb match on an exact request body that
+# embeds this SRP public ephemeral. SIRP generates a fresh random one per client,
+# so it has to be stubbed for those bodies to match. Every spaceship spec needs
+# it, not only the ones using the "common spaceship login" shared example: a spec
+# that reaches a login without it computes a real value, matches no stub, and
+# fails with WebMock::NetConnectNotAllowedError depending on what ran first.
+SPACESHIP_AUTHENTICATION_DATA =
+  '8f30ce83b660f03abb0f8570c235e0e1e1d3860a222304acf18e989bdc065dc922a141e6da4563f0' \
+  '5586605b0e10535d875ca7e0fae7fe100cfe533374f29aaa803cdfb2c6194f458485e87f76988f6' \
+  'cddaa1829309438e1aa9ab652b17cfc081fff40356cb3af35c621e9f37ba6e2a03e6abac5a6bfe' \
+  '18ddb489412b7c56355292e6c355f8859270d04063b843d23c1ef7503c3c5dd2c56740101a3ef5' \
+  'bfec6bff1e6dc55e3f70840a83a95d7b3d20ab350d0472809ce87a4e3c29ed9685eb7721dc87ba' \
+  'bfadbd9e65e75d5df55547bcff98711ddeae7b8e1e6dbf529e96f7caa4b830b43575cddc52cebc' \
+  '39f9522f85cbf33ac35ee59f66f48109c12fbb78d'
 
 require_relative 'client_stubbing'
 require_relative 'connect_api/provisioning/provisioning_stubbing'
@@ -104,6 +120,34 @@ def after_each_spaceship
 end
 
 RSpec.configure do |config|
+  config.before(:each) do |current_test|
+    next unless current_test.id.start_with?("./spaceship/")
+
+    allow_any_instance_of(SIRP::Client).to receive(:start_authentication).and_return(SPACESHIP_AUTHENTICATION_DATA)
+    allow_any_instance_of(SIRP::Client).to receive(:process_challenge).and_return("1234")
+  end
+
+  # Diagnostics for fastlane#30184. A login that escapes the stubs above computes
+  # a real SRP value, matches none of the recorded request bodies, and is blocked
+  # by WebMock. That reproduces on CI but not on every machine, so report what the
+  # client state was when it happened rather than guessing from the message.
+  config.after(:each) do |current_test|
+    next unless current_test.id.start_with?("./spaceship/")
+
+    exception = current_test.exception
+    next unless exception.is_a?(WebMock::NetConnectNotAllowedError)
+
+    stubbed = exception.message.include?(SPACESHIP_AUTHENTICATION_DATA)
+    warn(<<~DIAGNOSTICS)
+      [30184] blocked request in #{current_test.id}
+      [30184]   SRP value was the stubbed one: #{stubbed}
+      [30184]   Spaceship::Tunes.client:      #{Spaceship::Tunes.client.class}
+      [30184]   Spaceship::Portal.client:     #{Spaceship::Portal.client.class}
+      [30184]   Spaceship::ConnectAPI.client: #{Spaceship::ConnectAPI.instance_variable_get(:@client).class}
+      [30184]   FASTLANE_SESSION set: #{!ENV['FASTLANE_SESSION'].nil?}
+    DIAGNOSTICS
+  end
+
   def mock_client_response(method_name, with: anything)
     mock_method = allow(mock_client).to receive(method_name)
     mock_method = mock_method.with(with)
@@ -116,7 +160,6 @@ RSpec.configure do |config|
 end
 
 RSpec.shared_examples("common spaceship login") do |skip_tunes_login|
-  require 'fastlane-sirp'
   let(:authentication_data) {
     '8f30ce83b660f03abb0f8570c235e0e1e1d3860a222304acf18e989bdc065dc922a141e6da4563f0' \
       '5586605b0e10535d875ca7e0fae7fe100cfe533374f29aaa803cdfb2c6194f458485e87f76988f6' \
@@ -130,9 +173,6 @@ RSpec.shared_examples("common spaceship login") do |skip_tunes_login|
   let(:password) { 'so_secret' }
 
   before {
-    allow_any_instance_of(SIRP::Client).to receive(:start_authentication).and_return(authentication_data)
-    allow_any_instance_of(SIRP::Client).to receive(:process_challenge).and_return("1234")
-
     Spaceship::Tunes.login unless skip_tunes_login
   }
 end
