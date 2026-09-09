@@ -8,17 +8,24 @@ Entries stay in the list until the whole suite is stable, not until their own ro
 
 | Row | CI | Local | Files | Symptom | Likely cause | Status |
 | --- | --- | --- | --- | --- | --- | --- |
-| A | 15 | 1 | `spaceship/spec/spaceship_spec.rb` (10), `spaceauth_spec.rb` (4) | `WebMock::NetConnectNotAllowedError` on `POST https://idmsa.apple.com/appleauth/auth/signin/init` | A login ran without the SIRP stub, so a real SRP value was computed and matched none of the recorded request bodies | likely fixed, needs confirming on the pinned seed |
+| A | 16 | 1 | `spaceship/spec/spaceship_spec.rb` (10), `spaceauth_spec.rb` (6) | `WebMock::NetConnectNotAllowedError` on `POST https://idmsa.apple.com/appleauth/auth/signin/init` | A login ran without the SIRP stub, so a real SRP value was computed and matched none of the recorded request bodies | **fixed** in `b63ab357a`, confirmed at seed 48174: all 16 gone, no `signin/init` request blocked anywhere in the run |
 | B | 15 | 15 | `connect_api/models/`: `device_spec.rb` (8), `certificate_spec.rb` (3), `build_beta_detail_spec.rb`, `beta_build_metric_spec.rb`, `app_store_version_release_request_spec.rb`, `build_delivery_spec.rb` | `TypeError: You need to instantiate this module with provisioning_request_client`, also `test_flight_request_client` and `tunes_request_client` | ConnectAPI sub-clients are module level state that an earlier example instantiates and later ones inherit | open |
 | C | 5 | 5 | `frameit/spec/editor_spec.rb` | `undefined method '[]' for nil` at `frameit/lib/frameit/screenshot.rb:45` | Something another spec's setup populates is nil here | open |
 | D | 4 | 4 | `fastlane/spec/actions_specs/import_from_git_spec.rb` | `FastlaneCore::UI received :important with unexpected arguments`, `expected: 0 times with arguments: (/git checkout/)` | Message expectations that assume the action has not already run and cached in this process | open |
 | E | 2 | 2 | `fastlane_core/spec/command_executor_spec.rb` | `FastlaneCore::Interface::FastlaneError` | Not yet investigated | open |
-| F | 2 | 0 | `spaceship/spec/spaceauth_spec.rb` | `expected: 0` | Not yet investigated. Same file as part of A but a different failure | open |
 | G | 5 | 5 | `fastlane_core/spec/device_manager_spec.rb`, `fastlane/spec/actions_specs/notification_spec.rb`, `fastlane/spec/actions_specs/automatic_code_signing_spec.rb`, `spaceship/spec/two_step_or_factor_client_spec.rb`, `supply/spec/uploader_spec.rb` | assorted | Singles, triaged individually. The supply one looks like a genuine test bug rather than ordering: it calls `all_languages`, which is private | open |
-| H | 0 | 1 | `spaceship/spec/portal/portal_permission_spec.rb` | | Local only, did not appear in the CI run | open |
+| H | 1 | 1 | `spaceship/spec/portal/portal_permission_spec.rb` | | Was local only. Appeared on CI for the first time in the run that fixed A, so treat it as probably caused by that change until shown otherwise: making login deterministic everywhere alters the state later specs inherit | open, suspected regression from `b63ab357a` |
 | I | 2 | 0 | `spaceship/spec/portal/certificate_spec.rb` | `WebMock::NetConnectNotAllowedError` on `POST .../certificate/submitCertificateRequest.action` | Missing stub for certificate submission, not a login problem. Previously counted under A because both are blocked requests; the diagnostics separated them | open |
 
-### Update, run at seed 58148
+### Update, pinned run at seed 48174
+
+48 failures before, 33 after, on the same seed. The 16 that went are exactly rows A and F, both in `spaceship_spec.rb` and `spaceauth_spec.rb`. Row F turned out to be the same cause rather than a separate one, so it has been folded into A rather than kept as its own row: the `expected: 0` assertions were downstream of the same failed login.
+
+One failure appeared that was not there before, `portal/portal_permission_spec.rb`, which had only ever failed locally. It arrived in the same run as the fix, so it is recorded as a suspected regression rather than a coincidence.
+
+Row I is confirmed independent of A. The one remaining blocked request is certificate submission, with all three clients live.
+
+### Earlier update, run at seed 58148
 
 Moving the SIRP stubbing to every spaceship example (commit `b63ab357a`) appears to have cleared row A: that run blocked no `signin/init` request at all. Two blocked requests remained in `portal/certificate_spec.rb`, and the diagnostics showed them to be certificate submission rather than login, which is now row I.
 
