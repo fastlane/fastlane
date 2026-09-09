@@ -633,6 +633,79 @@ describe FastlaneCore do
       end
     end
 
+    describe 'build_settings() with disallow_xcodebuild_settings_lookup' do
+      it 'raises a helpful error naming the required build setting instead of running xcodebuild -showBuildSettings' do
+        project = FastlaneCore::Project.new({
+          project: "./fastlane_core/spec/fixtures/projects/Example.xcodeproj",
+          disallow_xcodebuild_settings_lookup: true
+        })
+
+        expect(FastlaneCore::CommandExecutor).to_not(receive(:execute))
+        expect(FastlaneCore::Project).to_not(receive(:run_command))
+
+        expect do
+          project.build_settings(key: "PRODUCT_BUNDLE_IDENTIFIER")
+        end.to raise_error(FastlaneCore::Interface::FastlaneError) do |error|
+          expect(error.message).to include("PRODUCT_BUNDLE_IDENTIFIER")
+          expect(error.message).to include("xcodebuild -showBuildSettings")
+          expect(error.message).to include("disallow_xcodebuild_settings_lookup")
+          expect(error.message).to include("project_spec.rb") # the caller that triggered the lookup
+        end
+      end
+
+      context 'when the FASTLANE_DISALLOW_XCODEBUILD_SETTINGS_LOOKUP environment variable is set' do
+        before { ENV['FASTLANE_DISALLOW_XCODEBUILD_SETTINGS_LOOKUP'] = 'true' }
+        after { ENV.delete('FASTLANE_DISALLOW_XCODEBUILD_SETTINGS_LOOKUP') }
+
+        it 'raises an error naming the environment variable even when the option is not set' do
+          project = FastlaneCore::Project.new({
+            project: "./fastlane_core/spec/fixtures/projects/Example.xcodeproj"
+          })
+
+          expect(FastlaneCore::CommandExecutor).to_not(receive(:execute))
+          expect(FastlaneCore::Project).to_not(receive(:run_command))
+
+          expect do
+            project.build_settings(key: "PRODUCT_BUNDLE_IDENTIFIER")
+          end.to raise_error(FastlaneCore::Interface::FastlaneError) do |error|
+            expect(error.message).to include("PRODUCT_BUNDLE_IDENTIFIER")
+            expect(error.message).to include("FASTLANE_DISALLOW_XCODEBUILD_SETTINGS_LOOKUP environment variable")
+          end
+        end
+      end
+
+      it 'fetches build settings when the option is false' do
+        allow(FastlaneCore::Helper).to receive(:xcode_at_least?).and_return(true)
+        project = FastlaneCore::Project.new({
+          project: "./fastlane_core/spec/fixtures/projects/Example.xcodeproj",
+          disallow_xcodebuild_settings_lookup: false
+        })
+
+        expect(FastlaneCore::CommandExecutor).to receive(:execute) # SwiftPM dependencies resolution
+        expect(FastlaneCore::Project).to receive(:run_command).and_return("PRODUCT_BUNDLE_IDENTIFIER = tools.fastlane.app\n")
+
+        expect(project.build_settings(key: "PRODUCT_BUNDLE_IDENTIFIER")).to eq("tools.fastlane.app")
+      end
+
+      it 'fetches build settings when the given options do not support disallow_xcodebuild_settings_lookup' do
+        allow(FastlaneCore::Helper).to receive(:xcode_at_least?).and_return(true)
+        config = FastlaneCore::Configuration.create(
+          [
+            FastlaneCore::ConfigItem.new(key: :workspace, optional: true),
+            FastlaneCore::ConfigItem.new(key: :project, optional: true)
+          ], {
+            project: './fastlane_core/spec/fixtures/projects/Example.xcodeproj'
+          }
+        )
+        project = FastlaneCore::Project.new(config)
+
+        expect(FastlaneCore::CommandExecutor).to receive(:execute) # SwiftPM dependencies resolution
+        expect(FastlaneCore::Project).to receive(:run_command).and_return("PRODUCT_BUNDLE_IDENTIFIER = tools.fastlane.app\n")
+
+        expect(project.build_settings(key: "PRODUCT_BUNDLE_IDENTIFIER")).to eq("tools.fastlane.app")
+      end
+    end
+
     describe "xcodebuild destination parameter" do
       context "when xcode version is at_least 13" do
         before(:each) do
