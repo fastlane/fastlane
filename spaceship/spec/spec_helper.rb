@@ -1,3 +1,4 @@
+require 'base64'
 require 'plist'
 require 'fastlane-sirp'
 
@@ -137,15 +138,25 @@ RSpec.configure do |config|
     exception = current_test.exception
     next unless exception.is_a?(WebMock::NetConnectNotAllowedError)
 
-    stubbed = exception.message.include?(SPACESHIP_AUTHENTICATION_DATA)
-    warn(<<~DIAGNOSTICS)
-      [30184] blocked request in #{current_test.id}
-      [30184]   SRP value was the stubbed one: #{stubbed}
-      [30184]   Spaceship::Tunes.client:      #{Spaceship::Tunes.client.class}
-      [30184]   Spaceship::Portal.client:     #{Spaceship::Portal.client.class}
-      [30184]   Spaceship::ConnectAPI.client: #{Spaceship::ConnectAPI.instance_variable_get(:@client).class}
-      [30184]   FASTLANE_SESSION set: #{!ENV['FASTLANE_SESSION'].nil?}
-    DIAGNOSTICS
+    url = exception.message[%r{(?:GET|POST|PUT|DELETE) (\S+)}, 1]
+    report = [
+      "[30184] blocked request in #{current_test.id}",
+      "[30184]   url: #{url}",
+      "[30184]   Spaceship::Tunes.client:      #{Spaceship::Tunes.client.class}",
+      "[30184]   Spaceship::Portal.client:     #{Spaceship::Portal.client.class}",
+      "[30184]   Spaceship::ConnectAPI.client: #{Spaceship::ConnectAPI.instance_variable_get(:@client).class}",
+      "[30184]   FASTLANE_SESSION set: #{!ENV['FASTLANE_SESSION'].nil?}"
+    ]
+
+    # Only meaningful for the SRP login. The request carries the base64 of the
+    # constant, not the constant itself, so comparing against the hex would
+    # always report false.
+    if url.to_s.include?("signin/init")
+      expected = Base64.strict_encode64([SPACESHIP_AUTHENTICATION_DATA].pack("H*"))
+      report << "[30184]   SRP value was the stubbed one: #{exception.message.include?(expected)}"
+    end
+
+    warn(report.join("\n"))
   end
 
   def mock_client_response(method_name, with: anything)

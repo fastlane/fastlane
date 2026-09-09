@@ -46,7 +46,10 @@ jobs:
 
       - name: Run the suite in a random order
         env:
-          RSPEC_ARGS: "--order random${{ inputs.seed && format(':{0}', inputs.seed) || '' }}"
+          # Pinned so successive runs are comparable: with a fresh order every
+          # time, a change in the failure count says nothing about whether a fix
+          # worked. The subset job below is the one that samples new orderings.
+          RSPEC_ARGS: "--order random:${{ inputs.seed || '48174' }}"
         shell: bash
         run: |
           echo "RSPEC_ARGS=$RSPEC_ARGS"
