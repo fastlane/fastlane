@@ -19,6 +19,12 @@ on:
       seed:
         description: "rspec seed, to reproduce a previous run. Leave blank for a new random order."
         required: false
+      record_timings:
+        description: "Record spec timings on the runner and upload them, instead of running the audit. The split is balanced from these, and they are per platform because the suite is a different shape on each."
+        type: choice
+        options: ["no", "macos", "linux", "both"]
+        default: "no"
+        required: false
         type: string
 
 permissions:
@@ -26,6 +32,7 @@ permissions:
 
 jobs:
   random_order:
+    if: inputs.record_timings == 'no' || inputs.record_timings == null
     name: "Random order, Xcode 16.4.0, Ruby 3.4"
     runs-on: macos-15
     steps:
@@ -84,6 +91,7 @@ jobs:
           if-no-files-found: ignore
 
   order_dependent_subset:
+    if: inputs.record_timings == 'no' || inputs.record_timings == null
     name: "Known order dependent specs, random order"
     runs-on: macos-15
     steps:
@@ -112,6 +120,7 @@ jobs:
         run: bundle exec rake test_order_dependent
 
   parallel_split:
+    if: inputs.record_timings == 'no' || inputs.record_timings == null
     name: "Parallel split, workers ${{ matrix.workers }}"
     runs-on: macos-15
     strategy:
@@ -150,6 +159,7 @@ jobs:
         run: bundle exec rake test_parallel
 
   random_order_linux:
+    if: inputs.record_timings == 'no' || inputs.record_timings == null
     name: "Random order, Linux, Ruby 3.1"
     runs-on: ubuntu-24.04
     steps:
@@ -184,6 +194,7 @@ jobs:
           title: '# :penguin: Random order failures, Linux'
 
   parallel_split_linux:
+    if: inputs.record_timings == 'no' || inputs.record_timings == null
     name: "Parallel split on Linux, workers ${{ matrix.workers }}"
     runs-on: ubuntu-24.04
     strategy:
@@ -212,6 +223,7 @@ jobs:
         run: bundle exec rake test_parallel
 
   isolated_home:
+    if: inputs.record_timings == 'no' || inputs.record_timings == null
     name: "Isolated HOME, workers 4"
     runs-on: macos-15
     steps:
@@ -239,3 +251,45 @@ jobs:
         env:
           WORKERS: 4
         run: bundle exec rake test_isolated
+
+  record_timings:
+    name: "Record spec timings, ${{ matrix.platform }}"
+    if: inputs.record_timings != 'no' && inputs.record_timings != null
+    strategy:
+      fail-fast: false
+      matrix:
+        platform: ${{ inputs.record_timings == 'both' && fromJSON('["macos","linux"]') || fromJSON(format('["{0}"]', inputs.record_timings)) }}
+    runs-on: ${{ matrix.platform == 'macos' && 'macos-15' || 'ubuntu-24.04' }}
+    steps:
+      - uses: actions/checkout@v7
+
+      - uses: maxim-lobanov/setup-xcode@v1
+        if: matrix.platform == 'macos'
+        with:
+          xcode-version: '16.4.0'
+
+      - uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: ${{ matrix.platform == 'macos' && '3.4' || '3.1' }}
+          bundler-cache: true
+
+      - name: Increase Open File Limit
+        shell: bash
+        run: ulimit -n 65536
+
+      # One process, deliberately. Per file durations are only meaningful when
+      # nothing else is competing, and the whole point of recording them here is
+      # that a runner's numbers differ from a laptop's: on Linux the
+      # requires_xcodebuild specs skip, which is 61% of the macOS example time,
+      # so a split balanced from macOS numbers leaves a Linux worker idle 41% to
+      # 48% of the run.
+      - name: Record timings
+        shell: bash
+        run: bundle exec rake spec_timings
+
+      - name: Upload
+        uses: actions/upload-artifact@v4
+        with:
+          name: spec-timings-${{ matrix.platform }}
+          path: internal/spec_timings.*.json
+          if-no-files-found: error

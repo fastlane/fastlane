@@ -10,7 +10,22 @@
 #   rake test_parallel                 workers chosen from the timings
 #   WORKERS=4 rake test_parallel
 #   WORKERS=6 RSPEC_ARGS="--order random" rake test_parallel
-SPEC_TIMINGS = "internal/spec_timings.json".freeze
+# Timings are per platform, because the suite is a different shape on each one.
+# 61% of the example time on macOS is in requires_xcodebuild files, and those
+# skip entirely on Linux, so balancing a Linux split from macOS numbers packs
+# around files that cost nothing there. Measured: 41% to 48% of worker time on
+# Linux was spent waiting for a straggler, against 15% to 17% on macOS.
+def spec_timings_platform
+  case RbConfig::CONFIG["host_os"]
+  when /darwin/ then "mac"
+  when /mswin|mingw|cygwin/ then "windows"
+  else "linux"
+  end
+end
+
+def spec_timings_path
+  "internal/spec_timings.#{spec_timings_platform}.json"
+end
 
 # How long a unit of work may be before it is worth cutting up, as a fraction of
 # a worker's share. A file at 1.3 times the share cannot be balanced away: some
@@ -32,9 +47,9 @@ def spec_files
 end
 
 def load_timings
-  return { "files" => {}, "examples" => {} } unless File.exist?(SPEC_TIMINGS)
+  return { "files" => {}, "examples" => {} } unless File.exist?(spec_timings_path)
 
-  data = JSON.parse(File.read(SPEC_TIMINGS))
+  data = JSON.parse(File.read(spec_timings_path))
   data.key?("files") ? data : { "files" => data, "examples" => {} } # older flat format
 end
 
@@ -104,13 +119,13 @@ task(:spec_timings) do
   # Per example timings only for what might need splitting. Keeping all of them
   # would be a megabyte of ids nothing reads.
   heavy = files.select { |_path, seconds| seconds > 5.0 }.keys
-  File.write(SPEC_TIMINGS, JSON.pretty_generate(
-                             "files" => files.sort_by { |_path, seconds| -seconds }.to_h,
-                             "examples" => examples.select { |path, _| heavy.include?(path) }
+  File.write(spec_timings_path, JSON.pretty_generate(
+                                  "files" => files.sort_by { |_path, seconds| -seconds }.to_h,
+                                  "examples" => examples.select { |path, _| heavy.include?(path) }
   ))
   File.delete(out)
 
-  puts("Wrote #{files.size} file timings (#{heavy.size} with per example detail) to #{SPEC_TIMINGS}, #{files.values.sum.round}s total")
+  puts("Wrote #{files.size} file timings (#{heavy.size} with per example detail) to #{spec_timings_path}, #{files.values.sum.round}s total")
 end
 
 desc("Run the suite as WORKERS independent rspec processes")
@@ -141,7 +156,7 @@ task(:test_parallel) do
   units = units_for(files, timings, target)
   buckets, weights = pack(units, workers)
 
-  source = total.zero? ? "file size, run `rake spec_timings` first" : "measured durations"
+  source = total.zero? ? "file size, run `rake spec_timings` first" : "durations measured on #{spec_timings_platform}"
   split = units.size - files.size
   puts("Running #{files.size} spec files as #{buckets.size} processes on #{Etc.nprocessors} cores, balanced by #{source}")
   puts("#{split} extra unit(s) from cutting up files heavier than one worker's share") if split.positive?
