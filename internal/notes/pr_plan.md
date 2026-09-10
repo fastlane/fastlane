@@ -65,3 +65,23 @@ The environment guard restores `ENV` after each example, so leaks no longer reac
 Row Z is fixed but `spaceship/spec/tunes/tunes_client_spec.rb` is worth watching: it was the only defect that needed several attempts, and the first two made things worse.
 
 The security gem needs a 0.3.0 release before #30178 can drop its git source and pin `~> 0.3`.
+
+## What happens to this branch
+
+It is scaffolding, and it should be deleted rather than kept once the pull requests have landed.
+
+fastlane squash merges. Every pull request arrives on master as a single new commit with `(#NNNNN)` appended, and there has not been a real merge commit since 2017. Two consequences follow, and both are the answer to "can we rebuild this branch afterwards".
+
+**The branch cannot be reconstructed by merging the pull requests back.** Squashing replaces a branch's commits with one commit at a different sha and different patch boundaries, so there is no shared history to merge against. It would conflict or duplicate.
+
+**Rebasing this branch onto master as pull requests land will also conflict.** Git can sometimes drop commits it recognises as already applied, by patch id, but squashing changes the boundaries so it usually will not recognise them. Expect to resolve the same change twice.
+
+So the model is that the content migrates to master through the pull requests, and master becomes the result. While extraction is in progress:
+
+- freeze this branch as the reference and stop adding work to it
+- cut each pull request branch from `master`, cherry picking what it needs
+- do not rebase this branch as things land. If a combined branch is still wanted for running the audit, recreate it from master plus whatever has not merged yet
+
+**Land the workflow early.** The audit only exists today because this branch exists. Once `.github/workflows/random-order-audit.yml` is on master, in whatever reduced form the team wants, the capability survives independently of the branch.
+
+**Land the notes early, and check their references first.** Four issues, #30186, #30187, #30188 and #30189, point at this investigation, and these notes are the record behind them. Anything citing a sha from this branch becomes a dangling reference the moment the branch is deleted. Five such references have been rewritten to describe the change instead. This file is the exception: it is about the extraction, it cites 57 of them, and it should not land on master at all.

@@ -29,7 +29,7 @@ Two estimates made earlier were both too high and are worth correcting, because 
 
 Only `-showBuildSettings` may be intercepted. `fastlane_core/spec/project_spec.rb:453` tests `run_command` itself with `echo` and with deliberate timeouts, and those have to keep shelling out.
 
-## Attempt 1, recorded fixtures. Reverted in `2655245d8`
+## Attempt 1, recorded fixtures. Tried and reverted
 
 Record each command's output to `fastlane_core/spec/fixtures/xcodebuild_settings` and replay it, refreshing with `RECORD_XCODEBUILD_SETTINGS=1`. 22 files, 768K.
 
@@ -45,7 +45,7 @@ Build settings carry the machine all the way through them. In one 548 line outpu
 
 Normalising the checkout path and the home directory is easy. Normalising the Xcode version is not, because the settings genuinely differ between versions. A recorded fixture would have to be keyed by Xcode version and regenerated for each, which is more machinery than the 25% is worth.
 
-## Attempt 2, memoise for the length of the run. Reverted in `10740cd41`
+## Attempt 2, memoise for the length of the run. Tried and reverted
 
 Hold the answers in a hash for the process lifetime, keyed by command. The first example to ask computes, the rest read. Nothing persisted, nothing machine specific, computed on the machine that is asking.
 
