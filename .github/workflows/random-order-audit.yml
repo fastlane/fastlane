@@ -252,25 +252,20 @@ jobs:
           WORKERS: 4
         run: bundle exec rake test_isolated
 
-  record_timings:
-    name: "Record spec timings, ${{ matrix.platform }}"
-    if: inputs.record_timings != 'no' && inputs.record_timings != null
-    strategy:
-      fail-fast: false
-      matrix:
-        platform: ${{ inputs.record_timings == 'both' && fromJSON('["macos","linux"]') || fromJSON(format('["{0}"]', inputs.record_timings)) }}
-    runs-on: ${{ matrix.platform == 'macos' && 'macos-15' || 'ubuntu-24.04' }}
+  record_timings_macos:
+    name: "Record spec timings, macOS"
+    if: inputs.record_timings == 'macos' || inputs.record_timings == 'both'
+    runs-on: macos-15
     steps:
       - uses: actions/checkout@v7
 
       - uses: maxim-lobanov/setup-xcode@v1
-        if: matrix.platform == 'macos'
         with:
           xcode-version: '16.4.0'
 
       - uses: ruby/setup-ruby@v1
         with:
-          ruby-version: ${{ matrix.platform == 'macos' && '3.4' || '3.1' }}
+          ruby-version: '3.4'
           bundler-cache: true
 
       - name: Increase Open File Limit
@@ -278,11 +273,7 @@ jobs:
         run: ulimit -n 65536
 
       # One process, deliberately. Per file durations are only meaningful when
-      # nothing else is competing, and the whole point of recording them here is
-      # that a runner's numbers differ from a laptop's: on Linux the
-      # requires_xcodebuild specs skip, which is 61% of the macOS example time,
-      # so a split balanced from macOS numbers leaves a Linux worker idle 41% to
-      # 48% of the run.
+      # nothing else is competing.
       - name: Record timings
         shell: bash
         run: bundle exec rake spec_timings
@@ -290,6 +281,37 @@ jobs:
       - name: Upload
         uses: actions/upload-artifact@v4
         with:
-          name: spec-timings-${{ matrix.platform }}
-          path: internal/spec_timings.*.json
+          name: spec-timings-macos
+          path: internal/spec_timings.mac.json
+          if-no-files-found: error
+
+  record_timings_linux:
+    name: "Record spec timings, Linux"
+    if: inputs.record_timings == 'linux' || inputs.record_timings == 'both'
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v7
+
+      - uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: '3.1'
+          bundler-cache: true
+
+      - name: Increase Open File Limit
+        shell: bash
+        run: ulimit -n 65536
+
+      # Recording here rather than on a laptop is the whole point: on Linux the
+      # requires_xcodebuild specs skip, which is 61% of the macOS example time,
+      # and three of the heaviest macOS files cost nothing at all here. A split
+      # balanced from macOS numbers left a worker idle 41% to 48% of the run.
+      - name: Record timings
+        shell: bash
+        run: bundle exec rake spec_timings
+
+      - name: Upload
+        uses: actions/upload-artifact@v4
+        with:
+          name: spec-timings-linux
+          path: internal/spec_timings.linux.json
           if-no-files-found: error
