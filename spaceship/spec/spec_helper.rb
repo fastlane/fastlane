@@ -37,12 +37,26 @@ if set_auth_vars.any?
   abort("[!] Please `unset` the following ENV vars which interfere with spaceship testing: #{set_auth_vars.join(', ')}".red)
 end
 
-@cache_paths = [
-  File.expand_path("/tmp/spaceship_itc_service_key.txt")
-]
+# Client#itc_service_key caches the key at a fixed path in /tmp, reading it with
+# File.exist? followed by File.read. These examples used to delete that file
+# before and after every one of them, which isolates them from each other in one
+# process and races in several: under `rake test_parallel` one worker removes
+# the file between another's exist? and read, or reads one a third has only
+# partly written, and the loser raises AppleTimeoutError from inside
+# itc_service_key. Row Z of internal/order_dependent_specs.md.
+#
+# Write it once instead, and never delete it. Every worker then finds a complete
+# file and nothing writes during the run, so there is nothing to race over. The
+# rename is what makes it safe: a worker either sees no file or a whole one,
+# never a half written one, since rename within a filesystem is atomic. The
+# value matches the authServiceKey that TunesStubbing returns for the olympus
+# request, so the key any spec sees is the same as before.
+ITC_SERVICE_KEY_PATH = File.expand_path("/tmp/spaceship_itc_service_key.txt")
 
-def try_delete(path)
-  FileUtils.rm_f(path) if File.exist?(path)
+unless File.exist?(ITC_SERVICE_KEY_PATH)
+  staging = "#{ITC_SERVICE_KEY_PATH}.#{Process.pid}"
+  File.write(staging, "e0abc")
+  File.rename(staging, ITC_SERVICE_KEY_PATH)
 end
 
 def clear_spaceship_model_clients(klass)
@@ -51,8 +65,6 @@ def clear_spaceship_model_clients(klass)
 end
 
 def before_each_spaceship
-  @cache_paths.each { |path| try_delete(path) }
-
   # Spaceship::Base subclasses each hold their own @client, stamped on by
   # set_client and preferred over Spaceship::Portal.client. Class level ivars are
   # not inherited, so a client cached on Spaceship::Certificate by one example
@@ -129,7 +141,7 @@ def before_each_spaceship
 end
 
 def after_each_spaceship
-  @cache_paths.each { |path| try_delete(path) }
+  nil
 end
 
 RSpec.configure do |config|

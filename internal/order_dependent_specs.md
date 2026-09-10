@@ -169,11 +169,19 @@ Balancing was worth more than workers: four workers went from 2.2x to 3.68x on t
 
 Memory is not the constraint. Six workers peak at 1.3GB resident in total, so a runner can be oversubscribed past its core count without memory pressure, which is the thing that would have limited it on CI.
 
-Splitting found two defects a random order never did. Row T, and a failure in `spaceship/spec/tunes/tunes_client_spec.rb:81` that appeared at six and eight workers. That one is not order dependent: the worker's exact file list passes on its own, 746 examples either way, so it is sensitive to something shared between concurrent processes rather than to what ran before it. It reappeared at four workers once the failure output was improved enough to read, and the cause is now visible: `Spaceship::AppleTimeoutError: Could not receive latest API key`, raised inside `Client#itc_service_key` at `client.rb:740`.
+Splitting found two defects a random order never did. Row T, and a failure in `spaceship/spec/tunes/tunes_client_spec.rb:81` that appeared at six and eight workers. That one is not order dependent: the worker's exact file list passes on its own, 746 examples either way, so it is sensitive to something shared between concurrent processes rather than to what ran before it. **Fixed.** The cause was not a partial read. Those examples count requests:
 
-That method caches to `/tmp/spaceship_itc_service_key.txt`, a fixed path with no override, and the sequence is `File.exist?` then `File.read`, with a plain `File.write` from any other process able to land in between. One worker can therefore read a file another is still writing. The spec itself is sound: the olympus request is stubbed in `tunes_stubbing.rb:26` and the file passes on its own with the cache absent.
+```ruby
+expect_any_instance_of(Spaceship::Client).to receive(:request).twice.and_call_original
+```
 
-This is the same category as row V, state outside the process, and neither the environment guard nor process isolation helps because every worker shares `/tmp`. Two candidate fixes, neither taken yet. Give the path an override as `SPACESHIP_COOKIE_PATH` has and point it somewhere per process for the suite, which is a production change made for the tests' benefit. Or populate the cache once at spec helper load so nothing ever writes it during a run, which removes the race without touching production code but takes the fetch path out of reach of any spec that means to exercise it. Worth a decision rather than a guess.
+and one of the two was `Client#itc_service_key` fetching the widget key. That method caches to a fixed path in `/tmp`, so the count depended on whether the file happened to exist. Cold, the fetch ran, the count was two and the third stubbed request returning 412 was reached, so the exception was raised. Warm, the fetch did not run, the third request was never reached, and nothing was raised, which is exactly the failure seen on CI.
+
+`spaceship/spec/spec_helper.rb` deleted that file before and after every spaceship example, which is not hygiene but a way of forcing the cold path. It works in one process. Across workers, any other worker creating the file breaks these four examples, and one worker deleting it between another's `File.exist?` and `File.read` breaks them differently.
+
+The fix is to stop the examples depending on the file at all: stub `itc_service_key` in that group and expect one request rather than two. They now pass with the cache present and with it absent, so no file state can reach them, and the per example deletion is gone. Four workers go from one failure to none.
+
+An earlier attempt stubbed `itc_service_key` for every spaceship example in `before_each_spaceship` instead, which broke sixteen of seventeen examples in the file: it removed the very request these four were counting.
 
 ## plugin_generator_spec, the standing exception
 
