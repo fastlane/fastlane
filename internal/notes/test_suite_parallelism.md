@@ -82,3 +82,21 @@ Contention itself is mild. Eight distinct heavy files take 186s run one after an
 That is why the remedy is to remove the subprocesses rather than to tune the worker count. About 180 examples each run a real `xcodebuild -showBuildSettings`; `Project#build_settings` memoises per instance and every example builds a fresh `Project`, so nothing is reused. Caching those would shorten the sequential run and halve the effective process count, which then lets the worker count rise. `FASTLANE_DISALLOW_XCODEBUILD_SETTINGS_LOOKUP` and the `disallow_xcodebuild_settings_lookup` option already exist to forbid the lookup; what is missing is a recorded fixture to answer from.
 
 Splitting also keeps finding order dependence that seeds do not. Rows T and Z came out of a worker seeing a subset no random order produces.
+
+## What rewriting the specs is worth
+
+Parallelism divides the work; rewriting removes it, so the two compound rather than compete, and rewriting also helps the plain sequential run that a developer gets by default.
+
+Nineteen of 446 spec files mention `requires_xcodebuild`, and they account for 167s of 275s of example time, 61%. Running the whole suite with `FASTLANE_DISALLOW_XCODEBUILD_SETTINGS_LOOKUP` set takes it from 276s to 117s, a 58% saving, with 233 examples failing. That number is an upper bound, since a failing example abandons whatever it had left to do, but it was reached a completely different way from the 61% and the two agree within three points.
+
+So the prize is somewhere around 40 to 55% of the sequential run. `Project#build_settings` memoises on `@build_settings`, per instance, and every example builds a fresh `Project`, so nothing is ever reused. A cache keyed on project path and configuration, recorded once and replayed, would take most of it.
+
+Not all of those examples can lose the subprocess. `Project.run_command` is tested for timeouts and retries with real sleeps, 9.6s of `project_spec` alone, and those have to keep shelling out. The target is the roughly eighty examples that only need build settings to exist.
+
+It would also raise the useful worker count. Each of those examples is a worker plus an xcodebuild child, so removing them halves the effective process count, and the `min(cores, 8)` cap in `test_parallel` should be revisited upwards afterwards.
+
+## Worker defaults
+
+`min(cores, 8)`, derived rather than fixed per platform: what decides the number is the core count and how much of the suite shells out, not the operating system. It fits both measurements, eight on a 14 core machine and four on a runner. `WORKERS` overrides it, and the run prints the core count it saw.
+
+Linux and Windows skip the xcodebuild specs altogether, so 61% of the example time does not exist there and their knee will sit somewhere else. Not measured, since the audit only runs on macOS today.
