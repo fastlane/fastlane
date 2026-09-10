@@ -138,8 +138,9 @@ The rest vary by seed, which puts them lower down the ordering space:
 | P | `gym/spec/platform_detection_spec.rb:32` | 1 of 3, and fails locally in any order, so check whether it is environmental |
 | Q | `credentials_manager/spec/account_manager_spec.rb:69` | **fixed** by the environment guard. It read a `DELIVER_PASSWORD` left set by an earlier example. Two attempts to fix it at the source failed because the value is written by `before_each_match`, `before_each_pilot` and `before_each_spaceship`, once per example in those tools, so there was no single setter to scope |
 | R | `fastlane/spec/actions_specs/automatic_code_signing_spec.rb:44` | **fixed** by the environment guard. Same shape as Q, with `FASTLANE_TEAM_ID` |
+| S | `scan/spec/runner_spec.rb:183,198` | **fixed**. Found by the first unpinned batch, at seed 53367. `NoMethodError: undefined method '[]=' for nil` at `scan/lib/scan/runner.rb:113`, which assigns `Scan.config[:only_testing]`. Every other group in the file builds its own config; the `retry_execute` group did not, and relied on whichever of them ran first leaving one behind. Same shape as row C with `Frameit.config`. Reproduces on its own with `-e retry_execute` |
 
-Seed 1150 reproduces every one of the seven common failures and is pinned in the workflow while these are worked through. Seeds 21323 and 40083 are recorded so the fixes can be validated against orderings other than the one they were developed on.
+Seeds 48174, 1150, 21323 and 40083 were each pinned in turn while the failures they exposed were worked through, and all four are green. The workflow samples a fresh order per run again as of `f9c6799fc`; the first batch of five turned up one new failure, row S at seed 53367.
 
 ## The environment guard
 
@@ -213,6 +214,7 @@ fastlane/spec/actions_specs/flock_spec.rb
 fastlane/spec/actions_specs/xcodebuild_spec.rb
 gym/spec/platform_detection_spec.rb
 credentials_manager/spec/account_manager_spec.rb
+scan/spec/runner_spec.rb
 ```
 
 Deliberately excluded: `fastlane_core/spec/project_spec.rb` and `fastlane/spec/plugins_specs/plugin_generator_spec.rb`. They fail locally in any order, including the normal one, so they are environmental rather than order dependent.

@@ -177,6 +177,14 @@ describe Scan do
 
     describe "retry_execute" do
       before(:each) do
+        # Every other group in this file builds its own config. This one relied
+        # on whichever of them ran first leaving one behind, and Scan.config is
+        # module level, so it outlives the example that made it. See
+        # fastlane#30184.
+        Scan.config = FastlaneCore::Configuration.create(Scan::Options.available_options, {
+          project: './scan/examples/standard/app.xcodeproj'
+        })
+
         @scan = Scan::Runner.new
       end
 
