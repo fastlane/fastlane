@@ -117,3 +117,34 @@ It does show eight untracked fixture entries, which are worth cleaning up, but t
 **Narrow the memo to a group.** Safe where a group asks the same question repeatedly, worth much less, and needs each group opted in by hand.
 
 **Leave it.** The parallel work alone took the suite from 276s to 41s on twelve workers. The 25% is real but it has now cost two red CI runs, and it is the smaller half of what has already been won.
+
+## Running against a home directory the project controls
+
+`rake test_isolated` points `HOME` at a throwaway directory, seeds it with an empty keychain, runs the suite and then reports what the run wrote there. `WORKERS=12 rake test_isolated` splits it; a pattern argument runs a subset.
+
+It exists because the suite both reads and writes the developer's real home, and reading is the dangerous half. Row Z is the example: `Client#itc_service_key` cached to a file, the examples depending on that file passed on any machine that had ever run the suite, and only a clean CI checkout failed. An isolated home makes that fail here instead.
+
+The writing half is not small either. A full run leaves 53 entries in `HOME`:
+
+```
+~/.fastlane/.did_show_opt_info
+~/Library/Developer/Xcode/Archives
+~/Library/MobileDevice/Provisioning Profiles
+~/Library/Logs/{fastlane,gym,scan,snapshot}
+~/.appstoreconnect
+~/.cache/rubocop_cache
+```
+
+Unseeded, nine examples fail, seven in `verify_build_spec` and two in `match/spec/importer_spec`, all with a keychain complaint. The obvious reading is that those specs reach into the developer's keychain and should be stubbed. That is not what is happening, and it is worth recording so nobody stubs them:
+
+```
+security cms -D   real home                  exit 0
+                  isolated home, no keychain exit 1, "cert import failed: A default keychain could not be found"
+                  isolated home, EMPTY one   exit 0
+```
+
+Nothing calls `security import`. `security cms -D`, which fastlane uses to decode provisioning profiles in `verify_build.rb`, `provisioning_profile.rb` and sigh's `local_manage.rb`, imports the signing certificate in order to verify the signature. Any keychain will do, including an empty one, and the certificates it writes are a side effect of decoding rather than anything the specs asked for. A full run puts four of them in the default keychain, three from the two match examples and one from verify_build.
+
+So the specs are doing legitimate work and stubbing them would remove real coverage. Seeding a keychain in the isolated home is the fix: the certificates land in a directory that is deleted afterwards rather than in the developer's login keychain.
+
+Worth raising separately: this is production behaviour, not a test artefact. fastlane adds certificates to a user's keychain whenever it parses a provisioning profile. `provisioning_profile.rb` already has a `-k <keychain_path>` variant of the call, so there is a mechanism for directing it somewhere chosen.
