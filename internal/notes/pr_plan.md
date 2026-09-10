@@ -28,9 +28,22 @@ The documentation commits, fifteen of them, mostly iterate on `internal/order_de
 
 **1. Module level configuration leaks between examples.** The largest and most self-contained group: `Frameit.config`, `Scan.config`, `Scan.project`, `Cert.config`, and the guard in `spec_helper.rb` that clears them all after each example. Four rows of the table were this one defect, and the guard closes the class rather than the instances. Commits: `b1e2dfab5`, `80dcf15d3`, `86646af35`, `05d0fc37f`, `4c95b43d8`, plus the `before(:all)` change in `xcpretty_reporter_options_generator_spec`.
 
+**These have to ship together.** The guard does not make the four per group fixes redundant, it makes them mandatory, and the dependency runs the opposite way to what it looks like. Before the guard those groups passed by inheriting a configuration some earlier example had left behind. The guard clears it after every example, so without their own setup they find `nil` and fail. Measured, by restoring each spec file to its state before the fix and running it with the guard in place:
+
+| Without the fix | Result |
+| --- | --- |
+| frameit config, row C | 58 examples, 5 failures |
+| cert config, row U | 14 examples, 2 failures |
+| scan retry_execute, row S | 15 examples, 2 failures |
+| scan detect_simulator, row W | 33 examples, 2 failures |
+
+Splitting the guard from the fixes, in either order, leaves master broken in between.
+
 **2. Spaceship client singletons.** `Spaceship::ConnectAPI.client`, `Tunes.client`, `Portal.client` outliving the example that set them, which accounts for six rows. Deliberately not solved by a blanket reset, which was tried and made things worse. Commits: `f26c4e79b`, `06ee1e635`, `dde0e8db0`, `f51ddd6d8`, `5d9de323a`.
 
 **3. Environment variables.** The guard that snapshots and restores `ENV` per example, and the specs that were leaking. Includes credentials: `DELIVER_PASSWORD`, `MAILGUN_APIKEY`, `DANGER_GITHUB_API_TOKEN`. Commits: `5742e6385`, `6f4bc3f41`, `e2efebcca`+`b2de30b70` squashed, `4888b5145`.
+
+Unlike group 1, the per spec fixes here are genuinely covered by the guard. `project_spec` and `update_checker_spec` both pass with their fixes removed, because the guard restores `ENV` either way. They are still worth keeping and worth landing in the same pull request: a spec that scopes what it sets is correct, while one that passes only because a global hook tidies up after it is contained rather than fixed, and the guard has known gaps at `before(:context)` and at anything outside the process. Keeping them also stops those specs appearing in the guard's own leak report, which is the list of what is left to do.
 
 **4. State outside the process.** Specs depending on files in `~` or `/tmp` that an earlier run left: the spaceship cookie, the service key cache, the harness's own log file read as a screenshot fixture. Plus `rake test_isolated`. This is the group that only fails on a clean machine, so it is also the group most worth landing. Commits: `3f751fb5d`, `150456cb1`+`d024e87cb` squashed, `85a81a7a3`, `7dc13d17c`, `eea089f59`, `8ce400604`.
 
@@ -45,6 +58,24 @@ The documentation commits, fifteen of them, mostly iterate on `internal/order_de
 **9. The notes.** `internal/order_dependent_specs.md`, `internal/notes/*`. Could ride along with 1 to 6, or land once as the record of the investigation.
 
 Already open: **#30178**, the security gem integration, which is independent of all of this.
+
+## Sequencing
+
+Group 1 is atomic, for the reason above. Beyond that the ordering that matters:
+
+1. **The notes**, group 9, and **the workflow**, group 8, first. Four open issues point at the notes as the record behind them, and the audit capability currently depends on this branch existing.
+2. **Group 1**, whole. It is the largest and it cannot be subdivided.
+3. **Groups 2 to 5** in any order. They are independent of each other.
+4. **Group 6**, the parallel runner, last of the code changes. It is worth little until the ordering work has landed, since a split is a harsher ordering than any seed.
+5. **Group 7**, the rubocop config regeneration, whenever. One line, unrelated to everything else.
+
+## Checking a fix is still needed
+
+Two ways to get this wrong, both of which happened while working out the table above.
+
+Reverting a whole commit does not work: each one bundles a spec fix with an update to `internal/order_dependent_specs.md`, and the manifest has changed too much since for the revert to apply. It fails with a conflict in the notes and tells you nothing about the spec. Restore the single file instead, with `git checkout <commit>^ -- <path>`.
+
+And check which file the commit actually changed. Row C's fix is in `frameit/spec/spec_helper.rb`, not in `editor_spec.rb`; testing the wrong one reported no failures for a fix that is worth five of them. Both mistakes fail in the direction of "looks fine".
 
 ## Issues worth opening
 
