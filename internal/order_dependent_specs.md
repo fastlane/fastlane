@@ -143,6 +143,7 @@ The rest vary by seed, which puts them lower down the ordering space:
 | U | `cert/spec/runner_spec.rb:51` | **fixed**. Found at seed 11703. `NoMethodError: undefined method '[]' for nil` at `cert/lib/cert/runner.rb:157`, reading `Cert.config[:type]`. The `"Successful run"` example above it assigns `Cert.config` from its own body rather than a hook, and this one never did, so it passed only when that had run first. Third instance of the same shape after row C's `Frameit.config` and row S's `Scan.config`. Reproduces on its own with `-e "correctly selects expired certificates"` |
 | V | `spaceship/spec/spaceauth_spec.rb:49,59` | **fixed**. Found by the subset job at seed 43548, and the first row whose state is not in the process at all. The `check_session` examples assert `exit(0)` for a valid session, and `has_valid_session` (`client.rb:414`) loads a cookie from `persistent_cookie_path`, which is `~/.fastlane/spaceship/<user>/cookie` in the real home directory. The examples never create one, so they passed only when an earlier example had logged in and persisted it. Each example now states the session it is testing. The exit code 1 example was stubbed too: it was passing only because no cookie happened to exist for `unknown-user` |
 | W | `scan/spec/detect_values_spec.rb:240,263` | **fixed**. Found at seed 30117. `FastlaneCore::Interface::FastlaneError: Exit status: 64`, which is `xcodebuild -showBuildSettings` rejecting a project, reached through `detect_values.rb:317 get_deployment_target_version`. The `#detect_simulator` group had no `before` at all and read two module level values earlier examples in the same file leave behind: `Scan.config`, without which it raises `NoMethodError` on its own, and `Scan.project`, which production code assigns at `detect_values.rb:30` while detecting values. Given its own config and `Scan.project = nil`, so the deployment target resolves to 0 without shelling out. Reproduces in the single file at seed 30117 |
+| X | `deliver/spec/runner_spec.rb` (12), `pilot/spec/manager_spec.rb` (2), and others | **fixed**. Seeds 49524, 10937 and 43881 in three consecutive CI runs, landing in a different file each time, all with the same trace: `#<Double "mock_client"> ... has leaked into another example`, through `Spaceship::ConnectAPI.token` at `spaceship.rb:38`. The source is `spaceship/spec/connect_api/spaceship_spec.rb`, whose `with explicit client` examples stub `Client.login` to return a double that `ConnectAPI.login` then assigns to `@client`. Row K cleared the clients in a `before(:each)`, which keeps that file's own examples honest but hands the last one's double to whatever runs next; rspec has already disabled it by then. Cleared in an `after(:each)` as well. Sixth row on this object after A, B, H, I and K, and the first fix aimed at the source rather than a landing site |
 
 Seeds 48174, 1150, 21323 and 40083 were each pinned in turn while the failures they exposed were worked through, and all four are green. The workflow samples a fresh order per run again as of `f9c6799fc`; the first batch of five turned up one new failure, row S at seed 53367.
 
@@ -214,6 +215,16 @@ It also does not see state that is not in the process. Row V was a cookie the su
 
 `fastlane_user_dir` (`client.rb:285`) is still `File.expand_path(File.join(Dir.home, ".fastlane"))` with no override, so anything else reaching for that directory is unaffected. `/tmp/spaceship_itc_service_key.txt` (`client.rb:757`) is likewise still cached outside the run.
 
+### Finding the source of an order dependent failure cheaply
+
+Row X took minutes rather than hours because of a shortcut worth reusing. `rspec --bisect` over the whole suite means many runs of 449 files, but the culprit always ran *before* the failure, so the search space is only the prefix:
+
+```
+rspec --order random:<seed> --dry-run --format json --out order.json
+```
+
+`--out` matters, since `spec_helper.rb` redirects `$stdout` and the JSON would otherwise land in its temporary file. Take every file up to the failing one, confirm those alone reproduce, then bisect that. For row X the prefix was 23 files of 449, and bisect went from 223 non failing examples to 1 in 17 seconds.
+
 ### Confirmed on CI, and what the inventory is still relative to
 
 Run 34447177995, seed 1150, macOS 15 with Ruby 3.4: 7863 examples and 0 failures on the full suite, 352 and 0 on the subset. The same example count as locally, so the two local `plugin_generator_spec` failures are environmental as suspected, not ordering.
@@ -259,6 +270,8 @@ deliver/spec/sync_screenshots_spec.rb
 cert/spec/runner_spec.rb
 scan/spec/detect_values_spec.rb
 spaceship/spec/client_spec.rb
+deliver/spec/runner_spec.rb
+pilot/spec/manager_spec.rb
 ```
 
 Deliberately excluded: `fastlane_core/spec/project_spec.rb` and `fastlane/spec/plugins_specs/plugin_generator_spec.rb`. They fail locally in any order, including the normal one, so they are environmental rather than order dependent.

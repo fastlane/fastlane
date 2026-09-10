@@ -10,6 +10,19 @@ describe Spaceship::ConnectAPI do
     Spaceship::Portal.client = nil
   end
 
+  # And after, not only before. Clearing on the way in keeps this file's own
+  # examples honest, but the last one still hands its client to whatever runs
+  # next. The `with explicit client` examples stub Client.login to return a
+  # double and ConnectAPI.login then assigns it, so what leaked out was an
+  # rspec double, which rspec disables at the end of its example. Anything
+  # later reaching ConnectAPI.token got "originally created in one example but
+  # has leaked into another". Row X. See fastlane#30184.
+  after(:each) do
+    Spaceship::ConnectAPI.client = nil
+    Spaceship::Tunes.client = nil
+    Spaceship::Portal.client = nil
+  end
+
   context '#client' do
     let(:mock_client) { double('mock_client') }
 
