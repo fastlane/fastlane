@@ -162,9 +162,11 @@ Twelve workers, same machine:
 
 About 7%, and flat. The second run is not faster than the first, so nothing expensive is being cached in `HOME` and there is no warm-up to amortise.
 
-The 244s is worth explaining because it was briefly reported here as the cost of isolation, and it is not. Without a seeded keychain `security` puts up a modal asking for keychain access and waits for someone to click it, so the run does not fail so much as stop. Twelve workers hitting that is what turned 44s into 244s. Headless, on CI, there is nobody to click it. `rake test_isolated` now checks the keychain exists before running anything and refuses to start otherwise, since hanging is a worse outcome than an error.
+The 244s is worth explaining because it was briefly reported here as the cost of isolation, and it is not. Without a seeded keychain `security` puts up a modal asking for keychain access and waits for it to be answered, so on a machine with a desktop session the run stalls rather than failing. Twelve workers hitting that is what turned 44s into 244s.
 
-This is the same shape as the reason the security gem needed fixing at all: fastlane-community/security#5 was a keychain prompt appearing where nobody could answer it, and the failure being invisible afterwards because the exit status was swallowed.
+Unattended it behaves differently, and better. With no session to draw on, `security` returns exit 36 with empty output instead of prompting. That was established while reproducing fastlane-community/security#5, over `ssh localhost` with `SSH_TTY` empty and `launchctl managername` reporting `Background`. So CI would not stall here, it would fail, and this guard is for the developer running it locally rather than for the runner.
+
+`rake test_isolated` checks the keychain exists before running anything and refuses to start otherwise.
 
 Two things follow.
 

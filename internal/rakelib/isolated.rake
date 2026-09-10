@@ -38,11 +38,15 @@ task(:test_isolated, [:pattern]) do |_task, args|
     "security unlock-keychain -p '' #{keychain}"
   ].each { |command| system(env, command, out: File::NULL, err: File::NULL) }
 
-  # Check it took, and stop here if it did not. Running on without a keychain is
-  # worse than a failure: `security` puts up a modal asking for access and waits
-  # for someone to click it, so the suite hangs rather than reporting anything.
-  # Twelve workers hitting that turned a 44s run into 244s. Headless, on CI,
-  # there is nobody to click it at all.
+  # Check it took, and stop here if it did not. Without a keychain, `security`
+  # puts up a modal asking for access and waits for it to be answered, so on a
+  # machine with a desktop session the suite stalls instead of reporting
+  # anything. Twelve workers hitting that turned a 44s run into 244s.
+  #
+  # Unattended it behaves differently and better: with no session to draw on,
+  # `security` returns exit 36 with empty output rather than prompting, which is
+  # what fastlane-community/security#5 was about. So this guard is for the
+  # developer running it, not for CI.
   seeded = File.join(home, "Library", "Keychains", "#{keychain}-db")
   unless File.exist?(seeded)
     FileUtils.remove_entry(home)
