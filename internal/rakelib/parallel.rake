@@ -112,9 +112,20 @@ task(:test_parallel) do
   files = spec_files
   total = timings["files"].values.sum
 
-  # Without splitting, the slowest file is a floor and workers past that point
-  # just finish early and wait. With it, cores are the limit again.
-  workers = Integer(ENV["WORKERS"] || Etc.nprocessors)
+  # Derived rather than fixed per platform, because what decides the number is
+  # the core count and how much of the suite shells out, not the operating
+  # system name. Measured: a 14 core machine flattens after eight workers, 50s
+  # against 276s sequential, and a macOS runner peaks at four, 263s against
+  # 562s, where six is slower than four. `min(cores, 8)` fits both.
+  #
+  # The cap is there because each worker spawns an xcodebuild child and waits on
+  # it, so N workers is nearer 2N runnable processes and a big machine
+  # oversubscribes long before it runs out of cores. If the xcodebuild specs
+  # ever stop shelling out, this cap should be revisited upwards. Linux and
+  # Windows skip those specs entirely, so their shape is different again.
+  #
+  # WORKERS overrides it, which is the point: measure on your own machine.
+  workers = Integer(ENV["WORKERS"] || [Etc.nprocessors, 8].min)
   target = total.positive? ? total / workers : 0
 
   units = units_for(files, timings, target)
@@ -122,7 +133,7 @@ task(:test_parallel) do
 
   source = total.zero? ? "file size, run `rake spec_timings` first" : "measured durations"
   split = units.size - files.size
-  puts("Running #{files.size} spec files as #{buckets.size} processes, balanced by #{source}")
+  puts("Running #{files.size} spec files as #{buckets.size} processes on #{Etc.nprocessors} cores, balanced by #{source}")
   puts("#{split} extra unit(s) from cutting up files heavier than one worker's share") if split.positive?
   unless total.zero?
     spread = weights.reject(&:zero?)
