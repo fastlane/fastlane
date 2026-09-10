@@ -60,3 +60,25 @@ The only true no GVL option, and incompatible with both RSpec and fastlane as th
 Worth stating plainly so it does not get dropped when the parallelism plan simplifies. The `ENV` guard in `spec_helper.rb` exists because a spec that leaves a credential behind in the environment is a leak, whatever the concurrency model. At seed 40083 thirty five variables escape their example, led by `FASTLANE_LANE_NAME` (61 examples) and `FASTLANE_PLATFORM_NAME` (35), and including `DELIVER_PASSWORD` (16), `MAILGUN_APIKEY` (3) and `DANGER_GITHUB_API_TOKEN` (1).
 
 Choosing processes over threads removes the need for a per thread `ENV` abstraction, but it does not remove the need to fix these. The plan is unchanged: run the guard in `report` mode to build the inventory, then per example either declare the variable as a legitimate output with `env_output:` metadata or wrap the mutation in `FastlaneSpec::Env.with_env_values`, and finally switch the guard to `enforce` so new leaks fail the build.
+
+## Measured, 2026-09-10
+
+Balanced on real per file durations, with files heavier than one worker's share cut into runs of examples.
+
+| Workers | This machine, 14 cores | macOS CI runner |
+| --- | --- | --- |
+| sequential | 276s | ~562s |
+| 2 | 140s | 352s |
+| 4 | 75s | 263s |
+| 6 | 58s | 276s |
+| 8 | 50s | |
+| 12 | 49s | |
+| 14 | 48s | |
+
+Two different answers. Locally the gain is 5.5x and flattens after eight workers; on the runner it is 2.1x and four workers beats six, so past the core count it actively regresses. A developer machine is where this pays.
+
+Contention itself is mild. Eight distinct heavy files take 186s run one after another and 42s run together, against an ideal of 37s, which is 88% efficient, and no single file inflates more than about 11%. What costs is oversubscription rather than interference: each rspec worker spawns an xcodebuild child and waits on it, so N workers is roughly 2N runnable processes, and 275s of measured work stretches to about 420s once fourteen workers are competing on fourteen cores.
+
+That is why the remedy is to remove the subprocesses rather than to tune the worker count. About 180 examples each run a real `xcodebuild -showBuildSettings`; `Project#build_settings` memoises per instance and every example builds a fresh `Project`, so nothing is reused. Caching those would shorten the sequential run and halve the effective process count, which then lets the worker count rise. `FASTLANE_DISALLOW_XCODEBUILD_SETTINGS_LOOKUP` and the `disallow_xcodebuild_settings_lookup` option already exist to forbid the lookup; what is missing is a recorded fixture to answer from.
+
+Splitting also keeps finding order dependence that seeds do not. Rows T and Z came out of a worker seeing a subset no random order produces.
