@@ -171,6 +171,18 @@ Memory is not the constraint. Six workers peak at 1.3GB resident in total, so a 
 
 Splitting found two defects a random order never did. Row T, and a failure in `spaceship/spec/tunes/tunes_client_spec.rb:81` that appeared at six and eight workers. That one is not order dependent: the worker's exact file list passes on its own, 746 examples either way, so it is sensitive to something shared between concurrent processes rather than to what ran before it. It has not reappeared since `spec_helper.rb` stopped pointing every worker's `$stdout` at the same fixed path, which they were opening with mode `"w"` and truncating under each other. That may or may not have been the cause, so it is watched rather than closed.
 
+## plugin_generator_spec, the standing exception
+
+Two examples in `fastlane/spec/plugins_specs/plugin_generator_spec.rb` fail in three different ways and none of them is ordering, so they are excluded from the rows above and noted here instead.
+
+They generate a plugin into a temporary directory and then shell out to `bundle install`, `bundle exec rubocop` and `bundle exec rake` inside it.
+
+- Locally they fail with `expect($?.exitstatus).to eq(0)` got 1, in every order and with every guard switched off, so it is environmental. Ruby 4.0.5 here against 3.4 on the runner is the obvious suspect, unconfirmed.
+- On CI they pass in the sequential job and fail under `rake test_parallel`. The file is 3.4s, well under the split threshold, so it is never cut up and runs whole in one worker. That points at several workers running `bundle install` and `bundle exec` at once against one gem home rather than at anything the split does to this file.
+- Run on their own with `-e`, they fail differently again, `Errno::ENOENT` for the plugin directory, because an earlier example in the file creates it. That is a real intra file dependency of the row D and row S shape, and worth fixing on its own.
+
+Until the middle one is understood the `parallel_split` job is `continue-on-error`, so it reports numbers without marking every run red and burying the two jobs that gate.
+
 ## The environment guard
 
 `spec_helper.rb` snapshots `ENV` around every example, restores it afterwards, and reports every variable an example changed and did not put back. Its point is not only ordering: a spec that leaves a credential in the environment is a leak whatever the concurrency model, and the inventory includes `MAILGUN_APIKEY` and `DANGER_GITHUB_API_TOKEN`.
