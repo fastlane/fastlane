@@ -1,24 +1,74 @@
 # Runs the suite as several independent rspec processes, see fastlane#30184.
 #
-# A spike rather than a replacement for `test_all`. The point is to find out
-# what breaks when the suite is split, and splitting is its own kind of
-# ordering: a worker sees a subset no random seed ever produces, such as the
-# spaceship specs with no fastlane spec having run first. So this is worth
-# running alongside the random order audit rather than after it.
+# Splitting is its own kind of ordering: a worker sees a subset no random seed
+# ever produces, such as the spaceship specs with no fastlane spec having run
+# first. Worth running alongside the random order audit rather than after it.
 #
 # Separate processes, not threads, because ENV and the working directory are
-# per process in the kernel. A forked worker cannot corrupt another one through
-# either, which is what makes this safe to try before every leak is fixed.
+# per process in the kernel. A worker cannot corrupt another through either.
 #
-#   rake test_parallel                 workers default to the processor count
+#   rake test_parallel                 workers chosen from the timings
 #   WORKERS=4 rake test_parallel
 #   WORKERS=6 RSPEC_ARGS="--order random" rake test_parallel
 SPEC_TIMINGS = "internal/spec_timings.json".freeze
 
-# Records how long each spec file takes, so test_parallel can balance on
-# something better than file size. Cheap to refresh and safe to leave stale:
-# a missing file just means a worse split, never a wrong one.
-desc("Record per file spec durations for test_parallel to balance on")
+# How long a unit of work may be before it is worth cutting up, as a fraction of
+# a worker's share. A file at 1.3 times the share cannot be balanced away: some
+# worker has to run it and everyone else waits.
+SPLIT_THRESHOLD = 1.05
+
+def spec_files
+  (Dir.glob("spec/**/*_spec.rb") + Dir.glob("*/spec/**/*_spec.rb")).uniq
+end
+
+def load_timings
+  return { "files" => {}, "examples" => {} } unless File.exist?(SPEC_TIMINGS)
+
+  data = JSON.parse(File.read(SPEC_TIMINGS))
+  data.key?("files") ? data : { "files" => data, "examples" => {} } # older flat format
+end
+
+# Longest processing time first: give the heaviest unit to whichever worker has
+# least queued. Within about 4/3 of optimal for this shape of problem, and the
+# tail is what sets the wall clock.
+def pack(units, workers)
+  buckets = Array.new(workers) { [] }
+  weights = Array.new(workers, 0.0)
+  units.sort_by { |_name, seconds| -seconds }.each do |name, seconds|
+    lightest = weights.each_with_index.min_by { |weight, _index| weight }[1]
+    buckets[lightest] << name
+    weights[lightest] += seconds
+  end
+  [buckets.reject(&:empty?), weights]
+end
+
+# A file heavier than the threshold is cut into runs of examples, addressed with
+# rspec's own `path[id,id]` syntax. Without this the slowest single file is a
+# floor no number of workers gets under: at 269s total and a 35s worst file,
+# seven workers is the most that can help.
+def units_for(files, timings, target)
+  files.flat_map do |file|
+    key = file.delete_prefix("./")
+    seconds = timings["files"][key] || 0.05
+    examples = timings["examples"][key]
+
+    next [[file, seconds]] if examples.nil? || seconds <= target * SPLIT_THRESHOLD
+
+    chunks = [[]]
+    running = 0.0
+    examples.sort_by { |_id, secs| -secs }.each do |id, secs|
+      if running + secs > target && !chunks.last.empty?
+        chunks << []
+        running = 0.0
+      end
+      chunks.last << id
+      running += secs
+    end
+    chunks.map { |ids| ["#{file}[#{ids.join(',')}]", ids.sum { |id| examples[id] }] }
+  end
+end
+
+desc("Record per file and per example spec durations for test_parallel to balance on")
 task(:spec_timings) do
   require "json"
 
@@ -32,14 +82,25 @@ task(:spec_timings) do
   sh("rspec --pattern 'spec/**/*_spec.rb,*/spec/**/*_spec.rb' --format json --out #{out}") { |_ok, _res| }
   raise("rspec produced no #{out}") unless File.exist?(out)
 
-  totals = Hash.new(0.0)
+  files = Hash.new(0.0)
+  examples = Hash.new { |hash, key| hash[key] = {} }
   JSON.parse(File.read(out))["examples"].each do |example|
-    totals[example["file_path"].delete_prefix("./")] += example["run_time"].to_f
+    path = example["file_path"].delete_prefix("./")
+    seconds = example["run_time"].to_f
+    files[path] += seconds
+    examples[path][example["id"][/\[(.*)\]/, 1]] = seconds
   end
-  File.write(SPEC_TIMINGS, JSON.pretty_generate(totals.sort_by { |_file, seconds| -seconds }.to_h))
+
+  # Per example timings only for what might need splitting. Keeping all of them
+  # would be a megabyte of ids nothing reads.
+  heavy = files.select { |_path, seconds| seconds > 5.0 }.keys
+  File.write(SPEC_TIMINGS, JSON.pretty_generate(
+                             "files" => files.sort_by { |_path, seconds| -seconds }.to_h,
+                             "examples" => examples.select { |path, _| heavy.include?(path) }
+  ))
   File.delete(out)
 
-  puts("Wrote #{totals.size} file timings to #{SPEC_TIMINGS}, #{totals.values.sum.round}s total")
+  puts("Wrote #{files.size} file timings (#{heavy.size} with per example detail) to #{SPEC_TIMINGS}, #{files.values.sum.round}s total")
 end
 
 desc("Run the suite as WORKERS independent rspec processes")
@@ -47,34 +108,23 @@ task(:test_parallel) do
   require "etc"
   require "json"
 
+  timings = load_timings
+  files = spec_files
+  total = timings["files"].values.sum
+
+  # Without splitting, the slowest file is a floor and workers past that point
+  # just finish early and wait. With it, cores are the limit again.
   workers = Integer(ENV["WORKERS"] || Etc.nprocessors)
-  files = (Dir.glob("spec/**/*_spec.rb") + Dir.glob("*/spec/**/*_spec.rb")).uniq
+  target = total.positive? ? total / workers : 0
 
-  # Weight by measured duration where we have it. File size is a poor stand in:
-  # one xcodebuild example outweighs a thousand pure ones, and weighting by size
-  # put 4006 examples in one worker against 1195 in another. `rake
-  # spec_timings` records real per file durations; without that file we fall
-  # back to size and say so.
-  timings = File.exist?(SPEC_TIMINGS) ? JSON.parse(File.read(SPEC_TIMINGS)) : {}
-  weight_of = lambda do |file|
-    timings[file] || timings[file.delete_prefix("./")] || (timings.empty? ? File.size(file) : 0.05)
-  end
+  units = units_for(files, timings, target)
+  buckets, weights = pack(units, workers)
 
-  # Longest processing time first: give the heaviest file to whichever worker
-  # has least queued. Optimal within about 4/3 of perfect for this shape of
-  # problem, and the tail is what sets the wall clock.
-  buckets = Array.new(workers) { [] }
-  weights = Array.new(workers, 0.0)
-  files.sort_by { |file| -weight_of.call(file) }.each do |file|
-    lightest = weights.each_with_index.min_by { |weight, _index| weight }[1]
-    buckets[lightest] << file
-    weights[lightest] += weight_of.call(file)
-  end
-  buckets.reject!(&:empty?)
-
-  source = timings.empty? ? "file size, run `rake spec_timings` for durations" : "measured durations"
+  source = total.zero? ? "file size, run `rake spec_timings` first" : "measured durations"
+  split = units.size - files.size
   puts("Running #{files.size} spec files as #{buckets.size} processes, balanced by #{source}")
-  unless timings.empty?
+  puts("#{split} extra unit(s) from cutting up files heavier than one worker's share") if split.positive?
+  unless total.zero?
     spread = weights.reject(&:zero?)
     puts(format("Predicted worker load %<min>.0fs to %<max>.0fs", min: spread.min, max: spread.max))
   end
@@ -84,7 +134,7 @@ task(:test_parallel) do
     log = "rspec_worker_#{index}.log"
     # Record the split, so a failure that only happens under one can be replayed
     # by handing these paths straight back to rspec.
-    File.write(log, "# worker #{index}, #{bucket.size} files\n# #{bucket.join(' ')}\n")
+    File.write(log, "# worker #{index}, #{bucket.size} units\n# #{bucket.join(' ')}\n")
     command = ["rspec", "--format", "progress", *ENV["RSPEC_ARGS"].to_s.split, *bucket]
     Process.spawn(*command, out: [log, "a"], err: [log, "a"])
   end
