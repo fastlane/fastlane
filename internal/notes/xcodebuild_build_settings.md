@@ -162,7 +162,9 @@ Twelve workers, same machine:
 
 About 7%, and flat. The second run is not faster than the first, so nothing expensive is being cached in `HOME` and there is no warm-up to amortise.
 
-The 244s is worth explaining because it was briefly reported here as the cost of isolation, and it is not. Without a seeded keychain the nine keychain examples fail, and the failures drag `xcodebuild` through its retry path, `xcode_build_settings_retries` defaulting to 3 with a timeout each, across twelve workers. That is the cost of a broken configuration, not of isolation.
+The 244s is worth explaining because it was briefly reported here as the cost of isolation, and it is not. Without a seeded keychain `security` puts up a modal asking for keychain access and waits for someone to click it, so the run does not fail so much as stop. Twelve workers hitting that is what turned 44s into 244s. Headless, on CI, there is nobody to click it. `rake test_isolated` now checks the keychain exists before running anything and refuses to start otherwise, since hanging is a worse outcome than an error.
+
+This is the same shape as the reason the security gem needed fixing at all: fastlane-community/security#5 was a keychain prompt appearing where nobody could answer it, and the failure being invisible afterwards because the exit status was swallowed.
 
 Two things follow.
 

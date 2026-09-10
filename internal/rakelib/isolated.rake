@@ -38,7 +38,18 @@ task(:test_isolated, [:pattern]) do |_task, args|
     "security unlock-keychain -p '' #{keychain}"
   ].each { |command| system(env, command, out: File::NULL, err: File::NULL) }
 
-  puts("HOME is #{home}")
+  # Check it took, and stop here if it did not. Running on without a keychain is
+  # worse than a failure: `security` puts up a modal asking for access and waits
+  # for someone to click it, so the suite hangs rather than reporting anything.
+  # Twelve workers hitting that turned a 44s run into 244s. Headless, on CI,
+  # there is nobody to click it at all.
+  seeded = File.join(home, "Library", "Keychains", "#{keychain}-db")
+  unless File.exist?(seeded)
+    FileUtils.remove_entry(home)
+    abort("could not seed a keychain at #{seeded}, refusing to run: the suite would block on a keychain prompt")
+  end
+
+  puts("HOME is #{home}, keychain seeded")
 
   target = ENV["WORKERS"] ? "test_parallel" : "test_all"
   target = "spec" if args[:pattern]
