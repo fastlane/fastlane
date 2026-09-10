@@ -37,6 +37,53 @@ end
 
 my_main = self
 RSpec.configure do |config|
+  # Singleton guard, see fastlane#30184.
+  #
+  # The fastlane tools keep their configuration on the module itself, so a value
+  # one example assigns is still there for every example after it. Four rows of
+  # internal/order_dependent_specs.md are the same defect: a group reading
+  # configuration it never set, green only while something earlier happened to
+  # leave one behind. Row W survived roughly twenty five random orders before a
+  # seed caught it, so waiting for seeds to find the rest is slow.
+  #
+  # Clearing them after every example turns those from occasional failures into
+  # permanent ones, which is the only way to enumerate them rather than wait.
+  #
+  # The ivars are cleared rather than assigned through the writers: Scan, Gym
+  # and Snapshot define `config=` to run detection and reset their cache as a
+  # side effect, so assigning nil would run detection against a nil config.
+  #
+  # FASTLANE_SPEC_SINGLETON_GUARD=off restores the old behaviour.
+  SINGLETON_GUARD_MODE = (ENV["FASTLANE_SPEC_SINGLETON_GUARD"] || "reset").to_sym
+
+  # Read off the `class << self` blocks of each tool's module.rb, plus
+  # supply/lib/supply.rb, which keeps its accessor elsewhere.
+  SINGLETON_ACCESSORS = {
+    "Cert" => %i[config],
+    "Deliver" => %i[cache],
+    "Frameit" => %i[config],
+    "Gym" => %i[config project cache],
+    "PEM" => %i[config],
+    "Precheck" => %i[config],
+    "Produce" => %i[config],
+    "Scan" => %i[config project cache devices],
+    "Screengrab" => %i[config android_environment],
+    "Sigh" => %i[config],
+    "Snapshot" => %i[config project cache],
+    "Supply" => %i[config]
+  }.freeze
+
+  config.after(:each) do
+    next if SINGLETON_GUARD_MODE == :off
+
+    SINGLETON_ACCESSORS.each do |name, attributes|
+      next unless Object.const_defined?(name)
+
+      mod = Object.const_get(name)
+      attributes.each { |attribute| mod.instance_variable_set("@#{attribute}", nil) }
+    end
+  end
+
   config.before(:each) do |current_test|
     # We don't want to call the RubyGems API at any point
     # This was a request that was added with Ruby 2.4.0
