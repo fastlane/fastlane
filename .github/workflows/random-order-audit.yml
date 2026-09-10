@@ -1,5 +1,13 @@
 # Runs the suite in a random order, on this branch only.
 #
+# A push runs the cheap jobs: the known order dependent subset, both platforms
+# split four ways, and Linux in a random order. That is about four minutes.
+#
+# The full sequential macOS run and the isolated HOME run are workflow_dispatch
+# only, along with the 2 and 6 worker comparisons. They are worth having and not
+# worth waiting eleven minutes for on every push, now that the suite has been
+# order independent across eight consecutive runs.
+#
 # The suite is order dependent today (fastlane#30184): specs leak module level
 # state, so whether a file passes depends on what ran before it. That blocks
 # parallelising the suite, and it is invisible while everything runs in the one
@@ -32,7 +40,7 @@ permissions:
 
 jobs:
   random_order:
-    if: inputs.record_timings == 'no' || inputs.record_timings == null
+    if: github.event_name == 'workflow_dispatch' && (inputs.record_timings == 'no' || inputs.record_timings == null)
     name: "Random order, Xcode 16.4.0, Ruby 3.4"
     runs-on: macos-15
     steps:
@@ -126,7 +134,10 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        workers: [2, 4, 6]
+        # 2 and 6 are for comparison and only worth paying for on demand. 4 is
+        # the one that has measured best on this runner, so it is what a push
+        # gets.
+        workers: ${{ github.event_name == 'workflow_dispatch' && fromJSON('[2,4,6]') || fromJSON('[4]') }}
     steps:
       - uses: actions/checkout@v7
 
@@ -200,7 +211,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        workers: [2, 4]
+        workers: ${{ github.event_name == 'workflow_dispatch' && fromJSON('[2,4]') || fromJSON('[4]') }}
     steps:
       - uses: actions/checkout@v7
 
@@ -223,7 +234,7 @@ jobs:
         run: bundle exec rake test_parallel
 
   isolated_home:
-    if: inputs.record_timings == 'no' || inputs.record_timings == null
+    if: github.event_name == 'workflow_dispatch' && (inputs.record_timings == 'no' || inputs.record_timings == null)
     name: "Isolated HOME, workers 4"
     runs-on: macos-15
     steps:
