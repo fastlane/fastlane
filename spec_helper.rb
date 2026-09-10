@@ -27,7 +27,10 @@ SPACESHIP_COOKIE_DIR = Dir.mktmpdir("fastlane-spec-spaceship")
 ENV["SPACESHIP_COOKIE_PATH"] = SPACESHIP_COOKIE_DIR
 
 unless ENV["DEBUG"]
-  fastlane_tests_tmpdir = "#{Dir.tmpdir}/fastlane_tests"
+  # Per process. `rake test_parallel` runs several rspec processes at once and a
+  # fixed name means they all open the same file with mode "w", each truncating
+  # what the others are writing. See fastlane#30184.
+  fastlane_tests_tmpdir = "#{Dir.tmpdir}/fastlane_tests#{ENV['TEST_ENV_NUMBER'] || Process.pid}"
   $stdout.puts("Changing stdout to #{fastlane_tests_tmpdir}, set `DEBUG` environment variable to print to stdout (e.g. when using `pry`)")
   $stdout = File.open(fastlane_tests_tmpdir, "w")
 end

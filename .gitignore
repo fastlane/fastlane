@@ -82,3 +82,4 @@ xcuserdata/
 # Dotenv
 .env
 rspec_worker_*.log
+rspec_timings_raw.json

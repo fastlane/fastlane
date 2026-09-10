@@ -23,7 +23,14 @@ task(:spec_timings) do
   require "json"
 
   out = "rspec_timings_raw.json"
-  sh("rspec --pattern 'spec/**/*_spec.rb,*/spec/**/*_spec.rb' --dry-run=false --format json --out #{out}")
+  # --out, not a shell redirect: spec_helper.rb repoints $stdout at a temporary
+  # file, so a redirect captures nothing.
+  #
+  # A failing example still has a duration, and this task is for timings rather
+  # than for verdicts, so a non-zero exit is not a reason to stop. `sh` aborts
+  # on one unless it is given a block.
+  sh("rspec --pattern 'spec/**/*_spec.rb,*/spec/**/*_spec.rb' --format json --out #{out}") { |_ok, _res| }
+  raise("rspec produced no #{out}") unless File.exist?(out)
 
   totals = Hash.new(0.0)
   JSON.parse(File.read(out))["examples"].each do |example|
@@ -75,8 +82,11 @@ task(:test_parallel) do
   started = Time.now
   pids = buckets.each_with_index.map do |bucket, index|
     log = "rspec_worker_#{index}.log"
+    # Record the split, so a failure that only happens under one can be replayed
+    # by handing these paths straight back to rspec.
+    File.write(log, "# worker #{index}, #{bucket.size} files\n# #{bucket.join(' ')}\n")
     command = ["rspec", "--format", "progress", *ENV["RSPEC_ARGS"].to_s.split, *bucket]
-    Process.spawn(*command, out: log, err: [log, "a"])
+    Process.spawn(*command, out: [log, "a"], err: [log, "a"])
   end
 
   results = pids.map { |pid| Process.wait2(pid).last }
