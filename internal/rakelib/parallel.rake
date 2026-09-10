@@ -18,7 +18,17 @@ SPEC_TIMINGS = "internal/spec_timings.json".freeze
 SPLIT_THRESHOLD = 1.05
 
 def spec_files
-  (Dir.glob("spec/**/*_spec.rb") + Dir.glob("*/spec/**/*_spec.rb")).uniq
+  files = (Dir.glob("spec/**/*_spec.rb") + Dir.glob("*/spec/**/*_spec.rb")).uniq
+  excluded = ENV["EXCLUDE"].to_s.split
+  return files if excluded.empty?
+
+  # Space separated paths to leave out. For specs that fail under a split for a
+  # reason that is not ordering, so that a real finding is not buried under a
+  # known one. Say which, every run, so an exclusion cannot quietly become
+  # permanent.
+  kept = files.reject { |file| excluded.include?(file.delete_prefix("./")) }
+  puts("Excluding #{files.size - kept.size} file(s) by EXCLUDE: #{excluded.join(', ')}")
+  kept
 end
 
 def load_timings
