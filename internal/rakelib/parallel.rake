@@ -172,18 +172,21 @@ task(:test_parallel) do
               elapsed: elapsed, workers: buckets.size))
 
   failed = results.each_with_index.reject { |status, _index| status.success? }
-  return if failed.empty?
 
-  # The worker logs stay on disk, so without this a CI log says only how many
-  # examples failed and never which. Print the failures and the split that
-  # produced them, since a split only failure cannot be reproduced without
-  # knowing what the worker was given.
-  failed.each do |_status, index|
-    log = File.readlines("rspec_worker_#{index}.log")
-    puts("")
-    puts("worker #{index} failures:")
-    log.grep(%r{^rspec \./}).each { |line| puts("  #{line.strip}") }
-    puts("  units: #{log[1].to_s.sub('# ', '').strip}")
+  # No `return` here: this is a block, and returning from one raises
+  # LocalJumpError, which is what it did on CI.
+  unless failed.empty?
+    # The worker logs stay on disk, so without this a CI log says only how many
+    # examples failed and never which. Print the failures and the split that
+    # produced them, since a split only failure cannot be reproduced without
+    # knowing what the worker was given.
+    failed.each do |_status, index|
+      log = File.readlines("rspec_worker_#{index}.log")
+      puts("")
+      puts("worker #{index} failures:")
+      log.grep(%r{^rspec \./}).each { |line| puts("  #{line.strip}") }
+      puts("  units: #{log[1].to_s.sub('# ', '').strip}")
+    end
+    abort("#{failed.size} of #{results.size} workers failed")
   end
-  abort("#{failed.size} of #{results.size} workers failed")
 end
