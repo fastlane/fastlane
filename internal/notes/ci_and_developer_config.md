@@ -15,7 +15,19 @@ A developer machine with 14 cores, against a macOS runner with 3 and a Linux run
 | 8 | 50s | | |
 | 12 | **41s** | | |
 
-Four workers is the knee on both runners. Six on macOS is worse than four by a wide margin, 266s against 151s, which is a three core runner being asked to run six workers that each drag an `xcodebuild` child along with them.
+Four workers is the knee on both runners. Six on macOS is worse than four, which is a three core runner being asked to run six workers that each drag an `xcodebuild` child along with them.
+
+The single run those first macOS figures came from was not enough to say so with confidence. Across five runs of the same commit:
+
+| Workers | Fastest | Median | Slowest |
+| --- | --- | --- | --- |
+| 2 | 229 | 337 | 412 |
+| 4 | 151 | 243 | 252 |
+| 6 | 266 | 303 | 391 |
+
+A runner varies by a factor of nearly two on identical work, so any single measurement from one is close to worthless. Four is reliably the best of the three, and six is reliably the worst, but the earlier statement that six costs 266s against four's 151s was comparing two samples that happen to be the fastest of their groups. The medians, 243s against 303s, are the honest comparison.
+
+Local numbers on a machine that is not shared do not behave this way, and the local table above is from single runs.
 
 `test_parallel` defaults to `min(cores, 12)`, which picks 3 on the macOS runner and 4 on Linux. Three is a little conservative for macOS; four measured better. The cap matters on a large machine, where one worker per core oversubscribes badly.
 
@@ -43,7 +55,7 @@ GitHub gives a fresh VM every run, which raises a fair question about caching. T
 
 **A developer on macOS**: `WORKERS=8 rake test_parallel`, 276s to 50s. Twelve is slightly faster at 41s but the returns are thin past eight. `rake test_isolated` before pushing anything that touches how specs read the environment or the filesystem.
 
-**macOS CI**: four workers, 562s to 151s. The default of `min(cores, 12)` picks three, which is close; pinning `WORKERS: 4` is worth the two lines.
+**macOS CI**: four workers, a median of 243s against 562s sequential. The default of `min(cores, 12)` picks three, which is close; pinning `WORKERS: 4` is worth the two lines.
 
 **Linux CI**: four workers, 130s to 71s. Cheap, and worth keeping for ordering coverage on a suite shape macOS never exercises.
 
