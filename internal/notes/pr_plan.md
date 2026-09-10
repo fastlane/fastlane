@@ -8,7 +8,7 @@ Four pairs cancel out and should be dropped rather than rebased:
 
 - `2655245d8` and its revert `f97a6de7f`, recording xcodebuild build settings to fixtures.
 - `10740cd41` and its revert `70372e974`, memoising them per run.
-- `5886100db` and `944842d71` are a cherry-pick of PR #30178 and belong to that PR, not here. They were carried temporarily so CI would exercise the security gem's `main` alongside this work.
+The cherry-pick of PR #30178 stays, deliberately. Every measurement on this branch was taken with it applied, and dropping it would leave the branch no longer matching what was measured. It reaches master through its own pull request rather than through this branch, which is deleted rather than merged, so carrying it here costs nothing.
 
 Both reverted attempts are written up in `internal/notes/xcodebuild_build_settings.md`, which is where that work should live until somebody takes it further.
 
