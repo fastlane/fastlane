@@ -148,3 +148,94 @@ jobs:
         env:
           WORKERS: ${{ matrix.workers }}
         run: bundle exec rake test_parallel
+
+  random_order_linux:
+    name: "Random order, Linux, Ruby 3.1"
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v7
+
+      - uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: '3.1'
+          bundler-cache: true
+
+      - name: Increase Open File Limit
+        shell: bash
+        run: ulimit -n 65536
+
+      # A different shape of suite, not just a different runner. Without Xcode
+      # the requires_xcodebuild and requires_keychain specs skip, which is 61%
+      # of the example time on macOS, so both the ordering and the timings are
+      # worth measuring separately rather than assumed from the mac numbers.
+      - name: Run the suite in a random order
+        shell: bash
+        run: |
+          git config --global user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git config --global user.name "github-actions[bot]"
+          bundle exec rake test_all
+
+      - name: RSpec report
+        if: always()
+        uses: SonicGarden/rspec-report-action@v8
+        with:
+          json-path: rspec_logs.json
+          comment: 'false'
+          title: '# :penguin: Random order failures, Linux'
+
+  parallel_split_linux:
+    name: "Parallel split on Linux, workers ${{ matrix.workers }}"
+    runs-on: ubuntu-24.04
+    strategy:
+      fail-fast: false
+      matrix:
+        workers: [2, 4]
+    steps:
+      - uses: actions/checkout@v7
+
+      - uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: '3.1'
+          bundler-cache: true
+
+      - name: Increase Open File Limit
+        shell: bash
+        run: ulimit -n 65536
+
+      # The useful worker count is expected to differ here. On macOS each worker
+      # drags an xcodebuild child along with it, so the knee sits near half the
+      # core count. Without Xcode there are far fewer subprocesses.
+      - name: Run the suite as ${{ matrix.workers }} processes
+        shell: bash
+        env:
+          WORKERS: ${{ matrix.workers }}
+        run: bundle exec rake test_parallel
+
+  isolated_home:
+    name: "Isolated HOME, workers 4"
+    runs-on: macos-15
+    steps:
+      - uses: actions/checkout@v7
+
+      - uses: maxim-lobanov/setup-xcode@v1
+        with:
+          xcode-version: '16.4.0'
+
+      - uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: '3.4'
+          bundler-cache: true
+
+      - name: Increase Open File Limit
+        shell: bash
+        run: ulimit -n 65536
+
+      # Runs against a home directory the run controls, so that a spec depending
+      # on state an earlier run left in ~ fails here. Row Z was exactly that and
+      # survived for months because every machine that had run the suite already
+      # had the file it needed. Locally this costs about 7%.
+      - name: Run the suite with an isolated HOME
+        shell: bash
+        env:
+          WORKERS: 4
+        run: bundle exec rake test_isolated
