@@ -30,7 +30,13 @@ end
 # How long a unit of work may be before it is worth cutting up, as a fraction of
 # a worker's share. A file at 1.3 times the share cannot be balanced away: some
 # worker has to run it and everyone else waits.
-SPLIT_THRESHOLD = 1.05
+#
+# Overridable so it can be measured rather than guessed. Anything at or above 1
+# only catches files that exceed a whole share, and a file at 0.96 of one is
+# just as bad: that worker runs it and almost nothing else. Cutting is not free
+# though, since each chunk is a separate rspec process that loads the file again
+# and repeats its before(:all).
+SPLIT_THRESHOLD = (ENV["SPLIT_THRESHOLD"] || 1.05).to_f
 
 def spec_files
   files = (Dir.glob("spec/**/*_spec.rb") + Dir.glob("*/spec/**/*_spec.rb")).uniq

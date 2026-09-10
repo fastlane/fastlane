@@ -99,3 +99,21 @@ This is also why Linux parallelism looked weak earlier in this document, 1.8x ag
 Timings now live in `internal/spec_timings.<platform>.json`, and the workflow has a `record_timings` input, `macos`, `linux` or `both`, which runs the suite once in a single process on that runner and uploads the file to be committed. Nobody needs the hardware to fix the balance for a platform they do not have.
 
 `deliver/spec/upload_metadata_spec.rb` is now the thing to look at on Linux: 27.1s of a 113s suite, 24% of it, and identical on both platforms. Four workers cannot go below it however well balanced, which is most of the 12% that remains.
+
+### Cutting files up more aggressively does not help, at least not where it was measured
+
+`SPLIT_THRESHOLD` decides when a file is heavy enough to be cut into runs of examples: at 1.05 it has to exceed a whole worker's share. Lowering it was worth trying, because a file at 0.96 of a share is just as bad as one at 1.05 and is not caught.
+
+Measured on 14 cores, three thresholds at two worker counts:
+
+| Threshold | 4 workers | 8 workers |
+| --- | --- | --- |
+| 1.05 | 77s, spread 2%, idle 1% | 49s, spread 19%, idle 7% |
+| 0.5 | 76s, spread 1%, idle 1% | 50s, spread 19%, idle 6% |
+| 0.33 | 76s, spread 1%, idle 0% | 48s, spread 17%, idle 8% |
+
+All within noise, so the default stays at 1.05. It is overridable through the environment for anyone who wants to measure it on their own hardware.
+
+The measurement has a hole in it worth stating. The case that prompted it is Linux at four workers, where `upload_metadata_spec` is 96% of a share. On 14 cores with 275s of work that situation does not arise: at four workers the split is already at 2% spread and 1% idle, because each share is large next to the biggest file. So these numbers show the change is harmless where it is not needed, and say nothing about whether it helps where it is. Testing that needs `SPLIT_THRESHOLD` plumbed through the workflow.
+
+The related finding is that imbalance is a function of worker count rather than a standing property of the split. The 42% spread recorded earlier was at twelve workers, not four.
