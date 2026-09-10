@@ -196,6 +196,13 @@ fastlane/spec/actions_specs/automatic_code_signing_spec.rb
 fastlane_core/spec/command_executor_spec.rb
 fastlane_core/spec/device_manager_spec.rb
 supply/spec/uploader_spec.rb
+spaceship/spec/connect_api/spaceship_spec.rb
+fastlane_core/spec/project_spec.rb
+fastlane/spec/ruby_version_warning_spec.rb
+fastlane/spec/actions_specs/flock_spec.rb
+fastlane/spec/actions_specs/xcodebuild_spec.rb
+gym/spec/platform_detection_spec.rb
+credentials_manager/spec/account_manager_spec.rb
 ```
 
 Deliberately excluded: `fastlane_core/spec/project_spec.rb` and `fastlane/spec/plugins_specs/plugin_generator_spec.rb`. They fail locally in any order, including the normal one, so they are environmental rather than order dependent.
