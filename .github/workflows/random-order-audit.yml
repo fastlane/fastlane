@@ -147,12 +147,4 @@ jobs:
         shell: bash
         env:
           WORKERS: ${{ matrix.workers }}
-          # plugin_generator_spec generates a plugin and shells out to bundle
-          # install and bundle exec inside it. It passes in the sequential job
-          # and fails here, and the file is well under the split threshold so it
-          # is never cut up, which points at several workers running bundler at
-          # once against one gem home rather than at the split. Left out so that
-          # a real finding is not buried under a known one. See
-          # internal/order_dependent_specs.md.
-          EXCLUDE: fastlane/spec/plugins_specs/plugin_generator_spec.rb
         run: bundle exec rake test_parallel
