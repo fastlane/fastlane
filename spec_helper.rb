@@ -65,6 +65,57 @@ RSpec.configure do |config|
     expect(ENV['PATH']).to be_truthy, "PATH is missing. (Previous test probably emptied it.)"
   end
 
+  # Environment guard, see fastlane#30184.
+  #
+  # A test that leaves a variable behind changes what every later test in the
+  # process sees, and several of the ones involved carry credentials:
+  # DELIVER_PASSWORD, FASTLANE_PASSWORD and FASTLANE_SESSION have all been found
+  # leaking between examples. Tests should scope what they set with
+  # FastlaneSpec::Env.with_env_values rather than assigning to ENV directly.
+  #
+  # Modes, through FASTLANE_SPEC_ENV_GUARD:
+  #   report  (default) leave ENV alone, report what escaped the example
+  #   enforce           restore ENV afterwards, so nothing escapes
+  #   off               do nothing
+  #
+  # An example that is meant to leave something behind declares it:
+  #   it "sets the team id", env_output: %w[FASTLANE_TEAM_ID] do
+  #
+  # Only key names are ever reported. The values are the point of the exercise.
+  ENV_GUARD_MODE = (ENV["FASTLANE_SPEC_ENV_GUARD"] || "report").to_sym
+  ENV_GUARD_LEAKS = Hash.new { |hash, key| hash[key] = [] }
+
+  config.around(:each) do |example|
+    if ENV_GUARD_MODE == :off
+      example.run
+    else
+      before = ENV.to_h
+      begin
+        example.run
+      ensure
+        allowed = Array(example.metadata[:env_output]).map(&:to_s)
+        after = ENV.to_h
+        escaped = ((after.keys - before.keys) | (before.keys - after.keys) |
+                   (before.keys & after.keys).reject { |key| before[key] == after[key] }) - allowed
+        escaped.each { |key| ENV_GUARD_LEAKS[key] << example.id }
+        ENV.replace(before) if ENV_GUARD_MODE == :enforce
+      end
+    end
+  end
+
+  config.after(:suite) do
+    next if ENV_GUARD_LEAKS.empty?
+
+    warn("")
+    warn("[env-guard] #{ENV_GUARD_LEAKS.size} environment variables escaped the example that changed them.")
+    warn("[env-guard] Scope them with FastlaneSpec::Env.with_env_values, or declare them with env_output:.")
+    ENV_GUARD_LEAKS.sort_by { |_key, ids| -ids.size }.each do |key, ids|
+      warn("[env-guard]   #{key} (#{ids.size})")
+      ids.uniq.first(3).each { |id| warn("[env-guard]       #{id}") }
+      warn("[env-guard]       ...") if ids.uniq.size > 3
+    end
+  end
+
   config.after(:each) do |current_test|
     # execute `after_each_*` method from spec_helper for each tool
     tool_name = current_test.id.match(%r{\.\/(\w+)\/})[1]
