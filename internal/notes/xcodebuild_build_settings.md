@@ -78,7 +78,21 @@ The memoisation was checked against three random seeds precisely because the haz
 
 That is the same shape as three other defects found on this branch: a spec reading the harness's own log file as a screenshot fixture, a stale generated `.rubocop.yml`, and a spaceship cookie nine months older than the run depending on it. A working copy accumulates state that a runner never has, so a green local run is weaker evidence than it looks.
 
-Anything attempted here again should be verified in a clean checkout. `git clean -xdn` lists what this tree carries that CI's does not.
+Anything attempted here again should be verified in a clean checkout. `git clean -dn` lists what this tree carries that a runner's does not, and on the machine this was written on that is 106 entries, 45 of them inside `spec/` or `examples/` directories:
+
+```
+scan/examples/standard/app.xcodeproj/project.xcworkspace/xcuserdata/<user>.xcuserdatad/WorkspaceSettings.xcsettings
+fastlane_core/spec/fixtures/projects/Example.xcodeproj/project.xcworkspace/xcshareddata/swiftpm/
+gym/examples/*/[...]/project.xcworkspace/xcshareddata/swiftpm/
+fastlane/spec/fixtures/plugins/ImportFromGem/Gemfile.lock
+...
+```
+
+The first of those is the file that broke attempt 2. The rest are the same hazard waiting for a different change to trip over: every one is an input some spec may read, present here and absent on a runner.
+
+Most are written by the suite itself. Xcode creates `xcshareddata/swiftpm` when it opens a project, `bundle install` writes the plugin lockfiles, and `detect_values_spec` copies the workspace settings in deliberately. None of them are cleaned up.
+
+**The check worth adding.** After a full run, `git status --porcelain` should be empty. It is not, and a job that asserted it would have caught all four of the defects found on this branch that came from leftover state: this one, `iap_detail_spec` reading the harness's log file as a screenshot, the stale generated `.rubocop.yml`, and a spaceship cookie nine months older than the run that depended on it. It is a cheaper and more general fix than chasing each spec that leaves something behind, and it turns "works on my machine" from a discovery made on CI into one made locally.
 
 ## What is left to try
 
