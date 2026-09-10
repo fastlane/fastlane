@@ -180,7 +180,27 @@ With restoring on, the full suite reports the same 35 variables with the same co
 | 4 more, including `FASTLANE_TEAM_NAME` and `PRODUCE_TEAM_NAME` | 2 each |
 | 13 more, including `DANGER_GITHUB_API_TOKEN`, `SIGH_UUID` and `ANDROID_SDK_ROOT` | 1 each |
 
-Four rows so far are the same defect: a group reading module level configuration it never sets, passing only while an earlier example happens to leave a value behind. Row C was `Frameit.config`, S was `Scan.config`, U was `Cert.config`, W was `Scan.config` and `Scan.project` together. Fixing them one at a time only catches the ones a seed exposes, and W survived roughly twenty five CI runs before one did. Nilling these singletons in an `after(:each)` per tool would make every remaining instance fail every time instead of occasionally, the same move that made the environment leaks tractable. `Scan.project` is the warning that the list is not just `config`: production code assigns it mid run, so the accessors have to be read off `scan/lib/scan/module.rb` and its siblings rather than guessed.
+## The singleton guard
+
+Four rows were the same defect: a group reading module level configuration it never sets, green only while an earlier example happened to leave a value behind. Row C was `Frameit.config`, S was `Scan.config`, U was `Cert.config`, W was `Scan.config` and `Scan.project` together. Fixing them one at a time only catches what a seed exposes, and W survived roughly twenty five random orders before one did.
+
+`spec_helper.rb` now clears these after every example, so a group that depends on one fails every time rather than occasionally. The accessors are read off each tool's `module.rb` `class << self` block, plus `supply/lib/supply.rb`, which keeps its accessor elsewhere and would have been missed by looking only at `module.rb`:
+
+| Module | Cleared |
+| --- | --- |
+| `Scan` | `config`, `project`, `cache`, `devices` |
+| `Gym`, `Snapshot` | `config`, `project`, `cache` |
+| `Screengrab` | `config`, `android_environment` |
+| `Cert`, `Frameit`, `PEM`, `Precheck`, `Produce`, `Sigh`, `Supply` | `config` |
+| `Deliver` | `cache` |
+
+The ivars are cleared rather than assigned through the writers. `Scan`, `Gym` and `Snapshot` define `config=` to run detection and reset their cache as a side effect, so assigning nil would run detection against a nil config.
+
+With the guard on, the full suite at defined order gains no failures at all, which says C, S, U and W were the only instances in the suite rather than the only ones a seed had found. The guard was checked against a probe rather than inferred from that zero: one example assigns `Scan.config` and `Scan.project`, the next asserts both are nil, and it passes with the guard on and fails with `FASTLANE_SPEC_SINGLETON_GUARD=off`.
+
+`Spaceship::ConnectAPI.client`, `Tunes.client` and `Portal.client` are deliberately not in the list. They are the same shape and account for rows A, B, H, I and K, but clearing them per example took `spaceship/spec` from 10 failures to 13 on a fixed seed, because some specs rely on the client persisting. They need individual work, not a blanket reset.
+
+`scan/spec/xcpretty_reporter_options_generator_spec.rb` set `Scan.config` in a `before(:all)`, a one shot that only serves the first example once the guard clears between them. Moved to `before(:each)`, as row K was. It was the only such case in the suite.
 
 The top four environment variables are not four hundred careless specs. `before_each_match`, `before_each_pilot` and `before_each_spaceship` each assign `DELIVER_USER` and `DELIVER_PASSWORD` on every example of their tool, so every match, pilot and spaceship example is counted. Fixing those three methods accounts for most of the list.
 

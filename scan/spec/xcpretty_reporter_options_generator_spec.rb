@@ -1,6 +1,9 @@
 describe Scan do
   describe Scan::XCPrettyReporterOptionsGenerator, requires_xcodebuild: true do
-    before(:all) do
+    # before(:each), not before(:all): Scan.config is module level and the
+    # singleton guard in spec_helper clears it after every example, so a one
+    # shot setup would only serve the first. See fastlane#30184.
+    before(:each) do
       options = { project: "./scan/examples/standard/app.xcodeproj" }
       Scan.config = FastlaneCore::Configuration.create(Scan::Options.available_options, options)
       Scan.cache[:temp_junit_report] = nil
