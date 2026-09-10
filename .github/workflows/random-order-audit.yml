@@ -19,13 +19,13 @@ on:
       seed:
         description: "rspec seed, to reproduce a previous run. Leave blank for a new random order."
         required: false
+        type: string
       record_timings:
         description: "Record spec timings on the runner and upload them, instead of running the audit. The split is balanced from these, and they are per platform because the suite is a different shape on each."
+        required: false
         type: choice
         options: ["no", "macos", "linux", "both"]
         default: "no"
-        required: false
-        type: string
 
 permissions:
   contents: read
