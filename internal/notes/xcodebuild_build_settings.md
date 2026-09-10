@@ -92,7 +92,21 @@ The first of those is the file that broke attempt 2. The rest are the same hazar
 
 Most are written by the suite itself. Xcode creates `xcshareddata/swiftpm` when it opens a project, `bundle install` writes the plugin lockfiles, and `detect_values_spec` copies the workspace settings in deliberately. None of them are cleaned up.
 
-**The check worth adding.** After a full run, `git status --porcelain` should be empty. It is not, and a job that asserted it would have caught all four of the defects found on this branch that came from leftover state: this one, `iap_detail_spec` reading the harness's log file as a screenshot, the stale generated `.rubocop.yml`, and a spaceship cookie nine months older than the run that depended on it. It is a cheaper and more general fix than chasing each spec that leaves something behind, and it turns "works on my machine" from a discovery made on CI into one made locally.
+**Checks worth adding, on CI only.** A developer's working copy legitimately accumulates things and a clean tree cannot be required of it. A runner starts from a fresh checkout, so anything present after a run was put there by the run.
+
+The obvious form of that, `git status --porcelain` after the suite, would have caught none of the four leftovers found on this branch, which is worth knowing before anyone builds it:
+
+| Left behind | Where | Seen by `git status --porcelain` |
+| --- | --- | --- |
+| `WorkspaceSettings.xcsettings` | in the repo, under `xcuserdata/` | no, `.gitignore:77` ignores it |
+| template `.rubocop.yml` | in the repo | no, explicitly ignored at `.gitignore:60` |
+| `#{Dir.tmpdir}/fastlane_tests` | outside the repo | no |
+| `~/.fastlane/spaceship/<user>/cookie` | outside the repo | no |
+
+It does show eight untracked fixture entries, which are worth cleaning up, but the defects were all somewhere it does not look. Two checks that would work:
+
+- `git status --porcelain --ignored` on CI, against a baseline taken before the run. Catches the first two. Noisy without a baseline, since `vendor/` and friends are ignored too.
+- Run the suite on CI with `HOME` pointed at a fresh temporary directory. Catches the last two, and more usefully makes a spec that depends on pre-existing home state fail on the runner rather than passing everywhere except a colleague's laptop. The spaceship cookie is exactly that: row Z passed for months on any machine that had ever run the suite.
 
 ## What is left to try
 
