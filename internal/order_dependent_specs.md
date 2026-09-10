@@ -142,6 +142,7 @@ The rest vary by seed, which puts them lower down the ordering space:
 | T | `deliver/spec/sync_screenshots_spec.rb:15,16` | **fixed**. Found by the parallel spike, not by any seed. The file used a bare `DisplayType`, which nothing in it defines. `deliver/spec/app_screenshot_spec.rb:5`, `app_screenshot_validator_spec.rb:5` and `frameit/spec/template_finder_spec.rb:6` each assign `DisplayType = ...` inside a `describe` block, and a constant assigned in a block takes the block's lexical scope, so all three define a global `::DisplayType` that this file was reading. It fails on its own in any order. Qualified to `Deliver::AppScreenshot::DisplayType`. The three definitions do not conflict with each other, all resolving to the same `Spaceship::ConnectAPI::AppScreenshotSet::DisplayType` object |
 | U | `cert/spec/runner_spec.rb:51` | **fixed**. Found at seed 11703. `NoMethodError: undefined method '[]' for nil` at `cert/lib/cert/runner.rb:157`, reading `Cert.config[:type]`. The `"Successful run"` example above it assigns `Cert.config` from its own body rather than a hook, and this one never did, so it passed only when that had run first. Third instance of the same shape after row C's `Frameit.config` and row S's `Scan.config`. Reproduces on its own with `-e "correctly selects expired certificates"` |
 | V | `spaceship/spec/spaceauth_spec.rb:49,59` | **fixed**. Found by the subset job at seed 43548, and the first row whose state is not in the process at all. The `check_session` examples assert `exit(0)` for a valid session, and `has_valid_session` (`client.rb:414`) loads a cookie from `persistent_cookie_path`, which is `~/.fastlane/spaceship/<user>/cookie` in the real home directory. The examples never create one, so they passed only when an earlier example had logged in and persisted it. Each example now states the session it is testing. The exit code 1 example was stubbed too: it was passing only because no cookie happened to exist for `unknown-user` |
+| W | `scan/spec/detect_values_spec.rb:240,263` | **fixed**. Found at seed 30117. `FastlaneCore::Interface::FastlaneError: Exit status: 64`, which is `xcodebuild -showBuildSettings` rejecting a project, reached through `detect_values.rb:317 get_deployment_target_version`. The `#detect_simulator` group had no `before` at all and read two module level values earlier examples in the same file leave behind: `Scan.config`, without which it raises `NoMethodError` on its own, and `Scan.project`, which production code assigns at `detect_values.rb:30` while detecting values. Given its own config and `Scan.project = nil`, so the deployment target resolves to 0 without shelling out. Reproduces in the single file at seed 30117 |
 
 Seeds 48174, 1150, 21323 and 40083 were each pinned in turn while the failures they exposed were worked through, and all four are green. The workflow samples a fresh order per run again as of `f9c6799fc`; the first batch of five turned up one new failure, row S at seed 53367.
 
@@ -179,7 +180,9 @@ With restoring on, the full suite reports the same 35 variables with the same co
 | 4 more, including `FASTLANE_TEAM_NAME` and `PRODUCE_TEAM_NAME` | 2 each |
 | 13 more, including `DANGER_GITHUB_API_TOKEN`, `SIGH_UUID` and `ANDROID_SDK_ROOT` | 1 each |
 
-The top four are not four hundred careless specs. `before_each_match`, `before_each_pilot` and `before_each_spaceship` each assign `DELIVER_USER` and `DELIVER_PASSWORD` on every example of their tool, so every match, pilot and spaceship example is counted. Fixing those three methods accounts for most of the list.
+Four rows so far are the same defect: a group reading module level configuration it never sets, passing only while an earlier example happens to leave a value behind. Row C was `Frameit.config`, S was `Scan.config`, U was `Cert.config`, W was `Scan.config` and `Scan.project` together. Fixing them one at a time only catches the ones a seed exposes, and W survived roughly twenty five CI runs before one did. Nilling these singletons in an `after(:each)` per tool would make every remaining instance fail every time instead of occasionally, the same move that made the environment leaks tractable. `Scan.project` is the warning that the list is not just `config`: production code assigns it mid run, so the accessors have to be read off `scan/lib/scan/module.rb` and its siblings rather than guessed.
+
+The top four environment variables are not four hundred careless specs. `before_each_match`, `before_each_pilot` and `before_each_spaceship` each assign `DELIVER_USER` and `DELIVER_PASSWORD` on every example of their tool, so every match, pilot and spaceship example is counted. Fixing those three methods accounts for most of the list.
 
 Restoring costs nothing measurable: the full suite is 7863 examples and 2 failures with the guard enforcing, and the same 2 fail with the guard switched off entirely. Those two are `plugin_generator_spec` shelling out to rubocop in the generated plugin, which fails locally and passes in CI, so they are environmental rather than ordering.
 
@@ -234,6 +237,8 @@ credentials_manager/spec/account_manager_spec.rb
 scan/spec/runner_spec.rb
 deliver/spec/sync_screenshots_spec.rb
 cert/spec/runner_spec.rb
+scan/spec/detect_values_spec.rb
+spaceship/spec/client_spec.rb
 ```
 
 Deliberately excluded: `fastlane_core/spec/project_spec.rb` and `fastlane/spec/plugins_specs/plugin_generator_spec.rb`. They fail locally in any order, including the normal one, so they are environmental rather than order dependent.
