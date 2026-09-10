@@ -352,6 +352,20 @@ module Spaceship
       parse_response(r, 'domainList')
     end
 
+    def merchant_domain_get_verification_file(domain_id, mac: false)
+      r = request(:get, "account/#{platform_slug(mac)}/identifiers/downloadDomainVerificationFile", {
+        teamId: team_id,
+        domainId: domain_id
+      })
+      a = parse_response(r)
+      # ruby won't accept unless we remove the newlines
+      if r.success? && Base64.urlsafe_decode64(a.delete("\r\n")).include?("Apple Inc.")
+        return a
+      else
+        raise UnexpectedResponse.new, "Couldn't download verification file, got this instead: #{a}"
+      end
+    end
+
     def create_merchant_domain!(merchant_id, domain_name, mac: false)
       ensure_csrf(Spaceship::Portal::Merchant)
 
