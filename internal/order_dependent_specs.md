@@ -6,6 +6,8 @@ Counts come from two runs at the time of writing: CI on `chore/random_order_audi
 
 Entries stay in the list until the whole suite is stable, not until their own row closes. A file that has just been fixed is exactly the one worth re-running in new orderings.
 
+Why this is being done, and what it unblocks, is in `internal/notes/test_suite_parallelism.md`.
+
 | Row | CI | Local | Files | Symptom | Likely cause | Status |
 | --- | --- | --- | --- | --- | --- | --- |
 | A | 16 | 1 | `spaceship/spec/spaceship_spec.rb` (10), `spaceauth_spec.rb` (6) | `WebMock::NetConnectNotAllowedError` on `POST https://idmsa.apple.com/appleauth/auth/signin/init` | A login ran without the SIRP stub, so a real SRP value was computed and matched none of the recorded request bodies | **fixed** in `b63ab357a`, confirmed at seed 48174: all 16 gone, no `signin/init` request blocked anywhere in the run |
