@@ -81,3 +81,4 @@ xcuserdata/
 
 # Dotenv
 .env
+rspec_worker_*.log

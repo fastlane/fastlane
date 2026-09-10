@@ -139,8 +139,19 @@ The rest vary by seed, which puts them lower down the ordering space:
 | Q | `credentials_manager/spec/account_manager_spec.rb:69` | **fixed** by the environment guard. It read a `DELIVER_PASSWORD` left set by an earlier example. Two attempts to fix it at the source failed because the value is written by `before_each_match`, `before_each_pilot` and `before_each_spaceship`, once per example in those tools, so there was no single setter to scope |
 | R | `fastlane/spec/actions_specs/automatic_code_signing_spec.rb:44` | **fixed** by the environment guard. Same shape as Q, with `FASTLANE_TEAM_ID` |
 | S | `scan/spec/runner_spec.rb:183,198` | **fixed**. Found by the first unpinned batch, at seed 53367. `NoMethodError: undefined method '[]=' for nil` at `scan/lib/scan/runner.rb:113`, which assigns `Scan.config[:only_testing]`. Every other group in the file builds its own config; the `retry_execute` group did not, and relied on whichever of them ran first leaving one behind. Same shape as row C with `Frameit.config`. Reproduces on its own with `-e retry_execute` |
+| T | `deliver/spec/sync_screenshots_spec.rb:15,16` | **fixed**. Found by the parallel spike, not by any seed. The file used a bare `DisplayType`, which nothing in it defines. `deliver/spec/app_screenshot_spec.rb:5`, `app_screenshot_validator_spec.rb:5` and `frameit/spec/template_finder_spec.rb:6` each assign `DisplayType = ...` inside a `describe` block, and a constant assigned in a block takes the block's lexical scope, so all three define a global `::DisplayType` that this file was reading. It fails on its own in any order. Qualified to `Deliver::AppScreenshot::DisplayType`. The three definitions do not conflict with each other, all resolving to the same `Spaceship::ConnectAPI::AppScreenshotSet::DisplayType` object |
 
 Seeds 48174, 1150, 21323 and 40083 were each pinned in turn while the failures they exposed were worked through, and all four are green. The workflow samples a fresh order per run again as of `f9c6799fc`; the first batch of five turned up one new failure, row S at seed 53367.
+
+## Splitting the suite is its own ordering
+
+`rake test_parallel` runs the suite as several independent rspec processes over a longest-file-first split. It is a spike, not a replacement for `test_all`, and it needs no new gem: `Process.spawn`, one rspec per worker, exit codes aggregated.
+
+It is worth running now rather than after the ordering work, because a split produces contexts no seed ever does. A worker sees a subset, so a file can run with none of the files it has been silently relying on. Row T came out of the first four worker run and no random order had found it in twenty CI runs.
+
+Processes rather than threads, because `ENV` and the working directory are per process in the kernel, so a worker cannot corrupt another through either. That is what makes this safe to try before the environment inventory is worked down. See `internal/notes/test_suite_parallelism.md` for why threads are not the route.
+
+First measurement, four workers on macOS: 106.9s against 236s sequential, a 2.2x. The split is by file size and comes out uneven, 4006 examples in one worker against 1195 in another, so there is room in the balancing before the 27.8s slowest file becomes the floor.
 
 ## The environment guard
 
@@ -215,6 +226,7 @@ fastlane/spec/actions_specs/xcodebuild_spec.rb
 gym/spec/platform_detection_spec.rb
 credentials_manager/spec/account_manager_spec.rb
 scan/spec/runner_spec.rb
+deliver/spec/sync_screenshots_spec.rb
 ```
 
 Deliberately excluded: `fastlane_core/spec/project_spec.rb` and `fastlane/spec/plugins_specs/plugin_generator_spec.rb`. They fail locally in any order, including the normal one, so they are environmental rather than order dependent.
