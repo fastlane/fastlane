@@ -68,3 +68,34 @@ The isolated home costing 60% on a runner against 7% locally.
 Whether the macOS knee moves once the specs stop shelling out to xcodebuild for build settings. Two attempts at that are written up in `internal/notes/xcodebuild_build_settings.md`, both reverted.
 
 Windows has not been measured at all. `ci.yml` covers it, this audit does not.
+
+## Timings have to come from the platform they balance
+
+The split is packed from recorded per file durations, and there was one file of them for every platform. That is wrong: the suite is a different shape on each, so a Linux split balanced from macOS numbers packs around files that cost nothing there.
+
+Three of the heaviest macOS files are free on Linux, where the `requires_xcodebuild` specs skip:
+
+```
+scan/spec/detect_values_spec.rb      mac 32.2s -> linux  0.0s
+scan/spec/runner_spec.rb             mac 29.1s -> linux  0.0s
+scan/spec/slack_poster_spec.rb       mac 12.2s -> linux  0.0s
+fastlane_core/spec/project_spec.rb   mac 35.1s -> linux  4.5s
+deliver/spec/upload_metadata_spec.rb mac 27.2s -> linux 27.1s
+```
+
+Whole suite: 275s of example time on macOS, 113s on Linux.
+
+What that cost, on the Linux runner at four workers:
+
+| Balanced from | Spread | Idle | Wall clock |
+| --- | --- | --- | --- |
+| macOS timings | 62% to 73% | 41% to 48% | 58s to 70s |
+| Linux timings | 23% | 12% | 43s |
+
+Nearly half the worker time was spent waiting for a straggler, and fixing the input took the wall clock down by a third. At two workers the split goes from 26% to 29% idle to 1%.
+
+This is also why Linux parallelism looked weak earlier in this document, 1.8x against macOS's 3.7x. That was not Linux having less to overlap, it was a split built from the wrong numbers.
+
+Timings now live in `internal/spec_timings.<platform>.json`, and the workflow has a `record_timings` input, `macos`, `linux` or `both`, which runs the suite once in a single process on that runner and uploads the file to be committed. Nobody needs the hardware to fix the balance for a platform they do not have.
+
+`deliver/spec/upload_metadata_spec.rb` is now the thing to look at on Linux: 27.1s of a 113s suite, 24% of it, and identical on both platforms. Four workers cannot go below it however well balanced, which is most of the 12% that remains.
