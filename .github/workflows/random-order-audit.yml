@@ -46,13 +46,13 @@ jobs:
 
       - name: Run the suite in a random order
         env:
-          # Pinned again while a second batch of failures is worked through.
-          # Unpinning after seed 48174 went green immediately found more: seeds
-          # 1150, 21323 and 40083 each fail, with seven failures common to all
-          # three. Pinned so successive runs are comparable, since with a fresh
-          # order each time a change in the count says nothing about whether a
-          # fix worked. Unpin again once this seed is green.
-          RSPEC_ARGS: "--order random:${{ inputs.seed || '1150' }}"
+          # Unpinned. Seeds 48174, 1150, 21323 and 40083 are all green, and the
+          # environment guard closed a whole class of ordering defect rather
+          # than one seed's worth, so pinning would now sample less than a fresh
+          # order does. Pass a seed to the workflow_dispatch input to reproduce
+          # a particular run; pin here again only if a fix needs successive runs
+          # to be comparable while it is worked through.
+          RSPEC_ARGS: "--order random${{ inputs.seed && format(':{0}', inputs.seed) || '' }}"
           # The console summary prints three example ids per variable, which is
           # not enough to work from when a variable has over a thousand. The
           # full inventory goes to a file and is uploaded below.
