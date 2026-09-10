@@ -140,6 +140,7 @@ The rest vary by seed, which puts them lower down the ordering space:
 | R | `fastlane/spec/actions_specs/automatic_code_signing_spec.rb:44` | **fixed** by the environment guard. Same shape as Q, with `FASTLANE_TEAM_ID` |
 | S | `scan/spec/runner_spec.rb:183,198` | **fixed**. Found by the first unpinned batch, at seed 53367. `NoMethodError: undefined method '[]=' for nil` at `scan/lib/scan/runner.rb:113`, which assigns `Scan.config[:only_testing]`. Every other group in the file builds its own config; the `retry_execute` group did not, and relied on whichever of them ran first leaving one behind. Same shape as row C with `Frameit.config`. Reproduces on its own with `-e retry_execute` |
 | T | `deliver/spec/sync_screenshots_spec.rb:15,16` | **fixed**. Found by the parallel spike, not by any seed. The file used a bare `DisplayType`, which nothing in it defines. `deliver/spec/app_screenshot_spec.rb:5`, `app_screenshot_validator_spec.rb:5` and `frameit/spec/template_finder_spec.rb:6` each assign `DisplayType = ...` inside a `describe` block, and a constant assigned in a block takes the block's lexical scope, so all three define a global `::DisplayType` that this file was reading. It fails on its own in any order. Qualified to `Deliver::AppScreenshot::DisplayType`. The three definitions do not conflict with each other, all resolving to the same `Spaceship::ConnectAPI::AppScreenshotSet::DisplayType` object |
+| U | `cert/spec/runner_spec.rb:51` | **fixed**. Found at seed 11703. `NoMethodError: undefined method '[]' for nil` at `cert/lib/cert/runner.rb:157`, reading `Cert.config[:type]`. The `"Successful run"` example above it assigns `Cert.config` from its own body rather than a hook, and this one never did, so it passed only when that had run first. Third instance of the same shape after row C's `Frameit.config` and row S's `Scan.config`. Reproduces on its own with `-e "correctly selects expired certificates"` |
 
 Seeds 48174, 1150, 21323 and 40083 were each pinned in turn while the failures they exposed were worked through, and all four are green. The workflow samples a fresh order per run again as of `f9c6799fc`; the first batch of five turned up one new failure, row S at seed 53367.
 
@@ -227,6 +228,7 @@ gym/spec/platform_detection_spec.rb
 credentials_manager/spec/account_manager_spec.rb
 scan/spec/runner_spec.rb
 deliver/spec/sync_screenshots_spec.rb
+cert/spec/runner_spec.rb
 ```
 
 Deliberately excluded: `fastlane_core/spec/project_spec.rb` and `fastlane/spec/plugins_specs/plugin_generator_spec.rb`. They fail locally in any order, including the normal one, so they are environmental rather than order dependent.
