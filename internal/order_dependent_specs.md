@@ -136,10 +136,42 @@ The rest vary by seed, which puts them lower down the ordering space:
 | N | `fastlane/spec/actions_specs/flock_spec.rb:20` | **fixed**. `FL_FLOCK_MESSAGE` and `FL_FLOCK_TOKEN` were set with raw assignments. They are the options' `env_name`s, so once set, the option is satisfied and the examples asserting it is required stop raising. Scoped with `with_env_values` |
 | O | `fastlane/spec/actions_specs/xcodebuild_spec.rb:712` | **fixed**. Three examples set `XCODE_BUILD_PATH` inline and only two deleted it, and those deletes were in the example body so they were skipped whenever the example failed. Scoped with `with_env_values` |
 | P | `gym/spec/platform_detection_spec.rb:32` | 1 of 3, and fails locally in any order, so check whether it is environmental |
-| Q | `credentials_manager/spec/account_manager_spec.rb:69` | 1 of 3 |
-| R | `fastlane/spec/actions_specs/automatic_code_signing_spec.rb:44` | 1 of 3. This file was fixed for row G, so either an intra group dependency remains inside its pinned scenario, or this is a different failure in the same file |
+| Q | `credentials_manager/spec/account_manager_spec.rb:69` | **fixed** by the environment guard. It read a `DELIVER_PASSWORD` left set by an earlier example. Two attempts to fix it at the source failed because the value is written by `before_each_match`, `before_each_pilot` and `before_each_spaceship`, once per example in those tools, so there was no single setter to scope |
+| R | `fastlane/spec/actions_specs/automatic_code_signing_spec.rb:44` | **fixed** by the environment guard. Same shape as Q, with `FASTLANE_TEAM_ID` |
 
 Seed 1150 reproduces every one of the seven common failures and is pinned in the workflow while these are worked through. Seeds 21323 and 40083 are recorded so the fixes can be validated against orderings other than the one they were developed on.
+
+## The environment guard
+
+`spec_helper.rb` snapshots `ENV` around every example, restores it afterwards, and reports every variable an example changed and did not put back. Its point is not only ordering: a spec that leaves a credential in the environment is a leak whatever the concurrency model, and the inventory includes `MAILGUN_APIKEY` and `DANGER_GITHUB_API_TOKEN`.
+
+Restoring is what makes the report worth reading. Without it each example is measured against whatever the previous one left behind, so an example setting a variable to the value already leaked there registers no change and is never named. `sigh/spec/manager_spec.rb`, `sigh/spec/runner_spec.rb` and `pem/spec/manager_spec.rb` all set `DELIVER_PASSWORD` to `"123"`: reporting without restoring names one of the 64 examples in those files, restoring names all 64. That is why the first local and CI inventories disagreed at 35 and 33 while finding the same variables. The counts were an artefact of the order, not a difference in what leaked.
+
+With restoring on, the full suite reports the same 35 variables with the same counts at defined order and at seed 40083:
+
+| Variable | Examples |
+| --- | --- |
+| `DELIVER_PASSWORD`, `DELIVER_USER` | 1336 each |
+| `FASTLANE_LANE_NAME` | 1202 |
+| `SPACESHIP_AVOID_XCODE_API` | 915 |
+| `DELIVER_HTML_EXPORT_PATH` | 130 |
+| `FASTLANE_PLATFORM_NAME` | 43 |
+| `FASTLANE_IS_INTERACTIVE` | 13 |
+| `FASTLANE_TEAM_ID` | 10 |
+| `CER_CERTIFICATE_ID`, `CER_FILE_PATH`, `CER_KEYCHAIN_PATH` | 8 each |
+| `BUNDLE_GEMFILE`, `BUNDLE_BIN_PATH` | 5 each |
+| `MAILGUN_APIKEY`, `MAILGUN_APP_LINK`, `MAILGUN_SANDBOX_POSTMASTER`, `FASTLANE_OPT_OUT_USAGE` | 4 each |
+| `FASTLANE_SKIP_DOCS` | 3 |
+| 4 more, including `FASTLANE_TEAM_NAME` and `PRODUCE_TEAM_NAME` | 2 each |
+| 13 more, including `DANGER_GITHUB_API_TOKEN`, `SIGH_UUID` and `ANDROID_SDK_ROOT` | 1 each |
+
+The top four are not four hundred careless specs. `before_each_match`, `before_each_pilot` and `before_each_spaceship` each assign `DELIVER_USER` and `DELIVER_PASSWORD` on every example of their tool, so every match, pilot and spaceship example is counted. Fixing those three methods accounts for most of the list.
+
+Restoring costs nothing measurable: the full suite is 7863 examples and 2 failures with the guard enforcing, and the same 2 fail with the guard switched off entirely. Those two are `plugin_generator_spec` shelling out to rubocop in the generated plugin, which fails locally and passes in CI, so they are environmental rather than ordering.
+
+`FASTLANE_SPEC_ENV_GUARD_REPORT` names a file to write the full inventory to, key by key and example by example. The console prints three ids per variable, which is not enough to work from when a variable has 1336.
+
+What the guard cannot see, because both run outside `around(:each)`: a top level `ENV` write in a tool spec helper, which is checked for separately and currently finds nothing, and a write in a `before(:context)` hook, which enters the baseline of every example in the group and outlives it.
 
 ## The list
 

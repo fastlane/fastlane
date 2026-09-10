@@ -53,6 +53,10 @@ jobs:
           # order each time a change in the count says nothing about whether a
           # fix worked. Unpin again once this seed is green.
           RSPEC_ARGS: "--order random:${{ inputs.seed || '1150' }}"
+          # The console summary prints three example ids per variable, which is
+          # not enough to work from when a variable has over a thousand. The
+          # full inventory goes to a file and is uploaded below.
+          FASTLANE_SPEC_ENV_GUARD_REPORT: env_guard_leaks.txt
         shell: bash
         run: |
           echo "RSPEC_ARGS=$RSPEC_ARGS"
@@ -67,6 +71,17 @@ jobs:
           json-path: rspec_logs.json
           comment: 'false'
           title: '# :game_die: Random order failures'
+
+      # The guard restores ENV after every example, so this inventory is the
+      # same whatever order the run used. It is the input to the environment
+      # section of internal/order_dependent_specs.md.
+      - name: Environment guard inventory
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: env-guard-leaks
+          path: env_guard_leaks.txt
+          if-no-files-found: ignore
 
   order_dependent_subset:
     name: "Known order dependent specs, random order"
