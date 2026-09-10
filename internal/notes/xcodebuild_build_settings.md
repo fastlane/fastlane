@@ -148,3 +148,26 @@ Nothing calls `security import`. `security cms -D`, which fastlane uses to decod
 So the specs are doing legitimate work and stubbing them would remove real coverage. Seeding a keychain in the isolated home is the fix: the certificates land in a directory that is deleted afterwards rather than in the developer's login keychain.
 
 Worth raising separately: this is production behaviour, not a test artefact. fastlane adds certificates to a user's keychain whenever it parses a provisioning profile. `provisioning_profile.rb` already has a `-k <keychain_path>` variant of the call, so there is a mechanism for directing it somewhere chosen.
+
+### What isolation costs, measured
+
+Twelve workers, same machine:
+
+| | Wall clock |
+| --- | --- |
+| Real home, warm | 41s |
+| Isolated home, first run | 44s |
+| Isolated home, second run against the same directory | 45s |
+| Isolated home, no keychain seeded | 244s, three workers failing |
+
+About 7%, and flat. The second run is not faster than the first, so nothing expensive is being cached in `HOME` and there is no warm-up to amortise.
+
+The 244s is worth explaining because it was briefly reported here as the cost of isolation, and it is not. Without a seeded keychain the nine keychain examples fail, and the failures drag `xcodebuild` through its retry path, `xcode_build_settings_retries` defaulting to 3 with a timeout each, across twelve workers. That is the cost of a broken configuration, not of isolation.
+
+Two things follow.
+
+Isolation is cheap enough to be the default way to run the suite rather than an occasional check, which is what would make a spec depending on leftover home state fail on the machine that wrote it.
+
+And GitHub's runners being cold on every run costs nothing here, since warm and cold are the same. Caching `~/Library/Developer/Xcode` or `~/.cache` would not speed CI up. CI is slower than this machine because it has three or four cores against fourteen, not because it starts empty.
+
+One more observation from the same measurement: the isolated home held 58 entries after the first run and 83 after the second. The suite does not converge on a fixed set, it keeps adding.
