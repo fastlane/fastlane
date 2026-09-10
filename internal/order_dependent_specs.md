@@ -155,7 +155,21 @@ It is worth running now rather than after the ordering work, because a split pro
 
 Processes rather than threads, because `ENV` and the working directory are per process in the kernel, so a worker cannot corrupt another through either. That is what makes this safe to try before the environment inventory is worked down. See `internal/notes/test_suite_parallelism.md` for why threads are not the route.
 
-First measurement, four workers on macOS: 106.9s against 236s sequential, a 2.2x. The split is by file size and comes out uneven, 4006 examples in one worker against 1195 in another, so there is room in the balancing before the 27.8s slowest file becomes the floor.
+Measured on 14 cores against 276s sequential, balanced on real per file durations from `rake spec_timings`:
+
+| Workers | Wall clock | Speedup | Predicted load spread |
+| --- | --- | --- | --- |
+| 1 | 276s | 1.00x | |
+| 2 | 140s | 1.97x | 135s / 135s |
+| 4 | 75s | 3.68x | 67s / 67s |
+| 6 | 58s | 4.76x | 45s / 45s |
+| 8 | 58s | 4.75x | 34s / 35s |
+
+Balancing was worth more than workers: four workers went from 2.2x to 3.68x on the same machine purely from weighting by duration rather than file size, which had put 4006 examples in one worker against 1195 in another. The returns fall away after four, and six and eight land in the same place, so the interesting range for a developer is four to six rather than one worker per core.
+
+Memory is not the constraint. Six workers peak at 1.3GB resident in total, so a runner can be oversubscribed past its core count without memory pressure, which is the thing that would have limited it on CI.
+
+Splitting found two defects a random order never did. Row T, and a failure in `spaceship/spec/tunes/tunes_client_spec.rb:81` that appeared at six and eight workers. That one is not order dependent: the worker's exact file list passes on its own, 746 examples either way, so it is sensitive to something shared between concurrent processes rather than to what ran before it. It has not reappeared since `spec_helper.rb` stopped pointing every worker's `$stdout` at the same fixed path, which they were opening with mode `"w"` and truncating under each other. That may or may not have been the cause, so it is watched rather than closed.
 
 ## The environment guard
 
