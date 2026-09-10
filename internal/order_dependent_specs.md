@@ -173,6 +173,16 @@ Restoring costs nothing measurable: the full suite is 7863 examples and 2 failur
 
 What the guard cannot see, because both run outside `around(:each)`: a top level `ENV` write in a tool spec helper, which is checked for separately and currently finds nothing, and a write in a `before(:context)` hook, which enters the baseline of every example in the group and outlives it.
 
+### Confirmed on CI, and what the inventory is still relative to
+
+Run 34447177995, seed 1150, macOS 15 with Ruby 3.4: 7863 examples and 0 failures on the full suite, 352 and 0 on the subset. The same example count as locally, so the two local `plugin_generator_spec` failures are environmental as suspected, not ordering.
+
+CI reports 33 variables against the 35 seen locally, and its set is a strict subset: no variable appears there that does not appear locally. The missing two are `FASTLANE_IS_INTERACTIVE` and `FASTLANE_SKIP_DOCS`, both written by `fastlane/spec/cli_tools_distributor_spec.rb`, which runs in both. `FASTLANE_OPT_OUT_USAGE` is 3 there against 4 here, the missing example being `opt_out_usage_spec`.
+
+The cause is the environment the suite inherits rather than the order it runs in. CI runs `bundle exec fastlane execute_tests`, and that fastlane invocation has already set all three by the time rspec starts: `Fastfile` lines 4 and 5 call `skip_docs` and `opt_out_usage`, and `cli_tools_distributor.rb:84` assigns `FASTLANE_IS_INTERACTIVE`. Running `bundle exec rspec` directly, as the local numbers were taken, leaves them unset. A spec writing the value that is already there changes nothing, so the guard has nothing to report.
+
+So the inventory is order independent, which is what it was changed for, but it is still relative to the ambient environment: a variable already carrying the value a spec assigns stays invisible. Closing that means recording the writes rather than diffing the end state, by prepending to `ENV`'s singleton the four methods that mutate it and having `with_env_values` mark the keys it is responsible for so the sanctioned wrapper is not reported. Worth doing when the current list is worked down, not before: the gap is two known variables in one known file, and the write recorder cannot by itself tell a scoped write from an unscoped one, which is why it is not the whole mechanism.
+
 ## The list
 
 Everything identified so far, from CI or locally. `rake test_order_dependent` reads the paths from this block.
