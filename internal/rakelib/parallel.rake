@@ -163,10 +163,31 @@ task(:test_parallel) do
   results = pids.map { |pid| Process.wait2(pid).last }
   elapsed = Time.now - started
 
+  durations = []
   results.each_with_index do |status, index|
-    tail = File.readlines("rspec_worker_#{index}.log").grep(/examples?,/).last.to_s.strip
-    puts(format("  worker %<index>d  exit %<exit>-3d %<tail>s",
-                index: index, exit: status.exitstatus, tail: tail))
+    log = File.readlines("rspec_worker_#{index}.log")
+    tail = log.grep(/examples?,/).last.to_s.strip
+    # What rspec itself reports, so the figure excludes process start up and the
+    # time spent loading 449 spec files. It writes "Finished in 40.6 seconds"
+    # under a minute and "Finished in 1 minute 15.2 seconds" over one, so both
+    # parts have to be read: taking the first number gave every worker 1.0s.
+    line = log.grep(/^Finished in /).last.to_s
+    seconds = (line[/([\d.]+) minutes?/, 1].to_f * 60) + line[/([\d.]+) seconds?/, 1].to_f
+    durations << seconds
+    puts(format("  worker %<index>d  exit %<exit>-3d %<seconds>6.1fs  %<tail>s",
+                index: index, exit: status.exitstatus, seconds: seconds, tail: tail))
+  end
+
+  # The wall clock is the slowest worker plus start up, so a split is only as
+  # good as its straggler. The timings this was balanced from were recorded on
+  # one machine, and the suite is 61% xcodebuild on macOS, so the balance can be
+  # much worse on a runner than the prediction suggests.
+  busy = durations.reject(&:zero?)
+  unless busy.empty?
+    puts(format("Worker time %<min>.1fs to %<max>.1fs, spread %<spread>.0f%%, idle %<idle>.0f%% of the wall clock",
+                min: busy.min, max: busy.max,
+                spread: 100.0 * (busy.max - busy.min) / busy.max,
+                idle: 100.0 * (busy.max * busy.size - busy.sum) / (busy.max * busy.size)))
   end
   puts(format("Wall clock %<elapsed>.1fs across %<workers>d processes",
               elapsed: elapsed, workers: buckets.size))
@@ -189,4 +210,44 @@ task(:test_parallel) do
     end
     abort("#{failed.size} of #{results.size} workers failed")
   end
+end
+
+# Finds the worker count for the machine it runs on, and refreshes the timings
+# it balances from. Both matter: spec_timings.json is recorded once, on whoever
+# ran it, and 61% of the example time on macOS is xcodebuild, so a split
+# balanced from one machine's numbers can be badly uneven on another.
+#
+#   rake test_tune              sweeps 2, 4, 6, 8, 12 capped at the core count
+#   COUNTS="2 4" rake test_tune
+#   REFRESH=1 rake test_tune    re-record the timings first, on this machine
+desc("Sweep worker counts on this machine and report which to use")
+task(:test_tune) do
+  require "etc"
+
+  Rake::Task[:spec_timings].invoke if ENV["REFRESH"]
+
+  counts = (ENV["COUNTS"]&.split || %w[2 4 6 8 12]).map(&:to_i)
+                                                   .select { |n| n <= Etc.nprocessors }.uniq
+  results = {}
+
+  counts.each do |workers|
+    started = Time.now
+    system({ "WORKERS" => workers.to_s }, "rake test_parallel", out: "tune_#{workers}.log", err: %W[tune_#{workers}.log a])
+    elapsed = Time.now - started
+    report = File.read("tune_#{workers}.log")
+    results[workers] = {
+      wall: elapsed,
+      spread: report[/spread (\d+)%/, 1].to_i,
+      idle: report[/idle (\d+)%/, 1].to_i
+    }
+    File.delete("tune_#{workers}.log")
+    puts(format("  %2<workers>d workers  %<wall>6.1fs  spread %<spread>2d%%  idle %<idle>2d%%",
+                workers: workers, **results[workers]))
+  end
+
+  best = results.min_by { |_workers, r| r[:wall] }
+  puts("")
+  puts(format("Fastest here: %<workers>d workers at %<wall>.0fs. Put WORKERS=%<workers>d in your CI job or your shell.",
+              workers: best[0], wall: best[1][:wall]))
+  puts("A large spread means the split is uneven on this machine: try REFRESH=1 to record its own timings.") if best[1][:spread] > 25
 end
