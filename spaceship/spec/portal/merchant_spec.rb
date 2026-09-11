@@ -220,6 +220,19 @@ describe Spaceship::Portal::Merchant do
   end
 
   describe Spaceship::Portal::Merchant::Domain do
+    let(:domain) do
+      Spaceship::Portal::Merchant::Domain.new(domain_list.first).tap { |d| d.merchant = merchant }
+    end
+
+    let(:mac_domain) do
+      mac_merchant = Spaceship::Portal::Merchant.new(JSON.parse({
+        omcId: "LM3IY56BXC",
+        platform: "mac"
+      }.to_json))
+
+      Spaceship::Portal::Merchant::Domain.new(domain_list.first).tap { |d| d.merchant = mac_merchant }
+    end
+
     describe ".all" do
       it "fetches all domains of the given merchant" do
         expect(mock_client).to receive(:merchant_domains).with("LM3IY56BXC", mac: false).and_return(domain_list)
@@ -291,6 +304,34 @@ describe Spaceship::Portal::Merchant do
         subject = Spaceship::Portal::Merchant::Domain.find(merchant, "payments.example.com")
         domain = subject.delete!
         expect(domain.domain_id).to eq("5Y57MLHP2K")
+      end
+    end
+
+    describe "#verification_file" do
+      it 'downloads the domain association file' do
+        expect(mock_client).to receive(:merchant_domain_get_verification_file).with("5Y57MLHP2K", mac: false).and_return("A-AAeyJ0ZWFtSWQiOiJYWFhYWFhYWFhYIg")
+
+        expect(domain.verification_file).to eq("A-AAeyJ0ZWFtSWQiOiJYWFhYWFhYWFhYIg")
+      end
+
+      it 'downloads from the Mac endpoint for a Mac merchant' do
+        expect(mock_client).to receive(:merchant_domain_get_verification_file).with("5Y57MLHP2K", mac: true)
+
+        mac_domain.verification_file
+      end
+    end
+
+    describe "#verify" do
+      it 'asks Apple to verify the domain' do
+        expect(mock_client).to receive(:merchant_domain_verify).with("5Y57MLHP2K", mac: false).and_return({ "resultCode" => 0 })
+
+        expect(domain.verify).to eq({ "resultCode" => 0 })
+      end
+
+      it 'verifies against the Mac endpoint for a Mac merchant' do
+        expect(mock_client).to receive(:merchant_domain_verify).with("5Y57MLHP2K", mac: true)
+
+        mac_domain.verify
       end
     end
   end
