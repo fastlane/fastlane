@@ -28,6 +28,41 @@ describe FastlaneCore do
         expect(@all_lines).to eq(["foo"])
       end
 
+      it 'returns the status of the command it ran rather than whatever $? holds', requires_pty: true do
+        # The status used to reach the end of spawn_with_pty through $?, read
+        # back via process_status, so anything that overwrote that global in
+        # between decided what the caller was told. Stub it to something the
+        # command did not produce: if the result still comes from there, this
+        # returns 99. See fastlane#30188.
+        wrong = double("ProcessStatus")
+        allow(wrong).to receive(:exitstatus).and_return(99)
+        allow(wrong).to receive(:signaled?).and_return(false)
+        allow(FastlaneCore::FastlanePty).to receive(:process_status).and_return(wrong)
+
+        exit_status = FastlaneCore::FastlanePty.spawn('exit 7') do |command_stdout, command_stdin, pid|
+          begin
+            command_stdout.read
+          rescue Errno::EIO
+            # Expected on Linux when the command exits while we are reading.
+          end
+        end
+
+        expect(exit_status).to eq(7)
+      end
+
+      it 'reports a clear error when no exit status can be determined', requires_pty: true do
+        # With nothing to reap and nothing in $?, the old code called
+        # exitstatus on nil from inside the handler that exists to report the
+        # failure, so the caller got a NoMethodError instead of the error.
+        allow(Process).to receive(:wait2).and_raise(Errno::ECHILD)
+        allow(FastlaneCore::FastlanePty).to receive(:process_status).and_return(nil)
+
+        expect {
+          FastlaneCore::FastlanePty.spawn('exit 0') do |command_stdout, command_stdin, pid|
+          end
+        }.to raise_error(FastlaneCore::FastlanePtyError, /Could not determine the exit status/)
+      end
+
       it 'doesn t return -1 if an exception was raised in the block in PTY.spawn' do
         status = double("ProcessStatus")
         allow(status).to receive(:exitstatus) { 0 }
