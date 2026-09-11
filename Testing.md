@@ -154,10 +154,19 @@ Randomize the order of tests for the full suite:
 RSPEC_ARGS="--order rand" bundle exec rake test_all
 ```
 
-Pass a given seed to the full test suite:
+A randomized run reports the seed it used twice, once as it starts and again as its last line:
+
 ```
-RSPEC_ARGS="--seed 1234" bundle exec rake test_all
+Randomized with seed 8347
 ```
+
+That number is what makes the run repeatable. Passing it back replays the same order, so a failure that only happens in one order can be reproduced rather than waited for:
+
+```
+RSPEC_ARGS="--seed 8347" bundle exec rake test_all
+```
+
+A seed only pins the order. A failure that depends on something outside the process, such as a file an earlier run left in your home directory, reproduces on your machine and not on a colleague's whatever seed you use. `rake test_isolated` above is for that case.
 
 Run each test file independently and randomize within each run:
 ```
