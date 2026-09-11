@@ -41,6 +41,14 @@ describe Spaceship::Client do
       then.to_return(status: status_ok, body: body)
   end
 
+  describe "#itc_service_key_path" do
+    # Was the literal "/tmp" too, and the write failure it caused on Windows
+    # came out of itc_service_key as an App Store Connect outage. See #30198.
+    it "caches the key in the system temporary directory" do
+      expect(TestClient.new.itc_service_key_path).to start_with(Dir.tmpdir)
+    end
+  end
+
   describe "#logger" do
     # The path used to be the literal "/tmp", which is not a directory on every
     # platform Ruby runs on. On Windows it resolves against the current drive,
