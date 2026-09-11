@@ -92,7 +92,9 @@ lane :execute_tests do
   # Run the tests
   build_fastlane_gem(version: version) unless File.file?("pkg/fastlane-#{version}.gem")
   Dir.chdir("..") do
-    sh("bundle", "exec", "rake", "test_all")
+    # Several processes rather than one. The suite is the same either way; a
+    # worker just gets a slice of it. See fastlane#30189.
+    sh("bundle", "exec", "rake", "test_parallel")
   end
 end
 

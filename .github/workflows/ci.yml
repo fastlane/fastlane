@@ -65,6 +65,11 @@ jobs:
       - name: Run tests
         env:
           RUBYOPT: ${{ matrix.rubyopt }}
+          # Four measured best on both runner shapes. The task would otherwise
+          # take min(cores, 8), which is three on the macOS runners, and each
+          # worker spends much of its time waiting on an xcodebuild child rather
+          # than holding a core. See fastlane#30189.
+          WORKERS: '4'
         shell: bash
         run: |
           git config --global user.email "41898282+github-actions[bot]@users.noreply.github.com"
