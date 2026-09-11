@@ -1,3 +1,4 @@
+require 'tempfile'
 describe Spaceship::Tunes::IAPDetail do
   before { TunesStubbing.itc_stub_iap }
   include_examples "common spaceship login"
@@ -97,12 +98,20 @@ describe Spaceship::Tunes::IAPDetail do
     end
 
     it "saved and changed screenshot" do
-      detailed.review_screenshot = "#{Dir.tmpdir}/fastlane_tests"
+      # Its own file. This used to point at "#{Dir.tmpdir}/fastlane_tests",
+      # which is where spec_helper redirects $stdout, so the example was relying
+      # on the harness's log file existing and being named that. Only the
+      # existence of the path is checked here: the upload and the content type
+      # are both stubbed below. See fastlane#30184.
+      screenshot = Tempfile.new(["review_screenshot", ".jpg"])
+      detailed.review_screenshot = screenshot.path
       expect(client.du_client).to receive(:upload_purchase_review_screenshot).and_return({ "token" => "tok", "height" => 100, "width" => 200, "md5" => "xxxx" })
       expect(client.du_client).to receive(:get_picture_type).and_return("MZPFT.SortedScreenShot")
       expect(Spaceship::Utilities).to receive(:content_type).and_return("image/jpg")
       expect(client).to receive(:update_iap!).with(app_id: '898536088', purchase_id: "1195137656", data: detailed.raw_data)
       detailed.save!
+    ensure
+      screenshot&.close!
     end
 
     it "saved with subscription pricing goal" do
