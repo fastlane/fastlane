@@ -23,6 +23,52 @@ def spec_timings_platform
   end
 end
 
+# Where a worker writes its rspec json, and where the merged result goes. The
+# report action on CI reads one file, but a worker only ever sees its own slice
+# of the suite, so the parts are joined after the run.
+RSPEC_JSON_PATH = "rspec_logs.json".freeze
+
+def worker_json(index)
+  "rspec_logs_#{index}.json"
+end
+
+# rspec's json has an examples array and a summary of counts. Concatenating the
+# arrays and adding the counts gives the same shape for the whole run. The
+# durations are not added: they overlap, so their sum is not the wall clock and
+# would misreport the run as slower than it was. The real figure is printed by
+# the task itself.
+def merge_worker_json(count)
+  require "json"
+
+  parts = (0...count).map { |index| worker_json(index) }.select { |path| File.exist?(path) }
+  return if parts.empty?
+
+  merged = { "version" => nil, "examples" => [], "summary" => Hash.new(0), "summary_line" => "" }
+  longest = 0.0
+
+  parts.each do |path|
+    part = JSON.parse(File.read(path))
+    merged["version"] ||= part["version"]
+    merged["examples"].concat(part["examples"] || [])
+    (part["summary"] || {}).each do |key, value|
+      if key == "duration"
+        longest = [longest, value.to_f].max
+      else
+        merged["summary"][key] += value.to_i
+      end
+    end
+  end
+
+  merged["summary"]["duration"] = longest
+  merged["summary_line"] =
+    "#{merged['summary']['example_count']} examples, " \
+    "#{merged['summary']['failure_count']} failures, " \
+    "#{merged['summary']['pending_count']} pending"
+
+  File.write(RSPEC_JSON_PATH, JSON.generate(merged))
+  parts.each { |path| File.delete(path) }
+end
+
 def spec_timings_path
   "internal/spec_timings.#{spec_timings_platform}.json"
 end
@@ -200,12 +246,20 @@ task(:test_parallel) do
     # The worker appends through the redirect below, so without this the log
     # still holds the previous run and every count read back out of it is wrong.
     File.write(log, "")
-    command = ["rspec", "--format", "progress", *ENV["RSPEC_ARGS"].to_s.split, *bucket]
+    command = ["rspec", "--format", "progress", *ENV["RSPEC_ARGS"].to_s.split]
+    # On GitHub Actions the run is also reported through rspec's json formatter.
+    # One file per worker, merged below into the single file the report action
+    # reads, since a worker only knows about its own examples.
+    command += ["--format", "json", "--out", worker_json(index)] if ENV["GITHUB_ACTIONS"]
+    command += bucket
     Process.spawn(*command, out: [log, "a"], err: [log, "a"])
   end
 
   results = pids.map { |pid| Process.wait2(pid).last }
   elapsed = Time.now - started
+
+  # Before the failure reporting below, which aborts.
+  merge_worker_json(buckets.size) if ENV["GITHUB_ACTIONS"]
 
   durations = []
   results.each_with_index do |status, index|

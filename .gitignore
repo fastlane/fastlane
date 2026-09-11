@@ -85,4 +85,5 @@ xcuserdata/
 # Parallel spec runs, see fastlane#30184
 rspec_worker_*.log
 rspec_worker_*.units
+rspec_logs_*.json
 rspec_timings_raw.json
