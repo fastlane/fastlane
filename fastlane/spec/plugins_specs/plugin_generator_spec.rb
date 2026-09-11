@@ -1,6 +1,7 @@
 require 'rubygems'
 
 initialized = false
+bundled = false
 test_ui = nil
 generator = nil
 tmp_dir = nil
@@ -57,6 +58,7 @@ describe Fastlane::PluginGenerator do
       tmp_dir = nil
       oldwd = nil
       initialized = false
+      bundled = false
     end
 
     it "creates gem root directory" do
@@ -281,10 +283,17 @@ describe Fastlane::PluginGenerator do
     end
 
     describe "All tests and style validation of the new plugin are passing" do
-      before (:all) do
-        # let(:gem_name) is not available in before(:all), so pass the directory
-        # in explicitly once instead of making this a before(:each)
-        plugin_sh('bundle install', 'fastlane-plugin-tester_thing')
+      # before(:each) with a flag, not before(:all). RSpec runs an inner
+      # before(:all) ahead of an outer before(:each), so as a before(:all) this
+      # ran `bundle install` before the plugin above had been generated. It only
+      # ever worked because an earlier example in the file had generated it
+      # already, and running this group on its own failed with Errno::ENOENT for
+      # the plugin directory. See fastlane#30184.
+      before(:each) do
+        unless bundled
+          plugin_sh('bundle install')
+          bundled = true
+        end
       end
 
       it "rspec tests are passing" do
