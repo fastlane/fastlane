@@ -156,6 +156,22 @@ module Spaceship
           end
         end
 
+        # Downloads the domain association file for this domain. It has to be
+        # served at `path` before Apple is able to verify the domain
+        #
+        # @return (String) The url-safe base64 encoded contents of the file
+        def verification_file
+          client.merchant_domain_get_verification_file(domain_id, mac: merchant.mac?)
+        end
+
+        # Asks Apple to verify this domain. The `verification_file` has to be
+        # served at `path` before calling this
+        #
+        # @return (Hash) The response of the Dev Portal
+        def verify
+          client.merchant_domain_verify(domain_id, mac: merchant.mac?)
+        end
+
         # Delete this Domain
         # @return (Domain) The domain you just deleted
         def delete!
