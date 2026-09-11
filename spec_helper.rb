@@ -98,6 +98,10 @@ RSpec.configure do |config|
     end
   end
 
+  config.after(:suite) do
+    FileUtils.remove_entry(SPACESHIP_COOKIE_DIR) if File.directory?(SPACESHIP_COOKIE_DIR)
+  end
+
   config.before(:each) do |current_test|
     # We don't want to call the RubyGems API at any point
     # This was a request that was added with Ruby 2.4.0
