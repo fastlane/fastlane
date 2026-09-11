@@ -101,6 +101,7 @@ end
 
 desc("Record per file and per example spec durations for test_parallel to balance on")
 task(:spec_timings) do
+  require "etc"
   require "json"
 
   out = "rspec_timings_raw.json"
@@ -125,7 +126,21 @@ task(:spec_timings) do
   # Per example timings only for what might need splitting. Keeping all of them
   # would be a megabyte of ids nothing reads.
   heavy = files.select { |_path, seconds| seconds > 5.0 }.keys
+  # Where these came from, because it decides whether they are worth balancing
+  # with. A split is only as good as its numbers, and numbers from a 14 core
+  # laptop describe a 3 core runner badly. That is the same mistake as balancing
+  # a Linux split from macOS timings, which left a worker idle 41% to 48%.
+  provenance = {
+    "at" => Time.now.utc.strftime("%Y-%m-%d"),
+    "ci" => !ENV["GITHUB_ACTIONS"].nil?,
+    "runner" => ENV["RUNNER_NAME"] || Etc.uname[:nodename],
+    "cores" => Etc.nprocessors,
+    "ruby" => RUBY_VERSION
+  }
+  provenance["xcode"] = `xcodebuild -version`[/Xcode ([\d.]+)/, 1] if RbConfig::CONFIG["host_os"] =~ /darwin/
+
   File.write(spec_timings_path, JSON.pretty_generate(
+                                  "recorded_on" => provenance.compact,
                                   "files" => files.sort_by { |_path, seconds| -seconds }.to_h,
                                   "examples" => examples.select { |path, _| heavy.include?(path) }
   ))
