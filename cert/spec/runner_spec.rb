@@ -49,6 +49,11 @@ describe Cert do
         end
 
         it "correctly selects expired certificates" do
+          # Cert.config is module level and the example above assigns it from
+          # its own body, so this one passed only when that had run first. See
+          # fastlane#30184.
+          Cert.config = FastlaneCore::Configuration.create(Cert::Options.available_options, keychain_path: ".")
+
           expired_cert = stub_certificate("expired_cert", false)
           good_cert = stub_certificate
 

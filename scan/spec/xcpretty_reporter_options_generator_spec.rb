@@ -1,9 +1,20 @@
 describe Scan do
   describe Scan::XCPrettyReporterOptionsGenerator, requires_xcodebuild: true do
+    # Scan.config is module level and the singleton guard in spec_helper clears
+    # it after every example, so the setup has to run per example rather than
+    # once. Build the configuration once all the same, and put it back by
+    # setting the ivars rather than assigning through Scan.config=, which runs
+    # DetectValues.set_additional_default_values and shells out to xcodebuild.
+    # Paying for that 26 times instead of once took this file from 5s to 48s.
+    # See fastlane#30184.
     before(:all) do
       options = { project: "./scan/examples/standard/app.xcodeproj" }
-      Scan.config = FastlaneCore::Configuration.create(Scan::Options.available_options, options)
-      Scan.cache[:temp_junit_report] = nil
+      @configuration = FastlaneCore::Configuration.create(Scan::Options.available_options, options)
+    end
+
+    before(:each) do
+      Scan.instance_variable_set(:@config, @configuration)
+      Scan.instance_variable_set(:@cache, {})
     end
 
     describe "xcpretty reporter options generation" do

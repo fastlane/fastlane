@@ -237,6 +237,19 @@ describe Scan do
     end
 
     describe "#detect_simulator" do
+      before do
+        # Both Scan.config and Scan.project are module level, and
+        # detect_values.rb:30 assigns Scan.project while detecting values, so a
+        # project built by an earlier example in this file outlives it. These
+        # examples are about simulator selection and do not care about the
+        # deployment target, but resolving one reads Scan.config and then shells
+        # out to xcodebuild against whatever project was left behind. Start from
+        # a known state. See fastlane#30184.
+        Scan.config = FastlaneCore::Configuration.create(Scan::Options.available_options,
+                                                          { project: "./scan/examples/standard/app.xcodeproj" })
+        Scan.project = nil
+      end
+
       it 'returns simulators for requested devices', requires_xcodebuild: true do
         simctl_list_devices_output = double('xcrun simctl list devices', read: File.read("./scan/spec/fixtures/XcrunSimctlListDevicesOutput15"))
         allow(Open3).to receive(:popen3).with("xcrun simctl list devices").and_yield(nil, simctl_list_devices_output, nil, nil)
