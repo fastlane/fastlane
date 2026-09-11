@@ -139,6 +139,14 @@ RSpec.configure do |config|
 
     allow_any_instance_of(SIRP::Client).to receive(:start_authentication).and_return(SPACESHIP_AUTHENTICATION_DATA)
     allow_any_instance_of(SIRP::Client).to receive(:process_challenge).and_return("1234")
+
+    # The API key is read from the sign out redirect now, see fastlane#30199.
+    # Stubbed for every spaceship example rather than only the ones that log in:
+    # the key is fetched from whichever request first needs it, and the local
+    # cache means an unstubbed one passes on a machine that has run the suite
+    # before and fails on a clean checkout.
+    stub_request(:head, "https://appstoreconnect.apple.com/logout")
+      .to_return(status: 302, headers: { "Location" => "https://idmsa.apple.com/appleauth/signout?widgetKey=e0abc&asop=destroy-session&asoc=/&rv=3" })
   end
 
   def mock_client_response(method_name, with: anything)
