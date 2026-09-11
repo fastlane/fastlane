@@ -1,3 +1,10 @@
+# FastlanePty requires this lazily, inside spawn_with_pty, so examples below that
+# reference the PTY constant only find it when something has already run a pty
+# backed command in this process. Require it here so they do not depend on that.
+# Guarded because pty is not available on Windows, where those examples are
+# skipped anyway. See fastlane#30184.
+require 'pty' unless FastlaneCore::Helper.windows?
+
 describe FastlaneCore do
   describe FastlaneCore::CommandExecutor do
     describe "execute" do
@@ -7,7 +14,7 @@ describe FastlaneCore do
 
       it 'executes a simple command successfully' do
         unless FastlaneCore::Helper.windows?
-          expect(Process).to receive(:wait)
+          expect(Process).to receive(:wait).and_call_original
         end
 
         result = FastlaneSpec::Env.with_env_values('FASTLANE_EXEC_FLUSH_PTY_WORKAROUND' => '1') do
@@ -37,7 +44,11 @@ describe FastlaneCore do
           # so we have to spawn a real process unless we want to mock methods
           # on nil.
           child_process_id = Process.spawn('echo foo', out: File::NULL)
-          expect(Process).to receive(:wait).with(child_process_id)
+          # and_call_original matters: Process.wait is what fills in $?, which
+          # FastlanePty reads for the exit status. Mocking it away leaves $? holding
+          # whatever the previous example left there, so these examples reported an
+          # earlier command's exit status when they did not run first.
+          expect(Process).to receive(:wait).with(child_process_id).and_call_original
 
           block.yield(fake_std_in, fake_std_out, child_process_id)
         end
@@ -69,7 +80,11 @@ describe FastlaneCore do
           # so we have to spawn a real process unless we want to mock methods
           # on nil.
           child_process_id = Process.spawn('echo foo', out: File::NULL)
-          expect(Process).to receive(:wait).with(child_process_id)
+          # and_call_original matters: Process.wait is what fills in $?, which
+          # FastlanePty reads for the exit status. Mocking it away leaves $? holding
+          # whatever the previous example left there, so these examples reported an
+          # earlier command's exit status when they did not run first.
+          expect(Process).to receive(:wait).with(child_process_id).and_call_original
 
           block.yield(fake_std_in, fake_std_out, child_process_id)
         end
@@ -88,7 +103,7 @@ Shopping list:
 
       it "does not print output to stdout when status != 0 and output was already printed" do
         unless FastlaneCore::Helper.windows?
-          expect(Process).to receive(:wait)
+          expect(Process).to receive(:wait).and_call_original
         end
 
         expect do
@@ -102,7 +117,7 @@ Shopping list:
 
       it "prints output to stdout only once when status != 0 and output was not already printed" do
         unless FastlaneCore::Helper.windows?
-          expect(Process).to receive(:wait).exactly(3)
+          expect(Process).to receive(:wait).exactly(3).and_call_original
         end
 
         expect do
@@ -135,7 +150,7 @@ Shopping list:
 
       it "calls error block with output argument" do
         unless FastlaneCore::Helper.windows?
-          expect(Process).to receive(:wait).twice
+          expect(Process).to receive(:wait).twice.and_call_original
         end
 
         error_block_input = nil
@@ -161,7 +176,7 @@ Shopping list:
 
       it "does not print output or exit status when failure output is suppressed" do
         unless FastlaneCore::Helper.windows?
-          expect(Process).to receive(:wait)
+          expect(Process).to receive(:wait).and_call_original
         end
 
         error_block_input = nil
@@ -267,7 +282,7 @@ Shopping list:
 
       it "still raises when failure output is suppressed without an error block" do
         unless FastlaneCore::Helper.windows?
-          expect(Process).to receive(:wait)
+          expect(Process).to receive(:wait).and_call_original
         end
 
         raised_error = nil
