@@ -1,4 +1,21 @@
+require 'base64'
 require 'plist'
+require 'fastlane-sirp'
+
+# The login stubs in tunes/tunes_stubbing.rb match on an exact request body that
+# embeds this SRP public ephemeral. SIRP generates a fresh random one per client,
+# so it has to be stubbed for those bodies to match. Every spaceship spec needs
+# it, not only the ones using the "common spaceship login" shared example: a spec
+# that reaches a login without it computes a real value, matches no stub, and
+# fails with WebMock::NetConnectNotAllowedError depending on what ran first.
+SPACESHIP_AUTHENTICATION_DATA =
+  '8f30ce83b660f03abb0f8570c235e0e1e1d3860a222304acf18e989bdc065dc922a141e6da4563f0' \
+  '5586605b0e10535d875ca7e0fae7fe100cfe533374f29aaa803cdfb2c6194f458485e87f76988f6' \
+  'cddaa1829309438e1aa9ab652b17cfc081fff40356cb3af35c621e9f37ba6e2a03e6abac5a6bfe' \
+  '18ddb489412b7c56355292e6c355f8859270d04063b843d23c1ef7503c3c5dd2c56740101a3ef5' \
+  'bfec6bff1e6dc55e3f70840a83a95d7b3d20ab350d0472809ce87a4e3c29ed9685eb7721dc87ba' \
+  'bfadbd9e65e75d5df55547bcff98711ddeae7b8e1e6dbf529e96f7caa4b830b43575cddc52cebc' \
+  '39f9522f85cbf33ac35ee59f66f48109c12fbb78d'
 
 require_relative 'client_stubbing'
 require_relative 'connect_api/provisioning/provisioning_stubbing'
@@ -20,16 +37,29 @@ if set_auth_vars.any?
   abort("[!] Please `unset` the following ENV vars which interfere with spaceship testing: #{set_auth_vars.join(', ')}".red)
 end
 
-@cache_paths = [
-  File.expand_path("/tmp/spaceship_itc_service_key.txt")
-]
+# Client#itc_service_key caches the key at a fixed path in /tmp, reading it with
+# File.exist? followed by File.read. These examples used to delete that file
+# before and after every one of them, which isolates them from each other in one
+# process and cannot work in several: one worker removes the file between
+# another's exist? and read, and the loser raises AppleTimeoutError from inside
+# itc_service_key.
+#
+# The deletion is gone. The examples that depended on it, in
+# spaceship/spec/tunes/tunes_client_spec.rb, stub the key instead, so nothing
+# here needs the file to be in any particular state. See fastlane#30184.
 
-def try_delete(path)
-  FileUtils.rm_f(path) if File.exist?(path)
+def clear_spaceship_model_clients(klass)
+  klass.instance_variable_set(:@client, nil)
+  klass.subclasses.each { |subclass| clear_spaceship_model_clients(subclass) }
 end
 
 def before_each_spaceship
-  @cache_paths.each { |path| try_delete(path) }
+  # Spaceship::Base subclasses each hold their own @client, stamped on by
+  # set_client and preferred over Spaceship::Portal.client. Class level ivars are
+  # not inherited, so a client cached on Spaceship::Certificate by one example
+  # keeps answering for later ones even after they log in again. Clear the tree
+  # so each example uses the client its own login produced.
+  clear_spaceship_model_clients(Spaceship::Base)
   ENV["DELIVER_USER"] = "spaceship@krausefx.com"
   ENV["DELIVER_PASSWORD"] = "so_secret"
   ENV['SPACESHIP_AVOID_XCODE_API'] = 'true'
@@ -100,10 +130,17 @@ def before_each_spaceship
 end
 
 def after_each_spaceship
-  @cache_paths.each { |path| try_delete(path) }
+  nil
 end
 
 RSpec.configure do |config|
+  config.before(:each) do |current_test|
+    next unless current_test.id.start_with?("./spaceship/")
+
+    allow_any_instance_of(SIRP::Client).to receive(:start_authentication).and_return(SPACESHIP_AUTHENTICATION_DATA)
+    allow_any_instance_of(SIRP::Client).to receive(:process_challenge).and_return("1234")
+  end
+
   def mock_client_response(method_name, with: anything)
     mock_method = allow(mock_client).to receive(method_name)
     mock_method = mock_method.with(with)
@@ -116,7 +153,6 @@ RSpec.configure do |config|
 end
 
 RSpec.shared_examples("common spaceship login") do |skip_tunes_login|
-  require 'fastlane-sirp'
   let(:authentication_data) {
     '8f30ce83b660f03abb0f8570c235e0e1e1d3860a222304acf18e989bdc065dc922a141e6da4563f0' \
       '5586605b0e10535d875ca7e0fae7fe100cfe533374f29aaa803cdfb2c6194f458485e87f76988f6' \
@@ -130,9 +166,16 @@ RSpec.shared_examples("common spaceship login") do |skip_tunes_login|
   let(:password) { 'so_secret' }
 
   before {
-    allow_any_instance_of(SIRP::Client).to receive(:start_authentication).and_return(authentication_data)
-    allow_any_instance_of(SIRP::Client).to receive(:process_challenge).and_return("1234")
+    unless skip_tunes_login
+      Spaceship::Tunes.login
 
-    Spaceship::Tunes.login unless skip_tunes_login
+      # Spaceship::ConnectAPI.client returns a globally held @client when one has
+      # been set, so a client built in an earlier example decides what this one
+      # talks to. Clear it, and log into the portal as well: the implicit client
+      # built in its place only wires up provisioning_request_client when a
+      # cookie, a token or a portal client is present.
+      Spaceship::ConnectAPI.client = nil
+      Spaceship::Portal.login
+    end
   }
 end
