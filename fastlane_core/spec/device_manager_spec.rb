@@ -2,6 +2,14 @@ require 'open3'
 
 describe FastlaneCore do
   describe FastlaneCore::DeviceManager do
+    # runtime_build_os_versions memoises into a module level ivar, so an example
+    # that stubs the underlying command only sees its stub if nothing has already
+    # populated it. Clearing it per example rather than once per group, which is
+    # what the before(:all) below does for the simulator cache. See fastlane#30184.
+    before(:each) do
+      FastlaneCore::DeviceManager.instance_variable_set(:@runtime_build_os_versions, nil)
+    end
+
     before(:all) do
       @simctl_output = File.read('./fastlane_core/spec/fixtures/DeviceManagerSimctlOutputXcode7')
       @system_profiler_output = File.read('./fastlane_core/spec/fixtures/DeviceManagerSystem_profilerOutput')
