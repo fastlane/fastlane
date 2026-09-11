@@ -1,3 +1,12 @@
+# The examples below stub PTY, but fastlane_pty.rb only requires it from inside
+# spawn_with_pty, so the constant does not exist until something has run that
+# method. They passed only when an earlier example in this file had, and failed
+# with "uninitialized constant PTY" whenever they ran first.
+#
+# Not available on Windows, where the examples needing it are skipped by their
+# requires_pty tag. See fastlane#30184.
+require "pty" unless FastlaneCore::Helper.windows?
+
 describe FastlaneCore do
   describe FastlaneCore::FastlanePty do
     describe "spawn" do
