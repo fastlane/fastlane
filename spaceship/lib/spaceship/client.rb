@@ -745,17 +745,7 @@ module Spaceship
         logger.warn("Could not read the cached App Store Connect API key: #{ex.message}")
       end
 
-      # Fixes issue https://github.com/fastlane/fastlane/issues/13281
-      # Even though we are using https://appstoreconnect.apple.com, the service key needs to still use a
-      # hostname through itunesconnect.apple.com
-      response = begin
-        request(:get, "https://appstoreconnect.apple.com/olympus/v1/app/config?hostname=itunesconnect.apple.com")
-      rescue Faraday::TimeoutError, Faraday::ConnectionFailed => ex
-        # The only case the old message was ever right about.
-        raise AppleTimeoutError.new, "Could not reach App Store Connect to fetch the API key: #{ex.message}"
-      end
-
-      @service_key = extract_service_key(response)
+      @service_key = fetch_service_key
 
       # Cache the key locally. Best effort as well: having the key and failing
       # to save it is not a reason to fail the login. See fastlane#30198.
@@ -766,6 +756,76 @@ module Spaceship
       end
 
       return @service_key
+    end
+
+    # Two sources, because the one this used to rely on is gone.
+    #
+    # App Store Connect's sign out route answers with a redirect that carries
+    # the key its own front end is using:
+    #
+    #   GET /logout -> 302 Location: .../appleauth/signout?widgetKey=<key>&...
+    #
+    # That is preferred over the olympus endpoint below, which Apple removed in
+    # September 2026 and which now answers 404. See fastlane#30199. The olympus
+    # call is kept as a fallback in case it comes back, since it is the source
+    # Apple documented rather than one scraped out of a redirect.
+    def fetch_service_key
+      key = fetch_service_key_from_signout
+      return key if key
+
+      # Fixes issue https://github.com/fastlane/fastlane/issues/13281
+      # Even though we are using https://appstoreconnect.apple.com, the service key needs to still use a
+      # hostname through itunesconnect.apple.com
+      response = begin
+        request(:get, "https://appstoreconnect.apple.com/olympus/v1/app/config?hostname=itunesconnect.apple.com")
+      rescue Faraday::TimeoutError, Faraday::ConnectionFailed => ex
+        # The only case the old message was ever right about.
+        raise AppleTimeoutError.new, "Could not reach App Store Connect to fetch the API key: #{ex.message}"
+      end
+
+      extract_service_key(response)
+    end
+
+    # Read the key out of the sign out redirect, or nil if it is not there.
+    #
+    # Two things about this request matter, and neither is decoration.
+    #
+    # It sends no cookies. The redirect it returns points at a signout with
+    # `asop=destroy-session`, so asking for it over the client's own connection,
+    # which carries the session jar, would end the session this method is being
+    # called in order to establish. A bare Faraday connection has neither a
+    # cookie jar nor redirect following, which is exactly what is wanted here.
+    #
+    # It does not follow the redirect. The key is in the Location header;
+    # following it is what performs the signout.
+    #
+    # Failure returns nil rather than raising, so the caller falls through to
+    # the other source rather than this becoming a new single point of failure.
+    # Deliberately not `self.class.client` or anything built from it. A bare
+    # Faraday connection has no cookie jar and no redirect following, which is
+    # the whole point; the spec asserts both rather than trusting this comment.
+    def signout_connection
+      Faraday.new(url: "https://appstoreconnect.apple.com")
+    end
+
+    def fetch_service_key_from_signout
+      response = signout_connection.head("/logout")
+
+      location = response.headers["location"].to_s
+      return nil if location.empty?
+
+      query = URI.parse(location).query
+      return nil if query.nil?
+
+      key = CGI.parse(query)["widgetKey"].first.to_s
+      return nil if key.empty?
+
+      logger.debug("Read the App Store Connect API key from the sign out redirect")
+      key
+    rescue StandardError => ex
+      # Anything at all: the fallback below is the point of this returning nil.
+      logger.debug("Could not read the App Store Connect API key from the sign out redirect: #{ex.message}")
+      nil
     end
 
     # The status matters, and used to be thrown away. A non 2xx response body is

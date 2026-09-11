@@ -41,6 +41,60 @@ describe Spaceship::Client do
       then.to_return(status: status_ok, body: body)
   end
 
+  describe "the App Store Connect API key source" do
+    # Apple removed the olympus endpoint this used to come from. Its own front
+    # end now takes the key from the sign out redirect. See #30199.
+    let(:client) { TestClient.new }
+    let(:key) { "e0b80c3bf78523bfe80974d320935bfa30add02e1bff88ec2166c6bd5a706c42" }
+    let(:location) { "https://idmsa.apple.com/appleauth/signout?widgetKey=#{key}&asop=destroy-session&asoc=/&rv=3" }
+
+    before do
+      allow(client).to receive(:itc_service_key_path).and_return(File.join(Dir.tmpdir, "spaceship_key_absent_spec.txt"))
+      allow(File).to receive(:write)
+    end
+
+    def signout_returning(headers)
+      double("connection", head: double("response", headers: headers))
+    end
+
+    it "reads the key out of the sign out redirect" do
+      allow(client).to receive(:signout_connection).and_return(signout_returning("location" => location))
+
+      expect(client.itc_service_key).to eq(key)
+    end
+
+    # The redirect points at a signout with asop=destroy-session. Asking for it
+    # over the connection that carries the session cookies would end the very
+    # session this method is called to establish.
+    it "does not ask for it over the session carrying connection" do
+      allow(client).to receive(:signout_connection).and_return(signout_returning("location" => location))
+      expect(client).to_not(receive(:request))
+
+      client.itc_service_key
+    end
+
+    it "builds a connection with no cookie jar and no redirect following" do
+      handlers = client.send(:signout_connection).builder.handlers.map(&:name)
+
+      expect(handlers.join(" ")).to_not(match(/CookieJar/i))
+      expect(handlers.join(" ")).to_not(match(/FollowRedirects/i))
+    end
+
+    it "falls back to the olympus endpoint when the redirect carries no key" do
+      allow(client).to receive(:signout_connection).and_return(signout_returning({}))
+      expect(client).to receive(:request).and_return(double("response", status: 200, body: { "authServiceKey" => "from-olympus" }))
+
+      expect(client.itc_service_key).to eq("from-olympus")
+    end
+
+    it "falls back when the sign out request fails outright" do
+      allow(client).to receive(:signout_connection).and_raise(Faraday::ConnectionFailed.new("nope"))
+      expect(client).to receive(:request).and_return(double("response", status: 200, body: { "authServiceKey" => "from-olympus" }))
+
+      expect(client.itc_service_key).to eq("from-olympus")
+    end
+  end
+
   describe "#itc_service_key" do
     # Apple started returning 404 from the key endpoint, and every one of these
     # surfaced as "Service key is empty" wrapped in a timeout. See #30199.
@@ -49,6 +103,8 @@ describe Spaceship::Client do
 
     before do
       allow(client).to receive(:itc_service_key_path).and_return(File.join(Dir.tmpdir, "spaceship_itc_service_key_spec_absent.txt"))
+      # These are about the olympus endpoint, which is the fallback now.
+      allow(client).to receive(:fetch_service_key_from_signout).and_return(nil)
     end
 
     def response_double(status, body)
