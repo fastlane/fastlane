@@ -1,3 +1,5 @@
+require 'base64'
+
 require_relative '../client'
 
 require_relative 'app'
@@ -358,12 +360,14 @@ module Spaceship
         domainId: domain_id
       })
       a = parse_response(r)
-      # ruby won't accept unless we remove the newlines
-      if r.success? && Base64.urlsafe_decode64(a.delete("\r\n")).include?("Apple Inc.")
-        return a
-      else
-        raise UnexpectedResponse.new, "Couldn't download verification file, got this instead: #{a}"
+      if r.success? && a.kind_of?(String)
+        begin
+          return a if Base64.urlsafe_decode64(a.delete("\r\n")).include?("Apple Inc.")
+        # if not valid pkcs#7 just fall through
+        rescue ArgumentError
+        end
       end
+      raise UnexpectedResponse.new, "Couldn't download verification file, got this instead: #{a}"
     end
 
     def merchant_domain_verify(domain_id, mac: false)
