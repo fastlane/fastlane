@@ -41,6 +41,57 @@ describe Spaceship::Client do
       then.to_return(status: status_ok, body: body)
   end
 
+  describe "#itc_service_key" do
+    # Apple started returning 404 from the key endpoint, and every one of these
+    # surfaced as "Service key is empty" wrapped in a timeout. See #30199.
+    let(:key_url) { "https://appstoreconnect.apple.com/olympus/v1/app/config?hostname=itunesconnect.apple.com" }
+    let(:client) { TestClient.new }
+
+    before do
+      allow(client).to receive(:itc_service_key_path).and_return(File.join(Dir.tmpdir, "spaceship_itc_service_key_spec_absent.txt"))
+    end
+
+    def response_double(status, body)
+      double("response", status: status, body: body)
+    end
+
+    it "reports the status when the endpoint is gone rather than an empty key" do
+      allow(client).to receive(:request).and_return(response_double(404, "<html><title>Error 404 Not Found</title></html>"))
+
+      expect { client.itc_service_key }
+        .to raise_error(Spaceship::UnexpectedResponse, /returned 404/)
+    end
+
+    it "does not report a permanent failure as something worth retrying" do
+      allow(client).to receive(:request).and_return(response_double(404, "<html>nope</html>"))
+
+      # AppleTimeoutError is in with_retry's list, so raising it for a 404 costs
+      # five attempts and three second sleeps before failing anyway.
+      expect { client.itc_service_key }.to_not(raise_error(Spaceship::AppleTimeoutError))
+    end
+
+    it "keeps a server error retryable" do
+      allow(client).to receive(:request).and_return(response_double(503, "<html>unavailable</html>"))
+
+      expect { client.itc_service_key }
+        .to raise_error(Spaceship::AppleTimeoutError, /returned 503/)
+    end
+
+    it "says the key was missing when the response was otherwise fine" do
+      allow(client).to receive(:request).and_return(response_double(200, {}))
+
+      expect { client.itc_service_key }
+        .to raise_error(Spaceship::UnexpectedResponse, /no authServiceKey/)
+    end
+
+    it "does not fail the login when the key cannot be cached" do
+      allow(client).to receive(:request).and_return(response_double(200, { "authServiceKey" => "e0abc" }))
+      allow(File).to receive(:write).and_raise(Errno::EACCES)
+
+      expect(client.itc_service_key).to eq("e0abc")
+    end
+  end
+
   describe "#itc_service_key_path" do
     # Guards against going back to a literal "/tmp"; the method says why.
     it "caches the key in the system temporary directory" do
