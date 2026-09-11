@@ -51,22 +51,34 @@ if FastlaneCore::Helper.mac?
   end
 end
 
+# A tool spec helper that writes to ENV at the top level rather than from a
+# before_each_* method would do it once, outside every example, where the guard
+# below can neither blame an example for it nor restore it. Nothing does that
+# today; this is here so that it cannot start silently. See fastlane#30184.
+env_guard_pristine = ENV.to_h
+
 (Fastlane::TOOLS + [:spaceship, :fastlane_core]).each do |tool|
   path = File.join(tool.to_s, "spec", "spec_helper.rb")
   require_relative path if File.exist?(path)
   require tool.to_s
 end
 
+env_guard_loaded = ENV.to_h
+ENV_GUARD_LOAD_TIME = ((env_guard_loaded.keys - env_guard_pristine.keys) |
+                       (env_guard_pristine.keys - env_guard_loaded.keys) |
+                       (env_guard_loaded.keys & env_guard_pristine.keys)
+                         .reject { |key| env_guard_loaded[key] == env_guard_pristine[key] }).sort.freeze
+
 my_main = self
 RSpec.configure do |config|
   # Singleton guard, see fastlane#30184.
   #
   # The fastlane tools keep their configuration on the module itself, so a value
-  # one example assigns is still there for every example after it. Four rows of
-  # internal/order_dependent_specs.md are the same defect: a group reading
-  # configuration it never set, green only while something earlier happened to
-  # leave one behind. Row W survived roughly twenty five random orders before a
-  # seed caught it, so waiting for seeds to find the rest is slow.
+  # one example assigns is still there for every example after it. Several groups
+  # were the same defect: reading configuration they never set, green only while
+  # something earlier happened to leave one behind. One of them survived roughly
+  # twenty five random orders before a seed caught it, so waiting for seeds to
+  # find the rest is slow.
   #
   # Clearing them after every example turns those from occasional failures into
   # permanent ones, which is the only way to enumerate them rather than wait.
@@ -108,6 +120,98 @@ RSpec.configure do |config|
 
   config.after(:suite) do
     FileUtils.remove_entry(SPACESHIP_COOKIE_DIR) if File.directory?(SPACESHIP_COOKIE_DIR)
+  end
+
+  # Environment guard, see fastlane#30184.
+  #
+  # A test that leaves a variable behind changes what every later test in the
+  # process sees, and several of the ones involved carry credentials:
+  # DELIVER_PASSWORD, FASTLANE_PASSWORD and FASTLANE_SESSION have all been found
+  # leaking between examples. Tests should scope what they set with
+  # FastlaneSpec::Env.with_env_values rather than assigning to ENV directly.
+  #
+  # Modes, through FASTLANE_SPEC_ENV_GUARD:
+  #   enforce (default) restore ENV after each example, and report what escaped
+  #   report            leave ENV alone, report what escaped
+  #   off               do nothing
+  #
+  # Restoring is what makes the report worth reading. Without it each example is
+  # measured against whatever the previous one left behind, so an example setting
+  # a variable to the value already leaked there registers no change and is never
+  # named. Three specs set DELIVER_PASSWORD to "123": running those files in
+  # report mode names one example, enforce mode names all 64. The set of keys is
+  # the same either way, the attribution is not, and in report mode it depends
+  # entirely on the order the suite happened to run in.
+  #
+  # An example that is meant to leave something behind declares it:
+  #   it "sets the team id", env_output: %w[FASTLANE_TEAM_ID] do
+  #
+  # Two kinds of write are invisible here because both happen outside
+  # around(:each): top level writes in a tool spec helper, reported separately
+  # from ENV_GUARD_LOAD_TIME below, and writes in a before(:context) hook, which
+  # enter the baseline of every example in the group and outlive the group.
+  #
+  # FASTLANE_SPEC_ENV_GUARD_REPORT names a file to write the full inventory to.
+  # The console summary lists only the first few examples per variable, which is
+  # not enough to work from when a variable has a thousand of them.
+  #
+  # Only key names are ever reported. The values are the point of the exercise.
+  ENV_GUARD_MODE = (ENV["FASTLANE_SPEC_ENV_GUARD"] || "enforce").to_sym
+  ENV_GUARD_LEAKS = Hash.new { |hash, key| hash[key] = [] }
+  ENV_GUARD_REPORT_PATH = ENV["FASTLANE_SPEC_ENV_GUARD_REPORT"]
+
+  config.around(:each) do |example|
+    if ENV_GUARD_MODE == :off
+      example.run
+    else
+      before = ENV.to_h
+      begin
+        example.run
+      ensure
+        allowed = Array(example.metadata[:env_output]).map(&:to_s)
+        after = ENV.to_h
+        escaped = ((after.keys - before.keys) | (before.keys - after.keys) |
+                   (before.keys & after.keys).reject { |key| before[key] == after[key] }) - allowed
+        escaped.each { |key| ENV_GUARD_LEAKS[key] << example.id }
+        ENV.replace(before) if ENV_GUARD_MODE == :enforce
+      end
+    end
+  end
+
+  config.after(:suite) do
+    unless ENV_GUARD_LOAD_TIME.empty?
+      warn("")
+      warn("[env-guard] #{ENV_GUARD_LOAD_TIME.size} variables were set while the tool spec helpers loaded.")
+      warn("[env-guard] They are written outside any example, so no mode restores them and no example is blamed.")
+      warn("[env-guard] Move them into a hook to bring them under the guard: #{ENV_GUARD_LOAD_TIME.join(', ')}")
+    end
+
+    next if ENV_GUARD_LEAKS.empty?
+
+    ranked = ENV_GUARD_LEAKS.sort_by { |key, ids| [-ids.size, key] }
+
+    warn("")
+    warn("[env-guard] #{ENV_GUARD_LEAKS.size} environment variables escaped the example that changed them.")
+    warn("[env-guard] Scope them with FastlaneSpec::Env.with_env_values, or declare them with env_output:.")
+    warn("[env-guard] Reporting only, ENV was left as the examples made it.") if ENV_GUARD_MODE == :report
+    ranked.each do |key, ids|
+      warn("[env-guard]   #{key} (#{ids.size})")
+      ids.uniq.first(3).each { |id| warn("[env-guard]       #{id}") }
+      warn("[env-guard]       ...") if ids.uniq.size > 3
+    end
+
+    if ENV_GUARD_REPORT_PATH
+      File.open(ENV_GUARD_REPORT_PATH, "w") do |file|
+        file.puts("# fastlane#30184, environment guard, mode #{ENV_GUARD_MODE}")
+        file.puts("# set while the tool spec helpers loaded: #{ENV_GUARD_LOAD_TIME.join(', ')}") unless ENV_GUARD_LOAD_TIME.empty?
+        ranked.each do |key, ids|
+          file.puts("")
+          file.puts("#{key} (#{ids.uniq.size})")
+          ids.uniq.sort.each { |id| file.puts("  #{id}") }
+        end
+      end
+      warn("[env-guard] Full inventory written to #{ENV_GUARD_REPORT_PATH}")
+    end
   end
 
   config.before(:each) do |current_test|
