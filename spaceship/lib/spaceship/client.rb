@@ -240,6 +240,11 @@ module Spaceship
 
     # The logger in which all requests are logged
     # <tmpdir>/spaceship[time]_[pid]_["threadid"].log by default
+    #
+    # Dir.tmpdir rather than a literal "/tmp", and it should stay that way:
+    # "/tmp" is not a directory on every platform Ruby runs on. On Windows it
+    # resolves against the current drive, so Logger.new raises Errno::ENOENT
+    # unless something else happens to have created it first.
     def logger
       unless @logger
         if ENV["VERBOSE"]
@@ -717,6 +722,14 @@ module Spaceship
     end
 
     # <tmpdir>/spaceship_itc_service_key.txt
+    #
+    # Dir.tmpdir rather than a literal "/tmp", for the same reason as #logger,
+    # and here the failure was worse than a missing file: itc_service_key
+    # rescues everything, so the write failing on Windows was reported as an
+    # App Store Connect outage. See #30198.
+    #
+    # On macOS this is also per user, so a cache written by one user no longer
+    # blocks another.
     def itc_service_key_path
       File.join(Dir.tmpdir, "spaceship_itc_service_key.txt")
     end
