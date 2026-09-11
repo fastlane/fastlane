@@ -76,6 +76,18 @@ jobs:
           git config --global user.name "github-actions[bot]"
           bundle exec fastlane execute_tests
 
+      # A worker's rspec output goes to its own log, not to stdout, so without
+      # this a failing job says which examples failed and never why.
+      - name: Keep the worker logs
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: rspec-worker-logs-${{ matrix.os }}-ruby${{ matrix.ruby }}-xcode${{ matrix.xcode }}
+          path: |
+            rspec_worker_*.log
+            rspec_worker_*.units
+          if-no-files-found: warn
+
       - name: RSpec report
         if: always()
         uses: SonicGarden/rspec-report-action@v8
