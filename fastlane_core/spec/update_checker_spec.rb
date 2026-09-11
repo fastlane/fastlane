@@ -37,9 +37,16 @@ describe FastlaneCore do
     end
 
     describe "#update_command" do
-      before do
-        ENV.delete("BUNDLE_BIN_PATH")
-        ENV.delete("BUNDLE_GEMFILE")
+      # Scoped, not deleted. These two decide Helper.bundler?, and dropping them
+      # for the rest of the process makes every later example look as though it
+      # is not running under bundler. take_off then finds the Gemfile in the
+      # working directory and emits "fastlane detected a Gemfile", an extra call
+      # that was failing ruby_version_warning_spec's `.once` constraint on
+      # UI.important. See fastlane#30184.
+      around(:each) do |example|
+        FastlaneSpec::Env.with_env_values("BUNDLE_BIN_PATH" => nil, "BUNDLE_GEMFILE" => nil) do
+          example.run
+        end
       end
 
       it "works a custom gem name" do
