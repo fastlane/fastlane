@@ -42,7 +42,8 @@ describe FastlaneCore do
       # is not running under bundler. take_off then finds the Gemfile in the
       # working directory and emits "fastlane detected a Gemfile", which is what
       # was failing ruby_version_warning_spec's `.once` constraint on
-      # UI.important. That was row M, whose trigger this is. See fastlane#30184.
+      # UI.important, which is what was failing ruby_version_warning_spec's
+      # `.once` constraint. See fastlane#30184.
       around(:each) do |example|
         FastlaneSpec::Env.with_env_values("BUNDLE_BIN_PATH" => nil, "BUNDLE_GEMFILE" => nil) do
           example.run

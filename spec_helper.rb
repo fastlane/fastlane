@@ -15,9 +15,9 @@ UI = FastlaneCore::UI
 # Spaceship persists a session cookie to ~/.fastlane/spaceship/<user>/cookie,
 # under the real home directory, and reads it back to decide whether a session
 # is valid. That makes the suite write to the developer's machine, and it makes
-# a spec able to depend on a file some earlier run left behind: the cookie that
-# row V depended on was nine months older than the run that needed it, so those
-# examples passed locally in every order while failing on CI. Redirect the store
+# a spec able to depend on a file some earlier run left behind: the cookie four
+# spaceauth examples depended on was nine months older than the run that needed
+# it, so they passed locally in every order and failed only on a clean checkout. Redirect the store
 # to a temporary directory that belongs to this process, so the suite leaves
 # nothing behind and a spec needing a session has to arrange one itself.
 #
@@ -98,11 +98,11 @@ RSpec.configure do |config|
   # Singleton guard, see fastlane#30184.
   #
   # The fastlane tools keep their configuration on the module itself, so a value
-  # one example assigns is still there for every example after it. Four rows of
-  # internal/order_dependent_specs.md are the same defect: a group reading
-  # configuration it never set, green only while something earlier happened to
-  # leave one behind. Row W survived roughly twenty five random orders before a
-  # seed caught it, so waiting for seeds to find the rest is slow.
+  # one example assigns is still there for every example after it. Four groups of
+  # specs had the same defect: they read configuration they never set, and were
+  # green only while something earlier happened to leave one behind. One of them
+  # survived roughly twenty five random orders before a seed caught it, so waiting
+  # for seeds to find the rest is slow.
   #
   # Clearing them after every example turns those from occasional failures into
   # permanent ones, which is the only way to enumerate them rather than wait.

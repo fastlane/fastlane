@@ -16,7 +16,7 @@ describe Spaceship::ConnectAPI do
   # double and ConnectAPI.login then assigns it, so what leaked out was an
   # rspec double, which rspec disables at the end of its example. Anything
   # later reaching ConnectAPI.token got "originally created in one example but
-  # has leaked into another". Row X. See fastlane#30184.
+  # has leaked into another". See fastlane#30184.
   after(:each) do
     Spaceship::ConnectAPI.client = nil
     Spaceship::Tunes.client = nil

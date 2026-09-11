@@ -162,7 +162,7 @@ jobs:
       # number is expected to be lower and the matrix is here to find it.
       #
       # Also a second order dependence check: a worker sees a subset no seed
-      # ever produces, which is how rows T and Z were found.
+      # ever produces, which is how two of the defects were found.
       - name: Run the suite as ${{ matrix.workers }} processes
         shell: bash
         env:
@@ -254,9 +254,9 @@ jobs:
         run: ulimit -n 65536
 
       # Runs against a home directory the run controls, so that a spec depending
-      # on state an earlier run left in ~ fails here. Row Z was exactly that and
-      # survived for months because every machine that had run the suite already
-      # had the file it needed. Locally this costs about 7%.
+      # on state an earlier run left in ~ fails here. One defect was exactly that
+      # and survived for months because every machine that had run the suite
+      # already had the file it needed. Locally this costs about 7%.
       - name: Run the suite with an isolated HOME
         shell: bash
         env:

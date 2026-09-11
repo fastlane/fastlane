@@ -43,7 +43,7 @@ end
 # process and races in several: under `rake test_parallel` one worker removes
 # the file between another's exist? and read, or reads one a third has only
 # partly written, and the loser raises AppleTimeoutError from inside
-# itc_service_key. Row Z of internal/order_dependent_specs.md.
+# itc_service_key.
 #
 # Write it once instead, and never delete it. Every worker then finds a complete
 # file and nothing writes during the run, so there is nothing to race over. The

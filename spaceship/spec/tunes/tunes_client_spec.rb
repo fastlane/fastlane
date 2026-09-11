@@ -42,7 +42,7 @@ describe Spaceship::TunesClient do
       # and the third stubbed request was never reached, so nothing was raised.
       # spaceship/spec/spec_helper.rb used to delete the file around every
       # example to force it cold, which works in one process and races in
-      # several, and was row Z. Answer the key directly so the count is the same
+      # several. Answer the key directly so the count is the same
       # either way. See fastlane#30184.
       allow_any_instance_of(Spaceship::Client).to receive(:itc_service_key).and_return("e0abc")
     end

@@ -3,7 +3,7 @@
 # The suite reads and writes the developer's real home. It leaves 53 entries
 # there, `~/.fastlane`, `~/Library/Logs/{fastlane,gym,scan,snapshot}`,
 # `~/Library/MobileDevice/Provisioning Profiles`, `~/.appstoreconnect` and more,
-# and it reads state left by earlier runs. That is how row Z survived for
+# and it reads state left by earlier runs. That is how one defect survived for
 # months: `Client#itc_service_key` cached to a file, the examples depending on
 # it passed on any machine that had ever run the suite, and only a clean CI
 # checkout ever failed.
