@@ -37,7 +37,7 @@ module Spaceship
     attr_accessor :user_email
 
     # The logger in which all requests are logged
-    # /tmp/spaceship[time]_[pid].log by default
+    # <tmpdir>/spaceship[time]_[pid].log by default
     attr_accessor :logger
 
     attr_accessor :csrf_tokens
@@ -239,14 +239,19 @@ module Spaceship
     #####################################################
 
     # The logger in which all requests are logged
-    # /tmp/spaceship[time]_[pid]_["threadid"].log by default
+    # <tmpdir>/spaceship[time]_[pid]_["threadid"].log by default
+    #
+    # Dir.tmpdir rather than a literal "/tmp", and it should stay that way:
+    # "/tmp" is not a directory on every platform Ruby runs on. On Windows it
+    # resolves against the current drive, so Logger.new raises Errno::ENOENT
+    # unless something else happens to have created it first.
     def logger
       unless @logger
         if ENV["VERBOSE"]
           @logger = Logger.new(STDOUT)
         else
           # Log to file by default
-          path = "/tmp/spaceship#{Time.now.to_i}_#{Process.pid}_#{Thread.current.object_id}.log"
+          path = File.join(Dir.tmpdir, "spaceship#{Time.now.to_i}_#{Process.pid}_#{Thread.current.object_id}.log")
           @logger = Logger.new(path)
         end
 
@@ -716,11 +721,23 @@ module Spaceship
       exit(has_valid_session)
     end
 
+    # <tmpdir>/spaceship_itc_service_key.txt
+    #
+    # Dir.tmpdir rather than a literal "/tmp", for the same reason as #logger,
+    # and here the failure was worse than a missing file: itc_service_key
+    # rescues everything, so the write failing on Windows was reported as an
+    # App Store Connect outage. See #30198.
+    #
+    # On macOS this is also per user, so a cache written by one user no longer
+    # blocks another.
+    def itc_service_key_path
+      File.join(Dir.tmpdir, "spaceship_itc_service_key.txt")
+    end
+
     def itc_service_key
       return @service_key if @service_key
 
       # Check if we have a local cache of the key
-      itc_service_key_path = "/tmp/spaceship_itc_service_key.txt"
       return File.read(itc_service_key_path) if File.exist?(itc_service_key_path)
 
       # Fixes issue https://github.com/fastlane/fastlane/issues/13281

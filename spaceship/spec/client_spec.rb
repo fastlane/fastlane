@@ -41,6 +41,25 @@ describe Spaceship::Client do
       then.to_return(status: status_ok, body: body)
   end
 
+  describe "#itc_service_key_path" do
+    # Guards against going back to a literal "/tmp"; the method says why.
+    it "caches the key in the system temporary directory" do
+      expect(TestClient.new.itc_service_key_path).to start_with(Dir.tmpdir)
+    end
+  end
+
+  describe "#logger" do
+    # Guards against going back to a literal "/tmp"; the method says why.
+    it "writes to the system temporary directory" do
+      client = TestClient.new
+
+      FastlaneSpec::Env.with_env_values("VERBOSE" => nil) do
+        expect(client.logger.instance_variable_get(:@logdev).filename)
+          .to start_with(Dir.tmpdir)
+      end
+    end
+  end
+
   describe 'detect_most_common_errors_and_raise_exceptions' do
     # this test is strange, the `error` has a typo "InsufficentPermissions" and is not really relevant
     it "raises Spaceship::InsufficientPermissions for InsufficentPermissions" do
