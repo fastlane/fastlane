@@ -12,6 +12,12 @@ describe FastlaneCore do
       let(:failing_command_output) { FastlaneCore::Helper.windows? ? "log \n" : "log\n" }
       let(:failing_command_error_input) { FastlaneCore::Helper.windows? ? "log " : "log" }
 
+      # A status object of the shape FastlanePty reads, for examples that stub
+      # PTY.spawn and so have no real child to reap.
+      let(:stubbed_status) do
+        instance_double(Process::Status, exitstatus: 0, signaled?: false)
+      end
+
       it 'executes a simple command successfully' do
         unless FastlaneCore::Helper.windows?
           expect(Process).to receive(:wait2).and_call_original
@@ -40,12 +46,11 @@ describe FastlaneCore do
         expect(PTY).to receive(:spawn) do |command, &block|
           expect(command).to eq('ls')
 
-          # FastlanePty reads the exit status from Process.wait2, so the
-          # example spawns a real process for it to reap.
-          child_process_id = Process.spawn('echo foo', out: File::NULL)
-          # and_call_original matters: wait2 is what produces the status
-          # FastlanePty returns, so mocking it away would leave nothing to read.
-          expect(Process).to receive(:wait2).with(child_process_id).and_call_original
+          # wait2 returns the status now, so the example hands one back rather
+          # than spawning a process for FastlanePty to reap. PTY.spawn is
+          # stubbed here, so there is no real child for the pid to refer to.
+          child_process_id = 4242
+          expect(Process).to receive(:wait2).with(child_process_id).and_return([child_process_id, stubbed_status])
 
           block.yield(fake_std_in, fake_std_out, child_process_id)
         end
@@ -73,12 +78,11 @@ describe FastlaneCore do
         expect(PTY).to receive(:spawn) do |command, &block|
           expect(command).to eq('echo foo')
 
-          # FastlanePty reads the exit status from Process.wait2, so the
-          # example spawns a real process for it to reap.
-          child_process_id = Process.spawn('echo foo', out: File::NULL)
-          # and_call_original matters: wait2 is what produces the status
-          # FastlanePty returns, so mocking it away would leave nothing to read.
-          expect(Process).to receive(:wait2).with(child_process_id).and_call_original
+          # wait2 returns the status now, so the example hands one back rather
+          # than spawning a process for FastlanePty to reap. PTY.spawn is
+          # stubbed here, so there is no real child for the pid to refer to.
+          child_process_id = 4242
+          expect(Process).to receive(:wait2).with(child_process_id).and_return([child_process_id, stubbed_status])
 
           block.yield(fake_std_in, fake_std_out, child_process_id)
         end
