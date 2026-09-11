@@ -38,6 +38,11 @@ describe Spaceship::SpaceauthRunner do
   end
 
   describe 'check_session option' do
+    # has_valid_session loads a cookie from the user's home directory, so these
+    # examples used to pass only when an earlier example had logged in and
+    # persisted one, and on a machine that had ever run the suite they passed
+    # from a file left by a previous run. Each example states the session it is
+    # testing instead. See fastlane#30184.
     before :each do
       Spaceship::Globals.check_session = true
     end
@@ -47,6 +52,8 @@ describe Spaceship::SpaceauthRunner do
     end
 
     it 'when using the default user, it should return a message saying the session is logged in with an exit code of 0' do
+      allow_any_instance_of(Spaceship::Client).to receive(:has_valid_session).and_return(true)
+
       expect do
         expect do
           Spaceship::SpaceauthRunner.new.run
@@ -57,6 +64,8 @@ describe Spaceship::SpaceauthRunner do
     end
 
     it 'when passed a known user, it should return a message saying the session is logged in with an exit code of 0' do
+      allow_any_instance_of(Spaceship::Client).to receive(:has_valid_session).and_return(true)
+
       expect do
         expect do
           Spaceship::SpaceauthRunner.new(username: 'spaceship@krausefx.com').run
@@ -67,6 +76,8 @@ describe Spaceship::SpaceauthRunner do
     end
 
     it 'when passed an unknown user, it should return a message saying no valid session found with an exit code of 1' do
+      allow_any_instance_of(Spaceship::Client).to receive(:has_valid_session).and_return(false)
+
       expect do
         expect do
           Spaceship::SpaceauthRunner.new(username: 'unknown-user').run
