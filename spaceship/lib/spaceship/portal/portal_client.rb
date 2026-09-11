@@ -366,6 +366,16 @@ module Spaceship
       end
     end
 
+    def merchant_domain_verify(domain_id, mac: false)
+      ensure_csrf(Spaceship::Portal::Merchant)
+
+      r = request(:post, "account/#{platform_slug(mac)}/identifiers/verifyDomain", {
+        domainId: domain_id,
+        teamId: team_id
+      })
+      parse_response(r)
+    end
+
     def create_merchant_domain!(merchant_id, domain_name, mac: false)
       ensure_csrf(Spaceship::Portal::Merchant)
 
