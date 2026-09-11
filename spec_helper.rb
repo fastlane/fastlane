@@ -9,7 +9,21 @@ require "webmock/rspec"
 WebMock.disable_net_connect!(allow: 'coveralls.io')
 
 require "fastlane"
+require "tmpdir"
 UI = FastlaneCore::UI
+
+# Spaceship persists a session cookie to ~/.fastlane/spaceship/<user>/cookie,
+# under the real home directory, and reads it back to decide whether a session
+# is valid. That makes the suite write to the developer's machine, and it makes
+# a spec able to depend on a file some earlier run left behind: the cookie four spaceauth
+# examples depended on was nine months older than the run that needed it here, so
+# they passed locally in every order and failed only on a clean checkout. Redirect the store
+# to a temporary directory that belongs to this process, so the suite leaves
+# nothing behind and a spec needing a session has to arrange one itself.
+#
+# See fastlane#30184.
+SPACESHIP_COOKIE_DIR = Dir.mktmpdir("fastlane-spec-spaceship")
+ENV["SPACESHIP_COOKIE_PATH"] = SPACESHIP_COOKIE_DIR
 
 unless ENV["DEBUG"]
   fastlane_tests_tmpdir = "#{Dir.tmpdir}/fastlane_tests"
@@ -82,6 +96,10 @@ RSpec.configure do |config|
       mod = Object.const_get(name)
       attributes.each { |attribute| mod.instance_variable_set("@#{attribute}", nil) }
     end
+  end
+
+  config.after(:suite) do
+    FileUtils.remove_entry(SPACESHIP_COOKIE_DIR) if File.directory?(SPACESHIP_COOKIE_DIR)
   end
 
   config.before(:each) do |current_test|
