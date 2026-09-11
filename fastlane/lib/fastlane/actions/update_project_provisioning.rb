@@ -1,5 +1,6 @@
-require 'tmpdir'
 # coding: utf-8
+
+require 'tmpdir'
 
 module Fastlane
   module Actions

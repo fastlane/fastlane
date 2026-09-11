@@ -1,4 +1,5 @@
 require 'tmpdir'
+
 module Fastlane
   module Actions
     class LcovAction < Action
