@@ -41,6 +41,20 @@ describe Spaceship::Client do
       then.to_return(status: status_ok, body: body)
   end
 
+  describe "#logger" do
+    # The path used to be the literal "/tmp", which is not a directory on every
+    # platform Ruby runs on. On Windows it resolves against the current drive,
+    # so Logger.new raised Errno::ENOENT unless something else had created it.
+    it "writes to the system temporary directory" do
+      client = TestClient.new
+
+      FastlaneSpec::Env.with_env_values("VERBOSE" => nil) do
+        expect(client.logger.instance_variable_get(:@logdev).filename)
+          .to start_with(Dir.tmpdir)
+      end
+    end
+  end
+
   describe 'detect_most_common_errors_and_raise_exceptions' do
     # this test is strange, the `error` has a typo "InsufficentPermissions" and is not really relevant
     it "raises Spaceship::InsufficientPermissions for InsufficentPermissions" do
