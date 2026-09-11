@@ -366,6 +366,15 @@ BODY
   end
 
   describe "#persistent_cookie_path" do
+    # spec_helper points SPACESHIP_COOKIE_PATH at a temporary store for the
+    # whole suite, so that the specs neither write a cookie to the developer's
+    # home directory nor read one an earlier run left there. These examples are
+    # about how the path is chosen when that variable is not set, so they have
+    # to run without it. See fastlane#30184.
+    around(:each) do |example|
+      FastlaneSpec::Env.with_env_values("SPACESHIP_COOKIE_PATH" => nil) { example.run }
+    end
+
     before do
       subject.login("username", "password")
     end
@@ -376,8 +385,9 @@ BODY
 
     it "uses $SPACESHIP_COOKIE_PATH when set" do
       tmp_path = Dir.mktmpdir
-      ENV["SPACESHIP_COOKIE_PATH"] = "#{tmp_path}/custom_path"
-      expect(subject.persistent_cookie_path).to eq("#{tmp_path}/custom_path/spaceship/username/cookie")
+      FastlaneSpec::Env.with_env_values("SPACESHIP_COOKIE_PATH" => "#{tmp_path}/custom_path") do
+        expect(subject.persistent_cookie_path).to eq("#{tmp_path}/custom_path/spaceship/username/cookie")
+      end
     end
 
     it "uses home dir by default" do
