@@ -716,11 +716,15 @@ module Spaceship
       exit(has_valid_session)
     end
 
+    # <tmpdir>/spaceship_itc_service_key.txt
+    def itc_service_key_path
+      File.join(Dir.tmpdir, "spaceship_itc_service_key.txt")
+    end
+
     def itc_service_key
       return @service_key if @service_key
 
       # Check if we have a local cache of the key
-      itc_service_key_path = "/tmp/spaceship_itc_service_key.txt"
       return File.read(itc_service_key_path) if File.exist?(itc_service_key_path)
 
       # Fixes issue https://github.com/fastlane/fastlane/issues/13281
