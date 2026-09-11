@@ -35,7 +35,7 @@ module FastlaneCore
 
     private_constant :ERROR_REGEX, :WARNING_REGEX, :OUTPUT_REGEX, :RETURN_VALUE_REGEX, :SKIP_ERRORS
 
-    def build_download_command(username, password, apple_id, destination = "/tmp", provider_short_name = "", jwt = nil)
+    def build_download_command(username, password, apple_id, destination = Dir.tmpdir, provider_short_name = "", jwt = nil)
       not_implemented(__method__)
     end
 
@@ -43,11 +43,11 @@ module FastlaneCore
       not_implemented(__method__)
     end
 
-    def build_upload_command(username, password, source = "/tmp", options = {})
+    def build_upload_command(username, password, source = Dir.tmpdir, options = {})
       not_implemented(__method__)
     end
 
-    def build_verify_command(username, password, source = "/tmp", provider_short_name = "", **kwargs)
+    def build_verify_command(username, password, source = Dir.tmpdir, provider_short_name = "", **kwargs)
       not_implemented(__method__)
     end
 
@@ -319,7 +319,7 @@ module FastlaneCore
       end
     end
 
-    def build_upload_command(username, password, source = "/tmp", options = {})
+    def build_upload_command(username, password, source = Dir.tmpdir, options = {})
       provider_short_name = options.fetch(:provider_short_name, "")
       provider_public_id = options.fetch(:provider_public_id, "")
       jwt = options[:jwt]
@@ -351,11 +351,11 @@ module FastlaneCore
       ].compact.join(' ')
     end
 
-    def build_download_command(username, password, apple_id, destination = "/tmp", provider_short_name = "", jwt = nil)
+    def build_download_command(username, password, apple_id, destination = Dir.tmpdir, provider_short_name = "", jwt = nil)
       raise "This feature has not been implemented yet with altool for Xcode 14"
     end
 
-    def build_verify_command(username, password, source = "/tmp", options = {})
+    def build_verify_command(username, password, source = Dir.tmpdir, options = {})
       provider_short_name = options.fetch(:provider_short_name, "")
       provider_public_id = options.fetch(:provider_public_id, "")
       api_key = options[:api_key]
@@ -442,7 +442,7 @@ module FastlaneCore
       end
     end
 
-    def build_upload_command(username, password, source = "/tmp", options = {})
+    def build_upload_command(username, password, source = Dir.tmpdir, options = {})
       provider_short_name = options.fetch(:provider_short_name, "")
       jwt = options[:jwt]
       api_key = options[:api_key]
@@ -458,7 +458,7 @@ module FastlaneCore
       ].compact.join(' ')
     end
 
-    def build_download_command(username, password, apple_id, destination = "/tmp", provider_short_name = "", jwt = nil)
+    def build_download_command(username, password, apple_id, destination = Dir.tmpdir, provider_short_name = "", jwt = nil)
       [
         '"' + Helper.transporter_path + '"',
         "-m lookupMetadata",
@@ -477,7 +477,7 @@ module FastlaneCore
       ].compact.join(' ')
     end
 
-    def build_verify_command(username, password, source = "/tmp", options = {})
+    def build_verify_command(username, password, source = Dir.tmpdir, options = {})
       provider_short_name = options.fetch(:provider_short_name, "")
       jwt = options[:jwt]
       [
@@ -568,7 +568,7 @@ module FastlaneCore
       end
     end
 
-    def build_upload_command(username, password, source = "/tmp", options = {})
+    def build_upload_command(username, password, source = Dir.tmpdir, options = {})
       provider_short_name = options.fetch(:provider_short_name, "")
       jwt = options[:jwt]
       api_key = options[:api_key]
@@ -607,7 +607,7 @@ module FastlaneCore
       end
     end
 
-    def build_verify_command(username, password, source = "/tmp", options = {})
+    def build_verify_command(username, password, source = Dir.tmpdir, options = {})
       provider_short_name = options.fetch(:provider_short_name, "")
       jwt = options[:jwt]
       credential_params = build_credential_params(username, password, jwt, nil, is_default_itms_on_xcode_11?)
@@ -641,7 +641,7 @@ module FastlaneCore
       end
     end
 
-    def build_download_command(username, password, apple_id, destination = "/tmp", provider_short_name = "", jwt = nil)
+    def build_download_command(username, password, apple_id, destination = Dir.tmpdir, provider_short_name = "", jwt = nil)
       credential_params = build_credential_params(username, password, jwt, nil, is_default_itms_on_xcode_11?)
       if is_default_itms_on_xcode_11?
         [
@@ -793,7 +793,9 @@ module FastlaneCore
     # @raise [Deliver::TransporterTransferError] when something went wrong
     #   when transferring
     def download(app_id, dir = nil)
-      dir ||= "/tmp"
+      # Dir.tmpdir, not a literal "/tmp": the transporter chdirs into this
+      # directory, and "/tmp" is not one on Windows. See fastlane#30184.
+      dir ||= Dir.tmpdir
 
       password_placeholder = @jwt.nil? ? 'YourPassword' : nil
       jwt_placeholder = @jwt.nil? ? nil : 'YourJWT'
