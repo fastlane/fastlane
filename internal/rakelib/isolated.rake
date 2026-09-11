@@ -1,25 +1,31 @@
-# Runs the suite against a home directory the project controls, see fastlane#30184.
+# Runs the suite against a home and a temporary directory the project controls,
+# see fastlane#30184.
 #
-# The suite reads and writes the developer's real home. It leaves dozens of
-# entries there — `~/.fastlane`, `~/Library/Logs/{fastlane,gym,scan,snapshot}`,
+# The suite reads and writes both. It leaves dozens of entries in the home
+# directory — `~/.fastlane`, `~/Library/Logs/{fastlane,gym,scan,snapshot}`,
 # `~/Library/MobileDevice/Provisioning Profiles`, `~/.appstoreconnect` and more
-# — and it reads state left by earlier runs. That is how the itc_service_key
-# dependency survived for months: `Client#itc_service_key` caches to a file, the
-# examples depending on it passed on any machine that had ever run the suite,
-# and only a clean CI checkout ever failed.
+# — and it reads state left by earlier runs in either place.
 #
-# Pointing HOME at a temporary directory makes those dependencies fail here
+# Both matter, and the second is easy to forget. `Client#itc_service_key` caches
+# the App Store Connect key under the temporary directory, not the home one, so
+# examples depending on that cache pass on any machine that has run the suite
+# before and fail only on a clean checkout. Isolating HOME alone leaves that
+# whole class invisible, which it was until it broke CI.
+#
+# Pointing both at throwaway directories makes those dependencies fail here
 # rather than on someone else's machine.
 #
 #   rake test_isolated                 the whole suite
 #   rake test_isolated[spaceship/spec] a subset
-desc("Run the suite with HOME pointed at a throwaway directory")
+desc("Run the suite with HOME and TMPDIR pointed at throwaway directories")
 task(:test_isolated, [:pattern]) do |_task, args|
   require "tmpdir"
   require "fileutils"
 
   home = Dir.mktmpdir("fastlane-isolated-home")
-  env = { "HOME" => home }
+  # Made before TMPDIR is redirected, so both live somewhere real.
+  tmp = Dir.mktmpdir("fastlane-isolated-tmp")
+  env = { "HOME" => home, "TMPDIR" => tmp }
 
   # A keychain has to be seeded, because `security cms -D`, which fastlane uses
   # to decode provisioning profiles in verify_build, provisioning_profile.rb and
@@ -56,14 +62,22 @@ task(:test_isolated, [:pattern]) do |_task, args|
 
   # What the run left behind, which is the point of the exercise as much as the
   # pass or fail is.
-  written = Dir.glob(File.join(home, "**", "*"), File::FNM_DOTMATCH)
-               .select { |path| File.file?(path) }
-  puts("")
-  puts("The run wrote #{written.size} files into HOME:")
-  written.group_by { |path| File.dirname(path).delete_prefix(home) }
-         .sort_by { |directory, files| [-files.size, directory] }
-         .each { |directory, files| puts("  #{files.size.to_s.rjust(4)}  ~#{directory}") }
+  { "HOME" => home, "TMPDIR" => tmp }.each do |name, root|
+    written = Dir.glob(File.join(root, "**", "*"), File::FNM_DOTMATCH)
+                 .select { |path| File.file?(path) }
+    puts("")
+    puts("The run wrote #{written.size} files into #{name}:")
+    prefix = name == "HOME" ? "~" : ""
+    written.group_by { |path| File.dirname(path).delete_prefix(root) }
+           .sort_by { |directory, files| [-files.size, directory] }
+           .each do |directory, files|
+             # Files sitting at the root group under an empty string, and the
+             # ones that land there are usually the interesting ones.
+             label = directory.empty? ? files.map { |f| File.basename(f) }.sort.join(", ") : "#{prefix}#{directory}"
+             puts("  #{files.size.to_s.rjust(4)}  #{label}")
+           end
+  end
 
-  FileUtils.remove_entry(home)
-  abort("suite failed under an isolated HOME") unless ok
+  [home, tmp].each { |root| FileUtils.remove_entry(root) }
+  abort("suite failed under an isolated HOME and TMPDIR") unless ok
 end
