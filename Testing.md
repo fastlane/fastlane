@@ -109,7 +109,9 @@ bundle exec rake test_isolated
 bundle exec rake "test_isolated[spaceship/spec]"
 ```
 
-It points `HOME` at a temporary directory, seeds a keychain on macOS, reports what the run wrote into it, and removes it.
+It points `HOME` and `TMPDIR` at temporary directories, seeds a keychain on macOS, reports what the run wrote into each, and removes them.
+
+Both matter. Some state a run leaves behind lives in the home directory and some in the temporary one, and a spec that depends on either passes on a machine that has run the suite before and fails on a clean checkout.
 
 #### Guards against leaking state between examples
 
