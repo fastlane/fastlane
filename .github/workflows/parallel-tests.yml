@@ -69,6 +69,17 @@ jobs:
           RSPEC_ARGS: "--order random"
         run: bundle exec rake test_parallel
 
+      # The worker logs hold the actual failure messages. The task prints which
+      # examples failed, but a split only failure needs the reason and the
+      # bucket that produced it, and neither survives the runner otherwise.
+      - name: Keep the worker logs
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: rspec-worker-logs-macos
+          path: rspec_worker_*.log
+          if-no-files-found: warn
+
   split_linux:
     name: "Split, Linux"
     if: inputs.record_timings == 'no' || inputs.record_timings == null
@@ -92,6 +103,17 @@ jobs:
           RSPEC_ARGS: "--order random"
         run: bundle exec rake test_parallel
 
+      # The worker logs hold the actual failure messages. The task prints which
+      # examples failed, but a split only failure needs the reason and the
+      # bucket that produced it, and neither survives the runner otherwise.
+      - name: Keep the worker logs
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: rspec-worker-logs-linux
+          path: rspec_worker_*.log
+          if-no-files-found: warn
+
   split_windows:
     name: "Split, Windows"
     if: inputs.record_timings == 'no' || inputs.record_timings == null
@@ -112,6 +134,17 @@ jobs:
           WORKERS: ${{ inputs.workers || '4' }}
           RSPEC_ARGS: "--order random"
         run: bundle exec rake test_parallel
+
+      # The worker logs hold the actual failure messages. The task prints which
+      # examples failed, but a split only failure needs the reason and the
+      # bucket that produced it, and neither survives the runner otherwise.
+      - name: Keep the worker logs
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: rspec-worker-logs-windows
+          path: rspec_worker_*.log
+          if-no-files-found: warn
 
   record_macos:
     name: "Record timings, macOS"
