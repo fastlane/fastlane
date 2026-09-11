@@ -1,3 +1,5 @@
+require 'tmpdir'
+
 module Fastlane
   module Actions
     class SpaceshipLogsAction < Action
@@ -8,8 +10,8 @@ module Fastlane
         copy_to_path = params[:copy_to_path]
         copy_to_clipboard = params[:copy_to_clipboard]
 
-        # Get log files
-        files = Dir.glob("/tmp/spaceship*.log").sort_by { |f| File.mtime(f) }.reverse
+        # Get log files, from wherever Spaceship::Client#logger writes them.
+        files = Dir.glob(File.join(Dir.tmpdir, "spaceship*.log")).sort_by { |f| File.mtime(f) }.reverse
 
         if files.size == 0
           UI.message("No Spaceship log files found")
