@@ -1,5 +1,23 @@
 describe Spaceship::ConnectAPI do
-  before(:all) do
+  # Per example, not per group: the explicit client context assigns
+  # Spaceship::ConnectAPI.client, and clearing only once at the start of the
+  # group left the implicit client examples inheriting whatever it was set to,
+  # including doubles belonging to an example that had already finished. See
+  # fastlane#30184.
+  before(:each) do
+    Spaceship::ConnectAPI.client = nil
+    Spaceship::Tunes.client = nil
+    Spaceship::Portal.client = nil
+  end
+
+  # And after, not only before. Clearing on the way in keeps this file's own
+  # examples honest, but the last one still hands its client to whatever runs
+  # next. The `with explicit client` examples stub Client.login to return a
+  # double and ConnectAPI.login then assigns it, so what leaked out was an
+  # rspec double, which rspec disables at the end of its example. Anything
+  # later reaching ConnectAPI.token got "originally created in one example but
+  # has leaked into another". See fastlane#30184.
+  after(:each) do
     Spaceship::ConnectAPI.client = nil
     Spaceship::Tunes.client = nil
     Spaceship::Portal.client = nil
