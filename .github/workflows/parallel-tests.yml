@@ -1,15 +1,29 @@
-# Runs the spec suite as several independent rspec processes.
+# Keeps the per platform spec timings current, and runs the split in a random
+# order.
 #
-# Two purposes, and they are related. It is much faster than a single process,
-# 562s down to about 150s on a macOS runner. And a split is a harsher test of
-# spec isolation than any seed: a worker sees a subset no random order ever
-# produces, so a spec that depends on another file having run first fails here.
-# Combined with `--order random` it exercises both axes at once, which is how
-# the pty exit status defect (#30188) was found.
+# The speed argument for splitting the suite now lives in the CI workflow, which
+# runs `rake test_parallel` on every pull request. What is left here is the two
+# things that workflow does not do.
 #
-# While the isolation work from #30184 is still landing this will be red, and
-# that is the point: it is the monitor for that work.
-name: Parallel tests
+# Recording the timings. The split is balanced from measured per file durations,
+# and they have to come from the platform they balance: 61% of the example time
+# on macOS is in files that skip entirely on Linux, and balancing a Linux split
+# from macOS numbers left a worker idle 41% to 48% of the run. Each file records
+# where it was measured. They only shift when the shape of the suite changes, so
+# quarterly is enough, and a stale file costs a worse split rather than a wrong
+# result.
+#
+# Running the split in a random order. CI runs it in the defined order, so the
+# two axes of isolation are exercised separately there. A worker sees a subset
+# no seed produces, and a random order within that subset is the harsher test of
+# the two combined. That is how the `DisplayType` global and the pty exit status
+# defect (#30188) were found, neither of which had shown up in a random order
+# alone.
+#
+# The quarterly run is also what keeps this honest. A workflow nobody runs is a
+# workflow that has quietly stopped working, and the only other trigger is a
+# pull request touching the parallel machinery, which may be months apart.
+name: Spec timings and random order split
 
 on:
   pull_request:
@@ -19,14 +33,6 @@ on:
       - '.github/workflows/parallel-tests.yml'
   schedule:
     # 04:00 UTC on the first of January, April, July and October.
-    #
-    # Quarterly is a compromise. The timings only shift when the shape of the
-    # suite changes, so they do not need refreshing often, and a stale file
-    # costs a worse split rather than a wrong result. But a workflow nobody runs
-    # is a workflow that has quietly stopped working, and this one is only
-    # otherwise triggered by pull requests that touch the parallel machinery,
-    # which may be months apart. Running the whole thing four times a year keeps
-    # it honest without spending much.
     - cron: '0 4 1 1,4,7,10 *'
   workflow_dispatch:
     inputs:
@@ -37,7 +43,7 @@ on:
         options: ["no", "macos", "linux", "windows", "both"]
         default: "no"
       workers:
-        description: "Workers per runner. Four has measured best on the macOS and Linux runners."
+        description: "Workers per runner. Four has measured best on all three runners."
         required: false
         type: string
         default: "4"
@@ -96,8 +102,7 @@ jobs:
         shell: bash
         run: ulimit -n 65536
       # Without Xcode the requires_xcodebuild and requires_keychain specs skip,
-      # which is most of the example time on macOS. A different shape of suite,
-      # so worth splitting separately and balancing from its own timings.
+      # which is most of the example time on macOS: 558s there against 106s here.
       - name: Run the suite split across workers, in a random order
         shell: bash
         env:
