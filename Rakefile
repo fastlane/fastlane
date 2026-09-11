@@ -108,6 +108,14 @@ task(:prepare_rubocop_config) do
   File.write(target, YAML.dump(config))
 end
 
-%w(build install release).each do |t|
+# test_all and test_parallel as well as the packaging tasks. The template's
+# .rubocop.yml is generated and gitignored, so a working copy can be left
+# holding one from an older fastlane, and plugin_generator_spec then generates a
+# plugin whose gemspec and rubocop config disagree about the Ruby version. That
+# surfaces as `expected 0, got 1` with the rubocop output thrown away, which is
+# a poor thing to debug: it looks like an environment problem and is a stale
+# file. Regenerating first is cheap and makes the run say the same thing on any
+# machine. See fastlane#30184.
+%w(build install release test_all test_parallel).each do |t|
   Rake::Task[t].enhance([:prepare_rubocop_config]) if Rake::Task.task_defined?(t)
 end
