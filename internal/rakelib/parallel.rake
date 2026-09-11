@@ -191,7 +191,15 @@ task(:test_parallel) do
     log = "rspec_worker_#{index}.log"
     # Record the split, so a failure that only happens under one can be replayed
     # by handing these paths straight back to rspec.
-    File.write(log, "# worker #{index}, #{bucket.size} units\n# #{bucket.join(' ')}\n")
+    #
+    # In its own file rather than as a header in the log: the worker appends to
+    # the log through a redirect, and on Windows that does not preserve what the
+    # parent wrote first, so the manifest came out empty exactly where a split
+    # only failure most needed it.
+    File.write("rspec_worker_#{index}.units", "#{bucket.join(' ')}\n")
+    # The worker appends through the redirect below, so without this the log
+    # still holds the previous run and every count read back out of it is wrong.
+    File.write(log, "")
     command = ["rspec", "--format", "progress", *ENV["RSPEC_ARGS"].to_s.split, *bucket]
     Process.spawn(*command, out: [log, "a"], err: [log, "a"])
   end
@@ -239,10 +247,14 @@ task(:test_parallel) do
     # knowing what the worker was given.
     failed.each do |_status, index|
       log = File.readlines("rspec_worker_#{index}.log")
+      units = File.read("rspec_worker_#{index}.units").split
       puts("")
       puts("worker #{index} failures:")
       log.grep(%r{^rspec \./}).each { |line| puts("  #{line.strip}") }
-      puts("  units: #{log[1].to_s.sub('# ', '').strip}")
+      # The file rather than its contents: a worker carries over a hundred paths
+      # and pasting them into a CI log buries the failures above.
+      puts("  this worker ran #{units.size} files, replay the split with:")
+      puts("    rspec $(cat rspec_worker_#{index}.units)")
     end
     abort("#{failed.size} of #{results.size} workers failed")
   end

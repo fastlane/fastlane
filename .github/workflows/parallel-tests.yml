@@ -77,7 +77,9 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: rspec-worker-logs-macos
-          path: rspec_worker_*.log
+          path: |
+            rspec_worker_*.log
+            rspec_worker_*.units
           if-no-files-found: warn
 
   split_linux:
@@ -111,7 +113,9 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: rspec-worker-logs-linux
-          path: rspec_worker_*.log
+          path: |
+            rspec_worker_*.log
+            rspec_worker_*.units
           if-no-files-found: warn
 
   split_windows:
@@ -143,7 +147,9 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: rspec-worker-logs-windows
-          path: rspec_worker_*.log
+          path: |
+            rspec_worker_*.log
+            rspec_worker_*.units
           if-no-files-found: warn
 
   record_macos:
