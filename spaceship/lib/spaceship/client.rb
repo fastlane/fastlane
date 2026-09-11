@@ -822,8 +822,12 @@ module Spaceship
 
       logger.debug("Read the App Store Connect API key from the sign out redirect")
       key
-    rescue StandardError => ex
-      # Anything at all: the fallback below is the point of this returning nil.
+    rescue Faraday::Error, URI::InvalidURIError => ex
+      # Only what this request can be expected to go wrong with. Rescuing
+      # everything here would put back the problem fastlane#30198 is about: a
+      # local failure, a missing log directory being the one that started it,
+      # would be swallowed and the caller would be handed whatever the fallback
+      # said instead of the real cause.
       logger.debug("Could not read the App Store Connect API key from the sign out redirect: #{ex.message}")
       nil
     end

@@ -87,6 +87,14 @@ describe Spaceship::Client do
       expect(client.itc_service_key).to eq("from-olympus")
     end
 
+    # fastlane#30198: a local failure on this path must not be swallowed and
+    # reported as whatever the fallback source had to say about itself.
+    it "does not swallow a local error as a reason to fall back" do
+      allow(client).to receive(:signout_connection).and_raise(Errno::ENOENT.new("/tmp/spaceship.log"))
+
+      expect { client.itc_service_key }.to raise_error(Errno::ENOENT)
+    end
+
     it "falls back when the sign out request fails outright" do
       allow(client).to receive(:signout_connection).and_raise(Faraday::ConnectionFailed.new("nope"))
       expect(client).to receive(:request).and_return(double("response", status: 200, body: { "authServiceKey" => "from-olympus" }))
