@@ -1,3 +1,4 @@
+require 'tmpdir'
 require 'deliver/runner'
 
 class MockSession
@@ -66,7 +67,7 @@ describe Deliver::Runner do
     describe 'with an IPA file for iOS' do
       it 'uploads the IPA for the iOS platform' do
         expect_any_instance_of(FastlaneCore::IpaUploadPackageBuilder).to receive(:generate)
-          .with(app_id: 'YI8C2AS', ipa_path: 'ACME.ipa', package_path: '/tmp', platform: 'ios')
+          .with(app_id: 'YI8C2AS', ipa_path: 'ACME.ipa', package_path: Dir.tmpdir, platform: 'ios')
           .and_return('path')
         expect(transporter).to receive(:upload).with(package_path: 'path', asset_path: 'ACME.ipa', platform: 'ios').and_return(true)
         runner.upload_binary
@@ -80,7 +81,7 @@ describe Deliver::Runner do
 
       it 'uploads the IPA for the tvOS platform' do
         expect_any_instance_of(FastlaneCore::IpaUploadPackageBuilder).to receive(:generate)
-          .with(app_id: 'YI8C2AS', ipa_path: 'ACME.ipa', package_path: '/tmp', platform: 'appletvos')
+          .with(app_id: 'YI8C2AS', ipa_path: 'ACME.ipa', package_path: Dir.tmpdir, platform: 'appletvos')
           .and_return('path')
         expect(transporter).to receive(:upload).with(package_path: 'path', asset_path: 'ACME.ipa', platform: 'appletvos').and_return(true)
         runner.upload_binary
@@ -94,7 +95,7 @@ describe Deliver::Runner do
 
       it 'uploads the IPA for the visionOS platform' do
         expect_any_instance_of(FastlaneCore::IpaUploadPackageBuilder).to receive(:generate)
-          .with(app_id: 'YI8C2AS', ipa_path: 'ACME.ipa', package_path: '/tmp', platform: 'xros')
+          .with(app_id: 'YI8C2AS', ipa_path: 'ACME.ipa', package_path: Dir.tmpdir, platform: 'xros')
           .and_return('path')
         expect(transporter).to receive(:upload).with(package_path: 'path', asset_path: 'ACME.ipa', platform: 'xros').and_return(true)
         runner.upload_binary
@@ -110,7 +111,7 @@ describe Deliver::Runner do
 
       it 'uploads the PKG for the macOS platform' do
         expect_any_instance_of(FastlaneCore::PkgUploadPackageBuilder).to receive(:generate)
-          .with(app_id: 'YI8C2AS', pkg_path: 'ACME.pkg', package_path: '/tmp', platform: 'osx')
+          .with(app_id: 'YI8C2AS', pkg_path: 'ACME.pkg', package_path: Dir.tmpdir, platform: 'osx')
           .and_return('path')
         expect(transporter).to receive(:upload).with(package_path: 'path', asset_path: 'ACME.pkg', platform: 'osx').and_return(true)
         runner.upload_binary
@@ -191,7 +192,7 @@ describe Deliver::Runner do
     describe 'with an IPA file for iOS' do
       it 'verifies the IPA for the iOS platform' do
         expect_any_instance_of(FastlaneCore::IpaUploadPackageBuilder).to receive(:generate)
-          .with(app_id: 'YI8C2AS', ipa_path: 'ACME.ipa', package_path: '/tmp', platform: 'ios')
+          .with(app_id: 'YI8C2AS', ipa_path: 'ACME.ipa', package_path: Dir.tmpdir, platform: 'ios')
           .and_return('path')
         expect(transporter).to receive(:verify).with(asset_path: "ACME.ipa", package_path: 'path', platform: "ios").and_return(true)
         runner.verify_binary
@@ -205,7 +206,7 @@ describe Deliver::Runner do
 
       it 'verifies the IPA for the tvOS platform' do
         expect_any_instance_of(FastlaneCore::IpaUploadPackageBuilder).to receive(:generate)
-          .with(app_id: 'YI8C2AS', ipa_path: 'ACME.ipa', package_path: '/tmp', platform: 'appletvos')
+          .with(app_id: 'YI8C2AS', ipa_path: 'ACME.ipa', package_path: Dir.tmpdir, platform: 'appletvos')
           .and_return('path')
         expect(transporter).to receive(:verify).with(asset_path: "ACME.ipa", package_path: 'path', platform: "appletvos").and_return(true)
         runner.verify_binary
@@ -219,7 +220,7 @@ describe Deliver::Runner do
 
       it 'verifies the IPA for the visionOS platform' do
         expect_any_instance_of(FastlaneCore::IpaUploadPackageBuilder).to receive(:generate)
-          .with(app_id: 'YI8C2AS', ipa_path: 'ACME.ipa', package_path: '/tmp', platform: 'xros')
+          .with(app_id: 'YI8C2AS', ipa_path: 'ACME.ipa', package_path: Dir.tmpdir, platform: 'xros')
           .and_return('path')
         expect(transporter).to receive(:verify).with(asset_path: "ACME.ipa", package_path: 'path', platform: "xros").and_return(true)
         runner.verify_binary
@@ -235,7 +236,7 @@ describe Deliver::Runner do
 
       it 'verifies the PKG for the macOS platform' do
         expect_any_instance_of(FastlaneCore::PkgUploadPackageBuilder).to receive(:generate)
-          .with(app_id: 'YI8C2AS', pkg_path: 'ACME.pkg', package_path: '/tmp', platform: 'osx')
+          .with(app_id: 'YI8C2AS', pkg_path: 'ACME.pkg', package_path: Dir.tmpdir, platform: 'osx')
           .and_return('path')
         expect(transporter).to receive(:verify).with(asset_path: "ACME.pkg", package_path: 'path', platform: "osx").and_return(true)
         runner.verify_binary
