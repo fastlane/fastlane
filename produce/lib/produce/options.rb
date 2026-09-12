@@ -17,6 +17,23 @@ module Produce
                                      code_gen_sensitive: true,
                                      default_value: user,
                                      default_value_dynamic: true),
+
+        # App Store Connect API
+        FastlaneCore::ConfigItem.new(key: :api_key_path,
+                                     env_names: ["PRODUCE_API_KEY_PATH", "APP_STORE_CONNECT_API_KEY_PATH"],
+                                     description: "Path to your App Store Connect API Key JSON file (https://docs.fastlane.tools/app-store-connect-api/#using-fastlane-api-key-json-file)",
+                                     optional: true,
+                                     conflicting_options: [:api_key],
+                                     verify_block: proc do |value|
+                                       UI.user_error!("Couldn't find API key JSON file at path '#{value}'") unless File.exist?(value)
+                                     end),
+        FastlaneCore::ConfigItem.new(key: :api_key,
+                                     env_names: ["PRODUCE_API_KEY", "APP_STORE_CONNECT_API_KEY"],
+                                     description: "Your App Store Connect API Key information (https://docs.fastlane.tools/app-store-connect-api/#using-fastlane-api-key-hash-option)",
+                                     type: Hash,
+                                     optional: true,
+                                     sensitive: true,
+                                     conflicting_options: [:api_key_path]),
         FastlaneCore::ConfigItem.new(key: :app_identifier,
                                      env_name: "PRODUCE_APP_IDENTIFIER",
                                      short_option: "-a",

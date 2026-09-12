@@ -84,6 +84,22 @@ module Spaceship
           provisioning_request_client.post("#{Version::V1}/bundleIdCapabilities", body)
         end
 
+        # Modify a Capability Configuration — patches the bundleIdCapability resource
+        # directly (attributes at the top level), not the bundleId it belongs to.
+        def patch_bundle_id_capability_configuration(bundle_id_capability_id:, enabled: false, settings: [])
+          body = {
+            data: {
+              type: "bundleIdCapabilities",
+              id: bundle_id_capability_id,
+              attributes: {
+                enabled: enabled,
+                settings: settings
+              }
+            }
+          }
+          provisioning_request_client.patch("#{Version::V1}/bundleIdCapabilities/#{bundle_id_capability_id}", body)
+        end
+
         def patch_bundle_id_capability(bundle_id_id:, seed_id:, enabled: false, capability_type:, settings: [])
           body = {
             data: {

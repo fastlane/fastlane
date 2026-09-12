@@ -1,5 +1,7 @@
+require 'ostruct'
 require 'spaceship'
 require_relative 'module'
+require_relative 'service'
 
 module Produce
   class DeveloperCenter
@@ -86,6 +88,8 @@ module Produce
     end
 
     def create_new_app
+      return create_new_app_via_connect_api if using_connect_api?
+
       ENV["CREATED_NEW_APP_ID"] = Time.now.to_i.to_s
       if app_exists?
         UI.success("[DevCenter] App '#{Produce.config[:app_identifier]}' already exists, nothing to do on the Dev Center")
@@ -114,6 +118,31 @@ module Produce
 
         UI.success("Finished creating new app '#{app_name}' on the Dev Center")
       end
+
+      return true
+    end
+
+    # App Store Connect API key path — used instead of Spaceship.login.
+    def create_new_app_via_connect_api
+      config_enabled_services = Produce.config[:enable_services] || Produce.config[:enabled_features]
+
+      existing = Spaceship::ConnectAPI::BundleId.find(app_identifier)
+      if existing
+        UI.success("[DevCenter] App '#{Produce.config[:app_identifier]}' already exists, nothing to do on the Dev Center")
+        return true
+      end
+
+      app_name = Produce.config[:app_name]
+      UI.message("Creating new app '#{app_name}' on the Apple Dev Center")
+
+      connect_api_platform = Spaceship::ConnectAPI::BundleIdPlatform.map(platform)
+      bundle_id = Spaceship::ConnectAPI::BundleId.create(name: app_name, platform: connect_api_platform, identifier: app_identifier)
+
+      UI.crash!("Something went wrong when creating the new app - it's not listed in the apps list") unless bundle_id
+
+      UI.message("Created app #{bundle_id.id}")
+      enable_inline_services(config_enabled_services) if config_enabled_services && !config_enabled_services.empty?
+      UI.success("Finished creating new app '#{app_name}' on the Dev Center")
 
       return true
     end
@@ -161,6 +190,17 @@ module Produce
 
     private
 
+    # Delegates to Service#update instead of duplicating its ~40-capability mapping.
+    # Skips any capability explicitly marked "off" — meaningless on a brand-new app.
+    def enable_inline_services(config_enabled_services)
+      to_enable = config_enabled_services.reject { |_, v| v == SERVICE_OFF }
+      return if to_enable.empty?
+
+      options = OpenStruct.new(to_enable)
+      options.define_singleton_method(:__hash__) { to_enable }
+      Produce::Service.new.update(true, options)
+    end
+
     def platform
       # This was added to support creation of multiple platforms
       # Produce::ItunesConnect can take an array of platforms to create for App Store Connect
@@ -174,9 +214,25 @@ module Produce
       Spaceship.app.find(app_identifier, mac: platform == "osx") != nil
     end
 
+    def using_connect_api?
+      !connect_api_token.nil?
+    end
+
+    def connect_api_token
+      Spaceship::ConnectAPI::Token.from(hash: Produce.config[:api_key], filepath: Produce.config[:api_key_path])
+    end
+
     def login
-      Spaceship.login(Produce.config[:username], nil)
-      Spaceship.select_team
+      if using_connect_api?
+        UI.message("Authenticating with App Store Connect API Key")
+
+        # `current_team_id:` avoids a live, session-based team_id lookup elsewhere in
+        # ConnectAPI's provisioning client, which has no session to use here.
+        Spaceship::ConnectAPI.client = Spaceship::ConnectAPI::Client.new(token: connect_api_token, current_team_id: Produce.config[:team_id])
+      else
+        Spaceship.login(Produce.config[:username], nil)
+        Spaceship.select_team
+      end
     end
   end
 end
