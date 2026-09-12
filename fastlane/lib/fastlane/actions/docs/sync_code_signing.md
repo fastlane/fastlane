@@ -408,6 +408,13 @@ If you're not using `Fastfile`, you can also use the `force_for_new_devices` opt
 fastlane match adhoc --force_for_new_devices
 ```
 
+##### Offline profile use
+
+If your profile requires the 'Offline support (7 day validity)' setting for use without Internet, use `offline_profile: true` to add this permission to generated profiles.
+
+> [!NOTE]
+> Offline profiles can only be created when logging in with an Apple ID. Apple's App Store Connect API (`api_key` / `api_key_path`) does not support this setting, so _match_ will fail with a clear error if both are combined.
+
 ##### Managed capabilities
 
 > [!IMPORTANT]
