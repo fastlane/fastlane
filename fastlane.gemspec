@@ -89,7 +89,7 @@ Gem::Specification.new do |spec|
   spec.add_dependency('optparse', '>= 0.1.1', '< 1.0.0') # Used to parse options with Commander
   spec.add_dependency('plist', '>= 3.1.0', '< 4.0.0') # Needed for set_build_number_repository and get_info_plist_value actions
   spec.add_dependency('rubyzip', '>= 3.4.0', '< 4.0.0') # fix swift/ipa in gym
-  spec.add_dependency('security', '= 0.2.0') # macOS Keychain manager
+  spec.add_dependency('security', '= 0.3.0') # macOS Keychain manager
   spec.add_dependency('simctl', '~> 1.6.3') # Used for querying and interacting with iOS simulators
   spec.add_dependency('terminal-notifier', '>= 2.0.0', '< 3.0.0') # macOS notifications
   spec.add_dependency('terminal-table', '~> 4') # Actions documentation
