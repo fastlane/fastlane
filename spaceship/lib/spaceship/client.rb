@@ -737,24 +737,60 @@ module Spaceship
     def itc_service_key
       return @service_key if @service_key
 
-      # Check if we have a local cache of the key
-      return File.read(itc_service_key_path) if File.exist?(itc_service_key_path)
+      # Check if we have a local cache of the key. Reading it is best effort:
+      # an unreadable cache is a reason to fetch the key again, not to fail.
+      begin
+        return File.read(itc_service_key_path) if File.exist?(itc_service_key_path)
+      rescue SystemCallError => ex
+        logger.warn("Could not read the cached App Store Connect API key: #{ex.message}")
+      end
 
       # Fixes issue https://github.com/fastlane/fastlane/issues/13281
       # Even though we are using https://appstoreconnect.apple.com, the service key needs to still use a
       # hostname through itunesconnect.apple.com
-      response = request(:get, "https://appstoreconnect.apple.com/olympus/v1/app/config?hostname=itunesconnect.apple.com")
-      @service_key = response.body["authServiceKey"].to_s
+      response = begin
+        request(:get, "https://appstoreconnect.apple.com/olympus/v1/app/config?hostname=itunesconnect.apple.com")
+      rescue Faraday::TimeoutError, Faraday::ConnectionFailed => ex
+        # The only case the old message was ever right about.
+        raise AppleTimeoutError.new, "Could not reach App Store Connect to fetch the API key: #{ex.message}"
+      end
 
-      raise "Service key is empty" if @service_key.length == 0
+      @service_key = extract_service_key(response)
 
-      # Cache the key locally
-      File.write(itc_service_key_path, @service_key)
+      # Cache the key locally. Best effort as well: having the key and failing
+      # to save it is not a reason to fail the login. See fastlane#30198.
+      begin
+        File.write(itc_service_key_path, @service_key)
+      rescue SystemCallError => ex
+        logger.warn("Could not cache the App Store Connect API key at #{itc_service_key_path}: #{ex.message}")
+      end
 
       return @service_key
-    rescue => ex
-      puts(ex.to_s)
-      raise AppleTimeoutError.new, "Could not receive latest API key from App Store Connect, this might be a server issue."
+    end
+
+    # The status matters, and used to be thrown away. A non 2xx response body is
+    # an HTML error page rather than JSON, and String#[] on it returns nil for
+    # the key being looked up, so the failure presented as an empty key no
+    # matter what had actually gone wrong. See fastlane#30199.
+    def extract_service_key(response)
+      status = response.status.to_i
+      body = response.body
+
+      unless (200..299).cover?(status)
+        detail = body.to_s.strip[0, 200]
+        message = "App Store Connect returned #{status} for the API key endpoint."
+        message += " #{detail}" unless detail.empty?
+
+        # 5xx and 429 are worth retrying, a 4xx is not, and with_retry decides
+        # that from the class rather than the message.
+        raise AppleTimeoutError.new, "#{message} This might be a temporary server error, check https://developer.apple.com/system-status/" if status >= 500
+        raise UnexpectedResponse.new, message
+      end
+
+      key = body.kind_of?(Hash) ? body["authServiceKey"].to_s : ""
+      raise UnexpectedResponse.new, "App Store Connect returned #{status} for the API key endpoint but no authServiceKey in the response." if key.empty?
+
+      key
     end
 
     #####################################################
