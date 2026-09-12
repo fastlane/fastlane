@@ -1,0 +1,9 @@
+== Runtimes ==
+iOS 17.0 (17.0 - 21A328) - com.apple.CoreSimulator.SimRuntime.iOS-17-0
+iOS 26.0 (26.0.1 - 23A8464) - com.apple.CoreSimulator.SimRuntime.iOS-26-0
+== Devices ==
+-- iOS 17.0 --
+    iPhone 15 Pro Max (752335B5-96D2-460D-89A9-3D5D768BDEAC) (Shutdown)
+-- iOS 26.0 --
+    iPhone 15 Pro Max (6D8B8DC9-F2BD-41C6-BC9A-C8BCEB521675) (Shutdown)
+    iPad Pro (12.9-inch) (6th generation) (F5106A29-D2BF-49DA-81C7-BEB94D9BDCED) (Shutdown)
