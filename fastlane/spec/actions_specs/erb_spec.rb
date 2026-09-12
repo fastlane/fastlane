@@ -2,7 +2,8 @@ describe Fastlane do
   describe Fastlane::FastFile do
     describe "ERB template" do
       let(:template) { File.expand_path("./fastlane/spec/fixtures/templates/dummy_html_template.erb") }
-      let(:destination) { "/tmp/fastlane/template.html" }
+      # Not a fixed path under /tmp: parallel rspec processes share it. See fastlane#30184.
+      let(:destination) { File.join(Dir.mktmpdir("fl_spec_erb"), "template.html") }
 
       it "generate template without placeholders" do
         result = Fastlane::FastFile.new.parse("lane :test do
@@ -28,10 +29,6 @@ describe Fastlane do
       end
 
       context "save to file" do
-        before do
-          FileUtils.mkdir_p(File.dirname(destination))
-        end
-
         it "generate template and save to file" do
           result = Fastlane::FastFile.new.parse("lane :test do
             erb(
@@ -50,7 +47,7 @@ describe Fastlane do
         end
 
         after do
-          File.delete(destination)
+          FileUtils.remove_entry(File.dirname(destination))
         end
       end
     end

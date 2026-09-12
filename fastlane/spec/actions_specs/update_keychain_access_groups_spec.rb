@@ -1,13 +1,13 @@
 describe Fastlane do
   describe Fastlane::FastFile do
     describe "Update Info Plist Integration" do
-      let(:test_path) { "/tmp/fastlane/tests/fastlane" }
+      # Not a fixed path under /tmp: parallel rspec processes share it. See fastlane#30184.
+      let(:test_path) { Dir.mktmpdir("fl_spec_update_keychain_access_groups") }
       let(:entitlements_path) { "com.test.entitlements" }
       let(:new_keychain_access_groups) { 'keychain.access.groups.test' }
 
       before do
         # Set up example info.plist
-        FileUtils.mkdir_p(test_path)
         File.write(File.join(test_path, entitlements_path), '<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd"><plist version="1.0"><dict><key>keychain-access-groups</key><array><string>keychain.access.groups.test</string></array></dict></plist>')
       end
 
@@ -59,8 +59,7 @@ describe Fastlane do
       end
 
       after do
-        # Clean up files
-        File.delete(File.join(test_path, entitlements_path))
+        FileUtils.remove_entry(test_path)
       end
     end
   end

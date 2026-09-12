@@ -1,17 +1,17 @@
 describe Fastlane do
   describe Fastlane::FastFile do
     describe "Sonar Integration" do
-      let(:test_path) { "/tmp/fastlane/tests/fastlane" }
+      # Not a fixed path under /tmp: parallel rspec processes share it. See fastlane#30184.
+      let(:test_path) { Dir.mktmpdir("fl_spec_sonar") }
       let(:sonar_project_path) { "sonar-project.properties" }
 
       before do
         # Set up example sonar-project.properties file
-        FileUtils.mkdir_p(test_path)
         File.write(File.join(test_path, sonar_project_path), '')
       end
 
       after(:each) do
-        File.delete(File.join(test_path, sonar_project_path)) if File.exist?(File.join(test_path, sonar_project_path))
+        FileUtils.remove_entry(test_path)
       end
 
       it "Should not print sonar command" do

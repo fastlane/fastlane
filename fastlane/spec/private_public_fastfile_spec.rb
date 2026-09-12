@@ -3,8 +3,6 @@ describe Fastlane do
     describe "Public/Private lanes" do
       let(:path) { './fastlane/spec/fixtures/fastfiles/FastfilePrivatePublic' }
       before do
-        FileUtils.rm_rf('/tmp/fastlane/')
-
         @ff = Fastlane::FastFile.new(path)
       end
 
