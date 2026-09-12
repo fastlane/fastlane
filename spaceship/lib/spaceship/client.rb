@@ -828,7 +828,12 @@ module Spaceship
       # local failure, a missing log directory being the one that started it,
       # would be swallowed and the caller would be handed whatever the fallback
       # said instead of the real cause.
-      logger.debug("Could not read the App Store Connect API key from the sign out redirect: #{ex.message}")
+      #
+      # Warn rather than debug. This is the source the key normally comes from,
+      # so failing here means the run is about to depend on an endpoint Apple has
+      # already removed once. If the fallback fails too, its message is all the
+      # caller sees, and this line is the half that says why.
+      logger.warn("Could not read the App Store Connect API key from the sign out redirect, falling back to the olympus endpoint: #{ex.message}")
       nil
     end
 
