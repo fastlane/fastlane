@@ -1583,6 +1583,30 @@ describe FastlaneCore do
         expect(instance.execute(upload_cmd, false)).to eq(false)
         expect(instance.errors.join("\n")).to include("[ContentDelivery.Uploader.102BA2C00] The provided entity includes an attribute with a value that has already been used")
       end
+
+      it "treats the upload success summary as authoritative over diagnostic errors" do
+        require 'stringio'
+        allow(FastlaneCore::Helper).to receive(:test?).and_return(false)
+        altool_output = <<~OUT
+          ERROR: transient upload diagnostic
+          UPLOAD SUCCEEDED with no errors
+        OUT
+        fake_io = StringIO.new(altool_output)
+        allow(FastlaneCore::FastlanePty).to receive(:spawn).and_yield(fake_io, nil, 123).and_return(0)
+
+        expect(instance.execute(upload_cmd, false)).to eq(true)
+        expect(instance.errors).to be_empty
+      end
+
+      it "treats the upload success summary as authoritative over an abnormal exit" do
+        require 'stringio'
+        allow(FastlaneCore::Helper).to receive(:test?).and_return(false)
+        fake_io = StringIO.new("UPLOAD SUCCEEDED with no errors\n")
+        allow(FastlaneCore::FastlanePty).to receive(:spawn).and_yield(fake_io, nil, 123).and_return(-1)
+
+        expect(instance.execute(upload_cmd, false)).to eq(true)
+        expect(instance.errors).to be_empty
+      end
     end
   end
 
