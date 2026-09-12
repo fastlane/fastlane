@@ -24,6 +24,8 @@ module Match
 
     attr_accessor :storage
 
+    attr_accessor :encryption
+
     attr_accessor :cache
 
     # rubocop:disable Metrics/PerceivedComplexity
@@ -45,14 +47,14 @@ module Match
       storage.download
 
       # Init the encryption only after the `storage.download` was called to have the right working directory
-      encryption = Encryption.for_storage_mode(params[:storage_mode], {
+      self.encryption = Encryption.for_storage_mode(params[:storage_mode], {
         git_url: params[:git_url],
         s3_bucket: params[:s3_bucket],
         s3_skip_encryption: params[:s3_skip_encryption],
         working_directory: storage.working_directory,
         force_legacy_encryption: params[:force_legacy_encryption]
       })
-      encryption.decrypt_files if encryption
+      self.encryption.decrypt_files if self.encryption
 
       unless params[:readonly]
         self.spaceship = SpaceshipEnsure.new(params[:username], params[:team_id], params[:team_name], api_token(params))
@@ -117,7 +119,7 @@ module Match
 
       has_file_changes = self.files_to_commit.count > 0 || self.files_to_delete.count > 0
       if has_file_changes && !params[:readonly]
-        encryption.encrypt_files if encryption
+        self.encryption.encrypt_files if self.encryption
         storage.save_changes!(files_to_commit: self.files_to_commit, files_to_delete: self.files_to_delete)
       end
 
@@ -209,6 +211,10 @@ module Match
         self.files_to_commit << cert_path
         self.files_to_commit << private_key_path
 
+        # We pause to upload certs immediatly (or renewals) in case later logic fails, leaving
+        # AppStore with a set of files de-synced from match storage. See fastlane/fastlane#30140
+        save_changes_immediately!(params)
+
         # Reset certificates cache since we have a new cert.
         self.cache.reset_certificates
       else
@@ -253,6 +259,27 @@ module Match
       end
 
       return File.basename(cert_path).gsub(".cer", "") # Certificate ID
+    end
+
+    # Saves all pending file changes to storage right away, keeping the
+    # working directory around so the current run can continue using it
+    def save_changes_immediately!(params)
+      return if params[:readonly]
+      return if self.files_to_commit.empty? && self.files_to_delete.empty?
+
+      self.encryption.encrypt_files if self.encryption
+      begin
+        self.storage.save_changes!(files_to_commit: self.files_to_commit,
+                                   files_to_delete: self.files_to_delete,
+                                   clear_working_directory: false)
+      ensure
+        # Always hand back a decrypted working directory, 2nd upload will hopefully work.
+        self.encryption.decrypt_files if self.encryption
+      end
+
+      # We may have another upload at end (profiles) so reset our cert file(s).
+      self.files_to_commit = []
+      self.files_to_delete = []
     end
 
     # @return [String] Path to certificate or P12 key
