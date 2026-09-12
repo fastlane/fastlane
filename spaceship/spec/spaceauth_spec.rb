@@ -17,13 +17,14 @@ describe Spaceship::SpaceauthRunner do
 
   describe 'copy_to_clipboard option', if: FastlaneCore::Clipboard.is_supported? do
     before :each do
-      # Save clipboard
-      @clipboard = FastlaneCore::Clipboard.paste
-    end
-
-    after :each do
-      # Restore clipboard
-      FastlaneCore::Clipboard.copy(content: @clipboard)
+      # Stubbed rather than driving the real pasteboard. There is one per
+      # machine, shared by every process, so two workers running this and
+      # fastlane's clipboard specs at the same time overwrite each other's.
+      # What these examples care about is whether the runner copied anything,
+      # not what is actually on the pasteboard. See fastlane#30210.
+      @clipboard = ""
+      allow(FastlaneCore::Clipboard).to receive(:paste) { @clipboard }
+      allow(FastlaneCore::Clipboard).to receive(:copy) { |args| @clipboard = args[:content] }
     end
 
     it 'when true, it should copy the session to clipboard' do
