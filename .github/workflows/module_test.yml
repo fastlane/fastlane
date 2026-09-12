@@ -9,6 +9,7 @@ on:
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: ${{ github.ref != 'refs/heads/master' }}
+  queue: ${{ github.ref == 'refs/heads/master' && 'max' || 'single' }}
 
 jobs:
   module_tests:
