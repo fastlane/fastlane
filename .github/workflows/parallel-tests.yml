@@ -40,7 +40,7 @@ on:
         description: "Record spec timings instead of running the split. The split is balanced from these, and they are per platform because the suite is a different shape on each."
         required: false
         type: choice
-        options: ["no", "macos", "linux", "windows", "both"]
+        options: ["no", "macos", "linux", "windows", "all"]
         default: "no"
       workers:
         description: "Workers per runner. Four has measured best on all three runners."
@@ -159,7 +159,7 @@ jobs:
 
   record_macos:
     name: "Record timings, macOS"
-    if: github.event_name == 'schedule' || inputs.record_timings == 'macos' || inputs.record_timings == 'both'
+    if: github.event_name == 'schedule' || inputs.record_timings == 'macos' || inputs.record_timings == 'all'
     runs-on: macos-15
     steps:
       - uses: actions/checkout@v7
@@ -186,7 +186,7 @@ jobs:
 
   record_linux:
     name: "Record timings, Linux"
-    if: github.event_name == 'schedule' || inputs.record_timings == 'linux' || inputs.record_timings == 'both'
+    if: github.event_name == 'schedule' || inputs.record_timings == 'linux' || inputs.record_timings == 'all'
     runs-on: ubuntu-24.04
     steps:
       - uses: actions/checkout@v7
@@ -211,7 +211,7 @@ jobs:
 
   record_windows:
     name: "Record timings, Windows"
-    if: github.event_name == 'schedule' || inputs.record_timings == 'windows' || inputs.record_timings == 'both'
+    if: github.event_name == 'schedule' || inputs.record_timings == 'windows' || inputs.record_timings == 'all'
     runs-on: windows-2022
     steps:
       - uses: actions/checkout@v7
