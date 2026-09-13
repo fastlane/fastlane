@@ -2,6 +2,10 @@ describe Fastlane do
   describe Fastlane::FastFile do
     describe "Public/Private lanes" do
       let(:path) { './fastlane/spec/fixtures/fastfiles/FastfilePrivatePublic' }
+      # Avoid fixed paths under /tmp: parallel test processes would share them. See fastlane#30184.
+      let(:output_dir) { Dir.mktmpdir("fl_spec_docs") }
+      let(:output_path) { File.join(output_dir, "documentation.md") }
+      after { FileUtils.remove_entry(output_dir) if File.directory?(output_dir) }
       before do
         @ff = Fastlane::FastFile.new(path)
       end
@@ -30,7 +34,6 @@ describe Fastlane do
       end
 
       it "doesn't expose the private lanes in `fastlane docs`" do
-        output_path = "/tmp/documentation.md"
         ff = Fastlane::FastFile.new(path)
         Fastlane::DocsGenerator.run(ff, output_path)
         output = File.read(output_path)
