@@ -306,10 +306,10 @@ describe Fastlane do
 
         ff.runner.execute(:something, nil, { value: time })
 
-        expect(File.read("/tmp/before_all.txt")).to eq(time)
-        expect(File.read("/tmp/after_all.txt")).to eq(time)
-        File.delete("/tmp/before_all.txt")
-        File.delete("/tmp/after_all.txt")
+        expect(File.read("#{FASTLANE_SPEC_SCRATCH}/before_all.txt")).to eq(time)
+        expect(File.read("#{FASTLANE_SPEC_SCRATCH}/after_all.txt")).to eq(time)
+        File.delete("#{FASTLANE_SPEC_SCRATCH}/before_all.txt")
+        File.delete("#{FASTLANE_SPEC_SCRATCH}/after_all.txt")
       end
 
       it "allows the user to invent a new platform" do
@@ -355,8 +355,8 @@ describe Fastlane do
           ff.runner.execute(:crash, nil, { value: time })
         end.to raise_error("Wups") # since we cause a crash
 
-        expect(File.read("/tmp/error.txt")).to eq(time)
-        File.delete("/tmp/error.txt")
+        expect(File.read("#{FASTLANE_SPEC_SCRATCH}/error.txt")).to eq(time)
+        File.delete("#{FASTLANE_SPEC_SCRATCH}/error.txt")
       end
 
       it "Exception in error block are swallowed and shown, and original exception is re-raised" do
@@ -375,21 +375,21 @@ describe Fastlane do
           ff = Fastlane::FastFile.new('./fastlane/spec/fixtures/fastfiles/SwitcherFastfile')
           ff.runner.execute(:lane1, :ios)
 
-          expect(File.read("/tmp/deliver_result.txt")).to eq("Lane 2 + parameter")
+          expect(File.read("#{FASTLANE_SPEC_SCRATCH}/deliver_result.txt")).to eq("Lane 2 + parameter")
         end
 
         it "use case 2: passing no parameter to a lane that takes parameters" do
           ff = Fastlane::FastFile.new('./fastlane/spec/fixtures/fastfiles/SwitcherFastfile')
           ff.runner.execute(:lane3, :ios)
 
-          expect(File.read("/tmp/deliver_result.txt")).to eq("Lane 2 + ")
+          expect(File.read("#{FASTLANE_SPEC_SCRATCH}/deliver_result.txt")).to eq("Lane 2 + ")
         end
 
         it "use case 3: Calling a lane directly which takes parameters" do
           ff = Fastlane::FastFile.new('./fastlane/spec/fixtures/fastfiles/SwitcherFastfile')
           ff.runner.execute(:lane4, :ios)
 
-          expect(File.read("/tmp/deliver_result.txt")).to eq("{}")
+          expect(File.read("#{FASTLANE_SPEC_SCRATCH}/deliver_result.txt")).to eq("{}")
         end
 
         it "use case 4: Passing parameters to another lane" do
@@ -401,7 +401,7 @@ describe Fastlane do
                              "{:key=>:value}"
                            end
 
-          expect(File.read("/tmp/deliver_result.txt")).to eq(expected_value)
+          expect(File.read("#{FASTLANE_SPEC_SCRATCH}/deliver_result.txt")).to eq(expected_value)
         end
 
         it "use case 5: Calling a method outside of the current platform" do
@@ -413,7 +413,7 @@ describe Fastlane do
                              "{:random=>:value}"
                            end
 
-          expect(File.read("/tmp/deliver_result.txt")).to eq(expected_value)
+          expect(File.read("#{FASTLANE_SPEC_SCRATCH}/deliver_result.txt")).to eq(expected_value)
         end
 
         it "calling a lane that doesn't exist" do
