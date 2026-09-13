@@ -291,6 +291,7 @@ module FastlaneCore
 
       @errors << "The call to the altool completed with a non-zero exit status: #{exit_status}. This indicates a failure." unless exit_status.zero?
       @errors << "-1 indicates altool exited abnormally; try retrying (see https://github.com/fastlane/fastlane/issues/21535)" if exit_status == -1
+      @errors.clear if @all_lines.any? { |line| line.include?("UPLOAD SUCCEEDED with no errors") }
 
       unless @errors.empty? || @all_lines.empty?
         @all_lines.each do |line|
