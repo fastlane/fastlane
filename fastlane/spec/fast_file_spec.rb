@@ -196,7 +196,7 @@ describe Fastlane do
 
     describe "Grouped fastlane for different platforms" do
       before do
-        FileUtils.rm_rf('/tmp/fastlane/')
+        FileUtils.rm_rf(FASTLANE_SPEC_SCRATCH)
 
         @ff = Fastlane::FastFile.new('./fastlane/spec/fixtures/fastfiles/FastfileGrouped')
       end
@@ -204,11 +204,11 @@ describe Fastlane do
       it "calls a block for a given platform (mac - beta)" do
         @ff.runner.execute('beta', 'mac')
 
-        expect(File.exist?('/tmp/fastlane/mac_beta.txt')).to eq(true)
-        expect(File.exist?('/tmp/fastlane/before_all_android.txt')).to eq(false)
-        expect(File.exist?('/tmp/fastlane/before_all.txt')).to eq(true)
-        expect(File.exist?('/tmp/fastlane/before_each_beta.txt')).to eq(true)
-        expect(File.exist?('/tmp/fastlane/after_each_beta.txt')).to eq(true)
+        expect(File.exist?("#{FASTLANE_SPEC_SCRATCH}/mac_beta.txt")).to eq(true)
+        expect(File.exist?("#{FASTLANE_SPEC_SCRATCH}/before_all_android.txt")).to eq(false)
+        expect(File.exist?("#{FASTLANE_SPEC_SCRATCH}/before_all.txt")).to eq(true)
+        expect(File.exist?("#{FASTLANE_SPEC_SCRATCH}/before_each_beta.txt")).to eq(true)
+        expect(File.exist?("#{FASTLANE_SPEC_SCRATCH}/after_each_beta.txt")).to eq(true)
 
         expect(Fastlane::Actions.lane_context[Fastlane::Actions::SharedValues::LANE_NAME]).to eq("mac beta")
       end
@@ -216,12 +216,12 @@ describe Fastlane do
       it "calls a block for a given platform (android - beta)" do
         @ff.runner.execute('beta', 'android')
 
-        expect(File.exist?('/tmp/fastlane/android_beta.txt')).to eq(true)
-        expect(File.exist?('/tmp/fastlane/before_all_android.txt')).to eq(true)
-        expect(File.exist?('/tmp/fastlane/after_all_android.txt')).to eq(true)
-        expect(File.exist?('/tmp/fastlane/before_all.txt')).to eq(true)
-        expect(File.exist?('/tmp/fastlane/before_each_beta.txt')).to eq(true)
-        expect(File.exist?('/tmp/fastlane/after_each_beta.txt')).to eq(true)
+        expect(File.exist?("#{FASTLANE_SPEC_SCRATCH}/android_beta.txt")).to eq(true)
+        expect(File.exist?("#{FASTLANE_SPEC_SCRATCH}/before_all_android.txt")).to eq(true)
+        expect(File.exist?("#{FASTLANE_SPEC_SCRATCH}/after_all_android.txt")).to eq(true)
+        expect(File.exist?("#{FASTLANE_SPEC_SCRATCH}/before_all.txt")).to eq(true)
+        expect(File.exist?("#{FASTLANE_SPEC_SCRATCH}/before_each_beta.txt")).to eq(true)
+        expect(File.exist?("#{FASTLANE_SPEC_SCRATCH}/after_each_beta.txt")).to eq(true)
 
         expect(Fastlane::Actions.lane_context[Fastlane::Actions::SharedValues::LANE_NAME]).to eq("android beta")
       end
@@ -231,13 +231,13 @@ describe Fastlane do
           @ff.runner.execute('witherror', 'android')
         end.to raise_error('my exception')
 
-        expect(File.exist?('/tmp/fastlane/before_all_android.txt')).to eq(true)
-        expect(File.exist?('/tmp/fastlane/after_all_android.txt')).to eq(false)
-        expect(File.exist?('/tmp/fastlane/android_error.txt')).to eq(true)
-        expect(File.exist?('/tmp/fastlane/error.txt')).to eq(true)
-        expect(File.exist?('/tmp/fastlane/before_all.txt')).to eq(true)
-        expect(File.exist?('/tmp/fastlane/before_each_witherror.txt')).to eq(true)
-        expect(File.exist?('/tmp/fastlane/after_each_witherror.txt')).to eq(false)
+        expect(File.exist?("#{FASTLANE_SPEC_SCRATCH}/before_all_android.txt")).to eq(true)
+        expect(File.exist?("#{FASTLANE_SPEC_SCRATCH}/after_all_android.txt")).to eq(false)
+        expect(File.exist?("#{FASTLANE_SPEC_SCRATCH}/android_error.txt")).to eq(true)
+        expect(File.exist?("#{FASTLANE_SPEC_SCRATCH}/error.txt")).to eq(true)
+        expect(File.exist?("#{FASTLANE_SPEC_SCRATCH}/before_all.txt")).to eq(true)
+        expect(File.exist?("#{FASTLANE_SPEC_SCRATCH}/before_each_witherror.txt")).to eq(true)
+        expect(File.exist?("#{FASTLANE_SPEC_SCRATCH}/after_each_witherror.txt")).to eq(false)
 
         expect(Fastlane::Actions.lane_context[Fastlane::Actions::SharedValues::PLATFORM_NAME]).to eq(:android)
       end
@@ -245,14 +245,14 @@ describe Fastlane do
       it "allows calls without a platform (nil - anotherroot)" do
         @ff.runner.execute('anotherroot')
 
-        expect(File.exist?('/tmp/fastlane/before_all_android.txt')).to eq(false)
-        expect(File.exist?('/tmp/fastlane/after_all_android.txt')).to eq(false)
-        expect(File.exist?('/tmp/fastlane/android_error.txt')).to eq(false)
-        expect(File.exist?('/tmp/fastlane/error.txt')).to eq(false)
-        expect(File.exist?('/tmp/fastlane/before_all.txt')).to eq(true)
-        expect(File.exist?('/tmp/fastlane/another_root.txt')).to eq(true)
-        expect(File.exist?('/tmp/fastlane/before_each_anotherroot.txt')).to eq(true)
-        expect(File.exist?('/tmp/fastlane/after_each_anotherroot.txt')).to eq(true)
+        expect(File.exist?("#{FASTLANE_SPEC_SCRATCH}/before_all_android.txt")).to eq(false)
+        expect(File.exist?("#{FASTLANE_SPEC_SCRATCH}/after_all_android.txt")).to eq(false)
+        expect(File.exist?("#{FASTLANE_SPEC_SCRATCH}/android_error.txt")).to eq(false)
+        expect(File.exist?("#{FASTLANE_SPEC_SCRATCH}/error.txt")).to eq(false)
+        expect(File.exist?("#{FASTLANE_SPEC_SCRATCH}/before_all.txt")).to eq(true)
+        expect(File.exist?("#{FASTLANE_SPEC_SCRATCH}/another_root.txt")).to eq(true)
+        expect(File.exist?("#{FASTLANE_SPEC_SCRATCH}/before_each_anotherroot.txt")).to eq(true)
+        expect(File.exist?("#{FASTLANE_SPEC_SCRATCH}/after_each_anotherroot.txt")).to eq(true)
 
         expect(Fastlane::Actions.lane_context[Fastlane::Actions::SharedValues::LANE_NAME]).to eq("anotherroot")
         expect(Fastlane::Actions.lane_context[Fastlane::Actions::SharedValues::PLATFORM_NAME]).to eq(nil)
@@ -266,19 +266,19 @@ describe Fastlane do
 
     describe "Different Fastfiles" do
       it "execute different envs" do
-        FileUtils.rm_rf('/tmp/fastlane/')
-        FileUtils.mkdir_p('/tmp/fastlane/')
+        FileUtils.rm_rf(FASTLANE_SPEC_SCRATCH)
+        FileUtils.mkdir_p(FASTLANE_SPEC_SCRATCH)
 
         ff = Fastlane::FastFile.new('./fastlane/spec/fixtures/fastfiles/Fastfile1')
         ff.runner.execute(:deploy)
-        expect(File.exist?('/tmp/fastlane/before_all')).to eq(true)
-        expect(File.exist?('/tmp/fastlane/deploy')).to eq(true)
-        expect(File.exist?('/tmp/fastlane/test')).to eq(false)
-        expect(File.exist?('/tmp/fastlane/after_all')).to eq(true)
-        expect(File.read("/tmp/fastlane/after_all")).to eq("deploy")
+        expect(File.exist?("#{FASTLANE_SPEC_SCRATCH}/before_all")).to eq(true)
+        expect(File.exist?("#{FASTLANE_SPEC_SCRATCH}/deploy")).to eq(true)
+        expect(File.exist?("#{FASTLANE_SPEC_SCRATCH}/test")).to eq(false)
+        expect(File.exist?("#{FASTLANE_SPEC_SCRATCH}/after_all")).to eq(true)
+        expect(File.read("#{FASTLANE_SPEC_SCRATCH}/after_all")).to eq("deploy")
 
         ff.runner.execute(:test)
-        expect(File.exist?('/tmp/fastlane/test')).to eq(true)
+        expect(File.exist?("#{FASTLANE_SPEC_SCRATCH}/test")).to eq(true)
       end
 
       it "prints a warning if a lane is called like an action" do
@@ -306,10 +306,10 @@ describe Fastlane do
 
         ff.runner.execute(:something, nil, { value: time })
 
-        expect(File.read("/tmp/before_all.txt")).to eq(time)
-        expect(File.read("/tmp/after_all.txt")).to eq(time)
-        File.delete("/tmp/before_all.txt")
-        File.delete("/tmp/after_all.txt")
+        expect(File.read("#{FASTLANE_SPEC_SCRATCH}/before_all.txt")).to eq(time)
+        expect(File.read("#{FASTLANE_SPEC_SCRATCH}/after_all.txt")).to eq(time)
+        File.delete("#{FASTLANE_SPEC_SCRATCH}/before_all.txt")
+        File.delete("#{FASTLANE_SPEC_SCRATCH}/after_all.txt")
       end
 
       it "allows the user to invent a new platform" do
@@ -330,21 +330,21 @@ describe Fastlane do
         ff = Fastlane::FastFile.new('./fastlane/spec/fixtures/fastfiles/FastfileLaneBlocks')
         ff.runner.execute(:run_ios, :ios)
 
-        expect(File.exist?('/tmp/fastlane/before_all')).to eq(true)
-        expect(File.exist?('/tmp/fastlane/after_all')).to eq(true)
+        expect(File.exist?("#{FASTLANE_SPEC_SCRATCH}/before_all")).to eq(true)
+        expect(File.exist?("#{FASTLANE_SPEC_SCRATCH}/after_all")).to eq(true)
 
-        before_each = File.read("/tmp/fastlane/before_each")
-        after_each = File.read("/tmp/fastlane/after_each")
+        before_each = File.read("#{FASTLANE_SPEC_SCRATCH}/before_each")
+        after_each = File.read("#{FASTLANE_SPEC_SCRATCH}/after_each")
 
         %w(run lane1 lane2).each do |lane|
           expect(before_each).to include(lane)
           expect(after_each).to include(lane)
         end
 
-        File.delete("/tmp/fastlane/before_each")
-        File.delete("/tmp/fastlane/after_each")
-        File.delete("/tmp/fastlane/before_all")
-        File.delete("/tmp/fastlane/after_all")
+        File.delete("#{FASTLANE_SPEC_SCRATCH}/before_each")
+        File.delete("#{FASTLANE_SPEC_SCRATCH}/after_each")
+        File.delete("#{FASTLANE_SPEC_SCRATCH}/before_all")
+        File.delete("#{FASTLANE_SPEC_SCRATCH}/after_all")
       end
 
       it "Parameters are also passed to the error block" do
@@ -355,8 +355,8 @@ describe Fastlane do
           ff.runner.execute(:crash, nil, { value: time })
         end.to raise_error("Wups") # since we cause a crash
 
-        expect(File.read("/tmp/error.txt")).to eq(time)
-        File.delete("/tmp/error.txt")
+        expect(File.read("#{FASTLANE_SPEC_SCRATCH}/error.txt")).to eq(time)
+        File.delete("#{FASTLANE_SPEC_SCRATCH}/error.txt")
       end
 
       it "Exception in error block are swallowed and shown, and original exception is re-raised" do
@@ -375,21 +375,21 @@ describe Fastlane do
           ff = Fastlane::FastFile.new('./fastlane/spec/fixtures/fastfiles/SwitcherFastfile')
           ff.runner.execute(:lane1, :ios)
 
-          expect(File.read("/tmp/deliver_result.txt")).to eq("Lane 2 + parameter")
+          expect(File.read("#{FASTLANE_SPEC_SCRATCH}/deliver_result.txt")).to eq("Lane 2 + parameter")
         end
 
         it "use case 2: passing no parameter to a lane that takes parameters" do
           ff = Fastlane::FastFile.new('./fastlane/spec/fixtures/fastfiles/SwitcherFastfile')
           ff.runner.execute(:lane3, :ios)
 
-          expect(File.read("/tmp/deliver_result.txt")).to eq("Lane 2 + ")
+          expect(File.read("#{FASTLANE_SPEC_SCRATCH}/deliver_result.txt")).to eq("Lane 2 + ")
         end
 
         it "use case 3: Calling a lane directly which takes parameters" do
           ff = Fastlane::FastFile.new('./fastlane/spec/fixtures/fastfiles/SwitcherFastfile')
           ff.runner.execute(:lane4, :ios)
 
-          expect(File.read("/tmp/deliver_result.txt")).to eq("{}")
+          expect(File.read("#{FASTLANE_SPEC_SCRATCH}/deliver_result.txt")).to eq("{}")
         end
 
         it "use case 4: Passing parameters to another lane" do
@@ -401,7 +401,7 @@ describe Fastlane do
                              "{:key=>:value}"
                            end
 
-          expect(File.read("/tmp/deliver_result.txt")).to eq(expected_value)
+          expect(File.read("#{FASTLANE_SPEC_SCRATCH}/deliver_result.txt")).to eq(expected_value)
         end
 
         it "use case 5: Calling a method outside of the current platform" do
@@ -413,7 +413,7 @@ describe Fastlane do
                              "{:random=>:value}"
                            end
 
-          expect(File.read("/tmp/deliver_result.txt")).to eq(expected_value)
+          expect(File.read("#{FASTLANE_SPEC_SCRATCH}/deliver_result.txt")).to eq(expected_value)
         end
 
         it "calling a lane that doesn't exist" do
@@ -440,19 +440,19 @@ describe Fastlane do
       end
 
       it "execute different envs with lane in before block" do
-        FileUtils.rm_rf('/tmp/fastlane/')
-        FileUtils.mkdir_p('/tmp/fastlane/')
+        FileUtils.rm_rf(FASTLANE_SPEC_SCRATCH)
+        FileUtils.mkdir_p(FASTLANE_SPEC_SCRATCH)
 
         ff = Fastlane::FastFile.new('./fastlane/spec/fixtures/fastfiles/Fastfile2')
         ff.runner.execute(:deploy)
-        expect(File.exist?('/tmp/fastlane/before_all_deploy')).to eq(true)
-        expect(File.exist?('/tmp/fastlane/deploy')).to eq(true)
-        expect(File.exist?('/tmp/fastlane/test')).to eq(false)
-        expect(File.exist?('/tmp/fastlane/after_all')).to eq(true)
-        expect(File.read("/tmp/fastlane/after_all")).to eq("deploy")
+        expect(File.exist?("#{FASTLANE_SPEC_SCRATCH}/before_all_deploy")).to eq(true)
+        expect(File.exist?("#{FASTLANE_SPEC_SCRATCH}/deploy")).to eq(true)
+        expect(File.exist?("#{FASTLANE_SPEC_SCRATCH}/test")).to eq(false)
+        expect(File.exist?("#{FASTLANE_SPEC_SCRATCH}/after_all")).to eq(true)
+        expect(File.read("#{FASTLANE_SPEC_SCRATCH}/after_all")).to eq("deploy")
 
         ff.runner.execute(:test)
-        expect(File.exist?('/tmp/fastlane/test')).to eq(true)
+        expect(File.exist?("#{FASTLANE_SPEC_SCRATCH}/test")).to eq(true)
       end
 
       it "automatically converts invalid quotations" do
@@ -578,21 +578,21 @@ RUBY
       end
 
       it "calls the error block when an error occurs" do
-        FileUtils.rm_rf('/tmp/fastlane/')
-        FileUtils.mkdir_p('/tmp/fastlane/')
+        FileUtils.rm_rf(FASTLANE_SPEC_SCRATCH)
+        FileUtils.mkdir_p(FASTLANE_SPEC_SCRATCH)
 
         ff = Fastlane::FastFile.new('./fastlane/spec/fixtures/fastfiles/Fastfile1')
         expect do
           ff.runner.execute(:error_causing_lane)
         end.to raise_exception("divided by 0")
 
-        expect(File.exist?('/tmp/fastlane/before_all')).to eq(true)
-        expect(File.exist?('/tmp/fastlane/deploy')).to eq(false)
-        expect(File.exist?('/tmp/fastlane/test')).to eq(false)
-        expect(File.exist?('/tmp/fastlane/after_all')).to eq(false)
-        expect(File.exist?('/tmp/fastlane/error')).to eq(true)
+        expect(File.exist?("#{FASTLANE_SPEC_SCRATCH}/before_all")).to eq(true)
+        expect(File.exist?("#{FASTLANE_SPEC_SCRATCH}/deploy")).to eq(false)
+        expect(File.exist?("#{FASTLANE_SPEC_SCRATCH}/test")).to eq(false)
+        expect(File.exist?("#{FASTLANE_SPEC_SCRATCH}/after_all")).to eq(false)
+        expect(File.exist?("#{FASTLANE_SPEC_SCRATCH}/error")).to eq(true)
 
-        expect(File.read("/tmp/fastlane/error")).to eq("error_causing_lane")
+        expect(File.read("#{FASTLANE_SPEC_SCRATCH}/error")).to eq("error_causing_lane")
       end
 
       it "raises an error if one lane is defined multiple times" do

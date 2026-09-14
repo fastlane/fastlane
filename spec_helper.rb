@@ -25,6 +25,11 @@ UI = FastlaneCore::UI
 SPACESHIP_COOKIE_DIR = Dir.mktmpdir("fastlane-spec-spaceship")
 ENV["SPACESHIP_COOKIE_PATH"] = SPACESHIP_COOKIE_DIR
 
+# Scratch root for the Fastfile fixtures and the specs that assert on them.
+# Avoid fixed paths under /tmp: parallel test processes would share them.
+# See fastlane#30184.
+FASTLANE_SPEC_SCRATCH = Dir.mktmpdir("fastlane-spec-scratch")
+
 unless ENV["DEBUG"]
   # Per process. `rake test_parallel` runs several rspec processes at once and a
   # fixed name means they all open the same file with mode "w", each truncating
