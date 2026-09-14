@@ -85,16 +85,8 @@ module Deliver
       elsif options[:pkg]
         # :pkg defaults to any *.pkg in the current directory, so only infer
         # osx from it when the user hasn't chosen a platform themselves
-        options[:platform] = 'osx' unless platform_specified?(options)
+        options[:platform] = 'osx' unless options.specified?(:platform)
       end
-    end
-
-    # :platform has a default value, so options[:platform] is never nil.
-    # Check where the value comes from instead: passed in, env var or Deliverfile.
-    def platform_specified?(options)
-      !options._values[:platform].nil? ||
-        !options.option_for_key(:platform).fetch_env_value.nil? ||
-        options.config_file_options.key?(:platform)
     end
 
     def verify_languages!(options)
