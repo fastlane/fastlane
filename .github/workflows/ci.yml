@@ -81,7 +81,7 @@ jobs:
       # this a failing job says which examples failed and never why.
       - name: Keep the worker logs
         if: failure()
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: rspec-worker-logs-${{ matrix.os }}-ruby${{ matrix.ruby }}-xcode${{ matrix.xcode }}
           path: |
