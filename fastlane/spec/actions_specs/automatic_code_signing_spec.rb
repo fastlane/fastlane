@@ -115,7 +115,8 @@ describe Fastlane do
     end
 
     it "sets code sign identity" do
-      temp_dir = Dir.tmpdir
+      # A directory of its own: Dir.tmpdir is the shared temp root, so parallel test processes would collide. See fastlane#30184.
+      temp_dir = Dir.mktmpdir('fl_spec_code_sign_identity')
       FileUtils.copy_entry(@project_path, temp_dir)
 
       # G3KGXDXQL9
