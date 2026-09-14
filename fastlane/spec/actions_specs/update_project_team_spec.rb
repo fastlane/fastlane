@@ -8,7 +8,8 @@ describe Fastlane do
 
       it "updates the development team ID for all targets and configurations" do
         # We'll use a copy of the xcodeproj to avoid modifying the fixture
-        temp_xcodeproj = File.join(Dir.tmpdir, "bundle.xcodeproj")
+        # A directory of its own: Dir.tmpdir is the shared temp root, so parallel test processes would collide. See fastlane#30184.
+        temp_xcodeproj = File.join(Dir.mktmpdir("fl_spec_update_project_team"), "bundle.xcodeproj")
         FileUtils.cp_r(xcodeproj, temp_xcodeproj)
 
         begin
@@ -29,7 +30,7 @@ describe Fastlane do
       end
 
       it "updates conditional DEVELOPMENT_TEAM settings using a fixture" do
-        temp_xcodeproj = File.join(Dir.tmpdir, "sdk-qualifier.xcodeproj")
+        temp_xcodeproj = File.join(Dir.mktmpdir("fl_spec_update_project_team"), "sdk-qualifier.xcodeproj")
         fixture_xcodeproj = File.join(fixtures_path, 'xcodeproj', 'sdk-qualifier.xcodeproj')
         FileUtils.cp_r(fixture_xcodeproj, temp_xcodeproj)
 
@@ -52,7 +53,7 @@ describe Fastlane do
       end
 
       it "works when only the base DEVELOPMENT_TEAM key exists" do
-        temp_xcodeproj = File.join(Dir.tmpdir, "bundle-no-sdk.xcodeproj")
+        temp_xcodeproj = File.join(Dir.mktmpdir("fl_spec_update_project_team"), "bundle-no-sdk.xcodeproj")
         FileUtils.cp_r(xcodeproj, temp_xcodeproj)
 
         begin

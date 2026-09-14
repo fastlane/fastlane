@@ -104,7 +104,8 @@ describe Cert do
 
         describe ":filename option handling" do
           filename = ""
-          let(:temp) { Dir.tmpdir }
+          # A directory of its own: Dir.tmpdir is the shared temp root, so parallel test processes would collide. See fastlane#30184.
+          let(:temp) { Dir.mktmpdir('fl_spec_cert') }
           let(:certificate) { stub_certificate }
           let(:filepath) do
             filename_ext = File.extname(filename) == ".cer" ? filename : "#{filename}.cer"
