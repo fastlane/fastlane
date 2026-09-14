@@ -83,4 +83,65 @@ describe Deliver::DetectValues do
       end
     end
   end
+
+  describe :find_platform do
+    before do
+      @old_cwd = Dir.pwd
+      Dir.chdir(tmpdir)
+    end
+
+    after do
+      Dir.chdir(@old_cwd)
+    end
+
+    def build_options(values)
+      FastlaneCore::Configuration.create(Deliver::Options.available_options, values)
+    end
+
+    describe 'when a pkg is in the current directory' do
+      before do
+        FileUtils.touch('MyApp.pkg')
+      end
+
+      it 'infers osx when no platform is given' do
+        options = build_options({})
+        value_detector.find_platform(options)
+        expect(options[:platform]).to eq('osx')
+      end
+
+      it 'keeps an explicitly passed platform' do
+        options = build_options({ platform: 'ios' })
+        value_detector.find_platform(options)
+        expect(options[:platform]).to eq('ios')
+      end
+
+      it 'keeps a platform set via environment variable' do
+        FastlaneSpec::Env.with_env_values('DELIVER_PLATFORM' => 'ios') do
+          options = build_options({})
+          value_detector.find_platform(options)
+          expect(options[:platform]).to eq('ios')
+        end
+      end
+
+      it 'keeps a platform set in the Deliverfile' do
+        File.write('Deliverfile', "platform('ios')\n")
+        options = build_options({})
+        options.load_configuration_file('Deliverfile', nil, true)
+        value_detector.find_platform(options)
+        expect(options[:platform]).to eq('ios')
+      end
+    end
+
+    describe 'when an ipa is in the current directory' do
+      before do
+        FileUtils.touch('MyApp.ipa')
+      end
+
+      it 'uses ios when no platform is given' do
+        options = build_options({})
+        value_detector.find_platform(options)
+        expect(options[:platform]).to eq('ios')
+      end
+    end
+  end
 end
