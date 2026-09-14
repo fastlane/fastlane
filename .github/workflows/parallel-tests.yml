@@ -80,7 +80,7 @@ jobs:
       # bucket that produced it, and neither survives the runner otherwise.
       - name: Keep the worker logs
         if: failure()
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: rspec-worker-logs-macos
           path: |
@@ -115,7 +115,7 @@ jobs:
       # bucket that produced it, and neither survives the runner otherwise.
       - name: Keep the worker logs
         if: failure()
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: rspec-worker-logs-linux
           path: |
@@ -149,7 +149,7 @@ jobs:
       # bucket that produced it, and neither survives the runner otherwise.
       - name: Keep the worker logs
         if: failure()
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: rspec-worker-logs-windows
           path: |
@@ -178,7 +178,7 @@ jobs:
       - name: Record timings
         shell: bash
         run: bundle exec rake spec_timings
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v7
         with:
           name: spec-timings-macos
           path: internal/spec_timings.mac.json
@@ -203,7 +203,7 @@ jobs:
       - name: Record timings
         shell: bash
         run: bundle exec rake spec_timings
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v7
         with:
           name: spec-timings-linux
           path: internal/spec_timings.linux.json
@@ -222,7 +222,7 @@ jobs:
       - name: Record timings
         shell: bash
         run: bundle exec rake spec_timings
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v7
         with:
           name: spec-timings-windows
           path: internal/spec_timings.windows.json
