@@ -85,13 +85,10 @@ describe Deliver::DetectValues do
   end
 
   describe :find_platform do
-    before do
-      @old_cwd = Dir.pwd
-      Dir.chdir(tmpdir)
-    end
-
-    after do
-      Dir.chdir(@old_cwd)
+    # A directory of its own, not the shared `tmpdir`, for the same reason as
+    # in 'running without fastlane' above.
+    around do |example|
+      Dir.mktmpdir { |dir| Dir.chdir(dir) { example.run } }
     end
 
     def build_options(values)
