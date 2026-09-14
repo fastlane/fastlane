@@ -290,6 +290,25 @@ describe FastlaneCore::Xcode::Project do
     end
   end
 
+  describe "with the project serialization newer Xcode versions write" do
+    # Xcode 26.3+ serializes a run script phase's shellScript as an array of lines, which
+    # the Xcodeproj gem rejects with a type checking error (fastlane/fastlane#30223)
+    it "loads array-valued attributes without type checking them" do
+      File.write(File.join(project_path, "project.pbxproj"), pbxproj.sub("APP /* App */ = {", <<~PBXPROJ + "APP /* App */ = {"))
+        SCRIPT = {
+          isa = PBXShellScriptBuildPhase;
+          shellPath = /bin/sh;
+          shellScript = (
+            "echo hello",
+            "",
+          );
+        };
+      PBXPROJ
+      expect(project.object("SCRIPT")["shellScript"]).to eq(["echo hello", ""])
+      expect(project.targets.map(&:name)).to eq(%w[App AppTests Everything])
+    end
+  end
+
   describe "with a real project" do
     let(:project) { FastlaneCore::Xcode::Project.open("./fastlane_core/spec/fixtures/projects/Example.xcodeproj") }
 
