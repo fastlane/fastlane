@@ -98,7 +98,13 @@ module FastlaneCore
       server = server_name(keychain_name)
 
       # Attempt to find password in keychain for keychain
-      item = Security::InternetPassword.find(server: server)
+      begin
+        item = Security::InternetPassword.find(server: server)
+      rescue Security::Error => ex
+        UI.important("Could not read the keychain item #{server}: #{ex.message}")
+        item = nil
+      end
+
       if item
         keychain_password = item.password
         UI.important("Using keychain password from keychain item #{server} in #{keychain_path}")
