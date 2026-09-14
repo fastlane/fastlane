@@ -1,5 +1,5 @@
-require 'spaceship'
-require_relative 'module'
+require "spaceship"
+require_relative "module"
 
 module Produce
   class DeveloperCenter
@@ -30,7 +30,6 @@ module Produce
         SERVICE_UNLESS_OPEN,
         SERVICE_UNTIL_FIRST_LAUNCH
       ],
-      extended_virtual_address_space: [SERVICE_ON, SERVICE_OFF],
       family_controls: [SERVICE_ON, SERVICE_OFF],
       file_provider_testing_mode: [SERVICE_ON, SERVICE_OFF],
       fonts: [SERVICE_ON, SERVICE_OFF],
@@ -79,10 +78,25 @@ module Produce
       group_activities: [SERVICE_ON, SERVICE_OFF],
       health_kit_estimate_recalibration: [SERVICE_ON, SERVICE_OFF],
       time_sensitive_notifications: [SERVICE_ON, SERVICE_OFF],
+      extended_virtual_address_space: [SERVICE_ON, SERVICE_OFF],
+      increased_memory_limit: [SERVICE_ON, SERVICE_OFF],
+      increased_memory_limit_debugging: [SERVICE_ON, SERVICE_OFF],
     }
+
+    # Keys supported by Spaceship::Portal::AppService (derived from AppService constants)
+    PORTAL_APP_SERVICE_KEYS = Spaceship::Portal::AppService.constants.filter_map do |constant|
+      next unless constant.to_s.match?(/\A[A-Z]/)
+
+      constant.to_s
+              .gsub(/([A-Z0-9]+)([A-Z][a-z])/, '\1_\2')
+              .gsub(/([a-z0-9])([A-Z])/, '\1_\2')
+              .downcase
+    end.freeze
+
     def run
       login
       create_new_app
+      enable_connect_api_services
     end
 
     def create_new_app
@@ -96,9 +110,9 @@ module Produce
         UI.message("Creating new app '#{app_name}' on the Apple Dev Center")
 
         app = Spaceship.app.create!(bundle_id: app_identifier,
-                                         name: app_name,
-                                         enable_services: enable_services,
-                                         mac: platform == "osx")
+                                    name: app_name,
+                                    enable_services: enable_services,
+                                    mac: platform == "osx")
 
         if app.name != Produce.config[:app_name]
           UI.important("Your app name includes non-ASCII characters, which are not supported by the Apple Developer Portal.")
@@ -126,7 +140,10 @@ module Produce
       config_enabled_services = Produce.config[:enable_services] || Produce.config[:enabled_features]
 
       config_enabled_services.each do |k, v|
-        if k.to_sym == :data_protection
+        key = k.to_sym
+        next if connect_api_only_service?(key)
+
+        if key == :data_protection
           case v
           when SERVICE_COMPLETE
             enabled_clean_options[app_service.data_protection.complete.service_id] = app_service.data_protection.complete
@@ -135,7 +152,7 @@ module Produce
           when SERVICE_UNTIL_FIRST_LAUNCH
             enabled_clean_options[app_service.data_protection.untilfirstauth.service_id] = app_service.data_protection.untilfirstauth
           end
-        elsif k.to_sym == :icloud
+        elsif key == :icloud
           case v
           when SERVICE_LEGACY
             enabled_clean_options[app_service.cloud.on.service_id] = app_service.cloud.on
@@ -155,11 +172,101 @@ module Produce
       enabled_clean_options
     end
 
+    def enable_connect_api_services
+      config_enabled_services = Produce.config[:enable_services] || Produce.config[:enabled_features] || {}
+      connect_services = config_enabled_services.select do |k, _v|
+        connect_api_only_service?(k.to_sym)
+      end
+      return if connect_services.empty?
+
+      enabled_service_names = connect_services.select { |_k, v| service_enabled?(v) }.keys
+      disabled_service_names = connect_services.select { |_k, v| service_disabled?(v) }.keys
+
+      UI.message("Configuring App Store Connect API capabilities for '#{app_identifier}'")
+      UI.message("\tenabling: #{enabled_service_names.join(', ')}") unless enabled_service_names.empty?
+      UI.message("\tdisabling: #{disabled_service_names.join(', ')}") unless disabled_service_names.empty?
+
+      wait_for_connect_api_bundle_id
+
+      require_relative "service"
+
+      enabled_services = connect_services.select { |_k, v| service_enabled?(v) }
+                                         .map { |k, v| [k.to_sym, normalize_service_value(v)] }
+                                         .to_h
+      disabled_services = connect_services.select { |_k, v| service_disabled?(v) }
+                                          .map { |k, _v| [k.to_sym, SERVICE_OFF] }
+                                          .to_h
+
+      unless enabled_services.empty?
+        Produce::Service.enable(build_connect_api_service_options(enabled_services), nil)
+      end
+
+      unless disabled_services.empty?
+        Produce::Service.disable(build_connect_api_service_options(disabled_services), nil)
+      end
+    end
+
+    def build_connect_api_service_options(services)
+      option_class = Class.new
+      option_class.attr_accessor(:__hash__)
+      ALLOWED_SERVICES.keys.each { |service| option_class.attr_accessor(service) }
+
+      service_object = option_class.new
+      service_object.__hash__ = {}
+
+      services.each do |key, value|
+        sym_key = key.to_sym
+        service_object.__hash__[sym_key] = true
+        service_object.send("#{sym_key}=", value)
+      end
+
+      service_object
+    end
+
+    def service_enabled?(value)
+      value == SERVICE_ON || value == true || (value != false && value.to_s != SERVICE_OFF)
+    end
+
+    def service_disabled?(value)
+      value == SERVICE_OFF || value == false
+    end
+
+    def normalize_service_value(value)
+      return SERVICE_ON if value == true || value.to_s == SERVICE_ON
+
+      value
+    end
+
     def app_identifier
       Produce.config[:app_identifier].to_s
     end
 
+    def connect_api_only_service?(key)
+      ALLOWED_SERVICES.key?(key) && !portal_app_service?(key)
+    end
+
+    def portal_app_service?(key)
+      key = key.to_sym
+      return true if key == :icloud || key == :data_protection
+
+      PORTAL_APP_SERVICE_KEYS.include?(key.to_s)
+    end
+
     private
+
+    def wait_for_connect_api_bundle_id
+      counter = 0
+      loop do
+        bundle_id = Spaceship::ConnectAPI::BundleId.find(app_identifier)
+        return bundle_id if bundle_id
+
+        counter += 1
+        UI.user_error!("Could not find '#{app_identifier}' on App Store Connect to configure capabilities") if counter >= 10
+
+        UI.message("Waiting for '#{app_identifier}' to be available on App Store Connect...")
+        sleep(3)
+      end
+    end
 
     def platform
       # This was added to support creation of multiple platforms
