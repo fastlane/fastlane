@@ -3,7 +3,6 @@ module Fastlane
     # Commits version bump.
     class HgCommitVersionBumpAction < Action
       def self.run(params)
-        require 'xcodeproj'
         require 'pathname'
         require 'set'
         require 'shellwords'
@@ -49,12 +48,8 @@ module Fastlane
           pbxproj_path = pbxproj_pathname.relative_path_from(repo_pathname).to_s
 
           # find the info_plist files
-          project = Xcodeproj::Project.open(xcodeproj_path)
-          info_plist_files = project.objects.select do |object|
-            object.isa == 'XCBuildConfiguration'
-          end.map(&:to_hash).map do |object_hash|
-            object_hash['buildSettings']
-          end.select do |build_settings|
+          project = FastlaneCore::Xcode::Project.open(xcodeproj_path)
+          info_plist_files = project.objects.grep(FastlaneCore::Xcode::Project::BuildConfiguration).map(&:build_settings).select do |build_settings|
             build_settings.key?('INFOPLIST_FILE')
           end.map do |build_settings|
             build_settings['INFOPLIST_FILE']

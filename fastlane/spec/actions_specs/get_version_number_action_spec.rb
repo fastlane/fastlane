@@ -111,7 +111,7 @@ describe Fastlane do
       end
 
       it "gets the correct version number with no target specified (and one target that isn't test)", requires_xcodeproj: true do
-        allow_any_instance_of(Xcodeproj::Project).to receive(:targets).and_wrap_original do |m, *args|
+        allow_any_instance_of(FastlaneCore::Xcode::Project).to receive(:targets).and_wrap_original do |m, *args|
           targets = m.call(*args)
           targets.select do |target|
             target.name == "TargetA"
@@ -125,7 +125,7 @@ describe Fastlane do
       end
 
       it "gets the correct version number with no target specified (and one target that isn't test and multiple test targets)", requires_xcodeproj: true do
-        allow_any_instance_of(Xcodeproj::Project).to receive(:targets).and_wrap_original do |m, *args|
+        allow_any_instance_of(FastlaneCore::Xcode::Project).to receive(:targets).and_wrap_original do |m, *args|
           targets = m.call(*args)
           targets.select do |target|
             target.name == "TargetATests" || target.name == "TargetB" || target.name == "TargetBTests"
@@ -179,7 +179,7 @@ describe Fastlane do
       end
 
       it "raises if one target and specified wrong target name", requires_xcodeproj: true do
-        allow_any_instance_of(Xcodeproj::Project).to receive(:targets).and_wrap_original do |m, *args|
+        allow_any_instance_of(FastlaneCore::Xcode::Project).to receive(:targets).and_wrap_original do |m, *args|
           [m.call(*args).first]
         end
 

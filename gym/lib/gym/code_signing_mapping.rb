@@ -1,5 +1,3 @@
-require 'xcodeproj'
-
 require_relative 'module'
 
 module Gym
@@ -109,7 +107,7 @@ module Gym
 
         if project_path
           scheme_path = File.join(project_path, "xcshareddata", "xcschemes", "#{Gym.config[:scheme]}.xcscheme")
-          Xcodeproj::XCScheme.new(scheme_path).archive_action.build_configuration if File.exist?(scheme_path)
+          FastlaneCore::Xcode::Scheme.new(scheme_path).archive_build_configuration if File.exist?(scheme_path)
         end
       end
 
@@ -132,9 +130,9 @@ module Gym
           # for informing user later on
           bundle_identifiers_with_duplicates = []
 
-          project = Xcodeproj::Project.open(project_path)
+          project = FastlaneCore::Xcode::Project.open(project_path)
           project.targets.each do |target|
-            target.build_configuration_list.build_configurations.each do |build_configuration|
+            target.build_configurations.each do |build_configuration|
               current = build_configuration.build_settings
               next if test_target?(current)
               sdkroot = build_configuration.resolve_build_setting("SDKROOT", target)

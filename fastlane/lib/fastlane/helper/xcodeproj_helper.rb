@@ -8,20 +8,27 @@ module Fastlane
         xcodeproj_paths.reject { |path| %r{/(#{DEPENDENCY_MANAGER_DIRS.join('|')})/.*.xcodeproj} =~ path }
       end
 
-      def self.get_project!(xcodeproj_path_or_dir)
-        require 'xcodeproj'
-
+      # Resolves a path to an `.xcodeproj`, or to a directory containing one, to the project path
+      def self.project_path!(xcodeproj_path_or_dir)
         if File.extname(xcodeproj_path_or_dir) == ".xcodeproj"
           project_path = xcodeproj_path_or_dir
         else
           project_path = Dir.glob("#{xcodeproj_path_or_dir}/*.xcodeproj").first
         end
 
-        if project_path && File.exist?(project_path)
-          return Xcodeproj::Project.open(project_path)
-        else
-          UI.user_error!("Unable to find Xcode project at #{project_path || xcodeproj_path_or_dir}")
-        end
+        return project_path if project_path && File.exist?(project_path)
+        UI.user_error!("Unable to find Xcode project at #{project_path || xcodeproj_path_or_dir}")
+      end
+
+      # Opens the project with the Xcodeproj gem, for actions that modify it
+      def self.get_project!(xcodeproj_path_or_dir)
+        require 'xcodeproj'
+        Xcodeproj::Project.open(project_path!(xcodeproj_path_or_dir))
+      end
+
+      # Opens the project with the read-only FastlaneCore::Xcode::Project, for actions that only inspect it
+      def self.read_project!(xcodeproj_path_or_dir)
+        FastlaneCore::Xcode::Project.open(project_path!(xcodeproj_path_or_dir))
       end
 
       def self.update_project_build_setting(project, build_setting, value)

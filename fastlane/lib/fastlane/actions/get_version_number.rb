@@ -42,7 +42,7 @@ module Fastlane
       end
 
       def self.get_project!(xcodeproj_path_or_dir)
-        Fastlane::Helper::XcodeprojHelper.get_project!(xcodeproj_path_or_dir)
+        Fastlane::Helper::XcodeprojHelper.read_project!(xcodeproj_path_or_dir)
       end
 
       def self.get_target!(project, target_name)
@@ -52,10 +52,7 @@ module Fastlane
         unless target_name
 
           # Gets non-test targets
-          non_test_targets = targets.reject do |t|
-            # Not all targets respond to `test_target_type?`
-            t.respond_to?(:test_target_type?) && t.test_target_type?
-          end
+          non_test_targets = targets.reject(&:test_target_type?)
 
           # Returns if only one non-test target
           if non_test_targets.count == 1
@@ -125,7 +122,7 @@ module Fastlane
       def self.get_version_number_from_plist!(plist_file)
         return '$(MARKETING_VERSION)' if plist_file.nil?
 
-        plist = Xcodeproj::Plist.read_from_path(plist_file)
+        plist = FastlaneCore::Xcode::Plist.read_from_path(plist_file)
         UI.user_error!("Unable to read plist: #{plist_file}") unless plist
 
         return '${MARKETING_VERSION}' if plist["CFBundleShortVersionString"].nil?

@@ -37,6 +37,7 @@ require_relative 'fastlane_core/test_parser'
 require_relative 'fastlane_core/ui/errors'
 require_relative 'fastlane_core/ui/ui'
 require_relative 'fastlane_core/update_checker/update_checker'
+require_relative 'fastlane_core/xcode'
 
 # Third Party code
 require 'colored'

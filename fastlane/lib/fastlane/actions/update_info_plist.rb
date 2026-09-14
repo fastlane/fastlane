@@ -17,7 +17,7 @@ module Fastlane
           UI.user_error!("Could not figure out your xcodeproj path. Please specify it using the `xcodeproj` parameter") if folder.nil?
 
           if params[:scheme]
-            project = Xcodeproj::Project.open(folder)
+            project = FastlaneCore::Xcode::Project.open(folder)
             scheme = project.native_targets.detect { |target| target.name == params[:scheme] }
             UI.user_error!("Couldn't find scheme named '#{params[:scheme]}'") unless scheme
 

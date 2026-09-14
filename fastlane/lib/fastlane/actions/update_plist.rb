@@ -5,8 +5,6 @@ module Fastlane
 
     class UpdatePlistAction < Action
       def self.run(params)
-        require 'xcodeproj'
-
         if params[:plist_path].nil?
           UI.user_error!("You must specify a plist path")
         end
@@ -15,12 +13,12 @@ module Fastlane
         plist_path = params[:plist_path]
 
         UI.user_error!("Couldn't find plist file at path '#{plist_path}'") unless File.exist?(plist_path)
-        plist = Xcodeproj::Plist.read_from_path(plist_path)
+        plist = FastlaneCore::Xcode::Plist.read_from_path(plist_path)
 
         params[:block].call(plist) if params[:block]
 
         # Write changes to file
-        Xcodeproj::Plist.write_to_path(plist, plist_path)
+        FastlaneCore::Xcode::Plist.write_to_path(plist, plist_path)
 
         UI.success("Updated #{params[:plist_path]} 💾.")
         File.read(plist_path)

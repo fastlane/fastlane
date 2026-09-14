@@ -6,7 +6,6 @@
 
 require 'addressable/uri'
 require 'tempfile'
-require 'xcodeproj'
 
 require 'fastlane_core/core_ext/cfpropertylist'
 require_relative '../module'
@@ -224,7 +223,7 @@ module Gym
       def signing_style
         projects = Gym.project.project_paths
         project = projects.first
-        xcodeproj = Xcodeproj::Project.open(project)
+        xcodeproj = FastlaneCore::Xcode::Project.open(project)
         xcodeproj.root_object.attributes["TargetAttributes"].each do |target, sett|
           return sett["ProvisioningStyle"].to_s.downcase
         end

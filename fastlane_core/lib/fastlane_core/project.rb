@@ -1,5 +1,5 @@
 require_relative 'helper'
-require 'xcodeproj'
+require_relative 'xcode'
 require_relative './configuration/configuration'
 require 'fastlane_core/command_executor'
 
@@ -106,18 +106,28 @@ module FastlaneCore
       end
     end
 
-    # returns the Xcodeproj::Workspace or nil if it is a project
+    # returns the FastlaneCore::Xcode::Workspace or nil if it is a project
     def workspace
       return nil unless workspace?
 
-      @workspace ||= Xcodeproj::Workspace.new_from_xcworkspace(path)
+      @workspace ||= FastlaneCore::Xcode::Workspace.open(path)
       @workspace
     end
 
     # returns the Xcodeproj::Project or nil if it is a workspace
+    #
+    # fastlane itself no longer needs this (see `pbxproj` for the read-only model it uses),
+    # it is kept for plugins and Fastfiles that reach into the Xcodeproj object model
     def project
       return nil if workspace?
+      require 'xcodeproj'
       @project ||= Xcodeproj::Project.open(path)
+    end
+
+    # returns the read-only FastlaneCore::Xcode::Project or nil if it is a workspace
+    def pbxproj
+      return nil if workspace?
+      @pbxproj ||= FastlaneCore::Xcode::Project.open(path)
     end
 
     # Get all available schemes in an array
@@ -131,7 +141,7 @@ module FastlaneCore
                        end.keys
                      end
                    else
-                     Xcodeproj::Project.schemes(path)
+                     FastlaneCore::Xcode::Project.schemes(path)
                    end
     end
 
@@ -195,7 +205,7 @@ module FastlaneCore
                                 # silently ignore nonexistent projects from
                                 # workspaces.
                                 begin
-                                  Xcodeproj::Project.open(p).build_configurations
+                                  FastlaneCore::Xcode::Project.open(p).build_configurations
                                 rescue
                                   []
                                 end
@@ -204,7 +214,7 @@ module FastlaneCore
                               .compact
                               .map(&:name)
                           else
-                            project.build_configurations.map(&:name)
+                            pbxproj.build_configurations.map(&:name)
                           end
     end
 
@@ -544,17 +554,10 @@ module FastlaneCore
       if self.workspace?
         # Find the xcodeproj file, as the information isn't included in the workspace file
         # We have a reference to the workspace, let's find the xcodeproj file
-        # Use Xcodeproj gem here to
-        # * parse the contents.xcworkspacedata XML file
-        # * handle different types (group:, container: etc.) of file references and their paths
-        # for details see https://github.com/CocoaPods/Xcodeproj/blob/e0287156d426ba588c9234bb2a4c824149889860/lib/xcodeproj/workspace/file_reference.rb```
-
-        workspace_dir_path = File.expand_path("..", self.path)
-        file_references_paths = workspace.file_references.map { |fr| fr.absolute_path(workspace_dir_path) }
-        @_project_paths = file_references_paths.select do |current_match|
-          # Xcode workspaces can contain loose files now, so let's filter non-xcodeproj files.
-          current_match.end_with?(".xcodeproj")
-        end.reject do |current_match|
+        # FastlaneCore::Xcode::Workspace parses the contents.xcworkspacedata XML file and
+        # handles the different types (group:, container: etc.) of file references and their paths.
+        # Xcode workspaces can contain loose files too, so `project_paths` only returns the .xcodeproj ones.
+        @_project_paths = workspace.project_paths.reject do |current_match|
           # We're not interested in a `Pods` project, as it doesn't contain any relevant information about code signing
           current_match.end_with?("Pods/Pods.xcodeproj")
         end
