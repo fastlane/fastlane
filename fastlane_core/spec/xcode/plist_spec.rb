@@ -28,7 +28,8 @@ describe FastlaneCore::Xcode::Plist do
 
   it "raises for a file with merge conflict markers" do
     path = File.join(dir, "Conflict.plist")
-    File.write(path, "<<<<<<< HEAD\n<plist/>\n=======\n<plist/>\n>>>>>>> branch\n")
+    # built from pieces so the repository's own lint check for leftover conflict markers doesn't trip on this spec
+    File.write(path, "#{'<' * 7} HEAD\n<plist/>\n#{'=' * 7}\n<plist/>\n#{'>' * 7} branch\n")
     expect { FastlaneCore::Xcode::Plist.read_from_path(path) }.to raise_error(FastlaneCore::Xcode::Error, /merge conflict/)
   end
 
