@@ -18,19 +18,26 @@ describe Fastlane::PluginGenerator do
     let(:summary) { plugin_info.summary }
     let(:details) { plugin_info.details }
 
+    # Paired with the after(:all) below. Not the block form of Dir.chdir,
+    # because rspec has no around(:all).
+    before(:all) do
+      tmp_dir = Dir.mktmpdir
+      oldwd = Dir.pwd
+      Dir.chdir(tmp_dir)
+    end
+
     before(:each) do
       stub_plugin_exists_on_rubygems(plugin_name, false)
 
+      # Generated once, but from a before(:each) rather than a before(:all),
+      # because this needs rspec-mocks and `let` helpers and both raise in a
+      # before(:context) hook.
       unless initialized
         test_ui = Fastlane::PluginGeneratorUI.new
         allow(test_ui).to receive(:message)
         allow(test_ui).to receive(:success)
         allow(test_ui).to receive(:input).and_raise(":input call was not mocked!")
         allow(test_ui).to receive(:confirm).and_raise(":confirm call was not mocked!")
-
-        tmp_dir = Dir.mktmpdir
-        oldwd = Dir.pwd
-        Dir.chdir(tmp_dir)
 
         generator = Fastlane::PluginGenerator.new(ui: test_ui, dest_root: tmp_dir)
 

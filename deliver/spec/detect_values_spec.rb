@@ -41,12 +41,13 @@ describe Deliver::DetectValues do
       describe 'running without fastlane' do
         before do
           allow(FastlaneCore::Helper).to receive(:fastlane_enabled?).and_return(false)
-          @old_cwd = Dir.pwd
-          Dir.chdir(tmpdir)
         end
 
-        after do
-          Dir.chdir(@old_cwd)
+        # A directory of its own, not the shared `tmpdir`: the outer `after`
+        # removes that one and runs inside this block, so we would be deleting
+        # the current directory, which Windows refuses.
+        around do |example|
+          Dir.mktmpdir { |dir| Dir.chdir(dir) { example.run } }
         end
 
         it 'sets up screenshots folder in current folder' do
