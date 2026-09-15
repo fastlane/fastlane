@@ -221,7 +221,7 @@ describe Spaceship::Portal::Merchant do
 
   describe Spaceship::Portal::Merchant::Domain do
     let(:domain) do
-      Spaceship::Portal::Merchant::Domain.new(domain_list.first).tap { |d| d.merchant = merchant }
+      Spaceship::Portal::Merchant::Domain.new(domain_list.first, merchant: merchant)
     end
 
     let(:mac_domain) do
@@ -230,7 +230,17 @@ describe Spaceship::Portal::Merchant do
         platform: "mac"
       }.to_json))
 
-      Spaceship::Portal::Merchant::Domain.new(domain_list.first).tap { |d| d.merchant = mac_merchant }
+      Spaceship::Portal::Merchant::Domain.new(domain_list.first, merchant: mac_merchant)
+    end
+
+    describe "#initialize" do
+      it "keeps a reference to the given merchant" do
+        expect(domain.merchant).to eq(merchant)
+      end
+
+      it "has no merchant when none was given" do
+        expect(Spaceship::Portal::Merchant::Domain.new(domain_list.first).merchant).to be_nil
+      end
     end
 
     describe ".all" do
