@@ -11294,7 +11294,7 @@ public func ssh(username: String,
    - syncImageUpload: Whether to use sha256 comparison to skip upload of images and screenshots that are already in Play Store
    - trackPromoteTo: The track to promote to. The default available tracks are: production, beta, alpha, internal
    - trackPromoteReleaseStatus: Promoted track release status (used when promoting a track) - valid values are completed, draft, halted, inProgress
-   - trackPromoteForce: Force promote a specific version code (version_name is required)
+   - trackPromoteForce: Force the promotion of a version code that is no longer returned for the source track (version_code and version_name are required)
    - validateOnly: Only validate changes with Google Play rather than actually publish
    - mapping: Path to the mapping file to upload (mapping.txt or native-debug-symbols.zip alike)
    - mappingPaths: An array of paths to mapping files to upload (mapping.txt or native-debug-symbols.zip alike)
@@ -13201,6 +13201,7 @@ public func uploadToAppStore(apiKeyPath: OptionalConfigValue<String?> = .fastlan
    - syncImageUpload: Whether to use sha256 comparison to skip upload of images and screenshots that are already in Play Store
    - trackPromoteTo: The track to promote to. The default available tracks are: production, beta, alpha, internal
    - trackPromoteReleaseStatus: Promoted track release status (used when promoting a track) - valid values are completed, draft, halted, inProgress
+   - trackPromoteForce: Force the promotion of a version code that is no longer returned for the source track (version_code and version_name are required)
    - validateOnly: Only validate changes with Google Play rather than actually publish
    - mapping: Path to the mapping file to upload (mapping.txt or native-debug-symbols.zip alike)
    - mappingPaths: An array of paths to mapping files to upload (mapping.txt or native-debug-symbols.zip alike)

@@ -176,9 +176,15 @@ This can be done using the `--track_promote_to` parameter. The `--track_promote_
 
 ### Force a Track Promotion
 
-The AndroidPublisherV3 API now returns only the latest version of each track instead of multiple versions as before. This created a difficulty when trying to promote older versions, as they were not being returned by the API. See [fastlane/fastlane#18497](https://github.com/fastlane/fastlane/issues/18497) for more info.
+The Play Developer API only returns the release that is currently serving each track. A version that has already been superseded by a newer one is missing from that response, so promoting it fails with `Track 'internal' doesn't have any releases`, even though the Play Console still offers it. See [fastlane/fastlane#18497](https://github.com/fastlane/fastlane/issues/18497) for more info.
 
-To work around this issue, a solution was implemented to force the submission of the version with `version_code = 1`, requiring the inclusion of the `--version_name` parameter and also the `--track_promote_force` parameter. This ensures that the older version is submitted correctly, even after the change in the API.
+The `--track_promote_force` parameter works around this by building the release out of the values you pass instead of looking it up in the source track. Both `--version_code` and `--version_name` are required with it:
+
+```no-highlight
+fastlane supply --track internal --track_promote_to production --track_promote_force --version_code 42 --version_name "1.2.3"
+```
+
+Because the release is no longer looked up, the version code is not checked against the source track - make sure it is a version that exists in the track you are promoting from.
 
 ## Retrieve Track Release Names & Version Codes
 

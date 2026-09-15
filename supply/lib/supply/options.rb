@@ -233,7 +233,7 @@ module Supply
         FastlaneCore::ConfigItem.new(key: :track_promote_force,
                                      env_name: "SUPPLY_TRACK_PROMOTE_FORCE",
                                      optional: true,
-                                     description: "Force promote a specific version code (:version_name is required)",
+                                     description: "Force the promotion of a version code that is no longer returned for the source track (:version_code and :version_name are required)",
                                      type: Boolean,
                                      default_value: false),
         FastlaneCore::ConfigItem.new(key: :validate_only,
