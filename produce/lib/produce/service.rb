@@ -420,10 +420,21 @@ module Produce
 
     def bundle_id
       return @bundle_id if @bundle_id
-      UI.message("Starting login with user '#{Produce.config[:username]}'")
-      Spaceship.login(Produce.config[:username], nil)
-      Spaceship.select_team
-      UI.message("Successfully logged in")
+
+      api_token = Spaceship::ConnectAPI::Token.from(hash: Produce.config[:api_key], filepath: Produce.config[:api_key_path])
+      if api_token
+        UI.message("Authenticating with App Store Connect API Key")
+
+        # `current_team_id:` avoids a live, session-based team_id lookup elsewhere in
+        # ConnectAPI's provisioning client, which has no session to use here.
+        Spaceship::ConnectAPI.client = Spaceship::ConnectAPI::Client.new(token: api_token, current_team_id: Produce.config[:team_id])
+      else
+        UI.message("Starting login with user '#{Produce.config[:username]}'")
+        Spaceship.login(Produce.config[:username], nil)
+        Spaceship.select_team
+        UI.message("Successfully logged in")
+      end
+
       @bundle_id ||= Spaceship::ConnectAPI::BundleId.find(Produce.config[:app_identifier].to_s)
     end
   end
