@@ -11,6 +11,7 @@ PATH
       base64 (~> 0.2)
       benchmark (>= 0.1.0)
       bundler (>= 2.4.0, < 5.0.0)
+      cgi (~> 0.4)
       colored (~> 1.2)
       commander (~> 4.6)
       csv (~> 3.3)
