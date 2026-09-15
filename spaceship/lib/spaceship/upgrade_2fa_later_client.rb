@@ -14,10 +14,9 @@ module Spaceship
 
       # Get URL that requests a repair and gets the widget key
       widget_key_location = response.headers['location']
-      uri    = URI.parse(widget_key_location)
-      params = CGI.parse(uri.query)
+      uri = URI.parse(widget_key_location)
 
-      widget_key = params.dig('widgetKey', 0)
+      widget_key = URI.decode_www_form(uri.query.to_s).assoc('widgetKey')&.last
       if widget_key.nil?
         STDERR.puts("Couldn't find widgetKey to continue with requests")
         return false

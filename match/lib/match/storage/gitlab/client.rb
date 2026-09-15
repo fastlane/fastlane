@@ -18,7 +18,7 @@ module Match
         end
 
         def base_url
-          return "#{@api_v4_url}/projects/#{CGI.escape(@project_id)}/secure_files"
+          return "#{@api_v4_url}/projects/#{URI.encode_www_form_component(@project_id)}/secure_files"
         end
 
         def authentication_key

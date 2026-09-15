@@ -817,8 +817,8 @@ module Spaceship
       query = URI.parse(location).query
       return nil if query.nil?
 
-      key = CGI.parse(query)["widgetKey"].first.to_s
-      return nil if key.empty?
+      key = URI.decode_www_form(query).assoc("widgetKey")&.last
+      return nil if key.nil? || key.empty?
 
       logger.debug("Read the App Store Connect API key from the sign out redirect")
       key

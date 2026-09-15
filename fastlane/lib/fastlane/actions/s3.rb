@@ -2,7 +2,6 @@ require 'fastlane/erb_template_helper'
 require 'fastlane/helper/s3_client_helper'
 require 'ostruct'
 require 'uri'
-require 'cgi'
 
 module Fastlane
   module Actions

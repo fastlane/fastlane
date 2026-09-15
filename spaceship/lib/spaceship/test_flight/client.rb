@@ -221,7 +221,7 @@ module Spaceship
 
       def search_for_tester_in_app(app_id: nil, text: nil)
         assert_required_params(__method__, binding)
-        text = CGI.escape(text)
+        text = URI.encode_www_form_component(text)
         url = "providers/#{team_id}/apps/#{app_id}/testers?order=asc&search=#{text}&sort=status"
         response = request(:get, url)
         handle_response(response)
