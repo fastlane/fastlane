@@ -157,4 +157,34 @@ describe Spaceship::ConnectAPI::App do
       expect(review_submission.state).to eq(Spaceship::ConnectAPI::ReviewSubmission::ReviewSubmissionState::READY_FOR_REVIEW)
     end
   end
+
+  describe("#get_app_availabilities") do
+    it('gets app availabilities when app is ready for distribution') do
+      ConnectAPIStubbing::Tunes.stub_get_app_availabilities_ready_for_distribution
+      app = Spaceship::ConnectAPI::App.new("123456789", [])
+
+      availabilities = app.get_app_availabilities
+
+      expect(availabilities.availableInNewTerritories).to be(false)
+      expect(availabilities.territory_availabilities.count).to eq(2)
+      expect(availabilities.territory_availabilities[0].available).to be(true)
+      expect(availabilities.territory_availabilities[1].available).to be(true)
+      expect(availabilities.territory_availabilities[0].contentStatuses).to eq(["AVAILABLE"])
+      expect(availabilities.territory_availabilities[1].contentStatuses).to eq(["AVAILABLE"])
+    end
+
+    it('gets app availabilities when app is removed from sale') do
+      ConnectAPIStubbing::Tunes.stub_get_app_availabilities_removed_from_sale
+      app = Spaceship::ConnectAPI::App.new("123456789", [])
+
+      availabilities = app.get_app_availabilities
+
+      expect(availabilities.availableInNewTerritories).to be(false)
+      expect(availabilities.territory_availabilities.count).to eq(2)
+      expect(availabilities.territory_availabilities[0].available).to be(false)
+      expect(availabilities.territory_availabilities[1].available).to be(false)
+      expect(availabilities.territory_availabilities[0].contentStatuses).to eq(["CANNOT_SELL"])
+      expect(availabilities.territory_availabilities[1].contentStatuses).to eq(["CANNOT_SELL"])
+    end
+  end
 end

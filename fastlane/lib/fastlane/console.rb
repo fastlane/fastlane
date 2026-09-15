@@ -6,12 +6,12 @@ module Fastlane
     def self.execute(args, options)
       ARGV.clear
       IRB.setup(nil)
-      @irb = IRB::Irb.new(nil)
+      workspace = IRB::WorkSpace.new(binding)
+      @irb = IRB::Irb.new(workspace)
       IRB.conf[:MAIN_CONTEXT] = @irb.context
       IRB.conf[:PROMPT][:FASTLANE] = IRB.conf[:PROMPT][:SIMPLE].dup
       IRB.conf[:PROMPT][:FASTLANE][:RETURN] = "%s\n"
       @irb.context.prompt_mode = :FASTLANE
-      @irb.context.workspace = IRB::WorkSpace.new(binding)
       trap('INT') do
         @irb.signal_handle
       end

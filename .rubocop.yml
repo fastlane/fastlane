@@ -3,12 +3,13 @@ inherit_from: .rubocop_todo.yml
 require:
   - rubocop/require_tools
   - rubocop-performance
-  - ./rubocop/fork_usage.rb
-  - ./rubocop/missing_keys_on_shared_area.rb
-  - ./rubocop/is_string_usage.rb
+  - ./internal/rubocop/fork_usage.rb
+  - ./internal/rubocop/missing_keys_on_shared_area.rb
+  - ./internal/rubocop/is_string_usage.rb
 
 AllCops:
-  TargetRubyVersion: 2.6
+  TargetRubyVersion: 3.1
+  SuggestExtensions: false
   NewCops: enable
   Include:
     - '**/*.rb'
@@ -26,6 +27,14 @@ AllCops:
 
 Lint/ErbNewArguments:
   Enabled: false
+
+# Ruby 3.1's hash value shorthand (`{ foo: }`) is allowed, but not enforced
+Style/HashSyntax:
+  EnforcedShorthandSyntax: either
+
+# Keep explicit block arguments (`&block`) instead of Ruby 3.1's anonymous `&`
+Naming/BlockForwarding:
+  EnforcedStyle: explicit
 
 Style/SlicingWithRange:
   Enabled: false

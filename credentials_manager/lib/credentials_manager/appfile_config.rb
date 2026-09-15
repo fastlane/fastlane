@@ -123,6 +123,10 @@ module CredentialsManager
       setter(:itc_provider, *args, &block)
     end
 
+    def provider_public_id(*args, &block)
+      setter(:provider_public_id, *args, &block)
+    end
+
     # Android
     def json_key_file(*args, &block)
       setter(:json_key_file, *args, &block)

@@ -111,12 +111,12 @@ describe Deliver::AppScreenshotIterator do
                               get_app_screenshot_sets: [],
                               locale: 'en-US')
 
-        screenshot = double('Deliver::AppScreenshot', device_type: Spaceship::ConnectAPI::AppScreenshotSet::DisplayType::APP_IPHONE_55)
+        screenshot = double('Deliver::AppScreenshot', display_type: Spaceship::ConnectAPI::AppScreenshotSet::DisplayType::APP_IPHONE_55)
 
         screenshots_per_language = { 'en-US' => [screenshot] }
 
         expect(localization).to receive(:create_app_screenshot_set)
-          .with(attributes: { screenshotDisplayType: screenshot.device_type })
+          .with(attributes: { screenshotDisplayType: screenshot.display_type })
           .and_return(app_screenshot_set)
         actual = described_class.new([localization]).each_local_screenshot(screenshots_per_language).to_a
         expect(actual).to eq([[localization, app_screenshot_set, screenshot, 0]])
@@ -139,10 +139,10 @@ describe Deliver::AppScreenshotIterator do
                                get_app_screenshot_sets: [app_screenshot_set2],
                                locale: 'fr-FR')
 
-        screenshot1 = double('Deliver::AppScreenshot', device_type: Spaceship::ConnectAPI::AppScreenshotSet::DisplayType::APP_IPHONE_55)
-        screenshot2 = double('Deliver::AppScreenshot', device_type: Spaceship::ConnectAPI::AppScreenshotSet::DisplayType::APP_IPHONE_55)
-        screenshot3 = double('Deliver::AppScreenshot', device_type: Spaceship::ConnectAPI::AppScreenshotSet::DisplayType::APP_IPHONE_55)
-        screenshot4 = double('Deliver::AppScreenshot', device_type: Spaceship::ConnectAPI::AppScreenshotSet::DisplayType::APP_IPHONE_55)
+        screenshot1 = double('Deliver::AppScreenshot', display_type: Spaceship::ConnectAPI::AppScreenshotSet::DisplayType::APP_IPHONE_55)
+        screenshot2 = double('Deliver::AppScreenshot', display_type: Spaceship::ConnectAPI::AppScreenshotSet::DisplayType::APP_IPHONE_55)
+        screenshot3 = double('Deliver::AppScreenshot', display_type: Spaceship::ConnectAPI::AppScreenshotSet::DisplayType::APP_IPHONE_55)
+        screenshot4 = double('Deliver::AppScreenshot', display_type: Spaceship::ConnectAPI::AppScreenshotSet::DisplayType::APP_IPHONE_55)
 
         screenshots_per_language = { 'en-US' => [screenshot1, screenshot2], 'fr-FR' => [screenshot3, screenshot4] }
 

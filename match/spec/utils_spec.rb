@@ -16,7 +16,8 @@ describe Match do
 
     describe 'import' do
       it 'finds a normal keychain name relative to ~/Library/Keychains' do
-        expected_command = "security import item.path -k '#{Dir.home}/Library/Keychains/login.keychain' -P #{''.shellescape} -T /usr/bin/codesign -T /usr/bin/security -T /usr/bin/productbuild -T /usr/bin/productsign 1> /dev/null"
+        keychain_path = "#{Dir.home}/Library/Keychains/login.keychain"
+        expected_command = "security import item.path -k #{keychain_path.shellescape} -P #{''.shellescape} -T /usr/bin/codesign -T /usr/bin/security -T /usr/bin/productbuild -T /usr/bin/productsign 1> /dev/null"
 
         # this command is also sent on macOS Sierra and we need to allow it or else the test will fail
         expected_partition_command = "security set-key-partition-list -S apple-tool:,apple:,codesign: -s -k #{''.shellescape} #{Dir.home}/Library/Keychains/login.keychain 1> /dev/null"
@@ -36,7 +37,7 @@ describe Match do
       it 'treats a keychain name it cannot find in ~/Library/Keychains as the full keychain path' do
         tmp_path = Dir.mktmpdir
         keychain = "#{tmp_path}/my/special.keychain"
-        expected_command = "security import item.path -k '#{keychain}' -P #{''.shellescape} -T /usr/bin/codesign -T /usr/bin/security -T /usr/bin/productbuild -T /usr/bin/productsign 1> /dev/null"
+        expected_command = "security import item.path -k #{keychain.shellescape} -P #{''.shellescape} -T /usr/bin/codesign -T /usr/bin/security -T /usr/bin/productbuild -T /usr/bin/productsign 1> /dev/null"
 
         # this command is also sent on macOS Sierra and we need to allow it or else the test will fail
         expected_partition_command = "security set-key-partition-list -S apple-tool:,apple:,codesign: -s -k #{''.shellescape} #{keychain} 1> /dev/null"
@@ -62,7 +63,8 @@ describe Match do
       end
 
       it "tries to find the macOS Sierra keychain too" do
-        expected_command = "security import item.path -k '#{Dir.home}/Library/Keychains/login.keychain-db' -P #{''.shellescape} -T /usr/bin/codesign -T /usr/bin/security -T /usr/bin/productbuild -T /usr/bin/productsign 1> /dev/null"
+        keychain_path = "#{Dir.home}/Library/Keychains/login.keychain-db"
+        expected_command = "security import item.path -k #{keychain_path.shellescape} -P #{''.shellescape} -T /usr/bin/codesign -T /usr/bin/security -T /usr/bin/productbuild -T /usr/bin/productsign 1> /dev/null"
 
         # this command is also sent on macOS Sierra and we need to allow it or else the test will fail
         expected_partition_command = "security set-key-partition-list -S apple-tool:,apple:,codesign: -s -k #{''.shellescape} #{Dir.home}/Library/Keychains/login.keychain-db 1> /dev/null"
@@ -81,7 +83,8 @@ describe Match do
 
       describe "keychain_password" do
         it 'prompts for keychain password when none given and not in keychain' do
-          expected_command = "security import item.path -k '#{Dir.home}/Library/Keychains/login.keychain' -P #{''.shellescape} -T /usr/bin/codesign -T /usr/bin/security -T /usr/bin/productbuild -T /usr/bin/productsign 1> /dev/null"
+          keychain_path = "#{Dir.home}/Library/Keychains/login.keychain"
+          expected_command = "security import item.path -k #{keychain_path.shellescape} -P #{''.shellescape} -T /usr/bin/codesign -T /usr/bin/security -T /usr/bin/productbuild -T /usr/bin/productsign 1> /dev/null"
 
           # this command is also sent on macOS Sierra and we need to allow it or else the test will fail
           expected_partition_command = "security set-key-partition-list -S apple-tool:,apple:,codesign: -s -k #{'user_entered'.shellescape} #{Dir.home}/Library/Keychains/login.keychain 1> /dev/null"
@@ -105,7 +108,8 @@ describe Match do
         end
 
         it 'find keychain password in keychain when none given' do
-          expected_command = "security import item.path -k '#{Dir.home}/Library/Keychains/login.keychain' -P #{''.shellescape} -T /usr/bin/codesign -T /usr/bin/security -T /usr/bin/productbuild -T /usr/bin/productsign 1> /dev/null"
+          keychain_path = "#{Dir.home}/Library/Keychains/login.keychain"
+          expected_command = "security import item.path -k #{keychain_path.shellescape} -P #{''.shellescape} -T /usr/bin/codesign -T /usr/bin/security -T /usr/bin/productbuild -T /usr/bin/productsign 1> /dev/null"
 
           # this command is also sent on macOS Sierra and we need to allow it or else the test will fail
           expected_partition_command = "security set-key-partition-list -S apple-tool:,apple:,codesign: -s -k #{'from_keychain'.shellescape} #{Dir.home}/Library/Keychains/login.keychain 1> /dev/null"

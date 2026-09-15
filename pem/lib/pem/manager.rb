@@ -20,7 +20,7 @@ module PEM
           remaining_days = (existing_certificate.expires - Time.now) / 60 / 60 / 24
 
           display_platform = ''
-          unless PEM.config[:website_push]
+          unless PEM.config[:website_push] || PEM.config[:voip_push]
             display_platform = "#{PEM.config[:platform]} "
           end
 
@@ -94,6 +94,8 @@ module PEM
       def certificate
         if PEM.config[:website_push]
           Spaceship.certificate.website_push
+        elsif PEM.config[:voip_push]
+          Spaceship.certificate.voip_push
         else
           platform = PEM.config[:platform]
           UI.user_error!('platform parameter is unspecified.') unless platform
@@ -123,6 +125,8 @@ module PEM
           'development'
         elsif PEM.config[:website_push]
           'website'
+        elsif PEM.config[:voip_push]
+          'voip'
         else
           'production'
         end

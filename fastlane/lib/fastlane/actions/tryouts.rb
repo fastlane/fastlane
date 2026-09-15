@@ -24,14 +24,15 @@ module Fastlane
 
       def self.upload_build(params)
         require 'faraday'
-        require 'faraday_middleware'
+        require 'faraday/multipart'
+        require 'faraday/follow_redirects'
 
         url = TRYOUTS_API_BUILD_RELEASE_TEMPLATE % params[:app_id]
         connection = Faraday.new(url) do |builder|
           builder.request(:multipart)
           builder.request(:url_encoded)
           builder.response(:json, content_type: /\bjson$/)
-          builder.use(FaradayMiddleware::FollowRedirects)
+          builder.response(:follow_redirects)
           builder.adapter(:net_http)
         end
 

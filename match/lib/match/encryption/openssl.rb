@@ -14,18 +14,23 @@ module Match
 
       attr_accessor :working_directory
 
+      attr_accessor :force_legacy_encryption
+
       def self.configure(params)
         return self.new(
           keychain_name: params[:keychain_name],
-          working_directory: params[:working_directory]
+          working_directory: params[:working_directory],
+          force_legacy_encryption: params[:force_legacy_encryption]
         )
       end
 
       # @param keychain_name: The identifier used to store the passphrase in the Keychain
       # @param working_directory: The path to where the certificates are stored
-      def initialize(keychain_name: nil, working_directory: nil)
+      # @param force_legacy_encryption: Force use of legacy EncryptionV1 algorithm
+      def initialize(keychain_name: nil, working_directory: nil, force_legacy_encryption: false)
         self.keychain_name = keychain_name
         self.working_directory = working_directory
+        self.force_legacy_encryption = force_legacy_encryption
       end
 
       def encrypt_files(password: nil)
@@ -33,7 +38,7 @@ module Match
         password ||= fetch_password!
         iterate(self.working_directory) do |current|
           files << current
-          encrypt_specific_file(path: current, password: password)
+          encrypt_specific_file(path: current, password: password, version: force_legacy_encryption ? 1 : 2)
           UI.success("🔒  Encrypted '#{File.basename(current)}'") if FastlaneCore::Globals.verbose?
         end
         UI.success("🔒  Successfully encrypted certificates repo")
@@ -88,8 +93,12 @@ module Match
       def fetch_password!
         password = ENV["MATCH_PASSWORD"]
         unless password
-          item = Security::InternetPassword.find(server: server_name(self.keychain_name))
-          password = item.password if item
+          begin
+            item = Security::InternetPassword.find(server: server_name(self.keychain_name))
+            password = item.password if item
+          rescue Security::Error => ex
+            UI.important("Could not read the local keychain: #{ex.message}")
+          end
         end
 
         unless password
@@ -109,10 +118,10 @@ module Match
         return password
       end
 
-      def encrypt_specific_file(path: nil, password: nil)
+      def encrypt_specific_file(path: nil, password: nil, version: nil)
         UI.user_error!("No password supplied") if password.to_s.strip.length == 0
         e = MatchFileEncryption.new
-        e.encrypt(file_path: path, password: password)
+        e.encrypt(file_path: path, password: password, version: version)
       rescue FastlaneCore::Interface::FastlaneError
         raise
       rescue => error

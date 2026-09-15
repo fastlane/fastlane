@@ -1,3 +1,5 @@
+require 'shellwords'
+
 describe FastlaneCore do
   describe FastlaneCore::Project do
     describe 'project and workspace detection' do
@@ -396,45 +398,57 @@ describe FastlaneCore do
       end
     end
 
+    # Scoped rather than assigned. These examples used to set the variable
+    # directly, with a before hook resetting it only for examples inside this
+    # group, so the last value assigned leaked out and changed what later
+    # examples saw. See fastlane#30184.
     describe 'Project.xcode_build_settings_timeout' do
-      before do
-        ENV['FASTLANE_XCODEBUILD_SETTINGS_TIMEOUT'] = nil
-      end
       it "returns default value" do
-        expect(FastlaneCore::Project.xcode_build_settings_timeout).to eq(3)
+        FastlaneSpec::Env.with_env_values('FASTLANE_XCODEBUILD_SETTINGS_TIMEOUT' => nil) do
+          expect(FastlaneCore::Project.xcode_build_settings_timeout).to eq(3)
+        end
       end
       it "returns specified value" do
-        ENV['FASTLANE_XCODEBUILD_SETTINGS_TIMEOUT'] = '5'
-        expect(FastlaneCore::Project.xcode_build_settings_timeout).to eq(5)
+        FastlaneSpec::Env.with_env_values('FASTLANE_XCODEBUILD_SETTINGS_TIMEOUT' => '5') do
+          expect(FastlaneCore::Project.xcode_build_settings_timeout).to eq(5)
+        end
       end
       it "returns 0 if empty" do
-        ENV['FASTLANE_XCODEBUILD_SETTINGS_TIMEOUT'] = ''
-        expect(FastlaneCore::Project.xcode_build_settings_timeout).to eq(0)
+        FastlaneSpec::Env.with_env_values('FASTLANE_XCODEBUILD_SETTINGS_TIMEOUT' => '') do
+          expect(FastlaneCore::Project.xcode_build_settings_timeout).to eq(0)
+        end
       end
       it "returns 0 if garbage" do
-        ENV['FASTLANE_XCODEBUILD_SETTINGS_TIMEOUT'] = 'hiho'
-        expect(FastlaneCore::Project.xcode_build_settings_timeout).to eq(0)
+        FastlaneSpec::Env.with_env_values('FASTLANE_XCODEBUILD_SETTINGS_TIMEOUT' => 'hiho') do
+          expect(FastlaneCore::Project.xcode_build_settings_timeout).to eq(0)
+        end
       end
     end
 
+    # Scoped rather than assigned. These examples used to set the variable
+    # directly, with a before hook resetting it only for examples inside this
+    # group, so the last value assigned leaked out and changed what later
+    # examples saw. See fastlane#30184.
     describe 'Project.xcode_build_settings_retries' do
-      before do
-        ENV['FASTLANE_XCODEBUILD_SETTINGS_RETRIES'] = nil
-      end
       it "returns default value" do
-        expect(FastlaneCore::Project.xcode_build_settings_retries).to eq(3)
+        FastlaneSpec::Env.with_env_values('FASTLANE_XCODEBUILD_SETTINGS_RETRIES' => nil) do
+          expect(FastlaneCore::Project.xcode_build_settings_retries).to eq(3)
+        end
       end
       it "returns specified value" do
-        ENV['FASTLANE_XCODEBUILD_SETTINGS_RETRIES'] = '5'
-        expect(FastlaneCore::Project.xcode_build_settings_retries).to eq(5)
+        FastlaneSpec::Env.with_env_values('FASTLANE_XCODEBUILD_SETTINGS_RETRIES' => '5') do
+          expect(FastlaneCore::Project.xcode_build_settings_retries).to eq(5)
+        end
       end
       it "returns 0 if empty" do
-        ENV['FASTLANE_XCODEBUILD_SETTINGS_RETRIES'] = ''
-        expect(FastlaneCore::Project.xcode_build_settings_retries).to eq(0)
+        FastlaneSpec::Env.with_env_values('FASTLANE_XCODEBUILD_SETTINGS_RETRIES' => '') do
+          expect(FastlaneCore::Project.xcode_build_settings_retries).to eq(0)
+        end
       end
       it "returns 0 if garbage" do
-        ENV['FASTLANE_XCODEBUILD_SETTINGS_RETRIES'] = 'hiho'
-        expect(FastlaneCore::Project.xcode_build_settings_retries).to eq(0)
+        FastlaneSpec::Env.with_env_values('FASTLANE_XCODEBUILD_SETTINGS_RETRIES' => 'hiho') do
+          expect(FastlaneCore::Project.xcode_build_settings_retries).to eq(0)
+        end
       end
     end
 
@@ -508,6 +522,29 @@ describe FastlaneCore do
       end
     end
 
+    describe "xcodebuild skip_package_repository_fetches" do
+      it 'generates xcodebuild -showBuildSettings command with disabled package fetches' do
+        allow(FastlaneCore::Helper).to receive(:xcode_at_least?).and_return(true)
+        project = FastlaneCore::Project.new({
+          project: "./fastlane_core/spec/fixtures/projects/Example.xcodeproj",
+          skip_package_repository_fetches: true
+        })
+        command = "xcodebuild -showBuildSettings -project ./fastlane_core/spec/fixtures/projects/Example.xcodeproj -skipPackageUpdates 2>&1"
+        expect(project.build_xcodebuild_showbuildsettings_command).to eq(command)
+      end
+    end
+
+    describe "xcodebuild package_authorization_provider" do
+      it 'generates an xcodebuild -showBuildSettings command that includes package_authorization_provider if provided in options', requires_xcode: true do
+        project = FastlaneCore::Project.new({
+          project: "./fastlane_core/spec/fixtures/projects/Example.xcodeproj",
+          package_authorization_provider: "keychain"
+        })
+        command = "xcodebuild -showBuildSettings -project ./fastlane_core/spec/fixtures/projects/Example.xcodeproj -packageAuthorizationProvider keychain 2>&1"
+        expect(project.build_xcodebuild_showbuildsettings_command).to eq(command)
+      end
+    end
+
     describe 'xcodebuild_xcconfig option', requires_xcode: true do
       it 'generates an xcodebuild -showBuildSettings command without xcconfig by default' do
         project = FastlaneCore::Project.new({ project: "./fastlane_core/spec/fixtures/projects/Example.xcodeproj" })
@@ -561,13 +598,14 @@ describe FastlaneCore do
         expect(project.build_xcodebuild_resolvepackagedependencies_command).to eq(command)
       end
 
-      it 'generates an xcodebuild -resolvePackageDependencies command with a custom resolving path with Xcode >= 11' do
+      it 'generates an xcodebuild -resolvePackageDependencies command with custom resolving paths with Xcode >= 11' do
         allow(FastlaneCore::Helper).to receive(:xcode_at_least?).and_return(true)
         project = FastlaneCore::Project.new({
           project: "./fastlane_core/spec/fixtures/projects/Example.xcodeproj",
-          cloned_source_packages_path: "./path/to/resolve"
+          cloned_source_packages_path: "./path/to/cloned_source_packages",
+          package_cache_path: "./path/to/package_cache"
         })
-        command = "xcodebuild -resolvePackageDependencies -project ./fastlane_core/spec/fixtures/projects/Example.xcodeproj -clonedSourcePackagesDirPath ./path/to/resolve"
+        command = "xcodebuild -resolvePackageDependencies -project ./fastlane_core/spec/fixtures/projects/Example.xcodeproj -clonedSourcePackagesDirPath ./path/to/cloned_source_packages -packageCachePath ./path/to/package_cache"
         expect(project.build_xcodebuild_resolvepackagedependencies_command).to eq(command)
       end
 
@@ -607,6 +645,79 @@ describe FastlaneCore do
       end
     end
 
+    describe 'build_settings() with disallow_xcodebuild_settings_lookup' do
+      it 'raises a helpful error naming the required build setting instead of running xcodebuild -showBuildSettings' do
+        project = FastlaneCore::Project.new({
+          project: "./fastlane_core/spec/fixtures/projects/Example.xcodeproj",
+          disallow_xcodebuild_settings_lookup: true
+        })
+
+        expect(FastlaneCore::CommandExecutor).to_not(receive(:execute))
+        expect(FastlaneCore::Project).to_not(receive(:run_command))
+
+        expect do
+          project.build_settings(key: "PRODUCT_BUNDLE_IDENTIFIER")
+        end.to raise_error(FastlaneCore::Interface::FastlaneError) do |error|
+          expect(error.message).to include("PRODUCT_BUNDLE_IDENTIFIER")
+          expect(error.message).to include("xcodebuild -showBuildSettings")
+          expect(error.message).to include("disallow_xcodebuild_settings_lookup")
+          expect(error.message).to include("project_spec.rb") # the caller that triggered the lookup
+        end
+      end
+
+      context 'when the FASTLANE_DISALLOW_XCODEBUILD_SETTINGS_LOOKUP environment variable is set' do
+        before { ENV['FASTLANE_DISALLOW_XCODEBUILD_SETTINGS_LOOKUP'] = 'true' }
+        after { ENV.delete('FASTLANE_DISALLOW_XCODEBUILD_SETTINGS_LOOKUP') }
+
+        it 'raises an error naming the environment variable even when the option is not set' do
+          project = FastlaneCore::Project.new({
+            project: "./fastlane_core/spec/fixtures/projects/Example.xcodeproj"
+          })
+
+          expect(FastlaneCore::CommandExecutor).to_not(receive(:execute))
+          expect(FastlaneCore::Project).to_not(receive(:run_command))
+
+          expect do
+            project.build_settings(key: "PRODUCT_BUNDLE_IDENTIFIER")
+          end.to raise_error(FastlaneCore::Interface::FastlaneError) do |error|
+            expect(error.message).to include("PRODUCT_BUNDLE_IDENTIFIER")
+            expect(error.message).to include("FASTLANE_DISALLOW_XCODEBUILD_SETTINGS_LOOKUP environment variable")
+          end
+        end
+      end
+
+      it 'fetches build settings when the option is false' do
+        allow(FastlaneCore::Helper).to receive(:xcode_at_least?).and_return(true)
+        project = FastlaneCore::Project.new({
+          project: "./fastlane_core/spec/fixtures/projects/Example.xcodeproj",
+          disallow_xcodebuild_settings_lookup: false
+        })
+
+        expect(FastlaneCore::CommandExecutor).to receive(:execute) # SwiftPM dependencies resolution
+        expect(FastlaneCore::Project).to receive(:run_command).and_return("PRODUCT_BUNDLE_IDENTIFIER = tools.fastlane.app\n")
+
+        expect(project.build_settings(key: "PRODUCT_BUNDLE_IDENTIFIER")).to eq("tools.fastlane.app")
+      end
+
+      it 'fetches build settings when the given options do not support disallow_xcodebuild_settings_lookup' do
+        allow(FastlaneCore::Helper).to receive(:xcode_at_least?).and_return(true)
+        config = FastlaneCore::Configuration.create(
+          [
+            FastlaneCore::ConfigItem.new(key: :workspace, optional: true),
+            FastlaneCore::ConfigItem.new(key: :project, optional: true)
+          ], {
+            project: './fastlane_core/spec/fixtures/projects/Example.xcodeproj'
+          }
+        )
+        project = FastlaneCore::Project.new(config)
+
+        expect(FastlaneCore::CommandExecutor).to receive(:execute) # SwiftPM dependencies resolution
+        expect(FastlaneCore::Project).to receive(:run_command).and_return("PRODUCT_BUNDLE_IDENTIFIER = tools.fastlane.app\n")
+
+        expect(project.build_settings(key: "PRODUCT_BUNDLE_IDENTIFIER")).to eq("tools.fastlane.app")
+      end
+    end
+
     describe "xcodebuild destination parameter" do
       context "when xcode version is at_least 13" do
         before(:each) do
@@ -631,6 +742,28 @@ describe FastlaneCore do
               destination: "FakeDestination"
               })
             command = "xcodebuild -resolvePackageDependencies -project ./fastlane_core/spec/fixtures/projects/Example.xcodeproj -destination FakeDestination"
+            expect(project.build_xcodebuild_resolvepackagedependencies_command).to eq(command)
+          end
+        end
+
+        context "when destination parameter is provided as an array" do
+          it 'generates an xcodebuild -showBuildSettings command that uses the first destination', requires_xcode: true do
+            project = FastlaneCore::Project.new({
+              project: "./fastlane_core/spec/fixtures/projects/Example.xcodeproj",
+              destination: ["platform=iOS Simulator,id=ABC123", "platform=iOS Simulator,id=DEF456"]
+            })
+            destination = "platform=iOS Simulator,id=ABC123".shellescape
+            command = "xcodebuild -showBuildSettings -project ./fastlane_core/spec/fixtures/projects/Example.xcodeproj -destination #{destination} 2>&1"
+            expect(project.build_xcodebuild_showbuildsettings_command).to eq(command)
+          end
+
+          it 'generates an xcodebuild -resolvePackageDependencies command that uses the first destination' do
+            project = FastlaneCore::Project.new({
+              project: "./fastlane_core/spec/fixtures/projects/Example.xcodeproj",
+              destination: ["platform=iOS Simulator,id=ABC123", "platform=iOS Simulator,id=DEF456"]
+              })
+            destination = "platform=iOS Simulator,id=ABC123".shellescape
+            command = "xcodebuild -resolvePackageDependencies -project ./fastlane_core/spec/fixtures/projects/Example.xcodeproj -destination #{destination}"
             expect(project.build_xcodebuild_resolvepackagedependencies_command).to eq(command)
           end
         end

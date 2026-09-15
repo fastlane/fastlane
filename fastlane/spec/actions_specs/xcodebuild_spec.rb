@@ -1,9 +1,10 @@
 describe Fastlane do
   describe Fastlane::FastFile do
-    build_log_path = File.expand_path("#{FastlaneCore::Helper.buildlog_path}/fastlane/xcbuild/#{Time.now.strftime('%F')}/#{Process.pid}/xcodebuild.log")
+    let(:build_log_path) { File.expand_path("#{FastlaneCore::Helper.buildlog_path}/fastlane/xcbuild/#{Time.now.strftime('%F')}/#{Process.pid}/xcodebuild.log") }
 
     describe "Xcodebuild Integration" do
       before :each do
+        allow(Time).to receive(:now).and_return(Time.at(1_420_063_200))
         Fastlane::Actions.lane_context.delete(:IPA_OUTPUT_PATH)
         Fastlane::Actions.lane_context.delete(:XCODEBUILD_ARCHIVE)
       end
@@ -678,34 +679,32 @@ describe Fastlane do
       end
 
       it "should save reports to BUILD_PATH + \"/report\" by default" do
-        ENV["XCODE_BUILD_PATH"] = "./build"
+        FastlaneSpec::Env.with_env_values('XCODE_BUILD_PATH' => "./build") do
+          result = Fastlane::FastFile.new.parse("lane :test do
+            xctest(
+              destination: 'name=iPhone 5s,OS=8.1',
+              scheme: 'MyApp',
+              workspace: 'MyApp.xcworkspace',
+              report_formats: ['html'],
+              report_screenshots: true
+            )
+          end").runner.execute(:test)
 
-        result = Fastlane::FastFile.new.parse("lane :test do
-          xctest(
-            destination: 'name=iPhone 5s,OS=8.1',
-            scheme: 'MyApp',
-            workspace: 'MyApp.xcworkspace',
-            report_formats: ['html'],
-            report_screenshots: true
+          expect(result).to eq(
+            "set -o pipefail && " \
+            + "xcodebuild " \
+            + "-destination \"name=iPhone 5s,OS=8.1\" " \
+            + "-scheme \"MyApp\" " \
+            + "-workspace \"MyApp.xcworkspace\" " \
+            + "build " \
+            + "test " \
+            + "| tee '#{build_log_path}' | xcpretty --color " \
+            + "--report html " \
+            + "--screenshots " \
+            + "--output \"./build/report\" " \
+            + "--test"
           )
-        end").runner.execute(:test)
-
-        expect(result).to eq(
-          "set -o pipefail && " \
-          + "xcodebuild " \
-          + "-destination \"name=iPhone 5s,OS=8.1\" " \
-          + "-scheme \"MyApp\" " \
-          + "-workspace \"MyApp.xcworkspace\" " \
-          + "build " \
-          + "test " \
-          + "| tee '#{build_log_path}' | xcpretty --color " \
-          + "--report html " \
-          + "--screenshots " \
-          + "--output \"./build/report\" " \
-          + "--test"
-        )
-
-        ENV.delete("XCODE_BUILD_PATH")
+        end
       end
 
       it "should support multiple output formats" do
@@ -771,37 +770,37 @@ describe Fastlane do
       end
 
       it "should support omitting output when specifying multiple reports " do
-        ENV["XCODE_BUILD_PATH"] = "./build"
+        FastlaneSpec::Env.with_env_values('XCODE_BUILD_PATH' => "./build") do
+          result = Fastlane::FastFile.new.parse("lane :test do
+            xctest(
+              destination: 'name=iPhone 5s,OS=8.1',
+              scheme: 'MyApp',
+              workspace: 'MyApp.xcworkspace',
+              reports: [{
+                report: 'html',
+              },
+              {
+                report: 'junit',
+              }],
+            )
+          end").runner.execute(:test)
 
-        result = Fastlane::FastFile.new.parse("lane :test do
-          xctest(
-            destination: 'name=iPhone 5s,OS=8.1',
-            scheme: 'MyApp',
-            workspace: 'MyApp.xcworkspace',
-            reports: [{
-              report: 'html',
-            },
-            {
-              report: 'junit',
-            }],
+          expect(result).to eq(
+            "set -o pipefail && " \
+            + "xcodebuild " \
+            + "-destination \"name=iPhone 5s,OS=8.1\" " \
+            + "-scheme \"MyApp\" " \
+            + "-workspace \"MyApp.xcworkspace\" " \
+            + "build " \
+            + "test " \
+            + "| tee '#{build_log_path}' | xcpretty --color " \
+            + "--report html " \
+            + "--output \"./build/report/report.html\" " \
+            + "--report junit " \
+            + "--output \"./build/report/report.xml\" " \
+            + "--test"
           )
-        end").runner.execute(:test)
-
-        expect(result).to eq(
-          "set -o pipefail && " \
-          + "xcodebuild " \
-          + "-destination \"name=iPhone 5s,OS=8.1\" " \
-          + "-scheme \"MyApp\" " \
-          + "-workspace \"MyApp.xcworkspace\" " \
-          + "build " \
-          + "test " \
-          + "| tee '#{build_log_path}' | xcpretty --color " \
-          + "--report html " \
-          + "--output \"./build/report/report.html\" " \
-          + "--report junit " \
-          + "--output \"./build/report/report.xml\" " \
-          + "--test"
-        )
+        end
       end
 
       it "should detect and use the workspace, when a workspace is present" do

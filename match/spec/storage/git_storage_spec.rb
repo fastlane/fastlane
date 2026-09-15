@@ -172,6 +172,29 @@ describe Match do
       end
     end
 
+    describe "#delete_files" do
+      it "uses literal pathspecs when removing files from git" do
+        storage = Match::Storage::GitStorage.new(
+          type: "development",
+          platform: "ios",
+          branch: git_branch
+        )
+
+        profile_with_wildcard = File.join(@path, "profiles", "development", "Development_com.example.WebDriverAgent.*.mobileprovision")
+        matched_profile = File.join(@path, "profiles", "development", "Development_com.example.WebDriverAgent.xctrunner.mobileprovision")
+
+        expected_commit_commands = [
+          "git --literal-pathspecs rm -- #{profile_with_wildcard.shellescape}",
+          "git --literal-pathspecs rm -- #{matched_profile.shellescape}",
+          "git commit -m " + '[fastlane] Updated development and platform ios'.shellescape,
+          "git push origin #{git_branch}"
+        ]
+        expect_command_execution(expected_commit_commands)
+
+        storage.delete_files(files_to_delete: [profile_with_wildcard, matched_profile])
+      end
+    end
+
     describe "#authentication" do
       describe "when using a private key file" do
         it "wraps the git command in ssh-agent shell" do
@@ -243,6 +266,26 @@ describe Match do
           expected_command = "ssh-agent bash -c 'ssh-add - <<< \"#{File.expand_path(private_key).shellescape}\"; #{given_command}'"
           expect(storage.command_from_private_key(given_command)).to eq(expected_command)
         end
+      end
+    end
+
+    describe "#git_env_values" do
+      it "sets a default GIT_SSH_COMMAND with BatchMode=yes when GIT_SSH_COMMAND is unset" do
+        allow(ENV).to receive(:[]).with('GIT_SSH_COMMAND').and_return(nil)
+        storage = Match::Storage::GitStorage.new
+        expect(storage.send(:git_env_values)).to eq({ 'GIT_TERMINAL_PROMPT' => '0', 'GIT_SSH_COMMAND' => 'ssh -o BatchMode=yes' })
+      end
+
+      it "appends BatchMode=yes when GIT_SSH_COMMAND exists" do
+        allow(ENV).to receive(:[]).with('GIT_SSH_COMMAND').and_return('ssh -v')
+        storage = Match::Storage::GitStorage.new
+        expect(storage.send(:git_env_values)['GIT_SSH_COMMAND']).to eq('ssh -v -o BatchMode=yes')
+      end
+
+      it "does not duplicate if BatchMode already exists" do
+        allow(ENV).to receive(:[]).with('GIT_SSH_COMMAND').and_return('ssh -o BatchMode=yes')
+        storage = Match::Storage::GitStorage.new
+        expect(storage.send(:git_env_values)['GIT_SSH_COMMAND']).to eq('ssh -o BatchMode=yes')
       end
     end
   end

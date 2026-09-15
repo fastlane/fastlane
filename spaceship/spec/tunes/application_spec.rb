@@ -1,5 +1,5 @@
 describe Spaceship::Application do
-  before { Spaceship::Tunes.login }
+  include_examples "common spaceship login"
   let(:client) { Spaceship::Application.client }
   let(:app) { Spaceship::Application.all.find { |a| a.apple_id == "898536088" } }
 

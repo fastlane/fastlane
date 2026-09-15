@@ -4,7 +4,7 @@
 
 - [ ] I've run `bundle exec rspec` from the root directory to see all new and existing tests pass
 - [ ] I've followed the _fastlane_ code style and run `bundle exec rubocop -a` to ensure the code style is valid
-- [ ] I see several green `ci/circleci` builds in the "All checks have passed" section of my PR ([connect CircleCI to GitHub](https://support.circleci.com/hc/en-us/articles/360008097173-Why-aren-t-pull-requests-triggering-jobs-on-my-organization-) if not)
+- [ ] I see several green GitHub Action builds in the "All checks have passed" section of my PR.
 - [ ] I've read the [Contribution Guidelines](https://github.com/fastlane/fastlane/blob/master/CONTRIBUTING.md)
 - [ ] I've updated the documentation if necessary.
 - [ ] I've added or updated relevant unit tests.

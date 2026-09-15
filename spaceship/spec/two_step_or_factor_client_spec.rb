@@ -35,7 +35,8 @@ describe Spaceship::Client do
         { "id" : 3, "numberWithDialCode" : "+1 (•••) •••-••66", "obfuscatedNumber" : "(•••) •••-••66", "pushMode" : "sms" },
         { "id" : 4, "numberWithDialCode" : "+39 ••• ••• ••71", "obfuscatedNumber" : "••• ••• ••71", "pushMode" : "sms" },
         { "id" : 5, "numberWithDialCode" : "+353 •• ••• ••43", "obfuscatedNumber" : "••• ••• •43", "pushMode" : "sms" },
-        { "id" : 6, "numberWithDialCode" : "+375 • ••• •••-••-59", "obfuscatedNumber" : "• ••• •••-••-59", "pushMode" : "sms" }
+        { "id" : 6, "numberWithDialCode" : "+375 • ••• •••-••-59", "obfuscatedNumber" : "• ••• •••-••-59", "pushMode" : "sms" },
+        { "id" : 7, "numberWithDialCode" : "+49\u00A0•••••••••11", "obfuscatedNumber" : "•••••••••11", "pushMode" : "sms" }
       ]
     '
   end
@@ -48,7 +49,8 @@ describe Spaceship::Client do
       "+1-123-456-7866" => 3,
       "+39 123 456 7871" => 4,
       "+353123456743" => 5,
-      "+375 00 000-00-59" => 6
+      "+375 00 000-00-59" => 6,
+      "+4900000000011" => 7
     }.each do |number_to_test, expected_phone_id|
       it "selects correct phone id #{expected_phone_id} for provided phone number #{number_to_test}" do
         phone_id = subject.phone_id_from_number(phone_numbers, number_to_test)
@@ -72,39 +74,39 @@ describe Spaceship::Client do
 
     context 'when running non-interactive' do
       it 'raises an error' do
-        ENV["FASTLANE_IS_INTERACTIVE"] = "false"
-        expect(subject).to receive(:handle_two_factor)
-        stub_request(:get, "https://idmsa.apple.com/appleauth/auth").to_return(status: 200, body: '{"trustedPhoneNumbers": [{"1": ""}]}', headers: { 'Content-Type' => 'application/json' })
-        subject.handle_two_step_or_factor("response")
+        FastlaneSpec::Env.with_env_values('FASTLANE_IS_INTERACTIVE' => 'false', 'SPACESHIP_ONLY_ALLOW_INTERACTIVE_2FA' => nil) do
+          expect(subject).to receive(:handle_two_factor)
+          stub_request(:get, "https://idmsa.apple.com/appleauth/auth").to_return(status: 200, body: '{"trustedPhoneNumbers": [{"1": ""}]}', headers: { 'Content-Type' => 'application/json' })
+          subject.handle_two_step_or_factor("response")
+        end
       end
     end
 
     context 'when running non-interactive and force 2FA to be interactive only' do
       it 'raises an error' do
-        ENV["FASTLANE_IS_INTERACTIVE"] = "false"
-        ENV["SPACESHIP_ONLY_ALLOW_INTERACTIVE_2FA"] = "true"
-        expect { subject.handle_two_step_or_factor("response") }.to raise_error("2FA can only be performed in interactive mode")
-        ENV.delete('SPACESHIP_ONLY_ALLOW_INTERACTIVE_2FA')
+        FastlaneSpec::Env.with_env_values('FASTLANE_IS_INTERACTIVE' => 'false', 'SPACESHIP_ONLY_ALLOW_INTERACTIVE_2FA' => 'true') do
+          expect { subject.handle_two_step_or_factor("response") }.to raise_error("2FA can only be performed in interactive mode")
+        end
       end
     end
 
     context 'when running interactive' do
       it 'does not raise an error' do
-        ENV["FASTLANE_IS_INTERACTIVE"] = "true"
-        ENV["SPACESHIP_ONLY_ALLOW_INTERACTIVE_2FA"] = "true"
-        expect(subject).to receive(:handle_two_factor)
-        stub_request(:get, "https://idmsa.apple.com/appleauth/auth").to_return(status: 200, body: '{"trustedPhoneNumbers": [{"1": ""}]}', headers: { 'Content-Type' => 'application/json' })
-        subject.handle_two_step_or_factor("response")
+        FastlaneSpec::Env.with_env_values('FASTLANE_IS_INTERACTIVE' => 'true', 'SPACESHIP_ONLY_ALLOW_INTERACTIVE_2FA' => 'true') do
+          expect(subject).to receive(:handle_two_factor)
+          stub_request(:get, "https://idmsa.apple.com/appleauth/auth").to_return(status: 200, body: '{"trustedPhoneNumbers": [{"1": ""}]}', headers: { 'Content-Type' => 'application/json' })
+          subject.handle_two_step_or_factor("response")
+        end
       end
     end
 
     context 'when interactive mode is not set' do
       it 'does not raise an error' do
-        ENV["FASTLANE_IS_INTERACTIVE"] = nil
-        ENV["SPACESHIP_ONLY_ALLOW_INTERACTIVE_2FA"] = "false"
-        expect(subject).to receive(:handle_two_factor)
-        stub_request(:get, "https://idmsa.apple.com/appleauth/auth").to_return(status: 200, body: '{"trustedPhoneNumbers": [{"1": ""}]}', headers: { 'Content-Type' => 'application/json' })
-        subject.handle_two_step_or_factor("response")
+        FastlaneSpec::Env.with_env_values('FASTLANE_IS_INTERACTIVE' => nil, 'SPACESHIP_ONLY_ALLOW_INTERACTIVE_2FA' => 'false') do
+          expect(subject).to receive(:handle_two_factor)
+          stub_request(:get, "https://idmsa.apple.com/appleauth/auth").to_return(status: 200, body: '{"trustedPhoneNumbers": [{"1": ""}]}', headers: { 'Content-Type' => 'application/json' })
+          subject.handle_two_step_or_factor("response")
+        end
       end
     end
 

@@ -7,6 +7,7 @@ describe Fastlane do
 
       describe "without :json_key or :json_key_data" do
         it "without :json_key or :json_key_data - could not find file" do
+          allow(Google::Auth).to receive(:get_application_default).and_raise(RuntimeError, "Your credentials were not found.")
           expect(UI).to receive(:interactive?).and_return(true)
           expect(UI).to receive(:important).with("To not be asked about this value, you can specify it using 'json_key'")
           expect(UI).to receive(:input).with(anything).and_return("not_a_file")
@@ -18,12 +19,13 @@ describe Fastlane do
         end
 
         it "without :json_key or :json_key_data - crashes in a not an interactive place" do
+          allow(Google::Auth).to receive(:get_application_default).and_raise(RuntimeError, "Your credentials were not found.")
           expect(UI).to receive(:interactive?).and_return(false)
           expect do
             Fastlane::FastFile.new.parse("lane :test do
               create_app_on_managed_play_store()
             end").runner.execute(:test)
-          end.to raise_error(FastlaneCore::Interface::FastlaneError, "Could not load Google authentication. Make sure it has been added as an environment variable in 'json_key' or 'json_key_data'")
+          end.to raise_error(FastlaneCore::Interface::FastlaneError, /Could not load Google credentials.*GOOGLE_APPLICATION_CREDENTIALS/m)
         end
       end
 

@@ -1,4 +1,5 @@
 describe Spaceship::Portal::WebsitePush do
+  include_examples "common spaceship login", true
   before { Spaceship.login }
   let(:client) { Spaceship::Portal::WebsitePush.client }
 

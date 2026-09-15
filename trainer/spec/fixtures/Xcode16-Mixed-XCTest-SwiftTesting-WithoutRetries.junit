@@ -1,0 +1,1334 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<testsuites tests='192' failures='20' skipped='7' time='81.43423'>
+  <testsuite name='FastlaneTrainerExampleTests' time='16.68984' tests='171' failures='15' skipped='6'>
+    <testsuite name='FastlaneTrainer Tests' time='16.68984' tests='171' failures='15' skipped='6'>
+      <testcase name='Conditionally skipped test' classname='FastlaneTrainerTests' time='1.0'>
+        <failure message='FastlaneTrainerExampleTests.swift:122: Caught error: TestError(message: &quot;Experimental features not enabled&quot;)'/>
+        <properties>
+          <property name='repetition' value='Retry 2'/>
+        </properties>
+      </testcase>
+      <testcase name='Async operation test' classname='FastlaneTrainerTests' time='2.0'>
+        <properties>
+          <property name='repetition' value='Retry 2'/>
+          <property name='tag1' value='async'/>
+        </properties>
+      </testcase>
+      <testcase name='Skipped test with condition' classname='FastlaneTrainerTests' time='0.97'>
+        <skipped message='Test &apos;Skipped test with condition&apos; skipped: Feature not yet implemented'/>
+        <properties>
+          <property name='repetition' value='Retry 2'/>
+        </properties>
+      </testcase>
+      <testcase name='Simple string validation' classname='FastlaneTrainerTests' time='1.0'>
+        <properties>
+          <property name='repetition' value='Retry 2'/>
+          <property name='tag1' value='basic'/>
+          <property name='tag2' value='string'/>
+          <property name='tag3' value='validation'/>
+        </properties>
+      </testcase>
+      <testcase name='Simple number validation' classname='FastlaneTrainerTests' time='1.0'>
+        <properties>
+          <property name='repetition' value='Retry 2'/>
+          <property name='tag1' value='basic'/>
+          <property name='tag2' value='number'/>
+          <property name='tag3' value='validation'/>
+        </properties>
+      </testcase>
+      <testcase name='Validate multiple strings (&quot;FastlaneTrainer&quot;)' classname='FastlaneTrainerTests' time='0.34'>
+        <failure message='FastlaneTrainerExampleTests.swift:50: Expectation failed: (input.count → 15) &lt; 8'/>
+        <properties>
+          <property name='testname' value='Validate multiple strings'/>
+          <property name='argument' value='&quot;FastlaneTrainer&quot;'/>
+          <property name='repetition' value='Retry 2'/>
+        </properties>
+      </testcase>
+      <testcase name='Validate multiple strings (&quot;Hello&quot;)' classname='FastlaneTrainerTests' time='0.34'>
+        <properties>
+          <property name='testname' value='Validate multiple strings'/>
+          <property name='argument' value='&quot;Hello&quot;'/>
+          <property name='repetition' value='Retry 2'/>
+        </properties>
+      </testcase>
+      <testcase name='Validate multiple strings (&quot;World&quot;)' classname='FastlaneTrainerTests' time='0.34'>
+        <properties>
+          <property name='testname' value='Validate multiple strings'/>
+          <property name='argument' value='&quot;World&quot;'/>
+          <property name='repetition' value='Retry 2'/>
+        </properties>
+      </testcase>
+      <testcase name='Multiple async operations (1)' classname='FastlaneTrainerTests' time='1.0'>
+        <properties>
+          <property name='testname' value='Multiple async operations'/>
+          <property name='argument' value='1'/>
+          <property name='repetition' value='Retry 2'/>
+          <property name='tag1' value='async'/>
+          <property name='tag2' value='performance'/>
+        </properties>
+      </testcase>
+      <testcase name='Multiple async operations (2)' classname='FastlaneTrainerTests' time='2.0'>
+        <properties>
+          <property name='testname' value='Multiple async operations'/>
+          <property name='argument' value='2'/>
+          <property name='repetition' value='Retry 2'/>
+          <property name='tag1' value='async'/>
+          <property name='tag2' value='performance'/>
+        </properties>
+      </testcase>
+      <testcase name='Multiple async operations (3)' classname='FastlaneTrainerTests' time='3.0'>
+        <properties>
+          <property name='testname' value='Multiple async operations'/>
+          <property name='argument' value='3'/>
+          <property name='repetition' value='Retry 2'/>
+          <property name='tag1' value='async'/>
+          <property name='tag2' value='performance'/>
+        </properties>
+      </testcase>
+      <testcase name='Test number ranges ((min: 0, max: 10))' classname='FastlaneTrainerTests' time='0.0035'>
+        <properties>
+          <property name='testname' value='Test number ranges'/>
+          <property name='argument' value='(min: 0, max: 10)'/>
+          <property name='repetition' value='Retry 2'/>
+        </properties>
+      </testcase>
+      <testcase name='Test number ranges ((min: 10, max: 20))' classname='FastlaneTrainerTests' time='0.0034'>
+        <properties>
+          <property name='testname' value='Test number ranges'/>
+          <property name='argument' value='(min: 10, max: 20)'/>
+          <property name='repetition' value='Retry 2'/>
+        </properties>
+      </testcase>
+      <testcase name='Test number ranges ((min: 20, max: 30))' classname='FastlaneTrainerTests' time='0.0034'>
+        <properties>
+          <property name='testname' value='Test number ranges'/>
+          <property name='argument' value='(min: 20, max: 30)'/>
+          <property name='repetition' value='Retry 2'/>
+        </properties>
+      </testcase>
+      <testcase name='testName🏷️And📋ParamsUsingSome😱Unusual🤪Characters()' classname='FastlaneTrainerTests' time='0.61'>
+        <failure message='FastlaneTrainerExampleTests.swift:67: Expectation failed: (asciiCharacter.asciiValue ?? 0 → 0) &gt; 6
+Character '/>
+        <properties>
+          <property name='testname' value='testName🏷️And📋ParamsUsingSome😱Unusual🤪Characters(asciiCharacter:)'/>
+          <property name='argument' value=''/>
+          <property name='repetition' value='Retry 2'/>
+        </properties>
+      </testcase>
+      <testcase name='testName🏷️And📋ParamsUsingSome😱Unusual🤪Characters(\u0001)' classname='FastlaneTrainerTests' time='0.28'>
+        <failure message='FastlaneTrainerExampleTests.swift:67: Expectation failed: (asciiCharacter.asciiValue ?? 0 → 1) &gt; 6
+Character \u0001 has ASCII value &lt;= 6'/>
+        <properties>
+          <property name='testname' value='testName🏷️And📋ParamsUsingSome😱Unusual🤪Characters(asciiCharacter:)'/>
+          <property name='argument' value='\u0001'/>
+          <property name='repetition' value='Retry 2'/>
+        </properties>
+      </testcase>
+      <testcase name='testName🏷️And📋ParamsUsingSome😱Unusual🤪Characters(\u0002)' classname='FastlaneTrainerTests' time='0.0015'>
+        <failure message='FastlaneTrainerExampleTests.swift:67: Expectation failed: (asciiCharacter.asciiValue ?? 0 → 2) &gt; 6
+Character \u0002 has ASCII value &lt;= 6'/>
+        <properties>
+          <property name='testname' value='testName🏷️And📋ParamsUsingSome😱Unusual🤪Characters(asciiCharacter:)'/>
+          <property name='argument' value='\u0002'/>
+          <property name='repetition' value='Retry 2'/>
+        </properties>
+      </testcase>
+      <testcase name='testName🏷️And📋ParamsUsingSome😱Unusual🤪Characters(\u0003)' classname='FastlaneTrainerTests' time='0.00013'>
+        <failure message='FastlaneTrainerExampleTests.swift:67: Expectation failed: (asciiCharacter.asciiValue ?? 0 → 3) &gt; 6
+Character \u0003 has ASCII value &lt;= 6'/>
+        <properties>
+          <property name='testname' value='testName🏷️And📋ParamsUsingSome😱Unusual🤪Characters(asciiCharacter:)'/>
+          <property name='argument' value='\u0003'/>
+          <property name='repetition' value='Retry 2'/>
+        </properties>
+      </testcase>
+      <testcase name='testName🏷️And📋ParamsUsingSome😱Unusual🤪Characters(\u0004)' classname='FastlaneTrainerTests' time='8.9e-05'>
+        <failure message='FastlaneTrainerExampleTests.swift:67: Expectation failed: (asciiCharacter.asciiValue ?? 0 → 4) &gt; 6
+Character \u0004 has ASCII value &lt;= 6'/>
+        <properties>
+          <property name='testname' value='testName🏷️And📋ParamsUsingSome😱Unusual🤪Characters(asciiCharacter:)'/>
+          <property name='argument' value='\u0004'/>
+          <property name='repetition' value='Retry 2'/>
+        </properties>
+      </testcase>
+      <testcase name='testName🏷️And📋ParamsUsingSome😱Unusual🤪Characters(\u0005)' classname='FastlaneTrainerTests' time='0.0007'>
+        <failure message='FastlaneTrainerExampleTests.swift:67: Expectation failed: (asciiCharacter.asciiValue ?? 0 → 5) &gt; 6
+Character \u0005 has ASCII value &lt;= 6'/>
+        <properties>
+          <property name='testname' value='testName🏷️And📋ParamsUsingSome😱Unusual🤪Characters(asciiCharacter:)'/>
+          <property name='argument' value='\u0005'/>
+          <property name='repetition' value='Retry 2'/>
+        </properties>
+      </testcase>
+      <testcase name='testName🏷️And📋ParamsUsingSome😱Unusual🤪Characters(\u0006)' classname='FastlaneTrainerTests' time='9.3e-05'>
+        <failure message='FastlaneTrainerExampleTests.swift:67: Expectation failed: (asciiCharacter.asciiValue ?? 0 → 6) &gt; 6
+Character \u0006 has ASCII value &lt;= 6'/>
+        <properties>
+          <property name='testname' value='testName🏷️And📋ParamsUsingSome😱Unusual🤪Characters(asciiCharacter:)'/>
+          <property name='argument' value='\u0006'/>
+          <property name='repetition' value='Retry 2'/>
+        </properties>
+      </testcase>
+      <testcase name='testName🏷️And📋ParamsUsingSome😱Unusual🤪Characters(\u0007)' classname='FastlaneTrainerTests' time='5.2e-05'>
+        <properties>
+          <property name='testname' value='testName🏷️And📋ParamsUsingSome😱Unusual🤪Characters(asciiCharacter:)'/>
+          <property name='argument' value='\u0007'/>
+          <property name='repetition' value='Retry 2'/>
+        </properties>
+      </testcase>
+      <testcase name='testName🏷️And📋ParamsUsingSome😱Unusual🤪Characters(\u0008)' classname='FastlaneTrainerTests' time='0.00052'>
+        <properties>
+          <property name='testname' value='testName🏷️And📋ParamsUsingSome😱Unusual🤪Characters(asciiCharacter:)'/>
+          <property name='argument' value='\u0008'/>
+          <property name='repetition' value='Retry 2'/>
+        </properties>
+      </testcase>
+      <testcase name='testName🏷️And📋ParamsUsingSome😱Unusual🤪Characters(\u000e)' classname='FastlaneTrainerTests' time='0.00032'>
+        <properties>
+          <property name='testname' value='testName🏷️And📋ParamsUsingSome😱Unusual🤪Characters(asciiCharacter:)'/>
+          <property name='argument' value='\u000e'/>
+          <property name='repetition' value='Retry 2'/>
+        </properties>
+      </testcase>
+      <testcase name='testName🏷️And📋ParamsUsingSome😱Unusual🤪Characters(\u000f)' classname='FastlaneTrainerTests' time='5.7e-05'>
+        <properties>
+          <property name='testname' value='testName🏷️And📋ParamsUsingSome😱Unusual🤪Characters(asciiCharacter:)'/>
+          <property name='argument' value='\u000f'/>
+          <property name='repetition' value='Retry 2'/>
+        </properties>
+      </testcase>
+      <testcase name='testName🏷️And📋ParamsUsingSome😱Unusual🤪Characters(\u0010)' classname='FastlaneTrainerTests' time='6.8e-05'>
+        <properties>
+          <property name='testname' value='testName🏷️And📋ParamsUsingSome😱Unusual🤪Characters(asciiCharacter:)'/>
+          <property name='argument' value='\u0010'/>
+          <property name='repetition' value='Retry 2'/>
+        </properties>
+      </testcase>
+      <testcase name='testName🏷️And📋ParamsUsingSome😱Unusual🤪Characters(\u0011)' classname='FastlaneTrainerTests' time='4.5e-05'>
+        <properties>
+          <property name='testname' value='testName🏷️And📋ParamsUsingSome😱Unusual🤪Characters(asciiCharacter:)'/>
+          <property name='argument' value='\u0011'/>
+          <property name='repetition' value='Retry 2'/>
+        </properties>
+      </testcase>
+      <testcase name='testName🏷️And📋ParamsUsingSome😱Unusual🤪Characters(\u0012)' classname='FastlaneTrainerTests' time='5.2e-05'>
+        <properties>
+          <property name='testname' value='testName🏷️And📋ParamsUsingSome😱Unusual🤪Characters(asciiCharacter:)'/>
+          <property name='argument' value='\u0012'/>
+          <property name='repetition' value='Retry 2'/>
+        </properties>
+      </testcase>
+      <testcase name='testName🏷️And📋ParamsUsingSome😱Unusual🤪Characters(\u0013)' classname='FastlaneTrainerTests' time='3.5e-05'>
+        <properties>
+          <property name='testname' value='testName🏷️And📋ParamsUsingSome😱Unusual🤪Characters(asciiCharacter:)'/>
+          <property name='argument' value='\u0013'/>
+          <property name='repetition' value='Retry 2'/>
+        </properties>
+      </testcase>
+      <testcase name='testName🏷️And📋ParamsUsingSome😱Unusual🤪Characters(\u0014)' classname='FastlaneTrainerTests' time='0.00014'>
+        <properties>
+          <property name='testname' value='testName🏷️And📋ParamsUsingSome😱Unusual🤪Characters(asciiCharacter:)'/>
+          <property name='argument' value='\u0014'/>
+          <property name='repetition' value='Retry 2'/>
+        </properties>
+      </testcase>
+      <testcase name='testName🏷️And📋ParamsUsingSome😱Unusual🤪Characters(\u0015)' classname='FastlaneTrainerTests' time='4.1e-05'>
+        <properties>
+          <property name='testname' value='testName🏷️And📋ParamsUsingSome😱Unusual🤪Characters(asciiCharacter:)'/>
+          <property name='argument' value='\u0015'/>
+          <property name='repetition' value='Retry 2'/>
+        </properties>
+      </testcase>
+      <testcase name='testName🏷️And📋ParamsUsingSome😱Unusual🤪Characters(\u0016)' classname='FastlaneTrainerTests' time='3.8e-05'>
+        <properties>
+          <property name='testname' value='testName🏷️And📋ParamsUsingSome😱Unusual🤪Characters(asciiCharacter:)'/>
+          <property name='argument' value='\u0016'/>
+          <property name='repetition' value='Retry 2'/>
+        </properties>
+      </testcase>
+      <testcase name='testName🏷️And📋ParamsUsingSome😱Unusual🤪Characters(\u0017)' classname='FastlaneTrainerTests' time='6.2e-05'>
+        <properties>
+          <property name='testname' value='testName🏷️And📋ParamsUsingSome😱Unusual🤪Characters(asciiCharacter:)'/>
+          <property name='argument' value='\u0017'/>
+          <property name='repetition' value='Retry 2'/>
+        </properties>
+      </testcase>
+      <testcase name='testName🏷️And📋ParamsUsingSome😱Unusual🤪Characters(\u0018)' classname='FastlaneTrainerTests' time='7.0e-05'>
+        <properties>
+          <property name='testname' value='testName🏷️And📋ParamsUsingSome😱Unusual🤪Characters(asciiCharacter:)'/>
+          <property name='argument' value='\u0018'/>
+          <property name='repetition' value='Retry 2'/>
+        </properties>
+      </testcase>
+      <testcase name='testName🏷️And📋ParamsUsingSome😱Unusual🤪Characters(\u0019)' classname='FastlaneTrainerTests' time='4.9e-05'>
+        <properties>
+          <property name='testname' value='testName🏷️And📋ParamsUsingSome😱Unusual🤪Characters(asciiCharacter:)'/>
+          <property name='argument' value='\u0019'/>
+          <property name='repetition' value='Retry 2'/>
+        </properties>
+      </testcase>
+      <testcase name='testName🏷️And📋ParamsUsingSome😱Unusual🤪Characters(\u001a)' classname='FastlaneTrainerTests' time='0.00039'>
+        <properties>
+          <property name='testname' value='testName🏷️And📋ParamsUsingSome😱Unusual🤪Characters(asciiCharacter:)'/>
+          <property name='argument' value='\u001a'/>
+          <property name='repetition' value='Retry 2'/>
+        </properties>
+      </testcase>
+      <testcase name='testName🏷️And📋ParamsUsingSome😱Unusual🤪Characters(\u001b)' classname='FastlaneTrainerTests' time='4.3e-05'>
+        <properties>
+          <property name='testname' value='testName🏷️And📋ParamsUsingSome😱Unusual🤪Characters(asciiCharacter:)'/>
+          <property name='argument' value='\u001b'/>
+          <property name='repetition' value='Retry 2'/>
+        </properties>
+      </testcase>
+      <testcase name='testName🏷️And📋ParamsUsingSome😱Unusual🤪Characters(\u001c)' classname='FastlaneTrainerTests' time='4.5e-05'>
+        <properties>
+          <property name='testname' value='testName🏷️And📋ParamsUsingSome😱Unusual🤪Characters(asciiCharacter:)'/>
+          <property name='argument' value='\u001c'/>
+          <property name='repetition' value='Retry 2'/>
+        </properties>
+      </testcase>
+      <testcase name='testName🏷️And📋ParamsUsingSome😱Unusual🤪Characters(\u001d)' classname='FastlaneTrainerTests' time='7.1e-05'>
+        <properties>
+          <property name='testname' value='testName🏷️And📋ParamsUsingSome😱Unusual🤪Characters(asciiCharacter:)'/>
+          <property name='argument' value='\u001d'/>
+          <property name='repetition' value='Retry 2'/>
+        </properties>
+      </testcase>
+      <testcase name='testName🏷️And📋ParamsUsingSome😱Unusual🤪Characters(\u001e)' classname='FastlaneTrainerTests' time='8.4e-05'>
+        <properties>
+          <property name='testname' value='testName🏷️And📋ParamsUsingSome😱Unusual🤪Characters(asciiCharacter:)'/>
+          <property name='argument' value='\u001e'/>
+          <property name='repetition' value='Retry 2'/>
+        </properties>
+      </testcase>
+      <testcase name='testName🏷️And📋ParamsUsingSome😱Unusual🤪Characters(\u001f)' classname='FastlaneTrainerTests' time='9.1e-05'>
+        <properties>
+          <property name='testname' value='testName🏷️And📋ParamsUsingSome😱Unusual🤪Characters(asciiCharacter:)'/>
+          <property name='argument' value='\u001f'/>
+          <property name='repetition' value='Retry 2'/>
+        </properties>
+      </testcase>
+      <testcase name='testName🏷️And📋ParamsUsingSome😱Unusual🤪Characters(\u007f)' classname='FastlaneTrainerTests' time='6.2e-05'>
+        <properties>
+          <property name='testname' value='testName🏷️And📋ParamsUsingSome😱Unusual🤪Characters(asciiCharacter:)'/>
+          <property name='argument' value='\u007f'/>
+          <property name='repetition' value='Retry 2'/>
+        </properties>
+      </testcase>
+      <testcase name='testName🏷️And📋ParamsUsingSome😱Unusual🤪Characters(	)' classname='FastlaneTrainerTests' time='5.1e-05'>
+        <properties>
+          <property name='testname' value='testName🏷️And📋ParamsUsingSome😱Unusual🤪Characters(asciiCharacter:)'/>
+          <property name='argument' value='	'/>
+          <property name='repetition' value='Retry 2'/>
+        </properties>
+      </testcase>
+      <testcase name='testName🏷️And📋ParamsUsingSome😱Unusual🤪Characters(\u000b)' classname='FastlaneTrainerTests' time='3.3e-05'>
+        <properties>
+          <property name='testname' value='testName🏷️And📋ParamsUsingSome😱Unusual🤪Characters(asciiCharacter:)'/>
+          <property name='argument' value='\u000b'/>
+          <property name='repetition' value='Retry 2'/>
+        </properties>
+      </testcase>
+      <testcase name='testName🏷️And📋ParamsUsingSome😱Unusual🤪Characters(\u000c)' classname='FastlaneTrainerTests' time='3.6e-05'>
+        <properties>
+          <property name='testname' value='testName🏷️And📋ParamsUsingSome😱Unusual🤪Characters(asciiCharacter:)'/>
+          <property name='argument' value='\u000c'/>
+          <property name='repetition' value='Retry 2'/>
+        </properties>
+      </testcase>
+      <testcase name='testName🏷️And📋ParamsUsingSome😱Unusual🤪Characters()' classname='FastlaneTrainerTests' time='3.9e-05'>
+        <properties>
+          <property name='testname' value='testName🏷️And📋ParamsUsingSome😱Unusual🤪Characters(asciiCharacter:)'/>
+          <property name='argument' value=''/>
+          <property name='repetition' value='Retry 2'/>
+        </properties>
+      </testcase>
+      <testcase name='testName🏷️And📋ParamsUsingSome😱Unusual🤪Characters( )' classname='FastlaneTrainerTests' time='4.4e-05'>
+        <properties>
+          <property name='testname' value='testName🏷️And📋ParamsUsingSome😱Unusual🤪Characters(asciiCharacter:)'/>
+          <property name='argument' value=' '/>
+          <property name='repetition' value='Retry 2'/>
+        </properties>
+      </testcase>
+      <testcase name='testName🏷️And📋ParamsUsingSome😱Unusual🤪Characters( )' classname='FastlaneTrainerTests' time='0.00012'>
+        <properties>
+          <property name='testname' value='testName🏷️And📋ParamsUsingSome😱Unusual🤪Characters(asciiCharacter:)'/>
+          <property name='argument' value=' '/>
+          <property name='repetition' value='Retry 2'/>
+        </properties>
+      </testcase>
+      <testcase name='testName🏷️And📋ParamsUsingSome😱Unusual🤪Characters(_)' classname='FastlaneTrainerTests' time='5.6e-05'>
+        <properties>
+          <property name='testname' value='testName🏷️And📋ParamsUsingSome😱Unusual🤪Characters(asciiCharacter:)'/>
+          <property name='argument' value='_'/>
+          <property name='repetition' value='Retry 2'/>
+        </properties>
+      </testcase>
+      <testcase name='testName🏷️And📋ParamsUsingSome😱Unusual🤪Characters(-)' classname='FastlaneTrainerTests' time='6.5e-05'>
+        <properties>
+          <property name='testname' value='testName🏷️And📋ParamsUsingSome😱Unusual🤪Characters(asciiCharacter:)'/>
+          <property name='argument' value='-'/>
+          <property name='repetition' value='Retry 2'/>
+        </properties>
+      </testcase>
+      <testcase name='testName🏷️And📋ParamsUsingSome😱Unusual🤪Characters(,)' classname='FastlaneTrainerTests' time='6.0e-05'>
+        <properties>
+          <property name='testname' value='testName🏷️And📋ParamsUsingSome😱Unusual🤪Characters(asciiCharacter:)'/>
+          <property name='argument' value=','/>
+          <property name='repetition' value='Retry 2'/>
+        </properties>
+      </testcase>
+      <testcase name='testName🏷️And📋ParamsUsingSome😱Unusual🤪Characters(;)' classname='FastlaneTrainerTests' time='8.5e-05'>
+        <properties>
+          <property name='testname' value='testName🏷️And📋ParamsUsingSome😱Unusual🤪Characters(asciiCharacter:)'/>
+          <property name='argument' value=';'/>
+          <property name='repetition' value='Retry 2'/>
+        </properties>
+      </testcase>
+      <testcase name='testName🏷️And📋ParamsUsingSome😱Unusual🤪Characters(:)' classname='FastlaneTrainerTests' time='5.3e-05'>
+        <properties>
+          <property name='testname' value='testName🏷️And📋ParamsUsingSome😱Unusual🤪Characters(asciiCharacter:)'/>
+          <property name='argument' value=':'/>
+          <property name='repetition' value='Retry 2'/>
+        </properties>
+      </testcase>
+      <testcase name='testName🏷️And📋ParamsUsingSome😱Unusual🤪Characters(!)' classname='FastlaneTrainerTests' time='9.3e-05'>
+        <properties>
+          <property name='testname' value='testName🏷️And📋ParamsUsingSome😱Unusual🤪Characters(asciiCharacter:)'/>
+          <property name='argument' value='!'/>
+          <property name='repetition' value='Retry 2'/>
+        </properties>
+      </testcase>
+      <testcase name='testName🏷️And📋ParamsUsingSome😱Unusual🤪Characters(?)' classname='FastlaneTrainerTests' time='9.1e-05'>
+        <properties>
+          <property name='testname' value='testName🏷️And📋ParamsUsingSome😱Unusual🤪Characters(asciiCharacter:)'/>
+          <property name='argument' value='?'/>
+          <property name='repetition' value='Retry 2'/>
+        </properties>
+      </testcase>
+      <testcase name='testName🏷️And📋ParamsUsingSome😱Unusual🤪Characters(.)' classname='FastlaneTrainerTests' time='5.7e-05'>
+        <properties>
+          <property name='testname' value='testName🏷️And📋ParamsUsingSome😱Unusual🤪Characters(asciiCharacter:)'/>
+          <property name='argument' value='.'/>
+          <property name='repetition' value='Retry 2'/>
+        </properties>
+      </testcase>
+      <testcase name='testName🏷️And📋ParamsUsingSome😱Unusual🤪Characters(&apos;)' classname='FastlaneTrainerTests' time='5.6e-05'>
+        <properties>
+          <property name='testname' value='testName🏷️And📋ParamsUsingSome😱Unusual🤪Characters(asciiCharacter:)'/>
+          <property name='argument' value='&apos;'/>
+          <property name='repetition' value='Retry 2'/>
+        </properties>
+      </testcase>
+      <testcase name='testName🏷️And📋ParamsUsingSome😱Unusual🤪Characters(&quot;)' classname='FastlaneTrainerTests' time='5.8e-05'>
+        <properties>
+          <property name='testname' value='testName🏷️And📋ParamsUsingSome😱Unusual🤪Characters(asciiCharacter:)'/>
+          <property name='argument' value='&quot;'/>
+          <property name='repetition' value='Retry 2'/>
+        </properties>
+      </testcase>
+      <testcase name='testName🏷️And📋ParamsUsingSome😱Unusual🤪Characters(()' classname='FastlaneTrainerTests' time='5.5e-05'>
+        <properties>
+          <property name='testname' value='testName🏷️And📋ParamsUsingSome😱Unusual🤪Characters(asciiCharacter:)'/>
+          <property name='argument' value='('/>
+          <property name='repetition' value='Retry 2'/>
+        </properties>
+      </testcase>
+      <testcase name='testName🏷️And📋ParamsUsingSome😱Unusual🤪Characters())' classname='FastlaneTrainerTests' time='0.00011'>
+        <properties>
+          <property name='testname' value='testName🏷️And📋ParamsUsingSome😱Unusual🤪Characters(asciiCharacter:)'/>
+          <property name='argument' value=')'/>
+          <property name='repetition' value='Retry 2'/>
+        </properties>
+      </testcase>
+      <testcase name='testName🏷️And📋ParamsUsingSome😱Unusual🤪Characters([)' classname='FastlaneTrainerTests' time='6.3e-05'>
+        <properties>
+          <property name='testname' value='testName🏷️And📋ParamsUsingSome😱Unusual🤪Characters(asciiCharacter:)'/>
+          <property name='argument' value='['/>
+          <property name='repetition' value='Retry 2'/>
+        </properties>
+      </testcase>
+      <testcase name='testName🏷️And📋ParamsUsingSome😱Unusual🤪Characters(])' classname='FastlaneTrainerTests' time='4.9e-05'>
+        <properties>
+          <property name='testname' value='testName🏷️And📋ParamsUsingSome😱Unusual🤪Characters(asciiCharacter:)'/>
+          <property name='argument' value=']'/>
+          <property name='repetition' value='Retry 2'/>
+        </properties>
+      </testcase>
+      <testcase name='testName🏷️And📋ParamsUsingSome😱Unusual🤪Characters({)' classname='FastlaneTrainerTests' time='5.4e-05'>
+        <properties>
+          <property name='testname' value='testName🏷️And📋ParamsUsingSome😱Unusual🤪Characters(asciiCharacter:)'/>
+          <property name='argument' value='{'/>
+          <property name='repetition' value='Retry 2'/>
+        </properties>
+      </testcase>
+      <testcase name='testName🏷️And📋ParamsUsingSome😱Unusual🤪Characters(})' classname='FastlaneTrainerTests' time='5.5e-05'>
+        <properties>
+          <property name='testname' value='testName🏷️And📋ParamsUsingSome😱Unusual🤪Characters(asciiCharacter:)'/>
+          <property name='argument' value='}'/>
+          <property name='repetition' value='Retry 2'/>
+        </properties>
+      </testcase>
+      <testcase name='testName🏷️And📋ParamsUsingSome😱Unusual🤪Characters(@)' classname='FastlaneTrainerTests' time='8.8e-05'>
+        <properties>
+          <property name='testname' value='testName🏷️And📋ParamsUsingSome😱Unusual🤪Characters(asciiCharacter:)'/>
+          <property name='argument' value='@'/>
+          <property name='repetition' value='Retry 2'/>
+        </properties>
+      </testcase>
+      <testcase name='testName🏷️And📋ParamsUsingSome😱Unusual🤪Characters(*)' classname='FastlaneTrainerTests' time='7.1e-05'>
+        <properties>
+          <property name='testname' value='testName🏷️And📋ParamsUsingSome😱Unusual🤪Characters(asciiCharacter:)'/>
+          <property name='argument' value='*'/>
+          <property name='repetition' value='Retry 2'/>
+        </properties>
+      </testcase>
+      <testcase name='testName🏷️And📋ParamsUsingSome😱Unusual🤪Characters(/)' classname='FastlaneTrainerTests' time='7.1e-05'>
+        <properties>
+          <property name='testname' value='testName🏷️And📋ParamsUsingSome😱Unusual🤪Characters(asciiCharacter:)'/>
+          <property name='argument' value='/'/>
+          <property name='repetition' value='Retry 2'/>
+        </properties>
+      </testcase>
+      <testcase name='testName🏷️And📋ParamsUsingSome😱Unusual🤪Characters(\)' classname='FastlaneTrainerTests' time='5.5e-05'>
+        <properties>
+          <property name='testname' value='testName🏷️And📋ParamsUsingSome😱Unusual🤪Characters(asciiCharacter:)'/>
+          <property name='argument' value='\'/>
+          <property name='repetition' value='Retry 2'/>
+        </properties>
+      </testcase>
+      <testcase name='testName🏷️And📋ParamsUsingSome😱Unusual🤪Characters(&amp;)' classname='FastlaneTrainerTests' time='7.4e-05'>
+        <properties>
+          <property name='testname' value='testName🏷️And📋ParamsUsingSome😱Unusual🤪Characters(asciiCharacter:)'/>
+          <property name='argument' value='&amp;'/>
+          <property name='repetition' value='Retry 2'/>
+        </properties>
+      </testcase>
+      <testcase name='testName🏷️And📋ParamsUsingSome😱Unusual🤪Characters(#)' classname='FastlaneTrainerTests' time='6.2e-05'>
+        <properties>
+          <property name='testname' value='testName🏷️And📋ParamsUsingSome😱Unusual🤪Characters(asciiCharacter:)'/>
+          <property name='argument' value='#'/>
+          <property name='repetition' value='Retry 2'/>
+        </properties>
+      </testcase>
+      <testcase name='testName🏷️And📋ParamsUsingSome😱Unusual🤪Characters(%)' classname='FastlaneTrainerTests' time='8.3e-05'>
+        <properties>
+          <property name='testname' value='testName🏷️And📋ParamsUsingSome😱Unusual🤪Characters(asciiCharacter:)'/>
+          <property name='argument' value='%'/>
+          <property name='repetition' value='Retry 2'/>
+        </properties>
+      </testcase>
+      <testcase name='testName🏷️And📋ParamsUsingSome😱Unusual🤪Characters(`)' classname='FastlaneTrainerTests' time='6.1e-05'>
+        <properties>
+          <property name='testname' value='testName🏷️And📋ParamsUsingSome😱Unusual🤪Characters(asciiCharacter:)'/>
+          <property name='argument' value='`'/>
+          <property name='repetition' value='Retry 2'/>
+        </properties>
+      </testcase>
+      <testcase name='testName🏷️And📋ParamsUsingSome😱Unusual🤪Characters(^)' classname='FastlaneTrainerTests' time='8.5e-05'>
+        <properties>
+          <property name='testname' value='testName🏷️And📋ParamsUsingSome😱Unusual🤪Characters(asciiCharacter:)'/>
+          <property name='argument' value='^'/>
+          <property name='repetition' value='Retry 2'/>
+        </properties>
+      </testcase>
+      <testcase name='testName🏷️And📋ParamsUsingSome😱Unusual🤪Characters(+)' classname='FastlaneTrainerTests' time='6.5e-05'>
+        <properties>
+          <property name='testname' value='testName🏷️And📋ParamsUsingSome😱Unusual🤪Characters(asciiCharacter:)'/>
+          <property name='argument' value='+'/>
+          <property name='repetition' value='Retry 2'/>
+        </properties>
+      </testcase>
+      <testcase name='testName🏷️And📋ParamsUsingSome😱Unusual🤪Characters(&lt;)' classname='FastlaneTrainerTests' time='5.4e-05'>
+        <properties>
+          <property name='testname' value='testName🏷️And📋ParamsUsingSome😱Unusual🤪Characters(asciiCharacter:)'/>
+          <property name='argument' value='&lt;'/>
+          <property name='repetition' value='Retry 2'/>
+        </properties>
+      </testcase>
+      <testcase name='testName🏷️And📋ParamsUsingSome😱Unusual🤪Characters(=)' classname='FastlaneTrainerTests' time='7.3e-05'>
+        <properties>
+          <property name='testname' value='testName🏷️And📋ParamsUsingSome😱Unusual🤪Characters(asciiCharacter:)'/>
+          <property name='argument' value='='/>
+          <property name='repetition' value='Retry 2'/>
+        </properties>
+      </testcase>
+      <testcase name='testName🏷️And📋ParamsUsingSome😱Unusual🤪Characters(&gt;)' classname='FastlaneTrainerTests' time='0.00018'>
+        <properties>
+          <property name='testname' value='testName🏷️And📋ParamsUsingSome😱Unusual🤪Characters(asciiCharacter:)'/>
+          <property name='argument' value='&gt;'/>
+          <property name='repetition' value='Retry 2'/>
+        </properties>
+      </testcase>
+      <testcase name='testName🏷️And📋ParamsUsingSome😱Unusual🤪Characters(|)' classname='FastlaneTrainerTests' time='8.3e-05'>
+        <properties>
+          <property name='testname' value='testName🏷️And📋ParamsUsingSome😱Unusual🤪Characters(asciiCharacter:)'/>
+          <property name='argument' value='|'/>
+          <property name='repetition' value='Retry 2'/>
+        </properties>
+      </testcase>
+      <testcase name='testName🏷️And📋ParamsUsingSome😱Unusual🤪Characters(~)' classname='FastlaneTrainerTests' time='7.5e-05'>
+        <properties>
+          <property name='testname' value='testName🏷️And📋ParamsUsingSome😱Unusual🤪Characters(asciiCharacter:)'/>
+          <property name='argument' value='~'/>
+          <property name='repetition' value='Retry 2'/>
+        </properties>
+      </testcase>
+      <testcase name='testName🏷️And📋ParamsUsingSome😱Unusual🤪Characters($)' classname='FastlaneTrainerTests' time='7.3e-05'>
+        <properties>
+          <property name='testname' value='testName🏷️And📋ParamsUsingSome😱Unusual🤪Characters(asciiCharacter:)'/>
+          <property name='argument' value='$'/>
+          <property name='repetition' value='Retry 2'/>
+        </properties>
+      </testcase>
+      <testcase name='testName🏷️And📋ParamsUsingSome😱Unusual🤪Characters(0)' classname='FastlaneTrainerTests' time='7.8e-05'>
+        <properties>
+          <property name='testname' value='testName🏷️And📋ParamsUsingSome😱Unusual🤪Characters(asciiCharacter:)'/>
+          <property name='argument' value='0'/>
+          <property name='repetition' value='Retry 2'/>
+        </properties>
+      </testcase>
+      <testcase name='testName🏷️And📋ParamsUsingSome😱Unusual🤪Characters(1)' classname='FastlaneTrainerTests' time='7.7e-05'>
+        <properties>
+          <property name='testname' value='testName🏷️And📋ParamsUsingSome😱Unusual🤪Characters(asciiCharacter:)'/>
+          <property name='argument' value='1'/>
+          <property name='repetition' value='Retry 2'/>
+        </properties>
+      </testcase>
+      <testcase name='testName🏷️And📋ParamsUsingSome😱Unusual🤪Characters(2)' classname='FastlaneTrainerTests' time='8.7e-05'>
+        <properties>
+          <property name='testname' value='testName🏷️And📋ParamsUsingSome😱Unusual🤪Characters(asciiCharacter:)'/>
+          <property name='argument' value='2'/>
+          <property name='repetition' value='Retry 2'/>
+        </properties>
+      </testcase>
+      <testcase name='testName🏷️And📋ParamsUsingSome😱Unusual🤪Characters(3)' classname='FastlaneTrainerTests' time='5.2e-05'>
+        <properties>
+          <property name='testname' value='testName🏷️And📋ParamsUsingSome😱Unusual🤪Characters(asciiCharacter:)'/>
+          <property name='argument' value='3'/>
+          <property name='repetition' value='Retry 2'/>
+        </properties>
+      </testcase>
+      <testcase name='testName🏷️And📋ParamsUsingSome😱Unusual🤪Characters(4)' classname='FastlaneTrainerTests' time='4.7e-05'>
+        <properties>
+          <property name='testname' value='testName🏷️And📋ParamsUsingSome😱Unusual🤪Characters(asciiCharacter:)'/>
+          <property name='argument' value='4'/>
+          <property name='repetition' value='Retry 2'/>
+        </properties>
+      </testcase>
+      <testcase name='testName🏷️And📋ParamsUsingSome😱Unusual🤪Characters(5)' classname='FastlaneTrainerTests' time='4.6e-05'>
+        <properties>
+          <property name='testname' value='testName🏷️And📋ParamsUsingSome😱Unusual🤪Characters(asciiCharacter:)'/>
+          <property name='argument' value='5'/>
+          <property name='repetition' value='Retry 2'/>
+        </properties>
+      </testcase>
+      <testcase name='testName🏷️And📋ParamsUsingSome😱Unusual🤪Characters(6)' classname='FastlaneTrainerTests' time='6.0e-05'>
+        <properties>
+          <property name='testname' value='testName🏷️And📋ParamsUsingSome😱Unusual🤪Characters(asciiCharacter:)'/>
+          <property name='argument' value='6'/>
+          <property name='repetition' value='Retry 2'/>
+        </properties>
+      </testcase>
+      <testcase name='testName🏷️And📋ParamsUsingSome😱Unusual🤪Characters(7)' classname='FastlaneTrainerTests' time='5.2e-05'>
+        <properties>
+          <property name='testname' value='testName🏷️And📋ParamsUsingSome😱Unusual🤪Characters(asciiCharacter:)'/>
+          <property name='argument' value='7'/>
+          <property name='repetition' value='Retry 2'/>
+        </properties>
+      </testcase>
+      <testcase name='testName🏷️And📋ParamsUsingSome😱Unusual🤪Characters(8)' classname='FastlaneTrainerTests' time='0.0002'>
+        <properties>
+          <property name='testname' value='testName🏷️And📋ParamsUsingSome😱Unusual🤪Characters(asciiCharacter:)'/>
+          <property name='argument' value='8'/>
+          <property name='repetition' value='Retry 2'/>
+        </properties>
+      </testcase>
+      <testcase name='testName🏷️And📋ParamsUsingSome😱Unusual🤪Characters(9)' classname='FastlaneTrainerTests' time='5.3e-05'>
+        <properties>
+          <property name='testname' value='testName🏷️And📋ParamsUsingSome😱Unusual🤪Characters(asciiCharacter:)'/>
+          <property name='argument' value='9'/>
+          <property name='repetition' value='Retry 2'/>
+        </properties>
+      </testcase>
+      <testcase name='testName🏷️And📋ParamsUsingSome😱Unusual🤪Characters(a)' classname='FastlaneTrainerTests' time='5.8e-05'>
+        <properties>
+          <property name='testname' value='testName🏷️And📋ParamsUsingSome😱Unusual🤪Characters(asciiCharacter:)'/>
+          <property name='argument' value='a'/>
+          <property name='repetition' value='Retry 2'/>
+        </properties>
+      </testcase>
+      <testcase name='testName🏷️And📋ParamsUsingSome😱Unusual🤪Characters(A)' classname='FastlaneTrainerTests' time='7.0e-05'>
+        <properties>
+          <property name='testname' value='testName🏷️And📋ParamsUsingSome😱Unusual🤪Characters(asciiCharacter:)'/>
+          <property name='argument' value='A'/>
+          <property name='repetition' value='Retry 2'/>
+        </properties>
+      </testcase>
+      <testcase name='testName🏷️And📋ParamsUsingSome😱Unusual🤪Characters(b)' classname='FastlaneTrainerTests' time='8.9e-05'>
+        <properties>
+          <property name='testname' value='testName🏷️And📋ParamsUsingSome😱Unusual🤪Characters(asciiCharacter:)'/>
+          <property name='argument' value='b'/>
+          <property name='repetition' value='Retry 2'/>
+        </properties>
+      </testcase>
+      <testcase name='testName🏷️And📋ParamsUsingSome😱Unusual🤪Characters(B)' classname='FastlaneTrainerTests' time='6.9e-05'>
+        <properties>
+          <property name='testname' value='testName🏷️And📋ParamsUsingSome😱Unusual🤪Characters(asciiCharacter:)'/>
+          <property name='argument' value='B'/>
+          <property name='repetition' value='Retry 2'/>
+        </properties>
+      </testcase>
+      <testcase name='testName🏷️And📋ParamsUsingSome😱Unusual🤪Characters(c)' classname='FastlaneTrainerTests' time='5.5e-05'>
+        <properties>
+          <property name='testname' value='testName🏷️And📋ParamsUsingSome😱Unusual🤪Characters(asciiCharacter:)'/>
+          <property name='argument' value='c'/>
+          <property name='repetition' value='Retry 2'/>
+        </properties>
+      </testcase>
+      <testcase name='testName🏷️And📋ParamsUsingSome😱Unusual🤪Characters(C)' classname='FastlaneTrainerTests' time='9.0e-05'>
+        <properties>
+          <property name='testname' value='testName🏷️And📋ParamsUsingSome😱Unusual🤪Characters(asciiCharacter:)'/>
+          <property name='argument' value='C'/>
+          <property name='repetition' value='Retry 2'/>
+        </properties>
+      </testcase>
+      <testcase name='testName🏷️And📋ParamsUsingSome😱Unusual🤪Characters(d)' classname='FastlaneTrainerTests' time='5.3e-05'>
+        <properties>
+          <property name='testname' value='testName🏷️And📋ParamsUsingSome😱Unusual🤪Characters(asciiCharacter:)'/>
+          <property name='argument' value='d'/>
+          <property name='repetition' value='Retry 2'/>
+        </properties>
+      </testcase>
+      <testcase name='testName🏷️And📋ParamsUsingSome😱Unusual🤪Characters(D)' classname='FastlaneTrainerTests' time='5.2e-05'>
+        <properties>
+          <property name='testname' value='testName🏷️And📋ParamsUsingSome😱Unusual🤪Characters(asciiCharacter:)'/>
+          <property name='argument' value='D'/>
+          <property name='repetition' value='Retry 2'/>
+        </properties>
+      </testcase>
+      <testcase name='testName🏷️And📋ParamsUsingSome😱Unusual🤪Characters(e)' classname='FastlaneTrainerTests' time='5.3e-05'>
+        <properties>
+          <property name='testname' value='testName🏷️And📋ParamsUsingSome😱Unusual🤪Characters(asciiCharacter:)'/>
+          <property name='argument' value='e'/>
+          <property name='repetition' value='Retry 2'/>
+        </properties>
+      </testcase>
+      <testcase name='testName🏷️And📋ParamsUsingSome😱Unusual🤪Characters(E)' classname='FastlaneTrainerTests' time='5.4e-05'>
+        <properties>
+          <property name='testname' value='testName🏷️And📋ParamsUsingSome😱Unusual🤪Characters(asciiCharacter:)'/>
+          <property name='argument' value='E'/>
+          <property name='repetition' value='Retry 2'/>
+        </properties>
+      </testcase>
+      <testcase name='testName🏷️And📋ParamsUsingSome😱Unusual🤪Characters(f)' classname='FastlaneTrainerTests' time='8.2e-05'>
+        <properties>
+          <property name='testname' value='testName🏷️And📋ParamsUsingSome😱Unusual🤪Characters(asciiCharacter:)'/>
+          <property name='argument' value='f'/>
+          <property name='repetition' value='Retry 2'/>
+        </properties>
+      </testcase>
+      <testcase name='testName🏷️And📋ParamsUsingSome😱Unusual🤪Characters(F)' classname='FastlaneTrainerTests' time='8.2e-05'>
+        <properties>
+          <property name='testname' value='testName🏷️And📋ParamsUsingSome😱Unusual🤪Characters(asciiCharacter:)'/>
+          <property name='argument' value='F'/>
+          <property name='repetition' value='Retry 2'/>
+        </properties>
+      </testcase>
+      <testcase name='testName🏷️And📋ParamsUsingSome😱Unusual🤪Characters(g)' classname='FastlaneTrainerTests' time='5.8e-05'>
+        <properties>
+          <property name='testname' value='testName🏷️And📋ParamsUsingSome😱Unusual🤪Characters(asciiCharacter:)'/>
+          <property name='argument' value='g'/>
+          <property name='repetition' value='Retry 2'/>
+        </properties>
+      </testcase>
+      <testcase name='testName🏷️And📋ParamsUsingSome😱Unusual🤪Characters(G)' classname='FastlaneTrainerTests' time='8.0e-05'>
+        <properties>
+          <property name='testname' value='testName🏷️And📋ParamsUsingSome😱Unusual🤪Characters(asciiCharacter:)'/>
+          <property name='argument' value='G'/>
+          <property name='repetition' value='Retry 2'/>
+        </properties>
+      </testcase>
+      <testcase name='testName🏷️And📋ParamsUsingSome😱Unusual🤪Characters(h)' classname='FastlaneTrainerTests' time='8.1e-05'>
+        <properties>
+          <property name='testname' value='testName🏷️And📋ParamsUsingSome😱Unusual🤪Characters(asciiCharacter:)'/>
+          <property name='argument' value='h'/>
+          <property name='repetition' value='Retry 2'/>
+        </properties>
+      </testcase>
+      <testcase name='testName🏷️And📋ParamsUsingSome😱Unusual🤪Characters(H)' classname='FastlaneTrainerTests' time='7.4e-05'>
+        <properties>
+          <property name='testname' value='testName🏷️And📋ParamsUsingSome😱Unusual🤪Characters(asciiCharacter:)'/>
+          <property name='argument' value='H'/>
+          <property name='repetition' value='Retry 2'/>
+        </properties>
+      </testcase>
+      <testcase name='testName🏷️And📋ParamsUsingSome😱Unusual🤪Characters(i)' classname='FastlaneTrainerTests' time='5.2e-05'>
+        <properties>
+          <property name='testname' value='testName🏷️And📋ParamsUsingSome😱Unusual🤪Characters(asciiCharacter:)'/>
+          <property name='argument' value='i'/>
+          <property name='repetition' value='Retry 2'/>
+        </properties>
+      </testcase>
+      <testcase name='testName🏷️And📋ParamsUsingSome😱Unusual🤪Characters(I)' classname='FastlaneTrainerTests' time='5.5e-05'>
+        <properties>
+          <property name='testname' value='testName🏷️And📋ParamsUsingSome😱Unusual🤪Characters(asciiCharacter:)'/>
+          <property name='argument' value='I'/>
+          <property name='repetition' value='Retry 2'/>
+        </properties>
+      </testcase>
+      <testcase name='testName🏷️And📋ParamsUsingSome😱Unusual🤪Characters(j)' classname='FastlaneTrainerTests' time='8.4e-05'>
+        <properties>
+          <property name='testname' value='testName🏷️And📋ParamsUsingSome😱Unusual🤪Characters(asciiCharacter:)'/>
+          <property name='argument' value='j'/>
+          <property name='repetition' value='Retry 2'/>
+        </properties>
+      </testcase>
+      <testcase name='testName🏷️And📋ParamsUsingSome😱Unusual🤪Characters(J)' classname='FastlaneTrainerTests' time='7.0e-05'>
+        <properties>
+          <property name='testname' value='testName🏷️And📋ParamsUsingSome😱Unusual🤪Characters(asciiCharacter:)'/>
+          <property name='argument' value='J'/>
+          <property name='repetition' value='Retry 2'/>
+        </properties>
+      </testcase>
+      <testcase name='testName🏷️And📋ParamsUsingSome😱Unusual🤪Characters(k)' classname='FastlaneTrainerTests' time='6.5e-05'>
+        <properties>
+          <property name='testname' value='testName🏷️And📋ParamsUsingSome😱Unusual🤪Characters(asciiCharacter:)'/>
+          <property name='argument' value='k'/>
+          <property name='repetition' value='Retry 2'/>
+        </properties>
+      </testcase>
+      <testcase name='testName🏷️And📋ParamsUsingSome😱Unusual🤪Characters(K)' classname='FastlaneTrainerTests' time='5.6e-05'>
+        <properties>
+          <property name='testname' value='testName🏷️And📋ParamsUsingSome😱Unusual🤪Characters(asciiCharacter:)'/>
+          <property name='argument' value='K'/>
+          <property name='repetition' value='Retry 2'/>
+        </properties>
+      </testcase>
+      <testcase name='testName🏷️And📋ParamsUsingSome😱Unusual🤪Characters(l)' classname='FastlaneTrainerTests' time='5.5e-05'>
+        <properties>
+          <property name='testname' value='testName🏷️And📋ParamsUsingSome😱Unusual🤪Characters(asciiCharacter:)'/>
+          <property name='argument' value='l'/>
+          <property name='repetition' value='Retry 2'/>
+        </properties>
+      </testcase>
+      <testcase name='testName🏷️And📋ParamsUsingSome😱Unusual🤪Characters(L)' classname='FastlaneTrainerTests' time='5.4e-05'>
+        <properties>
+          <property name='testname' value='testName🏷️And📋ParamsUsingSome😱Unusual🤪Characters(asciiCharacter:)'/>
+          <property name='argument' value='L'/>
+          <property name='repetition' value='Retry 2'/>
+        </properties>
+      </testcase>
+      <testcase name='testName🏷️And📋ParamsUsingSome😱Unusual🤪Characters(m)' classname='FastlaneTrainerTests' time='4.7e-05'>
+        <properties>
+          <property name='testname' value='testName🏷️And📋ParamsUsingSome😱Unusual🤪Characters(asciiCharacter:)'/>
+          <property name='argument' value='m'/>
+          <property name='repetition' value='Retry 2'/>
+        </properties>
+      </testcase>
+      <testcase name='testName🏷️And📋ParamsUsingSome😱Unusual🤪Characters(M)' classname='FastlaneTrainerTests' time='5.6e-05'>
+        <properties>
+          <property name='testname' value='testName🏷️And📋ParamsUsingSome😱Unusual🤪Characters(asciiCharacter:)'/>
+          <property name='argument' value='M'/>
+          <property name='repetition' value='Retry 2'/>
+        </properties>
+      </testcase>
+      <testcase name='testName🏷️And📋ParamsUsingSome😱Unusual🤪Characters(n)' classname='FastlaneTrainerTests' time='5.3e-05'>
+        <properties>
+          <property name='testname' value='testName🏷️And📋ParamsUsingSome😱Unusual🤪Characters(asciiCharacter:)'/>
+          <property name='argument' value='n'/>
+          <property name='repetition' value='Retry 2'/>
+        </properties>
+      </testcase>
+      <testcase name='testName🏷️And📋ParamsUsingSome😱Unusual🤪Characters(N)' classname='FastlaneTrainerTests' time='5.2e-05'>
+        <properties>
+          <property name='testname' value='testName🏷️And📋ParamsUsingSome😱Unusual🤪Characters(asciiCharacter:)'/>
+          <property name='argument' value='N'/>
+          <property name='repetition' value='Retry 2'/>
+        </properties>
+      </testcase>
+      <testcase name='testName🏷️And📋ParamsUsingSome😱Unusual🤪Characters(o)' classname='FastlaneTrainerTests' time='6.1e-05'>
+        <properties>
+          <property name='testname' value='testName🏷️And📋ParamsUsingSome😱Unusual🤪Characters(asciiCharacter:)'/>
+          <property name='argument' value='o'/>
+          <property name='repetition' value='Retry 2'/>
+        </properties>
+      </testcase>
+      <testcase name='testName🏷️And📋ParamsUsingSome😱Unusual🤪Characters(O)' classname='FastlaneTrainerTests' time='5.8e-05'>
+        <properties>
+          <property name='testname' value='testName🏷️And📋ParamsUsingSome😱Unusual🤪Characters(asciiCharacter:)'/>
+          <property name='argument' value='O'/>
+          <property name='repetition' value='Retry 2'/>
+        </properties>
+      </testcase>
+      <testcase name='testName🏷️And📋ParamsUsingSome😱Unusual🤪Characters(p)' classname='FastlaneTrainerTests' time='5.6e-05'>
+        <properties>
+          <property name='testname' value='testName🏷️And📋ParamsUsingSome😱Unusual🤪Characters(asciiCharacter:)'/>
+          <property name='argument' value='p'/>
+          <property name='repetition' value='Retry 2'/>
+        </properties>
+      </testcase>
+      <testcase name='testName🏷️And📋ParamsUsingSome😱Unusual🤪Characters(P)' classname='FastlaneTrainerTests' time='0.00012'>
+        <properties>
+          <property name='testname' value='testName🏷️And📋ParamsUsingSome😱Unusual🤪Characters(asciiCharacter:)'/>
+          <property name='argument' value='P'/>
+          <property name='repetition' value='Retry 2'/>
+        </properties>
+      </testcase>
+      <testcase name='testName🏷️And📋ParamsUsingSome😱Unusual🤪Characters(q)' classname='FastlaneTrainerTests' time='5.7e-05'>
+        <properties>
+          <property name='testname' value='testName🏷️And📋ParamsUsingSome😱Unusual🤪Characters(asciiCharacter:)'/>
+          <property name='argument' value='q'/>
+          <property name='repetition' value='Retry 2'/>
+        </properties>
+      </testcase>
+      <testcase name='testName🏷️And📋ParamsUsingSome😱Unusual🤪Characters(Q)' classname='FastlaneTrainerTests' time='5.8e-05'>
+        <properties>
+          <property name='testname' value='testName🏷️And📋ParamsUsingSome😱Unusual🤪Characters(asciiCharacter:)'/>
+          <property name='argument' value='Q'/>
+          <property name='repetition' value='Retry 2'/>
+        </properties>
+      </testcase>
+      <testcase name='testName🏷️And📋ParamsUsingSome😱Unusual🤪Characters(r)' classname='FastlaneTrainerTests' time='6.2e-05'>
+        <properties>
+          <property name='testname' value='testName🏷️And📋ParamsUsingSome😱Unusual🤪Characters(asciiCharacter:)'/>
+          <property name='argument' value='r'/>
+          <property name='repetition' value='Retry 2'/>
+        </properties>
+      </testcase>
+      <testcase name='testName🏷️And📋ParamsUsingSome😱Unusual🤪Characters(R)' classname='FastlaneTrainerTests' time='9.1e-05'>
+        <properties>
+          <property name='testname' value='testName🏷️And📋ParamsUsingSome😱Unusual🤪Characters(asciiCharacter:)'/>
+          <property name='argument' value='R'/>
+          <property name='repetition' value='Retry 2'/>
+        </properties>
+      </testcase>
+      <testcase name='testName🏷️And📋ParamsUsingSome😱Unusual🤪Characters(s)' classname='FastlaneTrainerTests' time='6.0e-05'>
+        <properties>
+          <property name='testname' value='testName🏷️And📋ParamsUsingSome😱Unusual🤪Characters(asciiCharacter:)'/>
+          <property name='argument' value='s'/>
+          <property name='repetition' value='Retry 2'/>
+        </properties>
+      </testcase>
+      <testcase name='testName🏷️And📋ParamsUsingSome😱Unusual🤪Characters(S)' classname='FastlaneTrainerTests' time='8.1e-05'>
+        <properties>
+          <property name='testname' value='testName🏷️And📋ParamsUsingSome😱Unusual🤪Characters(asciiCharacter:)'/>
+          <property name='argument' value='S'/>
+          <property name='repetition' value='Retry 2'/>
+        </properties>
+      </testcase>
+      <testcase name='testName🏷️And📋ParamsUsingSome😱Unusual🤪Characters(t)' classname='FastlaneTrainerTests' time='0.00016'>
+        <properties>
+          <property name='testname' value='testName🏷️And📋ParamsUsingSome😱Unusual🤪Characters(asciiCharacter:)'/>
+          <property name='argument' value='t'/>
+          <property name='repetition' value='Retry 2'/>
+        </properties>
+      </testcase>
+      <testcase name='testName🏷️And📋ParamsUsingSome😱Unusual🤪Characters(T)' classname='FastlaneTrainerTests' time='6.2e-05'>
+        <properties>
+          <property name='testname' value='testName🏷️And📋ParamsUsingSome😱Unusual🤪Characters(asciiCharacter:)'/>
+          <property name='argument' value='T'/>
+          <property name='repetition' value='Retry 2'/>
+        </properties>
+      </testcase>
+      <testcase name='testName🏷️And📋ParamsUsingSome😱Unusual🤪Characters(u)' classname='FastlaneTrainerTests' time='6.0e-05'>
+        <properties>
+          <property name='testname' value='testName🏷️And📋ParamsUsingSome😱Unusual🤪Characters(asciiCharacter:)'/>
+          <property name='argument' value='u'/>
+          <property name='repetition' value='Retry 2'/>
+        </properties>
+      </testcase>
+      <testcase name='testName🏷️And📋ParamsUsingSome😱Unusual🤪Characters(U)' classname='FastlaneTrainerTests' time='4.6e-05'>
+        <properties>
+          <property name='testname' value='testName🏷️And📋ParamsUsingSome😱Unusual🤪Characters(asciiCharacter:)'/>
+          <property name='argument' value='U'/>
+          <property name='repetition' value='Retry 2'/>
+        </properties>
+      </testcase>
+      <testcase name='testName🏷️And📋ParamsUsingSome😱Unusual🤪Characters(v)' classname='FastlaneTrainerTests' time='4.5e-05'>
+        <properties>
+          <property name='testname' value='testName🏷️And📋ParamsUsingSome😱Unusual🤪Characters(asciiCharacter:)'/>
+          <property name='argument' value='v'/>
+          <property name='repetition' value='Retry 2'/>
+        </properties>
+      </testcase>
+      <testcase name='testName🏷️And📋ParamsUsingSome😱Unusual🤪Characters(V)' classname='FastlaneTrainerTests' time='5.1e-05'>
+        <properties>
+          <property name='testname' value='testName🏷️And📋ParamsUsingSome😱Unusual🤪Characters(asciiCharacter:)'/>
+          <property name='argument' value='V'/>
+          <property name='repetition' value='Retry 2'/>
+        </properties>
+      </testcase>
+      <testcase name='testName🏷️And📋ParamsUsingSome😱Unusual🤪Characters(w)' classname='FastlaneTrainerTests' time='6.0e-05'>
+        <properties>
+          <property name='testname' value='testName🏷️And📋ParamsUsingSome😱Unusual🤪Characters(asciiCharacter:)'/>
+          <property name='argument' value='w'/>
+          <property name='repetition' value='Retry 2'/>
+        </properties>
+      </testcase>
+      <testcase name='testName🏷️And📋ParamsUsingSome😱Unusual🤪Characters(W)' classname='FastlaneTrainerTests' time='6.7e-05'>
+        <properties>
+          <property name='testname' value='testName🏷️And📋ParamsUsingSome😱Unusual🤪Characters(asciiCharacter:)'/>
+          <property name='argument' value='W'/>
+          <property name='repetition' value='Retry 2'/>
+        </properties>
+      </testcase>
+      <testcase name='testName🏷️And📋ParamsUsingSome😱Unusual🤪Characters(x)' classname='FastlaneTrainerTests' time='7.9e-05'>
+        <properties>
+          <property name='testname' value='testName🏷️And📋ParamsUsingSome😱Unusual🤪Characters(asciiCharacter:)'/>
+          <property name='argument' value='x'/>
+          <property name='repetition' value='Retry 2'/>
+        </properties>
+      </testcase>
+      <testcase name='testName🏷️And📋ParamsUsingSome😱Unusual🤪Characters(X)' classname='FastlaneTrainerTests' time='7.9e-05'>
+        <properties>
+          <property name='testname' value='testName🏷️And📋ParamsUsingSome😱Unusual🤪Characters(asciiCharacter:)'/>
+          <property name='argument' value='X'/>
+          <property name='repetition' value='Retry 2'/>
+        </properties>
+      </testcase>
+      <testcase name='testName🏷️And📋ParamsUsingSome😱Unusual🤪Characters(y)' classname='FastlaneTrainerTests' time='8.0e-05'>
+        <properties>
+          <property name='testname' value='testName🏷️And📋ParamsUsingSome😱Unusual🤪Characters(asciiCharacter:)'/>
+          <property name='argument' value='y'/>
+          <property name='repetition' value='Retry 2'/>
+        </properties>
+      </testcase>
+      <testcase name='testName🏷️And📋ParamsUsingSome😱Unusual🤪Characters(Y)' classname='FastlaneTrainerTests' time='8.6e-05'>
+        <properties>
+          <property name='testname' value='testName🏷️And📋ParamsUsingSome😱Unusual🤪Characters(asciiCharacter:)'/>
+          <property name='argument' value='Y'/>
+          <property name='repetition' value='Retry 2'/>
+        </properties>
+      </testcase>
+      <testcase name='testName🏷️And📋ParamsUsingSome😱Unusual🤪Characters(z)' classname='FastlaneTrainerTests' time='5.0e-05'>
+        <properties>
+          <property name='testname' value='testName🏷️And📋ParamsUsingSome😱Unusual🤪Characters(asciiCharacter:)'/>
+          <property name='argument' value='z'/>
+          <property name='repetition' value='Retry 2'/>
+        </properties>
+      </testcase>
+      <testcase name='testName🏷️And📋ParamsUsingSome😱Unusual🤪Characters(Z)' classname='FastlaneTrainerTests' time='5.4e-05'>
+        <properties>
+          <property name='testname' value='testName🏷️And📋ParamsUsingSome😱Unusual🤪Characters(asciiCharacter:)'/>
+          <property name='argument' value='Z'/>
+          <property name='repetition' value='Retry 2'/>
+        </properties>
+      </testcase>
+      <testsuite name='Math Operations' time='0.45' tests='1' failures='0' skipped='0'>
+        <testcase name='Basic arithmetic' classname='FastlaneTrainerTests.MathTests' time='0.9'>
+          <properties>
+            <property name='repetition' value='Retry 2'/>
+          </properties>
+        </testcase>
+      </testsuite>
+      <testsuite name='String Operations' time='0.76' tests='2' failures='0' skipped='0'>
+        <testcase name='String concatenation' classname='FastlaneTrainerTests.StringTests' time='0.9'>
+          <properties>
+            <property name='repetition' value='Retry 2'/>
+          </properties>
+        </testcase>
+        <testcase name='String transformations' classname='FastlaneTrainerTests.StringTests' time='0.61'>
+          <properties>
+            <property name='repetition' value='Retry 2'/>
+          </properties>
+        </testcase>
+      </testsuite>
+      <testsuite name='Content Management' time='0.8' tests='4' failures='1' skipped='0'>
+        <testsuite name='Posts' time='0.8' tests='4' failures='1' skipped='0'>
+          <testsuite name='Moderation' time='0.51' tests='3' failures='0' skipped='0'>
+            <testcase name='Content filtering (&quot;normal post&quot;)' classname='FastlaneTrainerTests.ContentTests.PostTests.ModerationTests' time='0.34'>
+              <properties>
+                <property name='testname' value='Content filtering'/>
+                <property name='argument' value='&quot;normal post&quot;'/>
+                <property name='repetition' value='Retry 2'/>
+              </properties>
+            </testcase>
+            <testcase name='Content filtering (&quot;post with @mention&quot;)' classname='FastlaneTrainerTests.ContentTests.PostTests.ModerationTests' time='0.34'>
+              <properties>
+                <property name='testname' value='Content filtering'/>
+                <property name='argument' value='&quot;post with @mention&quot;'/>
+                <property name='repetition' value='Retry 2'/>
+              </properties>
+            </testcase>
+            <testcase name='Content filtering (&quot;post with #hashtag&quot;)' classname='FastlaneTrainerTests.ContentTests.PostTests.ModerationTests' time='0.34'>
+              <properties>
+                <property name='testname' value='Content filtering'/>
+                <property name='argument' value='&quot;post with #hashtag&quot;'/>
+                <property name='repetition' value='Retry 2'/>
+              </properties>
+            </testcase>
+          </testsuite>
+          <testsuite name='Creation' time='0.29' tests='1' failures='1' skipped='0'>
+            <testcase name='Post length validation' classname='FastlaneTrainerTests.ContentTests.PostTests.CreationTests' time='0.57'>
+              <failure message='FastlaneTrainerExampleTests.swift:232: Expectation failed: (longPost.count → 1000) &lt;= 500'/>
+              <properties>
+                <property name='repetition' value='Retry 2'/>
+              </properties>
+            </testcase>
+          </testsuite>
+        </testsuite>
+      </testsuite>
+      <testsuite name='User Management' time='2.35' tests='11' failures='1' skipped='0'>
+        <testsuite name='Profile Management' time='1.4300000000000002' tests='7' failures='0' skipped='0'>
+          <testsuite name='Avatar' time='0.8' tests='4' failures='0' skipped='0'>
+            <testcase name='Avatar dimensions' classname='FastlaneTrainerTests.UserTests.ProfileTests.AvatarTests' time='0.57'>
+              <properties>
+                <property name='repetition' value='Retry 2'/>
+              </properties>
+            </testcase>
+            <testcase name='Avatar file types (&quot;gif&quot;)' classname='FastlaneTrainerTests.UserTests.ProfileTests.AvatarTests' time='0.34'>
+              <properties>
+                <property name='testname' value='Avatar file types'/>
+                <property name='argument' value='&quot;gif&quot;'/>
+                <property name='repetition' value='Retry 2'/>
+              </properties>
+            </testcase>
+            <testcase name='Avatar file types (&quot;jpg&quot;)' classname='FastlaneTrainerTests.UserTests.ProfileTests.AvatarTests' time='0.34'>
+              <properties>
+                <property name='testname' value='Avatar file types'/>
+                <property name='argument' value='&quot;jpg&quot;'/>
+                <property name='repetition' value='Retry 2'/>
+              </properties>
+            </testcase>
+            <testcase name='Avatar file types (&quot;png&quot;)' classname='FastlaneTrainerTests.UserTests.ProfileTests.AvatarTests' time='0.34'>
+              <properties>
+                <property name='testname' value='Avatar file types'/>
+                <property name='argument' value='&quot;png&quot;'/>
+                <property name='repetition' value='Retry 2'/>
+              </properties>
+            </testcase>
+          </testsuite>
+          <testsuite name='Settings' time='0.63' tests='3' failures='0' skipped='0'>
+            <testcase name='Privacy settings ((setting: &quot;email&quot;, isPrivate: true))' classname='FastlaneTrainerTests.UserTests.ProfileTests.SettingsTests' time='0.34'>
+              <properties>
+                <property name='testname' value='Privacy settings'/>
+                <property name='argument' value='(setting: &quot;email&quot;, isPrivate: true)'/>
+                <property name='repetition' value='Retry 2'/>
+              </properties>
+            </testcase>
+            <testcase name='Privacy settings ((setting: &quot;name&quot;, isPrivate: false))' classname='FastlaneTrainerTests.UserTests.ProfileTests.SettingsTests' time='0.57'>
+              <properties>
+                <property name='testname' value='Privacy settings'/>
+                <property name='argument' value='(setting: &quot;name&quot;, isPrivate: false)'/>
+                <property name='repetition' value='Retry 2'/>
+              </properties>
+            </testcase>
+            <testcase name='Privacy settings ((setting: &quot;profile&quot;, isPrivate: true))' classname='FastlaneTrainerTests.UserTests.ProfileTests.SettingsTests' time='0.35'>
+              <properties>
+                <property name='testname' value='Privacy settings'/>
+                <property name='argument' value='(setting: &quot;profile&quot;, isPrivate: true)'/>
+                <property name='repetition' value='Retry 2'/>
+              </properties>
+            </testcase>
+          </testsuite>
+        </testsuite>
+        <testsuite name='Registration' time='0.92' tests='4' failures='1' skipped='0'>
+          <testcase name='Basic registration' classname='FastlaneTrainerTests.UserTests.RegistrationTests' time='0.29'>
+            <properties>
+              <property name='repetition' value='Retry 2'/>
+            </properties>
+          </testcase>
+          <testsuite name='Email Validation' time='0.15' tests='1' failures='0' skipped='0'>
+            <testcase name='Valid email formats' classname='FastlaneTrainerTests.UserTests.RegistrationTests.EmailTests' time='0.29'>
+              <properties>
+                <property name='repetition' value='Retry 2'/>
+              </properties>
+            </testcase>
+          </testsuite>
+          <testsuite name='Password Validation' time='0.62' tests='2' failures='1' skipped='0'>
+            <testcase name='Password length requirements' classname='FastlaneTrainerTests.UserTests.RegistrationTests.PasswordTests' time='0.66'>
+              <failure message='FastlaneTrainerExampleTests.swift:162: Expectation failed: (password.count → 11) &lt; 8
+Password &apos;justbarely8&apos; is too short'/>
+              <failure message='FastlaneTrainerExampleTests.swift:162: Expectation failed: (password.count → 16) &lt; 8
+Password &apos;thisislongenough&apos; is too short'/>
+              <properties>
+                <property name='repetition' value='Retry 2'/>
+              </properties>
+            </testcase>
+            <testcase name='Password complexity' classname='FastlaneTrainerTests.UserTests.RegistrationTests.PasswordTests' time='0.57'>
+              <properties>
+                <property name='repetition' value='Retry 2'/>
+              </properties>
+            </testcase>
+          </testsuite>
+        </testsuite>
+      </testsuite>
+      <testsuite name='Test Skipping Demonstrations' time='1.49884' tests='11' failures='4' skipped='5'>
+        <testcase name='Unconditionally skipped test' classname='FastlaneTrainerTests.SkipTests' time='0.035'>
+          <skipped message='Test &apos;Unconditionally skipped test&apos; skipped: Feature pending implementation'/>
+          <properties>
+            <property name='repetition' value='Retry 2'/>
+          </properties>
+        </testcase>
+        <testcase name='Platform-specific test' classname='FastlaneTrainerTests.SkipTests' time='0.00011'>
+          <skipped message='Test &apos;Platform-specific test&apos; skipped: Test only runs in Catalyst'/>
+          <properties>
+            <property name='repetition' value='Retry 2'/>
+          </properties>
+        </testcase>
+        <testcase name='Version-dependent test' classname='FastlaneTrainerTests.SkipTests' time='0.89'>
+          <properties>
+            <property name='repetition' value='Retry 2'/>
+          </properties>
+        </testcase>
+        <testsuite name='Environment-Dependent Tests' time='0.00063' tests='2' failures='0' skipped='2'>
+          <testcase name='Production config test' classname='FastlaneTrainerTests.SkipTests.EnvironmentTests' time='9.0e-05'>
+            <skipped message='Test &apos;Production config test&apos; skipped: Test only runs in production'/>
+            <properties>
+              <property name='repetition' value='Retry 2'/>
+            </properties>
+          </testcase>
+          <testcase name='CI environment test' classname='FastlaneTrainerTests.SkipTests.EnvironmentTests' time='0.00016'>
+            <skipped message='Test &apos;CI environment test&apos; skipped: Test only runs in CI environment'/>
+            <properties>
+              <property name='repetition' value='Retry 2'/>
+            </properties>
+          </testcase>
+        </testsuite>
+        <testsuite name='Feature Flag Tests' time='0.45049' tests='4' failures='2' skipped='1'>
+          <testcase name='Premium feature test' classname='FastlaneTrainerTests.SkipTests.FeatureFlagTests' time='5.2e-05'>
+            <skipped message='Test &apos;Premium feature test&apos; skipped: Premium features not available'/>
+            <properties>
+              <property name='repetition' value='Retry 2'/>
+              <property name='tag1' value='validation'/>
+            </properties>
+          </testcase>
+          <testcase name='Feature flag dependent tests (&quot;basic_feature&quot;)' classname='FastlaneTrainerTests.SkipTests.FeatureFlagTests' time='0.29'>
+            <properties>
+              <property name='testname' value='Feature flag dependent tests'/>
+              <property name='argument' value='&quot;basic_feature&quot;'/>
+              <property name='repetition' value='Retry 2'/>
+            </properties>
+          </testcase>
+          <testcase name='Feature flag dependent tests (&quot;experimental_feature&quot;)' classname='FastlaneTrainerTests.SkipTests.FeatureFlagTests' time='0.29'>
+            <failure message='FastlaneTrainerExampleTests.swift:340: Caught error: TestError(message: &quot;Feature \&apos;experimental_feature\&apos; is not enabled&quot;)'/>
+            <properties>
+              <property name='testname' value='Feature flag dependent tests'/>
+              <property name='argument' value='&quot;experimental_feature&quot;'/>
+              <property name='repetition' value='Retry 2'/>
+            </properties>
+          </testcase>
+          <testcase name='Feature flag dependent tests (&quot;premium_feature&quot;)' classname='FastlaneTrainerTests.SkipTests.FeatureFlagTests' time='0.29'>
+            <failure message='FastlaneTrainerExampleTests.swift:340: Caught error: TestError(message: &quot;Feature \&apos;premium_feature\&apos; is not enabled&quot;)'/>
+            <properties>
+              <property name='testname' value='Feature flag dependent tests'/>
+              <property name='argument' value='&quot;premium_feature&quot;'/>
+              <property name='repetition' value='Retry 2'/>
+            </properties>
+          </testcase>
+        </testsuite>
+        <testsuite name='Resource-Dependent Tests' time='0.58' tests='2' failures='2' skipped='0'>
+          <testcase name='Network-dependent test' classname='FastlaneTrainerTests.SkipTests.ResourceTests' time='0.57'>
+            <failure message='FastlaneTrainerExampleTests.swift:297: Caught error: TestError(message: &quot;Test requires network access&quot;)'/>
+            <properties>
+              <property name='repetition' value='Retry 2'/>
+              <property name='tag1' value='network'/>
+            </properties>
+          </testcase>
+          <testcase name='Database test with cleanup' classname='FastlaneTrainerTests.SkipTests.ResourceTests' time='0.57'>
+            <failure message='FastlaneTrainerExampleTests.swift:307: Caught error: TestError(message: &quot;Database not available&quot;)'/>
+            <properties>
+              <property name='repetition' value='Retry 2'/>
+              <property name='tag1' value='database'/>
+            </properties>
+          </testcase>
+        </testsuite>
+      </testsuite>
+    </testsuite>
+    <properties>
+      <property name='Configuration' value='MyTestPlanConfig'/>
+      <property name='device' value='iPhone 16 Pro (18.2)'/>
+    </properties>
+  </testsuite>
+  <testsuite name='FastlaneTrainerExampleXCTests' time='0.74439' tests='11' failures='1' skipped='1'>
+    <testsuite name='FastlaneTrainerExampleXCTests' time='0.74439' tests='11' failures='1' skipped='1'>
+      <testcase name='testA_FirstTest()' classname='FastlaneTrainerExampleXCTests' time='0.0011'/>
+      <testcase name='testAsyncOperation()' classname='FastlaneTrainerExampleXCTests' time='0.11'/>
+      <testcase name='testAsyncOperationWithExpectation()' classname='FastlaneTrainerExampleXCTests' time='0.11'/>
+      <testcase name='testB_SecondTest()' classname='FastlaneTrainerExampleXCTests' time='0.00062'/>
+      <testcase name='testBasicAssertions()' classname='FastlaneTrainerExampleXCTests' time='0.0013'>
+        <failure message='FastlaneTrainerExampleXCTests.swift:53: XCTAssertFalse failed - False should be false'/>
+        <properties>
+          <property name='repetition' value='Retry 2'/>
+        </properties>
+      </testcase>
+      <testcase name='testConditionalExecution()' classname='FastlaneTrainerExampleXCTests' time='0.0044'>
+        <skipped message='Test skipped - Skipping slow tests'/>
+        <properties>
+          <property name='repetition' value='Retry 1'/>
+        </properties>
+      </testcase>
+      <testcase name='testMultipleExpectations()' classname='FastlaneTrainerExampleXCTests' time='0.21'/>
+      <testcase name='testPerformance()' classname='FastlaneTrainerExampleXCTests' time='0.26'/>
+      <testcase name='testPerformanceWithMetrics()' classname='FastlaneTrainerExampleXCTests' time='0.037'/>
+      <testcase name='testPlatformSpecific()' classname='FastlaneTrainerExampleXCTests' time='0.00067'/>
+      <testcase name='testThrowingOperation()' classname='FastlaneTrainerExampleXCTests' time='0.0006'/>
+    </testsuite>
+    <properties>
+      <property name='Configuration' value='MyTestPlanConfig'/>
+      <property name='device' value='iPhone 16 Pro (18.2)'/>
+    </properties>
+  </testsuite>
+  <testsuite name='FastlaneTrainerExampleUITests' time='64.0' tests='10' failures='4' skipped='0'>
+    <testsuite name='FastlaneTrainerExampleUITests' time='48.0' tests='6' failures='4' skipped='0'>
+      <testcase name='testAccessibilityAndScreenshots()' classname='FastlaneTrainerExampleUITests' time='3.0'>
+        <failure message='FastlaneTrainerExampleUITests.swift:129: XCTAssertTrue failed'/>
+        <properties>
+          <property name='repetition' value='Retry 2'/>
+        </properties>
+      </testcase>
+      <testcase name='testAlertHandling()' classname='FastlaneTrainerExampleUITests' time='6.0'/>
+      <testcase name='testBasicNavigation()' classname='FastlaneTrainerExampleUITests' time='8.0'>
+        <failure message='FastlaneTrainerExampleUITests.swift:43: Failed to tap &quot;Details&quot; Button: No matches found for first query match sequence: `Descendants matching type Button` -&gt; `Elements matching predicate &apos;&quot;Details&quot; IN identifiers&apos;`, given input App element pid: 14039'/>
+        <properties>
+          <property name='repetition' value='Retry 2'/>
+        </properties>
+      </testcase>
+      <testcase name='testGesturesAndInteractions()' classname='FastlaneTrainerExampleUITests' time='4.0'>
+        <failure message='FastlaneTrainerExampleUITests.swift:108: XCTAssertTrue failed'/>
+        <properties>
+          <property name='repetition' value='Retry 2'/>
+        </properties>
+      </testcase>
+      <testcase name='testLaunchPerformance()' classname='FastlaneTrainerExampleUITests' time='22.0'/>
+      <testcase name='testTextInputAndValidation()' classname='FastlaneTrainerExampleUITests' time='5.0'>
+        <failure message='FastlaneTrainerExampleUITests.swift:68: XCTAssertEqual failed: (&quot;Optional(&quot;Search&quot;)&quot;) is not equal to (&quot;Optional(&quot;&quot;)&quot;)'/>
+        <properties>
+          <property name='repetition' value='Retry 2'/>
+        </properties>
+      </testcase>
+    </testsuite>
+    <testsuite name='FastlaneTrainerExampleUITestsLaunchTests' time='16.0' tests='4' failures='0' skipped='0'>
+      <testcase name='testLaunch(1, 1)' classname='FastlaneTrainerExampleUITestsLaunchTests' time='4.0'>
+        <properties>
+          <property name='testname' value='testLaunch()'/>
+          <property name='argument' value='1, 1'/>
+        </properties>
+      </testcase>
+      <testcase name='testLaunch(1, 2)' classname='FastlaneTrainerExampleUITestsLaunchTests' time='4.0'>
+        <properties>
+          <property name='testname' value='testLaunch()'/>
+          <property name='argument' value='1, 2'/>
+        </properties>
+      </testcase>
+      <testcase name='testLaunch(2, 4)' classname='FastlaneTrainerExampleUITestsLaunchTests' time='4.0'>
+        <properties>
+          <property name='testname' value='testLaunch()'/>
+          <property name='argument' value='2, 4'/>
+        </properties>
+      </testcase>
+      <testcase name='testLaunch(4, 1)' classname='FastlaneTrainerExampleUITestsLaunchTests' time='4.0'>
+        <properties>
+          <property name='testname' value='testLaunch()'/>
+          <property name='argument' value='4, 1'/>
+        </properties>
+      </testcase>
+    </testsuite>
+    <properties>
+      <property name='Configuration' value='MyTestPlanConfig'/>
+      <property name='device' value='iPhone 16 Pro (18.2)'/>
+    </properties>
+  </testsuite>
+</testsuites>

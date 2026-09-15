@@ -1,6 +1,14 @@
 describe Fastlane do
   describe Fastlane::FastFile do
-    describe "import_from_git" do
+    # These examples are one scenario written as several examples: the `before :all`
+    # builds a git repository, and individual examples append commits, tags and
+    # branches to it that later ones then assert on. They therefore have to run in
+    # the order they are written, and a random order makes them assert against a
+    # repository at the wrong revision. Pinned rather than rewritten: making each
+    # example build its own repository would be order independent but would add a
+    # git init, several commits and several tags per example to a group that
+    # already takes eleven seconds. See fastlane#30184.
+    describe "import_from_git", order: :defined do
       it "raises an exception when no path is given" do
         expect do
           Fastlane::FastFile.new.parse("lane :test do
@@ -303,6 +311,29 @@ describe Fastlane do
             works
           end").runner.execute(:test)
         end
+      end
+
+      it "works with one HTTP header" do
+        header = 'Authorization: Basic my_base_64_key'
+
+        allow(Fastlane::Actions).to receive(:sh).and_call_original
+        expect(Fastlane::Actions).to receive(:sh).with(any_args, '--config', "http.extraHeader=#{header}")
+
+        Fastlane::FastFile.new.parse("lane :test do
+          import_from_git(url: '#{source_directory_path}', git_extra_headers: ['#{header}'])
+        end").runner.execute(:test)
+      end
+
+      it "works with two HTTP headers" do
+        first_header = 'Authorization: Basic my_base_64_key'
+        second_header = 'Cache-Control: no-cache'
+
+        allow(Fastlane::Actions).to receive(:sh).and_call_original
+        expect(Fastlane::Actions).to receive(:sh).with(any_args, '--config', "http.extraHeader=#{first_header}", '--config', "http.extraHeader=#{second_header}")
+
+        Fastlane::FastFile.new.parse("lane :test do
+          import_from_git(url: '#{source_directory_path}', git_extra_headers: ['#{first_header}', '#{second_header}'])
+        end").runner.execute(:test)
       end
 
       after :all do

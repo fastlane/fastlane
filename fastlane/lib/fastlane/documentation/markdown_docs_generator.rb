@@ -97,7 +97,7 @@ module Fastlane
       if File.exist?(custom_file_location)
         UI.verbose("Using custom md.erb file for action #{action.action_name}")
 
-        result = ERB.new(File.read(custom_file_location), 0, '-').result(binding) # https://web.archive.org/web/20160430190141/www.rrn.dk/rubys-erb-templating-system
+        result = ERB.new(File.read(custom_file_location), trim_mode: '-').result(binding) # https://web.archive.org/web/20160430190141/www.rrn.dk/rubys-erb-templating-system
 
         return result
       end
@@ -122,7 +122,7 @@ module Fastlane
         end
 
         template = File.join(Fastlane::ROOT, "lib/assets/ActionDetails.md.erb")
-        result = ERB.new(File.read(template), 0, '-').result(binding)
+        result = ERB.new(File.read(template), trim_mode: '-').result(binding)
 
         action_mds[action.action_name] = result
       end
@@ -135,16 +135,18 @@ module Fastlane
       FileUtils.mkdir_p(target_path)
       docs_dir = File.join(target_path, "docs")
       generated_actions_dir = File.join("generated", "actions")
+      FileUtils.rm_rf(File.join(docs_dir, generated_actions_dir))
+
       FileUtils.mkdir_p(File.join(docs_dir, generated_actions_dir))
+      FileUtils.mkdir_p(File.join(docs_dir, "img", "actions"))
 
       # Generate actions.md
       template = File.join(Fastlane::ROOT, "lib/assets/Actions.md.erb")
-      result = ERB.new(File.read(template), 0, '-').result(binding) # https://web.archive.org/web/20160430190141/www.rrn.dk/rubys-erb-templating-system
+      result = ERB.new(File.read(template), trim_mode: '-').result(binding) # https://web.archive.org/web/20160430190141/www.rrn.dk/rubys-erb-templating-system
       File.write(File.join(docs_dir, "generated", "actions.md"), result)
 
       # Generate actions sub pages (e.g. generated/actions/slather.md, generated/actions/scan.md)
       all_actions_ref_yml = []
-      FileUtils.mkdir_p(File.join(docs_dir, generated_actions_dir))
       ActionsList.all_actions do |action|
         @action = action # to provide a reference in the .html.erb template
         @action_filename = filename_for_action(action)
@@ -165,7 +167,7 @@ module Fastlane
         end
 
         template = File.join(Fastlane::ROOT, "lib/assets/ActionDetails.md.erb")
-        result = ERB.new(File.read(template), 0, '-').result(binding) # https://web.archive.org/web/20160430190141/www.rrn.dk/rubys-erb-templating-system
+        result = ERB.new(File.read(template), trim_mode: '-').result(binding) # https://web.archive.org/web/20160430190141/www.rrn.dk/rubys-erb-templating-system
 
         # Actions get placed in "generated/actions" directory
         file_name = File.join(generated_actions_dir, "#{action.action_name}.md")
@@ -186,7 +188,7 @@ module Fastlane
       File.write(mkdocs_yml_path, mkdocs_yml.to_yaml)
 
       # Copy over the assets from the `actions/docs/assets` directory
-      Dir[File.join(custom_action_docs_path, "assets", "*")].each do |current_asset_path|
+      Dir[File.join(Fastlane::ROOT, custom_action_docs_path, "assets", "*")].each do |current_asset_path|
         UI.message("Copying asset #{current_asset_path}")
         FileUtils.cp(current_asset_path, File.join(docs_dir, "img", "actions", File.basename(current_asset_path)))
       end

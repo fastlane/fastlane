@@ -24,7 +24,7 @@ module Gym
       FileUtils.mkdir_p(File.expand_path(Gym.config[:output_directory]))
 
       # Archive
-      if Gym.building_for_ios?
+      if Gym.building_for_ipa?
         fix_generic_archive unless Gym.project.watchos? # See https://github.com/fastlane/fastlane/pull/4325
         return BuildCommandGenerator.archive_path if Gym.config[:skip_package_ipa]
 
@@ -38,9 +38,10 @@ module Gym
           move_app_thinning_size_report
           move_apps_folder
           move_asset_packs
-          move_appstore_info
+          appstore_info_path = move_appstore_info
+          generate_appstore_info(path) unless appstore_info_path
         end
-      elsif Gym.building_for_mac?
+      elsif Gym.building_for_pkg?
         path = File.expand_path(Gym.config[:output_directory])
         compress_and_move_dsym
         if Gym.project.mac_app? || Gym.building_mac_catalyst_for_mac?
@@ -366,6 +367,40 @@ module Gym
         UI.success("Successfully exported the AppStoreInfo.plist file:")
         UI.message(appstore_info_path)
         appstore_info_path
+      end
+    end
+
+    # Create AppStoreInfo.plist using swinfo for iOS app-store exports
+    def generate_appstore_info(ipa_path)
+      return unless Gym.config[:generate_appstore_info] && Gym.building_for_ios? && Gym.config[:export_method] == 'app-store'
+
+      swinfo_plist_path = File.join(File.expand_path(Gym.config[:output_directory]), "AppStoreInfo.plist")
+      swinfo_path = File.join(FastlaneCore::Helper.xcode_path, "usr/bin/swinfo")
+
+      begin
+        UI.message("Generating AppStoreInfo.plist...")
+
+        # Build the swinfo command
+        command = [
+          "xcrun",
+          swinfo_path.shellescape,
+          "-f", ipa_path.shellescape,
+          "-o", swinfo_plist_path.shellescape,
+          "-prettyprint", "true",
+          "--plistFormat", "binary"
+        ].join(" ")
+
+        FastlaneCore::CommandExecutor.execute(command: command, print_all: FastlaneCore::Globals.verbose?, print_command: true)
+
+        if File.exist?(swinfo_plist_path)
+          UI.success("Successfully generated AppStoreInfo.plist:")
+          UI.message(swinfo_plist_path)
+          swinfo_plist_path
+        else
+          UI.error("Failed to generate AppStoreInfo.plist")
+        end
+      rescue => ex
+        UI.error("Error generating AppStoreInfo.plist: #{ex}")
       end
     end
 

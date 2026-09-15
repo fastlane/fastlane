@@ -72,7 +72,7 @@ module Spaceship
         def find(identifier, mac: false)
           all.find do |app|
             ((app.apple_id && app.apple_id.casecmp(identifier.to_s) == 0) || (app.bundle_id && app.bundle_id.casecmp(identifier.to_s) == 0)) &&
-              app.version_sets.any? { |v| (mac ? ["osx"] : ["ios", "appletvos"]).include?(v.platform) }
+              app.version_sets.any? { |v| (mac ? ["osx"] : ["ios", "xros", "appletvos"]).include?(v.platform) }
           end
         end
 

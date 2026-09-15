@@ -8,10 +8,8 @@ module Fastlane
         project_path = params[:path]
         selected_targets = params[:targets]
 
-        UI.user_error!("Could not find path to xcodeproj '#{project_path}'. Pass the path to your project (not workspace)!") unless File.exist?(project_path)
-
         # Load .xcodeproj
-        project = Xcodeproj::Project.open(project_path)
+        project = Fastlane::Helper::XcodeprojHelper.get_project!(project_path)
 
         # Fetch target
         targets = project.native_targets
@@ -25,10 +23,20 @@ module Fastlane
 
         # Set teamid in target
         targets.each do |target|
-          UI.message("Updating development team (#{params[:teamid]}) for target `#{target.name}` in the project '#{project_path}'")
-          # Update the build settings
           target.build_configurations.each do |configuration|
-            configuration.build_settings['DEVELOPMENT_TEAM'] = params[:teamid]
+            # Iterate over any keys that start with DEVELOPMENT_TEAM
+            # This will also set keys that have filtering like [sdk=iphoneos*]
+            keys = configuration.build_settings.keys.select { |key| key.to_s.start_with?("DEVELOPMENT_TEAM") }
+            keys.each do |key|
+              configuration.build_settings[key] = params[:teamid]
+              UI.message("Updated build setting '#{key}' to '#{params[:teamid]}' for configuration '#{configuration.name}'")
+            end
+
+            # Explicitly set the key with value if keys don't exist
+            unless keys.include?('DEVELOPMENT_TEAM')
+              configuration.build_settings['DEVELOPMENT_TEAM'] = params[:teamid]
+              UI.message("Added build setting 'DEVELOPMENT_TEAM' with value '#{params[:teamid]}' for configuration '#{configuration.name}'")
+            end
           end
 
           project.save
@@ -42,7 +50,7 @@ module Fastlane
       end
 
       def self.details
-        "This action updates the Developer Team ID of your Xcode project."
+        "This action updates (or adds) the Developer Team ID of your Xcode project."
       end
 
       def self.available_options
@@ -69,8 +77,8 @@ module Fastlane
         ]
       end
 
-      def self.author
-        "lgaches"
+      def self.authors
+        ["lgaches", "iBotPeaches"]
       end
 
       def self.is_supported?(platform)

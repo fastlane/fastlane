@@ -37,11 +37,14 @@ describe Spaceship::StatsMiddleware do
         mock_stats
       end
 
+      # Note: This does not test if all these services were actually added.
+
       urls = [
         # Supported
         "https://api.appstoreconnect.apple.com/stuff",
         "https://api.appstoreconnect.apple.com/stuff2",
         "https://appstoreconnect.apple.com/iris/v1/stuff",
+        "https://api.enterprise.developer.apple.com/stuff",
         "https://developer.apple.com/services-account/v1/stuff",
         "https://idmsa.apple.com/stuff",
         "https://appstoreconnect.apple.com/olympus/v1/stuff",
@@ -61,10 +64,11 @@ describe Spaceship::StatsMiddleware do
         expect(success).to be(true)
       end
 
-      expect(Spaceship::StatsMiddleware.service_stats.size).to eq(8)
+      expect(Spaceship::StatsMiddleware.service_stats.size).to eq(9)
 
       expect(find_count("api.appstoreconnect.apple.com")).to eq(2)
       expect(find_count("appstoreconnect.apple.com/iris/")).to eq(1)
+      expect(find_count("api.enterprise.developer.apple.com")).to eq(1)
       expect(find_count("developer.apple.com/services-account/")).to eq(1)
       expect(find_count("idmsa.apple.com")).to eq(1)
       expect(find_count("appstoreconnect.apple.com/olympus/v1/")).to eq(1)

@@ -111,6 +111,34 @@
       "links" : {
         "self" : "https://developer.apple.com:443/services-account/v1/certificates/444555666"
       }
+    }, {
+      "type" : "certificates",
+      "id" : "777888999",
+      "attributes" : {
+        "certificateTypeId" : "5QPB9NHCEI",
+        "requesterEmail" : "email@email.com",
+        "serialNumber" : "6FF0AA8635503A3D",
+        "certificateContent" : "content",
+        "displayName" : "Josh Holtz",
+        "requesterLastName" : "Holtz",
+        "ownerId" : "9XJ68BWQJB",
+        "csrContent" : null,
+        "machineName" : null,
+        "platform" : "MAC_OS_X",
+        "certificateTypeName" : "Developer ID Application (G2)",
+        "requesterFirstName" : "Josh",
+        "machineId" : null,
+        "ownerName" : "Josh Holtz",
+        "name" : "Developer ID Application (G2): Josh Holtz",
+        "platformName" : "macOS",
+        "responseId" : "7b21415c-74ad-42ea-9d79-f86dac95bb74",
+        "expirationDate" : "2020-05-01T15:18:38.000+0000",
+        "status" : "Issued",
+        "certificateType" : "DEVELOPER_ID_APPLICATION_G2"
+      },
+      "links" : {
+        "self" : "https://developer.apple.com:443/services-account/v1/certificates/444555666"
+      }
     } ],
     "links" : {
       "self" : "https://developer.apple.com:443/services-account/v1/certificates?sort=displayName&limit=1000"

@@ -689,7 +689,7 @@ Style/RedundantSort:
 Style/RedundantStringEscape:
   Enabled: false
 
-# Offense count: 192
+# Offense count: 210
 # This cop supports safe autocorrection (--autocorrect).
 # Configuration parameters: EnforcedStyle.
 # SupportedStyles: implicit, explicit

@@ -1,5 +1,6 @@
 require 'plist'
 require 'fastlane_core/globals'
+require 'fastlane_core/provisioning_profile'
 
 require_relative 'module'
 
@@ -19,10 +20,10 @@ module Sigh
 
     def self.install_profile(profile)
       UI.message("Installing provisioning profile...")
-      profile_path = File.expand_path("~") + "/Library/MobileDevice/Provisioning Profiles/"
+      profile_path = FastlaneCore::ProvisioningProfile.profiles_path
       uuid = ENV["SIGH_UUID"] || ENV["SIGH_UDID"]
       profile_filename = uuid + ".mobileprovision"
-      destination = profile_path + profile_filename
+      destination = File.join(profile_path, profile_filename)
 
       # If the directory doesn't exist, make it first
       unless File.directory?(profile_path)
@@ -126,8 +127,9 @@ module Sigh
     end
 
     def self.load_profiles
-      UI.message("Loading Provisioning profiles from ~/Library/MobileDevice/Provisioning Profiles/")
-      profiles_path = File.expand_path("~") + "/Library/MobileDevice/Provisioning Profiles/*.mobileprovision"
+      profiles_path = FastlaneCore::ProvisioningProfile.profiles_path
+      UI.message("Loading Provisioning profiles from #{profiles_path}")
+      profiles_path = File.join(profiles_path, "*.mobileprovision")
       profile_paths = Dir[profiles_path]
 
       profiles = []

@@ -1,5 +1,5 @@
 describe Spaceship::ConnectAPI::BetaAppLocalization do
-  before { Spaceship::Tunes.login }
+  include_examples "common spaceship login"
 
   describe '#Spaceship::ConnectAPI' do
     it 'succeeds with object' do

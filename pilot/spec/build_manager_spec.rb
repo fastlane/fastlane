@@ -41,6 +41,16 @@ describe "Build Manager" do
       changelog = Pilot::BuildManager.sanitize_changelog(changelog)
       expect(changelog).to eq(File.read("./pilot/spec/fixtures/build_manager/changelog_long_truncated"))
     end
+    it "accepts a frozen changelog containing emoji" do
+      changelog = "I'm 🦇B🏧an🪴!".freeze
+      changelog = Pilot::BuildManager.sanitize_changelog(changelog)
+      expect(changelog).to eq("I'm Ban!")
+    end
+    it "accepts a frozen changelog containing less than signs" do
+      changelog = "I'm <script>man<<!".freeze
+      changelog = Pilot::BuildManager.sanitize_changelog(changelog)
+      expect(changelog).to eq("I'm script>man!")
+    end
   end
 
   describe ".has_changelog_or_whats_new?" do
@@ -242,7 +252,7 @@ describe "Build Manager" do
           apple_id: 'mock_apple_id',
           app_identifier: 'mock_app_id',
           distribute_external: true,
-          groups: ["Blue Man Group"],
+          groups: ["Blue Man Group", "654"],
           skip_submission: false,
           demo_account_required: true,
           notify_external_testers: true,
@@ -403,9 +413,9 @@ describe "Build Manager" do
         # 2. client.add_beta_groups_to_build is called inside of build.add_beta_groups
         expect(Spaceship::ConnectAPI).to receive(:add_beta_groups_to_build).with({
           build_id: ready_to_submit_mock_build.id,
-          beta_group_ids: [beta_groups[0].id]
+          beta_group_ids: [beta_groups[0].id, beta_groups[1].id]
         }).and_return(Spaceship::ConnectAPI::Response.new)
-        expect(ready_to_submit_mock_build).to receive(:add_beta_groups).with(beta_groups: [beta_groups[0]]).and_wrap_original do |m, *args|
+        expect(ready_to_submit_mock_build).to receive(:add_beta_groups).with(beta_groups: [beta_groups[0], beta_groups[1]]).and_wrap_original do |m, *args|
           options = args.first
           m.call(**options)
         end
@@ -598,18 +608,76 @@ describe "Build Manager" do
     end
   end
 
+  describe "#update_routing_app_coverage" do
+    let(:fake_build_manager) { Pilot::BuildManager.new }
+    let(:fake_app) { double("fake app") }
+    let(:fake_version) { double("fake version") }
+    let(:geojson_path) { "./coverage.geojson" }
+
+    context "without routing_app_coverage_file set" do
+      it "does not touch the routing app coverage on App Store Connect" do
+        expect(fake_build_manager).not_to(receive(:app))
+
+        fake_build_manager.send(:update_routing_app_coverage, {})
+      end
+    end
+
+    context "with routing_app_coverage_file set" do
+      let(:options) { { routing_app_coverage_file: geojson_path } }
+
+      before(:each) do
+        allow(fake_build_manager).to receive(:fetch_app_platform).and_return("ios")
+        allow(fake_build_manager).to receive(:app).and_return(fake_app)
+      end
+
+      it "skips the upload when there is no editable app store version" do
+        expect(fake_app).to receive(:get_edit_app_store_version).with(platform: Spaceship::ConnectAPI::Platform::IOS).and_return(nil)
+
+        fake_build_manager.send(:update_routing_app_coverage, options)
+      end
+
+      it "uploads the file when no coverage exists yet" do
+        expect(fake_app).to receive(:get_edit_app_store_version).with(platform: Spaceship::ConnectAPI::Platform::IOS).and_return(fake_version)
+        expect(fake_version).to receive(:fetch_routing_app_coverage).and_return(nil)
+        expect(fake_version).to receive(:upload_routing_app_coverage).with(path: geojson_path)
+
+        fake_build_manager.send(:update_routing_app_coverage, options)
+      end
+
+      it "replaces an existing coverage file" do
+        routing_app_coverage = double("routing_app_coverage")
+        expect(fake_app).to receive(:get_edit_app_store_version).with(platform: Spaceship::ConnectAPI::Platform::IOS).and_return(fake_version)
+        expect(fake_version).to receive(:fetch_routing_app_coverage).and_return(routing_app_coverage)
+        expect(routing_app_coverage).to receive(:delete!)
+        expect(fake_version).to receive(:upload_routing_app_coverage).with(path: geojson_path)
+
+        fake_build_manager.send(:update_routing_app_coverage, options)
+      end
+    end
+  end
+
   describe "#upload" do
+    before(:each) do
+      # Prevent class-level Spaceship::ConnectAPI.client state from leaking
+      # in from other spec files (e.g. spaceship_spec.rb sets a real client
+      # that holds references to doubles which expire between examples).
+      allow(Spaceship::ConnectAPI).to receive(:client).and_return(nil)
+    end
+
     describe "shows the correct notices" do
       let(:fake_build_manager) { Pilot::BuildManager.new }
       let(:fake_app_id) { 123 }
       let(:fake_dir) { "fake dir" }
       let(:fake_app_platform) { "ios" }
+      let(:fake_app_identifier) { "org.fastlane.very-capable-app" }
+      let(:fake_short_version) { "1.0" }
+      let(:fake_bundle_version) { "1" }
       let(:upload_options) do
         {
           apple_id: fake_app_id,
           skip_waiting_for_build_processing: true,
           changelog: "changelog contents",
-          ipa: 'foo'
+          ipa: File.expand_path("./fastlane_core/spec/fixtures/ipas/very-capable-app.ipa")
         }
       end
 
@@ -619,7 +687,7 @@ describe "Build Manager" do
         allow(Dir).to receive(:mktmpdir).and_return(fake_dir)
 
         fake_ipauploadpackagebuilder = double
-        allow(fake_ipauploadpackagebuilder).to receive(:generate).with(app_id: fake_app_id, ipa_path: upload_options[:ipa], package_path: fake_dir, platform: fake_app_platform).and_return(true)
+        allow(fake_ipauploadpackagebuilder).to receive(:generate).with(app_id: fake_app_id, ipa_path: upload_options[:ipa], package_path: fake_dir, platform: fake_app_platform, app_identifier: fake_app_identifier, short_version: fake_short_version, bundle_version: fake_bundle_version).and_return(true)
         allow(FastlaneCore::IpaUploadPackageBuilder).to receive(:new).and_return(fake_ipauploadpackagebuilder)
 
         fake_itunestransporter = double
@@ -651,11 +719,14 @@ describe "Build Manager" do
       let(:fake_app_id) { 123 }
       let(:fake_dir) { "fake dir" }
       let(:fake_app_platform) { "ios" }
+      let(:fake_app_identifier) { "org.fastlane.very-capable-app" }
+      let(:fake_short_version) { "1.0" }
+      let(:fake_bundle_version) { "1" }
       let(:upload_options) do
         {
           apple_id: fake_app_id,
           skip_waiting_for_build_processing: true,
-          ipa: 'foo'
+          ipa: File.expand_path("./fastlane_core/spec/fixtures/ipas/very-capable-app.ipa")
         }
       end
 
@@ -664,7 +735,7 @@ describe "Build Manager" do
         allow(Dir).to receive(:mktmpdir).and_return(fake_dir)
 
         fake_ipauploadpackagebuilder = double
-        allow(fake_ipauploadpackagebuilder).to receive(:generate).with(app_id: fake_app_id, ipa_path: upload_options[:ipa], package_path: fake_dir, platform: fake_app_platform).and_return(true)
+        allow(fake_ipauploadpackagebuilder).to receive(:generate).with(app_id: fake_app_id, ipa_path: upload_options[:ipa], package_path: fake_dir, platform: fake_app_platform, app_identifier: fake_app_identifier, short_version: fake_short_version, bundle_version: fake_bundle_version).and_return(true)
         allow(FastlaneCore::IpaUploadPackageBuilder).to receive(:new).and_return(fake_ipauploadpackagebuilder)
 
         fake_itunestransporter = double
@@ -696,16 +767,16 @@ describe "Build Manager" do
         # other stuff required to let `upload` work:
 
         expect(fake_build_manager).to receive(:fetch_app_id).and_return(fake_app_id).exactly(2).times
-        expect(FastlaneCore::IpaFileAnalyser).to receive(:fetch_app_version)
-        expect(FastlaneCore::IpaFileAnalyser).to receive(:fetch_app_build)
+        expect(FastlaneCore::IpaFileAnalyser).to receive(:fetch_app_version).and_return(fake_short_version).exactly(2).times
+        expect(FastlaneCore::IpaFileAnalyser).to receive(:fetch_app_build).and_return(fake_bundle_version).exactly(2).times
 
         fake_app = double
         expect(fake_app).to receive(:id).and_return(fake_app_id)
         expect(fake_build_manager).to receive(:app).and_return(fake_app)
 
         fake_build = double
-        expect(fake_build).to receive(:app_version)
-        expect(fake_build).to receive(:version)
+        expect(fake_build).to receive(:app_version).and_return(fake_short_version)
+        expect(fake_build).to receive(:version).and_return(fake_bundle_version)
         expect(UI).to receive(:message).with("If you want to skip waiting for the processing to be finished, use the `skip_waiting_for_build_processing` option")
         expect(UI).to receive(:message).with("Note that if `skip_waiting_for_build_processing` is used but a `changelog` is supplied, this process will wait for the build to appear on App Store Connect, update the changelog and then skip the remaining of the processing steps.")
         expect(FastlaneCore::BuildWatcher).to receive(:wait_for_build_processing_to_be_complete).and_return(fake_build)
@@ -742,8 +813,8 @@ describe "Build Manager" do
         expect(fake_build_manager).to receive(:app).and_return(fake_app)
 
         fake_build = double
-        expect(fake_build).to receive(:app_version)
-        expect(fake_build).to receive(:version)
+        expect(fake_build).to receive(:app_version).and_return(fake_short_version)
+        expect(fake_build).to receive(:version).and_return(fake_bundle_version)
         expect(UI).to receive(:message).with("If you want to skip waiting for the processing to be finished, use the `skip_waiting_for_build_processing` option")
         expect(UI).to receive(:message).with("Note that if `skip_waiting_for_build_processing` is used but a `changelog` is supplied, this process will wait for the build to appear on App Store Connect, update the changelog and then skip the remaining of the processing steps.")
         expect(FastlaneCore::BuildWatcher).to receive(:wait_for_build_processing_to_be_complete).and_return(fake_build)
@@ -753,9 +824,12 @@ describe "Build Manager" do
 
       context "ipa for ios platform" do
         let(:fake_app_platform) { "ios" }
+        let(:fake_app_identifier) { "org.fastlane.very-capable-app" }
+        let(:fake_short_version) { "1.0" }
+        let(:fake_bundle_version) { "1" }
         let(:upload_options) do
           {
-            ipa: 'foo'
+            ipa: File.expand_path("./fastlane_core/spec/fixtures/ipas/very-capable-app.ipa")
           }
         end
 
@@ -763,14 +837,14 @@ describe "Build Manager" do
           allow(fake_build_manager).to receive(:fetch_app_platform).and_return(fake_app_platform)
 
           fake_ipauploadpackagebuilder = double
-          allow(fake_ipauploadpackagebuilder).to receive(:generate).with(app_id: fake_app_id, ipa_path: upload_options[:ipa], package_path: fake_dir, platform: fake_app_platform).and_return(true)
+          allow(fake_ipauploadpackagebuilder).to receive(:generate).with(app_id: fake_app_id, ipa_path: upload_options[:ipa], package_path: fake_dir, platform: fake_app_platform, app_identifier: fake_app_identifier, short_version: fake_short_version, bundle_version: fake_bundle_version).and_return(true)
           allow(FastlaneCore::IpaUploadPackageBuilder).to receive(:new).and_return(fake_ipauploadpackagebuilder)
         end
 
         it "gets file analysed with IpaFileAnalyser" do
           expect(fake_build_manager).to receive(:fetch_app_id).and_return(fake_app_id).exactly(2).times
-          expect(FastlaneCore::IpaFileAnalyser).to receive(:fetch_app_version)
-          expect(FastlaneCore::IpaFileAnalyser).to receive(:fetch_app_build)
+          expect(FastlaneCore::IpaFileAnalyser).to receive(:fetch_app_version).and_return(fake_short_version).exactly(2).times
+          expect(FastlaneCore::IpaFileAnalyser).to receive(:fetch_app_build).and_return(fake_bundle_version).exactly(2).times
           expect(FastlaneCore::PkgFileAnalyser).to_not(receive(:fetch_app_version))
           expect(FastlaneCore::PkgFileAnalyser).to_not(receive(:fetch_app_build))
 
@@ -780,6 +854,8 @@ describe "Build Manager" do
 
       context "pkg for osx platform" do
         let(:fake_app_platform) { "osx" }
+        let(:fake_short_version) { nil }
+        let(:fake_bundle_version) { nil }
         let(:upload_options) do
           {
             pkg: 'bar'
@@ -807,6 +883,8 @@ describe "Build Manager" do
 
       context "pkg for osx platform when both ipa and pkg are available" do
         let(:fake_app_platform) { "osx" }
+        let(:fake_short_version) { nil }
+        let(:fake_bundle_version) { nil }
         let(:upload_options) do
           {
             ipa: 'foo',
@@ -838,9 +916,12 @@ describe "Build Manager" do
 
       context "ipa for ios platform when both ipa and pkg are available" do
         let(:fake_app_platform) { "ios" }
+        let(:fake_app_identifier) { "org.fastlane.very-capable-app" }
+        let(:fake_short_version) { "1.0" }
+        let(:fake_bundle_version) { "1" }
         let(:upload_options) do
           {
-            ipa: 'foo',
+            ipa: File.expand_path("./fastlane_core/spec/fixtures/ipas/very-capable-app.ipa"),
             pkg: 'bar'
           }
         end
@@ -849,7 +930,7 @@ describe "Build Manager" do
           allow(fake_build_manager).to receive(:fetch_app_platform).and_return(fake_app_platform)
 
           fake_ipauploadpackagebuilder = double
-          allow(fake_ipauploadpackagebuilder).to receive(:generate).with(app_id: fake_app_id, ipa_path: upload_options[:ipa], package_path: fake_dir, platform: fake_app_platform).and_return(true)
+          allow(fake_ipauploadpackagebuilder).to receive(:generate).with(app_id: fake_app_id, ipa_path: upload_options[:ipa], package_path: fake_dir, platform: fake_app_platform, app_identifier: fake_app_identifier, short_version: fake_short_version, bundle_version: fake_bundle_version).and_return(true)
           allow(FastlaneCore::IpaUploadPackageBuilder).to receive(:new).and_return(fake_ipauploadpackagebuilder)
 
           expect(UI).to receive(:important).with("WARNING: Both `ipa` and `pkg` options are defined either explicitly or with default_value (build found in directory)")
@@ -858,8 +939,8 @@ describe "Build Manager" do
 
         it "gets file analysed with IpaFileAnalyser" do
           expect(fake_build_manager).to receive(:fetch_app_id).and_return(fake_app_id).exactly(2).times
-          expect(FastlaneCore::IpaFileAnalyser).to receive(:fetch_app_version)
-          expect(FastlaneCore::IpaFileAnalyser).to receive(:fetch_app_build)
+          expect(FastlaneCore::IpaFileAnalyser).to receive(:fetch_app_version).and_return(fake_short_version).exactly(2).times
+          expect(FastlaneCore::IpaFileAnalyser).to receive(:fetch_app_build).and_return(fake_bundle_version).exactly(2).times
           expect(FastlaneCore::PkgFileAnalyser).to_not(receive(:fetch_app_version))
           expect(FastlaneCore::PkgFileAnalyser).to_not(receive(:fetch_app_build))
 
@@ -870,9 +951,20 @@ describe "Build Manager" do
   end
 
   describe "#transporter_for_selected_team" do
+    before do
+      # Building an ItunesTransporter looks up an application-specific password in the
+      # keychain before falling back to DELIVER_PASSWORD. Left unstubbed these examples
+      # query the real keychain, so which path they take depends on whoever runs them.
+      # nil is what that lookup returns on a machine with no matching entry.
+      allow(Security::InternetPassword).to receive(:find).and_return(nil)
+    end
+
     let(:fake_manager) { Pilot::BuildManager.new }
-    let(:fake_api_key_json_path) do
+    let(:fake_team_api_key_json_path) do
       "./spaceship/spec/connect_api/fixtures/asc_key.json"
+    end
+    let(:fake_individual_api_key_json_path) do
+      "./spaceship/spec/connect_api/fixtures/asc_individual_key.json"
     end
 
     let(:selected_team_id) { "123" }
@@ -890,15 +982,26 @@ describe "Build Manager" do
       }
     end
 
-    it "with API token" do
+    it "with Team API Key and API token" do
       options = {}
-      allow(Spaceship::ConnectAPI).to receive(:token).and_return(Spaceship::ConnectAPI::Token.from(filepath: fake_api_key_json_path))
+      allow(Spaceship::ConnectAPI).to receive(:token).and_return(Spaceship::ConnectAPI::Token.from(filepath: fake_team_api_key_json_path))
 
       transporter = fake_manager.send(:transporter_for_selected_team, options)
       expect(transporter.instance_variable_get(:@jwt)).not_to(be_nil)
       expect(transporter.instance_variable_get(:@user)).to be_nil
       expect(transporter.instance_variable_get(:@password)).to be_nil
       expect(transporter.instance_variable_get(:@provider_short_name)).to be_nil
+    end
+
+    it "with Individual API Key" do
+      options = {}
+      allow(Spaceship::ConnectAPI).to receive(:token).and_return(Spaceship::ConnectAPI::Token.from(filepath: fake_individual_api_key_json_path))
+
+      transporter = fake_manager.send(:transporter_for_selected_team, options)
+      expect(transporter.instance_variable_get(:@jwt)).not_to(be_nil)
+      expect(transporter.instance_variable_get(:@user)).to be_nil
+      expect(transporter.instance_variable_get(:@password)).to be_nil
+      expect(transporter.instance_variable_get(:@provider_short_name)).to(be_nil)
     end
 
     describe "with itc_provider" do

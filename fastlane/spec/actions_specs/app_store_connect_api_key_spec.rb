@@ -116,6 +116,59 @@ describe Fastlane do
         end.to raise_error("The duration can't be more than 1200 (20 minutes) and the value entered was '1300'")
       end
 
+      it "strips surrounding whitespace from key_id and issuer_id" do
+        hash = {
+          key_id: key_id,
+          issuer_id: issuer_id,
+          key: File.binread(fake_api_key_p8_path),
+          is_key_content_base64: false,
+          duration: 500,
+          in_house: false
+        }
+
+        expect(Spaceship::ConnectAPI::Token).to receive(:create).with(hash).and_return("some fake token")
+        expect(Spaceship::ConnectAPI).to receive(:token=).with("some fake token")
+
+        result = Fastlane::FastFile.new.parse("lane :test do
+          app_store_connect_api_key(
+            key_id: ' #{key_id}\n',
+            issuer_id: '\t#{issuer_id} ',
+            key_filepath: '#{fake_api_key_p8_path}',
+          )
+        end").runner.execute(:test)
+
+        expect(result).to eq(hash)
+        expect(Fastlane::Actions.lane_context[Fastlane::Actions::SharedValues::APP_STORE_CONNECT_API_KEY]).to eq(hash)
+      end
+
+      it "preserves nil key_id and issuer_id when unset" do
+        hash = {
+          key_id: nil,
+          issuer_id: nil,
+          key: File.binread(fake_api_key_p8_path),
+          is_key_content_base64: false,
+          duration: 500,
+          in_house: false
+        }
+
+        expect(Spaceship::ConnectAPI::Token).not_to receive(:create)
+        expect(Spaceship::ConnectAPI).not_to receive(:token=)
+
+        result = Fastlane::Actions::AppStoreConnectApiKeyAction.run(
+          key_id: nil,
+          issuer_id: nil,
+          key_filepath: fake_api_key_p8_path,
+          key_content: nil,
+          is_key_content_base64: false,
+          duration: 500,
+          in_house: false,
+          set_spaceship_token: false
+        )
+
+        expect(result).to eq(hash)
+        expect(Fastlane::Actions.lane_context[Fastlane::Actions::SharedValues::APP_STORE_CONNECT_API_KEY]).to eq(hash)
+      end
+
       it "doesn't create and set api token if 'set_spaceship_token' input option is FALSE" do
         expect(Spaceship::ConnectAPI::Token).not_to receive(:create)
         expect(Spaceship::ConnectAPI).not_to receive(:token=)
