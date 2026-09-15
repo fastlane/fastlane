@@ -106,7 +106,7 @@ module Spaceship
         attr_accessor :expiration_date_string
 
         # @return (Spaceship::Portal::Merchant) The merchant this domain is registered to
-        #   This is not part of Apple's response, it gets set by whoever fetched the domain
+        #   This is not part of Apple's response, it gets passed in by whoever fetched the domain
         attr_accessor :merchant
 
         attr_mapping(
@@ -119,12 +119,20 @@ module Spaceship
           'expirationDateString' => :expiration_date_string
         )
 
+        # @param attrs [Hash] The domain attributes as returned by the Dev Portal
+        # @param existing_client [Spaceship::Client] The client to use for requests
+        # @param merchant [Merchant] The merchant this domain is registered to
+        def initialize(attrs = {}, existing_client = nil, merchant: nil)
+          super(attrs, existing_client)
+          @merchant = merchant
+        end
+
         class << self
           # @param merchant [Merchant] The merchant to fetch the domains of
           # @return (Array) Returns all domains registered to the given merchant
           def all(merchant)
             client.merchant_domains(merchant.merchant_id, mac: merchant.mac?).map do |domain|
-              new(domain).tap { |d| d.merchant = merchant }
+              new(domain, client, merchant: merchant)
             end
           end
 
@@ -135,7 +143,7 @@ module Spaceship
           # @return (Domain) The Domain you just registered
           def create!(merchant: nil, domain_name: nil)
             new_domain = client.create_merchant_domain!(merchant.merchant_id, domain_name, mac: merchant.mac?)
-            new(new_domain).tap { |d| d.merchant = merchant }
+            new(new_domain, client, merchant: merchant)
           end
 
           # Find a specific domain of a merchant based on the domain name
@@ -177,7 +185,7 @@ module Spaceship
       # @return (Array of Spaceship::Portal::Merchant::Domain) The domains registered to this merchant
       def domains
         @domains ||= client.merchant_domains(merchant_id, mac: mac?).map do |domain|
-          Domain.new(domain, client).tap { |d| d.merchant = self }
+          Domain.new(domain, client, merchant: self)
         end
       end
 
