@@ -12,9 +12,10 @@ module Pilot
 
       app = find_app(apple_id: options[:apple_id], app_identifier: options[:app_identifier])
       if app
-        testers = app.get_beta_testers(includes: "apps,betaTesterMetrics,betaGroups")
+        testers = app.get_beta_testers(includes: "apps,betaGroups")
+        fetch_and_assign_metrics(app: app, testers: testers)
       else
-        testers = Spaceship::ConnectAPI::BetaTester.all(includes: "apps,betaTesterMetrics,betaGroups")
+        testers = Spaceship::ConnectAPI::BetaTester.all(includes: "apps,betaGroups")
       end
 
       file = config[:testers_file_path]
@@ -26,7 +27,7 @@ module Pilot
           group_names = tester.beta_groups.map(&:name).join(";") || ""
 
           metric = (tester.beta_tester_metrics || []).first
-          if metric.installed?
+          if metric&.installed?
             install_version = "#{metric.installed_cf_bundle_short_version_string} (#{metric.installed_cf_bundle_version})"
             pretty_date = metric.installed_cf_bundle_version
           end
@@ -52,6 +53,19 @@ module Pilot
       end
 
       UI.user_error!("You must include an `app_identifier` to `list_testers`")
+    end
+
+    private
+
+    def fetch_and_assign_metrics(app:, testers:)
+      return if testers.empty?
+
+      testers.each do |tester|
+        metrics = Spaceship::ConnectAPI.get_beta_tester_metrics(
+          filter: { apps: app.id, betaTesters: tester.id }
+        ).to_models
+        tester.beta_tester_metrics = metrics
+      end
     end
   end
 end
