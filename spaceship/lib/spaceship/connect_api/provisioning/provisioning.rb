@@ -146,12 +146,15 @@ module Spaceship
           provisioning_request_client.get("#{Version::V1}/certificates/#{certificate_id}", params)
         end
 
-        def post_certificate(attributes: {})
+        def post_certificate(attributes: {}, relationships: nil)
+          data = {
+            attributes: attributes,
+            type: "certificates"
+          }
+          data[:relationships] = relationships if relationships
+
           body = {
-            data: {
-              attributes: attributes,
-              type: "certificates"
-            }
+            data: data
           }
 
           provisioning_request_client.post("#{Version::V1}/certificates", body)
@@ -161,6 +164,15 @@ module Spaceship
           raise "Certificate id is nil" if certificate_id.nil?
 
           provisioning_request_client.delete("#{Version::V1}/certificates/#{certificate_id}")
+        end
+
+        #
+        # passTypeIds
+        #
+
+        def get_pass_type_ids(filter: {}, includes: nil, fields: nil, limit: nil, sort: nil)
+          params = provisioning_request_client.build_params(filter: filter, includes: includes, fields: fields, limit: limit, sort: sort)
+          provisioning_request_client.get("#{Version::V1}/passTypeIds", params)
         end
 
         #

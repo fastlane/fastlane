@@ -45,6 +45,15 @@ module Cert
 
       FastlaneCore::PrintTable.print_values(config: Cert.config, hide_keys: [:output_path], title: "Summary for cert #{Fastlane::VERSION}")
 
+      if pass_type_certificate?
+        if Cert.config[:identifier].to_s.empty?
+          UI.user_error!("You need to provide an `identifier` (e.g. 'pass.com.example.mypass') when creating a Pass Type ID certificate")
+        end
+        unless Cert.config[:identifier].start_with?("pass.")
+          UI.user_error!("Pass Type ID identifiers need to start with 'pass.' (e.g. 'pass.com.example.mypass'), got: #{Cert.config[:identifier]}")
+        end
+      end
+
       login
 
       should_create = Cert.config[:force]
@@ -144,7 +153,15 @@ module Cert
       filter = {
         certificateType: certificate_types.join(",")
       }
-      return Spaceship::ConnectAPI::Certificate.all(filter: filter)
+      certificates = Spaceship::ConnectAPI::Certificate.all(filter: filter)
+
+      # A team can have pass certificates for multiple Pass Type IDs.
+      # The display name of a pass certificate is its Pass Type ID identifier (e.g. 'pass.com.example.mypass')
+      if pass_type_certificate? && Cert.config[:identifier]
+        certificates = certificates.select { |certificate| certificate.display_name == Cert.config[:identifier] }
+      end
+
+      return certificates
     end
 
     # The kind of certificate we're interested in (for creating)
@@ -165,6 +182,8 @@ module Cert
           ]
         when :developer_id_kext
           return [Spaceship::ConnectAPI::Certificate::CertificateType::DEVELOPER_ID_KEXT]
+        when :pass_type_id
+          return [Spaceship::ConnectAPI::Certificate::CertificateType::PASS_TYPE_ID]
         when :developer_id_installer
           if !Spaceship::ConnectAPI.token.nil?
             raise "As of 2021-11-09, the App Store Connect API does not allow accessing DEVELOPER_ID_INSTALLER with the API Key. Please file an issue on GitHub if this has changed and needs to be updated"
@@ -197,6 +216,28 @@ module Cert
       return [cert_type]
     end
 
+    def pass_type_certificate?
+      return Cert.config[:type].to_s == "pass_type_id"
+    end
+
+    # Looks up the id of the Pass Type ID (e.g. 'pass.com.example.mypass') that
+    # a new pass certificate should be associated with
+    def pass_type_id
+      identifier = Cert.config[:identifier]
+
+      pass_type_ids = Spaceship::ConnectAPI::PassTypeId.all
+      pass_type = pass_type_ids.find { |p| p.identifier == identifier }
+      unless pass_type
+        UI.error("Couldn't find Pass Type ID '#{identifier}' on the Developer Portal")
+        UI.error("Register it first at https://developer.apple.com/account/resources/identifiers/list/passTypeId")
+        available = pass_type_ids.map(&:identifier)
+        UI.message("Available Pass Type IDs:\n- #{available.join("\n- ")}") unless available.empty?
+        UI.user_error!("Couldn't find Pass Type ID '#{identifier}' on the Developer Portal")
+      end
+
+      return pass_type.id
+    end
+
     def create_certificate
       # Create a new certificate signing request
       csr, pkey = Spaceship::ConnectAPI::Certificate.create_certificate_signing_request
@@ -205,7 +246,8 @@ module Cert
       begin
         certificate = Spaceship::ConnectAPI::Certificate.create(
           certificate_type: certificate_type,
-          csr_content: csr.to_pem
+          csr_content: csr.to_pem,
+          pass_type_id: pass_type_certificate? ? pass_type_id : nil
         )
       rescue => ex
         type_name = (Cert.config[:development] ? "Development" : "Distribution")
