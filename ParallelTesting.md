@@ -47,7 +47,7 @@ That second case is the one worth being careful about: a green rerun is not evid
 
 **Fix**: `Dir.mktmpdir`, which is unique per call, or the suite's own scratch root `FASTLANE_SPEC_SCRATCH` (`spec_helper.rb:31`). Never a fixed basename under `Dir.tmpdir`.
 
-**Landed as**: #30217, #30220, #30225.
+**Landed as**: [#30217](https://github.com/fastlane/fastlane/pull/30217), [#30220](https://github.com/fastlane/fastlane/pull/30220), [#30225](https://github.com/fastlane/fastlane/pull/30225).
 
 ## 3. The working directory
 
@@ -63,7 +63,7 @@ around do |example|
 end
 ```
 
-**Landed as**: #30221.
+**Landed as**: [#30221](https://github.com/fastlane/fastlane/pull/30221).
 
 ## 4. Environment variables
 
@@ -99,7 +99,7 @@ it "sets the team id", env_output: %w[FASTLANE_TEAM_ID] do
 
 **Find it with**: `bundle exec rake test_isolated`, which points `HOME` and `TMPDIR` at throwaway directories and reports what the run wrote into them.
 
-**Landed as**: #30195.
+**Landed as**: [#30195](https://github.com/fastlane/fastlane/pull/30195).
 
 ## 7. Machine-global resources outside the process
 
@@ -109,7 +109,7 @@ it "sets the team id", env_output: %w[FASTLANE_TEAM_ID] do
 
 **Fix**: stub at the boundary. These cannot be partitioned between workers.
 
-**Landed as**: #30211 (clipboard).
+**Landed as**: [#30211](https://github.com/fastlane/fastlane/pull/30211) (clipboard).
 
 **Still open**: the keychain. Parts of the suite still import certificates into the real login keychain, and every worker shares it.
 
@@ -127,7 +127,7 @@ Parallelism changes memory pressure, so it changes when GC runs — which is why
 
 **Fix**: keep the object alive for as long as the file is needed.
 
-**Landed as**: #30227.
+**Landed as**: [#30227](https://github.com/fastlane/fastlane/pull/30227).
 
 ## 9. Platform assumptions
 
@@ -137,7 +137,7 @@ Parallelism changes memory pressure, so it changes when GC runs — which is why
 
 **Fix**: `Dir.tmpdir`, `File.join`, `Dir.mktmpdir`. Never a literal separator or root.
 
-**Landed as**: #30220.
+**Landed as**: [#30220](https://github.com/fastlane/fastlane/pull/30220).
 
 ## 10. Fixtures mutated in place
 
@@ -147,7 +147,7 @@ Parallelism changes memory pressure, so it changes when GC runs — which is why
 
 **Fix**: copy the fixture into a scratch directory and modify the copy.
 
-**Landed as**: #30215.
+**Landed as**: [#30215](https://github.com/fastlane/fastlane/pull/30215).
 
 ## Writing a spec that will not break
 
