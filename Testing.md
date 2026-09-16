@@ -64,7 +64,9 @@ Instead of using the line number you can also use a filter with the `it "somethi
 
 #### Running the suite as several processes
 
-The suite is a lot faster split across processes, and a split is also a harsher test than any seed: a worker gets a subset no random order produces, so a spec that depends on another file having run first fails there.
+This is what CI runs, so it is the one to run before pushing. The suite is a lot faster split across processes, and a split is also a harsher test than any seed: a worker gets a subset no random order produces, so a spec that depends on another file having run first fails there.
+
+When a spec passes on its own and fails in the split, [ParallelTesting.md](ParallelTesting.md) catalogues the reasons and how each was fixed.
 
 ```
 bundle exec rake test_parallel
@@ -99,6 +101,31 @@ The split is balanced from recorded per file durations. The files committed here
 ```
 bundle exec rake spec_timings
 ```
+
+#### When CI goes red
+
+CI runs `rake test_parallel` with `WORKERS: 4`, not `rspec`, so a job can fail on a split your sequential run never produces.
+
+A worker writes its rspec output to its own log rather than to stdout, so the job log alone will not say why an example failed. Two things carry the detail.
+
+The **job log** names the failing examples and the worker that ran them, and tells you how to replay that worker's exact split:
+
+```
+worker 2 failures:
+  rspec ./fastlane/spec/some_spec.rb:42
+  this worker ran 113 files, replay the split with:
+    rspec $(cat rspec_worker_2.units)
+```
+
+The **artifacts** hold the rest. Every job uploads `rspec-worker-logs-<os>-ruby<version>-xcode<version>`, containing one `rspec_worker_N.log` per worker with its full rspec output and pending list, and one `rspec_worker_N.units` with the files that worker was given. They are uploaded on every run, not only on failure, because a cancelled job produces no failure at all and is often the one you most want to inspect.
+
+To reproduce locally, download the artifact and feed the units file back:
+
+```
+rspec $(cat rspec_worker_2.units)
+```
+
+That reruns the same files in the same order on one process. If it passes there but failed on CI, the cause is not the file list: look at what else was running at the same time, or at what the runner had that your machine does not. `rake test_isolated` below covers the second case.
 
 #### Running against a throwaway home directory
 
