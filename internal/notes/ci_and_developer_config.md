@@ -1,6 +1,6 @@
 # What to run, where, and with how many workers
 
-Measured 2026-09-10, and again on the runners when the timings were first recorded. Companion to `test_suite_parallelism.md`, which covers why processes rather than threads. The defects this work depended on are fastlane#30184.
+Measured 2026-09-10, and again on the runners when the timings were first recorded. Worker counts and workflow inputs rechecked against master 2026-09-16. Companion to `test_suite_parallelism.md`, which covers why processes rather than threads. The defects this work depended on are fastlane#30184.
 
 ## The numbers
 
@@ -29,7 +29,7 @@ A runner varies by a factor of nearly two on identical work, so any single measu
 
 Local numbers on a machine that is not shared do not behave this way, and the local table above is from single runs.
 
-`test_parallel` defaults to `min(cores, 12)`, which picks 3 on the macOS runner and 4 on Linux. Three is a little conservative for macOS; four measured better. The cap matters on a large machine, where one worker per core oversubscribes badly.
+`test_parallel` defaults to `min(cores, 8)`. CI pins `WORKERS: 4` in `.github/workflows/ci.yml`, which is what all three runners use; they report 3 cores on macOS and 4 on Linux and Windows. The cap matters on a large machine, where one worker per core oversubscribes badly.
 
 ## Linux is a different suite, not the same one on another runner
 
@@ -55,7 +55,7 @@ GitHub gives a fresh VM every run, which raises a fair question about caching. T
 
 **A developer on macOS**: `WORKERS=8 rake test_parallel`, 276s to 50s. Twelve is slightly faster at 41s but the returns are thin past eight. `rake test_isolated` before pushing anything that touches how specs read the environment or the filesystem.
 
-**macOS CI**: four workers, a median of 243s against 562s sequential. The default of `min(cores, 12)` picks three, which is close; pinning `WORKERS: 4` is worth the two lines.
+**macOS CI**: four workers, a median of 243s against 562s sequential. The default of `min(cores, 8)` picks three on a three core runner, which is close; `WORKERS: 4` is now pinned in `ci.yml`.
 
 **Linux CI**: four workers, 130s to 71s. Cheap, and worth keeping for ordering coverage on a suite shape macOS never exercises.
 
@@ -96,7 +96,7 @@ Nearly half the worker time was spent waiting for a straggler, and fixing the in
 
 This is also why Linux parallelism looked weak earlier in this document, 1.8x against macOS's 3.7x. That was not Linux having less to overlap, it was a split built from the wrong numbers.
 
-Timings now live in `internal/spec_timings.<platform>.json`, and the workflow has a `record_timings` input, `macos`, `linux` or `both`, which runs the suite once in a single process on that runner and uploads the file to be committed. Nobody needs the hardware to fix the balance for a platform they do not have.
+Timings now live in `internal/spec_timings.<platform>.json`, and the workflow has a `record_timings` input, `macos`, `linux`, `windows` or `all`, which runs the suite once in a single process on that runner and uploads the file to be committed. Nobody needs the hardware to fix the balance for a platform they do not have.
 
 `deliver/spec/upload_metadata_spec.rb` is now the thing to look at on Linux: 27.1s of a 113s suite, 24% of it, and identical on both platforms. Four workers cannot go below it however well balanced, which is most of the 12% that remains.
 

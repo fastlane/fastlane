@@ -1,6 +1,6 @@
 # Speeding up the spec suite: objective, and which methods actually apply
 
-Why the order-dependence work was done at all, and what the options are now that it has landed. Written 2026-09-10. The defect list is fastlane#30184.
+Why the order-dependence work was done at all, and what the options are now that it has landed. Written 2026-09-10, runner figures rechecked 2026-09-16. The defect list is fastlane#30184.
 
 ## Objective
 
@@ -22,7 +22,7 @@ Cost is memory: every worker carries a full fastlane load.
 
 ## Method 2, oversubscribing workers past the core count
 
-GitHub Actions runners are core limited (linux 2, windows 2, macOS 4, or 3 on M1), and it is tempting to read that as the ceiling. It is not, for an I/O bound suite. A core is only contended by work that is actually running; a worker blocked in `waitpid` on `xcodebuild` is not using one. Two cores will keep six workers busy if five of them are waiting.
+GitHub Actions runners are core limited (3 on macOS, 4 on Linux and Windows, as the runners report themselves), and it is tempting to read that as the ceiling. It is not, for an I/O bound suite. A core is only contended by work that is actually running; a worker blocked in `waitpid` on `xcodebuild` is not using one. Two cores will keep six workers busy if five of them are waiting.
 
 So the way past the "core limit" is to run more processes than cores and measure, not to reach for threads. Worth benchmarking at 4 and 6 workers on the 2 core Linux runner. RAM is the real constraint here, not CPU.
 
@@ -99,4 +99,4 @@ It would also raise the useful worker count. Each of those examples is a worker 
 
 `min(cores, 8)`, derived rather than fixed per platform: what decides the number is the core count and how much of the suite shells out, not the operating system. It fits both measurements, eight on a 14 core machine and four on a runner. `WORKERS` overrides it, and the run prints the core count it saw.
 
-Linux and Windows skip the xcodebuild specs altogether, so 61% of the example time does not exist there and their knee will sit somewhere else. Not measured, since the audit only runs on macOS today.
+Linux and Windows skip the xcodebuild specs altogether, so 61% of the example time does not exist there and their knee sits somewhere else. Both have since been measured; see `ci_and_developer_config.md`.
