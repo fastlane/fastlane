@@ -1,6 +1,6 @@
 # Notes
 
-Working notes from the test suite work in fastlane#30184 and fastlane#30189.
+Working notes from the test suite work in [fastlane#30184](https://github.com/fastlane/fastlane/issues/30184) and [fastlane#30189](https://github.com/fastlane/fastlane/issues/30189).
 
 These are not documentation for using fastlane, and they are not a plan. They are the reasoning and the measurements behind decisions that are otherwise invisible in the code: why the suite is split across processes rather than threads, how many workers to run and where the numbers came from, and which approaches were tried and reverted.
 

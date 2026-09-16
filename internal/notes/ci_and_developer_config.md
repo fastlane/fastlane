@@ -1,6 +1,6 @@
 # What to run, where, and with how many workers
 
-Measured 2026-09-10, and again on the runners when the timings were first recorded. Worker counts and workflow inputs rechecked against master 2026-09-16. Companion to `test_suite_parallelism.md`, which covers why processes rather than threads. The defects this work depended on are fastlane#30184.
+Measured 2026-09-10, and again on the runners when the timings were first recorded. Worker counts and workflow inputs rechecked against master 2026-09-16. Companion to `test_suite_parallelism.md`, which covers why processes rather than threads. The defects this work depended on are [fastlane#30184](https://github.com/fastlane/fastlane/issues/30184).
 
 ## The numbers
 
@@ -43,7 +43,7 @@ That has two consequences. Linux is cheap ordering coverage, 130s against 562s, 
 
 `rake test_isolated` points `HOME` and `TMPDIR` at throwaway directories, seeds an empty keychain, runs the suite and reports what the run wrote there. `WORKERS=12 rake test_isolated` splits it; a pattern argument runs a subset.
 
-Its purpose is not speed. The suite both reads and writes the developer's home, and reading is the dangerous half: Row Z is the example, `Client#itc_service_key` cached to a file, and the examples depending on that file passed on any machine that had ever run the suite. Only a clean CI checkout failed. An isolated home makes that fail on the machine that wrote it.
+Its purpose is not speed. The suite both reads and writes the developer's home, and reading is the dangerous half. The example that made the case: `Client#itc_service_key` cached its answer to a file under `HOME`, and the examples depending on that file passed on any machine that had ever run the suite. Only a clean CI checkout failed. An isolated home makes that fail on the machine that wrote it.
 
 The writing half is not small either. What it writes:
 
@@ -89,7 +89,7 @@ About 7%, and flat. The second run is not faster than the first, so nothing expe
 
 The 244s is worth explaining because it was briefly reported as the cost of isolation, and it is not. Without a seeded keychain `security` puts up a modal asking for keychain access and waits for it to be answered, so on a machine with a desktop session the run stalls rather than failing. Twelve workers hitting that is what turned 44s into 244s.
 
-Unattended it behaves differently, and better. With no session to draw on, `security` returns exit 36 with empty output instead of prompting. That was established while reproducing fastlane-community/security#5, over `ssh localhost` with `SSH_TTY` empty and `launchctl managername` reporting `Background`. So CI would not stall here, it would fail, and this guard is for the developer running it locally rather than for the runner. `rake test_isolated` checks the keychain exists before running anything and refuses to start otherwise.
+Unattended it behaves differently, and better. With no session to draw on, `security` returns exit 36 with empty output instead of prompting. That was established while reproducing [fastlane-community/security#5](https://github.com/fastlane-community/security/issues/5), over `ssh localhost` with `SSH_TTY` empty and `launchctl managername` reporting `Background`. So CI would not stall here, it would fail, and this guard is for the developer running it locally rather than for the runner. `rake test_isolated` checks the keychain exists before running anything and refuses to start otherwise.
 
 On the macOS runner an isolated run took 242s at four workers. That was once written up here as isolation costing 60% on a runner, against 151s for the real home, and that comparison was wrong: 151s is the *fastest* of the five real-home samples under **The numbers** at the top of this note, whose median is 243s. Against the median, 242s against 243s, isolation costs nothing measurable there.
 

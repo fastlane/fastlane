@@ -1,6 +1,6 @@
 # Speeding up the spec suite: objective, and which methods actually apply
 
-Why the order-dependence work was done at all, and what the options are now that it has landed. Written 2026-09-10, runner figures rechecked 2026-09-16. The defect list is fastlane#30184.
+Why the order-dependence work was done at all, and what the options are now that it has landed. Written 2026-09-10, runner figures rechecked 2026-09-16. The defect list is [fastlane#30184](https://github.com/fastlane/fastlane/issues/30184).
 
 ## Objective
 
@@ -10,7 +10,7 @@ The suite is not CPU bound. Almost all of the time is spent waiting on subproces
 
 ## Prerequisite, and why it comes first
 
-Parallel workers receive an arbitrary subset of the suite in an arbitrary order. Any example that depends on another example having run first will fail intermittently once the split is introduced, and it will fail differently on every run. So the order-dependence work in fastlane#30184 was not a side quest, it was the thing that had to be finished before any parallelism could be trusted. Running the suite under `--order random` is the cheap way to find those dependencies before a worker split does it for us at a much worse signal to noise ratio.
+Parallel workers receive an arbitrary subset of the suite in an arbitrary order. Any example that depends on another example having run first will fail intermittently once the split is introduced, and it will fail differently on every run. So the order-dependence work in [fastlane#30184](https://github.com/fastlane/fastlane/issues/30184) was not a side quest, it was the thing that had to be finished before any parallelism could be trusted. Running the suite under `--order random` is the cheap way to find those dependencies before a worker split does it for us at a much worse signal to noise ratio.
 
 ## Method 1, processes
 
@@ -81,7 +81,7 @@ Contention itself is mild. Eight distinct heavy files take 186s run one after an
 
 That is why the remedy is to remove the subprocesses rather than to tune the worker count. About 180 examples each run a real `xcodebuild -showBuildSettings`; `Project#build_settings` memoises per instance and every example builds a fresh `Project`, so nothing is reused. Caching those would shorten the sequential run and halve the effective process count, which then lets the worker count rise. `FASTLANE_DISALLOW_XCODEBUILD_SETTINGS_LOOKUP` and the `disallow_xcodebuild_settings_lookup` option already exist to forbid the lookup; what is missing is a recorded fixture to answer from.
 
-Splitting also keeps finding order dependence that seeds do not. Rows T and Z came out of a worker seeing a subset no random order produces.
+Splitting also keeps finding order dependence that seeds do not. Two of the defects fixed in [fastlane#30184](https://github.com/fastlane/fastlane/issues/30184) surfaced only because a worker saw a subset no random order produces.
 
 ## What rewriting the specs is worth
 

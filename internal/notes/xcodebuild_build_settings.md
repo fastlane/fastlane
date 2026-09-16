@@ -1,6 +1,6 @@
 # Making the specs stop running xcodebuild so often
 
-Two attempts, both reverted, and what is left to try. Written 2026-09-10. See fastlane#30184.
+Two attempts, both reverted, and what is left to try. Written 2026-09-10. See [fastlane#30184](https://github.com/fastlane/fastlane/issues/30184).
 
 Kept because a reverted attempt leaves no trace in the history that anyone reads, and both of these look obviously correct until they are run on a clean machine.
 
@@ -27,7 +27,7 @@ Two estimates made earlier were both too high and are worth correcting, because 
 @build_settings = FastlaneCore::Project.run_command(command, timeout: timeout, retries: retries, print: true)
 ```
 
-`run_command` is a class method, so a spec helper can wrap it without touching production code or any spec file. That matters: five open pull requests sit on the files a call-site rewrite would have touched, #22069 directly on `project.rb`.
+`run_command` is a class method, so a spec helper can wrap it without touching production code or any spec file. That matters: five open pull requests sit on the files a call-site rewrite would have touched, [#22069](https://github.com/fastlane/fastlane/issues/22069) directly on `project.rb`.
 
 Only `-showBuildSettings` may be intercepted. `fastlane_core/spec/project_spec.rb:453` tests `run_command` itself with `echo` and with deliberate timeouts, and those have to keep shelling out.
 
