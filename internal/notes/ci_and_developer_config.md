@@ -83,11 +83,10 @@ Twelve workers, on the developer machine:
 | Real home, warm | 41s |
 | Isolated home, first run | 44s |
 | Isolated home, second run against the same directory | 45s |
-| Isolated home, no keychain seeded | 244s, three workers failing |
 
 About 7%, and flat. The second run is not faster than the first, so nothing expensive is being cached in `HOME` and there is no warm-up to amortise.
 
-The 244s is worth explaining because it was briefly reported as the cost of isolation, and it is not. Without a seeded keychain `security` puts up a modal asking for keychain access and waits for it to be answered, so on a machine with a desktop session the run stalls rather than failing. Twelve workers hitting that is what turned 44s into 244s.
+An isolated home with no keychain seeded was timed here too, at 244s, and that row has been removed rather than kept with a caveat. Without a seeded keychain `security` puts up a modal asking for keychain access and blocks until someone answers it, so the figure records how long twelve workers' modals went unanswered and nothing about the suite. It is not a slow configuration, it is a broken one, and there is no number to report until it is fixed. It was briefly written up here as the cost of isolation.
 
 Unattended it behaves differently, and better. With no session to draw on, `security` returns exit 36 with empty output instead of prompting. That was established while reproducing [fastlane-community/security#5](https://github.com/fastlane-community/security/issues/5), over `ssh localhost` with `SSH_TTY` empty and `launchctl managername` reporting `Background`. So CI would not stall here, it would fail, and this guard is for the developer running it locally rather than for the runner. `rake test_isolated` checks the keychain exists before running anything and refuses to start otherwise.
 
