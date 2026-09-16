@@ -9,7 +9,7 @@ That last one is the reason this directory exists. A reverted commit leaves noth
 | | |
 | --- | --- |
 | `test_suite_parallelism.md` | Why processes and not threads or Ractors, and what oversubscribing the core count buys |
-| `ci_and_developer_config.md` | How many workers, on CI and locally, and the measurements behind the numbers |
+| `ci_and_developer_config.md` | How many workers, on CI and locally, what the isolated home costs, and why the specs that need a keychain must not be stubbed |
 | `xcodebuild_build_settings.md` | Two reverted attempts at making the specs stop shelling out to xcodebuild, and why neither was caught locally |
 
 They record what was true when they were written, and each says when that was.

@@ -39,25 +39,69 @@ That has two consequences. Linux is cheap ordering coverage, 130s against 562s, 
 
 ## Isolated HOME
 
-`rake test_isolated` points `HOME` at a directory the run controls and seeds it with an empty keychain. Its purpose is not speed: it makes a spec that depends on state an earlier run left in `~` fail on the machine that wrote it. Row Z survived for months because every machine that had run the suite already had the file the examples needed, and only a clean CI checkout ever failed.
+`rake test_isolated` points `HOME` and `TMPDIR` at throwaway directories, seeds an empty keychain, runs the suite and reports what the run wrote there. `WORKERS=12 rake test_isolated` splits it; a pattern argument runs a subset.
 
-It costs about 7% locally, 44s against 41s on twelve workers, and that is flat: a second run against the same directory is no faster, so nothing expensive is being cached there.
+Its purpose is not speed. The suite both reads and writes the developer's home, and reading is the dangerous half: Row Z is the example, `Client#itc_service_key` cached to a file, and the examples depending on that file passed on any machine that had ever run the suite. Only a clean CI checkout failed. An isolated home makes that fail on the machine that wrote it.
 
-On the macOS runner it cost considerably more, 242s against 151s at four workers. Three cores have much less headroom than fourteen, and that gap is not yet explained. Worth understanding before making it a default anywhere.
+The writing half is not small either. What it writes:
 
-A full run leaves 58 entries in `HOME` and a second run leaves 83, so the suite does not converge on a fixed set. What it writes: `~/.fastlane`, `~/Library/Logs` for four tools, `~/Library/MobileDevice/Provisioning Profiles`, `~/Library/Developer/Xcode`, `~/.appstoreconnect`, a rubocop cache, and certificates in the default keychain as a side effect of `security cms -D` decoding provisioning profiles.
+```
+~/.fastlane/.did_show_opt_info
+~/Library/Developer/Xcode/Archives
+~/Library/MobileDevice/Provisioning Profiles
+~/Library/Logs/{fastlane,gym,scan,snapshot}
+~/.appstoreconnect
+~/.cache/rubocop_cache
+```
 
-## Cold runners cost nothing
+### The keychain failures are not specs reaching into your keychain
 
-GitHub gives a fresh VM every run, which raises a fair question about caching. The answer here is no: a second isolated run against a warm directory took 45s against the first run's 44s. Nothing expensive is cached in `HOME`, so `actions/cache` on `~/Library/Developer/Xcode` or `~/.cache` would not help. The runners are slower than a developer machine because they have three or four cores against fourteen.
+Unseeded, nine examples fail, seven in `verify_build_spec` and two in `match/spec/importer_spec`, all with a keychain complaint. The obvious reading is that those specs should be stubbed. That is not what is happening, and it is worth recording so nobody stubs them:
 
-## Suggested configuration
+```
+security cms -D   real home                  exit 0
+                  isolated home, no keychain exit 1, "cert import failed: A default keychain could not be found"
+                  isolated home, EMPTY one   exit 0
+```
 
-**A developer on macOS**: `WORKERS=8 rake test_parallel`, 276s to 50s. Twelve is slightly faster at 41s but the returns are thin past eight. `rake test_isolated` before pushing anything that touches how specs read the environment or the filesystem.
+Nothing calls `security import`. `security cms -D`, which fastlane uses to decode provisioning profiles in `verify_build.rb`, `provisioning_profile.rb` and sigh's `local_manage.rb`, imports the signing certificate in order to verify the signature. Any keychain will do, including an empty one, and the certificates it writes are a side effect of decoding rather than anything the specs asked for. A full run puts four of them in the default keychain, three from the two match examples and one from verify_build.
 
-**macOS CI**: four workers, a median of 243s against 562s sequential. The default of `min(cores, 8)` picks three on a three core runner, which is close; `WORKERS: 4` is now pinned in `ci.yml`.
+So the specs are doing legitimate work and stubbing them would remove real coverage. Seeding a keychain in the isolated home is the fix: the certificates land in a directory that is deleted afterwards rather than in the developer's login keychain.
 
-**Linux CI**: four workers, 130s to 71s. Cheap, and worth keeping for ordering coverage on a suite shape macOS never exercises.
+Worth raising separately: this is production behaviour, not a test artefact. fastlane adds certificates to a user's keychain whenever it parses a provisioning profile. `provisioning_profile.rb` already has a `-k <keychain_path>` variant of the call, so there is a mechanism for directing it somewhere chosen.
+
+### What isolation costs, measured
+
+Twelve workers, same machine:
+
+| | Wall clock |
+| --- | --- |
+| Real home, warm | 41s |
+| Isolated home, first run | 44s |
+| Isolated home, second run against the same directory | 45s |
+| Isolated home, no keychain seeded | 244s, three workers failing |
+
+About 7%, and flat. The second run is not faster than the first, so nothing expensive is being cached in `HOME` and there is no warm-up to amortise.
+
+The 244s is worth explaining because it was briefly reported as the cost of isolation, and it is not. Without a seeded keychain `security` puts up a modal asking for keychain access and waits for it to be answered, so on a machine with a desktop session the run stalls rather than failing. Twelve workers hitting that is what turned 44s into 244s.
+
+Unattended it behaves differently, and better. With no session to draw on, `security` returns exit 36 with empty output instead of prompting. That was established while reproducing fastlane-community/security#5, over `ssh localhost` with `SSH_TTY` empty and `launchctl managername` reporting `Background`. So CI would not stall here, it would fail, and this guard is for the developer running it locally rather than for the runner. `rake test_isolated` checks the keychain exists before running anything and refuses to start otherwise.
+
+On the macOS runner isolation cost considerably more, 242s against 151s at four workers. Three cores have much less headroom than fourteen, and that gap is not yet explained. Worth understanding before making it a default anywhere.
+
+The isolated home held 58 entries after the first run and 83 after the second. The suite does not converge on a fixed set, it keeps adding.
+
+### Cold runners cost nothing
+
+Warm and cold are the same, so GitHub giving a fresh VM every run costs nothing: the second isolated run against a warm directory took 45s against the first run's 44s. `actions/cache` on `~/Library/Developer/Xcode` or `~/.cache` would not help. The runners are slower than a developer machine because they have three or four cores against fourteen, not because they start empty.
+
+## What the numbers come out at
+
+Testing.md covers the commands; these are the conclusions behind them.
+
+**CI**: four workers on every runner, pinned in `ci.yml`. A median of 243s against 562s sequential on macOS, 130s to 71s on Linux. The `min(cores, 8)` default would pick three on the macOS runners, which is close but measurably worse.
+
+**A developer**: eight workers on a fourteen core machine, 276s to 50s. Twelve is slightly faster at 41s and the returns past eight are thin. `rake test_tune` measures it on your own hardware, which is the honest answer for a machine nobody here has seen.
 
 **Not worth doing**: more than four workers on a three core runner, caching the home directory, or one worker per core on a large machine.
 
