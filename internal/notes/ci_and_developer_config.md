@@ -4,6 +4,8 @@ Measured 2026-09-10, and again on the runners when the timings were first record
 
 ## The numbers
 
+Every figure in this note came off specific hardware, and none of it generalises on its own. One developer machine with 14 cores; GitHub's hosted runners as they were in September 2026, reporting 3 cores on macOS and 4 on Linux and Windows. A different core count, a different Xcode, or a runner generation change moves all of it. Treat the shape of the curves as the finding and the absolute numbers as illustrations; `rake test_tune` is how you get numbers for a machine that is not one of these.
+
 A developer machine with 14 cores, against a macOS runner with 3 and a Linux runner with 4:
 
 | Workers | 14 cores, local | macOS runner, 3 cores | Linux runner, 4 cores |
@@ -15,7 +17,7 @@ A developer machine with 14 cores, against a macOS runner with 3 and a Linux run
 | 8 | 50s | | |
 | 12 | **41s** | | |
 
-Four workers is the knee on both runners. Six on macOS is worse than four, which is a three core runner being asked to run six workers that each drag an `xcodebuild` child along with them.
+Four workers is the knee on both runners. Six on macOS is worse than four, which is a three core runner being asked to run six workers that each drag an `xcodebuild` child along with them. The macOS column is single runs and the 151s in it is a lucky one; the five sample table below is the honest version, and 151s should not be quoted on its own.
 
 The single run those first macOS figures came from was not enough to say so with confidence. Across five runs of the same commit:
 
@@ -72,7 +74,9 @@ Worth raising separately: this is production behaviour, not a test artefact. fas
 
 ### What isolation costs, measured
 
-Twelve workers, same machine:
+Two separate questions get confused here, so to be explicit. *Isolated against real* asks what redirecting `HOME` costs. *Cold against warm* asks whether a `HOME` that has already been written to makes a later run faster. The answers are about 7% and nothing.
+
+Twelve workers, on the developer machine:
 
 | | Wall clock |
 | --- | --- |
@@ -87,7 +91,9 @@ The 244s is worth explaining because it was briefly reported as the cost of isol
 
 Unattended it behaves differently, and better. With no session to draw on, `security` returns exit 36 with empty output instead of prompting. That was established while reproducing fastlane-community/security#5, over `ssh localhost` with `SSH_TTY` empty and `launchctl managername` reporting `Background`. So CI would not stall here, it would fail, and this guard is for the developer running it locally rather than for the runner. `rake test_isolated` checks the keychain exists before running anything and refuses to start otherwise.
 
-On the macOS runner isolation cost considerably more, 242s against 151s at four workers. Three cores have much less headroom than fourteen, and that gap is not yet explained. Worth understanding before making it a default anywhere.
+On the macOS runner an isolated run took 242s at four workers. That was once written up here as isolation costing 60% on a runner, against 151s for the real home, and that comparison was wrong: 151s is the *fastest* of the five real-home samples under **The numbers** at the top of this note, whose median is 243s. Against the median, 242s against 243s, isolation costs nothing measurable there.
+
+It is the mistake this note warns about two sections above — a runner varies by nearly a factor of two on identical work, so a single sample is close to worthless — made before the warning was written and not revisited afterwards. One isolated sample is no better, so the honest statement is that isolation has not been shown to cost anything on the runner, not that it has been shown to be free.
 
 The isolated home held 58 entries after the first run and 83 after the second. The suite does not converge on a fixed set, it keeps adding.
 
@@ -97,17 +103,15 @@ Warm and cold are the same, so GitHub giving a fresh VM every run costs nothing:
 
 ## What the numbers come out at
 
-Testing.md covers the commands; these are the conclusions behind them.
+Testing.md covers the commands; these are the conclusions behind them, and they are conclusions about the hardware listed at the top of this note rather than about the suite in the abstract.
 
-**CI**: four workers on every runner, pinned in `ci.yml`. A median of 243s against 562s sequential on macOS, 130s to 71s on Linux. The `min(cores, 8)` default would pick three on the macOS runners, which is close but measurably worse.
+**CI**: four workers on every runner, pinned in `ci.yml`. A median of 243s on macOS against a single sequential sample of ~562s, and 130s to 71s on Linux. The `min(cores, 8)` default would pick three on the macOS runners; three was never measured, so pinning four is a choice between a measured number and an unmeasured one rather than a demonstrated improvement.
 
 **A developer**: eight workers on a fourteen core machine, 276s to 50s. Twelve is slightly faster at 41s and the returns past eight are thin. `rake test_tune` measures it on your own hardware, which is the honest answer for a machine nobody here has seen.
 
 **Not worth doing**: more than four workers on a three core runner, caching the home directory, or one worker per core on a large machine.
 
 ## What is still open
-
-The isolated home costing 60% on a runner against 7% locally, which is still unexplained.
 
 Whether the macOS knee moves once the specs stop shelling out to xcodebuild for build settings. Two attempts at that are written up in `internal/notes/xcodebuild_build_settings.md`, both reverted.
 
