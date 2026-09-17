@@ -142,8 +142,22 @@ describe FastlaneCore do
     end
 
     describe "spawn_with_pty" do
+      # Both examples are about the command string that reaches PTY.spawn and
+      # nothing else. Stubbing it means the block never runs, so no status is
+      # produced and `spawn_with_pty` falls back to `process_status`, which is
+      # `$?`: whatever subprocess this process ran last. An earlier example in
+      # this file kills one, and these then failed with "Process crashed"
+      # depending on the order. Stub that fallback too. See fastlane#30184.
+      let(:exited_cleanly) do
+        instance_double(Process::Status, signaled?: false, exitstatus: 0)
+      end
+
+      before do
+        allow(FastlaneCore::FastlanePty).to receive(:process_status).and_return(exited_cleanly)
+      end
+
       it 'passes the command to Pty when FASTLANE_EXEC_FLUSH_PTY_WORKAROUND is not set', requires_pty: true do
-        allow(PTY).to receive(:spawn).with("echo foo")
+        expect(PTY).to receive(:spawn).with("echo foo")
 
         FastlaneSpec::Env.with_env_values('FASTLANE_EXEC_FLUSH_PTY_WORKAROUND' => nil) do
           FastlaneCore::FastlanePty.spawn_with_pty('echo foo') do |command_stdout, command_stdin, pid|
@@ -152,7 +166,7 @@ describe FastlaneCore do
       end
 
       it 'wraps the command with a workaround when FASTLANE_EXEC_FLUSH_PTY_WORKAROUND is set', requires_pty: true do
-        allow(PTY).to receive(:spawn).with("echo foo;")
+        expect(PTY).to receive(:spawn).with("echo foo;")
 
         FastlaneSpec::Env.with_env_values('FASTLANE_EXEC_FLUSH_PTY_WORKAROUND' => '1') do
           FastlaneCore::FastlanePty.spawn_with_pty('echo foo') do |command_stdout, command_stdin, pid|
