@@ -27,6 +27,9 @@ end
 # report action on CI reads one file, but a worker only ever sees its own slice
 # of the suite, so the parts are joined after the run.
 RSPEC_JSON_PATH = "rspec_logs.json".freeze
+# Widest line report_slowest will print. Two spaces, a 7 character duration, two
+# more, the padded location, one space, then the description.
+LINE_WIDTH = 100
 
 def worker_json(index)
   "rspec_logs_#{index}.json"
@@ -145,6 +148,48 @@ def units_for(files, timings, target)
   end
 end
 
+# The slowest files and examples of the run that just happened, rather than of
+# whatever machine recorded the committed timings. A worker's own output goes to
+# its log, so without this nothing says where the time went.
+def report_slowest(limit = 10)
+  require "json"
+  return unless File.exist?(RSPEC_JSON_PATH)
+
+  examples = JSON.parse(File.read(RSPEC_JSON_PATH))["examples"] || []
+  return if examples.empty?
+
+  total = examples.sum { |e| e["run_time"].to_f }
+  return if total.zero?
+
+  files = Hash.new(0.0)
+  examples.each { |e| files[e["file_path"]] += e["run_time"].to_f }
+
+  puts("")
+  puts("Slowest files, #{total.round}s of example time in total:")
+  files.sort_by { |_path, secs| -secs }.first(limit).each do |path, secs|
+    puts(format("  %<secs>6.1fs  %<share>4.1f%%  %<path>s",
+                secs: secs, share: 100.0 * secs / total, path: path.delete_prefix("./")))
+  end
+
+  puts("")
+  puts("Slowest examples:")
+  # path:line rather than rspec's `[1:1:14:3]` id. Both address the example, but
+  # only one of them can be clicked or opened.
+  #
+  # The leaf description rather than the full nested one. The chain repeats for
+  # every example in a group and what tells two of them apart is its last
+  # clause, which is exactly what truncating a long line removes.
+  rows = examples.sort_by { |e| -e["run_time"].to_f }.first(limit).map do |e|
+    ["#{e['file_path'].delete_prefix('./')}:#{e['line_number']}", e["description"].to_s, e["run_time"].to_f]
+  end
+  width = rows.map { |where, _, _| where.length }.max
+  budget = LINE_WIDTH - (width + 12)
+  rows.each do |where, what, secs|
+    what = "#{what[0, budget - 3]}..." if what.length > budget
+    puts(format("  %<secs>6.1fs  %<where>-#{width}s %<what>s", secs: secs, where: where, what: what))
+  end
+end
+
 desc("Record per file and per example spec durations for test_parallel to balance on")
 task(:spec_timings) do
   require "etc"
@@ -250,7 +295,7 @@ task(:test_parallel) do
     # On GitHub Actions the run is also reported through rspec's json formatter.
     # One file per worker, merged below into the single file the report action
     # reads, since a worker only knows about its own examples.
-    command += ["--format", "json", "--out", worker_json(index)] if ENV["GITHUB_ACTIONS"]
+    command += ["--format", "json", "--out", worker_json(index)]
     command += bucket
     Process.spawn(*command, out: [log, "a"], err: [log, "a"])
   end
@@ -259,7 +304,7 @@ task(:test_parallel) do
   elapsed = Time.now - started
 
   # Before the failure reporting below, which aborts.
-  merge_worker_json(buckets.size) if ENV["GITHUB_ACTIONS"]
+  merge_worker_json(buckets.size)
 
   durations = []
   results.each_with_index do |status, index|
@@ -289,6 +334,8 @@ task(:test_parallel) do
   end
   puts(format("Wall clock %<elapsed>.1fs across %<workers>d processes",
               elapsed: elapsed, workers: buckets.size))
+
+  report_slowest
 
   failed = results.each_with_index.reject { |status, _index| status.success? }
 
