@@ -73,17 +73,6 @@ def spec_timings_path
   "internal/spec_timings.#{spec_timings_platform}.json"
 end
 
-# How long a unit of work may be before it is worth cutting up, as a fraction of
-# a worker's share. A file at 1.3 times the share cannot be balanced away: some
-# worker has to run it and everyone else waits.
-#
-# Overridable so it can be measured rather than guessed. Anything at or above 1
-# only catches files that exceed a whole share, and a file at 0.96 of one is
-# just as bad: that worker runs it and almost nothing else. Cutting is not free
-# though, since each chunk is a separate rspec process that loads the file again
-# and repeats its before(:all).
-SPLIT_THRESHOLD = (ENV["SPLIT_THRESHOLD"] || 1.05).to_f
-
 def spec_files
   files = (Dir.glob("spec/**/*_spec.rb") + Dir.glob("*/spec/**/*_spec.rb")).uniq
   excluded = ENV["EXCLUDE"].to_s.split
@@ -119,29 +108,18 @@ def pack(units, workers)
   [buckets.reject(&:empty?), weights]
 end
 
-# A file heavier than the threshold is cut into runs of examples, addressed with
-# rspec's own `path[id,id]` syntax. Without this the slowest single file is a
-# floor no number of workers gets under: at 269s total and a 35s worst file,
-# seven workers is the most that can help.
-def units_for(files, timings, target)
-  files.flat_map do |file|
-    key = file.delete_prefix("./")
-    seconds = timings["files"][key] || 0.05
-    examples = timings["examples"][key]
-
-    next [[file, seconds]] if examples.nil? || seconds <= target * SPLIT_THRESHOLD
-
-    chunks = [[]]
-    running = 0.0
-    examples.sort_by { |_id, secs| -secs }.each do |id, secs|
-      if running + secs > target && !chunks.last.empty?
-        chunks << []
-        running = 0.0
-      end
-      chunks.last << id
-      running += secs
-    end
-    chunks.map { |ids| ["#{file}[#{ids.join(',')}]", ids.sum { |id| examples[id] }] }
+# One unit per file, weighted by its recorded duration. A file with no recording
+# is new, and 0.05 keeps it from being packed as if it were the heaviest thing
+# in the run.
+#
+# Heavy files used to be cut into runs of examples with rspec's `path[id,id]`
+# syntax, balanced from the recorded ids. That could silently drop an example
+# added since the timings were taken, because rspec runs the ids it is given and
+# nothing reported the ones it was not. A harness must not be able to skip a
+# test as a function of a worker count. See fastlane#30244.
+def units_for(files, timings)
+  files.map do |file|
+    [file, timings["files"][file.delete_prefix("./")] || 0.05]
   end
 end
 
@@ -169,8 +147,10 @@ task(:spec_timings) do
     examples[path][example["id"][/\[(.*)\]/, 1]] = seconds
   end
 
-  # Per example timings only for what might need splitting. Keeping all of them
-  # would be a megabyte of ids nothing reads.
+  # Per example detail for the heavy files only, as a record to investigate them
+  # with. The split does not read it; keeping all of it would be a megabyte of
+  # ids. These 21 or so files are about 83% of the example time, which is where
+  # anyone asking why the suite is slow would look first.
   heavy = files.select { |_path, seconds| seconds > 5.0 }.keys
   # Where these came from, because it decides whether they are worth balancing
   # with. A split is only as good as its numbers, and numbers from a 14 core
@@ -218,15 +198,12 @@ task(:test_parallel) do
   #
   # WORKERS overrides it, which is the point: measure on your own machine.
   workers = Integer(ENV["WORKERS"] || [Etc.nprocessors, 8].min)
-  target = total.positive? ? total / workers : 0
 
-  units = units_for(files, timings, target)
+  units = units_for(files, timings)
   buckets, weights = pack(units, workers)
 
   source = total.zero? ? "file size, run `rake spec_timings` first" : "durations measured on #{spec_timings_platform}"
-  split = units.size - files.size
   puts("Running #{files.size} spec files as #{buckets.size} processes on #{Etc.nprocessors} cores, balanced by #{source}")
-  puts("#{split} extra unit(s) from cutting up files heavier than one worker's share") if split.positive?
   unless total.zero?
     spread = weights.reject(&:zero?)
     puts(format("Predicted worker load %<min>.0fs to %<max>.0fs", min: spread.min, max: spread.max))
