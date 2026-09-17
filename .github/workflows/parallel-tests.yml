@@ -53,7 +53,7 @@ on:
   workflow_dispatch:
     inputs:
       record_timings:
-        description: "Record spec timings instead of running the split. The split is balanced from these, and they are per platform because the suite is a different shape on each."
+        description: "Record spec timings instead of running the split. The split is balanced from these, and they are per platform because the suite is a different shape on each. `all` also opens a pull request with the three files, which is how to refresh them without waiting for the quarterly run."
         required: false
         type: choice
         options: ["no", "macos", "linux", "windows", "all"]
@@ -243,3 +243,67 @@ jobs:
           name: spec-timings-windows
           path: internal/spec_timings.windows.json
           if-no-files-found: error
+
+  # Closes the loop on the recording above. The three record jobs each produce
+  # one platform's file on its own runner, so nothing but a fourth job can see
+  # all three at once. It opens a pull request rather than pushing to master,
+  # the way the release workflow does: a split balanced from bad numbers is a
+  # slow suite rather than a broken one, but the diff is still worth a look.
+  publish_timings:
+    name: "Open a pull request with the recorded timings"
+    needs: [record_macos, record_linux, record_windows]
+    # A dispatch can run from any ref, and this cuts its branch from whatever is
+    # checked out.
+    if: github.ref == 'refs/heads/master'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      pull-requests: write
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/download-artifact@v8
+        with:
+          pattern: spec-timings-*
+          path: recorded
+      - name: Open the pull request
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          set -euo pipefail
+
+          found=$(find recorded -name 'spec_timings.*.json' | wc -l)
+          if [ "$found" -ne 3 ]; then
+            echo "Expected three timing files, found $found:"
+            find recorded -type f
+            exit 1
+          fi
+          find recorded -name 'spec_timings.*.json' -exec cp {} internal/ \;
+
+          if git diff --quiet -- internal/spec_timings.linux.json internal/spec_timings.mac.json internal/spec_timings.windows.json; then
+            echo "The timings are unchanged. Nothing to open."
+            exit 0
+          fi
+
+          branch="spec-timings-$(date -u +%Y-%m-%d)"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git config user.name "github-actions[bot]"
+          git checkout -b "$branch"
+          git add internal/spec_timings.linux.json internal/spec_timings.mac.json internal/spec_timings.windows.json
+          git commit -m "Record the spec timings the split is balanced from"
+          git push --force-with-lease origin "$branch"
+
+          if [ -n "$(gh pr list --head "$branch" --state open --json number --jq '.[].number')" ]; then
+            echo "A pull request for $branch is already open, the push updated it."
+            exit 0
+          fi
+
+          gh pr create --base master --head "$branch" \
+            --title "Record the spec timings the split is balanced from" \
+            --body "$(cat <<'BODY'
+          Recorded by [this run](${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}) of `Spec timings and random order split`.
+
+          `rake test_parallel` packs the suite from measured per file durations, and they have to come from the platform they balance, because the suite is a different shape on each. Each file records where and when it was measured.
+
+          A stale file costs a worse balanced split rather than a wrong result, so this is not urgent, but the numbers are worth a glance before merging. `recorded_on` in each file says which runner produced it.
+          BODY
+          )"
