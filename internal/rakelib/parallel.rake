@@ -8,8 +8,8 @@
 # per process in the kernel. A worker cannot corrupt another through either.
 #
 #   rake test_parallel                 workers chosen from the timings
-#   WORKERS=4 rake test_parallel
-#   WORKERS=6 RSPEC_ARGS="--order random" rake test_parallel
+#   FASTLANE_SPEC_WORKERS=4 rake test_parallel
+#   FASTLANE_SPEC_WORKERS=6 RSPEC_ARGS="--order random" rake test_parallel
 # Timings are per platform, because the suite is a different shape on each one.
 # 61% of the example time on macOS is in requires_xcodebuild files, and those
 # skip entirely on Linux, so balancing a Linux split from macOS numbers packs
@@ -220,7 +220,7 @@ task(:spec_timings) do
   puts("Wrote #{files.size} file timings (#{heavy.size} with per example detail) to #{spec_timings_path}, #{files.values.sum.round}s total")
 end
 
-desc("Run the suite as WORKERS independent rspec processes")
+desc("Run the suite as FASTLANE_SPEC_WORKERS independent rspec processes")
 task(:test_parallel) do
   require "etc"
   require "json"
@@ -241,8 +241,9 @@ task(:test_parallel) do
   # ever stop shelling out, this cap should be revisited upwards. Linux and
   # Windows skip those specs entirely, so their shape is different again.
   #
-  # WORKERS overrides it, which is the point: measure on your own machine.
-  workers = Integer(ENV["WORKERS"] || [Etc.nprocessors, 8].min)
+  # FASTLANE_SPEC_WORKERS overrides it, which is the point: measure on your own
+  # machine.
+  workers = Integer(ENV["FASTLANE_SPEC_WORKERS"] || [Etc.nprocessors, 8].min)
 
   units = units_for(files, timings)
   buckets, weights = pack(units, workers)
@@ -358,7 +359,7 @@ task(:test_tune) do
 
   counts.each do |workers|
     started = Time.now
-    system({ "WORKERS" => workers.to_s }, "rake test_parallel", out: "tune_#{workers}.log", err: %W[tune_#{workers}.log a])
+    system({ "FASTLANE_SPEC_WORKERS" => workers.to_s }, "rake test_parallel", out: "tune_#{workers}.log", err: %W[tune_#{workers}.log a])
     elapsed = Time.now - started
     report = File.read("tune_#{workers}.log")
     results[workers] = {
@@ -373,7 +374,7 @@ task(:test_tune) do
 
   best = results.min_by { |_workers, r| r[:wall] }
   puts("")
-  puts(format("Fastest here: %<workers>d workers at %<wall>.0fs. Put WORKERS=%<workers>d in your CI job or your shell.",
+  puts(format("Fastest here: %<workers>d workers at %<wall>.0fs. Put FASTLANE_SPEC_WORKERS=%<workers>d in your CI job or your shell.",
               workers: best[0], wall: best[1][:wall]))
   puts("A large spread means the split is uneven on this machine: try REFRESH=1 to record its own timings.") if best[1][:spread] > 25
 end
