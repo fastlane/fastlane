@@ -11,7 +11,8 @@
 # from macOS numbers left a worker idle 41% to 48% of the run. Each file records
 # where it was measured. They only shift when the shape of the suite changes, so
 # quarterly is enough, and a stale file costs a worse split rather than a wrong
-# result.
+# result. Recording means a full single process run on each platform, which is
+# the expensive half of this workflow and the reason that half stays quarterly.
 #
 # Running the split in a random order. CI runs it in the defined order, so the
 # two axes of isolation are exercised separately there. A worker sees a subset
@@ -20,9 +21,14 @@
 # defect (#30188) were found, neither of which had shown up in a random order
 # alone.
 #
-# The quarterly run is also what keeps this honest. A workflow nobody runs is a
-# workflow that has quietly stopped working, and the only other trigger is a
-# pull request touching the parallel machinery, which may be months apart.
+# That half runs weekly, and cheaply: no recording, just the split. It earns it.
+# The first time it ran against a changed suite it found two order dependencies
+# that had been latent for days, one on Windows and one on macOS, neither of
+# them related to the pull request they appeared on. On a pull request trigger
+# alone it would have been months before anyone saw either.
+#
+# Running on a schedule is also what keeps this honest. A workflow nobody runs
+# is a workflow that has quietly stopped working.
 name: Spec timings and random order split
 
 on:
@@ -32,7 +38,17 @@ on:
       - 'internal/spec_timings.*.json'
       - '.github/workflows/parallel-tests.yml'
   schedule:
-    # 04:00 UTC on the first of January, April, July and October.
+    # Two cadences, told apart by github.event.schedule below.
+    #
+    # 04:00 UTC every Monday: the random order split only. It found two order
+    # dependencies the first time it ran against a changed suite, one on Windows
+    # and one on macOS, both of which had been latent for days. Quarterly is too
+    # rare to catch that class before it reaches someone.
+    - cron: '0 4 * * 1'
+    # 04:00 UTC on the first of January, April, July and October: the split and
+    # a full single process run per platform to record the timings. That run is
+    # the expensive half, and the timings only shift when the shape of the suite
+    # does, so it stays quarterly.
     - cron: '0 4 1 1,4,7,10 *'
   workflow_dispatch:
     inputs:
@@ -159,7 +175,7 @@ jobs:
 
   record_macos:
     name: "Record timings, macOS"
-    if: github.event_name == 'schedule' || inputs.record_timings == 'macos' || inputs.record_timings == 'all'
+    if: github.event.schedule == '0 4 1 1,4,7,10 *' || inputs.record_timings == 'macos' || inputs.record_timings == 'all'
     runs-on: macos-15
     steps:
       - uses: actions/checkout@v7
@@ -186,7 +202,7 @@ jobs:
 
   record_linux:
     name: "Record timings, Linux"
-    if: github.event_name == 'schedule' || inputs.record_timings == 'linux' || inputs.record_timings == 'all'
+    if: github.event.schedule == '0 4 1 1,4,7,10 *' || inputs.record_timings == 'linux' || inputs.record_timings == 'all'
     runs-on: ubuntu-24.04
     steps:
       - uses: actions/checkout@v7
@@ -211,7 +227,7 @@ jobs:
 
   record_windows:
     name: "Record timings, Windows"
-    if: github.event_name == 'schedule' || inputs.record_timings == 'windows' || inputs.record_timings == 'all'
+    if: github.event.schedule == '0 4 1 1,4,7,10 *' || inputs.record_timings == 'windows' || inputs.record_timings == 'all'
     runs-on: windows-2022
     steps:
       - uses: actions/checkout@v7
