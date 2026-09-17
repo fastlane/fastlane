@@ -3,14 +3,20 @@ require 'spec_helper'
 describe Spaceship::Portal::Merchant do
   let(:mock_client) { double('MockClient') }
 
-  let(:merchant) do
-    Spaceship::Portal::Merchant.new(JSON.parse({
+  let(:merchant_attrs) do
+    {
       name: "ExampleApp Production",
       prefix: "9J57U9392R",
       identifier: "merchant.com.example.app.production",
       status: "current",
       omcId: "LM3IY56BXC"
-    }.to_json))
+    }
+  end
+
+  # go through the API so we grab the platform too (the `mac` bit)
+  let(:merchant) do
+    mock_client_response(:merchants, with: { mac: false }) { [merchant_attrs] }
+    Spaceship::Portal::Merchant.find("merchant.com.example.app.production")
   end
 
   let(:domain_list) do
@@ -220,16 +226,16 @@ describe Spaceship::Portal::Merchant do
   end
 
   describe Spaceship::Portal::Merchant::Domain do
+    let(:mac_merchant) do
+      mock_client_response(:merchants, with: { mac: true }) { [merchant_attrs] }
+      Spaceship::Portal::Merchant.find("merchant.com.example.app.production", mac: true)
+    end
+
     let(:domain) do
       Spaceship::Portal::Merchant::Domain.new(domain_list.first, merchant: merchant)
     end
 
     let(:mac_domain) do
-      mac_merchant = Spaceship::Portal::Merchant.new(JSON.parse({
-        omcId: "LM3IY56BXC",
-        platform: "mac"
-      }.to_json))
-
       Spaceship::Portal::Merchant::Domain.new(domain_list.first, merchant: mac_merchant)
     end
 
@@ -254,11 +260,6 @@ describe Spaceship::Portal::Merchant do
       end
 
       it "fetches the Mac domains for a Mac merchant" do
-        mac_merchant = Spaceship::Portal::Merchant.new(JSON.parse({
-          omcId: "LM3IY56BXC",
-          platform: "mac"
-        }.to_json))
-
         expect(mock_client).to receive(:merchant_domains).with("LM3IY56BXC", mac: true).and_return(domain_list)
 
         Spaceship::Portal::Merchant::Domain.all(mac_merchant)
