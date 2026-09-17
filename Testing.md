@@ -72,16 +72,16 @@ When a spec passes on its own and fails in the split, [ParallelTesting.md](Paral
 bundle exec rake test_parallel
 ```
 
-`WORKERS` overrides the worker count, which otherwise is `min(cores, 8)`:
+`FASTLANE_SPEC_WORKERS` overrides the worker count, which otherwise is `min(cores, 8)`:
 
 ```
-WORKERS=12 bundle exec rake test_parallel
+FASTLANE_SPEC_WORKERS=12 bundle exec rake test_parallel
 ```
 
 `RSPEC_ARGS` is passed through to each worker, so the two axes can be combined:
 
 ```
-RSPEC_ARGS="--order random" WORKERS=4 bundle exec rake test_parallel
+RSPEC_ARGS="--order random" FASTLANE_SPEC_WORKERS=4 bundle exec rake test_parallel
 ```
 
 When a worker fails, the task prints which examples failed and the path to a file listing exactly what that worker ran, so the split can be replayed:
@@ -104,7 +104,7 @@ bundle exec rake spec_timings
 
 #### When CI goes red
 
-CI runs `rake test_parallel` with `WORKERS: 4`, not `rspec`, so a job can fail on a split your sequential run never produces.
+CI runs `rake test_parallel` with `FASTLANE_SPEC_WORKERS: 4`, not `rspec`, so a job can fail on a split your sequential run never produces.
 
 A worker writes its rspec output to its own log rather than to stdout, so the job log alone will not say why an example failed. Two things carry the detail.
 
