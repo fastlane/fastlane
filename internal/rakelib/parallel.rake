@@ -353,3 +353,102 @@ task(:test_tune) do
               workers: best[0], wall: best[1][:wall]))
   puts("A large spread means the split is uneven on this machine: try REFRESH=1 to record its own timings.") if best[1][:spread] > 25
 end
+
+# Runs a few spec files against each other in concurrent processes, over and
+# over, to provoke a race between them.
+#
+# This finds cross process races that repeating the whole suite does not, and
+# the reason is duty cycle. In a whole suite run a spec file executes once
+# inside about ninety seconds, so the window where it is vulnerable is a
+# rounding error and two such windows almost never coincide: measured at 1.6%
+# per run on CI and zero in eighty runs on an idle laptop. Loop two files
+# against each other instead and each one's window recurs every second or so,
+# which found the same race three times in fifteen rounds on the same laptop.
+#
+# Processes rather than threads, deliberately. The races are cross process by
+# nature, ENV and the working directory are per process in the kernel, and
+# rspec's own globals are not thread safe, so threads here would invent failures
+# rather than find them. The threads below only wait on children.
+#
+# Pick the files from what they share rather than at random: the point is to put
+# a writer and a deleter of the same path in different processes. See
+# fastlane#30184.
+#
+# Separate the files with spaces or commas. Address a single example as
+# `path:line` rather than rspec's `path[1:2,1:3]`, whose commas would be read as
+# separators here.
+#
+#   RACE_FILES="a_spec.rb b_spec.rb" rake test_race
+#   RACE_FILES="a_spec.rb,b_spec.rb" rake test_race
+#   ROUNDS=30 RACE_FILES="a_spec.rb:42, b_spec.rb:17" rake test_race
+desc("Run spec files against each other in concurrent processes to provoke a race")
+task(:test_race) do
+  require "fileutils"
+
+  files = ENV["RACE_FILES"].to_s.split(/[\s,]+/).reject(&:empty?)
+  abort("RACE_FILES is required: two or more spec files that share a resource") if files.size < 2
+
+  rounds = Integer(ENV["ROUNDS"] || 15)
+  # Copies of each file running at once. Two processes only collide when A's
+  # window overlaps B's; more copies raise the chance of some pair overlapping
+  # far faster than more rounds do, and cost nothing in wall clock until the
+  # machine runs out of cores.
+  procs = Integer(ENV["RACE_PROCS"] || 1)
+  dir = ENV["RACE_DIR"] || "race_results"
+  FileUtils.mkdir_p(dir)
+
+  # An entry may name a single example (`path:line`), which rspec accepts and
+  # which is usually what you want: it strips out the examples that do not touch
+  # the shared resource, so the round is mostly the part that can collide rather
+  # than a hundred that cannot. Passed to rspec as an argument rather than
+  # through a shell, so a path may contain spaces.
+  files = files.flat_map { |file| Array.new(procs) { file } }
+
+  puts("#{files.size} process(es), #{rounds} round(s) each, all at once:")
+  files.uniq.each { |file| puts("  #{file}#{procs > 1 ? " x#{procs}" : ''}") }
+
+  started = Time.now
+  mutex = Mutex.new
+  failures = Hash.new { |hash, key| hash[key] = [] }
+
+  threads = files.each_with_index.map do |file, index|
+    Thread.new do
+      rounds.times do |round|
+        log = File.join(dir, "race_#{index}_#{round}.log")
+        ok = system("bundle", "exec", "rspec", file, out: log, err: [log, "a"])
+        next if ok
+
+        # The failing example ids, so the report says what broke rather than
+        # only that something did.
+        broke = File.readlines(log).grep(%r{^rspec \./}).map { |line| line.split.fetch(1, "") }
+        mutex.synchronize { failures[file] << [round + 1, broke] }
+      end
+    end
+  end
+  threads.each(&:join)
+
+  elapsed = Time.now - started
+  total = files.size * rounds
+  red = failures.values.map(&:size).sum
+
+  puts("")
+  puts(format("%<red>d of %<total>d rounds red (%<rate>.0f%%) in %<elapsed>.0fs",
+              red: red, total: total, rate: 100.0 * red / total, elapsed: elapsed))
+
+  if red.zero?
+    # Said plainly, because a clean run here is weaker evidence than it looks:
+    # it only says these files do not race often, not that nothing does.
+    puts("No failures. That is evidence about these files only, and only at this rate.")
+  else
+    failures.each do |file, rows|
+      puts("")
+      puts("#{file}: #{rows.size} of #{rounds} rounds")
+      rows.flat_map(&:last).tally.sort_by { |_id, count| -count }.each do |id, count|
+        puts(format("  %<count>3d  %<id>s", count: count, id: id))
+      end
+    end
+    # Reported above, then failed here, so the detail is on screen and the exit
+    # status still says a race was found. test_parallel aborts the same way.
+    abort("#{red} of #{total} rounds red")
+  end
+end
