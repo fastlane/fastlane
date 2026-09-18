@@ -223,16 +223,7 @@ module Produce
     end
 
     def login
-      if using_connect_api?
-        UI.message("Authenticating with App Store Connect API Key")
-
-        # `current_team_id:` avoids a live, session-based team_id lookup elsewhere in
-        # ConnectAPI's provisioning client, which has no session to use here.
-        Spaceship::ConnectAPI.client = Spaceship::ConnectAPI::Client.new(token: connect_api_token, current_team_id: Produce.config[:team_id])
-      else
-        Spaceship.login(Produce.config[:username], nil)
-        Spaceship.select_team
-      end
+      Produce.authenticate_connect_api!
     end
   end
 end

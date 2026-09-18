@@ -27,10 +27,23 @@ describe Produce::Service do
       expect(result).to eq(found_bundle_id)
     end
 
-    it "falls back to session-based login when no API key is configured" do
+    it "falls back to session-based login when no API key is configured and no token exists" do
       config_with
+      allow(Spaceship::ConnectAPI).to receive(:token).and_return(nil)
       expect(Spaceship).to receive(:login).with("person@example.com", nil)
       expect(Spaceship).to receive(:select_team)
+      found_bundle_id = double("bundle_id")
+      allow(Spaceship::ConnectAPI::BundleId).to receive(:find).with("com.example.app").and_return(found_bundle_id)
+
+      result = Produce::Service.new.bundle_id
+
+      expect(result).to eq(found_bundle_id)
+    end
+
+    it "reuses a token already set by another lane instead of logging in again" do
+      config_with
+      allow(Spaceship::ConnectAPI).to receive(:token).and_return(fake_token)
+      expect(Spaceship).not_to receive(:login)
       found_bundle_id = double("bundle_id")
       allow(Spaceship::ConnectAPI::BundleId).to receive(:find).with("com.example.app").and_return(found_bundle_id)
 

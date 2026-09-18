@@ -120,10 +120,19 @@ describe Produce::DeveloperCenter do
       Produce::DeveloperCenter.new.send(:login)
     end
 
-    it "falls back to session-based login when no API key is configured" do
+    it "falls back to session-based login when no API key is configured and no token exists" do
       config_with
+      allow(Spaceship::ConnectAPI).to receive(:token).and_return(nil)
       expect(Spaceship).to receive(:login).with("person@example.com", nil)
       expect(Spaceship).to receive(:select_team)
+
+      Produce::DeveloperCenter.new.send(:login)
+    end
+
+    it "reuses a token already set by another lane instead of logging in again" do
+      config_with
+      allow(Spaceship::ConnectAPI).to receive(:token).and_return(fake_token)
+      expect(Spaceship).not_to receive(:login)
 
       Produce::DeveloperCenter.new.send(:login)
     end
