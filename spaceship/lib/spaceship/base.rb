@@ -224,7 +224,9 @@ module Spaceship
     # The initialize method accepts a parsed response from Apple and sets all
     # attributes that are defined by `attr_mapping`
     #
-    # Do not override `initialize` in your own models.
+    # Do not override `initialize` in your own models, use `setup` instead. An
+    # override that has to take a value Apple's response does not carry must call
+    # `super`, or `attr_mapping`, `raw_data`, `client` and `setup` are all skipped.
     def initialize(attrs = {}, existing_client = nil)
       attrs.each do |key, val|
         self.send("#{key}=", val) if respond_to?("#{key}=")

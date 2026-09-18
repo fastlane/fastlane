@@ -266,5 +266,83 @@ describe Spaceship::ConnectAPI::Tunes::Client do
         end
       end
     end
+
+    describe "routingAppCoverages" do
+      let(:app_store_version_id) { "123" }
+      let(:routing_app_coverage_id) { "456" }
+
+      context 'get_routing_app_coverage' do
+        let(:path) { "v1/appStoreVersions/#{app_store_version_id}/routingAppCoverage" }
+
+        it 'succeeds' do
+          params = {}
+          req_mock = test_request_params(path, params)
+          expect(client).to receive(:request).with(:get).and_yield(req_mock).and_return(req_mock)
+          client.get_routing_app_coverage(app_store_version_id: app_store_version_id)
+        end
+      end
+
+      context 'post_routing_app_coverage' do
+        let(:path) { "v1/routingAppCoverages" }
+        let(:attributes) { { fileSize: 1024, fileName: "coverage.geojson" } }
+        let(:body) do
+          {
+            data: {
+              type: "routingAppCoverages",
+              attributes: attributes,
+              relationships: {
+                appStoreVersion: {
+                  data: {
+                    type: "appStoreVersions",
+                    id: app_store_version_id
+                  }
+                }
+              }
+            }
+          }
+        end
+
+        it 'succeeds' do
+          url = path
+          req_mock = test_request_body(url, body)
+
+          expect(client).to receive(:request).with(:post).and_yield(req_mock).and_return(req_mock)
+          client.post_routing_app_coverage(app_store_version_id: app_store_version_id, attributes: attributes)
+        end
+      end
+
+      context 'patch_routing_app_coverage' do
+        let(:path) { "v1/routingAppCoverages/#{routing_app_coverage_id}" }
+        let(:attributes) { { uploaded: true, sourceFileChecksum: "checksum" } }
+        let(:body) do
+          {
+            data: {
+              type: "routingAppCoverages",
+              id: routing_app_coverage_id,
+              attributes: attributes
+            }
+          }
+        end
+
+        it 'succeeds' do
+          url = path
+          req_mock = test_request_body(url, body)
+
+          expect(client).to receive(:request).with(:patch).and_yield(req_mock).and_return(req_mock)
+          client.patch_routing_app_coverage(routing_app_coverage_id: routing_app_coverage_id, attributes: attributes)
+        end
+      end
+
+      context 'delete_routing_app_coverage' do
+        let(:path) { "v1/routingAppCoverages/#{routing_app_coverage_id}" }
+
+        it 'succeeds' do
+          params = {}
+          req_mock = test_request_params(path, params)
+          expect(client).to receive(:request).with(:delete).and_yield(req_mock).and_return(req_mock)
+          client.delete_routing_app_coverage(routing_app_coverage_id: routing_app_coverage_id)
+        end
+      end
+    end
   end
 end

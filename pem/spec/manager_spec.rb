@@ -46,6 +46,17 @@ describe PEM do
       expect(File.exist?("tmp/production_com.krausefx.app_macos.p12")).to eq(false)
     end
 
+    it "Successful run for a VoIP Services certificate" do
+      pem_stub_spaceship_cert(voip_push: true)
+
+      options = { app_identifier: "com.krausefx.app", generate_p12: false, output_path: "tmp/", voip_push: true }
+      PEM.config = FastlaneCore::Configuration.create(PEM::Options.available_options, options)
+      PEM::Manager.start
+
+      expect(File.exist?("tmp/voip_com.krausefx.app_ios.pem")).to eq(true)
+      expect(File.exist?("tmp/voip_com.krausefx.app_ios.pkey")).to eq(true)
+    end
+
     after :all do
       FileUtils.rm_r("tmp")
       File.delete("production_com.krausefx.app_ios.pem")

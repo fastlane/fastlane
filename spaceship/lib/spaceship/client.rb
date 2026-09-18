@@ -37,7 +37,7 @@ module Spaceship
     attr_accessor :user_email
 
     # The logger in which all requests are logged
-    # /tmp/spaceship[time]_[pid].log by default
+    # <tmpdir>/spaceship[time]_[pid].log by default
     attr_accessor :logger
 
     attr_accessor :csrf_tokens
@@ -239,14 +239,19 @@ module Spaceship
     #####################################################
 
     # The logger in which all requests are logged
-    # /tmp/spaceship[time]_[pid]_["threadid"].log by default
+    # <tmpdir>/spaceship[time]_[pid]_["threadid"].log by default
+    #
+    # Dir.tmpdir rather than a literal "/tmp", and it should stay that way:
+    # "/tmp" is not a directory on every platform Ruby runs on. On Windows it
+    # resolves against the current drive, so Logger.new raises Errno::ENOENT
+    # unless something else happens to have created it first.
     def logger
       unless @logger
         if ENV["VERBOSE"]
           @logger = Logger.new(STDOUT)
         else
           # Log to file by default
-          path = "/tmp/spaceship#{Time.now.to_i}_#{Process.pid}_#{Thread.current.object_id}.log"
+          path = File.join(Dir.tmpdir, "spaceship#{Time.now.to_i}_#{Process.pid}_#{Thread.current.object_id}.log")
           @logger = Logger.new(path)
         end
 
@@ -716,28 +721,145 @@ module Spaceship
       exit(has_valid_session)
     end
 
+    # <tmpdir>/spaceship_itc_service_key.txt
+    #
+    # Dir.tmpdir rather than a literal "/tmp", for the same reason as #logger,
+    # and here the failure was worse than a missing file: itc_service_key
+    # rescues everything, so the write failing on Windows was reported as an
+    # App Store Connect outage. See #30198.
+    #
+    # On macOS this is also per user, so a cache written by one user no longer
+    # blocks another.
+    def itc_service_key_path
+      File.join(Dir.tmpdir, "spaceship_itc_service_key.txt")
+    end
+
     def itc_service_key
       return @service_key if @service_key
 
-      # Check if we have a local cache of the key
-      itc_service_key_path = "/tmp/spaceship_itc_service_key.txt"
-      return File.read(itc_service_key_path) if File.exist?(itc_service_key_path)
+      # Check if we have a local cache of the key. Reading it is best effort:
+      # an unreadable cache is a reason to fetch the key again, not to fail.
+      begin
+        return File.read(itc_service_key_path) if File.exist?(itc_service_key_path)
+      rescue SystemCallError => ex
+        logger.warn("Could not read the cached App Store Connect API key: #{ex.message}")
+      end
+
+      @service_key = fetch_service_key
+
+      # Cache the key locally. Best effort as well: having the key and failing
+      # to save it is not a reason to fail the login. See fastlane#30198.
+      begin
+        File.write(itc_service_key_path, @service_key)
+      rescue SystemCallError => ex
+        logger.warn("Could not cache the App Store Connect API key at #{itc_service_key_path}: #{ex.message}")
+      end
+
+      return @service_key
+    end
+
+    # Two sources, because the one this used to rely on is gone.
+    #
+    # App Store Connect's sign out route answers with a redirect that carries
+    # the key its own front end is using:
+    #
+    #   GET /logout -> 302 Location: .../appleauth/signout?widgetKey=<key>&...
+    #
+    # That is preferred over the olympus endpoint below, which Apple removed in
+    # September 2026 and which now answers 404. See fastlane#30199. The olympus
+    # call is kept as a fallback in case it comes back, since it is the source
+    # Apple documented rather than one scraped out of a redirect.
+    def fetch_service_key
+      key = fetch_service_key_from_signout
+      return key if key
 
       # Fixes issue https://github.com/fastlane/fastlane/issues/13281
       # Even though we are using https://appstoreconnect.apple.com, the service key needs to still use a
       # hostname through itunesconnect.apple.com
-      response = request(:get, "https://appstoreconnect.apple.com/olympus/v1/app/config?hostname=itunesconnect.apple.com")
-      @service_key = response.body["authServiceKey"].to_s
+      response = begin
+        request(:get, "https://appstoreconnect.apple.com/olympus/v1/app/config?hostname=itunesconnect.apple.com")
+      rescue Faraday::TimeoutError, Faraday::ConnectionFailed => ex
+        # The only case the old message was ever right about.
+        raise AppleTimeoutError.new, "Could not reach App Store Connect to fetch the API key: #{ex.message}"
+      end
 
-      raise "Service key is empty" if @service_key.length == 0
+      extract_service_key(response)
+    end
 
-      # Cache the key locally
-      File.write(itc_service_key_path, @service_key)
+    # Read the key out of the sign out redirect, or nil if it is not there.
+    #
+    # Two things about this request matter, and neither is decoration.
+    #
+    # It sends no cookies. The redirect it returns points at a signout with
+    # `asop=destroy-session`, so asking for it over the client's own connection,
+    # which carries the session jar, would end the session this method is being
+    # called in order to establish. A bare Faraday connection has neither a
+    # cookie jar nor redirect following, which is exactly what is wanted here.
+    #
+    # It does not follow the redirect. The key is in the Location header;
+    # following it is what performs the signout.
+    #
+    # Failure returns nil rather than raising, so the caller falls through to
+    # the other source rather than this becoming a new single point of failure.
+    # Deliberately not `self.class.client` or anything built from it. A bare
+    # Faraday connection has no cookie jar and no redirect following, which is
+    # the whole point; the spec asserts both rather than trusting this comment.
+    def signout_connection
+      Faraday.new(url: "https://appstoreconnect.apple.com")
+    end
 
-      return @service_key
-    rescue => ex
-      puts(ex.to_s)
-      raise AppleTimeoutError.new, "Could not receive latest API key from App Store Connect, this might be a server issue."
+    def fetch_service_key_from_signout
+      response = signout_connection.head("/logout")
+
+      location = response.headers["location"].to_s
+      return nil if location.empty?
+
+      query = URI.parse(location).query
+      return nil if query.nil?
+
+      key = CGI.parse(query)["widgetKey"].first.to_s
+      return nil if key.empty?
+
+      logger.debug("Read the App Store Connect API key from the sign out redirect")
+      key
+    rescue Faraday::Error, URI::InvalidURIError => ex
+      # Only what this request can be expected to go wrong with. Rescuing
+      # everything here would put back the problem fastlane#30198 is about: a
+      # local failure, a missing log directory being the one that started it,
+      # would be swallowed and the caller would be handed whatever the fallback
+      # said instead of the real cause.
+      #
+      # Warn rather than debug. This is the source the key normally comes from,
+      # so failing here means the run is about to depend on an endpoint Apple has
+      # already removed once. If the fallback fails too, its message is all the
+      # caller sees, and this line is the half that says why.
+      logger.warn("Could not read the App Store Connect API key from the sign out redirect, falling back to the olympus endpoint: #{ex.message}")
+      nil
+    end
+
+    # The status matters, and used to be thrown away. A non 2xx response body is
+    # an HTML error page rather than JSON, and String#[] on it returns nil for
+    # the key being looked up, so the failure presented as an empty key no
+    # matter what had actually gone wrong. See fastlane#30199.
+    def extract_service_key(response)
+      status = response.status.to_i
+      body = response.body
+
+      unless (200..299).cover?(status)
+        detail = body.to_s.strip[0, 200]
+        message = "App Store Connect returned #{status} for the API key endpoint."
+        message += " #{detail}" unless detail.empty?
+
+        # 5xx and 429 are worth retrying, a 4xx is not, and with_retry decides
+        # that from the class rather than the message.
+        raise AppleTimeoutError.new, "#{message} This might be a temporary server error, check https://developer.apple.com/system-status/" if status >= 500
+        raise UnexpectedResponse.new, message
+      end
+
+      key = body.kind_of?(Hash) ? body["authServiceKey"].to_s : ""
+      raise UnexpectedResponse.new, "App Store Connect returned #{status} for the API key endpoint but no authServiceKey in the response." if key.empty?
+
+      key
     end
 
     #####################################################

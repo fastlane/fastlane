@@ -92,7 +92,9 @@ lane :execute_tests do
   # Run the tests
   build_fastlane_gem(version: version) unless File.file?("pkg/fastlane-#{version}.gem")
   Dir.chdir("..") do
-    sh("bundle", "exec", "rake", "test_all")
+    # Several processes rather than one. The suite is the same either way; a
+    # worker just gets a slice of it. See fastlane#30189.
+    sh("bundle", "exec", "rake", "test_parallel")
   end
 end
 
@@ -292,7 +294,8 @@ lane :create_github_release do |options|
     download_github_release_gem(version: version)
   end
 
-  sh "gem push --key github --host https://rubygems.pkg.github.com/#{github_username} #{gem_path}" unless options[:skip_github_packages]
+  # Unset GEM_HOST_API_KEY as GitHub Action (rubygems/configure-rubygems-credentials) sets it.
+  sh "env -u GEM_HOST_API_KEY gem push --key github --host https://rubygems.pkg.github.com/#{github_username} #{gem_path}" unless options[:skip_github_packages]
 
   sh "gem push #{gem_path}" unless options[:skip_rubygems]
 end
@@ -362,13 +365,21 @@ private_lane :github_changelog do |options|
       [message, username]
     end
 
+    # We may find 0 PRs, 1 PR, n+ PRs and we may be interactive or not. Self recovery exists in non-interactive
+    # User selection is required in interactive
     if item_infos.size == 0
-      if UI.confirm("Error generating changelog. No commit found for #{sha}. Skip?")
+      if !UI.interactive?
+        UI.important("No pull request found for commit #{sha}, falling back to the commit message for the changelog entry")
+      elsif UI.confirm("Error generating changelog. No pull request found for commit #{sha}. Skip?")
         next
       else
-        UI.user_error!("Cannot generate changelog. No commit found for #{sha}")
+        UI.user_error!("Cannot generate changelog. No pull request found for commit #{sha}")
       end
     elsif item_infos.size == 1
+      message = item_infos[0][0]
+      username = item_infos[0][1]
+    elsif !UI.interactive?
+      UI.important("Multiple pull requests found for commit #{sha}: #{item_infos.map { |info| info[0] }.join(', ')} - using the first one")
       message = item_infos[0][0]
       username = item_infos[0][1]
     else
@@ -383,7 +394,7 @@ private_lane :github_changelog do |options|
       username = item_infos[index][1]
     end
 
-    "* #{message} via #{name} (@#{username})"
+    username ? "* #{message} via #{name} (@#{username})" : "* #{message} via #{name}"
   end.compact.join("\n")
 
   formatted

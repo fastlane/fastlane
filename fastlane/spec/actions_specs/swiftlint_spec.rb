@@ -211,6 +211,20 @@ describe Fastlane do
           end
         end
 
+        context "when no subprocess status is available" do
+          # $? is nil until something in this process has run a subprocess, so
+          # the action used to raise NoMethodError instead of reporting. Unix
+          # never shows it because spec_helper runs `which xar` as it loads;
+          # Windows takes the branch that skips that call, so a worker without
+          # any other shelling out hit it. See fastlane#30188.
+          it 'reports the exit code as unknown rather than raising' do
+            allow(FastlaneCore::UI).to receive(:important)
+            expect(FastlaneCore::UI).to receive(:important).with(/exit code unknown/)
+
+            Fastlane::Actions::SwiftlintAction.handle_swiftlint_error(true, nil)
+          end
+        end
+
         context "when enabled" do
           it 'should not raise if swiftlint completes with a non-zero exit status' do
             allow(FastlaneCore::UI).to receive(:important)

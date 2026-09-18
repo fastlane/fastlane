@@ -64,6 +64,22 @@ describe Deliver::HtmlGenerator do
     end
   end
 
+  describe :run do
+    it "passes html_path as a separate argument to system, not via shell interpolation" do
+      options = { force: false }
+      screenshots = []
+      malicious_path = "/tmp/foo'$(touch /tmp/pwned).html"
+
+      allow(generator).to receive(:render).and_return(malicious_path)
+      allow(FastlaneCore::UI).to receive(:important)
+      allow(FastlaneCore::UI).to receive(:confirm).and_return(true)
+      allow(FastlaneCore::UI).to receive(:success)
+      expect(generator).to receive(:system).with("open", malicious_path)
+
+      generator.run(options, screenshots)
+    end
+  end
+
   describe :split_keywords do
     context 'only commas' do
       let(:keywords) { 'One,Two, Three, Four Token,' }

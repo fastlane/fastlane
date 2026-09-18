@@ -46,7 +46,7 @@ module Spaceship
         # @param mac [Bool] Fetches Mac merchant if true
         # @return (Array) Returns all merchants available for this account
         def all(mac: false)
-          client.merchants(mac: mac).map { |merchant| new(merchant) }
+          client.merchants(mac: mac).map { |merchant| new_with_platform(merchant, mac) }
         end
 
         # Creates a new Merchant on the Apple Dev Portal
@@ -57,7 +57,7 @@ module Spaceship
         # @return (Merchant) The Merchant you just created
         def create!(bundle_id: nil, name: nil, mac: false)
           new_merchant = client.create_merchant!(name, bundle_id, mac: mac)
-          new(new_merchant)
+          new_with_platform(new_merchant, mac)
         end
 
         # Find a specific Merchant ID based on the bundle_id
@@ -68,6 +68,12 @@ module Spaceship
             merchant.bundle_id == bundle_id
           end
         end
+
+        # Apple does not return the platform, so we record the one that was asked for.
+        def new_with_platform(attrs, mac)
+          new(attrs).tap { |merchant| merchant.platform = mac ? 'mac' : 'ios' }
+        end
+        private :new_with_platform
       end
 
       # Delete this Merchant

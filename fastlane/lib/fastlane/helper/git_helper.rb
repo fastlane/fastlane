@@ -9,9 +9,10 @@ module Fastlane
       end.freeze
     end
 
-    def self.git_log_between(pretty_format, from, to, merge_commit_filtering, date_format = nil, ancestry_path, app_path)
+    def self.git_log_between(pretty_format, from, to, matching_pattern, merge_commit_filtering, date_format = nil, ancestry_path, app_path)
       command = %w(git log)
       command << "--pretty=#{pretty_format}"
+      command << "--grep=#{matching_pattern}" if matching_pattern
       command << "--date=#{date_format}" if date_format
       command << '--ancestry-path' if ancestry_path
       command << "#{from}...#{to}"
@@ -24,9 +25,10 @@ module Fastlane
       nil
     end
 
-    def self.git_log_last_commits(pretty_format, commit_count, merge_commit_filtering, date_format = nil, ancestry_path, app_path)
+    def self.git_log_last_commits(pretty_format, commit_count, matching_pattern, merge_commit_filtering, date_format = nil, ancestry_path, app_path)
       command = %w(git log)
       command << "--pretty=#{pretty_format}"
+      command << "--grep=#{matching_pattern}" if matching_pattern
       command << "--date=#{date_format}" if date_format
       command << '--ancestry-path' if ancestry_path
       command << '-n' << commit_count.to_s

@@ -1,21 +1,21 @@
 before_all do
-  File.write('/tmp/fastlane/before_all', '1')
+  File.write("#{FASTLANE_SPEC_SCRATCH}/before_all", '1')
 end
 
 before_each do |lane|
-  open('/tmp/fastlane/before_each', 'a') { |f| f << lane }
+  open("#{FASTLANE_SPEC_SCRATCH}/before_each", 'a') { |f| f << lane }
 end
 
 after_all do |lane|
-  File.write('/tmp/fastlane/after_all', lane)
+  File.write("#{FASTLANE_SPEC_SCRATCH}/after_all", lane)
 end
 
 after_each do |lane|
-  open('/tmp/fastlane/after_each', 'a') { |f| f << lane }
+  open("#{FASTLANE_SPEC_SCRATCH}/after_each", 'a') { |f| f << lane }
 end
 
 error do |lane, exception|
-  File.write('/tmp/fastlane/error', lane)
+  File.write("#{FASTLANE_SPEC_SCRATCH}/error", lane)
 end
 
 platform :ios do

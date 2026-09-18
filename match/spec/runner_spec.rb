@@ -72,10 +72,18 @@ describe Match do
                                                                                     cache: fake_cache,
                                                                        working_directory: fake_storage.working_directory).and_return(profile_path)
           expect(FastlaneCore::ProvisioningProfile).to receive(:install).with(profile_path, keychain_path).and_return(destination)
+          # The new certificate is uploaded to storage right after being created,
+          # before any provisioning profile work
           expect(fake_storage).to receive(:save_changes!).with(
             files_to_commit: [
               File.join(repo_dir, "something.cer"),
-              File.join(repo_dir, "something.p12"), # this is important, as a cert consists out of 2 files
+              File.join(repo_dir, "something.p12") # this is important, as a cert consists out of 2 files
+            ],
+            files_to_delete: [],
+            clear_working_directory: false
+          )
+          expect(fake_storage).to receive(:save_changes!).with(
+            files_to_commit: [
               "./match/spec/fixtures/test.mobileprovision"
             ],
             files_to_delete: []
@@ -102,6 +110,56 @@ describe Match do
                                                                          type: "appstore")]).to eql(profile_path)
           expect(ENV[Match::Utils.environment_variable_name_certificate_name(app_identifier: "tools.fastlane.app",
                                                                              type: "appstore")]).to eql("fastlane certificate name")
+        end
+
+        it "keeps a new certificate in storage even when profile creation fails afterwards", requires_security: true do
+          git_url = "https://github.com/fastlane/fastlane/tree/master/certificates"
+          values = {
+            app_identifier: "tools.fastlane.app",
+            type: "appstore",
+            git_url: git_url,
+            shallow_clone: true,
+            username: "flapple@something.com"
+          }
+
+          config = FastlaneCore::Configuration.create(Match::Options.available_options, values)
+          repo_dir = Dir.mktmpdir
+          cert_path = File.join(repo_dir, "something.cer")
+
+          create_fake_cache
+
+          fake_storage = "fake_storage"
+          expect(Match::Storage::GitStorage).to receive(:configure).and_return(fake_storage)
+          expect(fake_storage).to receive(:download).and_return(nil)
+          expect(fake_storage).to receive(:clear_changes).and_return(nil)
+          allow(fake_storage).to receive(:working_directory).and_return(repo_dir)
+          allow(fake_storage).to receive(:prefixed_working_directory).and_return(repo_dir)
+
+          expect(Match::Generator).to receive(:generate_certificate).with(config, :distribution, fake_storage.working_directory, specific_cert_type: nil).and_return(cert_path)
+
+          # The new certificate is uploaded to storage right after being created,
+          # before any provisioning profile work (https://github.com/fastlane/fastlane/issues/30140)
+          expect(fake_storage).to receive(:save_changes!).with(
+            files_to_commit: [
+              File.join(repo_dir, "something.cer"),
+              File.join(repo_dir, "something.p12")
+            ],
+            files_to_delete: [],
+            clear_working_directory: false
+          )
+
+          # Profile creation fails after the new certificate was created
+          expect(Match::Generator).to receive(:generate_provisioning_profile).and_raise("Beta profile could not be created")
+
+          spaceship = "spaceship"
+          allow(spaceship).to receive(:team_id).and_return("")
+          expect(Match::SpaceshipEnsure).to receive(:new).and_return(spaceship)
+          expect(spaceship).to receive(:certificates_exists).and_return(true)
+          expect(spaceship).to receive(:bundle_identifier_exists).and_return(true)
+
+          expect do
+            Match::Runner.new.run(config)
+          end.to raise_error("Beta profile could not be created")
         end
 
         it "uses existing certificates and profiles if they exist", requires_security: true do
@@ -338,6 +396,8 @@ describe Match do
           # Storage
           fake_storage = create_fake_storage(match_config: match_config, repo_dir: repo_dir)
           begin # Ensure old certificates are removed from the storage and new are added.
+            # This happens right after the new certificate is created, keeping
+            # the working directory around for the rest of the run
             expect(fake_storage).to receive(:save_changes!).with(
               files_to_commit: [
                 new_stored_valid_cert_path,
@@ -346,12 +406,14 @@ describe Match do
               files_to_delete: [
                 stored_invalid_cert_path,
                 stored_invalid_key_path
-              ]
+              ],
+              clear_working_directory: false
             )
           end
 
           # Encryption
-          fake_encryption = create_fake_encryption(storage: fake_storage)
+          # Files are decrypted again after the new certificate was uploaded to storage.
+          fake_encryption = create_fake_encryption(storage: fake_storage, expected_decrypt_count: 2)
           # Ensure new files are encrypted.
           expect(fake_encryption).to receive(:encrypt_files).and_return(nil)
 
@@ -399,6 +461,62 @@ describe Match do
 
           # THEN
           # Rely on expectations defined above.
+        end
+
+        it "decrypts the working directory again when saving a renewed certificate fails", requires_security: true do
+          # GIVEN
+
+          # Downloaded and decrypted storage location.
+          repo_dir = "./match/spec/fixtures/invalid"
+          #   Invalid cert and key
+          stored_invalid_cert_path = "#{repo_dir}/certs/distribution/F7P4EE896K.cer"
+          stored_invalid_key_path = "#{repo_dir}/certs/distribution/F7P4EE896K.p12"
+
+          #   Valid cert
+          new_stored_valid_cert_path = "./match/spec/fixtures/valid/certs/distribution/E7P4EE896K.cer"
+
+          # match options
+          match_test_options = {
+            renew_expired_certs: true, # Current test suite.
+            skip_provisioning_profiles: true # We test certificate renewal, not profile.
+          }
+          match_config = create_match_config_with_git_storage(extra_values: match_test_options)
+
+          create_fake_cache
+
+          # EXPECTATIONS
+
+          # Storage
+          fake_storage = create_fake_storage(match_config: match_config, repo_dir: repo_dir)
+          # Ensure the immediate upload of the renewed certificate fails.
+          expect(fake_storage).to receive(:save_changes!).and_raise("Couldn't push changes back to git")
+
+          # Encryption
+          # Ensure files are decrypted again even though saving them failed, so the
+          # working directory is never left behind encrypted.
+          fake_encryption = create_fake_encryption(storage: fake_storage, expected_decrypt_count: 2)
+          expect(fake_encryption).to receive(:encrypt_files).and_return(nil)
+
+          # Certificate generator
+          # Ensure a new certificate is generated.
+          expect(Match::Generator).to receive(:generate_certificate).with(match_config, :distribution, fake_storage.working_directory, specific_cert_type: nil).and_return(new_stored_valid_cert_path)
+
+          create_fake_spaceship_ensure
+
+          # Utils
+          # Ensure match validates stored certificate and make it invalid for the current test suite.
+          expect(Match::Utils).to receive(:is_cert_valid?).with(stored_invalid_cert_path).and_return(false)
+
+          # File system
+          begin # Ensure old certificates are removed from the file system.
+            expect(File).to receive(:delete).with(stored_invalid_cert_path).and_return(nil)
+            expect(File).to receive(:delete).with(stored_invalid_key_path).and_return(nil)
+          end
+
+          # WHEN / THEN
+          expect do
+            Match::Runner.new.run(match_config)
+          end.to raise_error("Couldn't push changes back to git")
         end
 
         it "does not renew an outdated developer_id certificate when authenticated with an App Store Connect API token", requires_security: true do
@@ -491,12 +609,15 @@ describe Match do
           expect(Match::Generator).to receive(:generate_certificate).with(config, :distribution, fake_storage.working_directory, specific_cert_type: nil).and_return(cert_path)
           expect(Match::Generator).to_not(receive(:generate_provisioning_profile))
           expect(FastlaneCore::ProvisioningProfile).to_not(receive(:install))
+          # The new certificate is uploaded to storage right after being created,
+          # so there is nothing left to save at the end of the run
           expect(fake_storage).to receive(:save_changes!).with(
             files_to_commit: [
               File.join(repo_dir, "something.cer"),
               File.join(repo_dir, "something.p12") # this is important, as a cert consists out of 2 files
             ],
-            files_to_delete: []
+            files_to_delete: [],
+            clear_working_directory: false
           )
 
           spaceship = "spaceship"

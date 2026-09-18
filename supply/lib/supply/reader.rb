@@ -48,6 +48,21 @@ module Supply
       release_names
     end
 
+    def track_release_summaries
+      package_name = Supply.config[:package_name]
+      track = Supply.config[:track]
+
+      summaries = client.list_track_release_summaries(package_name, track)
+
+      if summaries.empty?
+        UI.important("No releases found in track '#{track}'")
+      else
+        UI.success("Found #{summaries.length} release(s) in track '#{track}'")
+      end
+
+      summaries
+    end
+
     private
 
     def client

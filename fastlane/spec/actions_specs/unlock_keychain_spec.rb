@@ -1,9 +1,9 @@
 describe Fastlane do
   describe Fastlane::FastFile do
     describe "Unlock keychain Integration" do
-      # do not use lazy init here
-      # this will prevent race conditions during parallel runs
-      let!(:keychain_path) { Tempfile.new('foo').path }
+      # Keep the Tempfile, not only its path: an unreferenced one is deleted when the GC finalises it. See fastlane#30184.
+      let(:keychain_file) { Tempfile.new('foo') }
+      let(:keychain_path) { keychain_file.path }
 
       it "works with path and password and existing keychain" do
         result = Fastlane::FastFile.new.parse("lane :test do

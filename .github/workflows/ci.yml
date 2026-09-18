@@ -7,7 +7,8 @@ on:
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
-  cancel-in-progress: true
+  cancel-in-progress: ${{ github.ref != 'refs/heads/master' }}
+  queue: ${{ github.ref == 'refs/heads/master' && 'max' || 'single' }}
 
 permissions:
   contents: read
@@ -31,7 +32,7 @@ jobs:
           - { xcode: '26.6', ruby: '3.4', rubyopt: '-W0', os: 'macos-26' }
           - { xcode: '26.6', ruby: '4.0', rubyopt: '-W0', os: 'macos-26' }
           - { xcode: '', ruby: '3.2', rubyopt: '', os: 'windows-2022' }
-          - { xcode: '', ruby: '3.0', rubyopt: '', os: 'ubuntu-24.04' }
+          - { xcode: '', ruby: '3.1', rubyopt: '', os: 'ubuntu-24.04' }
     steps:
       - uses: actions/checkout@v7
 
@@ -65,11 +66,28 @@ jobs:
       - name: Run tests
         env:
           RUBYOPT: ${{ matrix.rubyopt }}
+          # Four measured best on both runner shapes. The task would otherwise
+          # take min(cores, 8), which is three on the macOS runners, and each
+          # worker spends much of its time waiting on an xcodebuild child rather
+          # than holding a core. See fastlane#30189.
+          FASTLANE_SPEC_WORKERS: '4'
         shell: bash
         run: |
           git config --global user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git config --global user.name "github-actions[bot]"
           bundle exec fastlane execute_tests
+
+      # A worker's rspec output goes to its own log, not to stdout. Uploaded on
+      # every run because `failure()` does not fire on a cancelled job.
+      - name: Keep the worker logs
+        if: always()
+        uses: actions/upload-artifact@v7
+        with:
+          name: rspec-worker-logs-${{ matrix.os }}-ruby${{ matrix.ruby }}-xcode${{ matrix.xcode }}
+          path: |
+            rspec_worker_*.log
+            rspec_worker_*.units
+          if-no-files-found: warn
 
       - name: RSpec report
         if: always()

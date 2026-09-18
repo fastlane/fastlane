@@ -48,6 +48,74 @@ describe Fastlane::Actions do
       end
     end
 
+    context "command output encoding" do
+      it "prints valid UTF-8 output without a warning" do
+        allow(FastlaneCore::UI).to receive(:command_output)
+        allow(FastlaneCore::UI).to receive(:important)
+        expect_command("ls", output: "hello world\n")
+
+        Fastlane::Actions.sh("ls")
+
+        expect(FastlaneCore::UI).to have_received(:command_output).with("hello world")
+        expect(FastlaneCore::UI).to_not(have_received(:important))
+      end
+
+      it "sanitizes invalid UTF-8 output and warns the user" do
+        allow(FastlaneCore::UI).to receive(:command_output)
+        allow(FastlaneCore::UI).to receive(:important)
+        # "\xC3\x28" is an invalid UTF-8 byte sequence that would make `strip` raise.
+        expect_command("cat", output: "before \xC3\x28 after\n".dup.force_encoding("UTF-8"))
+
+        Fastlane::Actions.sh("cat")
+
+        expect(FastlaneCore::UI).to have_received(:command_output).with("before �( after")
+        expect(FastlaneCore::UI).to have_received(:important).with(/UTF-8/)
+      end
+
+      it "warns only once even when multiple lines are invalid UTF-8" do
+        allow(FastlaneCore::UI).to receive(:command_output)
+        allow(FastlaneCore::UI).to receive(:important)
+        output = "bad \xC3\x28 one\nbad \xC3\x28 two\nbad \xC3\x28 three\n".dup.force_encoding("UTF-8")
+        expect_command("cat", output: output)
+
+        Fastlane::Actions.sh("cat")
+
+        expect(FastlaneCore::UI).to have_received(:important).with(/UTF-8/).once
+      end
+
+      it "does not raise when stripping invalid UTF-8 output" do
+        allow(FastlaneCore::UI).to receive(:command_output)
+        allow(FastlaneCore::UI).to receive(:important)
+        expect_command("cat", output: "\xFF\xFE bad bytes\n".dup.force_encoding("UTF-8"))
+
+        expect do
+          Fastlane::Actions.sh("cat")
+        end.to_not(raise_error)
+      end
+
+      it "does not print or warn when print_command_output is false" do
+        allow(FastlaneCore::UI).to receive(:command_output)
+        allow(FastlaneCore::UI).to receive(:important)
+        expect_command("cat", output: "before \xC3\x28 after\n".dup.force_encoding("UTF-8"))
+
+        Fastlane::Actions.sh_control_output("cat", print_command: false, print_command_output: false)
+
+        expect(FastlaneCore::UI).to_not(have_received(:command_output))
+        expect(FastlaneCore::UI).to_not(have_received(:important))
+      end
+
+      it "keeps the raw (unsanitized) bytes in the returned result" do
+        allow(FastlaneCore::UI).to receive(:command_output)
+        allow(FastlaneCore::UI).to receive(:important)
+        raw = "before \xC3\x28 after\n".dup.force_encoding("UTF-8")
+        expect_command("cat", output: raw)
+
+        result = Fastlane::Actions.sh("cat")
+
+        expect(result).to eq(raw)
+      end
+    end
+
     context "passing command arguments to the system" do
       it "passes a string as a string" do
         expect_command("git commit")

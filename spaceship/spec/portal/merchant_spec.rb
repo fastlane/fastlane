@@ -118,4 +118,48 @@ describe Spaceship::Portal::Merchant do
       expect(merchant.merchant_id).to eq('LM3IY56BXC')
     end
   end
+
+  describe "the Mac platform" do
+    let(:mac_merchant) do
+      {
+        name: "ExampleApp Production",
+        prefix: "9J57U9392R",
+        identifier: "merchant.com.example.app.production",
+        status: "current",
+        omcId: "LM3IY56BXC"
+      }
+    end
+
+    it "records the platform a merchant was fetched with" do
+      mock_client_response(:merchants, with: { mac: true }) { [mac_merchant] }
+
+      merchant = Spaceship::Portal::Merchant.find("merchant.com.example.app.production", mac: true)
+      expect(merchant.mac?).to be(true)
+    end
+
+    it "records the platform a merchant was created with" do
+      allow(mock_client).to receive(:create_merchant!)
+        .with("ExampleApp Production", "merchant.com.example.app.production", mac: true)
+        .and_return(JSON.parse(mac_merchant.to_json))
+
+      merchant = Spaceship::Portal::Merchant.create!(bundle_id: "merchant.com.example.app.production", name: "ExampleApp Production", mac: true)
+      expect(merchant.mac?).to be(true)
+    end
+
+    it "deletes a Mac merchant against the Mac endpoint" do
+      mock_client_response(:merchants, with: { mac: true }) { [mac_merchant] }
+      expect(mock_client).to receive(:delete_merchant!).with("LM3IY56BXC", mac: true)
+
+      Spaceship::Portal::Merchant.find("merchant.com.example.app.production", mac: true).delete!
+    end
+
+    it "leaves an iOS merchant on the iOS endpoint" do
+      mock_client_response(:merchants, with: { mac: false }) { [mac_merchant] }
+      expect(mock_client).to receive(:delete_merchant!).with("LM3IY56BXC", mac: false)
+
+      merchant = Spaceship::Portal::Merchant.find("merchant.com.example.app.production")
+      expect(merchant.mac?).to be(false)
+      merchant.delete!
+    end
+  end
 end

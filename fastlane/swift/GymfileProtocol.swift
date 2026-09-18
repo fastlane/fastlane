@@ -152,6 +152,9 @@ public protocol GymfileProtocol: AnyObject {
     /// Skips resolution of Swift Package Manager dependencies
     var skipPackageDependenciesResolution: Bool { get }
 
+    /// Raises an error instead of fetching build settings by running `xcodebuild -showBuildSettings`, which can take a long time on large projects. The error names the required build setting, so the corresponding option can be specified manually
+    var disallowXcodebuildSettingsLookup: Bool { get }
+
     /// Prevents packages from automatically being resolved to versions other than those recorded in the `Package.resolved` file. This translates in the option `-disableAutomaticPackageResolution` being passed to xcodebuild
     var disablePackageAutomaticUpdates: Bool { get }
 
@@ -369,6 +372,10 @@ public extension GymfileProtocol {
         return false
     }
 
+    var disallowXcodebuildSettingsLookup: Bool {
+        return false
+    }
+
     var disablePackageAutomaticUpdates: Bool {
         return false
     }
@@ -392,4 +399,4 @@ public extension GymfileProtocol {
 
 // Please don't remove the lines below
 // They are used to detect outdated files
-// FastlaneRunnerAPIVersion [0.9.154]
+// FastlaneRunnerAPIVersion [0.9.158]

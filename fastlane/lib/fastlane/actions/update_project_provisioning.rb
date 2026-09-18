@@ -1,5 +1,7 @@
 # coding: utf-8
 
+require 'tmpdir'
+
 module Fastlane
   module Actions
     module SharedValues
@@ -146,7 +148,7 @@ module Fastlane
           FastlaneCore::ConfigItem.new(key: :certificate,
                                        env_name: "FL_PROJECT_PROVISIONING_CERTIFICATE_PATH",
                                        description: "Path to apple root certificate",
-                                       default_value: "/tmp/AppleIncRootCertificate.cer"),
+                                       default_value: File.join(Dir.tmpdir, "AppleIncRootCertificate.cer")),
           FastlaneCore::ConfigItem.new(key: :code_signing_identity,
                                        env_name: "FL_PROJECT_PROVISIONING_CODE_SIGN_IDENTITY",
                                        description: "Code sign identity for build configuration",
