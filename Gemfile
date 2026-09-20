@@ -37,6 +37,8 @@ gem "rake"
 # A readline implementation in Ruby
 # See: https://github.com/deivid-rodriguez/byebug/issues/289#issuecomment-251383465
 gem "rb-readline"
+# rbs >= 4.2 (pulled in transitively by rdoc) requires Ruby >= 3.3, while fastlane supports Ruby >= 3.2.
+gem "rbs", "< 4.2"
 # Behavior-driven testing tool for Ruby.
 gem "rspec", "~> 3.10"
 # A Ruby static code analyzer and formatter.
