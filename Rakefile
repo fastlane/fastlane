@@ -34,14 +34,17 @@ end
 
 task(:generate_team_table) do
   require 'json'
-  content = ["<table id='team'>"]
 
   contributors = JSON.parse(File.read("team.json"))
+  team = contributors.reject { |_, user| user['alumni'] }
+  alumni = contributors.select { |_, user| user['alumni'] }
+
+  content = ["<table id='team'>"]
   counter = 0
   number_of_rows = 5
 
-  contributors.keys.shuffle.each do |github_user|
-    user_content = contributors[github_user]
+  team.keys.shuffle.each do |github_user|
+    user_content = team[github_user]
     github_user_name = user_content['name']
     github_user_id = github_user_name.downcase.gsub(' ', '-')
     github_profile_url = "https://github.com/#{github_user}"
@@ -64,8 +67,13 @@ task(:generate_team_table) do
   end
   content << "</table>"
 
+  alumni_names = alumni.keys.shuffle.map do |github_user|
+    "<a href='https://github.com/#{github_user}'>#{alumni[github_user]['name']}</a>"
+  end
+
   readme = File.read("README.md")
-  readme.gsub!(%r{\<table id='team'\>.*\<\/table\>}m, content.join("\n"))
+  readme.gsub!(%r{\<table id='team'\>.*?\<\/table\>}m, content.join("\n"))
+  readme.gsub!(%r{\<p id='alumni'\>.*?\<\/p\>}m, "<p id='alumni'>\n#{alumni_names.join(",\n")}\n</p>")
   File.write("README.md", readme)
   puts("All done")
 end

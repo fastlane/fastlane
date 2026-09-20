@@ -470,6 +470,7 @@ lane :update_docs do |options|
     docs_path = generate_markdown_docs(target_path: ".")
     yml_path = File.expand_path("./mkdocs.yml")
     actions_md_path = File.expand_path(File.join(docs_path, "docs/generated/actions.md"))
+    team_table_md_path = File.expand_path(File.join(docs_path, "docs/generated/team-table.md"))
 
     action_docs_dir = File.join(docs_path, "docs/generated/actions")
     custom_assets_dir = File.join(docs_path, "docs/img/actions")
@@ -498,7 +499,7 @@ lane :update_docs do |options|
 
       Dir.chdir("fastlane") do # this is an assumption of fastlane, that we have to .. when shelling out
         # Commit the changes
-        changes_to_commit = [plugin_scores_cache_path, actions_md_path, "Gemfile.lock", plugins_path, yml_path, action_docs_dir, custom_assets_dir]
+        changes_to_commit = [plugin_scores_cache_path, actions_md_path, team_table_md_path, "Gemfile.lock", plugins_path, yml_path, action_docs_dir, custom_assets_dir]
         git_add(path: changes_to_commit)
         git_commit(path: changes_to_commit,
                 message: "Update docs for latest fastlane release #{version} (actions.md, available-plugins.md) 🚀")
