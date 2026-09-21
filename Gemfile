@@ -70,3 +70,7 @@ gem "yard", "~> 0.9.42"
 gemspec(path: ".")
 
 eval_gemfile("fastlane/Pluginfile")
+
+# Demonstration only: the wrappers this branch uses are not released yet.
+# See fastlane-community/security#29 and its feat/cms_decode branch.
+gem 'security', git: 'https://github.com/lacostej/security.git', branch: 'feat/cms_decode'

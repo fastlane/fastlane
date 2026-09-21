@@ -1,3 +1,5 @@
+require 'security'
+
 require_relative 'ui/ui'
 
 module FastlaneCore
@@ -107,25 +109,25 @@ module FastlaneCore
       private
 
       def decode(path, keychain_path = nil)
-        require 'tmpdir'
-        Dir.mktmpdir('fastlane') do |dir|
-          err = "#{dir}/cms.err"
-          # we want to prevent the error output to mix up with the standard output because of
-          # /dev/null: https://github.com/fastlane/fastlane/issues/6387
-          if Helper.mac?
-            if keychain_path.nil?
-              decoded = `security cms -D -i "#{path}" 2> #{err}`
-            else
-              decoded = `security cms -D -i "#{path}" -k "#{keychain_path.shellescape}" 2> #{err}`
-            end
-          else
-            # `security` only works on Mac, fallback to `openssl`
-            # via https://stackoverflow.com/a/14379814/252627
+        if Helper.mac?
+          # The keychain matters: verifying the CMS signature imports the
+          # signing certificate, and with none named that is the user's default
+          # keychain. See fastlane#30186.
+          Security::ProvisioningProfile.decode(path, keychain: keychain_path)
+        else
+          # `security` only works on Mac, fallback to `openssl`
+          # via https://stackoverflow.com/a/14379814/252627
+          require 'tmpdir'
+          Dir.mktmpdir('fastlane') do |dir|
+            err = "#{dir}/cms.err"
             decoded = `openssl smime -inform der -verify -noverify -in #{path.shellescape} 2> #{err}`
+            UI.error("Failure to decode #{path}. Exit: #{$?.exitstatus}: #{File.read(err)}") if $?.exitstatus != 0
+            decoded
           end
-          UI.error("Failure to decode #{path}. Exit: #{$?.exitstatus}: #{File.read(err)}") if $?.exitstatus != 0
-          decoded
         end
+      rescue Security::Error => e
+        UI.error("Failure to decode #{path}. Exit: #{e.status}: #{e.message}")
+        nil
       end
     end
   end
