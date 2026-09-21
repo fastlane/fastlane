@@ -10,7 +10,7 @@ module Fastlane
 
           values = self.gather_cert_info(app_path)
 
-          values = self.update_with_profile_info(app_path, values, keychain_path: params[:keychain_path])
+          values = self.update_with_profile_info(app_path, values, keychain_path: self.keychain_path(params))
 
           self.print_values(values)
 
@@ -64,6 +64,17 @@ module Fastlane
         end
 
         values
+      end
+
+      # Either spelling, neither required. The two are mutually exclusive, which
+      # `conflicting_options` enforces, so this does not have to decide which
+      # wins. Naming none of them keeps the behaviour this action has always
+      # had: the import goes to the user's default keychain.
+      def self.keychain_path(params)
+        return params[:keychain_path] if params[:keychain_path]
+        return FastlaneCore::Helper.keychain_path(params[:keychain_name]) if params[:keychain_name]
+
+        nil
       end
 
       def self.update_with_profile_info(app_path, values, keychain_path: nil)
@@ -175,9 +186,15 @@ module Fastlane
                                        description: "Explicitly set the ipa, app or xcarchive path",
                                        conflicting_options: [:ipa_path],
                                        optional: true),
+          FastlaneCore::ConfigItem.new(key: :keychain_name,
+                                       env_name: "FL_VERIFY_BUILD_KEYCHAIN_NAME",
+                                       description: "The keychain that decoding the provisioning profile may import its signing certificate into. With neither this nor keychain_path, that is the user's default keychain",
+                                       conflicting_options: [:keychain_path],
+                                       optional: true),
           FastlaneCore::ConfigItem.new(key: :keychain_path,
                                        env_name: "FL_VERIFY_BUILD_KEYCHAIN_PATH",
-                                       description: "Explicitly set the keychain that decoding the provisioning profile may import its signing certificate into",
+                                       description: "Path to the keychain that decoding the provisioning profile may import its signing certificate into",
+                                       conflicting_options: [:keychain_name],
                                        optional: true)
         ]
       end
