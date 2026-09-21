@@ -241,7 +241,7 @@ module Fastlane
     end
 
     def generate_lanefile_parsing_functions
-      parsing_functions = 'func parseArray(fromString: String, function: String = #function) -> [String] {
+      parsing_functions = 'public func parseArray(fromString: String, function: String = #function) -> [String] {
   verbose(message: "parsing an Array from data: \(fromString), from function: \(function)")
   let potentialArray: String
   if fromString.count < 2 {
@@ -253,11 +253,11 @@ module Fastlane
   return array
 }
 
-func parseDictionary(fromString: String, function: String = #function) -> [String : String] {
+public func parseDictionary(fromString: String, function: String = #function) -> [String : String] {
     return parseDictionaryHelper(fromString: fromString, function: function) as! [String: String]
 }
 
-func parseDictionary(fromString: String, function: String = #function) -> [String : Any] {
+public func parseDictionary(fromString: String, function: String = #function) -> [String : Any] {
     return parseDictionaryHelper(fromString: fromString, function: function)
 }
 
