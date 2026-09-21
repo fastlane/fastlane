@@ -54,6 +54,7 @@ module Fastlane
     end
 
     def class_ref_for_action(named: nil)
+      action = named
       class_ref = Actions.action_class_ref(named)
       unless class_ref
         if Fastlane::Actions.formerly_bundled_actions.include?(action)
