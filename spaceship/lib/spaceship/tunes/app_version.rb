@@ -614,7 +614,7 @@ module Spaceship
               "checksum" => video_preview_data["md5"],
               "pictureAssetToken" => video_preview_data["token"],
               "previewFrameTimeCode" => ts.to_s,
-              "isPortrait" => Utilities.portrait?(video_preview_path)
+              "isPortrait" => Utilities.portrait?(trailer_path)
             }
           }
 
