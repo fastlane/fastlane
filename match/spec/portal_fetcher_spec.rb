@@ -88,15 +88,37 @@ describe Match do
     end
 
     describe "bundle ids" do
-      it "fetches bundle ids" do
+      it "fetches bundle ids once if the filter length is less than the max" do
         # GIVEN
         sut = default_sut
 
         # WHEN
-        portal_bundle_ids = sut.bundle_ids(bundle_id_identifiers: ['bundle_id'])
+        portal_bundle_ids = sut.bundle_ids(bundle_id_identifiers: ['bundle_id_1', 'bundle_id_2'])
 
         # THEN
         expect(portal_bundle_ids).to eq([portal_bundle_id])
+        # Check that the bundle ids are fetched only once.
+        expect(Spaceship::ConnectAPI::BundleId).to have_received(:all)
+          .with(filter: { identifier: 'bundle_id_1,bundle_id_2' }).exactly(1).times
+      end
+
+      it "fetches bundle ids multiple times if the filter length is greater than the max bundle id filter length" do
+        # GIVEN
+        sut = default_sut
+        # Mock the bundle ids response to return several bundle ids for the first filter and one bundle id for the second filter.
+        allow(Spaceship::ConnectAPI::BundleId).to receive(:all).with(filter: { identifier: 'bundle_id_1,bundle_id_2' }).and_return([portal_bundle_id, portal_bundle_id])
+        allow(Spaceship::ConnectAPI::BundleId).to receive(:all).with(filter: { identifier: 'bundle_id_3' }).and_return([portal_bundle_id])
+
+        # WHEN
+        portal_bundle_ids = sut.bundle_ids(bundle_id_identifiers: ['bundle_id_1', 'bundle_id_2', 'bundle_id_3'], max_bundle_id_filter_length: 'bundle_id_1'.length * 2 + 3)
+
+        # THEN
+        expect(portal_bundle_ids).to eq([portal_bundle_id, portal_bundle_id, portal_bundle_id])
+        # Check that the bundle ids are fetched multiple times.
+        expect(Spaceship::ConnectAPI::BundleId).to have_received(:all)
+          .with(filter: { identifier: 'bundle_id_1,bundle_id_2' }).exactly(1).times
+        expect(Spaceship::ConnectAPI::BundleId).to have_received(:all)
+          .with(filter: { identifier: 'bundle_id_3' }).exactly(1).times
       end
     end
 
