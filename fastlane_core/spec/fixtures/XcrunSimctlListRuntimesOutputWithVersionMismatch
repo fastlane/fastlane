@@ -1,0 +1,98 @@
+{
+  "runtimes" : [
+    {
+      "bundlePath" : "/Library/Developer/CoreSimulator/Profiles/Runtimes/iOS 17.0.simruntime",
+      "buildversion" : "21A328",
+      "platform" : "iOS",
+      "runtimeRoot" : "/Library/Developer/CoreSimulator/Profiles/Runtimes/iOS 17.0.simruntime/Contents/Resources/RuntimeRoot",
+      "identifier" : "com.apple.CoreSimulator.SimRuntime.iOS-17-0",
+      "version" : "17.0",
+      "isInternal" : false,
+      "isAvailable" : true,
+      "name" : "iOS 17.0",
+      "supportedDeviceTypes" : [
+        {
+          "bundlePath" : "/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneOS.platform/Library/Developer/CoreSimulator/Profiles/DeviceTypes/iPhone 15 Pro Max.simdevicetype",
+          "name" : "iPhone 15 Pro Max",
+          "identifier" : "com.apple.CoreSimulator.SimDeviceType.iPhone-15-Pro-Max",
+          "productFamily" : "iPhone"
+        }
+      ],
+      "lastUsage" : {
+        "arm64" : "2025-10-31T03:40:19Z"
+      }
+    },
+    {
+      "bundlePath" : "/Library/Developer/CoreSimulator/Profiles/Runtimes/iOS 18.0.simruntime",
+      "buildversion" : "22A3351",
+      "platform" : "iOS",
+      "runtimeRoot" : "/Library/Developer/CoreSimulator/Profiles/Runtimes/iOS 18.0.simruntime/Contents/Resources/RuntimeRoot",
+      "identifier" : "com.apple.CoreSimulator.SimRuntime.iOS-18-0",
+      "version" : "18.0",
+      "isInternal" : false,
+      "isAvailable" : true,
+      "name" : "iOS 18.0",
+      "supportedDeviceTypes" : [
+        {
+          "bundlePath" : "/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneOS.platform/Library/Developer/CoreSimulator/Profiles/DeviceTypes/iPhone 15 Pro Max.simdevicetype",
+          "name" : "iPhone 15 Pro Max",
+          "identifier" : "com.apple.CoreSimulator.SimDeviceType.iPhone-15-Pro-Max",
+          "productFamily" : "iPhone"
+        }
+      ],
+      "lastUsage" : {
+        "arm64" : "2025-10-31T03:40:19Z"
+      }
+    },
+    {
+      "bundlePath" : "/Library/Developer/CoreSimulator/Volumes/iOS_22A3362/Library/Developer/CoreSimulator/Profiles/Runtimes/iOS 18.0.simruntime",
+      "buildversion" : "22A3362",
+      "platform" : "iOS",
+      "runtimeRoot" : "/Library/Developer/CoreSimulator/Volumes/iOS_22A3362/Library/Developer/CoreSimulator/Profiles/Runtimes/iOS 18.0.simruntime/Contents/Resources/RuntimeRoot",
+      "identifier" : "com.apple.CoreSimulator.SimRuntime.iOS-18-0",
+      "version" : "18.0.1",
+      "isInternal" : false,
+      "isAvailable" : true,
+      "name" : "iOS 18.0",
+      "supportedDeviceTypes" : [
+        {
+          "bundlePath" : "/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneOS.platform/Library/Developer/CoreSimulator/Profiles/DeviceTypes/iPhone 15 Pro Max.simdevicetype",
+          "name" : "iPhone 15 Pro Max",
+          "identifier" : "com.apple.CoreSimulator.SimDeviceType.iPhone-15-Pro-Max",
+          "productFamily" : "iPhone"
+        }
+      ],
+      "lastUsage" : {
+        "arm64" : "2025-10-31T03:40:19Z"
+      }
+    },
+    {
+      "bundlePath" : "/Library/Developer/CoreSimulator/Volumes/iOS_23A8464/Library/Developer/CoreSimulator/Profiles/Runtimes/iOS 26.0.simruntime",
+      "buildversion" : "23A8464",
+      "platform" : "iOS",
+      "runtimeRoot" : "/Library/Developer/CoreSimulator/Volumes/iOS_23A8464/Library/Developer/CoreSimulator/Profiles/Runtimes/iOS 26.0.simruntime/Contents/Resources/RuntimeRoot",
+      "identifier" : "com.apple.CoreSimulator.SimRuntime.iOS-26-0",
+      "version" : "26.0.1",
+      "isInternal" : false,
+      "isAvailable" : true,
+      "name" : "iOS 26.0",
+      "supportedDeviceTypes" : [
+        {
+          "bundlePath" : "/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneOS.platform/Library/Developer/CoreSimulator/Profiles/DeviceTypes/iPhone 15 Pro Max.simdevicetype",
+          "name" : "iPhone 15 Pro Max",
+          "identifier" : "com.apple.CoreSimulator.SimDeviceType.iPhone-15-Pro-Max",
+          "productFamily" : "iPhone"
+        },
+        {
+          "bundlePath" : "/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneOS.platform/Library/Developer/CoreSimulator/Profiles/DeviceTypes/iPad Pro (12.9-inch) (6th generation).simdevicetype",
+          "name" : "iPad Pro (12.9-inch) (6th generation)",
+          "identifier" : "com.apple.CoreSimulator.SimDeviceType.iPad-Pro-12-9-inch-6th-generation-8GB",
+          "productFamily" : "iPad"
+        }
+      ],
+      "lastUsage" : {
+        "arm64" : "2025-10-31T03:40:19Z"
+      }
+    }
+  ]
+}
