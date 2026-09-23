@@ -15,8 +15,6 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      # `pull_request_target` checks out the base branch, so the script we run below is
-      # always the trusted one from the target branch, never the one from the pull request.
       - uses: actions/checkout@v7
         with:
           sparse-checkout: .github/scripts
