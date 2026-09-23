@@ -1,19 +1,7 @@
-// Lint checks that run against every pull request, replacing what Danger used to do.
-// Invoked from .github/workflows/pr-checks.yml through actions/github-script.
-
-/** Header of the comment this script manages, used to find and replace earlier runs. */
 const COMMENT_HEADER = '### ⚠️ PR Lint Warnings';
-
-/** Login of the account the workflow comments as. */
 const BOT_LOGIN = 'github-actions[bot]';
-
-/** Pull requests changing more lines than this get a "Big PR" warning. */
 const BIG_PR_LINE_COUNT = 500;
-
-/** A description shorter than this is treated as a missing changelog summary. */
 const MIN_BODY_LENGTH = 5;
-
-/** Files carrying a version number that contributors need to bump when editing them. */
 const VERSIONED_HELPER_FILES = [
   'snapshot/lib/assets/SnapshotHelper.swift',
   'snapshot/lib/assets/SnapshotHelperXcode8.swift'
