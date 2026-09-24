@@ -1,3 +1,4 @@
+require 'digest'
 require 'spaceship/connect_api/models/app_screenshot'
 require 'spaceship/connect_api/models/app_screenshot_set'
 
@@ -43,7 +44,7 @@ module Deliver
 
     def self.calculate_checksum(path)
       bytes = File.binread(path)
-      Digest::MD5.hexdigest(bytes)
+      Digest::SHA256.hexdigest(bytes)
     end
 
     def initialize(path:, checksum:, context:)
