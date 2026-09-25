@@ -193,10 +193,72 @@ module Fastlane
         FileUtils.cp(current_asset_path, File.join(docs_dir, "img", "actions", File.basename(current_asset_path)))
       end
 
+      # Generate the team table (docs/generated/team-table.md) from team.json
+      generate_team_table(docs_dir)
+
       UI.success("Generated new docs on path #{target_path}")
     end
 
+    def generate_team_table(docs_dir)
+      require 'json'
+
+      team_json_path = File.expand_path(File.join(Fastlane::ROOT, "..", "team.json"))
+      unless File.exist?(team_json_path)
+        UI.message("Skipping team table generation, could not find #{team_json_path}")
+        return
+      end
+
+      contributors = JSON.parse(File.read(team_json_path))
+      team = contributors.reject { |_, user| user['alumni'] }
+      alumni = contributors.select { |_, user| user['alumni'] }
+
+      content = [render_team_table(team), ""]
+      unless alumni.empty?
+        alumni_names = alumni.keys.shuffle.map do |github_user|
+          "<a href='https://github.com/#{github_user}'>#{alumni[github_user]['name']}</a>"
+        end
+
+        content += [
+          "### _fastlane_ alumni",
+          "",
+          "_fastlane_ wouldn't be what it is today without the countless hours these former team members have dedicated to the project ❤️",
+          "",
+          "<p id='alumni'>\n#{alumni_names.join(",\n")}\n</p>",
+          ""
+        ]
+      end
+
+      File.write(File.join(docs_dir, "generated", "team-table.md"), content.join("\n"))
+    end
+
     private
+
+    def render_team_table(members)
+      columns = 5
+      content = ["<table id='team'>"]
+
+      members.keys.shuffle.each_with_index do |github_user, index|
+        user_content = members[github_user]
+        github_user_name = user_content['name']
+        github_profile_url = "https://github.com/#{github_user}"
+
+        content << "<tr>" if index % columns == 0
+        content << "<td>"
+        content << "<a href='#{github_profile_url}'>"
+        content << "<img src='#{github_profile_url}.png?size=200' width='140'>"
+        content << "</a>"
+        if user_content['twitter']
+          content << "<h4 align='center'><a href='https://twitter.com/#{user_content['twitter']}'>#{github_user_name}</a></h4>"
+        else
+          content << "<h4 align='center'>#{github_user_name}</h4>"
+        end
+        content << "</td>"
+        content << "</tr>" if index % columns == columns - 1
+      end
+
+      content << "</table>"
+      content.join("\n")
+    end
 
     def readable_category_name(category_symbol)
       case category_symbol

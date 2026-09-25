@@ -9,11 +9,13 @@
   },
   "milch": {
     "name": "Manu Wallner",
-    "twitter": "acrooow"
+    "twitter": "acrooow",
+    "alumni": true
   },
   "hjanuschka": {
     "name": "Helmut Januschka",
-    "twitter": "hjanuschka"
+    "twitter": "hjanuschka",
+    "alumni": true
   },
   "lacostej": {
     "name": "Jérôme Lacoste",
@@ -21,7 +23,8 @@
   },
   "giginet": {
     "name": "Kohki Miki",
-    "twitter": "giginet"
+    "twitter": "giginet",
+    "alumni": true
   },
   "janpio": {
     "name": "Jan Piotrowski",
@@ -33,10 +36,12 @@
   },
   "mgrebenets": {
     "name": "Maksym Grebenets",
-    "twitter": "mgrebenets"
+    "twitter": "mgrebenets",
+    "alumni": true
   },
   "jdee": {
-    "name": "Jimmy Dee"
+    "name": "Jimmy Dee",
+    "alumni": true
   },
   "joshdholtz": {
     "name": "Josh Holtz",
@@ -44,27 +49,33 @@
   },
   "matthewellis": {
     "name": "Matthew Ellis",
-    "twitter": "mellis1995"
+    "twitter": "mellis1995",
+    "alumni": true
   },
   "getaaron": {
     "name": "Aaron Brager",
-    "twitter": "getaaron"
+    "twitter": "getaaron",
+    "alumni": true
   },
   "nafu": {
     "name": "Fumiya Nakamura",
-    "twitter": "nafu003"
+    "twitter": "nafu003",
+    "alumni": true
   },
   "endocrimes": {
     "name": "Danielle Tomlinson",
-    "twitter": "endocrimes"
+    "twitter": "endocrimes",
+    "alumni": true
   },
   "lmirosevic": {
     "name": "Luka Mirosevic",
-    "twitter": "lmirosevic"
+    "twitter": "lmirosevic",
+    "alumni": true
   },
   "revolter": {
     "name": "Iulian Onofrei",
-    "twitter": "Revolt666"
+    "twitter": "Revolt666",
+    "alumni": true
   },
   "snatchev": {
     "name": "Stefan Natchev",
@@ -72,19 +83,23 @@
   },
   "minuscorp": {
     "name": "Jorge Revuelta H",
-    "twitter": "minuscorp"
+    "twitter": "minuscorp",
+    "alumni": true
   },
   "armcburney": {
     "name": "Andrew McBurney",
-    "twitter": "armcburney"
+    "twitter": "armcburney",
+    "alumni": true
   },
   "mollyIV": {
     "name": "Daniel Jankowski",
-    "twitter": "mollyIV"
+    "twitter": "mollyIV",
+    "alumni": true
   },
   "max-ott": {
     "name": "Max Ott",
-    "twitter": "ott_max"
+    "twitter": "ott_max",
+    "alumni": true
   },
   "rogerluan": {
     "name": "Roger Oba",
@@ -92,14 +107,17 @@
   },
   "ainame": {
     "name": "Satoshi Namai",
-    "twitter": "ainame"
+    "twitter": "ainame",
+    "alumni": true
   },
   "crazymanish": {
     "name": "Manish Rathi",
-    "twitter": "iammanishrathi"
+    "twitter": "iammanishrathi",
+    "alumni": true
   },
   "lucgrabowski": {
-    "name": "Łukasz Grabowski"
+    "name": "Łukasz Grabowski",
+    "alumni": true
   },
   "ibotpeaches": {
     "name": "Connor Tumbleson",
