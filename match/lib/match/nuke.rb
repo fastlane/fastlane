@@ -401,6 +401,10 @@ module Match
         return [
           Spaceship::ConnectAPI::Certificate::CertificateType::IOS_DISTRIBUTION
         ]
+      when :pass_type_id
+        return [
+          Spaceship::ConnectAPI::Certificate::CertificateType::PASS_TYPE_ID
+        ]
       else
         raise "Unknown type '#{type}'"
       end

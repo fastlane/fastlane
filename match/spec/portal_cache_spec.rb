@@ -112,7 +112,7 @@ describe Match do
         # GIVEN
         sut = default_sut
 
-        allow(Match::Portal::Fetcher).to receive(:certificates).with(additional_cert_types: sut.additional_cert_types, platform: sut.platform, profile_type: sut.profile_type).and_return(['portal_certificate_1']).once
+        allow(Match::Portal::Fetcher).to receive(:certificates).with(additional_cert_types: sut.additional_cert_types, platform: sut.platform, profile_type: sut.profile_type, certificate_types: sut.certificate_types).and_return(['portal_certificate_1']).once
 
         # WHEN
         certificates = sut.certificates
@@ -127,12 +127,12 @@ describe Match do
         # GIVEN
         sut = default_sut
 
-        allow(Match::Portal::Fetcher).to receive(:certificates).with(additional_cert_types: sut.additional_cert_types, platform: sut.platform, profile_type: sut.profile_type).and_return(['portal_certificate_1']).once
+        allow(Match::Portal::Fetcher).to receive(:certificates).with(additional_cert_types: sut.additional_cert_types, platform: sut.platform, profile_type: sut.profile_type, certificate_types: sut.certificate_types).and_return(['portal_certificate_1']).once
 
         certificates = sut.certificates
         expect(certificates).to eq(['portal_certificate_1'])
 
-        allow(Match::Portal::Fetcher).to receive(:certificates).with(additional_cert_types: sut.additional_cert_types, platform: sut.platform, profile_type: sut.profile_type).and_return(['portal_certificate_2']).once
+        allow(Match::Portal::Fetcher).to receive(:certificates).with(additional_cert_types: sut.additional_cert_types, platform: sut.platform, profile_type: sut.profile_type, certificate_types: sut.certificate_types).and_return(['portal_certificate_2']).once
 
         # WHEN
         sut.reset_certificates
