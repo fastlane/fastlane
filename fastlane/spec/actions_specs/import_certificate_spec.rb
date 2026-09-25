@@ -129,6 +129,41 @@ describe Fastlane do
 
         FastlaneCore::KeychainImporter.import_file(cert_name, keychain_path, certificate_password: password)
       end
+
+      it "works when providing only keychain_path without keychain_name" do
+        cert_name = "test.cer"
+        keychain_path = "/custom/path/to/my.keychain-db"
+        password = "testpassword"
+
+        expected_command = "security import #{cert_name} -k #{keychain_path.shellescape} -P #{password} -T /usr/bin/codesign -T /usr/bin/security -T /usr/bin/productbuild -T /usr/bin/productsign 1> /dev/null"
+        allowed_command = "security set-key-partition-list -S apple-tool:,apple: -s -k #{''.shellescape} #{keychain_path.shellescape} 1> /dev/null"
+
+        allow(File).to receive(:file?).and_return(false)
+        allow(File).to receive(:file?).with(keychain_path).and_return(true)
+        allow(File).to receive(:exist?).and_return(false)
+        expect(File).to receive(:exist?).with(cert_name).and_return(true)
+        allow(Open3).to receive(:popen3).with(expected_command)
+        allow(Open3).to receive(:popen3).with(allowed_command)
+
+        Fastlane::FastFile.new.parse("lane :test do
+          import_certificate ({
+            keychain_path: '#{keychain_path}',
+            certificate_path: '#{cert_name}',
+            certificate_password: '#{password}'
+          })
+        end").runner.execute(:test)
+      end
+
+      it "raises an error when neither keychain_name nor keychain_path is provided" do
+        cert_name = "test.cer"
+        expect do
+          Fastlane::FastFile.new.parse("lane :test do
+            import_certificate ({
+              certificate_path: '#{cert_name}'
+            })
+          end").runner.execute(:test)
+        end.to raise_error(FastlaneCore::Interface::FastlaneError, "You must provide either a :keychain_name or a :keychain_path")
+      end
     end
   end
 end
