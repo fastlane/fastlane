@@ -9,15 +9,21 @@ permissions:
   pull-requests: write
   issues: write
 
+concurrency:
+  group: pr-checks-${{ github.event.pull_request.number }}
+  cancel-in-progress: true
+
 jobs:
   pr-checks:
     name: Run PR checks
+    timeout-minutes: 5
     runs-on: ubuntu-latest
 
     steps:
       - uses: actions/checkout@v7
         with:
           sparse-checkout: .github/scripts
+          persist-credentials: 'false'
       - uses: actions/github-script@v8
         with:
           script: |
