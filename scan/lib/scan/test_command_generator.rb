@@ -68,6 +68,9 @@ module Scan
       options << "-enableCodeCoverage #{config[:code_coverage] ? 'YES' : 'NO'}" unless config[:code_coverage].nil?
       options << "-enableAddressSanitizer #{config[:address_sanitizer] ? 'YES' : 'NO'}" unless config[:address_sanitizer].nil?
       options << "-enableThreadSanitizer #{config[:thread_sanitizer] ? 'YES' : 'NO'}" unless config[:thread_sanitizer].nil?
+      if config[:collect_test_diagnostics] && FastlaneCore::Helper.xcode_at_least?(14)
+        options << "-collect-test-diagnostics #{config[:collect_test_diagnostics]}"
+      end
       if FastlaneCore::Helper.xcode_at_least?(11)
         if config[:cloned_source_packages_path] && !options.include?("-clonedSourcePackagesDirPath #{config[:cloned_source_packages_path].shellescape}")
           options << "-clonedSourcePackagesDirPath #{config[:cloned_source_packages_path].shellescape}"
