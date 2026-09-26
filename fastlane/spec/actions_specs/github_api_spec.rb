@@ -6,14 +6,14 @@ describe Fastlane do
       let(:headers) do
         {
           'Authorization' => 'Basic MTIzNDU2Nzg5',
-          'Host' => 'api.github.com:443',
+          'Host' => 'api.github.com',
           'User-Agent' => user_agent
         }
       end
       let(:headers_bearer) do
         {
           'Authorization' => 'Bearer 123456789',
-          'Host' => 'api.github.com:443',
+          'Host' => 'api.github.com',
           'User-Agent' => user_agent
         }
       end
@@ -125,7 +125,7 @@ describe Fastlane do
             let(:headers) do
               {
                 'Authorization' => 'Basic MTIzNDU2Nzg5',
-                'Host' => 'uploads.github.com:443',
+                'Host' => 'uploads.github.com',
                 'User-Agent' => user_agent
               }
             end
@@ -160,7 +160,7 @@ describe Fastlane do
               let(:headers) do
                 {
                   'Authorization' => 'custom',
-                  'Host' => 'uploads.github.com:443',
+                  'Host' => 'uploads.github.com',
                   'User-Agent' => 'fastlane-custom-user-agent',
                   'Content-Type' => 'text/plain'
                 }
@@ -371,7 +371,7 @@ describe Fastlane do
           stub_request(:put, "https://api.github.com/repos/fastlane/fastlane/contents/TEST_FILE.md").
             with(headers: {
                     'Authorization' => 'Basic MTIzNDU2Nzg5',
-                    'Host' => 'api.github.com:443',
+                    'Host' => 'api.github.com',
                     'User-Agent' => 'fastlane-github_api'
                   }).
             to_return(status: 401, body: error_response_body, headers: {})
