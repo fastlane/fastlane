@@ -4,6 +4,10 @@ module Fastlane
   module Actions
     class ImportCertificateAction < Action
       def self.run(params)
+        unless params[:keychain_name] || params[:keychain_path]
+          UI.user_error!("You must provide either a :keychain_name or a :keychain_path")
+        end
+
         keychain_path = params[:keychain_path] || FastlaneCore::Helper.keychain_path(params[:keychain_name])
 
         FastlaneCore::KeychainImporter.import_file(params[:certificate_path], keychain_path, keychain_password: params[:keychain_password], certificate_password: params[:certificate_password], certificate_format: params[:certificate_format], output: params[:log_output])
@@ -29,11 +33,13 @@ module Fastlane
           FastlaneCore::ConfigItem.new(key: :keychain_name,
                                        env_name: "KEYCHAIN_NAME",
                                        description: "Keychain the items should be imported to",
-                                       optional: false),
+                                       optional: true,
+                                       conflicting_options: [:keychain_path]),
           FastlaneCore::ConfigItem.new(key: :keychain_path,
                                        env_name: "KEYCHAIN_PATH",
                                        description: "Path to the Keychain file to which the items should be imported",
-                                       optional: true),
+                                       optional: true,
+                                       conflicting_options: [:keychain_name]),
           FastlaneCore::ConfigItem.new(key: :keychain_password,
                                        env_name: "FL_IMPORT_CERT_KEYCHAIN_PASSWORD",
                                        description: "The password for the keychain. Note that for the login keychain this is your user's password",
