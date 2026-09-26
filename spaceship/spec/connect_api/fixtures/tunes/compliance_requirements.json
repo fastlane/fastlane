@@ -1,0 +1,19 @@
+{
+  "accountId": "12345678-1234-1234-1234-123456789012",
+  "requirementData": [
+    {
+      "contentId": "123456789",
+      "requirements": [
+        {
+          "name": "MEDICAL_DEVICE",
+          "id": "87654321-4321-4321-4321-210987654321",
+          "ref": "https://appstoreconnect.apple.com/ppm/complianceform/v1/accounts/12345678-1234-1234-1234-123456789012/requirements/87654321-4321-4321-4321-210987654321/forms?contentId=123456789",
+          "status": "COLLECTED",
+          "dateSigned": "2026-09-26T20:12:56.849Z",
+          "formId": "11111111-2222-3333-4444-555555555555",
+          "isRequired": true
+        }
+      ]
+    }
+  ]
+}
