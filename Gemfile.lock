@@ -445,7 +445,7 @@ GEM
     xcpretty-travis-formatter (1.0.1)
       xcpretty (~> 0.2, >= 0.0.7)
     xcresult (0.2.4)
-    yard (0.9.42)
+    yard (0.9.44)
 
 PLATFORMS
   ruby
@@ -475,7 +475,7 @@ DEPENDENCIES
   webmock (~> 3.18)
   xcode-install (>= 2.6.7)
   xcov (~> 1.9.0)
-  yard (~> 0.9.42)
+  yard (~> 0.9.44)
 
 BUNDLED WITH
    2.7.2
