@@ -9,7 +9,7 @@ describe Fastlane do
             with(body: "{\"path\":\"/test/assets/TEST_FILE.md\",\"message\":\"Add my new file\",\"content\":\"dGVzdA==\\n\",\"branch\":\"master\"}",
               headers: {
                 'Authorization' => 'Basic MTIzNDVhYmNkZQ==',
-                'Host' => 'api.github.com:443',
+                'Host' => /\Aapi\.github\.com(:443)?\z/,
                 'User-Agent' => 'fastlane-github_api'
               }).
             to_return(status: 200, body: response_body, headers: {})
