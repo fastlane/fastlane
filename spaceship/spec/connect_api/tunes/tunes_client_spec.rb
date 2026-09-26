@@ -344,5 +344,58 @@ describe Spaceship::ConnectAPI::Tunes::Client do
         end
       end
     end
+
+    describe "complianceForm" do
+      let(:app_id) { "123456789" }
+      let(:requirement_id) { "87654321-4321-4321-4321-210987654321" }
+      let(:public_provider_id) { "12345678-1234-1234-1234-123456789012" }
+      let(:account_url) { "https://appstoreconnect.apple.com/ppm/complianceform/v1/accounts/#{public_provider_id}" }
+
+      before(:each) do
+        allow(client).to receive(:user_details_data).and_return({ "provider" => { "providerId" => 4321, "publicProviderId" => public_provider_id } })
+      end
+
+      context 'get_compliance_requirements' do
+        it 'uses the public provider id, not the numeric team id' do
+          req_mock = test_request_params("#{account_url}/requirements", { contentId: app_id })
+          expect(client).to receive(:request).with(:get).and_yield(req_mock).and_return(req_mock)
+          client.get_compliance_requirements(app_id: app_id)
+        end
+      end
+
+      context 'get_compliance_requirement_form' do
+        it 'succeeds' do
+          req_mock = test_request_params("#{account_url}/requirements/#{requirement_id}/forms", { contentId: app_id })
+          expect(client).to receive(:request).with(:get).and_yield(req_mock).and_return(req_mock)
+          client.get_compliance_requirement_form(requirement_id: requirement_id, app_id: app_id)
+        end
+      end
+
+      context 'post_compliance_requirement_form' do
+        let(:form) { { "contentId" => app_id, "countriesOrRegions" => ["EEA", "GBR", "USA"], "medicalDeviceData" => { "declaration" => "no" } } }
+
+        it 'succeeds' do
+          req_mock = test_request_body("#{account_url}/contents/#{app_id}/requirements/#{requirement_id}/forms", form)
+          expect(client).to receive(:request).with(:post).and_yield(req_mock).and_return(req_mock)
+          client.post_compliance_requirement_form(requirement_id: requirement_id, app_id: app_id, form: form)
+        end
+      end
+
+      it 'refuses an App Store Connect API key session' do
+        allow(client).to receive(:web_session?).and_return(false)
+        expect(client).not_to receive(:request)
+        expect do
+          client.get_compliance_requirements(app_id: app_id)
+        end.to raise_error(/logged in with an Apple ID/)
+      end
+
+      it 'fails clearly when the session has no public provider id' do
+        allow(client).to receive(:user_details_data).and_return({ "provider" => nil })
+        expect(client).not_to receive(:request)
+        expect do
+          client.get_compliance_requirements(app_id: app_id)
+        end.to raise_error(/publicProviderId/)
+      end
+    end
   end
 end

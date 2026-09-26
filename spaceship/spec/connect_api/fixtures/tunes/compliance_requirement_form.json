@@ -1,0 +1,74 @@
+{
+  "data": {
+    "accountId": "12345678-1234-1234-1234-123456789012",
+    "contentId": "123456789",
+    "requirementId": "87654321-4321-4321-4321-210987654321",
+    "requirementName": "MEDICAL_DEVICE",
+    "formId": "11111111-2222-3333-4444-555555555555",
+    "medicalDeviceData": {
+      "declaration": "no",
+      "registrationInfo": [
+        {
+          "declaration": "yes",
+          "countriesOrRegions": [
+            "EEA"
+          ]
+        },
+        {
+          "declaration": "yes",
+          "countriesOrRegions": [
+            "GBR"
+          ]
+        },
+        {
+          "declaration": "yes",
+          "countriesOrRegions": [
+            "USA"
+          ]
+        }
+      ]
+    }
+  },
+  "constraints": {
+    "$[*].medicalDeviceData.declaration": {
+      "attributeName": "declaration",
+      "required": true,
+      "isEditable": true,
+      "valueDeterminesMetadata": true,
+      "options": [
+        {
+          "value": "YES",
+          "locKey": "PPM.generic.answers.yes"
+        },
+        {
+          "value": "NO",
+          "locKey": "PPM.generic.answers.no"
+        }
+      ],
+      "optionType": "radio",
+      "labelKey": "ppm.compliance.form.medicaldevice.declaration.label",
+      "selectedIndex": -1
+    },
+    "$[*].countriesOrRegions": {
+      "attributeName": "countriesOrRegions",
+      "required": true,
+      "isEditable": true,
+      "options": [
+        {
+          "value": "USA",
+          "locKey": "PPM.generic.country.USA"
+        },
+        {
+          "value": "GBR",
+          "locKey": "PPM.generic.country.GBR"
+        },
+        {
+          "value": "EU",
+          "locKey": "PPM.generic.country.EU"
+        }
+      ],
+      "optionType": "checkbox",
+      "labelKey": "ppm.compliance.form.medicaldevice.countriesOrRegions.label"
+    }
+  }
+}
