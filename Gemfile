@@ -11,15 +11,8 @@ gem "climate_control", "~> 0.2.0"
 gem "coveralls", "~> 0.8.13"
 # Automates code review chores.
 gem "danger", "~> 9.0"
-# erb >= 5.0 (pulled in transitively by irb -> rdoc) requires Ruby >= 3.2, while fastlane supports Ruby >= 3.0.
-gem "erb", "< 5.0"
 # A fake filesystem.
-# Version 3.0.2 requires Ruby >=3.2, while fastlane uses a `required_ruby_version` of `>= 3.1`.
-gem "fakefs", ['>= 1.8', '< 3.0.2']
-# Danger 9 pulls in faraday-http-cache; 2.6.0+ requires Ruby 3.2+.
-gem "faraday-http-cache", "< 2.6"
-# Version 2 requires Ruby >=3.2, while fastlane uses a `required_ruby_version` of `>= 3.1`.
-gem "git", "< 2"
+gem "fakefs", ">= 1.8"
 # for file uploads with Faraday
 gem "mime-types", ['>= 1.16', '< 4.0']
 # standard library for OpenSSL has affected versions (unable to get certificate CRL) - ruby/openssl/issues/949
@@ -39,15 +32,13 @@ gem "pry-byebug"
 gem "pry-rescue"
 # A plugin for pry that enables exploring the call stack.
 gem "pry-stack_explorer"
-# public_suffix >= 7.0 requires Ruby >= 3.2, while fastlane uses a `required_ruby_version` of `>= 3.1`.
-gem "public_suffix", "< 7.0"
 # A simple task automation tool.
 gem "rake"
 # A readline implementation in Ruby
 # See: https://github.com/deivid-rodriguez/byebug/issues/289#issuecomment-251383465
 gem "rb-readline"
-# rdoc >= 8.0 (pulled in transitively by irb) requires Ruby >= 3.2, while fastlane supports Ruby >= 3.0.
-gem "rdoc", "< 8.0"
+# rbs >= 4.2 (pulled in transitively by rdoc) requires Ruby >= 3.3, while fastlane supports Ruby >= 3.2.
+gem "rbs", "< 4.2"
 # Behavior-driven testing tool for Ruby.
 gem "rspec", "~> 3.10"
 # A Ruby static code analyzer and formatter.

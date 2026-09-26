@@ -49,7 +49,7 @@ Gem::Specification.new do |spec|
     "source_code_uri" => "https://github.com/fastlane/fastlane"
   }
 
-  spec.required_ruby_version = '>= 3.1'
+  spec.required_ruby_version = '>= 3.2'
 
   spec.files = Dir.glob("*/lib/**/*", File::FNM_DOTMATCH) + Dir["fastlane/swift/**/*"] + Dir["bin/*"] + Dir["*/README.md"] + %w(README.md LICENSE .yardopts) - Dir["fastlane/lib/fastlane/actions/device_grid/assets/*"] - Dir["fastlane/lib/fastlane/actions/docs/assets/*"]
   spec.bindir = "bin"
@@ -66,6 +66,7 @@ Gem::Specification.new do |spec|
   spec.add_dependency('commander', '~> 4.6') # CLI parser
   spec.add_dependency('dotenv', '>= 2.1.1', '< 3.0.0')
   spec.add_dependency('emoji_regex', '>= 0.1', '< 4.0') # Used to scan for Emoji in the changelog
+  spec.add_dependency('erb', '>= 4.0', '< 7.0') # Used for templating
   spec.add_dependency('excon', '>= 0.71.0', '< 2.0.0') # Great HTTP Client
   spec.add_dependency('faraday', '~> 2.7') # The faraday gem is used for deploygate, hockey and testfairy actions.
   spec.add_dependency('faraday-cookie_jar', '~> 0.0.8') # Spaceship uses this to store cookies for the session, when authorizing with login/password.
@@ -77,7 +78,7 @@ Gem::Specification.new do |spec|
   spec.add_dependency('gh_inspector', '>= 1.1.2', '< 2.0.0') # search for issues on GitHub when something goes wrong
   spec.add_dependency('google-apis-androidpublisher_v3', '~> 0.99') # Google API Client to access Play Publishing API
   spec.add_dependency('google-apis-playcustomapp_v1', '~> 0.1') # Google API Client to access Custom app Publishing API
-  spec.add_dependency('google-cloud-env', '>= 1.6.0', '< 2.4.0') # Must be < 2.4.0 to support Ruby 3.1
+  spec.add_dependency('google-cloud-env', '>= 1.6.0', '< 2.5.0') # Must be < 2.5.0 to support Ruby 3.2
   spec.add_dependency('google-cloud-storage', '~> 1.31') # Access Google Cloud Storage for match
   spec.add_dependency('highline', '~> 2.0') # user inputs (e.g. passwords)
   spec.add_dependency('json', '< 3.0.0') # Because sometimes it's just not installed
