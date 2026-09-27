@@ -164,6 +164,46 @@ describe Fastlane do
           end").runner.execute(:test)
         end.to raise_error(FastlaneCore::Interface::FastlaneError, "You must provide either a :keychain_name or a :keychain_path")
       end
+
+      it "raises an error when both keychain_name and keychain_path are provided via parameters" do
+        cert_name = "test.cer"
+        expect do
+          Fastlane::FastFile.new.parse("lane :test do
+            import_certificate ({
+              certificate_path: '#{cert_name}',
+              keychain_name: 'test.keychain',
+              keychain_path: '/path/to/test.keychain'
+            })
+          end").runner.execute(:test)
+        end.to raise_error(FastlaneCore::Interface::FastlaneError, /Unresolved conflict between options/)
+      end
+
+      it "raises an error when both keychain_name and keychain_path are provided via environment variables" do
+        cert_name = "test.cer"
+        FastlaneSpec::Env.with_env_values('KEYCHAIN_NAME' => 'test.keychain', 'KEYCHAIN_PATH' => '/path/to/test.keychain') do
+          expect do
+            Fastlane::FastFile.new.parse("lane :test do
+              import_certificate ({
+                certificate_path: '#{cert_name}'
+              })
+            end").runner.execute(:test)
+          end.to raise_error(FastlaneCore::Interface::FastlaneError, "Unresolved conflict between options: 'keychain_name' and 'keychain_path'")
+        end
+      end
+
+      it "raises an error when one is provided via parameter and the other via environment variable" do
+        cert_name = "test.cer"
+        FastlaneSpec::Env.with_env_values('KEYCHAIN_PATH' => '/path/to/test.keychain') do
+          expect do
+            Fastlane::FastFile.new.parse("lane :test do
+              import_certificate ({
+                certificate_path: '#{cert_name}',
+                keychain_name: 'test.keychain'
+              })
+            end").runner.execute(:test)
+          end.to raise_error(FastlaneCore::Interface::FastlaneError, "Unresolved conflict between options: 'keychain_name' and 'keychain_path'")
+        end
+      end
     end
   end
 end

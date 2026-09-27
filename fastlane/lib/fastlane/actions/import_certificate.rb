@@ -4,11 +4,16 @@ module Fastlane
   module Actions
     class ImportCertificateAction < Action
       def self.run(params)
-        unless params[:keychain_name] || params[:keychain_path]
+        keychain_name = params[:keychain_name]
+        keychain_path = params[:keychain_path]
+
+        if keychain_name && keychain_path
+          UI.user_error!("Unresolved conflict between options: 'keychain_name' and 'keychain_path'")
+        elsif !keychain_name && !keychain_path
           UI.user_error!("You must provide either a :keychain_name or a :keychain_path")
         end
 
-        keychain_path = params[:keychain_path] || FastlaneCore::Helper.keychain_path(params[:keychain_name])
+        keychain_path ||= FastlaneCore::Helper.keychain_path(keychain_name)
 
         FastlaneCore::KeychainImporter.import_file(params[:certificate_path], keychain_path, keychain_password: params[:keychain_password], certificate_password: params[:certificate_password], certificate_format: params[:certificate_format], output: params[:log_output])
       end
@@ -67,18 +72,24 @@ module Fastlane
 
       def self.example_code
         [
-          'import_certificate(certificate_path: "certs/AppleWWDRCA6.cer")',
           'import_certificate(
-            certificate_path: "certs/dist.p12",
-            certificate_password: ENV["CERTIFICATE_PASSWORD"] || "default"
-          )',
-          'import_certificate(
-            certificate_path: "certs/development.cer"
+            certificate_path: "certs/AppleWWDRCA6.cer",
+            keychain_name: "login.keychain"
           )',
           'import_certificate(
             certificate_path: "certs/dist.p12",
             certificate_password: ENV["CERTIFICATE_PASSWORD"] || "default",
-            certificate_format: "pkcs12"
+            keychain_name: "custom.keychain"
+          )',
+          'import_certificate(
+            certificate_path: "certs/development.cer",
+            keychain_path: "~/Library/Keychains/login.keychain-db"
+          )',
+          'import_certificate(
+            certificate_path: "certs/dist.p12",
+            certificate_password: ENV["CERTIFICATE_PASSWORD"] || "default",
+            certificate_format: "pkcs12",
+            keychain_path: "/path/to/custom.keychain"
           )'
         ]
       end
