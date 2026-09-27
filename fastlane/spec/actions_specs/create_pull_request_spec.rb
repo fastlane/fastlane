@@ -10,7 +10,7 @@ describe Fastlane do
               body: '{"title":"test PR","head":"git rev-parse --abbrev-ref HEAD","base":"master"}',
               headers: {
                 'Authorization' => 'Basic MTIzNDU2Nzg5',
-                'Host' => 'api.github.com:443',
+                'Host' => 'api.github.com',
                 'User-Agent' => 'fastlane-github_api'
               }
             ).to_return(status: 201, body: response_body, headers: {})
@@ -20,7 +20,7 @@ describe Fastlane do
               body: '{"title":"test PR","head":"git rev-parse --abbrev-ref HEAD","base":"master","draft":true}',
               headers: {
                 'Authorization' => 'Basic MTIzNDU2Nzg5',
-                'Host' => 'api.github.com:443',
+                'Host' => 'api.github.com',
                 'User-Agent' => 'fastlane-github_api'
               }
             ).to_return(status: 201, body: response_body, headers: {})
@@ -31,7 +31,7 @@ describe Fastlane do
               body: '{"labels":["fastlane","is","awesome"]}',
               headers: {
                 'Authorization' => 'Basic MTIzNDU2Nzg5',
-                'Host' => 'api.github.com:443',
+                'Host' => 'api.github.com',
                 'User-Agent' => 'fastlane-github_api'
               }
             ).to_return(status: 200, body: "", headers: {})
@@ -41,7 +41,7 @@ describe Fastlane do
               body: '{"assignees":["octocat","hubot","other_user"]}',
               headers: {
                 'Authorization' => 'Basic MTIzNDU2Nzg5',
-                'Host' => 'api.github.com:443',
+                'Host' => 'api.github.com',
                 'User-Agent' => 'fastlane-github_api'
               }
             ).to_return(status: 201, body: "", headers: {})
@@ -51,7 +51,7 @@ describe Fastlane do
               body: '{"reviewers":["octocat","hubot","other_user"]}',
               headers: {
                 'Authorization' => 'Basic MTIzNDU2Nzg5',
-                'Host' => 'api.github.com:443',
+                'Host' => 'api.github.com',
                 'User-Agent' => 'fastlane-github_api'
               }
             ).to_return(status: 201, body: "", headers: {})
@@ -61,7 +61,7 @@ describe Fastlane do
               body: '{"team_reviewers":["octocat","hubot","other_team"]}',
               headers: {
                 'Authorization' => 'Basic MTIzNDU2Nzg5',
-                'Host' => 'api.github.com:443',
+                'Host' => 'api.github.com',
                 'User-Agent' => 'fastlane-github_api'
               }
             ).to_return(status: 201, body: "", headers: {})
@@ -71,7 +71,7 @@ describe Fastlane do
               body: '{"reviewers":["octocat","hubot","other_user"],"team_reviewers":["octocat","hubot","other_team"]}',
               headers: {
                 'Authorization' => 'Basic MTIzNDU2Nzg5',
-                'Host' => 'api.github.com:443',
+                'Host' => 'api.github.com',
                 'User-Agent' => 'fastlane-github_api'
               }
             ).to_return(status: 201, body: "", headers: {})
@@ -81,7 +81,7 @@ describe Fastlane do
               body: '{"milestone":42}',
               headers: {
                   'Authorization' => 'Basic MTIzNDU2Nzg5',
-                  'Host' => 'api.github.com:443',
+                  'Host' => 'api.github.com',
                   'User-Agent' => 'fastlane-github_api'
               }
             ).to_return(status: 201, body: "", headers: {})
