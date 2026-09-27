@@ -1,9 +1,8 @@
-When the pull request description references an issue ("Resolves #N"), read that issue and check the change against what it asks for, including any request to audit related code first.
+Before reviewing, read the issue referenced by "Resolves #N" and its comments, and the discussion on the pull request. Review the change against what the issue asks, including any request to audit or discuss before implementing.
 
-Prefer the existing mechanisms over new ones: option validation belongs in `FastlaneCore::ConfigItem` (`optional`, `conflicting_options`, `verify_block`), not in an action's `run` method. Flag code that introduces a pattern no other action uses.
+Review against the project's guidelines in this repository:
+- design: Design.md
+- scope: VISION.md and CONTRIBUTING.md
+- tests: Testing.md and ParallelTesting.md
 
-Options read from environment variables are not checked by `conflicting_options`. This is a known framework gap: do not suggest per-action workarounds for it.
-
-Tests for a fix should fail without the fix; flag tests that only exercise the happy path.
-
-Ruby code must keep working on the minimum Ruby version in `fastlane.gemspec`.
+Prefer the pattern the codebase already uses for the same problem. When a change introduces a new pattern, flag it and name the existing one.
