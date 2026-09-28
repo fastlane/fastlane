@@ -251,9 +251,10 @@ GEM
       kramdown (~> 2.0)
     logger (1.7.0)
     method_source (1.0.0)
-    mime-types (3.5.2)
-      mime-types-data (~> 3.2015)
-    mime-types-data (3.2024.0206)
+    mime-types (3.7.0)
+      logger
+      mime-types-data (~> 3.2025, >= 3.2025.0507)
+    mime-types-data (3.2026.0922)
     mini_magick (4.12.0)
     mini_mime (1.1.5)
     minitest (6.0.6)
