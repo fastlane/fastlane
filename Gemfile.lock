@@ -267,7 +267,7 @@ GEM
     mutex_m (0.3.0)
     nanaimo (0.4.0)
     nap (1.1.0)
-    naturally (2.2.1)
+    naturally (2.3.0)
     net-http (0.9.1)
       uri (>= 0.11.1)
     nkf (0.2.0)
