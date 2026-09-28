@@ -284,6 +284,9 @@ task(:test_parallel) do
     puts(format("Predicted worker load %<min>.0fs to %<max>.0fs", min: spread.min, max: spread.max))
   end
 
+  # SimpleCov merges results younger than 10 minutes, which would include a previous run with more workers
+  FileUtils.rm_f("coverage/.resultset.json")
+
   started = Time.now
   pids = buckets.each_with_index.map do |bucket, index|
     log = "rspec_worker_#{index}.log"
@@ -305,7 +308,8 @@ task(:test_parallel) do
     # reads, since a worker only knows about its own examples.
     command += ["--format", "json", "--out", worker_json(index)]
     command += bucket
-    Process.spawn({ "FASTLANE_SPEC_STUB_USAGE" => worker_stub_usage(index) }, *command, out: [log, "a"], err: [log, "a"])
+    Process.spawn({ "FASTLANE_SPEC_STUB_USAGE" => worker_stub_usage(index), "FASTLANE_SPEC_WORKER" => index.to_s },
+                  *command, out: [log, "a"], err: [log, "a"])
   end
 
   results = pids.map { |pid| Process.wait2(pid).last }

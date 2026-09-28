@@ -2,11 +2,15 @@
 module SpecHelper
 end
 
-require "coveralls"
-Coveralls.wear! unless ENV["FASTLANE_SKIP_UPDATE_CHECK"]
+unless ENV["FASTLANE_SKIP_UPDATE_CHECK"]
+  require "simplecov"
+  # rake test_parallel names each worker: SimpleCov merges results by name, so with one name they overwrite each other
+  SimpleCov.command_name("rspec-worker-#{ENV['FASTLANE_SPEC_WORKER']}") if ENV["FASTLANE_SPEC_WORKER"]
+  SimpleCov.start { add_filter("vendor") }
+end
 
 require "webmock/rspec"
-WebMock.disable_net_connect!(allow: 'coveralls.io')
+WebMock.disable_net_connect!
 
 require "fastlane"
 require "tmpdir"
