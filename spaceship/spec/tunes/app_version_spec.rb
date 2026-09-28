@@ -714,7 +714,6 @@ describe Spaceship::AppVersion, all: true do
 
     describe "Rejecting" do
       it 'rejects' do
-        TunesStubbing.itc_stub_reject_version_success
         version.can_reject_version = true
         expect(client).to receive(:reject!).with('898536088', 812_106_519)
         version.reject!

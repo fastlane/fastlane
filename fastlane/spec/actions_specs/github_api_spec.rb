@@ -122,7 +122,7 @@ describe Fastlane do
 
           context 'optional params' do
             let(:response_body) { File.read("./fastlane/spec/fixtures/requests/github_upload_release_asset_response.json") }
-            let(:headers) do
+            let(:upload_headers) do
               {
                 'Authorization' => 'Basic MTIzNDU2Nzg5',
                 'Host' => 'uploads.github.com',
@@ -133,7 +133,7 @@ describe Fastlane do
             before do
               stub_request(:post, "https://uploads.github.com/repos/fastlane/fastlane/releases/1/assets?name=TEST_FILE.md").
                 with(body: "test raw content of file",
-                   headers: headers).
+                   headers: upload_headers).
                 to_return(status: 200, body: response_body, headers: {})
             end
 
@@ -157,7 +157,7 @@ describe Fastlane do
             end
 
             context 'overridable headers' do
-              let(:headers) do
+              let(:upload_headers) do
                 {
                   'Authorization' => 'custom',
                   'Host' => 'uploads.github.com',

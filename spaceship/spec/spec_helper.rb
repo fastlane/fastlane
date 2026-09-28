@@ -80,11 +80,7 @@ def before_each_spaceship
   PortalStubbing.adp_stub_passbooks
   TunesStubbing.itc_stub_applications
   TunesStubbing.itc_stub_app_versions
-  TunesStubbing.itc_stub_build_trains
-  TunesStubbing.itc_stub_testers
-  TunesStubbing.itc_stub_testflight
   TunesStubbing.itc_stub_app_version_ref
-  TunesStubbing.itc_stub_user_detail
   TunesStubbing.itc_stub_sandbox_testers
   TunesStubbing.itc_stub_create_sandbox_tester
   TunesStubbing.itc_stub_delete_sandbox_tester
@@ -115,7 +111,6 @@ def before_each_spaceship
   ConnectAPIStubbing::TestFlight.stub_beta_build_localizations
   ConnectAPIStubbing::TestFlight.stub_beta_build_metrics
   ConnectAPIStubbing::TestFlight.stub_beta_feedbacks
-  ConnectAPIStubbing::TestFlight.stub_beta_feedbacks_delete
   ConnectAPIStubbing::TestFlight.stub_beta_groups
   ConnectAPIStubbing::TestFlight.stub_beta_testers
   ConnectAPIStubbing::TestFlight.stub_beta_tester_metrics
