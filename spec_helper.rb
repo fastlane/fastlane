@@ -2,11 +2,13 @@
 module SpecHelper
 end
 
-require "coveralls"
-Coveralls.wear! unless ENV["FASTLANE_SKIP_UPDATE_CHECK"]
+unless ENV["FASTLANE_SKIP_UPDATE_CHECK"]
+  require "simplecov"
+  SimpleCov.start { add_filter("vendor") }
+end
 
 require "webmock/rspec"
-WebMock.disable_net_connect!(allow: 'coveralls.io')
+WebMock.disable_net_connect!
 
 require "fastlane"
 require "tmpdir"
