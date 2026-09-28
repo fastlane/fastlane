@@ -129,15 +129,6 @@ class TunesStubbing
         to_return(status: 200, body: itc_read_fixture_file('review_by_version_id.json'), headers: { 'Content-Type' => 'application/json' })
     end
 
-    def itc_stub_build_details
-      stub_request(:get, "https://appstoreconnect.apple.com/WebObjects/iTunesConnect.woa/ra/apps/898536088/buildHistory?platform=ios").
-        to_return(status: 200, body: itc_read_fixture_file('build_history.json'), headers: { 'Content-Type' => 'application/json' })
-      stub_request(:get, "https://appstoreconnect.apple.com/WebObjects/iTunesConnect.woa/ra/apps/898536088/trains/2.0.1/buildHistory?platform=ios").
-        to_return(status: 200, body: itc_read_fixture_file('build_history_for_train.json'), headers: { 'Content-Type' => 'application/json' })
-      stub_request(:get, "https://appstoreconnect.apple.com/WebObjects/iTunesConnect.woa/ra/apps/898536088/platforms/ios/trains/2.0.1/builds/4/details").
-        to_return(status: 200, body: itc_read_fixture_file('build_details.json'), headers: { 'Content-Type' => 'application/json' })
-    end
-
     def itc_stub_candidate_builds
       stub_request(:get, "https://appstoreconnect.apple.com/WebObjects/iTunesConnect.woa/ra/apps/898536088/versions/812106519/candidateBuilds").
         to_return(status: 200, body: itc_read_fixture_file('candidate_builds.json'), headers: { 'Content-Type' => 'application/json' })
