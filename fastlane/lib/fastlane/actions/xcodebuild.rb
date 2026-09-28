@@ -349,11 +349,10 @@ module Fastlane
         end.compact
       end
 
-      # Cleans values for build settings
-      # Only escaping `$(inherit)` types of values since "sh"
-      # interprets these as sub-commands instead of passing value into xcodebuild
+      # Escapes what sh interprets inside double quotes, so the value reaches xcodebuild unchanged.
+      # xcodebuild expands $(VAR), ${VAR} and $VAR itself, from build settings and the environment.
       def self.clean_build_setting_value(value)
-        value.to_s.gsub('$(', '\\$(')
+        value.to_s.gsub(/[\\"$`]/) { |char| "\\#{char}" }
       end
 
       def self.detect_workspace
