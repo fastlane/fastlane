@@ -822,3 +822,44 @@ describe Fastlane do
     end
   end
 end
+
+describe Fastlane::Actions::XcodebuildAction do
+  describe ".clean_build_setting_value" do
+    {
+      'iPhone Developer: Josh' => 'iPhone Developer: Josh',
+      16 => '16',
+      nil => '',
+      '$(inherited) NDEBUG=1' => '\\$(inherited) NDEBUG=1',
+      '${HOME}/b and $HOME/c' => '\\${HOME}/b and \\$HOME/c',
+      'say "hi"' => 'say \\"hi\\"',
+      'back\\slash' => 'back\\\\slash',
+      '`cmd`' => '\\`cmd\\`',
+      "it's 50% (really) *great* & ok" => "it's 50% (really) *great* & ok"
+    }.each do |value, escaped|
+      it "escapes #{value.inspect} as #{escaped.inspect}" do
+        expect(described_class.clean_build_setting_value(value)).to eq(escaped)
+      end
+    end
+
+    unless FastlaneCore::Helper.windows?
+      [
+        '$(inherited) NDEBUG=1',
+        '${HOME}/b and $HOME/c',
+        'say "hi"',
+        'back\\slash',
+        '`touch pwned` and $(touch pwned)'
+      ].each do |value|
+        it "passes #{value.inspect} through sh unchanged" do
+          Dir.mktmpdir do |dir|
+            # the action wraps the value in double quotes: SETTING="value"
+            output, status = Open3.capture2("sh", "-c", "printf '%s' \"#{described_class.clean_build_setting_value(value)}\"", chdir: dir)
+
+            expect(status.success?).to be(true)
+            expect(output).to eq(value)
+            expect(File.exist?(File.join(dir, "pwned"))).to be(false)
+          end
+        end
+      end
+    end
+  end
+end
