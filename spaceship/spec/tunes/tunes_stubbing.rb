@@ -11,10 +11,6 @@ class TunesStubbing
     end
 
     def itc_stub_login
-      # Retrieving the current login URL
-      itc_service_key_path = File.expand_path("~/Library/Caches/spaceship_itc_service_key.txt")
-      File.delete(itc_service_key_path) if File.exist?(itc_service_key_path)
-
       stub_request(:get, 'https://appstoreconnect.apple.com/itc/static-resources/controllers/_cntrl.js').
         to_return(status: 200, body: itc_read_fixture_file('login_cntrl.js'))
       stub_request(:get, "https://appstoreconnect.apple.com/WebObjects/iTunesConnect.woa").

@@ -150,6 +150,11 @@ RSpec.configure do |config|
     # before and fails on a clean checkout.
     stub_request(:head, "https://appstoreconnect.apple.com/logout")
       .to_return(status: 302, headers: { "Location" => "https://idmsa.apple.com/appleauth/signout?widgetKey=e0abc&asop=destroy-session&asoc=/&rv=3" })
+
+    # The key cache defaults to Dir.tmpdir, shared by every run and worker: keep it per process, and empty
+    key_cache = File.join(FASTLANE_SPEC_SCRATCH, "spaceship_itc_service_key.txt")
+    File.delete(key_cache) if File.exist?(key_cache)
+    allow_any_instance_of(Spaceship::Client).to receive(:itc_service_key_path).and_return(key_cache)
   end
 
   def mock_client_response(method_name, with: anything)
