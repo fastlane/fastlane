@@ -112,7 +112,7 @@ jobs:
       - uses: actions/checkout@v7
       - uses: ruby/setup-ruby@v1
         with:
-          ruby-version: '3.1'
+          ruby-version: '3.2'
           bundler-cache: true
       - name: Increase Open File Limit
         shell: bash
@@ -208,7 +208,7 @@ jobs:
       - uses: actions/checkout@v7
       - uses: ruby/setup-ruby@v1
         with:
-          ruby-version: '3.1'
+          ruby-version: '3.2'
           bundler-cache: true
       - name: Increase Open File Limit
         shell: bash
