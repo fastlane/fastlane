@@ -54,36 +54,33 @@ module FastlaneCore
         command << " 1> /dev/null" # always disable stdout. This can be very verbose, and leak potentially sensitive info
 
         # Showing loading indicator as this can take some time if a lot of keys installed
-        Helper.show_loading_indicator("Setting key partition list... (this can take a minute if there are a lot of keys installed)")
+        Helper.with_loading_indicator("Setting key partition list... (this can take a minute if there are a lot of keys installed)") do
+          # Strip keychain password from command output
+          sensitive_command = command.gsub(password_part, " -k ********")
+          UI.command(sensitive_command) if output
+          Open3.popen3(command) do |stdin, stdout, stderr, thrd|
+            unless thrd.value.success?
+              err = stderr.read.to_s.strip
 
-        # Strip keychain password from command output
-        sensitive_command = command.gsub(password_part, " -k ********")
-        UI.command(sensitive_command) if output
-        Open3.popen3(command) do |stdin, stdout, stderr, thrd|
-          unless thrd.value.success?
-            err = stderr.read.to_s.strip
+              # Inform user when no/wrong password was used as its needed to prevent UI permission popup from Xcode when signing
+              if err.include?("SecKeychainItemSetAccessWithPassword")
+                keychain_name = File.basename(keychain_path, ".*")
+                Security::InternetPassword.delete(server: server_name(keychain_name))
 
-            # Inform user when no/wrong password was used as its needed to prevent UI permission popup from Xcode when signing
-            if err.include?("SecKeychainItemSetAccessWithPassword")
-              keychain_name = File.basename(keychain_path, ".*")
-              Security::InternetPassword.delete(server: server_name(keychain_name))
-
-              UI.important("")
-              UI.important("Could not configure imported keychain item (certificate) to prevent UI permission popup when code signing\n" \
-                       "Check if you supplied the correct `keychain_password` for keychain: `#{keychain_path}`\n" \
-                       "#{err}")
-              UI.important("")
-              UI.important("Please look at the following docs to see how to set a keychain password:")
-              UI.important(" - https://docs.fastlane.tools/actions/sync_code_signing")
-              UI.important(" - https://docs.fastlane.tools/actions/get_certificates")
-            else
-              UI.error(err)
+                UI.important("")
+                UI.important("Could not configure imported keychain item (certificate) to prevent UI permission popup when code signing\n" \
+                         "Check if you supplied the correct `keychain_password` for keychain: `#{keychain_path}`\n" \
+                         "#{err}")
+                UI.important("")
+                UI.important("Please look at the following docs to see how to set a keychain password:")
+                UI.important(" - https://docs.fastlane.tools/actions/sync_code_signing")
+                UI.important(" - https://docs.fastlane.tools/actions/get_certificates")
+              else
+                UI.error(err)
+              end
             end
           end
         end
-
-        # Hiding after Open3 finishes
-        Helper.hide_loading_indicator
 
       end
     end

@@ -280,5 +280,60 @@ describe FastlaneCore do
         expect(FastlaneCore::Helper.fastlane_enabled?).to be(true)
       end
     end
+
+    describe "loading indicator" do
+      let(:spinners) { [] }
+      # tty-spinner only writes to a terminal
+      let(:output) { StringIO.new.tap { |io| io.define_singleton_method(:tty?) { true } } }
+
+      before do
+        allow(FastlaneCore::Helper).to receive(:should_show_loading_indicator?).and_return(true)
+        allow(TTY::Spinner).to receive(:new).and_wrap_original do |original, *args, **options|
+          original.call(*args, **options, output: output).tap { |spinner| spinners << spinner }
+        end
+      end
+
+      after do
+        spinners.each { |spinner| spinner.stop unless spinner.done? }
+        FastlaneCore::Helper.instance_variable_set(:@require_fastlane_spinner, nil)
+      end
+
+      it "stops the spinner and reports an error when the block raises" do
+        expect do
+          FastlaneCore::Helper.with_loading_indicator("Working") { raise "boom" }
+        end.to raise_error("boom")
+
+        expect(spinners.size).to eq(1)
+        expect(spinners.first.done?).to be(true)
+        expect(output.string).to include(TTY::Spinner::CROSS)
+        expect(output.string).not_to include(TTY::Spinner::TICK)
+      end
+
+      it "returns the block's value and reports success" do
+        expect(FastlaneCore::Helper.with_loading_indicator("Working") { 42 }).to eq(42)
+
+        expect(spinners.first.done?).to be(true)
+        expect(output.string).to include(TTY::Spinner::TICK)
+      end
+
+      def return_early_from_indicator
+        FastlaneCore::Helper.with_loading_indicator("Working") { return :early }
+      end
+
+      it "reports success when the block returns early" do
+        expect(return_early_from_indicator).to eq(:early)
+
+        expect(spinners.first.done?).to be(true)
+        expect(output.string).to include(TTY::Spinner::TICK)
+        expect(output.string).not_to include(TTY::Spinner::CROSS)
+      end
+
+      it "stops a spinner that was shown but never hidden before showing the next one" do
+        FastlaneCore::Helper.show_loading_indicator("First")
+        FastlaneCore::Helper.show_loading_indicator("Second")
+
+        expect(spinners.map(&:done?)).to eq([true, false])
+      end
+    end
   end
 end
