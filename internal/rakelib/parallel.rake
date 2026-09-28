@@ -126,6 +126,35 @@ def units_for(files, timings)
   end
 end
 
+def worker_stub_usage(index)
+  "rspec_worker_#{index}.stubs.json"
+end
+
+UNUSED_STUBS_PATH = "unused_stubs.txt".freeze
+
+# A stub counts as unused only if no worker requested it. Listed rather than
+# failed unless FASTLANE_SPEC_UNUSED_STUBS=fail: a partial run leaves most
+# stubs unrequested. Returns how many were unused.
+def report_unused_stubs(count)
+  require "json"
+
+  parts = (0...count).map { |index| worker_stub_usage(index) }.select { |path| File.exist?(path) }
+  return 0 if parts.empty?
+
+  merged = Hash.new { |hash, key| hash[key] = { "requests" => 0, "registered_at" => [] } }
+  parts.each do |path|
+    JSON.parse(File.read(path)).each do |stub, usage|
+      merged[stub]["requests"] += usage["requests"]
+      merged[stub]["registered_at"] |= usage["registered_at"]
+    end
+  end
+
+  unused = merged.select { |_stub, usage| usage["requests"].zero? }
+  File.write(UNUSED_STUBS_PATH, unused.sort.map { |stub, usage| "#{stub}\n  #{usage['registered_at'].sort.join("\n  ")}\n" }.join)
+  puts("#{unused.size} of #{merged.size} stubs were never requested, see #{UNUSED_STUBS_PATH}")
+  unused.size
+end
+
 # The slowest files and examples of the run that just happened, rather than of
 # whatever machine recorded the committed timings. A worker's own output goes to
 # its log, so without this nothing says where the time went.
@@ -269,13 +298,14 @@ task(:test_parallel) do
     # The worker appends through the redirect below, so without this the log
     # still holds the previous run and every count read back out of it is wrong.
     File.write(log, "")
+    File.delete(worker_stub_usage(index)) if File.exist?(worker_stub_usage(index))
     command = ["rspec", "--format", "progress", *ENV["RSPEC_ARGS"].to_s.split]
     # On GitHub Actions the run is also reported through rspec's json formatter.
     # One file per worker, merged below into the single file the report action
     # reads, since a worker only knows about its own examples.
     command += ["--format", "json", "--out", worker_json(index)]
     command += bucket
-    Process.spawn(*command, out: [log, "a"], err: [log, "a"])
+    Process.spawn({ "FASTLANE_SPEC_STUB_USAGE" => worker_stub_usage(index) }, *command, out: [log, "a"], err: [log, "a"])
   end
 
   results = pids.map { |pid| Process.wait2(pid).last }
@@ -314,6 +344,7 @@ task(:test_parallel) do
               elapsed: elapsed, workers: buckets.size))
 
   report_slowest
+  unused_stubs = report_unused_stubs(buckets.size)
 
   failed = results.each_with_index.reject { |status, _index| status.success? }
 
@@ -336,6 +367,10 @@ task(:test_parallel) do
       puts("    rspec $(cat rspec_worker_#{index}.units)")
     end
     abort("#{failed.size} of #{results.size} workers failed")
+  end
+
+  if ENV["FASTLANE_SPEC_UNUSED_STUBS"] == "fail" && unused_stubs > 0
+    abort("#{unused_stubs} stubs were never requested, see #{UNUSED_STUBS_PATH}")
   end
 end
 
