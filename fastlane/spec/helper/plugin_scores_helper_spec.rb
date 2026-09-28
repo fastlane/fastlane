@@ -17,3 +17,22 @@ describe Fastlane::Helper::PluginScoresHelper::FastlaneActionFileParser do
     end
   end
 end
+
+describe Fastlane::Helper::PluginScoresHelper::FastlanePluginScore do
+  describe ".github_page?" do
+    it "accepts a github.com repository" do
+      expect(described_class.github_page?("https://github.com/fastlane/fastlane")).to be(true)
+    end
+
+    it "rejects hosts that only start with github.com" do
+      expect(described_class.github_page?("https://github.com.evil.example/fastlane/fastlane")).to be(false)
+      expect(described_class.github_page?("https://github.company.example/fastlane/fastlane")).to be(false)
+    end
+
+    it "rejects non https and unparsable homepages" do
+      expect(described_class.github_page?("http://github.com/fastlane/fastlane")).to be(false)
+      expect(described_class.github_page?("not a url")).to be(false)
+      expect(described_class.github_page?(nil)).to be(false)
+    end
+  end
+end
