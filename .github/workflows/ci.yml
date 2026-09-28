@@ -86,6 +86,7 @@ jobs:
           path: |
             rspec_worker_*.log
             rspec_worker_*.units
+            unused_stubs.txt
           if-no-files-found: warn
 
       - name: RSpec report
