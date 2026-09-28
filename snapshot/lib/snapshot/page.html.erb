@@ -96,38 +96,38 @@
       <button class="tabLink" onclick="openTab(event, 'byScreen')">By Screen</button>
     </div>
     <div id="byLanguage" class="tabContent"><h1 class="tabTitle">By Language:</h1><% image_counter = 0 %><% @data_by_language.each do |language, content| %>
-      <h2 id="<%= language %>"><%= language %></h2>
+      <h2 id="<%= ERB::Util.h(language) %>"><%= ERB::Util.h(language) %></h2>
       <hr>
       <table><% content.each do |device_name, screens| %>
         <tr>
           <th colspan="<%= screens.count %>">
-            <a id="<%= language %>-<%= device_name %>" class="deviceName" href="#<%= language %>-<%= device_name %>"><%= device_name %></a>
+            <a id="<%= ERB::Util.h(language) %>-<%= ERB::Util.h(device_name) %>" class="deviceName" href="#<%= ERB::Util.h(language) %>-<%= ERB::Util.h(device_name) %>"><%= ERB::Util.h(device_name) %></a>
           </th>
         </tr>
         <tr><% screens.each do |screen_path| %><% next if screen_path.include?"_framed.png" %>
           <td><% image_counter += 1 %>
-            <a href="<%= screen_path %>" target="_blank" class="screenshotLink">
-              <img class="screenshot" src="<%= screen_path %>" style="width: 100%;" alt="<%= language %> <%= device_name %>" data-tab="1" data-counter="<%= image_counter %>">
+            <a href="<%= ERB::Util.h(screen_path) %>" target="_blank" class="screenshotLink">
+              <img class="screenshot" src="<%= ERB::Util.h(screen_path) %>" style="width: 100%;" alt="<%= ERB::Util.h(language) %> <%= ERB::Util.h(device_name) %>" data-tab="1" data-counter="<%= image_counter %>">
             </a>
           </td><% end %>
         </tr><% end %>
       </table><% end %>
     </div>
     <div id="byScreen" class="tabContent"><h1 class="tabTitle">By Screen:</h1><% image_counter = 0 %><% @data_by_screen.each do |screen, content| %>
-      <h2 id="<%= screen %>" class="screen"><%= screen %></h2>
+      <h2 id="<%= ERB::Util.h(screen) %>" class="screen"><%= ERB::Util.h(screen) %></h2>
       <hr>
       <table><% content.each do |device_name, screens| %>
         <tr>
           <th colspan="<%= screens.count %>">
-            <a id="<%= screen %>-<%= device_name %>" class="deviceName" href="#<%= screen %>-<%= device_name %>"><%= device_name %></a>
+            <a id="<%= ERB::Util.h(screen) %>-<%= ERB::Util.h(device_name) %>" class="deviceName" href="#<%= ERB::Util.h(screen) %>-<%= ERB::Util.h(device_name) %>"><%= ERB::Util.h(device_name) %></a>
           </th>
         </tr>
         <tr><% screens.each do |language, screen_path| %><% next if screen_path.include?"_framed.png" %>
           <td><% image_counter += 1 %>
-            <a href="<%= screen_path %>" target="_blank" class="screenshotLink">
-              <img class="screenshot" src="<%= screen_path %>" style="width: 100%;" alt="<%= language %> <%= device_name %>" data-tab="2" data-counter="<%= image_counter %>">
+            <a href="<%= ERB::Util.h(screen_path) %>" target="_blank" class="screenshotLink">
+              <img class="screenshot" src="<%= ERB::Util.h(screen_path) %>" style="width: 100%;" alt="<%= ERB::Util.h(language) %> <%= ERB::Util.h(device_name) %>" data-tab="2" data-counter="<%= image_counter %>">
             </a>
-            <div class="caption"><%= language %></div>
+            <div class="caption"><%= ERB::Util.h(language) %></div>
           </td><% end %>
         </tr><% end %>
       </table><% end %>
@@ -222,9 +222,14 @@
           imageDisplay.alt             = img.alt;
           imageDisplay.dataset.counter = img.dataset.counter;
 
-          imageInfo.innerHTML          = '<h3>'+img.alt+'</h3>';
-          imageInfo.innerHTML         += decodeURI(img.src.split("/").pop());
-          imageInfo.innerHTML         += '<br />'+tmpImg.height+'&times;'+tmpImg.width+'px';
+          // textContent, not innerHTML: file names must not be interpreted as HTML
+          var imageTitle               = document.createElement('h3');
+          imageTitle.textContent       = img.alt;
+          imageInfo.textContent        = '';
+          imageInfo.appendChild(imageTitle);
+          imageInfo.appendChild(document.createTextNode(decodeURI(img.src.split("/").pop())));
+          imageInfo.appendChild(document.createElement('br'));
+          imageInfo.appendChild(document.createTextNode(tmpImg.height+'\u00d7'+tmpImg.width+'px'));
 
           overlay.style.display        = "block";
         });

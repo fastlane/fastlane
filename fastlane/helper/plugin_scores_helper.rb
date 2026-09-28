@@ -41,6 +41,14 @@ module Fastlane
         attr_accessor :data
         attr_accessor :cache
 
+        # The homepage is later called with GITHUB_API_TOKEN, so only an exact github.com host qualifies
+        def self.github_page?(url)
+          uri = URI.parse(url.to_s)
+          uri.kind_of?(URI::HTTPS) && uri.host == "github.com"
+        rescue URI::InvalidURIError
+          false
+        end
+
         def initialize(hash, cache_path)
           if ENV["GITHUB_USER_NAME"].to_s.length == 0 || ENV["GITHUB_API_TOKEN"].to_s.length == 0
             raise "Missing ENV variables GITHUB_USER_NAME and/or GITHUB_API_TOKEN"
@@ -52,7 +60,7 @@ module Fastlane
           self.homepage = hash["homepage_uri"] || hash["documentation_uri"]
           self.raw_hash = hash
 
-          has_github_page = self.homepage.to_s.start_with?("https://github.com") # Here we can add non GitHub support one day
+          has_github_page = self.class.github_page?(self.homepage) # Here we can add non GitHub support one day
 
           self.data = {
             has_homepage: self.homepage.to_s.length > 5,
