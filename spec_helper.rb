@@ -248,7 +248,8 @@ RSpec.configure do |config|
     # Runs inside webmock/rspec's around hook, so before WebMock.reset! clears the stubs
     config.after(:each) do
       WebMock::StubRegistry.instance.request_stubs.each do |stub|
-        usage = stub_usage[stub.request_pattern.to_s]
+        # Ruby 3.4 prints hashes as {"a" => 1} rather than {"a"=>1}: one form, so reports from different Rubies compare
+        usage = stub_usage[stub.request_pattern.to_s.gsub(" => ", "=>")]
         usage["requests"] += WebMock::RequestRegistry.instance.times_executed(stub.request_pattern)
         usage["registered_at"] |= [stub_origin[stub]].compact
       end
