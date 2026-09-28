@@ -158,7 +158,7 @@ GEM
     drb (2.2.3)
     emoji_regex (3.2.3)
     erb (6.0.7)
-    excon (1.5.0)
+    excon (1.6.0)
       logger
     fakefs (3.2.1)
     faraday (2.14.4)
