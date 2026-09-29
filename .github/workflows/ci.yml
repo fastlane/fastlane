@@ -89,6 +89,11 @@ jobs:
             unused_stubs.txt
           if-no-files-found: warn
 
+      # One macOS leg is enough. See fastlane#30289.
+      - name: Coverage summary
+        if: matrix.os == 'macos-26' && matrix.xcode == '26.6' && matrix.ruby == '3.4'
+        run: bundle exec rake coverage_summary
+
       - name: RSpec report
         if: always()
         uses: SonicGarden/rspec-report-action@v8
