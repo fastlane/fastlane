@@ -17,12 +17,9 @@ def coverage_percent(covered, lines)
   format("%.1f%%", 100.0 * covered / lines)
 end
 
-desc("Print the coverage of the last run, or add it to the GitHub Actions job summary")
+desc("Print the coverage of the last run, and add it to the GitHub Actions job summary")
 task(:coverage_summary) do
   summary = coverage_summary
-  if ENV["GITHUB_STEP_SUMMARY"]
-    File.write(ENV["GITHUB_STEP_SUMMARY"], summary, mode: "a")
-  else
-    puts(summary)
-  end
+  puts(summary)
+  File.write(ENV["GITHUB_STEP_SUMMARY"], summary, mode: "a") if ENV["GITHUB_STEP_SUMMARY"]
 end
