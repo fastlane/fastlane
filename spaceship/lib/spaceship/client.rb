@@ -608,13 +608,13 @@ module Spaceship
       when 403
         raise InvalidUserCredentialsError.new, "Invalid username and password combination. Used '#{user}' as the username."
       when 200
-        fetch_olympus_session
+        fetch_olympus_session_after_signin
         return response
       when 409
         # 2 step/factor is enabled for this account, first handle that
         handle_two_step_or_factor(response)
         # and then get the olympus session
-        fetch_olympus_session
+        fetch_olympus_session_after_signin
         return true
       else
         if (response.body || "").include?('invalid="true"')
@@ -692,6 +692,16 @@ module Spaceship
       return Spaceship::Hashcash.make(bits: bits, challenge: challenge)
     end
 
+    # Apple accepts a stale key for the sign in and 2FA, and only refuses the
+    # session afterwards, with a 401 that says nothing about the key.
+    def fetch_olympus_session_after_signin
+      fetch_olympus_session
+    rescue UnauthorizedAccessError
+      raise unless service_key_from_cache?
+
+      raise UnauthorizedAccessError.new, "App Store Connect refused the session after signing in. The App Store Connect API key came from the cache at #{itc_service_key_path} and may be stale: delete that file and try again."
+    end
+
     # Get the `itctx` from the new (22nd May 2017) API endpoint "olympus"
     # Update (29th March 2019) olympus migrates to new appstoreconnect API
     def fetch_olympus_session
@@ -734,45 +744,52 @@ module Spaceship
       File.join(Dir.tmpdir, "spaceship_itc_service_key.txt")
     end
 
+    # Read on every login from GET /logout -> 302 Location: .../signout?widgetKey=<key>.
+    # A stale key only fails after 2FA, so the cache is just a fallback. See fastlane#30291.
     def itc_service_key
       return @service_key if @service_key
 
-      # Check if we have a local cache of the key. Reading it is best effort:
-      # an unreadable cache is a reason to fetch the key again, not to fail.
-      begin
-        return File.read(itc_service_key_path) if File.exist?(itc_service_key_path)
-      rescue SystemCallError => ex
-        logger.warn("Could not read the cached App Store Connect API key: #{ex.message}")
+      key = fetch_service_key_from_signout
+      if key.nil?
+        cached = cached_service_key
+        return @service_key = cached if cached
+
+        key = fetch_service_key_from_olympus
       end
 
-      @service_key = fetch_service_key
-
-      # Cache the key locally. Best effort as well: having the key and failing
-      # to save it is not a reason to fail the login. See fastlane#30198.
-      begin
-        File.write(itc_service_key_path, @service_key)
-      rescue SystemCallError => ex
-        logger.warn("Could not cache the App Store Connect API key at #{itc_service_key_path}: #{ex.message}")
-      end
-
-      return @service_key
+      cache_service_key(key)
+      @service_key = key
     end
 
-    # Two sources, because the one this used to rely on is gone.
-    #
-    # App Store Connect's sign out route answers with a redirect that carries
-    # the key its own front end is using:
-    #
-    #   GET /logout -> 302 Location: .../appleauth/signout?widgetKey=<key>&...
-    #
-    # That is preferred over the olympus endpoint below, which Apple removed in
-    # September 2026 and which now answers 404. See fastlane#30199. The olympus
-    # call is kept as a fallback in case it comes back, since it is the source
-    # Apple documented rather than one scraped out of a redirect.
-    def fetch_service_key
-      key = fetch_service_key_from_signout
-      return key if key
+    def service_key_from_cache?
+      @service_key_from_cache == true
+    end
 
+    # Reading the cache is best effort: an unreadable cache is a reason to
+    # fetch the key again, not to fail.
+    def cached_service_key
+      return nil unless File.exist?(itc_service_key_path)
+
+      key = File.read(itc_service_key_path)
+      @service_key_from_cache = true
+      logger.warn("Using the cached App Store Connect API key from #{itc_service_key_path}")
+      key
+    rescue SystemCallError => ex
+      logger.warn("Could not read the cached App Store Connect API key: #{ex.message}")
+      nil
+    end
+
+    # Best effort as well: having the key and failing to save it is not a reason
+    # to fail the login. See fastlane#30198.
+    def cache_service_key(key)
+      File.write(itc_service_key_path, key)
+    rescue SystemCallError => ex
+      logger.warn("Could not cache the App Store Connect API key at #{itc_service_key_path}: #{ex.message}")
+    end
+
+    # The source Apple documented, removed in September 2026 and answering 404
+    # since. Kept as the last fallback in case it comes back. See fastlane#30199.
+    def fetch_service_key_from_olympus
       # Fixes issue https://github.com/fastlane/fastlane/issues/13281
       # Even though we are using https://appstoreconnect.apple.com, the service key needs to still use a
       # hostname through itunesconnect.apple.com
@@ -830,10 +847,11 @@ module Spaceship
       # said instead of the real cause.
       #
       # Warn rather than debug. This is the source the key normally comes from,
-      # so failing here means the run is about to depend on an endpoint Apple has
-      # already removed once. If the fallback fails too, its message is all the
-      # caller sees, and this line is the half that says why.
-      logger.warn("Could not read the App Store Connect API key from the sign out redirect, falling back to the olympus endpoint: #{ex.message}")
+      # so failing here means the run is about to depend on a cached key that may
+      # be stale, or on an endpoint Apple has already removed once. If the
+      # fallback fails too, its message is all the caller sees, and this line is
+      # the half that says why.
+      logger.warn("Could not read the App Store Connect API key from the sign out redirect, falling back to the cache or the olympus endpoint: #{ex.message}")
       nil
     end
 

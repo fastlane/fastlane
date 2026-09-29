@@ -29,3 +29,10 @@ If you _always_ want your security sent via SMS to a specific trusted phone numb
 ## Checking if a session is valid
 
 The `--check_session` flag can be passed if you wish to check if the locally stored session for a user is still valid. This is useful for local testing and CI workflows.
+
+## Files _spaceship_ keeps
+
+- The session, in `~/.fastlane/spaceship/<user>/cookie`, or under `SPACESHIP_COOKIE_PATH` when set.
+- The App Store Connect API key used to sign in with an Apple ID, in `spaceship_itc_service_key.txt` in the system temporary directory (Ruby's `Dir.tmpdir`). The key is read from App Store Connect on every sign in, and this file is only used when that fails. Deleting it is always safe.
+
+If signing in, including 2FA, succeeds but App Store Connect then refuses the session, the error says whether the cached key was used. Delete the file and try again.

@@ -103,6 +103,56 @@ describe Spaceship::Client do
     end
   end
 
+  describe "the cached App Store Connect API key" do
+    let(:client) { TestClient.new }
+    let(:signout) { double("connection", head: double("response", headers: { "location" => "https://idmsa.apple.com/appleauth/signout?widgetKey=fresh" })) }
+    let(:cache) { File.join(@dir, "spaceship_itc_service_key.txt") }
+
+    around do |example|
+      Dir.mktmpdir do |dir|
+        @dir = dir
+        example.run
+      end
+    end
+
+    before do
+      allow(client).to receive(:itc_service_key_path).and_return(cache)
+      File.write(cache, "stale")
+    end
+
+    it "is not used when the sign out redirect has a key" do
+      allow(client).to receive(:signout_connection).and_return(signout)
+
+      expect(client.itc_service_key).to eq("fresh")
+      expect(File.read(cache)).to eq("fresh")
+    end
+
+    it "is used when the sign out redirect has none" do
+      allow(client).to receive(:signout_connection).and_raise(Faraday::ConnectionFailed.new("nope"))
+      expect(client).to_not(receive(:request))
+
+      expect(client.itc_service_key).to eq("stale")
+    end
+
+    it "is named when App Store Connect refuses the session after signing in" do
+      allow(client).to receive(:signout_connection).and_raise(Faraday::ConnectionFailed.new("nope"))
+      allow(client).to receive(:fetch_olympus_session).and_raise(Spaceship::UnauthorizedAccessError.new, "Unauthorized Access")
+      client.itc_service_key
+
+      expect { client.send(:fetch_olympus_session_after_signin) }
+        .to raise_error(Spaceship::UnauthorizedAccessError, /cache at #{Regexp.escape(cache)} and may be stale/)
+    end
+
+    it "is not blamed for a refused session when it was not used" do
+      allow(client).to receive(:signout_connection).and_return(signout)
+      allow(client).to receive(:fetch_olympus_session).and_raise(Spaceship::UnauthorizedAccessError.new, "Unauthorized Access")
+      client.itc_service_key
+
+      expect { client.send(:fetch_olympus_session_after_signin) }
+        .to raise_error(Spaceship::UnauthorizedAccessError, "Unauthorized Access")
+    end
+  end
+
   describe "#itc_service_key" do
     # Apple started returning 404 from the key endpoint, and every one of these
     # surfaced as "Service key is empty" wrapped in a timeout. See #30199.
