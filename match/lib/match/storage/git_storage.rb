@@ -7,7 +7,6 @@ module Match
   module Storage
     # Store the code signing identities in a git repo
     class GitStorage < Interface
-      # Branch written into a freshly generated Matchfile when none is given
       DEFAULT_BRANCH = "main"
 
       # User provided values
@@ -165,9 +164,6 @@ module Match
         ].join(" ")
       end
 
-      # `match init` used to leave the branch out of the generated Matchfile, so a new setup
-      # silently fell back to the `git_branch` default of "master". Ask for the branch and
-      # write it out, defaulting to "main" the way new repositories are created these days.
       def generate_matchfile_content
         UI.important("Please create a new, private git repository to store the certificates and profiles there")
         url = UI.input("URL of the Git Repo: ")
