@@ -1,3 +1,5 @@
+require 'security'
+
 require_relative 'ui/ui'
 
 module FastlaneCore
@@ -107,22 +109,22 @@ module FastlaneCore
       private
 
       def decode(path, keychain_path = nil)
+        return decode_with_openssl(path) unless Helper.mac?
+
+        # Verifying the signature imports the signing certificate: into keychain_path, or the default keychain. See fastlane#30186.
+        Security::ProvisioningProfile.decode(path, keychain: keychain_path)
+      rescue Security::Error => e
+        UI.error("Failure to decode #{path}: #{e.message}")
+        ""
+      end
+
+      # `security` only works on Mac, fallback to `openssl`
+      # via https://stackoverflow.com/a/14379814/252627
+      def decode_with_openssl(path)
         require 'tmpdir'
         Dir.mktmpdir('fastlane') do |dir|
           err = "#{dir}/cms.err"
-          # we want to prevent the error output to mix up with the standard output because of
-          # /dev/null: https://github.com/fastlane/fastlane/issues/6387
-          if Helper.mac?
-            if keychain_path.nil?
-              decoded = `security cms -D -i "#{path}" 2> #{err}`
-            else
-              decoded = `security cms -D -i "#{path}" -k "#{keychain_path.shellescape}" 2> #{err}`
-            end
-          else
-            # `security` only works on Mac, fallback to `openssl`
-            # via https://stackoverflow.com/a/14379814/252627
-            decoded = `openssl smime -inform der -verify -noverify -in #{path.shellescape} 2> #{err}`
-          end
+          decoded = `openssl smime -inform der -verify -noverify -in #{path.shellescape} 2> #{err}`
           UI.error("Failure to decode #{path}. Exit: #{$?.exitstatus}: #{File.read(err)}") if $?.exitstatus != 0
           decoded
         end

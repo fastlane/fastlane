@@ -61,3 +61,6 @@ gem "yard", "~> 0.9.44"
 gemspec(path: ".")
 
 eval_gemfile("fastlane/Pluginfile")
+
+# Until the security gem releases what fastlane#30186 needs.
+gem "security", git: "https://github.com/lacostej/security.git", branch: "feat/cms_decode"
