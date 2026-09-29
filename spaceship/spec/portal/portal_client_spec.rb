@@ -493,6 +493,41 @@ the developer website<a/>.<br />"
     end
   end
 
+  describe 'website push api' do
+    let(:response_headers) { { 'Content-Type' => 'application/json' } }
+
+    { false => 'ios', true => 'mac' }.each do |mac, platform|
+      context "on #{platform}" do
+        let(:api_root) { "https://developer.apple.com/services-account/QH65B2/account/#{platform}/identifiers/" }
+
+        describe '#create_website_push!' do
+          it 'sends the name and identifier, and returns the created website push' do
+            stub_request(:post, api_root + 'addWebsitePushId.action').
+              with(body: { name: 'Fastlane Website Push', identifier: 'web.com.fastlane.example', teamId: 'XXXXXXXXXX' }).
+              to_return(status: 200, body: PortalStubbing.adp_read_fixture_file('addWebsitePushId.action.json'), headers: response_headers)
+
+            website_push = subject.create_website_push!('Fastlane Website Push', 'web.com.fastlane.example', mac: mac)
+
+            expect(website_push['websitePushId']).to eq('AXUVGTHPF6')
+            expect(website_push['identifier']).to eq('web.com.fastlane.example')
+          end
+        end
+
+        describe '#delete_website_push!' do
+          it 'sends the website push id' do
+            stub_request(:post, api_root + 'deleteWebsitePushId.action').
+              with(body: { websitePushId: 'R7878HDXC3', teamId: 'XXXXXXXXXX' }).
+              to_return(status: 200, body: PortalStubbing.adp_read_fixture_file('deleteWebsitePushId.action.json'), headers: response_headers)
+
+            response = subject.delete_website_push!('R7878HDXC3', mac: mac)
+
+            expect(response['resultCode']).to eq(0)
+          end
+        end
+      end
+    end
+  end
+
   describe 'merchant api' do
     let(:api_root) { 'https://developer.apple.com/services-account/QH65B2/account/ios/identifiers/' }
     before do

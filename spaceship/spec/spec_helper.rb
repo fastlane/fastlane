@@ -80,11 +80,7 @@ def before_each_spaceship
   PortalStubbing.adp_stub_passbooks
   TunesStubbing.itc_stub_applications
   TunesStubbing.itc_stub_app_versions
-  TunesStubbing.itc_stub_build_trains
-  TunesStubbing.itc_stub_testers
-  TunesStubbing.itc_stub_testflight
   TunesStubbing.itc_stub_app_version_ref
-  TunesStubbing.itc_stub_user_detail
   TunesStubbing.itc_stub_sandbox_testers
   TunesStubbing.itc_stub_create_sandbox_tester
   TunesStubbing.itc_stub_delete_sandbox_tester
@@ -115,7 +111,6 @@ def before_each_spaceship
   ConnectAPIStubbing::TestFlight.stub_beta_build_localizations
   ConnectAPIStubbing::TestFlight.stub_beta_build_metrics
   ConnectAPIStubbing::TestFlight.stub_beta_feedbacks
-  ConnectAPIStubbing::TestFlight.stub_beta_feedbacks_delete
   ConnectAPIStubbing::TestFlight.stub_beta_groups
   ConnectAPIStubbing::TestFlight.stub_beta_testers
   ConnectAPIStubbing::TestFlight.stub_beta_tester_metrics
@@ -150,6 +145,11 @@ RSpec.configure do |config|
     # before and fails on a clean checkout.
     stub_request(:head, "https://appstoreconnect.apple.com/logout")
       .to_return(status: 302, headers: { "Location" => "https://idmsa.apple.com/appleauth/signout?widgetKey=e0abc&asop=destroy-session&asoc=/&rv=3" })
+
+    # The key cache defaults to Dir.tmpdir, shared by every run and worker: keep it per process, and empty
+    key_cache = File.join(FASTLANE_SPEC_SCRATCH, "spaceship_itc_service_key.txt")
+    File.delete(key_cache) if File.exist?(key_cache)
+    allow_any_instance_of(Spaceship::Client).to receive(:itc_service_key_path).and_return(key_cache)
   end
 
   def mock_client_response(method_name, with: anything)
