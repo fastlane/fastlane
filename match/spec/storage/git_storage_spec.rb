@@ -22,6 +22,10 @@ describe Match do
       it "treats a whitespace-only answer as blank" do
         expect(matchfile_content("   ")).to include("git_branch(\"main\")")
       end
+
+      it "trims whitespace around a branch name" do
+        expect(matchfile_content("  certificates  ")).to include("git_branch(\"certificates\")")
+      end
     end
   end
 

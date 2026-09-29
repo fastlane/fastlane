@@ -167,8 +167,8 @@ module Match
       def generate_matchfile_content
         UI.important("Please create a new, private git repository to store the certificates and profiles there")
         url = UI.input("URL of the Git Repo: ")
-        branch = UI.input("Branch of the Git Repo (leave blank to use '#{DEFAULT_BRANCH}'): ")
-        branch = DEFAULT_BRANCH if branch.to_s.strip.empty?
+        branch = UI.input("Branch of the Git Repo (leave blank to use '#{DEFAULT_BRANCH}'): ").to_s.strip
+        branch = DEFAULT_BRANCH if branch.empty?
 
         return "git_url(\"#{url}\")\ngit_branch(\"#{branch}\")"
       end
