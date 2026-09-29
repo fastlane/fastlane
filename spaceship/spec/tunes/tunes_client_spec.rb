@@ -14,6 +14,20 @@ describe Spaceship::TunesClient do
         subject.login('bad-username', 'bad-password')
       end.to raise_exception(Spaceship::Client::InvalidUserCredentialsError, "Invalid username and password combination. Used 'bad-username' as the username.")
     end
+
+    it 'names the cached API key when App Store Connect refuses the session after signing in' do
+      Dir.mktmpdir do |dir|
+        cache = File.join(dir, "spaceship_itc_service_key.txt")
+        File.write(cache, "e0abc")
+        allow_any_instance_of(Spaceship::Client).to receive(:itc_service_key_path).and_return(cache)
+        stub_request(:head, "https://appstoreconnect.apple.com/logout").to_timeout
+        stub_request(:get, "https://appstoreconnect.apple.com/olympus/v1/session").to_return(status: 401)
+
+        expect do
+          subject.login('spaceship@krausefx.com', 'so_secret')
+        end.to raise_exception(Spaceship::UnauthorizedAccessError, /came from the cache at .* and may be stale/)
+      end
+    end
   end
 
   describe 'client' do
