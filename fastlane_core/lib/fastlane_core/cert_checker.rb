@@ -1,5 +1,6 @@
 require 'tempfile'
 require 'openssl'
+require 'security'
 
 require_relative 'features'
 require_relative 'helper'
@@ -74,9 +75,8 @@ module FastlaneCore
     def self.installed_identities(in_keychain: nil)
       install_missing_wwdr_certificates(in_keychain: in_keychain)
 
-      available = list_available_identities(in_keychain: in_keychain)
-      # Match for this text against word boundaries to avoid edge cases around multiples of 10 identities!
-      if /\b0 valid identities found\b/ =~ available
+      identities = available_identities(in_keychain: in_keychain)
+      if identities.empty?
         UI.error([
           "There are no local code signing identities found.",
           "You can run" << " `security find-identity -v -p codesigning #{in_keychain}".rstrip << "` to get this output.",
@@ -85,17 +85,7 @@ module FastlaneCore
         ].join("\n"))
       end
 
-      ids = []
-      available.split("\n").each do |current|
-        next if current.include?("REVOKED")
-        begin
-          (ids << current.match(/.*\) ([[:xdigit:]]*) \".*/)[1])
-        rescue
-          # the last line does not match
-        end
-      end
-
-      return ids
+      identities.reject { |identity| identity.status.to_s.include?("REVOKED") }.map(&:sha1)
     end
 
     def self.installed_installers(in_keychain: nil)
@@ -105,12 +95,11 @@ module FastlaneCore
       return available.scan(/^SHA-1 hash: ([[:xdigit:]]+)$/).flatten
     end
 
-    def self.list_available_identities(in_keychain: nil)
-      # -v  Show valid identities only (default is to show all identities)
-      # -p  Specify policy to evaluate
-      commands = ['security find-identity -v -p codesigning']
-      commands << in_keychain if in_keychain
-      `#{commands.join(' ')}`
+    def self.available_identities(in_keychain: nil)
+      Security::Identity.find(keychain: in_keychain)
+    rescue Security::Error => e
+      UI.error("Could not list the code signing identities: #{e.message}")
+      []
     end
 
     def self.list_available_third_party_mac_installer(in_keychain: nil)
