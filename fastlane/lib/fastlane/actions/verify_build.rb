@@ -1,4 +1,5 @@
 require 'plist'
+require 'security'
 
 module Fastlane
   module Actions
@@ -9,7 +10,7 @@ module Fastlane
 
           values = self.gather_cert_info(app_path)
 
-          values = self.update_with_profile_info(app_path, values)
+          values = self.update_with_profile_info(app_path, values, keychain_path: params[:keychain_path])
 
           self.print_values(values)
 
@@ -65,12 +66,15 @@ module Fastlane
         values
       end
 
-      def self.update_with_profile_info(app_path, values)
+      def self.update_with_profile_info(app_path, values, keychain_path: nil)
         provision_profile_path = "#{app_path}/embedded.mobileprovision"
         UI.user_error!("Unable to find embedded profile in #{provision_profile_path}") unless File.exist?(provision_profile_path)
 
-        profile = `cat #{provision_profile_path.shellescape} | security cms -D`
-        UI.user_error!("Unable to extract profile") unless $? == 0
+        begin
+          profile = Security::ProvisioningProfile.decode(provision_profile_path, keychain: keychain_path)
+        rescue Security::Error => e
+          UI.user_error!("Unable to extract profile: #{e.message}")
+        end
 
         plist = Plist.parse_xml(profile)
 
@@ -167,6 +171,10 @@ module Fastlane
                                        env_name: "FL_VERIFY_BUILD_BUILD_PATH",
                                        description: "Explicitly set the ipa, app or xcarchive path",
                                        conflicting_options: [:ipa_path],
+                                       optional: true),
+          FastlaneCore::ConfigItem.new(key: :keychain_path,
+                                       env_name: "FL_VERIFY_BUILD_KEYCHAIN_PATH",
+                                       description: "The keychain that decoding the embedded provisioning profile imports its signing certificate into. Defaults to the user's default keychain",
                                        optional: true)
         ]
       end

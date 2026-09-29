@@ -26,9 +26,15 @@ describe Fastlane do
         }
       end
 
+      # `security cms -D` would import the fixture's signing certificate into the default keychain. See fastlane#30186.
+      def decode_without_keychain(path)
+        `openssl smime -inform der -verify -noverify -in #{path.shellescape} 2>/dev/null`
+      end
+
       before(:each) do
         Fastlane::Actions.lane_context[Fastlane::Actions::SharedValues::IPA_OUTPUT_PATH] = nil
         allow(FastlaneCore::UI).to receive(:success).with("Driving the lane 'test' 🚀")
+        allow(Security::ProvisioningProfile).to receive(:decode) { |path, **| decode_without_keychain(path) }
       end
 
       if FastlaneCore::Helper.mac?
@@ -40,6 +46,27 @@ describe Fastlane do
           Fastlane::FastFile.new.parse("lane :test do
             verify_build
           end").runner.execute(:test)
+        end
+
+        it "decodes the profile into the keychain it is given" do
+          expect(Security::ProvisioningProfile).to receive(:decode)
+            .with(end_with("very-capable-app.app/embedded.mobileprovision"), keychain: "/a b.keychain-db") { |path, **| decode_without_keychain(path) }
+          allow(FastlaneCore::PrintTable).to receive(:print_values)
+          expect(FastlaneCore::UI).to receive(:success).with("Build is verified, have a 🍪.")
+
+          Fastlane::FastFile.new.parse("lane :test do
+            verify_build(build_path: '#{correctly_signed_app}', keychain_path: '/a b.keychain-db')
+          end").runner.execute(:test)
+        end
+
+        it "reports a profile security cannot decode" do
+          allow(Security::ProvisioningProfile).to receive(:decode).and_raise(Security::Error.new(1, "security: failed to decode message\n"))
+
+          expect do
+            Fastlane::FastFile.new.parse("lane :test do
+              verify_build(build_path: '#{correctly_signed_app}')
+            end").runner.execute(:test)
+          end.to raise_error("Unable to extract profile: security: failed to decode message (status 1)")
         end
 
         it "uses ipa set via ipa_path" do
