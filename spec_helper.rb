@@ -6,7 +6,10 @@ unless ENV["FASTLANE_SKIP_UPDATE_CHECK"]
   require "simplecov"
   # rake test_parallel names each worker: SimpleCov merges results by name, so with one name they overwrite each other
   SimpleCov.command_name("rspec-worker-#{ENV['FASTLANE_SPEC_WORKER']}") if ENV["FASTLANE_SPEC_WORKER"]
-  SimpleCov.start { add_filter("vendor") }
+  SimpleCov.start do
+    add_filter("vendor")
+    add_filter("/spec/")
+  end
 end
 
 require "webmock/rspec"
