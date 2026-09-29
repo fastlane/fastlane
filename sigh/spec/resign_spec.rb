@@ -1,11 +1,11 @@
 describe Sigh do
   describe Sigh::Resign do
     IDENTITY_1_NAME = "iPhone Developer: ed.belarus@gmail.com (ABCDEFGHIJ)"
-    IDENTITY_1_SHA1 = "T123XXXXXXXXXXXXXYYYYYYYYYYYYYYYYYYYYYYY"
+    IDENTITY_1_SHA1 = "A123000000000000000BBBBBBBBBBBBBBBBBBBBB"
     IDENTITY_2_NAME = "iPhone Distribution: Some Company LLC  (F12345678F)"
-    IDENTITY_2_SHA1 = "TXXXZZZ123456789098765432101234567890987"
+    IDENTITY_2_SHA1 = "ACCCDDD123456789098765432101234567890987"
     IDENTITY_3_NAME = "iPhone Distribution: Some Company LLC  (F12345678F)"
-    IDENTITY_3_SHA1 = "TB67GKJDDWEHHKEYW67G6DK8654HF6AZMJDG875D"
+    IDENTITY_3_SHA1 = "EB67FCBDDAEBBCE9767F6DC8654AF6ACDBDF875D"
     VALID_IDENTITIES_OUTPUT = "
 1) #{IDENTITY_1_SHA1} \"#{IDENTITY_1_NAME}\"
 2) #{IDENTITY_2_SHA1} \"#{IDENTITY_2_NAME}\"
@@ -34,7 +34,7 @@ describe Sigh do
     end
 
     it "Installed identities parser" do
-      stub_request_valid_identities(@resign, VALID_IDENTITIES_OUTPUT)
+      stub_valid_identities(VALID_IDENTITIES_OUTPUT)
       actualresult = @resign.installed_identities
       expect(actualresult.keys.count).to eq(3)
       expect(actualresult[IDENTITY_1_SHA1]).to eq(IDENTITY_1_NAME)
@@ -43,14 +43,14 @@ describe Sigh do
     end
 
     it "Installed identities descriptions" do
-      stub_request_valid_identities(@resign, VALID_IDENTITIES_OUTPUT)
+      stub_valid_identities(VALID_IDENTITIES_OUTPUT)
       actualresult = @resign.installed_identity_descriptions
       result = [IDENTITY_1_NAME, "\t#{IDENTITY_1_SHA1}", IDENTITY_2_NAME, "\t#{IDENTITY_2_SHA1}", "\t#{IDENTITY_3_SHA1}"]
       expect(actualresult).to eq(result)
     end
 
     it "SHA1 for identity with name input" do
-      stub_request_valid_identities(@resign, VALID_IDENTITIES_OUTPUT)
+      stub_valid_identities(VALID_IDENTITIES_OUTPUT)
       actualresult = @resign.sha1_for_signing_identity(IDENTITY_3_NAME)
       # due to order of of identities in the VALID_IDENTITIES_OUTPUT and since names of identities 2) and 3) are equal
       # sha1_for_signing_identity(name) returns first matching SHA1 for identity name
@@ -58,7 +58,7 @@ describe Sigh do
     end
 
     it "SHA1 for identity with SHA1 input" do
-      stub_request_valid_identities(@resign, VALID_IDENTITIES_OUTPUT)
+      stub_valid_identities(VALID_IDENTITIES_OUTPUT)
       actualresult = @resign.sha1_for_signing_identity(IDENTITY_1_SHA1)
       expect(actualresult).to eq(IDENTITY_1_SHA1)
     end
