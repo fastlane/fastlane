@@ -7,6 +7,8 @@ module Match
   module Storage
     # Store the code signing identities in a git repo
     class GitStorage < Interface
+      DEFAULT_BRANCH = "main"
+
       # User provided values
       attr_accessor :git_url
       attr_accessor :shallow_clone
@@ -165,8 +167,10 @@ module Match
       def generate_matchfile_content
         UI.important("Please create a new, private git repository to store the certificates and profiles there")
         url = UI.input("URL of the Git Repo: ")
+        branch = UI.input("Branch of the Git Repo (leave blank to use '#{DEFAULT_BRANCH}'): ").to_s.strip
+        branch = DEFAULT_BRANCH if branch.empty?
 
-        return "git_url(\"#{url}\")"
+        return "git_url(\"#{url}\")\ngit_branch(\"#{branch}\")"
       end
 
       def list_files(file_name: "", file_ext: "")

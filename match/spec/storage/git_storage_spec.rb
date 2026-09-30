@@ -2,6 +2,34 @@ require_relative 'git_storage_spec_helper'
 
 describe Match do
   describe Match::Storage::GitStorage do
+    describe '#generate_matchfile_content' do
+      let(:git_url) { "https://github.com/fastlane/fastlane" }
+
+      def matchfile_content(branch_input)
+        allow(FastlaneCore::UI.ui_object).to receive(:important)
+        allow(FastlaneCore::UI.ui_object).to receive(:input).and_return(git_url, branch_input)
+        described_class.new.generate_matchfile_content
+      end
+
+      it "records the branch so a new setup does not silently fall back to master" do
+        expect(matchfile_content("")).to eq("git_url(\"#{git_url}\")\ngit_branch(\"main\")")
+      end
+
+      it "keeps a branch typed by the user" do
+        expect(matchfile_content("certificates")).to include("git_branch(\"certificates\")")
+      end
+
+      it "treats a whitespace-only answer as blank" do
+        expect(matchfile_content("   ")).to include("git_branch(\"main\")")
+      end
+
+      it "trims whitespace around a branch name" do
+        expect(matchfile_content("  certificates  ")).to include("git_branch(\"certificates\")")
+      end
+    end
+  end
+
+  describe Match::Storage::GitStorage do
 
     let(:git_url) { "https://github.com/fastlane/fastlane/tree/master/certificates" }
     let(:git_branch) { "test" }
