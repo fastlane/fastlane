@@ -1,6 +1,7 @@
 require 'yaml'
+require 'open3'
 
-# The minimum Ruby is written in several files; this fails the change that raises it until they all follow.
+# Fastlane::MINIMUM_RUBY is the minimum Ruby; this fails a change that leaves a copy of it, CI or the executable behind.
 describe "Ruby versions" do
   root = File.expand_path("..", __dir__)
 
@@ -34,7 +35,24 @@ describe "Ruby versions" do
     end
   end
 
-  it "targets the minimum Ruby in .rubocop.yml" do
+  it "tests the minimum Ruby itself" do
+    pinned = Dir[File.join(root, ".github", "workflows", "*.yml")].flat_map { |workflow| pinned_rubies(YAML.load_file(workflow)) }
+
+    expect(pinned.map { |version| Gem::Version.new(version) }).to include(minimum_version(requirement))
+  end
+
+  it "states Fastlane::MINIMUM_RUBY in fastlane.gemspec" do
+    expect(requirement).to eq(Gem::Requirement.new(">= #{Fastlane::MINIMUM_RUBY}"))
+  end
+
+  it "has bin/fastlane refuse a Ruby below Fastlane::MINIMUM_RUBY" do
+    raise_minimum = 'require "fastlane/version"; Fastlane.send(:remove_const, :MINIMUM_RUBY); Fastlane::MINIMUM_RUBY = "99.0.0"; load ARGV.first'
+    output, status = Open3.capture2e(RbConfig.ruby, "-I", File.join(root, "fastlane", "lib"), "-e", raise_minimum, File.join(root, "bin", "fastlane"))
+
+    expect([status.exitstatus, output.strip]).to eq([1, "fastlane requires Ruby 99.0.0 or higher"])
+  end
+
+  it "targets Fastlane::MINIMUM_RUBY in .rubocop.yml" do
     target = YAML.load_file(File.join(root, ".rubocop.yml")).dig("AllCops", "TargetRubyVersion")
 
     expect(Gem::Version.new(target.to_s)).to eq(minimum_version(requirement))
@@ -42,20 +60,20 @@ describe "Ruby versions" do
 
   describe "the plugin template" do
     template = File.join(root, "fastlane", "lib", "fastlane", "plugins", "template")
+    let(:workflow) { YAML.load_file(File.join(template, ".github", "workflows", "test.yml")) }
 
-    let(:template_requirement) do
-      Gem::Requirement.new(File.read(File.join(template, "%gem_name%.gemspec.erb"))[/required_ruby_version = '([^']+)'/, 1])
+    it "requires fastlane's minimum Ruby" do
+      expect(File.read(File.join(template, "%gem_name%.gemspec.erb"))).to include("spec.required_ruby_version = '>= <%= Fastlane::MINIMUM_RUBY %>'")
     end
 
-    it "requires the same minimum Ruby as fastlane" do
-      expect(template_requirement).to eq(requirement)
+    it "only tests Rubies fastlane supports" do
+      too_old = pinned_rubies(workflow).reject { |version| requirement.satisfied_by?(Gem::Version.new(version)) }
+
+      expect(too_old).to be_empty, "the plugin template's test.yml pins #{too_old.uniq.join(', ')}, below #{requirement}"
     end
 
-    it "only tests Rubies its gemspec supports" do
-      workflow = File.join(template, ".github", "workflows", "test.yml")
-      too_old = pinned_rubies(YAML.load_file(workflow)).reject { |version| template_requirement.satisfied_by?(Gem::Version.new(version)) }
-
-      expect(too_old).to be_empty, "the plugin template's test.yml pins #{too_old.uniq.join(', ')}, below its gemspec's #{template_requirement}"
+    it "tests the minimum Ruby itself" do
+      expect(pinned_rubies(workflow).map { |version| Gem::Version.new(version) }).to include(minimum_version(requirement))
     end
   end
 end
