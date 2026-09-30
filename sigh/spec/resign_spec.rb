@@ -57,6 +57,35 @@ describe Sigh do
       expect(actualresult).to eq(IDENTITY_2_SHA1)
     end
 
+    describe "with a keychain_path" do
+      let(:login) { File.expand_path("~/Library/Keychains/login.keychain-db") }
+      let(:search_lists) { [] }
+
+      before do
+        allow(Security::Keychain).to receive(:list).with(:user).and_return([Security::Keychain.new(login)])
+        allow(Security::Keychain).to receive(:set_search_list) { |keychains| search_lists << keychains }
+        allow(@resign).to receive(:find_resign_path).and_return("/resign.sh")
+        # Stop once the search list is set, before resign.sh would run.
+        allow(@resign).to receive(:find_signing_identity).and_raise("stop")
+      end
+
+      def resign_with_keychain(keychain_path)
+        @resign.resign("a.ipa", "identity", "a.mobileprovision", nil, nil, nil, nil, nil, nil, nil, keychain_path)
+      end
+
+      it "adds the keychain to the search list, then restores it" do
+        expect { resign_with_keychain("/a b/ci.keychain-db") }.to raise_error("stop")
+
+        expect(search_lists).to eq([[login, File.expand_path("/a b/ci.keychain-db")], [login]])
+      end
+
+      it "leaves the search list alone when the keychain is already in it" do
+        expect { resign_with_keychain(login) }.to raise_error("stop")
+
+        expect(search_lists).to be_empty
+      end
+    end
+
     it "SHA1 for identity with SHA1 input" do
       stub_valid_identities(VALID_IDENTITIES_OUTPUT)
       actualresult = @resign.sha1_for_signing_identity(IDENTITY_1_SHA1)
