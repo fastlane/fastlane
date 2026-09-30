@@ -55,7 +55,7 @@ describe FastlaneCore do
       it "should return installed certificate's alias" do
         expect(FastlaneCore::CertChecker).to receive(:wwdr_keychain).and_return('login.keychain')
 
-        allow(FastlaneCore::Helper).to receive(:backticks).with(/security find-certificate/, { print: false }).and_return("-----BEGIN CERTIFICATE-----\nG6\n-----END CERTIFICATE-----\n")
+        allow(Security::Certificate).to receive(:find).and_return([instance_double(Security::Certificate, pem: "-----BEGIN CERTIFICATE-----\nG6\n-----END CERTIFICATE-----\n")])
 
         allow(Digest::SHA256).to receive(:hexdigest).with(cert.to_der).and_return('bdd4ed6e74691f0c2bfd01be0296197af1379e0418e2d300efa9c3bef642ca30')
         allow(OpenSSL::X509::Certificate).to receive(:new).and_return(cert)
@@ -66,7 +66,7 @@ describe FastlaneCore do
       it "should return an empty array if unknown WWDR certificates are found" do
         expect(FastlaneCore::CertChecker).to receive(:wwdr_keychain).and_return('login.keychain')
 
-        allow(FastlaneCore::Helper).to receive(:backticks).with(/security find-certificate/, { print: false }).and_return("-----BEGIN CERTIFICATE-----\nG6\n-----END CERTIFICATE-----\n")
+        allow(Security::Certificate).to receive(:find).and_return([instance_double(Security::Certificate, pem: "-----BEGIN CERTIFICATE-----\nG6\n-----END CERTIFICATE-----\n")])
 
         allow(OpenSSL::X509::Certificate).to receive(:new).and_return(cert)
 
@@ -76,13 +76,33 @@ describe FastlaneCore do
       it "should find Developer ID certificates by their own common name" do
         expect(FastlaneCore::CertChecker).to receive(:wwdr_keychain).and_return('login.keychain')
 
-        expect(FastlaneCore::Helper).to receive(:backticks).with(/security find-certificate -a -c 'Apple Worldwide Developer Relations'/, { print: false }).and_return("")
-        expect(FastlaneCore::Helper).to receive(:backticks).with(/security find-certificate -a -c 'Developer ID Certification Authority'/, { print: false }).and_return("-----BEGIN CERTIFICATE-----\nDEV-ID-G2\n-----END CERTIFICATE-----\n")
+        expect(Security::Certificate).to receive(:find).with(name: 'Apple Worldwide Developer Relations', keychain: 'login.keychain').and_return([])
+        expect(Security::Certificate).to receive(:find).with(name: 'Developer ID Certification Authority', keychain: 'login.keychain')
+                                                       .and_return([instance_double(Security::Certificate, pem: "-----BEGIN CERTIFICATE-----\nDEV-ID-G2\n-----END CERTIFICATE-----\n")])
 
         allow(Digest::SHA256).to receive(:hexdigest).with(cert.to_der).and_return('f16cd3c54c7f83cea4bf1a3e6a0819c8aaa8e4a1528fd144715f350643d2df3a')
         allow(OpenSSL::X509::Certificate).to receive(:new).and_return(cert)
 
         expect(FastlaneCore::CertChecker.installed_wwdr_certificates).to eq(['DEV-ID-G2'])
+      end
+    end
+
+    describe '#installed_installers' do
+      it 'should list the SHA-1 of both kinds of installer certificates in the keychain' do
+        expect(Security::Certificate).to receive(:find).with(name: "3rd Party Mac Developer Installer", keychain: "/a b.keychain-db")
+                                                       .and_return([instance_double(Security::Certificate, sha1: "AAAA")])
+        expect(Security::Certificate).to receive(:find).with(name: "Developer ID Installer", keychain: "/a b.keychain-db")
+                                                       .and_return([instance_double(Security::Certificate, sha1: "BBBB")])
+
+        expect(FastlaneCore::CertChecker.installed_installers(in_keychain: "/a b.keychain-db")).to eq(["AAAA", "BBBB"])
+      end
+
+      it 'should report a keychain it cannot search, and treat it as holding none' do
+        allow(Security::Certificate).to receive(:find).and_raise(Security::Error.new(50, "security: not allowed\n"))
+        expect(FastlaneCore::UI).to receive(:error).with("Could not search for '3rd Party Mac Developer Installer' certificates: security: not allowed (status 50)")
+        expect(FastlaneCore::UI).to receive(:error).with("Could not search for 'Developer ID Installer' certificates: security: not allowed (status 50)")
+
+        expect(FastlaneCore::CertChecker.installed_installers).to eq([])
       end
     end
 
@@ -136,12 +156,10 @@ describe FastlaneCore do
 
     describe 'shell escaping' do
       let(:keychain_name) { "keychain with spaces.keychain" }
-      let(:shell_escaped_name) { keychain_name.shellescape }
-      let(:name_regex) { Regexp.new(Regexp.escape(shell_escaped_name)) }
 
-      it 'should shell escape keychain names when checking for installation' do
+      it 'should pass keychain names with spaces as they are when checking for installation' do
         expect(FastlaneCore::CertChecker).to receive(:wwdr_keychain).and_return(keychain_name)
-        expect(FastlaneCore::Helper).to receive(:backticks).with(name_regex, { print: false }).twice.and_return("")
+        expect(Security::Certificate).to receive(:find).with(name: anything, keychain: keychain_name).twice.and_return([])
 
         FastlaneCore::CertChecker.installed_wwdr_certificates
       end
