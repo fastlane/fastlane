@@ -1,7 +1,9 @@
 #!/usr/bin/env ruby
 
-if RUBY_VERSION < '3.2.0'
-  abort("fastlane requires Ruby 3.2.0 or higher")
+require "fastlane/version"
+
+if Gem::Version.new(RUBY_VERSION) < Gem::Version.new(Fastlane::MINIMUM_RUBY)
+  abort("fastlane requires Ruby #{Fastlane::MINIMUM_RUBY} or higher")
 end
 
 def self.windows?

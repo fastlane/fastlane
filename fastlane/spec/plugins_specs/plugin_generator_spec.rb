@@ -240,6 +240,7 @@ describe Fastlane::PluginGenerator do
 
         expect(gemspec.name).to eq(gem_name)
         expect(gemspec.author).to eq(author)
+        expect(gemspec.required_ruby_version).to eq(Gem::Requirement.new(">= #{Fastlane::MINIMUM_RUBY}"))
         expect(gemspec.version).to eq(Gem::Version.new('0.1.0'))
         expect(gemspec.email).to eq(email)
         expect(gemspec.summary).to eq(summary)
