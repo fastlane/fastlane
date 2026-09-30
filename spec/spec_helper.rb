@@ -85,6 +85,20 @@ ENV_GUARD_LOAD_TIME = ((env_guard_loaded.keys - env_guard_pristine.keys) |
                          .reject { |key| env_guard_loaded[key] == env_guard_pristine[key] }).sort.freeze
 
 my_main = self
+# `security` subcommands that change the developer's keychains, which a spec must never run for real. See fastlane#30186.
+# cms is one: decoding a profile imports its signing certificate into a keychain.
+KEYCHAIN_CHANGING_SUBCOMMANDS = %w[
+  cms create-keychain delete-keychain unlock-keychain set-keychain-settings import set-key-partition-list
+  add-generic-password delete-generic-password add-internet-password delete-internet-password
+].freeze
+
+def keychain_changing?(command)
+  program, subcommand, *arguments = command
+  return false unless program == "security"
+
+  KEYCHAIN_CHANGING_SUBCOMMANDS.include?(subcommand) || (%w[list-keychains default-keychain].include?(subcommand) && arguments.include?("-s"))
+end
+
 RSpec.configure do |config|
   # Singleton guard, see fastlane#30184.
   #
@@ -277,6 +291,12 @@ RSpec.configure do |config|
     # We don't want to call the RubyGems API at any point
     # This was a request that was added with Ruby 2.4.0
     allow(Fastlane::FastlaneRequire).to receive(:install_gem_if_needed).and_return(nil)
+
+    allow(Security::Command).to receive(:run).and_wrap_original do |run, *command|
+      raise "A spec ran `#{command.join(' ')}`, which changes the developer's keychains: stub the security gem call instead" if keychain_changing?(command)
+
+      run.call(*command)
+    end
 
     ENV['FASTLANE_PLATFORM_NAME'] = nil
 
