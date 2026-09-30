@@ -26,12 +26,11 @@ module Sigh
       if keychain_path
         keychain_path_absolute = File.expand_path(keychain_path)
 
-        current_keychains = `security list-keychains`
-        current_keychains.delete!("\n")
+        current_keychains = Security::Keychain.list(:user).map(&:filename)
 
         unless current_keychains.include?(keychain_path_absolute)
           previous_keychains = current_keychains
-          `security list-keychains -s #{current_keychains} '#{keychain_path_absolute}'`
+          Security::Keychain.set_search_list(current_keychains + [keychain_path_absolute])
         end
       end
 
@@ -85,7 +84,7 @@ module Sigh
         false
       end
     ensure
-      `security list-keychains -s #{previous_keychains}` if previous_keychains
+      Security::Keychain.set_search_list(previous_keychains) if previous_keychains
     end
 
     def get_inputs(options, args)
