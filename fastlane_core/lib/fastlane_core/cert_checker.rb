@@ -142,7 +142,7 @@ module FastlaneCore
       file = Tempfile.new([File.basename(url, ".cer"), ".cer"])
       filename = file.path
       keychain ||= wwdr_keychain # backwards compatibility
-      keychain = "-k #{keychain.shellescape}" unless keychain.empty?
+      UI.user_error!("Could not install WWDR certificate: no keychain found to install it into") if keychain.empty?
 
       # Attempts to fix an issue installing WWDR cert tends to fail on CIs
       # https://github.com/fastlane/fastlane/issues/20960
@@ -151,40 +151,37 @@ module FastlaneCore
         curl_extras = "--http1.1 --retry 3 --retry-all-errors "
       end
 
-      import_command = "curl #{curl_extras}-f -o #{filename} #{url} && security import #{filename} #{keychain}"
-      UI.verbose("Installing WWDR Cert: #{import_command}")
+      download_command = "curl #{curl_extras}-f -o #{filename} #{url}"
+      UI.verbose("Downloading WWDR Cert: #{download_command}")
 
       require 'open3'
-      stdout, stderr, status = Open3.capture3(import_command)
+      stdout, stderr, status = Open3.capture3(download_command)
       if FastlaneCore::Globals.verbose?
         UI.command_output(stdout)
         UI.command_output(stderr)
       end
+      UI.user_error!("Could not download WWDR certificate") unless status.success?
 
-      unless status.success?
-        UI.verbose("Failed to install WWDR Certificate, checking output to see why")
-        # Check the command output, WWDR might already exist
-        unless /The specified item already exists in the keychain./ =~ stderr
-          UI.user_error!("Could not install WWDR certificate")
-        end
+      begin
+        Security::Certificate.import(filename, keychain: keychain, trusted_applications: [])
+      rescue Security::DuplicateItemError
         UI.verbose("WWDR Certificate was already installed")
+      rescue Security::Error => e
+        UI.user_error!("Could not install WWDR certificate: #{e.message}")
       end
       return true
     end
 
     def self.wwdr_keychain
-      priority = [
-        "security default-keychain -d user",
-        "security list-keychains -d user"
-      ]
-      priority.each do |command|
-        keychains = Helper.backticks(command, print: FastlaneCore::Globals.verbose?).split("\n")
-        unless keychains.empty?
-          # Select first keychain name from returned keychains list
-          return keychains[0].strip.tr('"', '')
-        end
+      keychain = begin
+        Security::Keychain.default_keychain
+      rescue Security::Error
+        nil
       end
-      return ""
+      keychain ||= Security::Keychain.list(:user).first
+      keychain ? keychain.filename : ""
+    rescue Security::Error
+      ""
     end
 
     def self.sha1_fingerprint(path)

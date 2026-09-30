@@ -130,6 +130,7 @@ describe FastlaneCore do
 
       it 'should download the WWDR certificate from correct URL' do
         allow(FastlaneCore::CertChecker).to receive(:wwdr_keychain).and_return('login.keychain')
+        allow(Security::Certificate).to receive(:import).and_return(true)
 
         expect(Open3).to receive(:capture3).with(include('https://www.apple.com/certificateauthority/AppleWWDRCAG2.cer')).and_return(["", "", success_status])
         FastlaneCore::CertChecker.install_wwdr_certificate('G2')
@@ -154,6 +155,54 @@ describe FastlaneCore do
       end
     end
 
+    describe '#install_wwdr_certificate' do
+      before do
+        allow(Open3).to receive(:capture3).and_return(["", "", success_status])
+      end
+
+      it 'should accept a certificate that is already installed' do
+        allow(Security::Certificate).to receive(:import).and_raise(Security::DuplicateItemError.new(1, "security: SecKeychainItemImport: The specified item already exists in the keychain.\n"))
+
+        expect(FastlaneCore::CertChecker.install_wwdr_certificate('G6', keychain: 'login.keychain')).to be(true)
+      end
+
+      it 'should fail when the certificate cannot be imported' do
+        allow(Security::Certificate).to receive(:import).and_raise(Security::Error.new(1, "security: SecKeychainItemImport: The specified keychain could not be found.\n"))
+
+        expect { FastlaneCore::CertChecker.install_wwdr_certificate('G6', keychain: 'login.keychain') }.to raise_error("Could not install WWDR certificate: security: SecKeychainItemImport: The specified keychain could not be found. (status 1)")
+      end
+
+      it 'should fail when the certificate cannot be downloaded, without importing' do
+        failed = double(success?: false)
+        allow(Open3).to receive(:capture3).and_return(["", "curl: (22) 404", failed])
+        expect(Security::Certificate).not_to receive(:import)
+
+        expect { FastlaneCore::CertChecker.install_wwdr_certificate('G6', keychain: 'login.keychain') }.to raise_error("Could not download WWDR certificate")
+      end
+    end
+
+    describe '#wwdr_keychain' do
+      it 'should prefer the default keychain' do
+        allow(Security::Keychain).to receive(:default_keychain).and_return(Security::Keychain.new("/a/login.keychain-db"))
+
+        expect(FastlaneCore::CertChecker.wwdr_keychain).to eq("/a/login.keychain-db")
+      end
+
+      it 'should fall back to the first keychain in the search list' do
+        allow(Security::Keychain).to receive(:default_keychain).and_raise(Security::Error.new(50, "security: SecKeychainCopyDefault: A default keychain could not be found.\n"))
+        allow(Security::Keychain).to receive(:list).with(:user).and_return([Security::Keychain.new("/a/other.keychain-db")])
+
+        expect(FastlaneCore::CertChecker.wwdr_keychain).to eq("/a/other.keychain-db")
+      end
+
+      it 'should answer an empty string when there is no keychain at all' do
+        allow(Security::Keychain).to receive(:default_keychain).and_raise(Security::Error.new(50, "security: SecKeychainCopyDefault: A default keychain could not be found.\n"))
+        allow(Security::Keychain).to receive(:list).with(:user).and_return([])
+
+        expect(FastlaneCore::CertChecker.wwdr_keychain).to eq("")
+      end
+    end
+
     describe 'shell escaping' do
       let(:keychain_name) { "keychain with spaces.keychain" }
 
@@ -170,10 +219,11 @@ describe FastlaneCore do
           `ls`
 
           keychain = "keychain with spaces.keychain"
-          cmd = %r{curl -f -o (([A-Z]\:)?\/.+\.cer) https://www\.apple\.com/certificateauthority/AppleWWDRCAG6\.cer && security import \1 -k #{Regexp.escape(keychain.shellescape)}}
+          cmd = %r{\Acurl -f -o (([A-Z]\:)?\/.+\.cer) https://www\.apple\.com/certificateauthority/AppleWWDRCAG6\.cer\z}
           require "open3"
 
           expect(Open3).to receive(:capture3).with(cmd).and_return(["", "", success_status])
+          expect(Security::Certificate).to receive(:import).with(end_with(".cer"), keychain: keychain, trusted_applications: []).and_return(true)
           expect(FastlaneCore::CertChecker).to receive(:wwdr_keychain).and_return(keychain_name)
 
           allow(FastlaneCore::CertChecker).to receive(:installed_wwdr_certificates).and_return(['G2', 'G3', 'G4', 'G5', 'DEV-ID-G1', 'DEV-ID-G2'])
@@ -187,10 +237,11 @@ describe FastlaneCore do
           stub_const('ENV', { "FASTLANE_WWDR_USE_HTTP1_AND_RETRIES" => "true" })
 
           keychain = "keychain with spaces.keychain"
-          cmd = %r{curl --http1.1 --retry 3 --retry-all-errors -f -o (([A-Z]\:)?\/.+\.cer) https://www\.apple\.com/certificateauthority/AppleWWDRCAG6\.cer && security import \1 -k #{Regexp.escape(keychain.shellescape)}}
+          cmd = %r{\Acurl --http1.1 --retry 3 --retry-all-errors -f -o (([A-Z]\:)?\/.+\.cer) https://www\.apple\.com/certificateauthority/AppleWWDRCAG6\.cer\z}
           require "open3"
 
           expect(Open3).to receive(:capture3).with(cmd).and_return(["", "", success_status])
+          expect(Security::Certificate).to receive(:import).with(end_with(".cer"), keychain: keychain, trusted_applications: []).and_return(true)
           expect(FastlaneCore::CertChecker).to receive(:wwdr_keychain).and_return(keychain_name)
 
           allow(FastlaneCore::CertChecker).to receive(:installed_wwdr_certificates).and_return(['G2', 'G3', 'G4', 'G5', 'DEV-ID-G1', 'DEV-ID-G2'])
