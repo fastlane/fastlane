@@ -57,6 +57,21 @@ module FastlaneCore
       !self.bundler? && !self.contained_fastlane? && !self.homebrew? && !self.mac_app?
     end
 
+    # How this fastlane was installed, as reported to analytics and printed at startup
+    def self.install_method
+      if self.bundler?
+        'bundler'
+      elsif self.contained_fastlane?
+        'standalone'
+      elsif self.homebrew?
+        'homebrew'
+      elsif self.mac_app?
+        'mac_app'
+      else
+        'gem'
+      end
+    end
+
     # environment
     #
 

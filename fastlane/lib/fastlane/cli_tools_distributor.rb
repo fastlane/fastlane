@@ -182,21 +182,12 @@ module Fastlane
 
       # Which fastlane a log comes from: `fastlane env`, run later by hand, can describe another install. See #29938.
       def print_running_version
-        source = if FastlaneCore::Helper.bundler?
-                   "Bundler"
-                 elsif FastlaneCore::Helper.homebrew?
-                   "Homebrew"
-                 elsif FastlaneCore::Helper.contained_fastlane?
-                   "self-contained"
-                 elsif FastlaneCore::Helper.mac_app?
-                   "Fabric.app"
-                 else
-                   "RubyGems"
-                 end
+        source = FastlaneCore::Helper.install_method
         if ARGV.include?("--verbose")
           require "fastlane/environment_printer"
           location = FastlaneCore::Helper.bundler? ? ENV["BUNDLE_GEMFILE"] : $PROGRAM_NAME
-          source += ": #{EnvironmentPrinter.anonymized_path(location.to_s)}"
+          # Dir.home rather than ENV['HOME'], which does not match the paths Ruby gives on Windows
+          source += ": #{EnvironmentPrinter.anonymized_path(location.to_s, Dir.home)}"
         end
 
         UI.message("fastlane #{Fastlane::VERSION} (Ruby #{RUBY_VERSION}, #{source})")

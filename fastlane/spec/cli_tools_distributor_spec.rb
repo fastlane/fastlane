@@ -52,28 +52,29 @@ describe Fastlane::CLIToolsDistributor do
       end
     end
 
-    it "prints the fastlane and Ruby versions, and Bundler, when running a lane" do
+    it "prints the fastlane and Ruby versions, and the install method, when running a lane" do
       allow(FastlaneCore::Helper).to receive(:bundler?).and_return(true)
       take_off_with(["sigh"])
 
-      expect(FastlaneCore::UI).to have_received(:message).with("fastlane #{Fastlane::VERSION} (Ruby #{RUBY_VERSION}, Bundler)")
+      expect(FastlaneCore::UI).to have_received(:message).with("fastlane #{Fastlane::VERSION} (Ruby #{RUBY_VERSION}, bundler)")
     end
 
-    it "adds the Gemfile with --verbose, with the home directory shortened" do
+    it "adds the Gemfile with --verbose, with the home directory shortened, also on Windows" do
       allow(FastlaneCore::Helper).to receive(:bundler?).and_return(true)
-      FastlaneSpec::Env.with_env_values('BUNDLE_GEMFILE' => File.join(Dir.home, "app", "Gemfile")) do
+      allow(Dir).to receive(:home).and_return("C:/Users/runneradmin")
+      FastlaneSpec::Env.with_env_values('BUNDLE_GEMFILE' => "C:/Users/runneradmin/app/Gemfile") do
         take_off_with(["sigh", "--verbose"])
       end
 
-      expect(FastlaneCore::UI).to have_received(:message).with("fastlane #{Fastlane::VERSION} (Ruby #{RUBY_VERSION}, Bundler: ~/app/Gemfile)")
+      expect(FastlaneCore::UI).to have_received(:message).with("fastlane #{Fastlane::VERSION} (Ruby #{RUBY_VERSION}, bundler: ~/app/Gemfile)")
     end
 
-    it "says RubyGems for a plain gem install" do
+    it "says gem for a plain gem install, as analytics does" do
       allow(FastlaneCore::Helper).to receive_messages(bundler?: false, homebrew?: false, contained_fastlane?: false, mac_app?: false)
       allow(Fastlane::CLIToolsDistributor).to receive(:print_bundle_exec_warning)
       take_off_with(["sigh"])
 
-      expect(FastlaneCore::UI).to have_received(:message).with("fastlane #{Fastlane::VERSION} (Ruby #{RUBY_VERSION}, RubyGems)")
+      expect(FastlaneCore::UI).to have_received(:message).with("fastlane #{Fastlane::VERSION} (Ruby #{RUBY_VERSION}, gem)")
     end
 
     it "does not print it for fastlane -v" do
