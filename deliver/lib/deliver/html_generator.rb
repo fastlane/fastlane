@@ -24,7 +24,7 @@ module Deliver
       UI.important("Verifying the upload via the HTML file can be disabled by either adding")
       UI.important("`force true` to your Deliverfile or using `fastlane deliver --force`")
 
-      system("open '#{html_path}'")
+      system("open", html_path)
       okay = UI.confirm("Does the Preview on path '#{html_path}' look okay for you?")
 
       if okay

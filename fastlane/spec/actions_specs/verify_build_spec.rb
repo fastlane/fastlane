@@ -83,14 +83,14 @@ describe Fastlane do
         end
 
         it "raises an error if app is built for iOS simulator" do
-          expect(FastlaneCore::UI).to receive(:user_error!).with("Unable to extract profile").and_call_original
+          expect(FastlaneCore::UI).to receive(:user_error!).with(/Unable to find embedded profile/).and_call_original
           expect do
             Fastlane::FastFile.new.parse("lane :test do
               verify_build(
                 build_path: '#{simulator_app}'
               )
             end").runner.execute(:test)
-          end.to raise_error("Unable to extract profile")
+          end.to raise_error(/Unable to find embedded profile/)
         end
 
         it "uses xcarchive set via build_path" do

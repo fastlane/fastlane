@@ -55,5 +55,38 @@ describe Sigh do
 
       expect { Sigh::Manager.start }.to raise_error("The name 'com.krausefx.app AppStore' is already taken, and fail_on_name_taken is true")
     end
+
+    describe '.install_profile' do
+      after do
+        ENV.delete("SIGH_UDID")
+        ENV.delete("SIGH_UUID")
+        ENV.delete("SIGH_NAME")
+      end
+
+      it 'passes keychain_path to ProvisioningProfile methods' do
+        profile = "fake_profile.mobileprovision"
+        keychain_path = "/path/to/custom.keychain"
+
+        expect(FastlaneCore::ProvisioningProfile).to receive(:uuid).with(profile, keychain_path).and_return("fake-uuid")
+        expect(FastlaneCore::ProvisioningProfile).to receive(:name).with(profile, keychain_path).and_return("fake-name")
+        expect(FastlaneCore::ProvisioningProfile).to receive(:install).with(profile, keychain_path)
+
+        Sigh::Manager.install_profile(profile, keychain_path)
+
+        expect(ENV["SIGH_UDID"]).to eq("fake-uuid")
+        expect(ENV["SIGH_UUID"]).to eq("fake-uuid")
+        expect(ENV["SIGH_NAME"]).to eq("fake-name")
+      end
+
+      it 'works without keychain_path' do
+        profile = "fake_profile.mobileprovision"
+
+        expect(FastlaneCore::ProvisioningProfile).to receive(:uuid).with(profile, nil).and_return("fake-uuid")
+        expect(FastlaneCore::ProvisioningProfile).to receive(:name).with(profile, nil).and_return("fake-name")
+        expect(FastlaneCore::ProvisioningProfile).to receive(:install).with(profile, nil)
+
+        Sigh::Manager.install_profile(profile)
+      end
+    end
   end
 end

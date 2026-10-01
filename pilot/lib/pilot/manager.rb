@@ -85,8 +85,8 @@ module Pilot
       result ||= FastlaneCore::IpaFileAnalyser.fetch_app_platform(config[:ipa]) if config[:ipa]
       result ||= FastlaneCore::PkgFileAnalyser.fetch_app_platform(config[:pkg]) if config[:pkg]
       if required
-        result ||= UI.input("Please enter the app's platform (appletvos, ios, osx): ")
-        UI.user_error!("App Platform must be ios, appletvos, or osx") unless ['ios', 'appletvos', 'osx'].include?(result)
+        result ||= UI.input("Please enter the app's platform (appletvos, ios, osx, xros): ")
+        UI.user_error!("App Platform must be ios, appletvos, osx, or xros") unless ['ios', 'appletvos', 'osx', 'xros'].include?(result)
         UI.verbose("App Platform (#{result})")
       end
       return result

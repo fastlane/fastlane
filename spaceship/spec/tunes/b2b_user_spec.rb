@@ -1,7 +1,7 @@
 require 'spec_helper'
 class B2bUserSpec
   describe Spaceship::Tunes::B2bUser do
-    before { Spaceship::Tunes.login }
+    include_examples "common spaceship login"
     before { TunesStubbing.itc_stub_app_pricing_intervals }
 
     let(:client) { Spaceship::AppVersion.client }

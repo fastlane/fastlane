@@ -783,6 +783,57 @@ describe FastlaneCore do
           end
         end
 
+        describe "specified?" do
+          let(:config_item) { FastlaneCore::ConfigItem.new(key: :item, env_name: "abc", default_value: "val default") }
+
+          it "raises an error if a non symbol was given" do
+            expect do
+              @config.specified?(123)
+            end.to raise_error("Key '123' must be a symbol. Example :123")
+          end
+
+          it "raises an error if this option does not exist" do
+            expect do
+              @config.specified?(:asdfasdf)
+            end.to raise_error("Could not find option 'asdfasdf' in the list of available options: cert_name, output, wait_processing_interval")
+          end
+
+          it "returns true for a passed in value" do
+            config = FastlaneCore::Configuration.create([config_item], { item: "val cli" })
+
+            expect(config.specified?(:item)).to eq(true)
+          end
+
+          it "returns true for an env_name value" do
+            FastlaneSpec::Env.with_env_values("abc" => "val env") do
+              config = FastlaneCore::Configuration.create([config_item], {})
+
+              expect(config.specified?(:item)).to eq(true)
+            end
+          end
+
+          it "returns true for a config file value" do
+            config = FastlaneCore::Configuration.create([config_item], {})
+            config.config_file_options = { item: "val config" }
+
+            expect(config.specified?(:item)).to eq(true)
+          end
+
+          it "returns false when only the default value is available" do
+            config = FastlaneCore::Configuration.create([config_item], {})
+
+            expect(config[:item]).to eq("val default")
+            expect(config.specified?(:item)).to eq(false)
+          end
+
+          it "returns false after the passed in value is cleared" do
+            config = FastlaneCore::Configuration.create([config_item], { item: "val cli" })
+            config.set(:item, nil)
+
+            expect(config.specified?(:item)).to eq(false)
+          end
+        end
+
         describe "Parameter priority order" do
           it "prioritizes CLI values over everything else" do
             ENV["abc"] = "val env"

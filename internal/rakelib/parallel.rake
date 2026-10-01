@@ -1,0 +1,479 @@
+# Runs the suite as several independent rspec processes, see fastlane#30184.
+#
+# Splitting is its own kind of ordering: a worker sees a subset no random seed
+# ever produces, such as the spaceship specs with no fastlane spec having run
+# first. Worth running alongside the random order audit rather than after it.
+#
+# Separate processes, not threads, because ENV and the working directory are
+# per process in the kernel. A worker cannot corrupt another through either.
+#
+#   rake test_parallel                 workers chosen from the timings
+#   FASTLANE_SPEC_WORKERS=4 rake test_parallel
+#   FASTLANE_SPEC_WORKERS=6 RSPEC_ARGS="--order random" rake test_parallel
+# Timings are per platform, because the suite is a different shape on each one.
+# 61% of the example time on macOS is in requires_xcodebuild files, and those
+# skip entirely on Linux, so balancing a Linux split from macOS numbers packs
+# around files that cost nothing there. Measured: 41% to 48% of worker time on
+# Linux was spent waiting for a straggler, against 15% to 17% on macOS.
+def spec_timings_platform
+  case RbConfig::CONFIG["host_os"]
+  when /darwin/ then "mac"
+  when /mswin|mingw|cygwin/ then "windows"
+  else "linux"
+  end
+end
+
+# Where a worker writes its rspec json, and where the merged result goes. The
+# report action on CI reads one file, but a worker only ever sees its own slice
+# of the suite, so the parts are joined after the run.
+RSPEC_JSON_PATH = "rspec_logs.json".freeze
+# Widest line report_slowest will print. Two spaces, a 7 character duration, two
+# more, the padded location, one space, then the description.
+LINE_WIDTH = 100
+
+def worker_json(index)
+  "rspec_logs_#{index}.json"
+end
+
+# rspec's json has an examples array and a summary of counts. Concatenating the
+# arrays and adding the counts gives the same shape for the whole run. The
+# durations are not added: they overlap, so their sum is not the wall clock and
+# would misreport the run as slower than it was. The real figure is printed by
+# the task itself.
+def merge_worker_json(count)
+  require "json"
+
+  parts = (0...count).map { |index| worker_json(index) }.select { |path| File.exist?(path) }
+  return if parts.empty?
+
+  merged = { "version" => nil, "examples" => [], "summary" => Hash.new(0), "summary_line" => "" }
+  longest = 0.0
+
+  parts.each do |path|
+    part = JSON.parse(File.read(path))
+    merged["version"] ||= part["version"]
+    merged["examples"].concat(part["examples"] || [])
+    (part["summary"] || {}).each do |key, value|
+      if key == "duration"
+        longest = [longest, value.to_f].max
+      else
+        merged["summary"][key] += value.to_i
+      end
+    end
+  end
+
+  merged["summary"]["duration"] = longest
+  merged["summary_line"] =
+    "#{merged['summary']['example_count']} examples, " \
+    "#{merged['summary']['failure_count']} failures, " \
+    "#{merged['summary']['pending_count']} pending"
+
+  File.write(RSPEC_JSON_PATH, JSON.generate(merged))
+  parts.each { |path| File.delete(path) }
+end
+
+def spec_timings_path
+  "internal/spec_timings.#{spec_timings_platform}.json"
+end
+
+def spec_files
+  files = (Dir.glob("spec/**/*_spec.rb") + Dir.glob("*/spec/**/*_spec.rb")).uniq
+  excluded = ENV["EXCLUDE"].to_s.split
+  return files if excluded.empty?
+
+  # Space separated paths to leave out. For specs that fail under a split for a
+  # reason that is not ordering, so that a real finding is not buried under a
+  # known one. Say which, every run, so an exclusion cannot quietly become
+  # permanent.
+  kept = files.reject { |file| excluded.include?(file.delete_prefix("./")) }
+  puts("Excluding #{files.size - kept.size} file(s) by EXCLUDE: #{excluded.join(', ')}")
+  kept
+end
+
+def load_timings
+  return { "files" => {}, "examples" => {} } unless File.exist?(spec_timings_path)
+
+  data = JSON.parse(File.read(spec_timings_path))
+  data.key?("files") ? data : { "files" => data, "examples" => {} } # older flat format
+end
+
+# Longest processing time first: give the heaviest unit to whichever worker has
+# least queued. Within about 4/3 of optimal for this shape of problem, and the
+# tail is what sets the wall clock.
+def pack(units, workers)
+  buckets = Array.new(workers) { [] }
+  weights = Array.new(workers, 0.0)
+  units.sort_by { |_name, seconds| -seconds }.each do |name, seconds|
+    lightest = weights.each_with_index.min_by { |weight, _index| weight }[1]
+    buckets[lightest] << name
+    weights[lightest] += seconds
+  end
+  [buckets.reject(&:empty?), weights]
+end
+
+# One unit per file, weighted by its recorded duration. A file with no recording
+# is new, and 0.05 keeps it from being packed as if it were the heaviest thing
+# in the run.
+#
+# Heavy files used to be cut into runs of examples with rspec's `path[id,id]`
+# syntax, balanced from the recorded ids. That could silently drop an example
+# added since the timings were taken, because rspec runs the ids it is given and
+# nothing reported the ones it was not. A harness must not be able to skip a
+# test as a function of a worker count. See fastlane#30244.
+def units_for(files, timings)
+  files.map do |file|
+    [file, timings["files"][file.delete_prefix("./")] || 0.05]
+  end
+end
+
+# The slowest files and examples of the run that just happened, rather than of
+# whatever machine recorded the committed timings. A worker's own output goes to
+# its log, so without this nothing says where the time went.
+def report_slowest(limit = 10)
+  require "json"
+  return unless File.exist?(RSPEC_JSON_PATH)
+
+  examples = JSON.parse(File.read(RSPEC_JSON_PATH))["examples"] || []
+  return if examples.empty?
+
+  total = examples.sum { |e| e["run_time"].to_f }
+  return if total.zero?
+
+  files = Hash.new(0.0)
+  examples.each { |e| files[e["file_path"]] += e["run_time"].to_f }
+
+  puts("")
+  puts("Slowest files, #{total.round}s of example time in total:")
+  files.sort_by { |_path, secs| -secs }.first(limit).each do |path, secs|
+    puts(format("  %<secs>6.1fs  %<share>4.1f%%  %<path>s",
+                secs: secs, share: 100.0 * secs / total, path: path.delete_prefix("./")))
+  end
+
+  puts("")
+  puts("Slowest examples:")
+  # path:line rather than rspec's `[1:1:14:3]` id. Both address the example, but
+  # only one of them can be clicked or opened.
+  #
+  # The leaf description rather than the full nested one. The chain repeats for
+  # every example in a group and what tells two of them apart is its last
+  # clause, which is exactly what truncating a long line removes.
+  rows = examples.sort_by { |e| -e["run_time"].to_f }.first(limit).map do |e|
+    ["#{e['file_path'].delete_prefix('./')}:#{e['line_number']}", e["description"].to_s, e["run_time"].to_f]
+  end
+  width = rows.map { |where, _, _| where.length }.max
+  budget = LINE_WIDTH - (width + 12)
+  rows.each do |where, what, secs|
+    what = "#{what[0, budget - 3]}..." if what.length > budget
+    puts(format("  %<secs>6.1fs  %<where>-#{width}s %<what>s", secs: secs, where: where, what: what))
+  end
+end
+
+desc("Record per file and per example spec durations for test_parallel to balance on")
+task(:spec_timings) do
+  require "etc"
+  require "json"
+
+  out = "rspec_timings_raw.json"
+  # --out, not a shell redirect: spec_helper.rb repoints $stdout at a temporary
+  # file, so a redirect captures nothing.
+  #
+  # A failing example still has a duration, and this task is for timings rather
+  # than for verdicts, so a non-zero exit is not a reason to stop. `sh` aborts
+  # on one unless it is given a block.
+  sh("rspec --pattern 'spec/**/*_spec.rb,*/spec/**/*_spec.rb' --format json --out #{out}") { |_ok, _res| }
+  raise("rspec produced no #{out}") unless File.exist?(out)
+
+  files = Hash.new(0.0)
+  examples = Hash.new { |hash, key| hash[key] = {} }
+  JSON.parse(File.read(out))["examples"].each do |example|
+    path = example["file_path"].delete_prefix("./")
+    seconds = example["run_time"].to_f
+    files[path] += seconds
+    examples[path][example["id"][/\[(.*)\]/, 1]] = seconds
+  end
+
+  # Per example detail for the heavy files only, as a record to investigate them
+  # with. The split does not read it; keeping all of it would be a megabyte of
+  # ids. These 21 or so files are about 83% of the example time, which is where
+  # anyone asking why the suite is slow would look first.
+  heavy = files.select { |_path, seconds| seconds > 5.0 }.keys
+  # Where these came from, because it decides whether they are worth balancing
+  # with. A split is only as good as its numbers, and numbers from a 14 core
+  # laptop describe a 3 core runner badly. That is the same mistake as balancing
+  # a Linux split from macOS timings, which left a worker idle 41% to 48%.
+  provenance = {
+    "at" => Time.now.utc.strftime("%Y-%m-%d"),
+    "ci" => !ENV["GITHUB_ACTIONS"].nil?,
+    "runner" => ENV["RUNNER_NAME"] || Etc.uname[:nodename],
+    "cores" => Etc.nprocessors,
+    "ruby" => RUBY_VERSION
+  }
+  provenance["xcode"] = `xcodebuild -version`[/Xcode ([\d.]+)/, 1] if RbConfig::CONFIG["host_os"] =~ /darwin/
+
+  File.write(spec_timings_path, JSON.pretty_generate(
+                                  "recorded_on" => provenance.compact,
+                                  "files" => files.sort_by { |_path, seconds| -seconds }.to_h,
+                                  "examples" => examples.select { |path, _| heavy.include?(path) }
+  ))
+  File.delete(out)
+
+  puts("Wrote #{files.size} file timings (#{heavy.size} with per example detail) to #{spec_timings_path}, #{files.values.sum.round}s total")
+end
+
+desc("Run the suite as FASTLANE_SPEC_WORKERS independent rspec processes")
+task(:test_parallel) do
+  require "etc"
+  require "json"
+
+  timings = load_timings
+  files = spec_files
+  total = timings["files"].values.sum
+
+  # Derived rather than fixed per platform, because what decides the number is
+  # the core count and how much of the suite shells out, not the operating
+  # system name. Measured: a 14 core machine flattens after eight workers, 50s
+  # against 276s sequential, and a macOS runner peaks at four, 263s against
+  # 562s, where six is slower than four. `min(cores, 8)` fits both.
+  #
+  # The cap is there because each worker spawns an xcodebuild child and waits on
+  # it, so N workers is nearer 2N runnable processes and a big machine
+  # oversubscribes long before it runs out of cores. If the xcodebuild specs
+  # ever stop shelling out, this cap should be revisited upwards. Linux and
+  # Windows skip those specs entirely, so their shape is different again.
+  #
+  # FASTLANE_SPEC_WORKERS overrides it, which is the point: measure on your own
+  # machine.
+  workers = Integer(ENV["FASTLANE_SPEC_WORKERS"] || [Etc.nprocessors, 8].min)
+
+  units = units_for(files, timings)
+  buckets, weights = pack(units, workers)
+
+  source = total.zero? ? "file size, run `rake spec_timings` first" : "durations measured on #{spec_timings_platform}"
+  puts("Running #{files.size} spec files as #{buckets.size} processes on #{Etc.nprocessors} cores, balanced by #{source}")
+  unless total.zero?
+    spread = weights.reject(&:zero?)
+    puts(format("Predicted worker load %<min>.0fs to %<max>.0fs", min: spread.min, max: spread.max))
+  end
+
+  started = Time.now
+  pids = buckets.each_with_index.map do |bucket, index|
+    log = "rspec_worker_#{index}.log"
+    # Record the split, so a failure that only happens under one can be replayed
+    # by handing these paths straight back to rspec.
+    #
+    # In its own file rather than as a header in the log: the worker appends to
+    # the log through a redirect, and on Windows that does not preserve what the
+    # parent wrote first, so the manifest came out empty exactly where a split
+    # only failure most needed it.
+    File.write("rspec_worker_#{index}.units", "#{bucket.join(' ')}\n")
+    # The worker appends through the redirect below, so without this the log
+    # still holds the previous run and every count read back out of it is wrong.
+    File.write(log, "")
+    command = ["rspec", "--format", "progress", *ENV["RSPEC_ARGS"].to_s.split]
+    # On GitHub Actions the run is also reported through rspec's json formatter.
+    # One file per worker, merged below into the single file the report action
+    # reads, since a worker only knows about its own examples.
+    command += ["--format", "json", "--out", worker_json(index)]
+    command += bucket
+    Process.spawn(*command, out: [log, "a"], err: [log, "a"])
+  end
+
+  results = pids.map { |pid| Process.wait2(pid).last }
+  elapsed = Time.now - started
+
+  # Before the failure reporting below, which aborts.
+  merge_worker_json(buckets.size)
+
+  durations = []
+  results.each_with_index do |status, index|
+    log = File.readlines("rspec_worker_#{index}.log")
+    tail = log.grep(/examples?,/).last.to_s.strip
+    # What rspec itself reports, so the figure excludes process start up and the
+    # time spent loading 449 spec files. It writes "Finished in 40.6 seconds"
+    # under a minute and "Finished in 1 minute 15.2 seconds" over one, so both
+    # parts have to be read: taking the first number gave every worker 1.0s.
+    line = log.grep(/^Finished in /).last.to_s
+    seconds = (line[/([\d.]+) minutes?/, 1].to_f * 60) + line[/([\d.]+) seconds?/, 1].to_f
+    durations << seconds
+    puts(format("  worker %<index>d  exit %<exit>-3d %<seconds>6.1fs  %<tail>s",
+                index: index, exit: status.exitstatus, seconds: seconds, tail: tail))
+  end
+
+  # The wall clock is the slowest worker plus start up, so a split is only as
+  # good as its straggler. The timings this was balanced from were recorded on
+  # one machine, and the suite is 61% xcodebuild on macOS, so the balance can be
+  # much worse on a runner than the prediction suggests.
+  busy = durations.reject(&:zero?)
+  unless busy.empty?
+    puts(format("Worker time %<min>.1fs to %<max>.1fs, spread %<spread>.0f%%, idle %<idle>.0f%% of the wall clock",
+                min: busy.min, max: busy.max,
+                spread: 100.0 * (busy.max - busy.min) / busy.max,
+                idle: 100.0 * (busy.max * busy.size - busy.sum) / (busy.max * busy.size)))
+  end
+  puts(format("Wall clock %<elapsed>.1fs across %<workers>d processes",
+              elapsed: elapsed, workers: buckets.size))
+
+  report_slowest
+
+  failed = results.each_with_index.reject { |status, _index| status.success? }
+
+  # No `return` here: this is a block, and returning from one raises
+  # LocalJumpError, which is what it did on CI.
+  unless failed.empty?
+    # The worker logs stay on disk, so without this a CI log says only how many
+    # examples failed and never which. Print the failures and the split that
+    # produced them, since a split only failure cannot be reproduced without
+    # knowing what the worker was given.
+    failed.each do |_status, index|
+      log = File.readlines("rspec_worker_#{index}.log")
+      units = File.read("rspec_worker_#{index}.units").split
+      puts("")
+      puts("worker #{index} failures:")
+      log.grep(%r{^rspec \./}).each { |line| puts("  #{line.strip}") }
+      # The file rather than its contents: a worker carries over a hundred paths
+      # and pasting them into a CI log buries the failures above.
+      puts("  this worker ran #{units.size} files, replay the split with:")
+      puts("    rspec $(cat rspec_worker_#{index}.units)")
+    end
+    abort("#{failed.size} of #{results.size} workers failed")
+  end
+end
+
+# Finds the worker count for the machine it runs on, and refreshes the timings
+# it balances from. Both matter: spec_timings.json is recorded once, on whoever
+# ran it, and 61% of the example time on macOS is xcodebuild, so a split
+# balanced from one machine's numbers can be badly uneven on another.
+#
+#   rake test_tune              sweeps 2, 4, 6, 8, 12 capped at the core count
+#   COUNTS="2 4" rake test_tune
+#   REFRESH=1 rake test_tune    re-record the timings first, on this machine
+desc("Sweep worker counts on this machine and report which to use")
+task(:test_tune) do
+  require "etc"
+
+  Rake::Task[:spec_timings].invoke if ENV["REFRESH"]
+
+  counts = (ENV["COUNTS"]&.split || %w[2 4 6 8 12]).map(&:to_i)
+                                                   .select { |n| n <= Etc.nprocessors }.uniq
+  results = {}
+
+  counts.each do |workers|
+    started = Time.now
+    system({ "FASTLANE_SPEC_WORKERS" => workers.to_s }, "rake test_parallel", out: "tune_#{workers}.log", err: %W[tune_#{workers}.log a])
+    elapsed = Time.now - started
+    report = File.read("tune_#{workers}.log")
+    results[workers] = {
+      wall: elapsed,
+      spread: report[/spread (\d+)%/, 1].to_i,
+      idle: report[/idle (\d+)%/, 1].to_i
+    }
+    File.delete("tune_#{workers}.log")
+    puts(format("  %2<workers>d workers  %<wall>6.1fs  spread %<spread>2d%%  idle %<idle>2d%%",
+                workers: workers, **results[workers]))
+  end
+
+  best = results.min_by { |_workers, r| r[:wall] }
+  puts("")
+  puts(format("Fastest here: %<workers>d workers at %<wall>.0fs. Put FASTLANE_SPEC_WORKERS=%<workers>d in your CI job or your shell.",
+              workers: best[0], wall: best[1][:wall]))
+  puts("A large spread means the split is uneven on this machine: try REFRESH=1 to record its own timings.") if best[1][:spread] > 25
+end
+
+# Runs a few spec files against each other in concurrent processes, over and
+# over, to provoke a race between them.
+#
+# This finds cross process races that repeating the whole suite does not, and
+# the reason is duty cycle. In a whole suite run a spec file executes once
+# inside about ninety seconds, so the window where it is vulnerable is a
+# rounding error and two such windows almost never coincide: measured at 1.6%
+# per run on CI and zero in eighty runs on an idle laptop. Loop two files
+# against each other instead and each one's window recurs every second or so,
+# which found the same race three times in fifteen rounds on the same laptop.
+#
+# Processes rather than threads, deliberately. The races are cross process by
+# nature, ENV and the working directory are per process in the kernel, and
+# rspec's own globals are not thread safe, so threads here would invent failures
+# rather than find them. The threads below only wait on children.
+#
+# Pick the files from what they share rather than at random: the point is to put
+# a writer and a deleter of the same path in different processes. See
+# fastlane#30184.
+#
+# Separate the files with spaces or commas. Address a single example as
+# `path:line` rather than rspec's `path[1:2,1:3]`, whose commas would be read as
+# separators here.
+#
+#   RACE_FILES="a_spec.rb b_spec.rb" rake test_race
+#   RACE_FILES="a_spec.rb,b_spec.rb" rake test_race
+#   ROUNDS=30 RACE_FILES="a_spec.rb:42, b_spec.rb:17" rake test_race
+desc("Run spec files against each other in concurrent processes to provoke a race")
+task(:test_race) do
+  require "fileutils"
+
+  files = ENV["RACE_FILES"].to_s.split(/[\s,]+/).reject(&:empty?)
+  abort("RACE_FILES is required: two or more spec files that share a resource") if files.size < 2
+
+  rounds = Integer(ENV["ROUNDS"] || 15)
+  # Copies of each file running at once. Two processes only collide when A's
+  # window overlaps B's; more copies raise the chance of some pair overlapping
+  # far faster than more rounds do, and cost nothing in wall clock until the
+  # machine runs out of cores.
+  procs = Integer(ENV["RACE_PROCS"] || 1)
+  dir = ENV["RACE_DIR"] || "race_results"
+  FileUtils.mkdir_p(dir)
+
+  # An entry may name a single example (`path:line`), which rspec accepts and
+  # which is usually what you want: it strips out the examples that do not touch
+  # the shared resource, so the round is mostly the part that can collide rather
+  # than a hundred that cannot. Passed to rspec as an argument rather than
+  # through a shell, so a path may contain spaces.
+  files = files.flat_map { |file| Array.new(procs) { file } }
+
+  puts("#{files.size} process(es), #{rounds} round(s) each, all at once:")
+  files.uniq.each { |file| puts("  #{file}#{procs > 1 ? " x#{procs}" : ''}") }
+
+  started = Time.now
+  mutex = Mutex.new
+  failures = Hash.new { |hash, key| hash[key] = [] }
+
+  threads = files.each_with_index.map do |file, index|
+    Thread.new do
+      rounds.times do |round|
+        log = File.join(dir, "race_#{index}_#{round}.log")
+        ok = system("bundle", "exec", "rspec", file, out: log, err: [log, "a"])
+        next if ok
+
+        # The failing example ids, so the report says what broke rather than
+        # only that something did.
+        broke = File.readlines(log).grep(%r{^rspec \./}).map { |line| line.split.fetch(1, "") }
+        mutex.synchronize { failures[file] << [round + 1, broke] }
+      end
+    end
+  end
+  threads.each(&:join)
+
+  elapsed = Time.now - started
+  total = files.size * rounds
+  red = failures.values.map(&:size).sum
+
+  puts("")
+  puts(format("%<red>d of %<total>d rounds red (%<rate>.0f%%) in %<elapsed>.0fs",
+              red: red, total: total, rate: 100.0 * red / total, elapsed: elapsed))
+
+  if red.zero?
+    # Said plainly, because a clean run here is weaker evidence than it looks:
+    # it only says these files do not race often, not that nothing does.
+    puts("No failures. That is evidence about these files only, and only at this rate.")
+  else
+    failures.each do |file, rows|
+      puts("")
+      puts("#{file}: #{rows.size} of #{rounds} rounds")
+      rows.flat_map(&:last).tally.sort_by { |_id, count| -count }.each do |id, count|
+        puts(format("  %<count>3d  %<id>s", count: count, id: id))
+      end
+    end
+    # Reported above, then failed here, so the detail is on screen and the exit
+    # status still says a race was found. test_parallel aborts the same way.
+    abort("#{red} of #{total} rounds red")
+  end
+end

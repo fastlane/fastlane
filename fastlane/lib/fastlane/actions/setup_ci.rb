@@ -8,7 +8,7 @@ module Fastlane
         end
 
         case detect_provider(params)
-        when 'circleci'
+        when 'circleci', 'codebuild'
           setup_output_paths
         end
 
@@ -20,7 +20,7 @@ module Fastlane
       end
 
       def self.detect_provider(params)
-        params[:provider] || (Helper.is_circle_ci? ? 'circleci' : nil)
+        params[:provider] || (Helper.is_circle_ci? ? 'circleci' : nil) || (Helper.is_codebuild? ? 'codebuild' : nil)
       end
 
       def self.setup_keychain(params)
@@ -34,14 +34,14 @@ module Fastlane
           return
         end
 
-        keychain_name = "fastlane_tmp_keychain"
+        keychain_name = params[:keychain_name]
         ENV["MATCH_KEYCHAIN_NAME"] = keychain_name
         ENV["MATCH_KEYCHAIN_PASSWORD"] = ""
 
         UI.message("Creating temporary keychain: \"#{keychain_name}\".")
         Actions::CreateKeychainAction.run(
           name: keychain_name,
-          default_keychain: true,
+          default_keychain: params[:set_default_keychain],
           unlock: true,
           timeout: params[:timeout],
           lock_when_sleeps: true,
@@ -108,7 +108,17 @@ module Fastlane
                                        env_name: "FL_SETUP_CI_TIMEOUT",
                                        description: "Set a custom timeout in seconds for keychain.  Set `0` if you want to specify 'no time-out'",
                                        type: Integer,
-                                       default_value: 3600)
+                                       default_value: 3600),
+          FastlaneCore::ConfigItem.new(key: :keychain_name,
+                                       env_name: "FL_SETUP_CI_KEYCHAIN_NAME",
+                                       description: "Set a custom keychain name",
+                                       type: String,
+                                       default_value: "fastlane_tmp_keychain"),
+          FastlaneCore::ConfigItem.new(key: :set_default_keychain,
+                                       env_name: "FL_SETUP_CI_SET_DEFAULT_KEYCHAIN",
+                                       description: "Set the temporary keychain as the system default",
+                                       type: Boolean,
+                                       default_value: true)
         ]
       end
 
@@ -128,6 +138,11 @@ module Fastlane
           'setup_ci(
             provider: "circleci",
             timeout: 0
+          )',
+          'setup_ci(
+            provider: "circleci",
+            timeout: 0,
+            keychain_name: "custom_keychain_name"
           )'
         ]
       end

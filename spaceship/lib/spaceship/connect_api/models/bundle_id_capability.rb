@@ -77,6 +77,8 @@ module Spaceship
 
         # Undocumented as of 2020-06-09
         MARZIPAN = "MARZIPAN" # Catalyst
+        # Undocumented as of 2025-10-15
+        DECLARED_AGE_RANGE = "DECLARED_AGE_RANGE"
       end
 
       module Settings
@@ -130,6 +132,12 @@ module Spaceship
       def delete!(client: nil, filter: {}, includes: nil, limit: nil, sort: nil)
         client ||= Spaceship::ConnectAPI
         client.delete_bundle_id_capability(bundle_id_capability_id: id)
+      end
+
+      def update!(client: nil, enabled: true, settings: [])
+        client ||= Spaceship::ConnectAPI
+        resp = client.patch_bundle_id_capability_configuration(bundle_id_capability_id: id, enabled: enabled, settings: settings)
+        return resp.to_models.first
       end
     end
   end

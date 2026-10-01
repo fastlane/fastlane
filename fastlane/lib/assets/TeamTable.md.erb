@@ -1,0 +1,28 @@
+<table id='team'>
+<%- team.each_slice(5) do |row| -%>
+<tr>
+<%- row.each do |github_user, user| -%>
+<td id='<%= ERB::Util.h(user['name'].downcase.tr(' ', '-')) %>'>
+<a href='https://github.com/<%= github_user %>'>
+<img src='https://github.com/<%= github_user %>.png?size=200' width='140'>
+</a>
+<%- if user['twitter'] -%>
+<h4 align='center'><a href='https://twitter.com/<%= user['twitter'] %>'><%= ERB::Util.h(user['name']) %></a></h4>
+<%- else -%>
+<h4 align='center'><%= ERB::Util.h(user['name']) %></h4>
+<%- end -%>
+</td>
+<%- end -%>
+</tr>
+<%- end -%>
+</table>
+<%- unless alumni.empty? -%>
+
+### _fastlane_ alumni
+
+_fastlane_ wouldn't be what it is today without the countless hours these former team members have dedicated to the project ❤️
+
+<p id='alumni'>
+<%= alumni.map { |github_user, user| "<a href='https://github.com/#{github_user}'>#{ERB::Util.h(user['name'])}</a>" }.join(",\n") %>
+</p>
+<%- end -%>

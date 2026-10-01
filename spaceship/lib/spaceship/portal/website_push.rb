@@ -48,7 +48,7 @@ module Spaceship
         # @param mac [Bool] Fetches Mac website push if true
         # @return (Array) Returns all website push available for this account
         def all(mac: false)
-          client.website_push(mac: mac).map { |website_push| self.new(website_push) }
+          client.website_push(mac: mac).map { |website_push| new_with_platform(website_push, mac) }
         end
 
         # Creates a new Website Push ID on the Apple Dev Portal
@@ -59,7 +59,7 @@ module Spaceship
         # @return (Website Push) The Website Push you just created
         def create!(bundle_id: nil, name: nil, mac: false)
           new_website_push = client.create_website_push!(name, bundle_id, mac: mac)
-          self.new(new_website_push)
+          new_with_platform(new_website_push, mac)
         end
 
         # Find a specific Website Push ID based on the bundle_id
@@ -70,6 +70,12 @@ module Spaceship
             website_push.bundle_id == bundle_id
           end
         end
+
+        # Apple does not return the platform, so we record the one that was asked for.
+        def new_with_platform(attrs, mac)
+          new(attrs).tap { |website_push| website_push.platform = mac ? 'mac' : 'ios' }
+        end
+        private :new_with_platform
       end
 
       # Delete this Website Push ID.

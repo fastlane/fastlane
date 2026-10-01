@@ -1,0 +1,40 @@
+{
+  "data": [
+    {
+      "type": "webhooks",
+      "id": "webhook-123",
+      "attributes": {
+        "name": "Production Webhook",
+        "url": "https://example.com/webhook",
+        "enabled": true,
+        "eventTypes": ["APP_STORE_VERSION_APP_VERSION_STATE_UPDATED"]
+      },
+      "links": {
+        "self": "https://api.appstoreconnect.apple.com/v1/webhooks/webhook-123"
+      }
+    },
+    {
+      "type": "webhooks",
+      "id": "webhook-456",
+      "attributes": {
+        "name": "Staging Webhook",
+        "url": "https://staging.example.com/webhook",
+        "enabled": true,
+        "eventTypes": ["APP_STORE_VERSION_APP_VERSION_STATE_UPDATED"]
+      },
+      "links": {
+        "self": "https://api.appstoreconnect.apple.com/v1/webhooks/webhook-456"
+      }
+    }
+  ],
+  "links": {
+    "self": "https://api.appstoreconnect.apple.com/v1/apps/1234567890/webhooks"
+  },
+  "meta": {
+    "paging": {
+      "total": 2,
+      "limit": 200
+    }
+  }
+}
+

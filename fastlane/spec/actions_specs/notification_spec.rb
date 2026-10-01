@@ -1,3 +1,8 @@
+# The notification action requires this lazily, inside its run method, so
+# examples referencing the TerminalNotifier constant only find it when another
+# example has already run the action. See fastlane#30184.
+require 'terminal-notifier'
+
 describe Fastlane do
   describe Fastlane::FastFile do
     describe "notification action" do

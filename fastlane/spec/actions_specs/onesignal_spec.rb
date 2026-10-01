@@ -15,7 +15,7 @@ describe Fastlane do
 
         context 'and is create' do
           before :each do
-            stub_request(:post, 'https://onesignal.com/api/v1/apps').to_return(status: 200, body: '{}')
+            stub_request(:post, 'https://api.onesignal.com/apps').to_return(status: 200, body: '{}')
           end
 
           it 'outputs success message' do
@@ -30,7 +30,7 @@ describe Fastlane do
 
         context 'and is update' do
           before :each do
-            stub_request(:put, "https://onesignal.com/api/v1/apps/#{app_id}").to_return(status: 200, body: '{}')
+            stub_request(:put, "https://api.onesignal.com/apps/#{app_id}").to_return(status: 200, body: '{}')
           end
 
           it 'outputs success message' do

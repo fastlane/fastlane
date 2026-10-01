@@ -1,3 +1,4 @@
+require 'tmpdir'
 require 'fileutils'
 
 require_relative 'utilities'
@@ -30,10 +31,10 @@ module Spaceship
       end
 
       # As things like screenshots and app icon shouldn't contain the alpha channel
-      # This will copy the image into /tmp to remove the alpha channel there
-      # That's done to not edit the original image
+      # This will copy the image into the temporary directory to remove the
+      # alpha channel there. That's done to not edit the original image.
       def remove_alpha_channel(original)
-        path = "/tmp/#{Digest::MD5.hexdigest(original)}.png"
+        path = File.join(Dir.tmpdir, "#{Digest::MD5.hexdigest(original)}.png")
         FileUtils.copy(original, path)
         if mac? # sips is only available on macOS
           `sips -s format bmp '#{path}' &> /dev/null` # &> /dev/null since there is warning because of the extension

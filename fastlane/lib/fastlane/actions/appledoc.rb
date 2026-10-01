@@ -56,7 +56,7 @@ module Fastlane
       def self.run(params)
         unless Helper.test?
           UI.message("Install using `brew install appledoc`")
-          UI.user_error!("appledoc not installed") if `which appledoc`.length == 0
+          UI.user_error!("appledoc not installed") unless Helper.which('appledoc')
         end
 
         params_hash = params.values
@@ -214,7 +214,7 @@ module Fastlane
             ],
             ignore: [
               "ignore/path/1",
-              "ingore/path/2"
+              "ignore/path/2"
             ],
             options: "--keep-intermediate-files --search-undocumented-doc",
             warnings: "--warn-missing-output-path --warn-missing-company-id"

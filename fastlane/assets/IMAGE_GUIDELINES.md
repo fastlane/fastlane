@@ -1,1 +1,0 @@
-Google open source projects may contain logos, trademarks or service names. These are "Brand Features", and if you want to use them, please do so consistent with [google.com/permissions/trademark/rules.html](https://www.google.com/permissions/trademark/rules.html).

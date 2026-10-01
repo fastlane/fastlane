@@ -56,9 +56,9 @@ describe Pilot::Options do
         localized_app_info: {
           'default' => {
             feedback_email: "default@email.com",
-            marketing_url: "https://example.com/marketing-defafult",
-            privacy_policy_url: "https://example.com/privacy-defafult",
-            tv_os_privacy_policy_url: "https://example.com/privacy-defafult",
+            marketing_url: "https://example.com/marketing-default",
+            privacy_policy_url: "https://example.com/privacy-default",
+            tv_os_privacy_policy_url: "https://example.com/privacy-default",
             description: "Default description"
           },
           'en-GB' => {
@@ -80,9 +80,9 @@ describe Pilot::Options do
         localized_app_info: {
           'default' => {
             feedback_email: "default@email.com",
-            marketing_url: "https://example.com/marketing-defafult",
-            privacy_policy_url: "https://example.com/privacy-defafult",
-            tv_os_privacy_policy_url: "https://example.com/privacy-defafult",
+            marketing_url: "https://example.com/marketing-default",
+            privacy_policy_url: "https://example.com/privacy-default",
+            tv_os_privacy_policy_url: "https://example.com/privacy-default",
             description: "Default description"
           },
           'en-GB' => {

@@ -297,6 +297,8 @@ module Spaceship
             "appletvos"
           when "MAC_OS"
             "osx"
+          when "VISION_OS"
+            "xros"
           when "IOS"
             "ios"
           else
@@ -659,7 +661,7 @@ module Spaceship
       r = request(:get, "ra/apps/#{app_id}/pricing/intervals")
       data = parse_response(r, 'data')
 
-      # preOrder isn't needed for for the request and has some
+      # preOrder isn't needed for the request and has some
       # values that can cause a failure (invalid dates) so we are removing it
       data.delete('preOrder')
 
@@ -1011,7 +1013,7 @@ module Spaceship
     end
 
     #####################################################
-    # @!group CandiateBuilds
+    # @!group CandidateBuilds
     #####################################################
 
     def candidate_builds(app_id, version_id)

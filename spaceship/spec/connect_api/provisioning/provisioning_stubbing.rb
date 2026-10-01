@@ -22,53 +22,53 @@ class ConnectAPIStubbing
       def stub_patch_bundle_id_capability
         # APP_ATTEST
         stub_request(:patch, "https://developer.apple.com/services-account/v1/bundleIds/ABCD1234").
-          with(body: { "data" => { "type" => "bundleIds", "id" => "ABCD1234", "attributes" => { "teamId" => "XXXXXXXXXX" },
+          with(body: { "data" => { "type" => "bundleIds", "id" => "ABCD1234", "attributes" => { "permissions" => { "edit" => true, "delete" => true }, "seedId" => "SEEDID", "teamId" => "XXXXXXXXXX" },
   "relationships" => { "bundleIdCapabilities" => { "data" => [{ "type" => "bundleIdCapabilities", "attributes" => { "enabled" => false, "settings" => [] }, "relationships" => { "capability" => { "data" => { "type" => "capabilities", "id" => "APP_ATTEST" } } } }] } } } }).
           to_return(status: 200)
         stub_request(:patch, "https://developer.apple.com/services-account/v1/bundleIds/ABCD1234").
-          with(body: { "data" => { "type" => "bundleIds", "id" => "ABCD1234", "attributes" => { "teamId" => "XXXXXXXXXX" },
+          with(body: { "data" => { "type" => "bundleIds", "id" => "ABCD1234", "attributes" => { "permissions" => { "edit" => true, "delete" => true }, "seedId" => "SEEDID", "teamId" => "XXXXXXXXXX" },
   "relationships" => { "bundleIdCapabilities" => { "data" => [{ "type" => "bundleIdCapabilities", "attributes" => { "enabled" => true, "settings" => [] }, "relationships" => { "capability" => { "data" => { "type" => "capabilities", "id" => "APP_ATTEST" } } } }] } } } }).
           to_return(status: 200)
 
         # ACCESS_WIFI
         stub_request(:patch, "https://developer.apple.com/services-account/v1/bundleIds/ABCD1234").
-          with(body: { "data" => { "type" => "bundleIds", "id" => "ABCD1234", "attributes" => { "teamId" => "XXXXXXXXXX" },
+          with(body: { "data" => { "type" => "bundleIds", "id" => "ABCD1234", "attributes" => { "permissions" => { "edit" => true, "delete" => true }, "seedId" => "SEEDID", "teamId" => "XXXXXXXXXX" },
   "relationships" => { "bundleIdCapabilities" => { "data" => [{ "type" => "bundleIdCapabilities", "attributes" => { "enabled" => false, "settings" => [] }, "relationships" => { "capability" => { "data" => { "type" => "capabilities", "id" => "ACCESS_WIFI_INFORMATION" } } } }] } } } }).
           to_return(status: 200)
         stub_request(:patch, "https://developer.apple.com/services-account/v1/bundleIds/ABCD1234").
-          with(body: { "data" => { "type" => "bundleIds", "id" => "ABCD1234", "attributes" => { "teamId" => "XXXXXXXXXX" },
+          with(body: { "data" => { "type" => "bundleIds", "id" => "ABCD1234", "attributes" => { "permissions" => { "edit" => true, "delete" => true }, "seedId" => "SEEDID", "teamId" => "XXXXXXXXXX" },
   "relationships" => { "bundleIdCapabilities" => { "data" => [{ "type" => "bundleIdCapabilities", "attributes" => { "enabled" => true, "settings" => [] }, "relationships" => { "capability" => { "data" => { "type" => "capabilities", "id" => "ACCESS_WIFI_INFORMATION" } } } }] } } } }).
           to_return(status: 200)
 
         # DATA_PROTECTION
         stub_request(:patch, "https://developer.apple.com/services-account/v1/bundleIds/ABCD1234").
-          with(body: { "data" => { "type" => "bundleIds", "id" => "ABCD1234", "attributes" => { "teamId" => "XXXXXXXXXX" },
+          with(body: { "data" => { "type" => "bundleIds", "id" => "ABCD1234", "attributes" => { "permissions" => { "edit" => true, "delete" => true }, "seedId" => "SEEDID", "teamId" => "XXXXXXXXXX" },
   "relationships" => { "bundleIdCapabilities" => { "data" => [{ "type" => "bundleIdCapabilities", "attributes" => { "enabled" => true, "settings" => [{ "key" => "DATA_PROTECTION_PERMISSION_LEVEL", "options" => [{ "key" => "COMPLETE_PROTECTION" }] }] }, "relationships" => { "capability" =>
           { "data" => { "type" => "capabilities", "id" => "DATA_PROTECTION" } } } }] } } } }).to_return(status: 200)
         stub_request(:patch, "https://developer.apple.com/services-account/v1/bundleIds/ABCD1234").
-          with(body: { "data" => { "type" => "bundleIds", "id" => "ABCD1234", "attributes" => { "teamId" => "XXXXXXXXXX" },
+          with(body: { "data" => { "type" => "bundleIds", "id" => "ABCD1234", "attributes" => { "permissions" => { "edit" => true, "delete" => true }, "seedId" => "SEEDID", "teamId" => "XXXXXXXXXX" },
   "relationships" => { "bundleIdCapabilities" => { "data" => [{ "type" => "bundleIdCapabilities", "attributes" => { "enabled" => true, "settings" => [{ "key" => "DATA_PROTECTION_PERMISSION_LEVEL", "options" => [{ "key" => "PROTECTED_UNLESS_OPEN" }] }] }, "relationships" => { "capability" =>
           { "data" => { "type" => "capabilities", "id" => "DATA_PROTECTION" } } } }] } } } }).to_return(status: 200)
         stub_request(:patch, "https://developer.apple.com/services-account/v1/bundleIds/ABCD1234").
-          with(body: { "data" => { "type" => "bundleIds", "id" => "ABCD1234", "attributes" => { "teamId" => "XXXXXXXXXX" },
+          with(body: { "data" => { "type" => "bundleIds", "id" => "ABCD1234", "attributes" => { "permissions" => { "edit" => true, "delete" => true }, "seedId" => "SEEDID", "teamId" => "XXXXXXXXXX" },
   "relationships" => { "bundleIdCapabilities" => { "data" => [{ "type" => "bundleIdCapabilities", "attributes" => { "enabled" => true, "settings" => [{ "key" => "DATA_PROTECTION_PERMISSION_LEVEL", "options" => [{ "key" => "PROTECTED_UNTIL_FIRST_USER_AUTH" }] }] }, "relationships" => { "capability" =>
           { "data" => { "type" => "capabilities", "id" => "DATA_PROTECTION" } } } }] } } } }).to_return(status: 200)
         stub_request(:patch, "https://developer.apple.com/services-account/v1/bundleIds/ABCD1234").
-          with(body: { "data" => { "type" => "bundleIds", "id" => "ABCD1234", "attributes" => { "teamId" => "XXXXXXXXXX" },
+          with(body: { "data" => { "type" => "bundleIds", "id" => "ABCD1234", "attributes" => { "permissions" => { "edit" => true, "delete" => true }, "seedId" => "SEEDID", "teamId" => "XXXXXXXXXX" },
   "relationships" => { "bundleIdCapabilities" => { "data" => [{ "type" => "bundleIdCapabilities", "attributes" => { "enabled" => false, "settings" => [] }, "relationships" => { "capability" => { "data" => { "type" => "capabilities", "id" => "DATA_PROTECTION" } } } }] } } } }).
           to_return(status: 200)
 
         # ICLOUD
         stub_request(:patch, "https://developer.apple.com/services-account/v1/bundleIds/ABCD1234").
-          with(body: { "data" => { "type" => "bundleIds", "id" => "ABCD1234", "attributes" => { "teamId" => "XXXXXXXXXX" },
+          with(body: { "data" => { "type" => "bundleIds", "id" => "ABCD1234", "attributes" => { "permissions" => { "edit" => true, "delete" => true }, "seedId" => "SEEDID", "teamId" => "XXXXXXXXXX" },
   "relationships" => { "bundleIdCapabilities" => { "data" => [{ "type" => "bundleIdCapabilities", "attributes" => { "enabled" => true, "settings" => [{ "key" => "ICLOUD_VERSION", "options" => [{ "key" => "XCODE_5" }] }] }, "relationships" => { "capability" => { "data" => { "type" => "capabilities", "id" => "ICLOUD" } } } }] } } } }).
           to_return(status: 200)
         stub_request(:patch, "https://developer.apple.com/services-account/v1/bundleIds/ABCD1234").
-          with(body: { "data" => { "type" => "bundleIds", "id" => "ABCD1234", "attributes" => { "teamId" => "XXXXXXXXXX" },
+          with(body: { "data" => { "type" => "bundleIds", "id" => "ABCD1234", "attributes" => { "permissions" => { "edit" => true, "delete" => true }, "seedId" => "SEEDID", "teamId" => "XXXXXXXXXX" },
   "relationships" => { "bundleIdCapabilities" => { "data" => [{ "type" => "bundleIdCapabilities", "attributes" => { "enabled" => true, "settings" => [{ "key" => "ICLOUD_VERSION", "options" => [{ "key" => "XCODE_6" }] }] }, "relationships" => { "capability" => { "data" => { "type" => "capabilities", "id" => "ICLOUD" } } } }] } } } }).
           to_return(status: 200)
         stub_request(:patch, "https://developer.apple.com/services-account/v1/bundleIds/ABCD1234").
-          with(body: { "data" => { "type" => "bundleIds", "id" => "ABCD1234", "attributes" => { "teamId" => "XXXXXXXXXX" },
+          with(body: { "data" => { "type" => "bundleIds", "id" => "ABCD1234", "attributes" => { "permissions" => { "edit" => true, "delete" => true }, "seedId" => "SEEDID", "teamId" => "XXXXXXXXXX" },
   "relationships" => { "bundleIdCapabilities" => { "data" => [{ "type" => "bundleIdCapabilities", "attributes" => { "enabled" => false, "settings" => [] }, "relationships" => { "capability" => { "data" => { "type" => "capabilities", "id" => "ICLOUD" } } } }] } } } }).
           to_return(status: 200)
       end
@@ -76,6 +76,23 @@ class ConnectAPIStubbing
       def stub_bundle_id
         stub_request(:post, "https://developer.apple.com/services-account/v1/bundleIds/123456789").
           to_return(status: 200, body: read_fixture_file('bundle_id.json'), headers: { 'Content-Type' => 'application/vnd.api+json' })
+      end
+
+      def stub_get_bundle_id_capabilities
+        stub_request(:post, "https://developer.apple.com/services-account/v1/bundleIds/123456789/bundleIdCapabilities").
+          to_return(status: 200, body: read_fixture_file('bundle_id_capabilities_empty.json'), headers: { 'Content-Type' => 'application/vnd.api+json' })
+      end
+
+      def stub_post_bundle_id_capability
+        stub_request(:post, "https://developer.apple.com/services-account/v1/bundleIdCapabilities").
+          with(body: { "data" => { "attributes" => { "capabilityType" => "APP_GROUPS", "settings" => [], "teamId" => "123" }, "type" => "bundleIdCapabilities", "relationships" => { "bundleId" => { "data" => { "type" => "bundleIds", "id" => "123456789" } } } } }).
+          to_return(status: 200, body: read_fixture_file('bundle_id_capability_create.json'), headers: { 'Content-Type' => 'application/vnd.api+json' })
+      end
+
+      def stub_patch_bundle_id_capability_configuration
+        stub_request(:patch, "https://developer.apple.com/services-account/v1/bundleIdCapabilities/123456789_APP_GROUPS").
+          with(body: { "data" => { "type" => "bundleIdCapabilities", "id" => "123456789_APP_GROUPS", "attributes" => { "enabled" => true, "settings" => [] } } }).
+          to_return(status: 200, body: read_fixture_file('bundle_id_capability_create.json'), headers: { 'Content-Type' => 'application/vnd.api+json' })
       end
 
       def stub_available_bundle_id_capabilities

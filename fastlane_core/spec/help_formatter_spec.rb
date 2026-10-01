@@ -35,7 +35,7 @@ describe FastlaneCore::HelpFormatter do
 
   before do
     commander.program = {
-      name: 'foor_bar_test',
+      name: 'foo_bar_test',
       description: 'This is a mock CLI app for testing'
     }
     default_command_options = [
@@ -51,7 +51,7 @@ describe FastlaneCore::HelpFormatter do
     }
   end
 
-  it 'should indicate default command with with default_command setting' do
+  it 'should indicate default command with default_command setting' do
     commander.default_command = :foo_bar
     help = described_class.new(commander).render
     expect(help).to match(/\(\* default\)/)

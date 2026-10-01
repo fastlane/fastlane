@@ -1,3 +1,5 @@
+require 'base64'
+
 require_relative '../client'
 
 require_relative 'app'
@@ -10,6 +12,7 @@ require_relative 'provisioning_profile'
 require_relative 'certificate'
 require_relative 'website_push'
 require_relative 'persons'
+require_relative 'key'
 
 module Spaceship
   # rubocop:disable Metrics/ClassLength
@@ -189,7 +192,7 @@ module Spaceship
 
     def valid_name_for(input)
       latinized = input.to_slug.transliterate
-      latinized = latinized.gsub(/[^0-9A-Za-z\d\s]/, '') # remove non-valid characters
+      latinized = latinized.gsub(/[^[:ascii:]]|[\.@&*"]/, '') # remove non-valid characters
       # Check if the input string was modified, since it might be empty now
       # (if it only contained non-latin symbols) or the duplicate of another app
       if latinized != input
@@ -341,6 +344,62 @@ module Spaceship
         })
         parse_response(r, 'identifierList')
       end
+    end
+
+    def merchant_domains(merchant_id, mac: false)
+      r = request(:post, "account/#{platform_slug(mac)}/identifiers/listDomainsForMerchant", {
+        merchantId: merchant_id,
+        teamId: team_id
+      })
+      parse_response(r, 'domainList')
+    end
+
+    def merchant_domain_get_verification_file(domain_id, mac: false)
+      r = request(:get, "account/#{platform_slug(mac)}/identifiers/downloadDomainVerificationFile", {
+        teamId: team_id,
+        domainId: domain_id
+      })
+      a = parse_response(r)
+      if r.success? && a.kind_of?(String)
+        begin
+          return a if Base64.urlsafe_decode64(a.delete("\r\n")).include?("Apple Inc.")
+        # if not valid pkcs#7 just fall through
+        rescue ArgumentError
+        end
+      end
+      raise UnexpectedResponse.new, "Couldn't download verification file, got this instead: #{a}"
+    end
+
+    def merchant_domain_verify(domain_id, mac: false)
+      ensure_csrf(Spaceship::Portal::Merchant)
+
+      r = request(:post, "account/#{platform_slug(mac)}/identifiers/verifyDomain", {
+        domainId: domain_id,
+        teamId: team_id
+      })
+      parse_response(r)
+    end
+
+    def create_merchant_domain!(merchant_id, domain_name, mac: false)
+      ensure_csrf(Spaceship::Portal::Merchant)
+
+      r = request(:post, "account/#{platform_slug(mac)}/identifiers/registerDomain", {
+        domainName: domain_name,
+        merchantId: merchant_id,
+        teamId: team_id
+      })
+      parse_response(r, 'domainList').first
+    end
+
+    def delete_merchant_domain!(domain_id, merchant_id, mac: false)
+      ensure_csrf(Spaceship::Portal::Merchant)
+
+      r = request(:post, "account/#{platform_slug(mac)}/identifiers/removeDomain", {
+        merchantId: merchant_id,
+        domainId: domain_id,
+        teamId: team_id
+      })
+      parse_response(r)
     end
 
     def create_merchant!(name, bundle_id, mac: false)
@@ -780,13 +839,39 @@ module Spaceship
     def create_key!(name: nil, service_configs: nil)
       fetch_csrf_token_for_keys
 
+      service_configs_requests = (service_configs || {}).map do |service_id, configs|
+        if service_id == Spaceship::Portal::Key::MUSIC_KIT_ID
+          {
+            serviceId: service_id,
+            isNew: true,
+            identifiers: configs[:identifiers] || {}
+          }
+        elsif service_id == Spaceship::Portal::Key::DEVICE_CHECK_ID
+          {
+            serviceId: service_id,
+            isNew: true,
+            identifiers: configs[:identifiers] || {}
+          }
+        elsif service_id == Spaceship::Portal::Key::APNS_ID
+          {
+            serviceId: service_id,
+            isNew: true,
+            identifiers: configs[:identifiers] || {},
+            environment: configs[:environment] || "all",
+            scope: configs[:scope] || "team"
+          }
+        else
+          raise "Unknown service id: #{service_id}"
+        end
+      end
+
       params = {
         name: name,
-        serviceConfigurations: service_configs,
+        serviceConfigurationsRequests: service_configs_requests,
         teamId: team_id
       }
 
-      response = request(:post, 'account/auth/key/create') do |req|
+      response = request(:post, 'account/auth/key/v2/create') do |req|
         req.headers['Content-Type'] = 'application/json'
         req.body = params.to_json
       end

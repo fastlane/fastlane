@@ -1,0 +1,309 @@
+# Keeps the per platform spec timings current, and runs the split in a random
+# order.
+#
+# The speed argument for splitting the suite now lives in the CI workflow, which
+# runs `rake test_parallel` on every pull request. What is left here is the two
+# things that workflow does not do.
+#
+# Recording the timings. The split is balanced from measured per file durations,
+# and they have to come from the platform they balance: 61% of the example time
+# on macOS is in files that skip entirely on Linux, and balancing a Linux split
+# from macOS numbers left a worker idle 41% to 48% of the run. Each file records
+# where it was measured. They only shift when the shape of the suite changes, so
+# quarterly is enough, and a stale file costs a worse split rather than a wrong
+# result. Recording means a full single process run on each platform, which is
+# the expensive half of this workflow and the reason that half stays quarterly.
+#
+# Running the split in a random order. CI runs it in the defined order, so the
+# two axes of isolation are exercised separately there. A worker sees a subset
+# no seed produces, and a random order within that subset is the harsher test of
+# the two combined. That is how the `DisplayType` global and the pty exit status
+# defect (#30188) were found, neither of which had shown up in a random order
+# alone.
+#
+# That half runs weekly, and cheaply: no recording, just the split. It earns it.
+# The first time it ran against a changed suite it found two order dependencies
+# that had been latent for days, one on Windows and one on macOS, neither of
+# them related to the pull request they appeared on. On a pull request trigger
+# alone it would have been months before anyone saw either.
+#
+# Running on a schedule is also what keeps this honest. A workflow nobody runs
+# is a workflow that has quietly stopped working.
+name: Spec timings and random order split
+
+on:
+  pull_request:
+    paths:
+      - 'internal/rakelib/parallel.rake'
+      - 'internal/spec_timings.*.json'
+      - '.github/workflows/parallel-tests.yml'
+  schedule:
+    # Two cadences, told apart by github.event.schedule below.
+    #
+    # 04:00 UTC every Monday: the random order split only. It found two order
+    # dependencies the first time it ran against a changed suite, one on Windows
+    # and one on macOS, both of which had been latent for days. Quarterly is too
+    # rare to catch that class before it reaches someone.
+    - cron: '0 4 * * 1'
+    # 04:00 UTC on the first of January, April, July and October: the split and
+    # a full single process run per platform to record the timings. That run is
+    # the expensive half, and the timings only shift when the shape of the suite
+    # does, so it stays quarterly.
+    - cron: '0 4 1 1,4,7,10 *'
+  workflow_dispatch:
+    inputs:
+      record_timings:
+        description: "Record spec timings instead of running the split. The split is balanced from these, and they are per platform because the suite is a different shape on each. `all` also opens a pull request with the three files, which is how to refresh them without waiting for the quarterly run."
+        required: false
+        type: choice
+        options: ["no", "macos", "linux", "windows", "all"]
+        default: "no"
+      workers:
+        description: "Workers per runner. Four has measured best on all three runners."
+        required: false
+        type: string
+        default: "4"
+
+permissions:
+  contents: read
+
+jobs:
+  split_macos:
+    name: "Split, macOS"
+    if: inputs.record_timings == 'no' || inputs.record_timings == null
+    runs-on: macos-15
+    steps:
+      - uses: actions/checkout@v7
+      - uses: maxim-lobanov/setup-xcode@v1
+        with:
+          xcode-version: '16.4.0'
+      - uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: '3.4'
+          bundler-cache: true
+      - name: Increase Open File Limit
+        shell: bash
+        run: ulimit -n 65536
+      - name: Run the suite split across workers, in a random order
+        shell: bash
+        env:
+          FASTLANE_SPEC_WORKERS: ${{ inputs.workers || '4' }}
+          RSPEC_ARGS: "--order random"
+        run: bundle exec rake test_parallel
+
+      # The worker logs hold the actual failure messages. The task prints which
+      # examples failed, but a split only failure needs the reason and the
+      # bucket that produced it, and neither survives the runner otherwise.
+      - name: Keep the worker logs
+        if: failure()
+        uses: actions/upload-artifact@v7
+        with:
+          name: rspec-worker-logs-macos
+          path: |
+            rspec_worker_*.log
+            rspec_worker_*.units
+          if-no-files-found: warn
+
+  split_linux:
+    name: "Split, Linux"
+    if: inputs.record_timings == 'no' || inputs.record_timings == null
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v7
+      - uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: '3.1'
+          bundler-cache: true
+      - name: Increase Open File Limit
+        shell: bash
+        run: ulimit -n 65536
+      # Without Xcode the requires_xcodebuild and requires_keychain specs skip,
+      # which is most of the example time on macOS: 558s there against 106s here.
+      - name: Run the suite split across workers, in a random order
+        shell: bash
+        env:
+          FASTLANE_SPEC_WORKERS: ${{ inputs.workers || '4' }}
+          RSPEC_ARGS: "--order random"
+        run: bundle exec rake test_parallel
+
+      # The worker logs hold the actual failure messages. The task prints which
+      # examples failed, but a split only failure needs the reason and the
+      # bucket that produced it, and neither survives the runner otherwise.
+      - name: Keep the worker logs
+        if: failure()
+        uses: actions/upload-artifact@v7
+        with:
+          name: rspec-worker-logs-linux
+          path: |
+            rspec_worker_*.log
+            rspec_worker_*.units
+          if-no-files-found: warn
+
+  split_windows:
+    name: "Split, Windows"
+    if: inputs.record_timings == 'no' || inputs.record_timings == null
+    runs-on: windows-2022
+    steps:
+      - uses: actions/checkout@v7
+      - uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: '3.2'
+          bundler-cache: true
+      # No ulimit step: the open file limit is not a thing to raise here, and
+      # there is no Xcode, so this is the Linux shape of the suite again on a
+      # third process model. Workers are spawned rather than forked, which is
+      # what makes the split possible here at all.
+      - name: Run the suite split across workers, in a random order
+        shell: bash
+        env:
+          FASTLANE_SPEC_WORKERS: ${{ inputs.workers || '4' }}
+          RSPEC_ARGS: "--order random"
+        run: bundle exec rake test_parallel
+
+      # The worker logs hold the actual failure messages. The task prints which
+      # examples failed, but a split only failure needs the reason and the
+      # bucket that produced it, and neither survives the runner otherwise.
+      - name: Keep the worker logs
+        if: failure()
+        uses: actions/upload-artifact@v7
+        with:
+          name: rspec-worker-logs-windows
+          path: |
+            rspec_worker_*.log
+            rspec_worker_*.units
+          if-no-files-found: warn
+
+  record_macos:
+    name: "Record timings, macOS"
+    if: github.event.schedule == '0 4 1 1,4,7,10 *' || inputs.record_timings == 'macos' || inputs.record_timings == 'all'
+    runs-on: macos-15
+    steps:
+      - uses: actions/checkout@v7
+      - uses: maxim-lobanov/setup-xcode@v1
+        with:
+          xcode-version: '16.4.0'
+      - uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: '3.4'
+          bundler-cache: true
+      - name: Increase Open File Limit
+        shell: bash
+        run: ulimit -n 65536
+      # One process, deliberately: per file durations only mean anything when
+      # nothing else is competing for the machine.
+      - name: Record timings
+        shell: bash
+        run: bundle exec rake spec_timings
+      - uses: actions/upload-artifact@v7
+        with:
+          name: spec-timings-macos
+          path: internal/spec_timings.mac.json
+          if-no-files-found: error
+
+  record_linux:
+    name: "Record timings, Linux"
+    if: github.event.schedule == '0 4 1 1,4,7,10 *' || inputs.record_timings == 'linux' || inputs.record_timings == 'all'
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v7
+      - uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: '3.1'
+          bundler-cache: true
+      - name: Increase Open File Limit
+        shell: bash
+        run: ulimit -n 65536
+      # Recording here rather than on a laptop is the point: three of the
+      # heaviest macOS files cost nothing on Linux, and balancing a Linux split
+      # from macOS numbers left a worker idle 41% to 48% of the run.
+      - name: Record timings
+        shell: bash
+        run: bundle exec rake spec_timings
+      - uses: actions/upload-artifact@v7
+        with:
+          name: spec-timings-linux
+          path: internal/spec_timings.linux.json
+          if-no-files-found: error
+
+  record_windows:
+    name: "Record timings, Windows"
+    if: github.event.schedule == '0 4 1 1,4,7,10 *' || inputs.record_timings == 'windows' || inputs.record_timings == 'all'
+    runs-on: windows-2022
+    steps:
+      - uses: actions/checkout@v7
+      - uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: '3.2'
+          bundler-cache: true
+      - name: Record timings
+        shell: bash
+        run: bundle exec rake spec_timings
+      - uses: actions/upload-artifact@v7
+        with:
+          name: spec-timings-windows
+          path: internal/spec_timings.windows.json
+          if-no-files-found: error
+
+  # Closes the loop on the recording above. The three record jobs each produce
+  # one platform's file on its own runner, so nothing but a fourth job can see
+  # all three at once. It opens a pull request rather than pushing to master,
+  # the way the release workflow does: a split balanced from bad numbers is a
+  # slow suite rather than a broken one, but the diff is still worth a look.
+  publish_timings:
+    name: "Open a pull request with the recorded timings"
+    needs: [record_macos, record_linux, record_windows]
+    # A dispatch can run from any ref, and this cuts its branch from whatever is
+    # checked out.
+    if: github.ref == 'refs/heads/master'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      pull-requests: write
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/download-artifact@v8
+        with:
+          pattern: spec-timings-*
+          path: recorded
+      - name: Open the pull request
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          set -euo pipefail
+
+          found=$(find recorded -name 'spec_timings.*.json' | wc -l)
+          if [ "$found" -ne 3 ]; then
+            echo "Expected three timing files, found $found:"
+            find recorded -type f
+            exit 1
+          fi
+          find recorded -name 'spec_timings.*.json' -exec cp {} internal/ \;
+
+          if git diff --quiet -- internal/spec_timings.linux.json internal/spec_timings.mac.json internal/spec_timings.windows.json; then
+            echo "The timings are unchanged. Nothing to open."
+            exit 0
+          fi
+
+          branch="spec-timings-$(date -u +%Y-%m-%d)"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git config user.name "github-actions[bot]"
+          git checkout -b "$branch"
+          git add internal/spec_timings.linux.json internal/spec_timings.mac.json internal/spec_timings.windows.json
+          git commit -m "Record the spec timings the split is balanced from"
+          git push --force-with-lease origin "$branch"
+
+          if [ -n "$(gh pr list --head "$branch" --state open --json number --jq '.[].number')" ]; then
+            echo "A pull request for $branch is already open, the push updated it."
+            exit 0
+          fi
+
+          gh pr create --base master --head "$branch" \
+            --title "Record the spec timings the split is balanced from" \
+            --body "$(cat <<'BODY'
+          Recorded by [this run](${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}) of `Spec timings and random order split`.
+
+          `rake test_parallel` packs the suite from measured per file durations, and they have to come from the platform they balance, because the suite is a different shape on each. Each file records where and when it was measured.
+
+          A stale file costs a worse balanced split rather than a wrong result, so this is not urgent, but the numbers are worth a glance before merging. `recorded_on` in each file says which runner produced it.
+          BODY
+          )"

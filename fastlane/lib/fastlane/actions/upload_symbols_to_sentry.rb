@@ -2,13 +2,15 @@ module Fastlane
   module Actions
     class UploadSymbolsToSentryAction < Action
       def self.run(params)
-        # Warning about usinging new plugin
+        # Warning about using new plugin
         UI.important("It's recommended to use the official Sentry Fastlane plugin")
         UI.important("GitHub: https://github.com/getsentry/fastlane-plugin-sentry")
         UI.important("Installation: fastlane add_plugin sentry")
 
-        Actions.verify_gem!('rest-client')
-        require 'rest-client'
+        UI.user_error!("This plugin is now completely deprecated")
+        # the code below doesn't run anymore
+        # Actions.verify_gem!('rest-client')
+        # require 'rest-client'
 
         # Params - API
         host = params[:api_host]

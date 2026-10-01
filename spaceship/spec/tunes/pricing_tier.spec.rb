@@ -1,5 +1,5 @@
 describe Spaceship::Tunes::PricingTier do
-  before { Spaceship::Tunes.login }
+  include_examples "common spaceship login"
 
   let(:client) { Spaceship::AppVersion.client }
 

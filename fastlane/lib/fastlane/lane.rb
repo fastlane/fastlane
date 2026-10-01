@@ -24,11 +24,19 @@ module Fastlane
       self.platform = platform
       self.name = name
       self.description = description
-      self.block = block
+      # We want to support _both_ lanes expecting a `Hash` (like `lane :foo do |options|`), and lanes expecting
+      # keyword parameters (like `lane :foo do |param1:, param2:, param3: 'default value'|`)
+      block_expects_keywords = !block.nil? && block.parameters.any? { |type, _| [:key, :keyreq].include?(type) }
+      # Conversion of the `Hash` parameters (passed by `Lane#call`) into keywords has to be explicit in Ruby 3
+      # https://www.ruby-lang.org/en/news/2019/12/12/separation-of-positional-and-keyword-arguments-in-ruby-3-0/
+      self.block = block_expects_keywords ? proc { |options| block.call(**options) } : block
       self.is_private = is_private
     end
 
     # Execute this lane
+    #
+    # @param [Hash] parameters The Hash of parameters to pass to the lane
+    #
     def call(parameters)
       block.call(parameters || {})
     end

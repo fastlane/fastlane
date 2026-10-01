@@ -42,7 +42,12 @@ module Fastlane
       end
 
       def self.replace_keychain_in_search_list(keychain_path)
-        Actions.lane_context[Actions::SharedValues::ORIGINAL_DEFAULT_KEYCHAIN] = Fastlane::Actions.sh("security default-keychain", log: false).strip
+        begin
+          UI.message("Reading existing default keychain")
+          Actions.lane_context[Actions::SharedValues::ORIGINAL_DEFAULT_KEYCHAIN] = Fastlane::Actions.sh("security default-keychain").strip
+        rescue => e
+          raise unless e.message.include?("security: SecKeychainCopyDefault: A default keychain could not be found.")
+        end
         escaped_path = keychain_path.shellescape
         Fastlane::Actions.sh("security list-keychains -s #{escaped_path}", log: false)
       end

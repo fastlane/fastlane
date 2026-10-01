@@ -267,6 +267,18 @@ module FastlaneCore
     end
     # rubocop:enable Metrics/PerceivedComplexity
 
+    # Returns true if the value for a certain key comes from one of the sources `fetch` checks
+    # before falling back to the default value: passed in, an environment variable or the config file
+    def specified?(key)
+      UI.crash!("Key '#{key}' must be a symbol. Example :#{key}") unless key.kind_of?(Symbol)
+
+      option = verify_options_key!(key)
+
+      !@values[key].nil? ||
+        !option.fetch_env_value.nil? ||
+        self.config_file_options.key?(key)
+    end
+
     # Overwrites or sets a new value for a given key
     # @param key [Symbol] Must be a symbol
     def set(key, value)

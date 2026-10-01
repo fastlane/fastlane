@@ -15,7 +15,7 @@ module Frameit
     attr_reader :priority_config_key
 
     def initialize(id, formatted_name, priority, resolutions, density_ppi, default_color, platform = Platform::IOS, deliver_screen_id = nil, priority_config_key = nil)
-      Raise("Priority mustn't be higher than #{REQUIRED_PRIORITY}") if priority > REQUIRED_PRIORITY
+      raise "Priority mustn't be higher than #{REQUIRED_PRIORITY}" if priority > REQUIRED_PRIORITY
       @id = id
       @deliver_screen_id = deliver_screen_id
       @formatted_name = formatted_name
@@ -71,9 +71,9 @@ module Frameit
       return nil
     end
 
-    # Previously ENV[FRAMEIT_FORCE_DEVICE_TYPE] was matched to Deliver::AppScreenshot::ScreenSize constants. However,
+    # Previously ENV[FRAMEIT_FORCE_DEVICE_TYPE] was matched to Deliver::AppScreenshot display type strings.
     # options.rb defined a few Apple devices with unspecified IDs, this option was never read from Frameit.config.
-    # Therefore this function matches both ScreenSize constants and formatted names to maintain backward compatibility.
+    # Therefore this function matches both DisplayType constants and formatted names to maintain backward compatibility.
     def self.find_device_by_id_or_name(id)
       return nil if id.nil?
       found_device = nil

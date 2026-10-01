@@ -8,7 +8,7 @@ module Spaceship
       #
       # This client is solely responsible for the making HTTP requests and
       # parsing their responses. Parameters should be either named parameters, or
-      # for large request data bodies, pass in anything that can resond to
+      # for large request data bodies, pass in anything that can respond to
       # `to_json`.
       #
       # Each request method should validate the required parameters. A required parameter is one that would result in 400-range response if it is not supplied.

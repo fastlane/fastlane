@@ -1,0 +1,9 @@
+Testing started
+[15:47:28]: ▸ Test Suite ExampleTestTests started on 'Clone 1 of iPhone 17 Pro - ExampleTest (96789)'
+[15:47:28]: ▸     ✖ [ExampleTestTests] testExample on 'Clone 1 of iPhone 17 Pro - ExampleTest (96789)' (0.474 seconds)
+[15:48:09]: ▸ Test Suite ExampleTestUITests started on 'Clone 2 of iPhone 17 Pro - ExampleTestUITests-Runner (97123)'
+[15:48:15]: ▸     ✖ [ExampleTestUITests] testExample on 'Clone 2 of iPhone 17 Pro - ExampleTestUITests-Runner (97123)' (6.270 seconds)
+[15:48:35]: ▸ 2026-01-09 15:48:35.816 xcodebuild[96200:1553005] [MT] IDETestOperationsObserverDebug: 144.107 elapsed -- Testing started completed.
+[15:48:35]: ▸ 2026-01-09 15:48:35.816 xcodebuild[96200:1553005] [MT] IDETestOperationsObserverDebug: 0.000 sec, +0.000 sec -- start
+[15:48:35]: ▸ 2026-01-09 15:48:35.816 xcodebuild[96200:1553005] [MT] IDETestOperationsObserverDebug: 144.107 sec, +144.107 sec -- end
+[15:48:35]: ▸ ** TEST FAILED **

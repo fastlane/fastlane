@@ -1,6 +1,15 @@
 require 'fastlane/cli_tools_distributor'
 
 describe Fastlane::CLIToolsDistributor do
+  around do |example|
+    # FASTLANE_SKIP_UPDATE_CHECK: prevent the update checker to run and clutter the output
+    # (Fastlane::PluginUpdateManager.start_looking_for_updates() will return)
+    # FASTLANE_DISABLE_ANIMATION: prevent the spinner in Fastlane::CLIToolsDistributor.take_off
+    FastlaneSpec::Env.with_env_values('FASTLANE_SKIP_UPDATE_CHECK': 'a_truthy_value', 'FASTLANE_DISABLE_ANIMATION': 'true') do
+      example.run
+    end
+  end
+
   describe "command handling" do
     it "runs the lane instead of the tool when there is a conflict" do
       FastlaneSpec::Env.with_ARGV(["sigh"]) do
@@ -61,6 +70,18 @@ describe Fastlane::CLIToolsDistributor do
         expect(FastlaneCore::FastlaneFolder).to receive(:fastfile_path).and_return("./fastlane/spec/fixtures/fastfiles/FastfileErrorInError").at_least(:once)
         expect(FastlaneCore::UpdateChecker).to receive(:start_looking_for_update).with('fastlane')
         expect(FastlaneCore::UpdateChecker).to receive(:show_update_status).with('fastlane', Fastlane::VERSION)
+        expect_any_instance_of(Commander::Runner).to receive(:abort).with("\n[!] Original error".red).and_raise(SystemExit) # mute console output from `abort`
+        expect do
+          Fastlane::CLIToolsDistributor.take_off
+        end.to raise_error(SystemExit)
+      end
+    end
+
+    it "throws the original error if UpdateChecker also fails" do
+      FastlaneSpec::Env.with_ARGV(["beta"]) do
+        expect(FastlaneCore::FastlaneFolder).to receive(:fastfile_path).and_return("./fastlane/spec/fixtures/fastfiles/FastfileErrorInError").at_least(:once)
+        expect(FastlaneCore::UpdateChecker).to receive(:start_looking_for_update).with('fastlane')
+        expect(FastlaneCore::UpdateChecker).to receive(:show_update_status).with('fastlane', Fastlane::VERSION).and_raise(LoadError)
         expect_any_instance_of(Commander::Runner).to receive(:abort).with("\n[!] Original error".red).and_raise(SystemExit) # mute console output from `abort`
         expect do
           Fastlane::CLIToolsDistributor.take_off

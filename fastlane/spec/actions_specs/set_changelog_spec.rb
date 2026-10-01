@@ -7,7 +7,7 @@ describe Fastlane do
         it 'raises a Fastlane error' do
           expect { Fastlane::FastFile.new.parse(invalidPlatform_lane).runner.execute(:test) }.to(
             raise_error(FastlaneCore::Interface::FastlaneError) do |error|
-              expect(error.message).to match(/Invalid platform 'whatever', must be ios, appletvos, mac/)
+              expect(error.message).to match(/Invalid platform 'whatever', must be ios, appletvos, xros, mac/)
             end
           )
         end

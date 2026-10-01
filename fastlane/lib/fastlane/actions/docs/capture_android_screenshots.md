@@ -32,7 +32,7 @@ androidTestImplementation 'tools.fastlane:screengrab:x.x.x'
 
 The latest version is [ ![Download](https://maven-badges.herokuapp.com/maven-central/tools.fastlane/screengrab/badge.svg)](https://search.maven.org/artifact/tools.fastlane/screengrab)
 
-As of Screengrab version 2.0.0, all Android test dependencies are AndroidX dependencies. This means a device with API 18+, Android 4.3 or greater is required. If you wish to capture screenshots with an older Android OS, then you must use a 1.x.x version.
+As of _screengrab_ version 2.0.0, all Android test dependencies are AndroidX dependencies. This means a device with API 18+, Android 4.3 or greater is required. If you wish to capture screenshots with an older Android OS, then you must use a 1.x.x version.
 
 ##### Configuring your Manifest Permissions
 
@@ -63,21 +63,21 @@ Ensure that the following permissions exist in your **src/debug/AndroidManifest.
 1. Add `LocaleTestRule` to your tests class to handle automatic switching of locales.
 
    If you're using Java use:
-   
+
    ```java
    @ClassRule
    public static final LocaleTestRule localeTestRule = new LocaleTestRule();
    ```
-   
+
    If you're using Kotlin use:
-   
+
    ```kotlin
    @Rule @JvmField
    val localeTestRule = LocaleTestRule()
    ```
-   
+
    The `@JvmField` annotation is important. It won't work like this:
-   
+
    ```kotlin
    companion object {
        @get:ClassRule
@@ -87,7 +87,7 @@ Ensure that the following permissions exist in your **src/debug/AndroidManifest.
 
 2. To capture screenshots, add the following to your tests `Screengrab.screenshot("name_of_screenshot_here");` on the appropriate screens
 
-# Generating Screenshots with Screengrab
+# Generating Screenshots with _screengrab_
 - Then, before running `fastlane screengrab` you'll need a debug and test apk
   - You can create your APKs manually with `./gradlew assembleDebug assembleAndroidTest`
   - You can also create a lane and use `build_android_app`:
@@ -228,7 +228,7 @@ When using JUnit 3 you'll need to add a bit more code:
 
 ## Clean Status Bar
 
-Screengrab can clean your status bar to make your screenshots even more beautiful.
+_screengrab_ can clean your status bar to make your screenshots even more beautiful.
 It is simply a wrapper that allows configuring SystemUI DemoMode in your code.
 Note: the clean status bar feature is only supported on devices with *API level >= 23*.
 

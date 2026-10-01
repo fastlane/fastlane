@@ -1,6 +1,7 @@
 require 'rubygems'
 
 initialized = false
+bundled = false
 test_ui = nil
 generator = nil
 tmp_dir = nil
@@ -17,19 +18,26 @@ describe Fastlane::PluginGenerator do
     let(:summary) { plugin_info.summary }
     let(:details) { plugin_info.details }
 
+    # Paired with the after(:all) below. Not the block form of Dir.chdir,
+    # because rspec has no around(:all).
+    before(:all) do
+      tmp_dir = Dir.mktmpdir
+      oldwd = Dir.pwd
+      Dir.chdir(tmp_dir)
+    end
+
     before(:each) do
       stub_plugin_exists_on_rubygems(plugin_name, false)
 
+      # Generated once, but from a before(:each) rather than a before(:all),
+      # because this needs rspec-mocks and `let` helpers and both raise in a
+      # before(:context) hook.
       unless initialized
         test_ui = Fastlane::PluginGeneratorUI.new
         allow(test_ui).to receive(:message)
         allow(test_ui).to receive(:success)
         allow(test_ui).to receive(:input).and_raise(":input call was not mocked!")
         allow(test_ui).to receive(:confirm).and_raise(":confirm call was not mocked!")
-
-        tmp_dir = Dir.mktmpdir
-        oldwd = Dir.pwd
-        Dir.chdir(tmp_dir)
 
         generator = Fastlane::PluginGenerator.new(ui: test_ui, dest_root: tmp_dir)
 
@@ -57,6 +65,7 @@ describe Fastlane::PluginGenerator do
       tmp_dir = nil
       oldwd = nil
       initialized = false
+      bundled = false
     end
 
     it "creates gem root directory" do
@@ -103,15 +112,27 @@ describe Fastlane::PluginGenerator do
       gemfile_lines = File.read(gemfile).lines
 
       [
-        "source('https://rubygems.org')\n",
-        "gemspec\n"
+        "source('https://rubygems.org')",
+        "gem 'bundler'",
+        "gem 'fastlane', '>= #{Fastlane::VERSION}'",
+        "gem 'pry'",
+        "gem 'rake'",
+        "gem 'rspec'",
+        "gem 'rubocop', '#{Fastlane::RUBOCOP_REQUIREMENT}'",
+        "gem 'rubocop-performance'",
+        "gem 'rubocop-require_tools'",
+        "gem 'simplecov'",
+        "gemspec"
       ].each do |line|
-        expect(gemfile_lines).to include(line)
+        # Expect them to match approximately, e.g. using regex
+        expect(gemfile_lines).to include("#{line}\n")
       end
     end
 
     it "creates a plugin.rb file for the plugin" do
-      plugin_rb_file = File.join(tmp_dir, gem_name, 'lib', 'fastlane', 'plugin', "#{plugin_name}.rb")
+      relative_path = File.join('lib', 'fastlane', 'plugin', "#{plugin_name}.rb")
+      plugin_rb_file = File.join(tmp_dir, gem_name, relative_path)
+
       expect(File.exist?(plugin_rb_file)).to be(true)
 
       plugin_rb_contents = File.read(plugin_rb_file)
@@ -122,7 +143,10 @@ describe Fastlane::PluginGenerator do
         $LOAD_PATH.unshift(lib) unless $LOAD_PATH.include?(lib)
 
         # rubocop:disable Security/Eval
-        eval(plugin_rb_contents)
+        # Starting with Ruby 3.3, we must pass the __FILE__ of the actual file location for the all_class method implementation to work.
+        # Also, we expand the relative_path within Dir.chdir, as Dir.chdir on macOS will make it so tmp paths will always be under /private,
+        # while expand_path called from outside of Dir.chdir will not be prefixed by /private
+        eval(plugin_rb_contents, binding, File.expand_path(relative_path), __LINE__)
         # rubocop:enable Security/Eval
 
         # If we evaluate the contents of the generated plugin.rb file,
@@ -219,18 +243,7 @@ describe Fastlane::PluginGenerator do
         expect(gemspec.version).to eq(Gem::Version.new('0.1.0'))
         expect(gemspec.email).to eq(email)
         expect(gemspec.summary).to eq(summary)
-        expect(gemspec.development_dependencies).to contain_exactly(
-          Gem::Dependency.new("pry", Gem::Requirement.new([">= 0"]), :development),
-          Gem::Dependency.new("bundler", Gem::Requirement.new([">= 0"]), :development),
-          Gem::Dependency.new("rspec", Gem::Requirement.new([">= 0"]), :development),
-          Gem::Dependency.new("rspec_junit_formatter", Gem::Requirement.new([">= 0"]), :development),
-          Gem::Dependency.new("rake", Gem::Requirement.new([">= 0"]), :development),
-          Gem::Dependency.new("rubocop", Gem::Requirement.new([Fastlane::RUBOCOP_REQUIREMENT]), :development),
-          Gem::Dependency.new("rubocop-require_tools", Gem::Requirement.new([">= 0"]), :development),
-          Gem::Dependency.new("rubocop-performance", Gem::Requirement.new([">= 0"]), :development),
-          Gem::Dependency.new("simplecov", Gem::Requirement.new([">= 0"]), :development),
-          Gem::Dependency.new("fastlane", Gem::Requirement.new([">= #{Fastlane::VERSION}"]), :development)
-        )
+        expect(gemspec.development_dependencies).to eq([])
       end
     end
 
@@ -277,10 +290,17 @@ describe Fastlane::PluginGenerator do
     end
 
     describe "All tests and style validation of the new plugin are passing" do
-      before (:all) do
-        # let(:gem_name) is not available in before(:all), so pass the directory
-        # in explicitly once instead of making this a before(:each)
-        plugin_sh('bundle install', 'fastlane-plugin-tester_thing')
+      # before(:each) with a flag, not before(:all). RSpec runs an inner
+      # before(:all) ahead of an outer before(:each), so as a before(:all) this
+      # ran `bundle install` before the plugin above had been generated. It only
+      # ever worked because an earlier example in the file had generated it
+      # already, and running this group on its own failed with Errno::ENOENT for
+      # the plugin directory. See fastlane#30184.
+      before(:each) do
+        unless bundled
+          plugin_sh('bundle install')
+          bundled = true
+        end
       end
 
       it "rspec tests are passing" do

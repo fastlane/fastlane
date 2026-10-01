@@ -11,9 +11,9 @@ module Screengrab
 
       @data = {}
 
-      Dir[File.join(screens_path, "*")].sort.each do |language_folder|
+      Dir[File.join(screens_path, "*")].each do |language_folder|
         language = File.basename(language_folder)
-        Dir[File.join(language_folder, 'images', '*', '*.png')].sort.each do |screenshot|
+        Dir[File.join(language_folder, 'images', '*', '*.png')].each do |screenshot|
           device_type_folder = File.basename(File.dirname(screenshot))
           @data[language] ||= {}
           @data[language][device_type_folder] ||= []

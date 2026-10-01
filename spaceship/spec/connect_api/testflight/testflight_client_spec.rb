@@ -47,7 +47,7 @@ describe Spaceship::ConnectAPI::TestFlight::Client do
 
     describe "apps" do
       context 'get_apps' do
-        let(:path) { "apps" }
+        let(:path) { "v1/apps" }
         let(:bundle_id) { "com.bundle.id" }
 
         it 'succeeds' do
@@ -67,7 +67,7 @@ describe Spaceship::ConnectAPI::TestFlight::Client do
 
       context 'get_app' do
         let(:app_id) { "123456789" }
-        let(:path) { "apps/#{app_id}" }
+        let(:path) { "v1/apps/#{app_id}" }
 
         it 'succeeds' do
           params = {}
@@ -80,7 +80,7 @@ describe Spaceship::ConnectAPI::TestFlight::Client do
 
     describe "betaAppLocalizations" do
       context 'get_beta_app_localizations' do
-        let(:path) { "betaAppLocalizations" }
+        let(:path) { "v1/betaAppLocalizations" }
         let(:app_id) { "123" }
 
         it 'succeeds' do
@@ -99,7 +99,7 @@ describe Spaceship::ConnectAPI::TestFlight::Client do
       end
 
       context 'post_beta_app_localizations' do
-        let(:path) { "betaAppLocalizations" }
+        let(:path) { "v1/betaAppLocalizations" }
         let(:app_id) { "123" }
         let(:attributes) { { key: "value" } }
         let(:body) do
@@ -129,7 +129,7 @@ describe Spaceship::ConnectAPI::TestFlight::Client do
       end
 
       context 'patch_beta_app_localizations' do
-        let(:path) { "betaAppLocalizations" }
+        let(:path) { "v1/betaAppLocalizations" }
         let(:localization_id) { "123" }
         let(:attributes) { { key: "value" } }
         let(:body) do
@@ -154,7 +154,7 @@ describe Spaceship::ConnectAPI::TestFlight::Client do
 
     describe "betaAppReviewDetails" do
       context 'get_beta_app_review_detail' do
-        let(:path) { "betaAppReviewDetails" }
+        let(:path) { "v1/betaAppReviewDetails" }
         let(:app_id) { "123" }
 
         it 'succeeds' do
@@ -173,7 +173,7 @@ describe Spaceship::ConnectAPI::TestFlight::Client do
       end
 
       context 'patch_beta_app_review_detail' do
-        let(:path) { "betaAppReviewDetails" }
+        let(:path) { "v1/betaAppReviewDetails" }
         let(:app_id) { "123" }
         let(:attributes) { { key: "value" } }
         let(:body) do
@@ -197,7 +197,7 @@ describe Spaceship::ConnectAPI::TestFlight::Client do
 
     describe "betaAppReviewSubmissions" do
       context 'get_beta_app_review_submissions' do
-        let(:path) { "betaAppReviewSubmissions" }
+        let(:path) { "v1/betaAppReviewSubmissions" }
         let(:app_id) { "123" }
 
         it 'succeeds' do
@@ -216,7 +216,7 @@ describe Spaceship::ConnectAPI::TestFlight::Client do
       end
 
       context 'post_beta_app_review_submissions' do
-        let(:path) { "betaAppReviewSubmissions" }
+        let(:path) { "v1/betaAppReviewSubmissions" }
         let(:build_id) { "123" }
         let(:body) do
           {
@@ -245,7 +245,7 @@ describe Spaceship::ConnectAPI::TestFlight::Client do
 
       context 'delete_beta_app_review_submission' do
         let(:beta_app_review_submission_id) { "123" }
-        let(:path) { "betaAppReviewSubmissions/#{beta_app_review_submission_id}" }
+        let(:path) { "v1/betaAppReviewSubmissions/#{beta_app_review_submission_id}" }
 
         it 'succeeds' do
           params = {}
@@ -258,7 +258,7 @@ describe Spaceship::ConnectAPI::TestFlight::Client do
 
     describe "betaBuildLocalizations" do
       context 'get_beta_build_localizations' do
-        let(:path) { "betaBuildLocalizations" }
+        let(:path) { "v1/betaBuildLocalizations" }
         let(:build_id) { "123" }
 
         it 'succeeds' do
@@ -277,7 +277,7 @@ describe Spaceship::ConnectAPI::TestFlight::Client do
       end
 
       context 'post_beta_build_localizations' do
-        let(:path) { "betaBuildLocalizations" }
+        let(:path) { "v1/betaBuildLocalizations" }
         let(:build_id) { "123" }
         let(:attributes) { { key: "value" } }
         let(:body) do
@@ -307,7 +307,7 @@ describe Spaceship::ConnectAPI::TestFlight::Client do
       end
 
       context 'patch_beta_build_localizations' do
-        let(:path) { "betaBuildLocalizations" }
+        let(:path) { "v1/betaBuildLocalizations" }
         let(:localization_id) { "123" }
         let(:attributes) { { key: "value" } }
         let(:body) do
@@ -332,7 +332,7 @@ describe Spaceship::ConnectAPI::TestFlight::Client do
 
     describe "betaFeedbacks" do
       context 'get_beta_feedbacks' do
-        let(:path) { "betaFeedbacks" }
+        let(:path) { "v1/betaFeedbacks" }
         let(:app_id) { "123456789" }
         let(:default_params) { {} }
 
@@ -354,7 +354,7 @@ describe Spaceship::ConnectAPI::TestFlight::Client do
 
     describe "betaGroups" do
       context 'get_beta_groups' do
-        let(:path) { "betaGroups" }
+        let(:path) { "v1/betaGroups" }
         let(:name) { "sir group a lot" }
         let(:default_params) { {} }
 
@@ -374,7 +374,7 @@ describe Spaceship::ConnectAPI::TestFlight::Client do
       end
 
       context 'add_beta_groups_to_build' do
-        let(:path) { "builds" }
+        let(:path) { "v1/builds" }
         let(:build_id) { "123" }
         let(:beta_group_ids) { ["123", "456"] }
         let(:body) do
@@ -398,7 +398,7 @@ describe Spaceship::ConnectAPI::TestFlight::Client do
       end
 
       context 'delete_beta_groups_from_build' do
-        let(:path) { "builds" }
+        let(:path) { "v1/builds" }
         let(:build_id) { "123" }
         let(:beta_group_ids) { ["123", "456"] }
         let(:body) do
@@ -422,7 +422,7 @@ describe Spaceship::ConnectAPI::TestFlight::Client do
       end
 
       context 'patch_beta_groups' do
-        let(:path) { "betaGroups" }
+        let(:path) { "v1/betaGroups" }
         let(:beta_group_id) { "123" }
         let(:attributes) { { public_link_enabled: false } }
         let(:body) do
@@ -447,7 +447,7 @@ describe Spaceship::ConnectAPI::TestFlight::Client do
 
     describe "betaTesters" do
       context 'get_beta_testers' do
-        let(:path) { "betaTesters" }
+        let(:path) { "v1/betaTesters" }
         let(:app_id) { "123" }
 
         it 'succeeds' do
@@ -466,7 +466,7 @@ describe Spaceship::ConnectAPI::TestFlight::Client do
       end
 
       context 'post_bulk_beta_tester_assignments' do
-        let(:path) { "bulkBetaTesterAssignments" }
+        let(:path) { "v1/bulkBetaTesterAssignments" }
         let(:beta_group_id) { "123" }
         let(:beta_testers) do
           [
@@ -503,7 +503,7 @@ describe Spaceship::ConnectAPI::TestFlight::Client do
       end
 
       context 'post_beta_tester_assignment' do
-        let(:path) { "betaTesters" }
+        let(:path) { "v1/betaTesters" }
         let(:beta_group_ids) { ["123", "456"] }
         let(:attributes) { { email: "email1", firstName: "first1", lastName: "last1" } }
         let(:body) do
@@ -537,7 +537,7 @@ describe Spaceship::ConnectAPI::TestFlight::Client do
       context "add_beta_tester_to_group" do
         let(:beta_group_id) { "123" }
         let(:beta_tester_ids) { ["1234", "5678"] }
-        let(:path) { "betaGroups/#{beta_group_id}/relationships/betaTesters" }
+        let(:path) { "v1/betaGroups/#{beta_group_id}/relationships/betaTesters" }
         let(:body) do
           {
               data: beta_tester_ids.map do |id|
@@ -561,7 +561,7 @@ describe Spaceship::ConnectAPI::TestFlight::Client do
       context 'delete_beta_tester_from_apps' do
         let(:beta_tester_id) { "123" }
         let(:app_ids) { ["1234", "5678"] }
-        let(:path) { "betaTesters/#{beta_tester_id}/relationships/apps" }
+        let(:path) { "v1/betaTesters/#{beta_tester_id}/relationships/apps" }
         let(:body) do
           {
             data: app_ids.map do |id|
@@ -585,7 +585,7 @@ describe Spaceship::ConnectAPI::TestFlight::Client do
       context 'delete_beta_tester_from_beta_groups' do
         let(:beta_tester_id) { "123" }
         let(:beta_group_ids) { ["1234", "5678"] }
-        let(:path) { "betaTesters/#{beta_tester_id}/relationships/betaGroups" }
+        let(:path) { "v1/betaTesters/#{beta_tester_id}/relationships/betaGroups" }
         let(:body) do
           {
             data: beta_group_ids.map do |id|
@@ -609,7 +609,7 @@ describe Spaceship::ConnectAPI::TestFlight::Client do
       context "delete_beta_testers_from_app" do
         let(:app_id) { "123" }
         let(:beta_tester_ids) { ["1234", "5678"] }
-        let(:path) { "apps/#{app_id}/relationships/betaTesters" }
+        let(:path) { "v1/apps/#{app_id}/relationships/betaTesters" }
         let(:body) do
           {
             data: beta_tester_ids.map do |id|
@@ -632,7 +632,7 @@ describe Spaceship::ConnectAPI::TestFlight::Client do
       context 'add_beta_tester_to_builds' do
         let(:beta_tester_id) { "123" }
         let(:build_ids) { ["1234", "5678"] }
-        let(:path) { "betaTesters/#{beta_tester_id}/relationships/builds" }
+        let(:path) { "v1/betaTesters/#{beta_tester_id}/relationships/builds" }
         let(:body) do
           {
             data: build_ids.map do |id|
@@ -654,7 +654,7 @@ describe Spaceship::ConnectAPI::TestFlight::Client do
       end
 
       context 'add_beta_testers_to_build' do
-        let(:path) { "builds" }
+        let(:path) { "v1/builds" }
         let(:build_id) { "123" }
         let(:beta_tester_ids) { ["123", "456"] }
         let(:body) do
@@ -678,7 +678,7 @@ describe Spaceship::ConnectAPI::TestFlight::Client do
       end
 
       context 'delete_beta_testers_from_build' do
-        let(:path) { "builds" }
+        let(:path) { "v1/builds" }
         let(:build_id) { "123" }
         let(:beta_tester_ids) { ["123", "456"] }
         let(:body) do
@@ -704,7 +704,7 @@ describe Spaceship::ConnectAPI::TestFlight::Client do
 
     describe "builds" do
       context 'get_builds' do
-        let(:path) { "builds" }
+        let(:path) { "v1/builds" }
         let(:build_id) { "123" }
         let(:default_params) { { include: "buildBetaDetail,betaBuildMetrics", limit: 10, sort: "uploadedDate" } }
 
@@ -725,7 +725,7 @@ describe Spaceship::ConnectAPI::TestFlight::Client do
 
       context 'get_build' do
         let(:build_id) { "123" }
-        let(:path) { "builds/#{build_id}" }
+        let(:path) { "v1/builds/#{build_id}" }
 
         it 'succeeds' do
           params = {}
@@ -736,7 +736,7 @@ describe Spaceship::ConnectAPI::TestFlight::Client do
       end
 
       context 'patch_builds' do
-        let(:path) { "builds" }
+        let(:path) { "v1/builds" }
         let(:build_id) { "123" }
         let(:attributes) { { name: "some_name" } }
         let(:body) do
@@ -761,7 +761,7 @@ describe Spaceship::ConnectAPI::TestFlight::Client do
 
     describe "buildBetaDetails" do
       context 'get_build_beta_details' do
-        let(:path) { "buildBetaDetails" }
+        let(:path) { "v1/buildBetaDetails" }
         let(:build_id) { "123" }
 
         it 'succeeds' do
@@ -780,7 +780,7 @@ describe Spaceship::ConnectAPI::TestFlight::Client do
       end
 
       context 'patch_build_beta_details' do
-        let(:path) { "buildBetaDetails" }
+        let(:path) { "v1/buildBetaDetails" }
         let(:build_beta_details_id) { "123" }
         let(:attributes) { { key: "value" } }
         let(:body) do
@@ -806,7 +806,7 @@ describe Spaceship::ConnectAPI::TestFlight::Client do
     describe "buildDeliveries" do
       context 'get_build_deliveries' do
         let(:app_id) { "123" }
-        let(:path) { "apps/#{app_id}/buildDeliveries" }
+        let(:path) { "v1/apps/#{app_id}/buildDeliveries" }
         let(:version) { "189" }
         let(:default_params) { {} }
 
@@ -828,7 +828,7 @@ describe Spaceship::ConnectAPI::TestFlight::Client do
 
     describe "preReleaseVersions" do
       context 'get_pre_release_versions' do
-        let(:path) { "preReleaseVersions" }
+        let(:path) { "v1/preReleaseVersions" }
         let(:version) { "186" }
         let(:default_params) { {} }
 

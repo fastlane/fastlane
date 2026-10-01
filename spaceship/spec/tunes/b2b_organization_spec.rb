@@ -2,7 +2,7 @@ require 'spec_helper'
 # require_relative '../../../spaceship/lib/spaceship/tunes/b2b_organization'
 class B2bOrganizationSpec
   describe Spaceship::Tunes::B2bOrganization do
-    before { Spaceship::Tunes.login }
+    include_examples "common spaceship login"
     before { TunesStubbing.itc_stub_app_pricing_intervals }
 
     let(:client) { Spaceship::AppVersion.client }

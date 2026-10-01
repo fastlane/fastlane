@@ -5,8 +5,7 @@ module Fastlane
   class SwiftLaneManager < LaneManagerBase
     # @param lane_name The name of the lane to execute
     # @param parameters [Hash] The parameters passed from the command line to the lane
-    # @param env Dot Env Information
-    def self.cruise_lane(lane, parameters = nil, env = nil, disable_runner_upgrades: false, swift_server_port: nil)
+    def self.cruise_lane(lane, parameters = nil, disable_runner_upgrades: false, swift_server_port: nil)
       UI.user_error!("lane must be a string") unless lane.kind_of?(String) || lane.nil?
       UI.user_error!("parameters must be a hash") unless parameters.kind_of?(Hash) || parameters.nil?
 
@@ -106,7 +105,7 @@ module Fastlane
       end
     end
 
-    def self.swap_paths_in_target(target: nil, file_refs_to_swap: nil, expected_path_to_replacement_path_tuples: nil)
+    def self.swap_paths_in_target(file_refs_to_swap: nil, expected_path_to_replacement_path_tuples: nil)
       made_project_updates = false
       file_refs_to_swap.each do |file_ref|
         expected_path_to_replacement_path_tuples.each do |preinstalled_config_relative_path, user_config_relative_path|
@@ -198,14 +197,12 @@ module Fastlane
 
       # Swap in all new user supplied configs into the project
       project_modified = swap_paths_in_target(
-        target: runner_target,
         file_refs_to_swap: target_file_refs,
         expected_path_to_replacement_path_tuples: new_user_tool_file_paths
       )
 
       # Swap out any configs the user has removed, inserting fastlane defaults
       project_modified = swap_paths_in_target(
-        target: runner_target,
         file_refs_to_swap: target_file_refs,
         expected_path_to_replacement_path_tuples: user_tool_files_possibly_removed
       ) || project_modified

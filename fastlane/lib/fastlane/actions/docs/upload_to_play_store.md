@@ -179,6 +179,12 @@ This can be done using the `--track_promote_to` parameter. The `--track_promote_
 Before performing a new APK upload you may want to check existing track version codes or release names, or you may simply want to provide an informational lane that displays the currently promoted version codes or release name for the production track. You can use the `google_play_track_version_codes` action to retrieve existing version codes for a package and track. You can use the `google_play_track_release_names` action to retrieve existing release names for a package and track.
 For more information, see the `fastlane action google_play_track_version_codes` and `fastlane action google_play_track_release_names` help output.
 
+## Parallel uploads
+
+By default _supply_ will spawn 10 threads to upload the metadata concurrently (_images, screenshots, texts_). If you want to change this, set either `DELIVER_NUMBER_OF_THREADS` or `FL_NUMBER_OF_THREADS` environment variable to any value between 1 and 10.
+
+If you want _supply_ to upload with more than 10 threads in parallel then you need to **additionally** set `FL_MAX_NUMBER_OF_THREADS` environment variable to the max number of parallel upload threads you wish to have (**Warning ⚠️** use this at your own risk!).
+
 ## Migration from AndroidPublisherV2 to AndroidPublisherV3 in _fastlane_ 2.135.0
 
 ### New Options
@@ -200,5 +206,3 @@ For more information, see the `fastlane action google_play_track_version_codes` 
   - Google Play will automatically remove releases that are superseded now
 - `:deactivate_on_promote`
   - Google Play will automatically deactivate a release from its previous track on promote
-
-:

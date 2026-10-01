@@ -196,6 +196,13 @@ describe CredentialsManager do
       end
     end
 
+    describe "Appfile10" do
+      it "supports provider_public_id in Appfile" do
+        config = CredentialsManager::AppfileConfig.new('credentials_manager/spec/fixtures/Appfile10')
+        expect(config.data[:provider_public_id]).to eq('00000000-0000-0000-0000-000000000000')
+      end
+    end
+
     describe "No Appfile" do
       it "prefills information from the environment variable" do
         env_name = "User@#{Time.now.to_i}"

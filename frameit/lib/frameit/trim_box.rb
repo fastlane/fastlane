@@ -10,7 +10,7 @@ module Frameit
 
     # identify_string: A string with syntax "<width>x<height>+<offset_x>+<offset_y>". This is returned by MiniMagick when using function .identify with format("%@"). It is also required for the MiniMagick .crop function.
     def initialize(identify_string)
-      UI.user_error!("Trimbox can not be initialised with an empty 'identify_string'.") unless identify_string.length > 0
+      UI.user_error!("Trimbox cannot be initialised with an empty 'identify_string'.") unless identify_string.length > 0
 
       # Parse the input syntax "<width>x<height>+<offset_x>+<offset_y>".
       # Extract these 4 parameters into an integer array, by using multiple string separators: "x" and "+":

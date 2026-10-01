@@ -22,11 +22,6 @@ module Spaceship
 
       # To pass from the user
 
-      # @deprecated Setted automatically by <tt>add_id_info_uses_idfa</tt> usage
-      # @return (Boolean) Ad ID Info - Limits ads tracking
-      # <b>DEPRECATED:</b> Use <tt>add_id_info_uses_idfa</tt> instead.
-      attr_accessor :add_id_info_limits_tracking
-
       # @return (Boolean) Ad ID Info - Serves ads
       attr_accessor :add_id_info_serves_ads
 
@@ -35,9 +30,6 @@ module Spaceship
 
       # @return (Boolean) Ad ID Info - Tracks installs
       attr_accessor :add_id_info_tracks_install
-
-      # @return (Boolean) Ad ID Info - Uses idfa
-      attr_accessor :add_id_info_uses_idfa
 
       # @return (Boolean) Content Rights - Contains third party content
       attr_accessor :content_rights_contains_third_party_content
@@ -80,7 +72,6 @@ module Spaceship
         'adIdInfo.servesAds.value' => :add_id_info_serves_ads,
         'adIdInfo.tracksAction.value' => :add_id_info_tracks_action,
         'adIdInfo.tracksInstall.value' => :add_id_info_tracks_install,
-        'adIdInfo.usesIdfa.value' => :add_id_info_uses_idfa,
 
         # Content Rights Section
         'contentRights.containsThirdPartyContent.value' => :content_rights_contains_third_party_content,
@@ -138,16 +129,6 @@ module Spaceship
         end
         raw_data_clone.delete(:version)
         raw_data_clone.delete(:application)
-
-        # Check whether the application makes use of IDFA or not
-        # and automatically set the mandatory limitsTracking value in the request JSON accordingly.
-        if !self.add_id_info_uses_idfa.nil? && self.add_id_info_uses_idfa == true
-          # Application uses IDFA, before sending for submission limitsTracking key in the request JSON must be set to true (agreement).
-          raw_data_clone.set(
-            ["adIdInfo", "limitsTracking", "value"],
-            true
-          )
-        end
 
         client.send_app_submission(application.apple_id, application.edit_version(platform: platform).version_id, raw_data_clone)
         @submitted_for_review = true

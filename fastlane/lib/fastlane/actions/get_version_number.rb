@@ -5,6 +5,7 @@ module Fastlane
     end
 
     class GetVersionNumberAction < Action
+      require 'fastlane/helper/xcodeproj_helper'
       require 'shellwords'
 
       def self.run(params)
@@ -41,18 +42,7 @@ module Fastlane
       end
 
       def self.get_project!(xcodeproj_path_or_dir)
-        require 'xcodeproj'
-        if File.extname(xcodeproj_path_or_dir) == ".xcodeproj"
-          project_path = xcodeproj_path_or_dir
-        else
-          project_path = Dir.glob("#{xcodeproj_path_or_dir}/*.xcodeproj").first
-        end
-
-        if project_path && File.exist?(project_path)
-          return Xcodeproj::Project.open(project_path)
-        else
-          UI.user_error!("Unable to find Xcode project at #{project_path || xcodeproj_path_or_dir}")
-        end
+        Fastlane::Helper::XcodeprojHelper.get_project!(xcodeproj_path_or_dir)
       end
 
       def self.get_target!(project, target_name)
@@ -69,7 +59,7 @@ module Fastlane
 
           # Returns if only one non-test target
           if non_test_targets.count == 1
-            return targets.first
+            return non_test_targets.first
           end
 
           options = targets.map(&:name)

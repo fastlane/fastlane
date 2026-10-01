@@ -1,0 +1,17 @@
+{
+  "cameraPresets" : {
+
+  },
+  "secondaryToolbarData" : {
+    "isGridVisible" : true,
+    "sceneReverbPreset" : -1
+  },
+  "unitDefaults" : {
+    "°" : "°",
+    "kg" : "g",
+    "m" : "cm",
+    "m\/s" : "m\/s",
+    "m\/s²" : "m\/s²",
+    "s" : "s"
+  }
+}

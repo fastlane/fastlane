@@ -1,6 +1,6 @@
 # How to respond to Issues and PRs
 
-## How we treat each other  
+## How we treat each other
 
 When replying to issues and PRs, make sure you always follow our [Code of Conduct](CODE_OF_CONDUCT.md) and our [vision for fastlane](VISION.md). Make sure to read these thoroughly and understand them before you interact with any other users! In general, be nice to each other, and treat **everyone** with the same respect and dignity.
 
