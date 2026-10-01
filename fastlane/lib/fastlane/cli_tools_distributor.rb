@@ -53,6 +53,7 @@ module Fastlane
         # We want to avoid printing output other than the version number if we are running `fastlane -v`
         unless running_version_command? || running_init_command?
           print_bundle_exec_warning(is_slow: (Time.now - before_import_time > 3))
+          print_running_version
         end
 
         # Try to check UTF-8 with `locale`, fallback to environment variables
@@ -177,6 +178,19 @@ module Fastlane
           "🚀" => "fastlane",
           "💪" => "gym"
         }[tool_name] || tool_name
+      end
+
+      # Which fastlane a log comes from: `fastlane env`, run later by hand, can describe another install. See #29938.
+      def print_running_version
+        source = FastlaneCore::Helper.install_method
+        if ARGV.include?("--verbose")
+          require "fastlane/environment_printer"
+          location = FastlaneCore::Helper.bundler? ? ENV["BUNDLE_GEMFILE"] : $PROGRAM_NAME
+          # Dir.home rather than ENV['HOME'], which does not match the paths Ruby gives on Windows
+          source += ": #{EnvironmentPrinter.anonymized_path(location.to_s, Dir.home)}"
+        end
+
+        UI.message("fastlane #{Fastlane::VERSION} (Ruby #{RUBY_VERSION}, #{source})")
       end
 
       def print_bundle_exec_warning(is_slow: false)
