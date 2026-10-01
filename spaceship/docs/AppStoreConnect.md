@@ -5,6 +5,7 @@
   * [Applications](#applications)
   * [AppVersions](#appversions)
   * [Select a build for review](#select-a-build-for-review)
+  * [Regulated medical device declaration](#regulated-medical-device-declaration)
   * [Submit app for App Store Review](#submit-app-for-app-store-review)
   * [Release reviewed build](#release-reviewed-build)
   * [Build Trains (TestFlight)](#build-trains-testflight)
@@ -218,6 +219,21 @@ version = app.get_edit_app_store_version
 build = Spaceship::ConnectAPI::Build.all(app_id: app.id, platform: platform).first
 version.select_build(build_id: build.id)
 ```
+### Regulated medical device declaration
+
+App Store Connect refuses to submit a Health & Fitness or Medical app that is distributed in the EEA, the UK or the US until the app declares whether it is a regulated medical device (`STATE_ERROR.CANNOT_SUBMIT_MISSING_REGULATED_MEDICAL_DEVICE_APP_DECLARATION`). The declaration is not part of the App Store Connect API, so this only works with Apple ID login (not API Key).
+
+```ruby
+app = Spaceship::ConnectAPI::App.find("com.krausefx.app")
+
+# "no", "yes", or nil (Apple does not ask this app, or nobody has answered yet)
+app.fetch_regulated_medical_device_declaration
+
+# Answers "No" for the EEA, the UK and the US, like the web UI does.
+# Returns false when there is nothing to answer; never changes an existing answer.
+app.declare_not_regulated_medical_device
+```
+
 ### Submit app for App Store Review
 
 ```ruby
