@@ -289,7 +289,7 @@ jobs:
           git config user.name "github-actions[bot]"
           git checkout -b "$branch"
           git add internal/spec_timings.linux.json internal/spec_timings.mac.json internal/spec_timings.windows.json
-          git commit -m "Record the spec timings the split is balanced from"
+          git commit -m "[ci] Record the spec timings the split is balanced from"
           git push --force-with-lease origin "$branch"
 
           if [ -n "$(gh pr list --head "$branch" --state open --json number --jq '.[].number')" ]; then
