@@ -41,6 +41,48 @@ describe Fastlane::CLIToolsDistributor do
     end
   end
 
+  describe "the running version" do
+    def take_off_with(argv)
+      FastlaneSpec::Env.with_ARGV(argv) do
+        require 'fastlane/commands_generator'
+        allow(FastlaneCore::FastlaneFolder).to receive(:fastfile_path).and_return("./fastlane/spec/fixtures/fastfiles/FastfileUseToolNameAsLane")
+        allow(Fastlane::CommandsGenerator).to receive(:start).and_return(nil)
+        allow(FastlaneCore::UI).to receive(:message)
+        Fastlane::CLIToolsDistributor.take_off
+      end
+    end
+
+    it "prints the fastlane and Ruby versions, and Bundler, when running a lane" do
+      allow(FastlaneCore::Helper).to receive(:bundler?).and_return(true)
+      take_off_with(["sigh"])
+
+      expect(FastlaneCore::UI).to have_received(:message).with("fastlane #{Fastlane::VERSION} (Ruby #{RUBY_VERSION}, Bundler)")
+    end
+
+    it "adds the Gemfile with --verbose, with the home directory shortened" do
+      allow(FastlaneCore::Helper).to receive(:bundler?).and_return(true)
+      FastlaneSpec::Env.with_env_values('BUNDLE_GEMFILE' => File.join(Dir.home, "app", "Gemfile")) do
+        take_off_with(["sigh", "--verbose"])
+      end
+
+      expect(FastlaneCore::UI).to have_received(:message).with("fastlane #{Fastlane::VERSION} (Ruby #{RUBY_VERSION}, Bundler: ~/app/Gemfile)")
+    end
+
+    it "says RubyGems for a plain gem install" do
+      allow(FastlaneCore::Helper).to receive_messages(bundler?: false, homebrew?: false, contained_fastlane?: false, mac_app?: false)
+      allow(Fastlane::CLIToolsDistributor).to receive(:print_bundle_exec_warning)
+      take_off_with(["sigh"])
+
+      expect(FastlaneCore::UI).to have_received(:message).with("fastlane #{Fastlane::VERSION} (Ruby #{RUBY_VERSION}, RubyGems)")
+    end
+
+    it "does not print it for fastlane -v" do
+      take_off_with(["-v"])
+
+      expect(FastlaneCore::UI).not_to have_received(:message).with(/\Afastlane .* \(Ruby /)
+    end
+  end
+
   describe "update checking" do
     it "checks for updates when running a lane" do
       FastlaneSpec::Env.with_ARGV(["sigh"]) do
