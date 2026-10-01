@@ -1205,6 +1205,11 @@ module Spaceship
       end
     end
 
+    # signin/init, signin/complete, and the legacy signin
+    def sign_in_request?(response)
+      response.env.url.host == "idmsa.apple.com" && response.env.url.path.start_with?("/appleauth/auth/signin")
+    end
+
     def handle_error(response)
       case response.status
       when 401
@@ -1213,7 +1218,7 @@ module Spaceship
         raise UnauthorizedAccessError.new, "Unauthorized Access"
       when 403
         # A refused sign-in, e.g. a locked Apple ID: like do_sirp, raise what Apple said, which with_retry does not retry. See fastlane#14387.
-        raise UnexpectedResponse, response.body if response.env.url.host == "idmsa.apple.com" && response.body.kind_of?(Hash) && response.body["serviceErrors"]
+        raise UnexpectedResponse, response.body if sign_in_request?(response) && response.body.kind_of?(Hash) && response.body["serviceErrors"]
 
         msg = "Access forbidden"
         logger.warn(msg)

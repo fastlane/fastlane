@@ -303,14 +303,16 @@ describe Spaceship::Client do
       end.to raise_error(Spaceship::ProgramLicenseAgreementUpdated)
     end
 
-    it "retries a 403 with serviceErrors from anything but Apple's sign-in" do
-      home = stub_request(:get, test_uri).
-             to_return(status: 403, body: { "serviceErrors" => [{ "code" => "-1", "message" => "Forbidden" }] }.to_json, headers: { 'Content-Type' => 'application/json' })
+    ["http://example.com", "https://idmsa.apple.com/appleauth/auth/verify/phone"].each do |url|
+      it "retries a 403 with serviceErrors from #{url}, which is not Apple's sign-in" do
+        forbidden = stub_request(:get, url).
+                    to_return(status: 403, body: { "serviceErrors" => [{ "code" => "-1", "message" => "Forbidden" }] }.to_json, headers: { 'Content-Type' => 'application/json' })
 
-      expect do
-        subject.req_home
-      end.to raise_error(Spaceship::AccessForbiddenError)
-      expect(home).to have_been_requested.times(5)
+        expect do
+          subject.request(:get, url)
+        end.to raise_error(Spaceship::AccessForbiddenError)
+        expect(forbidden).to have_been_requested.times(5)
+      end
     end
 
     it "raises Spaceship::AccessForbiddenError" do
