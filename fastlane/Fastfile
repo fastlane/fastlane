@@ -320,7 +320,7 @@ lane :download_github_release_gem do |options|
   file_path = File.join('../pkg', file_name)
 
   # Download the file
-  URI.open(gem_asset_url) do |remote_file|
+  URI.parse(gem_asset_url).open do |remote_file|
     File.open(file_path, 'wb') do |local_file|
       local_file.write(remote_file.read)
     end

@@ -25,7 +25,7 @@ module Fastlane
         loop do
           url = "https://rubygems.org/api/v1/search.json?query=fastlane-plugin-&page=#{page}"
           puts("RubyGems API Request: #{url}")
-          results = JSON.parse(URI.open(url).read)
+          results = JSON.parse(URI.parse(url).open.read)
           break if results.count == 0
 
           plugins += results.collect do |current|
