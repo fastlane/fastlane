@@ -404,9 +404,6 @@ Performance/UnfreezeString:
   Enabled: false
 
 # Offense count: 5
-Security/Open:
-  Enabled: false
-
 # Offense count: 1
 # This cop supports unsafe autocorrection (--autocorrect-all).
 # Configuration parameters: EnforcedStyle, AllowModifiersOnSymbols.
