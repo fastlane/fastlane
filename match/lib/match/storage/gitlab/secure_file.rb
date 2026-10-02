@@ -1,4 +1,5 @@
 require 'open-uri'
+require 'ostruct'
 
 require_relative '../../module'
 
