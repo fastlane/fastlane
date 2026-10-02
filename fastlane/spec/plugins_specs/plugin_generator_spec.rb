@@ -313,14 +313,14 @@ describe Fastlane::PluginGenerator do
       it "rubocop validations are passing" do
         # Actually run our generated spec as part of this spec #yodawg
         output = plugin_sh('bundle exec rubocop 2>&1')
-        expect($?.exitstatus).to eq(0)
+        expect($?.exitstatus).to eq(0), output
         expect(output).not_to include("instead of `require:")
       end
 
       it "`rake` runs both rspec and rubocop" do
         # Actually run our generated spec as part of this spec #yodawg
-        result = plugin_sh('bundle exec rake')
-        expect($?.exitstatus).to eq(0)
+        result = plugin_sh('bundle exec rake 2>&1')
+        expect($?.exitstatus).to eq(0), result
         expect(result).to include("no offenses detected") # rubocop
         expect(result).to include("example, 0 failures") # rspec
       end

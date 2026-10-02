@@ -68,11 +68,8 @@ task(:prepare_rubocop_config) do
 
   next unless File.exist?(rubocop_config)
 
-  config = YAML.safe_load(File.read(rubocop_config), aliases: true)
-  config['require'] = %w[rubocop/require_tools]
-  config.delete('inherit_from')
-  config.delete('CrossPlatform/ForkUsage')
-  config.delete('Lint/IsStringUsage')
+  require_relative 'internal/plugin_template_rubocop_config'
+  config = Fastlane::Internal::PluginTemplateRubocopConfig.from(YAML.safe_load(File.read(rubocop_config), aliases: true))
 
   target = File.join(lib, 'fastlane/plugins/template/.rubocop.yml')
   FileUtils.mkdir_p(File.dirname(target))
