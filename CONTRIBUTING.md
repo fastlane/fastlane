@@ -18,6 +18,7 @@ Some people might also use the [_fastlane_ tag on StackOverflow](https://stackov
 
 - To start working on _fastlane_, check out [YourFirstPR.md][firstpr]
 - For some more advanced tooling and debugging tips, check out [ToolsAndDebugging.md](ToolsAndDebugging.md)
+- For the conventions changes are reviewed against, read [Design.md](Design.md)
 
 ### New Actions
 
