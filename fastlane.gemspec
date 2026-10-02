@@ -49,7 +49,7 @@ Gem::Specification.new do |spec|
     "source_code_uri" => "https://github.com/fastlane/fastlane"
   }
 
-  # A literal, as RuboCop requires it to equal TargetRubyVersion; spec/ci_ruby_versions_spec.rb checks both against Fastlane::MINIMUM_RUBY
+  # A literal: RuboCop reads its target Ruby from it. spec/ci_ruby_versions_spec.rb checks both against Fastlane::MINIMUM_RUBY
   spec.required_ruby_version = '>= 3.2.0'
 
   spec.files = Dir.glob("*/lib/**/*", File::FNM_DOTMATCH) + Dir["fastlane/swift/**/*"] + Dir["bin/*"] + Dir["*/README.md"] + %w(README.md LICENSE .yardopts) - Dir["fastlane/lib/fastlane/actions/device_grid/assets/*"] - Dir["fastlane/lib/fastlane/actions/docs/assets/*"]

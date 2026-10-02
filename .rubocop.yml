@@ -10,8 +10,6 @@ require:
   - ./internal/rubocop/is_string_usage.rb
 
 AllCops:
-  # Not left to the gemspec: RuboCop 1.50 only finds it in a checkout directory named fastlane. See #30301
-  TargetRubyVersion: 3.2
   SuggestExtensions: false
   NewCops: enable
   Include:
