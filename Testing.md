@@ -62,6 +62,12 @@ The number is the line number of the unit test (`it ... do`) or unit test group 
 
 Instead of using the line number you can also use a filter with the `it "something", now: true` notation and then use `bundle exec rspec -t now` to run this tagged test. (Note that `now` can be any random string of your choice.)
 
+#### Writing a spec for a fix
+
+A spec for a fix has to fail against the code before the fix. Revert the fix, run the spec, and see it fail: a spec that also passes on the old code proves nothing. For options that can replace each other, cover each one alone, both together, and neither.
+
+A spec should not depend on the developer's environment: set or clear the environment variables an option reads (its `env_name`) with `FastlaneSpec::Env.with_env_values`.
+
 #### Running the suite as several processes
 
 This is what CI runs, so it is the one to run before pushing. The suite is a lot faster split across processes, and a split is also a harsher test than any seed: a worker gets a subset no random order produces, so a spec that depends on another file having run first fails there.
