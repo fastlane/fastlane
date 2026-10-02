@@ -26,4 +26,4 @@ Read the guides for the files a change touches, and apply their rules:
 - One concern per pull request.
 - A fix comes with a spec that fails without it ([Testing.md](Testing.md#writing-a-spec-for-a-fix)).
 - When a change introduces a new pattern where the codebase already has one, name the existing one and say why it does not fit.
-- Report security problems privately to the maintainers, not in issues, pull requests or reviews.
+- Do not describe security problems in public issues, pull requests or reviews.
