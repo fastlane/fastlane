@@ -9,11 +9,21 @@ module RuboCop
       #   sh("git tag #{tag.shellescape}")  # good
       #   sh("git", "tag", tag)             # good: no shell
       #
+      # Separate arguments cannot express a pipe, a redirect or `&&`; for those the
+      # message points at the Open3 equivalent.
+      #
       # A local variable is followed to its assignments in the same method:
       # it is accepted when every assignment is escaped, and a command string
       # built in a variable is checked where it is built.
       class UnescapedShellInterpolation < Base
         MSG = 'Escape `%<source>s` (`.shellescape`), or pass the command as separate arguments.'.freeze
+        MSG_SHELL_SYNTAX = 'Escape `%<source>s` (`.shellescape`), or run it without a shell: %<hints>s.'.freeze
+        # Matched against the command's literal text, quoted parts removed.
+        SHELL_SYNTAX_HINTS = {
+          /(?<!\|)\|(?!\|)/ => 'for the pipe, `Open3.pipeline_r`, or filter the output in Ruby',
+          /[<>]/ => 'for the redirect, Open3 with `out:`/`err:` (`err: File::NULL`), or `Open3.capture2e` for `2>&1`',
+          /&&|\|\||;/ => 'for `&&`/`;`, one call per command (`chdir:` replaces `cd … &&`)'
+        }.freeze
 
         COMMAND_METHODS = %i[sh backticks system exec spawn capture2 capture2e capture3 popen popen2 popen2e popen3].to_set.freeze
         SAFE_METHODS = %i[shellescape shelljoin to_i to_f].to_set.freeze
@@ -43,12 +53,34 @@ module RuboCop
         end
 
         def check_string(string, at)
-          string.each_child_node(:begin) do |interpolation|
+          hints = shell_syntax_hints(string)
+          interpolations(string).each do |interpolation|
             value = interpolation.children.last
             next if value.nil? || safe?(value, at)
 
-            add_offense(interpolation, message: format(MSG, source: value.source))
+            message = hints.empty? ? format(MSG, source: value.source) : format(MSG_SHELL_SYNTAX, source: value.source, hints: hints.join('; '))
+            add_offense(interpolation, message: message)
           end
+        end
+
+        # A string continued with `\` is a dstr of dstrs.
+        def interpolations(string)
+          string.each_child_node(:begin, :dstr).flat_map { |part| part.dstr_type? ? interpolations(part) : [part] }
+        end
+
+        def shell_syntax_hints(string)
+          text = literal_text(string).gsub(/'[^']*'|"[^"]*"/, '')
+          SHELL_SYNTAX_HINTS.filter_map { |pattern, hint| hint if text.match?(pattern) }
+        end
+
+        # The string's literal parts, an interpolation counting as one character.
+        def literal_text(string)
+          string.children.map do |part|
+            if part.str_type? then part.value
+            elsif part.dstr_type? then literal_text(part)
+            else 'x'
+            end
+          end.join
         end
 
         def safe?(value, at, seen = Set.new)

@@ -84,6 +84,58 @@ describe "fastlane's own RuboCop cops" do
       RUBY
     end
 
+    it "points at Open3 for a redirect, which separate arguments cannot express" do
+      expect_offense(<<~'RUBY')
+        sh("cmd #{arg1} #{arg2} 2>/dev/null")
+                ^^^^^^^ Fastlane/UnescapedShellInterpolation: Escape `arg1` (`.shellescape`), or run it without a shell: for the redirect, Open3 with `out:`/`err:` (`err: File::NULL`), or `Open3.capture2e` for `2>&1`.
+                        ^^^^^^^ Fastlane/UnescapedShellInterpolation: Escape `arg2` (`.shellescape`), or run it without a shell: for the redirect, Open3 with `out:`/`err:` (`err: File::NULL`), or `Open3.capture2e` for `2>&1`.
+      RUBY
+    end
+
+    it "points at Open3 for a pipe" do
+      expect_offense(<<~'RUBY')
+        sh("cmd1 #{arg1} | cmd2 #{arg2}")
+                 ^^^^^^^ Fastlane/UnescapedShellInterpolation: Escape `arg1` (`.shellescape`), or run it without a shell: for the pipe, `Open3.pipeline_r`, or filter the output in Ruby.
+                                ^^^^^^^ Fastlane/UnescapedShellInterpolation: Escape `arg2` (`.shellescape`), or run it without a shell: for the pipe, `Open3.pipeline_r`, or filter the output in Ruby.
+      RUBY
+    end
+
+    it "points at one call per command for && and ||, which are not pipes" do
+      expect_offense(<<~'RUBY')
+        sh("cd #{dir} && make || true")
+               ^^^^^^ Fastlane/UnescapedShellInterpolation: Escape `dir` (`.shellescape`), or run it without a shell: for `&&`/`;`, one call per command (`chdir:` replaces `cd … &&`).
+      RUBY
+    end
+
+    it "lists every shell feature the command uses" do
+      expect_offense(<<~'RUBY')
+        `cmd1 #{arg} 2>&1 | cmd2`
+              ^^^^^^ Fastlane/UnescapedShellInterpolation: Escape `arg` (`.shellescape`), or run it without a shell: for the pipe, `Open3.pipeline_r`, or filter the output in Ruby; for the redirect, Open3 with `out:`/`err:` (`err: File::NULL`), or `Open3.capture2e` for `2>&1`.
+      RUBY
+    end
+
+    it "ignores shell characters inside quotes" do
+      expect_offense(<<~'RUBY')
+        sh("git log --format='%h > %s' #{ref}")
+                                       ^^^^^^ Fastlane/UnescapedShellInterpolation: Escape `ref` (`.shellescape`), or pass the command as separate arguments.
+      RUBY
+    end
+
+    it "reads a command continued over several lines" do
+      expect_offense(<<~'RUBY')
+        sh("cmd1 #{arg} | " \
+                 ^^^^^^ Fastlane/UnescapedShellInterpolation: Escape `arg` (`.shellescape`), or run it without a shell: for the pipe, `Open3.pipeline_r`, or filter the output in Ruby; for the redirect, Open3 with `out:`/`err:` (`err: File::NULL`), or `Open3.capture2e` for `2>&1`.
+           "cmd2 2>/dev/null")
+      RUBY
+    end
+
+    it "accepts escaped values in a pipe or a redirect" do
+      expect_no_offenses(<<~'RUBY')
+        sh("cmd #{arg1.shellescape} #{arg2.shellescape} 2>/dev/null")
+        sh("cmd1 #{arg1.shellescape} | cmd2 #{arg2.shellescape}")
+      RUBY
+    end
+
     it "accepts escaped values, numbers and separate arguments" do
       expect_no_offenses(<<~'RUBY')
         sh("git tag #{tag.shellescape}")
