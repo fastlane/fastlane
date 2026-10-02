@@ -303,6 +303,18 @@ describe Spaceship::Client do
       end.to raise_error(Spaceship::ProgramLicenseAgreementUpdated)
     end
 
+    ["http://example.com", "https://idmsa.apple.com/appleauth/auth/verify/phone"].each do |url|
+      it "retries a 403 with serviceErrors from #{url}, which is not Apple's sign-in" do
+        forbidden = stub_request(:get, url).
+                    to_return(status: 403, body: { "serviceErrors" => [{ "code" => "-1", "message" => "Forbidden" }] }.to_json, headers: { 'Content-Type' => 'application/json' })
+
+        expect do
+          subject.request(:get, url)
+        end.to raise_error(Spaceship::AccessForbiddenError)
+        expect(forbidden).to have_been_requested.times(5)
+      end
+    end
+
     it "raises Spaceship::AccessForbiddenError" do
       stub_client_request(Spaceship::AccessForbiddenError, 6, 403, "<html>Access Denied - In Read</html>")
 
@@ -538,7 +550,9 @@ BODY
 
       expect do
         subject.do_sirp("user", "password", nil)
-      end.to raise_error(Spaceship::Client::UnexpectedResponse)
+      end.to raise_error(Spaceship::Client::UnexpectedResponse) { |error|
+        expect(error.preferred_error_info).to eq(["Apple provided the following error info:", "(-900007)"])
+      }
     end
   end
 

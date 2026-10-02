@@ -605,8 +605,6 @@ module Spaceship
       # Now we know if the login is successful or if we need to do 2 factor
 
       case response.status
-      when 403
-        raise InvalidUserCredentialsError.new, "Invalid username and password combination. Used '#{user}' as the username."
       when 200
         fetch_olympus_session_after_signin
         return response
@@ -1207,6 +1205,11 @@ module Spaceship
       end
     end
 
+    # signin/init, signin/complete, and the legacy signin
+    def sign_in_request?(response)
+      response.env.url.host == "idmsa.apple.com" && response.env.url.path.start_with?("/appleauth/auth/signin")
+    end
+
     def handle_error(response)
       case response.status
       when 401
@@ -1214,6 +1217,9 @@ module Spaceship
         logger.warn(msg)
         raise UnauthorizedAccessError.new, "Unauthorized Access"
       when 403
+        # A refused sign-in, e.g. a locked Apple ID: like do_sirp, raise what Apple said, which with_retry does not retry. See fastlane#14387.
+        raise UnexpectedResponse, response.body if sign_in_request?(response) && response.body.kind_of?(Hash) && response.body["serviceErrors"]
+
         msg = "Access forbidden"
         logger.warn(msg)
         raise AccessForbiddenError.new, msg

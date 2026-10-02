@@ -30,6 +30,48 @@ describe Spaceship::TunesClient do
     end
   end
 
+  describe 'when Apple refuses the sign-in' do
+    # signin/complete bodies: the 401 recorded against Apple on 2026-10-01, the 403s reported in #14387 (2019)
+    def stub_sign_in(status, body, content_type: 'application/json')
+      stub_request(:post, "https://idmsa.apple.com/appleauth/auth/signin/complete?isRememberMeEnabled=false").
+        to_return(status: status, body: body, headers: { 'Content-Type' => content_type })
+    end
+
+    it 'reports a wrong password as invalid credentials' do
+      sign_in = stub_sign_in(401, TunesStubbing.itc_read_fixture_file('signin_wrong_password.json'))
+
+      expect do
+        subject.login('spaceship@krausefx.com', 'so_secret')
+      end.to raise_exception(Spaceship::InvalidUserCredentialsError, "Invalid username and password combination. Used 'spaceship@krausefx.com' as the username.")
+      expect(sign_in).to have_been_requested.once
+    end
+
+    {
+      'signin_refused_locked.json' => "This Apple ID has been locked for security reasons. Visit iForgot to reset your account (https://iforgot.apple.com). (-20209)",
+      'signin_refused_20751.json' => "Your Apple ID or password was incorrect. (-20751)"
+    }.each do |fixture, apple_says|
+      it "shows what Apple answered in #{fixture}, and does not send the sign-in again" do
+        sign_in = stub_sign_in(403, TunesStubbing.itc_read_fixture_file(fixture))
+
+        expect do
+          subject.login('spaceship@krausefx.com', 'so_secret')
+        end.to raise_exception(Spaceship::UnexpectedResponse) { |error|
+          expect(error.preferred_error_info).to eq(["Apple provided the following error info:", apple_says])
+        }
+        expect(sign_in).to have_been_requested.once
+      end
+    end
+
+    it 'still retries a 403 that says nothing' do
+      sign_in = stub_sign_in(403, "<html>Access Denied</html>", content_type: 'text/html')
+
+      expect do
+        subject.login('spaceship@krausefx.com', 'so_secret')
+      end.to raise_exception(Spaceship::AccessForbiddenError)
+      expect(sign_in).to have_been_requested.times(5)
+    end
+  end
+
   describe 'client' do
     it 'exposes the session cookie' do
       begin

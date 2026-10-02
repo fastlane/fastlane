@@ -86,7 +86,13 @@ module Spaceship
     end
 
     def preferred_error_info
-      return nil unless @error_info.kind_of?(Hash) && @error_info['resultString']
+      return nil unless @error_info.kind_of?(Hash)
+
+      # What Apple's authentication service answers, e.g. on a locked Apple ID
+      service_errors = Array(@error_info['serviceErrors'])
+      return ["Apple provided the following error info:"] + service_errors.map { |error| [error['message'], "(#{error['code']})"].compact.join(" ") } unless service_errors.empty?
+
+      return nil unless @error_info['resultString']
 
       [
         "Apple provided the following error info:",
