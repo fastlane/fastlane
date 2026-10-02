@@ -52,8 +52,9 @@ describe "Ruby versions" do
     expect([status.exitstatus, output.strip]).to eq([1, "fastlane requires Ruby 99.0.0 or higher"])
   end
 
-  it "targets Fastlane::MINIMUM_RUBY in .rubocop.yml" do
-    target = YAML.load_file(File.join(root, ".rubocop.yml")).dig("AllCops", "TargetRubyVersion")
+  it "has RuboCop target Fastlane::MINIMUM_RUBY" do
+    require 'rubocop'
+    target = RuboCop::ConfigStore.new.for_dir(root).target_ruby_version
 
     expect(Gem::Version.new(target.to_s)).to eq(minimum_version(requirement))
   end
