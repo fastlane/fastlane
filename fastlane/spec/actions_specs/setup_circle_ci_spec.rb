@@ -44,6 +44,7 @@ describe Fastlane do
 
       it "works on macOS Environment when forced" do
         allow(FastlaneCore::Helper).to receive(:mac?).and_return(true)
+        expect(Fastlane::Actions::CreateKeychainAction).to receive(:run).with(hash_including(name: tmp_keychain_name))
         stub_const("ENV", {})
 
         Fastlane::FastFile.new.parse("lane :test do
