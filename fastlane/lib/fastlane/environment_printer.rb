@@ -252,34 +252,21 @@ module Fastlane
     def self.print_fastlane_files
       env_output = "### fastlane files:\n\n"
 
-      fastlane_path = FastlaneCore::FastlaneFolder.fastfile_path
-
-      if fastlane_path && File.exist?(fastlane_path)
-        env_output << "<details>"
-        env_output << "<summary>`#{fastlane_path}`</summary>\n"
+      {
+        "Fastfile" => FastlaneCore::FastlaneFolder.fastfile_path,
+        "Appfile" => CredentialsManager::AppfileConfig.default_path
+      }.each do |name, path|
+        if path && File.exist?(path)
+          env_output << "**#{name}** found at `#{path}`\n"
+        else
+          env_output << "**No #{name} found**\n"
+        end
         env_output << "\n"
-        env_output << "```ruby\n"
-        env_output <<  File.read(fastlane_path, encoding: "utf-8")
-        env_output <<  "\n```\n"
-        env_output << "</details>"
-      else
-        env_output << "**No Fastfile found**\n"
       end
-      env_output << "\n\n"
 
-      appfile_path = CredentialsManager::AppfileConfig.default_path
-      if appfile_path && File.exist?(appfile_path)
-        env_output << "<details>"
-        env_output << "<summary>`#{appfile_path}`</summary>\n"
-        env_output << "\n"
-        env_output << "```ruby\n"
-        env_output <<  File.read(appfile_path, encoding: "utf-8")
-        env_output <<  "\n```\n"
-        env_output << "</details>"
-      else
-        env_output << "**No Appfile found**\n"
-      end
-      env_output << "\n\n"
+      env_output << "The contents of these files are not included, as they may contain secrets. "
+      env_output << "If they are relevant to your issue, please add the parts that are, with any sensitive values removed.\n"
+      env_output << "\n"
       env_output
     end
 
