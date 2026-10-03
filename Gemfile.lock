@@ -1,3 +1,10 @@
+GIT
+  remote: https://github.com/fastlane-community/security.git
+  revision: fc497bc325f47ae6c95723b12aa26639dc16b49a
+  branch: gem/5-keychains
+  specs:
+    security (0.3.0)
+
 PATH
   remote: .
   specs:
@@ -371,7 +378,6 @@ GEM
       addressable (>= 2.3.5)
       faraday (>= 0.17.3, < 3)
     securerandom (0.4.1)
-    security (0.3.0)
     signet (0.21.0)
       addressable (~> 2.8)
       faraday (>= 0.17.5, < 3.a)
@@ -461,6 +467,7 @@ DEPENDENCIES
   rubocop (= 1.91.0)
   rubocop-performance
   rubocop-require_tools
+  security!
   simplecov
   sinatra (~> 4.2)
   webmock (~> 3.18)
