@@ -2,6 +2,7 @@ require_relative 'fastlane_core/globals'
 # Ruby monkey-patches - should be before almost all else
 require_relative 'fastlane_core/core_ext/string'
 require_relative 'fastlane_core/core_ext/shellwords'
+require_relative 'fastlane_core/secrets'
 
 require_relative 'fastlane_core/analytics/action_completion_context'
 require_relative 'fastlane_core/analytics/action_launch_context'

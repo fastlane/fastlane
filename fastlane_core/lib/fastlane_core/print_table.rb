@@ -1,5 +1,6 @@
 require_relative 'configuration/configuration'
 require_relative 'helper'
+require_relative 'secrets'
 
 module FastlaneCore
   class PrintTable
@@ -87,6 +88,8 @@ module FastlaneCore
       end
 
       def transform_output(rows, transform: :newline)
+        # Masked before wrapping, which would split a secret across lines
+        rows = rows.map { |row| row.map { |column| column.kind_of?(String) ? Secrets.mask(column) : column } }
         return rows unless should_transform?
 
         require 'fastlane_core/string_filters'
