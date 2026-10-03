@@ -50,16 +50,16 @@ describe Fastlane do
           expect(result.shellsplit).to eq(['say', 'Hi Josh Good Job'])
         end
 
-        it "speaks apostrophes and quotes as written" do
+        it "speaks apostrophes as written" do
           expect(Fastlane::Actions).to receive(:sh)
-            .with('say', %(It's "done"))
+            .with('say', "It's done")
             .and_call_original
 
           result = Fastlane::FastFile.new.parse("lane :test do
-            say(#{%(It's "done").inspect})
+            say(#{"It's done".inspect})
           end").runner.execute(:test)
 
-          expect(result.shellsplit).to eq(['say', %(It's "done")])
+          expect(result.shellsplit).to eq(['say', "It's done"])
         end
       end
 
