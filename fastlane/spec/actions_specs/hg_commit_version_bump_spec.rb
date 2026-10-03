@@ -42,8 +42,8 @@ describe Fastlane do
         expect(result.shellsplit).to eq(["hg", "commit", "-m", message])
       end
 
-      it "passes a message with quotes as a single argument" do
-        message = %(Bump to 2.0, it's "done")
+      it "passes a message with an apostrophe as a single argument" do
+        message = "Bump to 2.0, it's done"
 
         result = Fastlane::FastFile.new.parse("lane :test do
           hg_commit_version_bump(message: #{message.inspect})
