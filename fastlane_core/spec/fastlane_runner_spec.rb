@@ -78,6 +78,19 @@ describe Commander::Runner do
     end
   end
 
+  describe '#suggest_ruby_reinstall' do
+    it 'suggests the Ruby version fastlane recommends' do
+      errors = []
+      allow(FastlaneCore::UI).to receive(:error) { |message| errors << message }
+
+      Commander::Runner.new.suggest_ruby_reinstall(StandardError.new('my message'))
+
+      expect(errors).to include("  - Run `brew update && brew upgrade ruby-build && rbenv install #{Fastlane::SUGGESTED_MINIMUM_RUBY}`")
+      expect(errors).to include("  - Run `rbenv global #{Fastlane::SUGGESTED_MINIMUM_RUBY}` to make it the new global default Ruby version")
+      expect(errors).to include("  - Then run `rvm reinstall ruby-#{Fastlane::SUGGESTED_MINIMUM_RUBY}`")
+    end
+  end
+
   describe '#rescue_fastlane_error' do
     it 'calls show_github_issues if e.show_github_issues is true' do
       runner = Commander::Runner.new
