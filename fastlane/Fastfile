@@ -119,7 +119,7 @@ lane :bump do |options|
   paths_for_commit = []
 
   version_file_path = "./fastlane/lib/fastlane/version.rb"
-  last_version_file_path = File.absolute_path("../CHANGELOG.latest.md")
+  last_version_file_path = File.absolute_path("../internal/CHANGELOG.latest.md")
 
   # Verify everything is in a consistent state
   latest_version = current_version
@@ -270,7 +270,7 @@ lane :create_github_release do |options|
     validate_repo
 
     title = "Improvements"
-    description = File.read("../CHANGELOG.latest.md")
+    description = File.read("../internal/CHANGELOG.latest.md")
 
     github_release = set_github_release(
       repository_name: repo_name,
@@ -610,9 +610,9 @@ private_lane :ensure_tool_name_formatting do
   errors = []
   Dir.chdir("..") do
     Dir["**/*.md"].each do |path|
-      next if path == "CHANGELOG.latest.md"
+      next if path == "internal/CHANGELOG.latest.md"
       next if path.start_with?('vendor/', '.bundle/')
-      helper = Fastlane::Internal::Docs::ToolNameFormatting.new(path: path, is_documenting_invalid_examples: path == 'CONTRIBUTING.md')
+      helper = Fastlane::Internal::Docs::ToolNameFormatting.new(path: path, is_documenting_invalid_examples: path == 'docs/CONTRIBUTING.md')
       errors += helper.find_tool_name_formatting_errors
     end
   end

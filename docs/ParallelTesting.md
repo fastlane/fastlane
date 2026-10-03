@@ -45,7 +45,7 @@ That second case is the one worth being careful about: a green rerun is not evid
 
 **Why**: two workers using the same literal path. `/tmp/fastlane/something`, or `"#{Dir.tmpdir}/some_fixed_name"` — `Dir.tmpdir` is a *shared root*, not a private directory.
 
-**Fix**: `Dir.mktmpdir`, which is unique per call, or the suite's own scratch root `FASTLANE_SPEC_SCRATCH` (`spec_helper.rb:31`). Never a fixed basename under `Dir.tmpdir`.
+**Fix**: `Dir.mktmpdir`, which is unique per call, or the suite's own scratch root `FASTLANE_SPEC_SCRATCH` (`spec/spec_helper.rb:31`). Never a fixed basename under `Dir.tmpdir`.
 
 **Landed as**: [#30217](https://github.com/fastlane/fastlane/pull/30217), [#30220](https://github.com/fastlane/fastlane/pull/30220), [#30225](https://github.com/fastlane/fastlane/pull/30225).
 

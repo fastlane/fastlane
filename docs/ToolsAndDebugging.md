@@ -1,6 +1,6 @@
 # Tooling and Debugging
 
-For detailed instructions on how to get started with contributing to _fastlane_, first check out [YourFirstPR.md][first-pr] and [Testing.md](Testing.md). This guide will focus on more advanced instructions on how to debug _fastlane_ and _spaceship_ issues and work on patches.
+For detailed instructions on how to get started with contributing to _fastlane_, first check out [CONTRIBUTING.md][first-pr] and [Testing.md](Testing.md). This guide will focus on more advanced instructions on how to debug _fastlane_ and _spaceship_ issues and work on patches.
 
 ## Experiment with the _fastlane_ internals
 
@@ -10,7 +10,7 @@ This will allow you to invoke any of the _fastlane_ modules and classes and test
 
 ## Debug using [pry](https://pry.github.io/)
 
-Before you’re able to use [pry](https://pry.github.io/), make sure to have completed the [YourFirstPR.md][first-pr] setup part, as this will install all required development dependencies.
+Before you’re able to use [pry](https://pry.github.io/), make sure to have completed the [CONTRIBUTING.md][first-pr] setup part, as this will install all required development dependencies.
 
 To add a breakpoint anywhere in the _fastlane_ codebase, add the following 2 lines wherever you want to jump in
 
@@ -51,7 +51,7 @@ If it is a server issue, it’s best to [file a radar](https://bugreport.apple.c
 
 ### Setting up [Charles Web Proxy](https://www.charlesproxy.com/)
 
-<img src=".assets/ToolingCharlesEnableSSL.png" align="right" width="180" />
+<img src="assets/ToolingCharlesEnableSSL.png" align="right" width="180" />
 
 This section explains how you can set up [Charles Proxy](https://www.charlesproxy.com/) to track local https traffic and inspect the requests and their responses. Charles is a paid application with a free option that’s usually good enough for a quick debugging session limited to 30 minutes. If you prefer a free open source alternative, check out [mitmproxy](https://mitmproxy.org/).
 
@@ -66,7 +66,7 @@ After doing so, refresh the App Store Connect page. You should be able to see al
 
 We’re not using the built-in network tracker of your browser, since we also need a proxy for our local _fastlane_ install, which will be covered in the next section of this document.
 
-<img src=".assets/ToolingCharlesRequest.png" />
+<img src="assets/ToolingCharlesRequest.png" />
 
 ### Compare the API requests
 
@@ -109,7 +109,7 @@ SPACESHIP_DEBUG=1 bundle exec rake debug
 You can open an interactive _spaceship_ session console by running `fastlane spaceship`
 
 ### Additional Information
-See also the [Debugging _spaceship_](spaceship/docs/Debugging.md) documentation.
+See also the [Debugging _spaceship_](../spaceship/docs/Debugging.md) documentation.
 
 <!--Links-->
-[first-pr]: YourFirstPR.md
+[first-pr]: CONTRIBUTING.md
