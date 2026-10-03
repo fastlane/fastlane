@@ -74,7 +74,7 @@ env_guard_pristine = ENV.to_h
 
 (Fastlane::TOOLS + [:spaceship, :fastlane_core]).each do |tool|
   path = File.join(tool.to_s, "spec", "spec_helper.rb")
-  require_relative path if File.exist?(path)
+  require_relative "../#{path}" if File.exist?(path)
   require tool.to_s
 end
 

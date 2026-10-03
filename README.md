@@ -9,16 +9,10 @@
 [![Gem](https://img.shields.io/gem/v/fastlane.svg?style=flat)](https://rubygems.org/gems/fastlane)
 [![Homebrew](https://img.shields.io/badge/dynamic/json.svg?url=https://formulae.brew.sh/api/formula/fastlane.json&query=$.versions.stable&label=homebrew)](https://formulae.brew.sh/formula/fastlane)
 [![Build Status](https://img.shields.io/circleci/project/github/fastlane/fastlane/master.svg)](https://circleci.com/gh/fastlane/fastlane)
-[![PRs welcome!](https://img.shields.io/badge/PRs-welcome-brightgreen.svg)](https://github.com/fastlane/fastlane/blob/master/CONTRIBUTING.md)
+[![PRs welcome!](https://img.shields.io/badge/PRs-welcome-brightgreen.svg)](https://github.com/fastlane/fastlane/blob/master/docs/CONTRIBUTING.md)
 [![OpenCollective!](https://opencollective.com/fastlane/tiers/badge.svg)](https://opencollective.com/fastlane)
 
 _fastlane_ is a tool for iOS and Android developers to automate tedious tasks like generating screenshots, dealing with provisioning profiles, and releasing your application.
-
-<hr />
-<h2 align="center">
-  ✨ All fastlane docs were moved to <a href="https://docs.fastlane.tools/">docs.fastlane.tools</a> ✨
-</h2>
-<hr />
 
 ## Need Help?
 
@@ -126,11 +120,11 @@ Special thanks to all [contributors](https://github.com/fastlane/fastlane/graphs
 
 ## Contribute to _fastlane_
 
-Check out [CONTRIBUTING.md](CONTRIBUTING.md) for more information on how to help with _fastlane_.
+Check out [CONTRIBUTING.md](docs/CONTRIBUTING.md) for more information on how to help with _fastlane_.
 
 ## Code of Conduct
 
-Help us keep _fastlane_ open and inclusive. Please read and follow our [Code of Conduct](https://github.com/fastlane/fastlane/blob/master/CODE_OF_CONDUCT.md).
+Help us keep _fastlane_ open and inclusive. Please read and follow our [Code of Conduct](https://github.com/fastlane/fastlane/blob/master/docs/CODE_OF_CONDUCT.md).
 
 ## Metrics
 
@@ -146,7 +140,7 @@ _fastlane_ tracks a few key metrics to understand how developers are using the t
 * The Xcode version
 * Whether it was run in non-interactively or interactively
 
-You can easily opt-out of metrics collection by adding `opt_out_usage` at the top of your `Fastfile` or by setting the environment variable `FASTLANE_OPT_OUT_USAGE`. [Check out the metrics code on GitHub](https://github.com/fastlane/fastlane/tree/master/fastlane_core/lib/fastlane_core/analytics)
+You can easily opt out of metrics collection by adding `opt_out_usage` at the top of your `Fastfile` or by setting the environment variable `FASTLANE_OPT_OUT_USAGE`. [Check out the metrics code on GitHub](https://github.com/fastlane/fastlane/tree/master/fastlane_core/lib/fastlane_core/analytics)
 
 ## License
 
@@ -154,8 +148,3 @@ This project is licensed under the terms of the MIT license. See the [LICENSE](L
 
 > This project and all fastlane tools are in no way affiliated with Apple Inc. This project is open source under the MIT license, which means you have full access to the source code and can modify it to fit your own needs. All fastlane tools run on your own computer or server, so your credentials or other sensitive information will never leave your own computer. You are responsible for how you use fastlane tools.
 
-<hr />
-<h2 align="center">
-  ✨ All fastlane docs were moved to <a href="https://docs.fastlane.tools/">docs.fastlane.tools</a> ✨
-</h2>
-<hr />

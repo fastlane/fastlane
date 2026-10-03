@@ -20,7 +20,7 @@ Example logfile:
 
 _spaceship_ also comes with support for proxies (e.g. [Charles Web Proxy](https://www.charlesproxy.com/), free endless 30 minute trial available, available for all platforms) that listen on `https://127.0.0.1:8888`. Just set the environment variable `SPACESHIP_DEBUG` to activate.  
 
-Read [fastlane's "Tooling and Debugging" docs](https://github.com/fastlane/fastlane/blob/master/ToolsAndDebugging.md) for information on how to set it up.
+Read [fastlane's "Tooling and Debugging" docs](https://github.com/fastlane/fastlane/blob/master/docs/ToolsAndDebugging.md) for information on how to set it up.
 
 If your proxy is listening on another port or address, you can use `SPACESHIP_PROXY` to set this. Use `SPACESHIP_PROXY_SSL_VERIFY_NONE` to additionally disable certificate checking.
 
@@ -32,4 +32,4 @@ If your proxy is listening on another port or address, you can use `SPACESHIP_PR
 
 ## Further instructions
 
-You can also check [ToolsAndDebugging.md](https://github.com/fastlane/fastlane/blob/master/ToolsAndDebugging.md#debugging-and-patching-spaceship-issues) for further debugging instructions.
+You can also check [ToolsAndDebugging.md](https://github.com/fastlane/fastlane/blob/master/docs/ToolsAndDebugging.md#debugging-and-patching-spaceship-issues) for further debugging instructions.

@@ -9,7 +9,7 @@ about: If a recent release broke a feature 😬 (Please make sure you know the l
 ### New Regression Checklist
 
 - [ ] Updated fastlane to the latest version
-- [ ] I read the [Contribution Guidelines](https://github.com/fastlane/fastlane/blob/master/CONTRIBUTING.md)
+- [ ] I read the [Contribution Guidelines](https://github.com/fastlane/fastlane/blob/master/docs/CONTRIBUTING.md)
 - [ ] I read [docs.fastlane.tools](https://docs.fastlane.tools)
 - [ ] I searched for [existing GitHub issues](https://github.com/fastlane/fastlane/issues)
 
