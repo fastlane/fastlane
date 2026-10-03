@@ -862,7 +862,7 @@ Style/HashSlice:
     - 'produce/lib/produce/commands_generator.rb'
     - 'produce/lib/produce/service.rb'
     - 'spaceship/lib/spaceship/client.rb'
-    - 'spec_helper.rb'
+    - 'spec/spec_helper.rb'
 
 Style/MapIntoArray:
   Enabled: false
@@ -890,7 +890,7 @@ Style/OneClassPerFile:
     - 'precheck/lib/precheck/rule_processor.rb'
     - 'spaceship/lib/spaceship/helper/rels_middleware.rb'
     - 'spaceship/lib/spaceship/tunes/language_converter.rb'
-    - 'spec_helper.rb'
+    - 'spec/spec_helper.rb'
 
 Style/OptionalArguments:
   Exclude:

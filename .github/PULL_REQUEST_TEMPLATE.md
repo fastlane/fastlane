@@ -5,7 +5,7 @@
 - [ ] I've run `bundle exec rake test_parallel` from the root directory to see all new and existing tests pass — this is what CI runs, and it is usually faster than `bundle exec rspec`
 - [ ] I've followed the _fastlane_ code style and run `bundle exec rubocop -a` to ensure the code style is valid
 - [ ] I see several green GitHub Action builds in the "All checks have passed" section of my PR.
-- [ ] I've read the [Contribution Guidelines](https://github.com/fastlane/fastlane/blob/master/CONTRIBUTING.md)
+- [ ] I've read the [Contribution Guidelines](https://github.com/fastlane/fastlane/blob/master/docs/CONTRIBUTING.md)
 - [ ] I've updated the documentation if necessary.
 - [ ] I've added or updated relevant unit tests.
 

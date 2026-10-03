@@ -277,7 +277,6 @@ Layout/SpaceAroundOperators:
 Naming/FileName:
   Exclude:
     - '**/Dangerfile'
-    - '**/Brewfile'
     - '**/Gemfile'
     - '**/Podfile'
     - '**/Rakefile'
