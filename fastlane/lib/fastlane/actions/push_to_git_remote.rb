@@ -116,7 +116,7 @@ module Fastlane
 
       def self.example_code
         [
-          'push_to_git_remote # simple version. pushes the current branch to "origin" remote',
+          'push_to_git_remote # simple version. Pushes the current branch and all local tags to "origin" remote',
           'push_to_git_remote(
             remote: "origin",         # optional, default: "origin"
             local_branch: "develop",  # optional, default is set to current branch
