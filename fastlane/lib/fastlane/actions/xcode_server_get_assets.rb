@@ -20,12 +20,8 @@ module Fastlane
         password = params[:password]
         trust_self_signed_certs = params[:trust_self_signed_certs]
 
-        # setup (not)trusting self signed certificates.
         # it's normal to have a self signed certificate on your Xcode Server
-        Excon.defaults[:ssl_verify_peer] = !trust_self_signed_certs # for self-signed certificates
-
-        # create Xcode Server config
-        xcs = XcodeServer.new(host, username, password)
+        xcs = XcodeServer.new(host, username, password, ssl_verify_peer: !trust_self_signed_certs)
         bots = xcs.fetch_all_bots
 
         UI.important("Fetched #{bots.count} Bots from Xcode Server at #{host}.")
@@ -106,10 +102,11 @@ module Fastlane
       end
 
       class XcodeServer
-        def initialize(host, username, password)
+        def initialize(host, username, password, ssl_verify_peer: true)
           @host = host.start_with?('https://') ? host : "https://#{host}"
           @username = username
           @password = password
+          @ssl_verify_peer = ssl_verify_peer
         end
 
         def fetch_all_bots
@@ -199,9 +196,9 @@ module Fastlane
           headers = self.headers || {}
 
           if response_block
-            response = Excon.get(url, response_block: response_block, headers: headers)
+            response = Excon.get(url, response_block: response_block, headers: headers, ssl_verify_peer: @ssl_verify_peer)
           else
-            response = Excon.get(url, headers: headers)
+            response = Excon.get(url, headers: headers, ssl_verify_peer: @ssl_verify_peer)
           end
 
           return response
