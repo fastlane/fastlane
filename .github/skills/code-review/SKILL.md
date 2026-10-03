@@ -15,7 +15,8 @@ Hold the change to [AGENTS.md](../../../AGENTS.md) and the guides it lists for t
 ## Verify before reporting
 
 - Check every claim against the code before raising it. Do not post a finding you could not confirm.
-- If the change introduces or exposes a vulnerability, do not describe it, show how to exploit it, or suggest a fix that reveals it. Leave one short comment that the change needs a security review by a maintainer before it is merged, without details.
+- If the change introduces a vulnerability, do not describe it, show how to exploit it, or suggest a fix that reveals it. Leave one short comment that the change needs a security review by a maintainer before it is merged, without details.
+- If the change exposes or fixes an existing vulnerability in public, do not describe it either. Leave one short comment pointing the contributor to [SECURITY.md](../../../SECURITY.md) to report it privately.
 
 ## What to look for
 
