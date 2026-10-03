@@ -92,7 +92,7 @@ module Fastlane
         end
 
         # create a commit with a message
-        command = "hg commit -m '#{params[:message]}'"
+        command = "hg commit -m #{params[:message].shellescape}"
         return command if Helper.test?
         begin
           Actions.sh(command)
