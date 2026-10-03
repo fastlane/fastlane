@@ -7,8 +7,6 @@ require_relative "fastlane/lib/fastlane/version.rb"
 
 # Allows fine-grained control of environment variables.
 gem "climate_control", "~> 0.2.0"
-# Automates code review chores.
-gem "danger", "~> 9.0"
 # A fake filesystem.
 gem "fakefs", ">= 1.8"
 # for file uploads with Faraday

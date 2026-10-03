@@ -276,7 +276,6 @@ Layout/SpaceAroundOperators:
 # They have not to be snake_case
 Naming/FileName:
   Exclude:
-    - '**/Dangerfile'
     - '**/Brewfile'
     - '**/Gemfile'
     - '**/Podfile'
