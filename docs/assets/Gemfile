@@ -1,5 +1,0 @@
-# More information about how to use this file in [CONTRIBUTING.md](docs/Testing.md#test-your-local-fastlane-code-base-with-your-setup)
-
-source "https://rubygems.org"
-
-gemspec path: File.expand_path("<PATH_TO_YOUR_LOCAL_FASTLANE_CLONE>")

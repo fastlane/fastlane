@@ -248,7 +248,7 @@ Edit your `Gemfile` in your project's root folder and replace the `gem 'fastlane
 gemspec path: File.expand_path("<PATH_TO_YOUR_LOCAL_FASTLANE_CLONE>")
 ```
 
-If you don't have a `Gemfile` yet, copy the `Gemfile` [assets/Gemfile](assets/Gemfile) from your local _fastlane_ clone and drop it into your project's root folder.
+If you don't have a `Gemfile` yet, create one in your project's root folder with `source "https://rubygems.org"` followed by the `gemspec` line above.
 
 Make sure to replace `<PATH_TO_YOUR_LOCAL_FASTLANE_CLONE>` with the path to your _fastlane_ clone, e.g. `~/fastlane`, then you can run
 

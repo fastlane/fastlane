@@ -1,6 +1,6 @@
 # Tooling and Debugging
 
-For detailed instructions on how to get started with contributing to _fastlane_, first check out [CONTRIBUTING.md][first-pr] and [Testing.md](Testing.md). This guide will focus on more advanced instructions on how to debug _fastlane_ and _spaceship_ issues and work on patches.
+For detailed instructions on how to get started with contributing to _fastlane_, first check out [CONTRIBUTING.md](./CONTRIBUTING.md) and [Testing.md](./Testing.md). This guide will focus on more advanced instructions on how to debug _fastlane_ and _spaceship_ issues and work on patches.
 
 ## Experiment with the _fastlane_ internals
 
@@ -112,4 +112,4 @@ You can open an interactive _spaceship_ session console by running `fastlane spa
 See also the [Debugging _spaceship_](../spaceship/docs/Debugging.md) documentation.
 
 <!--Links-->
-[first-pr]: CONTRIBUTING.md
+[CONTRIBUTING.md](./CONTRIBUTING.md)
