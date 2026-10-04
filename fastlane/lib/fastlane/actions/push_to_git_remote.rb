@@ -3,7 +3,7 @@ module Fastlane
     # Push local changes to the remote branch
     class PushToGitRemoteAction < Action
       def self.run(params)
-        # Find the local git branch using HEAD or fallback to CI's ENV git branch if you're in detached HEAD state
+        # Find the current branch, or on a detached HEAD the branch CI names in its environment variables
         local_git_branch = Actions.git_branch_name_using_HEAD
         detached_head = local_git_branch == "HEAD"
         local_git_branch = Actions.git_branch unless local_git_branch && !detached_head
