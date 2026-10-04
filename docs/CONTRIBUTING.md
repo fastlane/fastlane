@@ -61,7 +61,7 @@ Once a core member has reviewed your PR, you might need to make changes before i
 
 _fastlane_ changes a lot and is in constant flux. We usually merge multiple PRs per day, so sometimes when we are done reviewing, your code might not work with the latest master branch anymore. To prevent this, before you make any changes after your code has been reviewed, you should always rebase the latest changes from the master branch.
 
-After your contribution is merged, it’s not immediately available to all users. Your change will be shipped as part of the next release, which is usually once per week. If your change is time critical, please let us know so we can schedule a release for your change.
+After your contribution is merged, it’s not immediately available to all users. Your change will be shipped as part of the next release, which is usually once per month. If your change is time-critical, please let us know so we can schedule a release for your change.
 
 ### New Actions
 
