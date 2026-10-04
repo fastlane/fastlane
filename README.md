@@ -120,7 +120,7 @@ Special thanks to all [contributors](https://github.com/fastlane/fastlane/graphs
 
 ## Contribute to _fastlane_
 
-Check out [CONTRIBUTING.md](docs/CONTRIBUTING.md) or [CODE_OF_CONDUCT](./docs/CODE_OF_CONDUCT.md) for more information on how to help with _fastlane_.
+Check out [CONTRIBUTING.md](docs/CONTRIBUTING.md) or [CODE_OF_CONDUCT.md](./docs/CODE_OF_CONDUCT.md) for more information on how to help with _fastlane_.
 
 ## License
 
