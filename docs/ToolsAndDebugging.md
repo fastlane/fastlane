@@ -10,7 +10,7 @@ This will allow you to invoke any of the _fastlane_ modules and classes and test
 
 ## Debug using [pry](https://pry.github.io/)
 
-Before you’re able to use [pry](https://pry.github.io/), make sure to have completed the [CONTRIBUTING.md][first-pr] setup part, as this will install all required development dependencies.
+Before you’re able to use [pry](https://pry.github.io/), make sure to have completed the [CONTRIBUTING.md](./CONTRIBUTING.md) setup part, as this will install all required development dependencies.
 
 To add a breakpoint anywhere in the _fastlane_ codebase, add the following 2 lines wherever you want to jump in
 
@@ -110,6 +110,3 @@ You can open an interactive _spaceship_ session console by running `fastlane spa
 
 ### Additional Information
 See also the [Debugging _spaceship_](../spaceship/docs/Debugging.md) documentation.
-
-<!--Links-->
-[CONTRIBUTING.md](./CONTRIBUTING.md)

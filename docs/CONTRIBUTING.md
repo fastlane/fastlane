@@ -133,10 +133,7 @@ This project is licensed under the terms of the MIT license. See the [LICENSE][l
 [code of conduct]: CODE_OF_CONDUCT.md
 [core contributor]: Maintaining.md#core-contributors
 [license]: ../LICENSE
-[tools and debugging]: ToolsAndDebugging.md
-[vision]: VISION.md
 [responding to prs]: Maintaining.md#responding-to-issues-and-prs
-[plugins]: https://docs.fastlane.tools/plugins/create-plugin/
 [submit action]: https://docs.fastlane.tools/create-action/#submitting-the-action-to-the-fastlane-main-repo
 [you can do this]: https://github.com/fastlane/fastlane/issues?utf8=%E2%9C%93&q=is%3Aopen+is%3Aissue+label%3A%22complexity%3A+you+can+do+this%22+
 [fastlane repo]: https://github.com/fastlane/fastlane
