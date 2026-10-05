@@ -92,6 +92,7 @@ module Fastlane
                                        conflicting_options: [:json_key],
                                        optional: true,
                                        description: "The raw service account JSON data used to authenticate with Google",
+                                       sensitive: true,
                                        code_gen_sensitive: true,
                                        default_value: CredentialsManager::AppfileConfig.try_fetch_value(:json_key_data_raw),
                                        default_value_dynamic: true,
