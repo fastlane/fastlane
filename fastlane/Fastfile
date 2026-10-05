@@ -628,7 +628,7 @@ private_lane :ensure_markdown_links do
   Dir.chdir("..") do
     Dir["**/*.md"].each do |path|
       next if path.start_with?('vendor/', '.bundle/') || path.include?('/fixtures/')
-      errors += Fastlane::Internal::MarkdownLinks.new(path: path).errors
+      errors += Fastlane::Internal::Docs::MarkdownLinks.new(path: path).errors
     end
   end
   errors.each { |a| UI.error(a) }

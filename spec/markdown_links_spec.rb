@@ -1,6 +1,6 @@
 require_relative '../internal/docs/markdown_links'
 
-describe Fastlane::Internal::MarkdownLinks do
+describe Fastlane::Internal::Docs::MarkdownLinks do
   let(:fixture_path) { 'spec/fixtures/markdown_links/page.md' }
 
   it 'reports missing files, missing headings and undefined references, and nothing else' do
