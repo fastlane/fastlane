@@ -324,7 +324,11 @@ module FastlaneCore
         # `simctl uninstall` fails on a shut down device. Boot it headlessly and wait:
         # Simulator.app is not bundled with Xcode 27 and later.
         UI.message("Booting #{device_type}")
-        Helper.backticks("xcrun simctl bootstatus #{device_udid} -b &> /dev/null")
+        if FastlaneCore::Helper.xcode_at_least?("11")
+          Helper.backticks("xcrun simctl bootstatus #{device_udid} -b &> /dev/null")
+        else
+          Helper.backticks("xcrun instruments -w #{device_udid} &> /dev/null")
+        end
 
         UI.message("Uninstall application #{app_identifier}")
         Helper.backticks("xcrun simctl uninstall #{device_udid} #{app_identifier} &> /dev/null")
