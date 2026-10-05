@@ -35,6 +35,7 @@ WebMock.disable_net_connect!
 
 require "fastlane"
 require "tmpdir"
+require "shellwords"
 UI = FastlaneCore::UI
 
 # Spaceship persists a session cookie to ~/.fastlane/spaceship/<user>/cookie,
@@ -110,7 +111,9 @@ KEYCHAIN_CHANGING_SUBCOMMANDS = %w[
   add-generic-password delete-generic-password add-internet-password delete-internet-password
 ].freeze
 
-def keychain_changing?(command)
+def keychain_changing?(command, stdin = nil)
+  # The security gem sends a command that takes a password to `security -i` on stdin.
+  command = ["security", *Shellwords.split(stdin.to_s)] if command == %w[security -i]
   program, subcommand, *arguments = command
   return false unless program == "security"
 
@@ -309,10 +312,10 @@ RSpec.configure do |config|
     # We don't want to call the RubyGems API at any point
     allow(Fastlane::FastlaneRequire).to receive(:install_gem_if_needed).and_return(nil)
 
-    allow(Security::Command).to receive(:run).and_wrap_original do |run, *command|
-      raise "A spec ran `#{command.join(' ')}`, which changes the developer's keychains: stub the security gem call instead" if keychain_changing?(command)
+    allow(Security::Command).to receive(:run).and_wrap_original do |run, *command, **options|
+      raise "A spec ran `#{command.join(' ')}`, which changes the developer's keychains: stub the security gem call instead" if keychain_changing?(command, options[:stdin])
 
-      run.call(*command)
+      run.call(*command, **options)
     end
 
     ENV['FASTLANE_PLATFORM_NAME'] = nil
