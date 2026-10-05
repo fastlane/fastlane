@@ -1,6 +1,8 @@
 ---
 name: 😱 Regression
 about: If a recent release broke a feature 😬 (Please make sure you know the last known working release version)
+title: "[Regression] "
+labels: ["status: regression"]
 
 ---
 
