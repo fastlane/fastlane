@@ -425,6 +425,7 @@ desc "Validates the docs still are good"
 lane :validate_docs do
   # Validate docs content
   ensure_tool_name_formatting
+  ensure_markdown_links
   ensure_code_samples
   ensure_special_docs_code_samples
   ensure_code_snippets
@@ -618,6 +619,21 @@ private_lane :ensure_tool_name_formatting do
   errors.each { |a| UI.error(a) }
   UI.user_error!("Invalid formatting of one of the fastlane tools") unless errors.empty?
   UI.success("✅  fastlane tools formatting is correct")
+end
+
+private_lane :ensure_markdown_links do
+  require_relative "../internal/docs/markdown_links"
+  UI.message("🕗  Verifying links in Markdown files...")
+  errors = []
+  Dir.chdir("..") do
+    Dir["**/*.md"].each do |path|
+      next if path.start_with?('vendor/', '.bundle/') || path.include?('/fixtures/')
+      errors += Fastlane::Internal::MarkdownLinks.new(path: path).errors
+    end
+  end
+  errors.each { |a| UI.error(a) }
+  UI.user_error!("Broken links in Markdown files") unless errors.empty?
+  UI.success("✅  Markdown links are valid")
 end
 
 # Run the code samples, yo
