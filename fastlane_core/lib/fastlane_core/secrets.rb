@@ -1,7 +1,9 @@
 require_relative 'core_ext/shellwords'
+require_relative 'env'
 
 module FastlaneCore
   # Values hidden from everything fastlane prints. Only output is masked: commands still receive the real value.
+  # FASTLANE_DISABLE_SECRET_MASKING turns it off, for debugging.
   module Secrets
     MASK = '********'.freeze
     # Shorter values would mask unrelated text.
@@ -25,12 +27,12 @@ module FastlaneCore
 
           [value, Shellwords.escape(value), value.shellescape].each { |form| values << form.b unless values.include?(form.b) }
           values.sort_by! { |v| -v.length }
-          install_output_filter
+          install_output_filter unless disabled?
         end
       end
 
       def mask(text)
-        return text if values.empty? || !text.kind_of?(String)
+        return text if values.empty? || !text.kind_of?(String) || disabled?
 
         masked = text.b
         values.each { |v| masked.gsub!(v, MASK) }
@@ -43,6 +45,10 @@ module FastlaneCore
 
       def clear
         @values = []
+      end
+
+      def disabled?
+        FastlaneCore::Env.truthy?('FASTLANE_DISABLE_SECRET_MASKING')
       end
 
       private

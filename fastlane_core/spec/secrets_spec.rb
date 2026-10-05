@@ -37,6 +37,14 @@ describe FastlaneCore::Secrets do
     it 'leaves text alone when nothing is registered' do
       expect(described_class.mask('tok-1234')).to eq('tok-1234')
     end
+
+    it 'leaves text alone when FASTLANE_DISABLE_SECRET_MASKING is set' do
+      described_class.register('tok-1234')
+
+      FastlaneSpec::Env.with_env_values('FASTLANE_DISABLE_SECRET_MASKING' => '1') do
+        expect(described_class.mask('token tok-1234 used')).to eq('token tok-1234 used')
+      end
+    end
   end
 
   describe FastlaneCore::Secrets::OutputFilter do
@@ -53,6 +61,39 @@ describe FastlaneCore::Secrets do
       writer.close
 
       expect(reader.read).not_to include('tok-1234')
+    end
+
+    it 'masks nothing when FASTLANE_DISABLE_SECRET_MASKING is set' do
+      FastlaneCore::Secrets.register('tok-1234')
+      reader, writer = IO.pipe
+      writer.singleton_class.prepend(described_class)
+
+      FastlaneSpec::Env.with_env_values('FASTLANE_DISABLE_SECRET_MASKING' => '1') do
+        writer.puts('puts tok-1234')
+        Logger.new(writer).info('logger tok-1234')
+      end
+      writer.close
+
+      expect(reader.read.scan('tok-1234').size).to eq(2)
+    end
+
+    it 'is not installed on $stdout and $stderr when FASTLANE_DISABLE_SECRET_MASKING is set' do
+      # Fresh streams: the real ones keep the filter an earlier example installed
+      stdout = $stdout
+      stderr = $stderr
+      $stdout = StringIO.new
+      $stderr = StringIO.new
+      begin
+        FastlaneSpec::Env.with_env_values('FASTLANE_DISABLE_SECRET_MASKING' => '1') do
+          FastlaneCore::Secrets.register('tok-1234')
+        end
+
+        expect($stdout.singleton_class).not_to include(described_class)
+        expect($stderr.singleton_class).not_to include(described_class)
+      ensure
+        $stdout = stdout
+        $stderr = stderr
+      end
     end
 
     it 'is installed on $stdout and $stderr when a secret is registered' do
