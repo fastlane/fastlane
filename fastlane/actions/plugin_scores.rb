@@ -31,7 +31,7 @@ module Fastlane
           plugins += results.collect do |current|
             next if self.hidden_plugins.include?(current['name'])
 
-            Fastlane::Internal::PluginScores::FastlanePluginScore.new(current, cache_path)
+            Fastlane::Internal::Docs::PluginScores::FastlanePluginScore.new(current, cache_path)
           end.compact
 
           page += 1

@@ -1,9 +1,9 @@
 require_relative '../internal/docs/tool_name_formatting'
 
-describe Fastlane::Internal::ToolNameFormatting do
+describe Fastlane::Internal::Docs::ToolNameFormatting do
   let(:fixture_path) { 'spec/fixtures/tool_name_formatting.txt' }
   before(:each) do
-    @helper = Fastlane::Internal::ToolNameFormatting.new(path: fixture_path, is_documenting_invalid_examples: true)
+    @helper = Fastlane::Internal::Docs::ToolNameFormatting.new(path: fixture_path, is_documenting_invalid_examples: true)
   end
 
   describe 'when parsing fixture file' do
