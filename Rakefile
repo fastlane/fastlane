@@ -36,14 +36,14 @@ task(:generate_team_table) do
   require_relative 'fastlane/lib/fastlane/documentation/markdown_docs_generator'
 
   readme = File.read("README.md")
-  readme.sub!(/(?<=<!-- team:start -->\n).*(?=<!-- team:end -->)/m) { Fastlane::MarkdownDocsGenerator.render_team("team.json") }
+  readme.sub!(/(?<=<!-- team:start -->\n).*(?=<!-- team:end -->)/m) { Fastlane::MarkdownDocsGenerator.render_team("internal/team.json") }
   File.write("README.md", readme)
   puts("All done")
 end
 
 task(:update_gem_spec_authors) do
   require 'json'
-  contributors = JSON.parse(File.read("team.json"))
+  contributors = JSON.parse(File.read("internal/team.json"))
 
   names = contributors.values.collect do |current|
     current["name"]

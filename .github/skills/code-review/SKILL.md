@@ -16,7 +16,7 @@ Hold the change to [AGENTS.md](../../../AGENTS.md) and the guides it lists for t
 
 - Check every claim against the code before raising it. Do not post a finding you could not confirm.
 - If the change introduces a vulnerability, do not describe it, show how to exploit it, or suggest a fix that reveals it. Leave one short comment that the change needs a security review by a maintainer before it is merged, without details.
-- If the change exposes or fixes an existing vulnerability in public, do not describe it either. Leave one short comment pointing the contributor to [SECURITY.md](../../../SECURITY.md) to report it privately.
+- If the change exposes or fixes an existing vulnerability in public, do not describe it either. Leave one short comment pointing the contributor to [SECURITY.md](../../../docs/SECURITY.md) to report it privately.
 
 ## What to look for
 
@@ -25,7 +25,7 @@ Hold the change to [AGENTS.md](../../../AGENTS.md) and the guides it lists for t
 - A fix whose spec would also pass against the code before the fix.
 - New behaviour without a spec for each branch, validator and error case.
 - A new pattern where the codebase already solves the same problem. Name the existing one: for two options that can replace each other, `delete_keychain` (`:name` and `:keychain_path`).
-- A change that contradicts [Design.md](../../../Design.md), or works around one of its known limits in a single action.
+- A change that contradicts [Design.md](../../../docs/Design.md), or works around one of its known limits in a single action.
 - A bug, or a change to an action's options, defaults or outputs that breaks existing Fastfiles.
 - `example_code`, `details` or option descriptions that no longer match what the code does after the change.
 

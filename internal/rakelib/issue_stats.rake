@@ -2,7 +2,7 @@ require 'json'
 require 'yaml'
 
 def load_fastlane_members
-  team_path = File.expand_path('../../team.json', __dir__)
+  team_path = File.expand_path('../team.json', __dir__)
   data = JSON.parse(File.read(team_path))
   members = data.keys.map { |u| u.to_s.downcase }
   members << 'fastlane-bot'

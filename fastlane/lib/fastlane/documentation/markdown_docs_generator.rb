@@ -200,7 +200,7 @@ module Fastlane
     end
 
     def generate_team_table(docs_dir)
-      team_json_path = File.expand_path(File.join(Fastlane::ROOT, "..", "team.json"))
+      team_json_path = File.expand_path(File.join(Fastlane::ROOT, "..", "internal", "team.json"))
       unless File.exist?(team_json_path)
         UI.message("Skipping team table generation, could not find #{team_json_path}")
         return
