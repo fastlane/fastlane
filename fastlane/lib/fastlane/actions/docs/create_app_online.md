@@ -10,8 +10,7 @@ _produce_ creates new iOS apps on both the Apple Developer Portal and App Store 
 
 <p align="center">
     <a href="#features">Features</a> &bull;
-    <a href="#usage">Usage</a> &bull;
-    <a href="#how-does-it-work">How does it work?</a>
+    <a href="#usage">Usage</a>
 </p>
 
 -------

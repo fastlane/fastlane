@@ -27,8 +27,7 @@ Get in contact with the creators on Twitter: [@FastlaneTools](https://twitter.co
     <a href="#whats-spaceship">Why?</a> &bull;
     <a href="#usage">Usage</a> &bull;
     <a href="#installation">Installation</a> &bull;
-    <a href="#technical-details">Technical Details</a> &bull;
-    <a href="#need-help">Need help?</a>
+    <a href="#technical-details">Technical Details</a>
 </p>
 
 -------
