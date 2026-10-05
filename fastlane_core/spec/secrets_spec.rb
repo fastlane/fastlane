@@ -6,6 +6,33 @@ describe FastlaneCore::Secrets do
       expect(described_class.mask('token tok-1234 used')).to eq('token ******** used')
     end
 
+    it 'names the option a value was registered for' do
+      described_class.register('tok-1234', name: :api_token)
+
+      expect(described_class.mask('token tok-1234 used')).to eq('token API_TOKEN_REDACTED used')
+    end
+
+    it 'names a value registered unnamed first, then for an option' do
+      described_class.register('tok-1234')
+      described_class.register('tok-1234', name: :api_token)
+
+      expect(described_class.mask('tok-1234')).to eq('API_TOKEN_REDACTED')
+    end
+
+    it 'keeps the first name a value was registered for' do
+      described_class.register('tok-1234', name: :api_token)
+      described_class.register('tok-1234', name: :other)
+
+      expect(described_class.mask('tok-1234')).to eq('API_TOKEN_REDACTED')
+    end
+
+    it 'does not mask a secret inside the name that replaced another one' do
+      described_class.register('TOKEN', name: :short)
+      described_class.register('tok-12345', name: :api_token)
+
+      expect(described_class.mask('tok-12345 TOKEN')).to eq('API_TOKEN_REDACTED SHORT_REDACTED')
+    end
+
     it 'replaces the escaped form sh prints for an environment hash' do
       described_class.register('p@ss word')
 

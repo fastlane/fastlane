@@ -59,7 +59,7 @@ module FastlaneCore
       @available_options.each do |element|
         next unless element.sensitive
 
-        Secrets.register(@values[element.key])
+        Secrets.register(@values[element.key], name: element.key)
         # if we are in captured output mode - keep a array of sensitive option values
         # those will be later - replaced by ####
         self.class.sensitive_strings << @values[element.key] if FastlaneCore::Globals.capture_output?
@@ -231,7 +231,7 @@ module FastlaneCore
 
       value = option.auto_convert_value(value)
       value = nil if value.nil? && !option.string? # by default boolean flags are false
-      Secrets.register(value) if option.sensitive
+      Secrets.register(value, name: option.key) if option.sensitive
       return value unless value.nil? && (!option.optional || force_ask) && ask
 
       # fallback to asking

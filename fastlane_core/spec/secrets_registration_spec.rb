@@ -10,7 +10,7 @@ describe "Masking secrets in output" do
     it "registers a sensitive value passed as a parameter" do
       FastlaneCore::Configuration.create(options, { api_token: "param-1234" })
 
-      expect(FastlaneCore::Secrets.mask("param-1234")).to eq("********")
+      expect(FastlaneCore::Secrets.mask("param-1234")).to eq("API_TOKEN_REDACTED")
     end
 
     it "registers a sensitive value from an environment variable when it is fetched" do
@@ -18,7 +18,7 @@ describe "Masking secrets in output" do
         FastlaneCore::Configuration.create(options, {})[:api_token]
       end
 
-      expect(FastlaneCore::Secrets.mask("env-1234")).to eq("********")
+      expect(FastlaneCore::Secrets.mask("env-1234")).to eq("API_TOKEN_REDACTED")
     end
 
     it "does not register values of other options" do
