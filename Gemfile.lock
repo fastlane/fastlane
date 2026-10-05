@@ -1,6 +1,6 @@
 GIT
   remote: https://github.com/fastlane-community/security.git
-  revision: ec4cd14a94d5f11926ac8b6b6fd8f2d161d957c4
+  revision: 9c7f7edbe245ab60417aa458f77712cec6070e5e
   branch: gem/7-passwords-via-interactive
   specs:
     security (0.3.0)
