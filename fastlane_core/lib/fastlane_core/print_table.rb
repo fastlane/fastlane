@@ -113,7 +113,7 @@ module FastlaneCore
         return return_array
       end
 
-      def collect_rows(options: nil, hide_keys: [], mask_keys: [], prefix: '', mask: '********')
+      def collect_rows(options: nil, hide_keys: [], mask_keys: [], prefix: '', mask: nil)
         rows = []
 
         options.each do |key, value|
@@ -121,7 +121,7 @@ module FastlaneCore
           next if value.nil?
           next if value.to_s == ""
           next if hide_keys.include?(prefixed_key)
-          value = mask if mask_keys.include?(prefixed_key)
+          value = mask || Secrets.label(key) if mask_keys.include?(prefixed_key)
 
           if value.respond_to?(:key)
             rows.concat(self.collect_rows(options: value, hide_keys: hide_keys, mask_keys: mask_keys, prefix: "#{prefix}#{key}.", mask: mask))
