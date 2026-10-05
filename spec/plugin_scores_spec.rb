@@ -1,24 +1,24 @@
-require_relative '../../helper/plugin_scores_helper.rb'
+require_relative '../internal/docs/plugin_scores'
 
-describe Fastlane::Helper::PluginScoresHelper::FastlaneActionFileParser do
+describe Fastlane::Internal::Docs::PluginScores::FastlaneActionFileParser do
   describe 'parsing' do
     it "parses single line action's description" do
-      action_file = './fastlane/spec/fixtures/plugins/single_line_description_action.rb'
-      actions = Fastlane::Helper::PluginScoresHelper::FastlaneActionFileParser.new.parse_file(File.expand_path(action_file))
+      action_file = './spec/fixtures/plugin_scores/single_line_description_action.rb'
+      actions = Fastlane::Internal::Docs::PluginScores::FastlaneActionFileParser.new.parse_file(File.expand_path(action_file))
       expect(actions.length).to equal(1)
       expect(actions.first.description).to match('This is single line description.') if actions.length == 1
     end
 
     it "parses multi line action's description" do
-      action_file = './fastlane/spec/fixtures/plugins/multi_line_description_action.rb'
-      actions = Fastlane::Helper::PluginScoresHelper::FastlaneActionFileParser.new.parse_file(File.expand_path(action_file))
+      action_file = './spec/fixtures/plugin_scores/multi_line_description_action.rb'
+      actions = Fastlane::Internal::Docs::PluginScores::FastlaneActionFileParser.new.parse_file(File.expand_path(action_file))
       expect(actions.length).to equal(1)
       expect(actions.first.description).to match('This is multi line description.') if actions.length == 1
     end
   end
 end
 
-describe Fastlane::Helper::PluginScoresHelper::FastlanePluginScore do
+describe Fastlane::Internal::Docs::PluginScores::FastlanePluginScore do
   describe ".github_page?" do
     it "accepts a github.com repository" do
       expect(described_class.github_page?("https://github.com/fastlane/fastlane")).to be(true)
