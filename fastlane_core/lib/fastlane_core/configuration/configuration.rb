@@ -1,5 +1,6 @@
 require_relative '../helper'
 require_relative '../globals'
+require_relative '../secrets'
 require_relative 'config_item'
 require_relative 'commander_generator'
 require_relative 'configuration_file'
@@ -53,16 +54,17 @@ module FastlaneCore
       # used for pushing and popping values to provide nesting configuration contexts
       @values_stack = []
 
-      # if we are in captured output mode - keep a array of sensitive option values
-      # those will be later - replaced by ####
-      if FastlaneCore::Globals.capture_output?
-        available_options.each do |element|
-          next unless element.sensitive
-          self.class.sensitive_strings << values[element.key]
-        end
+      verify_input_types
+
+      @available_options.each do |element|
+        next unless element.sensitive
+
+        Secrets.register(@values[element.key])
+        # if we are in captured output mode - keep a array of sensitive option values
+        # those will be later - replaced by ####
+        self.class.sensitive_strings << @values[element.key] if FastlaneCore::Globals.capture_output?
       end
 
-      verify_input_types
       verify_value_exists
       verify_no_duplicates
       verify_conflicts
@@ -229,6 +231,7 @@ module FastlaneCore
 
       value = option.auto_convert_value(value)
       value = nil if value.nil? && !option.string? # by default boolean flags are false
+      Secrets.register(value) if option.sensitive
       return value unless value.nil? && (!option.optional || force_ask) && ask
 
       # fallback to asking

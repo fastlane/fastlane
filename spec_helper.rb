@@ -133,6 +133,11 @@ RSpec.configure do |config|
     end
   end
 
+  # Secrets registered by one example would mask output in the next.
+  config.after(:each) do
+    FastlaneCore::Secrets.clear if defined?(FastlaneCore::Secrets)
+  end
+
   config.after(:suite) do
     FileUtils.remove_entry(SPACESHIP_COOKIE_DIR) if File.directory?(SPACESHIP_COOKIE_DIR)
   end
