@@ -18,33 +18,42 @@ module FastlaneCore
 
     class << self
       # Registers a secret, or every String inside a Hash or Array, together with the escaped forms `sh` prints.
-      def register(value)
+      # A name, such as the option's key, replaces it with `<NAME>_REDACTED` rather than MASK.
+      def register(value, name: nil)
         case value
-        when Hash then value.each_value { |v| register(v) }
-        when Array then value.each { |v| register(v) }
+        when Hash then value.each_value { |v| register(v, name: name) }
+        when Array then value.each { |v| register(v, name: name) }
         when String
           return if value.length < MIN_LENGTH
 
-          [value, Shellwords.escape(value), value.shellescape].each { |form| values << form.b unless values.include?(form.b) }
-          values.sort_by! { |v| -v.length }
+          replacement = name ? label(name) : MASK
+          [value, Shellwords.escape(value), value.shellescape].each do |form|
+            labels[form.b] = replacement if [nil, MASK].include?(labels[form.b])
+          end
+          @pattern = nil
           install_output_filter unless disabled?
         end
       end
 
       def mask(text)
-        return text if values.empty? || !text.kind_of?(String) || disabled?
+        return text if labels.empty? || !text.kind_of?(String) || disabled?
 
-        masked = text.b
-        values.each { |v| masked.gsub!(v, MASK) }
-        masked.force_encoding(text.encoding)
+        # One pass: a name put in place of a secret is not masked again by a shorter secret it contains
+        text.b.gsub(pattern) { |match| labels[match] }.force_encoding(text.encoding)
       end
 
-      def values
-        @values ||= []
+      # What a secret registered under this name is replaced with, e.g. API_TOKEN_REDACTED
+      def label(name)
+        "#{name.to_s.upcase}_REDACTED"
+      end
+
+      def labels
+        @labels ||= {}
       end
 
       def clear
-        @values = []
+        @labels = {}
+        @pattern = nil
       end
 
       def disabled?
@@ -52,6 +61,11 @@ module FastlaneCore
       end
 
       private
+
+      # Longest first, so a secret wins over a shorter one it contains
+      def pattern
+        @pattern ||= Regexp.union(labels.keys.sort_by { |v| -v.length })
+      end
 
       def install_output_filter
         [$stdout, $stderr].each do |io|
