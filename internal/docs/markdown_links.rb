@@ -58,8 +58,10 @@ module Fastlane
 
         # GitHub's heading slug: the rendered text, lowercased, without punctuation, spaces as hyphens
         def self.slug(heading)
-          # Links and images keep their text, autolinks their URL; other HTML tags go
-          text = heading.gsub(/!?\[([^\]]*)\]\([^)]*\)/, '\1').gsub(%r{<(https?://[^>]+)>}, '\1').gsub(/<[^>]+>/, '')
+          # Links and images keep their text, autolinks their URL
+          text = heading.gsub(/!?\[([^\]]*)\]\([^)]*\)/, '\1').gsub(%r{<(https?://[^>]+)>}, '\1')
+          # Other HTML tags go, until none is left: removing one could join the pieces of another
+          text = text.gsub(/<[^>]+>/, '') while text.match?(/<[^>]+>/)
           # Emphasis markers go, but not underscores inside words or code
           text = text.split(/(`[^`]*`)/).map { |part| part.start_with?('`') ? part.delete('`') : part.delete('*').gsub(/(?<![[:alnum:]])_+|_+(?![[:alnum:]])/, '') }.join
           text.downcase.gsub(/[^\p{L}\p{M}\p{N}_\- ]/, '').tr(' ', '-')
