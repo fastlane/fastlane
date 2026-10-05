@@ -1,6 +1,6 @@
 module Fastlane
-  module Helper
-    module PluginScoresHelper
+  module Internal
+    module PluginScores
       require 'faraday'
       require 'faraday/follow_redirects'
       require 'yaml'

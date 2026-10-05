@@ -1,6 +1,8 @@
+require 'fastlane/tools'
+
 module Fastlane
-  module Helper
-    class ToolNameFormattingHelper
+  module Internal
+    class ToolNameFormatting
       attr_accessor :path, :is_documenting_invalid_examples
 
       # @param [String] path Path to the file to be checked for tool formatting

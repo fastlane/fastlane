@@ -909,7 +909,7 @@ Style/RedundantCurrentDirectoryInPath:
 
 Style/RedundantRegexpArgument:
   Exclude:
-    - 'fastlane/helper/plugin_scores_helper.rb'
+    - 'internal/docs/plugin_scores.rb'
     - 'fastlane_core/lib/fastlane_core/core_ext/string.rb'
     - 'fastlane_core/lib/fastlane_core/device_manager.rb'
     - 'fastlane_core/lib/fastlane_core/itunes_transporter.rb'
@@ -958,4 +958,4 @@ Style/TimeNow:
 Style/YAMLFileRead:
   Exclude:
     - 'Rakefile'
-    - 'fastlane/helper/plugin_scores_helper.rb'
+    - 'internal/docs/plugin_scores.rb'

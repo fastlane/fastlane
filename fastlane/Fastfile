@@ -604,7 +604,7 @@ end
 
 desc "Ensure the correct formatting for the fastlane tools"
 private_lane :ensure_tool_name_formatting do
-  require_relative "../fastlane/helper/tool_name_formatting_helper.rb"
+  require_relative "../internal/docs/tool_name_formatting"
   UI.message("🕗  Verifying tool name formatting...")
   require 'fastlane/tools'
   errors = []
@@ -612,7 +612,7 @@ private_lane :ensure_tool_name_formatting do
     Dir["**/*.md"].each do |path|
       next if path == "CHANGELOG.latest.md"
       next if path.start_with?('vendor/', '.bundle/')
-      helper = Helper::ToolNameFormattingHelper.new(path: path, is_documenting_invalid_examples: path == 'CONTRIBUTING.md')
+      helper = Fastlane::Internal::ToolNameFormatting.new(path: path, is_documenting_invalid_examples: path == 'CONTRIBUTING.md')
       errors += helper.find_tool_name_formatting_errors
     end
   end
