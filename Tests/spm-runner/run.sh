@@ -6,6 +6,10 @@ set -u
 here=$(cd "$(dirname "$0")" && pwd)
 repository=$(cd "$here/../.." && pwd)
 work=$(mktemp -d)
+# Reuse the gems installed for this repository, then drop what `bundle exec` exported: the runner must find the project's Gemfile itself
+bundle_path=$(cd "$repository" && bundle config get path --parseable 2>/dev/null | sed -n 's/^path=//p')
+[ -n "$bundle_path" ] && export BUNDLE_PATH="$bundle_path"
+unset BUNDLE_GEMFILE BUNDLE_BIN_PATH BUNDLER_SETUP BUNDLER_VERSION RUBYOPT RUBYLIB
 trap 'rm -rf "$work"' EXIT
 failures=0
 

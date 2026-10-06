@@ -209,6 +209,11 @@ lane :generate_swift_api do |options|
     skip_package_ipa: true
   )
   sh("swift build")
+  # Set by the "Validate Fastlane.swift generation" CI job; set it locally to run the same checks
+  if ENV["FASTLANE_SWIFT_TESTS"]
+    sh("swift test")
+    sh("../Tests/spm-runner/run.sh")
+  end
   sh("rm -r ../.build")
   sh("rm ../FastlaneRunner")
   generated_files

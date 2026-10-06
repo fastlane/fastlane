@@ -119,6 +119,8 @@ jobs:
 
       - name: Generate Swift API
         run: bundle exec fastlane generate_swift_api
+        env:
+          FASTLANE_SWIFT_TESTS: true
 
   validate_documentation:
     name: Validate Documentation
