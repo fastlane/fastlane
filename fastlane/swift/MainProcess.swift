@@ -61,15 +61,12 @@ class MainProcess {
         // 3. Gemfile (BUNDLE_GEMFILE, or found from the working directory up, as Bundler does) -> bundle exec fastlane
         // 4. fastlane on PATH
         private func fastlaneLaunchArguments() -> [String] {
-            if let bin = ProcessInfo.processInfo.environment["FASTLANE_SPM_BIN"] {
-                // split(separator:) omits empty subsequences, so a blank or
-                // whitespace-only value yields an empty argv; fall through to
-                // the normal resolution chain instead of launching `env` with
-                // no command.
-                let arguments = bin.split(separator: " ").map(String.init)
-                if !arguments.isEmpty {
-                    return arguments
-                }
+            if let bin = ProcessInfo.processInfo.environment["FASTLANE_SPM_BIN"],
+               !bin.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty
+            {
+                // The shell splits the value, so quoted paths with spaces work; our arguments
+                // pass through "$@" untouched, and exec keeps the launched process ID.
+                return ["/bin/sh", "-c", "exec \(bin) \"$@\"", "sh"]
             }
             guard let bundleRoot = bundleRootDirectory() else {
                 return ["fastlane"]
