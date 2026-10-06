@@ -8,6 +8,29 @@ describe Scan do
     end
 
     describe "handle_results" do
+      # handle_results reads the test results from the result bundle whose path TestCommandGenerator stores.
+      # These specs don't run TestCommandGenerator, so they store one themselves. Trainer is stubbed, so no bundle has to be there.
+      def configure(options = {})
+        Scan.config = FastlaneCore::Configuration.create(Scan::Options.available_options, {
+          output_directory: '/tmp/scan_results',
+          project: './scan/examples/standard/app.xcodeproj'
+        }.merge(options))
+        Scan.cache[:result_bundle_path] = '/tmp/scan_results/test.xcresults'
+      end
+
+      def stub_test_results(failures:)
+        allow(Trainer::TestParser).to receive(:auto_convert).and_return({
+          "some/path": {
+            successful: failures.zero?,
+            number_of_tests: 10,
+            number_of_failures: failures,
+            number_of_tests_excluding_retries: 10,
+            number_of_failures_excluding_retries: failures,
+            number_of_retries: 0
+          }
+        })
+      end
+
       before(:each) do
         mock_slack_poster = Object.new
         allow(Scan::SlackPoster).to receive(:new).and_return(mock_slack_poster)
@@ -21,32 +44,14 @@ describe Scan do
         allow(Scan::TestResultParser).to receive(:new).and_return(mock_test_result_parser)
         allow(mock_test_result_parser).to receive(:parse_result).and_return({ tests: 100, failures: 0 })
 
-        allow(Trainer::TestParser).to receive(:auto_convert).and_return({
-          "some/path": {
-            successful: true,
-            number_of_tests: 10,
-            number_of_failures: 0,
-            number_of_tests_excluding_retries: 10,
-            number_of_failures_excluding_retries: 0,
-            number_of_retries: 0
-          }
-        })
+        stub_test_results(failures: 0)
 
         @scan = Scan::Runner.new
       end
 
       describe "with scan option :include_simulator_logs set to false" do
         it "does not copy any device logs to the output directory", requires_xcodebuild: true do
-          # Circle CI is setting the SCAN_INCLUDE_SIMULATOR_LOGS env var, so just leaving
-          # the include_simulator_logs option out does not let it default to false
-          Scan.config = FastlaneCore::Configuration.create(Scan::Options.available_options, {
-            output_directory: '/tmp/scan_results',
-            project: './scan/examples/standard/app.xcodeproj',
-            include_simulator_logs: false
-          })
-
-          # This is a needed side effect from running TestCommandGenerator which is not done in this test
-          Scan.cache[:result_bundle_path] = '/tmp/scan_results/test.xcresults'
+          configure(include_simulator_logs: false)
 
           expect(FastlaneCore::Simulator).not_to(receive(:copy_logs))
           @scan.handle_results(0)
@@ -55,32 +60,54 @@ describe Scan do
 
       describe "with scan option :include_simulator_logs set to true" do
         it "copies any device logs to the output directory", requires_xcodebuild: true do
-          # Circle CI is setting the SCAN_INCLUDE_SIMULATOR_LOGS env var, so just leaving
-          # the include_simulator_logs option out does not let it default to false
-          Scan.config = FastlaneCore::Configuration.create(Scan::Options.available_options, {
-            output_directory: '/tmp/scan_results',
-            project: './scan/examples/standard/app.xcodeproj',
-            include_simulator_logs: true
-          })
-
-          # This is a needed side effect from running TestCommandGenerator which is not done in this test
-          Scan.cache[:result_bundle_path] = '/tmp/scan_results/test.xcresults'
+          configure(include_simulator_logs: true)
 
           expect(FastlaneCore::Simulator).to receive(:copy_logs)
           @scan.handle_results(0)
         end
       end
 
+      describe "with scan option :include_simulator_logs set to on-failure" do
+        before(:each) do
+          configure(include_simulator_logs: 'on-failure')
+        end
+
+        it "does not copy any device logs when the tests pass", requires_xcodebuild: true do
+          expect(FastlaneCore::Simulator).not_to(receive(:copy_logs))
+          @scan.handle_results(0)
+        end
+
+        it "copies the device logs before reporting failed tests", requires_xcodebuild: true do
+          stub_test_results(failures: 1)
+
+          expect(FastlaneCore::Simulator).to receive(:copy_logs)
+          expect do
+            @scan.handle_results(65)
+          end.to raise_error(FastlaneCore::Interface::FastlaneTestFailure, "Tests have failed")
+        end
+
+        it "copies the device logs when xcodebuild failed and the results can't be read", requires_xcodebuild: true do
+          allow(Trainer::TestParser).to receive(:auto_convert).and_raise("Trainer couldn't parse the result bundle")
+
+          expect(FastlaneCore::Simulator).to receive(:copy_logs)
+          expect do
+            @scan.handle_results(65)
+          end.to raise_error("Trainer couldn't parse the result bundle")
+        end
+
+        it "copies the device logs when only the results show failed tests", requires_xcodebuild: true do
+          stub_test_results(failures: 1)
+
+          expect(FastlaneCore::Simulator).to receive(:copy_logs)
+          expect do
+            @scan.handle_results(0)
+          end.to raise_error(FastlaneCore::Interface::FastlaneTestFailure, "Tests have failed")
+        end
+      end
+
       describe "with scan option :force_legacy_xcresulttool set to true" do
         it "forwards force_legacy_xcresulttool to trainer", requires_xcodebuild: true do
-          Scan.config = FastlaneCore::Configuration.create(Scan::Options.available_options, {
-            output_directory: '/tmp/scan_results',
-            project: './scan/examples/standard/app.xcodeproj',
-            force_legacy_xcresulttool: true
-          })
-
-          # This is a needed side effect from running TestCommandGenerator which is not done in this test
-          Scan.cache[:result_bundle_path] = '/tmp/scan_results/test.xcresults'
+          configure(force_legacy_xcresulttool: true)
 
           expect(Trainer::TestParser).to receive(:auto_convert).with(hash_including(force_legacy_xcresulttool: true)).and_return({})
           @scan.handle_results(0)
@@ -90,24 +117,8 @@ describe Scan do
       describe "Test Failure" do
         it "raises a FastlaneTestFailure instead of a crash or UserError", requires_xcodebuild: true do
           expect do
-            Scan.config = FastlaneCore::Configuration.create(Scan::Options.available_options, {
-              output_directory: '/tmp/scan_results',
-              project: './scan/examples/standard/app.xcodeproj'
-            })
-
-            # This is a needed side effect from running TestCommandGenerator which is not done in this test
-            Scan.cache[:result_bundle_path] = '/tmp/scan_results/test.xcresults'
-
-            allow(Trainer::TestParser).to receive(:auto_convert).and_return({
-              "some/path": {
-                successful: true,
-                number_of_tests: 10,
-                number_of_failures: 1,
-                number_of_tests_excluding_retries: 10,
-                number_of_failures_excluding_retries: 1,
-                number_of_retries: 0
-              }
-            })
+            configure
+            stub_test_results(failures: 1)
 
             @scan.handle_results(0)
           end.to raise_error(FastlaneCore::Interface::FastlaneTestFailure, "Tests have failed")
@@ -116,25 +127,8 @@ describe Scan do
 
       describe "when handling result" do
         it "returns output if fail_build is false", requires_xcodebuild: true do
-          Scan.config = FastlaneCore::Configuration.create(Scan::Options.available_options, {
-            output_directory: '/tmp/scan_results',
-            project: './scan/examples/standard/app.xcodeproj',
-            fail_build: false
-          })
-
-          # This is a needed side effect from running TestCommandGenerator which is not done in this test
-          Scan.cache[:result_bundle_path] = '/tmp/scan_results/test.xcresults'
-
-          allow(Trainer::TestParser).to receive(:auto_convert).and_return({
-            "some/path": {
-              successful: true,
-              number_of_tests: 10,
-              number_of_failures: 1,
-              number_of_tests_excluding_retries: 10,
-              number_of_failures_excluding_retries: 1,
-              number_of_retries: 0
-            }
-          })
+          configure(fail_build: false)
+          stub_test_results(failures: 1)
 
           expect(@scan.handle_results(0)).to eq({
             number_of_tests: 10,
@@ -149,14 +143,7 @@ describe Scan do
 
       describe "with scan option :disable_xcpretty set to true" do
         it "does not generate a temp junit report", requires_xcodebuild: true do
-          Scan.config = FastlaneCore::Configuration.create(Scan::Options.available_options, {
-            output_directory: '/tmp/scan_results',
-            project: './scan/examples/standard/app.xcodeproj',
-            disable_xcpretty: true
-          })
-
-          # This is a needed side effect from running TestCommandGenerator which is not done in this test
-          Scan.cache[:result_bundle_path] = '/tmp/scan_results/test.xcresults'
+          configure(disable_xcpretty: true)
 
           Scan.cache[:temp_junit_report] = '/var/folders/non_existent_file.junit'
           @scan.handle_results(0)
@@ -165,14 +152,7 @@ describe Scan do
 
         it "fails if tests_exit_status is not 0", requires_xcodebuild: true do
           expect do
-            Scan.config = FastlaneCore::Configuration.create(Scan::Options.available_options, {
-              output_directory: '/tmp/scan_results',
-              project: './scan/examples/standard/app.xcodeproj',
-              disable_xcpretty: true
-            })
-
-            # This is a needed side effect from running TestCommandGenerator which is not done in this test
-            Scan.cache[:result_bundle_path] = '/tmp/scan_results/test.xcresults'
+            configure(disable_xcpretty: true)
 
             @scan.handle_results(1)
           end.to raise_error(FastlaneCore::Interface::FastlaneTestFailure, "Test execution failed. Exit status: 1")
@@ -223,6 +203,23 @@ describe Scan do
             end.to raise_error(FastlaneCore::Interface::FastlaneBuildFailure, "Build for testing failed. Exit status: 65")
           end
         end
+      end
+    end
+
+    describe "#prelaunch_simulators" do
+      # Xcode's headless mode shuts the simulators down before their logs could be collected
+      it "prelaunches the simulators when their logs are collected only on failure" do
+        allow(Scan).to receive(:config).and_return(FastlaneCore::Configuration.create(Scan::Options.available_options, {
+          prelaunch_simulator: false,
+          include_simulator_logs: 'on-failure'
+        }))
+
+        # Already booted, so there's nothing to shut down when the specs exit
+        simulator = FastlaneCore::DeviceManager::Device.new(name: "iPhone 15", udid: "00000000-0000-0000-0000-000000000015", os_type: "iOS", os_version: "17.0", state: "Booted", is_simulator: true)
+        allow(Scan).to receive(:devices).and_return([simulator])
+
+        expect(simulator).to receive(:boot)
+        Scan::Runner.new.prelaunch_simulators
       end
     end
 
