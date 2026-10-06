@@ -314,6 +314,7 @@ module Fastlane
               # it would defeat the caching's purpose.
               command += ['--depth', '1'] unless is_eligible_for_caching
               command += ['--branch', branch] unless branch == 'HEAD'
+              FastlaneCore::Secrets.register(git_extra_headers, name: :git_extra_headers)
               git_extra_headers.each do |header|
                 command += ['--config', "http.extraHeader=#{header}"]
               end
