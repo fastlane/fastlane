@@ -53,13 +53,13 @@ class MainProcess {
     }
 
     #if SWIFT_PACKAGE
-        // Resolves how to invoke fastlane, replacing the previous login-shell
-        // `eval $(path_helper)` + `which fastlane` lookup that broke under
-        // rbenv / bundler / system-ruby mixes (#29238). First match wins:
-        // 1. FASTLANE_SPM_BIN environment variable (explicit override)
-        // 2. bundler binstub bin/fastlane next to the Gemfile
-        // 3. Gemfile (BUNDLE_GEMFILE, or found from the working directory up, as Bundler does) -> bundle exec fastlane
-        // 4. fastlane on PATH
+        /// Resolves how to invoke fastlane, replacing the previous login-shell
+        /// `eval $(path_helper)` + `which fastlane` lookup that broke under
+        /// rbenv / bundler / system-ruby mixes (#29238). First match wins:
+        /// 1. FASTLANE_SPM_BIN environment variable (explicit override)
+        /// 2. bundler binstub bin/fastlane next to the Gemfile
+        /// 3. Gemfile (BUNDLE_GEMFILE, or found from the working directory up, as Bundler does) -> bundle exec fastlane
+        /// 4. fastlane on PATH
         private func fastlaneLaunchArguments() -> [String] {
             if let bin = ProcessInfo.processInfo.environment["FASTLANE_SPM_BIN"],
                !bin.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty
@@ -78,8 +78,8 @@ class MainProcess {
             return ["bundle", "exec", "fastlane"]
         }
 
-        // The directory of the Gemfile Bundler would use: BUNDLE_GEMFILE, else the
-        // nearest Gemfile or gems.rb from the working directory up.
+        /// The directory of the Gemfile Bundler would use: BUNDLE_GEMFILE, else the
+        /// nearest Gemfile or gems.rb from the working directory up.
         private func bundleRootDirectory() -> String? {
             let workingDirectory = FileManager.default.currentDirectoryPath
             if let gemfile = ProcessInfo.processInfo.environment["BUNDLE_GEMFILE"], !gemfile.isEmpty {
@@ -99,11 +99,11 @@ class MainProcess {
             }
         }
 
-        // The ruby socket server performs a single `accept` (see
-        // fastlane/server/socket_server.rb), so probing readiness with a TCP
-        // connection would consume that accept and shut the server down.
-        // Poll the LISTEN state read-only via lsof instead of the previous
-        // "stdout quiet for 5 seconds" heuristic.
+        /// The ruby socket server performs a single `accept` (see
+        /// fastlane/server/socket_server.rb), so probing readiness with a TCP
+        /// connection would consume that accept and shut the server down.
+        /// Poll the LISTEN state read-only via lsof instead of the previous
+        /// "stdout quiet for 5 seconds" heuristic.
         private func waitUntilSocketServerIsListening(port: UInt32, serverProcess: Process) {
             let deadline = Date(timeIntervalSinceNow: 30)
             while Date() < deadline {
@@ -123,8 +123,8 @@ class MainProcess {
             exit(1)
         }
 
-        // Terminate the socket server, escalating SIGTERM to SIGKILL if it
-        // doesn't exit promptly, so the timeout path never leaves an orphan.
+        /// Terminate the socket server, escalating SIGTERM to SIGKILL if it
+        /// doesn't exit promptly, so the timeout path never leaves an orphan.
         private func terminate(serverProcess: Process) {
             serverProcess.terminate()
             let killDeadline = Date(timeIntervalSinceNow: 2)
@@ -137,18 +137,18 @@ class MainProcess {
             }
         }
 
-        // Clears a stale socket server left by a previously crashed run on this
-        // port. Scoped to LISTENing ruby processes (`-sTCP:LISTEN -a -c ruby`)
-        // so it never kills an unrelated service or a connected client that
-        // happens to share the port.
+        /// Clears a stale socket server left by a previously crashed run on this
+        /// port. Scoped to LISTENing ruby processes (`-sTCP:LISTEN -a -c ruby`)
+        /// so it never kills an unrelated service or a connected client that
+        /// happens to share the port.
         private func killExistingSocketServerProcesses(port: UInt32) {
             let pids = outputOfProcess(arguments: [lsofPath, "-t", "-nP", "-iTCP:\(port)", "-sTCP:LISTEN", "-a", "-c", "ruby"])
                 .split(separator: "\n")
             pids.forEach { _ = outputOfProcess(arguments: ["/bin/kill", "-9", String($0)]) }
         }
 
-        // socket_server listens on whichever of 127.0.0.1 and ::1 is free, while the runner connects to `localhost`,
-        // so a process holding the port on either address would receive the runner's commands.
+        /// socket_server listens on whichever of 127.0.0.1 and ::1 is free, while the runner connects to `localhost`,
+        /// so a process holding the port on either address would receive the runner's commands.
         private func abortIfPortIsInUse(_ port: UInt32) {
             guard isAddressInUse(family: AF_INET, port: port) || isAddressInUse(family: AF_INET6, port: port) else {
                 return
@@ -160,7 +160,7 @@ class MainProcess {
             exit(1)
         }
 
-        // Binding fails with EADDRINUSE when another socket listens on that address and port, whoever owns it.
+        /// Binding fails with EADDRINUSE when another socket listens on that address and port, whoever owns it.
         private func isAddressInUse(family: Int32, port: UInt32) -> Bool {
             let socketDescriptor = socket(family, SOCK_STREAM, 0)
             guard socketDescriptor >= 0 else {
@@ -194,7 +194,7 @@ class MainProcess {
             return result != 0 && errno == EADDRINUSE
         }
 
-        // Only the process we launched counts: another process listening on the port is not our server
+        /// Only the process we launched counts: another process listening on the port is not our server
         private func isPortListening(_ port: UInt32, by processIdentifier: Int32) -> Bool {
             let result = runProcess(arguments: [lsofPath, "-t", "-nP", "-iTCP:\(port)", "-sTCP:LISTEN"])
             // `env` exits 127 when lsof can't be found. Without this guard the
@@ -208,8 +208,8 @@ class MainProcess {
             return result.output.split(separator: "\n").contains { $0 == Substring(String(processIdentifier)) }
         }
 
-        // Prefer the absolute macOS path so port checks don't depend on PATH;
-        // fall back to a PATH lookup if lsof lives somewhere non-standard.
+        /// Prefer the absolute macOS path so port checks don't depend on PATH;
+        /// fall back to a PATH lookup if lsof lives somewhere non-standard.
         private var lsofPath: String {
             let standardPath = "/usr/sbin/lsof"
             return FileManager.default.isExecutableFile(atPath: standardPath) ? standardPath : "lsof"
