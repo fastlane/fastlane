@@ -236,11 +236,13 @@ module Fastlane
 
       if FastlaneCore::FastlaneFolder.swift_runner_built?
         runner_last_modified_age = File.mtime(FastlaneCore::FastlaneFolder.swift_runner_path).to_i
-        fastfile_last_modified_age = File.mtime(FastlaneCore::FastlaneFolder.fastfile_path).to_i
+        # The Fastfile, and the runner's own files, which an upgrade or a pull can change without touching the Fastfile
+        sources = [FastlaneCore::FastlaneFolder.fastfile_path] + Dir[File.join(FastlaneCore::FastlaneFolder.swift_folder_path, '**', '*.swift')]
+        changed = sources.find { |source| File.mtime(source).to_i > runner_last_modified_age }
 
-        if runner_last_modified_age < fastfile_last_modified_age
-          # It's older than the Fastfile, so build it again
-          UI.verbose("Found changes to user's Fastfile.swift, setting re-build runner flag")
+        if changed
+          # It's older than one of its sources, so build it again
+          UI.verbose("Found changes to #{changed}, setting re-build runner flag")
           runner_needs_building = true
         end
       else
