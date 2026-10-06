@@ -209,7 +209,8 @@ module Match
         FastlaneCore::ConfigItem.new(key: :s3_access_key,
                                      env_name: "MATCH_S3_ACCESS_KEY",
                                      description: "S3 access key",
-                                     optional: true),
+                                     optional: true,
+                                     sensitive: true),
         FastlaneCore::ConfigItem.new(key: :s3_secret_access_key,
                                      env_name: "MATCH_S3_SECRET_ACCESS_KEY",
                                      description: "S3 secret access key",
@@ -247,11 +248,13 @@ module Match
         FastlaneCore::ConfigItem.new(key: :job_token,
                                       env_name: "CI_JOB_TOKEN",
                                       description: "GitLab CI_JOB_TOKEN",
-                                      optional: true),
+                                      optional: true,
+                                      sensitive: true),
         FastlaneCore::ConfigItem.new(key: :private_token,
                                       env_name: "PRIVATE_TOKEN",
                                       description: "GitLab Access Token",
-                                      optional: true),
+                                      optional: true,
+                                      sensitive: true),
 
         # Keychain
         FastlaneCore::ConfigItem.new(key: :keychain_name,
@@ -295,6 +298,14 @@ module Match
         FastlaneCore::ConfigItem.new(key: :force_for_new_certificates,
                                      env_name:  "MATCH_FORCE_FOR_NEW_CERTIFICATES",
                                      description: "Renew the provisioning profiles if the certificate count on the developer portal has changed. Works only for the 'development' provisioning profile type. Requires 'include_all_certificates' option to be 'true'",
+                                     type: Boolean,
+                                     default_value: false),
+        FastlaneCore::ConfigItem.new(key: :renew_expired_certs,
+                                     env_name: "MATCH_RENEW_EXPIRED_CERTS",
+                                     description: "Automatically renew expired certificates. Note: to renew `developer_id` and `developer_id_installer` certificates " \
+                                                  "you must log in with the Account Holder account by using username and password; App Store Connect API key doesn't work in this case. " \
+                                                  "The expired certificate is removed from the match storage and a new one is created, but the old certificate is not revoked on the " \
+                                                  "Apple Developer Portal — run `fastlane match nuke` if you need to free up certificate slots",
                                      type: Boolean,
                                      default_value: false),
         FastlaneCore::ConfigItem.new(key: :skip_confirmation,
@@ -364,6 +375,11 @@ module Match
         FastlaneCore::ConfigItem.new(key: :force_legacy_encryption,
                                      env_name: "MATCH_FORCE_LEGACY_ENCRYPTION",
                                      description: "Force encryption to use legacy cbc algorithm for backwards compatibility with older match versions",
+                                     type: Boolean,
+                                     default_value: false),
+        FastlaneCore::ConfigItem.new(key: :offline_profile,
+                                     env_name: "MATCH_OFFLINE_PROFILE",
+                                     description: "Enable profile with 'Offline Support' (7 day validity). Requires Apple ID login, not supported with App Store Connect API key authentication",
                                      type: Boolean,
                                      default_value: false),
 

@@ -66,6 +66,22 @@ describe Match do
       end
     end
 
+    describe '#download' do
+      let(:file) { { id: 1, name: 'certs/dist.p12', checksum: Digest::SHA256.hexdigest('p12 content') } }
+
+      it 'downloads the file with the client credentials into the working directory' do
+        stub_request(:get, 'https://gitlab.example.com/api/v4/projects/sample%2Fproject/secure_files/1/download').
+          with(headers: { client.authentication_key => client.authentication_value }).
+          to_return(body: 'p12 content')
+
+        Dir.mktmpdir do |dir|
+          subject.download(dir)
+
+          expect(File.read(File.join(dir, 'certs', 'dist.p12'))).to eq('p12 content')
+        end
+      end
+    end
+
     describe '#valid_checksum?' do
       let(:file) { { checksum: checksum } }
 

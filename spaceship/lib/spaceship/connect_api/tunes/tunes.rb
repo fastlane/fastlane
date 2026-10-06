@@ -717,9 +717,9 @@ module Spaceship
               type: "appInfoLocalizations",
               attributes: attributes,
               relationships: {
-                appStoreVersion: {
+                appInfo: {
                   data: {
-                    type: "appStoreVersions",
+                    type: "appInfos",
                     id: app_info_id
                   }
                 }
@@ -740,6 +740,11 @@ module Spaceship
           }
 
           tunes_request_client.patch("#{Version::V1}/appInfoLocalizations/#{app_info_localization_id}", body)
+        end
+
+        def delete_app_info_localization(app_info_localization_id: nil)
+          params = tunes_request_client.build_params(filter: nil, includes: nil, limit: nil, sort: nil)
+          tunes_request_client.delete("#{Version::V1}/appInfoLocalizations/#{app_info_localization_id}", params)
         end
 
         #
@@ -1011,6 +1016,51 @@ module Spaceship
         def delete_reset_ratings_request(reset_ratings_request_id: nil)
           params = tunes_request_client.build_params(filter: nil, includes: nil, limit: nil, sort: nil)
           tunes_request_client.delete("#{Version::V1}/resetRatingsRequests/#{reset_ratings_request_id}", params)
+        end
+
+        #
+        # routingAppCoverages
+        #
+
+        def get_routing_app_coverage(app_store_version_id: nil)
+          params = tunes_request_client.build_params(filter: nil, includes: nil, limit: nil, sort: nil)
+          tunes_request_client.get("#{Version::V1}/appStoreVersions/#{app_store_version_id}/routingAppCoverage", params)
+        end
+
+        def post_routing_app_coverage(app_store_version_id: nil, attributes: {})
+          body = {
+            data: {
+              type: "routingAppCoverages",
+              attributes: attributes,
+              relationships: {
+                appStoreVersion: {
+                  data: {
+                    type: "appStoreVersions",
+                    id: app_store_version_id
+                  }
+                }
+              }
+            }
+          }
+
+          tunes_request_client.post("#{Version::V1}/routingAppCoverages", body)
+        end
+
+        def patch_routing_app_coverage(routing_app_coverage_id: nil, attributes: {})
+          body = {
+            data: {
+              type: "routingAppCoverages",
+              id: routing_app_coverage_id,
+              attributes: attributes
+            }
+          }
+
+          tunes_request_client.patch("#{Version::V1}/routingAppCoverages/#{routing_app_coverage_id}", body)
+        end
+
+        def delete_routing_app_coverage(routing_app_coverage_id: nil)
+          params = tunes_request_client.build_params(filter: nil, includes: nil, limit: nil, sort: nil)
+          tunes_request_client.delete("#{Version::V1}/routingAppCoverages/#{routing_app_coverage_id}", params)
         end
 
         #

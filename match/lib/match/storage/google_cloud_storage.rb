@@ -82,7 +82,12 @@ module Match
         if self.google_cloud_keys_file.to_s.length > 0
           # Extract the Project ID from the `JSON` file
           # so the user doesn't have to provide it manually
-          keys_file_content = JSON.parse(File.read(self.google_cloud_keys_file))
+          begin
+            keys_file_content = JSON.parse(File.read(self.google_cloud_keys_file))
+          rescue JSON::ParserError
+            # Don't dump secret into logs in case a secret (p8) is passed. See fastlane/fastlane#21017
+            UI.user_error!("Provided keys file on path #{File.expand_path(self.google_cloud_keys_file)} is not a valid JSON file")
+          end
           if google_cloud_project_id.to_s.length > 0 && google_cloud_project_id != keys_file_content["project_id"]
             UI.important("The google_cloud_keys_file's project ID ('#{keys_file_content['project_id']}') doesn't match the google_cloud_project_id ('#{google_cloud_project_id}'). This may be the wrong keys file.")
           end

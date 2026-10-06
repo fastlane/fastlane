@@ -3,6 +3,11 @@ require 'spaceship/connect_api/provisioning/client'
 module Spaceship
   class ConnectAPI
     module Provisioning
+      # Raised when a profile with 'Offline Support' is requested while authenticated
+      # with an App Store Connect API key. Apple only exposes the isOfflineProfile
+      # attribute on the Developer Portal endpoint used by Apple ID (web session) logins.
+      class OfflineProfileNotSupportedError < StandardError; end
+
       module API
         module Version
           V1 = "v1"
@@ -82,6 +87,22 @@ module Spaceship
             }
           }
           provisioning_request_client.post("#{Version::V1}/bundleIdCapabilities", body)
+        end
+
+        # Modify a Capability Configuration — patches the bundleIdCapability resource
+        # directly (attributes at the top level), not the bundleId it belongs to.
+        def patch_bundle_id_capability_configuration(bundle_id_capability_id:, enabled: false, settings: [])
+          body = {
+            data: {
+              type: "bundleIdCapabilities",
+              id: bundle_id_capability_id,
+              attributes: {
+                enabled: enabled,
+                settings: settings
+              }
+            }
+          }
+          provisioning_request_client.patch("#{Version::V1}/bundleIdCapabilities/#{bundle_id_capability_id}", body)
         end
 
         def patch_bundle_id_capability(bundle_id_id:, seed_id:, enabled: false, capability_type:, settings: [])
@@ -222,6 +243,10 @@ module Spaceship
         end
 
         def post_profiles(bundle_id_id: nil, certificates: nil, devices: nil, attributes: {})
+          if attributes[:isOfflineProfile] && !provisioning_request_client.web_session?
+            raise OfflineProfileNotSupportedError, "Profiles with 'Offline Support' (isOfflineProfile) can only be created when logged in with an Apple ID; the App Store Connect API does not support this attribute"
+          end
+
           body = {
             data: {
               attributes: attributes,

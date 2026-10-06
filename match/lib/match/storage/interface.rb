@@ -47,11 +47,14 @@ module Match
       # given remote server
       # This method is blocking, meaning it might take multiple
       # seconds or longer to run
-      # @parameter files_to_commit [Array] Array to paths to files
+      # @param files_to_commit [Array] Array to paths to files
       #   that should be committed to the storage provider
-      # @parameter custom_message: [String] Custom change message
-      #           that's optional, is used for commit title
-      def save_changes!(files_to_commit: nil, files_to_delete: nil, custom_message: nil)
+      # @param custom_message: [String] Custom change message
+      #   that's optional, is used for commit title
+      # @param clear_working_directory: [Bool] Pass `false` to keep
+      #   the local working directory after saving, so more
+      #   changes can be made and saved later in the same run
+      def save_changes!(files_to_commit: nil, files_to_delete: nil, custom_message: nil, clear_working_directory: true)
         # Custom init to `[]` in case `nil` is passed
         files_to_commit ||= []
         files_to_delete ||= []
@@ -85,7 +88,7 @@ module Match
           end
         end
       ensure # Always clear working_directory after save
-        self.clear_changes
+        self.clear_changes if clear_working_directory
       end
 
       def upload_files(files_to_upload: [], custom_message: nil)

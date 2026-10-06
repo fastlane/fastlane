@@ -36,7 +36,12 @@ module Spaceship
       end
 
       def self.from_json_file(filepath)
-        json = JSON.parse(File.read(filepath), { symbolize_names: true })
+        begin
+          json = JSON.parse(File.read(filepath), { symbolize_names: true })
+        rescue JSON::ParserError
+          # Don't dump secret into logs in case a secret (p8) is passed. See fastlane/fastlane#21017
+          raise "Invalid JSON in App Store Connect API key file '#{filepath}'. Expected a JSON file with at least the 'key_id' and 'key' fields."
+        end
 
         missing_keys = []
         missing_keys << 'key_id' unless json.key?(:key_id)

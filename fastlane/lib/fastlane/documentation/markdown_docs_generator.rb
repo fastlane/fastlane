@@ -193,7 +193,30 @@ module Fastlane
         FileUtils.cp(current_asset_path, File.join(docs_dir, "img", "actions", File.basename(current_asset_path)))
       end
 
+      # Generate the team table (docs/generated/team-table.md) from team.json
+      generate_team_table(docs_dir)
+
       UI.success("Generated new docs on path #{target_path}")
+    end
+
+    def generate_team_table(docs_dir)
+      team_json_path = File.expand_path(File.join(Fastlane::ROOT, "..", "internal", "team.json"))
+      unless File.exist?(team_json_path)
+        UI.message("Skipping team table generation, could not find #{team_json_path}")
+        return
+      end
+
+      File.write(File.join(docs_dir, "generated", "team-table.md"), self.class.render_team(team_json_path))
+    end
+
+    # Also used by the `generate_team_table` rake task, so it must not depend on fastlane being loaded
+    def self.render_team(team_json_path)
+      require 'erb'
+      require 'json'
+
+      team, alumni = JSON.parse(File.read(team_json_path)).to_a.shuffle.partition { |_, user| !user['alumni'] }
+      template = File.expand_path("../../assets/TeamTable.md.erb", __dir__)
+      ERB.new(File.read(template), trim_mode: '-').result(binding)
     end
 
     private

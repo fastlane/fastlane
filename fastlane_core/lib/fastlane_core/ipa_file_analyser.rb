@@ -55,7 +55,7 @@ module FastlaneCore
     end
 
     def self.fetch_info_plist_with_rubyzip(path)
-      Zip::File.open(path, "rb") do |zipfile|
+      Zip::File.open(path) do |zipfile|
         file = zipfile.glob('**/Payload/*.app/Info.plist').first
         return nil unless file
         zipfile.read(file)

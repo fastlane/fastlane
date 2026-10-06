@@ -137,6 +137,7 @@ module Fastlane
           params.store(:attachment, attachments)
         end
 
+        require 'faraday/multipart'
         conn = Faraday.new(url: "https://api:#{options[:apikey]}@api.mailgun.net") do |f|
           f.request(:multipart)
           f.request(:url_encoded)

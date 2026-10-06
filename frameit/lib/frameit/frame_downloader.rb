@@ -20,6 +20,8 @@ module Frameit
 
       files = JSON.parse(download_file("files.json"))
       files.each_with_index do |current, index|
+        # files.json is downloaded: only accept plain file names, so nothing is written outside templates_path
+        UI.user_error!("Unexpected frame file name '#{current}'") if current.include?("/") || current.include?("\\") || current.start_with?(".")
         content = download_file(current, txt: "#{index + 1} of #{files.count} files")
         File.binwrite(File.join(templates_path, current), content)
       end

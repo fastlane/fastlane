@@ -20,12 +20,8 @@ module Fastlane
         password = params[:password]
         trust_self_signed_certs = params[:trust_self_signed_certs]
 
-        # setup (not)trusting self signed certificates.
         # it's normal to have a self signed certificate on your Xcode Server
-        Excon.defaults[:ssl_verify_peer] = !trust_self_signed_certs # for self-signed certificates
-
-        # create Xcode Server config
-        xcs = XcodeServer.new(host, username, password)
+        xcs = XcodeServer.new(host, username, password, ssl_verify_peer: !trust_self_signed_certs)
         bots = xcs.fetch_all_bots
 
         UI.important("Fetched #{bots.count} Bots from Xcode Server at #{host}.")
@@ -106,10 +102,11 @@ module Fastlane
       end
 
       class XcodeServer
-        def initialize(host, username, password)
+        def initialize(host, username, password, ssl_verify_peer: true)
           @host = host.start_with?('https://') ? host : "https://#{host}"
           @username = username
           @password = password
+          @ssl_verify_peer = ssl_verify_peer
         end
 
         def fetch_all_bots
@@ -129,18 +126,18 @@ module Fastlane
           # create a temp folder and a file, stream the download into it
           Dir.mktmpdir do |dir|
             temp_file = File.join(dir, "tmp_download.#{rand(1_000_000)}")
-            f = open(temp_file, 'w')
-            streamer = lambda do |chunk, remaining_bytes, total_bytes|
-              if remaining_bytes && total_bytes
-                UI.important("Downloading: #{100 - (100 * remaining_bytes.to_f / total_bytes.to_f).to_i}%")
-              else
-                UI.error(chunk.to_s)
+            response = File.open(temp_file, 'w') do |f|
+              streamer = lambda do |chunk, remaining_bytes, total_bytes|
+                if remaining_bytes && total_bytes
+                  UI.important("Downloading: #{100 - (100 * remaining_bytes.to_f / total_bytes.to_f).to_i}%")
+                else
+                  UI.error(chunk.to_s)
+                end
+                f.write(chunk)
               end
-              f.write(chunk)
-            end
 
-            response = self.get_endpoint("/integrations/#{integration_id}/assets", streamer)
-            f.close
+              self.get_endpoint("/integrations/#{integration_id}/assets", streamer)
+            end
 
             UI.user_error!("Integration doesn't have any assets (it probably never ran).") if response.status == 500
             UI.user_error!("Failed to fetch Assets zip for Integration #{integration_id} from Xcode Server at #{@host}, response: #{response.status}: #{response.body}") if response.status != 200
@@ -199,9 +196,9 @@ module Fastlane
           headers = self.headers || {}
 
           if response_block
-            response = Excon.get(url, response_block: response_block, headers: headers)
+            response = Excon.get(url, response_block: response_block, headers: headers, ssl_verify_peer: @ssl_verify_peer)
           else
-            response = Excon.get(url, headers: headers)
+            response = Excon.get(url, headers: headers, ssl_verify_peer: @ssl_verify_peer)
           end
 
           return response

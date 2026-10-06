@@ -57,6 +57,21 @@ module FastlaneCore
       !self.bundler? && !self.contained_fastlane? && !self.homebrew? && !self.mac_app?
     end
 
+    # How this fastlane was installed, as reported to analytics and printed at startup
+    def self.install_method
+      if self.bundler?
+        'bundler'
+      elsif self.contained_fastlane?
+        'standalone'
+      elsif self.homebrew?
+        'homebrew'
+      elsif self.mac_app?
+        'mac_app'
+      else
+        'gem'
+      end
+    end
+
     # environment
     #
 
@@ -91,9 +106,10 @@ module FastlaneCore
     end
 
     def self.operating_system
-      return "macOS" if RUBY_PLATFORM.downcase.include?("darwin")
-      return "Windows" if RUBY_PLATFORM.downcase.include?("mswin")
-      return "Linux" if RUBY_PLATFORM.downcase.include?("linux")
+      return "macOS" if self.mac?
+      return "Windows" if self.windows?
+      return "Linux" if self.linux?
+      return "Java" if RUBY_PLATFORM =~ /java/
       return "Unknown"
     end
 
@@ -380,6 +396,8 @@ module FastlaneCore
         # we set the default here, instead of at the parameters
         # as we don't want to `UI.message` a rocket that's just there for the loading indicator
         text ||= "🚀"
+        # A spinner left running by a show without a hide could never be stopped once replaced
+        @require_fastlane_spinner.stop if @require_fastlane_spinner && !@require_fastlane_spinner.done?
         @require_fastlane_spinner = TTY::Spinner.new("[:spinner] #{text} ", format: :dots)
         @require_fastlane_spinner.auto_spin
       else
@@ -387,10 +405,22 @@ module FastlaneCore
       end
     end
 
-    def self.hide_loading_indicator
+    def self.hide_loading_indicator(success: true)
       if self.should_show_loading_indicator? && @require_fastlane_spinner
-        @require_fastlane_spinner.success
+        success ? @require_fastlane_spinner.success : @require_fastlane_spinner.error
       end
+    end
+
+    # Shows the loading indicator while the block runs, and hides it even when the block raises
+    def self.with_loading_indicator(text = nil)
+      failed = false
+      show_loading_indicator(text)
+      yield
+    rescue Exception # rubocop:disable Lint/RescueException
+      failed = true
+      raise
+    ensure
+      hide_loading_indicator(success: !failed)
     end
 
     # files

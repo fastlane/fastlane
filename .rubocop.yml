@@ -1,14 +1,15 @@
 inherit_from: .rubocop_todo.yml
 
+plugins:
+  - rubocop-performance
+
 require:
   - rubocop/require_tools
-  - rubocop-performance
   - ./internal/rubocop/fork_usage.rb
   - ./internal/rubocop/missing_keys_on_shared_area.rb
   - ./internal/rubocop/is_string_usage.rb
 
 AllCops:
-  TargetRubyVersion: 3.0
   SuggestExtensions: false
   NewCops: enable
   Include:
@@ -18,15 +19,21 @@ AllCops:
     - '*/lib/assets/*Template'
     - '*/lib/assets/*TemplateAndroid'
   Exclude:
-    - '**/lib/assets/custom_action_template.rb'
     - './vendor/**/*'
     - '**/lib/assets/DefaultFastfileTemplate'
     - '**/lib/assets/MatchfileTemplate'
-    - '**/spec/fixtures/broken_files/broken_file.rb'
     - '**/*.provisionprofile'
 
 Lint/ErbNewArguments:
   Enabled: false
+
+# Ruby 3.1's hash value shorthand (`{ foo: }`) is allowed, but not enforced
+Style/HashSyntax:
+  EnforcedShorthandSyntax: either
+
+# Keep explicit block arguments (`&block`) instead of Ruby 3.1's anonymous `&`
+Naming/BlockForwarding:
+  EnforcedStyle: explicit
 
 Style/SlicingWithRange:
   Enabled: false
@@ -254,7 +261,7 @@ Lint/ParenthesesAsGroupedExpression:
 
 # This would reject is_ in front of methods
 # We use `is_supported?` everywhere already
-Naming/PredicateName:
+Naming/PredicatePrefix:
   Enabled: false
 
 # We allow the $
@@ -269,8 +276,6 @@ Layout/SpaceAroundOperators:
 # They have not to be snake_case
 Naming/FileName:
   Exclude:
-    - '**/Dangerfile'
-    - '**/Brewfile'
     - '**/Gemfile'
     - '**/Podfile'
     - '**/Rakefile'

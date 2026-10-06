@@ -3,7 +3,7 @@ require 'rubocop'
 module RuboCop
   module Cop
     module Lint
-      class IsStringUsage < RuboCop::Cop::Cop
+      class IsStringUsage < RuboCop::Cop::Base
         MSG = 'is_string key in used in FastlaneCore::ConfigItem. Replace with `type: <Integer|Float|String|Boolean|Array|Hash>`'.freeze
 
         def on_hash(node)
@@ -15,7 +15,7 @@ module RuboCop
             value = pair.value
             next unless key.source.to_sym == :is_string && (value.source.to_s == "false" || value.source.to_s == "true")
             if node.parent.children[0].source == "FastlaneCore::ConfigItem"
-              add_offense(pair, location: :expression)
+              add_offense(pair)
             end
           end
         end

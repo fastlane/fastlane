@@ -493,6 +493,41 @@ the developer website<a/>.<br />"
     end
   end
 
+  describe 'website push api' do
+    let(:response_headers) { { 'Content-Type' => 'application/json' } }
+
+    { false => 'ios', true => 'mac' }.each do |mac, platform|
+      context "on #{platform}" do
+        let(:api_root) { "https://developer.apple.com/services-account/QH65B2/account/#{platform}/identifiers/" }
+
+        describe '#create_website_push!' do
+          it 'sends the name and identifier, and returns the created website push' do
+            stub_request(:post, api_root + 'addWebsitePushId.action').
+              with(body: { name: 'Fastlane Website Push', identifier: 'web.com.fastlane.example', teamId: 'XXXXXXXXXX' }).
+              to_return(status: 200, body: PortalStubbing.adp_read_fixture_file('addWebsitePushId.action.json'), headers: response_headers)
+
+            website_push = subject.create_website_push!('Fastlane Website Push', 'web.com.fastlane.example', mac: mac)
+
+            expect(website_push['websitePushId']).to eq('AXUVGTHPF6')
+            expect(website_push['identifier']).to eq('web.com.fastlane.example')
+          end
+        end
+
+        describe '#delete_website_push!' do
+          it 'sends the website push id' do
+            stub_request(:post, api_root + 'deleteWebsitePushId.action').
+              with(body: { websitePushId: 'R7878HDXC3', teamId: 'XXXXXXXXXX' }).
+              to_return(status: 200, body: PortalStubbing.adp_read_fixture_file('deleteWebsitePushId.action.json'), headers: response_headers)
+
+            response = subject.delete_website_push!('R7878HDXC3', mac: mac)
+
+            expect(response['resultCode']).to eq(0)
+          end
+        end
+      end
+    end
+  end
+
   describe 'merchant api' do
     let(:api_root) { 'https://developer.apple.com/services-account/QH65B2/account/ios/identifiers/' }
     before do
@@ -522,6 +557,120 @@ the developer website<a/>.<br />"
       it 'deletes a merchant' do
         subject.delete_merchant!('LM3IY56BXC')
         expect(WebMock).to have_requested(:post, api_root + 'deleteOMC.action').with(body: { omcId: 'LM3IY56BXC', teamId: 'XXXXXXXXXX' })
+      end
+    end
+  end
+
+  describe 'merchant domain api' do
+    let(:api_root) { 'https://developer.apple.com/services-account/QH65B2/account/ios/identifiers/' }
+    let(:json_headers) { { 'Content-Type' => 'application/json' } }
+    let(:domain_list) do
+      {
+        domainList: [{
+          displayId: '5Y57MLHP2K',
+          name: 'payments.example.com',
+          status: 'pending',
+          path: 'https://payments.example.com/.well-known/apple-developer-merchantid-domain-association.txt',
+          canVerify: true
+        }]
+      }.to_json
+    end
+    let(:verification_file) { PortalStubbing.adp_read_fixture_file('downloadDomainVerificationFile.txt') }
+
+    before do
+      # the domain endpoints fetch their csrf token by listing the merchants first
+      MockAPI::DeveloperPortalServer.post('/services-account/QH65B2/account/ios/identifiers/:action') do
+        {
+          identifierList: [],
+          omcId: []
+        }
+      end
+
+      stub_request(:post, api_root + 'listDomainsForMerchant').to_return(status: 200, body: domain_list, headers: json_headers)
+      stub_request(:post, api_root + 'registerDomain').to_return(status: 200, body: domain_list, headers: json_headers)
+      stub_request(:post, api_root + 'removeDomain').to_return(status: 200, body: '{}', headers: json_headers)
+      stub_request(:post, api_root + 'verifyDomain').to_return(status: 200, body: '{}', headers: json_headers)
+      stub_request(:get, /downloadDomainVerificationFile/).to_return(status: 200, body: verification_file)
+    end
+
+    describe '#merchant_domains' do
+      it 'lists the domains of a merchant' do
+        domains = subject.merchant_domains('LM3IY56BXC')
+        expect(WebMock).to have_requested(:post, api_root + 'listDomainsForMerchant').with(body: { merchantId: 'LM3IY56BXC', teamId: 'XXXXXXXXXX' })
+        expect(domains.count).to eq(1)
+        expect(domains.first['displayId']).to eq('5Y57MLHP2K')
+      end
+    end
+
+    describe '#create_merchant_domain!' do
+      it 'registers a domain and returns just the new domain' do
+        domain = subject.create_merchant_domain!('LM3IY56BXC', 'payments.example.com')
+        expect(WebMock).to have_requested(:post, api_root + 'registerDomain').with(body: { domainName: 'payments.example.com', merchantId: 'LM3IY56BXC', teamId: 'XXXXXXXXXX' })
+        expect(domain['displayId']).to eq('5Y57MLHP2K')
+      end
+    end
+
+    describe '#delete_merchant_domain!' do
+      it 'deletes a domain' do
+        subject.delete_merchant_domain!('5Y57MLHP2K', 'LM3IY56BXC')
+        expect(WebMock).to have_requested(:post, api_root + 'removeDomain').with(body: { domainId: '5Y57MLHP2K', merchantId: 'LM3IY56BXC', teamId: 'XXXXXXXXXX' })
+      end
+    end
+
+    describe '#merchant_domain_verify' do
+      it 'asks Apple to verify a domain' do
+        subject.merchant_domain_verify('5Y57MLHP2K')
+        expect(WebMock).to have_requested(:post, api_root + 'verifyDomain').with(body: { domainId: '5Y57MLHP2K', teamId: 'XXXXXXXXXX' })
+      end
+    end
+
+    describe '#merchant_domain_get_verification_file' do
+      let(:error_text) { /^Couldn't download verification file, got this instead:/ }
+
+      it 'downloads the domain association file' do
+        file = subject.merchant_domain_get_verification_file('5Y57MLHP2K')
+        expect(WebMock).to have_requested(:get, api_root + 'downloadDomainVerificationFile?domainId=5Y57MLHP2K&teamId=XXXXXXXXXX')
+        expect(file).to eq(verification_file)
+      end
+
+      it 'decodes the file as url-safe base64' do
+        # the file uses `-` and `_`, so decoding it as standard base64 silently
+        # corrupts every byte that follows the first of them
+        file = subject.merchant_domain_get_verification_file('5Y57MLHP2K')
+        expect(Base64.urlsafe_decode64(file.delete("\r\n"))).to include('Apple Inc.')
+        expect(Base64.decode64(file)).to_not(include('Apple Inc.'))
+      end
+
+      it "raises when the file isn't signed by Apple" do
+        stub_request(:get, /downloadDomainVerificationFile/).to_return(status: 200, body: Base64.urlsafe_encode64('not a pkcs#7 blob'))
+
+        expect do
+          subject.merchant_domain_get_verification_file('5Y57MLHP2K')
+        end.to raise_error(Spaceship::Client::UnexpectedResponse, error_text)
+      end
+
+      it "raises when the response isn't base64 at all" do
+        stub_request(:get, /downloadDomainVerificationFile/).to_return(status: 200, body: PortalStubbing.adp_read_fixture_file('download_certificate_failure.html'))
+
+        expect do
+          subject.merchant_domain_get_verification_file('5Y57MLHP2K')
+        end.to raise_error(Spaceship::Client::UnexpectedResponse, error_text)
+      end
+
+      it 'raises when Apple returns an error payload with a 200' do
+        stub_request(:get, /downloadDomainVerificationFile/).to_return(status: 200, body: { resultCode: 1100, userString: 'You are not permitted to download this file.' }.to_json, headers: json_headers)
+
+        expect do
+          subject.merchant_domain_get_verification_file('5Y57MLHP2K')
+        end.to raise_error(Spaceship::Client::UnexpectedResponse, error_text)
+      end
+
+      it 'raises when the download fails' do
+        stub_request(:get, /downloadDomainVerificationFile/).to_return(status: 404, body: PortalStubbing.adp_read_fixture_file('download_certificate_failure.html'))
+
+        expect do
+          subject.merchant_domain_get_verification_file('5Y57MLHP2K')
+        end.to raise_error(Spaceship::Client::UnexpectedResponse, error_text)
       end
     end
   end

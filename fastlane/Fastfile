@@ -2,6 +2,7 @@ require 'fileutils'
 fastlane_require 'xcodeproj'
 
 skip_docs # Do not create fastlane/README.txt
+opt_out_usage # Do not report analytics for runs of fastlane on the fastlane repo itself
 
 # Test and Validate
 
@@ -91,7 +92,9 @@ lane :execute_tests do
   # Run the tests
   build_fastlane_gem(version: version) unless File.file?("pkg/fastlane-#{version}.gem")
   Dir.chdir("..") do
-    sh("bundle", "exec", "rake", "test_all")
+    # Several processes rather than one. The suite is the same either way; a
+    # worker just gets a slice of it. See fastlane#30189.
+    sh("bundle", "exec", "rake", "test_parallel")
   end
 end
 
@@ -116,7 +119,7 @@ lane :bump do |options|
   paths_for_commit = []
 
   version_file_path = "./fastlane/lib/fastlane/version.rb"
-  last_version_file_path = File.absolute_path("../CHANGELOG.latest.md")
+  last_version_file_path = File.absolute_path("../internal/CHANGELOG.latest.md")
 
   # Verify everything is in a consistent state
   latest_version = current_version
@@ -267,7 +270,7 @@ lane :create_github_release do |options|
     validate_repo
 
     title = "Improvements"
-    description = File.read("../CHANGELOG.latest.md")
+    description = File.read("../internal/CHANGELOG.latest.md")
 
     github_release = set_github_release(
       repository_name: repo_name,
@@ -291,7 +294,8 @@ lane :create_github_release do |options|
     download_github_release_gem(version: version)
   end
 
-  sh "gem push --key github --host https://rubygems.pkg.github.com/#{github_username} #{gem_path}" unless options[:skip_github_packages]
+  # Unset GEM_HOST_API_KEY as GitHub Action (rubygems/configure-rubygems-credentials) sets it.
+  sh "env -u GEM_HOST_API_KEY gem push --key github --host https://rubygems.pkg.github.com/#{github_username} #{gem_path}" unless options[:skip_github_packages]
 
   sh "gem push #{gem_path}" unless options[:skip_rubygems]
 end
@@ -316,7 +320,7 @@ lane :download_github_release_gem do |options|
   file_path = File.join('../pkg', file_name)
 
   # Download the file
-  URI.open(gem_asset_url) do |remote_file|
+  URI.parse(gem_asset_url).open do |remote_file|
     File.open(file_path, 'wb') do |local_file|
       local_file.write(remote_file.read)
     end
@@ -361,13 +365,21 @@ private_lane :github_changelog do |options|
       [message, username]
     end
 
+    # We may find 0 PRs, 1 PR, n+ PRs and we may be interactive or not. Self recovery exists in non-interactive
+    # User selection is required in interactive
     if item_infos.size == 0
-      if UI.confirm("Error generating changelog. No commit found for #{sha}. Skip?")
+      if !UI.interactive?
+        UI.important("No pull request found for commit #{sha}, falling back to the commit message for the changelog entry")
+      elsif UI.confirm("Error generating changelog. No pull request found for commit #{sha}. Skip?")
         next
       else
-        UI.user_error!("Cannot generate changelog. No commit found for #{sha}")
+        UI.user_error!("Cannot generate changelog. No pull request found for commit #{sha}")
       end
     elsif item_infos.size == 1
+      message = item_infos[0][0]
+      username = item_infos[0][1]
+    elsif !UI.interactive?
+      UI.important("Multiple pull requests found for commit #{sha}: #{item_infos.map { |info| info[0] }.join(', ')} - using the first one")
       message = item_infos[0][0]
       username = item_infos[0][1]
     else
@@ -382,7 +394,7 @@ private_lane :github_changelog do |options|
       username = item_infos[index][1]
     end
 
-    "* #{message} via #{name} (@#{username})"
+    username ? "* #{message} via #{name} (@#{username})" : "* #{message} via #{name}"
   end.compact.join("\n")
 
   formatted
@@ -413,6 +425,7 @@ desc "Validates the docs still are good"
 lane :validate_docs do
   # Validate docs content
   ensure_tool_name_formatting
+  ensure_markdown_links
   ensure_code_samples
   ensure_special_docs_code_samples
   ensure_code_snippets
@@ -458,6 +471,7 @@ lane :update_docs do |options|
     docs_path = generate_markdown_docs(target_path: ".")
     yml_path = File.expand_path("./mkdocs.yml")
     actions_md_path = File.expand_path(File.join(docs_path, "docs/generated/actions.md"))
+    team_table_md_path = File.expand_path(File.join(docs_path, "docs/generated/team-table.md"))
 
     action_docs_dir = File.join(docs_path, "docs/generated/actions")
     custom_assets_dir = File.join(docs_path, "docs/img/actions")
@@ -486,7 +500,7 @@ lane :update_docs do |options|
 
       Dir.chdir("fastlane") do # this is an assumption of fastlane, that we have to .. when shelling out
         # Commit the changes
-        changes_to_commit = [plugin_scores_cache_path, actions_md_path, "Gemfile.lock", plugins_path, yml_path, action_docs_dir, custom_assets_dir]
+        changes_to_commit = [plugin_scores_cache_path, actions_md_path, team_table_md_path, "Gemfile.lock", plugins_path, yml_path, action_docs_dir, custom_assets_dir]
         git_add(path: changes_to_commit)
         git_commit(path: changes_to_commit,
                 message: "Update docs for latest fastlane release #{version} (actions.md, available-plugins.md) 🚀")
@@ -590,21 +604,36 @@ end
 
 desc "Ensure the correct formatting for the fastlane tools"
 private_lane :ensure_tool_name_formatting do
-  require_relative "../fastlane/helper/tool_name_formatting_helper.rb"
+  require_relative "../internal/docs/tool_name_formatting"
   UI.message("🕗  Verifying tool name formatting...")
   require 'fastlane/tools'
   errors = []
   Dir.chdir("..") do
     Dir["**/*.md"].each do |path|
-      next if path == "CHANGELOG.latest.md"
+      next if path == "internal/CHANGELOG.latest.md"
       next if path.start_with?('vendor/', '.bundle/')
-      helper = Helper::ToolNameFormattingHelper.new(path: path, is_documenting_invalid_examples: path == 'CONTRIBUTING.md')
+      helper = Fastlane::Internal::Docs::ToolNameFormatting.new(path: path, is_documenting_invalid_examples: path == 'docs/CONTRIBUTING.md')
       errors += helper.find_tool_name_formatting_errors
     end
   end
   errors.each { |a| UI.error(a) }
   UI.user_error!("Invalid formatting of one of the fastlane tools") unless errors.empty?
   UI.success("✅  fastlane tools formatting is correct")
+end
+
+private_lane :ensure_markdown_links do
+  require_relative "../internal/docs/markdown_links"
+  UI.message("🕗  Verifying links in Markdown files...")
+  errors = []
+  Dir.chdir("..") do
+    Dir["**/*.md"].each do |path|
+      next if path.start_with?('vendor/', '.bundle/') || path.include?('/fixtures/')
+      errors += Fastlane::Internal::Docs::MarkdownLinks.new(path: path).errors
+    end
+  end
+  errors.each { |a| UI.error(a) }
+  UI.user_error!("Broken links in Markdown files") unless errors.empty?
+  UI.success("✅  Markdown links are valid")
 end
 
 # Run the code samples, yo

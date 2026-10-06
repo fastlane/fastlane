@@ -32,6 +32,29 @@ module Trainer
         node['children'].select { |child| node_types.include?(child['nodeType']) }
       end
 
+      # The version of the xcresulttool on the current PATH
+      #
+      # Not memoized: `xcrun` resolves through DEVELOPER_DIR, which the xcode_select,
+      # xcversion, xcodes and xcode_install actions change during a run, so the answer
+      # can differ between two calls in the same process.
+      #
+      # @return [Gem::Version, nil] The version, or nil when there is no xcrun to ask
+      def self.xcresulttool_version
+        # e.g. DEVELOPER_DIR=/Applications/Xcode_16_beta_3.app
+        # xcresulttool version 23021, format version 3.53 (current)
+        # xcresulttool version 24408, schema version: 0.1.0 (legacy commands format version: 3.56)
+        output = `xcrun xcresulttool version`
+        match = output.match(/xcresulttool version (?<version>[\d.]+)/)
+        raise "Could not read the xcresulttool version from #{output.strip.inspect}" if match.nil?
+
+        Gem::Version.new(match[:version])
+      rescue Errno::ENOENT
+        # No xcrun at all: not macOS, or no developer tools installed. Every other
+        # failure is left to surface, so a change in what xcresulttool reports is not
+        # silently read as "this version is not supported".
+        nil
+      end
+
       # Check if the current xcresulttool supports new commands introduced in Xcode 16+
       #
       # Since Xcode 16b3, xcresulttool has marked `get <object> --format json` as deprecated/legacy,
@@ -39,24 +62,15 @@ module Trainer
       #
       # @return [Boolean] Whether the xcresulttool supports Xcode 16+ commands
       def self.supports_xcresulttool_version_23?
-        # e.g. DEVELOPER_DIR=/Applications/Xcode_16_beta_3.app
-        # xcresulttool version 23021, format version 3.53 (current)
-        match = `xcrun xcresulttool version`.match(/xcresulttool version (?<version>[\d.]+)/)
-        version = match[:version]
+        version = xcresulttool_version
 
-        Gem::Version.new(version) >= Gem::Version.new(23_021)
-      rescue
-        false
+        !version.nil? && version >= Gem::Version.new(23_021)
       end
 
       def self.supports_xcresulttool_version_24?
-        # xcresulttool version 24408, schema version: 0.1.0 (legacy commands format version: 3.56)
-        match = `xcrun xcresulttool version`.match(/xcresulttool version (?<version>[\d.]+)/)
-        version = match[:version]
+        version = xcresulttool_version
 
-        Gem::Version.new(version) >= Gem::Version.new(24_408)
-      rescue
-        false
+        !version.nil? && version >= Gem::Version.new(24_408)
       end
     end
   end

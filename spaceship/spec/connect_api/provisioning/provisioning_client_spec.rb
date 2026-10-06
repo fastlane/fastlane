@@ -100,6 +100,12 @@ settings: settings = [{ key: Spaceship::ConnectAPI::BundleIdCapability::Settings
           client.patch_bundle_id_capability(bundle_id_id: "ABCD1234", seed_id: "SEEDID", enabled: false, capability_type: Spaceship::ConnectAPI::BundleIdCapability::Type::ICLOUD)
         end
       end
+
+      context 'patch_bundle_id_capability_configuration' do
+        it 'should make a request to update the capability directly, not the bundle ID' do
+          client.patch_bundle_id_capability_configuration(bundle_id_capability_id: "123456789_APP_GROUPS", enabled: true, settings: [])
+        end
+      end
     end
 
     describe "certificates" do

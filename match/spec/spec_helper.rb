@@ -72,12 +72,12 @@ def create_match_config_with_git_storage(extra_values: {}, git_url: nil, app_ide
   return match_config
 end
 
-def create_fake_encryption(storage:)
+def create_fake_encryption(storage:, expected_decrypt_count: 1)
   fake_encryption = "fake_encryption"
   expect(Match::Encryption::OpenSSL).to receive(:new).with(keychain_name: storage.git_url, working_directory: storage.working_directory, force_legacy_encryption: false).and_return(fake_encryption)
 
   # Ensure files from storage are decrypted.
-  expect(fake_encryption).to receive(:decrypt_files).and_return(nil)
+  expect(fake_encryption).to receive(:decrypt_files).exactly(expected_decrypt_count).times.and_return(nil)
 
   return fake_encryption
 end

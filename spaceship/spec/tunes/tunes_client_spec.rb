@@ -14,6 +14,62 @@ describe Spaceship::TunesClient do
         subject.login('bad-username', 'bad-password')
       end.to raise_exception(Spaceship::Client::InvalidUserCredentialsError, "Invalid username and password combination. Used 'bad-username' as the username.")
     end
+
+    it 'names the cached API key when App Store Connect refuses the session after signing in' do
+      Dir.mktmpdir do |dir|
+        cache = File.join(dir, "spaceship_itc_service_key.txt")
+        File.write(cache, "e0abc")
+        allow_any_instance_of(Spaceship::Client).to receive(:itc_service_key_path).and_return(cache)
+        stub_request(:head, "https://appstoreconnect.apple.com/logout").to_timeout
+        stub_request(:get, "https://appstoreconnect.apple.com/olympus/v1/session").to_return(status: 401)
+
+        expect do
+          subject.login('spaceship@krausefx.com', 'so_secret')
+        end.to raise_exception(Spaceship::UnauthorizedAccessError, /came from the cache at .* and may be stale/)
+      end
+    end
+  end
+
+  describe 'when Apple refuses the sign-in' do
+    # signin/complete bodies: the 401 recorded against Apple on 2026-10-01, the 403s reported in #14387 (2019)
+    def stub_sign_in(status, body, content_type: 'application/json')
+      stub_request(:post, "https://idmsa.apple.com/appleauth/auth/signin/complete?isRememberMeEnabled=false").
+        to_return(status: status, body: body, headers: { 'Content-Type' => content_type })
+    end
+
+    it 'reports a wrong password as invalid credentials' do
+      sign_in = stub_sign_in(401, TunesStubbing.itc_read_fixture_file('signin_wrong_password.json'))
+
+      expect do
+        subject.login('spaceship@krausefx.com', 'so_secret')
+      end.to raise_exception(Spaceship::InvalidUserCredentialsError, "Invalid username and password combination. Used 'spaceship@krausefx.com' as the username.")
+      expect(sign_in).to have_been_requested.once
+    end
+
+    {
+      'signin_refused_locked.json' => "This Apple ID has been locked for security reasons. Visit iForgot to reset your account (https://iforgot.apple.com). (-20209)",
+      'signin_refused_20751.json' => "Your Apple ID or password was incorrect. (-20751)"
+    }.each do |fixture, apple_says|
+      it "shows what Apple answered in #{fixture}, and does not send the sign-in again" do
+        sign_in = stub_sign_in(403, TunesStubbing.itc_read_fixture_file(fixture))
+
+        expect do
+          subject.login('spaceship@krausefx.com', 'so_secret')
+        end.to raise_exception(Spaceship::UnexpectedResponse) { |error|
+          expect(error.preferred_error_info).to eq(["Apple provided the following error info:", apple_says])
+        }
+        expect(sign_in).to have_been_requested.once
+      end
+    end
+
+    it 'still retries a 403 that says nothing' do
+      sign_in = stub_sign_in(403, "<html>Access Denied</html>", content_type: 'text/html')
+
+      expect do
+        subject.login('spaceship@krausefx.com', 'so_secret')
+      end.to raise_exception(Spaceship::AccessForbiddenError)
+      expect(sign_in).to have_been_requested.times(5)
+    end
   end
 
   describe 'client' do
@@ -34,10 +90,21 @@ describe Spaceship::TunesClient do
     before(:each) do
       # Don't need to test hashcash here
       allow_any_instance_of(Spaceship::Client).to receive(:fetch_hashcash)
+
+      # These examples count requests, and one of the requests used to be
+      # Client#itc_service_key fetching the widget key. That method caches to a
+      # fixed path in /tmp, so the count depended on whether the file happened
+      # to exist: cold, the fetch ran and the count was two; warm, it did not
+      # and the third stubbed request was never reached, so nothing was raised.
+      # spaceship/spec/spec_helper.rb used to delete the file around every
+      # example to force it cold, which works in one process and races in
+      # several. Answer the key directly so the count is the same
+      # either way. See fastlane#30184.
+      allow_any_instance_of(Spaceship::Client).to receive(:itc_service_key).and_return("e0abc")
     end
 
     it 'has authType is sa' do
-      expect_any_instance_of(Spaceship::Client).to receive(:request).twice.and_call_original
+      expect_any_instance_of(Spaceship::Client).to receive(:request).once.and_call_original
 
       response_second = double
       allow(response_second).to receive(:status).and_return(412)
@@ -51,7 +118,7 @@ describe Spaceship::TunesClient do
     end
 
     it 'has authType of hsa' do
-      expect_any_instance_of(Spaceship::Client).to receive(:request).twice.and_call_original
+      expect_any_instance_of(Spaceship::Client).to receive(:request).once.and_call_original
 
       response_second = double
       allow(response_second).to receive(:status).and_return(412)
@@ -65,7 +132,7 @@ describe Spaceship::TunesClient do
     end
 
     it 'has authType of non-sa' do
-      expect_any_instance_of(Spaceship::Client).to receive(:request).twice.and_call_original
+      expect_any_instance_of(Spaceship::Client).to receive(:request).once.and_call_original
 
       response_second = double
       allow(response_second).to receive(:status).and_return(412)
@@ -79,7 +146,7 @@ describe Spaceship::TunesClient do
     end
 
     it 'has authType of hsa2' do
-      expect_any_instance_of(Spaceship::Client).to receive(:request).twice.and_call_original
+      expect_any_instance_of(Spaceship::Client).to receive(:request).once.and_call_original
 
       response_second = double
       allow(response_second).to receive(:status).and_return(412)

@@ -3,6 +3,10 @@ require_relative 'swift_runner_upgrader.rb'
 
 module Fastlane
   class SwiftLaneManager < LaneManagerBase
+    # The runner protocol version this fastlane ships, see main.swift
+    RUNNER_PROTOCOL_VERSION = 1
+    RUNNER_PROTOCOL_VERSION_REGEX = /FastlaneRunnerProtocolVersion \[(\d+)\]/
+
     # @param lane_name The name of the lane to execute
     # @param parameters [Hash] The parameters passed from the command line to the lane
     def self.cruise_lane(lane, parameters = nil, disable_runner_upgrades: false, swift_server_port: nil)
@@ -26,6 +30,7 @@ module Fastlane
         end
 
         self.ensure_runner_built!
+        self.warn_if_runner_outdated
         swift_server_port ||= 2000
         socket_thread = self.start_socket_thread(port: swift_server_port)
         sleep(0.250) while socket_thread[:ready].nil?
@@ -229,6 +234,17 @@ module Fastlane
       end
     end
 
+    # The protocol version compiled into the built runner, 0 for runners from before it had one
+    def self.runner_protocol_version
+      File.binread(FastlaneCore::FastlaneFolder.swift_runner_path)[RUNNER_PROTOCOL_VERSION_REGEX, 1].to_i
+    end
+
+    def self.warn_if_runner_outdated
+      return if runner_protocol_version >= RUNNER_PROTOCOL_VERSION
+
+      UI.important("Your FastlaneRunner is outdated for this version of fastlane. Run a lane outside CI, without `disable_runner_upgrades`, to update it, then commit the changes.")
+    end
+
     def self.ensure_runner_built!
       UI.verbose("Checking for new user-provided tool configuration files")
       # if self.link_user_configs_to_project returns true, that means we need to rebuild the runner
@@ -236,11 +252,13 @@ module Fastlane
 
       if FastlaneCore::FastlaneFolder.swift_runner_built?
         runner_last_modified_age = File.mtime(FastlaneCore::FastlaneFolder.swift_runner_path).to_i
-        fastfile_last_modified_age = File.mtime(FastlaneCore::FastlaneFolder.fastfile_path).to_i
+        # The Fastfile, and the runner's own files, which an upgrade or a pull can change without touching the Fastfile
+        sources = [FastlaneCore::FastlaneFolder.fastfile_path] + Dir[File.join(FastlaneCore::FastlaneFolder.swift_folder_path, '**', '*.swift')]
+        changed = sources.find { |source| File.mtime(source).to_i > runner_last_modified_age }
 
-        if runner_last_modified_age < fastfile_last_modified_age
-          # It's older than the Fastfile, so build it again
-          UI.verbose("Found changes to user's Fastfile.swift, setting re-build runner flag")
+        if changed
+          # It's older than one of its sources, so build it again
+          UI.verbose("Found changes to #{changed}, setting re-build runner flag")
           runner_needs_building = true
         end
       else

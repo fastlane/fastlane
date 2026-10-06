@@ -8,8 +8,8 @@ describe Fastlane do
       end
 
       it "support a success callback block" do
-        temp_path = "/tmp/fastlane_callback.txt"
-        File.delete(temp_path) if File.exist?(temp_path)
+        # Avoid fixed paths under /tmp: parallel test processes would share them. See fastlane#30184.
+        temp_path = File.join(Dir.mktmpdir("fl_spec_pem"), "callback.txt")
 
         expect(File.exist?(temp_path)).to eq(false)
 

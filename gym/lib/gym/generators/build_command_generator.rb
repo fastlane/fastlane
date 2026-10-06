@@ -119,6 +119,8 @@ module Gym
       end
 
       def pipe_xcpretty
+        UI.important("Using xcpretty can result in missing some build errors and is slower than the preferred xcbeautify. See https://docs.fastlane.tools/best-practices/xcodebuild-formatters/ for more information.")
+
         pipe = []
 
         formatter = Gym.config[:xcpretty_formatter]

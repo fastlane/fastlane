@@ -1,0 +1,126 @@
+{
+  "KrauseFx": {
+    "name": "Felix Krause",
+    "twitter": "KrauseFx"
+  },
+  "taquitos": {
+    "name": "Joshua Liebowitz",
+    "twitter": "taquitos"
+  },
+  "milch": {
+    "name": "Manu Wallner",
+    "twitter": "acrooow",
+    "alumni": true
+  },
+  "hjanuschka": {
+    "name": "Helmut Januschka",
+    "twitter": "hjanuschka",
+    "alumni": true
+  },
+  "lacostej": {
+    "name": "Jérôme Lacoste",
+    "twitter": "lacostej"
+  },
+  "giginet": {
+    "name": "Kohki Miki",
+    "twitter": "giginet",
+    "alumni": true
+  },
+  "janpio": {
+    "name": "Jan Piotrowski",
+    "twitter": "Sujan"
+  },
+  "AliSoftware": {
+    "name": "Olivier Halligon",
+    "twitter": "aligatr"
+  },
+  "mgrebenets": {
+    "name": "Maksym Grebenets",
+    "twitter": "mgrebenets",
+    "alumni": true
+  },
+  "jdee": {
+    "name": "Jimmy Dee",
+    "alumni": true
+  },
+  "joshdholtz": {
+    "name": "Josh Holtz",
+    "twitter": "joshdholtz"
+  },
+  "matthewellis": {
+    "name": "Matthew Ellis",
+    "twitter": "mellis1995",
+    "alumni": true
+  },
+  "getaaron": {
+    "name": "Aaron Brager",
+    "twitter": "getaaron",
+    "alumni": true
+  },
+  "nafu": {
+    "name": "Fumiya Nakamura",
+    "twitter": "nafu003",
+    "alumni": true
+  },
+  "endocrimes": {
+    "name": "Danielle Tomlinson",
+    "twitter": "endocrimes",
+    "alumni": true
+  },
+  "lmirosevic": {
+    "name": "Luka Mirosevic",
+    "twitter": "lmirosevic",
+    "alumni": true
+  },
+  "revolter": {
+    "name": "Iulian Onofrei",
+    "twitter": "Revolt666",
+    "alumni": true
+  },
+  "snatchev": {
+    "name": "Stefan Natchev",
+    "twitter": "snatchev"
+  },
+  "minuscorp": {
+    "name": "Jorge Revuelta H",
+    "twitter": "minuscorp",
+    "alumni": true
+  },
+  "armcburney": {
+    "name": "Andrew McBurney",
+    "twitter": "armcburney",
+    "alumni": true
+  },
+  "mollyIV": {
+    "name": "Daniel Jankowski",
+    "twitter": "mollyIV",
+    "alumni": true
+  },
+  "max-ott": {
+    "name": "Max Ott",
+    "twitter": "ott_max",
+    "alumni": true
+  },
+  "rogerluan": {
+    "name": "Roger Oba",
+    "twitter": "rogerluan_"
+  },
+  "ainame": {
+    "name": "Satoshi Namai",
+    "twitter": "ainame",
+    "alumni": true
+  },
+  "crazymanish": {
+    "name": "Manish Rathi",
+    "twitter": "iammanishrathi",
+    "alumni": true
+  },
+  "lucgrabowski": {
+    "name": "Łukasz Grabowski",
+    "alumni": true
+  },
+  "ibotpeaches": {
+    "name": "Connor Tumbleson",
+    "twitter": "ibotpeaches"
+  }
+}

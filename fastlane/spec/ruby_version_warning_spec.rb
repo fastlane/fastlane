@@ -5,6 +5,14 @@ describe Fastlane::CLIToolsDistributor do
     before(:each) do
       # Need to make sure we don't actually trigger at_exit during tests in a way that interferes
       allow(Fastlane::CLIToolsDistributor).to receive(:at_exit)
+
+      # take_off warns about bundler whenever Helper.bundler? is false, which is
+      # what a spec that drops BUNDLE_GEMFILE or BUNDLE_BIN_PATH leaves behind.
+      # It warns either way: "detected a Gemfile" when the working directory has
+      # one, "get started using a Gemfile" when it does not, so the working
+      # directory only picks the message. Every example below constrains all
+      # calls to UI.important, so either one fails them. See fastlane#30184.
+      allow(Fastlane::CLIToolsDistributor).to receive(:print_bundle_exec_warning)
     end
 
     it "displays a warning when Ruby version is older than SUGGESTED_MINIMUM_RUBY" do

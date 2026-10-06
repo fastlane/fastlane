@@ -403,10 +403,6 @@ Performance/Sum:
 Performance/UnfreezeString:
   Enabled: false
 
-# Offense count: 5
-Security/Open:
-  Enabled: false
-
 # Offense count: 1
 # This cop supports unsafe autocorrection (--autocorrect-all).
 # Configuration parameters: EnforcedStyle, AllowModifiersOnSymbols.
@@ -689,7 +685,7 @@ Style/RedundantSort:
 Style/RedundantStringEscape:
   Enabled: false
 
-# Offense count: 192
+# Offense count: 210
 # This cop supports safe autocorrection (--autocorrect).
 # Configuration parameters: EnforcedStyle.
 # SupportedStyles: implicit, explicit
@@ -731,3 +727,235 @@ Style/TrailingCommaInHashLiteral:
 # SupportedStyles: forbid_for_all_comparison_operators, forbid_for_equality_operators_only, require_for_all_comparison_operators, require_for_equality_operators_only
 Style/YodaCondition:
   Enabled: false
+
+# New in the RuboCop 1.91.0 upgrade (from 1.50.2): offenses to fix cop by cop, then remove the entry.
+
+Layout/EmptyLinesAfterModuleInclusion:
+  Exclude:
+    - 'spaceship/lib/spaceship/connect_api/response.rb'
+    - 'spaceship/lib/spaceship/connect_api/spaceship.rb'
+    - 'trainer/lib/trainer/xcresult/test_plan.rb'
+
+Layout/EmptyLinesAroundMethodBody:
+  Exclude:
+    - 'match/lib/match/storage/gitlab_secure_files.rb'
+    - 'precheck/lib/precheck/rule.rb'
+    - 'screengrab/lib/screengrab/runner.rb'
+    - 'spaceship/lib/spaceship/tunes/tunes_client.rb'
+
+Layout/ExtraSpacing:
+  Exclude:
+    - 'fastlane_core/lib/fastlane_core/analytics/analytics_ingester_client.rb'
+
+Layout/MultilineMethodCallIndentation:
+  Exclude:
+    - 'trainer/lib/trainer/xcresult/test_case.rb'
+
+Lint/AmbiguousRange:
+  Exclude:
+    - 'fastlane_core/lib/fastlane_core/string_filters.rb'
+
+Lint/CopDirectiveSyntax:
+  Exclude:
+    - 'fastlane/lib/fastlane/actions/update_app_age_rating.rb'
+
+Lint/InterpolationCheck:
+  Exclude:
+    - 'fastlane/lib/fastlane/actions/adb_devices.rb'
+    - 'fastlane/lib/fastlane/actions/deploygate.rb'
+    - 'fastlane/lib/fastlane/actions/github_api.rb'
+    - 'fastlane/lib/fastlane/actions/read_podspec.rb'
+    - 'fastlane/lib/fastlane/actions/testfairy.rb'
+
+Lint/UselessConstantScoping:
+  Exclude:
+    - 'fastlane_core/lib/fastlane_core/itunes_transporter.rb'
+
+Lint/UselessOr:
+  Exclude:
+    - 'fastlane/lib/fastlane/actions/slack.rb'
+    - 'fastlane/lib/fastlane/helper/podspec_helper.rb'
+    - 'snapshot/lib/snapshot/simulator_launchers/simulator_launcher_base.rb'
+
+Lint/Void:
+  Exclude:
+    - 'fastlane/lib/fastlane/actions/slather.rb'
+
+Naming/PredicateMethod:
+  Enabled: false
+
+Performance/MapCompact:
+  Enabled: false
+
+Performance/MapMethodChain:
+  Exclude:
+    - 'deliver/spec/loader_spec.rb'
+
+Performance/StringIdentifierArgument:
+  Exclude:
+    - 'deliver/spec/upload_metadata_spec.rb'
+    - 'fastlane/lib/fastlane/server/socket_server.rb'
+    - 'frameit/spec/editor_spec.rb'
+
+Performance/ZipWithoutBlock:
+  Exclude:
+    - 'snapshot/lib/snapshot/simulator_launchers/simulator_launcher.rb'
+
+Style/ArgumentsForwarding:
+  Exclude:
+    - 'credentials_manager/lib/credentials_manager/appfile_config.rb'
+    - 'fastlane/lib/fastlane/fast_file.rb'
+    - 'fastlane/lib/fastlane/other_action.rb'
+    - 'fastlane/spec/helper/sh_helper_spec.rb'
+    - 'fastlane_core/lib/fastlane_core/ui/ui.rb'
+    - 'fastlane_core/spec/spec_helper.rb'
+    - 'spaceship/spec/client_stubbing.rb'
+    - 'spaceship/spec/connect_api/provisioning/provisioning_stubbing.rb'
+    - 'spaceship/spec/connect_api/testflight/testflight_stubbing.rb'
+    - 'spaceship/spec/connect_api/tunes/tunes_stubbing.rb'
+    - 'spaceship/spec/connect_api/users/users_stubbing.rb'
+    - 'spaceship/spec/portal/portal_stubbing.rb'
+    - 'spaceship/spec/tunes/tunes_stubbing.rb'
+
+Style/BitwisePredicate:
+  Exclude:
+    - 'fastlane/lib/fastlane/actions/resign.rb'
+
+Style/CollectionQuerying:
+  Enabled: false
+
+Style/DirectiveScope:
+  Enabled: false
+
+Style/EmptyLiteral:
+  Exclude:
+    - 'trainer/lib/trainer/xcresult/test_plan.rb'
+
+Style/EmptyStringInsideInterpolation:
+  Exclude:
+    - 'fastlane/lib/fastlane/actions/ensure_env_vars.rb'
+
+Style/FileOpen:
+  Exclude:
+    - 'fastlane/lib/fastlane/actions/commit_github_file.rb'
+    - 'fastlane/lib/fastlane/actions/get_managed_play_store_publishing_rights.rb'
+    - 'fastlane/spec/actions_specs/create_app_on_managed_play_store_spec.rb'
+    - 'fastlane/spec/actions_specs/get_managed_play_store_publishing_rights_spec.rb'
+    - 'fastlane_core/lib/fastlane_core/pkg_file_analyser.rb'
+    - 'precheck/lib/precheck/rules/curse_words_rule.rb'
+
+Style/HashAsLastArrayItem:
+  Exclude:
+    - 'fastlane_core/spec/core_ext/cfpropertylist_ext_spec.rb'
+
+Style/HashFetchChain:
+  Exclude:
+    - 'fastlane/lib/fastlane/fast_file.rb'
+    - 'fastlane/lib/fastlane/runner.rb'
+    - 'spaceship/lib/spaceship/tunes/app_version.rb'
+    - 'spaceship/lib/spaceship/tunes/tunes_client.rb'
+
+Style/HashSlice:
+  Exclude:
+    - 'fastlane/lib/fastlane/actions/deploygate.rb'
+    - 'fastlane_core/lib/fastlane_core/helper.rb'
+    - 'produce/lib/produce/commands_generator.rb'
+    - 'produce/lib/produce/service.rb'
+    - 'spaceship/lib/spaceship/client.rb'
+    - 'spec/spec_helper.rb'
+
+Style/MapIntoArray:
+  Enabled: false
+
+Style/MapJoin:
+  Exclude:
+    - 'spaceship/lib/spaceship/client.rb'
+
+Style/ModuleMemberExistenceCheck:
+  Exclude:
+    - 'spaceship/lib/spaceship/base.rb'
+    - 'spaceship/lib/spaceship/connect_api/model.rb'
+
+Style/OneClassPerFile:
+  Exclude:
+    - 'spec/**/*'
+    - 'test/**/*'
+    - 'deliver/spec/runner_spec.rb'
+    - 'fastlane/lib/fastlane/action.rb'
+    - 'fastlane/lib/fastlane/actions/create_app_on_managed_play_store.rb'
+    - 'fastlane_core/lib/fastlane_core/core_ext/shellwords.rb'
+    - 'fastlane_core/lib/fastlane_core/fastlane_pty.rb'
+    - 'fastlane_core/lib/fastlane_core/ui/errors/fastlane_error.rb'
+    - 'fastlane_core/lib/fastlane_core/ui/interface.rb'
+    - 'precheck/lib/precheck/rule_processor.rb'
+    - 'spaceship/lib/spaceship/helper/rels_middleware.rb'
+    - 'spaceship/lib/spaceship/tunes/language_converter.rb'
+    - 'spec/spec_helper.rb'
+
+Style/OptionalArguments:
+  Exclude:
+    - 'fastlane/lib/fastlane/helper/git_helper.rb'
+    - 'fastlane/lib/fastlane/swift_lane_manager.rb'
+    - 'scan/lib/scan/detect_values.rb'
+
+Style/ReduceToHash:
+  Exclude:
+    - 'deliver/lib/deliver/sync_app_previews.rb'
+    - 'fastlane/Fastfile'
+    - 'snapshot/lib/snapshot/simulator_launchers/simulator_launcher.rb'
+
+Style/RedundantCurrentDirectoryInPath:
+  Enabled: false
+
+Style/RedundantRegexpArgument:
+  Exclude:
+    - 'internal/docs/plugin_scores.rb'
+    - 'fastlane_core/lib/fastlane_core/core_ext/string.rb'
+    - 'fastlane_core/lib/fastlane_core/device_manager.rb'
+    - 'fastlane_core/lib/fastlane_core/itunes_transporter.rb'
+
+Style/ReturnNilInPredicateMethodDefinition:
+  Exclude:
+    - 'fastlane_core/lib/fastlane_core/globals.rb'
+    - 'internal/rubocop/missing_keys_on_shared_area.rb'
+    - 'match/lib/match/storage/git_storage.rb'
+
+Style/SelectByKind:
+  Exclude:
+    - 'spaceship/lib/spaceship/portal/provisioning_profile.rb'
+
+Style/SingleLineDoEndBlock:
+  Exclude:
+    - 'fastlane/spec/update_app_age_rating_spec.rb'
+    - 'fastlane_core/spec/command_executor_spec.rb'
+
+Style/StringLiteralsInInterpolation:
+  Exclude:
+    - 'snapshot/lib/snapshot/reset_simulators.rb'
+
+Style/SuperArguments:
+  Exclude:
+    - 'fastlane/lib/fastlane/actions/build_ios_app.rb'
+    - 'fastlane/lib/fastlane/actions/build_mac_app.rb'
+    - 'fastlane_core/lib/fastlane_core/itunes_transporter.rb'
+    - 'spaceship/lib/spaceship/base.rb'
+    - 'spaceship/lib/spaceship/connect_api/provisioning/client.rb'
+    - 'spaceship/lib/spaceship/connect_api/testflight/client.rb'
+    - 'spaceship/lib/spaceship/connect_api/tunes/client.rb'
+    - 'spaceship/lib/spaceship/connect_api/users/client.rb'
+    - 'spaceship/lib/spaceship/errors.rb'
+    - 'spaceship/lib/spaceship/stats_middleware.rb'
+    - 'spaceship/lib/spaceship/tunes/app_details.rb'
+    - 'spaceship/spec/test_flight/client_spec.rb'
+    - 'supply/lib/supply/client.rb'
+    - 'trainer/lib/trainer/legacy_xcresult.rb'
+
+Style/TimeNow:
+  Exclude:
+    - 'fastlane/spec/actions_specs/slack_spec.rb'
+    - 'fastlane_core/lib/fastlane_core/build_watcher.rb'
+
+Style/YAMLFileRead:
+  Exclude:
+    - 'Rakefile'
+    - 'internal/docs/plugin_scores.rb'

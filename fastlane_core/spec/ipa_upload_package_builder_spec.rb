@@ -52,5 +52,94 @@ describe FastlaneCore do
         expect(unique_path_with_spaces.include?(' ')).to eq(false)
       end
     end
+
+    context '#generate' do
+      let(:app_id) { 'my.app.id' }
+
+      # `package_path` is a *parent* directory that the caller may share with unrelated files —
+      # `deliver` passes "/tmp". ItunesTransporter#upload does `FileUtils.rm_rf` on whatever
+      # `generate` returns, so returning the parent itself would delete it along with everything
+      # else in it, and would make the transporter's `Dir.glob` match foreign packages.
+      around do |example|
+        Dir.mktmpdir do |parent|
+          @parent = parent
+          example.run
+        end
+      end
+
+      def generate(source_ipa: path)
+        FastlaneCore::IpaUploadPackageBuilder.new.generate(
+          app_id: app_id,
+          ipa_path: source_ipa,
+          package_path: @parent,
+          platform: 'ios'
+        )
+      end
+
+      shared_examples 'a package contained in package_path' do
+        it 'does not return package_path itself' do
+          expect(generate).not_to eq(@parent)
+        end
+
+        it 'returns a new directory directly below package_path' do
+          result = generate
+
+          expect(File.dirname(result)).to eq(@parent)
+          expect(File.directory?(result)).to be(true)
+        end
+
+        it 'leaves package_path intact when the returned path is removed' do
+          sibling = File.join(@parent, 'unrelated.ipa')
+          File.write(sibling, 'not ours')
+
+          FileUtils.rm_rf(generate)
+
+          expect(File.directory?(@parent)).to be(true)
+          expect(File.exist?(sibling)).to be(true)
+        end
+
+        it 'uses a distinct directory for each invocation' do
+          expect(generate).not_to eq(generate)
+        end
+
+        it 'places exactly one package file inside the returned directory' do
+          result = generate
+
+          expect(Dir.glob(File.join(result, '*.ipa')).count).to eq(1)
+        end
+      end
+
+      context 'on macOS' do
+        before do
+          allow(FastlaneCore::Helper).to receive(:is_mac?).and_return(true)
+        end
+
+        it_behaves_like 'a package contained in package_path'
+
+        it 'builds an .itmsp package' do
+          expect(generate).to end_with('.itmsp')
+        end
+      end
+
+      context 'on non-macOS platforms' do
+        before do
+          allow(FastlaneCore::Helper).to receive(:is_mac?).and_return(false)
+        end
+
+        it_behaves_like 'a package contained in package_path'
+
+        it 'copies an adjacent AppStoreInfo.plist into the package' do
+          Dir.mktmpdir do |source|
+            source_ipa = File.join(source, 'MyApp.ipa')
+            FileUtils.cp(path, source_ipa)
+            File.write(File.join(source, 'AppStoreInfo.plist'), '<plist></plist>')
+
+            result = generate(source_ipa: source_ipa)
+
+            expect(File.file?(File.join(result, 'AppStoreInfo.plist'))).to be(true)
+          end
+        end
+      end
+    end
   end
 end

@@ -8,6 +8,44 @@ describe Fastlane do
         allow(Fastlane::Actions).to receive(:git_branch).and_return("master")
       end
 
+      context "on a detached HEAD, as CI checks out" do
+        before do
+          allow(Fastlane::Actions).to receive(:sh)
+            .with("git rev-parse --abbrev-ref HEAD", log: false)
+            .and_return("HEAD\n")
+        end
+
+        it "pushes the local_branch given" do
+          allow(Fastlane::Actions).to receive(:git_branch).and_return("main")
+
+          result = Fastlane::FastFile.new.parse("lane :test do
+              push_to_git_remote(local_branch: 'staging')
+            end").runner.execute(:test)
+
+          expect(result).to eq("git push origin staging:staging --tags")
+        end
+
+        it "pushes HEAD to remote_branch when CI names no branch" do
+          allow(Fastlane::Actions).to receive(:git_branch).and_return("HEAD")
+
+          result = Fastlane::FastFile.new.parse("lane :test do
+              push_to_git_remote(remote_branch: 'release')
+            end").runner.execute(:test)
+
+          expect(result).to eq("git push origin HEAD:release --tags")
+        end
+
+        it "fails when CI names no branch and remote_branch is not given" do
+          allow(Fastlane::Actions).to receive(:git_branch).and_return("HEAD")
+
+          expect do
+            Fastlane::FastFile.new.parse("lane :test do
+                push_to_git_remote
+              end").runner.execute(:test)
+          end.to raise_error(FastlaneCore::Interface::FastlaneError, /HEAD is detached/)
+        end
+      end
+
       it "runs git push with defaults" do
         result = Fastlane::FastFile.new.parse("lane :test do
             push_to_git_remote
@@ -157,7 +195,8 @@ describe Fastlane do
               push_to_git_remote
             end").runner.execute(:test)
 
-          expect(result).to eq("git push origin master:master --tags")
+          # HEAD, as the local master branch does not have the commits made on the detached HEAD
+          expect(result).to eq("git push origin HEAD:master --tags")
         end
       end
 

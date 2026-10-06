@@ -1,16 +1,66 @@
+# The examples below stub PTY, but fastlane_pty.rb only requires it from inside
+# spawn_with_pty, so the constant does not exist until something has run that
+# method. They passed only when an earlier example in this file had, and failed
+# with "uninitialized constant PTY" whenever they ran first.
+#
+# Not available on Windows, where the examples needing it are skipped by their
+# requires_pty tag. See fastlane#30184.
+require "pty" unless FastlaneCore::Helper.windows?
+
 describe FastlaneCore do
   describe FastlaneCore::FastlanePty do
     describe "spawn" do
       it 'executes a simple command successfully' do
         @all_lines = []
 
-        exit_status = FastlaneCore::FastlanePty.spawn('echo foo') do |command_stdout, command_stdin, pid|
-          command_stdout.each do |line|
-            @all_lines << line.chomp
+        # Without the workaround this reads back nothing every few thousand runs,
+        # which is #21792 again: a command that exits immediately can leave the
+        # pty with nothing to read. command_executor_spec covers the same path
+        # and sets this for the same reason.
+        exit_status = FastlaneSpec::Env.with_env_values('FASTLANE_EXEC_FLUSH_PTY_WORKAROUND' => '1') do
+          FastlaneCore::FastlanePty.spawn('echo foo') do |command_stdout, command_stdin, pid|
+            command_stdout.each do |line|
+              @all_lines << line.chomp
+            end
           end
         end
         expect(exit_status).to eq(0)
         expect(@all_lines).to eq(["foo"])
+      end
+
+      it 'returns the status of the command it ran rather than whatever $? holds', requires_pty: true do
+        # The status used to reach the end of spawn_with_pty through $?, read
+        # back via process_status, so anything that overwrote that global in
+        # between decided what the caller was told. Stub it to something the
+        # command did not produce: if the result still comes from there, this
+        # returns 99. See fastlane#30188.
+        wrong = double("ProcessStatus")
+        allow(wrong).to receive(:exitstatus).and_return(99)
+        allow(wrong).to receive(:signaled?).and_return(false)
+        allow(FastlaneCore::FastlanePty).to receive(:process_status).and_return(wrong)
+
+        exit_status = FastlaneCore::FastlanePty.spawn('exit 7') do |command_stdout, command_stdin, pid|
+          begin
+            command_stdout.read
+          rescue Errno::EIO
+            # Expected on Linux when the command exits while we are reading.
+          end
+        end
+
+        expect(exit_status).to eq(7)
+      end
+
+      it 'reports a clear error when no exit status can be determined', requires_pty: true do
+        # With nothing to reap and nothing in $?, the old code called
+        # exitstatus on nil from inside the handler that exists to report the
+        # failure, so the caller got a NoMethodError instead of the error.
+        allow(Process).to receive(:wait2).and_raise(Errno::ECHILD)
+        allow(FastlaneCore::FastlanePty).to receive(:process_status).and_return(nil)
+
+        expect {
+          FastlaneCore::FastlanePty.spawn('exit 0') do |command_stdout, command_stdin, pid|
+          end
+        }.to raise_error(FastlaneCore::FastlanePtyError, /Could not determine the exit status/)
       end
 
       it 'doesn t return -1 if an exception was raised in the block in PTY.spawn' do
@@ -92,8 +142,22 @@ describe FastlaneCore do
     end
 
     describe "spawn_with_pty" do
+      # Both examples are about the command string that reaches PTY.spawn and
+      # nothing else. Stubbing it means the block never runs, so no status is
+      # produced and `spawn_with_pty` falls back to `process_status`, which is
+      # `$?`: whatever subprocess this process ran last. An earlier example in
+      # this file kills one, and these then failed with "Process crashed"
+      # depending on the order. Stub that fallback too. See fastlane#30184.
+      let(:exited_cleanly) do
+        instance_double(Process::Status, signaled?: false, exitstatus: 0)
+      end
+
+      before do
+        allow(FastlaneCore::FastlanePty).to receive(:process_status).and_return(exited_cleanly)
+      end
+
       it 'passes the command to Pty when FASTLANE_EXEC_FLUSH_PTY_WORKAROUND is not set', requires_pty: true do
-        allow(PTY).to receive(:spawn).with("echo foo")
+        expect(PTY).to receive(:spawn).with("echo foo")
 
         FastlaneSpec::Env.with_env_values('FASTLANE_EXEC_FLUSH_PTY_WORKAROUND' => nil) do
           FastlaneCore::FastlanePty.spawn_with_pty('echo foo') do |command_stdout, command_stdin, pid|
@@ -102,7 +166,7 @@ describe FastlaneCore do
       end
 
       it 'wraps the command with a workaround when FASTLANE_EXEC_FLUSH_PTY_WORKAROUND is set', requires_pty: true do
-        allow(PTY).to receive(:spawn).with("echo foo;")
+        expect(PTY).to receive(:spawn).with("echo foo;")
 
         FastlaneSpec::Env.with_env_values('FASTLANE_EXEC_FLUSH_PTY_WORKAROUND' => '1') do
           FastlaneCore::FastlanePty.spawn_with_pty('echo foo') do |command_stdout, command_stdin, pid|

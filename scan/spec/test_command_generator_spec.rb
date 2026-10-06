@@ -177,6 +177,56 @@ describe Scan do
         end
       end
 
+      describe "supports collecting test diagnostics" do
+        it "disables diagnostic collection", requires_xcodebuild: true do
+          allow(FastlaneCore::Helper).to receive(:xcode_at_least?).with(14).and_return(true)
+
+          options = { project: "./scan/examples/standard/app.xcodeproj", sdk: "9.0", collect_test_diagnostics: "never" }
+          Scan.config = FastlaneCore::Configuration.create(Scan::Options.available_options, options)
+
+          result = @test_command_generator.generate
+          expect(result).to include("-collect-test-diagnostics never")
+        end
+
+        it "collects diagnostics on failure", requires_xcodebuild: true do
+          allow(FastlaneCore::Helper).to receive(:xcode_at_least?).with(14).and_return(true)
+
+          options = { project: "./scan/examples/standard/app.xcodeproj", sdk: "9.0", collect_test_diagnostics: "on-failure" }
+          Scan.config = FastlaneCore::Configuration.create(Scan::Options.available_options, options)
+
+          result = @test_command_generator.generate
+          expect(result).to include("-collect-test-diagnostics on-failure")
+        end
+
+        it "doesn't add the flag when the option is not set", requires_xcodebuild: true do
+          allow(FastlaneCore::Helper).to receive(:xcode_at_least?).with(14).and_return(true)
+
+          options = { project: "./scan/examples/standard/app.xcodeproj", sdk: "9.0" }
+          Scan.config = FastlaneCore::Configuration.create(Scan::Options.available_options, options)
+
+          result = @test_command_generator.generate
+          expect(result).to_not(include("-collect-test-diagnostics never"))
+          expect(result).to_not(include("-collect-test-diagnostics on-failure"))
+        end
+
+        it "doesn't add the flag on Xcode versions before 14", requires_xcodebuild: true do
+          allow(FastlaneCore::Helper).to receive(:xcode_at_least?).with(14).and_return(false)
+
+          options = { project: "./scan/examples/standard/app.xcodeproj", sdk: "9.0", collect_test_diagnostics: "never" }
+          Scan.config = FastlaneCore::Configuration.create(Scan::Options.available_options, options)
+
+          result = @test_command_generator.generate
+          expect(result).to_not(include("-collect-test-diagnostics never"))
+        end
+
+        it "rejects unsupported values" do
+          expect do
+            options = { project: "./scan/examples/standard/app.xcodeproj", collect_test_diagnostics: "always" }
+            Scan.config = FastlaneCore::Configuration.create(Scan::Options.available_options, options)
+          end.to raise_error("Invalid collect_test_diagnostics always")
+        end
+      end
+
       it "supports custom xcpretty formatter as a gem name", requires_xcodebuild: true do
         options = { formatter: "custom-formatter", project: "./scan/examples/standard/app.xcodeproj", sdk: "9.0" }
         Scan.config = FastlaneCore::Configuration.create(Scan::Options.available_options, options)

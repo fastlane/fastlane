@@ -29,17 +29,17 @@ jobs:
 
     steps:
     - name: Checkout repository
-      uses: actions/checkout@v6
+      uses: actions/checkout@v7
 
     - name: Set up Ruby
       uses: ruby/setup-ruby@v1
       with:
-        ruby-version: '3.2'
+        ruby-version: '3.4'
 
     - name: Install fastlane
       run: bundle install
 
-    - uses: rubygems/configure-rubygems-credentials@v2.0.0
+    - uses: rubygems/configure-rubygems-credentials@v2.1.0
 
     - name: Configure GitHub Packages config
       env:

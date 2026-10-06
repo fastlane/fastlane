@@ -15,6 +15,39 @@ describe Fastlane do
       expect(fastlane_files).to include("Appfile")
     end
 
+    context "with a Fastfile and an Appfile" do
+      let(:fastfile) do
+        file = Tempfile.new("Fastfile")
+        file.write("lane :beta do\n  api_token('super-secret-token')\nend\n")
+        file.close
+        file
+      end
+
+      let(:appfile) do
+        file = Tempfile.new("Appfile")
+        file.write("apple_id('secret@example.org')\n")
+        file.close
+        file
+      end
+
+      before do
+        allow(FastlaneCore::FastlaneFolder).to receive(:fastfile_path).and_return(fastfile.path)
+        allow(CredentialsManager::AppfileConfig).to receive(:default_path).and_return(appfile.path)
+      end
+
+      after do
+        fastfile.unlink
+        appfile.unlink
+      end
+
+      it "names them without including their contents" do
+        expect(fastlane_files).to include(fastfile.path)
+        expect(fastlane_files).to include(appfile.path)
+        expect(fastlane_files).not_to(include("super-secret-token"))
+        expect(fastlane_files).not_to(include("secret@example.org"))
+      end
+    end
+
     let(:env) { Fastlane::EnvironmentPrinter.get }
 
     it "contains the key words" do

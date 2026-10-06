@@ -49,6 +49,11 @@ describe Cert do
         end
 
         it "correctly selects expired certificates" do
+          # Cert.config is module level and the example above assigns it from
+          # its own body, so this one passed only when that had run first. See
+          # fastlane#30184.
+          Cert.config = FastlaneCore::Configuration.create(Cert::Options.available_options, keychain_path: ".")
+
           expired_cert = stub_certificate("expired_cert", false)
           good_cert = stub_certificate
 
@@ -99,7 +104,8 @@ describe Cert do
 
         describe ":filename option handling" do
           filename = ""
-          let(:temp) { Dir.tmpdir }
+          # A directory of its own: Dir.tmpdir is the shared temp root, so parallel test processes would collide. See fastlane#30184.
+          let(:temp) { Dir.mktmpdir('fl_spec_cert') }
           let(:certificate) { stub_certificate }
           let(:filepath) do
             filename_ext = File.extname(filename) == ".cer" ? filename : "#{filename}.cer"

@@ -167,7 +167,7 @@ module Commander
         end
       rescue FastlaneCore::Interface::FastlaneCommonException => e # these are exceptions that we don't count as crashes
         display_user_error!(e, e.to_s)
-      rescue FastlaneCore::Interface::FastlaneError => e # user_error!
+      rescue FastlaneCore::Interface::FastlaneError, FastlaneCore::Interface::FastlaneShellError => e # user_error! or shell_error!
         rescue_fastlane_error(e)
       rescue Errno::ENOENT => e
         rescue_file_error(e)
@@ -265,11 +265,11 @@ module Commander
       ui.error("- If you use system Ruby:")
       ui.error("  - Run `brew update && brew install ruby`")
       ui.error("- If you use rbenv with ruby-build:")
-      ui.error("  - Run `brew update && brew upgrade ruby-build && rbenv install 2.3.1`")
-      ui.error("  - Run `rbenv global 2.3.1` to make it the new global default Ruby version")
+      ui.error("  - Run `brew update && brew upgrade ruby-build && rbenv install #{Fastlane::SUGGESTED_MINIMUM_RUBY}`")
+      ui.error("  - Run `rbenv global #{Fastlane::SUGGESTED_MINIMUM_RUBY}` to make it the new global default Ruby version")
       ui.error("- If you use rvm:")
       ui.error("  - First run `rvm osx-ssl-certs update all`")
-      ui.error("  - Then run `rvm reinstall ruby-2.3.1 --with-openssl-dir=/usr/local`")
+      ui.error("  - Then run `rvm reinstall ruby-#{Fastlane::SUGGESTED_MINIMUM_RUBY}`")
       ui.error("")
       ui.error("If that doesn't fix your issue, please google for the following error message:")
       ui.error("  '#{e}'")

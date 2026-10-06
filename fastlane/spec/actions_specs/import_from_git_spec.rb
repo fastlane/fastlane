@@ -1,6 +1,14 @@
 describe Fastlane do
   describe Fastlane::FastFile do
-    describe "import_from_git" do
+    # These examples are one scenario written as several examples: the `before :all`
+    # builds a git repository, and individual examples append commits, tags and
+    # branches to it that later ones then assert on. They therefore have to run in
+    # the order they are written, and a random order makes them assert against a
+    # repository at the wrong revision. Pinned rather than rewritten: making each
+    # example build its own repository would be order independent but would add a
+    # git init, several commits and several tags per example to a group that
+    # already takes eleven seconds. See fastlane#30184.
+    describe "import_from_git", order: :defined do
       it "raises an exception when no path is given" do
         expect do
           Fastlane::FastFile.new.parse("lane :test do
@@ -286,6 +294,39 @@ describe Fastlane do
           end").runner.execute(:test)
 
           expect(Fastlane::Actions).not_to have_received(:sh).with(/git checkout/)
+        end
+
+        it "updates a branch whose name contains shell characters" do
+          branch = "version-7(beta)"
+          Dir.chdir(source_directory_path) do
+            `git checkout -b #{branch.shellescape} 2>&1`
+          end
+          # Fetches the new branch into the cache.
+          Fastlane::FastFile.new.parse("lane :test do
+            import_from_git(url: '#{source_directory_path}', branch: '#{branch}', cache_path: '#{cache_directory_path}')
+          end").runner.execute(:test)
+
+          Dir.chdir(source_directory_path) do
+            File.write('fastlane/Fastfile', <<-FASTFILE)
+              lane :works do
+                UI.important('Works until v7')
+              end
+            FASTFILE
+            `git add .`
+            `git commit --message "Version 7"`
+            `git tag "7" --message "Version 7"`
+            `git checkout "master" 2>&1`
+          end
+
+          allow(UI).to receive(:message)
+          expect(UI).to receive(:important).with('Works until v7')
+
+          # Tag 7 is not in the cache yet, so the branch is checked out and pulled first.
+          Fastlane::FastFile.new.parse("lane :test do
+            import_from_git(url: '#{source_directory_path}', branch: '#{branch}', version: '7', cache_path: '#{cache_directory_path}')
+
+            works
+          end").runner.execute(:test)
         end
 
       end

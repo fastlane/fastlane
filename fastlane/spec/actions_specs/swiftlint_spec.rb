@@ -126,6 +126,62 @@ describe Fastlane do
           expect(result).to eq("swiftlint lint --path #{path}")
         end
 
+        it "passes path as a positional argument for swiftlint 0.48.0 and above" do
+          allow(Fastlane::Actions::SwiftlintAction).to receive(:swiftlint_version).and_return(Gem::Version.new('0.48.0'))
+          path = "./spec/fixtures"
+          result = Fastlane::FastFile.new.parse("
+            lane :test do
+              swiftlint(
+                path: '#{path}'
+              )
+            end").runner.execute(:test)
+
+          expect(result).to eq("swiftlint lint #{path}")
+        end
+
+        it "passes path after option flags as a positional argument for swiftlint 0.48.0 and above" do
+          allow(Fastlane::Actions::SwiftlintAction).to receive(:swiftlint_version).and_return(Gem::Version.new('0.48.0'))
+          path = "./spec/fixtures"
+          result = Fastlane::FastFile.new.parse("
+            lane :test do
+              swiftlint(
+                path: '#{path}',
+                strict: true
+              )
+            end").runner.execute(:test)
+
+          expect(result).to eq("swiftlint lint --strict #{path}")
+        end
+
+        it "appends the positional path after --use-script-input-files for swiftlint 0.48.0 and above" do
+          allow(Fastlane::Actions::SwiftlintAction).to receive(:swiftlint_version).and_return(Gem::Version.new('0.48.0'))
+          allow(File).to receive(:exist?).and_return(true)
+          path = "./spec/fixtures"
+          result = Fastlane::FastFile.new.parse("
+            lane :test do
+              swiftlint(
+                path: '#{path}',
+                files: ['AppDelegate.swift']
+              )
+            end").runner.execute(:test)
+
+          expect(result).to eq("SCRIPT_INPUT_FILE_COUNT=1 SCRIPT_INPUT_FILE_0=AppDelegate.swift swiftlint lint --use-script-input-files #{path}")
+        end
+
+        it "escapes spaces when passing path as a positional argument" do
+          allow(Fastlane::Actions::SwiftlintAction).to receive(:swiftlint_version).and_return(Gem::Version.new('0.48.0'))
+          allow(File).to receive(:exist?).and_return(true)
+          path = "./spec/my fixtures"
+          result = Fastlane::FastFile.new.parse("
+            lane :test do
+              swiftlint(
+                path: '#{path}'
+              )
+            end").runner.execute(:test)
+
+          expect(result).to eq("swiftlint lint #{path.shellescape}")
+        end
+
         it "adds invalid path option" do
           path = "./non/existent/path"
           expect do
@@ -152,6 +208,20 @@ describe Fastlane do
                 swiftlint
               end").runner.execute(:test)
             end.to raise_error(/SwiftLint finished with errors/)
+          end
+        end
+
+        context "when no subprocess status is available" do
+          # $? is nil until something in this process has run a subprocess, so
+          # the action used to raise NoMethodError instead of reporting. Unix
+          # never shows it because spec_helper runs `which xar` as it loads;
+          # Windows takes the branch that skips that call, so a worker without
+          # any other shelling out hit it. See fastlane#30188.
+          it 'reports the exit code as unknown rather than raising' do
+            allow(FastlaneCore::UI).to receive(:important)
+            expect(FastlaneCore::UI).to receive(:important).with(/exit code unknown/)
+
+            Fastlane::Actions::SwiftlintAction.handle_swiftlint_error(true, nil)
           end
         end
 

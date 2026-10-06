@@ -81,12 +81,23 @@ module Spaceship
         return resp.to_models.first
       end
 
+      # `patch_bundle_id_capability` patches the wrong resource (bundleIds, with
+      # attributes nested inside a relationship's `data` entry) — invalid JSON:API,
+      # rejected by Apple. This uses the real per-capability endpoints instead:
+      # create to enable, PATCH to update settings, delete to disable.
       def update_capability(capability_type, enabled: false, settings: [], client: nil)
         raise "capability_type is required " if capability_type.nil?
 
         client ||= Spaceship::ConnectAPI
-        resp = client.patch_bundle_id_capability(bundle_id_id: id, seed_id: seed_id, enabled: enabled, capability_type: capability_type, settings: settings)
-        return resp.to_models.first
+        existing = get_capabilities(client: client).find { |capability| capability.is_type?(capability_type) }
+
+        if enabled
+          return create_capability(capability_type, settings: settings, client: client) unless existing
+          return existing.update!(client: client, settings: settings)
+        else
+          existing&.delete!(client: client)
+          return nil
+        end
       end
     end
   end

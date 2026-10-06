@@ -1,0 +1,142 @@
+# Contributing to _fastlane_
+
+## I want to report a problem or ask a question
+
+Before submitting a new GitHub issue, please make sure to
+
+- Check out [docs.fastlane.tools](https://docs.fastlane.tools)
+- Check out the README pages on [this repo](https://github.com/fastlane/fastlane)
+- Search for [existing GitHub issues](https://github.com/fastlane/fastlane/issues)
+- Check out [SECURITY.md](./SECURITY.md) for reporting a security discovery
+
+If the above doesn't help, please [submit an issue](https://github.com/fastlane/fastlane/issues) on GitHub and provide information about your setup, in particular the output of the `fastlane env` command.
+
+**Note**: If you want to report a regression in _fastlane_ (something that has worked before, but broke with a new release), please mark your issue title as such using `[Regression] Your title here`. This enables us to quickly detect and fix regressions.
+
+Some people might also use the [_fastlane_ tag on StackOverflow](https://stackoverflow.com/questions/tagged/fastlane), however we don’t actively monitor issues submitted there.
+
+## I want to contribute to _fastlane_
+
+- For some more advanced tooling and debugging tips, check out [ToolsAndDebugging.md](ToolsAndDebugging.md)
+- For the conventions changes are reviewed against, read [Design.md](Design.md)
+
+### Prerequisites
+
+For working on _fastlane_ you should have [Bundler][bundler] installed. Bundler is a ruby project that allows you to specify all ruby dependencies in a file called the `Gemfile`. If you want to learn more about how Bundler works, check out [their website][bundler help].
+
+### Finding things to work on
+
+The core team usually tags issues that are ready to be worked on and easily accessible for new contributors with the [“you can do this” label][you can do this]. If you’ve never contributed to _fastlane_ before, these are a great place to start!
+
+If you want to work on something else, e.g. new functionality or fixing a bug, it would be helpful if you submit a new issue, so that we can have a chance to discuss it first. We might have some pointers for you on how to get started, or how to best integrate it with existing solutions.
+
+### Checking out the _fastlane_ repo
+
+- Click the “Fork” button in the upper right corner of the [main _fastlane_ repo][fastlane repo]
+- Clone your fork:
+  - `git clone git@github.com:<YOUR_GITHUB_USER>/fastlane.git`
+  - Learn more about how to manage your fork: https://help.github.com/articles/working-with-forks/
+- Install dependencies:
+  - Run `bundle install` in the project root
+  - If there are dependency errors, you might also need to run `bundle update`
+- Create a new branch to work on:
+  - `git checkout -b <YOUR_BRANCH_NAME>`
+  - A good name for a branch describes the thing you’ll be working on, e.g. `docs-fixes`, `fix-deliver-upload`, `gym-build-android-app`, etc.
+- That’s it! Now you’re ready to work on _fastlane_
+
+### Testing your changes
+
+[Testing _fastlane_](Testing.md) is so important, that the instructions have their own documentation file. They include [how to test your local changes](Testing.md#testing-your-local-changes) and [how to test your local fastlane code base with your setup](Testing.md#test-your-local-fastlane-code-base-with-your-setup).
+
+### Submitting the PR
+
+When the coding is done and you’re finished testing your changes, you are ready to submit the PR to the [_fastlane_ main repo][fastlane repo]. Everything you need to know about submitting the PR itself is inside our [Pull Request Template][pr template]. Some best practices are:
+
+- Use a descriptive title
+- Link the issues that are related to your PR in the body
+
+### After the review
+
+Once a core member has reviewed your PR, you might need to make changes before it gets merged. To make it easier on us, please make sure to avoid using `git commit --amend` or force pushes to make corrections. By avoiding rewriting the commit history, you will allow each round of edits to become its own visible commit. This helps the people who need to review your code easily understand exactly what has changed since the last time they looked. Feel free to use whatever commit messages you like, as we will squash them anyway. When you are done addressing your review, also add a small comment like “Feedback addressed @<your_reviewer>”.
+
+_fastlane_ changes a lot and is in constant flux. We usually merge multiple PRs per day, so sometimes when we are done reviewing, your code might not work with the latest master branch anymore. To prevent this, before you make any changes after your code has been reviewed, you should always rebase the latest changes from the master branch.
+
+After your contribution is merged, it’s not immediately available to all users. Your change will be shipped as part of the next release, which is usually once per month. If your change is time-critical, please let us know so we can schedule a release for your change.
+
+### New Actions
+
+Please be aware that we don’t accept submissions for new actions at the moment. You can find more information about that [here][submit action].
+
+## I want to help work on _fastlane_ by reviewing issues and PRs
+
+Thanks! We would really appreciate the help! Feel free to read our document on how to [respond to issues and PRs][responding to prs] and also check out how to become a [core contributor][core contributor].
+
+## Why did my issue/PR get closed?
+
+It's not you, it's us! _fastlane_ and its related tools receive a lot of issues and PRs. In order to effectively work through them and give each the prompt attention it deserves, we need to keep a sharp focus on the work we have outstanding.
+
+One way we do this is by closing issues that we don't feel are immediately actionable. This might mean that we need more information in order to investigate. Or, it might mean that we haven't been able to reproduce it using the provided info. In this case we might close the issue while we wait for others to reproduce the problem and possibly provide some more info that unlocks the mystery.
+
+<a id="fastlane-bot"/>
+
+Another way we do this is by having an [automated bot](https://github.com/fastlane/issue-bot) go through our issues and PRs. The main goal of the bot is to ensure that the issues are still relevant and reproducible. Issues can be opened, and later fall idle for a variety of reasons:
+
+* The user later decided not to use _fastlane_
+* A workaround was found, making it a low priority for the user
+* The user changed projects and/or companies
+* A new version of _fastlane_ has been released that fixed the problem
+
+No matter the reason, the _fastlane_ bot will ask for confirmation that an issue is still relevant after two months of inactivity. If the ticket becomes active again, it will remain open. If another 10 days pass with no activity, however, the ticket will be automatically closed.
+
+In any case, **a closed issue is not necessarily the end of the story!** If more info becomes available after an issue is closed, it can be reopened for further consideration.
+
+One of the best ways we can keep _fastlane_ an approachable, stable, and dependable tool is to be deliberate about how we choose to modify it. If we don't adopt your changes or new feature into _fastlane,_ that doesn't mean it was bad work! It may be that the _fastlane_ philosophy about how to accomplish a particular task doesn't align well with your approach. The best way to make sure that your time is well spent in contributing to _fastlane_ is to **start your work** on a modification or new feature **by opening an issue to discuss the problem or shortcoming with the community**. The _fastlane_ maintainers will do our best to give early feedback about whether a particular goal and approach is likely to be something we want to adopt!
+
+## Code of Conduct
+
+Help us keep _fastlane_ open and inclusive. Please read and follow our [Code of Conduct][code of conduct].
+
+## Branding
+
+We have a few guidelines for how to refer to _fastlane_ and its tools:
+
+- _fastlane_ and its actions should be written in all lowercase, even at the beginning of a sentence:
+    - ❌ "Use Fastlane to automate your screenshots."
+    - ❌ "Use _Fastlane_ to automate your screenshots."
+    - ❌ "Fastlane helps you deliver faster."
+    - ❌ "Match makes code signing management easy."
+    - ✅ "Use _fastlane_ to automate your screenshots."
+    - ✅ "_fastlane_ helps you deliver faster."
+    - ✅ "_match_ makes code signing management easy."
+- _fastlane_ and all of its actions should be italicized when written in prose:
+    - ❌ "`fastlane` is an all-in-one tool for app automation."
+    - ❌ "**fastlane** is an all-in-one tool for app automation."
+    - ❌ "fastlane is an all-in-one tool for app automation."
+    - ❌ "<ins>fastlane</ins> is an all-in-one tool for app automation."
+    - ❌ "`match` makes code signing management easy."
+    - ✅ "_fastlane_ is an all-in-one tool for app automation."
+    - ✅ "_match_ makes code signing management easy."
+
+Please use these guidelines when writing about _fastlane_ and its tools, be it when contributing to the project or writing about it elsewhere.
+
+## Above All, Thanks for Your Contributions
+
+Thank you for reading to the end, and for taking the time to contribute to the project! If you include the 🔑 emoji at the top of the body of your issue or pull request, we'll know that you've given this your full attention and are doing your best to help!
+
+## License
+
+This project is licensed under the terms of the MIT license. See the [LICENSE][license] file.
+
+> This project and all _fastlane_ tools are in no way affiliated with Apple Inc. This project is open source under the MIT license, which means you have full access to the source code and can modify it to fit your own needs. All _fastlane_ tools run on your own computer or server, so your credentials or other sensitive information will never leave your own computer. You are responsible for how you use _fastlane_ tools.
+
+<!-- Links: -->
+[code of conduct]: CODE_OF_CONDUCT.md
+[core contributor]: Maintaining.md#core-contributors
+[license]: ../LICENSE
+[responding to prs]: Maintaining.md#responding-to-issues-and-prs
+[submit action]: https://docs.fastlane.tools/create-action/#submitting-the-action-to-the-fastlane-main-repo
+[you can do this]: https://github.com/fastlane/fastlane/issues?utf8=%E2%9C%93&q=is%3Aopen+is%3Aissue+label%3A%22complexity%3A+you+can+do+this%22+
+[fastlane repo]: https://github.com/fastlane/fastlane
+[pr template]: ../.github/PULL_REQUEST_TEMPLATE.md
+[bundler]: https://bundler.io
+[bundler help]: https://bundler.io/v1.12/#getting-started

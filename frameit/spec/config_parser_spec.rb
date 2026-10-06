@@ -22,6 +22,10 @@ describe Frameit do
       end
 
       it "let's the user access the stored data using both default and specific values" do
+        # A real directory, because the parser checks the font path exists. A
+        # literal "/tmp" is not one on Windows, where it resolves against the
+        # current drive and nothing in the suite creates it. See fastlane#30184.
+        font = Dir.tmpdir
         default = {
           title: {
             font: "/",
@@ -32,7 +36,7 @@ describe Frameit do
         specific = {
           filter: "filter",
           title: {
-            font: "/tmp"
+            font: font
           }
         }
 
@@ -47,7 +51,7 @@ describe Frameit do
 
         expect(config.fetch_value("filter")).to eq(JSON.parse({
           title: {
-            font: "/tmp",
+            font: font,
             color: "#7F8081"
           },
           background: "./frameit/spec/fixtures/background.jpg",

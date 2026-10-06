@@ -93,8 +93,12 @@ module Match
       def fetch_password!
         password = ENV["MATCH_PASSWORD"]
         unless password
-          item = Security::InternetPassword.find(server: server_name(self.keychain_name))
-          password = item.password if item
+          begin
+            item = Security::InternetPassword.find(server: server_name(self.keychain_name))
+            password = item.password if item
+          rescue Security::Error => ex
+            UI.important("Could not read the local keychain: #{ex.message}")
+          end
         end
 
         unless password

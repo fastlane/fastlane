@@ -40,7 +40,7 @@ module Trainer
       # Allows iteration over test suites. Used by TestParser to collect test results
       include Enumerable
       def each(&block)
-        test_suites.map(&:to_hash).each(&block)
+        test_suites.map { |suite| suite.to_hash(output_remove_retry_attempts: output_remove_retry_attempts) }.each(&block)
       end
 
       # Generates a JUnit-compatible XML representation of the test plan
@@ -49,8 +49,8 @@ module Trainer
         # Create the root testsuites element with calculated summary attributes
         testsuites = Helper.create_xml_element('testsuites',
           tests: test_suites.sum(&:test_cases_count).to_s,
-          failures: test_suites.sum(&:failures_count).to_s,
-          skipped: test_suites.sum(&:skipped_count).to_s,
+          failures: test_suites.sum { |suite| suite.failures_count(output_remove_retry_attempts: output_remove_retry_attempts) }.to_s,
+          skipped: test_suites.sum { |suite| suite.skipped_count(output_remove_retry_attempts: output_remove_retry_attempts) }.to_s,
           time: test_suites.sum(&:duration).to_s)
 
         # Create <properties> node for configuration and device, to be applied to each suite node

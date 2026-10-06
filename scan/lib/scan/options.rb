@@ -207,6 +207,13 @@ module Scan
                                      conflict_block: proc do |value|
                                        UI.user_error!("You can't use 'thread_sanitizer' and 'address_sanitizer' options in one run")
                                      end),
+        FastlaneCore::ConfigItem.new(key: :collect_test_diagnostics,
+                                     env_name: "SCAN_COLLECT_TEST_DIAGNOSTICS",
+                                     description: "Whether verbose and long-running diagnostics (like sysdiagnoses or log archives) are collected when testing. Valid values are: on-failure or never. If not specified, the value in the test plan is used. Equivalent to -collect-test-diagnostics (Xcode 14 and up)",
+                                     optional: true,
+                                     verify_block: proc do |value|
+                                       UI.user_error!("Invalid collect_test_diagnostics #{value}") unless ['on-failure', 'never'].include?(value)
+                                     end),
 
         # output
         FastlaneCore::ConfigItem.new(key: :open_report,
@@ -271,6 +278,11 @@ module Scan
         FastlaneCore::ConfigItem.new(key: :output_remove_retry_attempts,
                                      env_names: ["SCAN_OUTPUT_REMOVE_RETRY_ATTEMPS", "SCAN_OUTPUT_REMOVE_RETRY_ATTEMPTS"], # The version with typo must be deprecated
                                      description: "Remove retry attempts from test results table and the JUnit report (if not using xcpretty)",
+                                     type: Boolean,
+                                     default_value: false),
+        FastlaneCore::ConfigItem.new(key: :force_legacy_xcresulttool,
+                                     env_names: ["SCAN_FORCE_LEGACY_XCRESULTTOOL", "TRAINER_FORCE_LEGACY_XCRESULTTOOL"],
+                                     description: "Force the use of the '--legacy' flag for xcresulttool instead of using the new commands",
                                      type: Boolean,
                                      default_value: false),
 
@@ -520,6 +532,11 @@ module Scan
         FastlaneCore::ConfigItem.new(key: :skip_package_dependencies_resolution,
                                      env_name: "SCAN_SKIP_PACKAGE_DEPENDENCIES_RESOLUTION",
                                      description: "Skips resolution of Swift Package Manager dependencies",
+                                     type: Boolean,
+                                     default_value: false),
+        FastlaneCore::ConfigItem.new(key: :disallow_xcodebuild_settings_lookup,
+                                     env_name: "SCAN_DISALLOW_XCODEBUILD_SETTINGS_LOOKUP",
+                                     description: "Raises an error instead of fetching build settings by running `xcodebuild -showBuildSettings`, which can take a long time on large projects. The error names the required build setting, so the corresponding option can be specified manually",
                                      type: Boolean,
                                      default_value: false),
         FastlaneCore::ConfigItem.new(key: :disable_package_automatic_updates,
