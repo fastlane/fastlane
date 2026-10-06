@@ -50,4 +50,35 @@ describe Fastlane::SwiftLaneManager do
       described_class.ensure_runner_built!
     end
   end
+
+  describe '.warn_if_runner_outdated' do
+    let(:runner) { Tempfile.new('FastlaneRunner') }
+
+    before { allow(FastlaneCore::FastlaneFolder).to receive(:swift_runner_path).and_return(runner.path) }
+    after { runner.close! }
+
+    # A built runner: machine code around the marker main.swift compiles in
+    def build_runner(marker)
+      File.binwrite(runner.path, "\xCF\xFA\xED\xFE\x00#{marker}\x00\x90".b)
+    end
+
+    it 'warns about a runner from before the protocol version' do
+      build_runner('')
+      expect(FastlaneCore::UI).to receive(:important).with(/FastlaneRunner is outdated/)
+
+      described_class.warn_if_runner_outdated
+    end
+
+    it 'does not warn about a runner with the current protocol version' do
+      build_runner("FastlaneRunnerProtocolVersion [#{described_class::RUNNER_PROTOCOL_VERSION}]")
+      expect(FastlaneCore::UI).not_to receive(:important)
+
+      described_class.warn_if_runner_outdated
+    end
+
+    it 'reads the protocol version that main.swift compiles in' do
+      main = File.read(File.expand_path('../swift/main.swift', __dir__))
+      expect(main[described_class::RUNNER_PROTOCOL_VERSION_REGEX, 1].to_i).to be == described_class::RUNNER_PROTOCOL_VERSION
+    end
+  end
 end
