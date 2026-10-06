@@ -40,6 +40,7 @@ class MainProcess {
         thread.name = "worker thread"
         #if SWIFT_PACKAGE
             killExistingSocketServerProcesses(port: argumentProcessor.port)
+            abortIfPortIsInUse(argumentProcessor.port)
 
             rubySocketCommand = Process()
             rubySocketCommand.launchPath = "/usr/bin/env"
@@ -113,7 +114,7 @@ class MainProcess {
                     log(message: "fastlane socket_server exited with status \(serverProcess.terminationStatus) before listening. Check that the resolved fastlane installation works (e.g. `bundle exec fastlane --version`).")
                     exit(1)
                 }
-                if isPortListening(port) {
+                if isPortListening(port, by: serverProcess.processIdentifier) {
                     return
                 }
                 Thread.sleep(forTimeInterval: 0.2)
@@ -149,7 +150,55 @@ class MainProcess {
             pids.forEach { _ = outputOfProcess(arguments: ["/bin/kill", "-9", String($0)]) }
         }
 
-        private func isPortListening(_ port: UInt32) -> Bool {
+        // socket_server listens on whichever of 127.0.0.1 and ::1 is free, while the runner connects to `localhost`,
+        // so a process holding the port on either address would receive the runner's commands.
+        private func abortIfPortIsInUse(_ port: UInt32) {
+            guard isAddressInUse(family: AF_INET, port: port) || isAddressInUse(family: AF_INET6, port: port) else {
+                return
+            }
+            // lsof only lists this user's processes unless run as root
+            let holders = outputOfProcess(arguments: [lsofPath, "-nP", "-iTCP:\(port)", "-sTCP:LISTEN"])
+            let holder = holders.isEmpty ? " by a process of another user" : ":\n\(holders)"
+            log(message: "Port \(port) is already in use on localhost\(holder)\nStop it, or choose another port for the runner with `swiftServerPort`.")
+            exit(1)
+        }
+
+        // Binding fails with EADDRINUSE when another socket listens on that address and port, whoever owns it.
+        private func isAddressInUse(family: Int32, port: UInt32) -> Bool {
+            let socketDescriptor = socket(family, SOCK_STREAM, 0)
+            guard socketDescriptor >= 0 else {
+                return false
+            }
+            defer { close(socketDescriptor) }
+            // Ignore connections left in TIME_WAIT by an earlier run, as the Ruby server does
+            var reuse: Int32 = 1
+            setsockopt(socketDescriptor, SOL_SOCKET, SO_REUSEADDR, &reuse, socklen_t(MemoryLayout<Int32>.size))
+
+            let result: Int32
+            if family == AF_INET {
+                var address = sockaddr_in()
+                address.sin_len = UInt8(MemoryLayout<sockaddr_in>.size)
+                address.sin_family = sa_family_t(AF_INET)
+                address.sin_port = in_port_t(UInt16(port).bigEndian)
+                address.sin_addr.s_addr = inet_addr("127.0.0.1")
+                result = withUnsafePointer(to: &address) {
+                    $0.withMemoryRebound(to: sockaddr.self, capacity: 1) { bind(socketDescriptor, $0, socklen_t(MemoryLayout<sockaddr_in>.size)) }
+                }
+            } else {
+                var address = sockaddr_in6()
+                address.sin6_len = UInt8(MemoryLayout<sockaddr_in6>.size)
+                address.sin6_family = sa_family_t(AF_INET6)
+                address.sin6_port = in_port_t(UInt16(port).bigEndian)
+                address.sin6_addr = in6addr_loopback
+                result = withUnsafePointer(to: &address) {
+                    $0.withMemoryRebound(to: sockaddr.self, capacity: 1) { bind(socketDescriptor, $0, socklen_t(MemoryLayout<sockaddr_in6>.size)) }
+                }
+            }
+            return result != 0 && errno == EADDRINUSE
+        }
+
+        // Only the process we launched counts: another process listening on the port is not our server
+        private func isPortListening(_ port: UInt32, by processIdentifier: Int32) -> Bool {
             let result = runProcess(arguments: [lsofPath, "-t", "-nP", "-iTCP:\(port)", "-sTCP:LISTEN"])
             // `env` exits 127 when lsof can't be found. Without this guard the
             // probe would silently return false on every poll, then kill the
@@ -159,7 +208,7 @@ class MainProcess {
                 log(message: "Could not run lsof (\(lsofPath)) to check socket server readiness. lsof ships at /usr/sbin/lsof on macOS; ensure it is installed and reachable.")
                 exit(1)
             }
-            return !result.output.isEmpty
+            return result.output.split(separator: "\n").contains { $0 == Substring(String(processIdentifier)) }
         }
 
         // Prefer the absolute macOS path so port checks don't depend on PATH;
