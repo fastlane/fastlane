@@ -729,17 +729,11 @@ module Spaceship
       exit(has_valid_session)
     end
 
-    # <tmpdir>/spaceship_itc_service_key.txt
-    #
-    # Dir.tmpdir rather than a literal "/tmp", for the same reason as #logger,
-    # and here the failure was worse than a missing file: itc_service_key
-    # rescues everything, so the write failing on Windows was reported as an
-    # App Store Connect outage. See #30198.
-    #
-    # On macOS this is also per user, so a cache written by one user no longer
-    # blocks another.
+    # <fastlane_user_dir>/spaceship_itc_service_key.txt: per user, and kept between
+    # runs. Dir.tmpdir (#30197) is shared by every user on Linux, and a literal
+    # "/tmp" is not a directory on Windows.
     def itc_service_key_path
-      File.join(Dir.tmpdir, "spaceship_itc_service_key.txt")
+      File.join(fastlane_user_dir, "spaceship_itc_service_key.txt")
     end
 
     # Read on every login from GET /logout -> 302 Location: .../signout?widgetKey=<key>.
@@ -782,7 +776,7 @@ module Spaceship
     def cache_service_key(key)
       File.write(itc_service_key_path, key)
     rescue SystemCallError => ex
-      logger.warn("Could not cache the App Store Connect API key at #{itc_service_key_path}: #{ex.message}")
+      logger.warn("Could not cache the App Store Connect API key: #{ex.message}")
     end
 
     # The source Apple documented, removed in September 2026 and answering 404
