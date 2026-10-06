@@ -11,6 +11,9 @@
 import Foundation
 
 let argumentProcessor = ArgumentProcessor(args: CommandLine.arguments)
+/// fastlane reads this from the built runner, to tell whether it is outdated. Increase it when the runner changes how it talks to fastlane.
+let runnerProtocolVersion = "FastlaneRunnerProtocolVersion [1]"
+verbose(message: runnerProtocolVersion)
 let timeout = argumentProcessor.commandTimeout
 
 class MainProcess {
@@ -44,4 +47,4 @@ while !process.doneRunningLane, RunLoop.current.run(mode: RunLoopMode.defaultRun
 
 // Please don't remove the lines below
 // They are used to detect outdated files
-// FastlaneRunnerAPIVersion [0.9.2]
+// FastlaneRunnerAPIVersion [0.9.3]

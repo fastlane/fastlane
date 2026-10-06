@@ -3,6 +3,10 @@ require_relative 'swift_runner_upgrader.rb'
 
 module Fastlane
   class SwiftLaneManager < LaneManagerBase
+    # The runner protocol version this fastlane ships, see main.swift
+    RUNNER_PROTOCOL_VERSION = 1
+    RUNNER_PROTOCOL_VERSION_REGEX = /FastlaneRunnerProtocolVersion \[(\d+)\]/
+
     # @param lane_name The name of the lane to execute
     # @param parameters [Hash] The parameters passed from the command line to the lane
     def self.cruise_lane(lane, parameters = nil, disable_runner_upgrades: false, swift_server_port: nil)
@@ -26,6 +30,7 @@ module Fastlane
         end
 
         self.ensure_runner_built!
+        self.warn_if_runner_outdated
         swift_server_port ||= 2000
         socket_thread = self.start_socket_thread(port: swift_server_port)
         sleep(0.250) while socket_thread[:ready].nil?
@@ -227,6 +232,17 @@ module Fastlane
         server = Fastlane::SocketServer.new(command_executor: command_executor, port: port)
         server.start
       end
+    end
+
+    # The protocol version compiled into the built runner, 0 for runners from before it had one
+    def self.runner_protocol_version
+      File.binread(FastlaneCore::FastlaneFolder.swift_runner_path)[RUNNER_PROTOCOL_VERSION_REGEX, 1].to_i
+    end
+
+    def self.warn_if_runner_outdated
+      return if runner_protocol_version >= RUNNER_PROTOCOL_VERSION
+
+      UI.important("Your FastlaneRunner is outdated for this version of fastlane. Run a lane outside CI, without `disable_runner_upgrades`, to update it, then commit the changes.")
     end
 
     def self.ensure_runner_built!
