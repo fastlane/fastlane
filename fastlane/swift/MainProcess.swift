@@ -56,8 +56,8 @@ class MainProcess {
         // `eval $(path_helper)` + `which fastlane` lookup that broke under
         // rbenv / bundler / system-ruby mixes (#29238). First match wins:
         // 1. FASTLANE_SPM_BIN environment variable (explicit override)
-        // 2. bundler binstub ./bin/fastlane
-        // 3. Gemfile in the working directory -> bundle exec fastlane
+        // 2. bundler binstub bin/fastlane next to the Gemfile
+        // 3. Gemfile (BUNDLE_GEMFILE, or found from the working directory up, as Bundler does) -> bundle exec fastlane
         // 4. fastlane on PATH
         private func fastlaneLaunchArguments() -> [String] {
             if let bin = ProcessInfo.processInfo.environment["FASTLANE_SPM_BIN"] {
@@ -70,15 +70,35 @@ class MainProcess {
                     return arguments
                 }
             }
-            let workingDirectory = FileManager.default.currentDirectoryPath
-            let binstub = workingDirectory + "/bin/fastlane"
+            guard let bundleRoot = bundleRootDirectory() else {
+                return ["fastlane"]
+            }
+            let binstub = bundleRoot + "/bin/fastlane"
             if FileManager.default.isExecutableFile(atPath: binstub) {
                 return [binstub]
             }
-            if FileManager.default.fileExists(atPath: workingDirectory + "/Gemfile") {
-                return ["bundle", "exec", "fastlane"]
+            return ["bundle", "exec", "fastlane"]
+        }
+
+        // The directory of the Gemfile Bundler would use: BUNDLE_GEMFILE, else the
+        // nearest Gemfile or gems.rb from the working directory up.
+        private func bundleRootDirectory() -> String? {
+            let workingDirectory = FileManager.default.currentDirectoryPath
+            if let gemfile = ProcessInfo.processInfo.environment["BUNDLE_GEMFILE"], !gemfile.isEmpty {
+                let path = gemfile.hasPrefix("/") ? gemfile : workingDirectory + "/" + gemfile
+                return (path as NSString).deletingLastPathComponent
             }
-            return ["fastlane"]
+            var directory = workingDirectory
+            while true {
+                for name in ["Gemfile", "gems.rb"] where FileManager.default.fileExists(atPath: directory + "/" + name) {
+                    return directory
+                }
+                let parent = (directory as NSString).deletingLastPathComponent
+                if parent == directory || parent.isEmpty {
+                    return nil
+                }
+                directory = parent
+            }
         }
 
         // The ruby socket server performs a single `accept` (see
