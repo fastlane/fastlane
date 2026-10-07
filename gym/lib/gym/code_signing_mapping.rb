@@ -115,7 +115,10 @@ module Gym
 
       configuration = Gym.config[:configuration]
       configuration ||= extract_from_scheme.call if Gym.config[:scheme]
-      configuration ||= self.project.default_build_settings(key: "CONFIGURATION")
+      unless configuration
+        self.project.verify_xcodebuild_settings_lookup_allowed!("CONFIGURATION", option: "configuration")
+        configuration = self.project.default_build_settings(key: "CONFIGURATION")
+      end
       return configuration
     end
 
