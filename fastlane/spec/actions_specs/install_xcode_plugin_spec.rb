@@ -25,7 +25,7 @@ describe Fastlane do
         zip_path = nil
         expect(Fastlane::Action).to receive(:sh).with("curl", any_args) do |*args|
           zip_path = args[args.index("-o") + 1]
-          expect(File.stat(File.dirname(zip_path)).mode & 0o777).to eq(0o700)
+          expect(File.stat(File.dirname(zip_path)).mode & 0o777).to eq(0o700) unless FastlaneCore::Helper.windows? # NTFS has no POSIX mode bits
         end
         expect(Fastlane::Action).to receive(:sh).with("unzip", "-qo", satisfy { |path| path == zip_path }, "-d", kind_of(String))
 
