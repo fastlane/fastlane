@@ -89,9 +89,10 @@ describe Fastlane do
           FileUtils.mkdir_p(File.join(folder, "src"))
           source = File.join(folder, "src", "main.m")
           FileUtils.touch(source)
-          # xcodebuild's output, and so xcpretty's database, escapes spaces with a backslash
+          # xcodebuild's output, and so xcpretty's database, writes the space as "\ "
+          escaped_source = File.join(dir, "Kaldi\\ Kafe", "src", "main.m")
           database = File.join(dir, "compile_commands.json")
-          File.write(database, JSON.generate([{ "directory" => folder, "file" => source.gsub(" ", "\\ "), "command" => "clang -c main.m" }]))
+          File.write(database, JSON.generate([{ "directory" => folder, "file" => escaped_source, "command" => "clang -c main.m" }]))
 
           result = Fastlane::FastFile.new.parse("lane :test do
               oclint(compile_commands: #{database.inspect})
