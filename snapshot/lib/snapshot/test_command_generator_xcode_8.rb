@@ -50,6 +50,7 @@ module Snapshot
       end
 
       def xcodebuild_log_path(device_type: nil, language: nil, locale: nil)
+        # Without build settings there's no app name, so the log is named after the scheme alone
         name_components = [Snapshot.project.app_name_if_lookup_allowed, Snapshot.config[:scheme]].compact
 
         if Snapshot.config[:namespace_log_files]
