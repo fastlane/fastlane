@@ -41,7 +41,12 @@ module Scan
       devices = Scan.config[:devices] || Array(Scan.config[:device]) # important to use Array(nil) for when the value is nil
       if devices.count > 0
         detect_simulator(devices, '', '', '', nil)
+      elsif Scan.project && Scan.config[:destination] && Scan.project.xcodebuild_settings_lookup_disallowed_by
+        # The destination already says where to test, so don't read build settings to pick a default simulator
+        verify_simulator_options_without_devices
       elsif Scan.project
+        # Picking a default simulator reads the project's supported platforms
+        Scan.project.verify_xcodebuild_settings_lookup_allowed!("SUPPORTED_PLATFORMS", option: %w(device devices destination))
         if Scan.project.ios?
           # An iPhone 5s is a reasonably small and useful default for tests
           detect_simulator(devices, 'iOS', 'IPHONEOS_DEPLOYMENT_TARGET', 'iPhone 5s', nil)
@@ -61,6 +66,16 @@ module Scan
       coerce_to_array_of_strings(:skip_test_configurations)
 
       return config
+    end
+
+    # These options act on the simulators scan picks, and with only a destination
+    # (and no build settings to read) it has none
+    def self.verify_simulator_options_without_devices
+      options = [:reset_simulator, :reinstall_app, :prelaunch_simulator, :include_simulator_logs].select { |option| Scan.config[option] }
+      return if options.empty?
+
+      UI.user_error!("Set `device` or `devices` to use #{options.map { |option| "`#{option}`" }.join(', ')}: scan can't tell which simulators to use" \
+                     " from `destination` while fetching build settings is disallowed by #{Scan.project.xcodebuild_settings_lookup_disallowed_by}.")
     end
 
     def self.prevalidate
@@ -87,6 +102,7 @@ module Scan
       return unless Scan.project
 
       return unless Scan.config[:derived_data_path].to_s.empty?
+      Scan.project.verify_xcodebuild_settings_lookup_allowed!("BUILT_PRODUCTS_DIR", option: "derived_data_path")
       default_path = Scan.project.build_settings(key: "BUILT_PRODUCTS_DIR")
       # => /Users/.../Library/Developer/Xcode/DerivedData/app-bqrfaojicpsqnoglloisfftjhksc/Build/Products/Release-iphoneos
       # We got 3 folders up to point to ".../DerivedData/app-[random_chars]/"
@@ -295,6 +311,11 @@ module Scan
       end
 
       # building up the destination now
+      if Scan.config[:catalyst_platform] == "macos" && Scan.project
+        # Whether this is a Mac Catalyst build reads the project's build settings
+        Scan.project.verify_xcodebuild_settings_lookup_allowed!("SUPPORTS_MACCATALYST", option: "destination")
+      end
+
       if Scan.building_mac_catalyst_for_mac?
         Scan.config[:destination] = ["platform=macOS,variant=Mac Catalyst"]
       elsif Scan.devices && Scan.devices.count > 0
@@ -314,7 +335,8 @@ module Scan
     # get deployment target version
     def self.get_deployment_target_version(deployment_target_key)
       version = Scan.config[:deployment_target_version]
-      version ||= Scan.project.build_settings(key: deployment_target_key) if Scan.project
+      # With `device`/`devices` there is no deployment target to read: the key is empty
+      version ||= Scan.project.build_settings(key: deployment_target_key) if Scan.project && !deployment_target_key.to_s.empty?
       version ||= 0
       return version
     end
