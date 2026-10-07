@@ -56,6 +56,15 @@ describe Scan do
       expect(Scan.devices).to be_nil
     end
 
+    it "doesn't keep the simulators an earlier run picked when only `destination` is given" do
+      configure(options.merge(device: "iPhone 15"))
+      expect(Scan.devices).to eq([simulator])
+
+      configure(options.merge(destination: "platform=iOS Simulator,id=00000000-0000-0000-0000-0000000000BB"))
+
+      expect(Scan.devices).to be_nil
+    end
+
     it "tests on `device` alone without reading build settings" do
       configure(options.merge(device: "iPhone 15"))
 
