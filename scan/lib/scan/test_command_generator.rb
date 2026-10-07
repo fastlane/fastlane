@@ -130,7 +130,7 @@ module Scan
     end
 
     def pipe
-      pipe = ["| tee '#{xcodebuild_log_path}'"]
+      pipe = ["| tee #{xcodebuild_log_path.shellescape}"]
 
       # disable_xcpretty is now deprecated and directs to use output_style of raw
       if Scan.config[:disable_xcpretty] || Scan.config[:output_style] == 'raw'

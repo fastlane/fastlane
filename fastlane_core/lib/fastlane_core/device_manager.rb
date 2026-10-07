@@ -243,7 +243,7 @@ module FastlaneCore
         plist_buddy_cmd = "-c \"Add :KeyboardContinuousPathEnabled bool false\""
         plist_path = File.expand_path("~/Library/Developer/CoreSimulator/Devices/#{self.udid}/data/Library/Preferences/com.apple.keyboard.ContinuousPath.plist")
 
-        Helper.backticks("#{plist_buddy} #{plist_buddy_cmd} #{plist_path} >/dev/null 2>&1")
+        Helper.backticks("#{plist_buddy} #{plist_buddy_cmd} #{plist_path.shellescape} >/dev/null 2>&1")
       end
     end
   end
@@ -300,7 +300,7 @@ module FastlaneCore
 
         UI.verbose("Launching #{simulator_path} for device: #{device.name} (#{device.udid})")
 
-        Helper.backticks("open -a #{simulator_path} --args -CurrentDeviceUDID #{device.udid}", print: FastlaneCore::Globals.verbose?)
+        Helper.backticks("open -a #{simulator_path.shellescape} --args -CurrentDeviceUDID #{device.udid}", print: FastlaneCore::Globals.verbose?)
       end
 
       def copy_logs(device, log_identity, logs_destination_dir, log_collection_start_time)

@@ -1063,7 +1063,16 @@ describe Scan do
 
         pipe = @test_command_generator.pipe
 
-        expect(pipe).to eq(["| tee '#{log_path}'"])
+        expect(pipe).to eq(["| tee #{log_path}"])
+      end
+
+      it "gives tee a log path containing an apostrophe and a space as one argument", requires_xcodebuild: true do
+        path = "/tmp/build logs/Kaldi's Kafe-Kaldi's Kafe.log"
+        allow(@test_command_generator).to receive(:xcodebuild_log_path).and_return(path)
+        options = { project: "./scan/examples/standard/app.xcodeproj", disable_xcpretty: true }
+        Scan.config = FastlaneCore::Configuration.create(Scan::Options.available_options, options)
+
+        expect(Shellwords.split(@test_command_generator.pipe.first)).to eq(["|", "tee", path])
       end
 
       it "uses no pipe with output_type of raw", requires_xcodebuild: true do
@@ -1072,7 +1081,7 @@ describe Scan do
 
         pipe = @test_command_generator.pipe
 
-        expect(pipe).to eq(["| tee '#{log_path}'"])
+        expect(pipe).to eq(["| tee #{log_path}"])
       end
 
       describe "with xcodebuild_formatter" do
@@ -1096,7 +1105,7 @@ describe Scan do
 
             pipe = @test_command_generator.pipe
 
-            expect(pipe).to eq(["| tee '#{log_path}'", "| xcbeautify"])
+            expect(pipe).to eq(["| tee #{log_path}", "| xcbeautify"])
           end
 
           it "xcpretty override when xcbeautify installed", requires_xcodebuild: true do
@@ -1118,7 +1127,7 @@ describe Scan do
 
             pipe = @test_command_generator.pipe
 
-            expect(pipe).to eq(["| tee '#{log_path}'", "| /path/to/another/xcbeautify"])
+            expect(pipe).to eq(["| tee #{log_path}", "| /path/to/another/xcbeautify"])
           end
         end
 
