@@ -530,6 +530,8 @@ the developer website<a/>.<br />"
 
   describe 'merchant api' do
     let(:api_root) { 'https://developer.apple.com/services-account/QH65B2/account/ios/identifiers/' }
+    let(:json_headers) { { 'Content-Type' => 'application/json', 'csrf' => 'merchant_token', 'csrf_ts' => '123123' } }
+    let(:merchant) { { 'omcId' => 'LM3IY56BXC', 'name' => 'ExampleApp Production', 'identifier' => 'merchant.com.example.app.production' } }
     before do
       MockAPI::DeveloperPortalServer.post('/services-account/QH65B2/account/ios/identifiers/:action') do
         {
@@ -537,12 +539,30 @@ the developer website<a/>.<br />"
           omcId: []
         }
       end
+
+      stub_request(:post, %r{https://developer.apple.com/services-account/QH65B2/account/mac/identifiers/(listOMCs|addOMC|deleteOMC)\.action}).
+        to_return(status: 404, body: { resultCode: 1003, resultString: 'Not Found', userString: 'Not Found', httpCode: 404 }.to_json, headers: json_headers)
     end
 
     describe '#merchants' do
       it 'lists merchants' do
         subject.merchants
         expect(WebMock).to have_requested(:post, api_root + 'listOMCs.action')
+      end
+
+      [false, true].each do |mac|
+        it "lists and paginates merchants through the iOS endpoint with mac: #{mac}" do
+          allow(subject).to receive(:page_size).and_return(1)
+          stub_request(:post, api_root + 'listOMCs.action').
+            with(body: { teamId: 'XXXXXXXXXX', pageNumber: '1', pageSize: '1', sort: 'name=asc' }).
+            to_return(status: 200, body: { identifierList: [merchant] }.to_json, headers: json_headers)
+          stub_request(:post, api_root + 'listOMCs.action').
+            with(body: { teamId: 'XXXXXXXXXX', pageNumber: '2', pageSize: '1', sort: 'name=asc' }).
+            to_return(status: 200, body: { identifierList: [] }.to_json, headers: json_headers)
+
+          expect(subject.merchants(mac: mac)).to eq([merchant])
+          expect(WebMock).to have_requested(:post, api_root + 'listOMCs.action').twice
+        end
       end
     end
 
@@ -551,12 +571,38 @@ the developer website<a/>.<br />"
         subject.create_merchant!('ExampleApp Production', 'merchant.com.example.app.production')
         expect(WebMock).to have_requested(:post, api_root + 'addOMC.action').with(body: { name: 'ExampleApp Production', identifier: 'merchant.com.example.app.production', teamId: 'XXXXXXXXXX' })
       end
+
+      [false, true].each do |mac|
+        it "creates a merchant through the iOS endpoint with mac: #{mac}" do
+          stub_request(:post, api_root + 'listOMCs.action').
+            to_return(status: 200, body: { identifierList: [] }.to_json, headers: json_headers)
+          stub_request(:post, api_root + 'addOMC.action').
+            with(body: { name: merchant['name'], identifier: merchant['identifier'], teamId: 'XXXXXXXXXX' }, headers: { 'csrf' => 'merchant_token' }).
+            to_return(status: 200, body: { omcId: merchant }.to_json, headers: json_headers)
+
+          expect(subject.create_merchant!(merchant['name'], merchant['identifier'], mac: mac)).to eq(merchant)
+          expect(WebMock).to have_requested(:post, api_root + 'addOMC.action')
+        end
+      end
     end
 
     describe '#delete_merchant!' do
       it 'deletes a merchant' do
         subject.delete_merchant!('LM3IY56BXC')
         expect(WebMock).to have_requested(:post, api_root + 'deleteOMC.action').with(body: { omcId: 'LM3IY56BXC', teamId: 'XXXXXXXXXX' })
+      end
+
+      [false, true].each do |mac|
+        it "deletes a merchant through the iOS endpoint with mac: #{mac}" do
+          stub_request(:post, api_root + 'listOMCs.action').
+            to_return(status: 200, body: { identifierList: [] }.to_json, headers: json_headers)
+          stub_request(:post, api_root + 'deleteOMC.action').
+            with(body: { omcId: merchant['omcId'], teamId: 'XXXXXXXXXX' }, headers: { 'csrf' => 'merchant_token' }).
+            to_return(status: 200, body: { resultCode: 0 }.to_json, headers: json_headers)
+
+          expect(subject.delete_merchant!(merchant['omcId'], mac: mac)).to eq('resultCode' => 0)
+          expect(WebMock).to have_requested(:post, api_root + 'deleteOMC.action')
+        end
       end
     end
   end
