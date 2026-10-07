@@ -321,6 +321,23 @@ else
     error "Error: Only can resign .app files and .ipa files."
 fi
 
+# Stop if a symbolic link resolves outside the temporary directory: later steps write through such links.
+# Resolved with the cd -P and pwd -P builtins, as realpath and readlink -f are missing on older macOS.
+TEMP_DIR_PHYSICAL="$(cd -P "$TEMP_DIR" && pwd -P)"
+checkStatus
+while IFS= read -d '' -r link; do
+    target="$(readlink "$link")"
+    [[ "$target" == /* ]] || target="$(dirname "$link")/$target"
+    if [ -d "$target" ]; then
+        resolved="$(cd -P "$target" 2>/dev/null && pwd -P)"
+    else
+        resolved="$(cd -P "$(dirname "$target")" 2>/dev/null && pwd -P)/$(basename "$target")"
+    fi
+    if [[ "$resolved" != "$TEMP_DIR_PHYSICAL" && "$resolved" != "$TEMP_DIR_PHYSICAL"/* ]]; then
+        error "Error: '${link#"$TEMP_DIR"/}' is a symbolic link to '$(readlink "$link")', outside of '$ORIGINAL_FILE'. Remove it before resigning."
+    fi
+done < <(find "$TEMP_DIR" -type l -print0)
+
 # check the keychain
 if [ "${KEYCHAIN}" != "" ]; then
     security list-keychains -s "$KEYCHAIN"
