@@ -50,7 +50,7 @@ module Snapshot
       end
 
       def xcodebuild_log_path(device_type: nil, language: nil, locale: nil)
-        name_components = [Snapshot.app_name_for_logs, Snapshot.config[:scheme]].compact
+        name_components = [Snapshot.project.app_name_if_lookup_allowed, Snapshot.config[:scheme]].compact
 
         if Snapshot.config[:namespace_log_files]
           name_components << device_type if device_type

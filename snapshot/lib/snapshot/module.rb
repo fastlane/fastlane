@@ -22,12 +22,6 @@ module Snapshot
       "Snapfile"
     end
 
-    # The project's app name to start log file names with. It comes from the build settings,
-    # so when those can't be read this is nil and the logs are named after the scheme
-    def app_name_for_logs
-      project.app_name unless project.xcodebuild_settings_lookup_disallowed_by
-    end
-
     def kill_simulator
       `killall 'iOS Simulator' &> /dev/null`
       `killall Simulator &> /dev/null`

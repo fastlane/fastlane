@@ -88,7 +88,7 @@ describe Scan do
     it "names `device`, `devices` and `destination` when none is set" do
       expect do
         configure(options)
-      end.to raise_error(FastlaneCore::Interface::FastlaneError, /To fix this, set the `device`, `devices` or `destination` option/)
+      end.to raise_error(FastlaneCore::Interface::FastlaneError, /To fix this, set one of the `device`, `devices` or `destination` options/)
     end
 
     [:reset_simulator, :reinstall_app, :prelaunch_simulator, :include_simulator_logs].each do |simulator_option|
@@ -123,32 +123,37 @@ describe Scan do
   end
 
   describe "names derived from the app name" do
-    let(:project) { instance_double(FastlaneCore::Project) }
+    # A project whose app name is `app_name`, which is nil when build settings can't be read
+    def project_named(app_name)
+      instance_double(FastlaneCore::Project, app_name_if_lookup_allowed: app_name)
+    end
 
-    def stub_config(options, disallowed_by:)
+    # A nil project is a Swift package
+    def stub_config(options, project)
       allow(Scan).to receive(:config).and_return(FastlaneCore::Configuration.create(Scan::Options.available_options, options.merge(scheme: "app", buildlog_path: Dir.mktmpdir)))
       allow(Scan).to receive(:project).and_return(project)
-      allow(project).to receive(:xcodebuild_settings_lookup_disallowed_by).and_return(disallowed_by)
     end
 
     describe "the build log" do
-      def log_name(options, disallowed_by:)
-        stub_config(options, disallowed_by: disallowed_by)
+      def log_name(options, project)
+        stub_config(options, project)
         File.basename(Scan::TestCommandGenerator.new.xcodebuild_log_path)
       end
 
       it "is named after `app_name` when it's set" do
-        expect(log_name({ app_name: "CustomApp" }, disallowed_by: "the option")).to eq("CustomApp-app.log")
+        expect(log_name({ app_name: "CustomApp" }, project_named(nil))).to eq("CustomApp-app.log")
       end
 
       it "is named after the scheme alone when build settings can't be read" do
-        expect(log_name({}, disallowed_by: "the option")).to eq("app.log")
+        expect(log_name({}, project_named(nil))).to eq("app.log")
+      end
+
+      it "is named after the scheme alone for a Swift package" do
+        expect(log_name({}, nil)).to eq("app.log")
       end
 
       it "is named after the project's app name otherwise" do
-        allow(project).to receive(:app_name).and_return("ExampleApp")
-
-        expect(log_name({}, disallowed_by: nil)).to eq("ExampleApp-app.log")
+        expect(log_name({}, project_named("ExampleApp"))).to eq("ExampleApp-app.log")
       end
     end
 
@@ -157,8 +162,8 @@ describe Scan do
         allow_any_instance_of(Fastlane::Actions::SlackAction::Runner).to receive(:post_message).with(any_args)
       end
 
-      def slack_message(options, disallowed_by:)
-        stub_config(options.merge(slack_url: "https://slack/hook/url"), disallowed_by: disallowed_by)
+      def slack_message(options, project)
+        stub_config(options.merge(slack_url: "https://slack/hook/url"), project)
         message = nil
         allow(Fastlane::Actions::SlackAction).to receive(:run) { |slack_options| message = slack_options[:message] }
         Scan::SlackPoster.new.run({ tests: 1, failures: 0 })
@@ -166,17 +171,19 @@ describe Scan do
       end
 
       it "names `app_name` when it's set" do
-        expect(slack_message({ app_name: "CustomApp" }, disallowed_by: "the option")).to start_with("CustomApp Tests:")
+        expect(slack_message({ app_name: "CustomApp" }, project_named(nil))).to start_with("CustomApp Tests:")
       end
 
       it "names the scheme when build settings can't be read" do
-        expect(slack_message({}, disallowed_by: "the option")).to start_with("app Tests:")
+        expect(slack_message({}, project_named(nil))).to start_with("app Tests:")
+      end
+
+      it "names the scheme for a Swift package" do
+        expect(slack_message({}, nil)).to start_with("app Tests:")
       end
 
       it "names the project's app name otherwise" do
-        allow(project).to receive(:app_name).and_return("ExampleApp")
-
-        expect(slack_message({}, disallowed_by: nil)).to start_with("ExampleApp Tests:")
+        expect(slack_message({}, project_named("ExampleApp"))).to start_with("ExampleApp Tests:")
       end
     end
   end
