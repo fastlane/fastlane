@@ -34,6 +34,8 @@ module Gym
     end
 
     def building_for_ios?
+      return true if building_for_non_mac_destination?
+
       if Gym.project.mac?
         # Can be building for iOS if mac project and catalyst or multiplatform and set to iOS
         return building_mac_catalyst_for_ios? || building_multiplatform_for_ios?
@@ -47,6 +49,8 @@ module Gym
     end
 
     def building_for_mac?
+      return false if building_for_non_mac_destination?
+
       if Gym.project.supports_mac_catalyst?
         # Can be a mac project and not build mac if catalyst
         return building_mac_catalyst_for_mac?
@@ -55,30 +59,48 @@ module Gym
       end
     end
 
+    # Whether the configuration already rules out a macOS build: the destination names
+    # an iOS, tvOS, watchOS or visionOS platform, and neither `sdk` nor `catalyst_platform`
+    # asks for macOS. The platform checks answer from this before reading the project's
+    # build settings, which may be disallowed. Anything else, including a destination
+    # without a platform, falls through to them
+    def building_for_non_mac_destination?
+      return false if Gym.config[:sdk].to_s.start_with?("macosx") || Gym.config[:catalyst_platform] == "macos"
+
+      destination_platform.match?(/\A(iOS|tvOS|watchOS|visionOS|xrOS)( Simulator)?\z/i)
+    end
+
+    # The platform named by `destination`, e.g. "iOS" for "generic/platform=iOS"
+    def destination_platform
+      Gym.config[:destination].to_s[/platform=([^,]+)/, 1].to_s.strip
+    end
+
     def building_mac_catalyst_for_ios?
-      return false unless Gym.project.supports_mac_catalyst?
-
       # If catalyst_platform is explicitly set, use it
-      if Gym.config[:catalyst_platform]
-        return Gym.config[:catalyst_platform] == "ios"
-      end
-
       # If catalyst_platform is not set, use SDK to determine
       # Mac Catalyst apps with iOS SDK build for iOS (IPA), not macOS
-      return Gym.config[:sdk] == "iphoneos" || Gym.config[:sdk] == "iphonesimulator"
+      for_ios = if Gym.config[:catalyst_platform]
+                  Gym.config[:catalyst_platform] == "ios"
+                else
+                  Gym.config[:sdk] == "iphoneos" || Gym.config[:sdk] == "iphonesimulator"
+                end
+
+      # Only read the project's build settings when they can change the answer
+      for_ios && Gym.project.supports_mac_catalyst?
     end
 
     def building_mac_catalyst_for_mac?
-      return false unless Gym.project.supports_mac_catalyst?
-
       # If catalyst_platform is explicitly set, use it
-      if Gym.config[:catalyst_platform]
-        return Gym.config[:catalyst_platform] == "macos"
-      end
-
       # If catalyst_platform is not set, use SDK to determine
       # Mac Catalyst apps with SDK macosx build for Mac (PKG), otherwise for iOS (IPA)
-      return Gym.config[:sdk] == "macosx"
+      for_mac = if Gym.config[:catalyst_platform]
+                  Gym.config[:catalyst_platform] == "macos"
+                else
+                  Gym.config[:sdk] == "macosx"
+                end
+
+      # Only read the project's build settings when they can change the answer
+      for_mac && Gym.project.supports_mac_catalyst?
     end
 
     def building_multiplatform_for_ios?
