@@ -30,7 +30,7 @@ module Gym
 
       detect_scheme
       detect_platform # we can only do that *after* we have the scheme
-      verify_platform_without_build_settings
+      verify_platform_without_build_settings # before the profile detection, which reads build settings but only logs its errors
       detect_selected_provisioning_profiles # we can only do that *after* we have the platform
       detect_configuration
       detect_toolchain
