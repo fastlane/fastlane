@@ -64,7 +64,7 @@ describe Fastlane do
           ensure_no_debug_code(text: 'pry', path: '.', exclude: '*.md')
         end").runner.execute(:test)
 
-        expect(result).to end_with(' --exclude \*.md')
+        expect(result).to end_with(" --exclude #{'*.md'.shellescape}")
       end
 
       it "handles the exclude_dirs parameter with no elements correctly" do
