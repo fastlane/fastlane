@@ -200,8 +200,14 @@ module Gym
           export_method: Gym.config[:export_method]
         }
 
-        sdk_path = Gym.project.build_settings(key: "SDKROOT")
-        values[:sdk] = File.basename(sdk_path) if sdk_path.to_s.length > 0
+        # This runs while a failure is being reported, so not being able to read the SDK (the
+        # lookup is disallowed, or times out) must not replace that failure with its own error
+        begin
+          sdk_path = Gym.project.build_settings(key: "SDKROOT")
+          values[:sdk] = File.basename(sdk_path) if sdk_path.to_s.length > 0
+        rescue => ex
+          UI.verbose("Couldn't read the SDK to show it: #{ex}")
+        end
 
         FastlaneCore::PrintTable.print_values(config: values,
                                            hide_keys: [],
