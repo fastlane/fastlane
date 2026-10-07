@@ -190,7 +190,7 @@ describe "fastlane's own RuboCop cops" do
           sh("ls #{a}")
                  ^^^^ Fastlane/UnescapedShellInterpolation: Escape `a` (`.shellescape`), or pass the command as separate arguments.
           b = path.shellescape
-          b += "x"
+          b += " #{path}"
           sh("ls #{b}")
                  ^^^^ Fastlane/UnescapedShellInterpolation: Escape `b` (`.shellescape`), or pass the command as separate arguments.
         end
@@ -206,6 +206,16 @@ describe "fastlane's own RuboCop cops" do
       RUBY
     end
 
+    it "flags a variable assigned from a list" do
+      expect_offense(<<~'RUBY')
+        def run(size)
+          width, height = size
+          sh("convert -resize #{width}")
+                              ^^^^^^^^ Fastlane/UnescapedShellInterpolation: Escape `width` (`.shellescape`), or pass the command as separate arguments.
+        end
+      RUBY
+    end
+
     it "checks a command built in a variable where it is built" do
       expect_offense(<<~'RUBY')
         def run(path)
@@ -213,6 +223,110 @@ describe "fastlane's own RuboCop cops" do
                                      ^^^^^^^ Fastlane/UnescapedShellInterpolation: Escape `path` (`.shellescape`), or pass the command as separate arguments.
           sh(command)
         end
+      RUBY
+    end
+
+    it "accepts a variable holding a string whose own values are escaped" do
+      expect_offense(<<~'RUBY')
+        def run(tag, path, deps)
+          tag_ref = "refs/tags/#{tag.shellescape}"
+          checkout_path = cached ? "" : "#{path.shellescape} #{deps.map(&:shellescape).join(' ')}"
+          sh("git checkout #{tag_ref} #{checkout_path}")
+          ref = "refs/tags/#{tag}"
+          sh("git checkout #{ref}")
+                           ^^^^^^ Fastlane/UnescapedShellInterpolation: Escape `ref` (`.shellescape`), or pass the command as separate arguments.
+        end
+      RUBY
+    end
+
+    it "accepts a list of literal or escaped values joined" do
+      expect_no_offenses(<<~'RUBY')
+        def run(dir)
+          prefix = ['cd', dir.shellescape, '&&'].join(' ')
+          sh("#{prefix} agvtool what-version")
+          sh("ls #{['-l', dir.shellescape].join(' ')}")
+        end
+      RUBY
+    end
+
+    it "accepts literal text added with += or <<" do
+      expect_no_offenses(<<~'RUBY')
+        def run
+          formatter = "--format progress"
+          formatter += " --format json" if ci
+          formatter << " --color"
+          sh("rspec #{formatter}")
+        end
+      RUBY
+    end
+
+    it "follows a variable run with backticks to where the command is built" do
+      expect_offense(<<~'RUBY')
+        def run(path, cmd)
+          escaped = "ls #{path.shellescape}"
+          `#{escaped}`
+          command = "ls #{path}"
+                        ^^^^^^^ Fastlane/UnescapedShellInterpolation: Escape `path` (`.shellescape`), or pass the command as separate arguments.
+          `#{command}`
+          `#{cmd}`
+           ^^^^^^ Fastlane/UnescapedShellInterpolation: Escape `cmd` (`.shellescape`), or pass the command as separate arguments.
+        end
+      RUBY
+    end
+
+    it "checks text appended to a command with <<" do
+      expect_offense(<<~'RUBY')
+        def run(path, dir)
+          command = "grep -R TODO #{path.shellescape}"
+          command << " --exclude-dir #{dir}"
+                                     ^^^^^^ Fastlane/UnescapedShellInterpolation: Escape `dir` (`.shellescape`), or pass the command as separate arguments.
+          sh(command)
+        end
+      RUBY
+    end
+
+    it "checks each element of a joined list" do
+      expect_offense(<<~'RUBY')
+        def run(path, args)
+          command = ['codesign', '-f', path, "--entitlements #{args}"].join(' ')
+                                       ^^^^ Fastlane/UnescapedShellInterpolation: Escape `path` (`.shellescape`), or pass the command as separate arguments.
+                                                             ^^^^^^^ Fastlane/UnescapedShellInterpolation: Escape `args` (`.shellescape`), or pass the command as separate arguments.
+          sh(command)
+          sh(['cd', path, '&&', 'make'].join(' '))
+                    ^^^^ Fastlane/UnescapedShellInterpolation: Escape `path` (`.shellescape`), or run it without a shell: for `&&`/`;`, one call per command (`chdir:` replaces `cd … &&`).
+          list = ['ls']
+          list << path
+                  ^^^^ Fastlane/UnescapedShellInterpolation: Escape `path` (`.shellescape`), or pass the command as separate arguments.
+          sh(list.join(' '))
+          sh(args.join(' '))
+             ^^^^^^^^^^^^^^ Fastlane/UnescapedShellInterpolation: Escape `args.join(' ')` (`.shellescape`), or pass the command as separate arguments.
+          sh(['ls', path.shellescape].join(' '))
+        end
+      RUBY
+    end
+
+    it "reads a list through compact, and each value a choice in it can take" do
+      expect_offense(<<~'RUBY')
+        def run(serial, path, task)
+          device = serial ? "SERIAL=#{serial.shellescape}" : nil
+          sh([device, path.shellescape, full ? "--all" : task].compact.join(' '))
+                                                         ^^^^ Fastlane/UnescapedShellInterpolation: Escape `task` (`.shellescape`), or pass the command as separate arguments.
+          sh("ls #{[device, path.shellescape].compact.join(' ')}")
+          command = ['git', 'add', device].compact
+          sh(command.join(' '))
+        end
+      RUBY
+    end
+
+    it "checks CommandExecutor.execute, sh_control_output and sh_no_action" do
+      expect_offense(<<~'RUBY')
+        FastlaneCore::CommandExecutor.execute(command: "ls #{path}", print_all: true)
+                                                           ^^^^^^^ Fastlane/UnescapedShellInterpolation: Escape `path` (`.shellescape`), or pass the command as separate arguments.
+        sh_control_output("ls #{path}")
+                              ^^^^^^^ Fastlane/UnescapedShellInterpolation: Escape `path` (`.shellescape`), or pass the command as separate arguments.
+        Actions.sh_no_action("ls #{path}")
+                                 ^^^^^^^ Fastlane/UnescapedShellInterpolation: Escape `path` (`.shellescape`), or pass the command as separate arguments.
+        launcher.execute(command: "ls #{path}")
       RUBY
     end
   end
