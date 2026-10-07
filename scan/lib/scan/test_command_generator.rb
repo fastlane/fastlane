@@ -44,9 +44,9 @@ module Scan
 
       options = []
       options += project_path_array unless config[:xctestrun]
-      options << "-sdk '#{config[:sdk]}'" if config[:sdk]
+      options << "-sdk #{config[:sdk].shellescape}" if config[:sdk]
       options << destination if destination # generated in `detect_values`
-      options << "-toolchain '#{config[:toolchain]}'" if config[:toolchain]
+      options << "-toolchain #{config[:toolchain].to_s.shellescape}" if config[:toolchain]
       if config[:derived_data_path] && !options.include?("-derivedDataPath #{config[:derived_data_path].shellescape}")
         options << "-derivedDataPath #{config[:derived_data_path].shellescape}"
       end
@@ -80,14 +80,14 @@ module Scan
           options << "-packageCachePath #{config[:package_cache_path].shellescape}"
         end
 
-        options << "-testPlan '#{config[:testplan]}'" if config[:testplan]
+        options << "-testPlan #{config[:testplan].shellescape}" if config[:testplan]
 
         # detect_values will ensure that these values are present as Arrays if
         # they are present at all
-        options += config[:only_test_configurations].map { |name| "-only-test-configuration '#{name}'" } if config[:only_test_configurations]
-        options += config[:skip_test_configurations].map { |name| "-skip-test-configuration '#{name}'" } if config[:skip_test_configurations]
+        options += config[:only_test_configurations].map { |name| "-only-test-configuration #{name.shellescape}" } if config[:only_test_configurations]
+        options += config[:skip_test_configurations].map { |name| "-skip-test-configuration #{name.shellescape}" } if config[:skip_test_configurations]
       end
-      options << "-xctestrun '#{config[:xctestrun]}'" if config[:xctestrun]
+      options << "-xctestrun #{config[:xctestrun].shellescape}" if config[:xctestrun]
       options << config[:xcargs] if config[:xcargs]
 
       # Number of retries does not equal xcodebuild's -test-iterations number
@@ -185,7 +185,7 @@ module Scan
       formatter = []
       if (custom_formatter = Scan.config[:xcpretty_formatter] || Scan.config[:formatter])
         if custom_formatter.end_with?(".rb")
-          formatter << "-f '#{custom_formatter}'"
+          formatter << "-f #{custom_formatter.shellescape}"
         else
           formatter << "-f `#{custom_formatter}`"
         end
@@ -237,7 +237,7 @@ module Scan
     # Generate destination parameters
     def destination
       unless Scan.cache[:destination]
-        Scan.cache[:destination] = [*Scan.config[:destination]].map { |dst| "-destination '#{dst}'" }.join(' ')
+        Scan.cache[:destination] = [*Scan.config[:destination]].map { |dst| "-destination #{dst.shellescape}" }.join(' ')
       end
       Scan.cache[:destination]
     end
