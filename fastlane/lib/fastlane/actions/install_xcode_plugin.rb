@@ -25,11 +25,14 @@ module Fastlane
           end
         end
 
-        zip_path = File.join(Dir.tmpdir, 'plugin.zip')
-        Action.sh("curl", "-L", "-s", "-o", zip_path, params[:url])
-        plugins_path = "#{ENV['HOME']}/Library/Application Support/Developer/Shared/Xcode/Plug-ins"
-        FileUtils.mkdir_p(plugins_path)
-        Action.sh("unzip", "-qo", zip_path, "-d", plugins_path)
+        Dir.mktmpdir do |dir|
+          zip_path = File.join(dir, 'plugin.zip')
+          # -f fails on an HTTP error instead of saving the error page; --proto also applies to redirects
+          Action.sh("curl", "-f", "-L", "-s", "--proto", "=https", "-o", zip_path, params[:url])
+          plugins_path = "#{ENV['HOME']}/Library/Application Support/Developer/Shared/Xcode/Plug-ins"
+          FileUtils.mkdir_p(plugins_path)
+          Action.sh("unzip", "-qo", zip_path, "-d", plugins_path)
+        end
 
         UI.success("Plugin #{File.basename(params[:url], '.zip')} installed successfully")
         UI.message("Please restart Xcode to use the newly installed plugin")
@@ -85,7 +88,14 @@ module Fastlane
       end
 
       def self.category
-        :misc
+        :deprecated
+      end
+
+      def self.deprecated_notes
+        [
+          "Since Xcode 8, which added runtime library validation and source editor extensions ([New Features in Xcode 8](https://developer.apple.com/library/archive/documentation/DeveloperTools/Conceptual/WhatsNewXcode/Chapters/xcode_8_0.html)), Xcode only loads plugins once you re-sign it yourself, and Xcode 14 removed its plugin system.",
+          "A source editor extension ships inside a macOS app: install the app, then enable the extension in the Extensions section of System Settings."
+        ].join("\n")
       end
     end
   end
