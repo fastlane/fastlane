@@ -487,6 +487,12 @@ module FastlaneCore
       nil
     end
 
+    # The app name from the build settings, or nil when fetching them is disallowed.
+    # For names that have something else to fall back on, such as a log file's
+    def app_name_if_lookup_allowed
+      app_name unless xcodebuild_settings_lookup_disallowed_by
+    end
+
     # Fails with the same error as a disallowed lookup of `key`, but naming the
     # option(s) that provide the value instead, when fetching build settings is
     # disallowed. Callers that know which option replaces a lookup check this
@@ -590,9 +596,11 @@ module FastlaneCore
     end
 
     def xcodebuild_settings_lookup_disallowed_message(key, disallowed_by, option: nil)
-      fix = if option
-              names = Array(option).map { |name| "`#{name}`" }
-              "set the #{[names[0..-2].join(', '), names.last].reject(&:empty?).join(' or ')} option"
+      names = Array(option).map { |name| "`#{name}`" }
+      fix = if names.size == 1
+              "set the #{names.first} option"
+            elsif names.size > 1
+              "set one of the #{names[0..-2].join(', ')} or #{names.last} options"
             else
               "manually specify the option whose automatic detection required the '#{key}' build setting"
             end

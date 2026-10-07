@@ -744,6 +744,22 @@ describe FastlaneCore do
         end
       end
 
+      describe '#app_name_if_lookup_allowed' do
+        it 'is nil, without reading build settings, when the lookup is disallowed' do
+          project = FastlaneCore::Project.new({ project: "./fastlane_core/spec/fixtures/projects/Example.xcodeproj", disallow_xcodebuild_settings_lookup: true })
+          expect(FastlaneCore::Project).to_not(receive(:run_command))
+
+          expect(project.app_name_if_lookup_allowed).to be_nil
+        end
+
+        it 'is the app name when the lookup is allowed' do
+          project = FastlaneCore::Project.new({ project: "./fastlane_core/spec/fixtures/projects/Example.xcodeproj" })
+          allow(project).to receive(:app_name).and_return("ExampleProductName")
+
+          expect(project.app_name_if_lookup_allowed).to eq("ExampleProductName")
+        end
+      end
+
       describe '#verify_xcodebuild_settings_lookup_allowed!' do
         let(:project) do
           FastlaneCore::Project.new({ project: "./fastlane_core/spec/fixtures/projects/Example.xcodeproj", disallow_xcodebuild_settings_lookup: true })
@@ -767,11 +783,11 @@ describe FastlaneCore do
         it 'lists every option that replaces the value' do
           expect do
             project.verify_xcodebuild_settings_lookup_allowed!("SUPPORTED_PLATFORMS", option: %w(device destination))
-          end.to raise_error(FastlaneCore::Interface::FastlaneError, /set the `device` or `destination` option,/)
+          end.to raise_error(FastlaneCore::Interface::FastlaneError, /set one of the `device` or `destination` options,/)
 
           expect do
             project.verify_xcodebuild_settings_lookup_allowed!("SUPPORTED_PLATFORMS", option: %w(device devices destination))
-          end.to raise_error(FastlaneCore::Interface::FastlaneError, /set the `device`, `devices` or `destination` option,/)
+          end.to raise_error(FastlaneCore::Interface::FastlaneError, /set one of the `device`, `devices` or `destination` options,/)
         end
 
         it 'does nothing when the lookup is allowed' do

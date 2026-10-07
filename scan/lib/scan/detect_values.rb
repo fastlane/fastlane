@@ -48,9 +48,7 @@ module Scan
       if devices.count > 0
         detect_simulator(devices, '', '', '', nil)
       elsif Scan.project && Scan.config[:destination] && Scan.project.xcodebuild_settings_lookup_disallowed_by
-        # The destination already says where to test, so don't read build settings to pick a default simulator.
-        # Clear the simulators an earlier run in this process picked, so nothing acts on those instead
-        Scan.devices = nil
+        # The destination already says where to test, so don't read build settings to pick a default simulator
         verify_simulator_options_without_devices
       elsif Scan.project
         # Picking a default simulator reads the project's supported platforms
