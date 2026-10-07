@@ -82,7 +82,7 @@ module Snapshot
       unless launcher_config.headless
         simulator_path = File.join(Helper.xcode_path, 'Applications', 'Simulator.app')
         device_udid = TestCommandGenerator.device_udid(device_types.first)
-        command = "open -a #{simulator_path} -g"
+        command = "open -a #{simulator_path.shellescape} -g"
         command += " --args -CurrentDeviceUDID #{device_udid}" if device_udid
         Helper.backticks(command, print: FastlaneCore::Globals.verbose?)
       end
