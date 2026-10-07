@@ -16,6 +16,8 @@ module RuboCop
       # it is accepted when every assignment is escaped, and a command string
       # built in a variable is checked where it is built.
       # A command joined from a list checks each element of the list.
+      # Not followed: pieces returned by other methods, as in gym's and scan's command generators, which build
+      # arrays joined elsewhere; such pieces are only reported, if at all, where the array is joined.
       class UnescapedShellInterpolation < Base
         MSG = 'Escape `%<source>s` (`.shellescape`), or pass the command as separate arguments.'.freeze
         MSG_SHELL_SYNTAX = 'Escape `%<source>s` (`.shellescape`), or run it without a shell: %<hints>s.'.freeze
