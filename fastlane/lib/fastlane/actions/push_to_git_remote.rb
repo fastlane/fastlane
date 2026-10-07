@@ -42,7 +42,7 @@ module Fastlane
         command << '--set-upstream' if params[:set_upstream]
 
         # optionally add the --push_options components
-        params[:push_options].each { |push_option| command << "--push-option=#{push_option}" } if params[:push_options]
+        params[:push_options].each { |push_option| command << "--push-option=#{push_option.shellescape}" } if params[:push_options]
 
         # execute our command
         return command.join(' ') if Helper.test?

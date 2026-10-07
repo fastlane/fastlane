@@ -155,6 +155,16 @@ describe Fastlane do
         expect(result).to eq("git push origin master:master --tags --push-option=something-to-tell-remote-git-server --push-option=something-else")
       end
 
+      it "keeps a push option with spaces and an apostrophe as one argument" do
+        result = Fastlane::FastFile.new.parse("lane :test do
+            push_to_git_remote(
+              push_options: [\"merge_request.title=Fix Kaldi's Kafe login\"]
+            )
+          end").runner.execute(:test)
+
+        expect(Shellwords.split(result).last).to eq("--push-option=merge_request.title=Fix Kaldi's Kafe login")
+      end
+
       context "runs git push using a checked out commit git branch" do
         it "should use the checked out commit git branch" do
           allow(Fastlane::Actions).to receive(:sh)
