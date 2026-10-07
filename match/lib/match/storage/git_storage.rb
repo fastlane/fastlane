@@ -87,11 +87,6 @@ module Match
         self.working_directory = Dir.mktmpdir
 
         command = "git clone #{self.git_url.shellescape} #{self.working_directory.shellescape}"
-        # HTTP headers are supposed to be case-insensitive but
-        # Bitbucket requires `Authorization: Basic` and `Authorization Bearer` to work
-        # https://github.com/fastlane/fastlane/pull/15928
-        command << " -c http.extraheader='Authorization: Basic #{self.git_basic_authorization}'" unless self.git_basic_authorization.nil?
-        command << " -c http.extraheader='Authorization: Bearer #{self.git_bearer_authorization}'" unless self.git_bearer_authorization.nil?
 
         if self.shallow_clone
           command << " --depth 1"
@@ -268,6 +263,26 @@ module Match
       def git_env_values
         env_values = { 'GIT_TERMINAL_PROMPT' => '0' }
         env_values['GIT_SSH_COMMAND'] = non_interactive_git_ssh_command
+        env_values.merge(authorization_env_values)
+      end
+
+      # Through git's environment (git 2.31+), so the header is neither on the command line nor stored in .git/config
+      def authorization_env_values
+        headers = []
+        # HTTP headers are supposed to be case-insensitive but
+        # Bitbucket requires `Authorization: Basic` and `Authorization Bearer` to work
+        # https://github.com/fastlane/fastlane/pull/15928
+        headers << "Authorization: Basic #{self.git_basic_authorization}" unless self.git_basic_authorization.nil?
+        headers << "Authorization: Bearer #{self.git_bearer_authorization}" unless self.git_bearer_authorization.nil?
+        return {} if headers.empty?
+
+        # Keep pairs the user already passes this way
+        first = ENV['GIT_CONFIG_COUNT'].to_i
+        env_values = { 'GIT_CONFIG_COUNT' => (first + headers.count).to_s }
+        headers.each_with_index do |header, i|
+          env_values["GIT_CONFIG_KEY_#{first + i}"] = 'http.extraheader'
+          env_values["GIT_CONFIG_VALUE_#{first + i}"] = header
+        end
         env_values
       end
 
