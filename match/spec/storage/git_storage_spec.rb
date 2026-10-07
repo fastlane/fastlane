@@ -246,12 +246,41 @@ describe Match do
       end
 
       describe "when using a raw private key" do
-        it "wraps the git command in ssh-agent shell" do
-          expect(File).to receive(:file?).twice.and_return(false)
-          private_key = "-----BEGIN PRIVATE KEY-----\n-----END PRIVATE KEY-----\n"
-          clone_command = "ssh-agent bash -c 'ssh-add - <<< \"#{private_key}\"; git clone #{git_url.shellescape} #{@path.shellescape}'"
+        let(:private_key) { "-----BEGIN EXAMPLE KEY-----\nEXAMPLE_KEY_BODY\n-----END EXAMPLE KEY-----\n" }
 
-          expect_command_execution(clone_command)
+        def expect_ssh_add_to_receive_key(command)
+          expect(FastlaneCore::CommandExecutor).to receive(:execute).once.with({
+            command: "ssh-agent bash -c 'ssh-add - <<< \"$MATCH_SSH_ADD_PRIVATE_KEY\"; #{command}'",
+            print_all: nil,
+            print_command: nil
+          }) do
+            expect(ENV['MATCH_SSH_ADD_PRIVATE_KEY']).to eq(private_key)
+            ""
+          end
+        end
+
+        it "gives the key to ssh-add for git push from the environment, not from the command line" do
+          allow(File).to receive(:file?).and_return(false)
+          profile = File.join(@path, "profiles", "development", "Development_com.example.mobileprovision")
+          expected_commit_commands = [
+            "git --literal-pathspecs rm -- #{profile.shellescape}",
+            "git commit -m " + '[fastlane] Updated development and platform ios'.shellescape
+          ]
+          expect_command_execution(expected_commit_commands)
+          expect_ssh_add_to_receive_key("git push origin #{git_branch}")
+
+          storage = Match::Storage::GitStorage.new(
+            type: "development",
+            platform: "ios",
+            branch: git_branch,
+            git_private_key: private_key
+          )
+          storage.delete_files(files_to_delete: [profile])
+        end
+
+        it "gives the key to ssh-add for git clone from the environment, not from the command line" do
+          expect(File).to receive(:file?).twice.and_return(false)
+          expect_ssh_add_to_receive_key("git clone #{git_url.shellescape} #{@path.shellescape}")
           expect_command_execution(branch_checkout_commands(git_branch))
 
           storage = Match::Storage::GitStorage.new(
@@ -271,13 +300,13 @@ describe Match do
       describe "when using a raw private key" do
         it "wraps any given command in ssh-agent shell" do
           given_command = "any random command"
-          private_key = "-----BEGIN PRIVATE KEY-----\n-----END PRIVATE KEY-----\n"
+          private_key = "-----BEGIN EXAMPLE KEY-----\nEXAMPLE_KEY_BODY\n-----END EXAMPLE KEY-----\n"
 
           storage = Match::Storage::GitStorage.new(
             git_private_key: private_key
           )
 
-          expected_command = "ssh-agent bash -c 'ssh-add - <<< \"#{private_key}\"; #{given_command}'"
+          expected_command = "ssh-agent bash -c 'ssh-add - <<< \"$MATCH_SSH_ADD_PRIVATE_KEY\"; #{given_command}'"
           expect(storage.command_from_private_key(given_command)).to eq(expected_command)
         end
       end
@@ -291,7 +320,7 @@ describe Match do
             git_private_key: private_key
           )
 
-          expected_command = "ssh-agent bash -c 'ssh-add - <<< \"#{File.expand_path(private_key).shellescape}\"; #{given_command}'"
+          expected_command = "ssh-agent bash -c 'ssh-add - <<< \"$MATCH_SSH_ADD_PRIVATE_KEY\"; #{given_command}'"
           expect(storage.command_from_private_key(given_command)).to eq(expected_command)
         end
       end
