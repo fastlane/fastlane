@@ -327,7 +327,7 @@ module Scan
 
     def open_report
       if !Helper.ci? && Scan.cache[:open_html_report_path]
-        `open --hide '#{Scan.cache[:open_html_report_path]}'`
+        system("open", "--hide", Scan.cache[:open_html_report_path])
       end
     end
 
