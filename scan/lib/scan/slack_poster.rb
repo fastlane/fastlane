@@ -44,9 +44,8 @@ module Scan
         }
       end
 
-      # The project's app name comes from its build settings, so without them the message names the scheme
-      app_name = Scan.config[:app_name]
-      app_name ||= Scan.project.xcodebuild_settings_lookup_disallowed_by ? Scan.config[:scheme] : Scan.project.app_name
+      # Without an app name (a Swift package, or build settings that can't be read), the message names the scheme
+      app_name = Scan.config[:app_name] || Scan.project&.app_name_if_lookup_allowed || Scan.config[:scheme]
 
       options = FastlaneCore::Configuration.create(Fastlane::Actions::SlackAction.available_options, {
         message: "#{app_name} Tests:\n#{Scan.config[:slack_message]}",
