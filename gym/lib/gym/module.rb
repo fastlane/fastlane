@@ -67,6 +67,7 @@ module Gym
     def building_for_non_mac_destination?
       return false if Gym.config[:sdk].to_s.start_with?("macosx") || Gym.config[:catalyst_platform] == "macos"
 
+      # Ignores case, as xcodebuild does. xrOS is visionOS's older name
       destination_platform.match?(/\A(iOS|tvOS|watchOS|visionOS|xrOS)( Simulator)?\z/i)
     end
 

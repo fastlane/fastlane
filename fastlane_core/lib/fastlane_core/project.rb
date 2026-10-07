@@ -493,10 +493,9 @@ module FastlaneCore
       app_name unless xcodebuild_settings_lookup_disallowed_by
     end
 
-    # Fails with the same error as a disallowed lookup of `key`, but naming the
-    # option(s) that provide the value instead, when fetching build settings is
-    # disallowed. Callers that know which option replaces a lookup check this
-    # before making it, so the error says what to set
+    # When fetching build settings is disallowed, fails with the error a lookup of
+    # `key` would raise, but naming the option(s) to set instead. Call it before a
+    # lookup that an option can replace
     # @param key [String] The build setting the caller is about to read
     # @param option [String, Array<String>] The option(s) that make the lookup unnecessary
     def verify_xcodebuild_settings_lookup_allowed!(key, option:)
@@ -607,6 +606,7 @@ module FastlaneCore
 
       message = "Could not read the '#{key}' build setting: fetching build settings by running" \
         " `xcodebuild -showBuildSettings` is disallowed by #{disallowed_by}."
+      # The first frame outside this file is the tool code that needed the value
       trigger = caller.find { |frame| !frame.start_with?(__FILE__) }
       message += "\nThe build setting lookup was triggered by: #{trigger}" if trigger
       message + "\nTo fix this, #{fix}, or disable #{disallowed_by} to allow fastlane to fetch it automatically."
