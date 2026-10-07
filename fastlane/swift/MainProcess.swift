@@ -60,7 +60,7 @@ class MainProcess {
         /// 2. bundler binstub bin/fastlane next to the Gemfile
         /// 3. Gemfile (BUNDLE_GEMFILE, or found from the working directory up, as Bundler does) -> bundle exec fastlane
         /// 4. fastlane on PATH
-        private func fastlaneLaunchArguments() -> [String] {
+        func fastlaneLaunchArguments() -> [String] {
             if let bin = ProcessInfo.processInfo.environment["FASTLANE_SPM_BIN"],
                !bin.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty
             {
@@ -80,7 +80,7 @@ class MainProcess {
 
         /// The directory of the Gemfile Bundler would use: BUNDLE_GEMFILE, else the
         /// nearest Gemfile or gems.rb from the working directory up.
-        private func bundleRootDirectory() -> String? {
+        func bundleRootDirectory() -> String? {
             let workingDirectory = FileManager.default.currentDirectoryPath
             if let gemfile = ProcessInfo.processInfo.environment["BUNDLE_GEMFILE"], !gemfile.isEmpty {
                 let path = gemfile.hasPrefix("/") ? gemfile : workingDirectory + "/" + gemfile
@@ -161,7 +161,7 @@ class MainProcess {
         }
 
         /// Binding fails with EADDRINUSE when another socket listens on that address and port, whoever owns it.
-        private func isAddressInUse(family: Int32, port: UInt32) -> Bool {
+        func isAddressInUse(family: Int32, port: UInt32) -> Bool {
             let socketDescriptor = socket(family, SOCK_STREAM, 0)
             guard socketDescriptor >= 0 else {
                 return false

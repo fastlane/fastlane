@@ -13,6 +13,7 @@ let package = Package(
             path: "./fastlane/swift",
             exclude: ["Actions.swift", "Plugins.swift", "main.swift", "formatting", "FastlaneSwiftRunner"]
         ),
+        .testTarget(name: "FastlaneTests", dependencies: ["Fastlane"], path: "./fastlane/spec/swift/FastlaneTests"),
     ],
     swiftLanguageVersions: [4]
 )
