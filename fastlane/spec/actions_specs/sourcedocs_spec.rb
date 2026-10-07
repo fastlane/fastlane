@@ -338,6 +338,20 @@ describe Fastlane do
           expect(result).to eq("sourcedocs generate --output-folder docs --min-acl internal --module-name-path --clean --collapsible --table-of-contents --reproducible-docs -- -scheme MyApp -sdk macosx")
         end
       end
+
+      context "when values contain spaces and an apostrophe" do
+        it "passes each as one argument" do
+          result = Fastlane::FastFile.new.parse("lane :test do
+            sourcedocs(
+              output_folder: \"Kaldi's Kafe/docs\",
+              module_name: \"Kaldi's Kafe\",
+              scheme: \"Kaldi's Kafe\"
+            )
+          end").runner.execute(:test)
+
+          expect(Shellwords.split(result)).to eq(["sourcedocs", "generate", "--module-name", "Kaldi's Kafe", "--output-folder", "Kaldi's Kafe/docs", "--", "-scheme", "Kaldi's Kafe"])
+        end
+      end
     end
   end
 end
