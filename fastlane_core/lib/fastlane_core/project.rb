@@ -413,13 +413,7 @@ module FastlaneCore
     def build_settings(key: nil, optional: true)
       unless @build_settings
         if (disallowed_by = xcodebuild_settings_lookup_disallowed_by)
-          message = "Could not read the '#{key}' build setting: fetching build settings by running" \
-            " `xcodebuild -showBuildSettings` is disallowed by #{disallowed_by}."
-          trigger = caller.find { |frame| !frame.start_with?(__FILE__) }
-          message += "\nThe build setting lookup was triggered by: #{trigger}" if trigger
-          message += "\nTo fix this, manually specify the option whose automatic detection required the '#{key}' build setting," \
-            " or disable #{disallowed_by} to allow fastlane to fetch it automatically."
-          UI.user_error!(message)
+          UI.user_error!(xcodebuild_settings_lookup_disallowed_message(key, disallowed_by))
         end
 
         if is_workspace
@@ -481,6 +475,27 @@ module FastlaneCore
     def default_build_settings(key: nil, optional: true)
       options[:scheme] ||= schemes.first if is_workspace
       build_settings(key: key, optional: optional)
+    end
+
+    # Returns a description of what disallowed fetching build settings via the
+    # (potentially slow on large projects) `xcodebuild -showBuildSettings` command,
+    # or nil if the lookup is allowed. Callers that can do without a value check
+    # this first, rather than running a lookup that would fail
+    def xcodebuild_settings_lookup_disallowed_by
+      return "the FASTLANE_DISALLOW_XCODEBUILD_SETTINGS_LOOKUP environment variable" if FastlaneCore::Env.truthy?("FASTLANE_DISALLOW_XCODEBUILD_SETTINGS_LOOKUP")
+      return "the `disallow_xcodebuild_settings_lookup` option" if options[:disallow_xcodebuild_settings_lookup]
+      nil
+    end
+
+    # Fails with the same error as a disallowed lookup of `key`, but naming the
+    # option(s) that provide the value instead, when fetching build settings is
+    # disallowed. Callers that know which option replaces a lookup check this
+    # before making it, so the error says what to set
+    # @param key [String] The build setting the caller is about to read
+    # @param option [String, Array<String>] The option(s) that make the lookup unnecessary
+    def verify_xcodebuild_settings_lookup_allowed!(key, option:)
+      disallowed_by = xcodebuild_settings_lookup_disallowed_by
+      UI.user_error!(xcodebuild_settings_lookup_disallowed_message(key, disallowed_by, option: option)) if disallowed_by
     end
 
     # @internal to module
@@ -574,13 +589,19 @@ module FastlaneCore
       FastlaneCore::Env.truthy?("AUTOMATED_SCHEME_SELECTION")
     end
 
-    # Returns a description of what disallowed fetching build settings via the
-    # (potentially slow on large projects) `xcodebuild -showBuildSettings` command,
-    # or nil if the lookup is allowed
-    def xcodebuild_settings_lookup_disallowed_by
-      return "the FASTLANE_DISALLOW_XCODEBUILD_SETTINGS_LOOKUP environment variable" if FastlaneCore::Env.truthy?("FASTLANE_DISALLOW_XCODEBUILD_SETTINGS_LOOKUP")
-      return "the `disallow_xcodebuild_settings_lookup` option" if options[:disallow_xcodebuild_settings_lookup]
-      nil
+    def xcodebuild_settings_lookup_disallowed_message(key, disallowed_by, option: nil)
+      fix = if option
+              names = Array(option).map { |name| "`#{name}`" }
+              "set the #{[names[0..-2].join(', '), names.last].reject(&:empty?).join(' or ')} option"
+            else
+              "manually specify the option whose automatic detection required the '#{key}' build setting"
+            end
+
+      message = "Could not read the '#{key}' build setting: fetching build settings by running" \
+        " `xcodebuild -showBuildSettings` is disallowed by #{disallowed_by}."
+      trigger = caller.find { |frame| !frame.start_with?(__FILE__) }
+      message += "\nThe build setting lookup was triggered by: #{trigger}" if trigger
+      message + "\nTo fix this, #{fix}, or disable #{disallowed_by} to allow fastlane to fetch it automatically."
     end
   end
 end
