@@ -369,6 +369,24 @@ describe Fastlane do
         end").runner.execute(:test)
       end
 
+      it "keeps HTTP headers out of the printed git command" do
+        header = 'Authorization: Basic EXAMPLE_TOKEN_123'
+        printed = StringIO.new
+        logger = Logger.new(printed)
+        logger.formatter = FastlaneCore::Shell.new.log.formatter
+        allow(FastlaneCore::UI.ui_object).to receive(:log).and_return(logger)
+
+        allow(Fastlane::Actions).to receive(:sh).and_call_original
+        expect(Fastlane::Actions).to receive(:sh).with(any_args, '--config', "http.extraHeader=#{header}").and_call_original
+
+        Fastlane::FastFile.new.parse("lane :test do
+          import_from_git(url: '#{source_directory_path}', git_extra_headers: ['#{header}'])
+        end").runner.execute(:test)
+
+        expect(printed.string).to include("git clone")
+        expect(printed.string).not_to include("EXAMPLE_TOKEN_123")
+      end
+
       after :all do
         ENV.delete("FORCE_SH_DURING_TESTS")
 
