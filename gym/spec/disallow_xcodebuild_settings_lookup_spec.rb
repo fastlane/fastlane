@@ -246,7 +246,8 @@ describe Gym do
     end
   end
 
-  describe "installerSigningCertificate in the export options" do
+  # The export options generator reads the Xcode version
+  describe "installerSigningCertificate in the export options", requires_xcode: true do
     def export_options(options)
       stub_config(options.merge(installer_cert_name: "3rd Party Mac Developer Installer: Team (ABCDE12345)", archive_path: File.join(Dir.mktmpdir, "App.xcarchive")))
       allow(Gym).to receive(:cache).and_return({})

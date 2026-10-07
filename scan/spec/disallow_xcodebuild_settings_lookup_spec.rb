@@ -43,7 +43,8 @@ describe Scan do
     Scan.config = FastlaneCore::Configuration.create(Scan::Options.available_options, options)
   end
 
-  describe "setup with build setting lookups disallowed" do
+  # scan's setup reads the Xcode version
+  describe "setup with build setting lookups disallowed", requires_xcode: true do
     before do
       expect(FastlaneCore::Project).not_to receive(:run_command)
     end
@@ -102,7 +103,7 @@ describe Scan do
     end
   end
 
-  describe "the deployment target for `device` or `devices`" do
+  describe "the deployment target for `device` or `devices`", requires_xcode: true do
     it "isn't read from the build settings, since there is none to filter by" do
       expect(FastlaneCore::Project).not_to receive(:run_command)
 
