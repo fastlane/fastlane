@@ -301,7 +301,7 @@ FastlaneAppTests.testCoinToss()
         output_path = File.absolute_path('/tmp/scan_results/build_products.zip')
 
         expect(FastlaneCore::Helper).to receive(:backticks)
-          .with("cd '#{path}' && rm -f '#{output_path}' && zip -r '#{output_path}' *", { print: false })
+          .with("cd #{path.shellescape} && rm -f #{output_path.shellescape} && zip -r #{output_path.shellescape} *", { print: false })
           .exactly(1).times
 
         scan = Scan::Runner.new
