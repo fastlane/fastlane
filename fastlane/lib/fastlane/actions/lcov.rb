@@ -44,7 +44,7 @@ module Fastlane
       end
 
       def self.gen_cov(options)
-        tmp_cov_file = File.join(Dir.tmpdir, "coverage.info")
+        tmp_cov_file = File.join(Dir.mktmpdir("lcov-"), "coverage.info")
         output_dir = options[:output_dir]
         derived_data_path = derived_data_dir(options)
 
