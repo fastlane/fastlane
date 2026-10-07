@@ -97,7 +97,7 @@ username("user@fastlane.tools")
 
 ##### Git Storage on GitHub
 
-If your machine is currently using SSH to authenticate with GitHub, you'll want to use a `git` URL, otherwise, you may see an authentication error when you attempt to use match. Alternatively, you can set a basic authorization for _match_:
+If your machine is currently using SSH to authenticate with GitHub, you'll want to use a `git` URL, otherwise, you may see an authentication error when you attempt to use match. Alternatively, you can set a basic authorization for _match_ (needs git 2.31 or later):
 
 Using parameter:
 
@@ -141,7 +141,7 @@ You can find more information about GitHub basic authentication and personal tok
 
 ##### Git Storage on Azure DevOps
 
-If you're running a pipeline on Azure DevOps and using git storage in a another repository on the same project, you might want to use `bearer` token authentication.
+If you're running a pipeline on Azure DevOps and using git storage in a another repository on the same project, you might want to use `bearer` token authentication (needs git 2.31 or later).
 
 Using parameter:
 
