@@ -182,32 +182,31 @@ describe Gym do
   end
 
   describe "the build log path" do
-    def log_name(options, disallowed_by:)
+    # `project_app_name` is nil when build settings can't be read
+    def log_name(options, project_app_name:)
       stub_config(options.merge(scheme: "Example", buildlog_path: Dir.mktmpdir))
-      allow(project).to receive(:xcodebuild_settings_lookup_disallowed_by).and_return(disallowed_by)
+      allow(project).to receive(:app_name_if_lookup_allowed).and_return(project_app_name)
       File.basename(Gym::BuildCommandGenerator.xcodebuild_log_path)
     end
 
     context "when build settings can't be read" do
       it "uses `app_name` alone" do
-        expect(log_name({ app_name: "CustomApp" }, disallowed_by: "the option")).to eq("CustomApp-Example.log")
+        expect(log_name({ app_name: "CustomApp" }, project_app_name: nil)).to eq("CustomApp-Example.log")
       end
 
       it "uses `output_name` alone instead of reading the app name" do
-        expect(log_name({ output_name: "App" }, disallowed_by: "the option")).to eq("App-Example.log")
+        expect(log_name({ output_name: "App" }, project_app_name: nil)).to eq("App-Example.log")
       end
 
       it "prefers `app_name` to `output_name`" do
-        expect(log_name({ app_name: "CustomApp", output_name: "App" }, disallowed_by: "the option")).to eq("CustomApp-Example.log")
+        expect(log_name({ app_name: "CustomApp", output_name: "App" }, project_app_name: nil)).to eq("CustomApp-Example.log")
       end
     end
 
     context "when build settings can be read" do
       it "uses the project's app name when `app_name` isn't set, whatever `output_name` is" do
-        allow(project).to receive(:app_name).and_return("ExampleProductName")
-
-        expect(log_name({ output_name: "App" }, disallowed_by: nil)).to eq("ExampleProductName-Example.log")
-        expect(log_name({}, disallowed_by: nil)).to eq("ExampleProductName-Example.log")
+        expect(log_name({ output_name: "App" }, project_app_name: "ExampleProductName")).to eq("ExampleProductName-Example.log")
+        expect(log_name({}, project_app_name: "ExampleProductName")).to eq("ExampleProductName-Example.log")
       end
     end
   end

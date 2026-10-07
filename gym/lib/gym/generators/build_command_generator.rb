@@ -154,10 +154,9 @@ module Gym
       end
 
       def xcodebuild_log_path
-        app_name = Gym.config[:app_name]
-        # The project's app name comes from its build settings. When those can't be read,
-        # name the log after the output instead, which is always set by now
-        app_name ||= Gym.project.xcodebuild_settings_lookup_disallowed_by ? Gym.config[:output_name] : Gym.project.app_name
+        # When build settings can't be read there's no app name, so name the log after the
+        # output instead, which is always set by now
+        app_name = Gym.config[:app_name] || Gym.project.app_name_if_lookup_allowed || Gym.config[:output_name]
         file_name = "#{app_name}-#{Gym.config[:scheme]}.log"
         containing = File.expand_path(Gym.config[:buildlog_path])
         FileUtils.mkdir_p(containing)
