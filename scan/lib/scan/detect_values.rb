@@ -19,6 +19,12 @@ module Scan
     def self.set_additional_default_values
       config = Scan.config
 
+      # The project and the simulators are kept on the module, and are only set below when this
+      # run has them. Start without the ones an earlier run in this process found, so a Swift
+      # package, or a project that doesn't test on a simulator, doesn't use those instead
+      Scan.project = nil
+      Scan.devices = nil
+
       # First, try loading the Scanfile from the current directory
       config.load_configuration_file(Scan.scanfile_name)
 
