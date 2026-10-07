@@ -207,9 +207,12 @@ describe Spaceship::Client do
   end
 
   describe "#itc_service_key_path" do
-    # Guards against going back to a literal "/tmp"; the method says why.
-    it "caches the key in the system temporary directory" do
-      expect(TestClient.new.itc_service_key_path).to start_with(Dir.tmpdir)
+    # The cookie store next to it has the same spec; a temporary directory is shared on Linux.
+    it "caches the key in the user's fastlane directory" do
+      # spec_helper stubs the path on every client; this example is about the method itself
+      allow_any_instance_of(Spaceship::Client).to receive(:itc_service_key_path).and_call_original
+
+      expect(TestClient.new.itc_service_key_path).to eq(File.expand_path("~/.fastlane/spaceship_itc_service_key.txt"))
     end
   end
 
