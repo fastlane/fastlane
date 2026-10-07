@@ -1,10 +1,10 @@
 #!/bin/bash
 # Runs a lane through the Swift Package Manager runner built from this checkout, in the situations the runner
 # has to handle, and checks which fastlane ran or that the runner stopped. macOS only (lsof, ::1).
-# Usage: Tests/spm-runner/run.sh   (needs swift, bundle and python3)
+# Usage: fastlane/spec/swift/spm-runner/run.sh   (needs swift, bundle and python3)
 set -u
 here=$(cd "$(dirname "$0")" && pwd)
-repository=$(cd "$here/../.." && pwd)
+repository=$(cd "$here/../../../.." && pwd)
 work=$(mktemp -d)
 # Reuse the gems installed for this repository, then drop what `bundle exec` exported: the runner must find the project's Gemfile itself
 bundle_path=$(cd "$repository" && bundle config get path --parseable 2>/dev/null | sed -n 's/^path=//p')
