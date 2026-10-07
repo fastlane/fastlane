@@ -24,4 +24,9 @@ describe Fastlane::Actions::LcovAction do
       expect(commands[2]).to start_with("genhtml #{cov_file} ")
     end
   end
+
+  it "is deprecated because it cannot read the coverage Xcode records" do
+    expect(Fastlane::Actions.is_deprecated?(described_class)).to eq(true)
+    expect(described_class.deprecated_notes).to include("LLVM `.profdata`")
+  end
 end

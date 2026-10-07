@@ -302,7 +302,11 @@ module Fastlane
       end
 
       def self.category
-        :testing
+        :deprecated
+      end
+
+      def self.deprecated_notes
+        "Xcode Server is no longer supported since Xcode 14 ([Xcode 14 Release Notes](https://developer.apple.com/documentation/xcode-release-notes/xcode-14-release-notes))."
       end
     end
   end
