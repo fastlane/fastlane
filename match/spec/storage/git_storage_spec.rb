@@ -366,6 +366,23 @@ describe Match do
         )
       end
 
+      it "stops with a clear error when git is older than 2.31, which ignores a header passed this way" do
+        allow(Open3).to receive(:capture2).with('git', '--version').and_return(["git version 2.30.2\n", double(success?: true)])
+        storage = Match::Storage::GitStorage.new(git_basic_authorization: "EXAMPLE_TOKEN_123")
+        expect { storage.send(:git_env_values) }.to raise_error(FastlaneCore::Interface::FastlaneError, /need git 2.31 or later, found git 2.30.2/)
+      end
+
+      it "accepts git 2.31 and later, including Apple's build" do
+        allow(Open3).to receive(:capture2).with('git', '--version').and_return(["git version 2.39.5 (Apple Git-154)\n", double(success?: true)])
+        storage = Match::Storage::GitStorage.new(git_basic_authorization: "EXAMPLE_TOKEN_123")
+        expect(storage.send(:git_env_values)).to include('GIT_CONFIG_KEY_0' => 'http.extraheader')
+      end
+
+      it "does not check the git version without a header" do
+        expect(Open3).not_to receive(:capture2)
+        Match::Storage::GitStorage.new.send(:git_env_values)
+      end
+
       it "does not duplicate if BatchMode already exists" do
         allow(ENV).to receive(:[]).with('GIT_SSH_COMMAND').and_return('ssh -o BatchMode=yes')
         storage = Match::Storage::GitStorage.new

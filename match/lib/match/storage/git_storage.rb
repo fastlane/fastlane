@@ -1,4 +1,5 @@
 require 'fastlane_core/command_executor'
+require 'open3'
 
 require_relative '../module'
 require_relative './interface'
@@ -276,6 +277,9 @@ module Match
         headers << "Authorization: Bearer #{self.git_bearer_authorization}" unless self.git_bearer_authorization.nil?
         return {} if headers.empty?
 
+        version = git_version
+        UI.user_error!("git_basic_authorization and git_bearer_authorization need git 2.31 or later, found git #{version}") if version && Gem::Version.new(version) < Gem::Version.new('2.31')
+
         # Keep pairs the user already passes this way
         first = ENV['GIT_CONFIG_COUNT'].to_i
         env_values = { 'GIT_CONFIG_COUNT' => (first + headers.count).to_s }
@@ -284,6 +288,16 @@ module Match
           env_values["GIT_CONFIG_VALUE_#{first + i}"] = header
         end
         env_values
+      end
+
+      # nil when git cannot be run: cloning reports that
+      def git_version
+        @git_version ||= begin
+          output, status = Open3.capture2('git', '--version')
+          output[/\d+\.\d+(\.\d+)?/] if status.success?
+        rescue Errno::ENOENT
+          nil
+        end
       end
 
       def non_interactive_git_ssh_command
