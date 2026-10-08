@@ -260,7 +260,7 @@ module Fastlane
           xcpretty_command = "#{xcpretty_command} --utf" if xcpretty_utf
         end
 
-        pipe_command = "| tee '#{buildlog_path}/xcodebuild.log' #{xcpretty_command}"
+        pipe_command = "| tee #{File.join(buildlog_path, 'xcodebuild.log').shellescape} #{xcpretty_command}"
 
         FileUtils.mkdir_p buildlog_path
         UI.message("For a more detailed xcodebuild log open #{buildlog_path}/xcodebuild.log")
@@ -293,7 +293,7 @@ module Fastlane
 
         # If raw_buildlog and some reports had to be created, create xcpretty reports from the build log
         if raw_buildlog && xcpretty_args.include?('--report')
-          output_result = Actions.sh "set -o pipefail && cat '#{buildlog_path}/xcodebuild.log' | xcpretty #{xcpretty_args} > /dev/null"
+          output_result = Actions.sh "set -o pipefail && cat #{File.join(buildlog_path, 'xcodebuild.log').shellescape} | xcpretty #{xcpretty_args} > /dev/null"
         end
 
         output_result
