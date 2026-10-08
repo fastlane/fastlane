@@ -1,5 +1,8 @@
 class ConnectAPIStubbing
   class Tunes
+    COMPLIANCE_FORM_ACCOUNT_URL = "https://appstoreconnect.apple.com/ppm/complianceform/v1/accounts/12345678-1234-1234-1234-123456789012"
+    COMPLIANCE_REQUIREMENT_ID = "87654321-4321-4321-4321-210987654321"
+
     class << self
       def read_fixture_file(filename)
         File.read(File.join('spaceship', 'spec', 'connect_api', 'fixtures', 'tunes', filename))
@@ -69,6 +72,30 @@ class ConnectAPIStubbing
       def stub_get_review_submission_items
         stub_request(:get, "https://appstoreconnect.apple.com/iris/v1/reviewSubmissions/123456789/items").
           to_return(status: 200, body: read_fixture_file('review_submission_items.json'), headers: { 'Content-Type' => 'application/json' })
+      end
+
+      def stub_get_compliance_requirements(required: true)
+        body = JSON.parse(read_fixture_file('compliance_requirements.json'))
+        body["requirementData"].first["requirements"] = [] unless required
+        stub_request(:get, "#{COMPLIANCE_FORM_ACCOUNT_URL}/requirements?contentId=123456789").
+          to_return(status: 200, body: JSON.generate(body), headers: { 'Content-Type' => 'application/json' })
+      end
+
+      # declaration: nil stubs a form that has never been answered
+      def stub_get_compliance_requirement_form(declaration: "no")
+        body = JSON.parse(read_fixture_file('compliance_requirement_form.json'))
+        if declaration.nil?
+          body["data"].delete("medicalDeviceData")
+        else
+          body["data"]["medicalDeviceData"]["declaration"] = declaration
+        end
+        stub_request(:get, "#{COMPLIANCE_FORM_ACCOUNT_URL}/requirements/#{COMPLIANCE_REQUIREMENT_ID}/forms?contentId=123456789").
+          to_return(status: 200, body: JSON.generate(body), headers: { 'Content-Type' => 'application/json' })
+      end
+
+      def stub_post_compliance_requirement_form
+        stub_request(:post, "#{COMPLIANCE_FORM_ACCOUNT_URL}/contents/123456789/requirements/#{COMPLIANCE_REQUIREMENT_ID}/forms").
+          to_return(status: 200, body: read_fixture_file('compliance_requirement_form.json'), headers: { 'Content-Type' => 'application/json' })
       end
 
       def stub_webhooks
