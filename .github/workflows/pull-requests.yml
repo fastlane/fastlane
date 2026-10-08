@@ -16,7 +16,7 @@ jobs:
     steps:
       - name: Communicate on PR merged
         if: github.event.pull_request.merged
-        uses: fastlane/github-actions/communicate-on-pull-request-merged@9d169551c320140defc7894ca86e328b995831d8 # v0.7.1
+        uses: fastlane/github-actions/communicate-on-pull-request-merged@212cacd2e482bf799ecfe99e379b65b0f3eeba56 # v0.8.0
         with:
           repo-token: ${{ secrets.GITHUB_TOKEN }}
           pr-comment: >

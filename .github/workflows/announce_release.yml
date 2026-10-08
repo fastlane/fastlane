@@ -55,7 +55,7 @@ jobs:
           echo "version=$version" >> "$GITHUB_OUTPUT"
 
       - name: Announce release on released pull requests
-        uses: fastlane/github-actions/communicate-on-pull-request-released@9d169551c320140defc7894ca86e328b995831d8 # v0.7.1
+        uses: fastlane/github-actions/communicate-on-pull-request-released@212cacd2e482bf799ecfe99e379b65b0f3eeba56 # v0.8.0
         with:
           version: ${{ steps.version.outputs.version }}
           repo-token: ${{ secrets.GITHUB_TOKEN }}
