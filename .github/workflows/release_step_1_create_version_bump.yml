@@ -14,12 +14,15 @@ on:
           - major
 
 permissions:
-  contents: write
-  pull-requests: write
+  contents: read
 
 jobs:
   create_version_bump:
     runs-on: macos-latest
+
+    permissions:
+      contents: write
+      pull-requests: write
 
     steps:
     - name: Checkout repository
