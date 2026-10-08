@@ -223,7 +223,7 @@ describe FastlaneCore do
 
       it "creates correct zip command with contents_only set to false with default print option (true)" do
         expect(FastlaneCore::Helper).to receive(:backticks)
-          .with("cd '#{directory}' && zip -r '#{the_zip}' 'to_zip'", print: true)
+          .with("cd #{directory.shellescape} && zip -r #{the_zip.shellescape} to_zip", print: true)
           .exactly(1).times
 
         FastlaneCore::Helper.zip_directory(directory_to_zip, the_zip, contents_only: false)
@@ -231,11 +231,21 @@ describe FastlaneCore do
 
       it "creates correct zip command with contents_only set to true with print set to false" do
         expect(FastlaneCore::Helper).to receive(:backticks)
-          .with("cd '#{directory_to_zip}' && zip -r '#{the_zip}' *", print: false)
+          .with("cd #{directory_to_zip.shellescape} && zip -r #{the_zip.shellescape} *", print: false)
           .exactly(1).times
         expect(FastlaneCore::UI).to receive(:command).exactly(1).times
 
         FastlaneCore::Helper.zip_directory(directory_to_zip, the_zip, contents_only: true, print: false)
+      end
+
+      it "keeps paths with an apostrophe and a space as one argument each" do
+        folder = File.absolute_path("/tmp/Kaldi's Kafe")
+        command = nil
+        allow(FastlaneCore::Helper).to receive(:backticks) { |cmd, print:| command = cmd }
+
+        FastlaneCore::Helper.zip_directory(File.join(folder, "Build Products"), File.join(folder, "out put.zip"), overwrite: true)
+
+        expect(Shellwords.split(command)).to eq(["cd", folder, "&&", "rm", "-f", File.join(folder, "out put.zip"), "&&", "zip", "-r", File.join(folder, "out put.zip"), "Build Products"])
       end
     end
 
