@@ -33,11 +33,11 @@ jobs:
           - { xcode: '', ruby: '3.2', rubyopt: '', os: 'windows-2022' }
           - { xcode: '', ruby: '3.2', rubyopt: '', os: 'ubuntu-24.04' }
     steps:
-      - uses: actions/checkout@v7
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
 
       - name: Select Xcode ${{ matrix.xcode }}
         if: runner.os == 'macOS'
-        uses: maxim-lobanov/setup-xcode@v1
+        uses: maxim-lobanov/setup-xcode@ed7a3b1fda3918c0306d1b724322adc0b8cc0a90 # v1.7.0
         with:
           xcode-version: ${{ matrix.xcode }}
 
@@ -48,7 +48,7 @@ jobs:
           xcode-select -p
 
       - name: Set up Ruby ${{ matrix.ruby }}
-        uses: ruby/setup-ruby@v1
+        uses: ruby/setup-ruby@14594264cd68ce8a2345dd349bc3d138a4ef85c8 # v1.327.0
         with:
           ruby-version: ${{ matrix.ruby }}
           bundler-cache: true
@@ -80,7 +80,7 @@ jobs:
       # every run because `failure()` does not fire on a cancelled job.
       - name: Keep the worker logs
         if: always()
-        uses: actions/upload-artifact@v7
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
         with:
           name: rspec-worker-logs-${{ matrix.os }}-ruby${{ matrix.ruby }}-xcode${{ matrix.xcode }}
           path: |
@@ -96,7 +96,7 @@ jobs:
 
       - name: RSpec report
         if: always()
-        uses: SonicGarden/rspec-report-action@v8
+        uses: SonicGarden/rspec-report-action@85aee0edd05bd561aa68d1579144df914537ef9b # v8.0.0
         with:
           json-path: rspec_logs.json
           comment: 'false'
@@ -106,13 +106,13 @@ jobs:
     name: Validate Fastlane.swift generation
     runs-on: macos-26
     steps:
-      - uses: actions/checkout@v7
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
 
-      - uses: maxim-lobanov/setup-xcode@v1
+      - uses: maxim-lobanov/setup-xcode@ed7a3b1fda3918c0306d1b724322adc0b8cc0a90 # v1.7.0
         with:
           xcode-version: '26.3'
 
-      - uses: ruby/setup-ruby@v1
+      - uses: ruby/setup-ruby@14594264cd68ce8a2345dd349bc3d138a4ef85c8 # v1.327.0
         with:
           ruby-version: '3.4'
           bundler-cache: true
@@ -126,9 +126,9 @@ jobs:
     name: Validate Documentation
     runs-on: ubuntu-24.04
     steps:
-      - uses: actions/checkout@v7
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
 
-      - uses: ruby/setup-ruby@v1
+      - uses: ruby/setup-ruby@14594264cd68ce8a2345dd349bc3d138a4ef85c8 # v1.327.0
         with:
           ruby-version: '3.4'
           bundler-cache: true
@@ -140,9 +140,9 @@ jobs:
     name: Lint source code
     runs-on: ubuntu-24.04
     steps:
-      - uses: actions/checkout@v7
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
 
-      - uses: ruby/setup-ruby@v1
+      - uses: ruby/setup-ruby@14594264cd68ce8a2345dd349bc3d138a4ef85c8 # v1.327.0
         with:
           ruby-version: '3.4'
           bundler-cache: true

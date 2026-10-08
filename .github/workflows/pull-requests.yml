@@ -3,6 +3,9 @@ on:
   pull_request_target:
     types: [closed]
 
+permissions:
+  contents: read
+
 jobs:
   communicate-on-pull-request-merged:
     name: communicate on pull request merged
@@ -13,7 +16,7 @@ jobs:
     steps:
       - name: Communicate on PR merged
         if: github.event.pull_request.merged
-        uses: fastlane/github-actions/communicate-on-pull-request-merged@latest
+        uses: fastlane/github-actions/communicate-on-pull-request-merged@9d169551c320140defc7894ca86e328b995831d8 # v0.7.1
         with:
           repo-token: ${{ secrets.GITHUB_TOKEN }}
           pr-comment: >
