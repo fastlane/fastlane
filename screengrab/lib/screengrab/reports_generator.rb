@@ -30,7 +30,7 @@ module Screengrab
 
       export_path = File.expand_path(export_path)
       UI.success("Successfully created HTML file with an overview of all the screenshots: '#{export_path}'")
-      system("open '#{export_path}'") unless Screengrab.config[:skip_open_summary]
+      system("open", export_path) unless Screengrab.config[:skip_open_summary]
     end
   end
 end
