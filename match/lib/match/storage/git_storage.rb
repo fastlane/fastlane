@@ -9,6 +9,7 @@ module Match
     # Store the code signing identities in a git repo
     class GitStorage < Interface
       DEFAULT_BRANCH = "main"
+      PRIVATE_KEY_ENV = "MATCH_SSH_ADD_PRIVATE_KEY"
 
       # User provided values
       attr_accessor :git_url
@@ -178,7 +179,8 @@ module Match
           ssh_add = File.expand_path(self.git_private_key).shellescape.to_s
         else
           UI.message("Private key file does not exist, will continue by using it as a raw key.")
-          ssh_add = "- <<< \"#{self.git_private_key}\""
+          # From the environment (git_env_values), so the key is not on bash's command line
+          ssh_add = "- <<< \"$#{PRIVATE_KEY_ENV}\""
         end
         return "ssh-agent bash -c 'ssh-add #{ssh_add}; #{command}'"
       end
@@ -264,6 +266,7 @@ module Match
       def git_env_values
         env_values = { 'GIT_TERMINAL_PROMPT' => '0' }
         env_values['GIT_SSH_COMMAND'] = non_interactive_git_ssh_command
+        env_values[PRIVATE_KEY_ENV] = self.git_private_key unless self.git_private_key.nil?
         env_values.merge(authorization_env_values)
       end
 
