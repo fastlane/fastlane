@@ -18,6 +18,8 @@ describe Scan do
       'SCAN_REINSTALL_APP' => nil,
       'SCAN_PRELAUNCH_SIMULATOR' => nil,
       'SCAN_INCLUDE_SIMULATOR_LOGS' => nil,
+      'SCAN_WORKSPACE' => nil,
+      'SCAN_PACKAGE_PATH' => nil,
       'SCAN_SCHEME' => nil,
       'SLACK_URL' => nil
     ) { example.run }
@@ -78,11 +80,13 @@ describe Scan do
       expect(Scan.devices).to eq([simulator])
     end
 
-    it "tests on `destination` with `device` for the simulator options, without reading build settings" do
-      configure(options.merge(destination: "platform=iOS Simulator,id=#{simulator.udid}", device: "iPhone 15", reset_simulator: true))
+    { device: "iPhone 15", devices: ["iPhone 15"] }.each do |devices_option, value|
+      it "tests on `destination` with `#{devices_option}` for the simulator options, without reading build settings" do
+        configure(options.merge(destination: "platform=iOS Simulator,id=#{simulator.udid}", devices_option => value, reset_simulator: true))
 
-      expect(Scan.devices).to eq([simulator])
-      expect(Scan.config[:destination]).to eq("platform=iOS Simulator,id=#{simulator.udid}")
+        expect(Scan.devices).to eq([simulator])
+        expect(Scan.config[:destination]).to eq("platform=iOS Simulator,id=#{simulator.udid}")
+      end
     end
 
     it "names `device`, `devices` and `destination` when none is set" do
