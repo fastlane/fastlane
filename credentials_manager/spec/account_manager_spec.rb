@@ -95,6 +95,11 @@ describe CredentialsManager do
         ask_for_login_with("FASTLANE_STORE_PASSWORDS_IN_KEYCHAIN" => "1")
       end
 
+      it "does not store the entered password when FASTLANE_DONT_STORE_PASSWORD is set, even when asked to" do
+        expect(Security::InternetPassword).not_to receive(:add)
+        ask_for_login_with("FASTLANE_STORE_PASSWORDS_IN_KEYCHAIN" => "1", "FASTLANE_DONT_STORE_PASSWORD" => "1")
+      end
+
       it "warns once that a stored password was read, and how to remove it" do
         dummy = double("item", password: "stored password")
         allow(Security::InternetPassword).to receive(:find).with(server: "deliver.#{user}").and_return(dummy)

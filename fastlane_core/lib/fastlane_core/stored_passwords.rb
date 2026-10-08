@@ -6,7 +6,9 @@ module FastlaneCore
   module StoredPasswords
     STORE_ENV = "FASTLANE_STORE_PASSWORDS_IN_KEYCHAIN"
 
+    # FASTLANE_DONT_STORE_PASSWORD, any value, still prevents storing
     def self.store?
+      return false if ENV["FASTLANE_DONT_STORE_PASSWORD"]
       Env.truthy?(STORE_ENV)
     end
 

@@ -9,8 +9,28 @@ describe FastlaneCore::StoredPasswords do
     end
 
     it "is true when FASTLANE_STORE_PASSWORDS_IN_KEYCHAIN is set" do
-      FastlaneSpec::Env.with_env_values("FASTLANE_STORE_PASSWORDS_IN_KEYCHAIN" => "1") do
+      FastlaneSpec::Env.with_env_values("FASTLANE_STORE_PASSWORDS_IN_KEYCHAIN" => "1", "FASTLANE_DONT_STORE_PASSWORD" => nil) do
         expect(described_class.store?).to be(true)
+      end
+    end
+
+    it "is false when FASTLANE_STORE_PASSWORDS_IN_KEYCHAIN is 0 or false" do
+      ["0", "false"].each do |value|
+        FastlaneSpec::Env.with_env_values("FASTLANE_STORE_PASSWORDS_IN_KEYCHAIN" => value, "FASTLANE_DONT_STORE_PASSWORD" => nil) do
+          expect(described_class.store?).to be(false)
+        end
+      end
+    end
+
+    it "is false when FASTLANE_DONT_STORE_PASSWORD is set, even with FASTLANE_STORE_PASSWORDS_IN_KEYCHAIN" do
+      FastlaneSpec::Env.with_env_values("FASTLANE_STORE_PASSWORDS_IN_KEYCHAIN" => "1", "FASTLANE_DONT_STORE_PASSWORD" => "1") do
+        expect(described_class.store?).to be(false)
+      end
+    end
+
+    it "treats any FASTLANE_DONT_STORE_PASSWORD value as set, even 0, as it always has" do
+      FastlaneSpec::Env.with_env_values("FASTLANE_STORE_PASSWORDS_IN_KEYCHAIN" => "1", "FASTLANE_DONT_STORE_PASSWORD" => "0") do
+        expect(described_class.store?).to be(false)
       end
     end
   end

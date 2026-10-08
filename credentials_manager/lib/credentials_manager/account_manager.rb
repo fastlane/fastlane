@@ -151,7 +151,6 @@ module CredentialsManager
         @password = ask("Password (#{note}for #{@user}): ") { |q| q.echo = "*" }
       end
 
-      return true if ENV["FASTLANE_DONT_STORE_PASSWORD"]
       return true unless FastlaneCore::StoredPasswords.store?
       return true unless mac?
 

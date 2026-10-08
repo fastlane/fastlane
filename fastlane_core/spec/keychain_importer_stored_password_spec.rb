@@ -15,12 +15,17 @@ describe FastlaneCore::KeychainImporter do
 
     it "does not store the entered password unless asked to" do
       expect(Security::InternetPassword).not_to receive(:add)
-      resolve_entered_password("FASTLANE_STORE_PASSWORDS_IN_KEYCHAIN" => nil)
+      resolve_entered_password("FASTLANE_STORE_PASSWORDS_IN_KEYCHAIN" => nil, "FASTLANE_DONT_STORE_PASSWORD" => nil)
     end
 
     it "stores the entered password when FASTLANE_STORE_PASSWORDS_IN_KEYCHAIN is set" do
       expect(Security::InternetPassword).to receive(:add).with("fastlane_keychain_signing", "", "entered password")
-      resolve_entered_password("FASTLANE_STORE_PASSWORDS_IN_KEYCHAIN" => "1")
+      resolve_entered_password("FASTLANE_STORE_PASSWORDS_IN_KEYCHAIN" => "1", "FASTLANE_DONT_STORE_PASSWORD" => nil)
+    end
+
+    it "does not store the entered password when FASTLANE_DONT_STORE_PASSWORD is set, even when asked to" do
+      expect(Security::InternetPassword).not_to receive(:add)
+      resolve_entered_password("FASTLANE_STORE_PASSWORDS_IN_KEYCHAIN" => "1", "FASTLANE_DONT_STORE_PASSWORD" => "1")
     end
 
     it "warns once that a stored password was read" do
