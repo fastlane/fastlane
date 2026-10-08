@@ -74,7 +74,7 @@ describe Fastlane do
         expect(result).to include('-F v=1.12')
         expect(result).to include('-F e=ipa')
         expect(result).to include("-F file=@#{file_path}")
-        expect(result).to include('-u admin:admin123')
+        expect(result.join(' ')).not_to(include('admin123'))
       end
 
       it "sets upload options correctly for Nexus 2 with repo classifier" do
@@ -103,7 +103,7 @@ describe Fastlane do
         expect(result).to include('-F c=dSYM')
         expect(result).to include('-F e=ipa')
         expect(result).to include("-F file=@#{file_path}")
-        expect(result).to include('-u admin:admin123')
+        expect(result.join(' ')).not_to(include('admin123'))
       end
 
       it "sets upload options correctly for Nexus 3 with all required parameters" do
@@ -119,7 +119,7 @@ describe Fastlane do
         )
 
         expect(result).to include("--upload-file #{file_path}")
-        expect(result).to include('-u admin:admin123')
+        expect(result.join(' ')).not_to(include('admin123'))
       end
 
       it "sets ssl option correctly" do
@@ -135,7 +135,59 @@ describe Fastlane do
         expect(Fastlane::Actions::NexusUploadAction.proxy_options(proxy_address: nil,
           proxy_port: nil, proxy_username: "", proxy_password: "")).to eq([])
         expect(Fastlane::Actions::NexusUploadAction.proxy_options(proxy_address: "http://1",
-          proxy_port: "2", proxy_username: "3", proxy_password: "4")).to eq(["-x http://1:2", "--proxy-user 3:4"])
+          proxy_port: "2", proxy_username: "3", proxy_password: "4")).to eq(["-x http://1:2"])
+      end
+
+      it "puts the credentials in the curl config, not on the command line" do
+        config = Fastlane::Actions::NexusUploadAction.curl_config(username: 'admin', password: 'admin123',
+          proxy_address: 'http://server', proxy_port: '30', proxy_username: 'proxyuser', proxy_password: 'proxypass')
+
+        expect(config).to eq(%(user = "admin:admin123"\nproxy-user = "proxyuser:proxypass"\n))
+      end
+
+      it "leaves the proxy credentials out of the curl config without a proxy" do
+        config = Fastlane::Actions::NexusUploadAction.curl_config(username: 'admin', password: 'admin123')
+
+        expect(config).to eq(%(user = "admin:admin123"\n))
+      end
+
+      it "escapes quotes, backslashes and whitespace in the curl config" do
+        config = Fastlane::Actions::NexusUploadAction.curl_config(username: 'admin', password: %(p"a\\s s\tw\n),
+          proxy_address: 'http://server', proxy_port: '30', proxy_username: 'proxy user', proxy_password: %(x\\"y))
+
+        expect(config).to eq(%(user = "admin:p\\"a\\\\s s\\tw\\n"\nproxy-user = "proxy user:x\\\\\\"y"\n))
+      end
+
+      it "gives curl the credentials on stdin" do
+        tmp_path = Dir.mktmpdir
+        file_path = "#{tmp_path}/file.ipa"
+        FileUtils.touch(file_path)
+        expect(Fastlane::Actions).to receive(:sh) do |command, log:, stdin:|
+          expect(command).to include('--config -')
+          expect(command).not_to(include('admin123'))
+          expect(command).not_to(include('proxypass'))
+          expect(command).not_to(include('-u '))
+          expect(command).not_to(include('--proxy-user'))
+          expect(stdin).to eq(%(user = "admin:admin123"\nproxy-user = "proxyuser:proxypass"\n))
+          'uploaded'
+        end
+
+        result = Fastlane::FastFile.new.parse("lane :test do
+          nexus_upload(file: '#{file_path}',
+                      repo_id: 'artefacts',
+                      repo_group_id: 'com.fastlane',
+                      repo_project_name: 'myproject',
+                      repo_project_version: '1.12',
+                      endpoint: 'http://localhost:8081',
+                      username: 'admin',
+                      password: 'admin123',
+                      proxy_address: 'http://server',
+                      proxy_port: '30',
+                      proxy_username: 'proxyuser',
+                      proxy_password: 'proxypass')
+        end").runner.execute(:test)
+
+        expect(result).to eq('uploaded')
       end
 
       it "raises an error if file does not exist" do
@@ -179,7 +231,7 @@ describe Fastlane do
                       proxy_address: 'http://server',
                       proxy_port: '30',
                       proxy_username: 'admin',
-                      proxy_password: 'admin')
+                      proxy_password: 'proxypass')
         end").runner.execute(:test)
 
         expect(result).to include('-F p=zip')
@@ -190,11 +242,13 @@ describe Fastlane do
         expect(result).to include('-F v=1.12')
         expect(result).to include('-F e=ipa')
         expect(result).to include("-F file=@#{tmp_path}")
-        expect(result).to include('-u admin:admin123')
+        expect(result).not_to(include('admin123'))
+        expect(result).to include('--config -')
         expect(result).to include('--verbose')
         expect(result).to include('http://localhost:8081/nexus/service/local/artifact/maven/content')
         expect(result).to include('-x http://server:30')
-        expect(result).to include('--proxy-user admin:admin')
+        expect(result).not_to(include('--proxy-user'))
+        expect(result).not_to(include('proxypass'))
         expect(result).to include('--insecure')
       end
 
@@ -225,7 +279,8 @@ describe Fastlane do
         expect(result).to include('-F c=dSYM')
         expect(result).to include('-F e=ipa')
         expect(result).to include("-F file=@#{file_path}")
-        expect(result).to include('-u admin:admin123')
+        expect(result).not_to(include('admin123'))
+        expect(result).to include('--config -')
         expect(result).to include('--verbose')
         expect(result).to include('http://localhost:8081/my-nexus/service/local/artifact/maven/content')
         expect(result).not_to(include('-x '))
@@ -251,15 +306,17 @@ describe Fastlane do
                       proxy_address: 'http://server',
                       proxy_port: '30',
                       proxy_username: 'admin',
-                      proxy_password: 'admin')
+                      proxy_password: 'proxypass')
         end").runner.execute(:test)
 
         expect(result).to include("--upload-file #{tmp_path}")
-        expect(result).to include('-u admin:admin123')
+        expect(result).not_to(include('admin123'))
+        expect(result).to include('--config -')
         expect(result).to include('--verbose')
         expect(result).to include('http://localhost:8081/nexus/repository/artefacts/com/fastlane/myproject/1.12/myproject-1.12.ipa')
         expect(result).to include('-x http://server:30')
-        expect(result).to include('--proxy-user admin:admin')
+        expect(result).not_to(include('--proxy-user'))
+        expect(result).not_to(include('proxypass'))
         expect(result).to include('--insecure')
       end
     end
