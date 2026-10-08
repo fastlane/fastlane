@@ -419,6 +419,9 @@ module Fastlane
         rubygem = Bundler.rubygems.find_name(gem_name).first
         UI.user_error!("Couldn't find gem '#{gem_name}', make sure it is in your Gemfile") unless rubygem
 
+        # Before its Fastfiles, whose lanes may call the actions of the plugins the gem depends on
+        Fastlane.plugin_manager.load_plugins_required_by(gem_name)
+
         gem_path = rubygem.full_gem_path
 
         fastfiles = paths.map { |r| Dir.glob("#{gem_path}/#{r}") }.flatten

@@ -1,3 +1,7 @@
 lane :second do
   UI.message("second fastfile")
 end
+
+lane :plugin_action do
+  UI.message("shared_fixture loaded: #{!Fastlane::Actions.action_class_ref('shared_fixture').nil?}")
+end
