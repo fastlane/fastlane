@@ -12,7 +12,7 @@ jobs:
     name: Lock closed and inactive issues and pull requests
     runs-on: ubuntu-latest
     steps:
-      - uses: fastlane/github-actions/lock@9d169551c320140defc7894ca86e328b995831d8 # v0.7.1
+      - uses: fastlane/github-actions/lock@212cacd2e482bf799ecfe99e379b65b0f3eeba56 # v0.8.0
         with:
           repo-token: ${{ secrets.GITHUB_TOKEN }}
           days-before-lock: 60
