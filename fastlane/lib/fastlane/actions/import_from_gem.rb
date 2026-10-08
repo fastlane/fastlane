@@ -2,7 +2,7 @@ module Fastlane
   module Actions
     class ImportFromGemAction < Action
       def self.run(params)
-        # in fast_file.rb
+        # this is implemented in the fast_file.rb
       end
 
       #####################################################
