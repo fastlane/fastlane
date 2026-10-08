@@ -6,20 +6,20 @@ module Fastlane
 
         command =  "sourcedocs generate"
         command << " --all-modules" if params[:all_modules]
-        command << " --spm-module #{params[:spm_module]}" unless params[:spm_module].nil?
-        command << " --module-name #{params[:module_name]}" unless params[:module_name].nil?
-        command << " --link-beginning #{params[:link_beginning]}" unless params[:link_beginning].nil?
-        command << " --link-ending #{params[:link_ending]}" unless params[:link_ending].nil?
-        command << " --output-folder #{params[:output_folder]}" unless params[:output_folder].nil?
-        command << " --min-acl #{params[:min_acl]}" unless params[:min_acl].nil?
+        command << " --spm-module #{params[:spm_module].shellescape}" unless params[:spm_module].nil?
+        command << " --module-name #{params[:module_name].shellescape}" unless params[:module_name].nil?
+        command << " --link-beginning #{params[:link_beginning].shellescape}" unless params[:link_beginning].nil?
+        command << " --link-ending #{params[:link_ending].shellescape}" unless params[:link_ending].nil?
+        command << " --output-folder #{params[:output_folder].shellescape}" unless params[:output_folder].nil?
+        command << " --min-acl #{params[:min_acl].shellescape}" unless params[:min_acl].nil?
         command << " --module-name-path" if params[:module_name_path]
         command << " --clean" if params[:clean]
         command << " --collapsible" if params[:collapsible]
         command << " --table-of-contents" if params[:table_of_contents]
         command << " --reproducible-docs" if params[:reproducible]
         unless params[:scheme].nil?
-          command << " -- -scheme #{params[:scheme]}"
-          command << " -sdk #{params[:sdk_platform]}" unless params[:sdk_platform].nil?
+          command << " -- -scheme #{params[:scheme].shellescape}"
+          command << " -sdk #{params[:sdk_platform].shellescape}" unless params[:sdk_platform].nil?
         end
         Actions.sh(command)
       end
