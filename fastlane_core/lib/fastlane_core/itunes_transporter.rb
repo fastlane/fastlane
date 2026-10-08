@@ -9,14 +9,6 @@ require_relative 'helper'
 require_relative 'fastlane_pty'
 
 module FastlaneCore
-  # The TransporterInputError occurs when you passed wrong inputs to the {Deliver::ItunesTransporter}
-  class TransporterInputError < StandardError
-  end
-  # The TransporterTransferError occurs when some error happens
-  # while uploading or downloading something from/to iTC
-  class TransporterTransferError < StandardError
-  end
-
   # Used internally
   class TransporterRequiresApplicationSpecificPasswordError < StandardError
   end
@@ -791,8 +783,6 @@ module FastlaneCore
     # @param app_id [Integer] The unique App ID
     # @param dir [String] the path in which the package file should be stored
     # @return (Bool) True if everything worked fine
-    # @raise [Deliver::TransporterTransferError] when something went wrong
-    #   when transferring
     def download(app_id, dir = nil)
       # Dir.tmpdir, not a literal "/tmp": the transporter chdirs into this
       # directory, and "/tmp" is not one on Windows. See fastlane#30184.
@@ -832,8 +822,6 @@ module FastlaneCore
     # @param package_path [String] the path to the package file (used instead of app_id and dir)
     # @param asset_path [String] the path to the ipa/dmg/pkg file (used instead of package_path if running on macOS)
     # @return (Bool) True if everything worked fine
-    # @raise [Deliver::TransporterTransferError] when something went wrong
-    #   when transferring
     def upload(app_id = nil, dir = nil, package_path: nil, asset_path: nil, platform: nil)
       raise "app_id and dir are required or package_path or asset_path is required" if (app_id.nil? || dir.nil?) && package_path.nil? && asset_path.nil?
 
@@ -901,8 +889,6 @@ module FastlaneCore
     # @param dir [String] the path in which the package file is located
     # @param package_path [String] the path to the package file (used instead of app_id and dir)
     # @return (Bool) True if everything worked fine
-    # @raise [Deliver::TransporterTransferError] when something went wrong
-    #   when transferring
     def verify(app_id = nil, dir = nil, package_path: nil, asset_path: nil, platform: nil)
       raise "app_id and dir are required or package_path or asset_path is required" if (app_id.nil? || dir.nil?) && package_path.nil? && asset_path.nil?
 
