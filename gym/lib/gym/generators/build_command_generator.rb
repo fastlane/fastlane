@@ -34,11 +34,11 @@ module Gym
 
         options = []
         options += project_path_array
-        options << "-sdk '#{config[:sdk]}'" if config[:sdk]
-        options << "-toolchain '#{config[:toolchain]}'" if config[:toolchain]
-        options << "-destination '#{config[:destination]}'" if config[:destination]
+        options << "-sdk #{config[:sdk].shellescape}" if config[:sdk]
+        options << "-toolchain #{config[:toolchain].shellescape}" if config[:toolchain]
+        options << "-destination #{config[:destination].shellescape}" if config[:destination]
         options << "-archivePath #{archive_path.shellescape}" unless config[:skip_archive]
-        options << "-resultBundlePath '#{result_bundle_path}'" if config[:result_bundle]
+        options << "-resultBundlePath #{result_bundle_path.shellescape}" if config[:result_bundle]
         options << "-showBuildTimingSummary" if config[:build_timing_summary]
         if config[:use_system_scm] && !options.include?("-scmProvider system")
           options << "-scmProvider system"
