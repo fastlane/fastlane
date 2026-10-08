@@ -23,9 +23,9 @@ password has been deleted.
 
 ## Storing in the keychain
 
-By default, your Apple credentials are stored in the macOS Keychain.
+_fastlane_ only stores your Apple password in the macOS Keychain when the `FASTLANE_STORE_PASSWORDS_IN_KEYCHAIN` environment variable is set to `"1"`. Any program running as you can read a password stored this way, through the `security` command ([#29712](https://github.com/fastlane/fastlane/issues/29712)), so prefer an App Store Connect API key, or the `FASTLANE_PASSWORD` environment variable.
 
-Your password is only stored locally on your computer.
+A password stored by an earlier version is still used, with a warning saying how to remove it.
 
 ## Change Password
 
@@ -40,7 +40,7 @@ FASTLANE_USER
 FASTLANE_PASSWORD
 ```
 
-If you don't want to have your password stored in the Keychain set the `FASTLANE_DONT_STORE_PASSWORD` environment variable to `"1"`.
+`FASTLANE_DONT_STORE_PASSWORD` set to `"1"` still prevents storing, even when `FASTLANE_STORE_PASSWORDS_IN_KEYCHAIN` is set.
 
 ## Implementing a custom solution
 
