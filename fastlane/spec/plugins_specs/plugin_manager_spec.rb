@@ -234,6 +234,28 @@ describe Fastlane do
       end
     end
 
+    describe "#load_plugins_required_by" do
+      it "loads the gem's plugins that are not loaded yet, and not the available plugins" do
+        pm = Fastlane::PluginManager.new
+        pm.plugin_references["fastlane-plugin-loaded"] = { version_number: "1.0.0", actions: [] }
+        expect(pm).to receive(:plugins_required_by).with("company_lanes").and_return(["fastlane-plugin-loaded", "fastlane-plugin-new"])
+        expect(pm).not_to receive(:available_plugins)
+        expect(Fastlane::FastlaneRequire).to receive(:install_gem_if_needed).once.with(gem_name: "fastlane-plugin-new", require_gem: true)
+        expect(pm).to receive(:store_plugin_reference).once.with("fastlane-plugin-new")
+
+        pm.load_plugins_required_by("company_lanes", print_table: false)
+      end
+
+      it "loads nothing when the gem's plugins are all loaded" do
+        pm = Fastlane::PluginManager.new
+        pm.plugin_references["fastlane-plugin-loaded"] = { version_number: "1.0.0", actions: [] }
+        expect(pm).to receive(:plugins_required_by).with("company_lanes").and_return(["fastlane-plugin-loaded"])
+        expect(Fastlane::FastlaneRequire).not_to receive(:install_gem_if_needed)
+
+        pm.load_plugins_required_by("company_lanes")
+      end
+    end
+
     describe "Error handling of invalid plugins" do
       it "shows an appropriate error message when an action is not available, even though a plugin was added" do
         expect do

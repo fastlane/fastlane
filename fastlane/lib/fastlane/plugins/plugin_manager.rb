@@ -287,11 +287,12 @@ module Fastlane
     #   fastlane-plugin-[plugin_name]
     # This will make sure to load the action
     # and all its helpers
-    def load_plugins(print_table: true)
+    # @param plugins [Array] the plugins to load, the available plugins by default
+    def load_plugins(print_table: true, plugins: nil)
       UI.verbose("Checking if there are any plugins that should be loaded...")
 
       loaded_plugins = false
-      available_plugins.each do |gem_name|
+      (plugins || available_plugins).each do |gem_name|
         UI.verbose("Loading '#{gem_name}' plugin")
         begin
           # BEFORE requiring the gem, we get a list of loaded actions
@@ -315,7 +316,7 @@ module Fastlane
         end
       end
 
-      if !loaded_plugins && self.pluginfile_content.to_s.include?(PluginManager.plugin_prefix)
+      if plugins.nil? && !loaded_plugins && self.pluginfile_content.to_s.include?(PluginManager.plugin_prefix)
         UI.error("It seems like you wanted to load some plugins, however they couldn't be loaded")
         UI.error("Please follow the troubleshooting guide: #{TROUBLESHOOTING_URL}")
       end
@@ -324,6 +325,12 @@ module Fastlane
 
       # We want to avoid printing output other than the version number if we are running `fastlane -v`
       print_plugin_information(self.plugin_references) unless skip_print_plugin_info
+    end
+
+    # Loads the plugins the given gem depends on that are not loaded yet
+    def load_plugins_required_by(gem_name, print_table: true)
+      plugins = plugins_required_by(gem_name) - self.plugin_references.keys
+      load_plugins(print_table: print_table, plugins: plugins) unless plugins.empty?
     end
 
     # Prints a table all the plugins that were loaded
