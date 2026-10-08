@@ -110,6 +110,11 @@ describe Fastlane do
           fail("Error should have been raised")
         end
       end
+
+      it "is deprecated because Xcode Server is no longer supported" do
+        expect(Fastlane::Actions.is_deprecated?(Fastlane::Actions::XcodeServerGetAssetsAction)).to eq(true)
+        expect(Fastlane::Actions::XcodeServerGetAssetsAction.deprecated_notes).to include("since Xcode 14")
+      end
     end
   end
 end
