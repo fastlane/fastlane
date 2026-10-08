@@ -8,6 +8,7 @@ describe Gym do
       "GYM_DESTINATION" => nil,
       "GYM_SDK" => nil,
       "GYM_CATALYST_PLATFORM" => nil,
+      "GYM_WORKSPACE" => nil,
       "GYM_SCHEME" => nil,
       "GYM_CONFIGURATION" => nil,
       "GYM_EXPORT_METHOD" => nil,
@@ -16,6 +17,8 @@ describe Gym do
       "GYM_APP_NAME" => nil,
       "GYM_OUTPUT_NAME" => nil,
       "GYM_SKIP_ARCHIVE" => nil,
+      "GYM_SKIP_BUILD_ARCHIVE" => nil,
+      "GYM_SKIP_PACKAGE_IPA" => nil,
       "GYM_SKIP_PROFILE_DETECTION" => nil,
       "GYM_USE_GENERIC_ARCHIVE_FIX" => nil
     ) { example.run }
