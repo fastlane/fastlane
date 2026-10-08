@@ -1,0 +1,5 @@
+source("https://rubygems.org")
+
+# The folder holds dependency_with_plugins and the plugin it depends on
+gem "dependency_with_plugins", path: "."
+gem "fastlane", path: "../../../../.."
