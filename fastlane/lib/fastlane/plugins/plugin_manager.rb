@@ -66,6 +66,15 @@ module Fastlane
       end
     end
 
+    # Returns the fastlane plugins the given gem depends on, directly or through other gems
+    def plugins_required_by(gem_name)
+      rubygem = Bundler.rubygems.find_name(gem_name).first
+      return [] unless rubygem
+      collect_bundler_runtime_dependencies([], rubygem).map(&:name).keep_if do |current|
+        current.start_with?(self.class.plugin_prefix)
+      end
+    end
+
     # Check if a plugin is added as dependency to either the
     # Gemfile or the Pluginfile
     def plugin_is_added_as_dependency?(plugin_name)
@@ -394,6 +403,22 @@ module Fastlane
         version_number: version_number,
         actions: references
       }
+    end
+
+    private
+
+    # recursively collect runtime dependencies
+    def collect_bundler_runtime_dependencies(collection, source)
+      # Compare by name: one gem can be required with different version constraints
+      known = collection.map(&:name)
+      runtime_deps = source.dependencies.select { |d| d.type == :runtime && !known.include?(d.name) }.uniq(&:name)
+      collection.concat(runtime_deps)
+      runtime_deps.each do |d|
+        collect_bundler_runtime_dependencies(collection, d.to_spec)
+      rescue Gem::MissingSpecError
+        # ignoring unresolvable dependencies
+      end
+      collection
     end
   end
 end
