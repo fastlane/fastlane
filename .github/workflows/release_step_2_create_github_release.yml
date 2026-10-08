@@ -28,7 +28,6 @@ jobs:
     permissions:
       packages: write
       contents: write
-      id-token: write
 
     steps:
     - name: Checkout repository
@@ -41,8 +40,6 @@ jobs:
 
     - name: Install fastlane
       run: bundle install
-
-    - uses: rubygems/configure-rubygems-credentials@dc5a8d8553e6ee01fc26761a49e99e733d17954a # v2.1.0
 
     - name: Configure GitHub Packages config
       env:
@@ -57,10 +54,34 @@ jobs:
         FASTLANE_RELEASE_API_BEARER: ${{ secrets.GITHUB_TOKEN }}
         SLACK_URL: ${{ secrets.SLACK_URL }}
       run: |
-        bundle exec fastlane create_github_release skip_github_packages:${{ github.event.inputs.skip_github_packages }} skip_rubygems:${{ github.event.inputs.skip_rubygems }}
+        bundle exec fastlane create_github_release skip_github_packages:${{ github.event.inputs.skip_github_packages }}
 
     - uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
       with:
         name: release_tag
         path: latest_fl_version.txt
         retention-days: 1
+
+  release_rubygems:
+    needs: create_github_release
+    if: ${{ inputs.skip_rubygems != true }}
+    runs-on: ubuntu-latest
+
+    permissions:
+      contents: read
+      id-token: write
+
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      with:
+        persist-credentials: false
+
+    - name: Set up Ruby
+      uses: ruby/setup-ruby@14594264cd68ce8a2345dd349bc3d138a4ef85c8 # v1.327.0
+      with:
+        ruby-version: '3.4'
+        bundler-cache: true
+
+    - name: Release to RubyGems
+      uses: rubygems/release-gem@7f9650160c1a4e7989fdc9855807bdbd421d8b6b # v1.4.1

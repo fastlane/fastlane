@@ -1,5 +1,9 @@
 require "bundler/gem_tasks"
 
+# The release workflow runs `rake release` (rubygems/release-gem) after the create_github_release lane has already
+# tagged the release. Prevent another tag.
+Rake::Task["release:source_control_push"].clear
+
 Dir.glob("internal/rakelib/*.rake").each { |r| load r }
 
 task(:test_all) do
