@@ -45,10 +45,10 @@ module Sigh
       entitlements = "-e #{entitlements.shellescape}" if entitlements
 
       provisioning_options = create_provisioning_options(provisioning_profiles)
-      version = "-n #{version}" if version
+      version = "-n #{version.shellescape}" if version
       display_name = "-d #{display_name.shellescape}" if display_name
-      short_version = "--short-version #{short_version}" if short_version
-      bundle_version = "--bundle-version #{bundle_version}" if bundle_version
+      short_version = "--short-version #{short_version.shellescape}" if short_version
+      bundle_version = "--bundle-version #{bundle_version.shellescape}" if bundle_version
       verbose = "-v" if FastlaneCore::Globals.verbose?
       bundle_id = "-b '#{new_bundle_id}'" if new_bundle_id
       use_app_entitlements_flag = "--use-app-entitlements" if use_app_entitlements
