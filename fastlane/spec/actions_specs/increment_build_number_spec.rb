@@ -87,6 +87,26 @@ describe Fastlane do
 
           expect(Fastlane::Actions.lane_context[Fastlane::Actions::SharedValues::BUILD_NUMBER]).to eq('24')
         end
+
+        ["2.0 (beta)", "42$HOME"].each do |build_number|
+          it "passes the build number #{build_number} to agvtool as one argument" do
+            command = nil
+            expect(Fastlane::Actions).to receive(:sh).with(/agvtool new-version/).once do |cmd|
+              command = cmd
+              ""
+            end
+
+            Fastlane::FastFile.new.parse("lane :test do
+              increment_build_number(build_number: '#{build_number}', xcodeproj: '.xcproject')
+            end").runner.execute(:test)
+
+            expect(command).to end_with("agvtool new-version -all #{build_number.shellescape} && cd -")
+            unless FastlaneCore::Helper.windows?
+              argument = command[/new-version -all (.*) && cd -\z/, 1]
+              expect(`printf '%s\\n' #{argument}`).to eq("#{build_number}\n")
+            end
+          end
+        end
       end
 
       describe "With agv not enabled" do
