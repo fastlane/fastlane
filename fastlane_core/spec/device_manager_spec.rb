@@ -512,5 +512,31 @@ describe FastlaneCore do
         expect(device.state).to eq('Booted')
       end
     end
+
+    describe FastlaneCore::Simulator do
+      describe "#uninstall_app" do
+        let(:udid) { "90B59F9D-C90D-4B17-B347-5A71CCC66787" }
+
+        before(:each) do
+          allow(UI).to receive(:message)
+        end
+
+        it "boots the simulator headlessly and waits before uninstalling on Xcode 11 or later" do
+          allow(FastlaneCore::Helper).to receive(:xcode_at_least?).with("11").and_return(true)
+          expect(FastlaneCore::Helper).to receive(:backticks).with("xcrun simctl bootstatus #{udid} -b &> /dev/null").ordered
+          expect(FastlaneCore::Helper).to receive(:backticks).with("xcrun simctl uninstall #{udid} com.example.app &> /dev/null").ordered
+
+          FastlaneCore::Simulator.uninstall_app("com.example.app", "iPhone 16 Pro", udid)
+        end
+
+        it "boots the simulator with instruments before uninstalling on Xcode older than 11" do
+          allow(FastlaneCore::Helper).to receive(:xcode_at_least?).with("11").and_return(false)
+          expect(FastlaneCore::Helper).to receive(:backticks).with("xcrun instruments -w #{udid} &> /dev/null").ordered
+          expect(FastlaneCore::Helper).to receive(:backticks).with("xcrun simctl uninstall #{udid} com.example.app &> /dev/null").ordered
+
+          FastlaneCore::Simulator.uninstall_app("com.example.app", "iPhone 16 Pro", udid)
+        end
+      end
+    end
   end
 end
