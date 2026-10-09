@@ -1,12 +1,15 @@
 # Checks every gradle-wrapper.jar in the repository against the checksums of the official Gradle releases.
-# Runs on every push to master, so there is always a successful run for OpenSSF Scorecard, which stops counting
-# the jars as unreviewed binaries once it finds one.
+# Pull requests run it only when they touch a jar. Pushes to master always run it: OpenSSF Scorecard counts the
+# jars as unreviewed binaries unless the latest commit on master has a successful run of this workflow.
 name: Gradle wrapper validation
 
 on:
   push:
     branches: [ master ]
   pull_request:
+    paths:
+      - '**/gradle-wrapper.jar'
+      - '.github/workflows/gradle-wrapper-validation.yml'
 
 permissions:
   contents: read
