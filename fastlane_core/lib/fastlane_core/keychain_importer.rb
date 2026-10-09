@@ -1,4 +1,5 @@
 require_relative 'helper'
+require_relative 'stored_passwords'
 require 'open3'
 require 'security'
 
@@ -105,15 +106,16 @@ module FastlaneCore
       if item
         keychain_password = item.password
         UI.important("Using keychain password from keychain item #{server} in #{keychain_path}")
+        StoredPasswords.read_warning(server, what: "the password for #{keychain_path}", remove_with: "security delete-internet-password -s #{server}", instead: "provide it with the keychain_password option or the MATCH_KEYCHAIN_PASSWORD environment variable")&.each { |line| UI.important(line) }
       end
 
       if keychain_password.nil?
         if UI.interactive?
           UI.important("Enter the password for #{keychain_path}")
-          UI.important("This passphrase will be stored in your local keychain with the name #{server} and used in future runs")
+          UI.important("This passphrase will be stored in your local keychain with the name #{server} and used in future runs") if StoredPasswords.store?
           UI.important("This prompt can be avoided by specifying the 'keychain_password' option or 'MATCH_KEYCHAIN_PASSWORD' environment variable")
           keychain_password = FastlaneCore::Helper.ask_password(message: "Password for #{keychain_name} keychain: ", confirm: true, confirmation_message: "Type password for #{keychain_name} keychain again: ")
-          Security::InternetPassword.add(server, "", keychain_password)
+          Security::InternetPassword.add(server, "", keychain_password) if StoredPasswords.store?
         else
           UI.important("Keychain password for #{keychain_path} was not specified and not found in your keychain. Specify the 'keychain_password' option to prevent the UI permission popup when code signing")
           keychain_password = ""

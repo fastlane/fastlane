@@ -93,7 +93,8 @@ describe Match do
           allow(FastlaneCore::UI).to receive(:interactive?).and_return(true)
 
           expect(FastlaneCore::Helper).to receive(:ask_password).and_return('user_entered')
-          expect(Security::InternetPassword).to receive(:add).with('fastlane_keychain_login', anything, 'user_entered')
+          # Not stored unless FASTLANE_STORE_PASSWORDS_IN_KEYCHAIN is set
+          expect(Security::InternetPassword).not_to receive(:add)
 
           allow(FastlaneCore::Helper).to receive(:show_loading_indicator).and_return(true)
           allow(File).to receive(:file?).and_return(false)
