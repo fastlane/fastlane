@@ -4,16 +4,11 @@ module Fastlane
   module Actions
     class ImportCertificateAction < Action
       def self.run(params)
-        keychain_name = params[:keychain_name]
-        keychain_path = params[:keychain_path]
-
-        if keychain_name && keychain_path
-          UI.user_error!("Unresolved conflict between options: 'keychain_name' and 'keychain_path'")
-        elsif !keychain_name && !keychain_path
+        unless params[:keychain_name] || params[:keychain_path]
           UI.user_error!("You must provide either a :keychain_name or a :keychain_path")
         end
 
-        keychain_path ||= FastlaneCore::Helper.keychain_path(keychain_name)
+        keychain_path = params[:keychain_path] || FastlaneCore::Helper.keychain_path(params[:keychain_name])
 
         FastlaneCore::KeychainImporter.import_file(params[:certificate_path], keychain_path, keychain_password: params[:keychain_password], certificate_password: params[:certificate_password], certificate_format: params[:certificate_format], output: params[:log_output])
       end
@@ -83,7 +78,7 @@ module Fastlane
           )',
           'import_certificate(
             certificate_path: "certs/development.cer",
-            keychain_path: "~/Library/Keychains/login.keychain-db"
+            keychain_path: File.expand_path("~/Library/Keychains/login.keychain-db")
           )',
           'import_certificate(
             certificate_path: "certs/dist.p12",
