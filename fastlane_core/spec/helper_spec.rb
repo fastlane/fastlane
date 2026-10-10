@@ -272,13 +272,13 @@ describe FastlaneCore do
           FastlaneCore::Helper.open_owner_only(path) { |file| file.write("secret") }
 
           expect(File.read(path)).to eq("secret")
-          expect(mode_of(path)).to eq(0o600) unless FastlaneCore::Helper.windows?
+          expect(mode_of(path)).to eq(0o600)
         end
 
         it "restricts an existing file before writing to it" do
           path = File.join(@dir, "key.pem")
           File.write(path, "old")
-          File.chmod(0o644, path) unless FastlaneCore::Helper.windows?
+          File.chmod(0o644, path)
 
           mode_while_writing = nil
           FastlaneCore::Helper.open_owner_only(path) do |file|
@@ -288,7 +288,7 @@ describe FastlaneCore do
 
           expect(File.read(path)).to eq("new")
           expect(File.writable?(path)).to be(true)
-          expect(mode_while_writing).to eq(0o600) unless FastlaneCore::Helper.windows?
+          expect(mode_while_writing).to eq(0o600)
         end
 
         it "passes the open mode, e.g. binary append" do
@@ -297,8 +297,20 @@ describe FastlaneCore do
           FastlaneCore::Helper.open_owner_only(path, "ab") { |file| file.write("b") }
 
           expect(File.binread(path)).to eq("ab")
-          expect(mode_of(path)).to eq(0o600) unless FastlaneCore::Helper.windows?
+          expect(mode_of(path)).to eq(0o600)
         end
+      end
+
+      # Temporary: what File.chmod reports on every platform
+      it "reports the mode File.chmod sets on a file and a directory" do
+        path = File.join(@dir, "chmod.txt")
+        File.write(path, "x")
+        File.chmod(0o600, path)
+        dir = File.join(@dir, "chmod_dir")
+        Dir.mkdir(dir)
+        File.chmod(0o700, dir)
+
+        expect([mode_of(path), mode_of(dir)]).to eq([0o600, 0o700])
       end
 
       describe "#mkdir_owner_only" do
@@ -307,17 +319,17 @@ describe FastlaneCore do
           FastlaneCore::Helper.mkdir_owner_only(dir)
 
           expect(File.directory?(dir)).to be(true)
-          expect(mode_of(dir)).to eq(0o700) unless FastlaneCore::Helper.windows?
+          expect(mode_of(dir)).to eq(0o700)
         end
 
         it "restricts an existing directory" do
           dir = File.join(@dir, "keys")
           Dir.mkdir(dir)
-          File.chmod(0o755, dir) unless FastlaneCore::Helper.windows?
+          File.chmod(0o755, dir)
           FastlaneCore::Helper.mkdir_owner_only(dir)
 
           expect(File.directory?(dir)).to be(true)
-          expect(mode_of(dir)).to eq(0o700) unless FastlaneCore::Helper.windows?
+          expect(mode_of(dir)).to eq(0o700)
         end
       end
     end
