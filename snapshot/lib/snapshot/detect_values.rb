@@ -34,6 +34,8 @@ module Snapshot
       coerce_to_array_of_strings(:skip_testing)
 
       # Devices
+      # Picking the default devices depends on whether the project builds for macOS
+      Snapshot.project.verify_xcodebuild_settings_lookup_allowed!("SUPPORTED_PLATFORMS", option: "devices") if config[:devices].nil?
       if config[:devices].nil? && !Snapshot.project.mac?
         config[:devices] = []
 

@@ -413,13 +413,7 @@ module FastlaneCore
     def build_settings(key: nil, optional: true)
       unless @build_settings
         if (disallowed_by = xcodebuild_settings_lookup_disallowed_by)
-          message = "Could not read the '#{key}' build setting: fetching build settings by running" \
-            " `xcodebuild -showBuildSettings` is disallowed by #{disallowed_by}."
-          trigger = caller.find { |frame| !frame.start_with?(__FILE__) }
-          message += "\nThe build setting lookup was triggered by: #{trigger}" if trigger
-          message += "\nTo fix this, manually specify the option whose automatic detection required the '#{key}' build setting," \
-            " or disable #{disallowed_by} to allow fastlane to fetch it automatically."
-          UI.user_error!(message)
+          UI.user_error!(xcodebuild_settings_lookup_disallowed_message(key, disallowed_by))
         end
 
         if is_workspace
@@ -481,6 +475,32 @@ module FastlaneCore
     def default_build_settings(key: nil, optional: true)
       options[:scheme] ||= schemes.first if is_workspace
       build_settings(key: key, optional: optional)
+    end
+
+    # Returns a description of what disallowed fetching build settings via the
+    # (potentially slow on large projects) `xcodebuild -showBuildSettings` command,
+    # or nil if the lookup is allowed. Callers that can do without a value check
+    # this first, rather than running a lookup that would fail
+    def xcodebuild_settings_lookup_disallowed_by
+      return "the FASTLANE_DISALLOW_XCODEBUILD_SETTINGS_LOOKUP environment variable" if FastlaneCore::Env.truthy?("FASTLANE_DISALLOW_XCODEBUILD_SETTINGS_LOOKUP")
+      return "the `disallow_xcodebuild_settings_lookup` option" if options[:disallow_xcodebuild_settings_lookup]
+      nil
+    end
+
+    # The app name from the build settings, or nil when fetching them is disallowed.
+    # For names that have something else to fall back on, such as a log file's
+    def app_name_if_lookup_allowed
+      app_name unless xcodebuild_settings_lookup_disallowed_by
+    end
+
+    # When fetching build settings is disallowed, fails with the error a lookup of
+    # `key` would raise, but naming the option(s) to set instead. Call it before a
+    # lookup that an option can replace
+    # @param key [String] The build setting the caller is about to read
+    # @param option [String, Array<String>] The option(s) that make the lookup unnecessary
+    def verify_xcodebuild_settings_lookup_allowed!(key, option:)
+      disallowed_by = xcodebuild_settings_lookup_disallowed_by
+      UI.user_error!(xcodebuild_settings_lookup_disallowed_message(key, disallowed_by, option: option)) if disallowed_by
     end
 
     # @internal to module
@@ -574,13 +594,22 @@ module FastlaneCore
       FastlaneCore::Env.truthy?("AUTOMATED_SCHEME_SELECTION")
     end
 
-    # Returns a description of what disallowed fetching build settings via the
-    # (potentially slow on large projects) `xcodebuild -showBuildSettings` command,
-    # or nil if the lookup is allowed
-    def xcodebuild_settings_lookup_disallowed_by
-      return "the FASTLANE_DISALLOW_XCODEBUILD_SETTINGS_LOOKUP environment variable" if FastlaneCore::Env.truthy?("FASTLANE_DISALLOW_XCODEBUILD_SETTINGS_LOOKUP")
-      return "the `disallow_xcodebuild_settings_lookup` option" if options[:disallow_xcodebuild_settings_lookup]
-      nil
+    def xcodebuild_settings_lookup_disallowed_message(key, disallowed_by, option: nil)
+      names = Array(option).map { |name| "`#{name}`" }
+      fix = if names.size == 1
+              "set the #{names.first} option"
+            elsif names.size > 1
+              "set one of the #{names[0..-2].join(', ')} or #{names.last} options"
+            else
+              "manually specify the option whose automatic detection required the '#{key}' build setting"
+            end
+
+      message = "Could not read the '#{key}' build setting: fetching build settings by running" \
+        " `xcodebuild -showBuildSettings` is disallowed by #{disallowed_by}."
+      # The first frame outside this file is the tool code that needed the value
+      trigger = caller.find { |frame| !frame.start_with?(__FILE__) }
+      message += "\nThe build setting lookup was triggered by: #{trigger}" if trigger
+      message + "\nTo fix this, #{fix}, or disable #{disallowed_by} to allow fastlane to fetch it automatically."
     end
   end
 end

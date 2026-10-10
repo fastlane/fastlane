@@ -11,6 +11,36 @@ describe Gym do
 %)
   end
 
+  describe Gym::ErrorHandler, requires_xcode: true do
+    context "when the SDK can't be read from the build settings" do
+      let(:project) { FastlaneCore::Project.new(project: "./gym/examples/multipleSchemes/Example.xcodeproj", disallow_xcodebuild_settings_lookup: true) }
+
+      before do
+        allow(Gym).to receive(:config).and_return(FastlaneCore::Configuration.create(Gym::Options.available_options, {}))
+        allow(Gym).to receive(:project).and_return(project)
+        allow(Gym::BuildCommandGenerator).to receive(:xcodebuild_log_path).and_return("missing.log")
+        expect(FastlaneCore::Project).not_to receive(:run_command)
+      end
+
+      it "still reports the build failure when fetching build settings is disallowed" do
+        expect(UI).to receive(:build_failure!).with("Error building the application - see the log above", error_info: @output)
+        Gym::ErrorHandler.handle_build_error(@output)
+      end
+
+      it "still reports the package failure when fetching build settings is disallowed" do
+        expect(UI).to receive(:build_failure!).with("Error packaging up the application", error_info: @output)
+        Gym::ErrorHandler.handle_package_error(@output)
+      end
+
+      it "still reports the build failure when fetching build settings times out" do
+        allow(project).to receive(:build_settings).and_raise(FastlaneCore::Interface::FastlaneDependencyCausedException, "xcodebuild -showBuildSettings timed out")
+
+        expect(UI).to receive(:build_failure!).with("Error building the application - see the log above", error_info: @output)
+        Gym::ErrorHandler.handle_build_error(@output)
+      end
+    end
+  end
+
   describe Gym::ErrorHandler, requires_xcodebuild: true do
     before(:each) { Gym.config = @config }
 
