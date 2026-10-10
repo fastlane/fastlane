@@ -77,6 +77,9 @@ public protocol ScanfileProtocol: AnyObject {
     /// Should the thread sanitizer be turned on?
     var threadSanitizer: Bool? { get }
 
+    /// Whether verbose and long-running diagnostics (like sysdiagnoses or log archives) are collected when testing. Valid values are: on-failure or never. If not specified, the value in the test plan is used. Equivalent to -collect-test-diagnostics (Xcode 14 and up)
+    var collectTestDiagnostics: String? { get }
+
     /// Should the HTML report be opened when tests are completed?
     var openReport: Bool { get }
 
@@ -353,6 +356,10 @@ public extension ScanfileProtocol {
         return nil
     }
 
+    var collectTestDiagnostics: String? {
+        return nil
+    }
+
     var openReport: Bool {
         return false
     }
@@ -588,4 +595,4 @@ public extension ScanfileProtocol {
 
 // Please don't remove the lines below
 // They are used to detect outdated files
-// FastlaneRunnerAPIVersion [0.9.163]
+// FastlaneRunnerAPIVersion [0.9.164]
