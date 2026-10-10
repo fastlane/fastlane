@@ -96,7 +96,8 @@ module FastlaneCore
       FileUtils.rm_rf(api_key[:cleanup_path])
     end
 
-    def execute(command, hide_output)
+    # @param env [Hash] environment for the command, such as the password it reads with -p @env:
+    def execute(command, hide_output, env: {})
       if Helper.test?
         yield(nil) if block_given?
         return command
@@ -113,7 +114,7 @@ module FastlaneCore
       end
 
       begin
-        exit_status = FastlaneCore::FastlanePty.spawn(command) do |command_stdout, command_stdin, pid|
+        exit_status = FastlaneCore::FastlanePty.spawn(command, env: env) do |command_stdout, command_stdin, pid|
           begin
             command_stdout.each do |line|
               @all_lines << line
@@ -267,7 +268,8 @@ module FastlaneCore
 
     attr_reader :errors
 
-    def execute(command, hide_output)
+    # @param env [Hash] environment for the command, such as the password it reads with -p @env:
+    def execute(command, hide_output, env: {})
       if Helper.test?
         yield(nil) if block_given?
         return command
@@ -283,7 +285,7 @@ module FastlaneCore
       end
 
       begin
-        exit_status = FastlaneCore::FastlanePty.spawn(command) do |command_stdout, command_stdin, pid|
+        exit_status = FastlaneCore::FastlanePty.spawn(command, env: env) do |command_stdout, command_stdin, pid|
           command_stdout.each do |line|
             @all_lines << line
             parse_line(line, hide_output) # this is where the parsing happens
@@ -313,7 +315,8 @@ module FastlaneCore
 
     def build_credential_params(username = nil, password = nil, jwt = nil, api_key = nil)
       if !username.nil? && !password.nil? && api_key.nil?
-        "-u #{username.shellescape} -p #{password.shellescape}"
+        # The password itself comes from the environment, see ItunesTransporter#password_environment
+        "-u #{username.shellescape} -p @env:ITMS_TRANSPORTER_PASSWORD"
       elsif !api_key.nil?
         # Individual API keys have no issuer_id; altool requires --apiIssuer
         # to be present, so we pass the key_id as a placeholder and add
@@ -582,7 +585,6 @@ module FastlaneCore
       credential_params = build_credential_params(username, password, jwt, api_key, is_default_itms_on_xcode_11?)
       if is_default_itms_on_xcode_11?
         [
-          ("ITMS_TRANSPORTER_PASSWORD=#{password.shellescape}" if jwt.to_s.empty?),
           'xcrun iTMSTransporter',
           '-m upload',
           credential_params,
@@ -620,7 +622,6 @@ module FastlaneCore
       credential_params = build_credential_params(username, password, jwt, nil, is_default_itms_on_xcode_11?)
       if is_default_itms_on_xcode_11?
         [
-          ("ITMS_TRANSPORTER_PASSWORD=#{password.shellescape}" if jwt.to_s.empty?),
           'xcrun iTMSTransporter',
           '-m verify',
           credential_params,
@@ -652,7 +653,6 @@ module FastlaneCore
       credential_params = build_credential_params(username, password, jwt, nil, is_default_itms_on_xcode_11?)
       if is_default_itms_on_xcode_11?
         [
-          ("ITMS_TRANSPORTER_PASSWORD=#{password.shellescape}" if jwt.to_s.empty?),
           'xcrun iTMSTransporter',
           '-m lookupMetadata',
           credential_params,
@@ -686,7 +686,6 @@ module FastlaneCore
       credential_params = build_credential_params(username, password, jwt, api_key, is_default_itms_on_xcode_11?)
       if is_default_itms_on_xcode_11?
         [
-          ("ITMS_TRANSPORTER_PASSWORD=#{password.shellescape}" if jwt.to_s.empty?),
           'xcrun iTMSTransporter',
           '-m provider',
           credential_params,
@@ -730,12 +729,12 @@ module FastlaneCore
       end
     end
 
-    def execute(command, hide_output)
+    def execute(command, hide_output, env: {})
       # The Java command needs to be run starting in a working directory in the iTMSTransporter
       # file area. The shell script takes care of changing directories over to there, but we'll
       # handle it manually here for this strategy.
       FileUtils.cd(Helper.itms_path) do
-        return super(command, hide_output)
+        return super(command, hide_output, env: env)
       end
     end
   end
@@ -810,7 +809,7 @@ module FastlaneCore
       UI.verbose(@transporter_executor.build_download_command(@user, password_placeholder, app_id, dir, @provider_short_name, jwt_placeholder))
 
       begin
-        result = @transporter_executor.execute(command, ItunesTransporter.hide_transporter_output?)
+        result = @transporter_executor.execute(command, ItunesTransporter.hide_transporter_output?, env: password_environment)
       rescue TransporterRequiresApplicationSpecificPasswordError => ex
         handle_two_step_failure(ex)
         return download(app_id, dir)
@@ -877,7 +876,7 @@ module FastlaneCore
       UI.verbose(@transporter_executor.build_upload_command(@user, password_placeholder, actual_dir, upload_options_placeholder))
 
       begin
-        result = @transporter_executor.execute(command, ItunesTransporter.hide_transporter_output?)
+        result = @transporter_executor.execute(command, ItunesTransporter.hide_transporter_output?, env: password_environment)
       rescue TransporterRequiresApplicationSpecificPasswordError => ex
         handle_two_step_failure(ex)
         return upload(app_id, dir, package_path: package_path, asset_path: asset_path)
@@ -938,7 +937,7 @@ module FastlaneCore
       UI.verbose(@transporter_executor.build_verify_command(@user, password_placeholder, actual_dir, verify_options_placeholder))
 
       begin
-        result = @transporter_executor.execute(command, ItunesTransporter.hide_transporter_output?)
+        result = @transporter_executor.execute(command, ItunesTransporter.hide_transporter_output?, env: password_environment)
       rescue TransporterRequiresApplicationSpecificPasswordError => ex
         handle_two_step_failure(ex)
         return verify(app_id, dir, package_path: package_path)
@@ -974,7 +973,7 @@ module FastlaneCore
 
       lines = []
       begin
-        result = @transporter_executor.execute(command, ItunesTransporter.hide_transporter_output?) { |xs| lines = xs }
+        result = @transporter_executor.execute(command, ItunesTransporter.hide_transporter_output?, env: password_environment) { |xs| lines = xs }
         return result if Helper.test?
       rescue TransporterRequiresApplicationSpecificPasswordError => ex
         handle_two_step_failure(ex)
@@ -991,6 +990,13 @@ module FastlaneCore
     private
 
     TWO_FACTOR_ENV_VARIABLE = "FASTLANE_APPLE_APPLICATION_SPECIFIC_PASSWORD"
+
+    # The password goes to the transporter in its environment, which altool and xcrun iTMSTransporter read through
+    # -p @env:ITMS_TRANSPORTER_PASSWORD, rather than on their command line
+    def password_environment
+      return {} if @password.to_s.empty?
+      { "ITMS_TRANSPORTER_PASSWORD" => @password }
+    end
 
     # Returns whether altool should be used or ItunesTransporter should be used
     def should_use_altool?(altool_compatible_command, use_shell_script)
