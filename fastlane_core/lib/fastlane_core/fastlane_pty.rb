@@ -20,13 +20,14 @@ module FastlaneCore
   end
 
   class FastlanePty
-    def self.spawn(command, &block)
-      spawn_with_pty(command, &block)
+    # @param env [Hash] environment variables for the command only, e.g. a value it should not get on its command line
+    def self.spawn(command, env: {}, &block)
+      spawn_with_pty(command, env: env, &block)
     rescue LoadError
-      spawn_with_popen(command, &block)
+      spawn_with_popen(command, env: env, &block)
     end
 
-    def self.spawn_with_pty(original_command, &block)
+    def self.spawn_with_pty(original_command, env: {}, &block)
       require 'pty'
       # this forces the PTY flush - fixes #21792
       command = ENV['FASTLANE_EXEC_FLUSH_PTY_WORKAROUND'] ? "#{original_command};" : original_command
@@ -35,7 +36,7 @@ module FastlaneCore
       # that runs a subprocess in between overwrites it, and nothing writes it at
       # all when the wait does not happen. See fastlane#30188.
       status = nil
-      PTY.spawn(command) do |command_stdout, command_stdin, pid|
+      PTY.spawn(*spawn_args(env, command)) do |command_stdout, command_stdin, pid|
         begin
           yield(command_stdout, command_stdin, pid)
         rescue Errno::EIO
@@ -71,10 +72,10 @@ module FastlaneCore
       raise FastlanePtyError.new(e, status&.exitstatus || e.exit_status, status)
     end
 
-    def self.spawn_with_popen(command, &block)
+    def self.spawn_with_popen(command, env: {}, &block)
       status = nil
       require 'open3'
-      Open3.popen2e(command) do |command_stdin, command_stdout, p| # note the inversion
+      Open3.popen2e(*spawn_args(env, command)) do |command_stdin, command_stdout, p| # note the inversion
         status = p.value
         yield(command_stdout, command_stdin, status.pid)
         command_stdin.close
@@ -86,6 +87,11 @@ module FastlaneCore
       # Wrapping any error in FastlanePtyError to allow callers to see and use
       # $?.exitstatus that would usually get returned
       raise FastlanePtyError.new(e, status.exitstatus || e.exit_status, status)
+    end
+
+    # Existing callers keep calling spawn with the command alone
+    def self.spawn_args(env, command)
+      (env || {}).empty? ? [command] : [env, command]
     end
 
     # to ease mocking
