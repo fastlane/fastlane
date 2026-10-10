@@ -81,6 +81,10 @@ jobs:
       with:
         persist-credentials: false
 
+    # setup-ruby writes path and deployment to Bundler's local config; keep them out of the tracked .bundle/config so `rake release` sees a clean tree
+    - name: Keep Bundler config out of the repository
+      run: echo "BUNDLE_APP_CONFIG=$RUNNER_TEMP/bundle" >> "$GITHUB_ENV"
+
     - name: Set up Ruby
       uses: ruby/setup-ruby@14594264cd68ce8a2345dd349bc3d138a4ef85c8 # v1.327.0
       with:
