@@ -622,6 +622,7 @@ private_lane :ensure_markdown_links do
   Dir.chdir("..") do
     Dir["**/*.md"].each do |path|
       next if path.start_with?('vendor/', '.bundle/') || path.include?('/fixtures/')
+      next if File.basename(path) == "CHANGELOG.latest.md"
       errors += Fastlane::Internal::Docs::MarkdownLinks.new(path: path).errors
     end
   end
