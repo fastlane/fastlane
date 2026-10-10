@@ -308,6 +308,25 @@ describe Deliver::Runner do
     end
   end
 
+  describe :precheck_app do
+    it 'does not submit for review when precheck reports a blocking violation' do
+      options[:app_version] = nil
+      options[:skip_app_version_update] = true
+      options[:skip_binary_upload] = true
+      options[:run_precheck_before_submit] = true
+      options[:submit_for_review] = true
+
+      allow(runner).to receive(:upload_metadata)
+      precheck_runner = instance_double(Precheck::Runner)
+      allow(Precheck::Runner).to receive(:new).and_return(precheck_runner)
+      allow(precheck_runner).to receive(:run).and_raise(FastlaneCore::Interface::FastlaneError)
+
+      expect(runner).not_to receive(:submit_for_review)
+
+      runner.run
+    end
+  end
+
   describe :upload_metadata do
     let(:fake_upload_metadata) { instance_double(Deliver::UploadMetadata, load_from_filesystem: nil, assign_defaults: nil, upload: nil) }
     let(:fake_upload_screenshots) { instance_double(Deliver::UploadScreenshots, collect_screenshots: [], upload: nil) }
