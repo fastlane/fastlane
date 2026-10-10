@@ -11,13 +11,6 @@ gem "climate_control", "~> 0.2.0"
 gem "fakefs", ">= 1.8"
 # for file uploads with Faraday
 gem "mime-types", ['>= 1.16', '< 4.0']
-# standard library for OpenSSL has affected versions (unable to get certificate CRL) - ruby/openssl/issues/949
-# We block affected versions here so a patched gem version will be used regardless of Ruby version.
-gem "openssl",
-    ">= 3.1.2",
-    "!= 3.2.0",
-    "!= 3.2.1",
-    "!= 3.3.0"
 # Fast XML parser and object marshaller.
 gem "ox", "~> 2.14"
 # Provides an interactive debugging environment for Ruby.
@@ -55,6 +48,18 @@ gem "xcode-install", ">= 2.6.7"
 gem "xcov", "~> 1.9.0"
 # A documentation generation tool for Ruby.
 gem "yard", "~> 0.9.44"
+
+# Excluded from the release job (BUNDLE_WITHOUT): the rubygems/release-gem attestation patch loads the default openssl
+# before Bundler, which then refuses a different locked version - rubygems/release-gem/issues/28
+group :openssl_pin do
+  # standard library for OpenSSL has affected versions (unable to get certificate CRL) - ruby/openssl/issues/949
+  # We block affected versions here so a patched gem version will be used regardless of Ruby version.
+  gem "openssl",
+      ">= 3.1.2",
+      "!= 3.2.0",
+      "!= 3.2.1",
+      "!= 3.3.0"
+end
 
 gemspec(path: ".")
 
