@@ -13,7 +13,8 @@ end
 def run_in_fixture_bundle(fixture_path, command)
   require "open3"
   bundle_path = Bundler.configured_bundle_path
-  env = bundle_path.use_system_gems? ? {} : { "BUNDLE_PATH" => bundle_path.base_path.to_s }
+  # Absolute, as the checked-in path is relative to this repository, not to the fixture
+  env = bundle_path.use_system_gems? ? {} : { "BUNDLE_PATH" => Bundler.root.join(bundle_path.base_path).to_s }
   Bundler.with_unbundled_env do
     Dir.chdir(fixture_path) do
       install_output, status = Open3.capture2e(env, "bundle install --local")
