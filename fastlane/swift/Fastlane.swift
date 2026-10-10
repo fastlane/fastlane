@@ -3068,6 +3068,8 @@ public func chatwork(apiToken: String,
 
  This action deletes the files that get created in your repo as a result of running the _gym_ and _sigh_ commands. It doesn't delete the `fastlane/report.xml` though, this is probably more suited for the .gitignore.
 
+ From _cert_ it only deletes the `.cer` file. The private key (`<certificate id>.p12`, despite its name an unencrypted PEM key) and the `.certSigningRequest` that _cert_ writes to its `output_path` when it creates a certificate are kept: _cert_ uses that `.p12` to install the certificate on a machine that doesn't have it, and on systems other than macOS it is the only copy of the key. Keep them out of version control.
+
  Useful if you quickly want to send out a test build by dropping down to the command line and typing something like `fastlane beta`, without leaving your repo in a messy state afterwards.
  */
 public func cleanBuildArtifacts(excludePattern: OptionalConfigValue<String?> = .fastlaneDefault(nil)) {
@@ -3435,6 +3437,8 @@ public func createAppOnManagedPlayStore(jsonKey: OptionalConfigValue<String?> = 
 
  - parameters:
    - username: Your Apple ID Username
+   - apiKeyPath: Path to your App Store Connect API Key JSON file (https://docs.fastlane.tools/app-store-connect-api/#using-fastlane-api-key-json-file)
+   - apiKey: Your App Store Connect API Key information (https://docs.fastlane.tools/app-store-connect-api/#using-fastlane-api-key-hash-option)
    - appIdentifier: App Identifier (Bundle ID, e.g. com.krausefx.app)
    - bundleIdentifierSuffix: App Identifier Suffix (Ignored if App Identifier does not end with .*)
    - appName: App Name
@@ -3459,6 +3463,8 @@ public func createAppOnManagedPlayStore(jsonKey: OptionalConfigValue<String?> = 
  For more information about _produce_, visit its documentation page: [https://docs.fastlane.tools/actions/produce/](https://docs.fastlane.tools/actions/produce/).
  */
 public func createAppOnline(username: String,
+                            apiKeyPath: OptionalConfigValue<String?> = .fastlaneDefault(nil),
+                            apiKey: OptionalConfigValue<[String: Any]?> = .fastlaneDefault(nil),
                             appIdentifier: String,
                             bundleIdentifierSuffix: OptionalConfigValue<String?> = .fastlaneDefault(nil),
                             appName: String,
@@ -3479,6 +3485,8 @@ public func createAppOnline(username: String,
                             itcTeamName: OptionalConfigValue<String?> = .fastlaneDefault(nil))
 {
     let usernameArg = RubyCommand.Argument(name: "username", value: username, type: nil)
+    let apiKeyPathArg = apiKeyPath.asRubyArgument(name: "api_key_path", type: nil)
+    let apiKeyArg = apiKey.asRubyArgument(name: "api_key", type: nil)
     let appIdentifierArg = RubyCommand.Argument(name: "app_identifier", value: appIdentifier, type: nil)
     let bundleIdentifierSuffixArg = bundleIdentifierSuffix.asRubyArgument(name: "bundle_identifier_suffix", type: nil)
     let appNameArg = RubyCommand.Argument(name: "app_name", value: appName, type: nil)
@@ -3498,6 +3506,8 @@ public func createAppOnline(username: String,
     let itcTeamIdArg = RubyCommand.Argument(name: "itc_team_id", value: itcTeamId, type: nil)
     let itcTeamNameArg = itcTeamName.asRubyArgument(name: "itc_team_name", type: nil)
     let array: [RubyCommand.Argument?] = [usernameArg,
+                                          apiKeyPathArg,
+                                          apiKeyArg,
                                           appIdentifierArg,
                                           bundleIdentifierSuffixArg,
                                           appNameArg,
@@ -5214,6 +5224,7 @@ public func getManagedPlayStorePublishingRights(jsonKey: OptionalConfigValue<Str
    - force: Renew provisioning profiles regardless of its state - to automatically add all devices for ad hoc profiles
    - includeMacInProfiles: Include Apple Silicon Mac devices in provisioning profiles for iOS/iPadOS apps
    - appIdentifier: The bundle identifier of your app
+   - offlineProfile: Enable profile with 'Offline Support' (7 day validity). Requires Apple ID login, not supported with App Store Connect API key authentication
    - apiKeyPath: Path to your App Store Connect API Key JSON file (https://docs.fastlane.tools/app-store-connect-api/#using-fastlane-api-key-json-file)
    - apiKey: Your App Store Connect API Key information (https://docs.fastlane.tools/app-store-connect-api/#using-fastlane-api-key-hash-option)
    - username: Your Apple ID Username
@@ -5248,6 +5259,7 @@ public func getManagedPlayStorePublishingRights(jsonKey: OptionalConfigValue<Str
                                                       force: OptionalConfigValue<Bool> = .fastlaneDefault(false),
                                                       includeMacInProfiles: OptionalConfigValue<Bool> = .fastlaneDefault(false),
                                                       appIdentifier: String,
+                                                      offlineProfile: OptionalConfigValue<Bool> = .fastlaneDefault(false),
                                                       apiKeyPath: OptionalConfigValue<String?> = .fastlaneDefault(nil),
                                                       apiKey: OptionalConfigValue<[String: Any]?> = .fastlaneDefault(nil),
                                                       username: OptionalConfigValue<String?> = .fastlaneDefault(nil),
@@ -5278,6 +5290,7 @@ public func getManagedPlayStorePublishingRights(jsonKey: OptionalConfigValue<Str
     let forceArg = force.asRubyArgument(name: "force", type: nil)
     let includeMacInProfilesArg = includeMacInProfiles.asRubyArgument(name: "include_mac_in_profiles", type: nil)
     let appIdentifierArg = RubyCommand.Argument(name: "app_identifier", value: appIdentifier, type: nil)
+    let offlineProfileArg = offlineProfile.asRubyArgument(name: "offline_profile", type: nil)
     let apiKeyPathArg = apiKeyPath.asRubyArgument(name: "api_key_path", type: nil)
     let apiKeyArg = apiKey.asRubyArgument(name: "api_key", type: nil)
     let usernameArg = username.asRubyArgument(name: "username", type: nil)
@@ -5307,6 +5320,7 @@ public func getManagedPlayStorePublishingRights(jsonKey: OptionalConfigValue<Str
                                           forceArg,
                                           includeMacInProfilesArg,
                                           appIdentifierArg,
+                                          offlineProfileArg,
                                           apiKeyPathArg,
                                           apiKeyArg,
                                           usernameArg,
@@ -6923,8 +6937,8 @@ public func makeChangelogFromJenkins(fallbackChangelog: String = "",
    - gitUserEmail: git user email to commit
    - shallowClone: Make a shallow clone of the repository (truncate the history to 1 revision)
    - cloneBranchDirectly: Clone just the branch specified, instead of the whole repo. This requires that the branch already exists. Otherwise the command will fail
-   - gitBasicAuthorization: Use a basic authorization header to access the git repo (e.g.: access via HTTPS, GitHub Actions, etc), usually a string in Base64
-   - gitBearerAuthorization: Use a bearer authorization header to access the git repo (e.g.: access to an Azure DevOps repository), usually a string in Base64
+   - gitBasicAuthorization: Use a basic authorization header to access the git repo (e.g.: access via HTTPS, GitHub Actions, etc), usually a string in Base64. Needs git 2.31 or later
+   - gitBearerAuthorization: Use a bearer authorization header to access the git repo (e.g.: access to an Azure DevOps repository), usually a string in Base64. Needs git 2.31 or later
    - gitPrivateKey: Use a private key to access the git repo (e.g.: access to GitHub repository via Deploy keys), usually a id_rsa named file or the contents hereof
    - googleCloudBucketName: Name of the Google Cloud Storage bucket to use
    - googleCloudKeysFile: Path to the gc_keys.json file
@@ -6962,6 +6976,7 @@ public func makeChangelogFromJenkins(fallbackChangelog: String = "",
    - outputPath: Path in which to export certificates, key and profile
    - skipSetPartitionList: Skips setting the partition list (which can sometimes take a long time). Setting the partition list is usually needed to prevent Xcode from prompting to allow a cert to be used for signing
    - forceLegacyEncryption: Force encryption to use legacy cbc algorithm for backwards compatibility with older match versions
+   - offlineProfile: Enable profile with 'Offline Support' (7 day validity). Requires Apple ID login, not supported with App Store Connect API key authentication
    - verbose: Print out extra information and all commands
 
  More information: https://docs.fastlane.tools/actions/match/
@@ -7023,6 +7038,7 @@ public func match(type: String = matchfile.type,
                   outputPath: OptionalConfigValue<String?> = .fastlaneDefault(matchfile.outputPath),
                   skipSetPartitionList: OptionalConfigValue<Bool> = .fastlaneDefault(matchfile.skipSetPartitionList),
                   forceLegacyEncryption: OptionalConfigValue<Bool> = .fastlaneDefault(matchfile.forceLegacyEncryption),
+                  offlineProfile: OptionalConfigValue<Bool> = .fastlaneDefault(matchfile.offlineProfile),
                   verbose: OptionalConfigValue<Bool> = .fastlaneDefault(matchfile.verbose))
 {
     let typeArg = RubyCommand.Argument(name: "type", value: type, type: nil)
@@ -7082,6 +7098,7 @@ public func match(type: String = matchfile.type,
     let outputPathArg = outputPath.asRubyArgument(name: "output_path", type: nil)
     let skipSetPartitionListArg = skipSetPartitionList.asRubyArgument(name: "skip_set_partition_list", type: nil)
     let forceLegacyEncryptionArg = forceLegacyEncryption.asRubyArgument(name: "force_legacy_encryption", type: nil)
+    let offlineProfileArg = offlineProfile.asRubyArgument(name: "offline_profile", type: nil)
     let verboseArg = verbose.asRubyArgument(name: "verbose", type: nil)
     let array: [RubyCommand.Argument?] = [typeArg,
                                           additionalCertTypesArg,
@@ -7140,6 +7157,7 @@ public func match(type: String = matchfile.type,
                                           outputPathArg,
                                           skipSetPartitionListArg,
                                           forceLegacyEncryptionArg,
+                                          offlineProfileArg,
                                           verboseArg]
     let args: [RubyCommand.Argument] = array
         .filter { $0?.value != nil }
@@ -7170,8 +7188,8 @@ public func match(type: String = matchfile.type,
    - gitUserEmail: git user email to commit
    - shallowClone: Make a shallow clone of the repository (truncate the history to 1 revision)
    - cloneBranchDirectly: Clone just the branch specified, instead of the whole repo. This requires that the branch already exists. Otherwise the command will fail
-   - gitBasicAuthorization: Use a basic authorization header to access the git repo (e.g.: access via HTTPS, GitHub Actions, etc), usually a string in Base64
-   - gitBearerAuthorization: Use a bearer authorization header to access the git repo (e.g.: access to an Azure DevOps repository), usually a string in Base64
+   - gitBasicAuthorization: Use a basic authorization header to access the git repo (e.g.: access via HTTPS, GitHub Actions, etc), usually a string in Base64. Needs git 2.31 or later
+   - gitBearerAuthorization: Use a bearer authorization header to access the git repo (e.g.: access to an Azure DevOps repository), usually a string in Base64. Needs git 2.31 or later
    - gitPrivateKey: Use a private key to access the git repo (e.g.: access to GitHub repository via Deploy keys), usually a id_rsa named file or the contents hereof
    - googleCloudBucketName: Name of the Google Cloud Storage bucket to use
    - googleCloudKeysFile: Path to the gc_keys.json file
@@ -7209,6 +7227,7 @@ public func match(type: String = matchfile.type,
    - outputPath: Path in which to export certificates, key and profile
    - skipSetPartitionList: Skips setting the partition list (which can sometimes take a long time). Setting the partition list is usually needed to prevent Xcode from prompting to allow a cert to be used for signing
    - forceLegacyEncryption: Force encryption to use legacy cbc algorithm for backwards compatibility with older match versions
+   - offlineProfile: Enable profile with 'Offline Support' (7 day validity). Requires Apple ID login, not supported with App Store Connect API key authentication
    - verbose: Print out extra information and all commands
 
  Use the match_nuke action to revoke your certificates and provisioning profiles.
@@ -7274,6 +7293,7 @@ public func matchNuke(type: String = "development",
                       outputPath: OptionalConfigValue<String?> = .fastlaneDefault(nil),
                       skipSetPartitionList: OptionalConfigValue<Bool> = .fastlaneDefault(false),
                       forceLegacyEncryption: OptionalConfigValue<Bool> = .fastlaneDefault(false),
+                      offlineProfile: OptionalConfigValue<Bool> = .fastlaneDefault(false),
                       verbose: OptionalConfigValue<Bool> = .fastlaneDefault(false))
 {
     let typeArg = RubyCommand.Argument(name: "type", value: type, type: nil)
@@ -7333,6 +7353,7 @@ public func matchNuke(type: String = "development",
     let outputPathArg = outputPath.asRubyArgument(name: "output_path", type: nil)
     let skipSetPartitionListArg = skipSetPartitionList.asRubyArgument(name: "skip_set_partition_list", type: nil)
     let forceLegacyEncryptionArg = forceLegacyEncryption.asRubyArgument(name: "force_legacy_encryption", type: nil)
+    let offlineProfileArg = offlineProfile.asRubyArgument(name: "offline_profile", type: nil)
     let verboseArg = verbose.asRubyArgument(name: "verbose", type: nil)
     let array: [RubyCommand.Argument?] = [typeArg,
                                           additionalCertTypesArg,
@@ -7391,6 +7412,7 @@ public func matchNuke(type: String = "development",
                                           outputPathArg,
                                           skipSetPartitionListArg,
                                           forceLegacyEncryptionArg,
+                                          offlineProfileArg,
                                           verboseArg]
     let args: [RubyCommand.Argument] = array
         .filter { $0?.value != nil }
@@ -7581,8 +7603,8 @@ public func notarize(package: String,
    - message: The message to display in the notification
    - sound: The name of a sound to play when the notification appears (names are listed in Sound Preferences)
    - activate: Bundle identifier of application to be opened when the notification is clicked
-   - appIcon: The URL of an image to display instead of the application icon (Mavericks+ only)
-   - contentImage: The URL of an image to display attached to the notification (Mavericks+ only)
+   - appIcon: **DEPRECATED!** The URL of an image to display instead of the application icon
+   - contentImage: The local path of an image to display attached to the notification (Mavericks+)
    - open: URL of the resource to be opened when the notification is clicked
    - execute: Shell command to run when the notification is clicked
  */
@@ -8415,6 +8437,8 @@ public func println(message: OptionalConfigValue<String?> = .fastlaneDefault(nil
 
  - parameters:
    - username: Your Apple ID Username
+   - apiKeyPath: Path to your App Store Connect API Key JSON file (https://docs.fastlane.tools/app-store-connect-api/#using-fastlane-api-key-json-file)
+   - apiKey: Your App Store Connect API Key information (https://docs.fastlane.tools/app-store-connect-api/#using-fastlane-api-key-hash-option)
    - appIdentifier: App Identifier (Bundle ID, e.g. com.krausefx.app)
    - bundleIdentifierSuffix: App Identifier Suffix (Ignored if App Identifier does not end with .*)
    - appName: App Name
@@ -8439,6 +8463,8 @@ public func println(message: OptionalConfigValue<String?> = .fastlaneDefault(nil
  For more information about _produce_, visit its documentation page: [https://docs.fastlane.tools/actions/produce/](https://docs.fastlane.tools/actions/produce/).
  */
 public func produce(username: String,
+                    apiKeyPath: OptionalConfigValue<String?> = .fastlaneDefault(nil),
+                    apiKey: OptionalConfigValue<[String: Any]?> = .fastlaneDefault(nil),
                     appIdentifier: String,
                     bundleIdentifierSuffix: OptionalConfigValue<String?> = .fastlaneDefault(nil),
                     appName: String,
@@ -8459,6 +8485,8 @@ public func produce(username: String,
                     itcTeamName: OptionalConfigValue<String?> = .fastlaneDefault(nil))
 {
     let usernameArg = RubyCommand.Argument(name: "username", value: username, type: nil)
+    let apiKeyPathArg = apiKeyPath.asRubyArgument(name: "api_key_path", type: nil)
+    let apiKeyArg = apiKey.asRubyArgument(name: "api_key", type: nil)
     let appIdentifierArg = RubyCommand.Argument(name: "app_identifier", value: appIdentifier, type: nil)
     let bundleIdentifierSuffixArg = bundleIdentifierSuffix.asRubyArgument(name: "bundle_identifier_suffix", type: nil)
     let appNameArg = RubyCommand.Argument(name: "app_name", value: appName, type: nil)
@@ -8478,6 +8506,8 @@ public func produce(username: String,
     let itcTeamIdArg = RubyCommand.Argument(name: "itc_team_id", value: itcTeamId, type: nil)
     let itcTeamNameArg = itcTeamName.asRubyArgument(name: "itc_team_name", type: nil)
     let array: [RubyCommand.Argument?] = [usernameArg,
+                                          apiKeyPathArg,
+                                          apiKeyArg,
                                           appIdentifierArg,
                                           bundleIdentifierSuffixArg,
                                           appNameArg,
@@ -9002,6 +9032,7 @@ public func rubyVersion() {
    - codeCoverage: Should code coverage be generated? (Xcode 7 and up)
    - addressSanitizer: Should the address sanitizer be turned on?
    - threadSanitizer: Should the thread sanitizer be turned on?
+   - collectTestDiagnostics: Whether verbose and long-running diagnostics (like sysdiagnoses or log archives) are collected when testing. Valid values are: on-failure or never. If not specified, the value in the test plan is used. Equivalent to -collect-test-diagnostics (Xcode 14 and up)
    - openReport: Should the HTML report be opened when tests are completed?
    - outputDirectory: The directory in which all reports will be stored
    - outputStyle: Define how the output should look like. Valid values are: standard, basic, rspec, or raw (disables xcpretty during xcodebuild)
@@ -9090,6 +9121,7 @@ public func rubyVersion() {
                                         codeCoverage: OptionalConfigValue<Bool?> = .fastlaneDefault(nil),
                                         addressSanitizer: OptionalConfigValue<Bool?> = .fastlaneDefault(nil),
                                         threadSanitizer: OptionalConfigValue<Bool?> = .fastlaneDefault(nil),
+                                        collectTestDiagnostics: OptionalConfigValue<String?> = .fastlaneDefault(nil),
                                         openReport: OptionalConfigValue<Bool> = .fastlaneDefault(false),
                                         outputDirectory: String = "./test_output",
                                         outputStyle: OptionalConfigValue<String?> = .fastlaneDefault(nil),
@@ -9174,6 +9206,7 @@ public func rubyVersion() {
     let codeCoverageArg = codeCoverage.asRubyArgument(name: "code_coverage", type: nil)
     let addressSanitizerArg = addressSanitizer.asRubyArgument(name: "address_sanitizer", type: nil)
     let threadSanitizerArg = threadSanitizer.asRubyArgument(name: "thread_sanitizer", type: nil)
+    let collectTestDiagnosticsArg = collectTestDiagnostics.asRubyArgument(name: "collect_test_diagnostics", type: nil)
     let openReportArg = openReport.asRubyArgument(name: "open_report", type: nil)
     let outputDirectoryArg = RubyCommand.Argument(name: "output_directory", value: outputDirectory, type: nil)
     let outputStyleArg = outputStyle.asRubyArgument(name: "output_style", type: nil)
@@ -9257,6 +9290,7 @@ public func rubyVersion() {
                                           codeCoverageArg,
                                           addressSanitizerArg,
                                           threadSanitizerArg,
+                                          collectTestDiagnosticsArg,
                                           openReportArg,
                                           outputDirectoryArg,
                                           outputStyleArg,
@@ -9453,6 +9487,7 @@ public func say(text: [String],
    - codeCoverage: Should code coverage be generated? (Xcode 7 and up)
    - addressSanitizer: Should the address sanitizer be turned on?
    - threadSanitizer: Should the thread sanitizer be turned on?
+   - collectTestDiagnostics: Whether verbose and long-running diagnostics (like sysdiagnoses or log archives) are collected when testing. Valid values are: on-failure or never. If not specified, the value in the test plan is used. Equivalent to -collect-test-diagnostics (Xcode 14 and up)
    - openReport: Should the HTML report be opened when tests are completed?
    - outputDirectory: The directory in which all reports will be stored
    - outputStyle: Define how the output should look like. Valid values are: standard, basic, rspec, or raw (disables xcpretty during xcodebuild)
@@ -9541,6 +9576,7 @@ public func say(text: [String],
                                     codeCoverage: OptionalConfigValue<Bool?> = .fastlaneDefault(scanfile.codeCoverage),
                                     addressSanitizer: OptionalConfigValue<Bool?> = .fastlaneDefault(scanfile.addressSanitizer),
                                     threadSanitizer: OptionalConfigValue<Bool?> = .fastlaneDefault(scanfile.threadSanitizer),
+                                    collectTestDiagnostics: OptionalConfigValue<String?> = .fastlaneDefault(scanfile.collectTestDiagnostics),
                                     openReport: OptionalConfigValue<Bool> = .fastlaneDefault(scanfile.openReport),
                                     outputDirectory: String = scanfile.outputDirectory,
                                     outputStyle: OptionalConfigValue<String?> = .fastlaneDefault(scanfile.outputStyle),
@@ -9625,6 +9661,7 @@ public func say(text: [String],
     let codeCoverageArg = codeCoverage.asRubyArgument(name: "code_coverage", type: nil)
     let addressSanitizerArg = addressSanitizer.asRubyArgument(name: "address_sanitizer", type: nil)
     let threadSanitizerArg = threadSanitizer.asRubyArgument(name: "thread_sanitizer", type: nil)
+    let collectTestDiagnosticsArg = collectTestDiagnostics.asRubyArgument(name: "collect_test_diagnostics", type: nil)
     let openReportArg = openReport.asRubyArgument(name: "open_report", type: nil)
     let outputDirectoryArg = RubyCommand.Argument(name: "output_directory", value: outputDirectory, type: nil)
     let outputStyleArg = outputStyle.asRubyArgument(name: "output_style", type: nil)
@@ -9708,6 +9745,7 @@ public func say(text: [String],
                                           codeCoverageArg,
                                           addressSanitizerArg,
                                           threadSanitizerArg,
+                                          collectTestDiagnosticsArg,
                                           openReportArg,
                                           outputDirectoryArg,
                                           outputStyleArg,
@@ -10311,6 +10349,7 @@ public func setupTravis(force: OptionalConfigValue<Bool> = .fastlaneDefault(fals
    - force: Renew provisioning profiles regardless of its state - to automatically add all devices for ad hoc profiles
    - includeMacInProfiles: Include Apple Silicon Mac devices in provisioning profiles for iOS/iPadOS apps
    - appIdentifier: The bundle identifier of your app
+   - offlineProfile: Enable profile with 'Offline Support' (7 day validity). Requires Apple ID login, not supported with App Store Connect API key authentication
    - apiKeyPath: Path to your App Store Connect API Key JSON file (https://docs.fastlane.tools/app-store-connect-api/#using-fastlane-api-key-json-file)
    - apiKey: Your App Store Connect API Key information (https://docs.fastlane.tools/app-store-connect-api/#using-fastlane-api-key-hash-option)
    - username: Your Apple ID Username
@@ -10345,6 +10384,7 @@ public func setupTravis(force: OptionalConfigValue<Bool> = .fastlaneDefault(fals
                                     force: OptionalConfigValue<Bool> = .fastlaneDefault(false),
                                     includeMacInProfiles: OptionalConfigValue<Bool> = .fastlaneDefault(false),
                                     appIdentifier: String,
+                                    offlineProfile: OptionalConfigValue<Bool> = .fastlaneDefault(false),
                                     apiKeyPath: OptionalConfigValue<String?> = .fastlaneDefault(nil),
                                     apiKey: OptionalConfigValue<[String: Any]?> = .fastlaneDefault(nil),
                                     username: OptionalConfigValue<String?> = .fastlaneDefault(nil),
@@ -10375,6 +10415,7 @@ public func setupTravis(force: OptionalConfigValue<Bool> = .fastlaneDefault(fals
     let forceArg = force.asRubyArgument(name: "force", type: nil)
     let includeMacInProfilesArg = includeMacInProfiles.asRubyArgument(name: "include_mac_in_profiles", type: nil)
     let appIdentifierArg = RubyCommand.Argument(name: "app_identifier", value: appIdentifier, type: nil)
+    let offlineProfileArg = offlineProfile.asRubyArgument(name: "offline_profile", type: nil)
     let apiKeyPathArg = apiKeyPath.asRubyArgument(name: "api_key_path", type: nil)
     let apiKeyArg = apiKey.asRubyArgument(name: "api_key", type: nil)
     let usernameArg = username.asRubyArgument(name: "username", type: nil)
@@ -10404,6 +10445,7 @@ public func setupTravis(force: OptionalConfigValue<Bool> = .fastlaneDefault(fals
                                           forceArg,
                                           includeMacInProfilesArg,
                                           appIdentifierArg,
+                                          offlineProfileArg,
                                           apiKeyPathArg,
                                           apiKeyArg,
                                           usernameArg,
@@ -11536,8 +11578,8 @@ public func swiftlint(mode: String = "lint",
    - gitUserEmail: git user email to commit
    - shallowClone: Make a shallow clone of the repository (truncate the history to 1 revision)
    - cloneBranchDirectly: Clone just the branch specified, instead of the whole repo. This requires that the branch already exists. Otherwise the command will fail
-   - gitBasicAuthorization: Use a basic authorization header to access the git repo (e.g.: access via HTTPS, GitHub Actions, etc), usually a string in Base64
-   - gitBearerAuthorization: Use a bearer authorization header to access the git repo (e.g.: access to an Azure DevOps repository), usually a string in Base64
+   - gitBasicAuthorization: Use a basic authorization header to access the git repo (e.g.: access via HTTPS, GitHub Actions, etc), usually a string in Base64. Needs git 2.31 or later
+   - gitBearerAuthorization: Use a bearer authorization header to access the git repo (e.g.: access to an Azure DevOps repository), usually a string in Base64. Needs git 2.31 or later
    - gitPrivateKey: Use a private key to access the git repo (e.g.: access to GitHub repository via Deploy keys), usually a id_rsa named file or the contents hereof
    - googleCloudBucketName: Name of the Google Cloud Storage bucket to use
    - googleCloudKeysFile: Path to the gc_keys.json file
@@ -11575,6 +11617,7 @@ public func swiftlint(mode: String = "lint",
    - outputPath: Path in which to export certificates, key and profile
    - skipSetPartitionList: Skips setting the partition list (which can sometimes take a long time). Setting the partition list is usually needed to prevent Xcode from prompting to allow a cert to be used for signing
    - forceLegacyEncryption: Force encryption to use legacy cbc algorithm for backwards compatibility with older match versions
+   - offlineProfile: Enable profile with 'Offline Support' (7 day validity). Requires Apple ID login, not supported with App Store Connect API key authentication
    - verbose: Print out extra information and all commands
 
  More information: https://docs.fastlane.tools/actions/match/
@@ -11636,6 +11679,7 @@ public func syncCodeSigning(type: String = "development",
                             outputPath: OptionalConfigValue<String?> = .fastlaneDefault(nil),
                             skipSetPartitionList: OptionalConfigValue<Bool> = .fastlaneDefault(false),
                             forceLegacyEncryption: OptionalConfigValue<Bool> = .fastlaneDefault(false),
+                            offlineProfile: OptionalConfigValue<Bool> = .fastlaneDefault(false),
                             verbose: OptionalConfigValue<Bool> = .fastlaneDefault(false))
 {
     let typeArg = RubyCommand.Argument(name: "type", value: type, type: nil)
@@ -11695,6 +11739,7 @@ public func syncCodeSigning(type: String = "development",
     let outputPathArg = outputPath.asRubyArgument(name: "output_path", type: nil)
     let skipSetPartitionListArg = skipSetPartitionList.asRubyArgument(name: "skip_set_partition_list", type: nil)
     let forceLegacyEncryptionArg = forceLegacyEncryption.asRubyArgument(name: "force_legacy_encryption", type: nil)
+    let offlineProfileArg = offlineProfile.asRubyArgument(name: "offline_profile", type: nil)
     let verboseArg = verbose.asRubyArgument(name: "verbose", type: nil)
     let array: [RubyCommand.Argument?] = [typeArg,
                                           additionalCertTypesArg,
@@ -11753,6 +11798,7 @@ public func syncCodeSigning(type: String = "development",
                                           outputPathArg,
                                           skipSetPartitionListArg,
                                           forceLegacyEncryptionArg,
+                                          offlineProfileArg,
                                           verboseArg]
     let args: [RubyCommand.Argument] = array
         .filter { $0?.value != nil }
@@ -14215,4 +14261,4 @@ public let snapshotfile: Snapshotfile = .init()
 
 // Please don't remove the lines below
 // They are used to detect outdated files
-// FastlaneRunnerAPIVersion [0.9.208]
+// FastlaneRunnerAPIVersion [0.9.209]
