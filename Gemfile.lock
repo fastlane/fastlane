@@ -1,3 +1,10 @@
+GIT
+  remote: https://github.com/fastlane-community/security.git
+  revision: 9c7f7edbe245ab60417aa458f77712cec6070e5e
+  branch: gem/7-passwords-via-interactive
+  specs:
+    security (0.3.0)
+
 PATH
   remote: .
   specs:
@@ -306,7 +313,6 @@ GEM
       rubocop (>= 1.0)
     ruby-progressbar (1.13.0)
     rubyzip (3.6.0)
-    security (0.3.0)
     signet (0.21.0)
       addressable (~> 2.8)
       faraday (>= 0.17.5, < 3.a)
@@ -392,6 +398,7 @@ DEPENDENCIES
   rubocop (= 1.91.0)
   rubocop-performance
   rubocop-require_tools
+  security!
   simplecov
   sinatra (~> 4.2)
   webmock (~> 3.18)

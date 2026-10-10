@@ -59,3 +59,6 @@ gem "yard", "~> 0.9.44"
 gemspec(path: ".")
 
 eval_gemfile("fastlane/Pluginfile")
+
+# Until the security gem releases the keychain APIs these changes use.
+gem "security", git: "https://github.com/fastlane-community/security.git", branch: "gem/7-passwords-via-interactive"
