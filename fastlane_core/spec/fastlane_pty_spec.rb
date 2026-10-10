@@ -188,6 +188,15 @@ describe FastlaneCore do
         end
       end
 
+      it 'passes the command alone when env is nil', requires_pty: true do
+        expect(PTY).to receive(:spawn).with("echo foo")
+
+        FastlaneSpec::Env.with_env_values('FASTLANE_EXEC_FLUSH_PTY_WORKAROUND' => nil) do
+          FastlaneCore::FastlanePty.spawn_with_pty('echo foo', env: nil) do |command_stdout, command_stdin, pid|
+          end
+        end
+      end
+
       it 'wraps the command with a workaround when FASTLANE_EXEC_FLUSH_PTY_WORKAROUND is set', requires_pty: true do
         expect(PTY).to receive(:spawn).with("echo foo;")
 

@@ -91,7 +91,7 @@ module FastlaneCore
 
     # Existing callers keep calling spawn with the command alone
     def self.spawn_args(env, command)
-      env.empty? ? [command] : [env, command]
+      (env || {}).empty? ? [command] : [env, command]
     end
 
     # to ease mocking
