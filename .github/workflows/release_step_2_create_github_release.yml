@@ -74,6 +74,8 @@ jobs:
     env:
       # The attestation patch loads the default openssl before Bundler, which would refuse our locked one - rubygems/release-gem/issues/28
       BUNDLE_WITHOUT: openssl_pin
+      # setup-ruby writes its Bundler settings to the local config, which would change our tracked .bundle/config and fail `rake release`'s clean-tree check
+      BUNDLE_APP_CONFIG: ${{ github.workspace }}/../bundle-config
 
     steps:
     - name: Checkout repository
