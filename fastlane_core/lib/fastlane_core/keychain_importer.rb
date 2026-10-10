@@ -1,5 +1,4 @@
 require_relative 'helper'
-require 'open3'
 require 'security'
 
 module FastlaneCore
@@ -27,48 +26,37 @@ module FastlaneCore
       set_partition_list(path, keychain_path, keychain_password: keychain_password, output: output)
     end
 
+    # What `security` reports for a wrong keychain password, on older and newer macOS.
+    WRONG_KEYCHAIN_PASSWORD = ["SecKeychainItemSetAccessWithPassword", "The user name or passphrase you entered is not correct"]
+
     def self.set_partition_list(path, keychain_path, keychain_password: nil, output: FastlaneCore::Globals.verbose?)
       # When security supports partition lists, also add the partition IDs
       # See https://openradar.appspot.com/28524119
-      if Helper.backticks('security -h | grep set-key-partition-list', print: false).length > 0
-        password_part = " -k #{keychain_password.to_s.shellescape}"
+      return unless Security::Keychain.supports_key_partition_list?
 
-        command = "security set-key-partition-list"
-        command << " -S apple-tool:,apple:,codesign:"
-        command << " -s" # This is a needed in Catalina to prevent "security: SecKeychainItemCopyAccess: A missing value was detected."
-        command << password_part
-        command << " #{keychain_path.shellescape}"
-        command << " 1> /dev/null" # always disable stdout. This can be very verbose, and leak potentially sensitive info
+      # Showing loading indicator as this can take some time if a lot of keys installed
+      Helper.with_loading_indicator("Setting key partition list... (this can take a minute if there are a lot of keys installed)") do
+        UI.command("security set-key-partition-list -S apple-tool:,apple:,codesign: -s -k ******** #{keychain_path.shellescape}") if output
+        Security::Keychain.new(keychain_path).set_key_partition_list(keychain_password.to_s)
+      rescue Security::Error => e
+        err = e.output.strip
 
-        # Showing loading indicator as this can take some time if a lot of keys installed
-        Helper.with_loading_indicator("Setting key partition list... (this can take a minute if there are a lot of keys installed)") do
-          # Strip keychain password from command output
-          sensitive_command = command.gsub(password_part, " -k ********")
-          UI.command(sensitive_command) if output
-          Open3.popen3(command) do |stdin, stdout, stderr, thrd|
-            unless thrd.value.success?
-              err = stderr.read.to_s.strip
+        # Inform user when no/wrong password was used as its needed to prevent UI permission popup from Xcode when signing
+        if WRONG_KEYCHAIN_PASSWORD.any? { |message| err.include?(message) }
+          keychain_name = File.basename(keychain_path, ".*")
+          Security::InternetPassword.delete(server: server_name(keychain_name))
 
-              # Inform user when no/wrong password was used as its needed to prevent UI permission popup from Xcode when signing
-              if err.include?("SecKeychainItemSetAccessWithPassword")
-                keychain_name = File.basename(keychain_path, ".*")
-                Security::InternetPassword.delete(server: server_name(keychain_name))
-
-                UI.important("")
-                UI.important("Could not configure imported keychain item (certificate) to prevent UI permission popup when code signing\n" \
-                         "Check if you supplied the correct `keychain_password` for keychain: `#{keychain_path}`\n" \
-                         "#{err}")
-                UI.important("")
-                UI.important("Please look at the following docs to see how to set a keychain password:")
-                UI.important(" - https://docs.fastlane.tools/actions/sync_code_signing")
-                UI.important(" - https://docs.fastlane.tools/actions/get_certificates")
-              else
-                UI.error(err)
-              end
-            end
-          end
+          UI.important("")
+          UI.important("Could not configure imported keychain item (certificate) to prevent UI permission popup when code signing\n" \
+                   "Check if you supplied the correct `keychain_password` for keychain: `#{keychain_path}`\n" \
+                   "#{err}")
+          UI.important("")
+          UI.important("Please look at the following docs to see how to set a keychain password:")
+          UI.important(" - https://docs.fastlane.tools/actions/sync_code_signing")
+          UI.important(" - https://docs.fastlane.tools/actions/get_certificates")
+        else
+          UI.error(err)
         end
-
       end
     end
 
