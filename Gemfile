@@ -12,12 +12,8 @@ gem "fakefs", ">= 1.8"
 # for file uploads with Faraday
 gem "mime-types", ['>= 1.16', '< 4.0']
 # standard library for OpenSSL has affected versions (unable to get certificate CRL) - ruby/openssl/issues/949
-# We block affected versions here so a patched gem version will be used regardless of Ruby version.
-gem "openssl",
-    ">= 3.1.2",
-    "!= 3.2.0",
-    "!= 3.2.1",
-    "!= 3.3.0"
+# which we avoid by targeting the 4.x releases which also fixes rubygems/release-gem/issues/28
+gem "openssl", ">= 4.0"
 # Fast XML parser and object marshaller.
 gem "ox", "~> 2.14"
 # Provides an interactive debugging environment for Ruby.
