@@ -71,6 +71,10 @@ jobs:
       contents: read
       id-token: write
 
+    env:
+      # The attestation patch loads the default openssl before Bundler, which would refuse our locked one - rubygems/release-gem/issues/28
+      BUNDLE_WITHOUT: openssl_pin
+
     steps:
     - name: Checkout repository
       uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
