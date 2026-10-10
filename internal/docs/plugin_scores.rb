@@ -5,6 +5,7 @@ module Fastlane
         require 'faraday'
         require 'faraday/follow_redirects'
         require 'yaml'
+        require 'date'
 
         class FastlanePluginRating
           attr_accessor :key
@@ -68,6 +69,7 @@ module Fastlane
               has_info: self.info.to_s.length > 5,
               downloads: self.downloads,
               has_github_page: has_github_page,
+              has_opensource_repo: nil,
               has_mit_license: includes_license?("MIT"),
               has_gnu_license: includes_license?("GNU") || includes_license?("GPL"),
               major_release: Gem::Version.new(hash["version"]) >= Gem::Version.new("1.0.0"),
@@ -92,12 +94,17 @@ module Fastlane
                 self.append_git_data
                 self.append_github_data
               end
+            else
+              self.data[:has_opensource_repo] = false if self.data[:has_opensource_repo].nil?
+              self.cache[self.name] ||= {}
+              self.cache[self.name][:has_opensource_repo] = self.data[:has_opensource_repo]
             end
 
             File.open(cache_path, 'w') do |file|
               file.write(self.cache.to_yaml)
             end
 
+            self.data[:has_opensource_repo] = false if self.data[:has_opensource_repo].nil?
             self.data[:overall_score] = 0
             self.data[:ratings] = self.ratings.collect do |current_rating|
               [
@@ -141,12 +148,25 @@ module Fastlane
                                description: "Lots of open issues are not a good sign usually, unless the project is really popular",
                                      value: (self.data[:github_issues].to_i * -1)),
               FastlanePluginRating.new(key: :downloads,
-                               description: "More downloads = more users have been using the plugin for a while",
-                                     value: (self.data[:downloads].to_i / 250)),
+                               description: "Downloads scaled 0–1000 points with max at 150k downloads",
+                                     value: downloads_score(self.data[:downloads].to_i)),
               FastlanePluginRating.new(key: :tests,
                                description: "The more tests a plugin has, the better",
-                                     value: [self.data[:tests].to_i * 3, 80].min)
+                                     value: [self.data[:tests].to_i * 3, 80].min),
+              FastlanePluginRating.new(key: :open_source,
+                               description: "fastlane is open source, it's good to have plugins open source too",
+                                     value: (self.data[:has_opensource_repo] ? 10 : -100))
             ]
+          end
+
+          # Downloads score: linearly scale 0..150_000 downloads to 0..1_000 points and cap at max.
+          def downloads_score(count)
+            max_downloads = 150_000
+            max_score = 1_000
+            c = count.to_i
+            c = 0 if c < 0
+            scaled = ((c.to_f / max_downloads) * max_score).round
+            scaled > max_score ? max_score : scaled
           end
 
           # What colors should the overall score be printed in
@@ -192,6 +212,7 @@ module Fastlane
               self.data[:github_issues] = cache_data[:github_issues]
               self.data[:github_forks] = cache_data[:github_forks]
               self.data[:github_contributors] = cache_data[:github_contributors]
+              self.data[:has_opensource_repo] = cache_data.key?(:has_opensource_repo) ? cache_data[:has_opensource_repo] : self.data[:has_opensource_repo]
 
               return true
             end
@@ -203,7 +224,7 @@ module Fastlane
           def append_git_data
             Dir.mktmpdir("fastlane-plugin") do |tmp|
               clone_folder = File.join(tmp, self.name)
-              system({ "GIT_TERMINAL_PROMPT" => "0" }, "git", "clone", self.homepage, clone_folder)
+              system({ "GIT_TERMINAL_PROMPT" => "0" }, "git", "clone", "--filter=blob:none", self.homepage, clone_folder)
 
               break unless File.directory?(clone_folder)
 
@@ -262,7 +283,15 @@ module Fastlane
             end
             conn.headers[:authorization] = Faraday::Utils.basic_header_from(ENV["GITHUB_USER_NAME"], ENV["GITHUB_API_TOKEN"])
             response = conn.get('')
+            if response.status == 404
+              puts("GitHub repo not found (404) for #{self}: #{self.homepage}")
+              self.data[:has_opensource_repo] = false if self.data[:has_opensource_repo].nil?
+              self.cache[self.name] ||= {}
+              self.cache[self.name][:has_opensource_repo] = self.data[:has_opensource_repo]
+              return
+            end
             repo_details = JSON.parse(response.body)
+            self.data[:has_opensource_repo] = (repo_details["private"] == false)
 
             url += "/stats/contributors"
             puts("Fetching #{url}")
@@ -274,8 +303,18 @@ module Fastlane
             end
 
             conn.headers[:authorization] = Faraday::Utils.basic_header_from(ENV["GITHUB_USER_NAME"], ENV["GITHUB_API_TOKEN"])
+
+            # GitHub may return 202 while it generates contributor stats, so poll until ready
+            max_attempts = 12
+            attempt = 1
             response = conn.get('')
-            contributor_details = JSON.parse(response.body)
+            while attempt <= max_attempts && response.status == 202
+              puts("Contributors stats not ready (202). Attempt #{attempt}/#{max_attempts}, retrying in 10s...")
+              sleep(10)
+              response = conn.get('')
+              attempt += 1
+            end
+            contributor_details = response.status == 200 ? JSON.parse(response.body) : []
 
             self.data[:github_stars] = repo_details["stargazers_count"].to_i
             self.data[:github_subscribers] = repo_details["subscribers_count"].to_i
@@ -290,12 +329,12 @@ module Fastlane
             cache_data[:github_issues] = self.data[:github_issues]
             cache_data[:github_forks] = self.data[:github_forks]
             cache_data[:github_contributors] = self.data[:github_contributors]
+            cache_data[:has_opensource_repo] = self.data[:has_opensource_repo]
           rescue => ex
             puts("error fetching #{self}")
             puts(self.homepage)
-            puts("Chances are high you exceeded the GitHub API limit")
+            puts("Unexpected error while fetching GitHub data for #{self}: #{self.homepage}")
             puts(ex)
-            puts(ex.backtrace)
             raise ex
           end
         end
