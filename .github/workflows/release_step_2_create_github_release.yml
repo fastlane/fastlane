@@ -81,7 +81,14 @@ jobs:
       uses: ruby/setup-ruby@14594264cd68ce8a2345dd349bc3d138a4ef85c8 # v1.327.0
       with:
         ruby-version: '3.4'
-        bundler-cache: true
+
+    # The release-gem attestation patch loads RubyGems push command and with it openssl before Bundler. Install to
+    # same location so both our constraints are happy.
+    # https://github.com/rubygems/release-gem/issues/28
+    - name: Install dependencies
+      run: |
+        bundle config set --local path.system true
+        bundle install
 
     - name: Release to RubyGems
       uses: rubygems/release-gem@7f9650160c1a4e7989fdc9855807bdbd421d8b6b # v1.4.1
