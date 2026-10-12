@@ -122,7 +122,7 @@ describe Spaceship::ConnectAPI::Tunes::API do
         type: 'appAssetLibraryImages', attributes: attributes,
         relationships: { assetLibrary: { data: { type: 'appAssetLibraries', id: 'library' } } }
       }
-    })
+    }, tries: 1)
     api.post_app_asset_library_image(app_asset_library_id: 'library', attributes: attributes)
   end
 
@@ -141,7 +141,7 @@ describe Spaceship::ConnectAPI::Tunes::API do
           appStoreVersionLocalization: { data: { type: 'appStoreVersionLocalizations', id: 'locale' } }
         }
       }
-    })
+    }, tries: 1)
     api.post_app_asset_library_placement(app_store_version_localization_id: 'locale', image_id: 'image', attributes: attributes)
   end
 

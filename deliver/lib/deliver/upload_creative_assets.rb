@@ -5,7 +5,7 @@ module Deliver
   class UploadCreativeAssets
     PLACEMENT_TYPES = %w[PRODUCT_PAGE_HEADER_ASSET APP_STORE_SEARCH_RESULTS_ASSET].freeze
     REQUIRED_KEYS = %i[locale path placement_type placement_group].freeze
-    EDITABLE_VERSION_STATES = %w[PREPARE_FOR_SUBMISSION DEVELOPER_REJECTED REJECTED METADATA_REJECTED].freeze
+    EDITABLE_VERSION_STATES = %w[PREPARE_FOR_SUBMISSION DEVELOPER_REJECTED REJECTED METADATA_REJECTED INVALID_BINARY].freeze
 
     def self.validate(entries)
       targets = []

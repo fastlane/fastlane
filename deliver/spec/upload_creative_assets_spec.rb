@@ -175,7 +175,7 @@ describe Deliver::UploadCreativeAssets do
     end
 
     it 'allows editing versions returned to the developer after rejection' do
-      ['DEVELOPER_REJECTED', 'REJECTED', 'METADATA_REJECTED'].each do |state|
+      ['DEVELOPER_REJECTED', 'REJECTED', 'METADATA_REJECTED', 'INVALID_BINARY'].each do |state|
         allow(version).to receive(:app_version_state).and_return(state)
         expect(Spaceship::ConnectAPI::AppAssetLibraryPlacement).to receive(:create)
         uploader.upload(options)

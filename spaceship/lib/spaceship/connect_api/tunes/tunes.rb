@@ -576,7 +576,7 @@ module Spaceship
               }
             }
           }
-          tunes_request_client.post("#{Version::V1}/appAssetLibraryImages", body)
+          tunes_request_client.post("#{Version::V1}/appAssetLibraryImages", body, tries: 1)
         end
 
         def patch_app_asset_library_image(app_asset_library_image_id:, attributes: {})
@@ -600,7 +600,7 @@ module Spaceship
               }
             }
           }
-          tunes_request_client.post("#{Version::V1}/appAssetLibraryPlacements", body)
+          tunes_request_client.post("#{Version::V1}/appAssetLibraryPlacements", body, tries: 1)
         end
 
         def delete_app_asset_library_placement(app_asset_library_placement_id:)
