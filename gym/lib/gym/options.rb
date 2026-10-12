@@ -323,7 +323,7 @@ module Gym
                                      default_value: false),
         FastlaneCore::ConfigItem.new(key: :disallow_xcodebuild_settings_lookup,
                                      env_name: "GYM_DISALLOW_XCODEBUILD_SETTINGS_LOOKUP",
-                                     description: "Raises an error instead of fetching build settings by running `xcodebuild -showBuildSettings`, which can take a long time on large projects. The error names the option to set instead. Only iOS, tvOS, watchOS and visionOS builds can be exported this way, so `destination` has to name one of those platforms",
+                                     description: "Raises an error instead of fetching build settings by running `xcodebuild -showBuildSettings`, which can take a long time on large projects. The error says what to set instead",
                                      type: Boolean,
                                      default_value: false),
         FastlaneCore::ConfigItem.new(key: :disable_package_automatic_updates,

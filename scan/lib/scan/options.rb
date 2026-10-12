@@ -536,7 +536,7 @@ module Scan
                                      default_value: false),
         FastlaneCore::ConfigItem.new(key: :disallow_xcodebuild_settings_lookup,
                                      env_name: "SCAN_DISALLOW_XCODEBUILD_SETTINGS_LOOKUP",
-                                     description: "Raises an error instead of fetching build settings by running `xcodebuild -showBuildSettings`, which can take a long time on large projects. The error names the option to set instead, such as `device`, `devices` or `destination`, and `derived_data_path`",
+                                     description: "Raises an error instead of fetching build settings by running `xcodebuild -showBuildSettings`, which can take a long time on large projects. The error says what to set instead",
                                      type: Boolean,
                                      default_value: false),
         FastlaneCore::ConfigItem.new(key: :disable_package_automatic_updates,
