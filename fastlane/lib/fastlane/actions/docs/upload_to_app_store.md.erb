@@ -906,3 +906,51 @@ deliver(
 
 Note that the **default** App Clip experience and the **advanced** App Clip experiences are
 different, [Apple explains this here](https://developer.apple.com/documentation/app_clips/configuring_the_launch_experience_of_your_app_clip/#3671988).
+
+## Creative assets (product page header and search results)
+
+Use `creative_assets` to upload PNG or JPEG images to Apple's App Asset Library and place them on an editable App Store version. Each entry specifies an existing version localization, a file, a placement type, and a placement group. Supported types are `PRODUCT_PAGE_HEADER_ASSET` and `APP_STORE_SEARCH_RESULTS_ASSET` (organic search results).
+
+Placement groups and image requirements come from Apple's current reference data, not from screenshot display types. Authenticate with an App Store Connect API key, then inspect the catalog:
+
+```ruby
+app_store_connect_api_key(key_id: ENV['ASC_KEY_ID'], issuer_id: ENV['ASC_ISSUER_ID'], key_filepath: ENV['ASC_KEY_FILEPATH'])
+reference = Spaceship::ConnectAPI::AppAssetLibraryRefDatum.all.first
+header = reference.placement_types.find { |item| item['placementTypeId'] == 'PRODUCT_PAGE_HEADER_ASSET' }
+puts header['specMappings'] # placementGroupId and accepted image/video specification IDs
+puts reference.image_specs # image dimensions, file formats and other requirements
+puts reference.features # placement policies and limits for APP_STORE_VERSIONS
+```
+
+Choose a supported group from that catalog and export an image matching one of its image specifications:
+
+```ruby
+deliver(
+  skip_binary_upload: true,
+  skip_screenshots: true,
+  creative_assets: [
+    {
+      locale: 'en-US',
+      path: './fastlane/creative-assets/header.png',
+      placement_type: 'PRODUCT_PAGE_HEADER_ASSET',
+      placement_group: ENV.fetch('ASC_HEADER_PLACEMENT_GROUP')
+    },
+    {
+      locale: 'en-US',
+      path: './fastlane/creative-assets/search.png',
+      placement_type: 'APP_STORE_SEARCH_RESULTS_ASSET',
+      placement_group: ENV.fetch('ASC_SEARCH_PLACEMENT_GROUP')
+    }
+  ]
+)
+```
+
+- `skip_screenshots` and `overwrite_screenshots` do not affect creative assets. No creative assets are uploaded unless `creative_assets` is provided.
+- Set `overwrite_creative_assets: true` to replace existing placements only for the configured locale/type/group combinations. The default is to stop if a target is occupied. Source assets in Asset Library are retained.
+- The uploader checks all targets against the current catalog, waits up to 300 seconds per image for processing, and checks the returned `specId` before removing that target's old placements. Apple requires delete/create to replace a placement; this is not atomic. If placement creation fails after deletion, the uploaded image remains in Asset Library and can be placed manually or by rerunning the lane.
+- Use the same path in multiple entries to upload a universal image once and reuse it within that run. Each placement must accept the image's specification. Subsequent runs upload a new asset; there is no checksum-based synchronization.
+- Localizations must already exist when this step runs. The usual metadata upload runs first. `edit_live` and `use_live_version` are not supported for creative asset uploads. The version must be in `PREPARE_FOR_SUBMISSION`, `DEVELOPER_REJECTED`, `REJECTED`, or `METADATA_REJECTED`; versions awaiting or undergoing review are rejected before any creative image is uploaded.
+- Creative images are not included in the generated HTML screenshot preview. Check their appearance in App Store Connect before submission.
+- Placement submission follows the parent App Store version via `submit_for_review`. Standalone asset review, video creative assets, custom product pages, and product page optimization are not implemented by this option.
+
+See Apple's [asset management guide](https://developer.apple.com/help/app-store-connect/manage-app-information/manage-your-app-store-assets), [image upload workflow](https://developer.apple.com/documentation/appstoreconnectapi/uploading-and-managing-image-assets), and [placement workflow](https://developer.apple.com/documentation/appstoreconnectapi/placing-assets-on-your-app-store-surfaces).
