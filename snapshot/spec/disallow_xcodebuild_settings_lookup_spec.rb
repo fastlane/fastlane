@@ -5,6 +5,7 @@ describe Snapshot do
     FastlaneSpec::Env.with_env_values(
       'FASTLANE_DISALLOW_XCODEBUILD_SETTINGS_LOOKUP' => nil,
       'SNAPSHOT_DISALLOW_XCODEBUILD_SETTINGS_LOOKUP' => nil,
+      'SNAPSHOT_WORKSPACE' => nil,
       'SNAPSHOT_SCHEME' => nil,
       'SNAPSHOT_NAMESPACE_LOG_FILES' => nil,
       'SNAPSHOT_BUILDLOG_PATH' => nil
