@@ -219,7 +219,7 @@ module Produce
     end
 
     def connect_api_token
-      Spaceship::ConnectAPI::Token.from(hash: Produce.config[:api_key], filepath: Produce.config[:api_key_path])
+      Spaceship::ConnectAPI::Token.from(hash: Produce.config_value(:api_key), filepath: Produce.config_value(:api_key_path))
     end
 
     def login

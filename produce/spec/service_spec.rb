@@ -40,6 +40,30 @@ describe Produce::Service do
       expect(result).to eq(found_bundle_id)
     end
 
+    it "falls back to session-based login when the config does not declare API key options" do
+      # modify_services builds Produce.config without :api_key/:api_key_path (regression from #30158)
+      options = [
+        FastlaneCore::ConfigItem.new(key: :username),
+        FastlaneCore::ConfigItem.new(key: :app_identifier),
+        FastlaneCore::ConfigItem.new(key: :team_id, optional: true),
+        FastlaneCore::ConfigItem.new(key: :team_name, optional: true)
+      ]
+      Produce.config = FastlaneCore::Configuration.create(options, {
+        app_identifier: "com.example.app",
+        username: "person@example.com",
+        team_id: "TEAMID1234"
+      })
+      allow(Spaceship::ConnectAPI).to receive(:token).and_return(nil)
+      expect(Spaceship).to receive(:login).with("person@example.com", nil)
+      expect(Spaceship).to receive(:select_team)
+      found_bundle_id = double("bundle_id")
+      allow(Spaceship::ConnectAPI::BundleId).to receive(:find).with("com.example.app").and_return(found_bundle_id)
+
+      result = Produce::Service.new.bundle_id
+
+      expect(result).to eq(found_bundle_id)
+    end
+
     it "reuses a token already set by another lane instead of logging in again" do
       config_with
       allow(Spaceship::ConnectAPI).to receive(:token).and_return(fake_token)
