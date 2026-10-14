@@ -84,6 +84,8 @@ module Snapshot
       {
         # snapshot in Xcode 9 saves screenshots with the SIMULATOR_DEVICE_NAME
         # which includes spaces
+        'iPhone 18 Pro Max' => "iPhone 18 Pro Max",
+        'iPhone 18 Pro' => "iPhone 18 Pro",
         'iPhone 17 Pro Max' => "iPhone 17 Pro Max",
         'iPhone 17 Pro' => "iPhone 17 Pro",
         'iPhone 17' => "iPhone 17",
