@@ -142,14 +142,6 @@ describe Deliver::AppScreenshot do
           ["AppleVisionPro{3840x2160}.jpg", DisplayType::APP_APPLE_VISION_PRO],
           ["Apple-Vision-Pro{3840x2160}.jpg", DisplayType::APP_APPLE_VISION_PRO]
         ],
-        "iPhone Duo outer display" => [
-          ["iPhoneDuo-Outer-Portrait{1398x2034}.jpg", DisplayType::APP_IPHONE_DUO],
-          ["iPhoneDuo-Outer-Landscape{2034x1398}.jpg", DisplayType::APP_IPHONE_DUO]
-        ],
-        "iPhone Duo inner display" => [
-          ["iPhoneDuo-Inner-Portrait{2007x2853}.jpg", DisplayType::APP_IPHONE_DUO],
-          ["iPhoneDuo-Inner-Landscape{2853x2007}.jpg", DisplayType::APP_IPHONE_DUO]
-        ],
         "Apple Watch" => [
           ["AppleWatch-Series3{312x390}.jpg", DisplayType::APP_WATCH_SERIES_3],
           ["AppleWatch-Series4{368x448}.jpg", DisplayType::APP_WATCH_SERIES_4],
@@ -365,10 +357,6 @@ describe Deliver::AppScreenshot do
     it "should return appropriate display types for 6.7 inch displays" do
       expect(app_screenshot_with(Deliver::AppScreenshot::DisplayType::APP_IPHONE_67).display_type).to eq(Deliver::AppScreenshot::DisplayType::APP_IPHONE_67)
       expect(app_screenshot_with(Deliver::AppScreenshot::DisplayType::IMESSAGE_APP_IPHONE_67).display_type).to eq(Deliver::AppScreenshot::DisplayType::IMESSAGE_APP_IPHONE_67)
-    end
-
-    it "should return appropriate display types for iPhone Duo displays" do
-      expect(app_screenshot_with(Deliver::AppScreenshot::DisplayType::APP_IPHONE_DUO).display_type).to eq(Deliver::AppScreenshot::DisplayType::APP_IPHONE_DUO)
     end
 
     it "should return appropriate display types for 6.5 inch displays" do

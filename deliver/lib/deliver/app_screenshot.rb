@@ -19,7 +19,6 @@ module Deliver
       DisplayType::APP_IPHONE_61 => "iPhone 14 Pro",
       DisplayType::APP_IPHONE_65 => "iPhone XS Max",
       DisplayType::APP_IPHONE_67 => "iPhone 14 Pro Max",
-      DisplayType::APP_IPHONE_DUO => "iPhone Duo",
       DisplayType::APP_IPAD_97 => "iPad",
       DisplayType::APP_IPAD_105 => "iPad 10.5",
       DisplayType::APP_IPAD_PRO_3GEN_11 => "iPad 11",
@@ -100,13 +99,6 @@ module Deliver
         [640, 960],
         [960, 600],
         [960, 640]
-      ],
-      # iPhone Duo outer and inner displays
-      DisplayType::APP_IPHONE_DUO => [
-        [1398, 2034],
-        [2034, 1398],
-        [2007, 2853],
-        [2853, 2007]
       ],
       DisplayType::APP_IPAD_97 => [
         [1024, 748],
