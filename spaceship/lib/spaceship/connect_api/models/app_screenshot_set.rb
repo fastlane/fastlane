@@ -19,6 +19,7 @@ module Spaceship
         APP_IPHONE_61 = "APP_IPHONE_61"
         APP_IPHONE_65 = "APP_IPHONE_65"
         APP_IPHONE_67 = "APP_IPHONE_67"
+        APP_IPHONE_DUO = "APP_IPHONE_DUO"
 
         APP_IPAD_97 = "APP_IPAD_97"
         APP_IPAD_105 = "APP_IPAD_105"
@@ -77,6 +78,7 @@ module Spaceship
           APP_IPHONE_61,
           APP_IPHONE_65,
           APP_IPHONE_67,
+          APP_IPHONE_DUO,
 
           APP_IPAD_97,
           APP_IPAD_105,
