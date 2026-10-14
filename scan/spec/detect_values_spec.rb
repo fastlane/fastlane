@@ -352,12 +352,15 @@ describe Scan do
 
         around do |example|
           FastlaneSpec::Env.with_env_values(
+            'FASTLANE_DISALLOW_XCODEBUILD_SETTINGS_LOOKUP' => nil,
+            'SCAN_DISALLOW_XCODEBUILD_SETTINGS_LOOKUP' => nil,
             'SCAN_DEVICE' => nil,
             'SCAN_DEVICES' => nil,
             'SCAN_DESTINATION' => nil,
             'SCAN_CATALYST_PLATFORM' => nil,
             'SCAN_DEPLOYMENT_TARGET_VERSION' => nil,
             'SCAN_DERIVED_DATA_PATH' => nil,
+            'SCAN_WORKSPACE' => nil,
             'SCAN_PROJECT' => nil,
             'SCAN_PACKAGE_PATH' => nil,
             'SCAN_SCHEME' => nil
