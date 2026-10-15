@@ -3437,8 +3437,6 @@ public func createAppOnManagedPlayStore(jsonKey: OptionalConfigValue<String?> = 
 
  - parameters:
    - username: Your Apple ID Username
-   - apiKeyPath: Path to your App Store Connect API Key JSON file (https://docs.fastlane.tools/app-store-connect-api/#using-fastlane-api-key-json-file)
-   - apiKey: Your App Store Connect API Key information (https://docs.fastlane.tools/app-store-connect-api/#using-fastlane-api-key-hash-option)
    - appIdentifier: App Identifier (Bundle ID, e.g. com.krausefx.app)
    - bundleIdentifierSuffix: App Identifier Suffix (Ignored if App Identifier does not end with .*)
    - appName: App Name
@@ -3463,8 +3461,6 @@ public func createAppOnManagedPlayStore(jsonKey: OptionalConfigValue<String?> = 
  For more information about _produce_, visit its documentation page: [https://docs.fastlane.tools/actions/produce/](https://docs.fastlane.tools/actions/produce/).
  */
 public func createAppOnline(username: String,
-                            apiKeyPath: OptionalConfigValue<String?> = .fastlaneDefault(nil),
-                            apiKey: OptionalConfigValue<[String: Any]?> = .fastlaneDefault(nil),
                             appIdentifier: String,
                             bundleIdentifierSuffix: OptionalConfigValue<String?> = .fastlaneDefault(nil),
                             appName: String,
@@ -3485,8 +3481,6 @@ public func createAppOnline(username: String,
                             itcTeamName: OptionalConfigValue<String?> = .fastlaneDefault(nil))
 {
     let usernameArg = RubyCommand.Argument(name: "username", value: username, type: nil)
-    let apiKeyPathArg = apiKeyPath.asRubyArgument(name: "api_key_path", type: nil)
-    let apiKeyArg = apiKey.asRubyArgument(name: "api_key", type: nil)
     let appIdentifierArg = RubyCommand.Argument(name: "app_identifier", value: appIdentifier, type: nil)
     let bundleIdentifierSuffixArg = bundleIdentifierSuffix.asRubyArgument(name: "bundle_identifier_suffix", type: nil)
     let appNameArg = RubyCommand.Argument(name: "app_name", value: appName, type: nil)
@@ -3506,8 +3500,6 @@ public func createAppOnline(username: String,
     let itcTeamIdArg = RubyCommand.Argument(name: "itc_team_id", value: itcTeamId, type: nil)
     let itcTeamNameArg = itcTeamName.asRubyArgument(name: "itc_team_name", type: nil)
     let array: [RubyCommand.Argument?] = [usernameArg,
-                                          apiKeyPathArg,
-                                          apiKeyArg,
                                           appIdentifierArg,
                                           bundleIdentifierSuffixArg,
                                           appNameArg,
@@ -8437,8 +8429,6 @@ public func println(message: OptionalConfigValue<String?> = .fastlaneDefault(nil
 
  - parameters:
    - username: Your Apple ID Username
-   - apiKeyPath: Path to your App Store Connect API Key JSON file (https://docs.fastlane.tools/app-store-connect-api/#using-fastlane-api-key-json-file)
-   - apiKey: Your App Store Connect API Key information (https://docs.fastlane.tools/app-store-connect-api/#using-fastlane-api-key-hash-option)
    - appIdentifier: App Identifier (Bundle ID, e.g. com.krausefx.app)
    - bundleIdentifierSuffix: App Identifier Suffix (Ignored if App Identifier does not end with .*)
    - appName: App Name
@@ -8463,8 +8453,6 @@ public func println(message: OptionalConfigValue<String?> = .fastlaneDefault(nil
  For more information about _produce_, visit its documentation page: [https://docs.fastlane.tools/actions/produce/](https://docs.fastlane.tools/actions/produce/).
  */
 public func produce(username: String,
-                    apiKeyPath: OptionalConfigValue<String?> = .fastlaneDefault(nil),
-                    apiKey: OptionalConfigValue<[String: Any]?> = .fastlaneDefault(nil),
                     appIdentifier: String,
                     bundleIdentifierSuffix: OptionalConfigValue<String?> = .fastlaneDefault(nil),
                     appName: String,
@@ -8485,8 +8473,6 @@ public func produce(username: String,
                     itcTeamName: OptionalConfigValue<String?> = .fastlaneDefault(nil))
 {
     let usernameArg = RubyCommand.Argument(name: "username", value: username, type: nil)
-    let apiKeyPathArg = apiKeyPath.asRubyArgument(name: "api_key_path", type: nil)
-    let apiKeyArg = apiKey.asRubyArgument(name: "api_key", type: nil)
     let appIdentifierArg = RubyCommand.Argument(name: "app_identifier", value: appIdentifier, type: nil)
     let bundleIdentifierSuffixArg = bundleIdentifierSuffix.asRubyArgument(name: "bundle_identifier_suffix", type: nil)
     let appNameArg = RubyCommand.Argument(name: "app_name", value: appName, type: nil)
@@ -8506,8 +8492,6 @@ public func produce(username: String,
     let itcTeamIdArg = RubyCommand.Argument(name: "itc_team_id", value: itcTeamId, type: nil)
     let itcTeamNameArg = itcTeamName.asRubyArgument(name: "itc_team_name", type: nil)
     let array: [RubyCommand.Argument?] = [usernameArg,
-                                          apiKeyPathArg,
-                                          apiKeyArg,
                                           appIdentifierArg,
                                           bundleIdentifierSuffixArg,
                                           appNameArg,
@@ -14261,4 +14245,4 @@ public let snapshotfile: Snapshotfile = .init()
 
 // Please don't remove the lines below
 // They are used to detect outdated files
-// FastlaneRunnerAPIVersion [0.9.209]
+// FastlaneRunnerAPIVersion [0.9.210]
