@@ -249,6 +249,79 @@ describe FastlaneCore do
       end
     end
 
+    describe "owner-only files" do
+      around do |example|
+        Dir.mktmpdir do |dir|
+          @dir = dir
+          old_umask = File.umask(0o022)
+          begin
+            example.run
+          ensure
+            File.umask(old_umask)
+          end
+        end
+      end
+
+      def mode_of(path)
+        File.stat(path).mode & 0o777
+      end
+
+      describe "#open_owner_only" do
+        it "creates the file readable only by its owner" do
+          path = File.join(@dir, "key.pem")
+          FastlaneCore::Helper.open_owner_only(path) { |file| file.write("secret") }
+
+          expect(File.read(path)).to eq("secret")
+          expect(mode_of(path)).to eq(0o600) unless FastlaneCore::Helper.windows?
+        end
+
+        it "restricts an existing file before writing to it" do
+          path = File.join(@dir, "key.pem")
+          File.write(path, "old")
+          File.chmod(0o644, path) unless FastlaneCore::Helper.windows?
+
+          mode_while_writing = nil
+          FastlaneCore::Helper.open_owner_only(path) do |file|
+            mode_while_writing = mode_of(path)
+            file.write("new")
+          end
+
+          expect(File.read(path)).to eq("new")
+          expect(File.writable?(path)).to be(true)
+          expect(mode_while_writing).to eq(0o600) unless FastlaneCore::Helper.windows?
+        end
+
+        it "passes the open mode, e.g. binary append" do
+          path = File.join(@dir, "log.txt")
+          File.write(path, "a")
+          FastlaneCore::Helper.open_owner_only(path, "ab") { |file| file.write("b") }
+
+          expect(File.binread(path)).to eq("ab")
+          expect(mode_of(path)).to eq(0o600) unless FastlaneCore::Helper.windows?
+        end
+      end
+
+      describe "#mkdir_owner_only" do
+        it "creates the directory and its parents, the directory accessible only by its owner" do
+          dir = File.join(@dir, "parent", "keys")
+          FastlaneCore::Helper.mkdir_owner_only(dir)
+
+          expect(File.directory?(dir)).to be(true)
+          expect(mode_of(dir)).to eq(0o700) unless FastlaneCore::Helper.windows?
+        end
+
+        it "restricts an existing directory" do
+          dir = File.join(@dir, "keys")
+          Dir.mkdir(dir)
+          File.chmod(0o755, dir) unless FastlaneCore::Helper.windows?
+          FastlaneCore::Helper.mkdir_owner_only(dir)
+
+          expect(File.directory?(dir)).to be(true)
+          expect(mode_of(dir)).to eq(0o700) unless FastlaneCore::Helper.windows?
+        end
+      end
+    end
+
     describe "#backticks" do
       it "executes the command and returns the output" do
         expect(FastlaneCore::Helper.backticks("echo hello")).to eq("hello\n")
