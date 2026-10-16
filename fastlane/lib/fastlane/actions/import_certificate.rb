@@ -4,6 +4,10 @@ module Fastlane
   module Actions
     class ImportCertificateAction < Action
       def self.run(params)
+        unless params[:keychain_name] || params[:keychain_path]
+          UI.user_error!("You must provide either a :keychain_name or a :keychain_path")
+        end
+
         keychain_path = params[:keychain_path] || FastlaneCore::Helper.keychain_path(params[:keychain_name])
 
         FastlaneCore::KeychainImporter.import_file(params[:certificate_path], keychain_path, keychain_password: params[:keychain_password], certificate_password: params[:certificate_password], certificate_format: params[:certificate_format], output: params[:log_output])
@@ -29,11 +33,13 @@ module Fastlane
           FastlaneCore::ConfigItem.new(key: :keychain_name,
                                        env_name: "KEYCHAIN_NAME",
                                        description: "Keychain the items should be imported to",
-                                       optional: false),
+                                       optional: true,
+                                       conflicting_options: [:keychain_path]),
           FastlaneCore::ConfigItem.new(key: :keychain_path,
                                        env_name: "KEYCHAIN_PATH",
                                        description: "Path to the Keychain file to which the items should be imported",
-                                       optional: true),
+                                       optional: true,
+                                       conflicting_options: [:keychain_name]),
           FastlaneCore::ConfigItem.new(key: :keychain_password,
                                        env_name: "FL_IMPORT_CERT_KEYCHAIN_PASSWORD",
                                        description: "The password for the keychain. Note that for the login keychain this is your user's password",
@@ -61,18 +67,24 @@ module Fastlane
 
       def self.example_code
         [
-          'import_certificate(certificate_path: "certs/AppleWWDRCA6.cer")',
           'import_certificate(
-            certificate_path: "certs/dist.p12",
-            certificate_password: ENV["CERTIFICATE_PASSWORD"] || "default"
-          )',
-          'import_certificate(
-            certificate_path: "certs/development.cer"
+            certificate_path: "certs/AppleWWDRCA6.cer",
+            keychain_name: "login.keychain"
           )',
           'import_certificate(
             certificate_path: "certs/dist.p12",
             certificate_password: ENV["CERTIFICATE_PASSWORD"] || "default",
-            certificate_format: "pkcs12"
+            keychain_name: "custom.keychain"
+          )',
+          'import_certificate(
+            certificate_path: "certs/development.cer",
+            keychain_path: File.expand_path("~/Library/Keychains/login.keychain-db")
+          )',
+          'import_certificate(
+            certificate_path: "certs/dist.p12",
+            certificate_password: ENV["CERTIFICATE_PASSWORD"] || "default",
+            certificate_format: "pkcs12",
+            keychain_path: "/path/to/custom.keychain"
           )'
         ]
       end
