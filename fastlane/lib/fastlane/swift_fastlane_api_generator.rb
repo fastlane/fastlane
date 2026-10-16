@@ -24,7 +24,7 @@ module Fastlane
 
       super()
 
-      self.actions_not_supported = ["import", "import_from_git"].to_set
+      self.actions_not_supported = ["import", "import_from_git", "import_from_gem"].to_set
       self.action_options_to_ignore = {
 
         "precheck" => [
@@ -83,7 +83,7 @@ module Fastlane
         available_actions << action.action_name unless available_external_actions.include?(action)
       end
 
-      self.actions_not_supported = (["import", "import_from_git"] + available_actions).to_set
+      self.actions_not_supported = (["import", "import_from_git", "import_from_gem"] + available_actions).to_set
       self.action_options_to_ignore = {}
     end
   end
@@ -113,7 +113,7 @@ module Fastlane
         available_actions << action.action_name unless available_plugins.include?(action)
       end
 
-      self.actions_not_supported = (["import", "import_from_git"] + available_actions).to_set
+      self.actions_not_supported = (["import", "import_from_git", "import_from_gem"] + available_actions).to_set
       self.action_options_to_ignore = {}
     end
   end
