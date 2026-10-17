@@ -269,4 +269,76 @@ describe Spaceship::ConnectAPI::Token do
       end
     end
   end
+
+  context '#write_key_to_file' do
+    let(:output_file) { Tempfile.new('key.p8') }
+    let(:output_path) { output_file.path }
+
+    # Same key as `private_key`, but with the whole base64 body collapsed onto a
+    # single line - the shape a key ends up in after travelling through an
+    # environment variable or a JSON payload that lost its line breaks
+    let(:single_line_private_key) do
+      lines = private_key.lines.map(&:chomp)
+      "#{lines.first}\n#{lines[1..-2].join}\n#{lines.last}\n"
+    end
+
+    def token_with_key_raw(key_raw)
+      Spaceship::ConnectAPI::Token.new(
+        key_id: key_id,
+        issuer_id: issuer_id,
+        key: OpenSSL::PKey::EC.new(private_key),
+        key_raw: key_raw
+      )
+    end
+
+    it 'rewraps a key whose base64 body is on a single line' do
+      token_with_key_raw(single_line_private_key).write_key_to_file(output_path)
+
+      expect(File.read(output_path)).to eq(private_key)
+    end
+
+    it 'wraps the base64 body at 64 characters per line' do
+      token_with_key_raw(single_line_private_key).write_key_to_file(output_path)
+
+      body = File.read(output_path).lines.map(&:chomp)[1..-2]
+
+      expect(body.size).to be > 1
+      expect(body[0..-2].map(&:size)).to all(eq(64))
+      expect(body.last.size).to be <= 64
+    end
+
+    it 'writes a key that can be read back by OpenSSL' do
+      token_with_key_raw(single_line_private_key).write_key_to_file(output_path)
+
+      written_key = OpenSSL::PKey::EC.new(File.read(output_path))
+      expect(written_key.private_key).to eq(OpenSSL::PKey::EC.new(private_key).private_key)
+    end
+
+    it 'rewraps a single line key that uses CRLF line endings' do
+      token_with_key_raw(single_line_private_key.gsub("\n", "\r\n")).write_key_to_file(output_path)
+
+      expect(File.read(output_path)).to eq(private_key)
+    end
+
+    it 'strips whitespace out of the base64 body' do
+      lines = single_line_private_key.lines.map(&:chomp)
+      spaced_key = "#{lines.first}\n#{lines[1].scan(/.{1,32}/).join(' ')}\n#{lines.last}\n"
+
+      token_with_key_raw(spaced_key).write_key_to_file(output_path)
+
+      expect(File.read(output_path)).to eq(private_key)
+    end
+
+    it 'writes an already wrapped key unchanged' do
+      token_with_key_raw(private_key).write_key_to_file(output_path)
+
+      expect(File.read(output_path)).to eq(private_key)
+    end
+
+    it 'does not raise when there is no raw key to write' do
+      expect do
+        token_with_key_raw(nil).write_key_to_file(output_path)
+      end.not_to(raise_error)
+    end
+  end
 end
