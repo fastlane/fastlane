@@ -104,7 +104,7 @@ describe Fastlane::Internal::Docs::PluginScores::FastlanePluginScore do
       let(:hash) { plugin_hash("homepage_uri" => "https://github.com/fastlane/fastlane-plugin-example") }
 
       def cache_entry(extra = {})
-        { "fastlane-plugin-example" => { sha: "abc123", initial_commit: Date.new(2020, 1, 1) }.merge(extra) }
+        { "fastlane-plugin-example" => { sha: "abc123", cache_version: described_class::CACHE_VERSION, initial_commit: Date.new(2020, 1, 1) }.merge(extra) }
       end
 
       it "rewards a cached open source repo" do
@@ -114,11 +114,20 @@ describe Fastlane::Internal::Docs::PluginScores::FastlanePluginScore do
         end
       end
 
-      it "penalizes a cache entry written before the open source rating existed" do
-        build_score(hash, cache: cache_entry) do |score|
-          expect(score.data[:has_opensource_repo]).to be(false)
-          expect(score.data[:ratings][:open_source]).to eq(-100)
-        end
+      it "refetches a plugin cached by an older cache version" do
+        expect_any_instance_of(described_class).to receive(:append_git_data)
+        expect_any_instance_of(described_class).to receive(:append_github_data)
+
+        build_score(hash, cache: cache_entry(cache_version: nil, has_opensource_repo: false)) { |score| }
+      end
+
+      it "refetches a plugin cached before cache versions existed" do
+        old_entry = cache_entry
+        old_entry["fastlane-plugin-example"].delete(:cache_version)
+        expect_any_instance_of(described_class).to receive(:append_git_data)
+        expect_any_instance_of(described_class).to receive(:append_github_data)
+
+        build_score(hash, cache: old_entry) { |score| }
       end
     end
 

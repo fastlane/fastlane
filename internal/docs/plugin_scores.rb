@@ -43,6 +43,9 @@ module Fastlane
           attr_accessor :data
           attr_accessor :cache
 
+          # Bump to refetch every plugin, e.g. when a new value is added to the cache
+          CACHE_VERSION = 2
+
           # The homepage is later called with GITHUB_API_TOKEN, so only an exact github.com host qualifies
           def self.github_page?(url)
             uri = URI.parse(url.to_s)
@@ -199,7 +202,7 @@ module Fastlane
 
             self.cache[self.name] = cache_data
 
-            if self.data[:sha] == cache_data[:sha]
+            if self.data[:sha] == cache_data[:sha] && cache_data[:cache_version] == CACHE_VERSION
               self.data[:initial_commit] = cache_data[:initial_commit]
               self.data[:age_in_days] = (DateTime.now - self.data[:initial_commit]).to_i
               self.data[:readme_score] = cache_data[:readme_score]
@@ -265,6 +268,7 @@ module Fastlane
                 cache_data[:tests] = self.data[:tests]
                 cache_data[:actions] = self.data[:actions]
                 cache_data[:sha] = self.data[:sha]
+                cache_data[:cache_version] = CACHE_VERSION
               end
             end
           end
