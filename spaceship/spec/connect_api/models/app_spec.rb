@@ -187,4 +187,64 @@ describe Spaceship::ConnectAPI::App do
       expect(availabilities.territory_availabilities[1].contentStatuses).to eq(["CANNOT_SELL"])
     end
   end
+
+  describe("regulated medical device declaration") do
+    let(:app) { Spaceship::ConnectAPI::App.new("123456789", []) }
+    let(:form_url) { "#{ConnectAPIStubbing::Tunes::COMPLIANCE_FORM_ACCOUNT_URL}/contents/123456789/requirements/#{ConnectAPIStubbing::Tunes::COMPLIANCE_REQUIREMENT_ID}/forms" }
+
+    it('fetches the requirement and the declaration') do
+      ConnectAPIStubbing::Tunes.stub_get_compliance_requirements
+      ConnectAPIStubbing::Tunes.stub_get_compliance_requirement_form(declaration: "no")
+
+      requirement = app.fetch_regulated_medical_device_requirement
+      expect(requirement["id"]).to eq(ConnectAPIStubbing::Tunes::COMPLIANCE_REQUIREMENT_ID)
+      expect(requirement["status"]).to eq("COLLECTED")
+      expect(app.fetch_regulated_medical_device_declaration).to eq("no")
+    end
+
+    it('does nothing when Apple does not ask this app') do
+      ConnectAPIStubbing::Tunes.stub_get_compliance_requirements(required: false)
+      ConnectAPIStubbing::Tunes.stub_post_compliance_requirement_form
+
+      expect(app.fetch_regulated_medical_device_requirement).to be_nil
+      expect(app.fetch_regulated_medical_device_declaration).to be_nil
+      expect(app.declare_not_regulated_medical_device).to eq(false)
+      expect(WebMock).not_to(have_requested(:post, form_url))
+    end
+
+    it('answers "no" for every region, like the web UI, when the form has no answer yet') do
+      ConnectAPIStubbing::Tunes.stub_get_compliance_requirements
+      ConnectAPIStubbing::Tunes.stub_get_compliance_requirement_form(declaration: nil)
+      ConnectAPIStubbing::Tunes.stub_post_compliance_requirement_form
+
+      expect(app.declare_not_regulated_medical_device).to eq(true)
+      expect(WebMock).to have_requested(:post, form_url).with(body: {
+        accountId: "12345678-1234-1234-1234-123456789012",
+        contentId: "123456789",
+        requirementId: ConnectAPIStubbing::Tunes::COMPLIANCE_REQUIREMENT_ID,
+        requirementName: "MEDICAL_DEVICE",
+        formId: "11111111-2222-3333-4444-555555555555",
+        countriesOrRegions: ["EEA", "GBR", "USA"],
+        medicalDeviceData: { declaration: "no" }
+      })
+    end
+
+    it('leaves an existing "no" alone') do
+      ConnectAPIStubbing::Tunes.stub_get_compliance_requirements
+      ConnectAPIStubbing::Tunes.stub_get_compliance_requirement_form(declaration: "no")
+      ConnectAPIStubbing::Tunes.stub_post_compliance_requirement_form
+
+      expect(app.declare_not_regulated_medical_device).to eq(false)
+      expect(WebMock).not_to(have_requested(:post, form_url))
+    end
+
+    it('never overwrites a "yes"') do
+      ConnectAPIStubbing::Tunes.stub_get_compliance_requirements
+      ConnectAPIStubbing::Tunes.stub_get_compliance_requirement_form(declaration: "yes")
+      ConnectAPIStubbing::Tunes.stub_post_compliance_requirement_form
+
+      expect { app.declare_not_regulated_medical_device }.to raise_error(/declared a regulated medical device/)
+      expect(WebMock).not_to(have_requested(:post, form_url))
+    end
+  end
 end
