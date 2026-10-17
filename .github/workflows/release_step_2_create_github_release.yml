@@ -129,7 +129,9 @@ jobs:
         VERSION: ${{ needs.create_github_release.outputs.version }}
         EXPECTED_SHA256: ${{ needs.create_github_release.outputs.gem-sha256 }}
       run: |
-        actual=$(curl -fsSL --retry 5 --retry-all-errors "https://rubygems.org/downloads/fastlane-$VERSION.gem" | sha256sum | cut -d' ' -f1)
+        gem="$RUNNER_TEMP/fastlane-$VERSION.gem"
+        curl -fsSL --retry 5 --retry-all-errors --output "$gem" "https://rubygems.org/downloads/fastlane-$VERSION.gem"
+        actual=$(sha256sum "$gem" | cut -d' ' -f1)
         if [ "$actual" != "$EXPECTED_SHA256" ]; then
           echo "::error::fastlane-$VERSION.gem on RubyGems ($actual) differs from the GitHub release gem ($EXPECTED_SHA256)"
           exit 1
