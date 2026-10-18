@@ -137,9 +137,9 @@ module Deliver
                                      description: "Path to the folder containing the app clip default experience metadata",
                                      optional: true),
 
-        # Product page header and organic search result images
+        # Product page header and organic search result assets
         FastlaneCore::ConfigItem.new(key: :creative_assets,
-                                     description: "Creative image placements, each with locale, path, placement_type and placement_group",
+                                     description: "Creative image or video placements with locale, path, placement_type, placement_group and optional preview_frame_time_code",
                                      type: Array,
                                      optional: true,
                                      verify_block: proc do |value|

@@ -43,7 +43,7 @@ describe Deliver::UploadCreativeAssets do
       expect { described_class.validate([entry]) }.to raise_error(/Could not find creative asset/)
     end
 
-    it 'rejects videos and unsupported placements' do
+    it 'rejects unsupported file formats and placements' do
       entry[:placement_type] = 'SEARCH_RESULTS_ADS_ASSET'
       expect { described_class.validate([entry]) }.to raise_error(/placement_type/)
       entry[:placement_type] = 'PRODUCT_PAGE_HEADER_ASSET'
@@ -76,6 +76,98 @@ describe Deliver::UploadCreativeAssets do
       allow(Spaceship::ConnectAPI::AppAssetLibraryRefDatum).to receive(:all).and_return([reference])
       allow(Spaceship::ConnectAPI::AppAssetLibraryPlacement).to receive(:all).with(app_store_version_localization_id: localization.id).and_return([])
       allow(Spaceship::ConnectAPI::AppAssetLibraryImage).to receive(:create).and_return(image)
+    end
+
+    describe 'videos' do
+      let(:video_entry) { entry.merge(path: @video_path, preview_frame_time_code: '00:00:01:00') }
+      let(:video) { double('video', id: 'video-id', spec_id: 'video-spec') }
+
+      before do
+        @video_path = File.join(File.dirname(@path), 'header.mp4')
+        File.binwrite(@video_path, 'video bytes')
+        options[:creative_assets] = [video_entry]
+        reference.placement_types.first['specMappings'].first['specs'] << 'video-spec'
+        allow(reference).to receive(:video_specs).and_return([{ 'specId' => 'video-spec' }])
+      end
+
+      it 'accepts supported video extensions and optional frame time codes' do
+        ['.mp4', '.mov', '.m4v', '.MP4'].each do |extension|
+          path = @video_path + extension
+          File.binwrite(path, 'video bytes')
+          expect { described_class.validate([video_entry.merge(path: path)]) }.not_to raise_error
+        end
+        expect { described_class.validate([video_entry.except(:preview_frame_time_code)]) }.not_to raise_error
+      end
+
+      it 'rejects empty or non-string time codes and a time code supplied for an image' do
+        ['', ' ', 12, nil].each do |time_code|
+          expect { described_class.validate([video_entry.merge(preview_frame_time_code: time_code)]) }.to raise_error(/preview_frame_time_code/)
+        end
+        expect { described_class.validate([entry.merge(preview_frame_time_code: '00:00:01:00')]) }.to raise_error(/only.*video/)
+      end
+
+      it 'uploads a video and places it through the video relationship' do
+        expect(Spaceship::ConnectAPI::AppAssetLibraryImage).not_to receive(:create)
+        expect(Spaceship::ConnectAPI::AppAssetLibraryVideo).to receive(:create).with(app_asset_library_id: library.id, path: @video_path, category: 'CREATIVE_ASSETS', preview_frame_time_code: '00:00:01:00').and_return(video)
+        expect(Spaceship::ConnectAPI::AppAssetLibraryPlacement).to receive(:create).with(app_store_version_localization_id: localization.id, video_id: video.id, placement_type: entry[:placement_type], placement_group: entry[:placement_group])
+        uploader.upload(options)
+      end
+
+      it 'replaces only the requested target after video and preview processing succeed' do
+        options[:overwrite_creative_assets] = true
+        allow(Spaceship::ConnectAPI::AppAssetLibraryPlacement).to receive(:all).and_return([placement])
+        expect(Spaceship::ConnectAPI::AppAssetLibraryVideo).to receive(:create).ordered.and_return(video)
+        expect(placement).to receive(:delete!).ordered
+        expect(Spaceship::ConnectAPI::AppAssetLibraryPlacement).to receive(:create).ordered.with(hash_including(video_id: video.id))
+        uploader.upload(options)
+      end
+
+      it 'supports images and videos in the same run' do
+        japanese = double('localization', id: 'ja-id', locale: 'ja')
+        allow(version).to receive(:get_app_store_version_localizations).and_return([localization, japanese])
+        allow(Spaceship::ConnectAPI::AppAssetLibraryPlacement).to receive(:all).and_return([])
+        options[:creative_assets] = [entry, video_entry.merge(locale: 'ja')]
+        expect(Spaceship::ConnectAPI::AppAssetLibraryImage).to receive(:create).once.and_return(image)
+        expect(Spaceship::ConnectAPI::AppAssetLibraryVideo).to receive(:create).once.and_return(video)
+        expect(Spaceship::ConnectAPI::AppAssetLibraryPlacement).to receive(:create).with(hash_including(image_id: image.id))
+        expect(Spaceship::ConnectAPI::AppAssetLibraryPlacement).to receive(:create).with(hash_including(video_id: video.id))
+        uploader.upload(options)
+      end
+
+      it 'reuses a video with the same frame but keeps different frame choices separate' do
+        japanese = double('localization', id: 'ja-id', locale: 'ja')
+        german = double('localization', id: 'de-id', locale: 'de-DE')
+        allow(version).to receive(:get_app_store_version_localizations).and_return([localization, japanese, german])
+        allow(Spaceship::ConnectAPI::AppAssetLibraryPlacement).to receive(:all).and_return([])
+        options[:creative_assets] += [video_entry.merge(locale: 'ja'), video_entry.merge(locale: 'de-DE', preview_frame_time_code: '00:00:02:00')]
+        expect(Spaceship::ConnectAPI::AppAssetLibraryVideo).to receive(:create).with(hash_including(preview_frame_time_code: '00:00:01:00')).once.and_return(video)
+        expect(Spaceship::ConnectAPI::AppAssetLibraryVideo).to receive(:create).with(hash_including(preview_frame_time_code: '00:00:02:00')).once.and_return(video)
+        expect(Spaceship::ConnectAPI::AppAssetLibraryPlacement).to receive(:create).exactly(3).times
+        uploader.upload(options)
+      end
+
+      it 'rejects a target without a compatible video spec before reserving anything' do
+        allow(reference).to receive(:video_specs).and_return([{ 'specId' => 'other-spec' }])
+        expect(Spaceship::ConnectAPI::AppAssetLibraryVideo).not_to receive(:create)
+        expect { uploader.upload(options) }.to raise_error(/video specification/)
+      end
+
+      it 'preserves existing placement if video or preview-frame processing fails' do
+        options[:overwrite_creative_assets] = true
+        allow(Spaceship::ConnectAPI::AppAssetLibraryPlacement).to receive(:all).and_return([placement])
+        allow(Spaceship::ConnectAPI::AppAssetLibraryVideo).to receive(:create).and_raise('preview processing failed')
+        expect(placement).not_to receive(:delete!)
+        expect { uploader.upload(options) }.to raise_error('preview processing failed')
+      end
+
+      it 'preserves existing placement if the processed video has the wrong spec' do
+        options[:overwrite_creative_assets] = true
+        allow(Spaceship::ConnectAPI::AppAssetLibraryPlacement).to receive(:all).and_return([placement])
+        allow(Spaceship::ConnectAPI::AppAssetLibraryVideo).to receive(:create).and_return(video)
+        allow(video).to receive(:spec_id).and_return('wrong-spec')
+        expect(placement).not_to receive(:delete!)
+        expect { uploader.upload(options) }.to raise_error(/not compatible/)
+      end
     end
 
     it 'does nothing when no creative assets were specified' do
