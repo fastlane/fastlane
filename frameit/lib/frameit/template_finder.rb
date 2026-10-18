@@ -24,10 +24,7 @@ module Frameit
       end
 
       if templates.count == 0
-        if screenshot.device_name.start_with?("Apple iPhone Duo ")
-          UI.error("iPhone Duo artwork must be installed locally from Apple Design Resources.")
-          UI.error("See frameit/frames_generator/README.md and run import_iphone_duo.rb; download_frames does not include these assets.")
-        elsif screenshot.deliver_screen_id == DEVICE_SCREEN_IDS[DisplayType::APP_IPHONE_35]
+        if screenshot.deliver_screen_id == DEVICE_SCREEN_IDS[DisplayType::APP_IPHONE_35]
           UI.important("Unfortunately 3.5\" device frames were discontinued. Skipping screen '#{screenshot.path}'")
           UI.error("Looked for: '#{filename}.png'")
         else
