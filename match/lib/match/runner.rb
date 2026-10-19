@@ -387,6 +387,8 @@ module Match
 
       if Helper.mac?
         installed_profile = FastlaneCore::ProvisioningProfile.install(stored_profile_path, keychain_path)
+      else
+        UI.message("Skipping installation of provisioning profile as it would not work on this operating system.")
       end
 
       if params[:output_path]
