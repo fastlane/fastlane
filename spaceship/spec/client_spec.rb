@@ -564,6 +564,11 @@ BODY
       response = TestResponse.new([130, 5, 3120, 130, 4, 171, 160, 3, 2].pack('C*'))
       expect(subject.send(:log_response, :get, TestClient.hostname, response)).to be_truthy
     end
+
+    it 'handles a frozen response body' do
+      response = TestResponse.new("".freeze)
+      expect(subject.send(:log_response, :get, TestClient.hostname, response)).to be_truthy
+    end
   end
 
   describe "#persistent_cookie_path" do
