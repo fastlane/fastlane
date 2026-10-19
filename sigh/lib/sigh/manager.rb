@@ -41,7 +41,11 @@ module Sigh
       ENV["SIGH_UDID"] = ENV["SIGH_UUID"] = uuid if uuid
       ENV["SIGH_NAME"] = name if name
 
-      FastlaneCore::ProvisioningProfile.install(profile, keychain_path)
+      if Helper.mac?
+        FastlaneCore::ProvisioningProfile.install(profile, keychain_path)
+      else
+        UI.message("Skipping installation of provisioning profile as it would not work on this operating system.")
+      end
     end
   end
 end
