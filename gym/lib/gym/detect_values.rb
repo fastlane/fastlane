@@ -1,5 +1,6 @@
 require 'fastlane_core/core_ext/cfpropertylist'
 require 'fastlane_core/project'
+require 'security'
 require_relative 'module'
 require_relative 'code_signing_mapping'
 
@@ -117,15 +118,15 @@ module Gym
         return
       end
 
-      output = Helper.backticks("security find-certificate -a -c \"#{prefix}\"", print: false)
-
-      # Find matches, filter by team_id, prepend prefix for full cert name
-      certs = output.scan(/"(?:#{prefix})(.*)"/)
-      certs = certs.flatten.uniq.select do |cert|
-        cert.include?(team_id)
-      end.map do |cert|
-        prefix + cert
+      names = begin
+        Security::Certificate.find(name: prefix).map(&:name)
+      rescue Security::Error => e
+        UI.error("Could not search for installer certificates: #{e.message}")
+        []
       end
+
+      # Filter by team_id, the part after the prefix
+      certs = names.uniq.select { |name| name.start_with?(prefix) && name.delete_prefix(prefix).include?(team_id) }
 
       if certs.first
         UI.verbose("Detected installer certificate to use: #{certs.first}")
