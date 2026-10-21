@@ -151,7 +151,7 @@ module Fastlane
         Actions.sh("git remote show #{remote_name} | grep 'HEAD branch' | sed 's/.*: //'", log: false).chomp
       else
         # Query git for the current remote head
-        Actions.sh("variable=$(git remote) && git remote show $variable | grep 'HEAD branch' | sed 's/.*: //'", log: false).chomp
+        Actions.sh("variable=$(git remote | head -1) && git remote show $variable | grep 'HEAD branch' | sed 's/.*: //'", log: false).chomp
       end
     rescue => err
       UI.verbose("Error getting git default remote branch: #{err.message}")
