@@ -7,37 +7,24 @@ module FastlaneCore
     def self.import_file(path, keychain_path, keychain_password: nil, certificate_password: "", certificate_format: nil, skip_set_partition_list: false, output: FastlaneCore::Globals.verbose?)
       UI.user_error!("Could not find file '#{path}'") unless File.exist?(path)
 
-      password_part = " -P #{certificate_password.shellescape}"
-      certificate_format_part = certificate_format.to_s.strip.empty? ? "" : " -f #{certificate_format.shellescape}"
+      certificate_format = nil if certificate_format.to_s.strip.empty?
+      UI.command("security import #{path.shellescape} -k #{keychain_path.shellescape} -P ********#{" -f #{certificate_format}" if certificate_format}") if output
 
-      command = "security import #{path.shellescape} -k #{keychain_path.shellescape}"
-      command << password_part
-      command << certificate_format_part
-      command << " -T /usr/bin/codesign" # to not be asked for permission when running a tool like `gym` (before Sierra)
-      command << " -T /usr/bin/security"
-      command << " -T /usr/bin/productbuild" # to not be asked for permission when using an installer cert for macOS
-      command << " -T /usr/bin/productsign"  # to not be asked for permission when using an installer cert for macOS
-      command << " 1> /dev/null" unless output
-
-      sensitive_command = command.gsub(password_part, " -P ********")
-      UI.command(sensitive_command) if output
-      Open3.popen3(command) do |stdin, stdout, stderr, thrd|
-        UI.command_output(stdout.read.to_s) if output
-
-        # Set partition list only if success since it can be a time consuming process if a lot of keys are installed
-        if thrd.value.success? && !skip_set_partition_list
-          keychain_password ||= resolve_keychain_password(keychain_path)
-          set_partition_list(path, keychain_path, keychain_password: keychain_password, output: output)
-        else
-          # Output verbose if file is already installed since not an error otherwise we will show the whole error
-          err = stderr.read.to_s.strip
-          if err.include?("SecKeychainItemImport") && err.include?("The specified item already exists in the keychain")
-            UI.verbose("'#{File.basename(path)}' is already installed on this machine")
-          else
-            UI.error(err)
-          end
-        end
+      begin
+        Security::Certificate.import(path, keychain: keychain_path, password: certificate_password, format: certificate_format)
+      rescue Security::DuplicateItemError
+        UI.verbose("'#{File.basename(path)}' is already installed on this machine")
+        return
+      rescue Security::Error => e
+        UI.error(e.output.strip)
+        return
       end
+
+      # Set partition list only if success since it can be a time consuming process if a lot of keys are installed
+      return if skip_set_partition_list
+
+      keychain_password ||= resolve_keychain_password(keychain_path)
+      set_partition_list(path, keychain_path, keychain_password: keychain_password, output: output)
     end
 
     def self.set_partition_list(path, keychain_path, keychain_password: nil, output: FastlaneCore::Globals.verbose?)
