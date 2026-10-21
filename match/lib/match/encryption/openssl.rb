@@ -67,6 +67,7 @@ module Match
       end
 
       def store_password(password)
+        return unless FastlaneCore::StoredPasswords.store?
         Security::InternetPassword.add(server_name(self.keychain_name), "", password)
       end
 
@@ -95,7 +96,11 @@ module Match
         unless password
           begin
             item = Security::InternetPassword.find(server: server_name(self.keychain_name))
-            password = item.password if item
+            if item
+              password = item.password
+              server = server_name(self.keychain_name)
+              FastlaneCore::StoredPasswords.read_warning(server, what: "the match passphrase", remove_with: "security delete-internet-password -s #{server}", instead: "provide it with the MATCH_PASSWORD environment variable")&.each { |line| UI.important(line) }
+            end
           rescue Security::Error => ex
             UI.important("Could not read the local keychain: #{ex.message}")
           end
@@ -105,10 +110,10 @@ module Match
           if !UI.interactive?
             UI.error("Neither the MATCH_PASSWORD environment variable nor the local keychain contained a password.")
             UI.error("Bailing out instead of asking for a password, since this is non-interactive mode.")
-            UI.user_error!("Try setting the MATCH_PASSWORD environment variable, or temporarily enable interactive mode to store a password.")
+            UI.user_error!("Try setting the MATCH_PASSWORD environment variable.")
           else
             UI.important("Enter the passphrase that should be used to encrypt/decrypt your certificates")
-            UI.important("This passphrase is specific per repository and will be stored in your local keychain")
+            UI.important(FastlaneCore::StoredPasswords.store? ? "This passphrase is specific per repository and will be stored in your local keychain" : "This passphrase is specific per repository")
             UI.important("Make sure to remember the password, as you'll need it when you run match on a different machine")
             password = FastlaneCore::Helper.ask_password(message: "Passphrase for Match storage: ", confirm: true)
             store_password(password)
