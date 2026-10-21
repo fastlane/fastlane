@@ -8,6 +8,9 @@ require_relative 'options'
 
 module Precheck
   class Runner
+    class BlockingViolationError < FastlaneCore::Interface::FastlaneError
+    end
+
     attr_accessor :spaceship
 
     # Uses the spaceship to download app metadata and then run all rule checkers
@@ -67,8 +70,7 @@ module Precheck
       end
 
       if processor_result.should_trigger_user_error?
-        UI.user_error!("precheck 👮‍♀️ 👮  found one or more potential problems that must be addressed before submitting to review")
-        return false
+        raise BlockingViolationError.new, "precheck 👮‍♀️ 👮  found one or more potential problems that must be addressed before submitting to review"
       end
 
       if processor_result.has_errors_or_warnings?

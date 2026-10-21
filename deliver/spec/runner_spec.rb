@@ -309,21 +309,40 @@ describe Deliver::Runner do
   end
 
   describe :precheck_app do
-    it 'does not submit for review when precheck reports a blocking violation' do
-      options[:app_version] = nil
-      options[:skip_app_version_update] = true
-      options[:skip_binary_upload] = true
-      options[:run_precheck_before_submit] = true
-      options[:submit_for_review] = true
+    let(:precheck_runner) { instance_double(Precheck::Runner) }
 
+    before do
       allow(runner).to receive(:upload_metadata)
-      precheck_runner = instance_double(Precheck::Runner)
+      runner.options[:app_version] = nil
+      runner.options[:skip_app_version_update] = true
+      runner.options[:skip_binary_upload] = true
+      runner.options[:run_precheck_before_submit] = true
+      runner.options[:submit_for_review] = true
       allow(Precheck::Runner).to receive(:new).and_return(precheck_runner)
-      allow(precheck_runner).to receive(:run).and_raise(FastlaneCore::Interface::FastlaneError)
+    end
+
+    it 'does not submit for review when precheck reports a blocking violation' do
+      expect(precheck_runner).to receive(:run).and_raise(
+        Precheck::Runner::BlockingViolationError.new,
+        'blocking precheck violations'
+      )
 
       expect(runner).not_to receive(:submit_for_review)
 
       runner.run
+    end
+
+    it 're-raises other FastlaneErrors so the top-level runner can display them' do
+      expect(precheck_runner).to receive(:run).and_raise(
+        FastlaneCore::Interface::FastlaneError.new,
+        'precheck could not run'
+      )
+
+      expect(runner).not_to receive(:submit_for_review)
+      expect { runner.run }.to raise_error(
+        FastlaneCore::Interface::FastlaneError,
+        'precheck could not run'
+      )
     end
   end
 
