@@ -336,7 +336,7 @@ module Spaceship
 
     def merchants(mac: false)
       paging do |page_number|
-        r = request(:post, "account/#{platform_slug(mac)}/identifiers/listOMCs.action", {
+        r = request(:post, "account/ios/identifiers/listOMCs.action", {
             teamId: team_id,
             pageNumber: page_number,
             pageSize: page_size,
@@ -405,7 +405,7 @@ module Spaceship
     def create_merchant!(name, bundle_id, mac: false)
       ensure_csrf(Spaceship::Portal::Merchant)
 
-      r = request(:post, "account/#{platform_slug(mac)}/identifiers/addOMC.action", {
+      r = request(:post, "account/ios/identifiers/addOMC.action", {
           name: name,
           identifier: bundle_id,
           teamId: team_id
@@ -416,7 +416,7 @@ module Spaceship
     def delete_merchant!(merchant_id, mac: false)
       ensure_csrf(Spaceship::Portal::Merchant)
 
-      r = request(:post, "account/#{platform_slug(mac)}/identifiers/deleteOMC.action", {
+      r = request(:post, "account/ios/identifiers/deleteOMC.action", {
           teamId: team_id,
           omcId: merchant_id
       })
