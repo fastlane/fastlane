@@ -1,60 +1,48 @@
+require 'security'
+
 module Fastlane
   module Actions
     class UnlockKeychainAction < Action
       def self.run(params)
         keychain_path = FastlaneCore::Helper.keychain_path(params[:path])
         add_to_search_list = params[:add_to_search_list]
-        set_default = params[:set_default]
-        commands = []
 
         # add to search list if not already added
         if add_to_search_list == true || add_to_search_list == :add
-          commands << add_keychain_to_search_list(keychain_path)
+          add_keychain_to_search_list(keychain_path)
         elsif add_to_search_list == :replace
-          commands << replace_keychain_in_search_list(keychain_path)
+          replace_keychain_in_search_list(keychain_path)
         end
 
-        # set default keychain
-        if set_default
-          commands << default_keychain(keychain_path)
-        end
-
-        escaped_path = keychain_path.shellescape
-        escaped_password = params[:password].shellescape
+        default_keychain(keychain_path) if params[:set_default]
 
         # Log the full path, useful for troubleshooting
-        UI.message("Unlocking keychain at path: #{escaped_path}")
+        UI.message("Unlocking keychain at path: #{keychain_path}")
         # unlock given keychain and disable lock and timeout
-        commands << Fastlane::Actions.sh("security unlock-keychain -p #{escaped_password} #{escaped_path}", log: false)
-        commands << Fastlane::Actions.sh("security set-keychain-settings #{escaped_path}", log: false)
-        commands
+        keychain = Security::Keychain.new(keychain_path)
+        UI.user_error!("Could not unlock keychain '#{keychain_path}'") unless keychain.unlock(params[:password])
+        UI.user_error!("Could not change the settings of keychain '#{keychain_path}'") unless keychain.update_settings
       end
 
       def self.add_keychain_to_search_list(keychain_path)
-        keychains = Fastlane::Actions.sh("security list-keychains -d user", log: false).shellsplit
+        keychains = Security::Keychain.list(:user).map(&:filename)
+        return if keychains.include?(keychain_path)
 
-        # add the keychain to the keychain list
-        unless keychains.include?(keychain_path)
-          keychains << keychain_path
-
-          Fastlane::Actions.sh("security list-keychains -s #{keychains.shelljoin}", log: false)
-        end
+        UI.user_error!("Could not add '#{keychain_path}' to the keychain search list") unless Security::Keychain.set_search_list(keychains + [keychain_path])
       end
 
       def self.replace_keychain_in_search_list(keychain_path)
         begin
           UI.message("Reading existing default keychain")
-          Actions.lane_context[Actions::SharedValues::ORIGINAL_DEFAULT_KEYCHAIN] = Fastlane::Actions.sh("security default-keychain").strip
-        rescue => e
-          raise unless e.message.include?("security: SecKeychainCopyDefault: A default keychain could not be found.")
+          Actions.lane_context[Actions::SharedValues::ORIGINAL_DEFAULT_KEYCHAIN] = Security::Keychain.default_keychain&.filename
+        rescue Security::Error => e
+          raise unless e.message.include?("A default keychain could not be found")
         end
-        escaped_path = keychain_path.shellescape
-        Fastlane::Actions.sh("security list-keychains -s #{escaped_path}", log: false)
+        UI.user_error!("Could not replace the keychain search list with '#{keychain_path}'") unless Security::Keychain.set_search_list([keychain_path])
       end
 
       def self.default_keychain(keychain_path)
-        escaped_path = keychain_path.shellescape
-        Fastlane::Actions.sh("security default-keychain -s #{escaped_path}", log: false)
+        UI.user_error!("Could not make '#{keychain_path}' the default keychain") unless Security::Keychain.set_default_keychain(keychain_path)
       end
 
       #####################################################
