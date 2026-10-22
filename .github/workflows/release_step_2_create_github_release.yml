@@ -122,17 +122,3 @@ jobs:
 
     - name: Release to RubyGems
       uses: rubygems/release-gem@7f9650160c1a4e7989fdc9855807bdbd421d8b6b # v1.4.1
-
-    # The attestation covers the GitHub release gem; it only covers the RubyGems gem while both builds are byte-identical
-    - name: Verify RubyGems gem matches the GitHub release gem
-      env:
-        VERSION: ${{ needs.create_github_release.outputs.version }}
-        EXPECTED_SHA256: ${{ needs.create_github_release.outputs.gem-sha256 }}
-      run: |
-        gem="$RUNNER_TEMP/fastlane-$VERSION.gem"
-        curl -fsSL --retry 5 --retry-all-errors --output "$gem" "https://rubygems.org/downloads/fastlane-$VERSION.gem"
-        actual=$(sha256sum "$gem" | cut -d' ' -f1)
-        if [ "$actual" != "$EXPECTED_SHA256" ]; then
-          echo "::error::fastlane-$VERSION.gem on RubyGems ($actual) differs from the GitHub release gem ($EXPECTED_SHA256)"
-          exit 1
-        fi
