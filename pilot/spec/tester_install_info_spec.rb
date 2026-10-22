@@ -73,6 +73,27 @@ describe Pilot::TesterInstallInfo do
         install_info.install_for(installed([device("1234", platform: "NEW_PLATFORM")]))
       end
 
+      it "treats a numeric appBuildVersion as a bare build number" do
+        allow(Spaceship::ConnectAPI::Build).to(receive(:all).and_return([]))
+
+        install = install_info.install_for(installed([device(1234)]))
+
+        expect(install.build).to eq("1234")
+        expect(install.display_version).to eq("1234")
+      end
+
+      it "ignores an empty appBuildVersion" do
+        expect(Spaceship::ConnectAPI::Build).not_to(receive(:all))
+
+        install = install_info.install_for(installed([device(""), device("1.2.3 (1234)")]))
+
+        expect(install.display_version).to eq("1.2.3 (1234)")
+      end
+
+      it "returns nil when the only appBuildVersion is empty" do
+        expect(install_info.install_for(installed([device("")]))).to be_nil
+      end
+
       it "skips the lookup without an app" do
         expect(Spaceship::ConnectAPI::Build).not_to(receive(:all))
 
@@ -95,6 +116,20 @@ describe Pilot::TesterInstallInfo do
 
         expect(install.display_version).to eq("1.3.300 (1113)")
         expect(install.build).to eq("1113")
+      end
+
+      it "formats a missing version as the metrics fields did" do
+        install = install_info.install_for(tester(betaTesterState: "INSTALLED", installedCfBundleVersion: "1113"))
+
+        expect(install.display_version).to eq(" (1113)")
+        expect(install.build).to eq("1113")
+      end
+
+      it "formats a missing version and build as the metrics fields did" do
+        install = install_info.install_for(tester(betaTesterState: "INSTALLED"))
+
+        expect(install.display_version).to eq(" ()")
+        expect(install.build).to be_nil
       end
 
       it "returns nil when the tester is not installed" do

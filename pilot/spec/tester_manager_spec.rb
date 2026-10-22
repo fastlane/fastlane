@@ -161,6 +161,19 @@ describe Pilot::TesterManager do
         expect_find_to_print(tester, base_rows + [["Latest Version", "1.2.3 (1234)"], ["Latest Install Date", "1234"], ["Installed", true]])
       end
 
+      it "looks up the version of a bare build number for the app" do
+        allow(fake_app).to receive(:id).and_return("123456789")
+        expect(Spaceship::ConnectAPI::Build).to receive(:all)
+          .with(app_id: "123456789", build_number: "1234", platform: "IOS")
+          .and_return([double("build", app_version: "1.2.3")])
+        tester = tester_with(state: "INSTALLED", appDevices: [
+                               { "appBuildVersion" => "999", "platform" => "IOS" },
+                               { "appBuildVersion" => "1234", "platform" => "IOS" }
+                             ])
+
+        expect_find_to_print(tester, base_rows + [["Latest Version", "1.2.3 (1234)"], ["Latest Install Date", "1234"], ["Installed", true]])
+      end
+
       it "prints the install rows from the metrics fields" do
         tester = tester_with(betaTesterState: "INSTALLED", installedCfBundleShortVersionString: "1.3.300", installedCfBundleVersion: "1113")
 

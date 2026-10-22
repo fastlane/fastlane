@@ -83,6 +83,42 @@ describe Pilot::TesterExporter do
       end
     end
 
+    context "when installed testers have a bare build number" do
+      let(:fake_app) { "fake app" }
+      let(:test_group) { Spaceship::ConnectAPI::BetaGroup.new("1", { name: "Test Group" }) }
+      let(:testers) do
+        ["one", "two"].each_with_index.map do |name, index|
+          Spaceship::ConnectAPI::BetaTester.new(index.to_s, {
+            firstName: name,
+            lastName: "tester",
+            email: "#{name}@tester.com",
+            betaGroups: [test_group],
+            state: "INSTALLED",
+            appDevices: [{ "appBuildVersion" => "1234", "platform" => "IOS" }]
+          })
+        end
+      end
+
+      before(:each) do
+        allow(fake_app).to receive(:id).and_return("123456789")
+        allow(fake_app).to receive(:get_beta_testers).with(includes: "apps,betaGroups").and_return(testers)
+        allow(fake_tester_exporter).to receive(:find_app).with(apple_id: fake_apple_id, app_identifier: fake_app_identifier).and_return(fake_app)
+      end
+
+      it "looks up the version once and exports it for each tester" do
+        expect(Spaceship::ConnectAPI::Build).to receive(:all).once.and_return([double("build", app_version: "1.2.3")])
+
+        fake_tester_exporter.export_testers(fake_input_options)
+
+        expected_rows = [
+          ["First", "Last", "Email", "Groups", "Installed Version", "Install Date"],
+          ["one", "tester", "one@tester.com", "Test Group", "1.2.3 (1234)", "1234"],
+          ["two", "tester", "two@tester.com", "Test Group", "1.2.3 (1234)", "1234"]
+        ]
+        expect(CSV.read(fake_testers_file_path)).to eq(expected_rows)
+      end
+    end
+
     context "when failed to find app using apple_id and app_identifier" do
       let(:fake_app) { "fake app" }
 

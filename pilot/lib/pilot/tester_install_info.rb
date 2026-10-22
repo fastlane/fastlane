@@ -29,14 +29,18 @@ module Pilot
       end
 
       return nil unless tester.beta_tester_state == Spaceship::ConnectAPI::BetaTesterMetric::BetaTesterState::INSTALLED
-      return Install.new(tester.installed_cf_bundle_short_version_string, tester.installed_cf_bundle_version)
+      # An empty version string keeps the "#{version} (#{build})" format for partial data
+      return Install.new(tester.installed_cf_bundle_short_version_string.to_s, tester.installed_cf_bundle_version)
     end
 
     private
 
     def install_from_app_devices(app_devices)
-      candidates = (app_devices || []).select { |device| device["appBuildVersion"] }.map do |device|
-        version, build = parse_build_version(device["appBuildVersion"])
+      candidates = (app_devices || []).filter_map do |device|
+        value = device["appBuildVersion"].to_s.strip
+        next if value.empty?
+
+        version, build = parse_build_version(value)
         { version: version, build: build, platform: device["platform"] }
       end
 
@@ -54,7 +58,7 @@ module Pilot
       return [nil, value]
     end
 
-    # Builds that are not valid versions sort lowest, as in app_store_build_number
+    # Compared with Gem::Version, as app_store_build_number.rb:114 does. A build Gem::Version rejects sorts lowest.
     def build_sort_key(build)
       return Gem::Version.correct?(build) ? Gem::Version.new(build) : Gem::Version.new("0")
     end
