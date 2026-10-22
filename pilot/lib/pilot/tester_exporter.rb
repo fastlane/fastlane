@@ -1,6 +1,7 @@
 require 'spaceship/tunes/application'
 require_relative 'module'
 require_relative 'manager'
+require_relative 'tester_install_info'
 
 module Pilot
   class TesterExporter < Manager

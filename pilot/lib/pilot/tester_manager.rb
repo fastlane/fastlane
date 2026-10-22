@@ -1,6 +1,7 @@
 require 'terminal-table'
 
 require_relative 'manager'
+require_relative 'tester_install_info'
 
 module Pilot
   class TesterManager < Manager
