@@ -27,7 +27,7 @@ describe Pilot::TesterExporter do
       let(:fake_app) { "fake app" }
 
       before(:each) do
-        allow(fake_app).to receive(:get_beta_testers).with(includes: "apps,betaTesterMetrics,betaGroups").and_return([])
+        allow(fake_app).to receive(:get_beta_testers).with(includes: "apps,betaGroups").and_return([])
         allow(fake_tester_exporter).to receive(:find_app).with(apple_id: fake_apple_id, app_identifier: fake_app_identifier).and_return(fake_app)
       end
 
@@ -44,12 +44,51 @@ describe Pilot::TesterExporter do
       end
     end
 
+    context "when testers have install data" do
+      let(:fake_app) { "fake app" }
+      let(:test_group) { Spaceship::ConnectAPI::BetaGroup.new("1", { name: "Test Group" }) }
+      let(:installed_tester) do
+        Spaceship::ConnectAPI::BetaTester.new("1", {
+          firstName: "fake",
+          lastName: "tester",
+          email: "fake@tester.com",
+          betaGroups: [test_group],
+          state: "INSTALLED",
+          appDevices: [{ "appBuildVersion" => "1.2.3 (1234)", "platform" => "IOS" }]
+        })
+      end
+      let(:invited_tester) do
+        Spaceship::ConnectAPI::BetaTester.new("2", {
+          firstName: "new",
+          lastName: "tester",
+          email: "new@tester.com",
+          betaGroups: [test_group],
+          state: "INVITED"
+        })
+      end
+
+      before(:each) do
+        allow(fake_app).to receive(:get_beta_testers).with(includes: "apps,betaGroups").and_return([installed_tester, invited_tester])
+        allow(fake_tester_exporter).to receive(:find_app).with(apple_id: fake_apple_id, app_identifier: fake_app_identifier).and_return(fake_app)
+      end
+
+      it "exports the installed version and build only for installed testers" do
+        fake_tester_exporter.export_testers(fake_input_options)
+
+        expect(CSV.read(fake_testers_file_path)).to eq([
+                                                         ["First", "Last", "Email", "Groups", "Installed Version", "Install Date"],
+                                                         ["fake", "tester", "fake@tester.com", "Test Group", "1.2.3 (1234)", "1234"],
+                                                         ["new", "tester", "new@tester.com", "Test Group", nil, nil]
+                                                       ])
+      end
+    end
+
     context "when failed to find app using apple_id and app_identifier" do
       let(:fake_app) { "fake app" }
 
       before(:each) do
         allow(fake_tester_exporter).to receive(:find_app).with(apple_id: fake_apple_id, app_identifier: fake_app_identifier).and_return(nil)
-        allow(Spaceship::ConnectAPI::BetaTester).to receive(:all).with(includes: "apps,betaTesterMetrics,betaGroups").and_return([])
+        allow(Spaceship::ConnectAPI::BetaTester).to receive(:all).with(includes: "apps,betaGroups").and_return([])
       end
 
       it "exports beta testers inside the correct file path" do

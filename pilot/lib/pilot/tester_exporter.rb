@@ -13,9 +13,9 @@ module Pilot
 
       app = find_app(apple_id: options[:apple_id], app_identifier: options[:app_identifier])
       if app
-        testers = app.get_beta_testers(includes: "apps,betaTesterMetrics,betaGroups")
+        testers = app.get_beta_testers(includes: "apps,betaGroups")
       else
-        testers = Spaceship::ConnectAPI::BetaTester.all(includes: "apps,betaTesterMetrics,betaGroups")
+        testers = Spaceship::ConnectAPI::BetaTester.all(includes: "apps,betaGroups")
       end
 
       file = config[:testers_file_path]
@@ -23,13 +23,15 @@ module Pilot
       CSV.open(file, "w") do |csv|
         csv << ['First', 'Last', 'Email', 'Groups', 'Installed Version', 'Install Date']
 
+        install_info = Pilot::TesterInstallInfo.new(app: app)
+
         testers.each do |tester|
           group_names = tester.beta_groups.map(&:name).join(";") || ""
 
-          metric = (tester.beta_tester_metrics || []).first
-          if metric.installed?
-            install_version = "#{metric.installed_cf_bundle_short_version_string} (#{metric.installed_cf_bundle_version})"
-            pretty_date = metric.installed_cf_bundle_version
+          install = install_info.install_for(tester)
+          if install
+            install_version = install.display_version
+            pretty_date = install.build
           end
 
           csv << [tester.first_name, tester.last_name, tester.email, group_names, install_version, pretty_date]

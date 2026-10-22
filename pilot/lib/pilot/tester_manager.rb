@@ -35,7 +35,7 @@ module Pilot
       tester = find_app_tester(email: config[:email], app: app)
       UI.user_error!("Tester #{config[:email]} not found") unless tester
 
-      describe_tester(tester)
+      describe_tester(tester, app: app)
       return tester
     end
 
@@ -98,7 +98,7 @@ module Pilot
     end
 
     def find_app_tester(email: nil, app: nil)
-      tester = app.get_beta_testers(filter: { email: email }, includes: "apps,betaTesterMetrics,betaGroups").first
+      tester = app.get_beta_testers(filter: { email: email }, includes: "apps,betaGroups").first
 
       if tester
         UI.success("Found existing tester #{email}")
@@ -108,7 +108,7 @@ module Pilot
     end
 
     def list_testers_by_app(app)
-      testers = app.get_beta_testers(includes: "apps,betaTesterMetrics,betaGroups")
+      testers = app.get_beta_testers(includes: "apps,betaGroups")
 
       list_by_app(testers, "All Testers")
     end
@@ -139,7 +139,7 @@ module Pilot
     end
 
     # Print out all the details of a specific tester
-    def describe_tester(tester)
+    def describe_tester(tester, app: nil)
       return unless tester
 
       rows = []
@@ -152,11 +152,11 @@ module Pilot
         rows << ["Groups", tester.beta_groups.map(&:name).join(";")]
       end
 
-      metric = (tester.beta_tester_metrics || []).first
-      if metric.installed?
-        rows << ["Latest Version", "#{metric.installed_cf_bundle_short_version_string} (#{metric.installed_cf_bundle_version})"]
-        rows << ["Latest Install Date", metric.installed_cf_bundle_version]
-        rows << ["Installed", metric.installed?]
+      install = Pilot::TesterInstallInfo.new(app: app).install_for(tester)
+      if install
+        rows << ["Latest Version", install.display_version]
+        rows << ["Latest Install Date", install.build]
+        rows << ["Installed", true]
       end
 
       puts(Terminal::Table.new(

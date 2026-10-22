@@ -111,6 +111,63 @@ describe Pilot::TesterManager do
       end
     end
 
+    describe "when asked to list testers" do
+      it "requests testers without betaTesterMetrics" do
+        expect(fake_app).to receive(:get_beta_testers).with(includes: "apps,betaGroups").and_return(app_context_testers)
+
+        tester_manager.list_testers(app_identifier: 'com.whatever')
+      end
+    end
+
+    describe "when asked to find a tester" do
+      let(:find_tester_options) do
+        FastlaneCore::Configuration.create(Pilot::Options.available_options, {
+          apple_id: '123456789',
+          email: fake_tester.email
+        })
+      end
+      let(:base_rows) do
+        [
+          ["First name", "fake"],
+          ["Last name", "tester"],
+          ["Email", fake_tester.email],
+          ["Groups", "Test Group;Second Group"]
+        ]
+      end
+
+      def tester_with(attributes)
+        Spaceship::ConnectAPI::BetaTester.new("1", {
+          firstName: 'fake',
+          lastName: 'tester',
+          email: 'fabric-devtools@gmail.com+fake@gmail.com',
+          betaGroups: [custom_tester_group, second_tester_group]
+        }.merge(attributes))
+      end
+
+      def expect_find_to_print(tester, expected_rows)
+        allow(fake_app).to receive(:get_beta_testers).with(filter: { email: fake_tester.email }, includes: "apps,betaGroups").and_return([tester])
+        expect(Terminal::Table).to receive(:new).with(title: fake_tester.email.green, rows: expected_rows)
+
+        tester_manager.find_tester(find_tester_options)
+      end
+
+      it "prints only the base rows for a tester without install data" do
+        expect_find_to_print(fake_tester, base_rows)
+      end
+
+      it "prints the install rows from the betaTesters fields" do
+        tester = tester_with(state: "INSTALLED", appDevices: [{ "appBuildVersion" => "1.2.3 (1234)", "platform" => "IOS" }])
+
+        expect_find_to_print(tester, base_rows + [["Latest Version", "1.2.3 (1234)"], ["Latest Install Date", "1234"], ["Installed", true]])
+      end
+
+      it "prints the install rows from the metrics fields" do
+        tester = tester_with(betaTesterState: "INSTALLED", installedCfBundleShortVersionString: "1.3.300", installedCfBundleVersion: "1113")
+
+        expect_find_to_print(tester, base_rows + [["Latest Version", "1.3.300 (1113)"], ["Latest Install Date", "1113"], ["Installed", true]])
+      end
+    end
+
     describe "when asked to invite a new tester to specific existing custom groups" do
       it "creates a new tester and adds it to the default groups" do
         allow(tester_manager).to receive(:find_app_tester).and_return(fake_tester)
