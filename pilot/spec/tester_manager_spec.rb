@@ -131,6 +131,24 @@ describe Pilot::TesterManager do
     end
 
     describe "when asked to add a tester with Apple ID login" do
+      it "sends the tester with unset names to each matched group" do
+        allow(fake_app).to receive(:get_beta_groups).and_return(groups)
+        options = FastlaneCore::Configuration.create(Pilot::Options.available_options, {
+          apple_id: '123456789',
+          email: fake_tester.email,
+          groups: ["Test Group", second_tester_group.id]
+        })
+        user = { email: fake_tester.email, firstName: nil, lastName: nil }
+
+        expect(custom_tester_group).to receive(:post_bulk_beta_tester_assignments).with(beta_testers: [user])
+        expect(second_tester_group).to receive(:post_bulk_beta_tester_assignments).with(beta_testers: [user])
+        expect(FastlaneCore::UI).to receive(:success).with("Successfully added tester #{fake_tester.email} to app #{fake_app_name} in group(s) Test Group;#{second_tester_group.id}")
+
+        FastlaneSpec::Env.with_env_values('PILOT_TESTER_FIRST_NAME' => nil, 'PILOT_TESTER_LAST_NAME' => nil) do
+          tester_manager.add_tester(options)
+        end
+      end
+
       it "sends no request when no group matches" do
         allow(fake_app).to receive(:get_beta_groups).and_return(groups)
         options = FastlaneCore::Configuration.create(Pilot::Options.available_options, {
@@ -161,7 +179,13 @@ describe Pilot::TesterManager do
         expect(FastlaneCore::UI).to receive(:success).with("Successfully added tester #{fake_tester.email} to app #{fake_app_name} in group(s) #{groups_param.join(';')}")
       end
 
+      around(:each) do |example|
+        FastlaneSpec::Env.with_env_values('PILOT_TESTER_FIRST_NAME' => nil, 'PILOT_TESTER_LAST_NAME' => nil) { example.run }
+      end
+
       before(:each) do
+        expect(custom_tester_group).not_to receive(:post_bulk_beta_tester_assignments)
+        expect(second_tester_group).not_to receive(:post_bulk_beta_tester_assignments)
         allow(Spaceship::ConnectAPI).to receive(:token).and_return(api_token)
         allow(fake_app).to receive(:get_beta_groups).and_return(groups)
         allow(Spaceship::ConnectAPI::BetaTester).to receive(:find).with(email: fake_tester.email, includes: "betaGroups").and_return(nil)
@@ -169,8 +193,6 @@ describe Pilot::TesterManager do
 
       it "creates a new tester in all matched groups with one request" do
         expect(Spaceship::ConnectAPI).to receive(:post_beta_tester_assignment).with(beta_group_ids: ["1", "2"], attributes: { email: fake_tester.email, firstName: "fake", lastName: "tester" })
-        expect(custom_tester_group).not_to receive(:post_bulk_beta_tester_assignments)
-        expect(second_tester_group).not_to receive(:post_bulk_beta_tester_assignments)
         expect_success_message(["Test Group", second_tester_group.id])
 
         tester_manager.add_tester(default_add_tester_options_with_group)
@@ -244,8 +266,6 @@ describe Pilot::TesterManager do
       it "sends no request when no group matches" do
         expect(Spaceship::ConnectAPI::BetaTester).not_to receive(:find)
         expect(Spaceship::ConnectAPI).not_to receive(:post_beta_tester_assignment)
-        expect(custom_tester_group).not_to receive(:post_bulk_beta_tester_assignments)
-        expect(second_tester_group).not_to receive(:post_bulk_beta_tester_assignments)
         expect_success_message(["Unknown Group"])
 
         tester_manager.add_tester(add_tester_options(groups: ["Unknown Group"]))
