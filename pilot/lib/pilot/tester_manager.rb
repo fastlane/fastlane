@@ -12,14 +12,20 @@ module Pilot
       groups_param = config[:groups]
       UI.user_error!("You must provide 1 or more groups (with the `:groups` option)") unless groups_param
 
-      app.get_beta_groups.select do |group|
-        next unless group.matches_identifiers?(groups_param)
-        user = {
-          email: config[:email],
-          firstName: config[:first_name],
-          lastName: config[:last_name]
-        }
-        group.post_bulk_beta_tester_assignments(beta_testers: [user])
+      groups = app.get_beta_groups.select { |group| group.matches_identifiers?(groups_param) }
+
+      # As of 2026-10-22, bulkBetaTesterAssignments is not in the App Store Connect API, only available with Apple ID auth
+      if Spaceship::ConnectAPI.token
+        add_tester_with_api_key(groups)
+      else
+        groups.each do |group|
+          user = {
+            email: config[:email],
+            firstName: config[:first_name],
+            lastName: config[:last_name]
+          }
+          group.post_bulk_beta_tester_assignments(beta_testers: [user])
+        end
       end
 
       group_names = groups_param.join(';')
@@ -79,6 +85,28 @@ module Pilot
     end
 
     private
+
+    def add_tester_with_api_key(groups)
+      return if groups.empty?
+
+      tester = Spaceship::ConnectAPI::BetaTester.find(email: config[:email], includes: "betaGroups")
+      if tester
+        member_ids = (tester.beta_groups || []).map(&:id)
+        groups.each do |group|
+          next if member_ids.include?(group.id)
+          group.add_beta_testers(beta_tester_ids: [tester.id])
+        end
+      else
+        Spaceship::ConnectAPI.post_beta_tester_assignment(
+          beta_group_ids: groups.map(&:id),
+          attributes: {
+            email: config[:email],
+            firstName: config[:first_name],
+            lastName: config[:last_name]
+          }.compact
+        )
+      end
+    end
 
     def find_app(apple_id: nil, app_identifier: nil)
       if app_identifier
