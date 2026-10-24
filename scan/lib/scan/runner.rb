@@ -43,7 +43,9 @@ module Scan
 
       prelaunch_simulators
 
-      if Scan.config[:reinstall_app]
+      # Like the options above, this acts on the simulators scan picked, and a Swift package
+      # or a project that doesn't test on a simulator has none
+      if Scan.config[:reinstall_app] && Scan.devices
         app_identifier = Scan.config[:app_identifier]
         app_identifier ||= UI.input("App Identifier: ")
 
@@ -413,6 +415,7 @@ module Scan
 
     def copy_simulator_logs
       return unless Scan.config[:include_simulator_logs]
+      return unless Scan.devices # no devices selected, no logs to collect
 
       UI.header("Collecting system logs")
       Scan.devices.each do |device|
