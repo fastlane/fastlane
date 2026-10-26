@@ -52,6 +52,7 @@ jobs:
         run: ulimit -n 65536
 
       - name: Run tests
+        id: tests
         env:
           # -W0 would also silence the warnings being recorded
           RUBYOPT: ${{ !inputs.warnings && '-W0' || '' }}
@@ -64,7 +65,8 @@ jobs:
           bundle exec fastlane execute_tests
 
       - name: Summarise the Ruby warnings
-        if: always() && inputs.warnings
+        # Not when setup failed and the tests never ran
+        if: always() && inputs.warnings && steps.tests.outcome != 'skipped'
         shell: bash
         run: bundle exec rake warnings_summary
 
