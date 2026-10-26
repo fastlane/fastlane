@@ -82,7 +82,8 @@ describe Fastlane::SwiftLaneManager do
     end
   end
 
-  describe '.cruise_swift_lane_in_thread' do
+  # The runner is run through /bin/sh
+  describe '.cruise_swift_lane_in_thread', unless: FastlaneCore::Helper.windows? do
     around do |example|
       Dir.mktmpdir('runner') do |dir|
         @dir = dir
