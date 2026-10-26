@@ -42,7 +42,6 @@ module Commander
     #  This is raising OptionParser::MissingArgument error because `--env` takes a string argument.
     #  A command of `-e --verbose` works because `--verbose` is seen as the argument.
     #  A command of `--verbose -e` doesn't work because no argument after `-e` so MissingArgument is raised again.
-    #  This broke somewhere between Ruby 2.5 and Ruby 2.6
     #
     # Solution:
     #  Proper solution is to set `parser.require_exact = true` but this only available on `optparse` version 0.1.1
@@ -221,9 +220,8 @@ module Commander
     end
 
     def handle_tls_error!(e)
-      # Apple has upgraded its App Store Connect servers to require TLS 1.2, but
-      # system Ruby 2.0 does not support it. We want to suggest that users upgrade
-      # their Ruby version
+      # Apple's App Store Connect servers require TLS 1.2. We want to suggest that users
+      # reinstall their Ruby
       suggest_ruby_reinstall(e)
       display_user_error!(e, e.to_s)
     end
