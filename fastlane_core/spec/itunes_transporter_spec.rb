@@ -1311,6 +1311,7 @@ describe FastlaneCore do
       before(:each) do
         ENV["FASTLANE_ITUNES_TRANSPORTER_USE_SHELL_SCRIPT"] = "1"
         allow(FastlaneCore::Helper).to receive(:itms_path).and_return(tmp_dir)
+        allow(File).to receive(:exist?).and_call_original if FastlaneCore::Helper.windows?
         allow(File).to receive(:exist?).with("C:/Program Files (x86)/itms").and_return(true) if FastlaneCore::Helper.windows?
       end
 

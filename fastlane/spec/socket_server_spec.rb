@@ -27,7 +27,8 @@ describe Fastlane::SocketServer do
     expect(thread.join(5)).to be(thread)
   end
 
-  it 'listens on every address localhost resolves to, on one free port' do
+  # Windows lets a socket bind a port another one listens on (Ruby sets SO_REUSEADDR), so a taken port goes unnoticed there
+  it 'listens on every address localhost resolves to, on one free port', unless: FastlaneCore::Helper.windows? do
     thread = start(described_class.new(port: 0))
 
     expect(thread[:port]).to be > 0
@@ -36,7 +37,7 @@ describe Fastlane::SocketServer do
     finish(thread, addresses.first)
   end
 
-  it 'refuses to start when another process listens on one of those addresses, rather than using the others' do
+  it 'refuses to start when another process listens on one of those addresses, rather than using the others', unless: FastlaneCore::Helper.windows? do
     # The runner tries the addresses of `localhost` in this order, so whoever holds the first one gets its commands.
     squatter = Addrinfo.tcp(addresses.first, 0).listen
     port = squatter.local_address.ip_port
