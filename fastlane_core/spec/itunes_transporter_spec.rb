@@ -1536,16 +1536,23 @@ describe FastlaneCore do
         end
 
         it 'passes the password in the environment, not on the command line' do
+          allow(FastlaneCore::Helper).to receive(:xcode_version).and_return('11.1')
+          allow(FastlaneCore::Helper).to receive(:mac?).and_return(true)
+          allow(FastlaneCore::Helper).to receive(:windows?).and_return(false)
+          transporter = FastlaneCore::ItunesTransporter.new(email, password, false)
           expect(FastlaneCore::FastlanePty).to receive(:spawn) do |command, env:|
             expect(command).to include("-p @env:ITMS_TRANSPORTER_PASSWORD")
             expect(command).not_to include("p@")
             expect(env).to eq("ITMS_TRANSPORTER_PASSWORD" => password)
             0
           end
-          expect(@transporter.upload('my.app.id', tmp_dir)).to eq(true)
+          expect(transporter.upload('my.app.id', tmp_dir)).to eq(true)
         end
 
         it 'passes the password in the environment to altool' do
+          allow(FastlaneCore::Helper).to receive(:xcode_version).and_return('14.0')
+          allow(FastlaneCore::Helper).to receive(:mac?).and_return(true)
+          allow(FastlaneCore::Helper).to receive(:windows?).and_return(false)
           transporter = FastlaneCore::ItunesTransporter.new(email, password, false, altool_compatible_command: true)
           expect(FastlaneCore::FastlanePty).to receive(:spawn) do |command, env:|
             expect(command).to include("altool")
