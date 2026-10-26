@@ -223,7 +223,7 @@ module Cert
       File.write(request_path, csr.to_pem)
 
       private_key_path = File.expand_path(File.join(Cert.config[:output_path], "#{certificate.id}.p12"))
-      File.write(private_key_path, pkey)
+      FastlaneCore::Helper.open_owner_only(private_key_path) { |file| file.write(pkey) }
 
       cert_path = store_certificate(certificate, Cert.config[:filename])
 

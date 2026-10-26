@@ -363,7 +363,7 @@ describe Match do
           # output_path
           expect(FileUtils).to receive(:mkdir_p).with(match_test_options[:output_path])
           expect(FileUtils).to receive(:cp).with(stored_valid_cert_path, match_test_options[:output_path])
-          expect(FileUtils).to receive(:cp).with("#{repo_dir}/certs/distribution/E7P4EE896K.p12", match_test_options[:output_path])
+          expect(FastlaneCore::Helper).to receive(:open_owner_only).with("#{match_test_options[:output_path]}/E7P4EE896K.p12", "wb")
           expect(FileUtils).to receive(:cp).with(stored_valid_profile_path, match_test_options[:output_path])
 
           # WHEN
@@ -898,6 +898,59 @@ describe Match do
           # Additional cert type should ignore certificate_id and pick the last cert
           additional_cert_id = runner.send(:fetch_certificate, params: config, specific_cert_type: "mac_installer_distribution")
           expect(additional_cert_id).to eq("INSTALLER2")
+        end
+      end
+    end
+
+    describe '#fetch_certificate output_path' do
+      let(:runner) { Match::Runner.new }
+
+      around do |example|
+        old_umask = File.umask(0o022)
+        begin
+          example.run
+        ensure
+          File.umask(old_umask)
+        end
+      end
+
+      def fetch_into(output_path, dir)
+        cert_dir = File.join(dir, "certs", "distribution")
+        FileUtils.mkdir_p(cert_dir)
+        File.write(File.join(cert_dir, "FIRST11111.cer"), "cert1")
+        File.write(File.join(cert_dir, "FIRST11111.p12"), "key1")
+
+        allow(Spaceship::ConnectAPI).to receive(:token).and_return("fake_token")
+        allow(runner).to receive(:prefixed_working_directory).and_return(dir)
+        allow(Match::Utils).to receive(:is_cert_valid?).and_return(true)
+        allow(Match::Utils).to receive(:get_cert_info).and_return([["Common Name", "test"]])
+        allow(FastlaneCore::Helper).to receive(:mac?).and_return(false)
+
+        values = { app_identifier: "com.test.app", type: "appstore", git_url: "https://example.com", output_path: output_path }
+        config = FastlaneCore::Configuration.create(Match::Options.available_options, values)
+        runner.send(:fetch_certificate, params: config)
+      end
+
+      it "copies the private key readable only by its owner" do
+        Dir.mktmpdir do |dir|
+          output_path = File.join(dir, "out")
+          FileUtils.mkdir_p(output_path)
+          fetch_into(output_path, File.join(dir, "repo"))
+          expect(File.stat(File.join(output_path, "FIRST11111.p12")).mode & 0o777).to eq(0o600) unless FastlaneCore::Helper.windows?
+          expect(File.stat(File.join(output_path, "FIRST11111.cer")).mode & 0o777).to eq(0o644) unless FastlaneCore::Helper.windows?
+        end
+      end
+
+      it "makes an existing private key copy readable only by its owner" do
+        Dir.mktmpdir do |dir|
+          output_path = File.join(dir, "out")
+          FileUtils.mkdir_p(output_path)
+          key_copy = File.join(output_path, "FIRST11111.p12")
+          File.write(key_copy, "old")
+          File.chmod(0o644, key_copy)
+          fetch_into(output_path, File.join(dir, "repo"))
+          expect(File.read(key_copy)).to eq("key1")
+          expect(File.stat(key_copy).mode & 0o777).to eq(0o600) unless FastlaneCore::Helper.windows?
         end
       end
     end
