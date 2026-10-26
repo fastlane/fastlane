@@ -3,6 +3,7 @@ require 'fastlane/server/command_parser.rb'
 require 'fastlane/server/json_return_value_processor.rb'
 require 'socket'
 require 'json'
+require 'openssl'
 
 module Fastlane
   class SocketServer
@@ -20,7 +21,8 @@ module Fastlane
       return_value_processor: nil,
       connection_timeout: 5,
       stay_alive: false,
-      port: 2000
+      port: 2000,
+      token: nil
     )
       if return_value_processor.nil?
         return_value_processor = JSONReturnValueProcessor.new
@@ -31,6 +33,8 @@ module Fastlane
       @connection_timeout = connection_timeout.to_i
       @stay_alive = stay_alive
       @port = port.to_i
+      # When set, every command must carry it: the runner reads it from a file only this user can read
+      @token = token
     end
 
     # this is the public API, don't call anything else
@@ -78,6 +82,11 @@ module Fastlane
     end
 
     def parse_and_execute_command(command_string: nil)
+      unless token_matches?(command_string)
+        UI.error("Refusing a command without this run's token: it does not come from the FastlaneRunner fastlane started")
+        return COMMAND_EXECUTION_STATE[:error]
+      end
+
       command = CommandParser.parse(json: command_string)
       case command
       when ControlCommand
@@ -137,15 +146,17 @@ module Fastlane
     end
 
     def listen
-      @server = TCPServer.open('localhost', @port) # Socket to listen on port 2000
-      UI.verbose("Waiting for #{@connection_timeout} seconds for a connection from FastlaneRunner")
+      @servers = listening_sockets
+      @port = @servers.first.local_address.ip_port
+      UI.verbose("Waiting for #{@connection_timeout} seconds for a connection from FastlaneRunner on port #{@port}")
 
-      # set thread local to ready so we can check it
+      # set thread locals so the caller can tell the runner where to connect
+      Thread.current[:port] = @port
       Thread.current[:ready] = true
       @client = nil
       begin
         Timeout.timeout(@connection_timeout) do
-          @client = @server.accept # Wait for a client to connect
+          @client = accept_first_connection
         end
       rescue Timeout::Error
         UI.user_error!("fastlane failed to receive a connection from the FastlaneRunner binary after #{@connection_timeout} seconds, shutting down")
@@ -166,8 +177,47 @@ module Fastlane
       @client.close
       @client = nil
 
-      @server.close
-      @server = nil
+      close_servers
+    end
+
+    # A socket on every address localhost resolves to. The runner connects to
+    # `localhost` and tries those addresses in turn, so another process listening
+    # on one this server did not take would receive its commands.
+    def listening_sockets
+      # Port 0: a free port, the same on every address
+      return Socket.tcp_server_sockets('localhost', 0) if @port.zero?
+
+      sockets = []
+      Addrinfo.getaddrinfo('localhost', @port, nil, :STREAM).uniq(&:ip_address).each do |address|
+        sockets << address.listen
+      rescue SystemCallError => e
+        sockets.each(&:close)
+        UI.user_error!("fastlane could not listen on #{address.inspect_sockaddr} for the FastlaneRunner binary: #{e.message}")
+      end
+      sockets
+    end
+
+    # The first connection on any of the sockets. They are closed once it is
+    # accepted, so nothing else can connect while the runner is talking to us.
+    def accept_first_connection
+      ready, = IO.select(@servers)
+      ready.first.accept.first
+    ensure
+      close_servers
+    end
+
+    def token_matches?(command_string)
+      return true if @token.nil?
+
+      token = JSON.parse(command_string)['token']
+      token.kind_of?(String) && OpenSSL.secure_compare(token, @token)
+    rescue JSON::ParserError, TypeError
+      false
+    end
+
+    def close_servers
+      (@servers || []).each { |server| server.close unless server.closed? }
+      @servers = nil
     end
 
     # record fastlane action command and then execute it

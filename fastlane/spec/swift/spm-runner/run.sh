@@ -42,7 +42,13 @@ scenario() {
     result="no lane, exit $status"
   fi
   case "$expected:$result" in
-    bundler:bundler=set | stopped:stopped) echo "PASS  $name: $result" ;;
+    bundler:bundler=set)
+      if grep -q "No --token_file given" "$work/run.log"; then
+        echo "FAIL  $name: socket_server ran without a token"; failures=$((failures + 1))
+      else
+        echo "PASS  $name: $result, token required"
+      fi ;;
+    stopped:stopped) echo "PASS  $name: $result" ;;
     *) echo "FAIL  $name: $result, expected $expected"; sed 's/^/      /' "$work/run.log"; failures=$((failures + 1)) ;;
   esac
 }

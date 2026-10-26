@@ -81,4 +81,40 @@ describe Fastlane::SwiftLaneManager do
       expect(main[described_class::RUNNER_PROTOCOL_VERSION_REGEX, 1].to_i).to be == described_class::RUNNER_PROTOCOL_VERSION
     end
   end
+
+  describe '.cruise_swift_lane_in_thread' do
+    around do |example|
+      Dir.mktmpdir('runner') do |dir|
+        @dir = dir
+        example.run
+      end
+    end
+
+    # A runner that records the arguments it received, one per line, run by a shell as sh does on a real run
+    def run_lane(lane, parameters)
+      runner = File.join(@dir, 'FastlaneRunner')
+      args_file = File.join(@dir, 'args')
+      File.write(runner, "#!/bin/sh\nprintf '%s\\n' \"$@\" > #{args_file.shellescape}\n")
+      File.chmod(0o700, runner)
+      allow(FastlaneCore::FastlaneFolder).to receive(:swift_runner_path).and_return(runner)
+      allow(Fastlane::Actions).to receive(:sh) { |command| `/bin/sh -c #{command.shellescape}` }
+
+      described_class.cruise_swift_lane_in_thread(lane, parameters, 2000, File.join(@dir, 'token file')).join
+      File.read(args_file).lines(chomp: true)
+    end
+
+    it 'passes each option value to the runner as one argument, as written' do
+      args = run_lane('beta', { branch: 'feature/x y;"$(true)"`true`' })
+
+      expect(args).to eq(['lane', 'beta', 'branch', 'feature/x y;"$(true)"`true`', 'swiftServerPort', '2000', 'swiftServerTokenFile', File.join(@dir, 'token file')])
+    end
+
+    it 'passes the lane name and option values as written in verbose mode' do
+      allow(FastlaneCore::Globals).to receive(:verbose?).and_return(true)
+
+      args = run_lane('beta lane', { notes: "it's; done" })
+
+      expect(args.first(4)).to eq(['lane', 'beta lane', 'notes', "it's; done"])
+    end
+  end
 end
