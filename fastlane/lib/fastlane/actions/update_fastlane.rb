@@ -78,8 +78,8 @@ module Fastlane
 
         UI.message("fastlane.tools successfully updated! I will now restart myself... 😴")
 
-        # Set no_update to true so we don't try to update again
-        exec("FL_NO_UPDATE=true #{$PROGRAM_NAME} #{ARGV.join(' ')}")
+        # Set no_update to true so we don't try to update again. Without a shell, so each argument stays as given
+        exec({ "FL_NO_UPDATE" => "true" }, $PROGRAM_NAME, *ARGV)
       end
 
       def self.get_gem_name(tool_info)
