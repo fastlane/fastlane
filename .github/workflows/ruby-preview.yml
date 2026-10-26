@@ -1,0 +1,64 @@
+name: Ruby preview
+
+on:
+  workflow_dispatch:
+    inputs:
+      ruby:
+        description: 'Ruby version known to ruby/setup-ruby, e.g. 4.1.0-preview1 or head'
+        required: true
+        default: '4.1.0-preview1'
+      os:
+        description: 'Runner'
+        type: choice
+        options: [macos-26, ubuntu-24.04, windows-2022]
+        default: macos-26
+  # Temporary, to run this workflow on its own pull request; removed before merging
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  tests:
+    name: ${{ inputs.os || 'macos-26' }}, Ruby ${{ inputs.ruby || '4.1.0-preview1' }} Tests
+    runs-on: ${{ inputs.os || 'macos-26' }}
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+
+      - name: Select Xcode 26.6
+        if: runner.os == 'macOS'
+        uses: maxim-lobanov/setup-xcode@ed7a3b1fda3918c0306d1b724322adc0b8cc0a90 # v1.7.0
+        with:
+          xcode-version: '26.6'
+
+      - name: Set up Ruby ${{ inputs.ruby || '4.1.0-preview1' }}
+        uses: ruby/setup-ruby@824c0e29fdfc7d689c191c27acc969d2d04b7dd8 # v1.331.0
+        with:
+          ruby-version: ${{ inputs.ruby || '4.1.0-preview1' }}
+          bundler-cache: true
+
+      - name: Increase Open File Limit
+        if: runner.os != 'Windows'
+        shell: bash
+        run: ulimit -n 65536
+
+      - name: Run tests
+        env:
+          RUBYOPT: '-W0'
+          FASTLANE_SPEC_WORKERS: '4'
+        shell: bash
+        run: |
+          ruby -v
+          git config --global user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git config --global user.name "github-actions[bot]"
+          bundle exec fastlane execute_tests
+
+      - name: Keep the worker logs
+        if: always()
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        with:
+          name: rspec-worker-logs-${{ inputs.os || 'macos-26' }}-ruby${{ inputs.ruby || '4.1.0-preview1' }}
+          path: |
+            rspec_worker_*.log
+            rspec_worker_*.units
+          if-no-files-found: warn
