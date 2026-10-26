@@ -67,6 +67,12 @@ on:
 permissions:
   contents: read
 
+env:
+  # Git's background maintenance can delete files under .git/objects while a local clone copies them - fastlane/fastlane#30432
+  GIT_CONFIG_COUNT: "1"
+  GIT_CONFIG_KEY_0: maintenance.auto
+  GIT_CONFIG_VALUE_0: "false"
+
 jobs:
   split_macos:
     name: "Split, macOS"

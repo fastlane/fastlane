@@ -224,11 +224,6 @@ Lint/RedundantCopEnableDirective:
 
 # Offense count: 3
 # This cop supports safe autocorrection (--autocorrect).
-Lint/RedundantRequireStatement:
-  Enabled: false
-
-# Offense count: 3
-# This cop supports safe autocorrection (--autocorrect).
 Lint/RedundantStringCoercion:
   Enabled: false
 

@@ -22,7 +22,6 @@ module Fastlane
     class CommitVersionBumpAction < Action
       def self.run(params)
         require 'xcodeproj'
-        require 'set'
         require 'shellwords'
 
         xcodeproj_path = params[:xcodeproj] ? File.expand_path(File.join('.', params[:xcodeproj])) : nil

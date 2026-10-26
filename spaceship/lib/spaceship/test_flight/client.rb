@@ -323,11 +323,7 @@ module Spaceship
       end
 
       def local_variable_get(binding, name)
-        if binding.respond_to?(:local_variable_get)
-          binding.local_variable_get(name)
-        else
-          binding.eval(name.to_s)
-        end
+        binding.local_variable_get(name)
       end
 
       def provider_id
