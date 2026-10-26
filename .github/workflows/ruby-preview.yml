@@ -35,6 +35,8 @@ jobs:
         uses: ruby/setup-ruby@824c0e29fdfc7d689c191c27acc969d2d04b7dd8 # v1.331.0
         with:
           ruby-version: ${{ inputs.ruby || '4.1.0-preview1' }}
+          # The lockfile's Bundler may not run on a preview Ruby: 2.7.2 does not on 4.1.0-preview1
+          bundler: latest
           bundler-cache: true
 
       - name: Increase Open File Limit
