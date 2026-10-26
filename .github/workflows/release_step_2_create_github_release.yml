@@ -28,6 +28,12 @@ jobs:
     permissions:
       packages: write
       contents: write
+      id-token: write
+      attestations: write
+
+    outputs:
+      version: ${{ steps.gem.outputs.version }}
+      gem-sha256: ${{ steps.gem.outputs.gem-sha256 }}
 
     steps:
     - name: Checkout repository
@@ -55,6 +61,29 @@ jobs:
         SLACK_URL: ${{ secrets.SLACK_URL }}
       run: |
         bundle exec fastlane create_github_release skip_github_packages:${{ github.event.inputs.skip_github_packages }}
+
+    - name: Hash gem
+      id: gem
+      run: |
+        version=$(cat latest_fl_version.txt)
+        echo "version=$version" >> "$GITHUB_OUTPUT"
+        echo "path=pkg/fastlane-$version.gem" >> "$GITHUB_OUTPUT"
+        echo "gem-sha256=$(shasum -a 256 "pkg/fastlane-$version.gem" | cut -d' ' -f1)" >> "$GITHUB_OUTPUT"
+
+    - name: Attest gem
+      id: attest
+      uses: actions/attest@1e69f48acb82d1966a394da916b4c1698aa569d6 # v4.2.2
+      with:
+        subject-path: ${{ steps.gem.outputs.path }}
+
+    - name: Attach attestation to GitHub release
+      env:
+        GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        VERSION: ${{ steps.gem.outputs.version }}
+        BUNDLE_PATH: ${{ steps.attest.outputs.bundle-path }}
+      run: |
+        cp "$BUNDLE_PATH" "pkg/fastlane-$VERSION.gem.sigstore.json"
+        gh release upload "$VERSION" "pkg/fastlane-$VERSION.gem.sigstore.json" --clobber
 
     - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
       with:
