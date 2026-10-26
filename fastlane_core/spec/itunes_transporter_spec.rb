@@ -1315,8 +1315,6 @@ describe FastlaneCore do
       end
 
       describe "upload command generation" do
-        let(:keys_parent_dir) { File.join(Dir.home, ".appstoreconnect") }
-
         context "on non-macOS platforms" do
           include_examples "non_macOS_setup"
 
@@ -1357,10 +1355,18 @@ describe FastlaneCore do
             expect(transporter.upload('my.app.id', tmp_dir)).to eq(shell_upload_command)
           end
 
-          it 'generates a call to the shell script with api key' do
-            transporter = FastlaneCore::ItunesTransporter.new(api_key: api_key)
-            expect(transporter.upload('my.app.id', tmp_dir)).to eq(shell_upload_command(username: nil, input_pass: nil, api_key: api_key))
-            expect(Dir.empty?(keys_parent_dir)).to be_truthy if Dir.exist?(keys_parent_dir)
+          it 'generates a call to the shell script with api key, and removes only the key it wrote' do
+            Dir.mktmpdir do |home|
+              allow(Dir).to receive(:home).and_return(home)
+              private_keys_dir = File.join(home, ".appstoreconnect/private_keys")
+              FileUtils.mkdir_p(private_keys_dir)
+              File.write(File.join(private_keys_dir, "AuthKey_OTHER.p8"), "theirs")
+              transporter = FastlaneCore::ItunesTransporter.new(api_key: api_key)
+
+              expect(transporter.upload('my.app.id', tmp_dir)).to eq(shell_upload_command(username: nil, input_pass: nil, api_key: api_key))
+              expect(File).not_to exist(File.join(private_keys_dir, "AuthKey_#{api_key[:key_id]}.p8"))
+              expect(File.read(File.join(private_keys_dir, "AuthKey_OTHER.p8"))).to eq("theirs")
+            end
           end
         end
       end
@@ -1758,5 +1764,89 @@ describe FastlaneCore do
       end
     end
 
+  end
+
+  describe "#prepare" do
+    let(:home) { Dir.mktmpdir }
+    let(:key_api_key) { api_key.merge(key: "-----BEGIN PRIVATE KEY-----\nDUMMY\n-----END PRIVATE KEY-----") }
+    let(:p8_name) { "AuthKey_#{api_key[:key_id]}.p8" }
+
+    around(:each) do |example|
+      old_umask = File.umask(0o022)
+      example.run
+    ensure
+      File.umask(old_umask)
+      FileUtils.rm_rf(home)
+    end
+
+    before do
+      allow(Dir).to receive(:home).and_return(home)
+    end
+
+    def mode_of(path)
+      File.stat(path).mode & 0o777
+    end
+
+    it "writes the key and creates private_keys readable by their owner only for the shell script executor" do
+      result = FastlaneCore::ShellScriptTransporterExecutor.new.prepare(original_api_key: key_api_key)
+
+      expect(result[:key_dir]).to eq(File.join(home, ".appstoreconnect/private_keys"))
+      expect(mode_of(result[:key_dir])).to eq(0o700) unless FastlaneCore::Helper.windows?
+      expect(mode_of(File.join(result[:key_dir], p8_name))).to eq(0o600) unless FastlaneCore::Helper.windows?
+    end
+
+    it "restricts an existing key file for the shell script executor" do
+      private_keys_dir = File.join(home, ".appstoreconnect/private_keys")
+      FileUtils.mkdir_p(private_keys_dir)
+      File.write(File.join(private_keys_dir, p8_name), "old")
+      File.chmod(0o644, File.join(private_keys_dir, p8_name))
+
+      FastlaneCore::ShellScriptTransporterExecutor.new.prepare(original_api_key: key_api_key)
+
+      expect(mode_of(File.join(private_keys_dir, p8_name))).to eq(0o600) unless FastlaneCore::Helper.windows?
+      expect(File.read(File.join(private_keys_dir, p8_name))).to eq(key_api_key[:key])
+    end
+
+    it "removes only the key it wrote from private_keys" do
+      executor = FastlaneCore::ShellScriptTransporterExecutor.new
+      result = executor.prepare(original_api_key: key_api_key)
+      other_key = File.join(result[:key_dir], "AuthKey_OTHER.p8")
+      File.write(other_key, "theirs")
+
+      executor.cleanup(result)
+
+      expect(File).not_to exist(File.join(result[:key_dir], p8_name))
+      expect(File.read(other_key)).to eq("theirs")
+    end
+
+    it "keeps a key file that was already in private_keys" do
+      private_keys_dir = File.join(home, ".appstoreconnect/private_keys")
+      FileUtils.mkdir_p(private_keys_dir)
+      File.write(File.join(private_keys_dir, p8_name), "old")
+      executor = FastlaneCore::ShellScriptTransporterExecutor.new
+
+      executor.cleanup(executor.prepare(original_api_key: key_api_key))
+
+      expect(File).to exist(File.join(private_keys_dir, p8_name))
+    end
+
+    it "removes the temporary directory for the altool executor" do
+      executor = FastlaneCore::AltoolTransporterExecutor.new
+      result = executor.prepare(original_api_key: key_api_key)
+
+      executor.cleanup(result)
+
+      expect(File).not_to exist(result[:key_dir])
+    end
+
+    it "writes the key readable by its owner only for the altool executor" do
+      result = FastlaneCore::AltoolTransporterExecutor.new.prepare(original_api_key: key_api_key)
+
+      begin
+        expect(mode_of(File.join(result[:key_dir], p8_name))).to eq(0o600) unless FastlaneCore::Helper.windows?
+      ensure
+        FileUtils.rm_rf(result[:key_dir])
+      end
+    end
   end
 end

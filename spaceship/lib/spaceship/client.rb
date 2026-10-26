@@ -252,6 +252,8 @@ module Spaceship
         else
           # Log to file by default
           path = File.join(Dir.tmpdir, "spaceship#{Time.now.to_i}_#{Process.pid}_#{Thread.current.object_id}.log")
+          # The log holds every request and response body: create it readable by its owner only
+          File.open(path, File::WRONLY | File::CREAT | File::APPEND, 0o600) {}
           @logger = Logger.new(path)
         end
 
@@ -279,10 +281,12 @@ module Spaceship
     def store_cookie(path: nil)
       path ||= persistent_cookie_path
       FileUtils.mkdir_p(File.expand_path("..", path))
+      File.chmod(0o700, File.expand_path("..", path))
 
       # really important to specify the session to true
       # otherwise myacinfo and more won't be stored
       @cookie.save(path, :yaml, session: true)
+      File.chmod(0o600, path)
       return File.read(path)
     end
 
@@ -880,6 +884,8 @@ module Spaceship
       begin
         if File.exist?(persistent_cookie_path)
           puts("Loading session from '#{persistent_cookie_path}'") if Spaceship::Globals.verbose?
+          File.chmod(0o700, File.expand_path("..", persistent_cookie_path))
+          File.chmod(0o600, persistent_cookie_path)
           @cookie.load(persistent_cookie_path)
           return true
         end

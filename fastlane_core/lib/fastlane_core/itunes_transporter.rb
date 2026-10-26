@@ -58,28 +58,42 @@ module FastlaneCore
     # Runs preparations before executing any command from the executor.
     #
     # @param original_api_key [Hash] api key containing the issuer id and private key
-    # @return [Hash] copy of `api_key` which includes an extra `key_dir` with the location of the .p8 file on disk
+    # @return [Hash] copy of `api_key` which includes an extra `key_dir` with the location of the .p8 file on disk,
+    #   and `cleanup_path`: what #cleanup removes afterwards
     def prepare(original_api_key:)
       return if original_api_key.nil?
       # Create .p8 file from api_key and provide api key info which contains .p8 file path
       api_key = original_api_key.dup
+      p8_name = "AuthKey_#{api_key[:key_id]}.p8"
       if self.kind_of?(ShellScriptTransporterExecutor)
         # as of Transporter v3.3.0, the app is unable to detect the private keys under the 'private_keys' folder in current directory
         # so we must rely on the other search paths in the Home dir:
         # https://help.apple.com/itc/transporteruserguide/en.lproj/static.html#itc803b7be80
         private_keys_dir = File.join(Dir.home, ".appstoreconnect/private_keys")
         unless Dir.exist?(private_keys_dir)
-          FileUtils.mkdir_p(private_keys_dir)
+          FileUtils.mkdir_p(private_keys_dir, mode: 0o700)
         end
         api_key[:key_dir] = private_keys_dir
+        # Keys already there belong to the user: only remove the one written below
+        p8_path = File.join(private_keys_dir, p8_name)
+        api_key[:cleanup_path] = p8_path unless File.exist?(p8_path)
       else
         api_key[:key_dir] = Dir.mktmpdir("deliver-")
+        api_key[:cleanup_path] = api_key[:key_dir]
       end
       # Specified p8 needs to be generated to call altool or iTMSTransporter
-      File.open(File.join(api_key[:key_dir], "AuthKey_#{api_key[:key_id]}.p8"), "wb") do |p8|
+      p8_path = File.join(api_key[:key_dir], p8_name)
+      File.open(p8_path, "wb", 0o600) do |p8|
         p8.write(api_key[:key])
       end
+      File.chmod(0o600, p8_path)
       api_key
+    end
+
+    # Removes what #prepare wrote: its temporary directory, or the key file it added to ~/.appstoreconnect/private_keys
+    def cleanup(api_key)
+      return if api_key.nil? || api_key[:cleanup_path].nil?
+      FileUtils.rm_rf(api_key[:cleanup_path])
     end
 
     def execute(command, hide_output)
@@ -869,7 +883,7 @@ module FastlaneCore
         return upload(app_id, dir, package_path: package_path, asset_path: asset_path)
       ensure
         if use_api_key
-          FileUtils.rm_rf(api_key[:key_dir]) unless api_key.nil?
+          @transporter_executor.cleanup(api_key)
         end
       end
 
@@ -967,7 +981,7 @@ module FastlaneCore
         return provider_ids
       ensure
         if use_api_key
-          FileUtils.rm_rf(api_key[:key_dir]) unless api_key.nil?
+          @transporter_executor.cleanup(api_key)
         end
       end
 
