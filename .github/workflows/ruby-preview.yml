@@ -1,4 +1,4 @@
-name: Ruby preview
+name: Tests on a chosen Ruby
 
 on:
   workflow_dispatch:
@@ -12,6 +12,10 @@ on:
         type: choice
         options: [macos-26, ubuntu-24.04, windows-2022]
         default: macos-26
+      warnings:
+        description: 'Record Ruby warnings, deprecations included, and summarise them'
+        type: boolean
+        default: false
 
 permissions:
   contents: read
@@ -23,6 +27,8 @@ jobs:
     env:
       # Keeps Bundler from switching back to the lockfile's 2.7.2 during bundle install
       BUNDLER_VERSION: '4'
+      # Read by spec/spec_helper.rb and rake warnings_summary; empty when not recording
+      FASTLANE_SPEC_WARNINGS: ${{ inputs.warnings && 'spec_warnings' || '' }}
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
 
@@ -47,7 +53,8 @@ jobs:
 
       - name: Run tests
         env:
-          RUBYOPT: '-W0'
+          # -W0 would also silence the warnings being recorded
+          RUBYOPT: ${{ !inputs.warnings && '-W0' || '' }}
           FASTLANE_SPEC_WORKERS: '4'
         shell: bash
         run: |
@@ -55,6 +62,11 @@ jobs:
           git config --global user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git config --global user.name "github-actions[bot]"
           bundle exec fastlane execute_tests
+
+      - name: Summarise the Ruby warnings
+        if: always() && inputs.warnings
+        shell: bash
+        run: bundle exec rake warnings_summary
 
       - name: Keep the worker logs
         if: always()
@@ -64,4 +76,5 @@ jobs:
           path: |
             rspec_worker_*.log
             rspec_worker_*.units
+            spec_warnings/
           if-no-files-found: warn

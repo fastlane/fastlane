@@ -12,6 +12,24 @@ unless ENV["FASTLANE_SKIP_UPDATE_CHECK"]
   end
 end
 
+# FASTLANE_SPEC_WARNINGS=<dir> records every Ruby warning, deprecations included, one file per process,
+# for `rake warnings_summary`. Recorded here because some specs replace $stderr while they run, and
+# through a file opened now because some run under FakeFS. Messages without a location are not warnings.
+unless ENV["FASTLANE_SPEC_WARNINGS"].to_s.empty?
+  require "fileutils"
+  require "json"
+  Warning[:deprecated] = true
+  FileUtils.mkdir_p(ENV["FASTLANE_SPEC_WARNINGS"])
+  warnings_log = File.open(File.join(ENV["FASTLANE_SPEC_WARNINGS"], "warnings_#{Process.pid}.jsonl"), "a") # rubocop:disable Style/FileOpen -- open for the whole run
+  warnings_log.sync = true
+  Warning.singleton_class.prepend(Module.new do
+    define_method(:warn) do |message, category: nil, **options|
+      warnings_log.write("#{JSON.generate({ category: category, message: message })}\n") if message.include?(": warning: ")
+      super(message, category: category, **options)
+    end
+  end)
+end
+
 require "webmock/rspec"
 WebMock.disable_net_connect!
 
