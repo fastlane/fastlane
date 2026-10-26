@@ -125,6 +125,14 @@ describe Match do
         subject.download
       end
 
+      it 'fails on a key that resolves outside the working directory once the prefix is stripped' do
+        allow(subject).to receive(:s3_object_prefix).and_return('123456/')
+        stub_bucket_content(objects: [instance_double('Aws::S3::Object', key: '123456/TEAMID1/../../outside.p12')])
+
+        expect(s3_client).not_to receive(:download_file)
+        expect { subject.download }.to raise_error(FastlaneCore::Interface::FastlaneError, /Refusing to download/)
+      end
+
       it 'downloads only file-like objects and skips folder-like objects' do
         valid_object = files_to_download[0]
         invalid_object = instance_double('Aws::S3::Object', key: 'ABCDEFG/certs/development/')

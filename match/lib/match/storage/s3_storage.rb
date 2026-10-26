@@ -114,7 +114,7 @@ module Match
           file_path = strip_s3_object_prefix(object.key) # :s3_object_prefix:team_id/path/to/file
 
           # strip s3_prefix from file_path
-          download_path = File.join(self.working_directory, file_path)
+          download_path = Storage.download_path(self.working_directory, file_path)
 
           FileUtils.mkdir_p(File.expand_path("..", download_path))
           UI.verbose("Downloading file from S3 '#{file_path}' on bucket #{self.s3_bucket}")

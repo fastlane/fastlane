@@ -80,6 +80,20 @@ describe Match do
           expect(File.read(File.join(dir, 'certs', 'dist.p12'))).to eq('p12 content')
         end
       end
+
+      context 'with a name that resolves outside the working directory' do
+        let(:file) { { id: 1, name: '../outside.p12', checksum: Digest::SHA256.hexdigest('p12 content') } }
+
+        it 'fails before requesting or writing anything' do
+          Dir.mktmpdir do |parent|
+            dir = File.join(parent, 'wd')
+            Dir.mkdir(dir)
+
+            expect { subject.download(dir) }.to raise_error(FastlaneCore::Interface::FastlaneError, /Refusing to download/)
+            expect(File.exist?(File.join(parent, 'outside.p12'))).to be(false)
+          end
+        end
+      end
     end
 
     describe '#valid_checksum?' do
