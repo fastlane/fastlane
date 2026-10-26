@@ -5,7 +5,7 @@ Gem::Specification.new do |spec|
   spec.version     = '1.0.0'
   spec.authors     = ["fastlane team"]
 
-  spec.required_ruby_version = '>= 3.2'
+  spec.required_ruby_version = '>= 3.3'
 
   spec.summary = "fake fastlane plugin for fastlane tests"
 
