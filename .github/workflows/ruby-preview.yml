@@ -22,6 +22,9 @@ jobs:
   tests:
     name: ${{ inputs.os || 'macos-26' }}, Ruby ${{ inputs.ruby || '4.1.0-preview1' }} Tests
     runs-on: ${{ inputs.os || 'macos-26' }}
+    env:
+      # Keeps Bundler from switching back to the lockfile's 2.7.2 during bundle install
+      BUNDLER_VERSION: '4'
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
 
