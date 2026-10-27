@@ -220,6 +220,8 @@ If you previously ran _match_ with the configured storage it will automatically 
 
 The provisioning profiles are installed in `~/Library/Developer/Xcode/UserData/Provisioning Profiles` while the certificates and private keys are installed in your Keychain.
 
+> fastlane checks the Xcode version when it starts. If your system's default Xcode is older than 16, select a newer one with `sudo xcode-select -s` or `DEVELOPER_DIR` before running fastlane: the `xcode_select` and `xcodes` actions run too late.
+
 To get a more detailed output of what _match_ is doing use
 
 ```no-highlight
