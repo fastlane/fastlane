@@ -255,15 +255,6 @@ module FastlaneCore
         user_local_itms_path = "/usr/local/itms"
         return user_local_itms_path if File.exist?(user_local_itms_path)
 
-        # Then check for iTMSTransporter in the Xcode path
-        [
-          "../Applications/Application Loader.app/Contents/MacOS/itms",
-          "../Applications/Application Loader.app/Contents/itms",
-          "../SharedFrameworks/ContentDeliveryServices.framework/Versions/A/itms" # For Xcode 11
-        ].each do |path|
-          result = File.expand_path(File.join(self.xcode_path, path))
-          return result if File.exist?(result)
-        end
         if FastlaneCore::Env.truthy?("FASTLANE_ITUNES_TRANSPORTER_USE_SHELL_SCRIPT")
           UI.user_error!("Could not find transporter at #{self.xcode_path}: Xcode 14 and newer no longer include it. Remove FASTLANE_ITUNES_TRANSPORTER_USE_SHELL_SCRIPT so fastlane uploads with altool, or install Transporter and set FASTLANE_ITUNES_TRANSPORTER_PATH.")
         end
