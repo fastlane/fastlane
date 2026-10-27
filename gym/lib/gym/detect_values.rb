@@ -74,7 +74,7 @@ module Gym
       CFPropertyList.native_types(CFPropertyList::List.new(file: path).value)
     end
 
-    # Since Xcode 9 you need to provide the explicit mapping of what provisioning profile to use for
+    # Xcode needs the explicit mapping of what provisioning profile to use for
     # each target of your app
     def self.detect_selected_provisioning_profiles
       Gym.config[:export_options] ||= {}
@@ -92,7 +92,7 @@ module Gym
     rescue => ex
       # We don't want to fail the build if the automatic detection doesn't work
       UI.error("Couldn't automatically detect the provisioning profile mapping")
-      UI.error("Since Xcode 9 you need to provide an explicit mapping of what")
+      UI.error("You need to provide an explicit mapping of what")
       UI.error("provisioning profile to use for each target of your app")
       UI.error(ex)
       UI.verbose(ex.backtrace.join("\n"))
