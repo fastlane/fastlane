@@ -839,21 +839,13 @@ DELIVER_ITMSTRANSPORTER_ADDITIONAL_UPLOAD_PARAMETERS="-t DAV" fastlane deliver
 ```
 
 ## HTTP Proxy
-iTunes Transporter is a Java application bundled with Xcode. In addition to utilizing the `DELIVER_ITMSTRANSPORTER_ADDITIONAL_UPLOAD_PARAMETERS="-t DAV"`, you need to configure the transporter application to use the proxy independently from the system proxy or any environment proxy settings. You can find the configuration file within Xcode:
+By default, _deliver_ uploads with altool. If you upload with a separately installed Transporter instead (`FASTLANE_ITUNES_TRANSPORTER_USE_SHELL_SCRIPT` and `FASTLANE_ITUNES_TRANSPORTER_PATH`, as on Linux), it runs on its own Java runtime, which ignores the system proxy settings. Pass the proxy as Java options:
 
 ```no-highlight
-TOOLS_PATH=$( xcode-select -p )
-REL_PATH='../SharedFrameworks/ContentDeliveryServices.framework/Versions/A/itms/java/lib/net.properties'
-echo "$TOOLS_PATH/$REL_PATH"
+DELIVER_ITMSTRANSPORTER_ADDITIONAL_UPLOAD_PARAMETERS="-Dhttps.proxyHost=myproxy.example.com -Dhttps.proxyPort=8080" fastlane deliver
 ```
 
-Add necessary proxy configuration values to the net.properties according to [Java Proxy Configuration](http://docs.oracle.com/javase/8/docs/technotes/guides/net/proxies.html).
-
-As an alternative to editing the properties files, proxy configuration can be specified on the command line directly:
-
-```no-highlight
-DELIVER_ITMSTRANSPORTER_ADDITIONAL_UPLOAD_PARAMETERS="-t DAV -Dhttp.proxyHost=myproxy.com -Dhttp.proxyPort=8080"
-```
+Its Java runtime turns off Basic authentication to HTTPS proxies (`jdk.http.auth.tunneling.disabledSchemes=Basic` in the Transporter's `java/conf/net.properties`).
 
 ## Limit
 App Store Connect has a limit of 150 binary uploads per day.
