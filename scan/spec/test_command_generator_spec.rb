@@ -65,7 +65,7 @@ describe Scan do
 
     allow(Open3).to receive(:capture3).with("xcrun simctl runtime -h").and_return([nil, 'Usage: simctl runtime <operation> <arguments>', nil])
 
-    allow(FastlaneCore::Helper).to receive(:xcode_at_least?).and_return(false)
+    allow(FastlaneCore::CommandExecutor).to receive(:execute).with(hash_including(command: /^xcodebuild -resolvePackageDependencies /))
     allow(FastlaneCore::CommandExecutor).to receive(:execute).with(command: "sw_vers -productVersion", print_all: false, print_command: false).and_return('10.12.1')
 
     allow(Scan).to receive(:project).and_return(@project)
@@ -149,10 +149,6 @@ describe Scan do
       end
 
       describe "supports number of retries" do
-        before(:each) do
-          allow(FastlaneCore::Helper).to receive(:xcode_at_least?).and_return(true)
-        end
-
         it "with 1 or more retries", requires_xcodebuild: true do
           log_path = File.expand_path("~/Library/Logs/scan/app-app.log")
 
@@ -179,8 +175,6 @@ describe Scan do
 
       describe "supports collecting test diagnostics" do
         it "disables diagnostic collection", requires_xcodebuild: true do
-          allow(FastlaneCore::Helper).to receive(:xcode_at_least?).with(14).and_return(true)
-
           options = { project: "./scan/examples/standard/app.xcodeproj", sdk: "9.0", collect_test_diagnostics: "never" }
           Scan.config = FastlaneCore::Configuration.create(Scan::Options.available_options, options)
 
@@ -189,8 +183,6 @@ describe Scan do
         end
 
         it "collects diagnostics on failure", requires_xcodebuild: true do
-          allow(FastlaneCore::Helper).to receive(:xcode_at_least?).with(14).and_return(true)
-
           options = { project: "./scan/examples/standard/app.xcodeproj", sdk: "9.0", collect_test_diagnostics: "on-failure" }
           Scan.config = FastlaneCore::Configuration.create(Scan::Options.available_options, options)
 
@@ -199,24 +191,12 @@ describe Scan do
         end
 
         it "doesn't add the flag when the option is not set", requires_xcodebuild: true do
-          allow(FastlaneCore::Helper).to receive(:xcode_at_least?).with(14).and_return(true)
-
           options = { project: "./scan/examples/standard/app.xcodeproj", sdk: "9.0" }
           Scan.config = FastlaneCore::Configuration.create(Scan::Options.available_options, options)
 
           result = @test_command_generator.generate
           expect(result).to_not(include("-collect-test-diagnostics never"))
           expect(result).to_not(include("-collect-test-diagnostics on-failure"))
-        end
-
-        it "doesn't add the flag on Xcode versions before 14", requires_xcodebuild: true do
-          allow(FastlaneCore::Helper).to receive(:xcode_at_least?).with(14).and_return(false)
-
-          options = { project: "./scan/examples/standard/app.xcodeproj", sdk: "9.0", collect_test_diagnostics: "never" }
-          Scan.config = FastlaneCore::Configuration.create(Scan::Options.available_options, options)
-
-          result = @test_command_generator.generate
-          expect(result).to_not(include("-collect-test-diagnostics never"))
         end
 
         it "rejects unsupported values" do
@@ -412,8 +392,8 @@ describe Scan do
           Scan.config = FastlaneCore::Configuration.create(Scan::Options.available_options, options)
 
           result = @test_command_generator.generate
-          expect(result).not_to include("-parallel-testing-enabled YES") if FastlaneCore::Helper.xcode_at_least?(10)
-          expect(result).not_to include("-parallel-testing-enabled NO") if FastlaneCore::Helper.xcode_at_least?(10)
+          expect(result).not_to include("-parallel-testing-enabled YES")
+          expect(result).not_to include("-parallel-testing-enabled NO")
         end
 
         it "specify YES when set to true", requires_xcodebuild: true do
@@ -423,7 +403,7 @@ describe Scan do
           Scan.config = FastlaneCore::Configuration.create(Scan::Options.available_options, options)
 
           result = @test_command_generator.generate
-          expect(result).to include("-parallel-testing-enabled YES") if FastlaneCore::Helper.xcode_at_least?(10)
+          expect(result).to include("-parallel-testing-enabled YES")
         end
 
         it "specify NO when set to false", requires_xcodebuild: true do
@@ -433,7 +413,7 @@ describe Scan do
           Scan.config = FastlaneCore::Configuration.create(Scan::Options.available_options, options)
 
           result = @test_command_generator.generate
-          expect(result).to include("-parallel-testing-enabled NO") if FastlaneCore::Helper.xcode_at_least?(10)
+          expect(result).to include("-parallel-testing-enabled NO")
         end
       end
 
@@ -447,7 +427,7 @@ describe Scan do
           log_path = File.expand_path("~/Library/Logs/scan/app-app.log")
 
           result = @test_command_generator.generate
-          expect(result).to include("-parallel-testing-worker-count 4") if FastlaneCore::Helper.xcode_at_least?(10)
+          expect(result).to include("-parallel-testing-worker-count 4")
         end
       end
 
@@ -461,7 +441,7 @@ describe Scan do
           log_path = File.expand_path("~/Library/Logs/scan/app-app.log")
 
           result = @test_command_generator.generate
-          expect(result).to include("-maximum-concurrent-test-simulator-destinations 3") if FastlaneCore::Helper.xcode_at_least?(10)
+          expect(result).to include("-maximum-concurrent-test-simulator-destinations 3")
         end
       end
 
@@ -475,7 +455,7 @@ describe Scan do
           log_path = File.expand_path("~/Library/Logs/scan/app-app.log")
 
           result = @test_command_generator.generate
-          expect(result).to include("-disable-concurrent-testing") if FastlaneCore::Helper.xcode_at_least?(10)
+          expect(result).to include("-disable-concurrent-testing")
         end
       end
 
@@ -530,29 +510,7 @@ describe Scan do
       end
 
       describe "Result Bundle Example" do
-        it "uses the correct build command with the example project when using Xcode 10 or earlier", requires_xcodebuild: true do
-          allow(FastlaneCore::Helper).to receive(:xcode_version).and_return('10')
-          log_path = File.expand_path("~/Library/Logs/scan/app-app.log")
-
-          options = { project: "./scan/examples/standard/app.xcodeproj", result_bundle: true, scheme: 'app' }
-          Scan.config = FastlaneCore::Configuration.create(Scan::Options.available_options, options)
-
-          result = @test_command_generator.generate
-          expect(result).to start_with([
-                                         "set -o pipefail &&",
-                                         "env NSUnbufferedIO=YES xcodebuild",
-                                         "-scheme app",
-                                         "-project ./scan/examples/standard/app.xcodeproj",
-                                         "-destination platform\\=iOS\\ Simulator,id\\=E697990C-3A83-4C01-83D1-C367011B31EE",
-                                         "-derivedDataPath #{Scan.config[:derived_data_path].shellescape}",
-                                         "-resultBundlePath ./fastlane/test_output/app.test_result",
-                                         :build,
-                                         :test
-                                       ])
-        end
-
         it "uses the correct build command with the example project when using Xcode 11 or later", requires_xcodebuild: true do
-          allow(FastlaneCore::Helper).to receive(:xcode_version).and_return('11')
           log_path = File.expand_path("~/Library/Logs/scan/app-app.log")
 
           options = { project: "./scan/examples/standard/app.xcodeproj", result_bundle: true, scheme: 'app' }
@@ -573,7 +531,6 @@ describe Scan do
         end
 
         it "uses the correct build command with the example project when using Xcode 11 or later and a custom result bundle path", requires_xcodebuild: true do
-          allow(FastlaneCore::Helper).to receive(:xcode_version).and_return('11')
           log_path = File.expand_path("~/Library/Logs/scan/app-app.log")
 
           options = { project: "./scan/examples/standard/app.xcodeproj", result_bundle_path: "./my_test_output/Alice's Man$ion backtick` quote\" 2024-09-30 at 5.10.35 PM (1).xcresult", scheme: 'app' }
@@ -914,7 +871,7 @@ describe Scan do
           log_path = File.expand_path("~/Library/Logs/scan/app-app.log")
 
           result = @test_command_generator.generate
-          expect(result).to include("-testPlan simple") if FastlaneCore::Helper.xcode_at_least?(11)
+          expect(result).to include("-testPlan simple")
         end
       end
 
@@ -929,21 +886,19 @@ describe Scan do
 
           result = @test_command_generator.generate
 
-          if FastlaneCore::Helper.xcode_at_least?(11)
-            expect(result).to start_with([
-                                           "set -o pipefail &&",
-                                           "env NSUnbufferedIO=YES xcodebuild",
-                                           "-scheme app",
-                                           "-project ./scan/examples/standard/app.xcodeproj",
-                                           "-destination platform\\=iOS\\ Simulator,id\\=E697990C-3A83-4C01-83D1-C367011B31EE",
-                                           "-derivedDataPath #{Scan.config[:derived_data_path].shellescape}",
-                                           "-testPlan simple",
-                                           "-only-test-configuration TestConfigurationA",
-                                           "-only-test-configuration TestConfigurationB",
-                                           :build,
-                                           :test
-                                         ])
-          end
+          expect(result).to start_with([
+                                         "set -o pipefail &&",
+                                         "env NSUnbufferedIO=YES xcodebuild",
+                                         "-scheme app",
+                                         "-project ./scan/examples/standard/app.xcodeproj",
+                                         "-destination platform\\=iOS\\ Simulator,id\\=E697990C-3A83-4C01-83D1-C367011B31EE",
+                                         "-derivedDataPath #{Scan.config[:derived_data_path].shellescape}",
+                                         "-testPlan simple",
+                                         "-only-test-configuration TestConfigurationA",
+                                         "-only-test-configuration TestConfigurationB",
+                                         :build,
+                                         :test
+                                       ])
         end
 
         it "only tests the test configuration specified in only_test_configurations when the input is a string", requires_xcodebuild: true do
@@ -956,20 +911,18 @@ describe Scan do
 
           result = @test_command_generator.generate
 
-          if FastlaneCore::Helper.xcode_at_least?(11)
-            expect(result).to start_with([
-                                           "set -o pipefail &&",
-                                           "env NSUnbufferedIO=YES xcodebuild",
-                                           "-scheme app",
-                                           "-project ./scan/examples/standard/app.xcodeproj",
-                                           "-destination platform\\=iOS\\ Simulator,id\\=E697990C-3A83-4C01-83D1-C367011B31EE",
-                                           "-derivedDataPath #{Scan.config[:derived_data_path].shellescape}",
-                                           "-testPlan simple",
-                                           "-only-test-configuration TestConfigurationA",
-                                           :build,
-                                           :test
-                                         ])
-          end
+          expect(result).to start_with([
+                                         "set -o pipefail &&",
+                                         "env NSUnbufferedIO=YES xcodebuild",
+                                         "-scheme app",
+                                         "-project ./scan/examples/standard/app.xcodeproj",
+                                         "-destination platform\\=iOS\\ Simulator,id\\=E697990C-3A83-4C01-83D1-C367011B31EE",
+                                         "-derivedDataPath #{Scan.config[:derived_data_path].shellescape}",
+                                         "-testPlan simple",
+                                         "-only-test-configuration TestConfigurationA",
+                                         :build,
+                                         :test
+                                       ])
         end
 
         it "does not test the test configuration specified in skip_test_configurations when the input is an array", requires_xcodebuild: true do
@@ -982,21 +935,19 @@ describe Scan do
 
           result = @test_command_generator.generate
 
-          if FastlaneCore::Helper.xcode_at_least?(11)
-            expect(result).to start_with([
-                                           "set -o pipefail &&",
-                                           "env NSUnbufferedIO=YES xcodebuild",
-                                           "-scheme app",
-                                           "-project ./scan/examples/standard/app.xcodeproj",
-                                           "-destination platform\\=iOS\\ Simulator,id\\=E697990C-3A83-4C01-83D1-C367011B31EE",
-                                           "-derivedDataPath #{Scan.config[:derived_data_path].shellescape}",
-                                           "-testPlan simple",
-                                           "-skip-test-configuration TestConfigurationA",
-                                           "-skip-test-configuration TestConfigurationB",
-                                           :build,
-                                           :test
-                                         ])
-          end
+          expect(result).to start_with([
+                                         "set -o pipefail &&",
+                                         "env NSUnbufferedIO=YES xcodebuild",
+                                         "-scheme app",
+                                         "-project ./scan/examples/standard/app.xcodeproj",
+                                         "-destination platform\\=iOS\\ Simulator,id\\=E697990C-3A83-4C01-83D1-C367011B31EE",
+                                         "-derivedDataPath #{Scan.config[:derived_data_path].shellescape}",
+                                         "-testPlan simple",
+                                         "-skip-test-configuration TestConfigurationA",
+                                         "-skip-test-configuration TestConfigurationB",
+                                         :build,
+                                         :test
+                                       ])
         end
 
         it "does not test the test configuration specified in skip_test_configurations when the input is a string", requires_xcodebuild: true do
@@ -1009,20 +960,18 @@ describe Scan do
 
           result = @test_command_generator.generate
 
-          if FastlaneCore::Helper.xcode_at_least?(11)
-            expect(result).to start_with([
-                                           "set -o pipefail &&",
-                                           "env NSUnbufferedIO=YES xcodebuild",
-                                           "-scheme app",
-                                           "-project ./scan/examples/standard/app.xcodeproj",
-                                           "-destination platform\\=iOS\\ Simulator,id\\=E697990C-3A83-4C01-83D1-C367011B31EE",
-                                           "-derivedDataPath #{Scan.config[:derived_data_path].shellescape}",
-                                           "-testPlan simple",
-                                           "-skip-test-configuration TestConfigurationA",
-                                           :build,
-                                           :test
-                                         ])
-          end
+          expect(result).to start_with([
+                                         "set -o pipefail &&",
+                                         "env NSUnbufferedIO=YES xcodebuild",
+                                         "-scheme app",
+                                         "-project ./scan/examples/standard/app.xcodeproj",
+                                         "-destination platform\\=iOS\\ Simulator,id\\=E697990C-3A83-4C01-83D1-C367011B31EE",
+                                         "-derivedDataPath #{Scan.config[:derived_data_path].shellescape}",
+                                         "-testPlan simple",
+                                         "-skip-test-configuration TestConfigurationA",
+                                         :build,
+                                         :test
+                                       ])
         end
       end
 
@@ -1032,7 +981,6 @@ describe Scan do
         end
 
         it "keeps destinations, test plan and test configurations as one argument each", requires_xcodebuild: true, aggregate_failures: true do
-          allow(FastlaneCore::Helper).to receive(:xcode_at_least?).with(11).and_return(true)
           options = {
             project: "./scan/examples/standard/app.xcodeproj",
             destination: ["platform=iOS Simulator,name=Kaldi's iPhone,OS=17.0", "platform=iOS Simulator,name=iPad Air 2"],
