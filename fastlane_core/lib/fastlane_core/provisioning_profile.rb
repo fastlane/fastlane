@@ -73,8 +73,7 @@ module FastlaneCore
       end
 
       def profiles_path
-        path = File.expand_path("~")
-        path = File.join(path, "Library", "Developer", "Xcode", "UserData", "Provisioning Profiles")
+        path = File.expand_path("~/Library/Developer/Xcode/UserData/Provisioning Profiles")
         # If the directory doesn't exist, create it first
         unless File.directory?(path)
           FileUtils.mkdir_p(path)

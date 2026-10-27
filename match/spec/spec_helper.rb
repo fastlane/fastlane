@@ -94,7 +94,7 @@ def create_fake_spaceship_ensure
 end
 
 def provisioning_path_for_xcode_version(xcode_version)
-  return File.join(File.expand_path("~"), "Library/Developer/Xcode/UserData/Provisioning Profiles")
+  return File.expand_path("~/Library/Developer/Xcode/UserData/Provisioning Profiles")
 end
 
 def create_fake_cache(allow_usage: true)

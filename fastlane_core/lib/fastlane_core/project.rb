@@ -368,9 +368,7 @@ module FastlaneCore
 
     def build_xcodebuild_showbuildsettings_command
       # We also need to pass the workspace and scheme to this command.
-      command = "xcodebuild -showBuildSettings #{xcodebuild_parameters.join(' ')}#{xcodebuild_destination_parameter}"
-      command = "#{command} 2>&1" # xcodebuild produces errors on stderr #21672
-      command
+      "xcodebuild -showBuildSettings #{xcodebuild_parameters.join(' ')}#{xcodebuild_destination_parameter} 2>&1" # xcodebuild produces errors on stderr #21672
     end
 
     def build_xcodebuild_resolvepackagedependencies_command
