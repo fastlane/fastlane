@@ -91,10 +91,12 @@ module Commander
       remove_global_options(options, @args)
 
       xcode_outdated = false
+      xcode_support_ending = false
       begin
         unless FastlaneCore::Helper.xcode_at_least?(Fastlane::MINIMUM_XCODE_RELEASE)
           xcode_outdated = true
         end
+        xcode_support_ending = !FastlaneCore::Helper.xcode_at_least?(Fastlane::SUGGESTED_MINIMUM_XCODE_RELEASE)
       rescue
         # We don't care about exceptions here
         # We'll land here if the user doesn't have Xcode at all for example
@@ -106,6 +108,10 @@ module Commander
         if xcode_outdated
           # We have to raise that error within this `begin` block to show a nice user error without a stack trace
           FastlaneCore::UI.user_error!("fastlane requires a minimum version of Xcode #{Fastlane::MINIMUM_XCODE_RELEASE}, please upgrade and make sure to use `sudo xcode-select -s /Applications/Xcode.app`")
+        end
+
+        if xcode_support_ending && !FastlaneCore::Env.truthy?("FASTLANE_SKIP_XCODE_VERSION_WARNING")
+          FastlaneCore::UI.important("WARNING: Support for your Xcode version (#{FastlaneCore::Helper.xcode_version}) is going away. fastlane will soon require Xcode #{Fastlane::SUGGESTED_MINIMUM_XCODE_RELEASE} or newer.")
         end
 
         is_swift = FastlaneCore::FastlaneFolder.swift?
