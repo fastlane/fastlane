@@ -128,6 +128,7 @@ describe Commander::Runner do
     end
 
     before do
+      stub_const("Fastlane::MINIMUM_XCODE_RELEASE", "15.0")
       stub_const("Fastlane::SUGGESTED_MINIMUM_XCODE_RELEASE", "16.0")
       allow(FastlaneCore::UI).to receive(:important)
     end
@@ -152,6 +153,12 @@ describe Commander::Runner do
     it 'does not warn without Xcode' do
       expect(FastlaneCore::UI).not_to receive(:important).with(/Support for your Xcode version/)
       run_with_xcode(nil)
+    end
+
+    it 'refuses an Xcode older than MINIMUM_XCODE_RELEASE' do
+      stub_const("Fastlane::MINIMUM_XCODE_RELEASE", "16.0")
+      expect(FastlaneCore::UI).to receive(:user_error!).with(/fastlane requires a minimum version of Xcode 16\.0/)
+      run_with_xcode("15.4")
     end
   end
 end
