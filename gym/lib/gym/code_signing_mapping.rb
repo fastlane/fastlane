@@ -193,13 +193,11 @@ module Gym
         rescue => ex
           # We catch errors here, as we might run into an exception on one included project
           # But maybe the next project actually contains the information we need
-          if Helper.xcode_at_least?("9.0")
-            UI.error("Couldn't automatically detect the provisioning profile mapping")
-            UI.error("Since Xcode 9 you need to provide an explicit mapping of what")
-            UI.error("provisioning profile to use for each target of your app")
-            UI.error(ex)
-            UI.verbose(ex.backtrace.join("\n"))
-          end
+          UI.error("Couldn't automatically detect the provisioning profile mapping")
+          UI.error("Since Xcode 9 you need to provide an explicit mapping of what")
+          UI.error("provisioning profile to use for each target of your app")
+          UI.error(ex)
+          UI.verbose(ex.backtrace.join("\n"))
         end
       end
 

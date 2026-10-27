@@ -161,7 +161,6 @@ module Fastlane
       end
 
       def self.show_xcode_9_warning
-        return unless Helper.xcode_at_least?("9.0")
         UI.message("You passed a path to a custom plist file for exporting the binary.")
         UI.message("Make sure to include information about what provisioning profiles to use with Xcode 9")
         UI.message("More information: https://docs.fastlane.tools/codesigning/xcode-project/#xcode-9-and-up")
