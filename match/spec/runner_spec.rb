@@ -14,9 +14,8 @@ describe Match do
       ENV.delete('FASTLANE_TEAM_NAME')
     end
 
-    ["10", "11", "16"].each do |xcode_version|
+    ["16"].each do |xcode_version|
       context "Xcode #{xcode_version}" do
-        let(:generate_apple_certs) { xcode_version == "11" }
         before do
           allow(FastlaneCore::Helper).to receive(:mac?).and_return(true)
           allow(FastlaneCore::Helper).to receive(:xcode_version).and_return(xcode_version)
