@@ -10,6 +10,23 @@ describe Fastlane do
         }
       end
 
+      before do
+        allow(Fastlane::Helper).to receive(:bundler?).and_return(false)
+      end
+
+      it "when running with Bundler" do
+        allow(Fastlane::Helper).to receive(:bundler?).and_return(true)
+        expect(Gem::CommandManager).not_to receive(:instance)
+        expect(Fastlane::Actions::UpdateFastlaneAction).not_to receive(:exec)
+
+        expect(UI).to receive(:success).with("Driving the lane 'test' 🚀")
+        expect(UI).to receive(:important).with(/Run `bundle update fastlane` instead/)
+
+        Fastlane::FastFile.new.parse("lane :test do
+          update_fastlane
+        end").runner.execute(:test)
+      end
+
       it "when no update needed" do
         expect(Gem::CommandManager).to receive(:instance).and_return(mock_instance).twice
 
