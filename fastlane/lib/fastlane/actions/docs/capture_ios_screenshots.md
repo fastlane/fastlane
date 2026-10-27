@@ -41,7 +41,7 @@ _snapshot_ runs completely in the background - you can do something else, while 
 
 # Features
 - Create hundreds of screenshots in multiple languages on all simulators
-- Take screenshots in multiple device simulators concurrently to cut down execution time (Xcode 9 only)
+- Take screenshots in multiple device simulators concurrently to cut down execution time
 - Configure it once, store the configuration in git
 - Do something else, while the computer takes the screenshots for you
 - Integrates with [_fastlane_](https://fastlane.tools) and [_deliver_](https://docs.fastlane.tools/actions/deliver/)
@@ -125,9 +125,9 @@ fastlane snapshot
 
 Your screenshots will be stored in the `./screenshots/` folder by default (or `./fastlane/screenshots` if you're using [_fastlane_](https://fastlane.tools))
 
-New with Xcode 9, *snapshot* can run multiple simulators concurrently. This is the default behavior in order to take your screenshots as quickly as possible. This can be disabled to run each device, one at a time, by setting the `:concurrent_simulators` option to `false`.
+*snapshot* can run multiple simulators concurrently. This is the default behavior in order to take your screenshots as quickly as possible. This can be disabled to run each device, one at a time, by setting the `:concurrent_simulators` option to `false`.
 
-**Note:** While running *snapshot* with Xcode 9, the simulators will not be visibly spawned. So, while you won't see the simulators running your tests, they will, in fact, be taking your screenshots.
+**Note:** The simulators will not be visibly spawned. So, while you won't see the simulators running your tests, they will, in fact, be taking your screenshots.
 
 If any error occurs while running the snapshot script on a device, that device will not have any screenshots, and _snapshot_ will continue with the next device or language. To stop the flow after the first error, run
 
