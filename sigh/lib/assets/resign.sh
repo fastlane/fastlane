@@ -179,7 +179,6 @@ DEFAULT_PROVISION=""
 TEMP_DIR="_floatsignTemp"
 USE_APP_ENTITLEMENTS=""
 VERBOSE=""
-XCODE_VERSION="$(xcodebuild -version | grep "Xcode" | /usr/bin/cut -f 2 -d ' ')"
 
 # List of plist keys used for reference to and from nested apps and extensions
 NESTED_APP_REFERENCE_KEYS=(":WKCompanionAppBundleIdentifier" ":NSExtension:NSExtensionAttributes:WKAppBundleIdentifier")
@@ -649,10 +648,6 @@ function resign {
 
         log "Resigning application using certificate: '$CERTIFICATE'"
         log "and entitlements: $ENTITLEMENTS"
-        if [[ "${XCODE_VERSION/.*/}" -lt 10 ]]; then
-            log "Creating an archived-expanded-entitlements.xcent file for Xcode 9 builds or earlier"
-            cp -f "$ENTITLEMENTS" "$APP_PATH/archived-expanded-entitlements.xcent"
-        fi
         /usr/bin/codesign ${VERBOSE} "${PAGESIZE_ARGS[@]}" --generate-entitlement-der -f -s "$CERTIFICATE" --entitlements "$ENTITLEMENTS" "$APP_PATH"
         checkStatus
     elif  [[ -n "${USE_APP_ENTITLEMENTS}" ]]; then
@@ -906,10 +901,6 @@ function resign {
         log "Resigning application using certificate: '$CERTIFICATE'"
         log "and patched entitlements:"
         log "$(cat "$PATCHED_ENTITLEMENTS")"
-        if [[ "${XCODE_VERSION/.*/}" -lt 10 ]]; then
-            log "Creating an archived-expanded-entitlements.xcent file for Xcode 9 builds or earlier"
-            cp -f "$PATCHED_ENTITLEMENTS" "$APP_PATH/archived-expanded-entitlements.xcent"
-        fi
         /usr/bin/codesign ${VERBOSE} "${PAGESIZE_ARGS[@]}" --generate-entitlement-der -f -s "$CERTIFICATE" --entitlements "$PATCHED_ENTITLEMENTS" "$APP_PATH"
         checkStatus
     else
@@ -918,10 +909,6 @@ function resign {
         checkStatus
         log "Resigning application using certificate: '$CERTIFICATE'"
         log "and entitlements from provisioning profile: $NEW_PROVISION"
-        if [[ "${XCODE_VERSION/.*/}" -lt 10 ]]; then
-            log "Creating an archived-expanded-entitlements.xcent file for Xcode 9 builds or earlier"
-            cp -- "$TEMP_DIR/newEntitlements" "$APP_PATH/archived-expanded-entitlements.xcent"
-        fi
         /usr/bin/codesign ${VERBOSE} "${PAGESIZE_ARGS[@]}" --generate-entitlement-der "${KEYCHAIN_ARGS[@]}" -f -s "$CERTIFICATE" --entitlements "$TEMP_DIR/newEntitlements" "$APP_PATH"
         checkStatus
     fi
