@@ -255,15 +255,6 @@ module FastlaneCore
         user_local_itms_path = "/usr/local/itms"
         return user_local_itms_path if File.exist?(user_local_itms_path)
 
-        # Then check for iTMSTransporter in the Xcode path
-        [
-          "../Applications/Application Loader.app/Contents/MacOS/itms",
-          "../Applications/Application Loader.app/Contents/itms",
-          "../SharedFrameworks/ContentDeliveryServices.framework/Versions/A/itms" # For Xcode 11
-        ].each do |path|
-          result = File.expand_path(File.join(self.xcode_path, path))
-          return result if File.exist?(result)
-        end
         UI.user_error!("Could not find transporter at #{self.xcode_path}. Please make sure you set the correct path to your Xcode installation.")
       elsif self.windows?
         [
