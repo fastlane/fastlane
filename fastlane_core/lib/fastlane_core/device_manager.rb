@@ -357,8 +357,16 @@ module FastlaneCore
         logs_collection_start = log_collection_start_time.strftime('%Y-%m-%d %H:%M:%S')
         command = "xcrun simctl spawn #{device.udid} log collect "
         command << "--start '#{logs_collection_start}' "
-        command << "--output #{logarchive_dst.shellescape} 2>/dev/null"
-        FastlaneCore::CommandExecutor.execute(command: command, print_all: false, print_command: true)
+        command << "--output #{logarchive_dst.shellescape}"
+        # The logs are diagnostics, so failing to collect them (e.g. the simulator is no longer booted)
+        # must not fail the action that asked for them
+        FastlaneCore::CommandExecutor.execute(command: command,
+                                            print_all: false,
+                                        print_command: true,
+                                suppress_error_output: true,
+                                                error: proc do |output, status|
+                                                  UI.important("Unable to collect system logs from #{device} (exit status #{status}): #{output}")
+                                                end)
       end
     end
   end
