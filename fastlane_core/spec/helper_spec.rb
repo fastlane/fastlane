@@ -213,6 +213,24 @@ describe FastlaneCore do
           stub_const('ENV', { 'FASTLANE_ITUNES_TRANSPORTER_PATH' => '/some/path/to/something' })
           expect(FastlaneCore::Helper.itms_path).to eq('/some/path/to/something')
         end
+
+        context "on a Mac without a transporter" do
+          before do
+            allow(FastlaneCore::Helper).to receive(:mac?).and_return(true)
+            allow(FastlaneCore::Helper).to receive(:xcode_path).and_return('/Applications/Xcode.app/Contents/Developer/')
+            allow(File).to receive(:exist?).and_return(false)
+          end
+
+          it "points at the Xcode installation" do
+            stub_const('ENV', {})
+            expect { FastlaneCore::Helper.itms_path }.to raise_error(FastlaneCore::Interface::FastlaneError, "Could not find transporter at /Applications/Xcode.app/Contents/Developer/. Please make sure you set the correct path to your Xcode installation.")
+          end
+
+          it "points at FASTLANE_ITUNES_TRANSPORTER_USE_SHELL_SCRIPT when it is set" do
+            stub_const('ENV', { 'FASTLANE_ITUNES_TRANSPORTER_USE_SHELL_SCRIPT' => '1' })
+            expect { FastlaneCore::Helper.itms_path }.to raise_error(FastlaneCore::Interface::FastlaneError, /Xcode 14 and newer no longer include it. Remove FASTLANE_ITUNES_TRANSPORTER_USE_SHELL_SCRIPT so fastlane uploads with altool/)
+          end
+        end
       end
     end
 
