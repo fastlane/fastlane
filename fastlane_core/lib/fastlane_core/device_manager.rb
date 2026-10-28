@@ -358,14 +358,16 @@ module FastlaneCore
         command = "xcrun simctl spawn #{device.udid} log collect "
         command << "--start '#{logs_collection_start}' "
         command << "--output #{logarchive_dst.shellescape}"
-        # The logs are diagnostics, so failing to collect them (e.g. the simulator is no longer booted)
-        # must not fail the action that asked for them
+        # A simulator that is no longer booted only warrants a warning: xcodebuild shuts down a simulator it booted
+        # itself once the tests finish, and the logs are diagnostics. Any other failure still fails the action.
         FastlaneCore::CommandExecutor.execute(command: command,
                                             print_all: false,
                                         print_command: true,
                                 suppress_error_output: true,
                                                 error: proc do |output, status|
-                                                  UI.important("Unable to collect system logs from #{device} (exit status #{status}): #{output}")
+                                                  message = "Unable to collect system logs from #{device} (exit status #{status}): #{output}"
+                                                  UI.user_error!(message) unless output.match?(/domain=com\.apple\.CoreSimulator\.SimError, code=405\b/)
+                                                  UI.important(message)
                                                 end)
       end
     end
