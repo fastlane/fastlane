@@ -10,6 +10,11 @@ module Fastlane
       def self.run(options)
         return if options[:no_update] # this is used to update itself
 
+        if Helper.bundler?
+          UI.important("update_fastlane does nothing when fastlane runs with Bundler: your Gemfile.lock sets the version. Run `bundle update fastlane` instead.")
+          return
+        end
+
         tools_to_update = ALL_TOOLS
         UI.message("Looking for updates for #{tools_to_update.join(', ')}...")
 
@@ -113,7 +118,9 @@ module Fastlane
           sample,
           "After the above changes, restart your terminal, then run `mkdir $GEM_HOME` to create the new gem directory. After this, you're good to go!",
           "",
-          "Recommended usage of the `update_fastlane` action is at the top inside of the `before_all` block, before running any other action."
+          "Recommended usage of the `update_fastlane` action is at the top inside of the `before_all` block, before running any other action.",
+          "",
+          "When fastlane runs with Bundler (`bundle exec fastlane`), this action does nothing: run `bundle update fastlane` instead."
         ].join("\n")
       end
 
