@@ -202,7 +202,6 @@ module FastlaneCore
 
       def boot
         return unless is_simulator
-        return unless os_type == "iOS"
         return if self.state == 'Booted'
 
         # Boot the simulator and wait for it to finish booting
@@ -214,7 +213,6 @@ module FastlaneCore
 
       def shutdown
         return unless is_simulator
-        return unless os_type == "iOS"
         return if self.state != 'Booted'
 
         UI.message("Shutting down #{self.udid}")
