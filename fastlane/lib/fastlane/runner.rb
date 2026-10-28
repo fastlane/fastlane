@@ -151,13 +151,10 @@ module Fastlane
         # built-in actions
       end
 
+      # Both lookups above only return classes that respond to `run`
       if class_ref
-        if class_ref.respond_to?(:run)
-          # Action is available, now execute it
-          return self.execute_action(method_sym, class_ref, arguments, custom_dir: custom_dir, from_action: from_action)
-        else
-          UI.user_error!("Action '#{method_sym}' of class '#{class_ref}' was found, but has no `run` method.")
-        end
+        # Action is available, now execute it
+        return self.execute_action(method_sym, class_ref, arguments, custom_dir: custom_dir, from_action: from_action)
       end
 
       # No lane, no action, let's at least show the correct error message
