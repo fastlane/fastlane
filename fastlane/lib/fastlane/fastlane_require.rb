@@ -27,7 +27,11 @@ module Fastlane
         UI.important("Installing Ruby gem '#{gem_name}'...")
 
         spec_name = self.find_gem_name(gem_name)
-        UI.important("Found gem \"#{spec_name}\" instead of the required name \"#{gem_name}\"") if spec_name != gem_name
+        if spec_name != gem_name
+          message = "Could not find gem '#{gem_name}' on RubyGems"
+          message += ". Did you mean '#{spec_name}'? Fix the name in your Fastfile" if spec_name
+          UI.user_error!(message)
+        end
 
         return if Helper.test?
 

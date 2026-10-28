@@ -39,6 +39,8 @@ describe Match do
 
       allow(Match::ChangePassword).to receive(:ensure_ui_interactive)
       allow(FastlaneCore::Helper).to receive(:ask_password).and_return("")
+      allow(Security::InternetPassword).to receive(:add)
+      expect(Security::InternetPassword).to receive(:delete).with(server: "match_#{git_url}")
 
       expect(fake_storage).to receive(:clear_changes)
 

@@ -12,7 +12,7 @@ describe Fastlane do
           })
         end").runner.execute(:test)
 
-        expect(result).to eq("hg commit -m 'Version Bump'")
+        expect(result.shellsplit).to eq(["hg", "commit", "-m", "Version Bump"])
       end
 
       it "passes when modified files are not a subset of expected files, but :force is true" do
@@ -27,7 +27,7 @@ describe Fastlane do
           })
         end").runner.execute(:test)
 
-        expect(result).to eq("hg commit -m 'Version Bump'")
+        expect(result.shellsplit).to eq(["hg", "commit", "-m", "Version Bump"])
       end
 
       it "works with a custom commit message" do
@@ -39,7 +39,17 @@ describe Fastlane do
           })
         end").runner.execute(:test)
 
-        expect(result).to eq("hg commit -m '#{message}'")
+        expect(result.shellsplit).to eq(["hg", "commit", "-m", message])
+      end
+
+      it "passes a message with an apostrophe as a single argument" do
+        message = "Bump to 2.0, it's done"
+
+        result = Fastlane::FastFile.new.parse("lane :test do
+          hg_commit_version_bump(message: #{message.inspect})
+        end").runner.execute(:test)
+
+        expect(result.shellsplit).to eq(["hg", "commit", "-m", message])
       end
 
       it "raises an exception with no files changed" do

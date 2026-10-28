@@ -55,7 +55,7 @@ puts data.password
 ```
 
 # Code of Conduct
-Help us keep _fastlane_ open and inclusive. Please read and follow our [Code of Conduct](https://github.com/fastlane/fastlane/blob/master/CODE_OF_CONDUCT.md).
+Help us keep _fastlane_ open and inclusive. Please read and follow our [Code of Conduct](https://github.com/fastlane/fastlane/blob/master/docs/CODE_OF_CONDUCT.md).
 
 # License
 

@@ -4,7 +4,7 @@ module Fastlane
   module Actions
     class BuildAndUploadToAppetizeAction < Action
       def self.run(params)
-        tmp_path = File.join(Dir.tmpdir, "fastlane_build")
+        tmp_path = Dir.mktmpdir("fastlane_build-")
 
         xcodebuild_configs = params[:xcodebuild]
         xcodebuild_configs[:sdk] = "iphonesimulator"

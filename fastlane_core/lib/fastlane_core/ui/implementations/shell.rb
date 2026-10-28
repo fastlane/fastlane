@@ -1,6 +1,7 @@
 require_relative '../../helper'
 require_relative '../../globals'
 require_relative '../../env'
+require_relative '../../secrets'
 
 require_relative '../interface'
 
@@ -23,7 +24,7 @@ module FastlaneCore
       end
 
       @log.formatter = proc do |severity, datetime, progname, msg|
-        "#{format_string(datetime, severity)}#{msg}\n"
+        "#{format_string(datetime, severity)}#{Secrets.mask(msg.to_s)}\n"
       end
 
       @log

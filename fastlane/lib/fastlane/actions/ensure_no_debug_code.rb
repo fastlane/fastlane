@@ -2,7 +2,7 @@ module Fastlane
   module Actions
     class EnsureNoDebugCodeAction < Action
       def self.run(params)
-        command = "grep -RE '#{params[:text]}' '#{File.absolute_path(params[:path])}'"
+        command = "grep -RE #{params[:text].shellescape} #{File.absolute_path(params[:path]).shellescape}"
 
         extensions = []
         extensions << params[:extension] unless params[:extension].nil?
@@ -20,7 +20,7 @@ module Fastlane
           command << " --include=\\*.#{extensions.join(',')}"
         end
 
-        command << " --exclude #{params[:exclude]}" if params[:exclude]
+        command << " --exclude #{params[:exclude].shellescape}" if params[:exclude]
 
         if params[:exclude_dirs]
           params[:exclude_dirs].each do |dir|

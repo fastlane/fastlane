@@ -42,6 +42,34 @@ describe Fastlane do
       end
     end
 
+    describe "#plugins_required_by" do
+      it "returns [] for a gem that is not installed" do
+        allow(Bundler.rubygems).to receive(:find_name).with("company_lanes").and_return([])
+        expect(plugin_manager.plugins_required_by("company_lanes")).to eq([])
+      end
+
+      it "lists a plugin required by two dependencies once, and skips development dependencies" do
+        dependency = lambda do |name, type: :runtime, dependencies: []|
+          double(name, name: name, type: type, to_spec: double("#{name} spec", dependencies: dependencies))
+        end
+        # Two Dependency objects for one gem, as when two gems require it with different version constraints
+        shared_plugin = [dependency.call("fastlane-plugin-shared"), dependency.call("fastlane-plugin-shared")]
+        lanes_a = dependency.call("company_lanes_a", dependencies: [shared_plugin[0], dependency.call("fastlane-plugin-devonly", type: :development)])
+        lanes_b = dependency.call("company_lanes_b", dependencies: [shared_plugin[1]])
+
+        allow(Bundler.rubygems).to receive(:find_name).with("company_lanes").and_return([double("company_lanes spec", dependencies: [lanes_a, lanes_b])])
+
+        expect(plugin_manager.plugins_required_by("company_lanes")).to eq(["fastlane-plugin-shared"])
+      end
+
+      # full integration test: Bundler resolves a gem that depends on a plugin, out of process
+      it "finds the plugins of a gem through its dependencies, without loading them by default" do
+        output = run_in_fixture_bundle("fastlane/spec/fixtures/plugins/GemfileWithDeps", "ruby list_plugins.rb").lines.map(&:chomp)
+        expect(output).to include("available: ")
+        expect(output).to include("required by dependency_with_plugins: fastlane-plugin-shared_fixture")
+      end
+    end
+
     describe "#plugin_is_added_as_dependency?" do
       before do
         allow(Bundler::SharedHelpers).to receive(:default_gemfile).and_return("./fastlane/spec/fixtures/plugins/Pluginfile1")
@@ -203,6 +231,28 @@ describe Fastlane do
         expect do
           pm.load_plugins
         end.to output(/No actions were found while loading one or more plugins/).to_stdout
+      end
+    end
+
+    describe "#load_plugins_required_by" do
+      it "loads the gem's plugins that are not loaded yet, and not the available plugins" do
+        pm = Fastlane::PluginManager.new
+        pm.plugin_references["fastlane-plugin-loaded"] = { version_number: "1.0.0", actions: [] }
+        expect(pm).to receive(:plugins_required_by).with("company_lanes").and_return(["fastlane-plugin-loaded", "fastlane-plugin-new"])
+        expect(pm).not_to receive(:available_plugins)
+        expect(Fastlane::FastlaneRequire).to receive(:install_gem_if_needed).once.with(gem_name: "fastlane-plugin-new", require_gem: true)
+        expect(pm).to receive(:store_plugin_reference).once.with("fastlane-plugin-new")
+
+        pm.load_plugins_required_by("company_lanes", print_table: false)
+      end
+
+      it "loads nothing when the gem's plugins are all loaded" do
+        pm = Fastlane::PluginManager.new
+        pm.plugin_references["fastlane-plugin-loaded"] = { version_number: "1.0.0", actions: [] }
+        expect(pm).to receive(:plugins_required_by).with("company_lanes").and_return(["fastlane-plugin-loaded"])
+        expect(Fastlane::FastlaneRequire).not_to receive(:install_gem_if_needed)
+
+        pm.load_plugins_required_by("company_lanes")
       end
     end
 

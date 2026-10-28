@@ -5,13 +5,14 @@ describe Fastlane do
       let(:not_an_ipa) { File.expand_path("./fastlane_core/spec/fixtures/ipas/not-an-ipa.ipa") }
       let(:correctly_signed_ipa) { File.expand_path("./fastlane_core/spec/fixtures/ipas/very-capable-app.ipa") }
       let(:correctly_signed_ipa_with_spaces) { File.expand_path("./fastlane_core/spec/fixtures/ipas/very capable app.ipa") }
-      let(:correctly_signed_xcarchive) { File.expand_path("./fastlane_core/spec/fixtures/archives/very-capable-app.xcarchive") }
-      let(:correctly_signed_xcarchive_with_spaces) { File.expand_path("./fastlane_core/spec/fixtures/archives/very capable app.xcarchive") }
-      let(:correctly_signed_app) { File.expand_path("./fastlane_core/spec/fixtures/archives/very-capable-app.xcarchive/Products/Applications/very-capable-app.app") }
-      let(:correctly_signed_app_with_spaces) { File.expand_path("./fastlane_core/spec/fixtures/archives/very capable app.xcarchive/Products/Applications/very capable app.app") }
+      # The .app fixtures are committed without their executable; the mac-only before(:context) builds and ad-hoc signs them.
+      let(:correctly_signed_xcarchive) { File.join(@built_fixtures, "archives/very-capable-app.xcarchive") }
+      let(:correctly_signed_xcarchive_with_spaces) { File.join(@built_fixtures, "archives/very capable app.xcarchive") }
+      let(:correctly_signed_app) { File.join(correctly_signed_xcarchive, "Products/Applications/very-capable-app.app") }
+      let(:correctly_signed_app_with_spaces) { File.join(correctly_signed_xcarchive_with_spaces, "Products/Applications/very capable app.app") }
       let(:incorrectly_signed_ipa) { File.expand_path("./fastlane_core/spec/fixtures/ipas/IncorrectlySigned.ipa") }
       let(:ipa_with_no_app) { File.expand_path("./fastlane_core/spec/fixtures/ipas/no-app-bundle.ipa") }
-      let(:simulator_app) { File.expand_path("./fastlane_core/spec/fixtures/bundles/simulator-app.app") }
+      let(:simulator_app) { File.join(@built_fixtures, "bundles/simulator-app.app") }
       let(:not_an_app) { File.expand_path("./fastlane_core/spec/fixtures/bundles/not-an-app.txt") }
       let(:archive_with_no_app) { File.expand_path("./fastlane_core/spec/fixtures/archives/no-app-bundle.xcarchive") }
       let(:expected_title) { "Summary for verify_build #{Fastlane::VERSION}" }
@@ -25,6 +26,8 @@ describe Fastlane do
           "authority" => ["TestFixture"]
         }
       end
+      # An ad-hoc signature has no Authority line.
+      let(:expected_built_app_info) { expected_app_info.except("authority") }
 
       before(:each) do
         Fastlane::Actions.lane_context[Fastlane::Actions::SharedValues::IPA_OUTPUT_PATH] = nil
@@ -32,6 +35,24 @@ describe Fastlane do
       end
 
       if FastlaneCore::Helper.mac?
+        # Copies the .app fixtures to a scratch directory, compiles an executable into each and ad-hoc signs it.
+        # Ad-hoc, because a named identity needs a keychain in the user's search list, which parallel workers share.
+        before(:context) do
+          @built_fixtures = Dir.mktmpdir("verify_build")
+          FileUtils.cp_r(Dir[File.expand_path("./fastlane_core/spec/fixtures/{archives,bundles}")], @built_fixtures)
+          source = File.join(@built_fixtures, "main.c")
+          File.write(source, "int main(void) { return 0; }\n")
+          Dir["#{@built_fixtures}/**/*.app"].each do |app|
+            executable = File.join(app, File.basename(app, ".app"))
+            system("cc", "-o", executable, source, exception: true)
+            system("codesign", "--force", "--sign", "-", app, exception: true)
+          end
+        end
+
+        after(:context) do
+          FileUtils.remove_entry(@built_fixtures)
+        end
+
         it "uses the ipa output path from lane context" do
           Fastlane::Actions.lane_context[Fastlane::Actions::SharedValues::IPA_OUTPUT_PATH] = correctly_signed_ipa
 
@@ -63,7 +84,7 @@ describe Fastlane do
         end
 
         it "uses app bundle set via build_path" do
-          expect(FastlaneCore::PrintTable).to receive(:print_values).with(config: expected_app_info, title: expected_title)
+          expect(FastlaneCore::PrintTable).to receive(:print_values).with(config: expected_built_app_info, title: expected_title)
           expect(FastlaneCore::UI).to receive(:success).with("Build is verified, have a 🍪.")
           Fastlane::FastFile.new.parse("lane :test do
             verify_build(
@@ -73,7 +94,7 @@ describe Fastlane do
         end
 
         it "uses app bundle set via build_path that contains spaces" do
-          expect(FastlaneCore::PrintTable).to receive(:print_values).with(config: expected_app_info, title: expected_title)
+          expect(FastlaneCore::PrintTable).to receive(:print_values).with(config: expected_built_app_info, title: expected_title)
           expect(FastlaneCore::UI).to receive(:success).with("Build is verified, have a 🍪.")
           Fastlane::FastFile.new.parse("lane :test do
             verify_build(
@@ -94,7 +115,7 @@ describe Fastlane do
         end
 
         it "uses xcarchive set via build_path" do
-          expect(FastlaneCore::PrintTable).to receive(:print_values).with(config: expected_app_info, title: expected_title)
+          expect(FastlaneCore::PrintTable).to receive(:print_values).with(config: expected_built_app_info, title: expected_title)
           expect(FastlaneCore::UI).to receive(:success).with("Build is verified, have a 🍪.")
           Fastlane::FastFile.new.parse("lane :test do
             verify_build(
@@ -104,13 +125,55 @@ describe Fastlane do
         end
 
         it "uses xcarchive set via build_path that contain spaces" do
-          expect(FastlaneCore::PrintTable).to receive(:print_values).with(config: expected_app_info, title: expected_title)
+          expect(FastlaneCore::PrintTable).to receive(:print_values).with(config: expected_built_app_info, title: expected_title)
           expect(FastlaneCore::UI).to receive(:success).with("Build is verified, have a 🍪.")
           Fastlane::FastFile.new.parse("lane :test do
             verify_build(
               build_path: '#{correctly_signed_xcarchive_with_spaces}'
             )
           end").runner.execute(:test)
+        end
+      end
+
+      describe "gather_cert_info" do
+        let(:authority) { "iPhone Distribution: Example (ABCDE12345)" }
+        let(:codesign_output) do
+          <<~OUTPUT
+            Executable=/path/to/app.app/app
+            Identifier=org.fastlane.app
+            Authority=#{authority}
+            Authority=Apple Worldwide Developer Relations Certification Authority
+            Authority=Apple Root CA
+            TeamIdentifier=ABCDE12345
+          OUTPUT
+        end
+
+        before do
+          # gather_cert_info checks $?, which a stubbed backtick leaves at the previous child's status.
+          allow(Fastlane::Actions::VerifyBuildAction).to receive(:`).with("codesign -vv -d /path/to/app.app 2>&1") do
+            system("exit 0") && codesign_output
+          end
+        end
+
+        it "reads the identifier, team and authorities and derives the provisioning type" do
+          expect(Fastlane::Actions::VerifyBuildAction.gather_cert_info("/path/to/app.app")).to eq({
+            "bundle_identifier" => "org.fastlane.app",
+            "team_identifier" => "ABCDE12345",
+            "provisioning_type" => "distribution",
+            "authority" => [
+              "iPhone Distribution: Example (ABCDE12345)",
+              "Apple Worldwide Developer Relations Certification Authority",
+              "Apple Root CA"
+            ]
+          })
+        end
+
+        context "with a development certificate" do
+          let(:authority) { "Apple Development: Example (ABCDE12345)" }
+
+          it "derives a development provisioning type" do
+            expect(Fastlane::Actions::VerifyBuildAction.gather_cert_info("/path/to/app.app")["provisioning_type"]).to eq("development")
+          end
         end
       end
 

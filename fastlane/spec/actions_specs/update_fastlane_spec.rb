@@ -56,9 +56,10 @@ describe Fastlane do
         expect(mock_cleanup).to receive(:options).and_return({})
         expect(mock_cleanup).to receive(:execute)
 
-        # Restart process
+        # Restart process, with the arguments as given
+        stub_const("ARGV", ["beta", "notes:fix a; b"])
         expect(UI).to receive(:message).with("fastlane.tools successfully updated! I will now restart myself... 😴")
-        expect(Fastlane::Actions::UpdateFastlaneAction).to receive(:exec)
+        expect(Fastlane::Actions::UpdateFastlaneAction).to receive(:exec).with({ "FL_NO_UPDATE" => "true" }, $PROGRAM_NAME, "beta", "notes:fix a; b")
 
         result = Fastlane::FastFile.new.parse("lane :test do
           update_fastlane

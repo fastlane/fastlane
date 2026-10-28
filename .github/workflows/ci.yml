@@ -13,6 +13,12 @@ concurrency:
 permissions:
   contents: read
 
+env:
+  # Git's background maintenance can delete files under .git/objects while a local clone copies them - fastlane/fastlane#30432
+  GIT_CONFIG_COUNT: "1"
+  GIT_CONFIG_KEY_0: maintenance.auto
+  GIT_CONFIG_VALUE_0: "false"
+
 jobs:
   macos-tests:
     name: ${{ matrix.os }}, Xcode ${{ matrix.xcode }}, Ruby ${{ matrix.ruby }} Tests
@@ -24,21 +30,21 @@ jobs:
       fail-fast: true
       matrix:
         include:
-          - { xcode: '16.4.0', ruby: '3.1', rubyopt: '', os: 'macos-15' }
           - { xcode: '16.4.0', ruby: '3.2', rubyopt: '', os: 'macos-15' }
           - { xcode: '16.4.0', ruby: '3.3', rubyopt: '', os: 'macos-15' }
           - { xcode: '16.4.0', ruby: '3.4', rubyopt: '', os: 'macos-15' }
           - { xcode: '26.5', ruby: '3.4', rubyopt: '-W0', os: 'macos-26' }
           - { xcode: '26.6', ruby: '3.4', rubyopt: '-W0', os: 'macos-26' }
           - { xcode: '26.6', ruby: '4.0', rubyopt: '-W0', os: 'macos-26' }
+          - { xcode: '27.0', ruby: '4.0', rubyopt: '-W0', os: 'xcode-27' }
           - { xcode: '', ruby: '3.2', rubyopt: '', os: 'windows-2022' }
-          - { xcode: '', ruby: '3.1', rubyopt: '', os: 'ubuntu-24.04' }
+          - { xcode: '', ruby: '3.2', rubyopt: '', os: 'ubuntu-24.04' }
     steps:
-      - uses: actions/checkout@v7
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
 
       - name: Select Xcode ${{ matrix.xcode }}
         if: runner.os == 'macOS'
-        uses: maxim-lobanov/setup-xcode@v1
+        uses: maxim-lobanov/setup-xcode@ed7a3b1fda3918c0306d1b724322adc0b8cc0a90 # v1.7.0
         with:
           xcode-version: ${{ matrix.xcode }}
 
@@ -49,7 +55,7 @@ jobs:
           xcode-select -p
 
       - name: Set up Ruby ${{ matrix.ruby }}
-        uses: ruby/setup-ruby@v1
+        uses: ruby/setup-ruby@824c0e29fdfc7d689c191c27acc969d2d04b7dd8 # v1.331.0
         with:
           ruby-version: ${{ matrix.ruby }}
           bundler-cache: true
@@ -81,17 +87,23 @@ jobs:
       # every run because `failure()` does not fire on a cancelled job.
       - name: Keep the worker logs
         if: always()
-        uses: actions/upload-artifact@v7
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
         with:
           name: rspec-worker-logs-${{ matrix.os }}-ruby${{ matrix.ruby }}-xcode${{ matrix.xcode }}
           path: |
             rspec_worker_*.log
             rspec_worker_*.units
+            unused_stubs.txt
           if-no-files-found: warn
+
+      # One macOS leg is enough. See fastlane#30289.
+      - name: Coverage summary
+        if: matrix.os == 'macos-26' && matrix.xcode == '26.6' && matrix.ruby == '3.4'
+        run: bundle exec rake coverage_summary
 
       - name: RSpec report
         if: always()
-        uses: SonicGarden/rspec-report-action@v8
+        uses: SonicGarden/rspec-report-action@85aee0edd05bd561aa68d1579144df914537ef9b # v8.0.0
         with:
           json-path: rspec_logs.json
           comment: 'false'
@@ -101,27 +113,29 @@ jobs:
     name: Validate Fastlane.swift generation
     runs-on: macos-26
     steps:
-      - uses: actions/checkout@v7
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
 
-      - uses: maxim-lobanov/setup-xcode@v1
+      - uses: maxim-lobanov/setup-xcode@ed7a3b1fda3918c0306d1b724322adc0b8cc0a90 # v1.7.0
         with:
           xcode-version: '26.3'
 
-      - uses: ruby/setup-ruby@v1
+      - uses: ruby/setup-ruby@824c0e29fdfc7d689c191c27acc969d2d04b7dd8 # v1.331.0
         with:
           ruby-version: '3.4'
           bundler-cache: true
 
       - name: Generate Swift API
         run: bundle exec fastlane generate_swift_api
+        env:
+          FASTLANE_SWIFT_TESTS: true
 
   validate_documentation:
     name: Validate Documentation
     runs-on: ubuntu-24.04
     steps:
-      - uses: actions/checkout@v7
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
 
-      - uses: ruby/setup-ruby@v1
+      - uses: ruby/setup-ruby@824c0e29fdfc7d689c191c27acc969d2d04b7dd8 # v1.331.0
         with:
           ruby-version: '3.4'
           bundler-cache: true
@@ -133,9 +147,9 @@ jobs:
     name: Lint source code
     runs-on: ubuntu-24.04
     steps:
-      - uses: actions/checkout@v7
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
 
-      - uses: ruby/setup-ruby@v1
+      - uses: ruby/setup-ruby@824c0e29fdfc7d689c191c27acc969d2d04b7dd8 # v1.331.0
         with:
           ruby-version: '3.4'
           bundler-cache: true

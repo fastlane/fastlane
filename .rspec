@@ -4,6 +4,7 @@ RSpec::Core::RakeTask.new(:spec)
 
 --default-path ./
 --exclude-pattern 'vendor/**/*_spec.rb'
---require ./spec_helper
+-I spec
+--require ./spec/spec_helper
 --color
 --format d

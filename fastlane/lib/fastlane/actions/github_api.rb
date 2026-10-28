@@ -250,12 +250,11 @@ module Fastlane
         def call_endpoint(url, http_method, headers, body, secure)
           require 'excon'
 
-          Excon.defaults[:ssl_verify_peer] = secure
           middlewares = Excon.defaults[:middlewares] + [Excon::Middleware::RedirectFollower] # allow redirect in case of repo renames
 
           UI.verbose("#{http_method} : #{url}")
 
-          connection = Excon.new(url)
+          connection = Excon.new(url, ssl_verify_peer: secure)
           connection.request(
             method: http_method,
             headers: headers,

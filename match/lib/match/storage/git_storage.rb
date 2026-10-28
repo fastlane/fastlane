@@ -1,4 +1,5 @@
 require 'fastlane_core/command_executor'
+require 'open3'
 
 require_relative '../module'
 require_relative './interface'
@@ -7,6 +8,9 @@ module Match
   module Storage
     # Store the code signing identities in a git repo
     class GitStorage < Interface
+      DEFAULT_BRANCH = "main"
+      PRIVATE_KEY_ENV = "MATCH_SSH_ADD_PRIVATE_KEY"
+
       # User provided values
       attr_accessor :git_url
       attr_accessor :shallow_clone
@@ -85,11 +89,6 @@ module Match
         self.working_directory = Dir.mktmpdir
 
         command = "git clone #{self.git_url.shellescape} #{self.working_directory.shellescape}"
-        # HTTP headers are supposed to be case-insensitive but
-        # Bitbucket requires `Authorization: Basic` and `Authorization Bearer` to work
-        # https://github.com/fastlane/fastlane/pull/15928
-        command << " -c http.extraheader='Authorization: Basic #{self.git_basic_authorization}'" unless self.git_basic_authorization.nil?
-        command << " -c http.extraheader='Authorization: Bearer #{self.git_bearer_authorization}'" unless self.git_bearer_authorization.nil?
 
         if self.shallow_clone
           command << " --depth 1"
@@ -165,8 +164,10 @@ module Match
       def generate_matchfile_content
         UI.important("Please create a new, private git repository to store the certificates and profiles there")
         url = UI.input("URL of the Git Repo: ")
+        branch = UI.input("Branch of the Git Repo (leave blank to use '#{DEFAULT_BRANCH}'): ").to_s.strip
+        branch = DEFAULT_BRANCH if branch.empty?
 
-        return "git_url(\"#{url}\")"
+        return "git_url(\"#{url}\")\ngit_branch(\"#{branch}\")"
       end
 
       def list_files(file_name: "", file_ext: "")
@@ -178,7 +179,8 @@ module Match
           ssh_add = File.expand_path(self.git_private_key).shellescape.to_s
         else
           UI.message("Private key file does not exist, will continue by using it as a raw key.")
-          ssh_add = "- <<< \"#{self.git_private_key}\""
+          # From the environment (git_env_values), so the key is not on bash's command line
+          ssh_add = "- <<< \"$#{PRIVATE_KEY_ENV}\""
         end
         return "ssh-agent bash -c 'ssh-add #{ssh_add}; #{command}'"
       end
@@ -264,7 +266,41 @@ module Match
       def git_env_values
         env_values = { 'GIT_TERMINAL_PROMPT' => '0' }
         env_values['GIT_SSH_COMMAND'] = non_interactive_git_ssh_command
+        env_values[PRIVATE_KEY_ENV] = self.git_private_key unless self.git_private_key.nil?
+        env_values.merge(authorization_env_values)
+      end
+
+      # Through git's environment (git 2.31+), so the header is neither on the command line nor stored in .git/config
+      def authorization_env_values
+        headers = []
+        # HTTP headers are supposed to be case-insensitive but
+        # Bitbucket requires `Authorization: Basic` and `Authorization Bearer` to work
+        # https://github.com/fastlane/fastlane/pull/15928
+        headers << "Authorization: Basic #{self.git_basic_authorization}" unless self.git_basic_authorization.nil?
+        headers << "Authorization: Bearer #{self.git_bearer_authorization}" unless self.git_bearer_authorization.nil?
+        return {} if headers.empty?
+
+        version = git_version
+        UI.user_error!("git_basic_authorization and git_bearer_authorization need git 2.31 or later, found git #{version}") if version && Gem::Version.new(version) < Gem::Version.new('2.31')
+
+        # Keep pairs the user already passes this way
+        first = ENV['GIT_CONFIG_COUNT'].to_i
+        env_values = { 'GIT_CONFIG_COUNT' => (first + headers.count).to_s }
+        headers.each_with_index do |header, i|
+          env_values["GIT_CONFIG_KEY_#{first + i}"] = 'http.extraheader'
+          env_values["GIT_CONFIG_VALUE_#{first + i}"] = header
+        end
         env_values
+      end
+
+      # nil when git cannot be run: cloning reports that
+      def git_version
+        @git_version ||= begin
+          output, status = Open3.capture2('git', '--version')
+          output[/\d+\.\d+(\.\d+)?/] if status.success?
+        rescue Errno::ENOENT
+          nil
+        end
       end
 
       def non_interactive_git_ssh_command

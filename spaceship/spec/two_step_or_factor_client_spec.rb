@@ -110,6 +110,25 @@ describe Spaceship::Client do
       end
     end
 
+    context 'when Apple cannot send the code' do
+      let(:body) { File.read(File.join('spaceship', 'spec', 'fixtures', 'appleauth_2fa_sms_cannot_be_sent.json'), encoding: 'utf-8') }
+
+      it "raises Apple's reason" do
+        stub_request(:get, "https://idmsa.apple.com/appleauth/auth").to_return(status: 200, body: body, headers: { 'Content-Type' => 'application/json' })
+
+        expect { subject.handle_two_step_or_factor("response") }
+          .to raise_error(Spaceship::Tunes::Error, "Apple could not start two-factor authentication: Verification codes can’t be sent to this phone number at this time. Please try again later. (-28248) " \
+                                                   "This Apple ID has no trusted devices: signing in to it on an Apple device adds one.")
+      end
+
+      it "keeps the generic error when Apple gives no reason" do
+        stub_request(:get, "https://idmsa.apple.com/appleauth/auth").to_return(status: 200, body: '{"noTrustedDevices": true}', headers: { 'Content-Type' => 'application/json' })
+
+        expect { subject.handle_two_step_or_factor("response") }
+          .to raise_error(RuntimeError, /didn't know how to handle this response/)
+      end
+    end
+
     context 'when SPACESHIP_2FA_SMS_DEFAULT_PHONE_NUMBER is not set' do
       context 'with trusted devices' do
         let(:response) do

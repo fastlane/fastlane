@@ -103,6 +103,56 @@ describe Spaceship::Client do
     end
   end
 
+  describe "the cached App Store Connect API key" do
+    let(:client) { TestClient.new }
+    let(:signout) { double("connection", head: double("response", headers: { "location" => "https://idmsa.apple.com/appleauth/signout?widgetKey=fresh" })) }
+    let(:cache) { File.join(@dir, "spaceship_itc_service_key.txt") }
+
+    around do |example|
+      Dir.mktmpdir do |dir|
+        @dir = dir
+        example.run
+      end
+    end
+
+    before do
+      allow(client).to receive(:itc_service_key_path).and_return(cache)
+      File.write(cache, "stale")
+    end
+
+    it "is not used when the sign out redirect has a key" do
+      allow(client).to receive(:signout_connection).and_return(signout)
+
+      expect(client.itc_service_key).to eq("fresh")
+      expect(File.read(cache)).to eq("fresh")
+    end
+
+    it "is used when the sign out redirect has none" do
+      allow(client).to receive(:signout_connection).and_raise(Faraday::ConnectionFailed.new("nope"))
+      expect(client).to_not(receive(:request))
+
+      expect(client.itc_service_key).to eq("stale")
+    end
+
+    it "is named when App Store Connect refuses the session after signing in" do
+      allow(client).to receive(:signout_connection).and_raise(Faraday::ConnectionFailed.new("nope"))
+      allow(client).to receive(:fetch_olympus_session).and_raise(Spaceship::UnauthorizedAccessError.new, "Unauthorized Access")
+      client.itc_service_key
+
+      expect { client.send(:fetch_olympus_session_after_signin) }
+        .to raise_error(Spaceship::UnauthorizedAccessError, /cache at #{Regexp.escape(cache)} and may be stale/)
+    end
+
+    it "is not blamed for a refused session when it was not used" do
+      allow(client).to receive(:signout_connection).and_return(signout)
+      allow(client).to receive(:fetch_olympus_session).and_raise(Spaceship::UnauthorizedAccessError.new, "Unauthorized Access")
+      client.itc_service_key
+
+      expect { client.send(:fetch_olympus_session_after_signin) }
+        .to raise_error(Spaceship::UnauthorizedAccessError, "Unauthorized Access")
+    end
+  end
+
   describe "#itc_service_key" do
     # Apple started returning 404 from the key endpoint, and every one of these
     # surfaced as "Service key is empty" wrapped in a timeout. See #30199.
@@ -157,9 +207,12 @@ describe Spaceship::Client do
   end
 
   describe "#itc_service_key_path" do
-    # Guards against going back to a literal "/tmp"; the method says why.
-    it "caches the key in the system temporary directory" do
-      expect(TestClient.new.itc_service_key_path).to start_with(Dir.tmpdir)
+    # The cookie store next to it has the same spec; a temporary directory is shared on Linux.
+    it "caches the key in the user's fastlane directory" do
+      # spec_helper stubs the path on every client; this example is about the method itself
+      allow_any_instance_of(Spaceship::Client).to receive(:itc_service_key_path).and_call_original
+
+      expect(TestClient.new.itc_service_key_path).to eq(File.expand_path("~/.fastlane/spaceship_itc_service_key.txt"))
     end
   end
 
@@ -172,6 +225,18 @@ describe Spaceship::Client do
         expect(client.logger.instance_variable_get(:@logdev).filename)
           .to start_with(Dir.tmpdir)
       end
+    end
+
+    it "writes a log readable by its owner only" do
+      old_umask = File.umask(0o022)
+      client = TestClient.new
+
+      FastlaneSpec::Env.with_env_values("VERBOSE" => nil) do
+        path = client.logger.instance_variable_get(:@logdev).filename
+        expect(File.stat(path).mode & 0o777).to eq(0o600) unless FastlaneCore::Helper.windows?
+      end
+    ensure
+      File.umask(old_umask)
     end
   end
 
@@ -251,6 +316,18 @@ describe Spaceship::Client do
       expect do
         subject.req_home
       end.to raise_error(Spaceship::ProgramLicenseAgreementUpdated)
+    end
+
+    ["http://example.com", "https://idmsa.apple.com/appleauth/auth/verify/phone"].each do |url|
+      it "retries a 403 with serviceErrors from #{url}, which is not Apple's sign-in" do
+        forbidden = stub_request(:get, url).
+                    to_return(status: 403, body: { "serviceErrors" => [{ "code" => "-1", "message" => "Forbidden" }] }.to_json, headers: { 'Content-Type' => 'application/json' })
+
+        expect do
+          subject.request(:get, url)
+        end.to raise_error(Spaceship::AccessForbiddenError)
+        expect(forbidden).to have_been_requested.times(5)
+      end
     end
 
     it "raises Spaceship::AccessForbiddenError" do
@@ -488,13 +565,20 @@ BODY
 
       expect do
         subject.do_sirp("user", "password", nil)
-      end.to raise_error(Spaceship::Client::UnexpectedResponse)
+      end.to raise_error(Spaceship::Client::UnexpectedResponse) { |error|
+        expect(error.preferred_error_info).to eq(["Apple provided the following error info:", "(-900007)"])
+      }
     end
   end
 
   describe "#log_response" do
     it 'handles ASCII-8BIT to UTF-8 encoding gracefully' do
       response = TestResponse.new([130, 5, 3120, 130, 4, 171, 160, 3, 2].pack('C*'))
+      expect(subject.send(:log_response, :get, TestClient.hostname, response)).to be_truthy
+    end
+
+    it 'handles a frozen response body' do
+      response = TestResponse.new("".freeze)
       expect(subject.send(:log_response, :get, TestClient.hostname, response)).to be_truthy
     end
   end
@@ -548,6 +632,73 @@ BODY
       allow(subject).to receive(:directory_accessible?).with(File.expand_path("/var/tmp")).and_return(false)
       allow(subject).to receive(:directory_accessible?).with(Dir.tmpdir).and_return(true)
       expect(subject.persistent_cookie_path).to eq("#{Dir.tmpdir}/spaceship/username/cookie")
+    end
+  end
+
+  describe "session cookie file permissions" do
+    let(:tmp_path) { Dir.mktmpdir }
+    let(:cookie_path) { File.join(tmp_path, "spaceship", "username", "cookie") }
+
+    around(:each) do |example|
+      old_umask = File.umask(0o022)
+      FastlaneSpec::Env.with_env_values("SPACESHIP_COOKIE_PATH" => tmp_path) { example.run }
+    ensure
+      File.umask(old_umask)
+      FileUtils.rm_rf(tmp_path)
+    end
+
+    before do
+      subject.user = "username"
+    end
+
+    def mode_of(path)
+      File.stat(path).mode & 0o777
+    end
+
+    def write_cookie_readable_by_all
+      FileUtils.mkdir_p(File.dirname(cookie_path), mode: 0o755)
+      HTTP::CookieJar.new.save(cookie_path, :yaml, session: true)
+      File.chmod(0o755, File.dirname(cookie_path))
+      File.chmod(0o644, cookie_path)
+    end
+
+    it "saves a new cookie readable by its owner only" do
+      subject.store_cookie
+
+      expect(mode_of(cookie_path)).to eq(0o600) unless FastlaneCore::Helper.windows?
+      expect(mode_of(File.dirname(cookie_path))).to eq(0o700) unless FastlaneCore::Helper.windows?
+    end
+
+    it "restricts an existing cookie when saving it again" do
+      write_cookie_readable_by_all
+
+      subject.store_cookie
+
+      expect(mode_of(cookie_path)).to eq(0o600) unless FastlaneCore::Helper.windows?
+      expect(mode_of(File.dirname(cookie_path))).to eq(0o700) unless FastlaneCore::Helper.windows?
+    end
+
+    it "restricts an existing cookie when loading it" do
+      write_cookie_readable_by_all
+
+      expect(subject.load_session_from_file).to be(true)
+
+      expect(mode_of(cookie_path)).to eq(0o600) unless FastlaneCore::Helper.windows?
+      expect(mode_of(File.dirname(cookie_path))).to eq(0o700) unless FastlaneCore::Helper.windows?
+    end
+
+    it "saves the cookie readable by its owner only in the Dir.tmpdir fallback" do
+      FastlaneSpec::Env.with_env_values("SPACESHIP_COOKIE_PATH" => nil) do
+        allow(subject).to receive(:fastlane_user_dir).and_return(File.join(tmp_path, "home", ".fastlane"))
+        allow(subject).to receive(:directory_accessible?).and_return(false)
+        allow(Dir).to receive(:tmpdir).and_return(tmp_path)
+        allow(subject).to receive(:directory_accessible?).with(tmp_path).and_return(true)
+
+        subject.store_cookie
+
+        expect(mode_of(cookie_path)).to eq(0o600) unless FastlaneCore::Helper.windows?
+        expect(mode_of(File.dirname(cookie_path))).to eq(0o700) unless FastlaneCore::Helper.windows?
+      end
     end
   end
 end

@@ -18,7 +18,7 @@ module Fastlane
     end
 
     def self.generate_action(name)
-      template = File.read("#{Fastlane::ROOT}/lib/assets/custom_action_template.rb")
+      template = File.read("#{Fastlane::ROOT}/lib/assets/custom_action_template.rb.template")
       template.gsub!('[[NAME]]', name)
       template.gsub!('[[NAME_UP]]', name.upcase)
       template.gsub!('[[NAME_CLASS]]', name.fastlane_class + 'Action')

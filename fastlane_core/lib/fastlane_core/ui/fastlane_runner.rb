@@ -42,7 +42,6 @@ module Commander
     #  This is raising OptionParser::MissingArgument error because `--env` takes a string argument.
     #  A command of `-e --verbose` works because `--verbose` is seen as the argument.
     #  A command of `--verbose -e` doesn't work because no argument after `-e` so MissingArgument is raised again.
-    #  This broke somewhere between Ruby 2.5 and Ruby 2.6
     #
     # Solution:
     #  Proper solution is to set `parser.require_exact = true` but this only available on `optparse` version 0.1.1
@@ -92,10 +91,12 @@ module Commander
       remove_global_options(options, @args)
 
       xcode_outdated = false
+      xcode_support_ending = false
       begin
         unless FastlaneCore::Helper.xcode_at_least?(Fastlane::MINIMUM_XCODE_RELEASE)
           xcode_outdated = true
         end
+        xcode_support_ending = !FastlaneCore::Helper.xcode_at_least?(Fastlane::SUGGESTED_MINIMUM_XCODE_RELEASE)
       rescue
         # We don't care about exceptions here
         # We'll land here if the user doesn't have Xcode at all for example
@@ -107,6 +108,10 @@ module Commander
         if xcode_outdated
           # We have to raise that error within this `begin` block to show a nice user error without a stack trace
           FastlaneCore::UI.user_error!("fastlane requires a minimum version of Xcode #{Fastlane::MINIMUM_XCODE_RELEASE}, please upgrade and make sure to use `sudo xcode-select -s /Applications/Xcode.app`")
+        end
+
+        if xcode_support_ending && !FastlaneCore::Env.truthy?("FASTLANE_SKIP_XCODE_VERSION_WARNING")
+          FastlaneCore::UI.important("WARNING: Support for your Xcode version (#{FastlaneCore::Helper.xcode_version}) is going away. fastlane will soon require Xcode #{Fastlane::SUGGESTED_MINIMUM_XCODE_RELEASE} or newer.")
         end
 
         is_swift = FastlaneCore::FastlaneFolder.swift?
@@ -221,9 +226,8 @@ module Commander
     end
 
     def handle_tls_error!(e)
-      # Apple has upgraded its App Store Connect servers to require TLS 1.2, but
-      # system Ruby 2.0 does not support it. We want to suggest that users upgrade
-      # their Ruby version
+      # Apple's App Store Connect servers require TLS 1.2. We want to suggest that users
+      # reinstall their Ruby
       suggest_ruby_reinstall(e)
       display_user_error!(e, e.to_s)
     end
@@ -265,11 +269,11 @@ module Commander
       ui.error("- If you use system Ruby:")
       ui.error("  - Run `brew update && brew install ruby`")
       ui.error("- If you use rbenv with ruby-build:")
-      ui.error("  - Run `brew update && brew upgrade ruby-build && rbenv install 2.3.1`")
-      ui.error("  - Run `rbenv global 2.3.1` to make it the new global default Ruby version")
+      ui.error("  - Run `brew update && brew upgrade ruby-build && rbenv install #{Fastlane::SUGGESTED_MINIMUM_RUBY}`")
+      ui.error("  - Run `rbenv global #{Fastlane::SUGGESTED_MINIMUM_RUBY}` to make it the new global default Ruby version")
       ui.error("- If you use rvm:")
       ui.error("  - First run `rvm osx-ssl-certs update all`")
-      ui.error("  - Then run `rvm reinstall ruby-2.3.1 --with-openssl-dir=/usr/local`")
+      ui.error("  - Then run `rvm reinstall ruby-#{Fastlane::SUGGESTED_MINIMUM_RUBY}`")
       ui.error("")
       ui.error("If that doesn't fix your issue, please google for the following error message:")
       ui.error("  '#{e}'")

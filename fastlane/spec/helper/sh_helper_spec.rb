@@ -6,6 +6,25 @@ describe Fastlane::Actions do
       allow(FastlaneCore::Helper).to receive(:sh_enabled?).and_return(true)
     end
 
+    context "with stdin" do
+      it "gives the data to the command and does not print it" do
+        allow(FastlaneCore::UI).to receive(:command)
+        allow(FastlaneCore::UI).to receive(:command_output)
+
+        expect(Fastlane::Actions.sh("cat", stdin: "user = \"EXAMPLE:SECRET\"\n")).to eq("user = \"EXAMPLE:SECRET\"\n")
+        expect(FastlaneCore::UI).to have_received(:command).with("cat")
+      end
+
+      it "does not block on large input" do
+        data = "x" * (1024 * 1024)
+        expect(Timeout.timeout(20) { Fastlane::Actions.sh("cat", stdin: data, log: false) }.length).to eq(data.length)
+      end
+
+      it "finishes when the command exits without reading its input" do
+        expect(Timeout.timeout(20) { Fastlane::Actions.sh("true", stdin: "x" * (1024 * 1024), log: false) }).to eq("")
+      end
+    end
+
     context "external commands are failed" do
       context "with error_callback" do
         it "doesn't raise shell_error" do

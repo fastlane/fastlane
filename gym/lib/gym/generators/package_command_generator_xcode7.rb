@@ -33,10 +33,10 @@ module Gym
         config = Gym.config
 
         options = []
-        options << "-exportOptionsPlist '#{config_path}'"
+        options << "-exportOptionsPlist #{config_path.shellescape}"
         options << "-archivePath #{BuildCommandGenerator.archive_path.shellescape}"
-        options << "-exportPath '#{temporary_output_path}'"
-        options << "-toolchain '#{config[:toolchain]}'" if config[:toolchain]
+        options << "-exportPath #{temporary_output_path.shellescape}"
+        options << "-toolchain #{config[:toolchain].shellescape}" if config[:toolchain]
         options << config[:export_xcargs] if config[:export_xcargs]
         options << config[:xcargs] if config[:xcargs]
 

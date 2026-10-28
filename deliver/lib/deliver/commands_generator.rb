@@ -133,7 +133,7 @@ module Deliver
           Deliver::Runner.new(options)
           html_path = Deliver::GenerateSummary.new.run(options)
           UI.success("Successfully generated HTML report at '#{html_path}'")
-          system("open '#{html_path}'") unless options[:force]
+          system("open", html_path) unless options[:force]
         end
       end
 

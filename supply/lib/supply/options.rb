@@ -108,6 +108,7 @@ module Supply
                                      conflicting_options: [:issuer, :key, :json_key],
                                      optional: true,
                                      description: "The raw content of a Google credentials JSON file (Application Default, Workload Identity, or Service Account), used to authenticate with Google",
+                                     sensitive: true,
                                      code_gen_sensitive: true,
                                      default_value: CredentialsManager::AppfileConfig.try_fetch_value(:json_key_data_raw),
                                      default_value_dynamic: true,

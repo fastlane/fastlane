@@ -88,7 +88,6 @@ module Produce
     end
 
     # rubocop:disable Metrics/PerceivedComplexity
-    # rubocop:disable Require/MissingRequireStatement
     def update(on, options)
       updated = valid_services_for(options).count
 

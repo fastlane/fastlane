@@ -464,6 +464,22 @@ describe FastlaneCore do
         device.disable_slide_to_type
       end
 
+      it "passes the preferences plist as one argument when the home directory contains a space" do
+        device = FastlaneCore::DeviceManager::Device.new(udid: "3E67398C-AF70-4D77-A22C-D43AA8623FE3", os_type: "iOS", os_version: "13.0", is_simulator: true)
+        allow(UI).to receive(:message)
+
+        # Absolute on every platform: on Windows "/Users/Jane Doe" has no drive and Ruby refuses it as a home
+        FastlaneSpec::Env.with_env_values('HOME' => File.join(Dir.tmpdir, 'Jane Doe')) do
+          plist_path = File.expand_path("~/Library/Developer/CoreSimulator/Devices/3E67398C-AF70-4D77-A22C-D43AA8623FE3/data/Library/Preferences/com.apple.keyboard.ContinuousPath.plist")
+          expect(plist_path).to include("Jane Doe")
+          expect(FastlaneCore::Helper).to receive(:backticks) do |command|
+            expect(Shellwords.split(command)).to eq(["/usr/libexec/PlistBuddy", "-c", "Add :KeyboardContinuousPathEnabled bool false", plist_path, ">/dev/null", "2>&1"])
+          end
+
+          device.disable_slide_to_type
+        end
+      end
+
       it "bypass slide to type disabling if less than iOS 13.0" do
         device = FastlaneCore::DeviceManager::Device.new(os_type: "iOS", os_version: "12.4", is_simulator: true)
 
