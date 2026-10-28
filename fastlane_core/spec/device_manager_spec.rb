@@ -505,11 +505,23 @@ describe FastlaneCore do
       end
 
       it "boots the simulator" do
-        device = FastlaneCore::DeviceManager::Device.new(os_type: "iOS", os_version: "13.0", is_simulator: true, state: nil)
+        device = FastlaneCore::DeviceManager::Device.new(udid: "1234", os_type: "iOS", os_version: "13.0", is_simulator: true, state: nil)
+        status = double('status', "success?": true)
+        expect(Open3).to receive(:capture2e).with("xcrun simctl bootstatus 1234 -b").and_return(["Finished", status])
 
         device.boot
 
         expect(device.state).to eq('Booted')
+      end
+
+      it "warns when the simulator fails to boot" do
+        device = FastlaneCore::DeviceManager::Device.new(name: "iPhone 17", udid: "1234", os_type: "iOS", os_version: "13.0", is_simulator: true, state: "Shutdown")
+        status = double('status', "success?": false)
+        expect(Open3).to receive(:capture2e).with("xcrun simctl bootstatus 1234 -b").and_return(["Invalid device: 1234\n", status])
+
+        expect(UI).to receive(:important).with("Unable to boot iPhone 17: Invalid device: 1234")
+
+        device.boot
       end
     end
   end
