@@ -1094,23 +1094,23 @@ describe FastlaneCore do
           end
 
           describe "upload command generation" do
-            it 'generates a call to xcrun iTMSTransporter' do
+            it 'generates a call to the shell script' do
               transporter = FastlaneCore::ItunesTransporter.new(email, password, false)
-              expect(transporter.upload('my.app.id', tmp_dir)).to eq(java_upload_command(classpath: false))
+              expect(transporter.upload('my.app.id', tmp_dir)).to eq(shell_upload_command)
             end
           end
 
           describe "verify command generation" do
-            it 'generates a call to xcrun iTMSTransporter' do
+            it 'generates a call to the shell script' do
               transporter = FastlaneCore::ItunesTransporter.new(email, password, false)
-              expect(transporter.verify('my.app.id', tmp_dir)).to eq(java_verify_command(classpath: false))
+              expect(transporter.verify('my.app.id', tmp_dir)).to eq(shell_verify_command)
             end
           end
 
           describe "download command generation" do
-            it 'generates a call to xcrun iTMSTransporter' do
+            it 'generates a call to the shell script' do
               transporter = FastlaneCore::ItunesTransporter.new(email, password, false)
-              expect(transporter.download('my.app.id', tmp_dir)).to eq(java_download_command(classpath: false))
+              expect(transporter.download('my.app.id', tmp_dir)).to eq(shell_download_command)
             end
           end
         end
@@ -1263,9 +1263,9 @@ describe FastlaneCore do
             stub_const('ENV', { 'FASTLANE_ITUNES_TRANSPORTER_PATH' => tmp_dir })
           end
           context "upload command generation" do
-            it 'generates a call to xcrun iTMSTransporter instead altool' do
+            it 'generates a call to the shell script instead of altool' do
               transporter = FastlaneCore::ItunesTransporter.new(email, password, false, 'abcd123', altool_compatible_command: true)
-              expect(transporter.upload('my.app.id', tmp_dir, platform: "osx")).to eq(java_upload_command(provider_short_name: 'abcd123', classpath: false))
+              expect(transporter.upload('my.app.id', tmp_dir, platform: "osx")).to eq(shell_upload_command(provider_short_name: 'abcd123'))
             end
           end
         end

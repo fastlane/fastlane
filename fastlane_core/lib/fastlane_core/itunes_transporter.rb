@@ -771,6 +771,8 @@ module FastlaneCore
       use_shell_script ||= Helper.is_mac? && Helper.xcode_version.start_with?('6.')
       use_shell_script ||= Helper.windows?
       use_shell_script ||= Feature.enabled?('FASTLANE_ITUNES_TRANSPORTER_USE_SHELL_SCRIPT')
+      # Transporter 2.0 and later bundles a Java that refuses the direct Java invocation; its own launcher works. See #15323.
+      use_shell_script ||= Helper.user_defined_itms_path?
 
       if jwt.to_s.empty? && api_key.nil?
         @user = user
