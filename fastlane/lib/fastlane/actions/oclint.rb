@@ -37,16 +37,16 @@ module Fastlane
         exclude_regex = ensure_regex_is_not_string!(exclude_regex)
 
         files = JSON.parse(File.read(compile_commands)).map do |compile_command|
-          file = compile_command['file']
+          # Paths taken from xcodebuild's output escape spaces with a backslash
+          file = compile_command['file'].gsub('\ ', ' ')
           File.exist?(file) ? file : File.join(compile_command['directory'], file)
         end
 
         files.uniq!
         files.select! do |file|
-          file_ruby = file.gsub('\ ', ' ')
-          File.exist?(file_ruby) and
-            (!select_regex or file_ruby =~ select_regex) and
-            (!exclude_regex or file_ruby !~ exclude_regex)
+          File.exist?(file) and
+            (!select_regex or file =~ select_regex) and
+            (!exclude_regex or file !~ exclude_regex)
         end
 
         command_prefix = [
@@ -58,7 +58,7 @@ module Fastlane
         report_type = params[:report_type]
         report_path = params[:report_path] ? params[:report_path] : 'oclint_report.' + report_type
 
-        oclint_args = ["-report-type=#{report_type}", "-o=#{report_path}"]
+        oclint_args = ["-report-type=#{report_type}", "-o=#{report_path.shellescape}"]
 
         oclint_args << "-list-enabled-rules" if params[:list_enabled_rules]
 
@@ -85,9 +85,9 @@ module Fastlane
 
         command = [
           command_prefix,
-          oclint_path,
+          oclint_path.shellescape,
           oclint_args,
-          '"' + files.join('" "') + '"'
+          files.shelljoin
         ].join(' ')
 
         Actions.lane_context[SharedValues::FL_OCLINT_REPORT_PATH] = File.expand_path(report_path)

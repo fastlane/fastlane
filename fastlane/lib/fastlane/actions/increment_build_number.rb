@@ -37,7 +37,7 @@ module Fastlane
         command = [
           command_prefix,
           'agvtool',
-          params[:build_number] ? "new-version#{mode} #{params[:build_number].to_s.strip}" : "next-version#{mode}",
+          params[:build_number] ? "new-version#{mode} #{params[:build_number].to_s.strip.shellescape}" : "next-version#{mode}",
           command_suffix
         ].join(' ')
 

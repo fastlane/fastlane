@@ -8,12 +8,13 @@ module Fastlane
     # When running this in tests, it will return the actual command instead of executing it
     # @param log [Boolean] should fastlane print out the executed command
     # @param error_callback [Block] a callback invoked with the command output if there is a non-zero exit status
-    def self.sh(*command, log: true, error_callback: nil, &b)
-      sh_control_output(*command, print_command: log, print_command_output: log, error_callback: error_callback, &b)
+    # @param stdin [String] data written to the command's standard input, which is then closed; it is never printed
+    def self.sh(*command, log: true, error_callback: nil, stdin: nil, &b)
+      sh_control_output(*command, print_command: log, print_command_output: log, error_callback: error_callback, stdin: stdin, &b)
     end
 
-    def self.sh_no_action(*command, log: true, error_callback: nil, &b)
-      sh_control_output(*command, print_command: log, print_command_output: log, error_callback: error_callback, &b)
+    def self.sh_no_action(*command, log: true, error_callback: nil, stdin: nil, &b)
+      sh_control_output(*command, print_command: log, print_command_output: log, error_callback: error_callback, stdin: stdin, &b)
     end
 
     # @param command The command to be executed (variadic)
@@ -25,7 +26,7 @@ module Fastlane
     # @yieldparam [String] result The complete output to stdout and stderr of the completed command
     # @yieldparam [String] cmd A shell command equivalent to the arguments passed
     # rubocop: disable Metrics/PerceivedComplexity
-    def self.sh_control_output(*command, print_command: true, print_command_output: true, error_callback: nil)
+    def self.sh_control_output(*command, print_command: true, print_command_output: true, error_callback: nil, stdin: nil)
       print_command = print_command_output = true if $troubleshoot
       # Set the encoding first, the user might have set it wrong
       previous_encoding = [Encoding.default_external, Encoding.default_internal]
@@ -52,7 +53,15 @@ module Fastlane
         # sh "ls", "-la", "/Applications/Xcode 7.3.1.app"
         # sh({ "FOO" => "Hello" }, "echo $FOO")
         sanitized_output = false
-        Open3.popen2e(*command) do |stdin, io, thread|
+        Open3.popen2e(*command) do |command_stdin, io, thread|
+          # From a thread, so a command that writes a lot before reading its input cannot block on a full pipe
+          writer = stdin && Thread.new do
+            command_stdin.write(stdin)
+          rescue Errno::EPIPE
+            # The command exited without reading all of it; its exit status says what happened
+          ensure
+            command_stdin.close
+          end
           io.sync = true
           io.each do |line|
             if print_command_output
@@ -64,6 +73,7 @@ module Fastlane
             result << line
           end
           exit_status = thread.value
+          writer&.join
         end
 
         UI.important("Command output wasn't valid UTF-8 and was sanitized. Please report the issue.") if sanitized_output

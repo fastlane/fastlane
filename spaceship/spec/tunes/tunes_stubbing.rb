@@ -11,20 +11,8 @@ class TunesStubbing
     end
 
     def itc_stub_login
-      # Retrieving the current login URL
-      itc_service_key_path = File.expand_path("~/Library/Caches/spaceship_itc_service_key.txt")
-      File.delete(itc_service_key_path) if File.exist?(itc_service_key_path)
-
-      stub_request(:get, 'https://appstoreconnect.apple.com/itc/static-resources/controllers/_cntrl.js').
-        to_return(status: 200, body: itc_read_fixture_file('login_cntrl.js'))
-      stub_request(:get, "https://appstoreconnect.apple.com/WebObjects/iTunesConnect.woa").
-        to_return(status: 200, body: "")
-      stub_request(:get, "https://appstoreconnect.apple.com/WebObjects/iTunesConnect.woa/wa").
-        to_return(status: 200, body: "")
       stub_request(:get, "https://appstoreconnect.apple.com/olympus/v1/session").
         to_return(status: 200, body: itc_read_fixture_file('olympus_session.json'), headers: { 'Content-Type' => 'application/json' })
-      stub_request(:get, "https://appstoreconnect.apple.com/olympus/v1/app/config?hostname=itunesconnect.apple.com").
-        to_return(status: 200, body: { authServiceKey: 'e0abc' }.to_json, headers: { 'Content-Type' => 'application/json' })
       stub_request(:post, "https://appstoreconnect.apple.com/olympus/v1/session").
         with(body: "{\"provider\":{\"providerId\":5678}}",
               headers: { 'Content-Type' => 'application/json', 'X-Requested-With' => 'olympus-ui' }).
@@ -33,9 +21,6 @@ class TunesStubbing
       # Actual login
       stub_request(:get, "https://idmsa.apple.com/appleauth/auth/signin?widgetKey=e0abc").
         to_return(status: 200, body: '', headers: { 'x-apple-hc-bits' => "12", 'x-apple-hc-challenge' => "f8b58554b2f22960fc0dc99aea342276" })
-      stub_request(:post, "https://idmsa.apple.com/appleauth/auth/signin").
-        with(body: { "accountName" => "spaceship@krausefx.com", "password" => "so_secret", "rememberMe" => true }.to_json).
-        to_return(status: 200, body: '{}', headers: { 'Set-Cookie' => "myacinfo=abcdef;" })
 
       # SIRP login
       stub_request(:post, "https://idmsa.apple.com/appleauth/auth/signin/init").
@@ -64,11 +49,6 @@ class TunesStubbing
           "BHKAnOh6Tjwp7ZaF63ch3Ie6v629nmXnXV31VUe8/5hxHd6ue44ebb9Snpb3yqS4MLQ1dc3cUs68OflS" \
           "L4XL8zrDXuWfZvSBCcEvu3jQ==\",\"accountName\":\"bad-username\",\"protocols\":[\"s2k\",\"s2k_fo\"]}"
         ).
-        to_return(status: 401, body: '{}', headers: { 'Set-Cookie' => 'session=invalid' })
-
-      # Failed login attempts
-      stub_request(:post, "https://idmsa.apple.com/appleauth/auth/signin").
-        with(body: { "accountName" => "bad-username", "password" => "bad-password", "rememberMe" => true }.to_json).
         to_return(status: 401, body: '{}', headers: { 'Set-Cookie' => 'session=invalid' })
 
       # 2FA: Request security code to trusted phone
@@ -110,14 +90,6 @@ class TunesStubbing
     end
 
     def itc_stub_applications
-      stub_request(:get, "https://appstoreconnect.apple.com/WebObjects/iTunesConnect.woa/ra/apps/manageyourapps/summary/v2").
-        to_return(status: 200, body: itc_read_fixture_file('app_summary.json'), headers: { 'Content-Type' => 'application/json' })
-
-      # Create Version stubbing
-      stub_request(:post, "https://appstoreconnect.apple.com/WebObjects/iTunesConnect.woa/ra/apps/version/create/1013943394").
-        with(body: "{\"version\":\"0.1\"}").
-        to_return(status: 200, body: itc_read_fixture_file('create_version_success.json'), headers: { 'Content-Type' => 'application/json' })
-
       # Create Application
       # Pre-Fill request
       stub_request(:get, "https://appstoreconnect.apple.com/WebObjects/iTunesConnect.woa/ra/apps/create/v2/?platformString=ios").
@@ -128,9 +100,6 @@ class TunesStubbing
         to_return(status: 200, body: itc_read_fixture_file('create_application_success.json'), headers: { 'Content-Type' => 'application/json' })
 
       # Overview of application to get the versions
-      stub_request(:get, "https://appstoreconnect.apple.com/WebObjects/iTunesConnect.woa/ra/apps/1013943394/overview").
-        to_return(status: 200, body: itc_read_fixture_file('app_overview.json'), headers: { 'Content-Type' => 'application/json' })
-
       stub_request(:get, "https://appstoreconnect.apple.com/WebObjects/iTunesConnect.woa/ra/apps/898536088/overview").
         to_return(status: 200, body: itc_read_fixture_file('app_overview.json'), headers: { 'Content-Type' => 'application/json' })
 
@@ -144,9 +113,6 @@ class TunesStubbing
       # Versions History
       stub_request(:get, "https://appstoreconnect.apple.com/WebObjects/iTunesConnect.woa/ra/apps/898536088/stateHistory?platform=ios").
         to_return(status: 200, body: itc_read_fixture_file('app_versions_history.json'), headers: { 'Content-Type' => 'application/json' })
-
-      stub_request(:get, "https://appstoreconnect.apple.com/WebObjects/iTunesConnect.woa/ra/apps/898536088/versions/814624685/stateHistory?platform=ios").
-        to_return(status: 200, body: itc_read_fixture_file('app_version_states_history.json'), headers: { 'Content-Type' => 'application/json' })
     end
 
     def itc_stub_ratings
@@ -161,15 +127,6 @@ class TunesStubbing
 
       stub_request(:get, "https://appstoreconnect.apple.com/WebObjects/iTunesConnect.woa/ra/apps/898536088/platforms/ios/reviews?index=0&sort=REVIEW_SORT_ORDER_MOST_RECENT&versionId=1").
         to_return(status: 200, body: itc_read_fixture_file('review_by_version_id.json'), headers: { 'Content-Type' => 'application/json' })
-    end
-
-    def itc_stub_build_details
-      stub_request(:get, "https://appstoreconnect.apple.com/WebObjects/iTunesConnect.woa/ra/apps/898536088/buildHistory?platform=ios").
-        to_return(status: 200, body: itc_read_fixture_file('build_history.json'), headers: { 'Content-Type' => 'application/json' })
-      stub_request(:get, "https://appstoreconnect.apple.com/WebObjects/iTunesConnect.woa/ra/apps/898536088/trains/2.0.1/buildHistory?platform=ios").
-        to_return(status: 200, body: itc_read_fixture_file('build_history_for_train.json'), headers: { 'Content-Type' => 'application/json' })
-      stub_request(:get, "https://appstoreconnect.apple.com/WebObjects/iTunesConnect.woa/ra/apps/898536088/platforms/ios/trains/2.0.1/builds/4/details").
-        to_return(status: 200, body: itc_read_fixture_file('build_details.json'), headers: { 'Content-Type' => 'application/json' })
     end
 
     def itc_stub_candidate_builds
@@ -243,62 +200,12 @@ class TunesStubbing
 
     def itc_stub_resolution_center
       # Called from the specs to simulate invalid server responses
-      stub_request(:get, "https://appstoreconnect.apple.com/WebObjects/iTunesConnect.woa/ra/apps/898536088/resolutionCenter?v=latest").
-        to_return(status: 200, body: itc_read_fixture_file('app_resolution_center.json'), headers: { 'Content-Type' => 'application/json' })
-
       stub_request(:get, "https://appstoreconnect.apple.com/WebObjects/iTunesConnect.woa/ra/apps/898536088/platforms/ios/resolutionCenter?v=latest").
         to_return(status: 200, body: itc_read_fixture_file('app_resolution_center.json'), headers: { 'Content-Type' => 'application/json' })
     end
 
-    def itc_stub_build_trains
-      %w(internal external).each do |type|
-        stub_request(:get, "https://appstoreconnect.apple.com/WebObjects/iTunesConnect.woa/ra/apps/898536088/trains/?platform=ios&testingType=#{type}").
-          to_return(status: 200, body: itc_read_fixture_file('build_trains.json'), headers: { 'Content-Type' => 'application/json' })
-
-        stub_request(:get, "https://appstoreconnect.apple.com/WebObjects/iTunesConnect.woa/ra/apps/898536088/trains/?platform=appletvos&testingType=#{type}").
-          to_return(status: 200, body: itc_read_fixture_file('build_trains.json'), headers: { 'Content-Type' => 'application/json' })
-
-        stub_request(:get, "https://appstoreconnect.apple.com/WebObjects/iTunesConnect.woa/ra/apps/898536088/trains/?testingType=#{type}").
-          to_return(status: 200, body: itc_read_fixture_file('build_trains.json'), headers: { 'Content-Type' => 'application/json' })
-
-        # Update build trains
-        stub_request(:post, "https://appstoreconnect.apple.com/WebObjects/iTunesConnect.woa/ra/apps/898536088/testingTypes/#{type}/trains/").
-          to_return(status: 200, body: itc_read_fixture_file('build_trains.json'), headers: { 'Content-Type' => 'application/json' })
-      end
-    end
-
-    def itc_stub_testers
-      stub_request(:get, "https://appstoreconnect.apple.com/WebObjects/iTunesConnect.woa/ra/users/pre/int").
-        to_return(status: 200, body: itc_read_fixture_file('testers/get_internal.json'), headers: { 'Content-Type' => 'application/json' })
-      stub_request(:get, "https://appstoreconnect.apple.com/WebObjects/iTunesConnect.woa/ra/users/pre/ext").
-        to_return(status: 200, body: itc_read_fixture_file('testers/get_external.json'), headers: { 'Content-Type' => 'application/json' })
-      stub_request(:get, "https://appstoreconnect.apple.com/WebObjects/iTunesConnect.woa/ra/user/internalTesters/898536088/").
-        to_return(status: 200, body: itc_read_fixture_file('testers/existing_internal_testers.json'), headers: { 'Content-Type' => 'application/json' })
-
-      # Creating new testers is stubbed in `testers_spec.rb`
-    end
-
-    def itc_stub_testflight
-      %w(appletvos ios).each do |type|
-        # Test information
-        stub_request(:get, "https://appstoreconnect.apple.com/WebObjects/iTunesConnect.woa/ra/apps/898536088/platforms/#{type}/trains/1.0/builds/10/testInformation").
-          to_return(status: 200, body: itc_read_fixture_file("testflight_build_info_#{type}.json"), headers: { 'Content-Type' => 'application/json' })
-
-        # Reject review
-        stub_request(:post, "https://appstoreconnect.apple.com/WebObjects/iTunesConnect.woa/ra/apps/898536088/platforms/#{type}/trains/1.0/builds/10/reject").
-          with(body: "{}").
-          to_return(status: 200, body: "{}", headers: { 'Content-Type' => 'application/json' })
-
-        # Submission
-        stub_request(:post, "https://appstoreconnect.apple.com/WebObjects/iTunesConnect.woa/ra/apps/898536088/platforms/#{type}/trains/1.0/builds/10/review/submit").
-          to_return(status: 200, body: itc_read_fixture_file("testflight_submission_submit_#{type}.json"), headers: { 'Content-Type' => 'application/json' })
-      end
-    end
-
     def itc_stub_resolution_center_valid
       # Called from the specs to simulate valid server responses
-      stub_request(:get, "https://appstoreconnect.apple.com/WebObjects/iTunesConnect.woa/ra/apps/898536088/resolutionCenter?v=latest").
-        to_return(status: 200, body: itc_read_fixture_file('app_resolution_center_valid.json'), headers: { 'Content-Type' => 'application/json' })
       stub_request(:get, "https://appstoreconnect.apple.com/WebObjects/iTunesConnect.woa/ra/apps/898536088/platforms/ios/resolutionCenter?v=latest").
         to_return(status: 200, body: itc_read_fixture_file('app_resolution_center_valid.json'), headers: { 'Content-Type' => 'application/json' })
     end
@@ -326,12 +233,6 @@ class TunesStubbing
     def itc_stub_app_version_ref
       stub_request(:get, "https://appstoreconnect.apple.com/WebObjects/iTunesConnect.woa/ra/apps/version/ref").
         to_return(status: 200, body: itc_read_fixture_file("app_version_ref.json"),
-                  headers: { "Content-Type" => "application/json" })
-    end
-
-    def itc_stub_user_detail
-      stub_request(:get, "https://appstoreconnect.apple.com/WebObjects/iTunesConnect.woa/ra/user/detail").
-        to_return(status: 200, body: itc_read_fixture_file("user_detail.json"),
                   headers: { "Content-Type" => "application/json" })
     end
 
@@ -396,9 +297,6 @@ class TunesStubbing
 
     def itc_stub_iap
       # pricing goal calculator
-      stub_request(:get, "https://appstoreconnect.apple.com/WebObjects/iTunesConnect.woa/ra/apps/898536088/iaps/1195137656/pricing/equalize/EUR/1").
-        to_return(status: 200, body: itc_read_fixture_file("iap_price_goal_calc.json"),
-                 headers: { "Content-Type" => "application/json" })
       stub_request(:get, "https://appstoreconnect.apple.com/WebObjects/iTunesConnect.woa/ra/apps/898536088/iaps/1195137657/pricing/equalize/EUR/1").
         to_return(status: 200, body: itc_read_fixture_file("iap_price_goal_calc.json"),
                  headers: { "Content-Type" => "application/json" })
@@ -439,11 +337,6 @@ class TunesStubbing
       stub_request(:get, "https://appstoreconnect.apple.com/WebObjects/iTunesConnect.woa/ra/apps/898536088/iaps/recurring/template").
         to_return(status: 200, body: itc_read_fixture_file("iap_recurring_template.json"),
                   headers: { "Content-Type" => "application/json" })
-      # iap edit family
-      stub_request(:put, "https://appstoreconnect.apple.com/WebObjects/iTunesConnect.woa/ra/apps/898536088/iaps/family/20373395/").
-        with(body: itc_read_fixture_file("iap_family_edit_versions.json")).
-        to_return(status: 200, body: itc_read_fixture_file("iap_family_detail.json"),
-                    headers: { "Content-Type" => "application/json" })
 
       # iap edit family
       stub_request(:put, "https://appstoreconnect.apple.com/WebObjects/iTunesConnect.woa/ra/apps/898536088/iaps/family/20373395/").
@@ -469,17 +362,6 @@ class TunesStubbing
       stub_request(:get, "https://appstoreconnect.apple.com/WebObjects/iTunesConnect.woa/ra/apps/898536088/iaps/family/template").
         to_return(status: 200, body: itc_read_fixture_file("iap_family_template.json"),
                  headers: { "Content-Type" => "application/json" })
-
-      # update IAP
-      stub_request(:put, "https://appstoreconnect.apple.com/WebObjects/iTunesConnect.woa/ra/apps/898536088/iaps/1195137656").
-        with(body: JSON.parse(itc_read_fixture_file("iap_update.json"))).
-        to_return(status: 200, body: itc_read_fixture_file("iap_detail.json"),
-                  headers: { "Content-Type" => "application/json" })
-      # update IAP recurring
-      stub_request(:put, "https://appstoreconnect.apple.com/WebObjects/iTunesConnect.woa/ra/apps/898536088/iaps/1195137657").
-        with(body: JSON.parse(itc_read_fixture_file("iap_update_recurring.json"))).
-        to_return(status: 200, body: itc_read_fixture_file("iap_detail_recurring.json"),
-                  headers: { "Content-Type" => "application/json" })
 
       # iap details
       stub_request(:get, "https://appstoreconnect.apple.com/WebObjects/iTunesConnect.woa/ra/apps/898536088/iaps/1194457865").
@@ -508,12 +390,6 @@ class TunesStubbing
       # iap recurring product pricing
       stub_request(:get, "https://appstoreconnect.apple.com/WebObjects/iTunesConnect.woa/ra/apps/898536088/iaps/1195137657/pricing").
         to_return(status: 200, body: itc_read_fixture_file("iap_pricing_recurring.json"),
-                  headers: { "Content-Type" => "application/json" })
-    end
-
-    def itc_stub_reject_version_success
-      stub_request(:post, "https://appstoreconnect.apple.com/WebObjects/iTunesConnect.woa/ra/apps/898536088/versions/812106519/reject").
-        to_return(status: 200, body: itc_read_fixture_file("reject_app_version_success.json"),
                   headers: { "Content-Type" => "application/json" })
     end
 
@@ -584,10 +460,6 @@ class TunesStubbing
     end
 
     def itc_stub_members
-      # resend notification
-      stub_request(:post, "https://appstoreconnect.apple.com/WebObjects/iTunesConnect.woa/ra/users/itc/helmut@januschka.com/resendInvitation").
-        to_return(status: 200, body: "", headers: {})
-
       # create member default (admin, all-apps)
       stub_request(:post, "https://appstoreconnect.apple.com/WebObjects/iTunesConnect.woa/ra/users/itc/create").
         with(body: JSON.parse(itc_read_fixture_file("member_create.json"))).

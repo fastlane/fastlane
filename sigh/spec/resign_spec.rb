@@ -33,6 +33,47 @@ describe Sigh do
       expect(provisioning_options).to eq("-p #{tmp_path}/folder/mobile.mobileprovision")
     end
 
+    describe "version options" do
+      def resign_command(version: nil, short_version: nil, bundle_version: nil)
+        command = nil
+        allow(@resign).to receive(:find_signing_identity).and_return(IDENTITY_1_SHA1)
+        allow(@resign).to receive(:validate_params)
+        allow(@resign).to receive(:puts)
+        allow(@resign).to receive(:`) do |cmd|
+          command = cmd
+          ""
+        end
+        @resign.resign("MyApp.ipa", IDENTITY_1_SHA1, ["MyApp.mobileprovision"], nil, version, nil, short_version, bundle_version, nil, nil, nil)
+        command
+      end
+
+      def shell_arguments(command)
+        `printf '%s\\n' #{command.delete_prefix(@resign.find_resign_path.shellescape)}`.split("\n")
+      end
+
+      ["2.0 (beta)", "1.0$HOME"].each do |value|
+        it "passes the version #{value} to resign.sh as one argument" do
+          command = resign_command(version: value)
+
+          expect(command).to include(" -n #{value.shellescape} ")
+          unless FastlaneCore::Helper.windows?
+            expect(shell_arguments(command).each_cons(2)).to include(["-n", value])
+          end
+        end
+
+        it "passes the short version and bundle version #{value} to resign.sh as one argument each" do
+          command = resign_command(short_version: value, bundle_version: value)
+
+          expect(command).to include(" --short-version #{value.shellescape} --bundle-version #{value.shellescape} ")
+          unless FastlaneCore::Helper.windows?
+            arguments = shell_arguments(command)
+            expect(arguments.each_cons(2)).to include(["--short-version", value])
+            expect(arguments.each_cons(2)).to include(["--bundle-version", value])
+          end
+        end
+      end
+    end
+
     it "Installed identities parser" do
       stub_request_valid_identities(@resign, VALID_IDENTITIES_OUTPUT)
       actualresult = @resign.installed_identities

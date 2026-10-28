@@ -1,7 +1,8 @@
 describe Match do
   describe Match::Storage::S3Storage do
     subject { described_class.new(s3_region: nil, s3_access_key: nil, s3_secret_access_key: nil, s3_session_token: nil, s3_bucket: 'foobar') }
-    let(:working_directory) { '/var/folders/px/abcdefghijklmnop/T/d20181026-96528-1av4gge' }
+    # Expanded as Storage.download_path does, which adds the drive letter on Windows
+    let(:working_directory) { File.expand_path('/var/folders/px/abcdefghijklmnop/T/d20181026-96528-1av4gge') }
 
     before do
       allow(subject).to receive(:working_directory).and_return(working_directory)
@@ -123,6 +124,14 @@ describe Match do
         end
 
         subject.download
+      end
+
+      it 'fails on a key that resolves outside the working directory once the prefix is stripped' do
+        allow(subject).to receive(:s3_object_prefix).and_return('123456/')
+        stub_bucket_content(objects: [instance_double('Aws::S3::Object', key: '123456/TEAMID1/../../outside.p12')])
+
+        expect(s3_client).not_to receive(:download_file)
+        expect { subject.download }.to raise_error(FastlaneCore::Interface::FastlaneError, /Refusing to download/)
       end
 
       it 'downloads only file-like objects and skips folder-like objects' do

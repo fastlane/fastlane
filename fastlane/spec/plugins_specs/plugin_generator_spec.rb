@@ -240,6 +240,7 @@ describe Fastlane::PluginGenerator do
 
         expect(gemspec.name).to eq(gem_name)
         expect(gemspec.author).to eq(author)
+        expect(gemspec.required_ruby_version).to eq(Gem::Requirement.new(">= #{Fastlane::MINIMUM_RUBY}"))
         expect(gemspec.version).to eq(Gem::Version.new('0.1.0'))
         expect(gemspec.email).to eq(email)
         expect(gemspec.summary).to eq(summary)
@@ -311,14 +312,15 @@ describe Fastlane::PluginGenerator do
 
       it "rubocop validations are passing" do
         # Actually run our generated spec as part of this spec #yodawg
-        plugin_sh('bundle exec rubocop')
-        expect($?.exitstatus).to eq(0)
+        output = plugin_sh('bundle exec rubocop 2>&1')
+        expect($?.exitstatus).to eq(0), output
+        expect(output).not_to include("instead of `require:")
       end
 
       it "`rake` runs both rspec and rubocop" do
         # Actually run our generated spec as part of this spec #yodawg
-        result = plugin_sh('bundle exec rake')
-        expect($?.exitstatus).to eq(0)
+        result = plugin_sh('bundle exec rake 2>&1')
+        expect($?.exitstatus).to eq(0), result
         expect(result).to include("no offenses detected") # rubocop
         expect(result).to include("example, 0 failures") # rspec
       end

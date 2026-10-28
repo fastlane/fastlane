@@ -1,3 +1,4 @@
+require 'ostruct'
 require 'spaceship/tunes/language_item'
 require 'spaceship/tunes/iap_list'
 require 'fastlane/markdown_table_formatter'

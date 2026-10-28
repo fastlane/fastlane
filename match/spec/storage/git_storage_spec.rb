@@ -2,6 +2,34 @@ require_relative 'git_storage_spec_helper'
 
 describe Match do
   describe Match::Storage::GitStorage do
+    describe '#generate_matchfile_content' do
+      let(:git_url) { "https://github.com/fastlane/fastlane" }
+
+      def matchfile_content(branch_input)
+        allow(FastlaneCore::UI.ui_object).to receive(:important)
+        allow(FastlaneCore::UI.ui_object).to receive(:input).and_return(git_url, branch_input)
+        described_class.new.generate_matchfile_content
+      end
+
+      it "records the branch so a new setup does not silently fall back to master" do
+        expect(matchfile_content("")).to eq("git_url(\"#{git_url}\")\ngit_branch(\"main\")")
+      end
+
+      it "keeps a branch typed by the user" do
+        expect(matchfile_content("certificates")).to include("git_branch(\"certificates\")")
+      end
+
+      it "treats a whitespace-only answer as blank" do
+        expect(matchfile_content("   ")).to include("git_branch(\"main\")")
+      end
+
+      it "trims whitespace around a branch name" do
+        expect(matchfile_content("  certificates  ")).to include("git_branch(\"certificates\")")
+      end
+    end
+  end
+
+  describe Match::Storage::GitStorage do
 
     let(:git_url) { "https://github.com/fastlane/fastlane/tree/master/certificates" }
     let(:git_branch) { "test" }
@@ -218,12 +246,41 @@ describe Match do
       end
 
       describe "when using a raw private key" do
-        it "wraps the git command in ssh-agent shell" do
-          expect(File).to receive(:file?).twice.and_return(false)
-          private_key = "-----BEGIN PRIVATE KEY-----\n-----END PRIVATE KEY-----\n"
-          clone_command = "ssh-agent bash -c 'ssh-add - <<< \"#{private_key}\"; git clone #{git_url.shellescape} #{@path.shellescape}'"
+        let(:private_key) { "-----BEGIN EXAMPLE KEY-----\nEXAMPLE_KEY_BODY\n-----END EXAMPLE KEY-----\n" }
 
-          expect_command_execution(clone_command)
+        def expect_ssh_add_to_receive_key(command)
+          expect(FastlaneCore::CommandExecutor).to receive(:execute).once.with({
+            command: "ssh-agent bash -c 'ssh-add - <<< \"$MATCH_SSH_ADD_PRIVATE_KEY\"; #{command}'",
+            print_all: nil,
+            print_command: nil
+          }) do
+            expect(ENV['MATCH_SSH_ADD_PRIVATE_KEY']).to eq(private_key)
+            ""
+          end
+        end
+
+        it "gives the key to ssh-add for git push from the environment, not from the command line" do
+          allow(File).to receive(:file?).and_return(false)
+          profile = File.join(@path, "profiles", "development", "Development_com.example.mobileprovision")
+          expected_commit_commands = [
+            "git --literal-pathspecs rm -- #{profile.shellescape}",
+            "git commit -m " + '[fastlane] Updated development and platform ios'.shellescape
+          ]
+          expect_command_execution(expected_commit_commands)
+          expect_ssh_add_to_receive_key("git push origin #{git_branch}")
+
+          storage = Match::Storage::GitStorage.new(
+            type: "development",
+            platform: "ios",
+            branch: git_branch,
+            git_private_key: private_key
+          )
+          storage.delete_files(files_to_delete: [profile])
+        end
+
+        it "gives the key to ssh-add for git clone from the environment, not from the command line" do
+          expect(File).to receive(:file?).twice.and_return(false)
+          expect_ssh_add_to_receive_key("git clone #{git_url.shellescape} #{@path.shellescape}")
           expect_command_execution(branch_checkout_commands(git_branch))
 
           storage = Match::Storage::GitStorage.new(
@@ -239,17 +296,62 @@ describe Match do
       end
     end
 
+    describe "#authorization header" do
+      let(:header) { "Authorization: Basic EXAMPLE_TOKEN_123" }
+
+      def expect_git_to_receive_header(command)
+        expect(FastlaneCore::CommandExecutor).to receive(:execute).once.with({
+          command: command,
+          print_all: nil,
+          print_command: nil
+        }) do
+          expect(`git config --get-all http.extraheader`).to include(header)
+          ""
+        end
+      end
+
+      it "gives the header to git clone through its environment, not its command line" do
+        expect_git_to_receive_header("git clone #{git_url.shellescape} #{@path.shellescape}")
+        expect_command_execution(branch_checkout_commands(git_branch))
+
+        storage = Match::Storage::GitStorage.new(
+          git_url: git_url,
+          branch: git_branch,
+          git_basic_authorization: "EXAMPLE_TOKEN_123"
+        )
+        storage.download
+      end
+
+      it "gives the header to git push through its environment, since it is no longer stored in the clone" do
+        profile = File.join(@path, "profiles", "development", "Development_com.example.mobileprovision")
+        expected_commit_commands = [
+          "git --literal-pathspecs rm -- #{profile.shellescape}",
+          "git commit -m " + '[fastlane] Updated development and platform ios'.shellescape
+        ]
+        expect_command_execution(expected_commit_commands)
+        expect_git_to_receive_header("git push origin #{git_branch}")
+
+        storage = Match::Storage::GitStorage.new(
+          type: "development",
+          platform: "ios",
+          branch: git_branch,
+          git_basic_authorization: "EXAMPLE_TOKEN_123"
+        )
+        storage.delete_files(files_to_delete: [profile])
+      end
+    end
+
     describe "#ssh-agent utilities" do
       describe "when using a raw private key" do
         it "wraps any given command in ssh-agent shell" do
           given_command = "any random command"
-          private_key = "-----BEGIN PRIVATE KEY-----\n-----END PRIVATE KEY-----\n"
+          private_key = "-----BEGIN EXAMPLE KEY-----\nEXAMPLE_KEY_BODY\n-----END EXAMPLE KEY-----\n"
 
           storage = Match::Storage::GitStorage.new(
             git_private_key: private_key
           )
 
-          expected_command = "ssh-agent bash -c 'ssh-add - <<< \"#{private_key}\"; #{given_command}'"
+          expected_command = "ssh-agent bash -c 'ssh-add - <<< \"$MATCH_SSH_ADD_PRIVATE_KEY\"; #{given_command}'"
           expect(storage.command_from_private_key(given_command)).to eq(expected_command)
         end
       end
@@ -263,7 +365,7 @@ describe Match do
             git_private_key: private_key
           )
 
-          expected_command = "ssh-agent bash -c 'ssh-add - <<< \"#{File.expand_path(private_key).shellescape}\"; #{given_command}'"
+          expected_command = "ssh-agent bash -c 'ssh-add - <<< \"$MATCH_SSH_ADD_PRIVATE_KEY\"; #{given_command}'"
           expect(storage.command_from_private_key(given_command)).to eq(expected_command)
         end
       end
@@ -280,6 +382,36 @@ describe Match do
         allow(ENV).to receive(:[]).with('GIT_SSH_COMMAND').and_return('ssh -v')
         storage = Match::Storage::GitStorage.new
         expect(storage.send(:git_env_values)['GIT_SSH_COMMAND']).to eq('ssh -v -o BatchMode=yes')
+      end
+
+      it "adds the authorization header after config pairs already passed through the environment" do
+        allow(ENV).to receive(:[]).and_call_original
+        allow(ENV).to receive(:[]).with('GIT_CONFIG_COUNT').and_return('1')
+        storage = Match::Storage::GitStorage.new(git_bearer_authorization: "EXAMPLE_TOKEN_123")
+        expect(storage.send(:git_env_values)).to include(
+          'GIT_CONFIG_COUNT' => '2',
+          'GIT_CONFIG_KEY_1' => 'http.extraheader',
+          'GIT_CONFIG_VALUE_1' => 'Authorization: Bearer EXAMPLE_TOKEN_123'
+        )
+      end
+
+      it "stops with a clear error when git is older than 2.31, which ignores a header passed this way" do
+        allow(Open3).to receive(:capture2).with('git', '--version').and_return(["git version 2.30.2\n", double(success?: true)])
+        storage = Match::Storage::GitStorage.new(git_basic_authorization: "EXAMPLE_TOKEN_123")
+        expect { storage.send(:git_env_values) }.to raise_error(FastlaneCore::Interface::FastlaneError, /need git 2.31 or later, found git 2.30.2/)
+      end
+
+      it "accepts git 2.31 and later, including Apple's build" do
+        allow(ENV).to receive(:[]).and_call_original
+        allow(ENV).to receive(:[]).with('GIT_CONFIG_COUNT').and_return(nil)
+        allow(Open3).to receive(:capture2).with('git', '--version').and_return(["git version 2.39.5 (Apple Git-154)\n", double(success?: true)])
+        storage = Match::Storage::GitStorage.new(git_basic_authorization: "EXAMPLE_TOKEN_123")
+        expect(storage.send(:git_env_values)).to include('GIT_CONFIG_KEY_0' => 'http.extraheader')
+      end
+
+      it "does not check the git version without a header" do
+        expect(Open3).not_to receive(:capture2)
+        Match::Storage::GitStorage.new.send(:git_env_values)
       end
 
       it "does not duplicate if BatchMode already exists" do

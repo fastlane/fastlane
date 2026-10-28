@@ -32,9 +32,25 @@ describe FastlaneCore do
                                                is_simulator: true)
 
       simulator_path = File.join(FastlaneCore::Helper.xcode_path, 'Applications', 'Simulator.app')
-      expected_command = "open -a #{simulator_path} --args -CurrentDeviceUDID #{device.udid}"
+      expected_command = "open -a #{simulator_path.shellescape} --args -CurrentDeviceUDID #{device.udid}"
 
       expect(FastlaneCore::Helper).to receive(:backticks).with(expected_command, print: FastlaneCore::Globals.verbose?)
+
+      FastlaneCore::Simulator.launch(device)
+    end
+
+    it "passes Simulator.app as one argument when the Xcode path contains a space" do
+      device = FastlaneCore::DeviceManager::Device.new(name: 'iPhone 5s',
+                                                       udid: '3E67398C-AF70-4D77-A22C-D43AA8623FE3',
+                                                    os_type: 'iOS',
+                                                 os_version: '10.0',
+                                                      state: 'Shutdown',
+                                               is_simulator: true)
+      allow(FastlaneCore::Helper).to receive(:xcode_path).and_return("/Applications/Xcode 15.app/Contents/Developer/")
+
+      expect(FastlaneCore::Helper).to receive(:backticks) do |command, _options|
+        expect(Shellwords.split(command)).to eq(["open", "-a", "/Applications/Xcode 15.app/Contents/Developer/Applications/Simulator.app", "--args", "-CurrentDeviceUDID", device.udid])
+      end
 
       FastlaneCore::Simulator.launch(device)
     end

@@ -81,15 +81,7 @@ struct RubyCommand: RubyCommandable {
 
     var closure: ((String) -> Void)? {
         let callbacks = args.filter { ($0.type != nil) && $0.type == .stringClosure }
-        guard let callback = callbacks.first else {
-            return nil
-        }
-
-        guard let callbackArgValue = callback.value else {
-            return nil
-        }
-
-        guard let callbackClosure = callbackArgValue as? ((String) -> Void) else {
+        guard let callback = callbacks.first, let callbackArgValue = callback.value, let callbackClosure = callbackArgValue as? ((String) -> Void) else {
             return nil
         }
         return callbackClosure

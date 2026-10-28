@@ -223,7 +223,7 @@ describe FastlaneCore do
 
       it "creates correct zip command with contents_only set to false with default print option (true)" do
         expect(FastlaneCore::Helper).to receive(:backticks)
-          .with("cd '#{directory}' && zip -r '#{the_zip}' 'to_zip'", print: true)
+          .with("cd #{directory.shellescape} && zip -r #{the_zip.shellescape} to_zip", print: true)
           .exactly(1).times
 
         FastlaneCore::Helper.zip_directory(directory_to_zip, the_zip, contents_only: false)
@@ -231,11 +231,94 @@ describe FastlaneCore do
 
       it "creates correct zip command with contents_only set to true with print set to false" do
         expect(FastlaneCore::Helper).to receive(:backticks)
-          .with("cd '#{directory_to_zip}' && zip -r '#{the_zip}' *", print: false)
+          .with("cd #{directory_to_zip.shellescape} && zip -r #{the_zip.shellescape} *", print: false)
           .exactly(1).times
         expect(FastlaneCore::UI).to receive(:command).exactly(1).times
 
         FastlaneCore::Helper.zip_directory(directory_to_zip, the_zip, contents_only: true, print: false)
+      end
+
+      it "keeps paths with an apostrophe and a space as one argument each" do
+        folder = File.absolute_path("/tmp/Kaldi's Kafe")
+        command = nil
+        allow(FastlaneCore::Helper).to receive(:backticks) { |cmd, print:| command = cmd }
+
+        FastlaneCore::Helper.zip_directory(File.join(folder, "Build Products"), File.join(folder, "out put.zip"), overwrite: true)
+
+        expect(Shellwords.split(command)).to eq(["cd", folder, "&&", "rm", "-f", File.join(folder, "out put.zip"), "&&", "zip", "-r", File.join(folder, "out put.zip"), "Build Products"])
+      end
+    end
+
+    describe "owner-only files" do
+      around do |example|
+        Dir.mktmpdir do |dir|
+          @dir = dir
+          old_umask = File.umask(0o022)
+          begin
+            example.run
+          ensure
+            File.umask(old_umask)
+          end
+        end
+      end
+
+      def mode_of(path)
+        File.stat(path).mode & 0o777
+      end
+
+      describe "#open_owner_only" do
+        it "creates the file readable only by its owner" do
+          path = File.join(@dir, "key.pem")
+          FastlaneCore::Helper.open_owner_only(path) { |file| file.write("secret") }
+
+          expect(File.read(path)).to eq("secret")
+          expect(mode_of(path)).to eq(0o600) unless FastlaneCore::Helper.windows?
+        end
+
+        it "restricts an existing file before writing to it" do
+          path = File.join(@dir, "key.pem")
+          File.write(path, "old")
+          File.chmod(0o644, path) unless FastlaneCore::Helper.windows?
+
+          mode_while_writing = nil
+          FastlaneCore::Helper.open_owner_only(path) do |file|
+            mode_while_writing = mode_of(path)
+            file.write("new")
+          end
+
+          expect(File.read(path)).to eq("new")
+          expect(File.writable?(path)).to be(true)
+          expect(mode_while_writing).to eq(0o600) unless FastlaneCore::Helper.windows?
+        end
+
+        it "passes the open mode, e.g. binary append" do
+          path = File.join(@dir, "log.txt")
+          File.write(path, "a")
+          FastlaneCore::Helper.open_owner_only(path, "ab") { |file| file.write("b") }
+
+          expect(File.binread(path)).to eq("ab")
+          expect(mode_of(path)).to eq(0o600) unless FastlaneCore::Helper.windows?
+        end
+      end
+
+      describe "#mkdir_owner_only" do
+        it "creates the directory and its parents, the directory accessible only by its owner" do
+          dir = File.join(@dir, "parent", "keys")
+          FastlaneCore::Helper.mkdir_owner_only(dir)
+
+          expect(File.directory?(dir)).to be(true)
+          expect(mode_of(dir)).to eq(0o700) unless FastlaneCore::Helper.windows?
+        end
+
+        it "restricts an existing directory" do
+          dir = File.join(@dir, "keys")
+          Dir.mkdir(dir)
+          File.chmod(0o755, dir) unless FastlaneCore::Helper.windows?
+          FastlaneCore::Helper.mkdir_owner_only(dir)
+
+          expect(File.directory?(dir)).to be(true)
+          expect(mode_of(dir)).to eq(0o700) unless FastlaneCore::Helper.windows?
+        end
       end
     end
 
@@ -278,6 +361,61 @@ describe FastlaneCore do
       it "returns true when FastlaneCore::FastlaneFolder.path is not nil" do
         expect(FastlaneCore::FastlaneFolder).to receive(:path).and_return('./fastlane')
         expect(FastlaneCore::Helper.fastlane_enabled?).to be(true)
+      end
+    end
+
+    describe "loading indicator" do
+      let(:spinners) { [] }
+      # tty-spinner only writes to a terminal
+      let(:output) { StringIO.new.tap { |io| io.define_singleton_method(:tty?) { true } } }
+
+      before do
+        allow(FastlaneCore::Helper).to receive(:should_show_loading_indicator?).and_return(true)
+        allow(TTY::Spinner).to receive(:new).and_wrap_original do |original, *args, **options|
+          original.call(*args, **options, output: output).tap { |spinner| spinners << spinner }
+        end
+      end
+
+      after do
+        spinners.each { |spinner| spinner.stop unless spinner.done? }
+        FastlaneCore::Helper.instance_variable_set(:@require_fastlane_spinner, nil)
+      end
+
+      it "stops the spinner and reports an error when the block raises" do
+        expect do
+          FastlaneCore::Helper.with_loading_indicator("Working") { raise "boom" }
+        end.to raise_error("boom")
+
+        expect(spinners.size).to eq(1)
+        expect(spinners.first.done?).to be(true)
+        expect(output.string).to include(TTY::Spinner::CROSS)
+        expect(output.string).not_to include(TTY::Spinner::TICK)
+      end
+
+      it "returns the block's value and reports success" do
+        expect(FastlaneCore::Helper.with_loading_indicator("Working") { 42 }).to eq(42)
+
+        expect(spinners.first.done?).to be(true)
+        expect(output.string).to include(TTY::Spinner::TICK)
+      end
+
+      def return_early_from_indicator
+        FastlaneCore::Helper.with_loading_indicator("Working") { return :early }
+      end
+
+      it "reports success when the block returns early" do
+        expect(return_early_from_indicator).to eq(:early)
+
+        expect(spinners.first.done?).to be(true)
+        expect(output.string).to include(TTY::Spinner::TICK)
+        expect(output.string).not_to include(TTY::Spinner::CROSS)
+      end
+
+      it "stops a spinner that was shown but never hidden before showing the next one" do
+        FastlaneCore::Helper.show_loading_indicator("First")
+        FastlaneCore::Helper.show_loading_indicator("Second")
+
+        expect(spinners.map(&:done?)).to eq([true, false])
       end
     end
   end

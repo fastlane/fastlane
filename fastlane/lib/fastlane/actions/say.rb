@@ -2,15 +2,13 @@ module Fastlane
   module Actions
     class SayAction < Action
       def self.run(params)
-        text = params[:text]
-        text = text.join(' ')
-        text = text.tr("'", '"')
+        text = params[:text].join(' ')
 
         if params[:mute]
           UI.message(text)
           return text
         else
-          Actions.sh("say '#{text}'")
+          Actions.sh('say', text)
         end
       end
 

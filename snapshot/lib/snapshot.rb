@@ -1,8 +1,6 @@
 require_relative 'snapshot/runner'
 require_relative 'snapshot/reports_generator'
 require_relative 'snapshot/detect_values'
-require_relative 'snapshot/screenshot_flatten'
-require_relative 'snapshot/screenshot_rotate'
 require_relative 'snapshot/dependency_checker'
 require_relative 'snapshot/latest_os_version'
 require_relative 'snapshot/test_command_generator'

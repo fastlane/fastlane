@@ -6,6 +6,15 @@ on:
       - master
   pull_request:
 
+permissions:
+  contents: read
+
+env:
+  # Git's background maintenance can delete files under .git/objects while a local clone copies them - fastlane/fastlane#30432
+  GIT_CONFIG_COUNT: "1"
+  GIT_CONFIG_KEY_0: maintenance.auto
+  GIT_CONFIG_VALUE_0: "false"
+
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: ${{ github.ref != 'refs/heads/master' }}
@@ -23,9 +32,9 @@ jobs:
         ruby: ['3.3', '3.4', '4.0']
     runs-on: ${{ matrix.os }}
     steps:
-      - uses: actions/checkout@v7
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
 
-      - uses: ruby/setup-ruby@v1
+      - uses: ruby/setup-ruby@824c0e29fdfc7d689c191c27acc969d2d04b7dd8 # v1.331.0
         with:
           ruby-version: ${{ matrix.ruby }}
           bundler-cache: true

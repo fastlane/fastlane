@@ -24,4 +24,10 @@ To add more tests to be then reported in the `.xcresult` fixture so that the _tr
     # cp "$XCRESULT_PATH"/{Info.plist,database.sqlite3} trainer/spec/fixtures/Xcode16-Mixed-XCTest-SwiftTesting.xcresult
     ```
 
+ - Save the JSON next to the bundle, as `spec/fixtures/Xcode{version}-Mixed-XCTest-SwiftTesting.json`. A newer `xcresulttool` cannot read the committed `database.sqlite3` (it deletes it and tries to rebuild it from the missing `Data/`), so the specs that run on every Xcode read this JSON instead of the bundle.
+
+    ```bash
+    $ xcrun xcresulttool get test-results tests --path "$XCRESULT_PATH" > trainer/spec/fixtures/Xcode{version}-Mixed-XCTest-SwiftTesting.json
+    ```
+
 You can then run the _trainer_ specs suite, which will use the new `.xcresult` fixture, and adjust the rspec tests accordingly to cover the added cases.

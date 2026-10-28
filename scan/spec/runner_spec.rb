@@ -273,6 +273,18 @@ FastlaneAppTests.testCoinToss()
       end
     end
 
+    describe "#open_report" do
+      it "opens the report with its path as one argument" do
+        report_path = "/Users/me/Kaldi's Kafe/fastlane/test_output/report.html"
+        allow(FastlaneCore::Helper).to receive(:ci?).and_return(false)
+        allow(Scan).to receive(:cache).and_return({ open_html_report_path: report_path })
+        scan = Scan::Runner.new
+
+        expect(scan).to receive(:system).with("open", "--hide", report_path)
+        scan.open_report
+      end
+    end
+
     describe "#zip_build_products" do
       it "doesn't zip data when :should_zip_build_products is false", requires_xcodebuild: true do
         Scan.config = FastlaneCore::Configuration.create(Scan::Options.available_options, {
@@ -301,7 +313,7 @@ FastlaneAppTests.testCoinToss()
         output_path = File.absolute_path('/tmp/scan_results/build_products.zip')
 
         expect(FastlaneCore::Helper).to receive(:backticks)
-          .with("cd '#{path}' && rm -f '#{output_path}' && zip -r '#{output_path}' *", { print: false })
+          .with("cd #{path.shellescape} && rm -f #{output_path.shellescape} && zip -r #{output_path.shellescape} *", { print: false })
           .exactly(1).times
 
         scan = Scan::Runner.new

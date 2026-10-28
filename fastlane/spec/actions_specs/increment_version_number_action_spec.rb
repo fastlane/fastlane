@@ -92,6 +92,21 @@ describe Fastlane do
         end
       end
 
+      ["2.0 (beta)", "1.0$HOME"].each do |version|
+        it "passes the version number #{version} to agvtool as one argument" do
+          Fastlane::FastFile.new.parse("lane :test do
+            increment_version_number(version_number: '#{version}')
+          end").runner.execute(:test)
+
+          command = Fastlane::Actions.lane_context[Fastlane::Actions::SharedValues::VERSION_NUMBER]
+          expect(command).to end_with("&& agvtool new-marketing-version #{version.shellescape}")
+          unless FastlaneCore::Helper.windows?
+            argument = command[/agvtool new-marketing-version (.*)\z/, 1]
+            expect(`printf '%s\\n' #{argument}`).to eq("#{version}\n")
+          end
+        end
+      end
+
       it "prefers a custom version number over a boring version bump" do
         Fastlane::FastFile.new.parse("lane :test do
           increment_version_number(version_number: '1.77.3', bump_type: 'major')

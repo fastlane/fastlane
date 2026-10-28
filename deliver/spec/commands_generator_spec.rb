@@ -152,6 +152,17 @@ describe Deliver::CommandsGenerator do
 
       Deliver::CommandsGenerator.start
     end
+
+    it "opens the report with its path as one argument" do
+      stub_commander_runner_args(['generate_summary', '--app_identifier', 'abcd'])
+      html_path = "/Users/me/Kaldi's Kafe/fastlane/Preview.html"
+
+      allow(Deliver::Runner).to receive(:new)
+      expect(Deliver::GenerateSummary).to receive(:new).and_return(double(run: html_path))
+      expect_any_instance_of(Deliver::CommandsGenerator).to receive(:system).with("open", html_path)
+
+      Deliver::CommandsGenerator.start
+    end
   end
 
   describe ":download_screenshots option handling" do

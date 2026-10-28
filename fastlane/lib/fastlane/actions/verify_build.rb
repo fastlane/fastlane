@@ -69,10 +69,7 @@ module Fastlane
         provision_profile_path = "#{app_path}/embedded.mobileprovision"
         UI.user_error!("Unable to find embedded profile in #{provision_profile_path}") unless File.exist?(provision_profile_path)
 
-        profile = `cat #{provision_profile_path.shellescape} | security cms -D`
-        UI.user_error!("Unable to extract profile") unless $? == 0
-
-        plist = Plist.parse_xml(profile)
+        plist = FastlaneCore::ProvisioningProfile.parse(provision_profile_path)
 
         values['app_name'] = plist['AppIDName']
         values['provisioning_uuid'] = plist['UUID']

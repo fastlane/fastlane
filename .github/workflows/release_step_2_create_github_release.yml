@@ -18,6 +18,9 @@ on:
         default: false
         type: boolean
 
+permissions:
+  contents: read
+
 jobs:
   create_github_release:
     runs-on: macos-latest
@@ -26,20 +29,23 @@ jobs:
       packages: write
       contents: write
       id-token: write
+      attestations: write
+
+    outputs:
+      version: ${{ steps.gem.outputs.version }}
+      gem-sha256: ${{ steps.gem.outputs.gem-sha256 }}
 
     steps:
     - name: Checkout repository
-      uses: actions/checkout@v7
+      uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
 
     - name: Set up Ruby
-      uses: ruby/setup-ruby@v1
+      uses: ruby/setup-ruby@824c0e29fdfc7d689c191c27acc969d2d04b7dd8 # v1.331.0
       with:
         ruby-version: '3.4'
 
     - name: Install fastlane
       run: bundle install
-
-    - uses: rubygems/configure-rubygems-credentials@v2.1.0
 
     - name: Configure GitHub Packages config
       env:
@@ -54,10 +60,65 @@ jobs:
         FASTLANE_RELEASE_API_BEARER: ${{ secrets.GITHUB_TOKEN }}
         SLACK_URL: ${{ secrets.SLACK_URL }}
       run: |
-        bundle exec fastlane create_github_release skip_github_packages:${{ github.event.inputs.skip_github_packages }} skip_rubygems:${{ github.event.inputs.skip_rubygems }}
+        bundle exec fastlane create_github_release skip_github_packages:${{ github.event.inputs.skip_github_packages }}
 
-    - uses: actions/upload-artifact@v7
+    - name: Hash gem
+      id: gem
+      run: |
+        version=$(cat latest_fl_version.txt)
+        echo "version=$version" >> "$GITHUB_OUTPUT"
+        echo "path=pkg/fastlane-$version.gem" >> "$GITHUB_OUTPUT"
+        echo "gem-sha256=$(shasum -a 256 "pkg/fastlane-$version.gem" | cut -d' ' -f1)" >> "$GITHUB_OUTPUT"
+
+    - name: Attest gem
+      id: attest
+      uses: actions/attest@1e69f48acb82d1966a394da916b4c1698aa569d6 # v4.2.2
+      with:
+        subject-path: ${{ steps.gem.outputs.path }}
+
+    - name: Attach attestation to GitHub release
+      env:
+        GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        VERSION: ${{ steps.gem.outputs.version }}
+        BUNDLE_PATH: ${{ steps.attest.outputs.bundle-path }}
+      run: |
+        cp "$BUNDLE_PATH" "pkg/fastlane-$VERSION.gem.sigstore.json"
+        gh release upload "$VERSION" "pkg/fastlane-$VERSION.gem.sigstore.json" --clobber
+
+    - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
       with:
         name: release_tag
         path: latest_fl_version.txt
         retention-days: 1
+
+  release_rubygems:
+    needs: create_github_release
+    if: ${{ inputs.skip_rubygems != true }}
+    runs-on: ubuntu-latest
+
+    permissions:
+      contents: read
+      id-token: write
+
+    env:
+      # The attestation patch loads the default openssl before Bundler, which would refuse our locked one - rubygems/release-gem/issues/28
+      BUNDLE_WITHOUT: openssl_pin
+
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      with:
+        persist-credentials: false
+
+    # setup-ruby writes path and deployment to Bundler's local config; keep them out of the tracked .bundle/config so `rake release` sees a clean tree
+    - name: Keep Bundler config out of the repository
+      run: echo "BUNDLE_APP_CONFIG=$RUNNER_TEMP/bundle" >> "$GITHUB_ENV"
+
+    - name: Set up Ruby
+      uses: ruby/setup-ruby@824c0e29fdfc7d689c191c27acc969d2d04b7dd8 # v1.331.0
+      with:
+        ruby-version: '3.4'
+        bundler-cache: true
+
+    - name: Release to RubyGems
+      uses: rubygems/release-gem@7f9650160c1a4e7989fdc9855807bdbd421d8b6b # v1.4.1
