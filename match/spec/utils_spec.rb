@@ -5,15 +5,12 @@ describe Match do
 
       allow(Security::InternetPassword).to receive(:find).and_return(nil)
 
-      allow(FastlaneCore::Helper).to receive(:backticks).with('security -h | grep set-key-partition-list', print: false).and_return('    set-key-partition-list               Set the partition list of a key.')
+      allow(Security::Keychain).to receive(:supports_key_partition_list?).and_return(true)
     end
 
     describe 'import' do
       it 'finds a normal keychain name relative to ~/Library/Keychains' do
         keychain_path = "#{Dir.home}/Library/Keychains/login.keychain"
-
-        # this command is also sent on macOS Sierra and we need to allow it or else the test will fail
-        expected_partition_command = "security set-key-partition-list -S apple-tool:,apple:,codesign: -s -k #{''.shellescape} #{Dir.home}/Library/Keychains/login.keychain 1> /dev/null"
 
         allow(FastlaneCore::Helper).to receive(:show_loading_indicator).and_return(true)
         allow(File).to receive(:file?).and_return(false)
@@ -22,7 +19,7 @@ describe Match do
         expect(File).to receive(:exist?).with('item.path').and_return(true)
 
         expect(Security::Certificate).to receive(:import).with('item.path', keychain: keychain_path, password: '', format: nil).and_return(true)
-        expect(Open3).to receive(:popen3).with(expected_partition_command)
+        expect_any_instance_of(Security::Keychain).to receive(:set_key_partition_list) { |target, password| expect([target.filename, password]).to eq(["#{Dir.home}/Library/Keychains/login.keychain", '']) }
 
         Match::Utils.import('item.path', 'login.keychain', password: '')
       end
@@ -31,9 +28,6 @@ describe Match do
         tmp_path = Dir.mktmpdir
         keychain = "#{tmp_path}/my/special.keychain"
 
-        # this command is also sent on macOS Sierra and we need to allow it or else the test will fail
-        expected_partition_command = "security set-key-partition-list -S apple-tool:,apple:,codesign: -s -k #{''.shellescape} #{keychain} 1> /dev/null"
-
         allow(FastlaneCore::Helper).to receive(:show_loading_indicator).and_return(true)
         allow(File).to receive(:file?).and_return(false)
         expect(File).to receive(:file?).with(keychain).and_return(true)
@@ -41,7 +35,7 @@ describe Match do
         expect(File).to receive(:exist?).with('item.path').and_return(true)
 
         expect(Security::Certificate).to receive(:import).with('item.path', keychain: keychain, password: '', format: nil).and_return(true)
-        expect(Open3).to receive(:popen3).with(expected_partition_command)
+        expect_any_instance_of(Security::Keychain).to receive(:set_key_partition_list) { |target, password| expect([target.filename, password]).to eq([keychain, '']) }
 
         Match::Utils.import('item.path', keychain, password: '')
       end
@@ -57,9 +51,6 @@ describe Match do
       it "tries to find the macOS Sierra keychain too" do
         keychain_path = "#{Dir.home}/Library/Keychains/login.keychain-db"
 
-        # this command is also sent on macOS Sierra and we need to allow it or else the test will fail
-        expected_partition_command = "security set-key-partition-list -S apple-tool:,apple:,codesign: -s -k #{''.shellescape} #{Dir.home}/Library/Keychains/login.keychain-db 1> /dev/null"
-
         allow(FastlaneCore::Helper).to receive(:show_loading_indicator).and_return(true)
         allow(File).to receive(:file?).and_return(false)
         expect(File).to receive(:file?).with("#{Dir.home}/Library/Keychains/login.keychain-db").and_return(true)
@@ -67,7 +58,7 @@ describe Match do
         expect(File).to receive(:exist?).with("item.path").and_return(true)
 
         expect(Security::Certificate).to receive(:import).with('item.path', keychain: keychain_path, password: '', format: nil).and_return(true)
-        expect(Open3).to receive(:popen3).with(expected_partition_command)
+        expect_any_instance_of(Security::Keychain).to receive(:set_key_partition_list) { |target, password| expect([target.filename, password]).to eq(["#{Dir.home}/Library/Keychains/login.keychain-db", '']) }
 
         Match::Utils.import('item.path', "login.keychain")
       end
@@ -75,9 +66,6 @@ describe Match do
       describe "keychain_password" do
         it 'prompts for keychain password when none given and not in keychain' do
           keychain_path = "#{Dir.home}/Library/Keychains/login.keychain"
-
-          # this command is also sent on macOS Sierra and we need to allow it or else the test will fail
-          expected_partition_command = "security set-key-partition-list -S apple-tool:,apple:,codesign: -s -k #{'user_entered'.shellescape} #{Dir.home}/Library/Keychains/login.keychain 1> /dev/null"
 
           allow(Security::InternetPassword).to receive(:find).and_return(nil)
           allow(FastlaneCore::UI).to receive(:interactive?).and_return(true)
@@ -92,16 +80,13 @@ describe Match do
           expect(File).to receive(:exist?).with('item.path').and_return(true)
 
           expect(Security::Certificate).to receive(:import).with('item.path', keychain: keychain_path, password: '', format: nil).and_return(true)
-          expect(Open3).to receive(:popen3).with(expected_partition_command)
+          expect_any_instance_of(Security::Keychain).to receive(:set_key_partition_list) { |target, password| expect([target.filename, password]).to eq(["#{Dir.home}/Library/Keychains/login.keychain", 'user_entered']) }
 
           Match::Utils.import('item.path', 'login.keychain')
         end
 
         it 'find keychain password in keychain when none given' do
           keychain_path = "#{Dir.home}/Library/Keychains/login.keychain"
-
-          # this command is also sent on macOS Sierra and we need to allow it or else the test will fail
-          expected_partition_command = "security set-key-partition-list -S apple-tool:,apple:,codesign: -s -k #{'from_keychain'.shellescape} #{Dir.home}/Library/Keychains/login.keychain 1> /dev/null"
 
           item = double
           allow(item).to receive(:password).and_return('from_keychain')
@@ -114,7 +99,7 @@ describe Match do
           expect(File).to receive(:exist?).with('item.path').and_return(true)
 
           expect(Security::Certificate).to receive(:import).with('item.path', keychain: keychain_path, password: '', format: nil).and_return(true)
-          expect(Open3).to receive(:popen3).with(expected_partition_command)
+          expect_any_instance_of(Security::Keychain).to receive(:set_key_partition_list) { |target, password| expect([target.filename, password]).to eq(["#{Dir.home}/Library/Keychains/login.keychain", 'from_keychain']) }
 
           Match::Utils.import('item.path', 'login.keychain')
         end
