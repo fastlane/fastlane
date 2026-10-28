@@ -13,11 +13,20 @@ module Produce
   ENV['FASTLANE_TEAM_ID'] ||= ENV["PRODUCE_TEAM_ID"]
   ENV['DELIVER_USER'] ||= ENV["PRODUCE_USERNAME"]
 
+  # Some Produce.config instances (e.g. modify_services, whose Configuration is built from its
+  # own narrower option set) never declare :api_key/:api_key_path at all. Configuration#[] raises
+  # for any key outside available_options, so reading those keys directly would crash before the
+  # token/session-login fallback below ever runs. Returns nil instead when the key isn't declared.
+  def self.config_value(key)
+    return nil unless Produce.config.available_options.any? { |option| option.key == key }
+    Produce.config[key]
+  end
+
   # Shared by DeveloperCenter#login and Service#bundle_id. Prefers a configured API key, falls
   # back to a token already set by another lane (e.g. app_store_connect_api_key), then falls
   # back to username-based session login.
   def self.authenticate_connect_api!
-    if (token = Spaceship::ConnectAPI::Token.from(hash: Produce.config[:api_key], filepath: Produce.config[:api_key_path]))
+    if (token = Spaceship::ConnectAPI::Token.from(hash: config_value(:api_key), filepath: config_value(:api_key_path)))
       UI.message("Authenticating with App Store Connect API Key")
 
       # `current_team_id:` avoids a live, session-based team_id lookup elsewhere in

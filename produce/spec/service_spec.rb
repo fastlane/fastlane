@@ -52,6 +52,31 @@ describe Produce::Service do
       expect(result).to eq(found_bundle_id)
     end
 
+    it "does not crash when the active config has no :api_key option at all (e.g. modify_services)" do
+      # Mirrors Fastlane::Actions::ModifyServicesAction.available_options, which never declares
+      # :api_key/:api_key_path - Produce.config[:api_key] would raise before reaching the
+      # session-login fallback.
+      narrow_options = [
+        FastlaneCore::ConfigItem.new(key: :username, description: "Username"),
+        FastlaneCore::ConfigItem.new(key: :app_identifier, description: "App Identifier"),
+        FastlaneCore::ConfigItem.new(key: :team_id, description: "Team ID", optional: true)
+      ]
+      Produce.config = FastlaneCore::Configuration.create(narrow_options, {
+        username: "person@example.com",
+        app_identifier: "com.example.app",
+        team_id: "TEAMID1234"
+      })
+      allow(Spaceship::ConnectAPI).to receive(:token).and_return(nil)
+      expect(Spaceship).to receive(:login).with("person@example.com", nil)
+      expect(Spaceship).to receive(:select_team)
+      found_bundle_id = double("bundle_id")
+      allow(Spaceship::ConnectAPI::BundleId).to receive(:find).with("com.example.app").and_return(found_bundle_id)
+
+      result = Produce::Service.new.bundle_id
+
+      expect(result).to eq(found_bundle_id)
+    end
+
     it "memoizes the bundle_id across calls instead of re-authenticating" do
       config_with(api_key: api_key)
       allow(Spaceship::ConnectAPI::Token).to receive(:from).and_return(fake_token)
