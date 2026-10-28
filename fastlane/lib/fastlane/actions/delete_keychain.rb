@@ -1,4 +1,4 @@
-require 'shellwords'
+require 'security'
 
 module Fastlane
   module Actions
@@ -18,8 +18,10 @@ module Fastlane
           UI.user_error!("You either have to set :name or :keychain_path")
         end
 
-        Fastlane::Actions.sh("security default-keychain -s #{original}", log: false) unless original.nil?
-        Fastlane::Actions.sh("security delete-keychain #{keychain_path.shellescape}", log: false)
+        if original && !Security::Keychain.set_default_keychain(original)
+          UI.user_error!("Could not restore '#{original}' as the default keychain")
+        end
+        UI.user_error!("Could not delete keychain '#{keychain_path}'") unless Security::Keychain.new(keychain_path).delete
       end
 
       def self.details
