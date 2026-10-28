@@ -54,16 +54,15 @@ module Fastlane
     end
 
     def class_ref_for_action(named: nil)
-      action = named
       class_ref = Actions.action_class_ref(named)
       unless class_ref
-        if Fastlane::Actions.formerly_bundled_actions.include?(action)
+        if Fastlane::Actions.formerly_bundled_actions.include?(named)
           # This was a formerly bundled action which is now a plugin.
           UI.verbose(caller.join("\n"))
-          UI.user_error!("The action '#{action}' is no longer bundled with fastlane. You can install it using `fastlane add_plugin #{action}`")
+          UI.user_error!("The action '#{named}' is no longer bundled with fastlane. You can install it using `fastlane add_plugin #{named}`")
         else
-          Fastlane::ActionsList.print_suggestions(action)
-          UI.user_error!("Action '#{action}' not available, run `fastlane actions` to get a full list")
+          Fastlane::ActionsList.print_suggestions(named)
+          UI.user_error!("Action '#{named}' not available, run `fastlane actions` to get a full list")
         end
       end
 

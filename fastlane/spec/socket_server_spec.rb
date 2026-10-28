@@ -252,3 +252,11 @@ describe 'fastlane socket_server' do
     run_command
   end
 end
+
+describe Fastlane::SocketServerActionCommandExecutor do
+  it "reports an unknown action" do
+    expect do
+      Fastlane::SocketServerActionCommandExecutor.new.class_ref_for_action(named: "no_such_action_xyz")
+    end.to raise_error(FastlaneCore::Interface::FastlaneError, /Action 'no_such_action_xyz' not available/)
+  end
+end
