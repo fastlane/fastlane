@@ -207,7 +207,8 @@ module FastlaneCore
 
         # Boot the simulator and wait for it to finish booting
         UI.message("Booting #{self}")
-        `xcrun simctl bootstatus #{self.udid} -b &> /dev/null`
+        output, status = Open3.capture2e("xcrun simctl bootstatus #{self.udid} -b")
+        UI.important("Unable to boot #{self}: #{output.strip}") unless status.success?
         self.state = 'Booted'
       end
 
