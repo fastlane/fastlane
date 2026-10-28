@@ -342,24 +342,11 @@ describe FastlaneCore do
     end
 
     describe "build_settings() can handle empty lines" do
-      it "SUPPORTED_PLATFORMS should be iphonesimulator iphoneos on Xcode >= 8.3" do
+      it "SUPPORTED_PLATFORMS should be iphonesimulator iphoneos" do
         options = { project: "./fastlane_core/spec/fixtures/projects/Example.xcodeproj" }
         @project = FastlaneCore::Project.new(options)
-        allow(FastlaneCore::Helper).to receive(:xcode_at_least?).with("11.0").and_return(false)
-        allow(FastlaneCore::Helper).to receive(:xcode_at_least?).with("13").and_return(false)
-        expect(FastlaneCore::Helper).to receive(:xcode_at_least?).with("8.3").and_return(true)
+        allow(FastlaneCore::CommandExecutor).to receive(:execute).with(hash_including(command: /^xcodebuild -resolvePackageDependencies /))
         command = "xcodebuild -showBuildSettings -project ./fastlane_core/spec/fixtures/projects/Example.xcodeproj 2>&1"
-        expect(FastlaneCore::Project).to receive(:run_command).with(command, { timeout: 3, retries: 3, print: true }).and_return(File.read("./fastlane_core/spec/fixtures/projects/build_settings_with_toolchains"))
-        expect(@project.build_settings(key: "SUPPORTED_PLATFORMS")).to eq("iphonesimulator iphoneos")
-      end
-
-      it "SUPPORTED_PLATFORMS should be iphonesimulator iphoneos on Xcode < 8.3" do
-        options = { project: "./fastlane_core/spec/fixtures/projects/Example.xcodeproj" }
-        @project = FastlaneCore::Project.new(options)
-        allow(FastlaneCore::Helper).to receive(:xcode_at_least?).with("11.0").and_return(false)
-        allow(FastlaneCore::Helper).to receive(:xcode_at_least?).with("13").and_return(false)
-        expect(FastlaneCore::Helper).to receive(:xcode_at_least?).with("8.3").and_return(false)
-        command = "xcodebuild clean -showBuildSettings -project ./fastlane_core/spec/fixtures/projects/Example.xcodeproj 2>&1"
         expect(FastlaneCore::Project).to receive(:run_command).with(command, { timeout: 3, retries: 3, print: true }).and_return(File.read("./fastlane_core/spec/fixtures/projects/build_settings_with_toolchains"))
         expect(@project.build_settings(key: "SUPPORTED_PLATFORMS")).to eq("iphonesimulator iphoneos")
       end
@@ -512,7 +499,6 @@ describe FastlaneCore do
 
     describe "xcodebuild disable_package_automatic_updates" do
       it 'generates xcodebuild -showBuildSettings command with disabled automatic package resolution' do
-        allow(FastlaneCore::Helper).to receive(:xcode_at_least?).and_return(true)
         project = FastlaneCore::Project.new({
           project: "./fastlane_core/spec/fixtures/projects/Example.xcodeproj",
           disable_package_automatic_updates: true
@@ -524,7 +510,6 @@ describe FastlaneCore do
 
     describe "xcodebuild skip_package_repository_fetches" do
       it 'generates xcodebuild -showBuildSettings command with disabled package fetches' do
-        allow(FastlaneCore::Helper).to receive(:xcode_at_least?).and_return(true)
         project = FastlaneCore::Project.new({
           project: "./fastlane_core/spec/fixtures/projects/Example.xcodeproj",
           skip_package_repository_fetches: true
@@ -592,14 +577,12 @@ describe FastlaneCore do
 
     describe 'xcodebuild command for SwiftPM', requires_xcode: true do
       it 'generates an xcodebuild -resolvePackageDependencies command with Xcode >= 11' do
-        allow(FastlaneCore::Helper).to receive(:xcode_at_least?).and_return(true)
         project = FastlaneCore::Project.new({ project: "./fastlane_core/spec/fixtures/projects/Example.xcodeproj" })
         command = "xcodebuild -resolvePackageDependencies -project ./fastlane_core/spec/fixtures/projects/Example.xcodeproj"
         expect(project.build_xcodebuild_resolvepackagedependencies_command).to eq(command)
       end
 
       it 'generates an xcodebuild -resolvePackageDependencies command with custom resolving paths with Xcode >= 11' do
-        allow(FastlaneCore::Helper).to receive(:xcode_at_least?).and_return(true)
         project = FastlaneCore::Project.new({
           project: "./fastlane_core/spec/fixtures/projects/Example.xcodeproj",
           cloned_source_packages_path: "./path/to/cloned_source_packages",
@@ -610,24 +593,11 @@ describe FastlaneCore do
       end
 
       it 'generates nil if skip_package_dependencies_resolution is true' do
-        allow(FastlaneCore::Helper).to receive(:xcode_at_least?).and_return(true)
         project = FastlaneCore::Project.new({
           project: "./fastlane_core/spec/fixtures/projects/Example.xcodeproj",
           skip_package_dependencies_resolution: true
         })
         expect(project.build_xcodebuild_resolvepackagedependencies_command).to be_nil
-      end
-
-      it 'build_settings() should not add SPM path if Xcode < 11' do
-        allow(FastlaneCore::Helper).to receive(:xcode_at_least?).with("8.3").and_return(true)
-        expect(FastlaneCore::Helper).to receive(:xcode_at_least?).with("11.0").and_return(false)
-        expect(FastlaneCore::Helper).to receive(:xcode_at_least?).with("13").and_return(false)
-        project = FastlaneCore::Project.new({
-          project: "./fastlane_core/spec/fixtures/projects/Example.xcodeproj",
-          cloned_source_packages_path: "./path/to/resolve"
-        })
-        command = "xcodebuild -showBuildSettings -project ./fastlane_core/spec/fixtures/projects/Example.xcodeproj 2>&1"
-        expect(project.build_xcodebuild_showbuildsettings_command).to eq(command)
       end
 
       it 'generates even if given options do not support skip_package_dependencies_resolution' do
@@ -687,7 +657,6 @@ describe FastlaneCore do
       end
 
       it 'fetches build settings when the option is false' do
-        allow(FastlaneCore::Helper).to receive(:xcode_at_least?).and_return(true)
         project = FastlaneCore::Project.new({
           project: "./fastlane_core/spec/fixtures/projects/Example.xcodeproj",
           disallow_xcodebuild_settings_lookup: false
@@ -700,7 +669,6 @@ describe FastlaneCore do
       end
 
       it 'fetches build settings when the given options do not support disallow_xcodebuild_settings_lookup' do
-        allow(FastlaneCore::Helper).to receive(:xcode_at_least?).and_return(true)
         config = FastlaneCore::Configuration.create(
           [
             FastlaneCore::ConfigItem.new(key: :workspace, optional: true),
@@ -720,12 +688,6 @@ describe FastlaneCore do
 
     describe "xcodebuild destination parameter" do
       context "when xcode version is at_least 13" do
-        before(:each) do
-          allow(FastlaneCore::Helper).to receive(:xcode_at_least?).with("8.3").and_return(true)
-          allow(FastlaneCore::Helper).to receive(:xcode_at_least?).with("11.0").and_return(true)
-          allow(FastlaneCore::Helper).to receive(:xcode_at_least?).with("13").and_return(true)
-        end
-
         context "when destination parameter is provided in options" do
           it 'generates an xcodebuild -showBuildSettings command that includes destination', requires_xcode: true do
             project = FastlaneCore::Project.new({
@@ -764,52 +726,6 @@ describe FastlaneCore do
               })
             destination = "platform=iOS Simulator,id=ABC123".shellescape
             command = "xcodebuild -resolvePackageDependencies -project ./fastlane_core/spec/fixtures/projects/Example.xcodeproj -destination #{destination}"
-            expect(project.build_xcodebuild_resolvepackagedependencies_command).to eq(command)
-          end
-        end
-
-        context "when destination parameter is not provided in options" do
-          it 'generates an xcodebuild -showBuildSettings command that does not include destination', requires_xcode: true do
-            project = FastlaneCore::Project.new({
-              project: "./fastlane_core/spec/fixtures/projects/Example.xcodeproj"
-            })
-            command = "xcodebuild -showBuildSettings -project ./fastlane_core/spec/fixtures/projects/Example.xcodeproj 2>&1"
-            expect(project.build_xcodebuild_showbuildsettings_command).to eq(command)
-          end
-
-          it 'generates an xcodebuild -resolvePackageDependencies command that does not include destination' do
-            project = FastlaneCore::Project.new({
-              project: "./fastlane_core/spec/fixtures/projects/Example.xcodeproj"
-              })
-            command = "xcodebuild -resolvePackageDependencies -project ./fastlane_core/spec/fixtures/projects/Example.xcodeproj"
-            expect(project.build_xcodebuild_resolvepackagedependencies_command).to eq(command)
-          end
-        end
-      end
-
-      context "when xcode version is less than 13" do
-        before(:each) do
-          allow(FastlaneCore::Helper).to receive(:xcode_at_least?).with("8.3").and_return(true)
-          allow(FastlaneCore::Helper).to receive(:xcode_at_least?).with("11.0").and_return(true)
-          allow(FastlaneCore::Helper).to receive(:xcode_at_least?).with("13").and_return(false)
-        end
-
-        context "when destination parameter is provided in options" do
-          it 'generates an xcodebuild -showBuildSettings command that does not include destination', requires_xcode: true do
-            project = FastlaneCore::Project.new({
-              project: "./fastlane_core/spec/fixtures/projects/Example.xcodeproj",
-              destination: "FakeDestination"
-            })
-            command = "xcodebuild -showBuildSettings -project ./fastlane_core/spec/fixtures/projects/Example.xcodeproj 2>&1"
-            expect(project.build_xcodebuild_showbuildsettings_command).to eq(command)
-          end
-
-          it 'generates an xcodebuild -resolvePackageDependencies command that does not include destination' do
-            project = FastlaneCore::Project.new({
-              project: "./fastlane_core/spec/fixtures/projects/Example.xcodeproj",
-              destination: "FakeDestination"
-              })
-            command = "xcodebuild -resolvePackageDependencies -project ./fastlane_core/spec/fixtures/projects/Example.xcodeproj"
             expect(project.build_xcodebuild_resolvepackagedependencies_command).to eq(command)
           end
         end

@@ -274,22 +274,12 @@ module Scan
       }.reject(&:nil?).first
     end
 
-    def self.min_xcode8?
-      Helper.xcode_at_least?("8.0")
-    end
-
     def self.detect_destination
       if Scan.config[:destination]
-        # No need to show below warnings message(s) for xcode13+, because
-        # Apple recommended to have destination in all xcodebuild commands
-        # otherwise, Apple will generate warnings in console logs
+        # No need to show a warning, because Apple recommends to have
+        # destination in all xcodebuild commands, otherwise, Apple will
+        # generate warnings in console logs
         # see: https://github.com/fastlane/fastlane/issues/19579
-        return if Helper.xcode_at_least?("13.0")
-
-        UI.important("It's not recommended to set the `destination` value directly")
-        UI.important("Instead use the other options available in `fastlane scan --help`")
-        UI.important("Using your value '#{Scan.config[:destination]}' for now")
-        UI.important("because I trust you know what you're doing...")
         return
       end
 
@@ -306,7 +296,7 @@ module Scan
 
         Scan.config[:destination] = Scan.devices.map { |d| "platform=#{d.os_type} Simulator,id=#{d.udid}" + arch }
       elsif Scan.project && Scan.project.mac_app?
-        Scan.config[:destination] = min_xcode8? ? ["platform=macOS"] : ["platform=OS X"]
+        Scan.config[:destination] = ["platform=macOS"]
       end
     end
 

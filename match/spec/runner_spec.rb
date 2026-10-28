@@ -14,9 +14,8 @@ describe Match do
       ENV.delete('FASTLANE_TEAM_NAME')
     end
 
-    ["10", "11", "16"].each do |xcode_version|
+    ["16"].each do |xcode_version|
       context "Xcode #{xcode_version}" do
-        let(:generate_apple_certs) { xcode_version == "11" }
         before do
           allow(FastlaneCore::Helper).to receive(:mac?).and_return(true)
           allow(FastlaneCore::Helper).to receive(:xcode_version).and_return(xcode_version)
@@ -840,7 +839,6 @@ describe Match do
           allow(Match::Utils).to receive(:is_cert_valid?).and_return(true)
           allow(Match::Utils).to receive(:get_cert_info).and_return([["Common Name", "test"]])
           allow(FastlaneCore::Helper).to receive(:mac?).and_return(true)
-          allow(FastlaneCore::Helper).to receive(:xcode_at_least?).and_return(false)
           allow(FastlaneCore::CertChecker).to receive(:installed?).and_return(false)
 
           expected_cert_path = File.join(cert_dir, "FIRST11111.cer")

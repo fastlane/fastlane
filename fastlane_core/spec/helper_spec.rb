@@ -163,12 +163,6 @@ describe FastlaneCore do
         expect(FastlaneCore::Helper.xcode_path).to match(%r{/Applications/Xcode.*.app/Contents/Developer/})
       end
 
-      it "#transporter_path", requires_xcode: true do
-        unless FastlaneCore::Helper.xcode_at_least?("14")
-          expect(FastlaneCore::Helper.transporter_path).to match(%r{/Applications/Xcode.*.app/Contents/Applications/Application Loader.app/Contents/itms/bin/iTMSTransporter|/Applications/Xcode.*.app/Contents/SharedFrameworks/ContentDeliveryServices.framework/Versions/A/itms/bin/iTMSTransporter})
-        end
-      end
-
       it "#xcode_version", requires_xcode: true do
         expect(FastlaneCore::Helper.xcode_version).to match(/^\d[\.\d]+$/)
       end
@@ -201,12 +195,8 @@ describe FastlaneCore do
         it "default", requires_xcode: true do
           stub_const('ENV', { 'FASTLANE_ITUNES_TRANSPORTER_PATH' => nil })
 
-          if FastlaneCore::Helper.xcode_at_least?("14")
-            expect(FastlaneCore::UI).to receive(:user_error!).with(/Could not find transporter/)
-            expect { FastlaneCore::Helper.itms_path }.not_to raise_error
-          else
-            expect(FastlaneCore::Helper.itms_path).to match(/itms/)
-          end
+          expect(FastlaneCore::UI).to receive(:user_error!).with(/Could not find transporter/)
+          expect { FastlaneCore::Helper.itms_path }.not_to raise_error
         end
 
         it "uses FASTLANE_ITUNES_TRANSPORTER_PATH", requires_xcode: true do

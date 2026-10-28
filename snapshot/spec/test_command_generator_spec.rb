@@ -357,7 +357,7 @@ describe Snapshot do
             configure(options.merge(testplan: 'simple'))
 
             command = Snapshot::TestCommandGenerator.generate(devices: ["iPhone 8"], language: "en", locale: nil)
-            expect(command.join('')).to include("-testPlan 'simple'") if FastlaneCore::Helper.xcode_at_least?(11)
+            expect(command.join('')).to include("-testPlan 'simple'")
           end
         end
 

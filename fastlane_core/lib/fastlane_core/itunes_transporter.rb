@@ -711,11 +711,11 @@ module FastlaneCore
     end
 
     def is_default_itms_on_xcode_11?
-      !Helper.user_defined_itms_path? && Helper.mac? && Helper.xcode_at_least?(11)
+      !Helper.user_defined_itms_path? && Helper.mac?
     end
 
     def java_code_option
-      if Helper.mac? && Helper.xcode_at_least?(9)
+      if Helper.mac?
         return "-jar #{Helper.transporter_java_jar_path.shellescape}"
       else
         return "-classpath #{Helper.transporter_java_jar_path.shellescape} com.apple.transporter.Application"
@@ -725,8 +725,6 @@ module FastlaneCore
     def handle_error(password)
       unless File.exist?(Helper.transporter_java_jar_path)
         UI.error("The iTMSTransporter Java app was not found at '#{Helper.transporter_java_jar_path}'.")
-        UI.error("If you're using Xcode 6, please select the shell script executor by setting the environment variable "\
-          "FASTLANE_ITUNES_TRANSPORTER_USE_SHELL_SCRIPT=1")
       end
     end
 
@@ -766,9 +764,6 @@ module FastlaneCore
     #                            short names
     # @param provider_public_id The provider public ID to be given to altool via --provider-public-id.
     def initialize(user = nil, password = nil, use_shell_script = false, provider_short_name = nil, jwt = nil, altool_compatible_command: false, api_key: nil, provider_public_id: nil)
-      # Xcode 6.x doesn't have the same iTMSTransporter Java setup as later Xcode versions, so
-      # we can't default to using the newer direct Java invocation strategy for those versions.
-      use_shell_script ||= Helper.is_mac? && Helper.xcode_version.start_with?('6.')
       use_shell_script ||= Helper.windows?
       use_shell_script ||= Feature.enabled?('FASTLANE_ITUNES_TRANSPORTER_USE_SHELL_SCRIPT')
 
@@ -995,7 +990,7 @@ module FastlaneCore
     # Returns whether altool should be used or ItunesTransporter should be used
     def should_use_altool?(altool_compatible_command, use_shell_script)
       # Xcode 14 no longer supports iTMSTransporter. Use altool instead
-      !use_shell_script && altool_compatible_command && !Helper.user_defined_itms_path? && Helper.mac? && Helper.xcode_at_least?(14)
+      !use_shell_script && altool_compatible_command && !Helper.user_defined_itms_path? && Helper.mac?
     end
 
     # Returns the password to be used with the transporter
