@@ -58,14 +58,8 @@ module Match
         devices
       end
 
-      # 4096 is the max URL length in the App Store Connect API request.
-      # If the URL length is too long, the ASC API will return a 500 HTTP response code.
-      #
-      # The MAX_BUNDLE_ID_FILTER_LENGTH constant is calculated as follows:
-      #   - minus 84 is the length of the https://.../bundleIds?limit=200&filter%25Bidentifier%25D= in the URL.
-      #   - minus 12 to round up to the round number of 4000.
-      #   - minus 100 to leave some space for the possible other parameters in the URL and URL changes.
-      MAX_BUNDLE_ID_FILTER_LENGTH = 3900
+      # App Store Connect refuses a filter value longer than 5000 characters; fastlane#29783 saw failures below that.
+      MAX_BUNDLE_ID_FILTER_LENGTH = 3500
 
       def self.bundle_ids(bundle_id_identifiers: nil, max_bundle_id_filter_length: MAX_BUNDLE_ID_FILTER_LENGTH)
         # Bundle IDs to fetch.
