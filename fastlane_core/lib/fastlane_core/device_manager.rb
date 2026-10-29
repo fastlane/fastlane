@@ -358,8 +358,8 @@ module FastlaneCore
         command = "xcrun simctl spawn #{device.udid} log collect "
         command << "--start '#{logs_collection_start}' "
         command << "--output #{logarchive_dst.shellescape}"
-        # A simulator that is no longer booted only warrants a warning: xcodebuild shuts down a simulator it booted
-        # itself once the tests finish, and the logs are diagnostics. Any other failure still fails the action.
+        # A simulator that is no longer booted only warrants a warning: the logs are diagnostics.
+        # Any other failure still fails the action.
         FastlaneCore::CommandExecutor.execute(command: command,
                                             print_all: false,
                                         print_command: true,
