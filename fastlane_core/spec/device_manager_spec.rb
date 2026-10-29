@@ -523,6 +523,25 @@ describe FastlaneCore do
 
         device.boot
       end
+
+      it "boots a tvOS simulator" do
+        device = FastlaneCore::DeviceManager::Device.new(name: "Apple TV", udid: "1234", os_type: "tvOS", os_version: "26.5", is_simulator: true, state: "Shutdown")
+        status = double('status', "success?": true)
+        expect(Open3).to receive(:capture2e).with("xcrun simctl bootstatus 1234 -b").and_return(["Finished", status])
+
+        device.boot
+
+        expect(device.state).to eq('Booted')
+      end
+
+      it "shuts down a tvOS simulator" do
+        device = FastlaneCore::DeviceManager::Device.new(name: "Apple TV", udid: "1234", os_type: "tvOS", os_version: "26.5", is_simulator: true, state: "Booted")
+        expect(device).to receive(:`).with("xcrun simctl shutdown 1234 2>/dev/null")
+
+        device.shutdown
+
+        expect(device.state).to eq('Shutdown')
+      end
     end
   end
 end
