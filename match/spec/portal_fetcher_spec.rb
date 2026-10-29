@@ -120,6 +120,11 @@ describe Match do
         expect(Spaceship::ConnectAPI::BundleId).to have_received(:all)
           .with(filter: { identifier: 'bundle_id_3' }).exactly(1).times
       end
+
+      it "makes no request for an empty list" do
+        expect(default_sut.bundle_ids(bundle_id_identifiers: [])).to eq([])
+        expect(Spaceship::ConnectAPI::BundleId).not_to have_received(:all)
+      end
     end
 
     describe "profiles" do
