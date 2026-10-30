@@ -29,13 +29,15 @@ module Deliver
     private
 
     def create_review_submission(options, app, version, platform)
-      # Can't submit a review if there is already a review in progress
-      if app.get_in_progress_review_submission(platform: platform)
+      # Apple allows one app-version submission alongside an items-only submission.
+      # Fail closed unless every active submission is demonstrably items-only.
+      in_progress_submissions = app.get_in_progress_review_submissions(platform: platform)
+      unless in_progress_submissions.all?(&:items_only?)
         UI.user_error!("Cannot submit for review - A review submission is already in progress")
       end
 
-      # There can only be one open submission per platform per app
-      # There might be a submission already created so we need to check
+      # Reuse an existing ready submission for the app version when possible.
+      # There might be a ready submission already created so we need to check
       # 1. Create the submission if its not already created
       # 2. Error if submission already contains some items for review (because we don't know what they are)
       submission = app.get_ready_review_submission(platform: platform, includes: "items")
