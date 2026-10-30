@@ -128,13 +128,12 @@ describe FastlaneCore do
       use_api_key = !api_key.nil?
       # altool never supports -assetFile, so even asset paths use -f
       upload_part = use_asset_path ? "-f #{tmp_dir}/#{random_uuid}.ipa" : "-f #{tmp_dir}/my.app.id.itmsp"
-      escaped_password = password.shellescape
 
       [
         "xcrun altool",
         "--upload-app",
         ("-u #{email.shellescape}" unless use_api_key),
-        ("-p #{escaped_password}" unless use_api_key),
+        ("-p @env:ITMS_TRANSPORTER_PASSWORD" unless use_api_key),
         ("--apiKey #{api_key[:key_id]}" if use_api_key),
         ("--apiIssuer #{api_key[:issuer_id]}" if use_api_key),
         ("--asc-provider #{provider_short_name}" unless use_api_key || provider_short_name.to_s.empty?),
@@ -149,13 +148,12 @@ describe FastlaneCore do
       use_api_key = !api_key.nil?
       # altool never supports -assetFile, so even asset paths use -f
       verify_part = use_asset_path ? "-f #{tmp_dir}/#{random_uuid}.ipa" : "-f #{tmp_dir}/my.app.id.itmsp"
-      escaped_password = password.shellescape
 
       [
         "xcrun altool",
         "--validate-app",
         ("-u #{email.shellescape}" unless use_api_key),
-        ("-p #{escaped_password}" unless use_api_key),
+        ("-p @env:ITMS_TRANSPORTER_PASSWORD" unless use_api_key),
         ("--apiKey #{api_key[:key_id]}" if use_api_key),
         ("--apiIssuer #{api_key[:issuer_id]}" if use_api_key),
         ("--asc-provider #{provider_short_name}" unless use_api_key || provider_short_name.to_s.empty?),
@@ -167,13 +165,12 @@ describe FastlaneCore do
 
     def altool_provider_id_command(api_key: nil)
       use_api_key = !api_key.nil?
-      escaped_password = password.shellescape
 
       [
         "xcrun altool",
         "--list-providers",
         ("-u #{email.shellescape}" unless use_api_key),
-        ("-p #{escaped_password}" unless use_api_key),
+        ("-p @env:ITMS_TRANSPORTER_PASSWORD" unless use_api_key),
         ("--apiKey #{api_key[:key_id]}" if use_api_key),
         ("--apiIssuer #{api_key[:issuer_id]}" if use_api_key),
         "--output-format json"
@@ -341,7 +338,6 @@ describe FastlaneCore do
       upload_part = use_asset_path ? "-assetFile #{tmp_dir}/#{random_uuid}.ipa" : "-f #{tmp_dir}/my.app.id.itmsp"
 
       [
-        ("ITMS_TRANSPORTER_PASSWORD=#{password.shellescape}" if jwt.nil?),
         "xcrun iTMSTransporter",
         "-m upload",
         ("-u #{email.shellescape}" if jwt.nil?),
@@ -357,7 +353,6 @@ describe FastlaneCore do
 
     def xcrun_verify_command(transporter: nil, jwt: nil)
       [
-        ("ITMS_TRANSPORTER_PASSWORD=#{password.shellescape}" if jwt.nil?),
         "xcrun iTMSTransporter",
         "-m verify",
         ("-u #{email.shellescape}" if jwt.nil?),
@@ -370,7 +365,6 @@ describe FastlaneCore do
 
     def xcrun_download_command(provider_short_name = nil, jwt: nil)
       [
-        ("ITMS_TRANSPORTER_PASSWORD=#{password.shellescape}" if jwt.nil?),
         "xcrun iTMSTransporter",
         '-m lookupMetadata',
         ("-u #{email.shellescape}" if jwt.nil?),
@@ -1540,6 +1534,43 @@ describe FastlaneCore do
           expect(FastlaneCore::FastlanePty).to receive(:spawn).and_raise(StandardError, "It's all broken now.")
           expect(@transporter.upload('my.app.id', tmp_dir)).to eq(false)
         end
+
+        it 'passes the password in the environment, not on the command line' do
+          allow(FastlaneCore::Helper).to receive(:xcode_version).and_return('11.1')
+          allow(FastlaneCore::Helper).to receive(:mac?).and_return(true)
+          allow(FastlaneCore::Helper).to receive(:windows?).and_return(false)
+          transporter = FastlaneCore::ItunesTransporter.new(email, password, false)
+          expect(FastlaneCore::FastlanePty).to receive(:spawn) do |command, env:|
+            expect(command).to include("-p @env:ITMS_TRANSPORTER_PASSWORD")
+            expect(command).not_to include("p@")
+            expect(env).to eq("ITMS_TRANSPORTER_PASSWORD" => password)
+            0
+          end
+          expect(transporter.upload('my.app.id', tmp_dir)).to eq(true)
+        end
+
+        it 'passes the password in the environment to altool' do
+          allow(FastlaneCore::Helper).to receive(:xcode_version).and_return('14.0')
+          allow(FastlaneCore::Helper).to receive(:mac?).and_return(true)
+          allow(FastlaneCore::Helper).to receive(:windows?).and_return(false)
+          transporter = FastlaneCore::ItunesTransporter.new(email, password, false, altool_compatible_command: true)
+          expect(FastlaneCore::FastlanePty).to receive(:spawn) do |command, env:|
+            expect(command).to include("altool")
+            expect(command).not_to include("p@")
+            expect(env).to eq("ITMS_TRANSPORTER_PASSWORD" => password)
+            0
+          end
+          expect(transporter.upload(package_path: "#{tmp_dir}/my.app.id.itmsp", platform: "ios")).to eq(true)
+        end
+
+        it 'passes no password when using an API key' do
+          transporter = FastlaneCore::ItunesTransporter.new(nil, nil, false, nil, jwt)
+          expect(FastlaneCore::FastlanePty).to receive(:spawn) do |command, env:|
+            expect(env).to eq({})
+            0
+          end
+          expect(transporter.upload('my.app.id', tmp_dir)).to eq(true)
+        end
       end
     end
 
@@ -1636,7 +1667,7 @@ describe FastlaneCore do
       context "with use username and password" do
         let(:usr_arg) { email }
         let(:pass_arg) { password }
-        let(:expected) { "-u #{email.shellescape} -p #{password.shellescape}" }
+        let(:expected) { "-u #{email.shellescape} -p @env:ITMS_TRANSPORTER_PASSWORD" }
 
         include_examples 'build_credential_params'
       end
