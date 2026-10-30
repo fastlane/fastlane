@@ -201,7 +201,8 @@ module Gym
           hash[:signingStyle] = 'manual'
         end
 
-        if Gym.config[:installer_cert_name] && (Gym.project.mac? || Gym.building_mac_catalyst_for_mac?)
+        # Installer certificates only sign macOS packages, so this is never needed for an IPA
+        if Gym.config[:installer_cert_name] && Gym.building_for_pkg?
           hash[:installerSigningCertificate] = Gym.config[:installer_cert_name]
         end
 

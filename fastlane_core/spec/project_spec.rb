@@ -646,6 +646,11 @@ describe FastlaneCore do
     end
 
     describe 'build_settings() with disallow_xcodebuild_settings_lookup' do
+      # The environment variable disallows the lookup on its own, so the developer's environment must not decide these
+      around do |example|
+        FastlaneSpec::Env.with_env_values('FASTLANE_DISALLOW_XCODEBUILD_SETTINGS_LOOKUP' => nil) { example.run }
+      end
+
       it 'raises a helpful error naming the required build setting instead of running xcodebuild -showBuildSettings' do
         project = FastlaneCore::Project.new({
           project: "./fastlane_core/spec/fixtures/projects/Example.xcodeproj",
@@ -666,8 +671,9 @@ describe FastlaneCore do
       end
 
       context 'when the FASTLANE_DISALLOW_XCODEBUILD_SETTINGS_LOOKUP environment variable is set' do
-        before { ENV['FASTLANE_DISALLOW_XCODEBUILD_SETTINGS_LOOKUP'] = 'true' }
-        after { ENV.delete('FASTLANE_DISALLOW_XCODEBUILD_SETTINGS_LOOKUP') }
+        around do |example|
+          FastlaneSpec::Env.with_env_values('FASTLANE_DISALLOW_XCODEBUILD_SETTINGS_LOOKUP' => 'true') { example.run }
+        end
 
         it 'raises an error naming the environment variable even when the option is not set' do
           project = FastlaneCore::Project.new({
@@ -715,6 +721,80 @@ describe FastlaneCore do
         expect(FastlaneCore::Project).to receive(:run_command).and_return("PRODUCT_BUNDLE_IDENTIFIER = tools.fastlane.app\n")
 
         expect(project.build_settings(key: "PRODUCT_BUNDLE_IDENTIFIER")).to eq("tools.fastlane.app")
+      end
+
+      describe '#xcodebuild_settings_lookup_disallowed_by' do
+        def project_with(options = {})
+          FastlaneCore::Project.new({ project: "./fastlane_core/spec/fixtures/projects/Example.xcodeproj" }.merge(options))
+        end
+
+        it 'names the option when it is set' do
+          expect(project_with(disallow_xcodebuild_settings_lookup: true).xcodebuild_settings_lookup_disallowed_by).to eq("the `disallow_xcodebuild_settings_lookup` option")
+        end
+
+        it 'names the environment variable when it is set' do
+          FastlaneSpec::Env.with_env_values('FASTLANE_DISALLOW_XCODEBUILD_SETTINGS_LOOKUP' => 'true') do
+            expect(project_with.xcodebuild_settings_lookup_disallowed_by).to eq("the FASTLANE_DISALLOW_XCODEBUILD_SETTINGS_LOOKUP environment variable")
+          end
+        end
+
+        it 'is nil when the lookup is allowed' do
+          expect(project_with.xcodebuild_settings_lookup_disallowed_by).to be_nil
+          expect(project_with(disallow_xcodebuild_settings_lookup: false).xcodebuild_settings_lookup_disallowed_by).to be_nil
+        end
+      end
+
+      describe '#app_name_if_lookup_allowed' do
+        it 'is nil, without reading build settings, when the lookup is disallowed' do
+          project = FastlaneCore::Project.new({ project: "./fastlane_core/spec/fixtures/projects/Example.xcodeproj", disallow_xcodebuild_settings_lookup: true })
+          expect(FastlaneCore::Project).to_not(receive(:run_command))
+
+          expect(project.app_name_if_lookup_allowed).to be_nil
+        end
+
+        it 'is the app name when the lookup is allowed' do
+          project = FastlaneCore::Project.new({ project: "./fastlane_core/spec/fixtures/projects/Example.xcodeproj" })
+          allow(project).to receive(:app_name).and_return("ExampleProductName")
+
+          expect(project.app_name_if_lookup_allowed).to eq("ExampleProductName")
+        end
+      end
+
+      describe '#verify_xcodebuild_settings_lookup_allowed!' do
+        let(:project) do
+          FastlaneCore::Project.new({ project: "./fastlane_core/spec/fixtures/projects/Example.xcodeproj", disallow_xcodebuild_settings_lookup: true })
+        end
+
+        before do
+          expect(FastlaneCore::Project).to_not(receive(:run_command))
+        end
+
+        it 'raises the lookup error naming the option that replaces the value' do
+          expect do
+            project.verify_xcodebuild_settings_lookup_allowed!("SUPPORTED_PLATFORMS", option: "destination")
+          end.to raise_error(FastlaneCore::Interface::FastlaneError) do |error|
+            expect(error.message).to include("Could not read the 'SUPPORTED_PLATFORMS' build setting")
+            expect(error.message).to include("disallowed by the `disallow_xcodebuild_settings_lookup` option")
+            expect(error.message).to include("project_spec.rb") # the caller that needed the value
+            expect(error.message).to include("To fix this, set the `destination` option, or disable the `disallow_xcodebuild_settings_lookup` option")
+          end
+        end
+
+        it 'lists every option that replaces the value' do
+          expect do
+            project.verify_xcodebuild_settings_lookup_allowed!("SUPPORTED_PLATFORMS", option: %w(device destination))
+          end.to raise_error(FastlaneCore::Interface::FastlaneError, /set one of the `device` or `destination` options,/)
+
+          expect do
+            project.verify_xcodebuild_settings_lookup_allowed!("SUPPORTED_PLATFORMS", option: %w(device devices destination))
+          end.to raise_error(FastlaneCore::Interface::FastlaneError, /set one of the `device`, `devices` or `destination` options,/)
+        end
+
+        it 'does nothing when the lookup is allowed' do
+          allowed = FastlaneCore::Project.new({ project: "./fastlane_core/spec/fixtures/projects/Example.xcodeproj" })
+
+          expect { allowed.verify_xcodebuild_settings_lookup_allowed!("SUPPORTED_PLATFORMS", option: "destination") }.not_to raise_error
+        end
       end
     end
 

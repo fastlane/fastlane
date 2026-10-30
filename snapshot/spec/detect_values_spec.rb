@@ -55,7 +55,8 @@ describe Snapshot do
             project: "./snapshot/example/Example.xcodeproj",
             scheme: "ExampleMacOSUITests"
         }
-        mock_project = instance_double(FastlaneCore::Project, mac?: true, path: "./snapshot/example/Example.xcodeproj", select_scheme: nil)
+        # Picking the default devices first checks that build settings may be read
+        mock_project = instance_double(FastlaneCore::Project, mac?: true, path: "./snapshot/example/Example.xcodeproj", select_scheme: nil, verify_xcodebuild_settings_lookup_allowed!: nil)
         allow(FastlaneCore::Project).to receive(:new).and_return(mock_project)
         allow(FastlaneCore::Project).to receive(:detect_projects)
 
