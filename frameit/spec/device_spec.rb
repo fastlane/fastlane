@@ -78,6 +78,11 @@ describe Frameit::Device do
         expect_screen_size_from_file("iphone-X-Landscape{2436x1125}.jpg", Platform::IOS).to eq(Devices::IPHONE_X)
       end
 
+      it "should detect iPad Air (2019) for 1668x2224 unless the file name contains iPad Pro (10.5-inch)" do
+        expect_screen_size_from_file("screenshot-Portrait{1668x2224}.jpg", Platform::IOS).to eq(Devices::IPAD_AIR_2019)
+        expect_screen_size_from_file("iPad Pro (10.5-inch)-Portrait{1668x2224}.jpg", Platform::IOS).to eq(Devices::IPAD_PRO_10_5)
+      end
+
       it "should detect iPhone X instead of iPhone XS because of CLI parameters or fastfile" do
         allow(Frameit.config).to receive(:[]).with(:use_legacy_iphonex).and_return(true)
         expect_screen_size_from_file("screenshot-Portrait{1125x2436}.jpg", Platform::IOS).to eq(Devices::IPHONE_X)
@@ -108,6 +113,23 @@ describe Frameit::Device do
       end
     end
 
+    describe "valid Surface screen sizes" do
+      it "should detect Surface Pro X because of file name containing device name" do
+        expect_screen_size_from_file("Surface Pro X portrait{1920x2880}.png", Platform::IOS).to eq(Devices::SURFACE_PRO_X)
+        expect_screen_size_from_file("Surface Pro X landscape{2880x1920}.png", Platform::ANDROID).to eq(Devices::SURFACE_PRO_X)
+      end
+
+      it "should detect Surface Pro X based on resolution when platform is ANY" do
+        expect_screen_size_from_file("screenshot-landscape{2880x1920}.png", Platform::ANY).to eq(Devices::SURFACE_PRO_X)
+      end
+
+      it "shouldn't detect Surface Pro X based on resolution alone for iOS" do
+        expect do
+          Frameit::Device.detect_device("screenshot-landscape{2880x1920}.png", Platform::IOS)
+        end.to raise_error(FastlaneCore::Interface::FastlaneError)
+      end
+    end
+
     describe "force device types" do
       it "should force iPhone X despite arbitrary file name and resolution via device ID" do
         expect_forced_screen_size("iphone-X").to eq(Devices::IPHONE_X)
@@ -127,6 +149,10 @@ describe Frameit::Device do
 
       it "should force iPhone 16 Pro Max via device ID" do
         expect_forced_screen_size("iphone16-pro-max").to eq(Devices::IPHONE_16_PRO_MAX)
+      end
+
+      it "should force Surface Pro X via device name" do
+        expect_forced_screen_size("Surface Pro X").to eq(Devices::SURFACE_PRO_X)
       end
 
       it "should force iPhone 17 via device ID" do
