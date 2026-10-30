@@ -83,10 +83,7 @@ module FastlaneCore
       end
       # Specified p8 needs to be generated to call altool or iTMSTransporter
       p8_path = File.join(api_key[:key_dir], p8_name)
-      File.open(p8_path, "wb", 0o600) do |p8|
-        p8.write(api_key[:key])
-      end
-      File.chmod(0o600, p8_path)
+      Helper.open_owner_only(p8_path, "wb") { |p8| p8.write(api_key[:key]) }
       api_key
     end
 

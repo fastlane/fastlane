@@ -15,6 +15,50 @@ describe Cert do
     # Iterates over different Xcode versions to test different cert types
     # Xcode 10 and earlier - Spaceship.certificate.production
     # Xcode 11 and later - Spaceship.certificate.apple_distribution
+    describe "#create_certificate" do
+      let(:temp) { Dir.mktmpdir('fl_spec_cert') }
+      let(:private_key_path) { File.join(temp, "cert_id.p12") }
+
+      around do |example|
+        old_umask = File.umask(0o022)
+        begin
+          example.run
+        ensure
+          File.umask(old_umask)
+          FileUtils.rm_rf(temp)
+          ENV.delete("CER_CERTIFICATE_ID")
+          ENV.delete("CER_FILE_PATH")
+        end
+      end
+
+      before do
+        allow(FastlaneCore::Helper).to receive(:mac?).and_return(false)
+        csr = double("csr", to_pem: "csr")
+        allow(Spaceship::ConnectAPI::Certificate).to receive(:create_certificate_signing_request).and_return([csr, "pkey"])
+        allow(Spaceship::ConnectAPI::Certificate).to receive(:create).and_return(stub_certificate)
+        Cert.config = FastlaneCore::Configuration.create(Cert::Options.available_options, output_path: temp)
+      end
+
+      def create_certificate
+        runner = Cert::Runner.new
+        allow(runner).to receive(:certificate_type).and_return(Spaceship::ConnectAPI::Certificate::CertificateType::IOS_DISTRIBUTION)
+        runner.create_certificate
+      end
+
+      it "creates the private key readable only by its owner" do
+        create_certificate
+        expect(File.stat(private_key_path).mode & 0o777).to eq(0o600) unless FastlaneCore::Helper.windows?
+      end
+
+      it "makes an existing private key file readable only by its owner" do
+        File.write(private_key_path, "old")
+        File.chmod(0o644, private_key_path)
+        create_certificate
+        expect(File.read(private_key_path)).to eq("pkey")
+        expect(File.stat(private_key_path).mode & 0o777).to eq(0o600) unless FastlaneCore::Helper.windows?
+      end
+    end
+
     xcode_versions.each do |xcode_version, dist_cert_type|
       context "Xcode #{xcode_version}" do
         before do

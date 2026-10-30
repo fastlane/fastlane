@@ -250,7 +250,8 @@ module Match
 
         if params[:output_path]
           FileUtils.cp(cert_path, params[:output_path])
-          FileUtils.cp(select_cert_or_key(paths: keys, certificate_id: certificate_id), params[:output_path])
+          key_path = select_cert_or_key(paths: keys, certificate_id: certificate_id)
+          FastlaneCore::Helper.open_owner_only(File.join(params[:output_path], File.basename(key_path)), "wb") { |file| IO.copy_stream(key_path, file) }
         end
 
         # Get and print info of certificate
