@@ -58,6 +58,39 @@ describe Deliver::Runner do
     })
   end
 
+  describe :run do
+    [:edit_live, :use_live_version].each do |live_option|
+      it "rejects creative assets with #{live_option} before changing App Store data" do
+        options[:creative_assets] = [{ locale: 'en-US' }]
+        options[live_option] = true
+        expect(runner).not_to receive(:verify_version)
+        expect(runner).not_to receive(:reject_version_if_possible)
+        expect(runner).not_to receive(:upload_metadata)
+        expect(runner).not_to receive(:upload_binary)
+
+        expect { runner.run }.to raise_error(/Creative asset uploads require an editable version/)
+      end
+    end
+
+    it 'allows live metadata updates without creative assets' do
+      options[:edit_live] = true
+      expect(runner).to receive(:verify_version)
+      expect(runner).to receive(:upload_metadata)
+      allow(runner).to receive(:upload_binary)
+      allow(runner).to receive(:precheck_app).and_return(true)
+
+      expect { runner.run }.not_to raise_error
+    end
+
+    it 'keeps verify_only limited to binary validation' do
+      options.merge!(verify_only: true, creative_assets: [{ locale: 'en-US' }], edit_live: true)
+      expect(runner).to receive(:verify_binary)
+      expect(runner).not_to receive(:upload_metadata)
+
+      runner.run
+    end
+  end
+
   describe :upload_binary do
     let(:transporter) { MockTransporter.new }
     before do
@@ -317,6 +350,21 @@ describe Deliver::Runner do
       allow(Deliver::UploadMetadata).to receive(:new).and_return(fake_upload_metadata)
       allow(Deliver::UploadScreenshots).to receive(:new).and_return(fake_upload_screenshots)
       allow(Deliver::HtmlGenerator).to receive(:new).and_return(fake_html_generator)
+    end
+
+    it 'uploads configured creative assets after metadata and screenshots' do
+      options[:creative_assets] = [{ locale: 'en-US' }]
+      uploader = instance_double(Deliver::UploadCreativeAssets)
+      expect(Deliver::UploadCreativeAssets).to receive(:new).and_return(uploader)
+      expect(fake_upload_metadata).to receive(:upload).ordered
+      expect(fake_upload_screenshots).to receive(:upload).ordered
+      expect(uploader).to receive(:upload).with(options).ordered
+      runner.upload_metadata
+    end
+
+    it 'does not instantiate a creative asset uploader without configuration' do
+      expect(Deliver::UploadCreativeAssets).not_to receive(:new)
+      runner.upload_metadata
     end
 
     it 'invokes SyncAppPreviews when app_previews_path is provided' do
