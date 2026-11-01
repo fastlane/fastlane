@@ -6,7 +6,7 @@ describe Fastlane do
       after { FileUtils.remove_entry(output_directory) if File.directory?(output_directory) }
 
       around do |example|
-        with_xcresult_fixture_copy("Test.test_result.xcresult") do |path|
+        with_fixture_copy("./trainer/spec/fixtures/Test.test_result.xcresult") do |path|
           @xcresult_path = path
           example.run
         end

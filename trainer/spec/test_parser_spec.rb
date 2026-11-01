@@ -58,7 +58,7 @@ describe Trainer do
       let(:config) { { force_legacy_xcresulttool: true } }
 
       around do |example|
-        with_xcresult_fixture_copy("Test.test_result.xcresult") do |path|
+        with_fixture_copy("./trainer/spec/fixtures/Test.test_result.xcresult") do |path|
           @xcresult_path = path
           example.run
         end
@@ -407,7 +407,7 @@ describe Trainer do
 
   describe Trainer::XCResult::Parser do
     around do |example|
-      with_xcresult_fixture_copy("Test.test_result.xcresult") do |path|
+      with_fixture_copy("./trainer/spec/fixtures/Test.test_result.xcresult") do |path|
         @xcresult_path = path
         example.run
       end
