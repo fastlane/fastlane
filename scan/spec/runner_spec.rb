@@ -2,6 +2,10 @@ require 'scan'
 
 describe Scan do
   describe Scan::Runner do
+    before(:each) do
+      fake_out_simulator_detection
+    end
+
     describe "handle_results" do
       before(:each) do
         mock_slack_poster = Object.new
