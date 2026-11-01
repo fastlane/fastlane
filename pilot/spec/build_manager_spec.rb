@@ -392,6 +392,7 @@ describe "Build Manager" do
         })
         expect(Spaceship::ConnectAPI::Build).to receive(:get).and_return(ready_to_submit_mock_build).exactly(2).times
         expect(FastlaneCore::UI).to receive(:message).with("Waiting for build 123 to process export compliance")
+        expect(fake_build_manager).to receive(:sleep).with(5)
         expect(ready_to_submit_mock_build).to receive(:build_beta_detail).and_return(build_beta_detail).exactly(3).times
 
         # Expect beta groups fetched from app. This tests:
