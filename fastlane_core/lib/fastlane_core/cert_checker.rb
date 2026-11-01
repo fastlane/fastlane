@@ -89,10 +89,9 @@ module FastlaneCore
     end
 
     def self.installed_installers(in_keychain: nil)
-      available = self.list_available_third_party_mac_installer(in_keychain: in_keychain)
-      available += self.list_available_developer_id_installer(in_keychain: in_keychain)
-
-      return available.scan(/^SHA-1 hash: ([[:xdigit:]]+)$/).flatten
+      ["3rd Party Mac Developer Installer", "Developer ID Installer"].flat_map do |name|
+        find_certificates(name, keychain: in_keychain).map(&:sha1)
+      end
     end
 
     def self.available_identities(in_keychain: nil)
@@ -102,41 +101,20 @@ module FastlaneCore
       []
     end
 
-    def self.list_available_third_party_mac_installer(in_keychain: nil)
-      # -Z  Print SHA-256 (and SHA-1) hash of the certificate
-      # -a  Find all matching certificates, not just the first one
-      # -c  Match on "name" when searching (optional)
-      commands = ['security find-certificate -Z -a -c "3rd Party Mac Developer Installer"']
-      commands << in_keychain if in_keychain
-      `#{commands.join(' ')}`
-    end
-
-    def self.list_available_developer_id_installer(in_keychain: nil)
-      # -Z  Print SHA-256 (and SHA-1) hash of the certificate
-      # -a  Find all matching certificates, not just the first one
-      # -c  Match on "name" when searching (optional)
-      commands = ['security find-certificate -Z -a -c "Developer ID Installer"']
-      commands << in_keychain if in_keychain
-      `#{commands.join(' ')}`
+    def self.find_certificates(name, keychain: nil)
+      Security::Certificate.find(name: name, keychain: keychain)
+    rescue Security::Error => e
+      UI.error("Could not search for '#{name}' certificates: #{e.message}")
+      []
     end
 
     def self.installed_wwdr_certificates(keychain: nil)
       keychain ||= wwdr_keychain # backwards compatibility
 
-      # Find all installed WWDRCA certificates. A single `security
-      # find-certificate` call can only match one common name, so query the
-      # keychain once per common name used by the certificates
-      installed_certs = []
-      WWDRCA_CERTIFICATE_NAMES.each do |certificate_name|
-        Helper.backticks("security find-certificate -a -c '#{certificate_name}' -p #{keychain.shellescape}", print: false)
-              .lines
-              .each do |line|
-          if line.start_with?('-----BEGIN CERTIFICATE-----')
-            installed_certs << line
-          else
-            installed_certs.last << line
-          end
-        end
+      # A single `security find-certificate` call can only match one common
+      # name, so query the keychain once per common name used by the certificates
+      installed_certs = WWDRCA_CERTIFICATE_NAMES.flat_map do |certificate_name|
+        find_certificates(certificate_name, keychain: keychain).map(&:pem)
       end
 
       # Get the alias (see `WWDRCA_CERTIFICATES`) of the installed WWDRCA certificates
