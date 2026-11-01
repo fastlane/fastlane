@@ -166,7 +166,7 @@ describe FastlaneCore do
     end
 
     describe "Valid Standard Project" do
-      before do
+      before(:all) do
         options = { project: "./fastlane_core/spec/fixtures/projects/Example.xcodeproj" }
         @project = FastlaneCore::Project.new(options)
       end
@@ -239,7 +239,7 @@ describe FastlaneCore do
     end
 
     describe "Mac Project" do
-      before do
+      before(:all) do
         options = { project: "./fastlane_core/spec/fixtures/projects/Mac.xcodeproj" }
         @project = FastlaneCore::Project.new(options)
       end
@@ -266,7 +266,7 @@ describe FastlaneCore do
     end
 
     describe "TVOS Project" do
-      before do
+      before(:all) do
         options = { project: "./fastlane_core/spec/fixtures/projects/ExampleTVOS.xcodeproj" }
         @project = FastlaneCore::Project.new(options)
       end
@@ -293,7 +293,7 @@ describe FastlaneCore do
     end
 
     describe "Cross-Platform Project" do
-      before do
+      before(:all) do
         options = { project: "./fastlane_core/spec/fixtures/projects/Cross-Platform.xcodeproj" }
         @project = FastlaneCore::Project.new(options)
       end
@@ -366,7 +366,7 @@ describe FastlaneCore do
     end
 
     describe "Build Settings with default configuration" do
-      before do
+      before(:all) do
         options = { project: "./fastlane_core/spec/fixtures/projects/Example.xcodeproj" }
         @project = FastlaneCore::Project.new(options)
       end
@@ -381,7 +381,7 @@ describe FastlaneCore do
     end
 
     describe "Build Settings with specific configuration" do
-      before do
+      before(:all) do
         options = {
           project: "./fastlane_core/spec/fixtures/projects/Example.xcodeproj",
           configuration: "SpecialConfiguration"
