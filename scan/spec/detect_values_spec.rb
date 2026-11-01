@@ -62,6 +62,15 @@ describe Scan do
         end.to raise_error(FastlaneCore::Interface::FastlaneCrash, "Unknown platform: test")
       end
 
+      it 'answers from the installed Xcode and runtimes', requires_xcodebuild: true do
+        sdks = JSON.parse(`xcodebuild -showsdks -json`)
+        sdk_version = sdks.find { |sdk| sdk['platform'] == 'iphonesimulator' }['productVersion']
+        runtimes = JSON.parse(`xcrun simctl list -j runtimes`)['runtimes']
+        runtime_versions = runtimes.select { |runtime| runtime['platform'] == 'iOS' }.map { |runtime| runtime['version'] }
+
+        expect([sdk_version, *runtime_versions].map { |version| Gem::Version.new(version) }).to include(Scan::DetectValues.default_os_version('iOS'))
+      end
+
       it 'returns an error if `xcrun simctl runtime -h` is broken' do
         help_output = 'garbage'
         allow(Open3).to receive(:capture3).with('xcrun simctl runtime -h').and_return([nil, help_output, nil])
