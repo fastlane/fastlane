@@ -57,6 +57,13 @@ describe Trainer do
     describe "Stores the data in a useful format" do
       let(:config) { { force_legacy_xcresulttool: true } }
 
+      around do |example|
+        with_xcresult_fixture_copy("Test.test_result.xcresult") do |path|
+          @xcresult_path = path
+          example.run
+        end
+      end
+
       describe "#tests_successful?" do
         it "returns false if tests failed" do
           tp = Trainer::TestParser.new("./trainer/spec/fixtures/Valid1.plist", config)
@@ -120,7 +127,7 @@ describe Trainer do
       end
 
       it "works as expected with xcresult", requires_xcode: true do
-        tp = Trainer::TestParser.new("./trainer/spec/fixtures/Test.test_result.xcresult", config)
+        tp = Trainer::TestParser.new(@xcresult_path, config)
         expect(tp.data).to eq([
                                 {
                                   project_path: "Test.xcodeproj",
@@ -231,7 +238,7 @@ describe Trainer do
 
       it "still produces a test failure message when file url is missing", requires_xcode: true do
         allow_any_instance_of(Trainer::LegacyXCResult::TestFailureIssueSummary).to receive(:document_location_in_creating_workspace).and_return(nil)
-        tp = Trainer::TestParser.new("./trainer/spec/fixtures/Test.test_result.xcresult", config)
+        tp = Trainer::TestParser.new(@xcresult_path, config)
         test_failures = tp.data.last[:tests].select { |t| t[:failures] }
         failure_messages = test_failures.map { |tf| tf[:failures].first[:failure_message] }
         expect(failure_messages).to eq(["XCTAssertTrue failed", "XCTAssertTrue failed"])
@@ -399,6 +406,13 @@ describe Trainer do
   end
 
   describe Trainer::XCResult::Parser do
+    around do |example|
+      with_xcresult_fixture_copy("Test.test_result.xcresult") do |path|
+        @xcresult_path = path
+        example.run
+      end
+    end
+
     # Read once at load. Each fixture group below encodes the output of one
     # xcresulttool version, so the groups that do not apply to this machine are
     # left undefined rather than defined and skipped. Unlike the actions, the
@@ -408,7 +422,7 @@ describe Trainer do
 
     if xcresulttool_23
       it 'generates same data for legacy and new commands', requires_xcodebuild: true do
-        xcresult_path = File.expand_path('../fixtures/Test.test_result.xcresult', __FILE__)
+        xcresult_path = @xcresult_path
 
         keys_to_compare = [
           :number_of_tests,

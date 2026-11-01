@@ -5,12 +5,19 @@ describe Fastlane do
       let(:output_directory) { Dir.mktmpdir("fl_spec_trainer") }
       after { FileUtils.remove_entry(output_directory) if File.directory?(output_directory) }
 
+      around do |example|
+        with_xcresult_fixture_copy("Test.test_result.xcresult") do |path|
+          @xcresult_path = path
+          example.run
+        end
+      end
+
       context ":fail_build" do
         it "does not raise an error if tests fail and fail_build is false", requires_xcode: true do
           expect do
             Fastlane::FastFile.new.parse("lane :parse_test_result do
                 trainer(
-                  path: '../trainer/spec/fixtures/Test.test_result.xcresult',
+                  path: '#{@xcresult_path}',
                   output_directory: '#{output_directory}',
                   fail_build: false
                 )
@@ -23,7 +30,7 @@ describe Fastlane do
           expect do
             Fastlane::FastFile.new.parse("lane :parse_test_result do
                 trainer(
-                  path: '../trainer/spec/fixtures/Test.test_result.xcresult',
+                  path: '#{@xcresult_path}',
                   output_directory: '#{output_directory}',
                   fail_build: true
                 )
