@@ -1,4 +1,8 @@
 describe Gym do
+  before do
+    fake_out_build_settings(GYM_BUILD_SETTINGS)
+  end
+
   it "detects when a multiplatform project is building for iOS", requires_xcodebuild: true do
     options = { project: "./gym/examples/multiplatform/Example.xcodeproj", sdk: "iphoneos" }
     Gym.config = FastlaneCore::Configuration.create(Gym::Options.available_options, options)
