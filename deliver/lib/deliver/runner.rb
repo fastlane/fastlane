@@ -13,6 +13,7 @@ require_relative 'upload_metadata'
 require_relative 'upload_app_clip_default_experience_metadata'
 require_relative 'upload_app_clip_default_experience_header_images'
 require_relative 'upload_screenshots'
+require_relative 'upload_creative_assets'
 require_relative 'sync_screenshots'
 require_relative 'sync_app_previews'
 require_relative 'detect_values'
@@ -55,6 +56,8 @@ module Deliver
         verify_binary
         return
       end
+
+      UploadCreativeAssets.validate_options(options)
 
       verify_version if options[:app_version].to_s.length > 0 && !options[:skip_app_version_update]
 
@@ -178,6 +181,8 @@ module Deliver
         )
         previews.sync_from_path
       end
+
+      UploadCreativeAssets.new.upload(options) if options[:creative_assets]
 
       UploadPriceTier.new.upload(options)
     end
