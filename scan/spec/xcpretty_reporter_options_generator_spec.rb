@@ -288,6 +288,8 @@ describe Scan do
             output_directory: "/test_output"
           }
 
+          fake_out_simulator_detection
+          fake_out_build_settings
           Scan.config = FastlaneCore::Configuration.create(Scan::Options.available_options, options)
           Scan.cache[:temp_junit_report] = nil
 

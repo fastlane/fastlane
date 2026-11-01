@@ -2,6 +2,7 @@ describe Scan do
   describe Scan::DetectValues do
     before do
       fake_out_simulator_detection
+      fake_out_build_settings
     end
 
     describe 'Xcode project' do
@@ -42,6 +43,7 @@ describe Scan do
 
     describe 'Xcode config handling' do
       before do
+        allow_any_instance_of(FastlaneCore::Project).to receive(:build_settings).and_call_original
         options = { project: "./scan/examples/standard/app.xcodeproj" }
         FileUtils.mkdir_p("./scan/examples/standard/app.xcodeproj/project.xcworkspace/xcuserdata/#{ENV['USER']}.xcuserdatad/")
         FileUtils.copy("./scan/examples/standard/WorkspaceSettings.xcsettings", "./scan/examples/standard/app.xcodeproj/project.xcworkspace/xcuserdata/#{ENV['USER']}.xcuserdatad/WorkspaceSettings.xcsettings")
@@ -52,6 +54,17 @@ describe Scan do
       it "fetches the path from the Xcode config", requires_xcodebuild: true do
         derived_data = Scan.config[:derived_data_path]
         expect(derived_data).to match(File.expand_path("./scan/examples/standard/"))
+      end
+    end
+
+    describe 'the build settings faked in the other examples' do
+      it 'match what the installed Xcode answers', requires_xcodebuild: true do
+        allow_any_instance_of(FastlaneCore::Project).to receive(:build_settings).and_call_original
+        project = FastlaneCore::Project.new(project: "./scan/examples/standard/app.xcodeproj")
+
+        SCAN_STANDARD_APP_BUILD_SETTINGS.each do |key, value|
+          expect(project.build_settings(key: key)).to eq(value), key
+        end
       end
     end
 
