@@ -110,7 +110,8 @@ module Deliver
       precheck_success = true
       begin
         precheck_success = Precheck::Runner.new.run
-      rescue Precheck::Runner::BlockingViolationError
+      rescue Precheck::Runner::BlockingViolationError => ex
+        UI.error(ex.message)
         return false
       rescue FastlaneCore::Interface::FastlaneError
         raise

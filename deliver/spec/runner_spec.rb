@@ -328,6 +328,7 @@ describe Deliver::Runner do
       )
 
       expect(runner).not_to receive(:submit_for_review)
+      expect(UI).to receive(:error).with('blocking precheck violations')
 
       runner.run
     end
