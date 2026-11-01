@@ -30,12 +30,16 @@ module Gym
 
       detect_scheme
       detect_platform # we can only do that *after* we have the scheme
+      verify_platform_without_build_settings # before the profile detection, which reads build settings but only logs its errors
       detect_selected_provisioning_profiles # we can only do that *after* we have the platform
       detect_configuration
       detect_toolchain
       detect_third_party_installer
 
-      config[:output_name] ||= Gym.project.app_name
+      unless config[:output_name]
+        Gym.project.verify_xcodebuild_settings_lookup_allowed!("WRAPPER_NAME", option: "output_name")
+        config[:output_name] = Gym.project.app_name
+      end
 
       config[:build_path] ||= archive_path_from_local_xcode_preferences
 
@@ -104,6 +108,8 @@ module Gym
     # Detects name of a "3rd Party Mac Developer Installer" cert for the configured team id
     def self.detect_third_party_installer
       return if Gym.config[:installer_cert_name]
+      # Installer certificates sign macOS exports, which need build settings anyway
+      return if Gym.project.xcodebuild_settings_lookup_disallowed_by
 
       team_id = Gym.config[:export_team_id] || Gym.project.build_settings(key: "DEVELOPMENT_TEAM")
       return if team_id.nil?
@@ -145,6 +151,7 @@ module Gym
     def self.detect_platform
       return if Gym.config[:destination]
 
+      Gym.project.verify_xcodebuild_settings_lookup_allowed!("SUPPORTED_PLATFORMS", option: "destination")
       platform = if Gym.project.tvos?
                    "tvOS"
                  elsif Gym.project.visionos?
@@ -157,6 +164,18 @@ module Gym
                    "iOS"
                  end
       Gym.config[:destination] = "generic/platform=#{platform}"
+    end
+
+    # Exporting a macOS build reads the project's build settings, to tell an app from a
+    # command-line tool and to find the app in the archive. When they can't be read,
+    # fail now rather than after the archive is built, unless nothing will be exported
+    def self.verify_platform_without_build_settings
+      disallowed_by = Gym.project.xcodebuild_settings_lookup_disallowed_by
+      return if disallowed_by.nil? || Gym.config[:skip_archive] || Gym.building_for_non_mac_destination?
+
+      UI.user_error!("gym can only export an iOS, tvOS, watchOS or visionOS build while fetching build settings is disallowed by #{disallowed_by}," \
+                     " because exporting for macOS needs the project's build settings. To fix this, set `destination` to one of those platforms" \
+                     " (e.g. \"generic/platform=iOS\") with no `sdk` or `catalyst_platform` for macOS, or disable #{disallowed_by}.")
     end
 
     # Detects the available configurations (e.g. Debug, Release)
