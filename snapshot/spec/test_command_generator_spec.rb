@@ -2,6 +2,10 @@ require 'tmpdir'
 
 describe Snapshot do
   describe Snapshot::TestCommandGenerator do
+    before do
+      fake_out_build_settings(SNAPSHOT_BUILD_SETTINGS)
+    end
+
     let(:os_version) { "9.3" }
     let(:iphone6_9_3) { FastlaneCore::DeviceManager::Device.new(name: "iPhone 6", os_version: os_version, udid: "11111", state: "Don't Care", is_simulator: true) }
     let(:iphone6_9_3_2) { FastlaneCore::DeviceManager::Device.new(name: "iPhone 6s", os_version: os_version, udid: "22222", state: "Don't Care", is_simulator: true) }
