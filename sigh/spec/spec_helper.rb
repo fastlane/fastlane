@@ -138,8 +138,10 @@ def sigh_stub_spaceship(valid_profile = true, expect_create = false, expect_dele
   end
 end
 
-def stub_request_valid_identities(resign, value)
-  expect(resign).to receive(:request_valid_identities).and_return(value)
+def stub_valid_identities(output)
+  succeeded = Security::Command.run("true").status
+  allow(Security::Command).to receive(:run).with("security", "find-identity", "-v", "-p", "codesigning")
+                                           .and_return(Security::Command::Result.new(output, "", succeeded))
 end
 
 # Commander::Command::Options does not define sane equals behavior,
