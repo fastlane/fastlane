@@ -19,3 +19,19 @@ Information about project "Example":
 EOS
   allow_any_instance_of(FastlaneCore::Project).to receive(:raw_info).and_return(fake_result)
 end
+
+# What xcodebuild -showBuildSettings answers for the keys snapshot reads, for
+# fake_out_build_settings.
+SNAPSHOT_BUILD_SETTINGS = {
+  "./snapshot/example/Example.xcodeproj" => {
+    "ExampleUITests" => {
+      "SUPPORTED_PLATFORMS" => "iphoneos iphonesimulator",
+      "WRAPPER_NAME" => "Example.app",
+      "WRAPPER_SUFFIX" => ".app"
+    },
+    "ExampleMacOS" => {
+      "WRAPPER_NAME" => "ExampleMacOS.app",
+      "WRAPPER_SUFFIX" => ".app"
+    }
+  }
+}.freeze
