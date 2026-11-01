@@ -43,6 +43,7 @@ module Frameit
 
   module Color
     MATTE_BLACK ||= "Matte Black"
+    JET_BLACK ||= "Jet Black"
     SPACE_GRAY ||= "Space Gray"
     ROSE_GOLD ||= "Rose Gold"
     CLEARLY_WHITE ||= "Clearly White"
@@ -87,7 +88,7 @@ module Frameit
     PACIFIC_BLUE ||= "Pacific Blue"
     MIDNIGHT ||= "Midnight"
     STARLIGHT ||= "Starlight"
-    SIERRA ||= "Sierra"
+    SIERRA_BLUE ||= "Sierra Blue"
     SORTA_SAGE ||= "Sorta Sage"
     TEAL ||= "Teal"
     ULTRAMARINE ||= "Ultramarine"
