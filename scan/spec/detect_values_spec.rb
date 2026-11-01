@@ -2,7 +2,7 @@ describe Scan do
   describe Scan::DetectValues do
     before do
       fake_out_simulator_detection
-      fake_out_build_settings
+      fake_out_build_settings(SCAN_BUILD_SETTINGS)
     end
 
     describe 'Xcode project' do
@@ -59,12 +59,7 @@ describe Scan do
 
     describe 'the build settings faked in the other examples' do
       it 'match what the installed Xcode answers', requires_xcodebuild: true do
-        allow_any_instance_of(FastlaneCore::Project).to receive(:build_settings).and_call_original
-        project = FastlaneCore::Project.new(project: "./scan/examples/standard/app.xcodeproj")
-
-        SCAN_STANDARD_APP_BUILD_SETTINGS.each do |key, value|
-          expect(project.build_settings(key: key)).to eq(value), key
-        end
+        expect_build_settings_to_match_xcode(SCAN_BUILD_SETTINGS)
       end
     end
 

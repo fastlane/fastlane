@@ -289,7 +289,7 @@ describe Scan do
           }
 
           fake_out_simulator_detection
-          fake_out_build_settings
+          fake_out_build_settings(SCAN_BUILD_SETTINGS)
           Scan.config = FastlaneCore::Configuration.create(Scan::Options.available_options, options)
           Scan.cache[:temp_junit_report] = nil
 
