@@ -60,6 +60,7 @@ describe Scan do
 
         before(:each) do
           fake_out_simulator_detection
+          fake_out_build_settings
           Scan.config = FastlaneCore::Configuration.create(Scan::Options.available_options, {
             project: './scan/examples/standard/app.xcodeproj'
           })

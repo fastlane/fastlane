@@ -4,6 +4,7 @@ describe Scan do
   describe Scan::Runner do
     before(:each) do
       fake_out_simulator_detection
+      fake_out_build_settings
     end
 
     describe "handle_results" do
