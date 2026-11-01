@@ -58,14 +58,20 @@ module Match
         devices
       end
 
-      def self.bundle_ids(bundle_id_identifiers: nil)
-        filter = { identifier: bundle_id_identifiers.join(',') } if bundle_id_identifiers
+      # App Store Connect refuses a filter value longer than 5000 characters; fastlane#29783 saw failures below that.
+      MAX_BUNDLE_ID_FILTER_LENGTH = 3500
 
-        bundle_ids = Spaceship::ConnectAPI::BundleId.all(
-          filter: filter
-        )
+      def self.bundle_ids(bundle_id_identifiers: nil, max_bundle_id_filter_length: MAX_BUNDLE_ID_FILTER_LENGTH)
+        return Spaceship::ConnectAPI::BundleId.all(filter: nil) unless bundle_id_identifiers
 
-        bundle_ids
+        filters = bundle_id_identifiers.each_with_object([]) do |identifier, list|
+          if list.empty? || list.last.length + 1 + identifier.length > max_bundle_id_filter_length
+            list << identifier.dup
+          else
+            list.last << ",#{identifier}"
+          end
+        end
+        filters.flat_map { |filter| Spaceship::ConnectAPI::BundleId.all(filter: { identifier: filter }) }
       end
     end
   end
