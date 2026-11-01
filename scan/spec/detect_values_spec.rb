@@ -1,5 +1,9 @@
 describe Scan do
   describe Scan::DetectValues do
+    before do
+      fake_out_simulator_detection
+    end
+
     describe 'Xcode project' do
       describe 'detects FastlaneCore::Project' do
         it 'with no :project or :package_path given', requires_xcodebuild: true do
@@ -53,6 +57,7 @@ describe Scan do
 
     describe "#default_os_version" do
       before do
+        allow(Scan::DetectValues).to receive(:default_os_version).and_call_original
         Scan::DetectValues.clear_cache
       end
 
@@ -257,6 +262,7 @@ describe Scan do
         Scan.config = FastlaneCore::Configuration.create(Scan::Options.available_options,
                                                           { project: "./scan/examples/standard/app.xcodeproj" })
         Scan.project = nil
+        allow(FastlaneCore::DeviceManager).to receive(:simulators).and_call_original
       end
 
       it 'returns simulators for requested devices', requires_xcodebuild: true do

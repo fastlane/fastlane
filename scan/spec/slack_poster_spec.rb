@@ -3,6 +3,8 @@ require 'slack-notifier'
 
 describe Scan::SlackPoster do
   before do
+    fake_out_simulator_detection
+
     # mock the network request part
     allow_any_instance_of(Fastlane::Actions::SlackAction::Runner).to receive(:post_message).with(any_args)
   end
