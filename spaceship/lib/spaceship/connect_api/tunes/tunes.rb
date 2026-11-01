@@ -595,6 +595,86 @@ module Spaceship
         end
 
         #
+        # Custom Product Pages
+        #
+
+        def get_app_custom_product_pages(app_id: nil, filter: {}, includes: nil, limit: nil, sort: nil)
+          params = tunes_request_client.build_params(filter: filter, includes: includes, limit: limit, sort: sort)
+          tunes_request_client.get("#{Version::V1}/apps/#{app_id}/appCustomProductPages", params)
+        end
+
+        def get_app_custom_product_page(app_custom_product_page_id: nil, filter: {}, includes: nil, limit: nil, sort: nil)
+          params = tunes_request_client.build_params(filter: filter, includes: includes, limit: limit, sort: sort)
+          tunes_request_client.get("#{Version::V1}/appCustomProductPages/#{app_custom_product_page_id}", params)
+        end
+
+        # AppCustomProductPageVersions
+        def get_app_custom_product_page_versions(app_custom_product_page_id: nil, filter: {}, includes: nil, limit: nil, sort: nil)
+          params = tunes_request_client.build_params(filter: filter, includes: includes, limit: limit, sort: sort)
+          tunes_request_client.get("#{Version::V1}/appCustomProductPages/#{app_custom_product_page_id}/appCustomProductPageVersions", params)
+        end
+
+        def get_app_custom_product_page_version(app_custom_product_page_version_id: nil, filter: {}, includes: nil, limit: nil, sort: nil)
+          params = tunes_request_client.build_params(filter: filter, includes: includes, limit: limit, sort: sort)
+          tunes_request_client.get("#{Version::V1}/appCustomProductPageVersions/#{app_custom_product_page_version_id}", params)
+        end
+
+        # AppCustomProductPageLocalizations (under Versions)
+        def get_app_custom_product_page_version_localizations(app_custom_product_page_version_id: nil, filter: {}, includes: nil, limit: nil, sort: nil)
+          params = tunes_request_client.build_params(filter: filter, includes: includes, limit: limit, sort: sort)
+          tunes_request_client.get("#{Version::V1}/appCustomProductPageVersions/#{app_custom_product_page_version_id}/appCustomProductPageLocalizations", params)
+        end
+
+        def post_app_custom_product_page_version_localization(app_custom_product_page_version_id: nil, attributes: {})
+          body = {
+            data: {
+              type: "appCustomProductPageLocalizations",
+              attributes: attributes,
+              relationships: {
+                appCustomProductPageVersion: {
+                  data: {
+                    type: "appCustomProductPageVersions",
+                    id: app_custom_product_page_version_id
+                  }
+                }
+              }
+            }
+          }
+
+          tunes_request_client.post("#{Version::V1}/appCustomProductPageLocalizations", body)
+        end
+
+        def get_app_custom_product_page_localization(app_custom_product_page_localization_id: nil, filter: {}, includes: nil, limit: nil, sort: nil)
+          params = tunes_request_client.build_params(filter: filter, includes: includes, limit: limit, sort: sort)
+          tunes_request_client.get("#{Version::V1}/appCustomProductPageLocalizations/#{app_custom_product_page_localization_id}", params)
+        end
+
+        # App Screenshot Sets for Custom Product Page Localizations
+        def get_app_custom_product_page_localization_app_screenshot_sets(app_custom_product_page_localization_id: nil, filter: {}, includes: nil, limit: nil, sort: nil)
+          params = tunes_request_client.build_params(filter: filter, includes: includes, limit: limit, sort: sort)
+          tunes_request_client.get("#{Version::V1}/appCustomProductPageLocalizations/#{app_custom_product_page_localization_id}/appScreenshotSets", params)
+        end
+
+        def post_app_custom_product_page_localization_app_screenshot_set(app_custom_product_page_localization_id: nil, attributes: {})
+          body = {
+            data: {
+              type: "appScreenshotSets",
+              attributes: attributes,
+              relationships: {
+                appCustomProductPageLocalization: {
+                  data: {
+                    type: "appCustomProductPageLocalizations",
+                    id: app_custom_product_page_localization_id
+                  }
+                }
+              }
+            }
+          }
+
+          tunes_request_client.post("#{Version::V1}/appScreenshotSets", body)
+        end
+
+        #
         # appInfos
         #
 
