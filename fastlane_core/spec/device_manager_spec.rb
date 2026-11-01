@@ -38,6 +38,18 @@ describe FastlaneCore do
       end.to raise_error(FastlaneCore::Interface::FastlaneError)
     end
 
+    it 'lists the same iOS simulators as the JSON output of the installed simctl', requires_xcodebuild: true do
+      listed = JSON.parse(`xcrun simctl list -j devices`)['devices'].flat_map do |runtime, devices|
+        os_type, os_version = runtime.split('.').last.split('-', 2)
+        next [] unless os_type == 'iOS'
+        devices.select { |device| device['isAvailable'] }.map { |device| [device['udid'], device['name'], os_version.tr('-', '.')] }
+      end
+
+      parsed = FastlaneCore::DeviceManager.simulators('iOS').map { |device| [device.udid, device.name, device.os_version] }
+      expect(parsed).not_to be_empty
+      expect(parsed).to match_array(listed)
+    end
+
     describe "properly parses the simctl output and generates Device objects for iOS simulator" do
       it "Xcode 7" do
         response = "response"
