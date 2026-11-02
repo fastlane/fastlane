@@ -206,7 +206,8 @@ describe Fastlane do
           end
 
           it "uses :keychain_profile even if there is API key in a lane context" do
-            allow(Spaceship::ConnectAPI::Token).to receive(:from).and_return('token')
+            Fastlane::Actions.lane_context[Fastlane::Actions::SharedValues::APP_STORE_CONNECT_API_KEY] = { key_id: 'KEYID' }
+            allow(Spaceship::ConnectAPI::Token).to receive(:from).and_return(double('token', key_id: 'KEYID', issuer_id: 'ISSUER'))
 
             expect(Fastlane::Actions).to receive(:sh).with("xcrun notarytool submit #{package.path} --output-format json --wait --keychain-profile #{keychain_profile.shellescape}", { error_callback: anything, log: false }).and_return(success_submit_response)
 
