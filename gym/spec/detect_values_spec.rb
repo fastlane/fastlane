@@ -1,4 +1,8 @@
 describe Gym do
+  before do
+    fake_out_build_settings(GYM_BUILD_SETTINGS)
+  end
+
   describe Gym::DetectValues do
     describe 'Xcode config handling', :stuff, requires_xcodebuild: true do
       now = Time.now
@@ -58,7 +62,6 @@ describe Gym do
       let(:output_none) { [] }
 
       it "no team id found" do
-        allow_any_instance_of(FastlaneCore::Project).to receive(:build_settings).with(anything).and_call_original
         allow_any_instance_of(FastlaneCore::Project).to receive(:build_settings).with(key: "DEVELOPMENT_TEAM").and_return(nil)
 
         expect(Security::Certificate).to_not(receive(:find))
@@ -110,7 +113,6 @@ describe Gym do
         let(:options) { { project: "./gym/examples/multipleSchemes/Example.xcodeproj", export_method: "app-store" } }
 
         before do
-          allow_any_instance_of(FastlaneCore::Project).to receive(:build_settings).with(anything).and_call_original
           allow_any_instance_of(FastlaneCore::Project).to receive(:build_settings).with(key: "DEVELOPMENT_TEAM").and_return(team_id)
         end
 
@@ -137,6 +139,12 @@ describe Gym do
           installer_cert_name = Gym.config[:installer_cert_name]
           expect(installer_cert_name).to eq(nil)
         end
+      end
+    end
+
+    describe "the build settings faked in the other examples" do
+      it "match what the installed Xcode answers", requires_xcodebuild: true do
+        expect_build_settings_to_match_xcode(GYM_BUILD_SETTINGS)
       end
     end
   end
