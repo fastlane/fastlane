@@ -22,3 +22,13 @@ ensure
   $stdout = orig_stdout
   $stderr = orig_stderr
 end
+
+# Yields the path of a temporary copy of a checked-in fixture, file or
+# directory, for specs whose code writes to what it reads: parallel workers
+# share the checkout.
+def with_fixture_copy(path)
+  Dir.mktmpdir("fl_spec_fixture") do |dir|
+    FileUtils.cp_r(path, dir)
+    yield(File.join(dir, File.basename(path)))
+  end
+end
