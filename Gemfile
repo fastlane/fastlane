@@ -10,6 +10,7 @@ gem "climate_control", "~> 0.2.0"
 # A fake filesystem.
 gem "fakefs", ">= 1.8"
 # reline requires it on Windows, and since Ruby 4.0 it is a bundled gem, which Bundler only loads from the Gemfile.
+# Remove it once reline is past 0.7.0: ruby/reline@96241f42 (ruby/reline#917) moves Windows to io-console.
 gem "fiddle", platforms: :windows
 # for file uploads with Faraday
 gem "mime-types", ['>= 1.16', '< 4.0']
