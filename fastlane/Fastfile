@@ -53,20 +53,11 @@ end
 desc "Measure the execution time of the --help command"
 lane :benchmark_help_command do
   Dir.chdir("..") do
-    # install gnomon if not installed yet
-    Actions.sh("echo foo | gnomon", log: true, error_callback: lambda { |result|
-      if Helper.windows? || Helper.mac?
-        sh('npm install -g gnomon')
-      else
-        sh('sudo npm install -g gnomon')
-      end
-    })
-    cmd = Helper.windows? ? "cd bin && fastlane --help | gnomon" : "bin/fastlane --help | gnomon"
+    cmd = Helper.windows? ? "cd bin && fastlane --help" : "PAGER=cat bin/fastlane --help"
     3.times do
-      content = sh(cmd, log: false)
-      content.each_line do |line|
-        UI.message("🏎️ '#{line.strip}'") if ["Total", "real", "user", "sys"].any? { |word| line.include?(word) }
-      end
+      started = Process.clock_gettime(Process::CLOCK_MONOTONIC)
+      sh(cmd, log: false)
+      UI.message("🏎️ 'Total #{format('%.4f', Process.clock_gettime(Process::CLOCK_MONOTONIC) - started)}s'")
     end
   end
 end
