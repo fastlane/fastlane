@@ -152,7 +152,7 @@ module Fastlane
         [
           FastlaneCore::ConfigItem.new(key: :dsym_path,
                                        env_name: "FL_UPLOAD_SYMBOLS_TO_CRASHLYTICS_DSYM_PATH",
-                                       description: "Path to the DSYM file or zip to upload",
+                                       description: "Path to the DSYM file or zip to upload. Defaults to the dSYM of the last build_app, or else the most recent .dSYM or .dSYM.zip under the current directory",
                                        default_value: ENV[SharedValues::DSYM_OUTPUT_PATH.to_s],
                                        default_value_dynamic: true,
                                        optional: true,
