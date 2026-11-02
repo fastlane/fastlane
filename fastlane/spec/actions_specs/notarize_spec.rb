@@ -165,7 +165,7 @@ describe Fastlane do
           let(:keychain_profile) { 'Keychain profile name' }
           let(:keychain_path) { '~/Library/My Keychains/name' }
 
-          it "successful with specified :keychain" do
+          it "successful with specified :keychain_path" do
             expect(Fastlane::Actions).to receive(:sh).with("xcrun notarytool submit #{package.path} --output-format json --wait --keychain-profile #{keychain_profile.shellescape} --keychain #{keychain_path.shellescape}", { error_callback: anything, log: false }).and_return(success_submit_response)
 
             expect(Fastlane::Actions).to receive(:sh).with("xcrun stapler staple #{package.path}", { log: false })
@@ -173,13 +173,26 @@ describe Fastlane do
             Fastlane::FastFile.new.parse("lane :test do
               notarize(
                 package: '#{package.path}',
-                keychain: '#{keychain_path}',
+                keychain_path: '#{keychain_path}',
                 keychain_profile: '#{keychain_profile}'
               )
             end").runner.execute(:test)
           end
 
-          it "successful w/o specified :keychain" do
+          it "raises when :keychain_path is given without :keychain_profile" do
+            expect(Fastlane::Actions).not_to receive(:sh)
+
+            expect do
+              Fastlane::FastFile.new.parse("lane :test do
+                notarize(
+                  package: '#{package.path}',
+                  keychain_path: '#{keychain_path}'
+                )
+              end").runner.execute(:test)
+            end.to raise_error(FastlaneCore::Interface::FastlaneError, "The :keychain_path option can only be used together with :keychain_profile")
+          end
+
+          it "successful w/o specified :keychain_path" do
             expect(Fastlane::Actions).to receive(:sh).with("xcrun notarytool submit #{package.path} --output-format json --wait --keychain-profile #{keychain_profile.shellescape}", { error_callback: anything, log: false }).and_return(success_submit_response)
 
             expect(Fastlane::Actions).to receive(:sh).with("xcrun stapler staple #{package.path}", { log: false })

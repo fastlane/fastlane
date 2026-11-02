@@ -3,6 +3,8 @@ module Fastlane
     class NotarizeAction < Action
       # rubocop:disable Metrics/PerceivedComplexity
       def self.run(params)
+        UI.user_error!("The :keychain_path option can only be used together with :keychain_profile") if params[:keychain_path] && !params[:keychain_profile]
+
         package_path = params[:package]
         skip_stapling = params[:skip_stapling]
         print_log = params[:print_log]
@@ -43,7 +45,7 @@ module Fastlane
         auth_parts = []
         if params[:keychain_profile]
           auth_parts << "--keychain-profile #{params[:keychain_profile].shellescape}"
-          auth_parts << "--keychain #{params[:keychain].shellescape}" if params[:keychain]
+          auth_parts << "--keychain #{params[:keychain_path].shellescape}" if params[:keychain_path]
         elsif api_key
           # Writes key contents to temporary file for command
           require 'tempfile'
@@ -194,8 +196,8 @@ module Fastlane
                                        conflicting_options: [:username, :api_key_path, :keychain_profile],
                                        sensitive: true,
                                        type: Hash),
-          FastlaneCore::ConfigItem.new(key: :keychain,
-                                       env_name: 'FL_NOTARIZE_KEYCHAIN',
+          FastlaneCore::ConfigItem.new(key: :keychain_path,
+                                       env_name: 'FL_NOTARIZE_KEYCHAIN_PATH',
                                        description: "The path to a keychain file to use for reading the keychain item. If not specified, the default user keychain is used",
                                        optional: true,
                                        conflicting_options: [:username, :api_key_path, :api_key],
