@@ -204,7 +204,7 @@ module Fastlane
                                        type: String),
           FastlaneCore::ConfigItem.new(key: :keychain_profile,
                                        env_name: 'FL_NOTARIZE_KEYCHAIN_PROFILE',
-                                       description: "Authenticate with credentials stored in the Keychain. Use the profile name you provided in the \"xcrun notarytool store-credentials\" command",
+                                       description: "Authenticate with credentials stored in the Keychain. Use the profile name you provided in the \"xcrun notarytool store-credentials\" command. Unlike :username, no app-specific password is passed on the command line, so prefer it when you do not use an API key",
                                        optional: true,
                                        conflicting_options: [:username, :api_key_path, :api_key],
                                        type: String)
@@ -213,6 +213,20 @@ module Fastlane
 
       def self.is_supported?(platform)
         platform == :mac
+      end
+
+      def self.example_code
+        [
+          'notarize(
+            package: "MyApp.app",
+            keychain_profile: "AC_PASSWORD"
+          )',
+          'notarize(
+            package: "MyApp.app",
+            keychain_profile: "AC_PASSWORD",
+            keychain_path: "~/Library/Keychains/notarization.keychain-db"
+          )'
+        ]
       end
 
       def self.category
