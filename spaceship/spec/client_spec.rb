@@ -424,6 +424,14 @@ BODY
         subject.req_home
       end.to raise_error(Spaceship::Client::BadGatewayError)
     end
+
+    it "returns a JSON response whose values contain an error page marker" do
+      body = { "data" => { "description" => "<h3>Bad Gateway</h3>" } }
+      stub_request(:get, test_uri).
+        to_return(status: 200, body: body.to_json, headers: { 'Content-Type' => 'application/json' })
+
+      expect(subject.req_home.body).to eq(body)
+    end
   end
 
   describe 'retry' do
