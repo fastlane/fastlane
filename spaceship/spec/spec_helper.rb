@@ -17,6 +17,14 @@ SPACESHIP_AUTHENTICATION_DATA =
   'bfadbd9e65e75d5df55547bcff98711ddeae7b8e1e6dbf529e96f7caa4b830b43575cddc52cebc' \
   '39f9522f85cbf33ac35ee59f66f48109c12fbb78d'
 
+# Every spaceship example registers the stubs again, about 110 fixture reads: read each file once per process.
+# The copy shares the cached buffer until modified, e.g. by PlistMiddleware's force_encoding.
+SPACESHIP_FIXTURES = {}
+def spaceship_fixture(path, binary: false)
+  SPACESHIP_FIXTURES[[path, binary]] ||= (binary ? File.binread(path) : File.read(path)).freeze
+  SPACESHIP_FIXTURES[[path, binary]].dup
+end
+
 require_relative 'client_stubbing'
 require_relative 'connect_api/provisioning/provisioning_stubbing'
 require_relative 'connect_api/testflight/testflight_stubbing'

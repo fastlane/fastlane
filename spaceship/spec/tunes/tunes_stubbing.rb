@@ -2,7 +2,7 @@
 class TunesStubbing
   class << self
     def itc_read_fixture_file(filename)
-      File.read(File.join('spaceship', 'spec', 'tunes', 'fixtures', filename))
+      spaceship_fixture(File.join('spaceship', 'spec', 'tunes', 'fixtures', filename))
     end
 
     # Necessary, as we're now running this in a different context
