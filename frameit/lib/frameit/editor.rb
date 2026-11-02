@@ -89,6 +89,18 @@ module Frameit
       frame.rotate(-rotation)
       @image.rotate(-rotation)
 
+      # Optional screen masks preserve asymmetric corners and camera cutouts.
+      # A portrait mask is applied after normalizing the screenshot orientation.
+      if offset['mask']
+        mask_path = File.join(FrameDownloader.templates_path, offset['mask'])
+        UI.user_error!("Could not find screen mask '#{mask_path}'") unless File.file?(mask_path)
+        mask = MiniMagick::Image.open(mask_path)
+        mask.resize("#{image.width}x#{image.height}!")
+        @image = image.composite(mask, "png") do |c|
+          c.compose("CopyOpacity")
+        end
+      end
+
       # Debug Mode: Add filename to frame
       if self.debug_mode
         filename = File.basename(@frame_path, ".*")
