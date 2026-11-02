@@ -70,7 +70,7 @@ module Precheck
       end
 
       if processor_result.should_trigger_user_error?
-        raise BlockingViolationError.new, "precheck 👮‍♀️ 👮  found one or more potential problems that must be addressed before submitting to review"
+        raise BlockingViolationError, "precheck 👮‍♀️ 👮  found one or more potential problems that must be addressed before submitting to review"
       end
 
       if processor_result.has_errors_or_warnings?
