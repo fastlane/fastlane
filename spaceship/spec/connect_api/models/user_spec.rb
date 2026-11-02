@@ -36,4 +36,36 @@ describe Spaceship::ConnectAPI::User do
       expect(model.notifications).to eq({})
     end
   end
+
+  describe 'listing' do
+    let(:client) { double('client') }
+    let(:response) { double('response', all_pages: []) }
+
+    it '.all passes limit and sort to get_users' do
+      expect(client).to receive(:get_users).with(
+        filter: {},
+        includes: Spaceship::ConnectAPI::User::ESSENTIAL_INCLUDES,
+        limit: 10,
+        sort: "username"
+      ).and_return(response)
+
+      Spaceship::ConnectAPI::User.all(client: client, limit: 10, sort: "username")
+    end
+
+    it '.all defaults limit to MAX_OBJECTS_PER_PAGE_LIMIT' do
+      expect(client).to receive(:get_users).with(
+        hash_including(limit: Spaceship::ConnectAPI::MAX_OBJECTS_PER_PAGE_LIMIT, sort: nil)
+      ).and_return(response)
+
+      Spaceship::ConnectAPI::User.all(client: client)
+    end
+
+    it '.find sends email as filter[username]' do
+      expect(client).to receive(:get_users).with(
+        hash_including(filter: { username: "spaceship@krausefx.com" })
+      ).and_return(response)
+
+      Spaceship::ConnectAPI::User.find(client: client, email: "spaceship@krausefx.com")
+    end
+  end
 end

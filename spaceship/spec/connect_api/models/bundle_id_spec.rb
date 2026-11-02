@@ -28,4 +28,29 @@ describe Spaceship::ConnectAPI::BundleId do
       expect(model.platform).to eq("IOS")
     end
   end
+
+  describe '.all' do
+    let(:client) { double('client') }
+    let(:response) { double('response', all_pages: []) }
+
+    it 'passes limit and sort to get_bundle_ids' do
+      expect(client).to receive(:get_bundle_ids).with(
+        filter: {},
+        includes: nil,
+        fields: nil,
+        limit: 10,
+        sort: "name"
+      ).and_return(response)
+
+      Spaceship::ConnectAPI::BundleId.all(client: client, limit: 10, sort: "name")
+    end
+
+    it 'defaults limit to MAX_OBJECTS_PER_PAGE_LIMIT' do
+      expect(client).to receive(:get_bundle_ids).with(
+        hash_including(limit: Spaceship::ConnectAPI::MAX_OBJECTS_PER_PAGE_LIMIT, sort: nil)
+      ).and_return(response)
+
+      Spaceship::ConnectAPI::BundleId.all(client: client)
+    end
+  end
 end
