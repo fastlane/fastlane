@@ -210,7 +210,7 @@ module Fastlane
         [
           'notarize(
             package: "MyApp.app",
-            keychain_profile: "AC_PASSWORD"
+            api_key_path: "fastlane/AuthKey.json"
           )',
           'notarize(
             package: "MyApp.app",
