@@ -308,6 +308,45 @@ describe Deliver::Runner do
     end
   end
 
+  describe :precheck_app do
+    let(:precheck_runner) { instance_double(Precheck::Runner) }
+
+    before do
+      allow(runner).to receive(:upload_metadata)
+      runner.options[:app_version] = nil
+      runner.options[:skip_app_version_update] = true
+      runner.options[:skip_binary_upload] = true
+      runner.options[:run_precheck_before_submit] = true
+      runner.options[:submit_for_review] = true
+      allow(Precheck::Runner).to receive(:new).and_return(precheck_runner)
+    end
+
+    it 'does not submit for review when precheck reports a blocking violation' do
+      expect(precheck_runner).to receive(:run).and_raise(
+        Precheck::Runner::BlockingViolationError.new,
+        'blocking precheck violations'
+      )
+
+      expect(runner).not_to receive(:submit_for_review)
+      expect(UI).to receive(:error).with('blocking precheck violations')
+
+      runner.run
+    end
+
+    it 're-raises other FastlaneErrors so the top-level runner can display them' do
+      expect(precheck_runner).to receive(:run).and_raise(
+        FastlaneCore::Interface::FastlaneError.new,
+        'precheck could not run'
+      )
+
+      expect(runner).not_to receive(:submit_for_review)
+      expect { runner.run }.to raise_error(
+        FastlaneCore::Interface::FastlaneError,
+        'precheck could not run'
+      )
+    end
+  end
+
   describe :upload_metadata do
     let(:fake_upload_metadata) { instance_double(Deliver::UploadMetadata, load_from_filesystem: nil, assign_defaults: nil, upload: nil) }
     let(:fake_upload_screenshots) { instance_double(Deliver::UploadScreenshots, collect_screenshots: [], upload: nil) }
