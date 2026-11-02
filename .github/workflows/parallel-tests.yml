@@ -205,6 +205,13 @@ jobs:
           name: spec-timings-macos
           path: internal/spec_timings.mac.json
           if-no-files-found: error
+      - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        with:
+          name: spec-probe-macos
+          path: |
+            rspec_timings_raw.json
+            spec_probe.json
+          if-no-files-found: error
 
   record_linux:
     name: "Record timings, Linux"
@@ -230,6 +237,13 @@ jobs:
           name: spec-timings-linux
           path: internal/spec_timings.linux.json
           if-no-files-found: error
+      - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        with:
+          name: spec-probe-linux
+          path: |
+            rspec_timings_raw.json
+            spec_probe.json
+          if-no-files-found: error
 
   record_windows:
     name: "Record timings, Windows"
@@ -248,6 +262,13 @@ jobs:
         with:
           name: spec-timings-windows
           path: internal/spec_timings.windows.json
+          if-no-files-found: error
+      - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        with:
+          name: spec-probe-windows
+          path: |
+            rspec_timings_raw.json
+            spec_probe.json
           if-no-files-found: error
 
   # Closes the loop on the recording above. The three record jobs each produce

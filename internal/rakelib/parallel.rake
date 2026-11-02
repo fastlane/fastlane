@@ -209,7 +209,7 @@ task(:spec_timings) do
   # A failing example still has a duration, and this task is for timings rather
   # than for verdicts, so a non-zero exit is not a reason to stop. `sh` aborts
   # on one unless it is given a block.
-  sh("rspec --pattern 'spec/**/*_spec.rb,*/spec/**/*_spec.rb' --format json --out #{out}") { |_ok, _res| }
+  sh("rspec --require ./internal/spec_probe.rb --pattern 'spec/**/*_spec.rb,*/spec/**/*_spec.rb' --format json --out #{out}") { |_ok, _res| }
   raise("rspec produced no #{out}") unless File.exist?(out)
 
   files = Hash.new(0.0)
@@ -244,7 +244,6 @@ task(:spec_timings) do
                                   "files" => files.sort_by { |_path, seconds| -seconds }.to_h,
                                   "examples" => examples.select { |path, _| heavy.include?(path) }
   ))
-  File.delete(out)
 
   puts("Wrote #{files.size} file timings (#{heavy.size} with per example detail) to #{spec_timings_path}, #{files.values.sum.round}s total")
 end
