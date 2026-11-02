@@ -55,9 +55,8 @@ lane :benchmark_help_command do
   Dir.chdir("..") do
     cmd = Helper.windows? ? "cd bin && fastlane --help" : "PAGER=cat bin/fastlane --help"
     3.times do
-      started = Process.clock_gettime(Process::CLOCK_MONOTONIC)
-      sh(cmd, log: false)
-      UI.message("🏎️ 'Total #{format('%.4f', Process.clock_gettime(Process::CLOCK_MONOTONIC) - started)}s'")
+      seconds = seconds_spent { sh(cmd, log: false) }
+      UI.message("🏎️ 'Total #{format('%.4f', seconds)}s'")
     end
   end
 end
@@ -531,6 +530,12 @@ def generate_markdown_docs(target_path: nil)
   require 'fastlane/documentation/markdown_docs_generator'
   Fastlane::MarkdownDocsGenerator.new.generate!(target_path: File.expand_path(target_path))
   return target_path
+end
+
+def seconds_spent
+  started = Process.clock_gettime(Process::CLOCK_MONOTONIC)
+  yield
+  Process.clock_gettime(Process::CLOCK_MONOTONIC) - started
 end
 
 # Exception Handling
