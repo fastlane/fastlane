@@ -32,11 +32,7 @@ describe Spaceship::ConnectAPI::BundleId do
   describe '#update_capability' do
     let(:bundle_id) { Spaceship::ConnectAPI.get_bundle_id(bundle_id_id: '123456789').first }
 
-    # A web-session client (no API key) proxies writes through developer.apple.com's own backend.
-    # Creating a capability there via the direct POST /v1/bundleIdCapabilities body 409s, demanding
-    # an undocumented `capabilities` relationship the direct, API-key-authenticated endpoint never
-    # asks for (confirmed live against a real bundle ID - see fastlane/fastlane#30445). So a session
-    # client must keep using the long-proven legacy bundleIds PATCH instead.
+    # Session clients 409 on the direct capability endpoint, so they use the legacy bundleIds PATCH.
     context 'authenticated via a web session (no API key)' do
       it 'enables a capability via the legacy bundleIds PATCH, not the direct capability endpoints' do
         stub_request(:patch, "https://developer.apple.com/services-account/v1/bundleIds/123456789").

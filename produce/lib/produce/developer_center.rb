@@ -214,12 +214,9 @@ module Produce
       Spaceship.app.find(app_identifier, mac: platform == "osx") != nil
     end
 
+    # Mirrors what #login authenticated with, not produce's own :api_key config.
     def using_connect_api?
-      !connect_api_token.nil?
-    end
-
-    def connect_api_token
-      Spaceship::ConnectAPI::Token.from(hash: Produce.config_value(:api_key), filepath: Produce.config_value(:api_key_path))
+      !Spaceship::ConnectAPI.token.nil?
     end
 
     def login

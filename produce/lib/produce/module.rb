@@ -13,10 +13,7 @@ module Produce
   ENV['FASTLANE_TEAM_ID'] ||= ENV["PRODUCE_TEAM_ID"]
   ENV['DELIVER_USER'] ||= ENV["PRODUCE_USERNAME"]
 
-  # Some Produce.config instances (e.g. modify_services, whose Configuration is built from its
-  # own narrower option set) never declare :api_key/:api_key_path at all. Configuration#[] raises
-  # for any key outside available_options, so reading those keys directly would crash before the
-  # token/session-login fallback below ever runs. Returns nil instead when the key isn't declared.
+  # Returns nil instead of raising when key isn't in the active config's available_options.
   def self.config_value(key)
     return nil unless Produce.config.available_options.any? { |option| option.key == key }
     Produce.config[key]

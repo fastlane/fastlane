@@ -81,17 +81,7 @@ module Spaceship
         return resp.to_models.first
       end
 
-      # Web-session auth (no API key) proxies writes through developer.apple.com's own backend
-      # (`web_session?`/`proxy_post`), which has validation `POST /v1/bundleIdCapabilities`
-      # directly doesn't: creating a new capability that way 409s demanding a `capabilities`
-      # relationship undocumented anywhere in the public API (confirmed live - the direct,
-      # API-key-authenticated endpoint accepts the same request with no such relationship).
-      # `patch_bundle_id_capability` is the long-standing, session-proven path for that case, so
-      # it stays the only path for a session client. Only an API-key client (`client.token`) uses
-      # the real per-capability endpoints below - create to enable, PATCH to update settings,
-      # delete to disable - which `patch_bundle_id_capability` can't do correctly for an API-key
-      # client (it patches the wrong resource: bundleIds, with attributes nested inside a
-      # relationship's `data` entry - invalid JSON:API, rejected outright by the direct API).
+      # Session clients use the legacy bundleIds PATCH; API-key clients use the endpoints below.
       def update_capability(capability_type, enabled: false, settings: [], client: nil)
         raise "capability_type is required " if capability_type.nil?
 

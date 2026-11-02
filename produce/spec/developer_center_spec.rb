@@ -16,17 +16,39 @@ describe Produce::DeveloperCenter do
   end
 
   describe "#using_connect_api?" do
-    it "is true when :api_key is set" do
+    it "is true after #login authenticates with produce's own :api_key" do
       config_with(api_key: api_key)
       allow(Spaceship::ConnectAPI::Token).to receive(:from).and_return(fake_token)
+      allow(Spaceship::ConnectAPI).to receive(:client=)
+      allow(Spaceship::ConnectAPI).to receive(:token).and_return(fake_token)
 
-      expect(Produce::DeveloperCenter.new.send(:using_connect_api?)).to eq(true)
+      instance = Produce::DeveloperCenter.new
+      instance.send(:login)
+
+      expect(instance.send(:using_connect_api?)).to eq(true)
     end
 
-    it "is false when neither :api_key nor :api_key_path is set" do
+    it "is true when a token was already set by another lane (e.g. app_store_connect_api_key), even though produce's own :api_key is unset" do
       config_with
+      allow(Spaceship::ConnectAPI).to receive(:token).and_return(fake_token)
+      expect(Spaceship).not_to receive(:login)
 
-      expect(Produce::DeveloperCenter.new.send(:using_connect_api?)).to eq(false)
+      instance = Produce::DeveloperCenter.new
+      instance.send(:login)
+
+      expect(instance.send(:using_connect_api?)).to eq(true)
+    end
+
+    it "is false after a session-based login, with neither :api_key nor an existing token" do
+      config_with
+      allow(Spaceship::ConnectAPI).to receive(:token).and_return(nil)
+      allow(Spaceship).to receive(:login)
+      allow(Spaceship).to receive(:select_team)
+
+      instance = Produce::DeveloperCenter.new
+      instance.send(:login)
+
+      expect(instance.send(:using_connect_api?)).to eq(false)
     end
   end
 
@@ -35,6 +57,7 @@ describe Produce::DeveloperCenter do
       config_with(api_key: api_key)
       allow(Spaceship::ConnectAPI::Token).to receive(:from).and_return(fake_token)
       allow(Spaceship::ConnectAPI).to receive(:client=)
+      allow(Spaceship::ConnectAPI).to receive(:token).and_return(fake_token)
     end
 
     it "does nothing but log when the app already exists" do
@@ -101,6 +124,24 @@ describe Produce::DeveloperCenter do
       expect(fake_bundle_id).not_to receive(:update_capability).with(
         Spaceship::ConnectAPI::BundleIdCapability::Type::APP_GROUPS, anything
       )
+
+      instance = Produce::DeveloperCenter.new
+      instance.send(:login)
+      result = instance.create_new_app
+
+      expect(result).to eq(true)
+    end
+  end
+
+  describe "#create_new_app (token set by another lane, no produce :api_key)" do
+    it "takes the App Store Connect API path instead of a session-less Spaceship.app call" do
+      config_with
+      allow(Spaceship::ConnectAPI).to receive(:token).and_return(fake_token)
+      expect(Spaceship).not_to receive(:login)
+      expect(Spaceship).not_to receive(:app)
+      allow(Spaceship::ConnectAPI::BundleId).to receive(:find).with("com.example.app").and_return(nil)
+      created_app = double("created_bundle_id", id: "ABC123")
+      expect(Spaceship::ConnectAPI::BundleId).to receive(:create).and_return(created_app)
 
       instance = Produce::DeveloperCenter.new
       instance.send(:login)
