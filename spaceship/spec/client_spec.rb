@@ -537,6 +537,18 @@ BODY
     end
   end
 
+  describe "a plist response that cannot be parsed" do
+    it "raises Faraday::ParsingError once the retries are used up" do
+      stub_request(:get, test_uri).
+        to_return(status: 200, body: "<html>Internal Server Error</html>", headers: { 'Content-Type' => 'application/x-plist' })
+
+      expect do
+        subject.req_home
+      end.to raise_error(Faraday::ParsingError)
+      expect(WebMock).to have_requested(:get, test_uri).times(5)
+    end
+  end
+
   describe "#do_sirp" do
     it "raises Spaceship::UnexpectedResponse when body is not valid JSON, but HTTP 200" do
       stub_request(:post, "https://idmsa.apple.com/appleauth/auth/signin/init").
