@@ -9,6 +9,8 @@ require_relative "fastlane/lib/fastlane/version.rb"
 gem "climate_control", "~> 0.2.0"
 # A fake filesystem.
 gem "fakefs", ">= 1.8"
+# reline requires it on Windows, and since Ruby 4.0 it is a bundled gem, which Bundler only loads from the Gemfile.
+install_if(-> { Gem.win_platform? }) { gem "fiddle" }
 # for file uploads with Faraday
 gem "mime-types", ['>= 1.16', '< 4.0']
 # Fast XML parser and object marshaller.
