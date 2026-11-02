@@ -32,16 +32,7 @@ module Fastlane
       def self.notarytool(params, package_path, skip_stapling, print_log, verbose, api_key, compressed_package_path)
         temp_file = nil
 
-        # Auth methods precedence:
-        # 1. Keychain or User/app specific password.
-        # 2. API Key.
-        #
-        # All three options are conflicting, but even if api_key is not specified
-        # as paramerer, it can be retrieved from the lane context.
-        # We must eliminate situation when user provides username or keychain
-        # aurhentication and api_key auth is used.
-
-        # Create authorization part of command with either API Key or Apple ID
+        # Keychain profile first, then API key (which can come from the lane context), then Apple ID
         auth_parts = []
         if params[:keychain_profile]
           auth_parts << "--keychain-profile #{params[:keychain_profile].shellescape}"
