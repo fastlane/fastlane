@@ -137,6 +137,32 @@ describe Fastlane do
         end.to raise_error(FastlaneCore::Interface::FastlaneError)
       end
 
+      it "does not search the project for dSYMs when its options are built" do
+        expect(Dir).not_to receive(:[]).with("./**/*.dSYM")
+
+        Fastlane::Actions::UploadSymbolsToCrashlyticsAction.available_options
+      end
+
+      it "uploads the most recent dSYM in the project when no dsym_path is given" do
+        binary_path = File.expand_path('./fastlane/spec/fixtures/screenshots/screenshot1.png')
+        app_id = '0:000000000000:ios:0f0000000ff0ff0'
+
+        Dir.mktmpdir do |dir|
+          Dir.chdir(dir) do
+            FileUtils.mkdir_p(["old/App.dSYM", "new/App.dSYM"])
+            File.utime(Time.now - 60, Time.now - 60, "old/App.dSYM")
+
+            expect(Fastlane::Actions).to receive(:sh).with("#{binary_path.shellescape} -ai #{app_id} -p ios #{File.expand_path('new/App.dSYM').shellescape}", log: false)
+
+            Fastlane::FastFile.new.parse("lane :test do
+              upload_symbols_to_crashlytics(
+                app_id: '#{app_id}',
+                binary_path: '#{binary_path}')
+            end").runner.execute(:test)
+          end
+        end
+      end
+
       context "with dsym_paths" do
         before :each do
           # dsym_path option to be nil
