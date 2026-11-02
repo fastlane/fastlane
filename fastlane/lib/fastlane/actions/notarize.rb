@@ -44,10 +44,6 @@ module Fastlane
         if params[:keychain_profile]
           auth_parts << "--keychain-profile #{params[:keychain_profile].shellescape}"
           auth_parts << "--keychain #{params[:keychain].shellescape}" if params[:keychain]
-        elsif params[:username]
-          auth_parts << "--apple-id #{params[:username]}"
-          auth_parts << "--password #{ENV['FASTLANE_APPLE_APPLICATION_SPECIFIC_PASSWORD']}"
-          auth_parts << "--team-id #{params[:asc_provider]}"
         elsif api_key
           # Writes key contents to temporary file for command
           require 'tempfile'
@@ -57,6 +53,10 @@ module Fastlane
           auth_parts << "--key #{temp_file.path}"
           auth_parts << "--key-id #{api_key.key_id}"
           auth_parts << "--issuer #{api_key.issuer_id}"
+        else
+          auth_parts << "--apple-id #{params[:username]}"
+          auth_parts << "--password #{ENV['FASTLANE_APPLE_APPLICATION_SPECIFIC_PASSWORD']}"
+          auth_parts << "--team-id #{params[:asc_provider]}"
         end
 
         # Submits package and waits for processing using `xcrun notarytool submit --wait`
