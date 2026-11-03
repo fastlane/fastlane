@@ -37,6 +37,12 @@ case "${1:-}" in
         if [ -n "$pid" ]; then
           n=$((n + 1))
           echo "$(date -u +%H:%M:%S) sampling $pid" >> "$0/sampled.txt"
+          # The file system calls behind the busy phase, with their paths, for 10 s from the first detection
+          if [ $n -eq 1 ]; then
+            ( $2 fs_usage -w -f filesys "$pid" > "$0/$1_fs_usage.txt" 2>&1 &
+              sleep 10
+              $2 pkill -INT -x fs_usage ) &
+          fi
           $2 sample "$pid" 2 -file "$0/$1_sample_$n.txt" >> "$0/sampled.txt" 2>&1 ||
             $2 spindump "$pid" 2 -file "$0/$1_spindump_$n.txt" >> "$0/sampled.txt" 2>&1
           sleep 5
@@ -82,7 +88,7 @@ case "${1:-}" in
     sudo log show --style compact --start "$(cat "$dir/start_time.txt")" \
       --predicate 'process == "simdiskimaged" OR process CONTAINS "CoreSimulator" OR subsystem BEGINSWITH "com.apple.CoreSimulator" OR process == "mds" OR process == "mds_stores"' \
       > "$dir/unified_log.txt" 2>&1
-    gzip -f "$dir/unified_log.txt"
+    gzip -f "$dir/unified_log.txt" "$dir"/*_fs_usage.txt 2>/dev/null
     ls -la "$dir"
     ;;
 
