@@ -17,7 +17,14 @@ module SpecStallWatchdog
     # Called at the start and end of each example: a stall is measured from the last one, so time spent in
     # before(:context) hooks or loading a file counts too.
     def mark(label)
-      @mutex.synchronize { @mark = [label, CLOCK.call(Process::CLOCK_MONOTONIC)] }
+      now = CLOCK.call(Process::CLOCK_MONOTONIC)
+      previous, since = @mutex.synchronize do
+        last = @mark
+        @mark = [label, now]
+        last
+      end
+      # The exact time of every slow example, which the dumps only bound
+      @out.puts("=== #{wall} took #{format('%.1f', now - since)}s: #{previous}") if previous.start_with?("start of ") && now - since >= 1
     end
 
     def wall
