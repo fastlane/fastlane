@@ -63,6 +63,26 @@ on:
         required: false
         type: string
         default: "4"
+      stall_probe:
+        description: "Run only the stall probe: the CI macOS matrix, recording what a worker waits on when it stalls."
+        required: false
+        type: boolean
+        default: false
+      time_simctl:
+        description: "Stall probe: time simctl when the job starts and before the tests. This also warms it up."
+        required: false
+        type: boolean
+        default: false
+      disable_spotlight:
+        description: "Stall probe: turn Spotlight indexing off before the checkout."
+        required: false
+        type: boolean
+        default: false
+      max_parallel:
+        description: "Stall probe: how many legs run at once. CI starts all seven together."
+        required: false
+        type: number
+        default: 1
 
 permissions:
   contents: read
@@ -76,7 +96,7 @@ env:
 jobs:
   split_macos:
     name: "Split, macOS"
-    if: inputs.record_timings == 'no' || inputs.record_timings == null
+    if: (inputs.record_timings == 'no' || inputs.record_timings == null) && !inputs.stall_probe
     runs-on: macos-15
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
@@ -112,7 +132,7 @@ jobs:
 
   split_linux:
     name: "Split, Linux"
-    if: inputs.record_timings == 'no' || inputs.record_timings == null
+    if: (inputs.record_timings == 'no' || inputs.record_timings == null) && !inputs.stall_probe
     runs-on: ubuntu-24.04
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
@@ -147,7 +167,7 @@ jobs:
 
   split_windows:
     name: "Split, Windows"
-    if: inputs.record_timings == 'no' || inputs.record_timings == null
+    if: (inputs.record_timings == 'no' || inputs.record_timings == null) && !inputs.stall_probe
     runs-on: windows-2022
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
@@ -175,6 +195,76 @@ jobs:
         with:
           name: rspec-worker-logs-windows
           path: |
+            rspec_worker_*.log
+            rspec_worker_*.units
+          if-no-files-found: warn
+
+  stall_probe:
+    name: "Stall probe, ${{ matrix.os }}, Xcode ${{ matrix.xcode }}, Ruby ${{ matrix.ruby }}"
+    if: inputs.stall_probe
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      max-parallel: ${{ fromJSON(inputs.max_parallel || 1) }}
+      matrix:
+        include:
+          - { xcode: '16.4.0', ruby: '3.2', rubyopt: '', os: 'macos-15' }
+          - { xcode: '16.4.0', ruby: '3.3', rubyopt: '', os: 'macos-15' }
+          - { xcode: '16.4.0', ruby: '3.4', rubyopt: '', os: 'macos-15' }
+          - { xcode: '26.5', ruby: '3.4', rubyopt: '-W0', os: 'macos-26' }
+          - { xcode: '26.6', ruby: '3.4', rubyopt: '-W0', os: 'macos-26' }
+          - { xcode: '26.6', ruby: '4.0', rubyopt: '-W0', os: 'macos-26' }
+          - { xcode: '27.0', ruby: '4.0', rubyopt: '-W0', os: 'xcode-27' }
+    env:
+      PROBE_DIR: ${{ github.workspace }}/probe
+      TIME_SIMCTL: ${{ inputs.time_simctl }}
+    steps:
+      - name: Turn Spotlight off
+        if: inputs.disable_spotlight
+        run: |
+          sudo mdutil -a -i off
+          sudo launchctl bootout system/com.apple.metadata.mds || echo "bootout refused"
+          sudo killall mds mds_stores mdworker_shared || echo "nothing to kill"
+          mdutil -s /
+          pgrep -lf 'mds|mdworker' || echo "no mds processes"
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - name: Start the monitors
+        run: internal/ci_stall_probe.sh start && internal/ci_stall_probe.sh snapshot 1-start
+      - uses: maxim-lobanov/setup-xcode@ed7a3b1fda3918c0306d1b724322adc0b8cc0a90 # v1.7.0
+        with:
+          xcode-version: ${{ matrix.xcode }}
+      - uses: ruby/setup-ruby@7f797815d8adceb1c412e7abefdd1ab4abc47a5f # v1.335.0
+        with:
+          ruby-version: ${{ matrix.ruby }}
+          bundler-cache: true
+      - name: Increase Open File Limit
+        run: ulimit -n 65536
+      - name: Snapshot before the tests
+        run: internal/ci_stall_probe.sh snapshot 2-before-tests
+      # As the CI workflow runs them
+      - name: Run tests
+        env:
+          RUBYOPT: ${{ matrix.rubyopt }}
+          FASTLANE_SPEC_WORKERS: '4'
+          RSPEC_ARGS: "--require ./internal/spec_stall_watchdog.rb"
+        run: |
+          git config --global user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git config --global user.name "github-actions[bot]"
+          bundle exec fastlane execute_tests
+      - name: Snapshot after the tests
+        if: always()
+        env:
+          TIME_SIMCTL: 'true'
+        run: internal/ci_stall_probe.sh snapshot 3-after-tests
+      - name: Stop the monitors
+        if: always()
+        run: internal/ci_stall_probe.sh stop
+      - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        if: always()
+        with:
+          name: stall-probe-${{ matrix.os }}-ruby${{ matrix.ruby }}-xcode${{ matrix.xcode }}
+          path: |
+            probe/
             rspec_worker_*.log
             rspec_worker_*.units
           if-no-files-found: warn
