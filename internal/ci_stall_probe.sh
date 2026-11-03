@@ -29,6 +29,22 @@ case "${1:-}" in
     echo $! > "$dir/pids"
     nohup bash -c "while true; do echo \"=== \$(date -u +%H:%M:%S)\"; vm_stat | grep -E 'free|compressor|Pageouts|Swapouts'; ps -axro pid,ppid,etime,%cpu,rss,state,command | head -16; sleep 2; done" > "$dir/top.txt" 2>&1 &
     echo $! >> "$dir/pids"
+    # simdiskimaged logs nothing while it is busy: up to three samples of it, 5 s apart, while it uses over half a core
+    nohup bash -c '
+      n=0
+      while [ $n -lt 3 ]; do
+        pid=$(ps -axo pid=,%cpu=,comm= | awk -v name="$1" "\$3 ~ (\"/\" name \"\$\") && \$2 > 50 {print \$1; exit}")
+        if [ -n "$pid" ]; then
+          n=$((n + 1))
+          echo "$(date -u +%H:%M:%S) sampling $pid" >> "$0/sampled.txt"
+          $2 sample "$pid" 2 -file "$0/$1_sample_$n.txt" >> "$0/sampled.txt" 2>&1 ||
+            $2 spindump "$pid" 2 -file "$0/$1_spindump_$n.txt" >> "$0/sampled.txt" 2>&1
+          sleep 5
+        else
+          sleep 1
+        fi
+      done' "$dir" "${PROBE_SAMPLE_PROCESS:-simdiskimaged}" "${PROBE_SUDO-sudo}" > /dev/null 2>&1 &
+    echo $! >> "$dir/pids"
     ;;
 
   snapshot)
