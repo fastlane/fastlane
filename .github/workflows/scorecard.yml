@@ -5,8 +5,8 @@ on:
   # Keeps the Maintained check up to date.
   schedule:
     - cron: "30 4 * * 1" # Every Monday at 04:30 UTC
-  push:
-    branches: [master]
+  # No push trigger: Scorecard flags the gradle-wrapper.jar files unless the commit already has a successful
+  # gradle-wrapper-validation.yml run, and a push starts both at once.
 
 permissions: read-all
 
