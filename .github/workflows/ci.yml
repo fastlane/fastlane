@@ -54,6 +54,11 @@ jobs:
           xcodebuild -version
           xcode-select -p
 
+      # The first simctl call on a fresh runner took 5 s to 78 s in one run, inside a spec. Start it while Ruby installs.
+      - name: Start the simulator service
+        if: runner.os == 'macOS'
+        run: nohup xcrun simctl list devices > /dev/null 2>&1 &
+
       - name: Set up Ruby ${{ matrix.ruby }}
         uses: ruby/setup-ruby@7f797815d8adceb1c412e7abefdd1ab4abc47a5f # v1.335.0
         with:
