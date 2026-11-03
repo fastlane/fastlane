@@ -78,6 +78,11 @@ on:
         required: false
         type: boolean
         default: false
+      warm_up:
+        description: "Stall probe: start simctl in the background as the first step, as CI does."
+        required: false
+        type: boolean
+        default: false
       max_parallel:
         description: "Stall probe: how many legs run at once. CI starts all seven together."
         required: false
@@ -219,6 +224,11 @@ jobs:
       PROBE_DIR: ${{ github.workspace }}/probe
       TIME_SIMCTL: ${{ inputs.time_simctl }}
     steps:
+      - name: Start the simulator service
+        if: inputs.warm_up
+        run: |
+          date -u +"%Y-%m-%d %H:%M:%S" > "$RUNNER_TEMP/probe_start_time.txt"
+          nohup xcrun simctl list devices > /dev/null 2>&1 &
       - name: Turn Spotlight off
         if: inputs.disable_spotlight
         run: |

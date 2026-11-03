@@ -24,7 +24,9 @@ timed() {
 
 case "${1:-}" in
   start)
-    date -u +"%Y-%m-%d %H:%M:%S" > "$dir/start_time.txt"
+    # The warm-up step runs before the checkout, which would delete anything it wrote to the workspace
+    cp "${RUNNER_TEMP:-/nonexistent}/probe_start_time.txt" "$dir/start_time.txt" 2>/dev/null ||
+      date -u +"%Y-%m-%d %H:%M:%S" > "$dir/start_time.txt"
     nohup iostat -w 2 > "$dir/iostat.txt" 2>&1 &
     echo $! > "$dir/pids"
     nohup bash -c "while true; do echo \"=== \$(date -u +%H:%M:%S)\"; vm_stat | grep -E 'free|compressor|Pageouts|Swapouts'; ps -axro pid,ppid,etime,%cpu,rss,state,command | head -16; sleep 2; done" > "$dir/top.txt" 2>&1 &
