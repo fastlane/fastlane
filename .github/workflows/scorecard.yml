@@ -5,34 +5,14 @@ on:
   # Keeps the Maintained check up to date.
   schedule:
     - cron: "30 4 * * 1" # Every Monday at 04:30 UTC
-  push:
-    branches: [master]
+  # No push trigger: Scorecard flags the gradle-wrapper.jar files unless the commit already has a successful
+  # gradle-wrapper-validation.yml run, and a push starts both at once.
 
 permissions: read-all
 
 jobs:
-  # Scorecard flags the gradle-wrapper.jar files unless this commit already has a successful gradle-wrapper-validation.yml
-  # run; it lost that race on 2 of 8 pushes. The analysis job itself may only use approved actions, so the wait is here.
-  wait-for-gradle-wrapper-validation:
-    name: Wait for the Gradle wrapper validation
-    runs-on: ubuntu-24.04
-    if: github.event.repository.default_branch == github.ref_name
-    permissions:
-      actions: read
-    steps:
-      - env:
-          GH_TOKEN: ${{ github.token }}
-        run: |
-          for _ in $(seq 30); do
-            conclusion=$(gh run list --repo "$GITHUB_REPOSITORY" --workflow gradle-wrapper-validation.yml --commit "$GITHUB_SHA" --json conclusion -q '.[0].conclusion')
-            [ -n "$conclusion" ] && echo "Gradle wrapper validation: $conclusion" && exit 0
-            sleep 10
-          done
-          echo "::warning::No finished Gradle wrapper validation for $GITHUB_SHA after 5 minutes"
-
   analysis:
     name: Scorecard analysis
-    needs: wait-for-gradle-wrapper-validation
     runs-on: ubuntu-latest
     # `publish_results: true` only works when run from the default branch.
     if: github.event.repository.default_branch == github.ref_name
