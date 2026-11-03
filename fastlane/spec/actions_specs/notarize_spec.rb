@@ -166,7 +166,7 @@ describe Fastlane do
           let(:keychain_path) { '~/Library/My Keychains/name' }
 
           it "successful with specified :keychain_path" do
-            expect(Fastlane::Actions).to receive(:sh).with("xcrun notarytool submit #{package.path} --output-format json --wait --keychain-profile #{keychain_profile.shellescape} --keychain #{keychain_path.shellescape}", { error_callback: anything, log: false }).and_return(success_submit_response)
+            expect(Fastlane::Actions).to receive(:sh).with("xcrun notarytool submit #{package.path} --output-format json --wait --keychain-profile #{keychain_profile.shellescape} --keychain #{File.expand_path(keychain_path).shellescape}", { error_callback: anything, log: false }).and_return(success_submit_response)
 
             expect(Fastlane::Actions).to receive(:sh).with("xcrun stapler staple #{package.path}", { log: false })
 

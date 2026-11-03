@@ -36,7 +36,7 @@ module Fastlane
         auth_parts = []
         if params[:keychain_profile]
           auth_parts << "--keychain-profile #{params[:keychain_profile].shellescape}"
-          auth_parts << "--keychain #{params[:keychain_path].shellescape}" if params[:keychain_path]
+          auth_parts << "--keychain #{File.expand_path(params[:keychain_path]).shellescape}" if params[:keychain_path]
         elsif api_key
           # Writes key contents to temporary file for command
           require 'tempfile'
@@ -215,8 +215,8 @@ module Fastlane
           '# If you want to notarize locally but don\'t have access to the API key,
           # you can notarize using stored credentials:
           #
-          # 1. Run `xcrun notarytool store-credentials --team-id "TEAM_ID" --password "APP_SPECIFIC_PASSWORD" --apple-id "APPLE_ID"`
-          # 2. There will be a prompt for the profile name.
+          # 1. Run `xcrun notarytool store-credentials --team-id "TEAM_ID" --apple-id "APPLE_ID"`
+          # 2. There will be prompts for the profile name and the app-specific password (so the password never appears on the command line).
           # 3. The specified profile name can be used at any time without the need to specify team ID, username and password:
           #    `xcrun notarytool submit --keychain-profile KEYCHAIN_PROFILE_NAME`
           notarize(
