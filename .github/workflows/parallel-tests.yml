@@ -83,6 +83,16 @@ on:
         required: false
         type: boolean
         default: false
+      simctl_probe:
+        description: "Measurement: time the first simctl call on fresh runners, without the tests."
+        required: false
+        type: boolean
+        default: false
+      simctl_call:
+        description: "simctl probe: what to run first, list or runfirstlaunch"
+        required: false
+        type: string
+        default: list
       max_parallel:
         description: "Stall probe: how many legs run at once. CI starts all seven together."
         required: false
@@ -101,7 +111,7 @@ env:
 jobs:
   split_macos:
     name: "Split, macOS"
-    if: (inputs.record_timings == 'no' || inputs.record_timings == null) && !inputs.stall_probe
+    if: (inputs.record_timings == 'no' || inputs.record_timings == null) && !inputs.stall_probe && !inputs.simctl_probe
     runs-on: macos-15
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
@@ -137,7 +147,7 @@ jobs:
 
   split_linux:
     name: "Split, Linux"
-    if: (inputs.record_timings == 'no' || inputs.record_timings == null) && !inputs.stall_probe
+    if: (inputs.record_timings == 'no' || inputs.record_timings == null) && !inputs.stall_probe && !inputs.simctl_probe
     runs-on: ubuntu-24.04
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
@@ -172,7 +182,7 @@ jobs:
 
   split_windows:
     name: "Split, Windows"
-    if: (inputs.record_timings == 'no' || inputs.record_timings == null) && !inputs.stall_probe
+    if: (inputs.record_timings == 'no' || inputs.record_timings == null) && !inputs.stall_probe && !inputs.simctl_probe
     runs-on: windows-2022
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
@@ -278,6 +288,37 @@ jobs:
             rspec_worker_*.log
             rspec_worker_*.units
           if-no-files-found: warn
+
+  simctl_probe:
+    name: "simctl probe, ${{ matrix.os }}, first call after ${{ matrix.delay }}s, ${{ matrix.rep }}"
+    if: inputs.simctl_probe
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [macos-15, macos-26, xcode-27]
+        delay: [0, 180]
+        rep: [1, 2]
+    env:
+      PROBE_DIR: ${{ github.workspace }}/probe
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          sparse-checkout: internal
+      - name: Start watching
+        run: internal/ci_simctl_probe.sh start
+      - name: Wait before the first call
+        run: sleep ${{ matrix.delay }}
+      - name: Call simctl
+        run: internal/ci_simctl_probe.sh call "${{ inputs.simctl_call }}"
+      - name: Wait for simdiskimaged and collect
+        if: always()
+        run: internal/ci_simctl_probe.sh stop
+      - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        if: always()
+        with:
+          name: simctl-probe-${{ matrix.os }}-delay${{ matrix.delay }}-${{ matrix.rep }}
+          path: probe/
 
   record_macos:
     name: "Record timings, macOS"
