@@ -2,6 +2,16 @@ require_relative '../module'
 
 module Match
   module Storage
+    # Where a file named `remote_name` by the storage is written in `working_directory`.
+    # Fails when the name would place it outside, e.g. with `..` segments.
+    def self.download_path(working_directory, remote_name)
+      root = File.expand_path(working_directory)
+      path = File.expand_path(File.join(root, remote_name))
+      return path if path.start_with?(root + File::SEPARATOR)
+
+      UI.user_error!("Refusing to download #{remote_name.inspect}: it would be written outside #{root}")
+    end
+
     class Interface
       MATCH_VERSION_FILE_NAME = "match_version.txt"
       # The working directory in which we download all the profiles
@@ -47,11 +57,14 @@ module Match
       # given remote server
       # This method is blocking, meaning it might take multiple
       # seconds or longer to run
-      # @parameter files_to_commit [Array] Array to paths to files
+      # @param files_to_commit [Array] Array to paths to files
       #   that should be committed to the storage provider
-      # @parameter custom_message: [String] Custom change message
-      #           that's optional, is used for commit title
-      def save_changes!(files_to_commit: nil, files_to_delete: nil, custom_message: nil)
+      # @param custom_message: [String] Custom change message
+      #   that's optional, is used for commit title
+      # @param clear_working_directory: [Bool] Pass `false` to keep
+      #   the local working directory after saving, so more
+      #   changes can be made and saved later in the same run
+      def save_changes!(files_to_commit: nil, files_to_delete: nil, custom_message: nil, clear_working_directory: true)
         # Custom init to `[]` in case `nil` is passed
         files_to_commit ||= []
         files_to_delete ||= []
@@ -85,7 +98,7 @@ module Match
           end
         end
       ensure # Always clear working_directory after save
-        self.clear_changes
+        self.clear_changes if clear_working_directory
       end
 
       def upload_files(files_to_upload: [], custom_message: nil)

@@ -314,6 +314,7 @@ module Fastlane
               # it would defeat the caching's purpose.
               command += ['--depth', '1'] unless is_eligible_for_caching
               command += ['--branch', branch] unless branch == 'HEAD'
+              FastlaneCore::Secrets.register(git_extra_headers, name: :git_extra_headers)
               git_extra_headers.each do |header|
                 command += ['--config', "http.extraHeader=#{header}"]
               end
@@ -329,7 +330,7 @@ module Fastlane
                 # Update the repo and try again before failing
                 UI.message("Updating git repo...")
                 Helper.with_env_values('GIT_TERMINAL_PROMPT' => '0') do
-                  Actions.sh("cd #{clone_folder.shellescape} && git checkout #{branch} && git reset --hard && git pull --all")
+                  Actions.sh("cd #{clone_folder.shellescape} && git checkout #{branch.shellescape} && git reset --hard && git pull --all")
                 end
 
                 checkout_param = find_tag(folder: clone_folder, version: version, remote: false)
@@ -403,6 +404,37 @@ module Fastlane
         else
           Dir.mktmpdir("fl_clone", &import_block)
         end
+      end
+    end
+
+    # @param gem_name [String] The name of the gem to import
+    # @param paths [Array] the list of pattern to expand matching fastfiles to import
+    def import_from_gem(gem_name: nil, paths: ["fastlane/Fastfile*"])
+      UI.user_error!("Please pass a gem name to the `import_from_gem` action") if gem_name.to_s.length == 0
+
+      Actions.execute_action('import_from_gem') do
+        action_launched('import_from_gem')
+
+        UI.message("Importing from gem: #{gem_name}")
+        rubygem = Bundler.rubygems.find_name(gem_name).first
+        UI.user_error!("Couldn't find gem '#{gem_name}', make sure it is in your Gemfile") unless rubygem
+
+        # Before its Fastfiles, whose lanes may call the actions of the plugins the gem depends on
+        Fastlane.plugin_manager.load_plugins_required_by(gem_name)
+
+        gem_path = rubygem.full_gem_path
+
+        fastfiles = paths.map { |r| Dir.glob("#{gem_path}/#{r}") }.flatten
+        UI.user_error!("No Fastfile found in gem '#{gem_name}' matching #{paths.join(', ')}") if fastfiles.empty?
+
+        return_value = fastfiles.map do |file_path|
+          UI.message("Importing fastfile from #{file_path}")
+          import(file_path)
+        end
+
+        action_completed('import_from_gem', status: FastlaneCore::ActionCompletionStatus::SUCCESS)
+
+        return_value
       end
     end
 

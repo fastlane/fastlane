@@ -169,8 +169,7 @@ module Spaceship
         status = response.status if response
 
         if [500, 504].include?(status)
-          msg = "Timeout received! Retrying after 3 seconds (remaining: #{tries})..."
-          raise TimeoutRetryError, msg
+          raise TimeoutRetryError, "Server error got #{status}"
         end
 
         if status == 429
@@ -191,10 +190,10 @@ module Spaceship
         end
       rescue TimeoutRetryError => error
         tries -= 1
-        puts(error) if Spaceship::Globals.verbose?
         if tries.zero?
           return response
         else
+          puts("#{error.message}, retrying (remaining: #{tries})...") if Spaceship::Globals.verbose?
           retry
         end
       rescue TooManyRequestsError => error
@@ -356,14 +355,6 @@ module Spaceship
       end
 
       private
-
-      def local_variable_get(binding, name)
-        if binding.respond_to?(:local_variable_get)
-          binding.local_variable_get(name)
-        else
-          binding.eval(name.to_s)
-        end
-      end
 
       def provider_id
         return team_id if self.provider.nil?

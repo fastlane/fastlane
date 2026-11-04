@@ -77,6 +77,9 @@ public protocol ScanfileProtocol: AnyObject {
     /// Should the thread sanitizer be turned on?
     var threadSanitizer: Bool? { get }
 
+    /// Whether verbose and long-running diagnostics (like sysdiagnoses or log archives) are collected when testing. Valid values are: on-failure or never. If not specified, the value in the test plan is used. Equivalent to -collect-test-diagnostics (Xcode 14 and up)
+    var collectTestDiagnostics: String? { get }
+
     /// Should the HTML report be opened when tests are completed?
     var openReport: Bool { get }
 
@@ -106,6 +109,9 @@ public protocol ScanfileProtocol: AnyObject {
 
     /// Remove retry attempts from test results table and the JUnit report (if not using xcpretty)
     var outputRemoveRetryAttempts: Bool { get }
+
+    /// Force the use of the '--legacy' flag for xcresulttool instead of using the new commands
+    var forceLegacyXcresulttool: Bool { get }
 
     /// **DEPRECATED!** Use `output_style: 'raw'` instead - Disable xcpretty formatting of build, similar to `output_style='raw'` but this will also skip the test results table
     var disableXcpretty: Bool? { get }
@@ -227,6 +233,9 @@ public protocol ScanfileProtocol: AnyObject {
     /// Skips resolution of Swift Package Manager dependencies
     var skipPackageDependenciesResolution: Bool { get }
 
+    /// Raises an error instead of fetching build settings by running `xcodebuild -showBuildSettings`, which can take a long time on large projects. The error names the required build setting, so the corresponding option can be specified manually
+    var disallowXcodebuildSettingsLookup: Bool { get }
+
     /// Prevents packages from automatically being resolved to versions other than those recorded in the `Package.resolved` file. This translates in the option `-disableAutomaticPackageResolution` being passed to xcodebuild
     var disablePackageAutomaticUpdates: Bool { get }
 
@@ -347,6 +356,10 @@ public extension ScanfileProtocol {
         return nil
     }
 
+    var collectTestDiagnostics: String? {
+        return nil
+    }
+
     var openReport: Bool {
         return false
     }
@@ -384,6 +397,10 @@ public extension ScanfileProtocol {
     }
 
     var outputRemoveRetryAttempts: Bool {
+        return false
+    }
+
+    var forceLegacyXcresulttool: Bool {
         return false
     }
 
@@ -547,6 +564,10 @@ public extension ScanfileProtocol {
         return false
     }
 
+    var disallowXcodebuildSettingsLookup: Bool {
+        return false
+    }
+
     var disablePackageAutomaticUpdates: Bool {
         return false
     }
@@ -574,4 +595,4 @@ public extension ScanfileProtocol {
 
 // Please don't remove the lines below
 // They are used to detect outdated files
-// FastlaneRunnerAPIVersion [0.9.158]
+// FastlaneRunnerAPIVersion [0.9.166]

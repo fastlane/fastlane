@@ -19,6 +19,7 @@ module Deliver
       DisplayType::APP_IPHONE_61 => "iPhone 14 Pro",
       DisplayType::APP_IPHONE_65 => "iPhone XS Max",
       DisplayType::APP_IPHONE_67 => "iPhone 14 Pro Max",
+      DisplayType::APP_IPHONE_DUO => "iPhone Duo",
       DisplayType::APP_IPAD_97 => "iPad",
       DisplayType::APP_IPAD_105 => "iPad 10.5",
       DisplayType::APP_IPAD_PRO_3GEN_11 => "iPad 11",
@@ -99,6 +100,13 @@ module Deliver
         [640, 960],
         [960, 600],
         [960, 640]
+      ],
+      # iPhone Duo outer and inner displays
+      DisplayType::APP_IPHONE_DUO => [
+        [1398, 2034],
+        [2034, 1398],
+        [2007, 2853],
+        [2853, 2007]
       ],
       DisplayType::APP_IPAD_97 => [
         [1024, 748],
@@ -220,9 +228,7 @@ module Deliver
     end
 
     def is_messages?
-      # rubocop:disable Require/MissingRequireStatement
       return DisplayType::ALL_IMESSAGE.include?(self.display_type)
-      # rubocop:enable Require/MissingRequireStatement
     end
 
     def self.calculate_display_type(path)
@@ -247,7 +253,6 @@ module Deliver
         is_2gen = path_lower.include?("app_ipad_pro_129") ||
                   (path_lower.include?("12.9") && path_lower.include?("2nd generation")) # e.g. iPad Pro (12.9-inch) (2nd generation)
 
-        # rubocop:disable Require/MissingRequireStatement
         if is_2gen
           return is_imessage ? DisplayType::IMESSAGE_APP_IPAD_PRO_129 : DisplayType::APP_IPAD_PRO_129
         else
@@ -256,7 +261,6 @@ module Deliver
       # Apple TV vs Vision Pro conflict
       when [3840, 2160]
         return path_lower.include?("vision") ? DisplayType::APP_APPLE_VISION_PRO : DisplayType::APP_APPLE_TV
-        # rubocop:enable Require/MissingRequireStatement
       else
         matching_display_type
       end

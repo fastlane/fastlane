@@ -29,7 +29,9 @@ module Fastlane
       end
 
       def self.value(key, target)
-        value = `pod keys get #{key} #{target}`
+        command = ["pod", "keys", "get", key]
+        command << target unless target.to_s.empty?
+        value = `#{command.shelljoin}`
         value.split("]").last.strip
       end
 

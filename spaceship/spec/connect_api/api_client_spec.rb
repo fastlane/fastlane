@@ -161,6 +161,33 @@ describe Spaceship::ConnectAPI::APIClient do
           client.get('')
         end.to raise_error(Spaceship::ConnectAPI::APIClient::TooManyRequestsError, "Too many requests, giving up after backing off for > 3600 seconds.")
       end
+
+      it 'retries a 500 without calling it a timeout' do
+        body = JSON.generate({ "errors": [{ "status": "500", "code": "UNEXPECTED_ERROR" }] })
+        stub_client_request(client.hostname, 500, body)
+        allow(Spaceship::Globals).to receive(:verbose?).and_return(true)
+
+        expect(client).to receive(:request).exactly(5).times.and_call_original
+        expect do
+          expect do
+            client.get('')
+          end.to raise_error(Spaceship::InternalServerError, "Server error got 500")
+        end.to output(4.downto(1).map { |remaining| "Server error got 500, retrying (remaining: #{remaining})...\n" }.join).to_stdout
+      end
+
+      it 'does not announce a retry when a single try is allowed' do
+        body = JSON.generate({ "errors": [{ "status": "504", "code": "UNEXPECTED_ERROR" }] })
+        stub_request(:post, client.hostname).
+          to_return(status: 504, body: body, headers: { "Content-Type": "application/json" })
+        allow(Spaceship::Globals).to receive(:verbose?).and_return(true)
+
+        expect(client).to receive(:request).once.and_call_original
+        expect do
+          expect do
+            client.post('', {}, tries: 1)
+          end.to raise_error(Spaceship::InternalServerError, "Server error got 504")
+        end.not_to output.to_stdout
+      end
     end
   end
 

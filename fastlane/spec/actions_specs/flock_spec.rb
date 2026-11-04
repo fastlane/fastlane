@@ -12,8 +12,16 @@ describe Fastlane do
       end
 
       context 'options' do
+        # Scoped rather than assigned. These are the options' env_names, so a
+        # value left behind satisfies the option and the examples asserting that
+        # it is required stop raising. See fastlane#30184.
+        around do |example|
+          FastlaneSpec::Env.with_env_values('FL_FLOCK_BASE_URL' => 'https://example.com') do
+            example.run
+          end
+        end
+
         before do
-          ENV['FL_FLOCK_BASE_URL'] = 'https://example.com'
           stub_request(:any, /example\.com/)
         end
 
@@ -34,9 +42,9 @@ describe Fastlane do
         end
 
         it 'allows environment variables' do
-          ENV['FL_FLOCK_MESSAGE'] = 'xxx'
-          ENV['FL_FLOCK_TOKEN'] = 'xxx'
-          expect { run_flock }.to_not(raise_error)
+          FastlaneSpec::Env.with_env_values('FL_FLOCK_MESSAGE' => 'xxx', 'FL_FLOCK_TOKEN' => 'xxx') do
+            expect { run_flock }.to_not(raise_error)
+          end
         end
       end
 

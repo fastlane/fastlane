@@ -1,3 +1,4 @@
+require 'tmpdir'
 require 'precheck/options'
 require 'precheck/runner'
 require 'fastlane_core/configuration/configuration'
@@ -109,6 +110,11 @@ module Deliver
       precheck_success = true
       begin
         precheck_success = Precheck::Runner.new.run
+      rescue Precheck::Runner::BlockingViolationError => ex
+        UI.error(ex.message)
+        return false
+      rescue FastlaneCore::Interface::FastlaneError
+        raise
       rescue => ex
         UI.error("fastlane precheck just tried to inspect your app's metadata for App Store guideline violations and ran into a problem. We're not sure what the problem was, but precheck failed to finish. You can run it in verbose mode if you want to see the whole error. We'll have a fix out soon 🚀")
         UI.verbose(ex.inspect)
@@ -196,7 +202,7 @@ module Deliver
         package_path = FastlaneCore::IpaUploadPackageBuilder.new.generate(
           app_id: Deliver.cache[:app].id,
           ipa_path: ipa_path,
-          package_path: "/tmp",
+          package_path: Dir.tmpdir,
           platform: platform
         )
         result = transporter.verify(package_path: package_path, asset_path: ipa_path, platform: platform)
@@ -204,7 +210,7 @@ module Deliver
         package_path = FastlaneCore::PkgUploadPackageBuilder.new.generate(
           app_id: Deliver.cache[:app].id,
           pkg_path: pkg_path,
-          package_path: "/tmp",
+          package_path: Dir.tmpdir,
           platform: platform
         )
         result = transporter.verify(package_path: package_path, asset_path: pkg_path, platform: platform)
@@ -233,7 +239,7 @@ module Deliver
         package_path = FastlaneCore::IpaUploadPackageBuilder.new.generate(
           app_id: Deliver.cache[:app].id,
           ipa_path: ipa_path,
-          package_path: "/tmp",
+          package_path: Dir.tmpdir,
           platform: platform
         )
         result = transporter.upload(package_path: package_path, asset_path: ipa_path, platform: platform)
@@ -241,7 +247,7 @@ module Deliver
         package_path = FastlaneCore::PkgUploadPackageBuilder.new.generate(
           app_id: Deliver.cache[:app].id,
           pkg_path: pkg_path,
-          package_path: "/tmp",
+          package_path: Dir.tmpdir,
           platform: platform
         )
         result = transporter.upload(package_path: package_path, asset_path: pkg_path, platform: platform)

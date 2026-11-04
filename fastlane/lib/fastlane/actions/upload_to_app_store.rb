@@ -10,8 +10,11 @@ module Fastlane
         begin
           config.load_configuration_file("Deliverfile")
           config[:screenshots_path] ||= Actions.lane_context[SharedValues::SNAPSHOT_SCREENSHOTS_PATH] if Actions.lane_context[SharedValues::SNAPSHOT_SCREENSHOTS_PATH]
-          config[:ipa] ||= Actions.lane_context[SharedValues::IPA_OUTPUT_PATH] if Actions.lane_context[SharedValues::IPA_OUTPUT_PATH]
-          config[:pkg] ||= Actions.lane_context[SharedValues::PKG_OUTPUT_PATH] if Actions.lane_context[SharedValues::PKG_OUTPUT_PATH]
+          # The build from gym wins over the newest *.ipa/*.pkg in the current directory, the options' default
+          unless config.specified?(:ipa) || config.specified?(:pkg)
+            config[:ipa] = Actions.lane_context[SharedValues::IPA_OUTPUT_PATH] if Actions.lane_context[SharedValues::IPA_OUTPUT_PATH]
+            config[:pkg] = Actions.lane_context[SharedValues::PKG_OUTPUT_PATH] if Actions.lane_context[SharedValues::PKG_OUTPUT_PATH]
+          end
 
           # Only set :api_key from SharedValues if :api_key_path isn't set (conflicting options)
           unless config[:api_key_path]

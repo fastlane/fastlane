@@ -44,4 +44,36 @@ describe Match do
       expect(e.decrypt(base64encoded_encrypted: encoded_encrypted_data, password: password)).to eq(garbage)
     end
   end
+
+  describe Match::Encryption::MatchFileEncryption do
+    around do |example|
+      old_umask = File.umask(0o022)
+      begin
+        example.run
+      ensure
+        File.umask(old_umask)
+      end
+    end
+
+    def decrypted_mode(filename)
+      Dir.mktmpdir do |dir|
+        path = File.join(dir, filename)
+        File.write(path, "content")
+        e = Match::Encryption::MatchFileEncryption.new
+        e.encrypt(file_path: path, password: "password")
+        expect(File.stat(path).mode & 0o777).to eq(0o644) unless FastlaneCore::Helper.windows?
+        e.decrypt(file_path: path, password: "password")
+        expect(File.read(path)).to eq("content")
+        File.stat(path).mode & 0o777
+      end
+    end
+
+    it "makes a decrypted private key readable only by its owner" do
+      expect(decrypted_mode("key.p12")).to eq(0o600) unless FastlaneCore::Helper.windows?
+    end
+
+    it "keeps the mode of a decrypted certificate" do
+      expect(decrypted_mode("cert.cer")).to eq(0o644) unless FastlaneCore::Helper.windows?
+    end
+  end
 end

@@ -44,7 +44,10 @@ module Fastlane
         begin
           Actions.sh(command)
         rescue
-          handle_swiftlint_error(params[:ignore_exit_status], $?.exitstatus)
+          # $? is the status of the last subprocess this thread ran, not
+          # necessarily this one: nil when the command never launched, and stale
+          # when something else ran in between. Only report it when it is there.
+          handle_swiftlint_error(params[:ignore_exit_status], $?&.exitstatus)
           raise if params[:raise_if_swiftlint_error]
         end
       end
@@ -248,10 +251,10 @@ module Fastlane
         end
 
         UI.important("")
-        UI.important("SwiftLint finished with exit code #{exit_status}, #{failure_suffix}")
+        UI.important("SwiftLint finished with exit code #{exit_status || 'unknown'}, #{failure_suffix}")
         UI.important(secondary_message)
         UI.important("")
-        UI.user_error!("SwiftLint finished with errors (exit code: #{exit_status})") unless ignore_exit_status
+        UI.user_error!("SwiftLint finished with errors (exit code: #{exit_status || 'unknown'})") unless ignore_exit_status
       end
     end
   end

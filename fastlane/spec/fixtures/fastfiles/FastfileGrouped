@@ -1,10 +1,10 @@
-FileUtils.mkdir_p("/tmp/fastlane/")
+FileUtils.mkdir_p(FASTLANE_SPEC_SCRATCH)
 
 default_platform :ios
 
 desc "Run all the tests"
 lane :test do
-  File.write("/tmp/fastlane/tests.txt", Time.now.to_s)
+  File.write("#{FASTLANE_SPEC_SCRATCH}/tests.txt", Time.now.to_s)
 end
 
 
@@ -14,7 +14,7 @@ platform :mac do
   desc "This action will also do a build version bump and push it to git."
   desc "This will **not** send an email to all testers, it will only be uploaded to the new TestFlight."
   lane :beta do
-    File.write("/tmp/fastlane/mac_beta.txt", Time.now.to_s)
+    File.write("#{FASTLANE_SPEC_SCRATCH}/mac_beta.txt", Time.now.to_s)
   end
   
 end
@@ -22,11 +22,11 @@ end
 platform :ios do
   desc "Submit a new version to the App Store"
   lane :beta do
-    File.write("/tmp/fastlane/ios_beta.txt", Time.now.to_s)
+    File.write("#{FASTLANE_SPEC_SCRATCH}/ios_beta.txt", Time.now.to_s)
   end
 
   lane :release do
-    File.write("/tmp/fastlane/ios_release.txt", Time.now.to_s)
+    File.write("#{FASTLANE_SPEC_SCRATCH}/ios_release.txt", Time.now.to_s)
   end
 
 end
@@ -34,12 +34,12 @@ end
 platform :android do
 
   before_all do
-    File.write("/tmp/fastlane/before_all_android.txt", Time.now.to_s)
+    File.write("#{FASTLANE_SPEC_SCRATCH}/before_all_android.txt", Time.now.to_s)
   end
 
   desc "Upload something to Google"
   lane :beta do
-    File.write("/tmp/fastlane/android_beta.txt", Time.now.to_s)
+    File.write("#{FASTLANE_SPEC_SCRATCH}/android_beta.txt", Time.now.to_s)
   end
 
   private_lane :such_private do
@@ -55,30 +55,30 @@ platform :android do
   end
 
   after_all do
-    File.write("/tmp/fastlane/after_all_android.txt", Time.now.to_s)
+    File.write("#{FASTLANE_SPEC_SCRATCH}/after_all_android.txt", Time.now.to_s)
   end
 
   error do
-    File.write("/tmp/fastlane/android_error.txt", Time.now.to_s)
+    File.write("#{FASTLANE_SPEC_SCRATCH}/android_error.txt", Time.now.to_s)
   end
 end
 
 before_all do |lane|
-  File.write("/tmp/fastlane/before_all.txt", Time.now.to_s)
+  File.write("#{FASTLANE_SPEC_SCRATCH}/before_all.txt", Time.now.to_s)
 end
 
 before_each do |lane|
-  File.write("/tmp/fastlane/before_each_#{lane}.txt", Time.now.to_s)
+  File.write("#{FASTLANE_SPEC_SCRATCH}/before_each_#{lane}.txt", Time.now.to_s)
 end
 
 after_each do |lane|
-  File.write("/tmp/fastlane/after_each_#{lane}.txt", Time.now.to_s)
+  File.write("#{FASTLANE_SPEC_SCRATCH}/after_each_#{lane}.txt", Time.now.to_s)
 end
 
 lane :anotherroot do
-  File.write("/tmp/fastlane/another_root.txt", Time.now.to_s)
+  File.write("#{FASTLANE_SPEC_SCRATCH}/another_root.txt", Time.now.to_s)
 end
 
 error do
-  File.write("/tmp/fastlane/error.txt", Time.now.to_s)
+  File.write("#{FASTLANE_SPEC_SCRATCH}/error.txt", Time.now.to_s)
 end

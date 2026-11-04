@@ -8,6 +8,22 @@ def before_each_fastlane
   ENV.delete('DELIVER_VERSION')
 end
 
+# Runs a command in a fixture project's own bundle, out of process. The bundle reuses the
+# gems installed for this repository and installs with --local, so nothing is fetched.
+def run_in_fixture_bundle(fixture_path, command)
+  require "open3"
+  bundle_path = Bundler.configured_bundle_path
+  # Absolute, as the checked-in path is relative to this repository, not to the fixture
+  env = bundle_path.use_system_gems? ? {} : { "BUNDLE_PATH" => Bundler.root.join(bundle_path.base_path).to_s }
+  Bundler.with_unbundled_env do
+    Dir.chdir(fixture_path) do
+      install_output, status = Open3.capture2e(env, "bundle install --local")
+      raise "bundle install --local failed in #{fixture_path}:\n#{install_output}" unless status.success?
+      Open3.capture2e(env, "bundle exec #{command}").first
+    end
+  end
+end
+
 def stub_plugin_exists_on_rubygems(plugin_name, exists)
   stub_request(:get, "https://rubygems.org/api/v1/gems/fastlane-plugin-#{plugin_name}.json").
     with(headers: { 'Accept' => '*/*', 'Accept-Encoding' => 'gzip;q=1.0,deflate;q=0.6,identity;q=0.3', 'User-Agent' => 'Ruby' }).

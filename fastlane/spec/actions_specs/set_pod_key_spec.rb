@@ -10,7 +10,7 @@ describe Fastlane do
           )
         end").runner.execute(:test)
 
-        expect(result).to eq("bundle exec pod keys set \"APIToken\" \"1234\"")
+        expect(result).to eq("bundle exec pod keys set APIToken 1234")
       end
 
       it "default use case with no bundle exec" do
@@ -22,7 +22,7 @@ describe Fastlane do
           )
         end").runner.execute(:test)
 
-        expect(result).to eq("pod keys set \"APIToken\" \"1234\"")
+        expect(result).to eq("pod keys set APIToken 1234")
       end
 
       it "appends the project name when provided" do
@@ -35,7 +35,7 @@ describe Fastlane do
           )
         end").runner.execute(:test)
 
-        expect(result).to eq("bundle exec pod keys set \"APIToken\" \"1234\" \"MyProject\"")
+        expect(result).to eq("bundle exec pod keys set APIToken 1234 MyProject")
       end
 
       it "requires a key" do
@@ -46,6 +46,22 @@ describe Fastlane do
             )
           end").runner.execute(:test)
         end.to raise_error(FastlaneCore::Interface::FastlaneError, /'key'/)
+      end
+
+      unless FastlaneCore::Helper.windows?
+        it "passes a value with $ to the shell unchanged" do
+          value = 'pa$$w0rd$HOME'
+          result = Fastlane::FastFile.new.parse("lane :test do
+            set_pod_key(
+              use_bundle_exec: false,
+              key: 'APIToken',
+              value: #{value.inspect}
+            )
+          end").runner.execute(:test)
+
+          arguments = result.delete_prefix("pod keys set ")
+          expect(`printf '%s\n' #{arguments}`.lines(chomp: true)).to eq(["APIToken", value])
+        end
       end
 
       it "requires a value" do

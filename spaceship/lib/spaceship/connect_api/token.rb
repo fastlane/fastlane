@@ -36,7 +36,12 @@ module Spaceship
       end
 
       def self.from_json_file(filepath)
-        json = JSON.parse(File.read(filepath), { symbolize_names: true })
+        begin
+          json = JSON.parse(File.read(filepath), { symbolize_names: true })
+        rescue JSON::ParserError
+          # Don't dump secret into logs in case a secret (p8) is passed. See fastlane/fastlane#21017
+          raise "Invalid JSON in App Store Connect API key file '#{filepath}'. Expected a JSON file with at least the 'key_id' and 'key' fields."
+        end
 
         missing_keys = []
         missing_keys << 'key_id' unless json.key?(:key_id)
@@ -120,7 +125,27 @@ module Spaceship
       end
 
       def write_key_to_file(path)
-        File.open(path, 'w') { |f| f.write(@key_raw) }
+        return unless @key_raw.kind_of?(String)
+
+        lines = @key_raw.lines.map(&:chomp)
+
+        if lines.size == 3 && lines.first.include?("BEGIN") && lines.last.include?("END")
+          header = lines.first
+          footer = lines.last
+          raw_base64 = lines[1].gsub(/\s+/, "") # Remove any whitespace
+
+          # Rewrap base64 content at 64 characters per line
+          wrapped = raw_base64.scan(/.{1,64}/).join("\n")
+
+          File.open(path, 'w') do |f|
+            f.puts(header)
+            f.puts(wrapped)
+            f.puts(footer)
+          end
+        else
+          # Fall back to writing raw (likely already well-formatted)
+          File.write(path, @key_raw)
+        end
       end
     end
   end

@@ -23,9 +23,6 @@ module Fastlane
           UI.success("Collecting Git commits between #{from} and #{to}")
         end
 
-        # Normally it is not good practice to take arbitrary input and convert it to a symbol
-        # because prior to Ruby 2.2, symbols are never garbage collected. However, we've
-        # already validated that the input matches one of our allowed values, so this is OK
         merge_commit_filtering = params[:merge_commit_filtering].to_sym
 
         # We want to be specific and exclude nil for this comparison
@@ -37,9 +34,9 @@ module Fastlane
 
         Dir.chdir(params[:path]) do
           if params[:commits_count]
-            changelog = Actions.git_log_last_commits(params[:pretty], params[:commits_count], merge_commit_filtering, params[:date_format], params[:ancestry_path], params[:app_path])
+            changelog = Actions.git_log_last_commits(params[:pretty], params[:commits_count], params[:matching_pattern], merge_commit_filtering, params[:date_format], params[:ancestry_path], params[:app_path])
           else
-            changelog = Actions.git_log_between(params[:pretty], from, to, merge_commit_filtering, params[:date_format], params[:ancestry_path], params[:app_path])
+            changelog = Actions.git_log_between(params[:pretty], from, to, params[:matching_pattern], merge_commit_filtering, params[:date_format], params[:ancestry_path], params[:app_path])
           end
 
           changelog = changelog.gsub("\n\n", "\n") if changelog # as there are duplicate newlines
@@ -104,6 +101,10 @@ module Fastlane
                                        description: 'The format applied to each commit while generating the collected value',
                                        optional: true,
                                        default_value: '%B'),
+          FastlaneCore::ConfigItem.new(key: :matching_pattern,
+                                       env_name: 'FL_CHANGELOG_FROM_GIT_COMMITS_MATCHING_PATTERN',
+                                       description: 'A regexp pattern to filter only the commits matching the pattern',
+                                       optional: true),
           FastlaneCore::ConfigItem.new(key: :date_format,
                                        env_name: 'FL_CHANGELOG_FROM_GIT_COMMITS_DATE_FORMAT',
                                        description: 'The date format applied to each commit while generating the collected value',
@@ -179,6 +180,7 @@ module Fastlane
             pretty: "- (%ae) %s",                    # Optional, lets you provide a custom format to apply to each commit when generating the changelog text
             date_format: "short",                    # Optional, lets you provide an additional date format to dates within the pretty-formatted string
             match_lightweight_tag: false,            # Optional, lets you ignore lightweight (non-annotated) tags when searching for the last tag
+            matching_pattern: "[.*?].*",             # Optional, lets you filter out commits not matching the regex pattern
             merge_commit_filtering: "exclude_merges" # Optional, lets you filter out merge commits
           )'
         ]

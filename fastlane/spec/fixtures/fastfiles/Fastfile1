@@ -1,19 +1,19 @@
 before_all do
-  File.write('/tmp/fastlane/before_all', '1')
+  File.write("#{FASTLANE_SPEC_SCRATCH}/before_all", '1')
 end
 
 lane :test do 
-  File.write('/tmp/fastlane/test', '1')
+  File.write("#{FASTLANE_SPEC_SCRATCH}/test", '1')
 end
 
 desc "My Deploy"
 desc "description"
 lane :deploy do
-  File.write('/tmp/fastlane/deploy', '1')
+  File.write("#{FASTLANE_SPEC_SCRATCH}/deploy", '1')
 end
 
 after_all do |lane|
-  File.write('/tmp/fastlane/after_all', lane)
+  File.write("#{FASTLANE_SPEC_SCRATCH}/after_all", lane)
 end
 
 lane :error_causing_lane do
@@ -21,7 +21,7 @@ lane :error_causing_lane do
 end
 
 error do |lane, exception|
-  File.write('/tmp/fastlane/error', lane)
+  File.write("#{FASTLANE_SPEC_SCRATCH}/error", lane)
 end
 
 platform :mac do

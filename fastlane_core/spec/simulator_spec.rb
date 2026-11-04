@@ -32,9 +32,25 @@ describe FastlaneCore do
                                                is_simulator: true)
 
       simulator_path = File.join(FastlaneCore::Helper.xcode_path, 'Applications', 'Simulator.app')
-      expected_command = "open -a #{simulator_path} --args -CurrentDeviceUDID #{device.udid}"
+      expected_command = "open -a #{simulator_path.shellescape} --args -CurrentDeviceUDID #{device.udid}"
 
       expect(FastlaneCore::Helper).to receive(:backticks).with(expected_command, print: FastlaneCore::Globals.verbose?)
+
+      FastlaneCore::Simulator.launch(device)
+    end
+
+    it "passes Simulator.app as one argument when the Xcode path contains a space" do
+      device = FastlaneCore::DeviceManager::Device.new(name: 'iPhone 5s',
+                                                       udid: '3E67398C-AF70-4D77-A22C-D43AA8623FE3',
+                                                    os_type: 'iOS',
+                                                 os_version: '10.0',
+                                                      state: 'Shutdown',
+                                               is_simulator: true)
+      allow(FastlaneCore::Helper).to receive(:xcode_path).and_return("/Applications/Xcode 15.app/Contents/Developer/")
+
+      expect(FastlaneCore::Helper).to receive(:backticks) do |command, _options|
+        expect(Shellwords.split(command)).to eq(["open", "-a", "/Applications/Xcode 15.app/Contents/Developer/Applications/Simulator.app", "--args", "-CurrentDeviceUDID", device.udid])
+      end
 
       FastlaneCore::Simulator.launch(device)
     end
@@ -50,6 +66,51 @@ describe FastlaneCore do
       expect(FastlaneCore::Helper).not_to(receive(:backticks))
 
       FastlaneCore::Simulator.launch(device)
+    end
+
+    it "warns instead of failing when the simulator is no longer booted" do
+      device = FastlaneCore::DeviceManager::Device.new(name: 'iPhone 5s',
+                                                       udid: '3E67398C-AF70-4D77-A22C-D43AA8623FE3',
+                                                    os_type: 'iOS',
+                                                 os_version: '10.0',
+                                                      state: 'Shutdown',
+                                               is_simulator: true)
+      error_output = [
+        "An error was encountered processing the command (domain=com.apple.CoreSimulator.SimError, code=405):",
+        "Process spawn via launchd failed because device is not booted."
+      ]
+      allow(FastlaneCore::CommandExecutor).to receive(:execute).and_call_original
+      allow(FastlaneCore::CommandExecutor).to receive(:execute).with(hash_including(command: 'sw_vers -productVersion')).and_return('15.0')
+      allow(FastlaneCore::FastlanePty).to receive(:spawn).with(start_with("xcrun simctl spawn #{device.udid} log collect")).and_yield(error_output, nil, nil).and_return(149)
+
+      expect(UI).to receive(:important).with("Unable to collect system logs from #{device} (exit status 149): #{error_output.join("\n")}")
+
+      Dir.mktmpdir do |logs_destination_dir|
+        expect do
+          FastlaneCore::Simulator.copy_logs(device, 'iPhone 5s_iOS_10.0', logs_destination_dir, Time.now)
+        end.not_to(raise_error)
+      end
+    end
+
+    it "fails with simctl's message when the system logs cannot be collected for another reason" do
+      device = FastlaneCore::DeviceManager::Device.new(name: 'iPhone 5s',
+                                                       udid: '3E67398C-AF70-4D77-A22C-D43AA8623FE3',
+                                                    os_type: 'iOS',
+                                                 os_version: '10.0',
+                                                      state: 'Booted',
+                                               is_simulator: true)
+      error_output = ["Invalid device: #{device.udid}"]
+      allow(FastlaneCore::CommandExecutor).to receive(:execute).and_call_original
+      allow(FastlaneCore::CommandExecutor).to receive(:execute).with(hash_including(command: 'sw_vers -productVersion')).and_return('15.0')
+      allow(FastlaneCore::FastlanePty).to receive(:spawn).with(start_with("xcrun simctl spawn #{device.udid} log collect")).and_yield(error_output, nil, nil).and_return(148)
+
+      expect(UI).not_to(receive(:important))
+
+      Dir.mktmpdir do |logs_destination_dir|
+        expect do
+          FastlaneCore::Simulator.copy_logs(device, 'iPhone 5s_iOS_10.0', logs_destination_dir, Time.now)
+        end.to raise_error(FastlaneCore::Interface::FastlaneError, "Unable to collect system logs from #{device} (exit status 148): #{error_output.join("\n")}")
+      end
     end
 
     it "raises an error if xcrun CLI prints garbage" do

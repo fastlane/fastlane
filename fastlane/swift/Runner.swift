@@ -57,7 +57,7 @@ class Runner {
     }
 
     static func waitWithPolling<T>(_ expression: @autoclosure @escaping () throws -> T, toEventually predicate: @escaping (T) -> Bool, timeout: Int, pollingInterval: DispatchTimeInterval = .milliseconds(4)) -> DispatchTimeoutResult {
-        func memoizedClosure<T>(_ closure: @escaping () throws -> T) -> (Bool) throws -> T {
+        func memoizedClosure(_ closure: @escaping () throws -> T) -> (Bool) throws -> T {
             var cache: T?
             return { withoutCaching in
                 if withoutCaching || cache == nil {

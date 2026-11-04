@@ -41,6 +41,205 @@ describe Spaceship::Client do
       then.to_return(status: status_ok, body: body)
   end
 
+  describe "the App Store Connect API key source" do
+    # Apple removed the olympus endpoint this used to come from. Its own front
+    # end now takes the key from the sign out redirect. See #30199.
+    let(:client) { TestClient.new }
+    let(:key) { "e0b80c3bf78523bfe80974d320935bfa30add02e1bff88ec2166c6bd5a706c42" }
+    let(:location) { "https://idmsa.apple.com/appleauth/signout?widgetKey=#{key}&asop=destroy-session&asoc=/&rv=3" }
+
+    before do
+      allow(client).to receive(:itc_service_key_path).and_return(File.join(Dir.tmpdir, "spaceship_key_absent_spec.txt"))
+      allow(File).to receive(:write)
+    end
+
+    def signout_returning(headers)
+      double("connection", head: double("response", headers: headers))
+    end
+
+    it "reads the key out of the sign out redirect" do
+      allow(client).to receive(:signout_connection).and_return(signout_returning("location" => location))
+
+      expect(client.itc_service_key).to eq(key)
+    end
+
+    # The redirect points at a signout with asop=destroy-session. Asking for it
+    # over the connection that carries the session cookies would end the very
+    # session this method is called to establish.
+    it "does not ask for it over the session carrying connection" do
+      allow(client).to receive(:signout_connection).and_return(signout_returning("location" => location))
+      expect(client).to_not(receive(:request))
+
+      client.itc_service_key
+    end
+
+    it "builds a connection with no cookie jar and no redirect following" do
+      handlers = client.send(:signout_connection).builder.handlers.map(&:name)
+
+      expect(handlers.join(" ")).to_not(match(/CookieJar/i))
+      expect(handlers.join(" ")).to_not(match(/FollowRedirects/i))
+    end
+
+    it "falls back to the olympus endpoint when the redirect carries no key" do
+      allow(client).to receive(:signout_connection).and_return(signout_returning({}))
+      expect(client).to receive(:request).and_return(double("response", status: 200, body: { "authServiceKey" => "from-olympus" }))
+
+      expect(client.itc_service_key).to eq("from-olympus")
+    end
+
+    # fastlane#30198: a local failure on this path must not be swallowed and
+    # reported as whatever the fallback source had to say about itself.
+    it "does not swallow a local error as a reason to fall back" do
+      allow(client).to receive(:signout_connection).and_raise(Errno::ENOENT.new("/tmp/spaceship.log"))
+
+      expect { client.itc_service_key }.to raise_error(Errno::ENOENT)
+    end
+
+    it "falls back when the sign out request fails outright" do
+      allow(client).to receive(:signout_connection).and_raise(Faraday::ConnectionFailed.new("nope"))
+      expect(client).to receive(:request).and_return(double("response", status: 200, body: { "authServiceKey" => "from-olympus" }))
+
+      expect(client.itc_service_key).to eq("from-olympus")
+    end
+  end
+
+  describe "the cached App Store Connect API key" do
+    let(:client) { TestClient.new }
+    let(:signout) { double("connection", head: double("response", headers: { "location" => "https://idmsa.apple.com/appleauth/signout?widgetKey=fresh" })) }
+    let(:cache) { File.join(@dir, "spaceship_itc_service_key.txt") }
+
+    around do |example|
+      Dir.mktmpdir do |dir|
+        @dir = dir
+        example.run
+      end
+    end
+
+    before do
+      allow(client).to receive(:itc_service_key_path).and_return(cache)
+      File.write(cache, "stale")
+    end
+
+    it "is not used when the sign out redirect has a key" do
+      allow(client).to receive(:signout_connection).and_return(signout)
+
+      expect(client.itc_service_key).to eq("fresh")
+      expect(File.read(cache)).to eq("fresh")
+    end
+
+    it "is used when the sign out redirect has none" do
+      allow(client).to receive(:signout_connection).and_raise(Faraday::ConnectionFailed.new("nope"))
+      expect(client).to_not(receive(:request))
+
+      expect(client.itc_service_key).to eq("stale")
+    end
+
+    it "is named when App Store Connect refuses the session after signing in" do
+      allow(client).to receive(:signout_connection).and_raise(Faraday::ConnectionFailed.new("nope"))
+      allow(client).to receive(:fetch_olympus_session).and_raise(Spaceship::UnauthorizedAccessError.new, "Unauthorized Access")
+      client.itc_service_key
+
+      expect { client.send(:fetch_olympus_session_after_signin) }
+        .to raise_error(Spaceship::UnauthorizedAccessError, /cache at #{Regexp.escape(cache)} and may be stale/)
+    end
+
+    it "is not blamed for a refused session when it was not used" do
+      allow(client).to receive(:signout_connection).and_return(signout)
+      allow(client).to receive(:fetch_olympus_session).and_raise(Spaceship::UnauthorizedAccessError.new, "Unauthorized Access")
+      client.itc_service_key
+
+      expect { client.send(:fetch_olympus_session_after_signin) }
+        .to raise_error(Spaceship::UnauthorizedAccessError, "Unauthorized Access")
+    end
+  end
+
+  describe "#itc_service_key" do
+    # Apple started returning 404 from the key endpoint, and every one of these
+    # surfaced as "Service key is empty" wrapped in a timeout. See #30199.
+    let(:key_url) { "https://appstoreconnect.apple.com/olympus/v1/app/config?hostname=itunesconnect.apple.com" }
+    let(:client) { TestClient.new }
+
+    before do
+      allow(client).to receive(:itc_service_key_path).and_return(File.join(Dir.tmpdir, "spaceship_itc_service_key_spec_absent.txt"))
+      # These are about the olympus endpoint, which is the fallback now.
+      allow(client).to receive(:fetch_service_key_from_signout).and_return(nil)
+    end
+
+    def response_double(status, body)
+      double("response", status: status, body: body)
+    end
+
+    it "reports the status when the endpoint is gone rather than an empty key" do
+      allow(client).to receive(:request).and_return(response_double(404, "<html><title>Error 404 Not Found</title></html>"))
+
+      expect { client.itc_service_key }
+        .to raise_error(Spaceship::UnexpectedResponse, /returned 404/)
+    end
+
+    it "does not report a permanent failure as something worth retrying" do
+      allow(client).to receive(:request).and_return(response_double(404, "<html>nope</html>"))
+
+      # AppleTimeoutError is in with_retry's list, so raising it for a 404 costs
+      # five attempts and three second sleeps before failing anyway.
+      expect { client.itc_service_key }.to raise_error(Spaceship::UnexpectedResponse)
+    end
+
+    it "keeps a server error retryable" do
+      allow(client).to receive(:request).and_return(response_double(503, "<html>unavailable</html>"))
+
+      expect { client.itc_service_key }
+        .to raise_error(Spaceship::AppleTimeoutError, /returned 503/)
+    end
+
+    it "says the key was missing when the response was otherwise fine" do
+      allow(client).to receive(:request).and_return(response_double(200, {}))
+
+      expect { client.itc_service_key }
+        .to raise_error(Spaceship::UnexpectedResponse, /no authServiceKey/)
+    end
+
+    it "does not fail the login when the key cannot be cached" do
+      allow(client).to receive(:request).and_return(response_double(200, { "authServiceKey" => "e0abc" }))
+      allow(File).to receive(:write).and_raise(Errno::EACCES)
+
+      expect(client.itc_service_key).to eq("e0abc")
+    end
+  end
+
+  describe "#itc_service_key_path" do
+    # The cookie store next to it has the same spec; a temporary directory is shared on Linux.
+    it "caches the key in the user's fastlane directory" do
+      # spec_helper stubs the path on every client; this example is about the method itself
+      allow_any_instance_of(Spaceship::Client).to receive(:itc_service_key_path).and_call_original
+
+      expect(TestClient.new.itc_service_key_path).to eq(File.expand_path("~/.fastlane/spaceship_itc_service_key.txt"))
+    end
+  end
+
+  describe "#logger" do
+    # Guards against going back to a literal "/tmp"; the method says why.
+    it "writes to the system temporary directory" do
+      client = TestClient.new
+
+      FastlaneSpec::Env.with_env_values("VERBOSE" => nil) do
+        expect(client.logger.instance_variable_get(:@logdev).filename)
+          .to start_with(Dir.tmpdir)
+      end
+    end
+
+    it "writes a log readable by its owner only" do
+      old_umask = File.umask(0o022)
+      client = TestClient.new
+
+      FastlaneSpec::Env.with_env_values("VERBOSE" => nil) do
+        path = client.logger.instance_variable_get(:@logdev).filename
+        expect(File.stat(path).mode & 0o777).to eq(0o600) unless FastlaneCore::Helper.windows?
+      end
+    ensure
+      File.umask(old_umask)
+    end
+  end
+
   describe 'detect_most_common_errors_and_raise_exceptions' do
     # this test is strange, the `error` has a typo "InsufficentPermissions" and is not really relevant
     it "raises Spaceship::InsufficientPermissions for InsufficentPermissions" do
@@ -117,6 +316,18 @@ describe Spaceship::Client do
       expect do
         subject.req_home
       end.to raise_error(Spaceship::ProgramLicenseAgreementUpdated)
+    end
+
+    ["http://example.com", "https://idmsa.apple.com/appleauth/auth/verify/phone"].each do |url|
+      it "retries a 403 with serviceErrors from #{url}, which is not Apple's sign-in" do
+        forbidden = stub_request(:get, url).
+                    to_return(status: 403, body: { "serviceErrors" => [{ "code" => "-1", "message" => "Forbidden" }] }.to_json, headers: { 'Content-Type' => 'application/json' })
+
+        expect do
+          subject.request(:get, url)
+        end.to raise_error(Spaceship::AccessForbiddenError)
+        expect(forbidden).to have_been_requested.times(5)
+      end
     end
 
     it "raises Spaceship::AccessForbiddenError" do
@@ -212,6 +423,14 @@ BODY
       expect do
         subject.req_home
       end.to raise_error(Spaceship::Client::BadGatewayError)
+    end
+
+    it "returns a JSON response whose values contain an error page marker" do
+      body = { "data" => { "description" => "<h3>Bad Gateway</h3>" } }
+      stub_request(:get, test_uri).
+        to_return(status: 200, body: body.to_json, headers: { 'Content-Type' => 'application/json' })
+
+      expect(subject.req_home.body).to eq(body)
     end
   end
 
@@ -326,6 +545,18 @@ BODY
     end
   end
 
+  describe "a plist response that cannot be parsed" do
+    it "raises Faraday::ParsingError once the retries are used up" do
+      stub_request(:get, test_uri).
+        to_return(status: 200, body: "<html>Internal Server Error</html>", headers: { 'Content-Type' => 'application/x-plist' })
+
+      expect do
+        subject.req_home
+      end.to raise_error(Faraday::ParsingError)
+      expect(WebMock).to have_requested(:get, test_uri).times(5)
+    end
+  end
+
   describe "#do_sirp" do
     it "raises Spaceship::UnexpectedResponse when body is not valid JSON, but HTTP 200" do
       stub_request(:post, "https://idmsa.apple.com/appleauth/auth/signin/init").
@@ -354,7 +585,9 @@ BODY
 
       expect do
         subject.do_sirp("user", "password", nil)
-      end.to raise_error(Spaceship::Client::UnexpectedResponse)
+      end.to raise_error(Spaceship::Client::UnexpectedResponse) { |error|
+        expect(error.preferred_error_info).to eq(["Apple provided the following error info:", "(-900007)"])
+      }
     end
   end
 
@@ -363,9 +596,23 @@ BODY
       response = TestResponse.new([130, 5, 3120, 130, 4, 171, 160, 3, 2].pack('C*'))
       expect(subject.send(:log_response, :get, TestClient.hostname, response)).to be_truthy
     end
+
+    it 'handles a frozen response body' do
+      response = TestResponse.new("".freeze)
+      expect(subject.send(:log_response, :get, TestClient.hostname, response)).to be_truthy
+    end
   end
 
   describe "#persistent_cookie_path" do
+    # spec_helper points SPACESHIP_COOKIE_PATH at a temporary store for the
+    # whole suite, so that the specs neither write a cookie to the developer's
+    # home directory nor read one an earlier run left there. These examples are
+    # about how the path is chosen when that variable is not set, so they have
+    # to run without it. See fastlane#30184.
+    around(:each) do |example|
+      FastlaneSpec::Env.with_env_values("SPACESHIP_COOKIE_PATH" => nil) { example.run }
+    end
+
     before do
       subject.login("username", "password")
     end
@@ -376,8 +623,9 @@ BODY
 
     it "uses $SPACESHIP_COOKIE_PATH when set" do
       tmp_path = Dir.mktmpdir
-      ENV["SPACESHIP_COOKIE_PATH"] = "#{tmp_path}/custom_path"
-      expect(subject.persistent_cookie_path).to eq("#{tmp_path}/custom_path/spaceship/username/cookie")
+      FastlaneSpec::Env.with_env_values("SPACESHIP_COOKIE_PATH" => "#{tmp_path}/custom_path") do
+        expect(subject.persistent_cookie_path).to eq("#{tmp_path}/custom_path/spaceship/username/cookie")
+      end
     end
 
     it "uses home dir by default" do
@@ -404,6 +652,73 @@ BODY
       allow(subject).to receive(:directory_accessible?).with(File.expand_path("/var/tmp")).and_return(false)
       allow(subject).to receive(:directory_accessible?).with(Dir.tmpdir).and_return(true)
       expect(subject.persistent_cookie_path).to eq("#{Dir.tmpdir}/spaceship/username/cookie")
+    end
+  end
+
+  describe "session cookie file permissions" do
+    let(:tmp_path) { Dir.mktmpdir }
+    let(:cookie_path) { File.join(tmp_path, "spaceship", "username", "cookie") }
+
+    around(:each) do |example|
+      old_umask = File.umask(0o022)
+      FastlaneSpec::Env.with_env_values("SPACESHIP_COOKIE_PATH" => tmp_path) { example.run }
+    ensure
+      File.umask(old_umask)
+      FileUtils.rm_rf(tmp_path)
+    end
+
+    before do
+      subject.user = "username"
+    end
+
+    def mode_of(path)
+      File.stat(path).mode & 0o777
+    end
+
+    def write_cookie_readable_by_all
+      FileUtils.mkdir_p(File.dirname(cookie_path), mode: 0o755)
+      HTTP::CookieJar.new.save(cookie_path, :yaml, session: true)
+      File.chmod(0o755, File.dirname(cookie_path))
+      File.chmod(0o644, cookie_path)
+    end
+
+    it "saves a new cookie readable by its owner only" do
+      subject.store_cookie
+
+      expect(mode_of(cookie_path)).to eq(0o600) unless FastlaneCore::Helper.windows?
+      expect(mode_of(File.dirname(cookie_path))).to eq(0o700) unless FastlaneCore::Helper.windows?
+    end
+
+    it "restricts an existing cookie when saving it again" do
+      write_cookie_readable_by_all
+
+      subject.store_cookie
+
+      expect(mode_of(cookie_path)).to eq(0o600) unless FastlaneCore::Helper.windows?
+      expect(mode_of(File.dirname(cookie_path))).to eq(0o700) unless FastlaneCore::Helper.windows?
+    end
+
+    it "restricts an existing cookie when loading it" do
+      write_cookie_readable_by_all
+
+      expect(subject.load_session_from_file).to be(true)
+
+      expect(mode_of(cookie_path)).to eq(0o600) unless FastlaneCore::Helper.windows?
+      expect(mode_of(File.dirname(cookie_path))).to eq(0o700) unless FastlaneCore::Helper.windows?
+    end
+
+    it "saves the cookie readable by its owner only in the Dir.tmpdir fallback" do
+      FastlaneSpec::Env.with_env_values("SPACESHIP_COOKIE_PATH" => nil) do
+        allow(subject).to receive(:fastlane_user_dir).and_return(File.join(tmp_path, "home", ".fastlane"))
+        allow(subject).to receive(:directory_accessible?).and_return(false)
+        allow(Dir).to receive(:tmpdir).and_return(tmp_path)
+        allow(subject).to receive(:directory_accessible?).with(tmp_path).and_return(true)
+
+        subject.store_cookie
+
+        expect(mode_of(cookie_path)).to eq(0o600) unless FastlaneCore::Helper.windows?
+        expect(mode_of(File.dirname(cookie_path))).to eq(0o700) unless FastlaneCore::Helper.windows?
+      end
     end
   end
 end

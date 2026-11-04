@@ -14,8 +14,12 @@ module FastlaneCore
 
     def generate(app_id: nil, ipa_path: nil, package_path: nil, platform: nil, app_identifier: nil, short_version: nil, bundle_version: nil)
       unless Helper.is_mac?
-        # .itmsp packages are not supported for ipa uploads starting Transporter 4.1, for non-macOS
-        self.package_path = package_path
+        # .itmsp packages are not supported for ipa uploads starting Transporter 4.1, for non-macOS.
+        # Use a unique subdirectory anyway: callers pass a shared parent (deliver passes "/tmp"),
+        # and ItunesTransporter#upload runs FileUtils.rm_rf on whatever this returns.
+        self.package_path = File.join(package_path, "#{app_id}-#{SecureRandom.uuid}")
+        FileUtils.mkdir_p(self.package_path)
+
         copy_ipa(ipa_path)
 
         # copy any AppStoreInfo.plist file that's next to the ipa file

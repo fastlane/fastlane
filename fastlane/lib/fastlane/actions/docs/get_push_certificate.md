@@ -17,9 +17,7 @@ To automate iOS Provisioning profiles you can use [_match_](https://docs.fastlan
 <p align="center">
     <a href="#features">Features</a> &bull;
     <a href="#usage">Usage</a> &bull;
-    <a href="#how-does-it-work">How does it work?</a> &bull;
-    <a href="#tips">Tips</a> &bull;
-    <a href="#need-help">Need help?</a>
+    <a href="#how-does-it-work">How does it work?</a>
 </p>
 
 -------
@@ -72,6 +70,12 @@ If you want to generate a Website Push certificate:
 
 ```no-highlight
 fastlane pem --website_push
+```
+
+If you want to generate a VoIP Services certificate (the type PushKit requires):
+
+```no-highlight
+fastlane pem --voip_push
 ```
 
 Set a password for your `p12` file:

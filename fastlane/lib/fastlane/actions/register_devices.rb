@@ -11,6 +11,10 @@ module Fastlane
         ['Device ID', 'Device Name', 'Device Platform']
       end
 
+      def self.ignored_line?(row)
+        row.all? { |value| value.to_s.strip.empty? } || row.first.to_s.strip.start_with?('#')
+      end
+
       def self.run(params)
         platform = Spaceship::ConnectAPI::BundleIdPlatform.map(params[:platform])
 
@@ -22,6 +26,7 @@ module Fastlane
           require 'csv'
 
           devices_file = CSV.read(File.expand_path(File.join(params[:devices_file])), col_sep: "\t")
+          devices_file = devices_file.reject { |row| ignored_line?(row) }
           unless devices_file.first == file_column_headers.first(2) || devices_file.first == file_column_headers
             UI.user_error!("Please provide a file according to the Apple Sample UDID file (https://developer.apple.com/account/resources/downloads/Multiple-Upload-Samples.zip)")
           end
@@ -55,8 +60,14 @@ module Fastlane
         existing_devices = Spaceship::ConnectAPI::Device.all
 
         device_objs = new_devices.map do |device|
-          if existing_devices.map(&:udid).map(&:downcase).include?(device[0].downcase)
-            UI.verbose("UDID #{device[0]} already exists - Skipping...")
+          normalized_udid = device[0].tr("-", "")
+          existing_device = existing_devices.find do |ed|
+            ed.udid.tr("-", "").casecmp(normalized_udid).zero?
+          end
+
+          if existing_device
+            UI.verbose("UDID #{existing_device.udid} already exists - Skipping...")
+
             next
           end
 
@@ -74,8 +85,12 @@ module Fastlane
           try_create_device(name: device[1], platform: device_platform, udid: device[0])
         end
 
-        UI.success("Successfully registered new devices.")
-        return device_objs
+        if device_objs.compact.empty?
+          UI.success("No new devices to register")
+        else
+          UI.success("Successfully registered new devices.")
+        end
+        return device_objs.compact
       end
 
       def self.try_create_device(name: nil, platform: nil, udid: nil)
@@ -169,7 +184,8 @@ module Fastlane
         [
           "This will register iOS/Mac devices with the Developer Portal so that you can include them in your provisioning profiles.",
           "This is an optimistic action, in that it will only ever add new devices to the member center, and never remove devices. If a device which has already been registered within the member center is not passed to this action, it will be left alone in the member center and continue to work.",
-          "The action will connect to the Apple Developer Portal using the username you specified in your `Appfile` with `apple_id`, but you can override it using the `username` option, or by setting the env variable `ENV['DELIVER_USER']`."
+          "The action will connect to the Apple Developer Portal using the username you specified in your `Appfile` with `apple_id`, but you can override it using the `username` option, or by setting the env variable `ENV['DELIVER_USER']`.",
+          "When using `devices_file`, blank lines and lines starting with `#` are ignored, so you can group devices, add notes, or comment out a device row without removing it."
         ].join("\n")
       end
 

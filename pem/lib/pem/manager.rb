@@ -20,7 +20,7 @@ module PEM
           remaining_days = (existing_certificate.expires - Time.now) / 60 / 60 / 24
 
           display_platform = ''
-          unless PEM.config[:website_push]
+          unless PEM.config[:website_push] || PEM.config[:voip_push]
             display_platform = "#{PEM.config[:platform]} "
           end
 
@@ -73,7 +73,7 @@ module PEM
 
         if PEM.config[:save_private_key]
           private_key_path = File.join(output_path, "#{filename_base}.pkey")
-          File.write(private_key_path, pkey.to_pem)
+          FastlaneCore::Helper.open_owner_only(private_key_path) { |file| file.write(pkey.to_pem) }
           UI.message("Private key: ".green + Pathname.new(private_key_path).realpath.to_s)
         end
 
@@ -81,12 +81,12 @@ module PEM
           p12_cert_path = File.join(output_path, "#{filename_base}.p12")
           p12_password = PEM.config[:p12_password] == "" ? nil : PEM.config[:p12_password]
           p12 = OpenSSL::PKCS12.create(p12_password, certificate_type, pkey, x509_certificate)
-          File.write(p12_cert_path, p12.to_der.force_encoding("UTF-8"))
+          FastlaneCore::Helper.open_owner_only(p12_cert_path) { |file| file.write(p12.to_der.force_encoding("UTF-8")) }
           UI.message("p12 certificate: ".green + Pathname.new(p12_cert_path).realpath.to_s)
         end
 
         x509_cert_path = File.join(output_path, "#{filename_base}.pem")
-        File.write(x509_cert_path, x509_certificate.to_pem + pkey.to_pem)
+        FastlaneCore::Helper.open_owner_only(x509_cert_path) { |file| file.write(x509_certificate.to_pem + pkey.to_pem) }
         UI.message("PEM: ".green + Pathname.new(x509_cert_path).realpath.to_s)
         return x509_cert_path
       end
@@ -94,6 +94,8 @@ module PEM
       def certificate
         if PEM.config[:website_push]
           Spaceship.certificate.website_push
+        elsif PEM.config[:voip_push]
+          Spaceship.certificate.voip_push
         else
           platform = PEM.config[:platform]
           UI.user_error!('platform parameter is unspecified.') unless platform
@@ -123,6 +125,8 @@ module PEM
           'development'
         elsif PEM.config[:website_push]
           'website'
+        elsif PEM.config[:voip_push]
+          'voip'
         else
           'production'
         end

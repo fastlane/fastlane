@@ -95,7 +95,9 @@ describe Fastlane do
         end
 
         it "disable keychain unlock" do
-          keychain_path = Tempfile.new("foo").path
+          # Keep the Tempfile, not only its path: an unreferenced one is deleted when the GC finalises it. See fastlane#30184.
+          keychain_file = Tempfile.new("foo")
+          keychain_path = keychain_file.path
           ENV["KEYCHAIN_PATH"] = keychain_path
 
           expect(UI).to receive(:message).with(/Set output directory path to:/)
@@ -116,7 +118,9 @@ describe Fastlane do
         it "unlock keychain" do
           allow(Fastlane::Actions::UnlockKeychainAction).to receive(:run).and_return(nil)
 
-          keychain_path = Tempfile.new("foo").path
+          # Keep the Tempfile, not only its path: an unreferenced one is deleted when the GC finalises it. See fastlane#30184.
+          keychain_file = Tempfile.new("foo")
+          keychain_path = keychain_file.path
           ENV["KEYCHAIN_PATH"] = keychain_path
 
           expect(UI).to receive(:message).with("Unlocking keychain: \"#{keychain_path}\".")

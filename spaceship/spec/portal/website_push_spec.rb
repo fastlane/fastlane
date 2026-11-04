@@ -56,4 +56,27 @@ describe Spaceship::Portal::WebsitePush do
       expect(website_push.website_id).to eq('R7878HDXC3')
     end
   end
+
+  describe "the Mac platform" do
+    it "records the platform a website push was fetched with" do
+      website_push = Spaceship::Portal::WebsitePush.find("web.com.example.two", mac: true)
+      expect(website_push.mac?).to be(true)
+    end
+
+    it "deletes a Mac website push against the Mac endpoint" do
+      expect(client).to receive(:delete_website_push!).with('R7878HDXC3', mac: true)
+      Spaceship::Portal::WebsitePush.find("web.com.example.two", mac: true).delete!
+    end
+
+    it "records the platform a website push was created with" do
+      expect(client).to receive(:create_website_push!).with('Fastlane Website Push', 'web.com.fastlane.example', mac: true).and_return({})
+      website_push = Spaceship::Portal::WebsitePush.create!(bundle_id: 'web.com.fastlane.example', name: 'Fastlane Website Push', mac: true)
+      expect(website_push.mac?).to be(true)
+    end
+
+    it "leaves an iOS website push on the iOS endpoint" do
+      website_push = Spaceship::Portal::WebsitePush.find("web.com.example.two")
+      expect(website_push.mac?).to be(false)
+    end
+  end
 end

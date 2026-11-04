@@ -49,5 +49,16 @@ describe FastlaneCore::QueueWorker do
 
       expect { subject.enqueue(2) }.to raise_error(ClosedQueueError)
     end
+
+    it 'should return an array of results from the block' do
+      subject = described_class.new(2) do |job|
+        job * 2
+      end
+
+      subject.batch_enqueue([1, 2, 3])
+      results = subject.start
+
+      expect(results).to contain_exactly(2, 4, 6)
+    end
   end
 end

@@ -357,6 +357,7 @@ module Deliver
       review_information(version)
       app_clip_review_information(version)
       review_attachment_file(version)
+      routing_app_coverage_file(version)
       app_rating(app_info)
     end
 
@@ -534,15 +535,13 @@ module Deliver
       if locales_to_enable.count > 0
         lng_text = "language"
         lng_text += "s" if locales_to_enable.count != 1
-        Helper.show_loading_indicator("Activating info #{lng_text} #{locales_to_enable.join(', ')}...")
-
-        locales_to_enable.each do |locale|
-          app_info.create_app_info_localization(attributes: {
-            locale: locale
-          })
+        Helper.with_loading_indicator("Activating info #{lng_text} #{locales_to_enable.join(', ')}...") do
+          locales_to_enable.each do |locale|
+            app_info.create_app_info_localization(attributes: {
+              locale: locale
+            })
+          end
         end
-
-        Helper.hide_loading_indicator
 
         # Refresh version localizations
         localizations = app_info.get_app_info_localizations
@@ -569,15 +568,13 @@ module Deliver
       if locales_to_enable.count > 0
         lng_text = "language"
         lng_text += "s" if locales_to_enable.count != 1
-        Helper.show_loading_indicator("Activating version #{lng_text} #{locales_to_enable.join(', ')}...")
-
-        locales_to_enable.each do |locale|
-          version.create_app_store_version_localization(attributes: {
-            locale: locale
-          })
+        Helper.with_loading_indicator("Activating version #{lng_text} #{locales_to_enable.join(', ')}...") do
+          locales_to_enable.each do |locale|
+            version.create_app_store_version_localization(attributes: {
+              locale: locale
+            })
+          end
         end
-
-        Helper.hide_loading_indicator
 
         # Refresh version localizations
         localizations = version.get_app_store_version_localizations
@@ -764,6 +761,27 @@ module Deliver
         app_store_review_attachments.each(&:delete!)
         UI.message("Removing review attachment file to App Store Connect") unless app_store_review_attachments.empty?
       end
+    end
+
+    def routing_app_coverage_file(version)
+      # Skip logic entirely if no coverage file passed. So status-quo stays the same.
+      return unless options[:routing_app_coverage_file]
+
+      routing_app_coverage =
+        begin
+          version.fetch_routing_app_coverage
+        rescue => error
+          UI.error("Error fetching routing app coverage - #{error.message}")
+          nil
+        end
+
+      if routing_app_coverage
+        UI.message("Removing previous routing app coverage file from App Store Connect")
+        routing_app_coverage.delete!
+      end
+
+      UI.message("Uploading routing app coverage file to App Store Connect")
+      version.upload_routing_app_coverage(path: options[:routing_app_coverage_file])
     end
 
     def app_rating(app_info)

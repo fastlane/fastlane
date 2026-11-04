@@ -14,21 +14,24 @@ on:
           - major
 
 permissions:
-  contents: write
-  pull-requests: write
+  contents: read
 
 jobs:
   create_version_bump:
     runs-on: macos-latest
 
+    permissions:
+      contents: write
+      pull-requests: write
+
     steps:
     - name: Checkout repository
-      uses: actions/checkout@v7
+      uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
 
     - name: Set up Ruby
-      uses: ruby/setup-ruby@v1
+      uses: ruby/setup-ruby@7f797815d8adceb1c412e7abefdd1ab4abc47a5f # v1.335.0
       with:
-        ruby-version: 3.2
+        ruby-version: 3.4
 
     - name: Install fastlane
       run: bundle install

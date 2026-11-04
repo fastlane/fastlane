@@ -51,7 +51,7 @@ module Snapshot
 
       export_path = File.expand_path(export_path)
       UI.success("Successfully created HTML file with an overview of all the screenshots: '#{export_path}'")
-      system("open '#{export_path}'") unless Snapshot.config[:skip_open_summary]
+      system("open", export_path) unless Snapshot.config[:skip_open_summary]
     end
 
     def xcode_8_and_below_device_name_mappings
@@ -84,6 +84,8 @@ module Snapshot
       {
         # snapshot in Xcode 9 saves screenshots with the SIMULATOR_DEVICE_NAME
         # which includes spaces
+        'iPhone 18 Pro Max' => "iPhone 18 Pro Max",
+        'iPhone 18 Pro' => "iPhone 18 Pro",
         'iPhone 17 Pro Max' => "iPhone 17 Pro Max",
         'iPhone 17 Pro' => "iPhone 17 Pro",
         'iPhone 17' => "iPhone 17",

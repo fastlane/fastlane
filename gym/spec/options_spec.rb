@@ -1,4 +1,8 @@
 describe Gym do
+  before do
+    fake_out_build_settings(GYM_BUILD_SETTINGS)
+  end
+
   describe Gym::Options do
     it "raises an exception when project path wasn't found" do
       expect do

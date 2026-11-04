@@ -56,10 +56,10 @@ public protocol MatchfileProtocol: AnyObject {
     /// Clone just the branch specified, instead of the whole repo. This requires that the branch already exists. Otherwise the command will fail
     var cloneBranchDirectly: Bool { get }
 
-    /// Use a basic authorization header to access the git repo (e.g.: access via HTTPS, GitHub Actions, etc), usually a string in Base64
+    /// Use a basic authorization header to access the git repo (e.g.: access via HTTPS, GitHub Actions, etc), usually a string in Base64. Needs git 2.31 or later
     var gitBasicAuthorization: String? { get }
 
-    /// Use a bearer authorization header to access the git repo (e.g.: access to an Azure DevOps repository), usually a string in Base64
+    /// Use a bearer authorization header to access the git repo (e.g.: access to an Azure DevOps repository), usually a string in Base64. Needs git 2.31 or later
     var gitBearerAuthorization: String? { get }
 
     /// Use a private key to access the git repo (e.g.: access to GitHub repository via Deploy keys), usually a id_rsa named file or the contents hereof
@@ -134,6 +134,9 @@ public protocol MatchfileProtocol: AnyObject {
     /// Renew the provisioning profiles if the certificate count on the developer portal has changed. Works only for the 'development' provisioning profile type. Requires 'include_all_certificates' option to be 'true'
     var forceForNewCertificates: Bool { get }
 
+    /// Automatically renew expired certificates. Note: to renew `developer_id` and `developer_id_installer` certificates you must log in with the Account Holder account by using username and password; App Store Connect API key doesn't work in this case. The expired certificate is removed from the match storage and a new one is created, but the old certificate is not revoked on the Apple Developer Portal — run `fastlane match nuke` if you need to free up certificate slots
+    var renewExpiredCerts: Bool { get }
+
     /// Disables confirmation prompts during nuke, answering them with yes
     var skipConfirmation: Bool { get }
 
@@ -169,6 +172,9 @@ public protocol MatchfileProtocol: AnyObject {
 
     /// Force encryption to use legacy cbc algorithm for backwards compatibility with older match versions
     var forceLegacyEncryption: Bool { get }
+
+    /// Enable profile with 'Offline Support' (7 day validity). Requires Apple ID login, not supported with App Store Connect API key authentication
+    var offlineProfile: Bool { get }
 
     /// Print out extra information and all commands
     var verbose: Bool { get }
@@ -351,6 +357,10 @@ public extension MatchfileProtocol {
         return false
     }
 
+    var renewExpiredCerts: Bool {
+        return false
+    }
+
     var skipConfirmation: Bool {
         return false
     }
@@ -399,6 +409,10 @@ public extension MatchfileProtocol {
         return false
     }
 
+    var offlineProfile: Bool {
+        return false
+    }
+
     var verbose: Bool {
         return false
     }
@@ -406,4 +420,4 @@ public extension MatchfileProtocol {
 
 // Please don't remove the lines below
 // They are used to detect outdated files
-// FastlaneRunnerAPIVersion [0.9.147]
+// FastlaneRunnerAPIVersion [0.9.155]

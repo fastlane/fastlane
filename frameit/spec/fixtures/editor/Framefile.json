@@ -17,7 +17,7 @@
     {
       "filter": "escaped-apostrophes",
       "title": {
-        "text": "Don\'t forget the apostrophes"
+        "text": "Don\\'t forget the apostrophes"
       }
     }
   ]

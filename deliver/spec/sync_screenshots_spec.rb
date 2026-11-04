@@ -12,8 +12,8 @@ describe Deliver::SyncScreenshots do
     end
 
     let(:en_US) { mock_app_store_version_localization }
-    let(:app_screenshot_set_55) { mock_app_screenshot_set(display_type: DisplayType::APP_IPHONE_55) }
-    let(:app_screenshot_set_65) { mock_app_screenshot_set(display_type: DisplayType::APP_IPHONE_65) }
+    let(:app_screenshot_set_55) { mock_app_screenshot_set(display_type: Deliver::AppScreenshot::DisplayType::APP_IPHONE_55) }
+    let(:app_screenshot_set_65) { mock_app_screenshot_set(display_type: Deliver::AppScreenshot::DisplayType::APP_IPHONE_65) }
 
     context 'ASC has nothing and going to add screenshots' do
       let(:screenshots) do

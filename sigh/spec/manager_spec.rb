@@ -63,29 +63,57 @@ describe Sigh do
         ENV.delete("SIGH_NAME")
       end
 
-      it 'passes keychain_path to ProvisioningProfile methods' do
-        profile = "fake_profile.mobileprovision"
-        keychain_path = "/path/to/custom.keychain"
+      context 'on macOS' do
+        before do
+          allow(FastlaneCore::Helper).to receive(:mac?).and_return(true)
+        end
 
-        expect(FastlaneCore::ProvisioningProfile).to receive(:uuid).with(profile, keychain_path).and_return("fake-uuid")
-        expect(FastlaneCore::ProvisioningProfile).to receive(:name).with(profile, keychain_path).and_return("fake-name")
-        expect(FastlaneCore::ProvisioningProfile).to receive(:install).with(profile, keychain_path)
+        it 'passes keychain_path to ProvisioningProfile methods' do
+          profile = "fake_profile.mobileprovision"
+          keychain_path = "/path/to/custom.keychain"
 
-        Sigh::Manager.install_profile(profile, keychain_path)
+          expect(FastlaneCore::ProvisioningProfile).to receive(:uuid).with(profile, keychain_path).and_return("fake-uuid")
+          expect(FastlaneCore::ProvisioningProfile).to receive(:name).with(profile, keychain_path).and_return("fake-name")
+          expect(FastlaneCore::ProvisioningProfile).to receive(:install).with(profile, keychain_path)
 
-        expect(ENV["SIGH_UDID"]).to eq("fake-uuid")
-        expect(ENV["SIGH_UUID"]).to eq("fake-uuid")
-        expect(ENV["SIGH_NAME"]).to eq("fake-name")
+          Sigh::Manager.install_profile(profile, keychain_path)
+
+          expect(ENV["SIGH_UDID"]).to eq("fake-uuid")
+          expect(ENV["SIGH_UUID"]).to eq("fake-uuid")
+          expect(ENV["SIGH_NAME"]).to eq("fake-name")
+        end
+
+        it 'works without keychain_path' do
+          profile = "fake_profile.mobileprovision"
+
+          expect(FastlaneCore::ProvisioningProfile).to receive(:uuid).with(profile, nil).and_return("fake-uuid")
+          expect(FastlaneCore::ProvisioningProfile).to receive(:name).with(profile, nil).and_return("fake-name")
+          expect(FastlaneCore::ProvisioningProfile).to receive(:install).with(profile, nil)
+
+          Sigh::Manager.install_profile(profile)
+        end
       end
 
-      it 'works without keychain_path' do
-        profile = "fake_profile.mobileprovision"
+      context 'on other operating systems' do
+        before do
+          allow(FastlaneCore::Helper).to receive(:mac?).and_return(false)
+        end
 
-        expect(FastlaneCore::ProvisioningProfile).to receive(:uuid).with(profile, nil).and_return("fake-uuid")
-        expect(FastlaneCore::ProvisioningProfile).to receive(:name).with(profile, nil).and_return("fake-name")
-        expect(FastlaneCore::ProvisioningProfile).to receive(:install).with(profile, nil)
+        # Installing asks for the Xcode version, which raises "Unable to locate Xcode"
+        # without Xcode, after the profile was already created on the portal
+        it 'skips installing the profile and still sets the environment variables' do
+          profile = "fake_profile.mobileprovision"
 
-        Sigh::Manager.install_profile(profile)
+          expect(FastlaneCore::ProvisioningProfile).to receive(:uuid).with(profile, nil).and_return("fake-uuid")
+          expect(FastlaneCore::ProvisioningProfile).to receive(:name).with(profile, nil).and_return("fake-name")
+          expect(FastlaneCore::ProvisioningProfile).not_to receive(:install)
+
+          Sigh::Manager.install_profile(profile)
+
+          expect(ENV["SIGH_UDID"]).to eq("fake-uuid")
+          expect(ENV["SIGH_UUID"]).to eq("fake-uuid")
+          expect(ENV["SIGH_NAME"]).to eq("fake-name")
+        end
       end
     end
   end

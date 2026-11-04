@@ -7,24 +7,13 @@ require_relative "fastlane/lib/fastlane/version.rb"
 
 # Allows fine-grained control of environment variables.
 gem "climate_control", "~> 0.2.0"
-# A tool for integrating Coveralls.io with Ruby apps.
-gem "coveralls", "~> 0.8.13"
-# Automates code review chores.
-gem "danger", "~> 8.0"
-# Plugin for Danger that reports JUnit test results.
-gem "danger-junit", "~> 1.0"
 # A fake filesystem.
-# Version 3.0.2 requires Ruby >=3.2, while fastlane uses a `required_ruby_version` of `>= 3.0`.
-gem "fakefs", ['>= 1.8', '< 3.0.2']
+gem "fakefs", ">= 1.8"
+# reline requires it on Windows, and since Ruby 4.0 it is a bundled gem, which Bundler only loads from the Gemfile.
+# Remove it once reline is past 0.7.0: ruby/reline@96241f42 (ruby/reline#917) moves Windows to io-console.
+gem "fiddle", platforms: :windows
 # for file uploads with Faraday
 gem "mime-types", ['>= 1.16', '< 4.0']
-# standard library for OpenSSL has affected versions (unable to get certificate CRL) - ruby/openssl/issues/949
-# We block affected versions here so a patched gem version will be used regardless of Ruby version.
-gem "openssl",
-    ">= 3.1.2",
-    "!= 3.2.0",
-    "!= 3.2.1",
-    "!= 3.3.0"
 # Fast XML parser and object marshaller.
 gem "ox", "~> 2.14"
 # Provides an interactive debugging environment for Ruby.
@@ -35,25 +24,25 @@ gem "pry-byebug"
 gem "pry-rescue"
 # A plugin for pry that enables exploring the call stack.
 gem "pry-stack_explorer"
-# public_suffix >= 7.0 requires Ruby >= 3.2, while fastlane uses a `required_ruby_version` of `>= 3.0`.
-gem "public_suffix", "< 7.0"
 # A simple task automation tool.
 gem "rake"
 # A readline implementation in Ruby
 # See: https://github.com/deivid-rodriguez/byebug/issues/289#issuecomment-251383465
 gem "rb-readline"
+# rbs >= 4.2 (pulled in transitively by rdoc) requires Ruby >= 3.3, while fastlane supports Ruby >= 3.2.
+gem "rbs", "< 4.2"
 # Behavior-driven testing tool for Ruby.
 gem "rspec", "~> 3.10"
-# Formatter for RSpec to generate JUnit compatible reports.
-gem "rspec_junit_formatter", "~> 0.4.1"
 # A Ruby static code analyzer and formatter.
 gem "rubocop", Fastlane::RUBOCOP_REQUIREMENT
 # A collection of RuboCop cops for performance optimizations.
 gem "rubocop-performance"
 # A RuboCop extension focused on enforcing tools.
 gem "rubocop-require_tools"
+# Code coverage for the test suite.
+gem "simplecov"
 # Used to mock servers.
-gem "sinatra", [">= 2.2.3", "< 3.0"]
+gem "sinatra", "~> 4.2"
 # A library for stubbing and setting expectations on HTTP requests.
 gem "webmock", "~> 3.18"
 # Needed for running xcode-install related tests.
@@ -61,7 +50,19 @@ gem "xcode-install", ">= 2.6.7"
 # Used for xcov's parameters generation: https://github.com/fastlane/fastlane/pull/12416
 gem "xcov", "~> 1.9.0"
 # A documentation generation tool for Ruby.
-gem "yard", "~> 0.9.11"
+gem "yard", "~> 0.9.44"
+
+# Excluded from the release job (BUNDLE_WITHOUT): the rubygems/release-gem attestation patch loads the default openssl
+# before Bundler, which then refuses a different locked version - rubygems/release-gem/issues/28
+group :openssl_pin do
+  # standard library for OpenSSL has affected versions (unable to get certificate CRL) - ruby/openssl/issues/949
+  # We block affected versions here so a patched gem version will be used regardless of Ruby version.
+  gem "openssl",
+      ">= 3.1.2",
+      "!= 3.2.0",
+      "!= 3.2.1",
+      "!= 3.3.0"
+end
 
 gemspec(path: ".")
 

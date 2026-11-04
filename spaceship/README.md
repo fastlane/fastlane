@@ -27,8 +27,7 @@ Get in contact with the creators on Twitter: [@FastlaneTools](https://twitter.co
     <a href="#whats-spaceship">Why?</a> &bull;
     <a href="#usage">Usage</a> &bull;
     <a href="#installation">Installation</a> &bull;
-    <a href="#technical-details">Technical Details</a> &bull;
-    <a href="#need-help">Need help?</a>
+    <a href="#technical-details">Technical Details</a>
 </p>
 
 -------
@@ -165,7 +164,7 @@ _spaceship_ does a lot of magic to get everything working so neatly:
 - **Multiple Spaceship**: You can launch multiple _spaceships_ with different Apple accounts to do things like syncing the registered devices.
 
 # Code of Conduct
-Help us keep _fastlane_ open and inclusive. Please read and follow our [Code of Conduct](https://github.com/fastlane/fastlane/blob/master/CODE_OF_CONDUCT.md).
+Help us keep _fastlane_ open and inclusive. Please read and follow our [Code of Conduct](https://github.com/fastlane/fastlane/blob/master/docs/CODE_OF_CONDUCT.md).
 
 # License
 This project is licensed under the terms of the MIT license. See the LICENSE file.
