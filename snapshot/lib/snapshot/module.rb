@@ -37,8 +37,4 @@ module Snapshot
   Boolean = Fastlane::Boolean
 
   Snapshot::DependencyChecker.check_dependencies
-
-  def self.min_xcode7?
-    xcode_version.split(".").first.to_i >= 7
-  end
 end

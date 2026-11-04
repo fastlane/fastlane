@@ -9,7 +9,6 @@ require_relative 'update'
 require_relative 'test_command_generator'
 require_relative 'reports_generator'
 require_relative 'simulator_launchers/simulator_launcher'
-require_relative 'simulator_launchers/simulator_launcher_xcode_8'
 require_relative 'simulator_launchers/launcher_configuration'
 
 module Snapshot
@@ -39,13 +38,8 @@ module Snapshot
 
       launcher_config = SimulatorLauncherConfiguration.new(snapshot_config: Snapshot.config)
 
-      if Helper.xcode_at_least?(9)
-        launcher = SimulatorLauncher.new(launcher_configuration: launcher_config)
-        results = launcher.take_screenshots_simultaneously
-      else
-        launcher = SimulatorLauncherXcode8.new(launcher_configuration: launcher_config)
-        results = launcher.take_screenshots_one_simulator_at_a_time
-      end
+      launcher = SimulatorLauncher.new(launcher_configuration: launcher_config)
+      results = launcher.take_screenshots_simultaneously
 
       print_results(results)
 
@@ -92,20 +86,15 @@ module Snapshot
       end
     end
 
-    # Depending on the Xcode version, the return value is different
     def self.path_to_helper_file_from_gem
       runner_dir = File.dirname(__FILE__)
 
-      if Helper.xcode_at_least?("9.0")
-        return File.expand_path('../assets/SnapshotHelper.swift', runner_dir)
-      else
-        return File.expand_path('../assets/SnapshotHelperXcode8.swift', runner_dir)
-      end
+      return File.expand_path('../assets/SnapshotHelper.swift', runner_dir)
     end
 
     def version_of_bundled_helper
       asset_path = self.class.path_to_helper_file_from_gem
-      regex_to_use = Helper.xcode_at_least?("9.0") ? /\n.*SnapshotHelperVersion \[.+\]/ : /\n.*SnapshotHelperXcode8Version \[.+\]/
+      regex_to_use = /\n.*SnapshotHelperVersion \[.+\]/
 
       bundled_helper = File.read(asset_path)
       current_version = bundled_helper.match(regex_to_use)[0]
