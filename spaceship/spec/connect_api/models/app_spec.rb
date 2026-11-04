@@ -145,6 +145,58 @@ describe Spaceship::ConnectAPI::App do
       expect(review_submissions.first.id).to eq("123456789")
     end
 
+    it '#get_in_progress_review_submissions' do
+      app = Spaceship::ConnectAPI::App.new("123456789-app", [])
+      first_submission = double('first_submission')
+      second_submission = double('second_submission')
+      first_page = double('first_page', to_models: [first_submission])
+      second_page = double('second_page', to_models: [second_submission])
+      response = double('response', all_pages: [first_page, second_page])
+      client = double('connect_api_client')
+      expected_submissions = [first_submission, second_submission]
+      expected_filter = {
+        state: "WAITING_FOR_REVIEW,IN_REVIEW,UNRESOLVED_ISSUES",
+        platform: Spaceship::ConnectAPI::Platform::IOS
+      }
+
+      expect(client).to receive(:get_review_submissions).with(
+        app_id: "123456789-app",
+        filter: expected_filter,
+        includes: nil,
+        limit: nil,
+        sort: nil
+      ).and_return(response)
+
+      expect(app.get_in_progress_review_submissions(client: client, platform: Spaceship::ConnectAPI::Platform::IOS)).to eq(expected_submissions)
+    end
+
+    it '#get_in_progress_review_submission forwards includes and returns the first submission' do
+      app = Spaceship::ConnectAPI::App.new("123456789-app", [])
+      first_submission = double('first_submission')
+      page = double('page', to_models: [first_submission, double('second_submission')])
+      response = double('response', all_pages: [page])
+      client = double('connect_api_client')
+
+      expect(client).to receive(:get_review_submissions).with(
+        app_id: "123456789-app",
+        filter: {
+          state: "WAITING_FOR_REVIEW,IN_REVIEW,UNRESOLVED_ISSUES",
+          platform: Spaceship::ConnectAPI::Platform::IOS
+        },
+        includes: "items",
+        limit: nil,
+        sort: nil
+      ).and_return(response)
+
+      submission = app.get_in_progress_review_submission(
+        client: client,
+        platform: Spaceship::ConnectAPI::Platform::IOS,
+        includes: "items"
+      )
+
+      expect(submission).to eq(first_submission)
+    end
+
     it '#create_review_submission' do
       ConnectAPIStubbing::Tunes.stub_create_review_submission
 
