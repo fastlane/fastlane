@@ -351,9 +351,13 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        os: [macos-15, macos-26]
+        os: [macos-15, macos-26, xcode-27]
         install: [true, false]
         rep: [1, 2, 3, 4, 5, 6]
+        exclude:
+          # Already has this CoreSimulator
+          - os: xcode-27
+            install: true
     env:
       PROBE_DIR: ${{ github.workspace }}/probe
     steps:
