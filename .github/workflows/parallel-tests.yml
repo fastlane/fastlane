@@ -94,7 +94,7 @@ on:
         type: string
         default: list
       coresim_probe:
-        description: "Measurement: the simctl probe on macos-26 with and without the CoreSimulator package from the xcode-27 image."
+        description: "Measurement: the simctl probe on macos-15 and macos-26 with and without the CoreSimulator package from the xcode-27 image."
         required: false
         type: boolean
         default: false
@@ -345,12 +345,13 @@ jobs:
           key: coresim-${{ github.run_id }}
 
   coresim_probe:
-    name: "CoreSimulator probe, macos-26, package installed ${{ matrix.install }}, ${{ matrix.rep }}"
+    name: "CoreSimulator probe, ${{ matrix.os }}, package installed ${{ matrix.install }}, ${{ matrix.rep }}"
     needs: coresim_fetch
-    runs-on: macos-26
+    runs-on: ${{ matrix.os }}
     strategy:
       fail-fast: false
       matrix:
+        os: [macos-15, macos-26]
         install: [true, false]
         rep: [1, 2, 3, 4, 5, 6]
     env:
@@ -383,7 +384,7 @@ jobs:
       - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
         if: always()
         with:
-          name: coresim-probe-install${{ matrix.install }}-${{ matrix.rep }}
+          name: coresim-probe-${{ matrix.os }}-install${{ matrix.install }}-${{ matrix.rep }}
           path: probe/
 
   coresim_cleanup:
