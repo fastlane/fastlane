@@ -319,6 +319,40 @@ module Spaceship
         end
 
         #
+        # complianceForm (regulated medical device declaration)
+        #
+        # Only available with Apple ID auth. App Store Connect's web UI saves this
+        # declaration through a separate compliance-form service that the public
+        # API does not expose. Its accounts are keyed by the session's PUBLIC
+        # provider id (a UUID), not the numeric team id, which answers
+        # 403 PPM.generic.unableProcessRequest.
+        #
+
+        def compliance_form_account_url
+          unless tunes_request_client.web_session?
+            raise "The compliance form can only be reached when logged in with an Apple ID; the App Store Connect API does not expose it"
+          end
+
+          public_provider_id = tunes_request_client.user_details_data.dig("provider", "publicProviderId")
+          raise "The compliance form needs an Apple ID session with a selected team (no publicProviderId found)" if public_provider_id.to_s.empty?
+          "https://appstoreconnect.apple.com/ppm/complianceform/v1/accounts/#{public_provider_id}"
+        end
+
+        def get_compliance_requirements(app_id:)
+          tunes_request_client.get("#{compliance_form_account_url}/requirements", { contentId: app_id })
+        end
+
+        def get_compliance_requirement_form(requirement_id:, app_id:)
+          tunes_request_client.get("#{compliance_form_account_url}/requirements/#{requirement_id}/forms", { contentId: app_id })
+        end
+
+        # Submits the FIRST answer to a requirement form. Changing an existing
+        # answer is a PUT to the same path, which also re-signs the form.
+        def post_compliance_requirement_form(requirement_id:, app_id:, form:)
+          tunes_request_client.post("#{compliance_form_account_url}/contents/#{app_id}/requirements/#{requirement_id}/forms", form)
+        end
+
+        #
         # appPreview
         #
 
