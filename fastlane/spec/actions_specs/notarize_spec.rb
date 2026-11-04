@@ -36,6 +36,28 @@ describe Fastlane do
         end.to raise_error("Unresolved conflict between options: 'username' and 'api_key'")
       end
 
+      it "forbids to provide both :username and :keychain_profile" do
+        expect do
+          Fastlane::FastFile.new.parse("lane :test do
+            notarize(
+              username: 'myusername@example.com',
+              keychain_profile: 'keychain profile name'
+            )
+          end").runner.execute(:test)
+        end.to raise_error("Unresolved conflict between options: 'username' and 'keychain_profile'")
+      end
+
+      it "forbids to provide both :api_key and :keychain_profile" do
+        expect do
+          Fastlane::FastFile.new.parse("lane :test do
+            notarize(
+              api_key: {'anykey' => 'anyvalue'},
+              keychain_profile: 'keychain profile name'
+            )
+          end").runner.execute(:test)
+        end.to raise_error("Unresolved conflict between options: 'api_key' and 'keychain_profile'")
+      end
+
       context "with notary tool" do
         let(:package) { Tempfile.new('app.ipa.zip') }
 
@@ -110,6 +132,96 @@ describe Fastlane do
             end.to raise_error(FastlaneCore::Interface::FastlaneError, "Could not notarize package. To see the error, please set 'print_log' to true.")
           end
         end
+
+        context "with an App Store Connect API key" do
+          let(:api_key) { double('token', key_id: 'KEYID', issuer_id: 'ISSUER') }
+          let(:key_file) { Tempfile.new('key') }
+
+          before do
+            package # create it before Tempfile.new is stubbed
+            allow(Spaceship::ConnectAPI::Token).to receive(:from).and_return(api_key)
+            allow(api_key).to receive(:write_key_to_file)
+            allow(Tempfile).to receive(:new).and_return(key_file)
+          end
+
+          it "uses the API key from the lane context when the Appfile sets :apple_id" do
+            allow(CredentialsManager::AppfileConfig).to receive(:try_fetch_value).and_call_original
+            allow(CredentialsManager::AppfileConfig).to receive(:try_fetch_value).with(:apple_id).and_return('myusername@example.com')
+            Fastlane::Actions.lane_context[Fastlane::Actions::SharedValues::APP_STORE_CONNECT_API_KEY] = { key_id: 'KEYID' }
+
+            expect(Fastlane::Actions).to receive(:sh).with("xcrun notarytool submit #{package.path} --output-format json --wait --key #{key_file.path} --key-id KEYID --issuer ISSUER", { error_callback: anything, log: false }).and_return(success_submit_response)
+
+            expect(Fastlane::Actions).to receive(:sh).with("xcrun stapler staple #{package.path}", { log: false })
+
+            Fastlane::FastFile.new.parse("lane :test do
+              notarize(
+                package: '#{package.path}'
+              )
+            end").runner.execute(:test)
+          end
+        end
+
+        context "with :keychain_profile" do
+          let(:keychain_profile) { 'Keychain profile name' }
+          let(:keychain_path) { '~/Library/My Keychains/name' }
+
+          it "successful with specified :keychain_path" do
+            expect(Fastlane::Actions).to receive(:sh).with("xcrun notarytool submit #{package.path} --output-format json --wait --keychain-profile #{keychain_profile.shellescape} --keychain #{File.expand_path(keychain_path).shellescape}", { error_callback: anything, log: false }).and_return(success_submit_response)
+
+            expect(Fastlane::Actions).to receive(:sh).with("xcrun stapler staple #{package.path}", { log: false })
+
+            Fastlane::FastFile.new.parse("lane :test do
+              notarize(
+                package: '#{package.path}',
+                keychain_path: '#{keychain_path}',
+                keychain_profile: '#{keychain_profile}'
+              )
+            end").runner.execute(:test)
+          end
+
+          it "raises when :keychain_path is given without :keychain_profile" do
+            expect(Fastlane::Actions).not_to receive(:sh)
+
+            expect do
+              Fastlane::FastFile.new.parse("lane :test do
+                notarize(
+                  package: '#{package.path}',
+                  keychain_path: '#{keychain_path}'
+                )
+              end").runner.execute(:test)
+            end.to raise_error(FastlaneCore::Interface::FastlaneError, "The :keychain_path option can only be used together with :keychain_profile")
+          end
+
+          it "successful w/o specified :keychain_path" do
+            expect(Fastlane::Actions).to receive(:sh).with("xcrun notarytool submit #{package.path} --output-format json --wait --keychain-profile #{keychain_profile.shellescape}", { error_callback: anything, log: false }).and_return(success_submit_response)
+
+            expect(Fastlane::Actions).to receive(:sh).with("xcrun stapler staple #{package.path}", { log: false })
+
+            Fastlane::FastFile.new.parse("lane :test do
+              notarize(
+                package: '#{package.path}',
+                keychain_profile: '#{keychain_profile}'
+              )
+            end").runner.execute(:test)
+          end
+
+          it "uses :keychain_profile even if there is API key in a lane context" do
+            Fastlane::Actions.lane_context[Fastlane::Actions::SharedValues::APP_STORE_CONNECT_API_KEY] = { key_id: 'KEYID' }
+            allow(Spaceship::ConnectAPI::Token).to receive(:from).and_return(double('token', key_id: 'KEYID', issuer_id: 'ISSUER'))
+
+            expect(Fastlane::Actions).to receive(:sh).with("xcrun notarytool submit #{package.path} --output-format json --wait --keychain-profile #{keychain_profile.shellescape}", { error_callback: anything, log: false }).and_return(success_submit_response)
+
+            expect(Fastlane::Actions).to receive(:sh).with("xcrun stapler staple #{package.path}", { log: false })
+
+            Fastlane::FastFile.new.parse("lane :test do
+              notarize(
+                package: '#{package.path}',
+                keychain_profile: '#{keychain_profile}'
+              )
+            end").runner.execute(:test)
+          end
+        end
+
       end
     end
   end
