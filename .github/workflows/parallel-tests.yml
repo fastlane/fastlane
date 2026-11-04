@@ -297,8 +297,8 @@ jobs:
       fail-fast: false
       matrix:
         os: [macos-15, macos-26, xcode-27]
-        delay: [0, 180]
-        rep: [1, 2]
+        delay: [0]
+        rep: [1, 2, 3, 4]
     env:
       PROBE_DIR: ${{ github.workspace }}/probe
     steps:

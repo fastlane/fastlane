@@ -61,6 +61,12 @@ case "${1:-}" in
       echo "$(date -u +%H:%M:%S) simdiskimaged $pid" > "$0/fs_usage_started.txt"
       sudo fs_usage -w -f filesys "$pid" > "$0/simdiskimaged_fs_usage.txt" 2>&1' "$dir" > /dev/null 2>&1 &
     echo $! >> "$dir/pids"
+    # Once simdiskimaged uses over half a core: a 5 s sample of all its threads
+    nohup bash -c '
+      until pid=$(ps -axo pid=,%cpu=,comm= | awk "\$3 ~ /\/simdiskimaged\$/ && \$2 > 50 {print \$1; exit}") && [ -n "$pid" ]; do sleep 0.5; done
+      echo "$(date -u +%H:%M:%S) sampling simdiskimaged $pid" > "$0/simdiskimaged_sampled.txt"
+      sudo sample "$pid" 5 1 -file "$0/simdiskimaged_sample.txt" >> "$0/simdiskimaged_sampled.txt" 2>&1' "$dir" > /dev/null 2>&1 &
+    echo $! >> "$dir/pids"
     ;;
 
   call)
@@ -95,7 +101,7 @@ case "${1:-}" in
     cp ~/Library/Logs/CoreSimulator/CoreSimulator.log "$dir/" 2>/dev/null || echo "no CoreSimulator.log"
     # Everything since boot, at info and debug level
     sudo log show --info --debug --style compact --start "$(date -r "$(sysctl -n kern.boottime | sed -E 's/^\{ sec = ([0-9]+),.*/\1/')" +"%Y-%m-%d %H:%M:%S")" \
-      --predicate 'process == "simdiskimaged" OR process == "diskimagesiod" OR process CONTAINS "CoreSimulator" OR subsystem BEGINSWITH "com.apple.CoreSimulator"' \
+      --predicate 'process == "simdiskimaged" OR process == "diskimagesiod" OR process CONTAINS "CoreSimulator" OR subsystem BEGINSWITH "com.apple.CoreSimulator" OR process == "lsd" OR process == "coreservicesd" OR process == "cryptexd" OR process == "mobileassetd" OR subsystem == "com.apple.launchservices"' \
       > "$dir/unified_log.txt" 2>&1
     sudo chown "$(id -u)" "$dir"/* 2>/dev/null
     gzip -f "$dir/unified_log.txt" "$dir/simdiskimaged_fs_usage.txt" 2>/dev/null
