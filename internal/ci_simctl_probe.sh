@@ -33,6 +33,7 @@ state() {
     echo "--- booted: $(sysctl -n kern.boottime)"
     uptime
     echo "--- xcode-select: $(xcode-select -p)"
+    echo "--- CoreSimulator: $(defaults read /Library/Developer/PrivateFrameworks/CoreSimulator.framework/Resources/Info.plist CFBundleShortVersionString 2>&1)"
     echo "--- processes"
     ps -axo pid,lstart,etime,time,%cpu,comm | grep -E 'simdiskimaged|CoreSimulator|diskimagesiod|simctl|mobileassetd' | grep -v grep || echo "none"
     echo "--- /Library/Developer/CoreSimulator"

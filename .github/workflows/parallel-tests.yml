@@ -93,6 +93,11 @@ on:
         required: false
         type: string
         default: list
+      coresim_probe:
+        description: "Measurement: the simctl probe on macos-26 with and without the CoreSimulator package from the xcode-27 image."
+        required: false
+        type: boolean
+        default: false
       max_parallel:
         description: "Stall probe: how many legs run at once. CI starts all seven together."
         required: false
@@ -111,7 +116,7 @@ env:
 jobs:
   split_macos:
     name: "Split, macOS"
-    if: (inputs.record_timings == 'no' || inputs.record_timings == null) && !inputs.stall_probe && !inputs.simctl_probe
+    if: (inputs.record_timings == 'no' || inputs.record_timings == null) && !inputs.stall_probe && !inputs.simctl_probe && !inputs.coresim_probe
     runs-on: macos-15
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
@@ -147,7 +152,7 @@ jobs:
 
   split_linux:
     name: "Split, Linux"
-    if: (inputs.record_timings == 'no' || inputs.record_timings == null) && !inputs.stall_probe && !inputs.simctl_probe
+    if: (inputs.record_timings == 'no' || inputs.record_timings == null) && !inputs.stall_probe && !inputs.simctl_probe && !inputs.coresim_probe
     runs-on: ubuntu-24.04
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
@@ -182,7 +187,7 @@ jobs:
 
   split_windows:
     name: "Split, Windows"
-    if: (inputs.record_timings == 'no' || inputs.record_timings == null) && !inputs.stall_probe && !inputs.simctl_probe
+    if: (inputs.record_timings == 'no' || inputs.record_timings == null) && !inputs.stall_probe && !inputs.simctl_probe && !inputs.coresim_probe
     runs-on: windows-2022
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
@@ -319,6 +324,79 @@ jobs:
         with:
           name: simctl-probe-${{ matrix.os }}-delay${{ matrix.delay }}-${{ matrix.rep }}
           path: probe/
+
+  coresim_fetch:
+    name: "CoreSimulator package from xcode-27"
+    if: inputs.coresim_probe
+    runs-on: xcode-27
+    steps:
+      - name: Copy the package
+        run: |
+          mkdir coresim
+          cp /Applications/Xcode.app/Contents/Resources/Packages/XcodeSystemResources.pkg coresim/
+          defaults read /Library/Developer/PrivateFrameworks/CoreSimulator.framework/Resources/Info.plist CFBundleShortVersionString | tee coresim/source_version.txt
+          xcodebuild -version
+          pkgutil --check-signature coresim/XcodeSystemResources.pkg
+          ls -la coresim
+      # Only workflows of this branch, and pull requests against it, can read it; coresim_cleanup deletes it
+      - uses: actions/cache/save@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
+        with:
+          path: coresim
+          key: coresim-${{ github.run_id }}
+
+  coresim_probe:
+    name: "CoreSimulator probe, macos-26, package installed ${{ matrix.install }}, ${{ matrix.rep }}"
+    needs: coresim_fetch
+    runs-on: macos-26
+    strategy:
+      fail-fast: false
+      matrix:
+        install: [true, false]
+        rep: [1, 2, 3, 4, 5, 6]
+    env:
+      PROBE_DIR: ${{ github.workspace }}/probe
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          sparse-checkout: internal
+      - uses: actions/cache/restore@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
+        if: matrix.install
+        with:
+          path: coresim
+          key: coresim-${{ github.run_id }}
+          fail-on-cache-miss: true
+      - name: Install the CoreSimulator package
+        if: matrix.install
+        run: |
+          defaults read /Library/Developer/PrivateFrameworks/CoreSimulator.framework/Resources/Info.plist CFBundleShortVersionString
+          pkgutil --check-signature coresim/XcodeSystemResources.pkg
+          sudo installer -pkg coresim/XcodeSystemResources.pkg -target /
+          defaults read /Library/Developer/PrivateFrameworks/CoreSimulator.framework/Resources/Info.plist CFBundleShortVersionString
+          rm -rf coresim
+      - name: Start watching
+        run: internal/ci_simctl_probe.sh start
+      - name: Call simctl
+        run: internal/ci_simctl_probe.sh call list
+      - name: Wait for simdiskimaged and collect
+        if: always()
+        run: internal/ci_simctl_probe.sh stop
+      - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        if: always()
+        with:
+          name: coresim-probe-install${{ matrix.install }}-${{ matrix.rep }}
+          path: probe/
+
+  coresim_cleanup:
+    name: "Delete the CoreSimulator package cache"
+    needs: [coresim_fetch, coresim_probe]
+    if: always() && inputs.coresim_probe
+    runs-on: ubuntu-24.04
+    permissions:
+      actions: write
+    steps:
+      - run: gh cache delete "coresim-${{ github.run_id }}" --repo "${{ github.repository }}"
+        env:
+          GH_TOKEN: ${{ github.token }}
 
   record_macos:
     name: "Record timings, macOS"
