@@ -6,7 +6,7 @@ describe Spaceship::ConnectAPI::BetaTester do
       response = Spaceship::ConnectAPI.get_beta_testers
       expect(response).to be_an_instance_of(Spaceship::ConnectAPI::Response)
 
-      expect(response.count).to eq(2)
+      expect(response.count).to eq(3)
       response.each do |model|
         expect(model).to be_an_instance_of(Spaceship::ConnectAPI::BetaTester)
       end
@@ -32,6 +32,16 @@ describe Spaceship::ConnectAPI::BetaTester do
       expect(model.latest_installed_device).to eq("iPhone14_7")
       expect(model.latest_installed_os_version).to eq("17.2.1")
       expect(model.latest_installed_device_platform).to eq("IOS")
+      expect(model.state).to be_nil
+      expect(model.app_devices).to eq([{ "model" => "iPhone14_7", "platform" => "IOS", "osVersion" => "17.2.1", "appBuildVersion" => "1.3.300 (1113)" }])
+    end
+
+    it 'maps the public state and appDevices fields' do
+      model = Spaceship::ConnectAPI.get_beta_testers.find { |m| m.id == "555555555" }
+      expect(model.state).to eq(Spaceship::ConnectAPI::BetaTester::State::INSTALLED)
+      expect(model.app_devices).to eq([{ "model" => "iPhone16_2", "platform" => "IOS", "osVersion" => "18.1", "appBuildVersion" => "1234" }])
+      expect(model.beta_tester_state).to be_nil
+      expect(model.installed_cf_bundle_version).to be_nil
     end
   end
 end

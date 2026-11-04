@@ -97,13 +97,52 @@
       "links" : {
         "self" : "https://appstoreconnect.apple.com/iris/v1/betaTesters/987654321"
       }
+    }, {
+      "type" : "betaTesters",
+      "id" : "555555555",
+      "attributes" : {
+        "firstName" : "Public",
+        "lastName" : "Shape",
+        "email" : "email3@email.com",
+        "inviteType" : "EMAIL",
+        "state" : "INSTALLED",
+        "appDevices" : [ {
+          "model" : "iPhone16_2",
+          "platform" : "IOS",
+          "osVersion" : "18.1",
+          "appBuildVersion" : "1234"
+        } ]
+      },
+      "relationships" : {
+        "apps" : {
+          "links" : {
+            "self" : "https://appstoreconnect.apple.com/iris/v1/betaTesters/555555555/relationships/apps",
+            "related" : "https://appstoreconnect.apple.com/iris/v1/betaTesters/555555555/apps"
+          }
+        },
+        "betaGroups" : {
+          "links" : {
+            "self" : "https://appstoreconnect.apple.com/iris/v1/betaTesters/555555555/relationships/betaGroups",
+            "related" : "https://appstoreconnect.apple.com/iris/v1/betaTesters/555555555/betaGroups"
+          }
+        },
+        "builds" : {
+          "links" : {
+            "self" : "https://appstoreconnect.apple.com/iris/v1/betaTesters/555555555/relationships/builds",
+            "related" : "https://appstoreconnect.apple.com/iris/v1/betaTesters/555555555/builds"
+          }
+        }
+      },
+      "links" : {
+        "self" : "https://appstoreconnect.apple.com/iris/v1/betaTesters/555555555"
+      }
     } ],
     "links" : {
       "self" : "https://appstoreconnect.apple.com/iris/v1/betaTesters"
     },
     "meta" : {
       "paging" : {
-        "total" : 2,
+        "total" : 3,
         "limit" : 50
       }
     }
