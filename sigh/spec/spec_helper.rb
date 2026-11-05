@@ -144,6 +144,18 @@ def stub_valid_identities(output)
                                            .and_return(Security::Command::Result.new(output, "", succeeded))
 end
 
+def generate_devices_list(total)
+  devices = []
+  (0..total).each do |i|
+    device_name = "device#{i + 1}"
+    device = { "id" => device_name, "udid" => device_name }
+    allow(device).to receive(:udid).and_return(device_name)
+    allow(device).to receive(:id).and_return(device_name)
+    devices << device
+  end
+  return devices
+end
+
 # Commander::Command::Options does not define sane equals behavior,
 # so we need this to make testing easier
 RSpec::Matchers.define(:match_commander_options) do |expected|
