@@ -36,7 +36,6 @@ MODIFIED_LITERALS = []
 REPOSITORY_ROOT = "#{File.expand_path('..', __dir__)}/".freeze # computed at load time, as some specs stub File
 MODIFIED_LITERALS_NOT_FIXED_YET = %w[
   fastlane/spec/fixtures/actions/alias_short_test.rb
-  gym/lib/gym/detect_values.rb
   spaceship/lib/spaceship/helper/plist_middleware.rb
 ].freeze
 if RUBY_VERSION >= "3.4"
