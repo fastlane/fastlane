@@ -49,7 +49,7 @@ describe Match do
 
           fake_cache = create_fake_cache
 
-          fake_storage = "fake_storage"
+          fake_storage = +"fake_storage"
           expect(Match::Storage::GitStorage).to receive(:configure).with({
             git_url: git_url,
             shallow_clone: true,
@@ -95,7 +95,7 @@ describe Match do
             files_to_delete: []
           )
 
-          spaceship = "spaceship"
+          spaceship = +"spaceship"
           allow(spaceship).to receive(:team_id).and_return("")
           expect(Match::SpaceshipEnsure).to receive(:new).and_return(spaceship)
           expect(spaceship).to receive(:certificates_exists).and_return(true)
@@ -134,7 +134,7 @@ describe Match do
 
           create_fake_cache
 
-          fake_storage = "fake_storage"
+          fake_storage = +"fake_storage"
           expect(Match::Storage::GitStorage).to receive(:configure).and_return(fake_storage)
           expect(fake_storage).to receive(:download).and_return(nil)
           expect(fake_storage).to receive(:clear_changes).and_return(nil)
@@ -157,7 +157,7 @@ describe Match do
           # Profile creation fails after the new certificate was created
           expect(Match::Generator).to receive(:generate_provisioning_profile).and_raise("Beta profile could not be created")
 
-          spaceship = "spaceship"
+          spaceship = +"spaceship"
           allow(spaceship).to receive(:team_id).and_return("")
           expect(Match::SpaceshipEnsure).to receive(:new).and_return(spaceship)
           expect(spaceship).to receive(:certificates_exists).and_return(true)
@@ -184,7 +184,7 @@ describe Match do
           cert_path = "./match/spec/fixtures/existing/certs/distribution/E7P4EE896K.cer"
           key_path = "./match/spec/fixtures/existing/certs/distribution/E7P4EE896K.p12"
 
-          fake_storage = "fake_storage"
+          fake_storage = +"fake_storage"
           expect(Match::Storage::GitStorage).to receive(:configure).with({
             git_url: git_url,
             shallow_clone: false,
@@ -206,7 +206,7 @@ describe Match do
           allow(fake_storage).to receive(:working_directory).and_return(repo_dir)
           allow(fake_storage).to receive(:prefixed_working_directory).and_return(repo_dir)
 
-          fake_encryption = "fake_encryption"
+          fake_encryption = +"fake_encryption"
           expect(Match::Encryption::OpenSSL).to receive(:new).with(keychain_name: fake_storage.git_url, working_directory: fake_storage.working_directory, force_legacy_encryption: false).and_return(fake_encryption)
           expect(fake_encryption).to receive(:decrypt_files).and_return(nil)
 
@@ -217,7 +217,7 @@ describe Match do
           expect(FastlaneCore::CertChecker).to receive(:installed?).with(cert_path, in_keychain: nil).and_return(false)
           expect(Match::Utils).to receive(:import).with(cert_path, keychain, password: nil).and_return(nil)
 
-          spaceship = "spaceship"
+          spaceship = +"spaceship"
           allow(spaceship).to receive(:team_id).and_return("")
           expect(Match::SpaceshipEnsure).to receive(:new).and_return(spaceship)
           expect(spaceship).to receive(:certificates_exists).and_return(true)
@@ -263,11 +263,11 @@ describe Match do
 
           fake_storage = create_fake_storage(match_config: config, repo_dir: repo_dir)
 
-          fake_encryption = "fake_encryption"
+          fake_encryption = +"fake_encryption"
           expect(Match::Encryption::OpenSSL).to receive(:new).with(keychain_name: fake_storage.git_url, working_directory: fake_storage.working_directory, force_legacy_encryption: false).and_return(fake_encryption)
           expect(fake_encryption).to receive(:decrypt_files).and_return(nil)
 
-          spaceship = "spaceship"
+          spaceship = +"spaceship"
           allow(spaceship).to receive(:team_id).and_return("")
           expect(Match::SpaceshipEnsure).not_to receive(:new)
 
@@ -298,11 +298,11 @@ describe Match do
           # Ensure no changes are written back to storage in readonly mode.
           expect(fake_storage).not_to receive(:save_changes!)
 
-          fake_encryption = "fake_encryption"
+          fake_encryption = +"fake_encryption"
           expect(Match::Encryption::OpenSSL).to receive(:new).with(keychain_name: fake_storage.git_url, working_directory: fake_storage.working_directory, force_legacy_encryption: false).and_return(fake_encryption)
           expect(fake_encryption).to receive(:decrypt_files).and_return(nil)
 
-          spaceship = "spaceship"
+          spaceship = +"spaceship"
           allow(spaceship).to receive(:team_id).and_return("")
           expect(Match::SpaceshipEnsure).not_to receive(:new)
 
@@ -596,7 +596,7 @@ describe Match do
 
           create_fake_cache
 
-          fake_storage = "fake_storage"
+          fake_storage = +"fake_storage"
           expect(Match::Storage::GitStorage).to receive(:configure).with({
             git_url: git_url,
             shallow_clone: true,
@@ -630,7 +630,7 @@ describe Match do
             clear_working_directory: false
           )
 
-          spaceship = "spaceship"
+          spaceship = +"spaceship"
           allow(spaceship).to receive(:team_id).and_return("")
           expect(Match::SpaceshipEnsure).to receive(:new).and_return(spaceship)
           expect(spaceship).to receive(:certificates_exists).and_return(true)
@@ -660,11 +660,11 @@ describe Match do
 
           fake_storage = create_fake_storage(match_config: config, repo_dir: repo_dir)
 
-          fake_encryption = "fake_encryption"
+          fake_encryption = +"fake_encryption"
           expect(Match::Encryption::OpenSSL).to receive(:new).with(keychain_name: fake_storage.git_url, working_directory: fake_storage.working_directory, force_legacy_encryption: false).and_return(fake_encryption)
           expect(fake_encryption).to receive(:decrypt_files).and_return(nil)
 
-          client = "client"
+          client = +"client"
           expect(Match::SpaceshipEnsure).to receive(:new)
           expect(Spaceship::ConnectAPI).to receive(:client).and_return(client)
           allow(client).to receive(:in_house?).and_return(false)

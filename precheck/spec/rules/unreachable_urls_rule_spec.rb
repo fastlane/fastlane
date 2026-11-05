@@ -6,8 +6,8 @@ module Precheck
       let(:rule) { UnreachableURLRule.new }
 
       def setup_url_rule_mock(url: "http://fastlane.tools", return_status: 200)
-        request = "fake request"
-        head_object = "fake head object"
+        request = +"fake request"
+        head_object = +"fake head object"
 
         allow(head_object).to receive(:status).and_return(return_status)
 
