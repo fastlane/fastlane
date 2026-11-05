@@ -45,7 +45,7 @@ module Fastlane
       shell_command = shell_command_from_args(*command)
       UI.command(shell_command) if print_command
 
-      result = ''
+      result = +''
       exit_status = nil
       if FastlaneCore::Helper.sh_enabled?
         # The command forms are documented on CommandExecutor.collect
