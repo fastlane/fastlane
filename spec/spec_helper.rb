@@ -30,7 +30,7 @@ unless ENV["FASTLANE_SPEC_WARNINGS"].to_s.empty?
   end)
 end
 
-# On Ruby 3.4+, an example fails when code in this repository modifies a string literal, see fastlane#30484.
+# On Ruby 3.4+, an example fails when code in this repository modifies a string literal, or stubs a method on one, see fastlane#30484.
 # Deprecation warnings are enabled for that, and printed only if they were already on.
 MODIFIED_LITERALS = []
 REPOSITORY_ROOT = "#{File.expand_path('..', __dir__)}/".freeze # computed at load time, as some specs stub File
@@ -200,6 +200,8 @@ RSpec.configure do |config|
     ours = MODIFIED_LITERALS.select do |message|
       path = message[/\A(.+?):\d+: warning: /, 1].to_s
       relative = path.delete_prefix(REPOSITORY_ROOT)
+      next true if path.include?("/rspec-mocks-") # a spec stubbed a method on a string literal
+
       relative != path && !relative.start_with?("vendor/") && !MODIFIED_LITERALS_NOT_FIXED_YET.include?(relative)
     end
     raise("Modified string literals (fastlane#30484):\n#{ours.uniq.join}") unless ours.empty?

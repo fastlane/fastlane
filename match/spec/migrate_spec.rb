@@ -17,7 +17,7 @@ describe Match do
       config = FastlaneCore::Configuration.create(Match::Options.available_options, values)
       repo_dir = Dir.mktmpdir
 
-      fake_google_cloud_storage = "fake_google_cloud_storage"
+      fake_google_cloud_storage = +"fake_google_cloud_storage"
       expect(Match::Storage::GoogleCloudStorage).to receive(:configure).with({
         type: nil,
         platform: nil,
@@ -37,7 +37,7 @@ describe Match do
       allow(fake_google_cloud_storage).to receive(:save_changes!)
       allow(fake_google_cloud_storage).to receive(:bucket_name).and_return("")
 
-      fake_git_storage = "fake_git_storage"
+      fake_git_storage = +"fake_git_storage"
       expect(Match::Storage::GitStorage).to receive(:configure).with({
         type: nil,
         platform: nil,
@@ -56,7 +56,7 @@ describe Match do
       allow(fake_git_storage).to receive(:download)
       allow(fake_git_storage).to receive(:working_directory).and_return(repo_dir)
 
-      spaceship = "spaceship"
+      spaceship = +"spaceship"
       allow(spaceship).to receive(:team_id).and_return("team_id")
       allow(Match::SpaceshipEnsure).to receive(:new).and_return(spaceship)
 

@@ -101,7 +101,7 @@ describe Produce::CommandsGenerator do
 
   describe ":group option handling" do
     def expect_group_create_with(group_name, group_identifier)
-      fake_group = "fake_group"
+      fake_group = +"fake_group"
       expect(Produce::Group).to receive(:new).and_return(fake_group)
       expect(fake_group).to receive(:create) do |options, args|
         expect(options.group_name).to eq(group_name)
@@ -137,7 +137,7 @@ describe Produce::CommandsGenerator do
 
   describe ":associate_group option handling" do
     def expect_group_associate_with(group_ids)
-      fake_group = "fake_group"
+      fake_group = +"fake_group"
       expect(Produce::Group).to receive(:new).and_return(fake_group)
       expect(fake_group).to receive(:associate) do |options, args|
         expect(args).to eq(group_ids)
@@ -171,7 +171,7 @@ describe Produce::CommandsGenerator do
 
   describe ":cloud_container option handling" do
     def expect_cloud_container_create_with(container_name, container_identifier)
-      fake_container = "fake_container"
+      fake_container = +"fake_container"
       expect(Produce::CloudContainer).to receive(:new).and_return(fake_container)
       expect(fake_container).to receive(:create) do |options, args|
         expect(options.container_name).to eq(container_name)
@@ -207,7 +207,7 @@ describe Produce::CommandsGenerator do
 
   describe ":associate_cloud_container option handling" do
     def expect_cloud_container_associate_with(container_ids)
-      fake_container = "fake_container"
+      fake_container = +"fake_container"
       expect(Produce::CloudContainer).to receive(:new).and_return(fake_container)
       expect(fake_container).to receive(:associate) do |options, args|
         expect(args).to eq(container_ids)
@@ -241,7 +241,7 @@ describe Produce::CommandsGenerator do
 
   describe ":merchant option handling" do
     def expect_merchant_create_with(merchant_name, merchant_identifier)
-      fake_merchant = "fake_merchant"
+      fake_merchant = +"fake_merchant"
       expect(Produce::Merchant).to receive(:new).and_return(fake_merchant)
       expect(fake_merchant).to receive(:create) do |options, args|
         expect(options.merchant_name).to eq(merchant_name)
@@ -265,7 +265,7 @@ describe Produce::CommandsGenerator do
 
   describe ":associate_merchant option handling" do
     def expect_merchant_associate_with(merchant_ids)
-      fake_merchant = "fake_merchant"
+      fake_merchant = +"fake_merchant"
       expect(Produce::Merchant).to receive(:new).and_return(fake_merchant)
       expect(fake_merchant).to receive(:associate) do |options, args|
         expect(args).to eq(merchant_ids)
