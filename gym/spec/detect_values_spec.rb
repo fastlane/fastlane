@@ -73,7 +73,7 @@ describe Gym do
       end
 
       describe "using export_team_id" do
-        let(:options) { { project: "./gym/examples/multipleSchemes/Example.xcodeproj", export_team_id: team_id, export_method: "app-store" } }
+        let(:options) { { project: "./gym/examples/multipleSchemes/Example.xcodeproj", export_team_id: team_id, export_method: "app-store-connect" } }
 
         it "finds installer cert from list with 2 matching and 1 non-matching" do
           expect(Security::Certificate).to receive(:find).with(name: "3rd Party Mac Developer Installer: ").and_return(output_2_matching_1_nonmatching)
@@ -110,7 +110,7 @@ describe Gym do
       end
 
       describe "using DEVELOPMENT_TEAM builds setting" do
-        let(:options) { { project: "./gym/examples/multipleSchemes/Example.xcodeproj", export_method: "app-store" } }
+        let(:options) { { project: "./gym/examples/multipleSchemes/Example.xcodeproj", export_method: "app-store-connect" } }
 
         before do
           allow_any_instance_of(FastlaneCore::Project).to receive(:build_settings).with(key: "DEVELOPMENT_TEAM").and_return(team_id)
