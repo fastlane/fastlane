@@ -53,7 +53,7 @@ module Fastlane
       end
 
       def self.optional_flags(params)
-        command = ""
+        command = +""
         command << supported_option_switch(params, :strict, "0.9.2", true)
         command << " --config #{params[:config_file].shellescape}" if params[:config_file]
         command << " --reporter #{params[:reporter]}" if params[:reporter]

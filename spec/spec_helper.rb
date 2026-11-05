@@ -36,17 +36,8 @@ MODIFIED_LITERALS = []
 REPOSITORY_ROOT = "#{File.expand_path('..', __dir__)}/".freeze # computed at load time, as some specs stub File
 MODIFIED_LITERALS_NOT_FIXED_YET = %w[
   fastlane/lib/fastlane/action.rb
-  fastlane/lib/fastlane/actions/git_pull.rb
-  fastlane/lib/fastlane/actions/jazzy.rb
-  fastlane/lib/fastlane/actions/lcov.rb
-  fastlane/lib/fastlane/actions/make_changelog_from_jenkins.rb
-  fastlane/lib/fastlane/actions/prompt.rb
-  fastlane/lib/fastlane/actions/sourcedocs.rb
-  fastlane/lib/fastlane/actions/swiftlint.rb
-  fastlane/lib/fastlane/actions/xcodebuild.rb
   fastlane/lib/fastlane/environment_printer.rb
   fastlane/lib/fastlane/helper/sh_helper.rb
-  fastlane/lib/fastlane/plugins/plugin_manager.rb
   fastlane/spec/fixtures/actions/alias_short_test.rb
   fastlane_core/lib/fastlane_core/cert_checker.rb
   fastlane_core/lib/fastlane_core/configuration/config_item.rb
