@@ -82,9 +82,9 @@ module Fastlane
       def self.root_certificates(path)
         paths = ROOT_CERTIFICATE_PATHS
         if path && File.size?(path)
-          paths = [path]
+          paths += [path]
         elsif path
-          UI.important("No certificate at '#{path}', verifying the profile with Apple's root certificates shipped with fastlane. Remove the `certificate` option unless you need a different root certificate.")
+          UI.important("No certificate at '#{path}', verifying the profile with Apple's root certificates shipped with fastlane. Remove the `certificate` option unless you need a root certificate they do not include.")
         end
         paths.map { |p| OpenSSL::X509::Certificate.new(File.binread(p)) }
       end
@@ -150,7 +150,7 @@ module Fastlane
                                        end),
           FastlaneCore::ConfigItem.new(key: :certificate,
                                        env_name: "FL_PROJECT_PROVISIONING_CERTIFICATE_PATH",
-                                       description: "Path to a root certificate to verify the profile with, instead of Apple's root certificates shipped with fastlane",
+                                       description: "Path to a root certificate to trust in addition to Apple's root certificates shipped with fastlane, e.g. a root Apple introduced after this release",
                                        optional: true),
           FastlaneCore::ConfigItem.new(key: :code_signing_identity,
                                        env_name: "FL_PROJECT_PROVISIONING_CODE_SIGN_IDENTITY",

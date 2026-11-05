@@ -168,10 +168,10 @@ describe Fastlane do
           action.root_certificates(nil)
         end
 
-        it "uses only the given certificate when it exists" do
+        it "adds the given certificate to the shipped ones when it exists" do
           path = write("root.cer", ca.to_der)
 
-          expect(action.root_certificates(path).map(&:to_der)).to eq([ca.to_der])
+          expect(action.root_certificates(path).map(&:to_der)).to eq(shipped_certificates + [ca.to_der])
         end
 
         it "verifies the profile with the given certificate and updates the project" do
