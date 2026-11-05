@@ -402,7 +402,7 @@ describe "resign.sh" do
     end
 
     # Stubs `security` and `xcodebuild`, and signs ad hoc ("-"), so no keychain is used.
-    def resign_ipa(dir)
+    def resign_ipa(dir, input: "ipa")
       bin = File.join(dir, "bin")
       FileUtils.mkdir_p(bin)
       File.write(File.join(bin, "xcodebuild"), "#!/bin/bash\necho 'Xcode 16.0'\n")
@@ -419,12 +419,16 @@ describe "resign.sh" do
       File.write(File.join(app, "Info.plist"), '<plist version="1.0"><dict><key>CFBundleIdentifier</key><string>com.example.test</string><key>CFBundleExecutable</key><string>Test</string></dict></plist>')
       FileUtils.cp("/usr/bin/true", File.join(app, "Test"))
       yield(app)
-      expect(system("zip", "-qry", "../test.ipa", "Payload", chdir: File.join(dir, "content"))).to be(true)
+      original = app
+      if input == "ipa"
+        expect(system("zip", "-qry", "../test.ipa", "Payload", chdir: File.join(dir, "content"))).to be(true)
+        original = File.join(dir, "test.ipa")
+      end
 
       work = File.join(dir, "work")
       FileUtils.mkdir_p(work)
       env = { "PATH" => "#{bin}:#{ENV.fetch('PATH')}" }
-      Open3.capture3(env, "bash", RESIGN_SH_PATH, File.join(dir, "test.ipa"), "-", "-p", File.join(dir, "new.mobileprovision"), File.join(dir, "resigned.ipa"), chdir: work)
+      Open3.capture3(env, "bash", RESIGN_SH_PATH, original, "-", "-p", File.join(dir, "new.mobileprovision"), File.join(dir, "resigned.ipa"), chdir: work)
     end
 
     it "stops when a link points outside the ipa and leaves its target unchanged" do
@@ -433,6 +437,23 @@ describe "resign.sh" do
         File.write(sentinel, "unchanged")
         Dir.mktmpdir do |dir|
           _, stderr, status = resign_ipa(dir) do |app|
+            File.symlink(sentinel, File.join(app, "embedded.mobileprovision"))
+          end
+
+          expect(status.success?).to be(false)
+          # Since macOS 26.7.2, unzip refuses to create the link, before resign.sh's own check runs
+          expect(stderr).to include("'Payload/Test.app/embedded.mobileprovision' is a symbolic link to '#{sentinel}'").or(include("symlink error: Permission denied"))
+          expect(File.read(sentinel)).to eq("unchanged")
+        end
+      end
+    end
+
+    it "stops when a link in an app points outside it and leaves its target unchanged" do
+      Dir.mktmpdir do |outside|
+        sentinel = File.join(outside, "sentinel.mobileprovision")
+        File.write(sentinel, "unchanged")
+        Dir.mktmpdir do |dir|
+          _, stderr, status = resign_ipa(dir, input: "app") do |app|
             File.symlink(sentinel, File.join(app, "embedded.mobileprovision"))
           end
 
