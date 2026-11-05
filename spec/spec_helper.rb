@@ -34,8 +34,6 @@ end
 # Deprecation warnings are enabled for that, and printed only if they were already on.
 MODIFIED_LITERALS = []
 REPOSITORY_ROOT = "#{File.expand_path('..', __dir__)}/".freeze # computed at load time, as some specs stub File
-MODIFIED_LITERALS_NOT_FIXED_YET = %w[
-].freeze
 if RUBY_VERSION >= "3.4"
   print_deprecations = Warning[:deprecated]
   Warning[:deprecated] = true
@@ -207,7 +205,7 @@ RSpec.configure do |config|
       relative = path.delete_prefix(REPOSITORY_ROOT)
       next true if path.include?("/rspec-mocks-") # a spec stubbed a method on a string literal
 
-      relative != path && !relative.start_with?("vendor/") && !MODIFIED_LITERALS_NOT_FIXED_YET.include?(relative)
+      relative != path && !relative.start_with?("vendor/")
     end
     raise("Modified string literals (fastlane#30484):\n#{ours.uniq.join}") unless ours.empty?
   end
