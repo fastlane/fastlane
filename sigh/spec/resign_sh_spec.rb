@@ -1,5 +1,7 @@
 require "open3"
 require "tempfile"
+require "openssl"
+require "shellwords"
 
 describe "resign.sh" do
   RESIGN_SH_PATH = File.expand_path("../lib/assets/resign.sh", File.dirname(__FILE__))
@@ -36,6 +38,65 @@ describe "resign.sh" do
   # Run a bash script and return [stdout, stderr, status]
   def run_bash(script)
     Open3.capture3("bash", "-c", script)
+  end
+
+  # A provisioning profile: the plist, signed as CMS by a throwaway self-signed certificate.
+  def signed_profile(plist)
+    key = OpenSSL::PKey::RSA.new(2048)
+    cert = OpenSSL::X509::Certificate.new
+    cert.version = 2
+    cert.serial = 1
+    cert.subject = cert.issuer = OpenSSL::X509::Name.parse("/CN=Test Profile Signing")
+    cert.public_key = key.public_key
+    cert.not_before = Time.now - 60
+    cert.not_after = Time.now + 3600
+    cert.sign(key, OpenSSL::Digest.new("SHA256"))
+    OpenSSL::PKCS7.sign(cert, key, plist, [], OpenSSL::PKCS7::BINARY).to_der
+  end
+
+  describe "decode_provision" do
+    before(:each) do
+      skip("/usr/bin/openssl required") unless File.executable?("/usr/bin/openssl")
+      @func = extract_function(@resign_sh_content, "decode_provision")
+    end
+
+    def decode(path)
+      run_bash("#{@func}\ndecode_provision #{path.shellescape}")
+    end
+
+    it "prints the plist inside the profile, and nothing on stderr" do
+      Dir.mktmpdir do |dir|
+        plist = '<plist version="1.0"><dict><key>Name</key><string>Test</string></dict></plist>'
+        path = File.join(dir, "test.mobileprovision")
+        File.binwrite(path, signed_profile(plist))
+
+        stdout, stderr, status = decode(path)
+
+        expect(status.success?).to be(true)
+        expect(stdout).to eq(plist)
+        expect(stderr).to eq("")
+      end
+    end
+
+    it "decodes a profile whose signature does not match its content, as `security cms -D` does" do
+      stdout, _, status = decode(File.expand_path("../../match/spec/fixtures/test.provisionprofile", __dir__))
+
+      expect(status.success?).to be(true)
+      expect(stdout).to include("<key>UUID</key>")
+    end
+
+    it "fails on a file that is not a profile" do
+      Dir.mktmpdir do |dir|
+        path = File.join(dir, "not.mobileprovision")
+        File.write(path, "not a profile")
+
+        stdout, stderr, status = decode(path)
+
+        expect(status.success?).to be(false)
+        expect(stdout).to eq("")
+        expect(stderr).not_to eq("")
+      end
+    end
   end
 
   # ─── Group A: does_bundle_id_match ────────────────────────────────────
@@ -401,18 +462,14 @@ describe "resign.sh" do
       skip("PlistBuddy and codesign required (macOS only)") unless RUBY_PLATFORM.include?("darwin")
     end
 
-    # Stubs `security` and `xcodebuild`, and signs ad hoc ("-"), so no keychain is used.
-    def resign_ipa(dir, input: "ipa")
+    # Stubs `security`, which logs its arguments and fails, and `xcodebuild`, and signs ad hoc ("-"), so no keychain is used.
+    def resign_ipa(dir, input: "ipa", args: [])
       bin = File.join(dir, "bin")
       FileUtils.mkdir_p(bin)
       File.write(File.join(bin, "xcodebuild"), "#!/bin/bash\necho 'Xcode 16.0'\n")
-      File.write(File.join(bin, "security"), <<~BASH)
-        #!/bin/bash
-        [[ "$1 $2" == "cms -D" ]] || exit 1
-        echo '<plist version="1.0"><dict><key>Entitlements</key><dict><key>application-identifier</key><string>ABCDE12345.com.example.test</string><key>com.apple.developer.team-identifier</key><string>ABCDE12345</string></dict></dict></plist>'
-      BASH
+      File.write(File.join(bin, "security"), "#!/bin/bash\necho \"$*\" >> '#{File.join(dir, 'security.log')}'\nexit 1\n")
       FileUtils.chmod(0o755, Dir[File.join(bin, "*")])
-      File.write(File.join(dir, "new.mobileprovision"), "new profile")
+      File.binwrite(File.join(dir, "new.mobileprovision"), signed_profile('<plist version="1.0"><dict><key>Entitlements</key><dict><key>application-identifier</key><string>ABCDE12345.com.example.test</string><key>com.apple.developer.team-identifier</key><string>ABCDE12345</string></dict></dict></plist>'))
 
       app = File.join(dir, "content", "Payload", "Test.app")
       FileUtils.mkdir_p(app)
@@ -428,7 +485,7 @@ describe "resign.sh" do
       work = File.join(dir, "work")
       FileUtils.mkdir_p(work)
       env = { "PATH" => "#{bin}:#{ENV.fetch('PATH')}" }
-      Open3.capture3(env, "bash", RESIGN_SH_PATH, original, "-", "-p", File.join(dir, "new.mobileprovision"), File.join(dir, "resigned.ipa"), chdir: work)
+      Open3.capture3(env, "bash", RESIGN_SH_PATH, original, "-", "-p", File.join(dir, "new.mobileprovision"), *args, File.join(dir, "resigned.ipa"), chdir: work)
     end
 
     it "stops when a link points outside the ipa and leaves its target unchanged" do
@@ -475,6 +532,21 @@ describe "resign.sh" do
         expect(status.success?).to be(true), stderr
         listing, = Open3.capture2("zipinfo", File.join(dir, "resigned.ipa"), "Payload/Test.app/Assets/Current")
         expect(listing).to start_with("l")
+      end
+    end
+
+    it "decodes the profiles without `security cms`, which imports certificates into the default keychain" do
+      Dir.mktmpdir do |dir|
+        # --use-app-entitlements also decodes the app's old embedded profile.
+        stdout, stderr, status = resign_ipa(dir, args: ["--use-app-entitlements"]) do |app|
+          File.binwrite(File.join(app, "embedded.mobileprovision"), signed_profile('<plist version="1.0"><dict><key>TeamIdentifier</key><array><string>OLDTEAM123</string></array></dict></plist>'))
+        end
+
+        expect(status.success?).to be(true), stderr
+        # Printed further down the --use-app-entitlements branch, so the old embedded profile was decoded.
+        expect(stdout + stderr).to include("WARNING: Changing team while resigning")
+        security_calls = File.exist?(File.join(dir, "security.log")) ? File.read(File.join(dir, "security.log")) : ""
+        expect(security_calls).not_to include("cms")
       end
     end
   end
