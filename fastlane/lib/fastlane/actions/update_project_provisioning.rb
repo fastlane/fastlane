@@ -26,7 +26,7 @@ module Fastlane
 
         # parsing mobileprovision file
         UI.message("Parsing mobile provisioning profile from '#{params[:profile]}'")
-        profile = File.read(params[:profile])
+        profile = File.binread(params[:profile])
         p7 = OpenSSL::PKCS7.new(profile)
         store = OpenSSL::X509::Store.new
         certs.each { |cert| store.add_cert(cert) }

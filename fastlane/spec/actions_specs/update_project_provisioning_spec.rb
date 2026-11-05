@@ -114,7 +114,8 @@ describe Fastlane do
           cert.sign(ca_key, OpenSSL::Digest.new('SHA256'))
           cert
         end
-        let(:plist) { Plist::Emit.dump({ "UUID" => "1234-ABCD", "Name" => "Test Profile" }) }
+        # The CRLF breaks a profile read in text mode on Windows.
+        let(:plist) { Plist::Emit.dump({ "UUID" => "1234-ABCD", "Name" => "Test Profile", "Note" => "line\r\nline" }) }
         let(:shipped_certificates) { action::ROOT_CERTIFICATE_PATHS.map { |path| File.binread(path) } }
 
         around do |example|
