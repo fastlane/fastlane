@@ -1,5 +1,6 @@
 require 'tempfile'
 require 'openssl'
+require 'security'
 
 require_relative 'features'
 require_relative 'helper'
@@ -74,9 +75,8 @@ module FastlaneCore
     def self.installed_identities(in_keychain: nil)
       install_missing_wwdr_certificates(in_keychain: in_keychain)
 
-      available = list_available_identities(in_keychain: in_keychain)
-      # Match for this text against word boundaries to avoid edge cases around multiples of 10 identities!
-      if /\b0 valid identities found\b/ =~ available
+      identities = available_identities(in_keychain: in_keychain)
+      if identities.empty?
         UI.error([
           "There are no local code signing identities found.",
           "You can run" << " `security find-identity -v -p codesigning #{in_keychain}".rstrip << "` to get this output.",
@@ -85,69 +85,36 @@ module FastlaneCore
         ].join("\n"))
       end
 
-      ids = []
-      available.split("\n").each do |current|
-        next if current.include?("REVOKED")
-        begin
-          (ids << current.match(/.*\) ([[:xdigit:]]*) \".*/)[1])
-        rescue
-          # the last line does not match
-        end
-      end
-
-      return ids
+      identities.reject { |identity| identity.status.to_s.include?("REVOKED") }.map(&:sha1)
     end
 
     def self.installed_installers(in_keychain: nil)
-      available = self.list_available_third_party_mac_installer(in_keychain: in_keychain)
-      available += self.list_available_developer_id_installer(in_keychain: in_keychain)
-
-      return available.scan(/^SHA-1 hash: ([[:xdigit:]]+)$/).flatten
+      ["3rd Party Mac Developer Installer", "Developer ID Installer"].flat_map do |name|
+        find_certificates(name, keychain: in_keychain).map(&:sha1)
+      end
     end
 
-    def self.list_available_identities(in_keychain: nil)
-      # -v  Show valid identities only (default is to show all identities)
-      # -p  Specify policy to evaluate
-      commands = ['security find-identity -v -p codesigning']
-      commands << in_keychain if in_keychain
-      `#{commands.join(' ')}`
+    def self.available_identities(in_keychain: nil)
+      Security::Identity.find(keychain: in_keychain)
+    rescue Security::Error => e
+      UI.error("Could not list the code signing identities: #{e.message}")
+      []
     end
 
-    def self.list_available_third_party_mac_installer(in_keychain: nil)
-      # -Z  Print SHA-256 (and SHA-1) hash of the certificate
-      # -a  Find all matching certificates, not just the first one
-      # -c  Match on "name" when searching (optional)
-      commands = ['security find-certificate -Z -a -c "3rd Party Mac Developer Installer"']
-      commands << in_keychain if in_keychain
-      `#{commands.join(' ')}`
-    end
-
-    def self.list_available_developer_id_installer(in_keychain: nil)
-      # -Z  Print SHA-256 (and SHA-1) hash of the certificate
-      # -a  Find all matching certificates, not just the first one
-      # -c  Match on "name" when searching (optional)
-      commands = ['security find-certificate -Z -a -c "Developer ID Installer"']
-      commands << in_keychain if in_keychain
-      `#{commands.join(' ')}`
+    def self.find_certificates(name, keychain: nil)
+      Security::Certificate.find(name: name, keychain: keychain)
+    rescue Security::Error => e
+      UI.error("Could not search for '#{name}' certificates: #{e.message}")
+      []
     end
 
     def self.installed_wwdr_certificates(keychain: nil)
       keychain ||= wwdr_keychain # backwards compatibility
 
-      # Find all installed WWDRCA certificates. A single `security
-      # find-certificate` call can only match one common name, so query the
-      # keychain once per common name used by the certificates
-      installed_certs = []
-      WWDRCA_CERTIFICATE_NAMES.each do |certificate_name|
-        Helper.backticks("security find-certificate -a -c '#{certificate_name}' -p #{keychain.shellescape}", print: false)
-              .lines
-              .each do |line|
-          if line.start_with?('-----BEGIN CERTIFICATE-----')
-            installed_certs << line
-          else
-            installed_certs.last << line
-          end
-        end
+      # A single `security find-certificate` call can only match one common
+      # name, so query the keychain once per common name used by the certificates
+      installed_certs = WWDRCA_CERTIFICATE_NAMES.flat_map do |certificate_name|
+        find_certificates(certificate_name, keychain: keychain).map(&:pem)
       end
 
       # Get the alias (see `WWDRCA_CERTIFICATES`) of the installed WWDRCA certificates
@@ -175,7 +142,7 @@ module FastlaneCore
       file = Tempfile.new([File.basename(url, ".cer"), ".cer"])
       filename = file.path
       keychain ||= wwdr_keychain # backwards compatibility
-      keychain = "-k #{keychain.shellescape}" unless keychain.empty?
+      UI.user_error!("Could not install WWDR certificate: no keychain found to install it into") if keychain.empty?
 
       # Attempts to fix an issue installing WWDR cert tends to fail on CIs
       # https://github.com/fastlane/fastlane/issues/20960
@@ -184,40 +151,37 @@ module FastlaneCore
         curl_extras = "--http1.1 --retry 3 --retry-all-errors "
       end
 
-      import_command = "curl #{curl_extras}-f -o #{filename} #{url} && security import #{filename} #{keychain}"
-      UI.verbose("Installing WWDR Cert: #{import_command}")
+      download_command = "curl #{curl_extras}-f -o #{filename} #{url}"
+      UI.verbose("Downloading WWDR Cert: #{download_command}")
 
       require 'open3'
-      stdout, stderr, status = Open3.capture3(import_command)
+      stdout, stderr, status = Open3.capture3(download_command)
       if FastlaneCore::Globals.verbose?
         UI.command_output(stdout)
         UI.command_output(stderr)
       end
+      UI.user_error!("Could not download WWDR certificate") unless status.success?
 
-      unless status.success?
-        UI.verbose("Failed to install WWDR Certificate, checking output to see why")
-        # Check the command output, WWDR might already exist
-        unless /The specified item already exists in the keychain./ =~ stderr
-          UI.user_error!("Could not install WWDR certificate")
-        end
+      begin
+        Security::Certificate.import(filename, keychain: keychain, trusted_applications: [])
+      rescue Security::DuplicateItemError
         UI.verbose("WWDR Certificate was already installed")
+      rescue Security::Error => e
+        UI.user_error!("Could not install WWDR certificate: #{e.message}")
       end
       return true
     end
 
     def self.wwdr_keychain
-      priority = [
-        "security default-keychain -d user",
-        "security list-keychains -d user"
-      ]
-      priority.each do |command|
-        keychains = Helper.backticks(command, print: FastlaneCore::Globals.verbose?).split("\n")
-        unless keychains.empty?
-          # Select first keychain name from returned keychains list
-          return keychains[0].strip.tr('"', '')
-        end
+      keychain = begin
+        Security::Keychain.default_keychain
+      rescue Security::Error
+        nil
       end
-      return ""
+      keychain ||= Security::Keychain.list(:user).first
+      keychain ? keychain.filename : ""
+    rescue Security::Error
+      ""
     end
 
     def self.sha1_fingerprint(path)

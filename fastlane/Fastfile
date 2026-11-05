@@ -53,20 +53,10 @@ end
 desc "Measure the execution time of the --help command"
 lane :benchmark_help_command do
   Dir.chdir("..") do
-    # install gnomon if not installed yet
-    Actions.sh("echo foo | gnomon", log: true, error_callback: lambda { |result|
-      if Helper.windows? || Helper.mac?
-        sh('npm install -g gnomon')
-      else
-        sh('sudo npm install -g gnomon')
-      end
-    })
-    cmd = Helper.windows? ? "cd bin && fastlane --help | gnomon" : "bin/fastlane --help | gnomon"
+    cmd = Helper.windows? ? "cd bin && fastlane --help" : "PAGER=cat bin/fastlane --help"
     3.times do
-      content = sh(cmd, log: false)
-      content.each_line do |line|
-        UI.message("🏎️ '#{line.strip}'") if ["Total", "real", "user", "sys"].any? { |word| line.include?(word) }
-      end
+      seconds = seconds_spent { sh(cmd, log: false) }
+      UI.message("🏎️ 'Total #{format('%.4f', seconds)}s'")
     end
   end
 end
@@ -438,7 +428,7 @@ end
 desc "Makes sure the tests on https://docs.fastlane.tools still work with the latest version"
 lane :verify_docs do
   clone_docs do
-    Bundler.with_clean_env do
+    Bundler.with_unbundled_env do
       puts(`sed -i -e "s/activate_bin_path/bin_path/g" $(which bundle)`) # workaround for bundler https://github.com/bundler/bundler/issues/4602#issuecomment-233619696
       sh("bundle install")
       sh("bundle exec fastlane test skip_building:true") # skip_building since we don't have a proper python environment set up
@@ -540,6 +530,12 @@ def generate_markdown_docs(target_path: nil)
   require 'fastlane/documentation/markdown_docs_generator'
   Fastlane::MarkdownDocsGenerator.new.generate!(target_path: File.expand_path(target_path))
   return target_path
+end
+
+def seconds_spent
+  started = Process.clock_gettime(Process::CLOCK_MONOTONIC)
+  yield
+  Process.clock_gettime(Process::CLOCK_MONOTONIC) - started
 end
 
 # Exception Handling

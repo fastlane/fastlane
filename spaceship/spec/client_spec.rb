@@ -424,6 +424,14 @@ BODY
         subject.req_home
       end.to raise_error(Spaceship::Client::BadGatewayError)
     end
+
+    it "returns a JSON response whose values contain an error page marker" do
+      body = { "data" => { "description" => "<h3>Bad Gateway</h3>" } }
+      stub_request(:get, test_uri).
+        to_return(status: 200, body: body.to_json, headers: { 'Content-Type' => 'application/json' })
+
+      expect(subject.req_home.body).to eq(body)
+    end
   end
 
   describe 'retry' do
@@ -534,6 +542,18 @@ BODY
 
         expect(subject.req_home.body).to eq(default_body)
       end
+    end
+  end
+
+  describe "a plist response that cannot be parsed" do
+    it "raises Faraday::ParsingError once the retries are used up" do
+      stub_request(:get, test_uri).
+        to_return(status: 200, body: "<html>Internal Server Error</html>", headers: { 'Content-Type' => 'application/x-plist' })
+
+      expect do
+        subject.req_home
+      end.to raise_error(Faraday::ParsingError)
+      expect(WebMock).to have_requested(:get, test_uri).times(5)
     end
   end
 

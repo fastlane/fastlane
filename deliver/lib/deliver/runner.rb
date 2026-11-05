@@ -110,6 +110,11 @@ module Deliver
       precheck_success = true
       begin
         precheck_success = Precheck::Runner.new.run
+      rescue Precheck::Runner::BlockingViolationError => ex
+        UI.error(ex.message)
+        return false
+      rescue FastlaneCore::Interface::FastlaneError
+        raise
       rescue => ex
         UI.error("fastlane precheck just tried to inspect your app's metadata for App Store guideline violations and ran into a problem. We're not sure what the problem was, but precheck failed to finish. You can run it in verbose mode if you want to see the whole error. We'll have a fix out soon 🚀")
         UI.verbose(ex.inspect)

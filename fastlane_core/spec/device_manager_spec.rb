@@ -38,6 +38,18 @@ describe FastlaneCore do
       end.to raise_error(FastlaneCore::Interface::FastlaneError)
     end
 
+    it 'lists the same iOS simulators as the JSON output of the installed simctl', requires_xcodebuild: true do
+      listed = JSON.parse(`xcrun simctl list -j devices`)['devices'].flat_map do |runtime, devices|
+        os_type, os_version = runtime.split('.').last.split('-', 2)
+        next [] unless os_type == 'iOS'
+        devices.select { |device| device['isAvailable'] }.map { |device| [device['udid'], device['name'], os_version.tr('-', '.')] }
+      end
+
+      parsed = FastlaneCore::DeviceManager.simulators('iOS').map { |device| [device.udid, device.name, device.os_version] }
+      expect(parsed).not_to be_empty
+      expect(parsed).to match_array(listed)
+    end
+
     describe "properly parses the simctl output and generates Device objects for iOS simulator" do
       it "Xcode 7" do
         response = "response"
@@ -522,6 +534,25 @@ describe FastlaneCore do
         expect(UI).to receive(:important).with("Unable to boot iPhone 17: Invalid device: 1234")
 
         device.boot
+      end
+
+      it "boots a tvOS simulator" do
+        device = FastlaneCore::DeviceManager::Device.new(name: "Apple TV", udid: "1234", os_type: "tvOS", os_version: "26.5", is_simulator: true, state: "Shutdown")
+        status = double('status', "success?": true)
+        expect(Open3).to receive(:capture2e).with("xcrun simctl bootstatus 1234 -b").and_return(["Finished", status])
+
+        device.boot
+
+        expect(device.state).to eq('Booted')
+      end
+
+      it "shuts down a tvOS simulator" do
+        device = FastlaneCore::DeviceManager::Device.new(name: "Apple TV", udid: "1234", os_type: "tvOS", os_version: "26.5", is_simulator: true, state: "Booted")
+        expect(device).to receive(:`).with("xcrun simctl shutdown 1234 2>/dev/null")
+
+        device.shutdown
+
+        expect(device.state).to eq('Shutdown')
       end
     end
   end
