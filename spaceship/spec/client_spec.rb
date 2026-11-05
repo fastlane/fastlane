@@ -343,6 +343,15 @@ describe Spaceship::Client do
     end
   end
 
+  describe 'request parameters' do
+    it 'preserves an unbraced trailing parameter hash' do
+      transport = stub_request(:get, "http://example.com?filter=value").to_return(status: 200, body: 'ok')
+
+      expect(subject.request(:get, test_uri, filter: 'value').body).to eq('ok')
+      expect(transport).to have_been_requested.once
+    end
+  end
+
   describe 'retry' do
     [
       Faraday::TimeoutError,

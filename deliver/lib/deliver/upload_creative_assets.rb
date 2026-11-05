@@ -66,7 +66,8 @@ module Deliver
       library = Spaceship::ConnectAPI::AppAssetLibrary.get(app_id: app.id)
       UI.user_error!('Apple returned no asset library for this app') unless library
       uploaded = {}
-      plans.each { |plan| upload_and_place(plan, library, uploaded) }
+      plans.each { |plan| prepare_image(plan, library, uploaded) }
+      plans.each { |plan| replace_placement(plan) }
       UI.success('Successfully uploaded and placed creative assets')
     end
 
@@ -86,7 +87,7 @@ module Deliver
       mapping.fetch('specs', [])
     end
 
-    def upload_and_place(plan, library, uploaded)
+    def prepare_image(plan, library, uploaded)
       entry = plan[:entry]
       path = File.expand_path(entry[:path])
       # Reuse a universal image for both placements and across localizations.
@@ -94,17 +95,58 @@ module Deliver
         app_asset_library_id: library.id, path: path, category: 'CREATIVE_ASSETS'
       )
       unless plan[:specs].include?(image.spec_id)
-        UI.user_error!("Uploaded image '#{image.id}' is not compatible with #{entry[:placement_type]} / #{entry[:placement_group]}; existing placements were preserved for this target")
+        UI.user_error!("Uploaded image '#{image.id}' is not compatible with #{entry[:placement_type]} / #{entry[:placement_group]}; all existing placements were preserved")
       end
 
-      # Apple placements are immutable. Keep the old placement until the image is ready.
-      plan[:existing].each(&:delete!)
+      plan[:image] = image
+    end
+
+    def replace_placement(plan)
+      entry = plan[:entry]
+      completed_deletions = []
+      operation = 'delete'
+      deletion_id = nil
+      # Apple placements are immutable; all images are ready before this phase.
+      plan[:existing].each do |placement|
+        deletion_id = placement.id
+        placement.delete!
+        completed_deletions << placement.id
+      end
+      operation = 'create'
+      deletion_id = nil
       Spaceship::ConnectAPI::AppAssetLibraryPlacement.create(
         app_store_version_localization_id: plan[:localization].id,
-        image_id: image.id,
+        image_id: plan[:image].id,
         placement_type: entry[:placement_type],
         placement_group: entry[:placement_group]
       )
+    rescue StandardError => error
+      # A transport error can occur after Apple applied the mutation. Read back
+      # once for diagnostics, but do not infer success or repeat any mutation.
+      observed = placement_readback(plan)
+      failed_deletion = deletion_id ? "Failed deletion ID: #{deletion_id}. " : ''
+      UI.user_error!("Could not #{operation} creative asset placement for #{entry.values_at(:locale, :placement_type, :placement_group).join(' / ')}. " \
+                     "Old placement IDs: #{plan[:existing].map(&:id).join(', ')}. New image ID: #{plan[:image].id}. " \
+                     "#{failed_deletion}Completed deletions: #{completed_deletions.join(', ')}. Original error: #{error.message}. #{observed} " \
+                     "The outcome remains uncertain; readback may be stale. No further placement mutations, retries, or rollback were attempted. " \
+                     "Check current placements and exact image IDs in App Store Connect before retrying.")
+    end
+
+    def placement_readback(plan)
+      entry = plan[:entry]
+      placements = Spaceship::ConnectAPI::AppAssetLibraryPlacement.all(
+        app_store_version_localization_id: plan[:localization].id, includes: 'image'
+      )
+      matching = placements.select do |placement|
+        placement.placement_type == entry[:placement_type] && placement.placement_group == entry[:placement_group]
+      end
+      observed = matching.map do |placement|
+        image_id = placement.image && placement.image.id
+        "#{placement.id} (image #{image_id || 'unknown'})"
+      end
+      "Readback placements: #{observed.empty? ? 'none observed' : observed.join(', ')}."
+    rescue StandardError => error
+      "Readback failed: #{error.message}."
     end
   end
 end
