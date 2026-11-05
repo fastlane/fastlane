@@ -11,6 +11,11 @@ describe Supply do
     end
 
     describe "initialize client" do
+      before do
+        # authorized_user credentials without a project id run `gcloud config config-helper`, which writes to ~/.config/gcloud.
+        allow(Google::Auth::CredentialsLoader).to receive(:load_gcloud_project_id).and_return(nil)
+      end
+
       it "with external account credentials" do
         stub_request(:get, "https://credential-source.example.com/token").
           to_return(status: 200, body: '{"value": "access-token"}', headers: { 'Content-Type' => 'application/json' })
