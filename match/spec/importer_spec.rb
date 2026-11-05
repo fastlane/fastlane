@@ -1,6 +1,6 @@
 describe Match do
   describe Match::Runner do
-    let(:fake_storage) { "fake_storage" }
+    let(:fake_storage) { +"fake_storage" }
     let(:keychain) { 'login.keychain' }
     let(:mock_cert) { double }
     let(:cert_path) { "./match/spec/fixtures/test.cer" }

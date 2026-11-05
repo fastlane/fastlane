@@ -326,7 +326,7 @@ module FastlaneCore
     def deprecated_description(initial_description, deprecated)
       has_description = !initial_description.to_s.empty?
 
-      description = "**DEPRECATED!**"
+      description = +"**DEPRECATED!**"
 
       if deprecated.kind_of?(String)
         description << " #{deprecated}"

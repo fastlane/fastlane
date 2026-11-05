@@ -59,7 +59,7 @@ describe Scan do
     Apple Watch - 42mm (A6371161-FEEA-46E2-9382-0DB41C85FA70) (Shutdown)
 "
     FastlaneCore::Simulator.clear_cache
-    response = "response"
+    response = +"response"
     allow(response).to receive(:read).and_return(@valid_simulators)
     allow(Open3).to receive(:popen3).with("xcrun simctl list devices").and_yield(nil, response, nil, nil)
 

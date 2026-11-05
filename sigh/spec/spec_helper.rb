@@ -1,19 +1,19 @@
 def sigh_stub_spaceship_connect(inhouse: false, create_profile_app_identifier: nil, all_app_identifiers: [], app_identifier_and_profile_names: {}, valid_profiles: true, expect_delete: false)
   allow(Spaceship::ConnectAPI).to receive(:login).and_return(nil)
-  allow(Spaceship::ConnectAPI).to receive(:client).and_return("client")
+  allow(Spaceship::ConnectAPI).to receive(:client).and_return(+"client")
   allow(Spaceship::ConnectAPI).to receive(:select_team).and_return(nil)
 
   allow(Spaceship::ConnectAPI.client).to receive(:in_house?).and_return(inhouse)
 
   # Mock cert
-  certificate = "certificate"
+  certificate = +"certificate"
   allow(certificate).to receive(:id).and_return("123456789")
   allow(certificate).to receive(:display_name).and_return("Roger Oba")
   allow(certificate).to receive(:expiration_date).and_return("2021-07-22T00:27:42.000+0000")
   allow(certificate).to receive(:certificate_content).and_return(Base64.encode64("cert content"))
   allow(Spaceship::ConnectAPI::Certificate).to receive(:all).and_return([certificate, certificate])
 
-  device = "device"
+  device = +"device"
   allow(device).to receive(:id).and_return(1)
   allow(Spaceship::ConnectAPI::Device).to receive(:devices_for_platform).and_return([device])
 

@@ -5,7 +5,7 @@ describe Sigh do
       ENV["DELIVER_PASSWORD"] = "123"
     end
 
-    let(:mock_base_client) { "fake api base client" }
+    let(:mock_base_client) { +"fake api base client" }
 
     before(:each) do
       allow(mock_base_client).to receive(:login)
