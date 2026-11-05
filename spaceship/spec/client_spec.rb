@@ -548,7 +548,7 @@ BODY
   describe "a plist response that cannot be parsed" do
     it "raises Faraday::ParsingError once the retries are used up" do
       stub_request(:get, test_uri).
-        to_return(status: 200, body: "<html>Internal Server Error</html>", headers: { 'Content-Type' => 'application/x-plist' })
+        to_return(status: 200, body: +"<html>Internal Server Error</html>", headers: { 'Content-Type' => 'application/x-plist' })
 
       expect do
         subject.req_home
