@@ -84,7 +84,7 @@ module Fastlane
         if path && File.size?(path)
           paths = [path]
         elsif path
-          UI.message("No certificate at '#{path}', using Apple's root certificates shipped with fastlane")
+          UI.important("No certificate at '#{path}', verifying the profile with Apple's root certificates shipped with fastlane. Remove the `certificate` option unless you need a different root certificate.")
         end
         paths.map { |p| OpenSSL::X509::Certificate.new(File.binread(p)) }
       end

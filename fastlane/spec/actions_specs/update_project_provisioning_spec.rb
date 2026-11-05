@@ -155,8 +155,17 @@ describe Fastlane do
           expect(action.root_certificates(nil).map(&:to_der)).to eq(shipped_certificates)
         end
 
-        it "uses the shipped certificates when the given certificate does not exist" do
-          expect(action.root_certificates(File.join(@dir, "missing.cer")).map(&:to_der)).to eq(shipped_certificates)
+        it "uses the shipped certificates, and warns, when the given certificate does not exist" do
+          path = File.join(@dir, "missing.cer")
+          expect(FastlaneCore::UI).to receive(:important).with(/No certificate at '#{Regexp.escape(path)}'.*Remove the `certificate` option/)
+
+          expect(action.root_certificates(path).map(&:to_der)).to eq(shipped_certificates)
+        end
+
+        it "does not warn when no certificate is given" do
+          expect(FastlaneCore::UI).not_to receive(:important)
+
+          action.root_certificates(nil)
         end
 
         it "uses only the given certificate when it exists" do
