@@ -639,6 +639,38 @@ the developer website<a/>.<br />"
       stub_request(:get, /downloadDomainVerificationFile/).to_return(status: 200, body: verification_file)
     end
 
+    describe 'with mac: true' do
+      before do
+        stub_request(:any, %r{https://developer.apple.com/services-account/QH65B2/account/mac/identifiers/(listDomainsForMerchant|registerDomain|removeDomain|verifyDomain|downloadDomainVerificationFile)}).
+          to_return(status: 404, body: { resultCode: 1003, resultString: 'Not Found', userString: 'Not Found', httpCode: 404 }.to_json, headers: json_headers)
+      end
+
+      it 'lists the domains through the iOS endpoint' do
+        expect(subject.merchant_domains('LM3IY56BXC', mac: true).count).to eq(1)
+        expect(WebMock).to have_requested(:post, api_root + 'listDomainsForMerchant')
+      end
+
+      it 'registers a domain through the iOS endpoint' do
+        expect(subject.create_merchant_domain!('LM3IY56BXC', 'payments.example.com', mac: true)['displayId']).to eq('5Y57MLHP2K')
+        expect(WebMock).to have_requested(:post, api_root + 'registerDomain')
+      end
+
+      it 'deletes a domain through the iOS endpoint' do
+        subject.delete_merchant_domain!('5Y57MLHP2K', 'LM3IY56BXC', mac: true)
+        expect(WebMock).to have_requested(:post, api_root + 'removeDomain')
+      end
+
+      it 'verifies a domain through the iOS endpoint' do
+        subject.merchant_domain_verify('5Y57MLHP2K', mac: true)
+        expect(WebMock).to have_requested(:post, api_root + 'verifyDomain')
+      end
+
+      it 'downloads the domain association file through the iOS endpoint' do
+        expect(subject.merchant_domain_get_verification_file('5Y57MLHP2K', mac: true)).to eq(verification_file)
+        expect(WebMock).to have_requested(:get, api_root + 'downloadDomainVerificationFile?domainId=5Y57MLHP2K&teamId=XXXXXXXXXX')
+      end
+    end
+
     describe '#merchant_domains' do
       it 'lists the domains of a merchant' do
         domains = subject.merchant_domains('LM3IY56BXC')
