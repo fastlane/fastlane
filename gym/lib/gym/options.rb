@@ -124,17 +124,11 @@ module Gym
                                      description: "Path to an export options plist or a hash with export options. Use 'xcodebuild -help' to print the full set of available options",
                                      optional: true,
                                      type: Hash,
-                                     skip_type_validation: true,
-                                     conflict_block: proc do |value|
-                                       UI.user_error!("'#{value.key}' must be false to use 'export_options'")
-                                     end),
+                                     skip_type_validation: true),
         FastlaneCore::ConfigItem.new(key: :export_xcargs,
                                      env_name: "GYM_EXPORT_XCARGS",
                                      description: "Pass additional arguments to xcodebuild for the package phase. Be sure to quote the setting names and values e.g. OTHER_LDFLAGS=\"-ObjC -lstdc++\"",
                                      optional: true,
-                                     conflict_block: proc do |value|
-                                       UI.user_error!("'#{value.key}' must be false to use 'export_xcargs'")
-                                     end,
                                      type: :shell_string),
         FastlaneCore::ConfigItem.new(key: :skip_build_archive,
                                      env_name: "GYM_SKIP_BUILD_ARCHIVE",
