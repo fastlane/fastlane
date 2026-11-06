@@ -6,6 +6,8 @@ describe Fastlane do
       let(:json_key_client_email) { JSON.parse(json_key_data)['client_email'] }
 
       describe "without options" do
+        before { allow(UI).to receive(:interactive?).and_return(true) }
+
         it "could not find file" do
           expect(UI).to receive(:important).with("To not be asked about this value, you can specify it using 'json_key'")
           expect(UI).to receive(:input).with(anything).and_return("not_a_file")
