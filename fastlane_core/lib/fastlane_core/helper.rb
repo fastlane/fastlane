@@ -381,7 +381,12 @@ module FastlaneCore
       end
 
       UI.command(command) unless print
-      Helper.backticks(command, print: print)
+      FastlaneCore::CommandExecutor.execute(command: command,
+                                          print_all: print,
+                                      print_command: print,
+                                              error: proc do |output|
+                                                UI.user_error!("Could not zip '#{path}' to '#{output_path}':\n#{output}")
+                                              end)
     end
 
     # Executes the provided block after adjusting the ENV to have the
