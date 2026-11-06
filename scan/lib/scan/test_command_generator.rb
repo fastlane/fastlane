@@ -220,11 +220,9 @@ module Scan
     # Store the raw file
     def xcodebuild_log_path
       parts = []
-      if Scan.config[:app_name]
-        parts << Scan.config[:app_name]
-      elsif Scan.project
-        parts << Scan.project.app_name
-      end
+      # Without an app name (a Swift package, or build settings that can't be read), the log is named after the scheme alone
+      app_name = Scan.config[:app_name] || Scan.project&.app_name_if_lookup_allowed
+      parts << app_name if app_name
       parts << Scan.config[:scheme] if Scan.config[:scheme]
 
       file_name = "#{parts.join('-')}.log"
