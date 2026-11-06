@@ -73,7 +73,7 @@ module Fastlane
           }
         )
 
-        notarization_info = JSON.parse(submit_response)
+        notarization_info = parse_notarytool_result(submit_response)
 
         # Staple
         submission_id = notarization_info["id"]
@@ -112,6 +112,17 @@ module Fastlane
         end
       ensure
         temp_file.delete if temp_file
+      end
+
+      # Actions.sh returns notarytool's stderr along with the JSON it prints on stdout
+      def self.parse_notarytool_result(output)
+        JSON.parse(output)
+      rescue JSON::ParserError
+        begin
+          JSON.parse(output.lines.reverse.find { |line| line.lstrip.start_with?('{') }.to_s)
+        rescue JSON::ParserError
+          UI.user_error!("notarytool did not return a notarization result:\n#{output}")
+        end
       end
 
       def self.staple(package_path, verbose)
