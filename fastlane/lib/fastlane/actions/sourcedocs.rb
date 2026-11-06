@@ -58,7 +58,7 @@ module Fastlane
           FastlaneCore::ConfigItem.new(key: :output_folder,
                                        env_name: 'FL_SOURCEDOCS_OUTPUT_FOLDER',
                                        description: 'Output directory to clean (default: Documentation/Reference)',
-                                       optional: false),
+                                       optional: true),
           FastlaneCore::ConfigItem.new(key: :min_acl,
                                        env_name: 'FL_SOURCEDOCS_MIN_ACL',
                                        description: 'Access level to include in documentation [private, fileprivate, internal, public, open] (default: public)',
