@@ -82,7 +82,7 @@ describe Fastlane do
           it "successful" do
             stub_const('ENV', { "FASTLANE_APPLE_APPLICATION_SPECIFIC_PASSWORD" => app_specific_password })
 
-            expect(Fastlane::Actions).to receive(:sh).with("xcrun notarytool submit #{package.path} --output-format json --wait --apple-id #{username} --password #{app_specific_password} --team-id #{asc_provider}", { error_callback: anything, log: false }).and_return(success_submit_response)
+            expect(Fastlane::Actions).to receive(:sh).with("xcrun notarytool submit #{package.path} --output-format json --wait --apple-id #{username} --password #{app_specific_password} --team-id #{asc_provider}", { error_callback: anything, log: false, separate_stderr: true }).and_return(success_submit_response)
 
             expect(Fastlane::Actions).to receive(:sh).with("xcrun stapler staple #{package.path}", { log: false })
 
@@ -98,7 +98,7 @@ describe Fastlane do
           it "successful with verbose option" do
             stub_const('ENV', { "FASTLANE_APPLE_APPLICATION_SPECIFIC_PASSWORD" => app_specific_password })
 
-            expect(Fastlane::Actions).to receive(:sh).with("xcrun notarytool submit #{package.path} --output-format json --wait --apple-id #{username} --password #{app_specific_password} --team-id #{asc_provider} --verbose", { error_callback: anything, log: true }).and_return(success_submit_response)
+            expect(Fastlane::Actions).to receive(:sh).with("xcrun notarytool submit #{package.path} --output-format json --wait --apple-id #{username} --password #{app_specific_password} --team-id #{asc_provider} --verbose", { error_callback: anything, log: true, separate_stderr: true }).and_return(success_submit_response)
 
             expect(Fastlane::Actions).to receive(:sh).with("xcrun stapler staple #{package.path}", { log: true })
 
@@ -115,7 +115,7 @@ describe Fastlane do
           it "successful with skip_stapling" do
             stub_const('ENV', { "FASTLANE_APPLE_APPLICATION_SPECIFIC_PASSWORD" => app_specific_password })
 
-            expect(Fastlane::Actions).to receive(:sh).with("xcrun notarytool submit #{package.path} --output-format json --wait --apple-id #{username} --password #{app_specific_password} --team-id #{asc_provider}", { error_callback: anything, log: false }).and_return(success_submit_response)
+            expect(Fastlane::Actions).to receive(:sh).with("xcrun notarytool submit #{package.path} --output-format json --wait --apple-id #{username} --password #{app_specific_password} --team-id #{asc_provider}", { error_callback: anything, log: false, separate_stderr: true }).and_return(success_submit_response)
 
             expect(Fastlane::Actions).not_to receive(:sh).with("xcrun stapler staple #{package.path}", { log: false })
 
@@ -132,7 +132,7 @@ describe Fastlane do
           it "invalid" do
             stub_const('ENV', { "FASTLANE_APPLE_APPLICATION_SPECIFIC_PASSWORD" => app_specific_password })
 
-            expect(Fastlane::Actions).to receive(:sh).with("xcrun notarytool submit #{package.path} --output-format json --wait --apple-id #{username} --password #{app_specific_password} --team-id #{asc_provider}", { error_callback: anything, log: false }).and_return(invalid_submit_response)
+            expect(Fastlane::Actions).to receive(:sh).with("xcrun notarytool submit #{package.path} --output-format json --wait --apple-id #{username} --password #{app_specific_password} --team-id #{asc_provider}", { error_callback: anything, log: false, separate_stderr: true }).and_return(invalid_submit_response)
 
             expect do
               result = Fastlane::FastFile.new.parse("lane :test do
@@ -216,7 +216,7 @@ describe Fastlane do
             allow(CredentialsManager::AppfileConfig).to receive(:try_fetch_value).with(:apple_id).and_return('myusername@example.com')
             Fastlane::Actions.lane_context[Fastlane::Actions::SharedValues::APP_STORE_CONNECT_API_KEY] = { key_id: 'KEYID' }
 
-            expect(Fastlane::Actions).to receive(:sh).with("xcrun notarytool submit #{package.path} --output-format json --wait --key #{key_file.path} --key-id KEYID --issuer ISSUER", { error_callback: anything, log: false }).and_return(success_submit_response)
+            expect(Fastlane::Actions).to receive(:sh).with("xcrun notarytool submit #{package.path} --output-format json --wait --key #{key_file.path} --key-id KEYID --issuer ISSUER", { error_callback: anything, log: false, separate_stderr: true }).and_return(success_submit_response)
 
             expect(Fastlane::Actions).to receive(:sh).with("xcrun stapler staple #{package.path}", { log: false })
 
@@ -233,7 +233,7 @@ describe Fastlane do
           let(:keychain_path) { '~/Library/My Keychains/name' }
 
           it "successful with specified :keychain_path" do
-            expect(Fastlane::Actions).to receive(:sh).with("xcrun notarytool submit #{package.path} --output-format json --wait --keychain-profile #{keychain_profile.shellescape} --keychain #{File.expand_path(keychain_path).shellescape}", { error_callback: anything, log: false }).and_return(success_submit_response)
+            expect(Fastlane::Actions).to receive(:sh).with("xcrun notarytool submit #{package.path} --output-format json --wait --keychain-profile #{keychain_profile.shellescape} --keychain #{File.expand_path(keychain_path).shellescape}", { error_callback: anything, log: false, separate_stderr: true }).and_return(success_submit_response)
 
             expect(Fastlane::Actions).to receive(:sh).with("xcrun stapler staple #{package.path}", { log: false })
 
@@ -260,7 +260,7 @@ describe Fastlane do
           end
 
           it "successful w/o specified :keychain_path" do
-            expect(Fastlane::Actions).to receive(:sh).with("xcrun notarytool submit #{package.path} --output-format json --wait --keychain-profile #{keychain_profile.shellescape}", { error_callback: anything, log: false }).and_return(success_submit_response)
+            expect(Fastlane::Actions).to receive(:sh).with("xcrun notarytool submit #{package.path} --output-format json --wait --keychain-profile #{keychain_profile.shellescape}", { error_callback: anything, log: false, separate_stderr: true }).and_return(success_submit_response)
 
             expect(Fastlane::Actions).to receive(:sh).with("xcrun stapler staple #{package.path}", { log: false })
 
@@ -276,7 +276,7 @@ describe Fastlane do
             Fastlane::Actions.lane_context[Fastlane::Actions::SharedValues::APP_STORE_CONNECT_API_KEY] = { key_id: 'KEYID' }
             allow(Spaceship::ConnectAPI::Token).to receive(:from).and_return(double('token', key_id: 'KEYID', issuer_id: 'ISSUER'))
 
-            expect(Fastlane::Actions).to receive(:sh).with("xcrun notarytool submit #{package.path} --output-format json --wait --keychain-profile #{keychain_profile.shellescape}", { error_callback: anything, log: false }).and_return(success_submit_response)
+            expect(Fastlane::Actions).to receive(:sh).with("xcrun notarytool submit #{package.path} --output-format json --wait --keychain-profile #{keychain_profile.shellescape}", { error_callback: anything, log: false, separate_stderr: true }).and_return(success_submit_response)
 
             expect(Fastlane::Actions).to receive(:sh).with("xcrun stapler staple #{package.path}", { log: false })
 
