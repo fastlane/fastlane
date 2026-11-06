@@ -31,7 +31,7 @@ module Fastlane
       def self.value(key, target)
         command = ["pod", "keys", "get", key]
         command << target unless target.to_s.empty?
-        # Not Actions.sh: it would add CocoaPods' warnings on stderr to the value
+        # Not Actions.sh: it adds stderr to the value, and --troubleshoot would print the secret
         require 'open3'
         value, error, status = Open3.capture3(*command)
         UI.user_error!("`#{command.shelljoin}` failed: #{error.strip}") unless status.success?
