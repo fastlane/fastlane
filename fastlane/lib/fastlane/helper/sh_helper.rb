@@ -9,24 +9,26 @@ module Fastlane
     # @param log [Boolean] should fastlane print out the executed command
     # @param error_callback [Block] a callback invoked with the command output if there is a non-zero exit status
     # @param stdin [String] data written to the command's standard input, which is then closed; it is never printed
-    def self.sh(*command, log: true, error_callback: nil, stdin: nil, &b)
-      sh_control_output(*command, print_command: log, print_command_output: log, error_callback: error_callback, stdin: stdin, &b)
+    # @param separate_stderr [Boolean] return stdout only; stderr goes to the error message and the error_callback
+    def self.sh(*command, log: true, error_callback: nil, stdin: nil, separate_stderr: false, &b)
+      sh_control_output(*command, print_command: log, print_command_output: log, error_callback: error_callback, stdin: stdin, separate_stderr: separate_stderr, &b)
     end
 
-    def self.sh_no_action(*command, log: true, error_callback: nil, stdin: nil, &b)
-      sh_control_output(*command, print_command: log, print_command_output: log, error_callback: error_callback, stdin: stdin, &b)
+    def self.sh_no_action(*command, log: true, error_callback: nil, stdin: nil, separate_stderr: false, &b)
+      sh_control_output(*command, print_command: log, print_command_output: log, error_callback: error_callback, stdin: stdin, separate_stderr: separate_stderr, &b)
     end
 
     # @param command The command to be executed (variadic)
     # @param print_command [Boolean] Should we print the command that's being executed
     # @param print_command_output [Boolean] Should we print the command output during execution
     # @param error_callback [Block] A block that's called if the command exits with a non-zero status
+    # @param separate_stderr [Boolean] Return stdout only, and give stderr to the error message and the error_callback
     # @yield [status, result, cmd] The return status of the command, all output from the command and an equivalent shell command
     # @yieldparam [Process::Status] status A Process::Status indicating the status of the completed command
-    # @yieldparam [String] result The complete output to stdout and stderr of the completed command
+    # @yieldparam [String] result The complete output to stdout and stderr of the completed command (stdout only with separate_stderr)
     # @yieldparam [String] cmd A shell command equivalent to the arguments passed
     # rubocop: disable Metrics/PerceivedComplexity
-    def self.sh_control_output(*command, print_command: true, print_command_output: true, error_callback: nil, stdin: nil)
+    def self.sh_control_output(*command, print_command: true, print_command_output: true, error_callback: nil, stdin: nil, separate_stderr: false)
       print_command = print_command_output = true if $troubleshoot
       # Set the encoding first, the user might have set it wrong
       previous_encoding = [Encoding.default_external, Encoding.default_internal]
@@ -53,7 +55,15 @@ module Fastlane
         # sh "ls", "-la", "/Applications/Xcode 7.3.1.app"
         # sh({ "FOO" => "Hello" }, "echo $FOO")
         sanitized_output = false
-        Open3.popen2e(*command) do |command_stdin, io, thread|
+        print_line = lambda do |line|
+          next unless print_command_output
+          # Ensure the string being stripped is in valid UTF-8 format; Otherwise warn at the end
+          text = line.encode('UTF-8', invalid: :replace)
+          UI.command_output(text.strip)
+          sanitized_output = true if text != line
+        end
+        errors = separate_stderr ? +'' : nil
+        Open3.public_send(separate_stderr ? :popen3 : :popen2e, *command) do |command_stdin, io, *error_io, thread|
           # From a thread, so a command that writes a lot before reading its input cannot block on a full pipe
           writer = stdin && Thread.new do
             command_stdin.write(stdin)
@@ -62,16 +72,19 @@ module Fastlane
           ensure
             command_stdin.close
           end
+          # From a thread too, so a command that fills stderr while stdout is read cannot block
+          error_reader = errors && Thread.new do
+            error_io.first.each do |line|
+              print_line.call(line)
+              errors << line
+            end
+          end
           io.sync = true
           io.each do |line|
-            if print_command_output
-              # Ensure the string being stripped is in valid UTF-8 format; Otherwise warn at the end
-              text = line.encode('UTF-8', invalid: :replace)
-              UI.command_output(text.strip)
-              sanitized_output = true if text != line
-            end
+            print_line.call(line)
             result << line
           end
+          error_reader&.join
           exit_status = thread.value
           writer&.join
         end
@@ -85,7 +98,8 @@ module Fastlane
         if exit_status.exitstatus != 0
           # Due to some output and build systems having 30-80k lines of output.
           # We will truncate what we will show to recap the failure.
-          truncated_msg = result.length > 500 ? result[-500..-1] : result
+          failure_output = errors || result
+          truncated_msg = failure_output.length > 500 ? failure_output[-500..-1] : failure_output
 
           signal = FastlaneCore::FastlanePty.signal_name(exit_status)
           message = if signal && print_command
@@ -102,7 +116,7 @@ module Fastlane
           if error_callback || block_given?
             UI.error(message)
             # block notified below, on success or failure
-            error_callback && error_callback.call(result)
+            error_callback && error_callback.call(failure_output)
           else
             UI.shell_error!(message)
           end
