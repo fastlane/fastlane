@@ -256,6 +256,14 @@ FastlaneAppTests.testCoinToss()
         @scan = Scan::Runner.new
       end
 
+      it "is deprecated" do
+        Tempfile.create("junit_report") do |report|
+          Scan.cache[:temp_junit_report] = report.path
+          expect(FastlaneCore::UI).to receive(:deprecated).with(/Scan::Runner#test_results is deprecated/)
+          @scan.test_results
+        end
+      end
+
       it "still proceeds successfully if the temp junit report was deleted", requires_xcodebuild: true do
         Scan.cache[:temp_junit_report] = '/var/folders/non_existent_file.junit'
         expect(@scan.test_results).to_not(be_nil)
