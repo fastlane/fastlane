@@ -67,6 +67,47 @@ describe Fastlane::Actions do
       end
     end
 
+    context "with separate_stderr", unless: FastlaneCore::Helper.windows? do
+      let(:command) { ["sh", "-c", "echo out; echo err >&2; exit ${STATUS:-0}"] }
+
+      it "returns only stdout" do
+        expect(Fastlane::Actions.sh(*command, log: false, separate_stderr: true)).to eq("out\n")
+      end
+
+      it "prints both streams" do
+        allow(FastlaneCore::UI).to receive(:command)
+        allow(FastlaneCore::UI).to receive(:command_output)
+        Fastlane::Actions.sh(*command, separate_stderr: true)
+
+        expect(FastlaneCore::UI).to have_received(:command_output).with("out")
+        expect(FastlaneCore::UI).to have_received(:command_output).with("err")
+      end
+
+      it "gives stderr to the error_callback and still returns stdout" do
+        allow(FastlaneCore::UI).to receive(:error)
+        error = nil
+        result = Fastlane::Actions.sh({ "STATUS" => "1" }, *command, log: false, separate_stderr: true, error_callback: ->(stderr) { error = stderr })
+
+        expect(error).to eq("err\n")
+        expect(result).to eq("out\n")
+      end
+
+      it "puts stderr in the error message" do
+        allow(FastlaneCore::UI).to receive(:command)
+        allow(FastlaneCore::UI).to receive(:command_output)
+        allow($stdout).to receive(:isatty).and_return(false)
+
+        expect do
+          Fastlane::Actions.sh({ "STATUS" => "1" }, *command, separate_stderr: true)
+        end.to raise_error(FastlaneCore::Interface::FastlaneShellError, /instead of 0.\nerr\n\z/)
+      end
+
+      it "does not block when the command writes a lot to stderr" do
+        big = ["sh", "-c", "head -c 1048576 /dev/zero | tr '\\0' x >&2; echo out"]
+        expect(Timeout.timeout(20) { Fastlane::Actions.sh(*big, log: false, separate_stderr: true) }).to eq("out\n")
+      end
+    end
+
     context "command output encoding" do
       it "prints valid UTF-8 output without a warning" do
         allow(FastlaneCore::UI).to receive(:command_output)
