@@ -51,6 +51,11 @@ UI = FastlaneCore::UI
 SPACESHIP_COOKIE_DIR = Dir.mktmpdir("fastlane-spec-spaceship")
 ENV["SPACESHIP_COOKIE_PATH"] = SPACESHIP_COOKIE_DIR
 
+# The same for ~/.fastlane, where analytics records that it showed its notice, and for
+# RuboCop's cache, which the plugin generator spec fills. See fastlane#30187.
+FASTLANE_SPEC_USER_DIR = Dir.mktmpdir("fastlane-spec-user-dir")
+ENV["RUBOCOP_CACHE_ROOT"] = Dir.mktmpdir("fastlane-spec-rubocop-cache")
+
 # Scratch root for the Fastfile fixtures and the specs that assert on them.
 # Avoid fixed paths under /tmp: parallel test processes would share them.
 # See fastlane#30184.
@@ -311,6 +316,8 @@ RSpec.configure do |config|
   config.before(:each) do |current_test|
     # We don't want to call the RubyGems API at any point
     allow(Fastlane::FastlaneRequire).to receive(:install_gem_if_needed).and_return(nil)
+
+    allow(FastlaneCore).to receive(:fastlane_user_dir).and_return(FASTLANE_SPEC_USER_DIR)
 
     allow(Security::Command).to receive(:run).and_wrap_original do |run, *command, **options|
       raise "A spec ran `#{command.join(' ')}`, which changes the developer's keychains: stub the security gem call instead" if keychain_changing?(command, options[:stdin])
