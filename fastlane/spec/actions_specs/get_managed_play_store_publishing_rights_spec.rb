@@ -29,6 +29,18 @@ describe Fastlane do
         end
       end
 
+      describe "without options in non-interactive mode" do
+        it "names both options" do
+          allow(UI).to receive(:interactive?).and_return(false)
+
+          expect do
+            Fastlane::FastFile.new.parse("lane :test do
+              get_managed_play_store_publishing_rights()
+            end").runner.execute(:test)
+          end.to raise_error(FastlaneCore::Interface::FastlaneError, /:json_key or :json_key_data/)
+        end
+      end
+
       describe "with options" do
         it "with :json_key" do
           expect(UI).to receive(:important).with("https://play.google.com/apps/publish/delegatePrivateApp?service_account=#{json_key_client_email}&continueUrl=https://fastlane.github.io/managed_google_play-callback/callback.html")
