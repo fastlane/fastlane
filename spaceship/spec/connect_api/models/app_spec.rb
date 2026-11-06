@@ -187,4 +187,19 @@ describe Spaceship::ConnectAPI::App do
       expect(availabilities.territory_availabilities[1].contentStatuses).to eq(["CANNOT_SELL"])
     end
   end
+
+  describe("#fetch_available_territories") do
+    it('gets app territory availabilities') do
+      ConnectAPIStubbing::Tunes.stub_get_territory_availabilities
+      app = Spaceship::ConnectAPI::App.new("123456789", [])
+
+      availabilities = app.fetch_available_territories
+
+      expect(availabilities.count).to eq(2)
+      expect(availabilities[0].available).to be(true)
+      expect(availabilities[1].available).to be(false)
+      expect(availabilities[0].contentStatuses).to eq(["AVAILABLE"])
+      expect(availabilities[1].contentStatuses).to eq(["CANNOT_SELL"])
+    end
+  end
 end
