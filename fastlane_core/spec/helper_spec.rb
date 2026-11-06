@@ -265,6 +265,17 @@ describe FastlaneCore do
 
         expect(Shellwords.split(command)).to eq(["cd", folder, "&&", "rm", "-f", File.join(folder, "out put.zip"), "&&", "zip", "-r", File.join(folder, "out put.zip"), "Build Products"])
       end
+
+      it "fails when zip cannot write the archive" do
+        Dir.mktmpdir do |tmp|
+          FileUtils.mkdir_p(File.join(tmp, "products"))
+          File.write(File.join(tmp, "products", "file"), "")
+
+          expect do
+            FastlaneCore::Helper.zip_directory(File.join(tmp, "products"), File.join(tmp, "missing", "out.zip"), contents_only: true, print: false)
+          end.to raise_error(FastlaneCore::Interface::FastlaneError, /Could not zip/)
+        end
+      end
     end
 
     describe "owner-only files" do
