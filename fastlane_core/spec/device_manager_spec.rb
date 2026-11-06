@@ -39,10 +39,11 @@ describe FastlaneCore do
     end
 
     it 'lists the same iOS simulators as the JSON output of the installed simctl', requires_xcodebuild: true do
+      # The version in the runtime's name, as in the text headers: iOS-27-2-iPhone19-4 is "iOS 27.2", iOS-26-4 is "iOS 26.4" at version 26.4.1
+      versions = JSON.parse(`xcrun simctl list -j runtimes`)['runtimes'].to_h { |runtime| [runtime['identifier'], runtime['name'].split[1]] }
       listed = JSON.parse(`xcrun simctl list -j devices`)['devices'].flat_map do |runtime, devices|
-        os_type, os_version = runtime.split('.').last.split('-', 2)
-        next [] unless os_type == 'iOS'
-        devices.select { |device| device['isAvailable'] }.map { |device| [device['udid'], device['name'], os_version.tr('-', '.')] }
+        next [] unless runtime.split('.').last.start_with?('iOS-')
+        devices.select { |device| device['isAvailable'] }.map { |device| [device['udid'], device['name'], versions[runtime]] }
       end
 
       parsed = FastlaneCore::DeviceManager.simulators('iOS').map { |device| [device.udid, device.name, device.os_version] }
