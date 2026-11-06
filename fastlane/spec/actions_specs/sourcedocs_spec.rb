@@ -13,6 +13,16 @@ describe Fastlane do
         end
       end
 
+      context "when no output path is given" do
+        it "leaves the default to sourcedocs" do
+          result = Fastlane::FastFile.new.parse("lane :test do
+            sourcedocs
+          end").runner.execute(:test)
+
+          expect(result).to eq("sourcedocs generate")
+        end
+      end
+
       context "when specify all_modules option" do
         it "doesn't add all_modules option" do
           result = Fastlane::FastFile.new.parse("lane :test do
