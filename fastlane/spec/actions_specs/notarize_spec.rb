@@ -61,6 +61,19 @@ describe Fastlane do
       context "with notary tool" do
         let(:package) { Tempfile.new('app.ipa.zip') }
 
+        it "fails before running notarytool when no credentials are given" do
+          allow(CredentialsManager::AppfileConfig).to receive(:try_fetch_value).and_return(nil)
+          expect(Fastlane::Actions).not_to receive(:sh)
+
+          expect do
+            Fastlane::FastFile.new.parse("lane :test do
+              notarize(
+                package: '#{package.path}'
+              )
+            end").runner.execute(:test)
+          end.to raise_error(FastlaneCore::Interface::FastlaneError, /:keychain_profile, :api_key, :api_key_path or :username/)
+        end
+
         context "with Apple ID" do
           let(:username) { 'myusername@example.com' }
           let(:asc_provider) { '123456789' }

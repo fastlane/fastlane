@@ -15,6 +15,7 @@ module Fastlane
           params[:api_key] ||= Actions.lane_context[SharedValues::APP_STORE_CONNECT_API_KEY]
         end
         api_key = Spaceship::ConnectAPI::Token.from(hash: params[:api_key], filepath: params[:api_key_path])
+        UI.user_error!("Pass :keychain_profile, :api_key, :api_key_path or :username") unless params[:keychain_profile] || api_key || params[:username]
 
         # Compress only if .app bundle
         compressed_package_path = nil
