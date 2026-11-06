@@ -204,7 +204,7 @@ module FastlaneCore
     def self.swift_version
       if self.which('swift')
         output = `swift --version 2> /dev/null`
-        return output.split("\n").first.match(/version ([0-9.]+)/).captures.first
+        return output.lines.first.to_s[/version ([0-9.]+)/, 1]
       end
       return nil
     end
