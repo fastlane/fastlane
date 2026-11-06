@@ -28,12 +28,12 @@ describe Fastlane do
       describe "the pod keys command" do
         def command_for(key, target)
           command = nil
-          allow(Fastlane::Actions::VerifyPodKeysAction).to receive(:`) do |cmd|
-            command = cmd
-            "[cocoapods-keys] secret"
+          allow(Open3).to receive(:capture3) do |*args|
+            command = args
+            ["[cocoapods-keys] secret", "", double("status", success?: true)]
           end
           Fastlane::Actions::VerifyPodKeysAction.value(key, target)
-          Shellwords.split(command)
+          command
         end
 
         it "passes a target name with a space as one argument" do
