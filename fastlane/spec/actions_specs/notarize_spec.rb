@@ -144,6 +144,43 @@ describe Fastlane do
               end").runner.execute(:test)
             end.to raise_error(FastlaneCore::Interface::FastlaneError, "Could not notarize package. To see the error, please set 'print_log' to true.")
           end
+
+          it "staples when notarytool logs to stderr before its result" do
+            stub_const('ENV', { "FASTLANE_APPLE_APPLICATION_SPECIFIC_PASSWORD" => app_specific_password })
+            # Actions.sh returns stderr along with stdout. See fastlane#28817.
+            output = "2026-11-06 10:00:00.000 notarytool[123:456] Error: execSQLStatement:onConnection: - no such table: main.cfurl_cache_response\n#{success_submit_response}\n"
+
+            expect(Fastlane::Actions).to receive(:sh).with("xcrun notarytool submit #{package.path} --output-format json --wait --apple-id #{username} --password #{app_specific_password} --team-id #{asc_provider}", { error_callback: anything, log: false }).and_return(output)
+            expect(Fastlane::Actions).to receive(:sh).with("xcrun stapler staple #{package.path}", { log: false })
+
+            Fastlane::FastFile.new.parse("lane :test do
+              notarize(
+                package: '#{package.path}',
+                username: '#{username}',
+                asc_provider: '#{asc_provider}'
+              )
+            end").runner.execute(:test)
+          end
+
+          it "fails with notarytool's message when it fails" do
+            stub_const('ENV', {})
+            output = "Error: Missing value for '--password <password>'\n"
+
+            expect(Fastlane::Actions).to receive(:sh).with("xcrun notarytool submit #{package.path} --output-format json --wait --apple-id #{username} --password  --team-id #{asc_provider}", { error_callback: anything, log: false }) do |_command, options|
+              options[:error_callback].call(output)
+              output
+            end
+
+            expect do
+              Fastlane::FastFile.new.parse("lane :test do
+                notarize(
+                  package: '#{package.path}',
+                  username: '#{username}',
+                  asc_provider: '#{asc_provider}'
+                )
+              end").runner.execute(:test)
+            end.to raise_error(FastlaneCore::Interface::FastlaneError, /Missing value for '--password <password>'/)
+          end
         end
 
         context "with an App Store Connect API key" do
