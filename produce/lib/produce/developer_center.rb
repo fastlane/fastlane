@@ -1,5 +1,6 @@
 require 'spaceship'
 require_relative 'module'
+require_relative 'service'
 
 module Produce
   class DeveloperCenter
@@ -31,6 +32,8 @@ module Produce
         SERVICE_UNTIL_FIRST_LAUNCH
       ],
       extended_virtual_address_space: [SERVICE_ON, SERVICE_OFF],
+      increased_memory_limit: [SERVICE_ON, SERVICE_OFF],
+      increased_memory_limit_debugging: [SERVICE_ON, SERVICE_OFF],
       family_controls: [SERVICE_ON, SERVICE_OFF],
       file_provider_testing_mode: [SERVICE_ON, SERVICE_OFF],
       fonts: [SERVICE_ON, SERVICE_OFF],
@@ -80,9 +83,26 @@ module Produce
       health_kit_estimate_recalibration: [SERVICE_ON, SERVICE_OFF],
       time_sensitive_notifications: [SERVICE_ON, SERVICE_OFF],
     }
+
+    # Capabilities the legacy Developer Portal does not expose: Spaceship::Portal::AppService
+    # has no method for them (verified: AppService.respond_to?(:increased_memory_limit) is
+    # false, same for extended_virtual_address_space), so passing them to
+    # Spaceship.app.create! via enable_services would raise NoMethodError. They are skipped
+    # during creation and enabled afterwards via Produce::Service, which PATCHes /v1/bundleIds.
+    # NOTE: Apple's public POST /v1/bundleIdCapabilities endpoint does NOT accept these
+    # types (they are not in Apple's CapabilityType enum); the PATCH path references them
+    # as "capabilities" catalog ids instead. They only take effect if Apple has granted
+    # the team the increased-memory-limit entitlement.
+    PORTAL_UNSUPPORTED_SERVICES = [:extended_virtual_address_space, :increased_memory_limit, :increased_memory_limit_debugging].freeze
+
+    def portal_unsupported_service?(key)
+      PORTAL_UNSUPPORTED_SERVICES.include?(key.to_sym)
+    end
+
     def run
       login
       create_new_app
+      enable_portal_unsupported_services
     end
 
     def create_new_app
@@ -126,7 +146,10 @@ module Produce
       config_enabled_services = Produce.config[:enable_services] || Produce.config[:enabled_features]
 
       config_enabled_services.each do |k, v|
-        if k.to_sym == :data_protection
+        key = k.to_sym
+        next if portal_unsupported_service?(key)
+
+        if key == :data_protection
           case v
           when SERVICE_COMPLETE
             enabled_clean_options[app_service.data_protection.complete.service_id] = app_service.data_protection.complete
@@ -135,7 +158,7 @@ module Produce
           when SERVICE_UNTIL_FIRST_LAUNCH
             enabled_clean_options[app_service.data_protection.untilfirstauth.service_id] = app_service.data_protection.untilfirstauth
           end
-        elsif k.to_sym == :icloud
+        elsif key == :icloud
           case v
           when SERVICE_LEGACY
             enabled_clean_options[app_service.cloud.on.service_id] = app_service.cloud.on
@@ -155,11 +178,91 @@ module Produce
       enabled_clean_options
     end
 
+    def enable_portal_unsupported_services
+      config_enabled_services = Produce.config[:enable_services] || Produce.config[:enabled_features] || {}
+      unsupported_services = config_enabled_services.select do |k, _v|
+        portal_unsupported_service?(k.to_sym)
+      end
+      return if unsupported_services.empty?
+
+      enabled_service_names = unsupported_services.select { |_k, v| service_enabled?(v) }.keys
+      disabled_service_names = unsupported_services.select { |_k, v| service_disabled?(v) }.keys
+
+      UI.message("Configuring capabilities the Developer Portal cannot set for '#{app_identifier}'")
+      UI.message("\tenabling: #{enabled_service_names.join(', ')}") unless enabled_service_names.empty?
+      UI.message("\tdisabling: #{disabled_service_names.join(', ')}") unless disabled_service_names.empty?
+
+      wait_for_bundle_id
+
+      enabled_services = unsupported_services.select { |_k, v| service_enabled?(v) }
+                                             .map { |k, v| [k.to_sym, normalize_service_value(v)] }
+                                             .to_h
+      disabled_services = unsupported_services.select { |_k, v| service_disabled?(v) }
+                                              .map { |k, _v| [k.to_sym, SERVICE_OFF] }
+                                              .to_h
+
+      unless enabled_services.empty?
+        Produce::Service.enable(build_service_options(enabled_services), nil)
+      end
+
+      unless disabled_services.empty?
+        Produce::Service.disable(build_service_options(disabled_services), nil)
+      end
+    end
+
+    # Produce::Service#update expects an options object with a reader per capability
+    # plus __hash__; a plain Hash does not satisfy that interface, so build one on a
+    # dedicated anonymous class instead of defining accessors on Object.
+    def build_service_options(services)
+      option_class = Class.new
+      option_class.attr_accessor(:__hash__)
+      ALLOWED_SERVICES.keys.each { |service| option_class.attr_accessor(service) }
+
+      service_object = option_class.new
+      service_object.__hash__ = {}
+
+      services.each do |key, value|
+        sym_key = key.to_sym
+        service_object.__hash__[sym_key] = true
+        service_object.send("#{sym_key}=", value)
+      end
+
+      service_object
+    end
+
+    def service_enabled?(value)
+      value == SERVICE_ON || value == true || (value != false && value.to_s != SERVICE_OFF)
+    end
+
+    def service_disabled?(value)
+      value == SERVICE_OFF || value == false
+    end
+
+    def normalize_service_value(value)
+      return SERVICE_ON if value == true || value.to_s == SERVICE_ON
+
+      value
+    end
+
     def app_identifier
       Produce.config[:app_identifier].to_s
     end
 
     private
+
+    def wait_for_bundle_id
+      counter = 0
+      loop do
+        bundle_id = Spaceship::ConnectAPI::BundleId.find(app_identifier)
+        return bundle_id if bundle_id
+
+        counter += 1
+        UI.user_error!("Could not find '#{app_identifier}' on App Store Connect to configure capabilities") if counter >= 10
+
+        UI.message("Waiting for '#{app_identifier}' to be available on App Store Connect...")
+        sleep(3)
+      end
+    end
 
     def platform
       # This was added to support creation of multiple platforms
