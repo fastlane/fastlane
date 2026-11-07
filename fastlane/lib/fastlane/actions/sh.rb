@@ -34,6 +34,12 @@ module Fastlane
                                          description: 'A callback invoked with the command output if there is a non-zero exit status',
                                          optional: true,
                                          type: :string_callback,
+                                         default_value: nil),
+          FastlaneCore::ConfigItem.new(key: :stdin,
+                                         description: 'Data written to the command\'s standard input, which is then closed. It is never printed, so it can carry a secret the command reads from its input',
+                                         optional: true,
+                                         sensitive: true,
+                                         type: String,
                                          default_value: nil)
         ]
       end
@@ -57,7 +63,8 @@ module Fastlane
       def self.example_code
         [
           'sh("ls")',
-          'sh("git", "commit", "-m", "My message")'
+          'sh("git", "commit", "-m", "My message")',
+          'sh("gh", "auth", "login", "--with-token", stdin: ENV["GH_TOKEN"])'
         ]
       end
 
