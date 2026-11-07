@@ -174,6 +174,26 @@ describe Fastlane::Actions do
 
         expect(result).to eq(raw)
       end
+
+      it "runs the block and the error_callback with UTF-8 as the default encoding, and restores the caller's" do
+        allow(FastlaneCore::UI).to receive(:command)
+        allow(FastlaneCore::UI).to receive(:error)
+        previous = [Encoding.default_external, Encoding.default_internal]
+        Encoding.default_external = Encoding::US_ASCII
+        Encoding.default_internal = nil
+        seen = []
+
+        expect_command("true")
+        Fastlane::Actions.sh("true") { seen << Encoding.default_external }
+        expect_command("false", exitstatus: 1)
+        Fastlane::Actions.sh("false", error_callback: ->(_) { seen << Encoding.default_external })
+        after = [Encoding.default_external, Encoding.default_internal]
+
+        expect(seen).to eq([Encoding::UTF_8, Encoding::UTF_8])
+        expect(after).to eq([Encoding::US_ASCII, nil])
+      ensure
+        Encoding.default_external, Encoding.default_internal = previous
+      end
     end
 
     context "when the command is killed by a signal", unless: FastlaneCore::Helper.windows? do

@@ -111,11 +111,12 @@ module FastlaneCore
 
       # Runs a program with these arguments, without a shell: nothing needs escaping.
       # An environment Hash may come first, as in Process.spawn.
+      # It runs in specs too, unlike Actions.sh, which returns the command string there.
       #
       # @param print_command [Boolean] print the command, shell-escaped
       # @param print_output [Boolean] print stdout and stderr as they come; never forced on, so output that holds a secret stays hidden
       # @param separate_stderr [Boolean] return stdout only; stderr goes to the error
-      # @param stdin [String] data written to the program's standard input, which is then closed
+      # @param stdin [String] data written to the program's standard input, which is then closed; fastlane never prints it, the program's own output may
       # @param error [Proc] called with the output (stderr with separate_stderr) and the Process::Status, nil when the
       #   program could not start; its value is returned. Without it, a failure raises.
       # @return [String] the output
@@ -148,6 +149,9 @@ module FastlaneCore
       #   collect("ls", "-la", "/Applications/Xcode 7.3.1.app")
       #   collect({ "FOO" => "Hello" }, "echo $FOO")
       #
+      # @param stdin [String] data written to the command's standard input, which is then closed; fastlane never prints it, the command's own output may
+      # @param separate_stderr [Boolean] keep stderr apart, in Result#errors
+      # @param print_output [Boolean] print stdout and stderr as they come
       # @return [Result] output: everything, or stdout only with separate_stderr; errors: stderr with separate_stderr, else nil
       def collect(*command, stdin: nil, separate_stderr: false, print_output: false)
         previous_encoding = [Encoding.default_external, Encoding.default_internal]
