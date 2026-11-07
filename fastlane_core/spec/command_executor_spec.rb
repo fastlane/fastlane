@@ -347,6 +347,83 @@ Shopping list:
       end
     end
 
+    describe "run" do
+      # The Ruby running the specs, as a child program that exists on every platform
+      def ruby(script)
+        [RbConfig.ruby, "-e", script]
+      end
+
+      before do
+        allow(FastlaneCore::UI).to receive(:command)
+        allow(FastlaneCore::UI).to receive(:command_output)
+      end
+
+      it "passes each argument to the program as given, without a shell" do
+        output = described_class.run(*ruby("print ARGV.inspect"), "$HOME a  b", "it's")
+        expect(output).to eq('["$HOME a  b", "it\'s"]')
+      end
+
+      it "runs a single string as a program name, not as a shell command line" do
+        expect do
+          described_class.run("echo hello")
+        end.to raise_error(FastlaneCore::Interface::FastlaneError, /`echo\\ hello` failed: No such file or directory/)
+      end
+
+      it "returns stdout and stderr together by default" do
+        expect(described_class.run(*ruby("$stdout.print 'out '; $stdout.flush; $stderr.print 'err'"))).to eq("out err")
+      end
+
+      it "returns stdout only with separate_stderr" do
+        expect(described_class.run(*ruby("print 'out'; warn 'err'"), separate_stderr: true)).to eq("out")
+      end
+
+      it "raises with the exit status and the end of the output" do
+        expect do
+          described_class.run(*ruby("print 'out'; warn 'err'; exit 3"), separate_stderr: true)
+        end.to raise_error(FastlaneCore::Interface::FastlaneError, /failed with exit status 3:\nerr/)
+      end
+
+      it "returns what the error block returns instead of raising" do
+        result = described_class.run(*ruby("warn 'err'; exit 3"), separate_stderr: true, error: ->(output, status) { [output, status.exitstatus] })
+        expect(result).to eq(["err\n", 3])
+      end
+
+      it "fails like a failed command when the program does not exist" do
+        expect do
+          described_class.run("fl-no-such-program", "x")
+        end.to raise_error(FastlaneCore::Interface::FastlaneError, /`fl-no-such-program x` failed: No such file or directory/)
+      end
+
+      it "gives the error block a missing program too" do
+        expect(described_class.run("fl-no-such-program", error: ->(output, status) { [output, status] })).to match([/No such file or directory/, nil])
+      end
+
+      it "passes an environment hash given first" do
+        expect(described_class.run({ "FL_SPEC_RUN" => "set" }, *ruby("print ENV['FL_SPEC_RUN']"))).to eq("set")
+      end
+
+      it "writes stdin to the program" do
+        expect(described_class.run(*ruby("print $stdin.read"), stdin: "data")).to eq("data")
+      end
+
+      it "prints the command, shell-escaped, and not its output by default" do
+        described_class.run(*ruby("print 'secret'"), "a b")
+        expect(FastlaneCore::UI).to have_received(:command).with(/ -e print\\ \\'secret\\' a\\ b\z/)
+        expect(FastlaneCore::UI).not_to have_received(:command_output)
+      end
+
+      it "prints both streams with print_output" do
+        described_class.run(*ruby("puts 'out'; warn 'err'"), separate_stderr: true, print_output: true)
+        expect(FastlaneCore::UI).to have_received(:command_output).with("out")
+        expect(FastlaneCore::UI).to have_received(:command_output).with("err")
+      end
+
+      it "does not block when the program writes a lot to stderr" do
+        output = Timeout.timeout(20) { described_class.run(*ruby("$stderr.write('x' * 1_048_576); print 'out'"), separate_stderr: true) }
+        expect(output).to eq("out")
+      end
+    end
+
     describe "which" do
       require 'tempfile'
 
