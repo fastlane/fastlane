@@ -206,23 +206,23 @@ module Fastlane
 
         raise ArgumentError, "sh requires :command keyword in argument" if command.nil?
         log = options[:log].nil? ? true : options[:log]
-        FastFile.sh(*command, step_name: options[:step_name], log: log, error_callback: options[:error_callback], &b)
+        FastFile.sh(*command, step_name: options[:step_name], log: log, error_callback: options[:error_callback], separate_stderr: options.fetch(:separate_stderr, false), &b)
       elsif args.count != 1 && args.last.kind_of?(Hash)
         new_args = args.dup
         options = new_args.pop
         log = options[:log].nil? ? true : options[:log]
-        FastFile.sh(*new_args, step_name: options[:step_name], log: log, error_callback: options[:error_callback], &b)
+        FastFile.sh(*new_args, step_name: options[:step_name], log: log, error_callback: options[:error_callback], separate_stderr: options.fetch(:separate_stderr, false), &b)
       else
         FastFile.sh(*args, &b)
       end
     end
 
-    def self.sh(*command, step_name: nil, log: true, error_callback: nil, &b)
+    def self.sh(*command, step_name: nil, log: true, error_callback: nil, separate_stderr: false, &b)
       command_header = step_name
       command_header ||= log ? Actions.shell_command_from_args(*command) : "shell command"
 
       Actions.execute_action(command_header) do
-        Actions.sh_no_action(*command, log: log, error_callback: error_callback, &b)
+        Actions.sh_no_action(*command, log: log, error_callback: error_callback, separate_stderr: separate_stderr, &b)
       end
     end
 

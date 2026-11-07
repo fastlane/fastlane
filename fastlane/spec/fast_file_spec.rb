@@ -36,7 +36,7 @@ describe Fastlane do
           expect(Fastlane::Actions).to receive(:execute_action).with("git commit").and_call_original
 
           expect(Fastlane::Actions).to receive(:sh_no_action)
-            .with("git commit", log: true, error_callback: nil)
+            .with("git commit", log: true, error_callback: nil, separate_stderr: false)
           @ff.sh("git commit")
         end
 
@@ -44,7 +44,7 @@ describe Fastlane do
           expect(Fastlane::Actions).to receive(:execute_action).with("git commit").and_call_original
 
           expect(Fastlane::Actions).to receive(:sh_no_action)
-            .with("git commit", log: true, error_callback: nil)
+            .with("git commit", log: true, error_callback: nil, separate_stderr: false)
           @ff.sh("git commit", log: true)
         end
 
@@ -52,7 +52,7 @@ describe Fastlane do
           expect(Fastlane::Actions).to receive(:execute_action).with("some_name").and_call_original
 
           expect(Fastlane::Actions).to receive(:sh_no_action)
-            .with("git commit", log: false, error_callback: nil)
+            .with("git commit", log: false, error_callback: nil, separate_stderr: false)
           @ff.sh("git commit", step_name: "some_name", log: false)
         end
 
@@ -60,7 +60,7 @@ describe Fastlane do
           expect(Fastlane::Actions).to receive(:execute_action).with("some_name").and_call_original
 
           expect(Fastlane::Actions).to receive(:sh_no_action)
-            .with("git commit", log: true, error_callback: nil)
+            .with("git commit", log: true, error_callback: nil, separate_stderr: false)
           @ff.sh("git commit", step_name: "some_name", log: true)
         end
 
@@ -68,7 +68,7 @@ describe Fastlane do
           expect(Fastlane::Actions).to receive(:execute_action).with("git commit").and_call_original
 
           expect(Fastlane::Actions).to receive(:sh_no_action)
-            .with("git", "commit", log: true, error_callback: nil)
+            .with("git", "commit", log: true, error_callback: nil, separate_stderr: false)
           @ff.sh("git", "commit")
         end
 
@@ -76,7 +76,7 @@ describe Fastlane do
           expect(Fastlane::Actions).to receive(:execute_action).with("git commit").and_call_original
 
           expect(Fastlane::Actions).to receive(:sh_no_action)
-            .with("git", "commit", log: true, error_callback: nil)
+            .with("git", "commit", log: true, error_callback: nil, separate_stderr: false)
           @ff.sh("git", "commit")
         end
 
@@ -85,10 +85,16 @@ describe Fastlane do
 
           proc = proc {}
           expect(Fastlane::Actions).to receive(:sh_no_action)
-            .with("git", "commit", log: true, error_callback: nil) do |*args, &block|
+            .with("git", "commit", log: true, error_callback: nil, separate_stderr: false) do |*args, &block|
               expect(proc).to be(block)
             end
           @ff.sh("git", "commit", &proc)
+        end
+
+        it "passes separate_stderr" do
+          expect(Fastlane::Actions).to receive(:sh_no_action)
+            .with("git", "--version", log: true, error_callback: nil, separate_stderr: true)
+          @ff.sh("git", "--version", separate_stderr: true)
         end
       end
 
@@ -97,7 +103,7 @@ describe Fastlane do
           expect(Fastlane::Actions).to receive(:execute_action).with("git commit").and_call_original
 
           expect(Fastlane::Actions).to receive(:sh_no_action)
-            .with("git commit", log: true, error_callback: nil)
+            .with("git commit", log: true, error_callback: nil, separate_stderr: false)
           @ff.sh(command: "git commit")
         end
 
@@ -105,7 +111,7 @@ describe Fastlane do
           expect(Fastlane::Actions).to receive(:execute_action).with("shell command").and_call_original
 
           expect(Fastlane::Actions).to receive(:sh_no_action)
-            .with("git commit", log: false, error_callback: nil)
+            .with("git commit", log: false, error_callback: nil, separate_stderr: false)
           @ff.sh(command: "git commit", log: false)
         end
 
@@ -113,7 +119,7 @@ describe Fastlane do
           expect(Fastlane::Actions).to receive(:execute_action).with("git commit").and_call_original
 
           expect(Fastlane::Actions).to receive(:sh_no_action)
-            .with("git", "commit", log: true, error_callback: nil)
+            .with("git", "commit", log: true, error_callback: nil, separate_stderr: false)
           @ff.sh(command: ["git", "commit"])
         end
 
@@ -122,10 +128,16 @@ describe Fastlane do
 
           proc = proc {}
           expect(Fastlane::Actions).to receive(:sh_no_action)
-            .with("git", "commit", log: true, error_callback: nil) do |*args, &block|
+            .with("git", "commit", log: true, error_callback: nil, separate_stderr: false) do |*args, &block|
               expect(proc).to be(block)
             end
           @ff.sh(command: ["git", "commit"], &proc)
+        end
+
+        it "passes separate_stderr" do
+          expect(Fastlane::Actions).to receive(:sh_no_action)
+            .with("git --version", log: true, error_callback: nil, separate_stderr: true)
+          @ff.sh(command: "git --version", separate_stderr: true)
         end
 
         it "raises error if no :command keyboard" do

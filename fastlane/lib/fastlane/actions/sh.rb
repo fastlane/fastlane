@@ -34,7 +34,12 @@ module Fastlane
                                          description: 'A callback invoked with the command output if there is a non-zero exit status',
                                          optional: true,
                                          type: :string_callback,
-                                         default_value: nil)
+                                         default_value: nil),
+          FastlaneCore::ConfigItem.new(key: :separate_stderr,
+                                         description: 'Return stdout only; stderr goes to the error message and the error_callback',
+                                         optional: true,
+                                         type: Boolean,
+                                         default_value: false)
         ]
       end
 
@@ -57,7 +62,8 @@ module Fastlane
       def self.example_code
         [
           'sh("ls")',
-          'sh("git", "commit", "-m", "My message")'
+          'sh("git", "commit", "-m", "My message")',
+          'version = sh("xcodebuild", "-version", separate_stderr: true)'
         ]
       end
 
