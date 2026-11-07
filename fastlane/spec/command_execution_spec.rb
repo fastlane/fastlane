@@ -81,7 +81,7 @@ describe "Running a command with sh, run and execute", unless: FastlaneCore::Hel
   end
 
   behaviour "returns stdout alone with separate_stderr", differs: { execute: "reads one terminal, where stdout and stderr are merged" } do |method|
-    expect(call(method, ruby("print 'out'; warn 'err'"), separate_stderr: true)).to eq("out")
+    expect(call(method, ruby("print 'out'; $stderr.puts 'err'"), separate_stderr: true)).to eq("out")
   end
 
   behaviour "returns the output as the command wrote it, final newline included", differs: { execute: "drops the final newline; kept in 3.0" } do |method|

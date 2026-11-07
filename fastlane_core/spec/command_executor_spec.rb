@@ -394,17 +394,17 @@ Shopping list:
       end
 
       it "returns stdout only with separate_stderr" do
-        expect(described_class.run(*ruby("print 'out'; warn 'err'"), separate_stderr: true)).to eq("out")
+        expect(described_class.run(*ruby("print 'out'; $stderr.puts 'err'"), separate_stderr: true)).to eq("out")
       end
 
       it "raises with the exit status and the end of the output" do
         expect do
-          described_class.run(*ruby("print 'out'; warn 'err'; exit 3"), separate_stderr: true)
+          described_class.run(*ruby("print 'out'; $stderr.puts 'err'; exit 3"), separate_stderr: true)
         end.to raise_error(FastlaneCore::Interface::FastlaneError, /failed with exit status 3:\nerr/)
       end
 
       it "returns what the error block returns instead of raising" do
-        result = described_class.run(*ruby("warn 'err'; exit 3"), separate_stderr: true, error: ->(output, status) { [output, status.exitstatus] })
+        result = described_class.run(*ruby("$stderr.puts 'err'; exit 3"), separate_stderr: true, error: ->(output, status) { [output, status.exitstatus] })
         expect(result).to eq(["err\n", 3])
       end
 
@@ -437,7 +437,7 @@ Shopping list:
       end
 
       it "prints both streams with print_output" do
-        described_class.run(*ruby("puts 'out'; warn 'err'"), separate_stderr: true, print_output: true)
+        described_class.run(*ruby("puts 'out'; $stderr.puts 'err'"), separate_stderr: true, print_output: true)
         expect(FastlaneCore::UI).to have_received(:command_output).with("out")
         expect(FastlaneCore::UI).to have_received(:command_output).with("err")
       end
