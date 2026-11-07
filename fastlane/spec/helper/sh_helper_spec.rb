@@ -208,6 +208,16 @@ describe Fastlane::Actions do
       end
     end
 
+    context "with chdir" do
+      it "runs the command in that directory, leaving fastlane's alone" do
+        Dir.mktmpdir do |dir|
+          output = Fastlane::Actions.sh(RbConfig.ruby, "-e", "print Dir.pwd", chdir: dir, log: false)
+          expect(output).to eq(File.realpath(dir))
+          expect(Dir.pwd).not_to eq(File.realpath(dir))
+        end
+      end
+    end
+
     context "passing command arguments to the system" do
       it "passes a string as a string" do
         expect_command("git commit")

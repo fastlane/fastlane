@@ -10,12 +10,13 @@ module Fastlane
     # @param error_callback [Block] a callback invoked with the command output if there is a non-zero exit status
     # @param stdin [String] data written to the command's standard input, which is then closed; fastlane never prints it, the command's own output may
     # @param separate_stderr [Boolean] return stdout only; stderr goes to the error message and the error_callback
-    def self.sh(*command, log: true, error_callback: nil, stdin: nil, separate_stderr: false, &b)
-      sh_control_output(*command, print_command: log, print_command_output: log, error_callback: error_callback, stdin: stdin, separate_stderr: separate_stderr, &b)
+    # @param chdir [String] directory the command runs in; fastlane's own stays as it is
+    def self.sh(*command, log: true, error_callback: nil, stdin: nil, separate_stderr: false, chdir: nil, &b)
+      sh_control_output(*command, print_command: log, print_command_output: log, error_callback: error_callback, stdin: stdin, separate_stderr: separate_stderr, chdir: chdir, &b)
     end
 
-    def self.sh_no_action(*command, log: true, error_callback: nil, stdin: nil, separate_stderr: false, &b)
-      sh_control_output(*command, print_command: log, print_command_output: log, error_callback: error_callback, stdin: stdin, separate_stderr: separate_stderr, &b)
+    def self.sh_no_action(*command, log: true, error_callback: nil, stdin: nil, separate_stderr: false, chdir: nil, &b)
+      sh_control_output(*command, print_command: log, print_command_output: log, error_callback: error_callback, stdin: stdin, separate_stderr: separate_stderr, chdir: chdir, &b)
     end
 
     # @param command The command to be executed (variadic)
@@ -28,7 +29,7 @@ module Fastlane
     # @yieldparam [String] result The complete output to stdout and stderr of the completed command (stdout only with separate_stderr)
     # @yieldparam [String] cmd A shell command equivalent to the arguments passed
     # rubocop: disable Metrics/PerceivedComplexity
-    def self.sh_control_output(*command, print_command: true, print_command_output: true, error_callback: nil, stdin: nil, separate_stderr: false)
+    def self.sh_control_output(*command, print_command: true, print_command_output: true, error_callback: nil, stdin: nil, separate_stderr: false, chdir: nil)
       print_command = print_command_output = true if $troubleshoot
       # Set the encoding first, the user might have set it wrong
       # Not a duplicate of CommandExecutor.collect's: this one also covers the block and the error_callback
@@ -48,7 +49,7 @@ module Fastlane
       exit_status = nil
       if FastlaneCore::Helper.sh_enabled?
         # The command forms are documented on CommandExecutor.collect
-        collected = FastlaneCore::CommandExecutor.collect(*command, stdin: stdin, separate_stderr: separate_stderr, print_output: print_command_output)
+        collected = FastlaneCore::CommandExecutor.collect(*command, stdin: stdin, separate_stderr: separate_stderr, print_output: print_command_output, chdir: chdir)
         result = collected.output
         errors = collected.errors
         exit_status = collected.status

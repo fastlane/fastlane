@@ -34,9 +34,10 @@ module FastlaneCore
       # @param suppress_error_output [Boolean] Suppress replaying output and printing the exit status
       #   when the command fails, unless verbose output is enabled.
       # @param env [Hash] environment variables for the command only, never printed: e.g. a value it should not get on its command line
+      # @param chdir [String] directory the command runs in; fastlane's own stays as it is
       # @return [String] All the output as string
       def execute(command: nil, print_all: false, print_command: true, error: nil, prefix: nil, loading: nil,
-                  suppress_output: false, suppress_error_output: false, env: {})
+                  suppress_output: false, suppress_error_output: false, env: {}, chdir: nil)
         # Read the output as UTF-8 whatever the user set, as sh does; restored below
         previous_encoding = [Encoding.default_external, Encoding.default_internal]
         Encoding.default_external = Encoding::UTF_8
@@ -57,7 +58,7 @@ module FastlaneCore
 
         begin
           # Options only when given, so existing calls reach FastlanePty.spawn unchanged
-          spawn_options = env.empty? ? {} : { env: env }
+          spawn_options = { env: (env unless env.empty?), chdir: chdir }.compact
           status = FastlaneCore::FastlanePty.spawn(command, **spawn_options) do |command_stdout, command_stdin, pid|
             command_stdout.each do |l|
               line = l.chomp
@@ -120,17 +121,25 @@ module FastlaneCore
       # @param print_output [Boolean] print stdout and stderr as they come; never forced on, so output that holds a secret stays hidden
       # @param separate_stderr [Boolean] return stdout only; stderr goes to the error
       # @param stdin [String] data written to the program's standard input, which is then closed; fastlane never prints it, the program's own output may
+      # @param chdir [String] directory the program runs in; fastlane's own stays as it is
       # @param error [Proc] called with the output (stderr with separate_stderr) and the Process::Status, nil when the
       #   program could not start; its value is returned. Without it, a failure raises.
       # @return [String] the output
-      def run(*command, print_command: true, print_output: false, separate_stderr: false, stdin: nil, error: nil)
+      def run(*command, print_command: true, print_output: false, separate_stderr: false, stdin: nil, chdir: nil, error: nil)
         env = command.first.kind_of?(Hash) ? command.shift : {}
         program, *arguments = command
         shell_command = (env.map { |k, v| "#{k}=#{v.to_s.shellescape}" } + [command.shelljoin]).join(" ")
         UI.command(shell_command) if print_command
 
+        # Checked first: starting in a missing directory raises the same Errno::ENOENT as a missing program
+        if chdir && !File.directory?(chdir)
+          message = "no directory '#{chdir}'"
+          return error.call(message, nil) if error
+          UI.user_error!("`#{shell_command}` failed: #{message}")
+        end
+
         # [program, program] makes Ruby start the program itself, even with no arguments: a single string would go to a shell
-        result = collect(env, [program, program], *arguments, stdin: stdin, separate_stderr: separate_stderr, print_output: print_output)
+        result = collect(env, [program, program], *arguments, stdin: stdin, separate_stderr: separate_stderr, print_output: print_output, chdir: chdir)
         return result.output if result.status.success?
 
         failure_output = result.errors || result.output
@@ -155,8 +164,9 @@ module FastlaneCore
       # @param stdin [String] data written to the command's standard input, which is then closed; fastlane never prints it, the command's own output may
       # @param separate_stderr [Boolean] keep stderr apart, in Result#errors
       # @param print_output [Boolean] print stdout and stderr as they come
+      # @param chdir [String] directory the command runs in; fastlane's own stays as it is
       # @return [Result] output: everything, or stdout only with separate_stderr; errors: stderr with separate_stderr, else nil
-      def collect(*command, stdin: nil, separate_stderr: false, print_output: false)
+      def collect(*command, stdin: nil, separate_stderr: false, print_output: false, chdir: nil)
         previous_encoding = [Encoding.default_external, Encoding.default_internal]
         Encoding.default_external = Encoding::UTF_8
         Encoding.default_internal = Encoding::UTF_8
@@ -173,7 +183,8 @@ module FastlaneCore
           sanitized_output = true if text != line
         end
 
-        Open3.public_send(separate_stderr ? :popen3 : :popen2e, *command) do |command_stdin, io, *error_io, thread|
+        # chdir only when given, so existing calls reach Open3 unchanged
+        Open3.public_send(separate_stderr ? :popen3 : :popen2e, *command, **{ chdir: chdir }.compact) do |command_stdin, io, *error_io, thread|
           # From a thread, so a command that writes a lot before reading its input cannot block on a full pipe
           writer = stdin && Thread.new do
             command_stdin.write(stdin)

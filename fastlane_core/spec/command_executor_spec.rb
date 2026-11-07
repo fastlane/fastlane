@@ -67,6 +67,15 @@ describe FastlaneCore do
         end.to raise_error(FastlaneCore::FastlanePtyError, /\AProcess crashed: killed by SIGKILL\z/)
       end
 
+      it 'runs the command in chdir, leaving fastlane\'s directory alone' do
+        allow(FastlaneCore::UI).to receive(:command)
+        Dir.mktmpdir do |dir|
+          result = FastlaneCore::CommandExecutor.execute(command: "#{RbConfig.ruby.shellescape} -e \"puts Dir.pwd\"", chdir: dir)
+          expect(result).to eq(File.realpath(dir))
+          expect(Dir.pwd).not_to eq(File.realpath(dir))
+        end
+      end
+
       it 'handles reading which throws a EIO exception', requires_pty: true do
         fake_std_in_lines = [
           "a_filename\n"
@@ -431,6 +440,23 @@ Shopping list:
         described_class.run(*ruby("puts 'out'; warn 'err'"), separate_stderr: true, print_output: true)
         expect(FastlaneCore::UI).to have_received(:command_output).with("out")
         expect(FastlaneCore::UI).to have_received(:command_output).with("err")
+      end
+
+      it "runs the program in chdir, leaving fastlane's directory alone" do
+        Dir.mktmpdir do |dir|
+          expect(described_class.run(*ruby("print Dir.pwd"), chdir: dir)).to eq(File.realpath(dir))
+          expect(Dir.pwd).not_to eq(File.realpath(dir))
+        end
+      end
+
+      it "fails naming the directory, not the program, when chdir does not exist" do
+        expect do
+          described_class.run(*ruby("print 1"), chdir: "/fl-no-such-dir")
+        end.to raise_error(FastlaneCore::Interface::FastlaneError, %r{failed: no directory '/fl-no-such-dir'})
+      end
+
+      it "gives the error block a missing chdir too" do
+        expect(described_class.run(*ruby("print 1"), chdir: "/fl-no-such-dir", error: ->(output, status) { [output, status] })).to eq(["no directory '/fl-no-such-dir'", nil])
       end
 
       it "does not block when the program writes a lot to stderr" do
