@@ -33,9 +33,10 @@ module FastlaneCore
       # @param suppress_output [Boolean] Should we print the command's output?
       # @param suppress_error_output [Boolean] Suppress replaying output and printing the exit status
       #   when the command fails, unless verbose output is enabled.
+      # @param env [Hash] environment variables for the command only, never printed: e.g. a value it should not get on its command line
       # @return [String] All the output as string
       def execute(command: nil, print_all: false, print_command: true, error: nil, prefix: nil, loading: nil,
-                  suppress_output: false, suppress_error_output: false)
+                  suppress_output: false, suppress_error_output: false, env: {})
         # Read the output as UTF-8 whatever the user set, as sh does; restored below
         previous_encoding = [Encoding.default_external, Encoding.default_internal]
         Encoding.default_external = Encoding::UTF_8
@@ -55,7 +56,9 @@ module FastlaneCore
         end
 
         begin
-          status = FastlaneCore::FastlanePty.spawn(command) do |command_stdout, command_stdin, pid|
+          # Options only when given, so existing calls reach FastlanePty.spawn unchanged
+          spawn_options = env.empty? ? {} : { env: env }
+          status = FastlaneCore::FastlanePty.spawn(command, **spawn_options) do |command_stdout, command_stdin, pid|
             command_stdout.each do |l|
               line = l.chomp
               line = line[1..-1] if line[0] == "\r"

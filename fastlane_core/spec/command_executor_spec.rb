@@ -30,6 +30,17 @@ describe FastlaneCore do
         expect(result).to eq('foo')
       end
 
+      it 'gives env to the command only, without printing it' do
+        allow(FastlaneCore::UI).to receive(:command)
+        command = "#{RbConfig.ruby.shellescape} -e \"puts ENV['FL_SPEC_EXECUTE_ENV']\""
+
+        result = FastlaneCore::CommandExecutor.execute(command: command, env: { 'FL_SPEC_EXECUTE_ENV' => 'EXAMPLE-VALUE' })
+
+        expect(result).to eq('EXAMPLE-VALUE')
+        expect(ENV.key?('FL_SPEC_EXECUTE_ENV')).to be(false)
+        expect(FastlaneCore::UI).to have_received(:command).with(command)
+      end
+
       it 'reads output as UTF-8 whatever the default encoding, and restores it', unless: FastlaneCore::Helper.windows? do
         allow(FastlaneCore::UI).to receive(:command)
         allow(FastlaneCore::UI).to receive(:command_output)
