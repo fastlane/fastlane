@@ -406,6 +406,10 @@ Shopping list:
         expect(described_class.run(*ruby("print $stdin.read"), stdin: "data")).to eq("data")
       end
 
+      it "gives the program an empty input when no stdin is given, instead of one nobody writes to" do
+        expect(Timeout.timeout(10) { described_class.run(*ruby("print $stdin.read.inspect")) }).to eq('""')
+      end
+
       it "prints the command, shell-escaped, and not its output by default" do
         described_class.run(*ruby("print 'secret'"), "a b")
         expect(FastlaneCore::UI).to have_received(:command).with(/ -e print\\ \\'secret\\' a\\ b\z/)

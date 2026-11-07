@@ -179,6 +179,8 @@ module FastlaneCore
           ensure
             command_stdin.close
           end
+          # Nothing to give: the command reads end-of-file instead of waiting on an input nobody writes to
+          command_stdin.close unless stdin
           # From a thread too, so a command that fills stderr while stdout is read cannot block
           error_reader = errors && Thread.new do
             error_io.first.each do |line|

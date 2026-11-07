@@ -23,6 +23,10 @@ describe Fastlane::Actions do
       it "finishes when the command exits without reading its input" do
         expect(Timeout.timeout(20) { Fastlane::Actions.sh("true", stdin: "x" * (1024 * 1024), log: false) }).to eq("")
       end
+
+      it "gives the command an empty input when no stdin is given, instead of one nobody writes to" do
+        expect(Timeout.timeout(10) { Fastlane::Actions.sh("cat", log: false) }).to eq("")
+      end
     end
 
     context "external commands are failed" do
@@ -321,7 +325,7 @@ def command_from_args(*args)
 end
 
 def expect_command(*command, exitstatus: 0, output: "")
-  mock_input = double(:input)
+  mock_input = double(:input, close: nil)
   mock_output = StringIO.new(output)
   mock_status = double(:status, exitstatus: exitstatus)
   mock_thread = double(:thread, value: mock_status)
