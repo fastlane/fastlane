@@ -141,7 +141,12 @@ module FastlaneCore
       Result = Struct.new(:output, :errors, :status)
 
       # Starts the command and collects its output and status; shared by run and Actions.sh.
-      # The command is given as to Open3: one string goes through a shell, separate arguments do not.
+      # The command takes the forms of Process.spawn: one string goes through a shell, separate arguments do not,
+      # and an environment Hash may come first.
+      #
+      #   collect("ls -la /Applications/Xcode\ 7.3.1.app")
+      #   collect("ls", "-la", "/Applications/Xcode 7.3.1.app")
+      #   collect({ "FOO" => "Hello" }, "echo $FOO")
       #
       # @return [Result] output: everything, or stdout only with separate_stderr; errors: stderr with separate_stderr, else nil
       def collect(*command, stdin: nil, separate_stderr: false, print_output: false)

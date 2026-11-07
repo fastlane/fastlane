@@ -46,50 +46,11 @@ module Fastlane
       result = ''
       exit_status = nil
       if FastlaneCore::Helper.sh_enabled?
-        # The argument list is passed directly to Open3.popen2e, which
-        # handles the variadic argument list in the same way as Kernel#spawn.
-        # (http://ruby-doc.org/core-2.4.2/Kernel.html#method-i-spawn) or
-        # Process.spawn (http://ruby-doc.org/core-2.4.2/Process.html#method-c-spawn).
-        #
-        # sh "ls -la /Applications/Xcode\ 7.3.1.app"
-        # sh "ls", "-la", "/Applications/Xcode 7.3.1.app"
-        # sh({ "FOO" => "Hello" }, "echo $FOO")
-        sanitized_output = false
-        print_line = lambda do |line|
-          next unless print_command_output
-          # Ensure the string being stripped is in valid UTF-8 format; Otherwise warn at the end
-          text = line.encode('UTF-8', invalid: :replace)
-          UI.command_output(text.strip)
-          sanitized_output = true if text != line
-        end
-        errors = separate_stderr ? +'' : nil
-        Open3.public_send(separate_stderr ? :popen3 : :popen2e, *command) do |command_stdin, io, *error_io, thread|
-          # From a thread, so a command that writes a lot before reading its input cannot block on a full pipe
-          writer = stdin && Thread.new do
-            command_stdin.write(stdin)
-          rescue Errno::EPIPE
-            # The command exited without reading all of it; its exit status says what happened
-          ensure
-            command_stdin.close
-          end
-          # From a thread too, so a command that fills stderr while stdout is read cannot block
-          error_reader = errors && Thread.new do
-            error_io.first.each do |line|
-              print_line.call(line)
-              errors << line
-            end
-          end
-          io.sync = true
-          io.each do |line|
-            print_line.call(line)
-            result << line
-          end
-          error_reader&.join
-          exit_status = thread.value
-          writer&.join
-        end
-
-        UI.important("Command output wasn't valid UTF-8 and was sanitized. Please report the issue.") if sanitized_output
+        # The command forms are documented on CommandExecutor.collect
+        collected = FastlaneCore::CommandExecutor.collect(*command, stdin: stdin, separate_stderr: separate_stderr, print_output: print_command_output)
+        result = collected.output
+        errors = collected.errors
+        exit_status = collected.status
 
         # Checking Process::Status#exitstatus instead of #success? makes for more
         # testable code. (Tests mock exitstatus only.) This is also consistent
