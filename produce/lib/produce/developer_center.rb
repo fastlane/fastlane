@@ -93,6 +93,10 @@ module Produce
     # types (they are not in Apple's CapabilityType enum); the PATCH path references them
     # as "capabilities" catalog ids instead. They only take effect if Apple has granted
     # the team the increased-memory-limit entitlement.
+    # These capabilities are NOT available via an App Store Connect API key (.p8):
+    # the public API has no endpoint that accepts them, so this feature only works
+    # with the username/password login session (Spaceship.login). Do not re-add an
+    # API-key path for them without first verifying Apple accepts the types.
     PORTAL_UNSUPPORTED_SERVICES = [:extended_virtual_address_space, :increased_memory_limit, :increased_memory_limit_debugging].freeze
 
     def portal_unsupported_service?(key)
