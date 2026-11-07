@@ -73,11 +73,10 @@ module FastlaneCore
           output << ex.to_s
           o = output.join("\n")
           puts(o) unless suppress_error_output
-          if error
-            error.call(o, nil)
-          else
-            raise ex
-          end
+          raise ex unless error
+          # Once, with the exit status FastlanePty read: -1 when the command was killed
+          error.call(o, ex.exit_status)
+          return o
         end
 
         # Exit status for build command, should be 0 if build succeeded

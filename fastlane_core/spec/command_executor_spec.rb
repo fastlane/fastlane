@@ -146,6 +146,23 @@ Shopping list:
         end.to output(failing_command_output).to_stdout
       end
 
+      it "calls the error block once, with exit status 127, when the program does not exist" do
+        allow(FastlaneCore::UI).to receive(:command)
+        calls = []
+        result = FastlaneCore::CommandExecutor.execute(command: "fl-no-such-program", suppress_error_output: true, error: proc { |output, status| calls << [output, status] })
+
+        expect(calls).to eq([[result, 127]])
+        expect(result).to match(/No such file or directory/)
+      end
+
+      it "calls the error block once, with exit status -1, when the command is killed", unless: FastlaneCore::Helper.windows? do
+        allow(FastlaneCore::UI).to receive(:command)
+        calls = []
+        FastlaneCore::CommandExecutor.execute(command: "sh -c 'kill -9 $$'", suppress_error_output: true, error: proc { |output, status| calls << status })
+
+        expect(calls).to eq([-1])
+      end
+
       it "calls error block with output argument" do
         unless FastlaneCore::Helper.windows?
           expect(Process).to receive(:wait2).twice.and_call_original
@@ -255,10 +272,9 @@ Shopping list:
         allow(command_error).to receive(:exit_status).and_return(42)
         expect(FastlaneCore::FastlanePty).to receive(:spawn).and_raise(command_error)
 
-        error_block_input = nil
-        error_block_status = nil
+        error_block_calls = []
 
-        expect(FastlaneCore::UI).to receive(:error).with("Exit status: 42")
+        expect(FastlaneCore::UI).not_to receive(:error)
 
         expect do
           FastlaneSpec::Env.with_verbose(true) do
@@ -267,15 +283,13 @@ Shopping list:
               print_command: false,
               suppress_error_output: true,
               error: proc do |error_output, status|
-                error_block_input = error_output
-                error_block_status = status
+                error_block_calls << [error_output, status]
               end
             )
           end
         end.to output("pty error\n").to_stdout
 
-        expect(error_block_input).to eq("pty error")
-        expect(error_block_status).to eq(42)
+        expect(error_block_calls).to eq([["pty error", 42]])
       end
 
       it "still raises when failure output is suppressed without an error block" do
