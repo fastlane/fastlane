@@ -33,7 +33,8 @@ describe FastlaneCore do
       it 'names the signal when the command is killed', unless: FastlaneCore::Helper.windows? do
         allow(FastlaneCore::UI).to receive(:command)
         expect do
-          FastlaneCore::CommandExecutor.execute(command: "sh -c 'kill -9 $$'", suppress_error_output: true)
+          # The shell Ruby starts kills itself: Ubuntu's dash, given "sh -c ...", would wait for the inner shell and exit 137
+          FastlaneCore::CommandExecutor.execute(command: "kill -9 $$", suppress_error_output: true)
         end.to raise_error(FastlaneCore::FastlanePtyError, /\AProcess crashed: killed by SIGKILL\z/)
       end
 
