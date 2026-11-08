@@ -1,15 +1,8 @@
 describe Snapshot do
-  # Unset every option these examples rely on being unset, and both switches for the lookup guard,
+  # Unset the environment variables snapshot's options read, and the global lookup switch,
   # so the developer's environment can't change the outcome
   around do |example|
-    FastlaneSpec::Env.with_env_values(
-      'FASTLANE_DISALLOW_XCODEBUILD_SETTINGS_LOOKUP' => nil,
-      'SNAPSHOT_DISALLOW_XCODEBUILD_SETTINGS_LOOKUP' => nil,
-      'SNAPSHOT_WORKSPACE' => nil,
-      'SNAPSHOT_SCHEME' => nil,
-      'SNAPSHOT_NAMESPACE_LOG_FILES' => nil,
-      'SNAPSHOT_BUILDLOG_PATH' => nil
-    ) { example.run }
+    FastlaneSpec::Env.with_option_env_values_cleared(Snapshot::Options.available_options, 'FASTLANE_DISALLOW_XCODEBUILD_SETTINGS_LOOKUP' => nil) { example.run }
   end
 
   let(:options) do

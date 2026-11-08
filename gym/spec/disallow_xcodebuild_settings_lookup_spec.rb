@@ -1,27 +1,8 @@
 describe Gym do
-  # Unset every option these examples rely on being unset, and both switches for the lookup guard,
+  # Unset the environment variables gym's options read, and the two gym reads directly,
   # so the developer's environment can't change the outcome
   around do |example|
-    FastlaneSpec::Env.with_env_values(
-      "FASTLANE_DISALLOW_XCODEBUILD_SETTINGS_LOOKUP" => nil,
-      "GYM_DISALLOW_XCODEBUILD_SETTINGS_LOOKUP" => nil,
-      "GYM_DESTINATION" => nil,
-      "GYM_SDK" => nil,
-      "GYM_CATALYST_PLATFORM" => nil,
-      "GYM_WORKSPACE" => nil,
-      "GYM_SCHEME" => nil,
-      "GYM_CONFIGURATION" => nil,
-      "GYM_EXPORT_METHOD" => nil,
-      "GYM_EXPORT_TEAM_ID" => nil,
-      "GYM_INSTALLER_CERT_NAME" => nil,
-      "GYM_APP_NAME" => nil,
-      "GYM_OUTPUT_NAME" => nil,
-      "GYM_SKIP_ARCHIVE" => nil,
-      "GYM_SKIP_BUILD_ARCHIVE" => nil,
-      "GYM_SKIP_PACKAGE_IPA" => nil,
-      "GYM_SKIP_PROFILE_DETECTION" => nil,
-      "GYM_USE_GENERIC_ARCHIVE_FIX" => nil
-    ) { example.run }
+    FastlaneSpec::Env.with_option_env_values_cleared(Gym::Options.available_options, "FASTLANE_DISALLOW_XCODEBUILD_SETTINGS_LOOKUP" => nil, "GYM_USE_GENERIC_ARCHIVE_FIX" => nil) { example.run }
   end
 
   # A project double with nothing stubbed fails the example if it is asked anything,
