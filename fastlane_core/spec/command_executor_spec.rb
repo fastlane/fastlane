@@ -146,7 +146,8 @@ Shopping list:
         end.to output(failing_command_output).to_stdout
       end
 
-      it "calls the error block once, with exit status 127, when the program does not exist" do
+      # 127 comes from a child that could not start the program: only the PTY reports it, and Windows has none
+      it "calls the error block once, with exit status 127, when the program does not exist", unless: FastlaneCore::Helper.windows? do
         allow(FastlaneCore::UI).to receive(:command)
         calls = []
         result = FastlaneCore::CommandExecutor.execute(command: "fl-no-such-program", suppress_error_output: true, error: proc { |output, status| calls << [output, status] })
