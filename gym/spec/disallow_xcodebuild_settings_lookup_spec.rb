@@ -164,7 +164,7 @@ describe Gym do
     end
 
     it "doesn't look for an installer certificate, which only signs macOS exports" do
-      expect(FastlaneCore::Helper).not_to receive(:backticks)
+      expect(Security::Certificate).not_to receive(:find)
 
       configure(options.merge(export_method: "app-store"))
 
