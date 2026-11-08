@@ -144,7 +144,9 @@ module FastlaneCore
 
         failure_output = result.errors || result.output
         return error.call(failure_output, result.status) if error
-        UI.user_error!("`#{shell_command}` failed with exit status #{result.status.exitstatus}:\n#{failure_output[-500..] || failure_output}")
+        signal = FastlanePty.signal_name(result.status)
+        outcome = signal ? "failed: killed by #{signal}" : "failed with exit status #{result.status.exitstatus}:"
+        UI.user_error!("`#{shell_command}` #{outcome}\n#{failure_output[-500..] || failure_output}")
       rescue SystemCallError => e
         raise unless e.kind_of?(Errno::ENOENT) || e.kind_of?(Errno::EACCES)
         return error.call(e.message, nil) if error

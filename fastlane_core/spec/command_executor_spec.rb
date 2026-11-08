@@ -442,6 +442,12 @@ Shopping list:
         expect(FastlaneCore::UI).to have_received(:command_output).with("err")
       end
 
+      it "names the signal when the program is killed", unless: FastlaneCore::Helper.windows? do
+        expect do
+          described_class.run(*ruby("Process.kill(:KILL, Process.pid)"))
+        end.to raise_error(FastlaneCore::Interface::FastlaneError, /failed: killed by SIGKILL/)
+      end
+
       it "runs the program in chdir, leaving fastlane's directory alone" do
         Dir.mktmpdir do |dir|
           expect(described_class.run(*ruby("print Dir.pwd"), chdir: dir)).to eq(File.realpath(dir))
