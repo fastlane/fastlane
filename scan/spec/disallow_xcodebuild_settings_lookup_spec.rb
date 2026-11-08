@@ -1,28 +1,10 @@
 require 'scan'
 
 describe Scan do
-  # Unset every option these examples rely on being unset, and both switches for the lookup guard,
+  # Unset the environment variables scan's options read, and the global lookup switch,
   # so the developer's environment can't change the outcome
   around do |example|
-    FastlaneSpec::Env.with_env_values(
-      'FASTLANE_DISALLOW_XCODEBUILD_SETTINGS_LOOKUP' => nil,
-      'SCAN_DISALLOW_XCODEBUILD_SETTINGS_LOOKUP' => nil,
-      'SCAN_DEVICE' => nil,
-      'SCAN_DEVICES' => nil,
-      'SCAN_DESTINATION' => nil,
-      'SCAN_DERIVED_DATA_PATH' => nil,
-      'SCAN_APP_NAME' => nil,
-      'SCAN_DEPLOYMENT_TARGET_VERSION' => nil,
-      'SCAN_CATALYST_PLATFORM' => nil,
-      'SCAN_RESET_SIMULATOR' => nil,
-      'SCAN_REINSTALL_APP' => nil,
-      'SCAN_PRELAUNCH_SIMULATOR' => nil,
-      'SCAN_INCLUDE_SIMULATOR_LOGS' => nil,
-      'SCAN_WORKSPACE' => nil,
-      'SCAN_PACKAGE_PATH' => nil,
-      'SCAN_SCHEME' => nil,
-      'SLACK_URL' => nil
-    ) { example.run }
+    FastlaneSpec::Env.with_option_env_values_cleared(Scan::Options.available_options, 'FASTLANE_DISALLOW_XCODEBUILD_SETTINGS_LOOKUP' => nil) { example.run }
   end
 
   let(:simulator) { FastlaneCore::DeviceManager::Device.new(name: "iPhone 15", udid: "00000000-0000-0000-0000-000000000015", os_type: "iOS", os_version: "17.0", state: "Shutdown", is_simulator: true) }

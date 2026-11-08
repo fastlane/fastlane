@@ -374,20 +374,7 @@ describe Scan do
         let(:simulator) { FastlaneCore::DeviceManager::Device.new(name: "iPhone 15", udid: "00000000-0000-0000-0000-000000000015", os_type: "iOS", os_version: "17.0", state: "Shutdown", is_simulator: true) }
 
         around do |example|
-          FastlaneSpec::Env.with_env_values(
-            'FASTLANE_DISALLOW_XCODEBUILD_SETTINGS_LOOKUP' => nil,
-            'SCAN_DISALLOW_XCODEBUILD_SETTINGS_LOOKUP' => nil,
-            'SCAN_DEVICE' => nil,
-            'SCAN_DEVICES' => nil,
-            'SCAN_DESTINATION' => nil,
-            'SCAN_CATALYST_PLATFORM' => nil,
-            'SCAN_DEPLOYMENT_TARGET_VERSION' => nil,
-            'SCAN_DERIVED_DATA_PATH' => nil,
-            'SCAN_WORKSPACE' => nil,
-            'SCAN_PROJECT' => nil,
-            'SCAN_PACKAGE_PATH' => nil,
-            'SCAN_SCHEME' => nil
-          ) { example.run }
+          FastlaneSpec::Env.with_option_env_values_cleared(Scan::Options.available_options, 'FASTLANE_DISALLOW_XCODEBUILD_SETTINGS_LOOKUP' => nil) { example.run }
         end
 
         before do
