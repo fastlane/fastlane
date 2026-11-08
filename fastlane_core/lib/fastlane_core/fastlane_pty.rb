@@ -86,7 +86,7 @@ module FastlaneCore
     rescue StandardError => e
       # Wrapping any error in FastlanePtyError to allow callers to see and use
       # $?.exitstatus that would usually get returned
-      raise FastlanePtyError.new(e, status.exitstatus || e.exit_status, status)
+      raise FastlanePtyError.new(e, status&.exitstatus || e.exit_status, status)
     end
 
     # Existing callers keep calling spawn with the command alone
