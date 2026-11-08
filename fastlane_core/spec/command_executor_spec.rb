@@ -158,7 +158,8 @@ Shopping list:
       it "calls the error block once, with exit status -1, when the command is killed", unless: FastlaneCore::Helper.windows? do
         allow(FastlaneCore::UI).to receive(:command)
         calls = []
-        FastlaneCore::CommandExecutor.execute(command: "sh -c 'kill -9 $$'", suppress_error_output: true, error: proc { |output, status| calls << status })
+        # The shell Ruby starts kills itself: Ubuntu's dash, given "sh -c ...", would wait for the inner shell and exit 137
+        FastlaneCore::CommandExecutor.execute(command: "kill -9 $$", suppress_error_output: true, error: proc { |output, status| calls << status })
 
         expect(calls).to eq([-1])
       end
