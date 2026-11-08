@@ -145,7 +145,14 @@ module Gym
       def print_full_log_path
         return if Gym.config[:disable_xcpretty]
 
-        log_path = Gym::BuildCommandGenerator.xcodebuild_log_path
+        # Naming the log can read the build settings, for the first time when only exporting.
+        # As in print_xcode_version, that must not replace the failure being reported
+        begin
+          log_path = Gym::BuildCommandGenerator.xcodebuild_log_path
+        rescue => ex
+          UI.verbose("Couldn't find the build log to show it: #{ex}")
+          return
+        end
         return unless File.exist?(log_path)
 
         # `xcodebuild` doesn't properly mark lines as failure reason or important information

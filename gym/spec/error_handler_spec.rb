@@ -16,6 +16,27 @@ describe Gym do
   end
 
   describe Gym::ErrorHandler, requires_xcode: true do
+    # `disable_xcpretty`, or the global lookup switch, would skip the lookups these examples are about
+    around do |example|
+      FastlaneSpec::Env.with_option_env_values_cleared(Gym::Options.available_options, 'FASTLANE_DISALLOW_XCODEBUILD_SETTINGS_LOOKUP' => nil) { example.run }
+    end
+
+    context "when naming the build log has to read the build settings" do
+      # When only exporting with `output_name` given, nothing has read them before the export fails
+      let(:project) { FastlaneCore::Project.new(project: "./gym/examples/multipleSchemes/Example.xcodeproj", scheme: "Example") }
+
+      before do
+        allow(Gym).to receive(:config).and_return(FastlaneCore::Configuration.create(Gym::Options.available_options, { scheme: "Example", output_name: "App", buildlog_path: Dir.mktmpdir }))
+        allow(Gym).to receive(:project).and_return(project)
+        allow(project).to receive(:build_settings).and_raise(FastlaneCore::Interface::FastlaneDependencyCausedException, "xcodebuild -showBuildSettings timed out")
+      end
+
+      it "still reports the package failure when fetching them times out" do
+        expect(UI).to receive(:build_failure!).with("Error packaging up the application", error_info: @output)
+        Gym::ErrorHandler.handle_package_error(@output)
+      end
+    end
+
     context "when the SDK can't be read from the build settings" do
       let(:project) { FastlaneCore::Project.new(project: "./gym/examples/multipleSchemes/Example.xcodeproj", disallow_xcodebuild_settings_lookup: true) }
 
