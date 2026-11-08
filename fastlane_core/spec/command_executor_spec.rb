@@ -48,6 +48,14 @@ describe FastlaneCore do
         Encoding.default_external, Encoding.default_internal = previous
       end
 
+      it 'names the signal when the command is killed', unless: FastlaneCore::Helper.windows? do
+        allow(FastlaneCore::UI).to receive(:command)
+        expect do
+          # The shell Ruby starts kills itself: Ubuntu's dash, given "sh -c ...", would wait for the inner shell and exit 137
+          FastlaneCore::CommandExecutor.execute(command: "kill -9 $$", suppress_error_output: true)
+        end.to raise_error(FastlaneCore::FastlanePtyError, /\AProcess crashed: killed by SIGKILL\z/)
+      end
+
       it 'handles reading which throws a EIO exception', requires_pty: true do
         fake_std_in_lines = [
           "a_filename\n"
@@ -164,6 +172,25 @@ Shopping list:
         end.to output(failing_command_output).to_stdout
       end
 
+      # 127 comes from a child that could not start the program: only the PTY reports it, and Windows has none
+      it "calls the error block once, with exit status 127, when the program does not exist", unless: FastlaneCore::Helper.windows? do
+        allow(FastlaneCore::UI).to receive(:command)
+        calls = []
+        result = FastlaneCore::CommandExecutor.execute(command: "fl-no-such-program", suppress_error_output: true, error: proc { |output, status| calls << [output, status] })
+
+        expect(calls).to eq([[result, 127]])
+        expect(result).to match(/No such file or directory/)
+      end
+
+      it "calls the error block once, with exit status -1, when the command is killed", unless: FastlaneCore::Helper.windows? do
+        allow(FastlaneCore::UI).to receive(:command)
+        calls = []
+        # The shell Ruby starts kills itself: Ubuntu's dash, given "sh -c ...", would wait for the inner shell and exit 137
+        FastlaneCore::CommandExecutor.execute(command: "kill -9 $$", suppress_error_output: true, error: proc { |output, status| calls << status })
+
+        expect(calls).to eq([-1])
+      end
+
       it "calls error block with output argument" do
         unless FastlaneCore::Helper.windows?
           expect(Process).to receive(:wait2).twice.and_call_original
@@ -273,10 +300,9 @@ Shopping list:
         allow(command_error).to receive(:exit_status).and_return(42)
         expect(FastlaneCore::FastlanePty).to receive(:spawn).and_raise(command_error)
 
-        error_block_input = nil
-        error_block_status = nil
+        error_block_calls = []
 
-        expect(FastlaneCore::UI).to receive(:error).with("Exit status: 42")
+        expect(FastlaneCore::UI).not_to receive(:error)
 
         expect do
           FastlaneSpec::Env.with_verbose(true) do
@@ -285,15 +311,13 @@ Shopping list:
               print_command: false,
               suppress_error_output: true,
               error: proc do |error_output, status|
-                error_block_input = error_output
-                error_block_status = status
+                error_block_calls << [error_output, status]
               end
             )
           end
         end.to output("pty error\n").to_stdout
 
-        expect(error_block_input).to eq("pty error")
-        expect(error_block_status).to eq(42)
+        expect(error_block_calls).to eq([["pty error", 42]])
       end
 
       it "still raises when failure output is suppressed without an error block" do
