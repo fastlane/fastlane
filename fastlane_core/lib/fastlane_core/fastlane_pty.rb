@@ -63,7 +63,7 @@ module FastlaneCore
       # Better a plain error than a NoMethodError raised from inside the handler
       # that exists to report the failure, which is what nil used to produce.
       raise StandardError, "Could not determine the exit status of the command" if status.nil?
-      raise StandardError, "Process crashed" if status.signaled?
+      raise StandardError, "Process crashed: killed by #{signal_name(status)}" if status.signaled?
       status.exitstatus
     rescue StandardError => e
       # Wrapping any error in FastlanePtyError to allow callers to see and use
@@ -80,7 +80,7 @@ module FastlaneCore
         yield(command_stdout, command_stdin, status.pid)
         command_stdin.close
         command_stdout.close
-        raise StandardError, "Process crashed" if status.signaled?
+        raise StandardError, "Process crashed: killed by #{signal_name(status)}" if status.signaled?
         status.exitstatus
       end
     rescue StandardError => e
@@ -92,6 +92,12 @@ module FastlaneCore
     # Existing callers keep calling spawn with the command alone
     def self.spawn_args(env, command)
       (env || {}).empty? ? [command] : [env, command]
+    end
+
+    # "SIGKILL" for a process killed by a signal, nil otherwise: Process::Status#exitstatus is nil only then
+    def self.signal_name(status)
+      return nil unless status.exitstatus.nil? && status.respond_to?(:termsig) && status.termsig
+      "SIG#{Signal.signame(status.termsig)}"
     end
 
     # to ease mocking

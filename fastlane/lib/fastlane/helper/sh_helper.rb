@@ -87,7 +87,12 @@ module Fastlane
           # We will truncate what we will show to recap the failure.
           truncated_msg = result.length > 500 ? result[-500..-1] : result
 
-          message = if print_command
+          signal = FastlaneCore::FastlanePty.signal_name(exit_status)
+          message = if signal && print_command
+                      "Command '#{shell_command}' was killed by #{signal}.\n"
+                    elsif signal
+                      "Shell command was killed by #{signal}.\n"
+                    elsif print_command
                       "Exit status of command '#{shell_command}' was #{exit_status.exitstatus} instead of 0.\n"
                     else
                       "Shell command exited with exit status #{exit_status.exitstatus} instead of 0.\n"

@@ -30,6 +30,14 @@ describe FastlaneCore do
         expect(result).to eq('foo')
       end
 
+      it 'names the signal when the command is killed', unless: FastlaneCore::Helper.windows? do
+        allow(FastlaneCore::UI).to receive(:command)
+        expect do
+          # The shell Ruby starts kills itself: Ubuntu's dash, given "sh -c ...", would wait for the inner shell and exit 137
+          FastlaneCore::CommandExecutor.execute(command: "kill -9 $$", suppress_error_output: true)
+        end.to raise_error(FastlaneCore::FastlanePtyError, /\AProcess crashed: killed by SIGKILL\z/)
+      end
+
       it 'handles reading which throws a EIO exception', requires_pty: true do
         fake_std_in_lines = [
           "a_filename\n"

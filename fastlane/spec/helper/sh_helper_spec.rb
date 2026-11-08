@@ -135,6 +135,14 @@ describe Fastlane::Actions do
       end
     end
 
+    context "when the command is killed by a signal", unless: FastlaneCore::Helper.windows? do
+      it "names the signal instead of a blank exit status" do
+        expect do
+          Fastlane::Actions.sh("sh", "-c", "kill -9 $$", log: false)
+        end.to raise_error(FastlaneCore::Interface::FastlaneShellError, /\AShell command was killed by SIGKILL\./)
+      end
+    end
+
     context "passing command arguments to the system" do
       it "passes a string as a string" do
         expect_command("git commit")
