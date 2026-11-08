@@ -386,7 +386,7 @@ Shopping list:
       it "runs a single string as a program name, not as a shell command line" do
         expect do
           described_class.run("echo hello")
-        end.to raise_error(FastlaneCore::Interface::FastlaneError, /`echo\\ hello` failed: No such file or directory/)
+        end.to raise_error(FastlaneCore::Interface::FastlaneError, /`#{Regexp.escape(['echo hello'].shelljoin)}` failed: No such file or directory/)
       end
 
       it "returns stdout and stderr together by default" do
@@ -432,7 +432,7 @@ Shopping list:
 
       it "prints the command, shell-escaped, and not its output by default" do
         described_class.run(*ruby("print 'secret'"), "a b")
-        expect(FastlaneCore::UI).to have_received(:command).with(/ -e print\\ \\'secret\\' a\\ b\z/)
+        expect(FastlaneCore::UI).to have_received(:command).with(/ #{Regexp.escape(['-e', "print 'secret'", 'a b'].shelljoin)}\z/)
         expect(FastlaneCore::UI).not_to have_received(:command_output)
       end
 
