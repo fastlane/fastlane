@@ -358,6 +358,27 @@ describe FastlaneCore do
       end
     end
 
+    describe "#swift_version", unless: FastlaneCore::Helper.windows? do
+      let(:bin_dir) { Dir.mktmpdir("fl_spec_swift") }
+
+      after { FileUtils.rm_rf(bin_dir) }
+
+      # The command runs in a subprocess, so PATH must really change, not just ENV in Ruby
+      def swift_version_with(script)
+        File.write(File.join(bin_dir, "swift"), "#!/bin/sh\n#{script}\n")
+        File.chmod(0o755, File.join(bin_dir, "swift"))
+        FastlaneCore::Helper.with_env_values("PATH" => "#{bin_dir}:#{ENV['PATH']}") { FastlaneCore::Helper.swift_version }
+      end
+
+      it "returns the version swift reports" do
+        expect(swift_version_with("echo 'Apple Swift version 5.9.2 (swiftlang-5.9.2.2.56 clang-1500.1.0.2.5)'")).to eq("5.9.2")
+      end
+
+      it "returns nil when swift fails without printing a version" do
+        expect(swift_version_with("echo 'xcrun: error: invalid active developer path' >&2; exit 1")).to be_nil
+      end
+    end
+
     describe "#which" do
       it "delegates to FastlaneCore::CommandExecutor.which" do
         expect(FastlaneCore::CommandExecutor).to receive(:which).with('ruby').and_return('/usr/bin/ruby')
