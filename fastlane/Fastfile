@@ -199,7 +199,8 @@ lane :generate_swift_api do |options|
   # Built, not archived: what SwiftLaneManager.build_runner! does for users
   gym(
     project: File.expand_path("swift/FastlaneSwiftRunner/FastlaneSwiftRunner.xcodeproj"),
-    skip_archive: true
+    skip_archive: true,
+    skip_package_dependencies_resolution: true # the project has no Swift packages
   )
   sh("swift build")
   # Set by the "Validate Fastlane.swift generation" CI job; set it locally to run the same checks
