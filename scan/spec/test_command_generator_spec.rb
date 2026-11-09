@@ -151,6 +151,9 @@ describe Scan do
       describe "supports number of retries" do
         before(:each) do
           allow(FastlaneCore::Helper).to receive(:xcode_at_least?).and_return(true)
+          # On Xcode 11+, the first build settings lookup on the shared @project resolves Swift packages.
+          # That is this example when it runs alone; otherwise an earlier one has already cached them.
+          allow(FastlaneCore::CommandExecutor).to receive(:execute).with(hash_including(command: start_with("xcodebuild -resolvePackageDependencies")))
         end
 
         it "with 1 or more retries", requires_xcodebuild: true do
