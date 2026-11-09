@@ -71,13 +71,14 @@ lane :execute_tests do
   # Verifying the --help command
   Dir.chdir("..") do
     cmd = Helper.windows? ? "cd bin && fastlane --help" : "PAGER=cat bin/fastlane --help"
-    content = sh(cmd)
+    content = nil
+    # Timed here rather than with benchmark_help_command: its three runs took the same time as this one
+    seconds = seconds_spent { content = sh(cmd) }
+    UI.message("🏎️ 'Total #{format('%.4f', seconds)}s'")
     ["--version", "https://fastlane.tools", "fastlane"].each do |current|
       UI.user_error!("--help missing information: '#{current}'") unless content.include?(current)
     end
   end
-
-  benchmark_help_command
 
   # Run the tests
   build_fastlane_gem(version: version) unless File.file?("pkg/fastlane-#{version}.gem")
