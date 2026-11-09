@@ -280,10 +280,12 @@ RSpec.configure do |config|
       ensure
         allowed = Array(example.metadata[:env_output]).map(&:to_s)
         after = ENV.to_h
-        escaped = ((after.keys - before.keys) | (before.keys - after.keys) |
-                   (before.keys & after.keys).reject { |key| before[key] == after[key] }) - allowed
+        changed = (after.keys - before.keys) | (before.keys - after.keys) |
+                  (before.keys & after.keys).reject { |key| before[key] == after[key] }
+        escaped = changed - allowed
         escaped.each { |key| ENV_GUARD_LEAKS[key] << example.id }
-        ENV.replace(before) if ENV_GUARD_MODE == :enforce
+        # Only the changed keys, not ENV.replace(before): that rewrote every variable after every example
+        changed.each { |key| before.key?(key) ? ENV[key] = before[key] : ENV.delete(key) } if ENV_GUARD_MODE == :enforce
       end
     end
   end
