@@ -118,6 +118,18 @@ describe FastlaneCore do
         }
       end
 
+      it 'reports a missing program without a pty instead of failing on the status it never got' do
+        expect(FastlaneCore::FastlanePty).to receive(:require).with("pty").and_raise(LoadError)
+        allow(FastlaneCore::FastlanePty).to receive(:require).with("open3").and_call_original
+
+        expect {
+          FastlaneCore::FastlanePty.spawn('fl-no-such-program') { |command_stdout, command_stdin, pid| }
+        }.to raise_error(FastlaneCore::FastlanePtyError, /No such file or directory/) { |error|
+          expect(error.exit_status).to eq(-1)
+          expect(error.process_status).to be_nil
+        }
+      end
+
       # could be used to test
       # let(:crasher_path) { File.expand_path("./fastlane_core/spec/crasher/crasher") }
 
