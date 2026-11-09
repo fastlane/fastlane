@@ -1,4 +1,5 @@
 require 'rubygems'
+require_relative '../../../internal/plugin_template_rubocop_config'
 
 initialized = false
 bundled = false
@@ -21,6 +22,8 @@ describe Fastlane::PluginGenerator do
     # Paired with the after(:all) below. Not the block form of Dir.chdir,
     # because rspec has no around(:all).
     before(:all) do
+      # The generated plugin uses this config; regenerate it so the spec also passes under plain `rspec`.
+      Fastlane::Internal::PluginTemplateRubocopConfig.write
       tmp_dir = Dir.mktmpdir
       oldwd = Dir.pwd
       Dir.chdir(tmp_dir)
