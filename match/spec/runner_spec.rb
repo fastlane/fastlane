@@ -17,9 +17,15 @@ describe Match do
     ["10", "11", "16"].each do |xcode_version|
       context "Xcode #{xcode_version}" do
         let(:generate_apple_certs) { xcode_version == "11" }
+        let(:home) { Dir.mktmpdir("match-runner-spec-home") }
+        after { FileUtils.remove_entry(home) }
         before do
           allow(FastlaneCore::Helper).to receive(:mac?).and_return(true)
           allow(FastlaneCore::Helper).to receive(:xcode_version).and_return(xcode_version)
+
+          # Profiles are installed under the home directory. ENV is stubbed below, so HOME cannot be redirected.
+          allow(File).to receive(:expand_path).and_call_original
+          allow(File).to receive(:expand_path).with("~").and_return(home)
 
           stub_const('ENV', { "MATCH_PASSWORD" => '2"QAHg@v(Qp{=*n^' })
         end
