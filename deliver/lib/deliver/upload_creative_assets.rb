@@ -3,6 +3,8 @@ require_relative 'module'
 
 module Deliver
   class UploadCreativeAssets
+    ASSET_CATEGORY = 'CREATIVE_ASSETS'.freeze
+    FEATURE_ID = 'APP_STORE_VERSIONS'.freeze
     PLACEMENT_TYPES = %w[PRODUCT_PAGE_HEADER_ASSET APP_STORE_SEARCH_RESULTS_ASSET].freeze
     REQUIRED_KEYS = %i[locale path placement_type placement_group].freeze
     EDITABLE_VERSION_STATES = %w[PREPARE_FOR_SUBMISSION DEVELOPER_REJECTED REJECTED METADATA_REJECTED INVALID_BINARY].freeze
@@ -60,13 +62,13 @@ module Deliver
         if !existing.empty? && !options[:overwrite_creative_assets]
           UI.user_error!("Creative asset already placed for #{entry[:locale]} / #{entry[:placement_type]} / #{entry[:placement_group]}; set overwrite_creative_assets: true to replace it")
         end
-        { entry: entry, localization: localization, specs: specs, existing: existing }
+        { entry:, localization:, specs:, existing: }
       end
 
       library = Spaceship::ConnectAPI::AppAssetLibrary.get(app_id: app.id)
       UI.user_error!('Apple returned no asset library for this app') unless library
-      uploaded = {}
-      plans.each { |plan| prepare_image(plan, library, uploaded) }
+      uploaded_images_by_path = {}
+      plans.each { |plan| prepare_image(plan, library, uploaded_images_by_path) }
       plans.each { |plan| replace_placement(plan) }
       UI.success('Successfully uploaded and placed creative assets')
     end
@@ -74,25 +76,25 @@ module Deliver
     private
 
     def compatible_specs(reference, entry)
-      feature = (reference.features || []).find { |item| item['featureId'] == 'APP_STORE_VERSIONS' }
+      feature = (reference.features || []).find { |item| item['featureId'] == FEATURE_ID }
       policy = (feature || {}).fetch('placementPolicies', []).find { |item| item['placementType'] == entry[:placement_type] }
       allowed = (policy || {}).fetch('groupLimits', []).any? do |group|
         group.fetch('groupIds', []).include?(entry[:placement_group]) && group.fetch('maxCount', 0) > 0
       end
       type = (reference.placement_types || []).find { |item| item['placementTypeId'] == entry[:placement_type] }
       mapping = (type || {}).fetch('specMappings', []).find { |item| item['placementGroupId'] == entry[:placement_group] }
-      unless allowed && (type || {}).fetch('acceptsAssetCategories', []).include?('CREATIVE_ASSETS') && mapping
+      unless allowed && (type || {}).fetch('acceptsAssetCategories', []).include?(ASSET_CATEGORY) && mapping
         UI.user_error!("Creative asset target is not supported by Apple's current reference data: #{entry[:placement_type]} / #{entry[:placement_group]}")
       end
       mapping.fetch('specs', [])
     end
 
-    def prepare_image(plan, library, uploaded)
+    def prepare_image(plan, library, uploaded_images_by_path)
       entry = plan[:entry]
       path = File.expand_path(entry[:path])
       # Reuse a universal image for both placements and across localizations.
-      image = uploaded[path] ||= Spaceship::ConnectAPI::AppAssetLibraryImage.create(
-        app_asset_library_id: library.id, path: path, category: 'CREATIVE_ASSETS'
+      image = uploaded_images_by_path[path] ||= Spaceship::ConnectAPI::AppAssetLibraryImage.create(
+        app_asset_library_id: library.id, path: path, category: ASSET_CATEGORY
       )
       unless plan[:specs].include?(image.spec_id)
         UI.user_error!("Uploaded image '#{image.id}' is not compatible with #{entry[:placement_type]} / #{entry[:placement_group]}; all existing placements were preserved")
