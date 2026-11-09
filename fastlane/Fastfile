@@ -38,9 +38,10 @@ lane :lint_source do
   ensure_no_debug_code(text: " UI\\.", path: "spaceship/lib", extension: ".rb", exclude_dirs: exclude_dirs)
   ensure_no_debug_code(text: " UI\\.", path: "credentials_manager/lib", extension: ".rb", exclude_dirs: exclude_dirs)
 
-  rubocop(step_name: 'policekeeping_the_code_with_rubocop')
-
   Dir.chdir("..") do
+    # Not the plugin's rubocop action: its -D turns off RuboCop's parallel default (rubocop/rubocop#16338)
+    sh("bundle", "exec", "rubocop", step_name: 'policekeeping_the_code_with_rubocop')
+
     # If no shellcheck - warn and skip, otherwise shellcheck all .sh and .bash files
     if system('which shellcheck > /dev/null 2>&1')
       sh('git ls-files -z "*.sh" "*.bash" | grep -z -v "Pods-" | xargs -0 shellcheck')
