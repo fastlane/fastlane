@@ -30,6 +30,24 @@ describe FastlaneCore do
         expect(result).to eq('foo')
       end
 
+      it 'reads output as UTF-8 whatever the default encoding, and restores it', unless: FastlaneCore::Helper.windows? do
+        allow(FastlaneCore::UI).to receive(:command)
+        allow(FastlaneCore::UI).to receive(:command_output)
+        previous = [Encoding.default_external, Encoding.default_internal]
+        Encoding.default_external = Encoding::US_ASCII
+        Encoding.default_internal = nil
+
+        result = FastlaneCore::CommandExecutor.execute(command: "printf 'caf\\303\\251\\n'", print_all: true)
+        after = [Encoding.default_external, Encoding.default_internal]
+
+        expect(result).to eq("café")
+        expect(result.encoding).to eq(Encoding::UTF_8)
+        expect(FastlaneCore::UI).to have_received(:command_output).with("café")
+        expect(after).to eq([Encoding::US_ASCII, nil])
+      ensure
+        Encoding.default_external, Encoding.default_internal = previous
+      end
+
       it 'names the signal when the command is killed', unless: FastlaneCore::Helper.windows? do
         allow(FastlaneCore::UI).to receive(:command)
         expect do

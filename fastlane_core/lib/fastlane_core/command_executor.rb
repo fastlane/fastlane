@@ -34,6 +34,11 @@ module FastlaneCore
       # @return [String] All the output as string
       def execute(command: nil, print_all: false, print_command: true, error: nil, prefix: nil, loading: nil,
                   suppress_output: false, suppress_error_output: false)
+        # Read the output as UTF-8 whatever the user set, as sh does; restored below
+        previous_encoding = [Encoding.default_external, Encoding.default_internal]
+        Encoding.default_external = Encoding::UTF_8
+        Encoding.default_internal = Encoding::UTF_8
+
         verbose = FastlaneCore::Globals.verbose?
         print_all = true if verbose
         suppress_error_output = false if verbose
@@ -97,6 +102,9 @@ module FastlaneCore
         end
 
         return output.join("\n")
+      ensure
+        Encoding.default_external = previous_encoding.first
+        Encoding.default_internal = previous_encoding.last
       end
     end
   end
