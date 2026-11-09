@@ -196,9 +196,10 @@ lane :generate_swift_api do |options|
     UI.success("Done formatting fastlane.swift API")
   end
   UI.success("Done generating fastlane.swift API, ensuring it builds")
+  # Built, not archived: what SwiftLaneManager.build_runner! does for users
   gym(
     project: File.expand_path("swift/FastlaneSwiftRunner/FastlaneSwiftRunner.xcodeproj"),
-    skip_package_ipa: true
+    skip_archive: true
   )
   sh("swift build")
   # Set by the "Validate Fastlane.swift generation" CI job; set it locally to run the same checks
@@ -207,7 +208,7 @@ lane :generate_swift_api do |options|
     sh("spec/swift/spm-runner/run.sh")
   end
   sh("rm -r ../.build")
-  sh("rm ../FastlaneRunner")
+  sh("rm FastlaneRunner") # the build copies it here; only the archive put it in the repository root
   generated_files
 end
 
