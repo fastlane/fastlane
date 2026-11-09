@@ -34,7 +34,6 @@ describe Match::Generator do
 
       before do
         allow(FastlaneCore::Helper).to receive(:mac?).and_return(is_mac)
-        allow(FastlaneCore::Helper).to receive(:xcode_at_least?).and_return(false)
         allow(Cert::Runner).to receive(:new).and_return(fake_runner)
         allow(fake_runner).to receive(:launch).and_return("fake_path")
         allow(File).to receive(:exist?).and_call_original

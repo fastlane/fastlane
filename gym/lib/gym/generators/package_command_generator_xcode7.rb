@@ -197,7 +197,7 @@ module Gym
 
         # xcodebuild will not use provisioning profiles
         # if we don't specify signingStyle as manual
-        if Helper.xcode_at_least?("9.0") && hash[:provisioningProfiles]
+        if hash[:provisioningProfiles]
           hash[:signingStyle] = 'manual'
         end
 

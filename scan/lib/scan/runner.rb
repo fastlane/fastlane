@@ -52,19 +52,10 @@ module Scan
         end
       end
 
-      retries = Scan.config[:number_of_retries]
-      execute(retries: retries)
+      execute
     end
 
-    def execute(retries: 0)
-      # Set retries to 0 if Xcode 13 because TestCommandGenerator will set '-retry-tests-on-failure -test-iterations'
-      if Helper.xcode_at_least?(13)
-        retries = 0
-        Scan.cache[:retry_attempt] = 0
-      else
-        Scan.cache[:retry_attempt] = Scan.config[:number_of_retries] - retries
-      end
-
+    def execute
       command = @test_command_generator.generate
 
       prefix_hash = [
@@ -86,12 +77,7 @@ module Scan
                                               error: proc do |error_output|
                                                 begin
                                                   exit_status = $?.exitstatus
-                                                  if retries > 0
-                                                    # If there are retries remaining, run the tests again
-                                                    return retry_execute(retries: retries, error_output: error_output)
-                                                  else
-                                                    ErrorHandler.handle_build_error(error_output, @test_command_generator.xcodebuild_log_path)
-                                                  end
+                                                  ErrorHandler.handle_build_error(error_output, @test_command_generator.xcodebuild_log_path)
                                                 rescue => ex
                                                   SlackPoster.new.run({
                                                     build_errors: 1
@@ -101,46 +87,6 @@ module Scan
                                               end)
 
       exit_status
-    end
-
-    def retry_execute(retries:, error_output: "")
-      tests = retryable_tests(error_output)
-
-      if tests.empty?
-        UI.build_failure!("Failed to find failed tests to retry (could not parse error output)")
-      end
-
-      Scan.config[:only_testing] = tests
-      UI.important("Retrying tests: #{Scan.config[:only_testing].join(', ')}")
-
-      retries -= 1
-      UI.important("Number of retries remaining: #{retries}")
-
-      return execute(retries: retries)
-    end
-
-    def retryable_tests(input)
-      input = Helper.strip_ansi_colors(input)
-
-      retryable_tests = []
-
-      failing_tests = input.split("Failing tests:\n").fetch(1, [])
-                           .split("\n\n").first
-
-      suites = failing_tests.split(/(?=\n\s+[\w\s]+:\n)/)
-
-      suites.each do |suite|
-        suite_name = suite.match(/\s*([\w\s\S]+):/).captures.first
-
-        test_cases = suite.split(":\n").fetch(1, []).split("\n").each
-                          .select { |line| line.match?(/^\s+/) }
-                          .map { |line| line.strip.gsub(/[\s\.]/, "/").gsub(/[\-\[\]\(\)]/, "") }
-                          .map { |line| suite_name + "/" + line }
-
-        retryable_tests += test_cases
-      end
-
-      return retryable_tests.uniq
     end
 
     def find_filename(type)

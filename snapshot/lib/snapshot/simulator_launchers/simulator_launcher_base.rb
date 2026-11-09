@@ -97,11 +97,7 @@ module Snapshot
         device_udid = TestCommandGenerator.device_udid(device_type)
 
         UI.message("Launch Simulator #{device_type}")
-        if FastlaneCore::Helper.xcode_at_least?("13")
-          Helper.backticks("open -a Simulator.app --args -CurrentDeviceUDID #{device_udid}", print: FastlaneCore::Globals.verbose?)
-        else
-          Helper.backticks("xcrun instruments -w #{device_udid}", print: FastlaneCore::Globals.verbose?)
-        end
+        Helper.backticks("open -a Simulator.app --args -CurrentDeviceUDID #{device_udid}", print: FastlaneCore::Globals.verbose?)
 
         paths.each do |path|
           UI.message("Adding '#{path}'")
