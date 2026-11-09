@@ -68,4 +68,10 @@ describe Spaceship::ConnectAPI::User do
       Spaceship::ConnectAPI::User.find(client: client, email: "spaceship@krausefx.com")
     end
   end
+
+  it 'loads on its own' do
+    # In a new process: this one has already loaded spaceship.
+    output, status = Open3.capture2e(RbConfig.ruby, "-e", "require 'spaceship/connect_api/models/user'")
+    expect(status.success?).to be(true), output
+  end
 end

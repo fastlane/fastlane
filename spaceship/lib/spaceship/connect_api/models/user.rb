@@ -1,5 +1,4 @@
 require_relative '../model'
-require_relative '../../connect_api'
 
 module Spaceship
   class ConnectAPI
@@ -57,6 +56,9 @@ module Spaceship
         ACCESS_TO_REPORTS = "ACCESS_TO_REPORTS"
         CUSTOMER_SUPPORT = "CUSTOMER_SUPPORT"
       end
+
+      # Not at the top: connect_api loads user_invitation.rb, which reads UserRole while it loads
+      require_relative '../../connect_api'
 
       #
       # API
