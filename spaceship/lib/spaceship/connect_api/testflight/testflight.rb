@@ -211,6 +211,7 @@ module Spaceship
         def create_beta_group(app_id: nil, group_name: nil, is_internal_group: false, public_link_enabled: false, public_link_limit: 10_000, public_link_limit_enabled: false, has_access_to_all_builds: nil)
           attributes = { name: group_name, isInternalGroup: is_internal_group }
           if is_internal_group
+            # Apple's docs don't say which groups take hasAccessToAllBuilds; fastlane sends it for internal groups only, as since #21478
             attributes[:hasAccessToAllBuilds] = has_access_to_all_builds.nil? ? true : has_access_to_all_builds
           else
             attributes.merge!(

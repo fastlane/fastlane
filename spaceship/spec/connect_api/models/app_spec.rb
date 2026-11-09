@@ -152,7 +152,7 @@ describe Spaceship::ConnectAPI::App do
 
       expect(a_request(:post, "https://appstoreconnect.apple.com/iris/v1/betaGroups").with do |request|
         attributes = JSON.parse(request.body).dig("data", "attributes")
-        attributes.values_at("publicLinkEnabled", "publicLinkLimitEnabled", "publicLinkLimit") == [true, true, 42]
+        attributes.values_at("publicLinkEnabled", "publicLinkLimitEnabled", "publicLinkLimit") == [true, true, 42] && !attributes.key?("hasAccessToAllBuilds")
       end).to have_been_made
     end
 
