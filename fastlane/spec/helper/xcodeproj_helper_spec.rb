@@ -76,6 +76,31 @@ describe Fastlane::Actions do
       end
     end
 
+    describe '.open_project!' do
+      let(:json_project_path) do
+        path = File.join(dir, PATH)
+        FileUtils.mkdir_p(path)
+        FileUtils.touch(File.join(path, "project.xcproj"))
+        path
+      end
+
+      it 'opens a project in the JSON format with an xcodeproj gem that supports the format' do
+        stub_const("Xcodeproj::Project::JSONFormat", Module.new)
+        expect(Xcodeproj::Project).to receive(:open).with(json_project_path).and_return(:project)
+
+        expect(Fastlane::Helper::XcodeprojHelper.open_project!(json_project_path)).to eq(:project)
+      end
+
+      it 'tells the user to update the xcodeproj gem when it cannot open a project in the JSON format' do
+        hide_const("Xcodeproj::Project::JSONFormat")
+        expect(Xcodeproj::Project).not_to receive(:open)
+
+        expect do
+          Fastlane::Helper::XcodeprojHelper.open_project!(json_project_path)
+        end.to raise_error(/Update the xcodeproj gem/)
+      end
+    end
+
     describe '.update_project_build_setting' do
       it 'updates matching build settings in the project and targets' do
         build_configuration = Struct.new(:build_settings)
@@ -324,6 +349,23 @@ describe Fastlane::Actions do
         changed = Fastlane::Helper::XcodeprojHelper.update_build_configuration_build_setting(build_configuration, "MARKETING_VERSION", "1.2.3")
 
         expect(changed).to eq(project: false, xcconfig: false)
+      end
+    end
+
+    describe '.project_file_path' do
+      it 'returns project.pbxproj for a project in the plist format' do
+        path = File.join(dir, PATH)
+        FileUtils.mkdir_p(path)
+
+        expect(Fastlane::Helper::XcodeprojHelper.project_file_path(path)).to eq(File.join(path, "project.pbxproj"))
+      end
+
+      it 'returns project.xcproj for a project in the JSON format' do
+        path = File.join(dir, PATH)
+        FileUtils.mkdir_p(path)
+        FileUtils.touch(File.join(path, "project.xcproj"))
+
+        expect(Fastlane::Helper::XcodeprojHelper.project_file_path(path)).to eq(File.join(path, "project.xcproj"))
       end
     end
 

@@ -28,6 +28,37 @@ describe Fastlane do
         allow(FastlaneCore::FastlaneFolder).to receive(:path).and_return(nil)
       end
 
+      it "raises a readable error when the path has no project file" do
+        empty_project_path = Dir.mktmpdir("fl_spec_update_code_signing_empty")
+        project_file_path = File.join(empty_project_path, "project.pbxproj")
+
+        expect do
+          Fastlane::FastFile.new.parse("lane :test do
+            update_code_signing_settings(use_automatic_signing: true, path: '#{empty_project_path}')
+          end").runner.execute(:test)
+        end.to raise_error(FastlaneCore::Interface::FastlaneError, /Could not find path to project config '#{Regexp.escape(project_file_path)}'/)
+      end
+
+      it "accepts a project in Xcode's JSON format, which has no TargetAttributes" do
+        json_project_path = File.join(Dir.mktmpdir("fl_spec_update_code_signing_json"), "App.xcodeproj")
+        FileUtils.mkdir_p(json_project_path)
+        FileUtils.touch(File.join(json_project_path, "project.xcproj"))
+        project = Xcodeproj::Project.new(json_project_path)
+        project.new_target(:application, "App", :ios)
+        project.root_object.attributes.delete("TargetAttributes")
+        # Opening a JSON format project needs a newer xcodeproj gem, which has this module
+        stub_const("Xcodeproj::Project::JSONFormat", Module.new)
+        allow(Xcodeproj::Project).to receive(:open).with(json_project_path).and_return(project)
+        expect(project).to receive(:save)
+
+        result = Fastlane::FastFile.new.parse("lane :test do
+          update_code_signing_settings(use_automatic_signing: true, path: '#{json_project_path}')
+        end").runner.execute(:test)
+
+        expect(result).to eq(true)
+        expect(project.targets.first.build_configurations.map { |config| config.build_settings["CODE_SIGN_STYLE"] }).to eq(["Automatic", "Automatic"])
+      end
+
       it "Automatic code signing" do
         allow(UI).to receive(:success)
         expect(UI).to receive(:success).with("Successfully updated project settings to use Code Sign Style = 'Automatic'")

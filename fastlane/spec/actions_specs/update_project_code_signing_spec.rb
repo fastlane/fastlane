@@ -28,6 +28,12 @@ describe Fastlane do
       it "prefers :uuid when both are given" do
         expect(run_action("uuid: 'NEW', udid: 'OTHER'")).to eq("PROVISIONING_PROFILE = \"NEW\";\n")
       end
+
+      it "raises an error for a project that uses the JSON project format" do
+        FileUtils.mv(File.join(@project, "project.pbxproj"), File.join(@project, "project.xcproj"))
+
+        expect { run_action("uuid: 'NEW'") }.to raise_error(/can't change projects that use Xcode's JSON project format/)
+      end
     end
   end
 end

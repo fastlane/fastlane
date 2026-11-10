@@ -18,10 +18,40 @@ module Fastlane
         end
 
         if project_path && File.exist?(project_path)
-          return Xcodeproj::Project.open(project_path)
+          return open_project!(project_path)
         else
           UI.user_error!("Unable to find Xcode project at #{project_path || xcodeproj_path_or_dir}")
         end
+      end
+
+      # Opens the project at the given path.
+      # A project in Xcode's JSON format needs a version of the xcodeproj gem that can read that format. An older
+      # version only reports that `project.pbxproj` doesn't exist, so this method tells the user to update the gem.
+      def self.open_project!(xcodeproj_path)
+        require 'xcodeproj'
+
+        if json_format?(xcodeproj_path) && !Xcodeproj::Project.const_defined?(:JSONFormat, false)
+          UI.user_error!("'#{xcodeproj_path}' uses Xcode's JSON project format (project.xcproj), which the installed version of the xcodeproj gem can't open. Update the xcodeproj gem to a version that supports the JSON project format.")
+        end
+        Xcodeproj::Project.open(xcodeproj_path)
+      end
+
+      # Returns whether the project uses Xcode's JSON project format, which stores the project in
+      # `project.xcproj` instead of `project.pbxproj`.
+      def self.json_format?(xcodeproj_path)
+        File.exist?(File.join(xcodeproj_path, "project.xcproj"))
+      end
+
+      # Returns the path of the file that stores the project.
+      def self.project_file_path(xcodeproj_path)
+        File.join(xcodeproj_path, json_format?(xcodeproj_path) ? "project.xcproj" : "project.pbxproj")
+      end
+
+      # Returns whether the project file has a format that is too old for the code signing actions.
+      # Xcode has stored TargetAttributes in projects for a long time, so a project without them is very old.
+      # Projects in Xcode's JSON format are the exception, because they only keep TargetAttributes for legacy signing settings.
+      def self.very_old_project_format?(project)
+        !project.root_object.attributes["TargetAttributes"] && !json_format?(project.path)
       end
 
       # Returns the given project path, or the path of the only project in the current directory.

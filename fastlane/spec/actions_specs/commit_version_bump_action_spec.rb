@@ -74,6 +74,30 @@ describe Fastlane::Actions::CommitVersionBumpAction do
     end
   end
 
+  describe 'run' do
+    it 'commits project.xcproj for a project that uses the JSON project format' do
+      repo = File.realpath(Dir.mktmpdir)
+      project_file = File.join(repo, "App.xcodeproj", "project.xcproj")
+      FileUtils.mkdir_p(File.dirname(project_file))
+      FileUtils.touch(project_file)
+      # Opening a JSON format project needs a newer xcodeproj gem, which has this module.
+      # The action only reads the project's build configurations.
+      stub_const("Xcodeproj::Project::JSONFormat", Module.new)
+      allow(Xcodeproj::Project).to receive(:open).and_return(double("project", objects: []))
+      allow(Fastlane::Actions).to receive(:sh).with('git rev-parse --show-toplevel').and_return(repo)
+      allow(Fastlane::Actions).to receive(:sh).with('git diff --name-only HEAD').and_return("App.xcodeproj/project.xcproj")
+      allow(Fastlane::Actions).to receive(:sh).with('git ls-files --other --exclude-standard').and_return("")
+      expect(Fastlane::Actions).to receive(:sh).with("git add #{project_file.shellescape}")
+      expect(Fastlane::Actions).to receive(:sh).with(/git commit/)
+
+      Dir.chdir(repo) do
+        Fastlane::FastFile.new.parse("lane :test do
+          commit_version_bump(xcodeproj: 'App.xcodeproj')
+        end").runner.execute(:test)
+      end
+    end
+  end
+
   describe 'build_git_command' do
     it 'creates a git commit with the provided message' do
       command = action.build_git_command(message: "my commit message")
