@@ -5,36 +5,16 @@ module Fastlane
     end
 
     class GetBuildNumberAction < Action
-      require 'shellwords'
+      require 'fastlane/helper/xcodeproj_helper'
 
       def self.run(params)
         # More information about how to set up your project and how it works:
         # https://developer.apple.com/library/ios/qa/qa1827/_index.html
+        project = Helper::XcodeprojHelper.get_single_project!(params[:xcodeproj])
+        build_number = Helper::XcodeprojHelper.current_build_number!(project)
 
-        folder = params[:xcodeproj] ? File.join(params[:xcodeproj], '..') : '.'
-
-        command_prefix = [
-          'cd',
-          File.expand_path(folder).shellescape,
-          '&&'
-        ].join(' ')
-
-        command = [
-          command_prefix,
-          'agvtool',
-          'what-version',
-          '-terse'
-        ].join(' ')
-
-        if Helper.test?
-          Actions.lane_context[SharedValues::BUILD_NUMBER] = command
-        else
-          build_number = Actions.sh(command).split("\n").last.strip
-
-          # Store the number in the shared hash
-          Actions.lane_context[SharedValues::BUILD_NUMBER] = build_number
-        end
-        return build_number
+        # Store the number in the shared hash
+        return Actions.lane_context[SharedValues::BUILD_NUMBER] = build_number
       rescue => ex
         return false if params[:hide_error_when_versioning_disabled]
         UI.error('Before being able to increment and read the version number from your Xcode project, you first need to setup your project properly. Please follow the guide at https://developer.apple.com/library/content/qa/qa1827/_index.html')

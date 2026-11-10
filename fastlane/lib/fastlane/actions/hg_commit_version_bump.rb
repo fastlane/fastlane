@@ -156,7 +156,7 @@ module Fastlane
         LIST
         [
           "The mercurial equivalent of the [commit_version_bump](https://docs.fastlane.tools/actions/commit_version_bump/) git action. Like the git version, it is useful in conjunction with [`increment_build_number`](https://docs.fastlane.tools/actions/increment_build_number/).",
-          "It checks the repo to make sure that only the relevant files have changed, these are the files that `increment_build_number` (`agvtool`) touches:".markdown_preserve_newlines,
+          "It checks the repo to make sure that only the relevant files have changed, these are the files that `increment_build_number` touches:".markdown_preserve_newlines,
           list,
           "Then commits those files to the repo.",
           "Customize the message with the `:message` option, defaults to 'Version Bump'",

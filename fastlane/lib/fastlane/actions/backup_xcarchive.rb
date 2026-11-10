@@ -6,6 +6,7 @@ module Fastlane
 
     class BackupXcarchiveAction < Action
       require 'fileutils'
+      require 'fastlane/helper/xcodeproj_helper'
 
       def self.run(params)
         # Get params
@@ -20,8 +21,7 @@ module Fastlane
 
         if versioned
           date = Time.now.strftime("%Y-%m-%d")
-          version = `agvtool what-marketing-version -terse1`
-          subfolder = "#{date} #{version.strip}"
+          subfolder = "#{date} #{marketing_version}"
           full_destination = File.expand_path(subfolder, base_destination)
         end
 
@@ -53,6 +53,16 @@ module Fastlane
 
           Actions.lane_context[SharedValues::BACKUP_XCARCHIVE_FILE] = "#{full_destination}/#{File.basename(xcarchive)}"
         end
+      end
+
+      # Returns the version in the first Info.plist of the project in the current directory.
+      # Returns an empty string when the current directory has no single project or no version.
+      def self.marketing_version
+        project_path = Helper::XcodeprojHelper.single_project_path(nil)
+        return "" unless project_path
+
+        project = Helper::XcodeprojHelper.get_project!(project_path)
+        Helper::XcodeprojHelper.info_plist_values(project, "CFBundleShortVersionString").first.to_s.strip
       end
 
       #####################################################
