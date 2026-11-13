@@ -33,7 +33,7 @@ module Fastlane
         command << target unless target.to_s.empty?
         # The value is a secret: run never prints the output unless asked, and keeps stderr out of it
         value = FastlaneCore::CommandExecutor.run(*command, separate_stderr: true, print_command: false)
-        value.split("]").last.to_s.strip
+        value.split("]").last.strip
       end
 
       def self.author
