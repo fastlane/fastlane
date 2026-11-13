@@ -306,7 +306,7 @@ FastlaneAppTests.testCoinToss()
           should_zip_build_products: false
         })
 
-        expect(FastlaneCore::Helper).to receive(:backticks).with(anything).exactly(0).times
+        expect(FastlaneCore::CommandExecutor).not_to receive(:execute)
 
         scan = Scan::Runner.new
         scan.zip_build_products
@@ -325,8 +325,8 @@ FastlaneAppTests.testCoinToss()
 
         output_path = File.absolute_path('/tmp/scan_results/build_products.zip')
 
-        expect(FastlaneCore::Helper).to receive(:backticks)
-          .with("cd #{path.shellescape} && rm -f #{output_path.shellescape} && zip -r #{output_path.shellescape} *", { print: false })
+        expect(FastlaneCore::CommandExecutor).to receive(:execute)
+          .with(hash_including(command: "cd #{path.shellescape} && rm -f #{output_path.shellescape} && zip -r #{output_path.shellescape} *", print_all: false))
           .exactly(1).times
 
         scan = Scan::Runner.new

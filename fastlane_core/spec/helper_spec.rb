@@ -240,16 +240,16 @@ describe FastlaneCore do
       let(:the_zip) { File.absolute_path('/tmp/thezip.zip') }
 
       it "creates correct zip command with contents_only set to false with default print option (true)" do
-        expect(FastlaneCore::Helper).to receive(:backticks)
-          .with("cd #{directory.shellescape} && zip -r #{the_zip.shellescape} to_zip", print: true)
+        expect(FastlaneCore::CommandExecutor).to receive(:execute)
+          .with(hash_including(command: "cd #{directory.shellescape} && zip -r #{the_zip.shellescape} to_zip", print_all: true))
           .exactly(1).times
 
         FastlaneCore::Helper.zip_directory(directory_to_zip, the_zip, contents_only: false)
       end
 
       it "creates correct zip command with contents_only set to true with print set to false" do
-        expect(FastlaneCore::Helper).to receive(:backticks)
-          .with("cd #{directory_to_zip.shellescape} && zip -r #{the_zip.shellescape} *", print: false)
+        expect(FastlaneCore::CommandExecutor).to receive(:execute)
+          .with(hash_including(command: "cd #{directory_to_zip.shellescape} && zip -r #{the_zip.shellescape} *", print_all: false))
           .exactly(1).times
         expect(FastlaneCore::UI).to receive(:command).exactly(1).times
 
@@ -259,11 +259,22 @@ describe FastlaneCore do
       it "keeps paths with an apostrophe and a space as one argument each" do
         folder = File.absolute_path("/tmp/Kaldi's Kafe")
         command = nil
-        allow(FastlaneCore::Helper).to receive(:backticks) { |cmd, print:| command = cmd }
+        allow(FastlaneCore::CommandExecutor).to receive(:execute) { |options| command = options[:command] }
 
         FastlaneCore::Helper.zip_directory(File.join(folder, "Build Products"), File.join(folder, "out put.zip"), overwrite: true)
 
         expect(Shellwords.split(command)).to eq(["cd", folder, "&&", "rm", "-f", File.join(folder, "out put.zip"), "&&", "zip", "-r", File.join(folder, "out put.zip"), "Build Products"])
+      end
+
+      it "fails when zip cannot write the archive" do
+        Dir.mktmpdir do |tmp|
+          FileUtils.mkdir_p(File.join(tmp, "products"))
+          File.write(File.join(tmp, "products", "file"), "")
+
+          expect do
+            FastlaneCore::Helper.zip_directory(File.join(tmp, "products"), File.join(tmp, "missing", "out.zip"), contents_only: true, print: false)
+          end.to raise_error(FastlaneCore::Interface::FastlaneError, /Could not zip/)
+        end
       end
     end
 
