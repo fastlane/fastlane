@@ -116,7 +116,7 @@ describe FastlaneCore do
           "  - Muffins\n"
         ]
 
-        fake_std_out = 'not_really_std_out'
+        fake_std_out = +'not_really_std_out'
 
         expect(fake_std_in).to receive(:close)
         expect(fake_std_out).to receive(:close)

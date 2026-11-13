@@ -4,11 +4,11 @@ require 'webmock'
 
 describe Precheck do
   describe Precheck::RuleProcessor do
-    let(:fake_happy_app) { "fake_app_object" }
-    let(:fake_happy_app_version) { "fake_app_version_object" }
-    let(:fake_happy_app_info) { "fake_app_info_object" }
-    let(:fake_in_app_purchase) { "fake_in_app_purchase" }
-    let(:fake_in_app_purchase_edit) { "fake_in_app_purchase_edit" }
+    let(:fake_happy_app) { +"fake_app_object" }
+    let(:fake_happy_app_version) { +"fake_app_version_object" }
+    let(:fake_happy_app_info) { +"fake_app_info_object" }
+    let(:fake_in_app_purchase) { +"fake_in_app_purchase" }
+    let(:fake_in_app_purchase_edit) { +"fake_in_app_purchase_edit" }
     let(:fake_in_app_purchase_edit_version) { { "de-DE": { name: "iap name", description: "iap desc" } } }
     let(:fake_in_app_purchases) { [fake_in_app_purchase] }
 
@@ -37,8 +37,8 @@ describe Precheck do
     end
 
     def setup_happy_url_rule_mock
-      request = "fake request"
-      head_object = "fake head object"
+      request = +"fake request"
+      head_object = +"fake head object"
 
       allow(head_object).to receive(:status).and_return(200)
 

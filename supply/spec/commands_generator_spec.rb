@@ -3,13 +3,13 @@ require 'supply/setup'
 
 describe Supply::CommandsGenerator do
   def expect_uploader_perform_upload
-    fake_uploader = "uploader"
+    fake_uploader = +"uploader"
     expect(Supply::Uploader).to receive(:new).and_return(fake_uploader)
     expect(fake_uploader).to receive(:perform_upload)
   end
 
   def expect_setup_perform_download
-    fake_setup = "setup"
+    fake_setup = +"setup"
     expect(Supply::Setup).to receive(:new).and_return(fake_setup)
     expect(fake_setup).to receive(:perform_download)
   end

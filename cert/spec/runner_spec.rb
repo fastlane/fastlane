@@ -70,7 +70,7 @@ describe Cert do
           certificate = stub_certificate
 
           allow(Spaceship::ConnectAPI).to receive(:login).and_return(nil)
-          allow(Spaceship::ConnectAPI).to receive(:client).and_return("client")
+          allow(Spaceship::ConnectAPI).to receive(:client).and_return(+"client")
           allow(Spaceship::ConnectAPI.client).to receive(:in_house?).and_return(false)
 
           allow(Spaceship::ConnectAPI::Certificate).to receive(:all).and_return([certificate])
@@ -102,7 +102,7 @@ describe Cert do
           good_cert = stub_certificate
 
           allow(Spaceship::ConnectAPI).to receive(:login).and_return(nil)
-          allow(Spaceship::ConnectAPI).to receive(:client).and_return("client")
+          allow(Spaceship::ConnectAPI).to receive(:client).and_return(+"client")
           allow(Spaceship::ConnectAPI.client).to receive(:in_house?).and_return(false)
 
           allow(Spaceship::ConnectAPI::Certificate).to receive(:all).and_return([expired_cert, good_cert])
@@ -115,7 +115,7 @@ describe Cert do
           good_cert = stub_certificate
 
           allow(Spaceship::ConnectAPI).to receive(:login).and_return(nil)
-          allow(Spaceship::ConnectAPI).to receive(:client).and_return("client")
+          allow(Spaceship::ConnectAPI).to receive(:client).and_return(+"client")
           allow(Spaceship::ConnectAPI.client).to receive(:in_house?).and_return(false)
           allow(Spaceship::ConnectAPI::Certificate).to receive(:all).and_return([expired_cert, good_cert])
 
@@ -133,7 +133,7 @@ describe Cert do
           expired_cert_2 = stub_certificate("expired_cert_2", false)
 
           allow(Spaceship::ConnectAPI).to receive(:login).and_return(nil)
-          allow(Spaceship::ConnectAPI).to receive(:client).and_return("client")
+          allow(Spaceship::ConnectAPI).to receive(:client).and_return(+"client")
           allow(Spaceship::ConnectAPI.client).to receive(:in_house?).and_return(false)
           allow(Spaceship::ConnectAPI::Certificate).to receive(:all).and_return([expired_cert_1, expired_cert_2])
 
@@ -158,7 +158,7 @@ describe Cert do
 
           before do
             allow(Spaceship::ConnectAPI).to receive(:login).and_return(nil)
-            allow(Spaceship::ConnectAPI).to receive(:client).and_return("client")
+            allow(Spaceship::ConnectAPI).to receive(:client).and_return(+"client")
             allow(Spaceship::ConnectAPI.client).to receive(:in_house?).and_return(false)
             allow(Spaceship::ConnectAPI::Certificate).to receive(:all).and_return([certificate])
 

@@ -47,7 +47,7 @@ module FastlaneCore
       end
 
       def colorize_array(array, colors)
-        value = ""
+        value = +""
         array.each do  |l|
           colored_line = l
           colored_line = "#{colors.first}#{l}#{colors.last}" if colors.length > 0

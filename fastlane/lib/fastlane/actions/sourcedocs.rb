@@ -4,7 +4,7 @@ module Fastlane
       def self.run(params)
         UI.user_error!("You have to install sourcedocs using `brew install sourcedocs`") unless Helper.which('sourcedocs') || Helper.test?
 
-        command =  "sourcedocs generate"
+        command = +"sourcedocs generate"
         command << " --all-modules" if params[:all_modules]
         command << " --spm-module #{params[:spm_module].shellescape}" unless params[:spm_module].nil?
         command << " --module-name #{params[:module_name].shellescape}" unless params[:module_name].nil?
