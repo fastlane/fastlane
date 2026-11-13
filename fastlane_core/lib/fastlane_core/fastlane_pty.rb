@@ -21,13 +21,14 @@ module FastlaneCore
 
   class FastlanePty
     # @param env [Hash] environment variables for the command only, e.g. a value it should not get on its command line
-    def self.spawn(command, env: {}, &block)
-      spawn_with_pty(command, env: env, &block)
+    # @param chdir [String] directory the command runs in; fastlane's own stays as it is
+    def self.spawn(command, env: {}, chdir: nil, &block)
+      spawn_with_pty(command, env: env, chdir: chdir, &block)
     rescue LoadError
-      spawn_with_popen(command, env: env, &block)
+      spawn_with_popen(command, env: env, chdir: chdir, &block)
     end
 
-    def self.spawn_with_pty(original_command, env: {}, &block)
+    def self.spawn_with_pty(original_command, env: {}, chdir: nil, &block)
       require 'pty'
       # this forces the PTY flush - fixes #21792
       command = ENV['FASTLANE_EXEC_FLUSH_PTY_WORKAROUND'] ? "#{original_command};" : original_command
@@ -36,7 +37,7 @@ module FastlaneCore
       # that runs a subprocess in between overwrites it, and nothing writes it at
       # all when the wait does not happen. See fastlane#30188.
       status = nil
-      PTY.spawn(*spawn_args(env, command)) do |command_stdout, command_stdin, pid|
+      PTY.spawn(*spawn_args(env, command, chdir)) do |command_stdout, command_stdin, pid|
         begin
           yield(command_stdout, command_stdin, pid)
         rescue Errno::EIO
@@ -72,10 +73,10 @@ module FastlaneCore
       raise FastlanePtyError.new(e, status&.exitstatus || e.exit_status, status)
     end
 
-    def self.spawn_with_popen(command, env: {}, &block)
+    def self.spawn_with_popen(command, env: {}, chdir: nil, &block)
       status = nil
       require 'open3'
-      Open3.popen2e(*spawn_args(env, command)) do |command_stdin, command_stdout, p| # note the inversion
+      Open3.popen2e(*spawn_args(env, command, chdir)) do |command_stdin, command_stdout, p| # note the inversion
         status = p.value
         yield(command_stdout, command_stdin, status.pid)
         command_stdin.close
@@ -89,9 +90,10 @@ module FastlaneCore
       raise FastlanePtyError.new(e, status&.exitstatus || e.exit_status, status)
     end
 
-    # Existing callers keep calling spawn with the command alone
-    def self.spawn_args(env, command)
-      (env || {}).empty? ? [command] : [env, command]
+    # Existing callers keep calling spawn with the command alone: env and chdir are added only when given
+    def self.spawn_args(env, command, chdir = nil)
+      args = (env || {}).empty? ? [command] : [env, command]
+      chdir ? args + [{ chdir: chdir }] : args
     end
 
     # "SIGKILL" for a process killed by a signal, nil otherwise: Process::Status#exitstatus is nil only then

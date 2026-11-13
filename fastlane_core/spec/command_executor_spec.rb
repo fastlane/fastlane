@@ -30,6 +30,17 @@ describe FastlaneCore do
         expect(result).to eq('foo')
       end
 
+      it 'gives env to the command only, without printing it' do
+        allow(FastlaneCore::UI).to receive(:command)
+        command = "#{RbConfig.ruby.shellescape} -e \"puts ENV['FL_SPEC_EXECUTE_ENV']\""
+
+        result = FastlaneCore::CommandExecutor.execute(command: command, env: { 'FL_SPEC_EXECUTE_ENV' => 'EXAMPLE-VALUE' })
+
+        expect(result).to eq('EXAMPLE-VALUE')
+        expect(ENV.key?('FL_SPEC_EXECUTE_ENV')).to be(false)
+        expect(FastlaneCore::UI).to have_received(:command).with(command)
+      end
+
       it 'reads output as UTF-8 whatever the default encoding, and restores it', unless: FastlaneCore::Helper.windows? do
         allow(FastlaneCore::UI).to receive(:command)
         allow(FastlaneCore::UI).to receive(:command_output)
@@ -54,6 +65,15 @@ describe FastlaneCore do
           # The shell Ruby starts kills itself: Ubuntu's dash, given "sh -c ...", would wait for the inner shell and exit 137
           FastlaneCore::CommandExecutor.execute(command: "kill -9 $$", suppress_error_output: true)
         end.to raise_error(FastlaneCore::FastlanePtyError, /\AProcess crashed: killed by SIGKILL\z/)
+      end
+
+      it 'runs the command in chdir, leaving fastlane\'s directory alone' do
+        allow(FastlaneCore::UI).to receive(:command)
+        Dir.mktmpdir do |dir|
+          result = FastlaneCore::CommandExecutor.execute(command: "#{RbConfig.ruby.shellescape} -e \"puts Dir.pwd\"", chdir: dir)
+          expect(result).to eq(File.realpath(dir))
+          expect(Dir.pwd).not_to eq(File.realpath(dir))
+        end
       end
 
       it 'handles reading which throws a EIO exception', requires_pty: true do
@@ -344,6 +364,110 @@ Shopping list:
 
         expect(raised_error).to be_a(FastlaneCore::Interface::FastlaneError)
         expect(raised_error.to_s).to eq("Exit status: 42")
+      end
+    end
+
+    describe "run" do
+      # The Ruby running the specs, as a child program that exists on every platform
+      def ruby(script)
+        [RbConfig.ruby, "-e", script]
+      end
+
+      before do
+        allow(FastlaneCore::UI).to receive(:command)
+        allow(FastlaneCore::UI).to receive(:command_output)
+      end
+
+      it "passes each argument to the program as given, without a shell" do
+        output = described_class.run(*ruby("print ARGV.inspect"), "$HOME a  b", "it's")
+        expect(output).to eq('["$HOME a  b", "it\'s"]')
+      end
+
+      it "runs a single string as a program name, not as a shell command line" do
+        expect do
+          described_class.run("echo hello")
+        end.to raise_error(FastlaneCore::Interface::FastlaneError, /`#{Regexp.escape(['echo hello'].shelljoin)}` failed: No such file or directory/)
+      end
+
+      it "returns stdout and stderr together by default" do
+        expect(described_class.run(*ruby("$stdout.print 'out '; $stdout.flush; $stderr.print 'err'"))).to eq("out err")
+      end
+
+      it "returns stdout only with separate_stderr" do
+        expect(described_class.run(*ruby("print 'out'; $stderr.puts 'err'"), separate_stderr: true)).to eq("out")
+      end
+
+      it "raises with the exit status and the end of the output" do
+        expect do
+          described_class.run(*ruby("print 'out'; $stderr.puts 'err'; exit 3"), separate_stderr: true)
+        end.to raise_error(FastlaneCore::Interface::FastlaneError, /failed with exit status 3:\nerr/)
+      end
+
+      it "returns what the error block returns instead of raising" do
+        result = described_class.run(*ruby("$stderr.puts 'err'; exit 3"), separate_stderr: true, error: ->(output, status) { [output, status.exitstatus] })
+        expect(result).to eq(["err\n", 3])
+      end
+
+      it "fails like a failed command when the program does not exist" do
+        expect do
+          described_class.run("fl-no-such-program", "x")
+        end.to raise_error(FastlaneCore::Interface::FastlaneError, /`fl-no-such-program x` failed: No such file or directory/)
+      end
+
+      it "gives the error block a missing program too" do
+        expect(described_class.run("fl-no-such-program", error: ->(output, status) { [output, status] })).to match([/No such file or directory/, nil])
+      end
+
+      it "passes an environment hash given first" do
+        expect(described_class.run({ "FL_SPEC_RUN" => "set" }, *ruby("print ENV['FL_SPEC_RUN']"))).to eq("set")
+      end
+
+      it "writes stdin to the program" do
+        expect(described_class.run(*ruby("print $stdin.read"), stdin: "data")).to eq("data")
+      end
+
+      it "gives the program an empty input when no stdin is given, instead of one nobody writes to" do
+        expect(Timeout.timeout(10) { described_class.run(*ruby("print $stdin.read.inspect")) }).to eq('""')
+      end
+
+      it "prints the command, shell-escaped, and not its output by default" do
+        described_class.run(*ruby("print 'secret'"), "a b")
+        expect(FastlaneCore::UI).to have_received(:command).with(/ #{Regexp.escape(['-e', "print 'secret'", 'a b'].shelljoin)}\z/)
+        expect(FastlaneCore::UI).not_to have_received(:command_output)
+      end
+
+      it "prints both streams with print_output" do
+        described_class.run(*ruby("puts 'out'; $stderr.puts 'err'"), separate_stderr: true, print_output: true)
+        expect(FastlaneCore::UI).to have_received(:command_output).with("out")
+        expect(FastlaneCore::UI).to have_received(:command_output).with("err")
+      end
+
+      it "names the signal when the program is killed", unless: FastlaneCore::Helper.windows? do
+        expect do
+          described_class.run(*ruby("Process.kill(:KILL, Process.pid)"))
+        end.to raise_error(FastlaneCore::Interface::FastlaneError, /failed: killed by SIGKILL/)
+      end
+
+      it "runs the program in chdir, leaving fastlane's directory alone" do
+        Dir.mktmpdir do |dir|
+          expect(described_class.run(*ruby("print Dir.pwd"), chdir: dir)).to eq(File.realpath(dir))
+          expect(Dir.pwd).not_to eq(File.realpath(dir))
+        end
+      end
+
+      it "fails naming the directory, not the program, when chdir does not exist" do
+        expect do
+          described_class.run(*ruby("print 1"), chdir: "/fl-no-such-dir")
+        end.to raise_error(FastlaneCore::Interface::FastlaneError, %r{failed: no directory '/fl-no-such-dir'})
+      end
+
+      it "gives the error block a missing chdir too" do
+        expect(described_class.run(*ruby("print 1"), chdir: "/fl-no-such-dir", error: ->(output, status) { [output, status] })).to eq(["no directory '/fl-no-such-dir'", nil])
+      end
+
+      it "does not block when the program writes a lot to stderr" do
+        output = Timeout.timeout(20) { described_class.run(*ruby("$stderr.write('x' * 1_048_576); print 'out'"), separate_stderr: true) }
+        expect(output).to eq("out")
       end
     end
 

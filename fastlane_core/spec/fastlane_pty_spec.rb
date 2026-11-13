@@ -176,6 +176,16 @@ describe FastlaneCore do
       end
     end
 
+    describe "spawn_args" do
+      it "passes the command alone when no option is given, as existing callers expect" do
+        expect(described_class.spawn_args({}, "echo foo")).to eq(["echo foo"])
+      end
+
+      it "adds env and chdir only when given" do
+        expect(described_class.spawn_args({ "A" => "1" }, "echo foo", "/tmp")).to eq([{ "A" => "1" }, "echo foo", { chdir: "/tmp" }])
+      end
+    end
+
     describe "spawn_with_pty" do
       # Both examples are about the command string that reaches PTY.spawn and
       # nothing else. Stubbing it means the block never runs, so no status is
