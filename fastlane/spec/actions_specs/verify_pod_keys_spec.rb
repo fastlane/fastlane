@@ -28,9 +28,9 @@ describe Fastlane do
       describe "the pod keys command" do
         def command_for(key, target)
           command = nil
-          allow(Open3).to receive(:capture3) do |*args|
+          allow(FastlaneCore::CommandExecutor).to receive(:run) do |*args, **_options|
             command = args
-            ["[cocoapods-keys] secret", "", double("status", success?: true)]
+            "[cocoapods-keys] secret"
           end
           Fastlane::Actions::VerifyPodKeysAction.value(key, target)
           command

@@ -31,10 +31,8 @@ module Fastlane
       def self.value(key, target)
         command = ["pod", "keys", "get", key]
         command << target unless target.to_s.empty?
-        # Not Actions.sh: it adds stderr to the value, and --troubleshoot would print the secret
-        require 'open3'
-        value, error, status = Open3.capture3(*command)
-        UI.user_error!("`#{command.shelljoin}` failed: #{error.strip}") unless status.success?
+        # The value is a secret: run never prints the output unless asked, and keeps stderr out of it
+        value = FastlaneCore::CommandExecutor.run(*command, separate_stderr: true, print_command: false)
         value.split("]").last.to_s.strip
       end
 
