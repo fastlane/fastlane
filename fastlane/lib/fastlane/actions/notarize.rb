@@ -66,15 +66,18 @@ module Fastlane
         end
 
         submit_command = submit_parts.join(' ')
+        notarytool_error = nil
         submit_response = Actions.sh(
           submit_command,
           log: verbose,
+          separate_stderr: true,
           error_callback: lambda { |msg|
+            notarytool_error = msg
             UI.error("Error polling for notarization info: #{msg}")
           }
         )
 
-        notarization_info = JSON.parse(submit_response)
+        notarization_info = parse_notarytool_result(submit_response, notarytool_error)
 
         # Staple
         submission_id = notarization_info["id"]
@@ -113,6 +116,12 @@ module Fastlane
         end
       ensure
         temp_file.delete if temp_file
+      end
+
+      def self.parse_notarytool_result(output, error)
+        JSON.parse(output)
+      rescue JSON::ParserError
+        UI.user_error!("notarytool did not return a notarization result:\n#{error || output}")
       end
 
       def self.staple(package_path, verbose)
