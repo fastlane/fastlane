@@ -612,6 +612,23 @@ describe Fastlane do
           expect(result).to eq("swiftlint lint")
         end
       end
+
+      context "when swiftlint version fails", unless: FastlaneCore::Helper.windows? do
+        it "fails with its message" do
+          allow(Fastlane::Actions::SwiftlintAction).to receive(:swiftlint_version).and_call_original
+          allow(FastlaneCore::Helper).to receive(:sh_enabled?).and_return(true)
+
+          Dir.mktmpdir("fl_spec_swiftlint") do |bin_dir|
+            executable = File.join(bin_dir, "swiftlint")
+            File.write(executable, "#!/bin/sh\necho 'dyld: Library not loaded: libsourcekitdInProc.dylib' >&2\nexit 1\n")
+            File.chmod(0o755, executable)
+
+            expect do
+              Fastlane::Actions::SwiftlintAction.swiftlint_version(executable: executable)
+            end.to raise_error(FastlaneCore::Interface::FastlaneError, /Library not loaded/)
+          end
+        end
+      end
     end
   end
 end

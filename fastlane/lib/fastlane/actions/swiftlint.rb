@@ -76,7 +76,10 @@ module Fastlane
       # Get current SwiftLint version
       def self.swiftlint_version(executable: nil)
         binary = executable || 'swiftlint'
-        Gem::Version.new(`#{binary} version`.chomp)
+        version = Actions.sh("#{binary} version", log: false, separate_stderr: true, error_callback: lambda { |error|
+          UI.user_error!("`#{binary} version` failed: #{error.strip}")
+        })
+        Gem::Version.new(version.chomp)
       end
 
       def self.supported_no_cache_option(params)
