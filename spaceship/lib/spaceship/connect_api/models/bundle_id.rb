@@ -81,12 +81,26 @@ module Spaceship
         return resp.to_models.first
       end
 
+      # Session clients use the legacy bundleIds PATCH; API-key clients use the endpoints below.
       def update_capability(capability_type, enabled: false, settings: [], client: nil)
         raise "capability_type is required " if capability_type.nil?
 
         client ||= Spaceship::ConnectAPI
-        resp = client.patch_bundle_id_capability(bundle_id_id: id, seed_id: seed_id, enabled: enabled, capability_type: capability_type, settings: settings)
-        return resp.to_models.first
+
+        unless client.token
+          resp = client.patch_bundle_id_capability(bundle_id_id: id, seed_id: seed_id, enabled: enabled, capability_type: capability_type, settings: settings)
+          return resp.to_models.first
+        end
+
+        existing = get_capabilities(client: client).find { |capability| capability.is_type?(capability_type) }
+
+        if enabled
+          return create_capability(capability_type, settings: settings, client: client) unless existing
+          return existing.update!(client: client, settings: settings)
+        else
+          existing&.delete!(client: client)
+          return nil
+        end
       end
     end
   end
