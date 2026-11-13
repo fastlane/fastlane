@@ -125,9 +125,43 @@ jobs:
           bundler-cache: true
 
       - name: Generate Swift API
-        run: bundle exec fastlane generate_swift_api
+        run: bundle exec fastlane generate_swift_sources
+
+      # The builds depend only on the generated sources, the lane and the toolchain: a set that already passed is not built again
+      - name: Key the generated sources and the toolchain
+        id: swift-key
+        run: |
+          toolchain=$( (xcodebuild -version; swift --version 2>&1) | shasum | cut -c1-16)
+          echo "key=swift-runner-$toolchain-${{ hashFiles('Package.swift', 'fastlane/swift/**', 'fastlane/spec/swift/FastlaneTests/**', 'fastlane/Fastfile') }}" >> "$GITHUB_OUTPUT"
+
+      - name: Look for a run that passed with them
+        id: swift-passed
+        uses: actions/cache/restore@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
+        with:
+          path: .swift-runner-passed
+          key: ${{ steps.swift-key.outputs.key }}
+          lookup-only: true
+
+      - name: Build the Swift runner and run the Swift tests
+        if: steps.swift-passed.outputs.cache-hit != 'true'
+        run: bundle exec fastlane build_swift_runner
         env:
           FASTLANE_SWIFT_TESTS: true
+
+      # Always: it also runs fastlane's Ruby side, which the key does not cover
+      - name: Run the Swift Package Manager runner checks
+        run: fastlane/spec/swift/spm-runner/run.sh
+
+      - name: Mark the sources as passed
+        if: steps.swift-passed.outputs.cache-hit != 'true'
+        run: touch .swift-runner-passed
+
+      - name: Record the passing run
+        if: steps.swift-passed.outputs.cache-hit != 'true'
+        uses: actions/cache/save@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
+        with:
+          path: .swift-runner-passed
+          key: ${{ steps.swift-key.outputs.key }}
 
   validate_documentation:
     name: Validate Documentation

@@ -186,6 +186,16 @@ end
 
 desc "Generate the Swift api and test it"
 lane :generate_swift_api do |options|
+  generated_files = generate_swift_sources(options)
+  build_swift_runner
+  # Set by the "Validate Fastlane.swift generation" CI job; set it locally to run the same checks
+  sh("spec/swift/spm-runner/run.sh") if ENV["FASTLANE_SWIFT_TESTS"]
+  generated_files
+end
+
+# CI runs the two halves on their own, to skip the build when the generated sources already passed
+desc "Generate the Swift api"
+lane :generate_swift_sources do |options|
   Fastlane::VERSION = options[:fastlane_version] if options[:fastlane_version]
 
   require "../fastlane/lib/fastlane/swift_fastlane_api_generator.rb"
@@ -195,6 +205,11 @@ lane :generate_swift_api do |options|
     sh("rake")
     UI.success("Done formatting fastlane.swift API")
   end
+  generated_files
+end
+
+desc "Build the Swift runner, and run the Swift tests with FASTLANE_SWIFT_TESTS"
+lane :build_swift_runner do
   UI.success("Done generating fastlane.swift API, ensuring it builds")
   # Built, not archived: what SwiftLaneManager.build_runner! does for users
   gym(
@@ -203,14 +218,9 @@ lane :generate_swift_api do |options|
     skip_package_dependencies_resolution: true # the project has no Swift packages
   )
   sh("swift build")
-  # Set by the "Validate Fastlane.swift generation" CI job; set it locally to run the same checks
-  if ENV["FASTLANE_SWIFT_TESTS"]
-    sh("swift test")
-    sh("spec/swift/spm-runner/run.sh")
-  end
+  sh("swift test") if ENV["FASTLANE_SWIFT_TESTS"]
   sh("rm -r ../.build")
   sh("rm FastlaneRunner") # the build copies it here; only the archive put it in the repository root
-  generated_files
 end
 
 desc "Generate the FastlaneSwiftRunner project manifest"
