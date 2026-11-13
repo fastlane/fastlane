@@ -115,8 +115,12 @@ module Spaceship
       end
 
       def post(url_or_path, body, tries: 5)
-        response = with_asc_retry(tries) do
-          request(:post) do |req|
+        # Pass explicit limits to the transport too, without changing default callers.
+        # Client#request keeps positional options for compatibility with unbraced parameter hashes.
+        request_args = [:post]
+        request_args.push(nil, nil, {}, false, { tries: tries }) unless tries == 5
+        response = with_asc_retry(tries, retry_rate_limit: tries != 1) do
+          request(*request_args) do |req|
             req.url(url_or_path)
             req.body = body.to_json
             req.headers['Content-Type'] = 'application/json'
@@ -163,7 +167,7 @@ module Spaceship
         end
       end
 
-      def with_asc_retry(tries = 5, backoff = 1, &_block)
+      def with_asc_retry(tries = 5, backoff = 1, retry_rate_limit: true, &_block)
         response = yield
 
         status = response.status if response
@@ -197,6 +201,8 @@ module Spaceship
           retry
         end
       rescue TooManyRequestsError => error
+        return response unless retry_rate_limit
+
         if backoff > 3600
           raise TooManyRequestsError, "Too many requests, giving up after backing off for > 3600 seconds."
         end
