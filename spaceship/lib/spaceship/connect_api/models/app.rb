@@ -442,6 +442,10 @@ module Spaceship
       end
 
       def get_in_progress_review_submission(client: nil, platform:, includes: nil)
+        return get_in_progress_review_submissions(client: client, platform: platform, includes: includes).first
+      end
+
+      def get_in_progress_review_submissions(client: nil, platform:, includes: nil)
         client ||= Spaceship::ConnectAPI
         filter = {
           state: [
@@ -452,7 +456,7 @@ module Spaceship
           platform: platform
         }
 
-        return get_review_submissions(client: client, filter: filter, includes: includes).first
+        return get_review_submissions(client: client, filter: filter, includes: includes)
       end
 
       # appStoreVersionForReview,items

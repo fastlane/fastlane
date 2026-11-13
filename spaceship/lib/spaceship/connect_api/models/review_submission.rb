@@ -70,6 +70,30 @@ module Spaceship
         return resp.to_models.first
       end
 
+      def items_only?(client: nil)
+        client ||= Spaceship::ConnectAPI
+        resp = client.get_review_submission_items(review_submission_id: id, includes: "appStoreVersion,appCustomProductPageVersion")
+
+        items = []
+        resp.all_pages.each do |page|
+          data = page.body["data"] if page.body.kind_of?(Hash)
+          return false unless data.kind_of?(Array)
+
+          items.concat(data)
+        end
+
+        return false if items.empty?
+
+        # Inspect raw relationship linkage so an omitted relationship is not
+        # mistaken for an explicit null, without inflating unsupported item types.
+        return items.all? do |item|
+          relationships = item["relationships"] if item.kind_of?(Hash)
+          app_store_version = relationships["appStoreVersion"] if relationships.kind_of?(Hash)
+
+          app_store_version.kind_of?(Hash) && app_store_version.key?("data") && app_store_version["data"].nil?
+        end
+      end
+
       def fetch_resolution_center_threads(client: nil)
         client ||= Spaceship::ConnectAPI
         resp = client.get_resolution_center_threads(filter: { reviewSubmission: id }, includes: 'reviewSubmission')
