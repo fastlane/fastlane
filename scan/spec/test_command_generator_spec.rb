@@ -63,6 +63,10 @@ describe Scan do
     allow(response).to receive(:read).and_return(@valid_simulators)
     allow(Open3).to receive(:popen3).with("xcrun simctl list devices").and_yield(nil, response, nil, nil)
 
+    simctl_runtime_output = File.read('./scan/spec/fixtures/XcrunSimctlListRuntimesOutput')
+    runtime_status = double('status', "success?": true)
+    allow(Open3).to receive(:capture2).with("xcrun simctl list -j runtimes").and_return([simctl_runtime_output, runtime_status])
+
     allow(Open3).to receive(:capture3).with("xcrun simctl runtime -h").and_return([nil, 'Usage: simctl runtime <operation> <arguments>', nil])
 
     allow(FastlaneCore::Helper).to receive(:xcode_at_least?).and_return(false)
