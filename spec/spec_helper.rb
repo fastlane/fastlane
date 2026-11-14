@@ -53,6 +53,10 @@ require "tmpdir"
 require "shellwords"
 UI = FastlaneCore::UI
 
+# rspec --bisect runs examples with $stdout set to a StringIO, on which tty-screen 0.8.2 calls ioctl to read
+# the terminal width: fail as a file does. See piotrmurach/tty-screen#24.
+StringIO.class_eval { def ioctl(*) = raise(Errno::ENOTTY) } unless StringIO.method_defined?(:ioctl)
+
 # Spaceship persists a session cookie to ~/.fastlane/spaceship/<user>/cookie,
 # under the real home directory, and reads it back to decide whether a session
 # is valid. That makes the suite write to the developer's machine, and it makes
