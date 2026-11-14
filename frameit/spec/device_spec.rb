@@ -28,6 +28,16 @@ describe Frameit::Device do
     end
 
     describe "valid iOS screen sizes" do
+      it "detects the iPhone Duo outer display in both orientations" do
+        expect_screen_size_from_file("iPhone Duo{1398x2034}.png", Platform::IOS).to eq(Devices::IPHONE_DUO_OUTER)
+        expect_screen_size_from_file("iPhone Duo{2034x1398}.png", Platform::IOS).to eq(Devices::IPHONE_DUO_OUTER)
+      end
+
+      it "detects the iPhone Duo inner display in both orientations" do
+        expect_screen_size_from_file("iPhone Duo{2007x2853}.png", Platform::IOS).to eq(Devices::IPHONE_DUO_INNER)
+        expect_screen_size_from_file("iPhone Duo{2853x2007}.png", Platform::IOS).to eq(Devices::IPHONE_DUO_INNER)
+      end
+
       it "should detect iPhone XS in portrait and landscape if filename contains \"Apple iPhone XS\"" do
         expect_screen_size_from_file("Apple iPhone XS-Portrait{1125x2436}.jpg", Platform::IOS).to eq(Devices::IPHONE_XS)
         expect_screen_size_from_file("Apple iPhone XS-Landscape{2436x1125}.jpg", Platform::IOS).to eq(Devices::IPHONE_XS)
