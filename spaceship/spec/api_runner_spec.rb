@@ -64,11 +64,11 @@ describe Spaceship::ApiRunner do
     expect(stub).to have_been_requested
   end
 
-  it "raises Apple's error for a failed request" do
+  it "reports Apple's error as a user error, without a stack trace" do
     errors = { errors: [{ status: '404', code: 'NOT_FOUND', title: 'The specified resource does not exist', detail: "There is no resource of type 'apps' with id '9'" }] }
     stub_request(:get, "#{api}/apps/9").to_return(status: 404, body: errors.to_json, headers: { 'Content-Type' => 'application/json' })
 
-    expect { run(method: 'GET', path: '/v1/apps/9') }.to raise_error(Spaceship::UnexpectedResponse, /There is no resource of type 'apps' with id '9'/)
+    expect { run(method: 'GET', path: '/v1/apps/9') }.to raise_error(FastlaneCore::Interface::FastlaneError, /There is no resource of type 'apps' with id '9'/)
   end
 
   it 'rejects invalid input before sending a request' do

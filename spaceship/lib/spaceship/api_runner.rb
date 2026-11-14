@@ -33,6 +33,9 @@ module Spaceship
 
       json = @paginate ? merge_pages(response.all_pages) : response.body
       return JSON.pretty_generate(json)
+    rescue Spaceship::UnexpectedResponse => e
+      # Apple's answer, not a crash: show it without a stack trace.
+      FastlaneCore::UI.user_error!(e.message)
     end
 
     private
