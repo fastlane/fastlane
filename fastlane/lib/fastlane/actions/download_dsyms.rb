@@ -28,7 +28,9 @@ module Fastlane
         # Get App
         app = Spaceship::ConnectAPI::App.find(params[:app_identifier])
         unless app
-          UI.user_error!("Could not find app with bundle identifier '#{params[:app_identifier]}' on account #{params[:username]}")
+          # None when logged in with an API key; do not ask for one
+          account = params.fetch(:username, ask: false)
+          UI.user_error!("Could not find app with bundle identifier '#{params[:app_identifier]}'#{" on account #{account}" if account}")
         end
 
         # Process options

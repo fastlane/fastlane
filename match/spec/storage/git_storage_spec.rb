@@ -402,6 +402,8 @@ describe Match do
       end
 
       it "accepts git 2.31 and later, including Apple's build" do
+        allow(ENV).to receive(:[]).and_call_original
+        allow(ENV).to receive(:[]).with('GIT_CONFIG_COUNT').and_return(nil)
         allow(Open3).to receive(:capture2).with('git', '--version').and_return(["git version 2.39.5 (Apple Git-154)\n", double(success?: true)])
         storage = Match::Storage::GitStorage.new(git_basic_authorization: "EXAMPLE_TOKEN_123")
         expect(storage.send(:git_env_values)).to include('GIT_CONFIG_KEY_0' => 'http.extraheader')

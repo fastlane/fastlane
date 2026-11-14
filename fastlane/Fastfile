@@ -38,9 +38,10 @@ lane :lint_source do
   ensure_no_debug_code(text: " UI\\.", path: "spaceship/lib", extension: ".rb", exclude_dirs: exclude_dirs)
   ensure_no_debug_code(text: " UI\\.", path: "credentials_manager/lib", extension: ".rb", exclude_dirs: exclude_dirs)
 
-  rubocop(step_name: 'policekeeping_the_code_with_rubocop')
-
   Dir.chdir("..") do
+    # Not the plugin's rubocop action: its -D turns off RuboCop's parallel default (rubocop/rubocop#16338)
+    sh("bundle", "exec", "rubocop", step_name: 'policekeeping_the_code_with_rubocop')
+
     # If no shellcheck - warn and skip, otherwise shellcheck all .sh and .bash files
     if system('which shellcheck > /dev/null 2>&1')
       sh('git ls-files -z "*.sh" "*.bash" | grep -z -v "Pods-" | xargs -0 shellcheck')
@@ -53,20 +54,10 @@ end
 desc "Measure the execution time of the --help command"
 lane :benchmark_help_command do
   Dir.chdir("..") do
-    # install gnomon if not installed yet
-    Actions.sh("echo foo | gnomon", log: true, error_callback: lambda { |result|
-      if Helper.windows? || Helper.mac?
-        sh('npm install -g gnomon')
-      else
-        sh('sudo npm install -g gnomon')
-      end
-    })
-    cmd = Helper.windows? ? "cd bin && fastlane --help | gnomon" : "bin/fastlane --help | gnomon"
+    cmd = Helper.windows? ? "cd bin && fastlane --help" : "PAGER=cat bin/fastlane --help"
     3.times do
-      content = sh(cmd, log: false)
-      content.each_line do |line|
-        UI.message("🏎️ '#{line.strip}'") if ["Total", "real", "user", "sys"].any? { |word| line.include?(word) }
-      end
+      seconds = seconds_spent { sh(cmd, log: false) }
+      UI.message("🏎️ 'Total #{format('%.4f', seconds)}s'")
     end
   end
 end
@@ -81,13 +72,14 @@ lane :execute_tests do
   # Verifying the --help command
   Dir.chdir("..") do
     cmd = Helper.windows? ? "cd bin && fastlane --help" : "PAGER=cat bin/fastlane --help"
-    content = sh(cmd)
+    content = nil
+    # Timed here rather than with benchmark_help_command: its three runs took the same time as this one
+    seconds = seconds_spent { content = sh(cmd) }
+    UI.message("🏎️ 'Total #{format('%.4f', seconds)}s'")
     ["--version", "https://fastlane.tools", "fastlane"].each do |current|
       UI.user_error!("--help missing information: '#{current}'") unless content.include?(current)
     end
   end
-
-  benchmark_help_command
 
   # Run the tests
   build_fastlane_gem(version: version) unless File.file?("pkg/fastlane-#{version}.gem")
@@ -194,6 +186,16 @@ end
 
 desc "Generate the Swift api and test it"
 lane :generate_swift_api do |options|
+  generated_files = generate_swift_sources(options)
+  build_swift_runner
+  # Set by the "Validate Fastlane.swift generation" CI job; set it locally to run the same checks
+  sh("spec/swift/spm-runner/run.sh") if ENV["FASTLANE_SWIFT_TESTS"]
+  generated_files
+end
+
+# CI runs the two halves on their own, to skip the build when the generated sources already passed
+desc "Generate the Swift api"
+lane :generate_swift_sources do |options|
   Fastlane::VERSION = options[:fastlane_version] if options[:fastlane_version]
 
   require "../fastlane/lib/fastlane/swift_fastlane_api_generator.rb"
@@ -203,20 +205,22 @@ lane :generate_swift_api do |options|
     sh("rake")
     UI.success("Done formatting fastlane.swift API")
   end
+  generated_files
+end
+
+desc "Build the Swift runner, and run the Swift tests with FASTLANE_SWIFT_TESTS"
+lane :build_swift_runner do
   UI.success("Done generating fastlane.swift API, ensuring it builds")
+  # Built, not archived: what SwiftLaneManager.build_runner! does for users
   gym(
     project: File.expand_path("swift/FastlaneSwiftRunner/FastlaneSwiftRunner.xcodeproj"),
-    skip_package_ipa: true
+    skip_archive: true,
+    skip_package_dependencies_resolution: true # the project has no Swift packages
   )
   sh("swift build")
-  # Set by the "Validate Fastlane.swift generation" CI job; set it locally to run the same checks
-  if ENV["FASTLANE_SWIFT_TESTS"]
-    sh("swift test")
-    sh("spec/swift/spm-runner/run.sh")
-  end
+  sh("swift test") if ENV["FASTLANE_SWIFT_TESTS"]
   sh("rm -r ../.build")
-  sh("rm ../FastlaneRunner")
-  generated_files
+  sh("rm FastlaneRunner") # the build copies it here; only the archive put it in the repository root
 end
 
 desc "Generate the FastlaneSwiftRunner project manifest"
@@ -438,7 +442,7 @@ end
 desc "Makes sure the tests on https://docs.fastlane.tools still work with the latest version"
 lane :verify_docs do
   clone_docs do
-    Bundler.with_clean_env do
+    Bundler.with_unbundled_env do
       puts(`sed -i -e "s/activate_bin_path/bin_path/g" $(which bundle)`) # workaround for bundler https://github.com/bundler/bundler/issues/4602#issuecomment-233619696
       sh("bundle install")
       sh("bundle exec fastlane test skip_building:true") # skip_building since we don't have a proper python environment set up
@@ -540,6 +544,12 @@ def generate_markdown_docs(target_path: nil)
   require 'fastlane/documentation/markdown_docs_generator'
   Fastlane::MarkdownDocsGenerator.new.generate!(target_path: File.expand_path(target_path))
   return target_path
+end
+
+def seconds_spent
+  started = Process.clock_gettime(Process::CLOCK_MONOTONIC)
+  yield
+  Process.clock_gettime(Process::CLOCK_MONOTONIC) - started
 end
 
 # Exception Handling

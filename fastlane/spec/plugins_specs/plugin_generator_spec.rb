@@ -1,4 +1,5 @@
 require 'rubygems'
+require_relative '../../../internal/plugin_template_rubocop_config'
 
 initialized = false
 bundled = false
@@ -21,6 +22,8 @@ describe Fastlane::PluginGenerator do
     # Paired with the after(:all) below. Not the block form of Dir.chdir,
     # because rspec has no around(:all).
     before(:all) do
+      # The generated plugin uses this config; regenerate it so the spec also passes under plain `rspec`.
+      Fastlane::Internal::PluginTemplateRubocopConfig.write
       tmp_dir = Dir.mktmpdir
       oldwd = Dir.pwd
       Dir.chdir(tmp_dir)
@@ -304,23 +307,12 @@ describe Fastlane::PluginGenerator do
         end
       end
 
-      it "rspec tests are passing" do
-        # Actually run our generated spec as part of this spec #yodawg
-        plugin_sh('bundle exec rspec')
-        expect($?.exitstatus).to eq(0)
-      end
-
-      it "rubocop validations are passing" do
-        # Actually run our generated spec as part of this spec #yodawg
-        output = plugin_sh('bundle exec rubocop 2>&1')
-        expect($?.exitstatus).to eq(0), output
-        expect(output).not_to include("instead of `require:")
-      end
-
+      # One `rake` run checks both: running rspec and rubocop on their own as well booted Bundler twice more for the same checks
       it "`rake` runs both rspec and rubocop" do
         # Actually run our generated spec as part of this spec #yodawg
         result = plugin_sh('bundle exec rake 2>&1')
         expect($?.exitstatus).to eq(0), result
+        expect(result).not_to include("instead of `require:")
         expect(result).to include("no offenses detected") # rubocop
         expect(result).to include("example, 0 failures") # rspec
       end

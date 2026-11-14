@@ -12,11 +12,45 @@ unless ENV["FASTLANE_SKIP_UPDATE_CHECK"]
   end
 end
 
+# FASTLANE_SPEC_WARNINGS=<dir> records every Ruby warning, deprecations included, one file per process,
+# for `rake warnings_summary`. Recorded here because some specs replace $stderr while they run, and
+# through a file opened now because some run under FakeFS. Messages without a location are not warnings.
+unless ENV["FASTLANE_SPEC_WARNINGS"].to_s.empty?
+  require "fileutils"
+  require "json"
+  Warning[:deprecated] = true
+  FileUtils.mkdir_p(ENV["FASTLANE_SPEC_WARNINGS"])
+  warnings_log = File.open(File.join(ENV["FASTLANE_SPEC_WARNINGS"], "warnings_#{Process.pid}.jsonl"), "a") # rubocop:disable Style/FileOpen -- open for the whole run
+  warnings_log.sync = true
+  Warning.singleton_class.prepend(Module.new do
+    define_method(:warn) do |message, category: nil, **options|
+      warnings_log.write("#{JSON.generate({ category: category, message: message })}\n") if message.include?(": warning: ")
+      super(message, category: category, **options)
+    end
+  end)
+end
+
+# On Ruby 3.4+, an example fails when code in this repository modifies a string literal, or stubs a method on one, see fastlane#30484.
+# Deprecation warnings are enabled for that, and printed only if they were already on.
+MODIFIED_LITERALS = []
+REPOSITORY_ROOT = "#{File.expand_path('..', __dir__)}/".freeze # computed at load time, as some specs stub File
+if RUBY_VERSION >= "3.4"
+  print_deprecations = Warning[:deprecated]
+  Warning[:deprecated] = true
+  Warning.singleton_class.prepend(Module.new do
+    define_method(:warn) do |message, category: nil, **options|
+      MODIFIED_LITERALS << message if message.include?(": warning: literal string will be frozen")
+      super(message, category: category, **options) if print_deprecations || category != :deprecated
+    end
+  end)
+end
+
 require "webmock/rspec"
 WebMock.disable_net_connect!
 
 require "fastlane"
 require "tmpdir"
+require "shellwords"
 UI = FastlaneCore::UI
 
 # Spaceship persists a session cookie to ~/.fastlane/spaceship/<user>/cookie,
@@ -31,6 +65,11 @@ UI = FastlaneCore::UI
 # See fastlane#30184.
 SPACESHIP_COOKIE_DIR = Dir.mktmpdir("fastlane-spec-spaceship")
 ENV["SPACESHIP_COOKIE_PATH"] = SPACESHIP_COOKIE_DIR
+
+# The same for ~/.fastlane, where analytics records that it showed its notice, and for
+# RuboCop's cache, which the plugin generator spec fills. See fastlane#30187.
+FASTLANE_SPEC_USER_DIR = Dir.mktmpdir("fastlane-spec-user-dir")
+ENV["RUBOCOP_CACHE_ROOT"] = Dir.mktmpdir("fastlane-spec-rubocop-cache")
 
 # Scratch root for the Fastfile fixtures and the specs that assert on them.
 # Avoid fixed paths under /tmp: parallel test processes would share them.
@@ -85,6 +124,22 @@ ENV_GUARD_LOAD_TIME = ((env_guard_loaded.keys - env_guard_pristine.keys) |
                          .reject { |key| env_guard_loaded[key] == env_guard_pristine[key] }).sort.freeze
 
 my_main = self
+# `security` subcommands that change the developer's keychains, which a spec must never run for real. See fastlane#30186.
+# cms is one: decoding a profile imports its signing certificate into a keychain.
+KEYCHAIN_CHANGING_SUBCOMMANDS = %w[
+  cms create-keychain delete-keychain unlock-keychain set-keychain-settings import set-key-partition-list
+  add-generic-password delete-generic-password add-internet-password delete-internet-password
+].freeze
+
+def keychain_changing?(command, stdin = nil)
+  # The security gem sends a command that takes a password to `security -i` on stdin.
+  command = ["security", *Shellwords.split(stdin.to_s)] if command == %w[security -i]
+  program, subcommand, *arguments = command
+  return false unless program == "security"
+
+  KEYCHAIN_CHANGING_SUBCOMMANDS.include?(subcommand) || (%w[list-keychains default-keychain].include?(subcommand) && arguments.include?("-s"))
+end
+
 RSpec.configure do |config|
   # Singleton guard, see fastlane#30184.
   #
@@ -142,6 +197,19 @@ RSpec.configure do |config|
     FileUtils.remove_entry(SPACESHIP_COOKIE_DIR) if File.directory?(SPACESHIP_COOKIE_DIR)
   end
 
+  config.before(:each) { MODIFIED_LITERALS.clear }
+
+  config.after(:each) do
+    ours = MODIFIED_LITERALS.select do |message|
+      path = message[/\A(.+?):\d+: warning: /, 1].to_s
+      relative = path.delete_prefix(REPOSITORY_ROOT)
+      next true if path.include?("/rspec-mocks-") # a spec stubbed a method on a string literal
+
+      relative != path && !relative.start_with?("vendor/")
+    end
+    raise("Modified string literals (fastlane#30484):\n#{ours.uniq.join}") unless ours.empty?
+  end
+
   # Environment guard, see fastlane#30184.
   #
   # A test that leaves a variable behind changes what every later test in the
@@ -190,10 +258,12 @@ RSpec.configure do |config|
       ensure
         allowed = Array(example.metadata[:env_output]).map(&:to_s)
         after = ENV.to_h
-        escaped = ((after.keys - before.keys) | (before.keys - after.keys) |
-                   (before.keys & after.keys).reject { |key| before[key] == after[key] }) - allowed
+        changed = (after.keys - before.keys) | (before.keys - after.keys) |
+                  (before.keys & after.keys).reject { |key| before[key] == after[key] }
+        escaped = changed - allowed
         escaped.each { |key| ENV_GUARD_LEAKS[key] << example.id }
-        ENV.replace(before) if ENV_GUARD_MODE == :enforce
+        # Only the changed keys, not ENV.replace(before): that rewrote every variable after every example
+        changed.each { |key| before.key?(key) ? ENV[key] = before[key] : ENV.delete(key) } if ENV_GUARD_MODE == :enforce
       end
     end
   end
@@ -275,8 +345,15 @@ RSpec.configure do |config|
 
   config.before(:each) do |current_test|
     # We don't want to call the RubyGems API at any point
-    # This was a request that was added with Ruby 2.4.0
     allow(Fastlane::FastlaneRequire).to receive(:install_gem_if_needed).and_return(nil)
+
+    allow(FastlaneCore).to receive(:fastlane_user_dir).and_return(FASTLANE_SPEC_USER_DIR)
+
+    allow(Security::Command).to receive(:run).and_wrap_original do |run, *command, **options|
+      raise "A spec ran `#{command.join(' ')}`, which changes the developer's keychains: stub the security gem call instead" if keychain_changing?(command, options[:stdin])
+
+      run.call(*command, **options)
+    end
 
     ENV['FASTLANE_PLATFORM_NAME'] = nil
 

@@ -31,7 +31,11 @@ module FastlaneCore
 
     def self.fetch_distribution_xml_file(path)
       Dir.mktmpdir do |dir|
-        Helper.backticks("xar -C #{dir.shellescape} -xf #{path.shellescape}")
+        FastlaneCore::CommandExecutor.execute(command: "xar -C #{dir.shellescape} -xf #{path.shellescape}",
+                                            print_all: true,
+                                                error: proc do |output|
+                                                  UI.user_error!("Could not extract '#{path}':\n#{output}")
+                                                end)
 
         Dir.foreach(dir) do |file|
           next unless file.include?('Distribution')

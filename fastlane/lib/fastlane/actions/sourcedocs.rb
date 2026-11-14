@@ -4,7 +4,7 @@ module Fastlane
       def self.run(params)
         UI.user_error!("You have to install sourcedocs using `brew install sourcedocs`") unless Helper.which('sourcedocs') || Helper.test?
 
-        command =  "sourcedocs generate"
+        command = +"sourcedocs generate"
         command << " --all-modules" if params[:all_modules]
         command << " --spm-module #{params[:spm_module].shellescape}" unless params[:spm_module].nil?
         command << " --module-name #{params[:module_name].shellescape}" unless params[:module_name].nil?
@@ -58,7 +58,7 @@ module Fastlane
           FastlaneCore::ConfigItem.new(key: :output_folder,
                                        env_name: 'FL_SOURCEDOCS_OUTPUT_FOLDER',
                                        description: 'Output directory to clean (default: Documentation/Reference)',
-                                       optional: false),
+                                       optional: true),
           FastlaneCore::ConfigItem.new(key: :min_acl,
                                        env_name: 'FL_SOURCEDOCS_MIN_ACL',
                                        description: 'Access level to include in documentation [private, fileprivate, internal, public, open] (default: public)',

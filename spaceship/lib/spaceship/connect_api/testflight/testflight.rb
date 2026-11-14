@@ -209,22 +209,20 @@ module Spaceship
         end
 
         def create_beta_group(app_id: nil, group_name: nil, is_internal_group: false, public_link_enabled: false, public_link_limit: 10_000, public_link_limit_enabled: false, has_access_to_all_builds: nil)
+          attributes = { name: group_name, isInternalGroup: is_internal_group }
           if is_internal_group
-            has_access_to_all_builds = true if has_access_to_all_builds.nil?
+            # Apple's docs don't say which groups take hasAccessToAllBuilds; fastlane sends it for internal groups only, as since #21478
+            attributes[:hasAccessToAllBuilds] = has_access_to_all_builds.nil? ? true : has_access_to_all_builds
           else
-            # Access to all builds is only for internal groups
-            has_access_to_all_builds = nil
+            attributes.merge!(
+              publicLinkEnabled: public_link_enabled,
+              publicLinkLimit: public_link_limit,
+              publicLinkLimitEnabled: public_link_limit_enabled
+            )
           end
           body = {
             data: {
-              attributes: {
-                name: group_name,
-                isInternalGroup: is_internal_group,
-                hasAccessToAllBuilds: has_access_to_all_builds, # Undocumented of 2021-08-02 in ASC API docs and ASC Open API spec. This is the default behavior on App Store Connect and does work with both Apple ID and API Token
-                publicLinkEnabled: public_link_enabled,
-                publicLinkLimit: public_link_limit,
-                publicLinkLimitEnabled: public_link_limit_enabled
-              },
+              attributes: attributes,
               relationships: {
                 app: {
                   data: {

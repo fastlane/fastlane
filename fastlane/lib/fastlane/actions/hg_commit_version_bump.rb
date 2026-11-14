@@ -5,7 +5,6 @@ module Fastlane
       def self.run(params)
         require 'xcodeproj'
         require 'pathname'
-        require 'set'
         require 'shellwords'
 
         xcodeproj_path = params[:xcodeproj] ? File.expand_path(File.join('.', params[:xcodeproj])) : nil

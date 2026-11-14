@@ -106,5 +106,30 @@ describe Match do
         enc.encrypt_files
       end
     end
+
+    describe "storing the passphrase in the keychain" do
+      before { FastlaneCore::StoredPasswords.reset_warnings! }
+
+      it "does not store the passphrase unless asked to" do
+        expect(Security::InternetPassword).not_to receive(:add)
+        @e.store_password("new passphrase")
+      end
+
+      it "stores the passphrase when FASTLANE_STORE_PASSWORDS_IN_KEYCHAIN is set" do
+        stub_const('ENV', { "FASTLANE_STORE_PASSWORDS_IN_KEYCHAIN" => "1" })
+        expect(Security::InternetPassword).to receive(:add).with("match_#{@git_url}", "", "new passphrase")
+        @e.store_password("new passphrase")
+      end
+
+      it "warns once that a stored passphrase was read" do
+        stub_const('ENV', {})
+        allow(Security::InternetPassword).to receive(:find).with(server: "match_#{@git_url}").and_return(double("item", password: "stored passphrase"))
+        allow(FastlaneCore::UI).to receive(:important)
+        expect(FastlaneCore::UI).to receive(:important).with(/any program running as you can read/).once
+
+        expect(@e.send(:fetch_password!)).to eq("stored passphrase")
+        @e.send(:fetch_password!)
+      end
+    end
   end
 end

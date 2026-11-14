@@ -59,7 +59,7 @@ describe Scan do
     Apple Watch - 42mm (A6371161-FEEA-46E2-9382-0DB41C85FA70) (Shutdown)
 "
     FastlaneCore::Simulator.clear_cache
-    response = "response"
+    response = +"response"
     allow(response).to receive(:read).and_return(@valid_simulators)
     allow(Open3).to receive(:popen3).with("xcrun simctl list devices").and_yield(nil, response, nil, nil)
 
@@ -151,6 +151,9 @@ describe Scan do
       describe "supports number of retries" do
         before(:each) do
           allow(FastlaneCore::Helper).to receive(:xcode_at_least?).and_return(true)
+          # On Xcode 11+, the first build settings lookup on the shared @project resolves Swift packages.
+          # That is this example when it runs alone; otherwise an earlier one has already cached them.
+          allow(FastlaneCore::CommandExecutor).to receive(:execute).with(hash_including(command: start_with("xcodebuild -resolvePackageDependencies")))
         end
 
         it "with 1 or more retries", requires_xcodebuild: true do
@@ -495,11 +498,11 @@ describe Scan do
 
             expect(FastlaneCore::CommandExecutor).
               to receive(:execute).
-              with(command: %r{xcrun simctl spawn 021A465B-A294-4D9E-AD07-6BDC8E186343 log collect --start '\d\d\d\d-\d\d-\d\d \d\d:\d\d:\d\d' --output /tmp/scan_results/system_logs-iPhone\\ 6s_iOS_10.0.logarchive 2>/dev/null}, print_all: false, print_command: true)
+              with(command: %r{xcrun simctl spawn 021A465B-A294-4D9E-AD07-6BDC8E186343 log collect --start '\d\d\d\d-\d\d-\d\d \d\d:\d\d:\d\d' --output /tmp/scan_results/system_logs-iPhone\\ 6s_iOS_10.0.logarchive}, print_all: false, print_command: true, suppress_error_output: true, error: kind_of(Proc))
 
             expect(FastlaneCore::CommandExecutor).
               to receive(:execute).
-              with(command: %r{xcrun simctl spawn 2ABEAF08-E480-4617-894F-6BAB587E7963 log collect --start '\d\d\d\d-\d\d-\d\d \d\d:\d\d:\d\d' --output /tmp/scan_results/system_logs-iPad\\ Air_iOS_10.0.logarchive 2>/dev/null}, print_all: false, print_command: true)
+              with(command: %r{xcrun simctl spawn 2ABEAF08-E480-4617-894F-6BAB587E7963 log collect --start '\d\d\d\d-\d\d-\d\d \d\d:\d\d:\d\d' --output /tmp/scan_results/system_logs-iPad\\ Air_iOS_10.0.logarchive}, print_all: false, print_command: true, suppress_error_output: true, error: kind_of(Proc))
 
             allow(Trainer::TestParser).to receive(:auto_convert).and_return({
               "some/path": {

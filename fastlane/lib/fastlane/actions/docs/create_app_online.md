@@ -25,7 +25,7 @@ _produce_ creates new iOS apps on both the Apple Developer Portal and App Store 
 - **Associate** apps with iCloud Containers on the Apple Developer Portal
 - **Create** Merchant Identifiers on the Apple Developer Portal
 - **Associate** apps with Merchant Identifiers on the Apple Developer Portal
-- Support for **multiple Apple accounts**, storing your credentials securely in the Keychain
+- Support for **multiple Apple accounts**
 
 # Usage
 

@@ -181,7 +181,7 @@ module Spaceship
       #   ProvisioningProfile.some_other_method
       #   #=> NoMethodError: undefined method `some_other_method' for ProvisioningProfile
       def method_missing(method_sym, *args, &block)
-        module_name = method_sym.to_s
+        module_name = method_sym.to_s.dup
         module_name.sub!(/^[a-z\d]/) { $&.upcase }
         module_name.gsub!(%r{(?:_|(/))([a-z\d])}) { $2.upcase }
         if const_defined?(module_name)

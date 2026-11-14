@@ -42,12 +42,21 @@ class MainProcess {
             killExistingSocketServerProcesses(port: argumentProcessor.port)
             abortIfPortIsInUse(argumentProcessor.port)
 
+            let serverToken = createServerToken()
+            ArgumentProcessor.serverToken = serverToken.token
+
             rubySocketCommand = Process()
             rubySocketCommand.launchPath = "/usr/bin/env"
             rubySocketCommand.arguments = fastlaneLaunchArguments() + ["socket_server", "-c", String(timeout), "-p", String(argumentProcessor.port)]
+            // An environment variable rather than --token_file, so that an older fastlane still starts
+            var environment = ProcessInfo.processInfo.environment
+            environment["FASTLANE_SOCKET_SERVER_TOKEN_FILE"] = serverToken.file
+            rubySocketCommand.environment = environment
             rubySocketCommand.launch()
 
             waitUntilSocketServerIsListening(port: argumentProcessor.port, serverProcess: rubySocketCommand)
+            // socket_server read the token when it started
+            try? FileManager.default.removeItem(atPath: serverToken.directory)
             thread.start()
         #endif
     }
@@ -76,6 +85,24 @@ class MainProcess {
                 return [binstub]
             }
             return ["bundle", "exec", "fastlane"]
+        }
+
+        /// A random token in a file only this user can read, which socket_server requires on every command and the runner sends
+        func createServerToken() -> (token: String, directory: String, file: String) {
+            var template = Array((NSTemporaryDirectory() as NSString).appendingPathComponent("fastlane-runner.XXXXXX").utf8CString)
+            guard let created = mkdtemp(&template), let random = FileHandle(forReadingAtPath: "/dev/urandom") else {
+                log(message: "Could not create the token for fastlane socket_server")
+                exit(1)
+            }
+            let directory = String(cString: created)
+            let token = random.readData(ofLength: 32).map { String(format: "%02x", $0) }.joined()
+            random.closeFile()
+            let file = directory + "/token"
+            guard token.count == 64, FileManager.default.createFile(atPath: file, contents: token.data(using: .utf8), attributes: [.posixPermissions: 0o600]) else {
+                log(message: "Could not create the token for fastlane socket_server")
+                exit(1)
+            }
+            return (token, directory, file)
         }
 
         /// The directory of the Gemfile Bundler would use: BUNDLE_GEMFILE, else the

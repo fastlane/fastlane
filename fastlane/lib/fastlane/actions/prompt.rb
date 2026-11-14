@@ -15,7 +15,7 @@ module Fastlane
           # Multi line
           end_tag = params[:multi_line_end_keyword]
           UI.important("Submit inputs using \"#{params[:multi_line_end_keyword]}\"")
-          user_input = ""
+          user_input = +""
           loop do
             line = STDIN.gets # returns `nil` if called at end of file
             break unless line

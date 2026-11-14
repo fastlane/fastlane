@@ -128,13 +128,12 @@ describe FastlaneCore do
       use_api_key = !api_key.nil?
       # altool never supports -assetFile, so even asset paths use -f
       upload_part = use_asset_path ? "-f #{tmp_dir}/#{random_uuid}.ipa" : "-f #{tmp_dir}/my.app.id.itmsp"
-      escaped_password = password.shellescape
 
       [
         "xcrun altool",
         "--upload-app",
         ("-u #{email.shellescape}" unless use_api_key),
-        ("-p #{escaped_password}" unless use_api_key),
+        ("-p @env:ITMS_TRANSPORTER_PASSWORD" unless use_api_key),
         ("--apiKey #{api_key[:key_id]}" if use_api_key),
         ("--apiIssuer #{api_key[:issuer_id]}" if use_api_key),
         ("--asc-provider #{provider_short_name}" unless use_api_key || provider_short_name.to_s.empty?),
@@ -149,13 +148,12 @@ describe FastlaneCore do
       use_api_key = !api_key.nil?
       # altool never supports -assetFile, so even asset paths use -f
       verify_part = use_asset_path ? "-f #{tmp_dir}/#{random_uuid}.ipa" : "-f #{tmp_dir}/my.app.id.itmsp"
-      escaped_password = password.shellescape
 
       [
         "xcrun altool",
         "--validate-app",
         ("-u #{email.shellescape}" unless use_api_key),
-        ("-p #{escaped_password}" unless use_api_key),
+        ("-p @env:ITMS_TRANSPORTER_PASSWORD" unless use_api_key),
         ("--apiKey #{api_key[:key_id]}" if use_api_key),
         ("--apiIssuer #{api_key[:issuer_id]}" if use_api_key),
         ("--asc-provider #{provider_short_name}" unless use_api_key || provider_short_name.to_s.empty?),
@@ -167,13 +165,12 @@ describe FastlaneCore do
 
     def altool_provider_id_command(api_key: nil)
       use_api_key = !api_key.nil?
-      escaped_password = password.shellescape
 
       [
         "xcrun altool",
         "--list-providers",
         ("-u #{email.shellescape}" unless use_api_key),
-        ("-p #{escaped_password}" unless use_api_key),
+        ("-p @env:ITMS_TRANSPORTER_PASSWORD" unless use_api_key),
         ("--apiKey #{api_key[:key_id]}" if use_api_key),
         ("--apiIssuer #{api_key[:issuer_id]}" if use_api_key),
         "--output-format json"
@@ -341,7 +338,6 @@ describe FastlaneCore do
       upload_part = use_asset_path ? "-assetFile #{tmp_dir}/#{random_uuid}.ipa" : "-f #{tmp_dir}/my.app.id.itmsp"
 
       [
-        ("ITMS_TRANSPORTER_PASSWORD=#{password.shellescape}" if jwt.nil?),
         "xcrun iTMSTransporter",
         "-m upload",
         ("-u #{email.shellescape}" if jwt.nil?),
@@ -357,7 +353,6 @@ describe FastlaneCore do
 
     def xcrun_verify_command(transporter: nil, jwt: nil)
       [
-        ("ITMS_TRANSPORTER_PASSWORD=#{password.shellescape}" if jwt.nil?),
         "xcrun iTMSTransporter",
         "-m verify",
         ("-u #{email.shellescape}" if jwt.nil?),
@@ -370,7 +365,6 @@ describe FastlaneCore do
 
     def xcrun_download_command(provider_short_name = nil, jwt: nil)
       [
-        ("ITMS_TRANSPORTER_PASSWORD=#{password.shellescape}" if jwt.nil?),
         "xcrun iTMSTransporter",
         '-m lookupMetadata',
         ("-u #{email.shellescape}" if jwt.nil?),
@@ -1094,23 +1088,23 @@ describe FastlaneCore do
           end
 
           describe "upload command generation" do
-            it 'generates a call to xcrun iTMSTransporter' do
+            it 'generates a call to the shell script' do
               transporter = FastlaneCore::ItunesTransporter.new(email, password, false)
-              expect(transporter.upload('my.app.id', tmp_dir)).to eq(java_upload_command(classpath: false))
+              expect(transporter.upload('my.app.id', tmp_dir)).to eq(shell_upload_command)
             end
           end
 
           describe "verify command generation" do
-            it 'generates a call to xcrun iTMSTransporter' do
+            it 'generates a call to the shell script' do
               transporter = FastlaneCore::ItunesTransporter.new(email, password, false)
-              expect(transporter.verify('my.app.id', tmp_dir)).to eq(java_verify_command(classpath: false))
+              expect(transporter.verify('my.app.id', tmp_dir)).to eq(shell_verify_command)
             end
           end
 
           describe "download command generation" do
-            it 'generates a call to xcrun iTMSTransporter' do
+            it 'generates a call to the shell script' do
               transporter = FastlaneCore::ItunesTransporter.new(email, password, false)
-              expect(transporter.download('my.app.id', tmp_dir)).to eq(java_download_command(classpath: false))
+              expect(transporter.download('my.app.id', tmp_dir)).to eq(shell_download_command)
             end
           end
         end
@@ -1263,9 +1257,9 @@ describe FastlaneCore do
             stub_const('ENV', { 'FASTLANE_ITUNES_TRANSPORTER_PATH' => tmp_dir })
           end
           context "upload command generation" do
-            it 'generates a call to xcrun iTMSTransporter instead altool' do
+            it 'generates a call to the shell script instead of altool' do
               transporter = FastlaneCore::ItunesTransporter.new(email, password, false, 'abcd123', altool_compatible_command: true)
-              expect(transporter.upload('my.app.id', tmp_dir, platform: "osx")).to eq(java_upload_command(provider_short_name: 'abcd123', classpath: false))
+              expect(transporter.upload('my.app.id', tmp_dir, platform: "osx")).to eq(shell_upload_command(provider_short_name: 'abcd123'))
             end
           end
         end
@@ -1311,12 +1305,11 @@ describe FastlaneCore do
       before(:each) do
         ENV["FASTLANE_ITUNES_TRANSPORTER_USE_SHELL_SCRIPT"] = "1"
         allow(FastlaneCore::Helper).to receive(:itms_path).and_return(tmp_dir)
+        allow(File).to receive(:exist?).and_call_original if FastlaneCore::Helper.windows?
         allow(File).to receive(:exist?).with("C:/Program Files (x86)/itms").and_return(true) if FastlaneCore::Helper.windows?
       end
 
       describe "upload command generation" do
-        let(:keys_parent_dir) { File.join(Dir.home, ".appstoreconnect") }
-
         context "on non-macOS platforms" do
           include_examples "non_macOS_setup"
 
@@ -1357,10 +1350,18 @@ describe FastlaneCore do
             expect(transporter.upload('my.app.id', tmp_dir)).to eq(shell_upload_command)
           end
 
-          it 'generates a call to the shell script with api key' do
-            transporter = FastlaneCore::ItunesTransporter.new(api_key: api_key)
-            expect(transporter.upload('my.app.id', tmp_dir)).to eq(shell_upload_command(username: nil, input_pass: nil, api_key: api_key))
-            expect(Dir.empty?(keys_parent_dir)).to be_truthy if Dir.exist?(keys_parent_dir)
+          it 'generates a call to the shell script with api key, and removes only the key it wrote' do
+            Dir.mktmpdir do |home|
+              allow(Dir).to receive(:home).and_return(home)
+              private_keys_dir = File.join(home, ".appstoreconnect/private_keys")
+              FileUtils.mkdir_p(private_keys_dir)
+              File.write(File.join(private_keys_dir, "AuthKey_OTHER.p8"), "theirs")
+              transporter = FastlaneCore::ItunesTransporter.new(api_key: api_key)
+
+              expect(transporter.upload('my.app.id', tmp_dir)).to eq(shell_upload_command(username: nil, input_pass: nil, api_key: api_key))
+              expect(File).not_to exist(File.join(private_keys_dir, "AuthKey_#{api_key[:key_id]}.p8"))
+              expect(File.read(File.join(private_keys_dir, "AuthKey_OTHER.p8"))).to eq("theirs")
+            end
           end
         end
       end
@@ -1533,6 +1534,43 @@ describe FastlaneCore do
           expect(FastlaneCore::FastlanePty).to receive(:spawn).and_raise(StandardError, "It's all broken now.")
           expect(@transporter.upload('my.app.id', tmp_dir)).to eq(false)
         end
+
+        it 'passes the password in the environment, not on the command line' do
+          allow(FastlaneCore::Helper).to receive(:xcode_version).and_return('11.1')
+          allow(FastlaneCore::Helper).to receive(:mac?).and_return(true)
+          allow(FastlaneCore::Helper).to receive(:windows?).and_return(false)
+          transporter = FastlaneCore::ItunesTransporter.new(email, password, false)
+          expect(FastlaneCore::FastlanePty).to receive(:spawn) do |command, env:|
+            expect(command).to include("-p @env:ITMS_TRANSPORTER_PASSWORD")
+            expect(command).not_to include("p@")
+            expect(env).to eq("ITMS_TRANSPORTER_PASSWORD" => password)
+            0
+          end
+          expect(transporter.upload('my.app.id', tmp_dir)).to eq(true)
+        end
+
+        it 'passes the password in the environment to altool' do
+          allow(FastlaneCore::Helper).to receive(:xcode_version).and_return('14.0')
+          allow(FastlaneCore::Helper).to receive(:mac?).and_return(true)
+          allow(FastlaneCore::Helper).to receive(:windows?).and_return(false)
+          transporter = FastlaneCore::ItunesTransporter.new(email, password, false, altool_compatible_command: true)
+          expect(FastlaneCore::FastlanePty).to receive(:spawn) do |command, env:|
+            expect(command).to include("altool")
+            expect(command).not_to include("p@")
+            expect(env).to eq("ITMS_TRANSPORTER_PASSWORD" => password)
+            0
+          end
+          expect(transporter.upload(package_path: "#{tmp_dir}/my.app.id.itmsp", platform: "ios")).to eq(true)
+        end
+
+        it 'passes no password when using an API key' do
+          transporter = FastlaneCore::ItunesTransporter.new(nil, nil, false, nil, jwt)
+          expect(FastlaneCore::FastlanePty).to receive(:spawn) do |command, env:|
+            expect(env).to eq({})
+            0
+          end
+          expect(transporter.upload('my.app.id', tmp_dir)).to eq(true)
+        end
       end
     end
 
@@ -1629,7 +1667,7 @@ describe FastlaneCore do
       context "with use username and password" do
         let(:usr_arg) { email }
         let(:pass_arg) { password }
-        let(:expected) { "-u #{email.shellescape} -p #{password.shellescape}" }
+        let(:expected) { "-u #{email.shellescape} -p @env:ITMS_TRANSPORTER_PASSWORD" }
 
         include_examples 'build_credential_params'
       end
@@ -1758,5 +1796,89 @@ describe FastlaneCore do
       end
     end
 
+  end
+
+  describe "#prepare" do
+    let(:home) { Dir.mktmpdir }
+    let(:key_api_key) { api_key.merge(key: "-----BEGIN PRIVATE KEY-----\nDUMMY\n-----END PRIVATE KEY-----") }
+    let(:p8_name) { "AuthKey_#{api_key[:key_id]}.p8" }
+
+    around(:each) do |example|
+      old_umask = File.umask(0o022)
+      example.run
+    ensure
+      File.umask(old_umask)
+      FileUtils.rm_rf(home)
+    end
+
+    before do
+      allow(Dir).to receive(:home).and_return(home)
+    end
+
+    def mode_of(path)
+      File.stat(path).mode & 0o777
+    end
+
+    it "writes the key and creates private_keys readable by their owner only for the shell script executor" do
+      result = FastlaneCore::ShellScriptTransporterExecutor.new.prepare(original_api_key: key_api_key)
+
+      expect(result[:key_dir]).to eq(File.join(home, ".appstoreconnect/private_keys"))
+      expect(mode_of(result[:key_dir])).to eq(0o700) unless FastlaneCore::Helper.windows?
+      expect(mode_of(File.join(result[:key_dir], p8_name))).to eq(0o600) unless FastlaneCore::Helper.windows?
+    end
+
+    it "restricts an existing key file for the shell script executor" do
+      private_keys_dir = File.join(home, ".appstoreconnect/private_keys")
+      FileUtils.mkdir_p(private_keys_dir)
+      File.write(File.join(private_keys_dir, p8_name), "old")
+      File.chmod(0o644, File.join(private_keys_dir, p8_name))
+
+      FastlaneCore::ShellScriptTransporterExecutor.new.prepare(original_api_key: key_api_key)
+
+      expect(mode_of(File.join(private_keys_dir, p8_name))).to eq(0o600) unless FastlaneCore::Helper.windows?
+      expect(File.read(File.join(private_keys_dir, p8_name))).to eq(key_api_key[:key])
+    end
+
+    it "removes only the key it wrote from private_keys" do
+      executor = FastlaneCore::ShellScriptTransporterExecutor.new
+      result = executor.prepare(original_api_key: key_api_key)
+      other_key = File.join(result[:key_dir], "AuthKey_OTHER.p8")
+      File.write(other_key, "theirs")
+
+      executor.cleanup(result)
+
+      expect(File).not_to exist(File.join(result[:key_dir], p8_name))
+      expect(File.read(other_key)).to eq("theirs")
+    end
+
+    it "keeps a key file that was already in private_keys" do
+      private_keys_dir = File.join(home, ".appstoreconnect/private_keys")
+      FileUtils.mkdir_p(private_keys_dir)
+      File.write(File.join(private_keys_dir, p8_name), "old")
+      executor = FastlaneCore::ShellScriptTransporterExecutor.new
+
+      executor.cleanup(executor.prepare(original_api_key: key_api_key))
+
+      expect(File).to exist(File.join(private_keys_dir, p8_name))
+    end
+
+    it "removes the temporary directory for the altool executor" do
+      executor = FastlaneCore::AltoolTransporterExecutor.new
+      result = executor.prepare(original_api_key: key_api_key)
+
+      executor.cleanup(result)
+
+      expect(File).not_to exist(result[:key_dir])
+    end
+
+    it "writes the key readable by its owner only for the altool executor" do
+      result = FastlaneCore::AltoolTransporterExecutor.new.prepare(original_api_key: key_api_key)
+
+      begin
+        expect(mode_of(File.join(result[:key_dir], p8_name))).to eq(0o600) unless FastlaneCore::Helper.windows?
+      ensure
+        FileUtils.rm_rf(result[:key_dir])
+      end
+    end
   end
 end

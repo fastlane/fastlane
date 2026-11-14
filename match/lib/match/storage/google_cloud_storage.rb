@@ -158,7 +158,7 @@ module Match
 
         bucket.files.each do |current_file|
           file_path = current_file.name # e.g. "N8X438SEU2/certs/distribution/XD9G7QCACF.cer"
-          download_path = File.join(self.working_directory, file_path)
+          download_path = Storage.download_path(self.working_directory, file_path)
 
           FileUtils.mkdir_p(File.expand_path("..", download_path))
           UI.verbose("Downloading file from Google Cloud Storage '#{file_path}' on bucket #{self.bucket_name}")

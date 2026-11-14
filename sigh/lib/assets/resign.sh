@@ -383,10 +383,17 @@ function provision_for_bundle_id {
     done
 }
 
+# Print the plist inside a provisioning profile. Unlike `security cms -D`, this imports no certificate
+# into the default keychain (#30186). Like it, it does not check the signature.
+function decode_provision {
+
+    /usr/bin/openssl smime -verify -noverify -nosigs -inform DER -in "$1" 2> >(grep -v '^Verification successful$' >&2)
+}
+
 # Find the bundle identifier contained inside a provisioning profile
 function bundle_id_for_provision {
 
-    local FULL_BUNDLE_ID=$(PlistBuddy -c 'Print :Entitlements:application-identifier' /dev/stdin <<< "$(security cms -D -i "$1")")
+    local FULL_BUNDLE_ID=$(PlistBuddy -c 'Print :Entitlements:application-identifier' /dev/stdin <<< "$(decode_provision "$1")")
     checkStatus
     echo "${FULL_BUNDLE_ID#*.}"
 }
@@ -502,7 +509,7 @@ function resign {
 
     # Replace the embedded mobile provisioning profile
     log "Validating the new provisioning profile: $NEW_PROVISION"
-    security cms -D -i "$NEW_PROVISION" > "$TEMP_DIR/profile.plist"
+    decode_provision "$NEW_PROVISION" > "$TEMP_DIR/profile.plist"
     checkStatus
 
     APP_IDENTIFIER_PREFIX=$(PlistBuddy -c "Print :Entitlements:application-identifier" "$TEMP_DIR/profile.plist" | grep -E '^[A-Z0-9]*' -o | tr -d '\n')
@@ -681,7 +688,7 @@ function resign {
 
         # Get the old and the new team ID
         # Old team ID is not part of app entitlements, have to get it from old embedded provisioning profile
-        security cms -D -i "$TEMP_DIR/old-embedded.mobileprovision" > "$TEMP_DIR/old-embedded-profile.plist"
+        decode_provision "$TEMP_DIR/old-embedded.mobileprovision" > "$TEMP_DIR/old-embedded-profile.plist"
         OLD_TEAM_ID=$(PlistBuddy -c "Print :TeamIdentifier:0" "$TEMP_DIR/old-embedded-profile.plist" 2>/dev/null)
         if [ "$OLD_TEAM_ID" == "" ]; then
             OLD_TEAM_ID="$OLD_APP_ID"

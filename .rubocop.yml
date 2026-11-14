@@ -8,6 +8,7 @@ require:
   - ./internal/rubocop/fork_usage.rb
   - ./internal/rubocop/missing_keys_on_shared_area.rb
   - ./internal/rubocop/is_string_usage.rb
+  - ./internal/rubocop/unescaped_shell_interpolation.rb
 
 AllCops:
   SuggestExtensions: false
@@ -23,9 +24,6 @@ AllCops:
     - '**/lib/assets/DefaultFastfileTemplate'
     - '**/lib/assets/MatchfileTemplate'
     - '**/*.provisionprofile'
-
-Lint/ErbNewArguments:
-  Enabled: false
 
 # Ruby 3.1's hash value shorthand (`{ foo: }`) is allowed, but not enforced
 Style/HashSyntax:
@@ -320,6 +318,9 @@ Lint/IsStringUsage:
     - 'precheck/**/*'
     - 'screengrab/**/*'
     - 'supply/**/*'
+
+Fastlane/UnescapedShellInterpolation:
+  Enabled: false
 
 # ( ) for method calls
 Style/MethodCallWithArgsParentheses:

@@ -185,7 +185,7 @@ module Fastlane
       puts("Installing plugin dependencies...")
       ensure_plugins_attached!
       with_clean_bundler_env do
-        cmd = "bundle install"
+        cmd = +"bundle install"
         cmd << " --quiet" unless FastlaneCore::Globals.verbose?
         cmd << " && bundle exec fastlane generate_swift" if FastlaneCore::FastlaneFolder.swift?
         cmd << " && echo 'Successfully installed plugins'"
@@ -204,7 +204,7 @@ module Fastlane
         UI.user_error!("No plugins are installed")
       end
       with_clean_bundler_env do
-        cmd = "bundle update"
+        cmd = +"bundle update"
         cmd << " #{plugins.join(' ')}"
         cmd << " --quiet" unless FastlaneCore::Globals.verbose?
         cmd << " && bundle exec fastlane generate_swift" if FastlaneCore::FastlaneFolder.swift?

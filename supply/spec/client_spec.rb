@@ -11,6 +11,11 @@ describe Supply do
     end
 
     describe "initialize client" do
+      before do
+        # authorized_user credentials without a project id run `gcloud config config-helper`, which writes to ~/.config/gcloud.
+        allow(Google::Auth::CredentialsLoader).to receive(:load_gcloud_project_id).and_return(nil)
+      end
+
       it "with external account credentials" do
         stub_request(:get, "https://credential-source.example.com/token").
           to_return(status: 200, body: '{"value": "access-token"}', headers: { 'Content-Type' => 'application/json' })
@@ -50,9 +55,10 @@ describe Supply do
       end
 
       it "with Application Default Credentials when no json_key is provided" do
-        mock_auth_client = double("auth_client")
+        # A verifying double keeps googleauth's method visibility: fetch_access_token! is private on this class (#30562).
+        mock_auth_client = instance_double(Google::Auth::ImpersonatedServiceAccountCredentials)
         allow(Google::Auth).to receive(:get_application_default).with(Supply::Client::SCOPE).and_return(mock_auth_client)
-        allow(mock_auth_client).to receive(:fetch_access_token!)
+        allow(mock_auth_client).to receive(:apply!)
 
         Supply::Client.make_from_config(params: { timeout: 1 })
       end

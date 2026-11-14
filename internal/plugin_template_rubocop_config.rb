@@ -1,10 +1,22 @@
+require 'fileutils'
 require 'rubocop'
+require 'yaml'
 
 module Fastlane
   module Internal
     # The plugin template's RuboCop config: fastlane's own, minus what only exists in this repository.
     module PluginTemplateRubocopConfig
       ROOT = File.expand_path('..', __dir__)
+      TARGET = File.join(ROOT, 'fastlane/lib/fastlane/plugins/template/.rubocop.yml')
+
+      # Writes the template's config from fastlane's .rubocop.yml, if there is one.
+      def self.write(source: File.join(ROOT, '.rubocop.yml'), target: TARGET)
+        return unless File.exist?(source)
+
+        config = from(YAML.safe_load_file(source, aliases: true))
+        FileUtils.mkdir_p(File.dirname(target))
+        File.write(target, YAML.dump(config))
+      end
 
       # `config` is fastlane's .rubocop.yml as a Hash. Its `require:` entries under ./internal/ are dropped,
       # with the configuration of every cop they define.

@@ -261,7 +261,7 @@ describe "monkey patch of String.shellescape (via CrossplatformShellwords)" do
     os = 'windows'
     shellescape_testcases.each do |testcase|
       it testcase['it'] + ': ' + testcase['it_result'][os] do
-        str = testcase['str'].to_s
+        str = testcase['str'].to_s.dup
         expect_correct_implementation_to_be_called(str, :shellescape, os)
         escaped = str.shellescape
         expect(escaped).to eq(testcase['expect'][os])
@@ -277,7 +277,7 @@ describe "monkey patch of String.shellescape (via CrossplatformShellwords)" do
     os = 'other'
     shellescape_testcases.each do |testcase|
       it testcase['it'] + ': ' + testcase['it_result'][os] do
-        str = testcase['str'].to_s
+        str = testcase['str'].to_s.dup
         expect_correct_implementation_to_be_called(str, :shellescape, os)
         escaped = str.shellescape
         expect(escaped).to eq(testcase['expect'][os])

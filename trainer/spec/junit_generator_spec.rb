@@ -1,5 +1,12 @@
 describe Trainer do
   describe Trainer::JunitGenerator do
+    around do |example|
+      with_fixture_copy("./trainer/spec/fixtures/Test.test_result.xcresult") do |path|
+        @xcresult_path = path
+        example.run
+      end
+    end
+
     it "works for a valid .plist file" do
       tp = Trainer::TestParser.new("./trainer/spec/fixtures/Valid1.plist")
       junit = File.read("./trainer/spec/fixtures/Valid1.junit")
@@ -25,7 +32,7 @@ describe Trainer do
     end
 
     it "works with an xcresult", requires_xcode: true do
-      tp = Trainer::TestParser.new("./trainer/spec/fixtures/Test.test_result.xcresult", { force_legacy_xcresulttool: true })
+      tp = Trainer::TestParser.new(@xcresult_path, { force_legacy_xcresulttool: true })
       junit = File.read("./trainer/spec/fixtures/XCResult.junit")
       expect(tp.to_junit).to eq(junit)
     end

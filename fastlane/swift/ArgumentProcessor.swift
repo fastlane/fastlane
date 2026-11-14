@@ -11,6 +11,10 @@
 import Foundation
 
 struct ArgumentProcessor {
+    /// The secret fastlane wrote to a file only this user can read: sent with every command so that
+    /// fastlane can tell this runner from another process that connected to its port
+    static var serverToken: String?
+
     let args: [RunnerArgument]
     let currentLane: String
     let commandTimeout: Int
@@ -32,6 +36,10 @@ struct ArgumentProcessor {
         }
 
         port = UInt32(fastlaneArgsMinusLanes.first(where: { $0.name == "swiftServerPort" })?.value ?? "") ?? 2000
+
+        if let tokenFile = fastlaneArgsMinusLanes.first(where: { $0.name == "swiftServerTokenFile" })?.value {
+            ArgumentProcessor.serverToken = (try? String(contentsOfFile: tokenFile, encoding: .utf8))?.trimmingCharacters(in: .whitespacesAndNewlines)
+        }
 
         // Configure logMode since we might need to use it before we finish parsing
         if let logModeArg = potentialLogMode.first {
@@ -74,7 +82,7 @@ struct ArgumentProcessor {
     func laneParameters() -> [String: String] {
         let laneParametersArgs = args.filter { arg in
             let lowercasedName = arg.name.lowercased()
-            return lowercasedName != "timeoutseconds" && lowercasedName != "lane" && lowercasedName != "logmode"
+            return lowercasedName != "timeoutseconds" && lowercasedName != "lane" && lowercasedName != "logmode" && lowercasedName != "swiftservertokenfile"
         }
         var laneParameters = [String: String]()
         for arg in laneParametersArgs {
@@ -86,4 +94,4 @@ struct ArgumentProcessor {
 
 // Please don't remove the lines below
 // They are used to detect outdated files
-// FastlaneRunnerAPIVersion [0.9.2]
+// FastlaneRunnerAPIVersion [0.9.3]

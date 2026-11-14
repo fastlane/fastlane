@@ -1,7 +1,6 @@
 require 'fastlane_core/device_manager'
 require 'fastlane_core/project'
 require 'pathname'
-require 'set'
 require_relative 'module'
 
 module Scan

@@ -17,6 +17,14 @@ SPACESHIP_AUTHENTICATION_DATA =
   'bfadbd9e65e75d5df55547bcff98711ddeae7b8e1e6dbf529e96f7caa4b830b43575cddc52cebc' \
   '39f9522f85cbf33ac35ee59f66f48109c12fbb78d'
 
+# Every spaceship example registers the stubs again, about 110 fixture reads: read each file once per process.
+# The copy shares the cached buffer until modified, e.g. by PlistMiddleware's force_encoding.
+SPACESHIP_FIXTURES = {}
+def spaceship_fixture(path, binary: false)
+  SPACESHIP_FIXTURES[[path, binary]] ||= (binary ? File.binread(path) : File.read(path)).freeze
+  SPACESHIP_FIXTURES[[path, binary]].dup
+end
+
 require_relative 'client_stubbing'
 require_relative 'connect_api/provisioning/provisioning_stubbing'
 require_relative 'connect_api/testflight/testflight_stubbing'
@@ -66,6 +74,11 @@ def before_each_spaceship
 
   ENV.delete("FASTLANE_USER")
 
+  $spaceship_default_stubs_active = true
+end
+
+# The stubs every spaceship example gets, matched after the example's own
+def register_spaceship_default_stubs
   TunesStubbing.itc_stub_login
   PortalStubbing.adp_stub_login
 
@@ -124,8 +137,30 @@ def before_each_spaceship
   ConnectAPIStubbing::Users.stub_users
 end
 
+# Built once per process rather than registered for every example: about 140
+# stubs, which cost more than most spaceship examples themselves.
+def spaceship_default_stubs
+  @spaceship_default_stubs ||= begin
+    registry = WebMock::StubRegistry.instance
+    example_stubs = registry.request_stubs
+    registry.request_stubs = []
+    register_spaceship_default_stubs
+    registry.request_stubs
+  ensure
+    registry.request_stubs = example_stubs
+  end
+end
+
+WebMock.globally_stub_request(:after_local_stubs) do |request|
+  next unless $spaceship_default_stubs_active
+  stub = spaceship_default_stubs.find { |default_stub| default_stub.request_pattern.matches?(request) }
+  next unless stub
+  response = stub.response.dup.evaluate(request)
+  { status: response.status, headers: response.headers, body: response.body }
+end
+
 def after_each_spaceship
-  nil
+  $spaceship_default_stubs_active = false
 end
 
 RSpec.configure do |config|

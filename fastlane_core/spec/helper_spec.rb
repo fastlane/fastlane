@@ -213,6 +213,24 @@ describe FastlaneCore do
           stub_const('ENV', { 'FASTLANE_ITUNES_TRANSPORTER_PATH' => '/some/path/to/something' })
           expect(FastlaneCore::Helper.itms_path).to eq('/some/path/to/something')
         end
+
+        context "on a Mac without a transporter" do
+          before do
+            allow(FastlaneCore::Helper).to receive(:mac?).and_return(true)
+            allow(FastlaneCore::Helper).to receive(:xcode_path).and_return('/Applications/Xcode.app/Contents/Developer/')
+            allow(File).to receive(:exist?).and_return(false)
+          end
+
+          it "points at the Xcode installation" do
+            stub_const('ENV', {})
+            expect { FastlaneCore::Helper.itms_path }.to raise_error(FastlaneCore::Interface::FastlaneError, "Could not find transporter at /Applications/Xcode.app/Contents/Developer/. Please make sure you set the correct path to your Xcode installation.")
+          end
+
+          it "points at FASTLANE_ITUNES_TRANSPORTER_USE_SHELL_SCRIPT when it is set" do
+            stub_const('ENV', { 'FASTLANE_ITUNES_TRANSPORTER_USE_SHELL_SCRIPT' => '1' })
+            expect { FastlaneCore::Helper.itms_path }.to raise_error(FastlaneCore::Interface::FastlaneError, /Xcode 14 and newer no longer include it. Remove FASTLANE_ITUNES_TRANSPORTER_USE_SHELL_SCRIPT so fastlane uploads with altool/)
+          end
+        end
       end
     end
 
@@ -222,16 +240,16 @@ describe FastlaneCore do
       let(:the_zip) { File.absolute_path('/tmp/thezip.zip') }
 
       it "creates correct zip command with contents_only set to false with default print option (true)" do
-        expect(FastlaneCore::Helper).to receive(:backticks)
-          .with("cd #{directory.shellescape} && zip -r #{the_zip.shellescape} to_zip", print: true)
+        expect(FastlaneCore::CommandExecutor).to receive(:execute)
+          .with(hash_including(command: "cd #{directory.shellescape} && zip -r #{the_zip.shellescape} to_zip", print_all: true))
           .exactly(1).times
 
         FastlaneCore::Helper.zip_directory(directory_to_zip, the_zip, contents_only: false)
       end
 
       it "creates correct zip command with contents_only set to true with print set to false" do
-        expect(FastlaneCore::Helper).to receive(:backticks)
-          .with("cd #{directory_to_zip.shellescape} && zip -r #{the_zip.shellescape} *", print: false)
+        expect(FastlaneCore::CommandExecutor).to receive(:execute)
+          .with(hash_including(command: "cd #{directory_to_zip.shellescape} && zip -r #{the_zip.shellescape} *", print_all: false))
           .exactly(1).times
         expect(FastlaneCore::UI).to receive(:command).exactly(1).times
 
@@ -241,11 +259,95 @@ describe FastlaneCore do
       it "keeps paths with an apostrophe and a space as one argument each" do
         folder = File.absolute_path("/tmp/Kaldi's Kafe")
         command = nil
-        allow(FastlaneCore::Helper).to receive(:backticks) { |cmd, print:| command = cmd }
+        allow(FastlaneCore::CommandExecutor).to receive(:execute) { |options| command = options[:command] }
 
         FastlaneCore::Helper.zip_directory(File.join(folder, "Build Products"), File.join(folder, "out put.zip"), overwrite: true)
 
         expect(Shellwords.split(command)).to eq(["cd", folder, "&&", "rm", "-f", File.join(folder, "out put.zip"), "&&", "zip", "-r", File.join(folder, "out put.zip"), "Build Products"])
+      end
+
+      it "fails when zip cannot write the archive" do
+        Dir.mktmpdir do |tmp|
+          FileUtils.mkdir_p(File.join(tmp, "products"))
+          File.write(File.join(tmp, "products", "file"), "")
+
+          expect do
+            FastlaneCore::Helper.zip_directory(File.join(tmp, "products"), File.join(tmp, "missing", "out.zip"), contents_only: true, print: false)
+          end.to raise_error(FastlaneCore::Interface::FastlaneError, /Could not zip/)
+        end
+      end
+    end
+
+    describe "owner-only files" do
+      around do |example|
+        Dir.mktmpdir do |dir|
+          @dir = dir
+          old_umask = File.umask(0o022)
+          begin
+            example.run
+          ensure
+            File.umask(old_umask)
+          end
+        end
+      end
+
+      def mode_of(path)
+        File.stat(path).mode & 0o777
+      end
+
+      describe "#open_owner_only" do
+        it "creates the file readable only by its owner" do
+          path = File.join(@dir, "key.pem")
+          FastlaneCore::Helper.open_owner_only(path) { |file| file.write("secret") }
+
+          expect(File.read(path)).to eq("secret")
+          expect(mode_of(path)).to eq(0o600) unless FastlaneCore::Helper.windows?
+        end
+
+        it "restricts an existing file before writing to it" do
+          path = File.join(@dir, "key.pem")
+          File.write(path, "old")
+          File.chmod(0o644, path) unless FastlaneCore::Helper.windows?
+
+          mode_while_writing = nil
+          FastlaneCore::Helper.open_owner_only(path) do |file|
+            mode_while_writing = mode_of(path)
+            file.write("new")
+          end
+
+          expect(File.read(path)).to eq("new")
+          expect(File.writable?(path)).to be(true)
+          expect(mode_while_writing).to eq(0o600) unless FastlaneCore::Helper.windows?
+        end
+
+        it "passes the open mode, e.g. binary append" do
+          path = File.join(@dir, "log.txt")
+          File.write(path, "a")
+          FastlaneCore::Helper.open_owner_only(path, "ab") { |file| file.write("b") }
+
+          expect(File.binread(path)).to eq("ab")
+          expect(mode_of(path)).to eq(0o600) unless FastlaneCore::Helper.windows?
+        end
+      end
+
+      describe "#mkdir_owner_only" do
+        it "creates the directory and its parents, the directory accessible only by its owner" do
+          dir = File.join(@dir, "parent", "keys")
+          FastlaneCore::Helper.mkdir_owner_only(dir)
+
+          expect(File.directory?(dir)).to be(true)
+          expect(mode_of(dir)).to eq(0o700) unless FastlaneCore::Helper.windows?
+        end
+
+        it "restricts an existing directory" do
+          dir = File.join(@dir, "keys")
+          Dir.mkdir(dir)
+          File.chmod(0o755, dir) unless FastlaneCore::Helper.windows?
+          FastlaneCore::Helper.mkdir_owner_only(dir)
+
+          expect(File.directory?(dir)).to be(true)
+          expect(mode_of(dir)).to eq(0o700) unless FastlaneCore::Helper.windows?
+        end
       end
     end
 
@@ -264,6 +366,27 @@ describe FastlaneCore do
         expect(FastlaneCore::UI).not_to receive(:command)
         expect(FastlaneCore::UI).not_to receive(:command_output)
         FastlaneCore::Helper.backticks("echo hello", print: false)
+      end
+    end
+
+    describe "#swift_version", unless: FastlaneCore::Helper.windows? do
+      let(:bin_dir) { Dir.mktmpdir("fl_spec_swift") }
+
+      after { FileUtils.rm_rf(bin_dir) }
+
+      # The command runs in a subprocess, so PATH must really change, not just ENV in Ruby
+      def swift_version_with(script)
+        File.write(File.join(bin_dir, "swift"), "#!/bin/sh\n#{script}\n")
+        File.chmod(0o755, File.join(bin_dir, "swift"))
+        FastlaneCore::Helper.with_env_values("PATH" => "#{bin_dir}:#{ENV['PATH']}") { FastlaneCore::Helper.swift_version }
+      end
+
+      it "returns the version swift reports" do
+        expect(swift_version_with("echo 'Apple Swift version 5.9.2 (swiftlang-5.9.2.2.56 clang-1500.1.0.2.5)'")).to eq("5.9.2")
+      end
+
+      it "returns nil when swift fails without printing a version" do
+        expect(swift_version_with("echo 'xcrun: error: invalid active developer path' >&2; exit 1")).to be_nil
       end
     end
 
