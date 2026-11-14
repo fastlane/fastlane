@@ -87,7 +87,7 @@ describe Spaceship::ConnectAPI::Tunes::Client do
           url = path
           req_mock = test_request_body(url, body)
 
-          expect(client).to receive(:request).with(:post).and_yield(req_mock).and_return(req_mock)
+          expect(client).to receive(:request).with(:post, nil, nil, {}, false, 1).and_yield(req_mock).and_return(req_mock)
           client.post_app_store_version_release_request(app_store_version_id: app_store_version_id)
         end
 
@@ -96,7 +96,7 @@ describe Spaceship::ConnectAPI::Tunes::Client do
           req_mock = test_request_body(url, body)
           allow(req_mock).to receive(:status).and_return(504)
 
-          expect(client).to receive(:request).with(:post).once.and_yield(req_mock).and_return(req_mock)
+          expect(client).to receive(:request).with(:post, nil, nil, {}, false, 1).once.and_yield(req_mock).and_return(req_mock)
           client.post_app_store_version_release_request(app_store_version_id: app_store_version_id)
         end
       end

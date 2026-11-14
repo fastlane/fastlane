@@ -451,9 +451,59 @@ module Spaceship
         #
         # appPricePoints
         #
-        def get_app_price_points(filter: {}, includes: nil, limit: nil, sort: nil)
+        def get_app_price_points(app_id: nil, filter: {}, includes: nil, limit: nil, sort: nil)
           params = tunes_request_client.build_params(filter: filter, includes: includes, limit: limit, sort: sort)
-          tunes_request_client.get("#{Version::V1}/appPricePoints", params)
+          path = app_id ? "#{Version::V1}/apps/#{app_id}/appPricePoints" : "#{Version::V1}/appPricePoints"
+          tunes_request_client.get(path, params)
+        end
+
+        #
+        # appPriceSchedules
+        #
+
+        def get_app_price_schedule(app_id:, includes: nil)
+          params = tunes_request_client.build_params(includes: includes)
+          tunes_request_client.get("#{Version::V1}/apps/#{app_id}/appPriceSchedule", params)
+        end
+
+        def get_app_price_schedule_manual_prices(app_price_schedule_id:, filter: {}, includes: nil, limit: nil)
+          params = tunes_request_client.build_params(filter: filter, includes: includes, limit: limit)
+          tunes_request_client.get("#{Version::V1}/appPriceSchedules/#{app_price_schedule_id}/manualPrices", params)
+        end
+
+        def post_app_price_schedule(app_id:, base_territory_id:, manual_prices:)
+          included = []
+          prices = manual_prices.each_with_index.map do |price, index|
+            if price[:id]
+              { type: "appPrices", id: price[:id] }
+            else
+              price_id = "${new-price-#{index}}"
+              included << {
+                type: "appPrices",
+                id: price_id,
+                attributes: {
+                  startDate: price[:start_date],
+                  endDate: price[:end_date]
+                },
+                relationships: {
+                  appPricePoint: { data: { type: "appPricePoints", id: price.fetch(:app_price_point_id) } }
+                }
+              }
+              { type: "appPrices", id: price_id }
+            end
+          end
+          body = {
+            data: {
+              type: "appPriceSchedules",
+              relationships: {
+                app: { data: { type: "apps", id: app_id } },
+                baseTerritory: { data: { type: "territories", id: base_territory_id } },
+                manualPrices: { data: prices }
+              }
+            },
+            included: included
+          }
+          tunes_request_client.post("#{Version::V1}/appPriceSchedules", body, tries: 1)
         end
 
         #
