@@ -21,9 +21,10 @@ describe FastlaneCore do
           file.write("not a xar archive")
           file.close
 
+          # xar's own message is not matched: the PTY can lose the output of a command that exits this fast (see FastlanePty.spawn_with_pty)
           expect do
             described_class.fetch_app_identifier(file.path)
-          end.to raise_error(FastlaneCore::Interface::FastlaneError, /Could not extract '#{Regexp.escape(file.path)}'.*Error opening xar archive/m)
+          end.to raise_error(FastlaneCore::Interface::FastlaneError, /Could not extract '#{Regexp.escape(file.path)}'/)
         end
       end
     end
