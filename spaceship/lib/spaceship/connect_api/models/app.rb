@@ -176,6 +176,19 @@ module Spaceship
       # App Pricing
       #
 
+      def get_app_price_points(client: nil, filter: {}, includes: "territory", limit: 200, sort: nil)
+        client ||= Spaceship::ConnectAPI
+        resps = client.get_app_price_points(app_id: id, filter: filter, includes: includes, limit: limit, sort: sort).all_pages
+        return resps.flat_map(&:to_models)
+      end
+
+      def fetch_app_price_schedule(client: nil, includes: "baseTerritory")
+        client ||= Spaceship::ConnectAPI
+        response = client.get_app_price_schedule(app_id: id, includes: includes)
+        return nil if response.body && response.body.key?("data") && response.body["data"].nil?
+        return response.to_models.first
+      end
+
       def fetch_app_prices(client: nil, filter: {}, includes: "priceTier", limit: nil, sort: nil)
         client ||= Spaceship::ConnectAPI
         resp = client.get_app_prices(app_id: id, filter: filter, includes: includes, limit: limit, sort: sort)
