@@ -145,7 +145,14 @@ module Gym
       def print_full_log_path
         return if Gym.config[:disable_xcpretty]
 
-        log_path = Gym::BuildCommandGenerator.xcodebuild_log_path
+        # Naming the log can read the build settings, for the first time when only exporting.
+        # As in print_xcode_version, that must not replace the failure being reported
+        begin
+          log_path = Gym::BuildCommandGenerator.xcodebuild_log_path
+        rescue => ex
+          UI.verbose("Couldn't find the build log to show it: #{ex}")
+          return
+        end
         return unless File.exist?(log_path)
 
         # `xcodebuild` doesn't properly mark lines as failure reason or important information
@@ -200,8 +207,14 @@ module Gym
           export_method: Gym.config[:export_method]
         }
 
-        sdk_path = Gym.project.build_settings(key: "SDKROOT")
-        values[:sdk] = File.basename(sdk_path) if sdk_path.to_s.length > 0
+        # This runs while a failure is being reported, so not being able to read the SDK (the
+        # lookup is disallowed, or times out) must not replace that failure with its own error
+        begin
+          sdk_path = Gym.project.build_settings(key: "SDKROOT")
+          values[:sdk] = File.basename(sdk_path) if sdk_path.to_s.length > 0
+        rescue => ex
+          UI.verbose("Couldn't read the SDK to show it: #{ex}")
+        end
 
         FastlaneCore::PrintTable.print_values(config: values,
                                            hide_keys: [],

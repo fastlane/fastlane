@@ -44,8 +44,11 @@ module Scan
         }
       end
 
+      # Without an app name (a Swift package, or build settings that can't be read), the message names the scheme
+      app_name = Scan.config[:app_name] || Scan.project&.app_name_if_lookup_allowed || Scan.config[:scheme]
+
       options = FastlaneCore::Configuration.create(Fastlane::Actions::SlackAction.available_options, {
-        message: "#{Scan.config[:app_name] || Scan.project.app_name} Tests:\n#{Scan.config[:slack_message]}",
+        message: "#{app_name} Tests:\n#{Scan.config[:slack_message]}",
         channel: channel,
         slack_url: Scan.config[:slack_url].to_s,
         success: results[:build_errors].to_i == 0 && results[:failures].to_i == 0,

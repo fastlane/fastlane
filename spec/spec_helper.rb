@@ -472,6 +472,14 @@ module FastlaneSpec
       ClimateControl.modify(hash, &block)
     end
 
+    # Like with_env_values, after unsetting every environment variable the given
+    # options read, so a value the developer exported can't reach a spec that
+    # relies on an option's default
+    def self.with_option_env_values_cleared(options, hash = {}, &block)
+      cleared = options.flat_map(&:env_names).to_h { |name| [name, nil] }
+      with_env_values(cleared.merge(hash), &block)
+    end
+
     def self.with_action_context_values(hash, &block)
       with_global_key_values(Fastlane::Actions.lane_context, hash, &block)
     end

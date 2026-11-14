@@ -180,6 +180,34 @@ describe Scan do
       end
     end
 
+    # A Swift package, or a project that doesn't test on a simulator, has no simulators to act on
+    describe "simulator options when scan picked no simulators" do
+      around do |example|
+        FastlaneSpec::Env.with_option_env_values_cleared(Scan::Options.available_options) { example.run }
+      end
+
+      def configure(options)
+        allow(Scan).to receive(:config).and_return(FastlaneCore::Configuration.create(Scan::Options.available_options, options))
+        allow(Scan).to receive(:devices).and_return(nil)
+      end
+
+      it "skips reinstalling the app" do
+        configure(reinstall_app: true, app_identifier: "tools.fastlane.app")
+        runner = Scan::Runner.new
+        expect(runner).to receive(:execute)
+        expect(FastlaneCore::Simulator).not_to receive(:uninstall_app)
+
+        runner.test_app
+      end
+
+      it "skips collecting the simulator logs" do
+        configure(include_simulator_logs: true)
+        expect(FastlaneCore::Simulator).not_to receive(:copy_logs)
+
+        Scan::Runner.new.copy_simulator_logs
+      end
+    end
+
     describe "retry_execute" do
       before(:each) do
         # Every other group in this file builds its own config. This one relied

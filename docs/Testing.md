@@ -66,7 +66,7 @@ Instead of using the line number you can also use a filter with the `it "somethi
 
 A spec for a fix has to fail against the code before the fix. Revert the fix, run the spec, and see it fail: a spec that also passes on the old code proves nothing. For options that can replace each other, cover each one alone, both together, and neither.
 
-A spec should not depend on the developer's environment: set or clear the environment variables an option reads (its `env_name`) with `FastlaneSpec::Env.with_env_values`.
+A spec should not depend on the developer's environment: set or clear the environment variables an option reads (its `env_name`) with `FastlaneSpec::Env.with_env_values`. `FastlaneSpec::Env.with_option_env_values_cleared(Gym::Options.available_options)` clears every one a tool's options read.
 
 #### Running the suite as several processes
 
