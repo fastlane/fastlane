@@ -23,6 +23,8 @@ module Spaceship
       attr_accessor :latest_installed_device
       attr_accessor :latest_installed_os_version
       attr_accessor :latest_installed_device_platform
+      attr_accessor :state
+      attr_accessor :app_devices
 
       attr_accessor :apps
       attr_accessor :beta_groups
@@ -49,12 +51,22 @@ module Spaceship
         "latestInstalledDevice" => "latest_installed_device",
         "latestInstalledOsVersion" => "latest_installed_os_version",
         "latestInstalledDevicePlatform" => "latest_installed_device_platform",
+        "state" => "state",
+        "appDevices" => "app_devices",
 
         "apps" => "apps",
         "betaGroups" => "beta_groups",
         "betaTesterMetrics" => "beta_tester_metrics",
         "builds" => "builds"
       })
+
+      module State
+        NOT_INVITED = "NOT_INVITED"
+        INVITED = "INVITED"
+        ACCEPTED = "ACCEPTED"
+        INSTALLED = "INSTALLED"
+        REVOKED = "REVOKED"
+      end
 
       def self.type
         return "betaTesters"
