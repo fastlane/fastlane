@@ -44,7 +44,7 @@ module Fastlane
       end
 
       def self.gen_cov(options)
-        tmp_cov_file = File.join(Dir.tmpdir, "coverage.info")
+        tmp_cov_file = File.join(Dir.mktmpdir("lcov-"), "coverage.info")
         output_dir = options[:output_dir]
         derived_data_path = derived_data_dir(options)
 
@@ -54,7 +54,7 @@ module Fastlane
       end
 
       def self.gen_lcov_cmd(cov_file)
-        cmd = "lcov "
+        cmd = +"lcov "
         exclude_dirs.each do |e|
           cmd << "--remove #{cov_file} \"#{e}\" "
         end
@@ -93,7 +93,14 @@ module Fastlane
       end
 
       def self.category
-        :testing
+        :deprecated
+      end
+
+      def self.deprecated_notes
+        [
+          "Xcode records coverage as LLVM `.profdata`, not the gcov `.gcda` files that `lcov --capture --directory` reads, and this action looks for them under `Build/Intermediates`, which Xcode now names `Build/Intermediates.noindex`.",
+          "Use `slather`, or `xcrun llvm-cov export -format=lcov` to produce an lcov file."
+        ].join("\n")
       end
     end
   end

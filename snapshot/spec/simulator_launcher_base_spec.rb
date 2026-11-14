@@ -34,7 +34,7 @@ describe Snapshot do
         allow(Snapshot::TestCommandGenerator).to receive(:device_udid).with("iPhone 16 Pro").and_return(device_udid)
 
         expect(Fastlane::Helper).to receive(:backticks)
-          .with("open -a #{simulator_path} -g --args -CurrentDeviceUDID #{device_udid}", print: FastlaneCore::Globals.verbose?)
+          .with("open -a #{simulator_path.shellescape} -g --args -CurrentDeviceUDID #{device_udid}", print: FastlaneCore::Globals.verbose?)
           .and_return("")
 
         launcher.prepare_simulators_for_launch(["iPhone 16 Pro", "iPad Pro 13-inch (M4)"])
@@ -44,10 +44,22 @@ describe Snapshot do
         allow(Snapshot::TestCommandGenerator).to receive(:device_udid).with("Mac").and_return(nil)
 
         expect(Fastlane::Helper).to receive(:backticks)
-          .with("open -a #{simulator_path} -g", print: FastlaneCore::Globals.verbose?)
+          .with("open -a #{simulator_path.shellescape} -g", print: FastlaneCore::Globals.verbose?)
           .and_return("")
 
         launcher.prepare_simulators_for_launch(["Mac"])
+      end
+
+      it "passes Simulator.app as one argument when the Xcode path contains a space" do
+        allow(Fastlane::Helper).to receive(:xcode_path).and_return("/Applications/Xcode 15.app/Contents/Developer/")
+        allow(Snapshot::TestCommandGenerator).to receive(:device_udid).with("iPhone 16 Pro").and_return(device_udid)
+
+        expect(Fastlane::Helper).to receive(:backticks).with(start_with("open -a"), print: FastlaneCore::Globals.verbose?) do |command, _options|
+          expect(Shellwords.split(command)).to eq(["open", "-a", "/Applications/Xcode 15.app/Contents/Developer/Applications/Simulator.app", "-g", "--args", "-CurrentDeviceUDID", device_udid])
+          ""
+        end
+
+        launcher.prepare_simulators_for_launch(["iPhone 16 Pro"])
       end
 
       it "does not resolve or open a simulator when running headlessly" do

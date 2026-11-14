@@ -13,6 +13,16 @@ describe Fastlane do
         end
       end
 
+      context "when no output path is given" do
+        it "leaves the default to sourcedocs" do
+          result = Fastlane::FastFile.new.parse("lane :test do
+            sourcedocs
+          end").runner.execute(:test)
+
+          expect(result).to eq("sourcedocs generate")
+        end
+      end
+
       context "when specify all_modules option" do
         it "doesn't add all_modules option" do
           result = Fastlane::FastFile.new.parse("lane :test do
@@ -336,6 +346,20 @@ describe Fastlane do
           end").runner.execute(:test)
 
           expect(result).to eq("sourcedocs generate --output-folder docs --min-acl internal --module-name-path --clean --collapsible --table-of-contents --reproducible-docs -- -scheme MyApp -sdk macosx")
+        end
+      end
+
+      context "when values contain spaces and an apostrophe" do
+        it "passes each as one argument" do
+          result = Fastlane::FastFile.new.parse("lane :test do
+            sourcedocs(
+              output_folder: \"Kaldi's Kafe/docs\",
+              module_name: \"Kaldi's Kafe\",
+              scheme: \"Kaldi's Kafe\"
+            )
+          end").runner.execute(:test)
+
+          expect(Shellwords.split(result)).to eq(["sourcedocs", "generate", "--module-name", "Kaldi's Kafe", "--output-folder", "Kaldi's Kafe/docs", "--", "-scheme", "Kaldi's Kafe"])
         end
       end
     end

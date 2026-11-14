@@ -10,6 +10,8 @@ require "pty" unless FastlaneCore::Helper.windows?
 describe FastlaneCore do
   describe FastlaneCore::FastlanePty do
     describe "spawn" do
+      let(:echo_spec_value) { FastlaneCore::Helper.windows? ? "echo %FASTLANE_PTY_SPEC_VALUE%" : 'echo "$FASTLANE_PTY_SPEC_VALUE"' }
+
       it 'executes a simple command successfully' do
         @all_lines = []
 
@@ -26,6 +28,27 @@ describe FastlaneCore do
         end
         expect(exit_status).to eq(0)
         expect(@all_lines).to eq(["foo"])
+      end
+
+      it 'passes env to the command only' do
+        lines = []
+        FastlaneSpec::Env.with_env_values('FASTLANE_EXEC_FLUSH_PTY_WORKAROUND' => '1', 'FASTLANE_PTY_SPEC_VALUE' => nil) do
+          FastlaneCore::FastlanePty.spawn(echo_spec_value, env: { 'FASTLANE_PTY_SPEC_VALUE' => 'from env' }) do |command_stdout, command_stdin, pid|
+            command_stdout.each { |line| lines << line.chomp }
+          end
+          expect(ENV.key?('FASTLANE_PTY_SPEC_VALUE')).to be(false)
+        end
+        expect(lines).to eq(["from env"])
+      end
+
+      it 'passes env to the command without a pty' do
+        expect(FastlaneCore::FastlanePty).to receive(:require).with("pty").and_raise(LoadError)
+        allow(FastlaneCore::FastlanePty).to receive(:require).with("open3").and_call_original
+        lines = []
+        FastlaneCore::FastlanePty.spawn(echo_spec_value, env: { 'FASTLANE_PTY_SPEC_VALUE' => 'from env' }) do |command_stdout, command_stdin, pid|
+          command_stdout.each { |line| lines << line.chomp }
+        end
+        expect(lines).to eq(["from env"])
       end
 
       it 'returns the status of the command it ran rather than whatever $? holds', requires_pty: true do
@@ -95,6 +118,18 @@ describe FastlaneCore do
         }
       end
 
+      it 'reports a missing program without a pty instead of failing on the status it never got' do
+        expect(FastlaneCore::FastlanePty).to receive(:require).with("pty").and_raise(LoadError)
+        allow(FastlaneCore::FastlanePty).to receive(:require).with("open3").and_call_original
+
+        expect {
+          FastlaneCore::FastlanePty.spawn('fl-no-such-program') { |command_stdout, command_stdin, pid| }
+        }.to raise_error(FastlaneCore::FastlanePtyError, /No such file or directory/) { |error|
+          expect(error.exit_status).to eq(-1)
+          expect(error.process_status).to be_nil
+        }
+      end
+
       # could be used to test
       # let(:crasher_path) { File.expand_path("./fastlane_core/spec/crasher/crasher") }
 
@@ -141,9 +176,33 @@ describe FastlaneCore do
       end
     end
 
+    describe "spawn_args" do
+      it "passes the command alone when no option is given, as existing callers expect" do
+        expect(described_class.spawn_args({}, "echo foo")).to eq(["echo foo"])
+      end
+
+      it "adds env and chdir only when given" do
+        expect(described_class.spawn_args({ "A" => "1" }, "echo foo", "/tmp")).to eq([{ "A" => "1" }, "echo foo", { chdir: "/tmp" }])
+      end
+    end
+
     describe "spawn_with_pty" do
+      # Both examples are about the command string that reaches PTY.spawn and
+      # nothing else. Stubbing it means the block never runs, so no status is
+      # produced and `spawn_with_pty` falls back to `process_status`, which is
+      # `$?`: whatever subprocess this process ran last. An earlier example in
+      # this file kills one, and these then failed with "Process crashed"
+      # depending on the order. Stub that fallback too. See fastlane#30184.
+      let(:exited_cleanly) do
+        instance_double(Process::Status, signaled?: false, exitstatus: 0)
+      end
+
+      before do
+        allow(FastlaneCore::FastlanePty).to receive(:process_status).and_return(exited_cleanly)
+      end
+
       it 'passes the command to Pty when FASTLANE_EXEC_FLUSH_PTY_WORKAROUND is not set', requires_pty: true do
-        allow(PTY).to receive(:spawn).with("echo foo")
+        expect(PTY).to receive(:spawn).with("echo foo")
 
         FastlaneSpec::Env.with_env_values('FASTLANE_EXEC_FLUSH_PTY_WORKAROUND' => nil) do
           FastlaneCore::FastlanePty.spawn_with_pty('echo foo') do |command_stdout, command_stdin, pid|
@@ -151,8 +210,17 @@ describe FastlaneCore do
         end
       end
 
+      it 'passes the command alone when env is nil', requires_pty: true do
+        expect(PTY).to receive(:spawn).with("echo foo")
+
+        FastlaneSpec::Env.with_env_values('FASTLANE_EXEC_FLUSH_PTY_WORKAROUND' => nil) do
+          FastlaneCore::FastlanePty.spawn_with_pty('echo foo', env: nil) do |command_stdout, command_stdin, pid|
+          end
+        end
+      end
+
       it 'wraps the command with a workaround when FASTLANE_EXEC_FLUSH_PTY_WORKAROUND is set', requires_pty: true do
-        allow(PTY).to receive(:spawn).with("echo foo;")
+        expect(PTY).to receive(:spawn).with("echo foo;")
 
         FastlaneSpec::Env.with_env_values('FASTLANE_EXEC_FLUSH_PTY_WORKAROUND' => '1') do
           FastlaneCore::FastlanePty.spawn_with_pty('echo foo') do |command_stdout, command_stdin, pid|

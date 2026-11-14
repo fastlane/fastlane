@@ -131,14 +131,14 @@ describe Supply do
 
     describe 'metadata encoding' do
       it 'prints a user friendly error message if metadata is not UTF-8 encoded' do
-        fake_config = 'fake config'
+        fake_config = +'fake config'
         allow(fake_config).to receive(:[]).and_return('fake config value')
         Supply.config = fake_config
 
         allow(File).to receive(:exist?).and_return(true)
         allow(File).to receive(:read).and_return("fake content")
 
-        fake_listing = "listing"
+        fake_listing = +"listing"
         Supply::AVAILABLE_METADATA_FIELDS.each do |field|
           allow(fake_listing).to receive("#{field}=".to_sym)
         end

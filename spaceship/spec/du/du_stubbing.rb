@@ -3,7 +3,7 @@ def du_fixture_file_path(filename)
 end
 
 def du_read_fixture_file(filename)
-  File.read(du_fixture_file_path(filename))
+  spaceship_fixture(du_fixture_file_path(filename))
 end
 
 # those represent UploadFile structures
@@ -22,24 +22,6 @@ def du_uploadimage_correct_jpg
   allow(mock_jpg).to receive(:file_size).and_return(520)
   allow(mock_jpg).to receive(:content_type).and_return('image/jpeg')
   allow(mock_jpg).to receive(:bytes).and_return("binary image...")
-  mock_jpg
-end
-
-def du_uploadtrailer_correct_mov
-  mock_jpg = double
-  allow(mock_jpg).to receive(:file_name).and_return('ftl_FAKEMD5_trailer-en-US.mov')
-  allow(mock_jpg).to receive(:file_size).and_return(123_456)
-  allow(mock_jpg).to receive(:content_type).and_return('video/quicktime')
-  allow(mock_jpg).to receive(:bytes).and_return("binary video...")
-  mock_jpg
-end
-
-def du_uploadtrailer_preview_correct_jpg
-  mock_jpg = double
-  allow(mock_jpg).to receive(:file_name).and_return('ftl_FAKEMD5_trailer-en-US_preview.jpg')
-  allow(mock_jpg).to receive(:file_size).and_return(12_345)
-  allow(mock_jpg).to receive(:content_type).and_return('image/jpg')
-  allow(mock_jpg).to receive(:bytes).and_return("trailer preview...")
   mock_jpg
 end
 
@@ -70,14 +52,6 @@ end
 
 def du_read_upload_screenshot_response_success
   du_read_fixture_file('upload_screenshot_response_success.json')
-end
-
-def du_read_upload_trailer_preview_response_success
-  du_read_fixture_file('upload_trailer_preview_response_success.json')
-end
-
-def du_read_upload_trailer_preview_2_response_success
-  du_read_fixture_file('upload_trailer_preview_2_response_success.json')
 end
 
 def du_upload_large_image_success

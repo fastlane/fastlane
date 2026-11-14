@@ -56,6 +56,21 @@ describe Fastlane::Action do
         end
       end
 
+      it "declares conflicts only between its own options" do
+        options = Array(action.available_options).grep(FastlaneCore::ConfigItem)
+        keys = options.map(&:key)
+        # These take some of supply's options; upload_to_play_store checks the full list.
+        partial_option_sets = %w(download_universal_apk_from_google_play upload_to_play_store_internal_app_sharing)
+
+        options.each do |option|
+          conflicts = Array(option.conflicting_options)
+          # Configuration only calls an option's conflict_block for the options it lists.
+          expect(conflicts).not_to(be_empty, "'#{name}' option '#{option.key}' has a conflict_block but no conflicting_options") if option.conflict_block
+          next if partial_option_sets.include?(name)
+          expect(conflicts - keys).to(be_empty, "'#{name}' option '#{option.key}' lists conflicting options it does not have: #{conflicts - keys}")
+        end
+      end
+
       it "output" do
         if action.output
           expect(action.output).to be_instance_of(Array), "'output' for action '#{name}' must be an array"

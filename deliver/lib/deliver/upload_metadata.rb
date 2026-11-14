@@ -535,15 +535,13 @@ module Deliver
       if locales_to_enable.count > 0
         lng_text = "language"
         lng_text += "s" if locales_to_enable.count != 1
-        Helper.show_loading_indicator("Activating info #{lng_text} #{locales_to_enable.join(', ')}...")
-
-        locales_to_enable.each do |locale|
-          app_info.create_app_info_localization(attributes: {
-            locale: locale
-          })
+        Helper.with_loading_indicator("Activating info #{lng_text} #{locales_to_enable.join(', ')}...") do
+          locales_to_enable.each do |locale|
+            app_info.create_app_info_localization(attributes: {
+              locale: locale
+            })
+          end
         end
-
-        Helper.hide_loading_indicator
 
         # Refresh version localizations
         localizations = app_info.get_app_info_localizations
@@ -570,15 +568,13 @@ module Deliver
       if locales_to_enable.count > 0
         lng_text = "language"
         lng_text += "s" if locales_to_enable.count != 1
-        Helper.show_loading_indicator("Activating version #{lng_text} #{locales_to_enable.join(', ')}...")
-
-        locales_to_enable.each do |locale|
-          version.create_app_store_version_localization(attributes: {
-            locale: locale
-          })
+        Helper.with_loading_indicator("Activating version #{lng_text} #{locales_to_enable.join(', ')}...") do
+          locales_to_enable.each do |locale|
+            version.create_app_store_version_localization(attributes: {
+              locale: locale
+            })
+          end
         end
-
-        Helper.hide_loading_indicator
 
         # Refresh version localizations
         localizations = version.get_app_store_version_localizations

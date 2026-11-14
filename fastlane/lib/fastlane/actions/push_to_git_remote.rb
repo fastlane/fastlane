@@ -3,22 +3,27 @@ module Fastlane
     # Push local changes to the remote branch
     class PushToGitRemoteAction < Action
       def self.run(params)
-        # Find the local git branch using HEAD or fallback to CI's ENV git branch if you're in detached HEAD state
+        # Find the current branch, or on a detached HEAD the branch CI names in its environment variables
         local_git_branch = Actions.git_branch_name_using_HEAD
-        local_git_branch = Actions.git_branch unless local_git_branch && local_git_branch != "HEAD"
+        detached_head = local_git_branch == "HEAD"
+        local_git_branch = Actions.git_branch unless local_git_branch && !detached_head
 
         local_branch = params[:local_branch]
         local_branch ||= local_git_branch.gsub(%r{#{params[:remote]}\/}, '') if local_git_branch
         UI.user_error!('Failed to get the current branch.') unless local_branch
 
         remote_branch = params[:remote_branch] || local_branch
+        UI.user_error!("HEAD is detached and no branch name was found in the CI environment variables; pass remote_branch") if remote_branch == "HEAD"
+
+        # On a detached HEAD the branch name comes from CI, and its local branch does not have the commits made on HEAD
+        source = params[:local_branch] || (detached_head ? "HEAD" : local_branch)
 
         # construct our command as an array of components
         command = [
           'git',
           'push',
           params[:remote],
-          "#{local_branch.shellescape}:#{remote_branch.shellescape}"
+          "#{source.shellescape}:#{remote_branch.shellescape}"
         ]
 
         # optionally add the tags component
@@ -37,7 +42,7 @@ module Fastlane
         command << '--set-upstream' if params[:set_upstream]
 
         # optionally add the --push_options components
-        params[:push_options].each { |push_option| command << "--push-option=#{push_option}" } if params[:push_options]
+        params[:push_options].each { |push_option| command << "--push-option=#{push_option.shellescape}" } if params[:push_options]
 
         # execute our command
         return command.join(' ') if Helper.test?
@@ -116,10 +121,10 @@ module Fastlane
 
       def self.example_code
         [
-          'push_to_git_remote # simple version. pushes "master" branch to "origin" remote',
+          'push_to_git_remote # simple version. Pushes the current branch and all local tags to "origin" remote',
           'push_to_git_remote(
             remote: "origin",         # optional, default: "origin"
-            local_branch: "develop",  # optional, aliased by "branch", default is set to current branch
+            local_branch: "develop",  # optional, default is set to current branch
             remote_branch: "develop", # optional, default is set to local_branch
             force: true,              # optional, default: false
             force_with_lease: true,   # optional, default: false

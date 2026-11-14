@@ -65,18 +65,18 @@
     </style>
   </head>
   <body><% image_counter = 0 %><% @data.each do |language, content| %>
-    <h1 id="<%= language %>" class="language"><%= language %></h1>
+    <h1 id="<%= ERB::Util.h(language) %>" class="language"><%= ERB::Util.h(language) %></h1>
     <hr>
     <table><% content.each do |device_name, screens| %>
       <tr>
         <th colspan="<%= screens.count %>">
-          <a id="<%= language %>-<%= device_name %>" class="deviceName" href="#<%= language %>-<%= device_name %>"><%= device_name %></a>
+          <a id="<%= ERB::Util.h(language) %>-<%= ERB::Util.h(device_name) %>" class="deviceName" href="#<%= ERB::Util.h(language) %>-<%= ERB::Util.h(device_name) %>"><%= ERB::Util.h(device_name) %></a>
         </th>
       </tr>
       <tr><% screens.each do |screen_path| %><% next if screen_path.include?"_framed.png" %>
         <td><% image_counter += 1 %>
-          <a href="<%= screen_path %>" target="_blank" class="screenshotLink">
-            <img class="screenshot" src="<%= screen_path %>" style="width: 100%;" alt="<%= language %> <%= device_name %>" data-counter="<%= image_counter %>">
+          <a href="<%= ERB::Util.h(screen_path) %>" target="_blank" class="screenshotLink">
+            <img class="screenshot" src="<%= ERB::Util.h(screen_path) %>" style="width: 100%;" alt="<%= ERB::Util.h(language) %> <%= ERB::Util.h(device_name) %>" data-counter="<%= image_counter %>">
           </a>
         </td><% end %>
       </tr><% end %>
@@ -128,9 +128,14 @@
           imageDisplay.alt             = img.alt;
           imageDisplay.dataset.counter = img.dataset.counter;
 
-          imageInfo.innerHTML          = '<h3>'+img.alt+'</h3>';
-          imageInfo.innerHTML         += decodeURI(img.src.split("/").pop());
-          imageInfo.innerHTML         += '<br />'+tmpImg.height+'&times;'+tmpImg.width+'px';
+          // textContent, not innerHTML: file names must not be interpreted as HTML
+          var imageTitle               = document.createElement('h3');
+          imageTitle.textContent       = img.alt;
+          imageInfo.textContent        = '';
+          imageInfo.appendChild(imageTitle);
+          imageInfo.appendChild(document.createTextNode(decodeURI(img.src.split("/").pop())));
+          imageInfo.appendChild(document.createElement('br'));
+          imageInfo.appendChild(document.createTextNode(tmpImg.height+'\u00d7'+tmpImg.width+'px'));
 
           overlay.style.display        = "block";
         });

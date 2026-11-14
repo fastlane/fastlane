@@ -27,6 +27,11 @@ describe Fastlane do
         expect(result).to include("-F dsym=@#{dsym_path.shellescape}")
         expect(result).to include("-F key=abc")
       end
+
+      it "is deprecated because the service was retired" do
+        expect(Fastlane::Actions.is_deprecated?(Fastlane::Actions::ApteligentAction)).to eq(true)
+        expect(Fastlane::Actions::ApteligentAction.deprecated_notes).to include("stopped selling Apteligent")
+      end
     end
   end
 end

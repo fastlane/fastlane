@@ -26,27 +26,36 @@ jobs:
     steps:
       - name: Download release tag artifact
         if: ${{ github.event_name == 'workflow_run' }}
-        uses: actions/download-artifact@v8
+        uses: actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333 # v8.0.2
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
           run-id: ${{ github.event.workflow_run.id }}
           name: release_tag
 
-      - name: Extract version from artifact
-        if: ${{ github.event_name == 'workflow_run' }}
+      - name: Determine version
+        id: version
+        env:
+          EVENT_NAME: ${{ github.event_name }}
+          INPUT_VERSION: ${{ github.event.inputs.version }}
         run: |
-          if [ ! -f "latest_fl_version.txt" ]; then
-            echo "latest_fl_version.txt not found in expected locations"
+          if [ "$EVENT_NAME" = "workflow_run" ]; then
+            if [ ! -f "latest_fl_version.txt" ]; then
+              echo "latest_fl_version.txt not found in expected locations"
+              exit 1
+            fi
+            version=$(cat latest_fl_version.txt)
+          else
+            version="$INPUT_VERSION"
+          fi
+          # The artifact comes from another workflow run: accept a version number and nothing else
+          if [[ ! "$version" =~ ^[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
+            echo "Refusing unexpected version: '$version'"
             exit 1
           fi
-          echo "FL_VERSION=$(cat latest_fl_version.txt)" >> "$GITHUB_ENV"
-
-      - name: Set version from workflow_dispatch input
-        if: ${{ github.event_name == 'workflow_dispatch' }}
-        run: echo "FL_VERSION=${{ github.event.inputs.version }}" >> "$GITHUB_ENV"
+          echo "version=$version" >> "$GITHUB_OUTPUT"
 
       - name: Announce release on released pull requests
-        uses: fastlane/github-actions/communicate-on-pull-request-released@latest
+        uses: fastlane/github-actions/communicate-on-pull-request-released@212cacd2e482bf799ecfe99e379b65b0f3eeba56 # v0.8.0
         with:
-          version: ${{ env.FL_VERSION }}
+          version: ${{ steps.version.outputs.version }}
           repo-token: ${{ secrets.GITHUB_TOKEN }}

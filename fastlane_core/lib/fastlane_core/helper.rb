@@ -2,6 +2,7 @@ require 'logger'
 require 'colored'
 require 'tty-spinner'
 require 'pathname'
+require 'fileutils'
 
 require_relative 'command_executor'
 require_relative 'fastlane_folder'
@@ -55,6 +56,21 @@ module FastlaneCore
     # returns true if fastlane was installed via RubyGems
     def self.rubygems?
       !self.bundler? && !self.contained_fastlane? && !self.homebrew? && !self.mac_app?
+    end
+
+    # How this fastlane was installed, as reported to analytics and printed at startup
+    def self.install_method
+      if self.bundler?
+        'bundler'
+      elsif self.contained_fastlane?
+        'standalone'
+      elsif self.homebrew?
+        'homebrew'
+      elsif self.mac_app?
+        'mac_app'
+      else
+        'gem'
+      end
     end
 
     # environment
@@ -188,7 +204,7 @@ module FastlaneCore
     def self.swift_version
       if self.which('swift')
         output = `swift --version 2> /dev/null`
-        return output.split("\n").first.match(/version ([0-9.]+)/).captures.first
+        return output.lines.first.to_s[/version ([0-9.]+)/, 1]
       end
       return nil
     end
@@ -247,6 +263,9 @@ module FastlaneCore
         ].each do |path|
           result = File.expand_path(File.join(self.xcode_path, path))
           return result if File.exist?(result)
+        end
+        if FastlaneCore::Env.truthy?("FASTLANE_ITUNES_TRANSPORTER_USE_SHELL_SCRIPT")
+          UI.user_error!("Could not find transporter at #{self.xcode_path}: Xcode 14 and newer no longer include it. Remove FASTLANE_ITUNES_TRANSPORTER_USE_SHELL_SCRIPT so fastlane uploads with altool, or install Transporter and set FASTLANE_ITUNES_TRANSPORTER_PATH.")
         end
         UI.user_error!("Could not find transporter at #{self.xcode_path}. Please make sure you set the correct path to your Xcode installation.")
       elsif self.windows?
@@ -329,25 +348,45 @@ module FastlaneCore
       str.gsub(/\e\[([;\d]+)?m/, '')
     end
 
+    # Opens path for writing, readable and writable only by its owner (0600), including when it
+    # already exists: the mode is set before anything is written. Windows has no such mode.
+    def self.open_owner_only(path, mode = "w", &block)
+      File.open(path, mode, 0o600) do |file|
+        file.chmod(0o600) unless windows?
+        yield(file)
+      end
+    end
+
+    # Creates dir and any missing parents accessible only by its owner (0700); an existing dir is restricted too
+    def self.mkdir_owner_only(dir)
+      FileUtils.mkdir_p(dir, mode: 0o700)
+      File.chmod(0o700, dir) unless windows?
+    end
+
     # Zips directory
     def self.zip_directory(path, output_path, contents_only: false, overwrite: false, print: true)
       if overwrite
-        overwrite_command = " && rm -f '#{output_path}'"
+        overwrite_command = " && rm -f #{output_path.shellescape}"
       else
         overwrite_command = ""
       end
 
       if contents_only
-        command = "cd '#{path}'#{overwrite_command} && zip -r '#{output_path}' *"
+        command = "cd #{path.shellescape}#{overwrite_command} && zip -r #{output_path.shellescape} *"
       else
         containing_path = File.expand_path("..", path)
         contents_path = File.basename(path)
 
-        command = "cd '#{containing_path}'#{overwrite_command} && zip -r '#{output_path}' '#{contents_path}'"
+        command = "cd #{containing_path.shellescape}#{overwrite_command} && zip -r #{output_path.shellescape} #{contents_path.shellescape}"
       end
 
       UI.command(command) unless print
-      Helper.backticks(command, print: print)
+      FastlaneCore::CommandExecutor.execute(command: command,
+                                          print_all: print,
+                                      print_command: print,
+                                              error: proc do |output|
+                                                UI.user_error!("Could not zip '#{path}' to '#{output_path}':\n#{output}")
+                                              end)
     end
 
     # Executes the provided block after adjusting the ENV to have the
@@ -381,6 +420,8 @@ module FastlaneCore
         # we set the default here, instead of at the parameters
         # as we don't want to `UI.message` a rocket that's just there for the loading indicator
         text ||= "🚀"
+        # A spinner left running by a show without a hide could never be stopped once replaced
+        @require_fastlane_spinner.stop if @require_fastlane_spinner && !@require_fastlane_spinner.done?
         @require_fastlane_spinner = TTY::Spinner.new("[:spinner] #{text} ", format: :dots)
         @require_fastlane_spinner.auto_spin
       else
@@ -388,10 +429,22 @@ module FastlaneCore
       end
     end
 
-    def self.hide_loading_indicator
+    def self.hide_loading_indicator(success: true)
       if self.should_show_loading_indicator? && @require_fastlane_spinner
-        @require_fastlane_spinner.success
+        success ? @require_fastlane_spinner.success : @require_fastlane_spinner.error
       end
+    end
+
+    # Shows the loading indicator while the block runs, and hides it even when the block raises
+    def self.with_loading_indicator(text = nil)
+      failed = false
+      show_loading_indicator(text)
+      yield
+    rescue Exception # rubocop:disable Lint/RescueException
+      failed = true
+      raise
+    ensure
+      hide_loading_indicator(success: !failed)
     end
 
     # files

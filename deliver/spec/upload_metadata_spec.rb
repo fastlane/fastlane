@@ -298,6 +298,7 @@ describe Deliver::UploadMetadata do
         allow(uploader).to receive(:review_information)
         allow(uploader).to receive(:review_attachment_file)
         allow(uploader).to receive(:app_rating)
+        allow(uploader).to receive(:sleep)
 
         # Verify available languages
         expect(app).to receive(:id).and_return(id)

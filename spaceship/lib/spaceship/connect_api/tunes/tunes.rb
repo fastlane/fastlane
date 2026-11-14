@@ -1114,7 +1114,9 @@ module Spaceship
               }
           }
 
-          tunes_request_client.post("#{Version::V1}/appStoreVersionReleaseRequests", body)
+          # App Store Connect can return a 500/504 after it has accepted the release request. A retry is then
+          # rejected because the version is already being released, so leave it to the caller to check the version state
+          tunes_request_client.post("#{Version::V1}/appStoreVersionReleaseRequests", body, tries: 1)
         end
 
         #

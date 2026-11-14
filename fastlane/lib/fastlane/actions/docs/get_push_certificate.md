@@ -17,9 +17,7 @@ To automate iOS Provisioning profiles you can use [_match_](https://docs.fastlan
 <p align="center">
     <a href="#features">Features</a> &bull;
     <a href="#usage">Usage</a> &bull;
-    <a href="#how-does-it-work">How does it work?</a> &bull;
-    <a href="#tips">Tips</a> &bull;
-    <a href="#need-help">Need help?</a>
+    <a href="#how-does-it-work">How does it work?</a>
 </p>
 
 -------

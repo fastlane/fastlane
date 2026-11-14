@@ -81,12 +81,15 @@ Use Git Storage to store all code signing identities in a private git repo, owne
 
 First, enter the URL to your private (!) Git repo (You can create one for free on e.g. [GitHub](https://github.com/new) or [BitBucket](https://bitbucket.org/repo/create)). The URL you enter can be either a `https://` or a `git` URL. `fastlane match init` won't read or modify your certificates or profiles yet, and also won't validate your git URL.
 
+You'll then be asked which branch of that repo to use, defaulting to `main` if you leave the answer blank.
+
 This will create a `Matchfile` in your current directory (or in your `./fastlane/` folder).
 
 Example content (for more advanced setups check out the [fastlane section](#fastlane)):
 
 ```ruby-skip-tests
 git_url("https://github.com/fastlane/certificates")
+git_branch("main")
 
 app_identifier("tools.fastlane.app")
 username("user@fastlane.tools")
@@ -94,7 +97,7 @@ username("user@fastlane.tools")
 
 ##### Git Storage on GitHub
 
-If your machine is currently using SSH to authenticate with GitHub, you'll want to use a `git` URL, otherwise, you may see an authentication error when you attempt to use match. Alternatively, you can set a basic authorization for _match_:
+If your machine is currently using SSH to authenticate with GitHub, you'll want to use a `git` URL, otherwise, you may see an authentication error when you attempt to use match. Alternatively, you can set a basic authorization for _match_ (needs git 2.31 or later):
 
 Using parameter:
 
@@ -138,7 +141,7 @@ You can find more information about GitHub basic authentication and personal tok
 
 ##### Git Storage on Azure DevOps
 
-If you're running a pipeline on Azure DevOps and using git storage in a another repository on the same project, you might want to use `bearer` token authentication.
+If you're running a pipeline on Azure DevOps and using git storage in a another repository on the same project, you might want to use `bearer` token authentication (needs git 2.31 or later).
 
 Using parameter:
 
@@ -259,7 +262,7 @@ If you want to use a single developer and/or distribution certificate for multip
 
 ```ruby-skip-tests
 git_url("https://github.com/example/example-repo.git")
-git_branch("master")
+git_branch("main")
 ```
 
 _match_ will reuse certificates and will create separate provisioning profiles for each app.
@@ -407,6 +410,13 @@ If you're not using `Fastfile`, you can also use the `force_for_new_devices` opt
 ```no-highlight
 fastlane match adhoc --force_for_new_devices
 ```
+
+##### Offline profile use
+
+If your profile requires the 'Offline support (7 day validity)' setting for use without Internet, use `offline_profile: true` to add this permission to generated profiles.
+
+> [!NOTE]
+> Offline profiles can only be created when logging in with an Apple ID. Apple's App Store Connect API (`api_key` / `api_key_path`) does not support this setting, so _match_ will fail with a clear error if both are combined.
 
 ##### Managed capabilities
 

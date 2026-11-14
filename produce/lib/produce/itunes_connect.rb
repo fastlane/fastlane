@@ -38,7 +38,7 @@ module Produce
         end
 
         # Produce.config[:itc_users]
-        application = Spaceship::ConnectAPI::App.create(
+        Spaceship::ConnectAPI::App.create(
           name: Produce.config[:app_name],
           version_string: Produce.config[:app_version] || "1.0",
           sku: Produce.config[:sku].to_s,

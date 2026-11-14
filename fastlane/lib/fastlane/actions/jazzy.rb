@@ -3,7 +3,7 @@ module Fastlane
     class JazzyAction < Action
       def self.run(params)
         Actions.verify_gem!('jazzy')
-        command = "jazzy"
+        command = +"jazzy"
         command << " --config #{params[:config]}" if params[:config]
         command << " --module-version #{params[:module_version]}" if params[:module_version]
         Actions.sh(command)

@@ -25,6 +25,42 @@ describe Fastlane do
         end
       end
 
+      describe "the pod keys command" do
+        def command_for(key, target)
+          command = nil
+          allow(FastlaneCore::CommandExecutor).to receive(:run) do |*args, **_options|
+            command = args
+            "[cocoapods-keys] secret"
+          end
+          Fastlane::Actions::VerifyPodKeysAction.value(key, target)
+          command
+        end
+
+        it "passes a target name with a space as one argument" do
+          expect(command_for("MyKey", "My App")).to eq(["pod", "keys", "get", "MyKey", "My App"])
+        end
+
+        it "passes no target argument when no target is set" do
+          expect(command_for("MyKey", "")).to eq(["pod", "keys", "get", "MyKey"])
+        end
+      end
+
+      describe "when pod keys fails", unless: FastlaneCore::Helper.windows? do
+        it "fails with its message" do
+          Dir.mktmpdir("fl_spec_pod") do |bin_dir|
+            File.write(File.join(bin_dir, "pod"), "#!/bin/sh\necho '[!] Unknown command: `keys`' >&2\nexit 1\n")
+            File.chmod(0o755, File.join(bin_dir, "pod"))
+
+            # The command runs in a subprocess, so PATH must really change, not just ENV in Ruby
+            expect do
+              FastlaneCore::Helper.with_env_values("PATH" => "#{bin_dir}:#{ENV['PATH']}") do
+                Fastlane::Actions::VerifyPodKeysAction.value("MyKey", "")
+              end
+            end.to raise_error(FastlaneCore::Interface::FastlaneError, /Unknown command: `keys`/)
+          end
+        end
+      end
+
       describe "invalid values" do
         value = ""
 

@@ -206,23 +206,23 @@ module Fastlane
 
         raise ArgumentError, "sh requires :command keyword in argument" if command.nil?
         log = options[:log].nil? ? true : options[:log]
-        FastFile.sh(*command, step_name: options[:step_name], log: log, error_callback: options[:error_callback], &b)
+        FastFile.sh(*command, step_name: options[:step_name], log: log, error_callback: options[:error_callback], stdin: options[:stdin], separate_stderr: options.fetch(:separate_stderr, false), chdir: options[:chdir], &b)
       elsif args.count != 1 && args.last.kind_of?(Hash)
         new_args = args.dup
         options = new_args.pop
         log = options[:log].nil? ? true : options[:log]
-        FastFile.sh(*new_args, step_name: options[:step_name], log: log, error_callback: options[:error_callback], &b)
+        FastFile.sh(*new_args, step_name: options[:step_name], log: log, error_callback: options[:error_callback], stdin: options[:stdin], separate_stderr: options.fetch(:separate_stderr, false), chdir: options[:chdir], &b)
       else
         FastFile.sh(*args, &b)
       end
     end
 
-    def self.sh(*command, step_name: nil, log: true, error_callback: nil, &b)
+    def self.sh(*command, step_name: nil, log: true, error_callback: nil, stdin: nil, separate_stderr: false, chdir: nil, &b)
       command_header = step_name
       command_header ||= log ? Actions.shell_command_from_args(*command) : "shell command"
 
       Actions.execute_action(command_header) do
-        Actions.sh_no_action(*command, log: log, error_callback: error_callback, &b)
+        Actions.sh_no_action(*command, log: log, error_callback: error_callback, stdin: stdin, separate_stderr: separate_stderr, chdir: chdir, &b)
       end
     end
 
@@ -314,6 +314,7 @@ module Fastlane
               # it would defeat the caching's purpose.
               command += ['--depth', '1'] unless is_eligible_for_caching
               command += ['--branch', branch] unless branch == 'HEAD'
+              FastlaneCore::Secrets.register(git_extra_headers, name: :git_extra_headers)
               git_extra_headers.each do |header|
                 command += ['--config', "http.extraHeader=#{header}"]
               end
@@ -329,7 +330,7 @@ module Fastlane
                 # Update the repo and try again before failing
                 UI.message("Updating git repo...")
                 Helper.with_env_values('GIT_TERMINAL_PROMPT' => '0') do
-                  Actions.sh("cd #{clone_folder.shellescape} && git checkout #{branch} && git reset --hard && git pull --all")
+                  Actions.sh("cd #{clone_folder.shellescape} && git checkout #{branch.shellescape} && git reset --hard && git pull --all")
                 end
 
                 checkout_param = find_tag(folder: clone_folder, version: version, remote: false)
@@ -403,6 +404,37 @@ module Fastlane
         else
           Dir.mktmpdir("fl_clone", &import_block)
         end
+      end
+    end
+
+    # @param gem_name [String] The name of the gem to import
+    # @param paths [Array] the list of pattern to expand matching fastfiles to import
+    def import_from_gem(gem_name: nil, paths: ["fastlane/Fastfile*"])
+      UI.user_error!("Please pass a gem name to the `import_from_gem` action") if gem_name.to_s.length == 0
+
+      Actions.execute_action('import_from_gem') do
+        action_launched('import_from_gem')
+
+        UI.message("Importing from gem: #{gem_name}")
+        rubygem = Bundler.rubygems.find_name(gem_name).first
+        UI.user_error!("Couldn't find gem '#{gem_name}', make sure it is in your Gemfile") unless rubygem
+
+        # Before its Fastfiles, whose lanes may call the actions of the plugins the gem depends on
+        Fastlane.plugin_manager.load_plugins_required_by(gem_name)
+
+        gem_path = rubygem.full_gem_path
+
+        fastfiles = paths.map { |r| Dir.glob("#{gem_path}/#{r}") }.flatten
+        UI.user_error!("No Fastfile found in gem '#{gem_name}' matching #{paths.join(', ')}") if fastfiles.empty?
+
+        return_value = fastfiles.map do |file_path|
+          UI.message("Importing fastfile from #{file_path}")
+          import(file_path)
+        end
+
+        action_completed('import_from_gem', status: FastlaneCore::ActionCompletionStatus::SUCCESS)
+
+        return_value
       end
     end
 

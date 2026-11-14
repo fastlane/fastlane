@@ -42,6 +42,11 @@ describe Fastlane do
     end
 
     it "disable_automatic_code_signing for specific target" do
+      # Start from the state the previous example leaves, so this one also passes when run alone.
+      Fastlane::FastFile.new.parse("lane :setup do
+        enable_automatic_code_signing(path: '#{@project_path}', team_id: 'XXXX')
+      end").runner.execute(:setup)
+
       allow(UI).to receive(:success)
       expect(UI).to receive(:success).with("Successfully updated project settings to use Code Sign Style = 'Manual'")
       expect(UI).to receive(:success).with("\t * today")

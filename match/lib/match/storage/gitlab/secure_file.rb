@@ -1,6 +1,8 @@
 require 'open-uri'
+require 'ostruct'
 
 require_relative '../../module'
+require_relative '../interface'
 
 module Match
   module Storage
@@ -35,11 +37,11 @@ module Match
           url = URI("#{file_url}/download")
 
           begin
-            destination_file = "#{working_directory}/#{@file.name}"
+            destination_file = Storage.download_path(working_directory, @file.name)
 
             create_subfolders(working_directory)
             File.open(destination_file, "wb") do |saved_file|
-              URI.open(url, "rb", { @client.authentication_key => @client.authentication_value }) do |data|
+              url.open("rb", { @client.authentication_key => @client.authentication_value }) do |data|
                 saved_file.write(data.read)
               end
 

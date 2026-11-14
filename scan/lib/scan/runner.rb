@@ -327,7 +327,7 @@ module Scan
 
     def open_report
       if !Helper.ci? && Scan.cache[:open_html_report_path]
-        `open --hide '#{Scan.cache[:open_html_report_path]}'`
+        system("open", "--hide", Scan.cache[:open_html_report_path])
       end
     end
 
@@ -378,6 +378,7 @@ module Scan
     end
 
     def test_results
+      UI.deprecated("Scan::Runner#test_results is deprecated and will be removed in a future version of fastlane; scan no longer uses it. Read the test results from the result bundle with Trainer::TestParser.")
       temp_junit_report = Scan.cache[:temp_junit_report]
       return File.read(temp_junit_report) if temp_junit_report && File.file?(temp_junit_report)
 

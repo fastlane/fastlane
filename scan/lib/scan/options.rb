@@ -207,6 +207,13 @@ module Scan
                                      conflict_block: proc do |value|
                                        UI.user_error!("You can't use 'thread_sanitizer' and 'address_sanitizer' options in one run")
                                      end),
+        FastlaneCore::ConfigItem.new(key: :collect_test_diagnostics,
+                                     env_name: "SCAN_COLLECT_TEST_DIAGNOSTICS",
+                                     description: "Whether verbose and long-running diagnostics (like sysdiagnoses or log archives) are collected when testing. Valid values are: on-failure or never. If not specified, the value in the test plan is used. Equivalent to -collect-test-diagnostics (Xcode 14 and up)",
+                                     optional: true,
+                                     verify_block: proc do |value|
+                                       UI.user_error!("Invalid collect_test_diagnostics #{value}") unless ['on-failure', 'never'].include?(value)
+                                     end),
 
         # output
         FastlaneCore::ConfigItem.new(key: :open_report,

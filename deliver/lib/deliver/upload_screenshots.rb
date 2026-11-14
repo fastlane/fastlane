@@ -41,15 +41,13 @@ module Deliver
       if locales_to_enable.count > 0
         lng_text = "language"
         lng_text += "s" if locales_to_enable.count != 1
-        Helper.show_loading_indicator("Activating #{lng_text} #{locales_to_enable.join(', ')}...")
-
-        locales_to_enable.each do |locale|
-          version.create_app_store_version_localization(attributes: {
-            locale: locale
-          })
+        Helper.with_loading_indicator("Activating #{lng_text} #{locales_to_enable.join(', ')}...") do
+          locales_to_enable.each do |locale|
+            version.create_app_store_version_localization(attributes: {
+              locale: locale
+            })
+          end
         end
-
-        Helper.hide_loading_indicator
 
         # Refresh version localizations
         localizations = version.get_app_store_version_localizations
@@ -57,9 +55,9 @@ module Deliver
 
       upload_screenshots(localizations, screenshots_per_language, options[:screenshot_processing_timeout])
 
-      Helper.show_loading_indicator("Sorting screenshots uploaded...")
-      sort_screenshots(localizations)
-      Helper.hide_loading_indicator
+      Helper.with_loading_indicator("Sorting screenshots uploaded...") do
+        sort_screenshots(localizations)
+      end
 
       UI.success("Successfully uploaded screenshots to App Store Connect")
     end
@@ -159,9 +157,9 @@ module Deliver
 
       UI.verbose('Uploading jobs are completed')
 
-      Helper.show_loading_indicator("Waiting for all the screenshots to finish being processed...")
-      states = wait_for_complete(iterator, timeout_seconds)
-      Helper.hide_loading_indicator
+      states = Helper.with_loading_indicator("Waiting for all the screenshots to finish being processed...") do
+        wait_for_complete(iterator, timeout_seconds)
+      end
       retry_upload_screenshots_if_needed(iterator, states, total_number_of_screenshots, tries, timeout_seconds, localizations, screenshots_per_language)
 
       UI.message("Successfully uploaded all screenshots")

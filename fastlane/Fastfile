@@ -38,9 +38,10 @@ lane :lint_source do
   ensure_no_debug_code(text: " UI\\.", path: "spaceship/lib", extension: ".rb", exclude_dirs: exclude_dirs)
   ensure_no_debug_code(text: " UI\\.", path: "credentials_manager/lib", extension: ".rb", exclude_dirs: exclude_dirs)
 
-  rubocop(step_name: 'policekeeping_the_code_with_rubocop')
-
   Dir.chdir("..") do
+    # Not the plugin's rubocop action: its -D turns off RuboCop's parallel default (rubocop/rubocop#16338)
+    sh("bundle", "exec", "rubocop", step_name: 'policekeeping_the_code_with_rubocop')
+
     # If no shellcheck - warn and skip, otherwise shellcheck all .sh and .bash files
     if system('which shellcheck > /dev/null 2>&1')
       sh('git ls-files -z "*.sh" "*.bash" | grep -z -v "Pods-" | xargs -0 shellcheck')
@@ -53,20 +54,10 @@ end
 desc "Measure the execution time of the --help command"
 lane :benchmark_help_command do
   Dir.chdir("..") do
-    # install gnomon if not installed yet
-    Actions.sh("echo foo | gnomon", log: true, error_callback: lambda { |result|
-      if Helper.windows? || Helper.mac?
-        sh('npm install -g gnomon')
-      else
-        sh('sudo npm install -g gnomon')
-      end
-    })
-    cmd = Helper.windows? ? "cd bin && fastlane --help | gnomon" : "bin/fastlane --help | gnomon"
+    cmd = Helper.windows? ? "cd bin && fastlane --help" : "PAGER=cat bin/fastlane --help"
     3.times do
-      content = sh(cmd, log: false)
-      content.each_line do |line|
-        UI.message("🏎️ '#{line.strip}'") if ["Total", "real", "user", "sys"].any? { |word| line.include?(word) }
-      end
+      seconds = seconds_spent { sh(cmd, log: false) }
+      UI.message("🏎️ 'Total #{format('%.4f', seconds)}s'")
     end
   end
 end
@@ -81,13 +72,14 @@ lane :execute_tests do
   # Verifying the --help command
   Dir.chdir("..") do
     cmd = Helper.windows? ? "cd bin && fastlane --help" : "PAGER=cat bin/fastlane --help"
-    content = sh(cmd)
+    content = nil
+    # Timed here rather than with benchmark_help_command: its three runs took the same time as this one
+    seconds = seconds_spent { content = sh(cmd) }
+    UI.message("🏎️ 'Total #{format('%.4f', seconds)}s'")
     ["--version", "https://fastlane.tools", "fastlane"].each do |current|
       UI.user_error!("--help missing information: '#{current}'") unless content.include?(current)
     end
   end
-
-  benchmark_help_command
 
   # Run the tests
   build_fastlane_gem(version: version) unless File.file?("pkg/fastlane-#{version}.gem")
@@ -119,7 +111,7 @@ lane :bump do |options|
   paths_for_commit = []
 
   version_file_path = "./fastlane/lib/fastlane/version.rb"
-  last_version_file_path = File.absolute_path("../CHANGELOG.latest.md")
+  last_version_file_path = File.absolute_path("../internal/CHANGELOG.latest.md")
 
   # Verify everything is in a consistent state
   latest_version = current_version
@@ -194,6 +186,16 @@ end
 
 desc "Generate the Swift api and test it"
 lane :generate_swift_api do |options|
+  generated_files = generate_swift_sources(options)
+  build_swift_runner
+  # Set by the "Validate Fastlane.swift generation" CI job; set it locally to run the same checks
+  sh("spec/swift/spm-runner/run.sh") if ENV["FASTLANE_SWIFT_TESTS"]
+  generated_files
+end
+
+# CI runs the two halves on their own, to skip the build when the generated sources already passed
+desc "Generate the Swift api"
+lane :generate_swift_sources do |options|
   Fastlane::VERSION = options[:fastlane_version] if options[:fastlane_version]
 
   require "../fastlane/lib/fastlane/swift_fastlane_api_generator.rb"
@@ -203,15 +205,22 @@ lane :generate_swift_api do |options|
     sh("rake")
     UI.success("Done formatting fastlane.swift API")
   end
+  generated_files
+end
+
+desc "Build the Swift runner, and run the Swift tests with FASTLANE_SWIFT_TESTS"
+lane :build_swift_runner do
   UI.success("Done generating fastlane.swift API, ensuring it builds")
+  # Built, not archived: what SwiftLaneManager.build_runner! does for users
   gym(
     project: File.expand_path("swift/FastlaneSwiftRunner/FastlaneSwiftRunner.xcodeproj"),
-    skip_package_ipa: true
+    skip_archive: true,
+    skip_package_dependencies_resolution: true # the project has no Swift packages
   )
   sh("swift build")
+  sh("swift test") if ENV["FASTLANE_SWIFT_TESTS"]
   sh("rm -r ../.build")
-  sh("rm ../FastlaneRunner")
-  generated_files
+  sh("rm FastlaneRunner") # the build copies it here; only the archive put it in the repository root
 end
 
 desc "Generate the FastlaneSwiftRunner project manifest"
@@ -270,7 +279,7 @@ lane :create_github_release do |options|
     validate_repo
 
     title = "Improvements"
-    description = File.read("../CHANGELOG.latest.md")
+    description = File.read("../internal/CHANGELOG.latest.md")
 
     github_release = set_github_release(
       repository_name: repo_name,
@@ -283,8 +292,6 @@ lane :create_github_release do |options|
     )
 
     release_url = github_release['html_url']
-    message = [title, description, release_url].join("\n\n")
-    add_fastlane_git_tag(tag: "fastlane/#{version}", message: message)
 
     UI.success("New GitHub release has been created: #{release_url}")
   else
@@ -294,10 +301,7 @@ lane :create_github_release do |options|
     download_github_release_gem(version: version)
   end
 
-  # Unset GEM_HOST_API_KEY as GitHub Action (rubygems/configure-rubygems-credentials) sets it.
-  sh "env -u GEM_HOST_API_KEY gem push --key github --host https://rubygems.pkg.github.com/#{github_username} #{gem_path}" unless options[:skip_github_packages]
-
-  sh "gem push #{gem_path}" unless options[:skip_rubygems]
+  sh "gem push --key github --host https://rubygems.pkg.github.com/#{github_username} #{gem_path}" unless options[:skip_github_packages]
 end
 
 lane :download_github_release_gem do |options|
@@ -320,7 +324,7 @@ lane :download_github_release_gem do |options|
   file_path = File.join('../pkg', file_name)
 
   # Download the file
-  URI.open(gem_asset_url) do |remote_file|
+  URI.parse(gem_asset_url).open do |remote_file|
     File.open(file_path, 'wb') do |local_file|
       local_file.write(remote_file.read)
     end
@@ -413,18 +417,13 @@ lane :show_changelog do |options|
   changes # return the text without the modified colors
 end
 
-desc "Add a git tag in the fastlane repo for this release"
-private_lane :add_fastlane_git_tag do |options|
-  `git tag -am #{options[:message].shellescape} #{options[:tag].shellescape}`
-  push_git_tags
-end
-
 # Docs
 
 desc "Validates the docs still are good"
 lane :validate_docs do
   # Validate docs content
   ensure_tool_name_formatting
+  ensure_markdown_links
   ensure_code_samples
   ensure_special_docs_code_samples
   ensure_code_snippets
@@ -443,7 +442,7 @@ end
 desc "Makes sure the tests on https://docs.fastlane.tools still work with the latest version"
 lane :verify_docs do
   clone_docs do
-    Bundler.with_clean_env do
+    Bundler.with_unbundled_env do
       puts(`sed -i -e "s/activate_bin_path/bin_path/g" $(which bundle)`) # workaround for bundler https://github.com/bundler/bundler/issues/4602#issuecomment-233619696
       sh("bundle install")
       sh("bundle exec fastlane test skip_building:true") # skip_building since we don't have a proper python environment set up
@@ -470,6 +469,7 @@ lane :update_docs do |options|
     docs_path = generate_markdown_docs(target_path: ".")
     yml_path = File.expand_path("./mkdocs.yml")
     actions_md_path = File.expand_path(File.join(docs_path, "docs/generated/actions.md"))
+    team_table_md_path = File.expand_path(File.join(docs_path, "docs/generated/team-table.md"))
 
     action_docs_dir = File.join(docs_path, "docs/generated/actions")
     custom_assets_dir = File.join(docs_path, "docs/img/actions")
@@ -498,7 +498,7 @@ lane :update_docs do |options|
 
       Dir.chdir("fastlane") do # this is an assumption of fastlane, that we have to .. when shelling out
         # Commit the changes
-        changes_to_commit = [plugin_scores_cache_path, actions_md_path, "Gemfile.lock", plugins_path, yml_path, action_docs_dir, custom_assets_dir]
+        changes_to_commit = [plugin_scores_cache_path, actions_md_path, team_table_md_path, "Gemfile.lock", plugins_path, yml_path, action_docs_dir, custom_assets_dir]
         git_add(path: changes_to_commit)
         git_commit(path: changes_to_commit,
                 message: "Update docs for latest fastlane release #{version} (actions.md, available-plugins.md) 🚀")
@@ -544,6 +544,12 @@ def generate_markdown_docs(target_path: nil)
   require 'fastlane/documentation/markdown_docs_generator'
   Fastlane::MarkdownDocsGenerator.new.generate!(target_path: File.expand_path(target_path))
   return target_path
+end
+
+def seconds_spent
+  started = Process.clock_gettime(Process::CLOCK_MONOTONIC)
+  yield
+  Process.clock_gettime(Process::CLOCK_MONOTONIC) - started
 end
 
 # Exception Handling
@@ -602,21 +608,37 @@ end
 
 desc "Ensure the correct formatting for the fastlane tools"
 private_lane :ensure_tool_name_formatting do
-  require_relative "../fastlane/helper/tool_name_formatting_helper.rb"
+  require_relative "../internal/docs/tool_name_formatting"
   UI.message("🕗  Verifying tool name formatting...")
   require 'fastlane/tools'
   errors = []
   Dir.chdir("..") do
     Dir["**/*.md"].each do |path|
-      next if path == "CHANGELOG.latest.md"
+      next if path == "internal/CHANGELOG.latest.md"
       next if path.start_with?('vendor/', '.bundle/')
-      helper = Helper::ToolNameFormattingHelper.new(path: path, is_documenting_invalid_examples: path == 'CONTRIBUTING.md')
+      helper = Fastlane::Internal::Docs::ToolNameFormatting.new(path: path, is_documenting_invalid_examples: path == 'docs/CONTRIBUTING.md')
       errors += helper.find_tool_name_formatting_errors
     end
   end
   errors.each { |a| UI.error(a) }
   UI.user_error!("Invalid formatting of one of the fastlane tools") unless errors.empty?
   UI.success("✅  fastlane tools formatting is correct")
+end
+
+private_lane :ensure_markdown_links do
+  require_relative "../internal/docs/markdown_links"
+  UI.message("🕗  Verifying links in Markdown files...")
+  errors = []
+  Dir.chdir("..") do
+    Dir["**/*.md"].each do |path|
+      next if path.start_with?('vendor/', '.bundle/') || path.include?('/fixtures/')
+      next if File.basename(path) == "CHANGELOG.latest.md"
+      errors += Fastlane::Internal::Docs::MarkdownLinks.new(path: path).errors
+    end
+  end
+  errors.each { |a| UI.error(a) }
+  UI.user_error!("Broken links in Markdown files") unless errors.empty?
+  UI.success("✅  Markdown links are valid")
 end
 
 # Run the code samples, yo

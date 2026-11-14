@@ -21,29 +21,13 @@ module FastlaneCore
         params: {
           fastlane_client_language: @fastlane_client_language,
           fastlane_version: Fastlane::VERSION,
-          install_method: install_method,
+          install_method: Helper.install_method,
           ruby_version: RUBY_VERSION,
           operating_system: Helper.operating_system,
           build_tool_version: @build_tool_version,
           ci: Helper.ci?.to_s
         }.reject { |_, value| value.nil? }
       }
-    end
-
-    private
-
-    def install_method
-      if Helper.bundler?
-        'bundler'
-      elsif Helper.contained_fastlane?
-        'standalone'
-      elsif Helper.homebrew?
-        'homebrew'
-      elsif Helper.mac_app?
-        'mac_app'
-      else
-        'gem'
-      end
     end
   end
 end

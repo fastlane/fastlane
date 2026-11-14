@@ -99,7 +99,14 @@ module Fastlane
       end
 
       def self.category
-        :beta
+        :deprecated
+      end
+
+      def self.deprecated_notes
+        [
+          "VMware stopped selling Apteligent to new customers on February 4, 2019, and announced moving its capabilities to VMware Workspace ONE Intelligence.",
+          "See [Apteligent moving to Workspace ONE Intelligence](https://vcdx181.com/2019/01/20/apteligent-moving-to-workspace-one-intelligence/)."
+        ].join("\n")
       end
     end
   end

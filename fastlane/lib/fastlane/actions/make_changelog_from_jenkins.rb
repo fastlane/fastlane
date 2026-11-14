@@ -9,7 +9,7 @@ module Fastlane
         require 'json'
         require 'net/http'
 
-        changelog = ""
+        changelog = +""
 
         if Helper.ci? || Helper.test?
           # The "BUILD_URL" environment variable is set automatically by Jenkins in every build

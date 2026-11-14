@@ -78,6 +78,19 @@ describe Commander::Runner do
     end
   end
 
+  describe '#suggest_ruby_reinstall' do
+    it 'suggests the Ruby version fastlane recommends' do
+      errors = []
+      allow(FastlaneCore::UI).to receive(:error) { |message| errors << message }
+
+      Commander::Runner.new.suggest_ruby_reinstall(StandardError.new('my message'))
+
+      expect(errors).to include("  - Run `brew update && brew upgrade ruby-build && rbenv install #{Fastlane::SUGGESTED_MINIMUM_RUBY}`")
+      expect(errors).to include("  - Run `rbenv global #{Fastlane::SUGGESTED_MINIMUM_RUBY}` to make it the new global default Ruby version")
+      expect(errors).to include("  - Then run `rvm reinstall ruby-#{Fastlane::SUGGESTED_MINIMUM_RUBY}`")
+    end
+  end
+
   describe '#rescue_fastlane_error' do
     it 'calls show_github_issues if e.show_github_issues is true' do
       runner = Commander::Runner.new
@@ -97,6 +110,48 @@ describe Commander::Runner do
       expect(runner).to receive(:display_user_error!)
 
       runner.rescue_fastlane_error(error)
+    end
+  end
+
+  describe 'Xcode version warning' do
+    let(:warning) { /Support for your Xcode version \(15\.4\) is going away. fastlane will soon require Xcode 16\.0 or newer/ }
+
+    def run_with_xcode(version)
+      allow(FastlaneCore::Helper).to receive(:xcode_version).and_return(version)
+      runner = Commander::Runner.new([])
+      runner.program(:name, 'tool_name')
+      runner.program(:version, '1.0')
+      runner.program(:description, 'Description')
+      runner.command(:run) { |c| c.action {} }
+      runner.default_command(:run)
+      runner.run!
+    end
+
+    before do
+      stub_const("Fastlane::SUGGESTED_MINIMUM_XCODE_RELEASE", "16.0")
+      allow(FastlaneCore::UI).to receive(:important)
+    end
+
+    it 'warns when Xcode is older than SUGGESTED_MINIMUM_XCODE_RELEASE' do
+      expect(FastlaneCore::UI).to receive(:important).with(warning)
+      run_with_xcode("15.4")
+    end
+
+    it 'does not warn when Xcode is SUGGESTED_MINIMUM_XCODE_RELEASE' do
+      expect(FastlaneCore::UI).not_to receive(:important).with(/Support for your Xcode version/)
+      run_with_xcode("16.0")
+    end
+
+    it 'does not warn when FASTLANE_SKIP_XCODE_VERSION_WARNING is set' do
+      expect(FastlaneCore::UI).not_to receive(:important).with(/Support for your Xcode version/)
+      FastlaneSpec::Env.with_env_values('FASTLANE_SKIP_XCODE_VERSION_WARNING' => 'true') do
+        run_with_xcode("15.4")
+      end
+    end
+
+    it 'does not warn without Xcode' do
+      expect(FastlaneCore::UI).not_to receive(:important).with(/Support for your Xcode version/)
+      run_with_xcode(nil)
     end
   end
 end

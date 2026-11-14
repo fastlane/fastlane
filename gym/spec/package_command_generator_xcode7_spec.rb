@@ -1,4 +1,8 @@
 describe Gym do
+  before do
+    fake_out_build_settings(GYM_BUILD_SETTINGS)
+  end
+
   before(:all) do
     options = { project: "./gym/examples/standard/Example.xcodeproj" }
     config = FastlaneCore::Configuration.create(Gym::Options.available_options, options)
@@ -19,9 +23,9 @@ describe Gym do
       result = Gym::PackageCommandGeneratorXcode7.generate
       expect(result).to eq([
                              "/usr/bin/xcrun #{Gym::PackageCommandGeneratorXcode7.wrap_xcodebuild.shellescape} -exportArchive",
-                             "-exportOptionsPlist '#{Gym::PackageCommandGeneratorXcode7.config_path}'",
+                             "-exportOptionsPlist #{Gym::PackageCommandGeneratorXcode7.config_path.shellescape}",
                              "-archivePath #{Gym::BuildCommandGenerator.archive_path.shellescape}",
-                             "-exportPath '#{Gym::PackageCommandGeneratorXcode7.temporary_output_path}'",
+                             "-exportPath #{Gym::PackageCommandGeneratorXcode7.temporary_output_path.shellescape}",
                              "-allowProvisioningUpdates",
                              ""
                            ])
@@ -34,9 +38,9 @@ describe Gym do
       result = Gym::PackageCommandGeneratorXcode7.generate
       expect(result).to eq([
                              "/usr/bin/xcrun #{Gym::PackageCommandGeneratorXcode7.wrap_xcodebuild.shellescape} -exportArchive",
-                             "-exportOptionsPlist '#{Gym::PackageCommandGeneratorXcode7.config_path}'",
+                             "-exportOptionsPlist #{Gym::PackageCommandGeneratorXcode7.config_path.shellescape}",
                              "-archivePath #{Gym::BuildCommandGenerator.archive_path.shellescape}",
-                             "-exportPath '#{Gym::PackageCommandGeneratorXcode7.temporary_output_path}'",
+                             "-exportPath #{Gym::PackageCommandGeneratorXcode7.temporary_output_path.shellescape}",
                              ""
                            ])
     end
@@ -50,9 +54,9 @@ describe Gym do
       result = Gym::PackageCommandGeneratorXcode7.generate
       expect(result).to eq([
                              "/usr/bin/xcrun #{Gym::PackageCommandGeneratorXcode7.wrap_xcodebuild.shellescape} -exportArchive",
-                             "-exportOptionsPlist '#{Gym::PackageCommandGeneratorXcode7.config_path}'",
+                             "-exportOptionsPlist #{Gym::PackageCommandGeneratorXcode7.config_path.shellescape}",
                              "-archivePath #{Gym::BuildCommandGenerator.archive_path.shellescape}",
-                             "-exportPath '#{Gym::PackageCommandGeneratorXcode7.temporary_output_path}'",
+                             "-exportPath #{Gym::PackageCommandGeneratorXcode7.temporary_output_path.shellescape}",
                              "DEBUG=1 BUNDLE_NAME=Example\\ App",
                              ""
                            ])
@@ -67,9 +71,9 @@ describe Gym do
       result = Gym::PackageCommandGeneratorXcode7.generate
       expect(result).to eq([
                              "/usr/bin/xcrun /tmp/path\\ with\\ spaces -exportArchive",
-                             "-exportOptionsPlist '#{Gym::PackageCommandGeneratorXcode7.config_path}'",
+                             "-exportOptionsPlist #{Gym::PackageCommandGeneratorXcode7.config_path.shellescape}",
                              "-archivePath #{Gym::BuildCommandGenerator.archive_path.shellescape}",
-                             "-exportPath '#{Gym::PackageCommandGeneratorXcode7.temporary_output_path}'",
+                             "-exportPath #{Gym::PackageCommandGeneratorXcode7.temporary_output_path.shellescape}",
                              ""
                            ])
     end
@@ -84,12 +88,26 @@ describe Gym do
       result = Gym::PackageCommandGeneratorXcode7.generate
       expect(result).to eq([
                              "/usr/bin/xcrun #{Gym::PackageCommandGeneratorXcode7.wrap_xcodebuild.shellescape} -exportArchive",
-                             "-exportOptionsPlist '#{Gym::PackageCommandGeneratorXcode7.config_path}'",
+                             "-exportOptionsPlist #{Gym::PackageCommandGeneratorXcode7.config_path.shellescape}",
                              "-archivePath #{Gym::BuildCommandGenerator.archive_path.shellescape}",
-                             "-exportPath '#{Gym::PackageCommandGeneratorXcode7.temporary_output_path}'",
-                             "-toolchain '#{options[:toolchain]}'",
+                             "-exportPath #{Gym::PackageCommandGeneratorXcode7.temporary_output_path.shellescape}",
+                             "-toolchain #{options[:toolchain]}",
                              ""
                            ])
+    end
+
+    it "keeps paths with an apostrophe and a space as one argument" do
+      options = { project: "./gym/examples/standard/Example.xcodeproj" }
+      Gym.config = FastlaneCore::Configuration.create(Gym::Options.available_options, options)
+
+      dir = File.join(Dir.mktmpdir, "Kaldi's Kafe")
+      FileUtils.mkdir_p(dir)
+      allow(Gym::PackageCommandGeneratorXcode7).to receive(:config_path).and_return(File.join(dir, "gym_config.plist"))
+      allow(Gym::PackageCommandGeneratorXcode7).to receive(:temporary_output_path).and_return(dir)
+
+      args = Shellwords.split(Gym::PackageCommandGeneratorXcode7.generate.join(" "))
+      expect(args[args.index("-exportOptionsPlist") + 1]).to eq(File.join(dir, "gym_config.plist"))
+      expect(args[args.index("-exportPath") + 1]).to eq(dir)
     end
 
     it "generates a valid plist file we need" do

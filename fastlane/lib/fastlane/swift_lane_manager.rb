@@ -1,8 +1,14 @@
 require_relative 'lane_manager_base.rb'
 require_relative 'swift_runner_upgrader.rb'
+require 'securerandom'
+require 'tmpdir'
 
 module Fastlane
   class SwiftLaneManager < LaneManagerBase
+    # The runner protocol version this fastlane ships, see main.swift
+    RUNNER_PROTOCOL_VERSION = 2
+    RUNNER_PROTOCOL_VERSION_REGEX = /FastlaneRunnerProtocolVersion \[(\d+)\]/
+
     # @param lane_name The name of the lane to execute
     # @param parameters [Hash] The parameters passed from the command line to the lane
     def self.cruise_lane(lane, parameters = nil, disable_runner_upgrades: false, swift_server_port: nil)
@@ -26,15 +32,26 @@ module Fastlane
         end
 
         self.ensure_runner_built!
-        swift_server_port ||= 2000
-        socket_thread = self.start_socket_thread(port: swift_server_port)
-        sleep(0.250) while socket_thread[:ready].nil?
+        self.warn_if_runner_outdated
+        # A secret only this user can read, which the runner sends back with every command
+        token_dir = Dir.mktmpdir('fastlane-runner')
+        token_file = File.join(token_dir, 'token')
+        token = SecureRandom.hex(32)
+        File.write(token_file, token, perm: 0o600)
+        token = nil unless self.runner_sends_token?
+        # Port 0 lets the server pick a free port, which no other process can take beforehand
+        socket_thread = self.start_socket_thread(port: swift_server_port || 0, token: token)
+        sleep(0.250) while socket_thread[:ready].nil? && socket_thread.alive?
+        # The thread ended without listening: join raises its error rather than waiting forever
+        socket_thread.join unless socket_thread[:ready]
         # wait on socket_thread to be in ready state, then start the runner thread
-        self.cruise_swift_lane_in_thread(lane, parameters, swift_server_port)
+        self.cruise_swift_lane_in_thread(lane, parameters, socket_thread[:port], token_file)
 
         socket_thread.value
       rescue Exception => ex # rubocop:disable Lint/RescueException
         e = ex
+      ensure
+        FileUtils.remove_entry(token_dir) if token_dir
       end
       # If we have a thread exception, drop that in the exception
       # won't ever have a situation where e is non-nil, and socket_thread[:exception] is also non-nil
@@ -79,14 +96,14 @@ module Fastlane
       end
     end
 
-    def self.cruise_swift_lane_in_thread(lane, parameters = nil, swift_server_port)
+    def self.cruise_swift_lane_in_thread(lane, parameters = nil, swift_server_port, token_file)
       if parameters.nil?
         parameters = {}
       end
 
       parameter_string = ""
       parameters.each do |key, value|
-        parameter_string += " #{key} #{value}"
+        parameter_string += " #{key.to_s.shellescape} #{value.to_s.shellescape}"
       end
 
       if FastlaneCore::Globals.verbose?
@@ -94,13 +111,16 @@ module Fastlane
       end
 
       parameter_string += " swiftServerPort #{swift_server_port}"
+      parameter_string += " swiftServerTokenFile #{token_file.shellescape}"
+
+      command = "#{FastlaneCore::FastlaneFolder.swift_runner_path.shellescape} lane #{lane.to_s.shellescape}#{parameter_string}"
 
       return Thread.new do
         if FastlaneCore::Globals.verbose?
-          return_value = Actions.sh(%(#{FastlaneCore::FastlaneFolder.swift_runner_path} lane #{lane}#{parameter_string}))
+          return_value = Actions.sh(command)
           UI.message("runner output: ".yellow + return_value)
         else
-          Actions.sh(%(#{FastlaneCore::FastlaneFolder.swift_runner_path} lane #{lane}#{parameter_string} > /dev/null))
+          Actions.sh("#{command} > /dev/null")
         end
       end
     end
@@ -218,15 +238,32 @@ module Fastlane
       return project_modified
     end
 
-    def self.start_socket_thread(port: nil)
+    def self.start_socket_thread(port: nil, token: nil)
       require 'fastlane/server/socket_server'
       require 'fastlane/server/socket_server_action_command_executor'
 
       return Thread.new do
         command_executor = SocketServerActionCommandExecutor.new
-        server = Fastlane::SocketServer.new(command_executor: command_executor, port: port)
+        server = Fastlane::SocketServer.new(command_executor: command_executor, port: port, token: token)
         server.start
       end
+    end
+
+    # The protocol version compiled into the built runner, 0 for runners from before it had one
+    def self.runner_protocol_version
+      File.binread(FastlaneCore::FastlaneFolder.swift_runner_path)[RUNNER_PROTOCOL_VERSION_REGEX, 1].to_i
+    end
+
+    def self.warn_if_runner_outdated
+      return if runner_protocol_version >= RUNNER_PROTOCOL_VERSION
+
+      UI.important("Your FastlaneRunner is outdated for this version of fastlane. Run a lane outside CI, without `disable_runner_upgrades`, to update it, then commit the changes.")
+    end
+
+    # Runners from protocol version 2 send the run's token with every command; older ones get warn_if_runner_outdated.
+    # Version 1 was released before the token existed.
+    def self.runner_sends_token?
+      runner_protocol_version >= 2
     end
 
     def self.ensure_runner_built!
@@ -236,11 +273,13 @@ module Fastlane
 
       if FastlaneCore::FastlaneFolder.swift_runner_built?
         runner_last_modified_age = File.mtime(FastlaneCore::FastlaneFolder.swift_runner_path).to_i
-        fastfile_last_modified_age = File.mtime(FastlaneCore::FastlaneFolder.fastfile_path).to_i
+        # The Fastfile, and the runner's own files, which an upgrade or a pull can change without touching the Fastfile
+        sources = [FastlaneCore::FastlaneFolder.fastfile_path] + Dir[File.join(FastlaneCore::FastlaneFolder.swift_folder_path, '**', '*.swift')]
+        changed = sources.find { |source| File.mtime(source).to_i > runner_last_modified_age }
 
-        if runner_last_modified_age < fastfile_last_modified_age
-          # It's older than the Fastfile, so build it again
-          UI.verbose("Found changes to user's Fastfile.swift, setting re-build runner flag")
+        if changed
+          # It's older than one of its sources, so build it again
+          UI.verbose("Found changes to #{changed}, setting re-build runner flag")
           runner_needs_building = true
         end
       else

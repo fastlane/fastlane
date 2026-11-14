@@ -6,7 +6,7 @@ describe Sigh do
     end
 
     let(:fake_runner) { Sigh::Runner.new }
-    let(:mock_base_client) { "fake api base client" }
+    let(:mock_base_client) { +"fake api base client" }
 
     before(:each) do
       allow(mock_base_client).to receive(:login)
@@ -16,6 +16,16 @@ describe Sigh do
     end
 
     describe "#run" do
+      it "fails early when offline_profile is used with an App Store Connect API key" do
+        allow(Spaceship::ConnectAPI).to receive(:token).and_return(double("token"))
+
+        options = { app_identifier: "com.krausefx.app", offline_profile: true, skip_install: true }
+        Sigh.config = FastlaneCore::Configuration.create(Sigh::Options.available_options, options)
+
+        expect do
+          fake_runner.run
+        end.to raise_error(FastlaneCore::Interface::FastlaneError, /offline_profile.*Apple ID/)
+      end
     end
 
     describe "#profile_type" do

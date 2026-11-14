@@ -202,18 +202,17 @@ module FastlaneCore
 
       def boot
         return unless is_simulator
-        return unless os_type == "iOS"
         return if self.state == 'Booted'
 
         # Boot the simulator and wait for it to finish booting
         UI.message("Booting #{self}")
-        `xcrun simctl bootstatus #{self.udid} -b &> /dev/null`
+        output, status = Open3.capture2e("xcrun simctl bootstatus #{self.udid} -b")
+        UI.important("Unable to boot #{self}: #{output.strip}") unless status.success?
         self.state = 'Booted'
       end
 
       def shutdown
         return unless is_simulator
-        return unless os_type == "iOS"
         return if self.state != 'Booted'
 
         UI.message("Shutting down #{self.udid}")
@@ -243,7 +242,7 @@ module FastlaneCore
         plist_buddy_cmd = "-c \"Add :KeyboardContinuousPathEnabled bool false\""
         plist_path = File.expand_path("~/Library/Developer/CoreSimulator/Devices/#{self.udid}/data/Library/Preferences/com.apple.keyboard.ContinuousPath.plist")
 
-        Helper.backticks("#{plist_buddy} #{plist_buddy_cmd} #{plist_path} >/dev/null 2>&1")
+        Helper.backticks("#{plist_buddy} #{plist_buddy_cmd} #{plist_path.shellescape} >/dev/null 2>&1")
       end
     end
   end
@@ -300,7 +299,7 @@ module FastlaneCore
 
         UI.verbose("Launching #{simulator_path} for device: #{device.name} (#{device.udid})")
 
-        Helper.backticks("open -a #{simulator_path} --args -CurrentDeviceUDID #{device.udid}", print: FastlaneCore::Globals.verbose?)
+        Helper.backticks("open -a #{simulator_path.shellescape} --args -CurrentDeviceUDID #{device.udid}", print: FastlaneCore::Globals.verbose?)
       end
 
       def copy_logs(device, log_identity, logs_destination_dir, log_collection_start_time)
@@ -356,8 +355,18 @@ module FastlaneCore
         logs_collection_start = log_collection_start_time.strftime('%Y-%m-%d %H:%M:%S')
         command = "xcrun simctl spawn #{device.udid} log collect "
         command << "--start '#{logs_collection_start}' "
-        command << "--output #{logarchive_dst.shellescape} 2>/dev/null"
-        FastlaneCore::CommandExecutor.execute(command: command, print_all: false, print_command: true)
+        command << "--output #{logarchive_dst.shellescape}"
+        # A simulator that is no longer booted only warrants a warning: the logs are diagnostics.
+        # Any other failure still fails the action.
+        FastlaneCore::CommandExecutor.execute(command: command,
+                                            print_all: false,
+                                        print_command: true,
+                                suppress_error_output: true,
+                                                error: proc do |output, status|
+                                                  message = "Unable to collect system logs from #{device} (exit status #{status}): #{output}"
+                                                  UI.user_error!(message) unless output.match?(/domain=com\.apple\.CoreSimulator\.SimError, code=405\b/)
+                                                  UI.important(message)
+                                                end)
       end
     end
   end

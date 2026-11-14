@@ -3,6 +3,7 @@ module Fastlane
     class GetManagedPlayStorePublishingRightsAction < Action
       def self.run(params)
         unless params[:json_key] || params[:json_key_data]
+          UI.user_error!("Pass :json_key or :json_key_data") unless UI.interactive?
           UI.important("To not be asked about this value, you can specify it using 'json_key'")
           json_key_path = UI.input("The service account json file used to authenticate with Google: ")
           json_key_path = File.expand_path(json_key_path)
@@ -92,6 +93,7 @@ module Fastlane
                                        conflicting_options: [:json_key],
                                        optional: true,
                                        description: "The raw service account JSON data used to authenticate with Google",
+                                       sensitive: true,
                                        code_gen_sensitive: true,
                                        default_value: CredentialsManager::AppfileConfig.try_fetch_value(:json_key_data_raw),
                                        default_value_dynamic: true,

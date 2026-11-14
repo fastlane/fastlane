@@ -17,6 +17,14 @@ SPACESHIP_AUTHENTICATION_DATA =
   'bfadbd9e65e75d5df55547bcff98711ddeae7b8e1e6dbf529e96f7caa4b830b43575cddc52cebc' \
   '39f9522f85cbf33ac35ee59f66f48109c12fbb78d'
 
+# Every spaceship example registers the stubs again, about 110 fixture reads: read each file once per process.
+# The copy shares the cached buffer until modified, e.g. by PlistMiddleware's force_encoding.
+SPACESHIP_FIXTURES = {}
+def spaceship_fixture(path, binary: false)
+  SPACESHIP_FIXTURES[[path, binary]] ||= (binary ? File.binread(path) : File.read(path)).freeze
+  SPACESHIP_FIXTURES[[path, binary]].dup
+end
+
 require_relative 'client_stubbing'
 require_relative 'connect_api/provisioning/provisioning_stubbing'
 require_relative 'connect_api/testflight/testflight_stubbing'
@@ -66,6 +74,11 @@ def before_each_spaceship
 
   ENV.delete("FASTLANE_USER")
 
+  $spaceship_default_stubs_active = true
+end
+
+# The stubs every spaceship example gets, matched after the example's own
+def register_spaceship_default_stubs
   TunesStubbing.itc_stub_login
   PortalStubbing.adp_stub_login
 
@@ -80,11 +93,7 @@ def before_each_spaceship
   PortalStubbing.adp_stub_passbooks
   TunesStubbing.itc_stub_applications
   TunesStubbing.itc_stub_app_versions
-  TunesStubbing.itc_stub_build_trains
-  TunesStubbing.itc_stub_testers
-  TunesStubbing.itc_stub_testflight
   TunesStubbing.itc_stub_app_version_ref
-  TunesStubbing.itc_stub_user_detail
   TunesStubbing.itc_stub_sandbox_testers
   TunesStubbing.itc_stub_create_sandbox_tester
   TunesStubbing.itc_stub_delete_sandbox_tester
@@ -112,7 +121,6 @@ def before_each_spaceship
   ConnectAPIStubbing::TestFlight.stub_beta_build_localizations
   ConnectAPIStubbing::TestFlight.stub_beta_build_metrics
   ConnectAPIStubbing::TestFlight.stub_beta_feedbacks
-  ConnectAPIStubbing::TestFlight.stub_beta_feedbacks_delete
   ConnectAPIStubbing::TestFlight.stub_beta_groups
   ConnectAPIStubbing::TestFlight.stub_beta_testers
   ConnectAPIStubbing::TestFlight.stub_beta_tester_metrics
@@ -129,8 +137,30 @@ def before_each_spaceship
   ConnectAPIStubbing::Users.stub_users
 end
 
+# Built once per process rather than registered for every example: about 140
+# stubs, which cost more than most spaceship examples themselves.
+def spaceship_default_stubs
+  @spaceship_default_stubs ||= begin
+    registry = WebMock::StubRegistry.instance
+    example_stubs = registry.request_stubs
+    registry.request_stubs = []
+    register_spaceship_default_stubs
+    registry.request_stubs
+  ensure
+    registry.request_stubs = example_stubs
+  end
+end
+
+WebMock.globally_stub_request(:after_local_stubs) do |request|
+  next unless $spaceship_default_stubs_active
+  stub = spaceship_default_stubs.find { |default_stub| default_stub.request_pattern.matches?(request) }
+  next unless stub
+  response = stub.response.dup.evaluate(request)
+  { status: response.status, headers: response.headers, body: response.body }
+end
+
 def after_each_spaceship
-  nil
+  $spaceship_default_stubs_active = false
 end
 
 RSpec.configure do |config|
@@ -147,6 +177,11 @@ RSpec.configure do |config|
     # before and fails on a clean checkout.
     stub_request(:head, "https://appstoreconnect.apple.com/logout")
       .to_return(status: 302, headers: { "Location" => "https://idmsa.apple.com/appleauth/signout?widgetKey=e0abc&asop=destroy-session&asoc=/&rv=3" })
+
+    # The key cache defaults to ~/.fastlane, shared by every run and worker: keep it per process, and empty
+    key_cache = File.join(FASTLANE_SPEC_SCRATCH, "spaceship_itc_service_key.txt")
+    File.delete(key_cache) if File.exist?(key_cache)
+    allow_any_instance_of(Spaceship::Client).to receive(:itc_service_key_path).and_return(key_cache)
   end
 
   def mock_client_response(method_name, with: anything)

@@ -6,6 +6,29 @@ describe Fastlane::Actions do
       allow(FastlaneCore::Helper).to receive(:sh_enabled?).and_return(true)
     end
 
+    context "with stdin" do
+      it "gives the data to the command and does not print it" do
+        allow(FastlaneCore::UI).to receive(:command)
+        allow(FastlaneCore::UI).to receive(:command_output)
+
+        expect(Fastlane::Actions.sh("cat", stdin: "user = \"EXAMPLE:SECRET\"\n")).to eq("user = \"EXAMPLE:SECRET\"\n")
+        expect(FastlaneCore::UI).to have_received(:command).with("cat")
+      end
+
+      it "does not block on large input" do
+        data = "x" * (1024 * 1024)
+        expect(Timeout.timeout(20) { Fastlane::Actions.sh("cat", stdin: data, log: false) }.length).to eq(data.length)
+      end
+
+      it "finishes when the command exits without reading its input" do
+        expect(Timeout.timeout(20) { Fastlane::Actions.sh("true", stdin: "x" * (1024 * 1024), log: false) }).to eq("")
+      end
+
+      it "gives the command an empty input when no stdin is given, instead of one nobody writes to" do
+        expect(Timeout.timeout(10) { Fastlane::Actions.sh("cat", log: false) }).to eq("")
+      end
+    end
+
     context "external commands are failed" do
       context "with error_callback" do
         it "doesn't raise shell_error" do
@@ -45,6 +68,47 @@ describe Fastlane::Actions do
 
           expect(UI).to have_received(:shell_error!).with("Exit status of command 'exit 1' was 1 instead of 0.\n")
         end
+      end
+    end
+
+    context "with separate_stderr", unless: FastlaneCore::Helper.windows? do
+      let(:command) { ["sh", "-c", "echo out; echo err >&2; exit ${STATUS:-0}"] }
+
+      it "returns only stdout" do
+        expect(Fastlane::Actions.sh(*command, log: false, separate_stderr: true)).to eq("out\n")
+      end
+
+      it "prints both streams" do
+        allow(FastlaneCore::UI).to receive(:command)
+        allow(FastlaneCore::UI).to receive(:command_output)
+        Fastlane::Actions.sh(*command, separate_stderr: true)
+
+        expect(FastlaneCore::UI).to have_received(:command_output).with("out")
+        expect(FastlaneCore::UI).to have_received(:command_output).with("err")
+      end
+
+      it "gives stderr to the error_callback and still returns stdout" do
+        allow(FastlaneCore::UI).to receive(:error)
+        error = nil
+        result = Fastlane::Actions.sh({ "STATUS" => "1" }, *command, log: false, separate_stderr: true, error_callback: ->(stderr) { error = stderr })
+
+        expect(error).to eq("err\n")
+        expect(result).to eq("out\n")
+      end
+
+      it "puts stderr in the error message" do
+        allow(FastlaneCore::UI).to receive(:command)
+        allow(FastlaneCore::UI).to receive(:command_output)
+        allow($stdout).to receive(:isatty).and_return(false)
+
+        expect do
+          Fastlane::Actions.sh({ "STATUS" => "1" }, *command, separate_stderr: true)
+        end.to raise_error(FastlaneCore::Interface::FastlaneShellError, /instead of 0.\nerr\n\z/)
+      end
+
+      it "does not block when the command writes a lot to stderr" do
+        big = ["sh", "-c", "head -c 1048576 /dev/zero | tr '\\0' x >&2; echo out"]
+        expect(Timeout.timeout(20) { Fastlane::Actions.sh(*big, log: false, separate_stderr: true) }).to eq("out\n")
       end
     end
 
@@ -113,6 +177,44 @@ describe Fastlane::Actions do
         result = Fastlane::Actions.sh("cat")
 
         expect(result).to eq(raw)
+      end
+
+      it "runs the block and the error_callback with UTF-8 as the default encoding, and restores the caller's" do
+        allow(FastlaneCore::UI).to receive(:command)
+        allow(FastlaneCore::UI).to receive(:error)
+        previous = [Encoding.default_external, Encoding.default_internal]
+        Encoding.default_external = Encoding::US_ASCII
+        Encoding.default_internal = nil
+        seen = []
+
+        expect_command("true")
+        Fastlane::Actions.sh("true") { seen << Encoding.default_external }
+        expect_command("false", exitstatus: 1)
+        Fastlane::Actions.sh("false", error_callback: ->(_) { seen << Encoding.default_external })
+        after = [Encoding.default_external, Encoding.default_internal]
+
+        expect(seen).to eq([Encoding::UTF_8, Encoding::UTF_8])
+        expect(after).to eq([Encoding::US_ASCII, nil])
+      ensure
+        Encoding.default_external, Encoding.default_internal = previous
+      end
+    end
+
+    context "when the command is killed by a signal", unless: FastlaneCore::Helper.windows? do
+      it "names the signal instead of a blank exit status" do
+        expect do
+          Fastlane::Actions.sh("sh", "-c", "kill -9 $$", log: false)
+        end.to raise_error(FastlaneCore::Interface::FastlaneShellError, /\AShell command was killed by SIGKILL\./)
+      end
+    end
+
+    context "with chdir" do
+      it "runs the command in that directory, leaving fastlane's alone" do
+        Dir.mktmpdir do |dir|
+          output = Fastlane::Actions.sh(RbConfig.ruby, "-e", "print Dir.pwd", chdir: dir, log: false)
+          expect(output).to eq(File.realpath(dir))
+          expect(Dir.pwd).not_to eq(File.realpath(dir))
+        end
       end
     end
 
@@ -233,7 +335,7 @@ def command_from_args(*args)
 end
 
 def expect_command(*command, exitstatus: 0, output: "")
-  mock_input = double(:input)
+  mock_input = double(:input, close: nil)
   mock_output = StringIO.new(output)
   mock_status = double(:status, exitstatus: exitstatus)
   mock_thread = double(:thread, value: mock_status)

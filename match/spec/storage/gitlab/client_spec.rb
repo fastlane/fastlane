@@ -124,7 +124,7 @@ describe Match do
 
         files = subject.files
 
-        assert_requested(:get, /gitlab.example.com/, query: "per_page=100")
+        assert_requested(:get, /gitlab\.example\.com/, query: "per_page=100")
       end
 
       it 'raises an exception for a non-json response' do
