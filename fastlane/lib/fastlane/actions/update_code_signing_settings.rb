@@ -1,17 +1,18 @@
 require 'xcodeproj'
+require 'fastlane/helper/xcodeproj_helper'
 module Fastlane
   module Actions
     class UpdateCodeSigningSettingsAction < Action
       def self.run(params)
         FastlaneCore::PrintTable.print_values(config: params, title: "Summary for code signing settings")
         path = params[:path]
-        path = File.join(File.expand_path(path), "project.pbxproj")
+        path = Helper::XcodeprojHelper.project_file_path(File.expand_path(path))
 
-        project = Xcodeproj::Project.open(params[:path])
         UI.user_error!("Could not find path to project config '#{path}'. Pass the path to your project (not workspace)!") unless File.exist?(path)
+        project = Helper::XcodeprojHelper.open_project!(params[:path])
         UI.message("Updating the Automatic Codesigning flag to #{params[:use_automatic_signing] ? 'enabled' : 'disabled'} for the given project '#{path}'")
 
-        unless project.root_object.attributes["TargetAttributes"]
+        if Helper::XcodeprojHelper.very_old_project_format?(project)
           UI.user_error!("Seems to be a very old project file format - please open your project file in a more recent version of Xcode")
           return false
         end

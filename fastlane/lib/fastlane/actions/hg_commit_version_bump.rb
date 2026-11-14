@@ -4,6 +4,7 @@ module Fastlane
     class HgCommitVersionBumpAction < Action
       def self.run(params)
         require 'xcodeproj'
+        require 'fastlane/helper/xcodeproj_helper'
         require 'pathname'
         require 'shellwords'
 
@@ -39,16 +40,16 @@ module Fastlane
           xcodeproj_path = xcodeproj_paths.first
         end
 
-        # find the pbxproj path, relative to hg directory
+        # find the project file path, relative to hg directory
         if Helper.test?
           hg_dirty_files = params[:test_dirty_files].split(",")
           expected_changed_files = params[:test_expected_files].split(",")
         else
-          pbxproj_pathname = Pathname.new(File.join(xcodeproj_path, 'project.pbxproj'))
-          pbxproj_path = pbxproj_pathname.relative_path_from(repo_pathname).to_s
+          project_file_pathname = Pathname.new(Helper::XcodeprojHelper.project_file_path(xcodeproj_path))
+          project_file_path = project_file_pathname.relative_path_from(repo_pathname).to_s
 
           # find the info_plist files
-          project = Xcodeproj::Project.open(xcodeproj_path)
+          project = Helper::XcodeprojHelper.open_project!(xcodeproj_path)
           info_plist_files = project.objects.select do |object|
             object.isa == 'XCBuildConfiguration'
           end.map(&:to_hash).map do |object_hash|
@@ -63,7 +64,7 @@ module Fastlane
 
           # create our list of files that we expect to have changed, they should all be relative to the project root, which should be equal to the hg workdir root
           expected_changed_files = []
-          expected_changed_files << pbxproj_path
+          expected_changed_files << project_file_path
           expected_changed_files << info_plist_files
           expected_changed_files.flatten!.uniq!
 
@@ -152,11 +153,11 @@ module Fastlane
       def self.details
         list = <<-LIST.markdown_list
           All `.plist` files
-          The `.xcodeproj/project.pbxproj` file
+          The `.xcodeproj/project.pbxproj` file, or `.xcodeproj/project.xcproj` for projects in Xcode's JSON format
         LIST
         [
           "The mercurial equivalent of the [commit_version_bump](https://docs.fastlane.tools/actions/commit_version_bump/) git action. Like the git version, it is useful in conjunction with [`increment_build_number`](https://docs.fastlane.tools/actions/increment_build_number/).",
-          "It checks the repo to make sure that only the relevant files have changed, these are the files that `increment_build_number` (`agvtool`) touches:".markdown_preserve_newlines,
+          "It checks the repo to make sure that only the relevant files have changed, these are the files that `increment_build_number` touches:".markdown_preserve_newlines,
           list,
           "Then commits those files to the repo.",
           "Customize the message with the `:message` option, defaults to 'Version Bump'",

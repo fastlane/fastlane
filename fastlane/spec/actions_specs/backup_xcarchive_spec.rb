@@ -93,6 +93,32 @@ describe Fastlane do
           File.delete(File.join(destination_path, zip_file))
         end
       end
+
+      context "versioned backup" do
+        # The project directory has no fastlane folder, so the action runs in it and finds the project.
+        let(:project_path) { Dir.mktmpdir }
+        let(:destination_path) { File.join(project_path, "dest") }
+        let(:source_xcarchive_path) { File.join(project_path, xcarchive_file) }
+
+        it "copies the xcarchive into a folder named after the date and the app version" do
+          FileUtils.mkdir_p(destination_path)
+          File.write(source_xcarchive_path, file_content)
+          create_versioning_project(project_path, info_plist: { "CFBundleShortVersionString" => "1.2.3" })
+
+          Dir.chdir(project_path) do
+            Fastlane::FastFile.new.parse("lane :test do
+              backup_xcarchive(
+                xcarchive: '#{source_xcarchive_path}',
+                destination: '#{destination_path}',
+                zip: false
+              )
+            end").runner.execute(:test)
+          end
+
+          versioned_path = File.join(destination_path, "#{Time.now.strftime('%Y-%m-%d')} 1.2.3")
+          expect(File.exist?(File.join(versioned_path, xcarchive_file))).to eq(true)
+        end
+      end
     end
   end
 end

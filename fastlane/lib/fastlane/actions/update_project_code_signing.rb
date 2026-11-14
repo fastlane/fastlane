@@ -4,12 +4,16 @@ module Fastlane
     end
 
     class UpdateProjectCodeSigningAction < Action
+      require 'fastlane/helper/xcodeproj_helper'
+
       def self.run(params)
         UI.message("You shouldn't use update_project_code_signing")
         UI.message("Have you considered using the recommended way to do code signing?")
         UI.message("https://docs.fastlane.tools/codesigning/getting-started/")
 
         path = params[:path]
+        # This action edits the text of project.pbxproj, which projects in Xcode's JSON format don't have
+        UI.user_error!("update_project_code_signing can't change projects that use Xcode's JSON project format (project.xcproj). Use update_code_signing_settings instead.") if Helper::XcodeprojHelper.json_format?(path)
         path = File.join(path, "project.pbxproj")
         UI.user_error!("Could not find path to project config '#{path}'. Pass the path to your project (not workspace)!") unless File.exist?(path)
 
