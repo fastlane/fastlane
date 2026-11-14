@@ -17,7 +17,7 @@ end
 
 # run, displays and saves the list of tests that do not work standalone
 task(:test_all_individually) do
-  files = Dir.glob("./**/*_spec.rb")
+  files = Dir.glob(["spec/**/*_spec.rb", "*/spec/**/*_spec.rb"])
 
   failed = files.select do |file|
     formatter = "--format progress"
