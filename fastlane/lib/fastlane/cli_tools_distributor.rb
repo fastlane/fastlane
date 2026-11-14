@@ -23,6 +23,9 @@ module Fastlane
       def take_off
         before_import_time = Time.now
 
+        # `fastlane spaceship api` prints Apple's JSON on STDOUT; logs and prompts go to stderr.
+        $stdout = $stderr if ARGV.first(2) == %w(spaceship api)
+
         if ENV["FASTLANE_DISABLE_ANIMATION"].nil?
           # Usually in the fastlane code base we use
           #

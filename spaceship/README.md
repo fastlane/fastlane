@@ -94,6 +94,18 @@ To try _spaceship_, just run `fastlane spaceship`. It will automatically start t
 
 This requires you to install `pry` using `gem install pry`. `pry` is not installed by default, as most [_fastlane_](https://fastlane.tools) users won't need the `spaceship playground`. You can add the `pry` dependency to your `Gemfile`.
 
+## Raw API requests
+
+`fastlane spaceship api` sends one App Store Connect API request and prints Apple's JSON response on stdout, including endpoints _spaceship_ has no model for:
+
+```sh
+fastlane spaceship api GET "/v1/apps?limit=200" --paginate --api_key_path key.json
+fastlane spaceship api PATCH /v1/betaGroups/123 --body @rename.json
+fastlane spaceship api DELETE /v1/betaGroups/123 --yes
+```
+
+With `--api_key_path` or the `SPACESHIP_CONNECT_API_*` environment variables it uses the [App Store Connect API](https://developer.apple.com/documentation/appstoreconnectapi); without them it logs in with your Apple ID (`-u`). `--paginate` follows `links.next` and prints all pages as one response. `DELETE` needs `--yes`.
+
 ## Apple Developer Portal API
 
 Open [DeveloperPortal.md](docs/DeveloperPortal.md) for code samples
