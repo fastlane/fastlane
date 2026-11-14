@@ -191,6 +191,18 @@ Because the release is no longer looked up, the version code is not checked agai
 Before performing a new APK upload you may want to check existing track version codes or release names, or you may simply want to provide an informational lane that displays the currently promoted version codes or release name for the production track. You can use the `google_play_track_version_codes` action to retrieve existing version codes for a package and track. You can use the `google_play_track_release_names` action to retrieve existing release names for a package and track.
 For more information, see the `fastlane action google_play_track_version_codes` and `fastlane action google_play_track_release_names` help output.
 
+## Raw API requests
+
+`fastlane supply api` sends one [Google Play Developer API](https://developers.google.com/android-publisher) request and prints Google's JSON response on stdout, including endpoints _supply_ has no command for:
+
+```no-highlight
+fastlane supply api GET /androidpublisher/v3/applications/com.example/reviews --paginate --json_key key.json
+fastlane supply api POST /androidpublisher/v3/applications/com.example/edits --json_key key.json
+fastlane supply api DELETE /androidpublisher/v3/applications/com.example/edits/EDIT_ID --yes --json_key key.json
+```
+
+Credentials come from `--json_key`, `--json_key_data`, `SUPPLY_JSON_KEY(_DATA)`, else Application Default Credentials. `--paginate` follows the next page token and prints all pages as one response. `DELETE` needs `--yes`. File uploads (APK, AAB, images) are not supported; use _supply_'s own options for those.
+
 ## Parallel uploads
 
 By default _supply_ will spawn 10 threads to upload the metadata concurrently (_images, screenshots, texts_). If you want to change this, set either `DELIVER_NUMBER_OF_THREADS` or `FL_NUMBER_OF_THREADS` environment variable to any value between 1 and 10.
