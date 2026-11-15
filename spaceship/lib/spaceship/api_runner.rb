@@ -6,21 +6,29 @@ require_relative 'connect_api'
 require_relative 'connect_api/client'
 
 module Spaceship
-  # Sends one App Store Connect API request and returns Apple's JSON response as text.
+  # Sends one App Store Connect API request and returns Apple's JSON response.
   class ApiRunner
     METHODS = %w(GET POST PATCH DELETE).freeze
 
-    def initialize(method:, path:, body: nil, paginate: false, api_key_path: nil, username: nil, yes: false)
+    def initialize(method:, path:, body: nil, paginate: false, api_key_path: nil, token: nil, username: nil, yes: false)
       @method = method.to_s.upcase
       @path = path.to_s.delete_prefix("/")
       @body = body
       @paginate = paginate
       @api_key_path = api_key_path
+      @token = token
       @username = username
       @yes = yes
     end
 
+    # The response as JSON text, or nil when Apple sends no body.
     def run
+      json = request
+      return json && JSON.pretty_generate(json)
+    end
+
+    # The response parsed: a Hash, or nil when Apple sends no body.
+    def request
       validate!
       body = parse_body
       response = case @method
@@ -31,8 +39,7 @@ module Spaceship
                  end
       return nil if response.nil?
 
-      json = @paginate ? merge_pages(response.all_pages) : response.body
-      return JSON.pretty_generate(json)
+      return @paginate ? merge_pages(response.all_pages) : response.body
     rescue Spaceship::UnexpectedResponse => e
       # Apple's answer, not a crash: show it without a stack trace.
       FastlaneCore::UI.user_error!(e.message)
@@ -52,6 +59,7 @@ module Spaceship
 
     def parse_body
       return nil if @body.nil?
+      return @body if @body.kind_of?(Hash)
       text = @body.start_with?("@") ? File.read(@body[1..]) : @body
       return JSON.parse(text)
     rescue JSON::ParserError => e
@@ -60,9 +68,11 @@ module Spaceship
 
     def client
       @client ||= begin
-        token = Spaceship::ConnectAPI::Token.from(filepath: @api_key_path) if @api_key_path
+        token = @token
+        token ||= Spaceship::ConnectAPI::Token.from(filepath: @api_key_path) if @api_key_path
         token ||= Spaceship::ConnectAPI::Token.create if ENV['SPACESHIP_CONNECT_API_KEY_ID']
-        connect_api = token ? Spaceship::ConnectAPI::Client.new(token: token) : login
+        # Without a key, reuse a session or token set earlier (e.g. in a lane), else log in.
+        connect_api = token ? Spaceship::ConnectAPI::Client.new(token: token) : (Spaceship::ConnectAPI.client || login)
         connect_api.tunes_request_client
       end
     end

@@ -79,6 +79,16 @@ describe Spaceship::ApiRunner do
     expect { run(method: 'GET', path: 'https://example.com/v1/apps') }.to raise_error(FastlaneCore::Interface::FastlaneError, /not a full URL/)
   end
 
+  it 'reuses a client set earlier, without logging in, when no key is given' do
+    stub_const('ENV', ENV.to_h.reject { |key, _| key.start_with?('SPACESHIP_CONNECT_API') })
+    existing = Spaceship::ConnectAPI::Client.new(token: token)
+    allow(Spaceship::ConnectAPI).to receive(:client).and_return(existing)
+    expect(Spaceship::ConnectAPI::Client).not_to receive(:login)
+    stub_request(:get, "#{api}/apps").to_return(status: 200, body: { data: [] }.to_json, headers: { 'Content-Type' => 'application/json' })
+
+    expect(Spaceship::ApiRunner.new(method: 'GET', path: '/v1/apps').request).to eq({ 'data' => [] })
+  end
+
   it 'logs in with the Apple ID and uses the web session host when no key is set' do
     tunes_client = double('tunes_client', team_id: '123', csrf_tokens: nil, select_team: nil)
     allow(Spaceship::TunesClient).to receive(:login).with('user@example.com', nil).and_return(tunes_client)
@@ -87,6 +97,7 @@ describe Spaceship::ApiRunner do
     expect(session_client.tunes_request_client).to receive(:request).and_return(double('response', status: 200, body: { 'data' => [] }, headers: {}))
 
     stub_const('ENV', ENV.to_h.reject { |key, _| key.start_with?('SPACESHIP_CONNECT_API') })
+    allow(Spaceship::ConnectAPI).to receive(:client).and_return(nil)
     output = Spaceship::ApiRunner.new(method: 'GET', path: '/v1/apps', username: 'user@example.com').run
 
     expect(session_client.tunes_request_client.hostname).to eq('https://appstoreconnect.apple.com/iris/')
