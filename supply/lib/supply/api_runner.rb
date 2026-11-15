@@ -24,20 +24,31 @@ module Supply
       return json && JSON.pretty_generate(json)
     end
 
-    # The response parsed: a Hash, or nil when Google sends no body.
+    # The response parsed: a Hash, or nil when Google sends no body. Error statuses fail.
     def request
+      result = response
+      UI.user_error!(self.class.error_message(result)) unless success?(result)
+      return result[:body].empty? ? nil : result[:json]
+    end
+
+    # { status:, body:, json: }, as github_api returns. Error statuses are returned, not raised.
+    def response
       validate!
       body = parse_body
       pages = [send_request(@path, body)]
-      while @paginate && (next_path = next_page_path(pages.last))
+      while @paginate && success?(pages.last) && (next_path = next_page_path(pages.last[:json]))
         pages << send_request(next_path, nil)
       end
-      return nil if pages.last.nil?
+      last = pages.last
+      return last unless pages.size > 1 && success?(last)
 
-      return @paginate ? merge_pages(pages) : pages.first
-    rescue Google::Apis::Error => e
-      # Google's answer, not a crash: show it without a stack trace.
-      UI.user_error!("Google Api Error: #{e.message} - #{error_message(e)}")
+      merged = merge_pages(pages.map { |page| page[:json] })
+      return { status: last[:status], body: merged.to_json, json: merged }
+    end
+
+    # Google's error message, or the body when it has none.
+    def self.error_message(result)
+      return "Google Api Error: #{result[:status]} - #{result[:json].dig('error', 'message') || result[:body]}"
     end
 
     private
@@ -66,13 +77,41 @@ module Supply
       @service ||= Supply::Client.make_from_config(params: { json_key: @json_key, json_key_data: @json_key_data, timeout: 300 }).client
     end
 
+    # Google's client returns only the body; this command keeps the status too.
+    class StatusCommand < Google::Apis::Core::HttpCommand
+      attr_reader :status
+
+      def process_response(status, header, body)
+        @status = status
+        super
+      end
+    end
+
+    # What BaseService#http does, keeping the status. Error statuses come back as results.
     def send_request(path, body)
       options = Google::Apis::RequestOptions.new(header: { 'Content-Type' => 'application/json' }) if body
       # An empty body keeps the client from form-encoding the query into a POST.
       body ||= "" if %w(POST PUT PATCH).include?(@method)
-      text = service.http(@method.downcase.to_sym, service.root_url + path, body: body, options: options)
-      return nil if text.nil? || text.empty?
-      return JSON.parse(text)
+      command = StatusCommand.new(@method.downcase.to_sym, service.root_url + path, body: body)
+      command.options = service.request_options.merge(options)
+      text = command.execute(service.client)
+      return result(command.status, text)
+    rescue Google::Apis::ClientError, Google::Apis::ServerError => e
+      return result(e.status_code, e.body)
+    end
+
+    def result(status, text)
+      text = text.to_s
+      json = begin
+               JSON.parse(text)
+             rescue JSON::ParserError
+               nil
+             end
+      return { status: status, body: text, json: json.kind_of?(Hash) ? json : {} }
+    end
+
+    def success?(result)
+      result[:status].to_i.between?(200, 299)
     end
 
     # Older endpoints (reviews, in-app products, users) page with `token` and `tokenPagination`,
@@ -103,13 +142,6 @@ module Supply
       json.delete("nextPageToken")
       json.delete("tokenPagination")
       return json
-    end
-
-    def error_message(error)
-      parsed = JSON.parse(error.body.to_s)
-      return parsed.dig("error", "message") || error.body
-    rescue JSON::ParserError
-      return error.body
     end
   end
 end
