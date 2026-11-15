@@ -8,7 +8,7 @@ module Fastlane
         params[:api_key] ||= Actions.lane_context[SharedValues::APP_STORE_CONNECT_API_KEY]
         token = Spaceship::ConnectAPI::Token.from(hash: params[:api_key], filepath: params[:api_key_path])
 
-        return Spaceship::ApiRunner.new(
+        result = Spaceship::ApiRunner.new(
           method: params[:http_method],
           path: params[:path],
           body: params[:body],
@@ -16,7 +16,14 @@ module Fastlane
           token: token,
           username: params[:username],
           yes: true
-        ).request
+        ).response
+
+        unless result[:status].between?(200, 299)
+          handler = params[:error_handlers][result[:status]] || params[:error_handlers]['*']
+          UI.user_error!(Spaceship::ApiRunner.error_message(result)) unless handler
+          handler.call(result)
+        end
+        return result
       end
 
       #####################################################
@@ -50,6 +57,10 @@ module Fastlane
                                        description: "Follow links.next and return all pages as one response (GET only)",
                                        type: Boolean,
                                        default_value: false),
+          FastlaneCore::ConfigItem.new(key: :error_handlers,
+                                       description: "Procs called with the result for error statuses, by status code or '*' for any other; without one, an error status fails the lane",
+                                       type: Hash,
+                                       default_value: {}),
           FastlaneCore::ConfigItem.new(key: :api_key_path,
                                        env_name: "APP_STORE_CONNECT_API_KEY_PATH",
                                        description: "Path to your App Store Connect API Key JSON file (https://docs.fastlane.tools/app-store-connect-api/#using-fastlane-api-key-json-file)",
@@ -72,7 +83,7 @@ module Fastlane
       end
 
       def self.return_value
-        "The parsed JSON response, or nil when Apple sends no body"
+        "A hash with the HTTP status code (:status), the response body as text (:body) and parsed (:json, {} when empty). With paginate, the pages merged into one response"
       end
 
       def self.return_type
@@ -90,7 +101,11 @@ module Fastlane
       def self.example_code
         [
           'app_store_connect_api_key(key_id: "D383SF739", issuer_id: "6053b7fe-68a8-4acb-89be-165aa6465141", key_filepath: "./AuthKey_D383SF739.p8")
-          apps = app_store_connect_api(path: "/v1/apps?limit=200", paginate: true) # apps["data"] lists every app',
+          apps = app_store_connect_api(path: "/v1/apps?limit=200", paginate: true) # apps[:json]["data"] lists every app',
+          'group = app_store_connect_api(
+            path: "/v1/betaGroups/123",
+            error_handlers: { 404 => proc { |result| UI.message("No such group") } }
+          )',
           'app_store_connect_api(
             http_method: "PATCH",
             path: "/v1/betaGroups/123",

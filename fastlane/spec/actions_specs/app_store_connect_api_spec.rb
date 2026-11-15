@@ -21,7 +21,9 @@ describe Fastlane do
           app_store_connect_api(path: '/v1/apps?limit=1')
         end").runner.execute(:test)
 
-        expect(result).to eq({ 'data' => [{ 'type' => 'apps', 'id' => '1' }] })
+        expect(result[:status]).to eq(200)
+        expect(result[:json]).to eq({ 'data' => [{ 'type' => 'apps', 'id' => '1' }] })
+        expect(JSON.parse(result[:body])).to eq(result[:json])
       end
 
       it "sends a Hash body as JSON" do
@@ -47,6 +49,30 @@ describe Fastlane do
             app_store_connect_api(path: '/v1/apps/9')
           end").runner.execute(:test)
         end.to raise_error(FastlaneCore::Interface::FastlaneError, /There is no resource of type 'apps' with id '9'/)
+      end
+
+      it "passes an error status to its error handler instead of failing" do
+        allow(Spaceship::ConnectAPI::Token).to receive(:from).and_return(token)
+        stub_request(:get, "#{api}/betaGroups/9").to_return(status: 404, body: { errors: [{ status: '404', code: 'NOT_FOUND', title: 'Not found' }] }.to_json, headers: json)
+        handled = nil
+        Fastlane::Actions::AppStoreConnectApiAction.run(
+          FastlaneCore::Configuration.create(Fastlane::Actions::AppStoreConnectApiAction.available_options,
+                                             path: '/v1/betaGroups/9', error_handlers: { 404 => proc { |result| handled = result } })
+        )
+
+        expect(handled[:status]).to eq(404)
+        expect(handled[:json]['errors'].first['code']).to eq('NOT_FOUND')
+      end
+
+      it "returns an empty body as an empty string and json" do
+        allow(Spaceship::ConnectAPI::Token).to receive(:from).and_return(token)
+        stub_request(:delete, "#{api}/betaGroups/9").to_return(status: 204, body: '')
+
+        result = Fastlane::FastFile.new.parse("lane :test do
+          app_store_connect_api(http_method: 'DELETE', path: '/v1/betaGroups/9')
+        end").runner.execute(:test)
+
+        expect(result).to eq({ status: 204, body: '', json: {} })
       end
 
       it "rejects an unknown http_method" do

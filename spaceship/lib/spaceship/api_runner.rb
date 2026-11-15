@@ -27,22 +27,31 @@ module Spaceship
       return json && JSON.pretty_generate(json)
     end
 
-    # The response parsed: a Hash, or nil when Apple sends no body.
+    # The response parsed: a Hash, or nil when Apple sends no body. Error statuses fail.
     def request
+      result = response
+      FastlaneCore::UI.user_error!(self.class.error_message(result)) unless result[:status].between?(200, 299)
+      return result[:body].empty? ? nil : result[:json]
+    end
+
+    # { status:, body:, json: }, as github_api returns. Error statuses are returned, except 401 and 403, which spaceship raises.
+    def response
       validate!
       body = parse_body
-      response = case @method
-                 when "GET" then client.get(@path)
-                 when "POST" then client.post(@path, body)
-                 when "PATCH" then client.patch(@path, body)
-                 when "DELETE" then client.delete(@path, nil, body)
-                 end
-      return nil if response.nil?
+      pages = [client.raw_request(@method.downcase.to_sym, @path, body)]
+      while @paginate && success?(pages.last) && pages.last.body.kind_of?(Hash) && (next_url = pages.last.body.dig("links", "next"))
+        pages << client.raw_request(:get, next_url)
+      end
+      last = pages.last
+      return result(last.status, merge_pages(pages.map(&:body))) if @paginate && success?(last)
+      return result(last.status, last.body)
+    end
 
-      return @paginate ? merge_pages(response.all_pages) : response.body
-    rescue Spaceship::UnexpectedResponse => e
-      # Apple's answer, not a crash: show it without a stack trace.
-      FastlaneCore::UI.user_error!(e.message)
+    # Apple's error titles and details, one per line.
+    def self.error_message(result)
+      errors = result[:json]["errors"]
+      return "App Store Connect responded with #{result[:status]}: #{result[:body]}" unless errors.kind_of?(Array)
+      return errors.map { |error| [error["title"], error["detail"]].compact.join(" - ") }.join("\n")
     end
 
     private
@@ -88,14 +97,29 @@ module Spaceship
       $stdout = stdout
     end
 
-    def merge_pages(pages)
-      json = pages.first.body.dup
+    def success?(raw)
+      raw.status.between?(200, 299)
+    end
+
+    def result(status, body)
+      return { status: status, body: body.to_json, json: body } if body.kind_of?(Hash)
+      text = body.to_s
+      json = begin
+               JSON.parse(text)
+             rescue JSON::ParserError
+               nil
+             end
+      return { status: status, body: text, json: json.kind_of?(Hash) ? json : {} }
+    end
+
+    def merge_pages(bodies)
+      json = bodies.first.dup
       return json unless json["data"].kind_of?(Array)
 
-      json["data"] = pages.flat_map { |page| page.body["data"] || [] }
-      included = pages.flat_map { |page| page.body["included"] || [] }.uniq { |resource| [resource["type"], resource["id"]] }
+      json["data"] = bodies.flat_map { |body| body["data"] || [] }
+      included = bodies.flat_map { |body| body["included"] || [] }.uniq { |resource| [resource["type"], resource["id"]] }
       json["included"] = included unless included.empty?
-      json["links"] = pages.last.body["links"] if pages.last.body["links"]
+      json["links"] = bodies.last["links"] if bodies.last["links"]
       return json
     end
   end
