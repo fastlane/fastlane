@@ -4,7 +4,7 @@ require 'fastlane_core'
 require_relative 'client'
 
 module Supply
-  # Sends one Google Play Developer API request and returns Google's JSON response as text.
+  # Sends one Google Play Developer API request and returns Google's JSON response.
   class ApiRunner
     METHODS = %w(GET POST PUT PATCH DELETE).freeze
 
@@ -18,16 +18,23 @@ module Supply
       @yes = yes
     end
 
+    # The response as JSON text, or nil when Google sends no body.
     def run
+      json = request
+      return json && JSON.pretty_generate(json)
+    end
+
+    # The response parsed: a Hash, or nil when Google sends no body.
+    def request
       validate!
       body = parse_body
-      pages = [request(@path, body)]
+      pages = [send_request(@path, body)]
       while @paginate && (next_path = next_page_path(pages.last))
-        pages << request(next_path, nil)
+        pages << send_request(next_path, nil)
       end
       return nil if pages.last.nil?
 
-      return JSON.pretty_generate(@paginate ? merge_pages(pages) : pages.first)
+      return @paginate ? merge_pages(pages) : pages.first
     rescue Google::Apis::Error => e
       # Google's answer, not a crash: show it without a stack trace.
       UI.user_error!("Google Api Error: #{e.message} - #{error_message(e)}")
@@ -47,6 +54,7 @@ module Supply
 
     def parse_body
       return nil if @body.nil?
+      return @body.to_json if @body.kind_of?(Hash)
       text = @body.start_with?("@") ? File.read(@body[1..]) : @body
       JSON.parse(text)
       return text
@@ -58,7 +66,7 @@ module Supply
       @service ||= Supply::Client.make_from_config(params: { json_key: @json_key, json_key_data: @json_key_data, timeout: 300 }).client
     end
 
-    def request(path, body)
+    def send_request(path, body)
       options = Google::Apis::RequestOptions.new(header: { 'Content-Type' => 'application/json' }) if body
       # An empty body keeps the client from form-encoding the query into a POST.
       body ||= "" if %w(POST PUT PATCH).include?(@method)
