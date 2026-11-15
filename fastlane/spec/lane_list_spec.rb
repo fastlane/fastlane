@@ -32,6 +32,16 @@ describe Fastlane do
  })
     end
 
+    it "#output_json writes to STDOUT, which stays clean when $stdout goes to stderr" do
+      stdout = $stdout
+      $stdout = StringIO.new
+      expect(STDOUT).to receive(:puts).with(JSON.pretty_generate({}))
+      Fastlane::LaneList.output_json(nil)
+      expect($stdout.string).to eq("")
+    ensure
+      $stdout = stdout
+    end
+
     it "generates empty JSON if there is no Fastfile" do
       result = Fastlane::LaneList.generate_json(nil)
       expect(result).to eq({})
