@@ -118,6 +118,11 @@ describe Fastlane::CLIToolsDistributor do
       expect(stdout_after_take_off(%w(supply api GET /androidpublisher/v3/applications/com.example/edits/1))).to be($stderr)
     end
 
+    it "sends everything but the JSON to stderr for actions --json and action <name> -j" do
+      expect(stdout_after_take_off(%w(actions --json))).to be($stderr)
+      expect(stdout_after_take_off(%w(action gym -j))).to be($stderr)
+    end
+
     it "keeps stdout for lanes without --json, and for -j given to another command" do
       expect(stdout_after_take_off(%w(lanes))).to be($stdout)
       expect(stdout_after_take_off(%w(gym -j))).to be($stdout)

@@ -18,7 +18,7 @@ module Fastlane
 
       def running_json_command?
         return true if %w(spaceship supply).include?(ARGV[0]) && ARGV[1] == "api"
-        ARGV.first == "lanes" && (ARGV.include?("-j") || ARGV.include?("--json"))
+        %w(lanes actions action).include?(ARGV.first) && (ARGV.include?("-j") || ARGV.include?("--json"))
       end
 
       def utf8_locale?
