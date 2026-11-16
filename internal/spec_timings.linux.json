@@ -168,7 +168,6 @@
     "fastlane/spec/actions_specs/version_bump_podspec_spec.rb": 0.04009569900000001,
     "fastlane/spec/actions_specs/github_api_spec.rb": 0.039911031,
     "spaceship/spec/connect_api/users/user_client_spec.rb": 0.038345453,
-    "fastlane/spec/actions_specs/hockey_spec.rb": 0.038308415,
     "fastlane/spec/actions_specs/pod_lib_lint_spec.rb": 0.037946627999999996,
     "fastlane/spec/actions_specs/create_pull_request_spec.rb": 0.037525081,
     "snapshot/spec/commands_generator_spec.rb": 0.037403136999999996,

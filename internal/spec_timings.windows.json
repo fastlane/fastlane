@@ -130,7 +130,6 @@
     "fastlane/spec/actions_specs/push_to_git_remote_spec.rb": 0.14350429999999997,
     "fastlane/spec/actions_specs/update_fastlane_spec.rb": 0.14313339999999997,
     "fastlane/spec/actions_specs/git_remote_branch_spec.rb": 0.1427416,
-    "fastlane/spec/actions_specs/hockey_spec.rb": 0.1422167,
     "fastlane/spec/actions_specs/pod_lib_lint_spec.rb": 0.1406568,
     "fastlane/spec/actions_specs/github_api_spec.rb": 0.14052509999999999,
     "spaceship/spec/tunes/b2b_user_spec.rb": 0.14031090000000002,
