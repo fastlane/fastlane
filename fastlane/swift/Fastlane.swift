@@ -12216,15 +12216,6 @@ public func twitter(consumerKey: String,
 }
 
 /**
- Post a message to [Typetalk](https://www.typetalk.com/)
- */
-public func typetalk() {
-    let args: [RubyCommand.Argument] = []
-    let command = RubyCommand(commandID: "", methodName: "typetalk", className: nil, args: args)
-    _ = runner.executeCommand(command)
-}
-
-/**
  Unlock a keychain
 
  - parameters:
