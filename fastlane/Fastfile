@@ -365,7 +365,7 @@ private_lane :github_changelog do |options|
         sleep(sleep_time)
       end
 
-      pr_resp = github_api(path: "/search/issues?q=repo:fastlane/fastlane+is:pr+base:master+SHA:#{sha}")
+      pr_resp = github_api(path: "/search/issues?q=repo:fastlane/fastlane+is:pr+base:master+SHA:#{sha}", api_bearer: ENV["FL_GITHUB_RELEASE_API_BEARER"])
       body = JSON.parse(pr_resp[:body])
       items = body["items"]
     end
