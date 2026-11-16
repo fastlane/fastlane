@@ -172,6 +172,9 @@ describe Pilot::TesterManager do
 
       it "looks up the version of a bare build number for the app" do
         allow(fake_app).to receive(:id).and_return("123456789")
+        allow(Spaceship::ConnectAPI::Build).to receive(:all)
+          .with(app_id: "123456789", build_number: "999", platform: "IOS")
+          .and_return([double("build", app_version: "1.2.2")])
         expect(Spaceship::ConnectAPI::Build).to receive(:all)
           .with(app_id: "123456789", build_number: "1234", platform: "IOS")
           .and_return([double("build", app_version: "1.2.3")])

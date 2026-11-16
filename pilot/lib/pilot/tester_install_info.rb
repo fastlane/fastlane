@@ -36,19 +36,16 @@ module Pilot
     private
 
     def install_from_app_devices(app_devices)
-      candidates = (app_devices || []).filter_map do |device|
+      installs = (app_devices || []).filter_map do |device|
         value = device["appBuildVersion"].to_s.strip
         next if value.empty?
 
         version, build = parse_build_version(value)
-        { version: version, build: build, platform: device["platform"] }
+        Install.new(version || lookup_version(build, device["platform"]), build)
       end
 
-      latest = candidates.max_by { |candidate| build_sort_key(candidate[:build]) }
-      return nil if latest.nil?
-
-      version = latest[:version] || lookup_version(latest[:build], latest[:platform])
-      return Install.new(version, latest[:build])
+      # A build number can restart with a new version, so the version is compared first
+      return installs.max_by { |install| [sort_key(install.version), sort_key(install.build)] }
     end
 
     # @return [Array<String, nil>] the version (nil for a bare build number) and the build
@@ -58,9 +55,11 @@ module Pilot
       return [nil, value]
     end
 
-    # Compared with Gem::Version, as app_store_build_number.rb:114 does. A build Gem::Version rejects sorts lowest.
-    def build_sort_key(build)
-      return Gem::Version.correct?(build) ? Gem::Version.new(build) : Gem::Version.new("0")
+    # Compared with Gem::Version, as app_store_build_number.rb:114 does.
+    # A missing value (a version no build matched) or one Gem::Version rejects sorts lowest.
+    def sort_key(value)
+      return Gem::Version.new(value) if value && Gem::Version.correct?(value)
+      return Gem::Version.new("0")
     end
 
     def lookup_version(build, platform)

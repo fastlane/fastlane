@@ -36,6 +36,33 @@ describe Pilot::TesterInstallInfo do
         expect(install.display_version).to eq("1.2.4 (1000)")
       end
 
+      it "picks the highest version when the build number restarts" do
+        install = install_info.install_for(installed([device("1.0 (100)"), device("2.0 (1)")]))
+
+        expect(install.display_version).to eq("2.0 (1)")
+      end
+
+      it "looks up every bare build number to pick the highest version" do
+        expect(Spaceship::ConnectAPI::Build).to(receive(:all)
+          .with(app_id: "123456789", build_number: "100", platform: "IOS")
+          .and_return([double("build", app_version: "1.0")]))
+        expect(Spaceship::ConnectAPI::Build).to(receive(:all)
+          .with(app_id: "123456789", build_number: "1", platform: "IOS")
+          .and_return([double("build", app_version: "2.0")]))
+
+        install = install_info.install_for(installed([device("100"), device("1")]))
+
+        expect(install.display_version).to eq("2.0 (1)")
+      end
+
+      it "sorts a bare build number with no matching build below a known version" do
+        allow(Spaceship::ConnectAPI::Build).to(receive(:all).and_return([]))
+
+        install = install_info.install_for(installed([device("500"), device("1.0 (1)")]))
+
+        expect(install.display_version).to eq("1.0 (1)")
+      end
+
       it "looks up the version of a bare build number" do
         expect(Spaceship::ConnectAPI::Build).to(receive(:all)
           .with(app_id: "123456789", build_number: "1234", platform: "IOS")
@@ -184,6 +211,8 @@ describe Pilot::TesterInstallInfo do
       end
 
       it "sorts a build that is not a valid version lowest without an error" do
+        allow(Spaceship::ConnectAPI::Build).to(receive(:all).and_return([]))
+
         install = install_info.install_for(installed([device("abc"), device("1.2.3 (12)")]))
 
         expect(install.display_version).to eq("1.2.3 (12)")
