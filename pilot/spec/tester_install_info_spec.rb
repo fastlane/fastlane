@@ -65,6 +65,23 @@ describe Pilot::TesterInstallInfo do
         expect(second.display_version).to eq("1.2.3 (1234)")
       end
 
+      it "looks up the same build number once per platform" do
+        expect(Spaceship::ConnectAPI::Build).to(receive(:all).once
+          .with(app_id: "123456789", build_number: "1234", platform: "IOS")
+          .and_return([double("build", app_version: "1.2.3")]))
+        expect(Spaceship::ConnectAPI::Build).to(receive(:all).once
+          .with(app_id: "123456789", build_number: "1234", platform: "MAC_OS")
+          .and_return([double("build", app_version: "4.5.6")]))
+
+        ios = install_info.install_for(installed([device("1234", platform: "IOS")]))
+        mac = install_info.install_for(installed([device("1234", platform: "MAC_OS")]))
+        ios_again = install_info.install_for(installed([device("1234", platform: "IOS")]))
+
+        expect(ios.display_version).to eq("1.2.3 (1234)")
+        expect(mac.display_version).to eq("4.5.6 (1234)")
+        expect(ios_again.display_version).to eq("1.2.3 (1234)")
+      end
+
       it "passes a nil platform to the lookup when the platform is not known" do
         expect(Spaceship::ConnectAPI::Build).to(receive(:all)
           .with(app_id: "123456789", build_number: "1234", platform: nil)
