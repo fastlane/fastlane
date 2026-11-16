@@ -36,7 +36,8 @@ module Fastlane
 
       def self.example_code
         [
-          'clipboard(value: "https://docs.fastlane.tools/")'
+          'clipboard(value: "https://docs.fastlane.tools/")',
+          'clipboard(value: lane_context[SharedValues::SET_GITHUB_RELEASE_HTML_LINK] || "")'
         ]
       end
 
