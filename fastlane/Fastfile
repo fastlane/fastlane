@@ -343,14 +343,13 @@ private_lane :github_changelog do |options|
   body = JSON.parse(resp[:body])
   commits = body["commits"].reverse
 
+  # Squash-merged commits end with "(#N)": fetch those pull requests in one GraphQL query instead of one search per commit
+  pr_number = ->(commit) { commit["commit"]["message"].lines.first.strip[/\(#(\d+)\)\z/, 1] }
+  pull_requests = github_pull_requests(commits.map(&pr_number).compact.uniq)
+
   sleep_time = ENV['FL_CHANGELOG_SLEEP'].to_i
 
   formatted = commits.map do |commit|
-    if sleep_time > 0
-      UI.message("Sleeping for #{sleep_time} second(s) to get changelog")
-      sleep(sleep_time)
-    end
-
     # Default to commit message info
     message = commit["commit"]["message"].lines.first.strip
     name = commit["commit"]["author"]["name"]
@@ -358,9 +357,18 @@ private_lane :github_changelog do |options|
 
     # Get pull request associate with commit message
     sha = commit["sha"]
-    pr_resp = github_api(path: "/search/issues?q=repo:fastlane/fastlane+is:pr+base:master+SHA:#{sha}")
-    body = JSON.parse(pr_resp[:body])
-    items = body["items"]
+    if (pull_request = pull_requests[pr_number.call(commit)])
+      items = [pull_request]
+    else
+      if sleep_time > 0
+        UI.message("Sleeping for #{sleep_time} second(s) to get changelog")
+        sleep(sleep_time)
+      end
+
+      pr_resp = github_api(path: "/search/issues?q=repo:fastlane/fastlane+is:pr+base:master+SHA:#{sha}")
+      body = JSON.parse(pr_resp[:body])
+      items = body["items"]
+    end
 
     item_infos = items.map do |item|
       message = "#{item['title']} (##{item['number']})"
@@ -402,6 +410,24 @@ private_lane :github_changelog do |options|
   end.compact.join("\n")
 
   formatted
+end
+
+# Returns the pull requests found, by number, in the shape of a search result: "title", "number" and "user" => { "login" }
+def github_pull_requests(numbers)
+  numbers.each_slice(100).each_with_object({}) do |slice, pull_requests|
+    fields = slice.map { |number| "pr#{number}: pullRequest(number: #{number}) { title number author { login __typename } }" }
+    query = "query { repository(owner: \"fastlane\", name: \"fastlane\") { #{fields.join(' ')} } }"
+    # GraphQL rejects GITHUB_TOKEN sent as api_token (Basic), which GITHUB_API_TOKEN sets on CI
+    resp = github_api(http_method: "POST", path: "/graphql", body: { query: query }, api_bearer: ENV["FL_GITHUB_RELEASE_API_BEARER"])
+    # A missing pull request is null with an error in the response, not an HTTP error: its commit falls back to the search
+    (resp[:json].dig("data", "repository") || {}).each_value do |pr|
+      next unless pr
+      # The search names bots "dependabot[bot]", GraphQL "dependabot"
+      login = pr.dig("author", "login")
+      login = "#{login}[bot]" if login && pr.dig("author", "__typename") == "Bot"
+      pull_requests[pr["number"].to_s] = { "title" => pr["title"], "number" => pr["number"], "user" => { "login" => login } }
+    end
+  end
 end
 
 desc "Print out the changelog since the last tagged release and open the GitHub page with the changes"
