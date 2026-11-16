@@ -31,9 +31,9 @@ describe Pilot::TesterInstallInfo do
       end
 
       it "picks the highest build by numeric comparison" do
-        install = install_info.install_for(installed([device("1.2.3 (999)"), device("1.2.4 (1000)")]))
+        install = install_info.install_for(installed([device("1.2.3 (999)"), device("1.2.3 (1000)")]))
 
-        expect(install.display_version).to eq("1.2.4 (1000)")
+        expect(install.display_version).to eq("1.2.3 (1000)")
       end
 
       it "picks the highest version when the build number restarts" do
