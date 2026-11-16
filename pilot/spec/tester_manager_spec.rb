@@ -120,6 +120,15 @@ describe Pilot::TesterManager do
     end
 
     describe "when asked to find a tester" do
+      around(:each) do |example|
+        FastlaneSpec::Env.with_env_values(
+          "PILOT_API_KEY_PATH" => nil,
+          "APP_STORE_CONNECT_API_KEY_PATH" => nil,
+          "PILOT_API_KEY" => nil,
+          "APP_STORE_CONNECT_API_KEY" => nil
+        ) { example.run }
+      end
+
       let(:find_tester_options) do
         FastlaneCore::Configuration.create(Pilot::Options.available_options, {
           apple_id: '123456789',
