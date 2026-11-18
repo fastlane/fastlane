@@ -5,6 +5,11 @@ module Spaceship
   class Client
     def handle_two_step_or_factor(response)
       raise "2FA can only be performed in interactive mode" if ENV["SPACESHIP_ONLY_ALLOW_INTERACTIVE_2FA"] == "true" && ENV["FASTLANE_IS_INTERACTIVE"] == "false"
+      unless can_prompt_for_2fa?
+        raise TwoFactorInputUnavailable, "Apple asks for a two-factor authentication code for '#{self.user}', and fastlane cannot ask for it here (CI, or stdin is not a terminal). " \
+                                         "Use an App Store Connect API key, or a session from `fastlane spaceauth` in FASTLANE_SESSION: https://docs.fastlane.tools/getting-started/ios/authentication/. " \
+                                         "To pipe the code in, set FASTLANE_ALLOW_PIPED_INPUT, and SPACESHIP_2FA_SMS_DEFAULT_PHONE_NUMBER to choose the phone."
+      end
       # extract `x-apple-id-session-id` and `scnt` from response, to be used by `update_request_headers`
       @x_apple_id_session_id = response["x-apple-id-session-id"]
       @scnt = response["scnt"]
@@ -240,6 +245,14 @@ module Spaceship
     # see `sms_fallback` + account has only one trusted number for receiving an sms
     def sms_automatically_sent(response)
       (response.body["trustedPhoneNumbers"] || []).count == 1 && sms_fallback(response)
+    end
+
+    # Without fastlane_core, spaceship asks as before
+    def can_prompt_for_2fa?
+      if Object.const_defined?("FastlaneCore") && FastlaneCore.const_defined?("Helper")
+        return FastlaneCore::Helper.can_prompt?
+      end
+      return true
     end
 
     # extracted into its own method for testing
