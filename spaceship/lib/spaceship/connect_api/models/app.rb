@@ -426,6 +426,57 @@ module Spaceship
       end
 
       #
+      # Regulated Medical Device declaration
+      # Only available with Apple ID auth
+      #
+
+      REGULATED_MEDICAL_DEVICE_REQUIREMENT = "MEDICAL_DEVICE"
+      REGULATED_MEDICAL_DEVICE_REGIONS = ["EEA", "GBR", "USA"]
+
+      # The app's MEDICAL_DEVICE compliance requirement as a Hash
+      # ("id", "status" ("COLLECTED" once answered), "dateSigned", ...), or nil
+      # when Apple does not require the declaration for this app.
+      def fetch_regulated_medical_device_requirement(client: nil)
+        client ||= Spaceship::ConnectAPI
+        resp = client.get_compliance_requirements(app_id: id)
+        requirements = (resp.body["requirementData"] || []).flat_map { |data| data["requirements"] || [] }
+        return requirements.find { |requirement| requirement["name"] == REGULATED_MEDICAL_DEVICE_REQUIREMENT }
+      end
+
+      # "no", "yes", or nil when the declaration is not required or not answered yet.
+      def fetch_regulated_medical_device_declaration(client: nil)
+        client ||= Spaceship::ConnectAPI
+        requirement = fetch_regulated_medical_device_requirement(client: client)
+        return nil if requirement.nil?
+
+        resp = client.get_compliance_requirement_form(requirement_id: requirement["id"], app_id: id)
+        return resp.body.dig("data", "medicalDeviceData", "declaration")
+      end
+
+      # Declares that the app is NOT a regulated medical device in any region
+      # Apple asks about (EEA, UK, US). Returns false when there is nothing to do
+      # (not required, or already declared "no"). Never changes a "yes": that
+      # answer carries regulatory data only a person should provide.
+      def declare_not_regulated_medical_device(client: nil)
+        client ||= Spaceship::ConnectAPI
+        requirement = fetch_regulated_medical_device_requirement(client: client)
+        return false if requirement.nil?
+
+        resp = client.get_compliance_requirement_form(requirement_id: requirement["id"], app_id: id)
+        data = resp.body["data"] || {}
+        declaration = data.dig("medicalDeviceData", "declaration")
+        return false if declaration == "no"
+        raise "This app is declared a regulated medical device (#{declaration.inspect}); change it in App Store Connect" unless declaration.nil?
+
+        form = data.except("medicalDeviceData").merge(
+          "countriesOrRegions" => REGULATED_MEDICAL_DEVICE_REGIONS,
+          "medicalDeviceData" => (data["medicalDeviceData"] || {}).merge("declaration" => "no")
+        )
+        client.post_compliance_requirement_form(requirement_id: requirement["id"], app_id: id, form: form)
+        return true
+      end
+
+      #
       # Review Submissions
       #
 
