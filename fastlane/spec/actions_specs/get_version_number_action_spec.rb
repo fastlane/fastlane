@@ -195,7 +195,7 @@ describe Fastlane do
           result = Fastlane::FastFile.new.parse("lane :test do
             get_version_number(xcodeproj: '#{xcodeproj_dir}')
           end").runner.execute(:test)
-        end.to raise_error(FastlaneCore::Interface::FastlaneCrash, /non-interactive mode/)
+        end.to raise_error(FastlaneCore::Interface::FastlaneError, /non-interactive mode/)
       end
 
       it "raises if in non-interactive mode if cannot infer configuration", requires_xcodeproj: true do
@@ -203,7 +203,7 @@ describe Fastlane do
           result = Fastlane::FastFile.new.parse("lane :test do
             get_version_number(xcodeproj: '#{xcodeproj_dir}', target: 'TargetDifferentConfigurations')
           end").runner.execute(:test)
-        end.to raise_error(FastlaneCore::Interface::FastlaneCrash, /non-interactive mode/)
+        end.to raise_error(FastlaneCore::Interface::FastlaneError, /non-interactive mode/)
       end
 
       it "gets correct version for different configurations", requires_xcodeproj: true do
