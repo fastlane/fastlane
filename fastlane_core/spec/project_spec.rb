@@ -70,6 +70,7 @@ describe FastlaneCore do
           workspaces = ['./Something.xcworkspace', './SomethingElse.xcworkspace']
           FileUtils.mkdir_p(workspaces)
 
+          allow(FastlaneCore::Helper).to receive(:can_prompt?).and_return(true)
           expect(FastlaneCore::Project).to receive(:choose).and_return(workspaces.last)
           expect(FastlaneCore::Project).not_to(receive(:select_project))
 
@@ -85,6 +86,7 @@ describe FastlaneCore do
           projects = ['./Something.xcodeproj', './SomethingElse.xcodeproj']
           FileUtils.mkdir_p(projects)
 
+          allow(FastlaneCore::Helper).to receive(:can_prompt?).and_return(true)
           expect(FastlaneCore::Project).to receive(:choose).and_return(projects.last)
           expect(FastlaneCore::Project).not_to(receive(:select_project))
 
@@ -92,6 +94,28 @@ describe FastlaneCore do
           FastlaneCore::Project.detect_projects(config)
 
           expect(config[:project]).to eq(projects.last)
+        end
+      end
+
+      it "stops when it cannot ask which of multiple workspaces to use" do
+        within_a_temp_dir do |dir|
+          FileUtils.mkdir_p(["./Something.xcworkspace", "./SomethingElse.xcworkspace"])
+          allow(FastlaneCore::Helper).to receive(:can_prompt?).and_return(false)
+          expect(FastlaneCore::Project).not_to(receive(:choose))
+
+          config = FastlaneCore::Configuration.new(options, {})
+          expect { FastlaneCore::Project.detect_projects(config) }.to raise_error(FastlaneCore::Interface::FastlaneError, "Found 2 workspaces: pass one with the `workspace` option")
+        end
+      end
+
+      it "stops when it cannot ask which of multiple projects to use" do
+        within_a_temp_dir do |dir|
+          FileUtils.mkdir_p(["./Something.xcodeproj", "./SomethingElse.xcodeproj"])
+          allow(FastlaneCore::Helper).to receive(:can_prompt?).and_return(false)
+          expect(FastlaneCore::Project).not_to(receive(:choose))
+
+          config = FastlaneCore::Configuration.new(options, {})
+          expect { FastlaneCore::Project.detect_projects(config) }.to raise_error(FastlaneCore::Interface::FastlaneError, "Found 2 projects: pass one with the `project` option")
         end
       end
 
@@ -338,6 +362,24 @@ describe FastlaneCore do
 
       it "#schemes returns all configurations" do
         expect(@workspace.configurations).to eq([])
+      end
+    end
+
+    describe "#select_scheme with several schemes" do
+      let(:workspace) { FastlaneCore::Project.new({ workspace: "./fastlane_core/spec/fixtures/projects/workspace_schemes/WorkspaceSchemes.xcworkspace" }) }
+
+      it "stops when it cannot ask which one to use" do
+        allow(FastlaneCore::Helper).to receive(:can_prompt?).and_return(false)
+        allow(FastlaneCore::UI).to receive(:error)
+        expect(workspace).not_to(receive(:choose))
+        expect { workspace.select_scheme }.to raise_error(FastlaneCore::Interface::FastlaneError, "Multiple schemes found")
+      end
+
+      it "asks which one to use when it can" do
+        allow(FastlaneCore::Helper).to receive(:can_prompt?).and_return(true)
+        expect(workspace).to receive(:choose).with("WorkspaceSchemesFramework", "WorkspaceSchemesApp", "WorkspaceSchemesScheme").and_return("WorkspaceSchemesApp")
+        workspace.select_scheme
+        expect(workspace.options[:scheme]).to eq("WorkspaceSchemesApp")
       end
     end
 

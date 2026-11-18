@@ -115,6 +115,32 @@ describe FastlaneCore do
       end
     end
 
+    describe "#can_prompt?" do
+      it "is true off CI with stdin on a terminal" do
+        stub_const('ENV', {})
+        allow($stdin).to receive(:tty?).and_return(true)
+        expect(FastlaneCore::Helper.can_prompt?).to be(true)
+      end
+
+      it "is false on CI, even with stdin on a terminal" do
+        stub_const('ENV', { 'CI' => 'true' })
+        allow($stdin).to receive(:tty?).and_return(true)
+        expect(FastlaneCore::Helper.can_prompt?).to be(false)
+      end
+
+      it "is false when stdin is not a terminal" do
+        stub_const('ENV', {})
+        allow($stdin).to receive(:tty?).and_return(false)
+        expect(FastlaneCore::Helper.can_prompt?).to be(false)
+      end
+
+      it "is true with FASTLANE_ALLOW_PIPED_INPUT, on CI and without a terminal" do
+        stub_const('ENV', { 'CI' => 'true', 'FASTLANE_ALLOW_PIPED_INPUT' => '1' })
+        allow($stdin).to receive(:tty?).and_return(false)
+        expect(FastlaneCore::Helper.can_prompt?).to be(true)
+      end
+    end
+
     describe "#is_circle_ci?" do
       it "returns true when building in CircleCI" do
         stub_const('ENV', { 'CIRCLECI' => true })
