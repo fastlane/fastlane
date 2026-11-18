@@ -17,6 +17,7 @@ module Fastlane
       end
 
       def running_json_command?
+        return true if ARGV.first(2) == %w(spaceship api)
         ARGV.first == "lanes" && (ARGV.include?("-j") || ARGV.include?("--json"))
       end
 

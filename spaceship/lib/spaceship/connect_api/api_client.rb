@@ -149,6 +149,17 @@ module Spaceship
         handle_response(response)
       end
 
+      # The raw response, with retries but without raising for 4xx statuses (401 and 403 still raise).
+      def raw_request(method, url_or_path, body = nil)
+        with_asc_retry do
+          request(method) do |req|
+            req.url(url_or_path)
+            req.body = body.to_json if body
+            req.headers['Content-Type'] = 'application/json' if body
+          end
+        end
+      end
+
       protected
 
       class TimeoutRetryError < StandardError

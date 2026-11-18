@@ -106,6 +106,12 @@ describe Fastlane::CLIToolsDistributor do
       expect(stdout_after_take_off(%w(lanes -j))).to be($stderr)
     end
 
+    it "sends everything but the JSON to stderr for spaceship api" do
+      require 'spaceship/commands_generator'
+      allow(Spaceship::CommandsGenerator).to receive(:start).and_return(nil)
+      expect(stdout_after_take_off(%w(spaceship api GET /v1/apps))).to be($stderr)
+    end
+
     it "keeps stdout for lanes without --json, and for -j given to another command" do
       expect(stdout_after_take_off(%w(lanes))).to be($stdout)
       expect(stdout_after_take_off(%w(gym -j))).to be($stdout)
