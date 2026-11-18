@@ -219,6 +219,12 @@ describe Spaceship::TunesClient do
         expect(subject.select_team(team_name: 'Harry')).to eq('5678')
       end
 
+      it "returns team_id from team_name when the App Store Connect name has spaces around it" do
+        user_details_data['availableProviders'][1]['name'] = ' Harry '
+        allow(subject).to receive(:user_details_data).and_return(user_details_data)
+        expect(subject.select_team(team_name: 'Harry')).to eq('5678')
+      end
+
       it "returns team_id from environment variable" do
         stub_const('ENV', { 'FASTLANE_ITC_TEAM_NAME' => 'Harry' })
         allow(subject).to receive(:user_details_data).and_return(user_details_data)
