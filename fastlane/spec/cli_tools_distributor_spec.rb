@@ -41,6 +41,77 @@ describe Fastlane::CLIToolsDistributor do
     end
   end
 
+  describe "the running version" do
+    def take_off_with(argv)
+      FastlaneSpec::Env.with_ARGV(argv) do
+        require 'fastlane/commands_generator'
+        allow(FastlaneCore::FastlaneFolder).to receive(:fastfile_path).and_return("./fastlane/spec/fixtures/fastfiles/FastfileUseToolNameAsLane")
+        allow(Fastlane::CommandsGenerator).to receive(:start).and_return(nil)
+        allow(FastlaneCore::UI).to receive(:message)
+        Fastlane::CLIToolsDistributor.take_off
+      end
+    end
+
+    it "prints the fastlane and Ruby versions, and the install method, when running a lane" do
+      allow(FastlaneCore::Helper).to receive(:bundler?).and_return(true)
+      take_off_with(["sigh"])
+
+      expect(FastlaneCore::UI).to have_received(:message).with("fastlane #{Fastlane::VERSION} (Ruby #{RUBY_VERSION}, bundler)")
+    end
+
+    it "adds the Gemfile with --verbose, with the home directory shortened, also on Windows" do
+      allow(FastlaneCore::Helper).to receive(:bundler?).and_return(true)
+      allow(Dir).to receive(:home).and_return("C:/Users/runneradmin")
+      FastlaneSpec::Env.with_env_values('BUNDLE_GEMFILE' => "C:/Users/runneradmin/app/Gemfile") do
+        take_off_with(["sigh", "--verbose"])
+      end
+
+      expect(FastlaneCore::UI).to have_received(:message).with("fastlane #{Fastlane::VERSION} (Ruby #{RUBY_VERSION}, bundler: ~/app/Gemfile)")
+    end
+
+    it "says gem for a plain gem install, as analytics does" do
+      allow(FastlaneCore::Helper).to receive_messages(bundler?: false, homebrew?: false, contained_fastlane?: false, mac_app?: false)
+      allow(Fastlane::CLIToolsDistributor).to receive(:print_bundle_exec_warning)
+      take_off_with(["sigh"])
+
+      expect(FastlaneCore::UI).to have_received(:message).with("fastlane #{Fastlane::VERSION} (Ruby #{RUBY_VERSION}, gem)")
+    end
+
+    it "does not print it for fastlane -v" do
+      take_off_with(["-v"])
+
+      expect(FastlaneCore::UI).not_to have_received(:message).with(/\Afastlane .* \(Ruby /)
+    end
+  end
+
+  describe "JSON commands" do
+    def stdout_after_take_off(argv)
+      stdout = $stdout
+      FastlaneSpec::Env.with_ARGV(argv) do
+        require 'fastlane/commands_generator'
+        require 'gym/options'
+        require 'gym/commands_generator'
+        allow(Fastlane::CommandsGenerator).to receive(:start).and_return(nil)
+        allow(Gym::CommandsGenerator).to receive(:start).and_return(nil)
+        allow(FastlaneCore::UI).to receive(:message)
+        Fastlane::CLIToolsDistributor.take_off
+      end
+      $stdout
+    ensure
+      $stdout = stdout
+    end
+
+    it "sends everything but the JSON to stderr for lanes --json and -j" do
+      expect(stdout_after_take_off(%w(lanes --json))).to be($stderr)
+      expect(stdout_after_take_off(%w(lanes -j))).to be($stderr)
+    end
+
+    it "keeps stdout for lanes without --json, and for -j given to another command" do
+      expect(stdout_after_take_off(%w(lanes))).to be($stdout)
+      expect(stdout_after_take_off(%w(gym -j))).to be($stdout)
+    end
+  end
+
   describe "update checking" do
     it "checks for updates when running a lane" do
       FastlaneSpec::Env.with_ARGV(["sigh"]) do
@@ -70,6 +141,18 @@ describe Fastlane::CLIToolsDistributor do
         expect(FastlaneCore::FastlaneFolder).to receive(:fastfile_path).and_return("./fastlane/spec/fixtures/fastfiles/FastfileErrorInError").at_least(:once)
         expect(FastlaneCore::UpdateChecker).to receive(:start_looking_for_update).with('fastlane')
         expect(FastlaneCore::UpdateChecker).to receive(:show_update_status).with('fastlane', Fastlane::VERSION)
+        expect_any_instance_of(Commander::Runner).to receive(:abort).with("\n[!] Original error".red).and_raise(SystemExit) # mute console output from `abort`
+        expect do
+          Fastlane::CLIToolsDistributor.take_off
+        end.to raise_error(SystemExit)
+      end
+    end
+
+    it "throws the original error if UpdateChecker also fails" do
+      FastlaneSpec::Env.with_ARGV(["beta"]) do
+        expect(FastlaneCore::FastlaneFolder).to receive(:fastfile_path).and_return("./fastlane/spec/fixtures/fastfiles/FastfileErrorInError").at_least(:once)
+        expect(FastlaneCore::UpdateChecker).to receive(:start_looking_for_update).with('fastlane')
+        expect(FastlaneCore::UpdateChecker).to receive(:show_update_status).with('fastlane', Fastlane::VERSION).and_raise(LoadError)
         expect_any_instance_of(Commander::Runner).to receive(:abort).with("\n[!] Original error".red).and_raise(SystemExit) # mute console output from `abort`
         expect do
           Fastlane::CLIToolsDistributor.take_off

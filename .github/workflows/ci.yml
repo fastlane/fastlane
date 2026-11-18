@@ -1,0 +1,192 @@
+name: CI
+
+on:
+  push:
+    branches: [ master ]
+  pull_request:
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: ${{ github.ref != 'refs/heads/master' }}
+  queue: ${{ github.ref == 'refs/heads/master' && 'max' || 'single' }}
+
+permissions:
+  contents: read
+
+env:
+  # Git's background maintenance can delete files under .git/objects while a local clone copies them - fastlane/fastlane#30432
+  GIT_CONFIG_COUNT: "1"
+  GIT_CONFIG_KEY_0: maintenance.auto
+  GIT_CONFIG_VALUE_0: "false"
+
+jobs:
+  macos-tests:
+    name: ${{ matrix.os }}, Xcode ${{ matrix.xcode }}, Ruby ${{ matrix.ruby }} Tests
+    runs-on: ${{ matrix.os }}
+    permissions:
+      contents: read
+      pull-requests: write
+    strategy:
+      fail-fast: true
+      matrix:
+        include:
+          - { xcode: '16.4.0', ruby: '3.2', rubyopt: '', os: 'macos-15' }
+          - { xcode: '16.4.0', ruby: '3.3', rubyopt: '', os: 'macos-15' }
+          - { xcode: '16.4.0', ruby: '3.4', rubyopt: '', os: 'macos-15' }
+          - { xcode: '26.5', ruby: '3.4', rubyopt: '-W0', os: 'macos-26' }
+          - { xcode: '26.6', ruby: '3.4', rubyopt: '-W0', os: 'macos-26' }
+          - { xcode: '26.6', ruby: '4.0', rubyopt: '-W0', os: 'macos-26' }
+          - { xcode: '27.0', ruby: '4.0', rubyopt: '-W0', os: 'xcode-27' }
+          - { xcode: '', ruby: '3.2', rubyopt: '', os: 'windows-2022' }
+          - { xcode: '', ruby: '3.2', rubyopt: '', os: 'ubuntu-24.04' }
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+
+      - name: Select Xcode ${{ matrix.xcode }}
+        if: runner.os == 'macOS'
+        uses: maxim-lobanov/setup-xcode@ed7a3b1fda3918c0306d1b724322adc0b8cc0a90 # v1.7.0
+        with:
+          xcode-version: ${{ matrix.xcode }}
+
+      - name: Debug | Xcode version
+        if: runner.os == 'macOS'
+        run: |
+          xcodebuild -version
+          xcode-select -p
+
+      - name: Set up Ruby ${{ matrix.ruby }}
+        uses: ruby/setup-ruby@b3aaceaef7e0ee231b499e7b5f49c03fc1d32199 # v1.338.0
+        with:
+          ruby-version: ${{ matrix.ruby }}
+          bundler-cache: true
+
+      - name: Debug | Ruby version
+        shell: bash
+        run: ruby -v
+
+      - name: Increase Open File Limit
+        if: runner.os != 'Windows'
+        shell: bash
+        run: ulimit -n 65536
+
+      - name: Run tests
+        env:
+          RUBYOPT: ${{ matrix.rubyopt }}
+          # Four measured best on both runner shapes. The task would otherwise
+          # take min(cores, 8), which is three on the macOS runners, and each
+          # worker spends much of its time waiting on an xcodebuild child rather
+          # than holding a core. See fastlane#30189.
+          FASTLANE_SPEC_WORKERS: '4'
+        shell: bash
+        run: |
+          git config --global user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git config --global user.name "github-actions[bot]"
+          bundle exec fastlane execute_tests
+
+      # A worker's rspec output goes to its own log, not to stdout. Uploaded on
+      # every run because `failure()` does not fire on a cancelled job.
+      - name: Keep the worker logs
+        if: always()
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        with:
+          name: rspec-worker-logs-${{ matrix.os }}-ruby${{ matrix.ruby }}-xcode${{ matrix.xcode }}
+          path: |
+            rspec_worker_*.log
+            rspec_worker_*.units
+            unused_stubs.txt
+          if-no-files-found: warn
+
+      # One macOS leg is enough. See fastlane#30289.
+      - name: Coverage summary
+        if: matrix.os == 'macos-26' && matrix.xcode == '26.6' && matrix.ruby == '3.4'
+        run: bundle exec rake coverage_summary
+
+      - name: RSpec report
+        if: always()
+        uses: SonicGarden/rspec-report-action@85aee0edd05bd561aa68d1579144df914537ef9b # v8.0.0
+        with:
+          json-path: rspec_logs.json
+          comment: 'false'
+          title: '# :cold_sweat: RSpec failure (${{ matrix.os }}, Xcode ${{ matrix.xcode }}, Ruby ${{ matrix.ruby }})'
+
+  validate_fastlane_swift_generation:
+    name: Validate Fastlane.swift generation
+    runs-on: macos-26
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+
+      - uses: maxim-lobanov/setup-xcode@ed7a3b1fda3918c0306d1b724322adc0b8cc0a90 # v1.7.0
+        with:
+          xcode-version: '26.3'
+
+      - uses: ruby/setup-ruby@b3aaceaef7e0ee231b499e7b5f49c03fc1d32199 # v1.338.0
+        with:
+          ruby-version: '3.4'
+          bundler-cache: true
+
+      - name: Generate Swift API
+        run: bundle exec fastlane generate_swift_sources
+
+      # The builds depend only on the generated sources, the lane and the toolchain: a set that already passed is not built again
+      - name: Key the generated sources and the toolchain
+        id: swift-key
+        run: |
+          toolchain=$( (xcodebuild -version; swift --version 2>&1) | shasum | cut -c1-16)
+          echo "key=swift-runner-$toolchain-${{ hashFiles('Package.swift', 'fastlane/swift/**', 'fastlane/spec/swift/FastlaneTests/**', 'fastlane/Fastfile') }}" >> "$GITHUB_OUTPUT"
+
+      - name: Look for a run that passed with them
+        id: swift-passed
+        uses: actions/cache/restore@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
+        with:
+          path: .swift-runner-passed
+          key: ${{ steps.swift-key.outputs.key }}
+          lookup-only: true
+
+      - name: Build the Swift runner and run the Swift tests
+        if: steps.swift-passed.outputs.cache-hit != 'true'
+        run: bundle exec fastlane build_swift_runner
+        env:
+          FASTLANE_SWIFT_TESTS: true
+
+      # Always: it also runs fastlane's Ruby side, which the key does not cover
+      - name: Run the Swift Package Manager runner checks
+        run: fastlane/spec/swift/spm-runner/run.sh
+
+      - name: Mark the sources as passed
+        if: steps.swift-passed.outputs.cache-hit != 'true'
+        run: touch .swift-runner-passed
+
+      - name: Record the passing run
+        if: steps.swift-passed.outputs.cache-hit != 'true'
+        uses: actions/cache/save@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
+        with:
+          path: .swift-runner-passed
+          key: ${{ steps.swift-key.outputs.key }}
+
+  validate_documentation:
+    name: Validate Documentation
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+
+      - uses: ruby/setup-ruby@b3aaceaef7e0ee231b499e7b5f49c03fc1d32199 # v1.338.0
+        with:
+          ruby-version: '3.4'
+          bundler-cache: true
+
+      - name: Validate docs
+        run: bundle exec fastlane validate_docs
+
+  lint_source_code:
+    name: Lint source code
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+
+      - uses: ruby/setup-ruby@b3aaceaef7e0ee231b499e7b5f49c03fc1d32199 # v1.338.0
+        with:
+          ruby-version: '3.4'
+          bundler-cache: true
+
+      - name: Lint
+        run: bundle exec fastlane lint_source

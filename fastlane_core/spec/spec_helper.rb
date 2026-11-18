@@ -5,34 +5,6 @@ def stub_request(*args)
   WebMock::API.stub_request(*args)
 end
 
-def before_each_fastlane_core
-  # iTunes Lookup API by Apple ID
-  ["invalid", "", 0, '284882215', ['338986109', 'FR']].each do |current|
-    if current.kind_of?(Array)
-      id = current[0]
-      country = current[1]
-      url = "https://itunes.apple.com/lookup?id=#{id}&country=#{country}"
-      body_file = "fastlane_core/spec/responses/itunesLookup-#{id}_#{country}.json"
-    else
-      id = current
-      url = "https://itunes.apple.com/lookup?id=#{id}"
-      body_file = "fastlane_core/spec/responses/itunesLookup-#{id}.json"
-    end
-    stub_request(:get, url).
-      with(headers: { 'Accept' => '*/*', 'Accept-Encoding' => 'gzip;q=1.0,deflate;q=0.6,identity;q=0.3', 'User-Agent' => 'Ruby' }).
-      to_return(status: 200, body: File.read(body_file), headers: {})
-  end
-
-  # iTunes Lookup API by App Identifier
-  stub_request(:get, "https://itunes.apple.com/lookup?bundleId=com.facebook.Facebook").
-    with(headers: { 'Accept' => '*/*', 'Accept-Encoding' => 'gzip;q=1.0,deflate;q=0.6,identity;q=0.3', 'User-Agent' => 'Ruby' }).
-    to_return(status: 200, body: File.read("fastlane_core/spec/responses/itunesLookup-com.facebook.Facebook.json"), headers: {})
-
-  stub_request(:get, "https://itunes.apple.com/lookup?bundleId=net.sunapps.invalid").
-    with(headers: { 'Accept' => '*/*', 'Accept-Encoding' => 'gzip;q=1.0,deflate;q=0.6,identity;q=0.3', 'User-Agent' => 'Ruby' }).
-    to_return(status: 200, body: File.read("fastlane_core/spec/responses/itunesLookup-net.sunapps.invalid.json"), headers: {})
-end
-
 def stub_commander_runner_args(args)
   runner = Commander::Runner.new(args)
   allow(Commander::Runner).to receive(:instance).and_return(runner)
@@ -49,4 +21,49 @@ def capture_stds
 ensure
   $stdout = orig_stdout
   $stderr = orig_stderr
+end
+
+# Yields the path of a temporary copy of a checked-in fixture, file or
+# directory, for specs whose code writes to what it reads: parallel workers
+# share the checkout.
+def with_fixture_copy(path)
+  Dir.mktmpdir("fl_spec_fixture") do |dir|
+    FileUtils.cp_r(path, dir)
+    yield(File.join(dir, File.basename(path)))
+  end
+end
+
+# Build settings that are paths on the machine that answered; a faked project
+# answers them as unset.
+MACHINE_PATH_BUILD_SETTINGS = %w[BUILT_PRODUCTS_DIR SDKROOT].freeze
+
+# Fetching build settings runs xcodebuild twice, over a second each time;
+# fake it out for tests that do not check a build setting.
+# settings maps a project path and scheme to the keys xcodebuild
+# -showBuildSettings answers for them. A project, scheme or key not listed
+# keeps the real lookup.
+def fake_out_build_settings(settings)
+  settings = settings.transform_keys { |path| File.expand_path(path) }
+  allow_any_instance_of(FastlaneCore::Project).to receive(:build_settings).and_wrap_original do |original, key: nil, optional: true|
+    project = original.receiver
+    answers = settings.dig(project.path, project.options[:scheme])
+    next nil if answers && MACHINE_PATH_BUILD_SETTINGS.include?(key)
+    next original.call(key: key, optional: optional) unless answers&.key?(key)
+
+    answers[key]
+  end
+end
+
+# Checks a fake_out_build_settings table against the installed Xcode.
+def expect_build_settings_to_match_xcode(settings)
+  allow_any_instance_of(FastlaneCore::Project).to receive(:build_settings).and_call_original
+  settings.each do |path, schemes|
+    schemes.each do |scheme, answers|
+      location = path.end_with?(".xcworkspace") ? :workspace : :project
+      project = FastlaneCore::Project.new(location => path, scheme: scheme)
+      answers.each do |key, value|
+        expect(project.build_settings(key: key)).to eq(value), "#{path} #{scheme} #{key}"
+      end
+    end
+  end
 end

@@ -101,7 +101,7 @@ describe Match do
           { id: 2, name: 'file2' }
         ].to_json
 
-        stub_request(:get, /gitlab.example.com/).
+        stub_request(:get, /gitlab\.example\.com/).
           with(headers: { 'PRIVATE-TOKEN' => 'abc123' }).
           to_return(status: 200, body: response)
 
@@ -111,7 +111,7 @@ describe Match do
       end
 
       it 'returns an empty array if there are results' do
-        stub_request(:get, /gitlab.example.com/).
+        stub_request(:get, /gitlab\.example\.com/).
           with(headers: { 'PRIVATE-TOKEN' => 'abc123' }).
           to_return(status: 200, body: [].to_json)
 
@@ -119,16 +119,16 @@ describe Match do
       end
 
       it 'requests 100 files from the API' do
-        stub_request(:get, /gitlab.example.com/).
+        stub_request(:get, /gitlab\.example\.com/).
           to_return(status: 200, body: [].to_json)
 
         files = subject.files
 
-        assert_requested(:get, /gitlab.example.com/, query: "per_page=100")
+        assert_requested(:get, /gitlab\.example\.com/, query: "per_page=100")
       end
 
       it 'raises an exception for a non-json response' do
-        stub_request(:get, /gitlab.example.com/).
+        stub_request(:get, /gitlab\.example\.com/).
           with(headers: { 'PRIVATE-TOKEN' => 'abc123' }).
           to_return(status: 200, body: 'foo')
 

@@ -77,6 +77,8 @@ module Spaceship
 
         # Undocumented as of 2020-06-09
         MARZIPAN = "MARZIPAN" # Catalyst
+        # Undocumented as of 2025-10-15
+        DECLARED_AGE_RANGE = "DECLARED_AGE_RANGE"
       end
 
       module Settings

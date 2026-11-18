@@ -20,8 +20,19 @@ module Spaceship
       elsif r.body.kind_of?(Hash) && r.body["trustedPhoneNumbers"].kind_of?(Array) && r.body["trustedPhoneNumbers"].first.kind_of?(Hash)
         handle_two_factor(r)
       else
+        raise_two_factor_service_errors!(r.body)
         raise "Although response from Apple indicated activated Two-step Verification or Two-factor Authentication, spaceship didn't know how to handle this response: #{r.body}"
       end
+    end
+
+    # Apple answers without any way to verify, e.g. when it cannot send the SMS code (-28248). See fastlane#29443.
+    def raise_two_factor_service_errors!(body)
+      errors = body.kind_of?(Hash) ? Array(body["serviceErrors"]) : []
+      return if errors.empty?
+
+      message = errors.map { |error| "#{error['message']} (#{error['code']})" }.join(" ")
+      message += " This Apple ID has no trusted devices: signing in to it on an Apple device adds one." if body["noTrustedDevices"]
+      raise Tunes::Error.new, "Apple could not start two-factor authentication: #{message}"
     end
 
     def handle_two_step(response)
@@ -264,7 +275,8 @@ If it is, please open an issue at https://github.com/fastlane/fastlane/issues/ne
     end
 
     def match_phone_to_masked_phone(phone_number, masked_number)
-      characters_to_remove_from_phone_numbers = ' \-()"'
+      # Apple's response sometimes contains NBSP instead of a plain space.
+      characters_to_remove_from_phone_numbers = "  \\-()\""
 
       # start with e.g. +49 162 1234585 or +1-123-456-7866
       phone_number = phone_number.tr(characters_to_remove_from_phone_numbers, '')

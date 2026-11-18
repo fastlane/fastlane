@@ -71,11 +71,11 @@ module Deliver
     def enable_localizations(locales)
       localizations = fetch_localizations
       locales_to_enable = locales - localizations.map(&:locale)
-      Helper.show_loading_indicator("Activating localizations for #{locales_to_enable.join(', ')}...")
-      locales_to_enable.each do |locale|
-        version.create_app_store_version_localization(attributes: { locale: locale })
+      Helper.with_loading_indicator("Activating localizations for #{locales_to_enable.join(', ')}...") do
+        locales_to_enable.each do |locale|
+          version.create_app_store_version_localization(attributes: { locale: locale })
+        end
       end
-      Helper.hide_loading_indicator
     end
 
     def replace_screenshots(iterator, screenshots, retries = 3)
@@ -127,35 +127,34 @@ module Deliver
 
     def wait_for_complete(iterator)
       retry_count = 0
-      Helper.show_loading_indicator("Waiting for all the screenshots processed...")
-      loop do
-        failing_screenshots = []
-        state_counts = iterator.each_app_screenshot.map { |_, _, app_screenshot| app_screenshot }.each_with_object({}) do |app_screenshot, hash|
-          state = app_screenshot.asset_delivery_state['state']
-          hash[state] ||= 0
-          hash[state] += 1
-          failing_screenshots << app_screenshot if app_screenshot.error?
+      Helper.with_loading_indicator("Waiting for all the screenshots processed...") do
+        loop do
+          failing_screenshots = []
+          state_counts = iterator.each_app_screenshot.map { |_, _, app_screenshot| app_screenshot }.each_with_object({}) do |app_screenshot, hash|
+            state = app_screenshot.asset_delivery_state['state']
+            hash[state] ||= 0
+            hash[state] += 1
+            failing_screenshots << app_screenshot if app_screenshot.error?
+          end
+
+          result = UploadResult.new(asset_delivery_state_counts: state_counts, failing_screenshots: failing_screenshots)
+          return result unless result.processing?
+
+          # sleep with exponential backoff
+          interval = 5 + (2**retry_count)
+          UI.message("There are still incomplete screenshots. Will check the states again in #{interval} secs - #{state_counts}")
+          sleep(interval)
+          retry_count += 1
         end
-
-        result = UploadResult.new(asset_delivery_state_counts: state_counts, failing_screenshots: failing_screenshots)
-        return result unless result.processing?
-
-        # sleep with exponential backoff
-        interval = 5 + (2**retry_count)
-        UI.message("There are still incomplete screenshots. Will check the states again in #{interval} secs - #{state_counts}")
-        sleep(interval)
-        retry_count += 1
       end
-    ensure
-      Helper.hide_loading_indicator
     end
 
     def sort_screenshots(iterator)
-      Helper.show_loading_indicator("Sorting screenshots uploaded...")
-      sort_worker = create_sort_worker
-      sort_worker.batch_enqueue(iterator.each_app_screenshot_set.to_a.map { |_, set| set })
-      sort_worker.start
-      Helper.hide_loading_indicator
+      Helper.with_loading_indicator("Sorting screenshots uploaded...") do
+        sort_worker = create_sort_worker
+        sort_worker.batch_enqueue(iterator.each_app_screenshot_set.to_a.map { |_, set| set })
+        sort_worker.start
+      end
     end
 
     private

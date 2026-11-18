@@ -86,6 +86,28 @@ describe Spaceship::ConnectAPI::App do
       expect(model.bundle_id).to eq("com.joshholtz.FastlaneTest")
     end
 
+    it('fetches live app info') do
+      ConnectAPIStubbing::Tunes.stub_get_app_infos
+      app = Spaceship::ConnectAPI::App.new("123456789", [])
+
+      info = app.fetch_live_app_info(includes: nil)
+      expect(info.id).to eq("1111-11111")
+      expect(info.app_store_age_rating).to eq("FOUR_PLUS")
+      expect(info.app_store_state).to eq("READY_FOR_SALE")
+      expect(info.state).to eq("READY_FOR_DISTRIBUTION")
+    end
+
+    it('fetches edit app info') do
+      ConnectAPIStubbing::Tunes.stub_get_app_infos
+      app = Spaceship::ConnectAPI::App.new("123456789", [])
+
+      info = app.fetch_edit_app_info(includes: nil)
+      expect(info.id).to eq("1111-2222")
+      expect(info.app_store_age_rating).to eq("FOUR_PLUS")
+      expect(info.app_store_state).to eq("PREPARE_FOR_SUBMISSION")
+      expect(info.state).to eq("PREPARE_FOR_SUBMISSION")
+    end
+
     it 'creates beta group' do
       app = Spaceship::ConnectAPI::App.find("com.joshholtz.FastlaneTest")
 
@@ -113,6 +135,27 @@ describe Spaceship::ConnectAPI::App do
       expect(model.has_access_to_all_builds).to eq(false)
     end
 
+    it 'omits public link attributes when creating an internal group' do
+      app = Spaceship::ConnectAPI::App.new("123456789", [])
+      app.create_beta_group(group_name: "Internal", is_internal_group: true)
+
+      expect(a_request(:post, "https://appstoreconnect.apple.com/iris/v1/betaGroups").with do |request|
+        JSON.parse(request.body).dig("data", "attributes") == {
+          "name" => "Internal", "isInternalGroup" => true, "hasAccessToAllBuilds" => true
+        }
+      end).to have_been_made
+    end
+
+    it 'sends the configured public link attributes when creating an external group' do
+      app = Spaceship::ConnectAPI::App.new("123456789", [])
+      app.create_beta_group(group_name: "External", public_link_enabled: true, public_link_limit_enabled: true, public_link_limit: 42)
+
+      expect(a_request(:post, "https://appstoreconnect.apple.com/iris/v1/betaGroups").with do |request|
+        attributes = JSON.parse(request.body).dig("data", "attributes")
+        attributes.values_at("publicLinkEnabled", "publicLinkLimitEnabled", "publicLinkLimit") == [true, true, 42] && !attributes.key?("hasAccessToAllBuilds")
+      end).to have_been_made
+    end
+
     it '#get_review_submissions' do
       ConnectAPIStubbing::Tunes.stub_get_review_submissions
 
@@ -133,6 +176,36 @@ describe Spaceship::ConnectAPI::App do
       expect(review_submission.id).to eq("123456789")
       expect(review_submission.platform).to eq(Spaceship::ConnectAPI::Platform::IOS)
       expect(review_submission.state).to eq(Spaceship::ConnectAPI::ReviewSubmission::ReviewSubmissionState::READY_FOR_REVIEW)
+    end
+  end
+
+  describe("#get_app_availabilities") do
+    it('gets app availabilities when app is ready for distribution') do
+      ConnectAPIStubbing::Tunes.stub_get_app_availabilities_ready_for_distribution
+      app = Spaceship::ConnectAPI::App.new("123456789", [])
+
+      availabilities = app.get_app_availabilities
+
+      expect(availabilities.availableInNewTerritories).to be(false)
+      expect(availabilities.territory_availabilities.count).to eq(2)
+      expect(availabilities.territory_availabilities[0].available).to be(true)
+      expect(availabilities.territory_availabilities[1].available).to be(true)
+      expect(availabilities.territory_availabilities[0].contentStatuses).to eq(["AVAILABLE"])
+      expect(availabilities.territory_availabilities[1].contentStatuses).to eq(["AVAILABLE"])
+    end
+
+    it('gets app availabilities when app is removed from sale') do
+      ConnectAPIStubbing::Tunes.stub_get_app_availabilities_removed_from_sale
+      app = Spaceship::ConnectAPI::App.new("123456789", [])
+
+      availabilities = app.get_app_availabilities
+
+      expect(availabilities.availableInNewTerritories).to be(false)
+      expect(availabilities.territory_availabilities.count).to eq(2)
+      expect(availabilities.territory_availabilities[0].available).to be(false)
+      expect(availabilities.territory_availabilities[1].available).to be(false)
+      expect(availabilities.territory_availabilities[0].contentStatuses).to eq(["CANNOT_SELL"])
+      expect(availabilities.territory_availabilities[1].contentStatuses).to eq(["CANNOT_SELL"])
     end
   end
 end

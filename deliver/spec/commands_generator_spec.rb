@@ -3,7 +3,7 @@ require 'deliver/setup'
 
 describe Deliver::CommandsGenerator do
   def expect_runner_run_with(expected_options)
-    fake_runner = "runner"
+    fake_runner = +"runner"
     expect_runner_new_with(expected_options).and_return(fake_runner)
     expect(fake_runner).to receive(:run)
   end
@@ -78,7 +78,7 @@ describe Deliver::CommandsGenerator do
 
   describe ":init option handling" do
     def expect_setup_run_with(expected_options)
-      fake_setup = "setup"
+      fake_setup = +"setup"
       expect(Deliver::Setup).to receive(:new).and_return(fake_setup)
       expect(fake_setup).to receive(:run) do |actual_options|
         expect(expected_options._values).to eq(actual_options._values)
@@ -118,7 +118,7 @@ describe Deliver::CommandsGenerator do
 
   describe ":generate_summary option handling" do
     def expect_generate_summary_run_with(expected_options)
-      fake_generate_summary = "generate_summary"
+      fake_generate_summary = +"generate_summary"
       expect(Deliver::GenerateSummary).to receive(:new).and_return(fake_generate_summary)
       expect(fake_generate_summary).to receive(:run) do |actual_options|
         expect(expected_options._values).to eq(actual_options._values)
@@ -149,6 +149,17 @@ describe Deliver::CommandsGenerator do
 
       expect_runner_new_with(expected_options)
       expect_generate_summary_run_with(expected_options)
+
+      Deliver::CommandsGenerator.start
+    end
+
+    it "opens the report with its path as one argument" do
+      stub_commander_runner_args(['generate_summary', '--app_identifier', 'abcd'])
+      html_path = "/Users/me/Kaldi's Kafe/fastlane/Preview.html"
+
+      allow(Deliver::Runner).to receive(:new)
+      expect(Deliver::GenerateSummary).to receive(:new).and_return(double(run: html_path))
+      expect_any_instance_of(Deliver::CommandsGenerator).to receive(:system).with("open", html_path)
 
       Deliver::CommandsGenerator.start
     end
@@ -206,7 +217,7 @@ describe Deliver::CommandsGenerator do
         force: true
       })
 
-      fake_app = "fake_app"
+      fake_app = +"fake_app"
       expect(fake_app).to receive(:get_latest_app_store_version).and_return(latest_version)
 
       expect(Deliver::Runner).to receive(:new) do |actual_options|
@@ -215,7 +226,7 @@ describe Deliver::CommandsGenerator do
         Deliver.cache[:app] = fake_app
       end
 
-      fake_setup = "fake_setup"
+      fake_setup = +"fake_setup"
       expect(Deliver::Setup).to receive(:new).and_return(fake_setup)
       expect(fake_setup).to receive(:generate_metadata_files) do |app, version, metadata_path|
         expect(app).to eq(fake_app)

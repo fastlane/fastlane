@@ -3,6 +3,7 @@ require 'fastlane/version'
 require 'fastlane_core/ui/help_formatter'
 
 require_relative 'download_screenshots'
+require_relative 'download_app_clip_header_images'
 require_relative 'options'
 require_relative 'module'
 require_relative 'generate_summary'
@@ -132,7 +133,7 @@ module Deliver
           Deliver::Runner.new(options)
           html_path = Deliver::GenerateSummary.new.run(options)
           UI.success("Successfully generated HTML report at '#{html_path}'")
-          system("open '#{html_path}'") unless options[:force]
+          system("open", html_path) unless options[:force]
         end
       end
 
@@ -149,6 +150,22 @@ module Deliver
           containing = FastlaneCore::Helper.fastlane_enabled_folder_path
           path = options[:screenshots_path] || File.join(containing, 'screenshots')
           Deliver::DownloadScreenshots.run(options, path)
+        end
+      end
+
+      command :download_app_clip_header_images do |c|
+        c.syntax = 'fastlane deliver download_app_clip_header_images'
+        c.description = "Downloads all existing app clip header images from App Store Connect and stores them in the app_clip_header_images folder"
+
+        FastlaneCore::CommanderGenerator.new.generate(deliverfile_options, command: c)
+
+        c.action do |args, options|
+          options = FastlaneCore::Configuration.create(deliverfile_options(skip_verification: true), options.__hash__)
+          options.load_configuration_file("Deliverfile")
+          Deliver::Runner.new(options, skip_version: true) # to login...
+          containing = FastlaneCore::Helper.fastlane_enabled_folder_path
+          path = options[:app_clip_header_images_path] || File.join(containing, 'app_clip_header_images')
+          Deliver::DownloadAppClipHeaderImages.run(options, path)
         end
       end
 

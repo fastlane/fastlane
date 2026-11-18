@@ -1,9 +1,9 @@
 describe Spaceship::Client do
   describe "UI" do
     describe "#select_team" do
+      include_examples "common spaceship login"
+
       subject { Spaceship.client }
-      let(:username) { 'spaceship@krausefx.com' }
-      let(:password) { 'so_secret' }
 
       before do
         Spaceship.login
