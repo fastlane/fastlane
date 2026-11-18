@@ -71,7 +71,7 @@ module Fastlane
                                        description: "The content of the key p8 file",
                                        sensitive: true,
                                        optional: true,
-                                       conflicting_options: [:filepath]),
+                                       conflicting_options: [:key_filepath]),
           FastlaneCore::ConfigItem.new(key: :is_key_content_base64,
                                        env_name: "APP_STORE_CONNECT_API_KEY_IS_KEY_CONTENT_BASE64",
                                        description: "Whether :key_content is Base64 encoded or not",

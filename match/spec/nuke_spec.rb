@@ -39,7 +39,7 @@ describe Match do
 
     before do
       allow(Spaceship::ConnectAPI).to receive(:login).and_return(nil)
-      allow(Spaceship::ConnectAPI).to receive(:client).and_return("client")
+      allow(Spaceship::ConnectAPI).to receive(:client).and_return(+"client")
       allow(Spaceship::ConnectAPI.client).to receive(:in_house?).and_return(false)
       allow(Spaceship::ConnectAPI.client).to receive(:portal_team_id).and_return(nil)
 
@@ -59,7 +59,7 @@ describe Match do
       config = FastlaneCore::Configuration.create(Match::Options.available_options, values)
       repo_dir = Dir.mktmpdir
 
-      fake_storage = "fake_storage"
+      fake_storage = +"fake_storage"
       expect(Match::Storage::GitStorage).to receive(:configure).with({
         git_url: git_url,
         shallow_clone: true,

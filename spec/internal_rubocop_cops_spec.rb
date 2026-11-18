@@ -11,6 +11,11 @@ describe "fastlane's own RuboCop cops" do
   let(:config) { RuboCop::Config.new }
   let(:cop) { described_class.new(config) }
 
+  # The parser re-encodes the source it is given in place, here a heredoc, see fastlane#30484.
+  def expect_no_offenses(source, *args, **kwargs)
+    super(source.dup, *args, **kwargs)
+  end
+
   [RuboCop::CrossPlatform::ForkUsage, RuboCop::Cop::Lint::IsStringUsage, RuboCop::Lint::MissingKeysOnSharedArea, RuboCop::Cop::Fastlane::UnescapedShellInterpolation].each do |cop_class|
     it "builds #{cop_class} on the cop API RuboCop does not deprecate, see #30301" do
       expect(cop_class.ancestors).not_to include(RuboCop::Cop::Cop)

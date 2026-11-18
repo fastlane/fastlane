@@ -48,9 +48,9 @@ describe Fastlane do
         end
 
         it "updates the xcode project when product bundle identifier in use" do
-          stub_project = 'stub project'
-          stub_configuration_1 = 'stub config 1'
-          stub_configuration_2 = 'stub config 2'
+          stub_project = +'stub project'
+          stub_configuration_1 = +'stub config 1'
+          stub_configuration_2 = +'stub config 2'
           stub_object = ['object']
           stub_settings_1 = Hash['PRODUCT_BUNDLE_IDENTIFIER', 'com.something.else']
           stub_settings_1['INFOPLIST_FILE'] = plist_path
@@ -78,9 +78,9 @@ describe Fastlane do
         end
 
         it "updates the xcode project when product bundle identifier in use and it uses curly brackets notation" do
-          stub_project = 'stub project'
-          stub_configuration_1 = 'stub config 1'
-          stub_configuration_2 = 'stub config 2'
+          stub_project = +'stub project'
+          stub_configuration_1 = +'stub config 1'
+          stub_configuration_2 = +'stub config 2'
           stub_object = ['object']
           stub_settings_1 = Hash['PRODUCT_BUNDLE_IDENTIFIER', 'com.something.else']
           stub_settings_1['INFOPLIST_FILE'] = plist_path
@@ -108,9 +108,9 @@ describe Fastlane do
         end
 
         it "updates the xcode project when info plist path contains $(SRCROOT)" do
-          stub_project = 'stub project'
-          stub_configuration_1 = 'stub config 1'
-          stub_configuration_2 = 'stub config 2'
+          stub_project = +'stub project'
+          stub_configuration_1 = +'stub config 1'
+          stub_configuration_2 = +'stub config 2'
           stub_object = ['object']
           stub_settings_1 = Hash['PRODUCT_BUNDLE_IDENTIFIER', 'com.something.else']
           stub_settings_1['INFOPLIST_FILE'] = plist_path_with_srcroot
@@ -138,9 +138,9 @@ describe Fastlane do
         end
 
         it "updates the xcode project when info plist path not contains $(SRCROOT)" do
-          stub_project = 'stub project'
-          stub_configuration_1 = 'stub config 1'
-          stub_configuration_2 = 'stub config 2'
+          stub_project = +'stub project'
+          stub_configuration_1 = +'stub config 1'
+          stub_configuration_2 = +'stub config 2'
           stub_object = ['object']
           stub_settings_1 = Hash['PRODUCT_BUNDLE_IDENTIFIER', 'com.something.else']
           stub_settings_1['INFOPLIST_FILE'] = plist_path_with_srcroot
@@ -168,8 +168,8 @@ describe Fastlane do
         end
 
         it "should raise an exception when PRODUCT_BUNDLE_IDENTIFIER in info plist but project doesn't use this info plist" do
-          stub_project = 'stub project'
-          stub_configuration = 'stub config'
+          stub_project = +'stub project'
+          stub_configuration = +'stub config'
           stub_object = ['object']
           stub_settings = Hash['PRODUCT_BUNDLE_IDENTIFIER', 'com.something.else']
 
@@ -191,7 +191,7 @@ describe Fastlane do
         end
 
         it "should raise an exception when PRODUCT_BUNDLE_IDENTIFIER in info plist but not project" do
-          stub_project = 'stub project'
+          stub_project = +'stub project'
           stub_configuration = 'stub config'
           stub_object = ['object']
 

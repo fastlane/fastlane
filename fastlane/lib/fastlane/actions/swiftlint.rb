@@ -53,7 +53,7 @@ module Fastlane
       end
 
       def self.optional_flags(params)
-        command = ""
+        command = +""
         command << supported_option_switch(params, :strict, "0.9.2", true)
         command << " --config #{params[:config_file].shellescape}" if params[:config_file]
         command << " --reporter #{params[:reporter]}" if params[:reporter]
@@ -76,7 +76,10 @@ module Fastlane
       # Get current SwiftLint version
       def self.swiftlint_version(executable: nil)
         binary = executable || 'swiftlint'
-        Gem::Version.new(`#{binary} version`.chomp)
+        version = Actions.sh("#{binary} version", log: false, separate_stderr: true, error_callback: lambda { |error|
+          UI.user_error!("`#{binary} version` failed: #{error.strip}")
+        })
+        Gem::Version.new(version.chomp)
       end
 
       def self.supported_no_cache_option(params)

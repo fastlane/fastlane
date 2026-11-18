@@ -30,6 +30,21 @@ unless ENV["FASTLANE_SPEC_WARNINGS"].to_s.empty?
   end)
 end
 
+# On Ruby 3.4+, an example fails when code in this repository modifies a string literal, or stubs a method on one, see fastlane#30484.
+# Deprecation warnings are enabled for that, and printed only if they were already on.
+MODIFIED_LITERALS = []
+REPOSITORY_ROOT = "#{File.expand_path('..', __dir__)}/".freeze # computed at load time, as some specs stub File
+if RUBY_VERSION >= "3.4"
+  print_deprecations = Warning[:deprecated]
+  Warning[:deprecated] = true
+  Warning.singleton_class.prepend(Module.new do
+    define_method(:warn) do |message, category: nil, **options|
+      MODIFIED_LITERALS << message if message.include?(": warning: literal string will be frozen")
+      super(message, category: category, **options) if print_deprecations || category != :deprecated
+    end
+  end)
+end
+
 require "webmock/rspec"
 WebMock.disable_net_connect!
 
@@ -37,6 +52,10 @@ require "fastlane"
 require "tmpdir"
 require "shellwords"
 UI = FastlaneCore::UI
+
+# rspec --bisect runs examples with $stdout set to a StringIO, on which tty-screen 0.8.2 calls ioctl to read
+# the terminal width: fail as a file does. See piotrmurach/tty-screen#24.
+StringIO.class_eval { def ioctl(*) = raise(Errno::ENOTTY) } unless StringIO.method_defined?(:ioctl)
 
 # Spaceship persists a session cookie to ~/.fastlane/spaceship/<user>/cookie,
 # under the real home directory, and reads it back to decide whether a session
@@ -50,6 +69,11 @@ UI = FastlaneCore::UI
 # See fastlane#30184.
 SPACESHIP_COOKIE_DIR = Dir.mktmpdir("fastlane-spec-spaceship")
 ENV["SPACESHIP_COOKIE_PATH"] = SPACESHIP_COOKIE_DIR
+
+# The same for ~/.fastlane, where analytics records that it showed its notice, and for
+# RuboCop's cache, which the plugin generator spec fills. See fastlane#30187.
+FASTLANE_SPEC_USER_DIR = Dir.mktmpdir("fastlane-spec-user-dir")
+ENV["RUBOCOP_CACHE_ROOT"] = Dir.mktmpdir("fastlane-spec-rubocop-cache")
 
 # Scratch root for the Fastfile fixtures and the specs that assert on them.
 # Avoid fixed paths under /tmp: parallel test processes would share them.
@@ -177,6 +201,19 @@ RSpec.configure do |config|
     FileUtils.remove_entry(SPACESHIP_COOKIE_DIR) if File.directory?(SPACESHIP_COOKIE_DIR)
   end
 
+  config.before(:each) { MODIFIED_LITERALS.clear }
+
+  config.after(:each) do
+    ours = MODIFIED_LITERALS.select do |message|
+      path = message[/\A(.+?):\d+: warning: /, 1].to_s
+      relative = path.delete_prefix(REPOSITORY_ROOT)
+      next true if path.include?("/rspec-mocks-") # a spec stubbed a method on a string literal
+
+      relative != path && !relative.start_with?("vendor/")
+    end
+    raise("Modified string literals (fastlane#30484):\n#{ours.uniq.join}") unless ours.empty?
+  end
+
   # Environment guard, see fastlane#30184.
   #
   # A test that leaves a variable behind changes what every later test in the
@@ -225,10 +262,12 @@ RSpec.configure do |config|
       ensure
         allowed = Array(example.metadata[:env_output]).map(&:to_s)
         after = ENV.to_h
-        escaped = ((after.keys - before.keys) | (before.keys - after.keys) |
-                   (before.keys & after.keys).reject { |key| before[key] == after[key] }) - allowed
+        changed = (after.keys - before.keys) | (before.keys - after.keys) |
+                  (before.keys & after.keys).reject { |key| before[key] == after[key] }
+        escaped = changed - allowed
         escaped.each { |key| ENV_GUARD_LEAKS[key] << example.id }
-        ENV.replace(before) if ENV_GUARD_MODE == :enforce
+        # Only the changed keys, not ENV.replace(before): that rewrote every variable after every example
+        changed.each { |key| before.key?(key) ? ENV[key] = before[key] : ENV.delete(key) } if ENV_GUARD_MODE == :enforce
       end
     end
   end
@@ -311,6 +350,8 @@ RSpec.configure do |config|
   config.before(:each) do |current_test|
     # We don't want to call the RubyGems API at any point
     allow(Fastlane::FastlaneRequire).to receive(:install_gem_if_needed).and_return(nil)
+
+    allow(FastlaneCore).to receive(:fastlane_user_dir).and_return(FASTLANE_SPEC_USER_DIR)
 
     allow(Security::Command).to receive(:run).and_wrap_original do |run, *command, **options|
       raise "A spec ran `#{command.join(' ')}`, which changes the developer's keychains: stub the security gem call instead" if keychain_changing?(command, options[:stdin])

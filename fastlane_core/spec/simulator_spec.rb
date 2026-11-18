@@ -114,7 +114,7 @@ describe FastlaneCore do
     end
 
     it "raises an error if xcrun CLI prints garbage" do
-      response = "response"
+      response = +"response"
       expect(response).to receive(:read).and_return("💩")
       expect(Open3).to receive(:popen3).with("xcrun simctl list devices").and_yield(nil, response, nil, nil)
 
@@ -124,7 +124,7 @@ describe FastlaneCore do
     end
 
     it "properly parses the simctl output and generates Device objects for iOS" do
-      response = "response"
+      response = +"response"
       expect(response).to receive(:read).and_return(@valid_simulators)
       expect(Open3).to receive(:popen3).with("xcrun simctl list devices").and_yield(nil, response, nil, nil)
 
@@ -154,7 +154,7 @@ describe FastlaneCore do
     end
 
     it "properly parses the simctl output and generates Device objects for tvOS" do
-      response = "response"
+      response = +"response"
       expect(response).to receive(:read).and_return(@valid_simulators)
       expect(Open3).to receive(:popen3).with("xcrun simctl list devices").and_yield(nil, response, nil, nil)
 
@@ -169,7 +169,7 @@ describe FastlaneCore do
     end
 
     it "properly parses the simctl output and generates Device objects for watchOS" do
-      response = "response"
+      response = +"response"
       expect(response).to receive(:read).and_return(@valid_simulators)
       expect(Open3).to receive(:popen3).with("xcrun simctl list devices").and_yield(nil, response, nil, nil)
 

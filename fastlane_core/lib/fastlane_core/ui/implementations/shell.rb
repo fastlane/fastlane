@@ -111,7 +111,7 @@ module FastlaneCore
 
       error('```')
       Range.new(start_line, end_line).each do |line|
-        str = line == error_line ? " => " : "    "
+        str = line == error_line ? +" => " : +"    "
         str << line.to_s.rjust(Math.log10(end_line) + 1)
         str << ":\t#{contents[line - 1]}"
         error(str)

@@ -96,8 +96,8 @@ describe PEM do
 
     after :all do
       FileUtils.rm_r("tmp")
-      File.delete("production_com.krausefx.app_ios.pem")
-      File.delete("production_com.krausefx.app_ios.pkey")
+      # Only "Successful run" creates them.
+      FileUtils.rm_f(["production_com.krausefx.app_ios.pem", "production_com.krausefx.app_ios.pkey"])
 
       ENV.delete("DELIVER_USER")
       ENV.delete("DELIVER_PASSWORD")

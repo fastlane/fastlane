@@ -135,6 +135,7 @@ module Fastlane
         if class_ref.respond_to?(:alias_used)
           orig_action = method_sym.to_s
           arguments = [{}] if arguments.empty?
+          arguments[0] = arguments.first.dup if arguments.first.kind_of?(String) # alias_used may change it, and it can be a literal from the Fastfile
           class_ref.alias_used(orig_action, arguments.first)
         end
       end

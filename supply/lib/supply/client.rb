@@ -82,7 +82,7 @@ module Supply
 
       UI.verbose("Fetching a new access token from Google...")
 
-      auth_client.fetch_access_token!
+      auth_client.apply!({}) # fetches the first token; fetch_access_token! is private on impersonated credentials
 
       if FastlaneCore::Env.truthy?("DEBUG")
         Google::Apis.logger.level = Logger::DEBUG

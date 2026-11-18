@@ -126,7 +126,7 @@ describe "Build Manager" do
   end
 
   describe "distribute submits the build for review" do
-    let(:mock_base_client) { "fake api base client" }
+    let(:mock_base_client) { +"fake api base client" }
     let(:fake_build_manager) { Pilot::BuildManager.new }
 
     let(:app) do

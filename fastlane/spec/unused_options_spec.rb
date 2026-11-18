@@ -22,7 +22,6 @@ describe Fastlane do
           ipa
           import_from_git
           import_from_gem
-          hockey
           deploygate
           crashlytics
           artifactory

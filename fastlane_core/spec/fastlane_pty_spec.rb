@@ -118,6 +118,18 @@ describe FastlaneCore do
         }
       end
 
+      it 'reports a missing program without a pty instead of failing on the status it never got' do
+        expect(FastlaneCore::FastlanePty).to receive(:require).with("pty").and_raise(LoadError)
+        allow(FastlaneCore::FastlanePty).to receive(:require).with("open3").and_call_original
+
+        expect {
+          FastlaneCore::FastlanePty.spawn('fl-no-such-program') { |command_stdout, command_stdin, pid| }
+        }.to raise_error(FastlaneCore::FastlanePtyError, /No such file or directory/) { |error|
+          expect(error.exit_status).to eq(-1)
+          expect(error.process_status).to be_nil
+        }
+      end
+
       # could be used to test
       # let(:crasher_path) { File.expand_path("./fastlane_core/spec/crasher/crasher") }
 
@@ -161,6 +173,16 @@ describe FastlaneCore do
         }.to raise_error(FastlaneCore::FastlanePtyError) { |error|
           expect(error.exit_status).to eq(-1) # command was forced to -1
         }
+      end
+    end
+
+    describe "spawn_args" do
+      it "passes the command alone when no option is given, as existing callers expect" do
+        expect(described_class.spawn_args({}, "echo foo")).to eq(["echo foo"])
+      end
+
+      it "adds env and chdir only when given" do
+        expect(described_class.spawn_args({ "A" => "1" }, "echo foo", "/tmp")).to eq([{ "A" => "1" }, "echo foo", { chdir: "/tmp" }])
       end
     end
 

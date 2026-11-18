@@ -42,8 +42,7 @@ module Gym
 
       # Make sure the output name is valid and remove a trailing `.ipa` extension
       # as it will be added by gym for free
-      config[:output_name].gsub!(".ipa", "")
-      config[:output_name].gsub!(File::SEPARATOR, "_")
+      config[:output_name] = config[:output_name].gsub(".ipa", "").gsub(File::SEPARATOR, "_")
 
       return config
     end

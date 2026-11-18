@@ -203,14 +203,14 @@ RSPEC_ARGS="--seed 8347" bundle exec rake test_all
 
 A seed only pins the order. A failure that depends on something outside the process, such as a file an earlier run left in your home directory, reproduces on your machine and not on a colleague's whatever seed you use. `rake test_isolated` above is for that case.
 
-Run each test file independently and randomize within each run:
+Run each test file on its own, in random order; the files that fail are listed in `failed_tests`:
 ```
-RSPEC_ARGS="--bisect random" bundle exec rake test_all_individually
+RSPEC_ARGS="--order rand" bundle exec rake test_all_individually
 ```
 
-Run the specific tests in bisect mode with a given seed:
+Find the examples a failing file needs to fail, with the seed its run printed:
 ```
-bundle exec rspec --seed 1234 bisect your/list/of/tests.rb
+bundle exec rspec --seed 1234 --bisect path/to/failing_spec.rb
 ```
 
 If `plugin_generator_spec` fails with a bare `expected 0, got 1` and no other detail, that is usually not a real failure. The plugin template's `.rubocop.yml` is generated and gitignored, so a working copy can be left holding one from an older _fastlane_, and the generated plugin's gemspec and rubocop config then disagree about the Ruby version. `bundle exec rake prepare_rubocop_config` regenerates it, and the test tasks run that first so it should not happen.

@@ -101,6 +101,8 @@ module Frameit
     MIST_BLUE ||= "Mist Blue"
     SAGE ||= "Sage"
     LAVENDER ||= "Lavender"
+    NIGHT_SKY ||= "Night Sky"
+    STAR_WHITE ||= "Star White"
 
     def self.all_colors
       Color.constants.map { |c| Color.const_get(c).upcase.gsub(' ', '_') }
@@ -131,6 +133,8 @@ module Frameit
   end
 
   module Devices
+    IPHONE_DUO_OUTER ||= Device.new("iphone-duo-outer", "Apple iPhone Duo Outer", 15, [[1398, 2034], [2034, 1398]], 460, Color::NIGHT_SKY, Platform::IOS)
+    IPHONE_DUO_INNER ||= Device.new("iphone-duo-inner", "Apple iPhone Duo Inner", 15, [[2007, 2853], [2853, 2007]], 460, Color::NIGHT_SKY, Platform::IOS)
     GOOGLE_PIXEL_3 ||= Device.new("google-pixel-3", "Google Pixel 3", 7, [[1080, 2160], [2160, 1080]], 443, Color::JUST_BLACK, Platform::ANDROID)
     GOOGLE_PIXEL_3_XL ||= Device.new("google-pixel-3-xl", "Google Pixel 3 XL", 7, [[1440, 2960], [2960, 1440]], 523, Color::JUST_BLACK, Platform::ANDROID)
     # Google Pixel 4's priority should be higher than Samsung Galaxy S10+ (priority 8):

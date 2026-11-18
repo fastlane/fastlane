@@ -2,25 +2,26 @@ describe Spaceship::Tunes::PricingTier do
   include_examples "common spaceship login"
 
   let(:client) { Spaceship::AppVersion.client }
+  let(:app_id) { '898536088' }
 
   describe "Pricing Tiers" do
     it "inspect works" do
-      pricing_tiers = client.pricing_tiers
+      pricing_tiers = client.pricing_tiers(app_id)
 
       expect(pricing_tiers.inspect).to include("Tunes::PricingTier")
       expect(pricing_tiers.inspect).to include("Tunes::PricingInfo")
     end
 
     it "correctly creates all pricing tiers including pricing infos" do
-      pricing_tiers = client.pricing_tiers
-      tier_1 = client.pricing_tiers[1]
+      pricing_tiers = client.pricing_tiers(app_id)
+      tier_1 = client.pricing_tiers(app_id)[1]
 
       expect(pricing_tiers.length).to eq(95)
       expect(tier_1.pricing_info.length).to eq(48)
     end
 
     it "correctly parses the pricing tiers" do
-      tier_1 = client.pricing_tiers[1]
+      tier_1 = client.pricing_tiers(app_id)[1]
 
       expect(tier_1).not_to(be_nil)
       expect(tier_1.tier_stem).to eq('1')
@@ -29,7 +30,7 @@ describe Spaceship::Tunes::PricingTier do
     end
 
     it "correctly parses the pricing information" do
-      tier_1_first_pricing_info = client.pricing_tiers[1].pricing_info[0]
+      tier_1_first_pricing_info = client.pricing_tiers(app_id)[1].pricing_info[0]
 
       expect(tier_1_first_pricing_info.country).to eq('United States')
       expect(tier_1_first_pricing_info.country_code).to eq('US')

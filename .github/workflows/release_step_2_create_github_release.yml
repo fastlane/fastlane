@@ -40,7 +40,7 @@ jobs:
       uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
 
     - name: Set up Ruby
-      uses: ruby/setup-ruby@7f797815d8adceb1c412e7abefdd1ab4abc47a5f # v1.335.0
+      uses: ruby/setup-ruby@b3aaceaef7e0ee231b499e7b5f49c03fc1d32199 # v1.338.0
       with:
         ruby-version: '3.4'
 
@@ -115,10 +115,33 @@ jobs:
       run: echo "BUNDLE_APP_CONFIG=$RUNNER_TEMP/bundle" >> "$GITHUB_ENV"
 
     - name: Set up Ruby
-      uses: ruby/setup-ruby@7f797815d8adceb1c412e7abefdd1ab4abc47a5f # v1.335.0
+      uses: ruby/setup-ruby@b3aaceaef7e0ee231b499e7b5f49c03fc1d32199 # v1.338.0
       with:
         ruby-version: '3.4'
         bundler-cache: true
 
+    # On a re-run after the push worked, skip it: RubyGems refuses a second push of the same version
+    - name: Check whether RubyGems already has this version
+      id: published
+      env:
+        VERSION: ${{ needs.create_github_release.outputs.version }}
+        GEM_SHA256: ${{ needs.create_github_release.outputs.gem-sha256 }}
+      run: |
+        status=0
+        ./.github/scripts/check_rubygems_release.sh "$VERSION" "$GEM_SHA256" || status=$?
+        case $status in
+          0) echo "::notice::fastlane $VERSION is already on RubyGems: skipping the push"
+             echo "published=true" >> "$GITHUB_OUTPUT" ;;
+          2) echo "published=false" >> "$GITHUB_OUTPUT" ;;
+          *) exit 1 ;;
+        esac
+
     - name: Release to RubyGems
-      uses: rubygems/release-gem@7f9650160c1a4e7989fdc9855807bdbd421d8b6b # v1.4.1
+      if: steps.published.outputs.published == 'false'
+      uses: rubygems/release-gem@5c53f5308233b7c0f47411f0471b3faae6fa57b2 # v1.4.2
+
+    - name: Verify the gem on RubyGems
+      env:
+        VERSION: ${{ needs.create_github_release.outputs.version }}
+        GEM_SHA256: ${{ needs.create_github_release.outputs.gem-sha256 }}
+      run: ./.github/scripts/check_rubygems_release.sh "$VERSION" "$GEM_SHA256" --wait

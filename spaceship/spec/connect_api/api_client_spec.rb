@@ -234,6 +234,14 @@ describe Spaceship::ConnectAPI::APIClient do
           client.send(:handle_error, mock_response)
         end.to raise_error(Spaceship::UnauthorizedAccessError, /Some title - some detail/)
       end
+
+      it 'raises UnauthorizedAccessError with the body when it is not JSON' do
+        allow(mock_response).to receive(:body).and_return('<html>Unauthorized</html>')
+
+        expect do
+          client.send(:handle_error, mock_response)
+        end.to raise_error(Spaceship::UnauthorizedAccessError, '<html>Unauthorized</html>')
+      end
     end
 
     describe "status of 403" do
@@ -284,6 +292,44 @@ describe Spaceship::ConnectAPI::APIClient do
         expect do
           client.send(:handle_error, mock_response)
         end.to raise_error(Spaceship::AccessForbiddenError, /Some title - some detail/)
+      end
+
+      it 'raises AccessForbiddenError with the body when it is not JSON' do
+        allow(mock_response).to receive(:body).and_return('<html>Forbidden</html>')
+
+        expect do
+          client.send(:handle_error, mock_response)
+        end.to raise_error(Spaceship::AccessForbiddenError, '<html>Forbidden</html>')
+      end
+
+      it 'raises AccessForbiddenError when a body that is not JSON contains "errors"' do
+        allow(mock_response).to receive(:body).and_return('<html>Too many errors</html>')
+
+        expect do
+          client.send(:handle_error, mock_response)
+        end.to raise_error(Spaceship::AccessForbiddenError, '<html>Too many errors</html>')
+      end
+    end
+
+    describe "status of 502" do
+      before(:each) do
+        allow(mock_response).to receive(:status).and_return(502)
+      end
+
+      it 'raises BadGatewayError when the body says it could not process the request' do
+        allow(mock_response).to receive(:body).and_return('Could not process this request')
+
+        expect do
+          client.send(:handle_error, mock_response)
+        end.to raise_error(Spaceship::BadGatewayError, 'Could not process this request')
+      end
+
+      it 'does not raise for another body' do
+        allow(mock_response).to receive(:body).and_return('<html>Bad Gateway</html>')
+
+        expect do
+          client.send(:handle_error, mock_response)
+        end.to_not(raise_error)
       end
     end
   end

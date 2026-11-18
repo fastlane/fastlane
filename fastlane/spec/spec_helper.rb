@@ -15,6 +15,9 @@ def run_in_fixture_bundle(fixture_path, command)
   bundle_path = Bundler.configured_bundle_path
   # Absolute, as the checked-in path is relative to this repository, not to the fixture
   env = bundle_path.use_system_gems? ? {} : { "BUNDLE_PATH" => Bundler.root.join(bundle_path.base_path).to_s }
+  # The child is a real fastlane run, out of reach of spec_helper's stubs: without this it sends an
+  # analytics event and records that it showed the notice in ~/.fastlane. See fastlane#30187.
+  env["FASTLANE_OPT_OUT_USAGE"] = "1"
   Bundler.with_unbundled_env do
     Dir.chdir(fixture_path) do
       install_output, status = Open3.capture2e(env, "bundle install --local")

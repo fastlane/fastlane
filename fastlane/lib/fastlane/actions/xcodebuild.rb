@@ -195,7 +195,7 @@ module Fastlane
         if testing
           if params[:reports]
             # New report options format
-            reports = params[:reports].reduce("") do |arguments, report|
+            reports = params[:reports].reduce(+"") do |arguments, report|
               report_string = "--report #{report[:report]}"
 
               if report[:output]

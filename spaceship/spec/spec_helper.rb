@@ -74,6 +74,11 @@ def before_each_spaceship
 
   ENV.delete("FASTLANE_USER")
 
+  $spaceship_default_stubs_active = true
+end
+
+# The stubs every spaceship example gets, matched after the example's own
+def register_spaceship_default_stubs
   TunesStubbing.itc_stub_login
   PortalStubbing.adp_stub_login
 
@@ -132,8 +137,30 @@ def before_each_spaceship
   ConnectAPIStubbing::Users.stub_users
 end
 
+# Built once per process rather than registered for every example: about 140
+# stubs, which cost more than most spaceship examples themselves.
+def spaceship_default_stubs
+  @spaceship_default_stubs ||= begin
+    registry = WebMock::StubRegistry.instance
+    example_stubs = registry.request_stubs
+    registry.request_stubs = []
+    register_spaceship_default_stubs
+    registry.request_stubs
+  ensure
+    registry.request_stubs = example_stubs
+  end
+end
+
+WebMock.globally_stub_request(:after_local_stubs) do |request|
+  next unless $spaceship_default_stubs_active
+  stub = spaceship_default_stubs.find { |default_stub| default_stub.request_pattern.matches?(request) }
+  next unless stub
+  response = stub.response.dup.evaluate(request)
+  { status: response.status, headers: response.headers, body: response.body }
+end
+
 def after_each_spaceship
-  nil
+  $spaceship_default_stubs_active = false
 end
 
 RSpec.configure do |config|

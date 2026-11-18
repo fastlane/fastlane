@@ -336,7 +336,7 @@ module Spaceship
 
     def merchants(mac: false)
       paging do |page_number|
-        r = request(:post, "account/#{platform_slug(mac)}/identifiers/listOMCs.action", {
+        r = request(:post, "account/ios/identifiers/listOMCs.action", {
             teamId: team_id,
             pageNumber: page_number,
             pageSize: page_size,
@@ -347,7 +347,7 @@ module Spaceship
     end
 
     def merchant_domains(merchant_id, mac: false)
-      r = request(:post, "account/#{platform_slug(mac)}/identifiers/listDomainsForMerchant", {
+      r = request(:post, "account/ios/identifiers/listDomainsForMerchant", {
         merchantId: merchant_id,
         teamId: team_id
       })
@@ -355,7 +355,7 @@ module Spaceship
     end
 
     def merchant_domain_get_verification_file(domain_id, mac: false)
-      r = request(:get, "account/#{platform_slug(mac)}/identifiers/downloadDomainVerificationFile", {
+      r = request(:get, "account/ios/identifiers/downloadDomainVerificationFile", {
         teamId: team_id,
         domainId: domain_id
       })
@@ -373,7 +373,7 @@ module Spaceship
     def merchant_domain_verify(domain_id, mac: false)
       ensure_csrf(Spaceship::Portal::Merchant)
 
-      r = request(:post, "account/#{platform_slug(mac)}/identifiers/verifyDomain", {
+      r = request(:post, "account/ios/identifiers/verifyDomain", {
         domainId: domain_id,
         teamId: team_id
       })
@@ -383,7 +383,7 @@ module Spaceship
     def create_merchant_domain!(merchant_id, domain_name, mac: false)
       ensure_csrf(Spaceship::Portal::Merchant)
 
-      r = request(:post, "account/#{platform_slug(mac)}/identifiers/registerDomain", {
+      r = request(:post, "account/ios/identifiers/registerDomain", {
         domainName: domain_name,
         merchantId: merchant_id,
         teamId: team_id
@@ -394,7 +394,7 @@ module Spaceship
     def delete_merchant_domain!(domain_id, merchant_id, mac: false)
       ensure_csrf(Spaceship::Portal::Merchant)
 
-      r = request(:post, "account/#{platform_slug(mac)}/identifiers/removeDomain", {
+      r = request(:post, "account/ios/identifiers/removeDomain", {
         merchantId: merchant_id,
         domainId: domain_id,
         teamId: team_id
@@ -405,7 +405,7 @@ module Spaceship
     def create_merchant!(name, bundle_id, mac: false)
       ensure_csrf(Spaceship::Portal::Merchant)
 
-      r = request(:post, "account/#{platform_slug(mac)}/identifiers/addOMC.action", {
+      r = request(:post, "account/ios/identifiers/addOMC.action", {
           name: name,
           identifier: bundle_id,
           teamId: team_id
@@ -416,7 +416,7 @@ module Spaceship
     def delete_merchant!(merchant_id, mac: false)
       ensure_csrf(Spaceship::Portal::Merchant)
 
-      r = request(:post, "account/#{platform_slug(mac)}/identifiers/deleteOMC.action", {
+      r = request(:post, "account/ios/identifiers/deleteOMC.action", {
           teamId: team_id,
           omcId: merchant_id
       })

@@ -204,6 +204,14 @@ describe Fastlane do
       end
 
       describe "Missing ipa file" do
+        it "names the options when no path is given and none is in the lane context" do
+          expect do
+            Fastlane::FastFile.new.parse("lane :test do
+              verify_build
+            end").runner.execute(:test)
+          end.to raise_error(FastlaneCore::Interface::FastlaneError, /:ipa_path or :build_path/)
+        end
+
         it "raises an error if ipa file path set via lane context does not exist" do
           Fastlane::Actions.lane_context[Fastlane::Actions::SharedValues::IPA_OUTPUT_PATH] = no_such_file
 
