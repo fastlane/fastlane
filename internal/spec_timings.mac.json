@@ -230,7 +230,6 @@
     "spaceship/spec/portal/invite_spec.rb": 0.026442,
     "match/spec/generator_spec.rb": 0.026382000000000003,
     "fastlane/spec/actions_specs/restore_file_spec.rb": 0.026248999999999998,
-    "fastlane/spec/actions_specs/hockey_spec.rb": 0.026177000000000002,
     "fastlane/spec/actions_specs/run_tests_spec.rb": 0.02609,
     "fastlane/spec/actions_specs/pod_push_spec.rb": 0.025855,
     "fastlane/spec/actions_specs/git_branch_spec.rb": 0.025847,

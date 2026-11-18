@@ -28,6 +28,7 @@ module FastlaneCore
       spawn_with_popen(command, env: env, chdir: chdir, &block)
     end
 
+    # On macOS the output of a command that exits very quickly can, rarely, be lost before it is read: see fastlane#21792
     def self.spawn_with_pty(original_command, env: {}, chdir: nil, &block)
       require 'pty'
       # this forces the PTY flush - fixes #21792

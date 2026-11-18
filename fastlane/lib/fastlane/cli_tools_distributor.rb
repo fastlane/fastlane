@@ -16,6 +16,11 @@ module Fastlane
         ARGV.include?("init")
       end
 
+      def running_json_command?
+        return true if ARGV.first(2) == %w(spaceship api)
+        ARGV.first == "lanes" && (ARGV.include?("-j") || ARGV.include?("--json"))
+      end
+
       def utf8_locale?
         (ENV['LANG'] || "").end_with?("UTF-8", "utf8") || (ENV['LC_ALL'] || "").end_with?("UTF-8", "utf8") || (FastlaneCore::CommandExecutor.which('locale') && `locale charmap`.strip == "UTF-8")
       end
@@ -23,8 +28,8 @@ module Fastlane
       def take_off
         before_import_time = Time.now
 
-        # `fastlane spaceship api` prints Apple's JSON on STDOUT; logs and prompts go to stderr.
-        $stdout = $stderr if ARGV.first(2) == %w(spaceship api)
+        # JSON commands print the JSON on STDOUT; logs and prompts go to stderr.
+        $stdout = $stderr if running_json_command?
 
         if ENV["FASTLANE_DISABLE_ANIMATION"].nil?
           # Usually in the fastlane code base we use
