@@ -113,7 +113,7 @@ module FastlaneCore
 
         # to support frozen strings (e.g. ENV variables) too
         # we have to dupe the value
-        # in < Ruby 2.4.0 `.dup` is not support by boolean values
+        # some objects, such as singleton classes, cannot be duped,
         # and there is no good way to check if a class actually
         # responds to `dup`, so we have to rescue the exception
         begin

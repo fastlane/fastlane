@@ -1,0 +1,11 @@
+Testing started
+Test suite 'ExampleTestTests' started on 'Clone 1 of iPhone 17 Pro - ExampleTest (96789)'
+Test case 'ExampleTestTests.testExample()' failed on 'Clone 1 of iPhone 17 Pro - ExampleTest (96789)' (0.474 seconds)
+Test suite 'ExampleTestUITests' started on 'Clone 2 of iPhone 17 Pro - ExampleTestUITests-Runner (97123)'
+Test case 'ExampleTestUITests.testExample()' failed on 'Clone 2 of iPhone 17 Pro - ExampleTestUITests-Runner (97123)' (6.270 seconds)
+2026-01-09 15:48:35.816 xcodebuild[96200:1553005] [MT] IDETestOperationsObserverDebug: 144.107 elapsed -- Testing started completed.
+
+Test session results, code coverage, and logs:
+        /Users/test/Library/Developer/Xcode/DerivedData/ExampleTest/Logs/Test/Test-ExampleTest-2026.01.09.xcresult
+
+** TEST EXECUTE FAILED **

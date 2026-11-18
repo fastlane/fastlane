@@ -297,6 +297,8 @@ module Spaceship
             "appletvos"
           when "MAC_OS"
             "osx"
+          when "VISION_OS"
+            "xros"
           when "IOS"
             "ios"
           else

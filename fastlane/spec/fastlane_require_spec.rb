@@ -9,9 +9,9 @@ describe Fastlane do
     end
 
     it "formats gem require name for non-fastlane-plugin" do
-      gem_name = "rest-client"
+      gem_name = "some-lib"
       gem_require_name = Fastlane::FastlaneRequire.format_gem_require_name(gem_name)
-      expect(gem_require_name).to eq("rest-client")
+      expect(gem_require_name).to eq("some-lib")
     end
 
     describe "checks if a gem is installed" do
@@ -31,6 +31,46 @@ describe Fastlane do
         gem_name = "yaml"
         gem_installed = Fastlane::FastlaneRequire.gem_installed?(gem_name)
         expect(gem_installed).to be(true)
+      end
+    end
+
+    describe "installs a missing gem" do
+      let(:fetcher) { instance_double(Gem::SpecFetcher, detect: [], suggest_gems_from_name: suggestions) }
+      let(:installer) { double("installer") }
+
+      before do
+        require "rubygems/command_manager"
+        allow(Fastlane::FastlaneRequire).to receive(:install_gem_if_needed).and_call_original
+        allow(Fastlane::FastlaneRequire).to receive(:gem_installed?).and_return(false)
+        allow(Fastlane::Helper).to receive(:bundler?).and_return(false)
+        # Take the branch that installs, which tests otherwise return before
+        allow(Fastlane::Helper).to receive(:test?).and_return(false)
+        allow(Gem::SpecFetcher).to receive(:fetcher).and_return(fetcher)
+        allow(Gem::CommandManager.instance).to receive(:[]).with(:install).and_return(installer)
+      end
+
+      context "when RubyGems only has a similar name" do
+        let(:suggestions) { ["fastlane-plugin-similar"] }
+
+        it "stops and suggests that name instead of installing it" do
+          expect(installer).not_to receive(:install_gem)
+
+          expect do
+            Fastlane::FastlaneRequire.install_gem_if_needed(gem_name: "fastlane-plugin-asked", require_gem: true)
+          end.to raise_error(FastlaneCore::Interface::FastlaneError, "Could not find gem 'fastlane-plugin-asked' on RubyGems. Did you mean 'fastlane-plugin-similar'? Fix the name in your Fastfile")
+        end
+      end
+
+      context "when RubyGems has no similar name" do
+        let(:suggestions) { [] }
+
+        it "stops and names the missing gem" do
+          expect(installer).not_to receive(:install_gem)
+
+          expect do
+            Fastlane::FastlaneRequire.install_gem_if_needed(gem_name: "fastlane-plugin-asked", require_gem: true)
+          end.to raise_error(FastlaneCore::Interface::FastlaneError, "Could not find gem 'fastlane-plugin-asked' on RubyGems")
+        end
       end
     end
   end

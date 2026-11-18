@@ -1,5 +1,10 @@
 describe Scan do
   describe Scan::DetectValues do
+    before do
+      fake_out_simulator_detection
+      fake_out_build_settings(SCAN_BUILD_SETTINGS)
+    end
+
     describe 'Xcode project' do
       describe 'detects FastlaneCore::Project' do
         it 'with no :project or :package_path given', requires_xcodebuild: true do
@@ -38,6 +43,7 @@ describe Scan do
 
     describe 'Xcode config handling' do
       before do
+        allow_any_instance_of(FastlaneCore::Project).to receive(:build_settings).and_call_original
         options = { project: "./scan/examples/standard/app.xcodeproj" }
         FileUtils.mkdir_p("./scan/examples/standard/app.xcodeproj/project.xcworkspace/xcuserdata/#{ENV['USER']}.xcuserdatad/")
         FileUtils.copy("./scan/examples/standard/WorkspaceSettings.xcsettings", "./scan/examples/standard/app.xcodeproj/project.xcworkspace/xcuserdata/#{ENV['USER']}.xcuserdatad/WorkspaceSettings.xcsettings")
@@ -51,8 +57,15 @@ describe Scan do
       end
     end
 
+    describe 'the build settings faked in the other examples' do
+      it 'match what the installed Xcode answers', requires_xcodebuild: true do
+        expect_build_settings_to_match_xcode(SCAN_BUILD_SETTINGS)
+      end
+    end
+
     describe "#default_os_version" do
       before do
+        allow(Scan::DetectValues).to receive(:default_os_version).and_call_original
         Scan::DetectValues.clear_cache
       end
 
@@ -60,6 +73,15 @@ describe Scan do
         expect do
           Scan::DetectValues.default_os_version('test')
         end.to raise_error(FastlaneCore::Interface::FastlaneCrash, "Unknown platform: test")
+      end
+
+      it 'answers from the installed Xcode and runtimes', requires_xcodebuild: true do
+        sdks = JSON.parse(`xcodebuild -showsdks -json`)
+        sdk_version = sdks.find { |sdk| sdk['platform'] == 'iphonesimulator' }['productVersion']
+        runtimes = JSON.parse(`xcrun simctl list -j runtimes`)['runtimes']
+        runtime_versions = runtimes.select { |runtime| runtime['platform'] == 'iOS' }.map { |runtime| runtime['version'] }
+
+        expect([sdk_version, *runtime_versions].map { |version| Gem::Version.new(version) }).to include(Scan::DetectValues.default_os_version('iOS'))
       end
 
       it 'returns an error if `xcrun simctl runtime -h` is broken' do
@@ -149,9 +171,108 @@ describe Scan do
           expect(Scan::DetectValues.default_os_version(os_type)).to eq(Gem::Version.new(actual_os_versions[os_type]))
         end
       end
+
+      it 'falls back to SDK version when runtime build is not found in installed runtimes' do
+        help_output = 'Usage: simctl runtime <operation> <arguments> match list'
+        allow(Open3).to receive(:capture3).with('xcrun simctl runtime -h').and_return([nil, help_output, nil])
+
+        sdks_output = File.read('./scan/spec/fixtures/XcodebuildSdksOutput15')
+        status = double('status', "success?": true)
+        allow(Open3).to receive(:capture2).with('xcodebuild -showsdks -json').and_return([sdks_output, status])
+
+        runtime_output = File.read('./scan/spec/fixtures/XcrunSimctlRuntimeMatchListOutput15')
+        allow(Open3).to receive(:capture2).with('xcrun simctl runtime match list -j').and_return([runtime_output, status])
+
+        # Return a hash that does NOT contain the chosenRuntimeBuild "21A342" for iOS
+        missing_build_versions = { "XXXXXX" => "16.0" }
+        allow(FastlaneCore::DeviceManager).to receive(:runtime_build_os_versions).and_return(missing_build_versions)
+
+        expect(FastlaneCore::UI).to receive(:important).with(/Runtime build '21A342' not found.*falling back to SDK version '17.0'/)
+
+        # Should fall back to SDK version 17.0 instead of crashing
+        expect(Scan::DetectValues.default_os_version('iOS')).to eq(Gem::Version.new('17.0'))
+      end
+
+      it 'caches the fallback value on subsequent calls' do
+        help_output = 'Usage: simctl runtime <operation> <arguments> match list'
+        allow(Open3).to receive(:capture3).with('xcrun simctl runtime -h').and_return([nil, help_output, nil])
+
+        sdks_output = File.read('./scan/spec/fixtures/XcodebuildSdksOutput15')
+        status = double('status', "success?": true)
+        allow(Open3).to receive(:capture2).with('xcodebuild -showsdks -json').and_return([sdks_output, status])
+
+        runtime_output = File.read('./scan/spec/fixtures/XcrunSimctlRuntimeMatchListOutput15')
+        allow(Open3).to receive(:capture2).with('xcrun simctl runtime match list -j').and_return([runtime_output, status])
+
+        missing_build_versions = {}
+        allow(FastlaneCore::DeviceManager).to receive(:runtime_build_os_versions).and_return(missing_build_versions)
+        allow(FastlaneCore::UI).to receive(:important)
+
+        first_result = Scan::DetectValues.default_os_version('iOS')
+        second_result = Scan::DetectValues.default_os_version('iOS')
+
+        expect(first_result).to eq(second_result)
+        # capture3 should only be called once due to memoization
+        expect(Open3).to have_received(:capture3).with('xcrun simctl runtime -h').once
+      end
+
+      it 'caches successful lookups on subsequent calls' do
+        help_output = 'Usage: simctl runtime <operation> <arguments> match list'
+        allow(Open3).to receive(:capture3).with('xcrun simctl runtime -h').and_return([nil, help_output, nil])
+
+        sdks_output = File.read('./scan/spec/fixtures/XcodebuildSdksOutput15')
+        status = double('status', "success?": true)
+        allow(Open3).to receive(:capture2).with('xcodebuild -showsdks -json').and_return([sdks_output, status])
+
+        runtime_output = File.read('./scan/spec/fixtures/XcrunSimctlRuntimeMatchListOutput15')
+        allow(Open3).to receive(:capture2).with('xcrun simctl runtime match list -j').and_return([runtime_output, status])
+
+        allow(FastlaneCore::DeviceManager).to receive(:runtime_build_os_versions).and_return(build_os_versions)
+
+        first_result = Scan::DetectValues.default_os_version('iOS')
+        second_result = Scan::DetectValues.default_os_version('iOS')
+
+        expect(first_result).to eq(Gem::Version.new('17.0.1'))
+        expect(first_result).to eq(second_result)
+        # capture3 should only be called once due to memoization
+        expect(Open3).to have_received(:capture3).with('xcrun simctl runtime -h').once
+      end
+
+      it 'uses productVersion over sdkVersion when they differ (Xcode 26 mismatch)' do
+        help_output = 'Usage: simctl runtime <operation> <arguments> match list'
+        allow(Open3).to receive(:capture3).with('xcrun simctl runtime -h').and_return([nil, help_output, nil])
+
+        # Xcode 26: sdkVersion is "26.4" but productVersion is "26.4.1"
+        sdks_output = File.read('./scan/spec/fixtures/XcodebuildSdksOutput26')
+        status = double('status', "success?": true)
+        allow(Open3).to receive(:capture2).with('xcodebuild -showsdks -json').and_return([sdks_output, status])
+
+        # simctl uses "26.4.1" (matching productVersion, not sdkVersion)
+        runtime_output = File.read('./scan/spec/fixtures/XcrunSimctlRuntimeMatchListOutput26')
+        allow(Open3).to receive(:capture2).with('xcrun simctl runtime match list -j').and_return([runtime_output, status])
+
+        xcode26_build_os_versions = { "26A5000a" => "26.4.1" }
+        allow(FastlaneCore::DeviceManager).to receive(:runtime_build_os_versions).and_return(xcode26_build_os_versions)
+
+        expect(Scan::DetectValues.default_os_version('iOS')).to eq(Gem::Version.new('26.4.1'))
+      end
     end
 
     describe "#detect_simulator" do
+      before do
+        # Both Scan.config and Scan.project are module level, and
+        # detect_values.rb:30 assigns Scan.project while detecting values, so a
+        # project built by an earlier example in this file outlives it. These
+        # examples are about simulator selection and do not care about the
+        # deployment target, but resolving one reads Scan.config and then shells
+        # out to xcodebuild against whatever project was left behind. Start from
+        # a known state. See fastlane#30184.
+        Scan.config = FastlaneCore::Configuration.create(Scan::Options.available_options,
+                                                          { project: "./scan/examples/standard/app.xcodeproj" })
+        Scan.project = nil
+        allow(FastlaneCore::DeviceManager).to receive(:simulators).and_call_original
+      end
+
       it 'returns simulators for requested devices', requires_xcodebuild: true do
         simctl_list_devices_output = double('xcrun simctl list devices', read: File.read("./scan/spec/fixtures/XcrunSimctlListDevicesOutput15"))
         allow(Open3).to receive(:popen3).with("xcrun simctl list devices").and_yield(nil, simctl_list_devices_output, nil, nil)
@@ -212,7 +333,7 @@ describe Scan do
       context "catalyst" do
         it "ios", requires_xcodebuild: true do
           options = { project: "./scan/examples/standard/app.xcodeproj" }
-          expect_any_instance_of(FastlaneCore::Project).to receive(:supports_mac_catalyst?).and_return(true)
+          expect_any_instance_of(FastlaneCore::Project).not_to receive(:supports_mac_catalyst?)
           Scan.config = FastlaneCore::Configuration.create(Scan::Options.available_options, options)
           expect(Scan.config[:destination].first).to match(/platform=iOS/)
         end

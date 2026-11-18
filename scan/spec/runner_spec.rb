@@ -2,6 +2,11 @@ require 'scan'
 
 describe Scan do
   describe Scan::Runner do
+    before(:each) do
+      fake_out_simulator_detection
+      fake_out_build_settings(SCAN_BUILD_SETTINGS)
+    end
+
     describe "handle_results" do
       before(:each) do
         mock_slack_poster = Object.new
@@ -62,6 +67,22 @@ describe Scan do
           Scan.cache[:result_bundle_path] = '/tmp/scan_results/test.xcresults'
 
           expect(FastlaneCore::Simulator).to receive(:copy_logs)
+          @scan.handle_results(0)
+        end
+      end
+
+      describe "with scan option :force_legacy_xcresulttool set to true" do
+        it "forwards force_legacy_xcresulttool to trainer", requires_xcodebuild: true do
+          Scan.config = FastlaneCore::Configuration.create(Scan::Options.available_options, {
+            output_directory: '/tmp/scan_results',
+            project: './scan/examples/standard/app.xcodeproj',
+            force_legacy_xcresulttool: true
+          })
+
+          # This is a needed side effect from running TestCommandGenerator which is not done in this test
+          Scan.cache[:result_bundle_path] = '/tmp/scan_results/test.xcresults'
+
+          expect(Trainer::TestParser).to receive(:auto_convert).with(hash_including(force_legacy_xcresulttool: true)).and_return({})
           @scan.handle_results(0)
         end
       end
@@ -161,6 +182,14 @@ describe Scan do
 
     describe "retry_execute" do
       before(:each) do
+        # Every other group in this file builds its own config. This one relied
+        # on whichever of them ran first leaving one behind, and Scan.config is
+        # module level, so it outlives the example that made it. See
+        # fastlane#30184.
+        Scan.config = FastlaneCore::Configuration.create(Scan::Options.available_options, {
+          project: './scan/examples/standard/app.xcodeproj'
+        })
+
         @scan = Scan::Runner.new
       end
 
@@ -227,6 +256,14 @@ FastlaneAppTests.testCoinToss()
         @scan = Scan::Runner.new
       end
 
+      it "is deprecated" do
+        Tempfile.create("junit_report") do |report|
+          Scan.cache[:temp_junit_report] = report.path
+          expect(FastlaneCore::UI).to receive(:deprecated).with(/Scan::Runner#test_results is deprecated/)
+          @scan.test_results
+        end
+      end
+
       it "still proceeds successfully if the temp junit report was deleted", requires_xcodebuild: true do
         Scan.cache[:temp_junit_report] = '/var/folders/non_existent_file.junit'
         expect(@scan.test_results).to_not(be_nil)
@@ -249,6 +286,18 @@ FastlaneAppTests.testCoinToss()
       end
     end
 
+    describe "#open_report" do
+      it "opens the report with its path as one argument" do
+        report_path = "/Users/me/Kaldi's Kafe/fastlane/test_output/report.html"
+        allow(FastlaneCore::Helper).to receive(:ci?).and_return(false)
+        allow(Scan).to receive(:cache).and_return({ open_html_report_path: report_path })
+        scan = Scan::Runner.new
+
+        expect(scan).to receive(:system).with("open", "--hide", report_path)
+        scan.open_report
+      end
+    end
+
     describe "#zip_build_products" do
       it "doesn't zip data when :should_zip_build_products is false", requires_xcodebuild: true do
         Scan.config = FastlaneCore::Configuration.create(Scan::Options.available_options, {
@@ -257,7 +306,7 @@ FastlaneAppTests.testCoinToss()
           should_zip_build_products: false
         })
 
-        expect(FastlaneCore::Helper).to receive(:backticks).with(anything).exactly(0).times
+        expect(FastlaneCore::CommandExecutor).not_to receive(:execute)
 
         scan = Scan::Runner.new
         scan.zip_build_products
@@ -276,8 +325,8 @@ FastlaneAppTests.testCoinToss()
 
         output_path = File.absolute_path('/tmp/scan_results/build_products.zip')
 
-        expect(FastlaneCore::Helper).to receive(:backticks)
-          .with("cd '#{path}' && rm -f '#{output_path}' && zip -r '#{output_path}' *", { print: false })
+        expect(FastlaneCore::CommandExecutor).to receive(:execute)
+          .with(hash_including(command: "cd #{path.shellescape} && rm -f #{output_path.shellescape} && zip -r #{output_path.shellescape} *", print_all: false))
           .exactly(1).times
 
         scan = Scan::Runner.new

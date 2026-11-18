@@ -2,6 +2,10 @@ require 'tmpdir'
 
 describe Snapshot do
   describe Snapshot::TestCommandGenerator do
+    before do
+      fake_out_build_settings(SNAPSHOT_BUILD_SETTINGS)
+    end
+
     let(:os_version) { "9.3" }
     let(:iphone6_9_3) { FastlaneCore::DeviceManager::Device.new(name: "iPhone 6", os_version: os_version, udid: "11111", state: "Don't Care", is_simulator: true) }
     let(:iphone6_9_3_2) { FastlaneCore::DeviceManager::Device.new(name: "iPhone 6s", os_version: os_version, udid: "22222", state: "Don't Care", is_simulator: true) }
@@ -11,6 +15,8 @@ describe Snapshot do
     let(:iphone6s_10_1) { FastlaneCore::DeviceManager::Device.new(name: "iPhone 6s (10.1)", os_version: '10.1', udid: "98765", state: "Don't Care", is_simulator: true) }
     let(:iphone4s_9_0) { FastlaneCore::DeviceManager::Device.new(name: "iPhone 4s", os_version: '9.0', udid: "4444", state: "Don't Care", is_simulator: true) }
     let(:iphone8_9_1) { FastlaneCore::DeviceManager::Device.new(name: "iPhone 8", os_version: '9.1', udid: "55555", state: "Don't Care", is_simulator: true) }
+    let(:iphone17_pro_26_4) { FastlaneCore::DeviceManager::Device.new(name: "iPhone 17 Pro", os_version: '26.4', udid: "B49A866F-9928-4BE5-B64C-43057EB05198", state: "Booted", is_simulator: true) }
+    let(:iphone17_pro_26_5) { FastlaneCore::DeviceManager::Device.new(name: "iPhone 17 Pro", os_version: '26.5', udid: "F24194FE-5DD3-470D-991D-6A91C456657A", state: "Booted", is_simulator: true) }
     let(:ipad_air_9_1) { FastlaneCore::DeviceManager::Device.new(name: "iPad Air (4th generation)", os_version: '9.1', udid: "12345", state: "Don't Care", is_simulator: true) }
     let(:appleTV) { FastlaneCore::DeviceManager::Device.new(name: "Apple TV 1080p", os_version: os_version, udid: "22222", state: "Don't Care", is_simulator: true) }
     let(:appleWatch6_44mm_7_4) { FastlaneCore::DeviceManager::Device.new(name: "Apple Watch Series 6 - 44mm", os_version: '7.4', udid: "5555544", state: "Don't Care", is_simulator: true) }
@@ -32,10 +38,31 @@ describe Snapshot do
           devices = ["iPhone 4s", "iPhone 6", "iPhone 6s"]
           result = Snapshot::TestCommandGenerator.destination(devices)
           expect(result).to eq([[
-            "-destination 'platform=iOS Simulator,name=iPhone 4s,OS=9.0'",
-            "-destination 'platform=iOS Simulator,name=iPhone 6,OS=9.3'",
-            "-destination 'platform=iOS Simulator,name=iPhone 6s,OS=9.3'"
+            "-destination 'platform=iOS Simulator,id=4444'",
+            "-destination 'platform=iOS Simulator,id=11111'",
+            "-destination 'platform=iOS Simulator,id=22222'"
           ].join(' ')])
+        end
+
+        it "uses the simulator id instead of OS version in generated destinations" do
+          allow(Snapshot).to receive(:config).and_return({ ios_version: "26.4.1" })
+          allow(FastlaneCore::DeviceManager).to receive(:simulators).and_return([iphone17_pro_26_4])
+
+          result = Snapshot::TestCommandGenerator.destination(["iPhone 17 Pro"])
+
+          expect(result).to eq(["-destination 'platform=iOS Simulator,id=B49A866F-9928-4BE5-B64C-43057EB05198'"])
+        end
+
+        it "uses the same simulator id as the simulator preparation steps" do
+          allow(Snapshot).to receive(:config).and_return({})
+          allow(Snapshot::LatestOsVersion).to receive(:version).and_return("26.4")
+          allow(FastlaneCore::DeviceManager).to receive(:simulators).and_return([iphone17_pro_26_4, iphone17_pro_26_5])
+
+          prepared_udid = Snapshot::TestCommandGenerator.device_udid("iPhone 17 Pro")
+          result = Snapshot::TestCommandGenerator.destination(["iPhone 17 Pro"])
+
+          expect(prepared_udid).to eq("F24194FE-5DD3-470D-991D-6A91C456657A")
+          expect(result).to eq(["-destination 'platform=iOS Simulator,id=#{prepared_udid}'"])
         end
       end
 
@@ -138,11 +165,11 @@ describe Snapshot do
 
           expect(FastlaneCore::CommandExecutor).
             to receive(:execute).
-            with(command: %r{xcrun simctl spawn 33333 log collect --start '\d\d\d\d-\d\d-\d\d \d\d:\d\d:\d\d' --output /tmp/scan_results/de-DE/system_logs-cfcd208495d565ef66e7dff9f98764da.logarchive 2>/dev/null}, print_all: false, print_command: true)
+            with(command: %r{xcrun simctl spawn 33333 log collect --start '\d\d\d\d-\d\d-\d\d \d\d:\d\d:\d\d' --output /tmp/scan_results/de-DE/system_logs-cfcd208495d565ef66e7dff9f98764da.logarchive}, print_all: false, print_command: true, suppress_error_output: true, error: kind_of(Proc))
 
           expect(FastlaneCore::CommandExecutor).
             to receive(:execute).
-            with(command: %r{xcrun simctl spawn 98765 log collect --start '\d\d\d\d-\d\d-\d\d \d\d:\d\d:\d\d' --output /tmp/scan_results/en-US/system_logs-cfcd208495d565ef66e7dff9f98764da.logarchive 2>/dev/null}, print_all: false, print_command: true)
+            with(command: %r{xcrun simctl spawn 98765 log collect --start '\d\d\d\d-\d\d-\d\d \d\d:\d\d:\d\d' --output /tmp/scan_results/en-US/system_logs-cfcd208495d565ef66e7dff9f98764da.logarchive}, print_all: false, print_command: true, suppress_error_output: true, error: kind_of(Proc))
 
           Snapshot::SimulatorLauncher.new(launcher_configuration: launcher_config).copy_simulator_logs(["iPhone 6 (10.1)"], "de-DE", nil, 0)
           Snapshot::SimulatorLauncher.new(launcher_configuration: launcher_config).copy_simulator_logs(["iPhone 6s (10.1)"], "en-US", nil, 0)
@@ -200,8 +227,6 @@ describe Snapshot do
               locale: nil,
               log_path: '/path/to/logs'
             )
-            name = command.join('').match(/name=(.+?),/)[1]
-            ios = command.join('').match(/OS=(\d+.\d+)/)[1]
             expect(command).to eq(
               [
                 "set -o pipefail &&",
@@ -209,7 +234,7 @@ describe Snapshot do
                 "-scheme ExampleUITests",
                 "-project ./snapshot/example/Example.xcodeproj",
                 "-derivedDataPath /tmp/path/to/snapshot_derived",
-                "-destination 'platform=iOS Simulator,name=#{name},OS=#{ios}'",
+                "-destination 'platform=iOS Simulator,id=55555'",
                 "FASTLANE_SNAPSHOT=YES",
                 "FASTLANE_LANGUAGE=en",
                 :build,
@@ -229,8 +254,6 @@ describe Snapshot do
               locale: nil,
               log_path: '/path/to/logs'
             )
-            name = command.join('').match(/name=(.+?),/)[1]
-            ios = command.join('').match(/OS=(\d+.\d+)/)[1]
             expect(command).to eq(
               [
                 "set -o pipefail &&",
@@ -239,7 +262,7 @@ describe Snapshot do
                 "-project ./snapshot/example/Example.xcodeproj",
                 "-derivedDataPath /tmp/path/to/snapshot_derived",
                 "-only-testing:TestBundle/TestSuite/Screenshots",
-                "-destination 'platform=iOS Simulator,name=#{name},OS=#{ios}'",
+                "-destination 'platform=iOS Simulator,id=55555'",
                 "FASTLANE_SNAPSHOT=YES",
                 "FASTLANE_LANGUAGE=en",
                 :build,
@@ -259,8 +282,6 @@ describe Snapshot do
               locale: nil,
               log_path: '/path/to/logs'
             )
-            name = command.join('').match(/name=(.+?),/)[1]
-            os = command.join('').match(/OS=(\d+.\d+)/)[1]
             expect(command).to eq(
               [
                 "set -o pipefail &&",
@@ -268,7 +289,7 @@ describe Snapshot do
                 "-scheme ExampleUITests",
                 "-project ./snapshot/example/Example.xcodeproj",
                 "-derivedDataPath /tmp/path/to/snapshot_derived",
-                "-destination 'platform=tvOS Simulator,name=#{name},OS=#{os}'",
+                "-destination 'platform=tvOS Simulator,id=22222'",
                 "FASTLANE_SNAPSHOT=YES",
                 "FASTLANE_LANGUAGE=en",
                 :build,
@@ -288,8 +309,6 @@ describe Snapshot do
               locale: nil,
               log_path: '/path/to/logs'
             )
-            name = command.join('').match(/name=(.+?),/)[1]
-            os = command.join('').match(/OS=(\d+.\d+)/)[1]
             expect(command).to eq(
               [
                 "set -o pipefail &&",
@@ -297,7 +316,7 @@ describe Snapshot do
                 "-scheme ExampleUITests",
                 "-project ./snapshot/example/Example.xcodeproj",
                 "-derivedDataPath /tmp/path/to/snapshot_derived",
-                "-destination 'platform=watchOS Simulator,name=#{name},OS=#{os}'",
+                "-destination 'platform=watchOS Simulator,id=5555544'",
                 "FASTLANE_SNAPSHOT=YES",
                 "FASTLANE_LANGUAGE=en",
                 :build,
@@ -411,6 +430,15 @@ describe Snapshot do
 
             command = Snapshot::TestCommandGenerator.generate(devices: ["iPhone 8"], language: "en", locale: nil)
             expect(command.join('')).to_not(include("> /dev/null"))
+          end
+        end
+
+        context "run_rosetta_simulator" do
+          it "adds ARCHS=x86_64 when true", requires_xcodebuild: true do
+            configure(options.merge(run_rosetta_simulator: true))
+
+            command = Snapshot::TestCommandGenerator.generate(devices: ["iPhone 8"], language: "en", locale: nil)
+            expect(command).to include("ARCHS=x86_64")
           end
         end
       end

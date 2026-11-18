@@ -94,7 +94,7 @@ module Supply
                                      short_option: "-j",
                                      conflicting_options: [:issuer, :key, :json_key_data],
                                      optional: true, # this shouldn't be optional but is until --key and --issuer are completely removed
-                                     description: "The path to a file containing service account JSON, used to authenticate with Google",
+                                     description: "The path to a Google credentials JSON file (Application Default, Workload Identity, or Service Account), used to authenticate with Google",
                                      code_gen_sensitive: true,
                                      default_value: CredentialsManager::AppfileConfig.try_fetch_value(:json_key_file),
                                      default_value_dynamic: true,
@@ -107,7 +107,8 @@ module Supply
                                      short_option: "-c",
                                      conflicting_options: [:issuer, :key, :json_key],
                                      optional: true,
-                                     description: "The raw service account JSON data used to authenticate with Google",
+                                     description: "The raw content of a Google credentials JSON file (Application Default, Workload Identity, or Service Account), used to authenticate with Google",
+                                     sensitive: true,
                                      code_gen_sensitive: true,
                                      default_value: CredentialsManager::AppfileConfig.try_fetch_value(:json_key_data_raw),
                                      default_value_dynamic: true,
@@ -230,6 +231,12 @@ module Supply
                                      verify_block: proc do |value|
                                                      UI.user_error!("Value must be one of '#{Supply::RELEASE_STATUS}'") unless Supply::ReleaseStatus::ALL.include?(value)
                                                    end),
+        FastlaneCore::ConfigItem.new(key: :track_promote_force,
+                                     env_name: "SUPPLY_TRACK_PROMOTE_FORCE",
+                                     optional: true,
+                                     description: "Force the promotion of a version code that is no longer returned for the source track (:version_code and :version_name are required)",
+                                     type: Boolean,
+                                     default_value: false),
         FastlaneCore::ConfigItem.new(key: :validate_only,
                                      env_name: "SUPPLY_VALIDATE_ONLY",
                                      optional: true,

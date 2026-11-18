@@ -16,12 +16,19 @@ module Fastlane
         ARGV.include?("init")
       end
 
+      def running_json_command?
+        ARGV.first == "lanes" && (ARGV.include?("-j") || ARGV.include?("--json"))
+      end
+
       def utf8_locale?
         (ENV['LANG'] || "").end_with?("UTF-8", "utf8") || (ENV['LC_ALL'] || "").end_with?("UTF-8", "utf8") || (FastlaneCore::CommandExecutor.which('locale') && `locale charmap`.strip == "UTF-8")
       end
 
       def take_off
         before_import_time = Time.now
+
+        # JSON commands print the JSON on STDOUT; logs and prompts go to stderr.
+        $stdout = $stderr if running_json_command?
 
         if ENV["FASTLANE_DISABLE_ANIMATION"].nil?
           # Usually in the fastlane code base we use
@@ -53,6 +60,7 @@ module Fastlane
         # We want to avoid printing output other than the version number if we are running `fastlane -v`
         unless running_version_command? || running_init_command?
           print_bundle_exec_warning(is_slow: (Time.now - before_import_time > 3))
+          print_running_version
         end
 
         # Try to check UTF-8 with `locale`, fallback to environment variables
@@ -62,6 +70,15 @@ module Fastlane
           at_exit do
             # Repeat warning here so users hopefully see it
             UI.error(warn)
+          end
+        end
+
+        # Ruby version warning
+        if Gem::Version.new(RUBY_VERSION) < Gem::Version.new(Fastlane::SUGGESTED_MINIMUM_RUBY) && !FastlaneCore::Env.truthy?("FASTLANE_SKIP_RUBY_VERSION_WARNING")
+          warn = "WARNING: Support for your Ruby version (#{RUBY_VERSION}) is going away. fastlane will soon require Ruby #{Fastlane::SUGGESTED_MINIMUM_RUBY} or newer."
+          UI.important(warn)
+          at_exit do
+            UI.important(warn)
           end
         end
 
@@ -123,7 +140,16 @@ module Fastlane
           Fastlane::CommandsGenerator.start
         end
       ensure
-        FastlaneCore::UpdateChecker.show_update_status('fastlane', Fastlane::VERSION)
+        # If the ruby setup if broken, and UpdateChecker fails catastrophically,
+        # we don't want to hide the original exception. We just print it
+        # see https://github.com/fastlane/fastlane/issues/29916
+        begin
+          FastlaneCore::UpdateChecker.show_update_status('fastlane', Fastlane::VERSION)
+        # rubocop:disable Lint/RescueException
+        rescue Exception => e
+          UI.error(e.to_s)
+        end
+        # rubocop:enable Lint/RescueException
       end
 
       def map_aliased_tools(tool_name)
@@ -159,6 +185,19 @@ module Fastlane
           "🚀" => "fastlane",
           "💪" => "gym"
         }[tool_name] || tool_name
+      end
+
+      # Which fastlane a log comes from: `fastlane env`, run later by hand, can describe another install. See #29938.
+      def print_running_version
+        source = FastlaneCore::Helper.install_method
+        if ARGV.include?("--verbose")
+          require "fastlane/environment_printer"
+          location = FastlaneCore::Helper.bundler? ? ENV["BUNDLE_GEMFILE"] : $PROGRAM_NAME
+          # Dir.home rather than ENV['HOME'], which does not match the paths Ruby gives on Windows
+          source += ": #{EnvironmentPrinter.anonymized_path(location.to_s, Dir.home)}"
+        end
+
+        UI.message("fastlane #{Fastlane::VERSION} (Ruby #{RUBY_VERSION}, #{source})")
       end
 
       def print_bundle_exec_warning(is_slow: false)
