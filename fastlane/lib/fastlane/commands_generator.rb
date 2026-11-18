@@ -239,19 +239,22 @@ module Fastlane
         c.description = 'Lists all available fastlane actions'
 
         c.option('--platform STRING', String, 'Only show actions available on the given platform')
+        c.option("-j", "--json", "Output a summary of each action in JSON instead of text")
 
         c.action do |args, options|
           require 'fastlane/documentation/actions_list'
-          Fastlane::ActionsList.run(filter: args.first, platform: options.platform)
+          Fastlane::ActionsList.run(filter: args.first, platform: options.platform, json: options.json)
         end
       end
 
       command :action do |c|
         c.syntax = 'fastlane action [tool_name]'
         c.description = 'Shows more information for a specific command'
+        c.option("-j", "--json", "Output the action's details in JSON instead of text")
+
         c.action do |args, options|
           require 'fastlane/documentation/actions_list'
-          Fastlane::ActionsList.run(filter: args.first)
+          Fastlane::ActionsList.run(filter: args.first, json: options.json)
         end
       end
 
