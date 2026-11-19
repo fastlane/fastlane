@@ -82,6 +82,8 @@ describe Fastlane do
       end
 
       it "lists every action with a summary, and none fails" do
+        # The broken_action fixture, which other examples require, is not an action and stays defined once loaded
+        hide_const("Fastlane::Actions::BrokenAction")
         json = Fastlane::ActionsList.generate_json
 
         expect(json[:version]).to eq(1)
