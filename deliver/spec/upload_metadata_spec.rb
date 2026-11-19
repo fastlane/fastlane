@@ -547,6 +547,66 @@ describe Deliver::UploadMetadata do
       end
     end
 
+    context "#upload with edit_live" do
+      let(:options) do
+        {
+          platform: "ios",
+          metadata_path: metadata_path,
+          edit_live: true,
+          promotional_text: { "en-US" => "Promotional text" },
+          version_check_wait_retry_limit: 5
+        }
+      end
+
+      before do
+        allow(Deliver).to receive(:cache).and_return({ app: app })
+
+        allow(uploader).to receive(:review_information)
+        allow(uploader).to receive(:review_attachment_file)
+        allow(uploader).to receive(:app_rating)
+        allow(uploader).to receive(:sleep)
+
+        allow(app).to receive(:id).and_return(id)
+        expect(uploader).to receive(:fetch_edit_app_info).and_return(nil)
+      end
+
+      def expect_promotional_text_update
+        # Get number of versions (used for if whats_new should be sent)
+        expect(Spaceship::ConnectAPI).to receive(:get_app_store_versions).and_return(app_store_versions)
+
+        expect(version).to receive(:get_app_store_version_localizations).and_return([version_localization_en])
+        expect(version).to receive(:update).with(attributes: {})
+        expect(version_localization_en).to receive(:update).with(attributes: {
+          "promotional_text" => "Promotional text"
+        })
+      end
+
+      it "updates the localizations of the live version" do
+        expect(app).to receive(:get_live_app_store_version).and_return(version)
+        expect(app).not_to receive(:get_edit_app_store_version)
+        expect_promotional_text_update
+
+        uploader.upload
+      end
+
+      it "updates the localizations of the editable version when there is no live version" do
+        expect(app).to receive(:get_live_app_store_version).and_return(nil)
+        expect(app).to receive(:get_edit_app_store_version).and_return(version)
+        expect_promotional_text_update
+
+        uploader.upload
+      end
+
+      it "fails when there is neither a live nor an editable version" do
+        allow(Kernel).to receive(:sleep)
+        expect(app).to receive(:get_live_app_store_version).and_return(nil)
+        expect(app).to receive(:get_edit_app_store_version).and_return(nil).exactly(5).times
+        expect(Spaceship::ConnectAPI).not_to receive(:get_app_store_versions)
+
+        expect { uploader.upload }.to raise_error(FastlaneCore::Interface::FastlaneError, /could not find a live or editable version/)
+      end
+    end
+
     context "fail when not allowed to update" do
       let(:live_app_info) { double('app_info') }
       let(:app_info) { nil }

@@ -120,6 +120,11 @@ module Deliver
         else
           UI.message("Found live version")
         end
+
+        UI.user_error!("Cannot update metadata - could not find a live or editable version for '#{platform}'") unless version
+
+        # Languages are not enabled on the live version, so only its existing localizations are updated
+        app_store_version_localizations = version.get_app_store_version_localizations
       else
         version = fetch_edit_app_store_version(app, platform)
         localised_options = (LOCALISED_VERSION_VALUES.keys + LOCALISED_APP_VALUES.keys)
