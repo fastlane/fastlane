@@ -6,5 +6,5 @@ module Fastlane
   SUGGESTED_MINIMUM_XCODE_RELEASE = "16.0".freeze
   RUBOCOP_REQUIREMENT = '1.91.0'.freeze
   MINIMUM_RUBY = '3.3.0'.freeze
-  SUGGESTED_MINIMUM_RUBY = '3.3.0'.freeze
+  SUGGESTED_MINIMUM_RUBY = '3.4.0'.freeze
 end
