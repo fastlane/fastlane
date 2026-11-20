@@ -172,7 +172,7 @@ module FastlaneCore
     def verify_interactive!(message)
       return if interactive?
       important(message)
-      crash!("Could not retrieve response as fastlane runs in non-interactive mode")
+      user_error!("Could not retrieve response as fastlane runs in non-interactive mode")
     end
   end
 end

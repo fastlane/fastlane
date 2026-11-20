@@ -1,5 +1,6 @@
 require 'security'
 require 'highline/import' # to hide the entered password
+require 'fastlane_core/helper'
 require 'fastlane_core/stored_passwords'
 
 require_relative 'appfile_config'
@@ -77,6 +78,7 @@ module CredentialsManager
         return false
       end
 
+      return false unless force || FastlaneCore::Helper.can_prompt?
       if force || agree("Do you want to re-enter your password? (y/n)", true)
         puts("Removing Keychain entry for user '#{user}'...".yellow) if mac?
         remove_from_keychain
@@ -136,7 +138,7 @@ module CredentialsManager
       end
 
       if @user.to_s.length == 0
-        raise "Missing username, and running in non-interactive shell" if $stdout.isatty == false
+        raise "Missing username, and fastlane cannot ask for it here: set FASTLANE_USER" if $stdout.isatty == false || !FastlaneCore::Helper.can_prompt?
         prompt_text = "Username"
         prompt_text += " (#{@note})" if @note
         prompt_text += ": "
@@ -146,7 +148,11 @@ module CredentialsManager
       end
 
       while @password.to_s.length == 0
-        raise "Missing password for user #{@user}, and running in non-interactive shell" if $stdout.isatty == false
+        if $stdout.isatty == false || !FastlaneCore::Helper.can_prompt?
+          message = "Missing password for user #{@user}, and fastlane cannot ask for it here"
+          message += ": set FASTLANE_PASSWORD" if default_prefix?
+          raise message
+        end
         note = @note + " " if @note
         @password = ask("Password (#{note}for #{@user}): ") { |q| q.echo = "*" }
       end

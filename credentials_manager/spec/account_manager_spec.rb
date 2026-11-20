@@ -74,6 +74,45 @@ describe CredentialsManager do
       c.invalid_credentials(force: true)
     end
 
+    describe "when fastlane cannot ask, with stdout on a terminal" do
+      before do
+        allow($stdout).to receive(:isatty).and_return(true)
+        allow(FastlaneCore::Helper).to receive(:can_prompt?).and_return(false)
+      end
+
+      it "keeps the Keychain item instead of asking to re-enter the password" do
+        c = CredentialsManager::AccountManager.new(user: "felix@krausefx.com")
+        expect(c).not_to receive(:agree)
+        expect(Security::InternetPassword).not_to receive(:delete)
+        FastlaneSpec::Env.with_env_values("FASTLANE_PASSWORD" => nil, "DELIVER_PASSWORD" => nil) do
+          expect(c.invalid_credentials).to be(false)
+        end
+      end
+
+      it "names FASTLANE_USER instead of asking for the username" do
+        c = CredentialsManager::AccountManager.new
+        expect(c).not_to receive(:ask)
+        FastlaneSpec::Env.with_env_values("FASTLANE_HIDE_LOGIN_INFORMATION" => "1") do
+          expect { c.send(:ask_for_login) }.to raise_error("Missing username, and fastlane cannot ask for it here: set FASTLANE_USER")
+        end
+      end
+
+      it "names FASTLANE_PASSWORD instead of asking for the password" do
+        c = CredentialsManager::AccountManager.new(user: "felix@krausefx.com")
+        expect(c).not_to receive(:ask)
+        FastlaneSpec::Env.with_env_values("FASTLANE_HIDE_LOGIN_INFORMATION" => "1") do
+          expect { c.send(:ask_for_login) }.to raise_error("Missing password for user felix@krausefx.com, and fastlane cannot ask for it here: set FASTLANE_PASSWORD")
+        end
+      end
+
+      it "does not name FASTLANE_PASSWORD for an application specific password" do
+        c = CredentialsManager::AccountManager.new(user: "felix@krausefx.com", prefix: "deliver.appspecific")
+        FastlaneSpec::Env.with_env_values("FASTLANE_HIDE_LOGIN_INFORMATION" => "1") do
+          expect { c.send(:ask_for_login) }.to raise_error("Missing password for user felix@krausefx.com, and fastlane cannot ask for it here")
+        end
+      end
+    end
+
     describe "storing the password in the keychain" do
       before { FastlaneCore::StoredPasswords.reset_warnings! }
 

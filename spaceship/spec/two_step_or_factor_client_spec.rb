@@ -10,6 +10,10 @@ describe Spaceship::Client do
       '123'
     end
 
+    def can_prompt_for_2fa?
+      true
+    end
+
     def choose_phone_number(opts)
       opts.first
     end
@@ -79,6 +83,19 @@ describe Spaceship::Client do
           stub_request(:get, "https://idmsa.apple.com/appleauth/auth").to_return(status: 200, body: '{"trustedPhoneNumbers": [{"1": ""}]}', headers: { 'Content-Type' => 'application/json' })
           subject.handle_two_step_or_factor("response")
         end
+      end
+    end
+
+    context "when fastlane cannot ask for the code" do
+      it "stops before asking Apple to send one" do
+        allow(subject).to receive(:can_prompt_for_2fa?).and_return(false)
+        expect(subject).not_to(receive(:handle_two_factor))
+        expect { subject.handle_two_step_or_factor("response") }.to raise_error(Spaceship::TwoFactorInputUnavailable, /FASTLANE_SESSION.*FASTLANE_ALLOW_PIPED_INPUT/)
+        expect(a_request(:get, "https://idmsa.apple.com/appleauth/auth")).not_to(have_been_made)
+      end
+
+      it "is shown as a user error, without a GitHub issue search" do
+        expect(Spaceship::TwoFactorInputUnavailable.new("no input").show_github_issues).to be(false)
       end
     end
 

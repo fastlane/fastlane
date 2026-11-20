@@ -18,6 +18,7 @@ module FastlaneCore
         if config[:workspace].to_s.length == 0
           workspace = Dir["./*.xcworkspace"]
           if workspace.count > 1
+            UI.user_error!("Found #{workspace.count} workspaces: pass one with the `workspace` option") unless Helper.can_prompt?
             puts("Select Workspace: ")
             config[:workspace] = choose(*workspace)
           elsif !workspace.first.nil?
@@ -30,6 +31,7 @@ module FastlaneCore
         if config[:workspace].to_s.length == 0 && config[:project].to_s.length == 0
           project = Dir["./*.xcodeproj"]
           if project.count > 1
+            UI.user_error!("Found #{project.count} projects: pass one with the `project` option") unless Helper.can_prompt?
             puts("Select Project: ")
             config[:project] = choose(*project)
           elsif !project.first.nil?
@@ -161,9 +163,9 @@ module FastlaneCore
         elsif automated_scheme_selection? && schemes.include?(project_name)
           UI.important("Using scheme matching project name (#{project_name}).")
           options[:scheme] = project_name
-        elsif Helper.ci?
+        elsif !Helper.can_prompt?
           UI.error("Multiple schemes found but you haven't specified one.")
-          UI.error("Since this is a CI, please pass one using the `scheme` option")
+          UI.error("fastlane cannot ask which one here, please pass one using the `scheme` option")
           show_scheme_shared_information
           UI.user_error!("Multiple schemes found")
         else

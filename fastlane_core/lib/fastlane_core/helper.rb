@@ -97,6 +97,12 @@ module FastlaneCore
       return false
     end
 
+    # @return [boolean] true if a prompt reading stdin can get an answer: off CI with stdin on a terminal, or FASTLANE_ALLOW_PIPED_INPUT set
+    def self.can_prompt?
+      return true if FastlaneCore::Env.truthy?("FASTLANE_ALLOW_PIPED_INPUT")
+      !ci? && $stdin.tty?
+    end
+
     def self.is_circle_ci?
       return ENV.key?('CIRCLECI')
     end
