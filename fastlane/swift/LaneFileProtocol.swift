@@ -32,7 +32,7 @@ public extension LaneFileProtocol {
 @objcMembers
 open class LaneFile: NSObject, LaneFileProtocol {
     private(set) static var fastfileInstance: LaneFile?
-    private static var onErrorCalled = Set<String>()
+    static var onErrorCalled = Set<String>()
 
     private static func trimLaneFromName(laneName: String) -> String {
         return String(laneName.prefix(laneName.count - 4))
