@@ -115,8 +115,10 @@ module Spaceship
       end
 
       def post(url_or_path, body, tries: 5)
+        # Apply explicit retry limits to transport errors as well as ASC statuses.
+        request_args = tries == 5 ? [:post] : [:post, nil, nil, {}, false, tries]
         response = with_asc_retry(tries) do
-          request(:post) do |req|
+          request(*request_args) do |req|
             req.url(url_or_path)
             req.body = body.to_json
             req.headers['Content-Type'] = 'application/json'

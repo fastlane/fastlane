@@ -1,3 +1,4 @@
+require 'date'
 require 'fastlane_core/configuration/config_item'
 require 'credentials_manager/appfile_config'
 
@@ -259,9 +260,42 @@ module Deliver
         FastlaneCore::ConfigItem.new(key: :price_tier,
                                      short_option: "-r",
                                      env_name: "DELIVER_PRICE_TIER",
-                                     description: "The price tier of this application",
+                                     description: "Set 0 for a free app. For paid apps use price_point_id instead of legacy numeric tiers",
                                      type: Integer,
-                                     optional: true),
+                                     conflicting_options: [:price_point_id],
+                                     optional: true,
+                                     verify_block: proc do |value|
+                                       UI.user_error!("Apple no longer supports numeric paid price tiers. Use price_point_id instead") unless value == 0
+                                     end),
+        FastlaneCore::ConfigItem.new(key: :price_point_id,
+                                     env_name: "DELIVER_PRICE_POINT_ID",
+                                     description: "App-specific App Store Connect price point ID in the base territory",
+                                     type: String,
+                                     conflicting_options: [:price_tier],
+                                     optional: true,
+                                     verify_block: proc do |value|
+                                       UI.user_error!("price_point_id must not be empty") if value.strip.empty?
+                                     end),
+        FastlaneCore::ConfigItem.new(key: :price_base_territory,
+                                     env_name: "DELIVER_PRICE_BASE_TERRITORY",
+                                     description: "Pricing base territory ID, such as USA. Uses the existing base territory, or USA for initial pricing",
+                                     type: String,
+                                     optional: true,
+                                     verify_block: proc do |value|
+                                       UI.user_error!("price_base_territory must be a three-letter territory ID, such as USA") unless value.match?(/\A[A-Z]{3}\z/)
+                                     end),
+        FastlaneCore::ConfigItem.new(key: :price_start_date,
+                                     env_name: "DELIVER_PRICE_START_DATE",
+                                     description: "Price change start date in YYYY-MM-DD format. Omit for an immediate change",
+                                     type: String,
+                                     optional: true,
+                                     verify_block: proc { |value| verify_price_date!(:price_start_date, value) }),
+        FastlaneCore::ConfigItem.new(key: :price_end_date,
+                                     env_name: "DELIVER_PRICE_END_DATE",
+                                     description: "Price change end date in YYYY-MM-DD format. Omit to keep the price until the next scheduled change",
+                                     type: String,
+                                     optional: true,
+                                     verify_block: proc { |value| verify_price_date!(:price_end_date, value) }),
         FastlaneCore::ConfigItem.new(key: :app_rating_config_path,
                                      short_option: "-g",
                                      env_name: "DELIVER_APP_RATING_CONFIG_PATH",
@@ -523,6 +557,13 @@ module Deliver
                                      optional: true,
                                      type: Integer)
       ]
+    end
+
+    def self.verify_price_date!(key, value)
+      date = Date.iso8601(value)
+      raise ArgumentError unless date.iso8601 == value
+    rescue ArgumentError, TypeError
+      UI.user_error!("#{key} must be a date in YYYY-MM-DD format")
     end
   end
   # rubocop:enable Metrics/ClassLength

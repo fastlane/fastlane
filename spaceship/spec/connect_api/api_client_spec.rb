@@ -188,6 +188,48 @@ describe Spaceship::ConnectAPI::APIClient do
           end.to raise_error(Spaceship::InternalServerError, "Server error got 504")
         end.not_to output.to_stdout
       end
+
+      it 'limits transport attempts without changing later default POST or GET retries' do
+        post_request = stub_request(:post, client.hostname).to_timeout
+        get_request = stub_request(:get, client.hostname).to_timeout
+
+        expect { client.post('', {}, tries: 1) }.to raise_error(Faraday::ConnectionFailed)
+        expect(post_request).to have_been_requested.once
+
+        expect { client.post('', {}) }.to raise_error(Faraday::ConnectionFailed)
+        expect(post_request).to have_been_requested.times(6)
+
+        expect { client.get('') }.to raise_error(Faraday::ConnectionFailed)
+        expect(get_request).to have_been_requested.times(5)
+      end
+
+      it 'does not retry a malformed JSON response when a single try is allowed' do
+        request = stub_request(:post, client.hostname).
+                  to_return(status: 200, body: '{invalid json', headers: { 'Content-Type' => 'application/json' })
+
+        expect { client.post('', {}, tries: 1) }.to raise_error(Faraday::ParsingError)
+        expect(request).to have_been_requested.once
+      end
+
+      it 'keeps accepting an unbraced positional headers hash' do
+        request = stub_request(:get, client.hostname).with(headers: { 'X-Request-Test' => 'unchanged' }).to_return(status: 200)
+
+        client.request(:get, client.hostname, nil, 'X-Request-Test' => 'unchanged')
+
+        expect(request).to have_been_requested.once
+      end
+
+      it 'applies the transport limit to later automatically paginated requests' do
+        next_url = "#{client.hostname}next"
+        stub_request(:get, client.hostname).to_return(
+          status: 200, body: JSON.generate(data: []),
+          headers: { 'Content-Type' => 'application/json', 'Link' => "<#{next_url}>; rel=\"next\"" }
+        )
+        request = stub_request(:get, next_url).to_timeout
+
+        expect { client.request(:get, client.hostname, nil, {}, true, 1) }.to raise_error(Faraday::ConnectionFailed)
+        expect(request).to have_been_requested.once
+      end
     end
   end
 

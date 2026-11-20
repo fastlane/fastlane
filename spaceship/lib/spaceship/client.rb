@@ -1010,7 +1010,7 @@ module Spaceship
       @additional_headers || {}
     end
 
-    def request(method, url_or_path = nil, params = nil, headers = {}, auto_paginate = false, &block)
+    def request(method, url_or_path = nil, params = nil, headers = {}, auto_paginate = false, tries = 5, &block)
       headers.merge!(csrf_tokens)
       headers.merge!(additional_headers)
       headers['User-Agent'] = USER_AGENT
@@ -1025,9 +1025,9 @@ module Spaceship
       end
 
       response = if auto_paginate
-                   send_request_auto_paginate(method, url_or_path, params, headers, &block)
+                   send_request_auto_paginate(method, url_or_path, params, headers, tries, &block)
                  else
-                   send_request(method, url_or_path, params, headers, &block)
+                   send_request(method, url_or_path, params, headers, tries, &block)
                  end
 
       return response
@@ -1181,9 +1181,9 @@ module Spaceship
     end
 
     # Actually sends the request to the remote server
-    # Automatically retries the request up to 3 times if something goes wrong
-    def send_request(method, url_or_path, params, headers, &block)
-      with_retry do
+    # Defaults to five attempts, unless the caller supplies a different limit.
+    def send_request(method, url_or_path, params, headers, tries = 5, &block)
+      with_retry(tries) do
         response = @client.send(method, url_or_path, params, headers, &block)
         log_response(method, url_or_path, response, headers, &block)
 
@@ -1237,12 +1237,12 @@ module Spaceship
       end
     end
 
-    def send_request_auto_paginate(method, url_or_path, params, headers, &block)
-      response = send_request(method, url_or_path, params, headers, &block)
+    def send_request_auto_paginate(method, url_or_path, params, headers, tries = 5, &block)
+      response = send_request(method, url_or_path, params, headers, tries, &block)
       return response unless should_process_next_rel?(response)
       last_response = response
       while last_response.env.rels[:next]
-        last_response = send_request(method, last_response.env.rels[:next], params, headers, &block)
+        last_response = send_request(method, last_response.env.rels[:next], params, headers, tries, &block)
         break unless should_process_next_rel?(last_response)
         response.body['data'].concat(last_response.body['data'])
       end

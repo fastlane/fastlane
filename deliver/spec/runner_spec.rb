@@ -308,6 +308,65 @@ describe Deliver::Runner do
     end
   end
 
+  describe 'pricing preflight' do
+    around do |example|
+      FastlaneSpec::Env.with_env_values(
+        'DELIVER_PRICE_TIER' => nil,
+        'DELIVER_PRICE_POINT_ID' => nil,
+        'DELIVER_PRICE_BASE_TERRITORY' => nil,
+        'DELIVER_PRICE_START_DATE' => nil,
+        'DELIVER_PRICE_END_DATE' => nil
+      ) { example.run }
+    end
+
+    before do
+      allow(Time).to receive(:now).and_return(Time.utc(2026, 1, 10, 12))
+    end
+
+    def expect_no_uploads
+      expect(runner).not_to receive(:verify_version)
+      expect(runner).not_to receive(:reject_version_if_possible)
+      expect(runner).not_to receive(:upload_metadata)
+      expect(runner).not_to receive(:upload_binary)
+      expect(runner).not_to receive(:submit_for_review)
+    end
+
+    it 'rejects resolved pricing conflicts before any App Store mutations' do
+      FastlaneSpec::Env.with_env_values('DELIVER_PRICE_TIER' => '0') do
+        config = FastlaneCore::Configuration.create(Deliver::Options.available_options, app_version: '1.0.7', reject_if_possible: true)
+        config.config_file_options = { price_point_id: 'paid-point' }
+        runner.options = config
+        expect_no_uploads
+        expect { runner.run }.to raise_error(FastlaneCore::Interface::FastlaneError, /price_tier.*price_point_id/)
+      end
+    end
+
+    it 'rejects pricing dates without a price before any App Store mutations' do
+      options[:price_start_date] = '2026-02-01'
+      expect_no_uploads
+      expect { runner.run }.to raise_error(FastlaneCore::Interface::FastlaneError, /require price_tier/)
+    end
+
+    it 'rejects a reversed interval before any App Store mutations' do
+      options.merge!(price_tier: 0, price_start_date: '2026-02-01', price_end_date: '2026-01-01')
+      expect_no_uploads
+      expect { runner.run }.to raise_error(FastlaneCore::Interface::FastlaneError, /must be after/)
+    end
+
+    it 'rejects an expired immediate change before any App Store mutations' do
+      options.merge!(price_point_id: 'paid-point', price_end_date: '2026-01-09')
+      expect_no_uploads
+      expect { runner.run }.to raise_error(FastlaneCore::Interface::FastlaneError, /price_end_date.*future/)
+    end
+
+    it 'does not validate unused pricing options when only verifying a binary' do
+      options.merge!(verify_only: true, price_start_date: '2026-02-01')
+      expect_no_uploads
+      expect(runner).to receive(:verify_binary)
+      runner.run
+    end
+  end
+
   describe :precheck_app do
     let(:precheck_runner) { instance_double(Precheck::Runner) }
 

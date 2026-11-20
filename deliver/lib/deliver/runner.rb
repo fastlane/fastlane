@@ -56,6 +56,8 @@ module Deliver
         return
       end
 
+      UploadPriceTier.new.validate_options!(options)
+
       verify_version if options[:app_version].to_s.length > 0 && !options[:skip_app_version_update]
 
       # Rejecting before upload meta
