@@ -29,8 +29,6 @@ gem "rake"
 # A readline implementation in Ruby
 # See: https://github.com/deivid-rodriguez/byebug/issues/289#issuecomment-251383465
 gem "rb-readline"
-# rbs >= 4.2 (pulled in transitively by rdoc) requires Ruby >= 3.3, while fastlane supports Ruby >= 3.2.
-gem "rbs", "< 4.2"
 # Behavior-driven testing tool for Ruby.
 gem "rspec", "~> 3.10"
 # A Ruby static code analyzer and formatter.
@@ -57,10 +55,9 @@ gem "yard", "~> 0.9.44"
 group :openssl_pin do
   # standard library for OpenSSL has affected versions (unable to get certificate CRL) - ruby/openssl/issues/949
   # We block affected versions here so a patched gem version will be used regardless of Ruby version.
+  # 3.2.4 is the first that builds against OpenSSL 4.0 - ruby/openssl/pull/1051
   gem "openssl",
-      ">= 3.1.2",
-      "!= 3.2.0",
-      "!= 3.2.1",
+      ">= 3.2.4",
       "!= 3.3.0"
 end
 
