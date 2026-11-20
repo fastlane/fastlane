@@ -113,6 +113,8 @@ module Deliver
         if version.nil?
           UI.message("Couldn't find live version, editing the current version on App Store Connect instead")
           version = fetch_edit_app_store_version(app, platform)
+          UI.user_error!("Cannot update metadata - could not find a live or editable version for '#{platform}'") unless version
+          UI.message("Found current version")
           # we don't want to update the localised_options and non_localised_options
           # as we also check for `options[:edit_live]` at other areas in the code
           # by not touching those 2 variables, deliver is more consistent with what the option says
@@ -120,8 +122,6 @@ module Deliver
         else
           UI.message("Found live version")
         end
-
-        UI.user_error!("Cannot update metadata - could not find a live or editable version for '#{platform}'") unless version
 
         # Languages are not enabled on the live version, so only its existing localizations are updated
         app_store_version_localizations = version.get_app_store_version_localizations
