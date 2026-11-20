@@ -746,6 +746,11 @@ module Deliver
     end
 
     def review_attachment_file(version)
+      if options[:skip_app_review_attachment]
+        UI.message("Skipping app review attachment, keeping the existing attachments on App Store Connect")
+        return
+      end
+
       app_store_review_detail = version.fetch_app_store_review_detail
       app_store_review_attachments = app_store_review_detail.app_store_review_attachments || []
 
