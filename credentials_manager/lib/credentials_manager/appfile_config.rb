@@ -1,5 +1,5 @@
-require 'fastlane_core/env'
 require 'fastlane_core/globals'
+require 'fastlane_core/smart_quotes'
 
 module CredentialsManager
   # Access the content of the app file (e.g. app identifier and Apple ID)
@@ -35,14 +35,8 @@ module CredentialsManager
         Dir.chdir(File.expand_path('..', path)) do
           content = File.read(full_path, encoding: "utf-8")
 
-          # From https://github.com/orta/danger/blob/master/lib/danger/danger_core/dangerfile.rb
-          if !FastlaneCore::Env.truthy?("FASTLANE_SKIP_SMART_QUOTES_SANITIZE") && content.tr!('“”‘’‛', %(""'''))
-            puts("Your #{File.basename(path)} has had smart quotes sanitised. " \
-                 'To avoid issues in the future, you should not use ' \
-                 'TextEdit for editing it. If you are not using TextEdit, ' \
-                 'you should turn off smart quotes in your editor of choice. ' \
-                 'If you use smart quotes on purpose, set FASTLANE_SKIP_SMART_QUOTES_SANITIZE=1 to keep them.'.red)
-          end
+          warning = FastlaneCore::SmartQuotes.sanitize!(content, path)
+          puts(warning.red) if warning
 
           # rubocop:disable Security/Eval
           eval(content)
