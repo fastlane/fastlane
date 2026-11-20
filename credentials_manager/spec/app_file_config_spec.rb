@@ -219,6 +219,15 @@ describe CredentialsManager do
         expect(config.data[:apple_id]).to eq('appfile@krausefx.com')
         expect(config.data[:app_identifier]).to eq('such.app')
       end
+
+      it "keeps smart quotes when FASTLANE_SKIP_SMART_QUOTES_SANITIZE is set" do
+        FastlaneSpec::Env.with_env_values('FASTLANE_SKIP_SMART_QUOTES_SANITIZE' => '1') do
+          config = CredentialsManager::AppfileConfig.new('credentials_manager/spec/fixtures/Appfile_smart_quotes_in_a_string')
+
+          expect(config.data[:app_identifier]).to eq('such.app')
+          expect(config.data[:team_name]).to eq('Felix’s “Team”')
+        end
+      end
     end
   end
 
