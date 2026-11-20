@@ -54,32 +54,6 @@ module Snapshot
       system("open", export_path) unless Snapshot.config[:skip_open_summary]
     end
 
-    def xcode_8_and_below_device_name_mappings
-      # The order IS important, since those names are used to check for include?
-      # and the iPhone 6 is included in the iPhone 6 Plus
-      {
-        'AppleTV1080p' => 'Apple TV',
-        'iPhone7Plus' => "iPhone7Plus (5.5-Inch)",
-        'iPhone7' => "iPhone7 (4.7-Inch)",
-        'iPhone6sPlus' => "iPhone6sPlus (5.5-Inch)",
-        'iPhone6Plus' => "iPhone6Plus (5.5-Inch)",
-        'iPhone6s' => "iPhone6s (4.7-Inch)",
-        'iPhone6' => "iPhone6 (4.7-Inch)",
-        'iPhone5' => "iPhone5 (4-Inch)",
-        'iPhone4' => "iPhone4 (3.5-Inch)",
-        'iPhoneSE' => "iPhone SE",
-        'iPad2' => "iPad2",
-        'iPadAir2' => 'iPad Air 2',
-        'iPadPro(12.9-inch)' => 'iPad Air Pro (12.9-inch)',
-        'iPadPro(9.7-inch)' => 'iPad Air Pro (9.7-inch)',
-        'iPadPro(9.7inch)' => "iPad Pro (9.7-inch)",
-        'iPadPro(12.9inch)' => "iPad Pro (12.9-inch)",
-        'iPadPro' => "iPad Pro",
-        'iPad' => "iPad",
-        'Mac' => "Mac"
-      }
-    end
-
     def xcode_9_and_above_device_name_mappings
       {
         # snapshot in Xcode 9 saves screenshots with the SIMULATOR_DEVICE_NAME
@@ -194,11 +168,7 @@ module Snapshot
     end
 
     def available_devices
-      if Helper.xcode_at_least?("9.0")
-        return xcode_9_and_above_device_name_mappings
-      else
-        return xcode_8_and_below_device_name_mappings
-      end
+      return xcode_9_and_above_device_name_mappings
     end
   end
 end

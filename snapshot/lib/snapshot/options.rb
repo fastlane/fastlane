@@ -244,7 +244,7 @@ module Snapshot
                                      is_string: false),
         FastlaneCore::ConfigItem.new(key: :concurrent_simulators,
                                      env_name: "SNAPSHOT_EXECUTE_CONCURRENT_SIMULATORS",
-                                     description: "Take snapshots on multiple simulators concurrently. Note: This option is only applicable when running against Xcode 9",
+                                     description: "Take snapshots on multiple simulators concurrently",
                                      default_value: true,
                                      is_string: false),
         FastlaneCore::ConfigItem.new(key: :disable_slide_to_type,

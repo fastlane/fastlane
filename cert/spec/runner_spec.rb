@@ -8,12 +8,10 @@ describe Cert do
     end
 
     xcode_versions = {
-      "10" => Spaceship.certificate.production,
-      "11" => Spaceship.certificate.apple_distribution
+      "16" => Spaceship.certificate.apple_distribution
     }
 
     # Iterates over different Xcode versions to test different cert types
-    # Xcode 10 and earlier - Spaceship.certificate.production
     # Xcode 11 and later - Spaceship.certificate.apple_distribution
     describe "#create_certificate" do
       let(:temp) { Dir.mktmpdir('fl_spec_cert') }
