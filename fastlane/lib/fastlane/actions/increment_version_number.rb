@@ -6,7 +6,6 @@ module Fastlane
 
     class IncrementVersionNumberAction < Action
       require 'fastlane/helper/xcodeproj_helper'
-      require 'shellwords'
 
       def self.is_supported?(platform)
         [:ios, :mac].include?(platform)
@@ -16,26 +15,16 @@ module Fastlane
         # More information about how to set up your project and how it works:
         # https://developer.apple.com/library/ios/qa/qa1827/_index.html
 
-        folder = params[:xcodeproj] ? File.join(params[:xcodeproj], '..') : '.'
-
-        command_prefix = [
-          'cd',
-          File.expand_path(folder).shellescape,
-          '&&'
-        ].join(' ')
+        project = Helper::XcodeprojHelper.get_single_project!(params[:xcodeproj])
 
         version_number_build_setting = nil
 
         begin
-          current_version = Actions
-                            .sh("#{command_prefix} agvtool what-marketing-version -terse1", log: FastlaneCore::Globals.verbose?)
-                            .split("\n")
-                            .last
-                            .strip
+          current_version = Helper::XcodeprojHelper.info_plist_values(project, "CFBundleShortVersionString").first.to_s
 
           if current_version =~ /\$\(([\w\-]+)\)/ || current_version =~ /\$\{([\w\-]+)\}/
             version_number_build_setting = $1
-            UI.verbose("agvtool returned #{current_version}, resolving it...")
+            UI.verbose("The Info.plist version is #{current_version}, resolving it...")
             current_version = GetVersionNumberAction.run(xcodeproj: params[:xcodeproj])
           end
         rescue
@@ -75,25 +64,10 @@ module Fastlane
           end
         end
 
-        command = [
-          command_prefix,
-          "agvtool new-marketing-version #{next_version_number.to_s.strip.shellescape}"
-        ].join(' ')
+        next_version_number = next_version_number.to_s.strip
+        update_project_version(project, version_number_build_setting || "MARKETING_VERSION", next_version_number)
 
-        if Helper.test?
-          Actions.lane_context[SharedValues::VERSION_NUMBER] = command
-        else
-          Actions.sh(command)
-          version_number_build_setting ||= "MARKETING_VERSION"
-          update_project_version_build_setting(
-            params[:xcodeproj],
-            version_number_build_setting,
-            next_version_number.to_s.strip
-          )
-          Actions.lane_context[SharedValues::VERSION_NUMBER] = next_version_number
-        end
-
-        return Actions.lane_context[SharedValues::VERSION_NUMBER]
+        return Actions.lane_context[SharedValues::VERSION_NUMBER] = next_version_number
       rescue => ex
         UI.error('Before being able to increment and read the version number from your Xcode project, you first need to setup your project properly. Please follow the guide at https://developer.apple.com/library/content/qa/qa1827/_index.html')
         raise ex
@@ -111,22 +85,11 @@ module Fastlane
         "Can't increment version"
       end
 
-      def self.update_project_version_build_setting(xcodeproj_path_or_dir, build_setting, version_number)
-        project_path_or_dir = xcodeproj_path_or_dir
-        if project_path_or_dir.nil?
-          xcodeproj_paths = Dir.glob("./*.xcodeproj")
-          return if xcodeproj_paths.empty?
-
-          if xcodeproj_paths.size > 1
-            return
-          end
-
-          project_path_or_dir = xcodeproj_paths.first
-        end
-
-        project = Fastlane::Helper::XcodeprojHelper.get_project!(project_path_or_dir)
-        changed = Fastlane::Helper::XcodeprojHelper.update_project_build_setting(project, build_setting, version_number)
-        project.save if changed[:project]
+      # Sets the version in the Info.plist files and in the build setting that holds it.
+      def self.update_project_version(project, build_setting, version_number)
+        Helper::XcodeprojHelper.update_info_plist_value(project, "CFBundleShortVersionString", version_number)
+        changed = Helper::XcodeprojHelper.update_project_build_setting(project, build_setting, version_number)
+        Helper::XcodeprojHelper.save_project_build_setting(project, build_setting, version_number) if changed[:project]
       end
 
       def self.description
