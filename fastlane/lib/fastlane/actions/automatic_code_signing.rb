@@ -1,4 +1,5 @@
 require 'xcodeproj'
+require 'fastlane/helper/xcodeproj_helper'
 module Fastlane
   module Actions
     class AutomaticCodeSigningAction < Action
@@ -7,19 +8,21 @@ module Fastlane
         UI.deprecated("Please use `update_code_signing_settings` action instead.")
         FastlaneCore::PrintTable.print_values(config: params, title: "Summary for Automatic Codesigning")
         path = params[:path]
-        path = File.join(File.expand_path(path), "project.pbxproj")
+        path = Helper::XcodeprojHelper.project_file_path(File.expand_path(path))
 
-        project = Xcodeproj::Project.open(params[:path])
         UI.user_error!("Could not find path to project config '#{path}'. Pass the path to your project (not workspace)!") unless File.exist?(path)
+        project = Helper::XcodeprojHelper.open_project!(params[:path])
         UI.message("Updating the Automatic Codesigning flag to #{params[:use_automatic_signing] ? 'enabled' : 'disabled'} for the given project '#{path}'")
 
-        unless project.root_object.attributes["TargetAttributes"]
+        if Helper::XcodeprojHelper.very_old_project_format?(project)
           UI.user_error!("Seems to be a very old project file format - please open your project file in a more recent version of Xcode")
           return false
         end
 
         target_dictionary = project.targets.map { |f| { name: f.name, uuid: f.uuid, build_configuration_list: f.build_configuration_list } }
-        target_attributes = project.root_object.attributes["TargetAttributes"]
+        # A project in Xcode's JSON format can have no TargetAttributes. This action then only changes build settings,
+        # and the project does not store the target attributes that the action sets below.
+        target_attributes = project.root_object.attributes["TargetAttributes"] || {}
         changed_targets = []
 
         # make sure TargetAttributes exist for all targets

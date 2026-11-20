@@ -5,55 +5,42 @@ module Fastlane
     end
 
     class IncrementBuildNumberAction < Action
-      require 'shellwords'
+      require 'fastlane/helper/xcodeproj_helper'
 
       def self.is_supported?(platform)
         [:ios, :mac, :xros].include?(platform)
       end
 
       def self.run(params)
-        folder = params[:xcodeproj] ? File.join(params[:xcodeproj], '..') : '.'
-
-        command_prefix = [
-          'cd',
-          File.expand_path(folder).shellescape,
-          '&&'
-        ].join(' ')
-
-        command_suffix = [
-          '&&',
-          'cd',
-          '-'
-        ].join(' ')
-
         # More information about how to set up your project and how it works:
         # https://developer.apple.com/library/ios/qa/qa1827/_index.html
         # Attention: This is NOT the version number - but the build number
+        project = Helper::XcodeprojHelper.get_single_project!(params[:xcodeproj])
+        build_number = params[:build_number].to_s.strip
+        build_number = next_build_number(project) if build_number.empty?
 
-        agv_disabled = !system([command_prefix, 'agvtool what-version', command_suffix].join(' '))
-        raise "Apple Generic Versioning is not enabled." if agv_disabled && params[:build_number].nil?
-
-        mode = params[:skip_info_plist] ? '' : ' -all'
-        command = [
-          command_prefix,
-          'agvtool',
-          params[:build_number] ? "new-version#{mode} #{params[:build_number].to_s.strip.shellescape}" : "next-version#{mode}",
-          command_suffix
-        ].join(' ')
-
-        output = Actions.sh(command)
-        if output.include?('$(SRCROOT)')
-          UI.error('Cannot set build number with plist path containing $(SRCROOT)')
-          UI.error('Please remove $(SRCROOT) in your Xcode target build settings')
+        changed = Helper::XcodeprojHelper.update_project_build_setting(project, "CURRENT_PROJECT_VERSION", build_number)
+        Helper::XcodeprojHelper.save_project_build_setting(project, "CURRENT_PROJECT_VERSION", build_number) if changed[:project]
+        changed_info_plists = params[:skip_info_plist] ? [] : Helper::XcodeprojHelper.update_info_plist_value(project, "CFBundleVersion", build_number)
+        unless changed.values.any? || changed_info_plists.any? || stores_build_number?(project, build_number)
+          UI.user_error!("Could not store the build number #{build_number} in the project. Set CURRENT_PROJECT_VERSION in the project's build settings, so that this action has a build setting to update.")
         end
 
-        # Store the new number in the shared hash
-        build_number = params[:build_number].to_s.strip
-        build_number = Actions.sh("#{command_prefix} agvtool what-version", log: false).split("\n").last.strip if build_number.to_s == ""
-
         return Actions.lane_context[SharedValues::BUILD_NUMBER] = build_number
-      rescue
-        UI.user_error!("Apple Generic Versioning is not enabled in this project.\nBefore being able to increment and read the version number from your Xcode project, you first need to setup your project properly. Please follow the guide at https://developer.apple.com/library/content/qa/qa1827/_index.html")
+      end
+
+      # Returns whether a build configuration, an xcconfig file, or an Info.plist file of the project holds the build number.
+      # The action asks this when it changed nothing. The project then either had the build number already, or it sets
+      # CURRENT_PROJECT_VERSION nowhere and has no literal CFBundleVersion, so the action had nothing to update.
+      def self.stores_build_number?(project, build_number)
+        build_configurations = ([project] + project.targets).flat_map(&:build_configurations)
+        build_configurations.any? { |config| config.resolve_build_setting("CURRENT_PROJECT_VERSION") == build_number } ||
+          Helper::XcodeprojHelper.info_plist_values(project, "CFBundleVersion").include?(build_number)
+      end
+
+      # Adds one to the whole-number part of the current build number, so "41" and "41.2" both become "42".
+      def self.next_build_number(project)
+        (Helper::XcodeprojHelper.current_build_number!(project).to_i + 1).to_s
       end
 
       def self.description

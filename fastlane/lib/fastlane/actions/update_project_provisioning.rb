@@ -6,6 +6,8 @@ module Fastlane
     end
 
     class UpdateProjectProvisioningAction < Action
+      require 'fastlane/helper/xcodeproj_helper'
+
       # Apple Root CA and Apple Root CA - G3, from https://www.apple.com/certificateauthority/
       ROOT_CERTIFICATE_PATHS = %w(AppleIncRootCertificate.cer AppleRootCA-G3.cer).map do |name|
         File.join(Fastlane::ROOT, "lib", "assets", "certificates", name)
@@ -19,7 +21,7 @@ module Fastlane
         folder = params[:xcodeproj] || Dir["*.xcodeproj"].first
 
         # validate folder
-        project_file_path = File.join(folder, "project.pbxproj")
+        project_file_path = Helper::XcodeprojHelper.project_file_path(folder)
         UI.user_error!("Could not find path to project config '#{project_file_path}'. Pass the path to your project (not workspace)!") unless File.exist?(project_file_path)
 
         certs = root_certificates(params[:certificate])
@@ -43,7 +45,7 @@ module Fastlane
         UI.success("Going to update project '#{folder}' with UUID")
         require 'xcodeproj'
 
-        project = Xcodeproj::Project.open(folder)
+        project = Helper::XcodeprojHelper.open_project!(folder)
         project.targets.each do |target|
           if !target_filter || target.name.match(target_filter) || (target.respond_to?(:product_type) && target.product_type.match(target_filter))
             UI.success("Updating target #{target.name}...")
@@ -103,7 +105,7 @@ module Fastlane
       def self.details
         [
           "You should check out the [code signing guide](https://docs.fastlane.tools/codesigning/getting-started/) before using this action.",
-          "This action retrieves a provisioning profile UUID from a provisioning profile (`.mobileprovision`) to set up the Xcode projects' code signing settings in `*.xcodeproj/project.pbxproj`.",
+          "This action retrieves a provisioning profile UUID from a provisioning profile (`.mobileprovision`) to set up the Xcode projects' code signing settings in the Xcode project (`*.xcodeproj`).",
           "The `:target_filter` value can be used to only update code signing for the specified targets.",
           "The `:build_configuration` value can be used to only update code signing for the specified build configurations of the targets passing through the `:target_filter`.",
           "Example usage is the WatchKit Extension or WatchKit App, where you need separate provisioning profiles.",
