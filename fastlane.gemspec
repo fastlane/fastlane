@@ -8,33 +8,33 @@ Gem::Specification.new do |spec|
   spec.name          = "fastlane"
   spec.version       = Fastlane::VERSION
   # list of authors is regenerated and resorted on each release
-  spec.authors       = ["Maksym Grebenets",
-                        "Manu Wallner",
-                        "Jan Piotrowski",
-                        "Fumiya Nakamura",
-                        "Satoshi Namai",
-                        "Jimmy Dee",
-                        "Matthew Ellis",
-                        "Max Ott",
-                        "Łukasz Grabowski",
-                        "Iulian Onofrei",
-                        "Olivier Halligon",
-                        "Jérôme Lacoste",
-                        "Helmut Januschka",
-                        "Daniel Jankowski",
-                        "Andrew McBurney",
-                        "Jorge Revuelta H",
-                        "Aaron Brager",
-                        "Josh Holtz",
-                        "Connor Tumbleson",
-                        "Stefan Natchev",
-                        "Luka Mirosevic",
-                        "Manish Rathi",
-                        "Roger Oba",
-                        "Kohki Miki",
+  spec.authors       = ["Connor Tumbleson",
                         "Felix Krause",
+                        "Matthew Ellis",
+                        "Danielle Tomlinson",
+                        "Roger Oba",
+                        "Helmut Januschka",
+                        "Stefan Natchev",
+                        "Satoshi Namai",
+                        "Jérôme Lacoste",
+                        "Manish Rathi",
+                        "Aaron Brager",
+                        "Andrew McBurney",
+                        "Olivier Halligon",
+                        "Kohki Miki",
+                        "Iulian Onofrei",
+                        "Max Ott",
+                        "Daniel Jankowski",
+                        "Łukasz Grabowski",
+                        "Josh Holtz",
+                        "Fumiya Nakamura",
+                        "Luka Mirosevic",
+                        "Jan Piotrowski",
+                        "Jimmy Dee",
                         "Joshua Liebowitz",
-                        "Danielle Tomlinson"]
+                        "Manu Wallner",
+                        "Maksym Grebenets",
+                        "Jorge Revuelta H"]
 
   spec.email         = ["fastlane@krausefx.com"]
   spec.summary       = Fastlane::SUMMARY
@@ -46,11 +46,12 @@ Gem::Specification.new do |spec|
     "changelog_uri" => "https://github.com/fastlane/fastlane/releases",
     "documentation_uri" => "https://docs.fastlane.tools/",
     "homepage_uri" => spec.homepage,
+    "rubygems_mfa_required" => "true",
     "source_code_uri" => "https://github.com/fastlane/fastlane"
   }
 
   # A literal: RuboCop reads its target Ruby from it. spec/ci_ruby_versions_spec.rb checks both against Fastlane::MINIMUM_RUBY
-  spec.required_ruby_version = '>= 3.2.0'
+  spec.required_ruby_version = '>= 3.3.0'
 
   spec.files = Dir.glob("*/lib/**/*", File::FNM_DOTMATCH) + Dir["fastlane/swift/**/*"] + Dir["bin/*"] + Dir["*/README.md"] + %w(README.md LICENSE .yardopts) - Dir["fastlane/lib/fastlane/actions/device_grid/assets/*"] - Dir["fastlane/lib/fastlane/actions/docs/assets/*"]
   spec.bindir = "bin"
@@ -69,7 +70,7 @@ Gem::Specification.new do |spec|
   spec.add_dependency('emoji_regex', '>= 0.1', '< 4.0') # Used to scan for Emoji in the changelog
   spec.add_dependency('erb', '>= 4.0', '< 7.0') # Used for templating
   spec.add_dependency('excon', '>= 1.0.0', '< 2.0.0') # Great HTTP Client
-  spec.add_dependency('faraday', '~> 2.7') # The faraday gem is used for deploygate, hockey and testfairy actions.
+  spec.add_dependency('faraday', '~> 2.7') # The faraday gem is used for deploygate and testfairy actions.
   spec.add_dependency('faraday-cookie_jar', '~> 0.0.8') # Spaceship uses this to store cookies for the session, when authorizing with login/password.
   spec.add_dependency('faraday-follow_redirects', '~> 0.3') # Replaces FaradayMiddleware::FollowRedirects from faraday_middleware
   spec.add_dependency('faraday-multipart', '~> 1.0') # Converts Request.body into a multipart.
@@ -79,7 +80,6 @@ Gem::Specification.new do |spec|
   spec.add_dependency('gh_inspector', '>= 1.1.2', '< 2.0.0') # search for issues on GitHub when something goes wrong
   spec.add_dependency('google-apis-androidpublisher_v3', '~> 0.99') # Google API Client to access Play Publishing API
   spec.add_dependency('google-apis-playcustomapp_v1', '~> 0.1') # Google API Client to access Custom app Publishing API
-  spec.add_dependency('google-cloud-env', '>= 1.6.0', '< 2.5.0') # Must be < 2.5.0 to support Ruby 3.2
   spec.add_dependency('google-cloud-storage', '~> 1.31') # Access Google Cloud Storage for match
   spec.add_dependency('highline', '~> 2.0') # user inputs (e.g. passwords)
   spec.add_dependency('json', '< 3.0.0') # Because sometimes it's just not installed
@@ -91,7 +91,7 @@ Gem::Specification.new do |spec|
   spec.add_dependency('optparse', '>= 0.1.1', '< 1.0.0') # Used to parse options with Commander
   spec.add_dependency('plist', '>= 3.1.0', '< 4.0.0') # Needed for set_build_number_repository and get_info_plist_value actions
   spec.add_dependency('rubyzip', '>= 3.4.0', '< 4.0.0') # fix swift/ipa in gym
-  spec.add_dependency('security', '~> 0.3') # macOS Keychain manager
+  spec.add_dependency('security', '~> 0.4') # macOS Keychain manager
   spec.add_dependency('simctl', '~> 1.6.3') # Used for querying and interacting with iOS simulators
   spec.add_dependency('terminal-notifier', '>= 3.1.0', '< 4.0.0') # macOS notifications
   spec.add_dependency('terminal-table', '~> 4') # Actions documentation

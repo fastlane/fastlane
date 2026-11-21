@@ -58,31 +58,43 @@ module FastlaneCore
     # Runs preparations before executing any command from the executor.
     #
     # @param original_api_key [Hash] api key containing the issuer id and private key
-    # @return [Hash] copy of `api_key` which includes an extra `key_dir` with the location of the .p8 file on disk
+    # @return [Hash] copy of `api_key` which includes an extra `key_dir` with the location of the .p8 file on disk,
+    #   and `cleanup_path`: what #cleanup removes afterwards
     def prepare(original_api_key:)
       return if original_api_key.nil?
       # Create .p8 file from api_key and provide api key info which contains .p8 file path
       api_key = original_api_key.dup
+      p8_name = "AuthKey_#{api_key[:key_id]}.p8"
       if self.kind_of?(ShellScriptTransporterExecutor)
         # as of Transporter v3.3.0, the app is unable to detect the private keys under the 'private_keys' folder in current directory
         # so we must rely on the other search paths in the Home dir:
         # https://help.apple.com/itc/transporteruserguide/en.lproj/static.html#itc803b7be80
         private_keys_dir = File.join(Dir.home, ".appstoreconnect/private_keys")
         unless Dir.exist?(private_keys_dir)
-          FileUtils.mkdir_p(private_keys_dir)
+          FileUtils.mkdir_p(private_keys_dir, mode: 0o700)
         end
         api_key[:key_dir] = private_keys_dir
+        # Keys already there belong to the user: only remove the one written below
+        p8_path = File.join(private_keys_dir, p8_name)
+        api_key[:cleanup_path] = p8_path unless File.exist?(p8_path)
       else
         api_key[:key_dir] = Dir.mktmpdir("deliver-")
+        api_key[:cleanup_path] = api_key[:key_dir]
       end
       # Specified p8 needs to be generated to call altool or iTMSTransporter
-      File.open(File.join(api_key[:key_dir], "AuthKey_#{api_key[:key_id]}.p8"), "wb") do |p8|
-        p8.write(api_key[:key])
-      end
+      p8_path = File.join(api_key[:key_dir], p8_name)
+      Helper.open_owner_only(p8_path, "wb") { |p8| p8.write(api_key[:key]) }
       api_key
     end
 
-    def execute(command, hide_output)
+    # Removes what #prepare wrote: its temporary directory, or the key file it added to ~/.appstoreconnect/private_keys
+    def cleanup(api_key)
+      return if api_key.nil? || api_key[:cleanup_path].nil?
+      FileUtils.rm_rf(api_key[:cleanup_path])
+    end
+
+    # @param env [Hash] environment for the command, such as the password it reads with -p @env:
+    def execute(command, hide_output, env: {})
       if Helper.test?
         yield(nil) if block_given?
         return command
@@ -99,7 +111,7 @@ module FastlaneCore
       end
 
       begin
-        exit_status = FastlaneCore::FastlanePty.spawn(command) do |command_stdout, command_stdin, pid|
+        exit_status = FastlaneCore::FastlanePty.spawn(command, env: env) do |command_stdout, command_stdin, pid|
           begin
             command_stdout.each do |line|
               @all_lines << line
@@ -253,7 +265,8 @@ module FastlaneCore
 
     attr_reader :errors
 
-    def execute(command, hide_output)
+    # @param env [Hash] environment for the command, such as the password it reads with -p @env:
+    def execute(command, hide_output, env: {})
       if Helper.test?
         yield(nil) if block_given?
         return command
@@ -269,7 +282,7 @@ module FastlaneCore
       end
 
       begin
-        exit_status = FastlaneCore::FastlanePty.spawn(command) do |command_stdout, command_stdin, pid|
+        exit_status = FastlaneCore::FastlanePty.spawn(command, env: env) do |command_stdout, command_stdin, pid|
           command_stdout.each do |line|
             @all_lines << line
             parse_line(line, hide_output) # this is where the parsing happens
@@ -299,7 +312,8 @@ module FastlaneCore
 
     def build_credential_params(username = nil, password = nil, jwt = nil, api_key = nil)
       if !username.nil? && !password.nil? && api_key.nil?
-        "-u #{username.shellescape} -p #{password.shellescape}"
+        # The password itself comes from the environment, see ItunesTransporter#password_environment
+        "-u #{username.shellescape} -p @env:ITMS_TRANSPORTER_PASSWORD"
       elsif !api_key.nil?
         # Individual API keys have no issuer_id; altool requires --apiIssuer
         # to be present, so we pass the key_id as a placeholder and add
@@ -568,7 +582,6 @@ module FastlaneCore
       credential_params = build_credential_params(username, password, jwt, api_key, is_default_itms_on_xcode_11?)
       if is_default_itms_on_xcode_11?
         [
-          ("ITMS_TRANSPORTER_PASSWORD=#{password.shellescape}" if jwt.to_s.empty?),
           'xcrun iTMSTransporter',
           '-m upload',
           credential_params,
@@ -606,7 +619,6 @@ module FastlaneCore
       credential_params = build_credential_params(username, password, jwt, nil, is_default_itms_on_xcode_11?)
       if is_default_itms_on_xcode_11?
         [
-          ("ITMS_TRANSPORTER_PASSWORD=#{password.shellescape}" if jwt.to_s.empty?),
           'xcrun iTMSTransporter',
           '-m verify',
           credential_params,
@@ -638,7 +650,6 @@ module FastlaneCore
       credential_params = build_credential_params(username, password, jwt, nil, is_default_itms_on_xcode_11?)
       if is_default_itms_on_xcode_11?
         [
-          ("ITMS_TRANSPORTER_PASSWORD=#{password.shellescape}" if jwt.to_s.empty?),
           'xcrun iTMSTransporter',
           '-m lookupMetadata',
           credential_params,
@@ -672,7 +683,6 @@ module FastlaneCore
       credential_params = build_credential_params(username, password, jwt, api_key, is_default_itms_on_xcode_11?)
       if is_default_itms_on_xcode_11?
         [
-          ("ITMS_TRANSPORTER_PASSWORD=#{password.shellescape}" if jwt.to_s.empty?),
           'xcrun iTMSTransporter',
           '-m provider',
           credential_params,
@@ -697,11 +707,11 @@ module FastlaneCore
     end
 
     def is_default_itms_on_xcode_11?
-      !Helper.user_defined_itms_path? && Helper.mac? && Helper.xcode_at_least?(11)
+      !Helper.user_defined_itms_path? && Helper.mac?
     end
 
     def java_code_option
-      if Helper.mac? && Helper.xcode_at_least?(9)
+      if Helper.mac?
         return "-jar #{Helper.transporter_java_jar_path.shellescape}"
       else
         return "-classpath #{Helper.transporter_java_jar_path.shellescape} com.apple.transporter.Application"
@@ -711,17 +721,15 @@ module FastlaneCore
     def handle_error(password)
       unless File.exist?(Helper.transporter_java_jar_path)
         UI.error("The iTMSTransporter Java app was not found at '#{Helper.transporter_java_jar_path}'.")
-        UI.error("If you're using Xcode 6, please select the shell script executor by setting the environment variable "\
-          "FASTLANE_ITUNES_TRANSPORTER_USE_SHELL_SCRIPT=1")
       end
     end
 
-    def execute(command, hide_output)
+    def execute(command, hide_output, env: {})
       # The Java command needs to be run starting in a working directory in the iTMSTransporter
       # file area. The shell script takes care of changing directories over to there, but we'll
       # handle it manually here for this strategy.
       FileUtils.cd(Helper.itms_path) do
-        return super(command, hide_output)
+        return super(command, hide_output, env: env)
       end
     end
   end
@@ -752,11 +760,10 @@ module FastlaneCore
     #                            short names
     # @param provider_public_id The provider public ID to be given to altool via --provider-public-id.
     def initialize(user = nil, password = nil, use_shell_script = false, provider_short_name = nil, jwt = nil, altool_compatible_command: false, api_key: nil, provider_public_id: nil)
-      # Xcode 6.x doesn't have the same iTMSTransporter Java setup as later Xcode versions, so
-      # we can't default to using the newer direct Java invocation strategy for those versions.
-      use_shell_script ||= Helper.is_mac? && Helper.xcode_version.start_with?('6.')
       use_shell_script ||= Helper.windows?
       use_shell_script ||= Feature.enabled?('FASTLANE_ITUNES_TRANSPORTER_USE_SHELL_SCRIPT')
+      # Transporter 2.0 and later bundles a Java that refuses the direct Java invocation; its own launcher works. See #15323.
+      use_shell_script ||= Helper.user_defined_itms_path?
 
       if jwt.to_s.empty? && api_key.nil?
         @user = user
@@ -796,7 +803,7 @@ module FastlaneCore
       UI.verbose(@transporter_executor.build_download_command(@user, password_placeholder, app_id, dir, @provider_short_name, jwt_placeholder))
 
       begin
-        result = @transporter_executor.execute(command, ItunesTransporter.hide_transporter_output?)
+        result = @transporter_executor.execute(command, ItunesTransporter.hide_transporter_output?, env: password_environment)
       rescue TransporterRequiresApplicationSpecificPasswordError => ex
         handle_two_step_failure(ex)
         return download(app_id, dir)
@@ -863,13 +870,13 @@ module FastlaneCore
       UI.verbose(@transporter_executor.build_upload_command(@user, password_placeholder, actual_dir, upload_options_placeholder))
 
       begin
-        result = @transporter_executor.execute(command, ItunesTransporter.hide_transporter_output?)
+        result = @transporter_executor.execute(command, ItunesTransporter.hide_transporter_output?, env: password_environment)
       rescue TransporterRequiresApplicationSpecificPasswordError => ex
         handle_two_step_failure(ex)
         return upload(app_id, dir, package_path: package_path, asset_path: asset_path)
       ensure
         if use_api_key
-          FileUtils.rm_rf(api_key[:key_dir]) unless api_key.nil?
+          @transporter_executor.cleanup(api_key)
         end
       end
 
@@ -924,7 +931,7 @@ module FastlaneCore
       UI.verbose(@transporter_executor.build_verify_command(@user, password_placeholder, actual_dir, verify_options_placeholder))
 
       begin
-        result = @transporter_executor.execute(command, ItunesTransporter.hide_transporter_output?)
+        result = @transporter_executor.execute(command, ItunesTransporter.hide_transporter_output?, env: password_environment)
       rescue TransporterRequiresApplicationSpecificPasswordError => ex
         handle_two_step_failure(ex)
         return verify(app_id, dir, package_path: package_path)
@@ -960,14 +967,14 @@ module FastlaneCore
 
       lines = []
       begin
-        result = @transporter_executor.execute(command, ItunesTransporter.hide_transporter_output?) { |xs| lines = xs }
+        result = @transporter_executor.execute(command, ItunesTransporter.hide_transporter_output?, env: password_environment) { |xs| lines = xs }
         return result if Helper.test?
       rescue TransporterRequiresApplicationSpecificPasswordError => ex
         handle_two_step_failure(ex)
         return provider_ids
       ensure
         if use_api_key
-          FileUtils.rm_rf(api_key[:key_dir]) unless api_key.nil?
+          @transporter_executor.cleanup(api_key)
         end
       end
 
@@ -978,10 +985,17 @@ module FastlaneCore
 
     TWO_FACTOR_ENV_VARIABLE = "FASTLANE_APPLE_APPLICATION_SPECIFIC_PASSWORD"
 
+    # The password goes to the transporter in its environment, which altool and xcrun iTMSTransporter read through
+    # -p @env:ITMS_TRANSPORTER_PASSWORD, rather than on their command line
+    def password_environment
+      return {} if @password.to_s.empty?
+      { "ITMS_TRANSPORTER_PASSWORD" => @password }
+    end
+
     # Returns whether altool should be used or ItunesTransporter should be used
     def should_use_altool?(altool_compatible_command, use_shell_script)
       # Xcode 14 no longer supports iTMSTransporter. Use altool instead
-      !use_shell_script && altool_compatible_command && !Helper.user_defined_itms_path? && Helper.mac? && Helper.xcode_at_least?(14)
+      !use_shell_script && altool_compatible_command && !Helper.user_defined_itms_path? && Helper.mac?
     end
 
     # Returns the password to be used with the transporter

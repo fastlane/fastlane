@@ -8,9 +8,11 @@ Gem::Specification.new do |spec|
   spec.version     = '1.0.0'
   spec.authors     = ["fastlane team"]
 
-  spec.required_ruby_version = '>= 3.2'
+  spec.required_ruby_version = '>= 3.3'
 
   spec.summary = "fake gem for fastlane tests"
+
+  spec.files = Dir.glob("fastlane/**/*", File::FNM_DOTMATCH)
 
   spec.add_dependency('fastlane')
   spec.add_dependency('fastlane-plugin-shared_fixture')

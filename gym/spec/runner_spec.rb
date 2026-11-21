@@ -19,5 +19,20 @@ describe Gym::Runner do
         expect(`unzip -Z1 #{zip_path.shellescape}`.lines.map(&:chomp)).to include("Kaldi's Kafe.app.dSYM/Contents/Info.plist")
       end
     end
+
+    it "fails when zip cannot write the archive" do
+      Dir.mktmpdir do |tmp|
+        dsym_path = File.join(tmp, "App.xcarchive", "dSYMs", "App.app.dSYM")
+        FileUtils.mkdir_p(File.join(dsym_path, "Contents"))
+        File.write(File.join(dsym_path, "Contents", "Info.plist"), "")
+
+        allow(Gym::PackageCommandGenerator).to receive(:dsym_path).and_return(dsym_path)
+        allow(Gym).to receive(:config).and_return({ output_directory: File.join(tmp, "missing"), output_name: "App", silent: true })
+
+        expect do
+          Gym::Runner.new.send(:compress_and_move_dsym)
+        end.to raise_error(FastlaneCore::Interface::FastlaneError, /Could not compress the dSYM/)
+      end
+    end
   end
 end

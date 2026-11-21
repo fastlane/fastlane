@@ -2,6 +2,16 @@ require_relative '../module'
 
 module Match
   module Storage
+    # Where a file named `remote_name` by the storage is written in `working_directory`.
+    # Fails when the name would place it outside, e.g. with `..` segments.
+    def self.download_path(working_directory, remote_name)
+      root = File.expand_path(working_directory)
+      path = File.expand_path(File.join(root, remote_name))
+      return path if path.start_with?(root + File::SEPARATOR)
+
+      UI.user_error!("Refusing to download #{remote_name.inspect}: it would be written outside #{root}")
+    end
+
     class Interface
       MATCH_VERSION_FILE_NAME = "match_version.txt"
       # The working directory in which we download all the profiles

@@ -5,6 +5,7 @@ module Fastlane
         require 'tmpdir'
 
         find_binary_path(params)
+        find_dsym_path(params)
         unless params[:app_id]
           find_gsp_path(params)
           find_api_token(params)
@@ -127,6 +128,11 @@ module Fastlane
         params[:binary_path] = File.expand_path(params[:binary_path])
       end
 
+      # Searched when the action runs rather than as the option's default, which is computed whenever the options are built
+      def self.find_dsym_path(params)
+        params[:dsym_path] ||= (Dir["./**/*.dSYM"] + Dir["./**/*.dSYM.zip"]).sort_by { |f| File.mtime(f) }.last
+      end
+
       #####################################################
       # @!group Documentation
       #####################################################
@@ -146,8 +152,8 @@ module Fastlane
         [
           FastlaneCore::ConfigItem.new(key: :dsym_path,
                                        env_name: "FL_UPLOAD_SYMBOLS_TO_CRASHLYTICS_DSYM_PATH",
-                                       description: "Path to the DSYM file or zip to upload",
-                                       default_value: ENV[SharedValues::DSYM_OUTPUT_PATH.to_s] || (Dir["./**/*.dSYM"] + Dir["./**/*.dSYM.zip"]).sort_by { |f| File.mtime(f) }.last,
+                                       description: "Path to the DSYM file or zip to upload. Defaults to the dSYM of the last build_app, or else the most recent .dSYM or .dSYM.zip under the current directory",
+                                       default_value: ENV[SharedValues::DSYM_OUTPUT_PATH.to_s],
                                        default_value_dynamic: true,
                                        optional: true,
                                        verify_block: proc do |value|

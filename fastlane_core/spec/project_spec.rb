@@ -70,6 +70,7 @@ describe FastlaneCore do
           workspaces = ['./Something.xcworkspace', './SomethingElse.xcworkspace']
           FileUtils.mkdir_p(workspaces)
 
+          allow(FastlaneCore::Helper).to receive(:can_prompt?).and_return(true)
           expect(FastlaneCore::Project).to receive(:choose).and_return(workspaces.last)
           expect(FastlaneCore::Project).not_to(receive(:select_project))
 
@@ -85,6 +86,7 @@ describe FastlaneCore do
           projects = ['./Something.xcodeproj', './SomethingElse.xcodeproj']
           FileUtils.mkdir_p(projects)
 
+          allow(FastlaneCore::Helper).to receive(:can_prompt?).and_return(true)
           expect(FastlaneCore::Project).to receive(:choose).and_return(projects.last)
           expect(FastlaneCore::Project).not_to(receive(:select_project))
 
@@ -92,6 +94,28 @@ describe FastlaneCore do
           FastlaneCore::Project.detect_projects(config)
 
           expect(config[:project]).to eq(projects.last)
+        end
+      end
+
+      it "stops when it cannot ask which of multiple workspaces to use" do
+        within_a_temp_dir do |dir|
+          FileUtils.mkdir_p(["./Something.xcworkspace", "./SomethingElse.xcworkspace"])
+          allow(FastlaneCore::Helper).to receive(:can_prompt?).and_return(false)
+          expect(FastlaneCore::Project).not_to(receive(:choose))
+
+          config = FastlaneCore::Configuration.new(options, {})
+          expect { FastlaneCore::Project.detect_projects(config) }.to raise_error(FastlaneCore::Interface::FastlaneError, "Found 2 workspaces: pass one with the `workspace` option")
+        end
+      end
+
+      it "stops when it cannot ask which of multiple projects to use" do
+        within_a_temp_dir do |dir|
+          FileUtils.mkdir_p(["./Something.xcodeproj", "./SomethingElse.xcodeproj"])
+          allow(FastlaneCore::Helper).to receive(:can_prompt?).and_return(false)
+          expect(FastlaneCore::Project).not_to(receive(:choose))
+
+          config = FastlaneCore::Configuration.new(options, {})
+          expect { FastlaneCore::Project.detect_projects(config) }.to raise_error(FastlaneCore::Interface::FastlaneError, "Found 2 projects: pass one with the `project` option")
         end
       end
 
@@ -166,7 +190,7 @@ describe FastlaneCore do
     end
 
     describe "Valid Standard Project" do
-      before do
+      before(:all) do
         options = { project: "./fastlane_core/spec/fixtures/projects/Example.xcodeproj" }
         @project = FastlaneCore::Project.new(options)
       end
@@ -239,7 +263,7 @@ describe FastlaneCore do
     end
 
     describe "Mac Project" do
-      before do
+      before(:all) do
         options = { project: "./fastlane_core/spec/fixtures/projects/Mac.xcodeproj" }
         @project = FastlaneCore::Project.new(options)
       end
@@ -266,7 +290,7 @@ describe FastlaneCore do
     end
 
     describe "TVOS Project" do
-      before do
+      before(:all) do
         options = { project: "./fastlane_core/spec/fixtures/projects/ExampleTVOS.xcodeproj" }
         @project = FastlaneCore::Project.new(options)
       end
@@ -293,7 +317,7 @@ describe FastlaneCore do
     end
 
     describe "Cross-Platform Project" do
-      before do
+      before(:all) do
         options = { project: "./fastlane_core/spec/fixtures/projects/Cross-Platform.xcodeproj" }
         @project = FastlaneCore::Project.new(options)
       end
@@ -341,32 +365,37 @@ describe FastlaneCore do
       end
     end
 
-    describe "build_settings() can handle empty lines" do
-      it "SUPPORTED_PLATFORMS should be iphonesimulator iphoneos on Xcode >= 8.3" do
-        options = { project: "./fastlane_core/spec/fixtures/projects/Example.xcodeproj" }
-        @project = FastlaneCore::Project.new(options)
-        allow(FastlaneCore::Helper).to receive(:xcode_at_least?).with("11.0").and_return(false)
-        allow(FastlaneCore::Helper).to receive(:xcode_at_least?).with("13").and_return(false)
-        expect(FastlaneCore::Helper).to receive(:xcode_at_least?).with("8.3").and_return(true)
-        command = "xcodebuild -showBuildSettings -project ./fastlane_core/spec/fixtures/projects/Example.xcodeproj 2>&1"
-        expect(FastlaneCore::Project).to receive(:run_command).with(command, { timeout: 3, retries: 3, print: true }).and_return(File.read("./fastlane_core/spec/fixtures/projects/build_settings_with_toolchains"))
-        expect(@project.build_settings(key: "SUPPORTED_PLATFORMS")).to eq("iphonesimulator iphoneos")
+    describe "#select_scheme with several schemes" do
+      let(:workspace) { FastlaneCore::Project.new({ workspace: "./fastlane_core/spec/fixtures/projects/workspace_schemes/WorkspaceSchemes.xcworkspace" }) }
+
+      it "stops when it cannot ask which one to use" do
+        allow(FastlaneCore::Helper).to receive(:can_prompt?).and_return(false)
+        allow(FastlaneCore::UI).to receive(:error)
+        expect(workspace).not_to(receive(:choose))
+        expect { workspace.select_scheme }.to raise_error(FastlaneCore::Interface::FastlaneError, "Multiple schemes found")
       end
 
-      it "SUPPORTED_PLATFORMS should be iphonesimulator iphoneos on Xcode < 8.3" do
+      it "asks which one to use when it can" do
+        allow(FastlaneCore::Helper).to receive(:can_prompt?).and_return(true)
+        expect(workspace).to receive(:choose).with("WorkspaceSchemesFramework", "WorkspaceSchemesApp", "WorkspaceSchemesScheme").and_return("WorkspaceSchemesApp")
+        workspace.select_scheme
+        expect(workspace.options[:scheme]).to eq("WorkspaceSchemesApp")
+      end
+    end
+
+    describe "build_settings() can handle empty lines" do
+      it "SUPPORTED_PLATFORMS should be iphonesimulator iphoneos" do
         options = { project: "./fastlane_core/spec/fixtures/projects/Example.xcodeproj" }
         @project = FastlaneCore::Project.new(options)
-        allow(FastlaneCore::Helper).to receive(:xcode_at_least?).with("11.0").and_return(false)
-        allow(FastlaneCore::Helper).to receive(:xcode_at_least?).with("13").and_return(false)
-        expect(FastlaneCore::Helper).to receive(:xcode_at_least?).with("8.3").and_return(false)
-        command = "xcodebuild clean -showBuildSettings -project ./fastlane_core/spec/fixtures/projects/Example.xcodeproj 2>&1"
+        allow(FastlaneCore::CommandExecutor).to receive(:execute).with(hash_including(command: /^xcodebuild -resolvePackageDependencies /))
+        command = "xcodebuild -showBuildSettings -project ./fastlane_core/spec/fixtures/projects/Example.xcodeproj 2>&1"
         expect(FastlaneCore::Project).to receive(:run_command).with(command, { timeout: 3, retries: 3, print: true }).and_return(File.read("./fastlane_core/spec/fixtures/projects/build_settings_with_toolchains"))
         expect(@project.build_settings(key: "SUPPORTED_PLATFORMS")).to eq("iphonesimulator iphoneos")
       end
     end
 
     describe "Build Settings with default configuration" do
-      before do
+      before(:all) do
         options = { project: "./fastlane_core/spec/fixtures/projects/Example.xcodeproj" }
         @project = FastlaneCore::Project.new(options)
       end
@@ -381,7 +410,7 @@ describe FastlaneCore do
     end
 
     describe "Build Settings with specific configuration" do
-      before do
+      before(:all) do
         options = {
           project: "./fastlane_core/spec/fixtures/projects/Example.xcodeproj",
           configuration: "SpecialConfiguration"
@@ -452,53 +481,6 @@ describe FastlaneCore do
       end
     end
 
-    describe "Project.run_command" do
-      def count_processes(text)
-        `ps -aef | grep #{text} | grep -v grep | wc -l`.to_i
-      end
-
-      it "runs simple commands" do
-        cmd = 'echo HO' # note: this command is deliberately not using `"` around `HO` as `echo` would echo those back on Windows
-        expect(FastlaneCore::Project.run_command(cmd)).to eq("HO\n")
-      end
-
-      it "runs more complicated commands" do
-        cmd = "ruby -e 'sleep 0.1; puts \"HI\"'"
-        expect(FastlaneCore::Project.run_command(cmd)).to eq("HI\n")
-      end
-
-      it "should timeouts and kills" do
-        text = "FOOBAR" # random text
-        count = count_processes(text)
-        cmd = "ruby -e 'sleep 3; puts \"#{text}\"'"
-        expect do
-          FastlaneCore::Project.run_command(cmd, timeout: 1)
-        end.to raise_error(Timeout::Error)
-
-        # on mac this before only partially works as expected
-        if FastlaneCore::Helper.mac?
-          # this shows the current implementation issue
-          # Timeout doesn't kill the running process
-          # i.e. see fastlane/fastlane_core#102
-          expect(count_processes(text)).to eq(count + 1)
-          sleep(5)
-          expect(count_processes(text)).to eq(count)
-          # you would be expected to be able to see the number of processes go back to count right away.
-        end
-      end
-
-      it "retries and kills" do
-        text = "NEEDSRETRY"
-        cmd = "ruby -e 'sleep 3; puts \"#{text}\"'"
-
-        expect(FastlaneCore::Project).to receive(:`).and_call_original.exactly(4).times
-
-        expect do
-          FastlaneCore::Project.run_command(cmd, timeout: 0.2, retries: 3)
-        end.to raise_error(Timeout::Error)
-      end
-    end
-
     describe "xcodebuild derived_data_path" do
       it 'generates an xcodebuild -showBuildSettings command that includes derived_data_path if provided in options', requires_xcode: true do
         project = FastlaneCore::Project.new({
@@ -512,7 +494,6 @@ describe FastlaneCore do
 
     describe "xcodebuild disable_package_automatic_updates" do
       it 'generates xcodebuild -showBuildSettings command with disabled automatic package resolution' do
-        allow(FastlaneCore::Helper).to receive(:xcode_at_least?).and_return(true)
         project = FastlaneCore::Project.new({
           project: "./fastlane_core/spec/fixtures/projects/Example.xcodeproj",
           disable_package_automatic_updates: true
@@ -524,7 +505,6 @@ describe FastlaneCore do
 
     describe "xcodebuild skip_package_repository_fetches" do
       it 'generates xcodebuild -showBuildSettings command with disabled package fetches' do
-        allow(FastlaneCore::Helper).to receive(:xcode_at_least?).and_return(true)
         project = FastlaneCore::Project.new({
           project: "./fastlane_core/spec/fixtures/projects/Example.xcodeproj",
           skip_package_repository_fetches: true
@@ -592,14 +572,12 @@ describe FastlaneCore do
 
     describe 'xcodebuild command for SwiftPM', requires_xcode: true do
       it 'generates an xcodebuild -resolvePackageDependencies command with Xcode >= 11' do
-        allow(FastlaneCore::Helper).to receive(:xcode_at_least?).and_return(true)
         project = FastlaneCore::Project.new({ project: "./fastlane_core/spec/fixtures/projects/Example.xcodeproj" })
         command = "xcodebuild -resolvePackageDependencies -project ./fastlane_core/spec/fixtures/projects/Example.xcodeproj"
         expect(project.build_xcodebuild_resolvepackagedependencies_command).to eq(command)
       end
 
       it 'generates an xcodebuild -resolvePackageDependencies command with custom resolving paths with Xcode >= 11' do
-        allow(FastlaneCore::Helper).to receive(:xcode_at_least?).and_return(true)
         project = FastlaneCore::Project.new({
           project: "./fastlane_core/spec/fixtures/projects/Example.xcodeproj",
           cloned_source_packages_path: "./path/to/cloned_source_packages",
@@ -610,24 +588,11 @@ describe FastlaneCore do
       end
 
       it 'generates nil if skip_package_dependencies_resolution is true' do
-        allow(FastlaneCore::Helper).to receive(:xcode_at_least?).and_return(true)
         project = FastlaneCore::Project.new({
           project: "./fastlane_core/spec/fixtures/projects/Example.xcodeproj",
           skip_package_dependencies_resolution: true
         })
         expect(project.build_xcodebuild_resolvepackagedependencies_command).to be_nil
-      end
-
-      it 'build_settings() should not add SPM path if Xcode < 11' do
-        allow(FastlaneCore::Helper).to receive(:xcode_at_least?).with("8.3").and_return(true)
-        expect(FastlaneCore::Helper).to receive(:xcode_at_least?).with("11.0").and_return(false)
-        expect(FastlaneCore::Helper).to receive(:xcode_at_least?).with("13").and_return(false)
-        project = FastlaneCore::Project.new({
-          project: "./fastlane_core/spec/fixtures/projects/Example.xcodeproj",
-          cloned_source_packages_path: "./path/to/resolve"
-        })
-        command = "xcodebuild -showBuildSettings -project ./fastlane_core/spec/fixtures/projects/Example.xcodeproj 2>&1"
-        expect(project.build_xcodebuild_showbuildsettings_command).to eq(command)
       end
 
       it 'generates even if given options do not support skip_package_dependencies_resolution' do
@@ -687,7 +652,6 @@ describe FastlaneCore do
       end
 
       it 'fetches build settings when the option is false' do
-        allow(FastlaneCore::Helper).to receive(:xcode_at_least?).and_return(true)
         project = FastlaneCore::Project.new({
           project: "./fastlane_core/spec/fixtures/projects/Example.xcodeproj",
           disallow_xcodebuild_settings_lookup: false
@@ -700,7 +664,6 @@ describe FastlaneCore do
       end
 
       it 'fetches build settings when the given options do not support disallow_xcodebuild_settings_lookup' do
-        allow(FastlaneCore::Helper).to receive(:xcode_at_least?).and_return(true)
         config = FastlaneCore::Configuration.create(
           [
             FastlaneCore::ConfigItem.new(key: :workspace, optional: true),
@@ -720,12 +683,6 @@ describe FastlaneCore do
 
     describe "xcodebuild destination parameter" do
       context "when xcode version is at_least 13" do
-        before(:each) do
-          allow(FastlaneCore::Helper).to receive(:xcode_at_least?).with("8.3").and_return(true)
-          allow(FastlaneCore::Helper).to receive(:xcode_at_least?).with("11.0").and_return(true)
-          allow(FastlaneCore::Helper).to receive(:xcode_at_least?).with("13").and_return(true)
-        end
-
         context "when destination parameter is provided in options" do
           it 'generates an xcodebuild -showBuildSettings command that includes destination', requires_xcode: true do
             project = FastlaneCore::Project.new({
@@ -764,52 +721,6 @@ describe FastlaneCore do
               })
             destination = "platform=iOS Simulator,id=ABC123".shellescape
             command = "xcodebuild -resolvePackageDependencies -project ./fastlane_core/spec/fixtures/projects/Example.xcodeproj -destination #{destination}"
-            expect(project.build_xcodebuild_resolvepackagedependencies_command).to eq(command)
-          end
-        end
-
-        context "when destination parameter is not provided in options" do
-          it 'generates an xcodebuild -showBuildSettings command that does not include destination', requires_xcode: true do
-            project = FastlaneCore::Project.new({
-              project: "./fastlane_core/spec/fixtures/projects/Example.xcodeproj"
-            })
-            command = "xcodebuild -showBuildSettings -project ./fastlane_core/spec/fixtures/projects/Example.xcodeproj 2>&1"
-            expect(project.build_xcodebuild_showbuildsettings_command).to eq(command)
-          end
-
-          it 'generates an xcodebuild -resolvePackageDependencies command that does not include destination' do
-            project = FastlaneCore::Project.new({
-              project: "./fastlane_core/spec/fixtures/projects/Example.xcodeproj"
-              })
-            command = "xcodebuild -resolvePackageDependencies -project ./fastlane_core/spec/fixtures/projects/Example.xcodeproj"
-            expect(project.build_xcodebuild_resolvepackagedependencies_command).to eq(command)
-          end
-        end
-      end
-
-      context "when xcode version is less than 13" do
-        before(:each) do
-          allow(FastlaneCore::Helper).to receive(:xcode_at_least?).with("8.3").and_return(true)
-          allow(FastlaneCore::Helper).to receive(:xcode_at_least?).with("11.0").and_return(true)
-          allow(FastlaneCore::Helper).to receive(:xcode_at_least?).with("13").and_return(false)
-        end
-
-        context "when destination parameter is provided in options" do
-          it 'generates an xcodebuild -showBuildSettings command that does not include destination', requires_xcode: true do
-            project = FastlaneCore::Project.new({
-              project: "./fastlane_core/spec/fixtures/projects/Example.xcodeproj",
-              destination: "FakeDestination"
-            })
-            command = "xcodebuild -showBuildSettings -project ./fastlane_core/spec/fixtures/projects/Example.xcodeproj 2>&1"
-            expect(project.build_xcodebuild_showbuildsettings_command).to eq(command)
-          end
-
-          it 'generates an xcodebuild -resolvePackageDependencies command that does not include destination' do
-            project = FastlaneCore::Project.new({
-              project: "./fastlane_core/spec/fixtures/projects/Example.xcodeproj",
-              destination: "FakeDestination"
-              })
-            command = "xcodebuild -resolvePackageDependencies -project ./fastlane_core/spec/fixtures/projects/Example.xcodeproj"
             expect(project.build_xcodebuild_resolvepackagedependencies_command).to eq(command)
           end
         end

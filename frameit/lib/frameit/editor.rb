@@ -31,7 +31,7 @@ module Frameit
       if @frame_path # Mac doesn't need a frame
         self.frame = MiniMagick::Image.open(@frame_path)
         # Rotate the frame according to the device orientation
-        self.frame.rotate(self.rotation_for_device_orientation)
+        rotate_image(self.frame, self.rotation_for_device_orientation)
       elsif self.class == Editor
         # Couldn't find device frame (probably an iPhone 4, for which there are no images available any more)
         # Message is already shown elsewhere
@@ -86,8 +86,20 @@ module Frameit
       # only. Instead of doing the calculations ourselves, it's much easier to let
       # imagemagick do the hard lifting for landscape screenshots
       rotation = self.rotation_for_device_orientation
-      frame.rotate(-rotation)
-      @image.rotate(-rotation)
+      rotate_image(frame, -rotation)
+      rotate_image(@image, -rotation)
+
+      # Optional screen masks preserve asymmetric corners and camera cutouts.
+      # A portrait mask is applied after normalizing the screenshot orientation.
+      if offset['mask']
+        mask_path = File.join(FrameDownloader.templates_path, offset['mask'])
+        UI.user_error!("Could not find screen mask '#{mask_path}'") unless File.file?(mask_path)
+        mask = MiniMagick::Image.open(mask_path)
+        mask.resize("#{image.width}x#{image.height}!")
+        @image = image.composite(mask, "png") do |c|
+          c.compose("CopyOpacity")
+        end
+      end
 
       # Debug Mode: Add filename to frame
       if self.debug_mode
@@ -135,8 +147,14 @@ module Frameit
       end
 
       # Revert the rotation from above
-      frame.rotate(rotation)
-      @image.rotate(rotation)
+      rotate_image(frame, rotation)
+      rotate_image(@image, rotation)
+    end
+
+    # Portrait screenshots need no rotation. ImageMagick would still decode and
+    # re-encode the whole image to rotate it by 0 degrees, so skip that pass.
+    def rotate_image(image, degrees)
+      image.rotate(degrees) unless degrees.zero?
     end
 
     def offset
@@ -283,8 +301,10 @@ module Frameit
       left_space = (background.width / 2.0 - image.width / 2.0).round
 
       @image = background.composite(image, "png") do |c|
-        colorspace = image.data["colorspace"]
-        c.colorspace(colorspace) if colorspace
+        # Ask for the colorspace alone: `image.data` makes ImageMagick compute
+        # statistics over every pixel to print them all as JSON
+        colorspace = image["%[colorspace]"]
+        c.colorspace(colorspace) unless colorspace.to_s.empty?
 
         c.compose("Over")
         c.geometry("+#{left_space}+#{device_top(background)}")
@@ -431,10 +451,6 @@ module Frameit
         empty_path = File.join(Frameit::ROOT, "lib/assets/empty.png")
         text_image = MiniMagick::Image.open(empty_path)
         image_height = max_height # gets trimmed afterwards anyway, and on the iPad the `y` would get cut
-        text_image.combine_options do |i|
-          # Oversize as the text might be larger than the actual image. We're trimming afterwards anyway
-          i.resize("#{max_width * 5.0}x#{image_height}!") # `!` says it should ignore the ratio
-        end
 
         current_font = font(key)
         text = fetch_text(key)
@@ -446,8 +462,11 @@ module Frameit
 
         interline_spacing = @config['interline_spacing']
 
-        # Add the actual title
+        # Size the canvas and add the actual title in a single pass, as every
+        # pass reads and writes the whole oversized canvas
         text_image.combine_options do |i|
+          # Oversize as the text might be larger than the actual image. We're trimming afterwards anyway
+          i.resize("#{max_width * 5.0}x#{image_height}!") # `!` says it should ignore the ratio
           i.font(current_font) if current_font
           i.weight(@config[key.to_s]['font_weight']) if @config[key.to_s]['font_weight']
           i.gravity("Center")

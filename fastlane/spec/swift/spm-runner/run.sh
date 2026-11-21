@@ -8,6 +8,8 @@ repository=$(cd "$here/../../../.." && pwd)
 work=$(mktemp -d)
 # Reuse the gems installed for this repository, then drop what `bundle exec` exported: the runner must find the project's Gemfile itself
 bundle_path=$(cd "$repository" && bundle config get path --parseable 2>/dev/null | sed -n 's/^path=//p')
+# A relative path (vendor/bundle) would be read from the temporary project, which has no gems
+case $bundle_path in /*) ;; ?*) bundle_path="$repository/$bundle_path" ;; esac
 [ -n "$bundle_path" ] && export BUNDLE_PATH="$bundle_path"
 unset BUNDLE_GEMFILE BUNDLE_BIN_PATH BUNDLER_SETUP BUNDLER_VERSION RUBYOPT RUBYLIB
 trap 'rm -rf "$work"' EXIT
@@ -42,7 +44,13 @@ scenario() {
     result="no lane, exit $status"
   fi
   case "$expected:$result" in
-    bundler:bundler=set | stopped:stopped) echo "PASS  $name: $result" ;;
+    bundler:bundler=set)
+      if grep -q "No --token_file given" "$work/run.log"; then
+        echo "FAIL  $name: socket_server ran without a token"; failures=$((failures + 1))
+      else
+        echo "PASS  $name: $result, token required"
+      fi ;;
+    stopped:stopped) echo "PASS  $name: $result" ;;
     *) echo "FAIL  $name: $result, expected $expected"; sed 's/^/      /' "$work/run.log"; failures=$((failures + 1)) ;;
   esac
 }

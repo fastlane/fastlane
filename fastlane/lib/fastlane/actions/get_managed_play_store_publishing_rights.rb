@@ -3,6 +3,7 @@ module Fastlane
     class GetManagedPlayStorePublishingRightsAction < Action
       def self.run(params)
         unless params[:json_key] || params[:json_key_data]
+          UI.user_error!("Pass :json_key or :json_key_data") unless UI.interactive?
           UI.important("To not be asked about this value, you can specify it using 'json_key'")
           json_key_path = UI.input("The service account json file used to authenticate with Google: ")
           json_key_path = File.expand_path(json_key_path)

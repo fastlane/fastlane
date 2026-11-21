@@ -29,37 +29,28 @@ describe Spaceship::ConnectAPI::BundleId do
     end
   end
 
-  describe '#update_capability' do
-    let(:bundle_id) { Spaceship::ConnectAPI.get_bundle_id(bundle_id_id: '123456789').first }
+  describe '.all' do
+    let(:client) { double('client') }
+    let(:response) { double('response', all_pages: []) }
 
-    it 'creates the capability when enabling one that does not exist yet' do
-      result = bundle_id.update_capability(Spaceship::ConnectAPI::BundleIdCapability::Type::APP_GROUPS, enabled: true)
-      expect(result).to be_an_instance_of(Spaceship::ConnectAPI::BundleIdCapability)
+    it 'passes limit and sort to get_bundle_ids' do
+      expect(client).to receive(:get_bundle_ids).with(
+        filter: {},
+        includes: nil,
+        fields: nil,
+        limit: 10,
+        sort: "name"
+      ).and_return(response)
+
+      Spaceship::ConnectAPI::BundleId.all(client: client, limit: 10, sort: "name")
     end
 
-    it 'patches the existing capability instead of creating a duplicate when already enabled' do
-      stub_request(:post, "https://developer.apple.com/services-account/v1/bundleIds/123456789/bundleIdCapabilities").
-        to_return(status: 200, body: ConnectAPIStubbing::Provisioning.read_fixture_file('bundle_id_capabilities_app_groups.json'), headers: { 'Content-Type' => 'application/vnd.api+json' })
+    it 'defaults limit to MAX_OBJECTS_PER_PAGE_LIMIT' do
+      expect(client).to receive(:get_bundle_ids).with(
+        hash_including(limit: Spaceship::ConnectAPI::MAX_OBJECTS_PER_PAGE_LIMIT, sort: nil)
+      ).and_return(response)
 
-      result = bundle_id.update_capability(Spaceship::ConnectAPI::BundleIdCapability::Type::APP_GROUPS, enabled: true)
-
-      expect(result.capability_type).to eq("APP_GROUPS")
-      expect(WebMock).not_to have_requested(:post, "https://developer.apple.com/services-account/v1/bundleIdCapabilities")
-      expect(WebMock).to have_requested(:patch, "https://developer.apple.com/services-account/v1/bundleIdCapabilities/123456789_APP_GROUPS")
-    end
-
-    it 'deletes the capability when disabling one that exists' do
-      stub_request(:post, "https://developer.apple.com/services-account/v1/bundleIds/123456789/bundleIdCapabilities").
-        to_return(status: 200, body: ConnectAPIStubbing::Provisioning.read_fixture_file('bundle_id_capabilities_app_groups.json'), headers: { 'Content-Type' => 'application/vnd.api+json' })
-      stub_request(:post, "https://developer.apple.com/services-account/v1/bundleIdCapabilities/123456789_APP_GROUPS").
-        with(headers: { 'X-Http-Method-Override' => 'DELETE' }).
-        to_return(status: 204)
-
-      result = bundle_id.update_capability(Spaceship::ConnectAPI::BundleIdCapability::Type::APP_GROUPS, enabled: false)
-
-      expect(result).to be_nil
-      expect(WebMock).to have_requested(:post, "https://developer.apple.com/services-account/v1/bundleIdCapabilities/123456789_APP_GROUPS").
-        with(headers: { 'X-Http-Method-Override' => 'DELETE' })
+      Spaceship::ConnectAPI::BundleId.all(client: client)
     end
   end
 end

@@ -1,4 +1,8 @@
 describe Gym do
+  before do
+    fake_out_build_settings(GYM_BUILD_SETTINGS)
+  end
+
   before(:all) do
     options = { project: "./gym/examples/multipleSchemes/Example.xcodeproj" }
     @config = FastlaneCore::Configuration.create(Gym::Options.available_options, options)
@@ -16,6 +20,7 @@ describe Gym do
 
     def mock_gym_path(content)
       log_path = "log_path"
+      allow(File).to receive(:exist?).and_call_original
       expect(File).to receive(:exist?).with(log_path).and_return(true)
       allow(Gym::BuildCommandGenerator).to receive(:xcodebuild_log_path).and_return(log_path)
       expect(File).to receive(:read).with(log_path).and_return(content)

@@ -31,7 +31,8 @@ module Fastlane
       def self.value(key, target)
         command = ["pod", "keys", "get", key]
         command << target unless target.to_s.empty?
-        value = `#{command.shelljoin}`
+        # The value is a secret: run never prints the output unless asked, and keeps stderr out of it
+        value = FastlaneCore::CommandExecutor.run(*command, separate_stderr: true, print_command: false)
         value.split("]").last.strip
       end
 

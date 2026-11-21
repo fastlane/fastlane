@@ -135,6 +135,7 @@ module Fastlane
         if class_ref.respond_to?(:alias_used)
           orig_action = method_sym.to_s
           arguments = [{}] if arguments.empty?
+          arguments[0] = arguments.first.dup if arguments.first.kind_of?(String) # alias_used may change it, and it can be a literal from the Fastfile
           class_ref.alias_used(orig_action, arguments.first)
         end
       end
@@ -151,13 +152,10 @@ module Fastlane
         # built-in actions
       end
 
+      # Both lookups above only return classes that respond to `run`
       if class_ref
-        if class_ref.respond_to?(:run)
-          # Action is available, now execute it
-          return self.execute_action(method_sym, class_ref, arguments, custom_dir: custom_dir, from_action: from_action)
-        else
-          UI.user_error!("Action '#{method_sym}' of class '#{class_name}' was found, but has no `run` method.")
-        end
+        # Action is available, now execute it
+        return self.execute_action(method_sym, class_ref, arguments, custom_dir: custom_dir, from_action: from_action)
       end
 
       # No lane, no action, let's at least show the correct error message

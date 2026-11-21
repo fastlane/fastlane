@@ -18,6 +18,7 @@ module FastlaneCore
         if config[:workspace].to_s.length == 0
           workspace = Dir["./*.xcworkspace"]
           if workspace.count > 1
+            UI.user_error!("Found #{workspace.count} workspaces: pass one with the `workspace` option") unless Helper.can_prompt?
             puts("Select Workspace: ")
             config[:workspace] = choose(*workspace)
           elsif !workspace.first.nil?
@@ -30,6 +31,7 @@ module FastlaneCore
         if config[:workspace].to_s.length == 0 && config[:project].to_s.length == 0
           project = Dir["./*.xcodeproj"]
           if project.count > 1
+            UI.user_error!("Found #{project.count} projects: pass one with the `project` option") unless Helper.can_prompt?
             puts("Select Project: ")
             config[:project] = choose(*project)
           elsif !project.first.nil?
@@ -161,9 +163,9 @@ module FastlaneCore
         elsif automated_scheme_selection? && schemes.include?(project_name)
           UI.important("Using scheme matching project name (#{project_name}).")
           options[:scheme] = project_name
-        elsif Helper.ci?
+        elsif !Helper.can_prompt?
           UI.error("Multiple schemes found but you haven't specified one.")
-          UI.error("Since this is a CI, please pass one using the `scheme` option")
+          UI.error("fastlane cannot ask which one here, please pass one using the `scheme` option")
           show_scheme_shared_information
           UI.user_error!("Multiple schemes found")
         else
@@ -343,20 +345,19 @@ module FastlaneCore
       proj << "-scmProvider system" if options[:use_system_scm]
       proj << "-packageAuthorizationProvider #{options[:package_authorization_provider].shellescape}" if options[:package_authorization_provider]
 
-      xcode_at_least_11 = FastlaneCore::Helper.xcode_at_least?('11.0')
-      if xcode_at_least_11 && options[:cloned_source_packages_path]
+      if options[:cloned_source_packages_path]
         proj << "-clonedSourcePackagesDirPath #{options[:cloned_source_packages_path].shellescape}"
       end
 
-      if xcode_at_least_11 && options[:package_cache_path]
+      if options[:package_cache_path]
         proj << "-packageCachePath #{options[:package_cache_path].shellescape}"
       end
 
-      if xcode_at_least_11 && options[:disable_package_automatic_updates]
+      if options[:disable_package_automatic_updates]
         proj << "-disableAutomaticPackageResolution"
       end
 
-      if xcode_at_least_11 && options[:skip_package_repository_fetches]
+      if options[:skip_package_repository_fetches]
         proj << "-skipPackageUpdates"
       end
 
@@ -369,17 +370,7 @@ module FastlaneCore
 
     def build_xcodebuild_showbuildsettings_command
       # We also need to pass the workspace and scheme to this command.
-      #
-      # The 'clean' portion of this command was a workaround for an xcodebuild bug with Core Data projects.
-      # This xcodebuild bug is fixed in Xcode 8.3 so 'clean' it's not necessary anymore
-      # See: https://github.com/fastlane/fastlane/pull/5626
-      if FastlaneCore::Helper.xcode_at_least?('8.3')
-        command = "xcodebuild -showBuildSettings #{xcodebuild_parameters.join(' ')}#{xcodebuild_destination_parameter}"
-      else
-        command = "xcodebuild clean -showBuildSettings #{xcodebuild_parameters.join(' ')}"
-      end
-      command = "#{command} 2>&1" # xcodebuild produces errors on stderr #21672
-      command
+      "xcodebuild -showBuildSettings #{xcodebuild_parameters.join(' ')}#{xcodebuild_destination_parameter} 2>&1" # xcodebuild produces errors on stderr #21672
     end
 
     def build_xcodebuild_resolvepackagedependencies_command
@@ -392,8 +383,7 @@ module FastlaneCore
       # Xcode13+ xcodebuild command 'without destination parameter' generates annoying warnings
       # See: https://github.com/fastlane/fastlane/issues/19579
       destination_parameter = ""
-      xcode_at_least_13 = FastlaneCore::Helper.xcode_at_least?("13")
-      if xcode_at_least_13 && options[:destination]
+      if options[:destination]
         begin
           destination = options[:destination]
           destination = destination.first if destination.kind_of?(Array)
@@ -430,17 +420,15 @@ module FastlaneCore
         end
 
         # SwiftPM support
-        if FastlaneCore::Helper.xcode_at_least?('11.0')
-          if (command = build_xcodebuild_resolvepackagedependencies_command)
-            UI.important("Resolving Swift Package Manager dependencies...")
-            FastlaneCore::CommandExecutor.execute(
-              command: command,
-              print_all: true,
-              print_command: true
-            )
-          else
-            UI.important("Skipped Swift Package Manager dependencies resolution.")
-          end
+        if (command = build_xcodebuild_resolvepackagedependencies_command)
+          UI.important("Resolving Swift Package Manager dependencies...")
+          FastlaneCore::CommandExecutor.execute(
+            command: command,
+            print_all: true,
+            print_command: true
+          )
+        else
+          UI.important("Skipped Swift Package Manager dependencies resolution.")
         end
 
         command = build_xcodebuild_showbuildsettings_command

@@ -153,6 +153,17 @@ module Spaceship
         handle_response(response)
       end
 
+      # The raw response, with retries but without raising for 4xx statuses (401 and 403 still raise).
+      def raw_request(method, url_or_path, body = nil)
+        with_asc_retry do
+          request(method) do |req|
+            req.url(url_or_path)
+            req.body = body.to_json if body
+            req.headers['Content-Type'] = 'application/json' if body
+          end
+        end
+      end
+
       protected
 
       class TimeoutRetryError < StandardError
@@ -173,8 +184,7 @@ module Spaceship
         status = response.status if response
 
         if [500, 504].include?(status)
-          msg = "Timeout received! Retrying after 3 seconds (remaining: #{tries})..."
-          raise TimeoutRetryError, msg
+          raise TimeoutRetryError, "Server error got #{status}"
         end
 
         if status == 429
@@ -195,10 +205,10 @@ module Spaceship
         end
       rescue TimeoutRetryError => error
         tries -= 1
-        puts(error) if Spaceship::Globals.verbose?
         if tries.zero?
           return response
         else
+          puts("#{error.message}, retrying (remaining: #{tries})...") if Spaceship::Globals.verbose?
           retry
         end
       rescue TooManyRequestsError => error
@@ -239,7 +249,7 @@ module Spaceship
       def handle_error(response)
         body = response.body.empty? ? {} : response.body
 
-        # Setting body nil if invalid JSON which can happen if 502
+        # A body that is not JSON, such as a 502 page, stays a String
         begin
           body = JSON.parse(body) if body.kind_of?(String)
         rescue
@@ -250,7 +260,8 @@ module Spaceship
         when 401
           raise UnauthorizedAccessError, format_errors(response)
         when 403
-          error = (body['errors'] || []).first || {}
+          errors = body['errors'] if body.kind_of?(Hash)
+          error = (errors || []).first || {}
           error_code = error['code']
           if error_code == "FORBIDDEN.REQUIRED_AGREEMENTS_MISSING_OR_EXPIRED"
             raise ProgramLicenseAgreementUpdated, format_errors(response)
@@ -341,7 +352,13 @@ module Spaceship
         # }
 
         body = response.body.empty? ? {} : response.body
-        body = JSON.parse(body) if body.kind_of?(String)
+        if body.kind_of?(String)
+          begin
+            body = JSON.parse(body)
+          rescue JSON::ParserError
+            return body # not JSON, such as an HTML error page
+          end
+        end
 
         formatted_errors = (body['errors'] || []).map do |error|
           messages = [[error['title'], error['detail'], error.dig("source", "pointer")].compact.join(" - ")]
@@ -362,14 +379,6 @@ module Spaceship
       end
 
       private
-
-      def local_variable_get(binding, name)
-        if binding.respond_to?(:local_variable_get)
-          binding.local_variable_get(name)
-        else
-          binding.eval(name.to_s)
-        end
-      end
 
       def provider_id
         return team_id if self.provider.nil?

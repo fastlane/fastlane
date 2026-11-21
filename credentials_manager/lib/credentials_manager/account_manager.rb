@@ -1,5 +1,7 @@
 require 'security'
 require 'highline/import' # to hide the entered password
+require 'fastlane_core/helper'
+require 'fastlane_core/stored_passwords'
 
 require_relative 'appfile_config'
 
@@ -52,7 +54,10 @@ module CredentialsManager
       unless @password
         begin
           item = Security::InternetPassword.find(server: server_name)
-          @password ||= item.password if item
+          if item
+            @password ||= item.password
+            warn_about_stored_password
+          end
         rescue Security::Error => ex
           puts("Could not read the Keychain entry for user '#{user}': #{ex.message}".yellow)
         end
@@ -73,6 +78,7 @@ module CredentialsManager
         return false
       end
 
+      return false unless force || FastlaneCore::Helper.can_prompt?
       if force || agree("Do you want to re-enter your password? (y/n)", true)
         puts("Removing Keychain entry for user '#{user}'...".yellow) if mac?
         remove_from_keychain
@@ -111,11 +117,17 @@ module CredentialsManager
 
     private
 
+    def warn_about_stored_password
+      remove_with = default_prefix? ? "fastlane fastlane-credentials remove --username #{user}" : "security delete-internet-password -s #{server_name}"
+      instead = default_prefix? ? "provide it with the FASTLANE_PASSWORD environment variable" : "enter it when asked"
+      FastlaneCore::StoredPasswords.read_warning(server_name, what: "the password for #{user}", remove_with: remove_with, instead: instead)&.each { |line| puts(line.yellow) }
+    end
+
     def ask_for_login
       if ENV["FASTLANE_HIDE_LOGIN_INFORMATION"].to_s.length == 0
         puts("-------------------------------------------------------------------------------------".green)
         puts("Please provide your Apple Developer Program account credentials".green)
-        puts("The login information you enter will be stored in your macOS Keychain".green) if mac?
+        puts("The login information you enter will be stored in your macOS Keychain".green) if mac? && FastlaneCore::StoredPasswords.store?
         if default_prefix?
           # We don't want to show this message, if we ask for the application specific password
           # which has a different prefix
@@ -126,7 +138,7 @@ module CredentialsManager
       end
 
       if @user.to_s.length == 0
-        raise "Missing username, and running in non-interactive shell" if $stdout.isatty == false
+        raise "Missing username, and fastlane cannot ask for it here: set FASTLANE_USER" if $stdout.isatty == false || !FastlaneCore::Helper.can_prompt?
         prompt_text = "Username"
         prompt_text += " (#{@note})" if @note
         prompt_text += ": "
@@ -136,12 +148,16 @@ module CredentialsManager
       end
 
       while @password.to_s.length == 0
-        raise "Missing password for user #{@user}, and running in non-interactive shell" if $stdout.isatty == false
+        if $stdout.isatty == false || !FastlaneCore::Helper.can_prompt?
+          message = "Missing password for user #{@user}, and fastlane cannot ask for it here"
+          message += ": set FASTLANE_PASSWORD" if default_prefix?
+          raise message
+        end
         note = @note + " " if @note
         @password = ask("Password (#{note}for #{@user}): ") { |q| q.echo = "*" }
       end
 
-      return true if ENV["FASTLANE_DONT_STORE_PASSWORD"]
+      return true unless FastlaneCore::StoredPasswords.store?
       return true unless mac?
 
       # Now we store this information in the keychain

@@ -23,9 +23,6 @@ module Fastlane
           UI.success("Collecting Git commits between #{from} and #{to}")
         end
 
-        # Normally it is not good practice to take arbitrary input and convert it to a symbol
-        # because prior to Ruby 2.2, symbols are never garbage collected. However, we've
-        # already validated that the input matches one of our allowed values, so this is OK
         merge_commit_filtering = params[:merge_commit_filtering].to_sym
 
         # We want to be specific and exclude nil for this comparison

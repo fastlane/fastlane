@@ -252,6 +252,8 @@ module Spaceship
         else
           # Log to file by default
           path = File.join(Dir.tmpdir, "spaceship#{Time.now.to_i}_#{Process.pid}_#{Thread.current.object_id}.log")
+          # The log holds every request and response body: create it readable by its owner only
+          File.open(path, File::WRONLY | File::CREAT | File::APPEND, 0o600) {}
           @logger = Logger.new(path)
         end
 
@@ -279,10 +281,12 @@ module Spaceship
     def store_cookie(path: nil)
       path ||= persistent_cookie_path
       FileUtils.mkdir_p(File.expand_path("..", path))
+      File.chmod(0o700, File.expand_path("..", path))
 
       # really important to specify the session to true
       # otherwise myacinfo and more won't be stored
       @cookie.save(path, :yaml, session: true)
+      File.chmod(0o600, path)
       return File.read(path)
     end
 
@@ -880,6 +884,8 @@ module Spaceship
       begin
         if File.exist?(persistent_cookie_path)
           puts("Loading session from '#{persistent_cookie_path}'") if Spaceship::Globals.verbose?
+          File.chmod(0o700, File.expand_path("..", persistent_cookie_path))
+          File.chmod(0o600, persistent_cookie_path)
           @cookie.load(persistent_cookie_path)
           return true
         end
@@ -1144,7 +1150,7 @@ module Spaceship
 
     def log_response(method, url, response, headers = nil, &block)
       url ||= extract_key_from_block('url', &block)
-      body = response.body.kind_of?(String) ? response.body.force_encoding(Encoding::UTF_8) : response.body
+      body = response.body.kind_of?(String) ? response.body.dup.force_encoding(Encoding::UTF_8) : response.body
       logger.debug("<< #{method.upcase} #{url}: #{response.status} #{body}")
     end
 
@@ -1183,15 +1189,18 @@ module Spaceship
 
         handle_error(response)
 
-        if response.body.to_s.include?("<title>302 Found</title>")
+        # Error pages are HTML; converting a parsed JSON or plist body to a string for each check is slow on large responses
+        body = response.body.kind_of?(String) ? response.body : ""
+
+        if body.include?("<title>302 Found</title>")
           raise AppleTimeoutError.new, "Apple 302 detected - this might be temporary server error, check https://developer.apple.com/system-status/ to see if there is a known downtime"
         end
 
-        if response.body.to_s.include?("<h3>Bad Gateway</h3>")
+        if body.include?("<h3>Bad Gateway</h3>")
           raise BadGatewayError.new, "Apple 502 detected - this might be temporary server error, try again later"
         end
 
-        if response.body.to_s.include?("<title>503 Service Temporarily Unavailable</title>") || response.body.to_s.include?("<h1>503 Service Temporarily Unavailable</h1>")
+        if body.include?("<title>503 Service Temporarily Unavailable</title>") || body.include?("<h1>503 Service Temporarily Unavailable</h1>")
           raise AppleTimeoutError.new, "Apple 503 detected - this might be temporary server error, check https://developer.apple.com/system-status/ to see if there is a known downtime"
         end
 

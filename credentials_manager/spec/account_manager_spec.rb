@@ -74,6 +74,84 @@ describe CredentialsManager do
       c.invalid_credentials(force: true)
     end
 
+    describe "when fastlane cannot ask, with stdout on a terminal" do
+      before do
+        allow($stdout).to receive(:isatty).and_return(true)
+        allow(FastlaneCore::Helper).to receive(:can_prompt?).and_return(false)
+      end
+
+      it "keeps the Keychain item instead of asking to re-enter the password" do
+        c = CredentialsManager::AccountManager.new(user: "felix@krausefx.com")
+        expect(c).not_to receive(:agree)
+        expect(Security::InternetPassword).not_to receive(:delete)
+        FastlaneSpec::Env.with_env_values("FASTLANE_PASSWORD" => nil, "DELIVER_PASSWORD" => nil) do
+          expect(c.invalid_credentials).to be(false)
+        end
+      end
+
+      it "names FASTLANE_USER instead of asking for the username" do
+        c = CredentialsManager::AccountManager.new
+        expect(c).not_to receive(:ask)
+        FastlaneSpec::Env.with_env_values("FASTLANE_HIDE_LOGIN_INFORMATION" => "1") do
+          expect { c.send(:ask_for_login) }.to raise_error("Missing username, and fastlane cannot ask for it here: set FASTLANE_USER")
+        end
+      end
+
+      it "names FASTLANE_PASSWORD instead of asking for the password" do
+        c = CredentialsManager::AccountManager.new(user: "felix@krausefx.com")
+        expect(c).not_to receive(:ask)
+        FastlaneSpec::Env.with_env_values("FASTLANE_HIDE_LOGIN_INFORMATION" => "1") do
+          expect { c.send(:ask_for_login) }.to raise_error("Missing password for user felix@krausefx.com, and fastlane cannot ask for it here: set FASTLANE_PASSWORD")
+        end
+      end
+
+      it "does not name FASTLANE_PASSWORD for an application specific password" do
+        c = CredentialsManager::AccountManager.new(user: "felix@krausefx.com", prefix: "deliver.appspecific")
+        FastlaneSpec::Env.with_env_values("FASTLANE_HIDE_LOGIN_INFORMATION" => "1") do
+          expect { c.send(:ask_for_login) }.to raise_error("Missing password for user felix@krausefx.com, and fastlane cannot ask for it here")
+        end
+      end
+    end
+
+    describe "storing the password in the keychain" do
+      before { FastlaneCore::StoredPasswords.reset_warnings! }
+
+      def ask_for_login_with(env)
+        c = CredentialsManager::AccountManager.new(user: user, password: "entered password")
+        allow(c).to receive(:mac?).and_return(true)
+        FastlaneSpec::Env.with_env_values({ "FASTLANE_HIDE_LOGIN_INFORMATION" => "1", "FASTLANE_DONT_STORE_PASSWORD" => nil }.merge(env)) do
+          c.send(:ask_for_login)
+        end
+      end
+
+      it "does not store the entered password unless asked to" do
+        expect(Security::InternetPassword).not_to receive(:add)
+        ask_for_login_with("FASTLANE_STORE_PASSWORDS_IN_KEYCHAIN" => nil)
+      end
+
+      it "stores the entered password when FASTLANE_STORE_PASSWORDS_IN_KEYCHAIN is set" do
+        expect(Security::InternetPassword).to receive(:add).with("deliver.#{user}", user, "entered password").and_return(true)
+        ask_for_login_with("FASTLANE_STORE_PASSWORDS_IN_KEYCHAIN" => "1")
+      end
+
+      it "does not store the entered password when FASTLANE_DONT_STORE_PASSWORD is set, even when asked to" do
+        expect(Security::InternetPassword).not_to receive(:add)
+        ask_for_login_with("FASTLANE_STORE_PASSWORDS_IN_KEYCHAIN" => "1", "FASTLANE_DONT_STORE_PASSWORD" => "1")
+      end
+
+      it "warns once that a stored password was read, and how to remove it" do
+        dummy = double("item", password: "stored password")
+        allow(Security::InternetPassword).to receive(:find).with(server: "deliver.#{user}").and_return(dummy)
+
+        expect do
+          expect(CredentialsManager::AccountManager.new(user: user).password).to eq("stored password")
+        end.to output(/any program running as you can read.*fastlane fastlane-credentials remove --username #{Regexp.escape(user)}/m).to_stdout
+        expect do
+          CredentialsManager::AccountManager.new(user: user).password
+        end.not_to output(/any program running as you can read/).to_stdout
+      end
+    end
+
     it "defaults to 'deliver' as a prefix" do
       c = CredentialsManager::AccountManager.new(user: user)
       expect(c.server_name).to eq("deliver.#{user}")

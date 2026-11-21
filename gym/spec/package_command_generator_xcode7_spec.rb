@@ -1,4 +1,8 @@
 describe Gym do
+  before do
+    fake_out_build_settings(GYM_BUILD_SETTINGS)
+  end
+
   before(:all) do
     options = { project: "./gym/examples/standard/Example.xcodeproj" }
     config = FastlaneCore::Configuration.create(Gym::Options.available_options, options)

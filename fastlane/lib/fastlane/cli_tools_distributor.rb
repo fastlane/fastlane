@@ -16,12 +16,20 @@ module Fastlane
         ARGV.include?("init")
       end
 
+      def running_json_command?
+        return true if %w(spaceship supply).include?(ARGV[0]) && ARGV[1] == "api"
+        %w(lanes actions action).include?(ARGV.first) && (ARGV.include?("-j") || ARGV.include?("--json"))
+      end
+
       def utf8_locale?
         (ENV['LANG'] || "").end_with?("UTF-8", "utf8") || (ENV['LC_ALL'] || "").end_with?("UTF-8", "utf8") || (FastlaneCore::CommandExecutor.which('locale') && `locale charmap`.strip == "UTF-8")
       end
 
       def take_off
         before_import_time = Time.now
+
+        # JSON commands print the JSON on STDOUT; logs and prompts go to stderr.
+        $stdout = $stderr if running_json_command?
 
         if ENV["FASTLANE_DISABLE_ANIMATION"].nil?
           # Usually in the fastlane code base we use

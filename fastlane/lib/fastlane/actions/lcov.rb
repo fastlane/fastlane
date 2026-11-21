@@ -54,7 +54,7 @@ module Fastlane
       end
 
       def self.gen_lcov_cmd(cov_file)
-        cmd = "lcov "
+        cmd = +"lcov "
         exclude_dirs.each do |e|
           cmd << "--remove #{cov_file} \"#{e}\" "
         end

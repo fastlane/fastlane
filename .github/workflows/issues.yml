@@ -12,6 +12,6 @@ jobs:
     name: Remind user about posting their fastlane env
     runs-on: ubuntu-latest
     steps:
-      - uses: fastlane/github-actions/fastlane-env-reminder@212cacd2e482bf799ecfe99e379b65b0f3eeba56 # v0.8.0
+      - uses: fastlane/github-actions/fastlane-env-reminder@0f64d079e31de0c707831cedb420443931098984 # v0.9.0
         with:
           repo-token: ${{ secrets.GITHUB_TOKEN }}

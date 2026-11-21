@@ -6,7 +6,7 @@ describe Sigh do
     end
 
     let(:fake_runner) { Sigh::Runner.new }
-    let(:mock_base_client) { "fake api base client" }
+    let(:mock_base_client) { +"fake api base client" }
 
     before(:each) do
       allow(mock_base_client).to receive(:login)

@@ -161,6 +161,33 @@ describe Spaceship::ConnectAPI::APIClient do
           client.get('')
         end.to raise_error(Spaceship::ConnectAPI::APIClient::TooManyRequestsError, "Too many requests, giving up after backing off for > 3600 seconds.")
       end
+
+      it 'retries a 500 without calling it a timeout' do
+        body = JSON.generate({ "errors": [{ "status": "500", "code": "UNEXPECTED_ERROR" }] })
+        stub_client_request(client.hostname, 500, body)
+        allow(Spaceship::Globals).to receive(:verbose?).and_return(true)
+
+        expect(client).to receive(:request).exactly(5).times.and_call_original
+        expect do
+          expect do
+            client.get('')
+          end.to raise_error(Spaceship::InternalServerError, "Server error got 500")
+        end.to output(4.downto(1).map { |remaining| "Server error got 500, retrying (remaining: #{remaining})...\n" }.join).to_stdout
+      end
+
+      it 'does not announce a retry when a single try is allowed' do
+        body = JSON.generate({ "errors": [{ "status": "504", "code": "UNEXPECTED_ERROR" }] })
+        stub_request(:post, client.hostname).
+          to_return(status: 504, body: body, headers: { "Content-Type": "application/json" })
+        allow(Spaceship::Globals).to receive(:verbose?).and_return(true)
+
+        expect(client).to receive(:request).once.and_call_original
+        expect do
+          expect do
+            client.post('', {}, tries: 1)
+          end.to raise_error(Spaceship::InternalServerError, "Server error got 504")
+        end.not_to output.to_stdout
+      end
     end
   end
 
@@ -206,6 +233,14 @@ describe Spaceship::ConnectAPI::APIClient do
         expect do
           client.send(:handle_error, mock_response)
         end.to raise_error(Spaceship::UnauthorizedAccessError, /Some title - some detail/)
+      end
+
+      it 'raises UnauthorizedAccessError with the body when it is not JSON' do
+        allow(mock_response).to receive(:body).and_return('<html>Unauthorized</html>')
+
+        expect do
+          client.send(:handle_error, mock_response)
+        end.to raise_error(Spaceship::UnauthorizedAccessError, '<html>Unauthorized</html>')
       end
     end
 
@@ -257,6 +292,44 @@ describe Spaceship::ConnectAPI::APIClient do
         expect do
           client.send(:handle_error, mock_response)
         end.to raise_error(Spaceship::AccessForbiddenError, /Some title - some detail/)
+      end
+
+      it 'raises AccessForbiddenError with the body when it is not JSON' do
+        allow(mock_response).to receive(:body).and_return('<html>Forbidden</html>')
+
+        expect do
+          client.send(:handle_error, mock_response)
+        end.to raise_error(Spaceship::AccessForbiddenError, '<html>Forbidden</html>')
+      end
+
+      it 'raises AccessForbiddenError when a body that is not JSON contains "errors"' do
+        allow(mock_response).to receive(:body).and_return('<html>Too many errors</html>')
+
+        expect do
+          client.send(:handle_error, mock_response)
+        end.to raise_error(Spaceship::AccessForbiddenError, '<html>Too many errors</html>')
+      end
+    end
+
+    describe "status of 502" do
+      before(:each) do
+        allow(mock_response).to receive(:status).and_return(502)
+      end
+
+      it 'raises BadGatewayError when the body says it could not process the request' do
+        allow(mock_response).to receive(:body).and_return('Could not process this request')
+
+        expect do
+          client.send(:handle_error, mock_response)
+        end.to raise_error(Spaceship::BadGatewayError, 'Could not process this request')
+      end
+
+      it 'does not raise for another body' do
+        allow(mock_response).to receive(:body).and_return('<html>Bad Gateway</html>')
+
+        expect do
+          client.send(:handle_error, mock_response)
+        end.to_not(raise_error)
       end
     end
   end

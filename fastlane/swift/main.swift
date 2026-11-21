@@ -12,7 +12,7 @@ import Foundation
 
 let argumentProcessor = ArgumentProcessor(args: CommandLine.arguments)
 /// fastlane reads this from the built runner, to tell whether it is outdated. Increase it when the runner changes how it talks to fastlane.
-let runnerProtocolVersion = "FastlaneRunnerProtocolVersion [1]"
+let runnerProtocolVersion = "FastlaneRunnerProtocolVersion [2]"
 verbose(message: runnerProtocolVersion)
 let timeout = argumentProcessor.commandTimeout
 

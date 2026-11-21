@@ -24,7 +24,7 @@ describe Pilot::TesterExporter do
     end
 
     context "when able to find app using apple_id and app_identifier" do
-      let(:fake_app) { "fake app" }
+      let(:fake_app) { +"fake app" }
 
       before(:each) do
         allow(fake_app).to receive(:get_beta_testers).with(includes: "apps,betaTesterMetrics,betaGroups").and_return([])
