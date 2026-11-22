@@ -18,13 +18,8 @@ module Fastlane
       @path = File.expand_path(path)
       content = File.read(path, encoding: "utf-8")
 
-      # From https://github.com/orta/danger/blob/master/lib/danger/Dangerfile.rb
-      if content.tr!('“”‘’‛', %(""'''))
-        UI.error("Your #{File.basename(path)} has had smart quotes sanitised. " \
-                'To avoid issues in the future, you should not use ' \
-                'TextEdit for editing it. If you are not using TextEdit, ' \
-                'you should turn off smart quotes in your editor of choice.')
-      end
+      warning = FastlaneCore::SmartQuotes.sanitize!(content, path)
+      UI.error(warning) if warning
 
       content.scan(/^\s*require ["'](.*?)["']/).each do |current|
         gem_name = current.last
