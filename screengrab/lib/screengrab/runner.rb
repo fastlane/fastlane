@@ -322,7 +322,6 @@ module Screengrab
               run_adb_command("-s #{device_serial.shellescape} exec-out#{run_as} tar -cC #{dir} #{base} | tar -xv -f- -C #{tempdir.shellescape}",
                               print_all: false,
                               print_command: true)
-
             end
           end
         end
