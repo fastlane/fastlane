@@ -287,6 +287,46 @@ describe Screengrab::Runner do
     it 'returns the number of screenshots copied even when existing files are overwritten' do
       expect(@runner.pull_screenshots_from_device(locale, device_serial, device_type_dir_name)).to eq(1)
     end
+
+    context 'when adb pull is denied permission' do
+      let(:device_path) { "/data/data/tools.fastlane.dev/app_screengrab/#{locale}/images/screenshots" }
+
+      around do |example|
+        Dir.mktmpdir('pull dir') do |pull_dir|
+          @pull_dir = pull_dir
+          example.run
+        end
+      end
+
+      before do
+        allow(mock_android_environment).to receive(:adb_path).and_return("adb")
+        allow(@runner).to receive(:if_device_path_exists).and_yield(device_path)
+        allow(Dir).to receive(:mktmpdir).and_yield(@pull_dir)
+        expect(mock_executor).to receive(:execute)
+          .with(hash_including(command: "adb -s #{device_serial} pull #{device_path} #{@pull_dir.shellescape}"))
+          .and_return("adb: error: failed to stat remote object: Permission denied")
+      end
+
+      it 'streams a tar archive with exec-out using run-as for internal paths' do
+        allow(@runner).to receive(:determine_internal_screenshots_paths).and_return([[device_path, true]])
+
+        expect(mock_executor).to receive(:execute)
+          .with(hash_including(command: "adb -s #{device_serial} exec-out run-as tools.fastlane.dev tar -cC #{File.dirname(device_path)} screenshots | tar -xv -f- -C #{@pull_dir.shellescape}"))
+          .and_return("")
+
+        @runner.pull_screenshots_from_device(locale, device_serial, device_type_dir_name)
+      end
+
+      it 'streams a tar archive with exec-out without run-as for external paths' do
+        allow(@runner).to receive(:determine_external_screenshots_path).and_return([[device_path, false]])
+
+        expect(mock_executor).to receive(:execute)
+          .with(hash_including(command: "adb -s #{device_serial} exec-out tar -cC #{File.dirname(device_path)} screenshots | tar -xv -f- -C #{@pull_dir.shellescape}"))
+          .and_return("")
+
+        @runner.pull_screenshots_from_device(locale, device_serial, device_type_dir_name)
+      end
+    end
   end
 
   describe :move_pulled_screenshots do
