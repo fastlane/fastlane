@@ -133,9 +133,7 @@ module FastlaneCore
         UI.important(@warnings.join("\n"))
       end
 
-      if @errors.join("").include?("app-specific")
-        raise TransporterRequiresApplicationSpecificPasswordError
-      end
+      raise_if_application_specific_password_required
 
       if @errors.count > 0 && @all_lines.count > 0
         # Print out the last 15 lines, this is key for non-verbose mode
@@ -167,6 +165,11 @@ module FastlaneCore
     end
 
     private
+
+    # The caller rescues the error to ask for an application specific password and retry
+    def raise_if_application_specific_password_required
+      raise TransporterRequiresApplicationSpecificPasswordError if @errors.join("").include?("app-specific")
+    end
 
     def itms_provider_pair(line)
       line = line.strip
@@ -297,6 +300,7 @@ module FastlaneCore
       @errors << "The call to the altool completed with a non-zero exit status: #{exit_status}. This indicates a failure." unless exit_status.zero?
       @errors << "-1 indicates altool exited abnormally; try retrying (see https://github.com/fastlane/fastlane/issues/21535)" if exit_status == -1
       @errors.clear if @all_lines.any? { |line| line.include?("UPLOAD SUCCEEDED with no errors") }
+      raise_if_application_specific_password_required
 
       unless @errors.empty? || @all_lines.empty?
         @all_lines.each do |line|
