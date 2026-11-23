@@ -124,7 +124,7 @@ module CredentialsManager
     end
 
     def ask_for_login
-      if ENV["FASTLANE_HIDE_LOGIN_INFORMATION"].to_s.length == 0
+      unless FastlaneCore::Env.truthy?("FASTLANE_HIDE_LOGIN_INFORMATION")
         puts("-------------------------------------------------------------------------------------".green)
         puts("Please provide your Apple Developer Program account credentials".green)
         puts("The login information you enter will be stored in your macOS Keychain".green) if mac? && FastlaneCore::StoredPasswords.store?
