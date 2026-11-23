@@ -141,7 +141,26 @@ describe FastlaneCore do
       end
     end
 
+    describe "#is_codebuild?" do
+      it "returns false when CODEBUILD_BUILD_ARN is false" do
+        stub_const('ENV', { 'CODEBUILD_BUILD_ARN' => 'false' })
+        expect(FastlaneCore::Helper.is_codebuild?).to be(false)
+      end
+    end
+
+    describe "#xcode_server?" do
+      it "returns true when XCS is true" do
+        stub_const('ENV', { 'XCS' => 'true' })
+        expect(FastlaneCore::Helper.xcode_server?).to be(true)
+      end
+    end
+
     describe "#is_circle_ci?" do
+      it "returns false when CIRCLECI is false" do
+        stub_const('ENV', { 'CIRCLECI' => 'false' })
+        expect(FastlaneCore::Helper.is_circle_ci?).to be(false)
+      end
+
       it "returns true when building in CircleCI" do
         stub_const('ENV', { 'CIRCLECI' => true })
         expect(FastlaneCore::Helper.ci?).to be(true)
