@@ -61,6 +61,9 @@ module Spaceship
         duration ||= ENV['SPACESHIP_CONNECT_API_TOKEN_DURATION']
 
         in_house_env = ENV['SPACESHIP_CONNECT_API_IN_HOUSE']
+        if in_house_env == "" && !in_house
+          puts("SPACESHIP_CONNECT_API_IN_HOUSE is empty, which means false. A future version of fastlane will read an empty value as true, like its other environment variables. Set it to false to keep the current behaviour.".yellow)
+        end
         in_house ||= !["", "no", "false", "off", "0"].include?(in_house_env) if in_house_env
 
         key ||= ENV['SPACESHIP_CONNECT_API_KEY']
