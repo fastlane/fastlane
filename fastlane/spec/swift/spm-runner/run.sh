@@ -45,7 +45,9 @@ scenario() {
   fi
   case "$expected:$result" in
     bundler:bundler=set)
-      if grep -q "No --token_file given" "$work/run.log"; then
+      if [ $status -ne 0 ]; then
+        echo "FAIL  $name: exit $status after the lane succeeded"; failures=$((failures + 1))
+      elif grep -q "No --token_file given" "$work/run.log"; then
         echo "FAIL  $name: socket_server ran without a token"; failures=$((failures + 1))
       else
         echo "PASS  $name: $result, token required"
@@ -81,5 +83,14 @@ for address in 127.0.0.1 ::1; do
   kill $holder
   wait $holder 2>/dev/null
 done
+
+# A failed lane makes the runner exit 1, without crashing
+(cd "$work/project" && perl -e 'alarm 30; exec @ARGV' "$runner" lane fail swiftServerPort "$(free_port)" > "$work/run.log" 2>&1)
+status=$?
+if [ $status -eq 1 ] && ! grep -q "Fatal error" "$work/run.log"; then
+  echo "PASS  a failed lane: exit 1"
+else
+  echo "FAIL  a failed lane: exit $status, expected 1"; sed 's/^/      /' "$work/run.log"; failures=$((failures + 1))
+fi
 
 exit $failures
