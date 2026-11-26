@@ -1,4 +1,10 @@
 describe Gym::CodeSigningMapping, requires_xcodebuild: true do
+  # These examples read build settings. The suite only unsets option variables, so the global
+  # lookup switch would still refuse them if the developer exported it
+  around do |example|
+    FastlaneSpec::Env.with_env_values("FASTLANE_DISALLOW_XCODEBUILD_SETTINGS_LOOKUP" => nil) { example.run }
+  end
+
   before do
     fake_out_build_settings(GYM_BUILD_SETTINGS)
   end

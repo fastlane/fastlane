@@ -1,4 +1,10 @@
 describe Gym do
+  # These examples read build settings. The suite only unsets option variables, so the global
+  # lookup switch would still refuse them if the developer exported it
+  around do |example|
+    FastlaneSpec::Env.with_env_values("FASTLANE_DISALLOW_XCODEBUILD_SETTINGS_LOOKUP" => nil) { example.run }
+  end
+
   before do
     fake_out_build_settings(GYM_BUILD_SETTINGS)
   end
@@ -16,11 +22,6 @@ describe Gym do
   end
 
   describe Gym::ErrorHandler, requires_xcode: true do
-    # The global lookup switch would skip the lookups these examples are about
-    around do |example|
-      FastlaneSpec::Env.with_env_values("FASTLANE_DISALLOW_XCODEBUILD_SETTINGS_LOOKUP" => nil) { example.run }
-    end
-
     context "when naming the build log has to read the build settings" do
       # When only exporting with `output_name` given, nothing has read them before the export fails
       let(:project) { FastlaneCore::Project.new(project: "./gym/examples/multipleSchemes/Example.xcodeproj", scheme: "Example") }

@@ -1,6 +1,12 @@
 require 'shellwords'
 
 describe FastlaneCore do
+  # These examples read build settings. The suite only unsets option variables, so the global
+  # lookup switch would still refuse them if the developer exported it
+  around do |example|
+    FastlaneSpec::Env.with_env_values("FASTLANE_DISALLOW_XCODEBUILD_SETTINGS_LOOKUP" => nil) { example.run }
+  end
+
   describe FastlaneCore::Project do
     describe 'project and workspace detection' do
       def within_a_temp_dir
@@ -611,11 +617,6 @@ describe FastlaneCore do
     end
 
     describe 'build_settings() with disallow_xcodebuild_settings_lookup' do
-      # The environment variable disallows the lookup on its own, so the developer's environment must not decide these
-      around do |example|
-        FastlaneSpec::Env.with_env_values('FASTLANE_DISALLOW_XCODEBUILD_SETTINGS_LOOKUP' => nil) { example.run }
-      end
-
       it 'raises a helpful error naming the required build setting instead of running xcodebuild -showBuildSettings' do
         project = FastlaneCore::Project.new({
           project: "./fastlane_core/spec/fixtures/projects/Example.xcodeproj",

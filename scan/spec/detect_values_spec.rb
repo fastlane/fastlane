@@ -1,4 +1,10 @@
 describe Scan do
+  # These examples read build settings. The suite only unsets option variables, so the global
+  # lookup switch would still refuse them if the developer exported it
+  around do |example|
+    FastlaneSpec::Env.with_env_values("FASTLANE_DISALLOW_XCODEBUILD_SETTINGS_LOOKUP" => nil) { example.run }
+  end
+
   describe Scan::DetectValues do
     before do
       fake_out_simulator_detection
@@ -372,10 +378,6 @@ describe Scan do
       # Several `run_tests` calls in one lane share the Scan module
       context "after an earlier run in the same process picked a simulator", requires_xcode: true do
         let(:simulator) { FastlaneCore::DeviceManager::Device.new(name: "iPhone 15", udid: "00000000-0000-0000-0000-000000000015", os_type: "iOS", os_version: "17.0", state: "Shutdown", is_simulator: true) }
-
-        around do |example|
-          FastlaneSpec::Env.with_env_values("FASTLANE_DISALLOW_XCODEBUILD_SETTINGS_LOOKUP" => nil) { example.run }
-        end
 
         before do
           allow(FastlaneCore::DeviceManager).to receive(:simulators).and_return([simulator])
