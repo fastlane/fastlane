@@ -13,6 +13,12 @@ module Spaceship
       return $verbose
     end
 
+    # Same reading as FastlaneCore::Env.truthy?, which spaceship can't depend on
+    def self.env_truthy?(name)
+      return false unless ENV[name]
+      !["no", "false", "off", "0"].include?(ENV[name].downcase)
+    end
+
     # if spaceship is run with the --check_session flag this value will be set to true
     def self.check_session
       return @check_session

@@ -251,6 +251,13 @@ describe Deliver::CommandsGenerator do
         end
       end
 
+      it "does not force overwriting metadata if DELIVER_FORCE_OVERWRITE is false" do
+        expect(UI).to receive(:interactive?).and_return(false)
+        FastlaneSpec::Env.with_env_values('DELIVER_FORCE_OVERWRITE' => 'false') do
+          expect(Deliver::CommandsGenerator.force_overwrite_metadata?({}, "an/ignored/path")).to be_falsy
+        end
+      end
+
       it "fails forcing overwriting metadata if DELIVER_FORCE_OVERWRITE isn't set, force isn't set and user answers no in interactive mode" do
         options = FastlaneCore::Configuration.create(Deliver::Options.available_options, {
           force: false

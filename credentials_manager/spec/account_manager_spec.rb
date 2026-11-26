@@ -124,6 +124,15 @@ describe CredentialsManager do
         end
       end
 
+      it "shows the login information when FASTLANE_HIDE_LOGIN_INFORMATION is false" do
+        c = CredentialsManager::AccountManager.new(user: user, password: "entered password")
+        allow(c).to receive(:puts)
+        expect(c).to receive(:puts).with(/Please provide your Apple Developer Program account credentials/)
+        FastlaneSpec::Env.with_env_values("FASTLANE_HIDE_LOGIN_INFORMATION" => "false", "FASTLANE_STORE_PASSWORDS_IN_KEYCHAIN" => nil) do
+          c.send(:ask_for_login)
+        end
+      end
+
       it "does not store the entered password unless asked to" do
         expect(Security::InternetPassword).not_to receive(:add)
         ask_for_login_with("FASTLANE_STORE_PASSWORDS_IN_KEYCHAIN" => nil)

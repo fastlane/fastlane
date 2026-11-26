@@ -231,6 +231,15 @@ describe Spaceship::Client do
       end
     end
 
+    it "writes to a file when VERBOSE is false" do
+      client = TestClient.new
+
+      FastlaneSpec::Env.with_env_values("VERBOSE" => "false") do
+        expect(client.logger.instance_variable_get(:@logdev).filename)
+          .to start_with(Dir.tmpdir)
+      end
+    end
+
     it "writes a log readable by its owner only" do
       old_umask = File.umask(0o022)
       client = TestClient.new

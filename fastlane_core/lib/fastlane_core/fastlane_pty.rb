@@ -2,6 +2,8 @@
 # https://github.com/fastlane/fastlane/pull/11384#issuecomment-356084518 and
 # https://github.com/DragonBox/u3d/blob/59e471ad78ac00cb629f479dbe386c5ad2dc5075/lib/u3d_core/command_runner.rb#L88-L96
 
+require_relative 'env'
+
 class StandardError
   def exit_status
     return -1
@@ -32,7 +34,7 @@ module FastlaneCore
     def self.spawn_with_pty(original_command, env: {}, chdir: nil, &block)
       require 'pty'
       # this forces the PTY flush - fixes #21792
-      command = ENV['FASTLANE_EXEC_FLUSH_PTY_WORKAROUND'] ? "#{original_command};" : original_command
+      command = FastlaneCore::Env.truthy?('FASTLANE_EXEC_FLUSH_PTY_WORKAROUND') ? "#{original_command};" : original_command
       # The status is produced in the ensure below and read after the block. It
       # travels in a local rather than in $?, which is a thread global: anything
       # that runs a subprocess in between overwrites it, and nothing writes it at

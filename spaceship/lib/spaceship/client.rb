@@ -218,14 +218,14 @@ module Spaceship
         c.use(Spaceship::StatsMiddleware)
         c.adapter(Faraday.default_adapter)
 
-        if ENV['SPACESHIP_DEBUG']
+        if Spaceship::Globals.env_truthy?('SPACESHIP_DEBUG')
           # for debugging only
           # This enables tracking of networking requests using Charles Web Proxy
           c.proxy = "https://127.0.0.1:8888"
           c.ssl[:verify_mode] = OpenSSL::SSL::VERIFY_NONE
         elsif ENV["SPACESHIP_PROXY"]
           c.proxy = ENV["SPACESHIP_PROXY"]
-          c.ssl[:verify_mode] = OpenSSL::SSL::VERIFY_NONE if ENV["SPACESHIP_PROXY_SSL_VERIFY_NONE"]
+          c.ssl[:verify_mode] = OpenSSL::SSL::VERIFY_NONE if Spaceship::Globals.env_truthy?("SPACESHIP_PROXY_SSL_VERIFY_NONE")
         end
 
         if ENV["DEBUG"]
@@ -247,7 +247,7 @@ module Spaceship
     # unless something else happens to have created it first.
     def logger
       unless @logger
-        if ENV["VERBOSE"]
+        if Spaceship::Globals.env_truthy?("VERBOSE")
           @logger = Logger.new(STDOUT)
         else
           # Log to file by default
@@ -646,7 +646,7 @@ module Spaceship
     # rubocop:enable Metrics/PerceivedComplexity
 
     def perform_login_method(user, password, modified_cookie)
-      do_legacy_signin = ENV['FASTLANE_USE_LEGACY_PRE_SIRP_AUTH']
+      do_legacy_signin = Spaceship::Globals.env_truthy?('FASTLANE_USE_LEGACY_PRE_SIRP_AUTH')
       if do_legacy_signin
         puts("Starting legacy Apple ID login") if Spaceship::Globals.verbose?
 

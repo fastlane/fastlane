@@ -65,6 +65,13 @@ describe Spaceship::ProvisioningProfile do
       Spaceship::ProvisioningProfile.find_by_bundle_id(bundle_id: 'some-fake-id')
     end
 
+    it 'should use the Xcode api when SPACESHIP_AVOID_XCODE_API is false' do
+      stub_const('ENV', { "SPACESHIP_AVOID_XCODE_API" => 'false' })
+      expect(client).to receive(:provisioning_profiles_via_xcode_api).and_call_original
+      expect(client).not_to(receive(:provisioning_profiles))
+      Spaceship::ProvisioningProfile.find_by_bundle_id(bundle_id: 'some-fake-id')
+    end
+
     it 'should use the developer portal api to get provisioning profiles and their appIds' do
       stub_const('ENV', { "SPACESHIP_AVOID_XCODE_API" => 'true' })
       expect(client).not_to(receive(:provisioning_profiles_via_xcode_api))

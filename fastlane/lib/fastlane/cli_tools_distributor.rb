@@ -1,3 +1,5 @@
+require 'fastlane_core/env'
+
 module Fastlane
   # This class is responsible for checking the ARGV
   # to see if the user wants to launch another fastlane
@@ -31,7 +33,8 @@ module Fastlane
         # JSON commands print the JSON on STDOUT; logs and prompts go to stderr.
         $stdout = $stderr if running_json_command?
 
-        if ENV["FASTLANE_DISABLE_ANIMATION"].nil?
+        animate = !FastlaneCore::Env.truthy?("FASTLANE_DISABLE_ANIMATION")
+        if animate
           # Usually in the fastlane code base we use
           #
           #   Helper.show_loading_indicator
