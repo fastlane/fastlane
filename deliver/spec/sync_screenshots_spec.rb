@@ -221,4 +221,20 @@ describe Deliver::SyncScreenshots do
       app_screenshot_set
     end
   end
+
+  describe '#sync_localizations' do
+    subject { described_class.new }
+
+    it 'replaces and sorts the screenshots of the given localizations without an app version' do
+      localizations = [double('localization', locale: 'en-US')]
+      screenshots = [double('Deliver::AppScreenshot', language: 'en-US')]
+      iterator = double('Deliver::AppScreenshotIterator')
+      expect(Deliver::AppScreenshotIterator).to receive(:new).with(localizations).and_return(iterator)
+      expect(subject).to receive(:replace_screenshots).with(iterator, screenshots)
+      expect(subject).to receive(:sort_screenshots).with(iterator)
+      expect(subject).not_to receive(:version)
+
+      subject.sync_localizations(localizations, screenshots)
+    end
+  end
 end

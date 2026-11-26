@@ -29,7 +29,9 @@ module Deliver
       end
     end
 
-    def initialize(app:, platform:)
+    # `app` and `platform` select the edit App Store version that `sync` uploads to.
+    # `sync_localizations` takes the localizations directly and needs neither.
+    def initialize(app: nil, platform: nil)
       @app = app
       @platform = platform
     end
@@ -41,12 +43,7 @@ module Deliver
     end
 
     def sync(screenshots)
-      UI.important('This is currently a beta feature in fastlane. This may cause some errors on your environment.')
-
-      unless FastlaneCore::Feature.enabled?('FASTLANE_ENABLE_BETA_DELIVER_SYNC_SCREENSHOTS')
-        UI.user_error!('Please set a value to "FASTLANE_ENABLE_BETA_DELIVER_SYNC_SCREENSHOTS" environment variable ' \
-                       'if you acknowledge the risk and try this out.')
-      end
+      ensure_beta_enabled!
 
       UI.important("Will begin uploading snapshots for '#{version.version_string}' on App Store Connect")
 
@@ -54,8 +51,15 @@ module Deliver
       screenshots_per_language = screenshots.group_by(&:language)
       enable_localizations(screenshots_per_language.keys)
 
-      # create iterator
-      localizations = fetch_localizations
+      sync_localizations(fetch_localizations, screenshots)
+
+      UI.important('Screenshots are synced successfully!')
+    end
+
+    # Syncs the screenshots into the given localizations, which must already exist for every
+    # language in `screenshots`. Any localization model that responds to `locale` and
+    # `get_app_screenshot_sets` works (an App Store version or a custom product page version).
+    def sync_localizations(localizations, screenshots)
       iterator = Deliver::AppScreenshotIterator.new(localizations)
 
       # sync local screenshots with remote settings by deleting and uploading
@@ -64,8 +68,15 @@ module Deliver
 
       # ensure screenshots within screenshot sets are sorted in right order
       sort_screenshots(iterator)
+    end
 
-      UI.important('Screenshots are synced successfully!')
+    def ensure_beta_enabled!
+      UI.important('This is currently a beta feature in fastlane. This may cause some errors on your environment.')
+
+      unless FastlaneCore::Feature.enabled?('FASTLANE_ENABLE_BETA_DELIVER_SYNC_SCREENSHOTS')
+        UI.user_error!('Please set a value to "FASTLANE_ENABLE_BETA_DELIVER_SYNC_SCREENSHOTS" environment variable ' \
+                       'if you acknowledge the risk and try this out.')
+      end
     end
 
     def enable_localizations(locales)
