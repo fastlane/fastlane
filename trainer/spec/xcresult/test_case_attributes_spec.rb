@@ -6,14 +6,15 @@ describe Trainer::XCResult::TestCaseAttributes do
       end
     end
 
-    context 'with Xcode >= 16.3' do
-      before do
-        allow(FastlaneCore::Helper).to receive(:xcode_at_least?).with('16.3').and_return(true)
-      end
-
+    context 'with durationInSeconds (Xcode 16.3 and later)' do
       it 'returns durationInSeconds when present' do
         node = { 'durationInSeconds' => 1.5 }
         expect(test_class.extract_duration(node)).to eq(1.5)
+      end
+
+      it 'prefers durationInSeconds over the rounded duration string' do
+        node = { 'duration' => '2s', 'durationInSeconds' => 2.5 }
+        expect(test_class.extract_duration(node)).to eq(2.5)
       end
 
       it 'returns 0.0 when durationInSeconds is nil' do
@@ -26,9 +27,9 @@ describe Trainer::XCResult::TestCaseAttributes do
         expect(test_class.extract_duration(node)).to eq(0.0)
       end
 
-      it 'returns 0 when durationInSeconds is 0' do
-        node = { 'durationInSeconds' => 0 }
-        expect(test_class.extract_duration(node)).to eq(0)
+      it 'returns a Float when durationInSeconds is an integer' do
+        node = { 'durationInSeconds' => 2 }
+        expect(test_class.extract_duration(node)).to eql(2.0)
       end
 
       it 'handles float values correctly' do
@@ -37,11 +38,7 @@ describe Trainer::XCResult::TestCaseAttributes do
       end
     end
 
-    context 'with Xcode < 16.3' do
-      before do
-        allow(FastlaneCore::Helper).to receive(:xcode_at_least?).with('16.3').and_return(false)
-      end
-
+    context 'without durationInSeconds (before Xcode 16.3)' do
       it 'returns 0.0 when duration is nil' do
         node = { 'duration' => nil }
         expect(test_class.extract_duration(node)).to eq(0.0)
