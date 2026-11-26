@@ -7,13 +7,25 @@ module Deliver
   # Set pricing independently of App Store country availability.
   class UploadPriceTier
     def upload(options)
-      validate_options!(options)
-      return unless options[:price_tier] || options[:price] || options[:price_point_id]
+      prepare(options)&.call
+    end
+
+    # Resolve pricing before deliver changes versions or metadata. The returned
+    # operation is invoked only after those steps succeed.
+    def prepare(options)
+      selectors = [:price_tier, :price, :price_point_id].select { |key| options[key] }
+      UI.user_error!("#{selectors.join(' and ')} cannot be used together") if selectors.size > 1
+      if selectors.empty?
+        UI.user_error!("price_base_territory requires price_tier: 0, price, or price_point_id") if options[:price_base_territory]
+        return
+      end
+      if %w[DELIVER_PRICE_START_DATE DELIVER_PRICE_END_DATE].any? { |key| !ENV[key].to_s.empty? }
+        UI.user_error!("Scheduled pricing is unsupported. Remove DELIVER_PRICE_START_DATE and DELIVER_PRICE_END_DATE before setting an immediate price")
+      end
 
       app = Deliver.cache[:app]
-      schedule = app.fetch_app_price_schedule
-      prices = schedule ? schedule.get_manual_prices : []
-      territory_id = base_territory_id(options, schedule, prices)
+      base, prices = read_schedule(app)
+      territory_id = base_territory_id(options, base, prices)
       point = price_point(app, options, territory_id)
       base_prices = prices.select { |price| price.territory.id == territory_id }
       current = current_price(base_prices)
@@ -26,30 +38,36 @@ module Deliver
         UI.user_error!("The base territory has a scheduled price change. Manage this schedule in App Store Connect")
       end
 
-      Spaceship::ConnectAPI::AppPriceSchedule.create(
-        app_id: app.id,
-        base_territory_id: territory_id,
-        price_point_id: point.id,
-        preserved_price_ids: prices.reject { |price| price == current }.map(&:id)
-      )
-      UI.success("Successfully updated the app price schedule")
-    end
-
-    def validate_options!(options)
-      selectors = [:price_tier, :price, :price_point_id].reject { |key| options[key].nil? }
-      UI.user_error!("#{selectors.join(' and ')} cannot be used together") if selectors.size > 1
-      if selectors.empty? && options[:price_base_territory]
-        UI.user_error!("price_base_territory requires price_tier: 0, price, or price_point_id")
+      before = schedule_snapshot(base, prices)
+      preserved = prices.reject { |price| price == current }.map(&:id)
+      return lambda do
+        # Uploading screenshots can take minutes. Check the schedule again
+        # before replacing it, without repeating the price-point lookup.
+        unless schedule_snapshot(*read_schedule(app)) == before
+          UI.user_error!("The app price schedule changed during the upload. Check App Store Connect before retrying")
+        end
+        Spaceship::ConnectAPI::AppPriceSchedule.create(
+          app_id: app.id, base_territory_id: territory_id, price_point_id: point.id, preserved_price_ids: preserved
+        )
+        UI.success("Successfully updated the app price schedule")
       end
     end
 
     private
 
-    def base_territory_id(options, schedule, prices)
+    def read_schedule(app)
+      schedule = app.fetch_app_price_schedule
+      [schedule&.base_territory&.id, schedule ? schedule.get_manual_prices : []]
+    end
+
+    def schedule_snapshot(base, prices)
+      [base, prices.to_h { |p| [p.id, [p.territory&.id, p.app_price_point&.id, p.start_date, p.end_date]] }]
+    end
+
+    def base_territory_id(options, existing, prices)
       if prices.any? { |price| price.id.to_s.empty? || price.territory&.id.to_s.empty? || price.app_price_point&.id.to_s.empty? }
         UI.user_error!("Could not read all existing price relationships; no pricing changes were made")
       end
-      existing = schedule&.base_territory&.id
       if existing.nil? && !prices.empty?
         UI.user_error!("Could not read the existing base territory; no pricing changes were made")
       end

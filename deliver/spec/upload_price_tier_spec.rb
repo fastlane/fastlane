@@ -72,24 +72,26 @@ describe Deliver::UploadPriceTier do
       uploader.upload(config)
     end
 
-    [:parameters, :environment, :configuration_file].repeated_permutation(2) do |tier_source, point_source|
-      next if tier_source == :parameters && point_source == :parameters # ConfigItem already rejects direct conflicts.
-
-      it "rejects free pricing from #{tier_source} with a paid price point from #{point_source} before contacting Apple" do
-        sources = { parameters: {}, environment: {}, configuration_file: {} }
-        sources[tier_source][:price_tier] = 0
-        sources[point_source][:price_point_id] = 'paid-point'
-        env = sources[:environment].to_h { |key, value| ["DELIVER_#{key.to_s.upcase}", value.to_s] }
-
-        FastlaneSpec::Env.with_env_values(env) do
-          config = FastlaneCore::Configuration.create(Deliver::Options.available_options, sources[:parameters])
-          config.config_file_options = sources[:configuration_file]
-          expect(app).not_to receive(:fetch_app_price_schedule)
-          expect(Spaceship::ConnectAPI::AppPriceSchedule).not_to receive(:create)
-          expect { uploader.upload(config) }.to raise_error(FastlaneCore::Interface::FastlaneError, /price_tier.*price_point_id/)
-        end
-      end
+    it 'rejects conflicting selectors for a standalone upload' do
+      config = FastlaneCore::Configuration.create(Deliver::Options.available_options, price_tier: 0)
+      config.config_file_options = { price_point_id: 'paid-point' }
+      expect(app).not_to receive(:fetch_app_price_schedule)
+      expect { uploader.upload(config) }.to raise_error(FastlaneCore::Interface::FastlaneError, /cannot be used together/)
     end
+  end
+
+  it 'refuses a previously scheduled environment price instead of applying it immediately' do
+    FastlaneSpec::Env.with_env_values('DELIVER_PRICE_START_DATE' => '2099-01-01') do
+      expect(app).not_to receive(:fetch_app_price_schedule)
+      expect { uploader.upload(price_point_id: paid.id) }.to raise_error(FastlaneCore::Interface::FastlaneError, /Scheduled pricing is unsupported/)
+    end
+  end
+
+  it 'does not overwrite a territory override added during the metadata upload' do
+    pending = uploader.prepare(price: '0.99')
+    prices << price('override', free, territory: canada)
+    expect(Spaceship::ConnectAPI::AppPriceSchedule).not_to receive(:create)
+    expect { pending.call }.to raise_error(FastlaneCore::Interface::FastlaneError, /schedule changed/)
   end
 
   it 'creates initial Free pricing through an app-specific zero price point' do

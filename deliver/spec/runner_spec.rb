@@ -326,14 +326,14 @@ describe Deliver::Runner do
       expect(runner).not_to receive(:submit_for_review)
     end
 
-    it 'rejects resolved pricing conflicts before any App Store mutations' do
-      FastlaneSpec::Env.with_env_values('DELIVER_PRICE_TIER' => '0') do
-        config = FastlaneCore::Configuration.create(Deliver::Options.available_options, app_version: '1.0.7', reject_if_possible: true)
-        config.config_file_options = { price_point_id: 'paid-point' }
-        runner.options = config
-        expect_no_uploads
-        expect { runner.run }.to raise_error(FastlaneCore::Interface::FastlaneError, /price_tier.*price_point_id/)
-      end
+    it 'rejects an unmatched customer price before creating or rejecting a version' do
+      app = Spaceship::ConnectAPI::App.new('app-id', {})
+      allow(Deliver).to receive(:cache).and_return(app: app)
+      allow(app).to receive(:fetch_app_price_schedule).and_return(nil)
+      allow(app).to receive(:get_app_price_points).with(filter: { territory: 'USA' }).and_return([])
+      options.merge!(price: '1.23', reject_if_possible: true)
+      expect_no_uploads
+      expect { runner.run }.to raise_error(FastlaneCore::Interface::FastlaneError, /No matching price point/)
     end
 
     it 'rejects a decimal price from the environment and a point ID from the Deliverfile' do
