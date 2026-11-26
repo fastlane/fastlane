@@ -228,10 +228,6 @@ describe Scan do
 
     # A Swift package, or a project that doesn't test on a simulator, has no simulators to act on
     describe "simulator options when scan picked no simulators" do
-      around do |example|
-        FastlaneSpec::Env.with_option_env_values_cleared(Scan::Options.available_options) { example.run }
-      end
-
       def configure(options)
         allow(Scan).to receive(:config).and_return(FastlaneCore::Configuration.create(Scan::Options.available_options, options))
         allow(Scan).to receive(:devices).and_return(nil)

@@ -16,9 +16,9 @@ describe Gym do
   end
 
   describe Gym::ErrorHandler, requires_xcode: true do
-    # `disable_xcpretty`, or the global lookup switch, would skip the lookups these examples are about
+    # The global lookup switch would skip the lookups these examples are about
     around do |example|
-      FastlaneSpec::Env.with_option_env_values_cleared(Gym::Options.available_options, 'FASTLANE_DISALLOW_XCODEBUILD_SETTINGS_LOOKUP' => nil) { example.run }
+      FastlaneSpec::Env.with_env_values("FASTLANE_DISALLOW_XCODEBUILD_SETTINGS_LOOKUP" => nil) { example.run }
     end
 
     context "when naming the build log has to read the build settings" do

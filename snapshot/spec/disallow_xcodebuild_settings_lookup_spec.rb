@@ -1,8 +1,8 @@
 describe Snapshot do
-  # Unset the environment variables snapshot's options read, and the global lookup switch,
-  # so the developer's environment can't change the outcome
+  # The suite unsets what snapshot's options read. The global lookup switch isn't one of them,
+  # so the developer's environment can't change the outcome through it either
   around do |example|
-    FastlaneSpec::Env.with_option_env_values_cleared(Snapshot::Options.available_options, 'FASTLANE_DISALLOW_XCODEBUILD_SETTINGS_LOOKUP' => nil) { example.run }
+    FastlaneSpec::Env.with_env_values("FASTLANE_DISALLOW_XCODEBUILD_SETTINGS_LOOKUP" => nil) { example.run }
   end
 
   let(:options) do

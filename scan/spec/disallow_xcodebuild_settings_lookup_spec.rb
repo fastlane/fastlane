@@ -1,10 +1,10 @@
 require 'scan'
 
 describe Scan do
-  # Unset the environment variables scan's options read, and the global lookup switch,
-  # so the developer's environment can't change the outcome
+  # The suite unsets what scan's options read. The global lookup switch isn't one of them,
+  # so the developer's environment can't change the outcome through it either
   around do |example|
-    FastlaneSpec::Env.with_option_env_values_cleared(Scan::Options.available_options, 'FASTLANE_DISALLOW_XCODEBUILD_SETTINGS_LOOKUP' => nil) { example.run }
+    FastlaneSpec::Env.with_env_values("FASTLANE_DISALLOW_XCODEBUILD_SETTINGS_LOOKUP" => nil) { example.run }
   end
 
   let(:simulator) { FastlaneCore::DeviceManager::Device.new(name: "iPhone 15", udid: "00000000-0000-0000-0000-000000000015", os_type: "iOS", os_version: "17.0", state: "Shutdown", is_simulator: true) }
