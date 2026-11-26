@@ -5,11 +5,37 @@ module Spaceship
     class AppCustomProductPageVersion
       include Spaceship::ConnectAPI::Model
 
+      attr_accessor :version
       attr_accessor :state
+      attr_accessor :deep_link
 
       attr_mapping({
-        "state" => "state"
+        "version" => "version",
+        "state" => "state",
+        "deepLink" => "deep_link"
       })
+
+      # https://developer.apple.com/documentation/appstoreconnectapi/appcustomproductpageversion/attributes-data.dictionary
+      module State
+        PREPARE_FOR_SUBMISSION = "PREPARE_FOR_SUBMISSION"
+        READY_FOR_REVIEW = "READY_FOR_REVIEW"
+        WAITING_FOR_REVIEW = "WAITING_FOR_REVIEW"
+        IN_REVIEW = "IN_REVIEW"
+        ACCEPTED = "ACCEPTED"
+        APPROVED = "APPROVED"
+        REPLACED_WITH_NEW_VERSION = "REPLACED_WITH_NEW_VERSION"
+        REJECTED = "REJECTED"
+      end
+
+      # The states in which the version's screenshots can still be changed
+      EDITABLE_STATES = [
+        State::PREPARE_FOR_SUBMISSION,
+        State::REJECTED
+      ]
+
+      def editable?
+        EDITABLE_STATES.include?(state)
+      end
 
       def self.type
         return "appCustomProductPageVersions"

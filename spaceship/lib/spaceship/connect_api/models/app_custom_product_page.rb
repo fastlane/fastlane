@@ -6,9 +6,17 @@ module Spaceship
       include Spaceship::ConnectAPI::Model
 
       attr_accessor :name
+      attr_accessor :url
+      attr_accessor :visible
+
+      attr_accessor :app
 
       attr_mapping({
-        "name" => "name"
+        "name" => "name",
+        "url" => "url",
+        "visible" => "visible",
+
+        "app" => "app"
       })
 
       def self.type

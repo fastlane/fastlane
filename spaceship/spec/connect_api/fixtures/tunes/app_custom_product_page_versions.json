@@ -1,0 +1,14 @@
+{
+  "data": [
+    {
+      "type": "appCustomProductPageVersions",
+      "id": "cpp-version-1",
+      "attributes": { "version": "1", "state": "APPROVED", "deepLink": null }
+    },
+    {
+      "type": "appCustomProductPageVersions",
+      "id": "cpp-version-2",
+      "attributes": { "version": "2", "state": "PREPARE_FOR_SUBMISSION", "deepLink": "example://tarot" }
+    }
+  ]
+}

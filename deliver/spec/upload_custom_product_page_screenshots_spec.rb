@@ -1,12 +1,11 @@
 require 'deliver/upload_custom_product_page_screenshots'
 
 describe Deliver::UploadCustomProductPageScreenshots do
-  let(:app) { double('Spaceship::ConnectAPI::App', name: 'Test App') }
+  let(:app) { double('Spaceship::ConnectAPI::App', id: 'app-1', name: 'Test App') }
 
   before do
     allow(Deliver).to receive(:cache).and_return({ app: app })
-    allow(FastlaneCore::Helper).to receive(:show_loading_indicator)
-    allow(FastlaneCore::Helper).to receive(:hide_loading_indicator)
+    allow(FastlaneCore::Helper).to receive(:with_loading_indicator).and_yield
   end
 
   def mock_options(overrides = {})
@@ -20,15 +19,16 @@ describe Deliver::UploadCustomProductPageScreenshots do
     }.merge(overrides)
   end
 
-  def mock_cpp(name: 'My CPP', id: 'cpp-123')
-    double('Spaceship::ConnectAPI::AppCustomProductPage', name: name, id: id)
+  def mock_cpp(name: 'My CPP', id: 'cpp-123', app_id: 'app-1')
+    owner = app_id ? double('Spaceship::ConnectAPI::App', id: app_id) : nil
+    double('Spaceship::ConnectAPI::AppCustomProductPage', name: name, id: id, app: owner)
   end
 
-  def mock_version(id: 'ver-1', state: 'PREPARE_FOR_SUBMISSION')
-    version = double('Spaceship::ConnectAPI::AppCustomProductPageVersion', id: id, state: state)
-    allow(version).to receive(:get_localizations).and_return([])
-    allow(version).to receive(:create_localization)
-    version
+  def mock_version(id: 'ver-1', version: '1', state: 'PREPARE_FOR_SUBMISSION')
+    model = Spaceship::ConnectAPI::AppCustomProductPageVersion.new(id, { 'version' => version, 'state' => state })
+    allow(model).to receive(:get_localizations).and_return([])
+    allow(model).to receive(:create_localization)
+    model
   end
 
   def mock_localization(locale: 'en-US')
@@ -39,286 +39,159 @@ describe Deliver::UploadCustomProductPageScreenshots do
     double('Deliver::AppScreenshot', language: language, path: path, display_type: display_type)
   end
 
+  def stub_page(cpp, versions)
+    allow(Spaceship::ConnectAPI::AppCustomProductPage).to receive(:get).with(app_custom_product_page_id: cpp.id, includes: 'app').and_return([cpp])
+    allow(Spaceship::ConnectAPI::AppCustomProductPageVersion).to receive(:all).with(app_custom_product_page_id: cpp.id).and_return(versions)
+  end
+
+  # A subject whose upload steps are stubbed, so a test only checks which steps run
+  def stubbed_subject
+    subject = described_class.new
+    allow(subject).to receive(:delete_screenshots)
+    allow(subject).to receive(:upload_screenshots)
+    allow(subject).to receive(:sort_screenshots)
+    subject
+  end
+
   describe '#upload' do
-    context 'early returns' do
+    context 'early returns and option errors' do
       it 'returns immediately when skip_screenshots is set' do
-        options = mock_options(skip_screenshots: true)
         expect(Spaceship::ConnectAPI::AppCustomProductPage).not_to receive(:get)
-        described_class.new.upload(options, [])
+        described_class.new.upload(mock_options(skip_screenshots: true), [])
       end
 
-      it 'returns immediately when edit_live is set' do
-        options = mock_options(edit_live: true)
+      it 'errors when edit_live is set' do
         expect(Spaceship::ConnectAPI::AppCustomProductPage).not_to receive(:get)
-        described_class.new.upload(options, [])
+        expect { described_class.new.upload(mock_options(edit_live: true), []) }.to raise_error(FastlaneCore::Interface::FastlaneError, /edit_live/)
+      end
+
+      it 'errors when custom_product_page_id is nil' do
+        expect { described_class.new.upload(mock_options(custom_product_page_id: nil), []) }.to raise_error(FastlaneCore::Interface::FastlaneError, /custom_product_page_id/)
+      end
+
+      it 'errors when custom_product_page_id is an empty string' do
+        expect { described_class.new.upload(mock_options(custom_product_page_id: '  '), []) }.to raise_error(FastlaneCore::Interface::FastlaneError, /custom_product_page_id/)
+      end
+
+      it 'errors in sync mode without the beta feature flag, before any request' do
+        allow(FastlaneCore::Feature).to receive(:enabled?).with('FASTLANE_ENABLE_BETA_DELIVER_SYNC_SCREENSHOTS').and_return(false)
+        expect(Spaceship::ConnectAPI::AppCustomProductPage).not_to receive(:get)
+        expect { described_class.new.upload(mock_options(sync_screenshots: true), []) }.to raise_error(FastlaneCore::Interface::FastlaneError, /FASTLANE_ENABLE_BETA_DELIVER_SYNC_SCREENSHOTS/)
       end
     end
 
-    context 'error cases' do
-      it 'errors when custom_product_page_id is nil' do
-        options = mock_options(custom_product_page_id: nil)
-        expect { described_class.new.upload(options, []) }.to raise_error(FastlaneCore::Interface::FastlaneError, /custom_product_page_id/)
-      end
-
-      it 'errors when custom_product_page_id is empty string' do
-        options = mock_options(custom_product_page_id: '  ')
-        expect { described_class.new.upload(options, []) }.to raise_error(FastlaneCore::Interface::FastlaneError, /custom_product_page_id/)
-      end
-
-      it 'errors when CPP not found' do
-        options = mock_options
+    context 'custom product page lookup' do
+      it 'errors when the page is not found' do
         allow(Spaceship::ConnectAPI::AppCustomProductPage).to receive(:get).and_return([])
-        expect { described_class.new.upload(options, []) }.to raise_error(FastlaneCore::Interface::FastlaneError, /Could not find custom product page/)
+        expect { described_class.new.upload(mock_options, []) }.to raise_error(FastlaneCore::Interface::FastlaneError, /Could not find Custom Product Page/)
       end
 
-      it 'errors when no versions exist' do
-        options = mock_options
-        cpp = mock_cpp
-        allow(Spaceship::ConnectAPI::AppCustomProductPage).to receive(:get).and_return([cpp])
-        allow(Spaceship::ConnectAPI::AppCustomProductPageVersion).to receive(:all).and_return([])
-        expect { described_class.new.upload(options, []) }.to raise_error(FastlaneCore::Interface::FastlaneError, /no versions/)
+      it 'errors when the page belongs to another app' do
+        stub_page(mock_cpp(app_id: 'app-2'), [mock_version])
+        expect(Spaceship::ConnectAPI::AppCustomProductPageVersion).not_to receive(:all)
+        expect { described_class.new.upload(mock_options, []) }.to raise_error(FastlaneCore::Interface::FastlaneError, /does not belong to app 'Test App'/)
       end
 
-      it 'errors when no editable version found' do
-        options = mock_options
-        cpp = mock_cpp
-        version = mock_version(id: 'ver-1', state: 'ACCEPTED')
-        allow(Spaceship::ConnectAPI::AppCustomProductPage).to receive(:get).and_return([cpp])
-        allow(Spaceship::ConnectAPI::AppCustomProductPageVersion).to receive(:all).and_return([version])
-        expect { described_class.new.upload(options, []) }.to raise_error(FastlaneCore::Interface::FastlaneError, /No editable version/)
+      it 'errors when the page has no app' do
+        stub_page(mock_cpp(app_id: nil), [mock_version])
+        expect { described_class.new.upload(mock_options, []) }.to raise_error(FastlaneCore::Interface::FastlaneError, /does not belong to app/)
       end
-
     end
 
     context 'version selection' do
-      it 'auto-selects most recent editable version' do
-        options = mock_options
-        cpp = mock_cpp
-        old_version = mock_version(id: 'ver-old', state: 'ACCEPTED')
-        new_version = mock_version(id: 'ver-new', state: 'PREPARE_FOR_SUBMISSION')
-        allow(Spaceship::ConnectAPI::AppCustomProductPage).to receive(:get).and_return([cpp])
-        allow(Spaceship::ConnectAPI::AppCustomProductPageVersion).to receive(:all).and_return([old_version, new_version])
-        allow(new_version).to receive(:get_localizations).and_return([])
+      it 'errors when no versions exist' do
+        stub_page(mock_cpp, [])
+        expect { described_class.new.upload(mock_options, []) }.to raise_error(FastlaneCore::Interface::FastlaneError, /no versions/)
+      end
 
-        subject = described_class.new
-        allow(subject).to receive(:upload_screenshots)
-        allow(subject).to receive(:sort_screenshots)
+      it 'errors when no version is editable, listing the states' do
+        stub_page(mock_cpp, [mock_version(version: '1', state: 'APPROVED'), mock_version(id: 'ver-2', version: '2', state: 'WAITING_FOR_REVIEW')])
+        expect { described_class.new.upload(mock_options, []) }.to raise_error(FastlaneCore::Interface::FastlaneError, /version 1: APPROVED, version 2: WAITING_FOR_REVIEW/)
+      end
 
-        subject.upload(options, [])
-        # Should use new_version (last editable version after reverse)
-        expect(new_version).to have_received(:get_localizations)
+      it 'selects the editable version with the highest version number, whatever the API order' do
+        newest = mock_version(id: 'ver-10', version: '10')
+        older = mock_version(id: 'ver-9', version: '9')
+        approved = mock_version(id: 'ver-11', version: '11', state: 'APPROVED')
+        stub_page(mock_cpp, [newest, approved, older])
+
+        stubbed_subject.upload(mock_options, [])
+        expect(newest).to have_received(:get_localizations)
+        expect(older).not_to have_received(:get_localizations)
+        expect(approved).not_to have_received(:get_localizations)
+      end
+
+      it 'treats a rejected version as editable' do
+        rejected = mock_version(version: '2', state: 'REJECTED')
+        stub_page(mock_cpp, [mock_version(id: 'ver-0', version: '1', state: 'APPROVED'), rejected])
+
+        stubbed_subject.upload(mock_options, [])
+        expect(rejected).to have_received(:get_localizations)
       end
     end
 
     context 'localization activation' do
-      it 'creates missing locales' do
-        options = mock_options
-        cpp = mock_cpp
-        version = mock_version(id: 'ver-1', state: 'DRAFT')
+      let(:version) { mock_version }
+
+      before { stub_page(mock_cpp, [version]) }
+
+      it 'creates missing locales and uploads to the refreshed localizations' do
         en_loc = mock_localization(locale: 'en-US')
-        allow(Spaceship::ConnectAPI::AppCustomProductPage).to receive(:get).and_return([cpp])
-        allow(Spaceship::ConnectAPI::AppCustomProductPageVersion).to receive(:all).and_return([version])
-        # First call returns only en-US; after creation, returns both
         fr_loc = mock_localization(locale: 'fr-FR')
         allow(version).to receive(:get_localizations).and_return([en_loc], [en_loc, fr_loc])
-
         screenshot = mock_screenshot(language: 'fr-FR')
 
-        subject = described_class.new
-        allow(subject).to receive(:upload_screenshots)
-        allow(subject).to receive(:sort_screenshots)
-
-        subject.upload(options, [screenshot])
+        subject = stubbed_subject
+        subject.upload(mock_options, [screenshot])
         expect(version).to have_received(:create_localization).with(attributes: { locale: 'fr-FR' })
+        expect(subject).to have_received(:upload_screenshots).with([en_loc, fr_loc], { 'fr-FR' => [screenshot] }, 3600)
       end
 
       it 'skips activation when all locales exist' do
-        options = mock_options
-        cpp = mock_cpp
-        version = mock_version(id: 'ver-1', state: 'DRAFT')
-        en_loc = mock_localization(locale: 'en-US')
-        allow(Spaceship::ConnectAPI::AppCustomProductPage).to receive(:get).and_return([cpp])
-        allow(Spaceship::ConnectAPI::AppCustomProductPageVersion).to receive(:all).and_return([version])
-        allow(version).to receive(:get_localizations).and_return([en_loc])
+        allow(version).to receive(:get_localizations).and_return([mock_localization(locale: 'en-US')])
 
-        screenshot = mock_screenshot(language: 'en-US')
-
-        subject = described_class.new
-        allow(subject).to receive(:upload_screenshots)
-        allow(subject).to receive(:sort_screenshots)
-
-        subject.upload(options, [screenshot])
+        stubbed_subject.upload(mock_options, [mock_screenshot(language: 'en-US')])
         expect(version).not_to have_received(:create_localization)
       end
     end
 
     context 'mode delegation' do
-      let(:cpp) { mock_cpp }
-      let(:version) { mock_version(id: 'ver-1', state: 'DRAFT') }
       let(:en_loc) { mock_localization(locale: 'en-US') }
       let(:screenshot) { mock_screenshot(language: 'en-US') }
 
       before do
-        allow(Spaceship::ConnectAPI::AppCustomProductPage).to receive(:get).and_return([cpp])
-        allow(Spaceship::ConnectAPI::AppCustomProductPageVersion).to receive(:all).and_return([version])
+        version = mock_version
         allow(version).to receive(:get_localizations).and_return([en_loc])
+        stub_page(mock_cpp, [version])
       end
 
-      it 'calls sync_replace_screenshots in sync mode' do
-        options = mock_options(sync_screenshots: true)
+      it 'syncs the page localizations with SyncScreenshots in sync mode' do
+        allow(FastlaneCore::Feature).to receive(:enabled?).with('FASTLANE_ENABLE_BETA_DELIVER_SYNC_SCREENSHOTS').and_return(true)
+        sync = Deliver::SyncScreenshots.new
+        allow(Deliver::SyncScreenshots).to receive(:new).and_return(sync)
+        expect(sync).to receive(:sync_localizations).with([en_loc], [screenshot])
 
-        subject = described_class.new
-        allow(subject).to receive(:sync_replace_screenshots)
-        allow(subject).to receive(:sort_screenshots)
-
-        subject.upload(options, [screenshot])
-        expect(subject).to have_received(:sync_replace_screenshots)
+        subject = stubbed_subject
+        subject.upload(mock_options(sync_screenshots: true), [screenshot])
+        expect(subject).not_to have_received(:upload_screenshots)
+        expect(subject).not_to have_received(:delete_screenshots)
       end
 
-      it 'calls delete_screenshots then upload_screenshots in overwrite mode' do
-        options = mock_options(overwrite_screenshots: true)
+      it 'deletes then uploads in overwrite mode' do
+        subject = stubbed_subject
+        subject.upload(mock_options(overwrite_screenshots: true), [screenshot])
+        expect(subject).to have_received(:delete_screenshots).with([en_loc], { 'en-US' => [screenshot] }).ordered
+        expect(subject).to have_received(:upload_screenshots).ordered
+        expect(subject).to have_received(:sort_screenshots).with([en_loc])
+      end
 
-        subject = described_class.new
-        allow(subject).to receive(:delete_screenshots)
-        allow(subject).to receive(:upload_screenshots)
-        allow(subject).to receive(:sort_screenshots)
-
-        subject.upload(options, [screenshot])
-        expect(subject).to have_received(:delete_screenshots)
+      it 'only uploads in default mode' do
+        subject = stubbed_subject
+        subject.upload(mock_options, [screenshot])
+        expect(subject).not_to have_received(:delete_screenshots)
         expect(subject).to have_received(:upload_screenshots)
+        expect(subject).to have_received(:sort_screenshots).with([en_loc])
       end
-
-      it 'calls upload_screenshots in default mode' do
-        options = mock_options
-
-        subject = described_class.new
-        allow(subject).to receive(:upload_screenshots)
-        allow(subject).to receive(:sort_screenshots)
-
-        subject.upload(options, [screenshot])
-        expect(subject).to have_received(:upload_screenshots)
-      end
-    end
-  end
-
-  describe '#sync_replace_screenshots' do
-    subject { described_class.new }
-
-    let(:iterator) { double('Deliver::AppScreenshotIterator') }
-    let(:screenshots) { [mock_screenshot] }
-
-    before do
-      allow(subject).to receive(:create_delete_worker).and_return(double('worker', batch_enqueue: nil, start: nil))
-      allow(subject).to receive(:create_upload_worker).and_return(double('worker', batch_enqueue: nil, start: nil))
-      allow(subject).to receive(:do_sync_replace_screenshots)
-    end
-
-    it 'returns when all complete' do
-      allow(subject).to receive(:wait_for_complete_sync).and_return({ processing: false, complete: 1, failing: [] })
-      subject.sync_replace_screenshots(iterator, screenshots)
-    end
-
-    it 'retries on processing/failures' do
-      # First call: still processing; second call: complete
-      call_count = 0
-      allow(subject).to receive(:wait_for_complete_sync) do
-        call_count += 1
-        if call_count == 1
-          { processing: false, complete: 0, failing: [] }
-        else
-          { processing: false, complete: 1, failing: [] }
-        end
-      end
-
-      subject.sync_replace_screenshots(iterator, screenshots, 3)
-    end
-
-    it 'crashes when retries exhausted' do
-      failing_screenshot = double('app_screenshot', delete!: nil)
-      allow(subject).to receive(:wait_for_complete_sync).and_return({ processing: false, complete: 0, failing: [failing_screenshot] })
-
-      expect { subject.sync_replace_screenshots(iterator, screenshots, 0) }.to raise_error(FastlaneCore::Interface::FastlaneCrash)
-    end
-  end
-
-  describe '#wait_for_complete_sync' do
-    subject { described_class.new }
-
-    def mock_iterator_with_screenshots(screenshots)
-      iterator = double('Deliver::AppScreenshotIterator')
-      localization = mock_localization
-      app_screenshot_set = double('app_screenshot_set')
-      enumerator_data = screenshots.map { |s| [localization, app_screenshot_set, s] }
-      allow(iterator).to receive(:each_app_screenshot) do |&block|
-        next(enumerator_data) unless block
-        enumerator_data.each { |args| block.call(*args) }
-      end
-      iterator
-    end
-
-    it 'returns immediately when nothing is processing' do
-      app_screenshot = double('app_screenshot',
-                              asset_delivery_state: { 'state' => 'COMPLETE' },
-                              error?: false)
-      iterator = mock_iterator_with_screenshots([app_screenshot])
-
-      result = subject.wait_for_complete_sync(iterator)
-      expect(result[:processing]).to be false
-      expect(result[:complete]).to eq(1)
-    end
-
-    it 'polls when screenshots are still processing' do
-      app_screenshot = double('app_screenshot')
-      allow(app_screenshot).to receive(:error?).and_return(false)
-      # First poll: UPLOAD_COMPLETE, second poll: COMPLETE
-      allow(app_screenshot).to receive(:asset_delivery_state).and_return(
-        { 'state' => 'UPLOAD_COMPLETE' },
-        { 'state' => 'COMPLETE' }
-      )
-
-      iterator = mock_iterator_with_screenshots([app_screenshot])
-      allow(subject).to receive(:sleep)
-
-      result = subject.wait_for_complete_sync(iterator)
-      expect(result[:processing]).to be false
-      expect(result[:complete]).to eq(1)
-      expect(subject).to have_received(:sleep).once
-    end
-
-    it 'reports failing screenshots' do
-      app_screenshot = double('app_screenshot',
-                              asset_delivery_state: { 'state' => 'COMPLETE' },
-                              error?: true)
-      iterator = mock_iterator_with_screenshots([app_screenshot])
-
-      result = subject.wait_for_complete_sync(iterator)
-      expect(result[:failing]).to eq([app_screenshot])
-    end
-  end
-
-  describe '#create_upload_worker' do
-    it 'creates a worker that calls upload_screenshot on the job' do
-      subject = described_class.new
-      worker = subject.create_upload_worker
-
-      app_screenshot_set = double('app_screenshot_set')
-      expect(app_screenshot_set).to receive(:upload_screenshot).with(path: '/path/to/img.png', wait_for_processing: false)
-
-      job = Deliver::UploadCustomProductPageScreenshots::CPPUploadScreenshotJob.new(app_screenshot_set, '/path/to/img.png')
-      worker.instance_variable_get(:@block).call(job)
-    end
-  end
-
-  describe '#create_delete_worker' do
-    it 'creates a worker that calls delete! on the job screenshot' do
-      subject = described_class.new
-      worker = subject.create_delete_worker
-
-      app_screenshot = double('app_screenshot', id: 'ss-1', file_name: 'test.png')
-      expect(app_screenshot).to receive(:delete!)
-
-      job = Deliver::UploadCustomProductPageScreenshots::CPPDeleteScreenshotJob.new(app_screenshot, 'en-US')
-      worker.instance_variable_get(:@block).call(job)
     end
   end
 end

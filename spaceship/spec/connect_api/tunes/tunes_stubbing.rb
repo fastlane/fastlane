@@ -71,6 +71,16 @@ class ConnectAPIStubbing
           to_return(status: 200, body: read_fixture_file('review_submission_items.json'), headers: { 'Content-Type' => 'application/json' })
       end
 
+      def stub_get_app_custom_product_page
+        stub_request(:get, "https://appstoreconnect.apple.com/iris/v1/appCustomProductPages/cpp-123?include=app").
+          to_return(status: 200, body: read_fixture_file('app_custom_product_page.json'), headers: { 'Content-Type' => 'application/json' })
+      end
+
+      def stub_get_app_custom_product_page_versions
+        stub_request(:get, "https://appstoreconnect.apple.com/iris/v1/appCustomProductPages/cpp-123/appCustomProductPageVersions").
+          to_return(status: 200, body: read_fixture_file('app_custom_product_page_versions.json'), headers: { 'Content-Type' => 'application/json' })
+      end
+
       def stub_webhooks
         stub_request(:get, "https://api.appstoreconnect.apple.com/v1/apps/123456789/webhooks").
           to_return(status: 200, body: read_fixture_file('webhooks.json'), headers: { 'Content-Type' => 'application/json' })
