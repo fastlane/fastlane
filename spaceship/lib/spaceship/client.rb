@@ -941,6 +941,9 @@ module Spaceship
     # @!group Helpers
     #####################################################
 
+    # Errors the net_http adapter wraps in Faraday::ConnectionFailed before the request is sent
+    UNSENT_REQUEST_ERRORS = [SocketError, Errno::ECONNREFUSED, Errno::EHOSTUNREACH, Errno::ENETUNREACH, Errno::EADDRNOTAVAIL, Net::OpenTimeout].freeze
+
     def with_retry(tries = 5, resend: true, &_block)
       return yield
     rescue \
@@ -950,8 +953,8 @@ module Spaceship
         AppleTimeoutError,
         GatewayTimeoutError,
         AccessForbiddenError => ex
-      # Apple may have processed a request that timed out or got a gateway error; a 403 was refused
-      raise ex unless resend || ex.kind_of?(AccessForbiddenError)
+      # Apple may have processed a request that failed after it was sent; a 403 was refused
+      raise ex unless resend || ex.kind_of?(AccessForbiddenError) || unsent_request?(ex)
       tries -= 1
       unless tries.zero?
         msg = "Timeout received: '#{ex.class}', '#{ex.message}'. Retrying after 3 seconds (remaining: #{tries})..."
@@ -1002,6 +1005,10 @@ module Spaceship
         retry
       end
       raise ex # re-raise the exception
+    end
+
+    def unsent_request?(ex)
+      ex.kind_of?(Faraday::ConnectionFailed) && UNSENT_REQUEST_ERRORS.any? { |error| ex.wrapped_exception.kind_of?(error) }
     end
 
     # memorize the last csrf tokens from responses

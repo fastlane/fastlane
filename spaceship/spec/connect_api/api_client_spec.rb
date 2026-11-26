@@ -208,6 +208,15 @@ describe Spaceship::ConnectAPI::APIClient do
         client.post('', {})
         expect(a_request(:post, client.hostname)).to have_been_made.twice
       end
+
+      it 'sends a single-try POST again when the connection was refused' do
+        stub_request(:post, client.hostname).
+          to_raise(Errno::ECONNREFUSED).then.
+          to_return(status: 200, body: "")
+
+        client.post('', {}, tries: 1)
+        expect(a_request(:post, client.hostname)).to have_been_made.twice
+      end
     end
   end
 
