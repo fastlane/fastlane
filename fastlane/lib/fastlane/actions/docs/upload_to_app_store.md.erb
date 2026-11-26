@@ -188,6 +188,9 @@ Up to 3 videos per locale and per device type are uploaded, then ordered by file
 
 A preview poster frame is set using `preview_frame_time_code`.
 
+##### custom_product_page_id
+Upload the screenshots in `screenshots_path` to a Custom Product Page instead of the app version. When this option is set, _deliver_ only uploads screenshots. See [Custom Product Pages](#custom-product-pages).
+
 ##### metadata_path
 Path to the metadata you want to use. The folder has to be structured like this
 
@@ -469,6 +472,28 @@ The action button that shows up for the default App Clip experience. The valid o
 
 See the [App Clip docs](#app-clips) for more info.
 </details>
+
+# Custom Product Pages
+
+_deliver_ can upload screenshots to a [Custom Product Page](https://developer.apple.com/app-store/custom-product-pages/) of your app. Pass the page's ID as `custom_product_page_id`:
+
+```no-highlight
+fastlane deliver --custom_product_page_id "2bd9652f-b015-4bbf-87cf-4d3e7f212e40" --screenshots_path "./screenshots/tarot"
+```
+
+```ruby
+deliver(
+  custom_product_page_id: "2bd9652f-b015-4bbf-87cf-4d3e7f212e40",
+  screenshots_path: "./screenshots/tarot",
+  overwrite_screenshots: true
+)
+```
+
+- **The ID**: in App Store Connect, open the page under _Custom Product Pages_. The ID is labeled _Product Page ID_ at the bottom of the page. It is also the `ppid` parameter of the page's URL.
+- **Only screenshots**: with `custom_product_page_id` set, _deliver_ uploads the screenshots to the page and does nothing else. The metadata, app previews, price tier and binary are not uploaded, precheck does not run, and nothing is submitted for review. A Custom Product Page is submitted for review on its own, in App Store Connect.
+- **The version**: the screenshots go to the newest version of the page that can still be changed (_Prepare for Submission_ or _Rejected_). A version that is in a review submission (_Ready for Review_) cannot be changed: remove it from the submission first. To change an approved page, create a new version of it in App Store Connect first.
+- **Languages**: the folder layout is the same as for `screenshots_path`. A language that the page does not have yet is added to it.
+- **Modes**: `overwrite_screenshots` deletes the page's screenshots in each uploaded language first, and `sync_screenshots` (with `FASTLANE_ENABLE_BETA_DELIVER_SYNC_SCREENSHOTS`) uploads and deletes only the screenshots that changed, as for the app version. `edit_live` cannot be used with `custom_product_page_id`.
 
 # Submit Build
 _deliver_ allows you to promote an existing build to production. Below are examples to select a previously uploaded build and submit it for review.

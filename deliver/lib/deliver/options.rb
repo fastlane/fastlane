@@ -37,7 +37,7 @@ module Deliver
                                      default_value_dynamic: true),
         FastlaneCore::ConfigItem.new(key: :custom_product_page_id,
                                      env_name: "DELIVER_CUSTOM_PRODUCT_PAGE_ID",
-                                     description: "Custom Product Page ID to upload screenshots to (e.g. 021f20ac-3614-435b-9fd0-fe3c042b165c)",
+                                     description: "The ID of a Custom Product Page ('Product Page ID' in App Store Connect) to upload the screenshots to. Only the screenshots are uploaded: metadata, binary and submission are skipped",
                                      optional: true),
         FastlaneCore::ConfigItem.new(key: :app_identifier,
                                      short_option: "-a",
