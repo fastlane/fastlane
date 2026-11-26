@@ -188,6 +188,26 @@ describe Spaceship::ConnectAPI::APIClient do
           end.to raise_error(Spaceship::InternalServerError, "Server error got 504")
         end.not_to output.to_stdout
       end
+
+      it 'does not send a POST again after a timeout when a single try is allowed' do
+        stub_request(:post, client.hostname).
+          to_raise(Faraday::TimeoutError).then.
+          to_return(status: 200, body: "")
+
+        expect do
+          client.post('', {}, tries: 1)
+        end.to raise_error(Faraday::TimeoutError)
+        expect(a_request(:post, client.hostname)).to have_been_made.once
+      end
+
+      it 'sends a POST again after a timeout by default' do
+        stub_request(:post, client.hostname).
+          to_raise(Faraday::TimeoutError).then.
+          to_return(status: 200, body: "")
+
+        client.post('', {})
+        expect(a_request(:post, client.hostname)).to have_been_made.twice
+      end
     end
   end
 

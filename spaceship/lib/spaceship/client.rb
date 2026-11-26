@@ -941,7 +941,7 @@ module Spaceship
     # @!group Helpers
     #####################################################
 
-    def with_retry(tries = 5, &_block)
+    def with_retry(tries = 5, resend: true, &_block)
       return yield
     rescue \
         Faraday::ConnectionFailed,
@@ -950,6 +950,8 @@ module Spaceship
         AppleTimeoutError,
         GatewayTimeoutError,
         AccessForbiddenError => ex
+      # Apple may have processed a request that timed out or got a gateway error; a 403 was refused
+      raise ex unless resend || ex.kind_of?(AccessForbiddenError)
       tries -= 1
       unless tries.zero?
         msg = "Timeout received: '#{ex.class}', '#{ex.message}'. Retrying after 3 seconds (remaining: #{tries})..."
@@ -974,6 +976,7 @@ module Spaceship
     rescue \
         Faraday::ParsingError, # <h2>Internal Server Error</h2> with content type json
         InternalServerError => ex
+      raise ex unless resend
       tries -= 1
       unless tries.zero?
         msg = "Internal Server Error received: '#{ex.class}', '#{ex.message}'. Retrying after 3 seconds (remaining: #{tries})..."
@@ -1010,7 +1013,7 @@ module Spaceship
       @additional_headers || {}
     end
 
-    def request(method, url_or_path = nil, params = nil, headers = {}, auto_paginate = false, &block)
+    def request(method, url_or_path = nil, params = nil, headers = {}, auto_paginate = false, resend: true, &block)
       headers.merge!(csrf_tokens)
       headers.merge!(additional_headers)
       headers['User-Agent'] = USER_AGENT
@@ -1027,7 +1030,7 @@ module Spaceship
       response = if auto_paginate
                    send_request_auto_paginate(method, url_or_path, params, headers, &block)
                  else
-                   send_request(method, url_or_path, params, headers, &block)
+                   send_request(method, url_or_path, params, headers, resend: resend, &block)
                  end
 
       return response
@@ -1182,8 +1185,8 @@ module Spaceship
 
     # Actually sends the request to the remote server
     # Automatically retries the request up to 3 times if something goes wrong
-    def send_request(method, url_or_path, params, headers, &block)
-      with_retry do
+    def send_request(method, url_or_path, params, headers, resend: true, &block)
+      with_retry(resend: resend) do
         response = @client.send(method, url_or_path, params, headers, &block)
         log_response(method, url_or_path, response, headers, &block)
 

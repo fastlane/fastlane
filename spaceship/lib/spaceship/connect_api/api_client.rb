@@ -115,8 +115,10 @@ module Spaceship
       end
 
       def post(url_or_path, body, tries: 5)
+        # A single try also stops the transport from resending a POST that Apple may have processed
+        request_options = tries > 1 ? {} : { resend: false }
         response = with_asc_retry(tries) do
-          request(:post) do |req|
+          request(:post, **request_options) do |req|
             req.url(url_or_path)
             req.body = body.to_json
             req.headers['Content-Type'] = 'application/json'
