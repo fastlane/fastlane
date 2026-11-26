@@ -198,15 +198,30 @@ describe Scan do
 
           expect(Scan::ErrorHandler).to receive(:handle_build_error).with(error_output, anything).and_call_original
 
-          allow(FastlaneCore::CommandExecutor).to receive(:execute) do |command:, print_all:, print_command:, prefix:, loading:, suppress_output:, error:|
-            system("ruby -e 'exit 65'")
-            error.call(error_output)
+          allow(FastlaneCore::CommandExecutor).to receive(:execute) do |error:, **|
+            error.call(error_output, 65)
             ""
           end
 
           expect do
             @scan.run
           end.to raise_error(FastlaneCore::Interface::FastlaneBuildFailure, "Build for testing failed. Exit status: 65")
+        end
+
+        it "reports the failed build before looking for a .xctestrun file to copy", requires_xcodebuild: true do
+          Dir.mktmpdir do |derived_data_path|
+            Scan.config = FastlaneCore::Configuration.create(Scan::Options.available_options, {
+              output_directory: '/tmp/scan_results',
+              project: './scan/examples/standard/app.xcodeproj',
+              derived_data_path: derived_data_path,
+              build_for_testing: true,
+              output_xctestrun: true
+            })
+
+            expect do
+              @scan.handle_results(65)
+            end.to raise_error(FastlaneCore::Interface::FastlaneBuildFailure, "Build for testing failed. Exit status: 65")
+          end
         end
       end
     end

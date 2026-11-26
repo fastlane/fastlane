@@ -74,9 +74,9 @@ module Scan
                                              prefix: prefix_hash,
                                             loading: "Loading...",
                                     suppress_output: Scan.config[:suppress_xcode_output],
-                                              error: proc do |error_output|
+                                              error: proc do |error_output, status|
                                                 begin
-                                                  exit_status = $?.exitstatus
+                                                  exit_status = status
                                                   ErrorHandler.handle_build_error(error_output, @test_command_generator.xcodebuild_log_path)
                                                 rescue => ex
                                                   SlackPoster.new.run({
@@ -206,17 +206,16 @@ module Scan
     end
 
     def handle_results(tests_exit_status)
+      # Before collecting artifacts: a failed build has none, and a missing one would hide this error
+      if Scan.config[:build_for_testing] && tests_exit_status != 0
+        UI.build_failure!("Build for testing failed. Exit status: #{tests_exit_status}")
+      end
+
       copy_simulator_logs
       zip_build_products
       copy_xctestrun
 
-      # Ensure we still fail the step on any non-zero exit status from xcodebuild.
-      if Scan.config[:build_for_testing]
-        unless tests_exit_status == 0
-          UI.build_failure!("Build for testing failed. Exit status: #{tests_exit_status}")
-        end
-        return nil
-      end
+      return nil if Scan.config[:build_for_testing]
 
       results = trainer_test_results
 
