@@ -103,6 +103,13 @@ describe Spaceship::ConnectAPI::Tunes::Client do
           expect(client).to receive(:request).with(:get).and_yield(req_mock).and_return(req_mock)
           client.get_territories
         end
+
+        it 'succeeds with filter, includes, limit and sort' do
+          params = { filter: { currency: "USD" }, include: "currency", limit: 200, sort: "id" }
+          req_mock = test_request_params(path, params)
+          expect(client).to receive(:request).with(:get).and_yield(req_mock).and_return(req_mock)
+          client.get_territories(filter: { currency: "USD" }, includes: "currency", limit: 200, sort: "id")
+        end
       end
     end
 
