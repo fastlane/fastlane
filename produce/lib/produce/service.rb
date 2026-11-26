@@ -1,5 +1,6 @@
 require 'spaceship'
 require_relative 'module'
+require_relative 'developer_center'
 
 # rubocop:disable Metrics/ClassLength
 module Produce
@@ -90,6 +91,8 @@ module Produce
 
     # rubocop:disable Metrics/PerceivedComplexity
     def update(on, options)
+      reject_portal_unsupported_services_with_api_key!(options) if using_connect_api?
+
       updated = valid_services_for(options).count
 
       if options.access_wifi
@@ -434,6 +437,26 @@ module Produce
       Produce.authenticate_connect_api!
 
       @bundle_id ||= Spaceship::ConnectAPI::BundleId.find(Produce.config[:app_identifier].to_s)
+    end
+
+    # Apple's public POST /v1/bundleIdCapabilities endpoint does not accept
+    # these types (not in CapabilityType enum), so with an App Store Connect
+    # API key there is no way to enable or disable them. Fail fast with the
+    # same message create_app_online shows, instead of letting Apple reject
+    # the request. Covers modify_services and produce enable_services, which
+    # both go through here.
+    def reject_portal_unsupported_services_with_api_key!(options)
+      unsupported = options.__hash__.keys.select do |key|
+        Produce::DeveloperCenter::PORTAL_UNSUPPORTED_SERVICES.include?(key.to_sym)
+      end
+      return if unsupported.empty?
+
+      UI.user_error!("Cannot modify '#{unsupported.join("', '")}' via the App Store Connect API key — these capabilities are not accepted by Apple's public API and require a username/password login session.")
+    end
+
+    # Mirrors what #login authenticated with, not produce's own :api_key config.
+    def using_connect_api?
+      !Spaceship::ConnectAPI.token.nil?
     end
   end
 end
