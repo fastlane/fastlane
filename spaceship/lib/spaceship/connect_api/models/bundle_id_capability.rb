@@ -133,6 +133,12 @@ module Spaceship
         client ||= Spaceship::ConnectAPI
         client.delete_bundle_id_capability(bundle_id_capability_id: id)
       end
+
+      def update!(client: nil, enabled: true, settings: [])
+        client ||= Spaceship::ConnectAPI
+        resp = client.patch_bundle_id_capability_configuration(bundle_id_capability_id: id, enabled: enabled, settings: settings)
+        return resp.to_models.first
+      end
     end
   end
 end

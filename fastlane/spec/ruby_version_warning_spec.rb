@@ -5,16 +5,24 @@ describe Fastlane::CLIToolsDistributor do
     before(:each) do
       # Need to make sure we don't actually trigger at_exit during tests in a way that interferes
       allow(Fastlane::CLIToolsDistributor).to receive(:at_exit)
+
+      # take_off warns about bundler whenever Helper.bundler? is false, which is
+      # what a spec that drops BUNDLE_GEMFILE or BUNDLE_BIN_PATH leaves behind.
+      # It warns either way: "detected a Gemfile" when the working directory has
+      # one, "get started using a Gemfile" when it does not, so the working
+      # directory only picks the message. Every example below constrains all
+      # calls to UI.important, so either one fails them. See fastlane#30184.
+      allow(Fastlane::CLIToolsDistributor).to receive(:print_bundle_exec_warning)
     end
 
-    it "displays a warning when Ruby version is older than SUGGESTED_RUBY_MIN_VERSION" do
+    it "displays a warning when Ruby version is older than SUGGESTED_MINIMUM_RUBY" do
       stub_const("RUBY_VERSION", "3.1.0")
-      stub_const("Fastlane::SUGGESTED_RUBY_MIN_VERSION", "3.2.0")
+      stub_const("Fastlane::SUGGESTED_MINIMUM_RUBY", "3.2.0")
 
       # It's called once in take_off, and once in at_exit (which we mock, so we can't easily check if it's called at exit without more complex setup)
       # Wait, at_exit block is executed when the process exits. In tests, we are mocking at_exit.
       # If we mock at_exit to NOT yield, then the block inside it won't be executed immediately.
-      expect(UI).to receive(:important).with(/Support for your Ruby version is going away/).once
+      expect(UI).to receive(:important).with(/Support for your Ruby version \(.*\) is going away/).once
 
       FastlaneSpec::Env.with_env_values('FASTLANE_SKIP_UPDATE_CHECK': 'true', 'FASTLANE_DISABLE_ANIMATION': 'true') do
         # We need to mock the require calls
@@ -40,11 +48,11 @@ describe Fastlane::CLIToolsDistributor do
       end
     end
 
-    it "does NOT display a warning when Ruby version is equal to SUGGESTED_RUBY_MIN_VERSION" do
+    it "does NOT display a warning when Ruby version is equal to SUGGESTED_MINIMUM_RUBY" do
       stub_const("RUBY_VERSION", "3.2.0")
-      stub_const("Fastlane::SUGGESTED_RUBY_MIN_VERSION", "3.2.0")
+      stub_const("Fastlane::SUGGESTED_MINIMUM_RUBY", "3.2.0")
 
-      expect(UI).not_to receive(:important).with(/Support for your Ruby version is going away/)
+      expect(UI).not_to receive(:important).with(/Support for your Ruby version \(.*\) is going away/)
 
       FastlaneSpec::Env.with_env_values('FASTLANE_SKIP_UPDATE_CHECK': 'true', 'FASTLANE_DISABLE_ANIMATION': 'true') do
         allow(Fastlane::CLIToolsDistributor).to receive(:require).with("fastlane")
@@ -68,9 +76,9 @@ describe Fastlane::CLIToolsDistributor do
 
     it "does NOT display a warning when FASTLANE_SKIP_RUBY_VERSION_WARNING is set" do
       stub_const("RUBY_VERSION", "3.1.0")
-      stub_const("Fastlane::SUGGESTED_RUBY_MIN_VERSION", "3.2.0")
+      stub_const("Fastlane::SUGGESTED_MINIMUM_RUBY", "3.2.0")
 
-      expect(UI).not_to receive(:important).with(/Support for your Ruby version is going away/)
+      expect(UI).not_to receive(:important).with(/Support for your Ruby version \(.*\) is going away/)
 
       FastlaneSpec::Env.with_env_values('FASTLANE_SKIP_UPDATE_CHECK': 'true', 'FASTLANE_DISABLE_ANIMATION': 'true', 'FASTLANE_SKIP_RUBY_VERSION_WARNING': 'true') do
         allow(Fastlane::CLIToolsDistributor).to receive(:require).with("fastlane")

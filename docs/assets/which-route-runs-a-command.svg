@@ -1,0 +1,47 @@
+<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 760 572' width='760' height='572' role='img' aria-label='Which route runs a command inside fastlane' font-family='-apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif' font-size='13'>
+<title>Which route runs a command</title>
+<rect width='760' height='572' fill='#ffffff'/>
+<defs><marker id='route-arrow' viewBox='0 0 10 10' refX='9' refY='5' markerWidth='6' markerHeight='6' orient='auto-start-reverse'><path d='M0 0L10 5L0 10z' fill='#c2c0b6'/></marker></defs>
+<text x='24' y='34' font-size='15' font-weight='600' fill='#141413'>Which route runs a command inside fastlane</text>
+<g fill='none' stroke='#c2c0b6' stroke-width='1.25'>
+<path d='M260 110H320' marker-end='url(#route-arrow)'/>
+<path d='M260 230H320' marker-end='url(#route-arrow)'/>
+<path d='M260 350H320' marker-end='url(#route-arrow)'/>
+<path d='M150 146V194' marker-end='url(#route-arrow)'/>
+<path d='M150 266V314' marker-end='url(#route-arrow)'/>
+<path d='M150 386V432' marker-end='url(#route-arrow)'/></g>
+<polygon points='40,110 150,74 260,110 150,146' fill='none' stroke='#c2c0b6' stroke-width='1.25'/>
+<text x='150' y='106' text-anchor='middle' fill='#141413'>Command text</text>
+<text x='150' y='122' text-anchor='middle' fill='#141413'>from the user?</text>
+<rect x='320' y='76' width='300' height='68' rx='8' fill='none' stroke='#c2c0b6' stroke-width='1.25'/>
+<text x='470' y='98' text-anchor='middle' font-weight='600' fill='#141413'>Shell: Actions.sh with a string</text>
+<text x='470' y='116' text-anchor='middle' font-size='11.5' fill='#5e5d59'>the sh action's command; xcargs (gym, scan);</text>
+<text x='470' y='132' text-anchor='middle' font-size='11.5' fill='#5e5d59'>executable (carthage, swiftlint)</text>
+<text x='290' y='102' text-anchor='middle' font-size='11.5' fill='#5e5d59'>yes</text>
+<text x='160' y='174' font-size='11.5' fill='#5e5d59'>no</text>
+<polygon points='40,230 150,194 260,230 150,266' fill='none' stroke='#c2c0b6' stroke-width='1.25'/>
+<text x='150' y='234' text-anchor='middle' fill='#141413'>Asks the user something?</text>
+<rect x='320' y='202' width='300' height='56' rx='8' fill='none' stroke='#c2c0b6' stroke-width='1.25'/>
+<text x='470' y='226' text-anchor='middle' font-weight='600' fill='#141413'>Interactive: Kernel.system</text>
+<text x='470' y='244' text-anchor='middle' font-size='11.5' fill='#5e5d59'>the user&#39;s own terminal, input and output</text>
+<text x='290' y='222' text-anchor='middle' font-size='11.5' fill='#5e5d59'>yes</text>
+<text x='160' y='294' font-size='11.5' fill='#5e5d59'>no</text>
+<polygon points='40,350 150,314 260,350 150,386' fill='none' stroke='#c2c0b6' stroke-width='1.25'/>
+<text x='150' y='354' text-anchor='middle' fill='#141413'>Output shown live?</text>
+<rect x='320' y='322' width='300' height='56' rx='8' fill='none' stroke='#c2c0b6' stroke-width='1.25'/>
+<text x='470' y='346' text-anchor='middle' font-weight='600' fill='#141413'>Terminal: CommandExecutor.execute</text>
+<text x='470' y='364' text-anchor='middle' font-size='11.5' fill='#5e5d59'>colours and live output; escaped strings</text>
+<text x='290' y='342' text-anchor='middle' font-size='11.5' fill='#5e5d59'>yes</text>
+<text x='160' y='414' font-size='11.5' fill='#5e5d59'>no</text>
+<rect x='24' y='432' width='300' height='56' rx='8' fill='#2c7be5' fill-opacity='0.12' stroke='#2c7be5' stroke-width='2'/>
+<text x='174' y='456' text-anchor='middle' font-weight='600' fill='#141413'>Default: CommandExecutor.run</text>
+<text x='174' y='474' text-anchor='middle' font-size='11.5' fill='#5e5d59'>no shell, raises when the command fails</text>
+<path d='M324 460H356' fill='none' stroke='#c2c0b6' stroke-width='1.25' stroke-dasharray='3 3'/>
+<rect x='356' y='428' width='380' height='64' rx='8' fill='none' stroke='#c2c0b6' stroke-width='1.25' stroke-dasharray='4 3'/>
+<text x='372' y='450' font-weight='600' fill='#141413'>Uses a glob, ~, $VAR or a pipe?</text>
+<text x='372' y='468' font-size='11.5' fill='#5e5d59'>You may keep it a string under sh or execute:</text>
+<text x='372' y='484' font-size='11.5' fill='#5e5d59'>the logged command can be copied to rerun it.</text>
+<line x1='24' y1='512' x2='736' y2='512' stroke='#c2c0b6' stroke-width='1' stroke-dasharray='3 4'/>
+<text x='24' y='536' font-size='11.5' fill='#5e5d59'>Parsing stdout? Actions.sh and CommandExecutor.run take separate_stderr: true.</text>
+<text x='24' y='554' font-size='11.5' fill='#5e5d59'>CommandExecutor.execute cannot: its terminal merges stdout and stderr.</text>
+</svg>

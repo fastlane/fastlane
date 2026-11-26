@@ -9,6 +9,8 @@
   "profanityOrCrudeHumor": "NONE",
   "sexualContentGraphicAndNudity": "NONE",
   "sexualContentOrNudity": "NONE",
+  "socialMedia": false,
+  "socialMediaAgeRestricted": false,
   "violenceCartoonOrFantasy": "NONE",
   "violenceRealistic": "INFREQUENT_OR_MILD",
   "violenceRealisticProlongedGraphicOrSadistic": "FREQUENT_OR_INTENSE",

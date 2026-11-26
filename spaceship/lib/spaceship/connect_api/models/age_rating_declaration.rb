@@ -27,6 +27,8 @@ module Spaceship
       attr_accessor :loot_box
       attr_accessor :messaging_and_chat
       attr_accessor :parental_controls
+      attr_accessor :social_media
+      attr_accessor :social_media_age_restricted
       attr_accessor :unrestricted_web_access
       attr_accessor :user_generated_content
 
@@ -96,6 +98,8 @@ module Spaceship
         "profanityOrCrudeHumor" => "profanity_or_crude_humor",
         "sexualContentGraphicAndNudity" => "sexual_content_graphic_and_nudity",
         "sexualContentOrNudity" => "sexual_content_or_nudity",
+        "socialMedia" => "social_media",
+        "socialMediaAgeRestricted" => "social_media_age_restricted",
         "unrestrictedWebAccess" => "unrestricted_web_access",
         "userGeneratedContent" => "user_generated_content",
         "violenceCartoonOrFantasy" => "violence_cartoon_or_fantasy",
@@ -174,6 +178,8 @@ module Spaceship
           "lootBox",
           "messagingAndChat",
           "parentalControls",
+          "socialMedia",
+          "socialMediaAgeRestricted",
           "unrestrictedWebAccess",
           "userGeneratedContent"
         ]

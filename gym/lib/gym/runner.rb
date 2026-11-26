@@ -223,8 +223,13 @@ module Gym
       UI.message("Compressing #{available_dsyms.count} dSYM(s)") unless Gym.config[:silent]
 
       output_path = File.expand_path(File.join(Gym.config[:output_directory], Gym.config[:output_name] + ".app.dSYM.zip"))
-      command = "cd '#{containing_directory}' && zip -r '#{output_path}' *.dSYM"
-      Helper.backticks(command, print: !Gym.config[:silent])
+      command = "cd #{containing_directory.shellescape} && zip -r #{output_path.shellescape} *.dSYM"
+      FastlaneCore::CommandExecutor.execute(command: command,
+                                          print_all: !Gym.config[:silent],
+                                      print_command: !Gym.config[:silent],
+                                              error: proc do |output|
+                                                UI.user_error!("Could not compress the dSYM(s) to '#{output_path}':\n#{output}")
+                                              end)
       puts("") # new line
 
       UI.success("Successfully exported and compressed dSYM file")

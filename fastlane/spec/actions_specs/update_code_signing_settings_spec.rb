@@ -16,7 +16,8 @@ describe Fastlane do
     before :each do
       ENV.delete("FASTLANE_TEAM_ID")
 
-      temp_dir = Dir.tmpdir
+      # A directory of its own: Dir.tmpdir is the shared temp root, so parallel test processes would collide. See fastlane#30184.
+      temp_dir = Dir.mktmpdir('fl_spec_update_code_signing')
       FileUtils.copy_entry(unmodified_project_path, temp_dir)
 
       project_path = temp_dir

@@ -1,4 +1,8 @@
 describe Gym do
+  before do
+    fake_out_build_settings(GYM_BUILD_SETTINGS)
+  end
+
   before(:all) do
     options = { project: "./gym/examples/multipleSchemes/Example.xcodeproj" }
     @config = FastlaneCore::Configuration.create(Gym::Options.available_options, options)
@@ -16,6 +20,7 @@ describe Gym do
 
     def mock_gym_path(content)
       log_path = "log_path"
+      allow(File).to receive(:exist?).and_call_original
       expect(File).to receive(:exist?).with(log_path).and_return(true)
       allow(Gym::BuildCommandGenerator).to receive(:xcodebuild_log_path).and_return(log_path)
       expect(File).to receive(:read).with(log_path).and_return(content)
@@ -53,6 +58,17 @@ Code signing is required for product type 'Application' in SDK 'iOS 11.0'
       expect(UI).to receive(:command_output).at_least(:once) # as this is called multiple times before
 
       Gym::ErrorHandler.handle_build_error(code_signing_output)
+    end
+
+    it "prints the error even if it's not in the last 5 lines" do
+      buried_error_output = "error: buried here\n" + (1..10).map { |i| "warning #{i}" }.join("\n")
+      mock_gym_path(buried_error_output)
+
+      expect(UI).to receive(:command_output).with("error: buried here")
+      expect(UI).to receive(:command_output).at_least(5).times
+      expect(UI).to receive(:build_failure!)
+
+      Gym::ErrorHandler.handle_build_error(buried_error_output)
     end
 
     it "prints mismatch between the export_method and the selected profiles only once" do

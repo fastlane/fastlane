@@ -1,0 +1,4 @@
+# This file contains "smart quotes" inside a string, which are kept
+# when FASTLANE_SKIP_SMART_QUOTES_SANITIZE is set
+app_identifier "such.app"
+team_name "Felix’s “Team”"

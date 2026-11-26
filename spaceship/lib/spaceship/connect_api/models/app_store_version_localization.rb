@@ -78,8 +78,7 @@ module Spaceship
       def get_app_preview_sets(client: nil, filter: {}, includes: "appPreviews", limit: nil, sort: nil)
         client ||= Spaceship::ConnectAPI
         filter ||= {}
-        filter["appStoreVersionLocalization"] = id
-        return Spaceship::ConnectAPI::AppPreviewSet.all(client: client, filter: filter, includes: includes, limit: limit, sort: sort)
+        return Spaceship::ConnectAPI::AppPreviewSet.all(client: client, app_store_version_localization_id: id, filter: filter, includes: includes, limit: limit, sort: sort)
       rescue => error
         raise Spaceship::AppStoreAppPreviewError.new(@locale, error)
       end

@@ -43,6 +43,7 @@ module Frameit
 
   module Color
     MATTE_BLACK ||= "Matte Black"
+    JET_BLACK ||= "Jet Black"
     SPACE_GRAY ||= "Space Gray"
     ROSE_GOLD ||= "Rose Gold"
     CLEARLY_WHITE ||= "Clearly White"
@@ -87,8 +88,21 @@ module Frameit
     PACIFIC_BLUE ||= "Pacific Blue"
     MIDNIGHT ||= "Midnight"
     STARLIGHT ||= "Starlight"
-    SIERRA ||= "Sierra"
+    SIERRA_BLUE ||= "Sierra Blue"
     SORTA_SAGE ||= "Sorta Sage"
+    TEAL ||= "Teal"
+    ULTRAMARINE ||= "Ultramarine"
+    BLACK_TITANIUM ||= "Black Titanium"
+    DESERT_TITANIUM ||= "Desert Titanium"
+    NATURAL_TITANIUM ||= "Natural Titanium"
+    WHITE_TITANIUM ||= "White Titanium"
+    COSMIC_ORANGE ||= "Cosmic Orange"
+    DEEP_BLUE ||= "Deep Blue"
+    MIST_BLUE ||= "Mist Blue"
+    SAGE ||= "Sage"
+    LAVENDER ||= "Lavender"
+    NIGHT_SKY ||= "Night Sky"
+    STAR_WHITE ||= "Star White"
 
     def self.all_colors
       Color.constants.map { |c| Color.const_get(c).upcase.gsub(' ', '_') }
@@ -119,6 +133,8 @@ module Frameit
   end
 
   module Devices
+    IPHONE_DUO_OUTER ||= Device.new("iphone-duo-outer", "Apple iPhone Duo Outer", 15, [[1398, 2034], [2034, 1398]], 460, Color::NIGHT_SKY, Platform::IOS)
+    IPHONE_DUO_INNER ||= Device.new("iphone-duo-inner", "Apple iPhone Duo Inner", 15, [[2007, 2853], [2853, 2007]], 460, Color::NIGHT_SKY, Platform::IOS)
     GOOGLE_PIXEL_3 ||= Device.new("google-pixel-3", "Google Pixel 3", 7, [[1080, 2160], [2160, 1080]], 443, Color::JUST_BLACK, Platform::ANDROID)
     GOOGLE_PIXEL_3_XL ||= Device.new("google-pixel-3-xl", "Google Pixel 3 XL", 7, [[1440, 2960], [2960, 1440]], 523, Color::JUST_BLACK, Platform::ANDROID)
     # Google Pixel 4's priority should be higher than Samsung Galaxy S10+ (priority 8):
@@ -147,6 +163,8 @@ module Frameit
     SAMSUNG_GALAXY_S10 ||= Device.new("samsung-galaxy-s10", "Samsung Galaxy S10", 7, [[1440, 3040], [3040, 1440]], 550, Color::PRISM_BLACK, Platform::ANDROID)
     SAMSUNG_GALAXY_S10_PLUS ||= Device.new("samsung-galaxy-s10-plus", "Samsung Galaxy S10+", 8, [[1440, 3040], [3040, 1440]], 522, Color::PRISM_BLACK, Platform::ANDROID)
     XIAOMI_MI_MIX_ALPHA ||= Device.new("xiaomi-mi-mix-alpha", "Xiaomi Mi Mix Alpha", 1, [[2088, 2250], [2250, 2088]], 388, nil, Platform::ANDROID)
+    # Surface Pro X runs Windows, so it's only auto-detected via file name, `force_device_type` or `use_platform: ANY`
+    SURFACE_PRO_X ||= Device.new("surface-pro-x", "Surface Pro X", 1, [[1920, 2880], [2880, 1920]], 267, Color::BLACK, Platform::ANY)
     IPHONE_5S ||= Device.new("iphone-5s", "Apple iPhone 5s", 2, [[640, 1096], [640, 1136], [1136, 600], [1136, 640]], 326, Color::SPACE_GRAY, Platform::IOS, DEVICE_SCREEN_IDS[DisplayType::APP_IPHONE_40], :use_legacy_iphone5s)
     IPHONE_5C ||= Device.new("iphone-5c", "Apple iPhone 5c", 2, [[640, 1136], [1136, 640]], 326, Color::WHITE)
     IPHONE_SE ||= Device.new("iphone-se", "Apple iPhone SE", 3, [[640, 1096], [640, 1136], [1136, 600], [1136, 640]], 326, Color::SPACE_GRAY, Platform::IOS, DEVICE_SCREEN_IDS[DisplayType::APP_IPHONE_40])
@@ -164,7 +182,7 @@ module Frameit
     IPHONE_11_PRO ||= Device.new("iphone-11-pro", "Apple iPhone 11 Pro", 9, [[1125, 2436], [2436, 1125]], 458, Color::SPACE_GRAY, Platform::IOS)
     IPHONE_11_PRO_MAX ||= Device.new("iphone11-pro-max", "Apple iPhone 11 Pro Max", 9, [[1242, 2688], [2688, 1242]], 458, Color::SPACE_GRAY, Platform::IOS)
     IPHONE_12 ||= Device.new("iphone-12", "Apple iPhone 12", 10, [[1170, 2532], [2532, 1170]], 460, Color::BLACK, Platform::IOS)
-    IPHONE_12_PRO ||= Device.new("iphone-12-pro", "Apple iPhone 12 Pro", 10, [[1170, 2532], [2532, 1170]], 460, Color::SPACE_GRAY, Platform::IOS)
+    IPHONE_12_PRO ||= Device.new("iphone-12-pro", "Apple iPhone 12 Pro", 10, [[1170, 2532], [2532, 1170]], 460, Color::GRAPHITE, Platform::IOS)
     IPHONE_12_PRO_MAX ||= Device.new("iphone12-pro-max", "Apple iPhone 12 Pro Max", 10, [[1284, 2778], [2778, 1284]], 458, Color::GRAPHITE, Platform::IOS)
     IPHONE_12_MINI ||= Device.new("iphone-12-mini", "Apple iPhone 12 Mini", 10, [[1125, 2436], [2436, 1125]], 476, Color::BLACK, Platform::IOS)
     IPHONE_13 ||= Device.new("iphone-13", "Apple iPhone 13", 11, [[1170, 2532], [2532, 1170]], 460, Color::MIDNIGHT, Platform::IOS)
@@ -173,8 +191,15 @@ module Frameit
     IPHONE_13_MINI ||= Device.new("iphone-13-mini", "Apple iPhone 13 Mini", 11, [[1080, 2340], [2340, 1080]], 476, Color::MIDNIGHT, Platform::IOS)
     IPHONE_14 ||= Device.new("iphone-14", "Apple iPhone 14", 12, [[1170, 2532], [2532, 1170]], 460, Color::MIDNIGHT, Platform::IOS)
     IPHONE_14_PLUS ||= Device.new("iphone-14-plus", "Apple iPhone 14 Plus", 12, [[1284, 2778], [2778, 1284]], 458, Color::MIDNIGHT, Platform::IOS)
-    IPHONE_14_PRO ||= Device.new("iphone-14-pro", "Apple iPhone 14 Pro", 12, [[1179, 2556], [2556, 1179]], 460, Color::PURPLE, Platform::IOS)
-    IPHONE_14_PRO_MAX ||= Device.new("iphone14-pro-max", "Apple iPhone 14 Pro Max", 12, [[1290, 2796], [2796, 1290]], 458, Color::PURPLE, Platform::IOS)
+    IPHONE_14_PRO ||= Device.new("iphone-14-pro", "Apple iPhone 14 Pro", 12, [[1179, 2556], [2556, 1179]], 460, Color::BLACK, Platform::IOS)
+    IPHONE_14_PRO_MAX ||= Device.new("iphone14-pro-max", "Apple iPhone 14 Pro Max", 12, [[1290, 2796], [2796, 1290]], 458, Color::BLACK, Platform::IOS)
+    IPHONE_16 ||= Device.new("iphone-16", "Apple iPhone 16", 13, [[1179, 2556], [2556, 1179]], 460, Color::BLACK, Platform::IOS)
+    IPHONE_16_PLUS ||= Device.new("iphone-16-plus", "Apple iPhone 16 Plus", 13, [[1290, 2796], [2796, 1290]], 460, Color::BLACK, Platform::IOS)
+    IPHONE_16_PRO ||= Device.new("iphone-16-pro", "Apple iPhone 16 Pro", 13, [[1206, 2622], [2622, 1206]], 460, Color::NATURAL_TITANIUM, Platform::IOS, DEVICE_SCREEN_IDS[DisplayType::APP_IPHONE_61])
+    IPHONE_16_PRO_MAX ||= Device.new("iphone16-pro-max", "Apple iPhone 16 Pro Max", 13, [[1320, 2868], [2868, 1320]], 460, Color::NATURAL_TITANIUM, Platform::IOS, DEVICE_SCREEN_IDS[DisplayType::APP_IPHONE_67])
+    IPHONE_17 ||= Device.new("iphone-17", "Apple iPhone 17", 14, [[1206, 2622], [2622, 1206]], 460, Color::BLACK, Platform::IOS)
+    IPHONE_17_PRO ||= Device.new("iphone-17-pro", "Apple iPhone 17 Pro", 14, [[1206, 2622], [2622, 1206]], 460, Color::SILVER, Platform::IOS, DEVICE_SCREEN_IDS[DisplayType::APP_IPHONE_61])
+    IPHONE_17_PRO_MAX ||= Device.new("iphone17-pro-max", "Apple iPhone 17 Pro Max", 14, [[1320, 2868], [2868, 1320]], 460, Color::SILVER, Platform::IOS, DEVICE_SCREEN_IDS[DisplayType::APP_IPHONE_67])
     IPAD_10_2 ||= Device.new("ipad-10-2", "Apple iPad 10.2", 1, [[1620, 2160], [2160, 1620]], 264, Color::SPACE_GRAY, Platform::IOS)
     IPAD_AIR_2 ||= Device.new("ipad-air-2", "Apple iPad Air 2", 1, [[1536, 2048], [2048, 1536]], 264, Color::SPACE_GRAY, Platform::IOS, DEVICE_SCREEN_IDS[DisplayType::APP_IPAD_97])
     IPAD_AIR_2019 ||= Device.new("ipad-air-2019", "Apple iPad Air (2019)", 2, [[1668, 2224], [2224, 1668]], 265, Color::SPACE_GRAY, Platform::IOS)
@@ -186,8 +211,8 @@ module Frameit
     IPAD_PRO_12_9 ||= Device.new("ipadPro129", "Apple iPad Pro (12.9-inch) (3rd generation)", 4, [[2048, 2732], [2732, 2048]], 264, Color::SPACE_GRAY, Platform::IOS, DEVICE_SCREEN_IDS[DisplayType::APP_IPAD_PRO_3GEN_129])
     # iPad Pro 13" (4th gen):
     IPAD_PRO_12_9_4 ||= Device.new("ipadPro129", "Apple iPad Pro (12.9-inch) (4th generation)", 5, [[2048, 2732], [2732, 2048]], 264, Color::SPACE_GRAY, Platform::IOS, DEVICE_SCREEN_IDS[DisplayType::APP_IPAD_PRO_3GEN_129])
-    # iPad Pro (10.5-inch) is not in frameit-frames repo, but must be included so that we are backward compatible with PR #15373
-    # priority must be lower so that users who didn't copy the frame to their frameit frames folder will not get an error
+    # iPad Pro (10.5-inch) shares the iPad Air (2019) frame and resolution, it was added for backward compatibility with PR #15373
+    # priority must be lower than iPad Air (2019) so that 1668x2224 screenshots without a device name keep using that device
     # ID and formatted name must be exactly as specified so that device.detect_device() will select this device if the filename includes them
     IPAD_PRO_10_5 ||= Device.new("ipad105", "Apple iPad Pro (10.5-inch)", 1, [[1668, 2224], [2224, 1668]], 265, Color::SPACE_GRAY, Platform::IOS, DEVICE_SCREEN_IDS[DisplayType::APP_IPAD_105])
     IPAD_PRO_11 ||= Device.new("ipadPro11", "Apple iPad Pro (11-inch)", 1, [[1668, 2388], [2388, 1668]], 265, Color::SPACE_GRAY, Platform::IOS, DEVICE_SCREEN_IDS[DisplayType::APP_IPAD_PRO_3GEN_11])

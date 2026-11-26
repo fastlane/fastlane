@@ -5,6 +5,7 @@ require 'credentials_manager/appfile_config'
 require_relative 'module'
 
 module Snapshot
+  # rubocop:disable Metrics/ClassLength
   class Options
     def self.verify_type(item_name, acceptable_types, value)
       type_ok = [Array, String].any? { |type| value.kind_of?(type) }
@@ -243,7 +244,7 @@ module Snapshot
                                      is_string: false),
         FastlaneCore::ConfigItem.new(key: :concurrent_simulators,
                                      env_name: "SNAPSHOT_EXECUTE_CONCURRENT_SIMULATORS",
-                                     description: "Take snapshots on multiple simulators concurrently. Note: This option is only applicable when running against Xcode 9",
+                                     description: "Take snapshots on multiple simulators concurrently",
                                      default_value: true,
                                      is_string: false),
         FastlaneCore::ConfigItem.new(key: :disable_slide_to_type,
@@ -267,9 +268,19 @@ module Snapshot
                                      description: "Skips resolution of Swift Package Manager dependencies",
                                      type: Boolean,
                                      default_value: false),
+        FastlaneCore::ConfigItem.new(key: :disallow_xcodebuild_settings_lookup,
+                                     env_name: "SNAPSHOT_DISALLOW_XCODEBUILD_SETTINGS_LOOKUP",
+                                     description: "Raises an error instead of fetching build settings by running `xcodebuild -showBuildSettings`, which can take a long time on large projects. The error names the required build setting, so the corresponding option can be specified manually",
+                                     type: Boolean,
+                                     default_value: false),
         FastlaneCore::ConfigItem.new(key: :disable_package_automatic_updates,
                                      env_name: "SNAPSHOT_DISABLE_PACKAGE_AUTOMATIC_UPDATES",
-                                     description: "Prevents packages from automatically being resolved to versions other than those recorded in the `Package.resolved` file",
+                                     description: "Prevents packages from automatically being resolved to versions other than those recorded in the `Package.resolved` file. This translates in the option `-disableAutomaticPackageResolution` being passed to xcodebuild",
+                                     type: Boolean,
+                                     default_value: false),
+        FastlaneCore::ConfigItem.new(key: :skip_package_repository_fetches,
+                                     env_name: "SNAPSHOT_SKIP_PACKAGE_REPOSITORY_FETCHES",
+                                     description: "Skips updating package dependencies from their remote. This translates in the option `-skipPackageUpdates` being passed to xcodebuild",
                                      type: Boolean,
                                      default_value: false),
         FastlaneCore::ConfigItem.new(key: :package_authorization_provider,
@@ -302,6 +313,11 @@ module Snapshot
                                      verify_block: proc do |value|
                                        verify_type('skip_testing', [Array, String], value)
                                      end),
+        FastlaneCore::ConfigItem.new(key: :run_rosetta_simulator,
+                                     env_name: "SNAPSHOT_RUN_ROSETTA_SIMULATOR",
+                                     description: "Run simulator in a Rosetta mode",
+                                     type: Boolean,
+                                     default_value: false),
 
         FastlaneCore::ConfigItem.new(key: :xcodebuild_formatter,
                                      env_names: ["SNAPSHOT_XCODEBUILD_FORMATTER", "FASTLANE_XCODEBUILD_FORMATTER"],
@@ -337,4 +353,5 @@ module Snapshot
       ]
     end
   end
+  # rubocop:enable Metrics/ClassLength
 end

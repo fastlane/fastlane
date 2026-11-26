@@ -34,6 +34,10 @@ module Sigh
         UI.message("Successfully logged in")
       end
 
+      if Sigh.config[:offline_profile] && !Spaceship::ConnectAPI.token.nil?
+        UI.user_error!("The 'offline_profile' option requires logging in with an Apple ID. Apple's App Store Connect API (API key authentication) does not support the 'Offline Support' profile setting")
+      end
+
       profiles = [] if Sigh.config[:skip_fetch_profiles]
       profiles ||= fetch_profiles # download the profile if it's there
 
@@ -185,7 +189,8 @@ module Sigh
         profile_type: profile_type,
         bundle_id_id: bundle_id.id,
         certificate_ids: certificates_to_use.map(&:id),
-        device_ids: devices_to_use.map(&:id)
+        device_ids: devices_to_use.map(&:id),
+        is_offline_profile: Sigh.config[:offline_profile]
       )
 
       profile
