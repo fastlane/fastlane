@@ -80,6 +80,11 @@ describe Deliver::UploadPriceTier do
     end
   end
 
+  it 'rejects an unsupported standalone tier before it can select the free point' do
+    expect(app).not_to receive(:fetch_app_price_schedule)
+    expect { uploader.upload(price_tier: 1) }.to raise_error(FastlaneCore::Interface::FastlaneError, /numeric paid price tiers/)
+  end
+
   it 'refuses a previously scheduled environment price instead of applying it immediately' do
     FastlaneSpec::Env.with_env_values('DELIVER_PRICE_START_DATE' => '2099-01-01') do
       expect(app).not_to receive(:fetch_app_price_schedule)

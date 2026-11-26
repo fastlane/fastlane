@@ -1,4 +1,4 @@
-require_relative 'module'
+require_relative 'options'
 require 'spaceship'
 require 'bigdecimal'
 require 'date'
@@ -13,6 +13,10 @@ module Deliver
     # Resolve pricing before deliver changes versions or metadata. The returned
     # operation is invoked only after those steps succeed.
     def prepare(options)
+      # Standalone callers may pass a Hash instead of a validated deliver configuration.
+      if options.kind_of?(Hash)
+        Options.pricing_options.each { |item| item.verify!(item.auto_convert_value(options[item.key])) }
+      end
       selectors = [:price_tier, :price, :price_point_id].select { |key| options[key] }
       UI.user_error!("#{selectors.join(' and ')} cannot be used together") if selectors.size > 1
       if selectors.empty?
