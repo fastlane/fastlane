@@ -72,7 +72,7 @@ module Fastlane
               has_info: self.info.to_s.length > 5,
               downloads: self.downloads,
               has_github_page: has_github_page,
-              has_opensource_repo: nil,
+              public_github_repo: nil, # stays nil unless the homepage is on GitHub
               has_mit_license: includes_license?("MIT"),
               has_gnu_license: includes_license?("GNU") || includes_license?("GPL"),
               major_release: Gem::Version.new(hash["version"]) >= Gem::Version.new("1.0.0"),
@@ -97,17 +97,12 @@ module Fastlane
                 self.append_git_data
                 self.append_github_data
               end
-            else
-              self.data[:has_opensource_repo] = false if self.data[:has_opensource_repo].nil?
-              self.cache[self.name] ||= {}
-              self.cache[self.name][:has_opensource_repo] = self.data[:has_opensource_repo]
             end
 
             File.open(cache_path, 'w') do |file|
               file.write(self.cache.to_yaml)
             end
 
-            self.data[:has_opensource_repo] = false if self.data[:has_opensource_repo].nil?
             self.data[:overall_score] = 0
             self.data[:ratings] = self.ratings.collect do |current_rating|
               [
@@ -151,25 +146,29 @@ module Fastlane
                                description: "Lots of open issues are not a good sign usually, unless the project is really popular",
                                      value: (self.data[:github_issues].to_i * -1)),
               FastlanePluginRating.new(key: :downloads,
-                               description: "Downloads scaled 0–1000 points with max at 150k downloads",
-                                     value: downloads_score(self.data[:downloads].to_i)),
+                               description: "More downloads = more users, counted per order of magnitude so they don't outweigh everything else",
+                                     value: downloads_score(self.data[:downloads])),
               FastlanePluginRating.new(key: :tests,
                                description: "The more tests a plugin has, the better",
                                      value: [self.data[:tests].to_i * 3, 80].min),
-              FastlanePluginRating.new(key: :open_source,
-                               description: "fastlane is open source, it's good to have plugins open source too",
-                                     value: (self.data[:has_opensource_repo] ? 10 : -100))
+              FastlanePluginRating.new(key: :public_github_repo,
+                               description: "fastlane is open source, plugins on GitHub should be public too",
+                                     value: public_github_repo_score(self.data[:public_github_repo]))
             ]
           end
 
-          # Downloads score: linearly scale 0..150_000 downloads to 0..1_000 points and cap at max.
+          # 20 points per order of magnitude (100 downloads = 40, 10k = 80), capped at 100 points from 100k downloads
           def downloads_score(count)
-            max_downloads = 150_000
-            max_score = 1_000
-            c = count.to_i
-            c = 0 if c < 0
-            scaled = ((c.to_f / max_downloads) * max_score).round
-            scaled > max_score ? max_score : scaled
+            [(Math.log10(count.to_i.clamp(0..) + 1) * 20).round, 100].min
+          end
+
+          # Only a GitHub repo that is private or gone is penalized, plugins hosted elsewhere are not rated
+          def public_github_repo_score(public_github_repo)
+            case public_github_repo
+            when true then 20
+            when false then -50
+            else 0
+            end
           end
 
           # What colors should the overall score be printed in
@@ -215,7 +214,7 @@ module Fastlane
               self.data[:github_issues] = cache_data[:github_issues]
               self.data[:github_forks] = cache_data[:github_forks]
               self.data[:github_contributors] = cache_data[:github_contributors]
-              self.data[:has_opensource_repo] = cache_data.key?(:has_opensource_repo) ? cache_data[:has_opensource_repo] : self.data[:has_opensource_repo]
+              self.data[:public_github_repo] = cache_data[:public_github_repo]
 
               return true
             end
@@ -288,14 +287,15 @@ module Fastlane
             conn.headers[:authorization] = Faraday::Utils.basic_header_from(ENV["GITHUB_USER_NAME"], ENV["GITHUB_API_TOKEN"])
             response = conn.get('')
             if response.status == 404
-              puts("GitHub repo not found (404) for #{self}: #{self.homepage}")
-              self.data[:has_opensource_repo] = false if self.data[:has_opensource_repo].nil?
-              self.cache[self.name] ||= {}
-              self.cache[self.name][:has_opensource_repo] = self.data[:has_opensource_repo]
+              puts("GitHub repo not found (404) for #{self.name}: #{self.homepage}")
+              self.data[:public_github_repo] = false
               return
             end
+            # e.g. a rate limit (403) still has a JSON body, which must not be cached as a repo with no stars
+            raise "GitHub returned #{response.status} for #{url}" unless response.success?
+
             repo_details = JSON.parse(response.body)
-            self.data[:has_opensource_repo] = (repo_details["private"] == false)
+            self.data[:public_github_repo] = (repo_details["private"] == false)
 
             url += "/stats/contributors"
             puts("Fetching #{url}")
@@ -318,6 +318,9 @@ module Fastlane
               response = conn.get('')
               attempt += 1
             end
+            raise "GitHub returned #{response.status} for #{url}" unless response.success?
+
+            # 204 means the repo has no commits
             contributor_details = response.status == 200 ? JSON.parse(response.body) : []
 
             self.data[:github_stars] = repo_details["stargazers_count"].to_i
@@ -333,11 +336,11 @@ module Fastlane
             cache_data[:github_issues] = self.data[:github_issues]
             cache_data[:github_forks] = self.data[:github_forks]
             cache_data[:github_contributors] = self.data[:github_contributors]
-            cache_data[:has_opensource_repo] = self.data[:has_opensource_repo]
+            cache_data[:public_github_repo] = self.data[:public_github_repo]
+            # Contributor stats that never became ready are fetched again on the next run
+            cache_data.delete(:cache_version) if response.status == 202
           rescue => ex
-            puts("error fetching #{self}")
-            puts(self.homepage)
-            puts("Unexpected error while fetching GitHub data for #{self}: #{self.homepage}")
+            puts("Error fetching GitHub data for #{self.name}: #{self.homepage}")
             puts(ex)
             raise ex
           end
