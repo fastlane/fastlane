@@ -212,6 +212,20 @@ describe Spaceship::ConnectAPI::Token do
         expect(token.in_house).to eq(true)
       end
 
+      ["FALSE", "No", "Off"].each do |value|
+        it "reads an in-house value of #{value} as false" do
+          stub_const('ENV', {
+            'SPACESHIP_CONNECT_API_KEY_ID' => 'key_id',
+            'SPACESHIP_CONNECT_API_IN_HOUSE' => value,
+            'SPACESHIP_CONNECT_API_KEY' => private_key
+          })
+
+          token = Spaceship::ConnectAPI::Token.create
+
+          expect(token.in_house).to eq(false)
+        end
+      end
+
       it "warns that an empty in-house value will mean true" do
         stub_const('ENV', {
           'SPACESHIP_CONNECT_API_KEY_ID' => 'key_id',
