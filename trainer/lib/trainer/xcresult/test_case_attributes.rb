@@ -19,11 +19,28 @@ module Trainer
       end
 
       module ClassMethods
+        # durationInSeconds exists from Xcode 16.3; older bundles only have the rounded, localized duration string
+        def extract_duration(node)
+          seconds = node['durationInSeconds']
+          return seconds.to_f unless seconds.nil?
+
+          parse_duration(node['duration'])
+        end
+
         def parse_duration(duration_str)
           return 0.0 if duration_str.nil?
 
-          # Handle comma-separated duration, and remove 's' suffix
-          duration_str.gsub(',', '.').chomp('s').to_f
+          # Handle different duration formats: "1m 5s", "22s", "0,011s"
+          if duration_str.include?('m')
+            # Parse format like "1m 5s"
+            parts = duration_str.split
+            minutes = parts.find { |p| p.include?('m') }&.gsub('m', '').to_f
+            seconds = parts.find { |p| p.include?('s') }&.gsub(',', '.')&.chomp('s').to_f
+            minutes * 60 + seconds
+          else
+            # Parse format like "22s", "0,011s"
+            duration_str.gsub(',', '.').chomp('s').to_f
+          end
         end
 
         def extract_failure_messages(node)
