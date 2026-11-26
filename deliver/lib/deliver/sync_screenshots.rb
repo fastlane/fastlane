@@ -43,6 +43,8 @@ module Deliver
     end
 
     def sync(screenshots)
+      raise ArgumentError, "SyncScreenshots#sync needs the app: and platform: of the App Store version (use #sync_localizations without them)" if @app.nil? || @platform.nil?
+
       ensure_beta_enabled!
 
       UI.important("Will begin uploading snapshots for '#{version.version_string}' on App Store Connect")

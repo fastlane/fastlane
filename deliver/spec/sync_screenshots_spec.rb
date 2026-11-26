@@ -222,6 +222,14 @@ describe Deliver::SyncScreenshots do
     end
   end
 
+  describe '#sync' do
+    it 'raises an ArgumentError without an app and a platform' do
+      expect(FastlaneCore::Feature).not_to receive(:enabled?)
+      expect { described_class.new.sync([]) }.to raise_error(ArgumentError, /app: and platform:/)
+      expect { described_class.new(app: double('app')).sync([]) }.to raise_error(ArgumentError, /app: and platform:/)
+    end
+  end
+
   describe '#sync_localizations' do
     subject { described_class.new }
 

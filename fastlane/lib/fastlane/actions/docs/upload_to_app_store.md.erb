@@ -493,7 +493,7 @@ deliver(
 - **Only screenshots**: with `custom_product_page_id` set, _deliver_ uploads the screenshots to the page and does nothing else. The metadata, app previews, price tier and binary are not uploaded, precheck does not run, and nothing is submitted for review. A Custom Product Page is submitted for review on its own, in App Store Connect.
 - **The version**: the screenshots go to the newest version of the page that can still be changed (_Prepare for Submission_ or _Rejected_). A version that is in a review submission (_Ready for Review_) cannot be changed: remove it from the submission first. To change an approved page, create a new version of it in App Store Connect first.
 - **Languages**: the folder layout is the same as for `screenshots_path`. A language that the page does not have yet is added to it.
-- **Modes**: `overwrite_screenshots` deletes the page's screenshots in each uploaded language first, and `sync_screenshots` (with `FASTLANE_ENABLE_BETA_DELIVER_SYNC_SCREENSHOTS`) uploads and deletes only the screenshots that changed, as for the app version. `edit_live` cannot be used with `custom_product_page_id`.
+- **Modes**: `overwrite_screenshots` deletes the page's screenshots in each uploaded language first, and `sync_screenshots` (with `FASTLANE_ENABLE_BETA_DELIVER_SYNC_SCREENSHOTS`) uploads and deletes only the screenshots that changed, as for the app version. `edit_live` and `skip_screenshots` cannot be used with `custom_product_page_id`.
 
 # Submit Build
 _deliver_ allows you to promote an existing build to production. Below are examples to select a previously uploaded build and submit it for review.

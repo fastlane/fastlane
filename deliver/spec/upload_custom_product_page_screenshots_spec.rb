@@ -54,10 +54,10 @@ describe Deliver::UploadCustomProductPageScreenshots do
   end
 
   describe '#upload' do
-    context 'early returns and option errors' do
-      it 'returns immediately when skip_screenshots is set' do
+    context 'option errors' do
+      it 'errors when skip_screenshots is set' do
         expect(Spaceship::ConnectAPI::AppCustomProductPage).not_to receive(:get)
-        described_class.new.upload(mock_options(skip_screenshots: true), [])
+        expect { described_class.new.upload(mock_options(skip_screenshots: true), []) }.to raise_error(FastlaneCore::Interface::FastlaneError, /skip_screenshots/)
       end
 
       it 'errors when edit_live is set' do

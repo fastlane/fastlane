@@ -11,7 +11,9 @@ module Deliver
   # `sync_screenshots` reuses SyncScreenshots: only the localizations differ.
   class UploadCustomProductPageScreenshots < UploadScreenshots
     def upload(options, screenshots)
-      return if options[:skip_screenshots]
+      if options[:skip_screenshots]
+        UI.user_error!("'custom_product_page_id' cannot be used with 'skip_screenshots': screenshots are the only thing uploaded to a custom product page")
+      end
 
       if options[:edit_live]
         UI.user_error!("'custom_product_page_id' cannot be used with 'edit_live': screenshots go to a version of the custom product page, not to the live app version")
