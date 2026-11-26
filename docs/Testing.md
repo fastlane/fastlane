@@ -66,7 +66,7 @@ Instead of using the line number you can also use a filter with the `it "somethi
 
 A spec for a fix has to fail against the code before the fix. Revert the fix, run the spec, and see it fail: a spec that also passes on the old code proves nothing. For options that can replace each other, cover each one alone, both together, and neither.
 
-A spec should not depend on the developer's environment: set or clear the environment variables an option reads (its `env_name`) with `FastlaneSpec::Env.with_env_values`.
+A spec should not depend on the developer's environment. The suite unsets every environment variable an option reads (its `env_name`) before the first example; a spec that needs one sets it with `FastlaneSpec::Env.with_env_values`.
 
 #### Running the suite as several processes
 

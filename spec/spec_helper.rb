@@ -127,6 +127,14 @@ ENV_GUARD_LOAD_TIME = ((env_guard_loaded.keys - env_guard_pristine.keys) |
                        (env_guard_loaded.keys & env_guard_pristine.keys)
                          .reject { |key| env_guard_loaded[key] == env_guard_pristine[key] }).sort.freeze
 
+# A spec must not read the developer's environment: unset every variable an option reads.
+# A spec that needs one sets it with FastlaneSpec::Env.with_env_values.
+Fastlane.load_actions
+actions = Fastlane::Actions.constants.map { |name| Fastlane::Actions.const_get(name) }
+options = actions.select { |action| action.kind_of?(Class) && action < Fastlane::Action }.flat_map { |action| action.available_options || [] }
+OPTION_ENV_NAMES = options.grep(FastlaneCore::ConfigItem).flat_map(&:env_names).reject(&:empty?).uniq.freeze
+OPTION_ENV_NAMES.each { |name| ENV.delete(name) }
+
 my_main = self
 # `security` subcommands that change the developer's keychains, which a spec must never run for real. See fastlane#30186.
 # cms is one: decoding a profile imports its signing certificate into a keychain.
