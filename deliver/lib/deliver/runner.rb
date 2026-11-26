@@ -57,6 +57,11 @@ module Deliver
         return
       end
 
+      if options[:custom_product_page_id]
+        upload_custom_product_page_screenshots
+        return
+      end
+
       verify_version if options[:app_version].to_s.length > 0 && !options[:skip_app_version_update]
 
       # Rejecting before upload meta
@@ -167,11 +172,7 @@ module Deliver
       # Commit
       upload_metadata.upload
 
-      if options[:custom_product_page_id]
-        cpp_upload = UploadCustomProductPageScreenshots.new
-        cpp_screenshots = Deliver::Loader.load_app_screenshots(options[:screenshots_path], options[:ignore_language_directory_validation])
-        cpp_upload.upload(options, cpp_screenshots)
-      elsif options[:sync_screenshots]
+      if options[:sync_screenshots]
         sync_screenshots = SyncScreenshots.new(app: Deliver.cache[:app], platform: Spaceship::ConnectAPI::Platform.map(options[:platform]))
         sync_screenshots.sync(screenshots)
       else
@@ -190,6 +191,16 @@ module Deliver
       end
 
       UploadPriceTier.new.upload(options)
+    end
+
+    # Upload screenshots to a custom product page, and nothing else: the metadata, app previews,
+    # price tier and binary belong to the app version, and the page is reviewed on its own
+    def upload_custom_product_page_screenshots
+      UI.important("Uploading screenshots to the Custom Product Page '#{options[:custom_product_page_id]}' only. " \
+                   "Metadata, app previews, the price tier, the binary, precheck and the submission for review are skipped.")
+
+      screenshots = UploadScreenshots.new.collect_screenshots(options)
+      UploadCustomProductPageScreenshots.new.upload(options, screenshots)
     end
 
     # Verify the binary with App Store Connect
