@@ -200,6 +200,34 @@ describe Scan do
           name: "Apple Watch Ultra (49mm)", os_type: "watchOS", os_version: "9.4"
         )
       end
+
+      context 'with several simulators of the same name and version' do
+        let(:simulators) do
+          [
+            FastlaneCore::DeviceManager::Device.new(name: "iPad Air", udid: "A", os_type: "iOS", os_version: "17.0", state: "Shutdown", is_simulator: true),
+            FastlaneCore::DeviceManager::Device.new(name: "iPhone 11", udid: "B", os_type: "iOS", os_version: "17.0", state: "Shutdown", is_simulator: true),
+            FastlaneCore::DeviceManager::Device.new(name: "iPhone 11", udid: "C", os_type: "iOS", os_version: "17.0", state: "Shutdown", is_simulator: true)
+          ]
+        end
+
+        before do
+          Scan.config = FastlaneCore::Configuration.create(Scan::Options.available_options, { project: "./scan/examples/standard/app.xcodeproj" })
+          Scan.project = nil
+          allow(FastlaneCore::DeviceManager).to receive(:simulators).and_return(simulators)
+          allow(Scan::DetectValues).to receive(:get_deployment_target_version).and_return("13.0")
+          allow(Scan::DetectValues).to receive(:default_os_version).and_return(Gem::Version.new('17.0'))
+        end
+
+        it 'picks one simulator with the requested name and version' do
+          result = Scan::DetectValues.detect_simulator(["iPhone 11 (17.0)"], 'iOS', '', '', nil)
+          expect(result.map(&:udid)).to eq(["B"])
+        end
+
+        it 'picks one simulator with the requested name' do
+          result = Scan::DetectValues.detect_simulator(["iPhone 11"], 'iOS', '', '', nil)
+          expect(result.map(&:name)).to eq(["iPhone 11"])
+        end
+      end
     end
 
     describe "#detect_destination" do
