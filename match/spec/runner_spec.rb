@@ -355,8 +355,8 @@ describe Match do
           expect(Match::Generator).not_to receive(:generate_certificate).with(match_config, :distribution, fake_storage.working_directory, specific_cert_type: nil)
           # Installed, without depending on or changing the real keychain.
           allow(FastlaneCore::CertChecker).to receive(:installed?).and_return(false)
-          expect(Match::Utils).to receive(:import).with("#{repo_dir}/certs/distribution/E7P4EE896K.p12", "login.keychain", password: nil)
-          expect(Match::Utils).to receive(:import).with(stored_valid_cert_path, "login.keychain", password: nil)
+          expect(Match::Utils).to receive(:import).with("#{repo_dir}/certs/distribution/E7P4EE896K.p12", "login.keychain", password: nil, skip_set_partition_list: false)
+          expect(Match::Utils).to receive(:import).with(stored_valid_cert_path, "login.keychain", password: nil, skip_set_partition_list: false)
 
           # Profiles
           begin # Ensure profiles are installed, but not validated.
@@ -850,8 +850,8 @@ describe Match do
           expected_cert_path = File.join(cert_dir, "FIRST11111.cer")
           expected_key_path = File.join(cert_dir, "FIRST11111.p12")
 
-          expect(Match::Utils).to receive(:import).with(expected_cert_path, "login.keychain", password: nil).ordered
-          expect(Match::Utils).to receive(:import).with(expected_key_path, "login.keychain", password: nil).ordered
+          expect(Match::Utils).to receive(:import).with(expected_cert_path, "login.keychain", password: nil, skip_set_partition_list: false).ordered
+          expect(Match::Utils).to receive(:import).with(expected_key_path, "login.keychain", password: nil, skip_set_partition_list: false).ordered
 
           values = {
             app_identifier: "com.test.app",
