@@ -39,22 +39,18 @@ module Scan
 
       # important to use Array(nil) for when the value is nil
       explicit_devices = Scan.config[:devices] || Array(Scan.config[:device])
-      destination_devices = extract_devices_from_destination(Scan.config[:destination])
-
-      if explicit_devices.any? && destination_devices.any? && (explicit_devices & destination_devices).empty?
-        UI.important("Both device and destination provided; using device '#{explicit_devices.join(', ')}' which differs from destination '#{destination_devices.join(', ')}'")
+      destination_devices, destination_udids = devices_from_destination(Scan.config[:destination])
+      if explicit_devices.any?
+        if destination_devices.any? || destination_udids.any?
+          UI.important("Both `device(s)` and `destination` provided; simulators are selected by `device(s)`, but xcodebuild still runs on `destination`")
+        end
+        destination_devices = []
+        destination_udids = []
       end
 
-      devices = if explicit_devices.any?
-                  explicit_devices
-                elsif destination_devices.any?
-                  destination_devices
-                else
-                  []
-                end
-
-      if devices.count > 0
-        detect_simulator(devices, '', '', '', nil)
+      devices = explicit_devices.any? ? explicit_devices : destination_devices
+      if devices.any? || destination_udids.any?
+        detect_simulator(devices, '', '', '', nil, destination_udids)
       elsif Scan.project
         if Scan.project.ios?
           # An iPhone 5s is a reasonably small and useful default for tests
@@ -209,44 +205,25 @@ module Scan
       /\s(?=\([\d\.]+\)$)/
     end
 
-    def self.extract_devices_from_destination(destination_value)
-      Array(destination_value).compact.flat_map do |destination|
-        next [] unless destination.include?("platform=")
+    # Returns [names_with_optional_os, udids] for simulator destinations
+    def self.devices_from_destination(destination_value)
+      names = []
+      udids = []
+      Array(destination_value).compact.each do |destination|
+        fields = destination.split(',').to_h { |pair| pair.split('=', 2).map(&:strip) }
+        next unless fields['platform'].to_s.downcase.include?('simulator')
 
-        platform = destination[/platform=([^,]+)/, 1]
-        next [] unless platform && platform.downcase.include?("simulator")
-
-        # Extract OS type from platform (e.g., "iOS Simulator" -> "iOS")
-        os_type = platform.gsub(/\s+Simulator$/i, '')
-
-        name = destination[/name=([^,]+)/, 1]
-        id = destination[/id=([^,]+)/, 1]
-
-        # According to xcodebuild docs, name and id are mutually exclusive
-        # If both are present, prefer name (more user-friendly)
-        device_name = nil
-        if name
-          device_name = name
-        elsif id
-          # Look up simulator by UDID
-          simulators = FastlaneCore::DeviceManager.simulators(os_type)
-          matching_sim = simulators.find { |sim| sim.udid == id }
-          if matching_sim
-            device_name = matching_sim.name
-          else
-            UI.error("Could not find simulator with id '#{id}' for platform '#{platform}'")
-            next []
-          end
-        else
-          next []
+        if fields['id'] && !fields['id'].empty?
+          udids << fields['id'] # id is the most specific selector
+        elsif fields['name'] && !fields['name'].empty?
+          os = fields['OS']
+          names << (os =~ /\A\d+(\.\d+)*\z/ ? "#{fields['name']} (#{os})" : fields['name'])
         end
-
-        os = destination[/OS=([^,]+)/, 1]
-        os && !os.empty? ? "#{device_name} (#{os})" : device_name
       end
+      [names, udids]
     end
 
-    def self.detect_simulator(devices, requested_os_type, deployment_target_key, default_device_name, simulator_type_descriptor)
+    def self.detect_simulator(devices, requested_os_type, deployment_target_key, default_device_name, simulator_type_descriptor, udids = [])
       clear_cache
 
       deployment_target_version = get_deployment_target_version(deployment_target_key)
@@ -301,6 +278,15 @@ module Scan
               UI.error("Ignoring '#{device_string}', couldn't find matching simulator")
             end
           end
+        end
+
+        udids.each do |udid|
+          found = simulators.select { |sim| sim.udid == udid }
+          if found.empty?
+            UI.test_failure!("No device found with UDID '#{udid}'") if Scan.config[:ensure_devices_found]
+            UI.error("Ignoring UDID '#{udid}', couldn't find matching simulator")
+          end
+          set_of_simulators.merge(found)
         end
 
         set_of_simulators.to_a
