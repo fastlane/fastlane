@@ -179,6 +179,28 @@ describe Spaceship::ConnectAPI::App do
     end
   end
 
+  describe "#get_latest_app_store_version" do
+    let(:app) { Spaceship::ConnectAPI::App.new("123456789", []) }
+
+    def versions(*created_dates)
+      created_dates.map.with_index { |date, i| double("version #{i}", created_date: date) }
+    end
+
+    it "returns the newest of two versions created the same day" do
+      newest, older = versions("2023-04-11T20:00:00-07:00", "2023-04-11T08:00:00-07:00")
+      allow(app).to receive(:get_app_store_versions).and_return([newest, older])
+
+      expect(app.get_latest_app_store_version).to eq(newest)
+    end
+
+    it "compares times across UTC offsets" do
+      older, newest = versions("2023-04-11T23:00:00+02:00", "2023-04-11T22:30:00Z")
+      allow(app).to receive(:get_app_store_versions).and_return([older, newest])
+
+      expect(app.get_latest_app_store_version).to eq(newest)
+    end
+  end
+
   describe("#get_app_availabilities") do
     it('gets app availabilities when app is ready for distribution') do
       ConnectAPIStubbing::Tunes.stub_get_app_availabilities_ready_for_distribution
