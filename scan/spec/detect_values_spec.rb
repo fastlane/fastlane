@@ -211,11 +211,12 @@ describe Scan do
         end
 
         before do
-          Scan.config = FastlaneCore::Configuration.create(Scan::Options.available_options, { project: "./scan/examples/standard/app.xcodeproj" })
-          Scan.project = nil
+          # Stub before setting Scan.config: setting it detects the devices, and CI on Linux and Windows has no xcrun
           allow(FastlaneCore::DeviceManager).to receive(:simulators).and_return(simulators)
           allow(Scan::DetectValues).to receive(:get_deployment_target_version).and_return("13.0")
           allow(Scan::DetectValues).to receive(:default_os_version).and_return(Gem::Version.new('17.0'))
+          Scan.config = FastlaneCore::Configuration.create(Scan::Options.available_options, { project: "./scan/examples/standard/app.xcodeproj" })
+          Scan.project = nil
         end
 
         it 'picks one simulator with the requested name and version' do
