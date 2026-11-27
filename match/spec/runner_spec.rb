@@ -209,12 +209,12 @@ describe Match do
           expect(Match::Encryption::OpenSSL).to receive(:new).with(keychain_name: fake_storage.git_url, working_directory: fake_storage.working_directory, force_legacy_encryption: false).and_return(fake_encryption)
           expect(fake_encryption).to receive(:decrypt_files).and_return(nil)
 
-          expect(Match::Utils).to receive(:import).with(key_path, keychain, password: nil).and_return(nil)
+          expect(Match::Utils).to receive(:import).with(key_path, keychain, password: nil, skip_set_partition_list: false).and_return(nil)
           expect(fake_storage).to_not(receive(:save_changes!))
 
           # To also install the certificate, fake that
           expect(FastlaneCore::CertChecker).to receive(:installed?).with(cert_path, in_keychain: nil).and_return(false)
-          expect(Match::Utils).to receive(:import).with(cert_path, keychain, password: nil).and_return(nil)
+          expect(Match::Utils).to receive(:import).with(cert_path, keychain, password: nil, skip_set_partition_list: false).and_return(nil)
 
           spaceship = +"spaceship"
           allow(spaceship).to receive(:team_id).and_return("")
@@ -355,8 +355,8 @@ describe Match do
           expect(Match::Generator).not_to receive(:generate_certificate).with(match_config, :distribution, fake_storage.working_directory, specific_cert_type: nil)
           # Installed, without depending on or changing the real keychain.
           allow(FastlaneCore::CertChecker).to receive(:installed?).and_return(false)
-          expect(Match::Utils).to receive(:import).with("#{repo_dir}/certs/distribution/E7P4EE896K.p12", "login.keychain", password: nil)
-          expect(Match::Utils).to receive(:import).with(stored_valid_cert_path, "login.keychain", password: nil)
+          expect(Match::Utils).to receive(:import).with("#{repo_dir}/certs/distribution/E7P4EE896K.p12", "login.keychain", password: nil, skip_set_partition_list: false)
+          expect(Match::Utils).to receive(:import).with(stored_valid_cert_path, "login.keychain", password: nil, skip_set_partition_list: false)
 
           # Profiles
           begin # Ensure profiles are installed, but not validated.
@@ -850,8 +850,8 @@ describe Match do
           expected_cert_path = File.join(cert_dir, "FIRST11111.cer")
           expected_key_path = File.join(cert_dir, "FIRST11111.p12")
 
-          expect(Match::Utils).to receive(:import).with(expected_cert_path, "login.keychain", password: nil).ordered
-          expect(Match::Utils).to receive(:import).with(expected_key_path, "login.keychain", password: nil).ordered
+          expect(Match::Utils).to receive(:import).with(expected_cert_path, "login.keychain", password: nil, skip_set_partition_list: false).ordered
+          expect(Match::Utils).to receive(:import).with(expected_key_path, "login.keychain", password: nil, skip_set_partition_list: false).ordered
 
           values = {
             app_identifier: "com.test.app",
@@ -863,6 +863,34 @@ describe Match do
 
           cert_id = runner.send(:fetch_certificate, params: config)
           expect(cert_id).to eq("FIRST11111")
+        end
+      end
+
+      it "passes skip_set_partition_list on when installing the stored certificate and key" do
+        Dir.mktmpdir do |dir|
+          cert_dir = File.join(dir, "certs", "distribution")
+          FileUtils.mkdir_p(cert_dir)
+          File.write(File.join(cert_dir, "FIRST11111.cer"), "cert1")
+          File.write(File.join(cert_dir, "FIRST11111.p12"), "key1")
+
+          allow(runner).to receive(:prefixed_working_directory).and_return(dir)
+          allow(Match::Utils).to receive(:is_cert_valid?).and_return(true)
+          allow(Match::Utils).to receive(:get_cert_info).and_return([["Common Name", "test"]])
+          allow(FastlaneCore::Helper).to receive(:mac?).and_return(true)
+          allow(FastlaneCore::CertChecker).to receive(:installed?).and_return(false)
+
+          expect(Match::Utils).to receive(:import).with(File.join(cert_dir, "FIRST11111.cer"), "login.keychain", password: nil, skip_set_partition_list: true).ordered
+          expect(Match::Utils).to receive(:import).with(File.join(cert_dir, "FIRST11111.p12"), "login.keychain", password: nil, skip_set_partition_list: true).ordered
+
+          values = {
+            app_identifier: "com.test.app",
+            type: "appstore",
+            git_url: "https://example.com",
+            skip_set_partition_list: true
+          }
+          config = FastlaneCore::Configuration.create(Match::Options.available_options, values)
+
+          runner.send(:fetch_certificate, params: config)
         end
       end
 
