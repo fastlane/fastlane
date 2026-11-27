@@ -1,7 +1,7 @@
 <?xml version='1.0' encoding='UTF-8'?>
-<testsuites tests='192' failures='20' skipped='7' time='275.81814'>
-  <testsuite name='FastlaneTrainerExampleTests' time='177.0' tests='171' failures='15' skipped='6'>
-    <testsuite name='FastlaneTrainer Tests' time='177.0' tests='171' failures='15' skipped='6'>
+<testsuites tests='192' failures='20' skipped='7' time='308.9194501399994'>
+  <testsuite name='FastlaneTrainerExampleTests' time='205.6' tests='171' failures='15' skipped='6'>
+    <testsuite name='FastlaneTrainer Tests' time='205.6' tests='171' failures='15' skipped='6'>
       <testcase name='Simple number validation' classname='FastlaneTrainerTests' time='0.0'>
         <properties>
           <property name='repetition' value='First Run'/>
@@ -2217,7 +2217,7 @@
                 <property name='repetition' value='Retry 1'/>
               </properties>
             </testcase>
-            <testcase name='Password length requirements' classname='FastlaneTrainerTests.UserTests.RegistrationTests.PasswordTests' time='0.004'>
+            <testcase name='Password length requirements' classname='FastlaneTrainerTests.UserTests.RegistrationTests.PasswordTests' time='0.003999948501586914'>
               <failure message='FastlaneTrainerExampleTests.swift:162: Expectation failed: (password.count → 11) &lt; 8: Password &apos;justbarely8&apos; is too short'/>
               <failure message='FastlaneTrainerExampleTests.swift:162: Expectation failed: (password.count → 16) &lt; 8: Password &apos;thisislongenough&apos; is too short'/>
               <properties>
@@ -2424,79 +2424,79 @@
       <property name='device' value='iPhone 17 Pro Max (26.1)'/>
     </properties>
   </testsuite>
-  <testsuite name='FastlaneTrainerExampleUITests' time='98.0' tests='10' failures='4' skipped='0'>
-    <testsuite name='FastlaneTrainerExampleUITests' time='70.0' tests='6' failures='4' skipped='0'>
-      <testcase name='testAccessibilityAndScreenshots()' classname='FastlaneTrainerExampleUITests' time='4.0'>
+  <testsuite name='FastlaneTrainerExampleUITests' time='102.50842958688736' tests='10' failures='4' skipped='0'>
+    <testsuite name='FastlaneTrainerExampleUITests' time='72.00330048799515' tests='6' failures='4' skipped='0'>
+      <testcase name='testAccessibilityAndScreenshots()' classname='FastlaneTrainerExampleUITests' time='4.257462024688721'>
         <failure message='FastlaneTrainerExampleUITests.swift:129: XCTAssertTrue failed'/>
         <properties>
           <property name='repetition' value='First Run'/>
         </properties>
       </testcase>
-      <testcase name='testAccessibilityAndScreenshots()' classname='FastlaneTrainerExampleUITests' time='5.0'>
+      <testcase name='testAccessibilityAndScreenshots()' classname='FastlaneTrainerExampleUITests' time='5.2304030656814575'>
         <failure message='FastlaneTrainerExampleUITests.swift:129: XCTAssertTrue failed'/>
         <properties>
           <property name='repetition' value='Retry 1'/>
         </properties>
       </testcase>
-      <testcase name='testAlertHandling()' classname='FastlaneTrainerExampleUITests' time='8.0'/>
-      <testcase name='testBasicNavigation()' classname='FastlaneTrainerExampleUITests' time='12.0'>
+      <testcase name='testAlertHandling()' classname='FastlaneTrainerExampleUITests' time='8.161120057106018'/>
+      <testcase name='testBasicNavigation()' classname='FastlaneTrainerExampleUITests' time='12.173303008079529'>
         <failure message='FastlaneTrainerExampleUITests.swift:43: Failed to tap &quot;Details&quot; Button: No matches found for first query match sequence: `Descendants matching type Button` -&gt; `Elements matching predicate &apos;&quot;Details&quot; IN identifiers&apos;`, given input App element pid: 20176'/>
         <properties>
           <property name='repetition' value='First Run'/>
         </properties>
       </testcase>
-      <testcase name='testBasicNavigation()' classname='FastlaneTrainerExampleUITests' time='11.0'>
+      <testcase name='testBasicNavigation()' classname='FastlaneTrainerExampleUITests' time='11.937219023704529'>
         <failure message='FastlaneTrainerExampleUITests.swift:43: Failed to tap &quot;Details&quot; Button: No matches found for first query match sequence: `Descendants matching type Button` -&gt; `Elements matching predicate &apos;&quot;Details&quot; IN identifiers&apos;`, given input App element pid: 20180'/>
         <properties>
           <property name='repetition' value='Retry 1'/>
         </properties>
       </testcase>
-      <testcase name='testGesturesAndInteractions()' classname='FastlaneTrainerExampleUITests' time='6.0'>
+      <testcase name='testGesturesAndInteractions()' classname='FastlaneTrainerExampleUITests' time='6.475698947906494'>
         <failure message='FastlaneTrainerExampleUITests.swift:108: XCTAssertTrue failed'/>
         <properties>
           <property name='repetition' value='First Run'/>
         </properties>
       </testcase>
-      <testcase name='testGesturesAndInteractions()' classname='FastlaneTrainerExampleUITests' time='6.0'>
+      <testcase name='testGesturesAndInteractions()' classname='FastlaneTrainerExampleUITests' time='6.532494902610779'>
         <failure message='FastlaneTrainerExampleUITests.swift:108: XCTAssertTrue failed'/>
         <properties>
           <property name='repetition' value='Retry 1'/>
         </properties>
       </testcase>
-      <testcase name='testLaunchPerformance()' classname='FastlaneTrainerExampleUITests' time='32.0'/>
-      <testcase name='testTextInputAndValidation()' classname='FastlaneTrainerExampleUITests' time='8.0'>
+      <testcase name='testLaunchPerformance()' classname='FastlaneTrainerExampleUITests' time='32.11108696460724'/>
+      <testcase name='testTextInputAndValidation()' classname='FastlaneTrainerExampleUITests' time='8.440632939338684'>
         <failure message='FastlaneTrainerExampleUITests.swift:68: XCTAssertEqual failed: (&quot;Optional(&quot;Search&quot;)&quot;) is not equal to (&quot;Optional(&quot;&quot;)&quot;)'/>
         <properties>
           <property name='repetition' value='First Run'/>
         </properties>
       </testcase>
-      <testcase name='testTextInputAndValidation()' classname='FastlaneTrainerExampleUITests' time='8.0'>
+      <testcase name='testTextInputAndValidation()' classname='FastlaneTrainerExampleUITests' time='8.414973020553589'>
         <failure message='FastlaneTrainerExampleUITests.swift:68: XCTAssertEqual failed: (&quot;Optional(&quot;Search&quot;)&quot;) is not equal to (&quot;Optional(&quot;&quot;)&quot;)'/>
         <properties>
           <property name='repetition' value='Retry 1'/>
         </properties>
       </testcase>
     </testsuite>
-    <testsuite name='FastlaneTrainerExampleUITestsLaunchTests' time='28.0' tests='4' failures='0' skipped='0'>
-      <testcase name='testLaunch(Dark Appearance, Landscape Right)' classname='FastlaneTrainerExampleUITestsLaunchTests' time='7.0'>
+    <testsuite name='FastlaneTrainerExampleUITestsLaunchTests' time='30.505129098892212' tests='4' failures='0' skipped='0'>
+      <testcase name='testLaunch(Dark Appearance, Landscape Right)' classname='FastlaneTrainerExampleUITestsLaunchTests' time='7.626282274723053'>
         <properties>
           <property name='testname' value='testLaunch()'/>
           <property name='argument' value='Dark Appearance, Landscape Right'/>
         </properties>
       </testcase>
-      <testcase name='testLaunch(Dark Appearance, Portrait)' classname='FastlaneTrainerExampleUITestsLaunchTests' time='7.0'>
+      <testcase name='testLaunch(Dark Appearance, Portrait)' classname='FastlaneTrainerExampleUITestsLaunchTests' time='7.626282274723053'>
         <properties>
           <property name='testname' value='testLaunch()'/>
           <property name='argument' value='Dark Appearance, Portrait'/>
         </properties>
       </testcase>
-      <testcase name='testLaunch(Light Appearance, Landscape Right)' classname='FastlaneTrainerExampleUITestsLaunchTests' time='7.0'>
+      <testcase name='testLaunch(Light Appearance, Landscape Right)' classname='FastlaneTrainerExampleUITestsLaunchTests' time='7.626282274723053'>
         <properties>
           <property name='testname' value='testLaunch()'/>
           <property name='argument' value='Light Appearance, Landscape Right'/>
         </properties>
       </testcase>
-      <testcase name='testLaunch(Light Appearance, Portrait)' classname='FastlaneTrainerExampleUITestsLaunchTests' time='7.0'>
+      <testcase name='testLaunch(Light Appearance, Portrait)' classname='FastlaneTrainerExampleUITestsLaunchTests' time='7.626282274723053'>
         <properties>
           <property name='testname' value='testLaunch()'/>
           <property name='argument' value='Light Appearance, Portrait'/>
@@ -2508,32 +2508,32 @@
       <property name='device' value='iPhone 17 Pro Max (26.1)'/>
     </properties>
   </testsuite>
-  <testsuite name='FastlaneTrainerExampleXCTests' time='0.81814' tests='11' failures='1' skipped='1'>
-    <testsuite name='FastlaneTrainerExampleXCTests' time='0.81814' tests='11' failures='1' skipped='1'>
-      <testcase name='testA_FirstTest()' classname='FastlaneTrainerExampleXCTests' time='0.0006'/>
-      <testcase name='testAsyncOperation()' classname='FastlaneTrainerExampleXCTests' time='0.11'/>
-      <testcase name='testAsyncOperationWithExpectation()' classname='FastlaneTrainerExampleXCTests' time='0.1'/>
-      <testcase name='testB_SecondTest()' classname='FastlaneTrainerExampleXCTests' time='0.0011'/>
-      <testcase name='testBasicAssertions()' classname='FastlaneTrainerExampleXCTests' time='0.16'>
+  <testsuite name='FastlaneTrainerExampleXCTests' time='0.81102055311203' tests='11' failures='1' skipped='1'>
+    <testsuite name='FastlaneTrainerExampleXCTests' time='0.81102055311203' tests='11' failures='1' skipped='1'>
+      <testcase name='testA_FirstTest()' classname='FastlaneTrainerExampleXCTests' time='0.0005970001220703125'/>
+      <testcase name='testAsyncOperation()' classname='FastlaneTrainerExampleXCTests' time='0.10856497287750244'/>
+      <testcase name='testAsyncOperationWithExpectation()' classname='FastlaneTrainerExampleXCTests' time='0.1016470193862915'/>
+      <testcase name='testB_SecondTest()' classname='FastlaneTrainerExampleXCTests' time='0.0010650157928466797'/>
+      <testcase name='testBasicAssertions()' classname='FastlaneTrainerExampleXCTests' time='0.158316969871521'>
         <failure message='FastlaneTrainerExampleXCTests.swift:53: XCTAssertFalse failed - False should be false'/>
         <properties>
           <property name='repetition' value='First Run'/>
         </properties>
       </testcase>
-      <testcase name='testBasicAssertions()' classname='FastlaneTrainerExampleXCTests' time='0.00088'>
+      <testcase name='testBasicAssertions()' classname='FastlaneTrainerExampleXCTests' time='0.0008759498596191406'>
         <failure message='FastlaneTrainerExampleXCTests.swift:53: XCTAssertFalse failed - False should be false'/>
         <properties>
           <property name='repetition' value='Retry 1'/>
         </properties>
       </testcase>
-      <testcase name='testConditionalExecution()' classname='FastlaneTrainerExampleXCTests' time='0.0041'>
+      <testcase name='testConditionalExecution()' classname='FastlaneTrainerExampleXCTests' time='0.004057049751281738'>
         <skipped message='Test skipped - Skipping slow tests'/>
       </testcase>
-      <testcase name='testMultipleExpectations()' classname='FastlaneTrainerExampleXCTests' time='0.21'/>
-      <testcase name='testPerformance()' classname='FastlaneTrainerExampleXCTests' time='0.27'/>
-      <testcase name='testPerformanceWithMetrics()' classname='FastlaneTrainerExampleXCTests' time='0.041'/>
-      <testcase name='testPlatformSpecific()' classname='FastlaneTrainerExampleXCTests' time='0.00049'/>
-      <testcase name='testThrowingOperation()' classname='FastlaneTrainerExampleXCTests' time='0.00085'/>
+      <testcase name='testMultipleExpectations()' classname='FastlaneTrainerExampleXCTests' time='0.20719408988952637'/>
+      <testcase name='testPerformance()' classname='FastlaneTrainerExampleXCTests' time='0.26620590686798096'/>
+      <testcase name='testPerformanceWithMetrics()' classname='FastlaneTrainerExampleXCTests' time='0.040757060050964355'/>
+      <testcase name='testPlatformSpecific()' classname='FastlaneTrainerExampleXCTests' time='0.00048601627349853516'/>
+      <testcase name='testThrowingOperation()' classname='FastlaneTrainerExampleXCTests' time='0.0008499622344970703'/>
     </testsuite>
     <properties>
       <property name='Configuration' value='MyTestPlanConfig'/>

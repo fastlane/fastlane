@@ -8,6 +8,10 @@ describe Spaceship::Client do
       request(:get, TestClient.hostname)
     end
 
+    def req_home_once
+      request(:get, TestClient.hostname, resend: false)
+    end
+
     def send_login_request(_user, _password)
       true
     end
@@ -227,6 +231,15 @@ describe Spaceship::Client do
       end
     end
 
+    it "writes to a file when VERBOSE is false" do
+      client = TestClient.new
+
+      FastlaneSpec::Env.with_env_values("VERBOSE" => "false") do
+        expect(client.logger.instance_variable_get(:@logdev).filename)
+          .to start_with(Dir.tmpdir)
+      end
+    end
+
     it "writes a log readable by its owner only" do
       old_umask = File.umask(0o022)
       client = TestClient.new
@@ -431,6 +444,65 @@ BODY
         to_return(status: 200, body: body.to_json, headers: { 'Content-Type' => 'application/json' })
 
       expect(subject.req_home.body).to eq(body)
+    end
+  end
+
+  describe 'retry with resend: false' do
+    [
+      Faraday::TimeoutError,
+      Faraday::ConnectionFailed,
+      Faraday::ParsingError,
+      Spaceship::BadGatewayError,
+      Spaceship::InternalServerError,
+      Spaceship::GatewayTimeoutError
+    ].each do |thrown|
+      it "does not send the request again after #{thrown}" do
+        stub_client_request(thrown, 1, 200, default_body)
+
+        expect do
+          subject.req_home_once
+        end.to raise_error(thrown)
+        expect(a_request(:get, test_uri)).to have_been_made.once
+      end
+    end
+
+    it "still retries Spaceship::AccessForbiddenError, which Apple refused" do
+      stub_client_request(Spaceship::AccessForbiddenError, 2, 200, default_body)
+
+      expect(subject.req_home_once.body).to eq(default_body)
+    end
+
+    # WebMock raises these inside Net::HTTP, so they go through the adapter's own error mapping:
+    # a different adapter that wraps them differently fails these examples.
+    {
+      Errno::ECONNRESET => Faraday::ConnectionFailed,
+      EOFError => Faraday::ConnectionFailed,
+      Net::ReadTimeout => Faraday::TimeoutError
+    }.each do |cause, thrown|
+      it "does not send the request again after #{cause}, once the request may have been sent" do
+        stub_client_request(cause, 1, 200, default_body)
+
+        expect do
+          subject.req_home_once
+        end.to raise_error(thrown)
+        expect(a_request(:get, test_uri)).to have_been_made.once
+      end
+    end
+
+    [
+      SocketError,
+      Errno::ECONNREFUSED,
+      Errno::EHOSTUNREACH,
+      Errno::ENETUNREACH,
+      Errno::EADDRNOTAVAIL,
+      Net::OpenTimeout
+    ].each do |cause|
+      it "still retries #{cause}, raised before the request was sent" do
+        stub_client_request(cause, 1, 200, default_body)
+
+        expect(subject.req_home_once.body).to eq(default_body)
+        expect(a_request(:get, test_uri)).to have_been_made.twice
+      end
     end
   end
 

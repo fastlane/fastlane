@@ -104,12 +104,12 @@ module FastlaneCore
     end
 
     def self.is_circle_ci?
-      return ENV.key?('CIRCLECI')
+      return FastlaneCore::Env.truthy?('CIRCLECI')
     end
 
-    # @return [boolean] true if environment variable CODEBUILD_BUILD_ARN is set
+    # @return [boolean] true if environment variable CODEBUILD_BUILD_ARN is set and not false
     def self.is_codebuild?
-      return ENV.key?('CODEBUILD_BUILD_ARN')
+      return FastlaneCore::Env.truthy?('CODEBUILD_BUILD_ARN')
     end
 
     def self.operating_system
@@ -169,7 +169,7 @@ module FastlaneCore
 
     def self.xcode_server?
       # XCS is set by Xcode Server
-      return ENV["XCS"].to_i == 1
+      return FastlaneCore::Env.truthy?("XCS")
     end
 
     # @return The version of the currently used Xcode installation (e.g. "7.0")

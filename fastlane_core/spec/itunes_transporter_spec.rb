@@ -1307,6 +1307,19 @@ describe FastlaneCore do
         expect(instance.errors.join("\n")).to include("[ContentDelivery.Uploader.102BA2C00] The provided entity includes an attribute with a value that has already been used")
       end
 
+      it "raises so that the caller asks for an application specific password when altool reports an auth error" do
+        require 'stringio'
+        allow(FastlaneCore::Helper).to receive(:test?).and_return(false)
+        altool_output = <<~OUT
+          2026-01-01 10:00:00.000 ERROR: [altool.100000000] Auth context delegate failed to get headers. Error Domain=ITunesConnectFoundationErrorDomain Code=1235 "Auth error. Please verify your account is valid and configured correctly, use an app-specific password if appropriate, or visit iforgot.apple.com."
+          2026-01-01 10:00:00.100 ERROR: [altool.main] Could not determine provider public id from Bundle ID 'com.example.app'. (30)
+        OUT
+        fake_io = StringIO.new(altool_output)
+        allow(FastlaneCore::FastlanePty).to receive(:spawn).and_yield(fake_io, nil, 123).and_return(1)
+
+        expect { instance.execute(upload_cmd, false) }.to raise_error(FastlaneCore::TransporterRequiresApplicationSpecificPasswordError)
+      end
+
       it "treats the upload success summary as authoritative over diagnostic errors" do
         require 'stringio'
         allow(FastlaneCore::Helper).to receive(:test?).and_return(false)

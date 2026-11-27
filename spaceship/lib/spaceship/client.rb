@@ -218,14 +218,14 @@ module Spaceship
         c.use(Spaceship::StatsMiddleware)
         c.adapter(Faraday.default_adapter)
 
-        if ENV['SPACESHIP_DEBUG']
+        if Spaceship::Globals.env_truthy?('SPACESHIP_DEBUG')
           # for debugging only
           # This enables tracking of networking requests using Charles Web Proxy
           c.proxy = "https://127.0.0.1:8888"
           c.ssl[:verify_mode] = OpenSSL::SSL::VERIFY_NONE
         elsif ENV["SPACESHIP_PROXY"]
           c.proxy = ENV["SPACESHIP_PROXY"]
-          c.ssl[:verify_mode] = OpenSSL::SSL::VERIFY_NONE if ENV["SPACESHIP_PROXY_SSL_VERIFY_NONE"]
+          c.ssl[:verify_mode] = OpenSSL::SSL::VERIFY_NONE if Spaceship::Globals.env_truthy?("SPACESHIP_PROXY_SSL_VERIFY_NONE")
         end
 
         if ENV["DEBUG"]
@@ -247,7 +247,7 @@ module Spaceship
     # unless something else happens to have created it first.
     def logger
       unless @logger
-        if ENV["VERBOSE"]
+        if Spaceship::Globals.env_truthy?("VERBOSE")
           @logger = Logger.new(STDOUT)
         else
           # Log to file by default
@@ -646,7 +646,7 @@ module Spaceship
     # rubocop:enable Metrics/PerceivedComplexity
 
     def perform_login_method(user, password, modified_cookie)
-      do_legacy_signin = ENV['FASTLANE_USE_LEGACY_PRE_SIRP_AUTH']
+      do_legacy_signin = Spaceship::Globals.env_truthy?('FASTLANE_USE_LEGACY_PRE_SIRP_AUTH')
       if do_legacy_signin
         puts("Starting legacy Apple ID login") if Spaceship::Globals.verbose?
 
@@ -941,7 +941,10 @@ module Spaceship
     # @!group Helpers
     #####################################################
 
-    def with_retry(tries = 5, &_block)
+    # Errors the net_http adapter wraps in Faraday::ConnectionFailed before the request is sent
+    UNSENT_REQUEST_ERRORS = [SocketError, Errno::ECONNREFUSED, Errno::EHOSTUNREACH, Errno::ENETUNREACH, Errno::EADDRNOTAVAIL, Net::OpenTimeout].freeze
+
+    def with_retry(tries = 5, resend: true, &_block)
       return yield
     rescue \
         Faraday::ConnectionFailed,
@@ -950,6 +953,8 @@ module Spaceship
         AppleTimeoutError,
         GatewayTimeoutError,
         AccessForbiddenError => ex
+      # Apple may have processed a request that failed after it was sent; a 403 was refused
+      raise ex unless resend || ex.kind_of?(AccessForbiddenError) || unsent_request?(ex)
       tries -= 1
       unless tries.zero?
         msg = "Timeout received: '#{ex.class}', '#{ex.message}'. Retrying after 3 seconds (remaining: #{tries})..."
@@ -974,6 +979,7 @@ module Spaceship
     rescue \
         Faraday::ParsingError, # <h2>Internal Server Error</h2> with content type json
         InternalServerError => ex
+      raise ex unless resend
       tries -= 1
       unless tries.zero?
         msg = "Internal Server Error received: '#{ex.class}', '#{ex.message}'. Retrying after 3 seconds (remaining: #{tries})..."
@@ -1001,6 +1007,10 @@ module Spaceship
       raise ex # re-raise the exception
     end
 
+    def unsent_request?(ex)
+      ex.kind_of?(Faraday::ConnectionFailed) && UNSENT_REQUEST_ERRORS.any? { |error| ex.wrapped_exception.kind_of?(error) }
+    end
+
     # memorize the last csrf tokens from responses
     def csrf_tokens
       @csrf_tokens || {}
@@ -1010,7 +1020,7 @@ module Spaceship
       @additional_headers || {}
     end
 
-    def request(method, url_or_path = nil, params = nil, headers = {}, auto_paginate = false, &block)
+    def request(method, url_or_path = nil, params = nil, headers = {}, auto_paginate = false, resend: true, &block)
       headers.merge!(csrf_tokens)
       headers.merge!(additional_headers)
       headers['User-Agent'] = USER_AGENT
@@ -1027,7 +1037,7 @@ module Spaceship
       response = if auto_paginate
                    send_request_auto_paginate(method, url_or_path, params, headers, &block)
                  else
-                   send_request(method, url_or_path, params, headers, &block)
+                   send_request(method, url_or_path, params, headers, resend: resend, &block)
                  end
 
       return response
@@ -1182,8 +1192,8 @@ module Spaceship
 
     # Actually sends the request to the remote server
     # Automatically retries the request up to 3 times if something goes wrong
-    def send_request(method, url_or_path, params, headers, &block)
-      with_retry do
+    def send_request(method, url_or_path, params, headers, resend: true, &block)
+      with_retry(resend: resend) do
         response = @client.send(method, url_or_path, params, headers, &block)
         log_response(method, url_or_path, response, headers, &block)
 

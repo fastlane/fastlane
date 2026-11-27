@@ -24,6 +24,20 @@ describe Fastlane do
         expect(UI).not_to(receive(:important))
         Fastlane::FastFile.new('./fastlane/spec/fixtures/fastfiles/FastfileRequireInstalledGem')
       end
+
+      it "replaces smart quotes and says how to keep them" do
+        expect(UI).to receive(:error).with(/has had smart quotes sanitised.*FASTLANE_SKIP_SMART_QUOTES_SANITIZE=1/)
+        ff = Fastlane::FastFile.new('./fastlane/spec/fixtures/fastfiles/FastfileSmartQuotes')
+        expect(ff.runner.execute(:test)).to eq("sanitised")
+      end
+
+      it "keeps smart quotes when FASTLANE_SKIP_SMART_QUOTES_SANITIZE is set" do
+        FastlaneSpec::Env.with_env_values('FASTLANE_SKIP_SMART_QUOTES_SANITIZE' => '1') do
+          expect(UI).not_to(receive(:error))
+          ff = Fastlane::FastFile.new('./fastlane/spec/fixtures/fastfiles/FastfileSmartQuotesInAString')
+          expect(ff.runner.execute(:test)).to eq("It’s a “lane”")
+        end
+      end
     end
 
     describe "#sh" do
