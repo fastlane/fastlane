@@ -1,3 +1,4 @@
+require 'time'
 require_relative '../model'
 require_relative './build'
 
@@ -240,8 +241,7 @@ module Spaceship
 
         # Get the latest version
         return get_app_store_versions(client: client, filter: filter, includes: includes)
-               .sort_by { |v| Date.parse(v.created_date) }
-               .last
+               .max_by { |v| Time.parse(v.created_date) }
       end
 
       def get_live_app_store_version(client: nil, platform: nil, includes: Spaceship::ConnectAPI::AppStoreVersion::ESSENTIAL_INCLUDES)

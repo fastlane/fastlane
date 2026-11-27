@@ -40,7 +40,7 @@ jobs:
       uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
 
     - name: Set up Ruby
-      uses: ruby/setup-ruby@b3aaceaef7e0ee231b499e7b5f49c03fc1d32199 # v1.338.0
+      uses: ruby/setup-ruby@be3c7df29b3349ec6bcfc6b4792f1cf9f5237d18 # v1.343.0
       with:
         ruby-version: '3.4'
 
@@ -115,7 +115,7 @@ jobs:
       run: echo "BUNDLE_APP_CONFIG=$RUNNER_TEMP/bundle" >> "$GITHUB_ENV"
 
     - name: Set up Ruby
-      uses: ruby/setup-ruby@b3aaceaef7e0ee231b499e7b5f49c03fc1d32199 # v1.338.0
+      uses: ruby/setup-ruby@be3c7df29b3349ec6bcfc6b4792f1cf9f5237d18 # v1.343.0
       with:
         ruby-version: '3.4'
         bundler-cache: true
@@ -138,7 +138,7 @@ jobs:
 
     - name: Release to RubyGems
       if: steps.published.outputs.published == 'false'
-      uses: rubygems/release-gem@5c53f5308233b7c0f47411f0471b3faae6fa57b2 # v1.4.2
+      uses: rubygems/release-gem@2654a0fe0dc39725c07fe84d7fe863a084f2424e # v1.5.0
 
     - name: Verify the gem on RubyGems
       env:
