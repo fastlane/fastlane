@@ -48,7 +48,8 @@ module Match
           team_id: params[:team_id],
           team_name: params[:team_name],
           api_key_path: params[:api_key_path],
-          api_key: params[:api_key]
+          api_key: params[:api_key],
+          skip_google_cloud_account_confirmation: params[:skip_google_cloud_account_confirmation]
         )
       end
 
@@ -62,7 +63,8 @@ module Match
                      team_id: nil,
                      team_name: nil,
                      api_key_path: nil,
-                     api_key: nil)
+                     api_key: nil,
+                     skip_google_cloud_account_confirmation: nil)
         @type = type if type
         @platform = platform if platform
         @google_cloud_project_id = google_cloud_project_id if google_cloud_project_id
@@ -76,12 +78,16 @@ module Match
         @api_key_path = api_key_path
         @api_key = api_key
 
-        @google_cloud_keys_file = ensure_keys_file_exists(google_cloud_keys_file, google_cloud_project_id)
-
+        @google_cloud_keys_file = ensure_keys_file_exists(google_cloud_keys_file, google_cloud_project_id, skip_google_cloud_account_confirmation)
         if self.google_cloud_keys_file.to_s.length > 0
           # Extract the Project ID from the `JSON` file
           # so the user doesn't have to provide it manually
-          keys_file_content = JSON.parse(File.read(self.google_cloud_keys_file))
+          begin
+            keys_file_content = JSON.parse(File.read(self.google_cloud_keys_file))
+          rescue JSON::ParserError
+            # Don't dump secret into logs in case a secret (p8) is passed. See fastlane/fastlane#21017
+            UI.user_error!("Provided keys file on path #{File.expand_path(self.google_cloud_keys_file)} is not a valid JSON file")
+          end
           if google_cloud_project_id.to_s.length > 0 && google_cloud_project_id != keys_file_content["project_id"]
             UI.important("The google_cloud_keys_file's project ID ('#{keys_file_content['project_id']}') doesn't match the google_cloud_project_id ('#{google_cloud_project_id}'). This may be the wrong keys file.")
           end
@@ -152,7 +158,7 @@ module Match
 
         bucket.files.each do |current_file|
           file_path = current_file.name # e.g. "N8X438SEU2/certs/distribution/XD9G7QCACF.cer"
-          download_path = File.join(self.working_directory, file_path)
+          download_path = Storage.download_path(self.working_directory, file_path)
 
           FileUtils.mkdir_p(File.expand_path("..", download_path))
           UI.verbose("Downloading file from Google Cloud Storage '#{file_path}' on bucket #{self.bucket_name}")
@@ -223,7 +229,7 @@ module Match
 
       # This method will make sure the keys file exists
       # If it's missing, it will help the user set things up
-      def ensure_keys_file_exists(google_cloud_keys_file, google_cloud_project_id)
+      def ensure_keys_file_exists(google_cloud_keys_file, google_cloud_project_id, skip_google_cloud_account_confirmation)
         if google_cloud_keys_file && File.exist?(google_cloud_keys_file)
           return google_cloud_keys_file
         end
@@ -251,7 +257,7 @@ module Match
             # we can continue and ask the user if they want to use a keys file.
           end
 
-          if application_default_keys && UI.confirm("Do you want to use this system's Google Cloud application default keys?")
+          if application_default_keys && (skip_google_cloud_account_confirmation || UI.confirm("Do you want to use this system's Google Cloud application default keys?"))
             return nil
           end
         end

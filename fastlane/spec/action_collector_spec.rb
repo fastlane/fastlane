@@ -18,7 +18,7 @@ describe Fastlane::ActionCollector do
     end
 
     it "returns 'undefined' if plugin version information is not available" do
-      expect(collector.determine_version("fastlane-plugin-not-existent/action_name")).to eq('undefined')
+      expect(collector.determine_version("fastlane-plugin-nonexistent/action_name")).to eq('undefined')
     end
 
     it "falls back to the fastlane version number" do

@@ -20,7 +20,7 @@ describe Fastlane do
             )
           end").runner.execute(:test)
 
-        expect(result).to match(%r{cd .* && oclint -report-type=html -o=oclint_report.html -p ./fastlane/spec/fixtures/oclint \".*})
+        expect(result).to match(%r{cd .* && oclint -report-type=html -o=oclint_report.html -p ./fastlane/spec/fixtures/oclint fastlane/spec/fixtures/oclint/src/.*})
       end
 
       it "works given a path to the directory containing compile_commands.json" do
@@ -30,7 +30,7 @@ describe Fastlane do
             )
           end").runner.execute(:test)
 
-        expect(result).to match(%r{cd .* && oclint -report-type=html -o=oclint_report.html -p ./fastlane/spec/fixtures/oclint \".*})
+        expect(result).to match(%r{cd .* && oclint -report-type=html -o=oclint_report.html -p ./fastlane/spec/fixtures/oclint fastlane/spec/fixtures/oclint/src/.*})
       end
 
       it "works with all parameters" do
@@ -83,6 +83,34 @@ describe Fastlane do
         expect(result).to include(" -disable-rule #{rule.shellescape} ")
       end
 
+      it "finds sources whose path xcodebuild wrote with escaped spaces, and passes each as one argument" do
+        Dir.mktmpdir do |dir|
+          folder = File.join(dir, "Kaldi Kafe")
+          FileUtils.mkdir_p(File.join(folder, "src"))
+          source = File.join(folder, "src", "main.m")
+          FileUtils.touch(source)
+          # xcodebuild's output, and so xcpretty's database, writes the space as "\ "
+          escaped_source = File.join(dir, "Kaldi\\ Kafe", "src", "main.m")
+          database = File.join(dir, "compile_commands.json")
+          File.write(database, JSON.generate([{ "directory" => folder, "file" => escaped_source, "command" => "clang -c main.m" }]))
+
+          result = Fastlane::FastFile.new.parse("lane :test do
+              oclint(compile_commands: #{database.inspect})
+            end").runner.execute(:test)
+
+          expect(Shellwords.split(result).last).to eq(source)
+        end
+      end
+
+      it "passes a report path with spaces and an apostrophe as one argument" do
+        report = File.join(Dir.tmpdir, "Kaldi's Kafe", "report.html")
+        result = Fastlane::FastFile.new.parse("lane :test do
+            oclint(compile_commands: './fastlane/spec/fixtures/oclint/compile_commands.json', report_path: #{report.inspect})
+          end").runner.execute(:test)
+
+        expect(Shellwords.split(result)).to include("-o=#{report}")
+      end
+
       it "works with select regex" do
         result = Fastlane::FastFile.new.parse("lane :test do
             oclint(
@@ -91,7 +119,7 @@ describe Fastlane do
             )
           end").runner.execute(:test)
 
-        expect(result).to include('"fastlane/spec/fixtures/oclint/src/AppDelegate.m"')
+        expect(result).to include(' fastlane/spec/fixtures/oclint/src/AppDelegate.m')
       end
 
       it "works with select regex when regex is string" do
@@ -102,7 +130,7 @@ describe Fastlane do
             )
           end").runner.execute(:test)
 
-        expect(result).to include('"fastlane/spec/fixtures/oclint/src/AppDelegate.m"')
+        expect(result).to include(' fastlane/spec/fixtures/oclint/src/AppDelegate.m')
       end
 
       it "works with exclude regex" do
@@ -113,7 +141,7 @@ describe Fastlane do
             )
           end").runner.execute(:test)
 
-        expect(result).not_to(include('"fastlane/spec/fixtures/oclint/src/Test.m"'))
+        expect(result).not_to(include('fastlane/spec/fixtures/oclint/src/Test.m'))
       end
 
       it "works with both select and exclude regex" do
@@ -125,7 +153,7 @@ describe Fastlane do
             )
           end").runner.execute(:test)
 
-        expect(result).to include('"fastlane/spec/fixtures/oclint/src/AppDelegate.m"')
+        expect(result).to include(' fastlane/spec/fixtures/oclint/src/AppDelegate.m')
         expect(result).not_to(include('Test'))
       end
 

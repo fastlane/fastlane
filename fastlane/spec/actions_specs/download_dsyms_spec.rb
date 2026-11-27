@@ -111,6 +111,20 @@ describe Fastlane do
         end
       end
 
+      context 'with an API key and no username' do
+        it 'says which app could not be found' do
+          allow(Spaceship::ConnectAPI::Token).to receive(:from).and_return(double('token'))
+          allow(Spaceship::ConnectAPI).to receive(:token=)
+          allow(Spaceship::ConnectAPI::App).to receive(:find).and_return(nil)
+
+          expect do
+            Fastlane::FastFile.new.parse("lane :test do
+              download_dsyms(api_key: { key_id: 'KEYID' }, app_identifier: 'tools.fastlane.missing')
+            end").runner.execute(:test)
+          end.to raise_error(FastlaneCore::Interface::FastlaneError, "Could not find app with bundle identifier 'tools.fastlane.missing'")
+        end
+      end
+
       context 'with wait_for_dsym_processing' do
         it 'downloads all dsyms of all builds in all trains' do
           expect(build_resp).to receive(:all_pages_each).and_yield(not_processed_build)

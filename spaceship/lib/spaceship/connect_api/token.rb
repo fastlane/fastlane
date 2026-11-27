@@ -1,6 +1,7 @@
 require 'jwt'
 require 'base64'
 require 'openssl'
+require 'spaceship/globals'
 
 # extract pem from .p8
 # openssl pkcs8 -topk8 -outform PEM -in AuthKey.p8 -out key.pem -nocrypt
@@ -29,17 +30,22 @@ module Spaceship
       attr_accessor :in_house
 
       def self.from(hash: nil, filepath: nil)
+        # FIXME: Ensure `in_house` value is a boolean.
         api_token ||= self.create(**hash.transform_keys(&:to_sym)) if hash
         api_token ||= self.from_json_file(filepath) if filepath
         return api_token
       end
 
       def self.from_json_file(filepath)
-        json = JSON.parse(File.read(filepath), { symbolize_names: true })
+        begin
+          json = JSON.parse(File.read(filepath), { symbolize_names: true })
+        rescue JSON::ParserError
+          # Don't dump secret into logs in case a secret (p8) is passed. See fastlane/fastlane#21017
+          raise "Invalid JSON in App Store Connect API key file '#{filepath}'. Expected a JSON file with at least the 'key_id' and 'key' fields."
+        end
 
         missing_keys = []
         missing_keys << 'key_id' unless json.key?(:key_id)
-        missing_keys << 'issuer_id' unless json.key?(:issuer_id)
         missing_keys << 'key' unless json.key?(:key)
 
         unless missing_keys.empty?
@@ -56,7 +62,11 @@ module Spaceship
         duration ||= ENV['SPACESHIP_CONNECT_API_TOKEN_DURATION']
 
         in_house_env = ENV['SPACESHIP_CONNECT_API_IN_HOUSE']
-        in_house ||= !["", "no", "false", "off", "0"].include?(in_house_env) if in_house_env
+        if in_house_env == "" && !in_house
+          puts("SPACESHIP_CONNECT_API_IN_HOUSE is empty, which means false. A future version of fastlane will read an empty value as true, like its other environment variables. Set it to false to keep the current behaviour.".yellow)
+        end
+        # Unlike the other boolean variables, empty means false (see the warning above)
+        in_house ||= in_house_env != "" && Spaceship::Globals.env_truthy?('SPACESHIP_CONNECT_API_IN_HOUSE') if in_house_env
 
         key ||= ENV['SPACESHIP_CONNECT_API_KEY']
         key ||= File.binread(filepath)
@@ -90,17 +100,27 @@ module Spaceship
       end
 
       def refresh!
-        @expiration = Time.now + @duration
+        now = Time.now
+        @expiration = now + @duration
 
         header = {
-          kid: key_id
+          kid: key_id,
+          typ: 'JWT'
         }
 
         payload = {
-          iss: issuer_id,
+          # Reduce the issued-at-time in case our time is slighly ahead of Apple's servers, which causes the token to be rejected.
+          iat: now.to_i - 60,
           exp: @expiration.to_i,
-          aud: 'appstoreconnect-v1'
+          aud: @in_house ? 'apple-developer-enterprise-v1' : 'appstoreconnect-v1'
         }
+        if issuer_id
+          payload[:iss] = issuer_id
+        else
+          # Consider the key as individual key.
+          # https://developer.apple.com/documentation/appstoreconnectapi/generating_tokens_for_api_requests#4313913
+          payload[:sub] = 'user'
+        end
 
         @text = JWT.encode(payload, @key, 'ES256', header)
       end
@@ -110,7 +130,27 @@ module Spaceship
       end
 
       def write_key_to_file(path)
-        File.open(path, 'w') { |f| f.write(@key_raw) }
+        return unless @key_raw.kind_of?(String)
+
+        lines = @key_raw.lines.map(&:chomp)
+
+        if lines.size == 3 && lines.first.include?("BEGIN") && lines.last.include?("END")
+          header = lines.first
+          footer = lines.last
+          raw_base64 = lines[1].gsub(/\s+/, "") # Remove any whitespace
+
+          # Rewrap base64 content at 64 characters per line
+          wrapped = raw_base64.scan(/.{1,64}/).join("\n")
+
+          File.open(path, 'w') do |f|
+            f.puts(header)
+            f.puts(wrapped)
+            f.puts(footer)
+          end
+        else
+          # Fall back to writing raw (likely already well-formatted)
+          File.write(path, @key_raw)
+        end
       end
     end
   end

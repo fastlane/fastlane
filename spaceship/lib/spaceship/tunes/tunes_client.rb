@@ -9,6 +9,7 @@ require_relative 'errors'
 require_relative 'iap_subscription_pricing_tier'
 require_relative 'pricing_tier'
 require_relative 'territory'
+require_relative '../connect_api/response'
 module Spaceship
   # rubocop:disable Metrics/ClassLength
   class TunesClient < Spaceship::Client
@@ -71,7 +72,7 @@ module Spaceship
         puts("Looking for App Store Connect Team with name #{t_name}") if Spaceship::Globals.verbose?
 
         teams.each do |t|
-          t_id = t['providerId'].to_s if t['name'].casecmp(t_name).zero?
+          t_id = t['providerId'].to_s if t['name'].strip.casecmp(t_name).zero?
         end
 
         puts("Could not find team with name '#{t_name}', trying to fallback to default team") if t_id.length.zero?
@@ -90,7 +91,7 @@ module Spaceship
       # user didn't specify a team... #thisiswhywecanthavenicethings
       loop do
         puts("Multiple #{'App Store Connect teams'.yellow} found, please enter the number of the team you want to use: ")
-        if ENV["FASTLANE_HIDE_TEAM_INFORMATION"].to_s.length == 0
+        unless Spaceship::Globals.env_truthy?("FASTLANE_HIDE_TEAM_INFORMATION")
           first_team = teams.first
           puts("Note: to automatically choose the team, provide either the App Store Connect Team ID, or the Team Name in your fastlane/Appfile:")
           puts("Alternatively you can pass the team name or team ID using the `FASTLANE_ITC_TEAM_ID` or `FASTLANE_ITC_TEAM_NAME` environment variable")
@@ -254,8 +255,70 @@ module Spaceship
     #####################################################
 
     def applications
-      r = request(:get, 'ra/apps/manageyourapps/summary/v2')
-      parse_response(r, 'data')['summaries']
+      # Doing this real bad puts for now until a more formal deprecation logic can get made
+      puts("Spaceship::Tunes::Application.all is deprecated")
+      puts("  It's using a temporary patch to keep it from raising an error but things may not work correctly")
+      puts("  Please consider switching to Spaceship::ConnectAPI if you can")
+      puts("  For more details - https://github.com/fastlane/fastlane/pull/20480")
+
+      # This legacy endpoint went offline around July 7th, 2022. This is a rough attempt
+      # at retrofitting using the newer App Store Connect API endpoints
+      #
+      # This could all be done easily with Spaceship::ConnectAPI::App.find but there were a lot of
+      # circular dependency issues that were very difficult to solve because. Spaceship::Tunes would be
+      # using Spaceship::ConnectAPI which uses Spaceship::Tunes
+      #
+      # However, using Spaceship::ConnectAPI::Response works. This will fetch multiple pages of app
+      # if it needs to
+      #
+      # https://github.com/fastlane/fastlane/pull/20480
+      r = request(:get, "https://appstoreconnect.apple.com/iris/v1/apps?include=appStoreVersions")
+      response = Spaceship::ConnectAPI::Response.new(
+        body: r.body,
+        status: r.status,
+        headers: r.headers,
+        client: nil
+      )
+
+      apps = response.all_pages do |url|
+        r = request(:get, url)
+        Spaceship::ConnectAPI::Response.new(
+          body: r.body,
+          status: r.status,
+          headers: r.headers,
+          client: nil
+        )
+      end.flat_map(&:to_models)
+
+      apps.map do |asc_app|
+        platforms = (asc_app.app_store_versions || []).map(&:platform).uniq.map do |asc_platform|
+          case asc_platform
+          when "TV_OS"
+            "appletvos"
+          when "MAC_OS"
+            "osx"
+          when "VISION_OS"
+            "xros"
+          when "IOS"
+            "ios"
+          else
+            raise "Cannot find a matching platform for '#{asc_platform}'}"
+          end
+        end
+
+        {
+          'adamId' => asc_app.id,
+          'name' => asc_app.name,
+          'vendorId' => "",
+          'bundleId' => asc_app.bundle_id,
+          'lastModifiedDate' => nil,
+          'issuesCount' => nil,
+          'iconUrl' => nil,
+          'versionSets' => platforms.map do |platform|
+            { 'type' => 'app', 'platformString' => platform }
+          end
+        }
+      end
     end
 
     def app_details(app_id)
@@ -598,7 +661,7 @@ module Spaceship
       r = request(:get, "ra/apps/#{app_id}/pricing/intervals")
       data = parse_response(r, 'data')
 
-      # preOrder isn't needed for for the request and has some
+      # preOrder isn't needed for the request and has some
       # values that can cause a failure (invalid dates) so we are removing it
       data.delete('preOrder')
 
@@ -950,7 +1013,7 @@ module Spaceship
     end
 
     #####################################################
-    # @!group CandiateBuilds
+    # @!group CandidateBuilds
     #####################################################
 
     def candidate_builds(app_id, version_id)

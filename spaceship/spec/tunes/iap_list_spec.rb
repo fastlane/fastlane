@@ -1,8 +1,8 @@
 describe Spaceship::Tunes::IAPList do
   before { TunesStubbing.itc_stub_iap }
-  before { Spaceship::Tunes.login }
+  include_examples "common spaceship login"
   let(:client) { Spaceship::Application.client }
-  let(:app) { Spaceship::Application.all.first }
+  let(:app) { Spaceship::Application.all.find { |a| a.apple_id == "898536088" } }
   let(:purchase) { app.in_app_purchases }
   describe "IAPList" do
     it "Creates a Object" do

@@ -10,7 +10,7 @@ module Fastlane
 
         return if Helper.test?
 
-        Produce.config = params # we alread have the finished config
+        Produce.config = params # we already have the finished config
 
         Dir.chdir(FastlaneCore::FastlaneFolder.path || Dir.pwd) do
           # This should be executed in the fastlane folder
