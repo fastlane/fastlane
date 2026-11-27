@@ -13,11 +13,14 @@ class ExampleUITests: XCTestCase {
     override func setUp() {
         super.setUp()
 
-        let app = XCUIApplication()
-        setupSnapshot(app)
-        app.launch()
+        MainActor.assumeIsolated {
+            let app = XCUIApplication()
+            setupSnapshot(app)
+            app.launch()
+        }
     }
 
+    @MainActor
     func testExample() {
         snapshot("0Launch")
         let tabBar = XCUIApplication().tabBars
