@@ -283,10 +283,13 @@ module Supply
         end
       end
 
-      AndroidPublisher::LocalizedText.new(
-        language: language,
-        text: changelog_text
-      )
+      # An empty text made the whole release notes update fail (fastlane#21004)
+      unless changelog_text.strip.empty?
+        AndroidPublisher::LocalizedText.new(
+          language: language,
+          text: changelog_text
+        )
+      end
     end
 
     def upload_changelogs(release_notes, release, track, track_name)
@@ -563,7 +566,10 @@ module Supply
         upload_metadata(job.language, listing) unless Supply.config[:skip_upload_metadata]
         upload_images(job.language) unless Supply.config[:skip_upload_images]
         upload_screenshots(job.language) unless Supply.config[:skip_upload_screenshots]
-        job.release_notes_queue << upload_changelog(job.language, job.version_code) unless Supply.config[:skip_upload_changelogs]
+        unless Supply.config[:skip_upload_changelogs]
+          changelog = upload_changelog(job.language, job.version_code)
+          job.release_notes_queue << changelog unless changelog.nil?
+        end
         UI.message("Uploaded all items for language '#{job.language}'... (#{Time.now - start_time} secs)")
       rescue => error
         UI.abort_with_message!("#{job.language} - #{error}")

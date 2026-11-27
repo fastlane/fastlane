@@ -150,6 +150,35 @@ describe Supply do
       end
     end
 
+    describe 'release notes' do
+      it 'leaves out the languages whose changelog is missing or empty' do
+        Dir.mktmpdir do |metadata_path|
+          {
+            'en-US' => { '1.txt' => "Fixes" },
+            'fr-FR' => {},
+            'de-DE' => { '1.txt' => "" },
+            'ja-JP' => { '1.txt' => "\n" },
+            'es-ES' => { 'default.txt' => "Default notes" }
+          }.each do |language, files|
+            changelogs = File.join(metadata_path, language, Supply::CHANGELOGS_FOLDER_NAME)
+            FileUtils.mkdir_p(changelogs)
+            files.each { |name, text| File.write(File.join(changelogs, name), text) }
+          end
+          Supply.config = { metadata_path: metadata_path, skip_upload_metadata: true, skip_upload_images: true, skip_upload_screenshots: true }
+
+          uploader = Supply::Uploader.new
+          allow(uploader).to receive(:client).and_return(double('client', listing_for_language: nil))
+          queue = Queue.new
+          worker = uploader.send(:create_meta_upload_worker)
+          worker.batch_enqueue(%w(en-US fr-FR de-DE ja-JP es-ES).map { |language| Supply::Uploader::UploadJob.new(language, 1, queue) })
+          worker.start
+
+          notes = Array.new(queue.size) { queue.pop }
+          expect(notes.map { |note| [note.language, note.text] }).to contain_exactly(["en-US", "Fixes"], ["es-ES", "Default notes"])
+        end
+      end
+    end
+
     describe 'all_languages' do
       it 'only grabs directories' do
         Supply.config = {
