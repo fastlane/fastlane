@@ -57,8 +57,6 @@ module Deliver
         return
       end
 
-      UploadCreativeAssets.validate_options(options)
-
       verify_version if options[:app_version].to_s.length > 0 && !options[:skip_app_version_update]
 
       # Rejecting before upload meta
@@ -147,6 +145,9 @@ module Deliver
 
     # Upload all metadata, screenshots, pricing information, etc. to App Store Connect
     def upload_metadata
+      creative_assets = UploadCreativeAssets.new if options[:creative_assets]&.any?
+      creative_assets&.check(options)
+
       # App clip experience metadata upload must happen before the upload metadata step. The app
       # clip app store review detail upload depends on there being a valid app clip default
       # experience on the edit version.
@@ -187,7 +188,7 @@ module Deliver
         previews.sync_from_path
       end
 
-      UploadCreativeAssets.new.upload(options) if options[:creative_assets]
+      creative_assets&.upload(options)
 
       UploadPriceTier.new.upload(options)
     end

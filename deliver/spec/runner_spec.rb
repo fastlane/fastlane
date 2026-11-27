@@ -59,19 +59,6 @@ describe Deliver::Runner do
   end
 
   describe :run do
-    [:edit_live, :use_live_version].each do |live_option|
-      it "rejects creative assets with #{live_option} before changing App Store data" do
-        options[:creative_assets] = [{ locale: 'en-US' }]
-        options[live_option] = true
-        expect(runner).not_to receive(:verify_version)
-        expect(runner).not_to receive(:reject_version_if_possible)
-        expect(runner).not_to receive(:upload_metadata)
-        expect(runner).not_to receive(:upload_binary)
-
-        expect { runner.run }.to raise_error(/Creative asset uploads require an editable version/)
-      end
-    end
-
     it 'allows live metadata updates without creative assets' do
       options[:edit_live] = true
       expect(runner).to receive(:verify_version)
@@ -83,7 +70,7 @@ describe Deliver::Runner do
     end
 
     it 'keeps verify_only limited to binary validation' do
-      options.merge!(verify_only: true, creative_assets: [{ locale: 'en-US' }], edit_live: true)
+      options.merge!(verify_only: true, creative_assets: [{ locale: 'en-US' }])
       expect(runner).to receive(:verify_binary)
       expect(runner).not_to receive(:upload_metadata)
 
@@ -395,10 +382,36 @@ describe Deliver::Runner do
       options[:creative_assets] = [{ locale: 'en-US' }]
       uploader = instance_double(Deliver::UploadCreativeAssets)
       expect(Deliver::UploadCreativeAssets).to receive(:new).and_return(uploader)
+      expect(uploader).to receive(:check).with(options).ordered
       expect(fake_upload_metadata).to receive(:upload).ordered
       expect(fake_upload_screenshots).to receive(:upload).ordered
       expect(uploader).to receive(:upload).with(options).ordered
       runner.upload_metadata
+    end
+
+    it 'stops before the HTML report and uploads when a creative asset target is already occupied' do
+      type = 'PRODUCT_PAGE_HEADER_ASSET'
+      group = 'header-group'
+      entry = { locale: 'en-US', path: './fastlane/spec/fixtures/screenshots/screenshot1.png', placement_type: type, placement_group: group }
+      options[:creative_assets] = [entry]
+      localization = double('localization', id: 'loc-id', locale: 'en-US')
+      version = double('version', app_version_state: 'PREPARE_FOR_SUBMISSION', get_app_store_version_localizations: [localization])
+      allow(Deliver.cache[:app]).to receive(:get_edit_app_store_version).and_return(version)
+      reference = double('reference',
+                         features: [{ 'featureId' => 'APP_STORE_VERSIONS', 'placementPolicies' => [
+                           { 'placementType' => type, 'groupLimits' => [{ 'groupIds' => [group], 'maxCount' => 1 }] }
+                         ] }],
+                         placement_types: [{ 'placementTypeId' => type, 'acceptsAssetCategories' => ['CREATIVE_ASSETS'],
+                                             'specMappings' => [{ 'placementGroupId' => group, 'specs' => ['header-spec'] }] }])
+      allow(Spaceship::ConnectAPI::AppAssetLibraryRefDatum).to receive(:all).and_return([reference])
+      placement = double('placement', placement_type: type, placement_group: group)
+      allow(Spaceship::ConnectAPI::AppAssetLibraryPlacement).to receive(:all).with(app_store_version_localization_id: localization.id).and_return([placement])
+
+      expect(Deliver::UploadAppClipDefaultExperienceMetadata).not_to receive(:new)
+      expect(runner).not_to receive(:validate_html)
+      expect(fake_upload_metadata).not_to receive(:upload)
+      expect(fake_upload_screenshots).not_to receive(:upload)
+      expect { runner.upload_metadata }.to raise_error(/already placed.*overwrite_creative_assets/)
     end
 
     it 'does not instantiate a creative asset uploader without configuration' do

@@ -142,6 +142,10 @@ module Deliver
                                      description: "Creative image placements, each with locale, path, placement_type and placement_group",
                                      type: Array,
                                      optional: true,
+                                     conflicting_options: [:edit_live, :use_live_version],
+                                     conflict_block: proc do |conflict|
+                                       UI.user_error!("You can't use 'creative_assets' and '#{conflict.key}' together. Creative assets require an editable version.")
+                                     end,
                                      verify_block: proc do |value|
                                        UploadCreativeAssets.validate(value)
                                      end),

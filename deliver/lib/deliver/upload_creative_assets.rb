@@ -27,19 +27,29 @@ module Deliver
       end
     end
 
-    def self.validate_options(options)
-      entries = options[:creative_assets]
-      return if entries.nil? || entries.empty?
-      if options[:edit_live] || options[:use_live_version]
-        UI.user_error!('Creative asset uploads require an editable version; edit_live and use_live_version are not supported')
-      end
+    def check(options)
+      # The metadata upload can create localizations that do not exist yet.
+      placement_plans(options, allow_missing_localizations: true)
     end
 
     def upload(options)
+      plans = placement_plans(options, allow_missing_localizations: false)
+      return if plans.empty?
+
+      library = Spaceship::ConnectAPI::AppAssetLibrary.get(app_id: Deliver.cache[:app].id)
+      UI.user_error!('Apple returned no asset library for this app') unless library
+      uploaded_images_by_path = {}
+      plans.each { |plan| prepare_image(plan, library, uploaded_images_by_path) }
+      plans.each { |plan| replace_placement(plan) }
+      UI.success('Successfully uploaded and placed creative assets')
+    end
+
+    private
+
+    def placement_plans(options, allow_missing_localizations:)
       entries = options[:creative_assets]
-      return if entries.nil? || entries.empty?
+      return [] if entries.nil? || entries.empty?
       self.class.validate(entries)
-      self.class.validate_options(options)
 
       app = Deliver.cache[:app]
       version = app.get_edit_app_store_version(platform: Spaceship::ConnectAPI::Platform.map(options[:platform]))
@@ -52,11 +62,12 @@ module Deliver
       UI.user_error!('Apple returned no asset library reference data') unless reference
 
       # Check every target before uploading files or removing existing placements.
-      plans = entries.map do |entry|
+      entries.filter_map do |entry|
         entry = entry.transform_keys(&:to_sym)
-        localization = localizations.find { |item| item.locale == entry[:locale] }
-        UI.user_error!("No existing version localization for '#{entry[:locale]}'") unless localization
         specs = compatible_specs(reference, entry)
+        localization = localizations.find { |item| item.locale == entry[:locale] }
+        next if allow_missing_localizations && !localization
+        UI.user_error!("No existing version localization for '#{entry[:locale]}'") unless localization
         placements = Spaceship::ConnectAPI::AppAssetLibraryPlacement.all(app_store_version_localization_id: localization.id)
         existing = placements.select { |item| item.placement_type == entry[:placement_type] && item.placement_group == entry[:placement_group] }
         if !existing.empty? && !options[:overwrite_creative_assets]
@@ -64,29 +75,21 @@ module Deliver
         end
         { entry:, localization:, specs:, existing: }
       end
-
-      library = Spaceship::ConnectAPI::AppAssetLibrary.get(app_id: app.id)
-      UI.user_error!('Apple returned no asset library for this app') unless library
-      uploaded_images_by_path = {}
-      plans.each { |plan| prepare_image(plan, library, uploaded_images_by_path) }
-      plans.each { |plan| replace_placement(plan) }
-      UI.success('Successfully uploaded and placed creative assets')
     end
 
-    private
-
     def compatible_specs(reference, entry)
-      feature = (reference.features || []).find { |item| item['featureId'] == FEATURE_ID }
-      policy = (feature || {}).fetch('placementPolicies', []).find { |item| item['placementType'] == entry[:placement_type] }
-      allowed = (policy || {}).fetch('groupLimits', []).any? do |group|
-        group.fetch('groupIds', []).include?(entry[:placement_group]) && group.fetch('maxCount', 0) > 0
+      feature = Array(reference.features).find { |item| item['featureId'] == FEATURE_ID }
+      policy = Array(feature&.dig('placementPolicies')).find { |item| item['placementType'] == entry[:placement_type] }
+      allowed = Array(policy&.dig('groupLimits')).any? do |group|
+        Array(group['groupIds']).include?(entry[:placement_group]) && group['maxCount'].to_i > 0
       end
-      type = (reference.placement_types || []).find { |item| item['placementTypeId'] == entry[:placement_type] }
-      mapping = (type || {}).fetch('specMappings', []).find { |item| item['placementGroupId'] == entry[:placement_group] }
-      unless allowed && (type || {}).fetch('acceptsAssetCategories', []).include?(ASSET_CATEGORY) && mapping
+      type = Array(reference.placement_types).find { |item| item['placementTypeId'] == entry[:placement_type] }
+      mapping = Array(type&.dig('specMappings')).find { |item| item['placementGroupId'] == entry[:placement_group] }
+      specs = Array(mapping&.dig('specs'))
+      unless allowed && Array(type&.dig('acceptsAssetCategories')).include?(ASSET_CATEGORY) && !specs.empty?
         UI.user_error!("Creative asset target is not supported by Apple's current reference data: #{entry[:placement_type]} / #{entry[:placement_group]}")
       end
-      mapping.fetch('specs', [])
+      specs
     end
 
     def prepare_image(plan, library, uploaded_images_by_path)

@@ -60,6 +60,14 @@ describe Deliver::UploadCreativeAssets do
   end
 
   describe 'options' do
+    [:edit_live, :use_live_version].each do |live_option|
+      it "rejects creative_assets with #{live_option} when building the configuration" do
+        expect do
+          FastlaneCore::Configuration.create(Deliver::Options.available_options, options.merge(live_option => true))
+        end.to raise_error(/'creative_assets' and '#{live_option}'.*editable version/)
+      end
+    end
+
     it 'validates creative assets through ConfigItem and defaults overwrite to false' do
       config = FastlaneCore::Configuration.create(Deliver::Options.available_options, creative_assets: [entry])
       expect(config[:overwrite_creative_assets]).to eq(false)
@@ -81,6 +89,22 @@ describe Deliver::UploadCreativeAssets do
     it 'does nothing when no creative assets were specified' do
       expect(app).not_to receive(:get_edit_app_store_version)
       uploader.upload({})
+    end
+
+    it 'validates the target even when metadata has yet to create its localization' do
+      allow(version).to receive(:get_app_store_version_localizations).and_return([])
+      options[:creative_assets] = [entry.merge(placement_group: 'unknown').transform_keys(&:to_s)]
+      expect(Spaceship::ConnectAPI::AppAssetLibraryPlacement).not_to receive(:all)
+      expect { uploader.check(options) }.to raise_error(/not supported.*unknown/)
+    end
+
+    it 'checks placements created with a new localization between the check and upload' do
+      allow(version).to receive(:get_app_store_version_localizations).and_return([], [localization])
+      expect(Spaceship::ConnectAPI::AppAssetLibraryImage).not_to receive(:create)
+      uploader.check(options)
+
+      allow(Spaceship::ConnectAPI::AppAssetLibraryPlacement).to receive(:all).with(app_store_version_localization_id: localization.id).and_return([placement])
+      expect { uploader.upload(options) }.to raise_error(/already placed/)
     end
 
     it 'uploads and places a creative image even when screenshots are skipped' do
@@ -296,10 +320,19 @@ describe Deliver::UploadCreativeAssets do
       expect { uploader.upload(options) }.to raise_error(/not supported/)
     end
 
-    it 'rejects live version options before accessing Apple' do
-      expect(app).not_to receive(:get_edit_app_store_version)
-      [:edit_live, :use_live_version].each do |key|
-        expect { uploader.upload(options.merge(key => true)) }.to raise_error(/editable version/)
+    [
+      [:features, 0, 'placementPolicies'],
+      [:features, 0, 'placementPolicies', 0, 'groupLimits'],
+      [:features, 0, 'placementPolicies', 0, 'groupLimits', 0, 'groupIds'],
+      [:features, 0, 'placementPolicies', 0, 'groupLimits', 0, 'maxCount'],
+      [:placement_types, 0, 'acceptsAssetCategories'],
+      [:placement_types, 0, 'specMappings'],
+      [:placement_types, 0, 'specMappings', 0, 'specs']
+    ].each do |collection, *path, field|
+      it "rejects the target before uploading when the reference catalog returns null for #{field}" do
+        reference.public_send(collection).dig(*path)[field] = nil
+        expect(Spaceship::ConnectAPI::AppAssetLibraryImage).not_to receive(:create)
+        expect { uploader.upload(options) }.to raise_error(/target is not supported/)
       end
     end
 
