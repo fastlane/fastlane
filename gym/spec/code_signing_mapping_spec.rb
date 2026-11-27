@@ -211,3 +211,27 @@ describe Gym::CodeSigningMapping, requires_xcodebuild: true do
     end
   end
 end
+
+# No Xcode needed: the destination is what gym's detect_platform sets
+describe Gym::CodeSigningMapping do
+  describe "#same_platform?" do
+    let(:csm) { Gym::CodeSigningMapping.new(project: nil) }
+
+    before do
+      allow(Gym).to receive(:building_mac_catalyst_for_mac?).and_return(false)
+    end
+
+    {
+      "generic/platform=macOS" => ["macosx", "iphoneos"],
+      "generic/platform=visionOS" => ["xros", "iphoneos"],
+      "generic/platform=iOS" => ["iphoneos", "macosx"],
+      "generic/platform=tvOS" => ["appletvos", "iphoneos"]
+    }.each do |destination, (matching, other)|
+      it "matches #{matching}, not #{other}, for #{destination}" do
+        allow(Gym).to receive(:config).and_return({ destination: destination })
+        expect(csm.same_platform?(matching)).to eq(true)
+        expect(csm.same_platform?(other)).to eq(false)
+      end
+    end
+  end
+end
