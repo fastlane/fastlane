@@ -28,6 +28,28 @@ describe Fastlane do
           )
         end
       end
+
+      context "when it cannot ask for input" do
+        let(:app) { double("app", get_edit_app_store_version: nil) }
+
+        before do
+          allow(Spaceship::ConnectAPI).to receive(:login).and_return(true)
+          allow(Spaceship::ConnectAPI::App).to receive(:find).and_return(app)
+          allow(FastlaneCore::Helper).to receive(:can_prompt?).and_return(false)
+          expect(STDIN).not_to(receive(:gets))
+        end
+
+        it "asks for the version option instead of reading one" do
+          lane = "lane :test do set_changelog(app_identifier: 'x.y.z', changelog: 'custom changelog', username: 'name@example.com') end"
+          expect { Fastlane::FastFile.new.parse(lane).runner.execute(:test) }.to raise_error(FastlaneCore::Interface::FastlaneError, "No version is being edited: pass the new one with the `version` option")
+        end
+
+        it "asks for the changelog option instead of reading one" do
+          allow(Fastlane::Actions::SetChangelogAction).to receive(:default_changelog_path).and_return("./missing/changelog.txt")
+          lane = "lane :test do set_changelog(app_identifier: 'x.y.z', version: '1.0', username: 'name@example.com') end"
+          expect { Fastlane::FastFile.new.parse(lane).runner.execute(:test) }.to raise_error(FastlaneCore::Interface::FastlaneError, "Pass the changelog with the `changelog` option, or write it to ./missing/changelog.txt")
+        end
+      end
     end
   end
 end

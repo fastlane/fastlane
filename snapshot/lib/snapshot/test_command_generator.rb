@@ -89,16 +89,18 @@ module Snapshot
           os = 'iOS'
         end
 
-        os_version = Snapshot.config[:ios_version] || Snapshot::LatestOsVersion.version(os)
+        requested_os_version = Snapshot.config[:ios_version]
 
         destinations = devices.map do |d|
-          device = find_device(d, os_version)
+          device = find_device(d, requested_os_version)
           if device.nil?
-            UI.user_error!("No device found named '#{d}' for version '#{os_version}'") if device.nil?
-          elsif device.os_version != os_version
-            UI.important("Using device named '#{device.name}' with version '#{device.os_version}' because no match was found for version '#{os_version}'")
+            message = "No device found named '#{d}'"
+            message += " for version '#{requested_os_version}'" if requested_os_version
+            UI.user_error!(message)
+          elsif requested_os_version && device.os_version != requested_os_version
+            UI.important("Using device named '#{device.name}' with version '#{device.os_version}' because no match was found for version '#{requested_os_version}'")
           end
-          "-destination 'platform=#{os} Simulator,name=#{device.name},OS=#{device.os_version}'"
+          "-destination 'platform=#{os} Simulator,id=#{device.udid}'"
         end
 
         return [destinations.join(' ')]

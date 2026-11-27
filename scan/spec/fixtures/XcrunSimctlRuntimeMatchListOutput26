@@ -1,0 +1,29 @@
+{
+  "appletvos26.4" : {
+    "chosenRuntimeBuild" : "26A5001a",
+    "defaultBuild" : "26A5001a",
+    "platform" : "com.apple.platform.appletvos",
+    "preferredBuild" : "26A5001a",
+    "sdkBuild" : "26A5001a",
+    "sdkDirectory" : "\/Applications\/Xcode.app\/Contents\/Developer\/Platforms\/AppleTVOS.platform\/Developer\/SDKs\/AppleTVOS26.4.sdk",
+    "sdkVersion" : "26.4.1"
+  },
+  "iphoneos26.4" : {
+    "chosenRuntimeBuild" : "26A5000a",
+    "defaultBuild" : "26A5000a",
+    "platform" : "com.apple.platform.iphoneos",
+    "preferredBuild" : "26A5000a",
+    "sdkBuild" : "26A5000a",
+    "sdkDirectory" : "\/Applications\/Xcode.app\/Contents\/Developer\/Platforms\/iPhoneOS.platform\/Developer\/SDKs\/iPhoneOS26.4.sdk",
+    "sdkVersion" : "26.4.1"
+  },
+  "watchos26.4" : {
+    "chosenRuntimeBuild" : "26A5002a",
+    "defaultBuild" : "26A5002a",
+    "platform" : "com.apple.platform.watchos",
+    "preferredBuild" : "26A5002a",
+    "sdkBuild" : "26A5002a",
+    "sdkDirectory" : "\/Applications\/Xcode.app\/Contents\/Developer\/Platforms\/WatchOS.platform\/Developer\/SDKs\/WatchOS26.4.sdk",
+    "sdkVersion" : "26.4.1"
+  }
+}

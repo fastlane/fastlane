@@ -4,7 +4,7 @@ describe Fastlane do
   describe Fastlane::OneOff do
     describe "Valid parameters" do
       before do
-        @runner = "runner"
+        @runner = +"runner"
         expect(Fastlane::Runner).to receive(:new).and_return(@runner)
       end
 

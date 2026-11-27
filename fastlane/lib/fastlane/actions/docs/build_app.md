@@ -6,8 +6,7 @@
 
 <p align="center">
     <a href="#whats-gym">Features</a> &bull;
-    <a href="#usage">Usage</a> &bull;
-    <a href="#tips">Tips</a>
+    <a href="#usage">Usage</a>
 </p>
 
 -------
@@ -195,7 +194,7 @@ end
 When _gym_ raises an error the `error_info` property will contain the process output
 in case you want to display the error in 3rd party tools such as Slack.
 
-You can then easily switch between the beta provider (e.g. `testflight`, `hockey`, `s3` and more).
+You can then easily switch between the beta provider (e.g. `testflight`, `s3` and more).
 
 # How does it work?
 

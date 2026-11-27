@@ -1,6 +1,7 @@
 require 'base64'
 require 'openssl'
 require 'securerandom'
+require 'fastlane_core/helper'
 
 module Match
   module Encryption
@@ -134,11 +135,11 @@ module Match
 
     # The methods of this class will encrypt or decrypt files in place, by default.
     class MatchFileEncryption
-      def encrypt(file_path:, password:, output_path: nil)
+      def encrypt(file_path:, password:, output_path: nil, version: 2)
         output_path = file_path unless output_path
         data_to_encrypt = File.binread(file_path)
         e = MatchDataEncryption.new
-        data = e.encrypt(data: data_to_encrypt, password: password)
+        data = e.encrypt(data: data_to_encrypt, password: password, version: version)
         File.write(output_path, data)
       end
 
@@ -147,7 +148,11 @@ module Match
         content = File.read(file_path)
         e = MatchDataEncryption.new
         decrypted_data = e.decrypt(base64encoded_encrypted: content, password: password)
-        File.binwrite(output_path, decrypted_data)
+        if File.extname(output_path) == ".p12"
+          FastlaneCore::Helper.open_owner_only(output_path, "wb") { |file| file.write(decrypted_data) }
+        else
+          File.binwrite(output_path, decrypted_data)
+        end
       end
     end
   end

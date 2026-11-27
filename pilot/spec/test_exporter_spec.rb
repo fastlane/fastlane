@@ -4,7 +4,9 @@ describe Pilot::TesterExporter do
   describe ".export_testers" do
     let(:fake_tester_exporter) { Pilot::TesterExporter.new }
     let(:fake_tester_manager) { double("tester manager") }
-    let(:fake_testers_file_path) { Tempfile.new("fake testers_file_path").path }
+    # Keep the Tempfile, not only its path: an unreferenced one is deleted when the GC finalises it. See fastlane#30184.
+    let(:fake_testers_file) { Tempfile.new("fake testers_file_path") }
+    let(:fake_testers_file_path) { fake_testers_file.path }
     let(:fake_apple_id) { "fake apple_id" }
     let(:fake_app_identifier) { "fake app_identifier" }
     let(:fake_input_options) do
@@ -22,7 +24,7 @@ describe Pilot::TesterExporter do
     end
 
     context "when able to find app using apple_id and app_identifier" do
-      let(:fake_app) { "fake app" }
+      let(:fake_app) { +"fake app" }
 
       before(:each) do
         allow(fake_app).to receive(:get_beta_testers).with(includes: "apps,betaTesterMetrics,betaGroups").and_return([])

@@ -27,8 +27,7 @@ Get in contact with the creators on Twitter: [@FastlaneTools](https://twitter.co
     <a href="#whats-spaceship">Why?</a> &bull;
     <a href="#usage">Usage</a> &bull;
     <a href="#installation">Installation</a> &bull;
-    <a href="#technical-details">Technical Details</a> &bull;
-    <a href="#need-help">Need help?</a>
+    <a href="#technical-details">Technical Details</a>
 </p>
 
 -------
@@ -94,6 +93,18 @@ To try _spaceship_, just run `fastlane spaceship`. It will automatically start t
 ![assets/docs/Playground.png](assets/docs/Playground.png)
 
 This requires you to install `pry` using `gem install pry`. `pry` is not installed by default, as most [_fastlane_](https://fastlane.tools) users won't need the `spaceship playground`. You can add the `pry` dependency to your `Gemfile`.
+
+## Raw API requests
+
+`fastlane spaceship api` sends one App Store Connect API request and prints Apple's JSON response on stdout, including endpoints _spaceship_ has no model for:
+
+```sh
+fastlane spaceship api GET "/v1/apps?limit=200" --paginate --api_key_path key.json
+fastlane spaceship api PATCH /v1/betaGroups/123 --body @rename.json
+fastlane spaceship api DELETE /v1/betaGroups/123 --yes
+```
+
+With `--api_key_path` or the `SPACESHIP_CONNECT_API_*` environment variables it uses the [App Store Connect API](https://developer.apple.com/documentation/appstoreconnectapi); without them it logs in with your Apple ID (`-u`). `--paginate` follows `links.next` and prints all pages as one response. `DELETE` needs `--yes`.
 
 ## Apple Developer Portal API
 
@@ -165,7 +176,7 @@ _spaceship_ does a lot of magic to get everything working so neatly:
 - **Multiple Spaceship**: You can launch multiple _spaceships_ with different Apple accounts to do things like syncing the registered devices.
 
 # Code of Conduct
-Help us keep _fastlane_ open and inclusive. Please read and follow our [Code of Conduct](https://github.com/fastlane/fastlane/blob/master/CODE_OF_CONDUCT.md).
+Help us keep _fastlane_ open and inclusive. Please read and follow our [Code of Conduct](https://github.com/fastlane/fastlane/blob/master/docs/CODE_OF_CONDUCT.md).
 
 # License
 This project is licensed under the terms of the MIT license. See the LICENSE file.
