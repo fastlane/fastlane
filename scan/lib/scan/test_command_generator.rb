@@ -50,6 +50,8 @@ module Scan
       if config[:derived_data_path] && !options.include?("-derivedDataPath #{config[:derived_data_path].shellescape}")
         options << "-derivedDataPath #{config[:derived_data_path].shellescape}"
       end
+      # A custom build location in Xcode's settings would put the products outside derived_data_path
+      options << "-IDEBuildLocationStyle=Unique" if config[:derived_data_path]
       if config[:use_system_scm] && !options.include?("-scmProvider system")
         options << "-scmProvider system"
       end
