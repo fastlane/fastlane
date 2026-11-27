@@ -6,7 +6,7 @@ describe Frameit::MacEditor do
     allow(FastImage).to receive(:size).and_call_original
     allow(FastImage).to receive(:size).with(screenshot_path).and_return([2880, 1800])
     allow(MiniMagick::Image).to receive(:open) { |path| MiniMagick::Image.new(path) }
-    allow_any_instance_of(MiniMagick::Image).to receive(:resize)
+    allow_any_instance_of(MiniMagick::Tool::Mogrify).to receive(:call) { '' }
     allow_any_instance_of(MiniMagick::Image).to receive(:composite) { |instance| instance }
     allow_any_instance_of(MiniMagick::Image).to receive(:format)
     allow_any_instance_of(MiniMagick::Image).to receive(:write)
