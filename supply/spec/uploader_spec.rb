@@ -81,8 +81,6 @@ describe Supply do
         @obb_dir = Dir.mktmpdir('supply')
         @apk_path = File.join(@obb_dir, 'my.apk')
 
-        # Makes Supply::Uploader.new.all_languages public for testing reasons
-        Supply::Uploader.send(:public, *Supply::Uploader.private_instance_methods)
       end
 
       def create_obb(name)
@@ -133,14 +131,14 @@ describe Supply do
 
     describe 'metadata encoding' do
       it 'prints a user friendly error message if metadata is not UTF-8 encoded' do
-        fake_config = 'fake config'
+        fake_config = +'fake config'
         allow(fake_config).to receive(:[]).and_return('fake config value')
         Supply.config = fake_config
 
         allow(File).to receive(:exist?).and_return(true)
         allow(File).to receive(:read).and_return("fake content")
 
-        fake_listing = "listing"
+        fake_listing = +"listing"
         Supply::AVAILABLE_METADATA_FIELDS.each do |field|
           allow(fake_listing).to receive("#{field}=".to_sym)
         end
@@ -152,13 +150,42 @@ describe Supply do
       end
     end
 
+    describe 'release notes' do
+      it 'leaves out the languages whose changelog is missing or empty' do
+        Dir.mktmpdir do |metadata_path|
+          {
+            'en-US' => { '1.txt' => "Fixes" },
+            'fr-FR' => {},
+            'de-DE' => { '1.txt' => "" },
+            'ja-JP' => { '1.txt' => "\n" },
+            'es-ES' => { 'default.txt' => "Default notes" }
+          }.each do |language, files|
+            changelogs = File.join(metadata_path, language, Supply::CHANGELOGS_FOLDER_NAME)
+            FileUtils.mkdir_p(changelogs)
+            files.each { |name, text| File.write(File.join(changelogs, name), text) }
+          end
+          Supply.config = { metadata_path: metadata_path, skip_upload_metadata: true, skip_upload_images: true, skip_upload_screenshots: true }
+
+          uploader = Supply::Uploader.new
+          allow(uploader).to receive(:client).and_return(double('client', listing_for_language: nil))
+          queue = Queue.new
+          worker = uploader.send(:create_meta_upload_worker)
+          worker.batch_enqueue(%w(en-US fr-FR de-DE ja-JP es-ES).map { |language| Supply::Uploader::UploadJob.new(language, 1, queue) })
+          worker.start
+
+          notes = Array.new(queue.size) { queue.pop }
+          expect(notes.map { |note| [note.language, note.text] }).to contain_exactly(["en-US", "Fixes"], ["es-ES", "Default notes"])
+        end
+      end
+    end
+
     describe 'all_languages' do
       it 'only grabs directories' do
         Supply.config = {
           metadata_path: 'supply/spec/fixtures/metadata/android'
         }
 
-        only_directories = Supply::Uploader.new.all_languages
+        only_directories = Supply::Uploader.new.send(:all_languages)
         expect(only_directories).to eq(['en-US', 'fr-FR', 'ja-JP'])
       end
     end
@@ -200,6 +227,55 @@ describe Supply do
         expect(client).not_to(receive(:update_track).with(config[:track], anything))
         expect(client).to receive(:update_track).with(config[:track_promote_to], track).once
         subject
+      end
+
+      it 'fails with a user error when the source track has no release' do
+        allow(track).to receive(:releases).and_return(nil)
+
+        expect { subject }.to raise_error(FastlaneCore::Interface::FastlaneError, /doesn't have any releases/)
+      end
+
+      context 'when :track_promote_force is set' do
+        let(:config) {
+          {
+            release_status: Supply::ReleaseStatus::COMPLETED,
+            track_promote_release_status: Supply::ReleaseStatus::COMPLETED,
+            track: 'alpha',
+            track_promote_to: 'beta',
+            track_promote_force: true,
+            version_code: 1,
+            version_name: '1.0.0'
+          }
+        }
+
+        it 'promotes a version code that is no longer returned for the source track' do
+          promoted_releases = nil
+          allow(track).to receive(:releases=) { |releases| promoted_releases = releases }
+
+          # The release found on the source track must be left untouched
+          expect(release).not_to(receive(:name=))
+          expect(release).not_to(receive(:version_codes=))
+
+          expect(client).to receive(:update_track).with(config[:track_promote_to], track).once
+          subject
+
+          expect(promoted_releases.size).to eq(1)
+          expect(promoted_releases.first.name).to eq('1.0.0')
+          expect(promoted_releases.first.version_codes).to eq(['1'])
+          expect(promoted_releases.first.status).to eq(Supply::ReleaseStatus::COMPLETED)
+        end
+
+        it 'fails when :version_code is missing' do
+          Supply.config = config.merge(version_code: nil)
+
+          expect { subject }.to raise_error(FastlaneCore::Interface::FastlaneError, /mandatory to enter the :version_code/)
+        end
+
+        it 'fails when :version_name is missing' do
+          Supply.config = config.merge(version_name: nil)
+
+          expect { subject }.to raise_error(FastlaneCore::Interface::FastlaneError, /mandatory to enter the :version_name/)
+        end
       end
     end
 
@@ -256,6 +332,106 @@ describe Supply do
     describe '#perform_upload with metadata' do
       it_behaves_like 'run supply to upload metadata', version_codes: [1, 2], with_explicit_changelogs: true
       it_behaves_like 'run supply to upload metadata', version_codes: [3], with_explicit_changelogs: false
+    end
+
+    describe '#perform_upload with version_codes_to_retain in promote-only mode' do
+      let(:client) { double('client') }
+      let(:config) do
+        {
+          package_name: 'com.example.app',
+          track: 'internal',
+          track_promote_to: 'production',
+          skip_upload_apk: true,
+          skip_upload_aab: true,
+          skip_upload_metadata: true,
+          skip_upload_images: true,
+          skip_upload_screenshots: true,
+          skip_upload_changelogs: true,
+          version_codes_to_retain: [1_775_721_088],
+          version_code: 1_776_275_968,
+          rollout: nil,
+          release_status: Supply::ReleaseStatus::COMPLETED,
+          track_promote_release_status: Supply::ReleaseStatus::COMPLETED,
+          validate_only: false,
+          metadata_path: nil
+        }
+      end
+
+      before do
+        Supply.config = config
+      end
+
+      it 'calls promote_track instead of update_track when skip_upload_apk and skip_upload_aab are true' do
+        uploader = Supply::Uploader.new
+        allow(uploader).to receive(:client).and_return(client)
+        allow(client).to receive(:begin_edit)
+        allow(client).to receive(:commit_current_edit!)
+
+        # THE CRITICAL ASSERTION: promote_track must be called, update_track must NOT
+        expect(uploader).to receive(:promote_track).once
+        expect(uploader).not_to receive(:update_track)
+
+        uploader.perform_upload
+      end
+
+      it 'does NOT call update_track with only version_codes_to_retain when no binaries uploaded' do
+        uploader = Supply::Uploader.new
+        allow(uploader).to receive(:client).and_return(client)
+        allow(client).to receive(:begin_edit)
+        allow(client).to receive(:commit_current_edit!)
+        allow(uploader).to receive(:promote_track)
+
+        # update_track must never be called in promote-only mode
+        expect(uploader).not_to receive(:update_track)
+
+        uploader.perform_upload
+      end
+    end
+
+    describe '#perform_upload with version_codes_to_retain when uploading new binaries' do
+      let(:client) { double('client') }
+      let(:config) do
+        {
+          package_name: 'com.example.app',
+          track: 'internal',
+          track_promote_to: nil,
+          skip_upload_apk: true,
+          skip_upload_aab: false,
+          aab: '/tmp/app.aab',
+          aab_paths: nil,
+          skip_upload_metadata: true,
+          skip_upload_images: true,
+          skip_upload_screenshots: true,
+          skip_upload_changelogs: true,
+          version_codes_to_retain: [1_775_721_088],
+          version_code: 1_776_275_968,
+          rollout: nil,
+          release_status: Supply::ReleaseStatus::COMPLETED,
+          track_promote_release_status: Supply::ReleaseStatus::COMPLETED,
+          validate_only: false,
+          metadata_path: nil
+        }
+      end
+
+      before do
+        Supply.config = config
+      end
+
+      it 'calls update_track with both new version code and retained codes when uploading' do
+        uploader = Supply::Uploader.new
+        allow(uploader).to receive(:client).and_return(client)
+        allow(client).to receive(:begin_edit)
+        allow(client).to receive(:commit_current_edit!)
+        # Simulate AAB upload returning a new version code
+        allow(uploader).to receive(:upload_bundles).and_return([1_776_275_968])
+        allow(uploader).to receive(:upload_mapping)
+
+        # update_track must be called with BOTH the new version AND the retained code
+        expect(uploader).to receive(:update_track).with([1_776_275_968, 1_775_721_088])
+        expect(uploader).not_to receive(:promote_track)
+
+        uploader.perform_upload
+      end
     end
 
     context 'when sync_image_upload is set' do
@@ -596,6 +772,16 @@ describe Supply do
         end
 
         it 'raises an error' do
+          expect { subject.update_rollout }.to raise_error(/Unable to find the requested release on track/)
+        end
+      end
+
+      context 'when track releases is nil' do
+        before do
+          allow(track).to receive(:releases).and_return(nil)
+        end
+
+        it 'does not crash and raises an error about missing release' do
           expect { subject.update_rollout }.to raise_error(/Unable to find the requested release on track/)
         end
       end

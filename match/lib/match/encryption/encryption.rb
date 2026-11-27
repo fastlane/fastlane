@@ -1,6 +1,7 @@
 require 'base64'
 require 'openssl'
 require 'securerandom'
+require 'fastlane_core/helper'
 
 module Match
   module Encryption
@@ -147,7 +148,11 @@ module Match
         content = File.read(file_path)
         e = MatchDataEncryption.new
         decrypted_data = e.decrypt(base64encoded_encrypted: content, password: password)
-        File.binwrite(output_path, decrypted_data)
+        if File.extname(output_path) == ".p12"
+          FastlaneCore::Helper.open_owner_only(output_path, "wb") { |file| file.write(decrypted_data) }
+        else
+          File.binwrite(output_path, decrypted_data)
+        end
       end
     end
   end

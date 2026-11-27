@@ -13,7 +13,8 @@ module Fastlane
         path = File.join(path, "project.pbxproj")
         UI.user_error!("Could not find path to project config '#{path}'. Pass the path to your project (not workspace)!") unless File.exist?(path)
 
-        uuid = params[:uuid] || params[:udid]
+        # :uuid last again, to ask for it or fail when neither is given
+        uuid = params.fetch(:uuid, ask: false) || params[:udid] || params[:uuid]
         UI.message("Updating provisioning profile UUID (#{uuid}) for the given project '#{path}'")
 
         p = File.read(path)

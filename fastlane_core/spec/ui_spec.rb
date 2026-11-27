@@ -11,7 +11,7 @@ describe FastlaneCore::UI do
   end
 
   it "allows overwriting of the ui_object for fastlane.ci" do
-    third_party_output = "third_party_output"
+    third_party_output = +"third_party_output"
     FastlaneCore::UI.ui_object = third_party_output
 
     expect(third_party_output).to receive(:error).with("yolo")

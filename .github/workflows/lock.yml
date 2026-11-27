@@ -3,13 +3,16 @@ name: Lock issues and pull requests
 on:
   schedule:
     - cron: "0 0 * * *" # Every day at midnight
+permissions:
+  issues: write
+  pull-requests: write
 
 jobs:
   lock:
     name: Lock closed and inactive issues and pull requests
     runs-on: ubuntu-latest
     steps:
-      - uses: fastlane/github-actions/lock@latest
+      - uses: fastlane/github-actions/lock@0f64d079e31de0c707831cedb420443931098984 # v0.9.0
         with:
-          repo-token: '${{ secrets.BOT_GITHUB_TOKEN }}'
+          repo-token: ${{ secrets.GITHUB_TOKEN }}
           days-before-lock: 60

@@ -58,38 +58,47 @@ module Trainer
         @test_cases_count ||= @test_cases.count + @sub_suites.sum(&:test_cases_count)
       end
 
-      def failures_count
-        @failures_count ||= @test_cases.count(&:failed?) + @sub_suites.sum(&:failures_count)
+      # When output_remove_retry_attempts is true, counts reflect each test case's final attempt
+      # only (matching the trimmed JUnit output), so a test that failed then was skipped on retry
+      # is no longer counted as a failure.
+      def failures_count(output_remove_retry_attempts: false)
+        predicate = output_remove_retry_attempts ? :final_failed? : :failed?
+        @test_cases.count(&predicate) +
+          @sub_suites.sum { |suite| suite.failures_count(output_remove_retry_attempts: output_remove_retry_attempts) }
       end
 
-      def skipped_count
-        @skipped_count ||= @test_cases.count(&:skipped?) + @sub_suites.sum(&:skipped_count)
+      def skipped_count(output_remove_retry_attempts: false)
+        predicate = output_remove_retry_attempts ? :final_skipped? : :skipped?
+        @test_cases.count(&predicate) +
+          @sub_suites.sum { |suite| suite.skipped_count(output_remove_retry_attempts: output_remove_retry_attempts) }
       end
 
-      def total_tests_count
-        @test_cases.sum(&:total_tests_count) +
-          @sub_suites.sum(&:total_tests_count)
+      def total_tests_count(output_remove_retry_attempts: false)
+        @test_cases.sum { |test_case| test_case.total_tests_count(output_remove_retry_attempts: output_remove_retry_attempts) } +
+          @sub_suites.sum { |suite| suite.total_tests_count(output_remove_retry_attempts: output_remove_retry_attempts) }
       end
 
-      def total_failures_count
-        @test_cases.sum(&:total_failures_count) +
-          @sub_suites.sum(&:total_failures_count)
+      def total_failures_count(output_remove_retry_attempts: false)
+        @test_cases.sum { |test_case| test_case.total_failures_count(output_remove_retry_attempts: output_remove_retry_attempts) } +
+          @sub_suites.sum { |suite| suite.total_failures_count(output_remove_retry_attempts: output_remove_retry_attempts) }
       end
 
-      def total_retries_count
+      def total_retries_count(output_remove_retry_attempts: false)
+        return 0 if output_remove_retry_attempts
+
         @test_cases.sum(&:retries_count) +
           @sub_suites.sum(&:total_retries_count)
       end
 
       # Hash representation used by TestParser to collect test results
-      def to_hash
+      def to_hash(output_remove_retry_attempts: false)
         {
-          number_of_tests: total_tests_count,
-          number_of_failures: total_failures_count,
+          number_of_tests: total_tests_count(output_remove_retry_attempts: output_remove_retry_attempts),
+          number_of_failures: total_failures_count(output_remove_retry_attempts: output_remove_retry_attempts),
           number_of_tests_excluding_retries: test_cases_count,
-          number_of_failures_excluding_retries: failures_count,
-          number_of_retries: total_retries_count,
-          number_of_skipped: skipped_count
+          number_of_failures_excluding_retries: failures_count(output_remove_retry_attempts: output_remove_retry_attempts),
+          number_of_retries: total_retries_count(output_remove_retry_attempts: output_remove_retry_attempts),
+          number_of_skipped: skipped_count(output_remove_retry_attempts: output_remove_retry_attempts)
         }
       end
 
@@ -100,13 +109,16 @@ module Trainer
           name: @name,
           time: duration.to_s,
           tests: test_cases_count.to_s,
-          failures: failures_count.to_s,
-          skipped: skipped_count.to_s)
+          failures: failures_count(output_remove_retry_attempts: output_remove_retry_attempts).to_s,
+          skipped: skipped_count(output_remove_retry_attempts: output_remove_retry_attempts).to_s)
 
         # Add test cases
         @test_cases.each do |test_case|
           runs = test_case.to_xml_nodes
-          runs = runs.last(1) if output_remove_retry_attempts
+          # Remove retry attempts: keep only the final run (whether it passes, fails, or is skipped)
+          if output_remove_retry_attempts
+            runs = runs.last(1)
+          end
           runs.each { |node| testsuite.add_element(node) }
         end
 

@@ -19,6 +19,7 @@ module Spaceship
         APP_IPHONE_61 = "APP_IPHONE_61"
         APP_IPHONE_65 = "APP_IPHONE_65"
         APP_IPHONE_67 = "APP_IPHONE_67"
+        APP_IPHONE_DUO = "APP_IPHONE_DUO"
 
         APP_IPAD_97 = "APP_IPAD_97"
         APP_IPAD_105 = "APP_IPAD_105"
@@ -43,11 +44,14 @@ module Spaceship
         APP_WATCH_SERIES_3 = "APP_WATCH_SERIES_3"
         APP_WATCH_SERIES_4 = "APP_WATCH_SERIES_4"
         APP_WATCH_SERIES_7 = "APP_WATCH_SERIES_7"
+        APP_WATCH_SERIES_10 = "APP_WATCH_SERIES_10"
         APP_WATCH_ULTRA = "APP_WATCH_ULTRA"
 
         APP_APPLE_TV = "APP_APPLE_TV"
 
         APP_DESKTOP = "APP_DESKTOP"
+
+        APP_APPLE_VISION_PRO = "APP_APPLE_VISION_PRO"
 
         ALL_IMESSAGE = [
           IMESSAGE_APP_IPHONE_40,
@@ -74,6 +78,7 @@ module Spaceship
           APP_IPHONE_61,
           APP_IPHONE_65,
           APP_IPHONE_67,
+          APP_IPHONE_DUO,
 
           APP_IPAD_97,
           APP_IPAD_105,
@@ -98,9 +103,12 @@ module Spaceship
           APP_WATCH_SERIES_3,
           APP_WATCH_SERIES_4,
           APP_WATCH_SERIES_7,
+          APP_WATCH_SERIES_10,
           APP_WATCH_ULTRA,
 
-          APP_DESKTOP
+          APP_DESKTOP,
+
+          APP_APPLE_VISION_PRO
         ]
       end
 

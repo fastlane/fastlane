@@ -2,7 +2,7 @@ require 'frameit/commands_generator'
 
 describe Frameit::CommandsGenerator do
   def expect_runner_run
-    fake_runner = "runner"
+    fake_runner = +"runner"
     expect(Frameit::Runner).to receive(:new).and_return(fake_runner)
     expect(fake_runner).to receive(:run)
   end
