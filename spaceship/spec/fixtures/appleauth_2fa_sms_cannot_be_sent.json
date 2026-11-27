@@ -1,0 +1,43 @@
+{
+    "success": 0,
+    "phoneNumber": {
+        "numberWithDialCode": "+1 (•••) •••-••00",
+        "nonFTEU": true,
+        "obfuscatedNumber": "(•••) •••-••00",
+        "lastTwoDigits": "00",
+        "pushMode": "sms",
+        "id": 1
+    },
+    "securityCode": {
+        "length": 6,
+        "tooManyCodesSent": false,
+        "tooManyCodesValidated": false,
+        "securityCodeLocked": false,
+        "securityCodeCooldown": false
+    },
+    "mode": "sms",
+    "type": "verification",
+    "authenticationType": "hsa2",
+    "noTrustedDevices": true,
+    "autoVerified": false,
+    "showAutoVerificationUI": false,
+    "hideSendSMSCodeOption": false,
+    "smsSpeedbumpEnabled": false,
+    "supervisedChangePasswordFlow": false,
+    "enableNonFTEU": false,
+    "hsa2Account": true,
+    "managedAccount": false,
+    "restrictedAccount": false,
+    "supportsRecovery": true,
+    "clientActionCancel": false,
+    "actionValidationSuccessful": false,
+    "successful": false,
+    "serviceErrors": [
+        {
+            "code": "-28248",
+            "title": "Verification Failed",
+            "message": "Verification codes can’t be sent to this phone number at this time. Please try again later.",
+            "suppressDismissal": false
+        }
+    ]
+}

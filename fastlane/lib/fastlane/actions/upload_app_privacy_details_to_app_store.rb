@@ -236,7 +236,7 @@ module Fastlane
           FastlaneCore::ConfigItem.new(key: :skip_json_file_saving,
                                        env_name: "UPLOAD_APP_PRIVACY_DETAILS_TO_APP_STORE_OUTPUT_SKIP_JSON_FILE_SAVING",
                                        description: "Whether to skip the saving of the JSON file",
-                                       conflicting_options: [:skip_output_json_path],
+                                       conflicting_options: [:output_json_path],
                                        type: Boolean,
                                        default_value: false),
           FastlaneCore::ConfigItem.new(key: :skip_upload,

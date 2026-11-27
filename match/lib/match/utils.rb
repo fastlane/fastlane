@@ -37,9 +37,14 @@ module Match
 
     def self.get_cert_info(cer_certificate)
       # can receive a certificate path or the file data
-      if File.exist?(cer_certificate)
-        cer_certificate = File.binread(cer_certificate)
+      begin
+        if File.exist?(cer_certificate)
+          cer_certificate = File.binread(cer_certificate)
+        end
+      rescue ArgumentError
+        # cert strings have null bytes; suppressing output
       end
+
       cert = OpenSSL::X509::Certificate.new(cer_certificate)
 
       # openssl output:

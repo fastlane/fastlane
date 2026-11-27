@@ -4,7 +4,7 @@ require_relative 'tunes/tunes_client'
 module Spaceship
   class Client
     def try_upgrade_2fa_later(response)
-      if ENV['SPACESHIP_SKIP_2FA_UPGRADE'].nil?
+      unless Spaceship::Globals.env_truthy?('SPACESHIP_SKIP_2FA_UPGRADE')
         return false
       end
 

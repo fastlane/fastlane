@@ -19,7 +19,7 @@ module Spaceship
         end
 
         def self.hostname
-          'https://appstoreconnect.apple.com/iris/v1/'
+          'https://appstoreconnect.apple.com/iris/'
         end
       end
     end

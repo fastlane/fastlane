@@ -3,6 +3,7 @@ require_relative 'module'
 module Scan
   class TestResultParser
     def parse_result(output)
+      UI.deprecated("Scan::TestResultParser is deprecated and will be removed in a future version of fastlane; scan no longer uses it. Read the test counts from the result bundle with Trainer::TestParser, or from the <testsuites> attributes of the JUnit report.")
       unless output
         return {
             tests: 0,

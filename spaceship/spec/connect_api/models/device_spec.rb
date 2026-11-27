@@ -1,5 +1,5 @@
 describe Spaceship::ConnectAPI::Device do
-  before { Spaceship::Portal.login }
+  include_examples "common spaceship login"
 
   describe '#client' do
     it '#get_devices' do
@@ -49,6 +49,28 @@ describe Spaceship::ConnectAPI::Device do
       udid = "5233342324433534345354534"
       existing_device = Spaceship::ConnectAPI::Device.find_by_udid(udid, include_disabled: true)
       expect(existing_device.enabled?).to eq(false)
+      expect(existing_device.udid).to eq(udid)
+    end
+
+    it '#enable an existing disabled udid' do
+      udid = "5233342324433534345354534"
+      existing_device = Spaceship::ConnectAPI::Device.enable(udid)
+      expect(existing_device.enabled?).to eq(true)
+      expect(existing_device.udid).to eq(udid)
+    end
+
+    it '#disable an existing disabled udid' do
+      udid = "184098239048390489012849018"
+      existing_device = Spaceship::ConnectAPI::Device.disable(udid)
+      expect(existing_device.enabled?).to eq(false)
+      expect(existing_device.udid).to eq(udid)
+    end
+
+    it '#rename an existing disabled udid' do
+      udid = "5843758273957239847298374982"
+      new_name = "renamed device"
+      existing_device = Spaceship::ConnectAPI::Device.rename(udid, new_name)
+      expect(existing_device.name).to eq(new_name)
       expect(existing_device.udid).to eq(udid)
     end
   end
