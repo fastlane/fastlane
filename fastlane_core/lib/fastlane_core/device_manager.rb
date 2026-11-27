@@ -128,11 +128,12 @@ module FastlaneCore
         end
       end
 
+      # nil when there is no simulator for the device, such as snapshot's "Mac"
       def latest_simulator_version_for_device(device)
         simulators.select { |s| s.name == device }
                   .sort_by { |s| Gem::Version.create(s.os_version) }
                   .last
-                  .os_version
+                  &.os_version
       end
 
       # The code below works from Xcode 7 on
