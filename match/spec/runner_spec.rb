@@ -866,6 +866,34 @@ describe Match do
         end
       end
 
+      it "passes skip_set_partition_list on when installing the stored certificate and key" do
+        Dir.mktmpdir do |dir|
+          cert_dir = File.join(dir, "certs", "distribution")
+          FileUtils.mkdir_p(cert_dir)
+          File.write(File.join(cert_dir, "FIRST11111.cer"), "cert1")
+          File.write(File.join(cert_dir, "FIRST11111.p12"), "key1")
+
+          allow(runner).to receive(:prefixed_working_directory).and_return(dir)
+          allow(Match::Utils).to receive(:is_cert_valid?).and_return(true)
+          allow(Match::Utils).to receive(:get_cert_info).and_return([["Common Name", "test"]])
+          allow(FastlaneCore::Helper).to receive(:mac?).and_return(true)
+          allow(FastlaneCore::CertChecker).to receive(:installed?).and_return(false)
+
+          expect(Match::Utils).to receive(:import).with(File.join(cert_dir, "FIRST11111.cer"), "login.keychain", password: nil, skip_set_partition_list: true).ordered
+          expect(Match::Utils).to receive(:import).with(File.join(cert_dir, "FIRST11111.p12"), "login.keychain", password: nil, skip_set_partition_list: true).ordered
+
+          values = {
+            app_identifier: "com.test.app",
+            type: "appstore",
+            git_url: "https://example.com",
+            skip_set_partition_list: true
+          }
+          config = FastlaneCore::Configuration.create(Match::Options.available_options, values)
+
+          runner.send(:fetch_certificate, params: config)
+        end
+      end
+
       it "ignores certificate_id when fetching additional cert types" do
         Dir.mktmpdir do |dir|
           # Primary cert type directory with the target certificate

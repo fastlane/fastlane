@@ -24,6 +24,21 @@ describe Match do
         Match::Utils.import('item.path', 'login.keychain', password: '')
       end
 
+      it 'leaves the key partition list alone when told to skip it' do
+        keychain_path = "#{Dir.home}/Library/Keychains/login.keychain"
+
+        allow(FastlaneCore::Helper).to receive(:show_loading_indicator).and_return(true)
+        allow(File).to receive(:file?).and_return(false)
+        allow(File).to receive(:file?).with(keychain_path).and_return(true)
+        allow(File).to receive(:exist?).and_return(false)
+        allow(File).to receive(:exist?).with('item.path').and_return(true)
+
+        expect(Security::Certificate).to receive(:import).with('item.path', keychain: keychain_path, password: '', format: nil).and_return(true)
+        expect_any_instance_of(Security::Keychain).not_to receive(:set_key_partition_list)
+
+        Match::Utils.import('item.path', 'login.keychain', password: '', skip_set_partition_list: true)
+      end
+
       it 'treats a keychain name it cannot find in ~/Library/Keychains as the full keychain path' do
         tmp_path = Dir.mktmpdir
         keychain = "#{tmp_path}/my/special.keychain"
