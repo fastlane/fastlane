@@ -46,7 +46,8 @@ describe Scan do
         it 'with :test_without_building true and :xctestrun given', requires_xcodebuild: true do
           options = {
             test_without_building: true,
-            xctestrun: "./scan/examples/standard/DerivedData/Build/testplan.xctestrun"
+            xctestrun: "./scan/examples/standard/DerivedData/Build/testplan.xctestrun",
+            destination: "platform=macOS"
           }
 
           expect(FastlaneCore::Project).to_not(receive(:detect_projects))
@@ -66,6 +67,16 @@ describe Scan do
 
           Scan.config = FastlaneCore::Configuration.create(Scan::Options.available_options, options)
           expect(Scan.project).to be_nil
+        end
+      end
+
+      describe 'an .xctestrun alone without a destination' do
+        it 'fails early', requires_xcodebuild: true do
+          options = { xctestrun: "./scan/examples/standard/DerivedData/Build/testplan.xctestrun" }
+
+          expect do
+            Scan.config = FastlaneCore::Configuration.create(Scan::Options.available_options, options)
+          end.to raise_error(FastlaneCore::Interface::FastlaneError, /Pass `destination`/)
         end
       end
 

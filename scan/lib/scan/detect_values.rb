@@ -23,6 +23,11 @@ module Scan
 
       prevalidate
 
+      # Without a project to pick a simulator from, xcodebuild refuses an .xctestrun with no -destination
+      if xctestrun_without_project? && Scan.config[:destination].nil? && Array(Scan.config[:devices] || Scan.config[:device]).empty?
+        UI.user_error!("Pass `destination` (for example \"platform=macOS\") or `device` with `xctestrun` when there is no project")
+      end
+
       # Detect the project if not SPM package, nor an .xctestrun run with no project around
       if Scan.config[:package_path].nil? && !xctestrun_without_project?
         FastlaneCore::Project.detect_projects(config)
