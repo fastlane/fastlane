@@ -186,5 +186,69 @@ describe Match do
         nuke.spaceship_login
       end
     end
+
+    describe "on an Enterprise account" do
+      let(:storage) { double("storage", download: nil, working_directory: "/tmp", clear_changes: nil) }
+
+      before do
+        allow(Spaceship::ConnectAPI::Token).to receive(:from).and_return(nil)
+        allow(Spaceship::ConnectAPI).to receive(:token).and_return(nil)
+        allow(Spaceship::ConnectAPI.client).to receive(:in_house?).and_return(true)
+        allow(Match::Storage).to receive(:from_params).and_return(storage)
+        allow(Match::Encryption).to receive(:for_storage_mode).and_return(nil)
+        allow(FastlaneCore::PrintTable).to receive(:print_values)
+        allow(UI).to receive(:error)
+      end
+
+      def config(type, **values)
+        FastlaneCore::Configuration.create(Match::Options.available_options, {
+          type: type,
+          git_url: "https://github.com/fastlane/fastlane",
+          username: "flapple@something.com"
+        }.merge(values))
+      end
+
+      def run_like_the_action(params)
+        Match::Nuke.new.run(params, type: Match.cert_type_sym(params[:type]))
+      end
+
+      it "asks before nuking from the match_nuke action, and stops when declined" do
+        expect(UI).to receive(:error).with("By nuking your account's enterprise, all your in-house apps will stop working!")
+        expect(UI).to receive(:confirm).with("Do you really want to nuke your Enterprise account?").and_return(false)
+        expect(Match::Storage).not_to receive(:from_params)
+
+        expect do
+          run_like_the_action(config("enterprise"))
+        end.to raise_error(FastlaneCore::Interface::FastlaneError, "Enterprise account nuke cancelled")
+      end
+
+      it "warns that nuking distribution from the match_nuke action also deletes Ad Hoc profiles" do
+        nuke = Match::Nuke.new
+        allow(nuke).to receive(:prepare_list) do
+          nuke.certs = [double("cert")]
+          nuke.profiles = []
+          nuke.files = []
+        end
+        allow(nuke).to receive(:filter_by_cert)
+        allow(nuke).to receive(:print_tables)
+        allow(UI).to receive(:confirm).and_return(true, false)
+
+        expect(UI).to receive(:error).with("By nuking your account's distribution, all your apps deployed via ad-hoc will stop working!")
+        expect(UI).to receive(:error).with("Warning: By nuking distribution, both App Store and Ad Hoc profiles will be deleted")
+        expect(nuke).not_to receive(:nuke_it_now!)
+
+        params = config("adhoc")
+        nuke.run(params, type: Match.cert_type_sym(params[:type]))
+      end
+
+      it "doesn't say the apps will stop working when certificates are only removed from storage" do
+        expect(UI).not_to receive(:error).with("By nuking your account's enterprise, all your in-house apps will stop working!")
+        expect(UI).to receive(:confirm).with("Do you really want to nuke your Enterprise account?").and_return(false)
+
+        expect do
+          run_like_the_action(config("enterprise", safe_remove_certs: true))
+        end.to raise_error(FastlaneCore::Interface::FastlaneError, "Enterprise account nuke cancelled")
+      end
+    end
   end
 end
