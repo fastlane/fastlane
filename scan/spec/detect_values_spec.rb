@@ -55,6 +55,34 @@ describe Scan do
         end
       end
 
+      describe 'does not attempt to detect FastlaneCore::Project for an .xctestrun alone' do
+        it 'with :xctestrun and :destination given', requires_xcodebuild: true do
+          options = {
+            xctestrun: "./scan/examples/standard/DerivedData/Build/testplan.xctestrun",
+            destination: "platform=macOS"
+          }
+
+          expect(FastlaneCore::Project).to_not(receive(:detect_projects))
+
+          Scan.config = FastlaneCore::Configuration.create(Scan::Options.available_options, options)
+          expect(Scan.project).to be_nil
+        end
+      end
+
+      describe 'keeps the project given with :xctestrun' do
+        it 'with :xctestrun and :project given', requires_xcodebuild: true do
+          options = {
+            xctestrun: "./scan/examples/standard/DerivedData/Build/testplan.xctestrun",
+            project: "./scan/examples/standard/app.xcodeproj"
+          }
+
+          expect(FastlaneCore::Project).to receive(:detect_projects).and_call_original
+
+          Scan.config = FastlaneCore::Configuration.create(Scan::Options.available_options, options)
+          expect(Scan.project.path).to eq(File.expand_path("./scan/examples/standard/app.xcodeproj"))
+        end
+      end
+
       describe 'detects FastlaneCore::Project' do
         before do
           # Mocks input from detect_projects

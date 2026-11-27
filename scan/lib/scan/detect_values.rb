@@ -23,8 +23,8 @@ module Scan
 
       prevalidate
 
-      # Detect the project if not SPM package and not running with: test_without_building and xctestrun
-      if Scan.config[:package_path].nil? && !(Scan.config[:test_without_building] && Scan.config[:xctestrun])
+      # Detect the project if not SPM package, nor an .xctestrun run with no project around
+      if Scan.config[:package_path].nil? && !xctestrun_without_project?
         FastlaneCore::Project.detect_projects(config)
         Scan.project = FastlaneCore::Project.new(config)
 
@@ -60,6 +60,14 @@ module Scan
       coerce_to_array_of_strings(:skip_test_configurations)
 
       return config
+    end
+
+    # An .xctestrun file can be run without a project: xcodebuild only needs the file
+    def self.xctestrun_without_project?
+      return false unless Scan.config[:xctestrun]
+      return false if Scan.config[:project] || Scan.config[:workspace]
+
+      Dir["./*.xcworkspace", "./*.xcodeproj"].empty?
     end
 
     def self.prevalidate
