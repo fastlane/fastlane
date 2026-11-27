@@ -196,6 +196,13 @@ describe CredentialsManager do
       end
     end
 
+    describe "Appfile10" do
+      it "supports provider_public_id in Appfile" do
+        config = CredentialsManager::AppfileConfig.new('credentials_manager/spec/fixtures/Appfile10')
+        expect(config.data[:provider_public_id]).to eq('00000000-0000-0000-0000-000000000000')
+      end
+    end
+
     describe "No Appfile" do
       it "prefills information from the environment variable" do
         env_name = "User@#{Time.now.to_i}"
@@ -211,6 +218,15 @@ describe CredentialsManager do
 
         expect(config.data[:apple_id]).to eq('appfile@krausefx.com')
         expect(config.data[:app_identifier]).to eq('such.app')
+      end
+
+      it "keeps smart quotes when FASTLANE_SKIP_SMART_QUOTES_SANITIZE is set" do
+        FastlaneSpec::Env.with_env_values('FASTLANE_SKIP_SMART_QUOTES_SANITIZE' => '1') do
+          config = CredentialsManager::AppfileConfig.new('credentials_manager/spec/fixtures/Appfile_smart_quotes_in_a_string')
+
+          expect(config.data[:app_identifier]).to eq('such.app')
+          expect(config.data[:team_name]).to eq('Felix’s “Team”')
+        end
       end
     end
   end

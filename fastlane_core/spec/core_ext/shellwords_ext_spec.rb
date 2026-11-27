@@ -236,7 +236,7 @@ def simulate_windows_shell_unwrapping(string)
   regex = /^("|')(([^"])(\S*)([^"]))("|')$/
   unless string.to_s.match(regex).nil?
     string = string.to_s.match(regex)[2] # get only part in quotes
-    string.to_s.gsub!('""', '"') # remove double double quotes
+    string.to_s.gsub!('""', '"') # remove doubled double quotes
   end
   return string
 end
@@ -261,7 +261,7 @@ describe "monkey patch of String.shellescape (via CrossplatformShellwords)" do
     os = 'windows'
     shellescape_testcases.each do |testcase|
       it testcase['it'] + ': ' + testcase['it_result'][os] do
-        str = testcase['str'].to_s
+        str = testcase['str'].to_s.dup
         expect_correct_implementation_to_be_called(str, :shellescape, os)
         escaped = str.shellescape
         expect(escaped).to eq(testcase['expect'][os])
@@ -277,7 +277,7 @@ describe "monkey patch of String.shellescape (via CrossplatformShellwords)" do
     os = 'other'
     shellescape_testcases.each do |testcase|
       it testcase['it'] + ': ' + testcase['it_result'][os] do
-        str = testcase['str'].to_s
+        str = testcase['str'].to_s.dup
         expect_correct_implementation_to_be_called(str, :shellescape, os)
         escaped = str.shellescape
         expect(escaped).to eq(testcase['expect'][os])
@@ -385,7 +385,7 @@ def expect_correct_implementation_to_be_called(obj, method, os)
       expect(WindowsShellwords).to receive(:shellescape).with(obj).and_call_original
       expect(Shellwords).not_to(receive(:escape))
     else
-      # Shellswords.escape
+      # Shellwords.escape
       expect(Shellwords).to receive(:escape).with(obj).and_call_original
       expect(WindowsShellwords).not_to(receive(:shellescape))
     end

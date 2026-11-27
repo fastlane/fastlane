@@ -1,6 +1,6 @@
 desc "Common setup for all lanes"
 before_all do |lane, options|
-  File.write("/tmp/before_all.txt", options[:value])
+  File.write("#{FASTLANE_SPEC_SCRATCH}/before_all.txt", options[:value])
 end
 
 lane :something do
@@ -12,10 +12,10 @@ end
 
 desc "Called on success"
 after_all do |lane, options|
-  File.write("/tmp/after_all.txt", options[:value])
+  File.write("#{FASTLANE_SPEC_SCRATCH}/after_all.txt", options[:value])
 end
 
 desc "Called on error"
 error do |lane, exception, options|
-  File.write("/tmp/error.txt", options[:value])
+  File.write("#{FASTLANE_SPEC_SCRATCH}/error.txt", options[:value])
 end

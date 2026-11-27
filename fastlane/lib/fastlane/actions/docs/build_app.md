@@ -6,8 +6,7 @@
 
 <p align="center">
     <a href="#whats-gym">Features</a> &bull;
-    <a href="#usage">Usage</a> &bull;
-    <a href="#tips">Tips</a>
+    <a href="#usage">Usage</a>
 </p>
 
 -------
@@ -42,8 +41,8 @@ fastlane gym
 
 _gym_ uses the latest APIs to build and sign your application which results in much faster build times.
 
-|          |  Gym Features  |
-|----------|----------------|
+|          |  _gym_ Features  |
+|----------|------------------|
 🚀 | _gym_ builds 30% faster than other build tools like [shenzhen](https://github.com/nomad/shenzhen)
 🏁 | Beautiful inline build output
 📖 | Helps you resolve common build errors like code signing issues
@@ -74,7 +73,7 @@ That's all you need to build your application. If you want more control, here ar
 fastlane gym --workspace "Example.xcworkspace" --scheme "AppName" --clean
 ```
 
-If you need to use a different Xcode installation, use `xcode-select` or define `DEVELOPER_DIR`:
+If you need to use a different Xcode installation, use `[xcodes](https://docs.fastlane.tools/actions/xcodes)` or define `DEVELOPER_DIR`:
 
 ```no-highlight
 DEVELOPER_DIR="/Applications/Xcode6.2.app" fastlane gym
@@ -150,7 +149,7 @@ build_app(
   scheme: "Release",
   export_method: "app-store",
   export_options: {
-    provisioningProfiles: { 
+    provisioningProfiles: {
       "com.example.bundleid" => "Provisioning Profile Name",
       "com.example.bundleid2" => "Provisioning Profile Name 2"
     }
@@ -184,10 +183,10 @@ end
 error do |lane, exception|
   slack(
     # message with short human friendly message
-    message: exception.to_s, 
-    success: false, 
+    message: exception.to_s,
+    success: false,
     # Output containing extended log output
-    payload: { "Output" => exception.error_info.to_s } 
+    payload: { "Output" => exception.error_info.to_s }
   )
 end
 ```
@@ -195,7 +194,7 @@ end
 When _gym_ raises an error the `error_info` property will contain the process output
 in case you want to display the error in 3rd party tools such as Slack.
 
-You can then easily switch between the beta provider (e.g. `testflight`, `hockey`, `s3` and more).
+You can then easily switch between the beta provider (e.g. `testflight`, `s3` and more).
 
 # How does it work?
 

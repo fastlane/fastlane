@@ -1,6 +1,8 @@
 module Fastlane
   class ActionsList
-    def self.run(filter: nil, platform: nil)
+    def self.run(filter: nil, platform: nil, json: false)
+      return output_json(filter: filter, platform: platform) if json
+
       require 'terminal-table'
       if filter
         show_details(filter: filter)
@@ -164,6 +166,98 @@ module Fastlane
       puts(Terminal::Table.new(title: "#{name} Return Value".green,
                                 rows: FastlaneCore::PrintTable.transform_output([[action.return_value]])))
       puts("")
+    end
+
+    # Bump only to rename or remove a field; new fields may appear in any version.
+    JSON_VERSION = 1
+
+    JSON_TYPES = {
+      "String" => "string",
+      "Symbol" => "string",
+      "Fastlane::Boolean" => "boolean",
+      "Integer" => "integer",
+      "Float" => "number",
+      "Numeric" => "number",
+      "Array" => "array",
+      "Hash" => "object",
+      "string_callback" => "callback"
+    }
+
+    def self.output_json(filter: nil, platform: nil)
+      json = filter ? generate_action_json(filter) : generate_json(platform: platform)
+      # Compact, unlike `lanes --json`: a third smaller for agents that read it; `| jq` for people
+      STDOUT.puts(JSON.generate(json))
+    end
+
+    # A summary of every action; `generate_action_json` has the details of one
+    def self.generate_json(platform: nil)
+      # The Fastfile is not read, so platforms it adds with add_extra_platforms are only known from --platform
+      platforms = (Fastlane::SupportedPlatforms.all + [platform&.to_sym]).compact.uniq
+      actions = {}
+      all_actions(platform) do |action, name|
+        actions[name] = action_json(action, name, details: false, platforms: platforms)
+      end
+      { version: JSON_VERSION, actions: actions }
+    end
+
+    def self.generate_action_json(name)
+      action = find_action_named(name)
+      UI.user_error!("Couldn't find action '#{name}'. Run `fastlane actions --json` to list them.") unless action
+
+      { version: JSON_VERSION, name: name }.merge(action_json(action, name, details: true))
+    end
+
+    # Plugin actions run code to describe themselves: one that raises is reported, not fatal to the list
+    def self.action_json(action, name, details:, platforms: Fastlane::SupportedPlatforms.all)
+      return { error: action_subclass_error(name) } unless action < Action
+
+      deprecated = Fastlane::Actions.is_deprecated?(action)
+      json = {
+        description: action.description,
+        category: action.category,
+        platforms: platforms.select { |platform| action.is_supported?(platform) },
+        deprecated: deprecated
+      }
+      return json unless details
+
+      json[:deprecation_message] = action.deprecated_notes if deprecated && action.deprecated_notes
+      json[:details] = action.details
+      json[:authors] = Array(action.author || action.authors)
+      json[:options] = Array(action.available_options).filter_map { |option| option_json(option) }
+      json[:outputs] = Array(action.output).map { |key, description| { name: key, description: description } }
+      json[:return_type] = action.return_type
+      json[:return_value] = action.return_value
+      json.compact
+    rescue StandardError, ScriptError => e
+      { error: "#{e.class}: #{e.message}" }
+    end
+
+    # Defaults are the ones the Swift API uses: none for sensitive options, and none computed on this machine
+    def self.option_json(option)
+      # Legacy actions describe an option as [key, description]
+      return { key: option[0].to_s, description: option[1] } if option.kind_of?(Array)
+      return nil unless option.kind_of?(FastlaneCore::ConfigItem)
+
+      json = {
+        key: option.key.to_s,
+        description: option.description,
+        type: JSON_TYPES[option.data_type.to_s],
+        optional: option.optional,
+        env_names: option.env_names,
+        short_option: option.short_option,
+        sensitive: option.sensitive || nil,
+        conflicting_options: option.conflicting_options
+      }
+      if option.default_value_dynamic
+        json[:default_is_dynamic] = true
+      elsif !option.code_gen_default_value.nil?
+        json[:default] = option.code_gen_default_value
+      end
+      if option.deprecated
+        json[:deprecated] = true
+        json[:deprecation_message] = option.deprecated if option.deprecated.kind_of?(String)
+      end
+      json.compact
     end
 
     # Iterates through all available actions and yields from there
