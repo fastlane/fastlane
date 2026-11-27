@@ -19,7 +19,8 @@ module Snapshot
 
       def options(language, locale)
         config = Snapshot.config
-        result_bundle_path = resolve_result_bundle_path(language, locale) if config[:result_bundle]
+        # On macOS the screenshots come back through the result bundle (see Collector)
+        result_bundle_path = resolve_result_bundle_path(language, locale) if config[:result_bundle] || macos?
 
         options = []
         options += project_path_array
@@ -97,12 +98,22 @@ module Snapshot
         Snapshot.cache[:derived_data_path] ||= (Snapshot.config[:derived_data_path] || Dir.mktmpdir("snapshot_derived"))
       end
 
+      # Snapshot runs the app on this Mac rather than in simulators
+      def macos?
+        Array(Snapshot.config[:devices]).first.to_s =~ /^Mac/ ? true : false
+      end
+
+      # Where a language's result bundle goes, without the clean-up resolve_result_bundle_path does
+      def result_bundle_path(language, locale)
+        File.join(Snapshot.config[:output_directory], "test_output", locale || language, Snapshot.config[:scheme]) + '.xcresult'
+      end
+
       def resolve_result_bundle_path(language, locale)
         Snapshot.cache[:result_bundle_path] = {}
         language_key = locale || language
 
         unless Snapshot.cache[:result_bundle_path][language_key]
-          path = File.join(Snapshot.config[:output_directory], "test_output", language_key, Snapshot.config[:scheme]) + '.xcresult'
+          path = result_bundle_path(language, locale)
           if File.directory?(path)
             FileUtils.remove_dir(path)
           end

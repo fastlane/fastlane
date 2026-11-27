@@ -230,7 +230,7 @@ module Snapshot
                                      short_option: "-z",
                                      env_name: "SNAPSHOT_RESULT_BUNDLE",
                                      is_string: false,
-                                     description: "Should an Xcode result bundle be generated in the output directory",
+                                     description: "Should an Xcode result bundle be generated in the output directory (always on macOS, where the screenshots come from it)",
                                      default_value: false,
                                      optional: true),
         FastlaneCore::ConfigItem.new(key: :test_target_name,
