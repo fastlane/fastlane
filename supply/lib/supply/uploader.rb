@@ -283,7 +283,8 @@ module Supply
         end
       end
 
-      unless changelog_text.empty?
+      # An empty text made the whole release notes update fail (fastlane#21004)
+      unless changelog_text.strip.empty?
         AndroidPublisher::LocalizedText.new(
           language: language,
           text: changelog_text
