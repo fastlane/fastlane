@@ -1,3 +1,4 @@
+require 'time'
 require_relative '../model'
 require_relative './build'
 
