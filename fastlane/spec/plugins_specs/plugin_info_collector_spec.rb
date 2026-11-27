@@ -8,7 +8,7 @@ describe Fastlane::PluginInfoCollector do
   end
 
   before do
-    ["my plugin", "test_name", "my_", "fastlane-whatever", "whatever"].each do |current|
+    ["test_name", "my_", "whatever"].each do |current|
       stub_plugin_exists_on_rubygems(current, false)
     end
   end

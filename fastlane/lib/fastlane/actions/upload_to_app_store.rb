@@ -10,8 +10,11 @@ module Fastlane
         begin
           config.load_configuration_file("Deliverfile")
           config[:screenshots_path] ||= Actions.lane_context[SharedValues::SNAPSHOT_SCREENSHOTS_PATH] if Actions.lane_context[SharedValues::SNAPSHOT_SCREENSHOTS_PATH]
-          config[:ipa] ||= Actions.lane_context[SharedValues::IPA_OUTPUT_PATH] if Actions.lane_context[SharedValues::IPA_OUTPUT_PATH]
-          config[:pkg] ||= Actions.lane_context[SharedValues::PKG_OUTPUT_PATH] if Actions.lane_context[SharedValues::PKG_OUTPUT_PATH]
+          # The build from gym wins over the newest *.ipa/*.pkg in the current directory, the options' default
+          unless config.specified?(:ipa) || config.specified?(:pkg)
+            config[:ipa] = Actions.lane_context[SharedValues::IPA_OUTPUT_PATH] if Actions.lane_context[SharedValues::IPA_OUTPUT_PATH]
+            config[:pkg] = Actions.lane_context[SharedValues::PKG_OUTPUT_PATH] if Actions.lane_context[SharedValues::PKG_OUTPUT_PATH]
+          end
 
           # Only set :api_key from SharedValues if :api_key_path isn't set (conflicting options)
           unless config[:api_key_path]
@@ -34,7 +37,7 @@ module Fastlane
           "If you don't want to verify an HTML preview for App Store builds, use the `:force` option.",
           "This is useful when running _fastlane_ on your Continuous Integration server:",
           "`_upload_to_app_store_(force: true)`",
-          "If your account is on multiple teams and you need to tell the `iTMSTransporter` which 'provider' to use, you can set the `:itc_provider` option to pass this info."
+          "If your account is on multiple teams and you need to tell the transporter which provider to use, you can set `:itc_provider` or `:provider_public_id`."
         ].join("\n")
       end
 
@@ -49,7 +52,7 @@ module Fastlane
       end
 
       def self.is_supported?(platform)
-        [:ios, :mac].include?(platform)
+        [:ios, :mac, :xros].include?(platform)
       end
 
       def self.example_code

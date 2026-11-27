@@ -4,7 +4,7 @@ describe Pilot::CommandsGenerator do
   let(:available_options) { Pilot::Options.available_options }
 
   def expect_build_manager_call_with(method_sym, expected_options)
-    fake_build_manager = "build_manager"
+    fake_build_manager = +"build_manager"
     expect(Pilot::BuildManager).to receive(:new).and_return(fake_build_manager)
     expect(fake_build_manager).to receive(method_sym) do |actual_options|
       expect(actual_options._values).to eq(expected_options._values)
@@ -40,7 +40,7 @@ describe Pilot::CommandsGenerator do
   def expect_tester_manager_call_with(method_sym, expected_options_sets)
     expected_options_sets = [expected_options_sets] unless expected_options_sets.kind_of?(Array)
 
-    fake_tester_manager = "tester_manager"
+    fake_tester_manager = +"tester_manager"
     expect(Pilot::TesterManager).to receive(:new).and_return(fake_tester_manager)
     expected_options_sets.each do |expected_options|
       expect(fake_tester_manager).to receive(method_sym) do |actual_options|
@@ -108,7 +108,7 @@ describe Pilot::CommandsGenerator do
 
   describe ":export option handling" do
     def expect_tester_exporter_export_testers_with(expected_options)
-      fake_tester_exporter = "tester_exporter"
+      fake_tester_exporter = +"tester_exporter"
       expect(Pilot::TesterExporter).to receive(:new).and_return(fake_tester_exporter)
       expect(fake_tester_exporter).to receive(:export_testers) do |actual_options|
         expect(actual_options._values).to eq(expected_options._values)
@@ -136,7 +136,7 @@ describe Pilot::CommandsGenerator do
 
   describe ":import option handling" do
     def expect_tester_importer_import_testers_with(expected_options)
-      fake_tester_importer = "tester_importer"
+      fake_tester_importer = +"tester_importer"
       expect(Pilot::TesterImporter).to receive(:new).and_return(fake_tester_importer)
       expect(fake_tester_importer).to receive(:import_testers) do |actual_options|
         expect(actual_options._values).to eq(expected_options._values)

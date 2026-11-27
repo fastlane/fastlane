@@ -41,6 +41,16 @@ describe "Build Manager" do
       changelog = Pilot::BuildManager.sanitize_changelog(changelog)
       expect(changelog).to eq(File.read("./pilot/spec/fixtures/build_manager/changelog_long_truncated"))
     end
+    it "accepts a frozen changelog containing emoji" do
+      changelog = "I'm 🦇B🏧an🪴!".freeze
+      changelog = Pilot::BuildManager.sanitize_changelog(changelog)
+      expect(changelog).to eq("I'm Ban!")
+    end
+    it "accepts a frozen changelog containing less than signs" do
+      changelog = "I'm <script>man<<!".freeze
+      changelog = Pilot::BuildManager.sanitize_changelog(changelog)
+      expect(changelog).to eq("I'm script>man!")
+    end
   end
 
   describe ".has_changelog_or_whats_new?" do
@@ -116,7 +126,7 @@ describe "Build Manager" do
   end
 
   describe "distribute submits the build for review" do
-    let(:mock_base_client) { "fake api base client" }
+    let(:mock_base_client) { +"fake api base client" }
     let(:fake_build_manager) { Pilot::BuildManager.new }
 
     let(:app) do
@@ -242,7 +252,7 @@ describe "Build Manager" do
           apple_id: 'mock_apple_id',
           app_identifier: 'mock_app_id',
           distribute_external: true,
-          groups: ["Blue Man Group"],
+          groups: ["Blue Man Group", "654"],
           skip_submission: false,
           demo_account_required: true,
           notify_external_testers: true,
@@ -382,6 +392,7 @@ describe "Build Manager" do
         })
         expect(Spaceship::ConnectAPI::Build).to receive(:get).and_return(ready_to_submit_mock_build).exactly(2).times
         expect(FastlaneCore::UI).to receive(:message).with("Waiting for build 123 to process export compliance")
+        expect(fake_build_manager).to receive(:sleep).with(5)
         expect(ready_to_submit_mock_build).to receive(:build_beta_detail).and_return(build_beta_detail).exactly(3).times
 
         # Expect beta groups fetched from app. This tests:
@@ -403,9 +414,9 @@ describe "Build Manager" do
         # 2. client.add_beta_groups_to_build is called inside of build.add_beta_groups
         expect(Spaceship::ConnectAPI).to receive(:add_beta_groups_to_build).with({
           build_id: ready_to_submit_mock_build.id,
-          beta_group_ids: [beta_groups[0].id]
+          beta_group_ids: [beta_groups[0].id, beta_groups[1].id]
         }).and_return(Spaceship::ConnectAPI::Response.new)
-        expect(ready_to_submit_mock_build).to receive(:add_beta_groups).with(beta_groups: [beta_groups[0]]).and_wrap_original do |m, *args|
+        expect(ready_to_submit_mock_build).to receive(:add_beta_groups).with(beta_groups: [beta_groups[0], beta_groups[1]]).and_wrap_original do |m, *args|
           options = args.first
           m.call(**options)
         end
@@ -598,7 +609,62 @@ describe "Build Manager" do
     end
   end
 
+  describe "#update_routing_app_coverage" do
+    let(:fake_build_manager) { Pilot::BuildManager.new }
+    let(:fake_app) { double("fake app") }
+    let(:fake_version) { double("fake version") }
+    let(:geojson_path) { "./coverage.geojson" }
+
+    context "without routing_app_coverage_file set" do
+      it "does not touch the routing app coverage on App Store Connect" do
+        expect(fake_build_manager).not_to(receive(:app))
+
+        fake_build_manager.send(:update_routing_app_coverage, {})
+      end
+    end
+
+    context "with routing_app_coverage_file set" do
+      let(:options) { { routing_app_coverage_file: geojson_path } }
+
+      before(:each) do
+        allow(fake_build_manager).to receive(:fetch_app_platform).and_return("ios")
+        allow(fake_build_manager).to receive(:app).and_return(fake_app)
+      end
+
+      it "skips the upload when there is no editable app store version" do
+        expect(fake_app).to receive(:get_edit_app_store_version).with(platform: Spaceship::ConnectAPI::Platform::IOS).and_return(nil)
+
+        fake_build_manager.send(:update_routing_app_coverage, options)
+      end
+
+      it "uploads the file when no coverage exists yet" do
+        expect(fake_app).to receive(:get_edit_app_store_version).with(platform: Spaceship::ConnectAPI::Platform::IOS).and_return(fake_version)
+        expect(fake_version).to receive(:fetch_routing_app_coverage).and_return(nil)
+        expect(fake_version).to receive(:upload_routing_app_coverage).with(path: geojson_path)
+
+        fake_build_manager.send(:update_routing_app_coverage, options)
+      end
+
+      it "replaces an existing coverage file" do
+        routing_app_coverage = double("routing_app_coverage")
+        expect(fake_app).to receive(:get_edit_app_store_version).with(platform: Spaceship::ConnectAPI::Platform::IOS).and_return(fake_version)
+        expect(fake_version).to receive(:fetch_routing_app_coverage).and_return(routing_app_coverage)
+        expect(routing_app_coverage).to receive(:delete!)
+        expect(fake_version).to receive(:upload_routing_app_coverage).with(path: geojson_path)
+
+        fake_build_manager.send(:update_routing_app_coverage, options)
+      end
+    end
+  end
+
   describe "#upload" do
+    before(:each) do
+      # Prevent class-level Spaceship::ConnectAPI.client state from leaking
+      # in from other spec files (e.g. spaceship_spec.rb sets a real client
+      # that holds references to doubles which expire between examples).
+      allow(Spaceship::ConnectAPI).to receive(:client).and_return(nil)
+    end
+
     describe "shows the correct notices" do
       let(:fake_build_manager) { Pilot::BuildManager.new }
       let(:fake_app_id) { 123 }
@@ -886,6 +952,14 @@ describe "Build Manager" do
   end
 
   describe "#transporter_for_selected_team" do
+    before do
+      # Building an ItunesTransporter looks up an application-specific password in the
+      # keychain before falling back to DELIVER_PASSWORD. Left unstubbed these examples
+      # query the real keychain, so which path they take depends on whoever runs them.
+      # nil is what that lookup returns on a machine with no matching entry.
+      allow(Security::InternetPassword).to receive(:find).and_return(nil)
+    end
+
     let(:fake_manager) { Pilot::BuildManager.new }
     let(:fake_team_api_key_json_path) do
       "./spaceship/spec/connect_api/fixtures/asc_key.json"
@@ -921,13 +995,13 @@ describe "Build Manager" do
     end
 
     it "with Individual API Key" do
-      options = { username: "josh" }
+      options = {}
       allow(Spaceship::ConnectAPI).to receive(:token).and_return(Spaceship::ConnectAPI::Token.from(filepath: fake_individual_api_key_json_path))
 
       transporter = fake_manager.send(:transporter_for_selected_team, options)
-      expect(transporter.instance_variable_get(:@jwt)).to(be_nil)
-      expect(transporter.instance_variable_get(:@user)).to eq("josh")
-      expect(transporter.instance_variable_get(:@password)).to eq("DELIVERPASS")
+      expect(transporter.instance_variable_get(:@jwt)).not_to(be_nil)
+      expect(transporter.instance_variable_get(:@user)).to be_nil
+      expect(transporter.instance_variable_get(:@password)).to be_nil
       expect(transporter.instance_variable_get(:@provider_short_name)).to(be_nil)
     end
 

@@ -4,50 +4,62 @@ describe Fastlane do
       describe "saying" do
         it "works with array" do
           expect(Fastlane::Actions).to receive(:sh)
-            .with('say \'Hi Felix Good Job\'')
+            .with('say', 'Hi Felix Good Job')
             .and_call_original
 
           result = Fastlane::FastFile.new.parse("lane :test do
             say(['Hi Felix', 'Good Job'])
           end").runner.execute(:test)
 
-          expect(result).to eq('say \'Hi Felix Good Job\'')
+          expect(result.shellsplit).to eq(['say', 'Hi Felix Good Job'])
         end
 
         it "works with string" do
           expect(Fastlane::Actions).to receive(:sh)
-            .with('say \'Hi Josh Good Job\'')
+            .with('say', 'Hi Josh Good Job')
             .and_call_original
 
           result = Fastlane::FastFile.new.parse("lane :test do
             say('Hi Josh Good Job')
           end").runner.execute(:test)
 
-          expect(result).to eq('say \'Hi Josh Good Job\'')
+          expect(result.shellsplit).to eq(['say', 'Hi Josh Good Job'])
         end
 
         it "works with options array" do
           expect(Fastlane::Actions).to receive(:sh)
-            .with('say \'Hi Felix Good Job\'')
+            .with('say', 'Hi Felix Good Job')
             .and_call_original
 
           result = Fastlane::FastFile.new.parse("lane :test do
             say(text: ['Hi Felix', 'Good Job'])
           end").runner.execute(:test)
 
-          expect(result).to eq('say \'Hi Felix Good Job\'')
+          expect(result.shellsplit).to eq(['say', 'Hi Felix Good Job'])
         end
 
         it "works with options string" do
           expect(Fastlane::Actions).to receive(:sh)
-            .with('say \'Hi Josh Good Job\'')
+            .with('say', 'Hi Josh Good Job')
             .and_call_original
 
           result = Fastlane::FastFile.new.parse("lane :test do
             say(text: 'Hi Josh Good Job')
           end").runner.execute(:test)
 
-          expect(result).to eq('say \'Hi Josh Good Job\'')
+          expect(result.shellsplit).to eq(['say', 'Hi Josh Good Job'])
+        end
+
+        it "speaks apostrophes as written" do
+          expect(Fastlane::Actions).to receive(:sh)
+            .with('say', "It's done")
+            .and_call_original
+
+          result = Fastlane::FastFile.new.parse("lane :test do
+            say(#{"It's done".inspect})
+          end").runner.execute(:test)
+
+          expect(result.shellsplit).to eq(['say', "It's done"])
         end
       end
 
@@ -102,6 +114,16 @@ describe Fastlane do
           end").runner.execute(:test)
 
           expect(result).to eq('Hi Josh Good Job')
+        end
+
+        it "prints apostrophes as written" do
+          expect(Fastlane::UI).to receive(:message).with("It's done")
+
+          result = Fastlane::FastFile.new.parse("lane :test do
+            say(#{"It's done".inspect})
+          end").runner.execute(:test)
+
+          expect(result).to eq("It's done")
         end
       end
     end
