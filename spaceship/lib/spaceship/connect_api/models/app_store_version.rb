@@ -1,6 +1,7 @@
 require_relative '../model'
 require_relative './app_store_review_detail'
 require_relative './app_store_version_localization'
+require_relative './routing_app_coverage'
 
 module Spaceship
   class ConnectAPI
@@ -25,6 +26,8 @@ module Spaceship
       attr_accessor :app_store_version_phased_release
       attr_accessor :app_store_review_detail
       attr_accessor :app_store_version_localizations
+
+      attr_accessor :app_clip_default_experience
 
       # Deprecated in App Store Connect API specification 3.3
       module AppStoreState
@@ -98,7 +101,9 @@ module Spaceship
         "build" => "build",
         "appStoreVersionPhasedRelease" => "app_store_version_phased_release",
         "appStoreReviewDetail" => "app_store_review_detail",
-        "appStoreVersionLocalizations" => "app_store_version_localizations"
+        "appStoreVersionLocalizations" => "app_store_version_localizations",
+
+        "appClipDefaultExperience" => "app_clip_default_experience"
       })
 
       ESSENTIAL_INCLUDES = [
@@ -237,6 +242,21 @@ module Spaceship
         client ||= Spaceship::ConnectAPI
         resp = client.patch_app_store_version_with_build(app_store_version_id: id, build_id: build_id)
         return resp.to_models.first
+      end
+
+      #
+      # Routing App Coverages
+      #
+
+      def fetch_routing_app_coverage(client: nil)
+        client ||= Spaceship::ConnectAPI
+        resp = client.get_routing_app_coverage(app_store_version_id: id)
+        return resp.to_models.first
+      end
+
+      def upload_routing_app_coverage(client: nil, path: nil)
+        client ||= Spaceship::ConnectAPI
+        return Spaceship::ConnectAPI::RoutingAppCoverage.create(client: client, app_store_version_id: id, path: path)
       end
 
       #

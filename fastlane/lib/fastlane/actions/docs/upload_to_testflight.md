@@ -82,6 +82,8 @@ _pilot_ uses [_spaceship_](https://spaceship.airforce) to submit the build metad
 ### Upload from Linux
 
 To upload binaries from Linux:
+
+- have the package file and the `AppStoreInfo.plist` file in the same location on disk (_check [fastlane gym](https://docs.fastlane.tools/actions/gym/) on how to make them_)
 - make sure you have [Transporter on Linux](https://help.apple.com/itc/transporteruserguide/en.lproj/static.html) installed
 - set the following environment variables:
     - `FASTLANE_ITUNES_TRANSPORTER_USE_SHELL_SCRIPT=true`
@@ -261,6 +263,9 @@ _pilot_ uses the [CredentialsManager](https://github.com/fastlane/fastlane/tree/
 
 ## Provider Short Name
 If you are on multiple App Store Connect teams, iTunes Transporter may need a provider short name to know where to upload your binary. _pilot_ will try to use the long name of the selected team to detect the provider short name. To override the detected value with an explicit one, use the `itc_provider` option.
+
+## Provider Public ID
+The provider public ID to be used with altool (--provider-public-id). This value will override the automatically detected provider value for altool uploads. Required after Xcode 26 when your account is associated with multiple providers and using username/app-password authentication.
 
 ## Use an Application Specific Password to upload
 

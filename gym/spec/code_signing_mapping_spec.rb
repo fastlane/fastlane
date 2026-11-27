@@ -1,4 +1,8 @@
 describe Gym::CodeSigningMapping, requires_xcodebuild: true do
+  before do
+    fake_out_build_settings(GYM_BUILD_SETTINGS)
+  end
+
   describe "#app_identifier_contains?" do
     it "returns false if it doesn't contain it" do
       csm = Gym::CodeSigningMapping.new(project: nil)
