@@ -11,9 +11,9 @@ module Screengrab
 
       @data = {}
 
-      Dir[File.join(screens_path, "*")].sort.each do |language_folder|
+      Dir[File.join(screens_path, "*")].each do |language_folder|
         language = File.basename(language_folder)
-        Dir[File.join(language_folder, 'images', '*', '*.png')].sort.each do |screenshot|
+        Dir[File.join(language_folder, 'images', '*', '*.png')].each do |screenshot|
           device_type_folder = File.basename(File.dirname(screenshot))
           @data[language] ||= {}
           @data[language][device_type_folder] ||= []
@@ -30,7 +30,7 @@ module Screengrab
 
       export_path = File.expand_path(export_path)
       UI.success("Successfully created HTML file with an overview of all the screenshots: '#{export_path}'")
-      system("open '#{export_path}'") unless Screengrab.config[:skip_open_summary]
+      system("open", export_path) unless Screengrab.config[:skip_open_summary]
     end
   end
 end

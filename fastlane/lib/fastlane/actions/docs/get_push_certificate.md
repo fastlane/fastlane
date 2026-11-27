@@ -17,9 +17,7 @@ To automate iOS Provisioning profiles you can use [_match_](https://docs.fastlan
 <p align="center">
     <a href="#features">Features</a> &bull;
     <a href="#usage">Usage</a> &bull;
-    <a href="#how-does-it-work">How does it work?</a> &bull;
-    <a href="#tips">Tips</a> &bull;
-    <a href="#need-help">Need help?</a>
+    <a href="#how-does-it-work">How does it work?</a>
 </p>
 
 -------
@@ -48,7 +46,7 @@ This does the following:
 - Downloads the certificate
 - Generates a new ```.pem``` file in the current working directory, which you can upload to your server
 
-Note that _pem_ will never revoke your existing certificates. _pem_ can't download any of your existing push certificates, as the private key is only available on the machine it was created on. 
+Note that _pem_ will never revoke your existing certificates. _pem_ can't download any of your existing push certificates, as the private key is only available on the machine it was created on.
 
 If you already have a push certificate enabled, which is active for at least 30 more days, _pem_ will not create a new certificate. If you still want to create one, use the `force`:
 
@@ -72,6 +70,12 @@ If you want to generate a Website Push certificate:
 
 ```no-highlight
 fastlane pem --website_push
+```
+
+If you want to generate a VoIP Services certificate (the type PushKit requires):
+
+```no-highlight
+fastlane pem --voip_push
 ```
 
 Set a password for your `p12` file:
@@ -111,7 +115,7 @@ If you need the `p12` in your keychain, perhaps to test push with an app like [K
 Enter Import Password:
   <hit enter: the p12 has no password>
 MAC verified OK
-Enter PEM pass phrase:
+Enter your pem passphrase:
   <enter a temporary password to encrypt the pem file>
 
 % openssl pkcs12 -export -in my.pem -out my-with-passphrase.p12

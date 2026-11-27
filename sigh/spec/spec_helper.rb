@@ -1,21 +1,21 @@
 def sigh_stub_spaceship_connect(inhouse: false, create_profile_app_identifier: nil, all_app_identifiers: [], app_identifier_and_profile_names: {}, valid_profiles: true, expect_delete: false)
   allow(Spaceship::ConnectAPI).to receive(:login).and_return(nil)
-  allow(Spaceship::ConnectAPI).to receive(:client).and_return("client")
+  allow(Spaceship::ConnectAPI).to receive(:client).and_return(+"client")
   allow(Spaceship::ConnectAPI).to receive(:select_team).and_return(nil)
 
   allow(Spaceship::ConnectAPI.client).to receive(:in_house?).and_return(inhouse)
 
   # Mock cert
-  certificate = "certificate"
+  certificate = +"certificate"
   allow(certificate).to receive(:id).and_return("123456789")
   allow(certificate).to receive(:display_name).and_return("Roger Oba")
   allow(certificate).to receive(:expiration_date).and_return("2021-07-22T00:27:42.000+0000")
   allow(certificate).to receive(:certificate_content).and_return(Base64.encode64("cert content"))
   allow(Spaceship::ConnectAPI::Certificate).to receive(:all).and_return([certificate, certificate])
 
-  device = "device"
+  device = +"device"
   allow(device).to receive(:id).and_return(1)
-  allow(Spaceship::ConnectAPI::Device).to receive(:all).and_return([device])
+  allow(Spaceship::ConnectAPI::Device).to receive(:devices_for_platform).and_return([device])
 
   bundle_ids = all_app_identifiers.map do |id|
     Spaceship::ConnectAPI::BundleId.new("123", {
@@ -41,6 +41,7 @@ def sigh_stub_spaceship_connect(inhouse: false, create_profile_app_identifier: n
         profileContent: Base64.encode64("profile content")
       })
       allow(profile).to receive(:bundle_id).and_return(bundle_id)
+      allow(profile).to receive(:expiration_date).and_return(Date.today.next_year.to_time.utc.strftime("%Y-%m-%dT%H:%M:%S%:z"))
 
       profile
     end
@@ -62,11 +63,19 @@ def sigh_stub_spaceship_connect(inhouse: false, create_profile_app_identifier: n
 
       expect(profile).to receive(:delete!) if expect_delete
 
+      if valid_profiles
+        allow(profile).to receive(:expiration_date).and_return(Date.today.next_year.to_time.utc.strftime("%Y-%m-%dT%H:%M:%S%:z"))
+      else
+        allow(profile).to receive(:expiration_date).and_return(Date.today.prev_year.to_time.utc.strftime("%Y-%m-%dT%H:%M:%S%:z"))
+      end
+
       profile
     end
   end
-  allow(Spaceship::ConnectAPI::Profile).to receive(:all).with(anything).and_return(profiles)
   allow(Spaceship::ConnectAPI::Profile).to receive(:all).and_return(profiles)
+  profiles.each do |profile|
+    allow(Spaceship::ConnectAPI::Profile).to receive(:all).with(filter: { name: profile.name }).and_return([profile])
+  end
 
   # Stubs production to only receive certs
   certs = [Spaceship.certificate.production]
@@ -129,8 +138,10 @@ def sigh_stub_spaceship(valid_profile = true, expect_create = false, expect_dele
   end
 end
 
-def stub_request_valid_identities(resign, value)
-  expect(resign).to receive(:request_valid_identities).and_return(value)
+def stub_valid_identities(output)
+  succeeded = Security::Command.run("true").status
+  allow(Security::Command).to receive(:run).with("security", "find-identity", "-v", "-p", "codesigning")
+                                           .and_return(Security::Command::Result.new(output, "", succeeded))
 end
 
 # Commander::Command::Options does not define sane equals behavior,

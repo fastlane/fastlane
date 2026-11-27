@@ -13,6 +13,7 @@ module Spaceship
       attr_accessor :public_link_limit
       attr_accessor :public_link
       attr_accessor :beta_testers
+      attr_accessor :has_access_to_all_builds
 
       attr_mapping({
         "name" => "name",
@@ -23,11 +24,17 @@ module Spaceship
         "publicLinkLimitEnabled" => "public_link_limit_enabled",
         "publicLinkLimit" => "public_link_limit",
         "publicLink" => "public_link",
-        "betaTesters" => "beta_testers"
+        "betaTesters" => "beta_testers",
+        "hasAccessToAllBuilds" => "has_access_to_all_builds",
       })
 
       def self.type
         return "betaGroups"
+      end
+
+      # Whether this group is referenced by any of the given identifiers (its name or id)
+      def matches_identifiers?(identifiers)
+        identifiers.include?(name) || identifiers.include?(id)
       end
 
       #
