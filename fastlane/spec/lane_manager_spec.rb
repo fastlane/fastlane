@@ -32,7 +32,7 @@ describe Fastlane do
         end
 
         it "Supports running a lane without a platform even when there is a default_platform" do
-          path = "/tmp/fastlane/tests.txt"
+          path = "#{FASTLANE_SPEC_SCRATCH}/tests.txt"
           File.delete(path) if File.exist?(path)
           expect(File.exist?(path)).to eq(false)
 

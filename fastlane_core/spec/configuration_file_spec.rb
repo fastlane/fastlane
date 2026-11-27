@@ -112,6 +112,21 @@ describe FastlaneCore do
           expect(config[:app_identifier]).to eq("net.sunapps.1")
         end
 
+        it "says how to keep smart quotes when it replaces them" do
+          config = FastlaneCore::Configuration.create(options, {})
+          expect(UI).to receive(:error).with(/has had smart quotes sanitised.*FASTLANE_SKIP_SMART_QUOTES_SANITIZE=1/)
+          config.load_configuration_file('./fastlane_core/spec/fixtures/ConfigInvalidQuotation')
+        end
+
+        it "keeps smart quotes when FASTLANE_SKIP_SMART_QUOTES_SANITIZE is set" do
+          FastlaneSpec::Env.with_env_values('FASTLANE_SKIP_SMART_QUOTES_SANITIZE' => '1') do
+            config = FastlaneCore::Configuration.create(options, {})
+            expect(UI).not_to(receive(:error))
+            config.load_configuration_file('./fastlane_core/spec/fixtures/ConfigSmartQuotesInAString')
+            expect(config[:ios_version]).to eq("It’s “1”")
+          end
+        end
+
         it "properly shows an error message when there is a syntax error in the Fastfile" do
           config = FastlaneCore::Configuration.create(options, {})
           expect do

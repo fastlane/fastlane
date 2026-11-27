@@ -64,6 +64,57 @@ describe Deliver::UploadMetadata do
     end
   end
 
+  describe "#app_rating" do
+    let(:options) { { app_rating_config_path: "/tmp/fake-age-rating.json" } }
+    let(:uploader) { Deliver::UploadMetadata.new(options) }
+
+    it "skips age rating upload when app info cannot be fetched (nil)" do
+      expect(File).not_to receive(:read)
+      expect(FastlaneCore::UI).not_to receive(:message).with("Setting the app's age rating...")
+
+      expect(FastlaneCore::UI).to receive(:important).with("Skipping age rating update because app info could not be fetched.")
+
+      uploader.send("app_rating", nil)
+    end
+  end
+
+  describe "#routing_app_coverage_file" do
+    let(:uploader) { Deliver::UploadMetadata.new(options) }
+    let(:version) { double("version") }
+
+    context "without routing_app_coverage_file set" do
+      let(:options) { {} }
+
+      it "does not touch the routing app coverage on App Store Connect" do
+        expect(version).not_to(receive(:fetch_routing_app_coverage))
+        expect(version).not_to(receive(:upload_routing_app_coverage))
+
+        uploader.send("routing_app_coverage_file", version)
+      end
+    end
+
+    context "with routing_app_coverage_file set" do
+      let(:geojson_path) { File.join(tmpdir, "coverage.geojson") }
+      let(:options) { { routing_app_coverage_file: geojson_path } }
+
+      it "uploads the file when no coverage exists yet" do
+        expect(version).to receive(:fetch_routing_app_coverage).and_return(nil)
+        expect(version).to receive(:upload_routing_app_coverage).with(path: geojson_path)
+
+        uploader.send("routing_app_coverage_file", version)
+      end
+
+      it "replaces an existing coverage file" do
+        routing_app_coverage = double("routing_app_coverage")
+        expect(version).to receive(:fetch_routing_app_coverage).and_return(routing_app_coverage)
+        expect(routing_app_coverage).to receive(:delete!)
+        expect(version).to receive(:upload_routing_app_coverage).with(path: geojson_path)
+
+        uploader.send("routing_app_coverage_file", version)
+      end
+    end
+  end
+
   describe "#review_information" do
     let(:options) { { metadata_path: tmpdir, app_review_information: app_review_information } }
     let(:version) { double("version") }
@@ -247,6 +298,7 @@ describe Deliver::UploadMetadata do
         allow(uploader).to receive(:review_information)
         allow(uploader).to receive(:review_attachment_file)
         allow(uploader).to receive(:app_rating)
+        allow(uploader).to receive(:sleep)
 
         # Verify available languages
         expect(app).to receive(:id).and_return(id)
@@ -492,6 +544,66 @@ describe Deliver::UploadMetadata do
 
           uploader.upload
         end
+      end
+    end
+
+    context "#upload with edit_live" do
+      let(:options) do
+        {
+          platform: "ios",
+          metadata_path: metadata_path,
+          edit_live: true,
+          promotional_text: { "en-US" => "Promotional text" },
+          version_check_wait_retry_limit: 5
+        }
+      end
+
+      before do
+        allow(Deliver).to receive(:cache).and_return({ app: app })
+
+        allow(uploader).to receive(:review_information)
+        allow(uploader).to receive(:review_attachment_file)
+        allow(uploader).to receive(:app_rating)
+        allow(uploader).to receive(:sleep)
+
+        allow(app).to receive(:id).and_return(id)
+        expect(uploader).to receive(:fetch_edit_app_info).and_return(nil)
+      end
+
+      def expect_promotional_text_update
+        # Get number of versions (used for if whats_new should be sent)
+        expect(Spaceship::ConnectAPI).to receive(:get_app_store_versions).and_return(app_store_versions)
+
+        expect(version).to receive(:get_app_store_version_localizations).and_return([version_localization_en])
+        expect(version).to receive(:update).with(attributes: {})
+        expect(version_localization_en).to receive(:update).with(attributes: {
+          "promotional_text" => "Promotional text"
+        })
+      end
+
+      it "updates the localizations of the live version" do
+        expect(app).to receive(:get_live_app_store_version).and_return(version)
+        expect(app).not_to receive(:get_edit_app_store_version)
+        expect_promotional_text_update
+
+        uploader.upload
+      end
+
+      it "updates the localizations of the editable version when there is no live version" do
+        expect(app).to receive(:get_live_app_store_version).and_return(nil)
+        expect(app).to receive(:get_edit_app_store_version).and_return(version)
+        expect_promotional_text_update
+
+        uploader.upload
+      end
+
+      it "fails when there is neither a live nor an editable version" do
+        allow(Kernel).to receive(:sleep)
+        expect(app).to receive(:get_live_app_store_version).and_return(nil)
+        expect(app).to receive(:get_edit_app_store_version).and_return(nil).exactly(5).times
+        expect(Spaceship::ConnectAPI).not_to receive(:get_app_store_versions)
+
+        expect { uploader.upload }.to raise_error(FastlaneCore::Interface::FastlaneError, /could not find a live or editable version/)
       end
     end
 

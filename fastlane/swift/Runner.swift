@@ -1,5 +1,5 @@
 // Runner.swift
-// Copyright (c) 2024 FastlaneTools
+// Copyright (c) 2026 FastlaneTools
 
 //
 //  ** NOTE **
@@ -57,7 +57,7 @@ class Runner {
     }
 
     static func waitWithPolling<T>(_ expression: @autoclosure @escaping () throws -> T, toEventually predicate: @escaping (T) -> Bool, timeout: Int, pollingInterval: DispatchTimeInterval = .milliseconds(4)) -> DispatchTimeoutResult {
-        func memoizedClosure<T>(_ closure: @escaping () throws -> T) -> (Bool) throws -> T {
+        func memoizedClosure(_ closure: @escaping () throws -> T) -> (Bool) throws -> T {
             var cache: T?
             return { withoutCaching in
                 if withoutCaching || cache == nil {
@@ -97,7 +97,7 @@ class Runner {
     }
 }
 
-// Handle threading stuff
+/// Handle threading stuff
 extension Runner {
     func startSocketThread(port: UInt32) {
         let secondsToWait = DispatchTimeInterval.seconds(SocketClient.connectTimeoutSeconds)
@@ -207,7 +207,12 @@ extension Runner: SocketClientDelegateProtocol {
             if self.shouldLeaveDispatchGroupDuringDisconnect {
                 self.dispatchGroup.leave()
             }
-            exit(0)
+            #if SWIFT_PACKAGE
+                // Run from the shell, the exit status is how the caller learns that the lane failed
+                exit(LaneFile.onErrorCalled.isEmpty ? 0 : 1)
+            #else
+                exit(0)
+            #endif
         }
     }
 }
@@ -230,7 +235,7 @@ class Logger {
         case verbose
     }
 
-    public static var logMode: LogMode = .normal
+    static var logMode: LogMode = .normal
 
     func log(message: String) {
         let timestamp = NSDate().timeIntervalSince1970

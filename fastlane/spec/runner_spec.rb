@@ -70,8 +70,7 @@ describe Fastlane do
 
       context 'when a lane expects its parameters as keywords' do
         def keywords_error_message(error, *kwlist)
-          # Depending on Ruby versions, the keyword names appear with or without a `:` in error messages, hence the `:?` Regexp
-          list = kwlist.map { |kw| ":?#{kw}" }.join(', ')
+          list = kwlist.map { |kw| ":#{kw}" }.join(', ')
           /#{Regexp.escape(error)}: #{list}/
         end
 
