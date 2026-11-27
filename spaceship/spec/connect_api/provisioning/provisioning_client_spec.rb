@@ -143,6 +143,25 @@ settings: settings = [{ key: Spaceship::ConnectAPI::BundleIdCapability::Settings
           client.get_devices
         end
       end
+
+      context 'patch_device' do
+        let(:path) { "v1/devices/ABCD1234" }
+
+        it 'sends the team with an Apple ID session' do
+          allow(client).to receive(:web_session?).and_return(true)
+          body = { data: { attributes: { name: nil, status: "DISABLED", teamId: "XXXXXXXXXX" }, id: "ABCD1234", type: "devices" } }
+          expect(client).to receive(:patch).with(path, body)
+          client.patch_device(id: "ABCD1234", status: "DISABLED")
+        end
+
+        it 'does not look up the team with an API key' do
+          allow(client).to receive(:web_session?).and_return(false)
+          expect(client).not_to receive(:team_id)
+          body = { data: { attributes: { name: nil, status: "DISABLED" }, id: "ABCD1234", type: "devices" } }
+          expect(client).to receive(:patch).with(path, body)
+          client.patch_device(id: "ABCD1234", status: "DISABLED")
+        end
+      end
     end
 
     describe "profiles" do
