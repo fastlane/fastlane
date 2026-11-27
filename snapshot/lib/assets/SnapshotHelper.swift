@@ -34,18 +34,21 @@ func snapshot(_ name: String, waitForLoadingIndicator: Bool) {
 ///   - timeout: Amount of seconds to wait until the network loading indicator disappears. Pass `0` if you don't want to wait.
 ///   - screenshotProvider: The provider to screenshot. Otherwise `XCUIScreen.main` is screenshotted. This is useful when taking screenshots for macOS and you'd prefer to screenshot the window and not the screen.
 @MainActor
-func snapshot(_ name: String, timeWaitingForIdle timeout: TimeInterval = 20, screenshotProvider: XCUIScreenshotProviding = XCUIScreen.main) {
+func snapshot(_ name: String, timeWaitingForIdle timeout: TimeInterval = 20, screenshotProvider: XCUIScreenshotProviding? = nil) {
     Snapshot.snapshot(name, timeWaitingForIdle: timeout, screenshotProvider: screenshotProvider)
 }
 
 enum SnapshotError: Error, CustomDebugStringConvertible {
     case cannotFindSimulatorHomeDirectory
+    case cannotFindHomeDirectory
     case cannotRunOnPhysicalDevice
 
     var debugDescription: String {
         switch self {
         case .cannotFindSimulatorHomeDirectory:
             return "Couldn't find simulator home location. Please, check SIMULATOR_HOST_HOME env variable."
+        case .cannotFindHomeDirectory:
+            return "Couldn't find the user's home directory."
         case .cannotRunOnPhysicalDevice:
             return "Can't use Snapshot on a physical device."
         }
@@ -143,7 +146,7 @@ open class Snapshot: NSObject {
         }
     }
 
-    open class func snapshot(_ name: String, timeWaitingForIdle timeout: TimeInterval = 20, screenshotProvider: XCUIScreenshotProviding = XCUIScreen.main) {
+    open class func snapshot(_ name: String, timeWaitingForIdle timeout: TimeInterval = 20, screenshotProvider: XCUIScreenshotProviding? = nil) {
         if timeout > 0 {
             waitForLoadingIndicatorToDisappear(within: timeout)
         }
@@ -159,20 +162,17 @@ open class Snapshot: NSObject {
             return
         }
 
-        let screenshot = screenshotProvider.screenshot()
+        let screenshot = (screenshotProvider ?? XCUIScreen.main).screenshot()
         
         #if os(OSX)
         
-        let image = screenshot.pngRepresentation
-        guard let screenshotsDir = screenshotsDirectory else { return }
-        let path = screenshotsDir.appendingPathComponent("MacBook-\(name).png", isDirectory: false)
-        
-        do {
-            try FileManager.default.createDirectory(at: screenshotsDir, withIntermediateDirectories: true, attributes: nil)
-            try image.write(to: path, options: .atomic)
-        } catch let error {
-            NSLog("Problem writing screenshot: \(name) to \(path)")
-            NSLog(error.localizedDescription)
+        // The UI test runner is sandboxed and can't write where snapshot reads, so attach the
+        // screenshot to the test results: snapshot exports it from the result bundle
+        let attachment = XCTAttachment(screenshot: screenshot)
+        attachment.name = "MacBook-\(name)"
+        attachment.lifetime = .keepAlways
+        XCTContext.runActivity(named: "snapshot: \(name)") { activity in
+            activity.add(attachment)
         }
         
         #else
@@ -243,7 +243,12 @@ open class Snapshot: NSObject {
         // on OSX config is stored in /Users/<username>/Library
         // and on iOS/tvOS/WatchOS it's in simulator's home dir
         #if os(OSX)
-            let homeDir = URL(fileURLWithPath: NSHomeDirectory())
+            // NSHomeDirectory() is the sandboxed runner's container; snapshot writes the language and
+            // launch arguments to the user's home, which the runner may read
+            guard let passwd = getpwuid(getuid()), let home = passwd.pointee.pw_dir else {
+                throw SnapshotError.cannotFindHomeDirectory
+            }
+            let homeDir = URL(fileURLWithPath: String(cString: home))
             return homeDir.appendingPathComponent(cachePath)
         #elseif arch(i386) || arch(x86_64) || arch(arm64)
             guard let simulatorHostHome = ProcessInfo().environment["SIMULATOR_HOST_HOME"] else {
@@ -321,4 +326,4 @@ private extension CGFloat {
 
 // Please don't remove the lines below
 // They are used to detect outdated configuration files
-// SnapshotHelperVersion [1.30]
+// SnapshotHelperVersion [1.31]
