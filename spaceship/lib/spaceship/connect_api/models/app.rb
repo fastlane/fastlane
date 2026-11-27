@@ -231,15 +231,24 @@ module Spaceship
         end
       end
 
-      def get_latest_app_store_version(client: nil, platform: nil, includes: nil)
+      # This will return the latest version that is available on the App Store.
+      # By default, it will only fetch the latest version (limit: 1), which is much faster than fetching all versions,
+      # relying on the App Store Connect API returning the versions sorted by most recent first.
+      # If Apple changes the way they sort versions, this might not return the latest version. As a safeguard,
+      # you can set the SPACESHIP_FETCH_ALL_APP_STORE_VERSIONS environment variable (or pass limit: nil) to
+      # eagerly fetch all versions, sort them, and then return the latest one.
+      # Unfortunately, there's no way to sort by version number on the server side, so when fetching all versions
+      # the sorting has to be done on the client side.
+      def get_latest_app_store_version(client: nil, platform: nil, includes: nil, limit: 1)
         client ||= Spaceship::ConnectAPI
         platform ||= Spaceship::ConnectAPI::Platform::IOS
+        limit = nil if ENV["SPACESHIP_FETCH_ALL_APP_STORE_VERSIONS"]
         filter = {
           platform: platform
         }
 
         # Get the latest version
-        return get_app_store_versions(client: client, filter: filter, includes: includes)
+        return get_app_store_versions(client: client, filter: filter, includes: includes, limit: limit)
                .sort_by { |v| Date.parse(v.created_date) }
                .last
       end
@@ -301,14 +310,14 @@ module Spaceship
         return get_app_store_versions(client: client, filter: filter, includes: includes).first
       end
 
-      def get_app_store_versions(client: nil, filter: {}, includes: Spaceship::ConnectAPI::AppStoreVersion::ESSENTIAL_INCLUDES, limit: nil, sort: nil)
+      def get_app_store_versions(client: nil, filter: {}, includes: Spaceship::ConnectAPI::AppStoreVersion::ESSENTIAL_INCLUDES, limit: nil)
+        # This API doesn't support "sort" (as of App Store Connect OpenAPI spec v2.4.0)
         client ||= Spaceship::ConnectAPI
+        resp = client.get_app_store_versions(app_id: id, filter: filter, includes: includes, limit: limit)
         if limit.nil?
-          resps = client.get_app_store_versions(app_id: id, filter: filter, includes: includes, limit: limit, sort: sort).all_pages
-          return resps.flat_map(&:to_models)
+          resp.all_pages.flat_map(&:to_models)
         else
-          resp = client.get_app_store_versions(app_id: id, filter: filter, includes: includes, limit: limit, sort: sort)
-          return resp.to_models
+          resp.to_models
         end
       end
 
@@ -365,8 +374,12 @@ module Spaceship
         filter ||= {}
         filter[:app] = id
 
-        resps = client.get_builds(filter: filter, includes: includes, limit: limit, sort: sort).all_pages
-        return resps.flat_map(&:to_models)
+        resp = client.get_builds(filter: filter, includes: includes, limit: limit, sort: sort)
+        if limit.nil?
+          resp.all_pages.flat_map(&:to_models)
+        else
+          resp.to_models
+        end
       end
 
       def get_build_deliveries(client: nil, filter: {}, includes: nil, limit: nil, sort: nil)
