@@ -86,7 +86,6 @@ Download existing metadata from App Store Connect and overwrite local metadata w
 
 ```no-highlight
 fastlane deliver download_metadata --force
-
 ```
 
 To get a list of available options run
@@ -107,21 +106,6 @@ deliver(
   force: true,
   metadata_path: "./metadata"
 )
-```
-
-Use download_metadata together with `app_store_connect_api_key`. Note: You must use `--force` option as this will be non-interactive terminal:
-
-```ruby
-app_identifier = "your.app"
-api_key = app_store_connect_api_key(
-  key_id: ENV["ASC_KEY_ID"],
-  issuer_id: ENV["ASC_ISSUER_ID"],
-  key_content: ENV["ASC_KEY_P8"],
-  is_key_content_base64: true,
-  in_house: false # detecting this via ASC private key not currently supported
-)
-  
-sh "bundle exec fastlane deliver download_metadata --force --api_key '#{api_key.to_json}' --app_identifier #{app_identifier}"
 ```
 
 ## More options
