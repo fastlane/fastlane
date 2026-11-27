@@ -1,12 +1,6 @@
 require 'shellwords'
 
 describe FastlaneCore do
-  # These examples read build settings. The suite only unsets option variables, so the global
-  # lookup switch would still refuse them if the developer exported it
-  around do |example|
-    FastlaneSpec::Env.with_env_values("FASTLANE_DISALLOW_XCODEBUILD_SETTINGS_LOOKUP" => nil) { example.run }
-  end
-
   describe FastlaneCore::Project do
     describe 'project and workspace detection' do
       def within_a_temp_dir

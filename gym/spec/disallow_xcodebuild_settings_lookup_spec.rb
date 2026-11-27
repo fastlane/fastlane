@@ -1,8 +1,7 @@
 describe Gym do
-  # The suite unsets what gym's options read. gym reads these two outside its options,
-  # so the developer's environment can't change the outcome through them either
+  # The suite doesn't unset this one: gym reads it outside its options
   around do |example|
-    FastlaneSpec::Env.with_env_values("FASTLANE_DISALLOW_XCODEBUILD_SETTINGS_LOOKUP" => nil, "GYM_USE_GENERIC_ARCHIVE_FIX" => nil) { example.run }
+    FastlaneSpec::Env.with_env_values("GYM_USE_GENERIC_ARCHIVE_FIX" => nil) { example.run }
   end
 
   # A project double with nothing stubbed fails the example if it is asked anything,

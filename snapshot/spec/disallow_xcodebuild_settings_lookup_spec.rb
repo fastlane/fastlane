@@ -1,10 +1,4 @@
 describe Snapshot do
-  # The suite unsets what snapshot's options read. The global lookup switch isn't one of them,
-  # so the developer's environment can't change the outcome through it either
-  around do |example|
-    FastlaneSpec::Env.with_env_values("FASTLANE_DISALLOW_XCODEBUILD_SETTINGS_LOOKUP" => nil) { example.run }
-  end
-
   let(:options) do
     {
       project: "./snapshot/example/Example.xcodeproj",

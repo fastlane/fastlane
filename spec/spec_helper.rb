@@ -134,6 +134,8 @@ actions = Fastlane::Actions.constants.map { |name| Fastlane::Actions.const_get(n
 options = actions.select { |action| action.kind_of?(Class) && action < Fastlane::Action }.flat_map { |action| action.available_options || [] }
 OPTION_ENV_NAMES = options.grep(FastlaneCore::ConfigItem).flat_map(&:env_names).reject(&:empty?).uniq.freeze
 OPTION_ENV_NAMES.each { |name| ENV.delete(name) }
+# No option reads this one, but exported it would refuse every build settings read the specs make
+ENV.delete("FASTLANE_DISALLOW_XCODEBUILD_SETTINGS_LOOKUP")
 
 my_main = self
 # `security` subcommands that change the developer's keychains, which a spec must never run for real. See fastlane#30186.

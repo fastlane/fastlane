@@ -1,10 +1,4 @@
 describe Scan do
-  # These examples read build settings. The suite only unsets option variables, so the global
-  # lookup switch would still refuse them if the developer exported it
-  around do |example|
-    FastlaneSpec::Env.with_env_values("FASTLANE_DISALLOW_XCODEBUILD_SETTINGS_LOOKUP" => nil) { example.run }
-  end
-
   describe Scan::XCPrettyReporterOptionsGenerator, requires_xcodebuild: true do
     # Scan.config is module level and the singleton guard in spec_helper clears
     # it after every example, so the setup has to run per example rather than
