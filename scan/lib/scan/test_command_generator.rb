@@ -253,16 +253,14 @@ module Scan
 
     # The path to the result bundle
     def result_bundle_path(use_output_directory)
-      root_dir = use_output_directory ? Scan.config[:output_directory] : Dir.mktmpdir
+      # Absolute: xcodebuild runs from the package directory when package_path is set
+      root_dir = use_output_directory ? File.expand_path(Scan.config[:output_directory]) : Dir.mktmpdir
 
       path = File.join([root_dir, Scan.config[:scheme]].compact) + '.xcresult'
 
       Scan.cache[:result_bundle_path] = path
 
-      # The result bundle path will be in the package path directory if specified
-      delete_path = path
-      delete_path = File.join(Scan.config[:package_path], path) if Scan.config[:package_path].to_s != ""
-      FileUtils.remove_dir(delete_path) if File.directory?(delete_path)
+      FileUtils.remove_dir(path) if File.directory?(path)
 
       return path
     end
