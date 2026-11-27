@@ -6,10 +6,17 @@ module Precheck
       let(:rule) { CopyrightDateRule.new }
       let(:happy_item) { TextItemToCheck.new("Copyright taquitos, #{DateTime.now.year}", :copyright, "copyright") }
       let(:old_copyright_item) { TextItemToCheck.new("Copyright taquitos, 2016", :copyright, "copyright") }
+      let(:future_copyright_item) { TextItemToCheck.new("Copyright taquitos, #{DateTime.now.year + 1}", :copyright, "copyright") }
+      let(:missing_year_item) { TextItemToCheck.new("Copyright taquitos", :copyright, "copyright") }
       let(:empty_copyright_item) { TextItemToCheck.new(nil, :copyright, "copyright") }
 
       it "passes for current date" do
         result = rule.check_item(happy_item)
+        expect(result.status).to eq(VALIDATION_STATES[:passed])
+      end
+
+      it "passes for a past year" do
+        result = rule.check_item(old_copyright_item)
         expect(result.status).to eq(VALIDATION_STATES[:passed])
       end
 
@@ -19,8 +26,13 @@ module Precheck
         expect(result).to eq(nil)
       end
 
-      it "fails for old date" do
-        result = rule.check_item(old_copyright_item)
+      it "fails for a future year" do
+        result = rule.check_item(future_copyright_item)
+        expect(result.status).to eq(VALIDATION_STATES[:failed])
+      end
+
+      it "fails when no year is present" do
+        result = rule.check_item(missing_year_item)
         expect(result.status).to eq(VALIDATION_STATES[:failed])
       end
 

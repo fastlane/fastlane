@@ -60,6 +60,28 @@ describe Snapshot::ResetSimulators do
     end
   end
 
+  describe '#clear_everything!' do
+    it "deletes no simulator when simctl lists no runtimes" do
+      allow(FastlaneCore::Helper).to receive(:backticks).with(/xcrun simctl list runtimes/, anything).and_return("")
+      allow(Snapshot::ResetSimulators).to receive(:`).with("xcrun simctl list devicetypes").and_return("== Device Types ==\niPhone 15 (com.apple.CoreSimulator.SimDeviceType.iPhone-15)\n")
+      expect(FastlaneCore::Simulator).not_to receive(:delete_all)
+
+      expect do
+        Snapshot::ResetSimulators.clear_everything!(nil, true)
+      end.to raise_error(FastlaneCore::Interface::FastlaneError, /no simulator was deleted/)
+    end
+
+    it "deletes no simulator when simctl lists no device types" do
+      allow(FastlaneCore::Helper).to receive(:backticks).with(/xcrun simctl list runtimes/, anything).and_return(fixture_runtimes_xcode9)
+      allow(Snapshot::ResetSimulators).to receive(:`).with("xcrun simctl list devicetypes").and_return("")
+      expect(FastlaneCore::Simulator).not_to receive(:delete_all)
+
+      expect do
+        Snapshot::ResetSimulators.clear_everything!(nil, true)
+      end.to raise_error(FastlaneCore::Interface::FastlaneError, /no simulator was deleted/)
+    end
+  end
+
   describe '#device_line_usable?' do
     describe 'usable devices' do
       it "should find normal devices to be usable" do
