@@ -467,6 +467,23 @@ describe FastlaneCore do
       expect(FastlaneCore::DeviceManager.runtime_build_os_versions['21R355']).to eq('10.0')
     end
 
+    describe "#latest_simulator_version_for_device" do
+      before do
+        allow(FastlaneCore::DeviceManager).to receive(:simulators).and_return([
+                                                                                FastlaneCore::DeviceManager::Device.new(name: "iPhone 17", os_type: "iOS", os_version: "26.2", is_simulator: true),
+                                                                                FastlaneCore::DeviceManager::Device.new(name: "iPhone 17", os_type: "iOS", os_version: "26.10", is_simulator: true)
+                                                                              ])
+      end
+
+      it "returns the newest version of the device's simulators" do
+        expect(FastlaneCore::DeviceManager.latest_simulator_version_for_device("iPhone 17")).to eq("26.10")
+      end
+
+      it "returns nil for a device without a simulator" do
+        expect(FastlaneCore::DeviceManager.latest_simulator_version_for_device("Mac")).to be_nil
+      end
+    end
+
     describe FastlaneCore::DeviceManager::Device do
       it "slide to type gets disabled if iOS 13.0 or greater" do
         device = FastlaneCore::DeviceManager::Device.new(os_type: "iOS", os_version: "13.0", is_simulator: true)
