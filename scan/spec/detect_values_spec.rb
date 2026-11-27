@@ -451,5 +451,88 @@ describe Scan do
         expect(Scan.config[:skip_test_configurations]).to eq(["ConfigurationA", "ConfigurationB"])
       end
     end
+
+    describe "device selection from :destination" do
+      def make_sim(name, udid, os_version)
+        FastlaneCore::DeviceManager::Device.new(name: name, udid: udid, os_type: 'iOS', os_version: os_version, state: 'Shutdown', is_simulator: true)
+      end
+
+      let(:sim_old) { make_sim('iPhone 17', 'AAAAAAAA-0000-0000-0000-000000000000', '18.4') }
+      let(:sim_new) { make_sim('iPhone 17', 'BBBBBBBB-0000-0000-0000-000000000000', '26.1') }
+      let(:sim_other) { make_sim('iPhone 16 Pro', 'CCCCCCCC-0000-0000-0000-000000000000', '18.4') }
+
+      def detect_with(options)
+        Scan.config = FastlaneCore::Configuration.create(
+          Scan::Options.available_options,
+          { project: "./scan/examples/standard/app.xcodeproj", scheme: "app", deployment_target_version: "9.0" }.merge(options)
+        )
+        Scan.devices
+      end
+
+      before do
+        allow(FastlaneCore::DeviceManager).to receive(:simulators).and_return([sim_other, sim_old, sim_new])
+        allow(Scan::DetectValues).to receive(:default_os_version).and_return(Gem::Version.new('26.1'))
+      end
+
+      it "uses the simulator from destination alone", requires_xcodebuild: true do
+        devices = detect_with(destination: "platform=iOS Simulator,name=iPhone 17,OS=18.4")
+        expect(devices).to eq([sim_old])
+      end
+
+      it "uses the highest OS when destination has a name without OS", requires_xcodebuild: true do
+        devices = detect_with(destination: "platform=iOS Simulator,name=iPhone 17")
+        expect(devices).to eq([sim_new])
+      end
+
+      it "selects by UDID when destination has an id, even if the name exists on several runtimes", requires_xcodebuild: true do
+        devices = detect_with(destination: "platform=iOS Simulator,id=#{sim_old.udid}")
+        expect(devices).to eq([sim_old])
+      end
+
+      it "prefers id over name when both are present", requires_xcodebuild: true do
+        devices = detect_with(destination: "platform=iOS Simulator,name=iPhone 16 Pro,id=#{sim_old.udid}")
+        expect(devices).to eq([sim_old])
+      end
+
+      it "treats a non-numeric OS like no OS", requires_xcodebuild: true do
+        expect(FastlaneCore::UI).not_to(receive(:test_failure!))
+        devices = detect_with(destination: "platform=iOS Simulator,name=iPhone 17,OS=latest", ensure_devices_found: true)
+        expect(devices).to eq([sim_new])
+      end
+
+      it "ignores destinations that are not simulators", requires_xcodebuild: true do
+        devices = detect_with(destination: "platform=iOS,name=iPhone 17")
+        expect(devices).not_to include(sim_old)
+        expect(FastlaneCore::UI).not_to(receive(:important))
+      end
+
+      it "fails for an unknown id when ensure_devices_found is set", requires_xcodebuild: true do
+        expect(FastlaneCore::UI).to receive(:test_failure!).with(/UDID 'UNKNOWN'/).and_raise(FastlaneCore::Interface::FastlaneTestFailure.new("x"))
+        expect do
+          detect_with(destination: "platform=iOS Simulator,id=UNKNOWN", ensure_devices_found: true)
+        end.to raise_error(FastlaneCore::Interface::FastlaneTestFailure)
+      end
+
+      it "uses device alone", requires_xcodebuild: true do
+        devices = detect_with(device: "iPhone 16 Pro")
+        expect(devices).to eq([sim_other])
+      end
+
+      it "prefers device over destination and warns", requires_xcodebuild: true do
+        expect(FastlaneCore::UI).to receive(:important).with(/Both `device\(s\)` and `destination` provided/)
+        devices = detect_with(device: "iPhone 16 Pro", destination: "platform=iOS Simulator,name=iPhone 17,OS=18.4")
+        expect(devices).to eq([sim_other])
+      end
+
+      it "does not warn when both are provided but destination is not a simulator", requires_xcodebuild: true do
+        expect(FastlaneCore::UI).not_to(receive(:important))
+        detect_with(device: "iPhone 16 Pro", destination: "platform=macOS")
+      end
+
+      it "falls back to the default simulator when neither is provided", requires_xcodebuild: true do
+        devices = detect_with({})
+        expect(devices.count).to eq(1)
+      end
+    end
   end
 end
