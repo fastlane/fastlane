@@ -137,7 +137,7 @@ module Spaceship
       end
 
       if depth >= 3
-        raise Tunes::Error.new, "Unable to verify 2FA code after 3 attempts.  Exiting to avoid lockout."
+        raise TwoFactorCodeRejected, "Apple rejected 3 two-factor authentication codes for '#{self.user}'. Stopping before Apple locks the account."
       end
 
       # "verification code" has already be pushed to devices

@@ -174,6 +174,31 @@ describe Spaceship::Client do
           expect(WebMock).to have_not_requested(:post, 'https://idmsa.apple.com/appleauth/auth/verify/phone/securitycode')
           expect(WebMock).to have_requested(:post, 'https://idmsa.apple.com/appleauth/auth/verify/trusteddevice/securitycode').with(body: { securityCode: { code: "123" } })
         end
+
+        context 'when Apple rejects the codes' do
+          def reject_codes(count)
+            calls = 0
+            allow_any_instance_of(Spaceship::TunesClient).to receive(:handle_itc_response) do
+              calls += 1
+              raise Spaceship::Tunes::Error, "Incorrect verification code." if calls <= count
+            end
+          end
+
+          it 'stops after three codes' do
+            reject_codes(3)
+            expect(subject).to receive(:ask_for_2fa_code).exactly(3).times.and_return('123')
+
+            expect { subject.handle_two_factor(response) }.to raise_error(Spaceship::TwoFactorCodeRejected, /Apple rejected 3 two-factor authentication codes/)
+            expect(WebMock).to have_requested(:post, 'https://idmsa.apple.com/appleauth/auth/verify/trusteddevice/securitycode').times(3)
+          end
+
+          it 'accepts the third code' do
+            reject_codes(2)
+            expect(subject).to receive(:ask_for_2fa_code).exactly(3).times.and_return('123')
+
+            expect(subject.handle_two_factor(response)).to eq(true)
+          end
+        end
       end
 
       context 'with no trusted devices' do
