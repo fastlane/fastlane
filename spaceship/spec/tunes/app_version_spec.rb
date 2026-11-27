@@ -1,5 +1,5 @@
 describe Spaceship::AppVersion, all: true do
-  before { Spaceship::Tunes.login }
+  include_examples "common spaceship login"
 
   let(:client) { Spaceship::AppVersion.client }
   let(:app) { Spaceship::Application.all.find { |a| a.apple_id == "898536088" } }
@@ -76,14 +76,14 @@ describe Spaceship::AppVersion, all: true do
         })
       end
 
-      it "increquent_mild" do
+      it "infrequent_mild" do
         val = @v.raw_data['ratings']['nonBooleanDescriptors'].find do |a|
           a['name'].include?('CARTOON_FANTASY_VIOLENCE')
         end
         expect(val['level']).to eq("ITC.apps.ratings.level.INFREQUENT_MILD")
       end
 
-      it "increquent_mild" do
+      it "infrequent_mild" do
         val = @v.raw_data['ratings']['nonBooleanDescriptors'].find do |a|
           a['name'].include?('CARTOON_FANTASY_VIOLENCE')
         end
@@ -113,7 +113,7 @@ describe Spaceship::AppVersion, all: true do
     end
 
     describe "#candidate_builds" do
-      it "proplery fetches and parses all builds ready to be deployed" do
+      it "properly fetches and parses all builds ready to be deployed" do
         version = app.edit_version
         res = version.candidate_builds
         build = res.first
@@ -250,7 +250,12 @@ describe Spaceship::AppVersion, all: true do
         version.description = "Yes"
         raise "Should raise exception before"
       rescue NoMethodError => ex
-        expect(ex.to_s).to include("undefined method `description='")
+        expected_message = if Gem::Version.create('3.4.0') <= Gem::Version.create(RUBY_VERSION)
+                             "undefined method 'description='"
+                           else
+                             "undefined method `description='"
+                           end
+        expect(ex.to_s).to include(expected_message)
       end
     end
 
@@ -291,154 +296,6 @@ describe Spaceship::AppVersion, all: true do
         expect(version.watch_app_icon.asset_token).to eq(nil)
       end
     end
-
-    # describe "Modifying the app trailers", :trailers do
-    #   let(:ipad_trailer_path) { "path_to_trailer.mov" }
-    #   let(:ipad_trailer_preview_path) { "path_to_trailer_preview.jpg" }
-    #   let(:ipad_external_valid_trailer_preview_path) { "path_to_my_screenshot.jpg" }
-    #   let(:ipad_external_invalid_trailer_preview_path) { "path_to_my_invalid_screenshot.jpg.jpg" }
-    #   before do
-    #     allow(Spaceship::UploadFile).to receive(:from_path) do |path|
-    #       r = du_uploadtrailer_correct_mov if path == ipad_trailer_path
-    #       r = du_uploadtrailer_preview_correct_jpg if path == ipad_trailer_preview_path
-    #       r = du_uploadtrailer_preview_correct_jpg if path == ipad_external_valid_trailer_preview_path
-    #       r
-    #     end
-
-    #     allow(Spaceship::Utilities).to receive(:grab_video_preview) do |path|
-    #       r = ipad_trailer_preview_path if path == ipad_trailer_path
-    #       r
-    #     end
-
-    #     allow(Spaceship::Utilities).to receive(:portrait?) do |path|
-    #       r = true if path == ipad_trailer_preview_path
-    #       r = true if path == ipad_external_invalid_trailer_preview_path
-    #       r = true if path == ipad_external_valid_trailer_preview_path
-    #       r
-    #     end
-
-    #     allow(Spaceship::Utilities).to receive(:resolution) do |path|
-    #       r = [900, 1200] if path == ipad_trailer_path
-    #       r = [768, 1024] if path == ipad_trailer_preview_path
-    #       r = [700, 1000] if path == ipad_external_invalid_trailer_preview_path
-    #       r = [768, 1024] if path == ipad_external_valid_trailer_preview_path
-    #       r
-    #     end
-
-    #     json = JSON.parse(du_read_fixture_file("upload_trailer_response_success.json"))
-    #     allow(client.du_client).to receive(:upload_trailer).and_return(json)
-
-    #     json = JSON.parse(du_read_upload_trailer_preview_response_success)
-    #     allow(client.du_client).to receive(:upload_trailer_preview).and_return(json)
-    #   end
-
-    #   def trailers(device)
-    #     version.trailers["English"].select { |s| s.device_type == device }
-    #   end
-
-    #   def ipad_trailers
-    #     trailers("ipad")
-    #   end
-
-    #   it "cannot add a trailer to iphone35" do
-    #     expect do
-    #       version.upload_trailer!(ipad_trailer_path, "English", 'iphone35')
-    #     end.to raise_error "No app trailer supported for iphone35"
-    #   end
-
-    #   it "requires timestamp with a specific format" do
-    #     expect do
-    #       version.upload_trailer!(ipad_trailer_path, "English", 'ipad', "00:01.000")
-    #     end.to raise_error "Invalid timestamp 00:01.000"
-    #     expect do
-    #       version.upload_trailer!(ipad_trailer_path, "English", 'ipad', "01.000")
-    #     end.to raise_error "Invalid timestamp 01.000"
-    #   end
-
-    #   it "can add a new trailer" do
-    #     # remove existing
-    #     version.upload_trailer!(nil, "English", 'ipad')
-
-    #     count = ipad_trailers.count
-    #     expect(count).to eq(0)
-    #     version.upload_trailer!(ipad_trailer_path, "English", 'ipad')
-    #     count_after = ipad_trailers.count
-    #     expect(count_after).to eq(count + 1)
-    #     expect(count_after).to eq(count + 1)
-    #     trailer = ipad_trailers[0]
-    #     expect(trailer.video_asset_token).to eq("VideoSource40/v4/e3/48/1a/e3481a8f-ec25-e19f-5048-270d7acaf89a/pr_source.mov")
-    #     expect(trailer.picture_asset_token).to eq("Purple69/v4/5f/2b/81/5f2b814d-1083-5509-61fb-c0845f7a9374/pr_source.jpg")
-    #     expect(trailer.descriptionXML).to match(/FoghornLeghorn/)
-    #     expect(trailer.preview_frame_time_code).to eq("00:00:05:00")
-    #     expect(trailer.video_url).to eq(nil)
-    #     expect(trailer.preview_image_url).to eq(nil)
-    #     expect(trailer.full_sized_preview_image_url).to eq(nil)
-    #     expect(trailer.device_type).to eq("ipad")
-    #     expect(trailer.language).to eq("English")
-    #   end
-
-    #   it "can modify the preview of an existing trailer and automatically generates a new screenshot preview" do
-    #     json = JSON.parse(du_read_upload_trailer_preview_2_response_success)
-    #     allow(client.du_client).to receive(:upload_trailer_preview).and_return(json)
-
-    #     count = ipad_trailers.count
-    #     expect(count).to eq(1)
-    #     version.upload_trailer!(ipad_trailer_path, "English", 'ipad', "06.12")
-    #     count_after = ipad_trailers.count
-    #     expect(count_after).to eq(count)
-    #     trailer = ipad_trailers[0]
-
-    #     expect(trailer.video_asset_token).to eq(nil)
-    #     expect(trailer.picture_asset_token).to eq("Purple70/v4/5f/2b/81/5f2b814d-1083-5509-61fb-c0845f7a9374/pr_source.jpg")
-    #     expect(trailer.descriptionXML).to eq(nil)
-    #     expect(trailer.preview_frame_time_code).to eq("00:00:06:12")
-    #     expect(trailer.video_url).to eq("http://a1713.phobos.apple.com/us/r30/PurpleVideo7/v4/be/38/db/be38db8d-868a-d442-87dc-cb6d630f921e/P37134684_default.m3u8")
-    #     expect(trailer.preview_image_url).to eq("https://is1-ssl.mzstatic.com/image/thumb/PurpleVideo5/v4/b7/41/5e/b7415e96-5ad5-6cf5-9323-15122145e53f/Job21976428-61a9-456b-af46-26c1303ae607-91524171-PreviewImage_AppTrailer_quicktime-Time1438426738374.png/500x500bb-80.png")
-    #     expect(trailer.full_sized_preview_image_url).to eq("https://is1-ssl.mzstatic.com/image/thumb/PurpleVideo5/v4/b7/41/5e/b7415e96-5ad5-6cf5-9323-15122145e53f/Job21976428-61a9-456b-af46-26c1303ae607-91524171-PreviewImage_AppTrailer_quicktime-Time1438426738374.png/900x1200ss-80.png")
-    #     expect(trailer.device_type).to eq("ipad")
-    #     expect(trailer.language).to eq("English")
-    #   end
-
-    #   it "can add a new trailer given a valid externally provided preview screenshot" do
-    #     # remove existing
-    #     version.upload_trailer!(nil, "English", 'ipad')
-
-    #     expect do
-    #       version.upload_trailer!(ipad_trailer_path, "English", 'ipad', '12.34', ipad_external_invalid_trailer_preview_path)
-    #     end.to raise_error "Invalid portrait screenshot resolution for device ipad. Should be [768, 1024]"
-    #   end
-
-    #   it "can add a new trailer given a valid externally provided preview screenshot" do
-    #     # remove existing
-    #     version.upload_trailer!(nil, "English", 'ipad')
-
-    #     count = ipad_trailers.count
-    #     expect(count).to eq(0)
-    #     version.upload_trailer!(ipad_trailer_path, "English", 'ipad', '12.34', ipad_external_valid_trailer_preview_path)
-    #     count_after = ipad_trailers.count
-    #     expect(count_after).to eq(count + 1)
-    #     trailer = ipad_trailers[0]
-    #     expect(trailer.video_asset_token).to eq("VideoSource40/v4/e3/48/1a/e3481a8f-ec25-e19f-5048-270d7acaf89a/pr_source.mov")
-    #     expect(trailer.picture_asset_token).to eq("Purple69/v4/5f/2b/81/5f2b814d-1083-5509-61fb-c0845f7a9374/pr_source.jpg")
-    #     expect(trailer.descriptionXML).to match(/FoghornLeghorn/)
-    #     expect(trailer.preview_frame_time_code).to eq("00:00:12:34")
-    #     expect(trailer.video_url).to eq(nil)
-    #     expect(trailer.preview_image_url).to eq(nil)
-    #     expect(trailer.full_sized_preview_image_url).to eq(nil)
-    #     expect(trailer.device_type).to eq("ipad")
-    #     expect(trailer.language).to eq("English")
-    #   end
-
-    #   # IDEA: can we detect trailer source change ?
-
-    #   it "remove the video trailer" do
-    #     count = ipad_trailers.count
-    #     expect(count).to eq(1)
-    #     version.upload_trailer!(nil, "English", 'ipad')
-    #     count_after = ipad_trailers.count
-    #     expect(count_after).to eq(count - 1)
-    #   end
-    # end
 
     describe "Reading and modifying the geojson file", :du do
       before do
@@ -599,7 +456,7 @@ describe Spaceship::AppVersion, all: true do
         it "fails with error if the screenshot to remove doesn't exist" do
           expect do
             version.upload_screenshot!(nil, 5, "English", 'iphone4', false)
-          end.to raise_error("cannot remove screenshot with non existing sort_order")
+          end.to raise_error("cannot remove screenshot with nonexistent sort_order")
         end
       end
     end
@@ -709,7 +566,6 @@ describe Spaceship::AppVersion, all: true do
 
     describe "Rejecting" do
       it 'rejects' do
-        TunesStubbing.itc_stub_reject_version_success
         version.can_reject_version = true
         expect(client).to receive(:reject!).with('898536088', 812_106_519)
         version.reject!

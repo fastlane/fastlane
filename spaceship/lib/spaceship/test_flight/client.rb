@@ -8,7 +8,7 @@ module Spaceship
       #
       # This client is solely responsible for the making HTTP requests and
       # parsing their responses. Parameters should be either named parameters, or
-      # for large request data bodies, pass in anything that can resond to
+      # for large request data bodies, pass in anything that can respond to
       # `to_json`.
       #
       # Each request method should validate the required parameters. A required parameter is one that would result in 400-range response if it is not supplied.
@@ -286,28 +286,6 @@ module Spaceship
         handle_response(response)
       end
 
-      ##
-      # @!group AppTestInfo
-      ##
-
-      def get_app_test_info(app_id: nil)
-        assert_required_params(__method__, binding)
-
-        response = request(:get, "providers/#{team_id}/apps/#{app_id}/testInfo")
-        handle_response(response)
-      end
-
-      def put_app_test_info(app_id: nil, app_test_info: nil)
-        assert_required_params(__method__, binding)
-
-        response = request(:put) do |req|
-          req.url("providers/#{team_id}/apps/#{app_id}/testInfo")
-          req.body = app_test_info.to_json
-          req.headers['Content-Type'] = 'application/json'
-        end
-        handle_response(response)
-      end
-
       protected
 
       def handle_response(response)
@@ -345,11 +323,7 @@ module Spaceship
       end
 
       def local_variable_get(binding, name)
-        if binding.respond_to?(:local_variable_get)
-          binding.local_variable_get(name)
-        else
-          binding.eval(name.to_s)
-        end
+        binding.local_variable_get(name)
       end
 
       def provider_id

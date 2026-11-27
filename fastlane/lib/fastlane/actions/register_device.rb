@@ -4,7 +4,7 @@ module Fastlane
   module Actions
     class RegisterDeviceAction < Action
       def self.is_supported?(platform)
-        platform == :ios
+        [:ios, :mac].include?(platform)
       end
 
       def self.run(params)
@@ -58,7 +58,7 @@ module Fastlane
                                        optional: true,
                                        default_value: platform.empty? ? "ios" : platform,
                                        verify_block: proc do |value|
-                                         UI.user_error!("The platform can only be ios or mac") unless %('ios', 'mac').include?(value)
+                                         UI.user_error!("The platform can only be ios or mac") unless %w(ios mac).include?(value)
                                        end),
           FastlaneCore::ConfigItem.new(key: :udid,
                                        env_name: "FL_REGISTER_DEVICE_UDID",

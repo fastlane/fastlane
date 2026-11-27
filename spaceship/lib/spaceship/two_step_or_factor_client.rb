@@ -5,6 +5,11 @@ module Spaceship
   class Client
     def handle_two_step_or_factor(response)
       raise "2FA can only be performed in interactive mode" if ENV["SPACESHIP_ONLY_ALLOW_INTERACTIVE_2FA"] == "true" && ENV["FASTLANE_IS_INTERACTIVE"] == "false"
+      unless can_prompt_for_2fa?
+        raise TwoFactorInputUnavailable, "Apple asks for a two-factor authentication code for '#{self.user}', and fastlane cannot ask for it here (CI, or stdin is not a terminal). " \
+                                         "Use an App Store Connect API key, or a session from `fastlane spaceauth` in FASTLANE_SESSION: https://docs.fastlane.tools/getting-started/ios/authentication/. " \
+                                         "To pipe the code in, set FASTLANE_ALLOW_PIPED_INPUT, and SPACESHIP_2FA_SMS_DEFAULT_PHONE_NUMBER to choose the phone."
+      end
       # extract `x-apple-id-session-id` and `scnt` from response, to be used by `update_request_headers`
       @x_apple_id_session_id = response["x-apple-id-session-id"]
       @scnt = response["scnt"]
@@ -20,8 +25,19 @@ module Spaceship
       elsif r.body.kind_of?(Hash) && r.body["trustedPhoneNumbers"].kind_of?(Array) && r.body["trustedPhoneNumbers"].first.kind_of?(Hash)
         handle_two_factor(r)
       else
+        raise_two_factor_service_errors!(r.body)
         raise "Although response from Apple indicated activated Two-step Verification or Two-factor Authentication, spaceship didn't know how to handle this response: #{r.body}"
       end
+    end
+
+    # Apple answers without any way to verify, e.g. when it cannot send the SMS code (-28248). See fastlane#29443.
+    def raise_two_factor_service_errors!(body)
+      errors = body.kind_of?(Hash) ? Array(body["serviceErrors"]) : []
+      return if errors.empty?
+
+      message = errors.map { |error| "#{error['message']} (#{error['code']})" }.join(" ")
+      message += " This Apple ID has no trusted devices: signing in to it on an Apple device adds one." if body["noTrustedDevices"]
+      raise Tunes::Error.new, "Apple could not start two-factor authentication: #{message}"
     end
 
     def handle_two_step(response)
@@ -61,9 +77,17 @@ module Spaceship
 
       # Send token to server to get a valid session
       r = request(:post) do |req|
-        req.url("https://idmsa.apple.com/appleauth/auth/verify/device/#{device_id}/securitycode")
+        req.url("https://idmsa.apple.com/appleauth/auth/verify/phone/securitycode")
         req.headers['Content-Type'] = 'application/json'
-        req.body = { "code" => code.to_s }.to_json
+        req.body = {
+          "phoneNumber": {
+            "id": device_id
+          },
+          "securityCode": {
+            "code" => code.to_s
+          },
+          "mode": "sms"
+        }.to_json
         update_request_headers(req)
       end
 
@@ -227,6 +251,14 @@ module Spaceship
       (response.body["trustedPhoneNumbers"] || []).count == 1 && sms_fallback(response)
     end
 
+    # Without fastlane_core, spaceship asks as before
+    def can_prompt_for_2fa?
+      if Object.const_defined?("FastlaneCore") && FastlaneCore.const_defined?("Helper")
+        return FastlaneCore::Helper.can_prompt?
+      end
+      return true
+    end
+
     # extracted into its own method for testing
     def ask_for_2fa_code(text)
       ask(text)
@@ -260,7 +292,8 @@ If it is, please open an issue at https://github.com/fastlane/fastlane/issues/ne
     end
 
     def match_phone_to_masked_phone(phone_number, masked_number)
-      characters_to_remove_from_phone_numbers = ' \-()"'
+      # Apple's response sometimes contains NBSP instead of a plain space.
+      characters_to_remove_from_phone_numbers = "  \\-()\""
 
       # start with e.g. +49 162 1234585 or +1-123-456-7866
       phone_number = phone_number.tr(characters_to_remove_from_phone_numbers, '')

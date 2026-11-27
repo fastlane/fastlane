@@ -2,6 +2,14 @@ require 'open3'
 
 describe FastlaneCore do
   describe FastlaneCore::DeviceManager do
+    # runtime_build_os_versions memoises into a module level ivar, so an example
+    # that stubs the underlying command only sees its stub if nothing has already
+    # populated it. Clearing it per example rather than once per group, which is
+    # what the before(:all) below does for the simulator cache. See fastlane#30184.
+    before(:each) do
+      FastlaneCore::DeviceManager.instance_variable_set(:@runtime_build_os_versions, nil)
+    end
+
     before(:all) do
       @simctl_output = File.read('./fastlane_core/spec/fixtures/DeviceManagerSimctlOutputXcode7')
       @system_profiler_output = File.read('./fastlane_core/spec/fixtures/DeviceManagerSystem_profilerOutput')
@@ -12,26 +20,42 @@ describe FastlaneCore do
       FastlaneCore::Simulator.clear_cache
     end
 
-    it "raises an error if xcrun CLI prints garbage simulator" do
-      response = "response"
-      s = StringIO.new
-      s.puts(response)
-      expect(Open3).to receive(:popen3).with("xcrun simctl list devices").and_yield(nil, s, nil, nil)
-      allow(Open3).to receive(:popen3).with("xcrun simctl list runtimes").and_yield(nil, s, nil, nil)
+    it 'raises an error if broken xcrun simctl list devices' do
+      response = double('xcrun simctl list devices', read: 'garbage')
+      expect(Open3).to receive(:popen3).with("xcrun simctl list devices").and_yield(nil, response, nil, nil)
 
       expect do
         devices = FastlaneCore::Simulator.all
       end.to raise_error("xcrun simctl not working.")
     end
 
+    it 'raises an error if broken xcrun simctl list runtimes' do
+      status = double('status', "success?": true)
+      expect(Open3).to receive(:capture2).with("xcrun simctl list -j runtimes").and_return(['garbage', status])
+
+      expect do
+        FastlaneCore::DeviceManager.runtime_build_os_versions
+      end.to raise_error(FastlaneCore::Interface::FastlaneError)
+    end
+
+    it 'lists the same iOS simulators as the JSON output of the installed simctl', requires_xcodebuild: true do
+      # The version in the runtime's name, as in the text headers: iOS-27-2-iPhone19-4 is "iOS 27.2", iOS-26-4 is "iOS 26.4" at version 26.4.1
+      versions = JSON.parse(`xcrun simctl list -j runtimes`)['runtimes'].to_h { |runtime| [runtime['identifier'], runtime['name'].split[1]] }
+      listed = JSON.parse(`xcrun simctl list -j devices`)['devices'].flat_map do |runtime, devices|
+        next [] unless runtime.split('.').last.start_with?('iOS-')
+        devices.select { |device| device['isAvailable'] }.map { |device| [device['udid'], device['name'], versions[runtime]] }
+      end
+
+      parsed = FastlaneCore::DeviceManager.simulators('iOS').map { |device| [device.udid, device.name, device.os_version] }
+      expect(parsed).not_to be_empty
+      expect(parsed).to match_array(listed)
+    end
+
     describe "properly parses the simctl output and generates Device objects for iOS simulator" do
       it "Xcode 7" do
-        response = "response"
+        response = +"response"
         expect(response).to receive(:read).and_return(@simctl_output)
         expect(Open3).to receive(:popen3).with("xcrun simctl list devices").and_yield(nil, response, nil, nil)
-        thing = {}
-        expect(thing).to receive(:read).and_return("line\n")
-        allow(Open3).to receive(:popen3).with("xcrun simctl list runtimes").and_yield(nil, thing, nil, nil)
 
         devices = FastlaneCore::Simulator.all
         expect(devices.count).to eq(6)
@@ -75,13 +99,10 @@ describe FastlaneCore do
       end
 
       it "Xcode 8" do
-        response = "response"
+        response = +"response"
         simctl_output = File.read('./fastlane_core/spec/fixtures/DeviceManagerSimctlOutputXcode8')
         expect(response).to receive(:read).and_return(simctl_output)
         expect(Open3).to receive(:popen3).with("xcrun simctl list devices").and_yield(nil, response, nil, nil)
-        thing = {}
-        expect(thing).to receive(:read).and_return("line\n")
-        allow(Open3).to receive(:popen3).with("xcrun simctl list runtimes").and_yield(nil, thing, nil, nil)
 
         devices = FastlaneCore::Simulator.all
         expect(devices.count).to eq(12)
@@ -107,13 +128,10 @@ describe FastlaneCore do
       end
 
       it 'Xcode 9' do
-        response = "response"
+        response = +"response"
         simctl_output = File.read('./fastlane_core/spec/fixtures/DeviceManagerSimctlOutputXcode9')
         expect(response).to receive(:read).and_return(simctl_output)
         expect(Open3).to receive(:popen3).with("xcrun simctl list devices").and_yield(nil, response, nil, nil)
-        thing = {}
-        expect(thing).to receive(:read).and_return("line\n")
-        allow(Open3).to receive(:popen3).with("xcrun simctl list runtimes").and_yield(nil, thing, nil, nil)
 
         devices = FastlaneCore::Simulator.all
         expect(devices.count).to eq(15)
@@ -139,13 +157,10 @@ describe FastlaneCore do
       end
 
       it 'Xcode 11' do
-        response = "response"
+        response = +"response"
         simctl_output = File.read('./fastlane_core/spec/fixtures/DeviceManagerSimctlOutputXcode11')
         expect(response).to receive(:read).and_return(simctl_output)
         expect(Open3).to receive(:popen3).with("xcrun simctl list devices").and_yield(nil, response, nil, nil)
-        thing = {}
-        expect(thing).to receive(:read).and_return("line\n")
-        allow(Open3).to receive(:popen3).with("xcrun simctl list runtimes").and_yield(nil, thing, nil, nil)
 
         devices = FastlaneCore::Simulator.all
         expect(devices.count).to eq(29)
@@ -172,12 +187,9 @@ describe FastlaneCore do
     end
 
     it "properly parses the simctl output and generates Device objects for tvOS simulator" do
-      response = "response"
+      response = +"response"
       expect(response).to receive(:read).and_return(@simctl_output)
       expect(Open3).to receive(:popen3).with("xcrun simctl list devices").and_yield(nil, response, nil, nil)
-      thing = {}
-      expect(thing).to receive(:read).and_return("line\n")
-      allow(Open3).to receive(:popen3).with("xcrun simctl list runtimes").and_yield(nil, thing, nil, nil)
 
       devices = FastlaneCore::SimulatorTV.all
       expect(devices.count).to eq(1)
@@ -191,12 +203,9 @@ describe FastlaneCore do
     end
 
     it "properly parses the simctl output and generates Device objects for watchOS simulator" do
-      response = "response"
+      response = +"response"
       expect(response).to receive(:read).and_return(@simctl_output)
       expect(Open3).to receive(:popen3).with("xcrun simctl list devices").and_yield(nil, response, nil, nil)
-      thing = {}
-      expect(thing).to receive(:read).and_return("line\n")
-      allow(Open3).to receive(:popen3).with("xcrun simctl list runtimes").and_yield(nil, thing, nil, nil)
 
       devices = FastlaneCore::SimulatorWatch.all
       expect(devices.count).to eq(2)
@@ -216,12 +225,9 @@ describe FastlaneCore do
     end
 
     it "properly parses the simctl output and generates Device objects for all simulators" do
-      response = "response"
+      response = +"response"
       expect(response).to receive(:read).and_return(@simctl_output)
       expect(Open3).to receive(:popen3).with("xcrun simctl list devices").and_yield(nil, response, nil, nil)
-      thing = {}
-      expect(thing).to receive(:read).and_return("line\n")
-      allow(Open3).to receive(:popen3).with("xcrun simctl list runtimes").and_yield(nil, thing, nil, nil)
 
       devices = FastlaneCore::DeviceManager.simulators
       expect(devices.count).to eq(9)
@@ -271,13 +277,10 @@ describe FastlaneCore do
     end
 
     it "properly parses the simctl output with unavailable devices and generates Device objects for all simulators" do
-      response = "response"
+      response = +"response"
       simctl_output = File.read('./fastlane_core/spec/fixtures/DeviceManagerSimctlOutputXcode10BootedUnavailable')
       expect(response).to receive(:read).and_return(simctl_output)
       expect(Open3).to receive(:popen3).with("xcrun simctl list devices").and_yield(nil, response, nil, nil)
-      thing = {}
-      expect(thing).to receive(:read).and_return("line\n")
-      allow(Open3).to receive(:popen3).with("xcrun simctl list runtimes").and_yield(nil, thing, nil, nil)
 
       devices = FastlaneCore::DeviceManager.simulators
       expect(devices.count).to eq(3)
@@ -303,7 +306,7 @@ describe FastlaneCore do
     end
 
     it "properly parses system_profiler and instruments output and generates Device objects for iOS" do
-      response = "response"
+      response = +"response"
       expect(response).to receive(:read).and_return(@system_profiler_output)
       expect(Open3).to receive(:popen3).with("system_profiler SPUSBDataType -xml").and_yield(nil, response, nil, nil)
 
@@ -329,7 +332,7 @@ describe FastlaneCore do
     end
 
     it "properly parses system_profiler output with entries that don't contain _items" do
-      response = "response"
+      response = +"response"
       expect(response).to receive(:read).and_return(@system_profiler_output_items_without_items)
       expect(Open3).to receive(:popen3).with("system_profiler SPUSBDataType -xml").and_yield(nil, response, nil, nil)
 
@@ -338,7 +341,7 @@ describe FastlaneCore do
     end
 
     it "properly finds devices in system_profiler output when connected via USB hubs" do
-      response = "response"
+      response = +"response"
       expect(response).to receive(:read).and_return(@system_profiler_output_usb_hub)
       expect(Open3).to receive(:popen3).with("system_profiler SPUSBDataType -xml").and_yield(nil, response, nil, nil)
 
@@ -356,7 +359,7 @@ describe FastlaneCore do
     end
 
     it "properly parses system_profiler and instruments output and generates Device objects for tvOS" do
-      response = "response"
+      response = +"response"
       expect(response).to receive(:read).and_return(@system_profiler_output)
       expect(Open3).to receive(:popen3).with("system_profiler SPUSBDataType -xml").and_yield(nil, response, nil, nil)
 
@@ -375,7 +378,7 @@ describe FastlaneCore do
     end
 
     it "properly parses output for all iOS devices" do
-      response = "response"
+      response = +"response"
       expect(response).to receive(:read).and_return(@system_profiler_output)
       expect(Open3).to receive(:popen3).with("system_profiler SPUSBDataType -xml").and_yield(nil, response, nil, nil)
 
@@ -384,9 +387,6 @@ describe FastlaneCore do
 
       expect(response).to receive(:read).and_return(@simctl_output)
       expect(Open3).to receive(:popen3).with("xcrun simctl list devices").and_yield(nil, response, nil, nil)
-      thing = {}
-      expect(thing).to receive(:read).and_return("line\n")
-      allow(Open3).to receive(:popen3).with("xcrun simctl list runtimes").and_yield(nil, thing, nil, nil)
 
       devices = FastlaneCore::DeviceManager.all('iOS')
       expect(devices.count).to eq(8)
@@ -430,7 +430,7 @@ describe FastlaneCore do
     end
 
     it "properly parses output for all tvOS devices" do
-      response = "response"
+      response = +"response"
       expect(response).to receive(:read).and_return(@system_profiler_output)
       expect(Open3).to receive(:popen3).with("system_profiler SPUSBDataType -xml").and_yield(nil, response, nil, nil)
 
@@ -439,9 +439,6 @@ describe FastlaneCore do
 
       expect(response).to receive(:read).and_return(@simctl_output)
       expect(Open3).to receive(:popen3).with("xcrun simctl list devices").and_yield(nil, response, nil, nil)
-      thing = {}
-      expect(thing).to receive(:read).and_return("line\n")
-      allow(Open3).to receive(:popen3).with("xcrun simctl list runtimes").and_yield(nil, thing, nil, nil)
 
       devices = FastlaneCore::DeviceManager.all('tvOS')
       expect(devices.count).to eq(2)
@@ -460,23 +457,14 @@ describe FastlaneCore do
       )
     end
 
-    it "parses runtime information properly to get the exact version information" do
-      response = "response"
-      expect(response).to receive(:read).and_return(@simctl_output)
-      expect(Open3).to receive(:popen3).with("xcrun simctl list devices").and_yield(nil, response, nil, nil)
-      thing = {}
-      expect(thing).to receive(:read).and_return("== Runtimes ==\ntvOS 9.0 (9.0.1 - 13A345) - com.apple.CoreSimulator.SimRuntime.tvOS-9-0\n")
-      allow(Open3).to receive(:popen3).with("xcrun simctl list runtimes").and_yield(nil, thing, nil, nil)
+    it 'properly parses `xcrun simctl list runtimes` to associate runtime builds with their exact OS version' do
+      status = double('status', "success?": true)
+      runtime_output = File.read('./fastlane_core/spec/fixtures/XcrunSimctlListRuntimesOutput')
+      expect(Open3).to receive(:capture2).with("xcrun simctl list -j runtimes").and_return([runtime_output, status])
 
-      devices = FastlaneCore::SimulatorTV.all
-      expect(devices.count).to eq(1)
-
-      expect(devices[0]).to have_attributes(
-        name: "Apple TV 1080p", os_type: "tvOS", os_version: "9.0.1",
-        udid: "D239A51B-A61C-4B60-B4D6-B7EC16595128",
-        state: "Shutdown",
-        is_simulator: true
-      )
+      expect(FastlaneCore::DeviceManager.runtime_build_os_versions['21A328']).to eq('17.0')
+      expect(FastlaneCore::DeviceManager.runtime_build_os_versions['21A342']).to eq('17.0.1')
+      expect(FastlaneCore::DeviceManager.runtime_build_os_versions['21R355']).to eq('10.0')
     end
 
     describe FastlaneCore::DeviceManager::Device do
@@ -487,6 +475,22 @@ describe FastlaneCore do
         expect(FastlaneCore::Helper).to receive(:backticks).times.once
 
         device.disable_slide_to_type
+      end
+
+      it "passes the preferences plist as one argument when the home directory contains a space" do
+        device = FastlaneCore::DeviceManager::Device.new(udid: "3E67398C-AF70-4D77-A22C-D43AA8623FE3", os_type: "iOS", os_version: "13.0", is_simulator: true)
+        allow(UI).to receive(:message)
+
+        # Absolute on every platform: on Windows "/Users/Jane Doe" has no drive and Ruby refuses it as a home
+        FastlaneSpec::Env.with_env_values('HOME' => File.join(Dir.tmpdir, 'Jane Doe')) do
+          plist_path = File.expand_path("~/Library/Developer/CoreSimulator/Devices/3E67398C-AF70-4D77-A22C-D43AA8623FE3/data/Library/Preferences/com.apple.keyboard.ContinuousPath.plist")
+          expect(plist_path).to include("Jane Doe")
+          expect(FastlaneCore::Helper).to receive(:backticks) do |command|
+            expect(Shellwords.split(command)).to eq(["/usr/libexec/PlistBuddy", "-c", "Add :KeyboardContinuousPathEnabled bool false", plist_path, ">/dev/null", "2>&1"])
+          end
+
+          device.disable_slide_to_type
+        end
       end
 
       it "bypass slide to type disabling if less than iOS 13.0" do
@@ -511,6 +515,45 @@ describe FastlaneCore do
         expect(FastlaneCore::Helper).to_not(receive(:backticks))
 
         device.disable_slide_to_type
+      end
+
+      it "boots the simulator" do
+        device = FastlaneCore::DeviceManager::Device.new(udid: "1234", os_type: "iOS", os_version: "13.0", is_simulator: true, state: nil)
+        status = double('status', "success?": true)
+        expect(Open3).to receive(:capture2e).with("xcrun simctl bootstatus 1234 -b").and_return(["Finished", status])
+
+        device.boot
+
+        expect(device.state).to eq('Booted')
+      end
+
+      it "warns when the simulator fails to boot" do
+        device = FastlaneCore::DeviceManager::Device.new(name: "iPhone 17", udid: "1234", os_type: "iOS", os_version: "13.0", is_simulator: true, state: "Shutdown")
+        status = double('status', "success?": false)
+        expect(Open3).to receive(:capture2e).with("xcrun simctl bootstatus 1234 -b").and_return(["Invalid device: 1234\n", status])
+
+        expect(UI).to receive(:important).with("Unable to boot iPhone 17: Invalid device: 1234")
+
+        device.boot
+      end
+
+      it "boots a tvOS simulator" do
+        device = FastlaneCore::DeviceManager::Device.new(name: "Apple TV", udid: "1234", os_type: "tvOS", os_version: "26.5", is_simulator: true, state: "Shutdown")
+        status = double('status', "success?": true)
+        expect(Open3).to receive(:capture2e).with("xcrun simctl bootstatus 1234 -b").and_return(["Finished", status])
+
+        device.boot
+
+        expect(device.state).to eq('Booted')
+      end
+
+      it "shuts down a tvOS simulator" do
+        device = FastlaneCore::DeviceManager::Device.new(name: "Apple TV", udid: "1234", os_type: "tvOS", os_version: "26.5", is_simulator: true, state: "Booted")
+        expect(device).to receive(:`).with("xcrun simctl shutdown 1234 2>/dev/null")
+
+        device.shutdown
+
+        expect(device.state).to eq('Shutdown')
       end
     end
   end

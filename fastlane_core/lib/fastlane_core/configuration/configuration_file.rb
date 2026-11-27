@@ -33,13 +33,8 @@ module FastlaneCore
       @block_for_missing = block_for_missing
       content = File.read(path, encoding: "utf-8")
 
-      # From https://github.com/orta/danger/blob/master/lib/danger/Dangerfile.rb
-      if content.tr!('“”‘’‛', %(""'''))
-        UI.error("Your #{File.basename(path)} has had smart quotes sanitised. " \
-                  'To avoid issues in the future, you should not use ' \
-                  'TextEdit for editing it. If you are not using TextEdit, ' \
-                  'you should turn off smart quotes in your editor of choice.')
-      end
+      warning = FastlaneCore::SmartQuotes.sanitize!(content, path)
+      UI.error(warning) if warning
 
       begin
         # rubocop:disable Security/Eval
@@ -48,7 +43,7 @@ module FastlaneCore
 
         print_resulting_config_values unless skip_printing_values # only on success
       rescue SyntaxError => ex
-        line = ex.to_s.match(/\(eval\):(\d+)/)[1]
+        line = ex.to_s.match(/\(eval.*\):(\d+)/)[1]
         UI.error("Error in your #{File.basename(path)} at line #{line}")
         UI.content_error(content, line)
         UI.user_error!("Syntax error in your configuration file '#{path}' on line #{line}: #{ex}")
@@ -113,7 +108,7 @@ module FastlaneCore
 
         # to support frozen strings (e.g. ENV variables) too
         # we have to dupe the value
-        # in < Ruby 2.4.0 `.dup` is not support by boolean values
+        # some objects, such as singleton classes, cannot be duped,
         # and there is no good way to check if a class actually
         # responds to `dup`, so we have to rescue the exception
         begin

@@ -5,6 +5,16 @@ describe Fastlane do
         allow(FastlaneCore::FastlaneFolder).to receive(:path).and_return(nil)
       end
 
+      # The action globs **/build/outputs from the project dir: run in an empty project, not the repository
+      around do |example|
+        Dir.mktmpdir do |dir|
+          Dir.chdir(dir) do
+            FileUtils.touch("README.md")
+            example.run
+          end
+        end
+      end
+
       describe "output controls" do
         let(:expected_command) { "#{File.expand_path('README.md').shellescape} tasks -p ." }
 

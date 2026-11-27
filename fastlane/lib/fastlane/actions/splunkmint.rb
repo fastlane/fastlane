@@ -11,7 +11,7 @@ module Fastlane
         command << upload_progress(params)
 
         # Fastlane::Actions.sh has buffering issues, no progress bar is shown in real time
-        # will reanable it when it is fixed
+        # will reenable it when it is fixed
         # result = Fastlane::Actions.sh(command.join(' '), log: false)
         shell_command = command.join(' ')
         result = Helper.test? ? shell_command : `#{shell_command}`
@@ -149,7 +149,14 @@ module Fastlane
       end
 
       def self.category
-        :beta
+        :deprecated
+      end
+
+      def self.deprecated_notes
+        [
+          "Splunk MINT reached End of Life in December 2021 for all MINT products, including the SDK and its Web Service.",
+          "See [Splunk MINT SDK for iOS (EOL)](https://docs.splunk.com/Documentation/MintIOSSDK/latest/DevGuide/APIReference)."
+        ].join("\n")
       end
     end
   end

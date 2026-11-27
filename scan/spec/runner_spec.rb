@@ -2,6 +2,11 @@ require 'scan'
 
 describe Scan do
   describe Scan::Runner do
+    before(:each) do
+      fake_out_simulator_detection
+      fake_out_build_settings(SCAN_BUILD_SETTINGS)
+    end
+
     describe "handle_results" do
       before(:each) do
         mock_slack_poster = Object.new
@@ -62,6 +67,22 @@ describe Scan do
           Scan.cache[:result_bundle_path] = '/tmp/scan_results/test.xcresults'
 
           expect(FastlaneCore::Simulator).to receive(:copy_logs)
+          @scan.handle_results(0)
+        end
+      end
+
+      describe "with scan option :force_legacy_xcresulttool set to true" do
+        it "forwards force_legacy_xcresulttool to trainer", requires_xcodebuild: true do
+          Scan.config = FastlaneCore::Configuration.create(Scan::Options.available_options, {
+            output_directory: '/tmp/scan_results',
+            project: './scan/examples/standard/app.xcodeproj',
+            force_legacy_xcresulttool: true
+          })
+
+          # This is a needed side effect from running TestCommandGenerator which is not done in this test
+          Scan.cache[:result_bundle_path] = '/tmp/scan_results/test.xcresults'
+
+          expect(Trainer::TestParser).to receive(:auto_convert).with(hash_including(force_legacy_xcresulttool: true)).and_return({})
           @scan.handle_results(0)
         end
       end
@@ -157,54 +178,51 @@ describe Scan do
           end.to raise_error(FastlaneCore::Interface::FastlaneTestFailure, "Test execution failed. Exit status: 1")
         end
       end
-    end
 
-    describe "retry_execute" do
-      before(:each) do
-        @scan = Scan::Runner.new
-      end
+      describe "when :build_for_testing is true" do
+        it "fails the run if xcodebuild exits with a non-zero status even when error output contains 'Executed'", requires_xcodebuild: true do
+          Scan.config = FastlaneCore::Configuration.create(Scan::Options.available_options, {
+            output_directory: '/tmp/scan_results',
+            project: './scan/examples/standard/app.xcodeproj',
+            build_for_testing: true,
+            fail_build: true
+          })
 
-      it "retry a failed test", requires_xcodebuild: true do
-        error_output = <<-ERROR_OUTPUT
-Failing tests:
-  FastlaneAppTests:
-          FastlaneAppTests.testCoinToss()
-          -[FastlaneAppTestsOC testCoinTossOC]
-          ERROR_OUTPUT
+          test_command_generator = @scan.instance_variable_get(:@test_command_generator)
+          allow(test_command_generator).to receive(:generate).and_return("xcodebuild build-for-testing")
 
-        expect(Fastlane::UI).to receive(:important).with("Retrying tests: FastlaneAppTests/FastlaneAppTests/testCoinToss, FastlaneAppTests/FastlaneAppTestsOC/testCoinTossOC").once
-        expect(Fastlane::UI).to receive(:important).with("Number of retries remaining: 4").once
-        expect(@scan).to receive(:execute)
+          error_output = <<~ERROR
+            Some random xcodebuild failure output
+            /tmp/MyAppTestsFileThatContainsWordExecuted.swift:12: error: Something broke
+          ERROR
 
-        @scan.retry_execute(retries: 5, error_output: error_output)
-      end
+          expect(Scan::ErrorHandler).to receive(:handle_build_error).with(error_output, anything).and_call_original
 
-      it "retry a failed test when project scheme name has non-whitespace character", requires_xcodebuild: true do
-        error_output = <<-ERROR_OUTPUT
-Failing tests:
-  Fastlane-App-Tests:
-          FastlaneAppTests.testCoinToss()
-          -[FastlaneAppTestsOC testCoinTossOC]
-          ERROR_OUTPUT
+          allow(FastlaneCore::CommandExecutor).to receive(:execute) do |error:, **|
+            error.call(error_output, 65)
+            ""
+          end
 
-        expect(Fastlane::UI).to receive(:important).with("Retrying tests: Fastlane-App-Tests/FastlaneAppTests/testCoinToss, Fastlane-App-Tests/FastlaneAppTestsOC/testCoinTossOC").once
-        expect(Fastlane::UI).to receive(:important).with("Number of retries remaining: 4").once
-        expect(@scan).to receive(:execute)
+          expect do
+            @scan.run
+          end.to raise_error(FastlaneCore::Interface::FastlaneBuildFailure, "Build for testing failed. Exit status: 65")
+        end
 
-        @scan.retry_execute(retries: 5, error_output: error_output)
-      end
+        it "reports the failed build before looking for a .xctestrun file to copy", requires_xcodebuild: true do
+          Dir.mktmpdir do |derived_data_path|
+            Scan.config = FastlaneCore::Configuration.create(Scan::Options.available_options, {
+              output_directory: '/tmp/scan_results',
+              project: './scan/examples/standard/app.xcodeproj',
+              derived_data_path: derived_data_path,
+              build_for_testing: true,
+              output_xctestrun: true
+            })
 
-      it "fail to parse error output", requires_xcodebuild: true do
-        error_output = <<-ERROR_OUTPUT
-Failing tests:
-FastlaneAppTests:
-FastlaneAppTests.testCoinToss()
--[FastlaneAppTestsOC testCoinTossOC]
-          ERROR_OUTPUT
-
-        expect do
-          @scan.retry_execute(retries: 5, error_output: error_output)
-        end.to raise_error(FastlaneCore::Interface::FastlaneBuildFailure, "Failed to find failed tests to retry (could not parse error output)")
+            expect do
+              @scan.handle_results(65)
+            end.to raise_error(FastlaneCore::Interface::FastlaneBuildFailure, "Build for testing failed. Exit status: 65")
+          end
+        end
       end
     end
 
@@ -225,6 +243,14 @@ FastlaneAppTests.testCoinToss()
         allow(mock_test_command_generator).to receive(:xcodebuild_log_path).and_return('./scan/spec/fixtures/boring.log')
 
         @scan = Scan::Runner.new
+      end
+
+      it "is deprecated" do
+        Tempfile.create("junit_report") do |report|
+          Scan.cache[:temp_junit_report] = report.path
+          expect(FastlaneCore::UI).to receive(:deprecated).with(/Scan::Runner#test_results is deprecated/)
+          @scan.test_results
+        end
       end
 
       it "still proceeds successfully if the temp junit report was deleted", requires_xcodebuild: true do
@@ -249,6 +275,18 @@ FastlaneAppTests.testCoinToss()
       end
     end
 
+    describe "#open_report" do
+      it "opens the report with its path as one argument" do
+        report_path = "/Users/me/Kaldi's Kafe/fastlane/test_output/report.html"
+        allow(FastlaneCore::Helper).to receive(:ci?).and_return(false)
+        allow(Scan).to receive(:cache).and_return({ open_html_report_path: report_path })
+        scan = Scan::Runner.new
+
+        expect(scan).to receive(:system).with("open", "--hide", report_path)
+        scan.open_report
+      end
+    end
+
     describe "#zip_build_products" do
       it "doesn't zip data when :should_zip_build_products is false", requires_xcodebuild: true do
         Scan.config = FastlaneCore::Configuration.create(Scan::Options.available_options, {
@@ -257,7 +295,7 @@ FastlaneAppTests.testCoinToss()
           should_zip_build_products: false
         })
 
-        expect(FastlaneCore::Helper).to receive(:backticks).with(anything).exactly(0).times
+        expect(FastlaneCore::CommandExecutor).not_to receive(:execute)
 
         scan = Scan::Runner.new
         scan.zip_build_products
@@ -276,8 +314,8 @@ FastlaneAppTests.testCoinToss()
 
         output_path = File.absolute_path('/tmp/scan_results/build_products.zip')
 
-        expect(FastlaneCore::Helper).to receive(:backticks)
-          .with("cd '#{path}' && rm -f '#{output_path}' && zip -r '#{output_path}' *", { print: false })
+        expect(FastlaneCore::CommandExecutor).to receive(:execute)
+          .with(hash_including(command: "cd #{path.shellescape} && rm -f #{output_path.shellescape} && zip -r #{output_path.shellescape} *", print_all: false))
           .exactly(1).times
 
         scan = Scan::Runner.new
