@@ -5,7 +5,7 @@ module Fastlane
         commands = []
 
         unless params[:only_tags]
-          command = "git pull"
+          command = +"git pull"
           command << " --rebase" if params[:rebase]
           commands += ["#{command} &&"]
         end

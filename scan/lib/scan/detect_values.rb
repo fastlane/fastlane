@@ -1,7 +1,6 @@
 require 'fastlane_core/device_manager'
 require 'fastlane_core/project'
 require 'pathname'
-require 'set'
 require_relative 'module'
 
 module Scan
@@ -90,6 +89,11 @@ module Scan
       default_path = Scan.project.build_settings(key: "BUILT_PRODUCTS_DIR")
       # => /Users/.../Library/Developer/Xcode/DerivedData/app-bqrfaojicpsqnoglloisfftjhksc/Build/Products/Release-iphoneos
       # We got 3 folders up to point to ".../DerivedData/app-[random_chars]/"
+      if default_path.nil?
+        UI.error("Can't retrieve BUILT_PRODUCTS_DIR from the project to detect derived data path.")
+        UI.error("Either set `derived_data_path` explicitly in `scan`, or enable build for running in the scheme.")
+        return
+      end
       default_path = File.expand_path("../../..", default_path)
       UI.verbose("Detected derived data path '#{default_path}'")
       Scan.config[:derived_data_path] = default_path
@@ -111,7 +115,9 @@ module Scan
 
     def self.default_os_version(os_type)
       @os_versions ||= {}
-      @os_versions[os_type] ||= begin
+      return @os_versions[os_type] if @os_versions.key?(os_type)
+
+      @os_versions[os_type] = begin
         UI.crash!("Unknown platform: #{os_type}") unless PLATFORMS.key?(os_type)
         platform = PLATFORMS[os_type]
 
@@ -128,7 +134,8 @@ module Scan
           sdks_output, status = Open3.capture2('xcodebuild -showsdks -json')
           sdk_version = begin
             raise status unless status.success?
-            JSON.parse(sdks_output).find { |e| e['platform'] == platform[:simulator] }['sdkVersion']
+            entry = JSON.parse(sdks_output).find { |e| e['platform'] == platform[:simulator] }
+            entry['productVersion'] || entry['sdkVersion']
           rescue StandardError => e
             UI.error(e)
             UI.error("xcodebuild CLI broken, please run `xcodebuild` and make sure it works")
@@ -147,7 +154,12 @@ module Scan
           end
 
           # Get OS version corresponding to build
-          Gem::Version.new(FastlaneCore::DeviceManager.runtime_build_os_versions[runtime_build])
+          os_version = FastlaneCore::DeviceManager.runtime_build_os_versions[runtime_build]
+          unless os_version
+            UI.important("Runtime build '#{runtime_build}' not found in installed runtimes, falling back to SDK version '#{sdk_version}'")
+            os_version = sdk_version
+          end
+          Gem::Version.new(os_version)
         end
       end
     end
@@ -262,22 +274,12 @@ module Scan
       }.reject(&:nil?).first
     end
 
-    def self.min_xcode8?
-      Helper.xcode_at_least?("8.0")
-    end
-
     def self.detect_destination
       if Scan.config[:destination]
-        # No need to show below warnings message(s) for xcode13+, because
-        # Apple recommended to have destination in all xcodebuild commands
-        # otherwise, Apple will generate warnings in console logs
+        # No need to show a warning, because Apple recommends to have
+        # destination in all xcodebuild commands, otherwise, Apple will
+        # generate warnings in console logs
         # see: https://github.com/fastlane/fastlane/issues/19579
-        return if Helper.xcode_at_least?("13.0")
-
-        UI.important("It's not recommended to set the `destination` value directly")
-        UI.important("Instead use the other options available in `fastlane scan --help`")
-        UI.important("Using your value '#{Scan.config[:destination]}' for now")
-        UI.important("because I trust you know what you're doing...")
         return
       end
 
@@ -294,7 +296,7 @@ module Scan
 
         Scan.config[:destination] = Scan.devices.map { |d| "platform=#{d.os_type} Simulator,id=#{d.udid}" + arch }
       elsif Scan.project && Scan.project.mac_app?
-        Scan.config[:destination] = min_xcode8? ? ["platform=macOS"] : ["platform=OS X"]
+        Scan.config[:destination] = ["platform=macOS"]
       end
     end
 

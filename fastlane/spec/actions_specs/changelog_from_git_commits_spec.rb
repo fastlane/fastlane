@@ -36,6 +36,18 @@ describe Fastlane do
         expect(result).to eq(changelog)
       end
 
+      it "Uses grep matching pattern if requested" do
+        matching_pattern = 'pizza'
+        result = Fastlane::FastFile.new.parse("lane :test do
+          changelog_from_git_commits(matching_pattern: '#{matching_pattern}')
+        end").runner.execute(:test)
+
+        tag_name = %w(git rev-list --tags --max-count=1).shelljoin
+        describe = %W(git describe --tags #{tag_name}).shelljoin
+        changelog = %W(git log --pretty=%B --grep=#{matching_pattern} #{describe}...HEAD).shelljoin
+        expect(result).to eq(changelog)
+      end
+
       it "Does not match lightweight tags when searching for the last one if so requested" do
         result = Fastlane::FastFile.new.parse("lane :test do
           changelog_from_git_commits(match_lightweight_tag: false)

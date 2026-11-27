@@ -136,6 +136,41 @@ describe Fastlane do
         expect(result).to eq("bundle exec danger --head=master")
       end
 
+      it "escapes base, head and pr" do
+        result = Fastlane::FastFile.new.parse("lane :test do
+          danger(use_bundle_exec: false, base: 'release/2.0 (beta)', head: 'feature/price-$5-fix', pr: 'https://github.com/danger/danger/pull/518')
+        end").runner.execute(:test)
+
+        expect(result).to eq("danger --base=#{'release/2.0 (beta)'.shellescape} --head=#{'feature/price-$5-fix'.shellescape} pr #{'https://github.com/danger/danger/pull/518'.shellescape}")
+      end
+
+      it "escapes danger_id and dangerfile" do
+        result = Fastlane::FastFile.new.parse("lane :test do
+          danger(use_bundle_exec: false, danger_id: 'unit tests', dangerfile: 'ci/My Dangerfile')
+        end").runner.execute(:test)
+
+        expect(result).to eq("danger --danger_id=#{'unit tests'.shellescape} --dangerfile=#{'ci/My Dangerfile'.shellescape}")
+      end
+
+      unless FastlaneCore::Helper.windows?
+        it "passes base, head, pr, danger_id and dangerfile to the shell unchanged" do
+          result = Fastlane::FastFile.new.parse("lane :test do
+            danger(use_bundle_exec: false, danger_id: 'unit tests', dangerfile: 'ci/My Dangerfile', base: 'release/2.0 (beta)', head: 'feature/price-$5-fix', pr: '518')
+          end").runner.execute(:test)
+
+          arguments = result.delete_prefix("danger ")
+          expected = [
+            "--danger_id=unit tests",
+            "--dangerfile=ci/My Dangerfile",
+            "--base=release/2.0 (beta)",
+            "--head=feature/price-$5-fix",
+            "pr",
+            "518"
+          ]
+          expect(`printf '%s\\n' #{arguments}`.lines.map(&:chomp)).to eq(expected)
+        end
+      end
+
       it "appends fail-if-no-pr flag when set" do
         result = Fastlane::FastFile.new.parse("lane :test do
           danger(fail_if_no_pr: true)

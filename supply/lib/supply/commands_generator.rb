@@ -56,6 +56,33 @@ module Supply
         end
       end
 
+      command :api do |c|
+        c.syntax = 'fastlane supply api <METHOD> <PATH> [options]'
+        c.description = "Send one Google Play Developer API request and print Google's JSON response"
+        c.option('--body JSON', String, 'Request body: JSON text, or @path to a JSON file')
+        c.option('--paginate', 'Follow the next page token and print all pages as one response (GET only)')
+        c.option('--json_key PATH', String, 'Service account JSON file. Without it, SUPPLY_JSON_KEY(_DATA), else Application Default Credentials')
+        c.option('--json_key_data JSON', String, 'Service account JSON data')
+        c.option('--yes', 'Confirm a DELETE request')
+        c.example('List reviews', 'fastlane supply api GET /androidpublisher/v3/applications/com.example/reviews --paginate --json_key key.json')
+        c.example('Open an edit', 'fastlane supply api POST /androidpublisher/v3/applications/com.example/edits --json_key key.json')
+
+        c.action do |args, options|
+          require 'supply/api_runner'
+          UI.user_error!("Usage: #{c.syntax}") unless args.size == 2
+          output = Supply::ApiRunner.new(
+            method: args[0],
+            path: args[1],
+            body: options.body,
+            paginate: options.paginate,
+            json_key: options.json_key,
+            json_key_data: options.json_key_data,
+            yes: options.yes
+          ).run
+          STDOUT.puts(output) if output # $stdout may point at stderr, see CLIToolsDistributor
+        end
+      end
+
       default_command(:run)
 
       run!

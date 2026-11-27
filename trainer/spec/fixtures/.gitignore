@@ -1,6 +1,10 @@
 # It takes a lot of disk space to commit the `Data/` directory in the `.xcresult` bundle, while the `database.sqlite3` file
 # is enough for `xcresulttool` to work (at least for the cases we have in the `trainer` specs suite and for Xcode 16+).
 #
+# That only holds for the `xcresulttool` that wrote the database: when a newer one finds a different database schema,
+# it deletes `database.sqlite3` and rebuilds it from `Data/`, which then fails because `Data/` is not committed. That is
+# why specs that need to run on every Xcode read the JSON committed next to the bundle instead of the bundle itself.
+#
 # Tip: to generate the `database.sqlite3` file from the `Data/` directory if it doesn't exist, run the following command:
 #
 # ```bash

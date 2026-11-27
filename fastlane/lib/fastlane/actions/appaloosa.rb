@@ -33,7 +33,8 @@ module Fastlane
         path = json_res['path']
         uri = URI.parse(Base64.decode64(s3_sign))
         File.open(file, 'rb') do |f|
-          http = Net::HTTP.new(uri.host)
+          http = Net::HTTP.new(uri.host, uri.port)
+          http.use_ssl = (uri.scheme == 'https')
           put = Net::HTTP::Put.new(uri.request_uri)
           put.body = f.read
           put['content-type'] = ''

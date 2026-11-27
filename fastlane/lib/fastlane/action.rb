@@ -160,15 +160,17 @@ class String
   end
 
   def markdown_sample(is_first = false)
-    self.markdown_clean_heredoc!
-    self.markdown_details(is_first)
+    sample = self.dup
+    sample.markdown_clean_heredoc!
+    sample.markdown_details(is_first)
   end
 
   def markdown_list(is_first = false)
-    self.markdown_clean_heredoc!
-    self.gsub!(/^/, "- ") # add list dashes
-    self.prepend(">") unless is_first # the empty line that will be added breaks the quote
-    self.markdown_details(is_first)
+    list = self.dup
+    list.markdown_clean_heredoc!
+    list.gsub!(/^/, "- ") # add list dashes
+    list.prepend(">") unless is_first # the empty line that will be added breaks the quote
+    list.markdown_details(is_first)
   end
 
   def markdown_details(is_first)

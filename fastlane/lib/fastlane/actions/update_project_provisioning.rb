@@ -6,7 +6,11 @@ module Fastlane
     end
 
     class UpdateProjectProvisioningAction < Action
-      ROOT_CERTIFICATE_URL = "https://www.apple.com/appleca/AppleIncRootCertificate.cer"
+      # Apple Root CA and Apple Root CA - G3, from https://www.apple.com/certificateauthority/
+      ROOT_CERTIFICATE_PATHS = %w(AppleIncRootCertificate.cer AppleRootCA-G3.cer).map do |name|
+        File.join(Fastlane::ROOT, "lib", "assets", "certificates", name)
+      end
+
       def self.run(params)
         UI.message("You’re updating provisioning profiles directly in your project, but have you considered easier ways to do code signing?")
         UI.message("https://docs.fastlane.tools/codesigning/GettingStarted/")
@@ -18,25 +22,16 @@ module Fastlane
         project_file_path = File.join(folder, "project.pbxproj")
         UI.user_error!("Could not find path to project config '#{project_file_path}'. Pass the path to your project (not workspace)!") unless File.exist?(project_file_path)
 
-        # download certificate
-        unless File.exist?(params[:certificate]) && File.size(params[:certificate]) > 0
-          UI.message("Downloading root certificate from (#{ROOT_CERTIFICATE_URL}) to path '#{params[:certificate]}'")
-          require 'open-uri'
-          File.open(params[:certificate], "w:ASCII-8BIT") do |file|
-            file.write(URI.open(ROOT_CERTIFICATE_URL, "rb").read)
-          end
-        end
+        certs = root_certificates(params[:certificate])
 
         # parsing mobileprovision file
         UI.message("Parsing mobile provisioning profile from '#{params[:profile]}'")
-        profile = File.read(params[:profile])
+        profile = File.binread(params[:profile])
         p7 = OpenSSL::PKCS7.new(profile)
         store = OpenSSL::X509::Store.new
-        UI.user_error!("Could not find valid certificate at '#{params[:certificate]}'") unless File.size(params[:certificate]) > 0
-        cert = OpenSSL::X509::Certificate.new(File.read(params[:certificate]))
-        store.add_cert(cert)
+        certs.each { |cert| store.add_cert(cert) }
 
-        p7.verify([cert], store)
+        p7.verify(certs, store)
         check_verify!(p7)
         data = Plist.parse_xml(p7.data)
 
@@ -82,6 +77,16 @@ module Fastlane
 
         # complete
         UI.success("Successfully updated project settings in '#{folder}'")
+      end
+
+      def self.root_certificates(path)
+        paths = ROOT_CERTIFICATE_PATHS
+        if path && File.size?(path)
+          paths += [path]
+        elsif path
+          UI.important("No certificate at '#{path}', verifying the profile with Apple's root certificates shipped with fastlane. Remove the `certificate` option unless you need a root certificate they do not include.")
+        end
+        paths.map { |p| OpenSSL::X509::Certificate.new(File.binread(p)) }
       end
 
       def self.check_verify!(p7)
@@ -145,8 +150,8 @@ module Fastlane
                                        end),
           FastlaneCore::ConfigItem.new(key: :certificate,
                                        env_name: "FL_PROJECT_PROVISIONING_CERTIFICATE_PATH",
-                                       description: "Path to apple root certificate",
-                                       default_value: "/tmp/AppleIncRootCertificate.cer"),
+                                       description: "Path to a root certificate to trust in addition to Apple's root certificates shipped with fastlane, e.g. a root Apple introduced after this release",
+                                       optional: true),
           FastlaneCore::ConfigItem.new(key: :code_signing_identity,
                                        env_name: "FL_PROJECT_PROVISIONING_CODE_SIGN_IDENTITY",
                                        description: "Code sign identity for build configuration",

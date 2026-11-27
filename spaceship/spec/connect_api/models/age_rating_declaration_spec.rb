@@ -5,6 +5,8 @@ describe Spaceship::ConnectAPI::AgeRatingDeclaration do
       "REALISTIC_VIOLENCE" => 1,
       "HORROR" => 2,
       "UNRESTRICTED_WEB_ACCESS" => 1,
+      "socialMedia" => 1,
+      "socialMediaAgeRestricted" => 0,
       "profanityOrCrudeHumor" => "NONE"
     }
   end
@@ -62,6 +64,8 @@ describe Spaceship::ConnectAPI::AgeRatingDeclaration do
                            "violenceRealistic",
                            "horrorOrFearThemes",
                            "unrestrictedWebAccess",
+                           "socialMedia",
+                           "socialMediaAgeRestricted",
                            "profanityOrCrudeHumor"
                          ])
     end
@@ -77,6 +81,8 @@ describe Spaceship::ConnectAPI::AgeRatingDeclaration do
                              "INFREQUENT_OR_MILD",
                              "FREQUENT_OR_INTENSE",
                              true,
+                             true,
+                             false,
                              "NONE"
                            ])
     end
