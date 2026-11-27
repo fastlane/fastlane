@@ -80,13 +80,16 @@ module Gym
       destination = Gym.config[:destination].dup
       destination.slice!("generic/platform=")
       destination_sdkroot = []
+      # gym sets "macOS" and "visionOS" (detect_values.rb); "macosx" stays for destinations users pass
       case destination
-      when "macosx"
+      when "macOS", "macosx"
         destination_sdkroot = ["macosx"]
       when "iOS"
         destination_sdkroot = ["iphoneos", "watchos"]
       when "tvOS"
         destination_sdkroot = ["appletvos"]
+      when "visionOS"
+        destination_sdkroot = ["xros"]
       end
 
       # Catalyst projects will always have an "iphoneos" sdkroot
