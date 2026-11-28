@@ -21,6 +21,7 @@ module Match
       attr_reader :team_name
       attr_reader :api_key_path
       attr_reader :api_key
+      attr_reader :skip_certificate_matching
 
       def self.configure(params)
         s3_region = params[:s3_region]
@@ -49,7 +50,8 @@ module Match
           team_id: params[:team_id],
           team_name: params[:team_name],
           api_key_path: params[:api_key_path],
-          api_key: params[:api_key]
+          api_key: params[:api_key],
+          skip_certificate_matching: params[:skip_certificate_matching]
         )
       end
 
@@ -64,7 +66,9 @@ module Match
                      team_id: nil,
                      team_name: nil,
                      api_key_path: nil,
-                     api_key: nil)
+                     api_key: nil,
+                     skip_certificate_matching: nil)
+        @skip_certificate_matching = skip_certificate_matching
         @s3_bucket = s3_bucket
         @s3_region = s3_region
         @s3_client = Fastlane::Helper::S3ClientHelper.new(access_key: s3_access_key, secret_access_key: s3_secret_access_key, session_token: s3_session_token, region: s3_region)
@@ -198,6 +202,8 @@ module Match
           return self.team_id
         else
           UI.user_error!("The `team_id` option is required. fastlane cannot automatically determine portal team id via the App Store Connect API (yet)") if self.team_id.to_s.empty?
+          # `match import --skip_certificate_matching` has no access to the Developer Portal
+          return self.team_id if self.skip_certificate_matching
 
           spaceship = SpaceshipEnsure.new(self.username, self.team_id, self.team_name, api_token)
           return spaceship.team_id

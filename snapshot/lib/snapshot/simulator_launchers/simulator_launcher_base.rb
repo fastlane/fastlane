@@ -1,3 +1,4 @@
+require 'open3'
 require 'plist'
 require 'time'
 
@@ -98,6 +99,10 @@ module Snapshot
 
         UI.message("Launch Simulator #{device_type}")
         Helper.backticks("open -a Simulator.app --args -CurrentDeviceUDID #{device_udid}", print: FastlaneCore::Globals.verbose?)
+
+        # addmedia adds nothing to a simulator that is still booting
+        output, status = Open3.capture2e("xcrun", "simctl", "bootstatus", device_udid, "-b")
+        UI.important("Unable to boot #{device_type}: #{output.strip}") unless status.success?
 
         paths.each do |path|
           UI.message("Adding '#{path}'")

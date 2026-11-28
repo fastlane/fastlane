@@ -274,12 +274,23 @@ describe Fastlane do
       expect(result).to eq(false)
     end
 
-    it "raises exception on old projects" do
-      expect(UI).to receive(:user_error!).with("Seems to be a very old project file format - please open your project file in a more recent version of Xcode")
-      result = Fastlane::FastFile.new.parse("lane :test do
-        disable_automatic_code_signing(path: './fastlane/spec/fixtures/xcodeproj/automatic-code-signing-old.xcodeproj')
+    it "adds TargetAttributes to projects without them, as Xcode 16 saves them" do
+      project_path = File.join(Dir.mktmpdir('fl_spec_automatic_code_signing_old'), 'automatic-code-signing-old.xcodeproj')
+      FileUtils.cp_r('./fastlane/spec/fixtures/xcodeproj/automatic-code-signing-old.xcodeproj', project_path)
+      expect(Xcodeproj::Project.open(project_path).root_object.attributes["TargetAttributes"]).to be_nil
+
+      allow(UI).to receive(:success)
+      expect(UI).to receive(:success).with("Successfully updated project settings to use Code Sign Style = 'Manual'")
+      Fastlane::FastFile.new.parse("lane :test do
+        disable_automatic_code_signing(path: '#{project_path}')
       end").runner.execute(:test)
-      expect(result).to eq(false)
+
+      project = Xcodeproj::Project.open(project_path)
+      project.targets.each do |target|
+        expect(project.root_object.attributes["TargetAttributes"][target.uuid]["ProvisioningStyle"]).to eq("Manual")
+      end
+    ensure
+      FileUtils.rm_rf(File.dirname(project_path)) if project_path
     end
   end
 end
