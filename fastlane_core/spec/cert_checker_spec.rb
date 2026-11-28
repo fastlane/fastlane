@@ -9,6 +9,15 @@ describe FastlaneCore do
       ProcessStatusMock.new
     }
 
+    # Apple's G6 intermediate, the file https://www.apple.com/certificateauthority/AppleWWDRCAG6.cer serves
+    let(:apple_wwdr_g6) { OpenSSL::X509::Certificate.new(File.read("./fastlane_core/spec/fixtures/certificates/AppleWWDRCAG6.pem")).to_der }
+
+    # Writes the downloaded file where the stubbed curl was told to save it
+    def download(command, content)
+      File.binwrite(command[/-o (\S+)/, 1], content)
+      ["", "", success_status]
+    end
+
     describe '#installed_identities' do
       it 'should print an error when no local code signing identities are found' do
         allow(FastlaneCore::CertChecker).to receive(:wwdr_keychain).and_return('login.keychain')
@@ -130,34 +139,35 @@ describe FastlaneCore do
 
       it 'should download the WWDR certificate from correct URL' do
         allow(FastlaneCore::CertChecker).to receive(:wwdr_keychain).and_return('login.keychain')
+        allow(FastlaneCore::UI).to receive(:important) # every download here is G6, so the others don't match their entry
         allow(Security::Certificate).to receive(:import).and_return(true)
 
-        expect(Open3).to receive(:capture3).with(include('https://www.apple.com/certificateauthority/AppleWWDRCAG2.cer')).and_return(["", "", success_status])
+        expect(Open3).to receive(:capture3).with(include('https://www.apple.com/certificateauthority/AppleWWDRCAG2.cer')) { |command| download(command, apple_wwdr_g6) }
         FastlaneCore::CertChecker.install_wwdr_certificate('G2')
 
-        expect(Open3).to receive(:capture3).with(include('https://www.apple.com/certificateauthority/AppleWWDRCAG3.cer')).and_return(["", "", success_status])
+        expect(Open3).to receive(:capture3).with(include('https://www.apple.com/certificateauthority/AppleWWDRCAG3.cer')) { |command| download(command, apple_wwdr_g6) }
         FastlaneCore::CertChecker.install_wwdr_certificate('G3')
 
-        expect(Open3).to receive(:capture3).with(include('https://www.apple.com/certificateauthority/AppleWWDRCAG4.cer')).and_return(["", "", success_status])
+        expect(Open3).to receive(:capture3).with(include('https://www.apple.com/certificateauthority/AppleWWDRCAG4.cer')) { |command| download(command, apple_wwdr_g6) }
         FastlaneCore::CertChecker.install_wwdr_certificate('G4')
 
-        expect(Open3).to receive(:capture3).with(include('https://www.apple.com/certificateauthority/AppleWWDRCAG5.cer')).and_return(["", "", success_status])
+        expect(Open3).to receive(:capture3).with(include('https://www.apple.com/certificateauthority/AppleWWDRCAG5.cer')) { |command| download(command, apple_wwdr_g6) }
         FastlaneCore::CertChecker.install_wwdr_certificate('G5')
 
-        expect(Open3).to receive(:capture3).with(include('https://www.apple.com/certificateauthority/AppleWWDRCAG6.cer')).and_return(["", "", success_status])
+        expect(Open3).to receive(:capture3).with(include('https://www.apple.com/certificateauthority/AppleWWDRCAG6.cer')) { |command| download(command, apple_wwdr_g6) }
         FastlaneCore::CertChecker.install_wwdr_certificate('G6')
 
-        expect(Open3).to receive(:capture3).with(include('https://www.apple.com/certificateauthority/DeveloperIDCA.cer')).and_return(["", "", success_status])
+        expect(Open3).to receive(:capture3).with(include('https://www.apple.com/certificateauthority/DeveloperIDCA.cer')) { |command| download(command, apple_wwdr_g6) }
         FastlaneCore::CertChecker.install_wwdr_certificate('DEV-ID-G1')
 
-        expect(Open3).to receive(:capture3).with(include('https://www.apple.com/certificateauthority/DeveloperIDG2CA.cer')).and_return(["", "", success_status])
+        expect(Open3).to receive(:capture3).with(include('https://www.apple.com/certificateauthority/DeveloperIDG2CA.cer')) { |command| download(command, apple_wwdr_g6) }
         FastlaneCore::CertChecker.install_wwdr_certificate('DEV-ID-G2')
       end
     end
 
     describe '#install_wwdr_certificate' do
       before do
-        allow(Open3).to receive(:capture3).and_return(["", "", success_status])
+        allow(Open3).to receive(:capture3) { |command| download(command, apple_wwdr_g6) }
       end
 
       it 'should accept a certificate that is already installed' do
@@ -170,6 +180,36 @@ describe FastlaneCore do
         allow(Security::Certificate).to receive(:import).and_raise(Security::Error.new(1, "security: SecKeychainItemImport: The specified keychain could not be found.\n"))
 
         expect { FastlaneCore::CertChecker.install_wwdr_certificate('G6', keychain: 'login.keychain') }.to raise_error("Could not install WWDR certificate: security: SecKeychainItemImport: The specified keychain could not be found. (status 1)")
+      end
+
+      it 'should install the download when it is the listed certificate' do
+        expect(Security::Certificate).to receive(:import).with(end_with(".cer"), keychain: 'login.keychain', trusted_applications: []).and_return(true)
+
+        expect(FastlaneCore::CertChecker.install_wwdr_certificate('G6', keychain: 'login.keychain')).to be(true)
+      end
+
+      it 'should not install a download that is not the listed certificate' do
+        key = OpenSSL::PKey::RSA.new(2048)
+        other = OpenSSL::X509::Certificate.new
+        other.version = 2
+        other.serial = 1
+        other.subject = other.issuer = OpenSSL::X509::Name.parse("/CN=Apple Worldwide Developer Relations Certification Authority/OU=G6")
+        other.public_key = key.public_key
+        other.not_before = Time.now - 60
+        other.not_after = Time.now + 3600
+        other.sign(key, OpenSSL::Digest.new("SHA256"))
+        allow(Open3).to receive(:capture3) { |command| download(command, other.to_der) }
+        expect(Security::Certificate).not_to receive(:import)
+        expect(FastlaneCore::UI).to receive(:important).with(%r{\ANot installing WWDR certificate 'G6': the download from https://www.apple.com/certificateauthority/AppleWWDRCAG6.cer is not the certificate fastlane expects \(SHA-256 \h{64}\)\z})
+
+        expect(FastlaneCore::CertChecker.install_wwdr_certificate('G6', keychain: 'login.keychain')).to be(false)
+      end
+
+      it 'should fail when the download is not a certificate, without importing' do
+        allow(Open3).to receive(:capture3) { |command| download(command, "<html>Service unavailable</html>") }
+        expect(Security::Certificate).not_to receive(:import)
+
+        expect { FastlaneCore::CertChecker.install_wwdr_certificate('G6', keychain: 'login.keychain') }.to raise_error("Could not install WWDR certificate: the download from https://www.apple.com/certificateauthority/AppleWWDRCAG6.cer is not a certificate")
       end
 
       it 'should fail when the certificate cannot be downloaded, without importing' do
@@ -222,7 +262,7 @@ describe FastlaneCore do
           cmd = %r{\Acurl -f -o (([A-Z]\:)?\/.+\.cer) https://www\.apple\.com/certificateauthority/AppleWWDRCAG6\.cer\z}
           require "open3"
 
-          expect(Open3).to receive(:capture3).with(cmd).and_return(["", "", success_status])
+          expect(Open3).to receive(:capture3).with(cmd) { |command| download(command, apple_wwdr_g6) }
           expect(Security::Certificate).to receive(:import).with(end_with(".cer"), keychain: keychain, trusted_applications: []).and_return(true)
           expect(FastlaneCore::CertChecker).to receive(:wwdr_keychain).and_return(keychain_name)
 
@@ -240,7 +280,7 @@ describe FastlaneCore do
           cmd = %r{\Acurl --http1.1 --retry 3 --retry-all-errors -f -o (([A-Z]\:)?\/.+\.cer) https://www\.apple\.com/certificateauthority/AppleWWDRCAG6\.cer\z}
           require "open3"
 
-          expect(Open3).to receive(:capture3).with(cmd).and_return(["", "", success_status])
+          expect(Open3).to receive(:capture3).with(cmd) { |command| download(command, apple_wwdr_g6) }
           expect(Security::Certificate).to receive(:import).with(end_with(".cer"), keychain: keychain, trusted_applications: []).and_return(true)
           expect(FastlaneCore::CertChecker).to receive(:wwdr_keychain).and_return(keychain_name)
 

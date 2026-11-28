@@ -163,6 +163,16 @@ module FastlaneCore
       UI.user_error!("Could not download WWDR certificate") unless status.success?
 
       begin
+        sha256 = Digest::SHA256.hexdigest(OpenSSL::X509::Certificate.new(File.binread(filename)).to_der)
+      rescue OpenSSL::X509::CertificateError
+        UI.user_error!("Could not install WWDR certificate: the download from #{url} is not a certificate")
+      end
+      unless WWDRCA_CERTIFICATES.find { |c| c[:alias] == cert_alias }.fetch(:sha256).casecmp?(sha256)
+        UI.important("Not installing WWDR certificate '#{cert_alias}': the download from #{url} is not the certificate fastlane expects (SHA-256 #{sha256})")
+        return false
+      end
+
+      begin
         Security::Certificate.import(filename, keychain: keychain, trusted_applications: [])
       rescue Security::DuplicateItemError
         UI.verbose("WWDR Certificate was already installed")
