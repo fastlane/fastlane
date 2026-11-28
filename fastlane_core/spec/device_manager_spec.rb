@@ -573,5 +573,34 @@ describe FastlaneCore do
         expect(device.state).to eq('Shutdown')
       end
     end
+
+    describe FastlaneCore::Simulator do
+      describe "#uninstall_app" do
+        let(:udid) { "90B59F9D-C90D-4B17-B347-5A71CCC66787" }
+
+        before(:each) do
+          allow(UI).to receive(:message)
+        end
+
+        it "boots the simulator headlessly and waits before uninstalling" do
+          status = double('status', "success?": true)
+          expect(Open3).to receive(:capture2e).with("xcrun simctl bootstatus #{udid} -b").and_return(["Finished", status]).ordered
+          expect(FastlaneCore::Helper).to receive(:backticks).with("xcrun simctl uninstall #{udid} com.example.app &> /dev/null").ordered
+          expect(UI).not_to receive(:important)
+
+          FastlaneCore::Simulator.uninstall_app("com.example.app", "iPhone 16 Pro", udid)
+        end
+
+        it "warns when the simulator fails to boot" do
+          status = double('status', "success?": false)
+          expect(Open3).to receive(:capture2e).with("xcrun simctl bootstatus #{udid} -b").and_return(["Invalid device: #{udid}\n", status])
+          expect(FastlaneCore::Helper).to receive(:backticks).with("xcrun simctl uninstall #{udid} com.example.app &> /dev/null")
+
+          expect(UI).to receive(:important).with("Unable to boot iPhone 16 Pro: Invalid device: #{udid}")
+
+          FastlaneCore::Simulator.uninstall_app("com.example.app", "iPhone 16 Pro", udid)
+        end
+      end
+    end
   end
 end
