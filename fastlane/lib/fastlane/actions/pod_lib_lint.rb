@@ -27,7 +27,7 @@ module Fastlane
         command << "--skip-import-validation" if params[:skip_import_validation]
         command << "--skip-tests" if params[:skip_tests]
         command << "--analyze" if params[:analyze]
-        command << "--configuration=#{params[:configuration]}" if params[:configuration]
+        command << "--configuration=#{params[:configuration].shellescape}" unless params[:configuration].to_s.empty?
 
         result = Actions.sh(command.join(' '))
         UI.success("Pod lib lint successful ⬆️ ")
@@ -153,7 +153,7 @@ module Fastlane
                                        default_value: false,
                                        env_name: "FL_POD_LIB_LINT_ANALYZE"),
           FastlaneCore::ConfigItem.new(key: :configuration,
-                                       description: "Build using the given configuration (if not provided, configuration defaults to Release)",
+                                       description: "Build using the given configuration (if not provided, configuration defaults to Release) (available since cocoapods >= 1.10)",
                                        type: String,
                                        optional: true,
                                        env_name: "FL_POD_LIB_LINT_CONFIGURATION")

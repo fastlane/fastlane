@@ -164,6 +164,22 @@ describe Fastlane do
 
         expect(result).to eq("bundle exec pod lib lint --configuration=Debug")
       end
+
+      it "quotes a configuration name with a space" do
+        result = Fastlane::FastFile.new.parse("lane :test do
+          pod_lib_lint(configuration: 'Debug Staging')
+        end").runner.execute(:test)
+
+        expect(result).to eq("bundle exec pod lib lint --configuration=#{'Debug Staging'.shellescape}")
+      end
+
+      it "leaves out an empty configuration, e.g. from an empty FL_POD_LIB_LINT_CONFIGURATION" do
+        result = Fastlane::FastFile.new.parse("lane :test do
+          pod_lib_lint(configuration: '')
+        end").runner.execute(:test)
+
+        expect(result).to eq("bundle exec pod lib lint")
+      end
     end
   end
 end
