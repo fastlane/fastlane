@@ -1,0 +1,94 @@
+{
+  "data" : [ {
+    "type" : "reviewSubmissions",
+    "id" : "123456789",
+    "attributes" : {
+      "state" : "READY_FOR_REVIEW",
+      "submittedDate" : null,
+      "platform" : "IOS"
+    },
+    "relationships" : {
+      "submittedByActor" : {
+        "data" : null
+      },
+      "lastUpdatedByActor" : {
+        "data" : null
+      },
+      "appStoreVersionForReview" : {
+        "data" : {
+          "type" : "appStoreVersions",
+          "id" : "123456789-app-store-version"
+        }
+      },
+      "items" : {
+        "meta" : {
+          "paging" : {
+            "total" : 1,
+            "limit" : 10
+          }
+        },
+        "data" : [ {
+          "type" : "reviewSubmissionItems",
+          "id" : "123456789-item"
+        } ],
+        "links" : {
+          "self" : "https://appstoreconnect.apple.com/iris/v1/reviewSubmissions/123456789/relationships/items",
+          "related" : "https://appstoreconnect.apple.com/iris/v1/reviewSubmissions/123456789/items"
+        }
+      }
+    },
+    "links" : {
+      "self" : "https://appstoreconnect.apple.com/iris/v1/reviewSubmissions/123456789"
+    }
+  }, {
+    "type" : "reviewSubmissions",
+    "id" : "987654321",
+    "attributes" : {
+      "state" : "COMPLETE",
+      "submittedDate" : null,
+      "platform" : "IOS"
+    },
+    "relationships" : {
+      "submittedByActor" : {
+        "data" : null
+      },
+      "lastUpdatedByActor" : {
+        "data" : null
+      },
+      "appStoreVersionForReview" : {
+        "data" : {
+          "type" : "appStoreVersions",
+          "id" : "987654321-app-store-version"
+        }
+      },
+      "items" : {
+        "meta" : {
+          "paging" : {
+            "total" : 1,
+            "limit" : 10
+          }
+        },
+        "data" : [ {
+          "type" : "reviewSubmissionItems",
+          "id" : "987654321-item"
+        } ],
+        "links" : {
+          "self" : "https://appstoreconnect.apple.com/iris/v1/reviewSubmissions/987654321/relationships/items",
+          "related" : "https://appstoreconnect.apple.com/iris/v1/reviewSubmissions/987654321/items"
+        }
+      }
+    },
+    "links" : {
+      "self" : "https://appstoreconnect.apple.com/iris/v1/reviewSubmissions/987654321"
+    }
+  } ],
+  "links" : {
+    "self" : "https://appstoreconnect.apple.com/iris/v1/apps/123456789-app/reviewSubmissions"
+  },
+  "meta" : {
+    "paging" : {
+      "total" : 1,
+      "limit" : 50
+    }
+  }
+}

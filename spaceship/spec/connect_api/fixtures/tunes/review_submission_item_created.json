@@ -1,0 +1,15 @@
+{
+  "data" : {
+    "type" : "reviewSubmissionItems",
+    "id" : "123456789-item",
+    "attributes" : {
+      "state" : "READY_FOR_REVIEW"
+    },
+    "links" : {
+      "self" : "https://appstoreconnect.apple.com/iris/v1/reviewSubmissionItems/123456789-items"
+    }
+  },
+  "links" : {
+    "self" : "https://appstoreconnect.apple.com/iris/v1/reviewSubmissionItems"
+  }
+}

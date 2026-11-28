@@ -158,7 +158,7 @@ describe Fastlane do
         expect(result).not_to(include('--proxy-user'))
       end
 
-      it "show progres bar option is used" do
+      it "show progress bar option is used" do
         ENV['DSYM_OUTPUT_PATH'] = nil
         ENV['DSYM_ZIP_PATH'] = nil
         Fastlane::Actions.lane_context[Fastlane::Actions::SharedValues::DSYM_OUTPUT_PATH] = nil
@@ -182,6 +182,11 @@ describe Fastlane do
         expect(result).to include('--progress-bar -o /dev/null --no-buffer')
         expect(result).not_to(include('-x '))
         expect(result).not_to(include('--proxy-user'))
+      end
+
+      it "is deprecated because the service was retired" do
+        expect(Fastlane::Actions.is_deprecated?(Fastlane::Actions::SplunkmintAction)).to eq(true)
+        expect(Fastlane::Actions::SplunkmintAction.deprecated_notes).to include("End of Life in December 2021")
       end
     end
   end

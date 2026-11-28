@@ -1,14 +1,17 @@
 inherit_from: .rubocop_todo.yml
 
+plugins:
+  - rubocop-performance
+
 require:
   - rubocop/require_tools
-  - rubocop-performance
-  - ./rubocop/fork_usage.rb
-  - ./rubocop/missing_keys_on_shared_area.rb
-  - ./rubocop/is_string_usage.rb
+  - ./internal/rubocop/fork_usage.rb
+  - ./internal/rubocop/missing_keys_on_shared_area.rb
+  - ./internal/rubocop/is_string_usage.rb
+  - ./internal/rubocop/unescaped_shell_interpolation.rb
 
 AllCops:
-  TargetRubyVersion: 2.5
+  SuggestExtensions: false
   NewCops: enable
   Include:
     - '**/*.rb'
@@ -17,12 +20,21 @@ AllCops:
     - '*/lib/assets/*Template'
     - '*/lib/assets/*TemplateAndroid'
   Exclude:
-    - '**/lib/assets/custom_action_template.rb'
     - './vendor/**/*'
     - '**/lib/assets/DefaultFastfileTemplate'
     - '**/lib/assets/MatchfileTemplate'
-    - '**/spec/fixtures/broken_files/broken_file.rb'
     - '**/*.provisionprofile'
+
+# Ruby 3.1's hash value shorthand (`{ foo: }`) is allowed, but not enforced
+Style/HashSyntax:
+  EnforcedShorthandSyntax: either
+
+# Keep explicit block arguments (`&block`) instead of Ruby 3.1's anonymous `&`
+Naming/BlockForwarding:
+  EnforcedStyle: explicit
+
+Style/SlicingWithRange:
+  Enabled: false
 
 Style/MultipleComparison:
   Enabled: false
@@ -196,7 +208,7 @@ Style/RedundantReturn:
 Style/IfUnlessModifier:
   Enabled: false
 
-# and and or is okay
+# "and" and "or" are okay
 Style/AndOr:
   Enabled: true
   EnforcedStyle: conditionals
@@ -222,6 +234,9 @@ Style/GuardClause:
 Style/StringLiterals:
   Enabled: false
 
+Style/QuotedSymbols:
+  Enabled: false
+
 # something = if something_else
 # that's confusing
 Style/ConditionalAssignment:
@@ -244,7 +259,7 @@ Lint/ParenthesesAsGroupedExpression:
 
 # This would reject is_ in front of methods
 # We use `is_supported?` everywhere already
-Naming/PredicateName:
+Naming/PredicatePrefix:
   Enabled: false
 
 # We allow the $
@@ -259,8 +274,6 @@ Layout/SpaceAroundOperators:
 # They have not to be snake_case
 Naming/FileName:
   Exclude:
-    - '**/Dangerfile'
-    - '**/Brewfile'
     - '**/Gemfile'
     - '**/Podfile'
     - '**/Rakefile'
@@ -306,10 +319,13 @@ Lint/IsStringUsage:
     - 'screengrab/**/*'
     - 'supply/**/*'
 
+Fastlane/UnescapedShellInterpolation:
+  Enabled: false
+
 # ( ) for method calls
 Style/MethodCallWithArgsParentheses:
   Enabled: true
-  IgnoredMethods:
+  AllowedMethods:
     - 'require'
     - 'require_relative'
     - 'fastlane_require'
@@ -332,3 +348,12 @@ Style/MethodCallWithArgsParentheses:
     - 'context'
     - 'before'
     - 'after'
+
+# Sorts the gems in the Gemfile alphabetically.
+Bundler/OrderedGems:
+  Enabled: true
+  TreatCommentsAsGroupSeparators: false
+
+Gemspec/DevelopmentDependencies:
+   Enabled: true
+   EnforcedStyle: Gemfile

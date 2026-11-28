@@ -141,7 +141,7 @@ module Spaceship
 
       # Delete this App ID. This action will most likely fail if the App ID is already in the store
       # or there are active profiles
-      # @return (App) The app you just deletd
+      # @return (App) The app you just deleted
       def delete!
         client.delete_app!(app_id, mac: mac?)
         self

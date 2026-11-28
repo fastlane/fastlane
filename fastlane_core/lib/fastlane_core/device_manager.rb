@@ -11,6 +11,19 @@ module FastlaneCore
         return connected_devices(requested_os_type) + simulators(requested_os_type)
       end
 
+      def runtime_build_os_versions
+        @runtime_build_os_versions ||= begin
+          output, status = Open3.capture2('xcrun simctl list -j runtimes')
+          raise status unless status.success?
+          json = JSON.parse(output)
+          json['runtimes'].map { |h| [h['buildversion'], h['version']] }.to_h
+        rescue StandardError => e
+          UI.error(e)
+          UI.error('xcrun simctl CLI broken; cun `xcrun simctl list runtimes` and make sure it works')
+          UI.user_error!('xcrun simctl not working')
+        end
+      end
+
       def simulators(requested_os_type = "")
         UI.verbose("Fetching available simulator devices")
 
@@ -20,18 +33,6 @@ module FastlaneCore
         output = ''
         Open3.popen3('xcrun simctl list devices') do |stdin, stdout, stderr, wait_thr|
           output = stdout.read
-        end
-
-        runtime_info = ''
-        Open3.popen3('xcrun simctl list runtimes') do |stdin, stdout, stderr, wait_thr|
-          # This regex outputs the version info in the format "<platform> <version><exact version>"
-          runtime_info = stdout.read.lines.map { |v| v.sub(/(\w+ \S+)\s*\((\S+)\s[\S\s]*/, "\\1 \\2") }.drop(1)
-        end
-        exact_versions = Hash.new({})
-        runtime_info.each do |r|
-          platform, general, exact = r.split
-          exact_versions[platform] = {} unless exact_versions.include?(platform)
-          exact_versions[platform][general] = exact
         end
 
         unless output.include?("== Devices ==")
@@ -57,7 +58,7 @@ module FastlaneCore
 
             if matches.count && (os_type == requested_os_type || requested_os_type == "")
               # This is disabled here because the Device is defined later in the file, and that's a problem for the cop
-              @devices << Device.new(name: name, os_type: os_type, os_version: (exact_versions[os_type][os_version] || os_version), udid: udid, state: state, is_simulator: true)
+              @devices << Device.new(name: name, os_type: os_type, os_version: os_version, udid: udid, state: state, is_simulator: true)
             end
           end
         end
@@ -91,15 +92,24 @@ module FastlaneCore
 
         discover_devices(result[0], device_types, device_uuids) if result[0]
 
-        if device_uuids.count > 0 # instruments takes a little while to return so skip it if we have no devices
-          instruments_devices_output = ''
-          Open3.popen3("instruments -s devices") do |stdin, stdout, stderr, wait_thr|
-            instruments_devices_output = stdout.read
+        # On macOS 26.7, SPUSBDataType lists no USB devices; SPUSBHostDataType does
+        if device_uuids.empty?
+          Open3.popen3("system_profiler SPUSBHostDataType -xml") do |stdin, stdout, stderr, wait_thr|
+            usb_devices_output = stdout.read
+          end
+          result = Plist.parse_xml(usb_devices_output)
+          discover_devices(result[0], device_types, device_uuids) if result && result[0]
+        end
+
+        if device_uuids.count > 0 # xctrace takes a little while to return so skip it if we have no devices
+          xctrace_devices_output = ''
+          Open3.popen3("xcrun xctrace list devices") do |stdin, stdout, stderr, wait_thr|
+            xctrace_devices_output = stdout.read
           end
 
-          instruments_devices_output.split(/\n/).each do |instruments_device|
+          xctrace_devices_output.split(/\n/).each do |xctrace_device|
             device_uuids.each do |device_uuid|
-              match = instruments_device.match(/(.+) \(([0-9.]+)\) \[(\h{40}|\h{8}-\h{16})\]?/)
+              match = xctrace_device.match(/(.+) \(([0-9.]+)\) \((\h{40}|\h{8}-\h{16})\)?/)
               if match && match[3].delete("-") == device_uuid
                 devices << Device.new(name: match[1], udid: match[3], os_type: requested_os_type, os_version: match[2], state: "Booted", is_simulator: false)
                 UI.verbose("USB Device Found - \"" + match[1] + "\" (" + match[2] + ") UUID:" + match[3])
@@ -119,7 +129,7 @@ module FastlaneCore
         end
 
         is_supported_device = device_types.any?(usb_item['_name'])
-        serial_num = usb_item['serial_num'] || ''
+        serial_num = usb_item['serial_num'] || usb_item['USBDeviceKeySerialNumber'] || ''
         has_serial_number = serial_num.length == 40 || serial_num.length == 24
 
         if is_supported_device && has_serial_number
@@ -127,11 +137,12 @@ module FastlaneCore
         end
       end
 
+      # nil when there is no simulator for the device, such as snapshot's "Mac"
       def latest_simulator_version_for_device(device)
         simulators.select { |s| s.name == device }
                   .sort_by { |s| Gem::Version.create(s.os_version) }
                   .last
-                  .os_version
+                  &.os_version
       end
 
       # The code below works from Xcode 7 on
@@ -201,18 +212,17 @@ module FastlaneCore
 
       def boot
         return unless is_simulator
-        return unless os_type == "iOS"
         return if self.state == 'Booted'
 
+        # Boot the simulator and wait for it to finish booting
         UI.message("Booting #{self}")
-
-        `xcrun simctl boot #{self.udid} 2>/dev/null`
+        output, status = Open3.capture2e("xcrun simctl bootstatus #{self.udid} -b")
+        UI.important("Unable to boot #{self}: #{output.strip}") unless status.success?
         self.state = 'Booted'
       end
 
       def shutdown
         return unless is_simulator
-        return unless os_type == "iOS"
         return if self.state != 'Booted'
 
         UI.message("Shutting down #{self.udid}")
@@ -242,7 +252,7 @@ module FastlaneCore
         plist_buddy_cmd = "-c \"Add :KeyboardContinuousPathEnabled bool false\""
         plist_path = File.expand_path("~/Library/Developer/CoreSimulator/Devices/#{self.udid}/data/Library/Preferences/com.apple.keyboard.ContinuousPath.plist")
 
-        Helper.backticks("#{plist_buddy} #{plist_buddy_cmd} #{plist_path} >/dev/null 2>&1")
+        Helper.backticks("#{plist_buddy} #{plist_buddy_cmd} #{plist_path.shellescape} >/dev/null 2>&1")
       end
     end
   end
@@ -289,6 +299,7 @@ module FastlaneCore
 
       def clear_cache
         @devices = nil
+        @runtime_build_os_versions = nil
       end
 
       def launch(device)
@@ -298,7 +309,7 @@ module FastlaneCore
 
         UI.verbose("Launching #{simulator_path} for device: #{device.name} (#{device.udid})")
 
-        Helper.backticks("open -a #{simulator_path} --args -CurrentDeviceUDID #{device.udid}", print: FastlaneCore::Globals.verbose?)
+        Helper.backticks("open -a #{simulator_path.shellescape} --args -CurrentDeviceUDID #{device.udid}", print: FastlaneCore::Globals.verbose?)
       end
 
       def copy_logs(device, log_identity, logs_destination_dir, log_collection_start_time)
@@ -320,7 +331,7 @@ module FastlaneCore
         UI.verbose("Uninstalling app '#{app_identifier}' from #{device_type}...")
 
         UI.message("Launch Simulator #{device_type}")
-        Helper.backticks("xcrun instruments -w #{device_udid} &> /dev/null")
+        Helper.backticks("open -a Simulator.app --args -CurrentDeviceUDID #{device_udid} &> /dev/null")
 
         UI.message("Uninstall application #{app_identifier}")
         Helper.backticks("xcrun simctl uninstall #{device_udid} #{app_identifier} &> /dev/null")
@@ -350,8 +361,18 @@ module FastlaneCore
         logs_collection_start = log_collection_start_time.strftime('%Y-%m-%d %H:%M:%S')
         command = "xcrun simctl spawn #{device.udid} log collect "
         command << "--start '#{logs_collection_start}' "
-        command << "--output #{logarchive_dst.shellescape} 2>/dev/null"
-        FastlaneCore::CommandExecutor.execute(command: command, print_all: false, print_command: true)
+        command << "--output #{logarchive_dst.shellescape}"
+        # A simulator that is no longer booted only warrants a warning: the logs are diagnostics.
+        # Any other failure still fails the action.
+        FastlaneCore::CommandExecutor.execute(command: command,
+                                            print_all: false,
+                                        print_command: true,
+                                suppress_error_output: true,
+                                                error: proc do |output, status|
+                                                  message = "Unable to collect system logs from #{device} (exit status #{status}): #{output}"
+                                                  UI.user_error!(message) unless output.match?(/domain=com\.apple\.CoreSimulator\.SimError, code=405\b/)
+                                                  UI.important(message)
+                                                end)
       end
     end
   end

@@ -1,10 +1,9 @@
 require 'spec_helper'
-require 'pp'
 
 describe Spaceship::Tunes::AppAnalytics do
-  before { Spaceship::Tunes.login }
+  include_examples "common spaceship login"
 
-  let(:app) { Spaceship::Application.all.first }
+  let(:app) { Spaceship::Application.all.find { |a| a.apple_id == "898536088" } }
 
   describe "App Analytics Grabbed Properly" do
     it "accesses live analytics details" do

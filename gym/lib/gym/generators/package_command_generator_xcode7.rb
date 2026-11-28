@@ -24,7 +24,7 @@ module Gym
         parts += options
         parts += pipe
 
-        File.write(config_path, config_content) # overwrite everytime. Could be optimized
+        File.write(config_path, config_content) # overwrite every time. Could be optimized
 
         parts
       end
@@ -33,10 +33,10 @@ module Gym
         config = Gym.config
 
         options = []
-        options << "-exportOptionsPlist '#{config_path}'"
+        options << "-exportOptionsPlist #{config_path.shellescape}"
         options << "-archivePath #{BuildCommandGenerator.archive_path.shellescape}"
-        options << "-exportPath '#{temporary_output_path}'"
-        options << "-toolchain '#{config[:toolchain]}'" if config[:toolchain]
+        options << "-exportPath #{temporary_output_path.shellescape}"
+        options << "-toolchain #{config[:toolchain].shellescape}" if config[:toolchain]
         options << config[:export_xcargs] if config[:export_xcargs]
         options << config[:xcargs] if config[:xcargs]
 
@@ -52,7 +52,7 @@ module Gym
         Gym.cache[:temporary_output_path] ||= Dir.mktmpdir('gym_output')
       end
 
-      # Wrap xcodebuild to work-around ipatool dependency to system ruby
+      # Wrap xcodebuild to work around ipatool dependency to system ruby
       def wrap_xcodebuild
         require 'fileutils'
         @wrapped_xcodebuild_path ||= File.join(Gym::ROOT, "lib/assets/wrap_xcodebuild/xcbuild-safe.sh")
@@ -111,7 +111,7 @@ module Gym
         Gym.cache[:binary_path]
       end
 
-      # The path the the dsym file for this app. Might be nil
+      # The path of the dSYM file for this app. Might be nil
       def dsym_path
         Dir[BuildCommandGenerator.archive_path + "/**/*.app.dSYM"].last
       end
@@ -197,11 +197,12 @@ module Gym
 
         # xcodebuild will not use provisioning profiles
         # if we don't specify signingStyle as manual
-        if Helper.xcode_at_least?("9.0") && hash[:provisioningProfiles]
+        if hash[:provisioningProfiles]
           hash[:signingStyle] = 'manual'
         end
 
-        if Gym.config[:installer_cert_name] && (Gym.project.mac? || Gym.building_mac_catalyst_for_mac?)
+        # Installer certificates only sign macOS packages, so this is never needed for an IPA
+        if Gym.config[:installer_cert_name] && Gym.building_for_pkg?
           hash[:installerSigningCertificate] = Gym.config[:installer_cert_name]
         end
 

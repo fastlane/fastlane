@@ -1,5 +1,6 @@
 require 'fastlane_core/core_ext/cfpropertylist'
 require 'fastlane_core/project'
+require 'security'
 require_relative 'module'
 require_relative 'code_signing_mapping'
 
@@ -30,19 +31,22 @@ module Gym
 
       detect_scheme
       detect_platform # we can only do that *after* we have the scheme
+      verify_platform_without_build_settings # before the profile detection, which reads build settings but only logs its errors
       detect_selected_provisioning_profiles # we can only do that *after* we have the platform
       detect_configuration
       detect_toolchain
       detect_third_party_installer
 
-      config[:output_name] ||= Gym.project.app_name
+      unless config[:output_name]
+        Gym.project.verify_xcodebuild_settings_lookup_allowed!("WRAPPER_NAME", option: "output_name")
+        config[:output_name] = Gym.project.app_name
+      end
 
       config[:build_path] ||= archive_path_from_local_xcode_preferences
 
       # Make sure the output name is valid and remove a trailing `.ipa` extension
       # as it will be added by gym for free
-      config[:output_name].gsub!(".ipa", "")
-      config[:output_name].gsub!(File::SEPARATOR, "_")
+      config[:output_name] = config[:output_name].gsub(".ipa", "").gsub(File::SEPARATOR, "_")
 
       return config
     end
@@ -74,7 +78,7 @@ module Gym
       CFPropertyList.native_types(CFPropertyList::List.new(file: path).value)
     end
 
-    # Since Xcode 9 you need to provide the explicit mapping of what provisioning profile to use for
+    # Xcode needs the explicit mapping of what provisioning profile to use for
     # each target of your app
     def self.detect_selected_provisioning_profiles
       Gym.config[:export_options] ||= {}
@@ -91,19 +95,18 @@ module Gym
       UI.message("Detected provisioning profile mapping: #{hash_to_use}")
     rescue => ex
       # We don't want to fail the build if the automatic detection doesn't work
-      # especially since the mapping is optional for pre Xcode 9 setups
-      if Helper.xcode_at_least?("9.0")
-        UI.error("Couldn't automatically detect the provisioning profile mapping")
-        UI.error("Since Xcode 9 you need to provide an explicit mapping of what")
-        UI.error("provisioning profile to use for each target of your app")
-        UI.error(ex)
-        UI.verbose(ex.backtrace.join("\n"))
-      end
+      UI.error("Couldn't automatically detect the provisioning profile mapping")
+      UI.error("You need to provide an explicit mapping of what")
+      UI.error("provisioning profile to use for each target of your app")
+      UI.error(ex)
+      UI.verbose(ex.backtrace.join("\n"))
     end
 
     # Detects name of a "3rd Party Mac Developer Installer" cert for the configured team id
     def self.detect_third_party_installer
       return if Gym.config[:installer_cert_name]
+      # Installer certificates sign macOS exports, which need build settings anyway
+      return if Gym.project.xcodebuild_settings_lookup_disallowed_by
 
       team_id = Gym.config[:export_team_id] || Gym.project.build_settings(key: "DEVELOPMENT_TEAM")
       return if team_id.nil?
@@ -117,15 +120,15 @@ module Gym
         return
       end
 
-      output = Helper.backticks("security find-certificate -a -c \"#{prefix}\"", print: false)
-
-      # Find matches, filter by team_id, prepend prefix for full cert name
-      certs = output.scan(/"(?:#{prefix})(.*)"/)
-      certs = certs.flatten.uniq.select do |cert|
-        cert.include?(team_id)
-      end.map do |cert|
-        prefix + cert
+      names = begin
+        Security::Certificate.find(name: prefix).map(&:name)
+      rescue Security::Error => e
+        UI.error("Could not search for installer certificates: #{e.message}")
+        []
       end
+
+      # Filter by team_id, the part after the prefix
+      certs = names.uniq.select { |name| name.start_with?(prefix) && name.delete_prefix(prefix).include?(team_id) }
 
       if certs.first
         UI.verbose("Detected installer certificate to use: #{certs.first}")
@@ -137,24 +140,35 @@ module Gym
       Gym.project.select_scheme
     end
 
-    def self.min_xcode8?
-      Helper.xcode_at_least?("8.0")
-    end
-
     # Is it an iOS device or a Mac?
     def self.detect_platform
       return if Gym.config[:destination]
 
+      Gym.project.verify_xcodebuild_settings_lookup_allowed!("SUPPORTED_PLATFORMS", option: "destination")
       platform = if Gym.project.tvos?
                    "tvOS"
+                 elsif Gym.project.visionos?
+                   "visionOS"
                  elsif Gym.building_for_ios?
                    "iOS"
                  elsif Gym.building_for_mac?
-                   min_xcode8? ? "macOS" : "OS X"
+                   "macOS"
                  else
                    "iOS"
                  end
       Gym.config[:destination] = "generic/platform=#{platform}"
+    end
+
+    # Exporting a macOS build reads the project's build settings, to tell an app from a
+    # command-line tool and to find the app in the archive. When they can't be read,
+    # fail now rather than after the archive is built, unless nothing will be exported
+    def self.verify_platform_without_build_settings
+      disallowed_by = Gym.project.xcodebuild_settings_lookup_disallowed_by
+      return if disallowed_by.nil? || Gym.config[:skip_archive] || Gym.building_for_non_mac_destination?
+
+      UI.user_error!("gym can only export an iOS, tvOS, watchOS or visionOS build while fetching build settings is disallowed by #{disallowed_by}," \
+                     " because exporting for macOS needs the project's build settings. To fix this, set `destination` to one of those platforms" \
+                     " (e.g. \"generic/platform=iOS\") with no `sdk` or `catalyst_platform` for macOS, or disable #{disallowed_by}.")
     end
 
     # Detects the available configurations (e.g. Debug, Release)

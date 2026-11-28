@@ -23,6 +23,7 @@ You can hide the inline changelog by setting the `FASTLANE_HIDE_CHANGELOG` envir
 
 - To hide timestamps in each row, set the `FASTLANE_HIDE_TIMESTAMP` environment variable to true.
 - To disable output formatting, set the `FASTLANE_DISABLE_OUTPUT_FORMAT` environment variable to true.
+- To prevent _fastlane_ from printing the plugins table on every lane run, set the `FASTLANE_HIDE_PLUGINS_TABLE` environment variable to true.
 
 ## Interacting with the user
 
@@ -71,7 +72,7 @@ UI.deprecated("The '--key' parameter is deprecated")
 ```
 
 # Code of Conduct
-Help us keep _fastlane_ open and inclusive. Please read and follow our [Code of Conduct](https://github.com/fastlane/fastlane/blob/master/CODE_OF_CONDUCT.md).
+Help us keep _fastlane_ open and inclusive. Please read and follow our [Code of Conduct](https://github.com/fastlane/fastlane/blob/master/docs/CODE_OF_CONDUCT.md).
 
 # License
 This project is licensed under the terms of the MIT license. See the LICENSE file.

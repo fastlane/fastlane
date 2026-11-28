@@ -8,7 +8,7 @@ describe Fastlane do
             git_remote_branch
           end").runner.execute(:test)
 
-        expect(result).to eq("variable=$(git remote) && git remote show $variable | grep 'HEAD branch' | sed 's/.*: //'")
+        expect(result).to eq("variable=$(git remote) && git remote show $(echo \"$variable\" | head -1) | grep 'HEAD branch' | sed 's/.*: //'")
       end
     end
 
@@ -28,7 +28,7 @@ describe Fastlane do
 
         Dir.chdir(test_directory_path) do
           expect(Fastlane::Actions).to receive(:sh)
-            .with("variable=$(git remote) && git remote show $variable | grep 'HEAD branch' | sed 's/.*: //'", log: false)
+            .with("variable=$(git remote) && git remote show $(echo \"$variable\" | head -1) | grep 'HEAD branch' | sed 's/.*: //'", log: false)
 
           result = Fastlane::FastFile.new.parse("lane :test do
             git_remote_branch
@@ -44,7 +44,7 @@ describe Fastlane do
         test_directory_path = Dir.mktmpdir(directory)
 
         Dir.chdir(test_directory_path) do
-          `git init`
+          `git -c init.defaultBranch=main init`
 
           File.write('test_file', <<-TESTFILE)
               'Hello'
@@ -53,7 +53,7 @@ describe Fastlane do
           `git commit --message "Test file"`
 
           expect(Fastlane::Actions).to receive(:sh)
-            .with("variable=$(git remote) && git remote show $variable | grep 'HEAD branch' | sed 's/.*: //'", log: false)
+            .with("variable=$(git remote) && git remote show $(echo \"$variable\" | head -1) | grep 'HEAD branch' | sed 's/.*: //'", log: false)
 
           result = Fastlane::FastFile.new.parse("lane :test do
             git_remote_branch
@@ -67,7 +67,7 @@ describe Fastlane do
     context "runs the command with a remote git repo" do
       it "Confirms that a default remote is found" do
         allow(Fastlane::Actions).to receive(:sh)
-          .with("variable=$(git remote) && git remote show $variable | grep 'HEAD branch' | sed 's/.*: //'", log: false)
+          .with("variable=$(git remote) && git remote show $(echo \"$variable\" | head -1) | grep 'HEAD branch' | sed 's/.*: //'", log: false)
           .and_return("main")
         allow(Fastlane::Actions).to receive(:git_branch).and_return(nil)
 

@@ -1,9 +1,10 @@
 describe Fastlane do
   describe Fastlane::FastFile do
-    build_log_path = File.expand_path("#{FastlaneCore::Helper.buildlog_path}/fastlane/xcbuild/#{Time.now.strftime('%F')}/#{Process.pid}/xcodebuild.log")
+    let(:build_log_path) { File.expand_path("#{FastlaneCore::Helper.buildlog_path}/fastlane/xcbuild/#{Time.now.strftime('%F')}/#{Process.pid}/xcodebuild.log") }
 
     describe "Xcodebuild Integration" do
       before :each do
+        allow(Time).to receive(:now).and_return(Time.at(1_420_063_200))
         Fastlane::Actions.lane_context.delete(:IPA_OUTPUT_PATH)
         Fastlane::Actions.lane_context.delete(:XCODEBUILD_ARCHIVE)
       end
@@ -66,7 +67,7 @@ describe Fastlane do
           "-hideShellScriptEnvironment -jobs \"5\" -parallelizeTargets OTHER_CODE_SIGN_FLAGS=\"--keychain /path/to/My.keychain\" -project " \
           "\"MyApp.xcodeproj\" -resultBundlePath \"/result/bundle/path\" -scheme \"MyApp\" -sdk \"iphonesimulator\" -skipUnavailableActions -target " \
           "\"MyAppTarget\" -toolchain \"toolchain name\" -workspace \"MyApp.xcworkspace\" -xcconfig \"my.xcconfig\" -newArgument YES -enableAddressSanitizer " \
-          "\"YES\" -enableThreadSanitizer \"NO\" -enableCodeCoverage \"YES\" | tee 'mypath/xcodebuild.log' | xcpretty --color --test"
+          "\"YES\" -enableThreadSanitizer \"NO\" -enableCodeCoverage \"YES\" | tee mypath/xcodebuild.log | xcpretty --color --test"
         )
       end
 
@@ -89,7 +90,7 @@ describe Fastlane do
           + "-destination-timeout \"240\" " \
           + "-scheme \"MyApp\" " \
           + "-workspace \"MyApp.xcworkspace\" " \
-          + "| tee '#{build_log_path}' | xcpretty --color --simple"
+          + "| tee #{build_log_path.shellescape} | xcpretty --color --simple"
         )
       end
 
@@ -114,7 +115,7 @@ describe Fastlane do
           + "GCC_PREPROCESSOR_DEFINITIONS=\"\\$(inherited) NDEBUG=1\" " \
           + "-scheme \"MyApp\" " \
           + "-workspace \"MyApp.xcworkspace\" " \
-          + "| tee '#{build_log_path}' | xcpretty --color --simple"
+          + "| tee #{build_log_path.shellescape} | xcpretty --color --simple"
         )
 
         # expect(result).to include('CODE_SIGN_IDENTITY="iPhone Developer: Josh"')
@@ -149,7 +150,7 @@ describe Fastlane do
         expect(result).to match(/-exportOptionsPlist \".*\.plist\"/)
         expect(result).to end_with(
           "-exportPath \"./build-dir/MyApp\" " \
-          + "| tee '#{build_log_path}' | xcpretty --color --simple"
+          + "| tee #{build_log_path.shellescape} | xcpretty --color --simple"
         )
       end
 
@@ -175,7 +176,7 @@ describe Fastlane do
         expect(result).to match(/-exportOptionsPlist \".*\.plist\"/)
         expect(result).to end_with(
           "-exportPath \"./build-dir/MyApp\" " \
-          + "| tee '#{build_log_path}' | xcpretty --color --simple"
+          + "| tee #{build_log_path.shellescape} | xcpretty --color --simple"
         )
       end
 
@@ -213,7 +214,7 @@ describe Fastlane do
           + "-exportArchive " \
           + "-exportPath \"./build-dir/MyApp\" " \
           + "-archivePath \"./build-dir/MyApp.xcarchive\" " \
-          + "| tee '#{build_log_path}' | xcpretty --color --simple"
+          + "| tee #{build_log_path.shellescape} | xcpretty --color --simple"
         )
       end
 
@@ -269,7 +270,7 @@ describe Fastlane do
           + "-scheme \"MyApp\" " \
           + "-workspace \"MyApp.xcworkspace\" " \
           + "-archivePath \"./build-dir/MyApp.xcarchive\" " \
-          + "| tee '#{build_log_path}' | xcpretty --color --simple"
+          + "| tee #{build_log_path.shellescape} | xcpretty --color --simple"
         )
       end
 
@@ -289,7 +290,7 @@ describe Fastlane do
           + "-archivePath \"./build-dir/MyApp.xcarchive\" " \
           + "-exportArchive " \
           + "-exportPath \"./build-dir/MyApp\" " \
-          + "| tee '#{build_log_path}' | xcpretty --color --simple"
+          + "| tee #{build_log_path.shellescape} | xcpretty --color --simple"
         )
       end
     end
@@ -311,7 +312,7 @@ describe Fastlane do
           + "-scheme \"MyApp\" " \
           + "-workspace \"MyApp.xcworkspace\" " \
           + "archive " \
-          + "| tee '#{build_log_path}' | xcpretty --color --simple"
+          + "| tee #{build_log_path.shellescape} | xcpretty --color --simple"
         )
       end
     end
@@ -331,7 +332,7 @@ describe Fastlane do
           + "-scheme \"MyApp\" " \
           + "-workspace \"MyApp.xcworkspace\" " \
           + "build " \
-          + "| tee '#{build_log_path}' | xcpretty --color --simple"
+          + "| tee #{build_log_path.shellescape} | xcpretty --color --simple"
         )
       end
     end
@@ -352,7 +353,7 @@ describe Fastlane do
           + "-scheme \"MyApp\" " \
           + "-workspace \"MyApp.xcworkspace\" " \
           + "build " \
-          + "| tee '#{build_log_path}' "
+          + "| tee #{build_log_path.shellescape} "
         )
       end
     end
@@ -393,7 +394,7 @@ describe Fastlane do
 
         expect(result).to eq(
           "set -o pipefail && " \
-          + "cat '#{build_log_path}' " \
+          + "cat #{build_log_path.shellescape} " \
           + "| xcpretty --color --report html --test > /dev/null"
         )
       end
@@ -406,8 +407,30 @@ describe Fastlane do
         end").runner.execute(:test)
 
         expect(result).to eq(
-          "set -o pipefail && xcodebuild clean | tee '#{build_log_path}' | xcpretty --color --simple"
+          "set -o pipefail && xcodebuild clean | tee #{build_log_path.shellescape} | xcpretty --color --simple"
         )
+      end
+    end
+
+    describe "buildlog_path with an apostrophe and a space" do
+      let(:buildlog_path) { File.join(Dir.mktmpdir, "Kaldi's Kafe") }
+
+      it "gives tee the log path as one argument" do
+        result = Fastlane::FastFile.new.parse("lane :test do
+          xcbuild(scheme: 'MyApp', buildlog_path: #{buildlog_path.inspect})
+        end").runner.execute(:test)
+
+        args = Shellwords.split(result)
+        expect(args[args.index("tee") + 1]).to eq(File.join(buildlog_path, "xcodebuild.log"))
+      end
+
+      it "gives cat the log path as one argument when reports are made from the raw log" do
+        result = Fastlane::FastFile.new.parse("lane :test do
+          xcbuild(scheme: 'MyApp', buildlog_path: #{buildlog_path.inspect}, raw_buildlog: true, report_formats: ['html'], test: true)
+        end").runner.execute(:test)
+
+        args = Shellwords.split(result)
+        expect(args[args.index("cat") + 1]).to eq(File.join(buildlog_path, "xcodebuild.log"))
       end
     end
 
@@ -451,7 +474,7 @@ describe Fastlane do
           + "-workspace \"MyApp.xcworkspace\" " \
           + "build " \
           + "test " \
-          + "| tee '#{build_log_path}' | xcpretty --color --test"
+          + "| tee #{build_log_path.shellescape} | xcpretty --color --test"
         )
       end
     end
@@ -478,7 +501,7 @@ describe Fastlane do
           + "build " \
           + "test " \
           + "-enableAddressSanitizer \"YES\" " \
-          + "| tee '#{build_log_path}' | xcpretty --color --test"
+          + "| tee #{build_log_path.shellescape} | xcpretty --color --test"
         )
       end
 
@@ -503,7 +526,7 @@ describe Fastlane do
           + "build " \
           + "test " \
           + "-enableAddressSanitizer \"NO\" " \
-          + "| tee '#{build_log_path}' | xcpretty --color --test"
+          + "| tee #{build_log_path.shellescape} | xcpretty --color --test"
         )
       end
     end
@@ -530,7 +553,7 @@ describe Fastlane do
           + "build " \
           + "test " \
           + "-enableThreadSanitizer \"YES\" " \
-          + "| tee '#{build_log_path}' | xcpretty --color --test"
+          + "| tee #{build_log_path.shellescape} | xcpretty --color --test"
         )
       end
 
@@ -555,7 +578,45 @@ describe Fastlane do
           + "build " \
           + "test " \
           + "-enableThreadSanitizer \"NO\" " \
-          + "| tee '#{build_log_path}' | xcpretty --color --test"
+          + "| tee #{build_log_path.shellescape} | xcpretty --color --test"
+        )
+      end
+    end
+
+    describe 'overriding xcodebuild architecture' do
+      it 'does not override the architecture if the option is not present' do
+        result = Fastlane::FastFile.new.parse("lane :build do
+          xcodebuild(
+            scheme: 'MyApp',
+            workspace: 'MyApp.xcworkspace',
+          )
+        end").runner.execute(:build)
+
+        expect(result).to eq(
+          "set -o pipefail && " \
+          + "xcodebuild " \
+          + "-scheme \"MyApp\" " \
+          + "-workspace \"MyApp.xcworkspace\" " \
+          + "| tee #{build_log_path.shellescape} | xcpretty --color --simple"
+        )
+      end
+
+      it 'overrides the architecture with what is specified if the option is present' do
+        result = Fastlane::FastFile.new.parse("lane :build do
+          xcodebuild(
+            scheme: 'MyApp',
+            workspace: 'MyApp.xcworkspace',
+            xcodebuild_architecture: 'x86_64'
+          )
+        end").runner.execute(:build)
+
+        expect(result).to eq(
+          "set -o pipefail && " \
+          + "arch -x86_64 " \
+          + "xcodebuild " \
+          + "-scheme \"MyApp\" " \
+          + "-workspace \"MyApp.xcworkspace\" " \
+          + "| tee #{build_log_path.shellescape} | xcpretty --color --simple"
         )
       end
     end
@@ -582,7 +643,7 @@ describe Fastlane do
           + "build " \
           + "test " \
           + "-enableCodeCoverage \"YES\" " \
-          + "| tee '#{build_log_path}' | xcpretty --color --test"
+          + "| tee #{build_log_path.shellescape} | xcpretty --color --test"
         )
       end
 
@@ -607,7 +668,7 @@ describe Fastlane do
           + "build " \
           + "test " \
           + "-enableCodeCoverage \"NO\" " \
-          + "| tee '#{build_log_path}' | xcpretty --color --test"
+          + "| tee #{build_log_path.shellescape} | xcpretty --color --test"
         )
       end
     end
@@ -632,7 +693,7 @@ describe Fastlane do
           + "-workspace \"MyApp.xcworkspace\" " \
           + "build " \
           + "test " \
-          + "| tee '#{build_log_path}' | xcpretty --color " \
+          + "| tee #{build_log_path.shellescape} | xcpretty --color " \
           + "--report junit " \
           + "--output \"./build-dir/test-report\" " \
           + "--test"
@@ -640,34 +701,32 @@ describe Fastlane do
       end
 
       it "should save reports to BUILD_PATH + \"/report\" by default" do
-        ENV["XCODE_BUILD_PATH"] = "./build"
+        FastlaneSpec::Env.with_env_values('XCODE_BUILD_PATH' => "./build") do
+          result = Fastlane::FastFile.new.parse("lane :test do
+            xctest(
+              destination: 'name=iPhone 5s,OS=8.1',
+              scheme: 'MyApp',
+              workspace: 'MyApp.xcworkspace',
+              report_formats: ['html'],
+              report_screenshots: true
+            )
+          end").runner.execute(:test)
 
-        result = Fastlane::FastFile.new.parse("lane :test do
-          xctest(
-            destination: 'name=iPhone 5s,OS=8.1',
-            scheme: 'MyApp',
-            workspace: 'MyApp.xcworkspace',
-            report_formats: ['html'],
-            report_screenshots: true
+          expect(result).to eq(
+            "set -o pipefail && " \
+            + "xcodebuild " \
+            + "-destination \"name=iPhone 5s,OS=8.1\" " \
+            + "-scheme \"MyApp\" " \
+            + "-workspace \"MyApp.xcworkspace\" " \
+            + "build " \
+            + "test " \
+            + "| tee #{build_log_path.shellescape} | xcpretty --color " \
+            + "--report html " \
+            + "--screenshots " \
+            + "--output \"./build/report\" " \
+            + "--test"
           )
-        end").runner.execute(:test)
-
-        expect(result).to eq(
-          "set -o pipefail && " \
-          + "xcodebuild " \
-          + "-destination \"name=iPhone 5s,OS=8.1\" " \
-          + "-scheme \"MyApp\" " \
-          + "-workspace \"MyApp.xcworkspace\" " \
-          + "build " \
-          + "test " \
-          + "| tee '#{build_log_path}' | xcpretty --color " \
-          + "--report html " \
-          + "--screenshots " \
-          + "--output \"./build/report\" " \
-          + "--test"
-        )
-
-        ENV.delete("XCODE_BUILD_PATH")
+        end
       end
 
       it "should support multiple output formats" do
@@ -688,7 +747,7 @@ describe Fastlane do
           + "-workspace \"MyApp.xcworkspace\" " \
           + "build " \
           + "test " \
-          + "| tee '#{build_log_path}' | xcpretty --color " \
+          + "| tee #{build_log_path.shellescape} | xcpretty --color " \
           + "--report html " \
           + "--report json-compilation-database " \
           + "--report junit " \
@@ -722,7 +781,7 @@ describe Fastlane do
           + "-workspace \"MyApp.xcworkspace\" " \
           + "build " \
           + "test " \
-          + "| tee '#{build_log_path}' | xcpretty --color " \
+          + "| tee #{build_log_path.shellescape} | xcpretty --color " \
           + "--report html " \
           + "--output \"./build-dir/test-report.html\" " \
           + "--screenshots " \
@@ -733,37 +792,37 @@ describe Fastlane do
       end
 
       it "should support omitting output when specifying multiple reports " do
-        ENV["XCODE_BUILD_PATH"] = "./build"
+        FastlaneSpec::Env.with_env_values('XCODE_BUILD_PATH' => "./build") do
+          result = Fastlane::FastFile.new.parse("lane :test do
+            xctest(
+              destination: 'name=iPhone 5s,OS=8.1',
+              scheme: 'MyApp',
+              workspace: 'MyApp.xcworkspace',
+              reports: [{
+                report: 'html',
+              },
+              {
+                report: 'junit',
+              }],
+            )
+          end").runner.execute(:test)
 
-        result = Fastlane::FastFile.new.parse("lane :test do
-          xctest(
-            destination: 'name=iPhone 5s,OS=8.1',
-            scheme: 'MyApp',
-            workspace: 'MyApp.xcworkspace',
-            reports: [{
-              report: 'html',
-            },
-            {
-              report: 'junit',
-            }],
+          expect(result).to eq(
+            "set -o pipefail && " \
+            + "xcodebuild " \
+            + "-destination \"name=iPhone 5s,OS=8.1\" " \
+            + "-scheme \"MyApp\" " \
+            + "-workspace \"MyApp.xcworkspace\" " \
+            + "build " \
+            + "test " \
+            + "| tee #{build_log_path.shellescape} | xcpretty --color " \
+            + "--report html " \
+            + "--output \"./build/report/report.html\" " \
+            + "--report junit " \
+            + "--output \"./build/report/report.xml\" " \
+            + "--test"
           )
-        end").runner.execute(:test)
-
-        expect(result).to eq(
-          "set -o pipefail && " \
-          + "xcodebuild " \
-          + "-destination \"name=iPhone 5s,OS=8.1\" " \
-          + "-scheme \"MyApp\" " \
-          + "-workspace \"MyApp.xcworkspace\" " \
-          + "build " \
-          + "test " \
-          + "| tee '#{build_log_path}' | xcpretty --color " \
-          + "--report html " \
-          + "--output \"./build/report/report.html\" " \
-          + "--report junit " \
-          + "--output \"./build/report/report.xml\" " \
-          + "--test"
-        )
+        end
       end
 
       it "should detect and use the workspace, when a workspace is present" do
@@ -778,9 +837,50 @@ describe Fastlane do
           + "xcodebuild " \
           + "build " \
           + "-workspace \"MyApp.xcworkspace\" " \
-          + "| tee '#{build_log_path}' | xcpretty --color " \
+          + "| tee #{build_log_path.shellescape} | xcpretty --color " \
           + "--simple"
         )
+      end
+    end
+  end
+end
+
+describe Fastlane::Actions::XcodebuildAction do
+  describe ".clean_build_setting_value" do
+    {
+      'iPhone Developer: Josh' => 'iPhone Developer: Josh',
+      16 => '16',
+      nil => '',
+      '$(inherited) NDEBUG=1' => '\\$(inherited) NDEBUG=1',
+      '${HOME}/b and $HOME/c' => '\\${HOME}/b and \\$HOME/c',
+      'say "hi"' => 'say \\"hi\\"',
+      'back\\slash' => 'back\\\\slash',
+      '`cmd`' => '\\`cmd\\`',
+      "it's 50% (really) *great* & ok" => "it's 50% (really) *great* & ok"
+    }.each do |value, escaped|
+      it "escapes #{value.inspect} as #{escaped.inspect}" do
+        expect(described_class.clean_build_setting_value(value)).to eq(escaped)
+      end
+    end
+
+    unless FastlaneCore::Helper.windows?
+      [
+        '$(inherited) NDEBUG=1',
+        '${HOME}/b and $HOME/c',
+        'say "hi"',
+        'back\\slash',
+        '`touch pwned` and $(touch pwned)'
+      ].each do |value|
+        it "passes #{value.inspect} through sh unchanged" do
+          Dir.mktmpdir do |dir|
+            # the action wraps the value in double quotes: SETTING="value"
+            output, status = Open3.capture2("sh", "-c", "printf '%s' \"#{described_class.clean_build_setting_value(value)}\"", chdir: dir)
+
+            expect(status.success?).to be(true)
+            expect(output).to eq(value)
+            expect(File.exist?(File.join(dir, "pwned"))).to be(false)
+          end
+        end
       end
     end
   end

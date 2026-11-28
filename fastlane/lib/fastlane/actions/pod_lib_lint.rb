@@ -30,7 +30,7 @@ module Fastlane
         command << "--configuration=#{params[:configuration]}" if params[:configuration]
 
         result = Actions.sh(command.join(' '))
-        UI.success("Pod lib lint Successfully ⬆️ ")
+        UI.success("Pod lib lint successful ⬆️ ")
         return result
       end
 
