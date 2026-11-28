@@ -151,6 +151,54 @@ describe Produce::DeveloperCenter do
     end
   end
 
+  describe "#enable_portal_unsupported_services" do
+    def instance_with(overrides = {}, app_just_created: true, token: nil)
+      config_with(overrides)
+      allow(Spaceship::ConnectAPI).to receive(:token).and_return(token)
+      instance = Produce::DeveloperCenter.new
+      instance.instance_variable_set(:@app_just_created, app_just_created)
+      allow(instance).to receive(:wait_for_bundle_id).and_return(double("bundle_id"))
+      instance
+    end
+
+    it "enables only the portal-unsupported services that are on, right after creation (session login)" do
+      instance = instance_with({ enable_services: { increased_memory_limit: "on", extended_virtual_address_space: "on", push_notification: "on" } })
+      expect(Produce::Service).to receive(:enable) do |options, _args|
+        expect(options.increased_memory_limit).to eq("on")
+        expect(options.extended_virtual_address_space).to eq("on")
+        expect(options.push_notification).to be_nil
+        expect(options.__hash__.keys).to contain_exactly(:increased_memory_limit, :extended_virtual_address_space)
+      end
+      expect(Produce::Service).not_to receive(:disable)
+
+      instance.enable_portal_unsupported_services
+    end
+
+    it "skips services marked off on a just-created app — everything starts off" do
+      instance = instance_with({ enable_services: { increased_memory_limit: "off" } })
+      expect(Produce::Service).not_to receive(:enable)
+      expect(Produce::Service).not_to receive(:disable)
+
+      instance.enable_portal_unsupported_services
+    end
+
+    it "does nothing when the app already existed — changing services is modify_services' job" do
+      instance = instance_with({ enable_services: { increased_memory_limit: "on" } }, app_just_created: false)
+      expect(Produce::Service).not_to receive(:enable)
+      expect(Produce::Service).not_to receive(:disable)
+
+      instance.enable_portal_unsupported_services
+    end
+
+    it "does nothing with an App Store Connect API key, even right after creation" do
+      instance = instance_with({ enable_services: { increased_memory_limit: "on" } }, token: fake_token)
+      expect(Produce::Service).not_to receive(:enable)
+      expect(Produce::Service).not_to receive(:disable)
+
+      instance.enable_portal_unsupported_services
+    end
+  end
+
   describe "#login" do
     it "authenticates with the App Store Connect API key when configured" do
       config_with(api_key: api_key)

@@ -1,5 +1,6 @@
 require 'spaceship'
 require_relative 'module'
+require_relative 'developer_center'
 
 # rubocop:disable Metrics/ClassLength
 module Produce
@@ -63,7 +64,8 @@ module Produce
                       :nfc_tag_reading, :passbook, :personal_vpn, :push_notification, :sign_in_with_apple, :siri_kit, :system_extension, :user_management, :vpn_configuration, :wallet,
                       :wireless_accessory, :driver_kit, :driver_kit_endpoint_security, :driver_kit_family_hid_device, :driver_kit_family_networking, :driver_kit_family_serial,
                       :driver_kit_hid_event_service, :driver_kit_transport_hid, :multitasking_camera_access, :sf_universal_link_api, :vp9_decoder, :music_kit, :shazam_kit,
-                      :communication_notifications, :group_activities, :health_kit_estimate_recalibration, :time_sensitive_notifications]
+                      :communication_notifications, :group_activities, :health_kit_estimate_recalibration, :time_sensitive_notifications,
+                      :increased_memory_limit, :increased_memory_limit_debugging]
       options.__hash__.select { |key, value| allowed_keys.include?(key) }
     end
 
@@ -89,6 +91,8 @@ module Produce
 
     # rubocop:disable Metrics/PerceivedComplexity
     def update(on, options)
+      reject_portal_unsupported_services_with_api_key!(options) if using_connect_api?
+
       updated = valid_services_for(options).count
 
       if options.access_wifi
@@ -181,6 +185,16 @@ module Produce
       if options.extended_virtual_address_space
         UI.message("\tExtended Virtual Address Space")
         bundle_id.update_capability(EXTENDED_VIRTUAL_ADDRESSING, enabled: on)
+      end
+
+      if options.increased_memory_limit
+        UI.message("\tIncreased Memory Limit")
+        bundle_id.update_capability(INCREASED_MEMORY_LIMIT, enabled: on)
+      end
+
+      if options.increased_memory_limit_debugging
+        UI.message("\tIncreased Debugging Memory Limit")
+        bundle_id.update_capability(INCREASED_MEMORY_LIMIT_DEBUGGING, enabled: on)
       end
 
       if options.family_controls
@@ -423,6 +437,26 @@ module Produce
       Produce.authenticate_connect_api!
 
       @bundle_id ||= Spaceship::ConnectAPI::BundleId.find(Produce.config[:app_identifier].to_s)
+    end
+
+    # Apple's public POST /v1/bundleIdCapabilities endpoint does not accept
+    # these types (not in CapabilityType enum), so with an App Store Connect
+    # API key there is no way to enable or disable them. Fail fast with the
+    # same message create_app_online shows, instead of letting Apple reject
+    # the request. Covers modify_services and produce enable_services, which
+    # both go through here.
+    def reject_portal_unsupported_services_with_api_key!(options)
+      unsupported = options.__hash__.keys.select do |key|
+        Produce::DeveloperCenter::PORTAL_UNSUPPORTED_SERVICES.include?(key.to_sym)
+      end
+      return if unsupported.empty?
+
+      UI.user_error!("Cannot modify '#{unsupported.join("', '")}' via the App Store Connect API key — these capabilities are not accepted by Apple's public API and require a username/password login session.")
+    end
+
+    # Mirrors what #login authenticated with, not produce's own :api_key config.
+    def using_connect_api?
+      !Spaceship::ConnectAPI.token.nil?
     end
   end
 end

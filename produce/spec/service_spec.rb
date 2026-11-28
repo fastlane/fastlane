@@ -1,4 +1,5 @@
 require "produce/service"
+require "produce/developer_center"
 
 describe Produce::Service do
   let(:fake_token) { double("connect_api_token", in_house: false) }
@@ -11,6 +12,69 @@ describe Produce::Service do
       team_id: "TEAMID1234",
       team_name: "Example Team"
     }.merge(overrides))
+  end
+
+  describe "#update (App Store Connect API key path)" do
+    def options_with(services)
+      option_class = Class.new
+      option_class.attr_accessor(:__hash__)
+      Produce::DeveloperCenter::ALLOWED_SERVICES.keys.each { |service| option_class.attr_accessor(service) }
+      options = option_class.new
+      options.__hash__ = {}
+      services.each do |key, value|
+        options.__hash__[key] = true
+        options.send("#{key}=", value)
+      end
+      options
+    end
+
+    it "fails fast when a portal-unsupported capability is requested with an API key" do
+      config_with
+      allow(Spaceship::ConnectAPI).to receive(:token).and_return(fake_token)
+      fake_bundle_id = double("service_bundle_id")
+      allow_any_instance_of(Produce::Service).to receive(:bundle_id).and_return(fake_bundle_id)
+      expect(fake_bundle_id).not_to receive(:update_capability)
+
+      expect do
+        Produce::Service.new.update(true, options_with(increased_memory_limit: "on"))
+      end.to raise_error(FastlaneCore::Interface::FastlaneError, %r{require a username/password login session})
+    end
+
+    it "fails fast for disabling too — the API rejects these types either way" do
+      config_with
+      allow(Spaceship::ConnectAPI).to receive(:token).and_return(fake_token)
+      fake_bundle_id = double("service_bundle_id")
+      allow_any_instance_of(Produce::Service).to receive(:bundle_id).and_return(fake_bundle_id)
+      expect(fake_bundle_id).not_to receive(:update_capability)
+
+      expect do
+        Produce::Service.new.update(false, options_with(extended_virtual_address_space: "off"))
+      end.to raise_error(FastlaneCore::Interface::FastlaneError, %r{require a username/password login session})
+    end
+
+    it "lets other capabilities through with an API key" do
+      config_with
+      allow(Spaceship::ConnectAPI).to receive(:token).and_return(fake_token)
+      fake_bundle_id = double("service_bundle_id")
+      allow_any_instance_of(Produce::Service).to receive(:bundle_id).and_return(fake_bundle_id)
+      expect(fake_bundle_id).to receive(:update_capability).with(
+        Spaceship::ConnectAPI::BundleIdCapability::Type::PUSH_NOTIFICATIONS, enabled: true
+      )
+
+      expect(Produce::Service.new.update(true, options_with(push_notification: "on"))).to eq(1)
+    end
+
+    it "lets portal-unsupported capabilities through with a session login" do
+      config_with
+      allow(Spaceship::ConnectAPI).to receive(:token).and_return(nil)
+      fake_bundle_id = double("service_bundle_id")
+      allow_any_instance_of(Produce::Service).to receive(:bundle_id).and_return(fake_bundle_id)
+      expect(fake_bundle_id).to receive(:update_capability).with(
+        Spaceship::ConnectAPI::BundleIdCapability::Type::INCREASED_MEMORY_LIMIT, enabled: true
+      )
+
+      expect(Produce::Service.new.update(true, options_with(increased_memory_limit: "on"))).to eq(1)
+    end
   end
 
   describe "#bundle_id" do

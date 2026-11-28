@@ -33,6 +33,8 @@ module Produce
         SERVICE_UNTIL_FIRST_LAUNCH
       ],
       extended_virtual_address_space: [SERVICE_ON, SERVICE_OFF],
+      increased_memory_limit: [SERVICE_ON, SERVICE_OFF],
+      increased_memory_limit_debugging: [SERVICE_ON, SERVICE_OFF],
       family_controls: [SERVICE_ON, SERVICE_OFF],
       file_provider_testing_mode: [SERVICE_ON, SERVICE_OFF],
       fonts: [SERVICE_ON, SERVICE_OFF],
@@ -82,9 +84,19 @@ module Produce
       health_kit_estimate_recalibration: [SERVICE_ON, SERVICE_OFF],
       time_sensitive_notifications: [SERVICE_ON, SERVICE_OFF],
     }
+
+    # No `Spaceship::Portal::AppService` method and not in the API's `CapabilityType`:
+    # enabled after creation through the login session.
+    PORTAL_UNSUPPORTED_SERVICES = [:extended_virtual_address_space, :increased_memory_limit, :increased_memory_limit_debugging].freeze
+
+    def portal_unsupported_service?(key)
+      PORTAL_UNSUPPORTED_SERVICES.include?(key.to_sym)
+    end
+
     def run
       login
       create_new_app
+      enable_portal_unsupported_services
     end
 
     def create_new_app
@@ -94,6 +106,7 @@ module Produce
       if app_exists?
         UI.success("[DevCenter] App '#{Produce.config[:app_identifier]}' already exists, nothing to do on the Dev Center")
         ENV["CREATED_NEW_APP_ID"] = nil
+        @app_just_created = false
         # Nothing to do here
       else
         app_name = Produce.config[:app_name]
@@ -115,6 +128,7 @@ module Produce
         UI.crash!("Something went wrong when creating the new app - it's not listed in the apps list") unless app_exists?
 
         ENV["CREATED_NEW_APP_ID"] = Time.now.to_i.to_s
+        @app_just_created = true
 
         UI.success("Finished creating new app '#{app_name}' on the Dev Center")
       end
@@ -129,6 +143,7 @@ module Produce
       existing = Spaceship::ConnectAPI::BundleId.find(app_identifier)
       if existing
         UI.success("[DevCenter] App '#{Produce.config[:app_identifier]}' already exists, nothing to do on the Dev Center")
+        @app_just_created = false
         return true
       end
 
@@ -142,6 +157,7 @@ module Produce
 
       UI.message("Created app #{bundle_id.id}")
       enable_inline_services(config_enabled_services) if config_enabled_services && !config_enabled_services.empty?
+      @app_just_created = true
       UI.success("Finished creating new app '#{app_name}' on the Dev Center")
 
       return true
@@ -155,7 +171,10 @@ module Produce
       config_enabled_services = Produce.config[:enable_services] || Produce.config[:enabled_features]
 
       config_enabled_services.each do |k, v|
-        if k.to_sym == :data_protection
+        key = k.to_sym
+        next if portal_unsupported_service?(key)
+
+        if key == :data_protection
           case v
           when SERVICE_COMPLETE
             enabled_clean_options[app_service.data_protection.complete.service_id] = app_service.data_protection.complete
@@ -164,7 +183,7 @@ module Produce
           when SERVICE_UNTIL_FIRST_LAUNCH
             enabled_clean_options[app_service.data_protection.untilfirstauth.service_id] = app_service.data_protection.untilfirstauth
           end
-        elsif k.to_sym == :icloud
+        elsif key == :icloud
           case v
           when SERVICE_LEGACY
             enabled_clean_options[app_service.cloud.on.service_id] = app_service.cloud.on
@@ -184,6 +203,68 @@ module Produce
       enabled_clean_options
     end
 
+    def enable_portal_unsupported_services
+      # Only runs right after the app was just created: changing services on an
+      # existing app is modify_services' job. "off" is skipped too — meaningless
+      # on a brand-new app, where everything starts off (mirrors
+      # enable_inline_services).
+      return unless @app_just_created
+
+      # On the App Store Connect API key path, create_new_app_via_connect_api already
+      # ran enable_inline_services (which skips these capabilities with a warning);
+      # running Produce::Service here would hit Apple's per-capability endpoints
+      # with a token, which reject these types (not in CapabilityType enum).
+      return if using_connect_api?
+
+      config_enabled_services = Produce.config[:enable_services] || Produce.config[:enabled_features] || {}
+      unsupported_services = config_enabled_services.select do |k, _v|
+        portal_unsupported_service?(k.to_sym)
+      end
+      return if unsupported_services.empty?
+
+      enabled_services = unsupported_services.select { |_k, v| service_enabled?(v) }
+                                             .map { |k, v| [k.to_sym, normalize_service_value(v)] }
+                                             .to_h
+      return if enabled_services.empty?
+
+      UI.message("Configuring capabilities the Developer Portal cannot set for '#{app_identifier}'")
+      UI.message("\tenabling: #{enabled_services.keys.join(', ')}")
+
+      wait_for_bundle_id
+
+      Produce::Service.enable(build_service_options(enabled_services), nil)
+    end
+
+    # Produce::Service#update expects an options object with a reader per capability
+    # plus __hash__; a plain Hash does not satisfy that interface, so build one on a
+    # dedicated anonymous class instead of defining accessors on Object.
+    def build_service_options(services)
+      option_class = Class.new
+      option_class.attr_accessor(:__hash__)
+      ALLOWED_SERVICES.keys.each { |service| option_class.attr_accessor(service) }
+
+      service_object = option_class.new
+      service_object.__hash__ = {}
+
+      services.each do |key, value|
+        sym_key = key.to_sym
+        service_object.__hash__[sym_key] = true
+        service_object.send("#{sym_key}=", value)
+      end
+
+      service_object
+    end
+
+    def service_enabled?(value)
+      value == SERVICE_ON || value == true || (value != false && value.to_s != SERVICE_OFF)
+    end
+
+    def normalize_service_value(value)
+      return SERVICE_ON if value == true || value.to_s == SERVICE_ON
+
+      value
+    end
+
     def app_identifier
       Produce.config[:app_identifier].to_s
     end
@@ -193,12 +274,30 @@ module Produce
     # Delegates to Service#update instead of duplicating its ~40-capability mapping.
     # Skips any capability explicitly marked "off" — meaningless on a brand-new app.
     def enable_inline_services(config_enabled_services)
-      to_enable = config_enabled_services.reject { |_, v| v == SERVICE_OFF }
+      unsupported = config_enabled_services.select { |k, _v| portal_unsupported_service?(k.to_sym) }
+      unless unsupported.empty?
+        UI.important("Skipping capabilities that cannot be enabled via the App Store Connect API key: #{unsupported.keys.join(', ')} — they require a username/password login session.")
+      end
+      to_enable = config_enabled_services.reject { |k, v| v == SERVICE_OFF || portal_unsupported_service?(k.to_sym) }
       return if to_enable.empty?
 
       options = OpenStruct.new(to_enable)
       options.define_singleton_method(:__hash__) { to_enable }
       Produce::Service.new.update(true, options)
+    end
+
+    def wait_for_bundle_id
+      counter = 0
+      loop do
+        bundle_id = Spaceship::ConnectAPI::BundleId.find(app_identifier)
+        return bundle_id if bundle_id
+
+        counter += 1
+        UI.user_error!("Could not find '#{app_identifier}' on App Store Connect to configure capabilities") if counter >= 10
+
+        UI.message("Waiting for '#{app_identifier}' to be available on App Store Connect...")
+        sleep(3)
+      end
     end
 
     def platform
