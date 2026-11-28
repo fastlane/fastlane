@@ -401,6 +401,25 @@ module Deliver
         enabled_languages << lang_folder.basename unless enabled_languages.include?(lang_folder.basename)
       end
 
+      # Locales that exist only on App Store Connect also need the default values.
+      app = Deliver.cache[:app]
+      if app
+        platform = Spaceship::ConnectAPI::Platform.map(options[:platform])
+        version = if options[:edit_live]
+                    app.get_live_app_store_version(platform: platform) || fetch_edit_app_store_version(app, platform)
+                  else
+                    fetch_edit_app_store_version(app, platform)
+                  end
+        version&.get_app_store_version_localizations&.each do |localization|
+          enabled_languages << localization.locale unless enabled_languages.include?(localization.locale)
+        end
+
+        app_info = options[:edit_live] ? fetch_live_app_info(app) : fetch_edit_app_info(app)
+        app_info&.get_app_info_localizations&.each do |localization|
+          enabled_languages << localization.locale unless enabled_languages.include?(localization.locale)
+        end
+      end
+
       return unless enabled_languages.include?("default")
       UI.message("Detected languages: " + enabled_languages.to_s)
 

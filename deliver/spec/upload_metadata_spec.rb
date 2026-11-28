@@ -753,6 +753,27 @@ describe Deliver::UploadMetadata do
       end
     end
 
+    context "with a locale that only exists on App Store Connect" do
+      it "copies the default release notes to that locale" do
+        version_localization = double('version_localization', locale: 'en-US')
+        version = double('version', get_app_store_version_localizations: [version_localization])
+        app = double('app')
+
+        allow(Deliver).to receive(:cache).and_return({ app: app })
+        options[:platform] = 'ios'
+        allow(app).to receive(:get_edit_app_store_version).and_return(version)
+        allow(uploader).to receive(:fetch_edit_app_info).and_return(nil)
+
+        create_filesystem_language('default')
+        options[:release_notes] = { 'default' => 'from default' }
+
+        uploader.load_from_filesystem
+        uploader.assign_defaults
+
+        expect(options[:release_notes]['en-US']).to eql('from default')
+      end
+    end
+
     context "with localized version values for release notes" do
       it "default value set for unspecified languages" do
         options[:languages] = ['en-AU', 'en-CA', 'en-GB']
