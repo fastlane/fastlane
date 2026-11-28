@@ -510,7 +510,17 @@ To import and encrypt a certificate (`.cer`), the private key (`.p12`) and the p
 fastlane match import
 ```
 
-You'll be prompted for the certificate (`.cer`), the private key (`.p12`) and the provisioning profiles (`.mobileprovision` or `.provisionprofile`) paths. _match_ will first validate the certificate (`.cer`) against the Developer Portal before importing the certificate, the private key and the provisioning profiles into the specified _match_ repository.
+You'll be prompted for the certificate (`.cer`), the private key (`.p12`) and the provisioning profiles (`.mobileprovision` or `.provisionprofile`) paths. To run without prompts, on CI for example, give the paths as options; once one is given, _match_ doesn't prompt for the others:
+
+```no-highlight
+fastlane match import --import_certificate_file_path cert.cer \
+                      --import_certificate_private_key_file_path key.p12 \
+                      --import_provisioning_profile_file_path profile.mobileprovision
+```
+
+A path that doesn't exist is an error. To import only a provisioning profile, give only `import_provisioning_profile_file_path`: _match_ then doesn't log in to the Developer Portal.
+
+_match_ will first validate the certificate (`.cer`) against the Developer Portal before importing the certificate, the private key and the provisioning profiles into the specified _match_ repository.
 
 However if there is no access to the developer portal but there are certificates, private keys and profiles provided, you can use the `skip_certificate_matching` option to tell _match_ not to verify the certificates. Like this:
 

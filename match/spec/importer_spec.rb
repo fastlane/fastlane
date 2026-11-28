@@ -101,6 +101,139 @@ describe Match do
       Match::Importer.new.import_cert(config, cert_path: cert_path, p12_path: p12_path)
     end
 
+    it "imports a .mobileprovision (iOS provision) into the match repo without a .cert and .p12" do
+      repo_dir = Dir.mktmpdir
+      setup_fake_storage(repo_dir, config)
+
+      # UI will prompt 2x for cert/key which we are not providing
+      expect(UI).to receive(:input).and_return("")
+      expect(UI).to receive(:input).and_return("")
+
+      # because no cert/key provided ConnectAPI operations will be skipped
+      expect(Spaceship::ConnectAPI).not_to receive(:login)
+      expect(Spaceship::ConnectAPI::Certificate).not_to receive(:all)
+      expect(fake_storage).to receive(:save_changes!).with(
+        files_to_commit: [
+          File.join(repo_dir, "profiles", "appstore", "AppStore_tools.fastlane.app.mobileprovision")
+        ]
+      )
+
+      expect(fake_storage).to receive(:clear_changes)
+
+      Match::Importer.new.import_cert(config, cert_path: nil, p12_path: nil, profile_path: ios_profile_path)
+    end
+
+    it "imports a .provisionprofile (osx provision) into the match repo without a .cert and .p12" do
+      repo_dir = Dir.mktmpdir
+      setup_fake_storage(repo_dir, config)
+
+      # UI will prompt 2x for cert/key which we are not providing
+      expect(UI).to receive(:input).and_return("")
+      expect(UI).to receive(:input).and_return("")
+
+      # because no cert/key provided ConnectAPI operations will be skipped
+      expect(Spaceship::ConnectAPI).not_to receive(:login)
+      expect(Spaceship::ConnectAPI::Certificate).not_to receive(:all)
+      expect(fake_storage).to receive(:save_changes!).with(
+        files_to_commit: [
+          File.join(repo_dir, "profiles", "appstore", "AppStore_tools.fastlane.app.provisionprofile")
+        ]
+      )
+
+      expect(fake_storage).to receive(:clear_changes)
+
+      Match::Importer.new.import_cert(config, cert_path: nil, p12_path: nil, profile_path: osx_profile_path)
+    end
+
+    context "with the paths given as options" do
+      it "imports a .cert, .p12 and .mobileprovision without prompting" do
+        config[:import_certificate_file_path] = cert_path
+        config[:import_certificate_private_key_file_path] = p12_path
+        config[:import_provisioning_profile_file_path] = ios_profile_path
+
+        repo_dir = Dir.mktmpdir
+        setup_fake_storage(repo_dir, config)
+
+        expect(UI).not_to receive(:input)
+        expect(Spaceship::ConnectAPI).to receive(:login)
+        expect(Spaceship::ConnectAPI::Certificate).to receive(:all).and_return([mock_cert])
+        expect(fake_storage).to receive(:save_changes!).with(
+          files_to_commit: [
+            File.join(repo_dir, "certs", "distribution", "#{mock_cert.id}.cer"),
+            File.join(repo_dir, "certs", "distribution", "#{mock_cert.id}.p12"),
+            File.join(repo_dir, "profiles", "appstore", "AppStore_tools.fastlane.app.mobileprovision")
+          ]
+        )
+        expect(fake_storage).to receive(:clear_changes)
+
+        Match::Importer.new.import_cert(config)
+      end
+
+      it "imports a .cert and .p12 without prompting for a profile" do
+        config[:import_certificate_file_path] = cert_path
+        config[:import_certificate_private_key_file_path] = p12_path
+
+        repo_dir = Dir.mktmpdir
+        setup_fake_storage(repo_dir, config)
+
+        expect(UI).not_to receive(:input)
+        expect(Spaceship::ConnectAPI).to receive(:login)
+        expect(Spaceship::ConnectAPI::Certificate).to receive(:all).and_return([mock_cert])
+        expect(fake_storage).to receive(:save_changes!).with(
+          files_to_commit: [
+            File.join(repo_dir, "certs", "distribution", "#{mock_cert.id}.cer"),
+            File.join(repo_dir, "certs", "distribution", "#{mock_cert.id}.p12")
+          ]
+        )
+        expect(fake_storage).to receive(:clear_changes)
+
+        Match::Importer.new.import_cert(config)
+      end
+
+      it "imports a .provisionprofile alone without prompting or logging in" do
+        config[:import_provisioning_profile_file_path] = osx_profile_path
+
+        repo_dir = Dir.mktmpdir
+        setup_fake_storage(repo_dir, config)
+
+        expect(UI).not_to receive(:input)
+        expect(Spaceship::ConnectAPI).not_to receive(:login)
+        expect(Spaceship::ConnectAPI::Certificate).not_to receive(:all)
+        expect(fake_storage).to receive(:save_changes!).with(
+          files_to_commit: [
+            File.join(repo_dir, "profiles", "appstore", "AppStore_tools.fastlane.app.provisionprofile")
+          ]
+        )
+        expect(fake_storage).to receive(:clear_changes)
+
+        Match::Importer.new.import_cert(config)
+      end
+
+      it "fails on a .cer and .p12 path that does not exist instead of importing the profile alone" do
+        config[:import_certificate_file_path] = "./match/spec/fixtures/missing.cer"
+        config[:import_certificate_private_key_file_path] = "./match/spec/fixtures/missing.p12"
+        config[:import_provisioning_profile_file_path] = ios_profile_path
+
+        expect(Match::Storage).not_to receive(:from_params)
+
+        expect do
+          Match::Importer.new.import_cert(config)
+        end.to raise_error(FastlaneCore::Interface::FastlaneError, "Certificate does not exist at path: ./match/spec/fixtures/missing.cer")
+      end
+
+      it "fails on a profile path that does not exist" do
+        config[:import_certificate_file_path] = cert_path
+        config[:import_certificate_private_key_file_path] = p12_path
+        config[:import_provisioning_profile_file_path] = "./match/spec/fixtures/missing.mobileprovision"
+
+        expect(Match::Storage).not_to receive(:from_params)
+
+        expect do
+          Match::Importer.new.import_cert(config)
+        end.to raise_error(FastlaneCore::Interface::FastlaneError, "Provisioning profile does not exist at path: ./match/spec/fixtures/missing.mobileprovision")
+      end
+    end
+
     it "imports a .cert and .p12 when the type is set to developer_id" do
       repo_dir = Dir.mktmpdir
       developer_id_config = FastlaneCore::Configuration.create(Match::Options.available_options, developer_id_test_values)
