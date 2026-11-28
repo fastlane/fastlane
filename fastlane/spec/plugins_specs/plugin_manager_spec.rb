@@ -28,6 +28,11 @@ describe Fastlane do
         allow(Bundler::SharedHelpers).to receive(:default_gemfile).and_return("./fastlane/spec/fixtures/plugins/Pluginfile1")
         expect(plugin_manager.available_gems).to eq(["fastlane-plugin-xcversion", "fastlane_core", "hemal"])
       end
+
+      it "leaves out gems in bundler groups that are not enabled" do
+        allow(Bundler::SharedHelpers).to receive(:default_gemfile).and_return("./fastlane/spec/fixtures/plugins/PluginfileWithOptionalGroup")
+        expect(plugin_manager.available_gems).to eq(["fastlane-plugin-always"])
+      end
     end
 
     describe "#available_plugins" do

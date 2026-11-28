@@ -1,0 +1,7 @@
+source "https://rubygems.org"
+
+gem "fastlane-plugin-always"
+
+group :android, optional: true do
+  gem "fastlane-plugin-android_only"
+end

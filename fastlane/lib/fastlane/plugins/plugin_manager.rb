@@ -55,7 +55,7 @@ module Fastlane
     def available_gems
       return [] unless gemfile_path
       dsl = Bundler::Dsl.evaluate(gemfile_path, nil, true)
-      return dsl.dependencies.map(&:name)
+      return dsl.requested_dependencies.map(&:name)
     end
 
     # Returns an array of fastlane plugins that are added to the Gemfile or Pluginfile
