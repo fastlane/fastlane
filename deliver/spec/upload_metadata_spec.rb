@@ -761,6 +761,7 @@ describe Deliver::UploadMetadata do
 
         allow(Deliver).to receive(:cache).and_return({ app: app })
         options[:platform] = 'ios'
+        options[:version_check_wait_retry_limit] = 5
         allow(app).to receive(:get_edit_app_store_version).and_return(version)
         allow(uploader).to receive(:fetch_edit_app_info).and_return(nil)
 
