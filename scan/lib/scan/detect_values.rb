@@ -263,7 +263,7 @@ module Scan
                   "of deployment target (#{deployment_target_version})")
                 end
               end
-              filter_simulators(simulators, :equal, version).tap(&potential_emptiness_error).select { |sim| sim.name == pieces.first }
+              [filter_simulators(simulators, :equal, version).tap(&potential_emptiness_error).find { |sim| sim.name == pieces.first }].compact
             end
           ).tap do |array|
             if array.empty?
