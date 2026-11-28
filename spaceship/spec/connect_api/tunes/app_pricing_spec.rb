@@ -50,6 +50,14 @@ describe 'Modern app pricing requests' do
     expect(request).to have_been_requested
   end
 
+  it 'does not resend a price schedule POST after a read timeout' do
+    request = stub_request(:post, "#{hostname}v1/appPriceSchedules").to_raise(Net::ReadTimeout)
+    expect do
+      client.post_app_price_schedule(app_id: 'app-id', base_territory_id: 'USA', price_point_id: 'free-point')
+    end.to raise_error(Faraday::TimeoutError)
+    expect(request).to have_been_requested.once
+  end
+
   it 'references unchanged prices and includes the new immediate price' do
     request = stub_request(:post, "#{hostname}v1/appPriceSchedules").with do |req|
       body = JSON.parse(req.body)

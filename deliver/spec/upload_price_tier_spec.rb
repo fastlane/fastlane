@@ -85,13 +85,6 @@ describe Deliver::UploadPriceTier do
     expect { uploader.upload(price_tier: 1) }.to raise_error(FastlaneCore::Interface::FastlaneError, /numeric paid price tiers/)
   end
 
-  it 'refuses a previously scheduled environment price instead of applying it immediately' do
-    FastlaneSpec::Env.with_env_values('DELIVER_PRICE_START_DATE' => '2099-01-01') do
-      expect(app).not_to receive(:fetch_app_price_schedule)
-      expect { uploader.upload(price_point_id: paid.id) }.to raise_error(FastlaneCore::Interface::FastlaneError, /Scheduled pricing is unsupported/)
-    end
-  end
-
   it 'does not overwrite a territory override added during the metadata upload' do
     pending = uploader.prepare(price: '0.99')
     prices << price('override', free, territory: canada)
@@ -189,6 +182,12 @@ describe Deliver::UploadPriceTier do
     it 'does not mistake the upcoming target price for an unchanged current price' do
       expect(Spaceship::ConnectAPI::AppPriceSchedule).not_to receive(:create)
       expect { uploader.upload(price_point_id: 'paid-point') }.to raise_error(FastlaneCore::Interface::FastlaneError, /Cannot safely identify/)
+    end
+
+    it 'does not rewrite the new price once every storefront has reached its start date' do
+      allow(Time).to receive(:now).and_return(Time.utc(2026, 1, 10, 12))
+      expect(Spaceship::ConnectAPI::AppPriceSchedule).not_to receive(:create)
+      uploader.upload(price: '0.99')
     end
   end
 

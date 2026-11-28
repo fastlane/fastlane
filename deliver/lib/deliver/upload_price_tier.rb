@@ -23,10 +23,6 @@ module Deliver
         UI.user_error!("price_base_territory requires price_tier: 0, price, or price_point_id") if options[:price_base_territory]
         return
       end
-      if %w[DELIVER_PRICE_START_DATE DELIVER_PRICE_END_DATE].any? { |key| !ENV[key].to_s.empty? }
-        UI.user_error!("Scheduled pricing is unsupported. Remove DELIVER_PRICE_START_DATE and DELIVER_PRICE_END_DATE before setting an immediate price")
-      end
-
       app = Deliver.cache[:app]
       base, prices = read_schedule(app)
       territory_id = base_territory_id(options, base, prices)
@@ -104,8 +100,8 @@ module Deliver
       now = Time.now
       earliest = now.getlocal("-12:00").to_date.iso8601
       latest = now.getlocal("+14:00").to_date.iso8601
-      remaining = base_prices.reject { |price| price.end_date && price.end_date < earliest }
-      current, future = remaining.partition { |price| price.start_date.nil? || price.start_date < earliest }
+      remaining = base_prices.reject { |price| price.end_date && price.end_date <= earliest }
+      current, future = remaining.partition { |price| price.start_date.nil? || price.start_date <= earliest }
       if current.size != 1 || (current.first.end_date && current.first.end_date <= latest) ||
          future.any? { |price| price.start_date <= latest || current.first.end_date.nil? || price.start_date < current.first.end_date }
         UI.user_error!("Cannot safely identify the current base territory price. Check the schedule in App Store Connect")
