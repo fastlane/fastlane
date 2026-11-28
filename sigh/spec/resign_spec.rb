@@ -34,7 +34,7 @@ describe Sigh do
     end
 
     it "Create entitlements options from a string, for every bundle" do
-      expect(@resign.create_entitlements_options("My App.entitlements")).to eq("-e My\\ App.entitlements")
+      expect(@resign.create_entitlements_options("My App.entitlements")).to eq("-e #{'My App.entitlements'.shellescape}")
     end
 
     it "Create entitlements options from hash" do
