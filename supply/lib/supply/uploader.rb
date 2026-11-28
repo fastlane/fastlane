@@ -95,7 +95,7 @@ module Supply
           UI.user_error!("Could not find folder #{metadata_path}") unless File.directory?(metadata_path)
 
           track, release = fetch_track_and_release!(track_name, version_code)
-          UI.user_error!("Unable to find the requested track '#{track_name}' for version code '#{version_code}'") unless track
+          UI.user_error!("Unable to find the requested track '#{track_name}'") unless track
           UI.user_error!("Could not find release for version code '#{version_code}' in track '#{track_name}' to update changelog") unless release
 
           release_notes_queue = Queue.new
@@ -131,8 +131,9 @@ module Supply
 
     def update_rollout
       track, release = fetch_track_and_release!(Supply.config[:track], Supply.config[:version_code], [Supply::ReleaseStatus::IN_PROGRESS, Supply::ReleaseStatus::DRAFT])
-      UI.user_error!("Unable to find the requested track - '#{Supply.config[:track]}'") unless track
-      UI.user_error!("Unable to find the requested release on track - '#{Supply.config[:track]}'") unless release
+      UI.user_error!("Unable to find the requested track '#{Supply.config[:track]}'") unless track
+      version_code_hint = Supply.config[:version_code] ? " for version code '#{Supply.config[:version_code]}'" : ""
+      UI.user_error!("Unable to find a release with status '#{Supply::ReleaseStatus::IN_PROGRESS}' or '#{Supply::ReleaseStatus::DRAFT}'#{version_code_hint} in track '#{Supply.config[:track]}'") unless release
 
       version_code = release.version_codes.max
 
