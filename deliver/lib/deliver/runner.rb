@@ -13,6 +13,7 @@ require_relative 'upload_metadata'
 require_relative 'upload_app_clip_default_experience_metadata'
 require_relative 'upload_app_clip_default_experience_header_images'
 require_relative 'upload_screenshots'
+require_relative 'upload_custom_product_page_screenshots'
 require_relative 'sync_screenshots'
 require_relative 'sync_app_previews'
 require_relative 'detect_values'
@@ -53,6 +54,11 @@ module Deliver
       if options[:verify_only]
         UI.important("Verify flag is set, only package validation will take place and no submission will be made")
         verify_binary
+        return
+      end
+
+      if options[:custom_product_page_id]
+        upload_custom_product_page_screenshots
         return
       end
 
@@ -185,6 +191,16 @@ module Deliver
       end
 
       UploadPriceTier.new.upload(options)
+    end
+
+    # Upload screenshots to a custom product page, and nothing else: the metadata, app previews,
+    # price tier and binary belong to the app version, and the page is reviewed on its own
+    def upload_custom_product_page_screenshots
+      UI.important("Uploading screenshots to the Custom Product Page '#{options[:custom_product_page_id]}' only. " \
+                   "Metadata, app previews, the price tier, the binary, precheck and the submission for review are skipped.")
+
+      screenshots = UploadScreenshots.new.collect_screenshots(options)
+      UploadCustomProductPageScreenshots.new.upload(options, screenshots)
     end
 
     # Verify the binary with App Store Connect

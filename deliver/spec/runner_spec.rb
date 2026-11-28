@@ -403,4 +403,33 @@ describe Deliver::Runner do
       runner.upload_metadata
     end
   end
+
+  describe :run do
+    context 'with custom_product_page_id' do
+      let(:fake_upload_screenshots) { instance_double(Deliver::UploadScreenshots) }
+      let(:fake_cpp_upload) { instance_double(Deliver::UploadCustomProductPageScreenshots) }
+      let(:screenshots) { [double('Deliver::AppScreenshot')] }
+
+      before do
+        options[:custom_product_page_id] = 'cpp-123'
+        options[:submit_for_review] = true
+        allow(Deliver::UploadScreenshots).to receive(:new).and_return(fake_upload_screenshots)
+        allow(fake_upload_screenshots).to receive(:collect_screenshots).with(options).and_return(screenshots)
+        allow(Deliver::UploadCustomProductPageScreenshots).to receive(:new).and_return(fake_cpp_upload)
+      end
+
+      it 'uploads the screenshots to the custom product page and does nothing else' do
+        expect(fake_cpp_upload).to receive(:upload).with(options, screenshots)
+
+        expect(runner).not_to receive(:verify_version)
+        expect(runner).not_to receive(:upload_metadata)
+        expect(runner).not_to receive(:upload_binary)
+        expect(runner).not_to receive(:precheck_app)
+        expect(runner).not_to receive(:submit_for_review)
+        expect(fake_upload_screenshots).not_to receive(:upload)
+
+        runner.run
+      end
+    end
+  end
 end

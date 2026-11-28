@@ -1,0 +1,23 @@
+{
+  "data": {
+    "type": "appCustomProductPages",
+    "id": "cpp-123",
+    "attributes": {
+      "name": "Tarot",
+      "url": "https://apps.apple.com/us/app/id123456789?ppid=cpp-123",
+      "visible": true
+    },
+    "relationships": {
+      "app": {
+        "data": { "type": "apps", "id": "123456789" }
+      }
+    }
+  },
+  "included": [
+    {
+      "type": "apps",
+      "id": "123456789",
+      "attributes": { "name": "Example App" }
+    }
+  ]
+}

@@ -221,4 +221,28 @@ describe Deliver::SyncScreenshots do
       app_screenshot_set
     end
   end
+
+  describe '#sync' do
+    it 'raises an ArgumentError without an app and a platform' do
+      expect(FastlaneCore::Feature).not_to receive(:enabled?)
+      expect { described_class.new.sync([]) }.to raise_error(ArgumentError, /app: and platform:/)
+      expect { described_class.new(app: double('app')).sync([]) }.to raise_error(ArgumentError, /app: and platform:/)
+    end
+  end
+
+  describe '#sync_localizations' do
+    subject { described_class.new }
+
+    it 'replaces and sorts the screenshots of the given localizations without an app version' do
+      localizations = [double('localization', locale: 'en-US')]
+      screenshots = [double('Deliver::AppScreenshot', language: 'en-US')]
+      iterator = double('Deliver::AppScreenshotIterator')
+      expect(Deliver::AppScreenshotIterator).to receive(:new).with(localizations).and_return(iterator)
+      expect(subject).to receive(:replace_screenshots).with(iterator, screenshots)
+      expect(subject).to receive(:sort_screenshots).with(iterator)
+      expect(subject).not_to receive(:version)
+
+      subject.sync_localizations(localizations, screenshots)
+    end
+  end
 end
