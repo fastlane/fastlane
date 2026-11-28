@@ -30,7 +30,8 @@ describe Match do
         team_name: nil,
         api_key_path: nil,
         api_key: nil,
-        skip_google_cloud_account_confirmation: nil
+        skip_google_cloud_account_confirmation: nil,
+        skip_certificate_matching: nil
       }).and_return(fake_google_cloud_storage)
 
       allow(fake_google_cloud_storage).to receive(:download)
