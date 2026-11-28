@@ -550,6 +550,64 @@ module Spaceship
         end
 
         #
+        # App Asset Library (App Store Connect API 4.5)
+        #
+
+        def get_app_asset_library(app_id:)
+          tunes_request_client.get("#{Version::V1}/apps/#{app_id}/assetLibrary", {})
+        end
+
+        def get_app_asset_library_ref_data(filter: {})
+          params = tunes_request_client.build_params(filter: filter, includes: nil, limit: nil, sort: nil)
+          tunes_request_client.get("#{Version::V1}/appAssetLibraryRefData", params)
+        end
+
+        def get_app_asset_library_image(app_asset_library_image_id:)
+          tunes_request_client.get("#{Version::V1}/appAssetLibraryImages/#{app_asset_library_image_id}", {})
+        end
+
+        def post_app_asset_library_image(app_asset_library_id:, attributes: {})
+          body = {
+            data: {
+              type: 'appAssetLibraryImages',
+              attributes: attributes,
+              relationships: {
+                assetLibrary: { data: { type: 'appAssetLibraries', id: app_asset_library_id } }
+              }
+            }
+          }
+          tunes_request_client.post("#{Version::V1}/appAssetLibraryImages", body, tries: 1)
+        end
+
+        def patch_app_asset_library_image(app_asset_library_image_id:, attributes: {})
+          body = { data: { type: 'appAssetLibraryImages', id: app_asset_library_image_id, attributes: attributes } }
+          tunes_request_client.patch("#{Version::V1}/appAssetLibraryImages/#{app_asset_library_image_id}", body)
+        end
+
+        def get_app_asset_library_placements(app_store_version_localization_id:, filter: {}, includes: nil, limit: nil, sort: nil)
+          params = tunes_request_client.build_params(filter: filter, includes: includes, limit: limit, sort: sort)
+          tunes_request_client.get("#{Version::V1}/appStoreVersionLocalizations/#{app_store_version_localization_id}/placements", params)
+        end
+
+        def post_app_asset_library_placement(app_store_version_localization_id:, image_id:, attributes: {})
+          body = {
+            data: {
+              type: 'appAssetLibraryPlacements',
+              attributes: attributes,
+              relationships: {
+                image: { data: { type: 'appAssetLibraryImages', id: image_id } },
+                appStoreVersionLocalization: { data: { type: 'appStoreVersionLocalizations', id: app_store_version_localization_id } }
+              }
+            }
+          }
+          tunes_request_client.post("#{Version::V1}/appAssetLibraryPlacements", body, tries: 1)
+        end
+
+        def delete_app_asset_library_placement(app_asset_library_placement_id:)
+          tunes_request_client.delete("#{Version::V1}/appAssetLibraryPlacements/#{app_asset_library_placement_id}", {})
+        end
+
+        #
         # appScreenshots
         #
 

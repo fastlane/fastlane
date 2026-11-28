@@ -13,6 +13,7 @@ require_relative 'upload_metadata'
 require_relative 'upload_app_clip_default_experience_metadata'
 require_relative 'upload_app_clip_default_experience_header_images'
 require_relative 'upload_screenshots'
+require_relative 'upload_creative_assets'
 require_relative 'sync_screenshots'
 require_relative 'sync_app_previews'
 require_relative 'detect_values'
@@ -144,6 +145,9 @@ module Deliver
 
     # Upload all metadata, screenshots, pricing information, etc. to App Store Connect
     def upload_metadata
+      creative_assets = UploadCreativeAssets.new if options[:creative_assets]&.any?
+      creative_assets&.check(options)
+
       # App clip experience metadata upload must happen before the upload metadata step. The app
       # clip app store review detail upload depends on there being a valid app clip default
       # experience on the edit version.
@@ -183,6 +187,8 @@ module Deliver
         )
         previews.sync_from_path
       end
+
+      creative_assets&.upload(options)
 
       UploadPriceTier.new.upload(options)
     end

@@ -58,6 +58,26 @@ describe Deliver::Runner do
     })
   end
 
+  describe :run do
+    it 'allows live metadata updates without creative assets' do
+      options[:edit_live] = true
+      expect(runner).to receive(:verify_version)
+      expect(runner).to receive(:upload_metadata)
+      allow(runner).to receive(:upload_binary)
+      allow(runner).to receive(:precheck_app).and_return(true)
+
+      expect { runner.run }.not_to raise_error
+    end
+
+    it 'keeps verify_only limited to binary validation' do
+      options.merge!(verify_only: true, creative_assets: [{ locale: 'en-US' }])
+      expect(runner).to receive(:verify_binary)
+      expect(runner).not_to receive(:upload_metadata)
+
+      runner.run
+    end
+  end
+
   describe :upload_binary do
     let(:transporter) { MockTransporter.new }
     before do
@@ -356,6 +376,47 @@ describe Deliver::Runner do
       allow(Deliver::UploadMetadata).to receive(:new).and_return(fake_upload_metadata)
       allow(Deliver::UploadScreenshots).to receive(:new).and_return(fake_upload_screenshots)
       allow(Deliver::HtmlGenerator).to receive(:new).and_return(fake_html_generator)
+    end
+
+    it 'uploads configured creative assets after metadata and screenshots' do
+      options[:creative_assets] = [{ locale: 'en-US' }]
+      uploader = instance_double(Deliver::UploadCreativeAssets)
+      expect(Deliver::UploadCreativeAssets).to receive(:new).and_return(uploader)
+      expect(uploader).to receive(:check).with(options).ordered
+      expect(fake_upload_metadata).to receive(:upload).ordered
+      expect(fake_upload_screenshots).to receive(:upload).ordered
+      expect(uploader).to receive(:upload).with(options).ordered
+      runner.upload_metadata
+    end
+
+    it 'stops before the HTML report and uploads when a creative asset target is already occupied' do
+      type = 'PRODUCT_PAGE_HEADER_ASSET'
+      group = 'header-group'
+      entry = { locale: 'en-US', path: './fastlane/spec/fixtures/screenshots/screenshot1.png', placement_type: type, placement_group: group }
+      options[:creative_assets] = [entry]
+      localization = double('localization', id: 'loc-id', locale: 'en-US')
+      version = double('version', app_version_state: 'PREPARE_FOR_SUBMISSION', get_app_store_version_localizations: [localization])
+      allow(Deliver.cache[:app]).to receive(:get_edit_app_store_version).and_return(version)
+      reference = double('reference',
+                         features: [{ 'featureId' => 'APP_STORE_VERSIONS', 'placementPolicies' => [
+                           { 'placementType' => type, 'groupLimits' => [{ 'groupIds' => [group], 'maxCount' => 1 }] }
+                         ] }],
+                         placement_types: [{ 'placementTypeId' => type, 'acceptsAssetCategories' => ['CREATIVE_ASSETS'],
+                                             'specMappings' => [{ 'placementGroupId' => group, 'specs' => ['header-spec'] }] }])
+      allow(Spaceship::ConnectAPI::AppAssetLibraryRefDatum).to receive(:all).and_return([reference])
+      placement = double('placement', placement_type: type, placement_group: group)
+      allow(Spaceship::ConnectAPI::AppAssetLibraryPlacement).to receive(:all).with(app_store_version_localization_id: localization.id).and_return([placement])
+
+      expect(Deliver::UploadAppClipDefaultExperienceMetadata).not_to receive(:new)
+      expect(runner).not_to receive(:validate_html)
+      expect(fake_upload_metadata).not_to receive(:upload)
+      expect(fake_upload_screenshots).not_to receive(:upload)
+      expect { runner.upload_metadata }.to raise_error(/already placed.*overwrite_creative_assets/)
+    end
+
+    it 'does not instantiate a creative asset uploader without configuration' do
+      expect(Deliver::UploadCreativeAssets).not_to receive(:new)
+      runner.upload_metadata
     end
 
     it 'invokes SyncAppPreviews when app_previews_path is provided' do
