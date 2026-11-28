@@ -190,14 +190,13 @@ module FastlaneCore
       @configurations ||= if workspace?
                             workspace
                               .file_references
-                              .map(&:path)
-                              .reject { |p| p.include?("Pods/Pods.xcodeproj") }
-                              .map do |p|
+                              .reject { |fr| fr.path.include?("Pods/Pods.xcodeproj") }
+                              .map do |fr|
                                 # To maintain backwards compatibility, we
                                 # silently ignore nonexistent projects from
-                                # workspaces.
+                                # workspaces, and references Xcodeproj can't resolve.
                                 begin
-                                  Xcodeproj::Project.open(p).build_configurations
+                                  Xcodeproj::Project.open(fr.absolute_path(File.expand_path("..", self.path))).build_configurations
                                 rescue
                                   []
                                 end
