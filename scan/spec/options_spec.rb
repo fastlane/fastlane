@@ -26,7 +26,13 @@ describe Scan::Options do
     it "rejects any other value" do
       expect do
         include_simulator_logs('sometimes')
-      end.to raise_error(FastlaneCore::Interface::FastlaneError, "Unsupported include_simulator_logs 'sometimes', must be: true, false, on-failure")
+      end.to raise_error(FastlaneCore::Interface::FastlaneError, "Unsupported include_simulator_logs 'sometimes', must be: true, on-failure, false")
+    end
+
+    it "shows a rejected Symbol as one, so it doesn't read like the valid String" do
+      expect do
+        include_simulator_logs(:"on-failure")
+      end.to raise_error(FastlaneCore::Interface::FastlaneError, 'Unsupported include_simulator_logs :"on-failure", must be: true, on-failure, false')
     end
   end
 end

@@ -265,8 +265,11 @@ module Scan
                                      default_value: false,
                                      optional: true,
                                      verify_block: proc do |value|
-                                       allowed_values = [true, false, 'on-failure']
-                                       UI.user_error!("Unsupported include_simulator_logs '#{value}', must be: #{allowed_values.join(', ')}") unless allowed_values.include?(value)
+                                       allowed_values = [true, 'on-failure', false]
+                                       next if allowed_values.include?(value)
+                                       # Any other type as Ruby writes it, so :"on-failure" doesn't read like the valid String
+                                       shown_value = value.kind_of?(String) ? "'#{value}'" : value.inspect
+                                       UI.user_error!("Unsupported include_simulator_logs #{shown_value}, must be: #{allowed_values.join(', ')}")
                                      end),
         FastlaneCore::ConfigItem.new(key: :suppress_xcode_output,
                                      env_name: "SCAN_SUPPRESS_XCODE_OUTPUT",
