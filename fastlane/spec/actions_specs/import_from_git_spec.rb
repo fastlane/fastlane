@@ -328,6 +328,21 @@ describe Fastlane do
           expect(Fastlane::Actions).not_to have_received(:sh).with(/git checkout/)
         end
 
+        it "doesn't superfluously execute checkout when the version is a requirement" do
+          allow(UI).to receive(:message)
+          expect(UI).to receive(:important).with('Works until v6')
+          allow(Fastlane::Actions).to receive(:sh).and_call_original
+
+          # Resolves to tag 6, which the clone is already at
+          Fastlane::FastFile.new.parse("lane :test do
+            import_from_git(url: '#{source_directory_path}', version: '~> 6', cache_path: '#{cache_directory_path}')
+
+            works
+          end").runner.execute(:test)
+
+          expect(Fastlane::Actions).not_to have_received(:sh).with(/git checkout/)
+        end
+
         it "updates a branch whose name contains shell characters" do
           branch = "version-7(beta)"
           Dir.chdir(source_directory_path) do
