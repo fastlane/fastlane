@@ -221,6 +221,8 @@ module Spaceship
             name: new_name,
             status: status
           }
+          # An Apple ID session needs the team; with an API key, team_id would request the Apple ID session and fail
+          attributes[:teamId] = provisioning_request_client.team_id if provisioning_request_client.web_session?
 
           body = {
             data: {
