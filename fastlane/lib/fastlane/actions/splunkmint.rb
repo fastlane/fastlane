@@ -149,7 +149,14 @@ module Fastlane
       end
 
       def self.category
-        :beta
+        :deprecated
+      end
+
+      def self.deprecated_notes
+        [
+          "Splunk MINT reached End of Life in December 2021 for all MINT products, including the SDK and its Web Service.",
+          "See [Splunk MINT SDK for iOS (EOL)](https://docs.splunk.com/Documentation/MintIOSSDK/latest/DevGuide/APIReference)."
+        ].join("\n")
       end
     end
   end

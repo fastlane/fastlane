@@ -1,7 +1,6 @@
 require 'fastlane_core/device_manager'
 require 'fastlane_core/project'
 require 'pathname'
-require 'set'
 require_relative 'module'
 
 module Scan
@@ -18,6 +17,12 @@ module Scan
     # Returns the finished config object
     def self.set_additional_default_values
       config = Scan.config
+
+      # The project and the simulators are kept on the module, and are only set below when this
+      # run has them. Start without the ones an earlier run in this process found, so a Swift
+      # package, or a project that doesn't test on a simulator, doesn't use those instead
+      Scan.project = nil
+      Scan.devices = nil
 
       # First, try loading the Scanfile from the current directory
       config.load_configuration_file(Scan.scanfile_name)
@@ -41,7 +46,12 @@ module Scan
       devices = Scan.config[:devices] || Array(Scan.config[:device]) # important to use Array(nil) for when the value is nil
       if devices.count > 0
         detect_simulator(devices, '', '', '', nil)
+      elsif Scan.project && Scan.config[:destination] && Scan.project.xcodebuild_settings_lookup_disallowed_by
+        # The destination already says where to test, so don't read build settings to pick a default simulator
+        verify_simulator_options_without_devices
       elsif Scan.project
+        # Picking a default simulator reads the project's supported platforms
+        Scan.project.verify_xcodebuild_settings_lookup_allowed!("SUPPORTED_PLATFORMS", option: %w(device devices destination))
         if Scan.project.ios?
           # An iPhone 5s is a reasonably small and useful default for tests
           detect_simulator(devices, 'iOS', 'IPHONEOS_DEPLOYMENT_TARGET', 'iPhone 5s', nil)
@@ -61,6 +71,16 @@ module Scan
       coerce_to_array_of_strings(:skip_test_configurations)
 
       return config
+    end
+
+    # These options act on the simulators scan picks, and with only a destination
+    # (and no build settings to read) it has none
+    def self.verify_simulator_options_without_devices
+      options = [:reset_simulator, :reinstall_app, :prelaunch_simulator, :include_simulator_logs].select { |option| Scan.config[option] }
+      return if options.empty?
+
+      UI.user_error!("Set `device` or `devices` to use #{options.map { |option| "`#{option}`" }.join(', ')}: scan can't tell which simulators to use" \
+                     " from `destination` while fetching build settings is disallowed by #{Scan.project.xcodebuild_settings_lookup_disallowed_by}.")
     end
 
     def self.prevalidate
@@ -87,9 +107,15 @@ module Scan
       return unless Scan.project
 
       return unless Scan.config[:derived_data_path].to_s.empty?
+      Scan.project.verify_xcodebuild_settings_lookup_allowed!("BUILT_PRODUCTS_DIR", option: "derived_data_path")
       default_path = Scan.project.build_settings(key: "BUILT_PRODUCTS_DIR")
       # => /Users/.../Library/Developer/Xcode/DerivedData/app-bqrfaojicpsqnoglloisfftjhksc/Build/Products/Release-iphoneos
       # We got 3 folders up to point to ".../DerivedData/app-[random_chars]/"
+      if default_path.nil?
+        UI.error("Can't retrieve BUILT_PRODUCTS_DIR from the project to detect derived data path.")
+        UI.error("Either set `derived_data_path` explicitly in `scan`, or enable build for running in the scheme.")
+        return
+      end
       default_path = File.expand_path("../../..", default_path)
       UI.verbose("Detected derived data path '#{default_path}'")
       Scan.config[:derived_data_path] = default_path
@@ -111,7 +137,9 @@ module Scan
 
     def self.default_os_version(os_type)
       @os_versions ||= {}
-      @os_versions[os_type] ||= begin
+      return @os_versions[os_type] if @os_versions.key?(os_type)
+
+      @os_versions[os_type] = begin
         UI.crash!("Unknown platform: #{os_type}") unless PLATFORMS.key?(os_type)
         platform = PLATFORMS[os_type]
 
@@ -128,7 +156,8 @@ module Scan
           sdks_output, status = Open3.capture2('xcodebuild -showsdks -json')
           sdk_version = begin
             raise status unless status.success?
-            JSON.parse(sdks_output).find { |e| e['platform'] == platform[:simulator] }['sdkVersion']
+            entry = JSON.parse(sdks_output).find { |e| e['platform'] == platform[:simulator] }
+            entry['productVersion'] || entry['sdkVersion']
           rescue StandardError => e
             UI.error(e)
             UI.error("xcodebuild CLI broken, please run `xcodebuild` and make sure it works")
@@ -147,7 +176,12 @@ module Scan
           end
 
           # Get OS version corresponding to build
-          Gem::Version.new(FastlaneCore::DeviceManager.runtime_build_os_versions[runtime_build])
+          os_version = FastlaneCore::DeviceManager.runtime_build_os_versions[runtime_build]
+          unless os_version
+            UI.important("Runtime build '#{runtime_build}' not found in installed runtimes, falling back to SDK version '#{sdk_version}'")
+            os_version = sdk_version
+          end
+          Gem::Version.new(os_version)
         end
       end
     end
@@ -262,26 +296,21 @@ module Scan
       }.reject(&:nil?).first
     end
 
-    def self.min_xcode8?
-      Helper.xcode_at_least?("8.0")
-    end
-
     def self.detect_destination
       if Scan.config[:destination]
-        # No need to show below warnings message(s) for xcode13+, because
-        # Apple recommended to have destination in all xcodebuild commands
-        # otherwise, Apple will generate warnings in console logs
+        # No need to show a warning, because Apple recommends to have
+        # destination in all xcodebuild commands, otherwise, Apple will
+        # generate warnings in console logs
         # see: https://github.com/fastlane/fastlane/issues/19579
-        return if Helper.xcode_at_least?("13.0")
-
-        UI.important("It's not recommended to set the `destination` value directly")
-        UI.important("Instead use the other options available in `fastlane scan --help`")
-        UI.important("Using your value '#{Scan.config[:destination]}' for now")
-        UI.important("because I trust you know what you're doing...")
         return
       end
 
       # building up the destination now
+      if Scan.config[:catalyst_platform] == "macos" && Scan.project
+        # Whether this is a Mac Catalyst build reads the project's build settings
+        Scan.project.verify_xcodebuild_settings_lookup_allowed!("SUPPORTS_MACCATALYST", option: "destination")
+      end
+
       if Scan.building_mac_catalyst_for_mac?
         Scan.config[:destination] = ["platform=macOS,variant=Mac Catalyst"]
       elsif Scan.devices && Scan.devices.count > 0
@@ -294,14 +323,15 @@ module Scan
 
         Scan.config[:destination] = Scan.devices.map { |d| "platform=#{d.os_type} Simulator,id=#{d.udid}" + arch }
       elsif Scan.project && Scan.project.mac_app?
-        Scan.config[:destination] = min_xcode8? ? ["platform=macOS"] : ["platform=OS X"]
+        Scan.config[:destination] = ["platform=macOS"]
       end
     end
 
     # get deployment target version
     def self.get_deployment_target_version(deployment_target_key)
       version = Scan.config[:deployment_target_version]
-      version ||= Scan.project.build_settings(key: deployment_target_key) if Scan.project
+      # With `device`/`devices` there is no deployment target to read: the key is empty
+      version ||= Scan.project.build_settings(key: deployment_target_key) if Scan.project && !deployment_target_key.to_s.empty?
       version ||= 0
       return version
     end

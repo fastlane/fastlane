@@ -10,7 +10,7 @@ def before_each_match
 end
 
 def create_fake_storage(match_config:, repo_dir:)
-  fake_storage = "fake_storage"
+  fake_storage = +"fake_storage"
   expect(Match::Storage::GitStorage).to receive(:configure).with({
     git_url: match_config[:git_url] || default_git_url,
     shallow_clone: match_config[:shallow_clone] || false,
@@ -72,18 +72,18 @@ def create_match_config_with_git_storage(extra_values: {}, git_url: nil, app_ide
   return match_config
 end
 
-def create_fake_encryption(storage:)
-  fake_encryption = "fake_encryption"
-  expect(Match::Encryption::OpenSSL).to receive(:new).with(keychain_name: storage.git_url, working_directory: storage.working_directory).and_return(fake_encryption)
+def create_fake_encryption(storage:, expected_decrypt_count: 1)
+  fake_encryption = +"fake_encryption"
+  expect(Match::Encryption::OpenSSL).to receive(:new).with(keychain_name: storage.git_url, working_directory: storage.working_directory, force_legacy_encryption: false).and_return(fake_encryption)
 
   # Ensure files from storage are decrypted.
-  expect(fake_encryption).to receive(:decrypt_files).and_return(nil)
+  expect(fake_encryption).to receive(:decrypt_files).exactly(expected_decrypt_count).times.and_return(nil)
 
   return fake_encryption
 end
 
 def create_fake_spaceship_ensure
-  spaceship_ensure = "spaceship"
+  spaceship_ensure = +"spaceship"
 
   allow(Match::SpaceshipEnsure).to receive(:new).and_return(spaceship_ensure)
 
@@ -93,8 +93,12 @@ def create_fake_spaceship_ensure
   return spaceship_ensure
 end
 
+def provisioning_path_for_xcode_version(xcode_version)
+  return File.expand_path("~/Library/Developer/Xcode/UserData/Provisioning Profiles")
+end
+
 def create_fake_cache(allow_usage: true)
-  fake_cache = 'fake_cache'
+  fake_cache = +'fake_cache'
 
   allow(Match::Portal::Cache).to receive(:new).and_return(fake_cache)
 

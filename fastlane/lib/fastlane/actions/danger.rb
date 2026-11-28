@@ -14,15 +14,15 @@ module Fastlane
         base = params[:base]
         head = params[:head]
         pr = params[:pr]
-        cmd << "--danger_id=#{danger_id}" if danger_id
-        cmd << "--dangerfile=#{dangerfile}" if dangerfile
+        cmd << "--danger_id=#{danger_id.shellescape}" if danger_id
+        cmd << "--dangerfile=#{dangerfile.shellescape}" if dangerfile
         cmd << "--fail-on-errors=true" if params[:fail_on_errors]
         cmd << "--fail-if-no-pr=true" if params[:fail_if_no_pr]
         cmd << "--new-comment" if params[:new_comment]
         cmd << "--remove-previous-comments" if params[:remove_previous_comments]
-        cmd << "--base=#{base}" if base
-        cmd << "--head=#{head}" if head
-        cmd << "pr #{pr}" if pr
+        cmd << "--base=#{base.shellescape}" if base
+        cmd << "--head=#{head.shellescape}" if head
+        cmd << "pr #{pr.shellescape}" if pr
 
         ENV['DANGER_GITHUB_API_TOKEN'] = params[:github_api_token] if params[:github_api_token]
         ENV['DANGER_GITHUB_HOST'] = params[:github_enterprise_host] if params[:github_enterprise_host]

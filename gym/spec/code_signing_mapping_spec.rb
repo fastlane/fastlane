@@ -1,4 +1,8 @@
-describe Gym::CodeSigningMapping do
+describe Gym::CodeSigningMapping, requires_xcodebuild: true do
+  before do
+    fake_out_build_settings(GYM_BUILD_SETTINGS)
+  end
+
   describe "#app_identifier_contains?" do
     it "returns false if it doesn't contain it" do
       csm = Gym::CodeSigningMapping.new(project: nil)
@@ -28,26 +32,28 @@ describe Gym::CodeSigningMapping do
   describe "#detect_project_profile_mapping" do
     it "returns the mapping of the selected provisioning profiles", requires_xcode: true do
       workspace_path = "gym/spec/fixtures/projects/cocoapods/Example.xcworkspace"
-      project = FastlaneCore::Project.new({
-        workspace: workspace_path
-      })
+      options = { workspace: workspace_path, scheme: "Example" }
+      project = FastlaneCore::Project.new(options)
+      Gym.config = FastlaneCore::Configuration.create(Gym::Options.available_options, options)
       csm = Gym::CodeSigningMapping.new(project: project)
       expect(csm.detect_project_profile_mapping).to eq({ "family.wwdc.app" => "match AppStore family.wwdc.app", "family.wwdc.app.watchkitapp" => "match AppStore family.wwdc.app.watchkitapp", "family.wwdc.app.watchkitapp.watchkitextension" => "match AppStore family.wwdc.app.watchkitappextension" })
     end
 
     it "detects the build configuration from selected scheme", requires_xcode: true do
       workspace_path = "gym/spec/fixtures/projects/cocoapods/Example.xcworkspace"
-      project = FastlaneCore::Project.new({ workspace: workspace_path })
+      options = { workspace: workspace_path, scheme: "Example (Debug)" }
+      project = FastlaneCore::Project.new(options)
+      Gym.config = FastlaneCore::Configuration.create(Gym::Options.available_options, options)
       csm = Gym::CodeSigningMapping.new(project: project)
-      Gym.config[:scheme] = "Example (Debug)"
       expect(csm.detect_project_profile_mapping).to eq({ "family.wwdc.app" => "match Development family.wwdc.app", "family.wwdc.app.watchkitapp" => "match Development family.wwdc.app.watchkitapp", "family.wwdc.app.watchkitapp.watchkitextension" => "match Development family.wwdc.app.watchkitappextension" })
     end
 
     it "detects the build configuration from selected scheme of a project based on inheritance for resolve xcconfigs", requires_xcode: true do
       workspace_path = "gym/spec/fixtures/projects/projectBasedOnInheritance/ExampleWithInheritedXcconfig.xcworkspace"
-      project = FastlaneCore::Project.new({ workspace: workspace_path })
+      options = { workspace: workspace_path, scheme: "Target A" }
+      project = FastlaneCore::Project.new(options)
+      Gym.config = FastlaneCore::Configuration.create(Gym::Options.available_options, options)
       csm = Gym::CodeSigningMapping.new(project: project)
-      Gym.config[:scheme] = "Target A"
       expect(csm.detect_project_profile_mapping).to eq({ "com.targeta.release" => "release-targeta", "com.targetb.release" => "release-targetb" })
     end
   end
@@ -55,11 +61,10 @@ describe Gym::CodeSigningMapping do
   describe "#detect_project_profile_mapping_for_tv_os" do
     it "returns the mapping of the selected provisioning profiles for tv_os", requires_xcode: true do
       workspace_path = "gym/spec/fixtures/projects/cocoapods/Example.xcworkspace"
-      project = FastlaneCore::Project.new({
-        workspace: workspace_path
-      })
+      options = { workspace: workspace_path, scheme: "ExampletvOS", destination: "generic/platform=tvOS" }
+      project = FastlaneCore::Project.new(options)
+      Gym.config = FastlaneCore::Configuration.create(Gym::Options.available_options, options)
       csm = Gym::CodeSigningMapping.new(project: project)
-      Gym.config[:destination] = "generic/platform=tvOS"
       expect(csm.detect_project_profile_mapping).to eq({ "family.wwdc.app" => "match AppStore family.wwdc.app.tvos" })
     end
   end
@@ -202,6 +207,30 @@ describe Gym::CodeSigningMapping do
       it "is not test target" do
         build_settings = {}
         expect(csm.test_target?(build_settings)).to be(false)
+      end
+    end
+  end
+end
+
+# No Xcode needed: the destination is what gym's detect_platform sets
+describe Gym::CodeSigningMapping do
+  describe "#same_platform?" do
+    let(:csm) { Gym::CodeSigningMapping.new(project: nil) }
+
+    before do
+      allow(Gym).to receive(:building_mac_catalyst_for_mac?).and_return(false)
+    end
+
+    {
+      "generic/platform=macOS" => ["macosx", "iphoneos"],
+      "generic/platform=visionOS" => ["xros", "iphoneos"],
+      "generic/platform=iOS" => ["iphoneos", "macosx"],
+      "generic/platform=tvOS" => ["appletvos", "iphoneos"]
+    }.each do |destination, (matching, other)|
+      it "matches #{matching}, not #{other}, for #{destination}" do
+        allow(Gym).to receive(:config).and_return({ destination: destination })
+        expect(csm.same_platform?(matching)).to eq(true)
+        expect(csm.same_platform?(other)).to eq(false)
       end
     end
   end

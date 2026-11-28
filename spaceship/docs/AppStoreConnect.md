@@ -15,6 +15,7 @@
   * [App Analytics](#app-analytics)
   * [Bundle Id](#bundle-id-auth-key)
   * [Bundle Id Capability](#bundle-id-capability-auth-key)
+  * [Webhooks](#webhooks-auth-key)
 - [License](#license)
 
 ## Usage
@@ -67,7 +68,7 @@ end
 app = Spaceship::ConnectAPI::App.create(name: "App Name",
                                         version_string: "1.0", # initial version
                                         sku: "123",
-                                        primary_locale: "English",
+                                        primary_locale: "en-us",
                                         bundle_id: "com.krausefx.app",
                                         platforms: ["IOS"],
                                         company_name: "krause inc")
@@ -168,7 +169,6 @@ attr_accessor :watch_store_icon
 attr_accessor :copyright
 attr_accessor :release_type
 attr_accessor :earliest_release_date
-attr_accessor :uses_idfa
 attr_accessor :is_watch_only
 attr_accessor :downloadable
 attr_accessor :created_date
@@ -221,7 +221,7 @@ version.select_build(build_id: build.id)
 ### Submit app for App Store Review
 
 ```ruby
-# Check out submit_for_review.rb to get an overview how to modify idfa, submission information
+# Check out submit_for_review.rb to get an overview how to modify submission information
 version.create_app_store_version_submission
 ```
 
@@ -451,6 +451,30 @@ capabilities.each do |capability|
     capability.delete!
   end
 end
+```
+
+### Webhooks (Auth Key)
+
+```ruby
+app = Spaceship::ConnectAPI::App.find("com.krausefx.app")
+
+# Fetch all webhooks
+webhooks = Spaceship::ConnectAPI::Webhook.all(app_id: app.id)
+
+# Create a new webhook
+new_webhook = Spaceship::ConnectAPI::Webhook.create(
+  app_id:      app.id,
+  event_types: [
+    Spaceship::ConnectAPI::Webhook::EventType::APP_STORE_VERSION_APP_VERSION_STATE_UPDATED,
+  ],
+  name:         'Webhook Name',
+  secret:       'secret1234',
+  url:          'https://webhook.example.com'
+)
+
+# Delete a webhook
+webhooks.first.delete!
+new_webhook.delete!
 ```
 
 ## License
