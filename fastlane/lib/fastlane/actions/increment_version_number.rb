@@ -83,7 +83,7 @@ module Fastlane
         if Helper.test?
           Actions.lane_context[SharedValues::VERSION_NUMBER] = command
         else
-          Actions.sh(command)
+          Fastlane::Helper::AgvtoolHelper.run(command, folder: folder)
           version_number_build_setting ||= "MARKETING_VERSION"
           update_project_version_build_setting(
             params[:xcodeproj],
@@ -95,7 +95,7 @@ module Fastlane
 
         return Actions.lane_context[SharedValues::VERSION_NUMBER]
       rescue => ex
-        UI.error('Before being able to increment and read the version number from your Xcode project, you first need to setup your project properly. Please follow the guide at https://developer.apple.com/library/content/qa/qa1827/_index.html')
+        UI.error('Before being able to increment and read the version number from your Xcode project, you first need to setup your project properly. Please follow the guide at https://developer.apple.com/library/content/qa/qa1827/_index.html') unless ex.kind_of?(Fastlane::Helper::AgvtoolHelper::DamagedProjectError)
         raise ex
       end
 
