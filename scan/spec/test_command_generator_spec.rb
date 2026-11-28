@@ -119,6 +119,7 @@ describe Scan do
                                          "-destination platform\\=iOS\\ Simulator,id\\=E697990C-3A83-4C01-83D1-C367011B31EE",
                                          "-toolchain com.apple.dt.toolchain.Swift_2_3",
                                          "-derivedDataPath #{Scan.config[:derived_data_path].shellescape}",
+                                         "-IDEBuildLocationStyle=Unique",
                                          :build,
                                          :test
                                        ])
@@ -142,6 +143,7 @@ describe Scan do
                                        "-sdk 9.0",
                                        "-destination platform\\=iOS\\ Simulator,id\\=E697990C-3A83-4C01-83D1-C367011B31EE",
                                        "-derivedDataPath #{Scan.config[:derived_data_path].shellescape}",
+                                       "-IDEBuildLocationStyle=Unique",
                                        "DEBUG=1 BUNDLE_NAME=Example\\ App",
                                        :build,
                                        :test
@@ -165,6 +167,7 @@ describe Scan do
                                          "-sdk 9.0",
                                          "-destination platform\\=iOS\\ Simulator,id\\=E697990C-3A83-4C01-83D1-C367011B31EE",
                                          "-derivedDataPath #{Scan.config[:derived_data_path].shellescape}",
+                                         "-IDEBuildLocationStyle=Unique",
                                          "-retry-tests-on-failure",
                                          "-test-iterations 2",
                                          :build,
@@ -271,6 +274,7 @@ describe Scan do
                                            "-project ./scan/examples/standard/app.xcodeproj",
                                            "-destination platform\\=iOS\\ Simulator,id\\=E697990C-3A83-4C01-83D1-C367011B31EE",
                                            "-derivedDataPath #{Scan.config[:derived_data_path].shellescape}",
+                                           "-IDEBuildLocationStyle=Unique",
                                            :build,
                                            :test
                                          ])
@@ -318,6 +322,7 @@ describe Scan do
                                              "-scheme package",
                                              "-destination platform\\=iOS\\ Simulator,id\\=E697990C-3A83-4C01-83D1-C367011B31EE",
                                              "-derivedDataPath #{Scan.config[:derived_data_path].shellescape}",
+                                             "-IDEBuildLocationStyle=Unique",
                                              :build,
                                              :test
                                            ])
@@ -347,6 +352,7 @@ describe Scan do
                                              "-workspace .",
                                              "-destination platform\\=iOS\\ Simulator,id\\=E697990C-3A83-4C01-83D1-C367011B31EE",
                                              "-derivedDataPath #{Scan.config[:derived_data_path].shellescape}",
+                                             "-IDEBuildLocationStyle=Unique",
                                              :build,
                                              :test
                                            ])
@@ -377,9 +383,17 @@ describe Scan do
                                          "-project ./scan/examples/standard/app.xcodeproj",
                                          "-destination platform\\=iOS\\ Simulator,id\\=E697990C-3A83-4C01-83D1-C367011B31EE",
                                          "-derivedDataPath /tmp/my/derived_data",
+                                         "-IDEBuildLocationStyle=Unique",
                                          :build,
                                          :test
                                        ])
+        end
+
+        it "keeps the products in derived_data_path with a custom xcodebuild_command", requires_xcodebuild: true do
+          Scan.config[:xcodebuild_command] = "xcrun xcodebuild"
+
+          result = @test_command_generator.generate
+          expect(result).to include("-derivedDataPath /tmp/my/derived_data", "-IDEBuildLocationStyle=Unique")
         end
       end
 
@@ -524,7 +538,8 @@ describe Scan do
                                          "-project ./scan/examples/standard/app.xcodeproj",
                                          "-destination platform\\=iOS\\ Simulator,id\\=E697990C-3A83-4C01-83D1-C367011B31EE",
                                          "-derivedDataPath #{Scan.config[:derived_data_path].shellescape}",
-                                         "-resultBundlePath ./fastlane/test_output/app.xcresult",
+                                         "-IDEBuildLocationStyle=Unique",
+                                         "-resultBundlePath #{File.expand_path('./fastlane/test_output/app.xcresult').shellescape}",
                                          :build,
                                          :test
                                        ])
@@ -544,10 +559,37 @@ describe Scan do
                                          "-project ./scan/examples/standard/app.xcodeproj",
                                          "-destination platform\\=iOS\\ Simulator,id\\=E697990C-3A83-4C01-83D1-C367011B31EE",
                                          "-derivedDataPath #{Scan.config[:derived_data_path].shellescape}",
+                                         "-IDEBuildLocationStyle=Unique",
                                          "-resultBundlePath ./my_test_output/Alice\\'s\\ Man\\$ion\\ backtick\\`\\ quote\\\"\\ 2024-09-30\\ at\\ 5.10.35\\ PM\\ \\(1\\).xcresult",
                                          :build,
                                          :test
                                        ])
+        end
+      end
+
+      describe "#result_bundle_path" do
+        def result_bundle_path_with(config)
+          allow(Scan).to receive(:config).and_return({ scheme: 'app', package_path: nil }.merge(config))
+          allow(Scan).to receive(:cache).and_return({})
+          @test_command_generator.send(:result_bundle_path, true)
+        end
+
+        it "is absolute for a relative output directory, as xcodebuild may run from the package directory" do
+          expect(result_bundle_path_with(output_directory: './test_output', package_path: 'MyPackage')).to eq(File.join(Dir.pwd, 'test_output', 'app.xcresult'))
+        end
+
+        it "keeps an absolute output directory" do
+          Dir.mktmpdir do |dir|
+            expect(result_bundle_path_with(output_directory: dir)).to eq(File.join(dir, 'app.xcresult'))
+          end
+        end
+
+        it "deletes the result bundle of an earlier run" do
+          Dir.mktmpdir do |dir|
+            FileUtils.mkdir_p(File.join(dir, 'app.xcresult'))
+            result_bundle_path_with(output_directory: dir)
+            expect(File.exist?(File.join(dir, 'app.xcresult'))).to be(false)
+          end
         end
       end
 
@@ -568,6 +610,7 @@ describe Scan do
                                          "-project ./scan/examples/standard/app.xcodeproj",
                                          "-destination platform\\=iOS\\ Simulator,id\\=E697990C-3A83-4C01-83D1-C367011B31EE",
                                          "-derivedDataPath #{Scan.config[:derived_data_path].shellescape}",
+                                         "-IDEBuildLocationStyle=Unique",
                                          '-only-testing:TestBundleA/TestSuiteB',
                                          '-only-testing:TestBundleC',
                                          :build,
@@ -591,6 +634,7 @@ describe Scan do
                                          "-project ./scan/examples/standard/app.xcodeproj",
                                          "-destination platform\\=iOS\\ Simulator,id\\=E697990C-3A83-4C01-83D1-C367011B31EE",
                                          "-derivedDataPath #{Scan.config[:derived_data_path].shellescape}",
+                                         "-IDEBuildLocationStyle=Unique",
                                          '-only-testing:TestBundleA/TestSuiteB',
                                          :build,
                                          :test
@@ -613,6 +657,7 @@ describe Scan do
                                          "-project ./scan/examples/standard/app.xcodeproj",
                                          "-destination platform\\=iOS\\ Simulator,id\\=E697990C-3A83-4C01-83D1-C367011B31EE",
                                          "-derivedDataPath #{Scan.config[:derived_data_path].shellescape}",
+                                         "-IDEBuildLocationStyle=Unique",
                                          '-skip-testing:TestBundleA/TestSuiteB',
                                          '-skip-testing:TestBundleC',
                                          :build,
@@ -636,6 +681,7 @@ describe Scan do
                                          "-project ./scan/examples/standard/app.xcodeproj",
                                          "-destination platform\\=iOS\\ Simulator,id\\=E697990C-3A83-4C01-83D1-C367011B31EE",
                                          "-derivedDataPath #{Scan.config[:derived_data_path].shellescape}",
+                                         "-IDEBuildLocationStyle=Unique",
                                          '-skip-testing:TestBundleA/TestSuiteB',
                                          :build,
                                          :test
@@ -656,6 +702,7 @@ describe Scan do
                                        # expect the single highest versioned iOS simulator device available with matching name
                                        "-destination platform\\=iOS\\ Simulator,id\\=021A465B-A294-4D9E-AD07-6BDC8E186343",
                                        "-derivedDataPath #{Scan.config[:derived_data_path].shellescape}",
+                                       "-IDEBuildLocationStyle=Unique",
                                        :build,
                                        :test
                                      ])
@@ -677,6 +724,7 @@ describe Scan do
                                        "-destination platform\\=iOS\\ Simulator,id\\=70E1E92F-A292-4980-BC3C-7770C5EEFCFD " \
                                        "-destination platform\\=iOS\\ Simulator,id\\=DD134998-177F-47DA-99FA-D549D9305476",
                                        "-derivedDataPath #{Scan.config[:derived_data_path].shellescape}",
+                                       "-IDEBuildLocationStyle=Unique",
                                        :build,
                                        :test
                                      ])
@@ -711,6 +759,7 @@ describe Scan do
                                          "-destination platform\\=iOS\\ Simulator,name\\=iPhone\\ 6s,OS\\=9.3 " \
                                          "-destination platform\\=iOS\\ Simulator,name\\=iPad\\ Air\\ 2,OS\\=9.2",
                                          "-derivedDataPath #{Scan.config[:derived_data_path].shellescape}",
+                                         "-IDEBuildLocationStyle=Unique",
                                          "build-for-testing"
                                        ])
         end
@@ -726,6 +775,7 @@ describe Scan do
                                          "-destination platform\\=iOS\\ Simulator,name\\=iPhone\\ 6s,OS\\=9.3 " \
                                          "-destination platform\\=iOS\\ Simulator,name\\=iPad\\ Air\\ 2,OS\\=9.2",
                                          "-derivedDataPath #{Scan.config[:derived_data_path].shellescape}",
+                                         "-IDEBuildLocationStyle=Unique",
                                          "test-without-building"
                                        ])
         end
@@ -752,6 +802,7 @@ describe Scan do
                                          "-destination platform\\=iOS\\ Simulator,name\\=iPhone\\ 6s,OS\\=9.3 " \
                                          "-destination platform\\=iOS\\ Simulator,name\\=iPad\\ Air\\ 2,OS\\=9.2",
                                          "-derivedDataPath #{Scan.config[:derived_data_path].shellescape}",
+                                         "-IDEBuildLocationStyle=Unique",
                                          "-xctestrun /folder/mytests.xctestrun",
                                          "test-without-building"
                                        ])
@@ -775,6 +826,7 @@ describe Scan do
                                          "-destination platform\\=iOS\\ Simulator,name\\=iPhone\\ 6s,OS\\=9.3 " \
                                          "-destination platform\\=iOS\\ Simulator,name\\=iPad\\ Air\\ 2,OS\\=9.2",
                                          "-derivedDataPath #{Scan.config[:derived_data_path].shellescape}",
+                                         "-IDEBuildLocationStyle=Unique",
                                          :build,
                                          :test
                                        ])
@@ -796,6 +848,7 @@ describe Scan do
                                          "-destination platform\\=iOS\\ Simulator,id\\=70E1E92F-A292-4980-BC3C-7770C5EEFCFD " \
                                          "-destination platform\\=iOS\\ Simulator,id\\=DD134998-177F-47DA-99FA-D549D9305476",
                                          "-derivedDataPath #{Scan.config[:derived_data_path].shellescape}",
+                                         "-IDEBuildLocationStyle=Unique",
                                          :build,
                                          :test
                                        ])
@@ -816,6 +869,7 @@ describe Scan do
                                          "-project ./scan/examples/standard/app.xcodeproj",
                                          "-destination platform\\=iOS\\ Simulator,id\\=9905A018-9DC9-4DD8-BA14-B0B000CC8622",
                                          "-derivedDataPath #{Scan.config[:derived_data_path].shellescape}",
+                                         "-IDEBuildLocationStyle=Unique",
                                          :build,
                                          :test
                                        ])
@@ -893,6 +947,7 @@ describe Scan do
                                          "-project ./scan/examples/standard/app.xcodeproj",
                                          "-destination platform\\=iOS\\ Simulator,id\\=E697990C-3A83-4C01-83D1-C367011B31EE",
                                          "-derivedDataPath #{Scan.config[:derived_data_path].shellescape}",
+                                         "-IDEBuildLocationStyle=Unique",
                                          "-testPlan simple",
                                          "-only-test-configuration TestConfigurationA",
                                          "-only-test-configuration TestConfigurationB",
@@ -918,6 +973,7 @@ describe Scan do
                                          "-project ./scan/examples/standard/app.xcodeproj",
                                          "-destination platform\\=iOS\\ Simulator,id\\=E697990C-3A83-4C01-83D1-C367011B31EE",
                                          "-derivedDataPath #{Scan.config[:derived_data_path].shellescape}",
+                                         "-IDEBuildLocationStyle=Unique",
                                          "-testPlan simple",
                                          "-only-test-configuration TestConfigurationA",
                                          :build,
@@ -942,6 +998,7 @@ describe Scan do
                                          "-project ./scan/examples/standard/app.xcodeproj",
                                          "-destination platform\\=iOS\\ Simulator,id\\=E697990C-3A83-4C01-83D1-C367011B31EE",
                                          "-derivedDataPath #{Scan.config[:derived_data_path].shellescape}",
+                                         "-IDEBuildLocationStyle=Unique",
                                          "-testPlan simple",
                                          "-skip-test-configuration TestConfigurationA",
                                          "-skip-test-configuration TestConfigurationB",
@@ -967,6 +1024,7 @@ describe Scan do
                                          "-project ./scan/examples/standard/app.xcodeproj",
                                          "-destination platform\\=iOS\\ Simulator,id\\=E697990C-3A83-4C01-83D1-C367011B31EE",
                                          "-derivedDataPath #{Scan.config[:derived_data_path].shellescape}",
+                                         "-IDEBuildLocationStyle=Unique",
                                          "-testPlan simple",
                                          "-skip-test-configuration TestConfigurationA",
                                          :build,

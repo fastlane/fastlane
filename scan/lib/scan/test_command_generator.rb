@@ -50,6 +50,8 @@ module Scan
       if config[:derived_data_path] && !options.include?("-derivedDataPath #{config[:derived_data_path].shellescape}")
         options << "-derivedDataPath #{config[:derived_data_path].shellescape}"
       end
+      # A custom build location in Xcode's settings would put the products outside derived_data_path
+      options << "-IDEBuildLocationStyle=Unique" if config[:derived_data_path]
       if config[:use_system_scm] && !options.include?("-scmProvider system")
         options << "-scmProvider system"
       end
@@ -216,11 +218,9 @@ module Scan
     # Store the raw file
     def xcodebuild_log_path
       parts = []
-      if Scan.config[:app_name]
-        parts << Scan.config[:app_name]
-      elsif Scan.project
-        parts << Scan.project.app_name
-      end
+      # Without an app name (a Swift package, or build settings that can't be read), the log is named after the scheme alone
+      app_name = Scan.config[:app_name] || Scan.project&.app_name_if_lookup_allowed
+      parts << app_name if app_name
       parts << Scan.config[:scheme] if Scan.config[:scheme]
 
       file_name = "#{parts.join('-')}.log"
@@ -251,16 +251,14 @@ module Scan
 
     # The path to the result bundle
     def result_bundle_path(use_output_directory)
-      root_dir = use_output_directory ? Scan.config[:output_directory] : Dir.mktmpdir
+      # Absolute: xcodebuild runs from the package directory when package_path is set
+      root_dir = use_output_directory ? File.expand_path(Scan.config[:output_directory]) : Dir.mktmpdir
 
       path = File.join([root_dir, Scan.config[:scheme]].compact) + '.xcresult'
 
       Scan.cache[:result_bundle_path] = path
 
-      # The result bundle path will be in the package path directory if specified
-      delete_path = path
-      delete_path = File.join(Scan.config[:package_path], path) if Scan.config[:package_path].to_s != ""
-      FileUtils.remove_dir(delete_path) if File.directory?(delete_path)
+      FileUtils.remove_dir(path) if File.directory?(path)
 
       return path
     end

@@ -136,6 +136,10 @@ module Spaceship
         puts("check out #{two_factor_url}")
       end
 
+      if depth >= 3
+        raise TwoFactorCodeRejected, "Apple rejected 3 two-factor authentication codes for '#{self.user}'. Stopping before Apple locks the account."
+      end
+
       # "verification code" has already be pushed to devices
 
       security_code = response.body["securityCode"]
