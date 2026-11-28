@@ -162,6 +162,8 @@ module Fastlane
 
         group_name = group.name.downcase
         manifest_group_filenames = inverted_hash[group_name]
+        # a group of the user, not one from the manifest
+        next if manifest_group_filenames.nil?
 
         # compare the current group files to what the manifest says should minimally be there
         manifest_group_filenames.each do |filename|
