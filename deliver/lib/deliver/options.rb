@@ -2,6 +2,7 @@ require 'fastlane_core/configuration/config_item'
 require 'credentials_manager/appfile_config'
 
 require_relative 'module'
+require_relative 'upload_creative_assets'
 
 module Deliver
   # rubocop:disable Metrics/ClassLength
@@ -135,6 +136,19 @@ module Deliver
                                      env_name: "DELIVER_APP_CLIP_DEFAULT_EXPERIENCE_METADATA_PATH",
                                      description: "Path to the folder containing the app clip default experience metadata",
                                      optional: true),
+
+        # Product page header and organic search result assets
+        FastlaneCore::ConfigItem.new(key: :creative_assets,
+                                     description: "Creative image or video placements with locale, path, placement_type, placement_group and optional preview_frame_time_code",
+                                     type: Array,
+                                     optional: true,
+                                     verify_block: proc do |value|
+                                       UploadCreativeAssets.validate(value)
+                                     end),
+        FastlaneCore::ConfigItem.new(key: :overwrite_creative_assets,
+                                     description: "Replace existing creative asset placements for the explicitly configured targets",
+                                     type: Boolean,
+                                     default_value: false),
 
         # app previews (videos)
         FastlaneCore::ConfigItem.new(key: :app_previews_path,
