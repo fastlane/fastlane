@@ -74,4 +74,29 @@ describe Spaceship::ConnectAPI::Device do
       expect(existing_device.udid).to eq(udid)
     end
   end
+
+  describe '.devices_for_platform with include_mac_in_profiles' do
+    def device(device_class, udid, platform)
+      Spaceship::ConnectAPI::Device.new("id-#{udid}", { "deviceClass" => device_class, "udid" => udid, "platform" => platform, "status" => "ENABLED" })
+    end
+
+    # The API reports Apple silicon Macs as MAC; only their UDID format tells them from Intel Macs
+    let(:iphone) { device("IPHONE", "00008030-000A1B2C3D4E5F60", "IOS") }
+    let(:silicon_mac) { device("MAC", "00008103-000A1B2C3D4E5F61", "MAC_OS") }
+    let(:intel_mac) { device("MAC", "A1B2C3D4-E5F6-0123-4567-89ABCDEF0123", "MAC_OS") }
+
+    before do
+      allow(Spaceship::ConnectAPI::Device).to receive(:all).and_return([iphone, silicon_mac, intel_mac])
+    end
+
+    it 'adds Apple silicon Macs, not Intel ones, to iOS profiles' do
+      devices = described_class.devices_for_platform(platform: :ios, include_mac_in_profiles: true)
+      expect(devices.map(&:udid)).to eq([iphone.udid, silicon_mac.udid])
+    end
+
+    it 'adds no Mac without it' do
+      devices = described_class.devices_for_platform(platform: :ios, include_mac_in_profiles: false)
+      expect(devices.map(&:udid)).to eq([iphone.udid])
+    end
+  end
 end
