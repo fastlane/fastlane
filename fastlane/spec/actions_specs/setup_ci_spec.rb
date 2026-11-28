@@ -252,6 +252,23 @@ describe Fastlane do
         described_class.setup_output_paths
         expect(ENV["FL_BUILDLOG_PATH"]).to eql("/dev/null/buildlogs")
       end
+
+      it "sets the SCAN_INCLUDE_SIMULATOR_LOGS" do
+        described_class.setup_output_paths
+        expect(ENV["SCAN_INCLUDE_SIMULATOR_LOGS"]).to eql("true")
+      end
+
+      it "keeps a SCAN_INCLUDE_SIMULATOR_LOGS that is already set" do
+        stub_const("ENV", { "FL_OUTPUT_DIR" => "/dev/null", "SCAN_INCLUDE_SIMULATOR_LOGS" => "on-failure" })
+        described_class.setup_output_paths
+        expect(ENV["SCAN_INCLUDE_SIMULATOR_LOGS"]).to eql("on-failure")
+      end
+
+      it "replaces a blank SCAN_INCLUDE_SIMULATOR_LOGS, which scan would reject" do
+        stub_const("ENV", { "FL_OUTPUT_DIR" => "/dev/null", "SCAN_INCLUDE_SIMULATOR_LOGS" => " " })
+        described_class.setup_output_paths
+        expect(ENV["SCAN_INCLUDE_SIMULATOR_LOGS"]).to eql("true")
+      end
     end
   end
 end
