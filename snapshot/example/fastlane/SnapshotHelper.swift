@@ -15,13 +15,12 @@
 import Foundation
 import XCTest
 
-var deviceLanguage = ""
-var locale = ""
-
+@MainActor
 func setupSnapshot(_ app: XCUIApplication, waitForAnimations: Bool = true) {
     Snapshot.setupSnapshot(app, waitForAnimations: waitForAnimations)
 }
 
+@MainActor
 func snapshot(_ name: String, waitForLoadingIndicator: Bool) {
     if waitForLoadingIndicator {
         Snapshot.snapshot(name)
@@ -33,18 +32,23 @@ func snapshot(_ name: String, waitForLoadingIndicator: Bool) {
 /// - Parameters:
 ///   - name: The name of the snapshot
 ///   - timeout: Amount of seconds to wait until the network loading indicator disappears. Pass `0` if you don't want to wait.
-func snapshot(_ name: String, timeWaitingForIdle timeout: TimeInterval = 20) {
-    Snapshot.snapshot(name, timeWaitingForIdle: timeout)
+///   - screenshotProvider: The provider to screenshot. Otherwise `XCUIScreen.main` is screenshotted. This is useful when taking screenshots for macOS and you'd prefer to screenshot the window and not the screen.
+@MainActor
+func snapshot(_ name: String, timeWaitingForIdle timeout: TimeInterval = 20, screenshotProvider: XCUIScreenshotProviding? = nil) {
+    Snapshot.snapshot(name, timeWaitingForIdle: timeout, screenshotProvider: screenshotProvider)
 }
 
 enum SnapshotError: Error, CustomDebugStringConvertible {
     case cannotFindSimulatorHomeDirectory
+    case cannotFindHomeDirectory
     case cannotRunOnPhysicalDevice
 
     var debugDescription: String {
         switch self {
         case .cannotFindSimulatorHomeDirectory:
             return "Couldn't find simulator home location. Please, check SIMULATOR_HOST_HOME env variable."
+        case .cannotFindHomeDirectory:
+            return "Couldn't find the user's home directory."
         case .cannotRunOnPhysicalDevice:
             return "Can't use Snapshot on a physical device."
         }
@@ -52,6 +56,7 @@ enum SnapshotError: Error, CustomDebugStringConvertible {
 }
 
 @objcMembers
+@MainActor
 open class Snapshot: NSObject {
     static var app: XCUIApplication?
     static var waitForAnimations = true
@@ -59,6 +64,8 @@ open class Snapshot: NSObject {
     static var screenshotsDirectory: URL? {
         return cacheDirectory?.appendingPathComponent("screenshots", isDirectory: true)
     }
+    static var deviceLanguage = ""
+    static var currentLocale = ""
 
     open class func setupSnapshot(_ app: XCUIApplication, waitForAnimations: Bool = true) {
 
@@ -103,17 +110,17 @@ open class Snapshot: NSObject {
 
         do {
             let trimCharacterSet = CharacterSet.whitespacesAndNewlines
-            locale = try String(contentsOf: path, encoding: .utf8).trimmingCharacters(in: trimCharacterSet)
+            currentLocale = try String(contentsOf: path, encoding: .utf8).trimmingCharacters(in: trimCharacterSet)
         } catch {
             NSLog("Couldn't detect/set locale...")
         }
 
-        if locale.isEmpty && !deviceLanguage.isEmpty {
-            locale = Locale(identifier: deviceLanguage).identifier
+        if currentLocale.isEmpty && !deviceLanguage.isEmpty {
+            currentLocale = Locale(identifier: deviceLanguage).identifier
         }
 
-        if !locale.isEmpty {
-            app.launchArguments += ["-AppleLocale", "\"\(locale)\""]
+        if !currentLocale.isEmpty {
+            app.launchArguments += ["-AppleLocale", "\"\(currentLocale)\""]
         }
     }
 
@@ -139,7 +146,7 @@ open class Snapshot: NSObject {
         }
     }
 
-    open class func snapshot(_ name: String, timeWaitingForIdle timeout: TimeInterval = 20) {
+    open class func snapshot(_ name: String, timeWaitingForIdle timeout: TimeInterval = 20, screenshotProvider: XCUIScreenshotProviding? = nil) {
         if timeout > 0 {
             waitForLoadingIndicatorToDisappear(within: timeout)
         }
@@ -149,23 +156,28 @@ open class Snapshot: NSObject {
         if Snapshot.waitForAnimations {
             sleep(1) // Waiting for the animation to be finished (kind of)
         }
+        
+        guard self.app != nil else {
+            NSLog("XCUIApplication is not set. Please call setupSnapshot(app) before snapshot().")
+            return
+        }
 
+        let screenshot = (screenshotProvider ?? XCUIScreen.main).screenshot()
+        
         #if os(OSX)
-            guard let app = self.app else {
-                NSLog("XCUIApplication is not set. Please call setupSnapshot(app) before snapshot().")
-                return
-            }
-
-            app.typeKey(XCUIKeyboardKeySecondaryFn, modifierFlags: [])
+        
+        // The UI test runner is sandboxed and can't write where snapshot reads, so attach the
+        // screenshot to the test results: snapshot exports it from the result bundle
+        let attachment = XCTAttachment(screenshot: screenshot)
+        attachment.name = "MacBook-\(name)"
+        attachment.lifetime = .keepAlways
+        XCTContext.runActivity(named: "snapshot: \(name)") { activity in
+            activity.add(attachment)
+        }
+        
         #else
 
-            guard self.app != nil else {
-                NSLog("XCUIApplication is not set. Please call setupSnapshot(app) before snapshot().")
-                return
-            }
-
-            let screenshot = XCUIScreen.main.screenshot()
-            #if os(iOS)
+            #if os(iOS) && !targetEnvironment(macCatalyst)
             let image = XCUIDevice.shared.orientation.isLandscape ?  fixLandscapeOrientation(image: screenshot.image) : screenshot.image
             #else
             let image = screenshot.image
@@ -180,7 +192,7 @@ open class Snapshot: NSObject {
                 simulator = regex.stringByReplacingMatches(in: simulator, range: range, withTemplate: "")
 
                 let path = screenshotsDir.appendingPathComponent("\(simulator)-\(name).png")
-                #if swift(<4.2)
+                #if swift(<5.0)
                     try UIImagePNGRepresentation(image)?.write(to: path, options: .atomic)
                 #else
                     try image.pngData()?.write(to: path, options: .atomic)
@@ -191,19 +203,25 @@ open class Snapshot: NSObject {
             }
         #endif
     }
-
+    
+    #if os(iOS) || os(watchOS) || os(tvOS)
     class func fixLandscapeOrientation(image: UIImage) -> UIImage {
-        if #available(iOS 10.0, *) {
-            let format = UIGraphicsImageRendererFormat()
-            format.scale = image.scale
-            let renderer = UIGraphicsImageRenderer(size: image.size, format: format)
-            return renderer.image { context in
-                image.draw(in: CGRect(x: 0, y: 0, width: image.size.width, height: image.size.height))
-            }
-        } else {
+        #if os(watchOS)
             return image
-        }
+        #else
+            if #available(iOS 10.0, *) {
+                let format = UIGraphicsImageRendererFormat()
+                format.scale = image.scale
+                let renderer = UIGraphicsImageRenderer(size: image.size, format: format)
+                return renderer.image { context in
+                    image.draw(in: CGRect(x: 0, y: 0, width: image.size.width, height: image.size.height))
+                }
+            } else {
+                return image
+            }
+        #endif
     }
+    #endif
 
     class func waitForLoadingIndicatorToDisappear(within timeout: TimeInterval) {
         #if os(tvOS)
@@ -225,7 +243,12 @@ open class Snapshot: NSObject {
         // on OSX config is stored in /Users/<username>/Library
         // and on iOS/tvOS/WatchOS it's in simulator's home dir
         #if os(OSX)
-            let homeDir = URL(fileURLWithPath: NSHomeDirectory())
+            // NSHomeDirectory() is the sandboxed runner's container; snapshot writes the language and
+            // launch arguments to the user's home, which the runner may read
+            guard let passwd = getpwuid(getuid()), let home = passwd.pointee.pw_dir else {
+                throw SnapshotError.cannotFindHomeDirectory
+            }
+            let homeDir = URL(fileURLWithPath: String(cString: home))
             return homeDir.appendingPathComponent(cachePath)
         #elseif arch(i386) || arch(x86_64) || arch(arm64)
             guard let simulatorHostHome = ProcessInfo().environment["SIMULATOR_HOST_HOME"] else {
@@ -277,6 +300,7 @@ private extension XCUIElementQuery {
         return self.containing(isNetworkLoadingIndicator)
     }
 
+    @MainActor
     var deviceStatusBars: XCUIElementQuery {
         guard let app = Snapshot.app else {
             fatalError("XCUIApplication is not set. Please call setupSnapshot(app) before snapshot().")
@@ -302,4 +326,4 @@ private extension CGFloat {
 
 // Please don't remove the lines below
 // They are used to detect outdated configuration files
-// SnapshotHelperVersion [1.25]
+// SnapshotHelperVersion [1.31]

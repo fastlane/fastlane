@@ -462,6 +462,7 @@ describe Snapshot do
               "-scheme ExampleMacOS",
               "-project ./snapshot/example/Example.xcodeproj",
               "-derivedDataPath /tmp/path/to/snapshot_derived",
+              "-resultBundlePath '#{Snapshot.config[:output_directory]}/test_output/en/ExampleMacOS.xcresult'",
               "-destination 'platform=macOS'",
               "FASTLANE_SNAPSHOT=YES",
               "FASTLANE_LANGUAGE=en",

@@ -14,6 +14,7 @@
 		2FE467601D5A605000E9FF83 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 2FE4675E1D5A605000E9FF83 /* Main.storyboard */; };
 		2FE467621D5A605000E9FF83 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 2FE467611D5A605000E9FF83 /* Assets.xcassets */; };
 		2FE4677C1D5A608A00E9FF83 /* ExampleTVUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2FE4677B1D5A608A00E9FF83 /* ExampleTVUITests.swift */; };
+		A18C4263DB1A4053DC89D6A8 /* SnapshotHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = 152478232668BA190010D0E4 /* SnapshotHelper.swift */; };
 		CA0BF1641A1117FD007D51BE /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = CA0BF1631A1117FD007D51BE /* main.m */; };
 		CA0BF1671A1117FD007D51BE /* AppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = CA0BF1661A1117FD007D51BE /* AppDelegate.m */; };
 		CA0BF16A1A1117FD007D51BE /* FirstViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = CA0BF1691A1117FD007D51BE /* FirstViewController.m */; };
@@ -530,6 +531,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				DB6ADD8F1E30E65E0031038C /* ExampleMacOSUITests.swift in Sources */,
+				A18C4263DB1A4053DC89D6A8 /* SnapshotHelper.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -714,7 +716,7 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				IPHONEOS_DEPLOYMENT_TARGET = 12.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 13.0;
 				MTL_ENABLE_DEBUG_INFO = YES;
 				ONLY_ACTIVE_ARCH = YES;
 				SDKROOT = iphoneos;
@@ -763,7 +765,7 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				IPHONEOS_DEPLOYMENT_TARGET = 12.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 13.0;
 				MTL_ENABLE_DEBUG_INFO = NO;
 				SDKROOT = iphoneos;
 				SWIFT_COMPILATION_MODE = wholemodule;
@@ -802,7 +804,7 @@
 				ENABLE_TESTABILITY = YES;
 				GCC_NO_COMMON_BLOCKS = YES;
 				INFOPLIST_FILE = ExampleUITests/Info.plist;
-				IPHONEOS_DEPLOYMENT_TARGET = 12.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 13.0;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
 				PRODUCT_BUNDLE_IDENTIFIER = com.krausefx.ExampleUITests;
 				PRODUCT_NAME = "$(TARGET_NAME)";
@@ -820,7 +822,7 @@
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
 				GCC_NO_COMMON_BLOCKS = YES;
 				INFOPLIST_FILE = ExampleUITests/Info.plist;
-				IPHONEOS_DEPLOYMENT_TARGET = 12.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 13.0;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
 				PRODUCT_BUNDLE_IDENTIFIER = com.krausefx.ExampleUITests;
 				PRODUCT_NAME = "$(TARGET_NAME)";
@@ -844,7 +846,7 @@
 				GCC_NO_COMMON_BLOCKS = YES;
 				INFOPLIST_FILE = ExampleMacOS/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks";
-				MACOSX_DEPLOYMENT_TARGET = 10.12;
+				MACOSX_DEPLOYMENT_TARGET = 10.15;
 				PRODUCT_BUNDLE_IDENTIFIER = at.felixkrause.ExampleMacOS;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SDKROOT = macosx;
@@ -868,7 +870,7 @@
 				GCC_NO_COMMON_BLOCKS = YES;
 				INFOPLIST_FILE = ExampleMacOS/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks";
-				MACOSX_DEPLOYMENT_TARGET = 10.12;
+				MACOSX_DEPLOYMENT_TARGET = 10.15;
 				PRODUCT_BUNDLE_IDENTIFIER = at.felixkrause.ExampleMacOS;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SDKROOT = macosx;
@@ -891,7 +893,7 @@
 				GCC_NO_COMMON_BLOCKS = YES;
 				INFOPLIST_FILE = ExampleMacOSUITests/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks @loader_path/../Frameworks";
-				MACOSX_DEPLOYMENT_TARGET = 10.12;
+				MACOSX_DEPLOYMENT_TARGET = 10.15;
 				PRODUCT_BUNDLE_IDENTIFIER = at.felixkrause.ExampleMacOSUITests;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SDKROOT = macosx;
@@ -916,7 +918,7 @@
 				GCC_NO_COMMON_BLOCKS = YES;
 				INFOPLIST_FILE = ExampleMacOSUITests/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks @loader_path/../Frameworks";
-				MACOSX_DEPLOYMENT_TARGET = 10.12;
+				MACOSX_DEPLOYMENT_TARGET = 10.15;
 				PRODUCT_BUNDLE_IDENTIFIER = at.felixkrause.ExampleMacOSUITests;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SDKROOT = macosx;
