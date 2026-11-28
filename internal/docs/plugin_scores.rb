@@ -5,6 +5,7 @@ module Fastlane
         require 'faraday'
         require 'faraday/follow_redirects'
         require 'yaml'
+        require 'date'
 
         class FastlanePluginRating
           attr_accessor :key
@@ -42,6 +43,9 @@ module Fastlane
           attr_accessor :data
           attr_accessor :cache
 
+          # Bump to refetch every plugin, e.g. when a new value is added to the cache
+          CACHE_VERSION = 2
+
           # The homepage is later called with GITHUB_API_TOKEN, so only an exact github.com host qualifies
           def self.github_page?(url)
             uri = URI.parse(url.to_s)
@@ -68,6 +72,7 @@ module Fastlane
               has_info: self.info.to_s.length > 5,
               downloads: self.downloads,
               has_github_page: has_github_page,
+              public_github_repo: nil, # stays nil unless the homepage is on GitHub
               has_mit_license: includes_license?("MIT"),
               has_gnu_license: includes_license?("GNU") || includes_license?("GPL"),
               major_release: Gem::Version.new(hash["version"]) >= Gem::Version.new("1.0.0"),
@@ -141,12 +146,29 @@ module Fastlane
                                description: "Lots of open issues are not a good sign usually, unless the project is really popular",
                                      value: (self.data[:github_issues].to_i * -1)),
               FastlanePluginRating.new(key: :downloads,
-                               description: "More downloads = more users have been using the plugin for a while",
-                                     value: (self.data[:downloads].to_i / 250)),
+                               description: "More downloads = more users, counted per order of magnitude so they don't outweigh everything else",
+                                     value: downloads_score(self.data[:downloads])),
               FastlanePluginRating.new(key: :tests,
                                description: "The more tests a plugin has, the better",
-                                     value: [self.data[:tests].to_i * 3, 80].min)
+                                     value: [self.data[:tests].to_i * 3, 80].min),
+              FastlanePluginRating.new(key: :public_github_repo,
+                               description: "fastlane is open source, plugins on GitHub should be public too",
+                                     value: public_github_repo_score(self.data[:public_github_repo]))
             ]
+          end
+
+          # 20 points per order of magnitude (100 downloads = 40, 10k = 80), capped at 100 points from 100k downloads
+          def downloads_score(count)
+            [(Math.log10(count.to_i.clamp(0..) + 1) * 20).round, 100].min
+          end
+
+          # Only a GitHub repo that is private or gone is penalized, plugins hosted elsewhere are not rated
+          def public_github_repo_score(public_github_repo)
+            case public_github_repo
+            when true then 20
+            when false then -50
+            else 0
+            end
           end
 
           # What colors should the overall score be printed in
@@ -179,7 +201,7 @@ module Fastlane
 
             self.cache[self.name] = cache_data
 
-            if self.data[:sha] == cache_data[:sha]
+            if self.data[:sha] == cache_data[:sha] && cache_data[:cache_version] == CACHE_VERSION
               self.data[:initial_commit] = cache_data[:initial_commit]
               self.data[:age_in_days] = (DateTime.now - self.data[:initial_commit]).to_i
               self.data[:readme_score] = cache_data[:readme_score]
@@ -192,6 +214,7 @@ module Fastlane
               self.data[:github_issues] = cache_data[:github_issues]
               self.data[:github_forks] = cache_data[:github_forks]
               self.data[:github_contributors] = cache_data[:github_contributors]
+              self.data[:public_github_repo] = cache_data[:public_github_repo]
 
               return true
             end
@@ -203,7 +226,7 @@ module Fastlane
           def append_git_data
             Dir.mktmpdir("fastlane-plugin") do |tmp|
               clone_folder = File.join(tmp, self.name)
-              system({ "GIT_TERMINAL_PROMPT" => "0" }, "git", "clone", self.homepage, clone_folder)
+              system({ "GIT_TERMINAL_PROMPT" => "0" }, "git", "clone", "--filter=blob:none", self.homepage, clone_folder)
 
               break unless File.directory?(clone_folder)
 
@@ -244,6 +267,7 @@ module Fastlane
                 cache_data[:tests] = self.data[:tests]
                 cache_data[:actions] = self.data[:actions]
                 cache_data[:sha] = self.data[:sha]
+                cache_data[:cache_version] = CACHE_VERSION
               end
             end
           end
@@ -262,7 +286,16 @@ module Fastlane
             end
             conn.headers[:authorization] = Faraday::Utils.basic_header_from(ENV["GITHUB_USER_NAME"], ENV["GITHUB_API_TOKEN"])
             response = conn.get('')
+            if response.status == 404
+              puts("GitHub repo not found (404) for #{self.name}: #{self.homepage}")
+              self.data[:public_github_repo] = false
+              return
+            end
+            # e.g. a rate limit (403) still has a JSON body, which must not be cached as a repo with no stars
+            raise "GitHub returned #{response.status} for #{url}" unless response.success?
+
             repo_details = JSON.parse(response.body)
+            self.data[:public_github_repo] = (repo_details["private"] == false)
 
             url += "/stats/contributors"
             puts("Fetching #{url}")
@@ -274,8 +307,21 @@ module Fastlane
             end
 
             conn.headers[:authorization] = Faraday::Utils.basic_header_from(ENV["GITHUB_USER_NAME"], ENV["GITHUB_API_TOKEN"])
+
+            # GitHub may return 202 while it generates contributor stats, so poll until ready
+            max_attempts = 12
+            attempt = 1
             response = conn.get('')
-            contributor_details = JSON.parse(response.body)
+            while attempt <= max_attempts && response.status == 202
+              puts("Contributors stats not ready (202). Attempt #{attempt}/#{max_attempts}, retrying in 10s...")
+              sleep(10)
+              response = conn.get('')
+              attempt += 1
+            end
+            raise "GitHub returned #{response.status} for #{url}" unless response.success?
+
+            # 204 means the repo has no commits
+            contributor_details = response.status == 200 ? JSON.parse(response.body) : []
 
             self.data[:github_stars] = repo_details["stargazers_count"].to_i
             self.data[:github_subscribers] = repo_details["subscribers_count"].to_i
@@ -290,12 +336,12 @@ module Fastlane
             cache_data[:github_issues] = self.data[:github_issues]
             cache_data[:github_forks] = self.data[:github_forks]
             cache_data[:github_contributors] = self.data[:github_contributors]
+            cache_data[:public_github_repo] = self.data[:public_github_repo]
+            # Contributor stats that never became ready are fetched again on the next run
+            cache_data.delete(:cache_version) if response.status == 202
           rescue => ex
-            puts("error fetching #{self}")
-            puts(self.homepage)
-            puts("Chances are high you exceeded the GitHub API limit")
+            puts("Error fetching GitHub data for #{self.name}: #{self.homepage}")
             puts(ex)
-            puts(ex.backtrace)
             raise ex
           end
         end
