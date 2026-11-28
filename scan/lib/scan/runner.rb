@@ -213,7 +213,9 @@ module Scan
         UI.build_failure!("Build for testing failed. Exit status: #{tests_exit_status}")
       end
 
-      copy_simulator_logs
+      # Before reading the results, which can fail too. on-failure copies them here once xcodebuild
+      # has failed, and otherwise only if the results show failures
+      copy_simulator_logs if Scan.config[:include_simulator_logs] != 'on-failure' || tests_exit_status != 0
       zip_build_products
       copy_xctestrun
 
@@ -225,6 +227,11 @@ module Scan
       number_of_skipped = results[:number_of_skipped]
       number_of_tests = results[:number_of_tests_excluding_retries]
       number_of_failures = results[:number_of_failures_excluding_retries]
+
+      # Before the failure is reported below, which raises when :fail_build is set
+      if Scan.config[:include_simulator_logs] == 'on-failure' && tests_exit_status == 0 && number_of_failures > 0
+        copy_simulator_logs
+      end
 
       SlackPoster.new.run({
         tests: number_of_tests,
