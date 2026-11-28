@@ -34,8 +34,11 @@ jobs:
           results_file: results.sarif
           results_format: sarif
           publish_results: true
+          # Fail if the Scorecard API rejects the results, rather than leaving the badge stale.
+          fail_on_publish_error: true
 
       - name: Upload artifact
+        if: ${{ always() }}
         uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
         with:
           name: SARIF file
@@ -43,6 +46,7 @@ jobs:
           retention-days: 5
 
       - name: Upload to code scanning
+        if: ${{ always() }}
         uses: github/codeql-action/upload-sarif@1bd86f2fdb4b86187fa4059f16f31a3202acc9ea # v4.39.4
         with:
           sarif_file: results.sarif
