@@ -334,6 +334,31 @@ describe Supply do
       it_behaves_like 'run supply to upload metadata', version_codes: [3], with_explicit_changelogs: false
     end
 
+    describe '#perform_upload_meta' do
+      let(:subject) { Supply::Uploader.new }
+      let(:client) { double('client') }
+      let(:metadata_dir) { Dir.mktmpdir }
+      let(:track) { AndroidPublisher::Track.new(releases: []) }
+
+      before do
+        # track_promote_to makes perform_upload pass another track than :track
+        Supply.config = { track: 'internal', track_promote_to: 'production', metadata_path: metadata_dir }
+        allow(Supply::Client).to receive(:make_from_config).and_return(client)
+      end
+
+      after { FileUtils.rm_rf(metadata_dir) }
+
+      it 'names the track it looked for when that track is missing' do
+        allow(client).to receive(:tracks).with('production').and_return([])
+        expect { subject.perform_upload_meta([1], 'production') }.to raise_error("Unable to find the requested track 'production'")
+      end
+
+      it 'names the track it looked in when the release is missing' do
+        allow(client).to receive(:tracks).with('production').and_return([track])
+        expect { subject.perform_upload_meta([1], 'production') }.to raise_error("Could not find release for version code '1' in track 'production' to update changelog")
+      end
+    end
+
     describe '#perform_upload with version_codes_to_retain in promote-only mode' do
       let(:client) { double('client') }
       let(:config) do
@@ -772,7 +797,12 @@ describe Supply do
         end
 
         it 'raises an error' do
-          expect { subject.update_rollout }.to raise_error(/Unable to find the requested release on track/)
+          expect { subject.update_rollout }.to raise_error("Unable to find a release with status 'inProgress' or 'draft' in track 'alpha'")
+        end
+
+        it 'names the requested version code' do
+          config[:version_code] = version_code
+          expect { subject.update_rollout }.to raise_error("Unable to find a release with status 'inProgress' or 'draft' for version code '123' in track 'alpha'")
         end
       end
 
@@ -782,7 +812,7 @@ describe Supply do
         end
 
         it 'does not crash and raises an error about missing release' do
-          expect { subject.update_rollout }.to raise_error(/Unable to find the requested release on track/)
+          expect { subject.update_rollout }.to raise_error(/Unable to find a release with status/)
         end
       end
     end
