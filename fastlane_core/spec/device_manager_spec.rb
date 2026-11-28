@@ -16,6 +16,8 @@ describe FastlaneCore do
       @xctrace_output = File.read('./fastlane_core/spec/fixtures/DeviceManagerXCTraceOutput')
       @system_profiler_output_items_without_items = File.read('./fastlane_core/spec/fixtures/DeviceManagerSystem_profilerOutputItemsWithoutItems')
       @system_profiler_output_usb_hub = File.read('./fastlane_core/spec/fixtures/DeviceManagerSystem_profilerOutputUsbHub')
+      @system_profiler_usb_host_output = File.read('./fastlane_core/spec/fixtures/DeviceManagerSystem_profilerUSBHostOutput')
+      @system_profiler_no_devices = '<plist version="1.0"><array><dict><key>_dataType</key><string>SPUSBDataType</string><key>_items</key><array/></dict></array></plist>'
 
       FastlaneCore::Simulator.clear_cache
     end
@@ -335,9 +337,27 @@ describe FastlaneCore do
       response = +"response"
       expect(response).to receive(:read).and_return(@system_profiler_output_items_without_items)
       expect(Open3).to receive(:popen3).with("system_profiler SPUSBDataType -xml").and_yield(nil, response, nil, nil)
+      host_response = +"host_response"
+      expect(host_response).to receive(:read).and_return(@system_profiler_no_devices)
+      expect(Open3).to receive(:popen3).with("system_profiler SPUSBHostDataType -xml").and_yield(nil, host_response, nil, nil)
 
       devices = FastlaneCore::DeviceManager.connected_devices('iOS')
       expect(devices).to be_empty
+    end
+
+    it "finds devices in SPUSBHostDataType when SPUSBDataType lists none" do
+      response = +"response"
+      expect(response).to receive(:read).and_return(@system_profiler_no_devices)
+      expect(Open3).to receive(:popen3).with("system_profiler SPUSBDataType -xml").and_yield(nil, response, nil, nil)
+      host_response = +"host_response"
+      expect(host_response).to receive(:read).and_return(@system_profiler_usb_host_output)
+      expect(Open3).to receive(:popen3).with("system_profiler SPUSBHostDataType -xml").and_yield(nil, host_response, nil, nil)
+      devices_response = +"devices_response"
+      expect(devices_response).to receive(:read).and_return("Example iPad (26.7.3) (00008103-000A1B2C3D4E5F60)\n")
+      expect(Open3).to receive(:popen3).with("xcrun xctrace list devices").and_yield(nil, devices_response, nil, nil)
+
+      devices = FastlaneCore::DeviceManager.connected_devices('iOS')
+      expect(devices.map(&:udid)).to eq(["00008103-000A1B2C3D4E5F60"])
     end
 
     it "properly finds devices in system_profiler output when connected via USB hubs" do

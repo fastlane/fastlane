@@ -92,6 +92,15 @@ module FastlaneCore
 
         discover_devices(result[0], device_types, device_uuids) if result[0]
 
+        # On macOS 26.7, SPUSBDataType lists no USB devices; SPUSBHostDataType does
+        if device_uuids.empty?
+          Open3.popen3("system_profiler SPUSBHostDataType -xml") do |stdin, stdout, stderr, wait_thr|
+            usb_devices_output = stdout.read
+          end
+          result = Plist.parse_xml(usb_devices_output)
+          discover_devices(result[0], device_types, device_uuids) if result && result[0]
+        end
+
         if device_uuids.count > 0 # xctrace takes a little while to return so skip it if we have no devices
           xctrace_devices_output = ''
           Open3.popen3("xcrun xctrace list devices") do |stdin, stdout, stderr, wait_thr|
@@ -120,7 +129,7 @@ module FastlaneCore
         end
 
         is_supported_device = device_types.any?(usb_item['_name'])
-        serial_num = usb_item['serial_num'] || ''
+        serial_num = usb_item['serial_num'] || usb_item['USBDeviceKeySerialNumber'] || ''
         has_serial_number = serial_num.length == 40 || serial_num.length == 24
 
         if is_supported_device && has_serial_number
