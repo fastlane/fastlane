@@ -38,7 +38,8 @@ module Match
               team_name: params[:team_name],
               api_key_path: params[:api_key_path],
               api_key: params[:api_key],
-              skip_google_cloud_account_confirmation: params[:skip_google_cloud_account_confirmation]
+              skip_google_cloud_account_confirmation: params[:skip_google_cloud_account_confirmation],
+              skip_certificate_matching: params[:skip_certificate_matching]
             })
           },
           "s3" => lambda { |params|
@@ -54,7 +55,8 @@ module Match
               team_id: params[:team_id],
               team_name: params[:team_name],
               api_key_path: params[:api_key_path],
-              api_key: params[:api_key]
+              api_key: params[:api_key],
+              skip_certificate_matching: params[:skip_certificate_matching]
             })
           },
           "gitlab_secure_files" => lambda { |params|
@@ -69,7 +71,8 @@ module Match
               team_id: params[:team_id],
               team_name: params[:team_name],
               api_key_path: params[:api_key_path],
-              api_key: params[:api_key]
+              api_key: params[:api_key],
+              skip_certificate_matching: params[:skip_certificate_matching]
             })
           }
         }

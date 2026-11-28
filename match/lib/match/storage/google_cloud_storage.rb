@@ -25,6 +25,7 @@ module Match
       attr_reader :team_name
       attr_reader :api_key_path
       attr_reader :api_key
+      attr_reader :skip_certificate_matching
 
       # Managed values
       attr_accessor :gc_storage
@@ -49,7 +50,8 @@ module Match
           team_name: params[:team_name],
           api_key_path: params[:api_key_path],
           api_key: params[:api_key],
-          skip_google_cloud_account_confirmation: params[:skip_google_cloud_account_confirmation]
+          skip_google_cloud_account_confirmation: params[:skip_google_cloud_account_confirmation],
+          skip_certificate_matching: params[:skip_certificate_matching]
         )
       end
 
@@ -64,7 +66,9 @@ module Match
                      team_name: nil,
                      api_key_path: nil,
                      api_key: nil,
-                     skip_google_cloud_account_confirmation: nil)
+                     skip_google_cloud_account_confirmation: nil,
+                     skip_certificate_matching: nil)
+        @skip_certificate_matching = skip_certificate_matching
         @type = type if type
         @platform = platform if platform
         @google_cloud_project_id = google_cloud_project_id if google_cloud_project_id
@@ -122,6 +126,8 @@ module Match
           return self.team_id
         else
           UI.user_error!("The `team_id` option is required. fastlane cannot automatically determine portal team id via the App Store Connect API (yet)") if self.team_id.to_s.empty?
+          # `match import --skip_certificate_matching` has no access to the Developer Portal
+          return self.team_id if self.skip_certificate_matching
 
           spaceship = SpaceshipEnsure.new(self.username, self.team_id, self.team_name, self.api_token)
           return spaceship.team_id
