@@ -231,6 +231,38 @@ describe Fastlane do
           end").runner.execute(:test)
         end
 
+        # Its own repository: the shared one's latest commit has no tag. See fastlane#21079.
+        ["1.0", "~> 1.0"].each do |requested_version|
+          it "checks out the files on the first run when #{requested_version} resolves to the latest commit" do
+            repository_path = Dir.mktmpdir("fl_spec_import_from_git_latest_tag")
+            cache_path = Dir.mktmpdir("fl_spec_import_from_git_latest_tag_cache")
+            Dir.chdir(repository_path) do
+              `git init`
+              `git config user.email "you@example.com"`
+              `git config user.name "Your Name"`
+              `mkdir fastlane`
+              File.write('fastlane/Fastfile', "lane :works_latest do\n  UI.important('Works from the latest tag')\nend\n")
+              `git add .`
+              `git commit --message "Version 1.0"`
+              `git tag "1.0" --message "Version 1.0"`
+            end
+
+            allow(UI).to receive(:message)
+            expect(UI).to receive(:important).with('Works from the latest tag')
+
+            Fastlane::FastFile.new.parse("lane :test do
+              import_from_git(url: '#{repository_path}', version: '#{requested_version}', cache_path: '#{cache_path}')
+
+              works_latest
+            end").runner.execute(:test)
+
+            clone_path = File.join(cache_path, File.basename(repository_path))
+            expect(Dir.children(clone_path).sort).to eq([".git", "fastlane"])
+          ensure
+            FileUtils.rm_rf([repository_path, cache_path].compact)
+          end
+        end
+
         # Meaning, `git fetch` and `git rebase` are performed when caching is eligible
         # and the version isn't specified.
         it "works with updated branch" do
@@ -289,6 +321,21 @@ describe Fastlane do
 
           Fastlane::FastFile.new.parse("lane :test do
             import_from_git(url: '#{source_directory_path}', version: '6', cache_path: '#{cache_directory_path}')
+
+            works
+          end").runner.execute(:test)
+
+          expect(Fastlane::Actions).not_to have_received(:sh).with(/git checkout/)
+        end
+
+        it "doesn't superfluously execute checkout when the version is a requirement" do
+          allow(UI).to receive(:message)
+          expect(UI).to receive(:important).with('Works until v6')
+          allow(Fastlane::Actions).to receive(:sh).and_call_original
+
+          # Resolves to tag 6, which the clone is already at
+          Fastlane::FastFile.new.parse("lane :test do
+            import_from_git(url: '#{source_directory_path}', version: '~> 6', cache_path: '#{cache_directory_path}')
 
             works
           end").runner.execute(:test)

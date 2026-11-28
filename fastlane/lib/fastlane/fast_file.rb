@@ -358,7 +358,8 @@ module Fastlane
                 current_tag = nil
               end
 
-              if current_tag != version
+              # A fresh `--no-checkout` clone is already at the tag but has no files yet
+              if current_tag != checkout_param || !File.exist?(File.join(clone_folder, path))
                 Actions.sh("cd #{clone_folder.shellescape} && git checkout #{checkout_param.shellescape} #{checkout_path}")
               end
             end
