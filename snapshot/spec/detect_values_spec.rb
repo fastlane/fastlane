@@ -1,5 +1,9 @@
 describe Snapshot do
   describe Snapshot::DetectValues do
+    before do
+      fake_out_build_settings(SNAPSHOT_BUILD_SETTINGS)
+    end
+
     describe "value coercion" do
       before(:each) do
         allow(Snapshot).to receive(:snapfile_name).and_return("some fake snapfile")
@@ -55,7 +59,8 @@ describe Snapshot do
             project: "./snapshot/example/Example.xcodeproj",
             scheme: "ExampleMacOSUITests"
         }
-        mock_project = instance_double(FastlaneCore::Project, mac?: true, path: "./snapshot/example/Example.xcodeproj", select_scheme: nil)
+        # Picking the default devices first checks that build settings may be read
+        mock_project = instance_double(FastlaneCore::Project, mac?: true, path: "./snapshot/example/Example.xcodeproj", select_scheme: nil, verify_xcodebuild_settings_lookup_allowed!: nil)
         allow(FastlaneCore::Project).to receive(:new).and_return(mock_project)
         allow(FastlaneCore::Project).to receive(:detect_projects)
 
@@ -81,6 +86,12 @@ describe Snapshot do
         Snapshot.config = FastlaneCore::Configuration.create(Snapshot::Options.available_options, options)
 
         expect(Snapshot.config[:devices]).to eq([test_device])
+      end
+    end
+
+    describe "the build settings faked in the other examples" do
+      it "match what the installed Xcode answers", requires_xcodebuild: true do
+        expect_build_settings_to_match_xcode(SNAPSHOT_BUILD_SETTINGS)
       end
     end
   end

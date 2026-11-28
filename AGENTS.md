@@ -6,7 +6,7 @@ _fastlane_ is one Ruby gem built from several tools in this repository: _fastlan
 
 CI runs these; run them before pushing:
 
-- `bundle exec rake test_parallel`: the spec suite, split across processes as on CI ([Testing.md](Testing.md))
+- `bundle exec rake test_parallel`: the spec suite, split across processes as on CI ([Testing.md](docs/Testing.md))
 - `bundle exec fastlane lint_source`: RuboCop and other source checks
 - `bundle exec fastlane validate_docs`: action documentation and how tools are named in Markdown
 
@@ -16,14 +16,14 @@ Read the guides for the files a change touches, and apply their rules:
 
 | Change | Guide |
 |---|---|
-| An action, its options or its outputs | [Design.md](Design.md) |
-| Specs | [Testing.md](Testing.md), [ParallelTesting.md](ParallelTesting.md) |
+| An action, its options or its outputs | [Design.md](docs/Design.md) |
+| Specs | [Testing.md](docs/Testing.md), [ParallelTesting.md](docs/ParallelTesting.md) |
 | Anything else | prefer the pattern the codebase already uses for the same problem |
 
 ## Rules
 
 - Start from the issue a change resolves: read it and its comments, and do what it asks first (an audit, a discussion) before changing code. A review checks the change against it.
 - One concern per pull request.
-- A fix comes with a spec that fails without it ([Testing.md](Testing.md#writing-a-spec-for-a-fix)).
+- A fix comes with a spec that fails without it ([Testing.md](docs/Testing.md#writing-a-spec-for-a-fix)).
 - When a change introduces a new pattern where the codebase already has one, name the existing one and say why it does not fit.
-- Do not describe security problems in public issues, pull requests or reviews. Report security issues through [SECURITY.md](./SECURITY.md).
+- Do not describe security problems in public issues, pull requests or reviews. Report security issues through [SECURITY.md](docs/SECURITY.md).

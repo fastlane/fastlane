@@ -37,7 +37,7 @@ module Deliver
 
     def self.force_overwrite_metadata?(options, path)
       res = options[:force]
-      res ||= ENV["DELIVER_FORCE_OVERWRITE"] # for backward compatibility
+      res ||= FastlaneCore::Env.truthy?("DELIVER_FORCE_OVERWRITE") # for backward compatibility
       res ||= UI.confirm("Do you want to overwrite existing metadata on path '#{File.expand_path(path)}'?") if UI.interactive?
       res
     end
@@ -133,7 +133,7 @@ module Deliver
           Deliver::Runner.new(options)
           html_path = Deliver::GenerateSummary.new.run(options)
           UI.success("Successfully generated HTML report at '#{html_path}'")
-          system("open '#{html_path}'") unless options[:force]
+          system("open", html_path) unless options[:force]
         end
       end
 
@@ -171,7 +171,7 @@ module Deliver
 
       command :download_metadata do |c|
         c.syntax = 'fastlane deliver download_metadata'
-        c.description = "Downloads existing metadata and stores it locally. This overwrites the local files."
+        c.description = "Downloads existing metadata and stores it locally. Use --force option to overwrite local files without prompt."
 
         FastlaneCore::CommanderGenerator.new.generate(deliverfile_options, command: c)
 
@@ -182,6 +182,7 @@ module Deliver
           containing = FastlaneCore::Helper.fastlane_enabled_folder_path
           path = options[:metadata_path] || File.join(containing, 'metadata')
           res = Deliver::CommandsGenerator.force_overwrite_metadata?(options, path)
+          UI.message("Will not overwrite existing metadata (answered no, or tty not detected). To override: use --force option") unless res
           return 0 unless res
 
           require 'deliver/setup'

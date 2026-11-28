@@ -2,6 +2,7 @@ require 'logger'
 require 'colored'
 require 'tty-spinner'
 require 'pathname'
+require 'fileutils'
 
 require_relative 'command_executor'
 require_relative 'fastlane_folder'
@@ -96,13 +97,19 @@ module FastlaneCore
       return false
     end
 
-    def self.is_circle_ci?
-      return ENV.key?('CIRCLECI')
+    # @return [boolean] true if a prompt reading stdin can get an answer: off CI with stdin on a terminal, or FASTLANE_ALLOW_PIPED_INPUT set
+    def self.can_prompt?
+      return true if FastlaneCore::Env.truthy?("FASTLANE_ALLOW_PIPED_INPUT")
+      !ci? && $stdin.tty?
     end
 
-    # @return [boolean] true if environment variable CODEBUILD_BUILD_ARN is set
+    def self.is_circle_ci?
+      return FastlaneCore::Env.truthy?('CIRCLECI')
+    end
+
+    # @return [boolean] true if environment variable CODEBUILD_BUILD_ARN is set and not false
     def self.is_codebuild?
-      return ENV.key?('CODEBUILD_BUILD_ARN')
+      return FastlaneCore::Env.truthy?('CODEBUILD_BUILD_ARN')
     end
 
     def self.operating_system
@@ -162,7 +169,7 @@ module FastlaneCore
 
     def self.xcode_server?
       # XCS is set by Xcode Server
-      return ENV["XCS"].to_i == 1
+      return FastlaneCore::Env.truthy?("XCS")
     end
 
     # @return The version of the currently used Xcode installation (e.g. "7.0")
@@ -203,7 +210,7 @@ module FastlaneCore
     def self.swift_version
       if self.which('swift')
         output = `swift --version 2> /dev/null`
-        return output.split("\n").first.match(/version ([0-9.]+)/).captures.first
+        return output.lines.first.to_s[/version ([0-9.]+)/, 1]
       end
       return nil
     end
@@ -254,14 +261,8 @@ module FastlaneCore
         user_local_itms_path = "/usr/local/itms"
         return user_local_itms_path if File.exist?(user_local_itms_path)
 
-        # Then check for iTMSTransporter in the Xcode path
-        [
-          "../Applications/Application Loader.app/Contents/MacOS/itms",
-          "../Applications/Application Loader.app/Contents/itms",
-          "../SharedFrameworks/ContentDeliveryServices.framework/Versions/A/itms" # For Xcode 11
-        ].each do |path|
-          result = File.expand_path(File.join(self.xcode_path, path))
-          return result if File.exist?(result)
+        if FastlaneCore::Env.truthy?("FASTLANE_ITUNES_TRANSPORTER_USE_SHELL_SCRIPT")
+          UI.user_error!("Could not find transporter at #{self.xcode_path}: Xcode 14 and newer no longer include it. Remove FASTLANE_ITUNES_TRANSPORTER_USE_SHELL_SCRIPT so fastlane uploads with altool, or install Transporter and set FASTLANE_ITUNES_TRANSPORTER_PATH.")
         end
         UI.user_error!("Could not find transporter at #{self.xcode_path}. Please make sure you set the correct path to your Xcode installation.")
       elsif self.windows?
@@ -344,25 +345,45 @@ module FastlaneCore
       str.gsub(/\e\[([;\d]+)?m/, '')
     end
 
+    # Opens path for writing, readable and writable only by its owner (0600), including when it
+    # already exists: the mode is set before anything is written. Windows has no such mode.
+    def self.open_owner_only(path, mode = "w", &block)
+      File.open(path, mode, 0o600) do |file|
+        file.chmod(0o600) unless windows?
+        yield(file)
+      end
+    end
+
+    # Creates dir and any missing parents accessible only by its owner (0700); an existing dir is restricted too
+    def self.mkdir_owner_only(dir)
+      FileUtils.mkdir_p(dir, mode: 0o700)
+      File.chmod(0o700, dir) unless windows?
+    end
+
     # Zips directory
     def self.zip_directory(path, output_path, contents_only: false, overwrite: false, print: true)
       if overwrite
-        overwrite_command = " && rm -f '#{output_path}'"
+        overwrite_command = " && rm -f #{output_path.shellescape}"
       else
         overwrite_command = ""
       end
 
       if contents_only
-        command = "cd '#{path}'#{overwrite_command} && zip -r '#{output_path}' *"
+        command = "cd #{path.shellescape}#{overwrite_command} && zip -r #{output_path.shellescape} *"
       else
         containing_path = File.expand_path("..", path)
         contents_path = File.basename(path)
 
-        command = "cd '#{containing_path}'#{overwrite_command} && zip -r '#{output_path}' '#{contents_path}'"
+        command = "cd #{containing_path.shellescape}#{overwrite_command} && zip -r #{output_path.shellescape} #{contents_path.shellescape}"
       end
 
       UI.command(command) unless print
-      Helper.backticks(command, print: print)
+      FastlaneCore::CommandExecutor.execute(command: command,
+                                          print_all: print,
+                                      print_command: print,
+                                              error: proc do |output|
+                                                UI.user_error!("Could not zip '#{path}' to '#{output_path}':\n#{output}")
+                                              end)
     end
 
     # Executes the provided block after adjusting the ENV to have the

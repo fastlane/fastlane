@@ -10,13 +10,13 @@ module Spaceship
 
     def process_response(env)
       env.body = parse(env.body)
+    rescue StandardError, SyntaxError => e
+      raise Faraday::ParsingError.new(e, env[:response])
     end
 
     def parse(body)
       require 'plist' unless Object.const_defined?("Plist")
       Plist.parse_xml(body.force_encoding("UTF-8"))
-    rescue StandardError, SyntaxError => e
-      raise Faraday::ParsingError.new(e, env)
     end
 
     def parse_response?(env)

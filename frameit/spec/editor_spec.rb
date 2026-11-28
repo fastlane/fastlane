@@ -36,6 +36,50 @@ describe Frameit do
         screenshot = Frameit::Screenshot.new(screenshot_path, Frameit::Color::BLACK, config, nil)
         Frameit::Editor.new(screenshot, config).frame!
       end
+
+      # Every ImageMagick call reads and writes the whole image, so framing
+      # should not make the calls that leave the image as it is
+      describe "ImageMagick passes" do
+        let(:mogrify_args) { [] }
+
+        before do
+          allow_any_instance_of(MiniMagick::Tool::Mogrify).to receive(:call) do |tool|
+            mogrify_args << tool.args.dup
+            ''
+          end
+          allow_any_instance_of(MiniMagick::Image).to receive(:composite) do |instance, *_args, &block|
+            block&.call(double('composite command').as_null_object)
+            instance
+          end
+          allow_any_instance_of(MiniMagick::Image).to receive(:[]).with("%[colorspace]").and_return("sRGB")
+          allow_any_instance_of(MiniMagick::Image).to receive(:data).and_return({ "colorspace" => "sRGB" })
+        end
+
+        def frame_screenshot
+          screenshot_path = './frameit/spec/fixtures/editor/apostrophes.png'
+          config = Frameit::ConfigParser.new.load('./frameit/spec/fixtures/editor/Framefile.json').fetch_value(screenshot_path)
+          screenshot = Frameit::Screenshot.new(screenshot_path, Frameit::Color::BLACK, config, nil)
+          Frameit::Editor.new(screenshot, config).frame!
+        end
+
+        it "does not rotate a portrait screenshot or its frame" do
+          frame_screenshot
+          expect(mogrify_args).not_to be_empty
+          expect(mogrify_args.flatten).not_to include("-rotate")
+        end
+
+        it "sizes the text canvas in the pass that draws the text" do
+          frame_screenshot
+          text_passes = mogrify_args.select { |args| args.include?("-draw") }
+          expect(text_passes).not_to be_empty
+          expect(text_passes).to all(include("-resize"))
+        end
+
+        it "reads the colorspace without having ImageMagick describe the whole image" do
+          expect_any_instance_of(MiniMagick::Image).not_to receive(:data)
+          frame_screenshot
+        end
+      end
     end
 
     describe "should_skip?" do

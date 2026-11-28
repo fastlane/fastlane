@@ -14,12 +14,17 @@ describe Match do
       ENV.delete('FASTLANE_TEAM_NAME')
     end
 
-    ["10", "11", "16"].each do |xcode_version|
+    ["16"].each do |xcode_version|
       context "Xcode #{xcode_version}" do
-        let(:generate_apple_certs) { xcode_version == "11" }
+        let(:home) { Dir.mktmpdir("match-runner-spec-home") }
+        after { FileUtils.remove_entry(home) }
         before do
           allow(FastlaneCore::Helper).to receive(:mac?).and_return(true)
           allow(FastlaneCore::Helper).to receive(:xcode_version).and_return(xcode_version)
+
+          # Profiles are installed under the home directory. ENV is stubbed below, so HOME cannot be redirected.
+          allow(File).to receive(:expand_path).and_call_original
+          allow(File).to receive(:expand_path).with("~").and_return(home)
 
           stub_const('ENV', { "MATCH_PASSWORD" => '2"QAHg@v(Qp{=*n^' })
         end
@@ -43,7 +48,7 @@ describe Match do
 
           fake_cache = create_fake_cache
 
-          fake_storage = "fake_storage"
+          fake_storage = +"fake_storage"
           expect(Match::Storage::GitStorage).to receive(:configure).with({
             git_url: git_url,
             shallow_clone: true,
@@ -89,7 +94,7 @@ describe Match do
             files_to_delete: []
           )
 
-          spaceship = "spaceship"
+          spaceship = +"spaceship"
           allow(spaceship).to receive(:team_id).and_return("")
           expect(Match::SpaceshipEnsure).to receive(:new).and_return(spaceship)
           expect(spaceship).to receive(:certificates_exists).and_return(true)
@@ -128,7 +133,7 @@ describe Match do
 
           create_fake_cache
 
-          fake_storage = "fake_storage"
+          fake_storage = +"fake_storage"
           expect(Match::Storage::GitStorage).to receive(:configure).and_return(fake_storage)
           expect(fake_storage).to receive(:download).and_return(nil)
           expect(fake_storage).to receive(:clear_changes).and_return(nil)
@@ -151,7 +156,7 @@ describe Match do
           # Profile creation fails after the new certificate was created
           expect(Match::Generator).to receive(:generate_provisioning_profile).and_raise("Beta profile could not be created")
 
-          spaceship = "spaceship"
+          spaceship = +"spaceship"
           allow(spaceship).to receive(:team_id).and_return("")
           expect(Match::SpaceshipEnsure).to receive(:new).and_return(spaceship)
           expect(spaceship).to receive(:certificates_exists).and_return(true)
@@ -178,7 +183,7 @@ describe Match do
           cert_path = "./match/spec/fixtures/existing/certs/distribution/E7P4EE896K.cer"
           key_path = "./match/spec/fixtures/existing/certs/distribution/E7P4EE896K.p12"
 
-          fake_storage = "fake_storage"
+          fake_storage = +"fake_storage"
           expect(Match::Storage::GitStorage).to receive(:configure).with({
             git_url: git_url,
             shallow_clone: false,
@@ -200,18 +205,18 @@ describe Match do
           allow(fake_storage).to receive(:working_directory).and_return(repo_dir)
           allow(fake_storage).to receive(:prefixed_working_directory).and_return(repo_dir)
 
-          fake_encryption = "fake_encryption"
+          fake_encryption = +"fake_encryption"
           expect(Match::Encryption::OpenSSL).to receive(:new).with(keychain_name: fake_storage.git_url, working_directory: fake_storage.working_directory, force_legacy_encryption: false).and_return(fake_encryption)
           expect(fake_encryption).to receive(:decrypt_files).and_return(nil)
 
-          expect(Match::Utils).to receive(:import).with(key_path, keychain, password: nil).and_return(nil)
+          expect(Match::Utils).to receive(:import).with(key_path, keychain, password: nil, skip_set_partition_list: false).and_return(nil)
           expect(fake_storage).to_not(receive(:save_changes!))
 
           # To also install the certificate, fake that
           expect(FastlaneCore::CertChecker).to receive(:installed?).with(cert_path, in_keychain: nil).and_return(false)
-          expect(Match::Utils).to receive(:import).with(cert_path, keychain, password: nil).and_return(nil)
+          expect(Match::Utils).to receive(:import).with(cert_path, keychain, password: nil, skip_set_partition_list: false).and_return(nil)
 
-          spaceship = "spaceship"
+          spaceship = +"spaceship"
           allow(spaceship).to receive(:team_id).and_return("")
           expect(Match::SpaceshipEnsure).to receive(:new).and_return(spaceship)
           expect(spaceship).to receive(:certificates_exists).and_return(true)
@@ -257,11 +262,11 @@ describe Match do
 
           fake_storage = create_fake_storage(match_config: config, repo_dir: repo_dir)
 
-          fake_encryption = "fake_encryption"
+          fake_encryption = +"fake_encryption"
           expect(Match::Encryption::OpenSSL).to receive(:new).with(keychain_name: fake_storage.git_url, working_directory: fake_storage.working_directory, force_legacy_encryption: false).and_return(fake_encryption)
           expect(fake_encryption).to receive(:decrypt_files).and_return(nil)
 
-          spaceship = "spaceship"
+          spaceship = +"spaceship"
           allow(spaceship).to receive(:team_id).and_return("")
           expect(Match::SpaceshipEnsure).not_to receive(:new)
 
@@ -292,11 +297,11 @@ describe Match do
           # Ensure no changes are written back to storage in readonly mode.
           expect(fake_storage).not_to receive(:save_changes!)
 
-          fake_encryption = "fake_encryption"
+          fake_encryption = +"fake_encryption"
           expect(Match::Encryption::OpenSSL).to receive(:new).with(keychain_name: fake_storage.git_url, working_directory: fake_storage.working_directory, force_legacy_encryption: false).and_return(fake_encryption)
           expect(fake_encryption).to receive(:decrypt_files).and_return(nil)
 
-          spaceship = "spaceship"
+          spaceship = +"spaceship"
           allow(spaceship).to receive(:team_id).and_return("")
           expect(Match::SpaceshipEnsure).not_to receive(:new)
 
@@ -350,8 +355,8 @@ describe Match do
           expect(Match::Generator).not_to receive(:generate_certificate).with(match_config, :distribution, fake_storage.working_directory, specific_cert_type: nil)
           # Installed, without depending on or changing the real keychain.
           allow(FastlaneCore::CertChecker).to receive(:installed?).and_return(false)
-          expect(Match::Utils).to receive(:import).with("#{repo_dir}/certs/distribution/E7P4EE896K.p12", "login.keychain", password: nil)
-          expect(Match::Utils).to receive(:import).with(stored_valid_cert_path, "login.keychain", password: nil)
+          expect(Match::Utils).to receive(:import).with("#{repo_dir}/certs/distribution/E7P4EE896K.p12", "login.keychain", password: nil, skip_set_partition_list: false)
+          expect(Match::Utils).to receive(:import).with(stored_valid_cert_path, "login.keychain", password: nil, skip_set_partition_list: false)
 
           # Profiles
           begin # Ensure profiles are installed, but not validated.
@@ -363,7 +368,7 @@ describe Match do
           # output_path
           expect(FileUtils).to receive(:mkdir_p).with(match_test_options[:output_path])
           expect(FileUtils).to receive(:cp).with(stored_valid_cert_path, match_test_options[:output_path])
-          expect(FileUtils).to receive(:cp).with("#{repo_dir}/certs/distribution/E7P4EE896K.p12", match_test_options[:output_path])
+          expect(FastlaneCore::Helper).to receive(:open_owner_only).with("#{match_test_options[:output_path]}/E7P4EE896K.p12", "wb")
           expect(FileUtils).to receive(:cp).with(stored_valid_profile_path, match_test_options[:output_path])
 
           # WHEN
@@ -590,7 +595,7 @@ describe Match do
 
           create_fake_cache
 
-          fake_storage = "fake_storage"
+          fake_storage = +"fake_storage"
           expect(Match::Storage::GitStorage).to receive(:configure).with({
             git_url: git_url,
             shallow_clone: true,
@@ -624,7 +629,7 @@ describe Match do
             clear_working_directory: false
           )
 
-          spaceship = "spaceship"
+          spaceship = +"spaceship"
           allow(spaceship).to receive(:team_id).and_return("")
           expect(Match::SpaceshipEnsure).to receive(:new).and_return(spaceship)
           expect(spaceship).to receive(:certificates_exists).and_return(true)
@@ -654,11 +659,11 @@ describe Match do
 
           fake_storage = create_fake_storage(match_config: config, repo_dir: repo_dir)
 
-          fake_encryption = "fake_encryption"
+          fake_encryption = +"fake_encryption"
           expect(Match::Encryption::OpenSSL).to receive(:new).with(keychain_name: fake_storage.git_url, working_directory: fake_storage.working_directory, force_legacy_encryption: false).and_return(fake_encryption)
           expect(fake_encryption).to receive(:decrypt_files).and_return(nil)
 
-          client = "client"
+          client = +"client"
           expect(Match::SpaceshipEnsure).to receive(:new)
           expect(Spaceship::ConnectAPI).to receive(:client).and_return(client)
           allow(client).to receive(:in_house?).and_return(false)
@@ -840,14 +845,13 @@ describe Match do
           allow(Match::Utils).to receive(:is_cert_valid?).and_return(true)
           allow(Match::Utils).to receive(:get_cert_info).and_return([["Common Name", "test"]])
           allow(FastlaneCore::Helper).to receive(:mac?).and_return(true)
-          allow(FastlaneCore::Helper).to receive(:xcode_at_least?).and_return(false)
           allow(FastlaneCore::CertChecker).to receive(:installed?).and_return(false)
 
           expected_cert_path = File.join(cert_dir, "FIRST11111.cer")
           expected_key_path = File.join(cert_dir, "FIRST11111.p12")
 
-          expect(Match::Utils).to receive(:import).with(expected_cert_path, "login.keychain", password: nil).ordered
-          expect(Match::Utils).to receive(:import).with(expected_key_path, "login.keychain", password: nil).ordered
+          expect(Match::Utils).to receive(:import).with(expected_cert_path, "login.keychain", password: nil, skip_set_partition_list: false).ordered
+          expect(Match::Utils).to receive(:import).with(expected_key_path, "login.keychain", password: nil, skip_set_partition_list: false).ordered
 
           values = {
             app_identifier: "com.test.app",
@@ -859,6 +863,34 @@ describe Match do
 
           cert_id = runner.send(:fetch_certificate, params: config)
           expect(cert_id).to eq("FIRST11111")
+        end
+      end
+
+      it "passes skip_set_partition_list on when installing the stored certificate and key" do
+        Dir.mktmpdir do |dir|
+          cert_dir = File.join(dir, "certs", "distribution")
+          FileUtils.mkdir_p(cert_dir)
+          File.write(File.join(cert_dir, "FIRST11111.cer"), "cert1")
+          File.write(File.join(cert_dir, "FIRST11111.p12"), "key1")
+
+          allow(runner).to receive(:prefixed_working_directory).and_return(dir)
+          allow(Match::Utils).to receive(:is_cert_valid?).and_return(true)
+          allow(Match::Utils).to receive(:get_cert_info).and_return([["Common Name", "test"]])
+          allow(FastlaneCore::Helper).to receive(:mac?).and_return(true)
+          allow(FastlaneCore::CertChecker).to receive(:installed?).and_return(false)
+
+          expect(Match::Utils).to receive(:import).with(File.join(cert_dir, "FIRST11111.cer"), "login.keychain", password: nil, skip_set_partition_list: true).ordered
+          expect(Match::Utils).to receive(:import).with(File.join(cert_dir, "FIRST11111.p12"), "login.keychain", password: nil, skip_set_partition_list: true).ordered
+
+          values = {
+            app_identifier: "com.test.app",
+            type: "appstore",
+            git_url: "https://example.com",
+            skip_set_partition_list: true
+          }
+          config = FastlaneCore::Configuration.create(Match::Options.available_options, values)
+
+          runner.send(:fetch_certificate, params: config)
         end
       end
 
@@ -898,6 +930,59 @@ describe Match do
           # Additional cert type should ignore certificate_id and pick the last cert
           additional_cert_id = runner.send(:fetch_certificate, params: config, specific_cert_type: "mac_installer_distribution")
           expect(additional_cert_id).to eq("INSTALLER2")
+        end
+      end
+    end
+
+    describe '#fetch_certificate output_path' do
+      let(:runner) { Match::Runner.new }
+
+      around do |example|
+        old_umask = File.umask(0o022)
+        begin
+          example.run
+        ensure
+          File.umask(old_umask)
+        end
+      end
+
+      def fetch_into(output_path, dir)
+        cert_dir = File.join(dir, "certs", "distribution")
+        FileUtils.mkdir_p(cert_dir)
+        File.write(File.join(cert_dir, "FIRST11111.cer"), "cert1")
+        File.write(File.join(cert_dir, "FIRST11111.p12"), "key1")
+
+        allow(Spaceship::ConnectAPI).to receive(:token).and_return("fake_token")
+        allow(runner).to receive(:prefixed_working_directory).and_return(dir)
+        allow(Match::Utils).to receive(:is_cert_valid?).and_return(true)
+        allow(Match::Utils).to receive(:get_cert_info).and_return([["Common Name", "test"]])
+        allow(FastlaneCore::Helper).to receive(:mac?).and_return(false)
+
+        values = { app_identifier: "com.test.app", type: "appstore", git_url: "https://example.com", output_path: output_path }
+        config = FastlaneCore::Configuration.create(Match::Options.available_options, values)
+        runner.send(:fetch_certificate, params: config)
+      end
+
+      it "copies the private key readable only by its owner" do
+        Dir.mktmpdir do |dir|
+          output_path = File.join(dir, "out")
+          FileUtils.mkdir_p(output_path)
+          fetch_into(output_path, File.join(dir, "repo"))
+          expect(File.stat(File.join(output_path, "FIRST11111.p12")).mode & 0o777).to eq(0o600) unless FastlaneCore::Helper.windows?
+          expect(File.stat(File.join(output_path, "FIRST11111.cer")).mode & 0o777).to eq(0o644) unless FastlaneCore::Helper.windows?
+        end
+      end
+
+      it "makes an existing private key copy readable only by its owner" do
+        Dir.mktmpdir do |dir|
+          output_path = File.join(dir, "out")
+          FileUtils.mkdir_p(output_path)
+          key_copy = File.join(output_path, "FIRST11111.p12")
+          File.write(key_copy, "old")
+          File.chmod(0o644, key_copy)
+          fetch_into(output_path, File.join(dir, "repo"))
+          expect(File.read(key_copy)).to eq("key1")
+          expect(File.stat(key_copy).mode & 0o777).to eq(0o600) unless FastlaneCore::Helper.windows?
         end
       end
     end

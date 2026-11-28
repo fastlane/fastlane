@@ -1,6 +1,7 @@
 require 'jwt'
 require 'base64'
 require 'openssl'
+require 'spaceship/globals'
 
 # extract pem from .p8
 # openssl pkcs8 -topk8 -outform PEM -in AuthKey.p8 -out key.pem -nocrypt
@@ -61,7 +62,11 @@ module Spaceship
         duration ||= ENV['SPACESHIP_CONNECT_API_TOKEN_DURATION']
 
         in_house_env = ENV['SPACESHIP_CONNECT_API_IN_HOUSE']
-        in_house ||= !["", "no", "false", "off", "0"].include?(in_house_env) if in_house_env
+        if in_house_env == "" && !in_house
+          puts("SPACESHIP_CONNECT_API_IN_HOUSE is empty, which means false. A future version of fastlane will read an empty value as true, like its other environment variables. Set it to false to keep the current behaviour.".yellow)
+        end
+        # Unlike the other boolean variables, empty means false (see the warning above)
+        in_house ||= in_house_env != "" && Spaceship::Globals.env_truthy?('SPACESHIP_CONNECT_API_IN_HOUSE') if in_house_env
 
         key ||= ENV['SPACESHIP_CONNECT_API_KEY']
         key ||= File.binread(filepath)
@@ -125,7 +130,27 @@ module Spaceship
       end
 
       def write_key_to_file(path)
-        File.open(path, 'w') { |f| f.write(@key_raw) }
+        return unless @key_raw.kind_of?(String)
+
+        lines = @key_raw.lines.map(&:chomp)
+
+        if lines.size == 3 && lines.first.include?("BEGIN") && lines.last.include?("END")
+          header = lines.first
+          footer = lines.last
+          raw_base64 = lines[1].gsub(/\s+/, "") # Remove any whitespace
+
+          # Rewrap base64 content at 64 characters per line
+          wrapped = raw_base64.scan(/.{1,64}/).join("\n")
+
+          File.open(path, 'w') do |f|
+            f.puts(header)
+            f.puts(wrapped)
+            f.puts(footer)
+          end
+        else
+          # Fall back to writing raw (likely already well-formatted)
+          File.write(path, @key_raw)
+        end
       end
     end
   end

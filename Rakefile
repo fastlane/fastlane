@@ -1,5 +1,9 @@
 require "bundler/gem_tasks"
 
+# The release workflow runs `rake release` (rubygems/release-gem) after the create_github_release lane has already
+# tagged the release. Prevent another tag.
+Rake::Task["release:source_control_push"].clear
+
 Dir.glob("internal/rakelib/*.rake").each { |r| load r }
 
 task(:test_all) do
@@ -13,7 +17,7 @@ end
 
 # run, displays and saves the list of tests that do not work standalone
 task(:test_all_individually) do
-  files = Dir.glob("./**/*_spec.rb")
+  files = Dir.glob(["spec/**/*_spec.rb", "*/spec/**/*_spec.rb"])
 
   failed = files.select do |file|
     formatter = "--format progress"
@@ -36,14 +40,14 @@ task(:generate_team_table) do
   require_relative 'fastlane/lib/fastlane/documentation/markdown_docs_generator'
 
   readme = File.read("README.md")
-  readme.sub!(/(?<=<!-- team:start -->\n).*(?=<!-- team:end -->)/m) { Fastlane::MarkdownDocsGenerator.render_team("team.json") }
+  readme.sub!(/(?<=<!-- team:start -->\n).*(?=<!-- team:end -->)/m) { Fastlane::MarkdownDocsGenerator.render_team("internal/team.json") }
   File.write("README.md", readme)
   puts("All done")
 end
 
 task(:update_gem_spec_authors) do
   require 'json'
-  contributors = JSON.parse(File.read("team.json"))
+  contributors = JSON.parse(File.read("internal/team.json"))
 
   names = contributors.values.collect do |current|
     current["name"]
@@ -60,23 +64,11 @@ task(default: :test_all)
 # Prepare the plugin template RuboCop config before building/installing the gem
 desc "Prepare .rubocop.yml for plugin template"
 task(:prepare_rubocop_config) do
-  require 'yaml'
-  require 'fileutils'
-
-  lib = File.expand_path('fastlane/lib', __dir__)
-  rubocop_config = File.expand_path('.rubocop.yml', __dir__)
-
-  next unless File.exist?(rubocop_config)
-
   require_relative 'internal/plugin_template_rubocop_config'
-  config = Fastlane::Internal::PluginTemplateRubocopConfig.from(YAML.safe_load(File.read(rubocop_config), aliases: true))
-
-  target = File.join(lib, 'fastlane/plugins/template/.rubocop.yml')
-  FileUtils.mkdir_p(File.dirname(target))
-  File.write(target, YAML.dump(config))
+  Fastlane::Internal::PluginTemplateRubocopConfig.write
 end
 
-# test_all and test_parallel as well as the packaging tasks. The template's
+# Every task that runs specs, as well as the packaging tasks. The template's
 # .rubocop.yml is generated and gitignored, so a working copy can be left
 # holding one from an older fastlane, and plugin_generator_spec then generates a
 # plugin whose gemspec and rubocop config disagree about the Ruby version. That
@@ -84,6 +76,6 @@ end
 # a poor thing to debug: it looks like an environment problem and is a stale
 # file. Regenerating first is cheap and makes the run say the same thing on any
 # machine. See fastlane#30184.
-%w(build install release test_all test_parallel).each do |t|
+%w(build install release test_all test_parallel test_all_individually test_isolated test_race spec_timings).each do |t|
   Rake::Task[t].enhance([:prepare_rubocop_config]) if Rake::Task.task_defined?(t)
 end

@@ -3,20 +3,9 @@ require 'tmpdir'
 
 describe Snapshot::ReportsGenerator do
   describe '#available_devices' do
-    # the Collector generates file names that remove all spaces from the device names, so
-    # any keys here can't contain spaces
-    it "xcode 8 devices don't have keys that contain spaces" do
-      allow(FastlaneCore::Helper).to receive(:xcode_at_least?).with("9.0").and_return(false)
-
-      device_name_keys = Snapshot::ReportsGenerator.new.available_devices.keys
-      expect(device_name_keys.none? { |k| k.include?(' ') }).to be(true)
-    end
-
     it "xcode 9 devices have keys that contain spaces" do
-      allow(FastlaneCore::Helper).to receive(:xcode_at_least?).with("9.0").and_return(false)
-
       device_name_keys = Snapshot::ReportsGenerator.new.available_devices.keys
-      expect(device_name_keys.none? { |k| k.include?(' ') }).to be(true)
+      expect(device_name_keys.any? { |k| k.include?(' ') }).to be(true)
     end
   end
   describe "#generate" do
@@ -47,6 +36,16 @@ describe Snapshot::ReportsGenerator do
         expect(html).not_to include("<img src=x onerror")
         expect(html).to include("x&quot; onerror=&quot;window.pwned=1&quot;")
         expect(html).to include("&lt;img src=x onerror=window.pwned=1&gt;")
+      end
+
+      it "opens the summary with its path as one argument" do
+        dir = File.join(@dir, "Kaldi's Kafe")
+        FileUtils.mkdir_p(dir)
+        allow(Snapshot).to receive(:config).and_return({ output_directory: dir, skip_open_summary: false })
+        generator = described_class.new
+
+        expect(generator).to receive(:system).with("open", File.join(dir, "screenshots.html"))
+        generator.generate
       end
     end
   end

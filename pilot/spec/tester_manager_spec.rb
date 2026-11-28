@@ -76,10 +76,10 @@ describe Pilot::TesterManager do
       })
     end
 
-    let(:fake_app) { "fake_app_object" }
+    let(:fake_app) { +"fake_app_object" }
     let(:fake_app_name) { "My Fake App" }
 
-    let(:fake_client) { "fake client" }
+    let(:fake_client) { +"fake client" }
 
     before(:each) do
       allow(fake_app).to receive(:apple_id).and_return("123456789")

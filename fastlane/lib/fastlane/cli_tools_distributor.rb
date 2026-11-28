@@ -1,3 +1,5 @@
+require 'fastlane_core/env'
+
 module Fastlane
   # This class is responsible for checking the ARGV
   # to see if the user wants to launch another fastlane
@@ -16,6 +18,11 @@ module Fastlane
         ARGV.include?("init")
       end
 
+      def running_json_command?
+        return true if %w(spaceship supply).include?(ARGV[0]) && ARGV[1] == "api"
+        %w(lanes actions action).include?(ARGV.first) && (ARGV.include?("-j") || ARGV.include?("--json"))
+      end
+
       def utf8_locale?
         (ENV['LANG'] || "").end_with?("UTF-8", "utf8") || (ENV['LC_ALL'] || "").end_with?("UTF-8", "utf8") || (FastlaneCore::CommandExecutor.which('locale') && `locale charmap`.strip == "UTF-8")
       end
@@ -23,7 +30,11 @@ module Fastlane
       def take_off
         before_import_time = Time.now
 
-        if ENV["FASTLANE_DISABLE_ANIMATION"].nil?
+        # JSON commands print the JSON on STDOUT; logs and prompts go to stderr.
+        $stdout = $stderr if running_json_command?
+
+        animate = !FastlaneCore::Env.truthy?("FASTLANE_DISABLE_ANIMATION")
+        if animate
           # Usually in the fastlane code base we use
           #
           #   Helper.show_loading_indicator

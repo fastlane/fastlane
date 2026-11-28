@@ -27,6 +27,9 @@
 # them related to the pull request they appeared on. On a pull request trigger
 # alone it would have been months before anyone saw either.
 #
+# Running each spec file alone, also weekly: a file must pass without the
+# setup or state another file leaves behind (fastlane/fastlane#22271).
+#
 # Running on a schedule is also what keeps this honest. A workflow nobody runs
 # is a workflow that has quietly stopped working.
 name: Spec timings and random order split
@@ -67,17 +70,23 @@ on:
 permissions:
   contents: read
 
+env:
+  # Git's background maintenance can delete files under .git/objects while a local clone copies them - fastlane/fastlane#30432
+  GIT_CONFIG_COUNT: "1"
+  GIT_CONFIG_KEY_0: maintenance.auto
+  GIT_CONFIG_VALUE_0: "false"
+
 jobs:
   split_macos:
     name: "Split, macOS"
     if: inputs.record_timings == 'no' || inputs.record_timings == null
     runs-on: macos-15
     steps:
-      - uses: actions/checkout@v7
-      - uses: maxim-lobanov/setup-xcode@v1
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - uses: maxim-lobanov/setup-xcode@ed7a3b1fda3918c0306d1b724322adc0b8cc0a90 # v1.7.0
         with:
           xcode-version: '16.4.0'
-      - uses: ruby/setup-ruby@v1
+      - uses: ruby/setup-ruby@be3c7df29b3349ec6bcfc6b4792f1cf9f5237d18 # v1.343.0
         with:
           ruby-version: '3.4'
           bundler-cache: true
@@ -96,7 +105,7 @@ jobs:
       # bucket that produced it, and neither survives the runner otherwise.
       - name: Keep the worker logs
         if: failure()
-        uses: actions/upload-artifact@v7
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
         with:
           name: rspec-worker-logs-macos
           path: |
@@ -109,10 +118,10 @@ jobs:
     if: inputs.record_timings == 'no' || inputs.record_timings == null
     runs-on: ubuntu-24.04
     steps:
-      - uses: actions/checkout@v7
-      - uses: ruby/setup-ruby@v1
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - uses: ruby/setup-ruby@be3c7df29b3349ec6bcfc6b4792f1cf9f5237d18 # v1.343.0
         with:
-          ruby-version: '3.2'
+          ruby-version: '3.3'
           bundler-cache: true
       - name: Increase Open File Limit
         shell: bash
@@ -131,7 +140,7 @@ jobs:
       # bucket that produced it, and neither survives the runner otherwise.
       - name: Keep the worker logs
         if: failure()
-        uses: actions/upload-artifact@v7
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
         with:
           name: rspec-worker-logs-linux
           path: |
@@ -139,15 +148,72 @@ jobs:
             rspec_worker_*.units
           if-no-files-found: warn
 
+  # Each spec file in its own process, in a random order: a file must not rely
+  # on setup or state left by another. fastlane/fastlane#22271
+  alone_macos:
+    name: "Each file alone, macOS"
+    if: inputs.record_timings == 'no' || inputs.record_timings == null
+    runs-on: macos-15
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - uses: maxim-lobanov/setup-xcode@ed7a3b1fda3918c0306d1b724322adc0b8cc0a90 # v1.7.0
+        with:
+          xcode-version: '16.4.0'
+      - uses: ruby/setup-ruby@b3aaceaef7e0ee231b499e7b5f49c03fc1d32199 # v1.338.0
+        with:
+          ruby-version: '3.4'
+          bundler-cache: true
+      - name: Increase Open File Limit
+        shell: bash
+        run: ulimit -n 65536
+      - name: Run each spec file alone, in a random order
+        shell: bash
+        env:
+          RSPEC_ARGS: "--order random"
+        run: bundle exec rake test_all_individually
+      - name: Keep the list of failing files
+        if: failure()
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        with:
+          name: failed-spec-files-macos
+          path: failed_tests
+          if-no-files-found: warn
+
+  alone_linux:
+    name: "Each file alone, Linux"
+    if: inputs.record_timings == 'no' || inputs.record_timings == null
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - uses: ruby/setup-ruby@b3aaceaef7e0ee231b499e7b5f49c03fc1d32199 # v1.338.0
+        with:
+          ruby-version: '3.3'
+          bundler-cache: true
+      - name: Increase Open File Limit
+        shell: bash
+        run: ulimit -n 65536
+      - name: Run each spec file alone, in a random order
+        shell: bash
+        env:
+          RSPEC_ARGS: "--order random"
+        run: bundle exec rake test_all_individually
+      - name: Keep the list of failing files
+        if: failure()
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        with:
+          name: failed-spec-files-linux
+          path: failed_tests
+          if-no-files-found: warn
+
   split_windows:
     name: "Split, Windows"
     if: inputs.record_timings == 'no' || inputs.record_timings == null
     runs-on: windows-2022
     steps:
-      - uses: actions/checkout@v7
-      - uses: ruby/setup-ruby@v1
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - uses: ruby/setup-ruby@be3c7df29b3349ec6bcfc6b4792f1cf9f5237d18 # v1.343.0
         with:
-          ruby-version: '3.2'
+          ruby-version: '3.3'
           bundler-cache: true
       # No ulimit step: the open file limit is not a thing to raise here, and
       # there is no Xcode, so this is the Linux shape of the suite again on a
@@ -165,7 +231,7 @@ jobs:
       # bucket that produced it, and neither survives the runner otherwise.
       - name: Keep the worker logs
         if: failure()
-        uses: actions/upload-artifact@v7
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
         with:
           name: rspec-worker-logs-windows
           path: |
@@ -178,11 +244,11 @@ jobs:
     if: github.event.schedule == '0 4 1 1,4,7,10 *' || inputs.record_timings == 'macos' || inputs.record_timings == 'all'
     runs-on: macos-15
     steps:
-      - uses: actions/checkout@v7
-      - uses: maxim-lobanov/setup-xcode@v1
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - uses: maxim-lobanov/setup-xcode@ed7a3b1fda3918c0306d1b724322adc0b8cc0a90 # v1.7.0
         with:
           xcode-version: '16.4.0'
-      - uses: ruby/setup-ruby@v1
+      - uses: ruby/setup-ruby@be3c7df29b3349ec6bcfc6b4792f1cf9f5237d18 # v1.343.0
         with:
           ruby-version: '3.4'
           bundler-cache: true
@@ -194,7 +260,7 @@ jobs:
       - name: Record timings
         shell: bash
         run: bundle exec rake spec_timings
-      - uses: actions/upload-artifact@v7
+      - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
         with:
           name: spec-timings-macos
           path: internal/spec_timings.mac.json
@@ -205,10 +271,10 @@ jobs:
     if: github.event.schedule == '0 4 1 1,4,7,10 *' || inputs.record_timings == 'linux' || inputs.record_timings == 'all'
     runs-on: ubuntu-24.04
     steps:
-      - uses: actions/checkout@v7
-      - uses: ruby/setup-ruby@v1
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - uses: ruby/setup-ruby@be3c7df29b3349ec6bcfc6b4792f1cf9f5237d18 # v1.343.0
         with:
-          ruby-version: '3.2'
+          ruby-version: '3.3'
           bundler-cache: true
       - name: Increase Open File Limit
         shell: bash
@@ -219,7 +285,7 @@ jobs:
       - name: Record timings
         shell: bash
         run: bundle exec rake spec_timings
-      - uses: actions/upload-artifact@v7
+      - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
         with:
           name: spec-timings-linux
           path: internal/spec_timings.linux.json
@@ -230,15 +296,15 @@ jobs:
     if: github.event.schedule == '0 4 1 1,4,7,10 *' || inputs.record_timings == 'windows' || inputs.record_timings == 'all'
     runs-on: windows-2022
     steps:
-      - uses: actions/checkout@v7
-      - uses: ruby/setup-ruby@v1
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - uses: ruby/setup-ruby@be3c7df29b3349ec6bcfc6b4792f1cf9f5237d18 # v1.343.0
         with:
-          ruby-version: '3.2'
+          ruby-version: '3.3'
           bundler-cache: true
       - name: Record timings
         shell: bash
         run: bundle exec rake spec_timings
-      - uses: actions/upload-artifact@v7
+      - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
         with:
           name: spec-timings-windows
           path: internal/spec_timings.windows.json
@@ -260,8 +326,8 @@ jobs:
       contents: write
       pull-requests: write
     steps:
-      - uses: actions/checkout@v7
-      - uses: actions/download-artifact@v8
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - uses: actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333 # v8.0.2
         with:
           pattern: spec-timings-*
           path: recorded

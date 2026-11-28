@@ -22,6 +22,20 @@ module Spaceship
     end
   end
 
+  # Apple asks for a 2FA code and nobody can enter one (CI, or stdin not a terminal)
+  class TwoFactorInputUnavailable < BasicPreferredInfoError
+    def show_github_issues
+      false
+    end
+  end
+
+  # Apple rejected the 2FA codes entered, and spaceship stops before Apple locks the account
+  class TwoFactorCodeRejected < BasicPreferredInfoError
+    def show_github_issues
+      false
+    end
+  end
+
   class AppleIDAndPrivacyAcknowledgementNeeded < BasicPreferredInfoError
     def show_github_issues
       false

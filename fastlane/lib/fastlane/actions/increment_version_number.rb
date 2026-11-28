@@ -77,7 +77,7 @@ module Fastlane
 
         command = [
           command_prefix,
-          "agvtool new-marketing-version #{next_version_number.to_s.strip}"
+          "agvtool new-marketing-version #{next_version_number.to_s.strip.shellescape}"
         ].join(' ')
 
         if Helper.test?

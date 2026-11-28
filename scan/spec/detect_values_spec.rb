@@ -1,5 +1,10 @@
 describe Scan do
   describe Scan::DetectValues do
+    before do
+      fake_out_simulator_detection
+      fake_out_build_settings(SCAN_BUILD_SETTINGS)
+    end
+
     describe 'Xcode project' do
       describe 'detects FastlaneCore::Project' do
         it 'with no :project or :package_path given', requires_xcodebuild: true do
@@ -38,6 +43,7 @@ describe Scan do
 
     describe 'Xcode config handling' do
       before do
+        allow_any_instance_of(FastlaneCore::Project).to receive(:build_settings).and_call_original
         options = { project: "./scan/examples/standard/app.xcodeproj" }
         FileUtils.mkdir_p("./scan/examples/standard/app.xcodeproj/project.xcworkspace/xcuserdata/#{ENV['USER']}.xcuserdatad/")
         FileUtils.copy("./scan/examples/standard/WorkspaceSettings.xcsettings", "./scan/examples/standard/app.xcodeproj/project.xcworkspace/xcuserdata/#{ENV['USER']}.xcuserdatad/WorkspaceSettings.xcsettings")
@@ -51,8 +57,15 @@ describe Scan do
       end
     end
 
+    describe 'the build settings faked in the other examples' do
+      it 'match what the installed Xcode answers', requires_xcodebuild: true do
+        expect_build_settings_to_match_xcode(SCAN_BUILD_SETTINGS)
+      end
+    end
+
     describe "#default_os_version" do
       before do
+        allow(Scan::DetectValues).to receive(:default_os_version).and_call_original
         Scan::DetectValues.clear_cache
       end
 
@@ -60,6 +73,15 @@ describe Scan do
         expect do
           Scan::DetectValues.default_os_version('test')
         end.to raise_error(FastlaneCore::Interface::FastlaneCrash, "Unknown platform: test")
+      end
+
+      it 'answers from the installed Xcode and runtimes', requires_xcodebuild: true do
+        sdks = JSON.parse(`xcodebuild -showsdks -json`)
+        sdk_version = sdks.find { |sdk| sdk['platform'] == 'iphonesimulator' }['productVersion']
+        runtimes = JSON.parse(`xcrun simctl list -j runtimes`)['runtimes']
+        runtime_versions = runtimes.select { |runtime| runtime['platform'] == 'iOS' }.map { |runtime| runtime['version'] }
+
+        expect([sdk_version, *runtime_versions].map { |version| Gem::Version.new(version) }).to include(Scan::DetectValues.default_os_version('iOS'))
       end
 
       it 'returns an error if `xcrun simctl runtime -h` is broken' do
@@ -248,6 +270,7 @@ describe Scan do
         Scan.config = FastlaneCore::Configuration.create(Scan::Options.available_options,
                                                           { project: "./scan/examples/standard/app.xcodeproj" })
         Scan.project = nil
+        allow(FastlaneCore::DeviceManager).to receive(:simulators).and_call_original
       end
 
       it 'returns simulators for requested devices', requires_xcodebuild: true do
@@ -343,6 +366,44 @@ describe Scan do
           Scan.config = FastlaneCore::Configuration.create(Scan::Options.available_options, options)
           expect(Scan.config[:destination].first).to match(/platform=iOS/)
           expect(Scan.config[:destination].first).to_not(match(/,arch=x86_64/))
+        end
+      end
+
+      # Several `run_tests` calls in one lane share the Scan module
+      context "after an earlier run in the same process picked a simulator", requires_xcode: true do
+        let(:simulator) { FastlaneCore::DeviceManager::Device.new(name: "iPhone 15", udid: "00000000-0000-0000-0000-000000000015", os_type: "iOS", os_version: "17.0", state: "Shutdown", is_simulator: true) }
+
+        before do
+          allow(FastlaneCore::DeviceManager).to receive(:simulators).and_return([simulator])
+
+          # The deployment target and derived data path are given, so no build settings are read
+          Scan.config = FastlaneCore::Configuration.create(Scan::Options.available_options, {
+            project: "./scan/examples/standard/app.xcodeproj",
+            device: "iPhone 15",
+            deployment_target_version: "17.0",
+            derived_data_path: Dir.mktmpdir
+          })
+          expect(Scan.devices).to eq([simulator])
+        end
+
+        it "tests a macOS project on the Mac, not on that simulator" do
+          allow_any_instance_of(FastlaneCore::Project).to receive_messages(ios?: false, tvos?: false, mac_app?: true)
+
+          Scan.config = FastlaneCore::Configuration.create(Scan::Options.available_options, {
+            project: "./scan/examples/standard/app.xcodeproj",
+            derived_data_path: Dir.mktmpdir
+          })
+
+          expect(Scan.devices).to be_nil
+          expect(Scan.config[:destination]).to eq(["platform=macOS"])
+        end
+
+        it "doesn't use that run's project or simulator for a Swift package" do
+          Scan.config = FastlaneCore::Configuration.create(Scan::Options.available_options, { package_path: "./scan/examples/package/" })
+
+          expect(Scan.project).to be_nil
+          expect(Scan.devices).to be_nil
+          expect(Scan.config[:destination]).to be_nil
         end
       end
     end

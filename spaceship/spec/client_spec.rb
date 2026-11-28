@@ -8,6 +8,10 @@ describe Spaceship::Client do
       request(:get, TestClient.hostname)
     end
 
+    def req_home_once
+      request(:get, TestClient.hostname, resend: false)
+    end
+
     def send_login_request(_user, _password)
       true
     end
@@ -207,9 +211,12 @@ describe Spaceship::Client do
   end
 
   describe "#itc_service_key_path" do
-    # Guards against going back to a literal "/tmp"; the method says why.
-    it "caches the key in the system temporary directory" do
-      expect(TestClient.new.itc_service_key_path).to start_with(Dir.tmpdir)
+    # The cookie store next to it has the same spec; a temporary directory is shared on Linux.
+    it "caches the key in the user's fastlane directory" do
+      # spec_helper stubs the path on every client; this example is about the method itself
+      allow_any_instance_of(Spaceship::Client).to receive(:itc_service_key_path).and_call_original
+
+      expect(TestClient.new.itc_service_key_path).to eq(File.expand_path("~/.fastlane/spaceship_itc_service_key.txt"))
     end
   end
 
@@ -222,6 +229,27 @@ describe Spaceship::Client do
         expect(client.logger.instance_variable_get(:@logdev).filename)
           .to start_with(Dir.tmpdir)
       end
+    end
+
+    it "writes to a file when VERBOSE is false" do
+      client = TestClient.new
+
+      FastlaneSpec::Env.with_env_values("VERBOSE" => "false") do
+        expect(client.logger.instance_variable_get(:@logdev).filename)
+          .to start_with(Dir.tmpdir)
+      end
+    end
+
+    it "writes a log readable by its owner only" do
+      old_umask = File.umask(0o022)
+      client = TestClient.new
+
+      FastlaneSpec::Env.with_env_values("VERBOSE" => nil) do
+        path = client.logger.instance_variable_get(:@logdev).filename
+        expect(File.stat(path).mode & 0o777).to eq(0o600) unless FastlaneCore::Helper.windows?
+      end
+    ensure
+      File.umask(old_umask)
     end
   end
 
@@ -409,6 +437,73 @@ BODY
         subject.req_home
       end.to raise_error(Spaceship::Client::BadGatewayError)
     end
+
+    it "returns a JSON response whose values contain an error page marker" do
+      body = { "data" => { "description" => "<h3>Bad Gateway</h3>" } }
+      stub_request(:get, test_uri).
+        to_return(status: 200, body: body.to_json, headers: { 'Content-Type' => 'application/json' })
+
+      expect(subject.req_home.body).to eq(body)
+    end
+  end
+
+  describe 'retry with resend: false' do
+    [
+      Faraday::TimeoutError,
+      Faraday::ConnectionFailed,
+      Faraday::ParsingError,
+      Spaceship::BadGatewayError,
+      Spaceship::InternalServerError,
+      Spaceship::GatewayTimeoutError
+    ].each do |thrown|
+      it "does not send the request again after #{thrown}" do
+        stub_client_request(thrown, 1, 200, default_body)
+
+        expect do
+          subject.req_home_once
+        end.to raise_error(thrown)
+        expect(a_request(:get, test_uri)).to have_been_made.once
+      end
+    end
+
+    it "still retries Spaceship::AccessForbiddenError, which Apple refused" do
+      stub_client_request(Spaceship::AccessForbiddenError, 2, 200, default_body)
+
+      expect(subject.req_home_once.body).to eq(default_body)
+    end
+
+    # WebMock raises these inside Net::HTTP, so they go through the adapter's own error mapping:
+    # a different adapter that wraps them differently fails these examples.
+    {
+      Errno::ECONNRESET => Faraday::ConnectionFailed,
+      EOFError => Faraday::ConnectionFailed,
+      Net::ReadTimeout => Faraday::TimeoutError
+    }.each do |cause, thrown|
+      it "does not send the request again after #{cause}, once the request may have been sent" do
+        stub_client_request(cause, 1, 200, default_body)
+
+        expect do
+          subject.req_home_once
+        end.to raise_error(thrown)
+        expect(a_request(:get, test_uri)).to have_been_made.once
+      end
+    end
+
+    [
+      SocketError,
+      Errno::ECONNREFUSED,
+      Errno::EHOSTUNREACH,
+      Errno::ENETUNREACH,
+      Errno::EADDRNOTAVAIL,
+      Net::OpenTimeout
+    ].each do |cause|
+      it "still retries #{cause}, raised before the request was sent" do
+        stub_client_request(cause, 1, 200, default_body)
+
+        expect(subject.req_home_once.body).to eq(default_body)
+        expect(a_request(:get, test_uri)).to have_been_made.twice
+      end
+    end
   end
 
   describe 'retry' do
@@ -522,6 +617,18 @@ BODY
     end
   end
 
+  describe "a plist response that cannot be parsed" do
+    it "raises Faraday::ParsingError once the retries are used up" do
+      stub_request(:get, test_uri).
+        to_return(status: 200, body: +"<html>Internal Server Error</html>", headers: { 'Content-Type' => 'application/x-plist' })
+
+      expect do
+        subject.req_home
+      end.to raise_error(Faraday::ParsingError)
+      expect(WebMock).to have_requested(:get, test_uri).times(5)
+    end
+  end
+
   describe "#do_sirp" do
     it "raises Spaceship::UnexpectedResponse when body is not valid JSON, but HTTP 200" do
       stub_request(:post, "https://idmsa.apple.com/appleauth/auth/signin/init").
@@ -559,6 +666,11 @@ BODY
   describe "#log_response" do
     it 'handles ASCII-8BIT to UTF-8 encoding gracefully' do
       response = TestResponse.new([130, 5, 3120, 130, 4, 171, 160, 3, 2].pack('C*'))
+      expect(subject.send(:log_response, :get, TestClient.hostname, response)).to be_truthy
+    end
+
+    it 'handles a frozen response body' do
+      response = TestResponse.new("".freeze)
       expect(subject.send(:log_response, :get, TestClient.hostname, response)).to be_truthy
     end
   end
@@ -612,6 +724,73 @@ BODY
       allow(subject).to receive(:directory_accessible?).with(File.expand_path("/var/tmp")).and_return(false)
       allow(subject).to receive(:directory_accessible?).with(Dir.tmpdir).and_return(true)
       expect(subject.persistent_cookie_path).to eq("#{Dir.tmpdir}/spaceship/username/cookie")
+    end
+  end
+
+  describe "session cookie file permissions" do
+    let(:tmp_path) { Dir.mktmpdir }
+    let(:cookie_path) { File.join(tmp_path, "spaceship", "username", "cookie") }
+
+    around(:each) do |example|
+      old_umask = File.umask(0o022)
+      FastlaneSpec::Env.with_env_values("SPACESHIP_COOKIE_PATH" => tmp_path) { example.run }
+    ensure
+      File.umask(old_umask)
+      FileUtils.rm_rf(tmp_path)
+    end
+
+    before do
+      subject.user = "username"
+    end
+
+    def mode_of(path)
+      File.stat(path).mode & 0o777
+    end
+
+    def write_cookie_readable_by_all
+      FileUtils.mkdir_p(File.dirname(cookie_path), mode: 0o755)
+      HTTP::CookieJar.new.save(cookie_path, :yaml, session: true)
+      File.chmod(0o755, File.dirname(cookie_path))
+      File.chmod(0o644, cookie_path)
+    end
+
+    it "saves a new cookie readable by its owner only" do
+      subject.store_cookie
+
+      expect(mode_of(cookie_path)).to eq(0o600) unless FastlaneCore::Helper.windows?
+      expect(mode_of(File.dirname(cookie_path))).to eq(0o700) unless FastlaneCore::Helper.windows?
+    end
+
+    it "restricts an existing cookie when saving it again" do
+      write_cookie_readable_by_all
+
+      subject.store_cookie
+
+      expect(mode_of(cookie_path)).to eq(0o600) unless FastlaneCore::Helper.windows?
+      expect(mode_of(File.dirname(cookie_path))).to eq(0o700) unless FastlaneCore::Helper.windows?
+    end
+
+    it "restricts an existing cookie when loading it" do
+      write_cookie_readable_by_all
+
+      expect(subject.load_session_from_file).to be(true)
+
+      expect(mode_of(cookie_path)).to eq(0o600) unless FastlaneCore::Helper.windows?
+      expect(mode_of(File.dirname(cookie_path))).to eq(0o700) unless FastlaneCore::Helper.windows?
+    end
+
+    it "saves the cookie readable by its owner only in the Dir.tmpdir fallback" do
+      FastlaneSpec::Env.with_env_values("SPACESHIP_COOKIE_PATH" => nil) do
+        allow(subject).to receive(:fastlane_user_dir).and_return(File.join(tmp_path, "home", ".fastlane"))
+        allow(subject).to receive(:directory_accessible?).and_return(false)
+        allow(Dir).to receive(:tmpdir).and_return(tmp_path)
+        allow(subject).to receive(:directory_accessible?).with(tmp_path).and_return(true)
+
+        subject.store_cookie
+
+        expect(mode_of(cookie_path)).to eq(0o600) unless FastlaneCore::Helper.windows?
+        expect(mode_of(File.dirname(cookie_path))).to eq(0o700) unless FastlaneCore::Helper.windows?
+      end
     end
   end
 end

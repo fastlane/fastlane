@@ -131,14 +131,14 @@ describe Supply do
 
     describe 'metadata encoding' do
       it 'prints a user friendly error message if metadata is not UTF-8 encoded' do
-        fake_config = 'fake config'
+        fake_config = +'fake config'
         allow(fake_config).to receive(:[]).and_return('fake config value')
         Supply.config = fake_config
 
         allow(File).to receive(:exist?).and_return(true)
         allow(File).to receive(:read).and_return("fake content")
 
-        fake_listing = "listing"
+        fake_listing = +"listing"
         Supply::AVAILABLE_METADATA_FIELDS.each do |field|
           allow(fake_listing).to receive("#{field}=".to_sym)
         end
@@ -147,6 +147,35 @@ describe Supply do
         expect(FastlaneCore::UI).to receive(:user_error!).with(/Metadata must be UTF-8 encoded./)
 
         Supply::Uploader.new.upload_metadata('en-US', fake_listing)
+      end
+    end
+
+    describe 'release notes' do
+      it 'leaves out the languages whose changelog is missing or empty' do
+        Dir.mktmpdir do |metadata_path|
+          {
+            'en-US' => { '1.txt' => "Fixes" },
+            'fr-FR' => {},
+            'de-DE' => { '1.txt' => "" },
+            'ja-JP' => { '1.txt' => "\n" },
+            'es-ES' => { 'default.txt' => "Default notes" }
+          }.each do |language, files|
+            changelogs = File.join(metadata_path, language, Supply::CHANGELOGS_FOLDER_NAME)
+            FileUtils.mkdir_p(changelogs)
+            files.each { |name, text| File.write(File.join(changelogs, name), text) }
+          end
+          Supply.config = { metadata_path: metadata_path, skip_upload_metadata: true, skip_upload_images: true, skip_upload_screenshots: true }
+
+          uploader = Supply::Uploader.new
+          allow(uploader).to receive(:client).and_return(double('client', listing_for_language: nil))
+          queue = Queue.new
+          worker = uploader.send(:create_meta_upload_worker)
+          worker.batch_enqueue(%w(en-US fr-FR de-DE ja-JP es-ES).map { |language| Supply::Uploader::UploadJob.new(language, 1, queue) })
+          worker.start
+
+          notes = Array.new(queue.size) { queue.pop }
+          expect(notes.map { |note| [note.language, note.text] }).to contain_exactly(["en-US", "Fixes"], ["es-ES", "Default notes"])
+        end
       end
     end
 
@@ -198,6 +227,55 @@ describe Supply do
         expect(client).not_to(receive(:update_track).with(config[:track], anything))
         expect(client).to receive(:update_track).with(config[:track_promote_to], track).once
         subject
+      end
+
+      it 'fails with a user error when the source track has no release' do
+        allow(track).to receive(:releases).and_return(nil)
+
+        expect { subject }.to raise_error(FastlaneCore::Interface::FastlaneError, /doesn't have any releases/)
+      end
+
+      context 'when :track_promote_force is set' do
+        let(:config) {
+          {
+            release_status: Supply::ReleaseStatus::COMPLETED,
+            track_promote_release_status: Supply::ReleaseStatus::COMPLETED,
+            track: 'alpha',
+            track_promote_to: 'beta',
+            track_promote_force: true,
+            version_code: 1,
+            version_name: '1.0.0'
+          }
+        }
+
+        it 'promotes a version code that is no longer returned for the source track' do
+          promoted_releases = nil
+          allow(track).to receive(:releases=) { |releases| promoted_releases = releases }
+
+          # The release found on the source track must be left untouched
+          expect(release).not_to(receive(:name=))
+          expect(release).not_to(receive(:version_codes=))
+
+          expect(client).to receive(:update_track).with(config[:track_promote_to], track).once
+          subject
+
+          expect(promoted_releases.size).to eq(1)
+          expect(promoted_releases.first.name).to eq('1.0.0')
+          expect(promoted_releases.first.version_codes).to eq(['1'])
+          expect(promoted_releases.first.status).to eq(Supply::ReleaseStatus::COMPLETED)
+        end
+
+        it 'fails when :version_code is missing' do
+          Supply.config = config.merge(version_code: nil)
+
+          expect { subject }.to raise_error(FastlaneCore::Interface::FastlaneError, /mandatory to enter the :version_code/)
+        end
+
+        it 'fails when :version_name is missing' do
+          Supply.config = config.merge(version_name: nil)
+
+          expect { subject }.to raise_error(FastlaneCore::Interface::FastlaneError, /mandatory to enter the :version_name/)
+        end
       end
     end
 

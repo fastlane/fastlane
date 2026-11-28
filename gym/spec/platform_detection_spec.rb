@@ -1,4 +1,8 @@
 describe Gym do
+  before do
+    fake_out_build_settings(GYM_BUILD_SETTINGS)
+  end
+
   it "detects when a multiplatform project is building for iOS", requires_xcodebuild: true do
     options = { project: "./gym/examples/multiplatform/Example.xcodeproj", sdk: "iphoneos" }
     Gym.config = FastlaneCore::Configuration.create(Gym::Options.available_options, options)
@@ -29,7 +33,7 @@ describe Gym do
     expect(Gym.building_multiplatform_for_mac?).to eq(true)
   end
 
-  it "detects the correct platform for a visionOS project", requires_xcodebuild: true, if: FastlaneCore::Helper.mac? && FastlaneCore::Helper.xcode_at_least?('15.0') do
+  it "detects the correct platform for a visionOS project", requires_xcodebuild: true, if: FastlaneCore::Helper.mac? do
     options = { project: "./gym/examples/visionos/VisionExample.xcodeproj", sdk: "xros", skip_package_dependencies_resolution: true }
     Gym.config = FastlaneCore::Configuration.create(Gym::Options.available_options, options)
 

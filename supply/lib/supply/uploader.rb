@@ -196,8 +196,11 @@ module Supply
         UI.user_error!("Cannot promote from track '#{Supply.config[:track]}' - track doesn't exist")
       end
 
-      releases = track_from.releases
-      if Supply.config[:version_code].to_s != ""
+      releases = track_from.releases || []
+
+      if Supply.config[:track_promote_force]
+        releases = [forced_track_release]
+      elsif Supply.config[:version_code].to_s != ""
         releases = releases.select do |release|
           release.version_codes.include?(Supply.config[:version_code].to_s)
         end
@@ -239,6 +242,29 @@ module Supply
       client.update_track(Supply.config[:track_promote_to], track_to)
     end
 
+    # Builds the release to promote instead of looking it up in the source track.
+    #
+    # The Play Developer API only returns the release currently serving each
+    # track, so a version that has already been superseded is absent from the
+    # payload and cannot be found by `promote_track`, even though the Play
+    # Console still allows promoting it. Building the release out of the
+    # configured values is the only way to promote such a version.
+    # See https://github.com/fastlane/fastlane/issues/18497
+    def forced_track_release
+      version_code = Supply.config[:version_code].to_s
+      version_name = Supply.config[:version_name].to_s
+
+      UI.user_error!("To force a track promotion, it is mandatory to enter the :version_code") if version_code.empty?
+      UI.user_error!("To force a track promotion, it is mandatory to enter the :version_name") if version_name.empty?
+
+      UI.important("Forcing the promotion of version code '#{version_code}' - it is not checked against track '#{Supply.config[:track]}'")
+
+      AndroidPublisher::TrackRelease.new(
+        name: version_name,
+        version_codes: [version_code]
+      )
+    end
+
     def upload_changelog(language, version_code)
       UI.user_error!("Cannot find changelog because no version code given - please specify :version_code") unless version_code
 
@@ -257,10 +283,13 @@ module Supply
         end
       end
 
-      AndroidPublisher::LocalizedText.new(
-        language: language,
-        text: changelog_text
-      )
+      # An empty text made the whole release notes update fail (fastlane#21004)
+      unless changelog_text.strip.empty?
+        AndroidPublisher::LocalizedText.new(
+          language: language,
+          text: changelog_text
+        )
+      end
     end
 
     def upload_changelogs(release_notes, release, track, track_name)
@@ -537,7 +566,10 @@ module Supply
         upload_metadata(job.language, listing) unless Supply.config[:skip_upload_metadata]
         upload_images(job.language) unless Supply.config[:skip_upload_images]
         upload_screenshots(job.language) unless Supply.config[:skip_upload_screenshots]
-        job.release_notes_queue << upload_changelog(job.language, job.version_code) unless Supply.config[:skip_upload_changelogs]
+        unless Supply.config[:skip_upload_changelogs]
+          changelog = upload_changelog(job.language, job.version_code)
+          job.release_notes_queue << changelog unless changelog.nil?
+        end
         UI.message("Uploaded all items for language '#{job.language}'... (#{Time.now - start_time} secs)")
       rescue => error
         UI.abort_with_message!("#{job.language} - #{error}")

@@ -27,6 +27,16 @@ describe Screengrab::ReportsGenerator do
         expect(html).not_to include(%(" onerror="))
         expect(html).to include("x&quot; onerror=&quot;window.pwned=1&quot;")
       end
+
+      it "opens the summary with its path as one argument" do
+        dir = File.join(@dir, "Kaldi's Kafe")
+        FileUtils.mkdir_p(dir)
+        allow(Screengrab).to receive(:config).and_return({ output_directory: dir, skip_open_summary: false })
+        generator = described_class.new
+
+        expect(generator).to receive(:system).with("open", File.join(dir, "screenshots.html"))
+        generator.generate
+      end
     end
   end
 

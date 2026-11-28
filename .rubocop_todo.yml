@@ -224,11 +224,6 @@ Lint/RedundantCopEnableDirective:
 
 # Offense count: 3
 # This cop supports safe autocorrection (--autocorrect).
-Lint/RedundantRequireStatement:
-  Enabled: false
-
-# Offense count: 3
-# This cop supports safe autocorrection (--autocorrect).
 Lint/RedundantStringCoercion:
   Enabled: false
 
@@ -862,7 +857,7 @@ Style/HashSlice:
     - 'produce/lib/produce/commands_generator.rb'
     - 'produce/lib/produce/service.rb'
     - 'spaceship/lib/spaceship/client.rb'
-    - 'spec_helper.rb'
+    - 'spec/spec_helper.rb'
 
 Style/MapIntoArray:
   Enabled: false
@@ -890,7 +885,7 @@ Style/OneClassPerFile:
     - 'precheck/lib/precheck/rule_processor.rb'
     - 'spaceship/lib/spaceship/helper/rels_middleware.rb'
     - 'spaceship/lib/spaceship/tunes/language_converter.rb'
-    - 'spec_helper.rb'
+    - 'spec/spec_helper.rb'
 
 Style/OptionalArguments:
   Exclude:
@@ -909,7 +904,7 @@ Style/RedundantCurrentDirectoryInPath:
 
 Style/RedundantRegexpArgument:
   Exclude:
-    - 'fastlane/helper/plugin_scores_helper.rb'
+    - 'internal/docs/plugin_scores.rb'
     - 'fastlane_core/lib/fastlane_core/core_ext/string.rb'
     - 'fastlane_core/lib/fastlane_core/device_manager.rb'
     - 'fastlane_core/lib/fastlane_core/itunes_transporter.rb'
@@ -958,4 +953,4 @@ Style/TimeNow:
 Style/YAMLFileRead:
   Exclude:
     - 'Rakefile'
-    - 'fastlane/helper/plugin_scores_helper.rb'
+    - 'internal/docs/plugin_scores.rb'

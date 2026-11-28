@@ -3,7 +3,7 @@ def du_fixture_file_path(filename)
 end
 
 def du_read_fixture_file(filename)
-  File.read(du_fixture_file_path(filename))
+  spaceship_fixture(du_fixture_file_path(filename))
 end
 
 # those represent UploadFile structures

@@ -20,7 +20,7 @@ module Fastlane
     def self.get
       UI.important("Generating fastlane environment output, this might take a few seconds...")
       require "fastlane/markdown_table_formatter"
-      env_output = ""
+      env_output = +""
       env_output << print_system_environment
       env_output << print_system_locale
       env_output << print_fastlane_files
@@ -33,7 +33,7 @@ module Fastlane
       status = (env_output.include?("🚫") ? "🚫" : "✅")
       env_header = "<details><summary>#{status} fastlane environment #{status}</summary>\n\n"
       env_tail = "</details>"
-      final_output = ""
+      final_output = +""
 
       if FastlaneCore::Globals.captured_output?
         final_output << "### Captured Output\n\n"
@@ -50,7 +50,7 @@ module Fastlane
     end
 
     def self.print_loaded_plugins
-      env_output =  "### Loaded fastlane plugins:\n"
+      env_output = +"### Loaded fastlane plugins:\n"
       env_output << "\n"
       plugin_manager = Fastlane::PluginManager.new
       plugin_manager.load_plugins(print_table: false)
@@ -58,7 +58,7 @@ module Fastlane
       if plugin_manager.available_plugins.length <= 0
         env_output << "**No plugins Loaded**\n"
       else
-        table = ""
+        table = +""
         table << "| Plugin | Version | Update-Status |\n"
         table << "|--------|---------|\n"
         plugin_manager.available_plugins.each do |plugin|
@@ -96,8 +96,8 @@ module Fastlane
 
     def self.print_loaded_fastlane_gems
       # fastlanes internal gems
-      env_output = "### fastlane gems\n\n"
-      table = ""
+      env_output = +"### fastlane gems\n\n"
+      table = +""
       table << "| Gem | Version | Update-Status |\n"
       table << "|-----|---------|------------|\n"
       fastlane_tools = Fastlane::TOOLS + [:fastlane_core, :credentials_manager]
@@ -128,10 +128,10 @@ module Fastlane
     end
 
     def self.print_loaded_gems
-      env_output = "<details>"
+      env_output = +"<details>"
       env_output << "<summary><b>Loaded gems</b></summary>\n\n"
 
-      table = "| Gem | Version |\n"
+      table = +"| Gem | Version |\n"
       table << "|-----|---------|\n"
       gems_to_check.each do |current_gem|
         unless Fastlane::TOOLS.include?(current_gem.name.to_sym)
@@ -146,9 +146,9 @@ module Fastlane
     end
 
     def self.print_system_locale
-      env_output = "### System Locale\n\n"
+      env_output = +"### System Locale\n\n"
       found_one = false
-      env_table = ""
+      env_table = +""
       ["LANG", "LC_ALL", "LANGUAGE"].each do |e|
         env_icon = "🚫"
         if ENV[e] && ENV[e].end_with?("UTF-8")
@@ -161,11 +161,11 @@ module Fastlane
         env_table << "| #{e} | #{ENV[e]} | #{env_icon} |\n"
       end
       if !found_one
-        table = "| Error |\n"
+        table = +"| Error |\n"
         table << "|-----|\n"
         table << "| No Locale with UTF8 found 🚫|\n"
       else
-        table = "| Variable | Value |  |\n"
+        table = +"| Variable | Value |  |\n"
         table << "|-----|---------|----|\n"
         table << env_table
       end
@@ -177,7 +177,7 @@ module Fastlane
     def self.print_system_environment
       require "openssl"
 
-      env_output = "### Stack\n\n"
+      env_output = +"### Stack\n\n"
       product, version, build = "Unknown"
       os_version = "UNKNOWN"
 
@@ -250,7 +250,7 @@ module Fastlane
     end
 
     def self.print_fastlane_files
-      env_output = "### fastlane files:\n\n"
+      env_output = +"### fastlane files:\n\n"
 
       {
         "Fastfile" => FastlaneCore::FastlaneFolder.fastfile_path,

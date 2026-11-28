@@ -25,7 +25,7 @@ module Gym
 
       # Archive
       if Gym.building_for_ipa?
-        fix_generic_archive unless Gym.project.watchos? # See https://github.com/fastlane/fastlane/pull/4325
+        fix_generic_archive
         return BuildCommandGenerator.archive_path if Gym.config[:skip_package_ipa]
 
         package_app
@@ -96,6 +96,16 @@ module Gym
 
     def fix_generic_archive
       return unless FastlaneCore::Env.truthy?("GYM_USE_GENERIC_ARCHIVE_FIX")
+
+      # Not for watchOS apps, see https://github.com/fastlane/fastlane/pull/4325. When build
+      # settings can't be read, the destination (which then has to name the platform) says so
+      watchos = if Gym.project.xcodebuild_settings_lookup_disallowed_by
+                  Gym.destination_platform.match?(/\AwatchOS/i)
+                else
+                  Gym.project.watchos?
+                end
+      return if watchos
+
       Gym::XcodebuildFixes.generic_archive_fix
     end
 
@@ -223,8 +233,13 @@ module Gym
       UI.message("Compressing #{available_dsyms.count} dSYM(s)") unless Gym.config[:silent]
 
       output_path = File.expand_path(File.join(Gym.config[:output_directory], Gym.config[:output_name] + ".app.dSYM.zip"))
-      command = "cd '#{containing_directory}' && zip -r '#{output_path}' *.dSYM"
-      Helper.backticks(command, print: !Gym.config[:silent])
+      command = "cd #{containing_directory.shellescape} && zip -r #{output_path.shellescape} *.dSYM"
+      FastlaneCore::CommandExecutor.execute(command: command,
+                                          print_all: !Gym.config[:silent],
+                                      print_command: !Gym.config[:silent],
+                                              error: proc do |output|
+                                                UI.user_error!("Could not compress the dSYM(s) to '#{output_path}':\n#{output}")
+                                              end)
       puts("") # new line
 
       UI.success("Successfully exported and compressed dSYM file")

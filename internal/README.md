@@ -8,4 +8,4 @@
 
 ------
 
-Internal scripts for Rubocop linting & Rake tasks.
+Internal scripts for Rubocop linting, Rake tasks, and the docs checks and generation the Fastfile runs (`docs/`).

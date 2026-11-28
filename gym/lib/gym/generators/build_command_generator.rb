@@ -34,11 +34,11 @@ module Gym
 
         options = []
         options += project_path_array
-        options << "-sdk '#{config[:sdk]}'" if config[:sdk]
-        options << "-toolchain '#{config[:toolchain]}'" if config[:toolchain]
-        options << "-destination '#{config[:destination]}'" if config[:destination]
+        options << "-sdk #{config[:sdk].shellescape}" if config[:sdk]
+        options << "-toolchain #{config[:toolchain].shellescape}" if config[:toolchain]
+        options << "-destination #{config[:destination].shellescape}" if config[:destination]
         options << "-archivePath #{archive_path.shellescape}" unless config[:skip_archive]
-        options << "-resultBundlePath '#{result_bundle_path}'" if config[:result_bundle]
+        options << "-resultBundlePath #{result_bundle_path.shellescape}" if config[:result_bundle]
         options << "-showBuildTimingSummary" if config[:build_timing_summary]
         if config[:use_system_scm] && !options.include?("-scmProvider system")
           options << "-scmProvider system"
@@ -154,7 +154,9 @@ module Gym
       end
 
       def xcodebuild_log_path
-        app_name = Gym.config[:app_name] || Gym.project.app_name
+        # When build settings can't be read there's no app name, so name the log after the
+        # output instead, which is always set by now
+        app_name = Gym.config[:app_name] || Gym.project.app_name_if_lookup_allowed || Gym.config[:output_name]
         file_name = "#{app_name}-#{Gym.config[:scheme]}.log"
         containing = File.expand_path(Gym.config[:buildlog_path])
         FileUtils.mkdir_p(containing)

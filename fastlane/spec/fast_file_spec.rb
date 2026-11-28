@@ -24,6 +24,20 @@ describe Fastlane do
         expect(UI).not_to(receive(:important))
         Fastlane::FastFile.new('./fastlane/spec/fixtures/fastfiles/FastfileRequireInstalledGem')
       end
+
+      it "replaces smart quotes and says how to keep them" do
+        expect(UI).to receive(:error).with(/has had smart quotes sanitised.*FASTLANE_SKIP_SMART_QUOTES_SANITIZE=1/)
+        ff = Fastlane::FastFile.new('./fastlane/spec/fixtures/fastfiles/FastfileSmartQuotes')
+        expect(ff.runner.execute(:test)).to eq("sanitised")
+      end
+
+      it "keeps smart quotes when FASTLANE_SKIP_SMART_QUOTES_SANITIZE is set" do
+        FastlaneSpec::Env.with_env_values('FASTLANE_SKIP_SMART_QUOTES_SANITIZE' => '1') do
+          expect(UI).not_to(receive(:error))
+          ff = Fastlane::FastFile.new('./fastlane/spec/fixtures/fastfiles/FastfileSmartQuotesInAString')
+          expect(ff.runner.execute(:test)).to eq("It’s a “lane”")
+        end
+      end
     end
 
     describe "#sh" do
@@ -36,7 +50,7 @@ describe Fastlane do
           expect(Fastlane::Actions).to receive(:execute_action).with("git commit").and_call_original
 
           expect(Fastlane::Actions).to receive(:sh_no_action)
-            .with("git commit", log: true, error_callback: nil)
+            .with("git commit", log: true, error_callback: nil, stdin: nil, separate_stderr: false, chdir: nil)
           @ff.sh("git commit")
         end
 
@@ -44,7 +58,7 @@ describe Fastlane do
           expect(Fastlane::Actions).to receive(:execute_action).with("git commit").and_call_original
 
           expect(Fastlane::Actions).to receive(:sh_no_action)
-            .with("git commit", log: true, error_callback: nil)
+            .with("git commit", log: true, error_callback: nil, stdin: nil, separate_stderr: false, chdir: nil)
           @ff.sh("git commit", log: true)
         end
 
@@ -52,7 +66,7 @@ describe Fastlane do
           expect(Fastlane::Actions).to receive(:execute_action).with("some_name").and_call_original
 
           expect(Fastlane::Actions).to receive(:sh_no_action)
-            .with("git commit", log: false, error_callback: nil)
+            .with("git commit", log: false, error_callback: nil, stdin: nil, separate_stderr: false, chdir: nil)
           @ff.sh("git commit", step_name: "some_name", log: false)
         end
 
@@ -60,7 +74,7 @@ describe Fastlane do
           expect(Fastlane::Actions).to receive(:execute_action).with("some_name").and_call_original
 
           expect(Fastlane::Actions).to receive(:sh_no_action)
-            .with("git commit", log: true, error_callback: nil)
+            .with("git commit", log: true, error_callback: nil, stdin: nil, separate_stderr: false, chdir: nil)
           @ff.sh("git commit", step_name: "some_name", log: true)
         end
 
@@ -68,7 +82,7 @@ describe Fastlane do
           expect(Fastlane::Actions).to receive(:execute_action).with("git commit").and_call_original
 
           expect(Fastlane::Actions).to receive(:sh_no_action)
-            .with("git", "commit", log: true, error_callback: nil)
+            .with("git", "commit", log: true, error_callback: nil, stdin: nil, separate_stderr: false, chdir: nil)
           @ff.sh("git", "commit")
         end
 
@@ -76,7 +90,7 @@ describe Fastlane do
           expect(Fastlane::Actions).to receive(:execute_action).with("git commit").and_call_original
 
           expect(Fastlane::Actions).to receive(:sh_no_action)
-            .with("git", "commit", log: true, error_callback: nil)
+            .with("git", "commit", log: true, error_callback: nil, stdin: nil, separate_stderr: false, chdir: nil)
           @ff.sh("git", "commit")
         end
 
@@ -85,10 +99,28 @@ describe Fastlane do
 
           proc = proc {}
           expect(Fastlane::Actions).to receive(:sh_no_action)
-            .with("git", "commit", log: true, error_callback: nil) do |*args, &block|
+            .with("git", "commit", log: true, error_callback: nil, stdin: nil, separate_stderr: false, chdir: nil) do |*args, &block|
               expect(proc).to be(block)
             end
           @ff.sh("git", "commit", &proc)
+        end
+
+        it "passes separate_stderr" do
+          expect(Fastlane::Actions).to receive(:sh_no_action)
+            .with("git", "--version", log: true, error_callback: nil, stdin: nil, separate_stderr: true, chdir: nil)
+          @ff.sh("git", "--version", separate_stderr: true)
+        end
+
+        it "passes stdin" do
+          expect(Fastlane::Actions).to receive(:sh_no_action)
+            .with("cat", log: true, error_callback: nil, stdin: "EXAMPLE DATA", separate_stderr: false, chdir: nil)
+          @ff.sh("cat", stdin: "EXAMPLE DATA")
+        end
+
+        it "passes chdir" do
+          expect(Fastlane::Actions).to receive(:sh_no_action)
+            .with("pwd", log: true, error_callback: nil, stdin: nil, separate_stderr: false, chdir: "/tmp")
+          @ff.sh("pwd", chdir: "/tmp")
         end
       end
 
@@ -97,7 +129,7 @@ describe Fastlane do
           expect(Fastlane::Actions).to receive(:execute_action).with("git commit").and_call_original
 
           expect(Fastlane::Actions).to receive(:sh_no_action)
-            .with("git commit", log: true, error_callback: nil)
+            .with("git commit", log: true, error_callback: nil, stdin: nil, separate_stderr: false, chdir: nil)
           @ff.sh(command: "git commit")
         end
 
@@ -105,7 +137,7 @@ describe Fastlane do
           expect(Fastlane::Actions).to receive(:execute_action).with("shell command").and_call_original
 
           expect(Fastlane::Actions).to receive(:sh_no_action)
-            .with("git commit", log: false, error_callback: nil)
+            .with("git commit", log: false, error_callback: nil, stdin: nil, separate_stderr: false, chdir: nil)
           @ff.sh(command: "git commit", log: false)
         end
 
@@ -113,7 +145,7 @@ describe Fastlane do
           expect(Fastlane::Actions).to receive(:execute_action).with("git commit").and_call_original
 
           expect(Fastlane::Actions).to receive(:sh_no_action)
-            .with("git", "commit", log: true, error_callback: nil)
+            .with("git", "commit", log: true, error_callback: nil, stdin: nil, separate_stderr: false, chdir: nil)
           @ff.sh(command: ["git", "commit"])
         end
 
@@ -122,10 +154,28 @@ describe Fastlane do
 
           proc = proc {}
           expect(Fastlane::Actions).to receive(:sh_no_action)
-            .with("git", "commit", log: true, error_callback: nil) do |*args, &block|
+            .with("git", "commit", log: true, error_callback: nil, stdin: nil, separate_stderr: false, chdir: nil) do |*args, &block|
               expect(proc).to be(block)
             end
           @ff.sh(command: ["git", "commit"], &proc)
+        end
+
+        it "passes separate_stderr" do
+          expect(Fastlane::Actions).to receive(:sh_no_action)
+            .with("git --version", log: true, error_callback: nil, stdin: nil, separate_stderr: true, chdir: nil)
+          @ff.sh(command: "git --version", separate_stderr: true)
+        end
+
+        it "passes stdin" do
+          expect(Fastlane::Actions).to receive(:sh_no_action)
+            .with("cat", log: true, error_callback: nil, stdin: "EXAMPLE DATA", separate_stderr: false, chdir: nil)
+          @ff.sh(command: "cat", stdin: "EXAMPLE DATA")
+        end
+
+        it "passes chdir" do
+          expect(Fastlane::Actions).to receive(:sh_no_action)
+            .with("pwd", log: true, error_callback: nil, stdin: nil, separate_stderr: false, chdir: "/tmp")
+          @ff.sh(command: "pwd", chdir: "/tmp")
         end
 
         it "raises error if no :command keyboard" do
@@ -320,10 +370,13 @@ describe Fastlane do
       end
 
       it "allows the user to set the platform in their Fastfile", focus: true do
+        allow(UI).to receive(:important)
         expect(UI).to receive(:important).with("Setting '[:windows, :neogeo]' as extra SupportedPlatforms")
         ff = Fastlane::FastFile.new('./fastlane/spec/fixtures/fastfiles/FastfileAddNewPlatform')
         expect(UI).to receive(:message).with("echo :windows")
         ff.runner.execute(:echo_lane, :windows)
+      ensure
+        Fastlane::SupportedPlatforms.extra = []
       end
 
       it "before_each and after_each are called every time" do

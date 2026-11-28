@@ -97,7 +97,7 @@ username("user@fastlane.tools")
 
 ##### Git Storage on GitHub
 
-If your machine is currently using SSH to authenticate with GitHub, you'll want to use a `git` URL, otherwise, you may see an authentication error when you attempt to use match. Alternatively, you can set a basic authorization for _match_:
+If your machine is currently using SSH to authenticate with GitHub, you'll want to use a `git` URL, otherwise, you may see an authentication error when you attempt to use match. Alternatively, you can set a basic authorization for _match_ (needs git 2.31 or later):
 
 Using parameter:
 
@@ -141,7 +141,7 @@ You can find more information about GitHub basic authentication and personal tok
 
 ##### Git Storage on Azure DevOps
 
-If you're running a pipeline on Azure DevOps and using git storage in a another repository on the same project, you might want to use `bearer` token authentication.
+If you're running a pipeline on Azure DevOps and using git storage in a another repository on the same project, you might want to use `bearer` token authentication (needs git 2.31 or later).
 
 Using parameter:
 
@@ -218,9 +218,9 @@ fastlane match development
 This will create a new certificate and provisioning profile (if required) and store them in your selected storage.
 If you previously ran _match_ with the configured storage it will automatically install the existing profiles from your storage.
 
-The provisioning profiles are installed in `~/Library/Developer/Xcode/UserData/Provisioning Profiles` (`~/Library/MobileDevice/Provisioning Profiles` for Xcode versions prior to 16.0) while the certificates and private keys are installed in your Keychain.
+The provisioning profiles are installed in `~/Library/Developer/Xcode/UserData/Provisioning Profiles` while the certificates and private keys are installed in your Keychain.
 
-> fastlane relies on the system's default Xcode version to determine the current version. The path where provisioning profiles are stored changed in Xcode 16. If you use the `xcode_select` or `xcodes` actions and you have Xcode 15 and 16 installed in your system, please make sure to execute them before invoking the `sync_code_signing` action.  
+> fastlane checks the Xcode version when it starts. If your system's default Xcode is older than 16, select a newer one with `sudo xcode-select -s` or `DEVELOPER_DIR` before running fastlane: the `xcode_select` and `xcodes` actions run too late.
 
 To get a more detailed output of what _match_ is doing use
 

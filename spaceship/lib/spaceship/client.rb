@@ -218,14 +218,14 @@ module Spaceship
         c.use(Spaceship::StatsMiddleware)
         c.adapter(Faraday.default_adapter)
 
-        if ENV['SPACESHIP_DEBUG']
+        if Spaceship::Globals.env_truthy?('SPACESHIP_DEBUG')
           # for debugging only
           # This enables tracking of networking requests using Charles Web Proxy
           c.proxy = "https://127.0.0.1:8888"
           c.ssl[:verify_mode] = OpenSSL::SSL::VERIFY_NONE
         elsif ENV["SPACESHIP_PROXY"]
           c.proxy = ENV["SPACESHIP_PROXY"]
-          c.ssl[:verify_mode] = OpenSSL::SSL::VERIFY_NONE if ENV["SPACESHIP_PROXY_SSL_VERIFY_NONE"]
+          c.ssl[:verify_mode] = OpenSSL::SSL::VERIFY_NONE if Spaceship::Globals.env_truthy?("SPACESHIP_PROXY_SSL_VERIFY_NONE")
         end
 
         if ENV["DEBUG"]
@@ -247,11 +247,13 @@ module Spaceship
     # unless something else happens to have created it first.
     def logger
       unless @logger
-        if ENV["VERBOSE"]
+        if Spaceship::Globals.env_truthy?("VERBOSE")
           @logger = Logger.new(STDOUT)
         else
           # Log to file by default
           path = File.join(Dir.tmpdir, "spaceship#{Time.now.to_i}_#{Process.pid}_#{Thread.current.object_id}.log")
+          # The log holds every request and response body: create it readable by its owner only
+          File.open(path, File::WRONLY | File::CREAT | File::APPEND, 0o600) {}
           @logger = Logger.new(path)
         end
 
@@ -279,10 +281,12 @@ module Spaceship
     def store_cookie(path: nil)
       path ||= persistent_cookie_path
       FileUtils.mkdir_p(File.expand_path("..", path))
+      File.chmod(0o700, File.expand_path("..", path))
 
       # really important to specify the session to true
       # otherwise myacinfo and more won't be stored
       @cookie.save(path, :yaml, session: true)
+      File.chmod(0o600, path)
       return File.read(path)
     end
 
@@ -642,7 +646,7 @@ module Spaceship
     # rubocop:enable Metrics/PerceivedComplexity
 
     def perform_login_method(user, password, modified_cookie)
-      do_legacy_signin = ENV['FASTLANE_USE_LEGACY_PRE_SIRP_AUTH']
+      do_legacy_signin = Spaceship::Globals.env_truthy?('FASTLANE_USE_LEGACY_PRE_SIRP_AUTH')
       if do_legacy_signin
         puts("Starting legacy Apple ID login") if Spaceship::Globals.verbose?
 
@@ -729,17 +733,11 @@ module Spaceship
       exit(has_valid_session)
     end
 
-    # <tmpdir>/spaceship_itc_service_key.txt
-    #
-    # Dir.tmpdir rather than a literal "/tmp", for the same reason as #logger,
-    # and here the failure was worse than a missing file: itc_service_key
-    # rescues everything, so the write failing on Windows was reported as an
-    # App Store Connect outage. See #30198.
-    #
-    # On macOS this is also per user, so a cache written by one user no longer
-    # blocks another.
+    # <fastlane_user_dir>/spaceship_itc_service_key.txt: per user, and kept between
+    # runs. Dir.tmpdir (#30197) is shared by every user on Linux, and a literal
+    # "/tmp" is not a directory on Windows.
     def itc_service_key_path
-      File.join(Dir.tmpdir, "spaceship_itc_service_key.txt")
+      File.join(fastlane_user_dir, "spaceship_itc_service_key.txt")
     end
 
     # Read on every login from GET /logout -> 302 Location: .../signout?widgetKey=<key>.
@@ -782,7 +780,7 @@ module Spaceship
     def cache_service_key(key)
       File.write(itc_service_key_path, key)
     rescue SystemCallError => ex
-      logger.warn("Could not cache the App Store Connect API key at #{itc_service_key_path}: #{ex.message}")
+      logger.warn("Could not cache the App Store Connect API key: #{ex.message}")
     end
 
     # The source Apple documented, removed in September 2026 and answering 404
@@ -886,6 +884,8 @@ module Spaceship
       begin
         if File.exist?(persistent_cookie_path)
           puts("Loading session from '#{persistent_cookie_path}'") if Spaceship::Globals.verbose?
+          File.chmod(0o700, File.expand_path("..", persistent_cookie_path))
+          File.chmod(0o600, persistent_cookie_path)
           @cookie.load(persistent_cookie_path)
           return true
         end
@@ -941,7 +941,10 @@ module Spaceship
     # @!group Helpers
     #####################################################
 
-    def with_retry(tries = 5, &_block)
+    # Errors the net_http adapter wraps in Faraday::ConnectionFailed before the request is sent
+    UNSENT_REQUEST_ERRORS = [SocketError, Errno::ECONNREFUSED, Errno::EHOSTUNREACH, Errno::ENETUNREACH, Errno::EADDRNOTAVAIL, Net::OpenTimeout].freeze
+
+    def with_retry(tries = 5, resend: true, &_block)
       return yield
     rescue \
         Faraday::ConnectionFailed,
@@ -950,6 +953,8 @@ module Spaceship
         AppleTimeoutError,
         GatewayTimeoutError,
         AccessForbiddenError => ex
+      # Apple may have processed a request that failed after it was sent; a 403 was refused
+      raise ex unless resend || ex.kind_of?(AccessForbiddenError) || unsent_request?(ex)
       tries -= 1
       unless tries.zero?
         msg = "Timeout received: '#{ex.class}', '#{ex.message}'. Retrying after 3 seconds (remaining: #{tries})..."
@@ -974,6 +979,7 @@ module Spaceship
     rescue \
         Faraday::ParsingError, # <h2>Internal Server Error</h2> with content type json
         InternalServerError => ex
+      raise ex unless resend
       tries -= 1
       unless tries.zero?
         msg = "Internal Server Error received: '#{ex.class}', '#{ex.message}'. Retrying after 3 seconds (remaining: #{tries})..."
@@ -1001,6 +1007,10 @@ module Spaceship
       raise ex # re-raise the exception
     end
 
+    def unsent_request?(ex)
+      ex.kind_of?(Faraday::ConnectionFailed) && UNSENT_REQUEST_ERRORS.any? { |error| ex.wrapped_exception.kind_of?(error) }
+    end
+
     # memorize the last csrf tokens from responses
     def csrf_tokens
       @csrf_tokens || {}
@@ -1010,7 +1020,7 @@ module Spaceship
       @additional_headers || {}
     end
 
-    def request(method, url_or_path = nil, params = nil, headers = {}, auto_paginate = false, &block)
+    def request(method, url_or_path = nil, params = nil, headers = {}, auto_paginate = false, resend: true, &block)
       headers.merge!(csrf_tokens)
       headers.merge!(additional_headers)
       headers['User-Agent'] = USER_AGENT
@@ -1027,7 +1037,7 @@ module Spaceship
       response = if auto_paginate
                    send_request_auto_paginate(method, url_or_path, params, headers, &block)
                  else
-                   send_request(method, url_or_path, params, headers, &block)
+                   send_request(method, url_or_path, params, headers, resend: resend, &block)
                  end
 
       return response
@@ -1150,7 +1160,7 @@ module Spaceship
 
     def log_response(method, url, response, headers = nil, &block)
       url ||= extract_key_from_block('url', &block)
-      body = response.body.kind_of?(String) ? response.body.force_encoding(Encoding::UTF_8) : response.body
+      body = response.body.kind_of?(String) ? response.body.dup.force_encoding(Encoding::UTF_8) : response.body
       logger.debug("<< #{method.upcase} #{url}: #{response.status} #{body}")
     end
 
@@ -1182,22 +1192,25 @@ module Spaceship
 
     # Actually sends the request to the remote server
     # Automatically retries the request up to 3 times if something goes wrong
-    def send_request(method, url_or_path, params, headers, &block)
-      with_retry do
+    def send_request(method, url_or_path, params, headers, resend: true, &block)
+      with_retry(resend: resend) do
         response = @client.send(method, url_or_path, params, headers, &block)
         log_response(method, url_or_path, response, headers, &block)
 
         handle_error(response)
 
-        if response.body.to_s.include?("<title>302 Found</title>")
+        # Error pages are HTML; converting a parsed JSON or plist body to a string for each check is slow on large responses
+        body = response.body.kind_of?(String) ? response.body : ""
+
+        if body.include?("<title>302 Found</title>")
           raise AppleTimeoutError.new, "Apple 302 detected - this might be temporary server error, check https://developer.apple.com/system-status/ to see if there is a known downtime"
         end
 
-        if response.body.to_s.include?("<h3>Bad Gateway</h3>")
+        if body.include?("<h3>Bad Gateway</h3>")
           raise BadGatewayError.new, "Apple 502 detected - this might be temporary server error, try again later"
         end
 
-        if response.body.to_s.include?("<title>503 Service Temporarily Unavailable</title>") || response.body.to_s.include?("<h1>503 Service Temporarily Unavailable</h1>")
+        if body.include?("<title>503 Service Temporarily Unavailable</title>") || body.include?("<h1>503 Service Temporarily Unavailable</h1>")
           raise AppleTimeoutError.new, "Apple 503 detected - this might be temporary server error, check https://developer.apple.com/system-status/ to see if there is a known downtime"
         end
 

@@ -30,6 +30,7 @@ module Fastlane
           if edit_version
             version_number = edit_version.version_string
           else
+            UI.user_error!("No version is being edited: pass the new one with the `version` option") unless Helper.can_prompt?
             UI.message("You have to specify a new version number: ")
             version_number = STDIN.gets.strip
           end
@@ -45,6 +46,7 @@ module Fastlane
             changelog = File.read(path)
           else
             UI.error("Couldn't find changelog.txt")
+            UI.user_error!("Pass the changelog with the `changelog` option, or write it to #{path}") unless Helper.can_prompt?
             UI.message("Please enter the changelog here:")
             changelog = STDIN.gets
           end

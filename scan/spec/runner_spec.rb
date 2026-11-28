@@ -2,6 +2,11 @@ require 'scan'
 
 describe Scan do
   describe Scan::Runner do
+    before(:each) do
+      fake_out_simulator_detection
+      fake_out_build_settings(SCAN_BUILD_SETTINGS)
+    end
+
     describe "handle_results" do
       before(:each) do
         mock_slack_poster = Object.new
@@ -173,62 +178,75 @@ describe Scan do
           end.to raise_error(FastlaneCore::Interface::FastlaneTestFailure, "Test execution failed. Exit status: 1")
         end
       end
+
+      describe "when :build_for_testing is true" do
+        it "fails the run if xcodebuild exits with a non-zero status even when error output contains 'Executed'", requires_xcodebuild: true do
+          Scan.config = FastlaneCore::Configuration.create(Scan::Options.available_options, {
+            output_directory: '/tmp/scan_results',
+            project: './scan/examples/standard/app.xcodeproj',
+            build_for_testing: true,
+            fail_build: true
+          })
+
+          test_command_generator = @scan.instance_variable_get(:@test_command_generator)
+          allow(test_command_generator).to receive(:generate).and_return("xcodebuild build-for-testing")
+
+          error_output = <<~ERROR
+            Some random xcodebuild failure output
+            /tmp/MyAppTestsFileThatContainsWordExecuted.swift:12: error: Something broke
+          ERROR
+
+          expect(Scan::ErrorHandler).to receive(:handle_build_error).with(error_output, anything).and_call_original
+
+          allow(FastlaneCore::CommandExecutor).to receive(:execute) do |error:, **|
+            error.call(error_output, 65)
+            ""
+          end
+
+          expect do
+            @scan.run
+          end.to raise_error(FastlaneCore::Interface::FastlaneBuildFailure, "Build for testing failed. Exit status: 65")
+        end
+
+        it "reports the failed build before looking for a .xctestrun file to copy", requires_xcodebuild: true do
+          Dir.mktmpdir do |derived_data_path|
+            Scan.config = FastlaneCore::Configuration.create(Scan::Options.available_options, {
+              output_directory: '/tmp/scan_results',
+              project: './scan/examples/standard/app.xcodeproj',
+              derived_data_path: derived_data_path,
+              build_for_testing: true,
+              output_xctestrun: true
+            })
+
+            expect do
+              @scan.handle_results(65)
+            end.to raise_error(FastlaneCore::Interface::FastlaneBuildFailure, "Build for testing failed. Exit status: 65")
+          end
+        end
+      end
     end
 
-    describe "retry_execute" do
-      before(:each) do
-        # Every other group in this file builds its own config. This one relied
-        # on whichever of them ran first leaving one behind, and Scan.config is
-        # module level, so it outlives the example that made it. See
-        # fastlane#30184.
-        Scan.config = FastlaneCore::Configuration.create(Scan::Options.available_options, {
-          project: './scan/examples/standard/app.xcodeproj'
-        })
-
-        @scan = Scan::Runner.new
+    # A Swift package, or a project that doesn't test on a simulator, has no simulators to act on
+    describe "simulator options when scan picked no simulators" do
+      def configure(options)
+        allow(Scan).to receive(:config).and_return(FastlaneCore::Configuration.create(Scan::Options.available_options, options))
+        allow(Scan).to receive(:devices).and_return(nil)
       end
 
-      it "retry a failed test", requires_xcodebuild: true do
-        error_output = <<-ERROR_OUTPUT
-Failing tests:
-  FastlaneAppTests:
-          FastlaneAppTests.testCoinToss()
-          -[FastlaneAppTestsOC testCoinTossOC]
-          ERROR_OUTPUT
+      it "skips reinstalling the app" do
+        configure(reinstall_app: true, app_identifier: "tools.fastlane.app")
+        runner = Scan::Runner.new
+        expect(runner).to receive(:execute)
+        expect(FastlaneCore::Simulator).not_to receive(:uninstall_app)
 
-        expect(Fastlane::UI).to receive(:important).with("Retrying tests: FastlaneAppTests/FastlaneAppTests/testCoinToss, FastlaneAppTests/FastlaneAppTestsOC/testCoinTossOC").once
-        expect(Fastlane::UI).to receive(:important).with("Number of retries remaining: 4").once
-        expect(@scan).to receive(:execute)
-
-        @scan.retry_execute(retries: 5, error_output: error_output)
+        runner.test_app
       end
 
-      it "retry a failed test when project scheme name has non-whitespace character", requires_xcodebuild: true do
-        error_output = <<-ERROR_OUTPUT
-Failing tests:
-  Fastlane-App-Tests:
-          FastlaneAppTests.testCoinToss()
-          -[FastlaneAppTestsOC testCoinTossOC]
-          ERROR_OUTPUT
+      it "skips collecting the simulator logs" do
+        configure(include_simulator_logs: true)
+        expect(FastlaneCore::Simulator).not_to receive(:copy_logs)
 
-        expect(Fastlane::UI).to receive(:important).with("Retrying tests: Fastlane-App-Tests/FastlaneAppTests/testCoinToss, Fastlane-App-Tests/FastlaneAppTestsOC/testCoinTossOC").once
-        expect(Fastlane::UI).to receive(:important).with("Number of retries remaining: 4").once
-        expect(@scan).to receive(:execute)
-
-        @scan.retry_execute(retries: 5, error_output: error_output)
-      end
-
-      it "fail to parse error output", requires_xcodebuild: true do
-        error_output = <<-ERROR_OUTPUT
-Failing tests:
-FastlaneAppTests:
-FastlaneAppTests.testCoinToss()
--[FastlaneAppTestsOC testCoinTossOC]
-          ERROR_OUTPUT
-
-        expect do
-          @scan.retry_execute(retries: 5, error_output: error_output)
-        end.to raise_error(FastlaneCore::Interface::FastlaneBuildFailure, "Failed to find failed tests to retry (could not parse error output)")
+        Scan::Runner.new.copy_simulator_logs
       end
     end
 
@@ -249,6 +267,14 @@ FastlaneAppTests.testCoinToss()
         allow(mock_test_command_generator).to receive(:xcodebuild_log_path).and_return('./scan/spec/fixtures/boring.log')
 
         @scan = Scan::Runner.new
+      end
+
+      it "is deprecated" do
+        Tempfile.create("junit_report") do |report|
+          Scan.cache[:temp_junit_report] = report.path
+          expect(FastlaneCore::UI).to receive(:deprecated).with(/Scan::Runner#test_results is deprecated/)
+          @scan.test_results
+        end
       end
 
       it "still proceeds successfully if the temp junit report was deleted", requires_xcodebuild: true do
@@ -273,6 +299,18 @@ FastlaneAppTests.testCoinToss()
       end
     end
 
+    describe "#open_report" do
+      it "opens the report with its path as one argument" do
+        report_path = "/Users/me/Kaldi's Kafe/fastlane/test_output/report.html"
+        allow(FastlaneCore::Helper).to receive(:ci?).and_return(false)
+        allow(Scan).to receive(:cache).and_return({ open_html_report_path: report_path })
+        scan = Scan::Runner.new
+
+        expect(scan).to receive(:system).with("open", "--hide", report_path)
+        scan.open_report
+      end
+    end
+
     describe "#zip_build_products" do
       it "doesn't zip data when :should_zip_build_products is false", requires_xcodebuild: true do
         Scan.config = FastlaneCore::Configuration.create(Scan::Options.available_options, {
@@ -281,7 +319,7 @@ FastlaneAppTests.testCoinToss()
           should_zip_build_products: false
         })
 
-        expect(FastlaneCore::Helper).to receive(:backticks).with(anything).exactly(0).times
+        expect(FastlaneCore::CommandExecutor).not_to receive(:execute)
 
         scan = Scan::Runner.new
         scan.zip_build_products
@@ -300,8 +338,8 @@ FastlaneAppTests.testCoinToss()
 
         output_path = File.absolute_path('/tmp/scan_results/build_products.zip')
 
-        expect(FastlaneCore::Helper).to receive(:backticks)
-          .with("cd '#{path}' && rm -f '#{output_path}' && zip -r '#{output_path}' *", { print: false })
+        expect(FastlaneCore::CommandExecutor).to receive(:execute)
+          .with(hash_including(command: "cd #{path.shellescape} && rm -f #{output_path.shellescape} && zip -r #{output_path.shellescape} *", print_all: false))
           .exactly(1).times
 
         scan = Scan::Runner.new

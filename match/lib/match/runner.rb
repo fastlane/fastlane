@@ -237,12 +237,12 @@ module Match
           if FastlaneCore::CertChecker.installed?(cert_path, in_keychain: keychain_name)
             UI.verbose("Certificate '#{File.basename(cert_path)}' is already installed on this machine")
           else
-            Utils.import(cert_path, params[:keychain_name], password: params[:keychain_password])
+            Utils.import(cert_path, params[:keychain_name], password: params[:keychain_password], skip_set_partition_list: params[:skip_set_partition_list])
 
             # Import the private key
             # there seems to be no good way to check if it's already installed - so just install it
             # Key will only be added to the partition list if it isn't already installed
-            Utils.import(select_cert_or_key(paths: keys, certificate_id: certificate_id), params[:keychain_name], password: params[:keychain_password])
+            Utils.import(select_cert_or_key(paths: keys, certificate_id: certificate_id), params[:keychain_name], password: params[:keychain_password], skip_set_partition_list: params[:skip_set_partition_list])
           end
         else
           UI.message("Skipping installation of certificate as it would not work on this operating system.")
@@ -250,7 +250,8 @@ module Match
 
         if params[:output_path]
           FileUtils.cp(cert_path, params[:output_path])
-          FileUtils.cp(select_cert_or_key(paths: keys, certificate_id: certificate_id), params[:output_path])
+          key_path = select_cert_or_key(paths: keys, certificate_id: certificate_id)
+          FastlaneCore::Helper.open_owner_only(File.join(params[:output_path], File.basename(key_path)), "wb") { |file| IO.copy_stream(key_path, file) }
         end
 
         # Get and print info of certificate
@@ -387,6 +388,8 @@ module Match
 
       if Helper.mac?
         installed_profile = FastlaneCore::ProvisioningProfile.install(stored_profile_path, keychain_path)
+      else
+        UI.message("Skipping installation of provisioning profile as it would not work on this operating system.")
       end
 
       if params[:output_path]

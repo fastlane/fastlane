@@ -6,12 +6,12 @@ describe "Ruby versions" do
   root = File.expand_path("..", __dir__)
 
   # Every Ruby a workflow pins, from ruby-version: and from matrix `ruby` entries. Expressions are
-  # skipped: ${{ matrix.ruby }} resolves to values listed elsewhere in the same file.
+  # skipped: ${{ matrix.ruby }} resolves to values listed elsewhere in the same file. So is a workflow_dispatch input named ruby.
   def pinned_rubies(node)
     case node
     when Hash
       node.flat_map do |key, value|
-        values = %w[ruby ruby-version].include?(key) ? Array(value).reject { |v| v.to_s.include?("${{") }.map(&:to_s) : []
+        values = %w[ruby ruby-version].include?(key) && !value.kind_of?(Hash) ? Array(value).reject { |v| v.to_s.include?("${{") }.map(&:to_s) : []
         values + pinned_rubies(value)
       end
     when Array

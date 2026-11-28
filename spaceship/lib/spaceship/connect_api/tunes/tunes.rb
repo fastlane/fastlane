@@ -1114,7 +1114,9 @@ module Spaceship
               }
           }
 
-          tunes_request_client.post("#{Version::V1}/appStoreVersionReleaseRequests", body)
+          # App Store Connect can return a 500/504 after it has accepted the release request. A retry is then
+          # rejected because the version is already being released, so leave it to the caller to check the version state
+          tunes_request_client.post("#{Version::V1}/appStoreVersionReleaseRequests", body, tries: 1)
         end
 
         #
@@ -1301,7 +1303,7 @@ module Spaceship
         #
 
         def get_territories(filter: {}, includes: nil, limit: nil, sort: nil)
-          params = tunes_request_client.build_params(filter: nil, includes: nil, limit: nil, sort: nil)
+          params = tunes_request_client.build_params(filter: filter, includes: includes, limit: limit, sort: sort)
           tunes_request_client.get("#{Version::V1}/territories", params)
         end
 

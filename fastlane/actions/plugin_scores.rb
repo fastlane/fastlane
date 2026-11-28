@@ -2,7 +2,7 @@ module Fastlane
   module Actions
     class PluginScoresAction < Action
       def self.run(params)
-        require_relative '../helper/plugin_scores_helper.rb'
+        require_relative '../../internal/docs/plugin_scores'
         require "erb"
 
         plugins = fetch_plugins(params[:cache_path]).sort_by { |v| v.data[:overall_score] }.reverse
@@ -31,7 +31,7 @@ module Fastlane
           plugins += results.collect do |current|
             next if self.hidden_plugins.include?(current['name'])
 
-            Fastlane::Helper::PluginScoresHelper::FastlanePluginScore.new(current, cache_path)
+            Fastlane::Internal::Docs::PluginScores::FastlanePluginScore.new(current, cache_path)
           end.compact
 
           page += 1

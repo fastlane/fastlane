@@ -319,7 +319,7 @@ module Screengrab
               # Determine if path needs the run-as permission
               run_as = needs_run_as ? " run-as #{@config[:app_package_name].shellescape.shellescape}" : ""
 
-              run_adb_command("-s #{device_serial.shellescape} shell#{run_as}  \"tar -cC #{dir} #{base}\" | tar -xv -f- -C #{tempdir}",
+              run_adb_command("-s #{device_serial.shellescape} exec-out#{run_as} tar -cC #{dir} #{base} | tar -xv -f- -C #{tempdir.shellescape}",
                               print_all: false,
                               print_command: true)
             end

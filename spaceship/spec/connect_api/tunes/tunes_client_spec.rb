@@ -87,8 +87,37 @@ describe Spaceship::ConnectAPI::Tunes::Client do
           url = path
           req_mock = test_request_body(url, body)
 
-          expect(client).to receive(:request).with(:post).and_yield(req_mock).and_return(req_mock)
+          expect(client).to receive(:request).with(:post, resend: false).and_yield(req_mock).and_return(req_mock)
           client.post_app_store_version_release_request(app_store_version_id: app_store_version_id)
+        end
+
+        it 'does not retry on a server error' do
+          url = path
+          req_mock = test_request_body(url, body)
+          allow(req_mock).to receive(:status).and_return(504)
+
+          expect(client).to receive(:request).with(:post, resend: false).once.and_yield(req_mock).and_return(req_mock)
+          client.post_app_store_version_release_request(app_store_version_id: app_store_version_id)
+        end
+      end
+    end
+
+    describe "territories" do
+      context 'get_territories' do
+        let(:path) { "v1/territories" }
+
+        it 'succeeds' do
+          params = {}
+          req_mock = test_request_params(path, params)
+          expect(client).to receive(:request).with(:get).and_yield(req_mock).and_return(req_mock)
+          client.get_territories
+        end
+
+        it 'succeeds with filter, includes, limit and sort' do
+          params = { filter: { currency: "USD" }, include: "currency", limit: 200, sort: "id" }
+          req_mock = test_request_params(path, params)
+          expect(client).to receive(:request).with(:get).and_yield(req_mock).and_return(req_mock)
+          client.get_territories(filter: { currency: "USD" }, includes: "currency", limit: 200, sort: "id")
         end
       end
     end
