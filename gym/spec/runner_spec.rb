@@ -20,6 +20,23 @@ describe Gym::Runner do
       end
     end
 
+    it "prints the path of the dSYM zip" do
+      Dir.mktmpdir do |tmp|
+        dsym_path = File.join(tmp, "App.xcarchive", "dSYMs", "App.app.dSYM")
+        FileUtils.mkdir_p(File.join(dsym_path, "Contents"))
+        File.write(File.join(dsym_path, "Contents", "Info.plist"), "")
+        output_directory = File.join(tmp, "output")
+        FileUtils.mkdir_p(output_directory)
+
+        allow(Gym::PackageCommandGenerator).to receive(:dsym_path).and_return(dsym_path)
+        allow(Gym).to receive(:config).and_return({ output_directory: output_directory, output_name: "App", silent: true })
+
+        allow(FastlaneCore::UI).to receive(:message).and_call_original
+        expect(FastlaneCore::UI).to receive(:message).with(File.join(File.expand_path(output_directory), "App.app.dSYM.zip"))
+        Gym::Runner.new.send(:compress_and_move_dsym)
+      end
+    end
+
     it "fails when zip cannot write the archive" do
       Dir.mktmpdir do |tmp|
         dsym_path = File.join(tmp, "App.xcarchive", "dSYMs", "App.app.dSYM")
