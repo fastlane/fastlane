@@ -63,7 +63,8 @@ module Fastlane
         ENV["SCAN_OUTPUT_DIRECTORY"] = (root + "scan").to_s
         ENV["GYM_OUTPUT_DIRECTORY"] = (root + "gym").to_s
         ENV["FL_BUILDLOG_PATH"] = (root + "buildlogs").to_s
-        ENV["SCAN_INCLUDE_SIMULATOR_LOGS"] = true.to_s
+        # Keeps a value set in the environment, such as on-failure. A blank one is replaced, as scan would reject it
+        ENV["SCAN_INCLUDE_SIMULATOR_LOGS"] = true.to_s if ENV["SCAN_INCLUDE_SIMULATOR_LOGS"].to_s.strip.empty?
       end
 
       #####################################################
