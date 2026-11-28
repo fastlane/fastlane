@@ -15,5 +15,16 @@ describe Match do
       expect(content).to include("type(\"development\")")
       expect(content).to include("match --help")
     end
+
+    it "offers the storage backends registered by plugins" do
+      Match::Storage.register_backend(type: "test_plugin") { nil }
+
+      expect(FastlaneCore::UI.ui_object).to receive(:select).with(anything, %w(git google_cloud s3 gitlab_secure_files test_plugin)).and_return("git")
+      expect(FastlaneCore::UI.ui_object).to receive(:input).and_return("https://github.com/fastlane/fastlane/tree/master/certificates", "")
+
+      Match::Setup.new.run(File.join(Dir.mktmpdir, "Matchfile"))
+    ensure
+      Match::Storage.backends.delete("test_plugin")
+    end
   end
 end
