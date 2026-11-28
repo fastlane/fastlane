@@ -74,6 +74,32 @@ describe Snapshot do
     end
 
     describe '#add_media' do
+      let(:booted) { instance_double(Process::Status, success?: true) }
+
+      before do
+        allow(Open3).to receive(:capture2e).with("xcrun", "simctl", "bootstatus", device_udid, "-b").and_return(["", booted])
+      end
+
+      it "waits for the simulator to boot before adding media" do
+        allow(Snapshot::TestCommandGenerator).to receive(:device_udid).and_return(device_udid)
+
+        expect(Fastlane::Helper).to receive(:backticks).with(/^open -a Simulator.app/, any_args).ordered.and_return("")
+        expect(Open3).to receive(:capture2e).with("xcrun", "simctl", "bootstatus", device_udid, "-b").ordered.and_return(["", booted])
+        expect(Fastlane::Helper).to receive(:backticks).with(/^xcrun simctl addmedia/, any_args).ordered.and_return("")
+
+        Snapshot::SimulatorLauncherBase.new.add_media(['phone'], 'photo', paths)
+      end
+
+      it "warns when the simulator doesn't boot" do
+        allow(Snapshot::TestCommandGenerator).to receive(:device_udid).and_return(device_udid)
+        allow(Fastlane::Helper).to receive(:backticks).and_return("")
+        allow(Open3).to receive(:capture2e).and_return(["Unable to boot device\n", instance_double(Process::Status, success?: false)])
+
+        expect(Snapshot::UI).to receive(:important).with("Unable to boot phone: Unable to boot device")
+
+        Snapshot::SimulatorLauncherBase.new.add_media(['phone'], 'photo', paths)
+      end
+
       it "should call simctl addmedia", requires_xcode: true do
         allow(Snapshot::TestCommandGenerator).to receive(:device_udid).and_return(device_udid)
 
