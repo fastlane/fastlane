@@ -1,6 +1,10 @@
+require 'fastlane_core'
+
 module Supply
   # rubocop:disable Metrics/ClassLength
   class Uploader
+    UploadJob = Struct.new(:language, :version_code, :release_notes_queue)
+
     def perform_upload
       FastlaneCore::PrintTable.print_values(config: Supply.config, hide_keys: [:issuer], mask_keys: [:json_key_data], title: "Summary for supply #{Fastlane::VERSION}")
 
@@ -15,9 +19,15 @@ module Supply
 
       track_to_update = Supply.config[:track]
 
+      # Capture whether any new binaries were actually uploaded before appending
+      # version_codes_to_retain. The branch below uses this flag so that retained
+      # codes do not cause a promote-only run to take the upload path.
+      # See: https://github.com/fastlane/fastlane/issues/29984
+      uploading_new_binaries = !apk_version_codes.empty?
+
       apk_version_codes.concat(Supply.config[:version_codes_to_retain]) if Supply.config[:version_codes_to_retain]
 
-      if !apk_version_codes.empty?
+      if uploading_new_binaries
         # Only update tracks if we have version codes
         # update_track handle setting rollout if needed
         # Updating a track with empty version codes can completely clear out a track
@@ -88,32 +98,28 @@ module Supply
           UI.user_error!("Unable to find the requested track - '#{Supply.config[:track]}'") unless track
           UI.user_error!("Could not find release for version code '#{version_code}' to update changelog") unless release
 
-          release_notes = []
-          all_languages.each do |language|
-            next if language.start_with?('.') # e.g. . or .. or hidden folders
-            UI.message("Preparing to upload for language '#{language}'...")
+          release_notes_queue = Queue.new
+          upload_worker = create_meta_upload_worker
+          upload_worker.batch_enqueue(
+            # skip . or .. or hidden folders
+            all_languages.reject { |lang| lang.start_with?('.') }.map { |lang| UploadJob.new(lang, version_code, release_notes_queue) }
+          )
+          upload_worker.start
 
-            listing = client.listing_for_language(language)
-
-            upload_metadata(language, listing) unless Supply.config[:skip_upload_metadata]
-            upload_images(language) unless Supply.config[:skip_upload_images]
-            upload_screenshots(language) unless Supply.config[:skip_upload_screenshots]
-            release_notes << upload_changelog(language, version_code) unless Supply.config[:skip_upload_changelogs]
-          end
-
+          release_notes = Array.new(release_notes_queue.size) { release_notes_queue.pop } # Queue to Array
           upload_changelogs(release_notes, release, track, track_name) unless release_notes.empty?
         end
       end
     end
 
-    def fetch_track_and_release!(track, version_code, status = nil)
+    def fetch_track_and_release!(track, version_code, statuses = nil)
       tracks = client.tracks(track)
       return nil, nil if tracks.empty?
 
       track = tracks.first
-      releases = track.releases
+      releases = track.releases || []
 
-      releases = releases.select { |r| r.status == status } if status
+      releases = releases.select { |r| statuses.include?(r.status) } unless statuses.nil? || statuses.empty?
       releases = releases.select { |r| (r.version_codes || []).map(&:to_s).include?(version_code.to_s) } if version_code
 
       if releases.size > 1
@@ -124,21 +130,32 @@ module Supply
     end
 
     def update_rollout
-      track, release = fetch_track_and_release!(Supply.config[:track], Supply.config[:version_code], Supply::ReleaseStatus::IN_PROGRESS)
+      track, release = fetch_track_and_release!(Supply.config[:track], Supply.config[:version_code], [Supply::ReleaseStatus::IN_PROGRESS, Supply::ReleaseStatus::DRAFT])
       UI.user_error!("Unable to find the requested track - '#{Supply.config[:track]}'") unless track
       UI.user_error!("Unable to find the requested release on track - '#{Supply.config[:track]}'") unless release
 
-      version_code = release.version_codes.first
+      version_code = release.version_codes.max
 
       UI.message("Updating #{version_code}'s rollout to '#{Supply.config[:rollout]}' on track '#{Supply.config[:track]}'...")
 
       if track && release
-        completed = Supply.config[:rollout].to_f == 1
-        release.user_fraction = completed ? nil : Supply.config[:rollout]
-        release.status = Supply::ReleaseStatus::COMPLETED if completed
+        rollout = Supply.config[:rollout]
+        status = Supply.config[:release_status]
 
-        # Deleted other version codes if completed because only allowed on completed version in a release
-        track.releases.delete_if { |r| !(r.version_codes || []).map(&:to_s).include?(version_code) } if completed
+        # If release_status not provided explicitly (and thus defaults to 'completed'), but rollout is provided with a value < 1.0, then set to 'inProgress' instead
+        status = Supply::ReleaseStatus::IN_PROGRESS if status == Supply::ReleaseStatus::COMPLETED && !rollout.nil? && rollout.to_f < 1
+        # If release_status is set to 'inProgress' but rollout is provided with a value = 1.0, then set to 'completed' instead
+        status = Supply::ReleaseStatus::COMPLETED if status == Supply::ReleaseStatus::IN_PROGRESS && rollout.to_f == 1
+        # If release_status is set to 'inProgress' but no rollout value is provided, error out
+        UI.user_error!("You need to provide a rollout value when release_status is set to 'inProgress'") if status == Supply::ReleaseStatus::IN_PROGRESS && rollout.nil?
+        release.status = status
+        # user_fraction is only valid for IN_PROGRESS or HALTED status
+        # https://googleapis.dev/ruby/google-api-client/latest/Google/Apis/AndroidpublisherV3/TrackRelease.html#user_fraction-instance_method
+        release.user_fraction = [Supply::ReleaseStatus::IN_PROGRESS, Supply::ReleaseStatus::HALTED].include?(release.status) ? rollout : nil
+
+        # It's okay to set releases to an array containing the newest release
+        # Google Play will keep previous releases there untouched
+        track.releases = [release]
       else
         UI.user_error!("Unable to find version to rollout in track '#{Supply.config[:track]}'")
       end
@@ -179,8 +196,11 @@ module Supply
         UI.user_error!("Cannot promote from track '#{Supply.config[:track]}' - track doesn't exist")
       end
 
-      releases = track_from.releases
-      if Supply.config[:version_code].to_s != ""
+      releases = track_from.releases || []
+
+      if Supply.config[:track_promote_force]
+        releases = [forced_track_release]
+      elsif Supply.config[:version_code].to_s != ""
         releases = releases.select do |release|
           release.version_codes.include?(Supply.config[:version_code].to_s)
         end
@@ -209,7 +229,7 @@ module Supply
       end
 
       if track_to
-        # Its okay to set releases to an array containing the newest release
+        # It's okay to set releases to an array containing the newest release
         # Google Play will keep previous releases there this release is a partial rollout
         track_to.releases = [release]
       else
@@ -220,6 +240,29 @@ module Supply
       end
 
       client.update_track(Supply.config[:track_promote_to], track_to)
+    end
+
+    # Builds the release to promote instead of looking it up in the source track.
+    #
+    # The Play Developer API only returns the release currently serving each
+    # track, so a version that has already been superseded is absent from the
+    # payload and cannot be found by `promote_track`, even though the Play
+    # Console still allows promoting it. Building the release out of the
+    # configured values is the only way to promote such a version.
+    # See https://github.com/fastlane/fastlane/issues/18497
+    def forced_track_release
+      version_code = Supply.config[:version_code].to_s
+      version_name = Supply.config[:version_name].to_s
+
+      UI.user_error!("To force a track promotion, it is mandatory to enter the :version_code") if version_code.empty?
+      UI.user_error!("To force a track promotion, it is mandatory to enter the :version_name") if version_name.empty?
+
+      UI.important("Forcing the promotion of version code '#{version_code}' - it is not checked against track '#{Supply.config[:track]}'")
+
+      AndroidPublisher::TrackRelease.new(
+        name: version_name,
+        version_codes: [version_code]
+      )
     end
 
     def upload_changelog(language, version_code)
@@ -240,10 +283,13 @@ module Supply
         end
       end
 
-      AndroidPublisher::LocalizedText.new(
-        language: language,
-        text: changelog_text
-      )
+      # An empty text made the whole release notes update fail (fastlane#21004)
+      unless changelog_text.strip.empty?
+        AndroidPublisher::LocalizedText.new(
+          language: language,
+          text: changelog_text
+        )
+      end
     end
 
     def upload_changelogs(release_notes, release, track, track_name)
@@ -270,7 +316,17 @@ module Supply
         path = Dir.glob(search, File::FNM_CASEFOLD).last
         next unless path
 
-        UI.message("Uploading image file #{path}...")
+        if Supply.config[:sync_image_upload]
+          UI.message("🔍 Checking #{image_type} checksum...")
+          existing_images = client.fetch_images(image_type: image_type, language: language)
+          sha256 = Digest::SHA256.file(path).hexdigest
+          if existing_images.map(&:sha256).include?(sha256)
+            UI.message("🟰 Skipping upload of screenshot #{path} as remote sha256 matches.")
+            next
+          end
+        end
+
+        UI.message("⬆️ Uploading image file #{path}...")
         client.upload_image(image_path: File.expand_path(path),
                             image_type: image_type,
                               language: language)
@@ -280,13 +336,30 @@ module Supply
     def upload_screenshots(language)
       Supply::SCREENSHOT_TYPES.each do |screenshot_type|
         search = File.join(metadata_path, language, Supply::IMAGES_FOLDER_NAME, screenshot_type, "*.#{IMAGE_FILE_EXTENSIONS}")
-        paths = Dir.glob(search, File::FNM_CASEFOLD)
+        paths = Dir.glob(search, File::FNM_CASEFOLD).sort
         next unless paths.count > 0
 
-        client.clear_screenshots(image_type: screenshot_type, language: language)
+        if Supply.config[:sync_image_upload]
+          UI.message("🔍 Checking #{screenshot_type} checksums...")
+          existing_images = client.fetch_images(image_type: screenshot_type, language: language)
+          # Don't keep images that either don't exist locally, or that are out of order compared to the `paths` to upload
+          first_path_checksum = Digest::SHA256.file(paths.first).hexdigest
+          existing_images.each do |image|
+            if image.sha256 == first_path_checksum
+              UI.message("🟰 Skipping upload of screenshot #{paths.first} as remote sha256 matches.")
+              paths.shift # Remove first path from the list of paths to be uploaded
+              first_path_checksum = paths.empty? ? nil : Digest::SHA256.file(paths.first).hexdigest
+            else
+              UI.message("🚮 Deleting #{language} screenshot id ##{image.id} as it does not exist locally or is out of order...")
+              client.clear_screenshot(image_type: screenshot_type, language: language, image_id: image.id)
+            end
+          end
+        else
+          client.clear_screenshots(image_type: screenshot_type, language: language)
+        end
 
-        paths.sort.each do |path|
-          UI.message("Uploading screenshot #{path}...")
+        paths.each do |path|
+          UI.message("⬆️  Uploading screenshot #{path}...")
           client.upload_image(image_path: File.expand_path(path),
                               image_type: screenshot_type,
                                 language: language)
@@ -407,7 +480,7 @@ module Supply
       tracks = client.tracks(Supply.config[:track])
       track = tracks.first
       if track
-        # Its okay to set releases to an array containing the newest release
+        # It's okay to set releases to an array containing the newest release
         # Google Play will keep previous releases there this release is a partial rollout
         track.releases = [track_release]
       else
@@ -482,6 +555,24 @@ module Supply
         'main'
       elsif filename.include?('patch')
         'patch'
+      end
+    end
+
+    def create_meta_upload_worker
+      FastlaneCore::QueueWorker.new do |job|
+        UI.message("Preparing uploads for language '#{job.language}'...")
+        start_time = Time.now
+        listing = client.listing_for_language(job.language)
+        upload_metadata(job.language, listing) unless Supply.config[:skip_upload_metadata]
+        upload_images(job.language) unless Supply.config[:skip_upload_images]
+        upload_screenshots(job.language) unless Supply.config[:skip_upload_screenshots]
+        unless Supply.config[:skip_upload_changelogs]
+          changelog = upload_changelog(job.language, job.version_code)
+          job.release_notes_queue << changelog unless changelog.nil?
+        end
+        UI.message("Uploaded all items for language '#{job.language}'... (#{Time.now - start_time} secs)")
+      rescue => error
+        UI.abort_with_message!("#{job.language} - #{error}")
       end
     end
   end

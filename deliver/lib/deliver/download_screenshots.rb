@@ -1,5 +1,6 @@
 require_relative 'module'
 require 'spaceship'
+require 'open-uri'
 
 module Deliver
   class DownloadScreenshots
@@ -67,7 +68,14 @@ module Deliver
           end
 
           path = File.join(containing_folder, file_name)
-          File.binwrite(path, FastlaneCore::Helper.open_uri(url).read)
+          # URI.open falls back to Kernel#open for anything that isn't a URL, which runs "|command" strings
+          uri = begin
+                  URI.parse(url)
+                rescue URI::InvalidURIError
+                  nil
+                end
+          UI.user_error!("Unexpected screenshot URL '#{url}'") unless uri.kind_of?(URI::HTTP)
+          File.binwrite(path, uri.read)
         end
       end
     end

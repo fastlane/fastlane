@@ -45,6 +45,9 @@ module Fastlane
         [
           "This action deletes the files that get created in your repo as a result of running the _gym_ and _sigh_ commands. It doesn't delete the `fastlane/report.xml` though, this is probably more suited for the .gitignore.",
           "",
+          "From _cert_ it only deletes the `.cer` file. The private key (`<certificate id>.p12`, despite its name an unencrypted PEM key) and the `.certSigningRequest` that _cert_ writes to its `output_path` when it creates a certificate are kept: " \
+          "_cert_ uses that `.p12` to install the certificate on a machine that doesn't have it, and on systems other than macOS it is the only copy of the key. Keep them out of version control.",
+          "",
           "Useful if you quickly want to send out a test build by dropping down to the command line and typing something like `fastlane beta`, without leaving your repo in a messy state afterwards."
         ].join("\n")
       end

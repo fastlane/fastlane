@@ -8,7 +8,7 @@ module Fastlane
         command << upload_url(params[:app_id].shellescape)
 
         # Fastlane::Actions.sh has buffering issues, no progress bar is shown in real time
-        # will reanable it when it is fixed
+        # will reenable it when it is fixed
         # result = Fastlane::Actions.sh(command.join(' '), log: false)
         shell_command = command.join(' ')
         return shell_command if Helper.test?
@@ -99,7 +99,14 @@ module Fastlane
       end
 
       def self.category
-        :beta
+        :deprecated
+      end
+
+      def self.deprecated_notes
+        [
+          "VMware stopped selling Apteligent to new customers on February 4, 2019, and announced moving its capabilities to VMware Workspace ONE Intelligence.",
+          "See [Apteligent moving to Workspace ONE Intelligence](https://vcdx181.com/2019/01/20/apteligent-moving-to-workspace-one-intelligence/)."
+        ].join("\n")
       end
     end
   end

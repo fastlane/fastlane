@@ -1,4 +1,6 @@
 describe Spaceship::Portal::Persons do
+  # Skip tunes login and login with portal
+  include_examples "common spaceship login", true
   before { Spaceship.login }
   it "should factor a new invite object" do
     created = 1_501_106_986_000

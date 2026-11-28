@@ -1,26 +1,30 @@
 def pem_stub_spaceship
   expect(Spaceship).to receive(:login).and_return(nil)
-  allow(Spaceship).to receive(:client).and_return("client")
+  allow(Spaceship).to receive(:client).and_return(+"client")
   expect(Spaceship.client).to receive(:select_team).and_return(nil)
   expect(Spaceship.certificate).to receive(:all).and_return([])
 
   csr = "csr"
-  pkey = "pkey"
+  pkey = +"pkey"
 
   expect(Spaceship.certificate).to receive(:create_certificate_signing_request).and_return([csr, pkey])
   expect(pkey).to receive(:to_pem).twice.and_return("to_pem")
 end
 
-def pem_stub_spaceship_cert(platform: 'ios')
+def pem_stub_spaceship_cert(platform: 'ios', voip_push: false)
   csr = "csr"
-  cert = "cert"
-  x509 = "x509"
+  cert = +"cert"
+  x509 = +"x509"
 
-  case platform
-  when 'macos'
-    expect(Spaceship.certificate.mac_production_push).to receive(:create!).with(csr: csr, bundle_id: "com.krausefx.app").and_return(cert)
+  if voip_push
+    expect(Spaceship.certificate.voip_push).to receive(:create!).with(csr: csr, bundle_id: "com.krausefx.app").and_return(cert)
   else
-    expect(Spaceship.certificate.production_push).to receive(:create!).with(csr: csr, bundle_id: "com.krausefx.app").and_return(cert)
+    case platform
+    when 'macos'
+      expect(Spaceship.certificate.mac_production_push).to receive(:create!).with(csr: csr, bundle_id: "com.krausefx.app").and_return(cert)
+    else
+      expect(Spaceship.certificate.production_push).to receive(:create!).with(csr: csr, bundle_id: "com.krausefx.app").and_return(cert)
+    end
   end
 
   expect(cert).to receive(:download).and_return(x509)

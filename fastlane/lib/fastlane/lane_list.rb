@@ -103,7 +103,7 @@ module Fastlane
     end
 
     def self.output_json(path)
-      puts(JSON.pretty_generate(self.generate_json(path)))
+      STDOUT.puts(JSON.pretty_generate(self.generate_json(path)))
     end
 
     # Returns a hash

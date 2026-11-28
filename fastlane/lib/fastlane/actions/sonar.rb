@@ -11,21 +11,22 @@ module Fastlane
         ].join(' ')
 
         sonar_scanner_args = []
-        sonar_scanner_args << "-Dproject.settings=\"#{params[:project_configuration_path]}\"" if params[:project_configuration_path]
-        sonar_scanner_args << "-Dsonar.projectKey=\"#{params[:project_key]}\"" if params[:project_key]
-        sonar_scanner_args << "-Dsonar.projectName=\"#{params[:project_name]}\"" if params[:project_name]
-        sonar_scanner_args << "-Dsonar.projectVersion=\"#{params[:project_version]}\"" if params[:project_version]
-        sonar_scanner_args << "-Dsonar.sources=\"#{params[:sources_path]}\"" if params[:sources_path]
-        sonar_scanner_args << "-Dsonar.exclusions=\"#{params[:exclusions]}\"" if params[:exclusions]
-        sonar_scanner_args << "-Dsonar.language=\"#{params[:project_language]}\"" if params[:project_language]
-        sonar_scanner_args << "-Dsonar.sourceEncoding=\"#{params[:source_encoding]}\"" if params[:source_encoding]
-        sonar_scanner_args << "-Dsonar.login=\"#{params[:sonar_login]}\"" if params[:sonar_login]
-        sonar_scanner_args << "-Dsonar.host.url=\"#{params[:sonar_url]}\"" if params[:sonar_url]
-        sonar_scanner_args << "-Dsonar.organization=\"#{params[:sonar_organization]}\"" if params[:sonar_organization]
-        sonar_scanner_args << "-Dsonar.branch.name=\"#{params[:branch_name]}\"" if params[:branch_name]
-        sonar_scanner_args << "-Dsonar.pullrequest.branch=\"#{params[:pull_request_branch]}\"" if params[:pull_request_branch]
-        sonar_scanner_args << "-Dsonar.pullrequest.base=\"#{params[:pull_request_base]}\"" if params[:pull_request_base]
-        sonar_scanner_args << "-Dsonar.pullrequest.key=\"#{params[:pull_request_key]}\"" if params[:pull_request_key]
+        sonar_scanner_args << "-Dproject.settings=#{params[:project_configuration_path].shellescape}" if params[:project_configuration_path]
+        sonar_scanner_args << "-Dsonar.projectKey=#{params[:project_key].shellescape}" if params[:project_key]
+        sonar_scanner_args << "-Dsonar.projectName=#{params[:project_name].shellescape}" if params[:project_name]
+        sonar_scanner_args << "-Dsonar.projectVersion=#{params[:project_version].shellescape}" if params[:project_version]
+        sonar_scanner_args << "-Dsonar.sources=#{params[:sources_path].shellescape}" if params[:sources_path]
+        sonar_scanner_args << "-Dsonar.exclusions=#{params[:exclusions].shellescape}" if params[:exclusions]
+        sonar_scanner_args << "-Dsonar.language=#{params[:project_language].shellescape}" if params[:project_language]
+        sonar_scanner_args << "-Dsonar.sourceEncoding=#{params[:source_encoding].shellescape}" if params[:source_encoding]
+        sonar_scanner_args << "-Dsonar.login=#{params[:sonar_login].shellescape}" if params[:sonar_login]
+        sonar_scanner_args << "-Dsonar.token=#{params[:sonar_token].shellescape}" if params[:sonar_token]
+        sonar_scanner_args << "-Dsonar.host.url=#{params[:sonar_url].shellescape}" if params[:sonar_url]
+        sonar_scanner_args << "-Dsonar.organization=#{params[:sonar_organization].shellescape}" if params[:sonar_organization]
+        sonar_scanner_args << "-Dsonar.branch.name=#{params[:branch_name].shellescape}" if params[:branch_name]
+        sonar_scanner_args << "-Dsonar.pullrequest.branch=#{params[:pull_request_branch].shellescape}" if params[:pull_request_branch]
+        sonar_scanner_args << "-Dsonar.pullrequest.base=#{params[:pull_request_base].shellescape}" if params[:pull_request_base]
+        sonar_scanner_args << "-Dsonar.pullrequest.key=#{params[:pull_request_key].shellescape}" if params[:pull_request_key]
 
         sonar_scanner_args << params[:sonar_runner_args] if params[:sonar_runner_args]
 
@@ -39,7 +40,7 @@ module Fastlane
       end
 
       def self.verify_sonar_scanner_binary
-        UI.user_error!("You have to install sonar-scanner using `brew install sonar-scanner`") unless `which sonar-scanner`.to_s.length > 0
+        UI.user_error!("You have to install sonar-scanner using `brew install sonar-scanner`") unless Helper.which('sonar-scanner')
       end
 
       #####################################################
@@ -100,9 +101,17 @@ module Fastlane
                                        optional: true),
           FastlaneCore::ConfigItem.new(key: :sonar_login,
                                        env_name: "FL_SONAR_LOGIN",
-                                       description: "Pass the Sonar Login token (e.g: xxxxxxprivate_token_XXXXbXX7e)",
+                                       description: "Pass the Sonar Login Token (e.g: xxxxxxprivate_token_XXXXbXX7e)",
+                                       deprecated: "Login and password were deprecated in favor of login token. See https://community.sonarsource.com/t/deprecating-sonar-login-and-sonar-password-in-favor-of-sonar-token/95829 for more details",
                                        optional: true,
-                                       sensitive: true),
+                                       sensitive: true,
+                                       conflicting_options: [:sonar_token]),
+          FastlaneCore::ConfigItem.new(key: :sonar_token,
+                                       env_name: "FL_SONAR_TOKEN",
+                                       description: "Pass the Sonar Token (e.g: xxxxxxprivate_token_XXXXbXX7e)",
+                                       optional: true,
+                                       sensitive: true,
+                                       conflicting_options: [:sonar_login]),
           FastlaneCore::ConfigItem.new(key: :sonar_url,
                                        env_name: "FL_SONAR_URL",
                                        description: "Pass the url of the Sonar server",
@@ -156,7 +165,7 @@ module Fastlane
             project_name: "iOS - AwesomeApp",
             sources_path: File.expand_path("../AwesomeApp"),
             sonar_organization: "myOrg",
-            sonar_login: "123456abcdef",
+            sonar_token: "123456abcdef",
             sonar_url: "https://sonarcloud.io"
           )'
         ]
