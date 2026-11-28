@@ -12,5 +12,15 @@ describe FastlaneCore do
         end.not_to raise_error
       end
     end
+
+    describe "a prompt when not interactive" do
+      it "is a user error, not a crash" do
+        shell = FastlaneCore::Shell.new
+        allow(shell).to receive(:interactive?).and_return(false)
+        allow(shell).to receive(:important)
+        expect(shell).not_to receive(:ask)
+        expect { shell.input("Scheme?") }.to raise_error(FastlaneCore::Interface::FastlaneError, "Could not retrieve response as fastlane runs in non-interactive mode")
+      end
+    end
   end
 end

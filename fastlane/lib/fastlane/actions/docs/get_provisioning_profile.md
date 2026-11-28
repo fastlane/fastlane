@@ -24,7 +24,7 @@ _sigh_ can create, renew, download and repair provisioning profiles (with one co
 - **Repair** a provisioning profile, when it is broken
 - **Create** a new provisioning profile, if it doesn't exist already
 - Supports **App Store**, **Ad Hoc** and **Development** profiles
-- Support for **multiple Apple accounts**, storing your credentials securely in the Keychain
+- Support for **multiple Apple accounts**
 - Support for **multiple Teams**
 - Support for **Enterprise Profiles**
 

@@ -32,6 +32,11 @@ module Spaceship
         return "betaGroups"
       end
 
+      # Whether this group is referenced by any of the given identifiers (its name or id)
+      def matches_identifiers?(identifiers)
+        identifiers.include?(name) || identifiers.include?(id)
+      end
+
       #
       # API
       #
