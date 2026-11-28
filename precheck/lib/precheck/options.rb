@@ -84,7 +84,7 @@ module Precheck
                                      optional: true,
                                      default_value: "ios",
                                      verify_block: proc do |value|
-                                       UI.user_error!("The platform can only be ios, appletvos, or osx") unless %('ios', 'appletvos', 'osx').include?(value)
+                                       UI.user_error!("The platform can only be ios, appletvos/tvos or osx") unless %w(ios appletvos tvos osx).include?(value)
                                      end),
         FastlaneCore::ConfigItem.new(key: :default_rule_level,
                                      short_option: "-r",

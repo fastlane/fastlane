@@ -1,3 +1,4 @@
+require 'time'
 require_relative '../model'
 require_relative './build'
 
@@ -22,6 +23,8 @@ module Spaceship
       # Only available with Apple ID auth
       attr_accessor :distribution_type
       attr_accessor :educationDiscountType
+
+      attr_accessor :app_clip_default_experience
 
       module ContentRightsDeclaration
         USES_THIRD_PARTY_CONTENT = "USES_THIRD_PARTY_CONTENT"
@@ -55,7 +58,8 @@ module Spaceship
 
         "appStoreVersions" => "app_store_versions",
         # This attribute is already deprecated. It will be removed in a future release.
-        "prices" => "prices"
+        "prices" => "prices",
+        "appClipDefaultExperience" => "app_clip_default_experience"
       })
 
       ESSENTIAL_INCLUDES = [
@@ -237,8 +241,7 @@ module Spaceship
 
         # Get the latest version
         return get_app_store_versions(client: client, filter: filter, includes: includes)
-               .sort_by { |v| Date.parse(v.created_date) }
-               .last
+               .max_by { |v| Time.parse(v.created_date) }
       end
 
       def get_live_app_store_version(client: nil, platform: nil, includes: Spaceship::ConnectAPI::AppStoreVersion::ESSENTIAL_INCLUDES)
@@ -481,6 +484,16 @@ module Spaceship
         user_ids.each do |user_id|
           client.delete_user_visible_apps(user_id: user_id, app_ids: [id])
         end
+      end
+
+      #
+      # App Clips
+      #
+
+      def get_app_clips(client: nil, filter: {}, includes: nil, limit: nil, sort: nil)
+        client ||= Spaceship::ConnectAPI
+        resps = client.get_app_clips(app_id: id, filter: filter, includes: includes, limit: limit, sort: sort).all_pages
+        resps.flat_map(&:to_models)
       end
     end
   end

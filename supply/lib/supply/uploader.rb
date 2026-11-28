@@ -19,9 +19,15 @@ module Supply
 
       track_to_update = Supply.config[:track]
 
+      # Capture whether any new binaries were actually uploaded before appending
+      # version_codes_to_retain. The branch below uses this flag so that retained
+      # codes do not cause a promote-only run to take the upload path.
+      # See: https://github.com/fastlane/fastlane/issues/29984
+      uploading_new_binaries = !apk_version_codes.empty?
+
       apk_version_codes.concat(Supply.config[:version_codes_to_retain]) if Supply.config[:version_codes_to_retain]
 
-      if !apk_version_codes.empty?
+      if uploading_new_binaries
         # Only update tracks if we have version codes
         # update_track handle setting rollout if needed
         # Updating a track with empty version codes can completely clear out a track
@@ -106,14 +112,14 @@ module Supply
       end
     end
 
-    def fetch_track_and_release!(track, version_code, status = nil)
+    def fetch_track_and_release!(track, version_code, statuses = nil)
       tracks = client.tracks(track)
       return nil, nil if tracks.empty?
 
       track = tracks.first
-      releases = track.releases
+      releases = track.releases || []
 
-      releases = releases.select { |r| r.status == status } if status
+      releases = releases.select { |r| statuses.include?(r.status) } unless statuses.nil? || statuses.empty?
       releases = releases.select { |r| (r.version_codes || []).map(&:to_s).include?(version_code.to_s) } if version_code
 
       if releases.size > 1
@@ -124,22 +130,35 @@ module Supply
     end
 
     def update_rollout
-      track_name = Supply.config[:track]
-      in_progress_status = Supply::ReleaseStatus::IN_PROGRESS
-      track, release = fetch_track_and_release!(track_name, Supply.config[:version_code], in_progress_status)
-      UI.user_error!("Unable to find the requested track '#{track_name}' with status in progress (#{in_progress_status})") unless track
-      UI.user_error!("Unable to find the requested release in track '#{track_name}' with status in progress (#{in_progress_status})") unless release
+      track, release = fetch_track_and_release!(Supply.config[:track], Supply.config[:version_code], [Supply::ReleaseStatus::IN_PROGRESS, Supply::ReleaseStatus::DRAFT])
+      UI.user_error!("Unable to find the requested track - '#{Supply.config[:track]}'") unless track
+      UI.user_error!("Unable to find the requested release on track - '#{Supply.config[:track]}'") unless release
 
       version_code = release.version_codes.max
 
-      UI.message("Updating #{version_code}'s rollout to '#{Supply.config[:rollout]}' in track '#{track_name}'...")
+      UI.message("Updating #{version_code}'s rollout to '#{Supply.config[:rollout]}' on track '#{Supply.config[:track]}'...")
 
-      completed = Supply.config[:rollout].to_f == 1
-      release.user_fraction = completed ? nil : Supply.config[:rollout]
-      release.status = Supply::ReleaseStatus::COMPLETED if completed
+      if track && release
+        rollout = Supply.config[:rollout]
+        status = Supply.config[:release_status]
 
-      # Deleted other version codes if completed because only allowed on completed version in a release
-      track.releases.delete_if { |r| !(r.version_codes || []).map(&:to_s).include?(version_code) } if completed
+        # If release_status not provided explicitly (and thus defaults to 'completed'), but rollout is provided with a value < 1.0, then set to 'inProgress' instead
+        status = Supply::ReleaseStatus::IN_PROGRESS if status == Supply::ReleaseStatus::COMPLETED && !rollout.nil? && rollout.to_f < 1
+        # If release_status is set to 'inProgress' but rollout is provided with a value = 1.0, then set to 'completed' instead
+        status = Supply::ReleaseStatus::COMPLETED if status == Supply::ReleaseStatus::IN_PROGRESS && rollout.to_f == 1
+        # If release_status is set to 'inProgress' but no rollout value is provided, error out
+        UI.user_error!("You need to provide a rollout value when release_status is set to 'inProgress'") if status == Supply::ReleaseStatus::IN_PROGRESS && rollout.nil?
+        release.status = status
+        # user_fraction is only valid for IN_PROGRESS or HALTED status
+        # https://googleapis.dev/ruby/google-api-client/latest/Google/Apis/AndroidpublisherV3/TrackRelease.html#user_fraction-instance_method
+        release.user_fraction = [Supply::ReleaseStatus::IN_PROGRESS, Supply::ReleaseStatus::HALTED].include?(release.status) ? rollout : nil
+
+        # It's okay to set releases to an array containing the newest release
+        # Google Play will keep previous releases there untouched
+        track.releases = [release]
+      else
+        UI.user_error!("Unable to find version to rollout in track '#{Supply.config[:track]}'")
+      end
 
       client.update_track(Supply.config[:track], track)
     end
@@ -177,8 +196,11 @@ module Supply
         UI.user_error!("Cannot promote from track '#{Supply.config[:track]}' - track doesn't exist")
       end
 
-      releases = track_from.releases
-      if Supply.config[:version_code].to_s != ""
+      releases = track_from.releases || []
+
+      if Supply.config[:track_promote_force]
+        releases = [forced_track_release]
+      elsif Supply.config[:version_code].to_s != ""
         releases = releases.select do |release|
           release.version_codes.include?(Supply.config[:version_code].to_s)
         end
@@ -207,7 +229,7 @@ module Supply
       end
 
       if track_to
-        # Its okay to set releases to an array containing the newest release
+        # It's okay to set releases to an array containing the newest release
         # Google Play will keep previous releases there this release is a partial rollout
         track_to.releases = [release]
       else
@@ -218,6 +240,29 @@ module Supply
       end
 
       client.update_track(Supply.config[:track_promote_to], track_to)
+    end
+
+    # Builds the release to promote instead of looking it up in the source track.
+    #
+    # The Play Developer API only returns the release currently serving each
+    # track, so a version that has already been superseded is absent from the
+    # payload and cannot be found by `promote_track`, even though the Play
+    # Console still allows promoting it. Building the release out of the
+    # configured values is the only way to promote such a version.
+    # See https://github.com/fastlane/fastlane/issues/18497
+    def forced_track_release
+      version_code = Supply.config[:version_code].to_s
+      version_name = Supply.config[:version_name].to_s
+
+      UI.user_error!("To force a track promotion, it is mandatory to enter the :version_code") if version_code.empty?
+      UI.user_error!("To force a track promotion, it is mandatory to enter the :version_name") if version_name.empty?
+
+      UI.important("Forcing the promotion of version code '#{version_code}' - it is not checked against track '#{Supply.config[:track]}'")
+
+      AndroidPublisher::TrackRelease.new(
+        name: version_name,
+        version_codes: [version_code]
+      )
     end
 
     def upload_changelog(language, version_code)
@@ -238,10 +283,13 @@ module Supply
         end
       end
 
-      AndroidPublisher::LocalizedText.new(
-        language: language,
-        text: changelog_text
-      )
+      # An empty text made the whole release notes update fail (fastlane#21004)
+      unless changelog_text.strip.empty?
+        AndroidPublisher::LocalizedText.new(
+          language: language,
+          text: changelog_text
+        )
+      end
     end
 
     def upload_changelogs(release_notes, release, track, track_name)
@@ -432,7 +480,7 @@ module Supply
       tracks = client.tracks(Supply.config[:track])
       track = tracks.first
       if track
-        # Its okay to set releases to an array containing the newest release
+        # It's okay to set releases to an array containing the newest release
         # Google Play will keep previous releases there this release is a partial rollout
         track.releases = [track_release]
       else
@@ -518,7 +566,10 @@ module Supply
         upload_metadata(job.language, listing) unless Supply.config[:skip_upload_metadata]
         upload_images(job.language) unless Supply.config[:skip_upload_images]
         upload_screenshots(job.language) unless Supply.config[:skip_upload_screenshots]
-        job.release_notes_queue << upload_changelog(job.language, job.version_code) unless Supply.config[:skip_upload_changelogs]
+        unless Supply.config[:skip_upload_changelogs]
+          changelog = upload_changelog(job.language, job.version_code)
+          job.release_notes_queue << changelog unless changelog.nil?
+        end
         UI.message("Uploaded all items for language '#{job.language}'... (#{Time.now - start_time} secs)")
       rescue => error
         UI.abort_with_message!("#{job.language} - #{error}")

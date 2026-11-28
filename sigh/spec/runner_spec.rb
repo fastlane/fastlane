@@ -6,7 +6,7 @@ describe Sigh do
     end
 
     let(:fake_runner) { Sigh::Runner.new }
-    let(:mock_base_client) { "fake api base client" }
+    let(:mock_base_client) { +"fake api base client" }
 
     before(:each) do
       allow(mock_base_client).to receive(:login)
@@ -16,6 +16,16 @@ describe Sigh do
     end
 
     describe "#run" do
+      it "fails early when offline_profile is used with an App Store Connect API key" do
+        allow(Spaceship::ConnectAPI).to receive(:token).and_return(double("token"))
+
+        options = { app_identifier: "com.krausefx.app", offline_profile: true, skip_install: true }
+        Sigh.config = FastlaneCore::Configuration.create(Sigh::Options.available_options, options)
+
+        expect do
+          fake_runner.run
+        end.to raise_error(FastlaneCore::Interface::FastlaneError, /offline_profile.*Apple ID/)
+      end
     end
 
     describe "#profile_type" do
@@ -101,6 +111,16 @@ describe Sigh do
           profiles = fake_runner.fetch_profiles
           expect(profiles.size).to eq(1)
         end
+
+        it "with cert_id filter" do
+          sigh_stub_spaceship_connect(inhouse: false, all_app_identifiers: ["com.krausefx.app"], app_identifier_and_profile_names: { "com.krausefx.app" => ["No dupe here"] })
+
+          options = { app_identifier: "com.krausefx.app", skip_certificate_verification: true, cert_id: "123456789" }
+          Sigh.config = FastlaneCore::Configuration.create(Sigh::Options.available_options, options)
+
+          profiles = fake_runner.fetch_profiles
+          expect(profiles.size).to eq(1)
+        end
       end
 
       context "unsuccessfully" do
@@ -113,6 +133,16 @@ describe Sigh do
           Sigh.config = FastlaneCore::Configuration.create(Sigh::Options.available_options, options)
 
           expect(FastlaneCore::CertChecker).to receive(:installed?).with(anything).and_return(false)
+
+          profiles = fake_runner.fetch_profiles
+          expect(profiles.size).to eq(0)
+        end
+
+        it "with cert_id filter" do
+          sigh_stub_spaceship_connect(inhouse: false, all_app_identifiers: ["com.krausefx.app"], app_identifier_and_profile_names: { "com.krausefx.app" => ["No dupe here"] })
+
+          options = { app_identifier: "com.krausefx.app", skip_certificate_verification: true, cert_id: "987654321" }
+          Sigh.config = FastlaneCore::Configuration.create(Sigh::Options.available_options, options)
 
           profiles = fake_runner.fetch_profiles
           expect(profiles.size).to eq(0)

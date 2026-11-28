@@ -181,7 +181,7 @@ module Spaceship
       #   ProvisioningProfile.some_other_method
       #   #=> NoMethodError: undefined method `some_other_method' for ProvisioningProfile
       def method_missing(method_sym, *args, &block)
-        module_name = method_sym.to_s
+        module_name = method_sym.to_s.dup
         module_name.sub!(/^[a-z\d]/) { $&.upcase }
         module_name.gsub!(%r{(?:_|(/))([a-z\d])}) { $2.upcase }
         if const_defined?(module_name)
@@ -224,7 +224,9 @@ module Spaceship
     # The initialize method accepts a parsed response from Apple and sets all
     # attributes that are defined by `attr_mapping`
     #
-    # Do not override `initialize` in your own models.
+    # Do not override `initialize` in your own models, use `setup` instead. An
+    # override that has to take a value Apple's response does not carry must call
+    # `super`, or `attr_mapping`, `raw_data`, `client` and `setup` are all skipped.
     def initialize(attrs = {}, existing_client = nil)
       attrs.each do |key, val|
         self.send("#{key}=", val) if respond_to?("#{key}=")

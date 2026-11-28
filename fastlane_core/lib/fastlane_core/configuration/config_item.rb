@@ -201,7 +201,10 @@ module FastlaneCore
       end
 
       if data_type != :string_callback && data_type && !value.kind_of?(data_type)
-        UI.user_error!("'#{self.key}' value must be a #{data_type}! Found #{value.class} instead.")
+        message = "'#{self.key}' value must be a #{data_type}! Found #{value.class} instead."
+        # A Hash given on the command line or in an environment variable is read as JSON
+        message += " On the command line or in an environment variable, pass it as JSON (in Ruby: `hash.to_json`)." if data_type == Hash && value.kind_of?(String)
+        UI.user_error!(message)
       end
     end
 
@@ -326,7 +329,7 @@ module FastlaneCore
     def deprecated_description(initial_description, deprecated)
       has_description = !initial_description.to_s.empty?
 
-      description = "**DEPRECATED!**"
+      description = +"**DEPRECATED!**"
 
       if deprecated.kind_of?(String)
         description << " #{deprecated}"
