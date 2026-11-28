@@ -25,7 +25,7 @@ module Gym
 
       # Archive
       if Gym.building_for_ipa?
-        fix_generic_archive unless Gym.project.watchos? # See https://github.com/fastlane/fastlane/pull/4325
+        fix_generic_archive
         return BuildCommandGenerator.archive_path if Gym.config[:skip_package_ipa]
 
         package_app
@@ -96,6 +96,16 @@ module Gym
 
     def fix_generic_archive
       return unless FastlaneCore::Env.truthy?("GYM_USE_GENERIC_ARCHIVE_FIX")
+
+      # Not for watchOS apps, see https://github.com/fastlane/fastlane/pull/4325. When build
+      # settings can't be read, the destination (which then has to name the platform) says so
+      watchos = if Gym.project.xcodebuild_settings_lookup_disallowed_by
+                  Gym.destination_platform.match?(/\AwatchOS/i)
+                else
+                  Gym.project.watchos?
+                end
+      return if watchos
+
       Gym::XcodebuildFixes.generic_archive_fix
     end
 
@@ -291,7 +301,7 @@ module Gym
         app_path = Dir[File.join(BuildCommandGenerator.archive_path, "Products", "Applications", "*.app")].last
       end
 
-      UI.crash!("Couldn't find application in '#{BuildCommandGenerator.archive_path}'") unless File.exist?(app_path)
+      UI.user_error!("Couldn't find application in '#{BuildCommandGenerator.archive_path}'") unless app_path && File.exist?(app_path)
 
       joined_app_path = File.join(Gym.config[:output_directory], File.basename(app_path))
       FileUtils.rm_rf(joined_app_path)

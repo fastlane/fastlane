@@ -179,6 +179,27 @@ describe Fastlane do
               end
             end
 
+            it "keeps the metadata files out of the zipped app", if: FastlaneCore::Helper.mac? do
+              Dir.mktmpdir("fl_spec_notarize") do |dir|
+                app = File.join(dir, "Demo.app")
+                FileUtils.mkdir_p(File.join(app, "Contents"))
+                plist = File.join(app, "Contents", "Info.plist")
+                File.write(plist, "plist")
+                # An extended attribute is what ditto stores as a ._ file
+                system("xattr", "-w", "com.example.note", "x", plist, exception: true)
+
+                with_fake_xcrun("[ \"$1\" = stapler ] && exit 0\necho '#{success_submit_response}'") do
+                  Fastlane::FastFile.new.parse("lane :test do
+                    notarize(package: '#{app}', username: '#{username}', asc_provider: '#{asc_provider}')
+                  end").runner.execute(:test)
+                end
+
+                entries = `unzip -Z1 #{"#{app}.zip".shellescape}`.lines.map(&:chomp)
+                expect(entries).to include("Demo.app/Contents/Info.plist")
+                expect(entries.grep(%r{^Demo\.app/.*\._})).to be_empty
+              end
+            end
+
             it "fails with notarytool's message when it fails" do
               script = <<~SCRIPT
                 echo "Error: Missing value for '--password <password>'" >&2

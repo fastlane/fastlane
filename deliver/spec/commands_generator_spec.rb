@@ -237,6 +237,18 @@ describe Deliver::CommandsGenerator do
       Deliver::CommandsGenerator.start
     end
 
+    it "says why it does not download when it cannot overwrite" do
+      stub_commander_runner_args(['download_metadata', '--app_identifier', 'abcd', '-m', 'metadata/path'])
+      allow(FastlaneCore::UI).to receive(:interactive?).and_return(false)
+      allow(FastlaneCore::UI).to receive(:message)
+
+      expect(Deliver::Runner).to receive(:new)
+      expect(FastlaneCore::UI).to receive(:message).with("Will not overwrite existing metadata (answered no, or tty not detected). To override: use --force option")
+      expect(Deliver::Setup).not_to receive(:new)
+
+      Deliver::CommandsGenerator.start
+    end
+
     describe "force overwriting metadata" do
       it "forces overwriting metadata if force is set" do
         options = FastlaneCore::Configuration.create(Deliver::Options.available_options, {

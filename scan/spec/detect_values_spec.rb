@@ -41,6 +41,91 @@ describe Scan do
       end
     end
 
+    describe 'test without building' do
+      describe 'does not attempt to detect FastlaneCore::Project' do
+        it 'with :test_without_building true and :xctestrun given', requires_xcodebuild: true do
+          options = {
+            test_without_building: true,
+            xctestrun: "./scan/examples/standard/DerivedData/Build/testplan.xctestrun",
+            destination: "platform=macOS"
+          }
+
+          expect(FastlaneCore::Project).to_not(receive(:detect_projects))
+
+          Scan.config = FastlaneCore::Configuration.create(Scan::Options.available_options, options)
+        end
+      end
+
+      describe 'does not attempt to detect FastlaneCore::Project for an .xctestrun alone' do
+        it 'with :xctestrun and :destination given', requires_xcodebuild: true do
+          options = {
+            xctestrun: "./scan/examples/standard/DerivedData/Build/testplan.xctestrun",
+            destination: "platform=macOS"
+          }
+
+          expect(FastlaneCore::Project).to_not(receive(:detect_projects))
+
+          Scan.config = FastlaneCore::Configuration.create(Scan::Options.available_options, options)
+          expect(Scan.project).to be_nil
+        end
+      end
+
+      describe 'an .xctestrun alone without a destination' do
+        it 'fails early', requires_xcodebuild: true do
+          options = { xctestrun: "./scan/examples/standard/DerivedData/Build/testplan.xctestrun" }
+
+          expect do
+            Scan.config = FastlaneCore::Configuration.create(Scan::Options.available_options, options)
+          end.to raise_error(FastlaneCore::Interface::FastlaneError, /Pass `destination`/)
+        end
+      end
+
+      describe 'keeps the project given with :xctestrun' do
+        it 'with :xctestrun and :project given', requires_xcodebuild: true do
+          options = {
+            xctestrun: "./scan/examples/standard/DerivedData/Build/testplan.xctestrun",
+            project: "./scan/examples/standard/app.xcodeproj"
+          }
+
+          expect(FastlaneCore::Project).to receive(:detect_projects).and_call_original
+
+          Scan.config = FastlaneCore::Configuration.create(Scan::Options.available_options, options)
+          expect(Scan.project.path).to eq(File.expand_path("./scan/examples/standard/app.xcodeproj"))
+        end
+      end
+
+      describe 'detects FastlaneCore::Project' do
+        before do
+          # Mocks input from detect_projects
+          @project = FastlaneCore::Project.new({
+            project: "./scan/examples/standard/app.xcodeproj"
+          })
+        end
+
+        it 'with :test_without_building true and no :xctestrun given', requires_xcodebuild: true do
+          options = {
+            test_without_building: true
+          }
+
+          expect(FastlaneCore::Project).to receive(:detect_projects)
+          expect(FastlaneCore::Project).to receive(:new).and_return(@project)
+
+          Scan.config = FastlaneCore::Configuration.create(Scan::Options.available_options, options)
+        end
+
+        it 'with :test_without_building false', requires_xcodebuild: true do
+          options = {
+            test_without_building: false
+          }
+
+          expect(FastlaneCore::Project).to receive(:detect_projects)
+          expect(FastlaneCore::Project).to receive(:new).and_return(@project)
+
+          Scan.config = FastlaneCore::Configuration.create(Scan::Options.available_options, options)
+        end
+      end
+    end
+
     describe 'Xcode config handling' do
       before do
         allow_any_instance_of(FastlaneCore::Project).to receive(:build_settings).and_call_original
@@ -366,6 +451,44 @@ describe Scan do
           Scan.config = FastlaneCore::Configuration.create(Scan::Options.available_options, options)
           expect(Scan.config[:destination].first).to match(/platform=iOS/)
           expect(Scan.config[:destination].first).to_not(match(/,arch=x86_64/))
+        end
+      end
+
+      # Several `run_tests` calls in one lane share the Scan module
+      context "after an earlier run in the same process picked a simulator", requires_xcode: true do
+        let(:simulator) { FastlaneCore::DeviceManager::Device.new(name: "iPhone 15", udid: "00000000-0000-0000-0000-000000000015", os_type: "iOS", os_version: "17.0", state: "Shutdown", is_simulator: true) }
+
+        before do
+          allow(FastlaneCore::DeviceManager).to receive(:simulators).and_return([simulator])
+
+          # The deployment target and derived data path are given, so no build settings are read
+          Scan.config = FastlaneCore::Configuration.create(Scan::Options.available_options, {
+            project: "./scan/examples/standard/app.xcodeproj",
+            device: "iPhone 15",
+            deployment_target_version: "17.0",
+            derived_data_path: Dir.mktmpdir
+          })
+          expect(Scan.devices).to eq([simulator])
+        end
+
+        it "tests a macOS project on the Mac, not on that simulator" do
+          allow_any_instance_of(FastlaneCore::Project).to receive_messages(ios?: false, tvos?: false, mac_app?: true)
+
+          Scan.config = FastlaneCore::Configuration.create(Scan::Options.available_options, {
+            project: "./scan/examples/standard/app.xcodeproj",
+            derived_data_path: Dir.mktmpdir
+          })
+
+          expect(Scan.devices).to be_nil
+          expect(Scan.config[:destination]).to eq(["platform=macOS"])
+        end
+
+        it "doesn't use that run's project or simulator for a Swift package" do
+          Scan.config = FastlaneCore::Configuration.create(Scan::Options.available_options, { package_path: "./scan/examples/package/" })
+
+          expect(Scan.project).to be_nil
+          expect(Scan.devices).to be_nil
+          expect(Scan.config[:destination]).to be_nil
         end
       end
     end

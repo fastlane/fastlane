@@ -13,7 +13,7 @@ describe FastlaneCore do
     before(:all) do
       @simctl_output = File.read('./fastlane_core/spec/fixtures/DeviceManagerSimctlOutputXcode7')
       @system_profiler_output = File.read('./fastlane_core/spec/fixtures/DeviceManagerSystem_profilerOutput')
-      @instruments_output = File.read('./fastlane_core/spec/fixtures/DeviceManagerInstrumentsOutput')
+      @xctrace_output = File.read('./fastlane_core/spec/fixtures/DeviceManagerXCTraceOutput')
       @system_profiler_output_items_without_items = File.read('./fastlane_core/spec/fixtures/DeviceManagerSystem_profilerOutputItemsWithoutItems')
       @system_profiler_output_usb_hub = File.read('./fastlane_core/spec/fixtures/DeviceManagerSystem_profilerOutputUsbHub')
 
@@ -305,13 +305,13 @@ describe FastlaneCore do
       )
     end
 
-    it "properly parses system_profiler and instruments output and generates Device objects for iOS" do
+    it "properly parses system_profiler and xctrace output and generates Device objects for iOS" do
       response = +"response"
       expect(response).to receive(:read).and_return(@system_profiler_output)
       expect(Open3).to receive(:popen3).with("system_profiler SPUSBDataType -xml").and_yield(nil, response, nil, nil)
 
-      expect(response).to receive(:read).and_return(@instruments_output)
-      expect(Open3).to receive(:popen3).with("instruments -s devices").and_yield(nil, response, nil, nil)
+      expect(response).to receive(:read).and_return(@xctrace_output)
+      expect(Open3).to receive(:popen3).with("xcrun xctrace list devices").and_yield(nil, response, nil, nil)
 
       devices = FastlaneCore::DeviceManager.connected_devices('iOS')
       expect(devices.count).to eq(2)
@@ -345,8 +345,8 @@ describe FastlaneCore do
       expect(response).to receive(:read).and_return(@system_profiler_output_usb_hub)
       expect(Open3).to receive(:popen3).with("system_profiler SPUSBDataType -xml").and_yield(nil, response, nil, nil)
 
-      expect(response).to receive(:read).and_return(@instruments_output)
-      expect(Open3).to receive(:popen3).with("instruments -s devices").and_yield(nil, response, nil, nil)
+      expect(response).to receive(:read).and_return(@xctrace_output)
+      expect(Open3).to receive(:popen3).with("xcrun xctrace list devices").and_yield(nil, response, nil, nil)
 
       devices = FastlaneCore::DeviceManager.connected_devices('iOS')
       expect(devices.count).to eq(1)
@@ -358,13 +358,13 @@ describe FastlaneCore do
       )
     end
 
-    it "properly parses system_profiler and instruments output and generates Device objects for tvOS" do
+    it "properly parses system_profiler and xctrace output and generates Device objects for tvOS" do
       response = +"response"
       expect(response).to receive(:read).and_return(@system_profiler_output)
       expect(Open3).to receive(:popen3).with("system_profiler SPUSBDataType -xml").and_yield(nil, response, nil, nil)
 
-      expect(response).to receive(:read).and_return(@instruments_output)
-      expect(Open3).to receive(:popen3).with("instruments -s devices").and_yield(nil, response, nil, nil)
+      expect(response).to receive(:read).and_return(@xctrace_output)
+      expect(Open3).to receive(:popen3).with("xcrun xctrace list devices").and_yield(nil, response, nil, nil)
 
       devices = FastlaneCore::DeviceManager.connected_devices('tvOS')
       expect(devices.count).to eq(1)
@@ -382,8 +382,8 @@ describe FastlaneCore do
       expect(response).to receive(:read).and_return(@system_profiler_output)
       expect(Open3).to receive(:popen3).with("system_profiler SPUSBDataType -xml").and_yield(nil, response, nil, nil)
 
-      expect(response).to receive(:read).and_return(@instruments_output)
-      expect(Open3).to receive(:popen3).with("instruments -s devices").and_yield(nil, response, nil, nil)
+      expect(response).to receive(:read).and_return(@xctrace_output)
+      expect(Open3).to receive(:popen3).with("xcrun xctrace list devices").and_yield(nil, response, nil, nil)
 
       expect(response).to receive(:read).and_return(@simctl_output)
       expect(Open3).to receive(:popen3).with("xcrun simctl list devices").and_yield(nil, response, nil, nil)
@@ -434,8 +434,8 @@ describe FastlaneCore do
       expect(response).to receive(:read).and_return(@system_profiler_output)
       expect(Open3).to receive(:popen3).with("system_profiler SPUSBDataType -xml").and_yield(nil, response, nil, nil)
 
-      expect(response).to receive(:read).and_return(@instruments_output)
-      expect(Open3).to receive(:popen3).with("instruments -s devices").and_yield(nil, response, nil, nil)
+      expect(response).to receive(:read).and_return(@xctrace_output)
+      expect(Open3).to receive(:popen3).with("xcrun xctrace list devices").and_yield(nil, response, nil, nil)
 
       expect(response).to receive(:read).and_return(@simctl_output)
       expect(Open3).to receive(:popen3).with("xcrun simctl list devices").and_yield(nil, response, nil, nil)
@@ -465,6 +465,23 @@ describe FastlaneCore do
       expect(FastlaneCore::DeviceManager.runtime_build_os_versions['21A328']).to eq('17.0')
       expect(FastlaneCore::DeviceManager.runtime_build_os_versions['21A342']).to eq('17.0.1')
       expect(FastlaneCore::DeviceManager.runtime_build_os_versions['21R355']).to eq('10.0')
+    end
+
+    describe "#latest_simulator_version_for_device" do
+      before do
+        allow(FastlaneCore::DeviceManager).to receive(:simulators).and_return([
+                                                                                FastlaneCore::DeviceManager::Device.new(name: "iPhone 17", os_type: "iOS", os_version: "26.2", is_simulator: true),
+                                                                                FastlaneCore::DeviceManager::Device.new(name: "iPhone 17", os_type: "iOS", os_version: "26.10", is_simulator: true)
+                                                                              ])
+      end
+
+      it "returns the newest version of the device's simulators" do
+        expect(FastlaneCore::DeviceManager.latest_simulator_version_for_device("iPhone 17")).to eq("26.10")
+      end
+
+      it "returns nil for a device without a simulator" do
+        expect(FastlaneCore::DeviceManager.latest_simulator_version_for_device("Mac")).to be_nil
+      end
     end
 
     describe FastlaneCore::DeviceManager::Device do

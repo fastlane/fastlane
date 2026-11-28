@@ -95,8 +95,8 @@ module Supply
           UI.user_error!("Could not find folder #{metadata_path}") unless File.directory?(metadata_path)
 
           track, release = fetch_track_and_release!(track_name, version_code)
-          UI.user_error!("Unable to find the requested track - '#{Supply.config[:track]}'") unless track
-          UI.user_error!("Could not find release for version code '#{version_code}' to update changelog") unless release
+          UI.user_error!("Unable to find the requested track '#{track_name}'") unless track
+          UI.user_error!("Could not find release for version code '#{version_code}' in track '#{track_name}' to update changelog") unless release
 
           release_notes_queue = Queue.new
           upload_worker = create_meta_upload_worker
@@ -131,12 +131,13 @@ module Supply
 
     def update_rollout
       track, release = fetch_track_and_release!(Supply.config[:track], Supply.config[:version_code], [Supply::ReleaseStatus::IN_PROGRESS, Supply::ReleaseStatus::DRAFT])
-      UI.user_error!("Unable to find the requested track - '#{Supply.config[:track]}'") unless track
-      UI.user_error!("Unable to find the requested release on track - '#{Supply.config[:track]}'") unless release
+      UI.user_error!("Unable to find the requested track '#{Supply.config[:track]}'") unless track
+      version_code_hint = Supply.config[:version_code] ? " for version code '#{Supply.config[:version_code]}'" : ""
+      UI.user_error!("Unable to find a release with status '#{Supply::ReleaseStatus::IN_PROGRESS}' or '#{Supply::ReleaseStatus::DRAFT}'#{version_code_hint} in track '#{Supply.config[:track]}'") unless release
 
       version_code = release.version_codes.max
 
-      UI.message("Updating #{version_code}'s rollout to '#{Supply.config[:rollout]}' on track '#{Supply.config[:track]}'...")
+      UI.message("Updating #{version_code}'s rollout to '#{Supply.config[:rollout]}' in track '#{Supply.config[:track]}'...")
 
       if track && release
         rollout = Supply.config[:rollout]
@@ -283,10 +284,13 @@ module Supply
         end
       end
 
-      AndroidPublisher::LocalizedText.new(
-        language: language,
-        text: changelog_text
-      )
+      # An empty text made the whole release notes update fail (fastlane#21004)
+      unless changelog_text.strip.empty?
+        AndroidPublisher::LocalizedText.new(
+          language: language,
+          text: changelog_text
+        )
+      end
     end
 
     def upload_changelogs(release_notes, release, track, track_name)
@@ -563,7 +567,10 @@ module Supply
         upload_metadata(job.language, listing) unless Supply.config[:skip_upload_metadata]
         upload_images(job.language) unless Supply.config[:skip_upload_images]
         upload_screenshots(job.language) unless Supply.config[:skip_upload_screenshots]
-        job.release_notes_queue << upload_changelog(job.language, job.version_code) unless Supply.config[:skip_upload_changelogs]
+        unless Supply.config[:skip_upload_changelogs]
+          changelog = upload_changelog(job.language, job.version_code)
+          job.release_notes_queue << changelog unless changelog.nil?
+        end
         UI.message("Uploaded all items for language '#{job.language}'... (#{Time.now - start_time} secs)")
       rescue => error
         UI.abort_with_message!("#{job.language} - #{error}")

@@ -383,6 +383,21 @@ describe FastlaneCore do
           end.to raise_error(FastlaneCore::Interface::FastlaneError, "'foo' value must be a Float! Found String instead.")
         end
 
+        it "reads a JSON String as a Hash" do
+          config_item = FastlaneCore::ConfigItem.new(key: :foo, description: 'foo', type: Hash)
+
+          expect(config_item.auto_convert_value('{"key_id":"ABC"}')).to eq({ "key_id" => "ABC" })
+        end
+
+        it "says to pass JSON when a Hash option gets a String that is not JSON" do
+          config_item = FastlaneCore::ConfigItem.new(key: :foo, description: 'foo', type: Hash)
+          value = config_item.auto_convert_value({ key_id: "ABC" }.to_s)
+
+          expect do
+            config_item.valid?(value)
+          end.to raise_error(FastlaneCore::Interface::FastlaneError, "'foo' value must be a Hash! Found String instead. On the command line or in an environment variable, pass it as JSON (in Ruby: `hash.to_json`).")
+        end
+
         it "verifies the default value as well" do
           c = FastlaneCore::ConfigItem.new(key: :output,
                                     env_name: "SIGH_OUTPUT_PATH",

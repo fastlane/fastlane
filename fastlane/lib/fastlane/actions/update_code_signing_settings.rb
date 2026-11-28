@@ -11,11 +11,6 @@ module Fastlane
         UI.user_error!("Could not find path to project config '#{path}'. Pass the path to your project (not workspace)!") unless File.exist?(path)
         UI.message("Updating the Automatic Codesigning flag to #{params[:use_automatic_signing] ? 'enabled' : 'disabled'} for the given project '#{path}'")
 
-        unless project.root_object.attributes["TargetAttributes"]
-          UI.user_error!("Seems to be a very old project file format - please open your project file in a more recent version of Xcode")
-          return false
-        end
-
         changed_targets = []
         changed_build_configurations = []
 

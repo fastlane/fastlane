@@ -150,6 +150,35 @@ describe Supply do
       end
     end
 
+    describe 'release notes' do
+      it 'leaves out the languages whose changelog is missing or empty' do
+        Dir.mktmpdir do |metadata_path|
+          {
+            'en-US' => { '1.txt' => "Fixes" },
+            'fr-FR' => {},
+            'de-DE' => { '1.txt' => "" },
+            'ja-JP' => { '1.txt' => "\n" },
+            'es-ES' => { 'default.txt' => "Default notes" }
+          }.each do |language, files|
+            changelogs = File.join(metadata_path, language, Supply::CHANGELOGS_FOLDER_NAME)
+            FileUtils.mkdir_p(changelogs)
+            files.each { |name, text| File.write(File.join(changelogs, name), text) }
+          end
+          Supply.config = { metadata_path: metadata_path, skip_upload_metadata: true, skip_upload_images: true, skip_upload_screenshots: true }
+
+          uploader = Supply::Uploader.new
+          allow(uploader).to receive(:client).and_return(double('client', listing_for_language: nil))
+          queue = Queue.new
+          worker = uploader.send(:create_meta_upload_worker)
+          worker.batch_enqueue(%w(en-US fr-FR de-DE ja-JP es-ES).map { |language| Supply::Uploader::UploadJob.new(language, 1, queue) })
+          worker.start
+
+          notes = Array.new(queue.size) { queue.pop }
+          expect(notes.map { |note| [note.language, note.text] }).to contain_exactly(["en-US", "Fixes"], ["es-ES", "Default notes"])
+        end
+      end
+    end
+
     describe 'all_languages' do
       it 'only grabs directories' do
         Supply.config = {
@@ -303,6 +332,31 @@ describe Supply do
     describe '#perform_upload with metadata' do
       it_behaves_like 'run supply to upload metadata', version_codes: [1, 2], with_explicit_changelogs: true
       it_behaves_like 'run supply to upload metadata', version_codes: [3], with_explicit_changelogs: false
+    end
+
+    describe '#perform_upload_meta' do
+      let(:subject) { Supply::Uploader.new }
+      let(:client) { double('client') }
+      let(:metadata_dir) { Dir.mktmpdir }
+      let(:track) { AndroidPublisher::Track.new(releases: []) }
+
+      before do
+        # track_promote_to makes perform_upload pass another track than :track
+        Supply.config = { track: 'internal', track_promote_to: 'production', metadata_path: metadata_dir }
+        allow(Supply::Client).to receive(:make_from_config).and_return(client)
+      end
+
+      after { FileUtils.rm_rf(metadata_dir) }
+
+      it 'names the track it looked for when that track is missing' do
+        allow(client).to receive(:tracks).with('production').and_return([])
+        expect { subject.perform_upload_meta([1], 'production') }.to raise_error("Unable to find the requested track 'production'")
+      end
+
+      it 'names the track it looked in when the release is missing' do
+        allow(client).to receive(:tracks).with('production').and_return([track])
+        expect { subject.perform_upload_meta([1], 'production') }.to raise_error("Could not find release for version code '1' in track 'production' to update changelog")
+      end
     end
 
     describe '#perform_upload with version_codes_to_retain in promote-only mode' do
@@ -743,7 +797,12 @@ describe Supply do
         end
 
         it 'raises an error' do
-          expect { subject.update_rollout }.to raise_error(/Unable to find the requested release on track/)
+          expect { subject.update_rollout }.to raise_error("Unable to find a release with status 'inProgress' or 'draft' in track 'alpha'")
+        end
+
+        it 'names the requested version code' do
+          config[:version_code] = version_code
+          expect { subject.update_rollout }.to raise_error("Unable to find a release with status 'inProgress' or 'draft' for version code '123' in track 'alpha'")
         end
       end
 
@@ -753,7 +812,7 @@ describe Supply do
         end
 
         it 'does not crash and raises an error about missing release' do
-          expect { subject.update_rollout }.to raise_error(/Unable to find the requested release on track/)
+          expect { subject.update_rollout }.to raise_error(/Unable to find a release with status/)
         end
       end
     end

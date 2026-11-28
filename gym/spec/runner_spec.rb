@@ -35,4 +35,21 @@ describe Gym::Runner do
       end
     end
   end
+
+  describe "#copy_mac_app" do
+    it "fails naming the archive when it contains no .app" do
+      Dir.mktmpdir do |tmp|
+        archive_path = File.join(tmp, "App.xcarchive")
+        FileUtils.mkdir_p(File.join(archive_path, "Products", "Applications"))
+
+        allow(Gym).to receive(:project).and_return(double("project", build_settings: "App"))
+        allow(Gym).to receive(:config).and_return({ output_directory: tmp })
+        allow(Gym::BuildCommandGenerator).to receive(:archive_path).and_return(archive_path)
+
+        expect do
+          Gym::Runner.new.send(:copy_mac_app)
+        end.to raise_error(FastlaneCore::Interface::FastlaneError, "Couldn't find application in '#{archive_path}'")
+      end
+    end
+  end
 end

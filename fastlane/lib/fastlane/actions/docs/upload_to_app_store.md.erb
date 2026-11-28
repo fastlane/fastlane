@@ -82,6 +82,12 @@ Download existing metadata from App Store Connect
 fastlane deliver download_metadata
 ```
 
+Download existing metadata from App Store Connect and overwrite local metadata without prompting or when running without a TTY (e.g on CI server).
+
+```no-highlight
+fastlane deliver download_metadata --force
+```
+
 To get a list of available options run
 
 ```no-highlight
