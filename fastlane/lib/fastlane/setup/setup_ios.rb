@@ -59,7 +59,7 @@ module Fastlane
 
         UI.verbose(ex.backtrace.join("\n"))
         if ex.kind_of?(Spaceship::Client::BasicPreferredInfoError) || ex.kind_of?(Spaceship::Client::UnexpectedResponse)
-          UI.error(ex.preferred_error_info)
+          UI.error(ex.preferred_error_info || ex.to_s)
         else
           UI.error(ex.to_s)
         end
@@ -487,7 +487,7 @@ module Fastlane
         rescue => ex
           # show the user facing error, and inform them of what went wrong
           if ex.kind_of?(Spaceship::Client::BasicPreferredInfoError) || ex.kind_of?(Spaceship::Client::UnexpectedResponse)
-            UI.error(ex.preferred_error_info)
+            UI.error(ex.preferred_error_info || ex.to_s)
           else
             UI.error(ex.to_s)
           end
