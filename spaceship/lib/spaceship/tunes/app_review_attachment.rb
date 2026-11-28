@@ -33,7 +33,7 @@ module Spaceship
       end
 
       def setup
-        # Since September 2015 we don't get the url any more, so we have to manually build it
+        # Since September 2015 we don't get the url anymore, so we have to manually build it
         self.url = "#{HOST_URL}/#{self.asset_token}"
       end
 

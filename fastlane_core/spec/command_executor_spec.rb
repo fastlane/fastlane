@@ -1,33 +1,104 @@
+# FastlanePty requires this lazily, inside spawn_with_pty, so examples below that
+# reference the PTY constant only find it when something has already run a pty
+# backed command in this process. Require it here so they do not depend on that.
+# Guarded because pty is not available on Windows, where those examples are
+# skipped anyway. See fastlane#30184.
+require 'pty' unless FastlaneCore::Helper.windows?
+
 describe FastlaneCore do
   describe FastlaneCore::CommandExecutor do
     describe "execute" do
+      let(:failing_command) { FastlaneCore::Helper.windows? ? 'echo log && exit 42' : 'echo log; exit 42' }
+      let(:failing_command_output) { FastlaneCore::Helper.windows? ? "log \n" : "log\n" }
+      let(:failing_command_error_input) { FastlaneCore::Helper.windows? ? "log " : "log" }
+
+      # A status object of the shape FastlanePty reads, for examples that stub
+      # PTY.spawn and so have no real child to reap.
+      let(:stubbed_status) do
+        instance_double(Process::Status, exitstatus: 0, signaled?: false)
+      end
+
       it 'executes a simple command successfully' do
         unless FastlaneCore::Helper.windows?
-          expect(Process).to receive(:wait)
+          expect(Process).to receive(:wait2).and_call_original
         end
 
-        result = FastlaneCore::CommandExecutor.execute(command: 'echo foo')
+        result = FastlaneSpec::Env.with_env_values('FASTLANE_EXEC_FLUSH_PTY_WORKAROUND' => '1') do
+          FastlaneCore::CommandExecutor.execute(command: 'echo foo')
+        end
 
         expect(result).to eq('foo')
       end
 
+      it 'gives env to the command only, without printing it' do
+        allow(FastlaneCore::UI).to receive(:command)
+        command = "#{RbConfig.ruby.shellescape} -e \"puts ENV['FL_SPEC_EXECUTE_ENV']\""
+
+        result = FastlaneCore::CommandExecutor.execute(command: command, env: { 'FL_SPEC_EXECUTE_ENV' => 'EXAMPLE-VALUE' })
+
+        expect(result).to eq('EXAMPLE-VALUE')
+        expect(ENV.key?('FL_SPEC_EXECUTE_ENV')).to be(false)
+        expect(FastlaneCore::UI).to have_received(:command).with(command)
+      end
+
+      it 'reads output as UTF-8 whatever the default encoding, and restores it', unless: FastlaneCore::Helper.windows? do
+        allow(FastlaneCore::UI).to receive(:command)
+        allow(FastlaneCore::UI).to receive(:command_output)
+        previous = [Encoding.default_external, Encoding.default_internal]
+        Encoding.default_external = Encoding::US_ASCII
+        Encoding.default_internal = nil
+
+        result = FastlaneCore::CommandExecutor.execute(command: "printf 'caf\\303\\251\\n'", print_all: true)
+        after = [Encoding.default_external, Encoding.default_internal]
+
+        expect(result).to eq("café")
+        expect(result.encoding).to eq(Encoding::UTF_8)
+        expect(FastlaneCore::UI).to have_received(:command_output).with("café")
+        expect(after).to eq([Encoding::US_ASCII, nil])
+      ensure
+        Encoding.default_external, Encoding.default_internal = previous
+      end
+
+      it 'names the signal when the command is killed', unless: FastlaneCore::Helper.windows? do
+        allow(FastlaneCore::UI).to receive(:command)
+        expect do
+          # The shell Ruby starts kills itself: Ubuntu's dash, given "sh -c ...", would wait for the inner shell and exit 137
+          FastlaneCore::CommandExecutor.execute(command: "kill -9 $$", suppress_error_output: true)
+        end.to raise_error(FastlaneCore::FastlanePtyError, /\AProcess crashed: killed by SIGKILL\z/)
+      end
+
+      it 'runs the command in chdir, leaving fastlane\'s directory alone' do
+        allow(FastlaneCore::UI).to receive(:command)
+        Dir.mktmpdir do |dir|
+          result = FastlaneCore::CommandExecutor.execute(command: "#{RbConfig.ruby.shellescape} -e \"puts Dir.pwd\"", chdir: dir)
+          expect(result).to eq(File.realpath(dir))
+          expect(Dir.pwd).not_to eq(File.realpath(dir))
+        end
+      end
+
       it 'handles reading which throws a EIO exception', requires_pty: true do
-        fake_std_in = [
+        fake_std_in_lines = [
           "a_filename\n"
         ]
-        expect(fake_std_in).to receive(:each).and_yield(*fake_std_in).and_raise(Errno::EIO)
+        fake_std_in = double("stdin")
+        expect(fake_std_in).to receive(:each).and_yield(*fake_std_in_lines).and_raise(Errno::EIO)
 
-        # Make a fake child process so we have a valid PID and $? is set correctly
+        fake_std_out = double("stdout")
+
+        expect(fake_std_in).to receive(:close)
+        expect(fake_std_out).to receive(:close)
+
+        # Make a fake child process so there is a valid PID to reap
         expect(PTY).to receive(:spawn) do |command, &block|
           expect(command).to eq('ls')
 
-          # PTY uses "$?" to get exitcode, which is filled in by Process.wait(),
-          # so we have to spawn a real process unless we want to mock methods
-          # on nil.
-          child_process_id = Process.spawn('echo foo', out: File::NULL)
-          expect(Process).to receive(:wait).with(child_process_id)
+          # wait2 returns the status now, so the example hands one back rather
+          # than spawning a process for FastlanePty to reap. PTY.spawn is
+          # stubbed here, so there is no real child for the pid to refer to.
+          child_process_id = 4242
+          expect(Process).to receive(:wait2).with(child_process_id).and_return([child_process_id, stubbed_status])
 
-          block.yield(fake_std_in, 'not_really_std_out', child_process_id)
+          block.yield(fake_std_in, fake_std_out, child_process_id)
         end
 
         result = FastlaneCore::CommandExecutor.execute(command: 'ls')
@@ -45,16 +116,21 @@ describe FastlaneCore do
           "  - Muffins\n"
         ]
 
+        fake_std_out = +'not_really_std_out'
+
+        expect(fake_std_in).to receive(:close)
+        expect(fake_std_out).to receive(:close)
+
         expect(PTY).to receive(:spawn) do |command, &block|
           expect(command).to eq('echo foo')
 
-          # PTY uses "$?" to get exitcode, which is filled in by Process.wait(),
-          # so we have to spawn a real process unless we want to mock methods
-          # on nil.
-          child_process_id = Process.spawn('echo foo', out: File::NULL)
-          expect(Process).to receive(:wait).with(child_process_id)
+          # wait2 returns the status now, so the example hands one back rather
+          # than spawning a process for FastlanePty to reap. PTY.spawn is
+          # stubbed here, so there is no real child for the pid to refer to.
+          child_process_id = 4242
+          expect(Process).to receive(:wait2).with(child_process_id).and_return([child_process_id, stubbed_status])
 
-          block.yield(fake_std_in, 'not_really_std_out', child_process_id)
+          block.yield(fake_std_in, fake_std_out, child_process_id)
         end
 
         result = FastlaneCore::CommandExecutor.execute(command: 'echo foo')
@@ -67,6 +143,331 @@ Shopping list:
   - Bread
   - Muffins
         LIST
+      end
+
+      it "does not print output to stdout when status != 0 and output was already printed" do
+        unless FastlaneCore::Helper.windows?
+          expect(Process).to receive(:wait2).and_call_original
+        end
+
+        expect do
+          FastlaneCore::CommandExecutor.execute(
+            command: failing_command,
+            print_all: true,
+            error: proc do |_error_output| end
+          )
+        end.not_to output(failing_command_output).to_stdout
+      end
+
+      it "prints output to stdout only once when status != 0 and output was not already printed" do
+        unless FastlaneCore::Helper.windows?
+          expect(Process).to receive(:wait2).exactly(3).and_call_original
+        end
+
+        expect do
+          FastlaneCore::CommandExecutor.execute(
+            command: failing_command,
+            print_all: false,
+            error: nil
+          )
+        end.to output(failing_command_output).to_stdout.and(raise_error(FastlaneCore::Interface::FastlaneError) do |error|
+          expect(error.to_s).to eq("Exit status: 42")
+        end)
+
+        expect do
+          FastlaneCore::CommandExecutor.execute(
+            command: failing_command,
+            print_all: false,
+            error: proc do |_error_output| end
+          )
+        end.to output(failing_command_output).to_stdout
+
+        expect do
+          FastlaneCore::CommandExecutor.execute(
+            command: failing_command,
+            print_all: true,
+            suppress_output: true,
+            error: proc do |_error_output| end
+          )
+        end.to output(failing_command_output).to_stdout
+      end
+
+      # 127 comes from a child that could not start the program: only the PTY reports it, and Windows has none
+      it "calls the error block once, with exit status 127, when the program does not exist", unless: FastlaneCore::Helper.windows? do
+        allow(FastlaneCore::UI).to receive(:command)
+        calls = []
+        result = FastlaneCore::CommandExecutor.execute(command: "fl-no-such-program", suppress_error_output: true, error: proc { |output, status| calls << [output, status] })
+
+        expect(calls).to eq([[result, 127]])
+        expect(result).to match(/No such file or directory/)
+      end
+
+      it "calls the error block once, with exit status -1, when the command is killed", unless: FastlaneCore::Helper.windows? do
+        allow(FastlaneCore::UI).to receive(:command)
+        calls = []
+        # The shell Ruby starts kills itself: Ubuntu's dash, given "sh -c ...", would wait for the inner shell and exit 137
+        FastlaneCore::CommandExecutor.execute(command: "kill -9 $$", suppress_error_output: true, error: proc { |output, status| calls << status })
+
+        expect(calls).to eq([-1])
+      end
+
+      it "calls error block with output argument" do
+        unless FastlaneCore::Helper.windows?
+          expect(Process).to receive(:wait2).twice.and_call_original
+        end
+
+        error_block_input = nil
+        result = FastlaneCore::CommandExecutor.execute(
+          command: failing_command,
+          print_all: true,
+          error: proc do |error_output|
+            error_block_input = error_output
+          end
+        )
+        expect(error_block_input).to eq(failing_command_error_input)
+
+        error_block_input = nil
+        result = FastlaneCore::CommandExecutor.execute(
+          command: failing_command,
+          print_all: false,
+          error: proc do |error_output|
+            error_block_input = error_output
+          end
+        )
+        expect(error_block_input).to eq(failing_command_error_input)
+      end
+
+      it "does not print output or exit status when failure output is suppressed" do
+        unless FastlaneCore::Helper.windows?
+          expect(Process).to receive(:wait2).and_call_original
+        end
+
+        error_block_input = nil
+        error_block_status = nil
+
+        expect(FastlaneCore::UI).not_to receive(:error)
+
+        expect do
+          FastlaneCore::CommandExecutor.execute(
+            command: failing_command,
+            print_all: false,
+            print_command: false,
+            suppress_error_output: true,
+            error: proc do |error_output, status|
+              error_block_input = error_output
+              error_block_status = status
+            end
+          )
+        end.not_to output.to_stdout
+
+        expect(error_block_input).to eq(failing_command_error_input)
+        expect(error_block_status).to eq(42)
+      end
+
+      it "prints output and exit status when failure output is suppressed in verbose mode" do
+        expect(FastlaneCore::FastlanePty).to receive(:spawn) do |command, &block|
+          expect(command).to eq("failing command")
+
+          block.yield(["log\n"], nil, nil)
+          42
+        end
+
+        error_block_input = nil
+        error_block_status = nil
+
+        expect(FastlaneCore::UI).to receive(:command_output).with("log")
+        expect(FastlaneCore::UI).to receive(:error).with("Exit status: 42")
+
+        FastlaneSpec::Env.with_verbose(true) do
+          FastlaneCore::CommandExecutor.execute(
+            command: "failing command",
+            print_command: false,
+            suppress_error_output: true,
+            error: proc do |error_output, status|
+              error_block_input = error_output
+              error_block_status = status
+            end
+          )
+        end
+
+        expect(error_block_input).to eq("log")
+        expect(error_block_status).to eq(42)
+      end
+
+      it "does not print rescued command output when failure output is suppressed" do
+        command_error = StandardError.new("pty error")
+        allow(command_error).to receive(:exit_status).and_return(42)
+        expect(FastlaneCore::FastlanePty).to receive(:spawn).and_raise(command_error)
+
+        error_block_input = nil
+
+        expect do
+          FastlaneCore::CommandExecutor.execute(
+            command: "failing command",
+            print_command: false,
+            suppress_error_output: true,
+            error: proc do |error_output|
+              error_block_input = error_output
+            end
+          )
+        end.not_to output.to_stdout
+
+        expect(error_block_input).to eq("pty error")
+      end
+
+      it "prints rescued command output when failure output is suppressed in verbose mode" do
+        command_error = StandardError.new("pty error")
+        allow(command_error).to receive(:exit_status).and_return(42)
+        expect(FastlaneCore::FastlanePty).to receive(:spawn).and_raise(command_error)
+
+        error_block_calls = []
+
+        expect(FastlaneCore::UI).not_to receive(:error)
+
+        expect do
+          FastlaneSpec::Env.with_verbose(true) do
+            FastlaneCore::CommandExecutor.execute(
+              command: "failing command",
+              print_command: false,
+              suppress_error_output: true,
+              error: proc do |error_output, status|
+                error_block_calls << [error_output, status]
+              end
+            )
+          end
+        end.to output("pty error\n").to_stdout
+
+        expect(error_block_calls).to eq([["pty error", 42]])
+      end
+
+      it "still raises when failure output is suppressed without an error block" do
+        unless FastlaneCore::Helper.windows?
+          expect(Process).to receive(:wait2).and_call_original
+        end
+
+        raised_error = nil
+
+        expect(FastlaneCore::UI).not_to receive(:error)
+
+        expect do
+          begin
+            FastlaneCore::CommandExecutor.execute(
+              command: failing_command,
+              print_all: false,
+              print_command: false,
+              suppress_error_output: true
+            )
+          rescue => ex
+            raised_error = ex
+          end
+        end.not_to output.to_stdout
+
+        expect(raised_error).to be_a(FastlaneCore::Interface::FastlaneError)
+        expect(raised_error.to_s).to eq("Exit status: 42")
+      end
+    end
+
+    describe "run" do
+      # The Ruby running the specs, as a child program that exists on every platform
+      def ruby(script)
+        [RbConfig.ruby, "-e", script]
+      end
+
+      before do
+        allow(FastlaneCore::UI).to receive(:command)
+        allow(FastlaneCore::UI).to receive(:command_output)
+      end
+
+      it "passes each argument to the program as given, without a shell" do
+        output = described_class.run(*ruby("print ARGV.inspect"), "$HOME a  b", "it's")
+        expect(output).to eq('["$HOME a  b", "it\'s"]')
+      end
+
+      it "runs a single string as a program name, not as a shell command line" do
+        expect do
+          described_class.run("echo hello")
+        end.to raise_error(FastlaneCore::Interface::FastlaneError, /`#{Regexp.escape(['echo hello'].shelljoin)}` failed: No such file or directory/)
+      end
+
+      it "returns stdout and stderr together by default" do
+        expect(described_class.run(*ruby("$stdout.print 'out '; $stdout.flush; $stderr.print 'err'"))).to eq("out err")
+      end
+
+      it "returns stdout only with separate_stderr" do
+        expect(described_class.run(*ruby("print 'out'; $stderr.puts 'err'"), separate_stderr: true)).to eq("out")
+      end
+
+      it "raises with the exit status and the end of the output" do
+        expect do
+          described_class.run(*ruby("print 'out'; $stderr.puts 'err'; exit 3"), separate_stderr: true)
+        end.to raise_error(FastlaneCore::Interface::FastlaneError, /failed with exit status 3:\nerr/)
+      end
+
+      it "returns what the error block returns instead of raising" do
+        result = described_class.run(*ruby("$stderr.puts 'err'; exit 3"), separate_stderr: true, error: ->(output, status) { [output, status.exitstatus] })
+        expect(result).to eq(["err\n", 3])
+      end
+
+      it "fails like a failed command when the program does not exist" do
+        expect do
+          described_class.run("fl-no-such-program", "x")
+        end.to raise_error(FastlaneCore::Interface::FastlaneError, /`fl-no-such-program x` failed: No such file or directory/)
+      end
+
+      it "gives the error block a missing program too" do
+        expect(described_class.run("fl-no-such-program", error: ->(output, status) { [output, status] })).to match([/No such file or directory/, nil])
+      end
+
+      it "passes an environment hash given first" do
+        expect(described_class.run({ "FL_SPEC_RUN" => "set" }, *ruby("print ENV['FL_SPEC_RUN']"))).to eq("set")
+      end
+
+      it "writes stdin to the program" do
+        expect(described_class.run(*ruby("print $stdin.read"), stdin: "data")).to eq("data")
+      end
+
+      it "gives the program an empty input when no stdin is given, instead of one nobody writes to" do
+        expect(Timeout.timeout(10) { described_class.run(*ruby("print $stdin.read.inspect")) }).to eq('""')
+      end
+
+      it "prints the command, shell-escaped, and not its output by default" do
+        described_class.run(*ruby("print 'secret'"), "a b")
+        expect(FastlaneCore::UI).to have_received(:command).with(/ #{Regexp.escape(['-e', "print 'secret'", 'a b'].shelljoin)}\z/)
+        expect(FastlaneCore::UI).not_to have_received(:command_output)
+      end
+
+      it "prints both streams with print_output" do
+        described_class.run(*ruby("puts 'out'; $stderr.puts 'err'"), separate_stderr: true, print_output: true)
+        expect(FastlaneCore::UI).to have_received(:command_output).with("out")
+        expect(FastlaneCore::UI).to have_received(:command_output).with("err")
+      end
+
+      it "names the signal when the program is killed", unless: FastlaneCore::Helper.windows? do
+        expect do
+          described_class.run(*ruby("Process.kill(:KILL, Process.pid)"))
+        end.to raise_error(FastlaneCore::Interface::FastlaneError, /failed: killed by SIGKILL/)
+      end
+
+      it "runs the program in chdir, leaving fastlane's directory alone" do
+        Dir.mktmpdir do |dir|
+          expect(described_class.run(*ruby("print Dir.pwd"), chdir: dir)).to eq(File.realpath(dir))
+          expect(Dir.pwd).not_to eq(File.realpath(dir))
+        end
+      end
+
+      it "fails naming the directory, not the program, when chdir does not exist" do
+        expect do
+          described_class.run(*ruby("print 1"), chdir: "/fl-no-such-dir")
+        end.to raise_error(FastlaneCore::Interface::FastlaneError, %r{failed: no directory '/fl-no-such-dir'})
+      end
+
+      it "gives the error block a missing chdir too" do
+        expect(described_class.run(*ruby("print 1"), chdir: "/fl-no-such-dir", error: ->(output, status) { [output, status] })).to eq(["no directory '/fl-no-such-dir'", nil])
+      end
+
+      it "does not block when the program writes a lot to stderr" do
+        output = Timeout.timeout(20) { described_class.run(*ruby("$stderr.write('x' * 1_048_576); print 'out'"), separate_stderr: true) }
+        expect(output).to eq("out")
       end
     end
 

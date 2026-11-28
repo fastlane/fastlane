@@ -2,7 +2,7 @@
   <img src="/img/actions/precheck.png" width="250">
 </p>
 
-Precheck
+_precheck_
 ============
 
 ###### Check your app using a community driven set of App Store review rules to avoid being rejected
@@ -23,8 +23,8 @@ Apple rejects builds for many avoidable metadata issues like including swear wor
 # Features
 
 
-|          |  precheck Features  |
-|----------|-----------------|
+|          |  _precheck_ Features  |
+|----------|-----------------------|
 🐛 |  product bug mentions
 🙅 | Swear word checker
 🤖 | Mentioning other platforms

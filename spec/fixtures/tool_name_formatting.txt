@@ -1,0 +1,27 @@
+Some lines in this file should start with a special formatting (the same used in CONTRIBUTING.md), so they are ignored by the name formatting checks.
+
+- ❌ "Use Fastlane to automate your screenshots."
+- ❌ "Use _Fastlane_ to automate your screenshots."
+- ❌ "Fastlane helps you deliver faster."
+- ❌ "Match makes code signing management easy."
+Use _fastlane_ to automate your screenshots.
+_fastlane_ helps you deliver faster.
+_match_ makes code signing management easy.
+- ❌ "`fastlane` is an all-in-one tool for app automation."
+- ❌ "**fastlane** is an all-in-one tool for app automation."
+- ❌ "fastlane is an all-in-one tool for app automation."
+- ❌ "<ins>fastlane</ins> is an all-in-one tool for app automation."
+- ❌ "`match` makes code signing management easy."
+_fastlane_ is an all-in-one tool for app automation.
+_match_ makes code signing management easy.
+FastLane makes code signing management easy.
+Fastlane makes code signing management easy.
+_FastLane_ makes code signing management easy.
+A sentence that has a tool name in the beginning of an env var: `MATCH_FILE`
+A sentence that has a tool name in the end of an env var: `UPDATE_FASTLANE`
+A sentence that has a tool name in the middle of an env var: `SOMETHING_FASTLANE_SOMETHING`
+A sentence that contains a _FastLane_ keyword, but also an env var: `FASTLANE_SKIP_CHANGELOG`.
+A sentence that contains `<PATH_TO_YOUR_LOCAL_FASTLANE_CLONE>` placeholder env var.
+A sentence that contains `File.expand_path("<PATH_TO_YOUR_LOCAL_FASTLANE_CLONE>")` placeholder string.
+A sentence that has a weird-looking env var with no prefix other than the delimiter: `_FASTLANE_SOMETHING`
+A sentence that has a weird-looking env var with no suffix other than the delimiter: `SOMETHING_FASTLANE_`

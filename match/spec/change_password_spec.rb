@@ -17,16 +17,21 @@ describe Match do
       config = FastlaneCore::Configuration.create(Match::Options.available_options, values)
       repo_dir = Dir.mktmpdir
 
-      fake_storage = "fake_storage"
-      expect(Match::Storage::GitStorage).to receive(:configure).with(
+      fake_storage = +"fake_storage"
+      expect(Match::Storage::GitStorage).to receive(:configure).with({
         git_url: git_url,
         shallow_clone: true,
         skip_docs: false,
         git_branch: "master",
         git_full_name: nil,
         git_user_email: nil,
-        clone_branch_directly: false
-      ).and_return(fake_storage)
+        clone_branch_directly: false,
+        git_basic_authorization: nil,
+        git_bearer_authorization: nil,
+        git_private_key: nil,
+        type: config[:type],
+        platform: config[:platform]
+      }).and_return(fake_storage)
 
       allow(fake_storage).to receive(:download)
       allow(fake_storage).to receive(:working_directory).and_return(repo_dir)
@@ -34,6 +39,8 @@ describe Match do
 
       allow(Match::ChangePassword).to receive(:ensure_ui_interactive)
       allow(FastlaneCore::Helper).to receive(:ask_password).and_return("")
+      allow(Security::InternetPassword).to receive(:add)
+      expect(Security::InternetPassword).to receive(:delete).with(server: "match_#{git_url}")
 
       expect(fake_storage).to receive(:clear_changes)
 

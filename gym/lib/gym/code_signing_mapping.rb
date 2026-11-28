@@ -80,13 +80,16 @@ module Gym
       destination = Gym.config[:destination].dup
       destination.slice!("generic/platform=")
       destination_sdkroot = []
+      # gym sets "macOS" and "visionOS" (detect_values.rb); "macosx" stays for destinations users pass
       case destination
-      when "macosx"
+      when "macOS", "macosx"
         destination_sdkroot = ["macosx"]
       when "iOS"
         destination_sdkroot = ["iphoneos", "watchos"]
       when "tvOS"
         destination_sdkroot = ["appletvos"]
+      when "visionOS"
+        destination_sdkroot = ["xros"]
       end
 
       # Catalyst projects will always have an "iphoneos" sdkroot
@@ -115,7 +118,10 @@ module Gym
 
       configuration = Gym.config[:configuration]
       configuration ||= extract_from_scheme.call if Gym.config[:scheme]
-      configuration ||= self.project.default_build_settings(key: "CONFIGURATION")
+      unless configuration
+        self.project.verify_xcodebuild_settings_lookup_allowed!("CONFIGURATION", option: "configuration")
+        configuration = self.project.default_build_settings(key: "CONFIGURATION")
+      end
       return configuration
     end
 
@@ -193,13 +199,11 @@ module Gym
         rescue => ex
           # We catch errors here, as we might run into an exception on one included project
           # But maybe the next project actually contains the information we need
-          if Helper.xcode_at_least?("9.0")
-            UI.error("Couldn't automatically detect the provisioning profile mapping")
-            UI.error("Since Xcode 9 you need to provide an explicit mapping of what")
-            UI.error("provisioning profile to use for each target of your app")
-            UI.error(ex)
-            UI.verbose(ex.backtrace.join("\n"))
-          end
+          UI.error("Couldn't automatically detect the provisioning profile mapping")
+          UI.error("You need to provide an explicit mapping of what")
+          UI.error("provisioning profile to use for each target of your app")
+          UI.error(ex)
+          UI.verbose(ex.backtrace.join("\n"))
         end
       end
 

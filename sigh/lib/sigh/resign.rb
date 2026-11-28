@@ -1,4 +1,5 @@
 require 'shellwords'
+require 'security'
 require 'fastlane_core/globals'
 
 require_relative 'module'
@@ -8,29 +9,28 @@ module Sigh
   class Resign
     def run(options, args)
       # get the command line inputs and parse those into the vars we need...
-      ipa, signing_identity, provisioning_profiles, entitlements, version, display_name, short_version, bundle_version, new_bundle_id, use_app_entitlements, keychain_path = get_inputs(options, args)
+      ipa, signing_identity, provisioning_profiles, entitlements, version, display_name, short_version, bundle_version, new_bundle_id, use_app_entitlements, keychain_path, page_size = get_inputs(options, args)
       # ... then invoke our programmatic interface with these vars
-      unless resign(ipa, signing_identity, provisioning_profiles, entitlements, version, display_name, short_version, bundle_version, new_bundle_id, use_app_entitlements, keychain_path)
+      unless resign(ipa, signing_identity, provisioning_profiles, entitlements, version, display_name, short_version, bundle_version, new_bundle_id, use_app_entitlements, keychain_path, page_size)
         UI.user_error!("Failed to re-sign .ipa")
       end
     end
 
-    def self.resign(ipa, signing_identity, provisioning_profiles, entitlements, version, display_name, short_version, bundle_version, new_bundle_id, use_app_entitlements, keychain_path)
-      self.new.resign(ipa, signing_identity, provisioning_profiles, entitlements, version, display_name, short_version, bundle_version, new_bundle_id, use_app_entitlements, keychain_path)
+    def self.resign(ipa, signing_identity, provisioning_profiles, entitlements, version, display_name, short_version, bundle_version, new_bundle_id, use_app_entitlements, keychain_path, pagesize = nil)
+      self.new.resign(ipa, signing_identity, provisioning_profiles, entitlements, version, display_name, short_version, bundle_version, new_bundle_id, use_app_entitlements, keychain_path, pagesize)
     end
 
-    def resign(ipa, signing_identity, provisioning_profiles, entitlements, version, display_name, short_version, bundle_version, new_bundle_id, use_app_entitlements, keychain_path)
+    def resign(ipa, signing_identity, provisioning_profiles, entitlements, version, display_name, short_version, bundle_version, new_bundle_id, use_app_entitlements, keychain_path, pagesize = nil)
       resign_path = find_resign_path
 
       if keychain_path
         keychain_path_absolute = File.expand_path(keychain_path)
 
-        current_keychains = `security list-keychains`
-        current_keychains.delete!("\n")
+        current_keychains = Security::Keychain.list(:user).map(&:filename)
 
         unless current_keychains.include?(keychain_path_absolute)
           previous_keychains = current_keychains
-          `security list-keychains -s #{current_keychains} '#{keychain_path_absolute}'`
+          Security::Keychain.set_search_list(current_keychains + [keychain_path_absolute])
         end
       end
 
@@ -45,20 +45,21 @@ module Sigh
       entitlements = "-e #{entitlements.shellescape}" if entitlements
 
       provisioning_options = create_provisioning_options(provisioning_profiles)
-      version = "-n #{version}" if version
+      version = "-n #{version.shellescape}" if version
       display_name = "-d #{display_name.shellescape}" if display_name
-      short_version = "--short-version #{short_version}" if short_version
-      bundle_version = "--bundle-version #{bundle_version}" if bundle_version
+      short_version = "--short-version #{short_version.shellescape}" if short_version
+      bundle_version = "--bundle-version #{bundle_version.shellescape}" if bundle_version
       verbose = "-v" if FastlaneCore::Globals.verbose?
       bundle_id = "-b '#{new_bundle_id}'" if new_bundle_id
       use_app_entitlements_flag = "--use-app-entitlements" if use_app_entitlements
       specific_keychain = "--keychain-path #{keychain_path.shellescape}" if keychain_path
+      pagesize_option = "--pagesize #{pagesize}" if pagesize
 
       command = [
         resign_path.shellescape,
         ipa.shellescape,
         signing_identity.shellescape,
-        provisioning_options, # we are aleady shellescaping this above, when we create the provisioning_options from the provisioning_profiles
+        provisioning_options, # we are already shellescaping this above, when we create the provisioning_options from the provisioning_profiles
         entitlements,
         version,
         display_name,
@@ -68,6 +69,7 @@ module Sigh
         verbose,
         bundle_id,
         specific_keychain,
+        pagesize_option,
         ipa.shellescape # Output path must always be last argument
       ].join(' ')
 
@@ -82,7 +84,7 @@ module Sigh
         false
       end
     ensure
-      `security list-keychains -s #{previous_keychains}` if previous_keychains
+      Security::Keychain.set_search_list(previous_keychains) if previous_keychains
     end
 
     def get_inputs(options, args)
@@ -97,12 +99,13 @@ module Sigh
       new_bundle_id = options.new_bundle_id || nil
       use_app_entitlements = options.use_app_entitlements || nil
       keychain_path = options.keychain_path || nil
+      page_size = options.page_size || nil
 
       if options.provisioning_name
         UI.important("The provisioning_name (-n) option is not applicable to resign. You should use provisioning_profile (-p) instead")
       end
 
-      return ipa, signing_identity, provisioning_profiles, entitlements, version, display_name, short_version, bundle_version, new_bundle_id, use_app_entitlements, keychain_path
+      return ipa, signing_identity, provisioning_profiles, entitlements, version, display_name, short_version, bundle_version, new_bundle_id, use_app_entitlements, keychain_path, page_size
     end
 
     def find_resign_path
@@ -110,11 +113,11 @@ module Sigh
     end
 
     def find_ipa
-      Dir[File.join(Dir.pwd, '*.ipa')].sort { |a, b| File.mtime(a) <=> File.mtime(b) }.first
+      Dir[File.join(Dir.pwd, '*.ipa')].min_by { |f| File.mtime(f) }
     end
 
     def find_provisioning_profile
-      Dir[File.join(Dir.pwd, '*.mobileprovision')].sort { |a, b| File.mtime(a) <=> File.mtime(b) }.first
+      Dir[File.join(Dir.pwd, '*.mobileprovision')].min_by { |f| File.mtime(f) }
     end
 
     def find_signing_identity(signing_identity)
@@ -186,23 +189,7 @@ module Sigh
 
     # Hash of available signing identities
     def installed_identities
-      available = request_valid_identities
-      ids = {}
-      available.split("\n").each do |current|
-        begin
-          sha1 = current.match(/[a-zA-Z0-9]{40}/).to_s
-          name = current.match(/.*\"(.*)\"/)[1]
-          ids[sha1] = name
-        rescue
-          nil
-        end # the last line does not match
-      end
-
-      ids
-    end
-
-    def request_valid_identities
-      `security find-identity -v -p codesigning`
+      Security::Identity.find.to_h { |identity| [identity.sha1, identity.name] }
     end
 
     def installed_identity_descriptions

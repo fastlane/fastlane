@@ -72,7 +72,7 @@ module Spaceship
         puts("Looking for App Store Connect Team with name #{t_name}") if Spaceship::Globals.verbose?
 
         teams.each do |t|
-          t_id = t['providerId'].to_s if t['name'].casecmp(t_name).zero?
+          t_id = t['providerId'].to_s if t['name'].strip.casecmp(t_name).zero?
         end
 
         puts("Could not find team with name '#{t_name}', trying to fallback to default team") if t_id.length.zero?
@@ -91,7 +91,7 @@ module Spaceship
       # user didn't specify a team... #thisiswhywecanthavenicethings
       loop do
         puts("Multiple #{'App Store Connect teams'.yellow} found, please enter the number of the team you want to use: ")
-        if ENV["FASTLANE_HIDE_TEAM_INFORMATION"].to_s.length == 0
+        unless Spaceship::Globals.env_truthy?("FASTLANE_HIDE_TEAM_INFORMATION")
           first_team = teams.first
           puts("Note: to automatically choose the team, provide either the App Store Connect Team ID, or the Team Name in your fastlane/Appfile:")
           puts("Alternatively you can pass the team name or team ID using the `FASTLANE_ITC_TEAM_ID` or `FASTLANE_ITC_TEAM_NAME` environment variable")
@@ -297,6 +297,8 @@ module Spaceship
             "appletvos"
           when "MAC_OS"
             "osx"
+          when "VISION_OS"
+            "xros"
           when "IOS"
             "ios"
           else
@@ -659,7 +661,7 @@ module Spaceship
       r = request(:get, "ra/apps/#{app_id}/pricing/intervals")
       data = parse_response(r, 'data')
 
-      # preOrder isn't needed for for the request and has some
+      # preOrder isn't needed for the request and has some
       # values that can cause a failure (invalid dates) so we are removing it
       data.delete('preOrder')
 
@@ -1011,7 +1013,7 @@ module Spaceship
     end
 
     #####################################################
-    # @!group CandiateBuilds
+    # @!group CandidateBuilds
     #####################################################
 
     def candidate_builds(app_id, version_id)

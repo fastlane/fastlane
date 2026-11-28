@@ -83,7 +83,9 @@ module Deliver
       if options[:ipa]
         options[:platform] ||= FastlaneCore::IpaFileAnalyser.fetch_app_platform(options[:ipa])
       elsif options[:pkg]
-        options[:platform] = 'osx'
+        # :pkg defaults to any *.pkg in the current directory, so only infer
+        # osx from it when the user hasn't chosen a platform themselves
+        options[:platform] = 'osx' unless options.specified?(:platform)
       end
     end
 
@@ -92,7 +94,7 @@ module Deliver
       return unless languages
 
       # 2020-08-24 - Available locales are not available as an endpoint in App Store Connect
-      # Update with Spaceship::Tunes.client.available_languages.sort (as long as endpoint is avilable)
+      # Update with Spaceship::Tunes.client.available_languages.sort (as long as endpoint is available)
       all_languages = Deliver::Languages::ALL_LANGUAGES
       diff = languages - all_languages
 

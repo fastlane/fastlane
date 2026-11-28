@@ -47,14 +47,14 @@ module Spaceship
             c.use(Spaceship::TokenRefreshMiddleware, token)
             c.adapter(Faraday.default_adapter)
 
-            if ENV['SPACESHIP_DEBUG']
+            if Spaceship::Globals.env_truthy?('SPACESHIP_DEBUG')
               # for debugging only
               # This enables tracking of networking requests using Charles Web Proxy
               c.proxy = "https://127.0.0.1:8888"
               c.ssl[:verify_mode] = OpenSSL::SSL::VERIFY_NONE
             elsif ENV["SPACESHIP_PROXY"]
               c.proxy = ENV["SPACESHIP_PROXY"]
-              c.ssl[:verify_mode] = OpenSSL::SSL::VERIFY_NONE if ENV["SPACESHIP_PROXY_SSL_VERIFY_NONE"]
+              c.ssl[:verify_mode] = OpenSSL::SSL::VERIFY_NONE if Spaceship::Globals.env_truthy?("SPACESHIP_PROXY_SSL_VERIFY_NONE")
             end
 
             if ENV["DEBUG"]
@@ -65,11 +65,11 @@ module Spaceship
       end
 
       # Instance level hostname only used when creating
-      # App Store Connect API Farady client.
+      # App Store Connect API Faraday client.
       # Forwarding to class level if using web session.
       def hostname
         if @token
-          return "https://api.appstoreconnect.apple.com/v1/"
+          return @token.in_house ? "https://api.enterprise.developer.apple.com/" : "https://api.appstoreconnect.apple.com/"
         end
         return self.class.hostname
       end
@@ -87,13 +87,14 @@ module Spaceship
         return @token.nil?
       end
 
-      def build_params(filter: nil, includes: nil, limit: nil, sort: nil, cursor: nil)
+      def build_params(filter: nil, includes: nil, fields: nil, limit: nil, sort: nil, cursor: nil)
         params = {}
 
         filter = filter.delete_if { |k, v| v.nil? } if filter
 
         params[:filter] = filter if filter && !filter.empty?
         params[:include] = includes if includes
+        params[:fields] = fields if fields
         params[:limit] = limit if limit
         params[:sort] = sort if sort
         params[:cursor] = cursor if cursor
@@ -114,8 +115,10 @@ module Spaceship
       end
 
       def post(url_or_path, body, tries: 5)
+        # A single try also stops the transport from resending a POST that Apple may have processed
+        request_options = tries > 1 ? {} : { resend: false }
         response = with_asc_retry(tries) do
-          request(:post) do |req|
+          request(:post, **request_options) do |req|
             req.url(url_or_path)
             req.body = body.to_json
             req.headers['Content-Type'] = 'application/json'
@@ -148,6 +151,17 @@ module Spaceship
         handle_response(response)
       end
 
+      # The raw response, with retries but without raising for 4xx statuses (401 and 403 still raise).
+      def raw_request(method, url_or_path, body = nil)
+        with_asc_retry do
+          request(method) do |req|
+            req.url(url_or_path)
+            req.body = body.to_json if body
+            req.headers['Content-Type'] = 'application/json' if body
+          end
+        end
+      end
+
       protected
 
       class TimeoutRetryError < StandardError
@@ -156,14 +170,23 @@ module Spaceship
         end
       end
 
-      def with_asc_retry(tries = 5, &_block)
+      class TooManyRequestsError < StandardError
+        def initialize(msg)
+          super
+        end
+      end
+
+      def with_asc_retry(tries = 5, backoff = 1, &_block)
         response = yield
 
         status = response.status if response
 
         if [500, 504].include?(status)
-          msg = "Timeout received! Retrying after 3 seconds (remaining: #{tries})..."
-          raise TimeoutRetryError, msg
+          raise TimeoutRetryError, "Server error got #{status}"
+        end
+
+        if status == 429
+          raise TooManyRequestsError, "Too many requests, backing off #{backoff} seconds"
         end
 
         return response
@@ -173,19 +196,27 @@ module Spaceship
         if tries.zero?
           raise error
         else
-          msg = "Token has expired or has been revoked! Trying to refresh..."
+          msg = "Token has expired, issued-at-time is in the future, or has been revoked! Trying to refresh..."
           puts(msg) if Spaceship::Globals.verbose?
           @token.refresh!
           retry
         end
       rescue TimeoutRetryError => error
         tries -= 1
-        puts(error) if Spaceship::Globals.verbose?
         if tries.zero?
           return response
         else
+          puts("#{error.message}, retrying (remaining: #{tries})...") if Spaceship::Globals.verbose?
           retry
         end
+      rescue TooManyRequestsError => error
+        if backoff > 3600
+          raise TooManyRequestsError, "Too many requests, giving up after backing off for > 3600 seconds."
+        end
+        puts(error) if Spaceship::Globals.verbose?
+        Kernel.sleep(backoff)
+        backoff *= 2
+        retry
       end
 
       def handle_response(response)
@@ -214,7 +245,7 @@ module Spaceship
       def handle_error(response)
         body = response.body.empty? ? {} : response.body
 
-        # Setting body nil if invalid JSON which can happen if 502
+        # A body that is not JSON, such as a 502 page, stays a String
         begin
           body = JSON.parse(body) if body.kind_of?(String)
         rescue
@@ -225,7 +256,8 @@ module Spaceship
         when 401
           raise UnauthorizedAccessError, format_errors(response)
         when 403
-          error = (body['errors'] || []).first || {}
+          errors = body['errors'] if body.kind_of?(Hash)
+          error = (errors || []).first || {}
           error_code = error['code']
           if error_code == "FORBIDDEN.REQUIRED_AGREEMENTS_MISSING_OR_EXPIRED"
             raise ProgramLicenseAgreementUpdated, format_errors(response)
@@ -316,7 +348,13 @@ module Spaceship
         # }
 
         body = response.body.empty? ? {} : response.body
-        body = JSON.parse(body) if body.kind_of?(String)
+        if body.kind_of?(String)
+          begin
+            body = JSON.parse(body)
+          rescue JSON::ParserError
+            return body # not JSON, such as an HTML error page
+          end
+        end
 
         formatted_errors = (body['errors'] || []).map do |error|
           messages = [[error['title'], error['detail'], error.dig("source", "pointer")].compact.join(" - ")]
@@ -337,14 +375,6 @@ module Spaceship
       end
 
       private
-
-      def local_variable_get(binding, name)
-        if binding.respond_to?(:local_variable_get)
-          binding.local_variable_get(name)
-        else
-          binding.eval(name.to_s)
-        end
-      end
 
       def provider_id
         return team_id if self.provider.nil?

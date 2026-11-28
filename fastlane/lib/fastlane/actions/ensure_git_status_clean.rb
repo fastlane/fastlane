@@ -23,7 +23,9 @@ module Fastlane
         # Manual post processing trying to ignore certain file paths
         if (ignore_files = params[:ignore_files])
           repo_status = repo_status.lines.reject do |line|
-            path = line.split(' ').last
+            path = path_from_git_status_line(line)
+            next if path.empty?
+
             was_found = ignore_files.include?(path)
 
             UI.message("Ignoring '#{path}'") if was_found
@@ -52,6 +54,19 @@ module Fastlane
           end
           UI.user_error!(error_message)
         end
+      end
+
+      def self.path_from_git_status_line(line)
+        # Extract the file path from the line based on https://git-scm.com/docs/git-status#_output.
+        # The first two characters indicate the status of the file path (e.g. ' M')
+        #  M App/script.sh
+        #
+        # If the file path is renamed, the original path is also included in the line (e.g. 'R  ORIG_PATH -> PATH')
+        # R  App/script.sh -> App/script_renamed.sh
+        #
+        path = line.match(/^.. (.* -> )?(.*)$/)[2]
+        path = path.delete_prefix('"').delete_suffix('"')
+        return path
       end
 
       def self.description

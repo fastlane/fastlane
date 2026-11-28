@@ -1,0 +1,13 @@
+platform :ios do
+  lane :lane_no_param do
+    'No parameter'
+  end
+
+  lane :lane_hash_param do |options|
+    "name: #{options[:name].inspect}; version: #{options[:version].inspect}; interactive: #{options[:interactive].inspect}"
+  end
+
+  lane :lane_kw_params do |name:, version:, interactive: true|
+    "name: #{name.inspect}; version: #{version.inspect}; interactive: #{interactive.inspect}"
+  end
+end

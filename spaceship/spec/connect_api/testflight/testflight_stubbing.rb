@@ -2,11 +2,11 @@ class ConnectAPIStubbing
   class TestFlight
     class << self
       def read_fixture_file(filename)
-        File.read(File.join('spaceship', 'spec', 'connect_api', 'fixtures', 'testflight', filename))
+        spaceship_fixture(File.join('spaceship', 'spec', 'connect_api', 'fixtures', 'testflight', filename))
       end
 
       def read_binary_fixture_file(filename)
-        File.binread(File.join('spaceship', 'spec', 'connect_api', 'fixtures', 'testflight', filename))
+        spaceship_fixture(File.join('spaceship', 'spec', 'connect_api', 'fixtures', 'testflight', filename), binary: true)
       end
 
       # Necessary, as we're now running this in a different context
@@ -58,17 +58,20 @@ class ConnectAPIStubbing
           to_return(status: 200, body: read_fixture_file('beta_feedbacks.json'), headers: { 'Content-Type' => 'application/json' })
       end
 
-      def stub_beta_feedbacks_delete
-        stub_request(:delete, "https://appstoreconnect.apple.com/iris/v1/betaFeedbacks/987654321").
-          to_return(status: 200, body: "", headers: {})
-      end
-
       def stub_beta_groups
         stub_request(:get, "https://appstoreconnect.apple.com/iris/v1/betaGroups").
           to_return(status: 200, body: read_fixture_file('beta_groups.json'), headers: { 'Content-Type' => 'application/json' })
 
+        created_beta_group = JSON.parse(read_fixture_file('beta_create_group.json'))
         stub_request(:post, "https://appstoreconnect.apple.com/iris/v1/betaGroups").
-          to_return(status: 200, body: read_fixture_file('beta_create_group.json'), headers: { 'Content-Type' => 'application/json' })
+          to_return { |request|
+            request_body = JSON.parse(request.body)
+            response_body = created_beta_group.dup
+            %w{isInternalGroup hasAccessToAllBuilds}.each do |attribute|
+              response_body["data"]["attributes"][attribute] = request_body["data"]["attributes"][attribute]
+            end
+            { status: 200, body: JSON.dump(response_body), headers: { 'Content-Type' => 'application/json' } }
+          }
 
         stub_request(:delete, "https://appstoreconnect.apple.com/iris/v1/betaGroups/123456789").
           to_return(status: 200, body: "", headers: {})
@@ -97,6 +100,11 @@ class ConnectAPIStubbing
       def stub_build_deliveries
         stub_request(:get, "https://appstoreconnect.apple.com/iris/v1/apps/1234/buildDeliveries").
           to_return(status: 200, body: read_fixture_file('build_deliveries.json'), headers: { 'Content-Type' => 'application/json' })
+      end
+
+      def stub_build_uploads
+        stub_request(:get, "https://appstoreconnect.apple.com/iris/v1/apps/1234/buildUploads").
+          to_return(status: 200, body: read_fixture_file('build_uploads.json'), headers: { 'Content-Type' => 'application/json' })
       end
 
       def stub_builds

@@ -16,7 +16,7 @@ module Fastlane
       end
 
       def self.details
-        "If no branch could be found, this action will return an empty string. This is a wrapper for the internal action Actions.git_branch"
+        "If no branch could be found, this action will return an empty string. If `FL_GIT_BRANCH_DONT_USE_ENV_VARS` is `true`, it'll ignore CI ENV vars. This is a wrapper for the internal action Actions.git_branch"
       end
 
       def self.available_options

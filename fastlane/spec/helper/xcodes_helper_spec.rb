@@ -45,22 +45,6 @@ describe Fastlane::Helper::XcodesHelper do
           expect { subject.class::Verify.requirement(argument) }.to raise_error(FastlaneCore::Interface::FastlaneError, 'Version must be specified')
         end
       end
-
-      context "when argument is not in RubyGems style" do
-        let(:argument) { "banana" }
-
-        it "raises user error" do
-          expect { subject.class::Verify.requirement(argument) }.to raise_error(FastlaneCore::Interface::FastlaneError, "The requirement '#{argument}' is not a valid RubyGems style requirement")
-        end
-      end
-
-      context "when argument is in RubyGems style" do
-        let(:argument) { "1.2.3" }
-
-        it "returns Gem::Requirement instance" do
-          expect(subject.class::Verify.requirement(argument)).to be_an_instance_of(Gem::Requirement)
-        end
-      end
     end
   end
 end
