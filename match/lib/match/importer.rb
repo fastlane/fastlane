@@ -146,24 +146,13 @@ module Match
       p12_path ||= params[:import_certificate_private_key_file_path]
       profile_path ||= params[:import_provisioning_profile_file_path]
 
+      # Once a path is given as an option, don't prompt for the other files: the run may be non-interactive.
+      skip_prompt = [:import_certificate_file_path, :import_certificate_private_key_file_path, :import_provisioning_profile_file_path].any? { |key| params[key] }
+
       # Get and verify cert, p12 and profiles path
-      if cert_path.nil?
-        cert_path = ensure_valid_file_path(cert_path, "Certificate", ".cer", optional: true, skip_prompt: params[:import_suppress_ui_file_path_prompts])
-      else
-        cert_path = ensure_valid_file_path(cert_path, "Certificate", ".cer", optional: true, skip_prompt: true)
-      end
-
-      if p12_path.nil?
-        p12_path = ensure_valid_file_path(p12_path, "Private key", ".p12", optional: true, skip_prompt: params[:import_suppress_ui_file_path_prompts])
-      else
-        p12_path = ensure_valid_file_path(p12_path, "Private key", ".p12", optional: true, skip_prompt: true)
-      end
-
-      if profile_path.nil?
-        profile_path = ensure_valid_file_path(profile_path, "Provisioning profile", ".mobileprovision or .provisionprofile", optional: true, skip_prompt: params[:import_suppress_ui_file_path_prompts])
-      else
-        profile_path = ensure_valid_file_path(profile_path, "Provisioning profile", ".mobileprovision or .provisionprofile", optional: true, skip_prompt: true)
-      end
+      cert_path = ensure_valid_file_path(cert_path, "Certificate", ".cer", optional: true, skip_prompt: skip_prompt)
+      p12_path = ensure_valid_file_path(p12_path, "Private key", ".p12", optional: true, skip_prompt: skip_prompt)
+      profile_path = ensure_valid_file_path(profile_path, "Provisioning profile", ".mobileprovision or .provisionprofile", optional: true, skip_prompt: skip_prompt)
 
       return [cert_path, p12_path, profile_path]
     end
@@ -180,7 +169,8 @@ module Match
         file_path = File.exist?(file_path) ? file_path : nil
       end
 
-      UI.user_error!("#{file_description} does not exist at path: #{raw_file_path}") unless !file_path.nil? || optional
+      # An optional file may be left empty, but a path that was given must exist.
+      UI.user_error!("#{file_description} does not exist at path: #{raw_file_path}") if file_path.nil? && !(optional && raw_file_path.to_s.empty?)
       file_path
     end
   end
