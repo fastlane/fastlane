@@ -21,7 +21,7 @@ describe Fastlane do
           testfairy
           ipa
           import_from_git
-          hockey
+          import_from_gem
           deploygate
           crashlytics
           artifactory
@@ -40,6 +40,7 @@ describe Fastlane do
           swiftlint
           plugin_scores
           google_play_track_version_codes
+          google_play_track_release_names
           modify_services
           build_app
           build_android_app
@@ -61,6 +62,7 @@ describe Fastlane do
           upload_to_play_store
           upload_to_play_store_internal_app_sharing
           upload_to_testflight
+          download_universal_apk_from_google_play
           puts
           println
           echo
@@ -70,6 +72,8 @@ describe Fastlane do
           validate_play_store_json_key
           update_fastlane
           s3
+          match_nuke
+          trainer
         )
       end
 

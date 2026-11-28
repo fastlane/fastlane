@@ -21,7 +21,7 @@ module Gym
           print("Invalid code signing settings")
           print("Your project defines a provisioning profile that doesn't match the bundle identifier of your app")
           print("Make sure you use the correct provisioning profile for this app")
-          print("Take a look at the ouptput above for more information")
+          print("Take a look at the output above for more information")
           print("You can follow this guide: https://docs.fastlane.tools/codesigning/GettingStarted/")
         when /provisioning profiles matching the bundle identifier .(.*)./ # the . around the (.*) are for the strange "
           print("You don't have the provisioning profile for '#{$1}' installed on the local machine")
@@ -127,6 +127,14 @@ module Gym
         UI.build_failure!("Archive invalid")
       end
 
+      def handle_empty_ipa
+        UI.build_failure!("IPA invalid")
+      end
+
+      def handle_empty_pkg
+        UI.build_failure!("PKG invalid")
+      end
+
       private
 
       # Just to make things easier
@@ -137,15 +145,32 @@ module Gym
       def print_full_log_path
         return if Gym.config[:disable_xcpretty]
 
-        log_path = Gym::BuildCommandGenerator.xcodebuild_log_path
+        # Naming the log can read the build settings, for the first time when only exporting.
+        # As in print_xcode_version, that must not replace the failure being reported
+        begin
+          log_path = Gym::BuildCommandGenerator.xcodebuild_log_path
+        rescue => ex
+          UI.verbose("Couldn't find the build log to show it: #{ex}")
+          return
+        end
         return unless File.exist?(log_path)
 
         # `xcodebuild` doesn't properly mark lines as failure reason or important information
         # so we assume that the last few lines show the error message that's relevant
         # (at least that's what was correct during testing)
-        log_content = File.read(log_path).split("\n")[-5..-1]
+        log_lines = File.read(log_path).split("\n")
+        log_content = log_lines.last(5)
         log_content.each do |row|
           UI.command_output(row)
+        end
+
+        # If we didn't find the error in the last 5 lines, let's search for it
+        # This is specifically for errors that might be buried by subsequent warnings
+        last_5_lines = log_content.join("\n")
+        unless last_5_lines.include?("error:")
+          UI.verbose("Error not found in last 5 lines, searching for it in the log...")
+          error_line = log_lines.reverse.find { |l| l.include?("error:") }
+          UI.command_output(error_line) if error_line
         end
 
         UI.message("")
@@ -155,8 +180,6 @@ module Gym
       end
 
       def print_xcode9_plist_warning
-        return unless Helper.xcode_at_least?("9.0")
-
         # prevent crash in case of packaging error AND if you have set export_options to a path.
         return unless Gym.config[:export_options].kind_of?(Hash)
 
@@ -182,8 +205,14 @@ module Gym
           export_method: Gym.config[:export_method]
         }
 
-        sdk_path = Gym.project.build_settings(key: "SDKROOT")
-        values[:sdk] = File.basename(sdk_path) if sdk_path.to_s.length > 0
+        # This runs while a failure is being reported, so not being able to read the SDK (the
+        # lookup is disallowed, or times out) must not replace that failure with its own error
+        begin
+          sdk_path = Gym.project.build_settings(key: "SDKROOT")
+          values[:sdk] = File.basename(sdk_path) if sdk_path.to_s.length > 0
+        rescue => ex
+          UI.verbose("Couldn't read the SDK to show it: #{ex}")
+        end
 
         FastlaneCore::PrintTable.print_values(config: values,
                                            hide_keys: [],

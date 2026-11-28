@@ -8,6 +8,7 @@ module Fastlane
     end
 
     class BuildAppAction < Action
+      # rubocop:disable Metrics/PerceivedComplexity
       def self.run(values)
         require 'gym'
 
@@ -16,7 +17,7 @@ module Fastlane
         end
 
         if Actions.lane_context[SharedValues::MATCH_PROVISIONING_PROFILE_MAPPING]
-          # Since Xcode 9 you need to explicitly provide the provisioning profile per app target
+          # Xcode needs the provisioning profile for each app target
           # If the user is smart and uses match and gym together with fastlane, we can do all
           # the heavy lifting for them
           values[:export_options] ||= {}
@@ -35,10 +36,10 @@ module Fastlane
 
             values[:export_options][:provisioningProfiles] = hash_to_use
           else
-            self.show_xcode_9_warning
+            self.show_export_options_plist_warning
           end
         elsif Actions.lane_context[SharedValues::SIGH_PROFILE_PATHS]
-          # Since Xcode 9 you need to explicitly provide the provisioning profile per app target
+          # Xcode needs the provisioning profile for each app target
           # If the user used sigh we can match the profiles from sigh
           values[:export_options] ||= {}
           if values[:export_options].kind_of?(Hash)
@@ -50,7 +51,8 @@ module Fastlane
               begin
                 profile = FastlaneCore::ProvisioningProfile.parse(profile_path)
                 app_id_prefix = profile["ApplicationIdentifierPrefix"].first
-                bundle_id = profile["Entitlements"]["application-identifier"].gsub("#{app_id_prefix}.", "")
+                entitlements = profile["Entitlements"]
+                bundle_id = (entitlements["application-identifier"] || entitlements["com.apple.application-identifier"]).gsub("#{app_id_prefix}.", "")
                 values[:export_options][:provisioningProfiles][bundle_id] = profile["Name"]
               rescue => ex
                 UI.error("Couldn't load profile at path: #{profile_path}")
@@ -59,7 +61,7 @@ module Fastlane
               end
             end
           else
-            self.show_xcode_9_warning
+            self.show_export_options_plist_warning
           end
         end
 
@@ -118,6 +120,10 @@ module Fastlane
         "The absolute path to the generated ipa file"
       end
 
+      def self.return_type
+        :string
+      end
+
       def self.author
         "KrauseFx"
       end
@@ -154,10 +160,9 @@ module Fastlane
         :building
       end
 
-      def self.show_xcode_9_warning
-        return unless Helper.xcode_at_least?("9.0")
+      def self.show_export_options_plist_warning
         UI.message("You passed a path to a custom plist file for exporting the binary.")
-        UI.message("Make sure to include information about what provisioning profiles to use with Xcode 9")
+        UI.message("Make sure it includes the provisioning profile to use for each target")
         UI.message("More information: https://docs.fastlane.tools/codesigning/xcode-project/#xcode-9-and-up")
       end
     end

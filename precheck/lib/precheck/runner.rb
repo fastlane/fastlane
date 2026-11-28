@@ -8,6 +8,9 @@ require_relative 'options'
 
 module Precheck
   class Runner
+    class BlockingViolationError < FastlaneCore::Interface::FastlaneError
+    end
+
     attr_accessor :spaceship
 
     # Uses the spaceship to download app metadata and then run all rule checkers
@@ -18,10 +21,35 @@ module Precheck
                                          hide_keys: [:output_path],
                                              title: "Summary for precheck #{Fastlane::VERSION}")
 
-      unless Spaceship::Tunes.client
+      api_token = if (token = Spaceship::ConnectAPI::Token.from(hash: Precheck.config[:api_key], filepath: Precheck.config[:api_key_path]))
+                    UI.message("Creating authorization token for App Store Connect API")
+                    token
+                  elsif (token = Spaceship::ConnectAPI.token)
+                    UI.message("Using existing authorization token for App Store Connect API")
+                    token
+                  end
+
+      if api_token
+
+        # As of 2020-09-15, App Store Connect API does not have support for IAPs yet
+        # This means that API Key will fail if checking for IAPs.
+        #
+        # There is also a check in Deliver::Runner for this.
+        # Please remove check in Deliver when the API support IAPs.
+        if Precheck.config[:include_in_app_purchases]
+          UI.user_error!("Precheck cannot check In-app purchases with the App Store Connect API Key (yet). Exclude In-app purchases from precheck, disable the precheck step in your build step, or use Apple ID login")
+        end
+
+        Spaceship::ConnectAPI.token = api_token
+      elsif Spaceship::Tunes.client.nil?
+        # Username is now optional since addition of App Store Connect API Key
+        # Force asking for username to prompt user if not already set
+        Precheck.config.fetch(:username, force_ask: true)
+
+        # Team selection passed though FASTLANE_ITC_TEAM_ID and FASTLANE_ITC_TEAM_NAME environment variables
+        # Prompts select team if multiple teams and none specified
         UI.message("Starting login with user '#{Precheck.config[:username]}'")
-        Spaceship::Tunes.login(Precheck.config[:username])
-        Spaceship::Tunes.select_team
+        Spaceship::ConnectAPI.login(Precheck.config[:username], use_portal: false, use_tunes: true)
 
         UI.message("Successfully logged in")
       end
@@ -42,8 +70,7 @@ module Precheck
       end
 
       if processor_result.should_trigger_user_error?
-        UI.user_error!("precheck 👮‍♀️ 👮  found one or more potential problems that must be addressed before submitting to review")
-        return false
+        raise BlockingViolationError, "precheck 👮‍♀️ 👮  found one or more potential problems that must be addressed before submitting to review"
       end
 
       if processor_result.has_errors_or_warnings?
@@ -160,11 +187,12 @@ module Precheck
     end
 
     def app
-      Spaceship::Tunes::Application.find(Precheck.config[:app_identifier])
+      Spaceship::ConnectAPI::App.find(Precheck.config[:app_identifier])
     end
 
     def latest_app_version
-      @latest_version ||= app.latest_version
+      platform = Spaceship::ConnectAPI::Platform.map(Precheck.config[:platform])
+      @latest_version ||= Precheck.config[:use_live] ? app.get_live_app_store_version(platform: platform) : app.get_latest_app_store_version(platform: platform)
     end
 
     # Makes sure the current App ID exists. If not, it will show an appropriate error message

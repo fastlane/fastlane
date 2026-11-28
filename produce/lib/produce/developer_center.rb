@@ -1,5 +1,7 @@
+require 'ostruct'
 require 'spaceship'
 require_relative 'module'
+require_relative 'service'
 
 module Produce
   class DeveloperCenter
@@ -10,43 +12,84 @@ module Produce
     SERVICE_UNTIL_FIRST_LAUNCH = "untilfirstauth"
     SERVICE_LEGACY = "legacy"
     SERVICE_CLOUDKIT = "cloudkit"
+    SERVICE_GAME_CENTER_IOS = "ios"
+    SERVICE_GAME_CENTER_MAC = "mac"
+    SERVICE_PRIMARY_APP_CONSENT = "on"
 
     ALLOWED_SERVICES = {
       access_wifi: [SERVICE_ON, SERVICE_OFF],
+      app_attest: [SERVICE_ON, SERVICE_OFF],
       app_group: [SERVICE_ON, SERVICE_OFF],
       apple_pay: [SERVICE_ON, SERVICE_OFF],
       associated_domains: [SERVICE_ON, SERVICE_OFF],
       auto_fill_credential: [SERVICE_ON, SERVICE_OFF],
+      class_kit: [SERVICE_ON, SERVICE_OFF],
+      declared_age_range: [SERVICE_ON, SERVICE_OFF],
+      icloud: [SERVICE_LEGACY, SERVICE_CLOUDKIT],
+      custom_network_protocol: [SERVICE_ON, SERVICE_OFF],
       data_protection: [
         SERVICE_COMPLETE,
         SERVICE_UNLESS_OPEN,
         SERVICE_UNTIL_FIRST_LAUNCH
       ],
-      game_center: [SERVICE_ON, SERVICE_OFF],
+      extended_virtual_address_space: [SERVICE_ON, SERVICE_OFF],
+      family_controls: [SERVICE_ON, SERVICE_OFF],
+      file_provider_testing_mode: [SERVICE_ON, SERVICE_OFF],
+      fonts: [SERVICE_ON, SERVICE_OFF],
+      game_center: [SERVICE_GAME_CENTER_IOS, SERVICE_GAME_CENTER_MAC],
       health_kit: [SERVICE_ON, SERVICE_OFF],
+      hls_interstitial_preview: [SERVICE_ON, SERVICE_OFF],
       home_kit: [SERVICE_ON, SERVICE_OFF],
       hotspot: [SERVICE_ON, SERVICE_OFF],
-      icloud: [SERVICE_LEGACY, SERVICE_CLOUDKIT],
       in_app_purchase: [SERVICE_ON, SERVICE_OFF],
       inter_app_audio: [SERVICE_ON, SERVICE_OFF],
+      low_latency_hls: [SERVICE_ON, SERVICE_OFF],
+      managed_associated_domains: [SERVICE_ON, SERVICE_OFF],
+      maps: [SERVICE_ON, SERVICE_OFF],
       multipath: [SERVICE_ON, SERVICE_OFF],
       network_extension: [SERVICE_ON, SERVICE_OFF],
       nfc_tag_reading: [SERVICE_ON, SERVICE_OFF],
       personal_vpn: [SERVICE_ON, SERVICE_OFF],
       passbook: [SERVICE_ON, SERVICE_OFF],
       push_notification: [SERVICE_ON, SERVICE_OFF],
+      sign_in_with_apple: [SERVICE_PRIMARY_APP_CONSENT],
       siri_kit: [SERVICE_ON, SERVICE_OFF],
+      system_extension: [SERVICE_ON, SERVICE_OFF],
+      user_management: [SERVICE_ON, SERVICE_OFF],
       vpn_configuration: [SERVICE_ON, SERVICE_OFF],
       wallet: [SERVICE_ON, SERVICE_OFF],
-      wireless_accessory: [SERVICE_ON, SERVICE_OFF]
+      wireless_accessory: [SERVICE_ON, SERVICE_OFF],
+      car_play_audio_app: [SERVICE_ON, SERVICE_OFF],
+      car_play_messaging_app: [SERVICE_ON, SERVICE_OFF],
+      car_play_navigation_app: [SERVICE_ON, SERVICE_OFF],
+      car_play_voip_calling_app: [SERVICE_ON, SERVICE_OFF],
+      critical_alerts: [SERVICE_ON, SERVICE_OFF],
+      hotspot_helper: [SERVICE_ON, SERVICE_OFF],
+      driver_kit: [SERVICE_ON, SERVICE_OFF],
+      driver_kit_endpoint_security: [SERVICE_ON, SERVICE_OFF],
+      driver_kit_family_hid_device: [SERVICE_ON, SERVICE_OFF],
+      driver_kit_family_networking: [SERVICE_ON, SERVICE_OFF],
+      driver_kit_family_serial: [SERVICE_ON, SERVICE_OFF],
+      driver_kit_hid_event_service: [SERVICE_ON, SERVICE_OFF],
+      driver_kit_transport_hid: [SERVICE_ON, SERVICE_OFF],
+      multitasking_camera_access: [SERVICE_ON, SERVICE_OFF],
+      sf_universal_link_api: [SERVICE_ON, SERVICE_OFF],
+      vp9_decoder: [SERVICE_ON, SERVICE_OFF],
+      music_kit: [SERVICE_ON, SERVICE_OFF],
+      shazam_kit: [SERVICE_ON, SERVICE_OFF],
+      communication_notifications: [SERVICE_ON, SERVICE_OFF],
+      group_activities: [SERVICE_ON, SERVICE_OFF],
+      health_kit_estimate_recalibration: [SERVICE_ON, SERVICE_OFF],
+      time_sensitive_notifications: [SERVICE_ON, SERVICE_OFF],
     }
-
     def run
       login
       create_new_app
     end
 
     def create_new_app
+      return create_new_app_via_connect_api if using_connect_api?
+
       ENV["CREATED_NEW_APP_ID"] = Time.now.to_i.to_s
       if app_exists?
         UI.success("[DevCenter] App '#{Produce.config[:app_identifier]}' already exists, nothing to do on the Dev Center")
@@ -75,6 +118,31 @@ module Produce
 
         UI.success("Finished creating new app '#{app_name}' on the Dev Center")
       end
+
+      return true
+    end
+
+    # App Store Connect API key path — used instead of Spaceship.login.
+    def create_new_app_via_connect_api
+      config_enabled_services = Produce.config[:enable_services] || Produce.config[:enabled_features]
+
+      existing = Spaceship::ConnectAPI::BundleId.find(app_identifier)
+      if existing
+        UI.success("[DevCenter] App '#{Produce.config[:app_identifier]}' already exists, nothing to do on the Dev Center")
+        return true
+      end
+
+      app_name = Produce.config[:app_name]
+      UI.message("Creating new app '#{app_name}' on the Apple Dev Center")
+
+      connect_api_platform = Spaceship::ConnectAPI::BundleIdPlatform.map(platform)
+      bundle_id = Spaceship::ConnectAPI::BundleId.create(name: app_name, platform: connect_api_platform, identifier: app_identifier)
+
+      UI.crash!("Something went wrong when creating the new app - it's not listed in the apps list") unless bundle_id
+
+      UI.message("Created app #{bundle_id.id}")
+      enable_inline_services(config_enabled_services) if config_enabled_services && !config_enabled_services.empty?
+      UI.success("Finished creating new app '#{app_name}' on the Dev Center")
 
       return true
     end
@@ -122,6 +190,17 @@ module Produce
 
     private
 
+    # Delegates to Service#update instead of duplicating its ~40-capability mapping.
+    # Skips any capability explicitly marked "off" — meaningless on a brand-new app.
+    def enable_inline_services(config_enabled_services)
+      to_enable = config_enabled_services.reject { |_, v| v == SERVICE_OFF }
+      return if to_enable.empty?
+
+      options = OpenStruct.new(to_enable)
+      options.define_singleton_method(:__hash__) { to_enable }
+      Produce::Service.new.update(true, options)
+    end
+
     def platform
       # This was added to support creation of multiple platforms
       # Produce::ItunesConnect can take an array of platforms to create for App Store Connect
@@ -135,9 +214,13 @@ module Produce
       Spaceship.app.find(app_identifier, mac: platform == "osx") != nil
     end
 
+    # Mirrors what #login authenticated with, not produce's own :api_key config.
+    def using_connect_api?
+      !Spaceship::ConnectAPI.token.nil?
+    end
+
     def login
-      Spaceship.login(Produce.config[:username], nil)
-      Spaceship.select_team
+      Produce.authenticate_connect_api!
     end
   end
 end

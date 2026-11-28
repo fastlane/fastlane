@@ -48,7 +48,6 @@ module Frameit
     # Device name for a given screen size. Used to use the correct template
     def device_name
       @device.formatted_name
-      # rubocop:enable Require/MissingRequireStatement
     end
 
     def default_color
@@ -70,7 +69,7 @@ module Frameit
     end
 
     def mac?
-      device_name == 'MacBook'
+      device_name == 'Apple MacBook'
     end
 
     # The name of the orientation of a screenshot. Used to find the correct template

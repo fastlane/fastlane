@@ -1,0 +1,385 @@
+describe Spaceship::ConnectAPI::APIClient do
+  describe "#build_params" do
+    let(:mock_token) { double('token') }
+    let(:client) { Spaceship::ConnectAPI::APIClient.new(token: mock_token) }
+
+    before(:each) do
+      allow(mock_token).to receive(:text).and_return("ewfawef")
+      allow(mock_token).to receive(:in_house).and_return(nil)
+    end
+
+    context 'build_params' do
+      let(:path) { "betaAppReviewDetails" }
+      let(:nil_filter) { { build: nil } }
+      let(:one_filter) { { build: "123" } }
+      let(:two_filters) { { build: "123", app: "321" } }
+      let(:includes) { "model.attribute" }
+      let(:fields) { { a: 'aField', b: 'bField1,bField2' } }
+      let(:limit) { "30" }
+      let(:sort) { "asc" }
+
+      it 'builds params with nothing' do
+        params = client.build_params
+        expect(params).to eq({})
+      end
+
+      it 'builds params with nil filter' do
+        params = client.build_params(filter: nil_filter)
+        expect(params).to eq({})
+      end
+
+      it 'builds params with one filter' do
+        params = client.build_params(filter: one_filter)
+        expect(params).to eq({
+          filter: one_filter
+        })
+      end
+
+      it 'builds params with two filters' do
+        params = client.build_params(filter: two_filters)
+        expect(params).to eq({
+          filter: two_filters
+        })
+      end
+
+      it 'builds params with includes' do
+        params = client.build_params(includes: includes)
+        expect(params).to eq({
+          include: includes
+        })
+      end
+
+      it 'builds params with fields' do
+        params = client.build_params(fields: fields)
+        expect(params).to eq({
+          fields: fields
+        })
+      end
+
+      it 'builds params with limit' do
+        params = client.build_params(limit: limit)
+        expect(params).to eq({
+          limit: limit
+        })
+      end
+
+      it 'builds params with sort' do
+        params = client.build_params(sort: sort)
+        expect(params).to eq({
+          sort: sort
+        })
+      end
+
+      it 'builds params with one filter, includes, fields, limit, and sort' do
+        params = client.build_params(filter: one_filter, includes: includes, fields: fields, limit: limit, sort: sort)
+        expect(params).to eq({
+          filter: one_filter,
+          include: includes,
+          fields: fields,
+          limit: limit,
+          sort: sort
+        })
+      end
+    end
+  end
+
+  describe "#request" do
+    let(:mock_token) { double('token') }
+    let(:client) { Spaceship::ConnectAPI::APIClient.new(token: mock_token) }
+
+    let(:unauth_error) { Spaceship::Client::UnauthorizedAccessError.new }
+
+    let(:default_body) { '{foo: "bar"}' }
+
+    def stub_client_request(uri, status, body)
+      stub_request(:get, uri).
+        to_return(status: status, body: body, headers: { "Content-Type": "application/json" })
+    end
+
+    before(:each) do
+      allow(mock_token).to receive(:text).and_return("ewfawef")
+      allow(mock_token).to receive(:expired?).and_return(false)
+      allow(mock_token).to receive(:in_house).and_return(nil)
+    end
+
+    it 'not raise on 200' do
+      body = JSON.generate({ "data": { "hello": "world" } })
+      stub_client_request(client.hostname, 200, body)
+
+      client.get('')
+    end
+
+    it 'raise on 401' do
+      body = JSON.generate({ "errors": [] })
+      stub_client_request(client.hostname, 401, body)
+
+      expect(mock_token).to receive(:refresh!).exactly(4).times
+
+      expect do
+        client.get('')
+      end.to raise_error(Spaceship::UnauthorizedAccessError)
+    end
+
+    it 'raise on 403 with program license agreement updated' do
+      body = JSON.generate({ "errors": [{ "code": "FORBIDDEN.REQUIRED_AGREEMENTS_MISSING_OR_EXPIRED" }] })
+      stub_client_request(client.hostname, 403, body)
+
+      expect do
+        client.get('')
+      end.to raise_error(Spaceship::ProgramLicenseAgreementUpdated)
+    end
+
+    it 'raise on 403' do
+      body = JSON.generate({ "errors": [] })
+      stub_client_request(client.hostname, 403, body)
+
+      expect do
+        client.get('')
+      end.to raise_error(Spaceship::AccessForbiddenError)
+    end
+
+    describe 'with_retry' do
+      it 'sleeps on 429' do
+        stub_request(:get, client.hostname).
+          to_return(status: 429).then.
+          to_return(status: 200, body: "")
+
+        expect(Kernel).to receive(:sleep).once.with(1)
+        expect(client).to receive(:handle_response).once
+        expect(client).to receive(:request).twice.and_call_original
+        expect do
+          client.get('')
+        end.to_not(raise_error)
+      end
+
+      it 'sleeps until limit is reached on 429' do
+        body = JSON.generate({ "errors": [{ "title": "The request rate limit has been reached.", "details": "We've received too many requests for this API. Please wait and try again or slow down your request rate." }] })
+        stub_client_request(client.hostname, 429, body)
+
+        expect(Kernel).to receive(:sleep).exactly(12).times
+        expect do
+          client.get('')
+        end.to raise_error(Spaceship::ConnectAPI::APIClient::TooManyRequestsError, "Too many requests, giving up after backing off for > 3600 seconds.")
+      end
+
+      it 'retries a 500 without calling it a timeout' do
+        body = JSON.generate({ "errors": [{ "status": "500", "code": "UNEXPECTED_ERROR" }] })
+        stub_client_request(client.hostname, 500, body)
+        allow(Spaceship::Globals).to receive(:verbose?).and_return(true)
+
+        expect(client).to receive(:request).exactly(5).times.and_call_original
+        expect do
+          expect do
+            client.get('')
+          end.to raise_error(Spaceship::InternalServerError, "Server error got 500")
+        end.to output(4.downto(1).map { |remaining| "Server error got 500, retrying (remaining: #{remaining})...\n" }.join).to_stdout
+      end
+
+      it 'does not announce a retry when a single try is allowed' do
+        body = JSON.generate({ "errors": [{ "status": "504", "code": "UNEXPECTED_ERROR" }] })
+        stub_request(:post, client.hostname).
+          to_return(status: 504, body: body, headers: { "Content-Type": "application/json" })
+        allow(Spaceship::Globals).to receive(:verbose?).and_return(true)
+
+        expect(client).to receive(:request).once.and_call_original
+        expect do
+          expect do
+            client.post('', {}, tries: 1)
+          end.to raise_error(Spaceship::InternalServerError, "Server error got 504")
+        end.not_to output.to_stdout
+      end
+
+      it 'does not send a POST again after a timeout when a single try is allowed' do
+        stub_request(:post, client.hostname).
+          to_raise(Faraday::TimeoutError).then.
+          to_return(status: 200, body: "")
+
+        expect do
+          client.post('', {}, tries: 1)
+        end.to raise_error(Faraday::TimeoutError)
+        expect(a_request(:post, client.hostname)).to have_been_made.once
+      end
+
+      it 'sends a POST again after a timeout by default' do
+        stub_request(:post, client.hostname).
+          to_raise(Faraday::TimeoutError).then.
+          to_return(status: 200, body: "")
+
+        client.post('', {})
+        expect(a_request(:post, client.hostname)).to have_been_made.twice
+      end
+
+      it 'sends a single-try POST again when the connection was refused' do
+        stub_request(:post, client.hostname).
+          to_raise(Errno::ECONNREFUSED).then.
+          to_return(status: 200, body: "")
+
+        client.post('', {}, tries: 1)
+        expect(a_request(:post, client.hostname)).to have_been_made.twice
+      end
+    end
+  end
+
+  describe "#handle_error" do
+    let(:mock_token) { double('token') }
+    let(:client) { Spaceship::ConnectAPI::APIClient.new(token: mock_token) }
+    let(:mock_response) { double('response') }
+
+    before(:each) do
+      allow(mock_token).to receive(:in_house).and_return(nil)
+    end
+
+    describe "status of 200" do
+      before(:each) do
+        allow(mock_response).to receive(:status).and_return(200)
+      end
+
+      it 'does not raise' do
+        allow(mock_response).to receive(:body).and_return({})
+
+        expect do
+          client.send(:handle_error, mock_response)
+        end.to_not(raise_error)
+      end
+    end
+
+    describe "status of 401" do
+      before(:each) do
+        allow(mock_response).to receive(:status).and_return(401)
+      end
+
+      it 'raises UnauthorizedAccessError with no errors in body' do
+        allow(mock_response).to receive(:body).and_return({})
+
+        expect do
+          client.send(:handle_error, mock_response)
+        end.to raise_error(Spaceship::UnauthorizedAccessError, /Unknown error/)
+      end
+
+      it 'raises UnauthorizedAccessError when body is string' do
+        allow(mock_response).to receive(:body).and_return('{"errors":[{"title": "Some title", "detail": "some detail"}]}')
+
+        expect do
+          client.send(:handle_error, mock_response)
+        end.to raise_error(Spaceship::UnauthorizedAccessError, /Some title - some detail/)
+      end
+
+      it 'raises UnauthorizedAccessError with the body when it is not JSON' do
+        allow(mock_response).to receive(:body).and_return('<html>Unauthorized</html>')
+
+        expect do
+          client.send(:handle_error, mock_response)
+        end.to raise_error(Spaceship::UnauthorizedAccessError, '<html>Unauthorized</html>')
+      end
+    end
+
+    describe "status of 403" do
+      before(:each) do
+        allow(mock_response).to receive(:status).and_return(403)
+      end
+
+      it 'raises ProgramLicenseAgreementUpdated with no errors in body FORBIDDEN.REQUIRED_AGREEMENTS_MISSING_OR_EXPIRED' do
+        allow(mock_response).to receive(:body).and_return({
+          "errors" => [
+            {
+              "code" => "FORBIDDEN.REQUIRED_AGREEMENTS_MISSING_OR_EXPIRED"
+            }
+          ]
+        })
+
+        expect do
+          client.send(:handle_error, mock_response)
+        end.to raise_error(Spaceship::ProgramLicenseAgreementUpdated)
+      end
+
+      it 'raises AccessForbiddenError with no errors in body' do
+        allow(mock_response).to receive(:body).and_return({})
+
+        expect do
+          client.send(:handle_error, mock_response)
+        end.to raise_error(Spaceship::AccessForbiddenError, /Unknown error/)
+      end
+
+      it 'raises AccessForbiddenError when body is string' do
+        allow(mock_response).to receive(:body).and_return('{"errors":[{"title": "Some title", "detail": "some detail"}]}')
+
+        expect do
+          client.send(:handle_error, mock_response)
+        end.to raise_error(Spaceship::AccessForbiddenError, /Some title - some detail/)
+      end
+
+      it 'raises AccessForbiddenError with errors in body' do
+        allow(mock_response).to receive(:body).and_return({
+          "errors" => [
+            {
+              "title" => "Some title",
+              "detail" => "some detail"
+            }
+          ]
+        })
+
+        expect do
+          client.send(:handle_error, mock_response)
+        end.to raise_error(Spaceship::AccessForbiddenError, /Some title - some detail/)
+      end
+
+      it 'raises AccessForbiddenError with the body when it is not JSON' do
+        allow(mock_response).to receive(:body).and_return('<html>Forbidden</html>')
+
+        expect do
+          client.send(:handle_error, mock_response)
+        end.to raise_error(Spaceship::AccessForbiddenError, '<html>Forbidden</html>')
+      end
+
+      it 'raises AccessForbiddenError when a body that is not JSON contains "errors"' do
+        allow(mock_response).to receive(:body).and_return('<html>Too many errors</html>')
+
+        expect do
+          client.send(:handle_error, mock_response)
+        end.to raise_error(Spaceship::AccessForbiddenError, '<html>Too many errors</html>')
+      end
+    end
+
+    describe "status of 502" do
+      before(:each) do
+        allow(mock_response).to receive(:status).and_return(502)
+      end
+
+      it 'raises BadGatewayError when the body says it could not process the request' do
+        allow(mock_response).to receive(:body).and_return('Could not process this request')
+
+        expect do
+          client.send(:handle_error, mock_response)
+        end.to raise_error(Spaceship::BadGatewayError, 'Could not process this request')
+      end
+
+      it 'does not raise for another body' do
+        allow(mock_response).to receive(:body).and_return('<html>Bad Gateway</html>')
+
+        expect do
+          client.send(:handle_error, mock_response)
+        end.to_not(raise_error)
+      end
+    end
+  end
+
+  describe "#hostname" do
+    let(:mock_token) { double('token') }
+    let(:client) { Spaceship::ConnectAPI::APIClient.new(token: mock_token) }
+
+    it 'points to App Store Connect API when in_house is not set' do
+      allow(mock_token).to receive(:in_house).and_return(nil)
+      expect(client.hostname).to eq('https://api.appstoreconnect.apple.com/')
+    end
+
+    it 'points to App Store Connect API when in_house is false' do
+      allow(mock_token).to receive(:in_house).and_return(false)
+      expect(client.hostname).to eq('https://api.appstoreconnect.apple.com/')
+    end
+
+    it 'points to Enterprise Program API when in_house is true' do
+      allow(mock_token).to receive(:in_house).and_return(true)
+      expect(client.hostname).to eq('https://api.enterprise.developer.apple.com/')
+    end
+  end
+end

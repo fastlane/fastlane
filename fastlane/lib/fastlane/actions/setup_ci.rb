@@ -8,11 +8,11 @@ module Fastlane
         end
 
         case detect_provider(params)
-        when 'circleci'
+        when 'circleci', 'codebuild'
           setup_output_paths
         end
 
-        setup_keychain
+        setup_keychain(params)
       end
 
       def self.should_run?(params)
@@ -20,25 +20,30 @@ module Fastlane
       end
 
       def self.detect_provider(params)
-        params[:provider] || (Helper.is_circle_ci? ? 'circleci' : nil)
+        params[:provider] || (Helper.is_circle_ci? ? 'circleci' : nil) || (Helper.is_codebuild? ? 'codebuild' : nil)
       end
 
-      def self.setup_keychain
+      def self.setup_keychain(params)
+        unless Helper.mac?
+          UI.message("Skipping Keychain setup on non-macOS CI Agent")
+          return
+        end
+
         unless ENV["MATCH_KEYCHAIN_NAME"].nil?
           UI.message("Skipping Keychain setup as a keychain was already specified")
           return
         end
 
-        keychain_name = "fastlane_tmp_keychain"
+        keychain_name = params[:keychain_name]
         ENV["MATCH_KEYCHAIN_NAME"] = keychain_name
         ENV["MATCH_KEYCHAIN_PASSWORD"] = ""
 
         UI.message("Creating temporary keychain: \"#{keychain_name}\".")
         Actions::CreateKeychainAction.run(
           name: keychain_name,
-          default_keychain: true,
+          default_keychain: params[:set_default_keychain],
           unlock: true,
-          timeout: 3600,
+          timeout: params[:timeout],
           lock_when_sleeps: true,
           password: "",
           add_to_search_list: true
@@ -87,19 +92,33 @@ module Fastlane
           FastlaneCore::ConfigItem.new(key: :force,
                                        env_name: "FL_SETUP_CI_FORCE",
                                        description: "Force setup, even if not executed by CI",
-                                       is_string: false,
+                                       type: Boolean,
                                        default_value: false),
           FastlaneCore::ConfigItem.new(key: :provider,
                                        env_name: "FL_SETUP_CI_PROVIDER",
                                        description: "CI provider. If none is set, the provider is detected automatically",
-                                       is_string: true,
                                        optional: true,
                                        verify_block: proc do |value|
                                          value = value.to_s
                                          # Validate both 'travis' and 'circleci' for backwards compatibility, even
                                          # though only the latter receives special treatment by this action
                                          UI.user_error!("A given CI provider '#{value}' is not supported. Available CI providers: 'travis', 'circleci'") unless ["travis", "circleci"].include?(value)
-                                       end)
+                                       end),
+          FastlaneCore::ConfigItem.new(key: :timeout,
+                                       env_name: "FL_SETUP_CI_TIMEOUT",
+                                       description: "Set a custom timeout in seconds for keychain.  Set `0` if you want to specify 'no time-out'",
+                                       type: Integer,
+                                       default_value: 3600),
+          FastlaneCore::ConfigItem.new(key: :keychain_name,
+                                       env_name: "FL_SETUP_CI_KEYCHAIN_NAME",
+                                       description: "Set a custom keychain name",
+                                       type: String,
+                                       default_value: "fastlane_tmp_keychain"),
+          FastlaneCore::ConfigItem.new(key: :set_default_keychain,
+                                       env_name: "FL_SETUP_CI_SET_DEFAULT_KEYCHAIN",
+                                       description: "Set the temporary keychain as the system default",
+                                       type: Boolean,
+                                       default_value: true)
         ]
       end
 
@@ -115,6 +134,15 @@ module Fastlane
         [
           'setup_ci(
             provider: "circleci"
+          )',
+          'setup_ci(
+            provider: "circleci",
+            timeout: 0
+          )',
+          'setup_ci(
+            provider: "circleci",
+            timeout: 0,
+            keychain_name: "custom_keychain_name"
           )'
         ]
       end

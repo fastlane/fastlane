@@ -121,12 +121,12 @@ module Frameit
 
     def self.supported_color?(value)
       return false if value.nil?
-      Color.all_colors.any? { |c| c == value }
+      Color.all_colors.any?(value)
     end
 
     def self.supported_platform?(value)
       return false if value.nil?
-      Platform.all_platforms.any? { |c| c == value }
+      Platform.all_platforms.any?(value)
     end
 
     def self.supported_device?(value)

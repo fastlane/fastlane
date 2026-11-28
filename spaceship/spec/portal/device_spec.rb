@@ -1,4 +1,6 @@
 describe Spaceship::Device do
+  # Skip tunes login and login with portal
+  include_examples "common spaceship login", true
   before { Spaceship.login }
   let(:client) { Spaceship::Device.client }
 

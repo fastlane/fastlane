@@ -16,10 +16,12 @@ module Scan
   class Runner
     def initialize
       @test_command_generator = TestCommandGenerator.new
+      @device_boot_datetime = DateTime.now
     end
 
     def run
-      handle_results(test_app)
+      @xcresults_before_run = find_xcresults_in_derived_data
+      return handle_results(test_app)
     end
 
     def test_app
@@ -39,14 +41,11 @@ module Scan
         end
       end
 
-      # We call this method, to be sure that all other simulators are killed
-      # And a correct one is freshly launched. Switching between multiple simulator
-      # in case the user specified multiple targets works with no issues
-      # This way it's okay to just call it for the first simulator we're using for
-      # the first test run
-      FastlaneCore::Simulator.launch(Scan.devices.first) if Scan.devices && Scan.config[:prelaunch_simulator]
+      prelaunch_simulators
 
-      if Scan.config[:reinstall_app]
+      # Like the options above, this acts on the simulators scan picked, and a Swift package
+      # or a project that doesn't test on a simulator has none
+      if Scan.config[:reinstall_app] && Scan.devices
         app_identifier = Scan.config[:app_identifier]
         app_identifier ||= UI.input("App Identifier: ")
 
@@ -55,7 +54,12 @@ module Scan
         end
       end
 
+      execute
+    end
+
+    def execute
       command = @test_command_generator.generate
+
       prefix_hash = [
         {
           prefix: "Running Tests: ",
@@ -72,9 +76,9 @@ module Scan
                                              prefix: prefix_hash,
                                             loading: "Loading...",
                                     suppress_output: Scan.config[:suppress_xcode_output],
-                                              error: proc do |error_output|
+                                              error: proc do |error_output, status|
                                                 begin
-                                                  exit_status = $?.exitstatus
+                                                  exit_status = status
                                                   ErrorHandler.handle_build_error(error_output, @test_command_generator.xcodebuild_log_path)
                                                 rescue => ex
                                                   SlackPoster.new.run({
@@ -83,47 +87,200 @@ module Scan
                                                   raise ex
                                                 end
                                               end)
+
       exit_status
     end
 
-    def handle_results(tests_exit_status)
-      result = TestResultParser.new.parse_result(test_results)
-      SlackPoster.new.run(result)
+    def find_filename(type)
+      index = Scan.config[:output_types].split(',').index(type)
+      return nil if index.nil?
+      return (Scan.config[:output_files] || "").split(',')[index]
+    end
 
-      if result[:failures] > 0
-        failures_str = result[:failures].to_s.red
-      else
-        failures_str = result[:failures].to_s.green
+    def output_html?
+      return Scan.config[:output_types].split(',').include?('html')
+    end
+
+    def output_junit?
+      return Scan.config[:output_types].split(',').include?('junit')
+    end
+
+    def output_json_compilation_database?
+      return Scan.config[:output_types].split(',').include?('json-compilation-database')
+    end
+
+    def output_html_filename
+      return find_filename('html')
+    end
+
+    def output_junit_filename
+      return find_filename('junit')
+    end
+
+    def output_json_compilation_database_filename
+      return find_filename('json-compilation-database')
+    end
+
+    def find_xcresults_in_derived_data
+      derived_data_path = Scan.config[:derived_data_path]
+      return [] if derived_data_path.nil? # Swift packages might not have derived data
+
+      xcresults_path = File.join(derived_data_path, "Logs", "Test", "*.xcresult")
+      return Dir[xcresults_path]
+    end
+
+    def trainer_test_results
+      require "trainer"
+
+      results = {
+        number_of_tests: 0,
+        number_of_failures: 0,
+        number_of_retries: 0,
+        number_of_skipped: 0,
+        number_of_tests_excluding_retries: 0,
+        number_of_failures_excluding_retries: 0
+      }
+
+      result_bundle_path = Scan.cache[:result_bundle_path]
+
+      # Looks for xcresult file in derived data if not specifically set
+      if result_bundle_path.nil?
+        xcresults = find_xcresults_in_derived_data
+        new_xcresults = xcresults - @xcresults_before_run
+
+        if new_xcresults.size != 1
+          UI.build_failure!("Cannot find .xcresult in derived data which is needed to determine test results. This is an issue within scan. File an issue on GitHub or try setting option `result_bundle: true`")
+        end
+
+        result_bundle_path = new_xcresults.first
+        Scan.cache[:result_bundle_path] = result_bundle_path
       end
+
+      output_path = Scan.config[:output_directory] || Dir.mktmpdir
+      output_path = File.absolute_path(output_path)
+
+      UI.build_failure!("A -resultBundlePath is needed to parse the test results. This should not have happened. Please file an issue.") unless result_bundle_path
+
+      params = {
+        path: result_bundle_path,
+        output_remove_retry_attempts: Scan.config[:output_remove_retry_attempts],
+        force_legacy_xcresulttool: Scan.config[:force_legacy_xcresulttool],
+        silent: !FastlaneCore::Globals.verbose?
+      }
+
+      formatter = Scan.config[:xcodebuild_formatter].chomp
+      show_output_types_tip = false
+      if output_html? && formatter != 'xcpretty'
+        UI.important("Skipping HTML... only available with `xcodebuild_formatter: 'xcpretty'` right now")
+        show_output_types_tip = true
+      end
+
+      if output_json_compilation_database? && formatter != 'xcpretty'
+        UI.important("Skipping JSON Compilation Database... only available with `xcodebuild_formatter: 'xcpretty'` right now")
+        show_output_types_tip = true
+      end
+
+      if show_output_types_tip
+        UI.important("Your 'xcodebuild_formatter' doesn't support these 'output_types'. Change your 'output_types' to prevent these warnings from showing...")
+      end
+
+      if output_junit?
+        if formatter == 'xcpretty'
+          UI.verbose("Generating junit report with xcpretty")
+        else
+          UI.verbose("Generating junit report with trainer")
+          params[:output_filename] = output_junit_filename || "report.junit"
+          params[:output_directory] = output_path
+        end
+      end
+
+      resulting_paths = Trainer::TestParser.auto_convert(params)
+      resulting_paths.each do |path, data|
+        results[:number_of_tests] += data[:number_of_tests]
+        results[:number_of_failures] += data[:number_of_failures]
+        results[:number_of_tests_excluding_retries] += data[:number_of_tests_excluding_retries]
+        results[:number_of_failures_excluding_retries] += data[:number_of_failures_excluding_retries]
+        results[:number_of_skipped] += data[:number_of_skipped] || 0
+        results[:number_of_retries] += data[:number_of_retries]
+      end
+
+      return results
+    end
+
+    def handle_results(tests_exit_status)
+      # Before collecting artifacts: a failed build has none, and a missing one would hide this error
+      if Scan.config[:build_for_testing] && tests_exit_status != 0
+        UI.build_failure!("Build for testing failed. Exit status: #{tests_exit_status}")
+      end
+
+      copy_simulator_logs
+      zip_build_products
+      copy_xctestrun
+
+      return nil if Scan.config[:build_for_testing]
+
+      results = trainer_test_results
+
+      number_of_retries = results[:number_of_retries]
+      number_of_skipped = results[:number_of_skipped]
+      number_of_tests = results[:number_of_tests_excluding_retries]
+      number_of_failures = results[:number_of_failures_excluding_retries]
+
+      SlackPoster.new.run({
+        tests: number_of_tests,
+        failures: number_of_failures
+      })
+
+      if number_of_failures > 0
+        failures_str = number_of_failures.to_s.red
+      else
+        failures_str = number_of_failures.to_s.green
+      end
+
+      retries_str = case number_of_retries
+                    when 0
+                      ""
+                    when 1
+                      " (and 1 retry)"
+                    else
+                      " (and #{number_of_retries} retries)"
+                    end
 
       puts(Terminal::Table.new({
         title: "Test Results",
         rows: [
-          ["Number of tests", result[:tests]],
+          ["Number of tests", "#{number_of_tests}#{retries_str}"],
+          number_of_skipped > 0 ? ["Number of tests skipped", number_of_skipped] : nil,
           ["Number of failures", failures_str]
-        ]
+        ].compact
       }))
       puts("")
 
-      copy_simulator_logs
-      zip_build_products
-
-      if result[:failures] > 0
+      if number_of_failures > 0
         open_report
 
-        UI.test_failure!("Tests have failed")
+        if Scan.config[:fail_build]
+          UI.test_failure!("Tests have failed")
+        else
+          UI.error("Tests have failed")
+        end
       end
 
       unless tests_exit_status == 0
-        UI.test_failure!("Test execution failed. Exit status: #{tests_exit_status}")
+        if Scan.config[:fail_build]
+          UI.test_failure!("Test execution failed. Exit status: #{tests_exit_status}")
+        else
+          UI.error("Test execution failed. Exit status: #{tests_exit_status}")
+        end
       end
 
       open_report
+      return results
     end
 
     def open_report
       if !Helper.ci? && Scan.cache[:open_html_report_path]
-        `open --hide '#{Scan.cache[:open_html_report_path]}'`
+        system("open", "--hide", Scan.cache[:open_html_report_path])
       end
     end
 
@@ -147,9 +304,34 @@ module Scan
       UI.message("Successfully zipped build products: #{output_path}")
     end
 
-    def test_results
-      return if Scan.config[:disable_xcpretty]
+    def copy_xctestrun
+      return unless Scan.config[:output_xctestrun]
 
+      # Gets :derived_data_path/Build/Products directory for coping .xctestrun file
+      derived_data_path = Scan.config[:derived_data_path]
+      path = File.join(derived_data_path, "Build", "Products")
+
+      # Gets absolute path of output directory
+      output_directory = File.absolute_path(Scan.config[:output_directory])
+      output_path = File.join(output_directory, "settings.xctestrun")
+
+      # Caching path for action to put into lane_context
+      Scan.cache[:output_xctestrun] = output_path
+
+      # Copy .xctestrun file and moves it to output directory
+      UI.message("Copying .xctestrun file")
+      xctestrun_file = Dir.glob("#{path}/*.xctestrun").first
+
+      if xctestrun_file
+        FileUtils.cp(xctestrun_file, output_path)
+        UI.message("Successfully copied xctestrun file: #{output_path}")
+      else
+        UI.user_error!("Could not find .xctestrun file to copy")
+      end
+    end
+
+    def test_results
+      UI.deprecated("Scan::Runner#test_results is deprecated and will be removed in a future version of fastlane; scan no longer uses it. Read the test results from the result bundle with Trainer::TestParser.")
       temp_junit_report = Scan.cache[:temp_junit_report]
       return File.read(temp_junit_report) if temp_junit_report && File.file?(temp_junit_report)
 
@@ -165,13 +347,32 @@ module Scan
       File.read(Scan.cache[:temp_junit_report])
     end
 
+    def prelaunch_simulators
+      return unless Scan.devices.to_a.size > 0 # no devices selected, no sims to launch
+
+      # Return early unless the user wants to prelaunch simulators. Or if the user wants simulator logs
+      # then we must prelaunch simulators because Xcode's headless
+      # mode launches and shuts down the simulators before we can collect the logs.
+      return unless Scan.config[:prelaunch_simulator] || Scan.config[:include_simulator_logs]
+
+      devices_to_shutdown = []
+      Scan.devices.each do |device|
+        devices_to_shutdown << device if device.state == "Shutdown"
+        device.boot
+      end
+      at_exit do
+        devices_to_shutdown.each(&:shutdown)
+      end
+    end
+
     def copy_simulator_logs
       return unless Scan.config[:include_simulator_logs]
+      return unless Scan.devices # no devices selected, no logs to collect
 
       UI.header("Collecting system logs")
       Scan.devices.each do |device|
         log_identity = "#{device.name}_#{device.os_type}_#{device.os_version}"
-        FastlaneCore::Simulator.copy_logs(device, log_identity, Scan.config[:output_directory])
+        FastlaneCore::Simulator.copy_logs(device, log_identity, Scan.config[:output_directory], @device_boot_datetime)
       end
     end
 

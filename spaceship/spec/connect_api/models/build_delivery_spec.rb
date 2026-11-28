@@ -1,9 +1,9 @@
 describe Spaceship::ConnectAPI::BuildDelivery do
-  before { Spaceship::Tunes.login }
+  include_examples "common spaceship login"
 
   describe '#Spaceship::ConnectAPI' do
     it '#get_build_deliveries' do
-      response = Spaceship::ConnectAPI.get_build_deliveries
+      response = Spaceship::ConnectAPI.get_build_deliveries(app_id: "1234")
       expect(response).to be_an_instance_of(Spaceship::ConnectAPI::Response)
 
       expect(response.count).to eq(1)

@@ -1,6 +1,6 @@
 describe Match do
   describe Match::Runner do
-    let(:fake_storage) { "fake_storage" }
+    let(:fake_storage) { +"fake_storage" }
     let(:keychain) { 'login.keychain' }
     let(:mock_cert) { double }
     let(:cert_path) { "./match/spec/fixtures/test.cer" }
@@ -48,16 +48,17 @@ describe Match do
       repo_dir = Dir.mktmpdir
       setup_fake_storage(repo_dir, config)
 
-      expect(Spaceship::Portal).to receive(:login)
-      expect(Spaceship::Portal).to receive(:select_team)
+      expect(Spaceship::ConnectAPI).to receive(:login)
       expect(Spaceship::ConnectAPI::Certificate).to receive(:all).and_return([mock_cert])
       expect(fake_storage).to receive(:save_changes!).with(
         files_to_commit: [
           File.join(repo_dir, "certs", "distribution", "#{mock_cert.id}.cer"),
           File.join(repo_dir, "certs", "distribution", "#{mock_cert.id}.p12"),
-          File.join(repo_dir, "profiles", "distribution", "Distribution_tools.fastlane.app.mobileprovision")
+          File.join(repo_dir, "profiles", "appstore", "AppStore_tools.fastlane.app.mobileprovision")
         ]
       )
+
+      expect(fake_storage).to receive(:clear_changes)
 
       Match::Importer.new.import_cert(config, cert_path: cert_path, p12_path: p12_path, profile_path: ios_profile_path)
     end
@@ -66,16 +67,17 @@ describe Match do
       repo_dir = Dir.mktmpdir
       setup_fake_storage(repo_dir, config)
 
-      expect(Spaceship::Portal).to receive(:login)
-      expect(Spaceship::Portal).to receive(:select_team)
+      expect(Spaceship::ConnectAPI).to receive(:login)
       expect(Spaceship::ConnectAPI::Certificate).to receive(:all).and_return([mock_cert])
       expect(fake_storage).to receive(:save_changes!).with(
         files_to_commit: [
           File.join(repo_dir, "certs", "distribution", "#{mock_cert.id}.cer"),
           File.join(repo_dir, "certs", "distribution", "#{mock_cert.id}.p12"),
-          File.join(repo_dir, "profiles", "distribution", "Distribution_tools.fastlane.app.provisionprofile")
+          File.join(repo_dir, "profiles", "appstore", "AppStore_tools.fastlane.app.provisionprofile")
         ]
       )
+
+      expect(fake_storage).to receive(:clear_changes)
 
       Match::Importer.new.import_cert(config, cert_path: cert_path, p12_path: p12_path, profile_path: osx_profile_path)
     end
@@ -85,8 +87,7 @@ describe Match do
       setup_fake_storage(repo_dir, config)
 
       expect(UI).to receive(:input).and_return("")
-      expect(Spaceship::Portal).to receive(:login)
-      expect(Spaceship::Portal).to receive(:select_team)
+      expect(Spaceship::ConnectAPI).to receive(:login)
       expect(Spaceship::ConnectAPI::Certificate).to receive(:all).and_return([mock_cert])
       expect(fake_storage).to receive(:save_changes!).with(
         files_to_commit: [
@@ -94,6 +95,8 @@ describe Match do
           File.join(repo_dir, "certs", "distribution", "#{mock_cert.id}.p12")
         ]
       )
+
+      expect(fake_storage).to receive(:clear_changes)
 
       Match::Importer.new.import_cert(config, cert_path: cert_path, p12_path: p12_path)
     end
@@ -105,8 +108,7 @@ describe Match do
       setup_fake_storage(repo_dir, developer_id_config)
 
       expect(UI).to receive(:input).and_return("")
-      expect(Spaceship::Portal).to receive(:login)
-      expect(Spaceship::Portal).to receive(:select_team)
+      expect(Spaceship::ConnectAPI).to receive(:login)
       expect(Spaceship::ConnectAPI::Certificate).to receive(:all).and_return([mock_cert])
       expect(fake_storage).to receive(:save_changes!).with(
         files_to_commit: [
@@ -115,28 +117,26 @@ describe Match do
         ]
       )
 
+      expect(fake_storage).to receive(:clear_changes)
+
       Match::Importer.new.import_cert(developer_id_config, cert_path: cert_path, p12_path: p12_path)
     end
 
     def setup_fake_storage(repo_dir, config)
-      expect(Match::Storage::GitStorage).to receive(:configure).with(
+      expect(Match::Storage::GitStorage).to receive(:configure).with({
         git_url: config[:git_url],
         shallow_clone: true,
         skip_docs: false,
         git_branch: "master",
         git_full_name: nil,
         git_user_email: nil,
+        git_private_key: nil,
+        git_basic_authorization: nil,
+        git_bearer_authorization: nil,
         clone_branch_directly: false,
         type: config[:type],
-        platform: config[:platform],
-        google_cloud_bucket_name: "",
-        google_cloud_keys_file: "",
-        google_cloud_project_id: "",
-        readonly: false,
-        username: config[:username],
-        team_id: nil,
-        team_name: nil
-      ).and_return(fake_storage)
+        platform: config[:platform]
+      }).and_return(fake_storage)
 
       expect(fake_storage).to receive(:download).and_return(nil)
       allow(fake_storage).to receive(:working_directory).and_return(repo_dir)

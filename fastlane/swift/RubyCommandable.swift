@@ -1,9 +1,5 @@
-//
-//  RubyCommandable.swift
-//  FastlaneRunner
-//
-//  Created by Joshua Liebowitz on 1/4/18.
-//
+// RubyCommandable.swift
+// Copyright (c) 2026 FastlaneTools
 
 //
 //  ** NOTE **
@@ -31,14 +27,18 @@ enum CommandType {
 protocol RubyCommandable {
     var type: CommandType { get }
     var commandJson: String { get }
+    var id: String { get }
 }
 
 extension RubyCommandable {
     var json: String {
-        return "{\"commandType\" : \"\(self.type.token)\", \"command\" : \(self.commandJson)}"
+        let token = ArgumentProcessor.serverToken.map { ", \"token\": \"\($0)\"" } ?? ""
+        return """
+        { "commandType": "\(type.token)", "command": \(commandJson)\(token) }
+        """
     }
 }
 
 // Please don't remove the lines below
 // They are used to detect outdated files
-// FastlaneRunnerAPIVersion [0.9.2]
+// FastlaneRunnerAPIVersion [0.9.3]

@@ -8,7 +8,7 @@ module Snapshot
     def self.find_helper
       paths = Dir["./**/SnapshotHelper.swift"] + Dir["./**/SnapshotHelperXcode8.swift"]
       # exclude assets in gym
-      paths.reject { |p| p.include?("snapshot/lib/assets/") }
+      paths.reject { |p| p.include?("snapshot/lib/assets/") || p.include?("DerivedData") }
     end
 
     def update(force: false)

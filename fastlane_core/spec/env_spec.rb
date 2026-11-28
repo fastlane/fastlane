@@ -16,6 +16,18 @@ describe FastlaneCore do
           expect(FastlaneCore::Env.truthy?('FL_TEST_SET')).to be_truthy
         end
       end
+      it "Reports false on disabled env in any case" do
+        FastlaneSpec::Env.with_env_values('FL_TEST_FALSE' => 'FALSE', 'FL_TEST_NO' => 'No', 'FL_TEST_OFF' => 'Off') do
+          expect(FastlaneCore::Env.truthy?('FL_TEST_FALSE')).to be_falsey
+          expect(FastlaneCore::Env.truthy?('FL_TEST_NO')).to be_falsey
+          expect(FastlaneCore::Env.truthy?('FL_TEST_OFF')).to be_falsey
+        end
+      end
+      it "Reports true on empty env" do
+        FastlaneSpec::Env.with_env_values('FL_TEST_EMPTY' => '') do
+          expect(FastlaneCore::Env.truthy?('FL_TEST_EMPTY')).to be_truthy
+        end
+      end
     end
   end
 end

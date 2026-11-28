@@ -1,5 +1,6 @@
 require_relative '../helper'
 require_relative '../globals'
+require_relative '../secrets'
 require_relative 'config_item'
 require_relative 'commander_generator'
 require_relative 'configuration_file'
@@ -53,16 +54,17 @@ module FastlaneCore
       # used for pushing and popping values to provide nesting configuration contexts
       @values_stack = []
 
-      # if we are in captured output mode - keep a array of sensitive option values
-      # those will be later - replaced by ####
-      if FastlaneCore::Globals.capture_output?
-        available_options.each do |element|
-          next unless element.sensitive
-          self.class.sensitive_strings << values[element.key]
-        end
+      verify_input_types
+
+      @available_options.each do |element|
+        next unless element.sensitive
+
+        Secrets.register(@values[element.key], name: element.key)
+        # if we are in captured output mode - keep a array of sensitive option values
+        # those will be later - replaced by ####
+        self.class.sensitive_strings << @values[element.key] if FastlaneCore::Globals.capture_output?
       end
 
-      verify_input_types
       verify_value_exists
       verify_no_duplicates
       verify_conflicts
@@ -208,19 +210,19 @@ module FastlaneCore
     #####################################################
 
     # Returns the value for a certain key. fastlane_core tries to fetch the value from different sources
-    # if 'ask' is true and the value is not present, the user will be prompted to provide a value
+    # if 'ask' is true and the value is not present, the user will be prompted to provide a value if optional
+    # if 'force_ask' is true, the option is not required to be optional to ask
     # rubocop:disable Metrics/PerceivedComplexity
-    def fetch(key, ask: true)
-      UI.crash!("Key '#{key}' must be a symbol. Example :app_id.") unless key.kind_of?(Symbol)
+    def fetch(key, ask: true, force_ask: false)
+      UI.crash!("Key '#{key}' must be a symbol. Example :#{key}") unless key.kind_of?(Symbol)
 
       option = verify_options_key!(key)
 
       # Same order as https://docs.fastlane.tools/advanced/#priorities-of-parameters-and-options
       value = if @values.key?(key) && !@values[key].nil?
                 @values[key]
-              elsif option.env_name && !ENV[option.env_name].nil?
-                # verify! before using (see https://github.com/fastlane/fastlane/issues/14449)
-                ENV[option.env_name].dup if option.verify!(option.auto_convert_value(ENV[option.env_name]))
+              elsif (env_value = option.fetch_env_value)
+                env_value
               elsif self.config_file_options.key?(key)
                 self.config_file_options[key]
               else
@@ -229,7 +231,8 @@ module FastlaneCore
 
       value = option.auto_convert_value(value)
       value = nil if value.nil? && !option.string? # by default boolean flags are false
-      return value unless value.nil? && !option.optional && ask
+      Secrets.register(value, name: option.key) if option.sensitive
+      return value unless value.nil? && (!option.optional || force_ask) && ask
 
       # fallback to asking
       if Helper.test? || !UI.interactive?
@@ -243,11 +246,17 @@ module FastlaneCore
       while value.nil?
         UI.important("To not be asked about this value, you can specify it using '#{option.key}'") if ENV["FASTLANE_ONBOARDING_IN_PROCESS"].to_s.length == 0
         value = option.sensitive ? UI.password("#{option.description}: ") : UI.input("#{option.description}: ")
+
+        # ConfigItem allows to specify a type for the item but UI.password and
+        # UI.input return String values. Try to convert the String input to
+        # the option's type before passing it along.
+        value = option.auto_convert_value(value)
+
         # Also store this value to use it from now on
         begin
           set(key, value)
         rescue => ex
-          puts(ex)
+          UI.error(ex)
           value = nil
         end
       end
@@ -260,6 +269,18 @@ module FastlaneCore
       return self[key]
     end
     # rubocop:enable Metrics/PerceivedComplexity
+
+    # Returns true if the value for a certain key comes from one of the sources `fetch` checks
+    # before falling back to the default value: passed in, an environment variable or the config file
+    def specified?(key)
+      UI.crash!("Key '#{key}' must be a symbol. Example :#{key}") unless key.kind_of?(Symbol)
+
+      option = verify_options_key!(key)
+
+      !@values[key].nil? ||
+        !option.fetch_env_value.nil? ||
+        self.config_file_options.key?(key)
+    end
 
     # Overwrites or sets a new value for a given key
     # @param key [Symbol] Must be a symbol

@@ -13,7 +13,7 @@ module Fastlane
           app_icon: :appIcon,
           content_image: :contentImage
         }
-        options = Hash[options.map { |k, v| [option_map.fetch(k, k), v] }]
+        options = options.transform_keys { |k| option_map.fetch(k, k) }
         TerminalNotifier.notify(message, options)
       end
 
@@ -43,10 +43,11 @@ module Fastlane
                                        description: "Bundle identifier of application to be opened when the notification is clicked",
                                        optional: true),
           FastlaneCore::ConfigItem.new(key: :app_icon,
-                                       description: "The URL of an image to display instead of the application icon (Mavericks+ only)",
+                                       deprecated: true,
+                                       description: "The URL of an image to display instead of the application icon",
                                        optional: true),
           FastlaneCore::ConfigItem.new(key: :content_image,
-                                       description: "The URL of an image to display attached to the notification (Mavericks+ only)",
+                                       description: "The local path of an image to display attached to the notification (Mavericks+)",
                                        optional: true),
           FastlaneCore::ConfigItem.new(key: :open,
                                        description: "URL of the resource to be opened when the notification is clicked",

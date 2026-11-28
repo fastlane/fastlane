@@ -2,14 +2,18 @@ require 'fastlane/documentation/docs_generator'
 
 describe Fastlane do
   describe Fastlane::DocsGenerator do
+    # Avoid fixed paths under /tmp: parallel test processes would share them. See fastlane#30184.
+    let(:output_dir) { Dir.mktmpdir("fl_spec_docs") }
+    let(:output_path) { File.join(output_dir, "documentation.md") }
+    after { FileUtils.remove_entry(output_dir) if File.directory?(output_dir) }
+
     it "generates new markdown docs" do
-      output_path = "/tmp/documentation.md"
       ff = Fastlane::FastFile.new('./fastlane/spec/fixtures/fastfiles/FastfileGrouped')
       Fastlane::DocsGenerator.run(ff, output_path)
 
       output = File.read(output_path)
 
-      expect(output).to include('gem install fastlane')
+      expect(output).to include('installation instructions')
       expect(output).to include('# Available Actions')
       expect(output).to include('### test')
       expect(output).to include('# iOS')
@@ -22,13 +26,12 @@ describe Fastlane do
     end
 
     it "generates new markdown docs but skips empty platforms" do
-      output_path = "/tmp/documentation.md"
       ff = Fastlane::FastFile.new('./fastlane/spec/fixtures/fastfiles/FastfilePlatformDocumentation')
       Fastlane::DocsGenerator.run(ff, output_path)
 
       output = File.read(output_path)
 
-      expect(output).to include('gem install fastlane')
+      expect(output).to include('installation instructions')
       expect(output).to include('# Available Actions')
       expect(output).to include('## Android')
       expect(output).to include('### android lane')

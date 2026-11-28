@@ -1,4 +1,8 @@
 describe Fastlane::Helper::AdbHelper do
+  before do
+    stub_const('ENV', { 'ANDROID_HOME' => '/usr/local/android-sdk' })
+  end
+
   describe "#load_all_devices" do
     context 'adb host' do
       it 'no host specified' do

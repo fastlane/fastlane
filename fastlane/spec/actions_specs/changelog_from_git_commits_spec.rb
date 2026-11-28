@@ -36,6 +36,18 @@ describe Fastlane do
         expect(result).to eq(changelog)
       end
 
+      it "Uses grep matching pattern if requested" do
+        matching_pattern = 'pizza'
+        result = Fastlane::FastFile.new.parse("lane :test do
+          changelog_from_git_commits(matching_pattern: '#{matching_pattern}')
+        end").runner.execute(:test)
+
+        tag_name = %w(git rev-list --tags --max-count=1).shelljoin
+        describe = %W(git describe --tags #{tag_name}).shelljoin
+        changelog = %W(git log --pretty=%B --grep=#{matching_pattern} #{describe}...HEAD).shelljoin
+        expect(result).to eq(changelog)
+      end
+
       it "Does not match lightweight tags when searching for the last one if so requested" do
         result = Fastlane::FastFile.new.parse("lane :test do
           changelog_from_git_commits(match_lightweight_tag: false)
@@ -174,7 +186,7 @@ describe Fastlane do
         end").runner.execute(:test)
 
         tag_name = %W(git rev-list --tags=#{tag_match_pattern} --max-count=1).shelljoin
-        describe = %W(git describe --tags #{tag_name}).shelljoin
+        describe = %W(git describe --tags #{tag_name} --match #{tag_match_pattern}).shelljoin
         changelog = %W(git log --pretty=%B #{describe}...HEAD).shelljoin
         expect(result).to eq(changelog)
       end
@@ -190,8 +202,27 @@ describe Fastlane do
         expect(result).to eq(changelog)
       end
 
+      it "Returns a scoped log from the app's path if so requested" do
+        result = Fastlane::FastFile.new.parse("lane :test do
+          changelog_from_git_commits(app_path: './apps/ios')
+        end").runner.execute(:test)
+
+        tag_name = %w(git rev-list --tags --max-count=1).shelljoin
+        describe = %W(git describe --tags #{tag_name}).shelljoin
+        changelog = %W(git log --pretty=%B #{describe}...HEAD ./apps/ios).shelljoin
+        expect(result).to eq(changelog)
+      end
+
       it "Runs between option from command line" do
-        expect(system("fastlane run changelog_from_git_commits between:123456,HEAD")).to be
+
+        options = FastlaneCore::Configuration.create(Fastlane::Actions::ChangelogFromGitCommitsAction.available_options, {
+          between: '123456,HEAD'
+        })
+
+        result = Fastlane::Actions::ChangelogFromGitCommitsAction.run(options)
+
+        changelog = %w(git log --pretty=%B 123456...HEAD).shelljoin
+        expect(result).to eq(changelog)
       end
 
       it "Accepts string value for :between" do
@@ -207,7 +238,7 @@ describe Fastlane do
           result = Fastlane::FastFile.new.parse("lane :test do
             changelog_from_git_commits(between: 'abcd1234')
           end").runner.execute(:test)
-        end.to raise_error(":between must contain comma")
+        end.to raise_error(":between must be an array of size 2")
       end
     end
   end

@@ -20,6 +20,8 @@ module Frameit
 
       files = JSON.parse(download_file("files.json"))
       files.each_with_index do |current, index|
+        # files.json is downloaded: only accept plain file names, so nothing is written outside templates_path
+        UI.user_error!("Unexpected frame file name '#{current}'") if current.include?("/") || current.include?("\\") || current.start_with?(".")
         content = download_file(current, txt: "#{index + 1} of #{files.count} files")
         File.binwrite(File.join(templates_path, current), content)
       end
@@ -53,7 +55,7 @@ module Frameit
 
     def print_disclaimer
       UI.header("Device frames disclaimer")
-      UI.important("All used device frames are available via Facebook Design: http://facebook.design/devices")
+      UI.important("Device frames include assets from Facebook Design: https://design.facebook.com/toolsandresources/devices/")
       UI.message("----------------------------------------")
       UI.message("While Facebook has redrawn and shares these assets for the benefit")
       UI.message("of the design community, Facebook does not own any of the underlying")
@@ -64,6 +66,9 @@ module Frameit
       UI.message("Facebook disclaims all express or implied warranties with respect to these assets, including")
       UI.message("non-infringement of intellectual property rights.")
       UI.message("----------------------------------------")
+      UI.important("iPhone Duo artwork is from Apple Design Resources: https://developer.apple.com/design/resources/")
+      UI.message("Apple artwork remains subject to Apple's license supplied with the original download.")
+      UI.message("----------------------------------------")
     end
 
     private
@@ -71,8 +76,9 @@ module Frameit
     def download_file(path, txt: "file")
       require 'uri'
       require 'excon'
+      require 'addressable/uri'
 
-      url = File.join(HOST_URL, Frameit.frames_version, URI.escape(path))
+      url = File.join(HOST_URL, Frameit.frames_version, Addressable::URI.encode(path))
       UI.message("Downloading #{txt} from '#{url}' ...")
       body = Excon.get(url).body
       raise body if body.include?("<Error>")

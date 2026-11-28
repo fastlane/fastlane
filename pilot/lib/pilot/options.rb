@@ -4,17 +4,36 @@ require 'credentials_manager/appfile_config'
 require_relative 'module'
 
 module Pilot
+  # rubocop:disable Metrics/ClassLength
+  # rubocop:disable Metrics/PerceivedComplexity
   class Options
     def self.available_options
       user = CredentialsManager::AppfileConfig.try_fetch_value(:itunes_connect_id)
       user ||= CredentialsManager::AppfileConfig.try_fetch_value(:apple_id)
 
       [
+        FastlaneCore::ConfigItem.new(key: :api_key_path,
+                                     env_names: ["PILOT_API_KEY_PATH", "APP_STORE_CONNECT_API_KEY_PATH"],
+                                     description: "Path to your App Store Connect API Key JSON file (https://docs.fastlane.tools/app-store-connect-api/#using-fastlane-api-key-json-file)",
+                                     optional: true,
+                                     conflicting_options: [:username],
+                                     verify_block: proc do |value|
+                                       UI.user_error!("Couldn't find API key JSON file at path '#{value}'") unless File.exist?(value)
+                                     end),
+        FastlaneCore::ConfigItem.new(key: :api_key,
+                                     env_names: ["PILOT_API_KEY", "APP_STORE_CONNECT_API_KEY"],
+                                     description: "Your App Store Connect API Key information (https://docs.fastlane.tools/app-store-connect-api/#using-fastlane-api-key-hash-option)",
+                                     type: Hash,
+                                     optional: true,
+                                     sensitive: true,
+                                     conflicting_options: [:api_key_path, :username]),
+
         # app upload info
         FastlaneCore::ConfigItem.new(key: :username,
                                      short_option: "-u",
                                      env_name: "PILOT_USERNAME",
                                      description: "Your Apple ID Username",
+                                     optional: true,
                                      default_value: user,
                                      default_value_dynamic: true),
         FastlaneCore::ConfigItem.new(key: :app_identifier,
@@ -31,9 +50,8 @@ module Pilot
                                      env_name: "PILOT_PLATFORM",
                                      description: "The platform to use (optional)",
                                      optional: true,
-                                     default_value: 'ios',
                                      verify_block: proc do |value|
-                                       UI.user_error!("The platform can only be ios, appletvos, or osx") unless ['ios', 'appletvos', 'osx'].include?(value)
+                                       UI.user_error!("The platform can only be ios, appletvos, osx, or xros") unless ['ios', 'appletvos', 'osx', 'xros'].include?(value)
                                      end),
         FastlaneCore::ConfigItem.new(key: :apple_id,
                                      short_option: "-p",
@@ -65,6 +83,26 @@ module Pilot
                                        value = File.expand_path(value)
                                        UI.user_error!("Could not find ipa file at path '#{value}'") unless File.exist?(value)
                                        UI.user_error!("'#{value}' doesn't seem to be an ipa file") unless value.end_with?(".ipa")
+                                     end,
+                                     conflicting_options: [:pkg],
+                                     conflict_block: proc do |value|
+                                       UI.user_error!("You can't use 'ipa' and '#{value.key}' options in one run.")
+                                     end),
+        FastlaneCore::ConfigItem.new(key: :pkg,
+                                     short_option: "-P",
+                                     optional: true,
+                                     env_name: "PILOT_PKG",
+                                     description: "Path to your pkg file",
+                                     code_gen_sensitive: true,
+                                     default_value: Dir["*.pkg"].sort_by { |x| File.mtime(x) }.last,
+                                     default_value_dynamic: true,
+                                     verify_block: proc do |value|
+                                       UI.user_error!("Could not find pkg file at path '#{File.expand_path(value)}'") unless File.exist?(value)
+                                       UI.user_error!("'#{value}' doesn't seem to be a pkg file") unless value.end_with?(".pkg")
+                                     end,
+                                     conflicting_options: [:ipa],
+                                     conflict_block: proc do |value|
+                                       UI.user_error!("You can't use 'pkg' and '#{value.key}' options in one run.")
                                      end),
 
         # app review info
@@ -72,7 +110,7 @@ module Pilot
                                      type: Boolean,
                                      env_name: "DEMO_ACCOUNT_REQUIRED",
                                      description: "Do you need a demo account when Apple does review?",
-                                     default_value: false),
+                                     optional: true),
         FastlaneCore::ConfigItem.new(key: :beta_app_review_info,
                                      type: Hash,
                                      env_name: "PILOT_BETA_APP_REVIEW_INFO",
@@ -122,7 +160,7 @@ module Pilot
                                      short_option: "-w",
                                      optional: true,
                                      env_name: "PILOT_CHANGELOG",
-                                     description: "Provide the 'What to Test' text when uploading a new build. `skip_waiting_for_build_processing: false` is required to set the changelog"),
+                                     description: "Provide the 'What to Test' text when uploading a new build"),
         FastlaneCore::ConfigItem.new(key: :skip_submission,
                                      short_option: "-s",
                                      env_name: "PILOT_SKIP_SUBMISSION",
@@ -144,8 +182,41 @@ module Pilot
                                      description: "Update build info immediately after validation. This is deprecated and will be removed in a future release. App Store Connect no longer supports setting build info until after build processing has completed, which is when build info is updated by default",
                                      is_string: false,
                                      default_value: false),
+        FastlaneCore::ConfigItem.new(key: :app_clip_invocations,
+                                     env_name: "PILOT_APP_CLIP_INVOCATIONS",
+                                     description: "Add beta app clip invocations to your builds in TestFlight",
+                                     optional: true,
+                                     type: Array,
+                                     verify_block: proc do |app_clip_invocations|
+                                       UI.user_error!("Could not evaluate array from '#{app_clip_invocations}'") unless app_clip_invocations.kind_of?(Array)
+
+                                       app_clip_invocations.each do |invocation|
+                                         UI.user_error!("Each app clip invocation must contain a url.") unless invocation[:url]
+                                         UI.user_error!("Each app clip invocation must contain a localized title.") unless invocation[:title] && invocation[:title].kind_of?(Hash)
+                                       end
+                                     end),
+        FastlaneCore::ConfigItem.new(key: :overwrite_app_clip_invocations,
+                                     env_name: "PILOT_APP_CLIPS_OVERWRITE_INVOCATIONS",
+                                     description: "Clear all previous beta app clip invocations before adding new ones",
+                                     optional: true,
+                                     type: Boolean,
+                                     default_value: false),
+        FastlaneCore::ConfigItem.new(key: :routing_app_coverage_file,
+                                     env_name: "PILOT_ROUTING_APP_COVERAGE_FILE",
+                                     description: "Path to the routing app coverage file (`.geojson`) that is required for routing apps. It will be uploaded to the editable App Store version of the app",
+                                     optional: true,
+                                     verify_block: proc do |value|
+                                       UI.user_error!("Could not find routing app coverage file at path '#{File.expand_path(value)}'") unless File.exist?(value)
+                                       UI.user_error!("Routing app coverage file must be a .geojson file") unless File.extname(value).casecmp(".geojson").zero?
+                                     end),
 
         # distribution
+        FastlaneCore::ConfigItem.new(key: :distribute_only,
+                                     short_option: "-D",
+                                     env_name: "PILOT_DISTRIBUTE_ONLY",
+                                     description: "Distribute a previously uploaded build (equivalent to the `fastlane pilot distribute` command)",
+                                     default_value: false,
+                                     type: Boolean),
         FastlaneCore::ConfigItem.new(key: :uses_non_exempt_encryption,
                                      short_option: "-X",
                                      env_name: "PILOT_USES_NON_EXEMPT_ENCRYPTION",
@@ -155,13 +226,13 @@ module Pilot
         FastlaneCore::ConfigItem.new(key: :distribute_external,
                                      is_string: false,
                                      env_name: "PILOT_DISTRIBUTE_EXTERNAL",
-                                     description: "Should the build be distributed to external testers?",
+                                     description: "Should the build be distributed to external testers? If set to true, use of `groups` option is required",
                                      default_value: false),
         FastlaneCore::ConfigItem.new(key: :notify_external_testers,
                                     is_string: false,
                                     env_name: "PILOT_NOTIFY_EXTERNAL_TESTERS",
-                                    description: "Should notify external testers?",
-                                    default_value: true),
+                                    description: "Should notify external testers? (Not setting a value will use App Store Connect's default which is to notify)",
+                                    optional: true),
         FastlaneCore::ConfigItem.new(key: :app_version,
                                      env_name: "PILOT_APP_VERSION",
                                      description: "The version number of the application build to distribute. If the version number is not specified, then the most recent build uploaded to TestFlight will be distributed. If specified, the most recent build for the version number will be distributed",
@@ -204,7 +275,7 @@ module Pilot
         FastlaneCore::ConfigItem.new(key: :groups,
                                      short_option: "-g",
                                      env_name: "PILOT_GROUPS",
-                                     description: "Associate tester to one group or more by group name / group id. E.g. `-g \"Team 1\",\"Team 2\"`",
+                                     description: "Associate tester to one group or more by group name / group id. E.g. `-g \"Team 1\",\"a06cf5b5-95a9-4beb-88c6-f22bd6b3f7a2\"` This is required when `distribute_external` option is set to true or when we want to add a tester to one or more external testing groups ",
                                      optional: true,
                                      type: Array,
                                      verify_block: proc do |value|
@@ -246,12 +317,16 @@ module Pilot
                                      verify_block: proc do |value|
                                        ENV["FASTLANE_TEAM_ID"] = value.to_s
                                      end),
-        # rubocop:disable Metrics/LineLength
+        # rubocop:disable Layout/LineLength
         FastlaneCore::ConfigItem.new(key: :itc_provider,
                                      env_name: "PILOT_ITC_PROVIDER",
-                                     description: "The provider short name to be used with the iTMSTransporter to identify your team. This value will override the automatically detected provider short name. To get provider short name run `pathToXcode.app/Contents/Applications/Application\\ Loader.app/Contents/itms/bin/iTMSTransporter -m provider -u 'USERNAME' -p 'PASSWORD' -account_type itunes_connect -v off`. The short names of providers should be listed in the second column",
+                                     description: "The provider short name to be used with the iTMSTransporter to identify your team. This value will override the automatically detected provider short name. To get provider short name run `xcrun iTMSTransporter -m provider -u 'USERNAME' -p 'PASSWORD' -account_type itunes_connect -v off`. The short names of providers should be listed in the second column",
                                      optional: true),
-        # rubocop:enable Metrics/LineLength
+        FastlaneCore::ConfigItem.new(key: :provider_public_id,
+                                     env_name: "PILOT_PROVIDER_PUBLIC_ID",
+                                     description: "The provider public ID to be used with altool (--provider-public-id). This value will override the automatically detected provider value for altool uploads. Required after Xcode 26 when your account is associated with multiple providers and using username/app-password authentication",
+                                     optional: true),
+        # rubocop:enable Layout/LineLength
 
         # waiting and uploaded build
         FastlaneCore::ConfigItem.new(key: :wait_processing_interval,
@@ -259,6 +334,14 @@ module Pilot
                                      env_name: "PILOT_WAIT_PROCESSING_INTERVAL",
                                      description: "Interval in seconds to wait for App Store Connect processing",
                                      default_value: 30,
+                                     type: Integer,
+                                     verify_block: proc do |value|
+                                       UI.user_error!("Please enter a valid positive number of seconds") unless value.to_i > 0
+                                     end),
+        FastlaneCore::ConfigItem.new(key: :wait_processing_timeout_duration,
+                                     env_name: "PILOT_WAIT_PROCESSING_TIMEOUT_DURATION",
+                                     description: "Timeout duration in seconds to wait for App Store Connect processing. If set, after exceeding timeout duration, this will `force stop` to wait for App Store Connect processing and exit with exception",
+                                     optional: true,
                                      type: Integer,
                                      verify_block: proc do |value|
                                        UI.user_error!("Please enter a valid positive number of seconds") unless value.to_i > 0
@@ -274,8 +357,15 @@ module Pilot
                                      env_name: "PILOT_REJECT_PREVIOUS_BUILD",
                                      description: "Expire previous if it's 'waiting for review'",
                                      is_string: false,
-                                     default_value: false)
+                                     default_value: false),
+        FastlaneCore::ConfigItem.new(key: :submit_beta_review,
+                                     env_name: "PILOT_DISTRIBUTE_EXTERNAL",
+                                     description: "Send the build for a beta review",
+                                     type: Boolean,
+                                     default_value: true)
       ]
     end
   end
+  # rubocop:enable Metrics/ClassLength
+  # rubocop:enable Metrics/PerceivedComplexity
 end

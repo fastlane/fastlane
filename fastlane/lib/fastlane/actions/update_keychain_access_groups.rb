@@ -56,10 +56,7 @@ module Fastlane
           FastlaneCore::ConfigItem.new(key: :identifiers,
                                        env_name: "FL_UPDATE_KEYCHAIN_ACCESS_GROUPS_IDENTIFIERS",
                                        description: "An Array of unique identifiers for the keychain access groups. Eg. ['your.keychain.access.groups.identifiers']",
-                                       is_string: false,
-                                       verify_block: proc do |value|
-                                         UI.user_error!("The parameter identifiers need to be an Array.") unless value.kind_of?(Array)
-                                       end)
+                                       type: Array)
         ]
       end
 

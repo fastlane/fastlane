@@ -1,5 +1,44 @@
+require_relative 'git_storage_spec_helper'
+
 describe Match do
   describe Match::Storage::GitStorage do
+    describe '#generate_matchfile_content' do
+      let(:git_url) { "https://github.com/fastlane/fastlane" }
+
+      def matchfile_content(branch_input)
+        allow(FastlaneCore::UI.ui_object).to receive(:important)
+        allow(FastlaneCore::UI.ui_object).to receive(:input).and_return(git_url, branch_input)
+        described_class.new.generate_matchfile_content
+      end
+
+      it "records the branch so a new setup does not silently fall back to master" do
+        expect(matchfile_content("")).to eq("git_url(\"#{git_url}\")\ngit_branch(\"main\")")
+      end
+
+      it "keeps a branch typed by the user" do
+        expect(matchfile_content("certificates")).to include("git_branch(\"certificates\")")
+      end
+
+      it "treats a whitespace-only answer as blank" do
+        expect(matchfile_content("   ")).to include("git_branch(\"main\")")
+      end
+
+      it "trims whitespace around a branch name" do
+        expect(matchfile_content("  certificates  ")).to include("git_branch(\"certificates\")")
+      end
+    end
+  end
+
+  describe Match::Storage::GitStorage do
+
+    let(:git_url) { "https://github.com/fastlane/fastlane/tree/master/certificates" }
+    let(:git_branch) { "test" }
+
+    before(:each) do
+      @path = Dir.mktmpdir # to have access to the actual path
+      allow(Dir).to receive(:mktmpdir).and_return(@path)
+    end
+
     describe "#generate_commit_message" do
       it "works" do
         storage = Match::Storage::GitStorage.new(
@@ -12,132 +51,373 @@ describe Match do
     end
 
     describe "#download" do
-      it "clones the repo" do
-        path = Dir.mktmpdir # to have access to the actual path
-        expect(Dir).to receive(:mktmpdir).and_return(path)
-        git_url = "https://github.com/fastlane/fastlane/tree/master/certificates"
-        shallow_clone = true
-        command = "git clone #{git_url.shellescape} #{path.shellescape} --depth 1 --no-single-branch"
-        to_params = {
-          command: command,
-          print_all: nil,
-          print_command: nil
-        }
+      describe "when no branch is specified" do
+        it "checkouts the master branch" do
+          # Override default "test" branch name.
+          git_branch = "master"
 
-        expect(FastlaneCore::CommandExecutor).
-          to receive(:execute).
-          with(to_params).
-          and_return(nil)
+          storage = Match::Storage::GitStorage.new(
+            git_url: git_url
+          )
 
-        storage = Match::Storage::GitStorage.new(
-          git_url: git_url,
-          shallow_clone: shallow_clone
-        )
-        storage.download
+          clone_command = "git clone #{git_url.shellescape} #{@path.shellescape}"
 
-        expect(File.directory?(storage.working_directory)).to eq(true)
-        expect(File.exist?(File.join(storage.working_directory, 'README.md'))).to eq(false) # because the README is being added when committing the changes
-      end
+          expect_command_execution(clone_command)
+          expect_command_execution(branch_checkout_commands(git_branch))
 
-      it "clones the repo (not shallow)" do
-        path = Dir.mktmpdir # to have access to the actual path
-        expect(Dir).to receive(:mktmpdir).and_return(path)
-        git_url = "https://github.com/fastlane/fastlane/tree/master/certificates"
-        shallow_clone = false
-        command = "git clone #{git_url.shellescape} #{path.shellescape}"
-        to_params = {
-          command: command,
-          print_all: nil,
-          print_command: nil
-        }
+          storage.download
 
-        expect(FastlaneCore::CommandExecutor).
-          to receive(:execute).
-          with(to_params).
-          and_return(nil)
-
-        storage = Match::Storage::GitStorage.new(
-          git_url: git_url,
-          shallow_clone: shallow_clone
-        )
-        storage.download
-
-        expect(File.directory?(storage.working_directory)).to eq(true)
-        expect(File.exist?(File.join(storage.working_directory, 'README.md'))).to eq(false) # because the README is being added when committing the changes
-      end
-
-      it "checks out a branch" do
-        path = Dir.mktmpdir # to have access to the actual path
-        expect(Dir).to receive(:mktmpdir).and_return(path)
-        git_url = "https://github.com/fastlane/fastlane/tree/master/certificates"
-        git_branch = "test"
-        shallow_clone = false
-
-        expected_commands = [
-          "git clone #{git_url.shellescape} #{path.shellescape}",
-          "git --no-pager branch --list origin/#{git_branch} --no-color -r",
-          "git checkout --orphan #{git_branch}",
-          "git reset --hard"
-        ]
-        expected_commands.each do |command|
-          expect(FastlaneCore::CommandExecutor).to receive(:execute).once.with({
-            command: command,
-            print_all: nil,
-            print_command: nil
-          }).and_return("")
+          expect(File.directory?(storage.working_directory)).to eq(true)
+          expect(File.exist?(File.join(storage.working_directory, 'README.md'))).to eq(false) # because the README is being added when committing the changes
         end
+      end
 
-        storage = Match::Storage::GitStorage.new(
-          git_url: git_url,
-          shallow_clone: shallow_clone,
-          branch: git_branch
-        )
-        storage.download
+      describe "when using shallow_clone" do
+        it "clones the repo with correct clone command" do
+          storage = Match::Storage::GitStorage.new(
+            git_url: git_url,
+            branch: git_branch,
+            # Test case:
+            shallow_clone: true
+          )
 
-        expect(File.directory?(storage.working_directory)).to eq(true)
-        expect(File.exist?(File.join(storage.working_directory, 'README.md'))).to eq(false) # because the README is being added when committing the changes
+          clone_command = "git clone #{git_url.shellescape} #{@path.shellescape} --depth 1 --no-single-branch"
+
+          expect_command_execution(clone_command)
+          expect_command_execution(branch_checkout_commands(git_branch))
+
+          storage.download
+
+          expect(File.directory?(storage.working_directory)).to eq(true)
+          expect(File.exist?(File.join(storage.working_directory, 'README.md'))).to eq(false) # because the README is being added when committing the changes
+        end
+      end
+
+      describe "when using shallow_clone and clone_branch_directly" do
+        it "clones the repo with correct clone command" do
+          storage = Match::Storage::GitStorage.new(
+            git_url: git_url,
+            branch: git_branch,
+            # Test case:
+            clone_branch_directly: true,
+            shallow_clone: true
+          )
+
+          clone_command = "git clone #{git_url.shellescape} #{@path.shellescape} --depth 1 -b #{git_branch} --single-branch"
+
+          expect_command_execution(clone_command)
+          expect_command_execution(branch_checkout_commands(git_branch))
+
+          storage.download
+
+          expect(File.directory?(storage.working_directory)).to eq(true)
+          expect(File.exist?(File.join(storage.working_directory, 'README.md'))).to eq(false) # because the README is being added when committing the changes
+        end
+      end
+
+      describe "when using clone_branch_directly" do
+        it "clones the repo with correct clone command" do
+          storage = Match::Storage::GitStorage.new(
+            git_url: git_url,
+            branch: git_branch,
+            # Test case:
+            clone_branch_directly: true
+          )
+
+          clone_command = "git clone #{git_url.shellescape} #{@path.shellescape} -b #{git_branch} --single-branch"
+
+          expect_command_execution(clone_command)
+          expect_command_execution(branch_checkout_commands(git_branch))
+
+          storage.download
+
+          expect(File.directory?(storage.working_directory)).to eq(true)
+          expect(File.exist?(File.join(storage.working_directory, 'README.md'))).to eq(false) # because the README is being added when committing the changes
+        end
+      end
+
+      describe "when not using shallow_clone and clone_branch_directly" do
+        it "clones the repo with correct clone command" do
+          storage = Match::Storage::GitStorage.new(
+            git_url: git_url,
+            branch: git_branch,
+            # Test case:
+            clone_branch_directly: false,
+            shallow_clone: false
+          )
+
+          clone_command = "git clone #{git_url.shellescape} #{@path.shellescape}"
+
+          expect_command_execution(clone_command)
+          expect_command_execution(branch_checkout_commands(git_branch))
+
+          storage.download
+
+          expect(File.directory?(storage.working_directory)).to eq(true)
+          expect(File.exist?(File.join(storage.working_directory, 'README.md'))).to eq(false) # because the README is being added when committing the changes
+        end
       end
     end
 
     describe "#save_changes" do
-      it "skips README file generation if so requested" do
-        path = Dir.mktmpdir # to have access to the actual path
-        expect(Dir).to receive(:mktmpdir).and_return(path)
-        git_url = "https://github.com/fastlane/fastlane/tree/master/certificates"
-        random_file = "random_file"
+      describe "when skip_docs is true" do
+        it "skips README file generation" do
+          random_file_to_commit = "random_file_to_commit"
 
+          storage = Match::Storage::GitStorage.new(
+            type: "appstore",
+            platform: "ios",
+            git_url: git_url,
+            branch: git_branch,
+            skip_docs: true
+          )
+
+          checkout_command = "git clone #{git_url.shellescape} #{@path.shellescape}"
+          expect_command_execution(checkout_command)
+          expect_command_execution(branch_checkout_commands(git_branch))
+
+          expected_commit_commands = [
+            # Stage new file for commit.
+            "git add #{random_file_to_commit}",
+            # Stage match_version.txt for commit.
+            "git add match_version.txt",
+            # Commit changes.
+            "git commit -m " + '[fastlane] Updated appstore and platform ios'.shellescape,
+            # Push changes to the remote origin.
+            "git push origin #{git_branch}"
+          ]
+          expect_command_execution(expected_commit_commands)
+
+          expect(storage).to receive(:clear_changes).and_return(nil) # so we can inspect the folder
+
+          storage.download
+          storage.save_changes!(files_to_commit: [random_file_to_commit])
+
+          expect(File.directory?(storage.working_directory)).to eq(true)
+          expect(File.exist?(File.join(storage.working_directory, 'README.md'))).to eq(false)
+          expect(File.read(File.join(storage.working_directory, 'match_version.txt'))).to eq(Fastlane::VERSION)
+        end
+      end
+    end
+
+    describe "#delete_files" do
+      it "uses literal pathspecs when removing files from git" do
         storage = Match::Storage::GitStorage.new(
-          type: "appstore",
+          type: "development",
           platform: "ios",
-          git_url: git_url,
-          shallow_clone: false,
-          skip_docs: true
+          branch: git_branch
         )
 
-        expected_commands = [
-          "git add #{random_file}",
-          "git add match_version.txt",
-          "git commit -m " + '[fastlane] Updated appstore and platform ios'.shellescape,
-          "git push origin master",
-          "git clone #{git_url.shellescape} #{path.shellescape}"
-        ]
+        profile_with_wildcard = File.join(@path, "profiles", "development", "Development_com.example.WebDriverAgent.*.mobileprovision")
+        matched_profile = File.join(@path, "profiles", "development", "Development_com.example.WebDriverAgent.xctrunner.mobileprovision")
 
-        expected_commands.each do |command|
+        expected_commit_commands = [
+          "git --literal-pathspecs rm -- #{profile_with_wildcard.shellescape}",
+          "git --literal-pathspecs rm -- #{matched_profile.shellescape}",
+          "git commit -m " + '[fastlane] Updated development and platform ios'.shellescape,
+          "git push origin #{git_branch}"
+        ]
+        expect_command_execution(expected_commit_commands)
+
+        storage.delete_files(files_to_delete: [profile_with_wildcard, matched_profile])
+      end
+    end
+
+    describe "#authentication" do
+      describe "when using a private key file" do
+        it "wraps the git command in ssh-agent shell" do
+          expect(File).to receive(:file?).twice.and_return(true)
+          private_key = "#{@path}/fastlane.match.id_dsa"
+          clone_command = "ssh-agent bash -c 'ssh-add #{private_key.shellescape}; git clone #{git_url.shellescape} #{@path.shellescape}'"
+
+          expect_command_execution(clone_command)
+          expect_command_execution(branch_checkout_commands(git_branch))
+
+          storage = Match::Storage::GitStorage.new(
+            git_url: git_url,
+            branch: git_branch,
+            git_private_key: private_key
+          )
+          storage.download
+
+          expect(File.directory?(storage.working_directory)).to eq(true)
+          expect(File.exist?(File.join(storage.working_directory, 'README.md'))).to eq(false) # because the README is being added when committing the changes
+        end
+      end
+
+      describe "when using a raw private key" do
+        let(:private_key) { "-----BEGIN EXAMPLE KEY-----\nEXAMPLE_KEY_BODY\n-----END EXAMPLE KEY-----\n" }
+
+        def expect_ssh_add_to_receive_key(command)
           expect(FastlaneCore::CommandExecutor).to receive(:execute).once.with({
-            command: command,
+            command: "ssh-agent bash -c 'ssh-add - <<< \"$MATCH_SSH_ADD_PRIVATE_KEY\"; #{command}'",
             print_all: nil,
             print_command: nil
-          }).and_return("")
+          }) do
+            expect(ENV['MATCH_SSH_ADD_PRIVATE_KEY']).to eq(private_key)
+            ""
+          end
         end
 
-        expect(storage).to receive(:clear_changes).and_return(nil) # so we can inspect the folder
+        it "gives the key to ssh-add for git push from the environment, not from the command line" do
+          allow(File).to receive(:file?).and_return(false)
+          profile = File.join(@path, "profiles", "development", "Development_com.example.mobileprovision")
+          expected_commit_commands = [
+            "git --literal-pathspecs rm -- #{profile.shellescape}",
+            "git commit -m " + '[fastlane] Updated development and platform ios'.shellescape
+          ]
+          expect_command_execution(expected_commit_commands)
+          expect_ssh_add_to_receive_key("git push origin #{git_branch}")
 
+          storage = Match::Storage::GitStorage.new(
+            type: "development",
+            platform: "ios",
+            branch: git_branch,
+            git_private_key: private_key
+          )
+          storage.delete_files(files_to_delete: [profile])
+        end
+
+        it "gives the key to ssh-add for git clone from the environment, not from the command line" do
+          expect(File).to receive(:file?).twice.and_return(false)
+          expect_ssh_add_to_receive_key("git clone #{git_url.shellescape} #{@path.shellescape}")
+          expect_command_execution(branch_checkout_commands(git_branch))
+
+          storage = Match::Storage::GitStorage.new(
+            git_url: git_url,
+            branch: git_branch,
+            git_private_key: private_key
+          )
+          storage.download
+
+          expect(File.directory?(storage.working_directory)).to eq(true)
+          expect(File.exist?(File.join(storage.working_directory, 'README.md'))).to eq(false) # because the README is being added when committing the changes
+        end
+      end
+    end
+
+    describe "#authorization header" do
+      let(:header) { "Authorization: Basic EXAMPLE_TOKEN_123" }
+
+      def expect_git_to_receive_header(command)
+        expect(FastlaneCore::CommandExecutor).to receive(:execute).once.with({
+          command: command,
+          print_all: nil,
+          print_command: nil
+        }) do
+          expect(`git config --get-all http.extraheader`).to include(header)
+          ""
+        end
+      end
+
+      it "gives the header to git clone through its environment, not its command line" do
+        expect_git_to_receive_header("git clone #{git_url.shellescape} #{@path.shellescape}")
+        expect_command_execution(branch_checkout_commands(git_branch))
+
+        storage = Match::Storage::GitStorage.new(
+          git_url: git_url,
+          branch: git_branch,
+          git_basic_authorization: "EXAMPLE_TOKEN_123"
+        )
         storage.download
-        storage.save_changes!(files_to_commit: [random_file])
+      end
 
-        expect(File.directory?(storage.working_directory)).to eq(true)
-        expect(File.exist?(File.join(storage.working_directory, 'README.md'))).to eq(false)
-        expect(File.read(File.join(storage.working_directory, 'match_version.txt'))).to eq(Fastlane::VERSION)
+      it "gives the header to git push through its environment, since it is no longer stored in the clone" do
+        profile = File.join(@path, "profiles", "development", "Development_com.example.mobileprovision")
+        expected_commit_commands = [
+          "git --literal-pathspecs rm -- #{profile.shellescape}",
+          "git commit -m " + '[fastlane] Updated development and platform ios'.shellescape
+        ]
+        expect_command_execution(expected_commit_commands)
+        expect_git_to_receive_header("git push origin #{git_branch}")
+
+        storage = Match::Storage::GitStorage.new(
+          type: "development",
+          platform: "ios",
+          branch: git_branch,
+          git_basic_authorization: "EXAMPLE_TOKEN_123"
+        )
+        storage.delete_files(files_to_delete: [profile])
+      end
+    end
+
+    describe "#ssh-agent utilities" do
+      describe "when using a raw private key" do
+        it "wraps any given command in ssh-agent shell" do
+          given_command = "any random command"
+          private_key = "-----BEGIN EXAMPLE KEY-----\nEXAMPLE_KEY_BODY\n-----END EXAMPLE KEY-----\n"
+
+          storage = Match::Storage::GitStorage.new(
+            git_private_key: private_key
+          )
+
+          expected_command = "ssh-agent bash -c 'ssh-add - <<< \"$MATCH_SSH_ADD_PRIVATE_KEY\"; #{given_command}'"
+          expect(storage.command_from_private_key(given_command)).to eq(expected_command)
+        end
+      end
+
+      describe "when using a private key file" do
+        it "wraps any given command in ssh-agent shell" do
+          given_command = "any random command"
+          private_key = "#{Dir.mktmpdir}/fastlane.match.id_dsa"
+
+          storage = Match::Storage::GitStorage.new(
+            git_private_key: private_key
+          )
+
+          expected_command = "ssh-agent bash -c 'ssh-add - <<< \"$MATCH_SSH_ADD_PRIVATE_KEY\"; #{given_command}'"
+          expect(storage.command_from_private_key(given_command)).to eq(expected_command)
+        end
+      end
+    end
+
+    describe "#git_env_values" do
+      it "sets a default GIT_SSH_COMMAND with BatchMode=yes when GIT_SSH_COMMAND is unset" do
+        allow(ENV).to receive(:[]).with('GIT_SSH_COMMAND').and_return(nil)
+        storage = Match::Storage::GitStorage.new
+        expect(storage.send(:git_env_values)).to eq({ 'GIT_TERMINAL_PROMPT' => '0', 'GIT_SSH_COMMAND' => 'ssh -o BatchMode=yes' })
+      end
+
+      it "appends BatchMode=yes when GIT_SSH_COMMAND exists" do
+        allow(ENV).to receive(:[]).with('GIT_SSH_COMMAND').and_return('ssh -v')
+        storage = Match::Storage::GitStorage.new
+        expect(storage.send(:git_env_values)['GIT_SSH_COMMAND']).to eq('ssh -v -o BatchMode=yes')
+      end
+
+      it "adds the authorization header after config pairs already passed through the environment" do
+        allow(ENV).to receive(:[]).and_call_original
+        allow(ENV).to receive(:[]).with('GIT_CONFIG_COUNT').and_return('1')
+        storage = Match::Storage::GitStorage.new(git_bearer_authorization: "EXAMPLE_TOKEN_123")
+        expect(storage.send(:git_env_values)).to include(
+          'GIT_CONFIG_COUNT' => '2',
+          'GIT_CONFIG_KEY_1' => 'http.extraheader',
+          'GIT_CONFIG_VALUE_1' => 'Authorization: Bearer EXAMPLE_TOKEN_123'
+        )
+      end
+
+      it "stops with a clear error when git is older than 2.31, which ignores a header passed this way" do
+        allow(Open3).to receive(:capture2).with('git', '--version').and_return(["git version 2.30.2\n", double(success?: true)])
+        storage = Match::Storage::GitStorage.new(git_basic_authorization: "EXAMPLE_TOKEN_123")
+        expect { storage.send(:git_env_values) }.to raise_error(FastlaneCore::Interface::FastlaneError, /need git 2.31 or later, found git 2.30.2/)
+      end
+
+      it "accepts git 2.31 and later, including Apple's build" do
+        allow(ENV).to receive(:[]).and_call_original
+        allow(ENV).to receive(:[]).with('GIT_CONFIG_COUNT').and_return(nil)
+        allow(Open3).to receive(:capture2).with('git', '--version').and_return(["git version 2.39.5 (Apple Git-154)\n", double(success?: true)])
+        storage = Match::Storage::GitStorage.new(git_basic_authorization: "EXAMPLE_TOKEN_123")
+        expect(storage.send(:git_env_values)).to include('GIT_CONFIG_KEY_0' => 'http.extraheader')
+      end
+
+      it "does not check the git version without a header" do
+        expect(Open3).not_to receive(:capture2)
+        Match::Storage::GitStorage.new.send(:git_env_values)
+      end
+
+      it "does not duplicate if BatchMode already exists" do
+        allow(ENV).to receive(:[]).with('GIT_SSH_COMMAND').and_return('ssh -o BatchMode=yes')
+        storage = Match::Storage::GitStorage.new
+        expect(storage.send(:git_env_values)['GIT_SSH_COMMAND']).to eq('ssh -o BatchMode=yes')
       end
     end
   end

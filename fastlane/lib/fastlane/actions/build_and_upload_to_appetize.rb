@@ -1,8 +1,10 @@
+require 'tmpdir'
+
 module Fastlane
   module Actions
     class BuildAndUploadToAppetizeAction < Action
       def self.run(params)
-        tmp_path = "/tmp/fastlane_build"
+        tmp_path = Dir.mktmpdir("fastlane_build-")
 
         xcodebuild_configs = params[:xcodebuild]
         xcodebuild_configs[:sdk] = "iphonesimulator"
@@ -21,7 +23,8 @@ module Fastlane
         other_action.appetize(path: zipped_bundle,
                               api_token: params[:api_token],
                               public_key: params[:public_key],
-                              note: params[:note])
+                              note: params[:note],
+                              timeout: params[:timeout])
 
         public_key = Actions.lane_context[SharedValues::APPETIZE_PUBLIC_KEY]
         UI.success("Generated Public Key: #{Actions.lane_context[SharedValues::APPETIZE_PUBLIC_KEY]}")
@@ -63,10 +66,9 @@ module Fastlane
                                        env_name: "APPETIZE_API_TOKEN",
                                        description: "Appetize.io API Token",
                                        sensitive: true,
-                                       is_string: true),
+                                       code_gen_sensitive: true),
           FastlaneCore::ConfigItem.new(key: :public_key,
                                        description: "If not provided, a new app will be created. If provided, the existing build will be overwritten",
-                                       is_string: true,
                                        optional: true,
                                        verify_block: proc do |value|
                                          if value.start_with?("private_")
@@ -75,8 +77,14 @@ module Fastlane
                                        end),
           FastlaneCore::ConfigItem.new(key: :note,
                                        description: "Notes you wish to add to the uploaded app",
-                                       is_string: true,
-                                       optional: true)
+                                       optional: true),
+          FastlaneCore::ConfigItem.new(key: :timeout,
+                                       description: "The number of seconds to wait until automatically ending the session due to user inactivity. Must be 30, 60, 90, 120, 180, 300, 600, 1800, 3600 or 7200. Default is 120",
+                                       type: Integer,
+                                       optional: true,
+                                       verify_block: proc do |value|
+                                         UI.user_error!("The value provided doesn't match any of the supported options.") unless [30, 60, 90, 120, 180, 300, 600, 1800, 3600, 7200].include?(value)
+                                       end)
         ]
       end
 

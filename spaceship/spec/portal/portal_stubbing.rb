@@ -1,11 +1,11 @@
 class PortalStubbing
   class << self
     def adp_read_fixture_file(filename)
-      File.read(File.join('spaceship', 'spec', 'portal', 'fixtures', filename))
+      spaceship_fixture(File.join('spaceship', 'spec', 'portal', 'fixtures', filename))
     end
 
     def adp_read_binary_fixture_file(filename)
-      File.binread(File.join('spaceship', 'spec', 'portal', 'fixtures', filename))
+      spaceship_fixture(File.join('spaceship', 'spec', 'portal', 'fixtures', filename), binary: true)
     end
 
     # Necessary, as we're now running this in a different context
@@ -20,7 +20,7 @@ class PortalStubbing
         to_return(status: 200, body: adp_read_fixture_file(File.join("enterprise", "listCertRequests.action.json")), headers: { 'Content-Type' => 'application/json' })
 
       stub_request(:post, "https://developer.apple.com/services-account/QH65B2/account/ios/profile/createProvisioningProfile.action").
-        with(body: { "appIdId" => "2UMR2S6PAA", "certificateIds" => "Q82WC5JRE9", "distributionType" => "inhouse", "provisioningProfileName" => "Delete Me", "teamId" => "XXXXXXXXXX" }).
+        with(body: { "appIdId" => "2UMR2S6PAA", "certificateIds" => "Q82WC5JRE9", "deviceIds" => "", "distributionType" => "inhouse", "provisioningProfileName" => "Delete Me", "teamId" => "XXXXXXXXXX" }).
         to_return(status: 200, body: adp_read_fixture_file('create_profile_success.json'), headers: { 'Content-Type' => 'application/json' })
     end
 
@@ -68,14 +68,6 @@ class PortalStubbing
         to_return(status: 200, body: adp_read_fixture_file('getProvisioningProfileAppStore.action.json'), headers: { 'Content-Type' => 'application/json' })
 
       stub_request(:post, "https://developer.apple.com/services-account/QH65B2/account/ios/profile/getProvisioningProfile.action").
-        with(body: { "provisioningProfileId" => "2MAY7NPHRU", "teamId" => "XXXXXXXXXX" }).
-        to_return(status: 200, body: adp_read_fixture_file('getProvisioningProfileAppStore.action.json'), headers: { 'Content-Type' => 'application/json' })
-
-      stub_request(:post, "https://developer.apple.com/services-account/QH65B2/account/ios/profile/getProvisioningProfile.action").
-        with(body: { "provisioningProfileId" => "2MAY7NPHRF", "teamId" => "XXXXXXXXXX" }).
-        to_return(status: 200, body: adp_read_fixture_file('getProvisioningProfiletvOSAppStore.action.json'), headers: { 'Content-Type' => 'application/json' })
-
-      stub_request(:post, "https://developer.apple.com/services-account/QH65B2/account/ios/profile/getProvisioningProfile.action").
         with(body: { "provisioningProfileId" => "PP00000005", "teamId" => "XXXXXXXXXX" }).
         to_return(status: 200, body: adp_read_fixture_file('getProvisioningProfileDevelopment.action.json'), headers: { 'Content-Type' => 'application/json' })
 
@@ -97,17 +89,8 @@ class PortalStubbing
 
       # Profile with template
       stub_request(:post, "https://developer.apple.com/services-account/QH65B2/account/ios/profile/createProvisioningProfile.action").
-        with(body: { "appIdId" => "R9YNDTPLJX", "certificateIds" => "C8DL7464RQ", "distributionType" => "limited", "provisioningProfileName" => "net.sunapps.106 limited", "teamId" => "XXXXXXXXXX", "template" => "Subscription Service iOS (dist)" }).
+        with(body: { "appIdId" => "R9YNDTPLJX", "certificateIds" => "C8DL7464RQ", "deviceIds" => "", "distributionType" => "limited", "provisioningProfileName" => "net.sunapps.106 limited", "teamId" => "XXXXXXXXXX", "template" => "Subscription Service iOS (dist)" }).
         to_return(status: 200, body: adp_read_fixture_file('create_profile_with_template_success.json'), headers: { 'Content-Type' => 'application/json' })
-
-      # Repair Profiles
-      stub_request(:post, "https://developer.apple.com/services-account/QH65B2/account/ios/profile/regenProvisioningProfile.action").
-        with(body: { "appIdId" => "572XTN75U2", "certificateIds" => "XC5PH8D47H", "deviceIds" => ["AAAAAAAAAA", "BBBBBBBBBB", "CCCCCCCCCC", "DDDDDDDDDD"], "distributionType" => "store", "provisioningProfileName" => "net.sunapps.7 AppStore", "teamId" => "XXXXXXXXXX" }).
-        to_return(status: 200, body: adp_read_fixture_file('repair_profile_success.json'), headers: { 'Content-Type' => 'application/json' })
-
-      stub_request(:post, "https://developer.apple.com/services-account/QH65B2/account/ios/profile/regenProvisioningProfile.action").
-        with(body: { "appIdId" => "572XTN75U2", "certificateIds" => "XC5PH8D47H", "deviceIds" => ["AAAAAAAAAA", "BBBBBBBBBB", "CCCCCCCCCC", "DDDDDDDDDD"], "distributionType" => "store", "provisioningProfileName" => "net.sunapps.7 AppStore", "teamId" => "XXXXXXXXXX", "subPlatform" => "tvOS" }).
-        to_return(status: 200, body: adp_read_fixture_file('repair_profile_tvos_success.json'), headers: { 'Content-Type' => 'application/json' })
 
       # Delete Profiles
       stub_request(:post, "https://developer.apple.com/services-account/QH65B2/account/ios/profile/deleteProvisioningProfile.action").
@@ -128,10 +111,6 @@ class PortalStubbing
       stub_request(:post, 'https://developer.apple.com/services-account/QH65B2/account/ios/device/listDevices.action').
         with(body: { deviceClasses: 'ipod', teamId: 'XXXXXXXXXX', pageSize: "500", pageNumber: "1", sort: 'name=asc', includeRemovedDevices: "false" }).
         to_return(status: 200, body: adp_read_fixture_file('listDevicesiPod.action.json'), headers: { 'Content-Type' => 'application/json' })
-
-      stub_request(:post, 'https://developer.apple.com/services-account/QH65B2/account/ios/device/listDevices.action').
-        with(body: { deviceClasses: 'tvOS', teamId: 'XXXXXXXXXX', pageSize: "500", pageNumber: "1", sort: 'name=asc' }).
-        to_return(status: 200, body: adp_read_fixture_file('listDevicesTV.action.json'), headers: { 'Content-Type' => 'application/json' })
 
       stub_request(:post, 'https://developer.apple.com/services-account/QH65B2/account/ios/device/listDevices.action').
         with(body: { deviceClasses: 'watch', teamId: 'XXXXXXXXXX', pageSize: "500", pageNumber: "1", sort: 'name=asc', includeRemovedDevices: "false" }).
@@ -182,7 +161,7 @@ class PortalStubbing
 
     def adp_stub_certificates
       stub_request(:post, "https://developer.apple.com/services-account/QH65B2/account/ios/certificate/listCertRequests.action").
-        with(body: { "pageNumber" => "1", "pageSize" => "500", "sort" => "certRequestStatusCode=asc", "teamId" => "XXXXXXXXXX", "types" => "83Q87W3TGH,WXV89964HE,5QPB9NHCEI,R58UK2EWSO,9RQEK7MSXA,LA30L5BJEU,BKLRAVXMGM,UPV3DW712I,Y3B2F3TYSI,3T2ZP62QW8,E5D663CMZW,4APLUP237T,MD8Q2VRT6A,T44PTHVNID,DZQUP8189Y,FGQUP4785Z,S5WE21TULA,3BQKVH9I2X,FUOY7LWJET" }).
+        with(body: { "pageNumber" => "1", "pageSize" => "500", "sort" => "certRequestStatusCode=asc", "teamId" => "XXXXXXXXXX", "types" => "83Q87W3TGH,WXV89964HE,5QPB9NHCEI,R58UK2EWSO,9RQEK7MSXA,LA30L5BJEU,JKG5JZ54H7,UPV3DW712I,Y3B2F3TYSI,3T2ZP62QW8,E5D663CMZW,4APLUP237T,MD8Q2VRT6A,3BQKVH9I2X,BKLRAVXMGM,T44PTHVNID,DZQUP8189Y,FGQUP4785Z,S5WE21TULA,FUOY7LWJET" }).
         to_return(status: 200, body: adp_read_fixture_file('listCertRequests.action.json'), headers: { 'Content-Type' => 'application/json' })
 
       stub_request(:post, "https://developer.apple.com/services-account/QH65B2/account/ios/certificate/listCertRequests.action").
@@ -244,19 +223,10 @@ class PortalStubbing
         with(body: "{\"teamId\":\"XXXXXXXXXX\"}").
         to_return(status: 200, body: adp_read_fixture_file("peopleList.json"), headers: { 'Content-Type' => 'application/json' })
 
-      # invite new member
-      stub_request(:post, "https://developer.apple.com/services-account/QH65B2/account/sendInvites").
-        with(body: "{\"invites\":[{\"recipientEmail\":\"helmut@januschka.com\",\"recipientRole\":\"admin\"}],\"teamId\":\"XXXXXXXXXX\"}").
-        to_return(status: 200, body: "", headers: {})
-
       # get invites
       stub_request(:post, "https://developer.apple.com/services-account/QH65B2/account/getInvites").
         with(body: "{\"teamId\":\"XXXXXXXXXX\"}").
         to_return(status: 200, body: adp_read_fixture_file("inviteList.json"), headers: { 'Content-Type' => 'application/json' })
-
-      stub_request(:post, "https://developer.apple.com/services-account/QH65B2/account/removeTeamMembers").
-        with(body: "{\"teamId\":\"XXXXXXXXXX\",\"teamMemberIds\":[\"5M8TWKRZ3J\"]}").
-        to_return(status: 200, body: "", headers: {})
 
       stub_request(:post, "https://developer.apple.com/services-account/QH65B2/account/setTeamMemberRoles").
         with(body: "{\"teamId\":\"XXXXXXXXXX\",\"role\":\"member\",\"teamMemberIds\":[\"5M8TWKRZ3J\"]}").
@@ -281,26 +251,6 @@ class PortalStubbing
       stub_request(:post, 'https://developer.apple.com/services-account/QH65B2/account/ios/identifiers/listPassTypeIds.action').
         with(body: { teamId: 'XXXXXXXXXX', pageSize: "500", pageNumber: "1", sort: 'name=asc' }).
         to_return(status: 200, body: adp_read_fixture_file('listPassTypeIds.action.json'), headers: { 'Content-Type' => 'application/json' })
-
-      stub_request(:post, "https://developer.apple.com/services-account/QH65B2/account/mac/identifiers/listPassTypeIds.action").
-        with(body: { "pageNumber" => "1", "pageSize" => "500", "sort" => "name=asc", "teamId" => "XXXXXXXXXX" }).
-        to_return(status: 200, body: adp_read_fixture_file('listPassTypeIds.action.json'), headers: { 'Content-Type' => 'application/json' })
-
-      stub_request(:post, "https://developer.apple.com/services-account/QH65B2/account/ios/identifiers/addPassTypeId.action").
-        with(body: { "name" => "Fastlane Passbook", "identifier" => "pass.com.fastlane.example", "teamId" => "XXXXXXXXXX" }).
-        to_return(status: 200, body: adp_read_fixture_file('addPassTypeId.action.json'), headers: { 'Content-Type' => 'application/json' })
-
-      stub_request(:post, "https://developer.apple.com/services-account/QH65B2/account/mac/identifiers/addPassTypeId.action").
-        with(body: { "name" => "Fastlane Passbook", "identifier" => "web.com.fastlane.example", "teamId" => "XXXXXXXXXX" }).
-        to_return(status: 200, body: adp_read_fixture_file('addPassTypeId.action.json'), headers: { 'Content-Type' => 'application/json' })
-
-      stub_request(:post, "https://developer.apple.com/services-account/QH65B2/account/ios/identifiers/deletePassTypeId.action").
-        with(body: { "passTypeId" => "R7878HDXC3", "teamId" => "XXXXXXXXXX" }).
-        to_return(status: 200, body: adp_read_fixture_file('deletePassTypeId.action.json'), headers: { 'Content-Type' => 'application/json' })
-
-      stub_request(:post, "https://developer.apple.com/services-account/QH65B2/account/mac/identifiers/deletePassTypeId.action").
-        with(body: { "passTypeId" => "R7878HDXC3", "teamId" => "XXXXXXXXXX" }).
-        to_return(status: 200, body: adp_read_fixture_file('deletePassTypeId.action.json'), headers: { 'Content-Type' => 'application/json' })
     end
 
     def adp_stub_website_pushes
@@ -311,22 +261,6 @@ class PortalStubbing
       stub_request(:post, "https://developer.apple.com/services-account/QH65B2/account/mac/identifiers/listWebsitePushIds.action").
         with(body: { "pageNumber" => "1", "pageSize" => "500", "sort" => "name=asc", "teamId" => "XXXXXXXXXX" }).
         to_return(status: 200, body: adp_read_fixture_file('listWebsitePushIds.action.json'), headers: { 'Content-Type' => 'application/json' })
-
-      stub_request(:post, "https://developer.apple.com/services-account/QH65B2/account/ios/identifiers/addWebsitePushId.action").
-        with(body: { "name" => "Fastlane Website Push", "identifier" => "web.com.fastlane.example", "teamId" => "XXXXXXXXXX" }).
-        to_return(status: 200, body: adp_read_fixture_file('addWebsitePushId.action.json'), headers: { 'Content-Type' => 'application/json' })
-
-      stub_request(:post, "https://developer.apple.com/services-account/QH65B2/account/mac/identifiers/addWebsitePushId.action").
-        with(body: { "name" => "Fastlane Website Push", "identifier" => "web.com.fastlane.example", "teamId" => "XXXXXXXXXX" }).
-        to_return(status: 200, body: adp_read_fixture_file('addWebsitePushId.action.json'), headers: { 'Content-Type' => 'application/json' })
-
-      stub_request(:post, "https://developer.apple.com/services-account/QH65B2/account/ios/identifiers/deleteWebsitePushId.action").
-        with(body: { "websitePushId" => "R7878HDXC3", "teamId" => "XXXXXXXXXX" }).
-        to_return(status: 200, body: adp_read_fixture_file('deleteWebsitePushId.action.json'), headers: { 'Content-Type' => 'application/json' })
-
-      stub_request(:post, "https://developer.apple.com/services-account/QH65B2/account/mac/identifiers/deleteWebsitePushId.action").
-        with(body: { "websitePushId" => "R7878HDXC3", "teamId" => "XXXXXXXXXX" }).
-        to_return(status: 200, body: adp_read_fixture_file('deleteWebsitePushId.action.json'), headers: { 'Content-Type' => 'application/json' })
     end
 
     def adp_stub_download_certificate_failure

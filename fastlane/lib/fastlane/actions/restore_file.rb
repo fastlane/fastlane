@@ -5,13 +5,13 @@ module Fastlane
         path = params[:path]
         backup_path = "#{path}.back"
         UI.user_error!("Could not find file '#{backup_path}'") unless File.exist?(backup_path)
-        FileUtils.cp(backup_path, path, { preserve: true })
+        FileUtils.cp(backup_path, path, preserve: true)
         FileUtils.rm(backup_path)
         UI.message("Successfully restored backup 📤")
       end
 
       def self.description
-        'This action restore your file that was backuped with the `backup_file` action'
+        'This action restore your file that was backed up with the `backup_file` action'
       end
 
       def self.is_supported?(platform)

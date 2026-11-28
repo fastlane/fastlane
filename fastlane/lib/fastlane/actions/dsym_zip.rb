@@ -61,7 +61,7 @@ module Fastlane
                                        description: 'Whether or not all dSYM files are to be included. Optional, default is false in which only your app dSYM is included',
                                        default_value: false,
                                        optional: true,
-                                       is_string: false,
+                                       type: Boolean,
                                        env_name: 'DSYM_ZIP_ALL')
         ]
       end

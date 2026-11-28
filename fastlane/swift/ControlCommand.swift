@@ -1,8 +1,5 @@
-//
-//  ControlCommand.swift
-//  FastlaneRunner
-//
-//  Created by Joshua Liebowitz on 1/3/18.
+// ControlCommand.swift
+// Copyright (c) 2026 FastlaneTools
 
 //
 //  ** NOTE **
@@ -15,7 +12,9 @@ import Foundation
 
 struct ControlCommand: RubyCommandable {
     static let commandKey = "command"
-    var type: CommandType { return .control }
+    var type: CommandType {
+        return .control
+    }
 
     enum ShutdownCommandType {
         static let userMessageKey: String = "userMessage"
@@ -49,24 +48,24 @@ struct ControlCommand: RubyCommandable {
     }
 
     let message: String?
+    let id: String = UUID().uuidString
     let shutdownCommandType: ShutdownCommandType
     var commandJson: String {
-        var jsonDictionary: [String: Any] = [ControlCommand.commandKey : self.shutdownCommandType.token]
+        var jsonDictionary: [String: Any] = [ControlCommand.commandKey: shutdownCommandType.token]
 
         if let message = message {
             jsonDictionary[ShutdownCommandType.userMessageKey] = message
         }
-        if case .cancel(let reason) = shutdownCommandType {
+        if case let .cancel(reason) = shutdownCommandType {
             jsonDictionary[ShutdownCommandType.CancelReason.reasonKey] = reason.reasonText
         }
 
         let jsonData = try! JSONSerialization.data(withJSONObject: jsonDictionary, options: [])
-        let jsonString = String(data: jsonData, encoding: .utf8)!
-        return jsonString
+        return String(data: jsonData, encoding: .utf8)!
     }
 
     init(commandType: ShutdownCommandType, message: String? = nil) {
-        self.shutdownCommandType = commandType
+        shutdownCommandType = commandType
         self.message = message
     }
 }

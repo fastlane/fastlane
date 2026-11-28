@@ -23,25 +23,25 @@ module Gym
 
       FileUtils.mkdir_p(File.expand_path(Gym.config[:output_directory]))
 
-      # Determine platform to archive
-      is_mac = Gym.project.mac? || Gym.building_mac_catalyst_for_mac?
-      is_ios = !is_mac && (Gym.project.ios? || Gym.project.tvos? || Gym.project.watchos?)
-
       # Archive
-      if is_ios
-        fix_generic_archive unless Gym.project.watchos? # See https://github.com/fastlane/fastlane/pull/4325
+      if Gym.building_for_ipa?
+        fix_generic_archive
         return BuildCommandGenerator.archive_path if Gym.config[:skip_package_ipa]
 
         package_app
         compress_and_move_dsym
-        path = move_ipa
-        move_manifest
-        move_app_thinning
-        move_app_thinning_size_report
-        move_apps_folder
-        move_asset_packs
-        move_appstore_info
-      elsif is_mac
+
+        unless Gym.export_destination_upload?
+          path = move_ipa
+          move_manifest
+          move_app_thinning
+          move_app_thinning_size_report
+          move_apps_folder
+          move_asset_packs
+          appstore_info_path = move_appstore_info
+          generate_appstore_info(path) unless appstore_info_path
+        end
+      elsif Gym.building_for_pkg?
         path = File.expand_path(Gym.config[:output_directory])
         compress_and_move_dsym
         if Gym.project.mac_app? || Gym.building_mac_catalyst_for_mac?
@@ -49,14 +49,17 @@ module Gym
           return path if Gym.config[:skip_package_pkg]
 
           package_app
-          path = move_pkg
-          move_appstore_info
+          unless Gym.export_destination_upload?
+            path = move_pkg
+            move_appstore_info
+          end
           return path
         end
         copy_files_from_path(File.join(BuildCommandGenerator.archive_path, "Products/usr/local/bin/*")) if Gym.project.command_line_tool?
       end
       return path
     end
+    # rubocop:enable Metrics/PerceivedComplexity
 
     #####################################################
     # @!group Printing out things
@@ -93,6 +96,16 @@ module Gym
 
     def fix_generic_archive
       return unless FastlaneCore::Env.truthy?("GYM_USE_GENERIC_ARCHIVE_FIX")
+
+      # Not for watchOS apps, see https://github.com/fastlane/fastlane/pull/4325. When build
+      # settings can't be read, the destination (which then has to name the platform) says so
+      watchos = if Gym.project.xcodebuild_settings_lookup_disallowed_by
+                  Gym.destination_platform.match?(/\AwatchOS/i)
+                else
+                  Gym.project.watchos?
+                end
+      return if watchos
+
       Gym::XcodebuildFixes.generic_archive_fix
     end
 
@@ -220,8 +233,13 @@ module Gym
       UI.message("Compressing #{available_dsyms.count} dSYM(s)") unless Gym.config[:silent]
 
       output_path = File.expand_path(File.join(Gym.config[:output_directory], Gym.config[:output_name] + ".app.dSYM.zip"))
-      command = "cd '#{containing_directory}' && zip -r '#{output_path}' *.dSYM"
-      Helper.backticks(command, print: !Gym.config[:silent])
+      command = "cd #{containing_directory.shellescape} && zip -r #{output_path.shellescape} *.dSYM"
+      FastlaneCore::CommandExecutor.execute(command: command,
+                                          print_all: !Gym.config[:silent],
+                                      print_command: !Gym.config[:silent],
+                                              error: proc do |output|
+                                                UI.user_error!("Could not compress the dSYM(s) to '#{output_path}':\n#{output}")
+                                              end)
       puts("") # new line
 
       UI.success("Successfully exported and compressed dSYM file")
@@ -241,15 +259,19 @@ module Gym
     # Moves over the binary and dsym file to the output directory
     # @return (String) The path to the resulting pkg file
     def move_pkg
-      FileUtils.mv(PackageCommandGenerator.pkg_path, File.expand_path(Gym.config[:output_directory]), force: true)
-      pkg_path = File.expand_path(File.join(Gym.config[:output_directory], File.basename(PackageCommandGenerator.pkg_path)))
+      binary_path = File.expand_path(File.join(Gym.config[:output_directory], File.basename(PackageCommandGenerator.binary_path)))
+      if File.exist?(binary_path)
+        UI.important(" Removing #{File.basename(binary_path)}") if FastlaneCore::Globals.verbose?
+        FileUtils.rm_rf(binary_path)
+      end
+      FileUtils.mv(PackageCommandGenerator.binary_path, File.expand_path(Gym.config[:output_directory]), force: true)
 
       UI.success("Successfully exported and signed the pkg file:")
-      UI.message(pkg_path)
-      pkg_path
+      UI.message(binary_path)
+      binary_path
     end
 
-    # copys framework from temp folder:
+    # copies framework from temp folder:
 
     def copy_files_from_path(path)
       UI.success("Exporting Files:")
@@ -272,12 +294,22 @@ module Gym
       exe_name = Gym.project.build_settings(key: "EXECUTABLE_NAME")
       app_path = File.join(BuildCommandGenerator.archive_path, "Products/Applications/#{exe_name}.app")
 
-      UI.crash!("Couldn't find application in '#{BuildCommandGenerator.archive_path}'") unless File.exist?(app_path)
+      unless File.exist?(app_path)
+        # Apparently the `EXECUTABLE_NAME` is not correct. This can happen when building a workspace which has a project
+        # earlier in the build order that has a different `EXECUTABLE_NAME` than the app. Try to find the last `.app` as
+        # a fallback for this situation.
+        app_path = Dir[File.join(BuildCommandGenerator.archive_path, "Products", "Applications", "*.app")].last
+      end
+
+      UI.user_error!("Couldn't find application in '#{BuildCommandGenerator.archive_path}'") unless app_path && File.exist?(app_path)
+
+      joined_app_path = File.join(Gym.config[:output_directory], File.basename(app_path))
+      FileUtils.rm_rf(joined_app_path)
       FileUtils.cp_r(app_path, File.expand_path(Gym.config[:output_directory]), remove_destination: true)
-      app_path = File.join(Gym.config[:output_directory], File.basename(app_path))
+
       UI.success("Successfully exported the .app file:")
-      UI.message(app_path)
-      app_path
+      UI.message(joined_app_path)
+      joined_app_path
     end
 
     # Move the manifest.plist if exists into the output directory
@@ -350,6 +382,40 @@ module Gym
         UI.success("Successfully exported the AppStoreInfo.plist file:")
         UI.message(appstore_info_path)
         appstore_info_path
+      end
+    end
+
+    # Create AppStoreInfo.plist using swinfo for iOS app-store exports
+    def generate_appstore_info(ipa_path)
+      return unless Gym.config[:generate_appstore_info] && Gym.building_for_ios? && Gym.config[:export_method] == 'app-store'
+
+      swinfo_plist_path = File.join(File.expand_path(Gym.config[:output_directory]), "AppStoreInfo.plist")
+      swinfo_path = File.join(FastlaneCore::Helper.xcode_path, "usr/bin/swinfo")
+
+      begin
+        UI.message("Generating AppStoreInfo.plist...")
+
+        # Build the swinfo command
+        command = [
+          "xcrun",
+          swinfo_path.shellescape,
+          "-f", ipa_path.shellescape,
+          "-o", swinfo_plist_path.shellescape,
+          "-prettyprint", "true",
+          "--plistFormat", "binary"
+        ].join(" ")
+
+        FastlaneCore::CommandExecutor.execute(command: command, print_all: FastlaneCore::Globals.verbose?, print_command: true)
+
+        if File.exist?(swinfo_plist_path)
+          UI.success("Successfully generated AppStoreInfo.plist:")
+          UI.message(swinfo_plist_path)
+          swinfo_plist_path
+        else
+          UI.error("Failed to generate AppStoreInfo.plist")
+        end
+      rescue => ex
+        UI.error("Error generating AppStoreInfo.plist: #{ex}")
       end
     end
 

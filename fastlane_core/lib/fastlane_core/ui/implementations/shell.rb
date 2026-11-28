@@ -1,6 +1,7 @@
 require_relative '../../helper'
 require_relative '../../globals'
 require_relative '../../env'
+require_relative '../../secrets'
 
 require_relative '../interface'
 
@@ -23,7 +24,7 @@ module FastlaneCore
       end
 
       @log.formatter = proc do |severity, datetime, progname, msg|
-        "#{format_string(datetime, severity)}#{msg}\n"
+        "#{format_string(datetime, severity)}#{Secrets.mask(msg.to_s)}\n"
       end
 
       @log
@@ -69,7 +70,7 @@ module FastlaneCore
     end
 
     def command_output(message)
-      actual = (message.split("\r").last || "") # as clearing the line will remove the `>` and the time stamp
+      actual = (encode_as_utf_8_if_possible(message).split("\r").last || "") # as clearing the line will remove the `>` and the time stamp
       actual.split("\n").each do |msg|
         if FastlaneCore::Env.truthy?("FASTLANE_DISABLE_OUTPUT_FORMAT")
           log.info(msg)
@@ -86,11 +87,13 @@ module FastlaneCore
 
     def header(message)
       format = format_string
-      if message.length + 8 < TTY::Screen.width - format.length
+      # clamp to zero to prevent negative argument error below
+      available_width = [0, TTY::Screen.width - format.length].max
+      if message.length + 8 < available_width
         message = "--- #{message} ---"
         i = message.length
       else
-        i = TTY::Screen.width - format.length
+        i = available_width
       end
       success("-" * i)
       success(message)
@@ -106,12 +109,14 @@ module FastlaneCore
       start_line = error_line - 2 < 1 ? 1 : error_line - 2
       end_line = error_line + 2 < contents.length ? error_line + 2 : contents.length
 
+      error('```')
       Range.new(start_line, end_line).each do |line|
-        str = line == error_line ? " => " : "    "
+        str = line == error_line ? +" => " : +"    "
         str << line.to_s.rjust(Math.log10(end_line) + 1)
         str << ":\t#{contents[line - 1]}"
         error(str)
       end
+      error('```')
     end
 
     #####################################################
@@ -145,15 +150,29 @@ module FastlaneCore
     def password(message)
       verify_interactive!(message)
 
-      ask("#{format_string}#{message.to_s.yellow}") { |q| q.echo = "*" }
+      ask("#{format_string}#{message.to_s.yellow}") do |q|
+        q.whitespace = :chomp
+        q.echo = "*"
+      end
     end
 
     private
 
+    def encode_as_utf_8_if_possible(message)
+      return message if message.valid_encoding?
+
+      # genstrings outputs UTF-16, so we should try to use this encoding if it turns out to be valid
+      test_message = message.dup
+      return message.encode(Encoding::UTF_8, Encoding::UTF_16) if test_message.force_encoding(Encoding::UTF_16).valid_encoding?
+
+      # replace any invalid with empty string
+      message.encode(Encoding::UTF_8, invalid: :replace)
+    end
+
     def verify_interactive!(message)
       return if interactive?
       important(message)
-      crash!("Could not retrieve response as fastlane runs in non-interactive mode")
+      user_error!("Could not retrieve response as fastlane runs in non-interactive mode")
     end
   end
 end

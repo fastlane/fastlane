@@ -2,7 +2,7 @@ module Fastlane
   module Actions
     class SwiftlintAction < Action
       def self.run(params)
-        if `which swiftlint`.to_s.length == 0 && params[:executable].nil? && !Helper.test?
+        unless Helper.which('swiftlint') || params[:executable] || Helper.test?
           UI.user_error!("You have to install swiftlint using `brew install swiftlint` or specify the executable path with the `:executable` option.")
         end
 
@@ -11,8 +11,20 @@ module Fastlane
           UI.user_error!("Your version of swiftlint (#{version}) does not support autocorrect mode.\nUpdate swiftlint using `brew update && brew upgrade swiftlint`")
         end
 
+        # See 'Breaking' section release notes here: https://github.com/realm/SwiftLint/releases/tag/0.43.0
+        if params[:mode] == :autocorrect && version >= Gem::Version.new('0.43.0')
+          UI.deprecated("Your version of swiftlint (#{version}) has deprecated autocorrect mode, please start using fix mode in input param")
+          UI.important("For now, switching swiftlint mode `from :autocorrect to :fix` for you 😇")
+          params[:mode] = :fix
+        elsif params[:mode] == :fix && version < Gem::Version.new('0.43.0')
+          UI.important("Your version of swiftlint (#{version}) does not support fix mode.\nUpdate swiftlint using `brew update && brew upgrade swiftlint`")
+          UI.important("For now, switching swiftlint mode `from :fix to :autocorrect` for you 😇")
+          params[:mode] = :autocorrect
+        end
+
+        mode_format = params[:mode] == :fix ? "--" : ""
         command = (params[:executable] || "swiftlint").dup
-        command << " #{params[:mode]}"
+        command << " #{mode_format}#{params[:mode]}"
         command << optional_flags(params)
 
         if params[:files]
@@ -25,19 +37,23 @@ module Fastlane
           command << " --use-script-input-files"
         end
 
+        command << path_argument(params) if params[:path]
+
         command << " > #{params[:output_file].shellescape}" if params[:output_file]
 
         begin
           Actions.sh(command)
         rescue
-          handle_swiftlint_error(params[:ignore_exit_status], $?.exitstatus)
+          # $? is the status of the last subprocess this thread ran, not
+          # necessarily this one: nil when the command never launched, and stale
+          # when something else ran in between. Only report it when it is there.
+          handle_swiftlint_error(params[:ignore_exit_status], $?&.exitstatus)
           raise if params[:raise_if_swiftlint_error]
         end
       end
 
       def self.optional_flags(params)
-        command = ""
-        command << " --path #{params[:path].shellescape}" if params[:path]
+        command = +""
         command << supported_option_switch(params, :strict, "0.9.2", true)
         command << " --config #{params[:config_file].shellescape}" if params[:config_file]
         command << " --reporter #{params[:reporter]}" if params[:reporter]
@@ -45,17 +61,29 @@ module Fastlane
         command << supported_option_switch(params, :format, "0.11.0", true) if params[:mode] == :autocorrect
         command << supported_no_cache_option(params) if params[:no_cache]
         command << " --compiler-log-path #{params[:compiler_log_path].shellescape}" if params[:compiler_log_path]
+        command << supported_option_switch(params, :progress, "0.49.1", true) if params[:progress]
         return command
+      end
+
+      def self.path_argument(params)
+        escaped_path = params[:path].shellescape
+        version = swiftlint_version(executable: params[:executable])
+        return " --path #{escaped_path}" if version < Gem::Version.new('0.48.0')
+
+        " #{escaped_path}"
       end
 
       # Get current SwiftLint version
       def self.swiftlint_version(executable: nil)
         binary = executable || 'swiftlint'
-        Gem::Version.new(`#{binary} version`.chomp)
+        version = Actions.sh("#{binary} version", log: false, separate_stderr: true, error_callback: lambda { |error|
+          UI.user_error!("`#{binary} version` failed: #{error.strip}")
+        })
+        Gem::Version.new(version.chomp)
       end
 
       def self.supported_no_cache_option(params)
-        if params[:mode] == :autocorrect || params[:mode] == :lint
+        if [:autocorrect, :fix, :lint].include?(params[:mode])
           return " --no-cache"
         else
           return ""
@@ -89,14 +117,13 @@ module Fastlane
         [
           FastlaneCore::ConfigItem.new(key: :mode,
                                        env_name: "FL_SWIFTLINT_MODE",
-                                       description: "SwiftLint mode: :lint, :autocorrect or :analyze",
-                                       is_string: false,
+                                       description: "SwiftLint mode: :lint, :fix, :autocorrect or :analyze",
+                                       type: Symbol,
                                        default_value: :lint,
                                        optional: true),
           FastlaneCore::ConfigItem.new(key: :path,
                                        env_name: "FL_SWIFTLINT_PATH",
                                        description: "Specify path to lint",
-                                       is_string: true,
                                        optional: true,
                                        verify_block: proc do |value|
                                          UI.user_error!("Couldn't find path '#{File.expand_path(value)}'") unless File.exist?(value)
@@ -113,20 +140,18 @@ module Fastlane
                                        env_name: "FL_SWIFTLINT_STRICT",
                                        description: 'Fail on warnings? (true/false)',
                                        default_value: false,
-                                       is_string: false,
                                        type: Boolean,
                                        optional: true),
           FastlaneCore::ConfigItem.new(key: :files,
                                        env_name: "FL_SWIFTLINT_FILES",
                                        description: 'List of files to process',
-                                       is_string: false,
+                                       type: Array,
                                        optional: true),
           FastlaneCore::ConfigItem.new(key: :ignore_exit_status,
                                        env_name: "FL_SWIFTLINT_IGNORE_EXIT_STATUS",
                                        description: "Ignore the exit status of the SwiftLint command, so that serious violations \
                                                     don't fail the build (true/false)",
                                        default_value: false,
-                                       is_string: false,
                                        type: Boolean,
                                        optional: true),
           FastlaneCore::ConfigItem.new(key: :raise_if_swiftlint_error,
@@ -134,53 +159,52 @@ module Fastlane
                                        description: "Raises an error if swiftlint fails, so you can fail CI/CD jobs if necessary \
                                                     (true/false)",
                                        default_value: false,
-                                       is_string: false,
                                        type: Boolean,
                                        optional: true),
           FastlaneCore::ConfigItem.new(key: :reporter,
                                        env_name: "FL_SWIFTLINT_REPORTER",
-                                       description: "Choose output reporter. Available: xcode, json, csv, checkstyle, junit, html, \
-                                                     emoji, sonarqube, markdown, github-actions-logging",
-                                       is_string: true,
+                                       description: "Choose output reporter. Available: xcode, json, csv, checkstyle, codeclimate, \
+                                                     junit, html, emoji, sonarqube, markdown, github-actions-logging",
                                        optional: true,
                                        verify_block: proc do |value|
-                                         available = ['xcode', 'json', 'csv', 'checkstyle', 'junit', 'html', 'emoji', 'sonarqube', 'markdown', 'github-actions-logging']
-                                         UI.user_error!("Available values are '#{available.join("', '")}'") unless available.include?(value)
+                                         available = ['xcode', 'json', 'csv', 'checkstyle', 'codeclimate', 'junit', 'html', 'emoji', 'sonarqube', 'markdown', 'github-actions-logging']
+                                         UI.important("Known 'reporter' values are '#{available.join("', '")}'. If you're receiving errors from swiftlint related to the reporter, make sure the reporter identifier you're using is correct and it's supported by your version of swiftlint.") unless available.include?(value)
                                        end),
           FastlaneCore::ConfigItem.new(key: :quiet,
                                        env_name: "FL_SWIFTLINT_QUIET",
                                        description: "Don't print status logs like 'Linting <file>' & 'Done linting'",
                                        default_value: false,
-                                       is_string: false,
                                        type: Boolean,
                                        optional: true),
           FastlaneCore::ConfigItem.new(key: :executable,
                                        env_name: "FL_SWIFTLINT_EXECUTABLE",
                                        description: "Path to the `swiftlint` executable on your machine",
-                                       is_string: true,
                                        optional: true),
           FastlaneCore::ConfigItem.new(key: :format,
                                        env_name: "FL_SWIFTLINT_FORMAT",
                                        description: "Format code when mode is :autocorrect",
                                        default_value: false,
-                                       is_string: false,
                                        type: Boolean,
                                        optional: true),
           FastlaneCore::ConfigItem.new(key: :no_cache,
                                        env_name: "FL_SWIFTLINT_NO_CACHE",
                                        description: "Ignore the cache when mode is :autocorrect or :lint",
                                        default_value: false,
-                                       is_string: false,
                                        type: Boolean,
                                        optional: true),
           FastlaneCore::ConfigItem.new(key: :compiler_log_path,
                                        env_name: "FL_SWIFTLINT_COMPILER_LOG_PATH",
                                        description: "Compiler log path when mode is :analyze",
-                                       is_string: true,
                                        optional: true,
                                        verify_block: proc do |value|
                                          UI.user_error!("Couldn't find compiler_log_path '#{File.expand_path(value)}'") unless File.exist?(value)
-                                       end)
+                                       end),
+          FastlaneCore::ConfigItem.new(key: :progress,
+                                       env_name: "FL_SWIFTLINT_PROGRESS",
+                                       description: "Show a live-updating progress bar instead of each file being processed",
+                                       default_value: false,
+                                       type: Boolean,
+                                       optional: true)
         ]
       end
 
@@ -230,10 +254,10 @@ module Fastlane
         end
 
         UI.important("")
-        UI.important("SwiftLint finished with exit code #{exit_status}, #{failure_suffix}")
+        UI.important("SwiftLint finished with exit code #{exit_status || 'unknown'}, #{failure_suffix}")
         UI.important(secondary_message)
         UI.important("")
-        UI.user_error!("SwiftLint finished with errors (exit code: #{exit_status})") unless ignore_exit_status
+        UI.user_error!("SwiftLint finished with errors (exit code: #{exit_status || 'unknown'})") unless ignore_exit_status
       end
     end
   end

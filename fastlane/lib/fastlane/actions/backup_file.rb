@@ -3,7 +3,7 @@ module Fastlane
     class BackupFileAction < Action
       def self.run(params)
         path = params[:path]
-        FileUtils.cp(path, "#{path}.back", { preserve: true })
+        FileUtils.cp(path, "#{path}.back", preserve: true)
         UI.message("Successfully created a backup 💾")
       end
 

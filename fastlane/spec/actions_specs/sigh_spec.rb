@@ -48,6 +48,13 @@ describe Fastlane do
           expect(Fastlane::Actions.lane_context[Fastlane::Actions::SharedValues::SIGH_PROFILE_TYPE]).to eq("enterprise")
           ENV.delete("SIGH_PROFILE_ENTERPRISE")
         end
+
+        it "developer-id" do
+          Fastlane::FastFile.new.parse("lane :test do
+            sigh(developer_id: true)
+          end").runner.execute(:test)
+          expect(Fastlane::Actions.lane_context[Fastlane::Actions::SharedValues::SIGH_PROFILE_TYPE]).to eq("developer-id")
+        end
       end
     end
   end

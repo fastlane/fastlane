@@ -17,6 +17,41 @@ describe FastlaneCore do
       end
     end
 
+    describe "#xcode_at_least?" do
+      ["15.2", "15.2.3", 15, 15.3].each do |check_version|
+        ["15.3", "16"].each do |xcode_version|
+          it "Xcode #{xcode_version} is at least #{check_version}" do
+            allow(FastlaneCore::Helper).to receive(:xcode_version).and_return(xcode_version)
+
+            expect(FastlaneCore::Helper.xcode_at_least?(check_version)).to be(true)
+          end
+        end
+
+        ["14", "14.99.99"].each do |xcode_version|
+          it "Xcode #{xcode_version} is less than #{check_version}" do
+            allow(FastlaneCore::Helper).to receive(:xcode_version).and_return(xcode_version)
+
+            expect(FastlaneCore::Helper.xcode_at_least?(check_version)).to be(false)
+          end
+        end
+      end
+    end
+
+    describe '#colors_disabled?' do
+      it "should return false if no environment variables set" do
+        stub_const('ENV', {})
+        expect(FastlaneCore::Helper.colors_disabled?).to be(false)
+      end
+      it "should return true if FASTLANE_DISABLE_COLORS" do
+        stub_const('ENV', { "FASTLANE_DISABLE_COLORS" => "true" })
+        expect(FastlaneCore::Helper.colors_disabled?).to be(true)
+      end
+      it "should return true if NO_COLORS" do
+        stub_const('ENV', { "NO_COLOR" => 1 })
+        expect(FastlaneCore::Helper.colors_disabled?).to be(true)
+      end
+    end
+
     describe '#json_file?' do
       it "should return false on invalid json file" do
         expect(FastlaneCore::Helper.json_file?("./fastlane_core/spec/fixtures/json_file/broken")).to be(false)
@@ -62,7 +97,7 @@ describe FastlaneCore do
         expect(FastlaneCore::Helper.ci?).to be(true)
       end
 
-      it "returns true when building in Github Actions" do
+      it "returns true when building in GitHub Actions" do
         stub_const('ENV', { 'GITHUB_ACTION' => 'FAKE_ACTION' })
         expect(FastlaneCore::Helper.ci?).to be(true)
         stub_const('ENV', { 'GITHUB_ACTIONS' => 'true' })
@@ -80,7 +115,52 @@ describe FastlaneCore do
       end
     end
 
+    describe "#can_prompt?" do
+      it "is true off CI with stdin on a terminal" do
+        stub_const('ENV', {})
+        allow($stdin).to receive(:tty?).and_return(true)
+        expect(FastlaneCore::Helper.can_prompt?).to be(true)
+      end
+
+      it "is false on CI, even with stdin on a terminal" do
+        stub_const('ENV', { 'CI' => 'true' })
+        allow($stdin).to receive(:tty?).and_return(true)
+        expect(FastlaneCore::Helper.can_prompt?).to be(false)
+      end
+
+      it "is false when stdin is not a terminal" do
+        stub_const('ENV', {})
+        allow($stdin).to receive(:tty?).and_return(false)
+        expect(FastlaneCore::Helper.can_prompt?).to be(false)
+      end
+
+      it "is true with FASTLANE_ALLOW_PIPED_INPUT, on CI and without a terminal" do
+        stub_const('ENV', { 'CI' => 'true', 'FASTLANE_ALLOW_PIPED_INPUT' => '1' })
+        allow($stdin).to receive(:tty?).and_return(false)
+        expect(FastlaneCore::Helper.can_prompt?).to be(true)
+      end
+    end
+
+    describe "#is_codebuild?" do
+      it "returns false when CODEBUILD_BUILD_ARN is false" do
+        stub_const('ENV', { 'CODEBUILD_BUILD_ARN' => 'false' })
+        expect(FastlaneCore::Helper.is_codebuild?).to be(false)
+      end
+    end
+
+    describe "#xcode_server?" do
+      it "returns true when XCS is true" do
+        stub_const('ENV', { 'XCS' => 'true' })
+        expect(FastlaneCore::Helper.xcode_server?).to be(true)
+      end
+    end
+
     describe "#is_circle_ci?" do
+      it "returns false when CIRCLECI is false" do
+        stub_const('ENV', { 'CIRCLECI' => 'false' })
+        expect(FastlaneCore::Helper.is_circle_ci?).to be(false)
+      end
+
       it "returns true when building in CircleCI" do
         stub_const('ENV', { 'CIRCLECI' => true })
         expect(FastlaneCore::Helper.ci?).to be(true)
@@ -128,12 +208,64 @@ describe FastlaneCore do
         expect(FastlaneCore::Helper.xcode_path).to match(%r{/Applications/Xcode.*.app/Contents/Developer/})
       end
 
-      it "#transporter_path", requires_xcode: true do
-        expect(FastlaneCore::Helper.transporter_path).to match(%r{/Applications/Xcode.*.app/Contents/Applications/Application Loader.app/Contents/itms/bin/iTMSTransporter|/Applications/Xcode.*.app/Contents/SharedFrameworks/ContentDeliveryServices.framework/Versions/A/itms/bin/iTMSTransporter})
-      end
-
       it "#xcode_version", requires_xcode: true do
         expect(FastlaneCore::Helper.xcode_version).to match(/^\d[\.\d]+$/)
+      end
+
+      context "#user_defined_itms_path?" do
+        it "not defined", requires_xcode: true do
+          stub_const('ENV', { 'FASTLANE_ITUNES_TRANSPORTER_PATH' => nil })
+          expect(FastlaneCore::Helper.user_defined_itms_path?).to be(false)
+        end
+
+        it "is defined", requires_xcode: true do
+          stub_const('ENV', { 'FASTLANE_ITUNES_TRANSPORTER_PATH' => '/some/path/to/something' })
+          expect(FastlaneCore::Helper.user_defined_itms_path?).to be(true)
+        end
+      end
+
+      context "#user_defined_itms_path" do
+        it "not defined", requires_xcode: true do
+          stub_const('ENV', { 'FASTLANE_ITUNES_TRANSPORTER_PATH' => nil })
+          expect(FastlaneCore::Helper.user_defined_itms_path).to be(nil)
+        end
+
+        it "is defined", requires_xcode: true do
+          stub_const('ENV', { 'FASTLANE_ITUNES_TRANSPORTER_PATH' => '/some/path/to/something' })
+          expect(FastlaneCore::Helper.user_defined_itms_path).to eq('/some/path/to/something')
+        end
+      end
+
+      context "#itms_path" do
+        it "default", requires_xcode: true do
+          stub_const('ENV', { 'FASTLANE_ITUNES_TRANSPORTER_PATH' => nil })
+
+          expect(FastlaneCore::UI).to receive(:user_error!).with(/Could not find transporter/)
+          expect { FastlaneCore::Helper.itms_path }.not_to raise_error
+        end
+
+        it "uses FASTLANE_ITUNES_TRANSPORTER_PATH", requires_xcode: true do
+          stub_const('ENV', { 'FASTLANE_ITUNES_TRANSPORTER_PATH' => '/some/path/to/something' })
+          expect(FastlaneCore::Helper.itms_path).to eq('/some/path/to/something')
+        end
+
+        context "on a Mac without a transporter" do
+          before do
+            allow(FastlaneCore::Helper).to receive(:mac?).and_return(true)
+            allow(FastlaneCore::Helper).to receive(:xcode_path).and_return('/Applications/Xcode.app/Contents/Developer/')
+            allow(File).to receive(:exist?).and_return(false)
+          end
+
+          it "points at the Xcode installation" do
+            stub_const('ENV', {})
+            expect { FastlaneCore::Helper.itms_path }.to raise_error(FastlaneCore::Interface::FastlaneError, "Could not find transporter at /Applications/Xcode.app/Contents/Developer/. Please make sure you set the correct path to your Xcode installation.")
+          end
+
+          it "points at FASTLANE_ITUNES_TRANSPORTER_USE_SHELL_SCRIPT when it is set" do
+            stub_const('ENV', { 'FASTLANE_ITUNES_TRANSPORTER_USE_SHELL_SCRIPT' => '1' })
+            expect { FastlaneCore::Helper.itms_path }.to raise_error(FastlaneCore::Interface::FastlaneError, /Xcode 14 and newer no longer include it. Remove FASTLANE_ITUNES_TRANSPORTER_USE_SHELL_SCRIPT so fastlane uploads with altool/)
+          end
+        end
       end
     end
 
@@ -143,20 +275,232 @@ describe FastlaneCore do
       let(:the_zip) { File.absolute_path('/tmp/thezip.zip') }
 
       it "creates correct zip command with contents_only set to false with default print option (true)" do
-        expect(FastlaneCore::Helper).to receive(:backticks)
-          .with("cd '#{directory}' && zip -r '#{the_zip}' 'to_zip'", print: true)
+        expect(FastlaneCore::CommandExecutor).to receive(:execute)
+          .with(hash_including(command: "cd #{directory.shellescape} && zip -r #{the_zip.shellescape} to_zip", print_all: true))
           .exactly(1).times
 
         FastlaneCore::Helper.zip_directory(directory_to_zip, the_zip, contents_only: false)
       end
 
       it "creates correct zip command with contents_only set to true with print set to false" do
-        expect(FastlaneCore::Helper).to receive(:backticks)
-          .with("cd '#{directory_to_zip}' && zip -r '#{the_zip}' *", print: false)
+        expect(FastlaneCore::CommandExecutor).to receive(:execute)
+          .with(hash_including(command: "cd #{directory_to_zip.shellescape} && zip -r #{the_zip.shellescape} *", print_all: false))
           .exactly(1).times
         expect(FastlaneCore::UI).to receive(:command).exactly(1).times
 
         FastlaneCore::Helper.zip_directory(directory_to_zip, the_zip, contents_only: true, print: false)
+      end
+
+      it "keeps paths with an apostrophe and a space as one argument each" do
+        folder = File.absolute_path("/tmp/Kaldi's Kafe")
+        command = nil
+        allow(FastlaneCore::CommandExecutor).to receive(:execute) { |options| command = options[:command] }
+
+        FastlaneCore::Helper.zip_directory(File.join(folder, "Build Products"), File.join(folder, "out put.zip"), overwrite: true)
+
+        expect(Shellwords.split(command)).to eq(["cd", folder, "&&", "rm", "-f", File.join(folder, "out put.zip"), "&&", "zip", "-r", File.join(folder, "out put.zip"), "Build Products"])
+      end
+
+      it "fails when zip cannot write the archive" do
+        Dir.mktmpdir do |tmp|
+          FileUtils.mkdir_p(File.join(tmp, "products"))
+          File.write(File.join(tmp, "products", "file"), "")
+
+          expect do
+            FastlaneCore::Helper.zip_directory(File.join(tmp, "products"), File.join(tmp, "missing", "out.zip"), contents_only: true, print: false)
+          end.to raise_error(FastlaneCore::Interface::FastlaneError, /Could not zip/)
+        end
+      end
+    end
+
+    describe "owner-only files" do
+      around do |example|
+        Dir.mktmpdir do |dir|
+          @dir = dir
+          old_umask = File.umask(0o022)
+          begin
+            example.run
+          ensure
+            File.umask(old_umask)
+          end
+        end
+      end
+
+      def mode_of(path)
+        File.stat(path).mode & 0o777
+      end
+
+      describe "#open_owner_only" do
+        it "creates the file readable only by its owner" do
+          path = File.join(@dir, "key.pem")
+          FastlaneCore::Helper.open_owner_only(path) { |file| file.write("secret") }
+
+          expect(File.read(path)).to eq("secret")
+          expect(mode_of(path)).to eq(0o600) unless FastlaneCore::Helper.windows?
+        end
+
+        it "restricts an existing file before writing to it" do
+          path = File.join(@dir, "key.pem")
+          File.write(path, "old")
+          File.chmod(0o644, path) unless FastlaneCore::Helper.windows?
+
+          mode_while_writing = nil
+          FastlaneCore::Helper.open_owner_only(path) do |file|
+            mode_while_writing = mode_of(path)
+            file.write("new")
+          end
+
+          expect(File.read(path)).to eq("new")
+          expect(File.writable?(path)).to be(true)
+          expect(mode_while_writing).to eq(0o600) unless FastlaneCore::Helper.windows?
+        end
+
+        it "passes the open mode, e.g. binary append" do
+          path = File.join(@dir, "log.txt")
+          File.write(path, "a")
+          FastlaneCore::Helper.open_owner_only(path, "ab") { |file| file.write("b") }
+
+          expect(File.binread(path)).to eq("ab")
+          expect(mode_of(path)).to eq(0o600) unless FastlaneCore::Helper.windows?
+        end
+      end
+
+      describe "#mkdir_owner_only" do
+        it "creates the directory and its parents, the directory accessible only by its owner" do
+          dir = File.join(@dir, "parent", "keys")
+          FastlaneCore::Helper.mkdir_owner_only(dir)
+
+          expect(File.directory?(dir)).to be(true)
+          expect(mode_of(dir)).to eq(0o700) unless FastlaneCore::Helper.windows?
+        end
+
+        it "restricts an existing directory" do
+          dir = File.join(@dir, "keys")
+          Dir.mkdir(dir)
+          File.chmod(0o755, dir) unless FastlaneCore::Helper.windows?
+          FastlaneCore::Helper.mkdir_owner_only(dir)
+
+          expect(File.directory?(dir)).to be(true)
+          expect(mode_of(dir)).to eq(0o700) unless FastlaneCore::Helper.windows?
+        end
+      end
+    end
+
+    describe "#backticks" do
+      it "executes the command and returns the output" do
+        expect(FastlaneCore::Helper.backticks("echo hello")).to eq("hello\n")
+      end
+
+      it "prints the command and output if print is true" do
+        expect(FastlaneCore::UI).to receive(:command).with("echo hello")
+        expect(FastlaneCore::UI).to receive(:command_output).with("hello\n")
+        FastlaneCore::Helper.backticks("echo hello", print: true)
+      end
+
+      it "does not print the command and output if print is false" do
+        expect(FastlaneCore::UI).not_to receive(:command)
+        expect(FastlaneCore::UI).not_to receive(:command_output)
+        FastlaneCore::Helper.backticks("echo hello", print: false)
+      end
+    end
+
+    describe "#swift_version", unless: FastlaneCore::Helper.windows? do
+      let(:bin_dir) { Dir.mktmpdir("fl_spec_swift") }
+
+      after { FileUtils.rm_rf(bin_dir) }
+
+      # The command runs in a subprocess, so PATH must really change, not just ENV in Ruby
+      def swift_version_with(script)
+        File.write(File.join(bin_dir, "swift"), "#!/bin/sh\n#{script}\n")
+        File.chmod(0o755, File.join(bin_dir, "swift"))
+        FastlaneCore::Helper.with_env_values("PATH" => "#{bin_dir}:#{ENV['PATH']}") { FastlaneCore::Helper.swift_version }
+      end
+
+      it "returns the version swift reports" do
+        expect(swift_version_with("echo 'Apple Swift version 5.9.2 (swiftlang-5.9.2.2.56 clang-1500.1.0.2.5)'")).to eq("5.9.2")
+      end
+
+      it "returns nil when swift fails without printing a version" do
+        expect(swift_version_with("echo 'xcrun: error: invalid active developer path' >&2; exit 1")).to be_nil
+      end
+    end
+
+    describe "#which" do
+      it "delegates to FastlaneCore::CommandExecutor.which" do
+        expect(FastlaneCore::CommandExecutor).to receive(:which).with('ruby').and_return('/usr/bin/ruby')
+        expect(FastlaneCore::Helper.which('ruby')).to eq('/usr/bin/ruby')
+      end
+
+      it "returns nil when command is not found" do
+        expect(FastlaneCore::CommandExecutor).to receive(:which).with('not_a_real_command').and_return(nil)
+        expect(FastlaneCore::Helper.which('not_a_real_command')).to be_nil
+      end
+    end
+
+    describe "#fastlane_enabled?" do
+      it "returns false when FastlaneCore::FastlaneFolder.path is nil" do
+        expect(FastlaneCore::FastlaneFolder).to receive(:path).and_return(nil)
+        expect(FastlaneCore::Helper.fastlane_enabled?).to be(false)
+      end
+
+      it "returns true when FastlaneCore::FastlaneFolder.path is not nil" do
+        expect(FastlaneCore::FastlaneFolder).to receive(:path).and_return('./fastlane')
+        expect(FastlaneCore::Helper.fastlane_enabled?).to be(true)
+      end
+    end
+
+    describe "loading indicator" do
+      let(:spinners) { [] }
+      # tty-spinner only writes to a terminal
+      let(:output) { StringIO.new.tap { |io| io.define_singleton_method(:tty?) { true } } }
+
+      before do
+        allow(FastlaneCore::Helper).to receive(:should_show_loading_indicator?).and_return(true)
+        allow(TTY::Spinner).to receive(:new).and_wrap_original do |original, *args, **options|
+          original.call(*args, **options, output: output).tap { |spinner| spinners << spinner }
+        end
+      end
+
+      after do
+        spinners.each { |spinner| spinner.stop unless spinner.done? }
+        FastlaneCore::Helper.instance_variable_set(:@require_fastlane_spinner, nil)
+      end
+
+      it "stops the spinner and reports an error when the block raises" do
+        expect do
+          FastlaneCore::Helper.with_loading_indicator("Working") { raise "boom" }
+        end.to raise_error("boom")
+
+        expect(spinners.size).to eq(1)
+        expect(spinners.first.done?).to be(true)
+        expect(output.string).to include(TTY::Spinner::CROSS)
+        expect(output.string).not_to include(TTY::Spinner::TICK)
+      end
+
+      it "returns the block's value and reports success" do
+        expect(FastlaneCore::Helper.with_loading_indicator("Working") { 42 }).to eq(42)
+
+        expect(spinners.first.done?).to be(true)
+        expect(output.string).to include(TTY::Spinner::TICK)
+      end
+
+      def return_early_from_indicator
+        FastlaneCore::Helper.with_loading_indicator("Working") { return :early }
+      end
+
+      it "reports success when the block returns early" do
+        expect(return_early_from_indicator).to eq(:early)
+
+        expect(spinners.first.done?).to be(true)
+        expect(output.string).to include(TTY::Spinner::TICK)
+        expect(output.string).not_to include(TTY::Spinner::CROSS)
+      end
+
+      it "stops a spinner that was shown but never hidden before showing the next one" do
+        FastlaneCore::Helper.show_loading_indicator("First")
+        FastlaneCore::Helper.show_loading_indicator("Second")
+
+        expect(spinners.map(&:done?)).to eq([true, false])
       end
     end
   end

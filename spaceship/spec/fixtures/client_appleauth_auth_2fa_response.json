@@ -9,6 +9,11 @@
 		"pushMode": "sms",
 		"obfuscatedNumber": "••••• •••••81",
 		"id": 2
+	}, {
+		"numberWithDialCode": "+49 ••••• •••••80",
+		"pushMode": "voice",
+		"obfuscatedNumber": "••••• •••••80",
+		"id": 3
 	}],
 	"securityCode": {
 		"length": 6,

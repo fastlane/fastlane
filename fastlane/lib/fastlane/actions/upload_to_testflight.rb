@@ -5,15 +5,37 @@ module Fastlane
         require 'pilot'
         require 'pilot/options'
 
+        distribute_only = values[:distribute_only]
+
         changelog = Actions.lane_context[SharedValues::FL_CHANGELOG]
         values[:changelog] ||= changelog if changelog
 
-        values[:ipa] ||= Actions.lane_context[SharedValues::IPA_OUTPUT_PATH]
-        values[:ipa] = File.expand_path(values[:ipa]) if values[:ipa]
+        unless distribute_only
+          # The build from gym wins over the newest *.ipa/*.pkg in the current directory, the options' default
+          unless values.specified?(:ipa) || values.specified?(:pkg)
+            values[:ipa] = Actions.lane_context[SharedValues::IPA_OUTPUT_PATH] if Actions.lane_context[SharedValues::IPA_OUTPUT_PATH]
+            values[:pkg] = Actions.lane_context[SharedValues::PKG_OUTPUT_PATH] if Actions.lane_context[SharedValues::PKG_OUTPUT_PATH]
+          end
+          values[:ipa] = File.expand_path(values[:ipa]) if values[:ipa]
+          values[:pkg] = File.expand_path(values[:pkg]) if values[:pkg]
+        end
+
+        # Only set :api_key from SharedValues if :api_key_path isn't set (conflicting options)
+        unless values[:api_key_path]
+          values[:api_key] ||= Actions.lane_context[SharedValues::APP_STORE_CONNECT_API_KEY]
+        end
 
         return values if Helper.test?
 
-        Pilot::BuildManager.new.upload(values) # we already have the finished config
+        if distribute_only
+          build_manager = Pilot::BuildManager.new
+          build_manager.start(values, should_login: true)
+
+          build_manager.wait_for_build_processing_to_be_complete(false) unless values[:skip_waiting_for_build_processing]
+          build_manager.distribute(values) # we already have the finished config
+        else
+          Pilot::BuildManager.new.upload(values) # we already have the finished config
+        end
       end
 
       #####################################################
@@ -68,8 +90,8 @@ module Fastlane
             localized_app_info: {
               "default": {
                 feedback_email: "default@email.com",
-                marketing_url: "https://example.com/marketing-defafult",
-                privacy_policy_url: "https://example.com/privacy-defafult",
+                marketing_url: "https://example.com/marketing-default",
+                privacy_policy_url: "https://example.com/privacy-default",
                 description: "Default description",
               },
               "en-GB": {
@@ -100,7 +122,7 @@ module Fastlane
       end
 
       def self.is_supported?(platform)
-        [:ios].include?(platform)
+        [:ios, :mac, :tvos].include?(platform)
       end
     end
   end

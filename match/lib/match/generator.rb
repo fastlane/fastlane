@@ -1,4 +1,5 @@
 require_relative 'module'
+require_relative 'profile_includes'
 
 module Match
   # Generate missing resources
@@ -14,17 +15,26 @@ module Match
         specific_cert_type = cert_type.to_s
       end
 
+      platform = params[:platform]
+      if platform.to_s == :catalyst.to_s
+        platform = :macos.to_s
+      end
+
       arguments = FastlaneCore::Configuration.create(Cert::Options.available_options, {
+        platform: platform,
         development: params[:type] == "development",
         type: specific_cert_type,
         generate_apple_certs: params[:generate_apple_certs],
         output_path: output_path,
         force: true, # we don't need a certificate without its private key, we only care about a new certificate
+        api_key_path: params[:api_key_path],
+        api_key: params[:api_key],
         username: params[:username],
         team_id: params[:team_id],
         team_name: params[:team_name],
-        keychain_path: FastlaneCore::Helper.keychain_path(params[:keychain_name]),
-        keychain_password: params[:keychain_password]
+        keychain_path: Helper.mac? ? FastlaneCore::Helper.keychain_path(params[:keychain_name]) : nil,
+        keychain_password: Helper.mac? ? params[:keychain_password] : nil,
+        skip_set_partition_list: params[:skip_set_partition_list]
       })
 
       Cert.config = arguments
@@ -48,7 +58,7 @@ module Match
     end
 
     # @return (String) The UUID of the newly generated profile
-    def self.generate_provisioning_profile(params: nil, prov_type: nil, certificate_id: nil, app_identifier: nil, force: true, working_directory: nil)
+    def self.generate_provisioning_profile(params: nil, prov_type: nil, certificate_id: nil, app_identifier: nil, force: true, cache: nil, working_directory: nil)
       require 'sigh/manager'
       require 'sigh/options'
 
@@ -74,10 +84,15 @@ module Match
         cert_id: certificate_id,
         provisioning_name: profile_name,
         ignore_profiles_with_different_name: true,
+        api_key_path: params[:api_key_path],
+        api_key: params[:api_key],
         team_id: params[:team_id],
         team_name: params[:team_name],
         template_name: params[:template_name],
-        fail_on_name_taken: params[:fail_on_name_taken]
+        fail_on_name_taken: params[:fail_on_name_taken],
+        include_all_certificates: params[:include_all_certificates],
+        include_mac_in_profiles: params[:include_mac_in_profiles],
+        offline_profile: params[:offline_profile],
       }
 
       values[:platform] = params[:platform]
@@ -91,10 +106,19 @@ module Match
         values[:development] = true
       end
 
+      if cache
+        values[:cached_certificates] = cache.certificates
+        values[:cached_devices] = cache.devices
+        values[:cached_bundle_ids] = cache.bundle_ids
+        values[:cached_profiles] = cache.profiles
+      end
+
       arguments = FastlaneCore::Configuration.create(Sigh::Options.available_options, values)
 
       Sigh.config = arguments
-      path = Sigh::Manager.start
+
+      keychain_path = FastlaneCore::Helper.keychain_path(params[:keychain_name]) if Helper.mac? && params[:keychain_name]
+      path = Sigh::Manager.start(keychain_path: keychain_path)
       return path
     end
 

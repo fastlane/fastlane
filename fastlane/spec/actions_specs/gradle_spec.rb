@@ -5,6 +5,16 @@ describe Fastlane do
         allow(FastlaneCore::FastlaneFolder).to receive(:path).and_return(nil)
       end
 
+      # The action globs **/build/outputs from the project dir: run in an empty project, not the repository
+      around do |example|
+        Dir.mktmpdir do |dir|
+          Dir.chdir(dir) do
+            FileUtils.touch("README.md")
+            example.run
+          end
+        end
+      end
+
       describe "output controls" do
         let(:expected_command) { "#{File.expand_path('README.md').shellescape} tasks -p ." }
 
@@ -179,6 +189,48 @@ describe Fastlane do
 
           last_action = Fastlane::Actions.executed_actions.last
           expect(last_action[:name]).to eq(task_name)
+        end
+      end
+
+      describe "setting of Actions.lane_context" do
+        after(:each) do
+          Fastlane::Actions.lane_context.delete(Fastlane::Actions::SharedValues::GRADLE_ALL_APK_OUTPUT_PATHS)
+          Fastlane::Actions.lane_context.delete(Fastlane::Actions::SharedValues::GRADLE_ALL_AAB_OUTPUT_PATHS)
+          Fastlane::Actions.lane_context.delete(Fastlane::Actions::SharedValues::GRADLE_ALL_OUTPUT_JSON_OUTPUT_PATHS)
+          Fastlane::Actions.lane_context.delete(Fastlane::Actions::SharedValues::GRADLE_ALL_MAPPING_TXT_OUTPUT_PATHS)
+        end
+
+        it "sets context when assemble" do
+          result = Fastlane::FastFile.new.parse("lane :build do
+            gradle(tasks: ['assembleRelease', 'assembleReleaseAndroidTest'], gradle_path: './README.md')
+          end").runner.execute(:build)
+
+          expect(Fastlane::Actions.lane_context[Fastlane::Actions::SharedValues::GRADLE_ALL_APK_OUTPUT_PATHS]).to eq([])
+          expect(Fastlane::Actions.lane_context[Fastlane::Actions::SharedValues::GRADLE_ALL_AAB_OUTPUT_PATHS]).to eq([])
+          expect(Fastlane::Actions.lane_context[Fastlane::Actions::SharedValues::GRADLE_ALL_OUTPUT_JSON_OUTPUT_PATHS]).to eq([])
+          expect(Fastlane::Actions.lane_context[Fastlane::Actions::SharedValues::GRADLE_ALL_MAPPING_TXT_OUTPUT_PATHS]).to eq([])
+        end
+
+        it "sets context when bundle" do
+          result = Fastlane::FastFile.new.parse("lane :build do
+            gradle(tasks: ['bundleRelease'], gradle_path: './README.md')
+          end").runner.execute(:build)
+
+          expect(Fastlane::Actions.lane_context[Fastlane::Actions::SharedValues::GRADLE_ALL_APK_OUTPUT_PATHS]).to eq([])
+          expect(Fastlane::Actions.lane_context[Fastlane::Actions::SharedValues::GRADLE_ALL_AAB_OUTPUT_PATHS]).to eq([])
+          expect(Fastlane::Actions.lane_context[Fastlane::Actions::SharedValues::GRADLE_ALL_OUTPUT_JSON_OUTPUT_PATHS]).to eq([])
+          expect(Fastlane::Actions.lane_context[Fastlane::Actions::SharedValues::GRADLE_ALL_MAPPING_TXT_OUTPUT_PATHS]).to eq([])
+        end
+
+        it "does not set context if not assemble or bundle" do
+          result = Fastlane::FastFile.new.parse("lane :build do
+            gradle(tasks: ['someOtherThing'], gradle_path: './README.md')
+          end").runner.execute(:build)
+
+          expect(Fastlane::Actions.lane_context[Fastlane::Actions::SharedValues::GRADLE_ALL_APK_OUTPUT_PATHS]).to eq(nil)
+          expect(Fastlane::Actions.lane_context[Fastlane::Actions::SharedValues::GRADLE_ALL_AAB_OUTPUT_PATHS]).to eq(nil)
+          expect(Fastlane::Actions.lane_context[Fastlane::Actions::SharedValues::GRADLE_ALL_OUTPUT_JSON_OUTPUT_PATHS]).to eq(nil)
+          expect(Fastlane::Actions.lane_context[Fastlane::Actions::SharedValues::GRADLE_ALL_MAPPING_TXT_OUTPUT_PATHS]).to eq(nil)
         end
       end
     end

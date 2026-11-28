@@ -5,12 +5,28 @@ module Fastlane
         command = []
         command << "curl"
         command << verbose(params)
+        command << "--fail"
         command += ssl_options(params)
         command += proxy_options(params)
         command += upload_options(params)
+        command << "--config -"
         command << upload_url(params)
 
-        Fastlane::Actions.sh(command.join(' '), log: params[:verbose])
+        Fastlane::Actions.sh(command.join(' '), log: params[:verbose], stdin: curl_config(params))
+      end
+
+      def self.curl_config(params)
+        config = "user = #{curl_config_string("#{params[:username]}:#{params[:password]}")}\n"
+        if params[:proxy_address] && params[:proxy_port] && params[:proxy_username] && params[:proxy_password]
+          config << "proxy-user = #{curl_config_string("#{params[:proxy_username]}:#{params[:proxy_password]}")}\n"
+        end
+        config
+      end
+
+      # Quotes a value for a curl config file, using the escapes listed under `-K, --config` in `man curl`.
+      def self.curl_config_string(value)
+        escapes = { "\\" => "\\\\", "\"" => "\\\"", "\t" => "\\t", "\n" => "\\n", "\r" => "\\r", "\v" => "\\v" }
+        "\"#{value.gsub(/[\\"\t\n\r\v]/, escapes)}\""
       end
 
       def self.upload_url(params)
@@ -60,8 +76,6 @@ module Fastlane
           options << "--upload-file #{file_path}"
         end
 
-        options << "-u #{params[:username].shellescape}:#{params[:password].shellescape}"
-
         options
       end
 
@@ -78,7 +92,6 @@ module Fastlane
         options = []
         if params[:proxy_address] && params[:proxy_port] && params[:proxy_username] && params[:proxy_password]
           options << "-x #{params[:proxy_address].shellescape}:#{params[:proxy_port].shellescape}"
-          options << "--proxy-user #{params[:proxy_username].shellescape}:#{params[:proxy_password].shellescape}"
         end
 
         options
@@ -138,11 +151,12 @@ module Fastlane
           FastlaneCore::ConfigItem.new(key: :password,
                                        env_name: "FL_NEXUS_PASSWORD",
                                        description: "Nexus password",
+                                       sensitive: true,
                                        optional: false),
           FastlaneCore::ConfigItem.new(key: :ssl_verify,
                                        env_name: "FL_NEXUS_SSL_VERIFY",
                                        description: "Verify SSL",
-                                       is_string: false,
+                                       type: Boolean,
                                        default_value: true,
                                        optional: true),
           FastlaneCore::ConfigItem.new(key: :nexus_version,
@@ -160,7 +174,7 @@ module Fastlane
           FastlaneCore::ConfigItem.new(key: :verbose,
                                        env_name: "FL_NEXUS_VERBOSE",
                                        description: "Make detailed output",
-                                       is_string: false,
+                                       type: Boolean,
                                        default_value: false,
                                        optional: true),
           FastlaneCore::ConfigItem.new(key: :proxy_username,

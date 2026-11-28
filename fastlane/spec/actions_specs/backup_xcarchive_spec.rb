@@ -76,7 +76,7 @@ describe Fastlane do
         end
 
         it "make zip with custom filename and copy to destination" do
-          allow(Fastlane::Actions).to receive(:sh).with("cd \"#{source_path}\" && zip -r -X \"#{tmp_path}/#{custom_zip_filename}.xcarchive.zip\" \"#{xcarchive_file}\" > /dev/null").and_return("")
+          allow(Fastlane::Actions).to receive(:sh).with("cd \"#{source_path}\" && zip -r -X -y \"#{tmp_path}/#{custom_zip_filename}.xcarchive.zip\" \"#{xcarchive_file}\" > /dev/null").and_return("")
           result = Fastlane::FastFile.new.parse("lane :test do
             backup_xcarchive(
               versioned: false,

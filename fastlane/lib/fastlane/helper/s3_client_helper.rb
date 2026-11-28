@@ -3,14 +3,16 @@ require 'aws-sdk-s3'
 module Fastlane
   module Helper
     class S3ClientHelper
-      attr_reader :client
+      attr_reader :access_key
+      attr_reader :region
 
-      def initialize(access_key: nil, secret_access_key: nil, region: nil)
-        creds = Aws::Credentials.new(access_key, secret_access_key)
-        Aws.config.update(
-          region: region,
-          credentials: creds
-        )
+      def initialize(access_key: nil, secret_access_key: nil, session_token: nil, region: nil, s3_client: nil)
+        @access_key = access_key
+        @secret_access_key = secret_access_key
+        @session_token = session_token
+        @region = region
+
+        @client = s3_client
       end
 
       def list_buckets
@@ -38,6 +40,10 @@ module Fastlane
         obj.public_url.to_s
       end
 
+      def download_file(bucket_name, key, destination_path)
+        Aws::S3::TransferManager.new(client: client).download_file(destination_path, bucket: bucket_name, key: key)
+      end
+
       def delete_file(bucket_name, file_name)
         bucket = find_bucket!(bucket_name)
         file = bucket.object(file_name)
@@ -50,12 +56,30 @@ module Fastlane
 
         return bucket
       end
-    end
 
-    private
+      private
 
-    def client
-      @client ||= Aws::S3::Client.new
+      attr_reader :secret_access_key
+      attr_reader :session_token
+
+      def client
+        @client ||= Aws::S3::Client.new(
+          {
+            region: region,
+            credentials: create_credentials
+          }.compact
+        )
+      end
+
+      def create_credentials
+        return nil if access_key.to_s.empty? || secret_access_key.to_s.empty?
+
+        Aws::Credentials.new(
+          access_key,
+          secret_access_key,
+          session_token
+        )
+      end
     end
   end
 end

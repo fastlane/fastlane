@@ -21,6 +21,26 @@
       }
     }, {
       "type" : "devices",
+      "id" : "13371337",
+      "attributes" : {
+        "addedDate" : "2020-12-14T11:46:42.000+0000",
+        "serialNumber" : null,
+        "description" : null,
+        "platform" : "IOS",
+        "name" : "Roger's iPhone",
+        "deviceClass" : "IPHONE",
+        "model" : "iPhone XS",
+        "udid" : "5233342324433534345354534",
+        "platformName" : "iOS",
+        "responseId" : "91ad3a67-c3c5-4ec2-b31d-879f683badbd",
+        "status" : "DISABLED",
+        "devicePlatformLabel" : "iPhone"
+      },
+      "links" : {
+        "self" : "https://developer.apple.com:443/services-account/v1/devices/13371337"
+      }
+    }, {
+      "type" : "devices",
       "id" : "987654321",
       "attributes" : {
         "addedDate" : "2018-11-23T16:22:00.000+0000",

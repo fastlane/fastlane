@@ -10,6 +10,11 @@ module Fastlane
       def self.run(options)
         return if options[:no_update] # this is used to update itself
 
+        if Helper.bundler?
+          UI.important("update_fastlane does nothing when fastlane runs with Bundler: your Gemfile.lock sets the version. Run `bundle update fastlane` instead.")
+          return
+        end
+
         tools_to_update = ALL_TOOLS
         UI.message("Looking for updates for #{tools_to_update.join(', ')}...")
 
@@ -45,30 +50,51 @@ module Fastlane
         end
 
         # suppress updater output - very noisy
-        Gem::DefaultUserInteraction.ui = Gem::SilentUI.new
+        Gem::DefaultUserInteraction.ui = Gem::SilentUI.new unless FastlaneCore::Globals.verbose?
 
         update_needed.each do |tool_info|
-          tool = tool_info[0]
+          tool = self.get_gem_name(tool_info)
           local_version = Gem::Version.new(highest_versions[tool].version)
           latest_official_version = FastlaneCore::UpdateChecker.fetch_latest(tool)
 
           UI.message("Updating #{tool} from #{local_version.to_s.yellow} to #{latest_official_version.to_s.yellow}... 🚀")
 
-          # Approximate_recommendation will create a string like "~> 0.10" from a version 0.10.0, e.g. one that is valid for versions >= 0.10 and <1.0
-          requirement_version = local_version.approximate_recommendation
-          updater.update_gem(tool, Gem::Requirement.new(requirement_version))
+          if Helper.homebrew?
+            Helper.backticks('brew upgrade fastlane')
+          else
+            # Approximate_recommendation will create a string like "~> 0.10" from a version 0.10.0, e.g. one that is valid for versions >= 0.10 and <1.0
+            requirement_version = local_version.approximate_recommendation
+            updater.update_gem(tool, Gem::Requirement.new(requirement_version))
+          end
 
           UI.success("Finished updating #{tool}")
         end
 
-        UI.message("Cleaning up old versions...")
-        cleaner.options[:args] = tools_to_update
-        cleaner.execute
+        unless Helper.homebrew?
+          UI.message("Cleaning up old versions...")
+          cleaner.options[:args] = tools_to_update
+          cleaner.execute
+        end
+
+        if FastlaneCore::FastlaneFolder.swift?
+          upgrader = SwiftRunnerUpgrader.new
+          upgrader.upgrade_if_needed!
+        end
 
         UI.message("fastlane.tools successfully updated! I will now restart myself... 😴")
 
-        # Set no_update to true so we don't try to update again
-        exec("FL_NO_UPDATE=true #{$PROGRAM_NAME} #{ARGV.join(' ')}")
+        # Set no_update to true so we don't try to update again. Without a shell, so each argument stays as given
+        exec({ "FL_NO_UPDATE" => "true" }, $PROGRAM_NAME, *ARGV)
+      end
+
+      def self.get_gem_name(tool_info)
+        if tool_info.kind_of?(Array)
+          return tool_info[0]
+        elsif tool_info.respond_to?(:name) # Gem::NameTuple in RubyGems >= 3.1.0
+          return tool_info.name
+        else
+          UI.crash!("Unknown gem update information returned from RubyGems. Please file a new issue for this... 🤷")
+        end
       end
 
       def self.description
@@ -92,7 +118,9 @@ module Fastlane
           sample,
           "After the above changes, restart your terminal, then run `mkdir $GEM_HOME` to create the new gem directory. After this, you're good to go!",
           "",
-          "Recommended usage of the `update_fastlane` action is at the top inside of the `before_all` block, before running any other action."
+          "Recommended usage of the `update_fastlane` action is at the top inside of the `before_all` block, before running any other action.",
+          "",
+          "When fastlane runs with Bundler (`bundle exec fastlane`), this action does nothing: run `bundle update fastlane` instead."
         ].join("\n")
       end
 
@@ -101,12 +129,12 @@ module Fastlane
           FastlaneCore::ConfigItem.new(key: :no_update,
                                        env_name: "FL_NO_UPDATE",
                                        description: "Don't update during this run. This is used internally",
-                                       is_string: false,
+                                       type: Boolean,
                                        default_value: false),
           FastlaneCore::ConfigItem.new(key: :nightly,
                                        env_name: "FL_UPDATE_FASTLANE_NIGHTLY",
                                        description: "Opt-in to install and use nightly fastlane builds",
-                                       is_string: false,
+                                       type: Boolean,
                                        default_value: false,
                                        deprecated: "Nightly builds are no longer being made available")
         ]

@@ -47,7 +47,9 @@ module FastlaneCore
       def bundle_id(path, keychain_path = nil)
         profile = parse(path, keychain_path)
         app_id_prefix = profile["ApplicationIdentifierPrefix"].first
-        bundle_id = profile["Entitlements"]["application-identifier"].gsub("#{app_id_prefix}.", "")
+        entitlements = profile["Entitlements"]
+        app_identifier = entitlements["application-identifier"] || entitlements["com.apple.application-identifier"]
+        bundle_id = app_identifier.gsub("#{app_id_prefix}.", "")
         bundle_id
       rescue
         UI.error("Unable to extract the Bundle Id from the provided provisioning profile '#{path}'.")
@@ -71,7 +73,7 @@ module FastlaneCore
       end
 
       def profiles_path
-        path = File.expand_path("~") + "/Library/MobileDevice/Provisioning Profiles/"
+        path = File.expand_path("~/Library/Developer/Xcode/UserData/Provisioning Profiles")
         # If the directory doesn't exist, create it first
         unless File.directory?(path)
           FileUtils.mkdir_p(path)
@@ -98,26 +100,17 @@ module FastlaneCore
 
       private
 
+      # keychain_path is ignored: unlike `security cms -D`, this imports no certificate into a keychain. See #30186.
       def decode(path, keychain_path = nil)
-        require 'tmpdir'
-        Dir.mktmpdir('fastlane') do |dir|
-          err = "#{dir}/cms.err"
-          # we want to prevent the error output to mix up with the standard output because of
-          # /dev/null: https://github.com/fastlane/fastlane/issues/6387
-          if Helper.mac?
-            if keychain_path.nil?
-              decoded = `security cms -D -i "#{path}" 2> #{err}`
-            else
-              decoded = `security cms -D -i "#{path}" -k "#{keychain_path.shellescape}" 2> #{err}`
-            end
-          else
-            # `security` only works on Mac, fallback to `openssl`
-            # via https://stackoverflow.com/a/14379814/252627
-            decoded = `openssl smime -inform der -verify -noverify -in #{path} 2> #{err}`
-          end
-          UI.error("Failure to decode #{path}. Exit: #{$?.exitstatus}: #{File.read(err)}") if $?.exitstatus != 0
-          decoded
-        end
+        require 'openssl'
+        profile = OpenSSL::PKCS7.new(File.binread(path))
+        # NOVERIFY skips the certificate chain, which `security cms -D` does not enforce either, but still checks the signature.
+        # A mismatch is decoded anyway, as `security cms -D` did: match/spec/fixtures/test.provisionprofile has one.
+        UI.important("The signature of #{path} does not match its content: it was changed after it was signed") unless profile.verify([], OpenSSL::X509::Store.new, nil, OpenSSL::PKCS7::NOVERIFY)
+        profile.data.to_s
+      rescue ArgumentError, OpenSSL::PKCS7::PKCS7Error, SystemCallError => e
+        UI.error("Failure to decode #{path}: #{e.message}")
+        ""
       end
     end
   end

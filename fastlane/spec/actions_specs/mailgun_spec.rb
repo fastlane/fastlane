@@ -32,6 +32,23 @@ describe Fastlane do
         end.to raise_exception("No value found for 'apikey'")
       end
 
+      it "sends with the deprecated :mailgun_sandbox_postmaster and :mailgun_apikey alone" do
+        ENV.delete('MAILGUN_SANDBOX_POSTMASTER')
+        ENV.delete('MAILGUN_APIKEY')
+        request = stub_request(:post, %r{api\.mailgun\.net/v3/example\.mailgun\.org/messages}).to_return(status: 200)
+
+        Fastlane::FastFile.new.parse("lane :test do
+        mailgun({
+          mailgun_sandbox_postmaster: 'postmaster@example.mailgun.org',
+          mailgun_apikey: 'key-example',
+          to: 'valid@example.com',
+          message: 'A valid email text'
+          })
+        end").runner.execute(:test)
+
+        expect(request).to have_been_requested
+      end
+
       it "raises an error if no mailgun to is given" do
         expect do
           Fastlane::FastFile.new.parse("lane :test do

@@ -2,7 +2,8 @@ require 'json'
 require 'supply/options'
 require 'supply/client'
 require 'supply/listing'
-require 'supply/apk_listing'
+require 'supply/image_listing'
+require 'supply/generated_universal_apk'
 require 'supply/release_listing'
 require 'supply/uploader'
 require 'supply/languages'
@@ -16,7 +17,7 @@ module Supply
   end
 
   AVAILABLE_METADATA_FIELDS = %w(title short_description full_description video)
-  IMAGES_TYPES = %w(featureGraphic icon promoGraphic tvBanner)
+  IMAGES_TYPES = %w(featureGraphic icon tvBanner) # https://developers.google.com/android-publisher/api-ref/rest/v3/AppImageType
   SCREENSHOT_TYPES = %w(phoneScreenshots sevenInchScreenshots tenInchScreenshots tvScreenshots wearScreenshots)
 
   IMAGES_FOLDER_NAME = "images"

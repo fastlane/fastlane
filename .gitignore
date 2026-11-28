@@ -11,8 +11,10 @@ coverage/
 rspec_logs.json
 test_output/
 .DS_STORE
+.DS_Store
 .keys
-*.swp 
+*.swp
+latest_fl_version.txt
 
 ## Specific to Android
 .gradle/
@@ -21,6 +23,7 @@ local.properties
 
 ## Specific to screengrab
 /screengrab/example/fastlane/metadata/
+/screengrab/target/
 
 ## Specific to RubyMotion:
 .dat*
@@ -39,7 +42,7 @@ build/
 
 # for a library or gem, you might want to ignore these files since the code is
 # intended to run in multiple environments; otherwise, check them in:
-Gemfile.lock
+# Gemfile.lock
 .ruby-version
 .ruby-gemset
 
@@ -78,3 +81,13 @@ xcuserdata/
 
 # Dotenv
 .env
+
+# Parallel spec runs, see fastlane#30184
+rspec_worker_*.log
+rspec_worker_*.units
+spec_warnings/
+rspec_worker_*.stubs.json
+unused_stubs.txt
+rspec_logs_*.json
+rspec_timings_raw.json
+race_results/

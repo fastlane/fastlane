@@ -17,7 +17,7 @@ module Fastlane
         if installer.installed?(params[:version])
           UI.success("Xcode #{params[:version]} is already installed ✨")
         else
-          installer.install_version(params[:version], true, true, true, true)
+          installer.install_version(params[:version], true, true, true, true, nil, true, nil, params[:download_retry_attempts])
         end
 
         xcode = installer.installed_versions.find { |x| x.version == params[:version] }
@@ -49,9 +49,7 @@ module Fastlane
         [
           FastlaneCore::ConfigItem.new(key: :version,
                                        env_name: "FL_XCODE_VERSION",
-                                       description: "The version number of the version of Xcode to install",
-                                       verify_block: proc do |value|
-                                       end),
+                                       description: "The version number of the version of Xcode to install"),
           FastlaneCore::ConfigItem.new(key: :username,
                                        short_option: "-u",
                                        env_name: "XCODE_INSTALL_USER",
@@ -65,7 +63,12 @@ module Fastlane
                                        optional: true,
                                        code_gen_sensitive: true,
                                        default_value: CredentialsManager::AppfileConfig.try_fetch_value(:team_id),
-                                       default_value_dynamic: true)
+                                       default_value_dynamic: true),
+          FastlaneCore::ConfigItem.new(key: :download_retry_attempts,
+                                       env_name: "XCODE_INSTALL_DOWNLOAD_RETRY_ATTEMPTS",
+                                       description: "Number of times the download will be retried in case of failure",
+                                       type: Integer,
+                                       default_value: 3)
         ]
       end
 
@@ -98,7 +101,11 @@ module Fastlane
       end
 
       def self.category
-        :building
+        :deprecated
+      end
+
+      def self.deprecated_notes
+        "The xcode-install gem, which this action depends on, has been sunset. Please migrate to [xcodes](https://docs.fastlane.tools/actions/xcodes). You can find a migration guide here: [xcpretty/xcode-install/MIGRATION.md](https://github.com/xcpretty/xcode-install/blob/master/MIGRATION.md)"
       end
     end
   end

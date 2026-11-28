@@ -213,7 +213,7 @@ describe Fastlane do
           expect(Supply.config[:aab]).to eq(aab_path)
         end
 
-        it "use the lane context AAB paths firt value if both unique and multiple contexts are set" do
+        it "use the lane context AAB paths first value if both unique and multiple contexts are set" do
           FastlaneSpec::Env.with_action_context_values(
             Fastlane::Actions::SharedValues::GRADLE_ALL_AAB_OUTPUT_PATHS => aab_paths_unique,
             Fastlane::Actions::SharedValues::GRADLE_AAB_OUTPUT_PATH => aab_path

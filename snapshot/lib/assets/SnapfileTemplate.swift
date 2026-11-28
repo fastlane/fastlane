@@ -8,7 +8,8 @@ class Snapshotfile: SnapshotfileProtocol {
     //    "iPhone 5",
     //    "iPad Pro (12.9-inch)",
     //    "iPad Pro (9.7-inch)",
-    //    "Apple TV 1080p"
+    //    "Apple TV 1080p",
+    //    "Apple Watch Series 6 - 44mm"
     //    ]
     //}
 

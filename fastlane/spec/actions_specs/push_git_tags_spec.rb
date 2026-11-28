@@ -1,7 +1,7 @@
 describe Fastlane do
   describe Fastlane::FastFile do
     describe "push_git_tags" do
-      it "uses the correct default comand" do
+      it "uses the correct default command" do
         result = Fastlane::FastFile.new.parse("lane :test do
           push_git_tags
         end").runner.execute(:test)
@@ -9,7 +9,7 @@ describe Fastlane do
         expect(result).to eq("git push origin --tags")
       end
 
-      it "uses the correct comand when forced" do
+      it "uses the correct command when forced" do
         result = Fastlane::FastFile.new.parse("lane :test do
           push_git_tags(force: true)
         end").runner.execute(:test)
@@ -17,7 +17,7 @@ describe Fastlane do
         expect(result).to eq("git push origin --tags --force")
       end
 
-      it "uses the correct comand when remote set" do
+      it "uses the correct command when remote set" do
         result = Fastlane::FastFile.new.parse("lane :test do
           push_git_tags(remote: 'foo')
         end").runner.execute(:test)
@@ -25,7 +25,7 @@ describe Fastlane do
         expect(result).to eq("git push foo --tags")
       end
 
-      it "uses the correct comand when remote set and forced" do
+      it "uses the correct command when remote set and forced" do
         result = Fastlane::FastFile.new.parse("lane :test do
           push_git_tags(remote: 'foo', force: true)
         end").runner.execute(:test)

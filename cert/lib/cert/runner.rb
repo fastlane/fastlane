@@ -12,18 +12,32 @@ module Cert
     def launch
       run
 
-      installed = FastlaneCore::CertChecker.installed?(ENV["CER_FILE_PATH"], in_keychain: ENV["CER_KEYCHAIN_PATH"])
-      UI.message("Verifying the certificate is properly installed locally...")
-      UI.user_error!("Could not find the newly generated certificate installed", show_github_issues: true) unless installed
-      UI.success("Successfully installed certificate #{ENV['CER_CERTIFICATE_ID']}")
+      if Helper.mac?
+        UI.message("Verifying the certificate is properly installed locally...")
+        installed = FastlaneCore::CertChecker.installed?(ENV["CER_FILE_PATH"], in_keychain: ENV["CER_KEYCHAIN_PATH"])
+        UI.user_error!("Could not find the newly generated certificate installed", show_github_issues: true) unless installed
+        UI.success("Successfully installed certificate #{ENV['CER_CERTIFICATE_ID']}")
+      else
+        UI.message("Skipping verifying certificates as it would not work on this operating system.")
+      end
       return ENV["CER_FILE_PATH"]
     end
 
     def login
-      UI.message("Starting login with user '#{Cert.config[:username]}'")
-      Spaceship.login(Cert.config[:username], nil)
-      Spaceship.select_team
-      UI.message("Successfully logged in")
+      if (api_token = Spaceship::ConnectAPI::Token.from(hash: Cert.config[:api_key], filepath: Cert.config[:api_key_path]))
+        UI.message("Creating authorization token for App Store Connect API")
+        Spaceship::ConnectAPI.token = api_token
+      elsif !Spaceship::ConnectAPI.token.nil?
+        UI.message("Using existing authorization token for App Store Connect API")
+      else
+        # Username is now optional since addition of App Store Connect API Key
+        # Force asking for username to prompt user if not already set
+        Cert.config.fetch(:username, force_ask: true)
+
+        UI.message("Starting login with user '#{Cert.config[:username]}'")
+        Spaceship::ConnectAPI.login(Cert.config[:username], nil, use_portal: true, use_tunes: false)
+        UI.message("Successfully logged in")
+      end
     end
 
     def run
@@ -35,7 +49,7 @@ module Cert
 
       should_create = Cert.config[:force]
       unless should_create
-        cert_path = find_existing_cert
+        cert_path = find_existing_cert if Helper.mac?
         should_create = cert_path.nil?
       end
 
@@ -65,11 +79,11 @@ module Cert
 
       to_revoke.each do |certificate|
         begin
-          UI.message("#{certificate.id} #{certificate.name} has expired, revoking...")
-          certificate.revoke!
+          UI.message("#{certificate.id} #{certificate.display_name} has expired, revoking...")
+          certificate.delete!
           revoke_count += 1
         rescue => e
-          UI.error("An error occurred while revoking #{certificate.id} #{certificate.name}")
+          UI.error("An error occurred while revoking #{certificate.id} #{certificate.display_name}")
           UI.error("#{e.message}\n#{e.backtrace.join("\n")}") if FastlaneCore::Globals.verbose?
         end
       end
@@ -78,14 +92,12 @@ module Cert
     end
 
     def expired_certs
-      certificates.select do |certificate|
-        certificate.expires < Time.now.utc
-      end
+      certificates.reject(&:valid?)
     end
 
     def find_existing_cert
       certificates.each do |certificate|
-        unless certificate.can_download
+        unless certificate.certificate_content
           next
         end
 
@@ -101,23 +113,23 @@ module Cert
           ENV["CER_FILE_PATH"] = path
           ENV["CER_KEYCHAIN_PATH"] = keychain
 
-          UI.success("Found the certificate #{certificate.id} (#{certificate.name}) which is installed on the local machine. Using this one.")
+          UI.success("Found the certificate #{certificate.id} (#{certificate.display_name}) which is installed on the local machine. Using this one.")
 
           return path
         elsif File.exist?(private_key_path)
           password = Cert.config[:keychain_password]
-          FastlaneCore::KeychainImporter.import_file(private_key_path, keychain, keychain_password: password)
-          FastlaneCore::KeychainImporter.import_file(path, keychain, keychain_password: password)
+          FastlaneCore::KeychainImporter.import_file(private_key_path, keychain, keychain_password: password, skip_set_partition_list: Cert.config[:skip_set_partition_list])
+          FastlaneCore::KeychainImporter.import_file(path, keychain, keychain_password: password, skip_set_partition_list: Cert.config[:skip_set_partition_list])
 
           ENV["CER_CERTIFICATE_ID"] = certificate.id
           ENV["CER_FILE_PATH"] = path
           ENV["CER_KEYCHAIN_PATH"] = keychain
 
-          UI.success("Found the cached certificate #{certificate.id} (#{certificate.name}). Using this one.")
+          UI.success("Found the cached certificate #{certificate.id} (#{certificate.display_name}). Using this one.")
 
           return path
         else
-          UI.error("Certificate #{certificate.id} (#{certificate.name}) can't be found on your local computer")
+          UI.error("Certificate #{certificate.id} (#{certificate.display_name}) can't be found on your local computer")
         end
 
         File.delete(path) # as apparently this certificate is pretty useless without a private key
@@ -129,19 +141,36 @@ module Cert
 
     # All certificates of this type
     def certificates
-      certificate_type.all
+      filter = {
+        certificateType: certificate_types.join(",")
+      }
+      return Spaceship::ConnectAPI::Certificate.all(filter: filter)
     end
 
-    # The kind of certificate we're interested in
+    # The kind of certificate we're interested in (for creating)
     def certificate_type
+      return certificate_types.first
+    end
+
+    # The kind of certificates we're interested in (for listing)
+    def certificate_types
       if Cert.config[:type]
         case Cert.config[:type].to_sym
         when :mac_installer_distribution
-          return Spaceship.certificate.mac_installer_distribution
+          return [Spaceship::ConnectAPI::Certificate::CertificateType::MAC_INSTALLER_DISTRIBUTION]
         when :developer_id_application
-          return Spaceship.certificate.developer_id_application
+          return [
+            Spaceship::ConnectAPI::Certificate::CertificateType::DEVELOPER_ID_APPLICATION_G2,
+            Spaceship::ConnectAPI::Certificate::CertificateType::DEVELOPER_ID_APPLICATION
+          ]
+        when :developer_id_kext
+          return [Spaceship::ConnectAPI::Certificate::CertificateType::DEVELOPER_ID_KEXT]
         when :developer_id_installer
-          return Spaceship.certificate.developer_id_installer
+          if !Spaceship::ConnectAPI.token.nil?
+            raise "As of 2021-11-09, the App Store Connect API does not allow accessing DEVELOPER_ID_INSTALLER with the API Key. Please file an issue on GitHub if this has changed and needs to be updated"
+          else
+            return [Spaceship::ConnectAPI::Certificate::CertificateType::DEVELOPER_ID_INSTALLER]
+          end
         else
           UI.user_error("Unaccepted value for :type - #{Cert.config[:type]}")
         end
@@ -149,32 +178,35 @@ module Cert
 
       # Check if apple certs (Xcode 11 and later) should be used
       if Cert.config[:generate_apple_certs]
-        cert_type = Spaceship.certificate.apple_distribution
-        cert_type = Spaceship.certificate.in_house if Spaceship.client.in_house? # Enterprise doesn't use Apple Distribution
-        cert_type = Spaceship.certificate.apple_development if Cert.config[:development]
+        cert_type = Spaceship::ConnectAPI::Certificate::CertificateType::DISTRIBUTION
+        cert_type = Spaceship::ConnectAPI::Certificate::CertificateType::IOS_DISTRIBUTION if Spaceship::ConnectAPI.client.in_house? # Enterprise doesn't use Apple Distribution
+        cert_type = Spaceship::ConnectAPI::Certificate::CertificateType::DEVELOPMENT if Cert.config[:development]
       else
         case Cert.config[:platform].to_s
         when 'ios', 'tvos'
-          cert_type = Spaceship.certificate.production
-          cert_type = Spaceship.certificate.in_house if Spaceship.client.in_house?
-          cert_type = Spaceship.certificate.development if Cert.config[:development]
+          cert_type = Spaceship::ConnectAPI::Certificate::CertificateType::IOS_DISTRIBUTION
+          cert_type = Spaceship::ConnectAPI::Certificate::CertificateType::IOS_DISTRIBUTION if Spaceship::ConnectAPI.client.in_house?
+          cert_type = Spaceship::ConnectAPI::Certificate::CertificateType::IOS_DEVELOPMENT if Cert.config[:development]
 
         when 'macos'
-          cert_type = Spaceship.certificate.mac_app_distribution
-          cert_type = Spaceship.certificate.mac_development if Cert.config[:development]
+          cert_type = Spaceship::ConnectAPI::Certificate::CertificateType::MAC_APP_DISTRIBUTION
+          cert_type = Spaceship::ConnectAPI::Certificate::CertificateType::MAC_APP_DEVELOPMENT if Cert.config[:development]
         end
       end
 
-      return cert_type
+      return [cert_type]
     end
 
     def create_certificate
       # Create a new certificate signing request
-      csr, pkey = Spaceship.certificate.create_certificate_signing_request
+      csr, pkey = Spaceship::ConnectAPI::Certificate.create_certificate_signing_request
 
       # Use the signing request to create a new (development|distribution) certificate
       begin
-        certificate = certificate_type.create!(csr: csr)
+        certificate = Spaceship::ConnectAPI::Certificate.create(
+          certificate_type: certificate_type,
+          csr_content: csr.to_pem
+        )
       rescue => ex
         type_name = (Cert.config[:development] ? "Development" : "Distribution")
         if ex.to_s.include?("You already have a current")
@@ -191,21 +223,29 @@ module Cert
       File.write(request_path, csr.to_pem)
 
       private_key_path = File.expand_path(File.join(Cert.config[:output_path], "#{certificate.id}.p12"))
-      File.write(private_key_path, pkey)
+      FastlaneCore::Helper.open_owner_only(private_key_path) { |file| file.write(pkey) }
 
       cert_path = store_certificate(certificate, Cert.config[:filename])
 
-      # Import all the things into the Keychain
-      keychain = File.expand_path(Cert.config[:keychain_path])
-      password = Cert.config[:keychain_password]
-      FastlaneCore::KeychainImporter.import_file(private_key_path, keychain, keychain_password: password)
-      FastlaneCore::KeychainImporter.import_file(cert_path, keychain, keychain_password: password)
+      if Helper.mac?
+        # Import all the things into the Keychain
+        keychain = File.expand_path(Cert.config[:keychain_path])
+        password = Cert.config[:keychain_password]
+        FastlaneCore::KeychainImporter.import_file(private_key_path, keychain, keychain_password: password, skip_set_partition_list: Cert.config[:skip_set_partition_list])
+        FastlaneCore::KeychainImporter.import_file(cert_path, keychain, keychain_password: password, skip_set_partition_list: Cert.config[:skip_set_partition_list])
+      else
+        UI.message("Skipping importing certificates as it would not work on this operating system.")
+      end
 
       # Environment variables for the fastlane action
       ENV["CER_CERTIFICATE_ID"] = certificate.id
       ENV["CER_FILE_PATH"] = cert_path
 
-      UI.success("Successfully generated #{certificate.id} which was imported to the local machine.")
+      if Helper.mac?
+        UI.success("Successfully generated #{certificate.id} which was imported to the local machine.")
+      else
+        UI.success("Successfully generated #{certificate.id}")
+      end
 
       return cert_path
     end
@@ -214,8 +254,8 @@ module Cert
       cert_name = filename ? filename : certificate.id
       cert_name = "#{cert_name}.cer" unless File.extname(cert_name) == ".cer"
       path = File.expand_path(File.join(Cert.config[:output_path], cert_name))
-      raw_data = certificate.download_raw
-      File.write(path, raw_data)
+      raw_data = Base64.decode64(certificate.certificate_content)
+      File.write(path, raw_data.force_encoding("UTF-8"))
       return path
     end
   end

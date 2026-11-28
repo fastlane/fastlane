@@ -10,6 +10,11 @@ module FastlaneCore
       return nil
     end
 
+    # Fetches the app platform from the given pkg file.
+    def self.fetch_app_platform(path)
+      return "osx"
+    end
+
     # Fetches the app version from the given pkg file.
     def self.fetch_app_version(path)
       xml = self.fetch_distribution_xml_file(path)
@@ -17,9 +22,20 @@ module FastlaneCore
       return nil
     end
 
+    # Fetches the app version from the given pkg file.
+    def self.fetch_app_build(path)
+      xml = self.fetch_distribution_xml_file(path)
+      return xml.elements['installer-gui-script/pkg-ref/bundle-version/bundle'].attributes['CFBundleVersion'] if xml
+      return nil
+    end
+
     def self.fetch_distribution_xml_file(path)
       Dir.mktmpdir do |dir|
-        Helper.backticks("xar -C #{dir.shellescape} -xf #{path.shellescape}")
+        FastlaneCore::CommandExecutor.execute(command: "xar -C #{dir.shellescape} -xf #{path.shellescape}",
+                                            print_all: true,
+                                                error: proc do |output|
+                                                  UI.user_error!("Could not extract '#{path}':\n#{output}")
+                                                end)
 
         Dir.foreach(dir) do |file|
           next unless file.include?('Distribution')

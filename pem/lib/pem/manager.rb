@@ -18,7 +18,13 @@ module PEM
 
         if existing_certificate
           remaining_days = (existing_certificate.expires - Time.now) / 60 / 60 / 24
-          UI.message("Existing push notification profile for '#{existing_certificate.owner_name}' is valid for #{remaining_days.round} more days.")
+
+          display_platform = ''
+          unless PEM.config[:website_push] || PEM.config[:voip_push]
+            display_platform = "#{PEM.config[:platform]} "
+          end
+
+          UI.message("Existing #{display_platform}push notification profile for '#{existing_certificate.owner_name}' is valid for #{remaining_days.round} more days.")
           if remaining_days > PEM.config[:active_days_limit]
             if PEM.config[:force]
               UI.success("You already have an existing push certificate, but a new one will be created since the --force option has been set.")
@@ -59,7 +65,7 @@ module PEM
 
         x509_certificate = cert.download
 
-        filename_base = PEM.config[:pem_name] || "#{certificate_type}_#{PEM.config[:app_identifier]}"
+        filename_base = PEM.config[:pem_name] || "#{certificate_type}_#{PEM.config[:app_identifier]}_#{PEM.config[:platform]}"
         filename_base = File.basename(filename_base, ".pem") # strip off the .pem if it was provided.
 
         output_path = File.expand_path(PEM.config[:output_path])
@@ -67,30 +73,50 @@ module PEM
 
         if PEM.config[:save_private_key]
           private_key_path = File.join(output_path, "#{filename_base}.pkey")
-          File.write(private_key_path, pkey.to_pem)
+          FastlaneCore::Helper.open_owner_only(private_key_path) { |file| file.write(pkey.to_pem) }
           UI.message("Private key: ".green + Pathname.new(private_key_path).realpath.to_s)
         end
 
         if PEM.config[:generate_p12]
           p12_cert_path = File.join(output_path, "#{filename_base}.p12")
-          p12 = OpenSSL::PKCS12.create(PEM.config[:p12_password], certificate_type, pkey, x509_certificate)
-          File.write(p12_cert_path, p12.to_der)
+          p12_password = PEM.config[:p12_password] == "" ? nil : PEM.config[:p12_password]
+          p12 = OpenSSL::PKCS12.create(p12_password, certificate_type, pkey, x509_certificate)
+          FastlaneCore::Helper.open_owner_only(p12_cert_path) { |file| file.write(p12.to_der.force_encoding("UTF-8")) }
           UI.message("p12 certificate: ".green + Pathname.new(p12_cert_path).realpath.to_s)
         end
 
         x509_cert_path = File.join(output_path, "#{filename_base}.pem")
-        File.write(x509_cert_path, x509_certificate.to_pem + pkey.to_pem)
+        FastlaneCore::Helper.open_owner_only(x509_cert_path) { |file| file.write(x509_certificate.to_pem + pkey.to_pem) }
         UI.message("PEM: ".green + Pathname.new(x509_cert_path).realpath.to_s)
         return x509_cert_path
       end
 
       def certificate
-        if PEM.config[:development]
-          Spaceship.certificate.development_push
-        elsif PEM.config[:website_push]
+        if PEM.config[:website_push]
           Spaceship.certificate.website_push
+        elsif PEM.config[:voip_push]
+          Spaceship.certificate.voip_push
         else
-          Spaceship.certificate.production_push
+          platform = PEM.config[:platform]
+          UI.user_error!('platform parameter is unspecified.') unless platform
+
+          case platform
+          when 'ios'
+            if PEM.config[:development]
+              Spaceship.certificate.development_push
+            else
+              Spaceship.certificate.production_push
+            end
+          when 'macos'
+            if PEM.config[:development]
+              Spaceship.certificate.mac_development_push
+            else
+              Spaceship.certificate.mac_production_push
+            end
+          else
+            UI.user_error!("Unsupported platform '#{platform}'. Supported platforms for development and production certificates are 'ios' & 'macos'")
+          end
+
         end
       end
 
@@ -99,6 +125,8 @@ module PEM
           'development'
         elsif PEM.config[:website_push]
           'website'
+        elsif PEM.config[:voip_push]
+          'voip'
         else
           'production'
         end

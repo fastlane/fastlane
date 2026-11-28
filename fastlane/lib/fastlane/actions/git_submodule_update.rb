@@ -13,20 +13,19 @@ module Fastlane
       #####################################################
 
       def self.description
-        "Executes a git submodule command"
+        "Executes a git submodule update command"
       end
 
       def self.available_options
         [
           FastlaneCore::ConfigItem.new(key: :recursive,
-           description: "Should the submodules be updated recursively",
-           type: Boolean,
-           default_value: false),
+                                       description: "Should the submodules be updated recursively?",
+                                       type: Boolean,
+                                       default_value: false),
           FastlaneCore::ConfigItem.new(key: :init,
-           description: "Should the submodules be initiated before update",
-           type: Boolean,
-           is_string: false,
-           default_value: false)
+                                       description: "Should the submodules be initiated before update?",
+                                       type: Boolean,
+                                       default_value: false)
         ]
       end
 
@@ -42,6 +41,15 @@ module Fastlane
 
       def self.is_supported?(platform)
         return true
+      end
+
+      def self.example_code
+        [
+          'git_submodule_update',
+          'git_submodule_update(recursive: true)',
+          'git_submodule_update(init: true)',
+          'git_submodule_update(recursive: true, init: true)'
+        ]
       end
 
       def self.category

@@ -48,6 +48,10 @@ module Fastlane
         "The absolute path to the installed provisioning profile"
       end
 
+      def self.return_type
+        :string
+      end
+
       def self.example_code
         [
           'install_provisioning_profile(path: "profiles/profile.mobileprovision")'

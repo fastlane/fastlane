@@ -1,5 +1,6 @@
 require 'plist'
 require 'fastlane_core/globals'
+require 'fastlane_core/provisioning_profile'
 
 require_relative 'module'
 
@@ -19,10 +20,10 @@ module Sigh
 
     def self.install_profile(profile)
       UI.message("Installing provisioning profile...")
-      profile_path = File.expand_path("~") + "/Library/MobileDevice/Provisioning Profiles/"
+      profile_path = FastlaneCore::ProvisioningProfile.profiles_path
       uuid = ENV["SIGH_UUID"] || ENV["SIGH_UDID"]
       profile_filename = uuid + ".mobileprovision"
-      destination = profile_path + profile_filename
+      destination = File.join(profile_path, profile_filename)
 
       # If the directory doesn't exist, make it first
       unless File.directory?(profile_path)
@@ -102,8 +103,12 @@ module Sigh
       now = DateTime.now
 
       profiles = load_profiles.select { |profile| (expired && profile["ExpirationDate"] < now) || (!pattern.nil? && profile["Name"] =~ pattern) }
+      if profiles.empty?
+        UI.important("No provisioning profiles that are either expired or match your pattern found")
+        return
+      end
 
-      UI.message("The following provisioning profiles are either expired or matches your pattern:")
+      UI.message("The following provisioning profiles are either expired or match your pattern:")
       profiles.each do |profile|
         UI.message(profile["Name"].red)
       end
@@ -126,13 +131,14 @@ module Sigh
     end
 
     def self.load_profiles
-      UI.message("Loading Provisioning profiles from ~/Library/MobileDevice/Provisioning Profiles/")
-      profiles_path = File.expand_path("~") + "/Library/MobileDevice/Provisioning Profiles/*.mobileprovision"
+      profiles_path = FastlaneCore::ProvisioningProfile.profiles_path
+      UI.message("Loading Provisioning profiles from #{profiles_path}")
+      profiles_path = File.join(profiles_path, "*.mobileprovision")
       profile_paths = Dir[profiles_path]
 
       profiles = []
       profile_paths.each do |profile_path|
-        profile = Plist.parse_xml(`security cms -D -i '#{profile_path}' 2> /dev/null`) # /dev/null: https://github.com/fastlane/fastlane/issues/6387
+        profile = FastlaneCore::ProvisioningProfile.parse(profile_path)
         profile['Path'] = profile_path
         profiles << profile
       end

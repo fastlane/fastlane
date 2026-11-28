@@ -2,7 +2,9 @@ require 'logger'
 require 'colored'
 require 'tty-spinner'
 require 'pathname'
+require 'fileutils'
 
+require_relative 'command_executor'
 require_relative 'fastlane_folder'
 require_relative 'ui/ui'
 require_relative 'env'
@@ -14,7 +16,7 @@ module FastlaneCore
 
     def self.fastlane_enabled?
       # This is called from the root context on the first start
-      @enabled ||= !FastlaneCore::FastlaneFolder.path.nil?
+      !FastlaneCore::FastlaneFolder.path.nil?
     end
 
     # Checks if fastlane is enabled for this project and returns the folder where the configuration lives
@@ -56,6 +58,21 @@ module FastlaneCore
       !self.bundler? && !self.contained_fastlane? && !self.homebrew? && !self.mac_app?
     end
 
+    # How this fastlane was installed, as reported to analytics and printed at startup
+    def self.install_method
+      if self.bundler?
+        'bundler'
+      elsif self.contained_fastlane?
+        'standalone'
+      elsif self.homebrew?
+        'homebrew'
+      elsif self.mac_app?
+        'mac_app'
+      else
+        'gem'
+      end
+    end
+
     # environment
     #
 
@@ -66,7 +83,7 @@ module FastlaneCore
 
     # @return true if it is enabled to execute external commands
     def self.sh_enabled?
-      !self.test?
+      !self.test? || ENV["FORCE_SH_DURING_TESTS"]
     end
 
     # @return [boolean] true if building in a known CI environment
@@ -74,20 +91,32 @@ module FastlaneCore
       return true if self.is_circle_ci?
 
       # Check for Jenkins, Travis CI, ... environment variables
-      ['JENKINS_HOME', 'JENKINS_URL', 'TRAVIS', 'CI', 'APPCENTER_BUILD_ID', 'TEAMCITY_VERSION', 'GO_PIPELINE_NAME', 'bamboo_buildKey', 'GITLAB_CI', 'XCS', 'TF_BUILD', 'GITHUB_ACTION', 'GITHUB_ACTIONS', 'BITRISE_IO'].each do |current|
-        return true if ENV.key?(current)
+      ['JENKINS_HOME', 'JENKINS_URL', 'TRAVIS', 'CI', 'APPCENTER_BUILD_ID', 'TEAMCITY_VERSION', 'GO_PIPELINE_NAME', 'bamboo_buildKey', 'GITLAB_CI', 'XCS', 'TF_BUILD', 'GITHUB_ACTION', 'GITHUB_ACTIONS', 'BITRISE_IO', 'BUDDY', 'CODEBUILD_BUILD_ARN'].each do |current|
+        return true if FastlaneCore::Env.truthy?(current)
       end
       return false
     end
 
+    # @return [boolean] true if a prompt reading stdin can get an answer: off CI with stdin on a terminal, or FASTLANE_ALLOW_PIPED_INPUT set
+    def self.can_prompt?
+      return true if FastlaneCore::Env.truthy?("FASTLANE_ALLOW_PIPED_INPUT")
+      !ci? && $stdin.tty?
+    end
+
     def self.is_circle_ci?
-      return ENV.key?('CIRCLECI')
+      return FastlaneCore::Env.truthy?('CIRCLECI')
+    end
+
+    # @return [boolean] true if environment variable CODEBUILD_BUILD_ARN is set and not false
+    def self.is_codebuild?
+      return FastlaneCore::Env.truthy?('CODEBUILD_BUILD_ARN')
     end
 
     def self.operating_system
-      return "macOS" if RUBY_PLATFORM.downcase.include?("darwin")
-      return "Windows" if RUBY_PLATFORM.downcase.include?("mswin")
-      return "Linux" if RUBY_PLATFORM.downcase.include?("linux")
+      return "macOS" if self.mac?
+      return "Windows" if self.windows?
+      return "Linux" if self.linux?
+      return "Java" if RUBY_PLATFORM =~ /java/
       return "Unknown"
     end
 
@@ -107,7 +136,7 @@ module FastlaneCore
 
     # Do we want to disable the colored output?
     def self.colors_disabled?
-      FastlaneCore::Env.truthy?("FASTLANE_DISABLE_COLORS")
+      FastlaneCore::Env.truthy?("FASTLANE_DISABLE_COLORS") || ENV.key?("NO_COLOR")
     end
 
     # Does the user use the Mac stock terminal
@@ -140,7 +169,7 @@ module FastlaneCore
 
     def self.xcode_server?
       # XCS is set by Xcode Server
-      return ENV["XCS"].to_i == 1
+      return FastlaneCore::Env.truthy?("XCS")
     end
 
     # @return The version of the currently used Xcode installation (e.g. "7.0")
@@ -167,11 +196,23 @@ module FastlaneCore
       @xcode_version
     end
 
-    # @return true if Xcode version is higher than 8.3
+    # @return true if installed Xcode version is 'greater than or equal to' the input parameter version
     def self.xcode_at_least?(version)
-      FastlaneCore::UI.user_error!("Unable to locate Xcode. Please make sure to have Xcode installed on your machine") if xcode_version.nil?
-      v = xcode_version
-      Gem::Version.new(v) >= Gem::Version.new(version)
+      installed_xcode_version = xcode_version
+      UI.user_error!("Unable to locate Xcode. Please make sure to have Xcode installed on your machine") if installed_xcode_version.nil?
+      Gem::Version.new(installed_xcode_version) >= Gem::Version.new(version)
+    end
+
+    # Swift
+    #
+
+    # @return Swift version
+    def self.swift_version
+      if self.which('swift')
+        output = `swift --version 2> /dev/null`
+        return output.lines.first.to_s[/version ([0-9.]+)/, 1]
+      end
+      return nil
     end
 
     # iTMSTransporter
@@ -203,23 +244,25 @@ module FastlaneCore
       return File.join(self.itms_path, 'iTMSTransporter')
     end
 
+    def self.user_defined_itms_path?
+      return FastlaneCore::Env.truthy?("FASTLANE_ITUNES_TRANSPORTER_PATH")
+    end
+
+    def self.user_defined_itms_path
+      return ENV["FASTLANE_ITUNES_TRANSPORTER_PATH"] if self.user_defined_itms_path?
+    end
+
     # @return the full path to the iTMSTransporter executable
     def self.itms_path
-      return ENV["FASTLANE_ITUNES_TRANSPORTER_PATH"] if FastlaneCore::Env.truthy?("FASTLANE_ITUNES_TRANSPORTER_PATH")
+      return self.user_defined_itms_path if FastlaneCore::Env.truthy?("FASTLANE_ITUNES_TRANSPORTER_PATH")
 
       if self.mac?
         # First check for manually install iTMSTransporter
         user_local_itms_path = "/usr/local/itms"
         return user_local_itms_path if File.exist?(user_local_itms_path)
 
-        # Then check for iTMSTransporter in the Xcode path
-        [
-          "../Applications/Application Loader.app/Contents/MacOS/itms",
-          "../Applications/Application Loader.app/Contents/itms",
-          "../SharedFrameworks/ContentDeliveryServices.framework/Versions/A/itms" # For Xcode 11
-        ].each do |path|
-          result = File.expand_path(File.join(self.xcode_path, path))
-          return result if File.exist?(result)
+        if FastlaneCore::Env.truthy?("FASTLANE_ITUNES_TRANSPORTER_USE_SHELL_SCRIPT")
+          UI.user_error!("Could not find transporter at #{self.xcode_path}: Xcode 14 and newer no longer include it. Remove FASTLANE_ITUNES_TRANSPORTER_USE_SHELL_SCRIPT so fastlane uploads with altool, or install Transporter and set FASTLANE_ITUNES_TRANSPORTER_PATH.")
         end
         UI.user_error!("Could not find transporter at #{self.xcode_path}. Please make sure you set the correct path to your Xcode installation.")
       elsif self.windows?
@@ -276,6 +319,18 @@ module FastlaneCore
     # helper methods
     #
 
+    # Cross-platform way of finding an executable in the $PATH.
+    # Returns the full path to the executable, or nil if not found.
+    # Unlike shelling out to `which`, this produces no output, making
+    # it suitable for CI environments.
+    #
+    #   Helper.which('ruby') #=> "/usr/bin/ruby"
+    #   Helper.which('not_real') #=> nil
+    #
+    def self.which(cmd)
+      FastlaneCore::CommandExecutor.which(cmd)
+    end
+
     # Runs a given command using backticks (`)
     # and prints them out using the UI.command method
     def self.backticks(command, print: true)
@@ -290,25 +345,45 @@ module FastlaneCore
       str.gsub(/\e\[([;\d]+)?m/, '')
     end
 
+    # Opens path for writing, readable and writable only by its owner (0600), including when it
+    # already exists: the mode is set before anything is written. Windows has no such mode.
+    def self.open_owner_only(path, mode = "w", &block)
+      File.open(path, mode, 0o600) do |file|
+        file.chmod(0o600) unless windows?
+        yield(file)
+      end
+    end
+
+    # Creates dir and any missing parents accessible only by its owner (0700); an existing dir is restricted too
+    def self.mkdir_owner_only(dir)
+      FileUtils.mkdir_p(dir, mode: 0o700)
+      File.chmod(0o700, dir) unless windows?
+    end
+
     # Zips directory
     def self.zip_directory(path, output_path, contents_only: false, overwrite: false, print: true)
       if overwrite
-        overwrite_command = " && rm -f '#{output_path}'"
+        overwrite_command = " && rm -f #{output_path.shellescape}"
       else
         overwrite_command = ""
       end
 
       if contents_only
-        command = "cd '#{path}'#{overwrite_command} && zip -r '#{output_path}' *"
+        command = "cd #{path.shellescape}#{overwrite_command} && zip -r #{output_path.shellescape} *"
       else
         containing_path = File.expand_path("..", path)
         contents_path = File.basename(path)
 
-        command = "cd '#{containing_path}'#{overwrite_command} && zip -r '#{output_path}' '#{contents_path}'"
+        command = "cd #{containing_path.shellescape}#{overwrite_command} && zip -r #{output_path.shellescape} #{contents_path.shellescape}"
       end
 
       UI.command(command) unless print
-      Helper.backticks(command, print: print)
+      FastlaneCore::CommandExecutor.execute(command: command,
+                                          print_all: print,
+                                      print_command: print,
+                                              error: proc do |output|
+                                                UI.user_error!("Could not zip '#{path}' to '#{output_path}':\n#{output}")
+                                              end)
     end
 
     # Executes the provided block after adjusting the ENV to have the
@@ -342,6 +417,8 @@ module FastlaneCore
         # we set the default here, instead of at the parameters
         # as we don't want to `UI.message` a rocket that's just there for the loading indicator
         text ||= "🚀"
+        # A spinner left running by a show without a hide could never be stopped once replaced
+        @require_fastlane_spinner.stop if @require_fastlane_spinner && !@require_fastlane_spinner.done?
         @require_fastlane_spinner = TTY::Spinner.new("[:spinner] #{text} ", format: :dots)
         @require_fastlane_spinner.auto_spin
       else
@@ -349,10 +426,22 @@ module FastlaneCore
       end
     end
 
-    def self.hide_loading_indicator
+    def self.hide_loading_indicator(success: true)
       if self.should_show_loading_indicator? && @require_fastlane_spinner
-        @require_fastlane_spinner.success
+        success ? @require_fastlane_spinner.success : @require_fastlane_spinner.error
       end
+    end
+
+    # Shows the loading indicator while the block runs, and hides it even when the block raises
+    def self.with_loading_indicator(text = nil)
+      failed = false
+      show_loading_indicator(text)
+      yield
+    rescue Exception # rubocop:disable Lint/RescueException
+      failed = true
+      raise
+    ensure
+      hide_loading_indicator(success: !failed)
     end
 
     # files
@@ -360,8 +449,37 @@ module FastlaneCore
 
     # checks if a given path is an executable file
     def self.executable?(cmd_path)
-      # no executable files on Windows, so existing is enough there
-      cmd_path && !File.directory?(cmd_path) && (File.executable?(cmd_path) || (self.windows? && File.exist?(cmd_path)))
+      if !cmd_path || File.directory?(cmd_path)
+        return false
+      end
+
+      return File.exist?(get_executable_path(cmd_path))
+    end
+
+    # returns the path of the executable with the correct extension on Windows
+    def self.get_executable_path(cmd_path)
+      cmd_path = localize_file_path(cmd_path)
+
+      if self.windows?
+        # PATHEXT contains the list of file extensions that Windows considers executable, semicolon separated.
+        # e.g. ".COM;.EXE;.BAT;.CMD"
+        exts = ENV['PATHEXT'] ? ENV['PATHEXT'].split(';') : []
+
+        # no executable files on Windows, so existing is enough there
+        # also check if command + ext is present
+        exts.each do |ext|
+          executable_path = "#{cmd_path}#{ext.downcase}"
+          return executable_path if File.exist?(executable_path)
+        end
+      end
+
+      return cmd_path
+    end
+
+    # returns the path with the platform-specific path separator (`/` on UNIX, `\` on Windows)
+    def self.localize_file_path(path)
+      # change `/` to `\` on Windows
+      return self.windows? ? path.gsub('/', '\\') : path
     end
 
     # checks if given file is a valid json file
@@ -417,20 +535,20 @@ module FastlaneCore
       UI.current.log
     end
 
-    def self.ask_password(message: "Passphrase: ", confirm: nil)
+    def self.ask_password(message: "Passphrase: ", confirm: nil, confirmation_message: "Type passphrase again: ")
       raise "This code should only run in interactive mode" unless UI.interactive?
 
       loop do
         password = UI.password(message)
         if confirm
-          password2 = UI.password("Type passphrase again: ")
+          password2 = UI.password(confirmation_message)
           if password == password2
             return password
           end
         else
           return password
         end
-        UI.error("Passphrases differ. Try again")
+        UI.error("Your entries do not match. Please try again")
       end
     end
   end

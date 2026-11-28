@@ -5,7 +5,7 @@ module Fastlane
     class InstallOnDeviceAction < Action
       def self.run(params)
         unless Helper.test?
-          UI.user_error!("ios-deploy not installed, see https://github.com/ios-control/ios-deploy for instructions") if `which ios-deploy`.length == 0
+          UI.user_error!("ios-deploy not installed, see https://github.com/ios-control/ios-deploy for instructions") unless Helper.which('ios-deploy')
         end
         taxi_cmd = [
           "ios-deploy",
@@ -34,27 +34,24 @@ module Fastlane
           FastlaneCore::ConfigItem.new(key: :extra,
                                        short_option: "-X",
                                        env_name: "FL_IOD_EXTRA",
-                                       description: "Extra Commandline arguments passed to ios-deploy",
-                                       optional: true,
-                                       is_string: true),
+                                       description: "Extra Command-line arguments passed to ios-deploy",
+                                       optional: true),
           FastlaneCore::ConfigItem.new(key: :device_id,
                                        short_option: "-d",
                                        env_name: "FL_IOD_DEVICE_ID",
                                        description: "id of the device / if not set defaults to first found device",
-                                       optional: true,
-                                       is_string: true),
+                                       optional: true),
           FastlaneCore::ConfigItem.new(key: :skip_wifi,
                                        short_option: "-w",
                                        env_name: "FL_IOD_WIFI",
                                        description: "Do not search for devices via WiFi",
                                        optional: true,
-                                       is_string: false),
+                                       type: Boolean),
           FastlaneCore::ConfigItem.new(key: :ipa,
                                        short_option: "-i",
                                        env_name: "FL_IOD_IPA",
                                        description: "The IPA file to put on the device",
                                        optional: true,
-                                       is_string: true,
                                        default_value: Actions.lane_context[SharedValues::IPA_OUTPUT_PATH] || Dir["*.ipa"].first,
                                        default_value_dynamic: true,
                                        verify_block: proc do |value|
@@ -71,7 +68,7 @@ module Fastlane
       end
 
       def self.details
-        "Installs the ipa on the device. If no id is given, the first found iOS device will be used. Works via USB or Wi-Fi. This requires `ios-deploy` to be installed. Please have a look at [ios-deploy](https://github.com/ios-control/ios-deploy). To quickly install it, use `npm -g i ios-deploy`"
+        "Installs the ipa on the device. If no id is given, the first found iOS device will be used. Works via USB or Wi-Fi. This requires `ios-deploy` to be installed. Please have a look at [ios-deploy](https://github.com/ios-control/ios-deploy). To quickly install it, use `brew install ios-deploy`"
       end
 
       def self.is_supported?(platform)

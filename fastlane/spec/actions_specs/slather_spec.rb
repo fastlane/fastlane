@@ -3,7 +3,7 @@ describe Fastlane do
     describe "Slather Integration" do
       let(:action) { Fastlane::Actions::SlatherAction }
       it "works with all parameters" do
-        allow(Fastlane::Actions::SlatherAction).to receive(:slather_version).and_return(Gem::Version.create('2.4.1'))
+        allow(Fastlane::Actions::SlatherAction).to receive(:slather_version).and_return(Gem::Version.create('2.8.0'))
         source_files = "*.swift"
         result = Fastlane::FastFile.new.parse("lane :test do
           slather({
@@ -24,6 +24,7 @@ describe Fastlane do
             cobertura_xml: true,
             sonarqube_xml: true,
             llvm_cov: true,
+            json: true,
             html: true,
             show: true,
             verbose: true,
@@ -36,7 +37,8 @@ describe Fastlane do
             workspace: 'foo.xcworkspace',
             arch: 'arm64',
             source_files: '#{source_files}',
-            decimals: '2'
+            decimals: '2',
+            ymlfile: 'foo.yml'
           })
         end").runner.execute(:test)
 
@@ -53,6 +55,7 @@ describe Fastlane do
                     --cobertura-xml
                     --sonarqube-xml
                     --llvm-cov
+                    --json
                     --html
                     --show
                     --build-directory foo
@@ -69,13 +72,15 @@ describe Fastlane do
                     --binary-basename YourFramework
                     --arch arm64
                     --source-files #{source_files.shellescape}
-                    --decimals 2 foo.xcodeproj".gsub(/\s+/, ' ')
+                    --decimals 2
+                    --ymlfile foo.yml
+                    foo.xcodeproj".gsub(/\s+/, ' ')
         expect(result).to eq(expected)
       end
 
       it "works with bundle" do
         allow(FastlaneCore::FastlaneFolder).to receive(:path).and_return(nil)
-        allow(Fastlane::Actions::SlatherAction).to receive(:slather_version).and_return(Gem::Version.create('2.4.1'))
+        allow(Fastlane::Actions::SlatherAction).to receive(:slather_version).and_return(Gem::Version.create('2.8.0'))
         result = Fastlane::FastFile.new.parse("lane :test do
           slather({
             use_bundle_exec: true,
@@ -94,6 +99,7 @@ describe Fastlane do
             cobertura_xml: true,
             sonarqube_xml: true,
             llvm_cov: true,
+            json: true,
             html: true,
             show: true,
             source_directory: 'baz',
@@ -102,7 +108,8 @@ describe Fastlane do
             proj: 'foo.xcodeproj',
             binary_basename: ['YourApp', 'YourFramework'],
             binary_file: 'you',
-            workspace: 'foo.xcworkspace'
+            workspace: 'foo.xcworkspace',
+            ymlfile: 'foo.yml'
           })
         end").runner.execute(:test)
 
@@ -118,6 +125,7 @@ describe Fastlane do
                     --cobertura-xml
                     --sonarqube-xml
                     --llvm-cov
+                    --json
                     --html
                     --show
                     --build-directory foo
@@ -130,7 +138,9 @@ describe Fastlane do
                     --workspace foo.xcworkspace
                     --binary-file you
                     --binary-basename YourApp
-                    --binary-basename YourFramework foo.xcodeproj'.gsub(/\s+/, ' ')
+                    --binary-basename YourFramework
+                    --ymlfile foo.yml
+                    foo.xcodeproj'.gsub(/\s+/, ' ')
         expect(result).to eq(expected)
       end
 
@@ -164,12 +174,14 @@ describe Fastlane do
       end
 
       it "works with spaces in paths" do
+        allow(Fastlane::Actions::SlatherAction).to receive(:slather_version).and_return(Gem::Version.create('2.8.0'))
         build_dir = "build dir"
         source_dir = "source dir"
         output_dir = "output dir"
         ignore = "nothing to ignore"
         scheme = "Foo App"
         proj = "foo bar.xcodeproj"
+        ymlfile = "fake yml file.yml"
         result = Fastlane::FastFile.new.parse("lane :test do
           slather({
             build_directory: '#{build_dir}',
@@ -178,6 +190,7 @@ describe Fastlane do
             source_directory: '#{source_dir}',
             output_directory: '#{output_dir}',
             ignore: '#{ignore}',
+            ymlfile: '#{ymlfile}',
             proj: '#{proj}'
           })
         end").runner.execute(:test)
@@ -189,6 +202,7 @@ describe Fastlane do
                     --ignore #{ignore.shellescape}
                     --input-format bah
                     --scheme #{scheme.shellescape}
+                    --ymlfile #{ymlfile.shellescape}
                     #{proj.shellescape}".gsub(/\s+/, ' ')
         expect(result).to eq(expected)
       end
@@ -237,6 +251,64 @@ describe Fastlane do
         expect(result).to eq(expected)
       end
 
+      it "works with binary_basename as string" do
+        result = Fastlane::FastFile.new.parse("lane :test do
+          slather({
+            binary_basename: 'bar',
+            proj: 'foo.xcodeproj'
+          })
+        end").runner.execute(:test)
+
+        expect(result).to eq("slather coverage --binary-basename bar foo.xcodeproj")
+      end
+
+      it "works with binary_basename as array" do
+        binary_basename = ['other', 'stuff']
+        expected = "slather coverage
+                    --binary-basename #{binary_basename[0]}
+                    --binary-basename #{binary_basename[1]}
+                    foo.xcodeproj".gsub(/\s+/, ' ')
+
+        result = Fastlane::FastFile.new.parse("lane :test do
+          slather({
+            binary_basename: #{binary_basename},
+            proj: 'foo.xcodeproj'
+          })
+        end").runner.execute(:test)
+
+        expect(result).to eq(expected)
+      end
+
+      it "works with binary_basename as environment string" do
+        ENV['FL_SLATHER_BINARY_BASENAME'] = 'bar'
+        result = Fastlane::FastFile.new.parse("lane :test do
+          slather({
+            proj: 'foo.xcodeproj'
+          })
+        end").runner.execute(:test)
+
+        expect(result).to eq("slather coverage --binary-basename bar foo.xcodeproj")
+        ENV.delete('FL_SLATHER_BINARY_BASENAME')
+      end
+
+      it "works with binary_basename as environment array" do
+        ENV['FL_SLATHER_BINARY_BASENAME'] = 'other,stuff'
+        binary_basenames = ENV['FL_SLATHER_BINARY_BASENAME'].split(',')
+        expected = "slather coverage
+                    --binary-basename #{binary_basenames[0]}
+                    --binary-basename #{binary_basenames[1]}
+                    foo.xcodeproj".gsub(/\s+/, ' ')
+
+        result = Fastlane::FastFile.new.parse("lane :test do
+          slather({
+            proj: 'foo.xcodeproj'
+          })
+        end").runner.execute(:test)
+
+        expect(result).to eq(expected)
+        ENV.delete('FL_SLATHER_BINARY_BASENAME')
+      end
+
       it "works with multiple ignore patterns" do
         pattern1 = "Pods/*"
         pattern2 = "../**/*/Xcode*"
@@ -279,26 +351,78 @@ describe Fastlane do
         end
       end
 
-      describe "#validate_params!" do
-        let(:param) { { configuration: 'Debug', proj: 'test.xcodeproj' } }
+      describe "#ymlfile_available?" do
+        let(:param) { { use_bundle_exec: false } }
         let(:version) { '' }
         before do
           allow(action).to receive(:slather_version).and_return(Gem::Version.create(version))
         end
 
-        context "when slather version is 2.4.0" do
-          let(:version) { '2.4.0' }
-          it "doesnot pass the validation" do
-            expect do
-              action.validate_params!(param)
-            end.to raise_error(FastlaneCore::Interface::FastlaneError, 'configuration option is available since version 2.4.1')
+        context "when slather version is 2.7.0" do
+          let(:version) { '2.7.0' }
+          it "ymlfile option is not available" do
+            expect(action.ymlfile_available?).to be_falsey
           end
         end
 
-        context "when slather version is 2.4.1" do
-          let(:version) { '2.4.1' }
-          it "pass the validation" do
-            expect(action.validate_params!(param)).to be_truthy
+        context "when slather version is 2.8.0" do
+          let(:version) { '2.8.0' }
+          it "ymlfile option is available" do
+            expect(action.ymlfile_available?).to be_truthy
+          end
+        end
+
+        context "when slather version is 2.8.1" do
+          let(:version) { '2.8.1' }
+          it "ymlfile option is available" do
+            expect(action.ymlfile_available?).to be_truthy
+          end
+        end
+      end
+
+      describe "#validate_params!" do
+        let(:version) { '' }
+        before do
+          allow(action).to receive(:slather_version).and_return(Gem::Version.create(version))
+        end
+
+        describe "with configuration param" do
+          let(:param) { { configuration: 'Debug', proj: 'test.xcodeproj' } }
+
+          context "when slather version is 2.4.0" do
+            let(:version) { '2.4.0' }
+            it "does not pass the validation" do
+              expect do
+                action.validate_params!(param)
+              end.to raise_error(FastlaneCore::Interface::FastlaneError, 'configuration option is available since version 2.4.1')
+            end
+          end
+
+          context "when slather version is 2.4.1" do
+            let(:version) { '2.4.1' }
+            it "pass the validation" do
+              expect(action.validate_params!(param)).to be_truthy
+            end
+          end
+        end
+
+        describe "with ymlfile param" do
+          let(:param) { { ymlfile: 'foo.yml', proj: 'test.xcodeproj' } }
+
+          context "when slather version is 2.7.0" do
+            let(:version) { '2.7.0' }
+            it "does not pass the validation" do
+              expect do
+                action.validate_params!(param)
+              end.to raise_error(FastlaneCore::Interface::FastlaneError, 'ymlfile option is available since version 2.8.0')
+            end
+          end
+
+          context "when slather version is 2.8.0" do
+            let(:version) { '2.8.0' }
+            it "pass the validation" do
+              expect(action.validate_params!(param)).to be_truthy
+            end
           end
         end
       end

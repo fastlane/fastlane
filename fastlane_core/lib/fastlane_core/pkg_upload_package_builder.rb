@@ -1,4 +1,5 @@
 require 'digest/md5'
+require 'securerandom'
 
 require_relative 'globals'
 require_relative 'ui/ui'
@@ -12,7 +13,7 @@ module FastlaneCore
     attr_accessor :package_path
 
     def generate(app_id: nil, pkg_path: nil, package_path: nil, platform: "osx")
-      self.package_path = File.join(package_path, "#{app_id}.itmsp")
+      self.package_path = File.join(package_path, "#{app_id}-#{SecureRandom.uuid}.itmsp")
       FileUtils.rm_rf(self.package_path) if File.directory?(self.package_path)
       FileUtils.mkdir_p(self.package_path)
 
@@ -21,7 +22,7 @@ module FastlaneCore
         apple_id: app_id,
         file_size: File.size(pkg_path),
         ipa_path: File.basename(pkg_path), # this is only the base name as the ipa is inside the package
-        md5: Digest::MD5.hexdigest(File.read(pkg_path)),
+        md5: Digest::MD5.file(pkg_path).hexdigest,
         archive_type: 'product-archive',
         platform: platform
       }
@@ -32,7 +33,7 @@ module FastlaneCore
       File.write(File.join(self.package_path, METADATA_FILE_NAME), xml)
       UI.success("Wrote XML data to '#{self.package_path}'") if FastlaneCore::Globals.verbose?
 
-      package_path
+      return self.package_path
     end
 
     private

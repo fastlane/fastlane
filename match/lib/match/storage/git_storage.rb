@@ -1,4 +1,5 @@
 require 'fastlane_core/command_executor'
+require 'open3'
 
 require_relative '../module'
 require_relative './interface'
@@ -7,6 +8,9 @@ module Match
   module Storage
     # Store the code signing identities in a git repo
     class GitStorage < Interface
+      DEFAULT_BRANCH = "main"
+      PRIVATE_KEY_ENV = "MATCH_SSH_ADD_PRIVATE_KEY"
+
       # User provided values
       attr_accessor :git_url
       attr_accessor :shallow_clone
@@ -19,6 +23,7 @@ module Match
       attr_accessor :platform
       attr_accessor :git_basic_authorization
       attr_accessor :git_bearer_authorization
+      attr_accessor :git_private_key
 
       def self.configure(params)
         return self.new(
@@ -32,7 +37,8 @@ module Match
           git_user_email: params[:git_user_email],
           clone_branch_directly: params[:clone_branch_directly],
           git_basic_authorization: params[:git_basic_authorization],
-          git_bearer_authorization: params[:git_bearer_authorization]
+          git_bearer_authorization: params[:git_bearer_authorization],
+          git_private_key: params[:git_private_key]
         )
       end
 
@@ -46,7 +52,8 @@ module Match
                      git_user_email: nil,
                      clone_branch_directly: false,
                      git_basic_authorization: nil,
-                     git_bearer_authorization: nil)
+                     git_bearer_authorization: nil,
+                     git_private_key: nil)
         self.git_url = git_url
         self.shallow_clone = shallow_clone
         self.skip_docs = skip_docs
@@ -56,9 +63,18 @@ module Match
         self.clone_branch_directly = clone_branch_directly
         self.git_basic_authorization = git_basic_authorization
         self.git_bearer_authorization = git_bearer_authorization
+        self.git_private_key = convert_private_key_path_to_absolute(git_private_key)
 
         self.type = type if type
         self.platform = platform if platform
+      end
+
+      def convert_private_key_path_to_absolute(git_private_key)
+        if !git_private_key.nil? && File.file?(File.expand_path(git_private_key))
+          File.expand_path(git_private_key).shellescape.to_s
+        else
+          git_private_key
+        end
       end
 
       def prefixed_working_directory
@@ -73,17 +89,19 @@ module Match
         self.working_directory = Dir.mktmpdir
 
         command = "git clone #{self.git_url.shellescape} #{self.working_directory.shellescape}"
-        # HTTP headers are supposed to be be case insensitive but
-        # Bitbucket requires `Authorization: Basic` and `Authorization Bearer` to work
-        # https://github.com/fastlane/fastlane/pull/15928
-        command << " -c http.extraheader='Authorization: Basic #{self.git_basic_authorization}'" unless self.git_basic_authorization.nil?
-        command << " -c http.extraheader='Authorization: Bearer #{self.git_bearer_authorization}'" unless self.git_bearer_authorization.nil?
 
         if self.shallow_clone
-          command << " --depth 1 --no-single-branch"
-        elsif self.clone_branch_directly
-          command += " -b #{self.branch.shellescape} --single-branch"
+          command << " --depth 1"
         end
+
+        if self.clone_branch_directly
+          command += " -b #{self.branch.shellescape} --single-branch"
+        elsif self.shallow_clone
+          # shallow clone all branches if not cloning branch directly
+          command += " --no-single-branch"
+        end
+
+        command = command_from_private_key(command) unless self.git_private_key.nil?
 
         UI.message("Cloning remote git repo...")
         if self.branch && !self.clone_branch_directly
@@ -92,19 +110,16 @@ module Match
 
         begin
           # GIT_TERMINAL_PROMPT will fail the `git clone` command if user credentials are missing
-          Helper.with_env_values('GIT_TERMINAL_PROMPT' => '0') do
+          Helper.with_env_values(git_env_values) do
             FastlaneCore::CommandExecutor.execute(command: command,
                                                 print_all: FastlaneCore::Globals.verbose?,
                                             print_command: FastlaneCore::Globals.verbose?)
           end
         rescue
-          UI.error("Error cloning certificates repo, please make sure you have read access to the repository you want to use")
           if self.branch && self.clone_branch_directly
             UI.error("You passed '#{self.branch}' as branch in combination with the `clone_branch_directly` flag. Please remove `clone_branch_directly` flag on the first run for _match_ to create the branch.")
           end
-          UI.error("Run the following command manually to make sure you're properly authenticated:")
-          UI.command(command)
-          UI.user_error!("Error cloning certificates git repo, please make sure you have access to the repository - see instructions above")
+          UI.user_error!("Error cloning certificates repo, please make sure you have read access to the repository you want to use")
         end
 
         add_user_config(self.git_full_name, self.git_user_email)
@@ -113,7 +128,7 @@ module Match
           UI.user_error!("Error cloning repo, make sure you have access to it '#{self.git_url}'")
         end
 
-        checkout_branch unless self.branch == "master"
+        checkout_branch
       end
 
       def human_readable_description
@@ -121,9 +136,10 @@ module Match
       end
 
       def delete_files(files_to_delete: [], custom_message: nil)
-        # No specific list given, e.g. this happens on `fastlane match nuke`
-        # We just want to run `git add -A` to commit everything
-        git_push(commands: ["git add -A"], commit_message: custom_message)
+        if files_to_delete.count > 0
+          commands = files_to_delete.map { |filename|  "git --literal-pathspecs rm -- #{filename.shellescape}" }
+          git_push(commands: commands, commit_message: custom_message)
+        end
       end
 
       def upload_files(files_to_upload: [], custom_message: nil)
@@ -148,8 +164,25 @@ module Match
       def generate_matchfile_content
         UI.important("Please create a new, private git repository to store the certificates and profiles there")
         url = UI.input("URL of the Git Repo: ")
+        branch = UI.input("Branch of the Git Repo (leave blank to use '#{DEFAULT_BRANCH}'): ").to_s.strip
+        branch = DEFAULT_BRANCH if branch.empty?
 
-        return "git_url(\"#{url}\")"
+        return "git_url(\"#{url}\")\ngit_branch(\"#{branch}\")"
+      end
+
+      def list_files(file_name: "", file_ext: "")
+        Dir[File.join(working_directory, "**", file_name, "*.#{file_ext}")]
+      end
+
+      def command_from_private_key(command)
+        if File.file?(self.git_private_key)
+          ssh_add = File.expand_path(self.git_private_key).shellescape.to_s
+        else
+          UI.message("Private key file does not exist, will continue by using it as a raw key.")
+          # From the environment (git_env_values), so the key is not on bash's command line
+          ssh_add = "- <<< \"$#{PRIVATE_KEY_ENV}\""
+        end
+        return "ssh-agent bash -c 'ssh-add #{ssh_add}; #{command}'"
       end
 
       private
@@ -213,10 +246,12 @@ module Match
       def git_push(commands: [], commit_message: nil)
         commit_message ||= generate_commit_message
         commands << "git commit -m #{commit_message.shellescape}"
-        commands << "git push origin #{self.branch.shellescape}"
+        git_push_command = "git push origin #{self.branch.shellescape}"
+        git_push_command = command_from_private_key(git_push_command) unless self.git_private_key.nil?
+        commands << git_push_command
 
         UI.message("Pushing changes to remote git repo...")
-        Helper.with_env_values('GIT_TERMINAL_PROMPT' => '0') do
+        Helper.with_env_values(git_env_values) do
           commands.each do |command|
             FastlaneCore::CommandExecutor.execute(command: command,
                                                 print_all: FastlaneCore::Globals.verbose?,
@@ -226,6 +261,56 @@ module Match
       rescue => ex
         UI.error("Couldn't commit or push changes back to git...")
         UI.error(ex)
+      end
+
+      def git_env_values
+        env_values = { 'GIT_TERMINAL_PROMPT' => '0' }
+        env_values['GIT_SSH_COMMAND'] = non_interactive_git_ssh_command
+        env_values[PRIVATE_KEY_ENV] = self.git_private_key unless self.git_private_key.nil?
+        env_values.merge(authorization_env_values)
+      end
+
+      # Through git's environment (git 2.31+), so the header is neither on the command line nor stored in .git/config
+      def authorization_env_values
+        headers = []
+        # HTTP headers are supposed to be case-insensitive but
+        # Bitbucket requires `Authorization: Basic` and `Authorization Bearer` to work
+        # https://github.com/fastlane/fastlane/pull/15928
+        headers << "Authorization: Basic #{self.git_basic_authorization}" unless self.git_basic_authorization.nil?
+        headers << "Authorization: Bearer #{self.git_bearer_authorization}" unless self.git_bearer_authorization.nil?
+        return {} if headers.empty?
+
+        version = git_version
+        UI.user_error!("git_basic_authorization and git_bearer_authorization need git 2.31 or later, found git #{version}") if version && Gem::Version.new(version) < Gem::Version.new('2.31')
+
+        # Keep pairs the user already passes this way
+        first = ENV['GIT_CONFIG_COUNT'].to_i
+        env_values = { 'GIT_CONFIG_COUNT' => (first + headers.count).to_s }
+        headers.each_with_index do |header, i|
+          env_values["GIT_CONFIG_KEY_#{first + i}"] = 'http.extraheader'
+          env_values["GIT_CONFIG_VALUE_#{first + i}"] = header
+        end
+        env_values
+      end
+
+      # nil when git cannot be run: cloning reports that
+      def git_version
+        @git_version ||= begin
+          output, status = Open3.capture2('git', '--version')
+          output[/\d+\.\d+(\.\d+)?/] if status.success?
+        rescue Errno::ENOENT
+          nil
+        end
+      end
+
+      def non_interactive_git_ssh_command
+        ssh_command = ENV['GIT_SSH_COMMAND']
+
+        if ssh_command.nil? || ssh_command.empty?
+          return "ssh -o BatchMode=yes"
+        end
+        return ssh_command if ssh_command.include?('BatchMode=yes')
+        "#{ssh_command} -o BatchMode=yes"
       end
     end
   end

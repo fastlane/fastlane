@@ -1,3 +1,5 @@
+require 'ostruct'
+
 module Fastlane
   class ErbTemplateHelper
     require "erb"
@@ -24,7 +26,7 @@ module Fastlane
     end
 
     def render(template)
-      ERB.new(template, nil, @trim_mode).result(binding)
+      ERB.new(template, trim_mode: @trim_mode).result(binding)
     end
   end
 end

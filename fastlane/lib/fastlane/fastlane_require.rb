@@ -27,7 +27,11 @@ module Fastlane
         UI.important("Installing Ruby gem '#{gem_name}'...")
 
         spec_name = self.find_gem_name(gem_name)
-        UI.important("Found gem \"#{spec_name}\" instead of the required name \"#{gem_name}\"") if spec_name != gem_name
+        if spec_name != gem_name
+          message = "Could not find gem '#{gem_name}' on RubyGems"
+          message += ". Did you mean '#{spec_name}'? Fix the name in your Fastfile" if spec_name
+          UI.user_error!(message)
+        end
 
         return if Helper.test?
 
@@ -59,8 +63,14 @@ module Fastlane
 
       def find_gem_name(user_supplied_name)
         fetcher = Gem::SpecFetcher.fetcher
-        gems = fetcher.suggest_gems_from_name(user_supplied_name)
 
+        # RubyGems 3.2.0 changed behavior of suggest_gems_from_name to no longer return user supplied name (only similar suggestions)
+        # First search for exact gem with detect then use suggest_gems_from_name
+        if (detected_gem = fetcher.detect(:latest) { |nt| nt.name == user_supplied_name }.first)
+          return detected_gem[0].name
+        end
+
+        gems = fetcher.suggest_gems_from_name(user_supplied_name)
         return gems.first
       end
 

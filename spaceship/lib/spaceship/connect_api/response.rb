@@ -6,11 +6,13 @@ module Spaceship
       include Enumerable
       attr_reader :body
       attr_reader :status
+      attr_reader :headers
       attr_reader :client
 
-      def initialize(body: nil, status: nil, client: nil)
+      def initialize(body: nil, status: nil, headers: nil, client: nil)
         @body = body
         @status = status
+        @headers = headers
         @client = client
       end
 
@@ -20,13 +22,17 @@ module Spaceship
         return links["next"]
       end
 
-      def next_page
+      def next_page(&block)
         url = next_url
         return nil if url.nil?
-        return client.get(url)
+        if block_given?
+          return yield(url)
+        else
+          return client.get(url)
+        end
       end
 
-      def next_pages(count: 1)
+      def next_pages(count: 1, &block)
         if !count.nil? && count < 0
           count = 0
         end
@@ -36,7 +42,7 @@ module Spaceship
 
         resp = self
         loop do
-          resp = resp.next_page
+          resp = resp.next_page(&block)
           break if resp.nil?
           responses << resp
           counter += 1
@@ -47,8 +53,8 @@ module Spaceship
         return responses
       end
 
-      def all_pages
-        return next_pages(count: nil)
+      def all_pages(&block)
+        return next_pages(count: nil, &block)
       end
 
       def to_models
@@ -60,6 +66,19 @@ module Spaceship
       def each(&block)
         to_models.each do |model|
           yield(model)
+        end
+      end
+
+      def all_pages_each(&block)
+        to_models.each do |model|
+          yield(model)
+        end
+
+        resp = self
+        loop do
+          resp = resp.next_page
+          break if resp.nil?
+          resp.each(&block)
         end
       end
     end

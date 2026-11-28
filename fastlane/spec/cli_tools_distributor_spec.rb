@@ -1,6 +1,15 @@
 require 'fastlane/cli_tools_distributor'
 
 describe Fastlane::CLIToolsDistributor do
+  around do |example|
+    # FASTLANE_SKIP_UPDATE_CHECK: prevent the update checker to run and clutter the output
+    # (Fastlane::PluginUpdateManager.start_looking_for_updates() will return)
+    # FASTLANE_DISABLE_ANIMATION: prevent the spinner in Fastlane::CLIToolsDistributor.take_off
+    FastlaneSpec::Env.with_env_values('FASTLANE_SKIP_UPDATE_CHECK': 'a_truthy_value', 'FASTLANE_DISABLE_ANIMATION': 'true') do
+      example.run
+    end
+  end
+
   describe "command handling" do
     it "runs the lane instead of the tool when there is a conflict" do
       FastlaneSpec::Env.with_ARGV(["sigh"]) do
@@ -19,6 +28,104 @@ describe Fastlane::CLIToolsDistributor do
         expect(Gym::CommandsGenerator).to receive(:start).and_return(nil)
         Fastlane::CLIToolsDistributor.take_off
       end
+    end
+
+    it "runs a separate aliased tool when the tool is available and the name is not used in a lane" do
+      FastlaneSpec::Env.with_ARGV(["build_app"]) do
+        require 'gym/options'
+        require 'gym/commands_generator'
+        expect(FastlaneCore::FastlaneFolder).to receive(:fastfile_path).and_return("./fastlane/spec/fixtures/fastfiles/FastfileUseToolNameAsLane").at_least(:once)
+        expect(Gym::CommandsGenerator).to receive(:start).and_return(nil)
+        Fastlane::CLIToolsDistributor.take_off
+      end
+    end
+  end
+
+  describe "the running version" do
+    def take_off_with(argv)
+      FastlaneSpec::Env.with_ARGV(argv) do
+        require 'fastlane/commands_generator'
+        allow(FastlaneCore::FastlaneFolder).to receive(:fastfile_path).and_return("./fastlane/spec/fixtures/fastfiles/FastfileUseToolNameAsLane")
+        allow(Fastlane::CommandsGenerator).to receive(:start).and_return(nil)
+        allow(FastlaneCore::UI).to receive(:message)
+        Fastlane::CLIToolsDistributor.take_off
+      end
+    end
+
+    it "prints the fastlane and Ruby versions, and the install method, when running a lane" do
+      allow(FastlaneCore::Helper).to receive(:bundler?).and_return(true)
+      take_off_with(["sigh"])
+
+      expect(FastlaneCore::UI).to have_received(:message).with("fastlane #{Fastlane::VERSION} (Ruby #{RUBY_VERSION}, bundler)")
+    end
+
+    it "adds the Gemfile with --verbose, with the home directory shortened, also on Windows" do
+      allow(FastlaneCore::Helper).to receive(:bundler?).and_return(true)
+      allow(Dir).to receive(:home).and_return("C:/Users/runneradmin")
+      FastlaneSpec::Env.with_env_values('BUNDLE_GEMFILE' => "C:/Users/runneradmin/app/Gemfile") do
+        take_off_with(["sigh", "--verbose"])
+      end
+
+      expect(FastlaneCore::UI).to have_received(:message).with("fastlane #{Fastlane::VERSION} (Ruby #{RUBY_VERSION}, bundler: ~/app/Gemfile)")
+    end
+
+    it "says gem for a plain gem install, as analytics does" do
+      allow(FastlaneCore::Helper).to receive_messages(bundler?: false, homebrew?: false, contained_fastlane?: false, mac_app?: false)
+      allow(Fastlane::CLIToolsDistributor).to receive(:print_bundle_exec_warning)
+      take_off_with(["sigh"])
+
+      expect(FastlaneCore::UI).to have_received(:message).with("fastlane #{Fastlane::VERSION} (Ruby #{RUBY_VERSION}, gem)")
+    end
+
+    it "does not print it for fastlane -v" do
+      take_off_with(["-v"])
+
+      expect(FastlaneCore::UI).not_to have_received(:message).with(/\Afastlane .* \(Ruby /)
+    end
+  end
+
+  describe "JSON commands" do
+    def stdout_after_take_off(argv)
+      stdout = $stdout
+      FastlaneSpec::Env.with_ARGV(argv) do
+        require 'fastlane/commands_generator'
+        require 'gym/options'
+        require 'gym/commands_generator'
+        allow(Fastlane::CommandsGenerator).to receive(:start).and_return(nil)
+        allow(Gym::CommandsGenerator).to receive(:start).and_return(nil)
+        allow(FastlaneCore::UI).to receive(:message)
+        Fastlane::CLIToolsDistributor.take_off
+      end
+      $stdout
+    ensure
+      $stdout = stdout
+    end
+
+    it "sends everything but the JSON to stderr for lanes --json and -j" do
+      expect(stdout_after_take_off(%w(lanes --json))).to be($stderr)
+      expect(stdout_after_take_off(%w(lanes -j))).to be($stderr)
+    end
+
+    it "sends everything but the JSON to stderr for spaceship api" do
+      require 'spaceship/commands_generator'
+      allow(Spaceship::CommandsGenerator).to receive(:start).and_return(nil)
+      expect(stdout_after_take_off(%w(spaceship api GET /v1/apps))).to be($stderr)
+    end
+
+    it "sends everything but the JSON to stderr for supply api" do
+      require 'supply/commands_generator'
+      allow(Supply::CommandsGenerator).to receive(:start).and_return(nil)
+      expect(stdout_after_take_off(%w(supply api GET /androidpublisher/v3/applications/com.example/edits/1))).to be($stderr)
+    end
+
+    it "sends everything but the JSON to stderr for actions --json and action <name> -j" do
+      expect(stdout_after_take_off(%w(actions --json))).to be($stderr)
+      expect(stdout_after_take_off(%w(action gym -j))).to be($stderr)
+    end
+
+    it "keeps stdout for lanes without --json, and for -j given to another command" do
+      expect(stdout_after_take_off(%w(lanes))).to be($stdout)
+      expect(stdout_after_take_off(%w(gym -j))).to be($stdout)
     end
   end
 
@@ -57,6 +164,18 @@ describe Fastlane::CLIToolsDistributor do
         end.to raise_error(SystemExit)
       end
     end
+
+    it "throws the original error if UpdateChecker also fails" do
+      FastlaneSpec::Env.with_ARGV(["beta"]) do
+        expect(FastlaneCore::FastlaneFolder).to receive(:fastfile_path).and_return("./fastlane/spec/fixtures/fastfiles/FastfileErrorInError").at_least(:once)
+        expect(FastlaneCore::UpdateChecker).to receive(:start_looking_for_update).with('fastlane')
+        expect(FastlaneCore::UpdateChecker).to receive(:show_update_status).with('fastlane', Fastlane::VERSION).and_raise(LoadError)
+        expect_any_instance_of(Commander::Runner).to receive(:abort).with("\n[!] Original error".red).and_raise(SystemExit) # mute console output from `abort`
+        expect do
+          Fastlane::CLIToolsDistributor.take_off
+        end.to raise_error(SystemExit)
+      end
+    end
   end
 
   describe "dotenv loading" do
@@ -83,11 +202,20 @@ describe Fastlane::CLIToolsDistributor do
         Fastlane::CLIToolsDistributor.take_off
       end
     end
+  end
 
-    it "passes nil when --env is not specified" do
-      FastlaneSpec::Env.with_ARGV(["lanes"]) do
-        expect(Fastlane::Helper::DotenvHelper).to receive(:load_dot_env).with(nil)
-        Fastlane::CLIToolsDistributor.take_off
+  describe "map_aliased_tools" do
+    before do
+      require 'fastlane'
+    end
+
+    it "returns nil when tool_name is nil" do
+      expect(Fastlane::CLIToolsDistributor.map_aliased_tools(nil)).to eq(nil)
+    end
+
+    Fastlane::TOOL_ALIASES.each do |key, value|
+      it "returns #{value} when tool_name is #{key}" do
+        expect(Fastlane::CLIToolsDistributor.map_aliased_tools(key)).to eq(value)
       end
     end
   end

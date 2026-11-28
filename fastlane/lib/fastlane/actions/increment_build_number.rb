@@ -8,7 +8,7 @@ module Fastlane
       require 'shellwords'
 
       def self.is_supported?(platform)
-        [:ios, :mac].include?(platform)
+        [:ios, :mac, :xros].include?(platform)
       end
 
       def self.run(params)
@@ -33,14 +33,15 @@ module Fastlane
         agv_disabled = !system([command_prefix, 'agvtool what-version', command_suffix].join(' '))
         raise "Apple Generic Versioning is not enabled." if agv_disabled && params[:build_number].nil?
 
+        mode = params[:skip_info_plist] ? '' : ' -all'
         command = [
           command_prefix,
           'agvtool',
-          params[:build_number] ? "new-version -all #{params[:build_number].to_s.strip}" : 'next-version -all',
+          params[:build_number] ? "new-version#{mode} #{params[:build_number].to_s.strip.shellescape}" : "next-version#{mode}",
           command_suffix
         ].join(' ')
 
-        output = Actions.sh(command)
+        output = Fastlane::Helper::AgvtoolHelper.run(command, folder: folder)
         if output.include?('$(SRCROOT)')
           UI.error('Cannot set build number with plist path containing $(SRCROOT)')
           UI.error('Please remove $(SRCROOT) in your Xcode target build settings')
@@ -51,6 +52,8 @@ module Fastlane
         build_number = Actions.sh("#{command_prefix} agvtool what-version", log: false).split("\n").last.strip if build_number.to_s == ""
 
         return Actions.lane_context[SharedValues::BUILD_NUMBER] = build_number
+      rescue Fastlane::Helper::AgvtoolHelper::DamagedProjectError
+        raise
       rescue
         UI.user_error!("Apple Generic Versioning is not enabled in this project.\nBefore being able to increment and read the version number from your Xcode project, you first need to setup your project properly. Please follow the guide at https://developer.apple.com/library/content/qa/qa1827/_index.html")
       end
@@ -65,7 +68,12 @@ module Fastlane
                                        env_name: "FL_BUILD_NUMBER_BUILD_NUMBER",
                                        description: "Change to a specific version. When you provide this parameter, Apple Generic Versioning does not have to be enabled",
                                        optional: true,
-                                       is_string: false),
+                                       skip_type_validation: true), # allow Integer, String
+          FastlaneCore::ConfigItem.new(key: :skip_info_plist,
+                                       env_name: "FL_BUILD_NUMBER_SKIP_INFO_PLIST",
+                                       description: "Don't update Info.plist files when updating the build version",
+                                       type: Boolean,
+                                       default_value: false),
           FastlaneCore::ConfigItem.new(key: :xcodeproj,
                                        env_name: "FL_BUILD_NUMBER_PROJECT",
                                        description: "optional, you must specify the path to your main Xcode project if it is not in the project root directory",

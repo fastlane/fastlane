@@ -5,8 +5,18 @@ describe Sigh do
       ENV["DELIVER_PASSWORD"] = "123"
     end
 
+    let(:mock_base_client) { +"fake api base client" }
+
+    before(:each) do
+      allow(mock_base_client).to receive(:login)
+      allow(mock_base_client).to receive(:team_id).and_return('')
+
+      allow(Spaceship::ConnectAPI::Provisioning::Client).to receive(:instance).and_return(mock_base_client)
+    end
+
     it "Successful run" do
-      sigh_stub_spaceship
+      sigh_stub_spaceship_connect(inhouse: false, create_profile_app_identifier: "com.krausefx.app", all_app_identifiers: ["com.krausefx.app"])
+
       options = { app_identifier: "com.krausefx.app", skip_install: true, skip_certificate_verification: true }
       Sigh.config = FastlaneCore::Configuration.create(Sigh::Options.available_options, options)
 
@@ -16,7 +26,8 @@ describe Sigh do
     end
 
     it "Invalid profile not force run" do
-      sigh_stub_spaceship(valid_profile = false, expect_create = true)
+      sigh_stub_spaceship_connect(inhouse: false, create_profile_app_identifier: "com.krausefx.app", all_app_identifiers: ["com.krausefx.app"], app_identifier_and_profile_names: { "com.krausefx.app" => ["No dupe here"] }, valid_profiles: false)
+
       options = { app_identifier: "com.krausefx.app", skip_install: true, skip_certificate_verification: true }
       Sigh.config = FastlaneCore::Configuration.create(Sigh::Options.available_options, options)
 
@@ -26,7 +37,8 @@ describe Sigh do
     end
 
     it "Invalid profile force run" do
-      sigh_stub_spaceship(valid_profile = false, expect_create = true, expect_delete = true)
+      sigh_stub_spaceship_connect(inhouse: false, create_profile_app_identifier: "com.krausefx.app", all_app_identifiers: ["com.krausefx.app"], app_identifier_and_profile_names: { "com.krausefx.app" => ["No dupe here"] }, valid_profiles: false, expect_delete: true)
+
       options = { app_identifier: "com.krausefx.app", skip_install: true, skip_certificate_verification: true, force: true }
       Sigh.config = FastlaneCore::Configuration.create(Sigh::Options.available_options, options)
 
@@ -36,11 +48,73 @@ describe Sigh do
     end
 
     it "Existing profile fail on name taken" do
-      sigh_stub_spaceship(valid_profile = true, expect_create = false, expect_delete = true, fail_delete = true)
-      options = { app_identifier: "com.krausefx.app", skip_install: true, fail_on_name_taken: true, skip_certificate_verification: true, force: true }
+      sigh_stub_spaceship_connect(inhouse: false, create_profile_app_identifier: nil, all_app_identifiers: ["com.krausefx.app", "com.krausefx.app.other"], app_identifier_and_profile_names: { "com.krausefx.app.other" => ["com.krausefx.app AppStore"] })
+
+      options = { app_identifier: "com.krausefx.app", skip_install: true, fail_on_name_taken: true, skip_certificate_verification: true, force: false }
       Sigh.config = FastlaneCore::Configuration.create(Sigh::Options.available_options, options)
 
       expect { Sigh::Manager.start }.to raise_error("The name 'com.krausefx.app AppStore' is already taken, and fail_on_name_taken is true")
+    end
+
+    describe '.install_profile' do
+      after do
+        ENV.delete("SIGH_UDID")
+        ENV.delete("SIGH_UUID")
+        ENV.delete("SIGH_NAME")
+      end
+
+      context 'on macOS' do
+        before do
+          allow(FastlaneCore::Helper).to receive(:mac?).and_return(true)
+        end
+
+        it 'passes keychain_path to ProvisioningProfile methods' do
+          profile = "fake_profile.mobileprovision"
+          keychain_path = "/path/to/custom.keychain"
+
+          expect(FastlaneCore::ProvisioningProfile).to receive(:uuid).with(profile, keychain_path).and_return("fake-uuid")
+          expect(FastlaneCore::ProvisioningProfile).to receive(:name).with(profile, keychain_path).and_return("fake-name")
+          expect(FastlaneCore::ProvisioningProfile).to receive(:install).with(profile, keychain_path)
+
+          Sigh::Manager.install_profile(profile, keychain_path)
+
+          expect(ENV["SIGH_UDID"]).to eq("fake-uuid")
+          expect(ENV["SIGH_UUID"]).to eq("fake-uuid")
+          expect(ENV["SIGH_NAME"]).to eq("fake-name")
+        end
+
+        it 'works without keychain_path' do
+          profile = "fake_profile.mobileprovision"
+
+          expect(FastlaneCore::ProvisioningProfile).to receive(:uuid).with(profile, nil).and_return("fake-uuid")
+          expect(FastlaneCore::ProvisioningProfile).to receive(:name).with(profile, nil).and_return("fake-name")
+          expect(FastlaneCore::ProvisioningProfile).to receive(:install).with(profile, nil)
+
+          Sigh::Manager.install_profile(profile)
+        end
+      end
+
+      context 'on other operating systems' do
+        before do
+          allow(FastlaneCore::Helper).to receive(:mac?).and_return(false)
+        end
+
+        # Installing asks for the Xcode version, which raises "Unable to locate Xcode"
+        # without Xcode, after the profile was already created on the portal
+        it 'skips installing the profile and still sets the environment variables' do
+          profile = "fake_profile.mobileprovision"
+
+          expect(FastlaneCore::ProvisioningProfile).to receive(:uuid).with(profile, nil).and_return("fake-uuid")
+          expect(FastlaneCore::ProvisioningProfile).to receive(:name).with(profile, nil).and_return("fake-name")
+          expect(FastlaneCore::ProvisioningProfile).not_to receive(:install)
+
+          Sigh::Manager.install_profile(profile)
+
+          expect(ENV["SIGH_UDID"]).to eq("fake-uuid")
+          expect(ENV["SIGH_UUID"]).to eq("fake-uuid")
+          expect(ENV["SIGH_NAME"]).to eq("fake-name")
+        end
+      end
     end
   end
 end

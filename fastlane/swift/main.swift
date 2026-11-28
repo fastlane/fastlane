@@ -1,9 +1,5 @@
-//
-//  main.swift
-//  FastlaneSwiftRunner
-//
-//  Created by Joshua Liebowitz on 8/26/17.
-//
+// main.swift
+// Copyright (c) 2026 FastlaneTools
 
 //
 //  ** NOTE **
@@ -15,23 +11,26 @@
 import Foundation
 
 let argumentProcessor = ArgumentProcessor(args: CommandLine.arguments)
+/// fastlane reads this from the built runner, to tell whether it is outdated. Increase it when the runner changes how it talks to fastlane.
+let runnerProtocolVersion = "FastlaneRunnerProtocolVersion [2]"
+verbose(message: runnerProtocolVersion)
 let timeout = argumentProcessor.commandTimeout
 
 class MainProcess {
     var doneRunningLane = false
     var thread: Thread!
-    
+
     @objc func connectToFastlaneAndRunLane() {
         runner.startSocketThread(port: argumentProcessor.port)
-        
-        let completedRun = Fastfile.runLane(named: argumentProcessor.currentLane, parameters: argumentProcessor.laneParameters())
+
+        let completedRun = Fastfile.runLane(from: nil, named: argumentProcessor.currentLane, with: argumentProcessor.laneParameters())
         if completedRun {
             runner.disconnectFromFastlaneProcess()
         }
-        
+
         doneRunningLane = true
     }
-    
+
     func startFastlaneThread() {
         thread = Thread(target: self, selector: #selector(connectToFastlaneAndRunLane), object: nil)
         thread.name = "worker thread"
@@ -39,14 +38,13 @@ class MainProcess {
     }
 }
 
-let process: MainProcess = MainProcess()
+let process = MainProcess()
 process.startFastlaneThread()
 
-while (!process.doneRunningLane && (RunLoop.current.run(mode: RunLoopMode.defaultRunLoopMode, before: Date(timeIntervalSinceNow: 2)))) {
+while !process.doneRunningLane, RunLoop.current.run(mode: RunLoopMode.defaultRunLoopMode, before: Date(timeIntervalSinceNow: 2)) {
     // no op
 }
 
 // Please don't remove the lines below
 // They are used to detect outdated files
-// FastlaneRunnerAPIVersion [0.9.2]
-
+// FastlaneRunnerAPIVersion [0.9.3]

@@ -15,13 +15,14 @@ module Fastlane
 
       def self.upload_build(api_token, user_name, binary, options)
         require 'faraday'
-        require 'faraday_middleware'
+        require 'faraday/multipart'
+        require 'faraday/follow_redirects'
 
         connection = Faraday.new(url: DEPLOYGATE_URL_BASE, request: { timeout: 120 }) do |builder|
           builder.request(:multipart)
           builder.request(:json)
           builder.response(:json, content_type: /\bjson$/)
-          builder.use(FaradayMiddleware::FollowRedirects)
+          builder.response(:follow_redirects)
           builder.adapter(:net_http)
         end
 
@@ -157,13 +158,12 @@ module Fastlane
                                        description: "Release note for distribution page"),
           FastlaneCore::ConfigItem.new(key: :disable_notify,
                                        optional: true,
-                                       is_string: false,
+                                       type: Boolean,
                                        default_value: false,
                                        env_name: "DEPLOYGATE_DISABLE_NOTIFY",
                                        description: "Disables Push notification emails"),
           FastlaneCore::ConfigItem.new(key: :distribution_name,
                                        optional: true,
-                                       is_string: true,
                                        env_name: "DEPLOYGATE_DISTRIBUTION_NAME",
                                        description: "Target Distribution Name")
         ]

@@ -5,20 +5,6 @@ describe Fastlane do
         allow(FastlaneCore::FastlaneFolder).to receive(:path).and_return(nil)
       end
 
-      it "extracts zip files" do
-        binary_path = './fastlane/spec/fixtures/screenshots/screenshot1.png'
-        dsym_path = './fastlane/spec/fixtures/dSYM/Themoji.dSYM.zip'
-
-        expect(Fastlane::Actions).to receive(:sh).with("unzip -qo #{File.expand_path(dsym_path).shellescape}")
-
-        Fastlane::FastFile.new.parse("lane :test do
-          upload_symbols_to_crashlytics(
-            dsym_path: '#{dsym_path}',
-            api_token: 'something123',
-            binary_path: '#{binary_path}')
-        end").runner.execute(:test)
-      end
-
       it "uploads dSYM files with app_id" do
         binary_path = './spec/fixtures/screenshots/screenshot1.png'
         dsym_path = './spec/fixtures/dSYM/Themoji.dSYM'
@@ -102,6 +88,29 @@ describe Fastlane do
         end").runner.execute(:test)
       end
 
+      it "uploads dSYM files with platform and debug params" do
+        dsym_path = './spec/fixtures/dSYM/Themoji.dSYM'
+        binary_path = './spec/fixtures/screenshots/screenshot1.png'
+        gsp_path = './spec/fixtures/plist/GoogleService-Info.plist'
+
+        command = []
+        command << File.expand_path(File.join("fastlane", binary_path)).shellescape
+        command << "-d"
+        command << "-gsp #{File.expand_path(File.join('fastlane', gsp_path)).shellescape}"
+        command << "-p tvos"
+        command << File.expand_path(File.join("fastlane", dsym_path)).shellescape
+
+        expect(Fastlane::Actions).to receive(:sh).with(command.join(" "), log: true)
+
+        Fastlane::FastFile.new.parse("lane :test do
+          upload_symbols_to_crashlytics(
+            dsym_path: 'fastlane/#{dsym_path}',
+            binary_path: 'fastlane/#{binary_path}',
+            platform: 'appletvos',
+            debug: true)
+        end").runner.execute(:test)
+      end
+
       it "raises exception if no api access is given" do
         allow(Fastlane::Actions::UploadSymbolsToCrashlyticsAction).to receive(:find_gsp_path).and_return(nil)
 
@@ -126,6 +135,32 @@ describe Fastlane do
               api_token: 'something123')
           end").runner.execute(:test)
         end.to raise_error(FastlaneCore::Interface::FastlaneError)
+      end
+
+      it "does not search the project for dSYMs when its options are built" do
+        expect(Dir).not_to receive(:[]).with("./**/*.dSYM")
+
+        Fastlane::Actions::UploadSymbolsToCrashlyticsAction.available_options
+      end
+
+      it "uploads the most recent dSYM in the project when no dsym_path is given" do
+        binary_path = File.expand_path('./fastlane/spec/fixtures/screenshots/screenshot1.png')
+        app_id = '0:000000000000:ios:0f0000000ff0ff0'
+
+        Dir.mktmpdir do |dir|
+          Dir.chdir(dir) do
+            FileUtils.mkdir_p(["old/App.dSYM", "new/App.dSYM"])
+            File.utime(Time.now - 60, Time.now - 60, "old/App.dSYM")
+
+            expect(Fastlane::Actions).to receive(:sh).with("#{binary_path.shellescape} -ai #{app_id} -p ios #{File.expand_path('new/App.dSYM').shellescape}", log: false)
+
+            Fastlane::FastFile.new.parse("lane :test do
+              upload_symbols_to_crashlytics(
+                app_id: '#{app_id}',
+                binary_path: '#{binary_path}')
+            end").runner.execute(:test)
+          end
+        end
       end
 
       context "with dsym_paths" do
@@ -174,6 +209,107 @@ describe Fastlane do
                 binary_path: 'fastlane/#{binary_path}')
             end").runner.execute(:test)
           end.to raise_error(FastlaneCore::Interface::FastlaneError)
+        end
+
+        it "raises an error if all uploads fail" do
+          binary_path = './spec/fixtures/screenshots/screenshot1.png'
+          dsym_path = './spec/fixtures/dSYM/Themoji.dSYM'
+          app_id = '0:000000000000:ios:0f0000000ff0ff0'
+
+          expect(Fastlane::Actions).to receive(:sh).and_raise("some error")
+          expect(UI).to receive(:success).with("Driving the lane 'test' 🚀")
+          expect(UI).to receive(:error).with("some error")
+          expect(UI).to receive(:user_error!).with("Service failed to upload any dSYM files to Crashlytics")
+
+          Fastlane::FastFile.new.parse("lane :test do
+            upload_symbols_to_crashlytics(
+              dsym_path: 'fastlane/#{dsym_path}',
+              app_id: '#{app_id}',
+              binary_path: 'fastlane/#{binary_path}')
+          end").runner.execute(:test)
+        end
+
+        it "raises the upload error if fail_on_error is true and an upload fails" do
+          binary_path = './spec/fixtures/screenshots/screenshot1.png'
+          dsym_path = './spec/fixtures/dSYM/Themoji.dSYM'
+          app_id = '0:000000000000:ios:0f0000000ff0ff0'
+
+          expect(Fastlane::Actions).to receive(:sh).and_raise("some error")
+          expect(UI).to receive(:error).with("some error")
+
+          expect do
+            Fastlane::FastFile.new.parse("lane :test do
+              upload_symbols_to_crashlytics(
+                dsym_path: 'fastlane/#{dsym_path}',
+                app_id: '#{app_id}',
+                binary_path: 'fastlane/#{binary_path}',
+                fail_on_error: true)
+            end").runner.execute(:test)
+          end.to raise_error("some error")
+        end
+
+        it "stops uploading remaining dSYM files if fail_on_error is true and an upload fails" do
+          binary_path = './spec/fixtures/screenshots/screenshot1.png'
+          dsym_1_path = './spec/fixtures/dSYM/Themoji.dSYM'
+          dsym_2_path = './spec/fixtures/dSYM/Themoji2.dSYM'
+          app_id = '0:000000000000:ios:0f0000000ff0ff0'
+
+          expect(Fastlane::Actions).to receive(:sh).once.and_raise("some error")
+
+          expect do
+            Fastlane::FastFile.new.parse("lane :test do
+              upload_symbols_to_crashlytics(
+                dsym_paths: ['fastlane/#{dsym_1_path}', 'fastlane/#{dsym_2_path}'],
+                app_id: '#{app_id}',
+                binary_path: 'fastlane/#{binary_path}',
+                fail_on_error: true)
+            end").runner.execute(:test)
+          end.to raise_error("some error")
+        end
+
+        it "continues uploading remaining dSYM files if fail_on_error is false and an upload fails" do
+          binary_path = './spec/fixtures/screenshots/screenshot1.png'
+          dsym_1_path = './spec/fixtures/dSYM/Themoji.dSYM'
+          dsym_2_path = './spec/fixtures/dSYM/Themoji2.dSYM'
+          app_id = '0:000000000000:ios:0f0000000ff0ff0'
+
+          expect(Fastlane::Actions).to receive(:sh).and_raise("some error")
+          expect(Fastlane::Actions).to receive(:sh).and_return("")
+
+          expect(UI).to receive(:success).with("Driving the lane 'test' 🚀")
+          expect(UI).to receive(:error).with("some error")
+          expect(UI).to receive(:success).with("Successfully uploaded some dSYM files to Crashlytics 💯")
+          expect(UI).to receive(:important).with("Some dSYM files failed to upload, see the errors above")
+
+          Fastlane::FastFile.new.parse("lane :test do
+            upload_symbols_to_crashlytics(
+              dsym_paths: ['fastlane/#{dsym_1_path}', 'fastlane/#{dsym_2_path}'],
+              app_id: '#{app_id}',
+              binary_path: 'fastlane/#{binary_path}',
+              fail_on_error: false)
+          end").runner.execute(:test)
+        end
+
+        it "displays a warning if only some uploads fail" do
+          binary_path = './spec/fixtures/screenshots/screenshot1.png'
+          dsym_1_path = './spec/fixtures/dSYM/Themoji.dSYM'
+          dsym_2_path = './spec/fixtures/dSYM/Themoji2.dSYM'
+          app_id = '0:000000000000:ios:0f0000000ff0ff0'
+
+          expect(Fastlane::Actions).to receive(:sh).and_return("")
+          expect(Fastlane::Actions).to receive(:sh).and_raise("some error")
+
+          expect(UI).to receive(:success).with("Driving the lane 'test' 🚀")
+          expect(UI).to receive(:success).with("Successfully uploaded some dSYM files to Crashlytics 💯")
+          expect(UI).to receive(:important).with("Some dSYM files failed to upload, see the errors above")
+          expect(UI).to receive(:error).with("some error")
+
+          Fastlane::FastFile.new.parse("lane :test do
+            upload_symbols_to_crashlytics(
+              dsym_paths: ['fastlane/#{dsym_1_path}', 'fastlane/#{dsym_2_path}'],
+              app_id: '#{app_id}',
+              binary_path: 'fastlane/#{binary_path}')
+          end").runner.execute(:test)
         end
       end
     end

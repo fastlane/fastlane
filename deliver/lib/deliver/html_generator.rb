@@ -1,3 +1,5 @@
+require 'spaceship'
+
 require_relative 'module'
 
 module Deliver
@@ -22,7 +24,7 @@ module Deliver
       UI.important("Verifying the upload via the HTML file can be disabled by either adding")
       UI.important("`force true` to your Deliverfile or using `fastlane deliver --force`")
 
-      system("open '#{html_path}'")
+      system("open", html_path)
       okay = UI.confirm("Does the Preview on path '#{html_path}' look okay for you?")
 
       if okay
@@ -48,10 +50,15 @@ module Deliver
       @export_path = export_path
 
       @app_name = (options[:name]['en-US'] || options[:name].values.first) if options[:name]
-      @app_name ||= options[:app].name
+      @app_name ||= Deliver.cache[:app].name
 
       @languages = options[:description].keys if options[:description]
-      @languages ||= options[:app].latest_version.description.languages
+      @languages ||= begin
+        platform = Spaceship::ConnectAPI::Platform.map(options[:platform])
+        version = Deliver.cache[:app].get_edit_app_store_version(platform: platform)
+
+        version.get_app_store_version_localizations.collect(&:locale)
+      end
 
       html_path = File.join(Deliver::ROOT, "lib/assets/summary.html.erb")
       html = ERB.new(File.read(html_path)).result(binding) # https://web.archive.org/web/20160430190141/www.rrn.dk/rubys-erb-templating-system

@@ -63,7 +63,7 @@ module FastlaneCore
       if !Helper.bundler? && !Helper.contained_fastlane? && Random.rand(5) == 1
         # We want to show this message from time to time, if the user doesn't use bundler, nor bundled fastlane
         puts('#######################################################################')
-        puts("# Run `sudo gem cleanup` from time to time to speed up fastlane")
+        puts("# Run `gem cleanup` from time to time to speed up fastlane")
       end
       puts('#######################################################################')
       Changelog.show_changes(gem_name, current_version, update_gem_command: UpdateChecker.update_command(gem_name: gem_name)) unless FastlaneCore::Env.truthy?("FASTLANE_HIDE_CHANGELOG")
@@ -80,7 +80,7 @@ module FastlaneCore
       elsif Helper.mac_app?
         "the Fabric app. Launch the app and navigate to the fastlane tab to get the most recent version."
       else
-        "sudo gem install #{gem_name.downcase}"
+        "gem install #{gem_name.downcase}"
       end
     end
 

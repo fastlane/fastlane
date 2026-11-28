@@ -26,7 +26,7 @@ UIColor *shortColorWithHex = [UIColor colorWithHexString:@"fff"];
 // with hash
 NSColor *colorWithHex = [NSColor colorWithHexString:@"#ff8942"];
 
-// wihtout hash
+// without hash
 NSColor *secondColorWithHex = [NSColor colorWithHexString:@"ff8942"];
 
 // short handling
@@ -50,4 +50,4 @@ HexColors was ported to macOS by [holgersindbaek](https://github.com/holgersindb
 [Marius Landwehr](https://github.com/mRs-) [@mariusLAN](https://twitter.com/mariusLAN)
 
 ## License
-HexColors is available underthe MIT license. See the LICENSE file for more info.
+HexColors is available under the MIT license. See the LICENSE file for more info.

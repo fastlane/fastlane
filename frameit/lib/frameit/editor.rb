@@ -31,7 +31,7 @@ module Frameit
       if @frame_path # Mac doesn't need a frame
         self.frame = MiniMagick::Image.open(@frame_path)
         # Rotate the frame according to the device orientation
-        self.frame.rotate(self.rotation_for_device_orientation)
+        rotate_image(self.frame, self.rotation_for_device_orientation)
       elsif self.class == Editor
         # Couldn't find device frame (probably an iPhone 4, for which there are no images available any more)
         # Message is already shown elsewhere
@@ -86,8 +86,20 @@ module Frameit
       # only. Instead of doing the calculations ourselves, it's much easier to let
       # imagemagick do the hard lifting for landscape screenshots
       rotation = self.rotation_for_device_orientation
-      frame.rotate(-rotation)
-      @image.rotate(-rotation)
+      rotate_image(frame, -rotation)
+      rotate_image(@image, -rotation)
+
+      # Optional screen masks preserve asymmetric corners and camera cutouts.
+      # A portrait mask is applied after normalizing the screenshot orientation.
+      if offset['mask']
+        mask_path = File.join(FrameDownloader.templates_path, offset['mask'])
+        UI.user_error!("Could not find screen mask '#{mask_path}'") unless File.file?(mask_path)
+        mask = MiniMagick::Image.open(mask_path)
+        mask.resize("#{image.width}x#{image.height}!")
+        @image = image.composite(mask, "png") do |c|
+          c.compose("CopyOpacity")
+        end
+      end
 
       # Debug Mode: Add filename to frame
       if self.debug_mode
@@ -109,14 +121,40 @@ module Frameit
         end
       end
 
+      # Apply rounded corners for the specifically matched iPhone 14, 16, and 17 device identifiers
+      if ["iphone-14", "iphone14", "iphone-16", "iphone16", "iphone-17", "iphone17"].any? { |id| screenshot.device.id.to_s.include?(id) }
+
+        maskData = MiniMagick::Tool::Convert.new do |img|
+          img.size("#{screenshot.size[0]}x#{screenshot.size[1]}")
+          img.canvas('none')
+          img.draw("roundrectangle 0,0,#{screenshot.size[0]},#{screenshot.size[1]},100,100")
+          img << 'png:-'
+        end
+
+        # Create a mask
+        mask = MiniMagick::Image.read(maskData)
+
+        @image = @image.composite(mask, "png") do |c|
+          c.channel("A")
+          c.compose("DstIn")
+          c.alpha("on")
+        end
+      end
+
       @image = frame.composite(image, "png") do |c|
         c.compose("DstOver")
         c.geometry(offset['offset'])
       end
 
       # Revert the rotation from above
-      frame.rotate(rotation)
-      @image.rotate(rotation)
+      rotate_image(frame, rotation)
+      rotate_image(@image, rotation)
+    end
+
+    # Portrait screenshots need no rotation. ImageMagick would still decode and
+    # re-encode the whole image to rotate it by 0 degrees, so skip that pass.
+    def rotate_image(image, degrees)
+      image.rotate(degrees) unless degrees.zero?
     end
 
     def offset
@@ -263,8 +301,10 @@ module Frameit
       left_space = (background.width / 2.0 - image.width / 2.0).round
 
       @image = background.composite(image, "png") do |c|
-        colorspace = image.data["colorspace"]
-        c.colorspace(colorspace) if colorspace
+        # Ask for the colorspace alone: `image.data` makes ImageMagick compute
+        # statistics over every pixel to print them all as JSON
+        colorspace = image["%[colorspace]"]
+        c.colorspace(colorspace) unless colorspace.to_s.empty?
 
         c.compose("Over")
         c.geometry("+#{left_space}+#{device_top(background)}")
@@ -298,7 +338,7 @@ module Frameit
       resize_text(keyword)
 
       vertical_padding = vertical_frame_padding # assign padding to variable
-      spacing_between_title_and_keyword = (actual_font_size / 2)
+      spacing_between_title_and_keyword = (actual_font_size('keyword') / 2)
       title_left_space = (background.width / 2.0 - title.width / 2.0).round
       keyword_left_space = (background.width / 2.0 - keyword.width / 2.0).round
 
@@ -325,7 +365,7 @@ module Frameit
     end
 
     def put_title_into_background(background, stack_title)
-      text_images = build_text_images(image.width - 2 * horizontal_frame_padding, image.height - 2 * vertical_frame_padding, stack_title)
+      text_images = build_text_images(image.width - 2 * horizontal_frame_padding, image.height - 2 * vertical_frame_padding)
 
       keyword = text_images[:keyword]
       title = text_images[:title]
@@ -359,7 +399,7 @@ module Frameit
       vertical_padding = vertical_frame_padding # assign padding to variable
       left_space = (background.width / 2.0 - sum_width / 2.0).round
 
-      self.space_to_device += actual_font_size + vertical_padding
+      self.space_to_device += actual_font_size('title') + vertical_padding
 
       if title_below_image
         title_top = background.height - effective_text_height / 2 - title.height / 2
@@ -385,19 +425,22 @@ module Frameit
       background
     end
 
-    def actual_font_size
+    def actual_font_size(key)
+      font_size = @config[key.to_s]['font_size']
+      return font_size if !font_size.nil? && font_size > 0
+
       font_scale_factor = @config['font_scale_factor'] || 0.1
-      UI.user_error!("Parameter 'font_scale_factor' can not be 0. Please provide a value larger than 0.0 (default = 0.1).") if font_scale_factor == 0.0
+      UI.user_error!("Parameter 'font_scale_factor' cannot be 0. Please provide a value larger than 0.0 (default = 0.1).") if font_scale_factor == 0.0
       [@image.width * font_scale_factor].max.round
     end
 
     # The space between the keyword and the title
     def keyword_padding
-      (actual_font_size / 3.0).round
+      (actual_font_size('keyword') / 3.0).round
     end
 
     # This will build up to 2 individual images with the title and optional keyword, which will then be added to the real image
-    def build_text_images(max_width, max_height, stack_title)
+    def build_text_images(max_width, max_height)
       words = [:keyword, :title].keep_if { |a| fetch_text(a) } # optional keyword/title
       results = {}
       trim_boxes = {}
@@ -408,10 +451,6 @@ module Frameit
         empty_path = File.join(Frameit::ROOT, "lib/assets/empty.png")
         text_image = MiniMagick::Image.open(empty_path)
         image_height = max_height # gets trimmed afterwards anyway, and on the iPad the `y` would get cut
-        text_image.combine_options do |i|
-          # Oversize as the text might be larger than the actual image. We're trimming afterwards anyway
-          i.resize("#{max_width * 5.0}x#{image_height}!") # `!` says it should ignore the ratio
-        end
 
         current_font = font(key)
         text = fetch_text(key)
@@ -423,11 +462,15 @@ module Frameit
 
         interline_spacing = @config['interline_spacing']
 
-        # Add the actual title
+        # Size the canvas and add the actual title in a single pass, as every
+        # pass reads and writes the whole oversized canvas
         text_image.combine_options do |i|
+          # Oversize as the text might be larger than the actual image. We're trimming afterwards anyway
+          i.resize("#{max_width * 5.0}x#{image_height}!") # `!` says it should ignore the ratio
           i.font(current_font) if current_font
+          i.weight(@config[key.to_s]['font_weight']) if @config[key.to_s]['font_weight']
           i.gravity("Center")
-          i.pointsize(actual_font_size)
+          i.pointsize(actual_font_size(key))
           i.draw("text 0,0 '#{text}'")
           i.interline_spacing(interline_spacing) if interline_spacing
           i.fill(@config[key.to_s]['color'])
@@ -435,7 +478,7 @@ module Frameit
 
         results[key] = text_image
 
-        # Natively trimming the image with .trim will result in the loss of the common baseline between the text in all images when side-by-side (e.g. stack_title is false).
+        # Natively trimming the image with .trim will result in the loss of the common baseline between the text in all images when side-by-side.
         # Hence retrieve the calculated trim bounding box without actually trimming:
         calculated_trim_box = text_image.identify do |b|
           b.format("%@") # CALCULATED: trim bounding box (without actually trimming), see: http://www.imagemagick.org/script/escape.php
@@ -463,26 +506,24 @@ module Frameit
         # Get matching trim box:
         trim_box = trim_boxes[key]
 
-        # For side-by-side text images (e.g. stack_title is false) adjust the trim box based on top_vertical_trim_offset and bottom_vertical_trim_offset to maintain the text baseline:
-        unless stack_title
-          # Determine the trim area by maintaining the same vertical top offset based on the smallest value from all trim boxes (top_vertical_trim_offset).
-          # When the vertical top offset is larger than the smallest vertical top offset, the trim box needs to be adjusted:
-          if trim_box.offset_y > top_vertical_trim_offset
-            # Increase the height of the trim box with the difference in vertical top offset:
-            trim_box.height += trim_box.offset_y - top_vertical_trim_offset
-            # Change the vertical top offset to match that of the others:
-            trim_box.offset_y = top_vertical_trim_offset
+        # Adjust the trim box based on top_vertical_trim_offset and bottom_vertical_trim_offset to maintain the text baseline:
+        # Determine the trim area by maintaining the same vertical top offset based on the smallest value from all trim boxes (top_vertical_trim_offset).
+        # When the vertical top offset is larger than the smallest vertical top offset, the trim box needs to be adjusted:
+        if trim_box.offset_y > top_vertical_trim_offset
+          # Increase the height of the trim box with the difference in vertical top offset:
+          trim_box.height += trim_box.offset_y - top_vertical_trim_offset
+          # Change the vertical top offset to match that of the others:
+          trim_box.offset_y = top_vertical_trim_offset
 
-            UI.verbose("Trim box for key \"#{key}\" is adjusted to align top: #{trim_box}\n")
-          end
+          UI.verbose("Trim box for key \"#{key}\" is adjusted to align top: #{trim_box.json_string_format}")
+        end
 
-          # Check if the height needs to be adjusted to reach the bottom offset:
-          if (trim_box.offset_y + trim_box.height) < bottom_vertical_trim_offset
-            # Set the height of the trim box to the difference between vertical bottom and top offset:
-            trim_box.height = bottom_vertical_trim_offset - trim_box.offset_y
+        # Check if the height needs to be adjusted to reach the bottom offset:
+        if (trim_box.offset_y + trim_box.height) < bottom_vertical_trim_offset
+          # Set the height of the trim box to the difference between vertical bottom and top offset:
+          trim_box.height = bottom_vertical_trim_offset - trim_box.offset_y
 
-            UI.verbose("Trim box for key \"#{key}\" is adjusted to align bottom: #{trim_box}\n")
-          end
+          UI.verbose("Trim box for key \"#{key}\" is adjusted to align bottom: #{trim_box.json_string_format}")
         end
 
         # Crop image with (adjusted) trim box parameters in MiniMagick string format:
@@ -497,7 +538,9 @@ module Frameit
       UI.user_error!("Valid parameters :keyword, :title") unless [:keyword, :title].include?(type)
 
       # Try to get it from a keyword.strings or title.strings file
-      strings_path = File.join(File.expand_path("..", screenshot.path), "#{type}.strings")
+      strings_path = File.join(File.expand_path("../", screenshot.path), "#{type}.strings")
+      strings_path = File.join(File.expand_path("../../", screenshot.path), "#{type}.strings") unless File.exist?(strings_path)
+      strings_path = File.join(File.expand_path("../../../", screenshot.path), "#{type}.strings") unless File.exist?(strings_path)
       if File.exist?(strings_path)
         parsed = StringsParser.parse(strings_path)
         text_array = parsed.find { |k, v| screenshot.path.upcase.include?(k.upcase) }

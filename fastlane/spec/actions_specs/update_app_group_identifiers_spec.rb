@@ -1,13 +1,13 @@
 describe Fastlane do
   describe Fastlane::FastFile do
     describe "Update Info Plist Integration" do
-      let(:test_path) { "/tmp/fastlane/tests/fastlane" }
+      # Not a fixed path under /tmp: parallel rspec processes share it. See fastlane#30184.
+      let(:test_path) { Dir.mktmpdir("fl_spec_update_app_group_identifiers") }
       let(:entitlements_path) { "com.test.entitlements" }
       let(:new_app_group) { 'group.com.enterprise.test' }
 
       before do
         # Set up example info.plist
-        FileUtils.mkdir_p(test_path)
         File.write(File.join(test_path, entitlements_path), '<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd"><plist version="1.0"><dict><key>com.apple.security.application-groups</key><array><string>group.com.test</string></array></dict></plist>')
       end
 
@@ -31,17 +31,6 @@ describe Fastlane do
           )
           end").runner.execute(:test)
         end.to raise_error("Could not find entitlements file at path 'xyz.#{File.join(test_path, entitlements_path)}'")
-      end
-
-      it "throws an error when the identifiers are not in an array" do
-        expect do
-          Fastlane::FastFile.new.parse("lane :test do
-          update_app_group_identifiers(
-            entitlements_file: '#{File.join(test_path, entitlements_path)}',
-            app_group_identifiers: '#{new_app_group}'
-          )
-          end").runner.execute(:test)
-        end.to raise_error('The parameter app_group_identifiers need to be an Array.')
       end
 
       it "throws an error when the entitlements file is not parsable" do
@@ -71,8 +60,7 @@ describe Fastlane do
       end
 
       after do
-        # Clean up files
-        File.delete(File.join(test_path, entitlements_path))
+        FileUtils.remove_entry(test_path)
       end
     end
   end

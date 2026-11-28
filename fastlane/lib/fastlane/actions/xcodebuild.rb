@@ -74,7 +74,7 @@ module Fastlane
 
       def self.run(params)
         unless Helper.test?
-          UI.user_error!("xcodebuild not installed") if `which xcodebuild`.length == 0
+          UI.user_error!("xcodebuild not installed") unless Helper.which('xcodebuild')
         end
 
         # The args we will build with
@@ -195,7 +195,7 @@ module Fastlane
         if testing
           if params[:reports]
             # New report options format
-            reports = params[:reports].reduce("") do |arguments, report|
+            reports = params[:reports].reduce(+"") do |arguments, report|
               report_string = "--report #{report[:report]}"
 
               if report[:output]
@@ -260,17 +260,18 @@ module Fastlane
           xcpretty_command = "#{xcpretty_command} --utf" if xcpretty_utf
         end
 
-        pipe_command = "| tee '#{buildlog_path}/xcodebuild.log' #{xcpretty_command}"
+        pipe_command = "| tee #{File.join(buildlog_path, 'xcodebuild.log').shellescape} #{xcpretty_command}"
 
         FileUtils.mkdir_p buildlog_path
         UI.message("For a more detailed xcodebuild log open #{buildlog_path}/xcodebuild.log")
 
         output_result = ""
 
+        override_architecture_prefix = params[:xcodebuild_architecture] ? "arch -#{params[:xcodebuild_architecture]} " : ""
         # In some cases the simulator is not booting up in time
         # One way to solve it is to try to rerun it for one more time
         begin
-          output_result = Actions.sh "set -o pipefail && xcodebuild #{xcodebuild_args} #{pipe_command}"
+          output_result = Actions.sh "set -o pipefail && #{override_architecture_prefix}xcodebuild #{xcodebuild_args} #{pipe_command}"
         rescue => ex
           exit_status = $?.exitstatus
 
@@ -292,7 +293,7 @@ module Fastlane
 
         # If raw_buildlog and some reports had to be created, create xcpretty reports from the build log
         if raw_buildlog && xcpretty_args.include?('--report')
-          output_result = Actions.sh "set -o pipefail && cat '#{buildlog_path}/xcodebuild.log' | xcpretty #{xcpretty_args} > /dev/null"
+          output_result = Actions.sh "set -o pipefail && cat #{File.join(buildlog_path, 'xcodebuild.log').shellescape} | xcpretty #{xcpretty_args} > /dev/null"
         end
 
         output_result
@@ -305,12 +306,12 @@ module Fastlane
 
           # Normalize some values
           export_options[:teamID] = CredentialsManager::AppfileConfig.try_fetch_value(:team_id) if !export_options[:teamID] && CredentialsManager::AppfileConfig.try_fetch_value(:team_id)
-          export_options[:onDemandResourcesAssetPacksBaseURL] = URI.escape(export_options[:onDemandResourcesAssetPacksBaseURL]) if export_options[:onDemandResourcesAssetPacksBaseURL]
+          export_options[:onDemandResourcesAssetPacksBaseURL] = Addressable::URI.encode(export_options[:onDemandResourcesAssetPacksBaseURL]) if export_options[:onDemandResourcesAssetPacksBaseURL]
           if export_options[:manifest]
-            export_options[:manifest][:appURL] = URI.encode_www_form_component(export_options[:manifest][:appURL]) if export_options[:manifest][:appURL]
-            export_options[:manifest][:displayImageURL] = URI.encode_www_form_component(export_options[:manifest][:displayImageURL]) if export_options[:manifest][:displayImageURL]
-            export_options[:manifest][:fullSizeImageURL] = URI.encode_www_form_component(export_options[:manifest][:fullSizeImageURL]) if export_options[:manifest][:fullSizeImageURL]
-            export_options[:manifest][:assetPackManifestURL] = URI.encode_www_form_component(export_options[:manifest][:assetPackManifestURL]) if export_options[:manifest][:assetPackManifestURL]
+            export_options[:manifest][:appURL] = Addressable::URI.encode(export_options[:manifest][:appURL]) if export_options[:manifest][:appURL]
+            export_options[:manifest][:displayImageURL] = Addressable::URI.encode(export_options[:manifest][:displayImageURL]) if export_options[:manifest][:displayImageURL]
+            export_options[:manifest][:fullSizeImageURL] = Addressable::URI.encode(export_options[:manifest][:fullSizeImageURL]) if export_options[:manifest][:fullSizeImageURL]
+            export_options[:manifest][:assetPackManifestURL] = Addressable::URI.encode(export_options[:manifest][:assetPackManifestURL]) if export_options[:manifest][:assetPackManifestURL]
           end
 
           # Saves options to plist
@@ -348,11 +349,10 @@ module Fastlane
         end.compact
       end
 
-      # Cleans values for build settings
-      # Only escaping `$(inherit)` types of values since "sh"
-      # interprets these as sub-commands instead of passing value into xcodebuild
+      # Escapes what sh interprets inside double quotes, so the value reaches xcodebuild unchanged.
+      # xcodebuild expands $(VAR), ${VAR} and $VAR itself, from build settings and the environment.
       def self.clean_build_setting_value(value)
-        value.to_s.gsub('$(', '\\$(')
+        value.to_s.gsub(/[\\"$`]/) { |char| "\\#{char}" }
       end
 
       def self.detect_workspace
@@ -383,8 +383,9 @@ module Fastlane
           ['scheme', 'The scheme to build'],
           ['build_settings', 'Hash of additional build information'],
           ['xcargs', 'Pass additional xcodebuild options'],
-          ['output_style', 'Set the output format to one of: :standard (Colored UTF8 output, default), :basic (black & white ASCII output)'],
           ['buildlog_path', 'The path where the xcodebuild.log will be created, by default it is created in ~/Library/Logs/fastlane/xcbuild'],
+          ['output_style', 'Set the output format to one of: :standard (Colored UTF8 output, default), :basic (black & white ASCII output)'],
+          ['xcodebuild_architecture', 'Allows to set the architecture that `xcodebuild` is run with, for example to force it to run under Rosetta on an Apple Silicon mac'],
           ['raw_buildlog', 'Set to true to see xcodebuild raw output. Default value is false'],
           ['xcpretty_output', 'specifies the output type for xcpretty. eg. \'test\', or \'simple\''],
           ['xcpretty_utf', 'Specifies xcpretty should use utf8 when reporting builds. This has no effect when raw_buildlog is specified.']
@@ -437,6 +438,7 @@ module Fastlane
           ['build_settings', 'Hash of additional build information'],
           ['xcargs', 'Pass additional xcodebuild options'],
           ['output_style', 'Set the output format to one of: :standard (Colored UTF8 output, default), :basic (black & white ASCII output)'],
+          ['xcodebuild_architecture', 'Allows to set the architecture that `xcodebuild` is run with, for example to force it to run under Rosetta on an Apple Silicon mac'],
           ['buildlog_path', 'The path where the xcodebuild.log will be created, by default it is created in ~/Library/Logs/fastlane/xcbuild'],
           ['raw_buildlog', 'Set to true to see xcodebuild raw output. Default value is false'],
           ['xcpretty_output', 'specifies the output type for xcpretty. eg. \'test\', or \'simple\''],
@@ -529,6 +531,7 @@ module Fastlane
           ['build_settings', 'Hash of additional build information'],
           ['xcargs', 'Pass additional xcodebuild options'],
           ['output_style', 'Set the output format to one of: :standard (Colored UTF8 output, default), :basic (black & white ASCII output)'],
+          ['xcodebuild_architecture', 'Allows to set the architecture that `xcodebuild` is run with, for example to force it to run under Rosetta on an Apple Silicon mac'],
           ['buildlog_path', 'The path where the xcodebuild.log will be created, by default it is created in ~/Library/Logs/fastlane/xcbuild'],
           ['raw_buildlog', 'Set to true to see xcodebuild raw output. Default value is false'],
           ['xcpretty_output', 'specifies the output type for xcpretty. eg. \'test\', or \'simple\''],
@@ -571,6 +574,7 @@ module Fastlane
           ['build_settings', 'Hash of additional build information'],
           ['xcargs', 'Pass additional xcodebuild options'],
           ['output_style', 'Set the output format to one of: :standard (Colored UTF8 output, default), :basic (black & white ASCII output)'],
+          ['xcodebuild_architecture', 'Allows to set the architecture that `xcodebuild` is run with, for example to force it to run under Rosetta on an Apple Silicon mac'],
           ['buildlog_path', 'The path where the xcodebuild.log will be created, by default it is created in ~/Library/Logs/fastlane/xcbuild'],
           ['raw_buildlog', 'Set to true to see xcodebuild raw output. Default value is false'],
           ['xcpretty_output', 'specifies the output type for xcpretty. eg. \'test\', or \'simple\''],
@@ -621,6 +625,7 @@ module Fastlane
           ['destination_timeout', 'The timeout for connecting to the simulator, in seconds'],
           ['enable_code_coverage', 'Turn code coverage on or off when testing. eg. true|false. Requires Xcode 7+'],
           ['output_style', 'Set the output format to one of: :standard (Colored UTF8 output, default), :basic (black & white ASCII output)'],
+          ['xcodebuild_architecture', 'Allows to set the architecture that `xcodebuild` is run with, for example to force it to run under Rosetta on an Apple Silicon mac'],
           ['buildlog_path', 'The path where the xcodebuild.log will be created, by default it is created in ~/Library/Logs/fastlane/xcbuild'],
           ['raw_buildlog', 'Set to true to see xcodebuild raw output. Default value is false'],
           ['xcpretty_output', 'specifies the output type for xcpretty. eg. \'test\', or \'simple\''],

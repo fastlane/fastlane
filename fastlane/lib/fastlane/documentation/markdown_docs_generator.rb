@@ -97,7 +97,7 @@ module Fastlane
       if File.exist?(custom_file_location)
         UI.verbose("Using custom md.erb file for action #{action.action_name}")
 
-        result = ERB.new(File.read(custom_file_location), 0, '-').result(binding) # https://web.archive.org/web/20160430190141/www.rrn.dk/rubys-erb-templating-system
+        result = ERB.new(File.read(custom_file_location), trim_mode: '-').result(binding) # https://web.archive.org/web/20160430190141/www.rrn.dk/rubys-erb-templating-system
 
         return result
       end
@@ -122,7 +122,7 @@ module Fastlane
         end
 
         template = File.join(Fastlane::ROOT, "lib/assets/ActionDetails.md.erb")
-        result = ERB.new(File.read(template), 0, '-').result(binding)
+        result = ERB.new(File.read(template), trim_mode: '-').result(binding)
 
         action_mds[action.action_name] = result
       end
@@ -134,15 +134,19 @@ module Fastlane
       require 'yaml'
       FileUtils.mkdir_p(target_path)
       docs_dir = File.join(target_path, "docs")
+      generated_actions_dir = File.join("generated", "actions")
+      FileUtils.rm_rf(File.join(docs_dir, generated_actions_dir))
+
+      FileUtils.mkdir_p(File.join(docs_dir, generated_actions_dir))
+      FileUtils.mkdir_p(File.join(docs_dir, "img", "actions"))
 
       # Generate actions.md
       template = File.join(Fastlane::ROOT, "lib/assets/Actions.md.erb")
-      result = ERB.new(File.read(template), 0, '-').result(binding) # https://web.archive.org/web/20160430190141/www.rrn.dk/rubys-erb-templating-system
-      File.write(File.join(docs_dir, "actions.md"), result)
+      result = ERB.new(File.read(template), trim_mode: '-').result(binding) # https://web.archive.org/web/20160430190141/www.rrn.dk/rubys-erb-templating-system
+      File.write(File.join(docs_dir, "generated", "actions.md"), result)
 
-      # Generate actions sub pages (e.g. actions/slather.md, actions/scan.md)
+      # Generate actions sub pages (e.g. generated/actions/slather.md, generated/actions/scan.md)
       all_actions_ref_yml = []
-      FileUtils.mkdir_p(File.join(docs_dir, "actions"))
       ActionsList.all_actions do |action|
         @action = action # to provide a reference in the .html.erb template
         @action_filename = filename_for_action(action)
@@ -163,29 +167,56 @@ module Fastlane
         end
 
         template = File.join(Fastlane::ROOT, "lib/assets/ActionDetails.md.erb")
-        result = ERB.new(File.read(template), 0, '-').result(binding) # https://web.archive.org/web/20160430190141/www.rrn.dk/rubys-erb-templating-system
+        result = ERB.new(File.read(template), trim_mode: '-').result(binding) # https://web.archive.org/web/20160430190141/www.rrn.dk/rubys-erb-templating-system
 
-        file_name = File.join("actions", "#{action.action_name}.md")
+        # Actions get placed in "generated/actions" directory
+        file_name = File.join(generated_actions_dir, "#{action.action_name}.md")
         File.write(File.join(docs_dir, file_name), result)
 
-        all_actions_ref_yml << { action.action_name => file_name }
+        # The action pages when published get moved to the "actions" directory
+        # The mkdocs.yml file needs to reference the "actions" directory (not the "generated/actions" directory)
+        published_file_name = File.join("actions", "#{action.action_name}.md")
+        all_actions_ref_yml << { action.action_name => published_file_name }
       end
 
       # Modify the mkdocs.yml to list all the actions
       mkdocs_yml_path = File.join(target_path, "mkdocs.yml")
       raise "Could not find mkdocs.yml in #{target_path}, make sure to point to the fastlane/docs repo" unless File.exist?(mkdocs_yml_path)
       mkdocs_yml = YAML.load_file(mkdocs_yml_path)
-      hidden_actions_array = mkdocs_yml["pages"].find { |p| !p["_Actions"].nil? }
+      hidden_actions_array = mkdocs_yml["nav"].find { |p| !p["_Actions"].nil? }
       hidden_actions_array["_Actions"] = all_actions_ref_yml
       File.write(mkdocs_yml_path, mkdocs_yml.to_yaml)
 
       # Copy over the assets from the `actions/docs/assets` directory
-      Dir[File.join(custom_action_docs_path, "assets", "*")].each do |current_asset_path|
+      Dir[File.join(Fastlane::ROOT, custom_action_docs_path, "assets", "*")].each do |current_asset_path|
         UI.message("Copying asset #{current_asset_path}")
         FileUtils.cp(current_asset_path, File.join(docs_dir, "img", "actions", File.basename(current_asset_path)))
       end
 
+      # Generate the team table (docs/generated/team-table.md) from team.json
+      generate_team_table(docs_dir)
+
       UI.success("Generated new docs on path #{target_path}")
+    end
+
+    def generate_team_table(docs_dir)
+      team_json_path = File.expand_path(File.join(Fastlane::ROOT, "..", "internal", "team.json"))
+      unless File.exist?(team_json_path)
+        UI.message("Skipping team table generation, could not find #{team_json_path}")
+        return
+      end
+
+      File.write(File.join(docs_dir, "generated", "team-table.md"), self.class.render_team(team_json_path))
+    end
+
+    # Also used by the `generate_team_table` rake task, so it must not depend on fastlane being loaded
+    def self.render_team(team_json_path)
+      require 'erb'
+      require 'json'
+
+      team, alumni = JSON.parse(File.read(team_json_path)).to_a.shuffle.partition { |_, user| !user['alumni'] }
+      template = File.expand_path("../../assets/TeamTable.md.erb", __dir__)
+      ERB.new(File.read(template), trim_mode: '-').result(binding)
     end
 
     private

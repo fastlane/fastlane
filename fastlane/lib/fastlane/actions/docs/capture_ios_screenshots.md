@@ -2,7 +2,7 @@
   <img src="/img/actions/snapshot.png" width="250">
 </p>
 
-###### Automate taking localized screenshots of your iOS and tvOS apps on every device
+###### Automate taking localized screenshots of your iOS, tvOS, and watchOS apps on every device
 
 <hr />
 <h4 align="center">
@@ -10,7 +10,7 @@
 </h4>
 <hr />
 
-_snapshot_ generates localized iOS and tvOS screenshots for different device types and languages for the App Store and can be uploaded using ([_deliver_](https://docs.fastlane.tools/actions/deliver/)).
+_snapshot_ generates localized iOS, tvOS, and watchOS screenshots for different device types and languages for the App Store and can be uploaded using ([_deliver_](https://docs.fastlane.tools/actions/deliver/)).
 
 You have to manually create 20 (languages) x 6 (devices) x 5 (screenshots) = **600 screenshots**.
 
@@ -41,7 +41,7 @@ _snapshot_ runs completely in the background - you can do something else, while 
 
 # Features
 - Create hundreds of screenshots in multiple languages on all simulators
-- Take screenshots in multiple device simulators concurrently to cut down execution time (Xcode 9 only)
+- Take screenshots in multiple device simulators concurrently to cut down execution time
 - Configure it once, store the configuration in git
 - Do something else, while the computer takes the screenshots for you
 - Integrates with [_fastlane_](https://fastlane.tools) and [_deliver_](https://docs.fastlane.tools/actions/deliver/)
@@ -84,7 +84,6 @@ Here a few links to get started:
 - Create a new UI Test target in your Xcode project ([top part of this article](https://krausefx.com/blog/run-xcode-7-ui-tests-from-the-command-line))
 - Run `fastlane snapshot init` in your project folder
 - Add the ./SnapshotHelper.swift to your UI Test target (You can move the file anywhere you want)
-  - (Xcode 8 only) add the ./SnapshotHelperXcode8.swift to your UI Test target
 - (Objective C only) add the bridging header to your test class:
   - `#import "MYUITests-Swift.h"`  
     (The bridging header is named after your test target with `-Swift.h` appended.)
@@ -106,7 +105,7 @@ app.launch()
 
 ```objective-c
 XCUIApplication *app = [[XCUIApplication alloc] init];
-[Snapshot setupSnapshot:app];
+[Snapshot setupSnapshot:app waitForAnimations:NO];
 [app launch];
 ```
 
@@ -126,9 +125,9 @@ fastlane snapshot
 
 Your screenshots will be stored in the `./screenshots/` folder by default (or `./fastlane/screenshots` if you're using [_fastlane_](https://fastlane.tools))
 
-New with Xcode 9, *snapshot* can run multiple simulators concurrently. This is the default behavior in order to take your screenshots as quickly as possible. This can be disabled to run each device, one at a time, by setting the `:concurrent_simulators` option to `false`.
+*snapshot* can run multiple simulators concurrently. This is the default behavior in order to take your screenshots as quickly as possible. This can be disabled to run each device, one at a time, by setting the `:concurrent_simulators` option to `false`.
 
-**Note:** While running *snapshot* with Xcode 9, the simulators will not be visibly spawned. So, while you won't see the simulators running your tests, they will, in fact, be taking your screenshots.
+**Note:** The simulators will not be visibly spawned. So, while you won't see the simulators running your tests, they will, in fact, be taking your screenshots.
 
 If any error occurs while running the snapshot script on a device, that device will not have any screenshots, and _snapshot_ will continue with the next device or language. To stop the flow after the first error, run
 
@@ -251,7 +250,7 @@ to update your `SnapshotHelper.swift` files. In case you modified your `Snapshot
 
 ## Launch Arguments
 
-You can provide additional arguments to your app on launch. These strings will be available in your app (eg. not in the testing target) through `ProcessInfo.processInfo.arguments`. Alternatively, use user-default syntax (`-key value`) and they will be available as key-value pairs in `UserDefaults.standard`.
+You can provide additional arguments to your app on launch. These strings will be available in your app (e.g. not in the testing target) through `ProcessInfo.processInfo.arguments`. Alternatively, use user-default syntax (`-key value`) and they will be available as key-value pairs in `UserDefaults.standard`.
 
 ```ruby-skip-tests
 launch_arguments([
@@ -281,6 +280,10 @@ launch_arguments([
   "-secretFeatureEnabled NO"
 ])
 ```
+
+## Xcode Environment Variables
+
+_snapshot_ includes `FASTLANE_SNAPSHOT=YES` and `FASTLANE_LANGUAGE=<language>` as arguments when executing `xcodebuild`. This means you may use these environment variables in a custom build phase run script to do any additional configuration.
 
 # How does it work?
 
@@ -328,7 +331,7 @@ To get more information about language and locale codes please read [Internation
 
 ## Use a clean status bar
 
-You can set `override_status_bar` to `true` to set the status bar to Tuesday January 9th at 9:41AM with full battery and reception.
+You can set `override_status_bar` to `true` to set the status bar to Tuesday January 9th at 9:41AM with full battery and reception. If you need more granular customization, to set a Carrier name for example, also set `override_status_bar_arguments` to the specific arguments to be passed to the `xcrun simctl status_bar override` command. Run `xcrun simctl status_bar --help` to see the options available.
 
 ## Editing the `Snapfile`
 
@@ -364,7 +367,7 @@ snapshot(launch_arguments: ["SKIP_ANIMATIONS"])
 ```
 
 By default, _snapshot_ will wait for a short time for the animations to finish.
-If you're skipping the animations, this is wait time is unnecessary and can be skipped:
+If you're skipping the animations, this wait time is unnecessary and can be skipped:
 
 ```swift
 setupSnapshot(app, waitForAnimations: false)

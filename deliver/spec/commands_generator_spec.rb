@@ -3,7 +3,7 @@ require 'deliver/setup'
 
 describe Deliver::CommandsGenerator do
   def expect_runner_run_with(expected_options)
-    fake_runner = "runner"
+    fake_runner = +"runner"
     expect_runner_new_with(expected_options).and_return(fake_runner)
     expect(fake_runner).to receive(:run)
   end
@@ -17,10 +17,10 @@ describe Deliver::CommandsGenerator do
   describe ":run option handling" do
     it "can use the username short flag from tool options" do
       # leaving out the command name defaults to 'run'
-      stub_commander_runner_args(['--description', 'My description', '-u', 'me@it.com'])
+      stub_commander_runner_args(['--description', '{"en-US": "My description"}', '-u', 'me@it.com'])
 
       expected_options = FastlaneCore::Configuration.create(Deliver::Options.available_options, {
-        description: 'My description',
+        description: { "en-US" => "My description" },
         username: 'me@it.com'
       })
 
@@ -31,10 +31,10 @@ describe Deliver::CommandsGenerator do
 
     it "can use the app_identifier flag from tool options" do
       # leaving out the command name defaults to 'run'
-      stub_commander_runner_args(['--description', 'My description', '--app_identifier', 'abcd'])
+      stub_commander_runner_args(['--description', '{"en-US": "My description"}', '--app_identifier', 'abcd'])
 
       expected_options = FastlaneCore::Configuration.create(Deliver::Options.available_options, {
-        description: 'My description',
+        description: { "en-US" => "My description" },
         app_identifier: 'abcd'
       })
 
@@ -46,10 +46,10 @@ describe Deliver::CommandsGenerator do
 
   describe ":submit_build option handling" do
     it "can use the username short flag from tool options" do
-      stub_commander_runner_args(['submit_build', '--description', 'My description', '-u', 'me@it.com'])
+      stub_commander_runner_args(['submit_build', '--description', '{"en-US": "My description"}', '-u', 'me@it.com'])
 
       expected_options = FastlaneCore::Configuration.create(Deliver::Options.available_options, {
-        description: 'My description',
+        description: { "en-US" => "My description" },
         username: 'me@it.com',
         submit_for_review: true,
         build_number: 'latest'
@@ -61,10 +61,10 @@ describe Deliver::CommandsGenerator do
     end
 
     it "can use the app_identifier flag from tool options" do
-      stub_commander_runner_args(['submit_build', '--description', 'My description', '--app_identifier', 'abcd'])
+      stub_commander_runner_args(['submit_build', '--description', '{"en-US": "My description"}', '--app_identifier', 'abcd'])
 
       expected_options = FastlaneCore::Configuration.create(Deliver::Options.available_options, {
-        description: 'My description',
+        description: { "en-US" => "My description" },
         app_identifier: 'abcd',
         submit_for_review: true,
         build_number: 'latest'
@@ -78,7 +78,7 @@ describe Deliver::CommandsGenerator do
 
   describe ":init option handling" do
     def expect_setup_run_with(expected_options)
-      fake_setup = "setup"
+      fake_setup = +"setup"
       expect(Deliver::Setup).to receive(:new).and_return(fake_setup)
       expect(fake_setup).to receive(:run) do |actual_options|
         expect(expected_options._values).to eq(actual_options._values)
@@ -86,10 +86,10 @@ describe Deliver::CommandsGenerator do
     end
 
     it "can use the username short flag from tool options" do
-      stub_commander_runner_args(['init', '--description', 'My description', '-u', 'me@it.com'])
+      stub_commander_runner_args(['init', '--description', '{"en-US": "My description"}', '-u', 'me@it.com'])
 
       expected_options = FastlaneCore::Configuration.create(Deliver::Options.available_options, {
-        description: 'My description',
+        description: { "en-US" => "My description" },
         username: 'me@it.com',
         run_precheck_before_submit: false
       })
@@ -101,10 +101,10 @@ describe Deliver::CommandsGenerator do
     end
 
     it "can use the app_identifier flag from tool options" do
-      stub_commander_runner_args(['init', '--description', 'My description', '--app_identifier', 'abcd'])
+      stub_commander_runner_args(['init', '--description', '{"en-US": "My description"}', '--app_identifier', 'abcd'])
 
       expected_options = FastlaneCore::Configuration.create(Deliver::Options.available_options, {
-        description: 'My description',
+        description: { "en-US" => "My description" },
         app_identifier: 'abcd',
         run_precheck_before_submit: false
       })
@@ -118,7 +118,7 @@ describe Deliver::CommandsGenerator do
 
   describe ":generate_summary option handling" do
     def expect_generate_summary_run_with(expected_options)
-      fake_generate_summary = "generate_summary"
+      fake_generate_summary = +"generate_summary"
       expect(Deliver::GenerateSummary).to receive(:new).and_return(fake_generate_summary)
       expect(fake_generate_summary).to receive(:run) do |actual_options|
         expect(expected_options._values).to eq(actual_options._values)
@@ -126,10 +126,9 @@ describe Deliver::CommandsGenerator do
     end
 
     it "can use the username short flag from tool options" do
-      stub_commander_runner_args(['generate_summary', '--description', 'My description', '-u', 'me@it.com', '-f', 'true'])
+      stub_commander_runner_args(['generate_summary', '-u', 'me@it.com', '-f', 'true'])
 
       expected_options = FastlaneCore::Configuration.create(Deliver::Options.available_options, {
-        description: 'My description',
         username: 'me@it.com',
         force: true
       })
@@ -141,16 +140,26 @@ describe Deliver::CommandsGenerator do
     end
 
     it "can use the app_identifier flag from tool options" do
-      stub_commander_runner_args(['generate_summary', '--description', 'My description', '--app_identifier', 'abcd', '-f', 'true'])
+      stub_commander_runner_args(['generate_summary', '--app_identifier', 'abcd', '-f', 'true'])
 
       expected_options = FastlaneCore::Configuration.create(Deliver::Options.available_options, {
-        description: 'My description',
         app_identifier: 'abcd',
         force: true
       })
 
       expect_runner_new_with(expected_options)
       expect_generate_summary_run_with(expected_options)
+
+      Deliver::CommandsGenerator.start
+    end
+
+    it "opens the report with its path as one argument" do
+      stub_commander_runner_args(['generate_summary', '--app_identifier', 'abcd'])
+      html_path = "/Users/me/Kaldi's Kafe/fastlane/Preview.html"
+
+      allow(Deliver::Runner).to receive(:new)
+      expect(Deliver::GenerateSummary).to receive(:new).and_return(double(run: html_path))
+      expect_any_instance_of(Deliver::CommandsGenerator).to receive(:system).with("open", html_path)
 
       Deliver::CommandsGenerator.start
     end
@@ -165,10 +174,9 @@ describe Deliver::CommandsGenerator do
     end
 
     it "can use the username short flag from tool options" do
-      stub_commander_runner_args(['download_screenshots', '--description', 'My description', '-u', 'me@it.com', '-w', 'screenshots/path'])
+      stub_commander_runner_args(['download_screenshots', '-u', 'me@it.com', '-w', 'screenshots/path'])
 
       expected_options = FastlaneCore::Configuration.create(Deliver::Options.available_options, {
-        description: 'My description',
         username: 'me@it.com',
         screenshots_path: 'screenshots/path'
       })
@@ -180,10 +188,9 @@ describe Deliver::CommandsGenerator do
     end
 
     it "can use the app_identifier flag from tool options" do
-      stub_commander_runner_args(['download_screenshots', '--description', 'My description', '--app_identifier', 'abcd', '-w', 'screenshots/path'])
+      stub_commander_runner_args(['download_screenshots', '--app_identifier', 'abcd', '-w', 'screenshots/path'])
 
       expected_options = FastlaneCore::Configuration.create(Deliver::Options.available_options, {
-        description: 'My description',
         app_identifier: 'abcd',
         screenshots_path: 'screenshots/path'
       })
@@ -196,31 +203,48 @@ describe Deliver::CommandsGenerator do
   end
 
   describe ":download_metadata option handling" do
+    let(:latest_version) do
+      double('version',
+             version_string: "1.0.0")
+    end
+
     it "can use the app_identifier flag from tool options" do
-      stub_commander_runner_args(['download_metadata', '--description', 'My description', '--app_identifier', 'abcd', '-m', 'metadata/path', '--force'])
+      stub_commander_runner_args(['download_metadata', '--app_identifier', 'abcd', '-m', 'metadata/path', '--force'])
 
       expected_options = FastlaneCore::Configuration.create(Deliver::Options.available_options, {
-        description: 'My description',
         app_identifier: 'abcd',
         metadata_path: 'metadata/path',
         force: true
       })
 
-      fake_app = "fake_app"
-      expect(fake_app).to receive(:latest_version).and_return('1.0.0')
+      fake_app = +"fake_app"
+      expect(fake_app).to receive(:get_latest_app_store_version).and_return(latest_version)
 
       expect(Deliver::Runner).to receive(:new) do |actual_options|
         expect(expected_options._values).to eq(actual_options._values)
-        # ugly work-around to do the work that DetectValues would normally do
-        actual_options[:app] = fake_app
+        # ugly workaround to do the work that DetectValues would normally do
+        Deliver.cache[:app] = fake_app
       end
 
-      fake_setup = "fake_setup"
+      fake_setup = +"fake_setup"
       expect(Deliver::Setup).to receive(:new).and_return(fake_setup)
-      expect(fake_setup).to receive(:generate_metadata_files) do |version, metadata_path|
-        expect(version).to eq('1.0.0')
+      expect(fake_setup).to receive(:generate_metadata_files) do |app, version, metadata_path|
+        expect(app).to eq(fake_app)
+        expect(version).to eq(latest_version)
         expect(metadata_path).to eq('metadata/path')
       end
+
+      Deliver::CommandsGenerator.start
+    end
+
+    it "says why it does not download when it cannot overwrite" do
+      stub_commander_runner_args(['download_metadata', '--app_identifier', 'abcd', '-m', 'metadata/path'])
+      allow(FastlaneCore::UI).to receive(:interactive?).and_return(false)
+      allow(FastlaneCore::UI).to receive(:message)
+
+      expect(Deliver::Runner).to receive(:new)
+      expect(FastlaneCore::UI).to receive(:message).with("Will not overwrite existing metadata (answered no, or tty not detected). To override: use --force option")
+      expect(Deliver::Setup).not_to receive(:new)
 
       Deliver::CommandsGenerator.start
     end
@@ -236,6 +260,13 @@ describe Deliver::CommandsGenerator do
       it "forces overwriting metadata if DELIVER_FORCE_OVERWRITE is set" do
         FastlaneSpec::Env.with_env_values('DELIVER_FORCE_OVERWRITE' => '1') do
           expect(Deliver::CommandsGenerator.force_overwrite_metadata?({}, "an/ignored/path")).to be_truthy
+        end
+      end
+
+      it "does not force overwriting metadata if DELIVER_FORCE_OVERWRITE is false" do
+        expect(UI).to receive(:interactive?).and_return(false)
+        FastlaneSpec::Env.with_env_values('DELIVER_FORCE_OVERWRITE' => 'false') do
+          expect(Deliver::CommandsGenerator.force_overwrite_metadata?({}, "an/ignored/path")).to be_falsy
         end
       end
 

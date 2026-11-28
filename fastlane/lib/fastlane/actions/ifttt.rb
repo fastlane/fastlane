@@ -53,18 +53,15 @@ module Fastlane
           FastlaneCore::ConfigItem.new(key: :value1,
                                        env_name: "IFTTT_VALUE1",
                                        description: "Extra data sent with the event",
-                                       optional: true,
-                                       is_string: true),
+                                       optional: true),
           FastlaneCore::ConfigItem.new(key: :value2,
                                       env_name: "IFTTT_VALUE2",
                                       description: "Extra data sent with the event",
-                                      optional: true,
-                                      is_string: true),
+                                      optional: true),
           FastlaneCore::ConfigItem.new(key: :value3,
                                        env_name: "IFTTT_VALUE3",
                                        description: "Extra data sent with the event",
-                                       optional: true,
-                                       is_string: true)
+                                       optional: true)
         ]
       end
 

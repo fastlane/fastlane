@@ -1,5 +1,5 @@
 describe Spaceship::ConnectAPI::BetaGroup do
-  before { Spaceship::Tunes.login }
+  include_examples "common spaceship login"
 
   describe '#Spaceship::ConnectAPI' do
     it '#get_beta_groups' do
@@ -21,6 +21,40 @@ describe Spaceship::ConnectAPI::BetaGroup do
       expect(model.public_link_limit_enabled).to eq(true)
       expect(model.public_link_limit).to eq(10)
       expect(model.public_link).to eq("https://testflight.apple.com/join/abcd1234")
+    end
+
+    it '#delete!' do
+      response = Spaceship::ConnectAPI.get_beta_groups
+      expect(response).to be_an_instance_of(Spaceship::ConnectAPI::Response)
+
+      expect(response.count).to eq(3)
+      response.each do |model|
+        expect(model).to be_an_instance_of(Spaceship::ConnectAPI::BetaGroup)
+      end
+
+      model = response.first
+      expect(model.id).to eq("123456789")
+      model.delete!
+    end
+  end
+
+  describe '#matches_identifiers?' do
+    let(:group) do
+      Spaceship::ConnectAPI::BetaGroup.new("987", {
+        name: "Blue Man Group"
+      })
+    end
+
+    it 'matches by name' do
+      expect(group.matches_identifiers?(["Blue Man Group"])).to eq(true)
+    end
+
+    it 'matches by id' do
+      expect(group.matches_identifiers?(["987"])).to eq(true)
+    end
+
+    it 'does not match unrelated identifiers' do
+      expect(group.matches_identifiers?(["Green Eggs and Ham", "654"])).to eq(false)
     end
   end
 end

@@ -13,13 +13,8 @@ module Fastlane
         UI.user_error!("Could not find path to project config '#{path}'. Pass the path to your project (not workspace)!") unless File.exist?(path)
         UI.message("Updating the Automatic Codesigning flag to #{params[:use_automatic_signing] ? 'enabled' : 'disabled'} for the given project '#{path}'")
 
-        unless project.root_object.attributes["TargetAttributes"]
-          UI.user_error!("Seems to be a very old project file format - please open your project file in a more recent version of Xcode")
-          return false
-        end
-
         target_dictionary = project.targets.map { |f| { name: f.name, uuid: f.uuid, build_configuration_list: f.build_configuration_list } }
-        target_attributes = project.root_object.attributes["TargetAttributes"]
+        target_attributes = (project.root_object.attributes["TargetAttributes"] ||= {})
         changed_targets = []
 
         # make sure TargetAttributes exist for all targets
@@ -126,39 +121,33 @@ module Fastlane
           FastlaneCore::ConfigItem.new(key: :use_automatic_signing,
                                        env_name: "FL_PROJECT_USE_AUTOMATIC_SIGNING",
                                        description: "Defines if project should use automatic signing",
-                                       is_string: false,
+                                       type: Boolean,
                                        default_value: false),
           FastlaneCore::ConfigItem.new(key: :team_id,
                                        env_name: "FASTLANE_TEAM_ID",
                                        optional: true,
-                                       description: "Team ID, is used when upgrading project",
-                                       is_string: true),
+                                       description: "Team ID, is used when upgrading project"),
           FastlaneCore::ConfigItem.new(key: :targets,
                                        env_name: "FL_PROJECT_SIGNING_TARGETS",
                                        optional: true,
                                        type: Array,
-                                       description: "Specify targets you want to toggle the signing mech. (default to all targets)",
-                                       is_string: false),
+                                       description: "Specify targets you want to toggle the signing mech. (default to all targets)"),
           FastlaneCore::ConfigItem.new(key: :code_sign_identity,
                                        env_name: "FL_CODE_SIGN_IDENTITY",
                                        description: "Code signing identity type (iPhone Developer, iPhone Distribution)",
-                                       optional: true,
-                                       is_string: true),
+                                       optional: true),
           FastlaneCore::ConfigItem.new(key: :profile_name,
                                        env_name: "FL_PROVISIONING_PROFILE_SPECIFIER",
                                        description: "Provisioning profile name to use for code signing",
-                                       optional: true,
-                                       is_string: true),
+                                       optional: true),
           FastlaneCore::ConfigItem.new(key: :profile_uuid,
                                        env_name: "FL_PROVISIONING_PROFILE",
                                        description: "Provisioning profile UUID to use for code signing",
-                                       optional: true,
-                                       is_string: true),
+                                       optional: true),
           FastlaneCore::ConfigItem.new(key: :bundle_identifier,
                                        env_name: "FL_APP_IDENTIFIER",
                                        description: "Application Product Bundle Identifier",
-                                       optional: true,
-                                       is_string: true)
+                                       optional: true)
         ]
       end
 

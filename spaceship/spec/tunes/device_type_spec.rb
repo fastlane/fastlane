@@ -1,5 +1,10 @@
 describe Spaceship::Tunes::DeviceType do
   describe "type identifiers" do
+    before(:each) do
+      # Let's catch those calls to avoid polluting the output
+      allow(Warning).to receive(:warn).with(/Spaceship::Tunes::DeviceType has been deprecated./, { category: nil })
+    end
+
     it "should be checkable using singleton functions" do
       expect(Spaceship::Tunes::DeviceType.exists?("iphone6")).to be_truthy
     end
@@ -38,8 +43,9 @@ describe Spaceship::Tunes::DeviceType do
         'desktop'
       ]
 
+      types = Spaceship::Tunes::DeviceType.types
       old_types.each do |identifier|
-        expect(Spaceship::Tunes::DeviceType.types).to include(identifier)
+        expect(types).to include(identifier)
       end
     end
   end

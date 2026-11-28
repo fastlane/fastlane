@@ -29,10 +29,10 @@ module Fastlane
       @sample_return_value = non_empty(string: sample_return_value)
       @param_type_overrides = key_type_overrides
 
-      # rubocop:disable LineLength
+      # rubocop:disable Layout/LineLength
       # class instance?
-      @reserved_words = %w[associativity break case catch class continue convenience default deinit didSet do else enum extension fallthrough false final for func get guard if in infix init inout internal lazy let mutating nil operator override postfix precedence prefix private public repeat required return self set static struct subscript super switch throws true try var weak where while willSet].to_set
-      # rubocop:enable LineLength
+      @reserved_words = %w[actor associativity async await break case catch class continue convenience default deinit didSet do else enum extension fallthrough false final for func guard if in infix init inout internal lazy let mutating nil operator override precedence private public repeat required return self static struct subscript super switch throws true try var weak where while willSet].to_set
+      # rubocop:enable Layout/LineLength
     end
 
     def sanitize_reserved_word(word: nil)
@@ -95,8 +95,16 @@ module Fastlane
         return "Int"
       elsif type_override == Boolean
         return "Bool"
+      elsif type_override == Float
+        return "Float"
+      elsif type_override == String
+        return "String"
       elsif type_override == :string_callback
-        return "((String) -> Void)"
+        # David Hart:
+        # It doesn't make sense to add escaping annotations to optional closures because they aren't function types:
+        # they are basically an enum (Optional) containing a function, the same way you would store a closure in any type:
+        # it's implicitly escaping because it's owned by another type.
+        return "((String) -> Void)?"
       else
         return default_type
       end
@@ -104,12 +112,13 @@ module Fastlane
 
     def override_default_value_if_not_correct_type(param_name: nil, param_type: nil, default_value: nil)
       return "[]" if param_type == "[String]" && default_value == ""
-      return "{_ in }" if param_type == "((String) -> Void)"
+      return "nil" if param_type == "((String) -> Void)?"
 
       return default_value
     end
 
     def get_type(param: nil, default_value: nil, optional: nil, param_type_override: nil, is_string: true)
+      require 'bigdecimal'
       unless param_type_override.nil?
         type = determine_type_from_override(type_override: param_type_override)
       end
@@ -119,7 +128,7 @@ module Fastlane
 
       optional_specifier = ""
       # if we are optional and don't have a default value, we'll need to use ?
-      optional_specifier = "?" if (optional && default_value.nil?) && type != "((String) -> Void)"
+      optional_specifier = "?" if (optional && default_value.nil?) && type != "((String) -> Void)?"
 
       # If we have a default value of true or false, we can infer it is a Bool
       if default_value.class == FalseClass
@@ -130,12 +139,24 @@ module Fastlane
         type = "[String]"
       elsif default_value.kind_of?(Hash)
         type = "[String : Any]"
+      # Although we can have a default value of Integer type, if param_type_override overridden that value, respect it.
       elsif default_value.kind_of?(Integer)
-        type = "Int"
+        if type == "Double" || type == "Float"
+          begin
+            # If we're not able to instantiate
+            _ = BigDecimal(default_value)
+          rescue
+            # We set it as a Int
+            type = "Int"
+          end
+        else
+          type = "Int"
+        end
       end
       return "#{type}#{optional_specifier}"
     end
 
+    # rubocop:disable Metrics/PerceivedComplexity
     def parameters
       unless @param_names
         return ""
@@ -149,8 +170,11 @@ module Fastlane
             # we can't handle default values for Hashes, yet
             # see method swift_default_implementations for similar behavior
             default_value = "[:]"
-          elsif type != "Bool" && type != "[String]" && type != "Int" && type != "((String) -> Void)"
+          elsif type != "Bool" && type != "[String]" && type != "Int" && type != "@escaping ((String) -> Void)" && type != "Float" && type != "Double"
             default_value = "\"#{default_value}\""
+          elsif type == "Float" || type == "Double"
+            require 'bigdecimal'
+            default_value = BigDecimal(default_value).to_s
           end
         end
 
@@ -169,7 +193,13 @@ module Fastlane
         if default_value.nil?
           "#{param}: #{type}"
         else
-          "#{param}: #{type} = #{default_value}"
+          if type == "((String) -> Void)?"
+            "#{param}: #{type} = nil"
+          elsif optional && type.end_with?('?') && !type.start_with?('Any') || type.start_with?('Bool')
+            "#{param}: OptionalConfigValue<#{type}> = .fastlaneDefault(#{default_value})"
+          else
+            "#{param}: #{type} = #{default_value}"
+          end
         end
       end
 
@@ -189,7 +219,7 @@ module Fastlane
       # This just creates a string with as many spaces are necessary given whether or not
       # the function has a 'discardableResult' annotation, the 'func' keyword, function name
       # and the opening paren.
-      function_keyword_definition = 'func '
+      function_keyword_definition = 'public func '
       open_paren = '('
       closed_paren = ')'
       indent = ' ' * (discardable_result.length + function_name.length + function_keyword_definition.length + open_paren.length)
@@ -211,7 +241,7 @@ module Fastlane
       # Adds newlines between each documentation element.
       documentation = documentation_elements.flat_map { |element| [element, separator] }.tap(&:pop).join("\n")
 
-      return "/**\n#{documentation}\n*/\n"
+      return "/**\n#{documentation.gsub('/*', '/\\*')}\n*/\n"
     end
 
     def swift_parameter_documentation
@@ -250,12 +280,17 @@ module Fastlane
         return "[]" # return empty list for argument
       end
 
-      argument_object_strings = @param_names.zip(param_type_overrides).map do |name, type_override|
+      argument_object_strings = @param_names.zip(param_type_overrides, param_default_values, param_optionality_values, param_is_strings).map do |name, type_override, default_value, is_optional, is_string|
+        type = get_type(param: name, default_value: default_value, optional: is_optional, param_type_override: type_override, is_string: is_string)
         sanitized_name = camel_case_lower(string: name)
         sanitized_name = sanitize_reserved_word(word: sanitized_name)
-        type_string = type_override == :string_callback ? ", type: .stringClosure" : nil
+        type_string = type_override == :string_callback ? ".stringClosure" : "nil"
 
-        "RubyCommand.Argument(name: \"#{name}\", value: #{sanitized_name}#{type_string})"
+        if !(type_override == :string_callback || !(is_optional && default_value.nil? && !type.start_with?('Any') || type.start_with?('Bool')))
+          { name: "#{sanitized_name.gsub('`', '')}Arg", arg: "let #{sanitized_name.gsub('`', '')}Arg = #{sanitized_name}.asRubyArgument(name: \"#{name}\", type: #{type_string})" }
+        else
+          { name: "#{sanitized_name.gsub('`', '')}Arg", arg: "let #{sanitized_name.gsub('`', '')}Arg = RubyCommand.Argument(name: \"#{name}\", value: #{sanitized_name}, type: #{type_string})" }
+        end
       end
       return argument_object_strings
     end
@@ -286,13 +321,17 @@ module Fastlane
 
     def implementation
       args = build_argument_list
+      implm = "#{args.group_by { |h| h[:arg] }.keys.join("\n")}\n"
+      if args.empty?
+        implm += "let args: [RubyCommand.Argument] = []\n"
+      else
+        implm += "let array: [RubyCommand.Argument?] = [#{args.group_by { |h| h[:name] }.keys.join(",\n")}]\n"
+        implm += "let args: [RubyCommand.Argument] = array\n"
+        implm += ".filter { $0?.value != nil }\n"
+        implm += ".compactMap { $0 }\n"
+      end
+      implm += "let command = RubyCommand(commandID: \"\", methodName: \"#{@function_name}\", className: nil, args: args)\n"
 
-      implm = "  let command = RubyCommand(commandID: \"\", methodName: \"#{@function_name}\", className: nil, args: ["
-      # Get the indent of the first argument in the list to give each
-      # subsequent argument it's own line with proper indenting
-      indent = ' ' * implm.length
-      implm += args.join(",\n#{indent}")
-      implm += "])\n"
       return implm + "  #{return_statement}"
     end
   end
@@ -393,7 +432,13 @@ module Fastlane
         param = sanitize_reserved_word(word: param)
         static_var_for_parameter_name = param
 
-        "#{param}: #{type} = #{self.class_name.downcase}.#{static_var_for_parameter_name}"
+        if type == "((String) -> Void)?"
+          "#{param}: #{type} = nil"
+        elsif (optional && type.end_with?('?') && !type.start_with?('Any')) || type.start_with?('Bool')
+          "#{param}: OptionalConfigValue<#{type}> = .fastlaneDefault(#{self.class_name.downcase}.#{static_var_for_parameter_name})"
+        else
+          "#{param}: #{type} = #{self.class_name.downcase}.#{static_var_for_parameter_name}"
+        end
       end
 
       return param_names_and_types

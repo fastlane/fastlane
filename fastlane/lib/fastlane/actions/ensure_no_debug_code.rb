@@ -2,7 +2,7 @@ module Fastlane
   module Actions
     class EnsureNoDebugCodeAction < Action
       def self.run(params)
-        command = "grep -RE '#{params[:text]}' '#{File.absolute_path(params[:path])}'"
+        command = "grep -RE #{params[:text].shellescape} #{File.absolute_path(params[:path]).shellescape}"
 
         extensions = []
         extensions << params[:extension] unless params[:extension].nil?
@@ -20,7 +20,7 @@ module Fastlane
           command << " --include=\\*.#{extensions.join(',')}"
         end
 
-        command << " --exclude #{params[:exclude]}" if params[:exclude]
+        command << " --exclude #{params[:exclude].shellescape}" if params[:exclude]
 
         if params[:exclude_dirs]
           params[:exclude_dirs].each do |dir|
@@ -84,18 +84,16 @@ module Fastlane
                                        env_name: "FL_ENSURE_NO_DEBUG_CODE_EXTENSIONS",
                                        description: "An array of file extensions that should be searched for",
                                        optional: true,
-                                       is_string: false),
+                                       type: Array),
           FastlaneCore::ConfigItem.new(key: :exclude,
                                        env_name: "FL_ENSURE_NO_DEBUG_CODE_EXCLUDE",
                                        description: "Exclude a certain pattern from the search",
-                                       optional: true,
-                                       is_string: true),
+                                       optional: true),
           FastlaneCore::ConfigItem.new(key: :exclude_dirs,
                                        env_name: "FL_ENSURE_NO_DEBUG_CODE_EXCLUDE_DIRS",
                                        description: "An array of dirs that should not be included in the search",
                                        optional: true,
-                                       type: Array,
-                                       is_string: false)
+                                       type: Array)
         ]
       end
 

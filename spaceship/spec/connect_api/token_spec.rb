@@ -1,31 +1,384 @@
+require 'tempfile'
+
 describe Spaceship::ConnectAPI::Token do
   let(:key_id) { 'BA5176BF04' }
   let(:issuer_id) { '693fbb20-54a0-4d94-88ce-8a6caf875439' }
 
-  context 'init' do
-    let(:private_key) do
-      key = OpenSSL::PKey::EC.new('prime256v1')
-      key.generate_key
-      key
-    end
-    let(:public_key) do
-      key = OpenSSL::PKey::EC.new(private_key)
-      key.private_key = nil
-      key
+  let(:fake_api_key_json_path) { "./spaceship/spec/connect_api/fixtures/asc_key.json" }
+  let(:fake_api_key_extra_fields_json_path) { "./spaceship/spec/connect_api/fixtures/asc_key_extra_fields.json" }
+  let(:fake_api_key_base64_json_path) { "./spaceship/spec/connect_api/fixtures/asc_key_base64.json" }
+  let(:fake_api_key_in_house_json_path) { "./spaceship/spec/connect_api/fixtures/asc_key_in_house.json" }
+
+  let(:private_key) do
+    json = JSON.parse(File.read(fake_api_key_json_path), { symbolize_names: true })
+    json[:key]
+  end
+
+  context '#from_json_file' do
+    it 'successfully creates token' do
+      token = Spaceship::ConnectAPI::Token.from_json_file(fake_api_key_json_path)
+
+      expect(token.key_id).to eq("D485S484")
+      expect(token.issuer_id).to eq("061966a2-5f3c-4185-af13-70e66d2263f5")
+      expect(token.in_house).to be_nil
     end
 
-    it 'generates proper token' do
-      token = Spaceship::ConnectAPI::Token.new(key_id: key_id, issuer_id: issuer_id, key: private_key)
+    it 'successfully creates token with extra fields' do
+      token = Spaceship::ConnectAPI::Token.from_json_file(fake_api_key_extra_fields_json_path)
+
+      expect(token.key_id).to eq("D485S484")
+      expect(token.issuer_id).to eq("061966a2-5f3c-4185-af13-70e66d2263f5")
+      expect(token.in_house).to be_nil
+    end
+
+    it 'successfully creates token with base64 encoded key' do
+      json = JSON.parse(File.read(fake_api_key_json_path), { symbolize_names: true })
+
+      expect(Base64).to receive(:decode64).and_call_original
+      expect(OpenSSL::PKey::EC).to receive(:new).with(json[:key]).and_call_original
+
+      token64 = Spaceship::ConnectAPI::Token.from_json_file(fake_api_key_base64_json_path)
+
+      expect(token64.key_id).to eq("D485S484")
+      expect(token64.issuer_id).to eq("061966a2-5f3c-4185-af13-70e66d2263f5")
+      expect(token64.in_house).to be_nil
+    end
+
+    it 'successfully creates token with in_house' do
+      token = Spaceship::ConnectAPI::Token.from_json_file(fake_api_key_in_house_json_path)
+
+      expect(token.key_id).to eq("D485S484")
+      expect(token.issuer_id).to eq("061966a2-5f3c-4185-af13-70e66d2263f5")
+      expect(token.in_house).to eq(true)
+    end
+
+    it 'raises error with invalid JSON without leaking the file contents' do
+      file = Tempfile.new('key.json')
+      file.write('-----BEGIN PRIVATE KEY-----secret-key-value-----END PRIVATE KEY-----')
+      file.close
+
+      expect do
+        Spaceship::ConnectAPI::Token.from_json_file(file.path)
+      end.to raise_error do |error|
+        expect(error.message).to eq("Invalid JSON in App Store Connect API key file '#{file.path}'. Expected a JSON file with at least the 'key_id' and 'key' fields.")
+        expect(error.message).not_to include('secret-key-value')
+      end
+    end
+
+    it 'raises error with missing all keys' do
+      file = Tempfile.new('key.json')
+      file.write('{"thing":"thing"}')
+      file.close
+      expect do
+        Spaceship::ConnectAPI::Token.from_json_file(file.path)
+      end.to raise_error("App Store Connect API key JSON is missing field(s): key_id, key")
+    end
+
+    it 'raises error with missing key' do
+      file = Tempfile.new('key.json')
+      file.write('{"key_id":"thing", "issuer_id": "thing"}')
+      file.close
+      expect do
+        Spaceship::ConnectAPI::Token.from_json_file(file.path)
+      end.to raise_error("App Store Connect API key JSON is missing field(s): key")
+    end
+  end
+
+  context '#from' do
+    describe 'hash' do
+      it 'with string keys' do
+        token = Spaceship::ConnectAPI::Token.from(hash: {
+          "key_id" => "key_id",
+          "issuer_id" => "issuer_id",
+          "key" => private_key,
+          "duration" => 200,
+          "in_house" => true
+        })
+
+        expect(token.key_id).to eq('key_id')
+        expect(token.issuer_id).to eq('issuer_id')
+        expect(token.text).not_to(be_nil)
+        expect(token.duration).to eq(200)
+        expect(token.in_house).to eq(true)
+      end
+
+      it 'with symbols keys' do
+        token = Spaceship::ConnectAPI::Token.from(hash: {
+          key_id: "key_id",
+          issuer_id: "issuer_id",
+          key: private_key,
+          duration: 200,
+          in_house: true
+        })
+
+        expect(token.key_id).to eq('key_id')
+        expect(token.issuer_id).to eq('issuer_id')
+        expect(token.text).not_to(be_nil)
+        expect(token.duration).to eq(200)
+        expect(token.in_house).to eq(true)
+      end
+    end
+  end
+
+  context '#create' do
+    describe 'with arguments' do
+      it "with key" do
+        token = Spaceship::ConnectAPI::Token.create(
+          key_id: "key_id",
+          issuer_id: "issuer_id",
+          key: private_key,
+          duration: 200,
+          in_house: true
+        )
+
+        expect(token.key_id).to eq('key_id')
+        expect(token.issuer_id).to eq('issuer_id')
+        expect(token.text).not_to(be_nil)
+        expect(token.duration).to eq(200)
+        expect(token.in_house).to eq(true)
+      end
+
+      it "with filepath" do
+        expect(File).to receive(:binread).with('/path/to/file').and_return(private_key)
+        token = Spaceship::ConnectAPI::Token.create(
+          key_id: "key_id",
+          issuer_id: "issuer_id",
+          filepath: "/path/to/file",
+          duration: 200,
+          in_house: true
+        )
+
+        expect(token.key_id).to eq('key_id')
+        expect(token.issuer_id).to eq('issuer_id')
+        expect(token.text).not_to(be_nil)
+        expect(token.duration).to eq(200)
+        expect(token.in_house).to eq(true)
+      end
+
+      it "without issuer_id" do
+        expect(File).to receive(:binread).with('/path/to/file').and_return(private_key)
+        token = Spaceship::ConnectAPI::Token.create(
+          key_id: "key_id",
+          filepath: "/path/to/file",
+          duration: 200,
+          in_house: true
+        )
+
+        expect(token.key_id).to eq('key_id')
+        expect(token.issuer_id).to be_nil
+        expect(token.text).not_to(be_nil)
+        expect(token.duration).to eq(200)
+        expect(token.in_house).to eq(true)
+      end
+    end
+
+    describe 'with environment variables' do
+      it "with key" do
+        stub_const('ENV', {
+          'SPACESHIP_CONNECT_API_KEY_ID' => 'key_id',
+          'SPACESHIP_CONNECT_API_ISSUER_ID' => 'issuer_id',
+          'SPACESHIP_CONNECT_API_KEY_FILEPATH' => nil,
+          'SPACESHIP_CONNECT_API_TOKEN_DURATION' => '200',
+          'SPACESHIP_CONNECT_API_IN_HOUSE' => 'no',
+          'SPACESHIP_CONNECT_API_KEY' => private_key
+        })
+
+        token = Spaceship::ConnectAPI::Token.create
+
+        expect(token.key_id).to eq('key_id')
+        expect(token.issuer_id).to eq('issuer_id')
+        expect(token.text).not_to(be_nil)
+        expect(token.duration).to eq(200)
+        expect(token.in_house).to eq(false)
+      end
+
+      it "with filepath" do
+        expect(File).to receive(:binread).with('/path/to/file').and_return(private_key)
+        stub_const('ENV', {
+          'SPACESHIP_CONNECT_API_KEY_ID' => 'key_id',
+          'SPACESHIP_CONNECT_API_ISSUER_ID' => 'issuer_id',
+          'SPACESHIP_CONNECT_API_KEY_FILEPATH' => '/path/to/file',
+          'SPACESHIP_CONNECT_API_TOKEN_DURATION' => '200',
+          'SPACESHIP_CONNECT_API_IN_HOUSE' => 'true',
+          'SPACESHIP_CONNECT_API_KEY' => nil
+        })
+
+        token = Spaceship::ConnectAPI::Token.create
+
+        expect(token.key_id).to eq('key_id')
+        expect(token.issuer_id).to eq('issuer_id')
+        expect(token.text).not_to(be_nil)
+        expect(token.duration).to eq(200)
+        expect(token.in_house).to eq(true)
+      end
+
+      ["FALSE", "No", "Off"].each do |value|
+        it "reads an in-house value of #{value} as false" do
+          stub_const('ENV', {
+            'SPACESHIP_CONNECT_API_KEY_ID' => 'key_id',
+            'SPACESHIP_CONNECT_API_IN_HOUSE' => value,
+            'SPACESHIP_CONNECT_API_KEY' => private_key
+          })
+
+          token = Spaceship::ConnectAPI::Token.create
+
+          expect(token.in_house).to eq(false)
+        end
+      end
+
+      it "warns that an empty in-house value will mean true" do
+        stub_const('ENV', {
+          'SPACESHIP_CONNECT_API_KEY_ID' => 'key_id',
+          'SPACESHIP_CONNECT_API_IN_HOUSE' => '',
+          'SPACESHIP_CONNECT_API_KEY' => private_key
+        })
+        expect(Spaceship::ConnectAPI::Token).to receive(:puts).with(/SPACESHIP_CONNECT_API_IN_HOUSE is empty/)
+
+        token = Spaceship::ConnectAPI::Token.create
+
+        expect(token.in_house).to eq(false)
+      end
+
+      it "does not warn when in_house is passed" do
+        stub_const('ENV', {
+          'SPACESHIP_CONNECT_API_KEY_ID' => 'key_id',
+          'SPACESHIP_CONNECT_API_IN_HOUSE' => '',
+          'SPACESHIP_CONNECT_API_KEY' => private_key
+        })
+        expect(Spaceship::ConnectAPI::Token).not_to receive(:puts)
+
+        token = Spaceship::ConnectAPI::Token.create(in_house: true)
+
+        expect(token.in_house).to eq(true)
+      end
+    end
+  end
+
+  context 'init' do
+    it 'generates proper team token' do
+      key = OpenSSL::PKey::EC.generate('prime256v1')
+      token = Spaceship::ConnectAPI::Token.new(key_id: key_id, issuer_id: issuer_id, key: key)
       expect(token.key_id).to eq(key_id)
       expect(token.issuer_id).to eq(issuer_id)
 
-      payload, header = JWT.decode(token.text, public_key, true, { algorithm: 'ES256' })
+      payload, header = JWT.decode(token.text, key, true, { algorithm: 'ES256' })
 
       expect(payload['iss']).to eq(issuer_id)
+      expect(payload['sub']).to be_nil
+
+      expect(payload['iat']).to be < Time.now.to_i
       expect(payload['aud']).to eq('appstoreconnect-v1')
       expect(payload['exp']).to be > Time.now.to_i
 
       expect(header['kid']).to eq(key_id)
+      expect(header['typ']).to eq('JWT')
+    end
+
+    it 'generates proper individual token' do
+      key = OpenSSL::PKey::EC.generate('prime256v1')
+      token = Spaceship::ConnectAPI::Token.new(key_id: key_id, key: key)
+      expect(token.key_id).to eq(key_id)
+      expect(token.issuer_id).to be_nil
+
+      payload, header = JWT.decode(token.text, key, true, { algorithm: 'ES256' })
+
+      expect(payload['sub']).to eq('user')
+      expect(payload['iss']).to be_nil
+
+      expect(payload['iat']).to be < Time.now.to_i
+      expect(payload['aud']).to eq('appstoreconnect-v1')
+      expect(payload['exp']).to be > Time.now.to_i
+
+      expect(header['kid']).to eq(key_id)
+      expect(header['typ']).to eq('JWT')
+    end
+
+    describe 'audience field for JWT payload' do
+      key = OpenSSL::PKey::EC.generate('prime256v1')
+
+      it 'uses appstoreconnect when in_house is false' do
+        token = Spaceship::ConnectAPI::Token.new(key_id: key_id, key: key, in_house: false)
+        payload, = JWT.decode(token.text, key, true, { algorithm: 'ES256' })
+        expect(payload['aud']).to eq('appstoreconnect-v1')
+      end
+
+      it 'uses enterprise when in_house is true' do
+        token = Spaceship::ConnectAPI::Token.new(key_id: key_id, key: key, in_house: true)
+        payload, = JWT.decode(token.text, key, true, { algorithm: 'ES256' })
+        expect(payload['aud']).to eq('apple-developer-enterprise-v1')
+      end
+    end
+  end
+
+  context '#write_key_to_file' do
+    let(:output_file) { Tempfile.new('key.p8') }
+    let(:output_path) { output_file.path }
+
+    # Same key as `private_key`, but with the whole base64 body collapsed onto a
+    # single line - the shape a key ends up in after travelling through an
+    # environment variable or a JSON payload that lost its line breaks
+    let(:single_line_private_key) do
+      lines = private_key.lines.map(&:chomp)
+      "#{lines.first}\n#{lines[1..-2].join}\n#{lines.last}\n"
+    end
+
+    def token_with_key_raw(key_raw)
+      Spaceship::ConnectAPI::Token.new(
+        key_id: key_id,
+        issuer_id: issuer_id,
+        key: OpenSSL::PKey::EC.new(private_key),
+        key_raw: key_raw
+      )
+    end
+
+    it 'rewraps a key whose base64 body is on a single line' do
+      token_with_key_raw(single_line_private_key).write_key_to_file(output_path)
+
+      expect(File.read(output_path)).to eq(private_key)
+    end
+
+    it 'wraps the base64 body at 64 characters per line' do
+      token_with_key_raw(single_line_private_key).write_key_to_file(output_path)
+
+      body = File.read(output_path).lines.map(&:chomp)[1..-2]
+
+      expect(body.size).to be > 1
+      expect(body[0..-2].map(&:size)).to all(eq(64))
+      expect(body.last.size).to be <= 64
+    end
+
+    it 'writes a key that can be read back by OpenSSL' do
+      token_with_key_raw(single_line_private_key).write_key_to_file(output_path)
+
+      written_key = OpenSSL::PKey::EC.new(File.read(output_path))
+      expect(written_key.private_key).to eq(OpenSSL::PKey::EC.new(private_key).private_key)
+    end
+
+    it 'rewraps a single line key that uses CRLF line endings' do
+      token_with_key_raw(single_line_private_key.gsub("\n", "\r\n")).write_key_to_file(output_path)
+
+      expect(File.read(output_path)).to eq(private_key)
+    end
+
+    it 'strips whitespace out of the base64 body' do
+      lines = single_line_private_key.lines.map(&:chomp)
+      spaced_key = "#{lines.first}\n#{lines[1].scan(/.{1,32}/).join(' ')}\n#{lines.last}\n"
+
+      token_with_key_raw(spaced_key).write_key_to_file(output_path)
+
+      expect(File.read(output_path)).to eq(private_key)
+    end
+
+    it 'writes an already wrapped key unchanged' do
+      token_with_key_raw(private_key).write_key_to_file(output_path)
+
+      expect(File.read(output_path)).to eq(private_key)
+    end
+
+    it 'does not raise when there is no raw key to write' do
+      expect do
+        token_with_key_raw(nil).write_key_to_file(output_path)
+      end.not_to(raise_error)
     end
   end
 end

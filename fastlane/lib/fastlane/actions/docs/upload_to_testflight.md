@@ -4,7 +4,7 @@
 
 ###### The best way to manage your TestFlight testers and builds from your terminal
 
-Pilot makes it easier to manage your app on Apple’s TestFlight. You can:
+_pilot_ makes it easier to manage your app on Apple’s TestFlight. You can:
 
 - Upload & distribute builds
 - Add & remove testers
@@ -26,7 +26,23 @@ _pilot_ uses [spaceship.airforce](https://spaceship.airforce) to interact with A
 
 # Usage
 
-For all commands you can specify the Apple ID to use using `-u felix@krausefx.com`. If you execute _pilot_ in a project already using [_fastlane_](https://fastlane.tools) the username and app identifier will automatically be determined.
+For all commands, you can either use an [API Key](#app-store-connect-api-key) or your [Apple ID](#apple-id).
+
+### App Store Connect API Key
+
+The App Store Connect API Key is the preferred authentication method (if you are able to use it).
+
+- Uses official App Store Connect API
+- No need for 2FA
+- Better performance over Apple ID
+
+Specify the API key using `--api_key_path ./path/to/api_key_info.json` or `--api_key "{\"key_id\": \"D83848D23\", \"issuer_id\": \"227b0bbf-ada8-458c-9d62-3d8022b7d07f\", \"key_filepath\": \"D83848D23.p8\"}"`
+
+Go to [Using App Store Connect API](/app-store-connect-api) for information on obtaining an API key, the _fastlane_ `api_key_info.json` format, and other API key usage.
+
+### Apple ID
+
+Specify the Apple ID to use using `-u felix@krausefx.com`. If you execute _pilot_ in a project already using [_fastlane_](https://fastlane.tools) the username and app identifier will automatically be determined.
 
 ## Uploading builds
 
@@ -61,7 +77,19 @@ _pilot_ does all kinds of magic for you:
 - Automatically detects the bundle identifier from your `ipa` file
 - Automatically fetch the AppID of your app based on the bundle identifier
 
-_pilot_ uses [_spaceship_](https://spaceship.airforce) to submit the build metadata and the iTunes Transporter to upload the binary. Because iTunes Transporter's upload capability is only supported on OS X, `pilot upload` does not work on Linux, as described [in this issue](https://github.com/fastlane/fastlane/issues/5789)
+_pilot_ uses [_spaceship_](https://spaceship.airforce) to submit the build metadata and the iTunes Transporter to upload the binary.
+
+### Upload from Linux
+
+To upload binaries from Linux:
+
+- have the package file and the `AppStoreInfo.plist` file in the same location on disk (_check [fastlane gym](https://docs.fastlane.tools/actions/gym/) on how to make them_)
+- make sure you have [Transporter on Linux](https://help.apple.com/itc/transporteruserguide/en.lproj/static.html) installed
+- set the following environment variables:
+    - `FASTLANE_ITUNES_TRANSPORTER_USE_SHELL_SCRIPT=true`
+    - `FASTLANE_ITUNES_TRANSPORTER_PATH=/usr/local/itms` (_or the path where Transporter is installed_)
+
+_Note: fastlane will temporarily save the upload credentials in `$HOME/.appstoreconnect/private_keys/`. Any other files in that directory will be deleted upon upload completion._
 
 ## List builds
 
@@ -119,16 +147,16 @@ The output will look like this:
 
 ### Add a new tester
 
-To add a new tester to both your App Store Connect account and to your app (if given), use the `pilot add` command. This will create a new tester (if necessary) or add an existing tester to the app to test.
+To add a new tester to your App Store Connect account and to associate it to at least one testing group of your app, use the `pilot add` command. This will create a new tester (if necessary) or add an existing tester to the app to test.
 
 ```no-highlight
-fastlane pilot add email@invite.com
+fastlane pilot add email@invite.com -g group-1,group-2
 ```
 
 Additionally you can specify the app identifier (if necessary):
 
 ```no-highlight
-fastlane pilot add email@email.com -a com.krausefx.app
+fastlane pilot add email@email.com -a com.krausefx.app -g group-1,group-2
 ```
 
 ### Find a tester
@@ -157,10 +185,16 @@ The resulting output will look like this:
 
 ### Remove a tester
 
-This command will only remove external beta testers.
+This command will remove beta tester from app (from all internal and external groups)
 
 ```no-highlight
 fastlane pilot remove felix@krausefx.com
+```
+
+You can also use `groups` option to remove the tester from the groups specified:
+
+```no-highlight
+fastlane pilot remove felix@krausefx.com -g group-1,group-2
 ```
 
 ### Export testers
@@ -202,7 +236,7 @@ fastlane pilot upload --verbose
 
 ## Firewall Issues
 
-_pilot_ uses the iTunes Transporter to upload metadata and binaries. In case you are behind a firewall, you can specify a different transporter protocol from the command line using
+_pilot_ uses the iTunes [Transporter](https://help.apple.com/itc/transporteruserguide/#/apdATD1E1288-D1E1A1303-D1E1288A1126) to upload metadata and binaries. In case you are behind a firewall, you can specify a different transporter protocol from the command line using
 
 ```no-highlight
 DELIVER_ITMSTRANSPORTER_ADDITIONAL_UPLOAD_PARAMETERS="-t DAV" pilot ...
@@ -215,6 +249,10 @@ ENV["DELIVER_ITMSTRANSPORTER_ADDITIONAL_UPLOAD_PARAMETERS"] = "-t DAV"
 pilot...
 ```
 
+Note, however, that Apple recommends you don’t specify the `-t transport` and instead allow Transporter to use automatic transport discovery to determine the best transport mode for your packages. For this reason, if the `t` option is passed, we will raise a warning.
+
+Also note that `-t` is not the only additional parameter that can be used. The string specified in the `DELIVER_ITMSTRANSPORTER_ADDITIONAL_UPLOAD_PARAMETERS` environment variable will be forwarded to Transporter. For all the available options, check [Apple's Transporter User Guide](https://help.apple.com/itc/transporteruserguide/#/apdATD1E1288-D1E1A1303-D1E1288A1126).
+
 ## Credentials Issues
 
 If your password contains special characters, _pilot_ may throw a confusing error saying your "Your Apple ID or password was entered incorrectly". The easiest way to fix this error is to change your password to something that **does not** contains special characters.
@@ -226,6 +264,12 @@ _pilot_ uses the [CredentialsManager](https://github.com/fastlane/fastlane/tree/
 ## Provider Short Name
 If you are on multiple App Store Connect teams, iTunes Transporter may need a provider short name to know where to upload your binary. _pilot_ will try to use the long name of the selected team to detect the provider short name. To override the detected value with an explicit one, use the `itc_provider` option.
 
+## Provider Public ID
+The provider public ID to be used with altool (--provider-public-id). This value will override the automatically detected provider value for altool uploads. Required after Xcode 26 when your account is associated with multiple providers and using username/app-password authentication.
+
 ## Use an Application Specific Password to upload
 
-_pilot_/`upload_to_testflight` can use an [Application Specific Password via the `FASTLANE_APPLE_APPLICATION_SPECIFIC_PASSWORD` envirionment variable](https://docs.fastlane.tools/best-practices/continuous-integration/#application-specific-passwords) to upload a binary if both the `skip_waiting_for_build_processing` and `apple_id` options are set. (If any of those are not set, it will use the normal Apple login process that might require 2FA authentication.)
+_pilot_/`upload_to_testflight` can use an [Application Specific Password via the `FASTLANE_APPLE_APPLICATION_SPECIFIC_PASSWORD` environment variable](https://docs.fastlane.tools/best-practices/continuous-integration/#application-specific-passwords) to upload a binary if both the `skip_waiting_for_build_processing` and `apple_id` options are set. (If any of those are not set, it will use the normal Apple login process that might require 2FA authentication.)
+
+## Role for App Store Connect User
+_pilot_/`upload_to_testflight` updates build information and testers after the build has finished processing. App Store Connect requires the  "App Manager" or "Admin" role for your Apple account to update this information. The "Developer" role will allow builds to be uploaded but _will not_ allow updating of build information and testers.

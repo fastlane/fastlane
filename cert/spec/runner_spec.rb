@@ -8,13 +8,55 @@ describe Cert do
     end
 
     xcode_versions = {
-      "10" => Spaceship.certificate.production,
-      "11" => Spaceship.certificate.apple_distribution
+      "16" => Spaceship.certificate.apple_distribution
     }
 
     # Iterates over different Xcode versions to test different cert types
-    # Xcode 10 and earlier - Spaceship.certificate.production
     # Xcode 11 and later - Spaceship.certificate.apple_distribution
+    describe "#create_certificate" do
+      let(:temp) { Dir.mktmpdir('fl_spec_cert') }
+      let(:private_key_path) { File.join(temp, "cert_id.p12") }
+
+      around do |example|
+        old_umask = File.umask(0o022)
+        begin
+          example.run
+        ensure
+          File.umask(old_umask)
+          FileUtils.rm_rf(temp)
+          ENV.delete("CER_CERTIFICATE_ID")
+          ENV.delete("CER_FILE_PATH")
+        end
+      end
+
+      before do
+        allow(FastlaneCore::Helper).to receive(:mac?).and_return(false)
+        csr = double("csr", to_pem: "csr")
+        allow(Spaceship::ConnectAPI::Certificate).to receive(:create_certificate_signing_request).and_return([csr, "pkey"])
+        allow(Spaceship::ConnectAPI::Certificate).to receive(:create).and_return(stub_certificate)
+        Cert.config = FastlaneCore::Configuration.create(Cert::Options.available_options, output_path: temp)
+      end
+
+      def create_certificate
+        runner = Cert::Runner.new
+        allow(runner).to receive(:certificate_type).and_return(Spaceship::ConnectAPI::Certificate::CertificateType::IOS_DISTRIBUTION)
+        runner.create_certificate
+      end
+
+      it "creates the private key readable only by its owner" do
+        create_certificate
+        expect(File.stat(private_key_path).mode & 0o777).to eq(0o600) unless FastlaneCore::Helper.windows?
+      end
+
+      it "makes an existing private key file readable only by its owner" do
+        File.write(private_key_path, "old")
+        File.chmod(0o644, private_key_path)
+        create_certificate
+        expect(File.read(private_key_path)).to eq("pkey")
+        expect(File.stat(private_key_path).mode & 0o777).to eq(0o600) unless FastlaneCore::Helper.windows?
+      end
+    end
+
     xcode_versions.each do |xcode_version, dist_cert_type|
       context "Xcode #{xcode_version}" do
         before do
@@ -25,11 +67,11 @@ describe Cert do
         it "Successful run" do
           certificate = stub_certificate
 
-          allow(Spaceship).to receive(:login).and_return(nil)
-          allow(Spaceship).to receive(:client).and_return("client")
-          allow(Spaceship).to receive(:select_team).and_return(nil)
-          allow(Spaceship.client).to receive(:in_house?).and_return(false)
-          allow(dist_cert_type).to receive(:all).and_return([certificate])
+          allow(Spaceship::ConnectAPI).to receive(:login).and_return(nil)
+          allow(Spaceship::ConnectAPI).to receive(:client).and_return(+"client")
+          allow(Spaceship::ConnectAPI.client).to receive(:in_house?).and_return(false)
+
+          allow(Spaceship::ConnectAPI::Certificate).to receive(:all).and_return([certificate])
 
           certificate_path = "#{Dir.pwd}/cert_id.cer"
           keychain_path = Dir.pwd.to_s
@@ -49,49 +91,54 @@ describe Cert do
         end
 
         it "correctly selects expired certificates" do
-          expired_cert = stub_certificate(Time.now.utc - 1)
+          # Cert.config is module level and the example above assigns it from
+          # its own body, so this one passed only when that had run first. See
+          # fastlane#30184.
+          Cert.config = FastlaneCore::Configuration.create(Cert::Options.available_options, keychain_path: ".")
+
+          expired_cert = stub_certificate("expired_cert", false)
           good_cert = stub_certificate
 
-          allow(Spaceship).to receive(:client).and_return("client")
-          allow(Spaceship.client).to receive(:in_house?).and_return(false)
-          allow(dist_cert_type).to receive(:all).and_return([expired_cert, good_cert])
+          allow(Spaceship::ConnectAPI).to receive(:login).and_return(nil)
+          allow(Spaceship::ConnectAPI).to receive(:client).and_return(+"client")
+          allow(Spaceship::ConnectAPI.client).to receive(:in_house?).and_return(false)
+
+          allow(Spaceship::ConnectAPI::Certificate).to receive(:all).and_return([expired_cert, good_cert])
 
           expect(Cert::Runner.new.expired_certs).to eq([expired_cert])
         end
 
         it "revokes expired certificates via revoke_expired sub-command" do
-          expired_cert = stub_certificate(Time.now.utc - 1)
+          expired_cert = stub_certificate("expired_cert", false)
           good_cert = stub_certificate
 
-          allow(Spaceship).to receive(:login).and_return(nil)
-          allow(Spaceship).to receive(:client).and_return("client")
-          allow(Spaceship).to receive(:select_team).and_return(nil)
-          allow(Spaceship.client).to receive(:in_house?).and_return(false)
-          allow(dist_cert_type).to receive(:all).and_return([expired_cert, good_cert])
+          allow(Spaceship::ConnectAPI).to receive(:login).and_return(nil)
+          allow(Spaceship::ConnectAPI).to receive(:client).and_return(+"client")
+          allow(Spaceship::ConnectAPI.client).to receive(:in_house?).and_return(false)
+          allow(Spaceship::ConnectAPI::Certificate).to receive(:all).and_return([expired_cert, good_cert])
 
           allow(FastlaneCore::CertChecker).to receive(:installed?).and_return(true)
 
-          expect(expired_cert).to receive(:revoke!)
-          expect(good_cert).to_not(receive(:revoke!))
+          expect(expired_cert).to receive(:delete!)
+          expect(good_cert).to_not(receive(:delete!))
 
           Cert.config = FastlaneCore::Configuration.create(Cert::Options.available_options, keychain_path: ".")
           Cert::Runner.new.revoke_expired_certs!
         end
 
         it "tries to revoke all expired certificates even if one has an error" do
-          expired_cert_1 = stub_certificate(Time.now.utc - 1)
-          expired_cert_2 = stub_certificate(Time.now.utc - 1)
+          expired_cert_1 = stub_certificate("expired_cert_1", false)
+          expired_cert_2 = stub_certificate("expired_cert_2", false)
 
-          allow(Spaceship).to receive(:login).and_return(nil)
-          allow(Spaceship).to receive(:client).and_return("client")
-          allow(Spaceship).to receive(:select_team).and_return(nil)
-          allow(Spaceship.client).to receive(:in_house?).and_return(false)
-          allow(dist_cert_type).to receive(:all).and_return([expired_cert_1, expired_cert_2])
+          allow(Spaceship::ConnectAPI).to receive(:login).and_return(nil)
+          allow(Spaceship::ConnectAPI).to receive(:client).and_return(+"client")
+          allow(Spaceship::ConnectAPI.client).to receive(:in_house?).and_return(false)
+          allow(Spaceship::ConnectAPI::Certificate).to receive(:all).and_return([expired_cert_1, expired_cert_2])
 
           allow(FastlaneCore::CertChecker).to receive(:installed?).and_return(true)
 
-          expect(expired_cert_1).to receive(:revoke!).and_raise("Boom!")
-          expect(expired_cert_2).to receive(:revoke!)
+          expect(expired_cert_1).to receive(:delete!).and_raise("Boom!")
+          expect(expired_cert_2).to receive(:delete!)
 
           Cert.config = FastlaneCore::Configuration.create(Cert::Options.available_options, keychain_path: ".")
           Cert::Runner.new.revoke_expired_certs!
@@ -99,7 +146,8 @@ describe Cert do
 
         describe ":filename option handling" do
           filename = ""
-          let(:temp) { Dir.tmpdir }
+          # A directory of its own: Dir.tmpdir is the shared temp root, so parallel test processes would collide. See fastlane#30184.
+          let(:temp) { Dir.mktmpdir('fl_spec_cert') }
           let(:certificate) { stub_certificate }
           let(:filepath) do
             filename_ext = File.extname(filename) == ".cer" ? filename : "#{filename}.cer"
@@ -107,11 +155,11 @@ describe Cert do
           end
 
           before do
-            allow(Spaceship).to receive(:login).and_return(nil)
-            allow(Spaceship).to receive(:client).and_return("client")
-            allow(Spaceship).to receive(:select_team).and_return(nil)
-            allow(Spaceship.client).to receive(:in_house?).and_return(false)
-            allow(dist_cert_type).to receive(:all).and_return([certificate])
+            allow(Spaceship::ConnectAPI).to receive(:login).and_return(nil)
+            allow(Spaceship::ConnectAPI).to receive(:client).and_return(+"client")
+            allow(Spaceship::ConnectAPI.client).to receive(:in_house?).and_return(false)
+            allow(Spaceship::ConnectAPI::Certificate).to receive(:all).and_return([certificate])
+
             allow(FastlaneCore::CertChecker).to receive(:installed?).and_return(true)
           end
 

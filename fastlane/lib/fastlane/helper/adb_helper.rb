@@ -24,7 +24,7 @@ module Fastlane
           adb_path = File.join(android_home, "platform-tools", "adb")
         end
 
-        self.adb_path = File.expand_path(adb_path)
+        self.adb_path = Helper.get_executable_path(File.expand_path(adb_path))
         self.adb_host = adb_host
       end
 

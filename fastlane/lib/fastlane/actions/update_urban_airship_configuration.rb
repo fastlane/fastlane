@@ -34,7 +34,7 @@ module Fastlane
                                        env_name: "URBAN_AIRSHIP_PLIST_PATH",
                                        description: "Path to Urban Airship configuration Plist",
                                        verify_block: proc do |value|
-                                         UI.user_errror!("Could not find Urban Airship plist file") unless File.exist?(value)
+                                         UI.user_error!("Could not find Urban Airship plist file") unless File.exist?(value)
                                        end),
           FastlaneCore::ConfigItem.new(key: :development_app_key,
                                        optional: true,
@@ -58,7 +58,6 @@ module Fastlane
                                        description: "The production app secret"),
           FastlaneCore::ConfigItem.new(key: :detect_provisioning_mode,
                                        env_name: "URBAN_AIRSHIP_DETECT_PROVISIONING_MODE",
-                                       is_string: false,
                                        type: Boolean,
                                        optional: true,
                                        description: "Automatically detect provisioning mode")

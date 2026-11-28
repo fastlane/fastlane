@@ -33,11 +33,11 @@ module Fastlane
 
     # Used to expose a local binding for use in ERB templating
     #
-    # rubocop:disable Style/AccessorMethodName
+    # rubocop:disable Naming/AccessorMethodName
     def get_binding
       binding
     end
-    # rubocop:enable Style/AccessorMethodName
+    # rubocop:enable Naming/AccessorMethodName
 
     def ==(other)
       @plugin_name == other.plugin_name &&

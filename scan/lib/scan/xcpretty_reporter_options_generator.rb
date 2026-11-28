@@ -13,7 +13,7 @@ module Scan
                Scan.config[:xcpretty_args])
     end
 
-    # Intialize with values from Scan.config matching these param names
+    # Initialize with values from Scan.config matching these param names
     def initialize(open_report, output_types, output_files, output_directory, use_clang_report_name, xcpretty_args)
       @open_report = open_report
       @output_types = output_types
@@ -49,7 +49,7 @@ module Scan
         type = raw_type.strip
         output_path = File.join(File.expand_path(@output_directory), determine_output_file_name(type))
         reporter << "--report #{type}"
-        reporter << "--output '#{output_path}'"
+        reporter << "--output #{output_path.shellescape}"
 
         if type == "html" && @open_report
           Scan.cache[:open_html_report_path] = output_path
@@ -62,7 +62,7 @@ module Scan
       @temp_junit_report = Tempfile.new("junit_report")
       Scan.cache[:temp_junit_report] = @temp_junit_report.path
       reporter << "--report junit"
-      reporter << "--output '#{Scan.cache[:temp_junit_report]}'"
+      reporter << "--output #{Scan.cache[:temp_junit_report].shellescape}"
       return reporter
     end
 

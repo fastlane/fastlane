@@ -1,5 +1,6 @@
 require 'commander'
 require 'fastlane/new_action'
+require 'fastlane_core/ui/help_formatter'
 
 HighLine.track_eof = false
 
@@ -35,7 +36,8 @@ module Fastlane
       # do not use "include" as it may be some where in the commandline where "env" is required, therefore explicit index->0
       unless ARGV[0] == "env" || CLIToolsDistributor.running_version_command? || CLIToolsDistributor.running_help_command?
         # *after* loading the plugins
-        Fastlane.plugin_manager.load_plugins
+        hide_plugins_table = FastlaneCore::Env.truthy?("FASTLANE_HIDE_PLUGINS_TABLE")
+        Fastlane.plugin_manager.load_plugins(print_table: !hide_plugins_table)
         Fastlane::PluginUpdateManager.start_looking_for_updates
       end
       self.new.run
@@ -66,7 +68,7 @@ module Fastlane
       return if $troubleshoot
       UI.error("---")
       UI.error("Are you sure you want to enable '--troubleshoot'?")
-      UI.error("All commmands will run in full unfiltered output mode.")
+      UI.error("All commands will run in full unfiltered output mode.")
       UI.error("Sensitive data, like passwords, could be printed to the log.")
       UI.error("---")
       if UI.confirm("Do you really want to enable --troubleshoot")
@@ -85,7 +87,7 @@ module Fastlane
       program :help, 'Author', 'Felix Krause <fastlane@krausefx.com>'
       program :help, 'Website', 'https://fastlane.tools'
       program :help, 'GitHub', 'https://github.com/fastlane/fastlane'
-      program :help_formatter, :compact
+      program :help_formatter, FastlaneCore::HelpFormatter
 
       global_option('--verbose') { FastlaneCore::Globals.verbose = true }
       global_option('--capture_output', 'Captures the output of the current run, and generates a markdown issue template') do
@@ -142,11 +144,16 @@ module Fastlane
         c.option('-s', '--stay_alive', 'Keeps socket server up even after error or disconnects, requires CTRL-C to kill.')
         c.option('-c seconds', '--connection_timeout', 'Sets connection established timeout')
         c.option('-p port', '--port', "Sets the port on localhost for the socket connection")
+        c.option('--token_file path', "File holding the token every command must carry (default: FASTLANE_SOCKET_SERVER_TOKEN_FILE)")
         c.action do |args, options|
           default_connection_timeout = 5
           stay_alive = options.stay_alive || false
           connection_timeout = options.connection_timeout || default_connection_timeout
           port = options.port || 2000
+          token_file = options.token_file || ENV["FASTLANE_SOCKET_SERVER_TOKEN_FILE"]
+          token = File.read(token_file).strip if token_file
+          UI.user_error!("The token file #{token_file} is empty") if token_file && token.empty?
+          UI.important("No --token_file given: any local process that connects first can run actions") unless token
 
           if stay_alive && options.connection_timeout.nil?
             UI.important("stay_alive is set, but the connection timeout is not, this will give you #{default_connection_timeout} seconds to (re)connect")
@@ -160,7 +167,8 @@ module Fastlane
             command_executor: command_executor,
             connection_timeout: connection_timeout,
             stay_alive: stay_alive,
-            port: port
+            port: port,
+            token: token
           )
           result = server.start
           UI.success("Result: #{result}") if result
@@ -209,7 +217,7 @@ module Fastlane
         c.action do |args, options|
           if ensure_fastfile
             ff = Fastlane::FastFile.new(File.join(FastlaneCore::FastlaneFolder.path || '.', 'Fastfile'))
-            UI.message("You don't need to run `fastlane docs` manually any more, this will be done automatically for you when running a lane.")
+            UI.message("You don't need to run `fastlane docs` manually anymore, this will be done automatically for you when running a lane.")
             Fastlane::DocsGenerator.run(ff)
           end
         end
@@ -231,19 +239,31 @@ module Fastlane
         c.description = 'Lists all available fastlane actions'
 
         c.option('--platform STRING', String, 'Only show actions available on the given platform')
+        c.option("-j", "--json", "Output a summary of each action in JSON instead of text")
 
         c.action do |args, options|
           require 'fastlane/documentation/actions_list'
-          Fastlane::ActionsList.run(filter: args.first, platform: options.platform)
+          Fastlane::ActionsList.run(filter: args.first, platform: options.platform, json: options.json)
         end
       end
 
       command :action do |c|
         c.syntax = 'fastlane action [tool_name]'
         c.description = 'Shows more information for a specific command'
+        c.option("-j", "--json", "Output the action's details in JSON instead of text")
+
         c.action do |args, options|
           require 'fastlane/documentation/actions_list'
-          Fastlane::ActionsList.run(filter: args.first)
+          Fastlane::ActionsList.run(filter: args.first, json: options.json)
+        end
+      end
+
+      command :console do |c|
+        c.syntax = 'fastlane console'
+        c.description = 'Opens an interactive developer console'
+        c.action do |args, options|
+          require 'fastlane/console'
+          Fastlane::Console.execute(args, options)
         end
       end
 

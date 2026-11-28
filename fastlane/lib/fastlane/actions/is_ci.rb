@@ -35,7 +35,7 @@ module Fastlane
 
       def self.example_code
         [
-          'if is_ci?
+          'if is_ci
             puts "I\'m a computer"
           else
             say "Hi Human!"
