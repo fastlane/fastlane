@@ -28,7 +28,9 @@ module Match
 
     def run(params, type: nil)
       self.params = params
-      self.type = type
+      # The match_nuke action passes a symbol, the CLI a string
+      self.type = type.to_s
+      self.safe_remove_certs = params[:safe_remove_certs] || false
 
       update_optional_values_depending_on_storage_type(params)
 
@@ -53,8 +55,6 @@ module Match
                                          hide_keys: [:app_identifier],
                                              title: "Summary for match nuke #{Fastlane::VERSION}")
 
-      self.safe_remove_certs = params[:safe_remove_certs] || false
-
       prepare_list
       filter_by_cert
       print_tables
@@ -69,7 +69,7 @@ module Match
           remove_or_revoke_message = self.safe_remove_certs ? "remove" : "revoke"
           UI.error("Are you sure you want to completely delete and #{remove_or_revoke_message} all the")
           UI.error("certificates and delete provisioning profiles listed above? (y/n)")
-          UI.error("Warning: By nuking distribution, both App Store and Ad Hoc profiles will be deleted") if type == "distribution"
+          UI.error("Warning: By nuking distribution, both App Store and Ad Hoc profiles will be deleted") if self.type == "distribution"
           UI.error("Warning: The :app_identifier value will be ignored - this will delete all profiles for all your apps!") if had_app_identifier
           UI.error("---")
           print_safe_remove_certs_hint
