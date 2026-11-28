@@ -33,6 +33,19 @@ describe Sigh do
       expect(provisioning_options).to eq("-p #{tmp_path}/folder/mobile.mobileprovision")
     end
 
+    it "Create entitlements options from a string, for every bundle" do
+      expect(@resign.create_entitlements_options("My App.entitlements")).to eq("-e #{'My App.entitlements'.shellescape}")
+    end
+
+    it "Create entitlements options from hash" do
+      tmp_path = Dir.mktmpdir
+      entitlements = {
+        "at.fastlane" => "#{tmp_path}/app.entitlements",
+        "at.fastlane.today" => "#{tmp_path}/today.entitlements"
+      }
+      expect(@resign.create_entitlements_options(entitlements)).to eq("-e at.fastlane=#{tmp_path}/app.entitlements -e at.fastlane.today=#{tmp_path}/today.entitlements")
+    end
+
     describe "version options" do
       def resign_command(version: nil, short_version: nil, bundle_version: nil)
         command = nil

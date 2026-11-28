@@ -165,6 +165,8 @@ fi
 ORIGINAL_FILE="$1"
 CERTIFICATE="$2"
 ENTITLEMENTS=
+RAW_ENTITLEMENTS=()
+ENTITLEMENTS_BY_ID=()
 BUNDLE_IDENTIFIER=""
 DISPLAY_NAME=""
 KEYCHAIN=""
@@ -195,7 +197,7 @@ while [ "$1" != "" ]; do
             ;;
         -e | --entitlements )
             shift
-            ENTITLEMENTS="$1"
+            RAW_ENTITLEMENTS+=("$1")
             ;;
         -d | --display-name )
             shift
@@ -270,7 +272,13 @@ done
 log "Original file: '$ORIGINAL_FILE'"
 log "Certificate: '$CERTIFICATE'"
 [[ -n "${DISPLAY_NAME}" ]] && log "Specified display name: '$DISPLAY_NAME'"
-[[ -n "${ENTITLEMENTS}" ]] && log "Specified signing entitlements: '$ENTITLEMENTS'"
+for entitlements in "${RAW_ENTITLEMENTS[@]}"; do
+    if [[ "$entitlements" =~ .+=.+ ]]; then
+        log "Specified signing entitlements: '${entitlements#*=}' for bundle identifier: '${entitlements%%=*}'"
+    else
+        log "Specified signing entitlements: '$entitlements'"
+    fi
+done
 [[ -n "${BUNDLE_IDENTIFIER}" ]] && log "Specified bundle identifier: '$BUNDLE_IDENTIFIER'"
 [[ -n "${KEYCHAIN}" ]] && log "Specified keychain to use: '$KEYCHAIN'"
 [[ -n "${VERSION_NUMBER}" ]] && log "Specified version number to use: '$VERSION_NUMBER'"
@@ -285,7 +293,7 @@ log "Certificate: '$CERTIFICATE'"
 [[ -n "$VERSION_NUMBER" && (-n "$SHORT_VERSION" || -n "$BUNDLE_VERSION") ]] && error "versionNumber option cannot be used in combination with shortVersion or bundleVersion options"
 
 # Check that --use-app-entitlements and -e, --entitlements are not used at the same time
-[[ -n "${USE_APP_ENTITLEMENTS}" && -n ${ENTITLEMENTS} ]] && error "--use-app-entitlements option cannot be used in combination with -e, --entitlements option."
+[[ -n "${USE_APP_ENTITLEMENTS}" && "${#RAW_ENTITLEMENTS[*]}" != "0" ]] && error "--use-app-entitlements option cannot be used in combination with -e, --entitlements option."
 
 # Check output file name
 if [ -z "$NEW_FILE" ]; then
@@ -382,6 +390,17 @@ function provision_for_bundle_id {
     done
 }
 
+# Find the entitlements file given for a bundle identifier with -e BUNDLE_ID=PATH, if any
+function entitlements_for_bundle_id {
+
+    for ARG in "${ENTITLEMENTS_BY_ID[@]}"; do
+        if does_bundle_id_match "${ARG%%=*}" "$1"; then
+            echo "${ARG#*=}"
+            break
+        fi
+    done
+}
+
 # Print the plist inside a provisioning profile. Unlike `security cms -D`, this imports no certificate
 # into the default keychain (#30186). Like it, it does not check the signature.
 function decode_provision {
@@ -437,6 +456,16 @@ for ARG in "${RAW_PROVISIONS[@]}"; do
     add_provision "$ARG"
 done
 
+# Load the entitlements files: BUNDLE_ID=PATH for that bundle, a plain PATH for every bundle (the last one wins)
+for ARG in "${RAW_ENTITLEMENTS[@]}"; do
+    if [[ "$ARG" =~ .+=.+ ]]; then
+        [[ -e "${ARG#*=}" ]] || error "Entitlements file '${ARG#*=}' does not exist"
+        ENTITLEMENTS_BY_ID+=("$ARG")
+    else
+        ENTITLEMENTS="$ARG"
+    fi
+done
+
 # Resign the given application
 function resign {
 
@@ -464,6 +493,8 @@ function resign {
     local CURRENT_NAME=$(PlistBuddy -c "Print :CFBundleDisplayName" "$APP_PATH/Info.plist")
     local CURRENT_BUNDLE_IDENTIFIER=$(PlistBuddy -c "Print :CFBundleIdentifier" "$APP_PATH/Info.plist")
     local NEW_PROVISION=$(provision_for_bundle_id "${BUNDLE_IDENTIFIER:-$CURRENT_BUNDLE_IDENTIFIER}")
+    local BUNDLE_ENTITLEMENTS=$(entitlements_for_bundle_id "${BUNDLE_IDENTIFIER:-$CURRENT_BUNDLE_IDENTIFIER}")
+    local ENTITLEMENTS="${BUNDLE_ENTITLEMENTS:-$ENTITLEMENTS}"
 
     if [[ "$NEW_PROVISION" == "" && "$NESTED" != NESTED ]]; then
         NEW_PROVISION="$DEFAULT_PROVISION"

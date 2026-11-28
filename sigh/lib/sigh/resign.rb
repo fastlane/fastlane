@@ -42,7 +42,7 @@ module Sigh
 
       # validate that we have valid values for all these params, we don't need to check signing_identity because `find_signing_identity` will only ever return a valid value
       validate_params(resign_path, ipa, provisioning_profiles)
-      entitlements = "-e #{entitlements.shellescape}" if entitlements
+      entitlements = create_entitlements_options(entitlements) if entitlements
 
       provisioning_options = create_provisioning_options(provisioning_profiles)
       version = "-n #{version.shellescape}" if version
@@ -134,6 +134,15 @@ module Sigh
       identities = installed_identities
       return signing_identity if identities.keys.include?(signing_identity)
       identities.key(signing_identity)
+    end
+
+    # A String: one entitlements file for every bundle, as before.
+    # A Hash (from the command line: [bundle_id, path] pairs): one file per bundle identifier, "-e at.fastlane=/folder/app.entitlements".
+    def create_entitlements_options(entitlements)
+      entitlements = [entitlements] unless entitlements.kind_of?(Enumerable)
+      entitlements.map do |bundle_id, path|
+        path ? "-e #{bundle_id.shellescape}=#{File.expand_path(path).shellescape}" : "-e #{bundle_id.shellescape}"
+      end.join(' ')
     end
 
     def create_provisioning_options(provisioning_profiles)
