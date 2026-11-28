@@ -23,7 +23,8 @@ module Match
         git_url: params[:git_url],
         s3_bucket: params[:s3_bucket],
         s3_skip_encryption: params[:s3_skip_encryption],
-        working_directory: storage.working_directory
+        working_directory: storage.working_directory,
+        force_legacy_encryption: params[:force_legacy_encryption]
       })
       encryption.decrypt_files if encryption
       UI.success("Repo is at: '#{storage.working_directory}'")

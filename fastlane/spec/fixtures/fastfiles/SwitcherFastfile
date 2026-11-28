@@ -1,5 +1,5 @@
 def path
-  "/tmp/deliver_result.txt"
+  "#{FASTLANE_SPEC_SCRATCH}/deliver_result.txt"
 end
 
 lane :so_shared do |values|

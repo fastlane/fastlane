@@ -128,11 +128,12 @@ module FastlaneCore
         end
       end
 
+      # nil when there is no simulator for the device, such as snapshot's "Mac"
       def latest_simulator_version_for_device(device)
         simulators.select { |s| s.name == device }
                   .sort_by { |s| Gem::Version.create(s.os_version) }
                   .last
-                  .os_version
+                  &.os_version
       end
 
       # The code below works from Xcode 7 on
@@ -202,18 +203,17 @@ module FastlaneCore
 
       def boot
         return unless is_simulator
-        return unless os_type == "iOS"
         return if self.state == 'Booted'
 
         # Boot the simulator and wait for it to finish booting
         UI.message("Booting #{self}")
-        `xcrun simctl bootstatus #{self.udid} -b &> /dev/null`
+        output, status = Open3.capture2e("xcrun simctl bootstatus #{self.udid} -b")
+        UI.important("Unable to boot #{self}: #{output.strip}") unless status.success?
         self.state = 'Booted'
       end
 
       def shutdown
         return unless is_simulator
-        return unless os_type == "iOS"
         return if self.state != 'Booted'
 
         UI.message("Shutting down #{self.udid}")
@@ -243,7 +243,7 @@ module FastlaneCore
         plist_buddy_cmd = "-c \"Add :KeyboardContinuousPathEnabled bool false\""
         plist_path = File.expand_path("~/Library/Developer/CoreSimulator/Devices/#{self.udid}/data/Library/Preferences/com.apple.keyboard.ContinuousPath.plist")
 
-        Helper.backticks("#{plist_buddy} #{plist_buddy_cmd} #{plist_path} >/dev/null 2>&1")
+        Helper.backticks("#{plist_buddy} #{plist_buddy_cmd} #{plist_path.shellescape} >/dev/null 2>&1")
       end
     end
   end
@@ -300,7 +300,7 @@ module FastlaneCore
 
         UI.verbose("Launching #{simulator_path} for device: #{device.name} (#{device.udid})")
 
-        Helper.backticks("open -a #{simulator_path} --args -CurrentDeviceUDID #{device.udid}", print: FastlaneCore::Globals.verbose?)
+        Helper.backticks("open -a #{simulator_path.shellescape} --args -CurrentDeviceUDID #{device.udid}", print: FastlaneCore::Globals.verbose?)
       end
 
       def copy_logs(device, log_identity, logs_destination_dir, log_collection_start_time)
@@ -322,11 +322,7 @@ module FastlaneCore
         UI.verbose("Uninstalling app '#{app_identifier}' from #{device_type}...")
 
         UI.message("Launch Simulator #{device_type}")
-        if FastlaneCore::Helper.xcode_at_least?("13")
-          Helper.backticks("open -a Simulator.app --args -CurrentDeviceUDID #{device_udid} &> /dev/null")
-        else
-          Helper.backticks("xcrun instruments -w #{device_udid} &> /dev/null")
-        end
+        Helper.backticks("open -a Simulator.app --args -CurrentDeviceUDID #{device_udid} &> /dev/null")
 
         UI.message("Uninstall application #{app_identifier}")
         Helper.backticks("xcrun simctl uninstall #{device_udid} #{app_identifier} &> /dev/null")
@@ -356,8 +352,18 @@ module FastlaneCore
         logs_collection_start = log_collection_start_time.strftime('%Y-%m-%d %H:%M:%S')
         command = "xcrun simctl spawn #{device.udid} log collect "
         command << "--start '#{logs_collection_start}' "
-        command << "--output #{logarchive_dst.shellescape} 2>/dev/null"
-        FastlaneCore::CommandExecutor.execute(command: command, print_all: false, print_command: true)
+        command << "--output #{logarchive_dst.shellescape}"
+        # A simulator that is no longer booted only warrants a warning: the logs are diagnostics.
+        # Any other failure still fails the action.
+        FastlaneCore::CommandExecutor.execute(command: command,
+                                            print_all: false,
+                                        print_command: true,
+                                suppress_error_output: true,
+                                                error: proc do |output, status|
+                                                  message = "Unable to collect system logs from #{device} (exit status #{status}): #{output}"
+                                                  UI.user_error!(message) unless output.match?(/domain=com\.apple\.CoreSimulator\.SimError, code=405\b/)
+                                                  UI.important(message)
+                                                end)
       end
     end
   end

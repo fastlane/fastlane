@@ -39,9 +39,9 @@ describe Gym do
                              "xcodebuild",
                              "-scheme Example",
                              "-project ./gym/examples/standard/Example.xcodeproj",
-                             "-sdk '9.0'",
-                             "-toolchain 'com.apple.dt.toolchain.Swift_2_3'",
-                             "-destination 'generic/platform=iOS'",
+                             "-sdk 9.0",
+                             "-toolchain com.apple.dt.toolchain.Swift_2_3",
+                             "-destination generic/platform\\=iOS",
                              "-archivePath #{Gym::BuildCommandGenerator.archive_path.shellescape}",
                              "DEBUG=1 BUNDLE_NAME=Example\\ App",
                              :archive,
@@ -63,8 +63,8 @@ describe Gym do
                              "xcodebuild",
                              "-scheme Example",
                              "-project ./gym/examples/standard/Example.xcodeproj",
-                             "-sdk '9.0'",
-                             "-destination 'generic/platform=iOS'",
+                             "-sdk 9.0",
+                             "-destination generic/platform\\=iOS",
                              "-archivePath #{Gym::BuildCommandGenerator.archive_path.shellescape}",
                              "DEBUG=1 BUNDLE_NAME=Example\\ App",
                              :archive,
@@ -85,8 +85,8 @@ describe Gym do
                              "xcodebuild",
                              "-scheme Example",
                              "-project ./gym/examples/standard/Example.xcodeproj",
-                             "-sdk '9.0'",
-                             "-destination 'generic/platform=iOS'",
+                             "-sdk 9.0",
+                             "-destination generic/platform\\=iOS",
                              "-archivePath #{Gym::BuildCommandGenerator.archive_path.shellescape}",
                              "DEBUG=1 BUNDLE_NAME=Example\\ App",
                              :archive,
@@ -107,7 +107,7 @@ describe Gym do
                              "arch -arm64 xcodebuild",
                              "-scheme Example",
                              "-project ./gym/examples/standard/Example.xcodeproj",
-                             "-destination 'generic/platform=iOS'",
+                             "-destination generic/platform\\=iOS",
                              "-archivePath #{Gym::BuildCommandGenerator.archive_path.shellescape}",
                              :archive,
                              "| tee #{log_path.shellescape}",
@@ -171,7 +171,7 @@ describe Gym do
                              "xcodebuild",
                              "-scheme Example",
                              "-project ./gym/examples/standard/Example.xcodeproj",
-                             "-destination 'generic/platform=iOS'",
+                             "-destination generic/platform\\=iOS",
                              :build,
                              "| tee #{log_path.shellescape}",
                              "| xcpretty"
@@ -193,7 +193,7 @@ describe Gym do
                                "xcodebuild",
                                "-scheme Example",
                                "-project ./gym/examples/standard/Example.xcodeproj",
-                               "-destination 'generic/platform=iOS'",
+                               "-destination generic/platform\\=iOS",
                                "-archivePath #{Gym::BuildCommandGenerator.archive_path.shellescape}",
                                :archive,
                                "| tee #{log_path.shellescape}",
@@ -236,6 +236,14 @@ describe Gym do
         result = Gym::BuildCommandGenerator.xcodebuild_log_path
         expect(result.to_s).to include(File.expand_path("#{FastlaneCore::Helper.buildlog_path}/gym"))
       end
+
+      it "#xcodebuild_log_path uses app_name when provided", requires_xcodebuild: true do
+        options = { project: "./gym/examples/standard/Example.xcodeproj", buildlog_path: "/tmp/my/path", scheme: 'Example', app_name: 'CustomApp' }
+        Gym.config = FastlaneCore::Configuration.create(Gym::Options.available_options, options)
+        expect(Gym.project).not_to receive(:app_name)
+        result = Gym::BuildCommandGenerator.xcodebuild_log_path
+        expect(result).to include("CustomApp-Example.log")
+      end
     end
 
     describe "Derived Data Example" do
@@ -246,6 +254,7 @@ describe Gym do
         allow(Gym).to receive(:project).and_return(@project)
       end
       it "uses the correct build command with the example project", requires_xcodebuild: true do
+        Gym.config = FastlaneCore::Configuration.create(Gym::Options.available_options, { project: "./gym/examples/standard/Example.xcodeproj", derived_data_path: "/tmp/my/derived_data", scheme: 'Example' })
         log_path = File.expand_path("#{FastlaneCore::Helper.buildlog_path}/gym/ExampleProductName-Example.log")
 
         result = Gym::BuildCommandGenerator.generate
@@ -255,7 +264,7 @@ describe Gym do
                                "-scheme Example",
                                "-project ./gym/examples/standard/Example.xcodeproj",
                                "-derivedDataPath /tmp/my/derived_data",
-                               "-destination 'generic/platform=iOS'",
+                               "-destination generic/platform\\=iOS",
                                "-archivePath #{Gym::BuildCommandGenerator.archive_path.shellescape}",
                                :archive,
                                "| tee #{log_path.shellescape}",
@@ -277,13 +286,23 @@ describe Gym do
                                "xcodebuild",
                                "-scheme Example",
                                "-project ./gym/examples/standard/Example.xcodeproj",
-                               "-destination 'generic/platform=iOS'",
+                               "-destination generic/platform\\=iOS",
                                "-archivePath #{Gym::BuildCommandGenerator.archive_path.shellescape}",
-                               "-resultBundlePath './ExampleProductName.result'",
+                               "-resultBundlePath ./ExampleProductName.xcresult",
                                :archive,
                                "| tee #{log_path.shellescape}",
                                "| xcpretty"
                              ])
+      end
+
+      it "keeps an output name with an apostrophe and a space as one argument", requires_xcodebuild: true do
+        options = { project: "./gym/examples/standard/Example.xcodeproj", result_bundle: true, scheme: 'Example', output_name: "Kaldi's Kafe",
+          destination: "platform=iOS Simulator,name=Kaldi's iPhone" }
+        Gym.config = FastlaneCore::Configuration.create(Gym::Options.available_options, options)
+
+        args = Shellwords.split(Gym::BuildCommandGenerator.generate.join(" "))
+        expect(args[args.index("-resultBundlePath") + 1]).to eq("./Kaldi's Kafe.xcresult")
+        expect(args[args.index("-destination") + 1]).to eq("platform=iOS Simulator,name=Kaldi's iPhone")
       end
     end
 
@@ -301,9 +320,9 @@ describe Gym do
                                "xcodebuild",
                                "-scheme Example",
                                "-project ./gym/examples/standard/Example.xcodeproj",
-                               "-destination 'generic/platform=iOS'",
+                               "-destination generic/platform\\=iOS",
                                "-archivePath #{Gym::BuildCommandGenerator.archive_path.shellescape}",
-                               "-resultBundlePath 'result_bundle'",
+                               "-resultBundlePath result_bundle",
                                :archive,
                                "| tee #{log_path.shellescape}",
                                "| xcpretty"
@@ -323,7 +342,7 @@ describe Gym do
                                "xcodebuild",
                                "-scheme Example",
                                "-project ./gym/examples/standard/Example.xcodeproj",
-                               "-destination 'generic/platform=iOS'",
+                               "-destination generic/platform\\=iOS",
                                "-archivePath #{Gym::BuildCommandGenerator.archive_path.shellescape}",
                                :archive,
                                "| tee #{log_path.shellescape}",
@@ -347,7 +366,7 @@ describe Gym do
                                "xcodebuild",
                                "-scheme Example",
                                "-project ./gym/examples/standard/Example.xcodeproj",
-                               "-destination 'generic/platform=iOS'",
+                               "-destination generic/platform\\=iOS",
                                "-archivePath #{Gym::BuildCommandGenerator.archive_path.shellescape}",
                                "OTHER_SWIFT_FLAGS=\"\\$(value) -Xfrontend -debug-time-function-bodies\"",
                                :archive,
@@ -371,7 +390,7 @@ describe Gym do
                                "xcodebuild",
                                "-scheme Example",
                                "-project ./gym/examples/standard/Example.xcodeproj",
-                               "-destination 'generic/platform=iOS'",
+                               "-destination generic/platform\\=iOS",
                                "-archivePath #{Gym::BuildCommandGenerator.archive_path.shellescape}",
                                :archive,
                                "| tee #{@log_path.shellescape}",

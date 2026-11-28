@@ -30,6 +30,7 @@ module Fastlane
           if edit_version
             version_number = edit_version.version_string
           else
+            UI.user_error!("No version is being edited: pass the new one with the `version` option") unless Helper.can_prompt?
             UI.message("You have to specify a new version number: ")
             version_number = STDIN.gets.strip
           end
@@ -45,6 +46,7 @@ module Fastlane
             changelog = File.read(path)
           else
             UI.error("Couldn't find changelog.txt")
+            UI.user_error!("Pass the changelog with the `changelog` option, or write it to #{path}") unless Helper.can_prompt?
             UI.message("Please enter the changelog here:")
             changelog = STDIN.gets
           end
@@ -169,10 +171,10 @@ module Fastlane
                                        end),
           FastlaneCore::ConfigItem.new(key: :platform,
                                        env_name: "FL_SET_CHANGELOG_PLATFORM",
-                                       description: "The platform of the app (ios, appletvos, mac)",
+                                       description: "The platform of the app (ios, appletvos, xros, mac)",
                                        default_value: "ios",
                                        verify_block: proc do |value|
-                                         available = ['ios', 'appletvos', 'mac']
+                                         available = ['ios', 'appletvos', 'xros', 'mac']
                                          UI.user_error!("Invalid platform '#{value}', must be #{available.join(', ')}") unless available.include?(value)
                                        end)
         ]
@@ -183,7 +185,7 @@ module Fastlane
       end
 
       def self.is_supported?(platform)
-        [:ios, :appletvos, :mac].include?(platform)
+        [:ios, :appletvos, :xros, :mac].include?(platform)
       end
 
       def self.example_code

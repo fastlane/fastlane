@@ -53,12 +53,23 @@ describe FastlaneCore do
 
     it "automatically masks sensitive options" do
       value = FastlaneCore::PrintTable.print_values(config: @config)
-      expect(value[:rows]).to eq([["cert_name", "asdf"], ["output", ".."], ["a_bool", true], ["a_sensitive", "********"]])
+      expect(value[:rows]).to eq([["cert_name", "asdf"], ["output", ".."], ["a_bool", true], ["a_sensitive", "A_SENSITIVE_REDACTED"]])
     end
 
     it "supports mask_keys property with symbols and strings" do
       value = FastlaneCore::PrintTable.print_values(config: @config, mask_keys: [:cert_name, 'a_bool'])
-      expect(value[:rows]).to eq([["cert_name", "********"], ["output", ".."], ["a_bool", "********"], ["a_sensitive", "********"]])
+      expect(value[:rows]).to eq([["cert_name", "CERT_NAME_REDACTED"], ["output", ".."], ["a_bool", "A_BOOL_REDACTED"], ["a_sensitive", "A_SENSITIVE_REDACTED"]])
+    end
+
+    it "names a masked key inside a hash after its own key" do
+      @config[:a_hash][:demo_password] = 'secret'
+      value = FastlaneCore::PrintTable.print_values(config: @config, hide_keys: [:cert_name, :a_bool, :a_sensitive], mask_keys: ['a_hash.demo_password'])
+      expect(value[:rows]).to eq([["output", ".."], ["a_hash.demo_password", "DEMO_PASSWORD_REDACTED"]])
+    end
+
+    it "uses the mask given to collect_rows" do
+      rows = FastlaneCore::PrintTable.collect_rows(options: { token: 'secret' }, mask_keys: ['token'], mask: '###')
+      expect(rows).to eq([["token", "###"]])
     end
 
     it "supports hide_keys property with symbols and strings" do
@@ -70,21 +81,21 @@ describe FastlaneCore do
       @config[:a_hash][:foo] = 'bar'
       @config[:a_hash][:bar] = { foo: 'bar' }
       value = FastlaneCore::PrintTable.print_values(config: @config, hide_keys: [:cert_name, :a_bool])
-      expect(value[:rows]).to eq([["output", ".."], ["a_hash.foo", "bar"], ["a_hash.bar.foo", "bar"], ["a_sensitive", "********"]])
+      expect(value[:rows]).to eq([["output", ".."], ["a_hash.foo", "bar"], ["a_hash.bar.foo", "bar"], ["a_sensitive", "A_SENSITIVE_REDACTED"]])
     end
 
     it "supports hide_keys property in hashes" do
       @config[:a_hash][:foo] = 'bar'
       @config[:a_hash][:bar] = { foo: 'bar' }
       value = FastlaneCore::PrintTable.print_values(config: @config, hide_keys: [:cert_name, :a_bool, 'a_hash.foo', 'a_hash.bar.foo'])
-      expect(value[:rows]).to eq([["output", ".."], ["a_sensitive", "********"]])
+      expect(value[:rows]).to eq([["output", ".."], ["a_sensitive", "A_SENSITIVE_REDACTED"]])
     end
 
     it "supports printing default values and ignores missing unset ones " do
       @config[:cert_name] = nil # compulsory without default
       @config[:output] = nil    # compulsory with default
       value = FastlaneCore::PrintTable.print_values(config: @config)
-      expect(value[:rows]).to eq([["output", "."], ["a_bool", true], ["a_sensitive", "********"]])
+      expect(value[:rows]).to eq([["output", "."], ["a_bool", true], ["a_sensitive", "A_SENSITIVE_REDACTED"]])
     end
 
     describe "Breaks down lines" do
