@@ -27,7 +27,11 @@ module Fastlane
         cmd << options[:commit].to_s if options[:commit]
 
         UI.message("Adding git tag '#{tag}' 🎯.")
-        Actions.sh(cmd.join(' '))
+
+        options[:path] = './' unless options[:path]
+        Dir.chdir(options[:path]) do
+          Actions.sh(cmd.join(' '))
+        end
       end
 
       def self.description
@@ -101,7 +105,12 @@ module Fastlane
                                        description: "Make a GPG-signed tag, using the default e-mail address's key",
                                        optional: true,
                                        type: Boolean,
-                                       default_value: false)
+                                       default_value: false),
+          FastlaneCore::ConfigItem.new(key: :path,
+                                       env_name: 'FL_GIT_TAG_PATH',
+                                       description: 'Path of the git repository',
+                                       optional: true,
+                                       default_value: './')
         ]
       end
 
