@@ -2,11 +2,11 @@ class ConnectAPIStubbing
   class Users
     class << self
       def read_fixture_file(filename)
-        File.read(File.join('spaceship', 'spec', 'connect_api', 'fixtures', 'users', filename))
+        spaceship_fixture(File.join('spaceship', 'spec', 'connect_api', 'fixtures', 'users', filename))
       end
 
       def read_binary_fixture_file(filename)
-        File.binread(File.join('spaceship', 'spec', 'connect_api', 'fixtures', 'users', filename))
+        spaceship_fixture(File.join('spaceship', 'spec', 'connect_api', 'fixtures', 'users', filename), binary: true)
       end
 
       # Necessary, as we're now running this in a different context

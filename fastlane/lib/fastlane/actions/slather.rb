@@ -35,7 +35,8 @@ module Fastlane
           binary_basename: '--binary-basename',
           arch: '--arch',
           source_files: '--source-files',
-          decimals: '--decimals'
+          decimals: '--decimals',
+          ymlfile: '--ymlfile'
       }.freeze
 
       def self.run(params)
@@ -51,8 +52,8 @@ module Fastlane
         sh(command)
       end
 
-      def self.has_config_file
-        File.file?('.slather.yml')
+      def self.has_config_file?(params)
+        params[:ymlfile] ? File.file?(params[:ymlfile]) : File.file?('.slather.yml')
       end
 
       def self.slather_version
@@ -64,12 +65,20 @@ module Fastlane
         Gem::Version.new('2.4.1') <= Gem::Version.new(slather_version)
       end
 
+      def self.ymlfile_available?
+        Gem::Version.new('2.8.0') <= Gem::Version.new(slather_version)
+      end
+
       def self.validate_params!(params)
         if params[:configuration]
           UI.user_error!('configuration option is available since version 2.4.1') unless configuration_available?
         end
 
-        if params[:proj] || has_config_file
+        if params[:ymlfile]
+          UI.user_error!('ymlfile option is available since version 2.8.0') unless ymlfile_available?
+        end
+
+        if params[:proj] || has_config_file?(params)
           true
         else
           UI.user_error!("You have to provide a project with `:proj` or use a .slather.yml")
@@ -158,7 +167,7 @@ module Fastlane
                                        optional: true),
           FastlaneCore::ConfigItem.new(key: :github,
                                        env_name: "FL_SLATHER_GITHUB_ENABLED", # The name of the environment variable
-                                       description: "Tell slather that it is running on Github Actions",
+                                       description: "Tell slather that it is running on GitHub Actions",
                                        type: Boolean,
                                        optional: true),
           FastlaneCore::ConfigItem.new(key: :buildkite,
@@ -285,6 +294,10 @@ module Fastlane
                                       description: "The amount of decimals to use for % coverage reporting",
                                       skip_type_validation: true, # allow Integer, String
                                       default_value: false,
+                                      optional: true),
+          FastlaneCore::ConfigItem.new(key: :ymlfile,
+                                      env_name: "FL_SLATHER_YMLFILE",
+                                      description: "Relative path to a file used in place of '.slather.yml'",
                                       optional: true)
         ]
       end

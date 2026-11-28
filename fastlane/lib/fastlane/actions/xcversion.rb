@@ -15,16 +15,6 @@ module Fastlane
         ENV["DEVELOPER_DIR"] = File.join(xcode.path, "/Contents/Developer")
       end
 
-      def self.read_xcode_version_file
-        xcode_version_paths = Dir.glob(".xcode-version")
-
-        if xcode_version_paths.first
-          return File.read(xcode_version_paths.first).strip
-        end
-
-        return nil
-      end
-
       def self.description
         "Select an Xcode to use by version specifier"
       end
@@ -44,10 +34,10 @@ module Fastlane
         [
           FastlaneCore::ConfigItem.new(key: :version,
                                        env_name: "FL_XCODE_VERSION",
-                                       description: "The version of Xcode to select specified as a Gem::Version requirement string (e.g. '~> 7.1.0')",
-                                       default_value: self.read_xcode_version_file,
+                                       description: "The version of Xcode to select specified as a Gem::Version requirement string (e.g. '~> 7.1.0'). Defaults to the value specified in the .xcode-version file ",
+                                       default_value: Helper::XcodesHelper.read_xcode_version_file,
                                        default_value_dynamic: true,
-                                       verify_block: Helper::XcversionHelper::Verify.method(:requirement))
+                                       verify_block: Helper::XcodesHelper::Verify.method(:requirement))
         ]
       end
 
@@ -58,12 +48,17 @@ module Fastlane
       def self.example_code
         [
           'xcversion(version: "8.1") # Selects Xcode 8.1.0',
-          'xcversion(version: "~> 8.1.0") # Selects the latest installed version from the 8.1.x set'
+          'xcversion(version: "~> 8.1.0") # Selects the latest installed version from the 8.1.x set',
+          'xcversion # When missing, the version value defaults to the value specified in the .xcode-version file'
         ]
       end
 
       def self.category
-        :building
+        :deprecated
+      end
+
+      def self.deprecated_notes
+        "The xcode-install gem, which this action depends on, has been sunset. Please migrate to [xcodes](https://docs.fastlane.tools/actions/xcodes). You can find a migration guide here: [xcpretty/xcode-install/MIGRATION.md](https://github.com/xcpretty/xcode-install/blob/master/MIGRATION.md)"
       end
     end
   end

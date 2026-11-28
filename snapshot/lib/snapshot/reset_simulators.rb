@@ -18,6 +18,11 @@ module Snapshot
 
       UI.abort_with_message!("User cancelled action") unless sure
 
+      # Listed before deleting: with nothing listed, nothing would be created again
+      all_runtime_type = runtimes
+      all_device_types = `xcrun simctl list devicetypes`.scan(/(.*)\s\((.*)\)/)
+      UI.user_error!("`xcrun simctl list` returned no runtimes or no device types; no simulator was deleted") if all_runtime_type.empty? || all_device_types.empty?
+
       if ios_versions
         ios_versions.each do |version|
           FastlaneCore::Simulator.delete_all_by_version(os_version: version)
@@ -29,7 +34,6 @@ module Snapshot
       FastlaneCore::SimulatorTV.delete_all
       FastlaneCore::SimulatorWatch.delete_all
 
-      all_runtime_type = runtimes
       # == Runtimes ==
       # iOS 9.3 (9.3 - 13E233) (com.apple.CoreSimulator.SimRuntime.iOS-9-3)
       # iOS 10.0 (10.0 - 14A345) (com.apple.CoreSimulator.SimRuntime.iOS-10-0)
@@ -47,7 +51,6 @@ module Snapshot
       tv_version_ids = filter_runtimes(all_runtime_type, 'tvOS')
       watch_versions_ids = filter_runtimes(all_runtime_type, 'watchOS')
 
-      all_device_types = `xcrun simctl list devicetypes`.scan(/(.*)\s\((.*)\)/)
       # == Device Types ==
       # iPhone 4s (com.apple.CoreSimulator.SimDeviceType.iPhone-4s)
       # iPhone 5 (com.apple.CoreSimulator.SimDeviceType.iPhone-5)

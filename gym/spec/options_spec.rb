@@ -1,4 +1,8 @@
 describe Gym do
+  before do
+    fake_out_build_settings(GYM_BUILD_SETTINGS)
+  end
+
   describe Gym::Options do
     it "raises an exception when project path wasn't found" do
       expect do
@@ -14,7 +18,7 @@ describe Gym do
       expect(Gym.config[:output_name]).to eq("Example")
     end
 
-    it "automatically chooses an existing scheme if the the defined one is not available", requires_xcodebuild: true do
+    it "automatically chooses an existing scheme if the defined one is not available", requires_xcodebuild: true do
       options = { project: "./gym/examples/standard/Example.xcodeproj", scheme: "NotHere" }
       Gym.config = FastlaneCore::Configuration.create(Gym::Options.available_options, options)
 

@@ -16,7 +16,8 @@ describe Fastlane do
     before :each do
       ENV.delete("FASTLANE_TEAM_ID")
 
-      temp_dir = Dir.tmpdir
+      # A directory of its own: Dir.tmpdir is the shared temp root, so parallel test processes would collide. See fastlane#30184.
+      temp_dir = Dir.mktmpdir('fl_spec_update_code_signing')
       FileUtils.copy_entry(unmodified_project_path, temp_dir)
 
       project_path = temp_dir
@@ -249,12 +250,23 @@ describe Fastlane do
         expect(result).to eq(false)
       end
 
-      it "raises exception on old projects" do
-        expect(UI).to receive(:user_error!).with("Seems to be a very old project file format - please open your project file in a more recent version of Xcode")
-        result = Fastlane::FastFile.new.parse("lane :test do
-          update_code_signing_settings(use_automatic_signing: false, path: '#{project_path_old}')
+      it "updates projects without TargetAttributes, as Xcode 16 saves them" do
+        FileUtils.rm_rf(project_path)
+        FileUtils.copy_entry(project_path_old, project_path)
+        expect(Xcodeproj::Project.open(project_path).root_object.attributes["TargetAttributes"]).to be_nil
+
+        allow(UI).to receive(:success)
+        expect(UI).to receive(:success).with("Successfully updated project settings to use Code Sign Style = 'Manual'")
+        Fastlane::FastFile.new.parse("lane :test do
+          update_code_signing_settings(use_automatic_signing: false, path: '#{project_path}')
         end").runner.execute(:test)
-        expect(result).to eq(false)
+
+        project = Xcodeproj::Project.open(project_path)
+        project.targets.each do |target|
+          target.build_configuration_list.get_setting("CODE_SIGN_STYLE").each_value do |value|
+            expect(value).to eq("Manual")
+          end
+        end
       end
     end
   end

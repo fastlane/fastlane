@@ -34,11 +34,12 @@ module Gym
 
         options = []
         options += project_path_array
-        options << "-sdk '#{config[:sdk]}'" if config[:sdk]
-        options << "-toolchain '#{config[:toolchain]}'" if config[:toolchain]
-        options << "-destination '#{config[:destination]}'" if config[:destination]
+        options << "-sdk #{config[:sdk].shellescape}" if config[:sdk]
+        options << "-toolchain #{config[:toolchain].shellescape}" if config[:toolchain]
+        options << "-destination #{config[:destination].shellescape}" if config[:destination]
         options << "-archivePath #{archive_path.shellescape}" unless config[:skip_archive]
-        options << "-resultBundlePath '#{result_bundle_path}'" if config[:result_bundle]
+        options << "-resultBundlePath #{result_bundle_path.shellescape}" if config[:result_bundle]
+        options << "-showBuildTimingSummary" if config[:build_timing_summary]
         if config[:use_system_scm] && !options.include?("-scmProvider system")
           options << "-scmProvider system"
         end
@@ -79,7 +80,7 @@ module Gym
         if Gym.config[:disable_xcpretty] || formatter == ''
           UI.verbose("Not using an xcodebuild formatter")
         elsif !options.empty?
-          UI.important("Detected legacy xcpretty being used so formatting wth xcpretty")
+          UI.important("Detected legacy xcpretty being used, so formatting with xcpretty")
           UI.important("Option(s) used: #{options.join(', ')}")
           pipe += pipe_xcpretty
         elsif formatter == 'xcpretty'
@@ -118,6 +119,8 @@ module Gym
       end
 
       def pipe_xcpretty
+        UI.important("Using xcpretty can result in missing some build errors and is slower than the preferred xcbeautify. See https://docs.fastlane.tools/best-practices/xcodebuild-formatters/ for more information.")
+
         pipe = []
 
         formatter = Gym.config[:xcpretty_formatter]
@@ -151,7 +154,10 @@ module Gym
       end
 
       def xcodebuild_log_path
-        file_name = "#{Gym.project.app_name}-#{Gym.config[:scheme]}.log"
+        # When build settings can't be read there's no app name, so name the log after the
+        # output instead, which is always set by now
+        app_name = Gym.config[:app_name] || Gym.project.app_name_if_lookup_allowed || Gym.config[:output_name]
+        file_name = "#{app_name}-#{Gym.config[:scheme]}.log"
         containing = File.expand_path(Gym.config[:buildlog_path])
         FileUtils.mkdir_p(containing)
 
@@ -183,7 +189,7 @@ module Gym
       def result_bundle_path
         unless Gym.cache[:result_bundle_path]
           path = Gym.config[:result_bundle_path]
-          path ||= File.join(Gym.config[:output_directory], Gym.config[:output_name] + ".result")
+          path ||= File.join(Gym.config[:output_directory], Gym.config[:output_name] + ".xcresult")
           if File.directory?(path)
             FileUtils.remove_dir(path)
           end

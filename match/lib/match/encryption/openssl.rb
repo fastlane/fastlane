@@ -14,18 +14,23 @@ module Match
 
       attr_accessor :working_directory
 
+      attr_accessor :force_legacy_encryption
+
       def self.configure(params)
         return self.new(
           keychain_name: params[:keychain_name],
-          working_directory: params[:working_directory]
+          working_directory: params[:working_directory],
+          force_legacy_encryption: params[:force_legacy_encryption]
         )
       end
 
       # @param keychain_name: The identifier used to store the passphrase in the Keychain
       # @param working_directory: The path to where the certificates are stored
-      def initialize(keychain_name: nil, working_directory: nil)
+      # @param force_legacy_encryption: Force use of legacy EncryptionV1 algorithm
+      def initialize(keychain_name: nil, working_directory: nil, force_legacy_encryption: false)
         self.keychain_name = keychain_name
         self.working_directory = working_directory
+        self.force_legacy_encryption = force_legacy_encryption
       end
 
       def encrypt_files(password: nil)
@@ -33,7 +38,7 @@ module Match
         password ||= fetch_password!
         iterate(self.working_directory) do |current|
           files << current
-          encrypt_specific_file(path: current, password: password)
+          encrypt_specific_file(path: current, password: password, version: force_legacy_encryption ? 1 : 2)
           UI.success("🔒  Encrypted '#{File.basename(current)}'") if FastlaneCore::Globals.verbose?
         end
         UI.success("🔒  Successfully encrypted certificates repo")
@@ -62,6 +67,7 @@ module Match
       end
 
       def store_password(password)
+        return unless FastlaneCore::StoredPasswords.store?
         Security::InternetPassword.add(server_name(self.keychain_name), "", password)
       end
 
@@ -88,18 +94,26 @@ module Match
       def fetch_password!
         password = ENV["MATCH_PASSWORD"]
         unless password
-          item = Security::InternetPassword.find(server: server_name(self.keychain_name))
-          password = item.password if item
+          begin
+            item = Security::InternetPassword.find(server: server_name(self.keychain_name))
+            if item
+              password = item.password
+              server = server_name(self.keychain_name)
+              FastlaneCore::StoredPasswords.read_warning(server, what: "the match passphrase", remove_with: "security delete-internet-password -s #{server}", instead: "provide it with the MATCH_PASSWORD environment variable")&.each { |line| UI.important(line) }
+            end
+          rescue Security::Error => ex
+            UI.important("Could not read the local keychain: #{ex.message}")
+          end
         end
 
         unless password
           if !UI.interactive?
             UI.error("Neither the MATCH_PASSWORD environment variable nor the local keychain contained a password.")
             UI.error("Bailing out instead of asking for a password, since this is non-interactive mode.")
-            UI.user_error!("Try setting the MATCH_PASSWORD environment variable, or temporarily enable interactive mode to store a password.")
+            UI.user_error!("Try setting the MATCH_PASSWORD environment variable.")
           else
             UI.important("Enter the passphrase that should be used to encrypt/decrypt your certificates")
-            UI.important("This passphrase is specific per repository and will be stored in your local keychain")
+            UI.important(FastlaneCore::StoredPasswords.store? ? "This passphrase is specific per repository and will be stored in your local keychain" : "This passphrase is specific per repository")
             UI.important("Make sure to remember the password, as you'll need it when you run match on a different machine")
             password = FastlaneCore::Helper.ask_password(message: "Passphrase for Match storage: ", confirm: true)
             store_password(password)
@@ -109,25 +123,10 @@ module Match
         return password
       end
 
-      # We encrypt with MD5 because that was the most common default value in older fastlane versions which used the local OpenSSL installation
-      # A more secure key and IV generation is needed in the future
-      # IV should be randomly generated and provided unencrypted
-      # salt should be randomly generated and provided unencrypted (like in the current implementation)
-      # key should be generated with OpenSSL::KDF::pbkdf2_hmac with properly chosen parameters
-      # Short explanation about salt and IV: https://stackoverflow.com/a/1950674/6324550
-      def encrypt_specific_file(path: nil, password: nil)
+      def encrypt_specific_file(path: nil, password: nil, version: nil)
         UI.user_error!("No password supplied") if password.to_s.strip.length == 0
-
-        data_to_encrypt = File.binread(path)
-        salt = SecureRandom.random_bytes(8)
-
-        # The :: is important, as there is a name clash
-        cipher = ::OpenSSL::Cipher.new('AES-256-CBC')
-        cipher.encrypt
-        cipher.pkcs5_keyivgen(password, salt, 1, "MD5")
-        encrypted_data = "Salted__" + salt + cipher.update(data_to_encrypt) + cipher.final
-
-        File.write(path, Base64.encode64(encrypted_data))
+        e = MatchFileEncryption.new
+        e.encrypt(file_path: path, password: password, version: version)
       rescue FastlaneCore::Interface::FastlaneError
         raise
       rescue => error
@@ -135,28 +134,12 @@ module Match
         UI.crash!("Error encrypting '#{path}'")
       end
 
-      # The encryption parameters in this implementations reflect the old behavior which depended on the users' local OpenSSL version
-      # 1.0.x OpenSSL and earlier versions use MD5, 1.1.0c and newer uses SHA256, we try both before giving an error
-      def decrypt_specific_file(path: nil, password: nil, hash_algorithm: "MD5")
-        stored_data = Base64.decode64(File.read(path))
-        salt = stored_data[8..15]
-        data_to_decrypt = stored_data[16..-1]
-
-        decipher = ::OpenSSL::Cipher.new('AES-256-CBC')
-        decipher.decrypt
-        decipher.pkcs5_keyivgen(password, salt, 1, hash_algorithm)
-
-        decrypted_data = decipher.update(data_to_decrypt) + decipher.final
-
-        File.binwrite(path, decrypted_data)
+      def decrypt_specific_file(path: nil, password: nil)
+        e = MatchFileEncryption.new
+        e.decrypt(file_path: path, password: password)
       rescue => error
-        fallback_hash_algorithm = "SHA256"
-        if hash_algorithm != fallback_hash_algorithm
-          decrypt_specific_file(path: path, password: password, hash_algorithm: fallback_hash_algorithm)
-        else
-          UI.error(error.to_s)
-          UI.crash!("Error decrypting '#{path}'")
-        end
+        UI.error(error.to_s)
+        UI.crash!("Error decrypting '#{path}'")
       end
     end
   end

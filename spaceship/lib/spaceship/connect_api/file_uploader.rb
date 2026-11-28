@@ -1,8 +1,8 @@
 require 'faraday' # HTTP Client
 require 'faraday-cookie_jar'
-require 'faraday_middleware'
 
 require 'spaceship/globals'
+require_relative '../helper/plist_middleware'
 
 require 'openssl'
 
@@ -79,14 +79,14 @@ module Spaceship
           c.response(:plist, content_type: /\bplist$/)
           c.adapter(Faraday.default_adapter)
 
-          if ENV['SPACESHIP_DEBUG']
+          if Spaceship::Globals.env_truthy?('SPACESHIP_DEBUG')
             # for debugging only
             # This enables tracking of networking requests using Charles Web Proxy
             c.proxy = "https://127.0.0.1:8888"
             c.ssl[:verify_mode] = OpenSSL::SSL::VERIFY_NONE
           elsif ENV["SPACESHIP_PROXY"]
             c.proxy = ENV["SPACESHIP_PROXY"]
-            c.ssl[:verify_mode] = OpenSSL::SSL::VERIFY_NONE if ENV["SPACESHIP_PROXY_SSL_VERIFY_NONE"]
+            c.ssl[:verify_mode] = OpenSSL::SSL::VERIFY_NONE if Spaceship::Globals.env_truthy?("SPACESHIP_PROXY_SSL_VERIFY_NONE")
           end
 
           if ENV["DEBUG"]

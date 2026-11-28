@@ -8,26 +8,31 @@ module Fastlane
     # When running this in tests, it will return the actual command instead of executing it
     # @param log [Boolean] should fastlane print out the executed command
     # @param error_callback [Block] a callback invoked with the command output if there is a non-zero exit status
-    def self.sh(*command, log: true, error_callback: nil, &b)
-      sh_control_output(*command, print_command: log, print_command_output: log, error_callback: error_callback, &b)
+    # @param stdin [String] data written to the command's standard input, which is then closed; fastlane never prints it, the command's own output may
+    # @param separate_stderr [Boolean] return stdout only; stderr goes to the error message and the error_callback
+    # @param chdir [String] directory the command runs in; fastlane's own stays as it is
+    def self.sh(*command, log: true, error_callback: nil, stdin: nil, separate_stderr: false, chdir: nil, &b)
+      sh_control_output(*command, print_command: log, print_command_output: log, error_callback: error_callback, stdin: stdin, separate_stderr: separate_stderr, chdir: chdir, &b)
     end
 
-    def self.sh_no_action(*command, log: true, error_callback: nil, &b)
-      sh_control_output(*command, print_command: log, print_command_output: log, error_callback: error_callback, &b)
+    def self.sh_no_action(*command, log: true, error_callback: nil, stdin: nil, separate_stderr: false, chdir: nil, &b)
+      sh_control_output(*command, print_command: log, print_command_output: log, error_callback: error_callback, stdin: stdin, separate_stderr: separate_stderr, chdir: chdir, &b)
     end
 
     # @param command The command to be executed (variadic)
     # @param print_command [Boolean] Should we print the command that's being executed
     # @param print_command_output [Boolean] Should we print the command output during execution
     # @param error_callback [Block] A block that's called if the command exits with a non-zero status
+    # @param separate_stderr [Boolean] Return stdout only, and give stderr to the error message and the error_callback
     # @yield [status, result, cmd] The return status of the command, all output from the command and an equivalent shell command
     # @yieldparam [Process::Status] status A Process::Status indicating the status of the completed command
-    # @yieldparam [String] result The complete output to stdout and stderr of the completed command
+    # @yieldparam [String] result The complete output to stdout and stderr of the completed command (stdout only with separate_stderr)
     # @yieldparam [String] cmd A shell command equivalent to the arguments passed
     # rubocop: disable Metrics/PerceivedComplexity
-    def self.sh_control_output(*command, print_command: true, print_command_output: true, error_callback: nil)
+    def self.sh_control_output(*command, print_command: true, print_command_output: true, error_callback: nil, stdin: nil, separate_stderr: false, chdir: nil)
       print_command = print_command_output = true if $troubleshoot
       # Set the encoding first, the user might have set it wrong
+      # Not a duplicate of CommandExecutor.collect's: this one also covers the block and the error_callback
       previous_encoding = [Encoding.default_external, Encoding.default_internal]
       Encoding.default_external = Encoding::UTF_8
       Encoding.default_internal = Encoding::UTF_8
@@ -40,42 +45,41 @@ module Fastlane
       shell_command = shell_command_from_args(*command)
       UI.command(shell_command) if print_command
 
-      result = ''
+      result = +''
       exit_status = nil
-      if Helper.sh_enabled?
-        # The argument list is passed directly to Open3.popen2e, which
-        # handles the variadic argument list in the same way as Kernel#spawn.
-        # (http://ruby-doc.org/core-2.4.2/Kernel.html#method-i-spawn) or
-        # Process.spawn (http://ruby-doc.org/core-2.4.2/Process.html#method-c-spawn).
-        #
-        # sh "ls -la /Applications/Xcode\ 7.3.1.app"
-        # sh "ls", "-la", "/Applications/Xcode 7.3.1.app"
-        # sh({ "FOO" => "Hello" }, "echo $FOO")
-        Open3.popen2e(*command) do |stdin, io, thread|
-          io.sync = true
-          io.each do |line|
-            UI.command_output(line.strip) if print_command_output
-            result << line
-          end
-          exit_status = thread.value
-        end
+      if FastlaneCore::Helper.sh_enabled?
+        # The command forms are documented on CommandExecutor.collect
+        collected = FastlaneCore::CommandExecutor.collect(*command, stdin: stdin, separate_stderr: separate_stderr, print_output: print_command_output, chdir: chdir)
+        result = collected.output
+        errors = collected.errors
+        exit_status = collected.status
 
         # Checking Process::Status#exitstatus instead of #success? makes for more
         # testable code. (Tests mock exitstatus only.) This is also consistent
         # with previous implementations of sh and... probably portable to all
         # relevant platforms.
         if exit_status.exitstatus != 0
-          message = if print_command
-                      "Exit status of command '#{shell_command}' was #{exit_status.exitstatus} instead of 0."
+          # Due to some output and build systems having 30-80k lines of output.
+          # We will truncate what we will show to recap the failure.
+          failure_output = errors || result
+          truncated_msg = failure_output.length > 500 ? failure_output[-500..-1] : failure_output
+
+          signal = FastlaneCore::FastlanePty.signal_name(exit_status)
+          message = if signal && print_command
+                      "Command '#{shell_command}' was killed by #{signal}.\n"
+                    elsif signal
+                      "Shell command was killed by #{signal}.\n"
+                    elsif print_command
+                      "Exit status of command '#{shell_command}' was #{exit_status.exitstatus} instead of 0.\n"
                     else
-                      "Shell command exited with exit status #{exit_status.exitstatus} instead of 0."
+                      "Shell command exited with exit status #{exit_status.exitstatus} instead of 0.\n"
                     end
-          message += "\n#{result}" if print_command_output
+          message += (truncated_msg).to_s if print_command_output && !$stdout.isatty
 
           if error_callback || block_given?
             UI.error(message)
             # block notified below, on success or failure
-            error_callback && error_callback.call(result)
+            error_callback && error_callback.call(failure_output)
           else
             UI.shell_error!(message)
           end

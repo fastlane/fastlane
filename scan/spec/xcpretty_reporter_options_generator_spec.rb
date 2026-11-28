@@ -1,9 +1,20 @@
 describe Scan do
   describe Scan::XCPrettyReporterOptionsGenerator, requires_xcodebuild: true do
+    # Scan.config is module level and the singleton guard in spec_helper clears
+    # it after every example, so the setup has to run per example rather than
+    # once. Build the configuration once all the same, and put it back by
+    # setting the ivars rather than assigning through Scan.config=, which runs
+    # DetectValues.set_additional_default_values and shells out to xcodebuild.
+    # Paying for that 26 times instead of once took this file from 5s to 48s.
+    # See fastlane#30184.
     before(:all) do
       options = { project: "./scan/examples/standard/app.xcodeproj" }
-      Scan.config = FastlaneCore::Configuration.create(Scan::Options.available_options, options)
-      Scan.cache[:temp_junit_report] = nil
+      @configuration = FastlaneCore::Configuration.create(Scan::Options.available_options, options)
+    end
+
+    before(:each) do
+      Scan.instance_variable_set(:@config, @configuration)
+      Scan.instance_variable_set(:@cache, {})
     end
 
     describe "xcpretty reporter options generation" do
@@ -15,7 +26,7 @@ describe Scan do
         expect(temp_junit_report).not_to(be_nil)
         expect(reporter_options).to end_with([
                                                "--report junit",
-                                               "--output '#{temp_junit_report}'"
+                                               "--output #{temp_junit_report.shellescape}"
                                              ])
       end
 
@@ -25,7 +36,7 @@ describe Scan do
 
         expect(reporter_options).to start_with([
                                                  "--report junit",
-                                                 "--output '/test_output/report.junit'"
+                                                 "--output /test_output/report.junit"
                                                ])
       end
 
@@ -35,7 +46,7 @@ describe Scan do
 
         expect(reporter_options).to start_with([
                                                  "--report junit",
-                                                 "--output '/test_output/junit.xml'"
+                                                 "--output /test_output/junit.xml"
                                                ])
       end
 
@@ -45,7 +56,7 @@ describe Scan do
 
         expect(reporter_options).to start_with([
                                                  "--report html",
-                                                 "--output '/test_output/report.html'"
+                                                 "--output /test_output/report.html"
                                                ])
       end
 
@@ -55,7 +66,7 @@ describe Scan do
 
         expect(reporter_options).to start_with([
                                                  "--report html",
-                                                 "--output '/test_output/custom_report.html'"
+                                                 "--output /test_output/custom_report.html"
                                                ])
       end
 
@@ -65,7 +76,7 @@ describe Scan do
 
         expect(reporter_options).to start_with([
                                                  "--report json-compilation-database",
-                                                 "--output '/test_output/report.json-compilation-database'"
+                                                 "--output /test_output/report.json-compilation-database"
                                                ])
       end
 
@@ -75,7 +86,7 @@ describe Scan do
 
         expect(reporter_options).to start_with([
                                                  "--report json-compilation-database",
-                                                 "--output '/test_output/custom_report.json'"
+                                                 "--output /test_output/custom_report.json"
                                                ])
       end
 
@@ -85,7 +96,7 @@ describe Scan do
 
         expect(reporter_options).to start_with([
                                                  "--report json-compilation-database",
-                                                 "--output '/test_output/compile_commands.json'"
+                                                 "--output /test_output/compile_commands.json"
                                                ])
       end
 
@@ -95,9 +106,9 @@ describe Scan do
 
         expect(reporter_options).to start_with([
                                                  "--report html",
-                                                 "--output '/test_output/report.html'",
+                                                 "--output /test_output/report.html",
                                                  "--report junit",
-                                                 "--output '/test_output/report.junit'"
+                                                 "--output /test_output/report.junit"
                                                ])
       end
 
@@ -107,10 +118,17 @@ describe Scan do
 
         expect(reporter_options).to start_with([
                                                  "--report html",
-                                                 "--output '/test_output/custom_report.html'",
+                                                 "--output /test_output/custom_report.html",
                                                  "--report junit",
-                                                 "--output '/test_output/junit.xml'"
+                                                 "--output /test_output/junit.xml"
                                                ])
+      end
+
+      it "keeps an output directory with an apostrophe and a space as one argument" do
+        generator = Scan::XCPrettyReporterOptionsGenerator.new(false, "html", nil, "/Users/jane/Kaldi's Kafe/test_output", false, nil)
+        args = Shellwords.split(generator.generate_reporter_options.join(" "))
+
+        expect(args[args.index("--output") + 1]).to eq("/Users/jane/Kaldi's Kafe/test_output/report.html")
       end
 
       context "options passed as arrays" do
@@ -122,7 +140,7 @@ describe Scan do
           expect(temp_junit_report).not_to(be_nil)
           expect(reporter_options).to end_with([
                                                  "--report junit",
-                                                 "--output '#{temp_junit_report}'"
+                                                 "--output #{temp_junit_report.shellescape}"
                                                ])
         end
 
@@ -132,7 +150,7 @@ describe Scan do
 
           expect(reporter_options).to start_with([
                                                    "--report junit",
-                                                   "--output '/test_output/report.junit'"
+                                                   "--output /test_output/report.junit"
                                                  ])
         end
 
@@ -142,7 +160,7 @@ describe Scan do
 
           expect(reporter_options).to start_with([
                                                    "--report junit",
-                                                   "--output '/test_output/junit.xml'"
+                                                   "--output /test_output/junit.xml"
                                                  ])
         end
 
@@ -152,7 +170,7 @@ describe Scan do
 
           expect(reporter_options).to start_with([
                                                    "--report html",
-                                                   "--output '/test_output/report.html'"
+                                                   "--output /test_output/report.html"
                                                  ])
         end
 
@@ -162,7 +180,7 @@ describe Scan do
 
           expect(reporter_options).to start_with([
                                                    "--report html",
-                                                   "--output '/test_output/custom_report.html'"
+                                                   "--output /test_output/custom_report.html"
                                                  ])
         end
 
@@ -172,7 +190,7 @@ describe Scan do
 
           expect(reporter_options).to start_with([
                                                    "--report json-compilation-database",
-                                                   "--output '/test_output/report.json-compilation-database'"
+                                                   "--output /test_output/report.json-compilation-database"
                                                  ])
         end
 
@@ -182,7 +200,7 @@ describe Scan do
 
           expect(reporter_options).to start_with([
                                                    "--report json-compilation-database",
-                                                   "--output '/test_output/custom_report.json'"
+                                                   "--output /test_output/custom_report.json"
                                                  ])
         end
 
@@ -191,11 +209,11 @@ describe Scan do
           reporter_options = generator.generate_reporter_options
 
           expect(reporter_options).to include("--report json-compilation-database")
-          expect(reporter_options).to include("--output '/test_output/compile_commands.json'")
+          expect(reporter_options).to include("--output /test_output/compile_commands.json")
 
           expect(reporter_options).to start_with([
                                                    "--report json-compilation-database",
-                                                   "--output '/test_output/compile_commands.json'"
+                                                   "--output /test_output/compile_commands.json"
                                                  ])
         end
 
@@ -205,9 +223,9 @@ describe Scan do
 
           expect(reporter_options).to start_with([
                                                    "--report html",
-                                                   "--output '/test_output/report.html'",
+                                                   "--output /test_output/report.html",
                                                    "--report junit",
-                                                   "--output '/test_output/report.junit'"
+                                                   "--output /test_output/report.junit"
                                                  ])
         end
 
@@ -217,9 +235,9 @@ describe Scan do
 
           expect(reporter_options).to start_with([
                                                    "--report html",
-                                                   "--output '/test_output/custom_report.html'",
+                                                   "--output /test_output/custom_report.html",
                                                    "--report junit",
-                                                   "--output '/test_output/junit.xml'"
+                                                   "--output /test_output/junit.xml"
                                                  ])
         end
       end
@@ -270,6 +288,8 @@ describe Scan do
             output_directory: "/test_output"
           }
 
+          fake_out_simulator_detection
+          fake_out_build_settings(SCAN_BUILD_SETTINGS)
           Scan.config = FastlaneCore::Configuration.create(Scan::Options.available_options, options)
           Scan.cache[:temp_junit_report] = nil
 
@@ -278,11 +298,11 @@ describe Scan do
           reporter_options = Scan::XCPrettyReporterOptionsGenerator.generate_from_scan_config.generate_reporter_options
           expect(reporter_options).to eq([
                                            "--report junit",
-                                           "--output '/test_output/junit.xml'",
+                                           "--output /test_output/junit.xml",
                                            "--report html",
-                                           "--output '/test_output/report.html'",
+                                           "--output /test_output/report.html",
                                            "--report junit",
-                                           "--output '#{Scan.cache[:temp_junit_report]}'"
+                                           "--output #{Scan.cache[:temp_junit_report].shellescape}"
                                          ])
         end
       end

@@ -1,0 +1,48 @@
+{
+  "configurations" : [
+    {
+      "id" : "414EF3C9-D29B-416A-A403-BECE6101D323",
+      "name" : "MyTestPlanConfig",
+      "options" : {
+        "environmentVariableEntries" : [
+          {
+            "key" : "TEST_ENV",
+            "value" : "Mocked"
+          }
+        ],
+        "maximumTestRepetitions" : 2,
+        "preferredScreenCaptureFormat" : "screenshot",
+        "testRepetitionMode" : "retryOnFailure",
+        "uiTestingScreenshotsLifetime" : "keepNever",
+        "userAttachmentLifetime" : "keepNever"
+      }
+    }
+  ],
+  "defaultOptions" : {
+    "testTimeoutsEnabled" : true
+  },
+  "testTargets" : [
+    {
+      "target" : {
+        "containerPath" : "container:FastlaneTrainerExample.xcodeproj",
+        "identifier" : "47A94E6B2D696FC8008AA4CD",
+        "name" : "FastlaneTrainerExampleTests"
+      }
+    },
+    {
+      "target" : {
+        "containerPath" : "container:FastlaneTrainerExample.xcodeproj",
+        "identifier" : "47A94E8E2D697052008AA4CD",
+        "name" : "FastlaneTrainerExampleXCTests"
+      }
+    },
+    {
+      "target" : {
+        "containerPath" : "container:FastlaneTrainerExample.xcodeproj",
+        "identifier" : "47A94E752D696FC8008AA4CD",
+        "name" : "FastlaneTrainerExampleUITests"
+      }
+    }
+  ],
+  "version" : 1
+}

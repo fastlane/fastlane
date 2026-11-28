@@ -48,11 +48,14 @@ describe Fastlane do
       end
 
       it "throws errors when syntax is incorrect" do
-        content = File.read('./fastlane/spec/fixtures/broken_files/broken_file.rb', encoding: 'utf-8')
-        expect(UI).to receive(:content_error).with(content, '7')
-        expect(UI).to receive(:content_error).with(content, '8')
+        # Stored without the .rb extension, so that tools which parse every Ruby file (CodeQL) skip it
+        content = File.read('./fastlane/spec/fixtures/broken_files/broken_file.rb.txt', encoding: 'utf-8')
+        expect(UI).to receive(:content_error).with(content, '7') # syntax error, unexpected ':', expecting '}'
         expect(UI).to receive(:user_error!).with("Syntax error in broken_file.rb")
-        Fastlane::Actions.load_external_actions("./fastlane/spec/fixtures/broken_files")
+        Dir.mktmpdir do |dir|
+          File.write(File.join(dir, 'broken_file.rb'), content)
+          Fastlane::Actions.load_external_actions(dir)
+        end
       end
     end
 
@@ -82,7 +85,7 @@ describe Fastlane do
         example_action_ref = Fastlane::Actions.action_class_ref("example_action")
         expect(Fastlane::Actions.is_deprecated?(example_action_ref)).to eq(false)
 
-        # An action (depreated)
+        # An action (deprecated)
         deprecated_action_ref = Fastlane::Actions.action_class_ref("deprecated_action")
         expect(Fastlane::Actions.is_deprecated?(deprecated_action_ref)).to eq(true)
 

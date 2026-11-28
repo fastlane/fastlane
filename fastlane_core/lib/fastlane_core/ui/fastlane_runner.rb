@@ -34,7 +34,7 @@ module Commander
 
     attr_accessor :collector
 
-    # Temporary work around for issues mentioned in https://github.com/fastlane/fastlane/pull/18760
+    # Temporary workaround for issues mentioned in https://github.com/fastlane/fastlane/pull/18760
     # Code taken from https://github.com/commander-rb/commander/blob/40d06bfbc54906d0de7c72ac73f4e9188c9ca294/lib/commander/runner.rb#L372-L385
     #
     # Problem:
@@ -42,7 +42,6 @@ module Commander
     #  This is raising OptionParser::MissingArgument error because `--env` takes a string argument.
     #  A command of `-e --verbose` works because `--verbose` is seen as the argument.
     #  A command of `--verbose -e` doesn't work because no argument after `-e` so MissingArgument is raised again.
-    #  This broke somewhere between Ruby 2.5 and Ruby 2.6
     #
     # Solution:
     #  Proper solution is to set `parser.require_exact = true` but this only available on `optparse` version 0.1.1
@@ -92,10 +91,12 @@ module Commander
       remove_global_options(options, @args)
 
       xcode_outdated = false
+      xcode_support_ending = false
       begin
         unless FastlaneCore::Helper.xcode_at_least?(Fastlane::MINIMUM_XCODE_RELEASE)
           xcode_outdated = true
         end
+        xcode_support_ending = !FastlaneCore::Helper.xcode_at_least?(Fastlane::SUGGESTED_MINIMUM_XCODE_RELEASE)
       rescue
         # We don't care about exceptions here
         # We'll land here if the user doesn't have Xcode at all for example
@@ -107,6 +108,10 @@ module Commander
         if xcode_outdated
           # We have to raise that error within this `begin` block to show a nice user error without a stack trace
           FastlaneCore::UI.user_error!("fastlane requires a minimum version of Xcode #{Fastlane::MINIMUM_XCODE_RELEASE}, please upgrade and make sure to use `sudo xcode-select -s /Applications/Xcode.app`")
+        end
+
+        if xcode_support_ending && !FastlaneCore::Env.truthy?("FASTLANE_SKIP_XCODE_VERSION_WARNING")
+          FastlaneCore::UI.important("WARNING: Support for your Xcode version (#{FastlaneCore::Helper.xcode_version}) is going away. fastlane will soon require Xcode #{Fastlane::SUGGESTED_MINIMUM_XCODE_RELEASE} or newer.")
         end
 
         is_swift = FastlaneCore::FastlaneFolder.swift?
@@ -167,7 +172,7 @@ module Commander
         end
       rescue FastlaneCore::Interface::FastlaneCommonException => e # these are exceptions that we don't count as crashes
         display_user_error!(e, e.to_s)
-      rescue FastlaneCore::Interface::FastlaneError => e # user_error!
+      rescue FastlaneCore::Interface::FastlaneError, FastlaneCore::Interface::FastlaneShellError => e # user_error! or shell_error!
         rescue_fastlane_error(e)
       rescue Errno::ENOENT => e
         rescue_file_error(e)
@@ -221,9 +226,8 @@ module Commander
     end
 
     def handle_tls_error!(e)
-      # Apple has upgraded its App Store Connect servers to require TLS 1.2, but
-      # system Ruby 2.0 does not support it. We want to suggest that users upgrade
-      # their Ruby version
+      # Apple's App Store Connect servers require TLS 1.2. We want to suggest that users
+      # reinstall their Ruby
       suggest_ruby_reinstall(e)
       display_user_error!(e, e.to_s)
     end
@@ -243,10 +247,6 @@ module Commander
       ui.error(e.to_s)
       ui.error("")
       ui.error("SSL errors can be caused by various components on your local machine.")
-      if Gem::Version.new(RUBY_VERSION) < Gem::Version.new('2.1')
-        ui.error("Apple has recently changed their servers to require TLS 1.2, which may")
-        ui.error("not be available to your system installed Ruby (#{RUBY_VERSION})")
-      end
       ui.error("")
       ui.error("The best solution is to use the self-contained fastlane version.")
       ui.error("Which ships with a bundled OpenSSL,ruby and all gems - so you don't depend on system libraries")
@@ -269,11 +269,11 @@ module Commander
       ui.error("- If you use system Ruby:")
       ui.error("  - Run `brew update && brew install ruby`")
       ui.error("- If you use rbenv with ruby-build:")
-      ui.error("  - Run `brew update && brew upgrade ruby-build && rbenv install 2.3.1`")
-      ui.error("  - Run `rbenv global 2.3.1` to make it the new global default Ruby version")
+      ui.error("  - Run `brew update && brew upgrade ruby-build && rbenv install #{Fastlane::SUGGESTED_MINIMUM_RUBY}`")
+      ui.error("  - Run `rbenv global #{Fastlane::SUGGESTED_MINIMUM_RUBY}` to make it the new global default Ruby version")
       ui.error("- If you use rvm:")
       ui.error("  - First run `rvm osx-ssl-certs update all`")
-      ui.error("  - Then run `rvm reinstall ruby-2.3.1 --with-openssl-dir=/usr/local`")
+      ui.error("  - Then run `rvm reinstall ruby-#{Fastlane::SUGGESTED_MINIMUM_RUBY}`")
       ui.error("")
       ui.error("If that doesn't fix your issue, please google for the following error message:")
       ui.error("  '#{e}'")
@@ -283,7 +283,7 @@ module Commander
     def handle_unknown_error!(e)
       # Some spaceship exception classes implement #preferred_error_info in order to share error info
       # that we'd rather display instead of crashing with a stack trace. However, fastlane_core and
-      # spaceship can not know about each other's classes! To make this information passing work, we
+      # spaceship cannot know about each other's classes! To make this information passing work, we
       # use a bit of Ruby duck-typing to check whether the unknown exception type implements the right
       # method. If so, we'll present any returned error info in the manner of a user_error!
       error_info = e.respond_to?(:preferred_error_info) ? e.preferred_error_info : nil
