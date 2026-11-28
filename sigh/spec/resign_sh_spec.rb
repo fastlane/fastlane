@@ -218,6 +218,35 @@ describe "resign.sh" do
     end
   end
 
+  describe "entitlements_for_bundle_id" do
+    before(:all) do
+      skip("resign.sh not found") unless File.exist?(RESIGN_SH_PATH)
+      @match_func = extract_function(@resign_sh_content, "does_bundle_id_match")
+      @entitlements_func = extract_function(@resign_sh_content, "entitlements_for_bundle_id")
+    end
+
+    def find_entitlements(entitlements, bundle_id)
+      entitlements_bash = entitlements.map { |k, v| "\"#{k}=#{v}\"" }.join(" ")
+      script = <<~BASH
+        #{@match_func}
+        #{@entitlements_func}
+        ENTITLEMENTS_BY_ID=(#{entitlements_bash})
+        entitlements_for_bundle_id "#{bundle_id}"
+      BASH
+      stdout, = run_bash(script)
+      stdout.strip
+    end
+
+    it "returns the entitlements file given for the bundle identifier" do
+      entitlements = { "com.example.app" => "/path/app.entitlements", "com.example.app.ext" => "/path/ext.entitlements" }
+      expect(find_entitlements(entitlements, "com.example.app.ext")).to eq("/path/ext.entitlements")
+    end
+
+    it "returns an empty string when none was given for it, so the default applies" do
+      expect(find_entitlements({ "com.example.app" => "/path/app.entitlements" }, "com.example.app.ext")).to eq("")
+    end
+  end
+
   # ─── Group C: Bundle ID replacement sed ───────────────────────────────
   # resign.sh uses BSD sed's `-i .bak` syntax which only works on macOS
   describe "bundle ID replacement sed" do

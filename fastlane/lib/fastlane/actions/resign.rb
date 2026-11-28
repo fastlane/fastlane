@@ -35,6 +35,19 @@ module Fastlane
               "com.example.awesome-app" => "path/to/profile",
               "com.example.awesome-app.app-extension" => "path/to/app-extension/profile"
             }
+          )',
+          '# Nested applications and app extensions can also get their own entitlements
+          resign(
+            ipa: "path/to/ipa",
+            signing_identity: "iPhone Distribution: Luka Mirosevic (0123456789)",
+            provisioning_profile: {
+              "com.example.awesome-app" => "path/to/profile",
+              "com.example.awesome-app.app-extension" => "path/to/app-extension/profile"
+            },
+            entitlements: {
+              "com.example.awesome-app" => "path/to/app.entitlements",
+              "com.example.awesome-app.app-extension" => "path/to/app-extension.entitlements"
+            }
           )'
         ]
       end
@@ -58,8 +71,9 @@ module Fastlane
                                        description: "Code signing identity to use. e.g. `iPhone Distribution: Luka Mirosevic (0123456789)`"),
           FastlaneCore::ConfigItem.new(key: :entitlements,
                                        env_name: "FL_RESIGN_ENTITLEMENTS",
-                                       description: "Path to the entitlement file to use, e.g. `myApp/MyApp.entitlements`",
+                                       description: "Path to the entitlement file to use, e.g. `myApp/MyApp.entitlements`. A hash associating entitlement files to bundle identifiers gives nested applications and app extensions their own",
                                        conflicting_options: [:use_app_entitlements],
+                                       skip_type_validation: true, # allows Hash
                                        optional: true),
           FastlaneCore::ConfigItem.new(key: :provisioning_profile,
                                        env_name: "FL_RESIGN_PROVISIONING_PROFILE",
