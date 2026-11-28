@@ -48,7 +48,7 @@ describe Gym::Runner do
 
         expect do
           Gym::Runner.new.send(:copy_mac_app)
-        end.to raise_error(FastlaneCore::Interface::FastlaneCrash, "Couldn't find application in '#{archive_path}'")
+        end.to raise_error(FastlaneCore::Interface::FastlaneError, "Couldn't find application in '#{archive_path}'")
       end
     end
   end
