@@ -260,6 +260,13 @@ describe FastlaneCore do
       it "#schemes returns all configurations" do
         expect(@workspace.configurations).to eq(["Debug", "Release"])
       end
+
+      it "#configurations skips workspace references Xcodeproj can't resolve" do
+        references = @workspace.workspace.file_references + [Xcodeproj::Workspace::FileReference.new("Other.xcodeproj", "developer")]
+        allow(@workspace.workspace).to receive(:file_references).and_return(references)
+
+        expect(@workspace.configurations).to eq(["Debug", "Release"])
+      end
     end
 
     describe "Mac Project" do
