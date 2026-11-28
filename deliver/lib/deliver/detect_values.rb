@@ -83,7 +83,9 @@ module Deliver
       if options[:ipa]
         options[:platform] ||= FastlaneCore::IpaFileAnalyser.fetch_app_platform(options[:ipa])
       elsif options[:pkg]
-        options[:platform] = 'osx'
+        # :pkg defaults to any *.pkg in the current directory, so only infer
+        # osx from it when the user hasn't chosen a platform themselves
+        options[:platform] = 'osx' unless options.specified?(:platform)
       end
     end
 

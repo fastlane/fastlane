@@ -135,6 +135,27 @@ describe Spaceship::ConnectAPI::App do
       expect(model.has_access_to_all_builds).to eq(false)
     end
 
+    it 'omits public link attributes when creating an internal group' do
+      app = Spaceship::ConnectAPI::App.new("123456789", [])
+      app.create_beta_group(group_name: "Internal", is_internal_group: true)
+
+      expect(a_request(:post, "https://appstoreconnect.apple.com/iris/v1/betaGroups").with do |request|
+        JSON.parse(request.body).dig("data", "attributes") == {
+          "name" => "Internal", "isInternalGroup" => true, "hasAccessToAllBuilds" => true
+        }
+      end).to have_been_made
+    end
+
+    it 'sends the configured public link attributes when creating an external group' do
+      app = Spaceship::ConnectAPI::App.new("123456789", [])
+      app.create_beta_group(group_name: "External", public_link_enabled: true, public_link_limit_enabled: true, public_link_limit: 42)
+
+      expect(a_request(:post, "https://appstoreconnect.apple.com/iris/v1/betaGroups").with do |request|
+        attributes = JSON.parse(request.body).dig("data", "attributes")
+        attributes.values_at("publicLinkEnabled", "publicLinkLimitEnabled", "publicLinkLimit") == [true, true, 42] && !attributes.key?("hasAccessToAllBuilds")
+      end).to have_been_made
+    end
+
     it '#get_review_submissions' do
       ConnectAPIStubbing::Tunes.stub_get_review_submissions
 
@@ -155,6 +176,58 @@ describe Spaceship::ConnectAPI::App do
       expect(review_submission.id).to eq("123456789")
       expect(review_submission.platform).to eq(Spaceship::ConnectAPI::Platform::IOS)
       expect(review_submission.state).to eq(Spaceship::ConnectAPI::ReviewSubmission::ReviewSubmissionState::READY_FOR_REVIEW)
+    end
+  end
+
+  describe "#get_latest_app_store_version" do
+    let(:app) { Spaceship::ConnectAPI::App.new("123456789", []) }
+
+    def versions(*created_dates)
+      created_dates.map.with_index { |date, i| double("version #{i}", created_date: date) }
+    end
+
+    it "returns the newest of two versions created the same day" do
+      newest, older = versions("2023-04-11T20:00:00-07:00", "2023-04-11T08:00:00-07:00")
+      allow(app).to receive(:get_app_store_versions).and_return([newest, older])
+
+      expect(app.get_latest_app_store_version).to eq(newest)
+    end
+
+    it "compares times across UTC offsets" do
+      older, newest = versions("2023-04-11T23:00:00+02:00", "2023-04-11T22:30:00Z")
+      allow(app).to receive(:get_app_store_versions).and_return([older, newest])
+
+      expect(app.get_latest_app_store_version).to eq(newest)
+    end
+  end
+
+  describe("#get_app_availabilities") do
+    it('gets app availabilities when app is ready for distribution') do
+      ConnectAPIStubbing::Tunes.stub_get_app_availabilities_ready_for_distribution
+      app = Spaceship::ConnectAPI::App.new("123456789", [])
+
+      availabilities = app.get_app_availabilities
+
+      expect(availabilities.availableInNewTerritories).to be(false)
+      expect(availabilities.territory_availabilities.count).to eq(2)
+      expect(availabilities.territory_availabilities[0].available).to be(true)
+      expect(availabilities.territory_availabilities[1].available).to be(true)
+      expect(availabilities.territory_availabilities[0].contentStatuses).to eq(["AVAILABLE"])
+      expect(availabilities.territory_availabilities[1].contentStatuses).to eq(["AVAILABLE"])
+    end
+
+    it('gets app availabilities when app is removed from sale') do
+      ConnectAPIStubbing::Tunes.stub_get_app_availabilities_removed_from_sale
+      app = Spaceship::ConnectAPI::App.new("123456789", [])
+
+      availabilities = app.get_app_availabilities
+
+      expect(availabilities.availableInNewTerritories).to be(false)
+      expect(availabilities.territory_availabilities.count).to eq(2)
+      expect(availabilities.territory_availabilities[0].available).to be(false)
+      expect(availabilities.territory_availabilities[1].available).to be(false)
+      expect(availabilities.territory_availabilities[0].contentStatuses).to eq(["CANNOT_SELL"])
+      expect(availabilities.territory_availabilities[1].contentStatuses).to eq(["CANNOT_SELL"])
     end
   end
 end

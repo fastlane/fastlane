@@ -383,6 +383,21 @@ describe FastlaneCore do
           end.to raise_error(FastlaneCore::Interface::FastlaneError, "'foo' value must be a Float! Found String instead.")
         end
 
+        it "reads a JSON String as a Hash" do
+          config_item = FastlaneCore::ConfigItem.new(key: :foo, description: 'foo', type: Hash)
+
+          expect(config_item.auto_convert_value('{"key_id":"ABC"}')).to eq({ "key_id" => "ABC" })
+        end
+
+        it "says to pass JSON when a Hash option gets a String that is not JSON" do
+          config_item = FastlaneCore::ConfigItem.new(key: :foo, description: 'foo', type: Hash)
+          value = config_item.auto_convert_value({ key_id: "ABC" }.to_s)
+
+          expect do
+            config_item.valid?(value)
+          end.to raise_error(FastlaneCore::Interface::FastlaneError, "'foo' value must be a Hash! Found String instead. On the command line or in an environment variable, pass it as JSON (in Ruby: `hash.to_json`).")
+        end
+
         it "verifies the default value as well" do
           c = FastlaneCore::ConfigItem.new(key: :output,
                                     env_name: "SIGH_OUTPUT_PATH",
@@ -780,6 +795,57 @@ describe FastlaneCore do
             new_val = "../../"
             expect(@config.set(:output, new_val)).to eq(true)
             expect(@config[:output]).to eq(new_val)
+          end
+        end
+
+        describe "specified?" do
+          let(:config_item) { FastlaneCore::ConfigItem.new(key: :item, env_name: "abc", default_value: "val default") }
+
+          it "raises an error if a non symbol was given" do
+            expect do
+              @config.specified?(123)
+            end.to raise_error("Key '123' must be a symbol. Example :123")
+          end
+
+          it "raises an error if this option does not exist" do
+            expect do
+              @config.specified?(:asdfasdf)
+            end.to raise_error("Could not find option 'asdfasdf' in the list of available options: cert_name, output, wait_processing_interval")
+          end
+
+          it "returns true for a passed in value" do
+            config = FastlaneCore::Configuration.create([config_item], { item: "val cli" })
+
+            expect(config.specified?(:item)).to eq(true)
+          end
+
+          it "returns true for an env_name value" do
+            FastlaneSpec::Env.with_env_values("abc" => "val env") do
+              config = FastlaneCore::Configuration.create([config_item], {})
+
+              expect(config.specified?(:item)).to eq(true)
+            end
+          end
+
+          it "returns true for a config file value" do
+            config = FastlaneCore::Configuration.create([config_item], {})
+            config.config_file_options = { item: "val config" }
+
+            expect(config.specified?(:item)).to eq(true)
+          end
+
+          it "returns false when only the default value is available" do
+            config = FastlaneCore::Configuration.create([config_item], {})
+
+            expect(config[:item]).to eq("val default")
+            expect(config.specified?(:item)).to eq(false)
+          end
+
+          it "returns false after the passed in value is cleared" do
+            config = FastlaneCore::Configuration.create([config_item], { item: "val cli" })
+            config.set(:item, nil)
+
+            expect(config.specified?(:item)).to eq(false)
           end
         end
 

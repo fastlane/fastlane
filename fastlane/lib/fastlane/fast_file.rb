@@ -18,13 +18,8 @@ module Fastlane
       @path = File.expand_path(path)
       content = File.read(path, encoding: "utf-8")
 
-      # From https://github.com/orta/danger/blob/master/lib/danger/Dangerfile.rb
-      if content.tr!('“”‘’‛', %(""'''))
-        UI.error("Your #{File.basename(path)} has had smart quotes sanitised. " \
-                'To avoid issues in the future, you should not use ' \
-                'TextEdit for editing it. If you are not using TextEdit, ' \
-                'you should turn off smart quotes in your editor of choice.')
-      end
+      warning = FastlaneCore::SmartQuotes.sanitize!(content, path)
+      UI.error(warning) if warning
 
       content.scan(/^\s*require ["'](.*?)["']/).each do |current|
         gem_name = current.last
@@ -206,21 +201,23 @@ module Fastlane
 
         raise ArgumentError, "sh requires :command keyword in argument" if command.nil?
         log = options[:log].nil? ? true : options[:log]
-        FastFile.sh(*command, step_name: options[:step_name], log: log, error_callback: options[:error_callback], &b)
+        FastFile.sh(*command, step_name: options[:step_name], log: log, error_callback: options[:error_callback], stdin: options[:stdin], separate_stderr: options.fetch(:separate_stderr, false), chdir: options[:chdir], &b)
       elsif args.count != 1 && args.last.kind_of?(Hash)
         new_args = args.dup
         options = new_args.pop
         log = options[:log].nil? ? true : options[:log]
-        FastFile.sh(*new_args, step_name: options[:step_name], log: log, error_callback: options[:error_callback], &b)
+        FastFile.sh(*new_args, step_name: options[:step_name], log: log, error_callback: options[:error_callback], stdin: options[:stdin], separate_stderr: options.fetch(:separate_stderr, false), chdir: options[:chdir], &b)
       else
         FastFile.sh(*args, &b)
       end
     end
 
-    def self.sh(*command, step_name: nil, log: true, error_callback: nil, &b)
-      command_header = log ? step_name || Actions.shell_command_from_args(*command) : "shell command"
+    def self.sh(*command, step_name: nil, log: true, error_callback: nil, stdin: nil, separate_stderr: false, chdir: nil, &b)
+      command_header = step_name
+      command_header ||= log ? Actions.shell_command_from_args(*command) : "shell command"
+
       Actions.execute_action(command_header) do
-        Actions.sh_no_action(*command, log: log, error_callback: error_callback, &b)
+        Actions.sh_no_action(*command, log: log, error_callback: error_callback, stdin: stdin, separate_stderr: separate_stderr, chdir: chdir, &b)
       end
     end
 
@@ -276,7 +273,8 @@ module Fastlane
     # @param version [String, Array] Version requirement for repo tags
     # @param dependencies [Array] An optional array of additional Fastfiles in the repository
     # @param cache_path [String] An optional path to a directory where the repository should be cloned into
-    def import_from_git(url: nil, branch: 'HEAD', path: 'fastlane/Fastfile', version: nil, dependencies: [], cache_path: nil) # rubocop:disable Metrics/PerceivedComplexity
+    # @param git_extra_headers [Array] An optional array of custom HTTP headers to access the git repo (`Authorization: Basic <YOUR BASE64 KEY>`, `Cache-Control: no-cache`, etc.)
+    def import_from_git(url: nil, branch: 'HEAD', path: 'fastlane/Fastfile', version: nil, dependencies: [], cache_path: nil, git_extra_headers: []) # rubocop:disable Metrics/PerceivedComplexity
       UI.user_error!("Please pass a path to the `import_from_git` action") if url.to_s.length == 0
 
       Actions.execute_action('import_from_git') do
@@ -295,8 +293,6 @@ module Fastlane
         import_block = proc do |target_path|
           clone_folder = File.join(target_path, repo_name)
 
-          branch_option = "--branch #{branch}" if branch != 'HEAD'
-
           checkout_dependencies = dependencies.map(&:shellescape).join(" ")
 
           # If the current call is eligible for caching, we check out all the
@@ -307,12 +303,17 @@ module Fastlane
           if Dir[clone_folder].empty?
             UI.message("Cloning remote git repo...")
             Helper.with_env_values('GIT_TERMINAL_PROMPT' => '0') do
+              command = ['git', 'clone', url, clone_folder, '--no-checkout']
               # When using cached clones, we need the entire repository history
               # so we can switch between tags or branches instantly, or else,
               # it would defeat the caching's purpose.
-              depth = is_eligible_for_caching ? "" : "--depth 1"
-
-              Actions.sh("git clone #{url.shellescape} #{clone_folder.shellescape} #{depth} --no-checkout #{branch_option}")
+              command += ['--depth', '1'] unless is_eligible_for_caching
+              command += ['--branch', branch] unless branch == 'HEAD'
+              FastlaneCore::Secrets.register(git_extra_headers, name: :git_extra_headers)
+              git_extra_headers.each do |header|
+                command += ['--config', "http.extraHeader=#{header}"]
+              end
+              Actions.sh(*command)
             end
           end
 
@@ -324,7 +325,7 @@ module Fastlane
                 # Update the repo and try again before failing
                 UI.message("Updating git repo...")
                 Helper.with_env_values('GIT_TERMINAL_PROMPT' => '0') do
-                  Actions.sh("cd #{clone_folder.shellescape} && git checkout #{branch} && git reset --hard && git pull --all")
+                  Actions.sh("cd #{clone_folder.shellescape} && git checkout #{branch.shellescape} && git reset --hard && git pull --all")
                 end
 
                 checkout_param = find_tag(folder: clone_folder, version: version, remote: false)
@@ -343,7 +344,11 @@ module Fastlane
               # Update the repo if it's eligible for caching but the version isn't specified
               UI.message("Fetching remote git branches and updating git repo...")
               Helper.with_env_values('GIT_TERMINAL_PROMPT' => '0') do
-                Actions.sh("cd #{clone_folder.shellescape} && git fetch --all --quiet && git checkout #{checkout_param.shellescape} #{checkout_path} && git reset --hard && git rebase")
+                command = "cd #{clone_folder.shellescape} && git fetch --all --quiet && git checkout #{checkout_param.shellescape} #{checkout_path} && git reset --hard"
+                # Check if checked out "branch" is actually a branch or a tag
+                current_branch = Actions.sh("cd #{clone_folder.shellescape} && git rev-parse --abbrev-ref HEAD")
+                command << " && git rebase" unless current_branch.strip.eql?("HEAD")
+                Actions.sh(command)
               end
             else
               begin
@@ -394,6 +399,37 @@ module Fastlane
         else
           Dir.mktmpdir("fl_clone", &import_block)
         end
+      end
+    end
+
+    # @param gem_name [String] The name of the gem to import
+    # @param paths [Array] the list of pattern to expand matching fastfiles to import
+    def import_from_gem(gem_name: nil, paths: ["fastlane/Fastfile*"])
+      UI.user_error!("Please pass a gem name to the `import_from_gem` action") if gem_name.to_s.length == 0
+
+      Actions.execute_action('import_from_gem') do
+        action_launched('import_from_gem')
+
+        UI.message("Importing from gem: #{gem_name}")
+        rubygem = Bundler.rubygems.find_name(gem_name).first
+        UI.user_error!("Couldn't find gem '#{gem_name}', make sure it is in your Gemfile") unless rubygem
+
+        # Before its Fastfiles, whose lanes may call the actions of the plugins the gem depends on
+        Fastlane.plugin_manager.load_plugins_required_by(gem_name)
+
+        gem_path = rubygem.full_gem_path
+
+        fastfiles = paths.map { |r| Dir.glob("#{gem_path}/#{r}") }.flatten
+        UI.user_error!("No Fastfile found in gem '#{gem_name}' matching #{paths.join(', ')}") if fastfiles.empty?
+
+        return_value = fastfiles.map do |file_path|
+          UI.message("Importing fastfile from #{file_path}")
+          import(file_path)
+        end
+
+        action_completed('import_from_gem', status: FastlaneCore::ActionCompletionStatus::SUCCESS)
+
+        return_value
       end
     end
 

@@ -9,7 +9,7 @@ about: If something isn't working as expected 🤔
 ### New Issue Checklist
 
 - [ ] Updated fastlane to the latest version
-- [ ] I read the [Contribution Guidelines](https://github.com/fastlane/fastlane/blob/master/CONTRIBUTING.md)
+- [ ] I read the [Contribution Guidelines](https://github.com/fastlane/fastlane/blob/master/docs/CONTRIBUTING.md)
 - [ ] I read [docs.fastlane.tools](https://docs.fastlane.tools)
 - [ ] I searched for [existing GitHub issues](https://github.com/fastlane/fastlane/issues)
 

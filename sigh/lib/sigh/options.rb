@@ -63,6 +63,11 @@ module Sigh
                                      code_gen_sensitive: true,
                                      default_value: CredentialsManager::AppfileConfig.try_fetch_value(:app_identifier),
                                      default_value_dynamic: true),
+        FastlaneCore::ConfigItem.new(key: :offline_profile,
+                                     env_name: "SIGH_OFFLINE_PROFILE",
+                                     description: "Enable profile with 'Offline Support' (7 day validity). Requires Apple ID login, not supported with App Store Connect API key authentication",
+                                     is_string: false,
+                                     default_value: false),
 
         # App Store Connect API
         FastlaneCore::ConfigItem.new(key: :api_key_path,
@@ -190,6 +195,7 @@ module Sigh
                                      env_name: "SIGH_PROVISIONING_PROFILE_TEMPLATE_NAME",
                                      description: "The name of provisioning profile template. If the developer account has provisioning profile templates (aka: custom entitlements), the template name can be found by inspecting the Entitlements drop-down while creating/editing a provisioning profile (e.g. \"Apple Pay Pass Suppression Development\")",
                                      optional: true,
+                                     deprecated: "Removed since May 2025 on App Store Connect API OpenAPI v3.8.0 - Learn more: https://docs.fastlane.tools/actions/match/#managed-capabilities",
                                      default_value: nil),
         FastlaneCore::ConfigItem.new(key: :fail_on_name_taken,
                                      env_name: "SIGH_FAIL_ON_NAME_TAKEN",

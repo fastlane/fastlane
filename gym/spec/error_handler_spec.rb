@@ -1,4 +1,8 @@
 describe Gym do
+  before do
+    fake_out_build_settings(GYM_BUILD_SETTINGS)
+  end
+
   before(:all) do
     options = { project: "./gym/examples/multipleSchemes/Example.xcodeproj" }
     @config = FastlaneCore::Configuration.create(Gym::Options.available_options, options)
@@ -11,11 +15,58 @@ describe Gym do
 %)
   end
 
+  describe Gym::ErrorHandler, requires_xcode: true do
+    context "when naming the build log has to read the build settings" do
+      # When only exporting with `output_name` given, nothing has read them before the export fails
+      let(:project) { FastlaneCore::Project.new(project: "./gym/examples/multipleSchemes/Example.xcodeproj", scheme: "Example") }
+
+      before do
+        allow(Gym).to receive(:config).and_return(FastlaneCore::Configuration.create(Gym::Options.available_options, { scheme: "Example", output_name: "App", buildlog_path: Dir.mktmpdir }))
+        allow(Gym).to receive(:project).and_return(project)
+        allow(project).to receive(:build_settings).and_raise(FastlaneCore::Interface::FastlaneDependencyCausedException, "xcodebuild -showBuildSettings timed out")
+      end
+
+      it "still reports the package failure when fetching them times out" do
+        expect(UI).to receive(:build_failure!).with("Error packaging up the application", error_info: @output)
+        Gym::ErrorHandler.handle_package_error(@output)
+      end
+    end
+
+    context "when the SDK can't be read from the build settings" do
+      let(:project) { FastlaneCore::Project.new(project: "./gym/examples/multipleSchemes/Example.xcodeproj", disallow_xcodebuild_settings_lookup: true) }
+
+      before do
+        allow(Gym).to receive(:config).and_return(FastlaneCore::Configuration.create(Gym::Options.available_options, {}))
+        allow(Gym).to receive(:project).and_return(project)
+        allow(Gym::BuildCommandGenerator).to receive(:xcodebuild_log_path).and_return("missing.log")
+        expect(FastlaneCore::Project).not_to receive(:run_command)
+      end
+
+      it "still reports the build failure when fetching build settings is disallowed" do
+        expect(UI).to receive(:build_failure!).with("Error building the application - see the log above", error_info: @output)
+        Gym::ErrorHandler.handle_build_error(@output)
+      end
+
+      it "still reports the package failure when fetching build settings is disallowed" do
+        expect(UI).to receive(:build_failure!).with("Error packaging up the application", error_info: @output)
+        Gym::ErrorHandler.handle_package_error(@output)
+      end
+
+      it "still reports the build failure when fetching build settings times out" do
+        allow(project).to receive(:build_settings).and_raise(FastlaneCore::Interface::FastlaneDependencyCausedException, "xcodebuild -showBuildSettings timed out")
+
+        expect(UI).to receive(:build_failure!).with("Error building the application - see the log above", error_info: @output)
+        Gym::ErrorHandler.handle_build_error(@output)
+      end
+    end
+  end
+
   describe Gym::ErrorHandler, requires_xcodebuild: true do
     before(:each) { Gym.config = @config }
 
     def mock_gym_path(content)
       log_path = "log_path"
+      allow(File).to receive(:exist?).and_call_original
       expect(File).to receive(:exist?).with(log_path).and_return(true)
       allow(Gym::BuildCommandGenerator).to receive(:xcodebuild_log_path).and_return(log_path)
       expect(File).to receive(:read).with(log_path).and_return(content)
@@ -53,6 +104,17 @@ Code signing is required for product type 'Application' in SDK 'iOS 11.0'
       expect(UI).to receive(:command_output).at_least(:once) # as this is called multiple times before
 
       Gym::ErrorHandler.handle_build_error(code_signing_output)
+    end
+
+    it "prints the error even if it's not in the last 5 lines" do
+      buried_error_output = "error: buried here\n" + (1..10).map { |i| "warning #{i}" }.join("\n")
+      mock_gym_path(buried_error_output)
+
+      expect(UI).to receive(:command_output).with("error: buried here")
+      expect(UI).to receive(:command_output).at_least(5).times
+      expect(UI).to receive(:build_failure!)
+
+      Gym::ErrorHandler.handle_build_error(buried_error_output)
     end
 
     it "prints mismatch between the export_method and the selected profiles only once" do
