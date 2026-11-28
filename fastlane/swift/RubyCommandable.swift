@@ -1,5 +1,5 @@
 // RubyCommandable.swift
-// Copyright (c) 2023 FastlaneTools
+// Copyright (c) 2026 FastlaneTools
 
 //
 //  ** NOTE **
@@ -32,12 +32,13 @@ protocol RubyCommandable {
 
 extension RubyCommandable {
     var json: String {
+        let token = ArgumentProcessor.serverToken.map { ", \"token\": \"\($0)\"" } ?? ""
         return """
-        { "commandType": "\(type.token)", "command": \(commandJson) }
+        { "commandType": "\(type.token)", "command": \(commandJson)\(token) }
         """
     }
 }
 
 // Please don't remove the lines below
 // They are used to detect outdated files
-// FastlaneRunnerAPIVersion [0.9.2]
+// FastlaneRunnerAPIVersion [0.9.3]

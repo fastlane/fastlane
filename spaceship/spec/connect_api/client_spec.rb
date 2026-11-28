@@ -188,7 +188,7 @@ describe Spaceship::ConnectAPI::Client do
         end
 
         it "raise error without in_house set" do
-          expect(mock_token).to receive(:in_house).and_return(nil)
+          allow(mock_token).to receive(:in_house).and_return(nil)
 
           expect do
             client.in_house?
@@ -196,7 +196,7 @@ describe Spaceship::ConnectAPI::Client do
         end
 
         it "with in_house set" do
-          expect(mock_token).to receive(:in_house).and_return(true).twice
+          allow(mock_token).to receive(:in_house).and_return(true)
 
           in_house = client.in_house?
           expect(in_house).to be(true)

@@ -167,7 +167,7 @@ module Fastlane
                                        optional: true),
           FastlaneCore::ConfigItem.new(key: :github,
                                        env_name: "FL_SLATHER_GITHUB_ENABLED", # The name of the environment variable
-                                       description: "Tell slather that it is running on Github Actions",
+                                       description: "Tell slather that it is running on GitHub Actions",
                                        type: Boolean,
                                        optional: true),
           FastlaneCore::ConfigItem.new(key: :buildkite,

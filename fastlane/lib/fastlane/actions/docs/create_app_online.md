@@ -10,8 +10,7 @@ _produce_ creates new iOS apps on both the Apple Developer Portal and App Store 
 
 <p align="center">
     <a href="#features">Features</a> &bull;
-    <a href="#usage">Usage</a> &bull;
-    <a href="#how-does-it-work">How does it work?</a>
+    <a href="#usage">Usage</a>
 </p>
 
 -------
@@ -26,7 +25,7 @@ _produce_ creates new iOS apps on both the Apple Developer Portal and App Store 
 - **Associate** apps with iCloud Containers on the Apple Developer Portal
 - **Create** Merchant Identifiers on the Apple Developer Portal
 - **Associate** apps with Merchant Identifiers on the Apple Developer Portal
-- Support for **multiple Apple accounts**, storing your credentials securely in the Keychain
+- Support for **multiple Apple accounts**
 
 # Usage
 
@@ -138,10 +137,11 @@ fastlane produce enable_services --help
 --associated-domains                  Enable Associated Domains
 --auto-fill-credential                Enable Auto Fill Credential
 --class-kit                           Enable Class Kit
---icloud STRING                        Enable iCloud, suitable values are "xcode5_compatible" and "xcode6_compatible"
+--icloud STRING                       Enable iCloud, suitable values are "xcode5_compatible" and "xcode6_compatible"
 --custom-network-protocol             Enable Custom Network Protocol
 --data-protection STRING              Enable Data Protection, suitable values are "complete", "unlessopen" and "untilfirstauth"
 --extended-virtual-address-space      Enable Extended Virtual Address Space
+--declared-age-range                  Enable Declared Age Range capability
 --game-center STRING                  Enable Game Center, suitable values are "ios" and "macos
 --health-kit                          Enable Health Kit
 --hls-interstitial-preview            Enable Hls Interstitial Preview
@@ -201,10 +201,11 @@ fastlane produce disable_services --help
 --associated-domains                  Disable Associated Domains
 --auto-fill-credential                Disable Auto Fill Credential
 --class-kit                           Disable Class Kit
---icloud STRING                        Disable iCloud
+--icloud STRING                       Disable iCloud
 --custom-network-protocol             Disable Custom Network Protocol
 --data-protection STRING              Disable Data Protection
 --extended-virtual-address-space      Disable Extended Virtual Address Space
+--declared-age-range                  Disable Declared Age Range capability
 --game-center STRING                  Disable Game Center
 --health-kit                          Disable Health Kit
 --hls-interstitial-preview            Disable Hls Interstitial Preview
@@ -302,7 +303,7 @@ lane :release do
     app_version: '1.0',
     sku: '123',
     team_name: 'SunApps GmbH', # only necessary when in multiple teams
-    
+
     # Optional
     # App services can be enabled during app creation
     enable_services: {
@@ -317,6 +318,7 @@ lane :release do
       car_play_navigation_app: "on",            # Valid values: "on", "off"
       car_play_voip_calling_app: "on",          # Valid values: "on", "off"
       class_kit: "on",                          # Valid values: "on", "off"
+      declared_age_range: "on",                 # Valid values: "on", "off"
       icloud: "xcode5_compatible",              # Valid values: "xcode5_compatible", "xcode6_compatible", "off"
       critical_alerts: "on",                    # Valid values: "on", "off"
       custom_network_protocol: "on",            # Valid values: "on", "off"

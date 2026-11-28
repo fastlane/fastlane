@@ -1,7 +1,6 @@
 require 'babosa'
 require 'faraday' # HTTP Client
 require 'faraday-cookie_jar'
-require 'faraday_middleware'
 require 'logger'
 require 'tmpdir'
 require 'cgi'
@@ -38,7 +37,7 @@ module Spaceship
     attr_accessor :user_email
 
     # The logger in which all requests are logged
-    # /tmp/spaceship[time]_[pid].log by default
+    # <tmpdir>/spaceship[time]_[pid].log by default
     attr_accessor :logger
 
     attr_accessor :csrf_tokens
@@ -219,14 +218,14 @@ module Spaceship
         c.use(Spaceship::StatsMiddleware)
         c.adapter(Faraday.default_adapter)
 
-        if ENV['SPACESHIP_DEBUG']
+        if Spaceship::Globals.env_truthy?('SPACESHIP_DEBUG')
           # for debugging only
           # This enables tracking of networking requests using Charles Web Proxy
           c.proxy = "https://127.0.0.1:8888"
           c.ssl[:verify_mode] = OpenSSL::SSL::VERIFY_NONE
         elsif ENV["SPACESHIP_PROXY"]
           c.proxy = ENV["SPACESHIP_PROXY"]
-          c.ssl[:verify_mode] = OpenSSL::SSL::VERIFY_NONE if ENV["SPACESHIP_PROXY_SSL_VERIFY_NONE"]
+          c.ssl[:verify_mode] = OpenSSL::SSL::VERIFY_NONE if Spaceship::Globals.env_truthy?("SPACESHIP_PROXY_SSL_VERIFY_NONE")
         end
 
         if ENV["DEBUG"]
@@ -240,14 +239,21 @@ module Spaceship
     #####################################################
 
     # The logger in which all requests are logged
-    # /tmp/spaceship[time]_[pid]_["threadid"].log by default
+    # <tmpdir>/spaceship[time]_[pid]_["threadid"].log by default
+    #
+    # Dir.tmpdir rather than a literal "/tmp", and it should stay that way:
+    # "/tmp" is not a directory on every platform Ruby runs on. On Windows it
+    # resolves against the current drive, so Logger.new raises Errno::ENOENT
+    # unless something else happens to have created it first.
     def logger
       unless @logger
-        if ENV["VERBOSE"]
+        if Spaceship::Globals.env_truthy?("VERBOSE")
           @logger = Logger.new(STDOUT)
         else
           # Log to file by default
-          path = "/tmp/spaceship#{Time.now.to_i}_#{Process.pid}_#{Thread.current.object_id}.log"
+          path = File.join(Dir.tmpdir, "spaceship#{Time.now.to_i}_#{Process.pid}_#{Thread.current.object_id}.log")
+          # The log holds every request and response body: create it readable by its owner only
+          File.open(path, File::WRONLY | File::CREAT | File::APPEND, 0o600) {}
           @logger = Logger.new(path)
         end
 
@@ -275,10 +281,12 @@ module Spaceship
     def store_cookie(path: nil)
       path ||= persistent_cookie_path
       FileUtils.mkdir_p(File.expand_path("..", path))
+      File.chmod(0o700, File.expand_path("..", path))
 
       # really important to specify the session to true
       # otherwise myacinfo and more won't be stored
       @cookie.save(path, :yaml, session: true)
+      File.chmod(0o600, path)
       return File.read(path)
     end
 
@@ -429,7 +437,7 @@ module Spaceship
           # which is common, as the session automatically invalidates after x hours (we don't know x)
           # In this case we don't actually care about the exact exception, and why it was failing
           # because either way, we'll have to do a fresh login, where we do the actual error handling
-          puts("Available session is not valid any more. Continuing with normal login.")
+          puts("Available session is not valid anymore. Continuing with normal login.")
         end
       end
       #
@@ -450,6 +458,114 @@ module Spaceship
       return false
     end
 
+    def do_sirp(user, password, modified_cookie)
+      require 'fastlane-sirp'
+      require 'base64'
+
+      client = SIRP::Client.new(2048)
+      a = client.start_authentication
+
+      data = {
+        a: Base64.strict_encode64(to_byte(a)),
+        accountName: user,
+        protocols: ['s2k', 's2k_fo']
+      }
+
+      response = request(:post) do |req|
+        req.url("https://idmsa.apple.com/appleauth/auth/signin/init")
+        req.body = data.to_json
+        req.headers['Content-Type'] = 'application/json'
+        req.headers['X-Requested-With'] = 'XMLHttpRequest'
+        req.headers['X-Apple-Widget-Key'] = self.itc_service_key
+        req.headers['Accept'] = 'application/json, text/javascript'
+        req.headers["Cookie"] = modified_cookie if modified_cookie
+      end
+
+      puts("Received SIRP signin init response: #{response.body}") if Spaceship::Globals.verbose?
+
+      body = response.body
+      unless body.kind_of?(Hash)
+        raise UnexpectedResponse, "Expected JSON response, but got #{body.class}: #{body.to_s[0..1000]}"
+      end
+
+      if body["serviceErrors"]
+        raise UnexpectedResponse, body
+      end
+
+      iterations = body["iteration"]
+      salt = Base64.strict_decode64(body["salt"])
+      b = Base64.strict_decode64(body["b"])
+      c = body["c"]
+      protocol = body["protocol"]
+
+      key_length = 32
+      encrypted_password = pbkdf2(password, salt, iterations, key_length, protocol)
+
+      m1 = client.process_challenge(
+        user,
+        to_hex(encrypted_password),
+        to_hex(salt),
+        to_hex(b),
+        is_password_encrypted: true
+      )
+      m2 = client.H_AMK
+
+      if m1 == false
+        puts("Error processing SIRP challenge") if Spaceship::Globals.verbose?
+        raise SIRPAuthenticationError
+      end
+
+      data = {
+        accountName: user,
+        c: c,
+        m1: Base64.encode64(to_byte(m1)).strip,
+        m2: Base64.encode64(to_byte(m2)).strip,
+        rememberMe: false
+      }
+
+      hashcash = self.fetch_hashcash
+
+      response = request(:post) do |req|
+        req.url("https://idmsa.apple.com/appleauth/auth/signin/complete?isRememberMeEnabled=false")
+        req.body = data.to_json
+        req.headers['Content-Type'] = 'application/json'
+        req.headers['X-Requested-With'] = 'XMLHttpRequest'
+        req.headers['X-Apple-Widget-Key'] = self.itc_service_key
+        req.headers['Accept'] = 'application/json, text/javascript'
+        req.headers["Cookie"] = modified_cookie if modified_cookie
+        req.headers["X-Apple-HC"] = hashcash if hashcash
+      end
+
+      puts("Completed SIRP authentication with status of #{response.status}") if Spaceship::Globals.verbose?
+
+      return response
+    end
+
+    def pbkdf2(password, salt, iterations, key_length, protocol, digest = OpenSSL::Digest::SHA256.new)
+      require 'openssl'
+
+      unless %w[s2k s2k_fo].include?(protocol)
+        raise SIRPAuthenticationError, "Unsupported protocol '#{protocol}' for pbkdf2"
+      end
+
+      password = OpenSSL::Digest::SHA256.digest(password)
+
+      if protocol == 's2k_fo'
+        puts("Using legacy s2k_fo protocol for password digest") if Spaceship::Globals.verbose?
+        password = to_hex(password)
+      end
+
+      OpenSSL::PKCS5.pbkdf2_hmac(password, salt, iterations, key_length, digest)
+    end
+
+    def to_hex(str)
+      str.unpack1('H*')
+    end
+
+    def to_byte(str)
+      [str].pack('H*')
+    end
+
     # This method is used for both the Apple Dev Portal and App Store Connect
     # This will also handle 2 step verification and 2 factor authentication
     #
@@ -464,12 +580,6 @@ module Spaceship
 
       # If the session is valid no need to attempt to generate a new one.
       return true if has_valid_session
-
-      data = {
-        accountName: user,
-        password: password,
-        rememberMe: true
-      }
 
       begin
         # The below workaround is only needed for 2 step verified machines
@@ -491,22 +601,7 @@ module Spaceship
           modified_cookie.gsub!(unescaped_important_cookie, escaped_important_cookie)
         end
 
-        # Fixes issue https://github.com/fastlane/fastlane/issues/21071
-        # On 2023-02-23, Apple added a custom implementation
-        # of hashcash to their auth flow
-        # hashcash = nil
-        hashcash = self.fetch_hashcash
-
-        response = request(:post) do |req|
-          req.url("https://idmsa.apple.com/appleauth/auth/signin")
-          req.body = data.to_json
-          req.headers['Content-Type'] = 'application/json'
-          req.headers['X-Requested-With'] = 'XMLHttpRequest'
-          req.headers['X-Apple-Widget-Key'] = self.itc_service_key
-          req.headers['Accept'] = 'application/json, text/javascript'
-          req.headers["Cookie"] = modified_cookie if modified_cookie
-          req.headers["X-Apple-HC"] = hashcash if hashcash
-        end
+        response = perform_login_method(user, password, modified_cookie)
       rescue UnauthorizedAccessError
         raise InvalidUserCredentialsError.new, "Invalid username and password combination. Used '#{user}' as the username."
       end
@@ -514,16 +609,14 @@ module Spaceship
       # Now we know if the login is successful or if we need to do 2 factor
 
       case response.status
-      when 403
-        raise InvalidUserCredentialsError.new, "Invalid username and password combination. Used '#{user}' as the username."
       when 200
-        fetch_olympus_session
+        fetch_olympus_session_after_signin
         return response
       when 409
         # 2 step/factor is enabled for this account, first handle that
         handle_two_step_or_factor(response)
         # and then get the olympus session
-        fetch_olympus_session
+        fetch_olympus_session_after_signin
         return true
       else
         if (response.body || "").include?('invalid="true"')
@@ -552,6 +645,40 @@ module Spaceship
     end
     # rubocop:enable Metrics/PerceivedComplexity
 
+    def perform_login_method(user, password, modified_cookie)
+      do_legacy_signin = Spaceship::Globals.env_truthy?('FASTLANE_USE_LEGACY_PRE_SIRP_AUTH')
+      if do_legacy_signin
+        puts("Starting legacy Apple ID login") if Spaceship::Globals.verbose?
+
+        # Fixes issue https://github.com/fastlane/fastlane/issues/21071
+        # On 2023-02-23, Apple added a custom implementation
+        # of hashcash to their auth flow
+        # hashcash = nil
+        hashcash = self.fetch_hashcash
+
+        data = {
+          accountName: user,
+          password: password,
+          rememberMe: true
+        }
+
+        return request(:post) do |req|
+          req.url("https://idmsa.apple.com/appleauth/auth/signin")
+          req.body = data.to_json
+          req.headers['Content-Type'] = 'application/json'
+          req.headers['X-Requested-With'] = 'XMLHttpRequest'
+          req.headers['X-Apple-Widget-Key'] = self.itc_service_key
+          req.headers['Accept'] = 'application/json, text/javascript'
+          req.headers["Cookie"] = modified_cookie if modified_cookie
+          req.headers["X-Apple-HC"] = hashcash if hashcash
+        end
+      else
+        # Fixes issue https://github.com/fastlane/fastlane/issues/26368#issuecomment-2424190032
+        puts("Starting SIRP Apple ID login") if Spaceship::Globals.verbose?
+        return do_sirp(user, password, modified_cookie)
+      end
+    end
+
     def fetch_hashcash
       response = request(:get, "https://idmsa.apple.com/appleauth/auth/signin?widgetKey=#{self.itc_service_key}")
       headers = response.headers
@@ -565,6 +692,16 @@ module Spaceship
       end
 
       return Spaceship::Hashcash.make(bits: bits, challenge: challenge)
+    end
+
+    # Apple accepts a stale key for the sign in and 2FA, and only refuses the
+    # session afterwards, with a 401 that says nothing about the key.
+    def fetch_olympus_session_after_signin
+      fetch_olympus_session
+    rescue UnauthorizedAccessError
+      raise unless service_key_from_cache?
+
+      raise UnauthorizedAccessError.new, "App Store Connect refused the session after signing in. The App Store Connect API key came from the cache at #{itc_service_key_path} and may be stale: delete that file and try again."
     end
 
     # Get the `itctx` from the new (22nd May 2017) API endpoint "olympus"
@@ -596,28 +733,147 @@ module Spaceship
       exit(has_valid_session)
     end
 
+    # <fastlane_user_dir>/spaceship_itc_service_key.txt: per user, and kept between
+    # runs. Dir.tmpdir (#30197) is shared by every user on Linux, and a literal
+    # "/tmp" is not a directory on Windows.
+    def itc_service_key_path
+      File.join(fastlane_user_dir, "spaceship_itc_service_key.txt")
+    end
+
+    # Read on every login from GET /logout -> 302 Location: .../signout?widgetKey=<key>.
+    # A stale key only fails after 2FA, so the cache is just a fallback. See fastlane#30291.
     def itc_service_key
       return @service_key if @service_key
 
-      # Check if we have a local cache of the key
-      itc_service_key_path = "/tmp/spaceship_itc_service_key.txt"
-      return File.read(itc_service_key_path) if File.exist?(itc_service_key_path)
+      key = fetch_service_key_from_signout
+      if key.nil?
+        cached = cached_service_key
+        return @service_key = cached if cached
 
+        key = fetch_service_key_from_olympus
+      end
+
+      cache_service_key(key)
+      @service_key = key
+    end
+
+    def service_key_from_cache?
+      @service_key_from_cache == true
+    end
+
+    # Reading the cache is best effort: an unreadable cache is a reason to
+    # fetch the key again, not to fail.
+    def cached_service_key
+      return nil unless File.exist?(itc_service_key_path)
+
+      key = File.read(itc_service_key_path)
+      @service_key_from_cache = true
+      logger.warn("Using the cached App Store Connect API key from #{itc_service_key_path}")
+      key
+    rescue SystemCallError => ex
+      logger.warn("Could not read the cached App Store Connect API key: #{ex.message}")
+      nil
+    end
+
+    # Best effort as well: having the key and failing to save it is not a reason
+    # to fail the login. See fastlane#30198.
+    def cache_service_key(key)
+      File.write(itc_service_key_path, key)
+    rescue SystemCallError => ex
+      logger.warn("Could not cache the App Store Connect API key: #{ex.message}")
+    end
+
+    # The source Apple documented, removed in September 2026 and answering 404
+    # since. Kept as the last fallback in case it comes back. See fastlane#30199.
+    def fetch_service_key_from_olympus
       # Fixes issue https://github.com/fastlane/fastlane/issues/13281
       # Even though we are using https://appstoreconnect.apple.com, the service key needs to still use a
       # hostname through itunesconnect.apple.com
-      response = request(:get, "https://appstoreconnect.apple.com/olympus/v1/app/config?hostname=itunesconnect.apple.com")
-      @service_key = response.body["authServiceKey"].to_s
+      response = begin
+        request(:get, "https://appstoreconnect.apple.com/olympus/v1/app/config?hostname=itunesconnect.apple.com")
+      rescue Faraday::TimeoutError, Faraday::ConnectionFailed => ex
+        # The only case the old message was ever right about.
+        raise AppleTimeoutError.new, "Could not reach App Store Connect to fetch the API key: #{ex.message}"
+      end
 
-      raise "Service key is empty" if @service_key.length == 0
+      extract_service_key(response)
+    end
 
-      # Cache the key locally
-      File.write(itc_service_key_path, @service_key)
+    # Read the key out of the sign out redirect, or nil if it is not there.
+    #
+    # Two things about this request matter, and neither is decoration.
+    #
+    # It sends no cookies. The redirect it returns points at a signout with
+    # `asop=destroy-session`, so asking for it over the client's own connection,
+    # which carries the session jar, would end the session this method is being
+    # called in order to establish. A bare Faraday connection has neither a
+    # cookie jar nor redirect following, which is exactly what is wanted here.
+    #
+    # It does not follow the redirect. The key is in the Location header;
+    # following it is what performs the signout.
+    #
+    # Failure returns nil rather than raising, so the caller falls through to
+    # the other source rather than this becoming a new single point of failure.
+    # Deliberately not `self.class.client` or anything built from it. A bare
+    # Faraday connection has no cookie jar and no redirect following, which is
+    # the whole point; the spec asserts both rather than trusting this comment.
+    def signout_connection
+      Faraday.new(url: "https://appstoreconnect.apple.com")
+    end
 
-      return @service_key
-    rescue => ex
-      puts(ex.to_s)
-      raise AppleTimeoutError.new, "Could not receive latest API key from App Store Connect, this might be a server issue."
+    def fetch_service_key_from_signout
+      response = signout_connection.head("/logout")
+
+      location = response.headers["location"].to_s
+      return nil if location.empty?
+
+      query = URI.parse(location).query
+      return nil if query.nil?
+
+      key = CGI.parse(query)["widgetKey"].first.to_s
+      return nil if key.empty?
+
+      logger.debug("Read the App Store Connect API key from the sign out redirect")
+      key
+    rescue Faraday::Error, URI::InvalidURIError => ex
+      # Only what this request can be expected to go wrong with. Rescuing
+      # everything here would put back the problem fastlane#30198 is about: a
+      # local failure, a missing log directory being the one that started it,
+      # would be swallowed and the caller would be handed whatever the fallback
+      # said instead of the real cause.
+      #
+      # Warn rather than debug. This is the source the key normally comes from,
+      # so failing here means the run is about to depend on a cached key that may
+      # be stale, or on an endpoint Apple has already removed once. If the
+      # fallback fails too, its message is all the caller sees, and this line is
+      # the half that says why.
+      logger.warn("Could not read the App Store Connect API key from the sign out redirect, falling back to the cache or the olympus endpoint: #{ex.message}")
+      nil
+    end
+
+    # The status matters, and used to be thrown away. A non 2xx response body is
+    # an HTML error page rather than JSON, and String#[] on it returns nil for
+    # the key being looked up, so the failure presented as an empty key no
+    # matter what had actually gone wrong. See fastlane#30199.
+    def extract_service_key(response)
+      status = response.status.to_i
+      body = response.body
+
+      unless (200..299).cover?(status)
+        detail = body.to_s.strip[0, 200]
+        message = "App Store Connect returned #{status} for the API key endpoint."
+        message += " #{detail}" unless detail.empty?
+
+        # 5xx and 429 are worth retrying, a 4xx is not, and with_retry decides
+        # that from the class rather than the message.
+        raise AppleTimeoutError.new, "#{message} This might be a temporary server error, check https://developer.apple.com/system-status/" if status >= 500
+        raise UnexpectedResponse.new, message
+      end
+
+      key = body.kind_of?(Hash) ? body["authServiceKey"].to_s : ""
+      raise UnexpectedResponse.new, "App Store Connect returned #{status} for the API key endpoint but no authServiceKey in the response." if key.empty?
+
+      key
     end
 
     #####################################################
@@ -628,6 +884,8 @@ module Spaceship
       begin
         if File.exist?(persistent_cookie_path)
           puts("Loading session from '#{persistent_cookie_path}'") if Spaceship::Globals.verbose?
+          File.chmod(0o700, File.expand_path("..", persistent_cookie_path))
+          File.chmod(0o600, persistent_cookie_path)
           @cookie.load(persistent_cookie_path)
           return true
         end
@@ -683,7 +941,10 @@ module Spaceship
     # @!group Helpers
     #####################################################
 
-    def with_retry(tries = 5, &_block)
+    # Errors the net_http adapter wraps in Faraday::ConnectionFailed before the request is sent
+    UNSENT_REQUEST_ERRORS = [SocketError, Errno::ECONNREFUSED, Errno::EHOSTUNREACH, Errno::ENETUNREACH, Errno::EADDRNOTAVAIL, Net::OpenTimeout].freeze
+
+    def with_retry(tries = 5, resend: true, &_block)
       return yield
     rescue \
         Faraday::ConnectionFailed,
@@ -692,6 +953,8 @@ module Spaceship
         AppleTimeoutError,
         GatewayTimeoutError,
         AccessForbiddenError => ex
+      # Apple may have processed a request that failed after it was sent; a 403 was refused
+      raise ex unless resend || ex.kind_of?(AccessForbiddenError) || unsent_request?(ex)
       tries -= 1
       unless tries.zero?
         msg = "Timeout received: '#{ex.class}', '#{ex.message}'. Retrying after 3 seconds (remaining: #{tries})..."
@@ -716,6 +979,7 @@ module Spaceship
     rescue \
         Faraday::ParsingError, # <h2>Internal Server Error</h2> with content type json
         InternalServerError => ex
+      raise ex unless resend
       tries -= 1
       unless tries.zero?
         msg = "Internal Server Error received: '#{ex.class}', '#{ex.message}'. Retrying after 3 seconds (remaining: #{tries})..."
@@ -743,6 +1007,10 @@ module Spaceship
       raise ex # re-raise the exception
     end
 
+    def unsent_request?(ex)
+      ex.kind_of?(Faraday::ConnectionFailed) && UNSENT_REQUEST_ERRORS.any? { |error| ex.wrapped_exception.kind_of?(error) }
+    end
+
     # memorize the last csrf tokens from responses
     def csrf_tokens
       @csrf_tokens || {}
@@ -752,7 +1020,7 @@ module Spaceship
       @additional_headers || {}
     end
 
-    def request(method, url_or_path = nil, params = nil, headers = {}, auto_paginate = false, &block)
+    def request(method, url_or_path = nil, params = nil, headers = {}, auto_paginate = false, resend: true, &block)
       headers.merge!(csrf_tokens)
       headers.merge!(additional_headers)
       headers['User-Agent'] = USER_AGENT
@@ -769,7 +1037,7 @@ module Spaceship
       response = if auto_paginate
                    send_request_auto_paginate(method, url_or_path, params, headers, &block)
                  else
-                   send_request(method, url_or_path, params, headers, &block)
+                   send_request(method, url_or_path, params, headers, resend: resend, &block)
                  end
 
       return response
@@ -892,7 +1160,7 @@ module Spaceship
 
     def log_response(method, url, response, headers = nil, &block)
       url ||= extract_key_from_block('url', &block)
-      body = response.body.kind_of?(String) ? response.body.force_encoding(Encoding::UTF_8) : response.body
+      body = response.body.kind_of?(String) ? response.body.dup.force_encoding(Encoding::UTF_8) : response.body
       logger.debug("<< #{method.upcase} #{url}: #{response.status} #{body}")
     end
 
@@ -924,23 +1192,35 @@ module Spaceship
 
     # Actually sends the request to the remote server
     # Automatically retries the request up to 3 times if something goes wrong
-    def send_request(method, url_or_path, params, headers, &block)
-      with_retry do
+    def send_request(method, url_or_path, params, headers, resend: true, &block)
+      with_retry(resend: resend) do
         response = @client.send(method, url_or_path, params, headers, &block)
         log_response(method, url_or_path, response, headers, &block)
 
         handle_error(response)
 
-        if response.body.to_s.include?("<title>302 Found</title>")
+        # Error pages are HTML; converting a parsed JSON or plist body to a string for each check is slow on large responses
+        body = response.body.kind_of?(String) ? response.body : ""
+
+        if body.include?("<title>302 Found</title>")
           raise AppleTimeoutError.new, "Apple 302 detected - this might be temporary server error, check https://developer.apple.com/system-status/ to see if there is a known downtime"
         end
 
-        if response.body.to_s.include?("<h3>Bad Gateway</h3>")
+        if body.include?("<h3>Bad Gateway</h3>")
           raise BadGatewayError.new, "Apple 502 detected - this might be temporary server error, try again later"
+        end
+
+        if body.include?("<title>503 Service Temporarily Unavailable</title>") || body.include?("<h1>503 Service Temporarily Unavailable</h1>")
+          raise AppleTimeoutError.new, "Apple 503 detected - this might be temporary server error, check https://developer.apple.com/system-status/ to see if there is a known downtime"
         end
 
         return response
       end
+    end
+
+    # signin/init, signin/complete, and the legacy signin
+    def sign_in_request?(response)
+      response.env.url.host == "idmsa.apple.com" && response.env.url.path.start_with?("/appleauth/auth/signin")
     end
 
     def handle_error(response)
@@ -950,11 +1230,20 @@ module Spaceship
         logger.warn(msg)
         raise UnauthorizedAccessError.new, "Unauthorized Access"
       when 403
+        # A refused sign-in, e.g. a locked Apple ID: like do_sirp, raise what Apple said, which with_retry does not retry. See fastlane#14387.
+        raise UnexpectedResponse, response.body if sign_in_request?(response) && response.body.kind_of?(Hash) && response.body["serviceErrors"]
+
         msg = "Access forbidden"
         logger.warn(msg)
         raise AccessForbiddenError.new, msg
       when 429
         raise TooManyRequestsError, response.to_hash
+      when 502
+        raise BadGatewayError.new, "Apple 502 detected - this might be temporary server error, try again later"
+      when 503
+        raise AppleTimeoutError.new, "Apple 503 detected - this might be temporary server error, check https://developer.apple.com/system-status/ to see if there is a known downtime"
+      when 504
+        raise GatewayTimeoutError.new, "Apple 504 detected - this might be temporary server error, try again later"
       end
     end
 

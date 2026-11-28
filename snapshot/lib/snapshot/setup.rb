@@ -12,10 +12,7 @@ module Snapshot
         template_path = "#{Snapshot::ROOT}/lib/assets/SnapfileTemplate"
         snapfile_path = File.join(path, 'Snapfile')
       end
-      snapshot_helper_filename = "SnapshotHelperXcode8.swift"
-      if Helper.xcode_at_least?("9.0")
-        snapshot_helper_filename = "SnapshotHelper.swift"
-      end
+      snapshot_helper_filename = "SnapshotHelper.swift"
 
       if File.exist?(snapfile_path)
         if print_instructions_on_failure
@@ -34,7 +31,7 @@ module Snapshot
       puts("✅  Successfully created #{snapshot_helper_filename} '#{File.join(path, snapshot_helper_filename)}'".green)
       puts("✅  Successfully created new Snapfile at '#{snapfile_path}'".green)
       puts("-------------------------------------------------------".yellow)
-      print_instructions(snapshot_helper_filename: snapshot_helper_filename, snapfile_path: snapfile_path)
+      print_instructions(snapshot_helper_filename: snapshot_helper_filename)
     end
 
     def self.print_instructions(snapshot_helper_filename: nil)

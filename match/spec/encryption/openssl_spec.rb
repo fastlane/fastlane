@@ -59,5 +59,77 @@ describe Match do
       @e.decrypt_files
       expect(File.binread(@full_path)).to eq(@content)
     end
+
+    describe "behavior of force_legacy_encryption parameter" do
+
+      before do
+        @match_encryption_double = instance_double(Match::Encryption::MatchFileEncryption)
+
+        expect(Match::Encryption::MatchFileEncryption)
+          .to(receive(:new))
+          .and_return(@match_encryption_double)
+      end
+
+      it "defaults to false and uses v2 encryption" do
+        expect(@match_encryption_double)
+          .to(receive(:encrypt))
+          .with(file_path: anything, password: anything, version: 2)
+
+        @e.encrypt_files
+      end
+
+      it "uses v1 when force_legacy_encryption is true" do
+        enc = Match::Encryption::OpenSSL.new(
+          keychain_name: @git_url,
+          working_directory: @directory,
+          force_legacy_encryption: true
+        )
+
+        expect(@match_encryption_double)
+          .to(receive(:encrypt))
+          .with(file_path: anything, password: anything, version: 1)
+
+        enc.encrypt_files
+      end
+
+      it "uses v2 when force_legacy_encryption is false" do
+        enc = Match::Encryption::OpenSSL.new(
+          keychain_name: @git_url,
+          working_directory: @directory,
+          force_legacy_encryption: false
+        )
+
+        expect(@match_encryption_double)
+          .to(receive(:encrypt))
+          .with(file_path: anything, password: anything, version: 2)
+
+        enc.encrypt_files
+      end
+    end
+
+    describe "storing the passphrase in the keychain" do
+      before { FastlaneCore::StoredPasswords.reset_warnings! }
+
+      it "does not store the passphrase unless asked to" do
+        expect(Security::InternetPassword).not_to receive(:add)
+        @e.store_password("new passphrase")
+      end
+
+      it "stores the passphrase when FASTLANE_STORE_PASSWORDS_IN_KEYCHAIN is set" do
+        stub_const('ENV', { "FASTLANE_STORE_PASSWORDS_IN_KEYCHAIN" => "1" })
+        expect(Security::InternetPassword).to receive(:add).with("match_#{@git_url}", "", "new passphrase")
+        @e.store_password("new passphrase")
+      end
+
+      it "warns once that a stored passphrase was read" do
+        stub_const('ENV', {})
+        allow(Security::InternetPassword).to receive(:find).with(server: "match_#{@git_url}").and_return(double("item", password: "stored passphrase"))
+        allow(FastlaneCore::UI).to receive(:important)
+        expect(FastlaneCore::UI).to receive(:important).with(/any program running as you can read/).once
+
+        expect(@e.send(:fetch_password!)).to eq("stored passphrase")
+        @e.send(:fetch_password!)
+      end
+    end
   end
 end

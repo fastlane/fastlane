@@ -22,6 +22,7 @@ module Match
       attr_reader :team_name
       attr_reader :api_key_path
       attr_reader :api_key
+      attr_reader :skip_certificate_matching
       attr_reader :api_v4_url
 
       def self.configure(params)
@@ -48,7 +49,8 @@ module Match
           team_name: params[:team_name],
           api_key_path: params[:api_key_path],
           api_key: params[:api_key],
-          gitlab_host: params[:gitlab_host]
+          gitlab_host: params[:gitlab_host],
+          skip_certificate_matching: params[:skip_certificate_matching]
         )
       end
 
@@ -62,7 +64,9 @@ module Match
                      team_name: nil,
                      api_key_path: nil,
                      api_key: nil,
-                     gitlab_host: nil)
+                     gitlab_host: nil,
+                     skip_certificate_matching: nil)
+        @skip_certificate_matching = skip_certificate_matching
 
         @readonly = readonly
         @username = username
@@ -120,6 +124,8 @@ module Match
           return self.team_id
         else
           UI.user_error!("The `team_id` option is required. fastlane cannot automatically determine portal team id via the App Store Connect API (yet)") if self.team_id.to_s.empty?
+          # `match import --skip_certificate_matching` has no access to the Developer Portal
+          return self.team_id if self.skip_certificate_matching
 
           spaceship = SpaceshipEnsure.new(self.username, self.team_id, self.team_name, api_token)
           return spaceship.team_id
@@ -132,7 +138,7 @@ module Match
         return api_token
       end
 
-      # Returns a short string describing + identifing the current
+      # Returns a short string describing + identifying the current
       # storage backend. This will be printed when nuking a storage
       def human_readable_description
         "GitLab Secure Files Storage [#{self.project_id}]"

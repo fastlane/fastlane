@@ -1,4 +1,5 @@
 require_relative '../model'
+
 module Spaceship
   class ConnectAPI
     class User
@@ -56,19 +57,22 @@ module Spaceship
         CUSTOMER_SUPPORT = "CUSTOMER_SUPPORT"
       end
 
+      # Not at the top: connect_api loads user_invitation.rb, which reads UserRole while it loads
+      require_relative '../../connect_api'
+
       #
       # API
       #
 
-      def self.all(client: nil, filter: {}, includes: ESSENTIAL_INCLUDES, limit: nil, sort: nil)
+      def self.all(client: nil, filter: {}, includes: ESSENTIAL_INCLUDES, limit: Spaceship::ConnectAPI::MAX_OBJECTS_PER_PAGE_LIMIT, sort: nil)
         client ||= Spaceship::ConnectAPI
-        resps = client.get_users(filter: filter, includes: includes).all_pages
+        resps = client.get_users(filter: filter, includes: includes, limit: limit, sort: sort).all_pages
         return resps.flat_map(&:to_models)
       end
 
       def self.find(client: nil, email: nil, includes: ESSENTIAL_INCLUDES)
         client ||= Spaceship::ConnectAPI
-        return all(client: client, filter: { email: email }, includes: includes)
+        return all(client: client, filter: { username: email }, includes: includes)
       end
 
       # @param client [ConnectAPI] ConnectAPI client.

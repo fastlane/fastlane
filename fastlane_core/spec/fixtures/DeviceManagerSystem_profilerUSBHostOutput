@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  `system_profiler SPUSBHostDataType -xml` on macOS 26.7, where SPUSBDataType lists no devices:
+  an iPad behind two USB hubs. Values are made up; the keys and the nesting are as macOS prints them.
+-->
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<array>
+	<dict>
+		<key>_dataType</key>
+		<string>SPUSBHostDataType</string>
+		<key>_items</key>
+		<array>
+			<dict>
+				<key>Driver</key>
+				<string>AppleT8132USBXHCI</string>
+				<key>USBKeyHardwareType</key>
+				<string>Built-in</string>
+				<key>USBKeyLocationID</key>
+				<string>0x01000000</string>
+				<key>_items</key>
+				<array>
+					<dict>
+						<key>USBDeviceKeyProductID</key>
+						<string>0x2817</string>
+						<key>USBDeviceKeySerialNumber</key>
+						<string>000000000000</string>
+						<key>USBDeviceKeyVendorID</key>
+						<string>0x2109</string>
+						<key>USBKeyHardwareType</key>
+						<string>Removable</string>
+						<key>_items</key>
+						<array>
+							<dict>
+								<key>USBDeviceKeyProductID</key>
+								<string>0x2817</string>
+								<key>USBDeviceKeySerialNumber</key>
+								<string>000000000001</string>
+								<key>USBDeviceKeyVendorID</key>
+								<string>0x2109</string>
+								<key>USBKeyHardwareType</key>
+								<string>Removable</string>
+								<key>_items</key>
+								<array>
+									<dict>
+										<key>USBDeviceKeyProductID</key>
+										<string>0x12ab</string>
+										<key>USBDeviceKeyProductVersion</key>
+										<string>17.00</string>
+										<key>USBDeviceKeySerialNumber</key>
+										<string>00008103000A1B2C3D4E5F60</string>
+										<key>USBDeviceKeyVendorID</key>
+										<string>0x05ac</string>
+										<key>USBDeviceKeyVendorName</key>
+										<string>Apple Inc.</string>
+										<key>USBKeyHardwareType</key>
+										<string>Removable</string>
+										<key>_name</key>
+										<string>iPad</string>
+									</dict>
+								</array>
+								<key>_name</key>
+								<string>USB2.0 Hub</string>
+							</dict>
+						</array>
+						<key>_name</key>
+						<string>USB 2.0 Hub</string>
+					</dict>
+				</array>
+				<key>_name</key>
+				<string>USB 3.1 Bus</string>
+			</dict>
+		</array>
+	</dict>
+</array>
+</plist>

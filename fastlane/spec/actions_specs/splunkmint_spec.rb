@@ -183,6 +183,11 @@ describe Fastlane do
         expect(result).not_to(include('-x '))
         expect(result).not_to(include('--proxy-user'))
       end
+
+      it "is deprecated because the service was retired" do
+        expect(Fastlane::Actions.is_deprecated?(Fastlane::Actions::SplunkmintAction)).to eq(true)
+        expect(Fastlane::Actions::SplunkmintAction.deprecated_notes).to include("End of Life in December 2021")
+      end
     end
   end
 end

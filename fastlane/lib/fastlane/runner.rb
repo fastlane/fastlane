@@ -40,13 +40,13 @@ module Fastlane
       return_val = nil
 
       path_to_use = FastlaneCore::FastlaneFolder.path || Dir.pwd
-      parameters ||= {}
+      parameters ||= {} # by default no parameters
       begin
         Dir.chdir(path_to_use) do # the file is located in the fastlane folder
           execute_flow_block(before_all_blocks, current_platform, current_lane, parameters)
           execute_flow_block(before_each_blocks, current_platform, current_lane, parameters)
 
-          return_val = lane_obj.call(parameters) # by default no parameters
+          return_val = lane_obj.call(parameters)
 
           # after blocks are only called if no exception was raised before
           # Call the platform specific after block and then the general one
@@ -124,7 +124,7 @@ module Fastlane
 
     # This is being called from `method_missing` from the Fastfile
     # It's also used when an action is called from another action
-    # @param from_action Indicates if this action is being trigged by another action.
+    # @param from_action Indicates if this action is being triggered by another action.
     #                    If so, it won't show up in summary.
     def trigger_action_by_name(method_sym, custom_dir, from_action, *arguments)
       # First, check if there is a predefined method in the actions folder
@@ -135,6 +135,7 @@ module Fastlane
         if class_ref.respond_to?(:alias_used)
           orig_action = method_sym.to_s
           arguments = [{}] if arguments.empty?
+          arguments[0] = arguments.first.dup if arguments.first.kind_of?(String) # alias_used may change it, and it can be a literal from the Fastfile
           class_ref.alias_used(orig_action, arguments.first)
         end
       end
@@ -151,13 +152,10 @@ module Fastlane
         # built-in actions
       end
 
+      # Both lookups above only return classes that respond to `run`
       if class_ref
-        if class_ref.respond_to?(:run)
-          # Action is available, now execute it
-          return self.execute_action(method_sym, class_ref, arguments, custom_dir: custom_dir, from_action: from_action)
-        else
-          UI.user_error!("Action '#{method_sym}' of class '#{class_name}' was found, but has no `run` method.")
-        end
+        # Action is available, now execute it
+        return self.execute_action(method_sym, class_ref, arguments, custom_dir: custom_dir, from_action: from_action)
       end
 
       # No lane, no action, let's at least show the correct error message

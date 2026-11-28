@@ -1,4 +1,4 @@
-require_relative '../model'
+require_relative '../../connect_api'
 require_relative './bundle_id_capability'
 module Spaceship
   class ConnectAPI
@@ -39,9 +39,9 @@ module Spaceship
       # API
       #
 
-      def self.all(client: nil, filter: {}, includes: nil, fields: nil, limit: nil, sort: nil)
+      def self.all(client: nil, filter: {}, includes: nil, fields: nil, limit: Spaceship::ConnectAPI::MAX_OBJECTS_PER_PAGE_LIMIT, sort: nil)
         client ||= Spaceship::ConnectAPI
-        resps = client.get_bundle_ids(filter: filter, includes: includes, fields: fields, limit: nil, sort: nil).all_pages
+        resps = client.get_bundle_ids(filter: filter, includes: includes, fields: fields, limit: limit, sort: sort).all_pages
         return resps.flat_map(&:to_models)
       end
 
@@ -81,12 +81,26 @@ module Spaceship
         return resp.to_models.first
       end
 
+      # Session clients use the legacy bundleIds PATCH; API-key clients use the endpoints below.
       def update_capability(capability_type, enabled: false, settings: [], client: nil)
         raise "capability_type is required " if capability_type.nil?
 
         client ||= Spaceship::ConnectAPI
-        resp = client.patch_bundle_id_capability(bundle_id_id: id, seed_id: seed_id, enabled: enabled, capability_type: capability_type, settings: settings)
-        return resp.to_models.first
+
+        unless client.token
+          resp = client.patch_bundle_id_capability(bundle_id_id: id, seed_id: seed_id, enabled: enabled, capability_type: capability_type, settings: settings)
+          return resp.to_models.first
+        end
+
+        existing = get_capabilities(client: client).find { |capability| capability.is_type?(capability_type) }
+
+        if enabled
+          return create_capability(capability_type, settings: settings, client: client) unless existing
+          return existing.update!(client: client, settings: settings)
+        else
+          existing&.delete!(client: client)
+          return nil
+        end
       end
     end
   end
