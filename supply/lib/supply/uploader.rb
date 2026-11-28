@@ -137,7 +137,7 @@ module Supply
 
       version_code = release.version_codes.max
 
-      UI.message("Updating #{version_code}'s rollout to '#{Supply.config[:rollout]}' on track '#{Supply.config[:track]}'...")
+      UI.message("Updating #{version_code}'s rollout to '#{Supply.config[:rollout]}' in track '#{Supply.config[:track]}'...")
 
       if track && release
         rollout = Supply.config[:rollout]
