@@ -378,6 +378,24 @@ module Deliver
       return Time.at(time_in_s_to_hour).utc.strftime("%Y-%m-%dT%H:%M:%S%:z")
     end
 
+    # Locales present only on App Store Connect that still need default values.
+    def app_store_locales
+      app = Deliver.cache[:app]
+      return [] unless app
+
+      platform = Spaceship::ConnectAPI::Platform.map(options[:platform])
+      version = if options[:edit_live]
+                  app.get_live_app_store_version(platform: platform) || fetch_edit_app_store_version(app, platform)
+                else
+                  fetch_edit_app_store_version(app, platform)
+                end
+      app_info = options[:edit_live] ? fetch_live_app_info(app) : fetch_edit_app_info(app)
+
+      locales = version&.get_app_store_version_localizations&.map(&:locale) || []
+      locales += app_info&.get_app_info_localizations&.map(&:locale) || []
+      locales.compact
+    end
+
     # If the user is using the 'default' language, then assign values where they are needed
     def assign_defaults
       # Normalizes languages keys from symbols to strings
@@ -399,6 +417,11 @@ module Deliver
       ignore_validation = options[:ignore_language_directory_validation]
       Loader.language_folders(options[:metadata_path], ignore_validation).each do |lang_folder|
         enabled_languages << lang_folder.basename unless enabled_languages.include?(lang_folder.basename)
+      end
+
+      # Locales that exist only on App Store Connect also need the default values.
+      app_store_locales.each do |locale|
+        enabled_languages << locale unless enabled_languages.include?(locale)
       end
 
       return unless enabled_languages.include?("default")
