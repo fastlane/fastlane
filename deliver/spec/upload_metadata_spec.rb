@@ -115,6 +115,102 @@ describe Deliver::UploadMetadata do
     end
   end
 
+  describe "#review_attachment_file" do
+    let(:uploader) { Deliver::UploadMetadata.new(options) }
+    let(:version) { double("version") }
+    let(:app_store_review_detail) { double("app_store_review_detail") }
+    let(:existing_attachment) { double("app_store_review_attachment") }
+    let(:attachment_path) { File.join(tmpdir, "review_attachment.pdf") }
+
+    context "with skip_app_review_attachment set to true" do
+      context "without app_review_attachment_file" do
+        let(:options) { { skip_app_review_attachment: true } }
+
+        it "does not fetch, upload or delete review attachments" do
+          expect(version).not_to(receive(:fetch_app_store_review_detail))
+          expect(app_store_review_detail).not_to(receive(:upload_attachment))
+          expect(existing_attachment).not_to(receive(:delete!))
+
+          uploader.send("review_attachment_file", version)
+        end
+      end
+
+      context "with app_review_attachment_file" do
+        let(:options) { { skip_app_review_attachment: true, app_review_attachment_file: attachment_path } }
+
+        it "ignores the file and does not fetch, upload or delete review attachments" do
+          expect(version).not_to(receive(:fetch_app_store_review_detail))
+          expect(app_store_review_detail).not_to(receive(:upload_attachment))
+          expect(existing_attachment).not_to(receive(:delete!))
+
+          uploader.send("review_attachment_file", version)
+        end
+      end
+    end
+
+    [nil, false].each do |skip_value|
+      context "with skip_app_review_attachment set to #{skip_value.inspect}" do
+        before do
+          allow(version).to receive(:fetch_app_store_review_detail).and_return(app_store_review_detail)
+          allow(app_store_review_detail).to receive(:app_store_review_attachments).and_return([existing_attachment])
+        end
+
+        context "without app_review_attachment_file" do
+          let(:options) { { skip_app_review_attachment: skip_value } }
+
+          it "removes the existing review attachments" do
+            expect(existing_attachment).to receive(:delete!)
+            expect(app_store_review_detail).not_to(receive(:upload_attachment))
+
+            uploader.send("review_attachment_file", version)
+          end
+        end
+
+        context "with app_review_attachment_file" do
+          let(:options) { { skip_app_review_attachment: skip_value, app_review_attachment_file: attachment_path } }
+
+          it "replaces the existing review attachments with the file" do
+            expect(existing_attachment).to receive(:delete!)
+            expect(app_store_review_detail).to receive(:upload_attachment).with(path: attachment_path)
+
+            uploader.send("review_attachment_file", version)
+          end
+        end
+      end
+    end
+  end
+
+  describe "skip_app_review_attachment option" do
+    it "defaults to false" do
+      FastlaneSpec::Env.with_env_values('DELIVER_SKIP_APP_REVIEW_ATTACHMENT' => nil) do
+        config = FastlaneCore::Configuration.create(Deliver::Options.available_options, {})
+        expect(config[:skip_app_review_attachment]).to eq(false)
+      end
+    end
+
+    it "is read as a boolean from DELIVER_SKIP_APP_REVIEW_ATTACHMENT" do
+      FastlaneSpec::Env.with_env_values('DELIVER_SKIP_APP_REVIEW_ATTACHMENT' => 'true') do
+        config = FastlaneCore::Configuration.create(Deliver::Options.available_options, {})
+        expect(config[:skip_app_review_attachment]).to eq(true)
+      end
+
+      FastlaneSpec::Env.with_env_values('DELIVER_SKIP_APP_REVIEW_ATTACHMENT' => 'false') do
+        config = FastlaneCore::Configuration.create(Deliver::Options.available_options, {})
+        expect(config[:skip_app_review_attachment]).to eq(false)
+      end
+    end
+
+    it "takes precedence over app_review_attachment_file set from DELIVER_APP_REVIEW_ATTACHMENT_FILE" do
+      FastlaneSpec::Env.with_env_values('DELIVER_SKIP_APP_REVIEW_ATTACHMENT' => 'true', 'DELIVER_APP_REVIEW_ATTACHMENT_FILE' => File.join(tmpdir, "review_attachment.pdf")) do
+        config = FastlaneCore::Configuration.create(Deliver::Options.available_options, {})
+        version = double("version")
+        expect(version).not_to(receive(:fetch_app_store_review_detail))
+
+        Deliver::UploadMetadata.new(config).send("review_attachment_file", version)
+      end
+    end
+  end
+
   describe "#review_information" do
     let(:options) { { metadata_path: tmpdir, app_review_information: app_review_information } }
     let(:version) { double("version") }
@@ -153,6 +249,15 @@ describe Deliver::UploadMetadata do
         })
 
         expect(FastlaneCore::UI).to receive(:message).with("Uploading app review information to App Store Connect")
+
+        uploader.send("review_information", version)
+      end
+
+      it "still sets review information and notes with skip_app_review_attachment" do
+        options[:skip_app_review_attachment] = true
+
+        expect(version).to receive(:fetch_app_store_review_detail).and_return(app_store_review_detail)
+        expect(app_store_review_detail).to receive(:update).with(attributes: hash_including("notes" => app_review_information[:notes]))
 
         uploader.send("review_information", version)
       end
@@ -348,6 +453,37 @@ describe Deliver::UploadMetadata do
 
           # Update app info
           expect(app_info).to receive(:update_categories).with(category_id_map: {})
+
+          uploader.upload
+        end
+
+        it "saves metadata and review information without touching review attachments with skip_app_review_attachment" do
+          options[:platform] = "ios"
+          options[:metadata_path] = metadata_path
+          options[:name] = { "en-US" => "App name" }
+          options[:description] = { "en-US" => "App description" }
+          options[:version_check_wait_retry_limit] = 5
+          options[:skip_app_review_attachment] = true
+          options[:app_review_attachment_file] = File.join(metadata_path, "review_attachment.pdf")
+
+          expect(Spaceship::ConnectAPI).to receive(:get_app_store_versions).and_return(app_store_versions)
+          expect(version).to receive(:update).with(attributes: {})
+          expect(app_info).to receive(:get_app_info_localizations).and_return([app_info_localization_en])
+          expect(app_info_localization_en).to receive(:name).and_return('App Name')
+          expect(version_localization_en).to receive(:update).with(attributes: {
+            "description" => options[:description]["en-US"]
+          })
+          expect(app_info_localization_en).to receive(:update).with(attributes: {
+            "name" => options[:name]["en-US"]
+          })
+          expect(app_info).to receive(:update_categories).with(category_id_map: {})
+
+          # Review information (including notes) is still processed
+          expect(uploader).to receive(:review_information).with(version)
+
+          # Review attachments are left untouched
+          expect(uploader).to receive(:review_attachment_file).with(version).and_call_original
+          expect(version).not_to(receive(:fetch_app_store_review_detail))
 
           uploader.upload
         end
