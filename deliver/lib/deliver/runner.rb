@@ -56,13 +56,15 @@ module Deliver
         return
       end
 
+      pricing = UploadPriceTier.new.prepare(options)
+
       verify_version if options[:app_version].to_s.length > 0 && !options[:skip_app_version_update]
 
       # Rejecting before upload meta
       # Screenshots cannot be updated or deleted if the app is in the "waiting for review" state
       reject_version_if_possible if options[:reject_if_possible]
 
-      upload_metadata
+      upload_metadata(pricing)
 
       has_binary = (options[:ipa] || options[:pkg])
       if !options[:skip_binary_upload] && !options[:build_number] && has_binary
@@ -143,7 +145,7 @@ module Deliver
     end
 
     # Upload all metadata, screenshots, pricing information, etc. to App Store Connect
-    def upload_metadata
+    def upload_metadata(pricing = UploadPriceTier.new.prepare(options))
       # App clip experience metadata upload must happen before the upload metadata step. The app
       # clip app store review detail upload depends on there being a valid app clip default
       # experience on the edit version.
@@ -184,7 +186,7 @@ module Deliver
         previews.sync_from_path
       end
 
-      UploadPriceTier.new.upload(options)
+      pricing&.call
     end
 
     # Verify the binary with App Store Connect

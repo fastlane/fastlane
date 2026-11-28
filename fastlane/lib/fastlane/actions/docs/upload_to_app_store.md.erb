@@ -214,11 +214,18 @@ force(true)
 If set to `true`, no HTML report will be generated before the actual upload. You can also pass `--force` when calling _deliver_.
 
 
-##### price_tier
-Pass the price tier as number. This will be active from the current day.
-```ruby-skip-tests
-price_tier 0
+##### App pricing
+
+Use one pricing option per upload. Set `price_tier: 0` for free, or pass a decimal string such as `price: "0.99"` for US$0.99 when the base territory is USA. Nonzero legacy tiers are unsupported. The change takes effect immediately. Existing country overrides are retained. Manage changes to a scheduled base price in App Store Connect.
+
+Pricing uses the app's existing base territory. For initial pricing, `price_base_territory` selects the base territory and defaults to USA when Apple supplies none. Storefront availability is configured separately.
+
+If multiple points have the same customer price, choose the app-specific ID with `price_point_id`. To list the points for a US base territory, run the following command.
+
+```no-highlight
+fastlane spaceship api GET "/v1/apps/<app id>/appPricePoints?filter[territory]=USA" --paginate
 ```
+
 ##### trade_representative_contact_information
 Trade Representative Contact information for Korean App Store. Available options: `first_name`, `last_name`, `address_line1`, `address_line2`, `address_line3`, `city_name`, `state`, `country`, `postal_code`, `phone_number`, `email_address`, `is_displayed_on_app_store`.
 

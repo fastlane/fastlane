@@ -256,12 +256,7 @@ module Deliver
                                     default_value: false),
 
         # other app configuration
-        FastlaneCore::ConfigItem.new(key: :price_tier,
-                                     short_option: "-r",
-                                     env_name: "DELIVER_PRICE_TIER",
-                                     description: "The price tier of this application",
-                                     type: Integer,
-                                     optional: true),
+        *pricing_options,
         FastlaneCore::ConfigItem.new(key: :app_rating_config_path,
                                      short_option: "-g",
                                      env_name: "DELIVER_APP_RATING_CONFIG_PATH",
@@ -522,6 +517,47 @@ module Deliver
                                      description: "The (spaceship) app ID of the app you want to use/modify",
                                      optional: true,
                                      type: Integer)
+      ]
+    end
+
+    def self.pricing_options
+      [
+        FastlaneCore::ConfigItem.new(key: :price_tier,
+                                     short_option: "-r",
+                                     env_name: "DELIVER_PRICE_TIER",
+                                     description: "Set 0 for a free app. For paid apps use price or price_point_id",
+                                     type: Integer,
+                                     conflicting_options: [:price, :price_point_id],
+                                     optional: true,
+                                     verify_block: proc do |value|
+                                       UI.user_error!("Apple no longer supports numeric paid price tiers. Use price or price_point_id instead") unless value == 0
+                                     end),
+        FastlaneCore::ConfigItem.new(key: :price,
+                                     env_name: "DELIVER_PRICE",
+                                     description: "Immediate customer price as a decimal string in the base territory's currency, such as '0.99' for USA",
+                                     type: String,
+                                     conflicting_options: [:price_tier, :price_point_id],
+                                     optional: true,
+                                     verify_block: proc do |value|
+                                       UI.user_error!("price must be a decimal string such as '0.99'") unless value.match?(/\A[0-9]+(?:\.[0-9]+)?\z/)
+                                     end),
+        FastlaneCore::ConfigItem.new(key: :price_point_id,
+                                     env_name: "DELIVER_PRICE_POINT_ID",
+                                     description: "App-specific App Store Connect price point ID in the base territory",
+                                     type: String,
+                                     conflicting_options: [:price_tier, :price],
+                                     optional: true,
+                                     verify_block: proc do |value|
+                                       UI.user_error!("price_point_id must not be empty") if value.strip.empty?
+                                     end),
+        FastlaneCore::ConfigItem.new(key: :price_base_territory,
+                                     env_name: "DELIVER_PRICE_BASE_TERRITORY",
+                                     description: "Pricing base territory ID, such as USA. Uses the existing base territory, or USA for initial pricing",
+                                     type: String,
+                                     optional: true,
+                                     verify_block: proc do |value|
+                                       UI.user_error!("price_base_territory must be a three-letter territory ID, such as USA") unless value.match?(/\A[A-Z]{3}\z/)
+                                     end)
       ]
     end
   end

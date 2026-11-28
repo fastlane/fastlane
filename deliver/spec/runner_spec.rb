@@ -308,6 +308,52 @@ describe Deliver::Runner do
     end
   end
 
+  describe 'pricing preflight' do
+    around do |example|
+      FastlaneSpec::Env.with_env_values(
+        'DELIVER_PRICE_TIER' => nil,
+        'DELIVER_PRICE_POINT_ID' => nil,
+        'DELIVER_PRICE_BASE_TERRITORY' => nil,
+        'DELIVER_PRICE' => nil
+      ) { example.run }
+    end
+
+    def expect_no_uploads
+      expect(runner).not_to receive(:verify_version)
+      expect(runner).not_to receive(:reject_version_if_possible)
+      expect(runner).not_to receive(:upload_metadata)
+      expect(runner).not_to receive(:upload_binary)
+      expect(runner).not_to receive(:submit_for_review)
+    end
+
+    it 'rejects an unmatched customer price before creating or rejecting a version' do
+      app = Spaceship::ConnectAPI::App.new('app-id', {})
+      allow(Deliver).to receive(:cache).and_return(app: app)
+      allow(app).to receive(:fetch_app_price_schedule).and_return(nil)
+      allow(app).to receive(:get_app_price_points).with(filter: { territory: 'USA' }).and_return([])
+      options.merge!(price: '1.23', reject_if_possible: true)
+      expect_no_uploads
+      expect { runner.run }.to raise_error(FastlaneCore::Interface::FastlaneError, /No matching price point/)
+    end
+
+    it 'rejects a decimal price from the environment and a point ID from the Deliverfile' do
+      FastlaneSpec::Env.with_env_values('DELIVER_PRICE' => '0.99') do
+        config = FastlaneCore::Configuration.create(Deliver::Options.available_options, {})
+        config.config_file_options = { price_point_id: 'paid-point' }
+        runner.options = config
+        expect_no_uploads
+        expect { runner.run }.to raise_error(FastlaneCore::Interface::FastlaneError, /price and price_point_id/)
+      end
+    end
+
+    it 'does not validate unused pricing options when only verifying a binary' do
+      options.merge!(verify_only: true, price: '0.99', price_tier: 0)
+      expect_no_uploads
+      expect(runner).to receive(:verify_binary)
+      runner.run
+    end
+  end
+
   describe :precheck_app do
     let(:precheck_runner) { instance_double(Precheck::Runner) }
 
