@@ -8,8 +8,13 @@ module Match
   class Options
     # This is match specific, as users can append storage specific options
     def self.append_option(option)
-      self.available_options # to ensure we created the initial `@available_options` array
-      @available_options << option
+      appended_options << option
+      # Plugins that memoize `available_options` (secrets_manager_storage 1.1.1) keep their list in `@available_options`
+      @available_options << option if @available_options
+    end
+
+    def self.appended_options
+      @appended_options ||= []
     end
 
     def self.default_platform
@@ -392,7 +397,7 @@ module Match
                                      verify_block: proc do |value|
                                        FastlaneCore::Globals.verbose = true if value
                                      end)
-      ]
+      ] + appended_options
     end
   end
   # rubocop:enable Metrics/ClassLength
