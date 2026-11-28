@@ -182,6 +182,18 @@ Example content (for more advanced setups check out the [fastlane section](#fast
 s3_bucket("ios-certificates")
 ```
 
+#### Storage plugins
+
+A [plugin](https://docs.fastlane.tools/plugins/create-plugin/) can add a storage mode: it registers a storage class implementing `Match::Storage::Interface`, an encryption backend (a block returning `nil` for none), and the options its storage reads.
+
+```ruby-skip-tests
+Match::Storage.register_backend(type: "my_storage", storage_class: MyStorage)
+Match::Encryption.register_backend(type: "my_storage") { nil }
+Match::Options.append_option(FastlaneCore::ConfigItem.new(key: :my_storage_bucket, description: "...", optional: true))
+```
+
+Plugins are loaded with your `Fastfile`, so use the new `storage_mode` with the _match_ action in a lane: `fastlane match` does not load plugins.
+
 ### Multiple teams
 
 _match_ can store the codesigning files for multiple development teams:
