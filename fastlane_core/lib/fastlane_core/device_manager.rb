@@ -94,7 +94,7 @@ module FastlaneCore
 
         if device_uuids.count > 0 # xctrace takes a little while to return so skip it if we have no devices
           xctrace_devices_output = ''
-          Open3.popen3("xctrace list devices") do |stdin, stdout, stderr, wait_thr|
+          Open3.popen3("xcrun xctrace list devices") do |stdin, stdout, stderr, wait_thr|
             xctrace_devices_output = stdout.read
           end
 

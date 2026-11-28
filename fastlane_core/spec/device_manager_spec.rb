@@ -311,7 +311,7 @@ describe FastlaneCore do
       expect(Open3).to receive(:popen3).with("system_profiler SPUSBDataType -xml").and_yield(nil, response, nil, nil)
 
       expect(response).to receive(:read).and_return(@xctrace_output)
-      expect(Open3).to receive(:popen3).with("xctrace list devices").and_yield(nil, response, nil, nil)
+      expect(Open3).to receive(:popen3).with("xcrun xctrace list devices").and_yield(nil, response, nil, nil)
 
       devices = FastlaneCore::DeviceManager.connected_devices('iOS')
       expect(devices.count).to eq(2)
@@ -346,7 +346,7 @@ describe FastlaneCore do
       expect(Open3).to receive(:popen3).with("system_profiler SPUSBDataType -xml").and_yield(nil, response, nil, nil)
 
       expect(response).to receive(:read).and_return(@xctrace_output)
-      expect(Open3).to receive(:popen3).with("xctrace list devices").and_yield(nil, response, nil, nil)
+      expect(Open3).to receive(:popen3).with("xcrun xctrace list devices").and_yield(nil, response, nil, nil)
 
       devices = FastlaneCore::DeviceManager.connected_devices('iOS')
       expect(devices.count).to eq(1)
@@ -364,7 +364,7 @@ describe FastlaneCore do
       expect(Open3).to receive(:popen3).with("system_profiler SPUSBDataType -xml").and_yield(nil, response, nil, nil)
 
       expect(response).to receive(:read).and_return(@xctrace_output)
-      expect(Open3).to receive(:popen3).with("xctrace list devices").and_yield(nil, response, nil, nil)
+      expect(Open3).to receive(:popen3).with("xcrun xctrace list devices").and_yield(nil, response, nil, nil)
 
       devices = FastlaneCore::DeviceManager.connected_devices('tvOS')
       expect(devices.count).to eq(1)
@@ -383,7 +383,7 @@ describe FastlaneCore do
       expect(Open3).to receive(:popen3).with("system_profiler SPUSBDataType -xml").and_yield(nil, response, nil, nil)
 
       expect(response).to receive(:read).and_return(@xctrace_output)
-      expect(Open3).to receive(:popen3).with("xctrace list devices").and_yield(nil, response, nil, nil)
+      expect(Open3).to receive(:popen3).with("xcrun xctrace list devices").and_yield(nil, response, nil, nil)
 
       expect(response).to receive(:read).and_return(@simctl_output)
       expect(Open3).to receive(:popen3).with("xcrun simctl list devices").and_yield(nil, response, nil, nil)
@@ -435,7 +435,7 @@ describe FastlaneCore do
       expect(Open3).to receive(:popen3).with("system_profiler SPUSBDataType -xml").and_yield(nil, response, nil, nil)
 
       expect(response).to receive(:read).and_return(@xctrace_output)
-      expect(Open3).to receive(:popen3).with("xctrace list devices").and_yield(nil, response, nil, nil)
+      expect(Open3).to receive(:popen3).with("xcrun xctrace list devices").and_yield(nil, response, nil, nil)
 
       expect(response).to receive(:read).and_return(@simctl_output)
       expect(Open3).to receive(:popen3).with("xcrun simctl list devices").and_yield(nil, response, nil, nil)
