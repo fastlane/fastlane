@@ -352,19 +352,14 @@ module Fastlane
               end
             else
               begin
-                is_checked_out = Actions.sh("cd #{clone_folder.shellescape} && git diff --name-only #{version}").strip.empty?
-              rescue
-                is_checked_out = false
-              end
-
-              begin
                 # https://stackoverflow.com/a/1593574/865175
                 current_tag = Actions.sh("cd #{clone_folder.shellescape} && git describe --exact-match --tags HEAD").strip
               rescue
                 current_tag = nil
               end
 
-              if !is_checked_out || current_tag != version
+              # A fresh `--no-checkout` clone is already at the tag but has no files yet
+              if current_tag != checkout_param || !File.exist?(File.join(clone_folder, path))
                 Actions.sh("cd #{clone_folder.shellescape} && git checkout #{checkout_param.shellescape} #{checkout_path}")
               end
             end
